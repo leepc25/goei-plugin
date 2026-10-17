@@ -302,6 +302,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .gx-sidecol .gx-sec { padding: 0; }
 .gx-mapbar { display: flex; gap: 8px; align-items: center; }
+/* 임무 탭 (v0.16.21): 지역 고르기 옆에 장소 검색. 결과는 아래로 펼쳐지는 작은 목록 */
+.gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
+.gx-mapfind { position: relative; flex: 1; min-width: 0; }
+.gx-mapfind .gx-search { width: 100%; font-size: 13px; }
+.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.gx-mapsug:empty { display: none; }
+.gx-sugi { display: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
+.gx-sugi:last-child { border-bottom: 0; }
+.gx-sugi:hover, .gx-sugi:focus-visible { background: var(--panel2); outline: none; }
+.gx-sugi small { color: var(--dim); font-size: 12px; }
+.gx-sugnone { margin: 0; padding: 10px 12px; color: var(--dim); font-size: 13px; text-align: center; }
+@media (max-width: 760px) { .gx-mapbar > .gx-select { flex-basis: 38%; } }
 .gx-select, .gx-search {
   min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
   background: var(--void); color: var(--text); font: inherit;
@@ -377,7 +389,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
 .gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .gx-mfilter .gx-chip { flex: none; min-height: 36px; padding: 0 14px; }
-.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; }
+.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; font-size: 13px; }
 .gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
 
 @media (max-width: 760px) {
@@ -1050,7 +1062,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
 .gx-field.gx-map > .gx-mapcol { position: static; }
 .gx-mapcol > .gx-sits { padding: 4px 0 0; }
-.gx-placehint { margin: 0 0 8px; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; text-align: center; }
+/* 상황 필터 줄 (v0.16.21): 고른 장소 칩 + 종류 필터 + 오른쪽 끝 목표 버튼 */
+.gx-placechip { border-color: var(--signal); color: var(--text); font-weight: 600; padding-right: 8px; }
+.gx-placechip svg { width: 14px; height: 14px; color: var(--dim); }
+.gx-placechip:hover svg { color: var(--signal); }
+.gx-goalchip { margin-left: auto; border-style: dashed; color: var(--mint); }
+.gx-goalchip:hover { border-color: var(--signal); }
+.gx-goalchip.on { border-style: solid; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); font-weight: 600; }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
 .gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }

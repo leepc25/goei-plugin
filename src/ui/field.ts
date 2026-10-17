@@ -43,13 +43,15 @@ interface FieldState {
   /** 모바일: 목표 고르기와 편성을 한 화면씩 (PC는 두 칸이라 상관없음) */
   step: 'goal' | 'team';
   query: string;
+  /** 임무 탭 지도 장소 검색 */
+  mapq: string;
   /** 두 번 눌러 확인하는 상황 종료 */
   confirmEnd: string | null;
 }
 
 export const field: FieldState = {
   region: '01', filter: 'all', place: null, target: null, team: [], support: 0,
-  mkind: 'an', mname: null, mpick: 'an', note: '', step: 'goal', query: '', confirmEnd: null,
+  mkind: 'an', mname: null, mpick: 'an', note: '', step: 'goal', query: '', mapq: '', confirmEnd: null,
 };
 
 export interface FieldEnv {
@@ -222,8 +224,38 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
   return `<div class="gx-mapbar">
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc(field.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
     </div>
     <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
+}
+
+/** 지도 장소 검색: 시군구·거점 이름으로 찾아 그 지도로 바로 간다 (v0.16.21) */
+function mapSuggest(c: Catalog): string {
+  const q = field.mapq.trim().toLowerCase();
+  if (!q) return '';
+  const hits: { value: string; name: string; sub: string }[] = [];
+  for (const code of MAP_CODES) {
+    (SIGUN[code] ?? []).forEach((gu, i) => {
+      if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
+    });
+  }
+  for (const lm of c.landmarks) {
+    if (!MAP_CODES.includes(lm.sido)) continue;
+    if (`${lm.name} ${lm.label ?? ''}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}` });
+  }
+  if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
+  return hits
+    .slice(0, 8)
+    .map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc(h.value)}"><b>${esc(h.name)}</b><small>${esc(h.sub)}</small></button>`)
+    .join('');
+}
+
+/** 입력할 때마다 검색 결과만 다시 그린다 (입력 칸은 그대로) */
+export function mapSuggestFor(ctx: ChatContext, q: string): string {
+  field.mapq = q;
+  const x = readCtx(ctx);
+  return typeof x === 'string' ? '' : mapSuggest(x.catalog);
 }
 
 // ── 상황 목록 ──
@@ -255,25 +287,24 @@ function situations(x: Ctx, events: WorldEvent[]): string {
     .join('');
   const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown = events.filter((e) => (field.filter === 'all' || e.kind === field.filter) && (!field.place || placeKey(e, x.catalog) === field.place));
-  let head = '';
+  // 장소를 고르면 필터 줄 맨 앞에 장소 칩(누르면 전체 상황), 줄 끝에 목표 버튼·표시 (v0.16.21: 장소 상자·버튼·안내가 세 줄을 먹었다)
+  let place = '';
+  let goal = '';
   if (field.place) {
-    // 상황이 없는 곳은 고르자마자 목표가 되니 버튼 대신 안내만 (v0.16.18: 눌러도 아무 일 없는 버튼이었다).
-    // 상황이 있는 곳은 상황 대신 장소를 목표로 삼을 때만 버튼
     const here = events.some((e) => placeKey(e, x.catalog) === field.place);
     const self = sameTarget(field.target, field.place);
-    head = `<div class="gx-ctxbar"><b>${esc(placeName(field.place, x.catalog))}</b>
-      <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
-      ${here && !self
-        ? `<button class="gx-wide" data-action="pick-place" data-value="${esc(field.place)}">이 장소 자체를 목표로</button>`
-        : self ? '<p class="gx-placehint">이 장소가 목표로 설정되었습니다.</p>' : ''}`;
+    place = `<button class="gx-chip gx-placechip" data-action="map-unplace" title="전체 상황 보기" aria-label="${esc(placeName(field.place, x.catalog))} 선택 풀기">${esc(placeName(field.place, x.catalog))}${ICONS.close}</button>`;
+    goal = self
+      ? '<span class="gx-chip gx-goalchip on">목표로 설정됨</span>'
+      : here ? `<button class="gx-chip gx-goalchip" data-action="pick-place" data-value="${esc(field.place)}">이 장소를 목표로</button>` : '';
   }
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
     : field.place || field.filter !== 'all'
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
-  return `<div class="gx-chips">${chips}</div>${head}
-    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : head.includes('gx-placehint') ? '' : `<p class="gx-none">${empty}</p>`}`;
+  return `<div class="gx-chips gx-sitbar">${place}${chips}${goal}</div>
+    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${field.place && x.on && field.filter === 'all' ? '이 장소에는 진행 중인 상황이 없어요.' : empty}</p>`}`;
 }
 
 // ── 편성 ──
@@ -364,7 +395,7 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
   return `<main class="gx-body gx-field gx-map" data-step="${field.step}">
     ${stepBar(goal, 'mission')}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}
-      <section class="gx-sec gx-sits"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section></div>
+      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
     <div class="gx-sidecol">
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
       ${teamPanel(x, goal, 'depart', '출발', busy, ctx)}
@@ -425,7 +456,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="${MISSION_LABEL[field.mkind]} 검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색"></div>
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색"></div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
@@ -600,7 +631,16 @@ export async function handleField(action: string, value: string | undefined, ctx
       field.confirmEnd = null;
       env.render();
       return true;
+    case 'map-jump':
     case 'map-place': {
+      let v = value ?? '';
+      if (action === 'map-jump') {
+        const [code, key] = v.split('|');
+        if (!MAP_CODES.includes(code) || !key) return true;
+        field.region = code;
+        field.mapq = '';
+        v = key;
+      }
       field.place = v;
       field.confirmEnd = null;
       const x = readCtx(ctx);

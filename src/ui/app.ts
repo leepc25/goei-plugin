@@ -23,7 +23,7 @@ import { savePhoto } from '../host/photo';
 import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
-import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
+import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
@@ -234,6 +234,11 @@ function ensureRoot(): HTMLElement {
     if (el?.dataset?.input === 'dir') return void directoryInput(el.dataset.key ?? '', el.value, root?.querySelector('.dir-bar') ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
     if (el?.dataset?.input === 'field-note') return void (field.note = el.value);
+    if (el?.dataset?.input === 'map-query' && view.kind === 'started') {
+      const box = root?.querySelector('.gx-mapsug');
+      if (box) box.innerHTML = mapSuggestFor(view.ctx, el.value);
+      return;
+    }
     if (el?.dataset?.input === 'start-note') {
       const had = !!(draft.situation ?? '').trim();
       draft.situation = el.value;

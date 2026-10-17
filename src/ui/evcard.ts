@@ -53,11 +53,10 @@ export function elapsedText(minute: number | null, since: number | null): string
 
 export function evCard(c: EvCard): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : '';
-  const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
-  const kind = `<span class="gx-badge gx-kind k-${c.kind}">${KIND[c.kind]}</span>`;
+  const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}" title="${KIND[c.kind]}${grade ? ` ${esc(grade)}등급` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
   const title = `<span class="gx-evc-name"><b>${esc(c.name)}</b></span>`;
   if (!c.key) {
-    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}<span class="gx-evc-tags">${kind}${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ''}</span></li>`;
+    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ''}</span></li>`;
   }
   const key = esc(c.key);
   const acts = `<span class="gx-evc-act">
@@ -68,5 +67,5 @@ export function evCard(c: EvCard): string {
         : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
   const open = c.open ? ` data-action="${c.open}" data-value="${key}"` : '';
   return `<li class="gx-evc go${c.selected ? ' sel' : ''}"${open}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${kind}${c.badge}${c.chips ?? ''}</span>${c.extra ?? ''}</span></li>`;
+    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ''}</span>${c.extra ?? ''}</span></li>`;
 }
