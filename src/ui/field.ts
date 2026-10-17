@@ -279,6 +279,29 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
   });
 }
 
+/** 고른 장소 카드: 상황 카드와 같은 모양, 오른쪽 위엔 위키만. 누르면 이 장소가 목표 */
+function placeCard(key: string, c: Catalog, on: boolean): string {
+  let name: string;
+  let sub: string;
+  let wiki: string;
+  if (key.startsWith('fac:')) {
+    const lm = c.landmarks.find((l) => l.name === key.slice(4));
+    name = lm?.label || lm?.name || key.slice(4);
+    sub = lm ? `${SIDO_NAME[lm.sido] ?? ''} ${lm.gu}`.trim() : '거점';
+    wiki = lm?.name ?? name;
+  } else {
+    const full = locName(key);
+    const cut = full.lastIndexOf(' ');
+    name = cut > 0 ? full.slice(cut + 1) : full;
+    sub = cut > 0 ? full.slice(0, cut) : '';
+    wiki = full;
+  }
+  const tag = on ? '<span class="gx-badge gx-goaltag">목표</span>' : '';
+  return `<li class="gx-evc go gx-placecard${on ? ' sel' : ''}" data-action="pick-place" data-value="${esc(key)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc(name)}</b>${tag}</span>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(wiki)}" title="위키" aria-label="${esc(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc(sub || '장소')}</small></span></li>`;
+}
+
 function situations(x: Ctx, events: WorldEvent[]): string {
   const counts: Record<Filter, number> = { all: events.length, an: 0, in: 0, ms: 0 };
   for (const e of events) counts[e.kind]++;
@@ -287,24 +310,20 @@ function situations(x: Ctx, events: WorldEvent[]): string {
     .join('');
   const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown = events.filter((e) => (field.filter === 'all' || e.kind === field.filter) && (!field.place || placeKey(e, x.catalog) === field.place));
-  // 장소를 고르면 필터 줄 맨 앞에 장소 칩(누르면 전체 상황), 줄 끝에 목표 버튼·표시 (v0.16.21: 장소 상자·버튼·안내가 세 줄을 먹었다)
+  // 장소를 고르면 목록 맨 앞에 그 장소 카드(누르면 목표), 필터 줄 오른쪽 끝에 선택 취소 (v0.16.21, 사용자 설계)
   let place = '';
-  let goal = '';
+  let cancel = '';
   if (field.place) {
-    const here = events.some((e) => placeKey(e, x.catalog) === field.place);
-    const self = sameTarget(field.target, field.place);
-    place = `<button class="gx-chip gx-placechip" data-action="map-unplace" title="전체 상황 보기" aria-label="${esc(placeName(field.place, x.catalog))} 선택 풀기">${esc(placeName(field.place, x.catalog))}${ICONS.close}</button>`;
-    goal = self
-      ? '<span class="gx-chip gx-goalchip on">목표로 설정됨</span>'
-      : here ? `<button class="gx-chip gx-goalchip" data-action="pick-place" data-value="${esc(field.place)}">이 장소를 목표로</button>` : '';
+    place = placeCard(field.place, x.catalog, sameTarget(field.target, field.place));
+    cancel = '<button class="gx-chip gx-unplace" data-action="map-unplace" title="장소 선택 풀기">취소</button>';
   }
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
     : field.place || field.filter !== 'all'
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
-  return `<div class="gx-chips gx-sitbar">${place}${chips}${goal}</div>
-    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${field.place && x.on && field.filter === 'all' ? '이 장소에는 진행 중인 상황이 없어요.' : empty}</p>`}`;
+  return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
+    ${shown.length || place ? `<ul class="gx-evcs">${place}${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
 }
 
 // ── 편성 ──

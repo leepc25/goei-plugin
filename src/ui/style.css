@@ -1062,13 +1062,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
 .gx-field.gx-map > .gx-mapcol { position: static; }
 .gx-mapcol > .gx-sits { padding: 4px 0 0; }
-/* 상황 필터 줄 (v0.16.21): 고른 장소 칩 + 종류 필터 + 오른쪽 끝 목표 버튼 */
-.gx-placechip { border-color: var(--signal); color: var(--text); font-weight: 600; padding-right: 8px; }
-.gx-placechip svg { width: 14px; height: 14px; color: var(--dim); }
-.gx-placechip:hover svg { color: var(--signal); }
-.gx-goalchip { margin-left: auto; border-style: dashed; color: var(--mint); }
-.gx-goalchip:hover { border-color: var(--signal); }
-.gx-goalchip.on { border-style: solid; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); font-weight: 600; }
+/* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
+.gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.gx-sitbar .gx-chip { flex: none; }
+.gx-unplace { margin-left: auto; }
+.gx-unplace:hover { border-color: var(--line2); color: var(--text); }
+.gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
+.gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
 .gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
@@ -1141,7 +1141,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
 .gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 /* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
-.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
+.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
 .gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-evc.go { cursor: pointer; }
 .gx-evc.go:hover { border-color: var(--line2); }
