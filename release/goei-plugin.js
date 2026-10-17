@@ -1,9 +1,87 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.21
+//@version 0.16.22
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
+// src/host/user.ts
+var USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""></span>';
+var MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif", avif: "image/avif" };
+var cached = { name: "", photo: null };
+var lastSrc = "";
+var SRC_KEY = "goei:user-src";
+function toBytes(data) {
+  if (data instanceof Uint8Array) return data;
+  if (data instanceof ArrayBuffer) return new Uint8Array(data);
+  if (Array.isArray(data)) return new Uint8Array(data);
+  if (data && typeof data === "object") {
+    const values = Object.values(data);
+    if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+  }
+  return null;
+}
+var unescape = (s5) => s5.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+function assetPathOf(src) {
+  const sw = src.match(/\/sw\/img\/([0-9a-f]+)/i);
+  if (sw) {
+    const hex3 = sw[1];
+    const bytes = new Uint8Array(hex3.length / 2);
+    for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex3.slice(i * 2, i * 2 + 2), 16);
+    const path = new TextDecoder().decode(bytes);
+    return path.startsWith("assets/") ? path : null;
+  }
+  let s5 = src;
+  try {
+    s5 = decodeURIComponent(src);
+  } catch {
+  }
+  const m = s5.replace(/\\/g, "/").match(/(?:^|\/)assets\/([^/?#]+)$/);
+  return m ? `assets/${m[1]}` : null;
+}
+async function photoFrom(src) {
+  if (!src) return null;
+  if (src.startsWith("data:")) return src;
+  const path = assetPathOf(src);
+  if (!path) return null;
+  const data = await risuai.readImage(path);
+  if (typeof data === "string") return data.startsWith("data:") ? data : null;
+  const bytes = toBytes(data);
+  if (!bytes?.length) return null;
+  const ext = path.split(".").pop()?.toLowerCase() ?? "";
+  return URL.createObjectURL(new Blob([bytes], { type: MIME[ext] ?? "image/png" }));
+}
+async function readUser() {
+  let name = cached.name;
+  try {
+    const n = String(await risuai.parseRisuChat("{{user}}") ?? "").trim();
+    if (n && n !== "{{user}}") name = n;
+  } catch {
+  }
+  let photo = cached.photo;
+  try {
+    const doc = await risuai.getRootDocument();
+    const box = await doc.querySelector("[data-goei-user]");
+    const html = box ? await box.getInnerHTML() : "";
+    let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
+    if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
+    else if (!src.startsWith("data:")) await risuai.pluginStorage.setItem(SRC_KEY, src).catch(() => {
+    });
+    if (src && src !== lastSrc) {
+      const next = await photoFrom(src);
+      if (next) {
+        if (photo?.startsWith("blob:")) URL.revokeObjectURL(photo);
+        photo = next;
+        lastSrc = src;
+      }
+    }
+  } catch (error) {
+    console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  cached = { name, photo };
+  return cached;
+}
+var userInfo = () => cached;
+
 // src/core/dispatch.ts
 var DirectiveError = class extends Error {
 };
@@ -30,10 +108,10 @@ function parseDirective(lore) {
     destination: ["name", "located"],
     party: ["solo", "group", "support_one", "support_many", "separator", "pair_separator", "last_separator"]
   };
-  for (const [group3, list5] of Object.entries(keys)) {
-    const obj3 = format?.[group3];
-    if (!obj3 || typeof obj3 !== "object") throw new DirectiveError(`Directive FORMAT.${group3}가 없어요.`);
-    for (const k of list5) if (typeof obj3[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group3}.${k}는 문자열이어야 해요.`);
+  for (const [group4, list5] of Object.entries(keys)) {
+    const obj3 = format?.[group4];
+    if (!obj3 || typeof obj3 !== "object") throw new DirectiveError(`Directive FORMAT.${group4}가 없어요.`);
+    for (const k of list5) if (typeof obj3[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group4}.${k}는 문자열이어야 해요.`);
   }
   if (typeof format.user_input !== "string") throw new DirectiveError("Directive FORMAT.user_input은 문자열이어야 해요.");
   for (const name of REQUIRED) if (!sections2[name]) throw new DirectiveError(`Directive의 ${name} 섹션을 확인하세요.`);
@@ -508,9 +586,9 @@ function keysOf(e) {
 function guessEnglish(e) {
   return keysOf(e).find(ascii) ?? "";
 }
-function legacyPlaces(lore, group3) {
+function legacyPlaces(lore, group4) {
   const world = obj2(book(lore, "World catalog"));
-  const rows = Array.isArray(world[group3]) ? world[group3] : [];
+  const rows = Array.isArray(world[group4]) ? world[group4] : [];
   const out = [];
   for (const r of rows) {
     if (!Array.isArray(r) || r.length !== 5) continue;
@@ -578,12 +656,12 @@ function factionDisplayNames(lore) {
   for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
   return { ...extraNames(lore), ...out };
 }
-function groupFaction(group3, names3) {
+function groupFaction(group4, names3) {
   let best = "";
   let len = 0;
   for (const f of FACTIONS) {
     const n = names3[f];
-    if (n && group3.includes(n) && n.length > len) {
+    if (n && group4.includes(n) && n.length > len) {
       best = f;
       len = n.length;
     }
@@ -635,11 +713,11 @@ function buildOrgs(lore, agents, saved) {
   for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
   return out;
 }
-function orgHint(group3, orgs, lore) {
-  if (!group3) return void 0;
-  const code = groupFaction(group3, factionDisplayNames(lore));
+function orgHint(group4, orgs, lore) {
+  if (!group4) return void 0;
+  const code = groupFaction(group4, factionDisplayNames(lore));
   if (code) return orgs.find((o) => o.faction === code);
-  return orgs.find((o) => o.name === group3) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group3.includes(o.name));
+  return orgs.find((o) => o.name === group4) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group4.includes(o.name));
 }
 function assignOrg(a, o) {
   a.affiliation = o ? orgAffiliation(o) : "";
@@ -672,9 +750,9 @@ function readDirectory(lore) {
   const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s2(e.comment)));
   const byLore = new Map(books.filter((e) => !isFolder(e)).map((e) => [s2(e.comment), e]));
   const places = (kind) => {
-    const group3 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
-    const legacy = legacyPlaces(books, group3);
-    const saved = obj2(data?.[group3]);
+    const group4 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
+    const legacy = legacyPlaces(books, group4);
+    const saved = obj2(data?.[group4]);
     const folder = members?.[kind] ?? [];
     const used = /* @__PURE__ */ new Set();
     const legacyLore = /* @__PURE__ */ new Map();
@@ -731,13 +809,13 @@ function readDirectory(lore) {
       rosterFor: Array.isArray(d.roster_for) ? list2(d.roster_for) : base.rosterFor,
       phoneTabs: Array.isArray(d.phone_tabs) ? list2(d.phone_tabs) : base.phoneTabs
     });
-    let group3 = "";
+    let group4 = "";
     for (const e of members?.agent ?? []) {
       const name = s2(e.comment);
       const sep = SEPARATOR.exec(name);
       if (sep) {
-        group3 = sep[1].trim();
-        if (group3 && !groups.includes(group3)) groups.push(group3);
+        group4 = sep[1].trim();
+        if (group4 && !groups.includes(group4)) groups.push(group4);
         continue;
       }
       if (seen.has(name)) continue;
@@ -748,11 +826,11 @@ function readDirectory(lore) {
         legacyLore.set(name, old.lore);
       }
       let base;
-      if (old) base = { ...old, lore: name, group: group3, inFolder: true };
-      else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group3, inFolder: true };
-      const row2 = merge(base, obj2(saved[name]));
-      if (!old && !saved[name]) fresh.add(row2);
-      out.push(row2);
+      if (old) base = { ...old, lore: name, group: group4, inFolder: true };
+      else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group4, inFolder: true };
+      const row3 = merge(base, obj2(saved[name]));
+      if (!old && !saved[name]) fresh.add(row3);
+      out.push(row3);
     }
     for (const [name, d] of Object.entries(saved)) {
       if (seen.has(name) || !exists.has(name)) continue;
@@ -895,9 +973,9 @@ function parseJson(raw, book2) {
 }
 var str = (v) => typeof v === "string" ? v.trim() : "";
 var strList = (v) => Array.isArray(v) ? v.map(str).filter(Boolean) : [];
-function worldRows(data, group3, landmark) {
-  const rows = data[group3];
-  if (!Array.isArray(rows)) throw new CatalogError(`World catalog / ${group3}: 배열이 필요합니다.`);
+function worldRows(data, group4, landmark) {
+  const rows = data[group4];
+  if (!Array.isArray(rows)) throw new CatalogError(`World catalog / ${group4}: 배열이 필요합니다.`);
   return rows.filter((r) => Array.isArray(r) && r.length === (landmark ? 10 : 5) && r[0] === true);
 }
 function parseCatalog(lore) {
@@ -1199,11 +1277,11 @@ function place(w, skip, rng) {
   const taken = occupied(w);
   return pick(POOL2.filter((l) => !taken.has(l) && l !== skip), rng);
 }
-function block(w, group3, name) {
-  if (name) w.blocks[`${group3}:${name}`] = w.epoch + 1;
+function block(w, group4, name) {
+  if (name) w.blocks[`${group4}:${name}`] = w.epoch + 1;
 }
-function blocked(w, group3, name) {
-  return (w.blocks[`${group3}:${name}`] ?? -1) >= w.epoch;
+function blocked(w, group4, name) {
+  return (w.blocks[`${group4}:${name}`] ?? -1) >= w.epoch;
 }
 function endAn(w, e) {
   block(w, "an", e.name);
@@ -1221,9 +1299,9 @@ function endMs(w, e) {
   w.ms = w.ms.filter((x) => x !== e);
 }
 function spawnAn(w, c, s5, preset, rng) {
-  const group3 = preset ? "preset" : "random";
-  const n = w.an.filter((e) => e.origin === "auto" && e.kind === group3).length;
-  if (n >= s5[`${group3}_cap`] || !(rng() * 100 < s5[`${group3}_p`])) return;
+  const group4 = preset ? "preset" : "random";
+  const n = w.an.filter((e) => e.origin === "auto" && e.kind === group4).length;
+  if (n >= s5[`${group4}_cap`] || !(rng() * 100 < s5[`${group4}_p`])) return;
   let name = "";
   if (preset) {
     const active = new Set(w.an.map((e) => e.presetName || presetCanon(c, e.name)));
@@ -1239,7 +1317,7 @@ function spawnAn(w, c, s5, preset, rng) {
     state: "발생대기",
     grade: "",
     deploy: "",
-    kind: group3,
+    kind: group4,
     origin: "auto",
     presetName: name,
     since: null,
@@ -1285,10 +1363,10 @@ function spawnMystic(w, c, s5, rng) {
 function expire(w, s5) {
   const now = w.minute;
   if (now === null) return;
-  const old = (e, group3) => {
+  const old = (e, group4) => {
     if (e.born === null) e.born = e.since ?? now;
-    const hours = s5[`${group3}_ttl`];
-    return s5[`${group3}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60;
+    const hours = s5[`${group4}_ttl`];
+    return s5[`${group4}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60;
   };
   for (const e of [...w.an]) if (!e.exploring && old(e, e.kind)) endAn(w, e);
   for (const e of [...w.inc]) if (old(e, "incident")) endIn(w, e);
@@ -2096,9 +2174,9 @@ function replyForUser(p, c) {
   const seen = /* @__PURE__ */ new Set();
   while (parent && p.comments[parent - 1] && !seen.has(parent)) {
     seen.add(parent);
-    const row2 = p.comments[parent - 1];
-    if (row2.mine) return true;
-    parent = row2.parent;
+    const row3 = p.comments[parent - 1];
+    if (row3.mine) return true;
+    parent = row3.parent;
   }
   return false;
 }
@@ -3011,14 +3089,14 @@ function tabCatalog(lore) {
   const data = loreJson(lore, "Phone tabs");
   if (data?.version !== 1 || !Array.isArray(data.tabs)) throw new PhoneError("Phone tabs: version 1 탭 설정이 필요해요.");
   const entries = [];
-  for (const row2 of data.tabs) {
-    const id = s3(row2?.id);
+  for (const row3 of data.tabs) {
+    const id = s3(row3?.id);
     if (!/^[TX]\d+$/.test(id) || entries.some((e) => e.id === id)) continue;
     const names3 = {};
-    if (row2.name_by_faction && typeof row2.name_by_faction === "object") {
-      for (const [f, n] of Object.entries(row2.name_by_faction)) if (s3(n)) names3[f] = s3(n);
+    if (row3.name_by_faction && typeof row3.name_by_faction === "object") {
+      for (const [f, n] of Object.entries(row3.name_by_faction)) if (s3(n)) names3[f] = s3(n);
     }
-    entries.push({ id, name: s3(row2.name) || id, names: names3, visibleFor: new Set(list3(row2.visible_for)) });
+    entries.push({ id, name: s3(row3.name) || id, names: names3, visibleFor: new Set(list3(row3.visible_for)) });
   }
   const extra = extraFactions(lore).map((f) => f.code);
   if (extra.length) {
@@ -3058,28 +3136,28 @@ function directory(lore, chat) {
   const roster = { characters: rosterOf(readDirectory(books)) };
   const map = /* @__PURE__ */ new Map();
   const contacts = [];
-  for (const row2 of roster.characters ?? []) {
-    const agentId = s3(row2?.id);
-    if (!/^P\d{3,}$/.test(agentId) || !s3(row2.name)) continue;
-    const english = s3(row2.english);
+  for (const row3 of roster.characters ?? []) {
+    const agentId = s3(row3?.id);
+    if (!/^P\d{3,}$/.test(agentId) || !s3(row3.name)) continue;
+    const english = s3(row3.english);
     const c = {
       id: contactId(agentId),
       agentId,
-      name: s3(row2.name),
+      name: s3(row3.name),
       english,
-      lore: s3(row2.lore),
-      group: s3(row2.affiliation),
-      rank: s3(row2.rank),
-      department: s3(row2.department),
-      tabs: list3(row2.phone_tabs),
-      terms: [s3(row2.name), english, s3(row2.lore), ...list3(row2.aliases), ...list3(row2.legacy_english)].filter(Boolean),
+      lore: s3(row3.lore),
+      group: s3(row3.affiliation),
+      rank: s3(row3.rank),
+      department: s3(row3.department),
+      tabs: list3(row3.phone_tabs),
+      terms: [s3(row3.name), english, s3(row3.lore), ...list3(row3.aliases), ...list3(row3.legacy_english)].filter(Boolean),
       visible: false,
       saved: false
     };
     c.visible = c.tabs.some((t) => visible.has(t));
     map.set(c.id, c);
     if (c.visible) contacts.push(c);
-    for (const name of [english, ...list3(row2.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
+    for (const name of [english, ...list3(row3.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
   }
   for (const entry of readCustom(chat).items) {
     let c = map.get(entry.id);
@@ -3170,7 +3248,7 @@ function conversationState(r) {
   let senders = /* @__PURE__ */ new Map();
   if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
     out = JSON.parse(JSON.stringify(r.conversationBaseline));
-    for (const row2 of out.senders ?? []) senders.set(row2.sender, row2);
+    for (const row3 of out.senders ?? []) senders.set(row3.sender, row3);
     out.senders = [];
   }
   for (const m of r.messages) {
@@ -3185,18 +3263,18 @@ function conversationState(r) {
       senders = /* @__PURE__ */ new Map();
     } else {
       out.npcMessagesSinceOwner++;
-      const row2 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
-      row2.messagesSinceOwner++;
-      row2.lastMessageTime = m.time || "";
-      row2.lastRecordID = m.id;
-      senders.set(m.sender, row2);
+      const row3 = senders.get(m.sender) ?? { sender: m.sender, messagesSinceOwner: 0, firstMessageTime: m.time || "" };
+      row3.messagesSinceOwner++;
+      row3.lastMessageTime = m.time || "";
+      row3.lastRecordID = m.id;
+      senders.set(m.sender, row3);
     }
   }
   const rt = r.readThrough;
   for (const key of [...senders.keys()].sort()) {
-    const row2 = senders.get(key);
-    row2.lastMessageRead = rt !== void 0 && row2.lastRecordID !== void 0 ? row2.lastRecordID <= rt ? "read" : "unread" : "unknown";
-    out.senders.push(row2);
+    const row3 = senders.get(key);
+    row3.lastMessageRead = rt !== void 0 && row3.lastRecordID !== void 0 ? row3.lastRecordID <= rt ? "read" : "unread" : "unknown";
+    out.senders.push(row3);
   }
   out.readReceipt = rt !== void 0 ? "tracked" : "unknown";
   out.ownerReadThroughRecordID = rt;
@@ -3365,7 +3443,7 @@ function readBulletins(chat) {
   try {
     const v = JSON.parse(raw);
     if (v && Array.isArray(v.items)) {
-      for (const row2 of v.items) if (row2.read === void 0) row2.read = true;
+      for (const row3 of v.items) if (row3.read === void 0) row3.read = true;
       return { version: 2, seq: Number(v.seq) || 0, items: v.items, checks: v.checks ?? {}, seen: v.seen ?? {}, lastIssuedTurns: v.lastIssuedTurns };
     }
   } catch {
@@ -3373,12 +3451,12 @@ function readBulletins(chat) {
   throw new PhoneError("공지 기록을 읽지 못했어요. 원본 기록은 그대로 둬요.");
 }
 var bulletinUnread = (b) => b.items.some((r) => r.read === false);
-var signature = (row2) => JSON.stringify([row2.channel, row2.title.trim(), row2.text.trim()]);
+var signature = (row3) => JSON.stringify([row3.channel, row3.title.trim(), row3.text.trim()]);
 function trimBulletins(b, cap = STORAGE.notice) {
   const n = Math.max(0, b.items.length - cap);
   b.items = b.items.slice(n);
   b.seen = {};
-  for (const row2 of b.items) b.seen[signature(row2)] = true;
+  for (const row3 of b.items) b.seen[signature(row3)] = true;
 }
 function noticeChannel(chat) {
   const code = String(chat.scriptstate?.["$st_faction"] ?? "");
@@ -3407,24 +3485,24 @@ var CATEGORIES = /* @__PURE__ */ new Set(["공지", "업무", "시설", "인사"
 function validateAnnouncements(rows, packet) {
   const list5 = rows ?? [];
   if (!Array.isArray(list5) || list5.length > (packet?.maxNew ?? 0)) fail("한 번에 받을 공지 수를 넘었어요.");
-  for (const row2 of list5) {
-    if (!row2 || typeof row2.issuer !== "string" || typeof row2.category !== "string" || typeof row2.title !== "string" || typeof row2.text !== "string") fail("공지 형식이 잘못됐어요.");
-    if (!CATEGORIES.has(row2.category)) fail("공지 분류가 올바르지 않아요.");
-    if (!row2.issuer.trim() || [...row2.issuer].length > LIMITS2.notice_issuer || !row2.title.trim() || [...row2.title].length > LIMITS2.notice_title || !row2.text.trim()) fail("공지 발신처·제목·본문을 확인하세요.");
-    if (tokens(row2.text) > LIMITS2.notice_tokens) fail(`공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`);
+  for (const row3 of list5) {
+    if (!row3 || typeof row3.issuer !== "string" || typeof row3.category !== "string" || typeof row3.title !== "string" || typeof row3.text !== "string") fail("공지 형식이 잘못됐어요.");
+    if (!CATEGORIES.has(row3.category)) fail("공지 분류가 올바르지 않아요.");
+    if (!row3.issuer.trim() || [...row3.issuer].length > LIMITS2.notice_issuer || !row3.title.trim() || [...row3.title].length > LIMITS2.notice_title || !row3.text.trim()) fail("공지 발신처·제목·본문을 확인하세요.");
+    if (tokens(row3.text) > LIMITS2.notice_tokens) fail(`공지 한 개는 ${LIMITS2.notice_tokens}토큰 이내여야 해요.`);
   }
   return list5;
 }
 function commitAnnouncements(b, st, rows, packet, time2) {
   let added = 0;
-  for (const row2 of rows) {
-    const rec = { channel: packet.channel, title: row2.title.trim(), text: row2.text.trim() };
+  for (const row3 of rows) {
+    const rec = { channel: packet.channel, title: row3.title.trim(), text: row3.text.trim() };
     const sig = signature(rec);
     if (b.seen[sig]) continue;
     b.seen[sig] = true;
     b.seq += 1;
     st.mid += 1;
-    b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row2.issuer.trim(), category: row2.category, title: rec.title, text: rec.text, time: time2 });
+    b.items.push({ id: b.seq, order: st.mid, read: false, channel: packet.channel, channelName: packet.channelName, issuer: row3.issuer.trim(), category: row3.category, title: rec.title, text: rec.text, time: time2 });
     added++;
   }
   if (added && packet.allowed) b.lastIssuedTurns = { ...b.lastIssuedTurns ?? {}, [packet.channel]: packet.turn };
@@ -3446,11 +3524,11 @@ function validateInvitations(rows, packet, st, dir2) {
   const sig = (m) => [...m].sort().join(",");
   const out = [];
   const fresh = /* @__PURE__ */ new Set();
-  for (const row2 of list5) {
-    if (!row2 || typeof row2.inviter !== "string" || !Array.isArray(row2.members) || typeof row2.name !== "string" || !Array.isArray(row2.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
-    const name = row2.name.trim();
+  for (const row3 of list5) {
+    if (!row3 || typeof row3.inviter !== "string" || !Array.isArray(row3.members) || typeof row3.name !== "string" || !Array.isArray(row3.patch)) fail("단톡방 초대 형식이 잘못됐어요.");
+    const name = row3.name.trim();
     if (!name || [...name].length > LIMITS2.room_name) fail("초대할 단톡방 이름이 길이 제한을 넘었어요.");
-    const members = row2.members;
+    const members = row3.members;
     if (members.length < 2 || members.length > LIMITS2.members) fail("단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.");
     const people = {};
     for (const cid of members) {
@@ -3458,13 +3536,13 @@ function validateInvitations(rows, packet, st, dir2) {
       if (typeof cid !== "string" || !allowed.has(cid) || !c || people[cid]) fail("단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.");
       people[cid] = personOf(c);
     }
-    if (!people[row2.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
+    if (!people[row3.inviter]) fail("초대한 인물은 단톡방 참여자여야 해요.");
     const key = `${name}\0${sig(members)}`;
     if (fresh.has(key)) fail("같은 단톡방 초대가 중복됐어요.");
     fresh.add(key);
     for (const r of Object.values(st.rooms)) if (r.kind === "group" && (r.name ?? "").trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
-    const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row2.inviter };
-    room.events = eventsFromPatch(row2.patch, room, false).events;
+    const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row3.inviter };
+    room.events = eventsFromPatch(row3.patch, room, false).events;
     out.push(room);
   }
   return out;
@@ -3629,8 +3707,8 @@ function buildRegistry(lore) {
   };
   const dir2 = readDirectory(books);
   const places = { 괴이: dir2.anomalies, "미스틱 사이트": dir2.sites };
-  for (const [group3, rows] of Object.entries(places)) {
-    rows.forEach((p, i) => add(`World catalog/${group3}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
+  for (const [group4, rows] of Object.entries(places)) {
+    rows.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
   }
   const world = json(books, "World catalog");
   const marks = Array.isArray(world?.["랜드마크"]) ? world["랜드마크"] : [];
@@ -4014,11 +4092,11 @@ function publicBoard(st, query) {
   for (const { p } of ranked) {
     if (rows.length >= 8) break;
     const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, content: trimTokens(c.body, LIMITS.quote_tokens) }));
-    const row2 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
-    while (JSON.stringify(row2).length > (cap - used) * 2 && row2.comments.length) row2.comments.shift();
-    const n = Math.ceil(JSON.stringify(row2).length / 2);
+    const row3 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
+    while (JSON.stringify(row3).length > (cap - used) * 2 && row3.comments.length) row3.comments.shift();
+    const n = Math.ceil(JSON.stringify(row3).length / 2);
     if (used + n <= cap) {
-      rows.push(row2);
+      rows.push(row3);
       used += n;
     }
   }
@@ -4223,18 +4301,18 @@ function rules(src, body4, mode2) {
   const p = sections(src);
   const keys = ["COMMON"];
   let direct = false;
-  let group3 = false;
+  let group4 = false;
   for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
     if (r.receiveMessages === false) continue;
-    if (r.kind === "group") group3 = true;
+    if (r.kind === "group") group4 = true;
     else direct = true;
   }
-  if (body4.invitationCheck?.allowed) group3 = true;
+  if (body4.invitationCheck?.allowed) group4 = true;
   const manual = body4.participants.some((x) => x.manuallySavedContact);
-  if (direct || group3) {
+  if (direct || group4) {
     keys.push("CONVERSATION");
     if (direct) keys.push("DIRECT_ROOMS");
-    if (group3) keys.push("GROUP_ROOMS");
+    if (group4) keys.push("GROUP_ROOMS");
     if (body4.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
     if (body4.crossRoomMessages?.length || (body4.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
     if (hasAttachment(JSON.stringify(body4))) keys.push("ATTACHMENT_READ");
@@ -4613,7 +4691,7 @@ function sniffMime(b) {
   if (s5(4, 4) === "ftyp" && /avi[fs]/.test(s5(8, 4))) return "image/avif";
   return "image/png";
 }
-function toBytes(data) {
+function toBytes2(data) {
   if (data instanceof Uint8Array) return data;
   if (data instanceof ArrayBuffer) return new Uint8Array(data);
   if (Array.isArray(data)) return new Uint8Array(data);
@@ -4661,7 +4739,7 @@ async function savePhoto(file) {
 async function photoData(asset) {
   try {
     if (asset.startsWith("assets/")) {
-      const bytes = toBytes(await risuai.readImage(asset));
+      const bytes = toBytes2(await risuai.readImage(asset));
       return bytes?.length ? `data:${sniffMime(bytes)};base64,${base64(bytes)}` : null;
     }
     const inlay = await risuai.readInlay(asset);
@@ -4673,7 +4751,7 @@ async function photoData(asset) {
 async function photoUrl(asset) {
   try {
     if (asset.startsWith("assets/")) {
-      const bytes = toBytes(await risuai.readImage(asset));
+      const bytes = toBytes2(await risuai.readImage(asset));
       return bytes?.length ? URL.createObjectURL(new Blob([bytes], { type: sniffMime(bytes) })) : null;
     }
     const inlay = await risuai.readInlay(asset);
@@ -4712,9 +4790,9 @@ function attachEditor(prefix, items, kinds, disabled = false, giftNote = "", sho
   return `<div class="at-editor" data-drop-photo="${prefix}">${rows}${showMenu ? `<div class="at-menu" role="group" aria-label="첨부 추가">${menu}${full ? `<small class="gx-muted">첨부는 ${ATTACH_MAX}개까지예요.</small>` : ""}</div>` : ""}</div>`;
 }
 function attachInput(items, key, value) {
-  const row2 = items[Number(key)];
-  if (!row2) return false;
-  row2.content = value;
+  const row3 = items[Number(key)];
+  if (!row3) return false;
+  row3.content = value;
   return true;
 }
 function attachAction(items, op, value, kinds) {
@@ -4811,9 +4889,9 @@ function attachBody(text, board2 = false) {
 }
 
 // src/host/assets.ts
-var MIME = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
+var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
 var cache3 = /* @__PURE__ */ new Map();
-function toBytes2(data) {
+function toBytes3(data) {
   if (data instanceof Uint8Array) return data;
   if (data instanceof ArrayBuffer) return new Uint8Array(data);
   if (Array.isArray(data)) return new Uint8Array(data);
@@ -4827,9 +4905,9 @@ async function load(path, ext) {
   try {
     const data = await risuai.readImage(path);
     if (typeof data === "string") return data.startsWith("data:") || data.startsWith("blob:") || data.startsWith("http") ? data : null;
-    const bytes = toBytes2(data);
+    const bytes = toBytes3(data);
     if (!bytes?.length) return null;
-    return URL.createObjectURL(new Blob([bytes], { type: MIME[ext.toLowerCase()] ?? "application/octet-stream" }));
+    return URL.createObjectURL(new Blob([bytes], { type: MIME2[ext.toLowerCase()] ?? "application/octet-stream" }));
   } catch (error) {
     console.log(`[goei] 이미지를 읽지 못했어요 (${path}): ${error instanceof Error ? error.message : String(error)}`);
     return null;
@@ -4837,12 +4915,12 @@ async function load(path, ext) {
 }
 function assetUrl(char, name) {
   const list5 = char.additionalAssets ?? [];
-  const row2 = list5.find((a) => Array.isArray(a) && a[0] === name && typeof a[1] === "string");
-  if (!row2) return Promise.resolve(null);
-  const key = `${String(char.chaId ?? char.name ?? "")}|${row2[1]}`;
+  const row3 = list5.find((a) => Array.isArray(a) && a[0] === name && typeof a[1] === "string");
+  if (!row3) return Promise.resolve(null);
+  const key = `${String(char.chaId ?? char.name ?? "")}|${row3[1]}`;
   let hit = cache3.get(key);
   if (!hit) {
-    hit = load(row2[1], String(row2[2] ?? row2[1].split(".").pop() ?? ""));
+    hit = load(row3[1], String(row3[2] ?? row3[1].split(".").pop() ?? ""));
     cache3.set(key, hit);
     void hit.then((url) => {
       if (!url) cache3.delete(key);
@@ -4914,9 +4992,23 @@ function prefetchFactions(char) {
 }
 var stLabel = (st) => st === "작전투입" ? "작전" : st;
 var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
+var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
 function agentInner(char, p, st, situation = "", act = "") {
   const role = [p.department, p.rank].filter(Boolean).join(" · ");
-  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em></span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+}
+function showIdCard(html) {
+  const box = document.createElement("div");
+  box.className = "gx gx-agpop gx-idpop";
+  box.setAttribute("role", "dialog");
+  box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+  const theme = document.querySelector(".gx")?.getAttribute("data-theme");
+  if (theme) box.setAttribute("data-theme", theme);
+  box.addEventListener("click", (e) => {
+    if (e.target.closest(".gx-idpop-card") && !e.target.closest(".gx-agpop-x")) return;
+    box.remove();
+  });
+  document.body.appendChild(box);
 }
 function showAgentInfo(card2) {
   const box = document.createElement("div");
@@ -4941,17 +5033,21 @@ var ICONS = {
   board: stroke('<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>'),
   map: stroke('<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/>'),
   mission: stroke('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'),
-  phone: stroke('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/>'),
+  phone: stroke('<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>'),
   gnet: stroke('<path d="M4 5h16v11H8l-4 4V5Z"/><path d="M8 9h8M8 12h5"/>'),
   wiki: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
   settings: stroke('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
   swap: stroke('<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>'),
+  idcard: stroke('<rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8.5 16.5c.7-1.7 2-2.5 3.5-2.5s2.8.8 3.5 2.5"/>'),
   info: stroke('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
   refresh: stroke('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>'),
   group: stroke('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>'),
   addUser: stroke('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/>'),
+  pen: stroke('<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>'),
+  mail: stroke('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>'),
   call: stroke('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>'),
-  send: stroke('<path d="M4 12 20 4l-6 16-3-7-7-1Z"/>'),
+  // 보내기: 굵은 위쪽 화살표 (메신저 전송 버튼)
+  send: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5.5M5.5 12 12 5.5 18.5 12"/></svg>',
   plus: stroke('<path d="M12 5v14M5 12h14"/>'),
   trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
@@ -5515,30 +5611,45 @@ function matches(c, q, fnames) {
 }
 var tool = (action, icon, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
 var blank2 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
+function agentStates(ctx) {
+  try {
+    if (!worldOn(ctx.chat)) return {};
+    return Object.fromEntries(Object.entries(readWorld(ctx.chat).agents).map(([k, v]) => [k, v.st]));
+  } catch {
+    return {};
+  }
+}
 function contactsView(ctx, d, st) {
   if (!d.tabs.length) return blank2("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
   const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
-  const q = phone.query.trim().toLowerCase();
+  const chips = `<div class="ph-tabs" role="tablist">${d.tabs.map((t) => `<button class="ph-tab${t.id === tab2 ? " on" : ""}" data-action="ph-ctab" data-value="${t.id}" aria-selected="${t.id === tab2}">${esc2(t.name)}</button>`).join("")}</div>`;
+  const rows = d.contacts.filter((c) => c.tabs.includes(tab2));
+  return chips + (rows.length ? contactList(ctx, rows, st) : blank2("이 탭에는 아직 연락처가 없어요."));
+}
+function contactList(ctx, rows, st) {
   const fnames = names(ctx);
-  const rows = d.contacts.filter((c) => q ? matches(c, q, fnames) : c.tabs.includes(tab2));
-  const chips = q ? `<p class="gx-muted ph-found">「${esc2(phone.query)}」 검색 결과 ${rows.length}명</p>` : `<div class="ph-tabs" role="tablist">${d.tabs.map((t) => `<button class="ph-tab${t.id === tab2 ? " on" : ""}" data-action="ph-ctab" data-value="${t.id}" aria-selected="${t.id === tab2}">${esc2(t.name)}</button>`).join("")}</div>`;
-  const list5 = rows.length ? `<ul class="ph-list">${rows.map((c) => {
+  const states = agentStates(ctx);
+  return `<ul class="ph-list ph-contacts">${rows.map((c) => {
     const room = st.rooms[`dm_${c.id}`];
     const confirm = phone.confirm === `contact:${c.id}`;
     return `<li class="ph-row"><button class="ph-main" data-action="ph-dm" data-value="${c.id}">${face(ctx, c, c.name)}
-            <span class="ph-who"><b>${esc2(c.name)}</b><small>${esc2(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
+            <span class="ph-who"><span class="ph-who-name"><b>${esc2(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}</span><small>${esc2(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
             ${room?.unread ? `<span class="ph-badge">${room.unread > 99 ? "99+" : room.unread}</span>` : ""}</button>
             <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc2(c.name)}" title="전화" aria-label="${esc2(c.name)}에게 전화">${ICONS.call}</button>
             ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc2(c.lore || c.name)}" title="위키" aria-label="${esc2(c.name)} 위키">${ICONS.book}</button>`}
             ${c.saved && c.custom ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
-  }).join("")}</ul>` : blank2(q ? "검색 결과가 없어요." : "이 탭에는 아직 연락처가 없어요.");
-  return chips + list5;
+  }).join("")}</ul>`;
+}
+function chatRooms(st, q) {
+  const keys = [.../* @__PURE__ */ new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
+  return keys.map((k) => st.rooms[k]).filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
 }
 function chatsView(ctx, st, d) {
-  const q = phone.query.trim().toLowerCase();
-  const keys = [.../* @__PURE__ */ new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
-  const rows = keys.map((k) => st.rooms[k]).filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
-  if (!rows.length) return blank2(q ? "검색 결과가 없어요." : "아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
+  const rows = chatRooms(st, "");
+  if (!rows.length) return blank2("아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
+  return chatList(ctx, rows, d);
+}
+function chatList(ctx, rows, d) {
   return `<ul class="ph-list ph-chats">${rows.map((r) => {
     const last = [...r.messages].reverse().find((m) => m.kind === "message") ?? r.messages[r.messages.length - 1];
     const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
@@ -5546,8 +5657,11 @@ function chatsView(ctx, st, d) {
     const on = phone.view === "room" && phone.room === r.id;
     return `<li class="ph-row"><button class="ph-main${on ? " on" : ""}" data-action="ph-room" data-value="${esc2(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx, who ?? void 0, roomLabel(r))}
         <span class="ph-who"><span class="ph-who-top"><b>${esc2(roomLabel(r))}</b>${last ? `<small class="ph-time">${esc2(shortTime(last.time))}</small>` : ""}</span>
-        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc2([...preview].slice(0, 60).join(""))}</small>${r.unread ? `<span class="ph-badge">${r.unread > 99 ? "99+" : r.unread}</span>` : ""}</span></span></button></li>`;
+        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc2([...preview].slice(0, 60).join(""))}</small>${r.unread ? `<span class="ph-badge">${r.unread > 99 ? "99+" : r.unread}</span>` : ""}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
   }).join("")}</ul>`;
+}
+function roomDel(id, pending, label) {
+  return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc2(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc2(id)}" title="삭제" aria-label="${esc2(label)} 삭제" ${pending ? "disabled" : ""}>${ICONS.trash}</button>`;
 }
 var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
 function roomView(ctx, st, d, busy2) {
@@ -5600,6 +5714,7 @@ function roomView(ctx, st, d, busy2) {
         <button class="ph-tool ph-plus${phone.attachMenu ? " on" : ""}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? "disabled" : ""}>${ICONS.plus}</button>
         <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc2(phone.draft)}</textarea>
         <button class="ph-send" data-action="ph-send" data-value="${esc2(r.id)}" aria-label="보내기" title="보내기" ${busy2 || locked ? "disabled" : ""}>${ICONS.send}</button>
+        <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
       </div>
     </div>
   </div>`;
@@ -5623,20 +5738,23 @@ function phonePickList(ctx) {
   return rows.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
         <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx, c, c.name)}<span class="ph-who"><b>${esc2(c.name)}</b><small>${esc2(contactDetails(c))}</small></span></button></li>`).join("");
 }
-function paneHead(title2, sub) {
-  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div></header>`;
+function paneHead(title2, sub, right = "") {
+  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
 }
 function groupView(ctx, st) {
   const room = phone.invite ? st.rooms[phone.invite] : void 0;
   const picked = phone.picked.length;
   return `<div class="ph-form">
-    ${paneHead(room ? `「${esc2(roomLabel(room))}」에 초대` : "단톡방 만들기", `${picked}명 선택 · 상대 최대 ${LIMITS2.members}명`)}
-    <div class="ph-form-body">
-      ${room ? "" : `<label class="ph-label">주제·상황 (선택)<small>비우면 지금 상황과 관계에 맞춰 시작해요</small></label><textarea class="gx-search" data-input="ph-topic" rows="2" placeholder="예: 내일 합동 조사 준비">${esc2(phone.topic)}</textarea>`}
-      <input class="gx-search" data-input="ph-pick-q" value="${esc2(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">
+    ${paneHead(
+    room ? `「${esc2(roomLabel(room))}」에 초대` : "단톡방 만들기",
+    `${picked}명 선택 · 상대 최대 ${LIMITS2.members}명`,
+    `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc2(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
+  )}
+    <div class="ph-form-body ph-gbody">
+      ${room ? "" : `<textarea class="gx-search" data-input="ph-topic" rows="2" placeholder="주제·상황 (선택). 비우면 지금 상황과 관계에 맞춰 시작해요" aria-label="주제·상황">${esc2(phone.topic)}</textarea>`}
       <ul class="ph-list ph-pick">${phonePickList(ctx)}</ul>
     </div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="ph-group-create" ${picked ? "" : "disabled"}>${room ? "초대하기" : picked === 1 ? "1:1 대화 열기" : "단톡방 만들기"}</button></div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="ph-group-create" ${picked ? "" : "disabled"}>${room ? "초대하기" : picked === 1 ? "1:1 대화" : "단톡방 만들기"}</button></div>
   </div>`;
 }
 function noticesView(ctx) {
@@ -5646,9 +5764,8 @@ function noticesView(ctx) {
   } catch (error) {
     return `<p class="gx-none">${esc2(error.message)}</p>`;
   }
-  const q = phone.query.trim().toLowerCase();
-  const all = [...b.items].reverse().filter((r) => !q || `${r.title} ${r.text} ${r.issuer}`.toLowerCase().includes(q));
-  if (!all.length) return blank2(q ? "검색 결과가 없어요." : "아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.");
+  const all = [...b.items].reverse();
+  if (!all.length) return blank2("아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.");
   const size = noticeSettings(ctx.chat.scriptstate).page;
   const pages = Math.max(1, Math.ceil(all.length / size));
   const page = Math.min(Math.max(1, phone.noticePage), pages);
@@ -5657,15 +5774,51 @@ function noticesView(ctx) {
   const head = `<div class="ph-notice-bar"><span class="gx-muted">공지 ${all.length}개${pages > 1 ? ` · ${page}/${pages}쪽` : ""}</span>
     ${unread ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>`;
   const nav = pages > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? "disabled" : ""}>다음 ›</button></div>` : "";
-  return `${head}<ul class="ph-list ph-notices">${items.map((r) => {
-    const open2 = phone.openNotice === r.id;
+  return `${head}${noticeList(items)}${nav}`;
+}
+function noticeList(items) {
+  return `<ul class="ph-list ph-notices">${items.map((r) => {
+    const on = phone.view === "notice" && phone.openNotice === r.id;
     const confirm = phone.confirm === `notice:${r.id}`;
-    return `<li class="ph-notice${open2 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-expanded="${open2}">
-        <span class="ph-ncard-top"><span class="gx-badge">${esc2(r.category)}</span><b>${esc2(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
-        <small>${esc2(r.issuer)}${r.time ? ` · ${esc2(r.time)}` : ""}</small>
-        ${open2 ? "" : `<span class="ph-ncard-pre">${esc2(r.text)}</span>`}</button>
-        ${open2 ? `<div class="ph-notice-body">${esc2(r.text).replace(/\n/g, "<br>")}<div class="ph-ncard-act"><button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-notice-del" data-value="${r.id}">${confirm ? "정말 삭제" : "삭제"}</button></div></div>` : ""}</li>`;
-  }).join("")}</ul>${nav}`;
+    const del = confirm ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc2(r.title)} 삭제">${ICONS.trash}</button>`;
+    const open2 = phone.openNotice === r.id;
+    return `<li class="ph-notice${on ? " on" : ""}${open2 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on}" aria-expanded="${open2}">
+        <span class="ph-ncard-top"><span class="gx-badge">${esc2(r.category)}</span><small>${esc2(r.issuer)}${r.time ? ` · ${esc2(r.time)}` : ""}</small></span>
+        <span class="ph-ncard-title"><b>${esc2(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
+</button>${del}
+        ${open2 ? `<div class="ph-notice-body">${esc2(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+  }).join("")}</ul>`;
+}
+function noticeDetail(ctx) {
+  let r;
+  try {
+    r = readBulletins(ctx.chat).items.find((x) => x.id === phone.openNotice);
+  } catch {
+    r = void 0;
+  }
+  if (!r) return '<div class="ph-empty"><p class="gx-none">공지를 찾지 못했어요.</p></div>';
+  const confirm = phone.confirm === `notice:${r.id}`;
+  const del = confirm ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : tool("ph-notice-del", ICONS.trash, "공지 삭제", `data-value="${r.id}"`);
+  return `<div class="ph-form ph-ndoc">${paneHead("공지", "", `<span class="ph-act">${del}</span>`)}
+    <article class="ph-ndoc-body">
+      <header class="ph-ndoc-head"><span class="gx-badge">${esc2(r.category)}</span><h3>${esc2(r.title)}</h3>
+        <div class="ph-ndoc-meta"><b>${esc2(r.issuer)}</b>${r.time ? `<span>${esc2(r.time)}</span>` : ""}</div></header>
+      <div class="ph-ndoc-text">${esc2(r.text).replace(/\n/g, "<br>")}</div>
+    </article></div>`;
+}
+function searchView(ctx, st, d) {
+  const q = phone.query.trim().toLowerCase();
+  const fnames = names(ctx);
+  const people = d.contacts.filter((c) => matches(c, q, fnames));
+  const rooms = chatRooms(st, q);
+  let notes = [];
+  try {
+    notes = [...readBulletins(ctx.chat).items].reverse().filter((r) => `${r.title} ${r.text} ${r.issuer}`.toLowerCase().includes(q));
+  } catch {
+  }
+  if (!people.length && !rooms.length && !notes.length) return blank2("검색 결과가 없어요.");
+  const sec = (title2, n, html) => n ? `<h4 class="ph-sec">${title2}<b>${n}</b></h4>${html}` : "";
+  return sec("연락처", people.length, contactList(ctx, people, st)) + sec("대화", rooms.length, chatList(ctx, rooms, d)) + sec("공지", notes.length, noticeList(notes));
 }
 function callView() {
   return `<div class="ph-form">${paneHead("전화 걸기", "기록을 남기고 창을 닫아요. 채팅에서 전송을 누르면 통화 장면이 이어져요.")}
@@ -5724,6 +5877,7 @@ function settingsView(ctx) {
     </div></div>`;
 }
 function listHtml(ctx, st, d) {
+  if (phone.query.trim()) return searchView(ctx, st, d);
   return phone.sub === "contacts" ? contactsView(ctx, d, st) : phone.sub === "chats" ? chatsView(ctx, st, d) : noticesView(ctx);
 }
 function paneHtml(ctx, st, d, busy2) {
@@ -5732,6 +5886,7 @@ function paneHtml(ctx, st, d, busy2) {
   if (phone.view === "call") return callView();
   if (phone.view === "add") return addView();
   if (phone.view === "settings") return settingsView(ctx);
+  if (phone.view === "notice") return noticeDetail(ctx);
   return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.phone}</span><b>괴담톡</b><p>왼쪽에서 대화나 연락처를 고르세요.</p></div>`;
 }
 function phoneContent(ctx, query) {
@@ -5770,7 +5925,6 @@ function phoneTab(ctx, env2) {
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn("contacts", "연락처")}${subBtn("chats", "대화", unread ? ` <b class="gn-count">${unread > 99 ? "99+" : unread}</b>` : "")}${subBtn("notices", "공지", b && bulletinUnread(b) ? '<span class="gn-dot"></span>' : "")}</div>
         <div class="ph-findbar">
-          <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc2(phone.query)}" placeholder="${phone.sub === "notices" ? "공지 검색" : "이름·대화 검색"}" aria-label="검색">
           <div class="ph-tools">
             ${tool("ph-refresh", ICONS.refresh, "새 메시지 확인", busy2 ? "disabled" : "", "새로고침")}
             ${tool("ph-group", ICONS.group, "단톡 만들기", busy2 ? "disabled" : "", "단톡")}
@@ -5778,6 +5932,7 @@ function phoneTab(ctx, env2) {
             ${tool("ph-call", ICONS.call, "전화 걸기", 'data-value=""', "전화")}
             ${tool("ph-settings", ICONS.settings, "괴담톡 설정", phone.view === "settings" ? 'aria-pressed="true"' : "", "설정")}
           </div>
+          <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc2(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
         </div>
       </div>
       ${detail ? "" : status}
@@ -5810,6 +5965,7 @@ async function handlePhone(action, value, ctx, env2) {
       await openDm(ctx, env2, v);
       return true;
     case "ph-room":
+      if (phone.view === "room" && phone.room === v && !matchMedia("(max-width: 760px)").matches) return handlePhone("ph-back", void 0, ctx, env2);
       await openRoom(ctx, env2, v);
       return true;
     case "ph-back":
@@ -5905,16 +6061,18 @@ async function handlePhone(action, value, ctx, env2) {
         delete st.rooms[v];
         st.order = st.order.filter((x) => x !== v);
       });
-      Object.assign(phone, { view: "list", room: null, sub: "chats" });
+      if (phone.room === v) Object.assign(phone, { view: phone.view === "room" ? "list" : phone.view, room: null });
       return true;
     case "ph-notice": {
       const id = Number(v);
-      phone.openNotice = phone.openNotice === id ? null : id;
-      if (phone.openNotice !== null) {
+      if (matchMedia("(max-width: 760px)").matches) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === "notice" ? "list" : phone.view });
+      else if (phone.view === "notice" && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: "list" });
+      else Object.assign(phone, { openNotice: id, view: "notice" });
+      {
         const b = readBulletins(ctx.chat);
-        const row2 = b.items.find((x) => x.id === id);
-        if (row2 && row2.read === false) {
-          row2.read = true;
+        const row3 = b.items.find((x) => x.id === id);
+        if (row3 && row3.read === false) {
+          row3.read = true;
           await setVars(ctx, env2, writeBulletins(b, ctx.chat.scriptstate));
           return true;
         }
@@ -5928,7 +6086,7 @@ async function handlePhone(action, value, ctx, env2) {
     case "ph-notice-all": {
       const b = readBulletins(ctx.chat);
       if (!b.items.some((x) => x.read === false)) break;
-      for (const row2 of b.items) row2.read = true;
+      for (const row3 of b.items) row3.read = true;
       await setVars(ctx, env2, writeBulletins(b, ctx.chat.scriptstate));
       return true;
     }
@@ -5940,7 +6098,7 @@ async function handlePhone(action, value, ctx, env2) {
       phone.confirm = null;
       const b = readBulletins(ctx.chat);
       b.items = b.items.filter((x) => x.id !== Number(v));
-      phone.openNotice = null;
+      if (phone.openNotice === Number(v)) Object.assign(phone, { openNotice: null, view: phone.view === "notice" ? "list" : phone.view });
       await setVars(ctx, env2, writeBulletins(b, ctx.chat.scriptstate));
       return true;
     }
@@ -6079,17 +6237,6 @@ function phoneUnread(ctx) {
   }
 }
 
-// src/ui/panels.ts
-var open = /* @__PURE__ */ new Set();
-var keepOpen = (key, fallback = false) => open.has(key) || fallback && !open.has(`!${key}`) ? " open" : "";
-function rememberPanel(el) {
-  const key = el.dataset.keep;
-  if (!key) return;
-  open.delete(key);
-  open.delete(`!${key}`);
-  open.add(el.open ? key : `!${key}`);
-}
-
 // src/ui/gnet.ts
 var gnet = {
   sub: "board",
@@ -6103,11 +6250,13 @@ var gnet = {
   editNick: false,
   nick: "",
   notice: "",
-  failure: null
+  failure: null,
+  settings: false,
+  attachMenu: false
 };
 var GN_KINDS = ["image", "photo", "video", "file", "link"];
 function resetGnet() {
-  Object.assign(gnet, { sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, notice: "", failure: null });
+  Object.assign(gnet, { sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, notice: "", failure: null, settings: false, attachMenu: false });
 }
 var jobs2 = /* @__PURE__ */ new Map();
 var chatKey2 = (ctx) => `${ctx.charIndex}:${ctx.chatIndex}`;
@@ -6361,16 +6510,58 @@ var body = (text) => attachBody(text, true);
 function time(date) {
   return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
 }
-function composeBox(c, busy2) {
-  const label = c.kind === "post" ? "새 글" : c.kind === "newdm" ? "새 쪽지" : c.label;
-  const hint = c.kind === "post" ? '<p class="gx-muted">올릴 글이나 쓰고 싶은 내용을 적으면 제목과 본문을 다듬어 올리고, 댓글도 함께 받아요.</p>' : "";
-  const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc3(gnet.to)}" aria-label="받는 사람">` : "";
-  return `<div class="gn-compose"><div class="gn-compose-head"><b>${esc3(label)}</b><button class="gx-mini" data-action="gn-cancel">취소</button></div>${hint}${to}
-    <textarea class="gx-search gn-text" data-input="gn-draft" rows="${c.kind === "post" ? 5 : 3}" placeholder="${c.kind === "post" ? "예: 어젯밤 소라 랜드 앞에서 이상한 소리 들은 사람 있음?" : gnet.attach.length ? "함께 보낼 글 (선택)" : "내용을 입력하세요"}">${esc3(gnet.draft)}</textarea>
-    ${attachEditor("gn", gnet.attach, GN_KINDS, busy2)}
-    <button class="gx-start gn-send" data-action="gn-send" ${busy2 ? "disabled" : ""}>${c.kind === "post" ? "올리기" : c.kind === "comment" ? "등록" : "보내기"}</button></div>`;
+var tool2 = (action, icon, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+function paneHead2(title2, sub, right = "", back = true) {
+  return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
 }
-function commentTree(p, me) {
+var narrow = () => matchMedia("(max-width: 760px)").matches;
+function paneKind(st, mobile = narrow()) {
+  if (gnet.settings) return "settings";
+  const c = gnet.compose;
+  if (c && (c.kind === "post" || c.kind === "newdm" || c.kind === "dm" && !st.dms.some((d) => d.nick === c.nick))) return "compose";
+  if (mobile) return null;
+  if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) return "post";
+  if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return "dm";
+  return null;
+}
+function inlineComposer(st, busy2) {
+  const c = gnet.compose;
+  if (c && c.kind !== "comment" && c.kind !== "dm") return "";
+  if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) {
+    const reply = c?.kind === "comment" && c.post === gnet.open && c.parent > 0 ? c : null;
+    const chip2 = reply ? `<div class="gn-replyto"><span>${esc3(reply.label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>` : "";
+    return composer(busy2, reply ? "답글 입력" : "댓글 입력", chip2);
+  }
+  if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
+    const ph = c?.kind === "dm" && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+    return composer(busy2, ph);
+  }
+  return "";
+}
+function composer(busy2, placeholder, chip2 = "") {
+  return `<div class="ph-composer gn-composer">
+    ${chip2}
+    ${attachEditor("gn", gnet.attach, GN_KINDS, busy2, "", gnet.attachMenu)}
+    <div class="ph-compose">
+      <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc3(placeholder)}" ${busy2 ? "disabled" : ""}>${esc3(gnet.draft)}</textarea>
+      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy2 ? "disabled" : ""}>${ICONS.send}</button>
+      <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
+    </div>
+  </div>`;
+}
+function composeView(c, busy2) {
+  const post = c.kind === "post";
+  const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc3(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc3(c.nick)}</b></p>` : "";
+  const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
+  return `<div class="ph-form gn-cpane">${paneHead2(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc3(c.label) : "")}
+    <div class="ph-form-body">${to}
+      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc3(ph)}" aria-label="내용">${esc3(gnet.draft)}</textarea>
+      ${attachEditor("gn", gnet.attach, GN_KINDS, busy2)}
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy2 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
+}
+function commentTree(p) {
   const kids = /* @__PURE__ */ new Map();
   p.comments.forEach((c, i) => {
     const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
@@ -6378,6 +6569,7 @@ function commentTree(p, me) {
   });
   const out = [];
   const seen = /* @__PURE__ */ new Set();
+  const target = gnet.compose?.kind === "comment" && gnet.compose.post === p.id ? gnet.compose.parent : 0;
   const walk = (n, depth) => {
     for (const k of kids.get(n) ?? []) {
       if (seen.has(k)) continue;
@@ -6385,114 +6577,150 @@ function commentTree(p, me) {
       const c = p.comments[k - 1];
       const confirm = gnet.confirm === `c:${p.id}:${k}`;
       const author = c.mine ? `<b class="gn-me">${esc3(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc3(c.nick)}</button>`;
-      out.push(`<li class="gn-c${c.unread ? " unread" : ""}" style="--gn-depth:${Math.min(depth, 3)}">
-        <div class="gn-c-head">${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}
-          <span class="gn-c-act"><button class="gx-mini" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${c.mine ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="gn-del-comment" data-value="${p.id}:${k}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></div>
-        <div class="gn-c-body">${body(c.body)}</div></li>`);
+      const del = c.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>` : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>` : "";
+      out.push(`<li class="gn-c${depth ? " re" : ""}${c.unread ? " unread" : ""}${target === k ? " target" : ""}" style="--gn-depth:${Math.min(depth, 3)}">
+        <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ""}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}</div>
+        <div class="gn-c-body">${body(c.body)}</div>
+        <div class="gn-c-act"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
       walk(k, depth + 1);
     }
   };
   walk(0, 0);
   return out.join("");
 }
-function postView(p, me, busy2) {
+function postView(p, busy2, inline = false) {
   const c = gnet.compose;
-  const composing = c?.kind === "comment" && c.post === p.id;
+  const reply = c?.kind === "comment" && c.post === p.id && c.parent > 0 ? c : null;
   const confirm = gnet.confirm === `p:${p.id}`;
-  return `<div class="gn-post">
-    <div class="gn-post-meta">${p.mine ? `<b class="gn-me">${esc3(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc3(p.nick)}</button>`}
-      <span>${esc3(p.date)}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span class="gn-no">#${p.id}</span></div>
-    <div class="gn-post-body">${body(p.body)}</div>
-    <div class="gn-post-act">
-      <button class="gx-mini" data-action="gn-comment" data-value="${p.id}">댓글 쓰기</button>
-      <button class="gx-mini" data-action="wiki-goto" data-value="${esc3(p.title)}">위키</button>
-      ${p.mine ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="gn-del-post" data-value="${p.id}">${confirm ? "정말 삭제" : "글 삭제"}</button>` : ""}
+  const right = p.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
+  const chip2 = reply ? `<div class="gn-replyto"><span>${esc3(reply.label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>` : "";
+  return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, right)}
+    <div class="gn-doc">
+      <article class="gn-post">
+        <header class="gn-post-head">${inline ? "" : `<h2 class="gn-post-title">${esc3(p.title)}</h2>`}
+          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc3(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc3(p.nick)}</button>`}</span>
+            <span>${esc3(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span>${inline && right ? `<span class="gn-inline-del">${right}</span>` : ""}</div></header>
+        <div class="gn-post-body">${body(p.body)}</div>
+      </article>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3></div>
+        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
-    ${composing ? composeBox(c, busy2) : ""}
-    <h3 class="gn-ccount">전체 댓글 ${p.comments.length}</h3>
-    ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, me)}</ul>` : '<p class="gx-none">아직 댓글이 없어요.</p>'}
+    ${inline ? "" : composer(busy2, reply ? "답글 입력" : "댓글 입력", chip2)}
   </div>`;
 }
-function boardView(st, me, busy2) {
+function dmPane(st, nick, busy2, inline = false) {
+  const t = dmThreads(st).find((x) => x.nick === nick);
+  if (!t) return "";
+  const confirm = gnet.confirm === `d:${nick}`;
+  const right = confirm ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc3(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc3(nick)}"`);
+  const src = st.sources[nick];
   const c = gnet.compose;
-  const top = c && c.kind === "post" ? composeBox(c, busy2) : "";
-  if (!st.posts.length) return `${top}<p class="gx-none">게시글이 없어요. 새로고침을 눌러 불러오세요.</p>`;
-  const rows = st.posts.map((p) => {
-    const open2 = gnet.open === p.id;
-    return `<li class="gn-row${open2 ? " open" : ""}${p.mine ? " mine" : ""}">
-        <button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-expanded="${open2}">
-          <span class="gn-title">${esc3(p.title)}${p.comments.length ? ` <em>[${p.comments.length}]</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
-          <span class="gn-row-meta"><span>${esc3(p.nick)}</span><span>${esc3(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
-        </button>${open2 ? postView(p, me, busy2) : ""}</li>`;
-  }).join("");
-  return `${top}<ul class="gn-list">${rows}</ul>`;
+  const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+  return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2(esc3(nick), `${t.rows.length}통`, right)}
+    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc3(src.title)}」</div>` : ""}
+      ${t.rows.map((d, i) => {
+    const first = i === 0 || t.rows[i - 1].side !== d.side;
+    return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc3(d.date)}</small>` : ""}</div></div>`;
+  }).join("")}
+    </div>
+    ${inline ? "" : composer(busy2, ph)}
+  </div>`;
 }
-function dmView(st, busy2) {
-  const c = gnet.compose;
-  const top = c?.kind === "newdm" || c?.kind === "dm" && !st.dms.some((d) => d.nick === c.nick) ? composeBox(c, busy2) : "";
+function boardList(st, busy2, mobile) {
+  if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
+  return `<ul class="ph-list gn-list">${st.posts.map((p) => {
+    const on = gnet.open === p.id && !gnet.settings;
+    return `<li class="gn-row${on ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on}">
+        <span class="gn-title"><b>${esc3(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
+        <span class="gn-row-meta"><span class="gn-row-nick">${esc3(p.nick)}</span><span>${esc3(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
+      </button>${mobile && on && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy2, true) : ""}</li>`;
+  }).join("")}</ul>`;
+}
+function dmList(st, busy2, mobile) {
   const threads = dmThreads(st);
-  if (!threads.length) return `${top}<p class="gx-none">주고받은 쪽지가 없어요. 게시판에서 닉네임을 누르거나 ✉ 쪽지로 보낼 수 있어요.</p>`;
-  const rows = threads.map((t) => {
-    const open2 = gnet.openDm === t.nick;
+  if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
+  return `<ul class="ph-list gn-list">${threads.map((t) => {
+    const on = gnet.openDm === t.nick && !gnet.settings;
+    const last = t.rows[t.rows.length - 1];
     const confirm = gnet.confirm === `d:${t.nick}`;
-    const bubbles = open2 ? `<div class="gn-thread">${st.sources[t.nick] ? `<p class="gx-muted">처음 이어진 글: 「${esc3(st.sources[t.nick].title)}」</p>` : ""}
-          ${t.rows.map((d) => `<div class="gn-bubble ${d.side}"><div>${body(d.body)}</div><small>${d.side === "me" ? "보냄" : "받음"}${d.date ? ` · ${esc3(d.date)}` : ""}</small></div>`).join("")}
-          ${c?.kind === "dm" && c.nick === t.nick ? composeBox(c, busy2) : `<div class="gn-post-act"><button class="gx-mini" data-action="gn-dm-reply" data-value="${esc3(t.nick)}">답장하기</button>
-          <button class="gx-mini${confirm ? " danger" : ""}" data-action="gn-del-thread" data-value="${esc3(t.nick)}">${confirm ? "정말 삭제" : "삭제"}</button></div>`}</div>` : "";
-    return `<li class="gn-row${open2 ? " open" : ""}"><button class="gn-row-main" data-action="gn-open-dm" data-value="${esc3(t.nick)}" aria-expanded="${open2}">
-        <span class="gn-title">${esc3(t.nick)}${t.unread ? `<span class="gx-badge hot">새 쪽지 ${t.unread}</span>` : ""}</span>
-        <span class="gn-row-meta"><span>${t.rows.length}통</span>${t.lastDate ? `<span>${esc3(t.lastDate)}</span>` : ""}</span></button>${bubbles}</li>`;
-  }).join("");
-  return `${top}<ul class="gn-list">${rows}</ul>`;
+    const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc3(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc3(t.nick)}" aria-label="${esc3(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+    return `<li class="ph-row"><button class="ph-main gn-dmrow${on ? " on" : ""}" data-action="gn-open-dm" data-value="${esc3(t.nick)}" aria-pressed="${on}">
+        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc3(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc3(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last.side === "me" ? "나: " : ""}${esc3([...previewText(last.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy2, true) : ""}</li>`;
+  }).join("")}</ul>`;
 }
-function settingsView2(ctx) {
+var row2 = (label, control, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control}</div></div>`;
+var group2 = (title2, rows) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows}</div></section>`;
+function settingsView2(ctx, back = true) {
   const v = (k) => String(ctx.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
-  const text = (k, ph) => `<input class="gx-search" data-change="gn-text" data-key="${k}" value="${esc3(v(k) === "-" ? "" : v(k))}" placeholder="${esc3(ph)}">`;
+  const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc3(v(k) === "-" ? "" : v(k))}" placeholder="${esc3(ph)}">`;
   const keep = gnetRetention(ctx.chat.scriptstate);
   const on = v("mode") !== "0";
-  return `<details class="nw-req gn-settings" data-keep="gn-settings"${keepOpen("gn-settings", !on)}><summary>괴담넷 설정</summary><div class="nw-settings">
-    <label>괴담넷 사용</label>${seg2("power", on ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}
-    ${on ? `<label>모델</label>${seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])}
-    <label>새로고침</label>${seg2("lazy", v("lazy") === "0" ? "0" : "1", [["1", "수동"], ["0", "본편 응답마다"]])}
-    <label>게시글 수</label>${seg2("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))}
-    <label>사생활</label>${seg2("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]])}
-    <label>주제</label>${text("subject", "비우면 세계관에 맞는 다양한 주제")}
-    <label>분위기·말투</label>${text("mood", "비우면 익명 커뮤니티 말투")}
-    <label>보호 대상</label>${text("protagonist", "비우면 주인공")}
-    <label>새로고침 시 내 글</label>${seg2("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]])}
-    <label>내 댓글 있는 글</label>${seg2("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]])}
-    <label>선쪽지 받기</label>${seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])}
-    <label>본편에 반영</label>${seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]])}
-    <label>다양성 강화</label>${seg2("sampling", v("sampling") === "1" ? "1" : "0", [["0", "끄기"], ["1", "켜기"]])}
-    <label>쪽지 자동 정리</label><div class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</div>` : ""}
-  </div><p class="gx-muted">${on ? `새로고침을 본편 응답마다로 두면 본편 응답이 끝날 때마다 게시판을 새로 불러와요(모델을 한 번 더 불러요). 본편에 반영을 켜면 최근 글 5개와 쪽지가 본편 요청에 참고 기록으로 붙어요. 쪽지 자동 정리는 상대마다 최근 ${keep.limit}통만 남겨요.` : "괴담넷을 끄면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 그대로 남아요."}</p></details>`;
+  const rows = on ? `${group2("괴담넷", [
+    row2("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
+    row2("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
+    row2("새로고침", seg2("lazy", v("lazy") === "0" ? "0" : "1", [["1", "수동"], ["0", "본편 응답마다"]]), "본편 응답마다면 응답이 끝날 때마다 모델을 한 번 더 불러요"),
+    row2("본편에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "최근 글 5개와 쪽지가 본편 요청에 참고로 붙어요"),
+    row2("다양성 강화", seg2("sampling", v("sampling") === "1" ? "1" : "0", [["0", "끄기"], ["1", "켜기"]]))
+  ].join(""))}
+      ${group2("게시판", [
+    row2("게시글 수", seg2("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+    row2("사생활", seg2("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]])),
+    row2("주제", text("subject", "비우면 세계관에 맞는 다양한 주제")),
+    row2("분위기·말투", text("mood", "비우면 익명 커뮤니티 말투")),
+    row2("보호 대상", text("protagonist", "비우면 주인공")),
+    row2("새로고침 시 내 글", seg2("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]])),
+    row2("내 댓글 있는 글", seg2("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]]))
+  ].join(""))}
+      ${group2("쪽지", [
+    row2("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
+    row2("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
+  ].join(""))}` : group2("괴담넷", row2("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
+  return `<div class="ph-form">${paneHead2("괴담넷 설정", "이 채팅에만 적용돼요", "", back)}<div class="ph-form-body ps">${rows}</div></div>`;
+}
+function paneHtml2(ctx, st, kind, busy2) {
+  if (kind === "settings") return settingsView2(ctx);
+  if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy2);
+  if (kind === "post") return postView(findPost(st, gnet.open), busy2);
+  if (kind === "dm") return dmPane(st, gnet.openDm, busy2);
+  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>괴담넷</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
 }
 function gnetTab(ctx, env2) {
   if (env2) liveEnv2 = env2;
   if (!gnetSettings(ctx.chat.scriptstate).enabled) {
-    return `<main class="gx-body gn"><div class="gx-empty">괴담넷이 꺼져 있어요. 아래 설정에서 켜면 다시 쓸 수 있어요.</div>${settingsView2(ctx)}</main>`;
+    return `<main class="gx-body gn gn-off">${settingsView2(ctx, false)}</main>`;
   }
   const st = readGnet(ctx.chat);
   const me = userNick(ctx.chat.scriptstate);
   const job = jobs2.get(chatKey2(ctx));
   const busy2 = !!job;
   const unreadDm = st.dms.filter((d) => d.unread).length;
-  const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc3(me === "익명" && !ctx.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="익명" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : `<button class="gn-nickbtn" data-action="gn-nick" title="닉네임 바꾸기">${esc3(me)} ✎</button>`;
+  const mobile = narrow();
+  const kind = paneKind(st, mobile);
+  const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc3(me === "익명" && !ctx.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
   const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc3(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc3(gnet.failure.raw)}</textarea></details>` : "";
-  return `<main class="gx-body gn">
-    <div class="gn-top"><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${gnet.sub === "board" ? " on" : ""}" data-action="gn-sub" data-value="board">게시판${boardUnread(st) ? '<span class="gn-dot"></span>' : ""}</button>
-      <button class="gx-seg${gnet.sub === "dm" ? " on" : ""}" data-action="gn-sub" data-value="dm">쪽지함${unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : ""}</button>
-    </div>${nick}</div>
-    ${job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc3(job)} 창을 닫아도 계속돼요.</div>` : ""}
-    ${gnet.notice ? `<div class="gx-hint gn-notice" role="status">${esc3(gnet.notice)}</div>` : ""}
-    <div class="gn-actions">
-      <button class="gx-mini" data-action="gn-refresh" ${busy2 ? "disabled" : ""}>↻ 새로고침</button>
-      <button class="gx-mini" data-action="gn-write">✎ 글쓰기</button>
-      <button class="gx-mini" data-action="gn-newdm">✉ 쪽지</button>
-    </div>
-    ${gnet.sub === "board" ? boardView(st, me, busy2) : dmView(st, busy2)}
-    ${fail3}${settingsView2(ctx)}
+  const status = `${job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc3(job)} 창을 닫아도 계속돼요.</div>` : ""}${gnet.notice ? `<div class="gx-hint gn-notice" role="status">${esc3(gnet.notice)}</div>` : ""}`;
+  const subBtn = (id, label, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
+  return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
+    <section class="ph-side" aria-label="괴담넷 목록">
+      <div class="ph-side-head">
+        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc3(me)}</b></span></div>
+        <div class="ph-tools">
+          ${tool2("gn-refresh", ICONS.refresh, "게시판 새로고침", busy2 ? "disabled" : "", "새로고침")}
+          ${tool2("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기")}
+          ${tool2("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지")}
+          ${tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임")}
+          ${tool2("gn-settings", ICONS.settings, "괴담넷 설정", gnet.settings ? 'aria-pressed="true"' : "", "설정")}
+        </div>
+        ${nick}
+      </div>
+      ${kind ? "" : status}
+      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy2, mobile) : dmList(st, busy2, mobile)}</div>
+      ${mobile && !kind ? inlineComposer(st, busy2) : ""}
+      ${fail3}
+    </section>
+    <section class="ph-pane">${kind ? status : ""}${paneHtml2(ctx, st, kind, busy2)}</section>
   </main>`;
 }
 var AUTO_LAST = "$gn_auto_last";
@@ -6535,11 +6763,27 @@ async function handleGnet(action, value, ctx, env2) {
   switch (action) {
     case "gn-sub":
       gnet.sub = v === "dm" ? "dm" : "board";
-      if (gnet.compose?.kind !== "post" || gnet.sub !== "board") gnet.compose = null;
+      if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+      break;
+    case "gn-back":
+      if (gnet.settings) gnet.settings = false;
+      else if (gnet.compose && (gnet.compose.kind === "post" || gnet.compose.kind === "newdm" || gnet.compose.kind === "dm" && !st().dms.some((d) => d.nick === gnet.compose.nick))) gnet.compose = null;
+      else if (gnet.sub === "board") gnet.open = null;
+      else gnet.openDm = null;
+      if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+      gnet.attachMenu = false;
+      break;
+    case "gn-settings":
+      gnet.settings = !gnet.settings;
+      break;
+    case "gn-att-menu":
+      gnet.attachMenu = !gnet.attachMenu;
       break;
     case "gn-open": {
-      gnet.open = gnet.open === a ? null : a;
-      if (gnet.compose?.kind === "comment") gnet.compose = null;
+      gnet.open = gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== "comment") ? null : a;
+      gnet.settings = false;
+      if (gnet.compose && gnet.compose.kind !== "post") gnet.compose = null;
+      if (gnet.compose?.kind === "post") gnet.compose = null;
       const p = gnet.open !== null ? findPost(st(), gnet.open) : void 0;
       if (p && postUnread(p)) {
         const id = p.id;
@@ -6549,8 +6793,9 @@ async function handleGnet(action, value, ctx, env2) {
       break;
     }
     case "gn-open-dm": {
-      gnet.openDm = gnet.openDm === v ? null : v;
-      if (gnet.compose?.kind === "dm") gnet.compose = null;
+      gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
+      gnet.settings = false;
+      gnet.compose = null;
       if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
         await mutate2(ctx, env2, (s5) => acknowledge(s5, void 0, v), {}, false);
         return true;
@@ -6561,22 +6806,28 @@ async function handleGnet(action, value, ctx, env2) {
       void refreshBoard(ctx, env2);
       return true;
     case "gn-write":
+      gnet.settings = false;
       gnet.sub = "board";
       gnet.compose = { kind: "post" };
       gnet.draft = "";
       gnet.attach = [];
       break;
     case "gn-newdm":
+      gnet.settings = false;
       gnet.sub = "dm";
       gnet.compose = { kind: "newdm" };
       gnet.draft = "";
       gnet.attach = [];
       break;
-    case "gn-comment":
+    case "gn-comment": {
       gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
-      gnet.draft = "";
       gnet.attach = [];
-      break;
+      env2.render();
+      const box = document.querySelector('.gn-composer [data-input="gn-draft"]');
+      box?.scrollIntoView({ block: "center", behavior: "smooth" });
+      box?.focus({ preventScroll: true });
+      return true;
+    }
     case "gn-reply": {
       const c = findPost(st(), a)?.comments[b - 1];
       if (!c) break;
@@ -6590,6 +6841,7 @@ async function handleGnet(action, value, ctx, env2) {
       const contact = p && (b > 0 ? p.comments[b - 1] : p);
       if (!p || !contact || contact.mine) break;
       gnet.sub = "dm";
+      gnet.settings = false;
       gnet.openDm = contact.nick;
       gnet.compose = { kind: "dm", nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 쪽지 · 「${p.title}」` };
       gnet.draft = "";
@@ -6611,7 +6863,7 @@ async function handleGnet(action, value, ctx, env2) {
       attachAction(gnet.attach, action === "gn-att-add" ? "add" : "del", v, GN_KINDS);
       break;
     case "gn-send": {
-      const c = gnet.compose;
+      const c = gnet.compose ?? (gnet.sub === "board" && gnet.open !== null ? { kind: "comment", post: gnet.open, parent: 0, label: "댓글" } : gnet.sub === "dm" && gnet.openDm ? { kind: "dm", nick: gnet.openDm, label: `${gnet.openDm}에게 답장` } : null);
       if (!c) break;
       if (!gnet.draft.trim() && !gnet.attach.length) {
         gnet.notice = "내용을 입력해 주세요.";
@@ -7309,6 +7561,7 @@ function themeVars(sel) {
     return `${sel}${t === "dark" ? "" : `[x-goei-theme="${t}"]`} { --g-void: ${p.void}; --g-panel: ${p.panel}; --g-line: ${p.line}; --g-text: ${p.text}; --g-sub: ${p.sub}; --g-signal: ${p.signal}; --g-acc: ${p.accentBg}; --g-acc-line: ${p.accentLine}; --g-scrim: ${p.scrim}; }`;
   }).join("\n");
 }
+var INTRO_MS = 2e3;
 var FAB_CSS = `
 ${themeVars("[x-goei-fab]")}
 [x-goei-fab] {
@@ -7346,37 +7599,44 @@ ${themeVars("[x-goei-fab]")}
   0%, 100% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 0 transparent; }
   50% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 7px color-mix(in srgb, var(--g-signal) 22%, transparent), 0 0 26px 6px color-mix(in srgb, var(--g-signal) 35%, transparent); }
 }
-[x-goei-fab][x-goei-glow="true"] button { animation: goei-fab-glow 1.3s ease-in-out 3; }
-@media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-glow="true"] button { animation: none; } }
-`;
-var INTRO_MS = 1800;
-var INTRO_CSS = `
-[x-goei-intro] { --g-void: #061216; --g-text: #e8fffa; --g-sub: #a7c9be; --g-signal: #7fe3d0; }
-[x-goei-intro] {
-  position: fixed; left: 50%; top: max(14px, env(safe-area-inset-top)); z-index: 2147483000; pointer-events: none;
-  display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px; max-width: calc(100vw - 32px); box-sizing: border-box;
-  border-radius: 14px; overflow: hidden; background: color-mix(in srgb, var(--g-void) 94%, transparent);
-  border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent);
-  box-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
-  font-family: 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif;
-  animation: goei-in-drop ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) forwards;
+@media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-intro="true"] * { animation: none !important; } }
+
+/* 접속 효과 (v0.16.22, 사용자 설계): 위쪽 띠 대신 유령 버튼 자리에서. 버튼이 튀어나오며 고리가 퍼지고,
+   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다. 표는 테마와 상관없이 원래 어두운 배색 */
+[x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
+[x-goei-fab][x-goei-intro="true"] button::after { display: none; }
+[x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
+[x-goei-fab][x-goei-intro="true"] [data-gr] {
+  display: block; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+  border: 2px solid var(--g-signal); opacity: 0; animation: goei-ring 1100ms ease-out 120ms both;
 }
-[x-goei-intro] [data-gi="scan"] {
-  position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 22%, transparent), transparent);
-  animation: goei-in-sweep 900ms ease-out 200ms both;
+[x-goei-fab][x-goei-intro="true"] [data-gr] + [data-gr] { animation-delay: 480ms; }
+[x-goei-fab][x-goei-intro="true"] [data-gl] {
+  --gl-dx: 12px;
+  display: flex; align-items: center; gap: 8px; position: absolute; top: 50%; right: calc(100% + 12px);
+  height: 36px; padding: 0 16px; box-sizing: border-box; border-radius: 10px; overflow: hidden; white-space: nowrap; pointer-events: none;
+  background: rgba(6, 18, 22, .94); border: 1px solid rgba(127, 227, 208, .45); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
+  color: #e8fffa; font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
+  transform-origin: right center; opacity: 0; animation: goei-label ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) 260ms both;
 }
-[x-goei-intro] [data-gi="ghost"] { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; color: var(--g-signal); background: color-mix(in srgb, var(--g-signal) 14%, transparent); }
-[x-goei-intro] [data-gi="ghost"] svg { width: 22px; height: 22px; }
-[x-goei-intro] [data-gi="title"] {
-  position: relative; color: var(--g-text); font-size: 14px; font-weight: 700; letter-spacing: .2em; white-space: nowrap;
-  animation: goei-in-glitch 520ms steps(1) 220ms 1;
+[x-goei-fab][x-goei-side="left"][x-goei-intro="true"] [data-gl] { --gl-dx: -12px; right: auto; left: calc(100% + 12px); transform-origin: left center; }
+[x-goei-fab] [data-gs] {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(127, 227, 208, .28), transparent);
+  animation: goei-in-sweep 800ms ease-out 420ms both;
 }
-@keyframes goei-in-drop {
-  0% { opacity: 0; transform: translate(-50%, -14px); }
-  14% { opacity: 1; transform: translate(-50%, 0); }
-  80% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -8px); }
+[x-goei-fab] [data-gt] { position: relative; animation: goei-in-glitch 520ms steps(1) 480ms 1; }
+@keyframes goei-fab-pop {
+  0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
+  60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes goei-ring { 0% { opacity: .9; transform: scale(.7); } 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes goei-label {
+  0% { opacity: 0; transform: translate(var(--gl-dx), -50%) scaleX(.5); }
+  16% { opacity: 1; transform: translate(0, -50%) scaleX(1); }
+  82% { opacity: 1; transform: translate(0, -50%) scaleX(1); }
+  100% { opacity: 0; transform: translate(0, -50%) scaleX(1); }
 }
 @keyframes goei-in-sweep { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
 @keyframes goei-in-glitch {
@@ -7386,15 +7646,10 @@ var INTRO_CSS = `
   60% { transform: translate(0); text-shadow: none; }
   100% { transform: translate(0); }
 }
-@media (prefers-reduced-motion: reduce) {
-  [x-goei-intro] *, [x-goei-intro] { animation-duration: 1ms !important; animation-delay: 0ms !important; }
-  [x-goei-intro] { transform: translateX(-50%); animation: none !important; }
-}
 `;
-var INTRO_HTML = `
-<div data-gi="scan"></div>
-<div data-gi="ghost" aria-hidden="true">${GHOST_ICON}</div>
-<div data-gi="title">ANOMALY SIMULATION</div>`;
+var FAB_HTML = (label) => `<span data-gr></span><span data-gr></span>
+<span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
+<button type="button" aria-label="${label}">${GHOST_ICON}</button>`;
 async function body2() {
   const doc = await risuai.getRootDocument();
   if (!doc) return null;
@@ -7424,7 +7679,7 @@ async function createFab(onOpen) {
   await removeLeftovers(doc);
   const host = await doc.createElement("div");
   await host.setAttribute("x-goei-fab", "true");
-  await host.setInnerHTML(`<button type="button" aria-label="${BRAND.fab} 열기 (끌어서 옮기기)">${GHOST_ICON}</button>`);
+  await host.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
   const style = await doc.createElement("style");
   await style.setTextContent(FAB_CSS);
   await host.appendChild(style);
@@ -7442,6 +7697,14 @@ async function createFab(onOpen) {
   await applyPos();
   let visible = false;
   let shown2 = null;
+  let introTimer;
+  const endIntro = () => {
+    if (introTimer === void 0) return;
+    clearTimeout(introTimer);
+    introTimer = void 0;
+    void host.setAttribute("x-goei-intro", "false").catch(() => {
+    });
+  };
   let drag = null;
   let moved = false;
   let pending = null;
@@ -7551,8 +7814,8 @@ async function createFab(onOpen) {
   };
   await bind();
   return {
-    async setVisible(next, glow = false) {
-      if (shown2 === next && !glow) return;
+    async setVisible(next, intro = false) {
+      if (shown2 === next && !intro) return;
       const reappear = next && !shown2;
       shown2 = next;
       if (reappear) await bind().catch(() => {
@@ -7566,9 +7829,16 @@ async function createFab(onOpen) {
         pos = clampPos(pos, vw, vh);
         await applyPos();
       }
-      await host.setAttribute("x-goei-glow", String(next && glow));
+      endIntro();
+      if (next && intro) {
+        const { vw } = await viewport();
+        await host.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
+        await host.setAttribute("x-goei-intro", "true");
+        introTimer = setTimeout(endIntro, INTRO_MS + 400);
+      }
       await host.setStyle("display", next ? "block" : "none");
     },
+    endIntro,
     async setTheme(theme) {
       await host.setAttribute("x-goei-theme", theme);
       await cardStyle2.setTextContent(cardVarsCss(theme) + LANDING_CSS);
@@ -7584,29 +7854,6 @@ async function createFab(onOpen) {
       await unbind();
     }
   };
-}
-var introHost = null;
-function cancelIntro() {
-  const h = introHost;
-  introHost = null;
-  void h?.remove().catch(() => {
-  });
-}
-async function playIntro() {
-  const root2 = await body2();
-  if (!root2) return;
-  const host = await root2.doc.createElement("div");
-  introHost = host;
-  await host.setAttribute("x-goei-intro", "true");
-  await host.setInnerHTML(INTRO_HTML);
-  const style = await root2.doc.createElement("style");
-  await style.setTextContent(INTRO_CSS);
-  await host.appendChild(style);
-  await root2.body.appendChild(host);
-  await new Promise((r) => setTimeout(r, INTRO_MS));
-  if (introHost === host) introHost = null;
-  await host.remove().catch(() => {
-  });
 }
 
 // src/ui/style.css
@@ -7731,18 +7978,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
 .gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
-.gx-op { position: relative; display: flex; align-items: flex-end; min-height: 92px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: linear-gradient(150deg, var(--accent-bg), var(--panel)); isolation: isolate; }
-.gx-op.has-img { min-height: 118px; }
-.gx-op-img { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center 30%; }
-.gx-op.has-img::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(4, 10, 9, .05) 0%, rgba(4, 10, 9, .55) 45%, rgba(4, 10, 9, .92) 100%); }
-.gx-op-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gx-op-txt small { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--sub); }
-.gx-op-txt b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
-.gx-op.has-img .gx-op-txt small { color: rgba(255, 255, 255, .72); }
-.gx-op.has-img .gx-op-txt b { color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
-.gx-op-sc { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--sub); min-width: 0; }
-.gx-op.has-img .gx-op-sc { color: rgba(255, 255, 255, .88); }
-.gx-op-sc i { flex: none; font-style: normal; font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: var(--signal); color: #04201c; }
 .gx-logo.mob { display: none; }
 /* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
 @media (min-width: 761px) {
@@ -8079,30 +8314,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-sugg:hover { border-color: var(--mint); }
 
 /* 괴담넷 */
-.gn { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; padding-bottom: 20px; }
-.gn-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.gn-nickbtn { border: 1px solid var(--line); background: var(--panel2); border-radius: 999px; padding: 4px 12px; font-size: 14px; color: var(--mint); }
 .gn-nickform { display: flex; gap: 6px; }
 .gn-nickform .gx-search { width: 160px; }
-.gn-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.gn-dot { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--danger); vertical-align: middle; }
 .gn-count { margin-left: 4px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; }
 .gn-notice { margin: 0; }
-.gn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
-.gn-row { border-bottom: 1px solid var(--line); }
-.gn-row-main { width: 100%; display: flex; flex-direction: column; gap: 2px; padding: 10px 4px; text-align: left; border: 0; background: none; }
-.gn-row-main:hover .gn-title { color: var(--signal); }
-.gn-row.open > .gn-row-main .gn-title { color: var(--signal); }
-.gn-title { font-weight: 600; color: var(--text); }
-.gn-title em { font-style: normal; color: var(--amber); font-weight: 500; }
-.gn-row-meta, .gn-post-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
-.gn-row.mine .gn-row-meta span:first-child { color: var(--mint); }
-.gn-post { display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px; padding: 14px; border-radius: 12px; background: var(--panel2); border: 1px solid var(--line); }
-.gn-post-meta { align-items: center; }
-.gn-no { margin-left: auto; }
-.gn-post-body p, .gn-c-body p, .gn-bubble p { margin: 0 0 6px; }
-.gn-post-body { font-size: 16px; line-height: 1.7; }
-.gn-post-act { display: flex; gap: 6px; flex-wrap: wrap; }
+.gn-dot { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--danger); vertical-align: middle; }
+.gn-post-body p, .gn-c-body p { margin: 0 0 6px; }
+.gn-post-body p:last-child, .gn-c-body p:last-child { margin-bottom: 0; }
 .gn-att { display: flex; gap: 8px; align-items: baseline; margin: 6px 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: 14px; }
 .gn-att b { color: var(--amber); flex: none; }
 /* 첨부 (원본 at-card·at-menu) */
@@ -8126,22 +8344,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .at-add:disabled { opacity: .45; }
 .ph-notice-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 8px; }
 .ph-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; font-size: 14px; color: var(--dim); }
-.gn-ccount { margin: 4px 0 0; font-size: 14px; color: var(--dim); font-weight: 500; }
-.gn-comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.gn-c { margin-left: calc(var(--gn-depth, 0) * 18px); padding: 8px 10px; border-left: 2px solid var(--line); background: var(--sunk); border-radius: 0 8px 8px 0; }
-.gn-c.unread { border-left-color: var(--danger); }
-.gn-c-head { display: flex; align-items: center; gap: 6px; font-size: 14px; }
-.gn-c-act { margin-left: auto; display: flex; gap: 4px; }
-.gn-c-act .gx-mini { padding: 2px 8px; font-size: 13px; min-height: 0; }
-.gn-nick { border: 0; background: none; padding: 0; color: var(--mint); font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }
 .gn-me { color: var(--signal); }
-.gn-compose { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid color-mix(in srgb, var(--signal) 40%, var(--line)); border-radius: 12px; background: var(--accent-bg); }
-.gn-compose p { margin: 0; }
-.gn-compose-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.gn-text { padding: 10px 12px; resize: vertical; line-height: 1.5; min-height: 72px; }
-.gn-send { align-self: flex-end; width: auto; padding: 8px 22px; min-height: 0; font-size: 15px; }
-.gn-thread { display: flex; flex-direction: column; gap: 8px; padding: 4px 4px 14px; }
-.gn-thread .gx-muted { margin: 0; font-size: 13px; }
 .gn-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; background: var(--panel2); border: 1px solid var(--line); }
 .gn-bubble.me { align-self: flex-end; background: var(--accent-bg); border-color: var(--accent-line); }
 .gn-bubble small { display: block; margin-top: 2px; font-size: 12px; color: var(--dim); }
@@ -8298,13 +8501,19 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-body.ph-app { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden; min-height: 0; }
 .gx-body .ph-side { display: flex; flex-direction: column; gap: 10px; min-height: 0; padding: 14px 14px 0; border-right: 1px solid var(--panel2); overflow: hidden; }
 .ph-side-head { display: flex; flex-direction: column; gap: 8px; }
-.ph-findbar { display: flex; align-items: center; gap: 4px; }
-.ph-findbar .ph-search { flex: 1; min-width: 0; }
-.ph-subs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 12px; background: var(--sunk); border: 1px solid var(--line); }
-.ph-sub { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 34px; padding: 0 12px; border: 0; border-radius: 9px; background: none; color: var(--dim); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; }
-.ph-sub.on { background: var(--panel2); color: var(--text); }
-.ph-tools { display: flex; gap: 0; flex: none; }
-.ph-tools .ph-tool { width: 34px; }
+.ph-findbar { display: flex; flex-direction: column; gap: 8px; }
+/* 연락처·대화·공지 탭 (v0.16.22): 상자 대신 글자 + 아래 밑줄 */
+.ph-subs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.ph-sub { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 42px; padding: 0 12px; border: 0; background: none; color: var(--dim); font: inherit; font-size: 15px; font-weight: 600; white-space: nowrap; }
+.ph-sub::after { content: ''; position: absolute; left: 22%; right: 22%; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: transparent; }
+.ph-sub:hover { color: var(--text); }
+.ph-sub.on { color: var(--text); font-weight: 700; }
+.ph-sub.on::after { background: var(--signal); }
+/* 도구 다섯 개: 한 줄에 아이콘 + 이름, 상자 없이 (PC·모바일 같음) */
+.ph-tools { flex: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.ph-tools .ph-tool { width: auto; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; }
+.ph-tools .ph-tool svg { width: 23px; height: 23px; }
+.ph-tool-l { font-size: 11.5px; font-weight: 600; line-height: 1; white-space: nowrap; }
 .ph-tool { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none; padding: 0; border: 0; border-radius: 10px; background: none; color: var(--sub); }
 .ph-tool svg { width: 20px; height: 20px; }
 .ph-tool:hover:not(:disabled) { background: var(--panel); color: var(--text); }
@@ -8315,7 +8524,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-search { width: 100%; flex: none; }
 .ph-content { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -14px; padding: 0 6px 14px; }
 .ph-found { margin: 0 8px 6px; }
-.ph-tabs { display: flex; gap: 6px; padding: 0 8px 8px; overflow-x: auto; scrollbar-width: none; }
+.ph-tabs { flex: none; display: flex; gap: 6px; padding: 0 8px 8px; overflow-x: auto; scrollbar-width: none; }
 .ph-tab { flex: none; min-height: 30px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; }
 .ph-tab.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
 .ph-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -8323,11 +8532,20 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-row:hover { background: var(--panel); }
 .ph-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px; border: 0; border-radius: 14px; background: none; text-align: left; color: var(--text); font: inherit; }
 .ph-main.on { background: var(--accent-bg); }
+.ph-row:has(> .ph-main.on), .ph-row:has(> .ph-main.on):hover { background: var(--accent-bg); }
+.ph-row:has(> .ph-rdel) .ph-main.on { background: none; }
 .ph-avatar { position: relative; overflow: hidden; flex: none; width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--panel2); color: var(--mint); font-weight: 700; font-size: 16px; }
 .ph-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ph-avatar.group { color: var(--amber); background: var(--amber-bg); }
 .ph-avatar.group svg { width: 22px; height: 22px; }
 .ph-avatar.group i { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 11px; font-weight: 800; }
+.ph-contacts .ph-avatar { width: 58px; height: 58px; border-radius: 17px; font-size: 19px; }
+.ph-who-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ph-who-name b { min-width: 0; }
+.ph-who-name .gx-st { flex: none; }
+.ph-sec { display: flex; align-items: center; gap: 6px; margin: 10px 8px 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
+.ph-sec:first-child { margin-top: 2px; }
+.ph-sec b { color: var(--dim); font-weight: 600; }
 .ph-avatar.sm { width: 40px; height: 40px; border-radius: 13px; font-size: 14px; }
 .ph-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ph-who b { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -8351,8 +8569,17 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-empty p { margin: 0; font-size: 14px; }
 .ph-room, .ph-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .ph-room-head { flex: none; display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 12px; border-bottom: 1px solid var(--panel2); background: var(--void); }
+/* 대화방 머리 도구 (새로고침·전화·초대·삭제): 누르기 쉽게 크게 (v0.16.22) */
+.ph-room-head .ph-act { display: flex; align-items: center; gap: 2px; }
+.ph-room-head .ph-act .ph-tool { width: 42px; height: 42px; }
+.ph-room-head .ph-act .ph-tool svg { width: 23px; height: 23px; }
 .ph-room-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .ph-room-title b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-head-q { flex: 0 1 220px; min-width: 0; min-height: 38px; }
+/* 단톡 만들기: 주제 칸은 고정, 사람 목록만 스크롤 */
+.ph-gbody { overflow: hidden; }
+.ph-gbody > textarea { flex: none; }
+.ph-gbody > .ph-pick { flex: 1; min-height: 0; overflow-y: auto; }
 .ph-room-title small { color: var(--dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -8372,6 +8599,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-msg.me .ph-line { flex-direction: row-reverse; }
 .ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
 .ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
+/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
+.ph-msg.npc .ph-bubble { background: #1F2E35; border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
 .ph-msg.me .ph-bubble { background: var(--signal); color: #04201c; }
 .ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
 .ph-bubble p { margin: 0; }
@@ -8397,25 +8627,26 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
 .ph-composer .at-editor { gap: 8px; }
 .ph-compose { display: flex; align-items: flex-end; gap: 6px; }
-.ph-input { flex: 1; min-width: 0; min-height: 42px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
+.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
 .ph-input:focus { outline: none; border-color: var(--accent-line); }
 .ph-plus { width: 42px; height: 42px; border-radius: 50%; }
 .ph-plus.on svg { transform: rotate(45deg); }
-.ph-send { display: grid; place-items: center; width: 42px; height: 42px; flex: none; padding: 0; border: 0; border-radius: 50%; background: var(--signal); color: #04201c; }
-.ph-send svg { width: 20px; height: 20px; }
-.ph-send:disabled { background: var(--panel2); color: var(--dim); }
+.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: #04201c; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
+.ph-send svg { width: 22px; height: 22px; }
+.ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.ph-send:active:not(:disabled) { transform: scale(.94); }
+.ph-back2 { display: none; }
+@media (max-width: 760px) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
+.ph-send:disabled { background: var(--panel2); color: var(--dim); box-shadow: none; }
 /* 단톡·전화·연락처 추가·설정 */
 .ph-form-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
 .ph-form-foot { flex: none; display: flex; justify-content: flex-end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-form-foot .gx-start { width: auto; min-width: 160px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.ph-form-foot .gx-start { width: 100%; min-height: 44px; border-radius: 12px; font-size: 16px; letter-spacing: .08em; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .ph-form-foot .gx-start svg { width: 18px; height: 18px; }
 .ph-label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; margin-bottom: -4px; }
 .ph-label small { font-weight: 400; color: var(--dim); font-size: 13px; }
 .ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
 .ph-pick { flex: none; }
-.ph-notice .ph-main { flex-direction: column; align-items: stretch; }
-.ph-notice-body { padding: 4px 10px 12px; font-size: 15px; line-height: 1.7; }
-.ph-notice-bar { padding: 0 8px; }
 .ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ph-pct { width: 72px; min-height: 34px; }
 
@@ -8441,7 +8672,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .ph-content { margin: 0 -12px; padding: 0 4px 12px; }
 
   .ph-room-head { min-height: 56px; padding: 6px 8px; gap: 8px; }
-  .ph-room-head .ph-act .ph-tool { width: 34px; height: 34px; }
+  .ph-head-q { flex-basis: 150px; }
+  .ph-room-head .ph-act .ph-tool { width: 40px; height: 40px; }
   .ph-msg { max-width: 84%; }
   .ph-log { padding: 10px 12px 8px; }
   .ph-composer { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
@@ -8520,32 +8752,34 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
 /* 괴담톡 공지: 카드 */
 .ph-notices { gap: 8px; padding: 0 8px; }
-.ph-notice { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.ph-notice { position: relative; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
 .ph-notice.new { border-color: var(--accent-line); }
-.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 12px 14px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; }
+.ph-notice.on { border-color: var(--signal); background: var(--panel2); }
+.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 12px 14px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
 .ph-ncard:hover { background: var(--panel2); }
-.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ph-ncard-top b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-notice.open .ph-ncard-top b { white-space: normal; }
-.ph-ncard small { font-size: 12px; color: var(--dim); }
-.ph-ncard-pre { font-size: 14px; line-height: 1.5; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.ph-notice .ph-notice-body { padding: 0 14px 12px; }
-.ph-ncard-act { display: flex; justify-content: flex-end; margin-top: 10px; }
+.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 40px; min-height: 26px; }
+.ph-ncard-top small { flex: 1; min-width: 0; font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-ncard-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ph-ncard-title b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-notice .ph-ndel { position: absolute; top: 8px; right: 8px; }
+.ph-notice .ph-tool.ph-ndel { width: 34px; height: 34px; }
 .ph-notice-bar { padding: 0 8px; }
+.ph-notice-body { margin: 0 14px 14px; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
+.ph-notice.open .ph-ncard-title b { white-space: normal; }
+/* PC는 목록에 첫 줄·제목만, 본문은 오른쪽 칸 */
+@media (min-width: 761px) { .ph-notice-body { display: none; } }
+.ph-row .ph-rdel { flex: none; }
+.ph-row .ph-tool.ph-rdel { width: 34px; height: 34px; color: var(--dim); }
+.ph-row .ph-tool.ph-rdel:hover { color: var(--danger); }
+.ph-notice .ph-tool.ph-ndel { color: var(--dim); }
+.ph-notice .ph-tool.ph-ndel:hover { color: var(--danger); }
 
 /* 위키 설정 등 작은 선택 버튼: 글자가 칸 밖으로 넘치지 않게 */
 .gx-segs-sm .gx-seg { flex: 0 0 auto; }
-.ph-tool-l { display: none; }
 
 @media (max-width: 760px) {
   /* 커스텀 임무: 모바일은 한 칸 (예전엔 .gx-field.gx-mission 두 칸 규칙이 이겨서 안내문이 세로로 한 글자씩 깨졌다) */
   .gx-field.gx-mission { grid-template-columns: minmax(0, 1fr); }
-  /* 괴담톡 검색줄: 버튼을 아래 줄로 내리고 크게, 이름 붙여서 */
-  .ph-findbar { flex-wrap: wrap; gap: 6px; }
-  .ph-findbar .ph-search { flex: 1 1 100%; }
-  .ph-tools { width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-  .ph-tools .ph-tool { width: auto; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 1px solid var(--line); background: var(--panel); }
-  .ph-tool-l { display: block; font-size: 11px; font-weight: 600; line-height: 1; white-space: nowrap; }
   /* 위키 설정: 선택 버튼 줄을 칸 너비만큼 */
   .nw-settings .gx-segs { justify-self: stretch; display: flex; }
   .nw-settings .gx-seg { flex: 1 0 auto; }
@@ -8677,8 +8911,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
 .gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
 .gx-sitbar .gx-chip { flex: none; }
-.gx-unplace { margin-left: auto; }
-.gx-unplace:hover { border-color: var(--line2); color: var(--text); }
+.gx-unplace { margin-left: auto; color: color-mix(in srgb, var(--danger) 75%, var(--dim)); }
+.gx-unplace:hover:not(:disabled) { border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
+.gx-unplace:disabled { color: var(--dim); opacity: .45; cursor: default; }
+.gx-mfilter .gx-unplace { margin-left: 0; }
 .gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
 .gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
@@ -8728,19 +8964,29 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
-.gx-op-txt { width: 100%; }
+/* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
+.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
+.gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
+.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
+.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-id-photo.none svg { width: 44px; height: 44px; }
+.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
+.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
+.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
+.gx-idbtn { display: none; overflow: hidden; padding: 0; }
+.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
+.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
+.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
+.gx-idpop-card .gx-id-photo { width: 160px; height: 160px; border-radius: 24px; }
+.gx-idpop-card .gx-agpop-x { z-index: 1; }
+@media (max-width: 760px) { .gx-idbtn { display: grid; } }
 .gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
 .gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
 .gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
 .gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
-.gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
-.gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
-.gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
-.gx-op.has-img:has(.gx-op-st) { min-height: 0; }
 /* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
-.gx-op.has-img:has(.gx-op-st)::before { background: linear-gradient(180deg, rgba(4, 10, 9, .5) 0%, rgba(4, 10, 9, .9) 100%); }
 
 /* 상황판 다시 설계 (v0.16.13) */
 /* 상황판 (v0.16.15 촘촘하게): 괴이·사건·특수 세 칸, 행은 한 줄. 위협도는 머리에만 (v0.16.16) */
@@ -8796,7 +9042,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard-tool svg { width: 18px; height: 18px; }
 .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
 .gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px; }
-.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; }
+.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; }
 .gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
 @media (max-width: 760px) {
   /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
@@ -8822,9 +9068,12 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-board .gx-acard { cursor: pointer; }
 }
 .gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
-.gx-agpop-card { position: relative; display: flex; gap: 12px; width: min(100%, 420px); box-sizing: border-box; padding: 16px 44px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); }
-.gx-agpop-card .gx-ava { width: 72px; height: 72px; border-radius: 16px; flex: none; }
-.gx-agpop-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gx-agpop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 200px; height: 200px; border-radius: 22px; flex: none; font-size: 64px; }
+/* 사진 아래 한 줄: 이름·상태 왼쪽, 부서·직급 오른쪽. 상황은 그 아래 전체 폭 */
+.gx-agpop-txt { align-self: stretch; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 8px; min-width: 0; padding: 0 4px; }
+.gx-agpop-txt small { text-align: right; }
+.gx-agpop-txt .gx-acard-sit { grid-column: 1 / -1; }
 .gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .gx-agpop-txt .gx-acard-top b { font-size: 16px; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
@@ -8839,6 +9088,96 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
   .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
 }
+
+/* 괴담넷 (v0.16.22): 괴담톡과 같은 두 칸. 왼쪽 목록, 오른쪽 글·쪽지·새 글·설정 */
+.gn-off { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.gn-nickform { display: flex; gap: 6px; }
+.gn-nickform .gx-search { flex: 1; min-width: 0; }
+.gn-mynick { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 0; padding: 0 6px 2px; line-height: 1.25; }
+.gn-mynick small { font-size: 11px; color: var(--dim); }
+.gn-mynick b { max-width: 100%; font-size: 14px; color: var(--signal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-list { gap: 4px; padding: 0 8px; }
+.gn-row { border-radius: 12px; }
+.gn-row-main { width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.gn-row-main:hover { background: var(--panel); }
+.gn-row.on .gn-row-main { background: var(--accent-bg); border-color: var(--accent-line); }
+.gn-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gn-title b { min-width: 0; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-title em { flex: none; font-style: normal; font-size: 13px; font-weight: 700; color: var(--amber); }
+.gn-title .gn-dot { margin-left: 0; flex: none; }
+.gn-row-meta { display: flex; gap: 10px; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; }
+.gn-row.mine .gn-row-nick { color: var(--signal); }
+.gn-ava { color: var(--signal); background: var(--accent-bg); }
+.gn-ava svg { width: 24px; height: 24px; }
+.gn-dm-t { font-size: 11px; color: var(--dim); padding: 0 6px; }
+/* 글 본문 + 댓글: 게시판 글 모양 (제목줄·구분선·댓글 줄). 가운데만 스크롤, 아래 입력줄 고정 */
+.gn-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: 16px 22px 24px; }
+.gn-post { display: flex; flex-direction: column; }
+.gn-post-head { padding: 14px 4px 12px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.gn-post-title { margin: 0 0 8px; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
+.gn-post-meta { display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.gn-post-who { font-size: 14px; }
+.gn-post-stat { margin-left: auto; display: flex; gap: 12px; }
+.gn-post-body { min-height: 120px; padding: 22px 4px 28px; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); }
+.gn-csec { display: flex; flex-direction: column; margin-top: 20px; }
+.gn-chead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 10px 4px; border-bottom: 2px solid var(--line2); }
+.gn-ccount { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.gn-ccount b { color: var(--amber); }
+.gn-cnone { margin: 0; padding: 24px; text-align: center; color: var(--dim); font-size: 14px; border-bottom: 1px solid var(--line); }
+.gn-comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.gn-c { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; align-items: start; gap: 4px 14px; padding: 12px 4px 12px calc(4px + var(--gn-depth, 0) * 20px); border-bottom: 1px solid var(--panel2); }
+.gn-c.re { background: color-mix(in srgb, var(--panel) 45%, transparent); }
+.gn-c.unread .gn-c-body { color: var(--text); font-weight: 600; }
+.gn-c.target { background: var(--accent-bg); }
+.gn-c-who { display: flex; align-items: center; gap: 4px; min-width: 0; min-height: 28px; font-size: 14px; overflow: hidden; }
+.gn-c-who > b, .gn-c-who > button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-re { flex: none; color: var(--dim); font-size: 14px; }
+.gn-c-body { padding-top: 3px; font-size: 15px; line-height: 1.65; color: var(--sub); overflow-wrap: anywhere; }
+.gn-c-act { display: flex; align-items: center; gap: 2px; }
+.gn-reply { min-height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.gn-reply:hover { background: var(--panel2); color: var(--text); }
+.gn-c .ph-tool.gn-cdel { width: 28px; height: 28px; }
+.gn-c .ph-tool.gn-cdel, .gn-pane .ph-act .ph-tool { color: var(--dim); }
+.gn-c .ph-tool.gn-cdel:hover, .gn-pane .ph-act .ph-tool:hover { color: var(--danger); }
+.gn-nick { border: 0; background: none; padding: 0; color: var(--mint); font: inherit; font-weight: 700; cursor: pointer; }
+.gn-nick:hover { text-decoration: underline; text-underline-offset: 3px; }
+.gn-me { color: var(--signal); font-weight: 700; }
+.gn-replyto { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 4px 4px 14px; border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; }
+.gn-replyto span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-to { margin: 0; font-size: 14px; color: var(--sub); }
+.gn-text { min-height: 140px; padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.ps-text { width: 260px; max-width: 100%; }
+@media (max-width: 760px) {
+  .gn-doc { padding: 10px 12px 16px; }
+  .gn-post-title { font-size: 18px; }
+  .gn-post-stat { margin-left: 0; }
+  .gn-c { grid-template-columns: minmax(0, 1fr) auto; padding-left: calc(4px + var(--gn-depth, 0) * 14px); }
+  .gn-c-body { grid-column: 1 / -1; grid-row: 2; padding-top: 0; }
+  .ps-text { width: 100%; }
+}
+/* 모바일 괴담넷: 목록 안에서 펼침 */
+.gn-inline { display: flex; flex-direction: column; margin: 0 0 8px; border-top: 1px solid var(--line); }
+.gn-inline .gn-doc { flex: none; overflow: visible; padding: 4px 6px 8px; }
+.gn-inline .gn-post-head { border-top: 0; padding-top: 8px; }
+.gn-inline .gn-post-meta { align-items: center; }
+.gn-inline-del { margin-left: auto; }
+.ph-side > .gn-composer { margin: 0 -12px; }
+.ph-side > .gn-composer .ph-back2 { display: none !important; }
+.gn-dm-inline .ph-log { flex: none; overflow: visible; padding: 8px 6px; }
+.ph-row:has(> .gn-dm-inline) { flex-wrap: wrap; padding-right: 0; }
+.ph-row > .gn-dm-inline { flex: 1 0 100%; }
+.gn-row.on:has(> .gn-inline) .gn-row-main { border-color: transparent; }
+.gn-row:has(> .gn-inline) { background: var(--panel); border: 1px solid var(--line); }
+/* 괴담톡 공지 본문: 공지문 모양 (상자 없이 제목줄·구분선·서명) */
+.ph-ndoc-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 24px 28px; }
+.ph-ndoc-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 4px 14px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.ph-ndoc-head h3 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
+.ph-ndoc-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.ph-ndoc-text { padding: 22px 4px 26px; font-size: 15px; line-height: 1.85; color: var(--text); word-break: keep-all; overflow-wrap: anywhere; }
+.ph-ndoc-meta b { color: var(--sub); font-weight: 600; }
+.ph-ndoc .ph-act .ph-tool { color: var(--dim); }
+.ph-ndoc .ph-act .ph-tool:hover { color: var(--danger); }
+@media (max-width: 760px) { .ph-ndoc-body { padding: 12px 14px 20px; } }
 `;
 
 // src/ui/mbar.ts
@@ -9068,7 +9407,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.21" : "0";
+var PLUGIN_VERSION = true ? "0.16.22" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -9173,19 +9512,19 @@ function updateGroup(ctx) {
   const cur = cardVersion(ctx.char.globalLore);
   const lite = !!readManifest(ctx.char.globalLore);
   const L = updateUi.latest;
-  const row2 = (label, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
+  const row3 = (label, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
   if (!UPDATE_BASE) {
-    return section2(row2("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
+    return section2(row3("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
   }
   const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
-  rows.push(row2(
+  rows.push(row3(
     "플러그인",
     `<span class="upd-ver">v${esc4(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc4(L.plugin)}</b>` : ""}</span>`,
     pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
   ));
   const cardNew = lite && L && compareVersions(L.card, cur) > 0;
   const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
-  rows.push(row2(
+  rows.push(row3(
     "카드",
     `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc4(cur)}`}${cardNew ? ` → <b>v${esc4(L.card)}</b>` : ""}</span>`,
     !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
@@ -9864,6 +10203,16 @@ async function handleWiki(action, value, ctx, env2) {
   return true;
 }
 
+// src/ui/panels.ts
+var open = /* @__PURE__ */ new Set();
+function rememberPanel(el) {
+  const key = el.dataset.keep;
+  if (!key) return;
+  open.delete(key);
+  open.delete(`!${key}`);
+  open.add(el.open ? key : `!${key}`);
+}
+
 // src/ui/evcard.ts
 var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var KIND = { an: "괴이", in: "사건", ms: "특수" };
@@ -9887,7 +10236,6 @@ function evCard(c) {
   }
   const key = esc7(c.key);
   const acts = `<span class="gx-evc-act">
-      <button class="gx-icon" data-action="${c.mapAction ?? "board-map"}" data-value="${key}" title="지도" aria-label="${esc7(c.name)} 지도">${ICONS.map}</button>
       ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc7(c.name)}" title="위키" aria-label="${esc7(c.name)} 위키">${ICONS.wiki}</button>` : ""}
       ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc7(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
   const open2 = c.open ? ` data-action="${c.open}" data-value="${key}"` : "";
@@ -9988,6 +10336,7 @@ function targetName(t) {
   if (t.type === "facility") return t.name;
   return locName(t.loc);
 }
+var isPC = () => !matchMedia("(max-width: 760px)").matches;
 function sameTarget(a, key) {
   if (!a) return false;
   if (a.type === "event") return a.key === key;
@@ -10092,7 +10441,6 @@ function eventRow(e, x, agents) {
     extra: e.report ? `<span class="gx-evc-sit">${esc8(e.report)}</span>` : "",
     key: e.key,
     open: "pick-event",
-    mapAction: "show-event",
     selected: field2.target?.type === "event" && field2.target.key === e.key,
     confirmEnd: field2.confirmEnd === e.key
   });
@@ -10124,15 +10472,14 @@ function situations(x, events) {
   const chips = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
   const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
-  let place2 = "";
-  let cancel = "";
-  if (field2.place) {
-    place2 = placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place));
-    cancel = '<button class="gx-chip gx-unplace" data-action="map-unplace" title="장소 선택 풀기">취소</button>';
-  }
+  const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
+  const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
   const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
   return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
     ${shown2.length || place2 ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+}
+function cancelChip(action, on) {
+  return `<button class="gx-chip gx-unplace" data-action="${action}" ${on ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
 }
 function lockedState(x, id) {
   const rec = x.world.agents[id];
@@ -10245,7 +10592,7 @@ function missionTab(ctx, opening, notice2, busy2) {
     ${stepBar(field2.mname, opening ? void 0 : "map")}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc8(field2.query)}" data-input="mission-query" aria-label="검색"></div>
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc8(field2.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field2.mname)}</div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
@@ -10415,8 +10762,14 @@ async function handleField(action, value, ctx, env2, opening) {
         field2.mapq = "";
         v2 = key;
       }
-      field2.place = v2;
       field2.confirmEnd = null;
+      if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
+        field2.place = null;
+        field2.target = null;
+        env2.render();
+        return true;
+      }
+      field2.place = v2;
       const x = readCtx(ctx);
       const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
       if (!here.length) field2.target = placeTarget(v2);
@@ -10425,30 +10778,41 @@ async function handleField(action, value, ctx, env2, opening) {
     }
     case "map-unplace":
       field2.place = null;
-      env2.render();
+      field2.target = null;
+      field2.confirmEnd = null;
+      toStep("goal", env2);
       return true;
     case "map-filter":
       field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
       env2.render();
       return true;
     case "pick-place":
+      if (isPC() && sameTarget(field2.target, v)) {
+        field2.target = null;
+        env2.render();
+        return true;
+      }
       field2.target = placeTarget(v);
       toStep("team", env2);
       return true;
     case "field-step":
       toStep(v === "team" ? "team" : "goal", env2);
       return true;
-    case "pick-event":
-    case "show-event": {
+    case "pick-event": {
       const x = readCtx(ctx);
       if (typeof x === "string") return true;
       const ev = activeEvents(x.world).find((e) => e.key === v);
       if (!ev) return true;
-      if (action === "pick-event") field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+      if (isPC() && sameTarget(field2.target, ev.key)) {
+        field2.target = null;
+        field2.confirmEnd = null;
+        env2.render();
+        return true;
+      }
+      field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
       field2.region = sidoOf(ev.loc);
       field2.confirmEnd = null;
-      if (action === "pick-event") toStep("team", env2);
-      else env2.render();
+      toStep("team", env2);
       return true;
     }
     case "end-event":
@@ -10487,12 +10851,21 @@ async function handleField(action, value, ctx, env2, opening) {
       env2.render();
       return true;
     case "mission-pick":
+      if (isPC() && field2.mname === v && field2.mpick === field2.mkind) {
+        field2.mname = null;
+        env2.render();
+        return true;
+      }
       field2.mname = v;
       field2.mpick = field2.mkind;
       toStep("team", env2);
       return true;
     case "mission-cancel":
       if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx, env2, (w) => (cancelMission(w, v), null));
+      return true;
+    case "mission-unpick":
+      field2.mname = null;
+      toStep("goal", env2);
       return true;
     case "mission-send":
       await sendMission(ctx, env2, opening);
@@ -10792,11 +11165,11 @@ function directoryInput(key, value, bar) {
   }
   const at = key.indexOf("|");
   const field4 = key.slice(0, at);
-  const row2 = findRow(d, key.slice(at + 1));
-  if (!row2) return;
-  if (field4 === "aliases") row2.aliases = splitList(value);
-  else if (field4 === "label") row2.label = value.trim() || row2.lore;
-  else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row2[field4] = value.trim();
+  const row3 = findRow(d, key.slice(at + 1));
+  if (!row3) return;
+  if (field4 === "aliases") row3.aliases = splitList(value);
+  else if (field4 === "label") row3.label = value.trim() || row3.lore;
+  else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row3[field4] = value.trim();
   else return;
   dirUi.done = "";
   if (bar) bar.innerHTML = directoryBar();
@@ -10844,22 +11217,22 @@ async function handleDirectory(action, value, ctx, env2) {
     case "dir-set":
     case "dir-toggle": {
       const [field4, arg] = v.split("|", 2);
-      const row2 = findRow(d, v.slice(field4.length + arg.length + 2));
-      if (!row2) break;
-      if (field4 === "preset") row2.preset = arg === "1";
-      else if (field4 === "affiliation") row2.affiliation = arg;
+      const row3 = findRow(d, v.slice(field4.length + arg.length + 2));
+      if (!row3) break;
+      if (field4 === "preset") row3.preset = arg === "1";
+      else if (field4 === "affiliation") row3.affiliation = arg;
       else if (field4 === "rosterFor" || field4 === "phoneTabs") {
-        const cur = row2[field4];
-        row2[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
+        const cur = row3[field4];
+        row3[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
       }
       dirUi.done = "";
       break;
     }
     case "dir-org-pick": {
       const at = v.indexOf("|");
-      const row2 = d.agents.find((a) => a.lore === v.slice(at + 1));
-      if (!row2) break;
-      assignOrg(row2, d.orgs.find((o) => o.name === v.slice(0, at)));
+      const row3 = d.agents.find((a) => a.lore === v.slice(at + 1));
+      if (!row3) break;
+      assignOrg(row3, d.orgs.find((o) => o.name === v.slice(0, at)));
       dirUi.done = "";
       break;
     }
@@ -11017,7 +11390,7 @@ function seg4(action, cur, items, disabled = false) {
 function field3(label, control, help) {
   return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control}</div></div>`;
 }
-var group2 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
+var group3 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
 function worldOffVars() {
   return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
 }
@@ -11077,8 +11450,8 @@ function settingsTab(ctx, scope = "chat", canChat = true) {
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc10(settingsUi.notice)}</div>` : ""}
-    ${group2("화면", field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy2), "채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음)."))}
-    ${group2("상황판", [
+    ${group3("화면", field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy2), "채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음)."))}
+    ${group3("상황판", [
     field3("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
     field3("요원 표시 인원", stepper("set-agent", "n", `${s5.agentLimit}명`, s5.agentLimit > 0, s5.agentLimit < AGENT_MAX, "요원 표시 인원", busy2), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
     field3("지원 투입", seg4("set-support", s5.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy2), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.")
@@ -11092,7 +11465,7 @@ function settingsTab(ctx, scope = "chat", canChat = true) {
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
     </section>
-    ${group2("캐릭터 이미지", [
+    ${group3("캐릭터 이미지", [
     field3("에셋 출력", seg4("set-asset", s5.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy2), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
     s5.assetOn ? field3("출력 모델", seg4("set-asset-model", s5.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy2), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
     s5.assetOn && s5.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s5.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy2), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
@@ -11345,10 +11718,14 @@ function ensureRoot() {
     void handle(el.dataset.action, take ?? el.dataset.value);
   });
   const photoTarget = (el) => {
-    const box = el?.closest?.(".gn-compose, .ph-room");
-    return box ? box.classList.contains("gn-compose") ? "gn" : "ph" : "";
+    const box = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+    return box ? box.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
   };
   const imageFiles = (list5) => [...list5 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+  if (!widthWatch) {
+    widthWatch = true;
+    matchMedia("(max-width: 760px)").addEventListener?.("change", () => root && render());
+  }
   root.addEventListener("paste", (ev) => {
     const prefix = photoTarget(ev.target);
     const files = imageFiles(ev.clipboardData?.items);
@@ -11473,6 +11850,7 @@ async function addPhotos(prefix, files) {
   }
   render();
 }
+var widthWatch = false;
 async function openApp(opts = {}) {
   ensureRoot();
   if (opts.quietIfNotLite) {
@@ -11485,6 +11863,9 @@ async function openApp(opts = {}) {
   shown = true;
   await risuai.showContainer("fullscreen");
   await refresh();
+  void readUser().then((u) => {
+    if (shown && (u.name || u.photo)) render();
+  });
   void checkLatest(settingsEnv);
 }
 async function refresh() {
@@ -11610,8 +11991,12 @@ async function handle(action, value) {
       tab = "map";
       notice = "";
       return render();
+    case "id-card": {
+      if (view.kind !== "started") return;
+      showIdCard(idCard(view.ctx));
+      return;
+    }
     case "agent-info": {
-      if (!matchMedia("(max-width: 760px)").matches) return;
       const card2 = root?.querySelector(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? "")}"]`);
       if (card2) showAgentInfo(card2);
       return;
@@ -11729,6 +12114,7 @@ function startedHeader(ctx) {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
+      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc11(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
@@ -11887,6 +12273,12 @@ function tabs() {
   </nav>`;
 }
 function brand(ctx) {
+  return `<div class="gx-nav-brand">
+      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
+      ${idCard(ctx)}
+    </div>`;
+}
+function idCard(ctx) {
   const facs = factionList(ctx.char.globalLore);
   const code = String(ctx.chat.scriptstate?.["$st_faction"] ?? "") || currentChoice(ctx.chat).faction || "";
   const f = code ? findFaction(code, facs) : void 0;
@@ -11898,10 +12290,13 @@ function brand(ctx) {
   const line = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc11(value)}</em></span>` : "";
   const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc11(time2)}</span><span>${esc11(weather)}</span></span>` : "";
   const status = line("위치", st?.place ?? "") + line("목표", st?.target ?? "") + meta;
-  return `<div class="gx-nav-brand">
-      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
-      <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc11(img)}')"></span>` : ""}
-        <span class="gx-op-txt"><b>${esc11(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
+  const u = userInfo();
+  const name = u.name || "나";
+  const photo = u.photo ? `<span class="gx-id-photo"><img src="${esc11(u.photo)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+  return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc11(img)}')"></span>` : ""}
+      ${photo}
+      <span class="gx-id-who"><b>${esc11(name)}</b><small>${esc11(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</small></span>
+      ${status ? `<span class="gx-op-st">${status}</span>` : ""}
     </div>`;
 }
 function selfName(ctx, code, name) {
@@ -11937,7 +12332,7 @@ function board(ctx) {
   const names3 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
   const one = (kind, i, c) => {
     const key = keys.get(`${kind}${i}`);
-    return evCard({ ...c, kind, key, open: "board-map", mapAction: "board-map", confirmEnd: !!key && field2.confirmEnd === key });
+    return evCard({ ...c, kind, key, open: "board-map", confirmEnd: !!key && field2.confirmEnd === key });
   };
   const an = w.an.map((e, i) => {
     const wait = e.state === "발생대기";
@@ -12113,11 +12508,15 @@ function cardStyle() {
 }
 function onDisplay(text) {
   if (typeof text !== "string") return text;
-  if (isLanding(text)) return landingHtml2();
+  const ours = liteNow || isLanding(text) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
-  if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
-  if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
-  if (hasCall(out)) out = renderCalls(out, callCardHtml);
+  if (isLanding(text)) out = landingHtml2();
+  else {
+    if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+    if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
+    if (hasCall(out)) out = renderCalls(out, callCardHtml);
+  }
+  if (ours && !out.includes("data-goei-user")) out += USER_MARK;
   return out;
 }
 async function readSnapshot(fab2) {
@@ -12164,8 +12563,6 @@ function startWatcher(fab2) {
         if (next.fabVisible) await readTheme(snap).catch(() => {
         });
         await fab2.setVisible(next.fabVisible, next.intro);
-        if (next.intro) void playIntro().catch(() => {
-        });
       }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -12192,7 +12589,7 @@ await risuai.addRisuScriptHandler("display", onDisplay);
 var stopWatcher = null;
 var fab = null;
 try {
-  fab = await createFab(() => (cancelIntro(), void openApp({ quietIfNotLite: true })));
+  fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
   const f = fab;
   void f.setTheme(currentTheme());
   onThemeChange((t) => void f.setTheme(t).catch(() => {
@@ -12202,7 +12599,7 @@ try {
   console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
   await risuai.registerButton(
     { name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` },
-    () => (cancelIntro(), void openApp({ quietIfNotLite: true }))
+    () => void openApp({ quietIfNotLite: true })
   );
 }
 await risuai.onUnload(async () => {
