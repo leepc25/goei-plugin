@@ -66,6 +66,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
+      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r } : { ok: false, status: 404, json: async () => null }; },
     };
     window.__assets = {};`;
 }
@@ -1294,6 +1295,46 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => window.__button);
   assert.equal(await page.evaluate(() => window.__button.arg.location), 'chat');
   console.log('PASS 권한 거부 시 채팅 메뉴 버튼으로 대체');
+  await page.close();
+}
+
+// 9) 업데이트: 창을 열면 새 버전 안내 → 건너뛰기 기억 → 설정에서 카드 업데이트 (명부·채팅은 그대로)
+{
+  const payload = JSON.parse(readFileSync(new URL('../release/card-update.json', import.meta.url), 'utf8'));
+  payload.version = '9.0.0';
+  payload.data.firstMessage = '새 첫 안내';
+  const man = payload.data.globalLore.find((e) => e.comment === '괴이봇 플러그인 매니페스트');
+  man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0' });
+  const { page, errors } = await boot(fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } });
+  await page.evaluate((p) => {
+    window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' } : url.includes('card-update.json') ? p : null;
+    const dir = window.__char.globalLore.find((e) => e.comment === '괴이봇 명부');
+    if (dir) dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
+    window.__char.globalLore.push({ comment: '내가 넣은 로어북', content: '메모', key: '', mode: 'normal' });
+  }, payload);
+  await open(page);
+  await page.waitForSelector('.upd-banner');
+  assert.match(await page.textContent('.upd-banner'), /카드 v9\.0\.0/);
+  assert.equal(await page.locator('.gx-xdot').count(), 1, '설정 아이콘에 점');
+  await page.click('[data-action="upd-skip"]');
+  assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
+  assert.equal(await page.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');
+  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click('[data-action="upd-prepare"]');
+  await page.waitForSelector('.upd-plan');
+  assert.match(await page.textContent('.upd-plan'), /첫 안내/);
+  await page.click('[data-action="upd-apply"]');
+  await page.waitForFunction(() => window.__calls.setChar === 1);
+  const ch = await page.evaluate(() => window.__char);
+  assert.equal(ch.firstMessage, '새 첫 안내');
+  assert.match(ch.globalLore.find((e) => e.comment === '괴이봇 명부')?.content ?? '"내가 고친 값"', /내가 고친 값/, '명부는 보존');
+  assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
+  assert.equal(ch.name, fixture.name, '이름 유지');
+  await page.waitForSelector('.gx-hint');
+  assert.match(await page.textContent('.gx-settings'), /v9\.0\.0으로 바꿨어요/);
+  assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
+  assert.deepEqual(errors, []);
+  console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지)');
   await page.close();
 }
 

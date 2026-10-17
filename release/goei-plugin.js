@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.0
+//@version 0.16.1
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -2452,14 +2452,14 @@ function applyActivity(st, rows, snapshots, nick) {
   if (rows === void 0 || rows === null) return [false, 0];
   if (!Array.isArray(rows)) return [false, 1];
   let changed = false;
-  let skipped = 0;
+  let skipped2 = 0;
   const done = /* @__PURE__ */ new Set();
   for (const u of rows) {
     const id = isObj(u) ? int(u.id) : null;
     const ref = id !== null ? snapshots.get(id) : void 0;
     const p = id !== null ? findPost(st, id) : void 0;
     if (!isObj(u) || id === null || done.has(id) || !ref || !p || postHead(p) !== ref.head || ref.rows.some((k, i) => !p.comments[i] || commentKey(p.comments[i]) !== k)) {
-      skipped++;
+      skipped2++;
       continue;
     }
     done.add(id);
@@ -2469,17 +2469,17 @@ function applyActivity(st, rows, snapshots, nick) {
     };
     const comments = Array.isArray(u.comments) ? u.comments : [];
     if (!ref.commentsAllowed && comments.length) {
-      skipped++;
+      skipped2++;
       continue;
     }
     const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
     p.views += delta(u.viewsDelta);
     p.votes += delta(u.upvotesDelta);
     for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-    if (got.dropped) skipped++;
+    if (got.dropped) skipped2++;
     changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
   }
-  return [changed, skipped];
+  return [changed, skipped2];
 }
 function incomingPlan(chat, st, s5, nick, rand, origin, saved) {
   const plan = { allowed: false, userHandle: nick, history: [] };
@@ -6174,11 +6174,11 @@ function writePost(ctx, env2, input2) {
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: /* @__PURE__ */ new Set() }, nick);
       for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
       trimBoard(cur, s5);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       if (!got.comments.length) note = "글을 올렸어요. 아직 댓글은 없어요.";
-      if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
+      if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
       if (inc.note) note += ` ${inc.note}`;
       return writeGnet(withVars(chat, { ...inc.vars, [ORIGIN_KEY]: JSON.stringify({ post: p.id }) }), cur, { ack: { post: p.id } });
     });
@@ -6237,11 +6237,11 @@ async function writeComment(ctx, env2, postId2, parent, body4) {
       }
       const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
       for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? "" : "등록했어요. 추가 답글은 없어요.";
       if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
-      if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
+      if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
       if (inc.note) note += ` ${inc.note}`;
       return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing() });
     });
@@ -8441,6 +8441,12 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0 2px; }
 .upd-plan { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
 .upd-plan small { color: var(--dim); }
+.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 12px; padding: 10px 12px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
+.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
+.upd-banner-t b { color: var(--text); margin-right: 4px; }
+.upd-banner-b { display: flex; gap: 6px; flex: none; }
+.gx-x { position: relative; }
+.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
 `;
 
 // src/ui/mapzoom.ts
@@ -8639,12 +8645,14 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.0" : "0";
+var PLUGIN_VERSION = true ? "0.16.1" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, done: "" };
 var checked = false;
+var skipped = "";
+var SKIP_KEY = "goei:update-skip";
 async function getJson(name) {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: "GET" });
   if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
@@ -8656,6 +8664,7 @@ async function checkLatest(env2, force = false) {
   updateUi.busy = force;
   if (force) updateUi.notice = "", env2.render();
   try {
+    if (!force) skipped = String(await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => "") ?? "");
     const v = await getJson("version.json");
     if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
     updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
@@ -8664,6 +8673,27 @@ async function checkLatest(env2, force = false) {
   }
   updateUi.busy = false;
   env2.render();
+}
+function newVersions(ctx) {
+  const L = updateUi.latest;
+  if (!L) return {};
+  const lite = !!readManifest(ctx.char.globalLore);
+  return {
+    card: lite && compareVersions(L.card, cardVersion(ctx.char.globalLore)) > 0 ? L.card : void 0,
+    plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : void 0
+  };
+}
+var skipKey = (n) => `${n.card ?? ""}|${n.plugin ?? ""}`;
+function hasUpdate(ctx) {
+  const n = newVersions(ctx);
+  return !!(n.card || n.plugin);
+}
+function updateBanner(ctx) {
+  const n = newVersions(ctx);
+  if (!(n.card || n.plugin) || skipKey(n) === skipped) return "";
+  const what = [n.plugin ? `플러그인 v${esc4(n.plugin)}` : "", n.card ? `카드 v${esc4(n.card)}` : ""].filter(Boolean).join(" · ");
+  return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
+    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
 }
 function updateGroup(ctx) {
   const busy2 = updateUi.busy;
@@ -8722,6 +8752,13 @@ var fieldName = (f) => FIELD_NAMES[f] ?? f;
 async function handleUpdate(action, ctx, env2) {
   if (!action.startsWith("upd-")) return false;
   if (updateUi.busy) return true;
+  if (action === "upd-skip") {
+    skipped = skipKey(newVersions(ctx));
+    await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {
+    });
+    env2.render();
+    return true;
+  }
   if (action === "upd-check") {
     updateUi.payload = null;
     updateUi.plan = null;
@@ -10869,6 +10906,13 @@ async function handle(action, value) {
     if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope);
     return;
   }
+  if (action === "upd-go") {
+    if (view.kind === "started") tab = "settings", settingsUi.scope = "chat";
+    else if (view.kind === "picker") pickerPrefs = true;
+    render();
+    root?.querySelector(".upd-ver")?.closest(".ps-group")?.scrollIntoView({ block: "start" });
+    return;
+  }
   if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
   if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env, view.kind === "opening")) return;
   switch (action) {
@@ -11003,7 +11047,7 @@ function startedHeader(ctx) {
   return `<header class="gx-head">
     <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b><small>${time2 || BRAND.name}</small></div></div>
     <div class="gx-head-act">${pill}
-      <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}</button>
+      <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -11097,13 +11141,13 @@ function body3() {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case "started":
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${subnav()}${startedBody(view.ctx)}</div>`;
     case "opening":
       return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case "picker":
       if (pickerPrefs)
         return `${header("새 채팅 기본 설정", `<button class="gx-x" data-action="prefs-close" aria-label="시작 화면으로">${ICONS.back}</button>`)}<div class="gx-content">${settingsTab(view.ctx, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope, false)}</div>`;
-      return `${header(view.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}</button>`)}<div class="gx-content">${picker()}</div>`;
+      return `${header(view.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>`)}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
   }
 }
 function picker() {
@@ -11152,7 +11196,7 @@ function tabs() {
     ${GNET_ON ? item("gnet", "괴담넷", ICONS.gnet) : ""}
     ${item("wiki", "위키", ICONS.wiki)}
     <span class="gx-nav-gap"></span>
-    ${item("settings", "설정", ICONS.settings, "desk")}
+    ${item("settings", "설정", ICONS.settings, "desk", ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
   </nav>`;
 }
 function brand(ctx) {

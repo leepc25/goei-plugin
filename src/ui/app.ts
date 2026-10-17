@@ -11,7 +11,7 @@ import { GHOST_ICON, ICONS } from './icons';
 import { agentInner, avatar, imageUrl, setImageRedraw } from './images';
 import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
-import { checkLatest, handleUpdate } from './update';
+import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { handleWiki, resetWiki, wiki, wikiSuggest, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
@@ -350,6 +350,14 @@ async function handle(action: string, value?: string): Promise<void> {
     if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope);
     return;
   }
+  if (action === 'upd-go') {
+    // 설정 → 업데이트로 (시작 전 화면은 기본 설정 화면에 같은 칸이 있다)
+    if (view.kind === 'started') (tab = 'settings'), (settingsUi.scope = 'chat');
+    else if (view.kind === 'picker') pickerPrefs = true;
+    render();
+    root?.querySelector('.upd-ver')?.closest('.ps-group')?.scrollIntoView({ block: 'start' });
+    return;
+  }
   if (action.startsWith('upd-') && (view.kind === 'started' || view.kind === 'picker') && (await handleUpdate(action, view.ctx, settingsEnv))) return;
   if ((view.kind === 'started' || view.kind === 'opening') && (await handleField(action, value, view.ctx, env, view.kind === 'opening'))) return;
   switch (action) {
@@ -490,7 +498,7 @@ function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b><small>${time || BRAND.name}</small></div></div>
     <div class="gx-head-act">${pill}
-      <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}</button>
+      <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -600,13 +608,13 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${subnav()}${startedBody(view.ctx)}</div>`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
       if (pickerPrefs)
         return `${header('새 채팅 기본 설정', `<button class="gx-x" data-action="prefs-close" aria-label="시작 화면으로">${ICONS.back}</button>`)}<div class="gx-content">${settingsTab(view.ctx, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope, false)}</div>`;
-      return `${header(view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}</button>`)}<div class="gx-content">${picker()}</div>`;
+      return `${header(view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`)}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
   }
 }
 
@@ -673,7 +681,7 @@ function tabs(): string {
     ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
     <span class="gx-nav-gap"></span>
-    ${item('settings', '설정', ICONS.settings, 'desk')}
+    ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
   </nav>`;
 }
 

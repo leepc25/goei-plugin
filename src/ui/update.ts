@@ -19,6 +19,9 @@ export const updateUi: {
 } = { busy: false, notice: '', latest: null, payload: null, plan: null, done: '' };
 
 let checked = false;
+/** 「건너뛰기」한 버전 ("카드|플러그인"). 같은 조합이면 안내를 다시 띄우지 않는다 */
+let skipped = '';
+const SKIP_KEY = 'goei:update-skip';
 
 async function getJson(name: string): Promise<unknown> {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: 'GET' });
@@ -33,6 +36,7 @@ export async function checkLatest(env: SettingsEnv, force = false): Promise<void
   updateUi.busy = force;
   if (force) (updateUi.notice = ''), env.render();
   try {
+    if (!force) skipped = String((await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => '')) ?? '');
     const v = (await getJson('version.json')) as Partial<Latest>;
     if (typeof v.card !== 'string' || typeof v.plugin !== 'string') throw new Error('업데이트 정보 형식이 달라요.');
     updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
@@ -41,6 +45,34 @@ export async function checkLatest(env: SettingsEnv, force = false): Promise<void
   }
   updateUi.busy = false;
   env.render();
+}
+
+/** 새로 나온 카드·플러그인 버전 (없으면 빈 칸) */
+export function newVersions(ctx: ChatContext): { card?: string; plugin?: string } {
+  const L = updateUi.latest;
+  if (!L) return {};
+  const lite = !!readManifest(ctx.char.globalLore);
+  return {
+    card: lite && compareVersions(L.card, cardVersion(ctx.char.globalLore)) > 0 ? L.card : undefined,
+    plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : undefined,
+  };
+}
+
+const skipKey = (n: { card?: string; plugin?: string }) => `${n.card ?? ''}|${n.plugin ?? ''}`;
+
+/** 설정 아이콘에 찍을 점: 새 버전이 있으면 (건너뛰어도 점은 남김) */
+export function hasUpdate(ctx: ChatContext): boolean {
+  const n = newVersions(ctx);
+  return !!(n.card || n.plugin);
+}
+
+/** 창 위쪽 한 줄 안내. 건너뛴 버전이면 띄우지 않는다 */
+export function updateBanner(ctx: ChatContext): string {
+  const n = newVersions(ctx);
+  if (!(n.card || n.plugin) || skipKey(n) === skipped) return '';
+  const what = [n.plugin ? `플러그인 v${esc(n.plugin)}` : '', n.card ? `카드 v${esc(n.card)}` : ''].filter(Boolean).join(' · ');
+  return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
+    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
 }
 
 export function updateGroup(ctx: ChatContext): string {
@@ -94,6 +126,12 @@ const fieldName = (f: string) => FIELD_NAMES[f] ?? f;
 export async function handleUpdate(action: string, ctx: ChatContext, env: SettingsEnv): Promise<boolean> {
   if (!action.startsWith('upd-')) return false;
   if (updateUi.busy) return true;
+  if (action === 'upd-skip') {
+    skipped = skipKey(newVersions(ctx));
+    await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {});
+    env.render();
+    return true;
+  }
   if (action === 'upd-check') {
     updateUi.payload = null;
     updateUi.plan = null;
