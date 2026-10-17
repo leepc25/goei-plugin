@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.20
+//@version 0.16.21
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -4956,6 +4956,10 @@ var ICONS = {
   trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
   back: stroke('<path d="m15 5-7 7 7 7"/>'),
+  pin: stroke('<path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.8" r="2.3"/>'),
+  // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
+  siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
+  spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
   close: stroke('<path d="M6 6l12 12M18 6 6 18"/>')
 };
 
@@ -7674,7 +7678,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
   width: min(100%, 1280px);
   /* 커스텀 임무 오른쪽(요원 12명·작전 메모·임무 요청)이 스크롤 없이 딱 들어오는 높이 (v0.16.16) */
-  height: min(100%, 920px);
+  height: min(100%, 950px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
@@ -7688,11 +7692,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* 시작 전 화면: 설정 묶음(980px) + 좌우 여백 폭 */
 .gx-panel.pre { width: min(100%, 1024px); }
 /* 스크롤바도 창 배색으로 (브라우저 기본 회색이 테마와 안 맞았다) */
-.gx, .gx * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--sub) 38%, transparent) transparent; }
-.gx ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+/* 스크롤바 (v0.16.21, 사용자 요청: 너무 눈에 띈다): 평소엔 아주 흐리게, 그 칸에 마우스를 올렸을 때만 보이게 */
+.gx, .gx * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--sub) 12%, transparent) transparent; }
+.gx *:hover { scrollbar-color: color-mix(in srgb, var(--sub) 30%, transparent) transparent; }
+.gx ::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
 .gx ::-webkit-scrollbar-track { background: transparent; }
-.gx ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 34%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
-.gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 55%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 12%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+.gx :hover::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 30%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 45%, transparent); border: 2px solid transparent; background-clip: padding-box; }
 .gx ::-webkit-scrollbar-corner { background: transparent; }
 .gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "nav head" "nav body"; }
 .gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
@@ -7907,6 +7914,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .gx-sidecol .gx-sec { padding: 0; }
 .gx-mapbar { display: flex; gap: 8px; align-items: center; }
+/* 임무 탭 (v0.16.21): 지역 고르기 옆에 장소 검색. 결과는 아래로 펼쳐지는 작은 목록 */
+.gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
+.gx-mapfind { position: relative; flex: 1; min-width: 0; }
+.gx-mapfind .gx-search { width: 100%; font-size: 13px; }
+.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.gx-mapsug:empty { display: none; }
+.gx-sugi { display: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
+.gx-sugi:last-child { border-bottom: 0; }
+.gx-sugi:hover, .gx-sugi:focus-visible { background: var(--panel2); outline: none; }
+.gx-sugi small { color: var(--dim); font-size: 12px; }
+.gx-sugnone { margin: 0; padding: 10px 12px; color: var(--dim); font-size: 13px; text-align: center; }
+@media (max-width: 760px) { .gx-mapbar > .gx-select { flex-basis: 38%; } }
 .gx-select, .gx-search {
   min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
   background: var(--void); color: var(--text); font: inherit;
@@ -7917,7 +7936,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
-.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 920px) - 210px); user-select: none; }
+.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
 .gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; }
 .gx-pin {
   position: absolute; transform: translate(-50%, -50%);
@@ -7962,7 +7981,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-kind { background: var(--void); color: var(--dim); }
 .gx-kind.k-an { color: var(--danger); }
 .gx-kind.k-in { color: var(--amber); }
-.gx-kind.k-ms { color: #c9a7ff; }
+.gx-kind.k-ms { color: var(--blue); }
 .gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .gx-team .gx-muted { margin: 0; font-size: 13px; }
 .gx-goal { display: flex; align-items: baseline; gap: 8px; }
@@ -7975,9 +7994,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
 .gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
 .gx-step:disabled { opacity: .4; }
-.gx-mbox { max-height: calc(min(100vh - 28px, 920px) - 222px); overflow-y: auto; }
-.gx-field.gx-mission { grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr); }
+.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
+/* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
+.gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
 .gx-mapcol .gx-segs { align-self: flex-start; }
+/* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
+.gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gx-mfilter .gx-chip { flex: none; min-height: 36px; padding: 0 14px; }
+.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; font-size: 13px; }
 .gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
 
 @media (max-width: 760px) {
@@ -7986,6 +8010,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .gx-mapcol .gx-canvas:not(.ph) { width: auto; }
   .gx-mapimg { width: 100%; max-height: none; }
   .gx-mbox { max-height: none; }
+  .gx-mlist { grid-template-columns: minmax(0, 1fr); }
   .gx-mapcol .gx-segs { align-self: stretch; display: flex; }
   .gx-mapcol .gx-seg { flex: 1; min-width: 0; padding: 0 8px; }
 }
@@ -8163,7 +8188,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
   .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
   /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
-  .gx-nav { padding-left: 0; padding-right: 0; }
+  /* 위아래 여백을 같게: 아래만 8px이라 아이콘이 위로 치우쳐 보였다 (v0.16.21) */
+  .gx-nav { padding: 4px 0 calc(4px + env(safe-area-inset-bottom)); }
   .gx-nav > .gx-nb { display: none; }
   .gx-mbar { display: block; flex: 1; min-width: 0; }
   .gx-mtrack { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
@@ -8580,6 +8606,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
 .gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
 .gx-team .gx-note { margin-top: 0; }
+/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
+.gx-team .gx-note textarea { min-height: 0; }
+.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
 .gx-notice { margin: 12px 20px 0; }
 /* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
 .gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
@@ -8645,7 +8674,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
 .gx-field.gx-map > .gx-mapcol { position: static; }
 .gx-mapcol > .gx-sits { padding: 4px 0 0; }
-.gx-placehint { margin: 0; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; text-align: center; }
+/* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
+.gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.gx-sitbar .gx-chip { flex: none; }
+.gx-unplace { margin-left: auto; }
+.gx-unplace:hover { border-color: var(--line2); color: var(--text); }
+.gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
+.gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
 .gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
@@ -8655,13 +8690,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard.pick.wide .gx-acard-sit { -webkit-line-clamp: 2; }
 .gx-acard.pick.wide .gx-acard-check { top: auto; bottom: 8px; right: 10px; transform: none; }
 @media (min-width: 761px) {
-  .gx-map .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
   /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
-  .gx-map > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
-  .gx-map > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
-  .gx-map .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
-  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start { flex: none; }
+  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
+  /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
+  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
+  .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
+  .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
+  .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start, .gx-mission .gx-team > .gx-note, .gx-mission .gx-team > .gx-start { flex: none; }
 }
 @media (max-width: 760px) {
   /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
@@ -8715,7 +8753,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
 .gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 /* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
-.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
+.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
 .gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-evc.go { cursor: pointer; }
 .gx-evc.go:hover { border-color: var(--line2); }
@@ -8737,12 +8775,17 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-evc-act .gx-icon { width: 26px; height: 26px; }
 .gx-evc-act .gx-icon svg { width: 15px; height: 15px; }
 .gx-evc-act .gx-mini { min-height: 26px; padding: 0 8px; font-size: 12px; }
-/* 괴이 등급 딱지: 등급마다 위험도가 보이게 (v0.16.16) */
-.gx-gmark.an.g-s { background: var(--danger); color: #fff; box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent); }
-.gx-gmark.an.g-a { background: color-mix(in srgb, var(--danger) 42%, transparent); color: var(--danger); }
-.gx-gmark.an.g-b { background: var(--amber-bg); color: var(--amber); }
-.gx-gmark.an.g-c { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
-.gx-gmark.an.g-d, .gx-gmark.an.g-e { background: var(--panel2); color: var(--dim); }
+/* 상황 딱지 (v0.16.21, 사용자 요청: 알록달록해서 눈에 안 들어온다): 괴이는 붉은 계열, 사건은 노란 계열, 특수는 파란 계열로 통일.
+   괴이는 바탕은 모두 같고 등급 글자만 높을수록 밝게 빛난다 */
+.gx-evc .gx-gmark.an { background: var(--danger-bg); color: color-mix(in srgb, var(--danger) 70%, transparent); font-size: 14px; font-weight: 800; }
+.gx-gmark.an.g-s { color: #fff; text-shadow: 0 0 4px var(--danger), 0 0 10px var(--danger), 0 0 16px var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 60%, transparent); }
+.gx-gmark.an.g-a { color: color-mix(in srgb, var(--danger) 55%, #fff); text-shadow: 0 0 4px var(--danger), 0 0 9px color-mix(in srgb, var(--danger) 70%, transparent); }
+.gx-gmark.an.g-b { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 45%, transparent); }
+.gx-gmark.an.g-c { color: color-mix(in srgb, var(--danger) 80%, transparent); }
+.gx-gmark.an.g-d, .gx-gmark.an.g-e { color: color-mix(in srgb, var(--danger) 55%, transparent); }
+.gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
+.gx-evc .gx-gmark.ms { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
+.gx-evc .gx-gmark svg { width: 16px; height: 16px; }
 /* 진행 중인 행은 눌러서 지도로, 오른쪽 위 아이콘 (v0.16.17) */
 #gx-sec-ag { scroll-margin-top: 12px; }
 #gx-sec-ag h2 { font-size: 15px; margin-bottom: 8px; }
@@ -8787,6 +8830,15 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
 .gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
 .gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+
+/* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
+   요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
+@media (min-width: 761px) {
+  .gx-board > .gx-bd-cols { flex: none; }
+  .gx-board .gx-bd-col > .gx-evcs { max-height: 316px; overflow-y: auto; overscroll-behavior: contain; }
+  .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
+  .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+}
 `;
 
 // src/ui/mbar.ts
@@ -9016,7 +9068,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.20" : "0";
+var PLUGIN_VERSION = true ? "0.16.21" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -9815,7 +9867,7 @@ async function handleWiki(action, value, ctx, env2) {
 // src/ui/evcard.ts
 var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var KIND = { an: "괴이", in: "사건", ms: "특수" };
-var MARK = { an: "?", in: "!", ms: "◇" };
+var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
 function peopleChips(char, names3, agents) {
   return names3.filter((n) => n && n !== "없음").map((n) => agents.has(n) ? `<span class="gx-pchip">${avatar(char, agents.get(n).english, n, "xs")}${esc7(n)}</span>` : `<span class="gx-badge">${esc7(n)}</span>`).join("");
 }
@@ -9823,15 +9875,15 @@ function elapsedText(minute, since) {
   if (minute === null || since === null) return "";
   const m = Math.max(0, minute - since);
   const h = Math.floor(m / 60);
-  return h ? `${h}시간 ${m % 60}분째` : `${m % 60}분째`;
+  if (!m) return "방금 발생";
+  return `발생 ${h ? `${h}시간 ` : ""}${m % 60 || !h ? `${m % 60}분 ` : ""}경과`;
 }
 function evCard(c) {
   const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
-  const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}">${grade ? esc7(grade) : MARK[c.kind]}</i>`;
-  const kind = `<span class="gx-badge gx-kind k-${c.kind}">${KIND[c.kind]}</span>`;
+  const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc7(grade)}등급` : ""}">${grade ? esc7(grade) : MARK[c.kind]}</i>`;
   const title2 = `<span class="gx-evc-name"><b>${esc7(c.name)}</b></span>`;
   if (!c.key) {
-    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${kind}${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
+    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
   }
   const key = esc7(c.key);
   const acts = `<span class="gx-evc-act">
@@ -9840,7 +9892,7 @@ function evCard(c) {
       ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc7(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
   const open2 = c.open ? ` data-action="${c.open}" data-value="${key}"` : "";
   return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open2}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${kind}${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
+    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
 }
 
 // src/host/send.ts
@@ -9876,6 +9928,7 @@ var field2 = {
   note: "",
   step: "goal",
   query: "",
+  mapq: "",
   confirmEnd: null
 };
 var mapUrls = {};
@@ -9926,13 +9979,6 @@ function placeKey(ev, c) {
     if (lm) return `fac:${lm.name}`;
   }
   return ev.loc;
-}
-function placeName(key, c) {
-  if (key.startsWith("fac:")) {
-    const lm = c.landmarks.find((l) => l.name === key.slice(4));
-    return lm ? `${lm.name} · ${lm.gu}` : key.slice(4);
-  }
-  return locName(key);
 }
 function placeTarget(key) {
   return key.startsWith("fac:") ? { type: "facility", name: key.slice(4) } : { type: "place", loc: key };
@@ -10003,8 +10049,31 @@ function mapCanvas(ctx, x, events, env2) {
   const img = url ? `<img class="gx-mapimg" src="${esc8(url)}" alt="${esc8(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
   return `<div class="gx-mapbar">
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc8(field2.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
     </div>
     <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== "01") : ""}</div>`;
+}
+function mapSuggest(c) {
+  const q = field2.mapq.trim().toLowerCase();
+  if (!q) return "";
+  const hits = [];
+  for (const code of MAP_CODES) {
+    (SIGUN[code] ?? []).forEach((gu, i) => {
+      if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
+    });
+  }
+  for (const lm of c.landmarks) {
+    if (!MAP_CODES.includes(lm.sido)) continue;
+    if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}` });
+  }
+  if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
+  return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc8(h.value)}"><b>${esc8(h.name)}</b><small>${esc8(h.sub)}</small></button>`).join("");
+}
+function mapSuggestFor(ctx, q) {
+  field2.mapq = q;
+  const x = readCtx(ctx);
+  return typeof x === "string" ? "" : mapSuggest(x.catalog);
 }
 function eventRow(e, x, agents) {
   const w = x.world;
@@ -10028,23 +10097,42 @@ function eventRow(e, x, agents) {
     confirmEnd: field2.confirmEnd === e.key
   });
 }
+function placeCard(key, c, on) {
+  let name;
+  let sub;
+  let wiki2;
+  if (key.startsWith("fac:")) {
+    const lm = c.landmarks.find((l) => l.name === key.slice(4));
+    name = lm?.label || lm?.name || key.slice(4);
+    sub = lm ? `${SIDO_NAME[lm.sido] ?? ""} ${lm.gu}`.trim() : "거점";
+    wiki2 = lm?.name ?? name;
+  } else {
+    const full = locName(key);
+    const cut2 = full.lastIndexOf(" ");
+    name = cut2 > 0 ? full.slice(cut2 + 1) : full;
+    sub = cut2 > 0 ? full.slice(0, cut2) : "";
+    wiki2 = full;
+  }
+  const tag = on ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
+  return `<li class="gx-evc go gx-placecard${on ? " sel" : ""}" data-action="pick-place" data-value="${esc8(key)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc8(name)}</b>${tag}</span>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc8(wiki2)}" title="위키" aria-label="${esc8(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc8(sub || "장소")}</small></span></li>`;
+}
 function situations(x, events) {
   const counts = { all: events.length, an: 0, in: 0, ms: 0 };
   for (const e of events) counts[e.kind]++;
   const chips = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
   const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
-  let head = "";
+  let place2 = "";
+  let cancel = "";
   if (field2.place) {
-    const here = events.some((e) => placeKey(e, x.catalog) === field2.place);
-    const self = sameTarget(field2.target, field2.place);
-    head = `<div class="gx-ctxbar"><b>${esc8(placeName(field2.place, x.catalog))}</b>
-      <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
-      ${here && !self ? `<button class="gx-wide" data-action="pick-place" data-value="${esc8(field2.place)}">이 장소 자체를 목표로</button>` : self ? '<p class="gx-placehint">이 장소 자체가 목표로 잡혔어요.</p>' : ""}`;
+    place2 = placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place));
+    cancel = '<button class="gx-chip gx-unplace" data-action="map-unplace" title="장소 선택 풀기">취소</button>';
   }
   const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
-  return `<div class="gx-chips">${chips}</div>${head}
-    ${shown2.length ? `<ul class="gx-evcs">${shown2.map((e) => eventRow(e, x, agents)).join("")}</ul>` : head.includes("gx-placehint") ? "" : `<p class="gx-none">${empty}</p>`}`;
+  return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
+    ${shown2.length || place2 ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}</ul>` : `<p class="gx-none">${empty}</p>`}`;
 }
 function lockedState(x, id) {
   const rec = x.world.agents[id];
@@ -10060,15 +10148,13 @@ function teamPanel(x, goal, action, label, busy2, ctx) {
     const full = !on && used >= TEAM_MAX;
     const st = x.world.agents[p.id]?.st ?? "미정";
     const sit = x.world.agents[p.id]?.situation ?? "";
-    if (ctx) {
-      const c = agentContact(ctx, p.id);
+    {
+      const c = ctx ? agentContact(ctx, p.id) : null;
       const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc8(p.id)}" title="괴담톡" aria-label="${esc8(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc8(c.wiki)}" title="위키" aria-label="${esc8(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
       const off = !!lock || full;
       return `<div class="gx-acard pick wide${on ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc8(p.id)}" aria-pressed="${on}" aria-disabled="${off}"
           ${lock ? `title="${esc8(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
     }
-    return `<button class="gx-acard pick${on ? " on" : ""}" data-action="team-toggle" data-value="${esc8(p.id)}" ${lock || full ? "disabled" : ""} aria-pressed="${on}"
-        title="${esc8(lock ? `${stLabel(lock)} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
   }).join("");
   const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field2.support > 0 ? " on" : ""}">
       <span class="gx-ava sq">${ICONS.group}</span>
@@ -10085,7 +10171,7 @@ function teamPanel(x, goal, action, label, busy2, ctx) {
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
     <label class="gx-note">
-      <textarea rows="3" aria-label="작전 메모"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc8(field2.note)}</textarea></label>
+      <textarea rows="2" aria-label="작전 메모"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc8(field2.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc8(label)}</button>
   </section>`;
 }
@@ -10111,7 +10197,7 @@ function mapTab(ctx, env2, notice2, busy2) {
   return `<main class="gx-body gx-field gx-map" data-step="${field2.step}">
     ${stepBar(goal, "mission")}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env2)}
-      <section class="gx-sec gx-sits"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section></div>
+      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
     <div class="gx-sidecol">
       ${notice2 ? `<div class="gx-err" role="alert">${esc8(notice2)}</div>` : ""}
       ${teamPanel(x, goal, "depart", "출발", busy2, ctx)}
@@ -10151,7 +10237,7 @@ function missionList(ctx, opening = false) {
 function missionTab(ctx, opening, notice2, busy2) {
   const x = readCtx(ctx);
   if (typeof x === "string") return `<div class="gx-empty">${esc8(x)}</div>`;
-  const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-seg${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
+  const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
   const p = x.world.pending;
   const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc8(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
   const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
@@ -10159,15 +10245,14 @@ function missionTab(ctx, opening, notice2, busy2) {
     ${stepBar(field2.mname, opening ? void 0 : "map")}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-segs">${segs}</div>
-      <input class="gx-search" type="search" placeholder="${MISSION_LABEL[field2.mkind]} 검색" value="${esc8(field2.query)}" data-input="mission-query" aria-label="검색">
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc8(field2.query)}" data-input="mission-query" aria-label="검색"></div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
       ${notice2 ? `<div class="gx-err" role="alert">${esc8(notice2)}</div>` : ""}
       ${x.world.notice && x.on ? `<div class="gx-hint">${esc8(x.world.notice)}</div>` : ""}
       ${pend}
-      ${teamPanel(x, field2.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy2)}
+      ${teamPanel(x, field2.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy2, opening ? void 0 : ctx)}
     </div>
   </main>`;
 }
@@ -10320,12 +10405,21 @@ async function handleField(action, value, ctx, env2, opening) {
       field2.confirmEnd = null;
       env2.render();
       return true;
+    case "map-jump":
     case "map-place": {
-      field2.place = v;
+      let v2 = value ?? "";
+      if (action === "map-jump") {
+        const [code, key] = v2.split("|");
+        if (!MAP_CODES.includes(code) || !key) return true;
+        field2.region = code;
+        field2.mapq = "";
+        v2 = key;
+      }
+      field2.place = v2;
       field2.confirmEnd = null;
       const x = readCtx(ctx);
-      const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v);
-      if (!here.length) field2.target = placeTarget(v);
+      const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+      if (!here.length) field2.target = placeTarget(v2);
       env2.render();
       return true;
     }
@@ -11333,6 +11427,11 @@ function ensureRoot() {
     if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root?.querySelector(".dir-bar") ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
     if (el?.dataset?.input === "field-note") return void (field2.note = el.value);
+    if (el?.dataset?.input === "map-query" && view.kind === "started") {
+      const box2 = root?.querySelector(".gx-mapsug");
+      if (box2) box2.innerHTML = mapSuggestFor(view.ctx, el.value);
+      return;
+    }
     if (el?.dataset?.input === "start-note") {
       const had = !!(draft.situation ?? "").trim();
       draft.situation = el.value;
@@ -11656,11 +11755,13 @@ function renderPicker() {
   if (foot && nfoot) foot.replaceWith(nfoot);
   else return render();
 }
+var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs";
 function render() {
   if (!root) return;
   const nav = view.kind === "started";
   const scroller = root.querySelector(".gx-body");
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
+  const inner = root.dataset.tab === tab ? [...root.querySelectorAll(INNER_SCROLL)].map((el) => el.scrollTop) : [];
   const log = root.querySelector(".ph-log");
   const logRoom = root.dataset.room ?? "";
   const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
@@ -11669,6 +11770,7 @@ function render() {
   root.dataset.tab = tab;
   const next = root.querySelector(".gx-body");
   if (next && keep) next.scrollTop = keep;
+  if (inner.length) root.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
   const nlog = root.querySelector(".ph-log");
   root.dataset.room = phone.room ?? "";
   if (nlog) {
