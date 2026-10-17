@@ -9,7 +9,7 @@ const esc = (s: unknown) =>
 
 export type EvKind = 'an' | 'in' | 'ms';
 const KIND: Record<EvKind, string> = { an: '괴이', in: '사건', ms: '특수' };
-const MARK: Record<EvKind, string> = { an: '?', in: '!', ms: '◇' };
+const MARK: Record<EvKind, string> = { an: '?', in: ICONS.siren, ms: ICONS.spook };
 
 export interface EvCard {
   kind: EvKind;
