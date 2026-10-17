@@ -466,7 +466,7 @@ function postView(p: GPost, busy: boolean, inline = false): string {
             <span>${esc(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span>${inline && right ? `<span class="gn-inline-del">${right}</span>` : ''}</div></header>
         <div class="gn-post-body">${body(p.body)}</div>
       </article>
-      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3><button class="gn-cwrite" data-action="gn-comment" data-value="${p.id}">${ICONS.pen}댓글 쓰기</button></div>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3></div>
         ${p.comments.length ? `<ul class="gn-comments">${commentTree(p)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
     ${inline ? '' : composer(busy, reply ? '답글 입력' : '댓글 입력', chip)}

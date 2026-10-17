@@ -1261,11 +1261,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-post-stat { margin-left: auto; display: flex; gap: 12px; }
 .gn-post-body { min-height: 120px; padding: 22px 4px 28px; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); }
 .gn-csec { display: flex; flex-direction: column; margin-top: 20px; }
-.gn-chead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 8px 4px; border-bottom: 2px solid var(--line2); }
+.gn-chead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 10px 4px; border-bottom: 2px solid var(--line2); }
 .gn-ccount { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
-.gn-cwrite { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 14px; border: 1px solid var(--accent-line); border-radius: 10px; background: var(--accent-bg); color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-.gn-cwrite svg { width: 16px; height: 16px; }
-.gn-cwrite:hover { filter: brightness(1.1); }
 .gn-ccount b { color: var(--amber); }
 .gn-cnone { margin: 0; padding: 24px; text-align: center; color: var(--dim); font-size: 14px; border-bottom: 1px solid var(--line); }
 .gn-comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
