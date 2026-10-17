@@ -557,7 +557,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
   .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
   /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
-  .gx-nav { padding-left: 0; padding-right: 0; }
+  /* 위아래 여백을 같게: 아래만 8px이라 아이콘이 위로 치우쳐 보였다 (v0.16.21) */
+  .gx-nav { padding: 4px 0 calc(4px + env(safe-area-inset-bottom)); }
   .gx-nav > .gx-nb { display: none; }
   .gx-mbar { display: block; flex: 1; min-width: 0; }
   .gx-mtrack { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
@@ -974,6 +975,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
 .gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
 .gx-team .gx-note { margin-top: 0; }
+/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
+.gx-team .gx-note textarea { min-height: 0; }
+.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
 .gx-notice { margin: 12px 20px 0; }
 /* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
 .gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
