@@ -23,11 +23,33 @@ let checked = false;
 let skipped = '';
 const SKIP_KEY = 'goei:update-skip';
 
+/**
+ * 웹 Risu의 nativeFetch는 모든 GET을 같은 프록시 주소로 보내서, 브라우저가 앞서 받은 응답(5분 캐시)을
+ * 다른 파일 요청에도 그대로 돌려준다(카드 파일을 달라 했는데 version.json이 옴).
+ * 그래서 Risu 본 화면에서 직접 받는 risuFetch(plainFetchForce)를 먼저 쓰고, 안 되면 nativeFetch로 받는다.
+ */
 async function getText(name: string): Promise<string> {
-  const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: 'GET' });
-  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
+  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+  const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
+  lastDirect = legacy ? '' : 'risuFetch 없음';
+  if (legacy) {
+    try {
+      // Content-Type을 text/plain으로 둬야 CORS 사전 요청 없이 GitHub에서 바로 받는다
+      const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } });
+      if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
+      lastDirect = `직접 받기 ${r?.status}: ${String(typeof r?.data === 'string' ? r.data : Object.prototype.toString.call(r?.data)).slice(0, 80)}`;
+    } catch (error) {
+      lastDirect = `직접 받기 오류: ${String(error).slice(0, 80)}`;
+    }
+  }
+  const res = await risuai.nativeFetch(url, { method: 'GET' }).catch((e: unknown) => {
+    throw new Error(`업데이트 정보를 받지 못했어요. (${String(e)}; ${lastDirect})`);
+  });
+  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}; ${lastDirect}).`);
   return String((await res.text()) ?? '');
 }
+let lastDirect = '';
+type RisuFetch = (url: string, arg: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown; status: number }>;
 
 async function getJson(name: string): Promise<unknown> {
   // Risu 판에 따라 json()이 문자열이나 바이트를 줄 수 있어 글자로 받아 직접 읽는다
@@ -46,7 +68,8 @@ async function getJson(name: string): Promise<unknown> {
  * 조각(card-update.N.txt)을 차례로 받아 이어 붙인다.
  */
 async function loadPayload(): Promise<unknown> {
-  const index = (await getJson('card-update.json')) as { parts?: unknown; length?: unknown };
+  const index = (await getJson('card-update.json')) as { parts?: unknown; length?: unknown; card?: unknown };
+  if (index && 'card' in index) throw new Error('Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.');
   if (!Array.isArray(index?.parts)) return index;
   let text = '';
   for (const name of index.parts) {
@@ -69,7 +92,7 @@ function describe(x: unknown): string {
   const o = x as Record<string, unknown>;
   const d = o.data as Record<string, unknown> | undefined;
   return `keys=${Object.keys(o).slice(0, 6).join('/') || '없음'}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : '없음'}, `
-    + `globalLore=${Array.isArray(d?.globalLore) ? 'list' : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? 'list' : typeof d?.customscripts}`;
+    + `globalLore=${Array.isArray(d?.globalLore) ? 'list' : typeof d?.globalLore}, customscript=${Array.isArray(d?.customscript) ? 'list' : typeof d?.customscript}`;
 }
 
 /** 작은 version.json만 받아 최신 버전을 안다 (창을 처음 열 때 한 번, 확인 버튼마다) */

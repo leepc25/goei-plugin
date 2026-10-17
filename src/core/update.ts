@@ -23,7 +23,7 @@ export interface CardPayload {
   version: string;
   /** 이 카드를 쓰려면 필요한 최소 플러그인 버전 */
   minPlugin: string;
-  data: Partial<Record<(typeof CARD_FIELDS)[number], unknown>> & { globalLore: LoreEntry[]; customscripts: { comment?: string }[] };
+  data: Partial<Record<(typeof CARD_FIELDS)[number], unknown>> & { globalLore: LoreEntry[]; customscript: { comment?: string }[] };
 }
 
 /** 사용자 손을 탄 값이라 업데이트가 덮어쓰지 않는 로어북 */
@@ -52,7 +52,7 @@ export function cardVersion(lore: LoreEntry[] | undefined): string {
 
 export function isPayload(x: unknown): x is CardPayload {
   const p = x as CardPayload;
-  return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === 'string' && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscripts);
+  return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === 'string' && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscript);
 }
 
 /** 같은 이름(+폴더)끼리 짝짓는 열쇠. 이름이 겹치면 순서로 구분한다 */
@@ -112,8 +112,10 @@ export interface UpdatePlan {
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
   const lore = mergeByName((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
-  const scripts = mergeByName((char.customscripts as { comment?: string }[]) ?? [], payload.data.customscripts, (r) => r.comment ?? '');
-  const next: Record<string, unknown> = { ...char, globalLore: lore.list, customscripts: scripts.list };
+  // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
+  const scripts = mergeByName((char.customscript as { comment?: string }[]) ?? [], payload.data.customscript, (r) => r.comment ?? '');
+  const next: Record<string, unknown> = { ...char, globalLore: lore.list, customscript: scripts.list };
+  delete next.customscripts;
   const fields: string[] = [];
   for (const f of CARD_FIELDS) {
     if (!(f in payload.data)) continue;

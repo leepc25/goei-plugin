@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.4
+//@version 0.16.5
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -7450,20 +7450,33 @@ async function createFab(onOpen) {
     if (moved) return;
     onOpen();
   };
-  const ids = [];
-  for (const [type, fn2] of [
-    ["pointerdown", onDown],
-    ["pointermove", onMove],
-    ["pointerup", onUp],
-    ["pointercancel", onUp],
-    ["click", onClick]
-  ]) {
-    ids.push({ type, id: await root2.body.addEventListener(type, fn2, { passive: true }) });
-  }
+  let ids = [];
+  const unbind = async () => {
+    const old = ids;
+    ids = [];
+    for (const { type, id } of old) await root2.body.removeEventListener(type, id).catch(() => {
+    });
+  };
+  const bind = async () => {
+    await unbind();
+    for (const [type, fn2] of [
+      ["pointerdown", onDown],
+      ["pointermove", onMove],
+      ["pointerup", onUp],
+      ["pointercancel", onUp],
+      ["click", onClick]
+    ]) {
+      ids.push({ type, id: await root2.body.addEventListener(type, fn2, { passive: true }) });
+    }
+  };
+  await bind();
   return {
     async setVisible(next, glow = false) {
       if (shown2 === next && !glow) return;
+      const reappear = next && !shown2;
       shown2 = next;
+      if (reappear) await bind().catch(() => {
+      });
       visible = next;
       if (!next) {
         drag = null;
@@ -7487,8 +7500,7 @@ async function createFab(onOpen) {
       drag = null;
       pending = null;
       await host.remove();
-      for (const { type, id } of ids) await root2.body.removeEventListener(type, id).catch(() => {
-      });
+      await unbind();
     }
   };
 }
@@ -8606,7 +8618,7 @@ function cardVersion(lore) {
 }
 function isPayload(x) {
   const p = x;
-  return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === "string" && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscripts);
+  return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === "string" && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscript);
 }
 function keyed(list5, name) {
   const seen = /* @__PURE__ */ new Map();
@@ -8646,8 +8658,9 @@ function mergeByName(current3, incoming, name, keep = () => false) {
 var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
 function planUpdate(char, payload) {
   const lore = mergeByName(char.globalLore ?? [], payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
-  const scripts = mergeByName(char.customscripts ?? [], payload.data.customscripts, (r) => r.comment ?? "");
-  const next = { ...char, globalLore: lore.list, customscripts: scripts.list };
+  const scripts = mergeByName(char.customscript ?? [], payload.data.customscript, (r) => r.comment ?? "");
+  const next = { ...char, globalLore: lore.list, customscript: scripts.list };
+  delete next.customscripts;
   const fields3 = [];
   for (const f of CARD_FIELDS) {
     if (!(f in payload.data)) continue;
@@ -8656,7 +8669,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.4" : "0";
+var PLUGIN_VERSION = true ? "0.16.5" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -8665,10 +8678,25 @@ var checked = false;
 var skipped = "";
 var SKIP_KEY = "goei:update-skip";
 async function getText(name) {
-  const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: "GET" });
-  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
+  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
+  const legacy = risuai.risuFetch;
+  lastDirect = legacy ? "" : "risuFetch 없음";
+  if (legacy) {
+    try {
+      const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
+      if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
+      lastDirect = `직접 받기 ${r?.status}: ${String(typeof r?.data === "string" ? r.data : Object.prototype.toString.call(r?.data)).slice(0, 80)}`;
+    } catch (error) {
+      lastDirect = `직접 받기 오류: ${String(error).slice(0, 80)}`;
+    }
+  }
+  const res = await risuai.nativeFetch(url, { method: "GET" }).catch((e) => {
+    throw new Error(`업데이트 정보를 받지 못했어요. (${String(e)}; ${lastDirect})`);
+  });
+  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}; ${lastDirect}).`);
   return String(await res.text() ?? "");
 }
+var lastDirect = "";
 async function getJson(name) {
   const text = await getText(name);
   let body4 = text;
@@ -8681,6 +8709,7 @@ async function getJson(name) {
 }
 async function loadPayload() {
   const index = await getJson("card-update.json");
+  if (index && "card" in index) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
   if (!Array.isArray(index?.parts)) return index;
   let text = "";
   for (const name of index.parts) {
@@ -8700,7 +8729,7 @@ function describe2(x) {
   if (x === null || typeof x !== "object") return `${typeof x}`;
   const o = x;
   const d = o.data;
-  return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? "list" : typeof d?.customscripts}`;
+  return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscript=${Array.isArray(d?.customscript) ? "list" : typeof d?.customscript}`;
 }
 async function checkLatest(env2, force = false) {
   if (!UPDATE_BASE || updateUi.busy || checked && !force) return;

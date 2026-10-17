@@ -303,21 +303,34 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
     onOpen();
   };
 
-  const ids: { type: string; id: string }[] = [];
-  for (const [type, fn] of [
-    ['pointerdown', onDown],
-    ['pointermove', onMove],
-    ['pointerup', onUp],
-    ['pointercancel', onUp],
-    ['click', onClick],
-  ] as const) {
-    ids.push({ type, id: await root.body.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
-  }
+  // 웹 Risu에서 플러그인을 업데이트하면 새 판의 리스너가 지워져 버튼이 모양만 남는 일이 있었다(껐다 켜면 살아남).
+  // 그래서 버튼이 다시 보일 때마다 리스너를 새로 건다.
+  let ids: { type: string; id: string }[] = [];
+  const unbind = async () => {
+    const old = ids;
+    ids = [];
+    for (const { type, id } of old) await root.body.removeEventListener(type, id).catch(() => {});
+  };
+  const bind = async () => {
+    await unbind();
+    for (const [type, fn] of [
+      ['pointerdown', onDown],
+      ['pointermove', onMove],
+      ['pointerup', onUp],
+      ['pointercancel', onUp],
+      ['click', onClick],
+    ] as const) {
+      ids.push({ type, id: await root.body.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
+    }
+  };
+  await bind();
 
   return {
     async setVisible(next, glow = false) {
       if (shown === next && !glow) return;
+      const reappear = next && !shown;
       shown = next;
+      if (reappear) await bind().catch(() => {});
       visible = next;
       if (!next) {
         drag = null;
@@ -342,7 +355,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
       pending = null;
       // Risu는 정리를 1초만 기다리고 플러그인을 끝낸다. 눈에 보이는 버튼부터 지운다
       await host.remove();
-      for (const { type, id } of ids) await root.body.removeEventListener(type, id).catch(() => {});
+      await unbind();
     },
   };
 }

@@ -278,7 +278,7 @@ def update_payload(data, risu, module, version, min_plugin):
             'virtualscript': '',
             'triggerscript': [],
             'globalLore': module['lorebook'],
-            'customscripts': module['regex'],
+            'customscript': module['regex'],  # Risu 캐릭터 필드 이름
         },
     }
 

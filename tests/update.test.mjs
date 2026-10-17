@@ -21,8 +21,8 @@ test('이름끼리 합치기: 바꾸고, 새로 넣고, 사용자 항목·보호
 });
 
 test('카드 합치기: 채팅·사진·이름은 그대로, 정해진 칸만 바뀜', () => {
-  const char = { name: '내 이름', chats: [{ message: [1] }], image: 'img', additionalAssets: [['a', 'b', 'png']], firstMessage: 'old', globalLore: [{ comment: '괴이봇 명부', content: 'mine' }], customscripts: [{ comment: '내 정규식' }] };
-  const payload = { schema: 1, version: '0.16.0', minPlugin: '0.16.0', data: { firstMessage: 'new', globalLore: [{ comment: '괴이봇 명부', content: '{}' }, { comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.16.0"}' }], customscripts: [{ comment: '📊상태창' }] } };
+  const char = { name: '내 이름', chats: [{ message: [1] }], image: 'img', additionalAssets: [['a', 'b', 'png']], firstMessage: 'old', globalLore: [{ comment: '괴이봇 명부', content: 'mine' }], customscript: [{ comment: '내 정규식' }] };
+  const payload = { schema: 1, version: '0.16.0', minPlugin: '0.16.0', data: { firstMessage: 'new', globalLore: [{ comment: '괴이봇 명부', content: '{}' }, { comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.16.0"}' }], customscript: [{ comment: '📊상태창' }] } };
   assert.ok(isPayload(payload));
   const plan = planUpdate(char, payload);
   assert.equal(plan.next.name, '내 이름');
@@ -32,7 +32,7 @@ test('카드 합치기: 채팅·사진·이름은 그대로, 정해진 칸만 �
   assert.deepEqual(plan.fields, ['firstMessage']);
   assert.equal(plan.next.globalLore[0].content, 'mine');
   assert.equal(cardVersion(plan.next.globalLore), '0.16.0');
-  assert.deepEqual(plan.next.customscripts.map((r) => r.comment), ['📊상태창', '내 정규식']);
+  assert.deepEqual(plan.next.customscript.map((r) => r.comment), ['📊상태창', '내 정규식']);
 });
 
 const PAYLOAD = new URL('../release/card-update.json', import.meta.url);
