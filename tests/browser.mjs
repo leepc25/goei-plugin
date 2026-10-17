@@ -825,7 +825,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   if (shots) await page.screenshot({ path: `${shots}/14-gnet-post.png` });
   // 답글: 내 댓글은 먼저 저장, 반응과 선쪽지는 같은 응답으로
   await page.click('[data-action="gn-reply"][data-value="' + (B + 2) + ':2"]');
-  await page.fill('.gn-text', '그 폰 나도 꺼졌음');
+  await page.fill('[data-input="gn-draft"]', '그 폰 나도 꺼졌음');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ comments: [{ author: 'abc92', content: '헐 너도?', parent: 3 }, { author: '익명', content: '엉뚱', parent: 1 }], incoming: [{ nick: '관람차덕후', body: '혹시 몇 시쯤이었음?' }], activity: [{ id: 1846001, viewsDelta: 5 }] }) }]; });
   await page.click('[data-action="gn-send"]');
   await page.waitForFunction(() => /C\|1846002\|2\|익명\|그 폰 나도 꺼졌음\|1/.test(window.__chat.scriptstate.$gn_raw || ''));
@@ -842,11 +842,27 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.click('[data-action="gn-open-dm"][data-value="관람차덕후"]');
   await page.waitForFunction(() => !/D\|관람차덕후\|npc\|[^|]*\|1/.test(window.__chat.scriptstate.$gn_raw), null, { timeout: 3000 });
-  await page.click('[data-action="gn-dm-reply"]');
-  await page.fill('.gn-text', '새벽 2시쯤');
+  await page.fill('[data-input="gn-draft"]', '새벽 2시쯤');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '그냥 문장' }, { type: 'success', result: '{"body":"나도 그 시간인데 소름"}' }]; });
   await page.click('[data-action="gn-send"]');
-  await page.waitForSelector('.gn-bubble.npc >> text=소름', { timeout: 5000 });
+  await page.waitForSelector('.ph-msg.npc >> text=소름', { timeout: 5000 });
+  if (shots) {
+    await page.screenshot({ path: `${shots}/14-gnet-dm.png` });
+    const vp = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${shots}/14-gnet-dm-mobile.png` });
+    await page.click('[data-action="gn-back"]');
+    await page.screenshot({ path: `${shots}/14-gnet-dmlist-mobile.png` });
+    await page.click('[data-action="gn-sub"][data-value="board"]');
+    await page.click('[data-action="gn-reply"] >> nth=0');
+    await page.screenshot({ path: `${shots}/14-gnet-post-mobile.png` });
+    await page.click('[data-action="gn-cancel"]');
+    await page.click('[data-action="gn-back"]');
+    await page.screenshot({ path: `${shots}/14-gnet-board-mobile.png` });
+    await page.click('[data-action="gn-sub"][data-value="dm"]');
+    await page.click('[data-action="gn-open-dm"][data-value="관람차덕후"]');
+    await page.setViewportSize(vp);
+  }
   const retry = await page.evaluate(() => window.__calls.llm[3].messages);
   assert.equal(retry.length, 4, '재시도는 이전 응답과 오류 안내를 붙인다');
   assert.ok(retry[3].content.includes('Validation error!'));
@@ -854,7 +870,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok(retry[1].content.includes('Original forum post #1846002'), '쪽지 출처 유지');
   // 글쓰기
   await page.click('[data-action="gn-write"]');
-  await page.fill('.gn-text', '관람차 본 사람 더 있음?');
+  await page.fill('[data-input="gn-draft"]', '관람차 본 사람 더 있음?');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ post: { title: '관람차 목격 모음', content: '나 말고 본 사람 손' }, comments: [{ author: 'ㅁㄴㅇㄹ', content: '손', parent: 0 }], incoming: [], activity: [] }) }]; });
   await page.click('[data-action="gn-send"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('P|1846003|2025.01.01 02:47|익명|관람차 목격 모음|0|0|나 말고 본 사람 손|1'), null, { timeout: 5000 });
@@ -869,12 +885,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const sub = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'submodel'));
   assert.equal(sub.length, 1, '보조 모델 요청에는 안 붙임');
   // 설정: 본편 반영 빼기
-  await page.click('.gn-settings summary');
+  await page.click('[data-action="gn-settings"]');
   await page.click('[data-action="gn-cfg"][data-value="context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
   const off = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
   assert.equal(off.length, 1);
   // 내 글 삭제 (두 번 눌러야)
+  await page.click('[data-action="gn-settings"]');
   await page.click('[data-action="gn-sub"][data-value="board"]');
   await page.waitForSelector('[data-action="gn-del-post"]');
   await page.click('[data-action="gn-del-post"]');
@@ -1224,7 +1241,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok((await page.textContent('.gn-notice')).includes('첨부 내용을 입력'), '빈 첨부는 막음');
   await page.fill('[data-input="gn-att"][data-key="0"]', '관람차 꼭대기에 사람 그림자');
   await page.fill('[data-input="gn-att"][data-key="1"]', 'https://example.com/sora');
-  await page.fill('.gn-text', '이거 뭐임');
+  await page.fill('[data-input="gn-draft"]', '이거 뭐임');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ post: { title: '관람차 사진', content: '이거 뭐임\n(첨부파일: 사진)\n[ATTACHMENT A1]' }, comments: [{ author: 'ㅇㅇ', content: '합성 아님?', parent: 0 }], incoming: [], activity: [] }) }]; });
   await page.click('[data-action="gn-send"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('관람차 사진'), null, { timeout: 5000 });
@@ -1239,12 +1256,12 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.equal(await page.locator('.gn-post .at-files .at-card-link a.at-go').count(), 1, '링크는 문서 목록, 주소면 누를 수 있음');
   if (shots) await page.screenshot({ path: `${shots}/18-gnet-attach.png` });
   // 괴담넷 끄기 → 탭은 안내만, 본편 반영 멈춤 → 켜면 고른 모델로
-  await page.click('.gn-settings summary');
+  await page.click('[data-action="gn-settings"]');
   await page.click('[data-action="gn-cfg"][data-value="mode=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
   await page.click('[data-action="gn-cfg"][data-value="power=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '0');
-  await page.waitForSelector('.gn .gx-empty');
+  await page.waitForSelector('.gn-off');
   assert.equal(await page.locator('[data-action="gn-refresh"]').count(), 0);
   const offReq = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
   assert.ok(!offReq.some((m) => m.content.includes('"feature":"gnet"')), '끄면 본편 반영 안 함');
@@ -1385,6 +1402,14 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 괴담넷 쪽지에도 사진
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="gnet"]');
   await page.waitForSelector('.gn');
+  // 괴담넷 새 글에도 클립보드 사진 붙여넣기
+  await page.click('[data-action="gn-write"]');
+  await page.evaluate((bytes) => {
+    const dt = new DataTransfer();
+    dt.items.add(new File([new Uint8Array(bytes)], 'paste.png', { type: 'image/png' }));
+    document.querySelector('[data-input="gn-draft"]').dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+  }, [...png]);
+  await page.waitForSelector('.gn-cpane .at-thumb', { timeout: 5000 });
   assert.deepEqual(errors, []);
   console.log('PASS 실제 사진: 고르기·붙여넣기·경로 저장·AI 이미지 전달·말풍선 표시·크게 보기');
   await page.close();

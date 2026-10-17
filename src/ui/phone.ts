@@ -656,6 +656,7 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
         <button class="ph-tool ph-plus${phone.attachMenu ? ' on' : ''}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? 'disabled' : ''}>${ICONS.plus}</button>
         <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? '참여자가 없어요' : phone.attach.length ? '함께 보낼 메시지 (선택)' : '메시지 입력'}" ${locked ? 'disabled' : ''}>${esc(phone.draft)}</textarea>
         <button class="ph-send" data-action="ph-send" data-value="${esc(r.id)}" aria-label="보내기" title="보내기" ${busy || locked ? 'disabled' : ''}>${ICONS.send}</button>
+        <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
       </div>
     </div>
   </div>`;
@@ -942,6 +943,8 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       await openDm(ctx, env, v);
       return true;
     case 'ph-room':
+      // PC: 열린 방을 다시 누르면 닫힌다 (‹ 뒤로와 같음)
+      if (phone.view === 'room' && phone.room === v && !matchMedia('(max-width: 760px)').matches) return handlePhone('ph-back', undefined, ctx, env);
       await openRoom(ctx, env, v);
       return true;
     case 'ph-back':
@@ -1043,6 +1046,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       const id = Number(v);
       // PC: 오른쪽 칸에 본문 하나. 모바일: 목록 안에서 펼치고 다시 누르면 접는다
       if (matchMedia('(max-width: 760px)').matches) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === 'notice' ? 'list' : phone.view });
+      else if (phone.view === 'notice' && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: 'list' });
       else Object.assign(phone, { openNotice: id, view: 'notice' });
       {
         const b = readBulletins(ctx.chat);
