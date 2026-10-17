@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.8
+//@version 0.16.9
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8583,6 +8583,37 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
 @media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
+
+/* 모바일 단계 바 (v0.16.9): 목표 고르기와 편성을 한 화면씩. PC는 두 칸이라 숨김 */
+.gx-stepbar { display: none; }
+@media (max-width: 760px) {
+  .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+  .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
+  .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
+  .gx-stepb b { font-size: 15px; }
+  .gx-stepb small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-stepb.on { border-color: var(--signal); background: var(--accent-bg); }
+  .gx-stepb.on i { background: var(--signal); color: var(--void); }
+  .gx-stepb.on small { color: var(--sub); }
+  .gx-field[data-step="goal"] .gx-team { display: none; }
+  .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 단계로 나눈 뒤에도 한 줄 한 명은 너무 길어서 두 칸 (상태는 이름 아래 줄, 부서·직급은 말줄임) */
+  .gx-acards.pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
+  /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
+  .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
+  .gx-acard.pick .gx-acard-top b { flex: 1 0 100%; padding-right: 16px; box-sizing: border-box; }
+  .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
+  .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 14px; }
+  .gx-acard.pick small { white-space: normal; font-size: 12px; line-height: 1.35; }
+  .gx-acard.pick .gx-acard-sit { display: none; }
+  .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
+}
 `;
 
 // src/ui/mapzoom.ts
@@ -8783,7 +8814,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.8" : "0";
+var PLUGIN_VERSION = true ? "0.16.9" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -9610,6 +9641,7 @@ var field2 = {
   mname: null,
   mpick: "an",
   note: "",
+  step: "goal",
   query: "",
   confirmEnd: null
 };
@@ -9623,6 +9655,7 @@ function resetField(all = false) {
   field2.support = 0;
   field2.mname = null;
   field2.note = "";
+  field2.step = "goal";
   field2.confirmEnd = null;
   field2.place = null;
   if (all) {
@@ -9808,10 +9841,21 @@ function teamPanel(x, goal, action, label, busy2) {
     <div class="gx-goal"><span>목표</span><b>${goal ? esc7(goal) : "목표를 골라 주세요"}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
-    <label class="gx-note"><span>추가 요청 <small>(선택)</small></span>
-      <textarea rows="3" data-input="field-note" placeholder="예: 조용히 잠입해서 먼저 주변을 살펴본다">${esc7(field2.note)}</textarea></label>
+    <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
+      <textarea rows="3" data-input="field-note">${esc7(field2.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc7(label)}</button>
   </section>`;
+}
+function stepBar(goal) {
+  const used = field2.team.length + field2.support + 1;
+  const b = (k, n, label, sub) => `<button class="gx-stepb${field2.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field2.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc7(sub)}</small></span></button>`;
+  return `<div class="gx-stepbar">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}</div>`;
+}
+function toStep(step, env2) {
+  field2.step = step;
+  env2.render();
+  const body4 = document.querySelector(".gx .gx-body");
+  if (body4 && matchMedia("(max-width: 760px)").matches) body4.scrollTop = 0;
 }
 function mapTab(ctx, env2, notice2, busy2) {
   const x = readCtx(ctx);
@@ -9820,7 +9864,8 @@ function mapTab(ctx, env2, notice2, busy2) {
   const t = field2.target;
   if (t?.type === "event" && !events.some((e) => e.key === t.key)) field2.target = null;
   const goal = field2.target ? targetName(field2.target) : null;
-  return `<main class="gx-body gx-field">
+  return `<main class="gx-body gx-field" data-step="${field2.step}">
+    ${stepBar(goal)}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env2)}</div>
     <div class="gx-sidecol">
       ${notice2 ? `<div class="gx-err" role="alert">${esc7(notice2)}</div>` : ""}
@@ -9866,7 +9911,8 @@ function missionTab(ctx, opening, notice2, busy2) {
   const p = x.world.pending;
   const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc7(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
   const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
-  return `<main class="gx-body gx-field gx-mission">
+  return `<main class="gx-body gx-field gx-mission" data-step="${field2.step}">
+    ${stepBar(field2.mname)}
     <div class="gx-mapcol">
       ${intro}
       <div class="gx-segs">${segs}</div>
@@ -10038,7 +10084,10 @@ async function handleField(action, value, ctx, env2, opening) {
       return true;
     case "pick-place":
       field2.target = placeTarget(v);
-      env2.render();
+      toStep("team", env2);
+      return true;
+    case "field-step":
+      toStep(v === "team" ? "team" : "goal", env2);
       return true;
     case "pick-event":
     case "show-event": {
@@ -10049,7 +10098,8 @@ async function handleField(action, value, ctx, env2, opening) {
       if (action === "pick-event") field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
       field2.region = sidoOf(ev.loc);
       field2.confirmEnd = null;
-      env2.render();
+      if (action === "pick-event") toStep("team", env2);
+      else env2.render();
       return true;
     }
     case "end-event":
@@ -10088,7 +10138,7 @@ async function handleField(action, value, ctx, env2, opening) {
     case "mission-pick":
       field2.mname = v;
       field2.mpick = field2.mkind;
-      env2.render();
+      toStep("team", env2);
       return true;
     case "mission-cancel":
       if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx, env2, (w) => (cancelMission(w, v), null));
@@ -11026,7 +11076,12 @@ function ensureRoot() {
     if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root?.querySelector(".dir-bar") ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
     if (el?.dataset?.input === "field-note") return void (field2.note = el.value);
-    if (el?.dataset?.input === "start-note") return void (draft.situation = el.value);
+    if (el?.dataset?.input === "start-note") {
+      const had = !!(draft.situation ?? "").trim();
+      draft.situation = el.value;
+      if (had !== !!el.value.trim()) root?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy);
+      return;
+    }
     if (el?.dataset?.input !== "mission-query") return;
     field2.query = el.value;
     const box = root?.querySelector(".gx-mbox");
@@ -11231,6 +11286,7 @@ async function start() {
     }
     const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
     const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
+    if (plan.kind === "direct" && !situation) throw new StartError("시작할 상황을 적어 주세요.");
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
       const next = applyStart(chat, plan);
@@ -11427,9 +11483,9 @@ function picker() {
     return `<button class="gx-sc${s5.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s5.fm}" aria-pressed="${s5.fm === draft.fm}">
             <b>${String(s5.fm).padStart(2, "0")}</b><span>${esc10(s5.label)}</span></button>`;
   }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
-  const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황 <small>(비워 두면 출발 뒤 채팅창에 적어요)</small></span>
-          <textarea rows="4" data-input="start-note" placeholder="예: 새벽 편의점 야간 근무 중, 냉장고 안에서 누가 문을 두드린다">${esc10(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
-  const ready = !!(f && sc);
+  const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
+          <textarea rows="4" data-input="start-note">${esc10(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
+  const ready = !!(f && sc) && (sc.kind !== "direct" || !!(draft.situation ?? "").trim());
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>첫 장면${f ? `<small class="gx-h2-sub">${esc10(f.name)} · ${f.scenarios.length}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>

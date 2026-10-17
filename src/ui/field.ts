@@ -38,6 +38,8 @@ interface FieldState {
   mpick: MissionKind;
   /** 지시문 뒤에 붙여 함께 보낼 말 */
   note: string;
+  /** 모바일: 목표 고르기와 편성을 한 화면씩 (PC는 두 칸이라 상관없음) */
+  step: 'goal' | 'team';
   query: string;
   /** 두 번 눌러 확인하는 상황 종료 */
   confirmEnd: string | null;
@@ -45,7 +47,7 @@ interface FieldState {
 
 export const field: FieldState = {
   region: '01', filter: 'all', place: null, target: null, team: [], support: 0,
-  mkind: 'an', mname: null, mpick: 'an', note: '', query: '', confirmEnd: null,
+  mkind: 'an', mname: null, mpick: 'an', note: '', step: 'goal', query: '', confirmEnd: null,
 };
 
 export interface FieldEnv {
@@ -71,6 +73,7 @@ export function resetField(all = false) {
   field.support = 0;
   field.mname = null;
   field.note = '';
+  field.step = 'goal';
   field.confirmEnd = null;
   field.place = null;
   if (all) {
@@ -307,13 +310,29 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     <div class="gx-goal"><span>목표</span><b>${goal ? esc(goal) : '목표를 골라 주세요'}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
-    <label class="gx-note"><span>추가 요청 <small>(선택)</small></span>
-      <textarea rows="3" data-input="field-note" placeholder="예: 조용히 잠입해서 먼저 주변을 살펴본다">${esc(field.note)}</textarea></label>
+    <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
+      <textarea rows="3" data-input="field-note">${esc(field.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
   </section>`;
 }
 
 // ── 탭 화면 ──
+
+/** 모바일 단계 바: ① 목표 → ② 편성 (CSS로 모바일에서만 보이고, 고른 단계만 보인다) */
+function stepBar(goal: string | null): string {
+  const used = field.team.length + field.support + 1;
+  const b = (k: 'goal' | 'team', n: string, label: string, sub: string) =>
+    `<button class="gx-stepb${field.step === k ? ' on' : ''}" data-action="field-step" data-value="${k}" aria-pressed="${field.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc(sub)}</small></span></button>`;
+  return `<div class="gx-stepbar">${b('goal', '1', '목표', goal ?? '고르기')}${b('team', '2', '편성', `${used} / 4`)}</div>`;
+}
+
+/** 단계를 바꾸면 맨 위부터 보이게 */
+function toStep(step: 'goal' | 'team', env: FieldEnv): void {
+  field.step = step;
+  env.render();
+  const body = document.querySelector('.gx .gx-body');
+  if (body && matchMedia('(max-width: 760px)').matches) body.scrollTop = 0;
+}
 
 export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: boolean): string {
   const x = readCtx(ctx);
@@ -323,7 +342,8 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
   const t = field.target;
   if (t?.type === 'event' && !events.some((e) => e.key === t.key)) field.target = null;
   const goal = field.target ? targetName(field.target) : null;
-  return `<main class="gx-body gx-field">
+  return `<main class="gx-body gx-field" data-step="${field.step}">
+    ${stepBar(goal)}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}</div>
     <div class="gx-sidecol">
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
@@ -382,7 +402,8 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
   const intro = opening
     ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>'
     : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
-  return `<main class="gx-body gx-field gx-mission">
+  return `<main class="gx-body gx-field gx-mission" data-step="${field.step}">
+    ${stepBar(field.mname)}
     <div class="gx-mapcol">
       ${intro}
       <div class="gx-segs">${segs}</div>
@@ -567,7 +588,10 @@ export async function handleField(action: string, value: string | undefined, ctx
       return true;
     case 'pick-place':
       field.target = placeTarget(v);
-      env.render();
+      toStep('team', env);
+      return true;
+    case 'field-step':
+      toStep(v === 'team' ? 'team' : 'goal', env);
       return true;
     case 'pick-event':
     case 'show-event': {
@@ -578,7 +602,8 @@ export async function handleField(action: string, value: string | undefined, ctx
       if (action === 'pick-event') field.target = { type: 'event', key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
       field.region = sidoOf(ev.loc);
       field.confirmEnd = null;
-      env.render();
+      if (action === 'pick-event') toStep('team', env);
+      else env.render();
       return true;
     }
     case 'end-event':
@@ -618,7 +643,7 @@ export async function handleField(action: string, value: string | undefined, ctx
     case 'mission-pick':
       field.mname = v;
       field.mpick = field.mkind;
-      env.render();
+      toStep('team', env);
       return true;
     case 'mission-cancel':
       if (v === 'an' || v === 'ms' || v === 'in') await saveWorld(ctx, env, (w) => (cancelMission(w, v), null));

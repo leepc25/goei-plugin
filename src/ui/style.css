@@ -985,3 +985,34 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
 @media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
+
+/* 모바일 단계 바 (v0.16.9): 목표 고르기와 편성을 한 화면씩. PC는 두 칸이라 숨김 */
+.gx-stepbar { display: none; }
+@media (max-width: 760px) {
+  .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+  .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
+  .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
+  .gx-stepb b { font-size: 15px; }
+  .gx-stepb small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-stepb.on { border-color: var(--signal); background: var(--accent-bg); }
+  .gx-stepb.on i { background: var(--signal); color: var(--void); }
+  .gx-stepb.on small { color: var(--sub); }
+  .gx-field[data-step="goal"] .gx-team { display: none; }
+  .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 단계로 나눈 뒤에도 한 줄 한 명은 너무 길어서 두 칸 (상태는 이름 아래 줄, 부서·직급은 말줄임) */
+  .gx-acards.pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
+  /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
+  .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
+  .gx-acard.pick .gx-acard-top b { flex: 1 0 100%; padding-right: 16px; box-sizing: border-box; }
+  .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
+  .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 14px; }
+  .gx-acard.pick small { white-space: normal; font-size: 12px; line-height: 1.35; }
+  .gx-acard.pick .gx-acard-sit { display: none; }
+  .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
+}

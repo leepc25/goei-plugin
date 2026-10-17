@@ -232,7 +232,13 @@ function ensureRoot(): HTMLElement {
     if (el?.dataset?.input === 'dir') return void directoryInput(el.dataset.key ?? '', el.value, root?.querySelector('.dir-bar') ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
     if (el?.dataset?.input === 'field-note') return void (field.note = el.value);
-    if (el?.dataset?.input === 'start-note') return void (draft.situation = el.value);
+    if (el?.dataset?.input === 'start-note') {
+      const had = !!(draft.situation ?? '').trim();
+      draft.situation = el.value;
+      // 비었다/채워졌다가 바뀔 때만 출발 버튼을 다시 그린다 (입력 중인 칸은 그대로)
+      if (had !== !!el.value.trim()) root?.querySelector<HTMLButtonElement>('.gx-foot .gx-start')?.toggleAttribute('disabled', !el.value.trim() || busy);
+      return;
+    }
     if (el?.dataset?.input !== 'mission-query') return;
     field.query = el.value;
     const box = root?.querySelector('.gx-mbox');
@@ -452,8 +458,9 @@ async function start(): Promise<void> {
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
     }
     const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
-    // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다 (비워 두면 예전처럼 채팅창에 직접)
+    // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다
     const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
+    if (plan.kind === 'direct' && !situation) throw new StartError('시작할 상황을 적어 주세요.');
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (chatPhase(chat) === 'started') throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
       const next = applyStart(chat, plan);
@@ -682,12 +689,13 @@ function picker(): string {
     : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
   const hint =
     sc?.kind === 'direct'
-      ? `<label class="gx-note"><span>시작할 상황 <small>(비워 두면 출발 뒤 채팅창에 적어요)</small></span>
-          <textarea rows="4" data-input="start-note" placeholder="예: 새벽 편의점 야간 근무 중, 냉장고 안에서 누가 문을 두드린다">${esc(draft.situation ?? '')}</textarea></label>`
+      ? `<label class="gx-note"><span>시작할 상황</span>
+          <textarea rows="4" data-input="start-note">${esc(draft.situation ?? '')}</textarea></label>`
       : sc?.kind === 'preset'
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
-  const ready = !!(f && sc);
+  // 직접 입력은 상황을 적어야 출발
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim());
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${f.scenarios.length}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>

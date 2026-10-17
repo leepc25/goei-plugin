@@ -188,7 +188,10 @@ async function open(page) {
   await open(page);
   await page.click('.gx-fac[data-value="E00"]');
   await page.click('.gx-sc[data-value="3"]');
+  // 직접 입력은 상황을 적어야 출발
+  assert.equal(await page.isDisabled('.gx-start'), true, '빈 상황이면 출발 불가');
   await page.fill('[data-input="start-note"]', '시작');
+  assert.equal(await page.isDisabled('.gx-start'), false);
   await page.click('.gx-start');
   await page.waitForSelector('.gx-notice');
   assert.ok((await page.textContent('.gx-notice')).includes('전송 버튼'));
@@ -1353,6 +1356,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok((await page.textContent('[data-action="faction"][data-value="F00"]')).includes('밤에만 움직이는 결사.'));
   assert.equal(await page.$$eval('.gx-sc', (els) => els.length), 2);
   await page.click('[data-action="fm"][data-value="1"]');
+  await page.fill('[data-input="start-note"]', '결사의 밤 모임');
   if (shots) await page.screenshot({ path: `${shots}/20-faction-picker.png` });
   await page.click('[data-action="start"]');
   await page.waitForFunction(() => window.__chat.scriptstate?.$st_faction === 'F00');
