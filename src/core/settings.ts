@@ -60,7 +60,7 @@ export const WORLD_SPEC: WorldField[] = (
     ['랜덤 괴이 RP 유지 시간', 'random_ttl', 8760, true],
     ['인시던트 RP 유지 시간', 'incident_ttl', 8760, true],
     ['미스틱 사이트 RP 유지 시간', 'mystic_ttl', 8760, true],
-    ['인시던트 중 랜드마크 비율', 'landmark_share', 100, false],
+    ['인시던트 중 거점 비율', 'landmark_share', 100, false],
   ] as [string, WorldField['key'], number | null, boolean][]
 ).map(([label, key, max, fraction]) => ({ key, label, max, fraction }));
 

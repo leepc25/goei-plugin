@@ -45,6 +45,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       registerSetting: async (name, cb) => { window.__setting = cb; return { id: 's' }; },
       getRootDocument: async () => window.__rootDoc,
       requestPluginPermission: async () => true,
+      sendChat: async (m) => { (window.__calls.send = window.__calls.send || []).push({ m, last: window.__chat.message?.at(-1)?.data }); if (window.__sendFail) throw new Error('Sending chat with plugin-based model is currently blocked'); return true; },
       unwarpSafeArray: async (a) => a,
       safeLocalStorage: { getItem: async (k) => window.__store[k] ?? null, setItem: async (k, v) => { window.__store[k] = v; } },
       pluginStorage: { getItem: async (k) => window.__store['p:' + k] ?? null, setItem: async (k, v) => { window.__store['p:' + k] = v; }, keys: async () => [], removeItem: async () => {} },
@@ -167,12 +168,33 @@ async function open(page) {
   await open(page);
   await page.click('.gx-fac[data-value="E00"]');
   await page.click('.gx-sc[data-value="3"]');
-  assert.ok((await page.textContent('.gx-hint')).includes('채팅 입력창'));
+  assert.ok((await page.textContent('.gx-note')).includes('시작할 상황'));
+  await page.fill('[data-input="start-note"]', '새벽 편의점, 냉장고 안에서 노크 소리');
   await page.click('.gx-start');
   await page.waitForFunction(() => window.__calls.setChat.length === 1);
   const saved = await page.evaluate(() => window.__calls.setChat[0]);
   assert.equal(fixture.alternateGreetings[saved.fmIndex], '');
-  console.log('PASS 직접 입력 → 빈 인사말');
+  assert.equal(saved.message.length, 1);
+  assert.equal(saved.message[0].data, '새벽 편의점, 냉장고 안에서 노크 소리');
+  await page.waitForFunction(() => window.__calls.send?.length === 1 && window.__calls.hide >= 1);
+  console.log('PASS 직접 입력 → 빈 인사말 + 적은 상황을 바로 전송');
+  await page.close();
+}
+
+// 2-1) 자동 전송이 막히면(플러그인 모델) 창을 연 채로 안내
+{
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  await page.evaluate(() => (window.__sendFail = true));
+  await open(page);
+  await page.click('.gx-fac[data-value="E00"]');
+  await page.click('.gx-sc[data-value="3"]');
+  await page.fill('[data-input="start-note"]', '시작');
+  await page.click('.gx-start');
+  await page.waitForSelector('.gx-notice');
+  assert.ok((await page.textContent('.gx-notice')).includes('전송 버튼'));
+  assert.equal(await page.evaluate(() => window.__chat.message.length), 1, '메시지는 놓여 있음');
+  assert.deepEqual(errors, []);
+  console.log('PASS 자동 전송 실패 → 안내');
   await page.close();
 }
 
@@ -466,9 +488,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   if (shots) await page.screenshot({ path: `${shots}/11-map-mobile.png`, fullPage: true });
   await page.setViewportSize({ width: 1100, height: 900 });
   const before = await page.evaluate(() => window.__chat.message.length);
+  await page.fill('[data-input="field-note"]', '조용히 진입한다');
   await page.click('[data-action="depart"]');
   await page.waitForFunction((n) => window.__chat.message.length === n + 1, before);
   const rec = await page.evaluate(() => window.__chat.message.at(-1));
+  assert.ok(rec.data.endsWith('%%/SCENE_CARD%%\n\n조용히 진입한다'), '추가 요청은 카드 뒤에');
+  await page.waitForFunction(() => window.__calls.send?.length === 1);
+  assert.ok((await page.evaluate(() => window.__calls.send[0])).last.endsWith('조용히 진입한다'), '놓은 뒤 바로 전송');
   assert.equal(rec.role, 'user');
   assert.match(rec.data, /^%%SCENE_CARD:[0-9a-f]+%%\n/);
   assert.ok(rec.data.includes(`Subject: ${where} ${preset.name}`), rec.data);
@@ -477,10 +503,16 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
   // 화면: 카드만, 요청: 표식 제거 + 덧붙인 글 합치기
   const card = await page.evaluate((t) => window.__calls.handlers.display(t), rec.data);
-  assert.ok(card.includes('목표') && card.includes(preset.name) && card.includes(`나, ${agentName}, 지원 ×1`) && !card.includes('Subject:'), card);
-  const req = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: t }, { role: 'user', content: '조용히 진입한다' }], 'model'), rec.data);
+  assert.ok(card.includes('목표') && card.includes(preset.name) && card.includes(`나, ${agentName}, 지원 ×1`) && !card.includes('Subject:') && card.includes('조용히 진입한다'), card);
+  // 다른 채팅에 갔다 와서 Lite 판정 전에 다시 그려도 카드로 (v0.16.7: 원문이 드러났다)
+  const raw = await page.evaluate(() => window.__calls.handlers.display('%%SCENE_CARD:7b22746172676574223a2261222c227061727479223a22eb8298227d%%\nUse it\n%%/SCENE_CARD%%'));
+  assert.ok(!raw.includes('SCENE_CARD') && !raw.includes('Use it'), raw);
+  const req = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: t }], 'model'), rec.data);
   assert.equal(req.length, 2);
   assert.ok(!req[1].content.includes('SCENE_CARD') && req[1].content.endsWith('Situation:\n조용히 진입한다'), req[1].content);
+  const req2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model'), rec.data);
+  assert.equal(req2.length, 1);
+  assert.ok(req2[0].content.endsWith('Situation:\n조용히 진입한다\n\n그리고 문을 연다'), req2[0].content);
   // 장소 자체 선택: 아직 안 보낸 카드는 바꿔 끼운다
   await open(page);
   await page.waitForSelector('.gx-canvas');
@@ -519,6 +551,11 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelectorAll('.gx-mlist li').length === 1);
   await page.click('.gx-mlist [data-action="mission-pick"]');
+  // 위 종류 버튼을 바꿔 봐도 고른 목표는 그대로
+  await page.click('.gx-seg[data-value="lm"]');
+  assert.equal((await page.textContent('.gx-goal b')).trim(), '소라 랜드');
+  assert.equal(await page.isDisabled('[data-action="mission-send"]'), false);
+  assert.equal((await page.textContent('[data-action="mission-send"]')).trim(), '작전 개시');
   if (shots) await page.screenshot({ path: `${shots}/12-mission-opening.png` });
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction(() => window.__chat.message.length === 1);
@@ -527,6 +564,42 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const w = JSON.parse(chat.scriptstate.$goei_world);
   assert.equal(w.pending.an, '소라 랜드');
   assert.match(chat.scriptstate.$an_report, /NEW \[AN\|<발생 지역: 시도와 시군구>\|소라 랜드\|활성/);
+  // 보내기 전(지시문만 놓임)에는 다시 열면 고르기 화면: 다른 대상으로 바꾸면 지시문·요청이 새 것으로
+  await page.evaluate(() => { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
+  await open(page);
+  await page.waitForSelector('.gx-search');
+  assert.equal(await page.locator('.gx-nav').count(), 0, '아직 플레이 화면 아님');
+  await page.click('.gx-seg[data-value="ms"]');
+  await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
+  const site0 = (await page.textContent('.gx-goal b')).trim();
+  await page.click('[data-action="mission-send"]');
+  await page.waitForFunction((n) => window.__chat.message.length === 1 && window.__chat.message[0].data.includes(n), site0);
+  {
+    const w2 = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_world));
+    assert.equal(w2.pending.an, undefined, '바꾼 뒤 예전 요청은 취소');
+    assert.equal(w2.pending.ms, site0);
+  }
+  // 일반 첫 장면으로 다시 고르면 지시문은 지워진다
+  await page.evaluate(() => { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
+  await open(page);
+  await page.waitForSelector('[data-action="repick"]');
+  await page.click('[data-action="repick"]');
+  await page.waitForSelector('.gx-fac.on');
+  await page.click('.gx-sc[data-value="1"]');
+  await page.click('.gx-start');
+  await page.waitForFunction(() => window.__chat.message.length === 0 && window.__chat.scriptstate.$st_fm === '1');
+  // 다시 커스텀 임무로 (아래 시험을 이어가려고)
+  await page.evaluate(() => { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
+  await open(page);
+  await page.waitForSelector('.gx-sc');
+  await page.click('.gx-sc[data-value="9"]');
+  await page.click('.gx-start');
+  await page.waitForSelector('.gx-search');
+  await page.fill('.gx-search', '소라');
+  await page.waitForFunction(() => document.querySelectorAll('.gx-mlist li').length === 1);
+  await page.click('.gx-mlist [data-action="mission-pick"]');
+  await page.click('[data-action="mission-send"]');
+  await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
   // 첫 전송은 시드를 유지 (지시문 + 덧붙인 글 = 한 번)
   await page.evaluate(() => window.__chat.message.push({ role: 'user', data: '더' }));
   const seeded = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'system', content: 'x %%SEED%%\nS\n%%/SEED%%\ny' }], 'model'));
@@ -538,6 +611,10 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.gx-seg[data-value="ms"]');
   await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
   const site = (await page.textContent('.gx-goal b')).trim();
+  // 다른 탭에 다녀와도 고른 목표 유지
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  assert.equal((await page.textContent('.gx-goal b')).trim(), site, '탭 이동 뒤에도 목표 유지');
   if (shots) await page.screenshot({ path: `${shots}/12-mission-tab.png` });
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction(() => window.__chat.message.length === 4);
@@ -931,7 +1008,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-mbox');
   await page.click('.gx-mbox [data-action="mission-pick"]');
   await page.waitForSelector('.gx-team');
-  assert.equal(await page.$('.gx-support'), null, '지원 투입 OFF면 지원 인원 칸 없음');
+  assert.equal(await page.locator('.gx-scard').count(), 0, '지원 투입 OFF면 지원 인원 카드 없음');
   // 에셋: 보조모델 + 캐릭터당 1장
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
   await page.waitForSelector('[data-action="set-asset-model"]');

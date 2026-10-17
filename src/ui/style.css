@@ -959,3 +959,23 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .upd-banner-b { display: flex; gap: 6px; flex: none; }
 .gx-x { position: relative; }
 .gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
+
+/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
+.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.gx-note > span { font-size: 14px; font-weight: 600; color: var(--sub); padding: 0 2px; }
+.gx-note small { font-weight: 400; color: var(--dim); }
+.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
+.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
+.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
+.gx-team .gx-note { margin-top: 0; }
+.gx-notice { margin: 12px 20px 0; }
+/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
+.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
+.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
+.gx-scard .gx-ava svg { width: 26px; height: 26px; }
+.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
+.gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.gx-scard-step .gx-step { width: 32px; height: 32px; border-radius: 9px; color: var(--text); }
+.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
+@media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }

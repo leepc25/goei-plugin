@@ -660,7 +660,7 @@ export function requestMission(w: WorldState, c: Catalog, s: WorldSettings, kind
     if (!w.ms.some((e) => e.name === name) && w.ms.filter((e) => e.origin !== 'auto').length >= s.extra_ms_cap) return '특수 추가 여유분이 가득 찼어요.';
     w.pending.ms = name;
   } else {
-    if (!c.landmarks.some((l) => l.name === name)) return '목록에 없는 랜드마크예요.';
+    if (!c.landmarks.some((l) => l.name === name)) return '목록에 없는 거점이에요.';
     if (!w.inc.some((e) => e.name === name) && w.inc.filter((e) => e.origin !== 'auto').length >= s.extra_in_cap) return '사건 추가 여유분이 가득 찼어요.';
     w.pending.in = name;
   }

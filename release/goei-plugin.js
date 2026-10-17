@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.6
+//@version 0.16.7
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -1625,7 +1625,7 @@ function requestMission(w, c, s5, kind, name) {
     if (!w.ms.some((e) => e.name === name) && w.ms.filter((e) => e.origin !== "auto").length >= s5.extra_ms_cap) return "특수 추가 여유분이 가득 찼어요.";
     w.pending.ms = name;
   } else {
-    if (!c.landmarks.some((l) => l.name === name)) return "목록에 없는 랜드마크예요.";
+    if (!c.landmarks.some((l) => l.name === name)) return "목록에 없는 거점이에요.";
     if (!w.inc.some((e) => e.name === name) && w.inc.filter((e) => e.origin !== "auto").length >= s5.extra_in_cap) return "사건 추가 여유분이 가득 찼어요.";
     w.pending.in = name;
   }
@@ -2141,13 +2141,13 @@ function writeGnet(chat, st, opts = {}) {
   const unread = boardUnread(st) || dmUnread(st);
   return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
 }
-function addUserPost(st, nick, title, body4, date) {
+function addUserPost(st, nick, title2, body4, date) {
   st.seq += 1;
   const p = {
     id: st.seq,
     date: validDate(date),
     nick: cut(nick, 80),
-    title: trimTokens(title, LIMITS.title_tokens),
+    title: trimTokens(title2, LIMITS.title_tokens),
     body: trimTokens(body4, LIMITS.post_tokens),
     views: 0,
     votes: 0,
@@ -2396,10 +2396,10 @@ function acceptComments(rows, existing, t, nick, base = t.total) {
 }
 function parsePostDraft(value) {
   if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
-  const title = str2(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
+  const title2 = str2(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
   const content = str2(value.post.content).trim();
-  if (!title || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
-  return { title: trimTokens(title, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
+  if (!title2 || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
+  return { title: trimTokens(title2, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
 }
 function attachPostDraft(draft2, input2) {
   if (!hasAttachment(input2)) return draft2;
@@ -3283,12 +3283,12 @@ function eventsFromPatch(patch, r, allowTitle) {
   if (!Array.isArray(patch)) fail("대화 변경 목록이 배열이 아니에요.");
   if (patch.length > LIMITS2.events + 1) fail("대화 변경 항목이 너무 많아요.");
   const events = [];
-  let title;
+  let title2;
   for (const op of patch) {
     if (!op || typeof op !== "object") fail("대화 변경 항목은 객체여야 해요.");
     if (op.op === "replace" && op.path === "/name" && allowTitle) {
-      if (title || r.kind !== "group" || typeof op.value !== "string" || !op.value.trim() || [...op.value].length > LIMITS2.room_name) fail("대화방 이름 형식이 잘못됐어요.");
-      title = op.value.trim();
+      if (title2 || r.kind !== "group" || typeof op.value !== "string" || !op.value.trim() || [...op.value].length > LIMITS2.room_name) fail("대화방 이름 형식이 잘못됐어요.");
+      title2 = op.value.trim();
       continue;
     }
     if (op.op !== "add" || op.path !== "/messages/-") fail("기존 기록은 고치거나 지울 수 없어요. 새 메시지만 추가하세요.");
@@ -3304,7 +3304,7 @@ function eventsFromPatch(patch, r, allowTitle) {
     } else fail("괴담톡에서 지원하지 않는 메시지 유형이에요.");
   }
   validateEvents(events, r);
-  return { events, title };
+  return { events, title: title2 };
 }
 function validateEvents(events, r) {
   if (events.length > LIMITS2.events) fail("한 번에 추가할 수 있는 말풍선 수를 넘었어요.");
@@ -4167,12 +4167,17 @@ function unwrapScenes(messages) {
       out.push(m);
       continue;
     }
-    let content = stripSceneCard(m.content);
+    const END = "%%/SCENE_CARD%%";
+    const end = m.content.lastIndexOf(END);
+    const tail = end >= 0 ? m.content.slice(end + END.length).trim() : "";
+    let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
+    const extra = tail ? [tail] : [];
     const next = messages[i + 1];
     if (next?.role === "user" && typeof next.content === "string" && !hasSceneCard(next.content)) {
-      content = withUserInput(null, content, next.content.trim());
+      if (next.content.trim()) extra.push(next.content.trim());
       i++;
     }
+    if (extra.length) content = withUserInput(null, content, extra.join("\n\n"));
     out.push({ ...m, content });
   }
   return { messages: out, changed: true };
@@ -4280,14 +4285,14 @@ function roomPacket(r) {
 }
 function participant(src, c, related, status, names3) {
   let lore = "";
-  let title = "";
+  let title2 = "";
   if (related) {
     const candidates = c.custom ? [c.name] : c.lore ? [c.lore] : [`${c.english} ${c.name}`, `${c.name} ${c.english}`, c.name, c.english ?? ""];
     for (const n of candidates) {
       const t = bookText(src, n);
       if (t) {
         lore = t;
-        title = n;
+        title2 = n;
         break;
       }
     }
@@ -4299,7 +4304,7 @@ function participant(src, c, related, status, names3) {
     factionDisplayName: names3[c.group ?? ""] ?? c.group,
     rank: c.rank,
     department: c.department,
-    source: title,
+    source: title2,
     lore,
     hasCharacterLore: !!lore.trim(),
     manuallySavedContact: !!c.custom,
@@ -4524,8 +4529,12 @@ function readManifest(lore) {
   }
   return null;
 }
+function unsentOpening(chat) {
+  const m = chat.message ?? [];
+  return m.length === 1 && m[0]?.role === "user" && hasSceneCard(String(m[0].data ?? ""));
+}
 function chatPhase(chat) {
-  if ((chat.message ?? []).length > 0) return "started";
+  if ((chat.message ?? []).length > 0 && !unsentOpening(chat)) return "started";
   return isFaction(chat.scriptstate?.["$st_faction"]) ? "staged" : "fresh";
 }
 function currentChoice(chat) {
@@ -4583,6 +4592,8 @@ function planStart(choice, manifest, lore, greetingCount, world = null) {
 function applyStart(chat, plan) {
   return {
     ...chat,
+    // 보내지 않은 커스텀 임무 지시문은 새 선택으로 바꾼다
+    ...unsentOpening(chat) ? { message: [] } : {},
     fmIndex: plan.fmIndex,
     scriptstate: { ...chat.scriptstate ?? {}, ...plan.scriptstate }
   };
@@ -5580,8 +5591,8 @@ function phonePickList(ctx) {
   return rows.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
         <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx, c, c.name)}<span class="ph-who"><b>${esc2(c.name)}</b><small>${esc2(contactDetails(c))}</small></span></button></li>`).join("");
 }
-function paneHead(title, sub) {
-  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</div></header>`;
+function paneHead(title2, sub) {
+  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div></header>`;
 }
 function groupView(ctx, st) {
   const room = phone.invite ? st.rooms[phone.invite] : void 0;
@@ -5644,7 +5655,7 @@ function seg(key, cur, items) {
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
 }
 var row = (label, control, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control}</div></div>`;
-var group = (title, rows) => `<section class="ps-group"><h3>${title}</h3><div class="ps-rows">${rows}</div></section>`;
+var group = (title2, rows) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows}</div></section>`;
 function settingsView(ctx) {
   const v = (k) => phoneValue(ctx.chat.scriptstate, k);
   const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]);
@@ -6694,7 +6705,7 @@ var WORLD_SPEC = [
   ["랜덤 괴이 RP 유지 시간", "random_ttl", 8760, true],
   ["인시던트 RP 유지 시간", "incident_ttl", 8760, true],
   ["미스틱 사이트 RP 유지 시간", "mystic_ttl", 8760, true],
-  ["인시던트 중 랜드마크 비율", "landmark_share", 100, false]
+  ["인시던트 중 거점 비율", "landmark_share", 100, false]
 ].map(([label, key, max, fraction]) => ({ key, label, max, fraction }));
 var wgKey = (key) => `$wg_${key}`;
 function worldValue(f, v) {
@@ -7173,6 +7184,59 @@ var BRAND = {
 };
 var CARD_FILE = "괴이_이면세계.charx";
 
+// src/ui/landing.ts
+var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+function title(p) {
+  const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .18em 0 .06em">:</span><span style="color:${p.signal}">이면세계</span>`;
+  const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
+  return `<div style="margin:6px 0 0;${font}">${line}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line}</div></div>`;
+}
+function corner(pos, p) {
+  const [v, h] = pos.split(" ");
+  return `<span aria-hidden="true" style="position:absolute;${v}:10px;${h}:10px;width:14px;height:14px;border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
+}
+function landingHtml(p) {
+  const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="50" height="50"');
+  return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:40em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:left;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<div data-goei-part="row" style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px 26px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:84px;height:84px;border-radius:24px;background:${p.accentBg};border:1px solid ${p.accentLine};color:${p.signal}">${ghost}</div><div data-goei-part="text" style="flex:1 1 15em;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em"><span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span><span style="display:inline-flex;align-items:center;gap:6px;color:${p.sub};letter-spacing:.2em"><span data-goei-part="dot" style="width:7px;height:7px;border-radius:50%;background:${p.signal}"></span>STANDBY</span></div>` + title(p) + `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
+}
+var LANDING_CSS = `
+[data-goei-card="landing"] { container-type: inline-size; }
+@keyframes goei-l-blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes goei-l-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(.7); } }
+@keyframes goei-l-mirror {
+  0%, 100% { transform: scaleY(-1) skewX(0deg) translateX(0); opacity: .3; }
+  25% { transform: scaleY(-1.04) skewX(5deg) translateX(-2px); opacity: .22; }
+  50% { transform: scaleY(-.97) skewX(-3deg) translateX(2px); opacity: .34; }
+  75% { transform: scaleY(-1.02) skewX(4deg) translateX(-1px); opacity: .25; }
+}
+@keyframes goei-l-label {
+  0%, 86%, 100% { opacity: .9; transform: translateX(0); }
+  88% { opacity: .3; transform: translateX(2px); }
+  90% { opacity: 1; transform: translateX(-2px); }
+  92% { opacity: .5; transform: translateX(1px); }
+  94% { opacity: .95; transform: translateX(0); }
+}
+@keyframes goei-l-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes goei-l-scan { 0% { transform: translateY(-100%); opacity: 0; } 15% { opacity: .55; } 70% { opacity: .55; } 100% { transform: translateY(260%); opacity: 0; } }
+[data-goei-card="landing"] [data-goei-part="hint"] { animation: goei-l-blink 1.6s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="dot"] { animation: goei-l-dot 1.6s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="mirror"] { animation: goei-l-mirror 4.5s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="label"] { display: inline-block; animation: goei-l-label 3.8s linear infinite; }
+[data-goei-card="landing"] [data-goei-part="ghost"] { animation: goei-l-float 3.2s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="scan"] { animation: goei-l-scan 5s ease-in-out infinite; }
+/* 인라인 style을 이겨야 해서 !important */
+@container (max-width: 30em) {
+  [data-goei-card="landing"] [data-goei-part="text"] { flex-basis: 100% !important; text-align: center !important; }
+  [data-goei-card="landing"] [data-goei-part="text"] > div:first-child { justify-content: center !important; }
+  [data-goei-card="landing"] [data-goei-part="text"] > div:last-child { justify-content: center !important; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 68px !important; height: 68px !important; border-radius: 20px !important; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-goei-card="landing"] [data-goei-part] { animation: none !important; }
+}
+`;
+
 // src/ui/theme.ts
 var PALETTES = {
   dark: { void: "#0B1215", panel: "#121B1F", line: "#24343B", text: "#E6EEEC", sub: "#B5C4C0", signal: "#5EEAD4", accentBg: "#10302C", accentLine: "#2C6E63", scrim: "rgba(3, 7, 9, .9)" },
@@ -7195,6 +7259,15 @@ function setCurrentTheme(t) {
 function onThemeChange(f) {
   listeners.add(f);
   return () => listeners.delete(f);
+}
+var KEYS = Object.keys(PALETTES.dark);
+function cardPalette(t) {
+  const p = PALETTES[t];
+  return Object.fromEntries(KEYS.map((k) => [k, `var(--goei-${k}, ${p[k]})`]));
+}
+function cardVarsCss(t) {
+  const p = PALETTES[t];
+  return `[data-goei-card] { ${KEYS.map((k) => `--goei-${k}: ${p[k]};`).join(" ")} }`;
 }
 
 // src/host/overlay.ts
@@ -7351,6 +7424,9 @@ async function createFab(onOpen) {
   const style = await doc.createElement("style");
   await style.setTextContent(FAB_CSS);
   await host.appendChild(style);
+  const cardStyle2 = await doc.createElement("style");
+  await cardStyle2.setTextContent(cardVarsCss("dark") + LANDING_CSS);
+  await host.appendChild(cardStyle2);
   await root2.body.appendChild(host);
   const button = await host.querySelector("button");
   if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
@@ -7491,6 +7567,7 @@ async function createFab(onOpen) {
     },
     async setTheme(theme) {
       await host.setAttribute("x-goei-theme", theme);
+      await cardStyle2.setTextContent(cardVarsCss(theme) + LANDING_CSS);
     },
     async chatScreenVisible() {
       return !!await doc.querySelector(".default-chat-screen");
@@ -7596,6 +7673,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   box-shadow: var(--shadow);
   overflow: hidden;
 }
+/* 시작 전 화면: 설정 묶음(980px) + 좌우 여백 폭 */
+.gx-panel.pre { width: min(100%, 1024px); }
+/* 스크롤바도 창 배색으로 (브라우저 기본 회색이 테마와 안 맞았다) */
+.gx, .gx * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--sub) 38%, transparent) transparent; }
+.gx ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+.gx ::-webkit-scrollbar-track { background: transparent; }
+.gx ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 34%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 55%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-corner { background: transparent; }
 .gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "nav head" "nav body"; }
 .gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
 .gx-content > .gx-body, .gx-content > main { flex: 1; min-height: 0; }
@@ -8471,6 +8557,26 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .upd-banner-b { display: flex; gap: 6px; flex: none; }
 .gx-x { position: relative; }
 .gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
+
+/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
+.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.gx-note > span { font-size: 14px; font-weight: 600; color: var(--sub); padding: 0 2px; }
+.gx-note small { font-weight: 400; color: var(--dim); }
+.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
+.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
+.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
+.gx-team .gx-note { margin-top: 0; }
+.gx-notice { margin: 12px 20px 0; }
+/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
+.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
+.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
+.gx-scard .gx-ava svg { width: 26px; height: 26px; }
+.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
+.gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.gx-scard-step .gx-step { width: 32px; height: 32px; border-radius: 9px; color: var(--text); }
+.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
+@media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
 `;
 
 // src/ui/mapzoom.ts
@@ -8671,7 +8777,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.6" : "0";
+var PLUGIN_VERSION = true ? "0.16.7" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -8897,16 +9003,16 @@ function validTitle(t) {
   return !!t.trim() && [...t].length <= 300 && !/[\r\n<>]/.test(t) && !t.includes("{{") && !t.includes("}}") && !t.startsWith(WIKI_PREFIX);
 }
 var QUALIFIERS = /* @__PURE__ */ new Set(["기업", "회사", "기관", "조직", "인물", "장소"]);
-function exactTopic(r, src, title) {
-  const entries = resolveName(r, title);
+function exactTopic(r, src, title2) {
+  const entries = resolveName(r, title2);
   const names3 = [...new Map(entries.filter((e) => e.lore).map((e) => [e.lore.toLowerCase(), e.lore])).values()];
   if (names3.length === 1) return [names3[0], true];
-  if (entries.length) return [title, true];
-  if (hasBook(src, title)) return [title, true];
-  return [title, false];
+  if (entries.length) return [title2, true];
+  if (hasBook(src, title2)) return [title2, true];
+  return [title2, false];
 }
-function canonicalTitle(r, src, title) {
-  const t = title.trim();
+function canonicalTitle(r, src, title2) {
+  const t = title2.trim();
   const [name, known] = exactTopic(r, src, t);
   if (known) return { title: name, known };
   const m = /^(.*?)\s*\(([^()]*)\)$/.exec(t);
@@ -8919,7 +9025,7 @@ function canonicalTitle(r, src, title) {
 function localLore(chat) {
   return Array.isArray(chat.localLore) ? chat.localLore : [];
 }
-function parseDocContent(title, content) {
+function parseDocContent(title2, content) {
   const body4 = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(content)?.[0];
   if (!body4) return null;
   let meta = null;
@@ -8931,7 +9037,7 @@ function parseDocContent(title, content) {
       meta = null;
     }
   }
-  return { title, meta, body: body4 };
+  return { title: title2, meta, body: body4 };
 }
 function listDocs(chat) {
   const out = [];
@@ -8939,18 +9045,18 @@ function listDocs(chat) {
   for (const e of localLore(chat)) {
     const name = String(e.comment ?? "");
     if (!name.startsWith(WIKI_PREFIX)) continue;
-    const title = name.slice(WIKI_PREFIX.length);
-    if (seen.has(title)) continue;
-    const doc = parseDocContent(title, String(e.content ?? ""));
+    const title2 = name.slice(WIKI_PREFIX.length);
+    if (seen.has(title2)) continue;
+    const doc = parseDocContent(title2, String(e.content ?? ""));
     if (doc) {
-      seen.add(title);
+      seen.add(title2);
       out.push(doc);
     }
   }
   return out;
 }
-function findDoc(chat, title) {
-  return listDocs(chat).find((d) => d.title === title) ?? null;
+function findDoc(chat, title2) {
+  return listDocs(chat).find((d) => d.title === title2) ?? null;
 }
 function docContent(meta, body4) {
   const json2 = JSON.stringify(meta).replace(/--/g, "-\\u002d");
@@ -8979,8 +9085,8 @@ function saveDoc(chat, meta, body4) {
   else lore.push(entry);
   return { ...chat, localLore: lore };
 }
-function deleteDoc(chat, title) {
-  return { ...chat, localLore: localLore(chat).filter((e) => e.comment !== WIKI_PREFIX + title) };
+function deleteDoc(chat, title2) {
+  return { ...chat, localLore: localLore(chat).filter((e) => e.comment !== WIKI_PREFIX + title2) };
 }
 var REQUIRED2 = ["NW.GUIDE", "NW.EXPAND", "NW.FAITHFUL", "NW.LENGTH_SHORT", "NW.LENGTH_STANDARD", "NW.LENGTH_DETAILED", "NW.LINKS_OPEN", "NW.FORMAT"];
 function wikiPrompt(src, req, s5, factionNames2, registry2) {
@@ -9031,7 +9137,7 @@ function innerBody(body4) {
   return body4.replace(/^<lightboard-namuwiki[^>]*>\s*/, "").replace(/\s*<\/lightboard-namuwiki>\s*$/, "");
 }
 var ARROW = /➡️|➡︎|➡/g;
-function acceptArticle(raw, title, canon2) {
+function acceptArticle(raw, title2, canon2) {
   const text = raw.trim();
   if (!text) throw new WikiError("모델이 빈 응답을 보냈어요.");
   const m = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(text);
@@ -9042,16 +9148,16 @@ function acceptArticle(raw, title, canon2) {
   let body4 = m[0];
   if (!body4.includes("[Paragraph]")) throw new WikiError("본문 문단([Paragraph])이 없는 응답이에요.");
   body4 = body4.replace(ARROW, "➡️").replace(/\{\{/g, "&#123;&#123;").replace(/\}\}/g, "&#125;&#125;");
-  const safeTitle = title.replace(/"/g, "&quot;");
+  const safeTitle = title2.replace(/"/g, "&quot;");
   body4 = body4.replace(/^<lightboard-namuwiki([^>]*)>/, (_all, attrs2) => {
     const rest = attrs2.replace(/\sdoc_title="[^"]*"/, "");
     return `<lightboard-namuwiki doc_title="${safeTitle}"${rest}>`;
   });
-  return reviewLinks(body4, title, canon2);
+  return reviewLinks(body4, title2, canon2);
 }
-function reviewLinks(body4, title, canon2) {
+function reviewLinks(body4, title2, canon2) {
   const seen = /* @__PURE__ */ new Set();
-  const self = canon2(title);
+  const self = canon2(title2);
   return body4.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
     const t = label.trim();
     if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label;
@@ -9208,30 +9314,30 @@ function canon(ctx) {
   const src = source3(ctx);
   return (t) => canonicalTitle(r, src, t).title;
 }
-function go(view2, title = "", query = wiki.query) {
-  if (wiki.view !== view2 || wiki.title !== title) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
+function go(view2, title2 = "", query = wiki.query) {
+  if (wiki.view !== view2 || wiki.title !== title2) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
   if (wiki.history.length > 30) wiki.history.shift();
   wiki.view = view2;
-  wiki.title = title;
+  wiki.title = title2;
   wiki.query = query;
   wiki.confirmDelete = null;
   wiki.notice = "";
 }
 function openTitle(ctx, raw, from) {
-  const title = canon(ctx)(raw.trim());
-  if (!validTitle(title)) {
+  const title2 = canon(ctx)(raw.trim());
+  if (!validTitle(title2)) {
     wiki.notice = "쓸 수 없는 제목이에요. 꺾쇠(<>), 줄바꿈, {{ }} 없이 300자 이내로 적어 주세요.";
     return;
   }
   const parent = wiki.view === "doc" ? findDoc(ctx.chat, wiki.title) : null;
-  if (findDoc(ctx.chat, title)) {
-    go("doc", title);
+  if (findDoc(ctx.chat, title2)) {
+    go("doc", title2);
     return;
   }
   wiki.inherited = from === "link" && parent?.meta ? parent.meta.primarySources : [];
   wiki.previousTitle = from === "link" && parent ? parent.title : null;
   wiki.direct = from !== "link";
-  go("compose", title);
+  go("compose", title2);
 }
 function search(ctx, q) {
   const query = q.trim();
@@ -9244,7 +9350,7 @@ function search(ctx, q) {
   if (!docs.length && !hits.length) return openTitle(ctx, c.title, "direct");
   go("query", "", query);
 }
-async function generate2(ctx, env2, title, regenerate) {
+async function generate2(ctx, env2, title2, regenerate) {
   const key = chatKey3(ctx);
   if (jobs3.has(key)) {
     wiki.notice = `「${jobs3.get(key).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
@@ -9252,12 +9358,12 @@ async function generate2(ctx, env2, title, regenerate) {
     return;
   }
   const s5 = wikiSettings(ctx.chat.scriptstate);
-  const old = findDoc(ctx.chat, title);
+  const old = findDoc(ctx.chat, title2);
   const inherited = regenerate ? old?.meta && !old.meta.direct ? old.meta.primarySources : [] : wiki.inherited;
   const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
   const previousDoc = regenerate ? s5.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle) : null;
   const writingRequest = String(ctx.chat.scriptstate?.["$nw_writing_request"] ?? "");
-  jobs3.set(key, { title, started: Date.now() });
+  jobs3.set(key, { title: title2, started: Date.now() });
   wiki.failure = null;
   wiki.notice = "";
   env2.render();
@@ -9269,17 +9375,17 @@ async function generate2(ctx, env2, title, regenerate) {
         return {};
       }
     })();
-    const prompt = wikiPrompt(source3(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s5, catalogNames, registry(ctx));
+    const prompt = wikiPrompt(source3(ctx), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s5, catalogNames, registry(ctx));
     const raw = await runModel(prompt.messages, s5.model);
     let body4;
     try {
-      body4 = acceptArticle(raw, title, canon(ctx));
+      body4 = acceptArticle(raw, title2, canon(ctx));
     } catch (error) {
-      wiki.failure = { title, reason: error instanceof Error ? error.message : String(error), raw };
+      wiki.failure = { title: title2, reason: error instanceof Error ? error.message : String(error), raw };
       throw error;
     }
     const meta = {
-      title,
+      title: title2,
       mode: s5.mode,
       model: s5.model,
       created: Math.floor(Date.now() / 1e3),
@@ -9291,11 +9397,11 @@ async function generate2(ctx, env2, title, regenerate) {
     };
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => saveDoc(chat, meta, body4));
     const cur = env2.current();
-    if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title) wiki.view = "doc";
+    if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) wiki.view = "doc";
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    wiki.notice = `「${title}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
-    if (!wiki.failure && !(error instanceof WikiError)) wiki.failure = { title, reason: msg, raw: error.raw ?? "" };
+    wiki.notice = `「${title2}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
+    if (!wiki.failure && !(error instanceof WikiError)) wiki.failure = { title: title2, reason: msg, raw: error.raw ?? "" };
   } finally {
     jobs3.delete(key);
     await env2.refresh();
@@ -9467,6 +9573,25 @@ async function handleWiki(action, value, ctx, env2) {
   return true;
 }
 
+// src/host/send.ts
+var QUICK_FAIL_MS = 700;
+async function sendNow() {
+  let sent;
+  try {
+    sent = Promise.resolve(risuai.sendChat("")).then(
+      (r) => r !== false,
+      (e) => {
+        console.log(`[goei] 자동 전송 실패: ${e instanceof Error ? e.message : String(e)}`);
+        return false;
+      }
+    );
+  } catch {
+    return false;
+  }
+  return Promise.race([sent, new Promise((r) => setTimeout(() => r(true), QUICK_FAIL_MS))]);
+}
+var SEND_FALLBACK = "채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.";
+
 // src/ui/field.ts
 var field2 = {
   region: "01",
@@ -9477,18 +9602,21 @@ var field2 = {
   support: 0,
   mkind: "an",
   mname: null,
+  mpick: "an",
+  note: "",
   query: "",
   confirmEnd: null
 };
 var mapUrls = {};
 var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var KIND_LABEL2 = { an: "괴이", in: "사건", ms: "특수" };
-var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "랜드마크" };
+var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
 function resetField(all = false) {
   field2.target = null;
   field2.team = [];
   field2.support = 0;
   field2.mname = null;
+  field2.note = "";
   field2.confirmEnd = null;
   field2.place = null;
   if (all) {
@@ -9660,17 +9788,23 @@ function teamPanel(x, goal, action, label, busy2) {
     return `<button class="gx-acard pick${on ? " on" : ""}" data-action="team-toggle" data-value="${esc7(p.id)}" ${lock || full ? "disabled" : ""} aria-pressed="${on}"
         title="${esc7(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
   }).join("");
+  const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field2.support > 0 ? " on" : ""}">
+      <span class="gx-ava sq">${ICONS.group}</span>
+      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
+      <span class="gx-scard-step">
+        <button class="gx-step" data-action="support" data-value="-1" ${field2.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
+        <b>${field2.support}</b>
+        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
+      </span>
+    </div>` : "";
   const ready = !!goal && validTeam(field2.team.length, field2.support) && !busy2;
   return `<section class="gx-team">
     <div class="gx-goal"><span>목표</span><b>${goal ? esc7(goal) : "목표를 골라 주세요"}</b><em>${used + 1} / 4</em></div>
-    ${roster.length ? `<div class="gx-acards pick">${chips}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
-    ${x.supportOn ? `<div class="gx-support"><span>지원 인원</span>
-      <button class="gx-step" data-action="support" data-value="-1" ${field2.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
-      <b>${field2.support}</b>
-      <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
-    </div>` : ""}
-    <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "놓는 중…" : esc7(label)}</button>
-    <p class="gx-muted">누르면 채팅에 지시문 카드가 놓여요. 하고 싶은 말을 덧붙이거나 그대로 전송하세요.</p>
+    ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
+    ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
+    <label class="gx-note"><span>추가 요청 <small>(선택)</small></span>
+      <textarea rows="3" data-input="field-note" placeholder="예: 조용히 잠입해서 먼저 주변을 살펴본다">${esc7(field2.note)}</textarea></label>
+    <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc7(label)}</button>
   </section>`;
 }
 function mapTab(ctx, env2, notice2, busy2) {
@@ -9715,7 +9849,7 @@ function missionList(ctx, opening = false) {
   const q = field2.query.trim().toLowerCase();
   const rows = missionCatalog(x.catalog, field2.mkind).filter((r) => !q || `${r.name} ${r.sub}`.toLowerCase().includes(q));
   if (!rows.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-  return `<ul class="gx-list gx-mlist">${rows.map((r) => `<li class="gx-ev${field2.mname === r.name ? " sel" : ""}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc7(r.name)}">
+  return `<ul class="gx-list gx-mlist">${rows.map((r) => `<li class="gx-ev${field2.mname === r.name && field2.mpick === field2.mkind ? " sel" : ""}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc7(r.name)}">
       <span class="gx-row"><b>${esc7(r.name)}</b>${missionStatus(x, field2.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc7(r.sub)}</span>` : ""}</button>
       ${opening ? "" : `<div class="gx-evact"><button class="gx-mini" data-action="wiki-goto" data-value="${esc7(r.name)}">위키</button></div>`}</li>`).join("")}</ul>`;
 }
@@ -9725,7 +9859,7 @@ function missionTab(ctx, opening, notice2, busy2) {
   const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-seg${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
   const p = x.world.pending;
   const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc7(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
-  const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르면 첫 장면 지시문이 채팅에 놓여요.</p>' : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
+  const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
   return `<main class="gx-body gx-field gx-mission">
     <div class="gx-mapcol">
       ${intro}
@@ -9737,7 +9871,7 @@ function missionTab(ctx, opening, notice2, busy2) {
       ${notice2 ? `<div class="gx-err" role="alert">${esc7(notice2)}</div>` : ""}
       ${x.world.notice && x.on ? `<div class="gx-hint">${esc7(x.world.notice)}</div>` : ""}
       ${pend}
-      ${teamPanel(x, field2.mname, "mission-send", opening ? "첫 장면 요청" : "요청", busy2)}
+      ${teamPanel(x, field2.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy2)}
     </div>
   </main>`;
 }
@@ -9745,7 +9879,10 @@ function newMessage2(data) {
   const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   return { role: "user", data, time: Date.now(), chatId: id };
 }
-function placeRecord(chat, record) {
+function placeRecord(chat, card2, note) {
+  const record = note.trim() ? `${card2}
+
+${note.trim()}` : card2;
   const message = (chat.message ?? []).slice();
   const last = message[message.length - 1];
   if (last?.role === "user" && hasSceneCard(last.data)) message[message.length - 1] = { ...last, data: record };
@@ -9773,7 +9910,13 @@ async function compose2(ctx, env2, build) {
       return build(latest, x).chat;
     });
     resetField();
+    const sent = await sendNow();
     env2.setBusy(false);
+    if (!sent) {
+      env2.setNotice(SEND_FALLBACK);
+      await env2.refresh();
+      return;
+    }
     await env2.close();
     await env2.refresh();
   } catch (error) {
@@ -9784,6 +9927,7 @@ async function compose2(ctx, env2, build) {
 }
 function depart(ctx, env2) {
   const target = field2.target;
+  const note = field2.note;
   const team = [...field2.team];
   const support = field2.support;
   return compose2(ctx, env2, (latest, x) => {
@@ -9805,12 +9949,13 @@ function depart(ctx, env2) {
     }
     const names3 = partyNames(x, team);
     const body4 = sceneDirective(d, dest, names3, support, false);
-    return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names3, support) }, body4)) };
+    return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names3, support) }, body4), note) };
   });
 }
 function sendMission(ctx, env2, opening) {
-  const kind = field2.mkind;
+  const kind = field2.mpick;
   const name = field2.mname;
+  const note = field2.note;
   const team = [...field2.team];
   const support = field2.support;
   return compose2(ctx, env2, (latest, x) => {
@@ -9830,12 +9975,14 @@ function sendMission(ctx, env2, opening) {
     let chat = latest;
     if (x.on) {
       const w = structuredClone(x.world);
+      const last = (latest.message ?? []).at(-1);
+      if (last?.role === "user" && hasSceneCard(String(last.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
       const err = requestMission(w, x.catalog, x.settings, kind, name);
       if (err) throw new DirectiveError(err);
       chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
     }
     const body4 = sceneDirective(d, dest, names3, support, opening);
-    return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names3, support) }, body4)) };
+    return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names3, support) }, body4), note) };
   });
 }
 async function saveWorld(ctx, env2, change) {
@@ -9928,13 +10075,13 @@ async function handleField(action, value, ctx, env2, opening) {
     case "mission-kind":
       if (v === "an" || v === "ms" || v === "lm") {
         field2.mkind = v;
-        field2.mname = null;
         field2.query = "";
       }
       env2.render();
       return true;
     case "mission-pick":
       field2.mname = v;
+      field2.mpick = field2.mkind;
       env2.render();
       return true;
     case "mission-cancel":
@@ -10463,7 +10610,7 @@ function seg4(action, cur, items, disabled = false) {
 function field3(label, control, help) {
   return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control}</div></div>`;
 }
-var group2 = (title, body4, note = "") => `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
+var group2 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
 function worldOffVars() {
   return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
 }
@@ -10499,7 +10646,7 @@ function worldKind(w, k, name, busy2) {
     ${worldRow(w, `${k}_p`, "발생 확률", "%", busy2)}
     ${field3("자동 종료", seg4("set-world", expire2 ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, "ON"], [`${k}_expire:0`, "OFF"]], busy2), "")}
     ${expire2 ? worldRow(w, `${k}_ttl`, "RP 유지 시간", "시간", busy2) : ""}
-    ${k === "incident" ? worldRow(w, "landmark_share", "랜드마크 비율", "%", busy2) : ""}
+    ${k === "incident" ? worldRow(w, "landmark_share", "거점 비율", "%", busy2) : ""}
   </div></div>`;
 }
 var SCOPE_HELP = {
@@ -10872,6 +11019,8 @@ function ensureRoot() {
     }
     if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root?.querySelector(".dir-bar") ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+    if (el?.dataset?.input === "field-note") return void (field2.note = el.value);
+    if (el?.dataset?.input === "start-note") return void (draft.situation = el.value);
     if (el?.dataset?.input !== "mission-query") return;
     field2.query = el.value;
     const box = root?.querySelector(".gx-mbox");
@@ -10963,6 +11112,20 @@ async function close() {
   shown = false;
   await risuai.hideContainer();
 }
+async function stagedTheme(ctx, value) {
+  if (value !== "light" && value !== "dark" && value !== "paper") return;
+  try {
+    const saved = await updateChat(
+      ctx.charIndex,
+      ctx.chatIndex,
+      (chat) => (chat.message ?? []).length || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
+    );
+    if (saved) ctx.chat = saved;
+  } catch (error) {
+    console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  render();
+}
 async function handle(action, value) {
   if (busy) return;
   if (view.kind === "started" && action.startsWith("wiki-") && await handleWiki(action, value, view.ctx, wikiEnv)) return;
@@ -10980,7 +11143,9 @@ async function handle(action, value) {
     return;
   }
   if (view.kind === "picker" && pickerPrefs && action.startsWith("set-")) {
-    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
+    if (settingsUi.busy) return;
+    await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
+    if (action === "set-theme" && view.kind === "picker" && view.staged) await stagedTheme(view.ctx, value);
     return;
   }
   if (view.kind === "started" && action.startsWith("set-")) {
@@ -11020,7 +11185,7 @@ async function handle(action, value) {
     case "tab":
       tab = TABS.includes(value) ? value : "board";
       notice = "";
-      resetField();
+      field2.confirmEnd = null;
       resetSettings();
       return render();
     case "wiki-goto":
@@ -11059,9 +11224,11 @@ async function start() {
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
     }
     const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
+    const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-      if ((chat.message ?? []).length > 0) throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
+      if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
       const next = applyStart(chat, plan);
+      if (situation) next.message = [...next.message ?? [], newMessage2(situation)];
       const theme = getPrefs().theme ?? "dark";
       return {
         ...next,
@@ -11074,6 +11241,11 @@ async function start() {
     repick = false;
     if (plan.kind === "preset") {
       resetField(true);
+      return refresh();
+    }
+    draft.situation = "";
+    if (situation && !await sendNow()) {
+      notice = SEND_FALLBACK;
       return refresh();
     }
     await close();
@@ -11171,7 +11343,7 @@ function render() {
   const logRoom = root.dataset.room ?? "";
   const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
   root.dataset.theme = themeOf();
-  root.innerHTML = `<div class="gx-panel${nav ? " has-nav" : ""}">${body3()}</div>`;
+  root.innerHTML = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body3()}</div>`;
   root.dataset.tab = tab;
   const next = root.querySelector(".gx-body");
   if (next && keep) next.scrollTop = keep;
@@ -11222,7 +11394,7 @@ function body3() {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case "started":
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="gx-err gx-notice" role="alert">${esc10(notice)}</div>` : ""}${subnav()}${startedBody(view.ctx)}</div>`;
     case "opening":
       return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case "picker":
@@ -11249,7 +11421,8 @@ function picker() {
     return `<button class="gx-sc${s5.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s5.fm}" aria-pressed="${s5.fm === draft.fm}">
             <b>${String(s5.fm).padStart(2, "0")}</b><span>${esc10(s5.label)}</span></button>`;
   }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
-  const hint = sc?.kind === "direct" ? '<div class="gx-hint">시작을 누른 뒤 채팅 입력창에 시작할 상황을 적어 보내세요.</div>' : sc?.kind === "preset" ? '<div class="gx-hint">시작을 누르면 이어서 목표(괴이·특수·랜드마크)와 동행을 골라요.</div>' : "";
+  const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황 <small>(비워 두면 출발 뒤 채팅창에 적어요)</small></span>
+          <textarea rows="4" data-input="start-note" placeholder="예: 새벽 편의점 야간 근무 중, 냉장고 안에서 누가 문을 두드린다">${esc10(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
   const ready = !!(f && sc);
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
@@ -11337,7 +11510,7 @@ function board(ctx) {
   const faction = String(ctx.chat.scriptstate?.["$st_faction"] ?? "");
   const names3 = (s5) => esc10(codesToNames(s5, catalog, faction));
   const pending = '<span class="gx-badge wait">발생 예정</span>';
-  const section3 = (id, title, count, rows, empty) => `<section class="gx-sec" id="gx-sec-${id}"><h2>${title}<small>${count}</small></h2>${count ? `<ul class="gx-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
+  const section3 = (id, title2, count, rows, empty) => `<section class="gx-sec" id="gx-sec-${id}"><h2>${title2}<small>${count}</small></h2>${count ? `<ul class="gx-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   const roster = rosterFor(w, catalog, faction, worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit);
   const byName = new Map(roster.map((p) => [p.name, p]));
   const people = (codes, label) => {
@@ -11404,8 +11577,9 @@ var WATCH_MS = 1e3;
 var liteNow = false;
 async function onBeforeRequest(messages, type) {
   if (type !== "model" || !Array.isArray(messages)) return messages;
+  messages = unwrapCalls(unwrapScenes(messages).messages).messages;
   if (liteNow) {
-    messages = unwrapCalls(unwrapScenes(stripHistoryTags(messages)).messages).messages;
+    messages = stripHistoryTags(messages);
     const ctx = await moduleContext().catch(() => []);
     for (const c of ctx) messages = [...messages, { role: "system", content: c }];
   }
@@ -11510,37 +11684,31 @@ async function onOutput(arg) {
 }
 var escHtml = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function sceneCardHtml(s5) {
-  const p = cardPalette();
-  return `<div style="${cardStyle()}flex-wrap:wrap"><span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s5.target)}</span><span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s5.party)}</span></div>`;
+  const p = cardPalette2();
+  return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s5.target)}</span><span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s5.party)}</span></div>`;
 }
 function callCardHtml(target) {
-  const p = cardPalette();
-  return `<div style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
+  const p = cardPalette2();
+  return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
 }
 function isLanding(text) {
   return text.includes('data-goei="landing"') || text.includes("ANOMALY SIMULATION") && text.includes("버튼을 눌러 시작하세요");
 }
-function landingHtml() {
-  const p = cardPalette();
-  return `<div style="max-width:34em;margin:18px auto;padding:22px 22px 18px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.65;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span style="display:inline-grid;place-items:center;width:52px;height:52px;border-radius:16px;background:${p.accentBg};color:${p.signal};margin-bottom:10px">${GHOST_ICON.replace('width="24" height="24"', 'width="30" height="30"')}</span><div style="font-family:monospace;font-size:11px;letter-spacing:.28em;color:${p.signal};opacity:.85">ANOMALY SIMULATION</div>` + titleHtml(p.text, p.signal) + `<div style="color:${p.sub}">유령 버튼을 눌러 시작하세요</div></div>`;
+function landingHtml2() {
+  return landingHtml(cardPalette2());
 }
-function titleHtml(text, signal) {
-  const line = `<span style="color:${text}">괴이</span><span style="color:${signal};font-weight:300;margin:0 .18em 0 .06em">:</span><span style="color:${signal}">이면세계</span>`;
-  const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
-  return `<div style="margin:10px 0 0;${font}">${line}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;transform:scaleY(-1);opacity:.3;-webkit-mask-image:linear-gradient(to top,#000,transparent 60%);mask-image:linear-gradient(to top,#000,transparent 60%)">${line}</div>`;
-}
-function cardPalette() {
-  return PALETTES[currentTheme()];
+function cardPalette2() {
+  return cardPalette(currentTheme());
 }
 function cardStyle() {
-  const p = cardPalette();
+  const p = cardPalette2();
   return `display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
 }
 function onDisplay(text) {
-  if (!liteNow || typeof text !== "string") return text;
-  if (isLanding(text)) return landingHtml();
+  if (typeof text !== "string") return text;
+  if (isLanding(text)) return landingHtml2();
   let out = text;
-  if (hasWorldTags(out)) out = cleanOutput(out);
+  if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
   if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
   if (hasCall(out)) out = renderCalls(out, callCardHtml);
   return out;
@@ -11608,7 +11776,7 @@ function startWatcher(fab2) {
     clearTimeout(timer);
   };
 }
-for (const permission of ["replacer", "mainDom"]) {
+for (const permission of ["replacer", "mainDom", "sendChat"]) {
   try {
     await risuai.requestPluginPermission(permission);
   } catch {

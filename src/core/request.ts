@@ -48,12 +48,18 @@ export function unwrapScenes<M extends PromptMessage>(messages: M[]): { messages
       out.push(m);
       continue;
     }
-    let content = stripSceneCard(m.content);
+    // 창의 「추가 요청」은 같은 메시지의 카드 뒤에 붙어 온다 (v0.16.7). 덧붙여 보낸 다음 글과 같이 Situation으로
+    const END = '%%/SCENE_CARD%%';
+    const end = m.content.lastIndexOf(END);
+    const tail = end >= 0 ? m.content.slice(end + END.length).trim() : '';
+    let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
+    const extra = tail ? [tail] : [];
     const next = messages[i + 1];
     if (next?.role === 'user' && typeof next.content === 'string' && !hasSceneCard(next.content)) {
-      content = withUserInput(null, content, next.content.trim());
+      if (next.content.trim()) extra.push(next.content.trim());
       i++;
     }
+    if (extra.length) content = withUserInput(null, content, extra.join('\n\n'));
     out.push({ ...m, content });
   }
   return { messages: out, changed: true };

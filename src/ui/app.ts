@@ -21,7 +21,8 @@ import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
 import { rememberPanel } from './panels';
 import { handlePhone, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
-import { field, handleField, mapTab, missionList, missionTab, resetField, type FieldEnv } from './field';
+import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, type FieldEnv } from './field';
+import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
@@ -30,6 +31,8 @@ interface Draft {
   faction?: FactionCode;
   lang: LangCode;
   fm?: number;
+  /** 직접 입력 첫 장면: 출발과 함께 보낼 상황 */
+  situation?: string;
 }
 
 type View =
@@ -228,6 +231,8 @@ function ensureRoot(): HTMLElement {
     }
     if (el?.dataset?.input === 'dir') return void directoryInput(el.dataset.key ?? '', el.value, root?.querySelector('.dir-bar') ?? null);
     if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+    if (el?.dataset?.input === 'field-note') return void (field.note = el.value);
+    if (el?.dataset?.input === 'start-note') return void (draft.situation = el.value);
     if (el?.dataset?.input !== 'mission-query') return;
     field.query = el.value;
     const box = root?.querySelector('.gx-mbox');
@@ -403,7 +408,8 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'tab':
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
-      resetField();
+      // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
+      field.confirmEnd = null;
       resetSettings();
       return render();
     case 'wiki-goto':
@@ -446,9 +452,12 @@ async function start(): Promise<void> {
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
     }
     const plan = planStart(choice, manifest, lore, ctx.char.alternateGreetings?.length ?? 0, world);
+    // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다 (비워 두면 예전처럼 채팅창에 직접)
+    const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-      if ((chat.message ?? []).length > 0) throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
+      if (chatPhase(chat) === 'started') throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
       const next = applyStart(chat, plan);
+      if (situation) next.message = [...(next.message ?? []), newMessage(situation)];
       // 새 채팅 기본값(설정 창)을 이 채팅에 적어 둔다. 나중에 기본값을 바꿔도 이 채팅은 그대로 (원본 ensureDefaults)
       const theme = getPrefs().theme ?? 'dark';
       return {
@@ -463,6 +472,11 @@ async function start(): Promise<void> {
     if (plan.kind === 'preset') {
       // 커스텀 임무: 창을 닫지 않고 바로 목표·동행 고르기로
       resetField(true);
+      return refresh();
+    }
+    draft.situation = '';
+    if (situation && !(await sendNow())) {
+      notice = SEND_FALLBACK;
       return refresh();
     }
     await close();
@@ -628,7 +642,7 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="gx-err gx-notice" role="alert">${esc(notice)}</div>` : ''}${subnav()}${startedBody(view.ctx)}</div>`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -668,9 +682,10 @@ function picker(): string {
     : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
   const hint =
     sc?.kind === 'direct'
-      ? '<div class="gx-hint">시작을 누른 뒤 채팅 입력창에 시작할 상황을 적어 보내세요.</div>'
+      ? `<label class="gx-note"><span>시작할 상황 <small>(비워 두면 출발 뒤 채팅창에 적어요)</small></span>
+          <textarea rows="4" data-input="start-note" placeholder="예: 새벽 편의점 야간 근무 중, 냉장고 안에서 누가 문을 두드린다">${esc(draft.situation ?? '')}</textarea></label>`
       : sc?.kind === 'preset'
-        ? '<div class="gx-hint">시작을 누르면 이어서 목표와 동행을 골라요.</div>'
+        ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   const ready = !!(f && sc);
   return `<main class="gx-body">

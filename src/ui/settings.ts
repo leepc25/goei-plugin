@@ -96,7 +96,7 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
     ${worldRow(w, `${k}_p`, '발생 확률', '%', busy)}
     ${field('자동 종료', seg('set-world', expire ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, 'ON'], [`${k}_expire:0`, 'OFF']], busy), '')}
     ${expire ? worldRow(w, `${k}_ttl`, 'RP 유지 시간', '시간', busy) : ''}
-    ${k === 'incident' ? worldRow(w, 'landmark_share', '랜드마크 비율', '%', busy) : ''}
+    ${k === 'incident' ? worldRow(w, 'landmark_share', '거점 비율', '%', busy) : ''}
   </div></div>`;
 }
 

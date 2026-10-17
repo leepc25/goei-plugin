@@ -34,8 +34,10 @@ let liteNow = false;
 
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
+  // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
+  messages = unwrapCalls(unwrapScenes(messages).messages).messages;
   if (liteNow) {
-    messages = unwrapCalls(unwrapScenes(stripHistoryTags(messages)).messages).messages;
+    messages = stripHistoryTags(messages);
     const ctx = await moduleContext().catch(() => [] as string[]);
     for (const c of ctx) messages = [...messages, { role: 'system', content: c } as M];
   }
@@ -187,10 +189,13 @@ function cardStyle(): string {
 
 /** Lite에서만: 응답이 막 들어와 아직 정리되기 전에도 태그가 보이지 않게, 이동 지시문은 카드로 */
 function onDisplay(text: string): string {
-  if (!liteNow || typeof text !== 'string') return text;
+  if (typeof text !== 'string') return text;
+  // 플러그인 고유 표식(시작 카드·지시문·전화 카드)은 Lite 판정 전에도 바꾼다.
+  // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
+  // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   if (isLanding(text)) return landingHtml();
   let out = text;
-  if (hasWorldTags(out)) out = cleanOutput(out);
+  if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
   if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
   if (hasCall(out)) out = renderCalls(out, callCardHtml);
   return out;
@@ -265,7 +270,7 @@ function startWatcher(fab: Fab): () => void {
 
 // 선택지용사처럼 필요한 권한을 처음에 한 번에 묻는다 (업데이트하면 Risu가 권한을 다시 묻는데,
 // 기능을 하나씩 켜는 도중에 묻지 않게)
-for (const permission of ['replacer', 'mainDom']) {
+for (const permission of ['replacer', 'mainDom', 'sendChat']) {
   try {
     await risuai.requestPluginPermission(permission);
   } catch {

@@ -12,6 +12,8 @@ import {
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
+import { SEND_FALLBACK, sendNow } from '../host/send';
+import { ICONS } from './icons';
 import { agentInner } from './images';
 import { mapZoomControls } from './mapzoom';
 
@@ -32,6 +34,10 @@ interface FieldState {
   support: number;
   mkind: MissionKind;
   mname: string | null;
+  /** mname을 고른 종류 (위 종류 버튼을 바꿔도 고른 목표는 그대로) */
+  mpick: MissionKind;
+  /** 지시문 뒤에 붙여 함께 보낼 말 */
+  note: string;
   query: string;
   /** 두 번 눌러 확인하는 상황 종료 */
   confirmEnd: string | null;
@@ -39,7 +45,7 @@ interface FieldState {
 
 export const field: FieldState = {
   region: '01', filter: 'all', place: null, target: null, team: [], support: 0,
-  mkind: 'an', mname: null, query: '', confirmEnd: null,
+  mkind: 'an', mname: null, mpick: 'an', note: '', query: '', confirmEnd: null,
 };
 
 export interface FieldEnv {
@@ -56,7 +62,7 @@ const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 const KIND_LABEL: Record<EventKind, string> = { an: '괴이', in: '사건', ms: '특수' };
-const MISSION_LABEL: Record<MissionKind, string> = { an: '괴이', ms: '특수', lm: '랜드마크' };
+const MISSION_LABEL: Record<MissionKind, string> = { an: '괴이', ms: '특수', lm: '거점' };
 
 /** 탭을 바꾸거나 새 채팅을 열 때 고른 것을 비운다 */
 export function resetField(all = false) {
@@ -64,6 +70,7 @@ export function resetField(all = false) {
   field.team = [];
   field.support = 0;
   field.mname = null;
+  field.note = '';
   field.confirmEnd = null;
   field.place = null;
   if (all) {
@@ -283,17 +290,26 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
         title="${esc(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
     })
     .join('');
+  // 지원 인원도 요원과 같은 카드 모양으로 (인원은 카드 안에서 −/+)
+  const support = x.supportOn
+    ? `<div class="gx-acard pick gx-scard${field.support > 0 ? ' on' : ''}">
+      <span class="gx-ava sq">${ICONS.group}</span>
+      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
+      <span class="gx-scard-step">
+        <button class="gx-step" data-action="support" data-value="-1" ${field.support <= 0 ? 'disabled' : ''} aria-label="지원 인원 줄이기">−</button>
+        <b>${field.support}</b>
+        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? 'disabled' : ''} aria-label="지원 인원 늘리기">+</button>
+      </span>
+    </div>`
+    : '';
   const ready = !!goal && validTeam(field.team.length, field.support) && !busy;
   return `<section class="gx-team">
     <div class="gx-goal"><span>목표</span><b>${goal ? esc(goal) : '목표를 골라 주세요'}</b><em>${used + 1} / 4</em></div>
-    ${roster.length ? `<div class="gx-acards pick">${chips}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
-    ${x.supportOn ? `<div class="gx-support"><span>지원 인원</span>
-      <button class="gx-step" data-action="support" data-value="-1" ${field.support <= 0 ? 'disabled' : ''} aria-label="지원 인원 줄이기">−</button>
-      <b>${field.support}</b>
-      <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? 'disabled' : ''} aria-label="지원 인원 늘리기">+</button>
-    </div>` : ''}
-    <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '놓는 중…' : esc(label)}</button>
-    <p class="gx-muted">누르면 채팅에 지시문 카드가 놓여요. 하고 싶은 말을 덧붙이거나 그대로 전송하세요.</p>
+    ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
+    ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
+    <label class="gx-note"><span>추가 요청 <small>(선택)</small></span>
+      <textarea rows="3" data-input="field-note" placeholder="예: 조용히 잠입해서 먼저 주변을 살펴본다">${esc(field.note)}</textarea></label>
+    <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
   </section>`;
 }
 
@@ -346,7 +362,7 @@ export function missionList(ctx: ChatContext, opening = false): string {
   const rows = missionCatalog(x.catalog, field.mkind).filter((r) => !q || `${r.name} ${r.sub}`.toLowerCase().includes(q));
   if (!rows.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
   return `<ul class="gx-list gx-mlist">${rows
-    .map((r) => `<li class="gx-ev${field.mname === r.name ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc(r.name)}">
+    .map((r) => `<li class="gx-ev${field.mname === r.name && field.mpick === field.mkind ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc(r.name)}">
       <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, field.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>
       ${opening ? '' : `<div class="gx-evact"><button class="gx-mini" data-action="wiki-goto" data-value="${esc(r.name)}">위키</button></div>`}</li>`)
     .join('')}</ul>`;
@@ -364,7 +380,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     .map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`)
     .join('');
   const intro = opening
-    ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르면 첫 장면 지시문이 채팅에 놓여요.</p>'
+    ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>'
     : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
   return `<main class="gx-body gx-field gx-mission">
     <div class="gx-mapcol">
@@ -377,20 +393,21 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
       ${x.world.notice && x.on ? `<div class="gx-hint">${esc(x.world.notice)}</div>` : ''}
       ${pend}
-      ${teamPanel(x, field.mname, 'mission-send', opening ? '첫 장면 요청' : '요청', busy)}
+      ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy)}
     </div>
   </main>`;
 }
 
 // ── 동작 ──
 
-function newMessage(data: string) {
+export function newMessage(data: string) {
   const id = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   return { role: 'user', data, time: Date.now(), chatId: id };
 }
 
-/** 아직 보내지 않은 지시문 카드가 마지막에 있으면 바꿔 끼우고, 아니면 덧붙인다 */
-function placeRecord(chat: Chat, record: string): Chat {
+/** 아직 보내지 않은 지시문 카드가 마지막에 있으면 바꿔 끼우고, 아니면 덧붙인다. 추가 요청은 카드 아래에 */
+function placeRecord(chat: Chat, card: string, note: string): Chat {
+  const record = note.trim() ? `${card}\n\n${note.trim()}` : card;
   const message = (chat.message ?? []).slice();
   const last = message[message.length - 1];
   if (last?.role === 'user' && hasSceneCard(last.data)) message[message.length - 1] = { ...last, data: record };
@@ -421,7 +438,14 @@ async function compose(ctx: ChatContext, env: FieldEnv, build: (latest: Chat, x:
       return build(latest, x).chat;
     });
     resetField();
+    // 놓은 메시지를 바로 보낸다. 안 되면 창을 연 채로 안내 (채팅창 전송 버튼으로 보내면 된다)
+    const sent = await sendNow();
     env.setBusy(false);
+    if (!sent) {
+      env.setNotice(SEND_FALLBACK);
+      await env.refresh();
+      return;
+    }
     await env.close();
     await env.refresh();
   } catch (error) {
@@ -433,6 +457,7 @@ async function compose(ctx: ChatContext, env: FieldEnv, build: (latest: Chat, x:
 
 export function depart(ctx: ChatContext, env: FieldEnv): Promise<void> {
   const target = field.target;
+  const note = field.note;
   const team = [...field.team];
   const support = field.support;
   return compose(ctx, env, (latest, x) => {
@@ -454,13 +479,14 @@ export function depart(ctx: ChatContext, env: FieldEnv): Promise<void> {
     }
     const names = partyNames(x, team);
     const body = sceneDirective(d, dest, names, support, false);
-    return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names, support) }, body)) };
+    return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names, support) }, body), note) };
   });
 }
 
 export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): Promise<void> {
-  const kind = field.mkind;
+  const kind = field.mpick;
   const name = field.mname;
+  const note = field.note;
   const team = [...field.team];
   const support = field.support;
   return compose(ctx, env, (latest, x) => {
@@ -480,12 +506,15 @@ export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): 
     let chat = latest;
     if (x.on) {
       const w = structuredClone(x.world);
+      // 보내지 않은 지시문을 바꿔 끼우면 그 요청도 새 것으로 (예전 대상이 같이 발생하지 않게)
+      const last = (latest.message ?? []).at(-1);
+      if (last?.role === 'user' && hasSceneCard(String(last.data ?? ''))) for (const k of ['an', 'ms', 'in'] as EventKind[]) cancelMission(w, k);
       const err = requestMission(w, x.catalog, x.settings, kind, name);
       if (err) throw new DirectiveError(err);
       chat = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction) } };
     }
     const body = sceneDirective(d, dest, names, support, opening);
-    return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names, support) }, body)) };
+    return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names, support) }, body), note) };
   });
 }
 
@@ -579,15 +608,16 @@ export async function handleField(action: string, value: string | undefined, ctx
       await depart(ctx, env);
       return true;
     case 'mission-kind':
+      // 종류만 바꿔 본다. 고른 목표(mname·mpick)는 그대로 둔다
       if (v === 'an' || v === 'ms' || v === 'lm') {
         field.mkind = v;
-        field.mname = null;
         field.query = '';
       }
       env.render();
       return true;
     case 'mission-pick':
       field.mname = v;
+      field.mpick = field.mkind;
       env.render();
       return true;
     case 'mission-cancel':
