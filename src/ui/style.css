@@ -1214,8 +1214,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
 .gx-agpop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text); }
 .gx-agpop-card .gx-ava { width: 200px; height: 200px; border-radius: 22px; flex: none; font-size: 64px; }
-.gx-agpop-txt { align-self: stretch; }
-.gx-agpop-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+/* 사진 아래 한 줄: 이름·상태 왼쪽, 부서·직급 오른쪽. 상황은 그 아래 전체 폭 */
+.gx-agpop-txt { align-self: stretch; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 8px; min-width: 0; padding: 0 4px; }
+.gx-agpop-txt small { text-align: right; }
+.gx-agpop-txt .gx-acard-sit { grid-column: 1 / -1; }
 .gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .gx-agpop-txt .gx-acard-top b { font-size: 16px; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
