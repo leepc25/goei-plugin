@@ -405,6 +405,17 @@ async function open(page) {
   const board = await page.textContent('.gx-panel');
   assert.ok(board.includes(preset.name) && board.includes('쟈알디') && board.includes('작전투입') && board.includes('2025.01.01 02:47'), board);
   if (shots) { await page.screenshot({ path: `${shots}/9-board.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-agents.png` }); }
+  if (shots) {
+    await page.setViewportSize({ width: 1600, height: Number(process.env.VH || 1200) });
+    await page.evaluate(() => { document.querySelector('.gx-body').scrollTop = 0; });
+    await page.screenshot({ path: `${shots}/9-board-wide.png` });
+    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+    await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `${shots}/9-mission-wide.png` });
+    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+    await page.waitForSelector('.gx-board');
+  }
   await page.setViewportSize({ width: 390, height: 844 });
   if (shots) { await page.screenshot({ path: `${shots}/9-board-mobile.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-mobile-agents.png` }); }
   await page.setViewportSize({ width: 1280, height: 860 });

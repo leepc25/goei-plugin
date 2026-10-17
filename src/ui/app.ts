@@ -800,10 +800,7 @@ function board(ctx: ChatContext): string {
   }
   const w = readWorld(ctx.chat);
   const faction = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
-  const names = (s: string) => esc(codesToNames(s, catalog, faction));
   const pending = '<span class="gx-badge wait">발생 예정</span>';
-  const section = (id: string, title: string, count: number, rows: string, empty: string) =>
-    `<section class="gx-sec" id="gx-sec-${id}"><h2>${title}<small>${count}</small></h2>${count ? `<ul class="gx-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   const roster = rosterFor(w, catalog, faction, worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit);
   const byName = new Map(roster.map((p) => [p.name, p]));
   // 배치·방문자 줄: 요원은 사진+이름 칩, 세력·조직·그 밖의 이름은 이름표 (v0.14.0. 예전엔 「관리국」에도 글자 사진 「관」을 그렸다)
@@ -812,12 +809,12 @@ function board(ctx: ChatContext): string {
     const chips = list
       .map((n) => (byName.has(n) ? `<span class="gx-pchip">${avatar(ctx.char, byName.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge">${esc(n)}</span>`))
       .join('');
-    return `<p class="gx-people"><span class="gx-people-l">${label}</span>${chips || '<span class="gx-muted">없음</span>'}</p>`;
+    return chips ? `<span class="gx-bd-who" title="${label}">${chips}</span>` : '';
   };
+  // 괴이·사건·특수는 한 줄짜리 행 (v0.16.15: 큰 카드를 늘어놓으니 한 화면에 안 들어왔다)
   const card = (kind: 'an' | 'in' | 'ms', mark: string, name: string, loc: string, meta: string, sub: string) =>
-    `<li class="gx-ev-card"><span class="gx-gmark ${kind}">${mark}</span><span class="gx-ev-name">${name}</span><span>${meta}</span>
-      <span class="gx-loc gx-ev-sub">${loc}</span>${sub ? `<div class="gx-ev-sub">${sub}</div>` : ''}</li>`;
-
+    `<li class="gx-bd-row"><i class="gx-gmark ${kind}">${mark}</i><span class="gx-bd-main"><span class="gx-bd-top"><b>${name}</b>${meta}</span>
+      <small>${loc}</small>${sub}</span></li>`;
   const an = w.an
     .map((e) => {
       const wait = e.state === '발생대기';
@@ -831,7 +828,7 @@ function board(ctx: ChatContext): string {
     .map((e) => {
       const wait = e.state === '발생대기';
       const since = elapsed(w, e.since);
-      return card('in', '!', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<p>${esc(e.situation)}</p>` : '');
+      return card('in', '!', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<span class="gx-bd-sit">${esc(e.situation)}</span>` : '');
     })
     .join('');
   const ms = w.ms
@@ -856,49 +853,29 @@ function board(ctx: ChatContext): string {
   const t = threat(w);
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
-  // 작전 현황: 진행 중인 괴이마다 배치된 우리 요원, 어디에도 안 잡힌 작전 요원은 따로 (아래 목록과 겹치지 않게 「누가 어디에」만)
-  const placed = new Set<string>();
-  const ops = w.an
-    .filter((e) => e.state !== '발생대기')
-    .map((e) => {
-      const who = codesToNames(e.deploy, catalog, faction).split(/\s*,\s*/).map((n) => n.trim()).filter((n) => byName.has(n));
-      who.forEach((n) => placed.add(n));
-      return who.length
-        ? `<li><span class="gx-ops-where"><i class="gx-gmark an">${esc(e.grade || '?')}</i><b>${esc(e.name)}</b><small>${esc(locName(e.loc))}</small></span><span class="gx-ops-who">${who.map((n) => `<span class="gx-pchip">${avatar(ctx.char, byName.get(n)!.english, n, 'xs')}${esc(n)}</span>`).join('')}</span></li>`
-        : '';
-    })
-    .join('');
-  const loose = onOp.filter((p) => !placed.has(p.name));
-  const looseRow = loose.length
-    ? `<li><span class="gx-ops-where"><i class="gx-gmark op">·</i><b>그 밖의 작전</b><small>배치 기록 없음</small></span><span class="gx-ops-who">${loose.map((p) => `<span class="gx-pchip" title="${esc(w.agents[p.id]?.situation ?? '')}">${avatar(ctx.char, p.english, p.name, 'xs')}${esc(p.name)}</span>`).join('')}</span></li>`
-    : '';
-  // 작전 현황 (v0.16.13 다시 설계): 왼쪽 위협도(무엇으로 매기는지 한 줄), 오른쪽 종류별 개수(누르면 그 목록으로), 아래 투입 현황
   const waiting = (list: { state: string }[]) => list.length - live(list);
+  // 맨 위 한 줄: 위협도 + 종류별 개수(누르면 그 칸으로). v0.16.15: 큰 숫자 상자·투입 현황 칸을 없앴다 (배치는 괴이 행에 이미 나온다)
   const stat = (id: string, label: string, n: number, sub: string, cls: string) =>
-    `<button class="gx-ops-stat ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b><small>${sub}</small></button>`;
-  const quiet = w.minute === null ? '첫 응답이 오면 시각과 상태가 채워져요.' : '지금 작전 중인 요원은 없어요.';
+    `<button class="gx-bd-stat ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b>${sub ? `<small>${sub}</small>` : ''}</button>`;
+  const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
+    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${list.length}</small></h2>${rows ? `<ul class="gx-bd-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
-    <section class="gx-ops lv${t.level}">
-      <div class="gx-ops-top">
-        <div class="gx-ops-lv">
-          <small>위협도</small>
-          <div class="gx-ops-num"><b>${t.level}</b><span>/ 5</span><em>${t.label}</em>${t.level ? '<span class="gx-live"></span>' : ''}</div>
-          <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ''}"></i>`).join('')}</span>
-          <p>진행 중인 괴이 등급과 사건 수로 매겨요.</p>
-        </div>
-        <div class="gx-ops-stats">
-          ${stat('an', '괴이', live(w.an), waiting(w.an) ? `예정 ${waiting(w.an)}` : '진행 중', 'an')}
-          ${stat('in', '사건', live(w.inc), waiting(w.inc) ? `예정 ${waiting(w.inc)}` : '진행 중', 'in')}
-          ${stat('ms', '특수', live(w.ms), waiting(w.ms) ? `예정 ${waiting(w.ms)}` : '출현', 'ms')}
-          ${stat('ag', '요원', onOp.length, `작전 중 / ${roster.length}명`, 'op')}
-        </div>
+    <section class="gx-bd-strip lv${t.level}">
+      <div class="gx-bd-lv" title="진행 중인 괴이 등급과 사건 수로 매겨요."><small>위협도</small><b>${t.level}</b><span>/5</span><em>${t.label}</em>
+        <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ''}"></i>`).join('')}</span></div>
+      <div class="gx-bd-stats">
+        ${stat('an', '괴이', live(w.an), waiting(w.an) ? `+${waiting(w.an)} 예정` : '', 'an')}
+        ${stat('in', '사건', live(w.inc), waiting(w.inc) ? `+${waiting(w.inc)} 예정` : '', 'in')}
+        ${stat('ms', '특수', live(w.ms), waiting(w.ms) ? `+${waiting(w.ms)} 예정` : '', 'ms')}
+        ${stat('ag', '작전', onOp.length, `/ ${roster.length}명`, 'op')}
       </div>
-      <div class="gx-ops-deploy"><h3>투입 현황</h3>
-        ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}</div>
     </section>
-    ${section('an', '괴이', w.an.length, an, '발생한 괴이가 없어요.')}
-    ${section('in', '사건', w.inc.length, inc, '진행 중인 사건이 없어요.')}
-    ${section('ms', '특수', w.ms.length, ms, '출현한 특수가 없어요.')}
+    ${w.minute === null ? '<p class="gx-hint">첫 응답이 오면 시각과 상태가 채워져요.</p>' : ''}
+    <div class="gx-bd-cols">
+      ${col('an', '괴이', w.an, an, '발생한 괴이가 없어요.')}
+      ${col('in', '사건', w.inc, inc, '진행 중인 사건이 없어요.')}
+      ${col('ms', '특수', w.ms, ms, '출현한 특수가 없어요.')}
+    </div>
     <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ''}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.'}</p>`}</section>
   </main>`;
 }
