@@ -450,6 +450,19 @@ async function open(page) {
     await page.click('[data-action="field-step"][data-value="goal"]');
   }
   await page.setViewportSize({ width: 1280, height: 860 });
+  // 취소: 장소를 고르면 켜지고, 누르면 장소와 목표가 함께 풀린다
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.waitForFunction(() => !document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
+  assert.equal(await page.locator('.gx-map .gx-unplace:not([disabled])').count(), 1, '고르면 취소가 켜짐');
+  await page.click('.gx-map .gx-unplace');
+  await page.waitForFunction(() => document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
+  assert.equal(await page.locator('.gx-map .gx-placecard').count(), 0, '취소하면 장소도 풀림');
+  assert.equal(await page.locator('.gx-map .gx-unplace[disabled]').count(), 1, '고른 것이 없으면 취소는 꺼짐');
+  // PC: 고른 상황을 한 번 더 누르면 풀린다
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.waitForFunction(() => !document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.waitForFunction(() => document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
   console.log('PASS 상황판 요원 카드에서 괴담톡·위키 바로 열기');
@@ -1057,6 +1070,10 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-mbox');
   await page.click('.gx-mbox [data-action="mission-pick"]');
   await page.waitForSelector('.gx-team');
+  assert.equal(await page.locator('.gx-mission .gx-unplace:not([disabled])').count(), 1, '커스텀 목표를 고르면 취소가 켜짐');
+  await page.click('.gx-mission .gx-unplace');
+  await page.waitForFunction(() => document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
+  assert.equal(await page.locator('.gx-mlist .sel').count(), 0, '취소하면 커스텀 목표가 풀림');
   assert.equal(await page.locator('.gx-scard').count(), 0, '지원 투입 OFF면 지원 인원 카드 없음');
   // 에셋: 보조모델 + 캐릭터당 1장
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');

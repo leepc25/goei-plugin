@@ -153,6 +153,9 @@ function targetName(t: Target): string {
   return locName(t.loc);
 }
 
+/** PC에서는 고른 것을 한 번 더 누르면 풀린다 (모바일은 누르면 편성으로 넘어가서 취소 칩으로 푼다) */
+const isPC = () => !matchMedia('(max-width: 760px)').matches;
+
 function sameTarget(a: Target | null, key: string): boolean {
   if (!a) return false;
   if (a.type === 'event') return a.key === key;
@@ -310,13 +313,10 @@ function situations(x: Ctx, events: WorldEvent[]): string {
     .join('');
   const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown = events.filter((e) => (field.filter === 'all' || e.kind === field.filter) && (!field.place || placeKey(e, x.catalog) === field.place));
-  // 장소를 고르면 목록 맨 앞에 그 장소 카드(누르면 목표), 필터 줄 오른쪽 끝에 선택 취소 (v0.16.21, 사용자 설계)
-  let place = '';
-  let cancel = '';
-  if (field.place) {
-    place = placeCard(field.place, x.catalog, sameTarget(field.target, field.place));
-    cancel = '<button class="gx-chip gx-unplace" data-action="map-unplace" title="장소 선택 풀기">취소</button>';
-  }
+  // 장소를 고르면 목록 맨 앞에 그 장소 카드(누르면 목표). 필터 줄 오른쪽 끝 취소는 장소나 목표를 골랐을 때만 눌리고,
+  // 누르면 장소와 목표가 함께 풀린다 (v0.16.22, 사용자 요청)
+  const place = field.place ? placeCard(field.place, x.catalog, sameTarget(field.target, field.place)) : '';
+  const cancel = cancelChip('map-unplace', !!(field.place || field.target));
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
     : field.place || field.filter !== 'all'
@@ -324,6 +324,11 @@ function situations(x: Ctx, events: WorldEvent[]): string {
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
   return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
     ${shown.length || place ? `<ul class="gx-evcs">${place}${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+}
+
+/** 선택 취소 칩: 고른 것이 없으면 꺼져 있다 */
+function cancelChip(action: string, on: boolean): string {
+  return `<button class="gx-chip gx-unplace" data-action="${action}" ${on ? 'title="선택 풀기"' : 'disabled'}>취소</button>`;
 }
 
 // ── 편성 ──
@@ -475,7 +480,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색"></div>
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}</div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
@@ -660,8 +665,14 @@ export async function handleField(action: string, value: string | undefined, ctx
         field.mapq = '';
         v = key;
       }
-      field.place = v;
       field.confirmEnd = null;
+      if (action === 'map-place' && isPC() && field.place === v) {
+        field.place = null;
+        if (sameTarget(field.target, v)) field.target = null;
+        env.render();
+        return true;
+      }
+      field.place = v;
       const x = readCtx(ctx);
       const here = typeof x === 'string' || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v);
       if (!here.length) field.target = placeTarget(v);
@@ -670,13 +681,20 @@ export async function handleField(action: string, value: string | undefined, ctx
     }
     case 'map-unplace':
       field.place = null;
-      env.render();
+      field.target = null;
+      field.confirmEnd = null;
+      toStep('goal', env);
       return true;
     case 'map-filter':
       field.filter = (['all', 'an', 'in', 'ms'] as Filter[]).includes(v as Filter) ? (v as Filter) : 'all';
       env.render();
       return true;
     case 'pick-place':
+      if (isPC() && sameTarget(field.target, v)) {
+        field.target = null;
+        env.render();
+        return true;
+      }
       field.target = placeTarget(v);
       toStep('team', env);
       return true;
@@ -689,6 +707,12 @@ export async function handleField(action: string, value: string | undefined, ctx
       if (typeof x === 'string') return true;
       const ev = activeEvents(x.world).find((e) => e.key === v);
       if (!ev) return true;
+      if (action === 'pick-event' && isPC() && sameTarget(field.target, ev.key)) {
+        field.target = null;
+        field.confirmEnd = null;
+        env.render();
+        return true;
+      }
       if (action === 'pick-event') field.target = { type: 'event', key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
       field.region = sidoOf(ev.loc);
       field.confirmEnd = null;
@@ -734,12 +758,21 @@ export async function handleField(action: string, value: string | undefined, ctx
       env.render();
       return true;
     case 'mission-pick':
+      if (isPC() && field.mname === v && field.mpick === field.mkind) {
+        field.mname = null;
+        env.render();
+        return true;
+      }
       field.mname = v;
       field.mpick = field.mkind;
       toStep('team', env);
       return true;
     case 'mission-cancel':
       if (v === 'an' || v === 'ms' || v === 'in') await saveWorld(ctx, env, (w) => (cancelMission(w, v), null));
+      return true;
+    case 'mission-unpick':
+      field.mname = null;
+      toStep('goal', env);
       return true;
     case 'mission-send':
       await sendMission(ctx, env, opening);

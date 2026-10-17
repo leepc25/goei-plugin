@@ -177,6 +177,9 @@ await page.click('.gx-stepswap').catch(() => {});
 await g('m05-mission');
 await page.click('.gx-stepbar .gx-stepb >> nth=0').catch((e) => console.log('goal', e.message));
 await g('m05b-custom-goal');
+await page.click('.gx-mbox [data-action="mission-pick"]').catch((e) => console.log('mpick', e.message));
+await page.click('.gx-stepbar .gx-stepb >> nth=0').catch(() => {});
+await g('m05c-custom-cancel');
 await page.click('.gx-mtrack .gx-nb[data-value=\"phone\"] >> nth=1');
 await g('m06-phone');
 for (const t of await page.$$eval('[data-action^="ph-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);
@@ -194,6 +197,14 @@ for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e)
 await page.setViewportSize({ width: 1300, height: 860 });
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 await g('p01-board');
+await page.click('.gx-nav .gx-nb[data-value="map"]');
+await page.click('.gx-map li[data-action="pick-event"] .gx-evc-name').catch((e) => console.log('pick-event', e.message));
+await g('p02-map-cancel');
+await page.click('.gx-stepswap, .gx-nav .gx-nb[data-value="mission"]').catch(() => {});
+await page.waitForSelector('.gx-mbox').catch(() => {});
+await page.click('.gx-mbox [data-action="mission-pick"]').catch((e) => console.log('mpick', e.message));
+await g('p03-custom-cancel');
+await page.click('.gx-nav .gx-nb[data-value="board"]');
 // 가장 빡빡한 경우: 진행 중 괴이 3개 + 요원 4줄, 상태 설명 두 줄씩 꽉 → 창 전체가 스크롤되면 안 된다
 await page.setViewportSize({ width: 1920, height: 1080 });
 const fill = () => page.evaluate(() => {
