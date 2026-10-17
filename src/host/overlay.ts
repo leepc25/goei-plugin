@@ -3,7 +3,8 @@
 import { clampPos, DEFAULT_FAB_POS, dragTo, DRAG_THRESHOLD, inside, parsePos, type FabPos, type Rect } from '../core/fab';
 import { GHOST_ICON } from '../ui/icons';
 import { BRAND } from '../ui/brand';
-import { PALETTES, type ThemeName } from '../ui/theme';
+import { LANDING_CSS } from '../ui/landing';
+import { cardVarsCss, PALETTES, type ThemeName } from '../ui/theme';
 
 /** 창과 같은 배색을 x-goei-theme 속성별 CSS 변수로 (본 화면에서는 style 속성으로 변수를 못 넣을 수 있어 선택자로 나눈다) */
 function themeVars(sel: string): string {
@@ -195,6 +196,10 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
   const style = await doc.createElement('style');
   await style.setTextContent(FAB_CSS);
   await host.appendChild(style);
+  // 채팅 속 카드 배색 (테마를 바꾸면 이 내용만 바꾼다)
+  const cardStyle = await doc.createElement('style');
+  await cardStyle.setTextContent(cardVarsCss('dark') + LANDING_CSS);
+  await host.appendChild(cardStyle);
   await root.body.appendChild(host);
   const button = await host.querySelector('button');
   if (!button) throw new Error('여는 버튼을 만들지 못했어요.');
@@ -345,6 +350,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
     },
     async setTheme(theme) {
       await host.setAttribute('x-goei-theme', theme);
+      await cardStyle.setTextContent(cardVarsCss(theme) + LANDING_CSS);
     },
     async chatScreenVisible() {
       return !!(await doc.querySelector('.default-chat-screen'));

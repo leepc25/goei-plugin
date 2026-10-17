@@ -148,6 +148,14 @@ async function open(page) {
   await page.waitForSelector('.gx-fac.on');
   assert.equal(await page.getAttribute('.gx-fac.on', 'data-value'), 'C00');
   assert.equal(await page.getAttribute('.gx-sc.on', 'data-value'), '1');
+  // 출발 뒤 첫 전송 전에 설정에서 테마를 바꾸면 이 채팅·창에도 바로 (v0.16.7: 기본값만 바뀌어 먹통처럼 보였다)
+  await page.click('[data-action="prefs-open"]');
+  await page.waitForSelector('.gx-settings');
+  await page.click('[data-action="set-theme"][data-value="light"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'light' && document.querySelector('.gx').dataset.theme === 'light');
+  await page.click('[data-action="prefs-close"]');
+  await page.waitForSelector('.gx-fac.on');
+  assert.equal((await page.locator('.gx-panel').boundingBox()).width <= 1024, true, '시작 전 창은 설정 폭');
   assert.deepEqual(errors, []);
   console.log('PASS 새 채팅 시작 → 추가 인사말·채팅 변수 저장');
   await page.close();

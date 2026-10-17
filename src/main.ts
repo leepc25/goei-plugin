@@ -19,10 +19,11 @@ import { updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, playIntro, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
-import { currentTheme, onThemeChange, PALETTES, setCurrentTheme, themeName } from './ui/theme';
+import { cardPalette as themedCardPalette, currentTheme, onThemeChange, setCurrentTheme, themeName } from './ui/theme';
 import { getPrefs } from './core/settings';
 import { openApp } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
+import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 
 const PLUGIN_ID = 'goei-plugin';
@@ -154,7 +155,7 @@ const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<'
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
 function sceneCardHtml(s: { target: string; party: string }): string {
   const p = cardPalette();
-  return `<div style="${cardStyle()}flex-wrap:wrap">`
+  return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s.target)}</span>`
     + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span></div>`;
 }
@@ -162,7 +163,7 @@ function sceneCardHtml(s: { target: string; party: string }): string {
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
 function callCardHtml(target: string): string {
   const p = cardPalette();
-  return `<div style="${cardStyle()}">`
+  return `<div data-goei-card="call" style="${cardStyle()}">`
     + `<span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
 }
 
@@ -172,26 +173,12 @@ function isLanding(text: string): boolean {
 }
 
 function landingHtml(): string {
-  const p = cardPalette();
-  return `<div style="max-width:34em;margin:18px auto;padding:22px 22px 18px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.65;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)">`
-    + `<span style="display:inline-grid;place-items:center;width:52px;height:52px;border-radius:16px;background:${p.accentBg};color:${p.signal};margin-bottom:10px">${GHOST_ICON.replace('width="24" height="24"', 'width="30" height="30"')}</span>`
-    + `<div style="font-family:monospace;font-size:11px;letter-spacing:.28em;color:${p.signal};opacity:.85">ANOMALY SIMULATION</div>`
-    + titleHtml(p.text, p.signal)
-    + `<div style="color:${p.sub}">유령 버튼을 눌러 시작하세요</div></div>`;
+  return renderLanding(cardPalette());
 }
 
-/** 제목 「괴이: 이면세계」: 크게, 이면(뒷면)이라는 뜻을 살려 아래로 흐리게 비친 반사를 단다 */
-function titleHtml(text: string, signal: string): string {
-  const line = `<span style="color:${text}">괴이</span><span style="color:${signal};font-weight:300;margin:0 .18em 0 .06em">:</span><span style="color:${signal}">이면세계</span>`;
-  const font = 'font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap';
-  return `<div style="margin:10px 0 0;${font}">${line}</div>`
-    + `<div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;transform:scaleY(-1);opacity:.3;`
-    + `-webkit-mask-image:linear-gradient(to top,#000,transparent 60%);mask-image:linear-gradient(to top,#000,transparent 60%)">${line}</div>`;
-}
-
-/** 채팅 속 기록 카드도 창 배색을 따른다 */
+/** 채팅 속 기록 카드도 창 배색을 따른다 (테마를 바꾸면 다시 그리지 않아도 바로 바뀌게 CSS 변수로) */
 function cardPalette() {
-  return PALETTES[currentTheme()];
+  return themedCardPalette(currentTheme());
 }
 function cardStyle(): string {
   const p = cardPalette();

@@ -326,6 +326,23 @@ async function close(): Promise<void> {
   await risuai.hideContainer();
 }
 
+/**
+ * 출발은 눌렀지만 첫 전송 전인 채팅: 테마가 이미 채팅에 적혀 있어서 기본값만 바꾸면 창·시작 카드가 그대로였다.
+ * 아직 시작 전이니 이 채팅에도 같이 적는다.
+ */
+async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise<void> {
+  if (value !== 'light' && value !== 'dark' && value !== 'paper') return;
+  try {
+    const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) =>
+      (chat.message ?? []).length || chat.scriptstate?.['$st_fixed_theme'] === value ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), $st_fixed_theme: value } },
+    );
+    if (saved) ctx.chat = saved;
+  } catch (error) {
+    console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  render();
+}
+
 async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
   if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
@@ -343,7 +360,9 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (view.kind === 'picker' && pickerPrefs && action.startsWith('set-')) {
-    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope);
+    if (settingsUi.busy) return;
+    await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope);
+    if (action === 'set-theme' && view.kind === 'picker' && view.staged) await stagedTheme(view.ctx, value);
     return;
   }
   if (view.kind === 'started' && action.startsWith('set-')) {
@@ -552,7 +571,8 @@ function render(): void {
   const logRoom = root.dataset.room ?? '';
   const logKeep = log && logRoom === (phone.room ?? '') ? (log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop) : -1;
   root.dataset.theme = themeOf();
-  root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ''}">${body()}</div>`;
+  // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
+  root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
   root.dataset.tab = tab;
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
@@ -650,7 +670,7 @@ function picker(): string {
     sc?.kind === 'direct'
       ? '<div class="gx-hint">시작을 누른 뒤 채팅 입력창에 시작할 상황을 적어 보내세요.</div>'
       : sc?.kind === 'preset'
-        ? '<div class="gx-hint">시작을 누르면 이어서 목표(괴이·특수·랜드마크)와 동행을 골라요.</div>'
+        ? '<div class="gx-hint">시작을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   const ready = !!(f && sc);
   return `<main class="gx-body">

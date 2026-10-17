@@ -35,3 +35,21 @@ export function onThemeChange(f: (t: ThemeName) => void): () => void {
   listeners.add(f);
   return () => listeners.delete(f);
 }
+
+const KEYS = Object.keys(PALETTES.dark) as (keyof Palette)[];
+
+/**
+ * 채팅 속 카드(첫 안내·기록 카드)의 배색. 카드 HTML은 메시지를 다시 그릴 때만 새로 만들어져서,
+ * 색을 값으로 박으면 테마를 바꿔도 새로고침 전까지 그대로다. 그래서 본 화면 style이 바꿔 주는
+ * CSS 변수로 쓰고, 그 style이 없을 때만 그린 때의 배색으로 보인다.
+ */
+export function cardPalette(t: ThemeName): Palette {
+  const p = PALETTES[t];
+  return Object.fromEntries(KEYS.map((k) => [k, `var(--goei-${k}, ${p[k]})`])) as unknown as Palette;
+}
+
+/** cardPalette의 변수에 지금 배색을 넣는 CSS (본 화면에 붙인다) */
+export function cardVarsCss(t: ThemeName): string {
+  const p = PALETTES[t];
+  return `[data-goei-card] { ${KEYS.map((k) => `--goei-${k}: ${p[k]};`).join(' ')} }`;
+}
