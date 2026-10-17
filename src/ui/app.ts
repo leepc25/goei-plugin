@@ -690,7 +690,7 @@ function picker(): string {
   const hint =
     sc?.kind === 'direct'
       ? `<label class="gx-note"><span>시작할 상황</span>
-          <textarea rows="4" data-input="start-note">${esc(draft.situation ?? '')}</textarea></label>`
+          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc(draft.situation ?? '')}</textarea></label>`
       : sc?.kind === 'preset'
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';

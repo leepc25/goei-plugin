@@ -1017,3 +1017,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-acard.pick .gx-acard-sit { display: none; }
   .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
 }
+@media (max-width: 760px) {
+  /* 모바일 편성 단계 (v0.16.11, 사용자 요청): 작전 메모·작전 개시는 아래에 두고 요원 목록만 스크롤 */
+  .gx-field[data-step="team"] { display: flex; flex-direction: column; align-items: stretch; overflow: hidden; padding-bottom: 12px; }
+  .gx-field[data-step="team"] > .gx-sidecol { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-field[data-step="team"] .gx-note textarea { min-height: 64px; }
+}

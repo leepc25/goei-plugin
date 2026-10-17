@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.10
+//@version 0.16.11
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8815,7 +8815,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.10" : "0";
+var PLUGIN_VERSION = true ? "0.16.11" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -9843,7 +9843,7 @@ function teamPanel(x, goal, action, label, busy2) {
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
     <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
-      <textarea rows="3" data-input="field-note">${esc7(field2.note)}</textarea></label>
+      <textarea rows="3" data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc7(field2.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc7(label)}</button>
   </section>`;
 }
@@ -11485,7 +11485,7 @@ function picker() {
             <b>${String(s5.fm).padStart(2, "0")}</b><span>${esc10(s5.label)}</span></button>`;
   }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
   const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
-          <textarea rows="4" data-input="start-note">${esc10(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
+          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc10(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
   const ready = !!(f && sc) && (sc.kind !== "direct" || !!(draft.situation ?? "").trim());
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
