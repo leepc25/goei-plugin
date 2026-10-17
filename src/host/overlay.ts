@@ -341,10 +341,20 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
 }
 
 /** 접속 효과는 테마와 상관없이 늘 어두운 원래 배색 (밝은 테마에서 너무 눈부셔서) */
+let introHost: SafeEl | null = null;
+
+/** 창을 열면 띠가 창 머리를 가리지 않게 바로 치운다 */
+export function cancelIntro(): void {
+  const h = introHost;
+  introHost = null;
+  void h?.remove().catch(() => {});
+}
+
 export async function playIntro(): Promise<void> {
   const root = await body();
   if (!root) return;
   const host = await root.doc.createElement('div');
+  introHost = host;
   await host.setAttribute('x-goei-intro', 'true');
   await host.setInnerHTML(INTRO_HTML);
   const style = await root.doc.createElement('style');
@@ -352,5 +362,6 @@ export async function playIntro(): Promise<void> {
   await host.appendChild(style);
   await root.body.appendChild(host);
   await new Promise((r) => setTimeout(r, INTRO_MS));
-  await host.remove();
+  if (introHost === host) introHost = null;
+  await host.remove().catch(() => {});
 }

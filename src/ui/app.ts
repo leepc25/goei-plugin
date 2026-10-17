@@ -541,32 +541,14 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
-/** 진행 중 화면의 머리: 지금 탭 이름. 위협도는 모바일에서만 설정 버튼 옆에 (PC는 왼쪽 소속 패널 아래, v0.16.18) */
+/** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
-    <div class="gx-head-act">${threatButton(ctx, 'mob')}
+    <div class="gx-head-act">
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
-}
-
-/** 위협도: 진행 중인 괴이 등급과 사건 수로 0~5 */
-function threat(w: WorldState): { level: number; label: string } {
-  const weight: Record<string, number> = { S: 3, A: 2, B: 1 };
-  let n = 0;
-  for (const e of w.an) if (e.state !== '발생대기') n += 1 + (weight[e.grade ?? ''] ?? 0);
-  for (const e of w.inc) if (e.state !== '발생대기') n += 1;
-  const level = n === 0 ? 0 : n <= 1 ? 1 : n <= 3 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : 5;
-  return { level, label: ['평온', '주의', '경계', '심각', '위험', '재난'][level] };
-}
-
-/** 위협도 한 칸 (누르면 상황판). desk: 왼쪽 소속 패널 아래, mob: 모바일 머리의 설정 버튼 옆 */
-function threatButton(ctx: ChatContext, where: 'desk' | 'mob'): string {
-  if (!worldOn(ctx.chat)) return '';
-  const t = threat(readWorld(ctx.chat));
-  return `<button class="gx-threat ${where}${t.level ? '' : ' calm'}" data-action="tab" data-value="board" title="위협도 ${t.level} · ${t.label}">
-    ${t.level ? '<span class="gx-live"></span>' : ''}<span class="w">위협도</span><b>${t.level}</b><span class="t">${t.label}</span></button>`;
 }
 
 /**
@@ -762,7 +744,6 @@ function brand(ctx: ChatContext): string {
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? ' has-img' : ''}">${img ? `<span class="gx-op-img" style="background-image:url('${esc(img)}')"></span>` : ''}
         <span class="gx-op-txt"><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b>${status ? `<span class="gx-op-st">${status}</span>` : ''}</span></div>
-      ${threatButton(ctx, 'desk')}
     </div>`;
 }
 
@@ -844,7 +825,7 @@ function board(ctx: ChatContext): string {
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
   const waiting = (list: { state: string }[]) => list.length - live(list);
-  // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 위협도는 머리의 표시, 개수는 각 칸 제목에
+  // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 개수는 각 칸 제목에 (위협도는 v0.16.19 다음에 완전히 뺐다)
   const count = (list: { state: string }[], on: string) => [live(list) ? `${on} ${live(list)}` : '', waiting(list) ? `예정 ${waiting(list)}` : ''].filter(Boolean).join(' · ') || '0';
   const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
     `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;

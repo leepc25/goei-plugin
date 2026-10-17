@@ -143,13 +143,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-tabicon svg { width: 20px; height: 20px; }
 .gx-tabhead b { letter-spacing: .02em; }
 .gx-nav-gap { flex: 1; }
-/* 위협도 한 칸 (v0.16.18): PC는 소속 패널 아래, 모바일은 머리의 설정·닫기 옆. 높이·모서리는 설정·닫기 버튼(.gx-x)과 같게 */
-.gx-threat { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent); border-radius: 12px; background: var(--danger-bg); color: var(--danger); font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; flex: none; }
-.gx-threat.calm { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
-.gx-threat .w { color: var(--sub); font-weight: 600; }
-.gx-threat b { font-family: var(--mono); font-size: 17px; }
-.gx-threat .t { margin-left: auto; }
-.gx-threat.mob { display: none; }
 .gx-nb {
   position: relative; display: flex; align-items: center; gap: 12px;
   width: 100%; min-height: 48px; padding: 0 14px;
@@ -553,8 +546,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-nav { flex-direction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
   .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
   .gx-logo.mob { display: grid; }
-  .gx-threat.mob { display: flex; gap: 6px; padding: 0 12px; }
-  .gx-threat.mob .t { margin-left: 0; }
   .gx-nb, .gx-nb.mob { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 0 2px; border-radius: 0; font-size: 12px; text-align: center; background: transparent; }
   .gx-nb:hover { background: transparent; }
   .gx-nb.on { background: transparent; }

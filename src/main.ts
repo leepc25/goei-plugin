@@ -17,7 +17,7 @@ import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
 import { updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
-import { createFab, playIntro, type Fab } from './host/overlay';
+import { cancelIntro, createFab, playIntro, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, setCurrentTheme, themeName } from './ui/theme';
 import { getPrefs } from './core/settings';
@@ -282,7 +282,7 @@ await risuai.addRisuScriptHandler('display', onDisplay);
 let stopWatcher: (() => void) | null = null;
 let fab: Fab | null = null;
 try {
-  fab = await createFab(() => void openApp({ quietIfNotLite: true }));
+  fab = await createFab(() => (cancelIntro(), void openApp({ quietIfNotLite: true })));
   const f = fab;
   void f.setTheme(currentTheme());
   onThemeChange((t) => void f.setTheme(t).catch(() => {}));
@@ -292,7 +292,7 @@ try {
   console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
   await risuai.registerButton(
     { name: BRAND.name, icon: GHOST_ICON, iconType: 'html', location: 'chat', id: `${PLUGIN_ID}-chat` },
-    () => void openApp({ quietIfNotLite: true }),
+    () => (cancelIntro(), void openApp({ quietIfNotLite: true })),
   );
 }
 
