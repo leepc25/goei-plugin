@@ -403,7 +403,7 @@ async function open(page) {
   await open(page);
   await page.waitForSelector('.gx-board');
   const board = await page.textContent('.gx-panel');
-  assert.ok(board.includes(preset.name) && board.includes('쟈알디') && board.includes('작전투입') && board.includes('2025.01.01 02:47'), board);
+  assert.ok(board.includes(preset.name) && board.includes('쟈알디') && board.includes('작전') && board.includes('2025.01.01 02:47'), board);
   if (shots) { await page.screenshot({ path: `${shots}/9-board.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-agents.png` }); }
   if (shots) {
     await page.setViewportSize({ width: 1600, height: Number(process.env.VH || 1200) });

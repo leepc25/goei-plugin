@@ -134,7 +134,7 @@ await g('m02-board-scroll');
 await page.click('.gx-board .gx-acard .gx-acard-sit').catch((e) => console.log('agpop', e.message));
 await g('m02b-agent-info');
 await page.click('.gx-agpop-x').catch(() => {});
-await page.click('.gx-nav .gx-nb.mob[data-value="map"]');
+await page.click('.gx-mtrack .gx-nb[data-value=\"map\"] >> nth=1');
 await g('m03-map');
 // 두 손가락으로 지도 확대 (충남 근처)
 {
@@ -168,7 +168,7 @@ await g('m04d-team-360');
 await page.setViewportSize({ width: 390, height: 844 });
 await page.click('.gx-stepswap').catch(() => {});
 await g('m05-mission');
-await page.click('.gx-nav .gx-nb[data-value="phone"]');
+await page.click('.gx-mtrack .gx-nb[data-value=\"phone\"] >> nth=1');
 await g('m06-phone');
 for (const t of await page.$$eval('[data-action^="ph-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);
 await page.click('[data-action="ph-ctab"][data-value="T05"]');
@@ -179,7 +179,7 @@ await page.click('[data-action="ph-sub"][data-value="notices"]');
 await g('m06d-notices');
 await page.click('[data-action="ph-notice"][data-value="n2"]').catch((e) => console.log('notice click', e.message));
 await g('m06e-notice-open');
-await page.click('.gx-nav .gx-nb[data-value="wiki"]');
+await page.click('.gx-mtrack .gx-nb[data-value=\"wiki\"] >> nth=1');
 await g('m07-wiki');
 for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);
 await page.setViewportSize({ width: 1300, height: 860 });

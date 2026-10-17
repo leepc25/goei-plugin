@@ -326,8 +326,8 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     <div class="gx-goal"><span>목표</span><b${goal ? '' : ' class="none"'}>${goal ? esc(goal) : '미정'}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
-    <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
-      <textarea rows="3"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>
+    <label class="gx-note">
+      <textarea rows="3" aria-label="작전 메모"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
   </section>`;
 }

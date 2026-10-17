@@ -156,6 +156,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
 .gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
 .gx-nb.mob { display: none; }
+.gx-mbar { display: none; }
 .gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
 
 /* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
@@ -551,6 +552,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-nb.on { background: transparent; }
   .gx-nb svg { width: 24px; height: 24px; }
   .gx-nb .gx-nbadge { position: absolute; top: 5px; left: calc(50% + 6px); margin: 0; min-width: 18px; height: 18px; font-size: 11px; }
+  /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
+  .gx-nav { padding-left: 0; padding-right: 0; }
+  .gx-nav > .gx-nb { display: none; }
+  .gx-mbar { display: block; flex: 1; min-width: 0; }
+  .gx-mtrack { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .gx-mtrack::-webkit-scrollbar { display: none; }
+  .gx-mtrack > .gx-nb { display: flex; flex: 0 0 20%; position: relative; scroll-snap-align: start; }
   .gx-facs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: none; }
   .gx-fac { scroll-snap-align: start; }
   .gx-fac.has-img { min-height: 188px; }
@@ -958,8 +966,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
 .gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-.gx-note > span { font-size: 14px; font-weight: 600; color: var(--sub); padding: 0 2px; }
-.gx-note small { font-weight: 400; color: var(--dim); }
 .gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
 .gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
 .gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
@@ -1050,15 +1056,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) {
   /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
   .gx-field { padding-top: 10px; row-gap: 12px; }
-  .gx-stepbar { gap: 6px; margin-bottom: 2px; }
+  /* 목표·편성·전환 줄은 위에 고정, 아래만 스크롤 (사용자 요청) */
+  .gx-stepbar { gap: 6px; position: sticky; top: -10px; z-index: 3; margin: -10px -16px 0; padding: 10px 16px 8px; background: var(--void); }
   .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
   .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
   .gx-stepb span { flex-direction: row; align-items: baseline; gap: 6px; }
   .gx-stepb b { font-size: 14px; flex: none; }
   /* 편성 단계: 요원 목록이 넓게. 작전 메모는 한 줄로 접어 두고 누르면 펼친다 */
-  .gx-field[data-step="team"] .gx-goal { font-size: 14px; }
+  /* 목표·인원은 위 목표·편성 줄에 이미 나온다 */
+  .gx-team > .gx-goal { display: none; }
   .gx-field[data-step="team"] .gx-note { gap: 4px; }
-  .gx-field[data-step="team"] .gx-note > span { font-size: 13px; }
   /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
   .gx-note textarea { scrollbar-width: none; }
   .gx-note textarea::-webkit-scrollbar { display: none; }
