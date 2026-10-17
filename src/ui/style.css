@@ -989,7 +989,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-stepbar { display: none; }
 @media (max-width: 760px) {
   .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr auto; }
+  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr 84px; }
   /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
   .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
   .gx-stepswap svg { width: 16px; height: 16px; }
