@@ -175,6 +175,8 @@ await g('m04d-team-360');
 await page.setViewportSize({ width: 390, height: 844 });
 await page.click('.gx-stepswap').catch(() => {});
 await g('m05-mission');
+await page.click('.gx-stepbar .gx-stepb >> nth=0').catch((e) => console.log('goal', e.message));
+await g('m05b-custom-goal');
 await page.click('.gx-mtrack .gx-nb[data-value=\"phone\"] >> nth=1');
 await g('m06-phone');
 for (const t of await page.$$eval('[data-action^="ph-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);

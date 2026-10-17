@@ -601,7 +601,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => document.querySelectorAll('.gx-mlist li').length === 1);
   await page.click('.gx-mlist [data-action="mission-pick"]');
   // 위 종류 버튼을 바꿔 봐도 고른 목표는 그대로
-  await page.click('.gx-seg[data-value="lm"]');
+  await page.click('[data-action="mission-kind"][data-value="lm"]');
   assert.equal((await page.textContent('.gx-goal b')).trim(), '소라 랜드');
   assert.equal(await page.isDisabled('[data-action="mission-send"]'), false);
   assert.equal((await page.textContent('[data-action="mission-send"]')).trim(), '작전 개시');
@@ -618,7 +618,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.waitForSelector('.gx-search');
   assert.equal(await page.locator('.gx-nav').count(), 0, '아직 플레이 화면 아님');
-  await page.click('.gx-seg[data-value="ms"]');
+  await page.click('[data-action="mission-kind"][data-value="ms"]');
   await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
   const site0 = (await page.textContent('.gx-goal b')).trim();
   await page.click('[data-action="mission-send"]');
@@ -657,7 +657,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.evaluate(() => { window.__chat.message.push({ role: 'char', data: '응답' }); const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
-  await page.click('.gx-seg[data-value="ms"]');
+  await page.click('[data-action="mission-kind"][data-value="ms"]');
   await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
   const site = (await page.textContent('.gx-goal b')).trim();
   // 다른 탭에 다녀와도 고른 목표 유지

@@ -411,7 +411,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
   const x = readCtx(ctx);
   if (typeof x === 'string') return `<div class="gx-empty">${esc(x)}</div>`;
   const segs = (['an', 'ms', 'lm'] as MissionKind[])
-    .map((k) => `<button class="gx-seg${field.mkind === k ? ' on' : ''}" data-action="mission-kind" data-value="${k}" aria-pressed="${field.mkind === k}">${MISSION_LABEL[k]}</button>`)
+    .map((k) => `<button class="gx-chip${field.mkind === k ? ' on' : ''}" data-action="mission-kind" data-value="${k}" aria-pressed="${field.mkind === k}">${MISSION_LABEL[k]}</button>`)
     .join('');
   const p = x.world.pending;
   const pend = (['an', 'ms', 'in'] as EventKind[])
@@ -425,8 +425,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-segs">${segs}</div>
-      <input class="gx-search" type="search" placeholder="${MISSION_LABEL[field.mkind]} 검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="${MISSION_LABEL[field.mkind]} 검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색"></div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
