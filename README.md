@@ -21,7 +21,7 @@ RisuAI용 괴담 시뮬레이션 「괴이: 이면세계」의 전용 플러그�
 
 - `npm ci && npm run build && npm test` (브라우저 테스트: `python3 tests/make_fixture.py <카드.charx> <fixture.json>` 뒤 `node tests/browser.mjs <fixture.json>`)
 - 카드 빌드: `python3 tools/build_lite_card.py card/원본_봇카드.jpeg release/괴이_이면세계.charx` (먼저 `npm run build`). `release/card-update.json`·`version.json`도 함께 만들어집니다.
-- 릴리스: `package.json` 버전을 올리고 `dist/goei-plugin.js`와 위 파일들을 `release/`에 넣어 커밋한 뒤 `v버전` 태그를 올리면, GitHub Actions가 Releases에 zip·카드·플러그인을 붙입니다.
+- 릴리스: `package.json` 버전을 올리고 `dist/goei-plugin.js`와 위 파일들을 `release/`에 넣어 main에 커밋하면, `release/version.json`이 바뀐 것을 보고 GitHub Actions가 `v버전` 릴리스를 만들어 zip·카드·플러그인을 붙입니다.
 
 # 변경 기록
 
