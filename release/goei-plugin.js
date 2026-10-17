@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.11
+//@version 0.16.12
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8615,6 +8615,29 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-acard.pick .gx-acard-sit { display: none; }
   .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
 }
+@media (max-width: 760px) {
+  /* 모바일 편성 단계 (v0.16.11, 사용자 요청): 작전 메모·작전 개시는 아래에 두고 요원 목록만 스크롤 */
+  .gx-field[data-step="team"] { display: flex; flex-direction: column; align-items: stretch; overflow: hidden; padding-bottom: 12px; }
+  .gx-field[data-step="team"] > .gx-sidecol { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-field[data-step="team"] .gx-note textarea { min-height: 64px; }
+}
+
+/* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
+.gx-op-txt { width: 100%; }
+.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
+.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
+.gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.gx-op-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px; margin-top: 1px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.gx-op-meta .y { opacity: .7; }
+.gx-op-dot { opacity: .5; }
+.gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
+.gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
+.gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
+.gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
+.gx-op.has-img:has(.gx-op-st) { min-height: 176px; }
 `;
 
 // src/ui/mapzoom.ts
@@ -8815,7 +8838,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.11" : "0";
+var PLUGIN_VERSION = true ? "0.16.12" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -11357,11 +11380,10 @@ function header(sub, extra = "") {
 }
 function startedHeader(ctx) {
   const w = worldOn(ctx.chat) ? readWorld(ctx.chat) : null;
-  const time2 = w ? clock(w.minute) : "";
   const t = w ? threat(w) : null;
   const pill = t ? `<span class="gx-threat${t.level ? "" : " calm"}" title="위협도 ${t.level} · ${t.label}">${t.level ? '<span class="gx-live"></span>' : ""}<span class="w">위협도 </span>${t.level}<span class="t"> · ${t.label}</span></span>` : "";
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b><small>${time2 || BRAND.name}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">${pill}
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -11525,13 +11547,13 @@ function brand(ctx) {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
   const time2 = (w ? clock(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
   const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
-  const row2 = (label, value) => value ? `<li><span>${label}</span><b>${value}</b></li>` : "";
-  const rows = row2("시각", time2) + row2("위치", esc10(st?.place ?? "")) + row2("날씨", esc10(weather)) + row2("목표", esc10(st?.target ?? ""));
+  const line = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${value}</em></span>` : "";
+  const meta = [time2, esc10(weather)].filter(Boolean).join('<span class="gx-op-dot">·</span>');
+  const status = line("위치", esc10(st?.place ?? "")) + line("목표", esc10(st?.target ?? "")) + (meta ? `<span class="gx-op-meta">${meta}</span>` : "");
   return `<div class="gx-nav-brand">
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc10(img)}')"></span>` : ""}
-        <span class="gx-op-txt"><small>소속</small><b>${esc10(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b></span></div>
-      ${rows ? `<ul class="gx-stat">${rows}</ul>` : ""}
+        <span class="gx-op-txt"><small>소속</small><b>${esc10(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
     </div>`;
 }
 function selfName(ctx, code, name) {

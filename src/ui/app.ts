@@ -532,11 +532,10 @@ function header(sub: string, extra = ''): string {
 /** 진행 중 화면의 머리: 지금 탭 이름 + 상태창 시각 + 위협도 */
 function startedHeader(ctx: ChatContext): string {
   const w = worldOn(ctx.chat) ? readWorld(ctx.chat) : null;
-  const time = w ? clock(w.minute) : '';
   const t = w ? threat(w) : null;
   const pill = t ? `<span class="gx-threat${t.level ? '' : ' calm'}" title="위협도 ${t.level} · ${t.label}">${t.level ? '<span class="gx-live"></span>' : ''}<span class="w">위협도 </span>${t.level}<span class="t"> · ${t.label}</span></span>` : '';
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b><small>${time || BRAND.name}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">${pill}
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -728,7 +727,7 @@ function tabs(): string {
   </nav>`;
 }
 
-/** 왼쪽 위: 표지 + 간이 상태창 (소속 사진·이름, 시각·위치·날씨·목표). 첫 장면 선택은 시작 뒤엔 쓸모없어 뺐다 */
+/** 왼쪽 위: 표지 + 소속 사진 패널 (안에 위치·목표·시각·날씨). 첫 장면 선택은 시작 뒤엔 쓸모없어 뺐다 */
 function brand(ctx: ChatContext): string {
   const facs = factionList(ctx.char.globalLore);
   const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '') || currentChoice(ctx.chat).faction || '';
@@ -738,13 +737,14 @@ function brand(ctx: ChatContext): string {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const time = (w ? clock(w.minute) : '') || [st?.date, st?.time].filter(Boolean).join(' ');
   const weather = [st?.weather, st?.temp].filter(Boolean).join(' ');
-  const row = (label: string, value: string) => (value ? `<li><span>${label}</span><b>${value}</b></li>` : '');
-  const rows = row('시각', time) + row('위치', esc(st?.place ?? '')) + row('날씨', esc(weather)) + row('목표', esc(st?.target ?? ''));
+  // 상태는 소속 사진 패널 안에: 위치·목표는 한 줄씩, 시각·날씨는 한 줄에 작게
+  const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${value}</em></span>` : '');
+  const meta = [time, esc(weather)].filter(Boolean).join('<span class="gx-op-dot">·</span>');
+  const status = line('위치', esc(st?.place ?? '')) + line('목표', esc(st?.target ?? '')) + (meta ? `<span class="gx-op-meta">${meta}</span>` : '');
   return `<div class="gx-nav-brand">
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? ' has-img' : ''}">${img ? `<span class="gx-op-img" style="background-image:url('${esc(img)}')"></span>` : ''}
-        <span class="gx-op-txt"><small>소속</small><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b></span></div>
-      ${rows ? `<ul class="gx-stat">${rows}</ul>` : ''}
+        <span class="gx-op-txt"><small>소속</small><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b>${status ? `<span class="gx-op-st">${status}</span>` : ''}</span></div>
     </div>`;
 }
 

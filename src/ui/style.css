@@ -1025,3 +1025,18 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
   .gx-field[data-step="team"] .gx-note textarea { min-height: 64px; }
 }
+
+/* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
+.gx-op-txt { width: 100%; }
+.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
+.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
+.gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.gx-op-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px; margin-top: 1px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.gx-op-meta .y { opacity: .7; }
+.gx-op-dot { opacity: .5; }
+.gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
+.gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
+.gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
+.gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
+.gx-op.has-img:has(.gx-op-st) { min-height: 176px; }
