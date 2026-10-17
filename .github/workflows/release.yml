@@ -40,8 +40,9 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             for a in $(gh release view "$TAG" --json assets -q '.assets[].name'); do gh release delete-asset "$TAG" "$a" -y; done
             gh release upload "$TAG" "${files[@]}" --clobber
+            gh release edit "$TAG" --prerelease
           else
             gh release create "$TAG" --target "$GITHUB_SHA" "${files[@]}" \
-              --title "괴이: 이면세계 ${TAG}" \
+              --title "괴이: 이면세계 ${TAG}" --prerelease \
               --notes "처음 설치: zip을 받아 goei-plugin.js를 Risu 설정 → 플러그인에 추가하고, 괴이_이면세계.charx를 캐릭터로 가져오세요. 그다음부터는 플러그인 탭과 창의 설정 → 업데이트에서 갱신됩니다."
           fi
