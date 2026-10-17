@@ -406,7 +406,22 @@ async function open(page) {
   assert.ok(board.includes(preset.name) && board.includes('쟈알디') && board.includes('작전투입') && board.includes('2025.01.01 02:47'), board);
   if (shots) { await page.screenshot({ path: `${shots}/9-board.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-agents.png` }); }
   await page.setViewportSize({ width: 390, height: 844 });
-  if (shots) await page.screenshot({ path: `${shots}/9-board-mobile.png` });
+  if (shots) { await page.screenshot({ path: `${shots}/9-board-mobile.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-mobile-agents.png` }); }
+  await page.setViewportSize({ width: 1280, height: 860 });
+  // 상황판 요원 카드의 톡·위키 바로가기
+  const agentCard = page.locator('.gx-board .gx-acard', { hasText: '쟈알디' });
+  await agentCard.locator('[data-action="agent-talk"]').click();
+  await page.waitForSelector('.ph-room');
+  assert.ok((await page.textContent('.ph-room')).includes('쟈알디'));
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.waitForSelector('.gx-board');
+  await agentCard.locator('[data-action="wiki-goto"]').click();
+  await page.waitForSelector('.nw-compose, .nw-doc');
+  assert.ok((await page.textContent('.gx-panel')).includes('쟈알디'));
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.waitForSelector('.gx-board');
+  await page.setViewportSize({ width: 390, height: 844 });
+  console.log('PASS 상황판 요원 카드에서 괴담톡·위키 바로 열기');
   // 다른 봇: 리스너·표시 모두 무시
   await page.evaluate(() => { window.__char = { name: '다른 봇', globalLore: [] }; window.risuai.getCurrentCharacterIndex = async () => 1; });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'none', null, { timeout: 3000 });

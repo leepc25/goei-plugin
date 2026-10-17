@@ -1040,3 +1040,57 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
 .gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
 .gx-op.has-img:has(.gx-op-st) { min-height: 176px; }
+
+/* 상황판 다시 설계 (v0.16.13) */
+.gx-board > .gx-ops, .gx-board > .gx-ops.calm { gap: 14px; padding: 16px; border-radius: 18px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--signal); }
+.gx-ops.lv1, .gx-ops.lv2 { border-left-color: var(--amber); }
+.gx-ops.lv3, .gx-ops.lv4, .gx-ops.lv5 { border-left-color: var(--danger); }
+.gx-ops-top { display: grid; grid-template-columns: minmax(200px, 260px) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.gx-ops-lv { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gx-ops-lv > small { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--dim); }
+.gx-ops-num { display: flex; align-items: baseline; gap: 6px; }
+.gx-ops-num b { font-family: var(--mono); font-size: 40px; line-height: 1; font-weight: 700; color: var(--signal); }
+.gx-ops-num span { font-family: var(--mono); font-size: 15px; color: var(--dim); }
+.gx-ops-num em { margin-left: 4px; font-style: normal; font-size: 17px; font-weight: 700; color: var(--signal); }
+.gx-ops-num .gx-live { align-self: center; margin-left: 2px; }
+.gx-ops.lv1 .gx-ops-num b, .gx-ops.lv1 .gx-ops-num em, .gx-ops.lv2 .gx-ops-num b, .gx-ops.lv2 .gx-ops-num em { color: var(--amber); }
+.gx-ops.lv3 .gx-ops-num b, .gx-ops.lv3 .gx-ops-num em, .gx-ops.lv4 .gx-ops-num b, .gx-ops.lv4 .gx-ops-num em, .gx-ops.lv5 .gx-ops-num b, .gx-ops.lv5 .gx-ops-num em { color: var(--danger); }
+.gx-ops-lv .gx-meter { width: 100%; max-width: 220px; }
+.gx-ops-lv p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--dim); }
+.gx-ops-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gx-ops-stat { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--void); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.gx-ops-stat:hover { border-color: var(--line2); }
+.gx-ops-stat span { font-size: 13px; font-weight: 600; color: var(--dim); }
+.gx-ops-stat b { font-family: var(--mono); font-size: 28px; line-height: 1.1; font-weight: 700; }
+.gx-ops-stat small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.gx-ops-stat.an b { color: var(--danger); } .gx-ops-stat.in b { color: var(--amber); } .gx-ops-stat.ms b { color: var(--signal); } .gx-ops-stat.op b { color: var(--blue); }
+.gx-ops-deploy { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--panel2); }
+.gx-ops-deploy h3 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.gx-ops-list li { background: var(--void); }
+/* 괴이·사건·특수: PC는 여러 칸 */
+.gx-board .gx-sec > .gx-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
+.gx-board .gx-sec > .gx-list > li { margin: 0; }
+/* 진행 칸 높이가 옆 칸에 맞춰 늘어나도 글은 위에서부터 */
+.gx-board .gx-ev-card { align-content: start; }
+/* 요원 카드: 사진 크게 */
+.gx-acard-act { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; align-self: center; }
+.gx-acard-tool { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+.gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+.gx-board .gx-acard { align-items: center; gap: 14px; padding: 12px 14px; }
+.gx-board .gx-acard .gx-ava { width: 84px; height: 84px; border-radius: 18px; font-size: 28px; }
+@media (max-width: 760px) {
+  .gx-ops-top { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .gx-ops-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gx-ops-num b { font-size: 34px; }
+  /* 모바일 요원 카드: 한 줄에 2개, 사진 위 글 아래 */
+  .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gx-board .gx-acard { flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; text-align: center; }
+  .gx-board .gx-acard .gx-ava { width: 76px; height: 76px; border-radius: 18px; }
+  .gx-board .gx-acard-txt { width: 100%; align-items: center; }
+  .gx-board .gx-acard-top { justify-content: center; }
+  .gx-board .gx-acard-txt small { max-width: 100%; }
+  .gx-board .gx-acard-act { flex-direction: row; justify-content: center; gap: 8px; align-self: stretch; padding-top: 8px; border-top: 1px solid var(--line); }
+  .gx-board .gx-acard-tool { flex: 1; max-width: 72px; height: 34px; }
+}

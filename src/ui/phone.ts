@@ -423,6 +423,21 @@ async function openDm(ctx: ChatContext, env: PhoneEnv, cid: string) {
   await env.refresh();
 }
 
+/** 상황판 요원 카드의 톡·위키: 요원 번호(P001…)로 연락처를 찾는다 */
+export function agentContact(ctx: ChatContext, agentId: string): { id: string; wiki: string } | null {
+  const c = dir(ctx).map.get(contactId(agentId));
+  return c ? { id: c.id, wiki: c.lore || c.name } : null;
+}
+
+/** 상황판에서 바로 그 요원과의 1:1 방을 연다 */
+export async function openAgentDm(ctx: ChatContext, env: PhoneEnv, agentId: string): Promise<boolean> {
+  const c = agentContact(ctx, agentId);
+  if (!c) return false;
+  phone.query = '';
+  await openDm(ctx, env, c.id);
+  return true;
+}
+
 /** 말 한마디 없이 나간 빈 1:1 방은 지운다 (원본 clearEmptyRoom) */
 function dropEmpty(st: PState, keep: string) {
   const prev = phone.room;

@@ -20,7 +20,7 @@ import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
 import { rememberPanel } from './panels';
-import { handlePhone, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
+import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
@@ -418,6 +418,14 @@ async function handle(action: string, value?: string): Promise<void> {
       field.confirmEnd = null;
       resetSettings();
       return render();
+    case 'agent-talk':
+      // 상황판 요원 카드의 톡: 괴담톡 탭으로 넘어가 그 요원과의 1:1 방을 연다
+      if (view.kind !== 'started') return;
+      tab = 'phone';
+      notice = '';
+      resetField();
+      if (!(await openAgentDm(view.ctx, phoneEnv, value ?? ''))) render();
+      return;
     case 'wiki-goto':
       // 지도·커스텀 임무 목록의 「위키」: 위키 탭으로 넘어가 그 제목을 연다 (없으면 작성 화면)
       if (view.kind !== 'started') return;
@@ -836,7 +844,12 @@ function board(ctx: ChatContext): string {
     .map((p) => {
       const rec = w.agents[p.id];
       const st = rec?.st ?? '미정';
-      return `<li class="gx-acard${st === '작전투입' ? ' op' : ''}" title="${esc(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? '')}</li>`;
+      const c = agentContact(ctx, p.id);
+      const act = c
+        ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(p.id)}" title="괴담톡" aria-label="${esc(p.name)}에게 톡">${ICONS.phone}</button>`
+          + `<button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(c.wiki)}" title="위키" aria-label="${esc(p.name)} 위키">${ICONS.wiki}</button></span>`
+        : '';
+      return `<li class="gx-acard${st === '작전투입' ? ' op' : ''}" title="${esc(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? '')}${act}</li>`;
     })
     .join('');
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';
@@ -859,17 +872,29 @@ function board(ctx: ChatContext): string {
   const looseRow = loose.length
     ? `<li><span class="gx-ops-where"><i class="gx-gmark op">·</i><b>그 밖의 작전</b><small>배치 기록 없음</small></span><span class="gx-ops-who">${loose.map((p) => `<span class="gx-pchip" title="${esc(w.agents[p.id]?.situation ?? '')}">${avatar(ctx.char, p.english, p.name, 'xs')}${esc(p.name)}</span>`).join('')}</span></li>`
     : '';
-  const chip = (id: string, label: string, n: number, cls: string) =>
-    `<button class="gx-ops-chip ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b></button>`;
+  // 작전 현황 (v0.16.13 다시 설계): 왼쪽 위협도(무엇으로 매기는지 한 줄), 오른쪽 종류별 개수(누르면 그 목록으로), 아래 투입 현황
+  const waiting = (list: { state: string }[]) => list.length - live(list);
+  const stat = (id: string, label: string, n: number, sub: string, cls: string) =>
+    `<button class="gx-ops-stat ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b><small>${sub}</small></button>`;
   const quiet = w.minute === null ? '첫 응답이 오면 시각과 상태가 채워져요.' : '지금 작전 중인 요원은 없어요.';
   return `<main class="gx-body gx-board">
-    <section class="gx-ops${t.level ? '' : ' calm'}">
-      <div class="gx-ops-bar">
-        <span class="gx-ops-threat">${t.level ? '<span class="gx-live"></span>' : ''}위협도 ${t.level}<small>${t.label}</small>
-          <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ''}"></i>`).join('')}</span></span>
-        <span class="gx-ops-chips">${chip('an', '괴이', live(w.an), 'an')}${chip('in', '사건', live(w.inc), 'in')}${chip('ms', '특수', live(w.ms), 'ms')}${chip('ag', '작전', onOp.length, 'op')}</span>
+    <section class="gx-ops lv${t.level}">
+      <div class="gx-ops-top">
+        <div class="gx-ops-lv">
+          <small>위협도</small>
+          <div class="gx-ops-num"><b>${t.level}</b><span>/ 5</span><em>${t.label}</em>${t.level ? '<span class="gx-live"></span>' : ''}</div>
+          <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ''}"></i>`).join('')}</span>
+          <p>진행 중인 괴이 등급과 사건 수로 매겨요.</p>
+        </div>
+        <div class="gx-ops-stats">
+          ${stat('an', '괴이', live(w.an), waiting(w.an) ? `예정 ${waiting(w.an)}` : '진행 중', 'an')}
+          ${stat('in', '사건', live(w.inc), waiting(w.inc) ? `예정 ${waiting(w.inc)}` : '진행 중', 'in')}
+          ${stat('ms', '특수', live(w.ms), waiting(w.ms) ? `예정 ${waiting(w.ms)}` : '출현', 'ms')}
+          ${stat('ag', '요원', onOp.length, `작전 중 / ${roster.length}명`, 'op')}
+        </div>
       </div>
-      ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}
+      <div class="gx-ops-deploy"><h3>투입 현황</h3>
+        ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}</div>
     </section>
     ${section('an', '괴이', w.an.length, an, '발생한 괴이가 없어요.')}
     ${section('in', '사건', w.inc.length, inc, '진행 중인 사건이 없어요.')}
