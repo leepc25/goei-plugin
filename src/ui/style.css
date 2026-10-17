@@ -368,7 +368,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
 .gx-step:disabled { opacity: .4; }
 .gx-mbox { max-height: calc(min(100vh - 28px, 920px) - 222px); overflow-y: auto; }
-.gx-field.gx-mission { grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr); }
+/* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
+.gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
 .gx-mapcol .gx-segs { align-self: flex-start; }
 .gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
 
@@ -378,6 +379,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .gx-mapcol .gx-canvas:not(.ph) { width: auto; }
   .gx-mapimg { width: 100%; max-height: none; }
   .gx-mbox { max-height: none; }
+  .gx-mlist { grid-template-columns: minmax(0, 1fr); }
   .gx-mapcol .gx-segs { align-self: stretch; display: flex; }
   .gx-mapcol .gx-seg { flex: 1; min-width: 0; padding: 0 8px; }
 }
@@ -1037,7 +1039,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
 .gx-field.gx-map > .gx-mapcol { position: static; }
 .gx-mapcol > .gx-sits { padding: 4px 0 0; }
-.gx-placehint { margin: 0; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; text-align: center; }
+.gx-placehint { margin: 0 0 8px; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; text-align: center; }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
 .gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
@@ -1047,13 +1049,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard.pick.wide .gx-acard-sit { -webkit-line-clamp: 2; }
 .gx-acard.pick.wide .gx-acard-check { top: auto; bottom: 8px; right: 10px; transform: none; }
 @media (min-width: 761px) {
-  .gx-map .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
   /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
-  .gx-map > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
-  .gx-map > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
-  .gx-map .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
-  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start { flex: none; }
+  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
+  /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
+  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
+  .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
+  .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
+  .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start, .gx-mission .gx-team > .gx-note, .gx-mission .gx-team > .gx-start { flex: none; }
 }
 @media (max-width: 760px) {
   /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */

@@ -265,7 +265,7 @@ function situations(x: Ctx, events: WorldEvent[]): string {
       <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
       ${here && !self
         ? `<button class="gx-wide" data-action="pick-place" data-value="${esc(field.place)}">이 장소 자체를 목표로</button>`
-        : self ? '<p class="gx-placehint">이 장소 자체가 목표로 잡혔어요.</p>' : ''}`;
+        : self ? '<p class="gx-placehint">이 장소가 목표로 설정되었습니다.</p>' : ''}`;
   }
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
@@ -294,9 +294,9 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
       const full = !on && used >= TEAM_MAX;
       const st = x.world.agents[p.id]?.st ?? '미정';
       const sit = x.world.agents[p.id]?.situation ?? '';
-      // 임무 탭(wide): 상황판 요원 카드와 같은 모양(큰 사진·설명·톡·위키), 한 줄에 한 명 (v0.16.17)
-      if (ctx) {
-        const c = agentContact(ctx, p.id);
+      // 상황판 요원 카드와 같은 모양(큰 사진·설명·톡·위키), 한 줄에 한 명. 커스텀·첫 장면 편성도 같다
+      {
+        const c = ctx ? agentContact(ctx, p.id) : null;
         const act = c
           ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(p.id)}" title="괴담톡" aria-label="${esc(p.name)}에게 톡">${ICONS.phone}</button>`
             + `<button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(c.wiki)}" title="위키" aria-label="${esc(p.name)} 위키">${ICONS.wiki}</button></span>`
@@ -305,8 +305,6 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
         return `<div class="gx-acard pick wide${on ? ' on' : ''}${off ? ' off' : ''}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc(p.id)}" aria-pressed="${on}" aria-disabled="${off}"
           ${lock ? `title="${esc(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ''}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
       }
-      return `<button class="gx-acard pick${on ? ' on' : ''}" data-action="team-toggle" data-value="${esc(p.id)}" ${lock || full ? 'disabled' : ''} aria-pressed="${on}"
-        title="${esc(lock ? `${stLabel(lock)} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
     })
     .join('');
   // 지원 인원도 요원과 같은 카드 모양으로 (인원은 카드 안에서 −/+)
@@ -435,7 +433,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
       ${x.world.notice && x.on ? `<div class="gx-hint">${esc(x.world.notice)}</div>` : ''}
       ${pend}
-      ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy)}
+      ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy, opening ? undefined : ctx)}
     </div>
   </main>`;
 }

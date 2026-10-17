@@ -587,12 +587,16 @@ function renderPicker(): void {
   else return render();
 }
 
+const INNER_SCROLL = '.gx-acards.pick, .gx-sidecol, .gx-mbox, .gx-sits';
+
 function render(): void {
   if (!root) return;
   const nav = view.kind === 'started';
   // 다시 그려도 읽던 자리를 지킨다
   const scroller = root.querySelector('.gx-body');
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
+  // 안쪽 스크롤 칸(편성 요원 목록·사이드 칸 등)도 같은 탭이면 자리를 지킨다
+  const inner = root.dataset.tab === tab ? [...root.querySelectorAll<HTMLElement>(INNER_SCROLL)].map((el) => el.scrollTop) : [];
   // 괴담톡 대화: 맨 아래를 보고 있었으면(또는 방을 새로 열면) 다시 그린 뒤에도 맨 아래로
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
@@ -603,6 +607,7 @@ function render(): void {
   root.dataset.tab = tab;
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
+  if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
   const nlog = root.querySelector<HTMLElement>('.ph-log');
   root.dataset.room = phone.room ?? '';
   if (nlog) {

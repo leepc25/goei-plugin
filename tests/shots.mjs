@@ -165,6 +165,13 @@ await g('m04c-360');
 await page.click('.gx-stepbar button:nth-child(2)').catch((e) => console.log('step', e.message));
 await page.click('.gx-acard.pick.wide:not(.off)', { timeout: 3000 }).catch((e) => console.log('pick', e.message));
 await g('m04d-team-360');
+// 요원 목록을 내린 뒤 고르면 그 자리에 머물러야 한다
+{
+  const before = await page.$eval('.gx-acards.pick', (el) => ((el.scrollTop = el.scrollHeight), el.scrollTop));
+  await page.$$eval('.gx-acard.pick.wide:not(.off)', (els) => els[els.length - 1]?.click());
+  await page.waitForTimeout(200);
+  console.log('pick scroll', before, await page.$eval('.gx-acards.pick', (el) => el.scrollTop));
+}
 await page.setViewportSize({ width: 390, height: 844 });
 await page.click('.gx-stepswap').catch(() => {});
 await g('m05-mission');
@@ -195,6 +202,8 @@ await page.$$eval('[data-action="map-region"]', (els) => els.find((e) => e.datas
 await page.waitForTimeout(400);
 await page.$$eval('[data-action="map-place"]', (els) => els.find((e) => !/hot|live|an|warn/.test(e.className))?.click());
 await g('p04-map-place');
+await page.click('.gx-nav .gx-nb.desk[data-value="mission"]').catch((e) => console.log('custom', e.message));
+await g('p05-custom');
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 // 바깥(어두운 막)을 누르면 닫힘
 await page.mouse.click(5, 5);
