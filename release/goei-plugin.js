@@ -1,8 +1,9 @@
 //@name goei-plugin
-//@display-name 괴이봇
+//@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.15.3
-//@description 괴이봇(Anomaly Sim 2.4 Lite) 전용 플러그인: 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
+//@version 0.16.0
+//@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
+//@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
 var DirectiveError = class extends Error {
 };
@@ -840,7 +841,7 @@ function cleanSpec(spec) {
   }
   return out;
 }
-var HELP = "괴이봇 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 모델에게는 보내지 않습니다.";
+var HELP = "괴이: 이면세계 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 모델에게는 보내지 않습니다.";
 function directoryContent(data) {
   return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
 }
@@ -1954,18 +1955,18 @@ var en = (s5) => String(s5 ?? "").replace(/\\/g, "\\\\").replace(/\|/g, "\\p").r
 function fields2(line) {
   const out = [];
   let cur = "";
-  let esc10 = false;
+  let esc11 = false;
   for (const c of line) {
-    if (esc10) {
+    if (esc11) {
       cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-      esc10 = false;
-    } else if (c === "\\") esc10 = true;
+      esc11 = false;
+    } else if (c === "\\") esc11 = true;
     else if (c === "|") {
       out.push(cur);
       cur = "";
     } else cur += c;
   }
-  if (esc10) cur += "\\";
+  if (esc11) cur += "\\";
   out.push(cur);
   return out;
 }
@@ -3622,9 +3623,9 @@ function json(lore, comment) {
 function buildRegistry(lore) {
   const books = lore ?? [];
   const entries = [];
-  const add = (key, name, loreName, terms) => {
-    const uniq = [...new Set([name, loreName, ...terms].map((t) => t.trim()).filter(Boolean))];
-    entries.push({ key, name, lore: loreName, terms: uniq });
+  const add = (key, name, loreName2, terms) => {
+    const uniq = [...new Set([name, loreName2, ...terms].map((t) => t.trim()).filter(Boolean))];
+    entries.push({ key, name, lore: loreName2, terms: uniq });
   };
   const dir2 = readDirectory(books);
   const places = { 괴이: dir2.anomalies, "미스틱 사이트": dir2.sites };
@@ -7170,6 +7171,7 @@ var BRAND = {
   /** 떠 있는 여는 버튼에 마우스를 올렸을 때 */
   fab: "괴이: 이면세계"
 };
+var CARD_FILE = "괴이_이면세계.charx";
 
 // src/ui/theme.ts
 var PALETTES = {
@@ -8431,6 +8433,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-stat span { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-stat b { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
 .gx-stat b .y { opacity: .7; }
+
+/* 설정 → 업데이트 */
+.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
+.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
+.upd-ver b { color: var(--signal); }
+.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0 2px; }
+.upd-plan { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
+.upd-plan small { color: var(--dim); }
 `;
 
 // src/ui/mapzoom.ts
@@ -8538,6 +8548,215 @@ function bindMapZoom(root2) {
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
   });
+}
+
+// src/core/update.ts
+var UPDATE_SCHEMA = 1;
+var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
+var CARD_FIELDS = [
+  "firstMessage",
+  "alternateGreetings",
+  "creatorNotes",
+  "desc",
+  "personality",
+  "scenario",
+  "exampleMessage",
+  "systemPrompt",
+  "postHistoryInstructions",
+  "backgroundHTML",
+  "lowLevelAccess",
+  "virtualscript",
+  "triggerscript"
+];
+var PROTECTED_LORE = [DIRECTORY_COMMENT2];
+function compareVersions(a, b) {
+  const pa = String(a).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
+  const pb = String(b).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (d) return d < 0 ? -1 : 1;
+  }
+  return 0;
+}
+function cardVersion(lore) {
+  const entry = (lore ?? []).find((e) => e.comment === MANIFEST_COMMENT);
+  try {
+    const v = JSON.parse(String(entry?.content ?? "")).version;
+    return typeof v === "string" && v ? v : "0";
+  } catch {
+    return "0";
+  }
+}
+function isPayload(x) {
+  const p = x;
+  return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === "string" && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscripts);
+}
+function keyed(list5, name) {
+  const seen = /* @__PURE__ */ new Map();
+  return list5.map((x) => {
+    const k = name(x);
+    const n = seen.get(k) ?? 0;
+    seen.set(k, n + 1);
+    return `${k}\0${n}`;
+  });
+}
+function mergeByName(current3, incoming, name, keep = () => false) {
+  const ck = keyed(current3, name);
+  const ik = keyed(incoming, name);
+  const cur = new Map(ck.map((k, i) => [k, current3[i]]));
+  const count = { replaced: 0, added: 0, kept: 0, protected: 0 };
+  const list5 = incoming.map((x, i) => {
+    const old = cur.get(ik[i]);
+    if (old === void 0) {
+      count.added++;
+      return x;
+    }
+    if (keep(old)) {
+      count.protected++;
+      return old;
+    }
+    if (JSON.stringify(old) !== JSON.stringify(x)) count.replaced++;
+    return x;
+  });
+  const used = new Set(ik);
+  ck.forEach((k, i) => {
+    if (used.has(k)) return;
+    count.kept++;
+    list5.push(current3[i]);
+  });
+  return { list: list5, count };
+}
+var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
+function planUpdate(char, payload) {
+  const lore = mergeByName(char.globalLore ?? [], payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
+  const scripts = mergeByName(char.customscripts ?? [], payload.data.customscripts, (r) => r.comment ?? "");
+  const next = { ...char, globalLore: lore.list, customscripts: scripts.list };
+  const fields3 = [];
+  for (const f of CARD_FIELDS) {
+    if (!(f in payload.data)) continue;
+    if (JSON.stringify(char[f]) !== JSON.stringify(payload.data[f])) fields3.push(f);
+    next[f] = payload.data[f];
+  }
+  return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
+}
+var PLUGIN_VERSION = true ? "0.16.0" : "0";
+
+// src/ui/update.ts
+var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, done: "" };
+var checked = false;
+async function getJson(name) {
+  const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: "GET" });
+  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
+  return res.json();
+}
+async function checkLatest(env2, force = false) {
+  if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
+  checked = true;
+  updateUi.busy = force;
+  if (force) updateUi.notice = "", env2.render();
+  try {
+    const v = await getJson("version.json");
+    if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
+    updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
+  } catch (error) {
+    if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
+  }
+  updateUi.busy = false;
+  env2.render();
+}
+function updateGroup(ctx) {
+  const busy2 = updateUi.busy;
+  const rows = [];
+  const cur = cardVersion(ctx.char.globalLore);
+  const lite = !!readManifest(ctx.char.globalLore);
+  const L = updateUi.latest;
+  const row2 = (label, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
+  if (!UPDATE_BASE) {
+    return section2(row2("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
+  }
+  const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
+  rows.push(row2(
+    "플러그인",
+    `<span class="upd-ver">v${esc4(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc4(L.plugin)}</b>` : ""}</span>`,
+    pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
+  ));
+  const cardNew = lite && L && compareVersions(L.card, cur) > 0;
+  const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
+  rows.push(row2(
+    "카드",
+    `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc4(cur)}`}${cardNew ? ` → <b>v${esc4(L.card)}</b>` : ""}</span>`,
+    !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
+  ));
+  let actions = `<button class="gx-mini" data-action="upd-check" ${busy2 ? "disabled" : ""}>${busy2 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
+  if (cardNew && !needPlugin) {
+    actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy2 ? "disabled" : ""}>${busy2 ? "적용 중…" : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy2 ? "disabled" : ""}>카드 업데이트 준비</button>`;
+  }
+  const plan = updateUi.plan;
+  const summary = plan ? `<ul class="upd-plan">
+        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc4(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
+        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
+        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요. 사진·에셋이 새로 생긴 버전이면 zip의 카드를 가져와야 해요.</p>` : "";
+  return section2(rows.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc4(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc4(updateUi.done)}</p>` : ""));
+}
+function section2(body4) {
+  return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body4}</div></section>`;
+}
+var FIELD_NAMES = {
+  firstMessage: "첫 안내",
+  alternateGreetings: "첫 장면",
+  creatorNotes: "제작 노트",
+  desc: "설명",
+  personality: "성격",
+  scenario: "시나리오",
+  exampleMessage: "예시 대화",
+  systemPrompt: "시스템 프롬프트",
+  postHistoryInstructions: "탈옥 프롬프트",
+  backgroundHTML: "배경 HTML",
+  lowLevelAccess: "저수준 접근",
+  virtualscript: "가상 스크립트",
+  triggerscript: "트리거"
+};
+var fieldName = (f) => FIELD_NAMES[f] ?? f;
+async function handleUpdate(action, ctx, env2) {
+  if (!action.startsWith("upd-")) return false;
+  if (updateUi.busy) return true;
+  if (action === "upd-check") {
+    updateUi.payload = null;
+    updateUi.plan = null;
+    updateUi.done = "";
+    await checkLatest(env2, true);
+    return true;
+  }
+  updateUi.busy = true;
+  updateUi.notice = "";
+  env2.render();
+  try {
+    const char = await risuai.getCharacterFromIndex(ctx.charIndex);
+    if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
+    if (action === "upd-prepare") {
+      const p = await getJson("card-update.json");
+      if (!isPayload(p)) throw new Error("카드 업데이트 파일 형식이 달라요.");
+      if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
+      updateUi.payload = p;
+      updateUi.plan = planUpdate(char, p);
+    } else if (action === "upd-apply" && updateUi.payload) {
+      const plan = planUpdate(char, updateUi.payload);
+      await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
+      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요. 채팅을 다시 열면 새 내용이 보여요.`;
+      updateUi.payload = null;
+      updateUi.plan = null;
+      updateUi.busy = false;
+      await env2.refresh();
+      return true;
+    }
+  } catch (error) {
+    updateUi.notice = error instanceof Error ? error.message : String(error);
+  }
+  updateUi.busy = false;
+  env2.render();
+  return true;
 }
 
 // src/core/wiki.ts
@@ -8724,8 +8943,8 @@ function reviewLinks(body4, title, canon2) {
     return `➡️${t}➡️`;
   });
 }
-var esc4 = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var escText = (s5) => esc4(s5.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
+var esc5 = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var escText = (s5) => esc5(s5.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
 function attrs(open2) {
   const out = {};
   for (const m of open2.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
@@ -8758,7 +8977,7 @@ function renderArticle(body4, o) {
   const inline = (s5) => escText(s5).replace(/➡️([^➡]+?)➡️/g, (_all, t) => {
     const raw = t.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
     const c = o.canon(raw);
-    return `<button class="nw-link${o.saved(c) ? " on" : ""}" data-action="wiki-open" data-value="${esc4(c)}">${t}</button>`;
+    return `<button class="nw-link${o.saved(c) ? " on" : ""}" data-action="wiki-open" data-value="${esc5(c)}">${t}</button>`;
   }).replace(/❗([^❗]+?)❗/g, "<b>$1</b>").replace(/\*\*([^*]+?)\*\*/g, "<b>$1</b>").replace(/✂️([^✂]+?)✂️/g, "<s>$1</s>").replace(/📌([^📌]+?)📌/gu, (_all, t) => {
     notes.push(t);
     return `<sup class="nw-fn">[${notes.length}]</sup>`;
@@ -8859,7 +9078,7 @@ function resetWiki() {
 }
 var jobs3 = /* @__PURE__ */ new Map();
 var chatKey3 = (ctx) => `${ctx.charIndex}:${ctx.chatIndex}`;
-var esc5 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc6 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var regCache = null;
 function registry(ctx) {
   if (!regCache || regCache.lore !== ctx.char.globalLore) regCache = { lore: ctx.char.globalLore, reg: buildRegistry(ctx.char.globalLore) };
@@ -8973,7 +9192,7 @@ function seg3(action, cur, items) {
 }
 function busyLine(ctx) {
   const job = jobs3.get(chatKey3(ctx));
-  return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc5(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
+  return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc6(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
 }
 var SUGGEST = { html: "" };
 function wikiSuggest(ctx, q) {
@@ -8983,22 +9202,22 @@ function wikiSuggest(ctx, q) {
   const docs = listDocs(ctx.chat).filter((d) => d.title.toLowerCase().includes(lower)).slice(0, 6);
   const hits = searchRegistry(registry(ctx), query).filter((e) => e.lore && !docs.some((d) => d.title === e.lore)).slice(0, 8);
   const items = [
-    ...docs.map((d) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc5(d.title)}"><b>${esc5(d.title)}</b><span class="gx-badge live">문서 있음</span></button>`),
-    ...hits.map((e) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc5(e.lore)}"><b>${esc5(e.name)}</b>${e.lore !== e.name ? `<span class="gx-loc">${esc5(e.lore)}</span>` : ""}<span class="gx-badge wait">작성 화면</span></button>`)
+    ...docs.map((d) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc6(d.title)}"><b>${esc6(d.title)}</b><span class="gx-badge live">문서 있음</span></button>`),
+    ...hits.map((e) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc6(e.lore)}"><b>${esc6(e.name)}</b>${e.lore !== e.name ? `<span class="gx-loc">${esc6(e.lore)}</span>` : ""}<span class="gx-badge wait">작성 화면</span></button>`)
   ];
   if (!docs.some((d) => d.title === query) && !hits.some((e) => e.lore === query || e.name === query)) {
-    items.push(`<button class="nw-sugg" data-action="wiki-write" data-value="${esc5(query)}"><b>${esc5(query)}</b><span class="gx-badge wait">이 제목으로 새로 쓰기</span></button>`);
+    items.push(`<button class="nw-sugg" data-action="wiki-write" data-value="${esc6(query)}"><b>${esc6(query)}</b><span class="gx-badge wait">이 제목으로 새로 쓰기</span></button>`);
   }
   return items.join("");
 }
 function searchBar() {
-  return `<div class="nw-search"><input class="gx-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="문서 제목 검색 또는 새 제목" value="${esc5(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="gx-mini" data-action="wiki-search" data-take="wiki-q">검색</button></div>
+  return `<div class="nw-search"><input class="gx-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="문서 제목 검색 또는 새 제목" value="${esc6(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="gx-mini" data-action="wiki-search" data-take="wiki-q">검색</button></div>
     <div class="nw-suggest" role="listbox">${SUGGEST.html}</div>`;
 }
 function requestBox(ctx) {
   const req = String(ctx.chat.scriptstate?.["$nw_writing_request"] ?? "");
   return `<details class="nw-req"${req ? " open" : ""}><summary>작성 지침${req ? " · 사용 중" : ""}</summary>
-    <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="예: 도시전설 게시판 말투로, 목격담 위주로">${esc5(req)}</textarea>
+    <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="예: 도시전설 게시판 말투로, 목격담 위주로">${esc6(req)}</textarea>
     <p class="gx-muted">비우기 전까지 이후 모든 문서 작성에 쓰여요.</p></details>`;
 }
 function home(ctx) {
@@ -9006,10 +9225,10 @@ function home(ctx) {
   const docs = listDocs(ctx.chat).slice().reverse();
   const rows = docs.map((d) => {
     const confirm = wiki.confirmDelete === d.title;
-    return `<li class="gx-ev"><button class="gx-evmain" data-action="wiki-open" data-value="${esc5(d.title)}"><span class="gx-row"><b>${esc5(d.title)}</b></span>
+    return `<li class="gx-ev"><button class="gx-evmain" data-action="wiki-open" data-value="${esc6(d.title)}"><span class="gx-row"><b>${esc6(d.title)}</b></span>
         ${d.meta?.created ? `<span class="gx-loc">${new Date(d.meta.created * 1e3).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" })}</span>` : ""}</button>
-        <div class="gx-evact"><button class="gx-mini" data-action="wiki-rewrite" data-value="${esc5(d.title)}">재작성</button>
-        <button class="gx-mini${confirm ? " danger" : ""}" data-action="wiki-delete" data-value="${esc5(d.title)}">${confirm ? "정말 삭제" : "삭제"}</button></div></li>`;
+        <div class="gx-evact"><button class="gx-mini" data-action="wiki-rewrite" data-value="${esc6(d.title)}">재작성</button>
+        <button class="gx-mini${confirm ? " danger" : ""}" data-action="wiki-delete" data-value="${esc6(d.title)}">${confirm ? "정말 삭제" : "삭제"}</button></div></li>`;
   }).join("");
   return `${searchBar()}${requestBox(ctx)}
     <div class="nw-settings">
@@ -9027,10 +9246,10 @@ function queryView(ctx) {
   const exact = canon(ctx)(q);
   const shown2 = /* @__PURE__ */ new Set([...docs.map((d) => d.title), ...hits.map((e) => e.lore)]);
   return `${searchBar()}
-    <section class="gx-sec"><h2>「${esc5(q)}」 검색 결과</h2><ul class="gx-list gx-evs">
-      ${docs.map((d) => `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc5(d.title)}"><span class="gx-row"><b>${esc5(d.title)}</b><span class="gx-badge live">문서 있음</span></span></button></li>`).join("")}
-      ${hits.map((e) => e.lore ? `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc5(e.lore)}"><span class="gx-row"><b>${esc5(e.name)}</b><span class="gx-badge wait">작성 화면</span></span>${e.lore !== e.name ? `<span class="gx-loc">${esc5(e.lore)}</span>` : ""}</button></li>` : `<li><div class="gx-evmain"><span class="gx-row"><b>${esc5(e.name)}</b><span class="gx-badge">연결 미지정</span></span></div></li>`).join("")}
-      ${shown2.has(exact) ? "" : `<li><button class="gx-evmain" data-action="wiki-write" data-value="${esc5(q)}"><span class="gx-row"><b>${esc5(q)}</b><span class="gx-badge wait">이 제목으로 작성</span></span></button></li>`}
+    <section class="gx-sec"><h2>「${esc6(q)}」 검색 결과</h2><ul class="gx-list gx-evs">
+      ${docs.map((d) => `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc6(d.title)}"><span class="gx-row"><b>${esc6(d.title)}</b><span class="gx-badge live">문서 있음</span></span></button></li>`).join("")}
+      ${hits.map((e) => e.lore ? `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc6(e.lore)}"><span class="gx-row"><b>${esc6(e.name)}</b><span class="gx-badge wait">작성 화면</span></span>${e.lore !== e.name ? `<span class="gx-loc">${esc6(e.lore)}</span>` : ""}</button></li>` : `<li><div class="gx-evmain"><span class="gx-row"><b>${esc6(e.name)}</b><span class="gx-badge">연결 미지정</span></span></div></li>`).join("")}
+      ${shown2.has(exact) ? "" : `<li><button class="gx-evmain" data-action="wiki-write" data-value="${esc6(q)}"><span class="gx-row"><b>${esc6(q)}</b><span class="gx-badge wait">이 제목으로 작성</span></span></button></li>`}
     </ul></section>`;
 }
 function compose(ctx) {
@@ -9039,10 +9258,10 @@ function compose(ctx) {
   const lore = hasBook(source3(ctx), wiki.title);
   const req = String(ctx.chat.scriptstate?.["$nw_writing_request"] ?? "");
   return `<section class="nw-compose">
-    <h2 class="nw-title">${esc5(wiki.title)}</h2>
-    <p class="gx-muted">${lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc5(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc5(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요."}</p>
-    ${req ? `<p class="gx-hint">작성 지침: ${esc5(req)}</p>` : ""}
-    <button class="gx-start" data-action="wiki-start" data-value="${esc5(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "위키 작성 시작"}</button>
+    <h2 class="nw-title">${esc6(wiki.title)}</h2>
+    <p class="gx-muted">${lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc6(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc6(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요."}</p>
+    ${req ? `<p class="gx-hint">작성 지침: ${esc6(req)}</p>` : ""}
+    <button class="gx-start" data-action="wiki-start" data-value="${esc6(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "위키 작성 시작"}</button>
   </section>${requestBox(ctx)}`;
 }
 function docView(ctx) {
@@ -9055,13 +9274,13 @@ function docView(ctx) {
   const saved = new Set(listDocs(ctx.chat).map((d) => d.title));
   const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c });
   const job = jobs3.get(chatKey3(ctx));
-  const links = (label, list5) => list5.length ? `<div class="nw-more"><b>${label}</b>${list5.map((t) => `<button class="nw-link${saved.has(t) ? " on" : ""}" data-action="wiki-open" data-value="${esc5(t)}">${esc5(t)}</button>`).join("")}</div>` : "";
+  const links = (label, list5) => list5.length ? `<div class="nw-more"><b>${label}</b>${list5.map((t) => `<button class="nw-link${saved.has(t) ? " on" : ""}" data-action="wiki-open" data-value="${esc6(t)}">${esc6(t)}</button>`).join("")}</div>` : "";
   const m = doc.meta;
   const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc5(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>작성 지침: ${esc5(m.writingRequest)}</p>` : ""}</details>` : "";
+       ${m.sources.length ? `<p>${esc6(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>작성 지침: ${esc6(m.writingRequest)}</p>` : ""}</details>` : "";
   return `<article class="nw-doc">
-    <header class="nw-dochead"><h2 class="nw-title">${esc5(doc.title)}</h2>
-      <button class="gx-mini" data-action="wiki-rewrite" data-value="${esc5(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "↻ 새로고침"}</button></header>
+    <header class="nw-dochead"><h2 class="nw-title">${esc6(doc.title)}</h2>
+      <button class="gx-mini" data-action="wiki-rewrite" data-value="${esc6(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "↻ 새로고침"}</button></header>
     <div class="nw-body">${r.html}</div>
     ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
   </article>`;
@@ -9071,8 +9290,8 @@ function wikiTab(ctx) {
   const back = wiki.history.length ? '<button class="gx-mini" data-action="wiki-back">← 뒤로</button>' : "";
   const nav = `<div class="nw-nav">${back}<button class="gx-mini" data-action="wiki-home">목록</button></div>`;
   const view2 = wiki.view === "doc" ? docView(ctx) : wiki.view === "compose" ? compose(ctx) : wiki.view === "query" ? queryView(ctx) : home(ctx);
-  const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc5(wiki.failure.title)})</summary><p>${esc5(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc5(wiki.failure.raw)}</textarea></details>` : "";
-  return `<main class="gx-body nw">${wiki.view === "home" ? "" : nav}${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc5(wiki.notice)}</div>` : ""}${view2}${fail3}</main>`;
+  const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc6(wiki.failure.title)})</summary><p>${esc6(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc6(wiki.failure.raw)}</textarea></details>` : "";
+  return `<main class="gx-body nw">${wiki.view === "home" ? "" : nav}${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc6(wiki.notice)}</div>` : ""}${view2}${fail3}</main>`;
 }
 async function handleWiki(action, value, ctx, env2) {
   const v = value ?? "";
@@ -9144,7 +9363,7 @@ var field2 = {
   confirmEnd: null
 };
 var mapUrls = {};
-var esc6 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var KIND_LABEL2 = { an: "괴이", in: "사건", ms: "특수" };
 var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "랜드마크" };
 function resetField(all = false) {
@@ -9223,8 +9442,8 @@ function mapImage(ctx, code, env2) {
   return hit === "loading" ? null : hit;
 }
 function pin(action, value, label, x, y, cls, count = 0) {
-  return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc6(value)}" aria-label="${esc6(label)}">
-    <span class="gx-dot"></span><span class="gx-pname">${esc6(label)}${count ? `<b>${count}</b>` : ""}</span></button>`;
+  return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc7(value)}" aria-label="${esc7(label)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc7(label)}${count ? `<b>${count}</b>` : ""}</span></button>`;
 }
 function hotClass(list5) {
   if (!list5.length) return "";
@@ -9262,8 +9481,8 @@ function mapCanvas(ctx, x, events, env2) {
       pins += pin("map-place", key, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
     }
   }
-  const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc6(regionName(c))}</option>`).join("");
-  const img = url ? `<img class="gx-mapimg" src="${esc6(url)}" alt="${esc6(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
+  const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc7(regionName(c))}</option>`).join("");
+  const img = url ? `<img class="gx-mapimg" src="${esc7(url)}" alt="${esc7(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
   return `<div class="gx-mapbar">
       ${code !== "01" ? '<button class="gx-mini" data-action="map-region" data-value="01">← 전국</button>' : ""}
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
@@ -9274,20 +9493,20 @@ function eventRow(e, x) {
   const selected = field2.target?.type === "event" && field2.target.key === e.key;
   const confirm = field2.confirmEnd === e.key;
   const facts = [
-    e.grade ? `<span class="gx-grade g${esc6(e.grade)}">${esc6(e.grade)}</span>` : "",
-    e.kind !== "in" ? `<span class="gx-loc">${e.kind === "ms" ? "방문자" : "투입"} ${esc6(codesToNames(e.people || "없음", x.catalog, x.faction))}</span>` : ""
+    e.grade ? `<span class="gx-grade g${esc7(e.grade)}">${esc7(e.grade)}</span>` : "",
+    e.kind !== "in" ? `<span class="gx-loc">${e.kind === "ms" ? "방문자" : "투입"} ${esc7(codesToNames(e.people || "없음", x.catalog, x.faction))}</span>` : ""
   ].join("");
   return `<li class="gx-ev${selected ? " sel" : ""}">
-    <button class="gx-evmain" data-action="pick-event" data-value="${esc6(e.key)}">
-      <span class="gx-row"><span class="gx-kind k-${e.kind}">${KIND_LABEL2[e.kind]}</span><b>${esc6(e.name)}</b></span>
-      <span class="gx-loc">${esc6(locName(e.loc))}</span>
+    <button class="gx-evmain" data-action="pick-event" data-value="${esc7(e.key)}">
+      <span class="gx-row"><span class="gx-kind k-${e.kind}">${KIND_LABEL2[e.kind]}</span><b>${esc7(e.name)}</b></span>
+      <span class="gx-loc">${esc7(locName(e.loc))}</span>
       ${facts ? `<span class="gx-row">${facts}</span>` : ""}
-      ${e.report ? `<span class="gx-report">${esc6(e.report)}</span>` : ""}
+      ${e.report ? `<span class="gx-report">${esc7(e.report)}</span>` : ""}
     </button>
     <div class="gx-evact">
-      <button class="gx-mini" data-action="show-event" data-value="${esc6(e.key)}" aria-label="${esc6(e.name)} 지역 지도">지도</button>
-      ${e.name !== "이름 미확인" ? `<button class="gx-mini" data-action="wiki-goto" data-value="${esc6(e.name)}">위키</button>` : ""}
-      <button class="gx-mini${confirm ? " danger" : ""}" data-action="end-event" data-value="${esc6(e.key)}">${confirm ? "정말 종료" : "상황 종료"}</button>
+      <button class="gx-mini" data-action="show-event" data-value="${esc7(e.key)}" aria-label="${esc7(e.name)} 지역 지도">지도</button>
+      ${e.name !== "이름 미확인" ? `<button class="gx-mini" data-action="wiki-goto" data-value="${esc7(e.name)}">위키</button>` : ""}
+      <button class="gx-mini${confirm ? " danger" : ""}" data-action="end-event" data-value="${esc7(e.key)}">${confirm ? "정말 종료" : "상황 종료"}</button>
     </div>
   </li>`;
 }
@@ -9298,9 +9517,9 @@ function situations(x, events) {
   const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
   let head = "";
   if (field2.place) {
-    head = `<div class="gx-ctxbar"><b>${esc6(placeName(field2.place, x.catalog))}</b>
+    head = `<div class="gx-ctxbar"><b>${esc7(placeName(field2.place, x.catalog))}</b>
       <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
-      <button class="gx-wide${sameTarget(field2.target, field2.place) ? " on" : ""}" data-action="pick-place" data-value="${esc6(field2.place)}">이 장소 자체를 목표로</button>`;
+      <button class="gx-wide${sameTarget(field2.target, field2.place) ? " on" : ""}" data-action="pick-place" data-value="${esc7(field2.place)}">이 장소 자체를 목표로</button>`;
   }
   const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
   return `<div class="gx-chips">${chips}</div>${head}
@@ -9320,25 +9539,25 @@ function teamPanel(x, goal, action, label, busy2) {
     const full = !on && used >= TEAM_MAX;
     const st = x.world.agents[p.id]?.st ?? "미정";
     const sit = x.world.agents[p.id]?.situation ?? "";
-    return `<button class="gx-acard pick${on ? " on" : ""}" data-action="team-toggle" data-value="${esc6(p.id)}" ${lock || full ? "disabled" : ""} aria-pressed="${on}"
-        title="${esc6(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
+    return `<button class="gx-acard pick${on ? " on" : ""}" data-action="team-toggle" data-value="${esc7(p.id)}" ${lock || full ? "disabled" : ""} aria-pressed="${on}"
+        title="${esc7(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
   }).join("");
   const ready = !!goal && validTeam(field2.team.length, field2.support) && !busy2;
   return `<section class="gx-team">
-    <div class="gx-goal"><span>목표</span><b>${goal ? esc6(goal) : "목표를 골라 주세요"}</b><em>${used + 1} / 4</em></div>
+    <div class="gx-goal"><span>목표</span><b>${goal ? esc7(goal) : "목표를 골라 주세요"}</b><em>${used + 1} / 4</em></div>
     ${roster.length ? `<div class="gx-acards pick">${chips}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${x.supportOn ? `<div class="gx-support"><span>지원 인원</span>
       <button class="gx-step" data-action="support" data-value="-1" ${field2.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
       <b>${field2.support}</b>
       <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
     </div>` : ""}
-    <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "놓는 중…" : esc6(label)}</button>
+    <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "놓는 중…" : esc7(label)}</button>
     <p class="gx-muted">누르면 채팅에 지시문 카드가 놓여요. 하고 싶은 말을 덧붙이거나 그대로 전송하세요.</p>
   </section>`;
 }
 function mapTab(ctx, env2, notice2, busy2) {
   const x = readCtx(ctx);
-  if (typeof x === "string") return `<div class="gx-empty">${esc6(x)}</div>`;
+  if (typeof x === "string") return `<div class="gx-empty">${esc7(x)}</div>`;
   const events = x.on ? activeEvents(x.world) : [];
   const t = field2.target;
   if (t?.type === "event" && !events.some((e) => e.key === t.key)) field2.target = null;
@@ -9346,7 +9565,7 @@ function mapTab(ctx, env2, notice2, busy2) {
   return `<main class="gx-body gx-field">
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env2)}</div>
     <div class="gx-sidecol">
-      ${notice2 ? `<div class="gx-err" role="alert">${esc6(notice2)}</div>` : ""}
+      ${notice2 ? `<div class="gx-err" role="alert">${esc7(notice2)}</div>` : ""}
       <section class="gx-sec"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section>
       ${teamPanel(x, goal, "depart", "출발", busy2)}
     </div>
@@ -9378,27 +9597,27 @@ function missionList(ctx, opening = false) {
   const q = field2.query.trim().toLowerCase();
   const rows = missionCatalog(x.catalog, field2.mkind).filter((r) => !q || `${r.name} ${r.sub}`.toLowerCase().includes(q));
   if (!rows.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-  return `<ul class="gx-list gx-mlist">${rows.map((r) => `<li class="gx-ev${field2.mname === r.name ? " sel" : ""}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc6(r.name)}">
-      <span class="gx-row"><b>${esc6(r.name)}</b>${missionStatus(x, field2.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc6(r.sub)}</span>` : ""}</button>
-      ${opening ? "" : `<div class="gx-evact"><button class="gx-mini" data-action="wiki-goto" data-value="${esc6(r.name)}">위키</button></div>`}</li>`).join("")}</ul>`;
+  return `<ul class="gx-list gx-mlist">${rows.map((r) => `<li class="gx-ev${field2.mname === r.name ? " sel" : ""}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc7(r.name)}">
+      <span class="gx-row"><b>${esc7(r.name)}</b>${missionStatus(x, field2.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc7(r.sub)}</span>` : ""}</button>
+      ${opening ? "" : `<div class="gx-evact"><button class="gx-mini" data-action="wiki-goto" data-value="${esc7(r.name)}">위키</button></div>`}</li>`).join("")}</ul>`;
 }
 function missionTab(ctx, opening, notice2, busy2) {
   const x = readCtx(ctx);
-  if (typeof x === "string") return `<div class="gx-empty">${esc6(x)}</div>`;
+  if (typeof x === "string") return `<div class="gx-empty">${esc7(x)}</div>`;
   const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-seg${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
   const p = x.world.pending;
-  const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc6(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
+  const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc7(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
   const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르면 첫 장면 지시문이 채팅에 놓여요.</p>' : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
   return `<main class="gx-body gx-field gx-mission">
     <div class="gx-mapcol">
       ${intro}
       <div class="gx-segs">${segs}</div>
-      <input class="gx-search" type="search" placeholder="${MISSION_LABEL[field2.mkind]} 검색" value="${esc6(field2.query)}" data-input="mission-query" aria-label="검색">
+      <input class="gx-search" type="search" placeholder="${MISSION_LABEL[field2.mkind]} 검색" value="${esc7(field2.query)}" data-input="mission-query" aria-label="검색">
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
-      ${notice2 ? `<div class="gx-err" role="alert">${esc6(notice2)}</div>` : ""}
-      ${x.world.notice && x.on ? `<div class="gx-hint">${esc6(x.world.notice)}</div>` : ""}
+      ${notice2 ? `<div class="gx-err" role="alert">${esc7(notice2)}</div>` : ""}
+      ${x.world.notice && x.on ? `<div class="gx-hint">${esc7(x.world.notice)}</div>` : ""}
       ${pend}
       ${teamPanel(x, field2.mname, "mission-send", opening ? "첫 장면 요청" : "요청", busy2)}
     </div>
@@ -9646,7 +9865,7 @@ var dirUi = {
 function resetDirectory() {
   Object.assign(dirUi, { kind: "anomaly", q: "", open: "", draft: null, base: "", from: null, busy: false, notice: "", done: "", adding: false, addQ: "" });
 }
-var esc7 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc8 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var snapshot = (d) => JSON.stringify(directoryData(d));
 function draftOf(ctx) {
   const lore = ctx.char.globalLore ?? [];
@@ -9670,8 +9889,8 @@ function matches2(r, q) {
   const a = r;
   return [a.lore, a.label, a.name, a.english, a.rank, a.department, ...a.aliases ?? []].some((t) => t && t.toLowerCase().includes(q));
 }
-var input = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><input data-input="dir" data-key="${esc7(key)}" value="${esc7(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
-var chip = (action, value, label, on) => `<button class="gx-chip${on ? " on" : ""}" data-action="${action}" data-value="${esc7(value)}" aria-pressed="${on}">${esc7(label)}</button>`;
+var input = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><input data-input="dir" data-key="${esc8(key)}" value="${esc8(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
+var chip = (action, value, label, on) => `<button class="gx-chip${on ? " on" : ""}" data-action="${action}" data-value="${esc8(value)}" aria-pressed="${on}">${esc8(label)}</button>`;
 var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o.spec.code);
 var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
 function namesOf(d, lore) {
@@ -9685,7 +9904,7 @@ function tabsOf(d, lore) {
   for (const o of draftExtras(d)) tabs2.push({ id: extraTabId(o.spec.code), name: tabName(o), visibleFor: [o.spec.code] });
   return tabs2;
 }
-var area = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><textarea data-input="dir" data-key="${esc7(key)}" rows="3">${esc7(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
+var area = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><textarea data-input="dir" data-key="${esc8(key)}" rows="3">${esc8(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
 var SEP = /^\s*-{2,}\s*(.*?)\s*-{2,}\s*$/;
 var sourceCache = /* @__PURE__ */ new WeakMap();
 function loreSources(lore) {
@@ -9717,20 +9936,20 @@ function directoryExtList(ctx) {
   const q = dirUi.addQ.trim().toLowerCase();
   const list5 = [...loreSources(ctx.char.globalLore)].filter(([name, src]) => src && !have.has(name) && !/설정/.test(src) && src.replace(/[^\p{L}\p{N}]/gu, "") !== own && (!q || name.toLowerCase().includes(q) || src.toLowerCase().includes(q))).slice(0, 60);
   if (!list5.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
-  return list5.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc7(name)}"><b>${esc7(name)}</b><small>${esc7(src)}</small><span>＋ 후보로</span></button>`).join("");
+  return list5.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc8(name)}"><b>${esc8(name)}</b><small>${esc8(src)}</small><span>＋ 후보로</span></button>`).join("");
 }
 function placePanel(p) {
   const k = (f) => `${f}|${p.lore}`;
   return `<div class="dir-panel">
     <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc7(`preset|1|${p.lore}`)}">ON</button>
-      <button class="gx-seg${!p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc7(`preset|0|${p.lore}`)}">OFF</button></div></div>
+      <button class="gx-seg${p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc8(`preset|1|${p.lore}`)}">ON</button>
+      <button class="gx-seg${!p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc8(`preset|0|${p.lore}`)}">OFF</button></div></div>
     <p class="gx-muted">OFF여도 직접 고르거나 대화에 나오면 상황판에 기록돼요.</p>
     ${input(k("label"), p.label, "표시 이름", "상황판과 지도에 보이는 이름")}
     ${input(k("english"), p.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
     ${input(k("aliases"), p.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <p class="gx-muted">로어북: ${esc7(p.lore)}${p.inFolder ? "" : " (폴더 밖)"}</p>
-    ${p.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc7(p.lore)}">후보 목록에서 빼기</button>`}
+    <p class="gx-muted">로어북: ${esc8(p.lore)}${p.inFolder ? "" : " (폴더 밖)"}</p>
+    ${p.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc8(p.lore)}">후보 목록에서 빼기</button>`}
   </div>`;
 }
 function agentPanel(a, ctx, d) {
@@ -9750,13 +9969,13 @@ function agentPanel(a, ctx, d) {
     </div>
     ${input(k("english"), a.english, "영문명", "사진 에셋 이름과 같아야 사진이 나와요")}
     ${input(k("aliases"), a.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <p class="gx-muted">로어북: ${esc7(a.lore)} · ID ${esc7(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
+    <p class="gx-muted">로어북: ${esc8(a.lore)} · ID ${esc8(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
   </div>`;
 }
 function factionBlock(o, ctx) {
   const lore = ctx.char.globalLore ?? [];
   const k = (f) => `org:${f}|${o.name}`;
-  const seg5 = (action, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc7(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc7(`0|${o.name}`)}">${b}</button></div>`;
+  const seg5 = (action, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc8(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc8(`0|${o.name}`)}">${b}</button></div>`;
   const start2 = `${input(k("title"), o.spec.title ?? "", "시작 화면 이름", o.faction ? "비우면 원래 이름" : "비우면 조직 이름")}
     ${area(k("blurb"), o.spec.blurb ?? "", "시작 화면 설명")}
     ${input(k("photo"), o.spec.photo ?? "", "사진 에셋 이름", o.faction ? "비우면 원래 사진(f01~f05)" : "카드 에셋 이름. 비우면 사진 없이")}`;
@@ -9765,17 +9984,17 @@ function factionBlock(o, ctx) {
   }
   const on = !!o.spec.playable;
   const ready = placeholdersReady(lore);
-  const head = `<div class="dir-line"><span>플레이 세력${on && o.spec.code ? ` <b class="dir-code">${esc7(o.spec.code)}</b>` : ""}</span>${seg5("dir-fac-play", on, "ON", "OFF")}</div>`;
+  const head = `<div class="dir-line"><span>플레이 세력${on && o.spec.code ? ` <b class="dir-code">${esc8(o.spec.code)}</b>` : ""}</span>${seg5("dir-fac-play", on, "ON", "OFF")}</div>`;
   if (!on) return `<div class="dir-fac">${head}<p class="gx-muted">켜면 이 조직으로 시작할 수 있어요. 첫 장면은 직접 입력과 커스텀 임무로 시작해요.</p></div>`;
   const patch = ready ? "" : `<div class="gx-hint">이 카드의 🏷️Tag 로어북에 새 세력 자리가 없어서 아직 시작 화면에 안 보여요. <button class="gx-mini" data-action="dir-fac-patch">로어북에 자리 넣기</button></div>`;
   return `<div class="dir-fac">${head}${patch}
     <div class="dir-line"><span>유형</span><div class="dir-chips">${FACTION_TYPES.map((x) => chip("dir-fac-type", `${x.id}|${o.name}`, x.label, (o.spec.type ?? "org") === x.id)).join("")}</div></div>
-    <p class="gx-muted">${esc7(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
+    <p class="gx-muted">${esc8(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
     ${start2}
     ${input(k("gm_name"), o.spec.gm_name ?? "", "모델용 영어 이름", "소속 변경 태그 목록과 세력 설명 제목에 써요. 비우면 조직 이름")}
     ${area(k("gm_desc"), o.spec.gm_desc ?? "", "모델용 세력 설명", "📜Faction 로어북 끝에 붙어요. 영어로 적으면 다른 세력 설명과 어울려요")}
     ${input(k("seed"), (o.spec.seed ?? [o.name]).join(", "), "시작 때 함께 넣을 로어북", "쉼표로 나눠 적어요. 첫 응답에 이 로어북들이 꼭 들어가요")}
-    ${input(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc7(tabName(o))}」`)}
+    ${input(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc8(tabName(o))}」`)}
   </div>`;
 }
 function orgPanel(o, ctx, d) {
@@ -9788,10 +10007,10 @@ function orgPanel(o, ctx, d) {
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip("dir-org-toggle", `rosterFor|${f}|${o.name}`, names3[f], o.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
     <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? '<p class="gx-muted">기본 플레이 세력이라 조직 이름은 Faction display 로어북을 따라요.</p>' : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc7(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
+    ${o.faction ? '<p class="gx-muted">기본 플레이 세력이라 조직 이름은 Faction display 로어북을 따라요.</p>' : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc8(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc7(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
-    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc7(m.name)).join(", ")}</p>` : ""}
+      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc8(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
+    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc8(m.name)).join(", ")}</p>` : ""}
   </div>`;
 }
 function orgRow(o, ctx, d, names3) {
@@ -9800,17 +10019,17 @@ function orgRow(o, ctx, d, names3) {
   const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names3[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
   const play = o.faction || o.spec.playable && o.spec.code;
   return `<div class="dir-row${open2 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc7(o.name)}" aria-expanded="${open2}">
-      <span class="dir-name"><b>${esc7(o.name)}</b><small>${esc7(sub)}</small></span>
-      ${play ? `<span class="gx-badge live">플레이 ${esc7(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n}명</span>
+    <button class="dir-head" data-action="dir-open" data-value="${esc8(o.name)}" aria-expanded="${open2}">
+      <span class="dir-name"><b>${esc8(o.name)}</b><small>${esc8(sub)}</small></span>
+      ${play ? `<span class="gx-badge live">플레이 ${esc8(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n}명</span>
     </button>${open2 ? orgPanel(o, ctx, d) : ""}</div>`;
 }
 function placeRow(p, src = "") {
   const open2 = dirUi.open === p.lore;
   return `<div class="dir-row${open2 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc7(p.lore)}" aria-expanded="${open2}">
-      <span class="dir-name"><b>${esc7(p.label)}</b><small>${esc7(p.english || "영문명 없음")}</small></span>
-      ${p.inFolder ? "" : `<span class="gx-badge wait">${esc7(src || "폴더 밖")}</span>`}
+    <button class="dir-head" data-action="dir-open" data-value="${esc8(p.lore)}" aria-expanded="${open2}">
+      <span class="dir-name"><b>${esc8(p.label)}</b><small>${esc8(p.english || "영문명 없음")}</small></span>
+      ${p.inFolder ? "" : `<span class="gx-badge wait">${esc8(src || "폴더 밖")}</span>`}
       <span class="gx-badge${p.preset ? " live" : ""}">${p.preset ? "발생 후보" : "숨김"}</span>
     </button>${open2 ? placePanel(p) : ""}</div>`;
 }
@@ -9818,9 +10037,9 @@ function agentRow(a, ctx, d, names3) {
   const open2 = dirUi.open === a.lore;
   const sub = [a.affiliation ? orgName(d, names3, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
   return `<div class="dir-row${open2 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc7(a.lore)}" aria-expanded="${open2}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc8(a.lore)}" aria-expanded="${open2}">
       ${avatar(ctx.char, a.english, a.name)}
-      <span class="dir-name"><b>${esc7(a.name)}</b><small>${esc7(sub || "소속 미정")}</small></span>
+      <span class="dir-name"><b>${esc8(a.name)}</b><small>${esc8(sub || "소속 미정")}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? "" : '<span class="gx-badge">목록 숨김</span>'}
     </button>${open2 ? agentPanel(a, ctx, d) : ""}</div>`;
 }
@@ -9840,7 +10059,7 @@ function directoryList(ctx) {
     const inside2 = rows2.filter((r) => r.inFolder);
     const outside = rows2.filter((r) => !r.inFolder);
     const folder = dirUi.kind === "anomaly" ? "🚧괴이" : "🎁파밍";
-    const add = dirUi.adding ? `<div class="dir-ext"><div class="dir-ext-head"><input class="gx-search" data-input="dir-ext-q" value="${esc7(dirUi.addQ)}" placeholder="로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><button class="gx-mini" data-action="dir-ext-close">닫기</button></div>
+    const add = dirUi.adding ? `<div class="dir-ext"><div class="dir-ext-head"><input class="gx-search" data-input="dir-ext-q" value="${esc8(dirUi.addQ)}" placeholder="로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><button class="gx-mini" data-action="dir-ext-close">닫기</button></div>
           <div class="dir-ext-list">${directoryExtList(ctx)}</div></div>` : `<button class="dir-ext-open" data-action="dir-ext-open">＋ 다른 폴더에서 후보 추가</button>`;
     return `${inside2.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside2.length}</small></h3>${inside2.map((r) => placeRow(r)).join("")}` : ""}
       ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, src.get(r.lore))).join("")}` : ""}
@@ -9851,12 +10070,12 @@ function directoryList(ctx) {
   const key = (a) => a.affiliation ? orgName(d, names3, a.affiliation) : "";
   const order = ["", ...d.orgs.map((o) => o.name)];
   const groups = [...new Set(rows.map(key))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
-  return groups.map((g) => `<h3 class="dir-group${g ? "" : " warn"}">${esc7(g || "소속 미정")}<small>${rows.filter((r) => key(r) === g).length}</small></h3>${rows.filter((r) => key(r) === g).map((r) => agentRow(r, ctx, d, names3)).join("")}`).join("");
+  return groups.map((g) => `<h3 class="dir-group${g ? "" : " warn"}">${esc8(g || "소속 미정")}<small>${rows.filter((r) => key(r) === g).length}</small></h3>${rows.filter((r) => key(r) === g).map((r) => agentRow(r, ctx, d, names3)).join("")}`).join("");
 }
 function directoryBar() {
   const changed = dirty();
   const status = dirUi.busy ? "저장하는 중…" : changed ? "고친 내용이 있어요" : dirUi.done || "카드에 저장된 값이에요";
-  return `<span class="dir-status${changed ? " on" : ""}">${esc7(status)}</span>
+  return `<span class="dir-status${changed ? " on" : ""}">${esc8(status)}</span>
     <button class="gx-mini" data-action="dir-reset" ${!changed || dirUi.busy ? "disabled" : ""}>되돌리기</button>
     <button class="gx-start dir-save" data-action="dir-save" ${!changed || dirUi.busy ? "disabled" : ""}>카드에 저장</button>`;
 }
@@ -9874,10 +10093,10 @@ function directoryView(ctx) {
       <p class="gx-muted">여기서 고친 값은 카드 로어북 「괴이봇 명부」에 저장돼서 카드를 공유하면 같이 가요. 이 카드의 모든 채팅에 바로 적용돼요.</p>
       ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
     </div>
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc7(dirUi.notice)}</div>` : ""}
+    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc8(dirUi.notice)}</div>` : ""}
     <div class="gx-segs dir-kinds">${kinds.map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? " on" : ""}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`).join("")}</div>
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
-    <input class="dir-search" data-input="dir-q" value="${esc7(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">
+    <input class="dir-search" data-input="dir-q" value="${esc8(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">
     <div class="dir-list">${directoryList(ctx)}</div>
     <div class="dir-bar">${directoryBar()}</div>
   </div>`;
@@ -10119,7 +10338,7 @@ function resetSettings() {
   settingsUi.notice = "";
   settingsUi.scope = "chat";
 }
-var esc8 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc9 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function seg4(action, cur, items, disabled = false) {
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
 }
@@ -10141,8 +10360,8 @@ function current2(ctx, scope) {
   };
 }
 function stepper(action, key, shown2, canDown, canUp, label, busy2) {
-  return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${!canDown || busy2 ? "disabled" : ""} aria-label="${esc8(label)} 줄이기">−</button>
-    <b>${esc8(shown2)}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${!canUp || busy2 ? "disabled" : ""} aria-label="${esc8(label)} 늘리기">+</button></div>`;
+  return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key}:-" ${!canDown || busy2 ? "disabled" : ""} aria-label="${esc9(label)} 줄이기">−</button>
+    <b>${esc9(shown2)}</b><button class="gx-step" data-action="${action}" data-value="${key}:+" ${!canUp || busy2 ? "disabled" : ""} aria-label="${esc9(label)} 늘리기">+</button></div>`;
 }
 function worldStep(key) {
   if (key.endsWith("_p") || key === "landmark_share") return 10;
@@ -10153,7 +10372,7 @@ function worldRow(w, key, label, unit, busy2) {
   const f = WORLD_SPEC.find((x) => x.key === key);
   const v = w[key];
   const max = f.max ?? 99;
-  return field3(esc8(label), stepper("set-world", key, `${v}${unit}`, v > 0, v < max, label, busy2), "");
+  return field3(esc9(label), stepper("set-world", key, `${v}${unit}`, v > 0, v < max, label, busy2), "");
 }
 function worldKind(w, k, name, busy2) {
   const expire2 = w[`${k}_expire`] === 1;
@@ -10185,7 +10404,7 @@ function settingsTab(ctx, scope = "chat", canChat = true) {
   const note = String(ctx.chat.scriptstate?.[ASSET_NOTE] ?? "");
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
-    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc8(settingsUi.notice)}</div>` : ""}
+    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc9(settingsUi.notice)}</div>` : ""}
     ${group2("화면", field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy2), "채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음)."))}
     ${group2("상황판", [
     field3("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
@@ -10206,7 +10425,8 @@ function settingsTab(ctx, scope = "chat", canChat = true) {
     s5.assetOn ? field3("출력 모델", seg4("set-asset-model", s5.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy2), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
     s5.assetOn && s5.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s5.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy2), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
   ].join(""))}
-    ${scope === "chat" && s5.assetOn && s5.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc8(note)}</p>` : ""}
+    ${scope === "chat" && s5.assetOn && s5.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc9(note)}</p>` : ""}
+    ${updateGroup(ctx)}
     ${canChat ? '<p class="gx-muted">괴담넷·괴담톡·위키 설정은 각 탭 안에 있어요.</p>' : ""}
   </main>`;
 }
@@ -10406,7 +10626,7 @@ var phoneEnv = {
     await refresh();
   }
 };
-var esc9 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc10 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function ensureRoot() {
   if (root) return root;
   setImageRedraw(() => view.kind === "picker" ? renderPicker() : render());
@@ -10581,12 +10801,13 @@ async function openApp(opts = {}) {
   shown = true;
   await risuai.showContainer("fullscreen");
   await refresh();
+  void checkLatest(settingsEnv);
 }
 async function refresh() {
   try {
     const ctx = await loadContext();
     if (!ctx) {
-      view = { kind: "error", message: "선택된 채팅이 없어요. 괴이봇 Lite 채팅을 연 뒤 다시 눌러 주세요." };
+      view = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
     } else {
       const manifest = readManifest(ctx.char.globalLore);
       const phase = chatPhase(ctx.chat);
@@ -10648,6 +10869,7 @@ async function handle(action, value) {
     if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope);
     return;
   }
+  if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
   if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env, view.kind === "opening")) return;
   switch (action) {
     case "close":
@@ -10769,7 +10991,7 @@ var TAB_TITLE = {
 };
 function header(sub, extra = "") {
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${BRAND.name}</b><small>${esc9(sub)}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${BRAND.name}</b><small>${esc10(sub)}</small></div></div>
     <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -10868,11 +11090,11 @@ function body3() {
     case "loading":
       return `${header("불러오는 중")}<div class="gx-empty">채팅 정보를 읽는 중이에요…</div>`;
     case "error":
-      return `${header("오류")}<div class="gx-empty">${esc9(view.message)}</div>`;
+      return `${header("오류")}<div class="gx-empty">${esc10(view.message)}</div>`;
     case "not-lite":
       return `${header("연결 안 됨")}<div class="gx-empty">
-        <p><b>${esc9(view.name || "이 캐릭터")}</b>는 괴이봇 Lite 카드가 아니에요.</p>
-        <p>플러그인은 경량 카드(괴이봇_Lite.charx)에서만 동작해요. 원본 카드는 기존 Lua로 그대로 돌아가요.</p>
+        <p><b>${esc10(view.name || "이 캐릭터")}</b>는 ${BRAND.name} 카드가 아니에요.</p>
+        <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case "started":
       return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${subnav()}${startedBody(view.ctx)}</div>`;
@@ -10892,26 +11114,26 @@ function picker() {
     (x) => {
       const img = view.kind === "picker" ? imageUrl(view.ctx.char, x.photo) : null;
       return `<button class="gx-fac${x.code === draft.faction ? " on" : ""}${img ? " has-img" : ""}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
-        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc9(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc9(x.name)}</b><span>${esc9(x.blurb)}</span></span></button>`;
+        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc10(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc10(x.name)}</b><span>${esc10(x.blurb)}</span></span></button>`;
     }
   ).join("");
   const langs = SCENARIOS.languages.map(
-    (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc9(l.label)}</button>`
+    (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc10(l.label)}</button>`
   ).join("");
   const scenarios = f ? f.scenarios.map((s5) => {
     return `<button class="gx-sc${s5.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s5.fm}" aria-pressed="${s5.fm === draft.fm}">
-            <b>${String(s5.fm).padStart(2, "0")}</b><span>${esc9(s5.label)}</span></button>`;
+            <b>${String(s5.fm).padStart(2, "0")}</b><span>${esc10(s5.label)}</span></button>`;
   }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
   const hint = sc?.kind === "direct" ? '<div class="gx-hint">시작을 누른 뒤 채팅 입력창에 시작할 상황을 적어 보내세요.</div>' : sc?.kind === "preset" ? '<div class="gx-hint">시작을 누르면 이어서 목표(괴이·특수·랜드마크)와 동행을 골라요.</div>' : "";
   const ready = !!(f && sc);
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
-    <section><h2><i>2</i>첫 장면${f ? `<small class="gx-h2-sub">${esc9(f.name)} · ${f.scenarios.length}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>2</i>첫 장면${f ? `<small class="gx-h2-sub">${esc10(f.name)} · ${f.scenarios.length}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
     <section><h2><i>3</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
-    ${f && sc ? `<div class="gx-foot-sum">${esc9(f.name)} · ${String(sc.fm).padStart(2, "0")} ${esc9(sc.label)}</div>` : ""}
-    ${notice ? `<div class="gx-err" role="alert">${esc9(notice)}</div>` : ""}
+    ${f && sc ? `<div class="gx-foot-sum">${esc10(f.name)} · ${String(sc.fm).padStart(2, "0")} ${esc10(sc.label)}</div>` : ""}
+    ${notice ? `<div class="gx-err" role="alert">${esc10(notice)}</div>` : ""}
     <button class="gx-start" data-action="start" ${ready && !busy ? "" : "disabled"}>${busy ? "시작하는 중…" : "출 발"}</button>
   </footer>`;
 }
@@ -10943,11 +11165,11 @@ function brand(ctx) {
   const time2 = (w ? clock(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
   const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
   const row2 = (label, value) => value ? `<li><span>${label}</span><b>${value}</b></li>` : "";
-  const rows = row2("시각", time2) + row2("위치", esc9(st?.place ?? "")) + row2("날씨", esc9(weather)) + row2("목표", esc9(st?.target ?? ""));
+  const rows = row2("시각", time2) + row2("위치", esc10(st?.place ?? "")) + row2("날씨", esc10(weather)) + row2("목표", esc10(st?.target ?? ""));
   return `<div class="gx-nav-brand">
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
-      <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc9(img)}')"></span>` : ""}
-        <span class="gx-op-txt"><small>소속</small><b>${esc9(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b></span></div>
+      <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc10(img)}')"></span>` : ""}
+        <span class="gx-op-txt"><small>소속</small><b>${esc10(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b></span></div>
       ${rows ? `<ul class="gx-stat">${rows}</ul>` : ""}
     </div>`;
 }
@@ -10977,51 +11199,51 @@ function board(ctx) {
   if (!worldOn(ctx.chat)) {
     return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
-      ${notice ? `<div class="gx-err" role="alert">${esc9(notice)}</div>` : ""}
+      ${notice ? `<div class="gx-err" role="alert">${esc10(notice)}</div>` : ""}
       <button class="gx-start" data-action="world-on" ${busy ? "disabled" : ""}>${busy ? "켜는 중…" : "상황판 켜기"}</button></div>`;
   }
   let catalog;
   try {
     catalog = parseCatalog(ctx.char.globalLore);
   } catch (error) {
-    return `<div class="gx-empty">${esc9(error instanceof Error ? error.message : String(error))}</div>`;
+    return `<div class="gx-empty">${esc10(error instanceof Error ? error.message : String(error))}</div>`;
   }
   const w = readWorld(ctx.chat);
   const faction = String(ctx.chat.scriptstate?.["$st_faction"] ?? "");
-  const names3 = (s5) => esc9(codesToNames(s5, catalog, faction));
+  const names3 = (s5) => esc10(codesToNames(s5, catalog, faction));
   const pending = '<span class="gx-badge wait">발생 예정</span>';
-  const section2 = (id, title, count, rows, empty) => `<section class="gx-sec" id="gx-sec-${id}"><h2>${title}<small>${count}</small></h2>${count ? `<ul class="gx-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
+  const section3 = (id, title, count, rows, empty) => `<section class="gx-sec" id="gx-sec-${id}"><h2>${title}<small>${count}</small></h2>${count ? `<ul class="gx-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   const roster = rosterFor(w, catalog, faction, worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit);
   const byName = new Map(roster.map((p) => [p.name, p]));
   const people = (codes, label) => {
     const list5 = codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim()).filter((n) => n && n !== "없음");
-    const chips = list5.map((n) => byName.has(n) ? `<span class="gx-pchip">${avatar(ctx.char, byName.get(n).english, n, "xs")}${esc9(n)}</span>` : `<span class="gx-badge">${esc9(n)}</span>`).join("");
+    const chips = list5.map((n) => byName.has(n) ? `<span class="gx-pchip">${avatar(ctx.char, byName.get(n).english, n, "xs")}${esc10(n)}</span>` : `<span class="gx-badge">${esc10(n)}</span>`).join("");
     return `<p class="gx-people"><span class="gx-people-l">${label}</span>${chips || '<span class="gx-muted">없음</span>'}</p>`;
   };
   const card2 = (kind, mark, name, loc, meta, sub) => `<li class="gx-ev-card"><span class="gx-gmark ${kind}">${mark}</span><span class="gx-ev-name">${name}</span><span>${meta}</span>
       <span class="gx-loc gx-ev-sub">${loc}</span>${sub ? `<div class="gx-ev-sub">${sub}</div>` : ""}</li>`;
   const an = w.an.map((e) => {
     const wait = e.state === "발생대기";
-    const meta = wait ? pending : `${e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc9(e.state)}</span>`}`;
+    const meta = wait ? pending : `${e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc10(e.state)}</span>`}`;
     const since = elapsed(w, e.since);
     const sub = wait ? "" : people(e.deploy, "배치");
-    return card2(wait ? "an" : "an", e.grade ? esc9(e.grade) : "?", esc9(e.name || "이름 미확인"), `${esc9(locName(e.loc))}${since ? ` · ${since}` : ""}`, meta, sub);
+    return card2(wait ? "an" : "an", e.grade ? esc10(e.grade) : "?", esc10(e.name || "이름 미확인"), `${esc10(locName(e.loc))}${since ? ` · ${since}` : ""}`, meta, sub);
   }).join("");
   const inc = w.inc.map((e) => {
     const wait = e.state === "발생대기";
     const since = elapsed(w, e.since);
-    return card2("in", "!", esc9(e.name || "이름 미확인"), `${esc9(locName(e.loc))}${since ? ` · ${since}` : ""}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<p>${esc9(e.situation)}</p>` : "");
+    return card2("in", "!", esc10(e.name || "이름 미확인"), `${esc10(locName(e.loc))}${since ? ` · ${since}` : ""}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<p>${esc10(e.situation)}</p>` : "");
   }).join("");
   const ms = w.ms.map((e) => {
     const wait = e.state === "발생대기";
-    return card2("ms", "◇", esc9(e.name), esc9(locName(e.loc)), wait ? pending : '<span class="gx-badge live">출현</span>', wait ? "" : people(e.visitors, "방문자"));
+    return card2("ms", "◇", esc10(e.name), esc10(locName(e.loc)), wait ? pending : '<span class="gx-badge live">출현</span>', wait ? "" : people(e.visitors, "방문자"));
   }).join("");
   const ag = roster.map((p) => {
     const rec = w.agents[p.id];
     const st = rec?.st ?? "미정";
-    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc9(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "")}</li>`;
+    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc10(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "")}</li>`;
   }).join("");
-  const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc9(w.promoted.join(", "))}</p>` : "";
+  const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc10(w.promoted.join(", "))}</p>` : "";
   const t = threat(w);
   const live = (list5) => list5.filter((e) => e.state !== "발생대기").length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === "작전투입");
@@ -11029,10 +11251,10 @@ function board(ctx) {
   const ops = w.an.filter((e) => e.state !== "발생대기").map((e) => {
     const who = codesToNames(e.deploy, catalog, faction).split(/\s*,\s*/).map((n) => n.trim()).filter((n) => byName.has(n));
     who.forEach((n) => placed.add(n));
-    return who.length ? `<li><span class="gx-ops-where"><i class="gx-gmark an">${esc9(e.grade || "?")}</i><b>${esc9(e.name)}</b><small>${esc9(locName(e.loc))}</small></span><span class="gx-ops-who">${who.map((n) => `<span class="gx-pchip">${avatar(ctx.char, byName.get(n).english, n, "xs")}${esc9(n)}</span>`).join("")}</span></li>` : "";
+    return who.length ? `<li><span class="gx-ops-where"><i class="gx-gmark an">${esc10(e.grade || "?")}</i><b>${esc10(e.name)}</b><small>${esc10(locName(e.loc))}</small></span><span class="gx-ops-who">${who.map((n) => `<span class="gx-pchip">${avatar(ctx.char, byName.get(n).english, n, "xs")}${esc10(n)}</span>`).join("")}</span></li>` : "";
   }).join("");
   const loose = onOp.filter((p) => !placed.has(p.name));
-  const looseRow = loose.length ? `<li><span class="gx-ops-where"><i class="gx-gmark op">·</i><b>그 밖의 작전</b><small>배치 기록 없음</small></span><span class="gx-ops-who">${loose.map((p) => `<span class="gx-pchip" title="${esc9(w.agents[p.id]?.situation ?? "")}">${avatar(ctx.char, p.english, p.name, "xs")}${esc9(p.name)}</span>`).join("")}</span></li>` : "";
+  const looseRow = loose.length ? `<li><span class="gx-ops-where"><i class="gx-gmark op">·</i><b>그 밖의 작전</b><small>배치 기록 없음</small></span><span class="gx-ops-who">${loose.map((p) => `<span class="gx-pchip" title="${esc10(w.agents[p.id]?.situation ?? "")}">${avatar(ctx.char, p.english, p.name, "xs")}${esc10(p.name)}</span>`).join("")}</span></li>` : "";
   const chip2 = (id, label, n, cls) => `<button class="gx-ops-chip ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b></button>`;
   const quiet = w.minute === null ? "첫 응답이 오면 시각과 상태가 채워져요." : "지금 작전 중인 요원은 없어요.";
   return `<main class="gx-body gx-board">
@@ -11044,9 +11266,9 @@ function board(ctx) {
       </div>
       ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}
     </section>
-    ${section2("an", "괴이", w.an.length, an, "발생한 괴이가 없어요.")}
-    ${section2("in", "사건", w.inc.length, inc, "진행 중인 사건이 없어요.")}
-    ${section2("ms", "특수", w.ms.length, ms, "출현한 특수가 없어요.")}
+    ${section3("an", "괴이", w.an.length, an, "발생한 괴이가 없어요.")}
+    ${section3("in", "사건", w.inc.length, inc, "진행 중인 사건이 없어요.")}
+    ${section3("ms", "특수", w.ms.length, ms, "출현한 특수가 없어요.")}
     <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ""}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요."}</p>`}</section>
   </main>`;
 }
