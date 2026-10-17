@@ -813,7 +813,7 @@ function board(ctx: ChatContext): string {
   const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
   const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
-    return evCard({ ...c, kind, key, open: 'board-map', mapAction: 'board-map', confirmEnd: !!key && field.confirmEnd === key });
+    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key });
   };
   const an = w.an
     .map((e, i) => {

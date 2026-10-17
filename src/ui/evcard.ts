@@ -28,8 +28,6 @@ export interface EvCard {
   key?: string;
   /** 카드를 눌렀을 때 */
   open?: string;
-  /** 지도 아이콘 */
-  mapAction?: string;
   selected?: boolean;
   confirmEnd?: boolean;
 }
@@ -60,7 +58,6 @@ export function evCard(c: EvCard): string {
   }
   const key = esc(c.key);
   const acts = `<span class="gx-evc-act">
-      <button class="gx-icon" data-action="${c.mapAction ?? 'board-map'}" data-value="${key}" title="지도" aria-label="${esc(c.name)} 지도">${ICONS.map}</button>
       ${c.name !== '이름 미확인' ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>` : ''}
       ${c.confirmEnd
         ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>`

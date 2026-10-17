@@ -264,7 +264,7 @@ export function mapSuggestFor(ctx: ChatContext, q: string): string {
 // ── 상황 목록 ──
 
 function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string }>): string {
-  // 상황판과 같은 카드 (ui/evcard.ts). 누르면 목표로 고르기, 지도 아이콘은 그 지역 지도
+  // 상황판과 같은 카드 (ui/evcard.ts). 누르면 목표로 고르고 그 지역 지도를 연다 (v0.16.22: 지도 아이콘은 뺐다)
   const w = x.world;
   const src = e.kind === 'an' ? w.an[e.index] : e.kind === 'in' ? w.inc[e.index] : w.ms[e.index];
   const since = src && 'since' in src ? elapsedText(w.minute, src.since) : '';
@@ -277,7 +277,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
     extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
-    key: e.key, open: 'pick-event', mapAction: 'show-event',
+    key: e.key, open: 'pick-event',
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
 }
@@ -701,23 +701,21 @@ export async function handleField(action: string, value: string | undefined, ctx
     case 'field-step':
       toStep(v === 'team' ? 'team' : 'goal', env);
       return true;
-    case 'pick-event':
-    case 'show-event': {
+    case 'pick-event': {
       const x = readCtx(ctx);
       if (typeof x === 'string') return true;
       const ev = activeEvents(x.world).find((e) => e.key === v);
       if (!ev) return true;
-      if (action === 'pick-event' && isPC() && sameTarget(field.target, ev.key)) {
+      if (isPC() && sameTarget(field.target, ev.key)) {
         field.target = null;
         field.confirmEnd = null;
         env.render();
         return true;
       }
-      if (action === 'pick-event') field.target = { type: 'event', key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+      field.target = { type: 'event', key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
       field.region = sidoOf(ev.loc);
       field.confirmEnd = null;
-      if (action === 'pick-event') toStep('team', env);
-      else env.render();
+      toStep('team', env);
       return true;
     }
     case 'end-event':

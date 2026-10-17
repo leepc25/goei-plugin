@@ -438,7 +438,7 @@ async function open(page) {
   await page.setViewportSize({ width: 390, height: 844 });
   // 상황판 행 → 임무(지도) 탭의 그 자리
   await page.setViewportSize({ width: 1280, height: 860 });
-  await page.click(`.gx-board .gx-evc:has-text("${preset.name}") .gx-icon[data-action="board-map"]`);
+  await page.click(`.gx-board li[data-action="board-map"]:has-text("${preset.name}") .gx-evc-name`);
   await page.waitForSelector('.gx-map .gx-placecard');
   assert.ok((await page.textContent('.gx-map .gx-sits')).includes(preset.name));
   if (shots) {
