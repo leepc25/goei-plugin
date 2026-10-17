@@ -228,12 +228,12 @@ UPDATE_FILE = 'card-update.json'
 CARD_NAME = '괴이: 이면세계'  # 정식 이름 (src/ui/brand.ts BRAND.name과 같게)
 
 
-def update_payload(data, risu, module, version):
+def update_payload(data, risu, module, version, min_plugin):
     """플러그인 창의 「업데이트」가 받는 카드 데이터 (Risu 캐릭터 객체 이름, 사진·에셋·이름 제외). core/update.ts CARD_FIELDS와 맞춘다"""
     return {
         'schema': 1,
         'version': version,
-        'minPlugin': version,
+        'minPlugin': min_plugin,  # 카드가 실제로 요구하는 플러그인 (package.json goei.minPlugin). 카드만 바뀐 판은 옛 플러그인에서도 받게
         'data': {
             'firstMessage': data.get('first_mes', ''),
             'alternateGreetings': data.get('alternate_greetings', []),
@@ -268,7 +268,9 @@ def main(src, dst):
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
 
     greetings, greeting_index = build_openings(data['first_mes'], scenarios)
-    version = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))['version']
+    pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
+    version = pkg['version']
+    min_plugin = pkg.get('goei', {}).get('minPlugin', version)
     manifest = {
         'schema': 1,
         'plugin': 'goei-plugin',
@@ -316,7 +318,7 @@ def main(src, dst):
         z.writestr('module.risum', write_module(lite_module))
         for name, blob in others.items():
             z.writestr(name, blob, compress_type=zipfile.ZIP_STORED)
-    payload = update_payload(data, risu, lite_module, version)
+    payload = update_payload(data, risu, lite_module, version, min_plugin)
     Path(dst).with_name(UPDATE_FILE).write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(

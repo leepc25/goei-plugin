@@ -14,6 +14,7 @@
     "typescript": "5.9.3"
   },
   "goei": {
-    "updateBase": "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release"
+    "updateBase": "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release",
+    "minPlugin": "0.16.0"
   }
 }
