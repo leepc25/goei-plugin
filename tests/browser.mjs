@@ -67,7 +67,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
-      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => JSON.stringify(r) } : { ok: false, status: 404, json: async () => null, text: async () => '' }; },
+      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => typeof r === 'string' ? r : JSON.stringify(r) } : { ok: false, status: 404, json: async () => null, text: async () => '' }; },
     };
     window.__assets = {};`;
 }
@@ -1301,14 +1301,20 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
 
 // 9) 업데이트: 창을 열면 새 버전 안내 → 건너뛰기 기억 → 설정에서 카드 업데이트 (명부·채팅은 그대로)
 {
-  const payload = JSON.parse(readFileSync(new URL('../release/card-update.json', import.meta.url), 'utf8'));
+  const index = JSON.parse(readFileSync(new URL('../release/card-update.json', import.meta.url), 'utf8'));
+  const payload = JSON.parse(index.parts.map((n) => readFileSync(new URL(`../release/${n}`, import.meta.url), 'utf8')).join(''));
   payload.version = '9.0.0';
   payload.data.firstMessage = '새 첫 안내';
   const man = payload.data.globalLore.find((e) => e.comment === '괴이봇 플러그인 매니페스트');
   man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0' });
   const { page, errors } = await boot(fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } });
   await page.evaluate((p) => {
-    window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' } : url.includes('card-update.json') ? p : null;
+    // 실제처럼 목록(card-update.json)과 조각(card-update.N.txt)으로 나눠 준다
+    const text = JSON.stringify(p);
+    const parts = [text.slice(0, 1000), text.slice(1000, 50000), text.slice(50000)];
+    window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' }
+      : url.includes('card-update.json') ? { schema: 1, version: p.version, minPlugin: '0.0.1', parts: parts.map((_, i) => `card-update.${i + 1}.txt`), length: text.length }
+      : (/card-update\.(\d+)\.txt/.exec(url) ? parts[+/card-update\.(\d+)\.txt/.exec(url)[1] - 1] : null);
     const dir = window.__char.globalLore.find((e) => e.comment === '괴이봇 명부');
     if (dir) dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
     window.__char.globalLore.push({ comment: '내가 넣은 로어북', content: '메모', key: '', mode: 'normal' });

@@ -23,11 +23,15 @@ let checked = false;
 let skipped = '';
 const SKIP_KEY = 'goei:update-skip';
 
-async function getJson(name: string): Promise<unknown> {
+async function getText(name: string): Promise<string> {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: 'GET' });
   if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
+  return String((await res.text()) ?? '');
+}
+
+async function getJson(name: string): Promise<unknown> {
   // Risu 판에 따라 json()이 문자열이나 바이트를 줄 수 있어 글자로 받아 직접 읽는다
-  const text = await res.text();
+  const text = await getText(name);
   let body: unknown = text;
   try {
     for (let i = 0; i < 2 && typeof body === 'string'; i++) body = JSON.parse(body.replace(/^\uFEFF/, ''));
@@ -37,12 +41,34 @@ async function getJson(name: string): Promise<unknown> {
   return body;
 }
 
+/**
+ * 카드 데이터는 1MB가 넘어서 Risu 웹 프록시가 한 번에 못 넘긴다. card-update.json은 조각 목록이고,
+ * 조각(card-update.N.txt)을 차례로 받아 이어 붙인다.
+ */
+async function loadPayload(): Promise<unknown> {
+  const index = (await getJson('card-update.json')) as { parts?: unknown; length?: unknown };
+  if (!Array.isArray(index?.parts)) return index;
+  let text = '';
+  for (const name of index.parts) {
+    if (typeof name !== 'string' || !/^card-update\.\d+\.txt$/.test(name)) throw new Error('카드 업데이트 목록 형식이 달라요.');
+    text += await getText(name);
+  }
+  if (typeof index.length === 'number' && text.length !== index.length) {
+    throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text.length}자)`);
+  }
+}
+
 /** 형식이 다를 때 무엇을 받았는지 짧게 (원인 찾기용) */
 function describe(x: unknown): string {
   if (x === null || typeof x !== 'object') return `${typeof x}`;
   const o = x as Record<string, unknown>;
   const d = o.data as Record<string, unknown> | undefined;
-  return `schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : '없음'}, `
+  return `keys=${Object.keys(o).slice(0, 6).join('/') || '없음'}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : '없음'}, `
     + `globalLore=${Array.isArray(d?.globalLore) ? 'list' : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? 'list' : typeof d?.customscripts}`;
 }
 
@@ -163,7 +189,7 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
     const char = (await risuai.getCharacterFromIndex(ctx.charIndex)) as Record<string, unknown> | null;
     if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
     if (action === 'upd-prepare') {
-      const p = await getJson('card-update.json');
+      const p = await loadPayload();
       if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe(p)})`);
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;

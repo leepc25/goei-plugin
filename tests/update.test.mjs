@@ -37,7 +37,13 @@ test('카드 합치기: 채팅·사진·이름은 그대로, 정해진 칸만 �
 
 const PAYLOAD = new URL('../release/card-update.json', import.meta.url);
 test('실제 카드 업데이트 파일: 형식·매니페스트 버전', { skip: !existsSync(PAYLOAD) }, () => {
-  const p = JSON.parse(readFileSync(PAYLOAD, 'utf8'));
+  // card-update.json은 조각 목록, 실제 데이터는 card-update.N.txt를 이어 붙인 것
+  const index = JSON.parse(readFileSync(PAYLOAD, 'utf8'));
+  const text = index.parts.map((n) => readFileSync(new URL(n, PAYLOAD), 'utf8')).join('');
+  assert.equal(text.length, index.length, 'JS 글자 수와 목록의 length가 같아야 한다');
+  for (const n of index.parts) assert.ok(Buffer.byteLength(readFileSync(new URL(n, PAYLOAD), 'utf8')) <= 200_000);
+  const p = JSON.parse(text);
+  assert.equal(p.version, index.version);
   assert.ok(isPayload(p));
   assert.ok(readManifest(p.data.globalLore));
   assert.equal(cardVersion(p.data.globalLore), p.version);

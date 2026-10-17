@@ -225,6 +225,35 @@ def drop_settings(entries):
 
 
 UPDATE_FILE = 'card-update.json'
+# Risu 웹은 외부 파일을 프록시로 받는데, 1MB 넘는 파일은 제대로 못 받는다(v0.16.3에서 빈 객체가 옴).
+# 그래서 카드 데이터를 작은 조각(card-update.N.txt)으로 나누고 card-update.json에는 목록만 둔다.
+UPDATE_PART_BYTES = 200_000
+
+
+def write_update(folder, payload):
+    folder = Path(folder)
+    for old in folder.glob('card-update.*.txt'):
+        old.unlink()
+    text = json.dumps(payload, ensure_ascii=False)
+    parts, buf, size = [], [], 0
+    for ch in text:
+        n = len(ch.encode('utf-8'))
+        if size + n > UPDATE_PART_BYTES:
+            parts.append(''.join(buf))
+            buf, size = [], 0
+        buf.append(ch)
+        size += n
+    if buf:
+        parts.append(''.join(buf))
+    names = []
+    for i, part in enumerate(parts, 1):
+        name = f'card-update.{i}.txt'
+        (folder / name).write_text(part, encoding='utf-8')
+        names.append(name)
+    index = {'schema': payload['schema'], 'version': payload['version'], 'minPlugin': payload['minPlugin'],
+             'parts': names, 'length': len(text.encode('utf-16-le')) // 2}  # JS 글자 수(UTF-16)
+    (folder / UPDATE_FILE).write_text(json.dumps(index, ensure_ascii=False), encoding='utf-8')
+    return len(names)
 CARD_NAME = '괴이: 이면세계'  # 정식 이름 (src/ui/brand.ts BRAND.name과 같게)
 
 
@@ -319,12 +348,12 @@ def main(src, dst):
         for name, blob in others.items():
             z.writestr(name, blob, compress_type=zipfile.ZIP_STORED)
     payload = update_payload(data, risu, lite_module, version, min_plugin)
-    Path(dst).with_name(UPDATE_FILE).write_text(json.dumps(payload, ensure_ascii=False), encoding='utf-8')
+    parts = write_update(Path(dst).parent, payload)
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
-        'output': str(dst), 'update': UPDATE_FILE, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex),
+        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex),
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))
 

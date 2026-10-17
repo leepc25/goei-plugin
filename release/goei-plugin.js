@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.3
+//@version 0.16.4
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8656,7 +8656,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.3" : "0";
+var PLUGIN_VERSION = true ? "0.16.4" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -8664,10 +8664,13 @@ var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: nul
 var checked = false;
 var skipped = "";
 var SKIP_KEY = "goei:update-skip";
-async function getJson(name) {
+async function getText(name) {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: "GET" });
   if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
-  const text = await res.text();
+  return String(await res.text() ?? "");
+}
+async function getJson(name) {
+  const text = await getText(name);
   let body4 = text;
   try {
     for (let i = 0; i < 2 && typeof body4 === "string"; i++) body4 = JSON.parse(body4.replace(/^\uFEFF/, ""));
@@ -8676,11 +8679,28 @@ async function getJson(name) {
   }
   return body4;
 }
+async function loadPayload() {
+  const index = await getJson("card-update.json");
+  if (!Array.isArray(index?.parts)) return index;
+  let text = "";
+  for (const name of index.parts) {
+    if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
+    text += await getText(name);
+  }
+  if (typeof index.length === "number" && text.length !== index.length) {
+    throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text.length}자)`);
+  }
+}
 function describe2(x) {
   if (x === null || typeof x !== "object") return `${typeof x}`;
   const o = x;
   const d = o.data;
-  return `schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? "list" : typeof d?.customscripts}`;
+  return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? "list" : typeof d?.customscripts}`;
 }
 async function checkLatest(env2, force = false) {
   if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
@@ -8797,7 +8817,7 @@ async function handleUpdate(action, ctx, env2) {
     const char = await risuai.getCharacterFromIndex(ctx.charIndex);
     if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
     if (action === "upd-prepare") {
-      const p = await getJson("card-update.json");
+      const p = await loadPayload();
       if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe2(p)})`);
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;
