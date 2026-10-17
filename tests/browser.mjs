@@ -236,7 +236,7 @@ async function open(page) {
   const { page, errors } = await boot({ name: '다른 봇', alternateGreetings: [], globalLore: [] }, { message: [] });
   await page.waitForTimeout(2500);
   assert.equal(await page.evaluate(() => { const f = document.querySelector('[x-goei-fab]'); return f ? getComputedStyle(f).display : 'none'; }), 'none');
-  assert.equal(await page.$('[x-goei-intro]'), null);
+  assert.equal(await page.locator('[x-goei-intro="true"]').count(), 0);
   await page.mouse.click(1100 - 16 - 24, 900 - 96 - 24); // 버튼 기본 자리
   await page.click('#other');
   await page.waitForTimeout(300);
@@ -279,9 +279,9 @@ async function open(page) {
 // 7) 플로팅 버튼: Lite 채팅 화면에서만, 들어올 때마다 접속 효과, 버튼 영역 클릭만 반응
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
-  await page.waitForSelector('[x-goei-intro]', { timeout: 3000 });
+  await page.waitForSelector('[x-goei-fab][x-goei-intro="true"]', { timeout: 3000 });
   if (shots) { await page.waitForTimeout(900); await page.screenshot({ path: `${shots}/5-intro.png` }); }
-  await page.waitForSelector('[x-goei-intro]', { state: 'detached', timeout: 5000 });
+  await page.waitForSelector('[x-goei-fab][x-goei-intro="true"]', { state: 'detached', timeout: 5000 });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block');
   // 화면의 다른 곳을 눌러도 열리지 않는다 (Risu는 리스너를 문서 전체에 건다)
   await page.click('#other');
@@ -296,13 +296,13 @@ async function open(page) {
   await page.evaluate(() => { window.__screen = document.querySelector('.default-chat-screen'); window.__screen.remove(); });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'none', null, { timeout: 3000 });
   await page.evaluate(() => { document.body.prepend(window.__screen); });
-  await page.waitForSelector('[x-goei-intro]', { timeout: 3000 });
+  await page.waitForSelector('[x-goei-fab][x-goei-intro="true"]', { timeout: 3000 });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
   // 다른 봇으로 가면 숨김, 돌아오면 다시 효과
   await page.evaluate(() => { window.__char = { name: '다른 봇', globalLore: [] }; window.risuai.getCurrentCharacterIndex = async () => 1; });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'none', null, { timeout: 3000 });
   await page.evaluate(() => { window.__char = window.__liteChar; window.risuai.getCurrentCharacterIndex = async () => 0; });
-  await page.waitForSelector('[x-goei-intro]', { timeout: 3000 });
+  await page.waitForSelector('[x-goei-fab][x-goei-intro="true"]', { timeout: 3000 });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
   assert.deepEqual(errors, []);
   console.log('PASS 플로팅 버튼: Lite 채팅 화면에서만, 들어올 때마다 효과, 버튼 클릭만 반응');

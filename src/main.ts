@@ -18,7 +18,7 @@ import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
 import { updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
-import { cancelIntro, createFab, playIntro, type Fab } from './host/overlay';
+import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, setCurrentTheme, themeName } from './ui/theme';
 import { getPrefs } from './core/settings';
@@ -255,9 +255,8 @@ function startWatcher(fab: Fab): () => void {
       liteNow = state.lite;
       if (next.changed) {
         if (next.fabVisible) await readTheme(snap).catch(() => {});
-        // v0.16.18: 버튼은 효과를 기다리지 않고 바로 (효과는 위쪽 작은 띠라 버튼을 가리지 않는다)
+        // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
         await fab.setVisible(next.fabVisible, next.intro);
-        if (next.intro) void playIntro().catch(() => {});
       }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -289,7 +288,7 @@ await risuai.addRisuScriptHandler('display', onDisplay);
 let stopWatcher: (() => void) | null = null;
 let fab: Fab | null = null;
 try {
-  fab = await createFab(() => (cancelIntro(), void openApp({ quietIfNotLite: true })));
+  fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
   const f = fab;
   void f.setTheme(currentTheme());
   onThemeChange((t) => void f.setTheme(t).catch(() => {}));
@@ -299,7 +298,7 @@ try {
   console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
   await risuai.registerButton(
     { name: BRAND.name, icon: GHOST_ICON, iconType: 'html', location: 'chat', id: `${PLUGIN_ID}-chat` },
-    () => (cancelIntro(), void openApp({ quietIfNotLite: true })),
+    () => void openApp({ quietIfNotLite: true }),
   );
 }
 
