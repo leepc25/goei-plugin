@@ -150,8 +150,8 @@ function ensureRoot(): HTMLElement {
   });
   // 작성칸에 사진 붙여넣기·끌어놓기 (원본처럼)
   const photoTarget = (el: EventTarget | null) => {
-    const box = (el as HTMLElement | null)?.closest?.('.gn-pane, .gn-cpane, .gn-inline, .ph-room');
-    return box ? (box.matches('.gn-pane, .gn-cpane, .gn-inline') ? 'gn' : 'ph') : '';
+    const box = (el as HTMLElement | null)?.closest?.('.gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room');
+    return box ? (box.matches('.gn-pane, .gn-cpane, .gn-inline, .gn-composer') ? 'gn' : 'ph') : '';
   };
   const imageFiles = (list: FileList | DataTransferItemList | undefined) =>
     [...(list ?? [])].map((x) => (x instanceof File ? x : (x as DataTransferItem).kind === 'file' ? (x as DataTransferItem).getAsFile() : null)).filter((f): f is File => !!f && f.type.startsWith('image/'));

@@ -365,6 +365,24 @@ function paneKind(st: GState, mobile = narrow()): Pane {
 }
 
 /** 아래 입력줄 (댓글·답글·쪽지 답장): 괴담톡 입력줄과 같은 모양 */
+/** 모바일에서 펼친 글·쪽지의 입력줄: 목록 아래에 고정 (괴담톡처럼) */
+function inlineComposer(st: GState, busy: boolean): string {
+  const c = gnet.compose;
+  if (c && c.kind !== 'comment' && c.kind !== 'dm') return '';
+  if (gnet.sub === 'board' && gnet.open !== null && findPost(st, gnet.open)) {
+    const reply = c?.kind === 'comment' && c.post === gnet.open && c.parent > 0 ? c : null;
+    const chip = reply
+      ? `<div class="gn-replyto"><span>${esc(reply.label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`
+      : '';
+    return composer(busy, reply ? '답글 입력' : '댓글 입력', chip);
+  }
+  if (gnet.sub === 'dm' && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
+    const ph = c?.kind === 'dm' && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : '쪽지 입력';
+    return composer(busy, ph);
+  }
+  return '';
+}
+
 function composer(busy: boolean, placeholder: string, chip = ''): string {
   return `<div class="ph-composer gn-composer">
     ${chip}
@@ -448,10 +466,10 @@ function postView(p: GPost, busy: boolean, inline = false): string {
             <span>${esc(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span>${inline && right ? `<span class="gn-inline-del">${right}</span>` : ''}</div></header>
         <div class="gn-post-body">${body(p.body)}</div>
       </article>
-      <section class="gn-csec"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3><button class="gn-cwrite" data-action="gn-comment" data-value="${p.id}">${ICONS.pen}댓글 쓰기</button></div>
         ${p.comments.length ? `<ul class="gn-comments">${commentTree(p)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
-    ${composer(busy, reply ? '답글 입력' : '댓글 입력', chip)}
+    ${inline ? '' : composer(busy, reply ? '답글 입력' : '댓글 입력', chip)}
   </div>`;
 }
 
@@ -472,7 +490,7 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
         return `<div class="ph-msg ${d.side === 'me' ? 'me' : 'npc'}${first ? ' first' : ''}"><div class="ph-msg-col"><div class="ph-bubble">${body(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc(d.date)}</small>` : ''}</div></div>`;
       }).join('')}
     </div>
-    ${composer(busy, ph)}
+    ${inline ? '' : composer(busy, ph)}
   </div>`;
 }
 
@@ -588,6 +606,7 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
       </div>
       ${kind ? '' : status}
       <div class="ph-content">${gnet.sub === 'board' ? boardList(st, busy, mobile) : dmList(st, busy, mobile)}</div>
+      ${mobile && !kind ? inlineComposer(st, busy) : ''}
       ${fail}
     </section>
     <section class="ph-pane">${kind ? status : ''}${paneHtml(ctx, st, kind, busy)}</section>
@@ -696,11 +715,16 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       gnet.draft = '';
       gnet.attach = [];
       break;
-    case 'gn-comment':
+    case 'gn-comment': {
+      // 아래 입력줄로 데려간다 (모바일은 펼친 글 맨 끝에 있어 안 보일 수 있음)
       gnet.compose = { kind: 'comment', post: a, parent: 0, label: '댓글' };
-      gnet.draft = '';
       gnet.attach = [];
-      break;
+      env.render();
+      const box = document.querySelector<HTMLTextAreaElement>('.gn-composer [data-input="gn-draft"]');
+      box?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      box?.focus({ preventScroll: true });
+      return true;
+    }
     case 'gn-reply': {
       const c = findPost(st(), a)?.comments[b - 1];
       if (!c) break;

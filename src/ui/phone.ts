@@ -758,13 +758,12 @@ function noticeDetail(ctx: ChatContext): string {
   const del = confirm
     ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>`
     : tool('ph-notice-del', ICONS.trash, '공지 삭제', `data-value="${r.id}"`);
-  // 공지문 모양: 제목줄(분류·제목·발신) → 본문 → 아래 발신 서명
-  return `<div class="ph-form ph-ndoc">${paneHead('공지', esc(r.issuer), `<span class="ph-act">${del}</span>`)}
+  // 공지문 모양: 제목줄(분류·제목·발신·시각) → 본문. 발신처는 한 번만
+  return `<div class="ph-form ph-ndoc">${paneHead('공지', '', `<span class="ph-act">${del}</span>`)}
     <article class="ph-ndoc-body">
       <header class="ph-ndoc-head"><span class="gx-badge">${esc(r.category)}</span><h3>${esc(r.title)}</h3>
-        <div class="ph-ndoc-meta"><span>발신 ${esc(r.issuer)}</span>${r.time ? `<span>${esc(r.time)}</span>` : ''}</div></header>
+        <div class="ph-ndoc-meta"><b>${esc(r.issuer)}</b>${r.time ? `<span>${esc(r.time)}</span>` : ''}</div></header>
       <div class="ph-ndoc-text">${esc(r.text).replace(/\n/g, '<br>')}</div>
-      <footer class="ph-ndoc-sign">${r.time ? `<span>${esc(r.time.split(' ')[0])}</span>` : ''}<b>${esc(r.issuer)}</b></footer>
     </article></div>`;
 }
 
