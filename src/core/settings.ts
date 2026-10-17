@@ -1,0 +1,246 @@
+// 기본 설정과 괴이 생성 수치. 우선순위: 이 채팅의 변수($st_*, $wg_*) > 플러그인 저장소의 기본값(설정 창)
+// > 옛 카드의 Settings 로어북(있으면) > 내장 기본값. 채팅 변수 키는 원본 ensureDefaults·WG.get과 같다.
+import type { LoreEntry, ScriptState } from './types';
+import { DEFAULT_SETTINGS, type WorldSettings } from './world/engine';
+
+export type AssetModel = 'main' | 'aux';
+
+export interface BasicSettings {
+  /** 새 채팅을 상황판(괴이 발생·요원 시스템)을 켜고 시작할지. Settings 기본설정의 「상황판」(옛 이름 통합관제) */
+  anomalyOn: boolean;
+  /** 에셋(캐릭터 이미지) 출력 */
+  assetOn: boolean;
+  /** main: 본문 AI가 이미지 태그를 함께 적음, aux: 보조 모델이 완성된 본문에 태그를 보충 */
+  assetModel: AssetModel;
+  /** 캐릭터당 이미지 수 1~4 */
+  assetLimit: number;
+  /** 요원 표시 인원 0~20 */
+  agentLimit: number;
+  /** 지원 투입 */
+  supportOn: boolean;
+}
+
+export const ST = {
+  assetOn: '$st_asset_on',
+  assetModel: '$st_asset_model',
+  assetLimit: '$st_asset_limit',
+  agentLimit: '$st_agent_limit',
+  supportOn: '$st_support_on',
+} as const;
+
+export const AGENT_MAX = 20;
+
+export const BASIC_DEFAULTS: BasicSettings = { anomalyOn: true, assetOn: true, assetModel: 'main', assetLimit: 2, agentLimit: 12, supportOn: true };
+
+/** 괴이 생성 수치. label은 옛 Settings 로어북 「괴이생성」의 항목 이름 (원본 WG.spec) */
+export interface WorldField {
+  key: Exclude<keyof WorldSettings, 'agent_limit'>;
+  label: string;
+  max: number | null;
+  fraction: boolean;
+}
+export const WORLD_SPEC: WorldField[] = (
+  [
+    ['추가 발생 여유분', 'extra_cap', null, false],
+    ['미스틱 사이트 추가 여유분', 'extra_ms_cap', null, false],
+    ['인시던트 추가 여유분', 'extra_in_cap', null, false],
+    ['프리셋 괴이 상한', 'preset_cap', null, false],
+    ['프리셋 괴이 발생 확률', 'preset_p', 100, false],
+    ['랜덤 괴이 상한', 'random_cap', null, false],
+    ['랜덤 괴이 발생 확률', 'random_p', 100, false],
+    ['인시던트 상한', 'incident_cap', null, false],
+    ['인시던트 발생 확률', 'incident_p', 100, false],
+    ['미스틱 사이트 상한', 'mystic_cap', null, false],
+    ['미스틱 사이트 발생 확률', 'mystic_p', 100, false],
+    ['프리셋 자동 종료', 'preset_expire', 1, false],
+    ['랜덤 괴이 자동 종료', 'random_expire', 1, false],
+    ['인시던트 자동 종료', 'incident_expire', 1, false],
+    ['미스틱 사이트 자동 종료', 'mystic_expire', 1, false],
+    ['프리셋 괴이 RP 유지 시간', 'preset_ttl', 8760, true],
+    ['랜덤 괴이 RP 유지 시간', 'random_ttl', 8760, true],
+    ['인시던트 RP 유지 시간', 'incident_ttl', 8760, true],
+    ['미스틱 사이트 RP 유지 시간', 'mystic_ttl', 8760, true],
+    ['인시던트 중 랜드마크 비율', 'landmark_share', 100, false],
+  ] as [string, WorldField['key'], number | null, boolean][]
+).map(([label, key, max, fraction]) => ({ key, label, max, fraction }));
+
+/** 원본 WG.get의 채팅 변수 이름 */
+export const wgKey = (key: string) => `$wg_${key}`;
+
+function worldValue(f: WorldField, v: unknown): number | null {
+  const n = num(v);
+  if (n === null || n < 0 || (f.max !== null && n > f.max) || (!f.fraction && !Number.isInteger(n))) return null;
+  return n;
+}
+
+interface SettingsBook {
+  basic: Record<string, unknown>;
+  world: Record<string, unknown>;
+}
+
+const cache = new WeakMap<LoreEntry[], SettingsBook>();
+
+export type Theme = 'light' | 'dark' | 'paper';
+
+/** 설정 창에서 고친 새 채팅 기본값 (플러그인 저장소). 없는 항목은 아래 단계 값을 쓴다 */
+export interface Prefs {
+  basic: Partial<BasicSettings>;
+  world: Partial<WorldSettings>;
+  theme?: Theme;
+}
+
+let prefs: Prefs = { basic: {}, world: {} };
+
+export function getPrefs(): Prefs {
+  return prefs;
+}
+
+/** 저장소에서 읽은 값을 검사해 넣는다. 틀린 항목은 버린다 */
+export function setPrefs(raw: unknown): Prefs {
+  const o = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
+  const b = o.basic && typeof o.basic === 'object' ? (o.basic as Record<string, unknown>) : {};
+  const w = o.world && typeof o.world === 'object' ? (o.world as Record<string, unknown>) : {};
+  const basic: Partial<BasicSettings> = {};
+  if (typeof b.anomalyOn === 'boolean') basic.anomalyOn = b.anomalyOn;
+  if (typeof b.assetOn === 'boolean') basic.assetOn = b.assetOn;
+  if (b.assetModel === 'main' || b.assetModel === 'aux') basic.assetModel = b.assetModel;
+  const al = int(b.assetLimit, 1, 4);
+  if (al !== null) basic.assetLimit = al;
+  const ag = int(b.agentLimit, 0, AGENT_MAX);
+  if (ag !== null) basic.agentLimit = ag;
+  if (typeof b.supportOn === 'boolean') basic.supportOn = b.supportOn;
+  const world: Partial<WorldSettings> = {};
+  for (const f of WORLD_SPEC) {
+    const n = worldValue(f, w[f.key]);
+    if (n !== null) world[f.key] = n;
+  }
+  const theme = o.theme === 'light' || o.theme === 'dark' || o.theme === 'paper' ? o.theme : undefined;
+  prefs = { basic, world, ...(theme ? { theme } : {}) };
+  return prefs;
+}
+
+/** Settings 로어북 (이전 이름 통합설정). 같은 이름이 여럿이면 원본처럼 삽입 순서가 큰 쪽 */
+export function readSettingsBook(lore: LoreEntry[] | undefined): SettingsBook {
+  const list = lore ?? [];
+  const hit = cache.get(list);
+  if (hit) return hit;
+  let out: SettingsBook = { basic: {}, world: {} };
+  for (const name of ['Settings', '통합설정']) {
+    const books = list.filter((e) => e.comment === name && typeof e.content === 'string' && e.content.trim());
+    if (!books.length) continue;
+    const chosen = books.reduce((a, b) => (Number(b.insertorder ?? b.insertion_order ?? 0) > Number(a.insertorder ?? a.insertion_order ?? 0) ? b : a));
+    try {
+      const data = JSON.parse(String(chosen.content).replace(/^﻿/, '').trim()) as Record<string, unknown>;
+      const obj = (v: unknown) => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
+      out = { basic: obj(data['기본설정']), world: obj(data['괴이생성']) };
+    } catch {
+      // 구문이 틀리면 기본값으로 (원본도 값마다 기본값으로 돌아감)
+    }
+    break;
+  }
+  cache.set(list, out);
+  return out;
+}
+
+function num(v: unknown): number | null {
+  if (typeof v === 'boolean') return v ? 1 : 0;
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
+function int(v: unknown, min: number, max: number): number | null {
+  const n = num(v);
+  return n !== null && Number.isInteger(n) && n >= min && n <= max ? n : null;
+}
+
+function flag(v: unknown): boolean | null {
+  if (v === true || v === '1' || v === 1 || v === 'ON') return true;
+  if (v === false || v === '0' || v === 0 || v === 'OFF') return false;
+  return null;
+}
+
+function model(v: unknown): AssetModel | null {
+  if (v === 'main' || v === '메인') return 'main';
+  if (v === 'aux' || v === '보조') return 'aux';
+  return null;
+}
+
+/** 카드 기본값 (Settings 기본설정) */
+export function basicDefaults(lore: LoreEntry[] | undefined): BasicSettings {
+  const b = readSettingsBook(lore).basic;
+  const book: BasicSettings = {
+    anomalyOn: flag(b['상황판'] ?? b['통합관제']) ?? BASIC_DEFAULTS.anomalyOn,
+    assetOn: flag(b['에셋 출력']) ?? BASIC_DEFAULTS.assetOn,
+    assetModel: model(b['에셋 모델']) ?? BASIC_DEFAULTS.assetModel,
+    assetLimit: int(b['캐릭터당 이미지 수'], 1, 4) ?? BASIC_DEFAULTS.assetLimit,
+    agentLimit: int(b['요원 표시 인원'], 0, AGENT_MAX) ?? BASIC_DEFAULTS.agentLimit,
+    supportOn: flag(b['지원 투입']) ?? BASIC_DEFAULTS.supportOn,
+  };
+  return { ...book, ...prefs.basic };
+}
+
+/** 이 채팅의 값 (채팅 변수가 없거나 틀리면 카드 기본값) */
+export function basicSettings(lore: LoreEntry[] | undefined, ss: ScriptState | undefined): BasicSettings {
+  const d = basicDefaults(lore);
+  const v = ss ?? {};
+  return {
+    anomalyOn: v.$st_anomaly_on === undefined ? d.anomalyOn : v.$st_anomaly_on === '1',
+    assetOn: flag(v[ST.assetOn]) ?? d.assetOn,
+    assetModel: model(v[ST.assetModel]) ?? d.assetModel,
+    assetLimit: int(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
+    agentLimit: int(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
+    supportOn: flag(v[ST.supportOn]) ?? d.supportOn,
+  };
+}
+
+/** 채팅 변수로 적을 값. 에셋 모듈 로어북이 getvar로 읽는다 (원본 ensureDefaults와 같은 형식) */
+export function basicVars(s: BasicSettings): ScriptState {
+  return {
+    [ST.assetOn]: s.assetOn ? '1' : '0',
+    [ST.assetModel]: s.assetModel,
+    [ST.assetLimit]: String(s.assetLimit),
+    [ST.agentLimit]: String(s.agentLimit),
+    [ST.supportOn]: s.supportOn ? '1' : '0',
+  };
+}
+
+/** 빠진 변수만 채운다. 바꿀 것이 없으면 null */
+export function missingBasicVars(lore: LoreEntry[] | undefined, ss: ScriptState | undefined): ScriptState | null {
+  const all = basicVars(basicSettings(lore, ss));
+  const v = ss ?? {};
+  const out: ScriptState = {};
+  for (const [k, val] of Object.entries(all)) if (v[k] === undefined || v[k] === '' || v[k] === null || v[k] === 'null') out[k] = val;
+  return Object.keys(out).length ? out : null;
+}
+
+/** 새 채팅의 괴이 생성 수치: 내장 기본값 < 옛 Settings 로어북 < 플러그인 저장소 */
+export function worldDefaults(lore: LoreEntry[] | undefined): WorldSettings {
+  const w = readSettingsBook(lore).world;
+  const out: WorldSettings = { ...DEFAULT_SETTINGS };
+  for (const f of WORLD_SPEC) {
+    const n = worldValue(f, w[f.label]);
+    if (n !== null) out[f.key] = n;
+  }
+  Object.assign(out, prefs.world);
+  out.agent_limit = basicDefaults(lore).agentLimit;
+  return out;
+}
+
+/** 이 채팅의 괴이 생성 수치 ($wg_* 채팅 변수가 있으면 그 값) + 요원 표시 인원 */
+export function worldSettings(lore: LoreEntry[] | undefined, ss?: ScriptState): WorldSettings {
+  const out = worldDefaults(lore);
+  const v = ss ?? {};
+  for (const f of WORLD_SPEC) {
+    const n = worldValue(f, v[wgKey(f.key)]);
+    if (n !== null) out[f.key] = n;
+  }
+  out.agent_limit = basicSettings(lore, ss).agentLimit;
+  return out;
+}
+
+/** 시작할 때 채팅에 적을 괴이 생성 수치 (나중에 기본값을 바꿔도 이 채팅은 그대로) */
+export function worldVarsOf(w: WorldSettings): ScriptState {
+  const out: ScriptState = {};
+  for (const f of WORLD_SPEC) out[wgKey(f.key)] = String(w[f.key]);
+  return out;
+}

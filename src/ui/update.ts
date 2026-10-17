@@ -1,0 +1,133 @@
+// 설정 → 「업데이트」: 저장소의 최신 카드·플러그인 버전을 확인하고, 카드는 이 창에서 바로 갱신한다.
+import { cardVersion, compareVersions, isPayload, planUpdate, PLUGIN_VERSION, UPDATE_BASE, type CardPayload, type UpdatePlan } from '../core/update';
+import { readManifest } from '../core/start';
+import type { ChatContext } from '../host/risu';
+import type { SettingsEnv } from './settings';
+
+const esc = (s: unknown) =>
+  String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+interface Latest { card: string; plugin: string; minPlugin: string }
+
+export const updateUi: {
+  busy: boolean;
+  notice: string;
+  latest: Latest | null;
+  payload: CardPayload | null;
+  plan: UpdatePlan | null;
+  done: string;
+} = { busy: false, notice: '', latest: null, payload: null, plan: null, done: '' };
+
+let checked = false;
+
+async function getJson(name: string): Promise<unknown> {
+  const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: 'GET' });
+  if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
+  return res.json();
+}
+
+/** 작은 version.json만 받아 최신 버전을 안다 (창을 처음 열 때 한 번, 확인 버튼마다) */
+export async function checkLatest(env: SettingsEnv, force = false): Promise<void> {
+  if (!UPDATE_BASE || updateUi.busy || (checked && !force)) return;
+  checked = true;
+  updateUi.busy = force;
+  if (force) (updateUi.notice = ''), env.render();
+  try {
+    const v = (await getJson('version.json')) as Partial<Latest>;
+    if (typeof v.card !== 'string' || typeof v.plugin !== 'string') throw new Error('업데이트 정보 형식이 달라요.');
+    updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
+  } catch (error) {
+    if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
+  }
+  updateUi.busy = false;
+  env.render();
+}
+
+export function updateGroup(ctx: ChatContext): string {
+  const busy = updateUi.busy;
+  const rows: string[] = [];
+  const cur = cardVersion(ctx.char.globalLore);
+  const lite = !!readManifest(ctx.char.globalLore);
+  const L = updateUi.latest;
+  const row = (label: string, value: string, help = '') =>
+    `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${value}</div></div>`;
+  if (!UPDATE_BASE) {
+    return section(row('업데이트', '<span class="gx-muted">준비 중</span>', '업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요.'));
+  }
+  const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
+  rows.push(row('플러그인', `<span class="upd-ver">v${esc(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc(L!.plugin)}</b>` : ''}</span>`,
+    pluginNew ? 'Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요.' : L ? '최신이에요.' : ''));
+  const cardNew = lite && L && compareVersions(L.card, cur) > 0;
+  const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
+  rows.push(row('카드', `<span class="upd-ver">${cur === '0' ? '이전 판' : `v${esc(cur)}`}${cardNew ? ` → <b>v${esc(L!.card)}</b>` : ''}</span>`,
+    !lite ? '이 채팅의 카드는 Lite 카드가 아니에요.' : cardNew ? (needPlugin ? '플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요.' : '채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요.') : L ? '최신이에요.' : ''));
+  let actions = `<button class="gx-mini" data-action="upd-check" ${busy ? 'disabled' : ''}>${busy && !updateUi.payload ? '확인 중…' : '새 버전 확인'}</button>`;
+  if (cardNew && !needPlugin) {
+    actions += updateUi.plan
+      ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? '적용 중…' : '카드에 적용'}</button>`
+      : `<button class="gx-mini primary" data-action="upd-prepare" ${busy ? 'disabled' : ''}>카드 업데이트 준비</button>`;
+  }
+  const plan = updateUi.plan;
+  const summary = plan
+    ? `<ul class="upd-plan">
+        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc(plan.fields.map(fieldName).join(', '))})</small>` : ''}</li>
+        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ''}</li>
+        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요. 사진·에셋이 새로 생긴 버전이면 zip의 카드를 가져와야 해요.</p>`
+    : '';
+  return section(rows.join('') + `<div class="upd-act">${actions}</div>${summary}`
+    + (updateUi.notice ? `<div class="gx-err" role="alert">${esc(updateUi.notice)}</div>` : '')
+    + (updateUi.done ? `<p class="gx-hint">${esc(updateUi.done)}</p>` : ''));
+}
+
+function section(body: string): string {
+  return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body}</div></section>`;
+}
+
+const FIELD_NAMES: Record<string, string> = {
+  firstMessage: '첫 안내', alternateGreetings: '첫 장면', creatorNotes: '제작 노트', desc: '설명', personality: '성격', scenario: '시나리오',
+  exampleMessage: '예시 대화', systemPrompt: '시스템 프롬프트', postHistoryInstructions: '탈옥 프롬프트', backgroundHTML: '배경 HTML',
+  lowLevelAccess: '저수준 접근', virtualscript: '가상 스크립트', triggerscript: '트리거',
+};
+const fieldName = (f: string) => FIELD_NAMES[f] ?? f;
+
+export async function handleUpdate(action: string, ctx: ChatContext, env: SettingsEnv): Promise<boolean> {
+  if (!action.startsWith('upd-')) return false;
+  if (updateUi.busy) return true;
+  if (action === 'upd-check') {
+    updateUi.payload = null;
+    updateUi.plan = null;
+    updateUi.done = '';
+    await checkLatest(env, true);
+    return true;
+  }
+  updateUi.busy = true;
+  updateUi.notice = '';
+  env.render();
+  try {
+    const char = (await risuai.getCharacterFromIndex(ctx.charIndex)) as Record<string, unknown> | null;
+    if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
+    if (action === 'upd-prepare') {
+      const p = await getJson('card-update.json');
+      if (!isPayload(p)) throw new Error('카드 업데이트 파일 형식이 달라요.');
+      if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
+      updateUi.payload = p;
+      updateUi.plan = planUpdate(char, p);
+    } else if (action === 'upd-apply' && updateUi.payload) {
+      // 준비한 뒤 카드가 바뀌었을 수 있으니 저장 직전에 다시 합친다
+      const plan = planUpdate(char, updateUi.payload);
+      await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
+      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요. 채팅을 다시 열면 새 내용이 보여요.`;
+      updateUi.payload = null;
+      updateUi.plan = null;
+      updateUi.busy = false;
+      await env.refresh();
+      return true;
+    }
+  } catch (error) {
+    updateUi.notice = error instanceof Error ? error.message : String(error);
+  }
+  updateUi.busy = false;
+  env.render();
+  return true;
+}

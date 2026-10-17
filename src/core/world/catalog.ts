@@ -1,0 +1,167 @@
+// 상황판 목록: 괴이·미스틱 사이트·요원은 카드 명부(directory.ts: 로어북 폴더 + 괴이봇 명부 + 옛 목록),
+// 랜드마크는 World catalog, 세력 표시명은 Faction display.
+import { extraNames, factionList, factionVars } from '../factions';
+import type { FactionCode, LoreEntry, ScriptState } from '../types';
+import { SIGUN } from './geo';
+import { readDirectory } from './directory';
+
+export interface WorldItem {
+  name: string;
+  english: string;
+  aliases: string[];
+}
+
+export interface Landmark extends WorldItem {
+  /** 지도 표시명 */
+  label: string;
+  sido: string;
+  gu: string;
+  x: number;
+  y: number;
+}
+
+export interface Person {
+  id: string;
+  name: string;
+  english: string;
+  affiliation: string;
+  rank: string;
+  department: string;
+  rosterFor: FactionCode[];
+}
+
+export interface Catalog {
+  anomalies: WorldItem[];
+  mysticSites: WorldItem[];
+  landmarks: Landmark[];
+  people: Person[];
+  /** 사망 후 몇 번의 응답이 지나면 결번 처리하고 예비 인원을 올릴지 */
+  refill: number;
+  /** 관점 소속 → (소속 코드 → 표시명) */
+  factionDisplay: Record<string, Record<string, string>>;
+  /** 명부에서 만든 새 세력 코드 → 이름 */
+  extraNames?: Record<string, string>;
+  /** [AC]로 바꿀 수 있는 소속 코드 전체 → 소속 이름($ib_affiliation) */
+  affiliations?: Record<string, string>;
+  /** 태그·세력 로어북 자리표시자 변수 (factions.ts factionVars) */
+  factionVars?: ScriptState;
+}
+
+export class CatalogError extends Error {}
+
+const FALLBACK_DISPLAY: Record<string, string> = {
+  A00: '관리국',
+  B00: '가짜 관리국',
+  C00: '백일몽',
+  D00: '민간인',
+  E00: '프리랜서',
+};
+
+function loreText(lore: LoreEntry[], comment: string): string | null {
+  const parts = lore.filter((e) => e.comment === comment && typeof e.content === 'string' && e.content.trim());
+  return parts.length ? parts.map((e) => e.content as string).join('\n') : null;
+}
+
+function parseJson(raw: string, book: string): unknown {
+  const clean = raw
+    .replace(/^﻿/, '')
+    .trim()
+    .replace(/^```[\w-]*\s*\n/, '')
+    .replace(/\n\s*```\s*$/, '');
+  try {
+    return JSON.parse(clean);
+  } catch {
+    throw new CatalogError(`${book}: JSON 구문을 확인하세요.`);
+  }
+}
+
+const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+const strList = (v: unknown) => (Array.isArray(v) ? v.map(str).filter(Boolean) : []);
+
+function worldRows(data: Record<string, unknown>, group: string, landmark: boolean): unknown[][] {
+  const rows = data[group];
+  if (!Array.isArray(rows)) throw new CatalogError(`World catalog / ${group}: 배열이 필요합니다.`);
+  return rows.filter((r): r is unknown[] => Array.isArray(r) && r.length === (landmark ? 10 : 5) && r[0] === true);
+}
+
+export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
+  const list = lore ?? [];
+  const dir = readDirectory(list);
+  const worldRaw = loreText(list, 'World catalog');
+  if (!worldRaw && !dir.folders) throw new CatalogError('World catalog 로어북이 없어요.');
+  const world = worldRaw ? (parseJson(worldRaw, 'World catalog') as Record<string, unknown>) : {};
+  const item = (r: unknown[], nameAt: number, englishAt: number, aliasAt: number): WorldItem => ({
+    name: str(r[nameAt]),
+    english: str(r[englishAt]),
+    aliases: strList(r[aliasAt]),
+  });
+  const place = (p: { label: string; english: string; aliases: string[] }): WorldItem => ({ name: p.label, english: p.english, aliases: p.aliases });
+  const anomalies = dir.anomalies.filter((p) => p.preset).map(place).filter((e) => e.name);
+  const mysticSites = dir.sites.filter((p) => p.preset).map(place).filter((e) => e.name);
+  const landmarks: Landmark[] = (Array.isArray(world['랜드마크']) ? worldRows(world, '랜드마크', true) : [])
+    .map((r) => ({
+      ...item(r, 1, 4, 9),
+      label: str(r[2]),
+      sido: str(r[5]),
+      gu: str(r[6]),
+      x: Number(r[7]),
+      y: Number(r[8]),
+    }))
+    .filter((e) => e.name && SIGUN[e.sido]?.includes(e.gu));
+
+  if (!dir.folders) {
+    const rosterRaw = loreText(list, 'Agent roster');
+    if (!rosterRaw) throw new CatalogError('Agent roster 로어북이 없어요.');
+    const roster = parseJson(rosterRaw, 'Agent roster') as { version?: number; characters?: unknown[] };
+    if (roster.version !== 2 || !Array.isArray(roster.characters)) {
+      throw new CatalogError('Agent roster: version 2 인물 명부가 필요합니다.');
+    }
+  }
+  const people: Person[] = dir.agents
+    .map((a) => ({
+      id: a.id,
+      name: a.name,
+      english: a.english,
+      affiliation: a.affiliation,
+      rank: a.rank,
+      department: a.department,
+      rosterFor: a.rosterFor as FactionCode[],
+    }))
+    .filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
+  const refill = dir.refill;
+
+  let factionDisplay: Record<string, Record<string, string>> = {};
+  const displayRaw = loreText(list, 'Faction display');
+  if (displayRaw) {
+    try {
+      factionDisplay = parseJson(displayRaw, 'Faction display') as Record<string, Record<string, string>>;
+    } catch {
+      factionDisplay = {};
+    }
+  }
+  const affiliations: Record<string, string> = {};
+  for (const f of factionList(list)) affiliations[f.code] = f.affiliation;
+  return { anomalies, mysticSites, landmarks, people, refill, factionDisplay, extraNames: extraNames(list), affiliations, factionVars: factionVars(list) };
+}
+
+/** 내 소속에서 본 세력 표시명 (B00에서는 관리국/가짜 관리국이 뒤바뀜) */
+export function factionNames(catalog: Catalog, viewer: string | undefined): Record<string, string> {
+  const map = catalog.factionDisplay[viewer ?? ''] ?? catalog.factionDisplay.none;
+  if (map && typeof map === 'object') return catalog.extraNames ? { ...catalog.extraNames, ...map } : map;
+  const m = { ...catalog.extraNames, ...FALLBACK_DISPLAY };
+  if (viewer === 'B00') {
+    m.A00 = '가짜 관리국';
+    m.B00 = '관리국';
+  }
+  return m;
+}
+
+/** 프리셋 괴이 이름에 맞는 정식 이름 (긴 이름 우선) */
+export function presetCanon(catalog: Catalog, name: string | undefined): string | null {
+  if (!name?.trim()) return null;
+  let best: string | null = null;
+  for (const a of catalog.anomalies) {
+    if ((name === a.name || name.includes(a.name)) && (!best || a.name.length > best.length)) best = a.name;
+  }
+  return best;
+}

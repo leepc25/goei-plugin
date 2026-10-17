@@ -1,0 +1,7 @@
+node_modules/
+dist/
+dist-test/
+__pycache__/
+release/*.zip
+release/*.charx
+out/

@@ -1,0 +1,77 @@
+{
+  "languages": [
+    {"code": "ko", "label": "한국어"},
+    {"code": "en", "label": "English"}
+  ],
+  "factions": [
+    {
+      "code": "A00", "name": "관리국", "affiliation": "관리국",
+      "blurb": "괴이로부터 인류를 지키는 비밀 조직. 소수 정예 초인 요원들이 일상 뒤에 숨어 움직인다.",
+      "scenarios": [
+        {"fm": 1, "label": "면접", "kind": "opening"},
+        {"fm": 2, "label": "코드네임", "kind": "opening"},
+        {"fm": 3, "label": "근무 수칙", "kind": "opening"},
+        {"fm": 4, "label": "격리 실습", "kind": "opening"},
+        {"fm": 5, "label": "격리팀", "kind": "opening"},
+        {"fm": 6, "label": "교전", "kind": "opening"},
+        {"fm": 7, "label": "한설인육공장", "kind": "opening"},
+        {"fm": 8, "label": "직접 입력", "kind": "direct"},
+        {"fm": 9, "label": "커스텀 임무", "kind": "preset"}
+      ]
+    },
+    {
+      "code": "B00", "name": "가짜 관리국", "affiliation": "관리국",
+      "blurb": "스스로를 진짜 관리국이라 여기는 또 하나의 관리국. 괴이를 이물이라 부르며 체계화된 무력으로 대응한다.",
+      "scenarios": [
+        {"fm": 1, "label": "취조실", "kind": "opening"},
+        {"fm": 2, "label": "신입 교육", "kind": "opening"},
+        {"fm": 3, "label": "오리엔테이션", "kind": "opening"},
+        {"fm": 4, "label": "스카우트", "kind": "opening"},
+        {"fm": 5, "label": "검사부대", "kind": "opening"},
+        {"fm": 6, "label": "데이터베이스", "kind": "opening"},
+        {"fm": 7, "label": "상황 발생", "kind": "opening"},
+        {"fm": 8, "label": "직접 입력", "kind": "direct"},
+        {"fm": 9, "label": "커스텀 임무", "kind": "preset"}
+      ]
+    },
+    {
+      "code": "C00", "name": "백일몽 주식회사", "affiliation": "백일몽 주식회사",
+      "blurb": "괴이를 상품으로 만드는 제약 대기업. 겉으로는 제약사, 진짜 상품은 꿈결이다.",
+      "scenarios": [
+        {"fm": 1, "label": "신입 OT", "kind": "opening"},
+        {"fm": 2, "label": "D조 첫 출근", "kind": "opening"},
+        {"fm": 3, "label": "화요 퀴즈쇼", "kind": "opening"},
+        {"fm": 4, "label": "유쾌 테마파크", "kind": "opening"},
+        {"fm": 5, "label": "커스텀 장비", "kind": "opening"},
+        {"fm": 6, "label": "착한 친구", "kind": "opening"},
+        {"fm": 7, "label": "세광특별시", "kind": "opening"},
+        {"fm": 8, "label": "직접 입력", "kind": "direct"},
+        {"fm": 9, "label": "커스텀 임무", "kind": "preset"}
+      ]
+    },
+    {
+      "code": "D00", "name": "민간인", "affiliation": "민간인",
+      "blurb": "괴이의 존재를 모르는 평범한 사람. 우연한 조우가 모든 것을 바꾼다.",
+      "scenarios": [
+        {"fm": 1, "label": "지하철의 여자", "kind": "opening"},
+        {"fm": 2, "label": "기독교 상점", "kind": "opening"},
+        {"fm": 3, "label": "세계정치 게시판", "kind": "opening"},
+        {"fm": 4, "label": "무엇이든 자판기", "kind": "opening"},
+        {"fm": 5, "label": "중림 지하상가", "kind": "opening"},
+        {"fm": 6, "label": "직접 입력", "kind": "direct"},
+        {"fm": 7, "label": "커스텀 임무", "kind": "preset"}
+      ]
+    },
+    {
+      "code": "E00", "name": "프리랜서", "affiliation": "프리랜서",
+      "blurb": "특수재난대응협회와 뒷골목 알선소의 의뢰로 먹고사는 해결사.",
+      "scenarios": [
+        {"fm": 1, "label": "협회 접수창구", "kind": "opening"},
+        {"fm": 2, "label": "대박알선", "kind": "opening"},
+        {"fm": 3, "label": "직접 입력", "kind": "direct"},
+        {"fm": 4, "label": "커스텀 임무", "kind": "preset"}
+      ]
+    }
+  ],
+  "defaultScenario": {"A00": 2, "B00": 2, "C00": 2, "D00": 1, "E00": 1}
+}
