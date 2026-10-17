@@ -587,7 +587,7 @@ function renderPicker(): void {
   else return render();
 }
 
-const INNER_SCROLL = '.gx-acards.pick, .gx-sidecol, .gx-mbox, .gx-sits';
+const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs';
 
 function render(): void {
   if (!root) return;

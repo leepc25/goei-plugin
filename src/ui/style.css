@@ -66,7 +66,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
   width: min(100%, 1280px);
   /* 커스텀 임무 오른쪽(요원 12명·작전 메모·임무 요청)이 스크롤 없이 딱 들어오는 높이 (v0.16.16) */
-  height: min(100%, 920px);
+  height: min(100%, 950px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
@@ -309,7 +309,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
 .gx-canvas.ph { aspect-ratio: 4 / 5; }
 .gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
-.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 920px) - 210px); user-select: none; }
+.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
 .gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; }
 .gx-pin {
   position: absolute; transform: translate(-50%, -50%);
@@ -367,7 +367,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
 .gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
 .gx-step:disabled { opacity: .4; }
-.gx-mbox { max-height: calc(min(100vh - 28px, 920px) - 222px); overflow-y: auto; }
+.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
 /* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
 .gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
 .gx-mapcol .gx-segs { align-self: flex-start; }
@@ -1052,9 +1052,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
   /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
-  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
+  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
   /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
-  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
+  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
   .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
   .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
   .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
@@ -1184,3 +1184,12 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-agpop-txt small { font-size: 13px; color: var(--dim); }
 .gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
 .gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+
+/* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
+   요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
+@media (min-width: 761px) {
+  .gx-board > .gx-bd-cols { flex: none; }
+  .gx-board .gx-bd-col > .gx-evcs { max-height: 316px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
+  .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; scrollbar-width: thin; }
+}

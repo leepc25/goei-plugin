@@ -192,6 +192,28 @@ for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e)
 await page.setViewportSize({ width: 1300, height: 860 });
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 await g('p01-board');
+// 가장 빡빡한 경우: 진행 중 괴이 3개 + 요원 4줄, 상태 설명 두 줄씩 꽉 → 창 전체가 스크롤되면 안 된다
+await page.setViewportSize({ width: 1920, height: 1080 });
+const fill = () => page.evaluate(() => {
+  const ul = document.querySelector('#gx-sec-an .gx-evcs');
+  const live = [...ul.children].find((li) => li.querySelector('.gx-evc-who')) ?? ul.children[0];
+  ul.innerHTML = '';
+  for (let i = 0; i < 3; i++) ul.appendChild(live.cloneNode(true));
+  const long = '현장 주변을 수색하며 생존자를 찾고 있다. 외곽 통로에서 이상한 소리가 계속 들려 무전으로 보고하는 중이다.';
+  document.querySelectorAll('#gx-sec-ag .gx-acard-txt').forEach((t) => {
+    let s = t.querySelector('.gx-acard-sit');
+    if (!s) { s = document.createElement('span'); s.className = 'gx-acard-sit'; t.appendChild(s); }
+    s.textContent = long;
+  });
+  const b = document.querySelector('.gx-board');
+  return { body: [b.clientHeight, b.scrollHeight], an: ul.offsetHeight, ag: document.querySelector('#gx-sec-ag .gx-acards').offsetHeight, card: document.querySelector('#gx-sec-ag .gx-acard').offsetHeight, ev: live.offsetHeight };
+});
+console.log('board full', JSON.stringify(await fill()));
+await g('p01b-board-full');
+await page.evaluate(() => { const ul = document.querySelector('#gx-sec-an .gx-evcs'); ul.appendChild(ul.children[0].cloneNode(true)); const ag = document.querySelector('#gx-sec-ag .gx-acards'); for (let i = 0; i < 3; i++) ag.appendChild(ag.children[i].cloneNode(true)); const b = document.querySelector('.gx-board'); console.log(b.clientHeight, b.scrollHeight); });
+console.log('board over', await page.evaluate(() => { const b = document.querySelector('.gx-board'); return [b.clientHeight, b.scrollHeight, document.querySelector('#gx-sec-an .gx-evcs').scrollHeight, document.querySelector('#gx-sec-an .gx-evcs').clientHeight]; }));
+await g('p01c-board-over');
+await page.setViewportSize({ width: 1300, height: 860 });
 await page.click('.gx-nav .gx-nb.desk[data-value="map"]');
 await g('p02-map');
 await page.click('.gx-zbtn[data-zoom="in"]');
