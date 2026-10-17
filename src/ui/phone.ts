@@ -739,7 +739,7 @@ function noticeList(items: ReturnType<typeof readBulletins>['items']): string {
       return `<li class="ph-notice${on ? ' on' : ''}${open ? ' open' : ''}${r.read === false ? ' new' : ''}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on}" aria-expanded="${open}">
         <span class="ph-ncard-top"><span class="gx-badge">${esc(r.category)}</span><small>${esc(r.issuer)}${r.time ? ` · ${esc(r.time)}` : ''}</small></span>
         <span class="ph-ncard-title"><b>${esc(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ''}</span>
-        ${open ? '' : `<span class="ph-ncard-pre">${esc(r.text)}</span>`}</button>${del}
+</button>${del}
         ${open ? `<div class="ph-notice-body">${esc(r.text).replace(/\n/g, '<br>')}</div>` : ''}</li>`;
     })
     .join('')}</ul>`;
@@ -754,11 +754,17 @@ function noticeDetail(ctx: ChatContext): string {
     r = undefined;
   }
   if (!r) return '<div class="ph-empty"><p class="gx-none">공지를 찾지 못했어요.</p></div>';
-  return `<div class="ph-form ph-ndoc">${paneHead('공지', esc(r.issuer))}
+  const confirm = phone.confirm === `notice:${r.id}`;
+  const del = confirm
+    ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>`
+    : tool('ph-notice-del', ICONS.trash, '공지 삭제', `data-value="${r.id}"`);
+  // 공지문 모양: 제목줄(분류·제목·발신) → 본문 → 아래 발신 서명
+  return `<div class="ph-form ph-ndoc">${paneHead('공지', esc(r.issuer), `<span class="ph-act">${del}</span>`)}
     <article class="ph-ndoc-body">
-      <div class="ph-ndoc-meta"><span class="gx-badge">${esc(r.category)}</span><small>${esc(r.issuer)}${r.time ? ` · ${esc(r.time)}` : ''}</small></div>
-      <h3>${esc(r.title)}</h3>
+      <header class="ph-ndoc-head"><span class="gx-badge">${esc(r.category)}</span><h3>${esc(r.title)}</h3>
+        <div class="ph-ndoc-meta"><span>발신 ${esc(r.issuer)}</span>${r.time ? `<span>${esc(r.time)}</span>` : ''}</div></header>
       <div class="ph-ndoc-text">${esc(r.text).replace(/\n/g, '<br>')}</div>
+      <footer class="ph-ndoc-sign">${r.time ? `<span>${esc(r.time.split(' ')[0])}</span>` : ''}<b>${esc(r.issuer)}</b></footer>
     </article></div>`;
 }
 

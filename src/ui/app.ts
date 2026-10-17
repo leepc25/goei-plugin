@@ -150,11 +150,16 @@ function ensureRoot(): HTMLElement {
   });
   // 작성칸에 사진 붙여넣기·끌어놓기 (원본처럼)
   const photoTarget = (el: EventTarget | null) => {
-    const box = (el as HTMLElement | null)?.closest?.('.gn-pane, .gn-cpane, .ph-room');
-    return box ? (box.classList.contains('gn-pane') || box.classList.contains('gn-cpane') ? 'gn' : 'ph') : '';
+    const box = (el as HTMLElement | null)?.closest?.('.gn-pane, .gn-cpane, .gn-inline, .ph-room');
+    return box ? (box.matches('.gn-pane, .gn-cpane, .gn-inline') ? 'gn' : 'ph') : '';
   };
   const imageFiles = (list: FileList | DataTransferItemList | undefined) =>
     [...(list ?? [])].map((x) => (x instanceof File ? x : (x as DataTransferItem).kind === 'file' ? (x as DataTransferItem).getAsFile() : null)).filter((f): f is File => !!f && f.type.startsWith('image/'));
+  // PC↔모바일 폭이 바뀌면 다시 그린다 (괴담넷은 모바일에서 목록 안 펼침, PC는 두 칸)
+  if (!widthWatch) {
+    widthWatch = true;
+    matchMedia('(max-width: 760px)').addEventListener?.('change', () => root && render());
+  }
   root.addEventListener('paste', (ev) => {
     const prefix = photoTarget(ev.target);
     const files = imageFiles(ev.clipboardData?.items);
@@ -286,6 +291,7 @@ async function addPhotos(prefix: string, files: File[]): Promise<void> {
 }
 
 /** quietIfNotLite: 플로팅 버튼에서 열 때는 괴이봇 Lite가 아니면 아무것도 띄우지 않는다. */
+let widthWatch = false;
 export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<void> {
   ensureRoot();
   if (opts.quietIfNotLite) {

@@ -851,16 +851,15 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     const vp = page.viewportSize();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: `${shots}/14-gnet-dm-mobile.png` });
-    await page.click('[data-action="gn-back"]');
-    await page.screenshot({ path: `${shots}/14-gnet-dmlist-mobile.png` });
+    assert.equal(await page.locator('.gn-dm-inline').count(), 1, '모바일 쪽지는 목록 안에서 펼침');
     await page.click('[data-action="gn-sub"][data-value="board"]');
-    await page.click('[data-action="gn-reply"] >> nth=0');
+    await page.click('.gn-inline [data-action="gn-reply"] >> nth=0');
     await page.screenshot({ path: `${shots}/14-gnet-post-mobile.png` });
     await page.click('[data-action="gn-cancel"]');
-    await page.click('[data-action="gn-back"]');
+    await page.click('.gn-row.on .gn-row-main');
     await page.screenshot({ path: `${shots}/14-gnet-board-mobile.png` });
+    assert.equal(await page.locator('.gn-inline').count(), 0, '다시 누르면 접힘');
     await page.click('[data-action="gn-sub"][data-value="dm"]');
-    await page.click('[data-action="gn-open-dm"][data-value="관람차덕후"]');
     await page.setViewportSize(vp);
   }
   const retry = await page.evaluate(() => window.__calls.llm[3].messages);

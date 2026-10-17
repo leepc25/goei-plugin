@@ -351,10 +351,14 @@ function paneHead(title: string, sub: string, right = '', back = true): string {
 
 /** 오른쪽 칸(모바일은 목록 대신)에 무엇을 띄울지 (v0.16.22: 괴담톡처럼 두 칸) */
 type Pane = 'settings' | 'compose' | 'post' | 'dm' | null;
-function paneKind(st: GState): Pane {
+/** 모바일: 글·쪽지는 화면을 넘기지 않고 목록 안에서 펼친다 (사용자 요청) */
+const narrow = () => matchMedia('(max-width: 760px)').matches;
+
+function paneKind(st: GState, mobile = narrow()): Pane {
   if (gnet.settings) return 'settings';
   const c = gnet.compose;
   if (c && (c.kind === 'post' || c.kind === 'newdm' || (c.kind === 'dm' && !st.dms.some((d) => d.nick === c.nick)))) return 'compose';
+  if (mobile) return null;
   if (gnet.sub === 'board' && gnet.open !== null && findPost(st, gnet.open)) return 'post';
   if (gnet.sub === 'dm' && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return 'dm';
   return null;
@@ -412,10 +416,11 @@ function commentTree(p: GPost): string {
           ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>`
           : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>`
         : '';
+      // 게시판 댓글 줄: 닉네임 | 내용 | 답글·삭제 (모바일은 닉네임 줄 아래 내용)
       out.push(`<li class="gn-c${depth ? ' re' : ''}${c.unread ? ' unread' : ''}${target === k ? ' target' : ''}" style="--gn-depth:${Math.min(depth, 3)}">
-        <div class="gn-c-head">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ''}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ''}
-          <span class="gn-c-act"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</span></div>
-        <div class="gn-c-body">${body(c.body)}</div></li>`);
+        <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ''}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ''}</div>
+        <div class="gn-c-body">${body(c.body)}</div>
+        <div class="gn-c-act"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
       walk(k, depth + 1);
     }
   };
@@ -423,7 +428,7 @@ function commentTree(p: GPost): string {
   return out.join('');
 }
 
-function postView(p: GPost, busy: boolean): string {
+function postView(p: GPost, busy: boolean, inline = false): string {
   const c = gnet.compose;
   const reply = c?.kind === 'comment' && c.post === p.id && c.parent > 0 ? c : null;
   const confirm = gnet.confirm === `p:${p.id}`;
@@ -435,21 +440,22 @@ function postView(p: GPost, busy: boolean): string {
   const chip = reply
     ? `<div class="gn-replyto"><span>${esc(reply.label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`
     : '';
-  return `<div class="ph-room gn-pane">${paneHead(esc(p.title), `#${p.id}`, right)}
+  return `<div class="${inline ? 'gn-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead('게시판', `#${p.id}`, right)}
     <div class="gn-doc">
       <article class="gn-post">
-        <div class="gn-post-meta">${p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc(p.nick)}</button>`}
-          <span>${esc(p.date)}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></div>
+        <header class="gn-post-head">${inline ? '' : `<h2 class="gn-post-title">${esc(p.title)}</h2>`}
+          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc(p.nick)}</button>`}</span>
+            <span>${esc(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span>${inline && right ? `<span class="gn-inline-del">${right}</span>` : ''}</div></header>
         <div class="gn-post-body">${body(p.body)}</div>
       </article>
-      <section class="gn-csec"><h3 class="gn-ccount">댓글 <b>${p.comments.length}</b></h3>
+      <section class="gn-csec"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>
         ${p.comments.length ? `<ul class="gn-comments">${commentTree(p)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
     </div>
     ${composer(busy, reply ? '답글 입력' : '댓글 입력', chip)}
   </div>`;
 }
 
-function dmPane(st: GState, nick: string, busy: boolean): string {
+function dmPane(st: GState, nick: string, busy: boolean, inline = false): string {
   const t = dmThreads(st).find((x) => x.nick === nick);
   if (!t) return '';
   const confirm = gnet.confirm === `d:${nick}`;
@@ -459,7 +465,7 @@ function dmPane(st: GState, nick: string, busy: boolean): string {
   const src = st.sources[nick];
   const c = gnet.compose;
   const ph = c?.kind === 'dm' && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : '쪽지 입력';
-  return `<div class="ph-room gn-pane">${paneHead(esc(nick), `${t.rows.length}통`, right)}
+  return `<div class="${inline ? 'gn-inline gn-dm-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead(esc(nick), `${t.rows.length}통`, right)}
     <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc(src.title)}」</div>` : ''}
       ${t.rows.map((d, i) => {
         const first = i === 0 || t.rows[i - 1].side !== d.side;
@@ -471,7 +477,7 @@ function dmPane(st: GState, nick: string, busy: boolean): string {
 }
 
 /** 게시판 목록: 첫 줄 제목·댓글 수, 둘째 줄 닉네임·시각·조회·추천 */
-function boardList(st: GState): string {
+function boardList(st: GState, busy: boolean, mobile: boolean): string {
   if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
   return `<ul class="ph-list gn-list">${st.posts
     .map((p) => {
@@ -479,12 +485,12 @@ function boardList(st: GState): string {
       return `<li class="gn-row${on ? ' on' : ''}${p.mine ? ' mine' : ''}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on}">
         <span class="gn-title"><b>${esc(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ''}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ''}</span>
         <span class="gn-row-meta"><span class="gn-row-nick">${esc(p.nick)}</span><span>${esc(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
-      </button></li>`;
+      </button>${mobile && on && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy, true) : ''}</li>`;
     })
     .join('')}</ul>`;
 }
 
-function dmList(st: GState): string {
+function dmList(st: GState, busy: boolean, mobile: boolean): string {
   const threads = dmThreads(st);
   if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
   return `<ul class="ph-list gn-list">${threads
@@ -498,7 +504,7 @@ function dmList(st: GState): string {
       return `<li class="ph-row"><button class="ph-main gn-dmrow${on ? ' on' : ''}" data-action="gn-open-dm" data-value="${esc(t.nick)}" aria-pressed="${on}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
         <span class="ph-who"><span class="ph-who-top"><b>${esc(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc(time(t.lastDate) || t.lastDate)}</small>` : ''}</span>
-        <span class="ph-who-bot"><small>${last.side === 'me' ? '나: ' : ''}${esc([...previewText(last.body)].slice(0, 60).join(''))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ''}</span></span></button>${del}</li>`;
+        <span class="ph-who-bot"><small>${last.side === 'me' ? '나: ' : ''}${esc([...previewText(last.body)].slice(0, 60).join(''))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ''}</span></span></button>${del}${mobile && on && gnet.compose?.kind !== 'newdm' ? dmPane(st, t.nick, busy, true) : ''}</li>`;
     })
     .join('')}</ul>`;
 }
@@ -556,7 +562,8 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   const job = jobs.get(chatKey(ctx));
   const busy = !!job;
   const unreadDm = st.dms.filter((d) => d.unread).length;
-  const kind = paneKind(st);
+  const mobile = narrow();
+  const kind = paneKind(st, mobile);
   const nick = gnet.editNick
     ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc(me === '익명' && !ctx.chat.scriptstate?.[GN_NICK] ? '' : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>`
     : '';
@@ -569,18 +576,18 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   return `<main class="gx-body ph ph-app gn ${kind ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담넷 목록">
       <div class="ph-side-head">
-        <div class="ph-subs">${subBtn('board', '게시판', boardUnread(st) ? '<span class="gn-dot"></span>' : '')}${subBtn('dm', '쪽지함', unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : '')}</div>
+        <div class="ph-subs">${subBtn('board', '게시판', boardUnread(st) ? '<span class="gn-dot"></span>' : '')}${subBtn('dm', '쪽지함', unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : '')}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc(me)}</b></span></div>
         <div class="ph-tools">
           ${tool('gn-refresh', ICONS.refresh, '게시판 새로고침', busy ? 'disabled' : '', '새로고침')}
           ${tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기')}
           ${tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지')}
-          ${tool('gn-nick', ICONS.idcard, `내 닉네임: ${esc(me)}`, gnet.editNick ? 'aria-pressed="true"' : '', esc(me))}
+          ${tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임')}
           ${tool('gn-settings', ICONS.settings, '괴담넷 설정', gnet.settings ? 'aria-pressed="true"' : '', '설정')}
         </div>
         ${nick}
       </div>
       ${kind ? '' : status}
-      <div class="ph-content">${gnet.sub === 'board' ? boardList(st) : dmList(st)}</div>
+      <div class="ph-content">${gnet.sub === 'board' ? boardList(st, busy, mobile) : dmList(st, busy, mobile)}</div>
       ${fail}
     </section>
     <section class="ph-pane">${kind ? status : ''}${paneHtml(ctx, st, kind, busy)}</section>
@@ -730,10 +737,9 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       break;
     case 'gn-send': {
       // 글을 연 채 아래 입력줄에 쓰면 댓글, 쪽지를 연 채 쓰면 답장
-      const shown = paneKind(st());
       const c: Compose | null = gnet.compose
-        ?? (shown === 'post' && gnet.open !== null ? { kind: 'comment', post: gnet.open, parent: 0, label: '댓글' }
-          : shown === 'dm' && gnet.openDm ? { kind: 'dm', nick: gnet.openDm, label: `${gnet.openDm}에게 답장` } : null);
+        ?? (gnet.sub === 'board' && gnet.open !== null ? { kind: 'comment', post: gnet.open, parent: 0, label: '댓글' }
+          : gnet.sub === 'dm' && gnet.openDm ? { kind: 'dm', nick: gnet.openDm, label: `${gnet.openDm}에게 답장` } : null);
       if (!c) break;
       if (!gnet.draft.trim() && !gnet.attach.length) {
         gnet.notice = '내용을 입력해 주세요.';
