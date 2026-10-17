@@ -1154,21 +1154,17 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 /* 사진+톡·위키 칸: PC는 없는 셈 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
 .gx-acard-side { display: contents; }
-/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 왼쪽 칸에 큰 사진, 그 아래 톡·위키 나란히. 글은 오른쪽 칸 전체 */
+/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
 @media (max-width: 760px) {
-  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: flex-start; gap: 8px; padding: 8px; }
-  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
-  .gx-acard-side { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: none; }
-  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: static; display: flex; justify-content: space-between; width: 64px; gap: 0; margin: 0; }
-  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 31px; height: 30px; border-radius: 8px; background: var(--panel2); color: var(--sub); }
-  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 17px; height: 17px; }
-  /* 이름 아래 상태 딱지: 줄이 바뀌어도 찌그러지지 않게 높이·위 여백 고정 */
-  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 0; }
+  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: center; gap: 10px; padding: 10px; }
+  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 60px; height: 60px; border-radius: 14px; font-size: 22px; }
+  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; margin: 0; }
+  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 36px; height: 34px; }
+  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
+  /* 이름·상태 줄은 버튼 자리만큼 비우고, 딱지는 높이 고정 (줄이 바뀌어도 찌그러지지 않게) */
+  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 76px; }
   .gx-board .gx-acard-top b, .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; max-width: 100%; }
   .gx-board .gx-st, .gx-acard.pick.wide .gx-st { flex: none; height: 20px; line-height: 20px; padding: 0 7px; font-size: 11.5px; }
-  /* 고른 표시는 사진 왼쪽 위 모서리에 (이름 자리를 먹지 않게) */
-  .gx-acard.pick.wide .gx-acard-check { top: 4px; left: 4px; right: auto; bottom: auto; }
-  /* 좁은 칸: 단어 중간이 아니라 「 · 」에서 줄을 바꾼다 */
   .gx-board .gx-acard-txt small, .gx-acard.pick.wide .gx-acard-txt small, .gx-board .gx-acard-sit, .gx-acard.pick.wide .gx-acard-sit { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
   .gx-board .gx-acard { cursor: pointer; }
 }
