@@ -1002,13 +1002,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
 }
 @media (max-width: 760px) {
-  /* 편성 요원: 단계로 나눈 뒤에도 한 줄 한 명은 너무 길어서 두 칸 (상태는 이름 아래 줄, 부서·직급은 말줄임) */
-  .gx-acards.pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 편성 요원: 한 줄에 한 명 (v0.16.18: 두 칸은 글이 너무 좁았다, 사용자 결정) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); }
   .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
   .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
   /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
   .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
-  .gx-acard.pick .gx-acard-top b { flex: 1 0 100%; padding-right: 16px; box-sizing: border-box; }
+  .gx-acard.pick .gx-acard-top b { flex: 0 1 auto; padding-right: 0; }
   .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
   .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
   .gx-acard.pick .gx-acard-top b { font-size: 14px; }
@@ -1146,8 +1146,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
 @media (max-width: 760px) {
-  /* 모바일 요원 카드: 한 줄에 2개, PC와 같은 가로 배치(사진만 작게) */
-  .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
+  .gx-board .gx-acards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .gx-board .gx-acard-top b { font-size: 13.5px; }
   .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
   .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
