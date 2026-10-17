@@ -47,7 +47,8 @@ export function elapsedText(minute: number | null, since: number | null): string
   if (minute === null || since === null) return '';
   const m = Math.max(0, minute - since);
   const h = Math.floor(m / 60);
-  return h ? `${h}시간 ${m % 60}분째` : `${m % 60}분째`;
+  if (!m) return '방금 발생';
+  return `발생 ${h ? `${h}시간 ` : ''}${m % 60 || !h ? `${m % 60}분 ` : ''}경과`;
 }
 
 export function evCard(c: EvCard): string {
