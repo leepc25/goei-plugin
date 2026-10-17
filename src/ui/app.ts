@@ -8,7 +8,7 @@ import {
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
-import { agentInner, avatar, imageUrl, setImageRedraw } from './images';
+import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo } from './images';
 import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
@@ -425,6 +425,13 @@ async function handle(action: string, value?: string): Promise<void> {
       tab = 'map';
       notice = '';
       return render();
+    case 'agent-info': {
+      // 상황판 요원 카드: 모바일에서만 상태 전문 창 (PC는 잘림이 거의 없고 카드가 넓다)
+      if (!matchMedia('(max-width: 760px)').matches) return;
+      const card = root?.querySelector<HTMLElement>(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? '')}"]`);
+      if (card) showAgentInfo(card);
+      return;
+    }
     case 'agent-talk':
       // 상황판 요원 카드의 톡: 괴담톡 탭으로 넘어가 그 요원과의 1:1 방을 연다
       if (view.kind !== 'started') return;
@@ -818,7 +825,8 @@ function board(ctx: ChatContext): string {
         ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(p.id)}" title="괴담톡" aria-label="${esc(p.name)}에게 톡">${ICONS.phone}</button>`
           + `<button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(c.wiki)}" title="위키" aria-label="${esc(p.name)} 위키">${ICONS.wiki}</button></span>`
         : '';
-      return `<li class="gx-acard${st === '작전투입' ? ' op' : ''}" title="${esc(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? '')}${act}</li>`;
+      // 카드를 누르면 상태 전문 (모바일은 상태가 두 줄에서 잘린다)
+      return `<li class="gx-acard${st === '작전투입' ? ' op' : ''}" title="${esc(p.id)}" data-action="agent-info" data-value="${esc(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? '', act)}</li>`;
     })
     .join('');
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';

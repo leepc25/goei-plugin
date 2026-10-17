@@ -76,10 +76,31 @@ export function prefetchFactions(char: CharacterSnapshot): void {
 }
 
 /** 요원 상태 색 (상황판·편성 공통) */
+/** 화면에 보이는 상태 이름 (모델 태그 값은 그대로 「작전투입」, 사용자 요청으로 표시만 짧게) */
+export const stLabel = (st: string) => (st === '작전투입' ? '작전' : st);
+
 const AGENT_COLOR: Record<string, string> = { 작전투입: 'var(--signal)', 외근: 'var(--blue)', 부상: 'var(--amber)', 실종: 'var(--danger)', 격리: 'var(--danger)', 사망: 'var(--danger)', 비번: 'var(--dim)' };
 
 /** 요원 카드 속: 둥근 네모 사진 + 이름·상태 + 소속 부서·직급 (+ 현재 상황) */
-export function agentInner(char: CharacterSnapshot, p: { english?: string; name: string; department?: string; rank?: string }, st: string, situation = ''): string {
+/** act: 톡·위키 버튼. 사진과 한 칸(.gx-acard-side)에 넣어 모바일에서는 사진 바로 아래 나란히 둔다 (PC는 카드 오른쪽 위) */
+export function agentInner(char: CharacterSnapshot, p: { english?: string; name: string; department?: string; rank?: string }, st: string, situation = '', act = ''): string {
   const role = [p.department, p.rank].filter(Boolean).join(' · ');
-  return `${avatar(char, p.english, p.name, 'sq')}<span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? 'var(--dim)'}">${escAttr(st)}</em></span>${role ? `<small>${escAttr(role)}</small>` : ''}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ''}</span>`;
+  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, 'sq')}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? 'var(--dim)'}">${escAttr(stLabel(st))}</em></span>${role ? `<small>${escAttr(role)}</small>` : ''}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ''}</span>`;
+}
+
+/** 모바일 상황판 요원 카드를 눌렀을 때: 잘린 상태 설명까지 전부 보여 주는 작은 창 */
+export function showAgentInfo(card: HTMLElement): void {
+  const box = document.createElement('div');
+  box.className = 'gx gx-agpop';
+  box.setAttribute('role', 'dialog');
+  const side = card.querySelector('.gx-ava')?.outerHTML ?? '';
+  const txt = card.querySelector('.gx-acard-txt')?.innerHTML ?? '';
+  box.innerHTML = `<div class="gx-agpop-card">${side}<div class="gx-agpop-txt">${txt}</div><button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+  const theme = document.querySelector('.gx')?.getAttribute('data-theme');
+  if (theme) box.setAttribute('data-theme', theme);
+  box.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('.gx-agpop-card') && !(e.target as HTMLElement).closest('.gx-agpop-x')) return;
+    box.remove();
+  });
+  document.body.appendChild(box);
 }

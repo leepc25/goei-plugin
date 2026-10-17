@@ -131,6 +131,9 @@ await page.waitForSelector('.gx-board');
 await g('m01-board');
 await page.evaluate(() => document.querySelector('.gx-content')?.scrollBy(0, 600));
 await g('m02-board-scroll');
+await page.click('.gx-board .gx-acard .gx-acard-sit').catch((e) => console.log('agpop', e.message));
+await g('m02b-agent-info');
+await page.click('.gx-agpop-x').catch(() => {});
 await page.click('.gx-nav .gx-nb.mob[data-value="map"]');
 await g('m03-map');
 // 두 손가락으로 지도 확대 (충남 근처)

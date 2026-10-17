@@ -15,7 +15,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { ICONS } from './icons';
 import { elapsedText, evCard, peopleChips } from './evcard';
-import { agentInner } from './images';
+import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
 
@@ -303,10 +303,10 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
           : '';
         const off = !!lock || full;
         return `<div class="gx-acard pick wide${on ? ' on' : ''}${off ? ' off' : ''}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc(p.id)}" aria-pressed="${on}" aria-disabled="${off}"
-          ${lock ? `title="${esc(`${lock} 상태라 편성할 수 없어요`)}"` : ''}>${agentInner(x.char, p, st, sit)}${act}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+          ${lock ? `title="${esc(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ''}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
       }
       return `<button class="gx-acard pick${on ? ' on' : ''}" data-action="team-toggle" data-value="${esc(p.id)}" ${lock || full ? 'disabled' : ''} aria-pressed="${on}"
-        title="${esc(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
+        title="${esc(lock ? `${stLabel(lock)} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
     })
     .join('');
   // 지원 인원도 요원과 같은 카드 모양으로 (인원은 카드 안에서 −/+)

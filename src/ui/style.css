@@ -1067,16 +1067,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .gx-field[data-step="team"] .gx-team { gap: 8px; }
   /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
-  .gx-acard.pick.wide { align-items: flex-start; gap: 8px; padding: 10px 8px; }
-  .gx-acard.pick.wide .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
-  .gx-acard.pick.wide { flex-wrap: wrap; }
   .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
   .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
   .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
-  .gx-acard.pick.wide .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
-  .gx-acard.pick.wide .gx-acard-tool { width: 40px; height: 34px; }
-  .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
-  .gx-acard.pick.wide .gx-acard-check { bottom: 9px; left: 10px; right: auto; }
 }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
@@ -1148,14 +1141,36 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) {
   /* 모바일 요원 카드: 한 줄에 2개, PC와 같은 가로 배치(사진만 작게) */
   .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .gx-board .gx-acard { align-items: flex-start; gap: 8px; padding: 10px 8px; }
-  .gx-board .gx-acard .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
   .gx-board .gx-acard-top b { font-size: 13.5px; }
   .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
-  /* 톡·위키: 손가락으로 누르기 쉽게 카드 맨 아래 오른쪽에 큰 칸으로 (v0.16.18: 20px짜리는 탭하기 힘들었고, 옆에 세로로 두면 글자가 좁아졌다) */
-  .gx-board .gx-acard { flex-wrap: wrap; }
-  .gx-board .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
-  .gx-board .gx-acard-tool { width: 40px; height: 34px; }
-  .gx-board .gx-acard-tool svg { width: 18px; height: 18px; }
   .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
 }
+/* 사진+톡·위키 칸: PC는 없는 셈 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+.gx-acard-side { display: contents; }
+/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 왼쪽 칸에 큰 사진, 그 아래 톡·위키 나란히. 글은 오른쪽 칸 전체 */
+@media (max-width: 760px) {
+  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: flex-start; gap: 8px; padding: 8px; }
+  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
+  .gx-acard-side { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: none; }
+  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: static; display: flex; justify-content: space-between; width: 64px; gap: 0; margin: 0; }
+  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 31px; height: 30px; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 17px; height: 17px; }
+  /* 이름 아래 상태 딱지: 줄이 바뀌어도 찌그러지지 않게 높이·위 여백 고정 */
+  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 0; }
+  .gx-board .gx-acard-top b, .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; max-width: 100%; }
+  .gx-board .gx-st, .gx-acard.pick.wide .gx-st { flex: none; height: 20px; line-height: 20px; padding: 0 7px; font-size: 11.5px; }
+  /* 고른 표시는 사진 왼쪽 위 모서리에 (이름 자리를 먹지 않게) */
+  .gx-acard.pick.wide .gx-acard-check { top: 4px; left: 4px; right: auto; bottom: auto; }
+  /* 좁은 칸: 단어 중간이 아니라 「 · 」에서 줄을 바꾼다 */
+  .gx-board .gx-acard-txt small, .gx-acard.pick.wide .gx-acard-txt small, .gx-board .gx-acard-sit, .gx-acard.pick.wide .gx-acard-sit { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+  .gx-board .gx-acard { cursor: pointer; }
+}
+.gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
+.gx-agpop-card { position: relative; display: flex; gap: 12px; width: min(100%, 420px); box-sizing: border-box; padding: 16px 44px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 72px; height: 72px; border-radius: 16px; flex: none; }
+.gx-agpop-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gx-agpop-txt .gx-acard-top b { font-size: 16px; }
+.gx-agpop-txt small { font-size: 13px; color: var(--dim); }
+.gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
