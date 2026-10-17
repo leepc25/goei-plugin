@@ -163,7 +163,7 @@ await page.click('.gx-stepbar button:nth-child(2)').catch((e) => console.log('st
 await page.click('.gx-acard.pick.wide:not(.off)', { timeout: 3000 }).catch((e) => console.log('pick', e.message));
 await g('m04d-team-360');
 await page.setViewportSize({ width: 390, height: 844 });
-await page.click('.gx-subnav [data-value="mission"]').catch(() => {});
+await page.click('.gx-stepswap').catch(() => {});
 await g('m05-mission');
 await page.click('.gx-nav .gx-nb[data-value="phone"]');
 await g('m06-phone');

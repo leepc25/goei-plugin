@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.18
+//@version 0.16.19
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -4929,6 +4929,7 @@ var ICONS = {
   gnet: stroke('<path d="M4 5h16v11H8l-4 4V5Z"/><path d="M8 9h8M8 12h5"/>'),
   wiki: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
   settings: stroke('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+  swap: stroke('<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>'),
   info: stroke('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
   refresh: stroke('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>'),
   group: stroke('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>'),
@@ -7772,10 +7773,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
 .gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
 .gx-nb.mob { display: none; }
-.gx-subwrap { display: none; padding: 8px 16px 0; }
 .gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
-.gx-subnav { display: flex; gap: 2px; padding: 3px; margin: 8px 0 0; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
-.gx-subnav .gx-seg { flex: 1; min-width: 0; }
 
 .gx-body { padding: 4px 20px 16px; overflow-y: auto; overscroll-behavior: contain; }
 .gx-body section { padding: 14px 0 6px; }
@@ -7910,7 +7908,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-tabs { overflow-x: auto; scrollbar-width: none; }
 .gx-tab { white-space: nowrap; flex: none; }
 .gx-tab-end { margin-left: auto; font-size: 14px; }
-.gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; }
+.gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
 /* PC: 지도는 옆 목록을 내려도 따라오고, 창 높이에 맞춰 최대한 크게 (v0.11.0) */
 .gx-field > .gx-mapcol { position: sticky; top: 12px; }
 .gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -8179,8 +8177,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-seg { flex: 1; min-width: 0; padding: 0 8px; }
   .gx-brand small { font-size: 13px; }
   .gx-brand small .y { display: none; }
-  .gx-subwrap { display: block; }
-  .gx-subnav { margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .gx-live::after { animation: none; } .gx-fac.has-img::after { transition: none; } }
 
@@ -8602,6 +8598,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-stepbar { display: none; }
 @media (max-width: 760px) {
   .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr auto; }
+  /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
+  .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .gx-stepswap svg { width: 16px; height: 16px; }
   .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
   .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
   .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
@@ -8667,7 +8667,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 @media (max-width: 760px) {
   /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
-  .gx-subnav .gx-seg { min-height: 34px; font-size: 14px; }
+  .gx-field { padding-top: 10px; row-gap: 12px; }
   .gx-stepbar { gap: 6px; margin-bottom: 2px; }
   .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
   .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
@@ -8978,7 +8978,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.18" : "0";
+var PLUGIN_VERSION = true ? "0.16.19" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -10051,10 +10051,11 @@ function teamPanel(x, goal, action, label, busy2, ctx) {
     <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc8(label)}</button>
   </section>`;
 }
-function stepBar(goal) {
+function stepBar(goal, swap) {
   const used = field2.team.length + field2.support + 1;
   const b = (k, n, label, sub) => `<button class="gx-stepb${field2.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field2.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc8(sub)}</small></span></button>`;
-  return `<div class="gx-stepbar">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}</div>`;
+  const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
+  return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
 }
 function toStep(step, env2) {
   field2.step = step;
@@ -10070,7 +10071,7 @@ function mapTab(ctx, env2, notice2, busy2) {
   if (t?.type === "event" && !events.some((e) => e.key === t.key)) field2.target = null;
   const goal = field2.target ? targetName(field2.target) : null;
   return `<main class="gx-body gx-field gx-map" data-step="${field2.step}">
-    ${stepBar(goal)}
+    ${stepBar(goal, "mission")}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env2)}
       <section class="gx-sec gx-sits"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section></div>
     <div class="gx-sidecol">
@@ -10117,7 +10118,7 @@ function missionTab(ctx, opening, notice2, busy2) {
   const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc8(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
   const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
   return `<main class="gx-body gx-field gx-mission" data-step="${field2.step}">
-    ${stepBar(field2.mname)}
+    ${stepBar(field2.mname, opening ? void 0 : "map")}
     <div class="gx-mapcol">
       ${intro}
       <div class="gx-segs">${segs}</div>
@@ -11685,7 +11686,7 @@ function body3() {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case "started":
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="gx-err gx-notice" role="alert">${esc11(notice)}</div>` : ""}${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="gx-err gx-notice" role="alert">${esc11(notice)}</div>` : ""}${startedBody(view.ctx)}</div>`;
     case "opening":
       return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case "picker":
@@ -11767,11 +11768,6 @@ function selfName(ctx, code, name) {
   const c = parseCatalog(ctx.char.globalLore);
   const outside = factionNames(c, void 0)[code];
   return outside && name === outside ? factionNames(c, code)[code] ?? name : name;
-}
-function subnav() {
-  if (tab !== "map" && tab !== "mission") return "";
-  const seg5 = (id, label) => `<button class="gx-seg${tab === id ? " on" : ""}" data-action="tab" data-value="${id}" aria-pressed="${tab === id}">${label}</button>`;
-  return `<div class="gx-subwrap"><div class="gx-subnav">${seg5("map", "임무")}${seg5("mission", "커스텀")}</div></div>`;
 }
 function clock(minute) {
   if (minute === null) return "";

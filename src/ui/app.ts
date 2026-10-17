@@ -665,7 +665,7 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="gx-err gx-notice" role="alert">${esc(notice)}</div>` : ''}${subnav()}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="gx-err gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -771,13 +771,6 @@ function selfName(ctx: ChatContext, code: string, name: string): string {
   const c = parseCatalog(ctx.char.globalLore);
   const outside = factionNames(c, undefined)[code];
   return outside && name === outside ? factionNames(c, code)[code] ?? name : name;
-}
-
-/** 지도와 커스텀 임무 사이 전환 (모바일 하단 바는 한 칸이라 화면 위에 둔다) */
-function subnav(): string {
-  if (tab !== 'map' && tab !== 'mission') return '';
-  const seg = (id: Tab, label: string) => `<button class="gx-seg${tab === id ? ' on' : ''}" data-action="tab" data-value="${id}" aria-pressed="${tab === id}">${label}</button>`;
-  return `<div class="gx-subwrap"><div class="gx-subnav">${seg('map', '임무')}${seg('mission', '커스텀')}</div></div>`;
 }
 
 function clock(minute: number | null): string {

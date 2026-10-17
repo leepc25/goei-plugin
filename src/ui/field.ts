@@ -334,12 +334,16 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
 
 // ── 탭 화면 ──
 
-/** 모바일 단계 바: ① 목표 → ② 편성 (CSS로 모바일에서만 보이고, 고른 단계만 보인다) */
-function stepBar(goal: string | null): string {
+/** 모바일 단계 바: ① 목표 → ② 편성 (CSS로 모바일에서만 보이고, 고른 단계만 보인다).
+ *  swap: 오른쪽 끝 임무↔커스텀 전환 (v0.16.18: 위에 따로 있던 전환 줄은 자리만 차지했다) */
+function stepBar(goal: string | null, swap?: 'map' | 'mission'): string {
   const used = field.team.length + field.support + 1;
   const b = (k: 'goal' | 'team', n: string, label: string, sub: string) =>
     `<button class="gx-stepb${field.step === k ? ' on' : ''}" data-action="field-step" data-value="${k}" aria-pressed="${field.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc(sub)}</small></span></button>`;
-  return `<div class="gx-stepbar">${b('goal', '1', '목표', goal ?? '고르기')}${b('team', '2', '편성', `${used} / 4`)}</div>`;
+  const sw = swap
+    ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === 'map' ? '임무로 전환' : '커스텀으로 전환'}">${ICONS.swap}<span>${swap === 'map' ? '임무' : '커스텀'}</span></button>`
+    : '';
+  return `<div class="gx-stepbar${sw ? ' has-swap' : ''}">${b('goal', '1', '목표', goal ?? '고르기')}${b('team', '2', '편성', `${used} / 4`)}${sw}</div>`;
 }
 
 /** 단계를 바꾸면 맨 위부터 보이게 */
@@ -360,7 +364,7 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
   const goal = field.target ? targetName(field.target) : null;
   // v0.16.17: 왼쪽은 지도 + 그 아래 상황 목록, 오른쪽 위에 편성 (예전엔 왼쪽 지도 아래가 비고 오른쪽만 길었다)
   return `<main class="gx-body gx-field gx-map" data-step="${field.step}">
-    ${stepBar(goal)}
+    ${stepBar(goal, 'mission')}
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}
       <section class="gx-sec gx-sits"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section></div>
     <div class="gx-sidecol">
@@ -420,7 +424,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>'
     : '';
   return `<main class="gx-body gx-field gx-mission" data-step="${field.step}">
-    ${stepBar(field.mname)}
+    ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
       <div class="gx-segs">${segs}</div>
