@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.9
+//@version 0.16.10
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -7772,10 +7772,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-fac.has-img:hover::after { opacity: .82; }
 /* 평소엔 어두운 흑백, 마우스를 올리거나 고르면 컬러로 (v0.16.8: 밝아지는 효과가 너무 약했다).
    사진 위 filter 전환 애니메이션은 매 프레임 사진을 다시 그려 끊겨서(v0.10.2) 바로 바꾼다 */
-.gx-fac-img { filter: grayscale(1) brightness(.5); }
-.gx-fac.on .gx-fac-img { filter: none; }
-@media (hover: hover) { .gx-fac.has-img:hover .gx-fac-img { filter: none; } }
-.gx-fac.has-img:not(.on) .gx-fac-txt span { opacity: .85; }
+/* 마우스가 없는 휴대폰에서는 늘 컬러 */
+@media (hover: hover) {
+  .gx-fac-img { filter: grayscale(1) brightness(.5); }
+  .gx-fac.on .gx-fac-img, .gx-fac.has-img:hover .gx-fac-img { filter: none; }
+}
 .gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
 
 .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
@@ -8814,7 +8815,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.9" : "0";
+var PLUGIN_VERSION = true ? "0.16.10" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
