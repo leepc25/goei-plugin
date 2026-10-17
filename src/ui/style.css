@@ -1186,7 +1186,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard-tool svg { width: 18px; height: 18px; }
 .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
 .gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px; }
-.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; }
+.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; }
 .gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
 @media (max-width: 760px) {
   /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
@@ -1212,8 +1212,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-board .gx-acard { cursor: pointer; }
 }
 .gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
-.gx-agpop-card { position: relative; display: flex; gap: 12px; width: min(100%, 420px); box-sizing: border-box; padding: 16px 44px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); }
-.gx-agpop-card .gx-ava { width: 72px; height: 72px; border-radius: 16px; flex: none; }
+.gx-agpop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 200px; height: 200px; border-radius: 22px; flex: none; font-size: 64px; }
+.gx-agpop-txt { align-self: stretch; }
 .gx-agpop-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .gx-agpop-txt .gx-acard-top b { font-size: 16px; }

@@ -197,6 +197,9 @@ for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e)
 await page.setViewportSize({ width: 1300, height: 860 });
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 await g('p01-board');
+await page.click('.gx-board .gx-acard .gx-acard-top b').catch((e) => console.log('agpop pc', e.message));
+await g('p01d-agent-info');
+await page.click('.gx-agpop-x').catch(() => {});
 await page.click('.gx-nav .gx-nb[data-value="map"]');
 await page.click('.gx-map li[data-action="pick-event"] .gx-evc-name').catch((e) => console.log('pick-event', e.message));
 await g('p02-map-cancel');

@@ -432,8 +432,7 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       return render();
     case 'agent-info': {
-      // 상황판 요원 카드: 모바일에서만 상태 전문 창 (PC는 잘림이 거의 없고 카드가 넓다)
-      if (!matchMedia('(max-width: 760px)').matches) return;
+      // 상황판 요원 카드: 큰 사진과 상태 전문 창 (v0.16.22부터 PC도)
       const card = root?.querySelector<HTMLElement>(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? '')}"]`);
       if (card) showAgentInfo(card);
       return;

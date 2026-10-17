@@ -425,6 +425,12 @@ async function open(page) {
   await page.setViewportSize({ width: 1280, height: 860 });
   // 상황판 요원 카드의 톡·위키 바로가기
   const agentCard = page.locator('.gx-board .gx-acard', { hasText: '쟈알디' });
+  // PC도 요원 카드를 누르면 큰 사진 창
+  await agentCard.locator('.gx-acard-top b').click();
+  await page.waitForSelector('.gx-agpop');
+  assert.equal(await page.$eval('.gx-agpop .gx-ava', (el) => el.getBoundingClientRect().width), 200);
+  await page.click('.gx-agpop-x');
+  assert.equal(await page.locator('.gx-agpop').count(), 0);
   await agentCard.locator('[data-action="agent-talk"]').click();
   await page.waitForSelector('.ph-room');
   assert.ok((await page.textContent('.ph-room')).includes('쟈알디'));

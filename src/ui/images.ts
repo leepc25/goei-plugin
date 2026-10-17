@@ -88,7 +88,7 @@ export function agentInner(char: CharacterSnapshot, p: { english?: string; name:
   return `<span class="gx-acard-side">${avatar(char, p.english, p.name, 'sq')}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? 'var(--dim)'}">${escAttr(stLabel(st))}</em></span>${role ? `<small>${escAttr(role)}</small>` : ''}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ''}</span>`;
 }
 
-/** 모바일 상황판 요원 카드를 눌렀을 때: 잘린 상태 설명까지 전부 보여 주는 작은 창 */
+/** 상황판 요원 카드를 눌렀을 때: 큰 사진(200px)과 잘린 상태 설명까지 전부 보여 주는 작은 창 */
 export function showAgentInfo(card: HTMLElement): void {
   const box = document.createElement('div');
   box.className = 'gx gx-agpop';
