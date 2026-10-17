@@ -239,7 +239,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     : e.kind === 'in' ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
   const names = e.kind === 'in' ? [] : codesToNames(e.people || '없음', x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
   return evCard({
-    kind: e.kind, name: e.name, grade: e.grade, kindTag: true,
+    kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
     extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
     key: e.key, open: 'pick-event', mapAction: 'show-event',
@@ -257,9 +257,15 @@ function situations(x: Ctx, events: WorldEvent[]): string {
   const shown = events.filter((e) => (field.filter === 'all' || e.kind === field.filter) && (!field.place || placeKey(e, x.catalog) === field.place));
   let head = '';
   if (field.place) {
+    // 상황이 없는 곳은 고르자마자 목표가 되니 버튼 대신 안내만 (v0.16.18: 눌러도 아무 일 없는 버튼이었다).
+    // 상황이 있는 곳은 상황 대신 장소를 목표로 삼을 때만 버튼
+    const here = events.some((e) => placeKey(e, x.catalog) === field.place);
+    const self = sameTarget(field.target, field.place);
     head = `<div class="gx-ctxbar"><b>${esc(placeName(field.place, x.catalog))}</b>
       <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
-      <button class="gx-wide${sameTarget(field.target, field.place) ? ' on' : ''}" data-action="pick-place" data-value="${esc(field.place)}">이 장소 자체를 목표로</button>`;
+      ${here && !self
+        ? `<button class="gx-wide" data-action="pick-place" data-value="${esc(field.place)}">이 장소 자체를 목표로</button>`
+        : self ? '<p class="gx-placehint">이 장소 자체가 목표로 잡혔어요.</p>' : ''}`;
   }
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
@@ -267,7 +273,7 @@ function situations(x: Ctx, events: WorldEvent[]): string {
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
   return `<div class="gx-chips">${chips}</div>${head}
-    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : head.includes('gx-placehint') ? '' : `<p class="gx-none">${empty}</p>`}`;
 }
 
 // ── 편성 ──

@@ -159,6 +159,9 @@ await page.evaluate(() => { const c = [...document.querySelectorAll('.gx-pick, .
 await g('m04b-map-picks');
 await page.setViewportSize({ width: 360, height: 780 });
 await g('m04c-360');
+await page.click('.gx-stepbar button:nth-child(2)').catch((e) => console.log('step', e.message));
+await page.click('.gx-acard.pick.wide:not(.off)', { timeout: 3000 }).catch((e) => console.log('pick', e.message));
+await g('m04d-team-360');
 await page.setViewportSize({ width: 390, height: 844 });
 await page.click('.gx-subnav [data-value="mission"]').catch(() => {});
 await g('m05-mission');
@@ -179,6 +182,17 @@ for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e)
 await page.setViewportSize({ width: 1300, height: 860 });
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 await g('p01-board');
+await page.click('.gx-nav .gx-nb.desk[data-value="map"]');
+await g('p02-map');
+await page.click('.gx-zbtn[data-zoom="in"]');
+await page.mouse.move(400, 400);
+await g('p03-map-zoomed');
+await page.click('.gx-zbtn[data-zoom="reset"]');
+await page.$$eval('[data-action="map-region"]', (els) => els.find((e) => e.dataset.value !== '01' && !/hot|live|an|warn/.test(e.className))?.click());
+await page.waitForTimeout(400);
+await page.$$eval('[data-action="map-place"]', (els) => els.find((e) => !/hot|live|an|warn/.test(e.className))?.click());
+await g('p04-map-place');
+await page.click('.gx-nav .gx-nb[data-value="board"]');
 // 바깥(어두운 막)을 누르면 닫힘
 await page.mouse.click(5, 5);
 console.log('outside close', await page.evaluate(() => window.__calls.hide ?? 'n/a'));

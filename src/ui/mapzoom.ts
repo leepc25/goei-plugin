@@ -1,5 +1,5 @@
 // 지도 확대: 지도 칸(.gx-canvas)은 그대로 두고 안쪽 그림(.gx-mapzoom)만 키우고 옮긴다.
-// 휴대폰은 두 손가락 벌리기·한 손가락 끌기, PC는 휠(트랙패드 오므리기)·끌기, 어디서나 +/− 버튼.
+// 휴대폰은 두 손가락 벌리기·한 손가락 끌기, PC는 Ctrl+휠(트랙패드 오므리기)·끌기, 어디서나 +/− 버튼.
 // 핀은 그림과 함께 자리를 옮기고, 크기는 조금만 커지도록 되돌려 줄인다(--pz).
 
 const MAX = 4;
@@ -10,12 +10,13 @@ interface View { z: number; x: number; y: number }
 /** 지역별 확대 상태. 다시 그려도 보던 자리를 지킨다 */
 const views = new Map<string, View>();
 
-/** nation: 지역 지도일 때 맨 아래 「전국」 (v0.16.17: 지도 위 줄에 있던 ← 전국을 확대 버튼 밑으로) */
+/** nation: 지역 지도일 때 맨 아래 「전국」 (v0.16.17: 지도 위 줄에 있던 ← 전국을 확대 버튼 밑으로).
+ *  원래 크기 버튼은 맨 위: 확대하면 생기는데 아래에 두면 +/− 가 한 칸씩 밀려 올라갔다 (v0.16.18) */
 export function mapZoomControls(nation = false): string {
   return `<div class="gx-zoom" aria-label="지도 확대">
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기">⤢</button>
       <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
       <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기">⤢</button>
       ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ''}
     </div>`;
 }
@@ -108,10 +109,10 @@ export function bindMapZoom(root: HTMLElement): void {
     start = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
   }, { passive: true });
 
-  // PC: 지도 위 휠로 확대·축소 (v0.16.17, 예전엔 Ctrl+휠만), 마우스 끌기.
-  // 원래 크기에서 아래로 굴리면 창 스크롤로 넘긴다
+  // PC: Ctrl+휠(트랙패드 오므리기)로만 확대·축소, 마우스 끌기.
+  // 그냥 휠은 창 스크롤 (v0.16.18: v0.16.17에서 그냥 휠로 확대하게 했더니 불편했다)
   canvas.addEventListener('wheel', (e) => {
-    if (!e.ctrlKey && v.z <= 1 && e.deltaY > 0) return;
+    if (!e.ctrlKey) return;
     e.preventDefault();
     const [cx, cy] = local(e.clientX, e.clientY);
     zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);

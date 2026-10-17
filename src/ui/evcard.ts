@@ -1,5 +1,5 @@
 // 괴이·사건·특수 카드 한 장. 상황판과 임무 탭이 같은 모양을 쓴다 (v0.16.17, 사용자 요청: 두 곳 모양 통일).
-// 차이는 임무 탭이 제목 옆에 종류(괴이·사건·특수)를 붙이는 것과, 카드를 눌렀을 때 하는 일뿐이다.
+// 차이는 카드를 눌렀을 때 하는 일뿐이다. 종류(괴이·사건·특수)는 두 곳 모두 상태 딱지 왼쪽에 같은 모양 딱지로 (v0.16.18).
 import type { CharacterSnapshot } from '../host/risu';
 import { ICONS } from './icons';
 import { avatar } from './images';
@@ -24,8 +24,6 @@ export interface EvCard {
   chips?: string;
   /** 사건 상황 등 아래 줄 (html) */
   extra?: string;
-  /** 제목 옆 종류 딱지 (임무 탭) */
-  kindTag?: boolean;
   /** 진행 중인 상황의 key. 없으면(발생 예정) 아이콘 없이 보기만 */
   key?: string;
   /** 카드를 눌렀을 때 */
@@ -55,10 +53,10 @@ export function elapsedText(minute: number | null, since: number | null): string
 export function evCard(c: EvCard): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : '';
   const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
-  const tag = c.kindTag ? `<span class="gx-kind k-${c.kind}">${KIND[c.kind]}</span>` : '';
-  const title = `<span class="gx-evc-name">${tag}<b>${esc(c.name)}</b></span>`;
+  const kind = `<span class="gx-badge gx-kind k-${c.kind}">${KIND[c.kind]}</span>`;
+  const title = `<span class="gx-evc-name"><b>${esc(c.name)}</b></span>`;
   if (!c.key) {
-    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}${c.badge}</span><small>${c.loc}</small>${c.extra ?? ''}</span></li>`;
+    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}<span class="gx-evc-tags">${kind}${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ''}</span></li>`;
   }
   const key = esc(c.key);
   const acts = `<span class="gx-evc-act">
@@ -69,5 +67,5 @@ export function evCard(c: EvCard): string {
         : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
   const open = c.open ? ` data-action="${c.open}" data-value="${key}"` : '';
   return `<li class="gx-evc go${c.selected ? ' sel' : ''}"${open}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ''}</span>${c.extra ?? ''}</span></li>`;
+    <small>${c.loc}</small><span class="gx-evc-who">${kind}${c.badge}${c.chips ?? ''}</span>${c.extra ?? ''}</span></li>`;
 }

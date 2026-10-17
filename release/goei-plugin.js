@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.17
+//@version 0.16.18
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -7747,11 +7747,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 /* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
 .gx-head { position: relative; }
-.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 20px; bottom: -1px; width: 140px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--signal), transparent); }
+.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, var(--signal), color-mix(in srgb, var(--signal) 55%, transparent)); }
 .gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
 .gx-tabicon svg { width: 20px; height: 20px; }
 .gx-tabhead b { letter-spacing: .02em; }
 .gx-nav-gap { flex: 1; }
+/* 위협도 한 칸 (v0.16.18): PC는 소속 패널 아래, 모바일은 머리의 설정·닫기 옆. 높이·모서리는 설정·닫기 버튼(.gx-x)과 같게 */
+.gx-threat { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent); border-radius: 12px; background: var(--danger-bg); color: var(--danger); font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; flex: none; }
+.gx-threat.calm { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+.gx-threat .w { color: var(--sub); font-weight: 600; }
+.gx-threat b { font-family: var(--mono); font-size: 17px; }
+.gx-threat .t { margin-left: auto; }
+.gx-threat.mob { display: none; }
 .gx-nb {
   position: relative; display: flex; align-items: center; gap: 12px;
   width: 100%; min-height: 48px; padding: 0 14px;
@@ -7961,7 +7968,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-evact { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 6px 8px 6px 0; }
 .gx-evs li.sel, .gx-mlist li.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-report { font-size: 13px; color: var(--text); }
-.gx-kind { font-size: 12px; padding: 2px 6px; border-radius: 6px; background: var(--void); color: var(--dim); }
+.gx-kind { background: var(--void); color: var(--dim); }
 .gx-kind.k-an { color: var(--danger); }
 .gx-kind.k-in { color: var(--amber); }
 .gx-kind.k-ms { color: #c9a7ff; }
@@ -8151,13 +8158,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-panel, .gx-panel.has-nav { width: 100%; height: 100%; border-radius: 0; border: 0;
     grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "head" "body" "nav"; }
   .gx-head { padding: 12px 16px 10px; }
-  .gx-head:has(.gx-tabhead)::after { left: 16px; width: 110px; }
   .gx-tabicon { width: 34px; height: 34px; border-radius: 11px; }
   .gx-body { padding: 4px 16px 16px; }
   .upd-banner { --gx-pad: 16px; }
   .gx-nav { flex-direction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
   .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
   .gx-logo.mob { display: grid; }
+  .gx-threat.mob { display: flex; gap: 6px; padding: 0 12px; }
+  .gx-threat.mob .t { margin-left: 0; }
   .gx-nb, .gx-nb.mob { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 0 2px; border-radius: 0; font-size: 12px; text-align: center; background: transparent; }
   .gx-nb:hover { background: transparent; }
   .gx-nb.on { background: transparent; }
@@ -8639,6 +8647,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
 .gx-field.gx-map > .gx-mapcol { position: static; }
 .gx-mapcol > .gx-sits { padding: 4px 0 0; }
+.gx-placehint { margin: 0; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; text-align: center; }
 /* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
 .gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
@@ -8650,7 +8659,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (min-width: 761px) {
   .gx-map .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
-  .gx-map > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 86px); }
+  /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
+  .gx-map > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 920px) - 89px); }
   .gx-map > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
   .gx-map .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
   .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start { flex: none; }
@@ -8667,6 +8677,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] .gx-goal { font-size: 14px; }
   .gx-field[data-step="team"] .gx-note { gap: 4px; }
   .gx-field[data-step="team"] .gx-note > span { font-size: 13px; }
+  /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
+  .gx-note textarea { scrollbar-width: none; }
+  .gx-note textarea::-webkit-scrollbar { display: none; }
   .gx-field[data-step="team"] .gx-note textarea { min-height: 0; height: 42px; padding: 9px 12px; resize: none; }
   .gx-field[data-step="team"] .gx-note textarea:focus, .gx-field[data-step="team"] .gx-note textarea.filled { height: 96px; }
   .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -8674,13 +8687,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
   .gx-acard.pick.wide { align-items: flex-start; gap: 8px; padding: 10px 8px; }
   .gx-acard.pick.wide .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
-  .gx-acard.pick.wide .gx-acard-top { padding-right: 36px; }
+  .gx-acard.pick.wide { flex-wrap: wrap; }
+  .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
   .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
   .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
-  .gx-acard.pick.wide .gx-acard-act { top: 5px; right: 3px; gap: 0; }
-  .gx-acard.pick.wide .gx-acard-tool { width: 20px; height: 24px; }
-  .gx-acard.pick.wide .gx-acard-tool svg { width: 15px; height: 15px; }
-  .gx-acard.pick.wide .gx-acard-check { bottom: 6px; right: 6px; }
+  .gx-acard.pick.wide .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
+  .gx-acard.pick.wide .gx-acard-tool { width: 40px; height: 34px; }
+  .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
+  .gx-acard.pick.wide .gx-acard-check { bottom: 9px; left: 10px; right: auto; }
 }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
@@ -8708,6 +8722,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-bd-col .gx-none { margin: 0; padding: 10px 12px; font-size: 13px; border: 1px dashed var(--line); border-radius: 12px; }
 /* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
 .gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+/* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
+.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
 .gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gx-evc.go { cursor: pointer; }
 .gx-evc.go:hover { border-color: var(--line2); }
@@ -8716,7 +8732,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
 .gx-evc-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.gx-evc-name .gx-kind { flex: none; }
+.gx-evc-tags { display: flex; align-items: center; gap: 4px; flex: none; }
+.gx-evc-tags .gx-badge { font-size: 11.5px; padding: 3px 8px; }
 .gx-evc-name b { min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-evc-top > .gx-badge { flex: none; font-size: 11.5px; padding: 3px 8px; }
 .gx-evc-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -8753,10 +8770,12 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-board .gx-acard .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
   .gx-board .gx-acard-top b { font-size: 13.5px; }
   .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
-  .gx-board .gx-acard-act { top: 5px; right: 3px; gap: 0; }
-  .gx-board .gx-acard-tool { width: 20px; height: 24px; }
-  .gx-board .gx-acard-tool svg { width: 15px; height: 15px; }
-  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 36px; }
+  /* 톡·위키: 손가락으로 누르기 쉽게 카드 맨 아래 오른쪽에 큰 칸으로 (v0.16.18: 20px짜리는 탭하기 힘들었고, 옆에 세로로 두면 글자가 좁아졌다) */
+  .gx-board .gx-acard { flex-wrap: wrap; }
+  .gx-board .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
+  .gx-board .gx-acard-tool { width: 40px; height: 34px; }
+  .gx-board .gx-acard-tool svg { width: 18px; height: 18px; }
+  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
 }
 `;
 
@@ -8766,9 +8785,9 @@ var MOVE = 6;
 var views = /* @__PURE__ */ new Map();
 function mapZoomControls(nation = false) {
   return `<div class="gx-zoom" aria-label="지도 확대">
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기">⤢</button>
       <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
       <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기">⤢</button>
       ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
     </div>`;
 }
@@ -8848,7 +8867,7 @@ function bindMapZoom(root2) {
     start2 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
   }, { passive: true });
   canvas.addEventListener("wheel", (e) => {
-    if (!e.ctrlKey && v.z <= 1 && e.deltaY > 0) return;
+    if (!e.ctrlKey) return;
     e.preventDefault();
     const [cx, cy] = local(e.clientX, e.clientY);
     zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
@@ -8959,7 +8978,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.17" : "0";
+var PLUGIN_VERSION = true ? "0.16.18" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -9771,10 +9790,10 @@ function elapsedText(minute, since) {
 function evCard(c) {
   const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
   const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}">${grade ? esc7(grade) : MARK[c.kind]}</i>`;
-  const tag = c.kindTag ? `<span class="gx-kind k-${c.kind}">${KIND[c.kind]}</span>` : "";
-  const title2 = `<span class="gx-evc-name">${tag}<b>${esc7(c.name)}</b></span>`;
+  const kind = `<span class="gx-badge gx-kind k-${c.kind}">${KIND[c.kind]}</span>`;
+  const title2 = `<span class="gx-evc-name"><b>${esc7(c.name)}</b></span>`;
   if (!c.key) {
-    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${c.badge}</span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
+    return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${kind}${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
   }
   const key = esc7(c.key);
   const acts = `<span class="gx-evc-act">
@@ -9783,7 +9802,7 @@ function evCard(c) {
       ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc7(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
   const open2 = c.open ? ` data-action="${c.open}" data-value="${key}"` : "";
   return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open2}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
+    <small>${c.loc}</small><span class="gx-evc-who">${kind}${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
 }
 
 // src/host/send.ts
@@ -9960,7 +9979,6 @@ function eventRow(e, x, agents) {
     kind: e.kind,
     name: e.name,
     grade: e.grade,
-    kindTag: true,
     loc: `${esc8(locName(e.loc))}${since ? ` · ${since}` : ""}`,
     badge,
     chips: peopleChips(x.char, names3, agents),
@@ -9980,13 +9998,15 @@ function situations(x, events) {
   const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
   let head = "";
   if (field2.place) {
+    const here = events.some((e) => placeKey(e, x.catalog) === field2.place);
+    const self = sameTarget(field2.target, field2.place);
     head = `<div class="gx-ctxbar"><b>${esc8(placeName(field2.place, x.catalog))}</b>
       <button class="gx-mini" data-action="map-unplace">전체 상황</button></div>
-      <button class="gx-wide${sameTarget(field2.target, field2.place) ? " on" : ""}" data-action="pick-place" data-value="${esc8(field2.place)}">이 장소 자체를 목표로</button>`;
+      ${here && !self ? `<button class="gx-wide" data-action="pick-place" data-value="${esc8(field2.place)}">이 장소 자체를 목표로</button>` : self ? '<p class="gx-placehint">이 장소 자체가 목표로 잡혔어요.</p>' : ""}`;
   }
   const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
   return `<div class="gx-chips">${chips}</div>${head}
-    ${shown2.length ? `<ul class="gx-evcs">${shown2.map((e) => eventRow(e, x, agents)).join("")}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown2.length ? `<ul class="gx-evcs">${shown2.map((e) => eventRow(e, x, agents)).join("")}</ul>` : head.includes("gx-placehint") ? "" : `<p class="gx-none">${empty}</p>`}`;
 }
 function lockedState(x, id) {
   const rec = x.world.agents[id];
@@ -11564,10 +11584,24 @@ function header(sub, extra = "") {
 function startedHeader(ctx) {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
-    <div class="gx-head-act">
+    <div class="gx-head-act">${threatButton(ctx, "mob")}
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
+}
+function threat(w) {
+  const weight = { S: 3, A: 2, B: 1 };
+  let n = 0;
+  for (const e of w.an) if (e.state !== "발생대기") n += 1 + (weight[e.grade ?? ""] ?? 0);
+  for (const e of w.inc) if (e.state !== "발생대기") n += 1;
+  const level = n === 0 ? 0 : n <= 1 ? 1 : n <= 3 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : 5;
+  return { level, label: ["평온", "주의", "경계", "심각", "위험", "재난"][level] };
+}
+function threatButton(ctx, where) {
+  if (!worldOn(ctx.chat)) return "";
+  const t = threat(readWorld(ctx.chat));
+  return `<button class="gx-threat ${where}${t.level ? "" : " calm"}" data-action="tab" data-value="board" title="위협도 ${t.level} · ${t.label}">
+    ${t.level ? '<span class="gx-live"></span>' : ""}<span class="w">위협도</span><b>${t.level}</b><span class="t">${t.label}</span></button>`;
 }
 function renderPicker() {
   const facs = root?.querySelectorAll(".gx-facs .gx-fac");
@@ -11726,6 +11760,7 @@ function brand(ctx) {
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc11(img)}')"></span>` : ""}
         <span class="gx-op-txt"><b>${esc11(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
+      ${threatButton(ctx, "desk")}
     </div>`;
 }
 function selfName(ctx, code, name) {
