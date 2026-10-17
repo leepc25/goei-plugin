@@ -965,11 +965,19 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok((await page.textContent('[data-action="ph-sub"][data-value="chats"]')).includes('3'), '대화 탭 안 읽음 수 (선톡 1 + 초대 1 + 단톡 말풍선 1)');
   await page.click('[data-action="ph-sub"][data-value="chats"]');
   assert.ok((await page.textContent('.ph-list')).includes('야간조 수다방'));
+  assert.ok((await page.$$('.ph-chats .ph-rdel')).length >= 2, '대화 목록 휴지통');
+  if (shots) {
+    await page.screenshot({ path: `${shots}/15-phone-chats.png` });
+    const vp = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${shots}/15-phone-chats-mobile.png` });
+    await page.setViewportSize(vp);
+  }
   // 공지: 열면 읽음
   await page.click('[data-action="ph-sub"][data-value="notices"]');
   await page.click('[data-action="ph-notice"]');
   await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$ph_bulletins).items[0].read === true);
-  assert.ok((await page.textContent('.ph-notice-body')).includes('배관 공사'));
+  assert.ok((await page.textContent('.ph-ndoc-text, .ph-notice-body')).includes('배관 공사'));
   // 받은 직후 다시 확인: 대기 중인 선톡·초대·공지는 빼고, 이미 대화 중인 방(내가 마지막에 말한 방·단톡)만 묻는다
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '{"updates":[],"announcements":[],"invitations":[]}' }]; });
   await page.click('[data-action="ph-refresh"]');

@@ -124,7 +124,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
 const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, { width: 390, height: 844 }, { touch: true });
 await startedWithReply(page);
 await page.evaluate(async () => {
-  const items = [1, 2, 3].map((i) => ({ id: `n${i}`, channel: 'A00', issuer: '관리국 총무과', category: i === 1 ? '안전' : '공지', title: `공지 제목 ${i} 조금 길게 써 보는 제목입니다`, text: '본문 첫 줄입니다. 배관 공사로 인해 지하 2층 출입이 제한됩니다.\n둘째 줄.', time: '2025.01.01 02:4' + i, read: i !== 1 }));
+  const items = [1, 2, 3].map((i) => ({ id: i, channel: 'A00', issuer: '관리국 총무과', category: i === 1 ? '안전' : '공지', title: `공지 제목 ${i} 조금 길게 써 보는 제목입니다`, text: '본문 첫 줄입니다. 배관 공사로 인해 지하 2층 출입이 제한됩니다.\n둘째 줄.', time: '2025.01.01 02:4' + i, read: i !== 1 }));
   window.__chat.scriptstate.$ph_bulletins = JSON.stringify({ version: 1, items, seen: {} });
 });
 // 유저 사진: Risu가 채팅 속 숨은 칸의 {{source::user}}를 /sw/img/<경로 hex>로 바꿔 둔 상태를 흉내 낸다
@@ -201,6 +201,9 @@ await g('m06-phone');
 await page.click('.ph-list [data-action="ph-dm"]').catch((e) => console.log('dm', e.message));
 await g('m06f-room');
 await page.click('.ph-back').catch(() => {});
+await page.click('[data-action="ph-group"]').catch((e) => console.log('group', e.message));
+await g('m06g-group');
+await page.click('.ph-back').catch(() => {});
 for (const t of await page.$$eval('[data-action^="ph-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);
 await page.click('[data-action="ph-ctab"][data-value="T05"]');
 await g('m06b-phone-empty');
@@ -208,7 +211,7 @@ await page.click('[data-action="ph-sub"][data-value="chats"]');
 await g('m06c-chats-empty');
 await page.click('[data-action="ph-sub"][data-value="notices"]');
 await g('m06d-notices');
-await page.click('[data-action="ph-notice"][data-value="n2"]').catch((e) => console.log('notice click', e.message));
+await page.click('[data-action="ph-notice"] >> nth=1').catch((e) => console.log('notice click', e.message));
 await g('m06e-notice-open');
 await page.click('.gx-mtrack .gx-nb[data-value=\"wiki\"] >> nth=1');
 await g('m07-wiki');
@@ -267,6 +270,14 @@ await page.$$eval('[data-action="map-place"]', (els) => els.find((e) => !/hot|li
 await g('p04-map-place');
 await page.click('.gx-nav .gx-nb.desk[data-value="mission"]').catch((e) => console.log('custom', e.message));
 await g('p05-custom');
+await page.click('.gx-nav .gx-nb[data-value="phone"]').catch((e) => console.log('pc phone', e.message));
+await page.click('[data-action="ph-sub"][data-value="notices"]').catch((e) => console.log('pc notices', e.message));
+await page.click('[data-action="ph-notice"] >> nth=1').catch((e) => console.log('pc notice', e.message));
+await g('p06-notice');
+await page.click('[data-action="ph-sub"][data-value="chats"]').catch((e) => console.log('pc chats', e.message));
+await g('p06b-chats');
+await page.click('[data-action="ph-group"]').catch((e) => console.log('pc group', e.message));
+await g('p06c-group');
 await page.click('.gx-nav .gx-nb[data-value="board"]');
 // 바깥(어두운 막)을 누르면 닫힘
 await page.mouse.click(5, 5);
