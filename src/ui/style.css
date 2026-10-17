@@ -552,6 +552,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-nb.on { background: transparent; }
   .gx-nb svg { width: 24px; height: 24px; }
   .gx-nb .gx-nbadge { position: absolute; top: 5px; left: calc(50% + 6px); margin: 0; min-width: 18px; height: 18px; font-size: 11px; }
+  /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
+  .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
   /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
   .gx-nav { padding-left: 0; padding-right: 0; }
   .gx-nav > .gx-nb { display: none; }
