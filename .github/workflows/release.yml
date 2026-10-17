@@ -1,5 +1,6 @@
 # release/version.json이 바뀐 커밋이 main에 올라오면 그 버전(package.json)으로 카드·플러그인을 빌드해 Releases에 붙인다.
-# 같은 버전의 릴리스가 이미 있으면 건너뛴다. 태그(v버전)는 릴리스를 만들 때 함께 생긴다.
+# 같은 버전의 릴리스가 이미 있으면 파일만 새로 바꿔 올린다. 태그(v버전)는 릴리스를 만들 때 함께 생긴다.
+# GitHub는 릴리스 파일 이름의 한글을 지우므로 파일 이름은 영문, 화면에 보이는 이름(라벨)은 한글로 둔다.
 name: release
 on:
   push:
@@ -13,37 +14,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 버전
-        id: v
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          tag="v$(node -p "require('./package.json').version")"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          if gh release view "$tag" >/dev/null 2>&1; then echo "skip=1" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - if: steps.v.outputs.skip != '1'
-        run: npm ci
-      - if: steps.v.outputs.skip != '1'
-        run: npm run build
+      - run: npm ci
+      - run: npm run build
       - name: 카드 빌드
-        if: steps.v.outputs.skip != '1'
-        run: python3 tools/build_lite_card.py card/원본_봇카드.jpeg out/괴이_이면세계.charx
+        run: python3 tools/build_lite_card.py card/원본_봇카드.jpeg out/card.charx
       - name: 묶기
-        if: steps.v.outputs.skip != '1'
-        env:
-          TAG: ${{ steps.v.outputs.tag }}
+        id: v
         run: |
-          cp dist/goei-plugin.js out/
-          cd out && zip -q "괴이_이면세계_${TAG}.zip" goei-plugin.js 괴이_이면세계.charx
+          tag="v$(node -p "require('./package.json').version")"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          cd out
+          cp ../dist/goei-plugin.js goei-plugin.js
+          mv card.charx goei-imyeonsegye.charx
+          mkdir pack && cp goei-plugin.js pack/ && cp goei-imyeonsegye.charx "pack/괴이_이면세계.charx"
+          (cd pack && zip -q "../goei-imyeonsegye-${tag}.zip" goei-plugin.js 괴이_이면세계.charx)
       - name: 릴리스
-        if: steps.v.outputs.skip != '1'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
         run: |
-          gh release create "$TAG" --target "$GITHUB_SHA" out/goei-plugin.js out/괴이_이면세계.charx "out/괴이_이면세계_${TAG}.zip" \
-            --title "괴이: 이면세계 ${TAG}" \
-            --notes "처음 설치: zip의 goei-plugin.js를 Risu 설정 → 플러그인에 추가하고, 괴이_이면세계.charx를 캐릭터로 가져오세요. 그다음부터는 플러그인 탭과 창의 설정 → 업데이트에서 갱신됩니다."
+          files=("out/goei-imyeonsegye-${TAG}.zip#괴이_이면세계_${TAG}.zip (플러그인+카드)" "out/goei-plugin.js#goei-plugin.js (플러그인)" "out/goei-imyeonsegye.charx#괴이_이면세계.charx (카드)")
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            for a in $(gh release view "$TAG" --json assets -q '.assets[].name'); do gh release delete-asset "$TAG" "$a" -y; done
+            gh release upload "$TAG" "${files[@]}" --clobber
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" "${files[@]}" \
+              --title "괴이: 이면세계 ${TAG}" \
+              --notes "처음 설치: zip을 받아 goei-plugin.js를 Risu 설정 → 플러그인에 추가하고, 괴이_이면세계.charx를 캐릭터로 가져오세요. 그다음부터는 플러그인 탭과 창의 설정 → 업데이트에서 갱신됩니다."
+          fi
