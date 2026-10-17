@@ -10,6 +10,7 @@
 
 사용법: python3 tools/build_lite_card.py <원본.charx|원본.jpeg> <결과.charx>
 """
+import hashlib
 import json
 import subprocess
 import tempfile
@@ -264,6 +265,7 @@ def update_payload(data, risu, module, version, min_plugin):
         'version': version,
         'minPlugin': min_plugin,  # 카드가 실제로 요구하는 플러그인 (package.json goei.minPlugin). 카드만 바뀐 판은 옛 플러그인에서도 받게
         'data': {
+            'characterVersion': version,
             'firstMessage': data.get('first_mes', ''),
             'alternateGreetings': data.get('alternate_greetings', []),
             'creatorNotes': data.get('creator_notes', ''),
@@ -306,7 +308,11 @@ def main(src, dst):
         'version': version,
         'source': {'name': data.get('name'), 'version': data.get('character_version')},
         'greetings': greeting_index,
+        # 사진·에셋 지문: 카드 업데이트(글 내용만 옮김)로 못 옮기는 사진이 바뀌었는지 창이 알 수 있게
+        'assets': hashlib.sha1(''.join(f'{n}:{hashlib.sha1(b).hexdigest()};' for n, b in sorted(others.items())).encode()).hexdigest()[:12],
     }
+    # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
+    data['character_version'] = version
     lore = [e for e in lore if e.get('comment') != MANIFEST_COMMENT]
     lore = migrate_directory(drop_settings(lore))
     lore.append({

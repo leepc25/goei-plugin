@@ -52,6 +52,10 @@ export interface Manifest {
   source?: { name?: string; version?: string };
   /** "A00-ko-1" → alternateGreetings index */
   greetings: Record<string, number>;
+  /** 카드 버전 */
+  version?: string;
+  /** 사진·에셋 지문 (build_lite_card.py). 카드 업데이트로 못 옮기는 사진이 바뀌었는지 비교용 */
+  assets?: string;
 }
 
 export interface StartChoice {

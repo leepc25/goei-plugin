@@ -44,6 +44,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       registerButton: async (arg, cb) => { window.__button = { arg, cb }; return { id: arg.id }; },
       registerSetting: async (name, cb) => { window.__setting = cb; return { id: 's' }; },
       getRootDocument: async () => window.__rootDoc,
+      requestPluginPermission: async () => true,
       unwarpSafeArray: async (a) => a,
       safeLocalStorage: { getItem: async (k) => window.__store[k] ?? null, setItem: async (k, v) => { window.__store[k] = v; } },
       pluginStorage: { getItem: async (k) => window.__store['p:' + k] ?? null, setItem: async (k, v) => { window.__store['p:' + k] = v; }, keys: async () => [], removeItem: async () => {} },
@@ -1346,6 +1347,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
   assert.equal(ch.name, fixture.name, '이름 유지');
   await page.waitForSelector('.gx-hint');
+  if (shots) await page.locator('.gx-hint').last().scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-done.png` });
   assert.match(await page.textContent('.gx-settings'), /v9\.0\.0으로 바꿨어요/);
   assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);

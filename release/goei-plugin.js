@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.5
+//@version 0.16.6
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -7454,7 +7454,7 @@ async function createFab(onOpen) {
   const unbind = async () => {
     const old = ids;
     ids = [];
-    for (const { type, id } of old) await root2.body.removeEventListener(type, id).catch(() => {
+    for (const { type, id } of old) await host.removeEventListener(type, id).catch(() => {
     });
   };
   const bind = async () => {
@@ -7466,7 +7466,7 @@ async function createFab(onOpen) {
       ["pointercancel", onUp],
       ["click", onClick]
     ]) {
-      ids.push({ type, id: await root2.body.addEventListener(type, fn2, { passive: true }) });
+      ids.push({ type, id: await host.addEventListener(type, fn2, { passive: true }) });
     }
   };
   await bind();
@@ -8463,7 +8463,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
 .upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
 .upd-plan small { color: var(--dim); }
-.ps-rows > .ps-note, .ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
 .upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
 .upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
 .upd-banner-t b { color: var(--text); margin-right: 4px; }
@@ -8583,6 +8584,7 @@ function bindMapZoom(root2) {
 var UPDATE_SCHEMA = 1;
 var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
 var CARD_FIELDS = [
+  "characterVersion",
   "firstMessage",
   "alternateGreetings",
   "creatorNotes",
@@ -8669,7 +8671,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.5" : "0";
+var PLUGIN_VERSION = true ? "0.16.6" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -8800,13 +8802,19 @@ function updateGroup(ctx) {
         <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc4(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
         <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
         <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요. 사진·에셋이 새로 생긴 버전이면 zip의 카드를 가져와야 해요.</p>` : "";
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.${assetsChanged(ctx) ? " <b>이번 판은 사진도 바뀌었어요.</b> 사진은 카드 업데이트로 옮길 수 없어서 zip 안의 카드를 다시 가져와야 들어와요." : ""}</p>` : "";
   return section2(rows.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc4(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc4(updateUi.done)}</p>` : ""));
+}
+function assetsChanged(ctx) {
+  const next = updateUi.payload ? readManifest(updateUi.payload.data.globalLore)?.assets : void 0;
+  const cur = readManifest(ctx.char.globalLore)?.assets;
+  return typeof next === "string" && typeof cur === "string" && next !== cur;
 }
 function section2(body4) {
   return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body4}</div></section>`;
 }
 var FIELD_NAMES = {
+  characterVersion: "캐릭터 버전",
   firstMessage: "첫 안내",
   alternateGreetings: "첫 장면",
   creatorNotes: "제작 노트",
@@ -11599,6 +11607,12 @@ function startWatcher(fab2) {
     stopped = true;
     clearTimeout(timer);
   };
+}
+for (const permission of ["replacer", "mainDom"]) {
+  try {
+    await risuai.requestPluginPermission(permission);
+  } catch {
+  }
 }
 await loadPrefs();
 await risuai.addRisuReplacer("beforeRequest", onBeforeRequest);

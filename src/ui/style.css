@@ -942,7 +942,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
 .upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
 .upd-plan small { color: var(--dim); }
-.ps-rows > .ps-note, .ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
 .upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
 .upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
 .upd-banner-t b { color: var(--text); margin-right: 4px; }

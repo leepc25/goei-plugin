@@ -13,7 +13,7 @@ declare const __UPDATE_BASE__: string | undefined;
 
 /** 카드에서 바꾸는 칸 (Risu 캐릭터 객체 이름) */
 export const CARD_FIELDS = [
-  'firstMessage', 'alternateGreetings', 'creatorNotes', 'desc', 'personality', 'scenario', 'exampleMessage',
+  'characterVersion', 'firstMessage', 'alternateGreetings', 'creatorNotes', 'desc', 'personality', 'scenario', 'exampleMessage',
   'systemPrompt', 'postHistoryInstructions', 'backgroundHTML', 'lowLevelAccess', 'virtualscript', 'triggerscript',
 ] as const;
 

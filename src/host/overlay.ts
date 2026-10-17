@@ -303,13 +303,13 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
     onOpen();
   };
 
-  // 웹 Risu에서 플러그인을 업데이트하면 새 판의 리스너가 지워져 버튼이 모양만 남는 일이 있었다(껐다 켜면 살아남).
-  // 그래서 버튼이 다시 보일 때마다 리스너를 새로 건다.
+  // 리스너는 선택지용사처럼 버튼 상자(host)에 건다. 웹 Risu에서 플러그인을 업데이트하면 리스너가 지워져
+  // 버튼이 모양만 남는 일이 있었다(껐다 켜면 살아남). 그래서 버튼이 다시 보일 때마다 새로 건다.
   let ids: { type: string; id: string }[] = [];
   const unbind = async () => {
     const old = ids;
     ids = [];
-    for (const { type, id } of old) await root.body.removeEventListener(type, id).catch(() => {});
+    for (const { type, id } of old) await host.removeEventListener(type, id).catch(() => {});
   };
   const bind = async () => {
     await unbind();
@@ -320,7 +320,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
       ['pointercancel', onUp],
       ['click', onClick],
     ] as const) {
-      ids.push({ type, id: await root.body.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
+      ids.push({ type, id: await host.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
     }
   };
   await bind();

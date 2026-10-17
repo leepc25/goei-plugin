@@ -276,6 +276,15 @@ function startWatcher(fab: Fab): () => void {
   };
 }
 
+// 선택지용사처럼 필요한 권한을 처음에 한 번에 묻는다 (업데이트하면 Risu가 권한을 다시 묻는데,
+// 기능을 하나씩 켜는 도중에 묻지 않게)
+for (const permission of ['replacer', 'mainDom']) {
+  try {
+    await risuai.requestPluginPermission(permission);
+  } catch {
+    /* 옛 Risu에는 없을 수 있다. 그러면 기능을 켤 때 Risu가 묻는다 */
+  }
+}
 await loadPrefs();
 await risuai.addRisuReplacer('beforeRequest', onBeforeRequest);
 await risuai.addRisuChatListener('output', onOutput);

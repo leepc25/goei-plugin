@@ -171,11 +171,18 @@ export function updateGroup(ctx: ChatContext): string {
         <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc(plan.fields.map(fieldName).join(', '))})</small>` : ''}</li>
         <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ''}</li>
         <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요. 사진·에셋이 새로 생긴 버전이면 zip의 카드를 가져와야 해요.</p>`
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.${assetsChanged(ctx) ? ' <b>이번 판은 사진도 바뀌었어요.</b> 사진은 카드 업데이트로 옮길 수 없어서 zip 안의 카드를 다시 가져와야 들어와요.' : ''}</p>`
     : '';
   return section(rows.join('') + `<div class="upd-act">${actions}</div>${summary}`
     + (updateUi.notice ? `<div class="gx-err" role="alert">${esc(updateUi.notice)}</div>` : '')
     + (updateUi.done ? `<p class="gx-hint">${esc(updateUi.done)}</p>` : ''));
+}
+
+/** 새 카드의 사진 지문이 지금 카드와 다른지 (지금 카드에 지문이 없으면 옛 판이라 사진은 그대로였던 것으로 본다) */
+function assetsChanged(ctx: ChatContext): boolean {
+  const next = updateUi.payload ? readManifest(updateUi.payload.data.globalLore)?.assets : undefined;
+  const cur = readManifest(ctx.char.globalLore)?.assets;
+  return typeof next === 'string' && typeof cur === 'string' && next !== cur;
 }
 
 function section(body: string): string {
@@ -183,7 +190,7 @@ function section(body: string): string {
 }
 
 const FIELD_NAMES: Record<string, string> = {
-  firstMessage: '첫 안내', alternateGreetings: '첫 장면', creatorNotes: '제작 노트', desc: '설명', personality: '성격', scenario: '시나리오',
+  characterVersion: '캐릭터 버전', firstMessage: '첫 안내', alternateGreetings: '첫 장면', creatorNotes: '제작 노트', desc: '설명', personality: '성격', scenario: '시나리오',
   exampleMessage: '예시 대화', systemPrompt: '시스템 프롬프트', postHistoryInstructions: '탈옥 프롬프트', backgroundHTML: '배경 HTML',
   lowLevelAccess: '저수준 접근', virtualscript: '가상 스크립트', triggerscript: '트리거',
 };
