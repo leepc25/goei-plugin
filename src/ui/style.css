@@ -1032,9 +1032,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
 .gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
-.gx-op-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px; margin-top: 1px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op-meta .y { opacity: .7; }
-.gx-op-dot { opacity: .5; }
+.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
 .gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
 .gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
@@ -1073,10 +1071,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 진행 칸 높이가 옆 칸에 맞춰 늘어나도 글은 위에서부터 */
 .gx-board .gx-ev-card { align-content: start; }
 /* 요원 카드: 사진 크게 */
-.gx-acard-act { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; align-self: center; }
-.gx-acard-tool { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--dim); cursor: pointer; }
-.gx-acard-tool:hover { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+.gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
+.gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); }
 .gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
 .gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
 .gx-board .gx-acard { align-items: center; gap: 14px; padding: 12px 14px; }
 .gx-board .gx-acard .gx-ava { width: 84px; height: 84px; border-radius: 18px; font-size: 28px; }
@@ -1084,13 +1083,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-ops-top { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .gx-ops-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gx-ops-num b { font-size: 34px; }
-  /* 모바일 요원 카드: 한 줄에 2개, 사진 위 글 아래 */
+  /* 모바일 요원 카드: 한 줄에 2개, PC와 같은 가로 배치(사진만 작게) */
   .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .gx-board .gx-acard { flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; text-align: center; }
-  .gx-board .gx-acard .gx-ava { width: 76px; height: 76px; border-radius: 18px; }
-  .gx-board .gx-acard-txt { width: 100%; align-items: center; }
-  .gx-board .gx-acard-top { justify-content: center; }
-  .gx-board .gx-acard-txt small { max-width: 100%; }
-  .gx-board .gx-acard-act { flex-direction: row; justify-content: center; gap: 8px; align-self: stretch; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
-  .gx-board .gx-acard-tool { flex: 1; max-width: 72px; height: 34px; }
+  .gx-board .gx-acard { align-items: flex-start; gap: 8px; padding: 10px 8px; }
+  .gx-board .gx-acard .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
+  .gx-board .gx-acard-top b { font-size: 13.5px; }
+  .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
+  .gx-board .gx-acard-act { top: 5px; right: 3px; gap: 0; }
+  .gx-board .gx-acard-tool { width: 20px; height: 24px; }
+  .gx-board .gx-acard-tool svg { width: 15px; height: 15px; }
+  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 36px; }
 }

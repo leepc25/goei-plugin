@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.13
+//@version 0.16.14
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8641,9 +8641,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
 .gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
-.gx-op-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px; margin-top: 1px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op-meta .y { opacity: .7; }
-.gx-op-dot { opacity: .5; }
+.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
 .gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
 .gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
@@ -8682,10 +8680,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 진행 칸 높이가 옆 칸에 맞춰 늘어나도 글은 위에서부터 */
 .gx-board .gx-ev-card { align-content: start; }
 /* 요원 카드: 사진 크게 */
-.gx-acard-act { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; align-self: center; }
-.gx-acard-tool { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--dim); cursor: pointer; }
-.gx-acard-tool:hover { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+.gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
+.gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); }
 .gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
 .gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
 .gx-board .gx-acard { align-items: center; gap: 14px; padding: 12px 14px; }
 .gx-board .gx-acard .gx-ava { width: 84px; height: 84px; border-radius: 18px; font-size: 28px; }
@@ -8693,15 +8692,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-ops-top { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .gx-ops-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gx-ops-num b { font-size: 34px; }
-  /* 모바일 요원 카드: 한 줄에 2개, 사진 위 글 아래 */
+  /* 모바일 요원 카드: 한 줄에 2개, PC와 같은 가로 배치(사진만 작게) */
   .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .gx-board .gx-acard { flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; text-align: center; }
-  .gx-board .gx-acard .gx-ava { width: 76px; height: 76px; border-radius: 18px; }
-  .gx-board .gx-acard-txt { width: 100%; align-items: center; }
-  .gx-board .gx-acard-top { justify-content: center; }
-  .gx-board .gx-acard-txt small { max-width: 100%; }
-  .gx-board .gx-acard-act { flex-direction: row; justify-content: center; gap: 8px; align-self: stretch; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
-  .gx-board .gx-acard-tool { flex: 1; max-width: 72px; height: 34px; }
+  .gx-board .gx-acard { align-items: flex-start; gap: 8px; padding: 10px 8px; }
+  .gx-board .gx-acard .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
+  .gx-board .gx-acard-top b { font-size: 13.5px; }
+  .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
+  .gx-board .gx-acard-act { top: 5px; right: 3px; gap: 0; }
+  .gx-board .gx-acard-tool { width: 20px; height: 24px; }
+  .gx-board .gx-acard-tool svg { width: 15px; height: 15px; }
+  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 36px; }
 }
 `;
 
@@ -8903,7 +8903,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.13" : "0";
+var PLUGIN_VERSION = true ? "0.16.14" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -11619,13 +11619,13 @@ function brand(ctx) {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
   const time2 = (w ? clock(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
   const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
-  const line = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${value}</em></span>` : "";
-  const meta = [time2, esc10(weather)].filter(Boolean).join('<span class="gx-op-dot">·</span>');
-  const status = line("위치", esc10(st?.place ?? "")) + line("목표", esc10(st?.target ?? "")) + (meta ? `<span class="gx-op-meta">${meta}</span>` : "");
+  const line = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc10(value)}</em></span>` : "";
+  const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc10(time2)}</span><span>${esc10(weather)}</span></span>` : "";
+  const status = line("위치", st?.place ?? "") + line("목표", st?.target ?? "") + meta;
   return `<div class="gx-nav-brand">
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc10(img)}')"></span>` : ""}
-        <span class="gx-op-txt"><small>소속</small><b>${esc10(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
+        <span class="gx-op-txt"><b>${esc10(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
     </div>`;
 }
 function selfName(ctx, code, name) {
@@ -11648,7 +11648,7 @@ function clock(minute) {
   if (minute === null) return "";
   const d = new Date(minute * 6e4);
   const p = (n) => String(n).padStart(2, "0");
-  return `<span class="y">${d.getUTCFullYear()}.</span>${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
 }
 function board(ctx) {
   if (!worldOn(ctx.chat)) {

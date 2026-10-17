@@ -745,14 +745,14 @@ function brand(ctx: ChatContext): string {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const time = (w ? clock(w.minute) : '') || [st?.date, st?.time].filter(Boolean).join(' ');
   const weather = [st?.weather, st?.temp].filter(Boolean).join(' ');
-  // 상태는 소속 사진 패널 안에: 위치·목표는 한 줄씩, 시각·날씨는 한 줄에 작게
-  const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${value}</em></span>` : '');
-  const meta = [time, esc(weather)].filter(Boolean).join('<span class="gx-op-dot">·</span>');
-  const status = line('위치', esc(st?.place ?? '')) + line('목표', esc(st?.target ?? '')) + (meta ? `<span class="gx-op-meta">${meta}</span>` : '');
+  // 소속 사진 패널: 맨 위 소속 이름 한 줄, 가로줄 아래 위치·목표 한 줄씩, 맨 아래 왼쪽 날짜·시각 / 오른쪽 날씨·온도
+  const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>` : '');
+  const meta = time || weather ? `<span class="gx-op-meta"><span>${esc(time)}</span><span>${esc(weather)}</span></span>` : '';
+  const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta;
   return `<div class="gx-nav-brand">
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? ' has-img' : ''}">${img ? `<span class="gx-op-img" style="background-image:url('${esc(img)}')"></span>` : ''}
-        <span class="gx-op-txt"><small>소속</small><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b>${status ? `<span class="gx-op-st">${status}</span>` : ''}</span></div>
+        <span class="gx-op-txt"><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b>${status ? `<span class="gx-op-st">${status}</span>` : ''}</span></div>
     </div>`;
 }
 
@@ -781,7 +781,7 @@ function clock(minute: number | null): string {
   if (minute === null) return '';
   const d = new Date(minute * 60000);
   const p = (n: number) => String(n).padStart(2, '0');
-  return `<span class="y">${d.getUTCFullYear()}.</span>${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
 }
 
 
