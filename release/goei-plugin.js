@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.12
+//@version 0.16.13
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -5417,6 +5417,17 @@ async function openDm(ctx, env2, cid) {
   Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
   await env2.refresh();
 }
+function agentContact(ctx, agentId) {
+  const c = dir(ctx).map.get(contactId(agentId));
+  return c ? { id: c.id, wiki: c.lore || c.name } : null;
+}
+async function openAgentDm(ctx, env2, agentId) {
+  const c = agentContact(ctx, agentId);
+  if (!c) return false;
+  phone.query = "";
+  await openDm(ctx, env2, c.id);
+  return true;
+}
 function dropEmpty(st, keep) {
   const prev = phone.room;
   if (!prev || prev === keep) return;
@@ -8638,6 +8649,60 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
 .gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
 .gx-op.has-img:has(.gx-op-st) { min-height: 176px; }
+
+/* 상황판 다시 설계 (v0.16.13) */
+.gx-board > .gx-ops, .gx-board > .gx-ops.calm { gap: 14px; padding: 16px; border-radius: 18px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--signal); }
+.gx-ops.lv1, .gx-ops.lv2 { border-left-color: var(--amber); }
+.gx-ops.lv3, .gx-ops.lv4, .gx-ops.lv5 { border-left-color: var(--danger); }
+.gx-ops-top { display: grid; grid-template-columns: minmax(200px, 260px) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.gx-ops-lv { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gx-ops-lv > small { font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--dim); }
+.gx-ops-num { display: flex; align-items: baseline; gap: 6px; }
+.gx-ops-num b { font-family: var(--mono); font-size: 40px; line-height: 1; font-weight: 700; color: var(--signal); }
+.gx-ops-num span { font-family: var(--mono); font-size: 15px; color: var(--dim); }
+.gx-ops-num em { margin-left: 4px; font-style: normal; font-size: 17px; font-weight: 700; color: var(--signal); }
+.gx-ops-num .gx-live { align-self: center; margin-left: 2px; }
+.gx-ops.lv1 .gx-ops-num b, .gx-ops.lv1 .gx-ops-num em, .gx-ops.lv2 .gx-ops-num b, .gx-ops.lv2 .gx-ops-num em { color: var(--amber); }
+.gx-ops.lv3 .gx-ops-num b, .gx-ops.lv3 .gx-ops-num em, .gx-ops.lv4 .gx-ops-num b, .gx-ops.lv4 .gx-ops-num em, .gx-ops.lv5 .gx-ops-num b, .gx-ops.lv5 .gx-ops-num em { color: var(--danger); }
+.gx-ops-lv .gx-meter { width: 100%; max-width: 220px; }
+.gx-ops-lv p { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--dim); }
+.gx-ops-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gx-ops-stat { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--void); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.gx-ops-stat:hover { border-color: var(--line2); }
+.gx-ops-stat span { font-size: 13px; font-weight: 600; color: var(--dim); }
+.gx-ops-stat b { font-family: var(--mono); font-size: 28px; line-height: 1.1; font-weight: 700; }
+.gx-ops-stat small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.gx-ops-stat.an b { color: var(--danger); } .gx-ops-stat.in b { color: var(--amber); } .gx-ops-stat.ms b { color: var(--signal); } .gx-ops-stat.op b { color: var(--blue); }
+.gx-ops-deploy { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--panel2); }
+.gx-ops-deploy h3 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.gx-ops-list li { background: var(--void); }
+/* 괴이·사건·특수: PC는 여러 칸 */
+.gx-board .gx-sec > .gx-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
+.gx-board .gx-sec > .gx-list > li { margin: 0; }
+/* 진행 칸 높이가 옆 칸에 맞춰 늘어나도 글은 위에서부터 */
+.gx-board .gx-ev-card { align-content: start; }
+/* 요원 카드: 사진 크게 */
+.gx-acard-act { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; align-self: center; }
+.gx-acard-tool { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+.gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+.gx-board .gx-acard { align-items: center; gap: 14px; padding: 12px 14px; }
+.gx-board .gx-acard .gx-ava { width: 84px; height: 84px; border-radius: 18px; font-size: 28px; }
+@media (max-width: 760px) {
+  .gx-ops-top { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .gx-ops-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gx-ops-num b { font-size: 34px; }
+  /* 모바일 요원 카드: 한 줄에 2개, 사진 위 글 아래 */
+  .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gx-board .gx-acard { flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; text-align: center; }
+  .gx-board .gx-acard .gx-ava { width: 76px; height: 76px; border-radius: 18px; }
+  .gx-board .gx-acard-txt { width: 100%; align-items: center; }
+  .gx-board .gx-acard-top { justify-content: center; }
+  .gx-board .gx-acard-txt small { max-width: 100%; }
+  .gx-board .gx-acard-act { flex-direction: row; justify-content: center; gap: 8px; align-self: stretch; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); }
+  .gx-board .gx-acard-tool { flex: 1; max-width: 72px; height: 34px; }
+}
 `;
 
 // src/ui/mapzoom.ts
@@ -8838,7 +8903,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.12" : "0";
+var PLUGIN_VERSION = true ? "0.16.13" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -11273,6 +11338,13 @@ async function handle(action, value) {
       field2.confirmEnd = null;
       resetSettings();
       return render();
+    case "agent-talk":
+      if (view.kind !== "started") return;
+      tab = "phone";
+      notice = "";
+      resetField();
+      if (!await openAgentDm(view.ctx, phoneEnv, value ?? "")) render();
+      return;
     case "wiki-goto":
       if (view.kind !== "started") return;
       tab = "wiki";
@@ -11624,7 +11696,9 @@ function board(ctx) {
   const ag = roster.map((p) => {
     const rec = w.agents[p.id];
     const st = rec?.st ?? "미정";
-    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc10(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "")}</li>`;
+    const c = agentContact(ctx, p.id);
+    const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc10(p.id)}" title="괴담톡" aria-label="${esc10(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc10(c.wiki)}" title="위키" aria-label="${esc10(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
+    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc10(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "")}${act}</li>`;
   }).join("");
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc10(w.promoted.join(", "))}</p>` : "";
   const t = threat(w);
@@ -11638,16 +11712,27 @@ function board(ctx) {
   }).join("");
   const loose = onOp.filter((p) => !placed.has(p.name));
   const looseRow = loose.length ? `<li><span class="gx-ops-where"><i class="gx-gmark op">·</i><b>그 밖의 작전</b><small>배치 기록 없음</small></span><span class="gx-ops-who">${loose.map((p) => `<span class="gx-pchip" title="${esc10(w.agents[p.id]?.situation ?? "")}">${avatar(ctx.char, p.english, p.name, "xs")}${esc10(p.name)}</span>`).join("")}</span></li>` : "";
-  const chip2 = (id, label, n, cls) => `<button class="gx-ops-chip ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b></button>`;
+  const waiting = (list5) => list5.length - live(list5);
+  const stat = (id, label, n, sub, cls) => `<button class="gx-ops-stat ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b><small>${sub}</small></button>`;
   const quiet = w.minute === null ? "첫 응답이 오면 시각과 상태가 채워져요." : "지금 작전 중인 요원은 없어요.";
   return `<main class="gx-body gx-board">
-    <section class="gx-ops${t.level ? "" : " calm"}">
-      <div class="gx-ops-bar">
-        <span class="gx-ops-threat">${t.level ? '<span class="gx-live"></span>' : ""}위협도 ${t.level}<small>${t.label}</small>
-          <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ""}"></i>`).join("")}</span></span>
-        <span class="gx-ops-chips">${chip2("an", "괴이", live(w.an), "an")}${chip2("in", "사건", live(w.inc), "in")}${chip2("ms", "특수", live(w.ms), "ms")}${chip2("ag", "작전", onOp.length, "op")}</span>
+    <section class="gx-ops lv${t.level}">
+      <div class="gx-ops-top">
+        <div class="gx-ops-lv">
+          <small>위협도</small>
+          <div class="gx-ops-num"><b>${t.level}</b><span>/ 5</span><em>${t.label}</em>${t.level ? '<span class="gx-live"></span>' : ""}</div>
+          <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ""}"></i>`).join("")}</span>
+          <p>진행 중인 괴이 등급과 사건 수로 매겨요.</p>
+        </div>
+        <div class="gx-ops-stats">
+          ${stat("an", "괴이", live(w.an), waiting(w.an) ? `예정 ${waiting(w.an)}` : "진행 중", "an")}
+          ${stat("in", "사건", live(w.inc), waiting(w.inc) ? `예정 ${waiting(w.inc)}` : "진행 중", "in")}
+          ${stat("ms", "특수", live(w.ms), waiting(w.ms) ? `예정 ${waiting(w.ms)}` : "출현", "ms")}
+          ${stat("ag", "요원", onOp.length, `작전 중 / ${roster.length}명`, "op")}
+        </div>
       </div>
-      ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}
+      <div class="gx-ops-deploy"><h3>투입 현황</h3>
+        ${ops || looseRow ? `<ul class="gx-ops-list">${ops}${looseRow}</ul>` : `<p class="gx-ops-quiet">${quiet}</p>`}</div>
     </section>
     ${section3("an", "괴이", w.an.length, an, "발생한 괴이가 없어요.")}
     ${section3("in", "사건", w.inc.length, inc, "진행 중인 사건이 없어요.")}
