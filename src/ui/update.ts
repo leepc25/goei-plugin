@@ -26,7 +26,24 @@ const SKIP_KEY = 'goei:update-skip';
 async function getJson(name: string): Promise<unknown> {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: 'GET' });
   if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
-  return res.json();
+  // Risu 판에 따라 json()이 문자열이나 바이트를 줄 수 있어 글자로 받아 직접 읽는다
+  const text = await res.text();
+  let body: unknown = text;
+  try {
+    for (let i = 0; i < 2 && typeof body === 'string'; i++) body = JSON.parse(body.replace(/^\uFEFF/, ''));
+  } catch {
+    throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text ?? '').length}자)`);
+  }
+  return body;
+}
+
+/** 형식이 다를 때 무엇을 받았는지 짧게 (원인 찾기용) */
+function describe(x: unknown): string {
+  if (x === null || typeof x !== 'object') return `${typeof x}`;
+  const o = x as Record<string, unknown>;
+  const d = o.data as Record<string, unknown> | undefined;
+  return `schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : '없음'}, `
+    + `globalLore=${Array.isArray(d?.globalLore) ? 'list' : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? 'list' : typeof d?.customscripts}`;
 }
 
 /** 작은 version.json만 받아 최신 버전을 안다 (창을 처음 열 때 한 번, 확인 버튼마다) */
@@ -147,7 +164,7 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
     if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
     if (action === 'upd-prepare') {
       const p = await getJson('card-update.json');
-      if (!isPayload(p)) throw new Error('카드 업데이트 파일 형식이 달라요.');
+      if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe(p)})`);
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;
       updateUi.plan = planUpdate(char, p);

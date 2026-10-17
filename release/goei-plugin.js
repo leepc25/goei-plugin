@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.1
+//@version 0.16.2
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -8013,6 +8013,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
     grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "head" "body" "nav"; }
   .gx-head { padding: 12px 16px 10px; }
   .gx-body { padding: 4px 16px 16px; }
+  .upd-banner { --gx-pad: 16px; }
   .gx-nav { flex-direction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
   .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
   .gx-logo.mob { display: grid; }
@@ -8438,10 +8439,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
 .upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
 .upd-ver b { color: var(--signal); }
-.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0 2px; }
-.upd-plan { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
+.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
+.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
 .upd-plan small { color: var(--dim); }
-.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 12px; padding: 10px 12px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
+.ps-rows > .ps-note, .ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0; padding: 0 14px 12px; }
+.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
 .upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
 .upd-banner-t b { color: var(--text); margin-right: 4px; }
 .upd-banner-b { display: flex; gap: 6px; flex: none; }
@@ -8645,7 +8647,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.1" : "0";
+var PLUGIN_VERSION = true ? "0.16.2" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -8656,7 +8658,20 @@ var SKIP_KEY = "goei:update-skip";
 async function getJson(name) {
   const res = await risuai.nativeFetch(`${UPDATE_BASE}/${name}?t=${Date.now()}`, { method: "GET" });
   if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}).`);
-  return res.json();
+  const text = await res.text();
+  let body4 = text;
+  try {
+    for (let i = 0; i < 2 && typeof body4 === "string"; i++) body4 = JSON.parse(body4.replace(/^\uFEFF/, ""));
+  } catch {
+    throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text ?? "").length}자)`);
+  }
+  return body4;
+}
+function describe2(x) {
+  if (x === null || typeof x !== "object") return `${typeof x}`;
+  const o = x;
+  const d = o.data;
+  return `schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscripts=${Array.isArray(d?.customscripts) ? "list" : typeof d?.customscripts}`;
 }
 async function checkLatest(env2, force = false) {
   if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
@@ -8774,7 +8789,7 @@ async function handleUpdate(action, ctx, env2) {
     if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
     if (action === "upd-prepare") {
       const p = await getJson("card-update.json");
-      if (!isPayload(p)) throw new Error("카드 업데이트 파일 형식이 달라요.");
+      if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe2(p)})`);
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;
       updateUi.plan = planUpdate(char, p);

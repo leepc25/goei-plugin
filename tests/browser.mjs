@@ -66,7 +66,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
-      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r } : { ok: false, status: 404, json: async () => null }; },
+      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => JSON.stringify(r) } : { ok: false, status: 404, json: async () => null, text: async () => '' }; },
     };
     window.__assets = {};`;
 }
@@ -1315,6 +1315,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.waitForSelector('.upd-banner');
   assert.match(await page.textContent('.upd-banner'), /카드 v9\.0\.0/);
+  if (shots) {
+    await page.screenshot({ path: `${shots}/update-banner.png` });
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `${shots}/update-banner-m.png` });
+    await page.setViewportSize({ width: 1100, height: 900 });
+  }
   assert.equal(await page.locator('.gx-xdot').count(), 1, '설정 아이콘에 점');
   await page.click('[data-action="upd-skip"]');
   assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
@@ -1322,6 +1329,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
   await page.click('[data-action="upd-prepare"]');
   await page.waitForSelector('.upd-plan');
+  if (shots) await page.locator('.upd-plan').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-settings.png` });
   assert.match(await page.textContent('.upd-plan'), /첫 안내/);
   await page.click('[data-action="upd-apply"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
