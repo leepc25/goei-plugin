@@ -436,6 +436,22 @@ async function open(page) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
   await page.setViewportSize({ width: 390, height: 844 });
+  // 상황판 행 → 임무(지도) 탭의 그 자리
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.click(`.gx-board .gx-evc:has-text("${preset.name}") .gx-icon[data-action="board-map"]`);
+  await page.waitForSelector('.gx-map .gx-ctxbar');
+  assert.ok((await page.textContent('.gx-map .gx-sits')).includes(preset.name));
+  if (shots) {
+    await page.screenshot({ path: `${shots}/9-map-from-board.png` });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${shots}/9-map-mobile-goal.png` });
+    await page.click('[data-action="field-step"][data-value="team"]');
+    await page.screenshot({ path: `${shots}/9-map-mobile-team.png` });
+    await page.click('[data-action="field-step"][data-value="goal"]');
+  }
+  await page.setViewportSize({ width: 1280, height: 860 });
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.waitForSelector('.gx-board');
   console.log('PASS 상황판 요원 카드에서 괴담톡·위키 바로 열기');
   // 다른 봇: 리스너·표시 모두 무시
   await page.evaluate(() => { window.__char = { name: '다른 봇', globalLore: [] }; window.risuai.getCurrentCharacterIndex = async () => 1; });
@@ -504,7 +520,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.equal(await page.locator('.gx-pin.nation.hot').count() >= 1, true);
   if (shots) await page.screenshot({ path: `${shots}/11-map-nation.png` });
   // 상황 선택: 그 시도 지도로 바뀌고 목표가 채워진다
-  await page.click(`.gx-ev:has-text("${preset.name}") .gx-evmain`);
+  await page.click(`.gx-evc:has-text("${preset.name}") .gx-evc-main`);
   await page.waitForFunction((c) => document.querySelector('.gx-select')?.value === c, code);
   assert.equal(await page.textContent('.gx-goal b'), preset.name);
   await page.waitForFunction(() => document.querySelector('.gx-mapimg')?.naturalWidth > 0, null, { timeout: 5000 });
@@ -558,10 +574,10 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok((await page.evaluate(() => window.__chat.message.at(-1).data)).includes('Companions: No additional companions'));
   // 상황 종료: 두 번 눌러 확인
   await open(page);
-  await page.waitForSelector('.gx-ev');
-  await page.click(`.gx-ev:has-text("${preset.name}") [data-action="end-event"]`);
-  assert.equal((await page.textContent(`.gx-ev:has-text("${preset.name}") [data-action="end-event"]`)).trim(), '정말 종료');
-  await page.click(`.gx-ev:has-text("${preset.name}") [data-action="end-event"]`);
+  await page.waitForSelector('.gx-evc');
+  await page.click(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`);
+  assert.equal((await page.textContent(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`)).trim(), '정말 종료');
+  await page.click(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`);
   await page.waitForFunction((name) => !JSON.parse(window.__chat.scriptstate.$goei_world).an.some((e) => e.name === name), preset.name);
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$an_report)).includes(`${preset.name}|활성`));
   assert.deepEqual(errors, []);

@@ -14,7 +14,9 @@ import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { ICONS } from './icons';
+import { elapsedText, evCard, peopleChips } from './evcard';
 import { agentInner } from './images';
+import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
 
 export type Target =
@@ -219,34 +221,30 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
     ? `<img class="gx-mapimg" src="${esc(url)}" alt="${esc(code === '01' ? '전국' : regionName(code))} 지도">`
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
   return `<div class="gx-mapbar">
-      ${code !== '01' ? '<button class="gx-mini" data-action="map-region" data-value="01">← 전국</button>' : ''}
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
     </div>
-    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls() : ''}</div>`;
+    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
 }
 
 // ── 상황 목록 ──
 
-function eventRow(e: WorldEvent, x: Ctx): string {
-  const selected = field.target?.type === 'event' && field.target.key === e.key;
-  const confirm = field.confirmEnd === e.key;
-  const facts = [
-    e.grade ? `<span class="gx-grade g${esc(e.grade)}">${esc(e.grade)}</span>` : '',
-    e.kind !== 'in' ? `<span class="gx-loc">${e.kind === 'ms' ? '방문자' : '투입'} ${esc(codesToNames(e.people || '없음', x.catalog, x.faction))}</span>` : '',
-  ].join('');
-  return `<li class="gx-ev${selected ? ' sel' : ''}">
-    <button class="gx-evmain" data-action="pick-event" data-value="${esc(e.key)}">
-      <span class="gx-row"><span class="gx-kind k-${e.kind}">${KIND_LABEL[e.kind]}</span><b>${esc(e.name)}</b></span>
-      <span class="gx-loc">${esc(locName(e.loc))}</span>
-      ${facts ? `<span class="gx-row">${facts}</span>` : ''}
-      ${e.report ? `<span class="gx-report">${esc(e.report)}</span>` : ''}
-    </button>
-    <div class="gx-evact">
-      <button class="gx-mini" data-action="show-event" data-value="${esc(e.key)}" aria-label="${esc(e.name)} 지역 지도">지도</button>
-      ${e.name !== '이름 미확인' ? `<button class="gx-mini" data-action="wiki-goto" data-value="${esc(e.name)}">위키</button>` : ''}
-      <button class="gx-mini${confirm ? ' danger' : ''}" data-action="end-event" data-value="${esc(e.key)}">${confirm ? '정말 종료' : '상황 종료'}</button>
-    </div>
-  </li>`;
+function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string }>): string {
+  // 상황판과 같은 카드 (ui/evcard.ts). 누르면 목표로 고르기, 지도 아이콘은 그 지역 지도
+  const w = x.world;
+  const src = e.kind === 'an' ? w.an[e.index] : e.kind === 'in' ? w.inc[e.index] : w.ms[e.index];
+  const since = src && 'since' in src ? elapsedText(w.minute, src.since) : '';
+  const an = e.kind === 'an' ? w.an[e.index] : undefined;
+  const badge = e.kind === 'an'
+    ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>'
+    : e.kind === 'in' ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
+  const names = e.kind === 'in' ? [] : codesToNames(e.people || '없음', x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
+  return evCard({
+    kind: e.kind, name: e.name, grade: e.grade, kindTag: true,
+    loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
+    extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
+    key: e.key, open: 'pick-event', mapAction: 'show-event',
+    selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
+  });
 }
 
 function situations(x: Ctx, events: WorldEvent[]): string {
@@ -255,6 +253,7 @@ function situations(x: Ctx, events: WorldEvent[]): string {
   const chips = (['all', 'an', 'in', 'ms'] as Filter[])
     .map((f) => `<button class="gx-chip${field.filter === f ? ' on' : ''}" data-action="map-filter" data-value="${f}">${f === 'all' ? '전체' : KIND_LABEL[f]}<b>${counts[f]}</b></button>`)
     .join('');
+  const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
   const shown = events.filter((e) => (field.filter === 'all' || e.kind === field.filter) && (!field.place || placeKey(e, x.catalog) === field.place));
   let head = '';
   if (field.place) {
@@ -268,7 +267,7 @@ function situations(x: Ctx, events: WorldEvent[]): string {
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
   return `<div class="gx-chips">${chips}</div>${head}
-    ${shown.length ? `<ul class="gx-list gx-evs">${shown.map((e) => eventRow(e, x)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown.length ? `<ul class="gx-evcs">${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
 }
 
 // ── 편성 ──
@@ -278,7 +277,7 @@ function lockedState(x: Ctx, id: string): string | null {
   return agentLocked(rec) ? rec!.st : null;
 }
 
-function teamPanel(x: Ctx, goal: string | null, action: string, label: string, busy: boolean): string {
+function teamPanel(x: Ctx, goal: string | null, action: string, label: string, busy: boolean, ctx?: ChatContext): string {
   const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
   if (!x.supportOn) field.support = 0;
   const used = field.team.length + field.support;
@@ -289,6 +288,17 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
       const full = !on && used >= TEAM_MAX;
       const st = x.world.agents[p.id]?.st ?? '미정';
       const sit = x.world.agents[p.id]?.situation ?? '';
+      // 임무 탭(wide): 상황판 요원 카드와 같은 모양(큰 사진·설명·톡·위키), 한 줄에 한 명 (v0.16.17)
+      if (ctx) {
+        const c = agentContact(ctx, p.id);
+        const act = c
+          ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(p.id)}" title="괴담톡" aria-label="${esc(p.name)}에게 톡">${ICONS.phone}</button>`
+            + `<button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(c.wiki)}" title="위키" aria-label="${esc(p.name)} 위키">${ICONS.wiki}</button></span>`
+          : '';
+        const off = !!lock || full;
+        return `<div class="gx-acard pick wide${on ? ' on' : ''}${off ? ' off' : ''}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc(p.id)}" aria-pressed="${on}" aria-disabled="${off}"
+          ${lock ? `title="${esc(`${lock} 상태라 편성할 수 없어요`)}"` : ''}>${agentInner(x.char, p, st, sit)}${act}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+      }
       return `<button class="gx-acard pick${on ? ' on' : ''}" data-action="team-toggle" data-value="${esc(p.id)}" ${lock || full ? 'disabled' : ''} aria-pressed="${on}"
         title="${esc(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
     })
@@ -311,7 +321,7 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
     <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
-      <textarea rows="3" data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>
+      <textarea rows="3"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
   </section>`;
 }
@@ -342,13 +352,14 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
   const t = field.target;
   if (t?.type === 'event' && !events.some((e) => e.key === t.key)) field.target = null;
   const goal = field.target ? targetName(field.target) : null;
-  return `<main class="gx-body gx-field" data-step="${field.step}">
+  // v0.16.17: 왼쪽은 지도 + 그 아래 상황 목록, 오른쪽 위에 편성 (예전엔 왼쪽 지도 아래가 비고 오른쪽만 길었다)
+  return `<main class="gx-body gx-field gx-map" data-step="${field.step}">
     ${stepBar(goal)}
-    <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}</div>
+    <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}
+      <section class="gx-sec gx-sits"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section></div>
     <div class="gx-sidecol">
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
-      <section class="gx-sec"><h2>상황<small>${events.length}</small></h2>${situations(x, events)}</section>
-      ${teamPanel(x, goal, 'depart', '출발', busy)}
+      ${teamPanel(x, goal, 'depart', '출발', busy, ctx)}
     </div>
   </main>`;
 }
@@ -384,7 +395,7 @@ export function missionList(ctx: ChatContext, opening = false): string {
   return `<ul class="gx-list gx-mlist">${rows
     .map((r) => `<li class="gx-ev${field.mname === r.name && field.mpick === field.mkind ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc(r.name)}">
       <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, field.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>
-      ${opening ? '' : `<div class="gx-evact"><button class="gx-mini" data-action="wiki-goto" data-value="${esc(r.name)}">위키</button></div>`}</li>`)
+      ${opening ? '' : `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button></div>`}</li>`)
     .join('')}</ul>`;
 }
 
@@ -630,6 +641,9 @@ export async function handleField(action: string, value: string | undefined, ctx
       await saveWorld(ctx, env, (w) => (endEvent(w, v) ? null : '이미 끝났거나 바뀐 상황이에요.'));
       return true;
     case 'team-toggle': {
+      // 임무 탭 카드는 button이 아니라서(안에 톡·위키 버튼) 못 고르는 요원도 눌린다
+      const tx = readCtx(ctx);
+      if (typeof tx !== 'string' && lockedState(tx, v)) return true;
       const i = field.team.indexOf(v);
       if (i >= 0) field.team.splice(i, 1);
       else if (field.team.length + field.support < TEAM_MAX) field.team.push(v);

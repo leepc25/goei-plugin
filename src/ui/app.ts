@@ -20,6 +20,7 @@ import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
 import { rememberPanel } from './panels';
+import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
@@ -530,7 +531,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '지도', mission: '커스텀 임무', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -709,14 +710,14 @@ function tabs(): string {
   const unreadPhone = view.kind === 'started' && phoneUnread(view.ctx);
   const cur: Tab = tab === 'mission' ? 'map' : tab;
   const item = (id: Tab, label: string, icon: string, cls = '', badge = '') =>
-    `<button class="gx-nb${cls ? ` ${cls}` : ''}${cur === id || tab === id ? ' on' : ''}" data-action="tab" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
+    `<button class="gx-nb${cls ? ` ${cls}` : ''}${(cls === 'mob' ? cur === id : tab === id) ? ' on' : ''}" data-action="tab" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
   const ctx = view.kind === 'started' ? view.ctx : null;
   return `<nav class="gx-nav" aria-label="주요 화면">
     ${ctx ? brand(ctx) : ''}
     ${item('board', '상황판', ICONS.board)}
-    ${item('map', '지도', ICONS.map, 'desk')}
+    ${item('map', '임무', ICONS.map, 'desk')}
     ${item('map', '임무', ICONS.map, 'mob')}
-    ${item('mission', '커스텀 임무', ICONS.mission, 'desk')}
+    ${item('mission', '커스텀', ICONS.mission, 'desk')}
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
@@ -757,14 +758,7 @@ function selfName(ctx: ChatContext, code: string, name: string): string {
 function subnav(): string {
   if (tab !== 'map' && tab !== 'mission') return '';
   const seg = (id: Tab, label: string) => `<button class="gx-seg${tab === id ? ' on' : ''}" data-action="tab" data-value="${id}" aria-pressed="${tab === id}">${label}</button>`;
-  return `<div class="gx-subwrap"><div class="gx-subnav">${seg('map', '지도')}${seg('mission', '커스텀 임무')}</div></div>`;
-}
-
-function elapsed(w: WorldState, since: number | null): string {
-  if (w.minute === null || since === null) return '';
-  const m = Math.max(0, w.minute - since);
-  const h = Math.floor(m / 60);
-  return h ? `${h}시간 ${m % 60}분째` : `${m % 60}분째`;
+  return `<div class="gx-subwrap"><div class="gx-subnav">${seg('map', '임무')}${seg('mission', '커스텀')}</div></div>`;
 }
 
 function clock(minute: number | null): string {
@@ -793,45 +787,33 @@ function board(ctx: ChatContext): string {
   const pending = '<span class="gx-badge wait">발생 예정</span>';
   const roster = rosterFor(w, catalog, faction, worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit);
   const byName = new Map(roster.map((p) => [p.name, p]));
-  // 배치·방문자 줄: 요원은 사진+이름 칩, 세력·조직·그 밖의 이름은 이름표 (v0.14.0. 예전엔 「관리국」에도 글자 사진 「관」을 그렸다)
-  const people = (codes: string, label: string) => {
-    const list = codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim()).filter((n) => n && n !== '없음');
-    const chips = list
-      .map((n) => (byName.has(n) ? `<span class="gx-pchip">${avatar(ctx.char, byName.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge">${esc(n)}</span>`))
-      .join('');
-    return chips ? `<span class="gx-bd-who" title="${label}">${chips}</span>` : '';
-  };
   // 괴이·사건·특수는 한 줄짜리 행 (v0.16.15: 큰 카드를 늘어놓으니 한 화면에 안 들어왔다)
-  // 진행 중인 것만 지도에 있으니 그 행만 누르면 지도로 (v0.16.16)
+  // 괴이·사건·특수 카드는 임무 탭과 같은 모양 (ui/evcard.ts). 진행 중인 카드는 누르면 지도로
   const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
-  const card = (kind: 'an' | 'in' | 'ms', index: number, mark: string, name: string, loc: string, meta: string, sub: string, grade = '') => {
-    const key = keys.get(`${kind}${index}`);
-    const inner = `<i class="gx-gmark ${kind}${grade ? ` g-${grade.toLowerCase()}` : ''}">${mark}</i><span class="gx-bd-main"><span class="gx-bd-top"><b>${name}</b>${meta}</span>
-      <small>${loc}</small>${sub}</span>`;
-    return key
-      ? `<li class="gx-bd-row go"><button class="gx-bd-go" data-action="board-map" data-value="${esc(key)}" title="지도에서 보기">${inner}</button></li>`
-      : `<li class="gx-bd-row">${inner}</li>`;
+  const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
+  const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
+    const key = keys.get(`${kind}${i}`);
+    return evCard({ ...c, kind, key, open: 'board-map', mapAction: 'board-map', confirmEnd: !!key && field.confirmEnd === key });
   };
   const an = w.an
     .map((e, i) => {
       const wait = e.state === '발생대기';
-      const meta = wait ? pending : `${e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`}`;
-      const since = elapsed(w, e.since);
-      const sub = wait ? '' : people(e.deploy, '배치');
-      return card('an', i, e.grade ? esc(e.grade) : '?', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, meta, sub, /^[A-Za-z]+$/.test(e.grade) ? e.grade : '');
+      const since = elapsedText(w.minute, e.since);
+      const badge = wait ? pending : e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`;
+      return one('an', i, { name: e.name || '이름 미확인', grade: e.grade, loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: wait ? '' : peopleChips(ctx.char, names(e.deploy), byName) });
     })
     .join('');
   const inc = w.inc
     .map((e, i) => {
       const wait = e.state === '발생대기';
-      const since = elapsed(w, e.since);
-      return card('in', i, '!', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<span class="gx-bd-sit">${esc(e.situation)}</span>` : '');
+      const since = elapsedText(w.minute, e.since);
+      return one('in', i, { name: e.name || '이름 미확인', loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge: wait ? pending : '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit">${esc(e.situation)}</span>` : '' });
     })
     .join('');
   const ms = w.ms
     .map((e, i) => {
       const wait = e.state === '발생대기';
-      return card('ms', i, '◇', esc(e.name), esc(locName(e.loc)), wait ? pending : '<span class="gx-badge live">출현</span>', wait ? '' : people(e.visitors, '방문자'));
+      return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName) });
     })
     .join('');
   const ag = roster
@@ -853,7 +835,7 @@ function board(ctx: ChatContext): string {
   // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 위협도는 머리의 표시, 개수는 각 칸 제목에
   const count = (list: { state: string }[], on: string) => [live(list) ? `${on} ${live(list)}` : '', waiting(list) ? `예정 ${waiting(list)}` : ''].filter(Boolean).join(' · ') || '0';
   const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
-    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-bd-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
+    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
     ${w.minute === null ? '<p class="gx-hint">첫 응답이 오면 시각과 상태가 채워져요.</p>' : ''}
     <div class="gx-bd-cols">
