@@ -9,7 +9,7 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
-import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo } from './images';
+import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
@@ -20,6 +20,7 @@ import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
+import { readUser, userInfo } from '../host/user';
 import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
@@ -297,6 +298,10 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   shown = true;
   await risuai.showContainer('fullscreen');
   await refresh();
+  // 유저 사진·이름 (ID카드). 읽히면 한 번 다시 그린다
+  void readUser().then((u) => {
+    if (shown && (u.name || u.photo)) render();
+  });
   void checkLatest(settingsEnv); // 새 버전이 있으면 설정 → 업데이트에 표시 (세션에 한 번)
 }
 
@@ -431,6 +436,12 @@ async function handle(action: string, value?: string): Promise<void> {
       tab = 'map';
       notice = '';
       return render();
+    case 'id-card': {
+      // 모바일: 머리의 ID카드 버튼 → 왼쪽 패널과 같은 카드를 작은 창으로
+      if (view.kind !== 'started') return;
+      showIdCard(idCard(view.ctx));
+      return;
+    }
     case 'agent-info': {
       // 상황판 요원 카드: 큰 사진과 상태 전문 창 (v0.16.22부터 PC도)
       const card = root?.querySelector<HTMLElement>(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? '')}"]`);
@@ -558,6 +569,7 @@ function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
+      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
@@ -752,8 +764,17 @@ function tabs(): string {
   </nav>`;
 }
 
-/** 왼쪽 위: 표지 + 소속 사진 패널 (안에 위치·목표·시각·날씨). 첫 장면 선택은 시작 뒤엔 쓸모없어 뺐다 */
+/** 왼쪽 위: 표지 + 세로 ID카드 */
 function brand(ctx: ChatContext): string {
+  return `<div class="gx-nav-brand">
+      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
+      ${idCard(ctx)}
+    </div>`;
+}
+
+/** 세로 ID카드 (v0.16.22, 사용자 설계): 맨 위 유저 사진({{source::user}})·이름({{user}}), 아래 소속과 위치·목표·시각·날씨.
+ *  배경엔 소속 사진이 아래에서 위로 옅어지며 은은하게 비친다. PC 왼쪽 위, 모바일은 머리 버튼으로 작은 창 */
+function idCard(ctx: ChatContext): string {
   const facs = factionList(ctx.char.globalLore);
   const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '') || currentChoice(ctx.chat).faction || '';
   const f = code ? findFaction(code, facs) : undefined;
@@ -766,10 +787,15 @@ function brand(ctx: ChatContext): string {
   const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>` : '');
   const meta = time || weather ? `<span class="gx-op-meta"><span>${esc(time)}</span><span>${esc(weather)}</span></span>` : '';
   const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta;
-  return `<div class="gx-nav-brand">
-      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
-      <div class="gx-op${img ? ' has-img' : ''}">${img ? `<span class="gx-op-img" style="background-image:url('${esc(img)}')"></span>` : ''}
-        <span class="gx-op-txt"><b>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</b>${status ? `<span class="gx-op-st">${status}</span>` : ''}</span></div>
+  const u = userInfo();
+  const name = u.name || '나';
+  const photo = u.photo
+    ? `<span class="gx-id-photo"><img src="${esc(u.photo)}" alt=""></span>`
+    : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+  return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
+      ${photo}
+      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</small></span>
+      ${status ? `<span class="gx-op-st">${status}</span>` : ''}
     </div>`;
 }
 

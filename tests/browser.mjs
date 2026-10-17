@@ -25,6 +25,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       _el: el,
       setAttribute: async (k, v) => { if (!k.startsWith('x-')) throw new Error('x- only'); el.setAttribute(k, v); },
       setInnerHTML: async (h) => { el.innerHTML = h; },
+      getInnerHTML: async () => el.innerHTML,
       setTextContent: async (t) => { el.textContent = t; },
       setStyle: async (k, v) => { el.style[k] = v; },
       appendChild: async (c) => { el.appendChild(c._el); },
@@ -69,6 +70,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
+      parseRisuChat: async (t) => String(t).replace(/\{\{user\}\}/g, window.__userName ?? '{{user}}'),
       nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => typeof r === 'string' ? r : JSON.stringify(r) } : { ok: false, status: 404, json: async () => null, text: async () => '' }; },
     };
     window.__assets = {};`;
@@ -383,6 +385,7 @@ async function open(page) {
   // 응답이 들어온 직후 화면 표시: 태그 숨김
   const shown = await page.evaluate((reply) => window.__calls.handlers.display(reply), reply);
   assert.ok(!shown.includes('[AN|') && !shown.includes('[AG|') && shown.includes('[▣|'), shown);
+  assert.ok(shown.includes('data-goei-user') && shown.includes('{{source::user}}'), '이 봇 채팅엔 유저 사진 숨은 칸');
   await page.evaluate(async () => {
     const c = window.__chat;
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });

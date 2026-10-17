@@ -1,3 +1,4 @@
+import { USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
@@ -193,11 +194,17 @@ function onDisplay(text: string): string {
   // 플러그인 고유 표식(시작 카드·지시문·전화 카드)은 Lite 판정 전에도 바꾼다.
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
-  if (isLanding(text)) return landingHtml();
+  // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
+  const ours = liteNow || isLanding(text) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
-  if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
-  if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
-  if (hasCall(out)) out = renderCalls(out, callCardHtml);
+  if (isLanding(text)) out = landingHtml();
+  else {
+    if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+    if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
+    if (hasCall(out)) out = renderCalls(out, callCardHtml);
+  }
+  // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
+  if (ours && !out.includes('data-goei-user')) out += USER_MARK;
   return out;
 }
 

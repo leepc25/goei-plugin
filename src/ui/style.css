@@ -119,18 +119,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
 .gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
-.gx-op { position: relative; display: flex; align-items: flex-end; min-height: 92px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: linear-gradient(150deg, var(--accent-bg), var(--panel)); isolation: isolate; }
-.gx-op.has-img { min-height: 118px; }
-.gx-op-img { position: absolute; inset: 0; z-index: -2; background-size: cover; background-position: center 30%; }
-.gx-op.has-img::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(4, 10, 9, .05) 0%, rgba(4, 10, 9, .55) 45%, rgba(4, 10, 9, .92) 100%); }
-.gx-op-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gx-op-txt small { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--sub); }
-.gx-op-txt b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
-.gx-op.has-img .gx-op-txt small { color: rgba(255, 255, 255, .72); }
-.gx-op.has-img .gx-op-txt b { color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
-.gx-op-sc { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--sub); min-width: 0; }
-.gx-op.has-img .gx-op-sc { color: rgba(255, 255, 255, .88); }
-.gx-op-sc i { flex: none; font-style: normal; font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: var(--signal); color: #04201c; }
 .gx-logo.mob { display: none; }
 /* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
 @media (min-width: 761px) {
@@ -1118,19 +1106,29 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
-.gx-op-txt { width: 100%; }
+/* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
+.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
+.gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
+.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
+.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-id-photo.none svg { width: 44px; height: 44px; }
+.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
+.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
+.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
+.gx-idbtn { display: none; overflow: hidden; padding: 0; }
+.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
+.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
+.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
+.gx-idpop-card .gx-id-photo { width: 160px; height: 160px; border-radius: 24px; }
+.gx-idpop-card .gx-agpop-x { z-index: 1; }
+@media (max-width: 760px) { .gx-idbtn { display: grid; } }
 .gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
 .gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
 .gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
 .gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op.has-img .gx-op-st { border-top-color: rgba(255, 255, 255, .18); }
-.gx-op.has-img .gx-op-ln i { color: rgba(255, 255, 255, .6); }
-.gx-op.has-img .gx-op-ln em { color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
-.gx-op.has-img .gx-op-meta { color: rgba(255, 255, 255, .78); }
-.gx-op.has-img:has(.gx-op-st) { min-height: 0; }
 /* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
-.gx-op.has-img:has(.gx-op-st)::before { background: linear-gradient(180deg, rgba(4, 10, 9, .5) 0%, rgba(4, 10, 9, .9) 100%); }
 
 /* 상황판 다시 설계 (v0.16.13) */
 /* 상황판 (v0.16.15 촘촘하게): 괴이·사건·특수 세 칸, 행은 한 줄. 위협도는 머리에만 (v0.16.16) */

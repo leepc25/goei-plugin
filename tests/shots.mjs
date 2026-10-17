@@ -25,6 +25,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       _el: el,
       setAttribute: async (k, v) => { if (!k.startsWith('x-')) throw new Error('x- only'); el.setAttribute(k, v); },
       setInnerHTML: async (h) => { el.innerHTML = h; },
+      getInnerHTML: async () => el.innerHTML,
       setTextContent: async (t) => { el.textContent = t; },
       setStyle: async (k, v) => { el.style[k] = v; },
       appendChild: async (c) => { el.appendChild(c._el); },
@@ -66,6 +67,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
+      parseRisuChat: async (t) => String(t).replace(/\{\{user\}\}/g, window.__userName ?? '{{user}}'),
     };
     window.__assets = {};`;
 }
@@ -125,10 +127,24 @@ await page.evaluate(async () => {
   const items = [1, 2, 3].map((i) => ({ id: `n${i}`, channel: 'A00', issuer: '관리국 총무과', category: i === 1 ? '안전' : '공지', title: `공지 제목 ${i} 조금 길게 써 보는 제목입니다`, text: '본문 첫 줄입니다. 배관 공사로 인해 지하 2층 출입이 제한됩니다.\n둘째 줄.', time: '2025.01.01 02:4' + i, read: i !== 1 }));
   window.__chat.scriptstate.$ph_bulletins = JSON.stringify({ version: 1, items, seen: {} });
 });
+// 유저 사진: Risu가 채팅 속 숨은 칸의 {{source::user}}를 /sw/img/<경로 hex>로 바꿔 둔 상태를 흉내 낸다
+await page.evaluate(() => {
+  const row = (window.__char.additionalAssets || []).find((a) => /jyaldi/i.test(a[0])) || window.__char.additionalAssets[0];
+  window.__userName = '한지우';
+  const hex = [...new TextEncoder().encode(row[1])].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const box = document.createElement('span');
+  box.setAttribute('data-goei-user', '');
+  box.hidden = true;
+  box.innerHTML = `<img src="/sw/img/${hex}" alt="">`;
+  document.body.appendChild(box);
+});
 const g = async (name) => { await page.waitForTimeout(250); await page.screenshot({ path: `${shots}/${name}.png` }); };
 await open(page);
 await page.waitForSelector('.gx-board');
 await g('m01-board');
+await page.click('.gx-idbtn').catch((e) => console.log('idbtn', e.message));
+await g('m01b-idcard');
+await page.click('.gx-idpop .gx-agpop-x').catch(() => {});
 await page.evaluate(() => document.querySelector('.gx-content')?.scrollBy(0, 600));
 await g('m02-board-scroll');
 await page.click('.gx-board .gx-acard .gx-acard-sit').catch((e) => console.log('agpop', e.message));
