@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.19
+//@version 0.16.20
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -16,9 +16,9 @@ function parseDirective(lore) {
   heads.forEach((h, i) => {
     const name = h[1];
     if (name in sections2) throw new DirectiveError(`Directive 섹션이 중복됐어요: ${name}`);
-    const start2 = h.index + h[0].length;
+    const start3 = h.index + h[0].length;
     const end = i + 1 < heads.length ? heads[i + 1].index : raw.length;
-    sections2[name] = raw.slice(start2, end).trim();
+    sections2[name] = raw.slice(start3, end).trim();
   });
   let format;
   try {
@@ -4912,10 +4912,26 @@ function avatar(char, english, name, cls = "") {
 function prefetchFactions(char) {
   for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, f.photo);
 }
+var stLabel = (st) => st === "작전투입" ? "작전" : st;
 var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
-function agentInner(char, p, st, situation = "") {
+function agentInner(char, p, st, situation = "", act = "") {
   const role = [p.department, p.rank].filter(Boolean).join(" · ");
-  return `${avatar(char, p.english, p.name, "sq")}<span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(st)}</em></span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em></span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+}
+function showAgentInfo(card2) {
+  const box = document.createElement("div");
+  box.className = "gx gx-agpop";
+  box.setAttribute("role", "dialog");
+  const side = card2.querySelector(".gx-ava")?.outerHTML ?? "";
+  const txt = card2.querySelector(".gx-acard-txt")?.innerHTML ?? "";
+  box.innerHTML = `<div class="gx-agpop-card">${side}<div class="gx-agpop-txt">${txt}</div><button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
+  const theme = document.querySelector(".gx")?.getAttribute("data-theme");
+  if (theme) box.setAttribute("data-theme", theme);
+  box.addEventListener("click", (e) => {
+    if (e.target.closest(".gx-agpop-card") && !e.target.closest(".gx-agpop-x")) return;
+    box.remove();
+  });
+  document.body.appendChild(box);
 }
 
 // src/ui/icons.ts
@@ -7173,8 +7189,8 @@ function clampPos(pos, viewW, viewH) {
     bottom: Math.round(Math.min(maxB, Math.max(FAB_MARGIN, b)))
   };
 }
-function dragTo(start2, dx, dy, viewW, viewH) {
-  return clampPos({ right: start2.right - dx, bottom: start2.bottom - dy }, viewW, viewH);
+function dragTo(start3, dx, dy, viewW, viewH) {
+  return clampPos({ right: start3.right - dx, bottom: start3.bottom - dy }, viewW, viewH);
 }
 function parsePos(raw) {
   try {
@@ -7329,80 +7345,52 @@ ${themeVars("[x-goei-fab]")}
 [x-goei-fab][x-goei-glow="true"] button { animation: goei-fab-glow 1.3s ease-in-out 3; }
 @media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-glow="true"] button { animation: none; } }
 `;
-var INTRO_MS = 1500;
+var INTRO_MS = 1800;
 var INTRO_CSS = `
-[x-goei-intro] { --g-void: #061216; --g-text: #e8fffa; --g-sub: #a7c9be; --g-signal: #7fe3d0; --g-scrim: rgba(2,6,8,.94); }
+[x-goei-intro] { --g-void: #061216; --g-text: #e8fffa; --g-sub: #a7c9be; --g-signal: #7fe3d0; }
 [x-goei-intro] {
-  position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; overflow: hidden;
+  position: fixed; left: 50%; top: max(14px, env(safe-area-inset-top)); z-index: 2147483000; pointer-events: none;
+  display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px; max-width: calc(100vw - 32px); box-sizing: border-box;
+  border-radius: 14px; overflow: hidden; background: color-mix(in srgb, var(--g-void) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent);
+  box-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
   font-family: 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif;
-  animation: goei-in-veil ${INTRO_MS}ms ease forwards;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--g-void) 82%, transparent) 0%, var(--g-scrim) 70%);
+  animation: goei-in-drop ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) forwards;
 }
 [x-goei-intro] [data-gi="scan"] {
-  position: absolute; left: 0; right: 0; height: 2px; top: -4%;
-  background: linear-gradient(90deg, transparent, var(--g-signal) 20%, var(--g-text) 50%, var(--g-signal) 80%, transparent);
-  box-shadow: 0 0 18px 4px color-mix(in srgb, var(--g-signal) 55%, transparent);
-  animation: goei-scan 682ms cubic-bezier(.4,0,.2,1) 74ms forwards;
+  position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 22%, transparent), transparent);
+  animation: goei-in-sweep 900ms ease-out 200ms both;
 }
-[x-goei-intro] [data-gi="lines"] {
-  position: absolute; inset: 0; opacity: .18;
-  background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--g-signal) 22%, transparent) 0 1px, transparent 1px 4px);
-  animation: goei-flicker 558ms steps(6) 2;
-}
-[x-goei-intro] [data-gi="core"] {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  width: min(86vw, 520px); padding: 26px 20px 22px;
-  border-top: 1px solid color-mix(in srgb, var(--g-signal) 50%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--g-signal) 50%, transparent);
-  animation: goei-open 372ms cubic-bezier(.2,.8,.2,1) 186ms both;
-}
-[x-goei-intro] [data-gi="core"]::before, [x-goei-intro] [data-gi="core"]::after {
-  content: ""; position: absolute; top: -5px; width: 10px; height: 10px; border: 1px solid var(--g-signal); transform: rotate(45deg); background: var(--g-void);
-}
-[x-goei-intro] [data-gi="core"]::before { left: -5px; }
-[x-goei-intro] [data-gi="core"]::after { right: -5px; }
-[x-goei-intro] [data-gi="ghost"] { color: var(--g-signal); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--g-signal) 60%, transparent)); animation: goei-pulse 558ms ease-in-out 310ms 2; }
-[x-goei-intro] [data-gi="ghost"] svg { width: 44px; height: 44px; }
-[x-goei-intro] [data-gi="label"] { color: var(--g-sub); font-size: 11px; letter-spacing: .42em; }
+[x-goei-intro] [data-gi="ghost"] { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; color: var(--g-signal); background: color-mix(in srgb, var(--g-signal) 14%, transparent); }
+[x-goei-intro] [data-gi="ghost"] svg { width: 22px; height: 22px; }
 [x-goei-intro] [data-gi="title"] {
-  position: relative; color: var(--g-text); font-size: clamp(20px, 5.4vw, 30px); font-weight: 700; letter-spacing: .12em; white-space: nowrap;
-  text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent);
-  animation: goei-glitch 868ms steps(1) 248ms 1;
+  position: relative; color: var(--g-text); font-size: 14px; font-weight: 700; letter-spacing: .2em; white-space: nowrap;
+  animation: goei-in-glitch 520ms steps(1) 220ms 1;
 }
-[x-goei-intro] [data-gi="sub"] { color: var(--g-sub); font-size: 13px; letter-spacing: .08em; }
-[x-goei-intro] [data-gi="bar"] { width: 160px; height: 2px; background: color-mix(in srgb, var(--g-signal) 18%, transparent); overflow: hidden; }
-[x-goei-intro] [data-gi="bar"] i { display: block; height: 100%; width: 0; background: var(--g-signal); box-shadow: 0 0 8px var(--g-signal); animation: goei-load 806ms ease-out 279ms forwards; }
-@keyframes goei-in-veil { 0% { opacity: 0; } 10% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes goei-scan { to { top: 104%; } }
-@keyframes goei-flicker { 0%,100% { opacity: .18; } 33% { opacity: .05; } 66% { opacity: .3; } }
-@keyframes goei-open { from { opacity: 0; clip-path: inset(48% 0 48% 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
-@keyframes goei-pulse { 50% { transform: scale(1.08); filter: drop-shadow(0 0 18px color-mix(in srgb, var(--g-signal) 90%, transparent)); } }
-@keyframes goei-load { to { width: 100%; } }
-@keyframes goei-glitch {
+@keyframes goei-in-drop {
+  0% { opacity: 0; transform: translate(-50%, -14px); }
+  14% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -8px); }
+}
+@keyframes goei-in-sweep { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+@keyframes goei-in-glitch {
   0% { transform: translate(0); text-shadow: 2px 0 #ff5a7a, -2px 0 #4fe0ff; }
-  8% { transform: translate(-2px, 1px); clip-path: inset(10% 0 55% 0); }
-  14% { transform: translate(2px, -1px); clip-path: inset(60% 0 8% 0); }
-  20% { transform: translate(0); clip-path: none; text-shadow: -1px 0 #ff5a7a, 1px 0 #4fe0ff; }
-  46% { text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent); }
-  52% { transform: translate(1px, 0); text-shadow: 2px 0 #ff5a7a, -2px 0 #4fe0ff; }
-  56% { transform: translate(0); text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent); }
+  20% { transform: translate(-1px, 0); }
+  40% { transform: translate(1px, 0); text-shadow: -1px 0 #ff5a7a, 1px 0 #4fe0ff; }
+  60% { transform: translate(0); text-shadow: none; }
   100% { transform: translate(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   [x-goei-intro] *, [x-goei-intro] { animation-duration: 1ms !important; animation-delay: 0ms !important; }
-  [x-goei-intro] { animation: goei-in-veil ${INTRO_MS}ms linear forwards !important; }
-  [x-goei-intro] [data-gi="bar"] i { width: 100%; }
+  [x-goei-intro] { transform: translateX(-50%); animation: none !important; }
 }
 `;
 var INTRO_HTML = `
-<div data-gi="lines"></div>
 <div data-gi="scan"></div>
-<section data-gi="core" aria-hidden="true">
-  <div data-gi="ghost">${GHOST_ICON}</div>
-  <div data-gi="label">SYSTEM //</div>
-  <div data-gi="title">ANOMALY SIMULATION</div>
-  <div data-gi="bar"><i></i></div>
-</section>`;
+<div data-gi="ghost" aria-hidden="true">${GHOST_ICON}</div>
+<div data-gi="title">ANOMALY SIMULATION</div>`;
 async function body2() {
   const doc = await risuai.getRootDocument();
   if (!doc) return null;
@@ -7593,10 +7581,18 @@ async function createFab(onOpen) {
     }
   };
 }
+var introHost = null;
+function cancelIntro() {
+  const h = introHost;
+  introHost = null;
+  void h?.remove().catch(() => {
+  });
+}
 async function playIntro() {
   const root2 = await body2();
   if (!root2) return;
   const host = await root2.doc.createElement("div");
+  introHost = host;
   await host.setAttribute("x-goei-intro", "true");
   await host.setInnerHTML(INTRO_HTML);
   const style = await root2.doc.createElement("style");
@@ -7604,7 +7600,9 @@ async function playIntro() {
   await host.appendChild(style);
   await root2.body.appendChild(host);
   await new Promise((r) => setTimeout(r, INTRO_MS));
-  await host.remove();
+  if (introHost === host) introHost = null;
+  await host.remove().catch(() => {
+  });
 }
 
 // src/ui/style.css
@@ -7748,18 +7746,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 /* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
 .gx-head { position: relative; }
-.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, var(--signal), color-mix(in srgb, var(--signal) 55%, transparent)); }
+.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--signal) 14%, color-mix(in srgb, var(--signal) 70%, transparent) 80%, transparent); }
 .gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
 .gx-tabicon svg { width: 20px; height: 20px; }
 .gx-tabhead b { letter-spacing: .02em; }
 .gx-nav-gap { flex: 1; }
-/* 위협도 한 칸 (v0.16.18): PC는 소속 패널 아래, 모바일은 머리의 설정·닫기 옆. 높이·모서리는 설정·닫기 버튼(.gx-x)과 같게 */
-.gx-threat { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent); border-radius: 12px; background: var(--danger-bg); color: var(--danger); font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; flex: none; }
-.gx-threat.calm { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
-.gx-threat .w { color: var(--sub); font-weight: 600; }
-.gx-threat b { font-family: var(--mono); font-size: 17px; }
-.gx-threat .t { margin-left: auto; }
-.gx-threat.mob { display: none; }
 .gx-nb {
   position: relative; display: flex; align-items: center; gap: 12px;
   width: 100%; min-height: 48px; padding: 0 14px;
@@ -7773,9 +7764,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
 .gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
 .gx-nb.mob { display: none; }
+.gx-mbar { display: none; }
 .gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
 
-.gx-body { padding: 4px 20px 16px; overflow-y: auto; overscroll-behavior: contain; }
+/* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
+.gx-body { padding: 4px 10px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .gx-body section { padding: 14px 0 6px; }
 .gx-body h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--text); }
 .gx-body h2 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg); font-style: normal; font-size: 13px; color: var(--signal); font-family: var(--mono); }
@@ -8162,13 +8155,20 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-nav { flex-direction: row; gap: 0; padding: 0 4px calc(8px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--panel2); background: var(--sunk); overflow: visible; }
   .gx-nav-brand, .gx-nav-gap, .gx-nb.desk { display: none; }
   .gx-logo.mob { display: grid; }
-  .gx-threat.mob { display: flex; gap: 6px; padding: 0 12px; }
-  .gx-threat.mob .t { margin-left: 0; }
   .gx-nb, .gx-nb.mob { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-height: 58px; padding: 0 2px; border-radius: 0; font-size: 12px; text-align: center; background: transparent; }
   .gx-nb:hover { background: transparent; }
   .gx-nb.on { background: transparent; }
   .gx-nb svg { width: 24px; height: 24px; }
   .gx-nb .gx-nbadge { position: absolute; top: 5px; left: calc(50% + 6px); margin: 0; min-width: 18px; height: 18px; font-size: 11px; }
+  /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
+  .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
+  /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
+  .gx-nav { padding-left: 0; padding-right: 0; }
+  .gx-nav > .gx-nb { display: none; }
+  .gx-mbar { display: block; flex: 1; min-width: 0; }
+  .gx-mtrack { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .gx-mtrack::-webkit-scrollbar { display: none; }
+  .gx-mtrack > .gx-nb { display: flex; flex: 0 0 20%; position: relative; scroll-snap-align: start; }
   .gx-facs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: none; }
   .gx-fac { scroll-snap-align: start; }
   .gx-fac.has-img { min-height: 188px; }
@@ -8576,8 +8576,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
 .gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-.gx-note > span { font-size: 14px; font-weight: 600; color: var(--sub); padding: 0 2px; }
-.gx-note small { font-weight: 400; color: var(--dim); }
 .gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
 .gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
 .gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
@@ -8598,7 +8596,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-stepbar { display: none; }
 @media (max-width: 760px) {
   .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr auto; }
+  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr 84px; }
   /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
   .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
   .gx-stepswap svg { width: 16px; height: 16px; }
@@ -8614,13 +8612,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
 }
 @media (max-width: 760px) {
-  /* 편성 요원: 단계로 나눈 뒤에도 한 줄 한 명은 너무 길어서 두 칸 (상태는 이름 아래 줄, 부서·직급은 말줄임) */
-  .gx-acards.pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 편성 요원: 한 줄에 한 명 (v0.16.18: 두 칸은 글이 너무 좁았다, 사용자 결정) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); }
   .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
   .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
   /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
   .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
-  .gx-acard.pick .gx-acard-top b { flex: 1 0 100%; padding-right: 16px; box-sizing: border-box; }
+  .gx-acard.pick .gx-acard-top b { flex: 0 1 auto; padding-right: 0; }
   .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
   .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
   .gx-acard.pick .gx-acard-top b { font-size: 14px; }
@@ -8668,15 +8666,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) {
   /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
   .gx-field { padding-top: 10px; row-gap: 12px; }
-  .gx-stepbar { gap: 6px; margin-bottom: 2px; }
+  /* 목표·편성·전환 줄은 위에 고정, 아래만 스크롤 (사용자 요청) */
+  .gx-stepbar { gap: 6px; position: sticky; top: -10px; z-index: 3; margin: -10px -16px 0; padding: 10px 16px 8px; background: var(--void); }
   .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
   .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
   .gx-stepb span { flex-direction: row; align-items: baseline; gap: 6px; }
   .gx-stepb b { font-size: 14px; flex: none; }
   /* 편성 단계: 요원 목록이 넓게. 작전 메모는 한 줄로 접어 두고 누르면 펼친다 */
-  .gx-field[data-step="team"] .gx-goal { font-size: 14px; }
+  /* 목표·인원은 위 목표·편성 줄에 이미 나온다 */
+  .gx-team > .gx-goal { display: none; }
   .gx-field[data-step="team"] .gx-note { gap: 4px; }
-  .gx-field[data-step="team"] .gx-note > span { font-size: 13px; }
   /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
   .gx-note textarea { scrollbar-width: none; }
   .gx-note textarea::-webkit-scrollbar { display: none; }
@@ -8685,16 +8684,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .gx-field[data-step="team"] .gx-team { gap: 8px; }
   /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
-  .gx-acard.pick.wide { align-items: flex-start; gap: 8px; padding: 10px 8px; }
-  .gx-acard.pick.wide .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
-  .gx-acard.pick.wide { flex-wrap: wrap; }
   .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
   .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
   .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
-  .gx-acard.pick.wide .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
-  .gx-acard.pick.wide .gx-acard-tool { width: 40px; height: 34px; }
-  .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
-  .gx-acard.pick.wide .gx-acard-check { bottom: 9px; left: 10px; right: auto; }
 }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
@@ -8764,20 +8756,66 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; }
 .gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
 @media (max-width: 760px) {
-  /* 모바일 요원 카드: 한 줄에 2개, PC와 같은 가로 배치(사진만 작게) */
-  .gx-board .gx-acards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .gx-board .gx-acard { align-items: flex-start; gap: 8px; padding: 10px 8px; }
-  .gx-board .gx-acard .gx-ava { width: 42px; height: 42px; border-radius: 11px; font-size: 16px; }
+  /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
+  .gx-board .gx-acards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .gx-board .gx-acard-top b { font-size: 13.5px; }
   .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
-  /* 톡·위키: 손가락으로 누르기 쉽게 카드 맨 아래 오른쪽에 큰 칸으로 (v0.16.18: 20px짜리는 탭하기 힘들었고, 옆에 세로로 두면 글자가 좁아졌다) */
-  .gx-board .gx-acard { flex-wrap: wrap; }
-  .gx-board .gx-acard-act { position: static; flex: 0 0 100%; justify-content: flex-end; gap: 4px; margin: -4px -4px -6px 0; }
-  .gx-board .gx-acard-tool { width: 40px; height: 34px; }
-  .gx-board .gx-acard-tool svg { width: 18px; height: 18px; }
   .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
 }
+/* 사진+톡·위키 칸: PC는 없는 셈 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+.gx-acard-side { display: contents; }
+/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
+@media (max-width: 760px) {
+  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: center; gap: 10px; padding: 10px; }
+  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 60px; height: 60px; border-radius: 14px; font-size: 22px; }
+  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; margin: 0; }
+  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 36px; height: 34px; }
+  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
+  /* 이름·상태 줄은 버튼 자리만큼 비우고, 딱지는 높이 고정 (줄이 바뀌어도 찌그러지지 않게) */
+  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 76px; }
+  .gx-board .gx-acard-top b, .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; max-width: 100%; }
+  .gx-board .gx-st, .gx-acard.pick.wide .gx-st { flex: none; height: 20px; line-height: 20px; padding: 0 7px; font-size: 11.5px; }
+  .gx-board .gx-acard-txt small, .gx-acard.pick.wide .gx-acard-txt small, .gx-board .gx-acard-sit, .gx-acard.pick.wide .gx-acard-sit { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+  .gx-board .gx-acard { cursor: pointer; }
+}
+.gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
+.gx-agpop-card { position: relative; display: flex; gap: 12px; width: min(100%, 420px); box-sizing: border-box; padding: 16px 44px 16px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 72px; height: 72px; border-radius: 16px; flex: none; }
+.gx-agpop-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gx-agpop-txt .gx-acard-top b { font-size: 16px; }
+.gx-agpop-txt small { font-size: 13px; color: var(--dim); }
+.gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
 `;
+
+// src/ui/mbar.ts
+var start = 0;
+function mbarHtml(items) {
+  const set = items.join("");
+  return `<div class="gx-mbar"><div class="gx-mtrack">${set}${set}${set}</div></div>`;
+}
+function bindMbar(root2) {
+  const track = root2.querySelector(".gx-mtrack");
+  if (!track) return;
+  const n = track.children.length / 3;
+  const cell = () => track.firstElementChild?.offsetWidth || track.clientWidth / 5;
+  const setW = () => cell() * n;
+  track.scrollLeft = setW() + start * cell();
+  let timer;
+  track.addEventListener("scroll", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const w = setW();
+      if (!w) return;
+      let x = track.scrollLeft;
+      if (x < w * 0.5) x += w;
+      else if (x >= w * 1.5) x -= w;
+      if (x !== track.scrollLeft) track.scrollLeft = x;
+      start = (Math.round((x - w) / cell()) % n + n) % n;
+    }, 120);
+  }, { passive: true });
+}
 
 // src/ui/mapzoom.ts
 var MAX = 4;
@@ -8785,7 +8823,7 @@ var MOVE = 6;
 var views = /* @__PURE__ */ new Map();
 function mapZoomControls(nation = false) {
   return `<div class="gx-zoom" aria-label="지도 확대">
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기">⤢</button>
+      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
       <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
       ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
@@ -8833,38 +8871,38 @@ function bindMapZoom(root2) {
     if (dragged && !e.target.closest(".gx-zoom")) e.stopPropagation(), e.preventDefault();
     dragged = false;
   }, true);
-  let start2 = null;
+  let start3 = null;
   const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   canvas.addEventListener("touchstart", (e) => {
     const t = e.touches;
     dragged = false;
-    if (e.target.closest(".gx-zoom")) return start2 = null;
+    if (e.target.closest(".gx-zoom")) return start3 = null;
     if (t.length === 2) {
       const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-      start2 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-    } else if (t.length === 1) start2 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
+      start3 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
+    } else if (t.length === 1) start3 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
   }, { passive: true });
   canvas.addEventListener("touchmove", (e) => {
     const t = e.touches;
-    if (!start2) return;
-    if (t.length === 2 && start2.d) {
+    if (!start3) return;
+    if (t.length === 2 && start3.d) {
       e.preventDefault();
       dragged = true;
       const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-      const nz = Math.min(MAX, Math.max(1, start2.v.z * dist(t) / start2.d));
-      v = { z: nz, x: mx - (start2.mx - start2.v.x) / start2.v.z * nz, y: my - (start2.my - start2.v.y) / start2.v.z * nz };
+      const nz = Math.min(MAX, Math.max(1, start3.v.z * dist(t) / start3.d));
+      v = { z: nz, x: mx - (start3.mx - start3.v.x) / start3.v.z * nz, y: my - (start3.my - start3.v.y) / start3.v.z * nz };
       apply();
-    } else if (t.length === 1 && v.z > 1 && !start2.d) {
+    } else if (t.length === 1 && v.z > 1 && !start3.d) {
       e.preventDefault();
-      const dx = t[0].clientX - start2.x, dy = t[0].clientY - start2.y;
+      const dx = t[0].clientX - start3.x, dy = t[0].clientY - start3.y;
       if (Math.hypot(dx, dy) > MOVE) dragged = true;
-      v = { ...start2.v, x: start2.v.x + dx, y: start2.v.y + dy };
+      v = { ...start3.v, x: start3.v.x + dx, y: start3.v.y + dy };
       apply();
     }
   }, { passive: false });
   canvas.addEventListener("touchend", (e) => {
     const t = e.touches;
-    start2 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
+    start3 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
   }, { passive: true });
   canvas.addEventListener("wheel", (e) => {
     if (!e.ctrlKey) return;
@@ -8978,7 +9016,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.19" : "0";
+var PLUGIN_VERSION = true ? "0.16.20" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -10027,10 +10065,10 @@ function teamPanel(x, goal, action, label, busy2, ctx) {
       const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc8(p.id)}" title="괴담톡" aria-label="${esc8(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc8(c.wiki)}" title="위키" aria-label="${esc8(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
       const off = !!lock || full;
       return `<div class="gx-acard pick wide${on ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc8(p.id)}" aria-pressed="${on}" aria-disabled="${off}"
-          ${lock ? `title="${esc8(`${lock} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit)}${act}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+          ${lock ? `title="${esc8(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
     }
     return `<button class="gx-acard pick${on ? " on" : ""}" data-action="team-toggle" data-value="${esc8(p.id)}" ${lock || full ? "disabled" : ""} aria-pressed="${on}"
-        title="${esc8(lock ? `${lock} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
+        title="${esc8(lock ? `${stLabel(lock)} 상태라 편성할 수 없어요` : sit)}">${agentInner(x.char, p, st, sit)}<span class="gx-acard-check" aria-hidden="true">✓</span></button>`;
   }).join("");
   const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field2.support > 0 ? " on" : ""}">
       <span class="gx-ava sq">${ICONS.group}</span>
@@ -10046,8 +10084,8 @@ function teamPanel(x, goal, action, label, busy2, ctx) {
     <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc8(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
-    <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
-      <textarea rows="3"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc8(field2.note)}</textarea></label>
+    <label class="gx-note">
+      <textarea rows="3" aria-label="작전 메모"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc8(field2.note)}</textarea></label>
     <button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy2 ? "보내는 중…" : esc8(label)}</button>
   </section>`;
 }
@@ -10516,11 +10554,11 @@ function factionBlock(o, ctx) {
   const lore = ctx.char.globalLore ?? [];
   const k = (f) => `org:${f}|${o.name}`;
   const seg5 = (action, on2, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on2 ? " on" : ""}" data-action="${action}" data-value="${esc9(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on2 ? " on" : ""}" data-action="${action}" data-value="${esc9(`0|${o.name}`)}">${b}</button></div>`;
-  const start2 = `${input(k("title"), o.spec.title ?? "", "시작 화면 이름", o.faction ? "비우면 원래 이름" : "비우면 조직 이름")}
+  const start3 = `${input(k("title"), o.spec.title ?? "", "시작 화면 이름", o.faction ? "비우면 원래 이름" : "비우면 조직 이름")}
     ${area(k("blurb"), o.spec.blurb ?? "", "시작 화면 설명")}
     ${input(k("photo"), o.spec.photo ?? "", "사진 에셋 이름", o.faction ? "비우면 원래 사진(f01~f05)" : "카드 에셋 이름. 비우면 사진 없이")}`;
   if (o.faction) {
-    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg5("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start2}</div>`;
+    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg5("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start3}</div>`;
   }
   const on = !!o.spec.playable;
   const ready = placeholdersReady(lore);
@@ -10530,7 +10568,7 @@ function factionBlock(o, ctx) {
   return `<div class="dir-fac">${head}${patch}
     <div class="dir-line"><span>유형</span><div class="dir-chips">${FACTION_TYPES.map((x) => chip("dir-fac-type", `${x.id}|${o.name}`, x.label, (o.spec.type ?? "org") === x.id)).join("")}</div></div>
     <p class="gx-muted">${esc9(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
-    ${start2}
+    ${start3}
     ${input(k("gm_name"), o.spec.gm_name ?? "", "모델용 영어 이름", "소속 변경 태그 목록과 세력 설명 제목에 써요. 비우면 조직 이름")}
     ${area(k("gm_desc"), o.spec.gm_desc ?? "", "모델용 세력 설명", "📜Faction 로어북 끝에 붙어요. 영어로 적으면 다른 세력 설명과 어울려요")}
     ${input(k("seed"), (o.spec.seed ?? [o.name]).join(", "), "시작 때 함께 넣을 로어북", "쉼표로 나눠 적어요. 첫 응답에 이 로어북들이 꼭 들어가요")}
@@ -11461,7 +11499,7 @@ async function handle(action, value) {
       notice = "";
       return renderPicker();
     case "start":
-      return start();
+      return start2();
     case "tab":
       tab = TABS.includes(value) ? value : "board";
       notice = "";
@@ -11473,6 +11511,12 @@ async function handle(action, value) {
       tab = "map";
       notice = "";
       return render();
+    case "agent-info": {
+      if (!matchMedia("(max-width: 760px)").matches) return;
+      const card2 = root?.querySelector(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? "")}"]`);
+      if (card2) showAgentInfo(card2);
+      return;
+    }
     case "agent-talk":
       if (view.kind !== "started") return;
       tab = "phone";
@@ -11497,7 +11541,7 @@ async function handle(action, value) {
       return turnWorldOn();
   }
 }
-async function start() {
+async function start2() {
   if (view.kind !== "picker" || !draft.faction || !draft.fm) return;
   const { ctx, manifest } = view;
   busy = true;
@@ -11585,24 +11629,10 @@ function header(sub, extra = "") {
 function startedHeader(ctx) {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
-    <div class="gx-head-act">${threatButton(ctx, "mob")}
+    <div class="gx-head-act">
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
-}
-function threat(w) {
-  const weight = { S: 3, A: 2, B: 1 };
-  let n = 0;
-  for (const e of w.an) if (e.state !== "발생대기") n += 1 + (weight[e.grade ?? ""] ?? 0);
-  for (const e of w.inc) if (e.state !== "발생대기") n += 1;
-  const level = n === 0 ? 0 : n <= 1 ? 1 : n <= 3 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : 5;
-  return { level, label: ["평온", "주의", "경계", "심각", "위험", "재난"][level] };
-}
-function threatButton(ctx, where) {
-  if (!worldOn(ctx.chat)) return "";
-  const t = threat(readWorld(ctx.chat));
-  return `<button class="gx-threat ${where}${t.level ? "" : " calm"}" data-action="tab" data-value="board" title="위협도 ${t.level} · ${t.label}">
-    ${t.level ? '<span class="gx-live"></span>' : ""}<span class="w">위협도</span><b>${t.level}</b><span class="t">${t.label}</span></button>`;
 }
 function renderPicker() {
   const facs = root?.querySelectorAll(".gx-facs .gx-fac");
@@ -11647,6 +11677,7 @@ function render() {
   }
   hydratePhotos(root);
   bindMapZoom(root);
+  bindMbar(root);
   setCurrentTheme(themeName(root.dataset.theme));
 }
 function themeOf() {
@@ -11743,6 +11774,14 @@ function tabs() {
     ${item("wiki", "위키", ICONS.wiki)}
     <span class="gx-nav-gap"></span>
     ${item("settings", "설정", ICONS.settings, "desk", ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
+    ${mbarHtml([
+    item("board", "상황판", ICONS.board),
+    item("map", "임무", ICONS.map, "mob"),
+    item("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ""),
+    ...GNET_ON ? [item("gnet", "괴담넷", ICONS.gnet)] : [],
+    item("wiki", "위키", ICONS.wiki),
+    `<button class="gx-nb" data-action="close" aria-label="닫기">${ICONS.close}<span>닫기</span></button>`
+  ])}
   </nav>`;
 }
 function brand(ctx) {
@@ -11761,7 +11800,6 @@ function brand(ctx) {
       <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       <div class="gx-op${img ? " has-img" : ""}">${img ? `<span class="gx-op-img" style="background-image:url('${esc11(img)}')"></span>` : ""}
         <span class="gx-op-txt"><b>${esc11(f ? selfName(ctx, f.code, f.name) : "소속 없음")}</b>${status ? `<span class="gx-op-st">${status}</span>` : ""}</span></div>
-      ${threatButton(ctx, "desk")}
     </div>`;
 }
 function selfName(ctx, code, name) {
@@ -11819,7 +11857,7 @@ function board(ctx) {
     const st = rec?.st ?? "미정";
     const c = agentContact(ctx, p.id);
     const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc11(p.id)}" title="괴담톡" aria-label="${esc11(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc11(c.wiki)}" title="위키" aria-label="${esc11(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
-    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc11(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "")}${act}</li>`;
+    return `<li class="gx-acard${st === "작전투입" ? " op" : ""}" title="${esc11(p.id)}" data-action="agent-info" data-value="${esc11(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? "", act)}</li>`;
   }).join("");
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc11(w.promoted.join(", "))}</p>` : "";
   const live = (list5) => list5.filter((e) => e.state !== "발생대기").length;
@@ -12023,13 +12061,9 @@ function startWatcher(fab2) {
       if (next.changed) {
         if (next.fabVisible) await readTheme(snap).catch(() => {
         });
-        if (next.intro) {
-          await fab2.setVisible(false);
-          await playIntro().catch(() => {
-          });
-          if (stopped) return;
-        }
         await fab2.setVisible(next.fabVisible, next.intro);
+        if (next.intro) void playIntro().catch(() => {
+        });
       }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -12056,7 +12090,7 @@ await risuai.addRisuScriptHandler("display", onDisplay);
 var stopWatcher = null;
 var fab = null;
 try {
-  fab = await createFab(() => void openApp({ quietIfNotLite: true }));
+  fab = await createFab(() => (cancelIntro(), void openApp({ quietIfNotLite: true })));
   const f = fab;
   void f.setTheme(currentTheme());
   onThemeChange((t) => void f.setTheme(t).catch(() => {
@@ -12066,7 +12100,7 @@ try {
   console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
   await risuai.registerButton(
     { name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` },
-    () => void openApp({ quietIfNotLite: true })
+    () => (cancelIntro(), void openApp({ quietIfNotLite: true }))
   );
 }
 await risuai.onUnload(async () => {
