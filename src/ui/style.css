@@ -172,6 +172,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* 사진 확대 대신 아래 그늘만 옅게: 큰 사진을 키우는 효과는 매 프레임 다시 그려서 끊겼다 (v0.10.2) */
 .gx-fac.has-img::after { transition: opacity .15s; }
 .gx-fac.has-img:hover::after { opacity: .82; }
+/* 평소엔 어두운 흑백, 마우스를 올리거나 고르면 컬러로 (v0.16.8: 밝아지는 효과가 너무 약했다).
+   사진 위 filter 전환 애니메이션은 매 프레임 사진을 다시 그려 끊겨서(v0.10.2) 바로 바꾼다 */
+.gx-fac-img { filter: grayscale(1) brightness(.5); }
+.gx-fac.on .gx-fac-img { filter: none; }
+@media (hover: hover) { .gx-fac.has-img:hover .gx-fac-img { filter: none; } }
+.gx-fac.has-img:not(.on) .gx-fac-txt span { opacity: .85; }
 .gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
 
 .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
