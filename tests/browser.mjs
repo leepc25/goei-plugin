@@ -413,6 +413,10 @@ async function open(page) {
     await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${shots}/9-mission-wide.png` });
+    for (const t of ['board', 'map', 'mission', 'phone', 'wiki', 'settings']) {
+      await page.click(`.gx-nav .gx-nb:not(.mob)[data-value="${t}"]`); await page.waitForTimeout(150);
+      await page.screenshot({ path: `${shots}/9-tab-${t}.png` });
+    }
     await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
     await page.waitForSelector('.gx-board');
   }

@@ -307,7 +307,7 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     : '';
   const ready = !!goal && validTeam(field.team.length, field.support) && !busy;
   return `<section class="gx-team">
-    <div class="gx-goal"><span>목표</span><b>${goal ? esc(goal) : '목표를 골라 주세요'}</b><em>${used + 1} / 4</em></div>
+    <div class="gx-goal"><span>목표</span><b${goal ? '' : ' class="none"'}>${goal ? esc(goal) : '미정'}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
     <label class="gx-note"><span>작전 메모 <small>(선택)</small></span>
@@ -401,7 +401,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     .join('');
   const intro = opening
     ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>'
-    : '<p class="gx-muted">고른 대상은 다음 응답에서 모델이 발생시키고 상황판에 등록돼요.</p>';
+    : '';
   return `<main class="gx-body gx-field gx-mission" data-step="${field.step}">
     ${stepBar(field.mname)}
     <div class="gx-mapcol">
@@ -482,7 +482,7 @@ export function depart(ctx: ChatContext, env: FieldEnv): Promise<void> {
   const team = [...field.team];
   const support = field.support;
   return compose(ctx, env, (latest, x) => {
-    if (!target) throw new DirectiveError('목표를 골라 주세요.');
+    if (!target) throw new DirectiveError('목표가 정해지지 않았어요.');
     if (!validTeam(team.length, support)) throw new DirectiveError('요원과 지원 인원을 다시 확인해 주세요.');
     if (support > 0 && !x.supportOn) throw new DirectiveError('지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.');
     const d = parseDirective(ctx.char.globalLore);
@@ -511,7 +511,7 @@ export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): 
   const team = [...field.team];
   const support = field.support;
   return compose(ctx, env, (latest, x) => {
-    if (!name) throw new DirectiveError('목표를 골라 주세요.');
+    if (!name) throw new DirectiveError('목표가 정해지지 않았어요.');
     if (!validTeam(team.length, support)) throw new DirectiveError('요원과 지원 인원을 다시 확인해 주세요.');
     if (support > 0 && !x.supportOn) throw new DirectiveError('지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.');
     const d = parseDirective(ctx.char.globalLore);
@@ -557,6 +557,19 @@ async function saveWorld(ctx: ChatContext, env: FieldEnv, change: (w: WorldState
     env.setNotice(error instanceof Error ? error.message : String(error));
     env.render();
   }
+}
+
+/** 상황판 행을 누르면 지도에서 그 자리를 연다 (v0.16.16). key는 activeEvents의 key */
+export function showOnMap(ctx: ChatContext, key: string): boolean {
+  const x = readCtx(ctx);
+  if (typeof x === 'string' || !x.on) return false;
+  const ev = activeEvents(x.world).find((e) => e.key === key);
+  if (!ev) return false;
+  field.region = sidoOf(ev.loc);
+  field.place = placeKey(ev, x.catalog);
+  field.filter = 'all';
+  field.confirmEnd = null;
+  return true;
 }
 
 /** 지도·커스텀 임무 탭의 버튼. 처리했으면 true */

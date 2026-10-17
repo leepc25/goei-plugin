@@ -3,7 +3,7 @@ import { factionList } from '../core/factions';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
 import type { FactionCode, LangCode, Manifest } from '../core/types';
 import {
-  type Catalog, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
+  activeEvents, type Catalog, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import css from './style.css';
@@ -21,7 +21,7 @@ import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
 import { rememberPanel } from './panels';
 import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
-import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, type FieldEnv } from './field';
+import { field, handleField, mapTab, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
@@ -418,6 +418,12 @@ async function handle(action: string, value?: string): Promise<void> {
       field.confirmEnd = null;
       resetSettings();
       return render();
+    case 'board-map':
+      // 상황판 행: 지도 탭에서 그 자리를 연다
+      if (view.kind !== 'started' || !showOnMap(view.ctx, value ?? '')) return;
+      tab = 'map';
+      notice = '';
+      return render();
     case 'agent-talk':
       // 상황판 요원 카드의 톡: 괴담톡 탭으로 넘어가 그 요원과의 1:1 방을 연다
       if (view.kind !== 'started') return;
@@ -442,9 +448,6 @@ async function handle(action: string, value?: string): Promise<void> {
       return refresh();
     case 'world-on':
       return turnWorldOn();
-    case 'board-jump':
-      root?.querySelector(`#gx-sec-${value}`)?.scrollIntoView({ block: 'start' });
-      return;
   }
 }
 
@@ -537,27 +540,14 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
-/** 진행 중 화면의 머리: 지금 탭 이름 + 상태창 시각 + 위협도 */
+/** 진행 중 화면의 머리: 지금 탭 이름 (v0.16.16: 위협도 표시는 뺐다) */
 function startedHeader(ctx: ChatContext): string {
-  const w = worldOn(ctx.chat) ? readWorld(ctx.chat) : null;
-  const t = w ? threat(w) : null;
-  const pill = t ? `<span class="gx-threat${t.level ? '' : ' calm'}" title="위협도 ${t.level} · ${t.label}">${t.level ? '<span class="gx-live"></span>' : ''}<span class="w">위협도 </span>${t.level}<span class="t"> · ${t.label}</span></span>` : '';
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo mob">${GHOST_ICON}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
-    <div class="gx-head-act">${pill}
+    <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-head-act">
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
-}
-
-/** 위협도: 진행 중인 괴이 등급과 사건 수로 0~5 */
-function threat(w: WorldState): { level: number; label: string } {
-  const weight: Record<string, number> = { S: 3, A: 2, B: 1 };
-  let n = 0;
-  for (const e of w.an) if (e.state !== '발생대기') n += 1 + (weight[e.grade ?? ''] ?? 0);
-  for (const e of w.inc) if (e.state !== '발생대기') n += 1;
-  const level = n === 0 ? 0 : n <= 1 ? 1 : n <= 3 ? 2 : n <= 5 ? 3 : n <= 7 ? 4 : 5;
-  return { level, label: ['평온', '주의', '경계', '심각', '위험', '재난'][level] };
 }
 
 /**
@@ -812,29 +802,36 @@ function board(ctx: ChatContext): string {
     return chips ? `<span class="gx-bd-who" title="${label}">${chips}</span>` : '';
   };
   // 괴이·사건·특수는 한 줄짜리 행 (v0.16.15: 큰 카드를 늘어놓으니 한 화면에 안 들어왔다)
-  const card = (kind: 'an' | 'in' | 'ms', mark: string, name: string, loc: string, meta: string, sub: string) =>
-    `<li class="gx-bd-row"><i class="gx-gmark ${kind}">${mark}</i><span class="gx-bd-main"><span class="gx-bd-top"><b>${name}</b>${meta}</span>
-      <small>${loc}</small>${sub}</span></li>`;
+  // 진행 중인 것만 지도에 있으니 그 행만 누르면 지도로 (v0.16.16)
+  const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
+  const card = (kind: 'an' | 'in' | 'ms', index: number, mark: string, name: string, loc: string, meta: string, sub: string, grade = '') => {
+    const key = keys.get(`${kind}${index}`);
+    const inner = `<i class="gx-gmark ${kind}${grade ? ` g-${grade.toLowerCase()}` : ''}">${mark}</i><span class="gx-bd-main"><span class="gx-bd-top"><b>${name}</b>${meta}</span>
+      <small>${loc}</small>${sub}</span>`;
+    return key
+      ? `<li class="gx-bd-row go"><button class="gx-bd-go" data-action="board-map" data-value="${esc(key)}" title="지도에서 보기">${inner}</button></li>`
+      : `<li class="gx-bd-row">${inner}</li>`;
+  };
   const an = w.an
-    .map((e) => {
+    .map((e, i) => {
       const wait = e.state === '발생대기';
       const meta = wait ? pending : `${e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`}`;
       const since = elapsed(w, e.since);
       const sub = wait ? '' : people(e.deploy, '배치');
-      return card(wait ? 'an' : 'an', e.grade ? esc(e.grade) : '?', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, meta, sub);
+      return card('an', i, e.grade ? esc(e.grade) : '?', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, meta, sub, /^[A-Za-z]+$/.test(e.grade) ? e.grade : '');
     })
     .join('');
   const inc = w.inc
-    .map((e) => {
+    .map((e, i) => {
       const wait = e.state === '발생대기';
       const since = elapsed(w, e.since);
-      return card('in', '!', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<span class="gx-bd-sit">${esc(e.situation)}</span>` : '');
+      return card('in', i, '!', esc(e.name || '이름 미확인'), `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, wait ? pending : '<span class="gx-badge hot">진행</span>', e.situation ? `<span class="gx-bd-sit">${esc(e.situation)}</span>` : '');
     })
     .join('');
   const ms = w.ms
-    .map((e) => {
+    .map((e, i) => {
       const wait = e.state === '발생대기';
-      return card('ms', '◇', esc(e.name), esc(locName(e.loc)), wait ? pending : '<span class="gx-badge live">출현</span>', wait ? '' : people(e.visitors, '방문자'));
+      return card('ms', i, '◇', esc(e.name), esc(locName(e.loc)), wait ? pending : '<span class="gx-badge live">출현</span>', wait ? '' : people(e.visitors, '방문자'));
     })
     .join('');
   const ag = roster
@@ -850,26 +847,14 @@ function board(ctx: ChatContext): string {
     })
     .join('');
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';
-  const t = threat(w);
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
   const waiting = (list: { state: string }[]) => list.length - live(list);
-  // 맨 위 한 줄: 위협도 + 종류별 개수(누르면 그 칸으로). v0.16.15: 큰 숫자 상자·투입 현황 칸을 없앴다 (배치는 괴이 행에 이미 나온다)
-  const stat = (id: string, label: string, n: number, sub: string, cls: string) =>
-    `<button class="gx-bd-stat ${cls}" data-action="board-jump" data-value="${id}"><span>${label}</span><b>${n}</b>${sub ? `<small>${sub}</small>` : ''}</button>`;
+  // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 위협도는 머리의 표시, 개수는 각 칸 제목에
+  const count = (list: { state: string }[], on: string) => [live(list) ? `${on} ${live(list)}` : '', waiting(list) ? `예정 ${waiting(list)}` : ''].filter(Boolean).join(' · ') || '0';
   const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
-    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${list.length}</small></h2>${rows ? `<ul class="gx-bd-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
+    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-bd-list">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
-    <section class="gx-bd-strip lv${t.level}">
-      <div class="gx-bd-lv" title="진행 중인 괴이 등급과 사건 수로 매겨요."><small>위협도</small><b>${t.level}</b><span>/5</span><em>${t.label}</em>
-        <span class="gx-meter">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= t.level ? `l${i}` : ''}"></i>`).join('')}</span></div>
-      <div class="gx-bd-stats">
-        ${stat('an', '괴이', live(w.an), waiting(w.an) ? `+${waiting(w.an)} 예정` : '', 'an')}
-        ${stat('in', '사건', live(w.inc), waiting(w.inc) ? `+${waiting(w.inc)} 예정` : '', 'in')}
-        ${stat('ms', '특수', live(w.ms), waiting(w.ms) ? `+${waiting(w.ms)} 예정` : '', 'ms')}
-        ${stat('ag', '작전', onOp.length, `/ ${roster.length}명`, 'op')}
-      </div>
-    </section>
     ${w.minute === null ? '<p class="gx-hint">첫 응답이 오면 시각과 상태가 채워져요.</p>' : ''}
     <div class="gx-bd-cols">
       ${col('an', '괴이', w.an, an, '발생한 괴이가 없어요.')}
