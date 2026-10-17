@@ -901,6 +901,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 검색: 목록만 다시 그린다
   await page.fill('.ph-search', '스팡달');
   assert.equal(await page.locator('.ph-content [data-action="ph-dm"]').count(), 1);
+  assert.ok((await page.textContent('.ph-content .ph-sec')).startsWith('연락처'), '통합 검색: 연락처 묶음');
   await page.fill('.ph-search', '');
   if (shots) await page.screenshot({ path: `${shots}/15-phone-contacts.png` });
   // 1:1 대화: 내 말은 먼저 저장, 답장은 패치로

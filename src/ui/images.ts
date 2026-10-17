@@ -81,11 +81,14 @@ export const stLabel = (st: string) => (st === '작전투입' ? '작전' : st);
 
 const AGENT_COLOR: Record<string, string> = { 작전투입: 'var(--signal)', 외근: 'var(--blue)', 부상: 'var(--amber)', 실종: 'var(--danger)', 격리: 'var(--danger)', 사망: 'var(--danger)', 비번: 'var(--dim)' };
 
+/** 요원 상태 딱지 (상황판·편성·괴담톡 연락처 공통) */
+export const stChip = (st: string) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? 'var(--dim)'}">${escAttr(stLabel(st))}</em>`;
+
 /** 요원 카드 속: 둥근 네모 사진 + 이름·상태 + 소속 부서·직급 (+ 현재 상황) */
 /** act: 톡·위키 버튼. 사진과 한 칸(.gx-acard-side)에 넣어 모바일에서는 사진 바로 아래 나란히 둔다 (PC는 카드 오른쪽 위) */
 export function agentInner(char: CharacterSnapshot, p: { english?: string; name: string; department?: string; rank?: string }, st: string, situation = '', act = ''): string {
   const role = [p.department, p.rank].filter(Boolean).join(' · ');
-  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, 'sq')}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b><em class="gx-st" style="--st:${AGENT_COLOR[st] ?? 'var(--dim)'}">${escAttr(stLabel(st))}</em></span>${role ? `<small>${escAttr(role)}</small>` : ''}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ''}</span>`;
+  return `<span class="gx-acard-side">${avatar(char, p.english, p.name, 'sq')}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ''}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ''}</span>`;
 }
 
 /** 모바일 ID카드 창: 요원 정보 창과 같은 틀에 카드만 넣는다 */

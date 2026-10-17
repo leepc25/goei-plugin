@@ -11,7 +11,8 @@ import {
   chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
-import { imageUrl } from './images';
+import { imageUrl, stChip } from './images';
+import { readWorld, worldOn } from '../core/world/output';
 import { ICONS } from './icons';
 import type { RefSource } from '../core/refs';
 import { tokens } from '../core/gnet';
@@ -525,39 +526,56 @@ const tool = (action: string, icon: string, label: string, extra = '', short = '
 /** 빈 목록 안내: 목록 칸 한가운데 */
 const blank = (text: string) => `<div class="ph-blank"><p>${text}</p></div>`;
 
+/** 상황판의 요원 상태 (작전·비번 등). 상황판이 꺼져 있거나 기록이 없으면 빈 칸 */
+function agentStates(ctx: ChatContext): Record<string, string> {
+  try {
+    if (!worldOn(ctx.chat)) return {};
+    return Object.fromEntries(Object.entries(readWorld(ctx.chat).agents).map(([k, v]) => [k, v.st]));
+  } catch {
+    return {};
+  }
+}
+
 function contactsView(ctx: ChatContext, d: Directory, st: PState): string {
   if (!d.tabs.length) return blank('이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.');
   const tab = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
-  const q = phone.query.trim().toLowerCase();
+  const chips = `<div class="ph-tabs" role="tablist">${d.tabs.map((t) => `<button class="ph-tab${t.id === tab ? ' on' : ''}" data-action="ph-ctab" data-value="${t.id}" aria-selected="${t.id === tab}">${esc(t.name)}</button>`).join('')}</div>`;
+  const rows = d.contacts.filter((c) => c.tabs.includes(tab));
+  return chips + (rows.length ? contactList(ctx, rows, st) : blank('이 탭에는 아직 연락처가 없어요.'));
+}
+
+/** 연락처 줄: 큰 사진, 이름 옆에 상황판 상태 딱지, 아래 직급·소속 */
+function contactList(ctx: ChatContext, rows: Contact[], st: PState): string {
   const fnames = names(ctx);
-  const rows = d.contacts.filter((c) => (q ? matches(c, q, fnames) : c.tabs.includes(tab)));
-  const chips = q
-    ? `<p class="gx-muted ph-found">「${esc(phone.query)}」 검색 결과 ${rows.length}명</p>`
-    : `<div class="ph-tabs" role="tablist">${d.tabs.map((t) => `<button class="ph-tab${t.id === tab ? ' on' : ''}" data-action="ph-ctab" data-value="${t.id}" aria-selected="${t.id === tab}">${esc(t.name)}</button>`).join('')}</div>`;
-  const list = rows.length
-    ? `<ul class="ph-list">${rows
+  const states = agentStates(ctx);
+  return `<ul class="ph-list ph-contacts">${rows
         .map((c) => {
           const room = st.rooms[`dm_${c.id}`];
           const confirm = phone.confirm === `contact:${c.id}`;
           return `<li class="ph-row"><button class="ph-main" data-action="ph-dm" data-value="${c.id}">${face(ctx, c, c.name)}
-            <span class="ph-who"><b>${esc(c.name)}</b><small>${esc(contactDetails(c) || (c.custom ? c.note || '직접 추가한 연락처' : fnames[c.group ?? ''] ?? ''))}</small></span>
+            <span class="ph-who"><span class="ph-who-name"><b>${esc(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ''}</span><small>${esc(contactDetails(c) || (c.custom ? c.note || '직접 추가한 연락처' : fnames[c.group ?? ''] ?? ''))}</small></span>
             ${room?.unread ? `<span class="ph-badge">${room.unread > 99 ? '99+' : room.unread}</span>` : ''}</button>
             <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc(c.name)}" title="전화" aria-label="${esc(c.name)}에게 전화">${ICONS.call}</button>
             ${c.custom ? '' : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc(c.lore || c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.book}</button>`}
             ${c.saved && c.custom ? `<button class="gx-mini${confirm ? ' danger' : ''}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? '정말 삭제' : '삭제'}</button>` : ''}</span></li>`;
         })
-        .join('')}</ul>`
-    : blank(q ? '검색 결과가 없어요.' : '이 탭에는 아직 연락처가 없어요.');
-  return chips + list;
+        .join('')}</ul>`;
+}
+
+function chatRooms(st: PState, q: string) {
+  const keys = [...new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
+  return keys
+    .map((k) => st.rooms[k])
+    .filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
 }
 
 function chatsView(ctx: ChatContext, st: PState, d: Directory): string {
-  const q = phone.query.trim().toLowerCase();
-  const keys = [...new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
-  const rows = keys
-    .map((k) => st.rooms[k])
-    .filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
-  if (!rows.length) return blank(q ? '검색 결과가 없어요.' : '아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.');
+  const rows = chatRooms(st, '');
+  if (!rows.length) return blank('아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.');
+  return chatList(ctx, rows, d);
+}
+
+function chatList(ctx: ChatContext, rows: ReturnType<typeof chatRooms>, d: Directory): string {
   return `<ul class="ph-list ph-chats">${rows
     .map((r) => {
       const last = [...r.messages].reverse().find((m) => m.kind === 'message') ?? r.messages[r.messages.length - 1];
@@ -684,9 +702,8 @@ function noticesView(ctx: ChatContext): string {
   } catch (error) {
     return `<p class="gx-none">${esc((error as Error).message)}</p>`;
   }
-  const q = phone.query.trim().toLowerCase();
-  const all = [...b.items].reverse().filter((r) => !q || `${r.title} ${r.text} ${r.issuer}`.toLowerCase().includes(q));
-  if (!all.length) return blank(q ? '검색 결과가 없어요.' : '아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.');
+  const all = [...b.items].reverse();
+  if (!all.length) return blank('아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.');
   const size = noticeSettings(ctx.chat.scriptstate).page;
   const pages = Math.max(1, Math.ceil(all.length / size));
   const page = Math.min(Math.max(1, phone.noticePage), pages);
@@ -697,7 +714,11 @@ function noticesView(ctx: ChatContext): string {
   const nav = pages > 1
     ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? 'disabled' : ''}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? 'disabled' : ''}>다음 ›</button></div>`
     : '';
-  return `${head}<ul class="ph-list ph-notices">${items
+  return `${head}${noticeList(items)}${nav}`;
+}
+
+function noticeList(items: ReturnType<typeof readBulletins>['items']): string {
+  return `<ul class="ph-list ph-notices">${items
     .map((r) => {
       const open = phone.openNotice === r.id;
       const confirm = phone.confirm === `notice:${r.id}`;
@@ -708,7 +729,24 @@ function noticesView(ctx: ChatContext): string {
         ${open ? '' : `<span class="ph-ncard-pre">${esc(r.text)}</span>`}</button>
         ${open ? `<div class="ph-notice-body">${esc(r.text).replace(/\n/g, '<br>')}<div class="ph-ncard-act"><button class="gx-mini${confirm ? ' danger' : ''}" data-action="ph-notice-del" data-value="${r.id}">${confirm ? '정말 삭제' : '삭제'}</button></div></div>` : ''}</li>`;
     })
-    .join('')}</ul>${nav}`;
+    .join('')}</ul>`;
+}
+
+/** 통합 검색 (v0.16.22): 검색어가 있으면 탭과 상관없이 연락처·대화·공지를 한꺼번에 */
+function searchView(ctx: ChatContext, st: PState, d: Directory): string {
+  const q = phone.query.trim().toLowerCase();
+  const fnames = names(ctx);
+  const people = d.contacts.filter((c) => matches(c, q, fnames));
+  const rooms = chatRooms(st, q);
+  let notes: ReturnType<typeof readBulletins>['items'] = [];
+  try {
+    notes = [...readBulletins(ctx.chat).items].reverse().filter((r) => `${r.title} ${r.text} ${r.issuer}`.toLowerCase().includes(q));
+  } catch {
+    /* 공지를 못 읽으면 공지만 뺀다 */
+  }
+  if (!people.length && !rooms.length && !notes.length) return blank('검색 결과가 없어요.');
+  const sec = (title: string, n: number, html: string) => (n ? `<h4 class="ph-sec">${title}<b>${n}</b></h4>${html}` : '');
+  return sec('연락처', people.length, contactList(ctx, people, st)) + sec('대화', rooms.length, chatList(ctx, rooms, d)) + sec('공지', notes.length, noticeList(notes));
 }
 
 function callView(): string {
@@ -776,6 +814,7 @@ function settingsView(ctx: ChatContext): string {
 
 /** 왼쪽 목록 (연락처·대화·공지) */
 function listHtml(ctx: ChatContext, st: PState, d: Directory): string {
+  if (phone.query.trim()) return searchView(ctx, st, d);
   return phone.sub === 'contacts' ? contactsView(ctx, d, st) : phone.sub === 'chats' ? chatsView(ctx, st, d) : noticesView(ctx);
 }
 
@@ -830,7 +869,6 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn('contacts', '연락처')}${subBtn('chats', '대화', unread ? ` <b class="gn-count">${unread > 99 ? '99+' : unread}</b>` : '')}${subBtn('notices', '공지', b && bulletinUnread(b) ? '<span class="gn-dot"></span>' : '')}</div>
         <div class="ph-findbar">
-          <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc(phone.query)}" placeholder="${phone.sub === 'notices' ? '공지 검색' : '이름·대화 검색'}" aria-label="검색">
           <div class="ph-tools">
             ${tool('ph-refresh', ICONS.refresh, '새 메시지 확인', busy ? 'disabled' : '', '새로고침')}
             ${tool('ph-group', ICONS.group, '단톡 만들기', busy ? 'disabled' : '', '단톡')}
@@ -838,6 +876,7 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
             ${tool('ph-call', ICONS.call, '전화 걸기', 'data-value=""', '전화')}
             ${tool('ph-settings', ICONS.settings, '괴담톡 설정', phone.view === 'settings' ? 'aria-pressed="true"' : '', '설정')}
           </div>
+          <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
         </div>
       </div>
       ${detail ? '' : status}

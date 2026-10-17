@@ -666,9 +666,9 @@ export async function handleField(action: string, value: string | undefined, ctx
         v = key;
       }
       field.confirmEnd = null;
-      if (action === 'map-place' && isPC() && field.place === v) {
+      if (action === 'map-place' && isPC() && field.place === v && sameTarget(field.target, v)) {
         field.place = null;
-        if (sameTarget(field.target, v)) field.target = null;
+        field.target = null;
         env.render();
         return true;
       }
