@@ -165,7 +165,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-nb.mob { display: none; }
 .gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
 
-.gx-body { padding: 4px 20px 16px; overflow-y: auto; overscroll-behavior: contain; }
+/* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
+.gx-body { padding: 4px 10px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .gx-body section { padding: 14px 0 6px; }
 .gx-body h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--text); }
 .gx-body h2 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg); font-style: normal; font-size: 13px; color: var(--signal); font-family: var(--mono); }

@@ -55,82 +55,56 @@ ${themeVars('[x-goei-fab]')}
 @media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-glow="true"] button { animation: none; } }
 `;
 
-export const INTRO_MS = 1500;
+export const INTRO_MS = 1800;
 
+// 접속 효과 (v0.16.18): 화면 전체를 덮던 막 대신 위쪽 가운데에 잠깐 내려왔다 사라지는 작은 띠.
+// 누르는 것을 막지 않고(pointer-events: none), 유령 버튼은 효과를 기다리지 않고 바로 뜬다.
 const INTRO_CSS = `
-[x-goei-intro] { --g-void: #061216; --g-text: #e8fffa; --g-sub: #a7c9be; --g-signal: #7fe3d0; --g-scrim: rgba(2,6,8,.94); }
+[x-goei-intro] { --g-void: #061216; --g-text: #e8fffa; --g-sub: #a7c9be; --g-signal: #7fe3d0; }
 [x-goei-intro] {
-  position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; overflow: hidden;
+  position: fixed; left: 50%; top: max(14px, env(safe-area-inset-top)); z-index: 2147483000; pointer-events: none;
+  display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px; max-width: calc(100vw - 32px); box-sizing: border-box;
+  border-radius: 14px; overflow: hidden; background: color-mix(in srgb, var(--g-void) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent);
+  box-shadow: 0 10px 30px -12px rgba(0,0,0,.6);
   font-family: 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif;
-  animation: goei-in-veil ${INTRO_MS}ms ease forwards;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--g-void) 82%, transparent) 0%, var(--g-scrim) 70%);
+  animation: goei-in-drop ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) forwards;
 }
 [x-goei-intro] [data-gi="scan"] {
-  position: absolute; left: 0; right: 0; height: 2px; top: -4%;
-  background: linear-gradient(90deg, transparent, var(--g-signal) 20%, var(--g-text) 50%, var(--g-signal) 80%, transparent);
-  box-shadow: 0 0 18px 4px color-mix(in srgb, var(--g-signal) 55%, transparent);
-  animation: goei-scan 682ms cubic-bezier(.4,0,.2,1) 74ms forwards;
+  position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 22%, transparent), transparent);
+  animation: goei-in-sweep 900ms ease-out 200ms both;
 }
-[x-goei-intro] [data-gi="lines"] {
-  position: absolute; inset: 0; opacity: .18;
-  background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--g-signal) 22%, transparent) 0 1px, transparent 1px 4px);
-  animation: goei-flicker 558ms steps(6) 2;
-}
-[x-goei-intro] [data-gi="core"] {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-  width: min(86vw, 520px); padding: 26px 20px 22px;
-  border-top: 1px solid color-mix(in srgb, var(--g-signal) 50%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--g-signal) 50%, transparent);
-  animation: goei-open 372ms cubic-bezier(.2,.8,.2,1) 186ms both;
-}
-[x-goei-intro] [data-gi="core"]::before, [x-goei-intro] [data-gi="core"]::after {
-  content: ""; position: absolute; top: -5px; width: 10px; height: 10px; border: 1px solid var(--g-signal); transform: rotate(45deg); background: var(--g-void);
-}
-[x-goei-intro] [data-gi="core"]::before { left: -5px; }
-[x-goei-intro] [data-gi="core"]::after { right: -5px; }
-[x-goei-intro] [data-gi="ghost"] { color: var(--g-signal); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--g-signal) 60%, transparent)); animation: goei-pulse 558ms ease-in-out 310ms 2; }
-[x-goei-intro] [data-gi="ghost"] svg { width: 44px; height: 44px; }
-[x-goei-intro] [data-gi="label"] { color: var(--g-sub); font-size: 11px; letter-spacing: .42em; }
+[x-goei-intro] [data-gi="ghost"] { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; color: var(--g-signal); background: color-mix(in srgb, var(--g-signal) 14%, transparent); }
+[x-goei-intro] [data-gi="ghost"] svg { width: 22px; height: 22px; }
 [x-goei-intro] [data-gi="title"] {
-  position: relative; color: var(--g-text); font-size: clamp(20px, 5.4vw, 30px); font-weight: 700; letter-spacing: .12em; white-space: nowrap;
-  text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent);
-  animation: goei-glitch 868ms steps(1) 248ms 1;
+  position: relative; color: var(--g-text); font-size: 14px; font-weight: 700; letter-spacing: .2em; white-space: nowrap;
+  animation: goei-in-glitch 520ms steps(1) 220ms 1;
 }
-[x-goei-intro] [data-gi="sub"] { color: var(--g-sub); font-size: 13px; letter-spacing: .08em; }
-[x-goei-intro] [data-gi="bar"] { width: 160px; height: 2px; background: color-mix(in srgb, var(--g-signal) 18%, transparent); overflow: hidden; }
-[x-goei-intro] [data-gi="bar"] i { display: block; height: 100%; width: 0; background: var(--g-signal); box-shadow: 0 0 8px var(--g-signal); animation: goei-load 806ms ease-out 279ms forwards; }
-@keyframes goei-in-veil { 0% { opacity: 0; } 10% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes goei-scan { to { top: 104%; } }
-@keyframes goei-flicker { 0%,100% { opacity: .18; } 33% { opacity: .05; } 66% { opacity: .3; } }
-@keyframes goei-open { from { opacity: 0; clip-path: inset(48% 0 48% 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
-@keyframes goei-pulse { 50% { transform: scale(1.08); filter: drop-shadow(0 0 18px color-mix(in srgb, var(--g-signal) 90%, transparent)); } }
-@keyframes goei-load { to { width: 100%; } }
-@keyframes goei-glitch {
+@keyframes goei-in-drop {
+  0% { opacity: 0; transform: translate(-50%, -14px); }
+  14% { opacity: 1; transform: translate(-50%, 0); }
+  80% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -8px); }
+}
+@keyframes goei-in-sweep { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+@keyframes goei-in-glitch {
   0% { transform: translate(0); text-shadow: 2px 0 #ff5a7a, -2px 0 #4fe0ff; }
-  8% { transform: translate(-2px, 1px); clip-path: inset(10% 0 55% 0); }
-  14% { transform: translate(2px, -1px); clip-path: inset(60% 0 8% 0); }
-  20% { transform: translate(0); clip-path: none; text-shadow: -1px 0 #ff5a7a, 1px 0 #4fe0ff; }
-  46% { text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent); }
-  52% { transform: translate(1px, 0); text-shadow: 2px 0 #ff5a7a, -2px 0 #4fe0ff; }
-  56% { transform: translate(0); text-shadow: 0 0 14px color-mix(in srgb, var(--g-signal) 55%, transparent); }
+  20% { transform: translate(-1px, 0); }
+  40% { transform: translate(1px, 0); text-shadow: -1px 0 #ff5a7a, 1px 0 #4fe0ff; }
+  60% { transform: translate(0); text-shadow: none; }
   100% { transform: translate(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   [x-goei-intro] *, [x-goei-intro] { animation-duration: 1ms !important; animation-delay: 0ms !important; }
-  [x-goei-intro] { animation: goei-in-veil ${INTRO_MS}ms linear forwards !important; }
-  [x-goei-intro] [data-gi="bar"] i { width: 100%; }
+  [x-goei-intro] { transform: translateX(-50%); animation: none !important; }
 }
 `;
 
 const INTRO_HTML = `
-<div data-gi="lines"></div>
 <div data-gi="scan"></div>
-<section data-gi="core" aria-hidden="true">
-  <div data-gi="ghost">${GHOST_ICON}</div>
-  <div data-gi="label">SYSTEM //</div>
-  <div data-gi="title">ANOMALY SIMULATION</div>
-  <div data-gi="bar"><i></i></div>
-</section>`;
+<div data-gi="ghost" aria-hidden="true">${GHOST_ICON}</div>
+<div data-gi="title">ANOMALY SIMULATION</div>`;
 
 type Safe = Awaited<ReturnType<RisuaiPluginAPI['getRootDocument']>>;
 type SafeEl = Awaited<ReturnType<Safe['createElement']>>;

@@ -248,12 +248,9 @@ function startWatcher(fab: Fab): () => void {
       liteNow = state.lite;
       if (next.changed) {
         if (next.fabVisible) await readTheme(snap).catch(() => {});
-        if (next.intro) {
-          await fab.setVisible(false);
-          await playIntro().catch(() => {});
-          if (stopped) return;
-        }
+        // v0.16.18: 버튼은 효과를 기다리지 않고 바로 (효과는 위쪽 작은 띠라 버튼을 가리지 않는다)
         await fab.setVisible(next.fabVisible, next.intro);
+        if (next.intro) void playIntro().catch(() => {});
       }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
