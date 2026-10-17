@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.2
+//@version 0.16.3
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/core/dispatch.ts
@@ -7332,10 +7332,19 @@ async function loadPos() {
     return { ...DEFAULT_FAB_POS };
   }
 }
+async function removeLeftovers(doc) {
+  try {
+    const list5 = await risuai.unwarpSafeArray(await doc.querySelectorAll("[x-goei-fab], [x-goei-intro]"));
+    for (const el of list5) await el.remove().catch(() => {
+    });
+  } catch {
+  }
+}
 async function createFab(onOpen) {
   const root2 = await body2();
   if (!root2) throw new Error("Risu 화면 접근 권한이 없어요.");
   const { doc } = root2;
+  await removeLeftovers(doc);
   const host = await doc.createElement("div");
   await host.setAttribute("x-goei-fab", "true");
   await host.setInnerHTML(`<button type="button" aria-label="${BRAND.fab} 열기 (끌어서 옮기기)">${GHOST_ICON}</button>`);
@@ -7477,9 +7486,9 @@ async function createFab(onOpen) {
       visible = false;
       drag = null;
       pending = null;
-      await loop;
-      for (const { type, id } of ids) await root2.body.removeEventListener(type, id);
       await host.remove();
+      for (const { type, id } of ids) await root2.body.removeEventListener(type, id).catch(() => {
+      });
     }
   };
 }
@@ -8647,7 +8656,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.2" : "0";
+var PLUGIN_VERSION = true ? "0.16.3" : "0";
 
 // src/ui/update.ts
 var esc4 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);

@@ -35,7 +35,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       remove: async () => { el.remove(); },
     });
     window.__store = {};
-    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), createElement: async (t) => wrap(document.createElement(t)) } : null;
+    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
     window.__chat = ${JSON.stringify(chat)};
@@ -44,6 +44,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       registerButton: async (arg, cb) => { window.__button = { arg, cb }; return { id: arg.id }; },
       registerSetting: async (name, cb) => { window.__setting = cb; return { id: 's' }; },
       getRootDocument: async () => window.__rootDoc,
+      unwarpSafeArray: async (a) => a,
       safeLocalStorage: { getItem: async (k) => window.__store[k] ?? null, setItem: async (k, v) => { window.__store[k] = v; } },
       pluginStorage: { getItem: async (k) => window.__store['p:' + k] ?? null, setItem: async (k, v) => { window.__store['p:' + k] = v; }, keys: async () => [], removeItem: async () => {} },
       addRisuReplacer: async (type, fn) => { window.__calls.replacers.push(fn); },

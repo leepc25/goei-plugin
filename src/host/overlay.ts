@@ -170,6 +170,15 @@ async function loadPos(): Promise<FabPos> {
   }
 }
 
+async function removeLeftovers(doc: Safe): Promise<void> {
+  try {
+    const list = await risuai.unwarpSafeArray(await doc!.querySelectorAll('[x-goei-fab], [x-goei-intro]'));
+    for (const el of list) await el.remove().catch(() => {});
+  } catch {
+    /* 못 지워도 새 버튼은 만든다 */
+  }
+}
+
 /**
  * 주의: Risu의 SafeElement.addEventListener는 요소가 아니라 문서 전체에 리스너를 건다.
  * 그래서 모든 클릭·포인터 이벤트에서 좌표가 버튼 안인지 직접 확인해야 한다.
@@ -178,6 +187,8 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
   const root = await body();
   if (!root) throw new Error('Risu 화면 접근 권한이 없어요.');
   const { doc } = root;
+  // 플러그인을 업데이트하면 이전 판이 미처 못 지운 버튼·접속 효과가 남을 수 있다 (죽은 버튼이 새 버튼을 가리지 않게)
+  await removeLeftovers(doc);
   const host = await doc.createElement('div');
   await host.setAttribute('x-goei-fab', 'true');
   await host.setInnerHTML(`<button type="button" aria-label="${BRAND.fab} 열기 (끌어서 옮기기)">${GHOST_ICON}</button>`);
@@ -329,9 +340,9 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
       visible = false;
       drag = null;
       pending = null;
-      await loop;
-      for (const { type, id } of ids) await root.body.removeEventListener(type, id);
+      // Risu는 정리를 1초만 기다리고 플러그인을 끝낸다. 눈에 보이는 버튼부터 지운다
       await host.remove();
+      for (const { type, id } of ids) await root.body.removeEventListener(type, id).catch(() => {});
     },
   };
 }
