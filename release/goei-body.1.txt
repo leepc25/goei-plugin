@@ -1,4 +1,4 @@
-// goei-body 0.16.29
+// goei-body 0.16.30
 "use strict";
 (() => {
   // src/host/user.ts
@@ -594,6 +594,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const i = (SIGUN[sido] ?? []).indexOf(gu);
     return i >= 0 ? `${sido}-${i}` : null;
   }
+  var placeWhere = (sido, gu) => [SIDO_NAME[sido] ?? "", gu].filter(Boolean).join(" ");
   var NATION_PINS = geo_default.nation;
   var REGION_PINS = geo_default.pins;
   var MAP_CODES = NATION_PINS.map((p) => p[0]);
@@ -844,8 +845,16 @@ ${body4.slice(at).replace(/^\s+/, "")}
     교황청: "Vatican",
     이슬람: "Islam",
     발푸르기스: "Walpurgis Society",
-    흡혈귀: "Vampires"
+    흡혈귀: "Vampires",
+    무명찬란교: "Mumyeong Chanrangyo",
+    극단: "The Troupe",
+    병원: "The Hospital",
+    "세계정치 게시판": "The World Politics Forum"
   };
+  function orgFolder(lore) {
+    const keys = new Set(lore.filter((e) => isFolder(e) && ["세력", "조직"].includes(folderWord(s2(e.comment))) && typeof e.key === "string").map((e) => e.key));
+    return keys.size ? lore.filter((e) => !isFolder(e) && keys.has(String(e.folder ?? "")) && s2(e.comment)) : [];
+  }
   function buildOrgs(lore, agents2, saved) {
     const names3 = factionDisplayNames(lore);
     const tabs2 = phoneTabs(lore);
@@ -871,6 +880,17 @@ ${body4.slice(at).replace(/^\s+/, "")}
     for (const f of FACTIONS) make(names3[f], f);
     for (const name of Object.keys(saved)) if (s2(name) && !out.some((o) => o.name === name)) make(name, "");
     for (const a of agents2) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
+    for (const e of orgFolder(lore)) {
+      const name = s2(e.comment);
+      const same = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
+      if (out.some(same)) continue;
+      make(name, "");
+      const o = out[out.length - 1];
+      if (!o.spec.english) {
+        const en2 = guessEnglish(e);
+        if (en2) o.spec.english = en2;
+      }
+    }
     return out;
   }
   function orgHint(group4, orgs, lore) {
@@ -1158,7 +1178,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
   }
   function landmarksOf(bases) {
-    return bases.filter((b) => b.show && b.name && SIGUN[b.sido]?.includes(b.gu)).map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
+    return bases.filter((b) => b.show && b.name && SIGUN[b.sido] && (!b.gu || SIGUN[b.sido].includes(b.gu))).map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
   }
   function parseCatalog(lore) {
     const list4 = lore ?? [];
@@ -1703,7 +1723,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
     for (const t of scanIncidents(text)) {
       if (!validName(t.name)) continue;
       const lm = c.landmarks.find((l) => l.name === t.name);
-      const loc = lm ? landmarkLoc(lm.sido, lm.gu) : uniqueRegion(t.region);
+      const loc = lm && lm.gu ? landmarkLoc(lm.sido, lm.gu) : uniqueRegion(t.region);
+      if (lm && !lm.gu && loc && !loc.startsWith(`${lm.sido}-`)) continue;
       if (!loc || loc === SEALED_LOC || !regionMatch(t.region, locName(loc))) continue;
       let e = w.inc.find((x) => x.name === t.name);
       if (e && e.loc !== loc) continue;
@@ -4427,22 +4448,4 @@ ${c}`)]).join("\n\n");
       language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
       read(name) {
         const raw = g[name] ?? "";
-        return evaluate(raw, env2).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
-      }
-    };
-  }
-  function fmt(template, ...args) {
-    let i = 0;
-    return template.replace(/%s/g, () => args[i++] ?? "");
-  }
-  function fill2(template, values) {
-    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
-  }
-  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
-  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
-  function systemText(b, guideline, format, identity, attachments = false) {
-    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
-    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
-    if (identity) outro += `
-ROLE BINDING (application-owned metadata):
-${JSON.strin
+        return evalua

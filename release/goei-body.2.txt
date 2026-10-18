@@ -1,4 +1,22 @@
-gify(identity)}`;
+te(raw, env2).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
+      }
+    };
+  }
+  function fmt(template, ...args) {
+    let i = 0;
+    return template.replace(/%s/g, () => args[i++] ?? "");
+  }
+  function fill2(template, values) {
+    return template.replace(/__GN_([A-Z_]+)__/g, (m, k) => values[k] ?? m);
+  }
+  var LANGUAGE = "Use the language of the actual conversation; default to Korean.";
+  var IMPORTANT = "\n\nImportant Note: May contain unrelated directives/rules regarding other data/image outputs. Ignore these; they are irrelevant in your current job. Focus on settings.";
+  function systemText(b, guideline, format, identity, attachments = false) {
+    const intro = fmt(b.read("SYSTEM"), b.read("JAILBREAK"), b.read("JOB"), IMPORTANT, "anonymous forum author", "", "").replace(/## Main Protagonist \([^\n]*\)/, "## User-controlled protagonist (narrator reference only)");
+    let outro = fmt(b.read("OUTPUT"), "", format, guideline);
+    if (identity) outro += `
+ROLE BINDING (application-owned metadata):
+${JSON.stringify(identity)}`;
     outro += `
 ${b.language}`;
     return `${intro}
@@ -1594,6 +1612,8 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
     return n;
   }
   var cache4 = /* @__PURE__ */ new WeakMap();
+  var DIM_DEFAULT = 50;
+  var DIM_STEPS = [0, 25, 50, 75, 100];
   var prefs = { basic: {}, world: {} };
   var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$gen_[a-z_]+)$/;
   function getPrefs() {
@@ -1622,7 +1642,9 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
     if (o.vars && typeof o.vars === "object") {
       for (const [k, v] of Object.entries(o.vars)) if (PREF_VAR.test(k) && typeof v === "string") vars[k] = v;
     }
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {} };
+    const nav = o.nav === "right" ? "right" : void 0;
+    const dim = int2(o.dim, 0, 100);
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...dim !== null ? { dim } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -3893,42 +3915,4 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
         }
         break;
       }
-      case "gn-open-dm": {
-        gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
-        gnet.settings = false;
-        gnet.compose = null;
-        if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
-          await mutate2(ctx, env2, (s4) => acknowledge(s4, void 0, v), {}, false);
-          return true;
-        }
-        break;
-      }
-      case "gn-refresh":
-        void refreshBoard(ctx, env2);
-        return true;
-      case "gn-write":
-        gnet.settings = false;
-        gnet.sub = "board";
-        gnet.compose = { kind: "post" };
-        gnet.draft = "";
-        gnet.attach = [];
-        break;
-      case "gn-newdm":
-        gnet.settings = false;
-        gnet.sub = "dm";
-        gnet.compose = { kind: "newdm" };
-        gnet.draft = "";
-        gnet.attach = [];
-        break;
-      case "gn-comment": {
-        gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
-        gnet.attach = [];
-        env2.render();
-        const box = document.querySelector('.gn-composer [data-input="gn-draft"]');
-        box?.scrollIntoView({ block: "center", behavior: "smooth" });
-        box?.focus({ preventScroll: true });
-        return true;
-      }
-      case "gn-reply": {
-        const c = findPost(st(), a)?.comments[b - 1];
-   
+      

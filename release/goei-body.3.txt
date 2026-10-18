@@ -1,4 +1,42 @@
-     if (!c) break;
+case "gn-open-dm": {
+        gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
+        gnet.settings = false;
+        gnet.compose = null;
+        if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
+          await mutate2(ctx, env2, (s4) => acknowledge(s4, void 0, v), {}, false);
+          return true;
+        }
+        break;
+      }
+      case "gn-refresh":
+        void refreshBoard(ctx, env2);
+        return true;
+      case "gn-write":
+        gnet.settings = false;
+        gnet.sub = "board";
+        gnet.compose = { kind: "post" };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-newdm":
+        gnet.settings = false;
+        gnet.sub = "dm";
+        gnet.compose = { kind: "newdm" };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-comment": {
+        gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
+        gnet.attach = [];
+        env2.render();
+        const box = document.querySelector('.gn-composer [data-input="gn-draft"]');
+        box?.scrollIntoView({ block: "center", behavior: "smooth" });
+        box?.focus({ preventScroll: true });
+        return true;
+      }
+      case "gn-reply": {
+        const c = findPost(st(), a)?.comments[b - 1];
+        if (!c) break;
         gnet.draft = "";
         gnet.attach = [];
         if (gnet.compose?.kind === "comment" && gnet.compose.post === a && gnet.compose.parent === b) {
@@ -468,18 +506,18 @@ ${job.trailing}` : body4;
   // src/ui/brand.ts
   var BRAND = {
     /** 창 머리·표지 이름 */
-    name: "괴이: 이면세계",
+    name: "괴이 ː 이면세계",
     /** 표지 아래 작은 영문 */
     sub: "ANOMALY SIM",
     /** 떠 있는 여는 버튼에 마우스를 올렸을 때 */
-    fab: "괴이: 이면세계"
+    fab: "괴이 ː 이면세계"
   };
   var CARD_FILE = "괴이_이면세계.charx";
 
   // src/ui/landing.ts
   var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
   function title(p) {
-    const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .18em 0 .06em">:</span><span style="color:${p.signal}">이면세계</span>`;
+    const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
     const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
     return `<div style="margin:6px 0 0;${font}">${line}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line}</div></div>`;
   }
@@ -593,16 +631,7 @@ ${themeVars("[x-goei-fab]")}
 [x-goei-fab] button svg { transition: transform .15s ease; }
 [x-goei-fab] button:active { transform: translateY(0) scale(.96); }
 [x-goei-fab][x-goei-drag="true"] button { cursor: grabbing; transform: scale(1.06); box-shadow: 0 10px 26px -6px rgba(0,0,0,.55), 0 0 0 4px color-mix(in srgb, var(--g-signal) 24%, transparent); }
-[x-goei-fab][x-goei-drag="true"] button::after { opacity: 0 !important; }
 [x-goei-fab] button svg { width: 26px; height: 26px; pointer-events: none; }
-[x-goei-fab] button::after {
-  content: "${BRAND.fab}"; position: absolute; right: calc(100% + 10px); top: 50%;
-  transform: translate(4px, -50%); padding: 4px 9px; border-radius: 8px;
-  background: var(--g-panel); border: 1px solid var(--g-line); color: var(--g-sub);
-  font: 12px/1.3 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; white-space: nowrap;
-  opacity: 0; pointer-events: none; transition: opacity .12s ease, transform .12s ease;
-}
-[x-goei-fab] button:hover::after { opacity: 1; transform: translate(0, -50%); }
 @keyframes goei-fab-glow {
   0%, 100% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 0 transparent; }
   50% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 7px color-mix(in srgb, var(--g-signal) 22%, transparent), 0 0 26px 6px color-mix(in srgb, var(--g-signal) 35%, transparent); }
@@ -613,7 +642,6 @@ ${themeVars("[x-goei-fab]")}
    버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다.
    v0.16.28 (사용자 요청): 표도 테마를 따른다. 다크는 네온 빛줄기와 글리치, 라이트는 맑은 빛줄기만, 페이퍼는 도장 찍듯 눌리는 잉크 */
 [x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
-[x-goei-fab][x-goei-intro="true"] button::after { display: none; }
 [x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
 [x-goei-fab][x-goei-intro="true"] [data-gr] {
   display: block; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
@@ -940,9 +968,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex; align-items: center; justify-content: center;
   padding: 14px;
   /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
-  background: var(--scrim);
   color: var(--text);
 }
+/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」(--dim, 0~1) */
+.gx::before { content: ""; position: absolute; inset: 0; background: var(--scrim); opacity: var(--dim, .5); pointer-events: none; }
 .gx-panel {
   /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
@@ -971,7 +1000,22 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx :hover::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 30%, transparent); border: 2px solid transparent; background-clip: padding-box; }
 .gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 45%, transparent); border: 2px solid transparent; background-clip: padding-box; }
 .gx ::-webkit-scrollbar-corner { background: transparent; }
-.gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "nav head" "nav body"; }
+.gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "head head" "nav body"; }
+/* 메뉴를 오른쪽에 (설정 → 화면 「메뉴 위치」, PC만). 상단바는 창 전체 폭 */
+@media (min-width: 761px) {
+  .gx[data-nav="right"] .gx-panel.has-nav { grid-template-columns: minmax(0, 1fr) 236px; grid-template-areas: "head head" "body nav"; }
+  .gx[data-nav="right"] .gx-nav { border-right: 0; border-left: 1px solid var(--panel2); }
+}
+/* 상단바: 「괴이 ː 이면세계 › 지금 화면」 한 줄. 꺾쇠는 메뉴 위치와 상관없이 제목 바로 뒤 */
+.gx-hmark { display: flex; align-items: center; gap: 10px; flex: none; min-width: 0; }
+.gx-hmark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
+.gx-hmark .gx-logo svg { width: 24px; height: 24px; }
+.gx-hsep { flex: none; color: var(--dim); font-size: 20px; line-height: 1; margin: 0 2px; }
+.gx-tabhead .gx-tabicon { display: none; }
+@media (max-width: 760px) {
+  .gx-hmark, .gx-hsep { display: none; }
+  .gx-tabhead .gx-tabicon { display: grid; }
+}
 .gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
 .gx-content > .gx-body, .gx-content > main { flex: 1; min-height: 0; }
 .gx-head {
@@ -1000,6 +1044,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mark .gx-logo svg { width: 24px; height: 24px; }
 .gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
 .gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
+/* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
+.gx-hmark .gx-mark-txt { display: inline-grid; }
+.gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
+.gx-hmark .gx-mark-txt small i { font-style: normal; }
+/* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
+.gx-hmark .gx-mark-txt small { padding-right: 3px; }
+.gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
 .gx-logo.mob { display: none; }
 /* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
@@ -2443,6 +2494,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-main { min-width: 0; }
 .nw-app > .ph-drawer { display: none; }
 .nw-nohit { flex-direction: column; gap: 14px; }
+.nw-near-lead { margin: 10px 8px 4px; font-size: 13px; color: var(--sub); line-height: 1.5; }
+.nw-hero-res:empty { display: none; }
+.nw-hero-res { margin-top: 10px; max-height: 360px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.nw-hero-res .nw-groups { padding: 4px 4px 8px; }
 .nw-nohit .gx-start { display: inline-flex; align-items: center; gap: 6px; width: auto; min-height: 44px; padding: 0 20px; font-size: 15px; letter-spacing: normal; }
 .nw-nohit .gx-start svg { width: 18px; height: 18px; }
 .nw-main .ph-room-head.nw-noback { padding-left: 16px; }
@@ -2581,7 +2636,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 /* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
 .gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
-.gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 9px 0 8px; margin-bottom: -14px; background: var(--void); }
+.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
 .gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
 
 
@@ -2620,6 +2675,17 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-gp-card { width: 100%; }
   .gx-gp-act { margin-top: auto; flex-direction: column; }
 }
+
+/* 명부 위 한 줄 도구 (검색 · 추가 · 사용법). 추가 칸·사용법은 누를 때만 펼친다 */
+.dir-tools { display: flex; gap: 8px; align-items: stretch; }
+.dir-tools .dir-qbox { flex: 1; min-width: 0; }
+.dir-tools .dir-search { margin: 0; height: 100%; }
+.dir-tool { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.dir-tool svg { width: 16px; height: 16px; }
+.dir-tool.icon { width: 44px; justify-content: center; padding: 0; font-size: 16px; }
+.dir-tool:hover, .dir-tool.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+.dir-help { padding-top: 10px; }
+@media (max-width: 760px) { .dir-tools { justify-content: flex-end; } }
 `;
 
   // src/ui/mbar.ts
@@ -2867,6 +2933,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   }
 
   // src/game/style.css
-  var style_default2 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }\n.goei-game .gg-squad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px; margin: 0; box-sizing: border-box; }\n.goei-game .gg-ag { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 8px; row-gap: 3px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 6px 8px; margin: 0; min-width: 0; }\n.goei-game .gg-ag.ready { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-ag.down { opacity: .55; }\n.goei-game .gg-face { grid-row: 1 / 4; width: 40px; height: 40px; border-radius: 8px; background-repeat: no-repeat; background-size: 320px 40px; }\n.goei-game .gg-nm { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-bar { height: 5px; border-radius: 3px; background: var(--gg-line); overflow: hidden; }\n.goei-game .gg-bar b { display: block; height: 100%; width: 100%; transform-origin: left; background: #5dc98a; }\n.goei-game .gg-bar.sk b { background: var(--gg-signal); }\n.goei-game .gg-ag.low .gg-bar.hp b { background: var(--gg-danger); }\n.goei-game .gg-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--gg-bg); z-index: 2; }\n.goei-game .gg-sheet[hidden] { display: none; }\n.goei-game .gg-sh-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 0; border-bottom: 1px solid var(--gg-line); }\n.goei-game .gg-sh-head b { flex: 1; font-size: 15px; }\n.goei-game .gg-sh-body { flex: 1; overflow-y: auto; padding: 12px; margin: 0; }\n.goei-game .gg-sh-foot { display: flex; gap: 8px; padding: 10px 12px; margin: 0; border-top: 1px solid var(--gg-line); }\n.goei-game .gg-sh-foot .gg-tb { flex: 1; padding: 10px; font-weight: 700; }\n.goei-game .gg-tb.primary { background: var(--gg-accent); border-color: var(--gg-signal); }\n.goei-game .gg-tb[disabled] { opacity: .45; cursor: default; }\n.goei-game .gg-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }\n.goei-game .gg-pk { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 10px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 8px; margin: 0; }\n.goei-game .gg-pk.on { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-pk .gg-face { grid-row: 1 / 3; width: 48px; height: 48px; background-size: 384px 48px; }\n.goei-game .gg-pk small { color: var(--gg-dim); font-size: 12px; }\n.goei-game .gg-rec { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; max-width: 420px; margin: 0 auto; padding: 4px; }\n.goei-game .gg-rec dt { color: var(--gg-dim); }\n.goei-game .gg-rec dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }\n.goei-game .gg-rec .gg-sec { grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gg-line); font-weight: 700; }\n.goei-game .gg-load { color: var(--gg-dim); padding: 16px; margin: 0; }\n@media (max-width: 520px) {\n  .goei-game .gg-squad { gap: 4px; padding: 6px; }\n  .goei-game .gg-ag { grid-template-columns: minmax(0, 1fr); padding: 6px; justify-items: stretch; }\n  .goei-game .gg-ag .gg-face { grid-row: auto; justify-self: center; }\n  .goei-game .gg-nm { text-align: center; font-size: 12px; }\n  .goei-game .gg-pick { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }\n}\n";
-
- 
+  var style_default2 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canva

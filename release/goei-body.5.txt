@@ -1,4 +1,205 @@
-ge", (ev) => {
+   if (!worldOn(ctx.chat)) return true;
+          settingsUi.confirmOff = true;
+          env2.render();
+          return true;
+        }
+        if (v === "off-no") {
+          settingsUi.confirmOff = false;
+          env2.render();
+          return true;
+        }
+        settingsUi.confirmOff = false;
+        if (v === "off-yes") {
+          await save(ctx, env2, (chat) => worldOn(chat) ? worldOffVars() : null);
+          return true;
+        }
+        if (v === "on") {
+          await save(ctx, env2, (chat) => {
+            if (worldOn(chat)) return null;
+            const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+            return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random);
+          });
+        }
+        return true;
+      case "set-agent":
+        await save(ctx, env2, (chat) => {
+          const cur = basicSettings(lore, chat.scriptstate).agentLimit;
+          const next = Math.min(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
+          if (next === cur) return null;
+          const vars = withBasic(ctx, chat, { agentLimit: next });
+          if (worldOn(chat)) {
+            const ss = { ...chat.scriptstate ?? {}, ...vars };
+            Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
+          }
+          return vars;
+        });
+        return true;
+      case "set-theme":
+        if (v !== "light" && v !== "dark" && v !== "paper") return true;
+        await save(ctx, env2, (chat) => chat.scriptstate?.[THEME_KEY] === v ? null : { [THEME_KEY]: v });
+        return true;
+      case "set-support":
+        await save(ctx, env2, (chat) => withBasic(ctx, chat, { supportOn: v === "1" }));
+        return true;
+      case "set-asset":
+        await save(ctx, env2, (chat) => withBasic(ctx, chat, { assetOn: v === "1" }));
+        return true;
+      case "set-asset-model":
+        if (v !== "main" && v !== "aux") return true;
+        await save(ctx, env2, (chat) => withBasic(ctx, chat, { assetModel: v }));
+        return true;
+      case "set-asset-limit": {
+        const n = Number(v);
+        if (!Number.isInteger(n) || n < 1 || n > 4) return true;
+        await save(ctx, env2, (chat) => withBasic(ctx, chat, { assetLimit: n }));
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var root = null;
+  var view = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy = false;
+  var notice = "";
+  var GNET_ON = true;
+  var TABS2 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "settings"];
+  var tab = "board";
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env = {
+    render: () => render(),
+    refresh: () => refresh(),
+    close: () => close(),
+    setNotice: (text) => {
+      notice = text;
+    },
+    setBusy: (on2) => {
+      busy = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render(),
+    refresh: () => refresh(),
+    current: () => view.kind === "started" ? view.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render(), refresh: () => refresh() };
+  var shown = false;
+  var phoneEnv = {
+    render: () => render(),
+    refresh: () => refresh(),
+    visible: () => shown && tab === "phone" && view.kind === "started",
+    close: async () => {
+      await close();
+      await refresh();
+    }
+  };
+  var esc14 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot() {
+    if (root) return root;
+    setImageRedraw(() => view.kind === "picker" ? renderPicker() : render());
+    const style = document.createElement("style");
+    style.textContent = style_default;
+    document.head.appendChild(style);
+    root = document.createElement("div");
+    root.className = "gx";
+    document.body.appendChild(root);
+    root.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files.length) void addPhotos(pickFor, files);
+    });
+    let downOutside = false;
+    root.addEventListener("pointerdown", (ev) => downOutside = ev.target === root);
+    root.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root) {
+        if (downOutside) void handle("close");
+        downOutside = false;
+        return;
+      }
+      const pick2 = t.closest("[data-pick-photo]");
+      if (pick2) {
+        if (pick2.hasAttribute("disabled") || busy) return;
+        pickFor = pick2.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void handle("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const take = el.dataset.take ? root?.querySelector(`[name="${el.dataset.take}"]`)?.value : void 0;
+      void handle(el.dataset.action, take ?? el.dataset.value);
+    });
+    const photoTarget = (el) => {
+      const box = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box ? box.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+    };
+    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+    if (!widthWatch) {
+      widthWatch = true;
+      matchMedia("(max-width: 760px)").addEventListener?.("change", () => root && render());
+    }
+    root.addEventListener("paste", (ev) => {
+      const prefix = photoTarget(ev.target);
+      const files = imageFiles(ev.clipboardData?.items);
+      if (!prefix || !files.length) return;
+      ev.preventDefault();
+      void addPhotos(prefix, files);
+    });
+    root.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    root.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files = imageFiles(ev.dataTransfer.files);
+      if (files.length) void addPhotos(prefix, files);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render();
+      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render();
+    });
+    root.addEventListener("keydown", (ev) => {
+      const el = ev.target;
+      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
+        const send2 = root?.querySelector(".ph-send");
+        ev.preventDefault();
+        if (send2 && !send2.disabled) void handle("ph-send", send2.dataset.value);
+        return;
+      }
+      if (ev.key !== "Enter" || ev.isComposing || !el?.dataset?.enter) return;
+      ev.preventDefault();
+      void handle(el.dataset.enter, el.value);
+    });
+    root.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      const input2 = form.querySelector("input");
+      if (form.dataset.submit) void handle(form.dataset.submit, input2?.value ?? "");
+    });
+    root.addEventListener("change", (ev) => {
       const el = ev.target;
       if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
     });
@@ -8,6 +209,12 @@ ge", (ev) => {
         wiki.query = el.value;
         const box2 = root?.querySelector(".nw .ph-content");
         if (box2) box2.innerHTML = wikiList(view.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "wiki-home-query" && view.kind === "started") {
+        wiki.homeQuery = el.value;
+        const box2 = root?.querySelector(".nw-hero-res");
+        if (box2) box2.innerHTML = wikiHomeResults(view.ctx);
         return;
       }
       if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
@@ -376,7 +583,7 @@ ge", (ev) => {
   }
   function startedHeader(ctx) {
     return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       <button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc14(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
@@ -422,6 +629,9 @@ ge", (ev) => {
     const focusSel = act && root.contains(act) && act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
     const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
     root.dataset.theme = themeOf();
+    const pf = getPrefs();
+    root.dataset.nav = pf.nav ?? "left";
+    root.style.setProperty("--dim", String((pf.dim ?? DIM_DEFAULT) / 100));
     root.innerHTML = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body3()}</div>`;
     root.dataset.tab = tab;
     if (focusSel) {
@@ -602,7 +812,6 @@ ge", (ev) => {
   }
   function brand(ctx) {
     return `<div class="gx-nav-brand">
-      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       ${idCard(ctx)}
     </div>`;
   }
@@ -960,5 +1169,5 @@ ge", (ev) => {
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.29", start: start3 };
+  globalThis.__goeiBody = { version: "0.16.30", start: start3 };
 })();
