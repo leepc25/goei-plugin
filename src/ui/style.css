@@ -1595,9 +1595,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
 .nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
 .nw-tabs + .nw-groups { padding-right: 26px; }
-.nw-idx { position: absolute; z-index: 1; right: 2px; bottom: 8px; top: 64px; display: flex; flex-direction: column; justify-content: center; gap: 1px; width: 22px; touch-action: none; user-select: none; }
-.nw-idx button { flex: 0 1 22px; min-height: 14px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--dim); font: inherit; font-size: 11.5px; font-weight: 700; line-height: 1; cursor: pointer; }
-.nw-idx button:hover, .nw-idx button.on { background: var(--accent-bg); color: var(--signal); }
+.nw-kbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; margin-left: -10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.nw-kbtn b { color: var(--dim); font-weight: 600; }
+.nw-kbtn::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
+.nw-kbtn:hover { background: var(--accent-bg); color: var(--signal); }
+.nw-kgrid { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--void) 72%, transparent); }
+.nw-kgrid[hidden] { display: none; }
+.nw-kgrid-in { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.nw-kgrid-in button { height: 52px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
+.nw-kgrid-in button:hover:not(:disabled) { border-color: var(--signal); color: var(--signal); background: var(--accent-bg); }
+.nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
 .nw-card.none { opacity: .6; border-style: dashed; }
 .nw-more-btn { align-self: center; margin-top: 2px; }
 .nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }

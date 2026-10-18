@@ -345,10 +345,13 @@ export function wikiList(ctx: ChatContext): string {
   const keys = KEYS.filter((k) => shown.some((d) => keyOf(d.title) === k));
   const groups = keys.map((k) => {
     const rows = shown.filter((d) => keyOf(d.title) === k);
-    return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${k}<b>${rows.length}</b></h4><ul class="ph-list">${rows.map((d) => dated(d, tab !== 'story')).join('')}</ul>`;
+    const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
+    return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab !== 'story')).join('')}</ul>`;
   }).join('');
-  // 오른쪽 가장자리 ㄱ~ㅎ 색인 (누르거나 끌면 그 자음으로)
-  const index = keys.length > 1 ? `<nav class="nw-idx" aria-label="가나다 색인">${keys.map((k) => `<button type="button" data-k="${k}" aria-label="${k}">${k}</button>`).join('')}</nav>` : '';
+  // 자음 제목을 누르면 자음판 (v0.16.25, 휴대폰 연락처처럼): 문서가 있는 자음만 켜진다
+  const index = keys.length > 1
+    ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? '' : 'disabled'}>${k}</button>`).join('')}</div></div>`
+    : '';
   return `${chips}<div class="nw-groups">${groups}</div>${index}`;
 }
 
@@ -591,25 +594,27 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     e.stopPropagation();
     e.preventDefault();
   }, true);
-  // ㄱ~ㅎ 색인: 누르거나 위아래로 끌면 그 자음 묶음으로 (목록은 검색할 때마다 다시 그려지므로 서랍에서 받는다)
-  const jump = (x: number, y: number) => {
-    const k = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest<HTMLElement>('[data-k]')?.dataset.k;
-    const box = panel.querySelector<HTMLElement>('.nw-groups');
-    const sec = k ? box?.querySelector<HTMLElement>(`[data-ksec="${k}"]`) : null;
-    if (box && sec) box.scrollTop = sec.offsetTop;
-    panel.querySelectorAll('.nw-idx [data-k]').forEach((b) => b.classList.toggle('on', (b as HTMLElement).dataset.k === k));
-  };
-  let indexing = false;
-  panel.addEventListener('pointerdown', (e) => {
-    if (!(e.target as HTMLElement).closest('.nw-idx')) return;
-    indexing = true;
-    e.preventDefault();
-    jump(e.clientX, e.clientY);
-    window.addEventListener('pointerup', () => (indexing = false), { once: true });
+  // 자음판: 묶음 제목을 누르면 열리고, 자음을 고르면 그 묶음으로, 바깥을 누르면 닫힌다 (목록은 검색할 때마다 다시 그려지므로 서랍에서 받는다)
+  panel.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const grid = panel.querySelector<HTMLElement>('.nw-kgrid');
+    if (!grid) return;
+    if (t.closest('[data-kpick]')) {
+      grid.hidden = false;
+      return;
+    }
+    const k = t.closest<HTMLElement>('.nw-kgrid [data-k]')?.dataset.k;
+    if (k) {
+      const box = panel.querySelector<HTMLElement>('.nw-groups');
+      const sec = box?.querySelector<HTMLElement>(`[data-ksec="${k}"]`);
+      if (box && sec) box.scrollTop = sec.offsetTop;
+      grid.hidden = true;
+      return;
+    }
+    if (t.closest('.nw-kgrid') && !t.closest('.nw-kgrid-in button')) grid.hidden = true;
   });
-  panel.addEventListener('pointermove', (e) => indexing && jump(e.clientX, e.clientY));
   let t0: { x: number; y: number } | null = null;
-  panel.addEventListener('touchstart', (e) => (t0 = (e.target as HTMLElement).closest('.nw-idx') ? null : { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }), { passive: true });
+  panel.addEventListener('touchstart', (e) => (t0 = (e.target as HTMLElement).closest('.nw-kgrid') ? null : { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }), { passive: true });
   panel.addEventListener('touchend', (e) => {
     if (!t0) return;
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
