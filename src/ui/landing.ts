@@ -7,9 +7,9 @@ import type { Palette } from './theme';
 
 const MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
 
-/** 제목 「괴이: 이면세계」와 아래로 비친 반사(이면). 반사는 물결처럼 일렁인다 */
+/** 제목 「괴이 ː 이면세계」와 아래로 비친 반사(이면). 반사는 물결처럼 일렁인다 */
 function title(p: Palette): string {
-  const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .18em 0 .06em">:</span><span style="color:${p.signal}">이면세계</span>`;
+  const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
   const font = 'font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap';
   return `<div style="margin:6px 0 0;${font}">${line}</div>`
     + `<div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;`

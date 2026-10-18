@@ -65,7 +65,7 @@ function base64(b: Uint8Array): string {
 /** 팩 바이트를 풀어 저장한다 */
 export async function installPack(bytes: Uint8Array): Promise<void> {
   const pack = parsePack(bytes);
-  if (!pack || pack.id !== PACK_ID) throw new PackError('괴이: 이면세계 순찰 그림 팩 파일이 아니에요.');
+  if (!pack || pack.id !== PACK_ID) throw new PackError('괴이 ː 이면세계 순찰 그림 팩 파일이 아니에요.');
   if (pack.version !== PACK_VERSION) throw new PackError('플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.');
   const files: Record<string, string> = {};
   for (const name of PACK_FILES) files[name] = base64(pack.files.get(name)!);

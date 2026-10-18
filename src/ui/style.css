@@ -96,13 +96,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .gx[data-nav="right"] .gx-panel.has-nav { grid-template-columns: minmax(0, 1fr) 236px; grid-template-areas: "head head" "body nav"; }
   .gx[data-nav="right"] .gx-nav { border-right: 0; border-left: 1px solid var(--panel2); }
 }
-/* 상단바: 「괴이: 이면세계 › 지금 화면」 한 줄. 왼쪽 표지 폭을 메뉴 칸에 맞춰 꺾쇠가 메뉴 경계에 온다 */
-.gx-hmark { display: flex; align-items: center; gap: 10px; flex: none; width: 204px; min-width: 0; }
+/* 상단바: 「괴이 ː 이면세계 › 지금 화면」 한 줄. 꺾쇠는 메뉴 위치와 상관없이 제목 바로 뒤 */
+.gx-hmark { display: flex; align-items: center; gap: 10px; flex: none; min-width: 0; }
 .gx-hmark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
 .gx-hmark .gx-logo svg { width: 24px; height: 24px; }
-.gx-hsep { flex: none; color: var(--dim); font-size: 20px; line-height: 1; margin: 0 2px 0 -4px; }
+.gx-hsep { flex: none; color: var(--dim); font-size: 20px; line-height: 1; margin: 0 2px; }
 .gx-tabhead .gx-tabicon { display: none; }
-.gx[data-nav="right"] .gx-hmark { width: auto; }
 @media (max-width: 760px) {
   .gx-hmark, .gx-hsep { display: none; }
   .gx-tabhead .gx-tabicon { display: grid; }
@@ -135,6 +134,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mark .gx-logo svg { width: 24px; height: 24px; }
 .gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
 .gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
+/* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
+.gx-hmark .gx-mark-txt { display: inline-grid; }
+.gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
+.gx-hmark .gx-mark-txt small i { font-style: normal; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
 .gx-logo.mob { display: none; }
 /* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
