@@ -71,7 +71,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
       parseRisuChat: async (t) => String(t).replace(/\{\{user\}\}/g, window.__userName ?? '{{user}}'),
-      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => typeof r === 'string' ? r : JSON.stringify(r) } : { ok: false, status: 404, json: async () => null, text: async () => '' }; },
+      nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => typeof r === 'string' ? r : JSON.stringify(r), arrayBuffer: async () => (r instanceof Uint8Array ? r : new TextEncoder().encode(typeof r === 'string' ? r : JSON.stringify(r))).slice().buffer } : { ok: false, status: 404, json: async () => null, text: async () => '', arrayBuffer: async () => new ArrayBuffer(0) }; },
     };
     window.__assets = {};`;
 }
@@ -1777,6 +1777,51 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);
   console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지)');
+  await page.close();
+}
+
+// 관찰형 게임: 그림 팩이 없으면 받기 화면, 받은 뒤에는 바로 게임
+{
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  await startedWithReply(page);
+  await page.click('[x-goei-fab] button');
+  await page.click('[data-action="game-open"] >> nth=0');
+  await page.waitForSelector('.gx-gp');
+  if (shots) {
+    await page.screenshot({ path: `${shots}/game-pack.png` });
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `${shots}/game-pack-m.png` });
+    await page.setViewportSize({ width: 1100, height: 900 });
+  }
+  await page.click('[data-gp="get"]');
+  await page.waitForFunction(() => !document.querySelector('.gx-gp-msg')?.hidden && !document.querySelector('[data-gp="get"]').disabled);
+  assert.match(await page.textContent('.gx-gp-msg'), /받지 못했어요/);
+  const pack = readFileSync(new URL('../dist/goei-game-patrol.pack', import.meta.url)).toString('base64');
+  await page.evaluate((b64) => {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    window.__fetch = (u) => (u.includes('goei-game-patrol.pack') ? bytes : null);
+  }, pack);
+  await page.click('[data-gp="get"]');
+  await page.waitForSelector('.goei-game canvas');
+  await page.waitForFunction(() => !document.querySelector('.gg-load'));
+  assert.equal(await page.evaluate(() => Object.keys(window.__assets).length), 19, '그림 19장을 에셋으로');
+  assert.ok(await page.evaluate(() => JSON.parse(window.__store['p:goei:game-pack:patrol']).paths.faces), '경로만 저장');
+  await page.waitForTimeout(1500);
+  if (shots) {
+    await page.screenshot({ path: `${shots}/game-pc.png` });
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `${shots}/game-m.png` });
+    await page.setViewportSize({ width: 1100, height: 900 });
+  }
+  await page.click('[data-action="game-close"]');
+  assert.equal(await page.locator('.gx-game').count(), 0);
+  await page.click('[data-action="game-open"] >> nth=0');
+  await page.waitForSelector('.goei-game canvas');
+  assert.equal(await page.locator('.gx-gp').count(), 0, '받은 뒤에는 바로 게임');
+  assert.deepEqual(errors, []);
+  console.log('PASS 관찰형 게임: 그림 팩 받기 실패 안내 → 받기 → 에셋 저장 → 다시 열면 바로 게임');
   await page.close();
 }
 

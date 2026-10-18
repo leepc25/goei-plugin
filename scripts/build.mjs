@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { buildPack } from './game-pack.mjs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 // 업데이트 주소: package.json의 goei.updateBase (저장소 release 폴더 raw 주소). 있으면 Risu 플러그인 탭이 이 주소로 플러그인을 갱신한다
@@ -26,7 +27,7 @@ const result = await build({
   charset: 'utf8',
   minify: false,
   legalComments: 'none',
-  loader: { '.css': 'text', '.png': 'dataurl' },
+  loader: { '.css': 'text' },
   write: false,
 });
 const code = header + result.outputFiles[0].text;
@@ -50,7 +51,7 @@ await build({
   format: 'esm',
   target: 'es2022',
   charset: 'utf8',
-  loader: { '.css': 'text', '.png': 'dataurl' },
+  loader: { '.css': 'text' },
   outfile: 'dist-test/game-demo.js',
 });
 await build({
@@ -61,6 +62,16 @@ await build({
   charset: 'utf8',
   outfile: 'dist-test/game-sim.mjs',
 });
+
+// 게임 그림 팩: 플러그인과 따로, 원하는 사람만 게임 창에서 받는다 (release/ 폴더에서 바로 받거나 파일로 넣기).
+// 그림이 그대로면 바이트도 같아서 매번 써도 바뀐 것으로 잡히지 않는다
+const PACK_VERSION = Number(/PACK_VERSION = (\d+)/.exec(readFileSync('src/game/assets.ts', 'utf8'))[1]);
+const pack = buildPack('game-pack/patrol', 'patrol', PACK_VERSION);
+writeFileSync('dist/goei-game-patrol.pack', pack);
+mkdirSync('release', { recursive: true });
+writeFileSync('release/goei-game-patrol.pack', pack);
+mkdirSync('dist-test', { recursive: true });
+writeFileSync('dist-test/goei-game-patrol.pack', pack);
 
 const info = {
   version: pkg.version,

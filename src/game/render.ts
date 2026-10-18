@@ -1,5 +1,5 @@
 // 캔버스 그리기. 그림은 늘이거나 줄이지 않고 기기 픽셀 기준 정수 배율로만 키운다.
-import { ATLAS, BACKS, SHEETS, type Frame } from './assets';
+import { BACK_FILES, SHEET_FILES, type Atlas, type Frame, type GameArt } from './assets';
 import { CAMP, ENEMIES, ROOMS, TUNE, type AgentId, type BackId, type EnemyId } from './data';
 import { alive, footY, frameOf, type Run, type Unit } from './sim';
 
@@ -33,10 +33,13 @@ export class Renderer {
     this.ctx = canvas.getContext('2d')!;
   }
 
-  async load(): Promise<void> {
+  private atlas = {} as Atlas;
+
+  async load(art: GameArt): Promise<void> {
+    this.atlas = art.atlas;
     await Promise.all([
-      ...Object.entries(SHEETS).map(async ([k, v]) => this.sheets.set(k, await loadImage(v))),
-      ...Object.entries(BACKS).map(async ([k, v]) => this.backs.set(k, await loadImage(v!))),
+      ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art.url(v)))),
+      ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art.url(v)))),
     ]);
     this.ready = true;
   }
@@ -151,7 +154,7 @@ export class Renderer {
   }
 
   private unit(u: Unit, cam: number): void {
-    const f: Frame = ATLAS[u.kind as AgentId | EnemyId][frameOf(u)];
+    const f: Frame = this.atlas[u.kind as AgentId | EnemyId][frameOf(u)];
     const img = this.sheets.get(u.kind);
     if (!f || !img) return;
     const [sx, sy, w, h, ax, ay] = f;
@@ -175,7 +178,7 @@ export class Renderer {
     c.restore();
     if (u.side === 'e' && !ENEMIES[u.kind as EnemyId].boss && alive(u) && u.hp < u.max) {
       const bw = 26;
-      const top = y - ATLAS[u.kind as EnemyId][0]![6] - 8;
+      const top = y - this.atlas[u.kind as EnemyId][0]![6] - 8;
       c.fillStyle = 'rgba(0,0,0,.6)';
       c.fillRect(x - bw / 2 - 1, top - 1, bw + 2, 4);
       c.fillStyle = '#e0524a';

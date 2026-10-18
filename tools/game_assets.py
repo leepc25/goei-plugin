@@ -1,5 +1,6 @@
-"""관찰형 게임 그림 준비: game-src/의 동작 시트를 프레임별로 잘라 src/game/assets/에 아틀라스로 묶는다.
+"""관찰형 게임 그림 준비: game-src/의 동작 시트를 프레임별로 잘라 game-pack/patrol/에 아틀라스로 묶는다.
 
+게임 팩은 플러그인과 따로 배포되어 원하는 사람만 받는다 (scripts/build.mjs가 release/game/에 낸다).
 GPT가 만든 시트는 칸 경계가 정확하지 않아(효과가 옆 칸까지 번지고, 옆 칸 조각이 들어옴) 균등 격자로 자르면
 효과가 잘리거나 조각이 섞인다. 그래서 이어진 픽셀 덩어리마다 무게중심이 있는 칸에 배정해 프레임을 만든다.
 크기를 바꾸지 않고(늘이기·줄이기 없음) 원본 픽셀 그대로 옮긴다.
@@ -15,7 +16,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'game-src')
-OUT = os.path.join(ROOT, 'src', 'game', 'assets')
+OUT = os.path.join(ROOT, 'game-pack', 'patrol')
 
 AGENTS = ['jyaldi', 'gorgo', 'geshu', 'deadfall', 'spandal', 'eileen', 'curas', 'rose']
 ENEMIES = ['corner', 'watchman', 'statue', 'master']

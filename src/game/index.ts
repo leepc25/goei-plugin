@@ -1,7 +1,7 @@
 // 관찰형 게임 「관리국 순찰」: 응답을 기다리는 동안 분대가 학교를 순찰하며 싸우는 모습을 지켜본다.
 // 플러그인 창은 mountGame(box, host)로 붙이고, 돌려받은 함수로 정리한다.
 import css from './style.css';
-import { FACES } from './assets';
+import { FACE_FILE, type GameArt } from './assets';
 import { AGENTS, CAMP, ENEMIES, ROOMS, TUNE, type AgentId, type EnemyId } from './data';
 import { Renderer } from './render';
 import { agentDef, agents, alive, applySquad, newRun, readMeta, step, trigger, type Meta, type Run } from './sim';
@@ -17,6 +17,8 @@ export interface GameHost {
   onWaiting(cb: (waiting: boolean) => void): () => void;
   /** 모바일 폭인가 */
   narrow(): boolean;
+  /** 게임 그림 (게임 팩). 열 때마다 부른다 */
+  art(): Promise<GameArt>;
 }
 
 /** 같은 페이지에서 닫았다 다시 열면 순찰을 이어서 보여 준다 (저장은 기록만) */
@@ -26,8 +28,10 @@ const STEP = 1 / 30;
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
+let faces = '';
+
 function faceStyle(id: AgentId, size: number): string {
-  return `background-image:url('${FACES}');background-position:${-agentDef(id).face * size}px 0`;
+  return `background-image:url('${faces}');background-position:${-agentDef(id).face * size}px 0`;
 }
 
 export function mountGame(box: HTMLElement, host: GameHost): () => void {
@@ -191,7 +195,9 @@ export function mountGame(box: HTMLElement, host: GameHost): () => void {
 
   void (async () => {
     try {
-      const [raw] = await Promise.all([host.load().catch(() => null), renderer.load()]);
+      const art = await host.art();
+      faces = art.url(FACE_FILE);
+      const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art)]);
       if (disposed) return;
       meta = readMeta(raw);
       run = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);

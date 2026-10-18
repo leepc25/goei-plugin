@@ -1699,3 +1699,23 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 .adv-num input { -moz-appearance: textfield; appearance: textfield; }
 .adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* 관찰형 게임 「관리국 순찰」: 창 전체를 덮는다 (ui/game.ts) */
+.gx-panel { position: relative; }
+.gx-game { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--void); }
+.gx-game > .gx-head { flex: none; }
+.gx-game-box { flex: 1; min-height: 0; display: flex; }
+.gx-gp { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; margin: 0; min-height: 0; }
+.gx-gp-card { display: flex; flex-direction: column; gap: 10px; width: min(420px, 100%); padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
+.gx-gp-card b { font-size: 16px; }
+.gx-gp-card p { margin: 0; color: var(--dim); }
+.gx-gp-card .gx-gp-msg { color: var(--text); padding: 8px 12px; border-radius: 8px; background: var(--panel2); }
+.gx-gp-act { display: flex; gap: 8px; margin-top: 6px; }
+.gx-gp-btn { flex: 1; min-height: 42px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.gx-gp-btn.primary { border-color: var(--signal); background: var(--accent-bg); color: var(--signal); }
+.gx-gp-btn[disabled] { opacity: .5; cursor: default; }
+@media (max-width: 760px) {
+  .gx-gp { align-items: stretch; }
+  .gx-gp-card { width: 100%; }
+  .gx-gp-act { margin-top: auto; flex-direction: column; }
+}

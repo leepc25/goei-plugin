@@ -31,6 +31,7 @@ import { openApp } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
+import { setWaiting } from './host/waiting';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -40,6 +41,7 @@ let liteNow = false;
 
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
+  setWaiting(true);
   // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
   messages = unwrapCalls(unwrapScenes(messages).messages).messages;
   if (liteNow) {
@@ -127,6 +129,7 @@ function stripHistoryTags<M extends PromptMessage>(messages: M[]): M[] {
 
 /** 모델 응답이 채팅에 들어간 뒤: 상황판 태그 반영 + 저장 본문 정리 + 다음 턴 브리핑 */
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
+  setWaiting(false);
   try {
     const char = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
