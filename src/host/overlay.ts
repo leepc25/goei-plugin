@@ -40,16 +40,7 @@ ${themeVars('[x-goei-fab]')}
 [x-goei-fab] button svg { transition: transform .15s ease; }
 [x-goei-fab] button:active { transform: translateY(0) scale(.96); }
 [x-goei-fab][x-goei-drag="true"] button { cursor: grabbing; transform: scale(1.06); box-shadow: 0 10px 26px -6px rgba(0,0,0,.55), 0 0 0 4px color-mix(in srgb, var(--g-signal) 24%, transparent); }
-[x-goei-fab][x-goei-drag="true"] button::after { opacity: 0 !important; }
 [x-goei-fab] button svg { width: 26px; height: 26px; pointer-events: none; }
-[x-goei-fab] button::after {
-  content: "${BRAND.fab}"; position: absolute; right: calc(100% + 10px); top: 50%;
-  transform: translate(4px, -50%); padding: 4px 9px; border-radius: 8px;
-  background: var(--g-panel); border: 1px solid var(--g-line); color: var(--g-sub);
-  font: 12px/1.3 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; white-space: nowrap;
-  opacity: 0; pointer-events: none; transition: opacity .12s ease, transform .12s ease;
-}
-[x-goei-fab] button:hover::after { opacity: 1; transform: translate(0, -50%); }
 @keyframes goei-fab-glow {
   0%, 100% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 0 transparent; }
   50% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 7px color-mix(in srgb, var(--g-signal) 22%, transparent), 0 0 26px 6px color-mix(in srgb, var(--g-signal) 35%, transparent); }
@@ -60,7 +51,6 @@ ${themeVars('[x-goei-fab]')}
    버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다.
    v0.16.28 (사용자 요청): 표도 테마를 따른다. 다크는 네온 빛줄기와 글리치, 라이트는 맑은 빛줄기만, 페이퍼는 도장 찍듯 눌리는 잉크 */
 [x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
-[x-goei-fab][x-goei-intro="true"] button::after { display: none; }
 [x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
 [x-goei-fab][x-goei-intro="true"] [data-gr] {
   display: block; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;

@@ -4,7 +4,7 @@ import {
   assignOrg, directoryData, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
-import { MAP_CODES, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
+import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
 import { assetNames, assetUrl, hasAsset, pictureName } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
@@ -345,13 +345,13 @@ function baseMap(ctx: ChatContext, code: string, env: DirectoryEnv | null): stri
 
 let mapEnv: DirectoryEnv | null = null;
 
-const baseWhere = (b: BaseRow) => [SIDO_NAME[b.sido] ?? '', b.gu].filter(Boolean).join(' ') || '위치 미정';
+const baseWhere = (b: BaseRow) => placeWhere(b.sido, b.gu) || '위치 미정';
 
 function basePanel(b: BaseRow, ctx: ChatContext, d: Directory): string {
   const k = (f: string) => `base:${f}|${b.name}`;
   const url = baseMap(ctx, b.sido, mapEnv);
   const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? ' selected' : ''}>${esc(regionName(c))}</option>`).join('');
-  const gus = (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc(g)}"${g === b.gu ? ' selected' : ''}>${esc(g)}</option>`).join('');
+  const gus = `<option value=""${b.gu ? '' : ' selected'}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc(g)}"${g === b.gu ? ' selected' : ''}>${esc(g)}</option>`).join('');
   const map = url
     ? `<div class="dir-map" data-base-pick="${esc(b.name)}"><img src="${esc(url)}" alt="${esc(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>`
     : `<div class="dir-map ph">지도 불러오는 중…</div>`;
@@ -705,7 +705,7 @@ export async function handleDirectory(action: string, value: string | undefined,
       const name = freeBaseName(d, want);
       const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
       const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : '02';
-      d.bases.push({ name, label: '', lore: org ? org.name : '', english: '', aliases: [], org: org?.name ?? '', sido, gu: SIGUN[sido]?.[0] ?? '', x: 50, y: 50, show: true });
+      d.bases.push({ name, label: '', lore: org ? org.name : '', english: '', aliases: [], org: org?.name ?? '', sido, gu: '', x: 50, y: 50, show: true });
       dirUi.kind = 'base';
       dirUi.open = name;
       dirUi.q = '';
@@ -731,10 +731,10 @@ export async function handleDirectory(action: string, value: string | undefined,
       if (!b) break;
       if (action === 'dir-base-sido' && REGIONS.includes(val) && val !== b.sido) {
         b.sido = val;
-        b.gu = SIGUN[val]?.[0] ?? '';
+        b.gu = '';
         b.x = 50;
         b.y = 50;
-      } else if (action === 'dir-base-gu' && SIGUN[b.sido]?.includes(val)) b.gu = val;
+      } else if (action === 'dir-base-gu' && (!val || SIGUN[b.sido]?.includes(val))) b.gu = val;
       dirUi.done = '';
       break;
     }

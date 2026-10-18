@@ -59,6 +59,9 @@ export function landmarkLoc(sido: string, gu: string): string | null {
   return i >= 0 ? `${sido}-${i}` : null;
 }
 
+/** 거점 위치 글: 시군구를 안 골랐으면 시도만 (예: 서울특별시) */
+export const placeWhere = (sido: string, gu: string): string => [SIDO_NAME[sido] ?? '', gu].filter(Boolean).join(' ');
+
 /** 전국 지도의 시도 핀: [코드, 짧은 이름, x%, y%] */
 export const NATION_PINS = geo.nation as unknown as [string, string, number, number][];
 /** 시도 지도의 시군구 핀 (SIGUN 순서와 같음, x%·y%) */

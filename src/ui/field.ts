@@ -8,7 +8,7 @@ import { basicSettings, worldSettings } from '../core/settings';
 import {
   activeEvents, agentLocked, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
-  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, prevWorldVars,
+  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
@@ -133,7 +133,7 @@ function sidoOf(loc: string): string {
 /** 사건이 랜드마크에서 났으면 그 시설 자리, 아니면 시군구 자리 */
 function placeKey(ev: WorldEvent, c: Catalog): string {
   if (ev.kind === 'in') {
-    const lm = c.landmarks.find((l) => l.name === ev.name && landmarkLoc(l.sido, l.gu) === ev.loc);
+    const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
     if (lm) return `fac:${lm.name}`;
   }
   return ev.loc;
@@ -142,7 +142,7 @@ function placeKey(ev: WorldEvent, c: Catalog): string {
 function placeName(key: string, c: Catalog): string {
   if (key.startsWith('fac:')) {
     const lm = c.landmarks.find((l) => l.name === key.slice(4));
-    return lm ? `${lm.name} · ${lm.gu}` : key.slice(4);
+    return lm ? `${lm.name} · ${lm.gu || SIDO_NAME[lm.sido] || ''}` : key.slice(4);
   }
   return locName(key);
 }
@@ -259,7 +259,7 @@ function mapSuggest(c: Catalog): string {
   }
   for (const lm of c.landmarks) {
     if (!MAP_CODES.includes(lm.sido)) continue;
-    if (`${lm.name} ${lm.label ?? ''}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}` });
+    if (`${lm.name} ${lm.label ?? ''}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
   }
   if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
   return hits
@@ -304,7 +304,7 @@ function placeCard(key: string, c: Catalog, on: boolean): string {
   if (key.startsWith('fac:')) {
     const lm = c.landmarks.find((l) => l.name === key.slice(4));
     name = lm?.label || lm?.name || key.slice(4);
-    sub = lm ? `${SIDO_NAME[lm.sido] ?? ''} ${lm.gu}`.trim() : '거점';
+    sub = lm ? placeWhere(lm.sido, lm.gu) : '거점';
     wiki = lm?.name ?? name;
   } else {
     const full = locName(key);
@@ -461,7 +461,7 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
 function missionCatalog(c: Catalog, kind: MissionKind): { name: string; sub: string }[] {
   if (kind === 'an') return c.anomalies.map((a) => ({ name: a.name, sub: a.english }));
   if (kind === 'ms') return c.mysticSites.map((m) => ({ name: m.name, sub: m.english }));
-  return c.landmarks.map((l) => ({ name: l.name, sub: `${SIDO_NAME[l.sido] ?? ''} ${l.gu}` }));
+  return c.landmarks.map((l) => ({ name: l.name, sub: placeWhere(l.sido, l.gu) }));
 }
 
 function missionStatus(x: Ctx, kind: MissionKind, name: string): string {
@@ -609,7 +609,7 @@ export function depart(ctx: ChatContext, env: FieldEnv): Promise<void> {
     } else if (target.type === 'facility') {
       const lm = x.catalog.landmarks.find((l) => l.name === target.name);
       if (!lm) throw new DirectiveError('시설 목록이 바뀌었어요. 다시 골라 주세요.');
-      dest = destination(d, lm.name, `${regionName(lm.sido)} ${lm.gu}`);
+      dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ''));
     } else {
       dest = destination(d, locName(target.loc));
     }
@@ -633,7 +633,7 @@ export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): 
     let dest = destination(d, name);
     if (kind === 'lm') {
       const lm = x.catalog.landmarks.find((l) => l.name === name);
-      if (lm) dest = destination(d, name, `${SIDO_NAME[lm.sido] ?? ''} ${lm.gu}`);
+      if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
     } else if (kind === 'ms') {
       const site = x.world.ms.find((m) => m.name === name);
       if (site) dest = destination(d, name, locName(site.loc));

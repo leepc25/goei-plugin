@@ -444,7 +444,9 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   for (const t of scanIncidents(text)) {
     if (!validName(t.name)) continue;
     const lm = c.landmarks.find((l) => l.name === t.name);
-    const loc = lm ? landmarkLoc(lm.sido, lm.gu) : uniqueRegion(t.region);
+    // 시군구 없는 거점은 응답이 적은 지역으로 (그 시도 안에서만)
+    const loc = lm && lm.gu ? landmarkLoc(lm.sido, lm.gu) : uniqueRegion(t.region);
+    if (lm && !lm.gu && loc && !loc.startsWith(`${lm.sido}-`)) continue;
     if (!loc || loc === SEALED_LOC || !regionMatch(t.region, locName(loc))) continue;
     let e = w.inc.find((x) => x.name === t.name);
     if (e && e.loc !== loc) continue;

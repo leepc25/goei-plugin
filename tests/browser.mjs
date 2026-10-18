@@ -1958,6 +1958,8 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="dir-base-new"][data-take="dir-base-new"]');
   await page.waitForSelector('.dir-row:has-text("시험 거점")');
   assert.equal(await page.evaluate(() => window.__calls.setChar || 0), 0, '저장하지 않음');
+  assert.equal(await page.inputValue('select[data-change="dir-base-gu"]'), '', '새 거점은 시군구를 안 고른 채로');
+  assert.match(await page.textContent('.dir-row.open .dir-name small'), /· 서울특별시$/, '시군구 없으면 시도만');
   const sido = await page.inputValue('.dir select[data-change^="dir-base-sido"], .dir select[name*="sido"]').catch(() => '02');
   await page.click('[data-action="tab"][data-value="map"] >> nth=0');
   await page.waitForSelector('.gx-field');

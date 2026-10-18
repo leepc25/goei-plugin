@@ -23,7 +23,7 @@ import { moduleAssetStamp, pictureName } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
 import { lastStatusFields } from '../core/world/tags';
-import { SIDO_NAME } from '../core/world/geo';
+import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 
@@ -222,7 +222,7 @@ function entries(ctx: ChatContext): Entry[] {
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
-      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: [SIDO_NAME[l.sido] ?? '', l.gu].filter(Boolean).join(' '), photo: '', terms: [l.name, l.english, ...l.aliases] });
+      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: '', terms: [l.name, l.english, ...l.aliases] });
     }
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */

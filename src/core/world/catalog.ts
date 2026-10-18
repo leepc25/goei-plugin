@@ -87,7 +87,7 @@ function worldRows(data: Record<string, unknown>, group: string, landmark: boole
 /** 지도에 그릴 거점 (보이기 켠 것, 지역이 맞는 것만) */
 export function landmarksOf(bases: BaseRow[]): Landmark[] {
   return bases
-    .filter((b) => b.show && b.name && SIGUN[b.sido]?.includes(b.gu))
+    .filter((b) => b.show && b.name && SIGUN[b.sido] && (!b.gu || SIGUN[b.sido].includes(b.gu)))
     .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
 }
 
