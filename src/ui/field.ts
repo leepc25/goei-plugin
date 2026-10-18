@@ -12,7 +12,7 @@ import {
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
-import { SEND_FALLBACK, sendNow } from '../host/send';
+import { SEND_FALLBACK, noticeClass, sendNow } from '../host/send';
 import { ICONS } from './icons';
 import { elapsedText, evCard, peopleChips } from './evcard';
 import { agentInner, stLabel } from './images';
@@ -452,7 +452,7 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
     <div class="gx-mapcol">${mapCanvas(ctx, x, events, env)}
       <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
     <div class="gx-sidecol">
-      ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
+      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
       ${teamPanel(x, goal, 'depart', '출발', busy, ctx)}
     </div>
   </main>${fieldDrawer(x, true)}`;
@@ -526,7 +526,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
-      ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
+      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
       ${x.world.notice && x.on ? `<div class="gx-hint">${esc(x.world.notice)}</div>` : ''}
       ${pend}
       ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy, opening ? undefined : ctx)}

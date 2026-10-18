@@ -22,3 +22,6 @@ export async function sendNow(): Promise<boolean> {
 
 /** 자동 전송이 안 될 때 안내 */
 export const SEND_FALLBACK = '채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.';
+
+/** 안내 상자 모양: 자동 전송 안내는 오류가 아니라 일반 안내 색 */
+export const noticeClass = (text: string): string => (text === SEND_FALLBACK ? 'gx-err info' : 'gx-err');

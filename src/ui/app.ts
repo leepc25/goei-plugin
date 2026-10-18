@@ -32,7 +32,7 @@ import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
-import { SEND_FALLBACK, sendNow } from '../host/send';
+import { SEND_FALLBACK, noticeClass, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
@@ -824,7 +824,7 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="gx-err gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -878,7 +878,7 @@ function picker(): string {
   </main>
   <footer class="gx-foot">
     ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)} · ${String(sc.fm).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
-    ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
+    ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
     <button class="gx-start" data-action="start" ${ready && !busy ? '' : 'disabled'}>${busy ? '시작하는 중…' : '출 발'}</button>
   </footer>`;
 }
@@ -963,7 +963,7 @@ function board(ctx: ChatContext): string {
   if (!worldOn(ctx.chat)) {
     return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
-      ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
+      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
       <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>`;
   }
   let catalog: Catalog;
