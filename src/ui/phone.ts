@@ -572,7 +572,8 @@ function contactList(ctx: ChatContext, rows: Contact[], st: PState): string {
         .map((c) => {
           const room = st.rooms[`dm_${c.id}`];
           const confirm = phone.confirm === `contact:${c.id}`;
-          return `<li class="ph-row"><button class="ph-main" data-action="ph-dm" data-value="${c.id}">${face(ctx, c, c.name)}
+          const on = phone.view === 'room' && phone.room === `dm_${c.id}`;
+          return `<li class="ph-row"><button class="ph-main${on ? ' on' : ''}" data-action="ph-dm" data-value="${c.id}">${face(ctx, c, c.name)}
             <span class="ph-who"><span class="ph-who-name"><b>${esc(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ''}</span><small>${esc(contactDetails(c) || (c.custom ? c.note || '직접 추가한 연락처' : fnames[c.group ?? ''] ?? ''))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
             <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc(c.name)}" title="전화" aria-label="${esc(c.name)}에게 전화">${ICONS.call}</button>
@@ -1005,6 +1006,8 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       phone.pickQuery = '';
       break;
     case 'ph-dm':
+      // PC: 열린 대화의 연락처를 다시 누르면 닫힌다 (대화 목록과 같음)
+      if (phone.view === 'room' && phone.room === `dm_${v}` && !matchMedia('(max-width: 760px)').matches) return handlePhone('ph-back', undefined, ctx, env);
       await openDm(ctx, env, v);
       return true;
     case 'ph-room':
