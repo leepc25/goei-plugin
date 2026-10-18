@@ -386,14 +386,19 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     </div>`
     : '';
   const ready = !!goal && validTeam(field.team.length, field.support) && !busy;
+  const go = `<button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>`;
+  lastGo = go;
   return `<section class="gx-team">
     <div class="gx-goal"><span>목표</span><b${goal ? '' : ' class="none"'}>${goal ? esc(goal) : '미정'}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
     ${narrow() ? '' : noteBox()}
-    <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
+    ${narrow() ? '' : go}
   </section>`;
 }
+
+/** 모바일 편성: 출발·요청 버튼은 서랍 맨 아래에 늘 보이고, 작전 메모는 그 위로 펼쳐진다 (teamPanel이 채운다) */
+let lastGo = '';
 
 /** 작전 메모 (PC는 편성 칸 안, 모바일은 하단 서랍. 출발·요청 버튼은 서랍에 넣지 않는다) */
 function noteBox(): string {
@@ -404,7 +409,7 @@ function noteBox(): string {
 /** 모바일 하단 서랍: 목표 단계는 지역·검색(임무 탭만), 편성 단계는 작전 메모 */
 function fieldDrawer(x: Ctx, withMap: boolean): string {
   if (!narrow()) return '';
-  if (field.step === 'team') return drawerBox(noteBox(), 'gx-notedrawer');
+  if (field.step === 'team') return drawerBox(noteBox(), 'gx-notedrawer', `<div class="gx-mgo">${lastGo}</div>`);
   return withMap ? drawerBox(mapBar(x), 'gx-mapdrawer') : '';
 }
 

@@ -1597,6 +1597,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-mdrawer .gx-mapbar { margin: 0; }
   .gx-mdrawer .gx-note { display: block; margin: 0; }
   .gx-mdrawer .gx-note textarea { width: 100%; }
+  .gx-mgo { padding: 0 12px 10px; }
+  .gx-mgo .gx-start { min-height: 46px; border-radius: 12px; font-size: 16px; }
   /* 장소 검색 제안은 서랍 위로 펼친다 */
   .gx-mdrawer .gx-mapfind { position: relative; }
   .gx-mdrawer .gx-mapsug { top: auto; bottom: calc(100% + 6px); }
