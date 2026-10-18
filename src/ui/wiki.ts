@@ -15,6 +15,7 @@ import { imageUrl } from './images';
 import { readDirectory } from '../core/world/directory';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
+import { lastStatusFields } from '../core/world/tags';
 import { SIDO_NAME } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -371,17 +372,24 @@ function homeView(ctx: ChatContext): string {
       <span class="nw-card-img${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
       <b>${esc(e?.name ?? title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</button>`;
   };
-  // 지금 얽힌 문서: 상황판의 진행 중 괴이·사건·특수와 작전에 나간 요원
+  // 지금 얽힌 문서: 상황판은 배경일 뿐이라, 유저가 지금 들어가 있는 곳만 본다.
+  // 상태창 마지막 칸(지금 다루는 괴이·특수·사건)과 거기 투입된 요원, 작전투입 요원, 상태창 위치
   const live: [string, string][] = [];
+  const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
+  const target = st?.target.trim() ?? '';
   if (worldOn(ctx.chat)) {
     const w = readWorld(ctx.chat);
     const kind = { an: '괴이', in: '사건', ms: '특수' } as const;
-    for (const ev of activeEvents(w)) if (ev.name && ev.name !== '이름 미확인') live.push([c(ev.name), `${kind[ev.kind]} · 진행 중`]);
+    const here = activeEvents(w).filter((ev) => ev.name && (ev.name.trim() === target || w.an.some((a) => a.exploring && a.name === ev.name)));
+    for (const ev of here) live.push([c(ev.name), `${kind[ev.kind]} · 탐사 중`]);
+    const deploy = here.map((ev) => ev.people ?? '').join(' ');
     for (const a of readDirectory(ctx.char.globalLore).agents) {
-      const st = w.agents[a.id]?.st;
-      if (st === '작전투입' || st === '외근') live.push([c(a.lore || a.name), `인물 · ${st}`]);
+      const s = w.agents[a.id]?.st;
+      const sent = deploy && (deploy.includes(a.id) || (a.name && deploy.includes(a.name)));
+      if (sent || s === '작전투입') live.push([c(a.lore || a.name), '인물 · 작전투입']);
     }
-  }
+  } else if (target) live.push([c(target), '탐사 중']);
+  if (st?.place && entryFor(ctx, c(st.place))) live.push([c(st.place), '현재 위치']);
   const seen = new Set<string>();
   const liveCards = live.filter(([t]) => (seen.has(t) ? false : (seen.add(t), true))).slice(0, 8).map(([t, sub]) => card(t, sub)).join('');
   const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
