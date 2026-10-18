@@ -4,7 +4,7 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
-  acceptArticle, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
+  acceptArticle, canonicalTitle, deleteDoc, docLinks, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
   type WikiMeta, type WikiSettings,
 } from '../core/wiki';
 import { runModel } from '../host/llm';
@@ -35,15 +35,13 @@ interface WikiState {
   notice: string;
   /** 잠깐 떴다 사라지는 안내 */
   info: string;
-  /** 왼쪽 목록이 펼쳐져 있는지 (접으면 가나다 상자 줄만) */
+  /** 왼쪽 목록이 본문 위로 펼쳐져 있는지 */
   listOpen: boolean;
-  /** 마지막으로 누른 가나다 상자 */
-  key: string;
   newTitle: string;
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: true, key: '', newTitle: '',
+  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, newTitle: '',
 };
 
 export function resetWiki() {
@@ -116,7 +114,10 @@ function search(ctx: ChatContext, q: string) {
   const c = canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
-  if (!matches(ctx, query).length) openTitle(ctx, c.title, 'direct');
+  const lower = query.toLowerCase();
+  if (!matches(ctx, query).length && !listDocs(ctx.chat).some((d) => d.title.toLowerCase().includes(lower))) return openTitle(ctx, c.title, 'direct');
+  // 여러 개가 걸리면 목록을 펼쳐 고르게
+  wiki.listOpen = true;
 }
 
 // ── 생성 ──
@@ -179,9 +180,9 @@ async function setVar(ctx: ChatContext, env: WikiEnv, key: string, value: string
 }
 
 // ── 화면 ──
-// v0.16.23 (사용자 설계): 왼쪽은 작성한 문서를 전화번호부처럼 가나다순으로. 접으면 가나다 상자 줄만 남고 문서가 넓어진다.
-// 상자를 누르면 목록이 펼쳐지며 그 자리로 간다. 모바일도 같은 왼쪽 서랍 (누르거나 오른쪽으로 밀면 펼침, 왼쪽으로 밀면 접힘).
-// 명부 항목(괴이·특수·거점·인물·조직)은 검색할 때만 나온다.
+// v0.16.23 (사용자 설계): 왼쪽 세로바는 위키 메인·작성·설정 세 버튼과 펼치기 자리. 세로바 빈 곳을 누르거나 옆으로 밀면
+// 작성한 문서 목록(전화번호부처럼 가나다순)이 본문 위로 덮어 펼쳐진다. 본문 칸 크기는 그대로. PC·모바일 같은 구조.
+// 명부 항목(괴이·특수·거점·인물·조직)은 검색할 때만 나온다. 첫 화면은 위키 메인 페이지.
 
 interface Entry {
   cat: Cat;
@@ -314,22 +315,49 @@ export function wikiList(ctx: ChatContext): string {
   }).join('');
 }
 
-/** 가나다 상자 줄: 맨 위 펼치기·접기, 문서가 있는 자음마다 상자, 맨 아래 새 문서·설정 */
-function rail(ctx: ChatContext): string {
-  const docs = listDocs(ctx.chat);
-  const cur = wiki.key || ((wiki.view === 'doc' || wiki.view === 'compose') && wiki.title ? keyOf(wiki.title) : '');
-  const boxes = KEYS.map((k) => [k, docs.filter((d) => keyOf(d.title) === k).length] as const)
-    .filter(([, n]) => n)
-    .map(([k, n]) => `<button class="nw-key${k === cur ? ' on' : ''}" data-action="wiki-key" data-value="${k}" aria-label="${k} ${n}개" title="${k} ${n}개"><b>${k}</b><small>${n}</small></button>`)
-    .join('');
+/** 왼쪽 세로바: 위키 메인·새 문서·설정, 남은 자리는 목록 펼치기 (누르거나 옆으로 밀기) */
+function rail(): string {
   const open = wiki.listOpen;
-  return `<nav class="nw-rail" aria-label="가나다">
-    <button class="nw-key nw-toggle${open ? ' on' : ''}" data-action="wiki-list" aria-expanded="${open}" aria-label="${open ? '목록 접기' : '목록 펼치기'}" title="${open ? '목록 접기' : '목록 펼치기'}">${open ? ICONS.back : ICONS.list}</button>
-    <div class="nw-keys">${boxes}</div>
-    <div class="nw-railtools">
-      ${tool('wiki-new', ICONS.pen, '새 문서', wiki.view === 'new' ? 'aria-pressed="true"' : '')}
-      ${tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '')}
-    </div></nav>`;
+  const label = open ? '목록 접기' : '목록 펼치기';
+  return `<nav class="nw-rail" aria-label="위키 메뉴">
+    ${tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '')}
+    ${tool('wiki-new', ICONS.pen, '새 문서', wiki.view === 'new' ? 'aria-pressed="true"' : '')}
+    ${tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '')}
+    <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open ? '' : ' flip'}">${ICONS.back}</span></button>
+  </nav>`;
+}
+
+/** 위키 메인: 검색, 최근 문서, 작성이 필요한 문서 */
+function homeView(ctx: ChatContext): string {
+  const docs = listDocs(ctx.chat);
+  const saved = new Set(docs.map((d) => d.title));
+  const recent = docs.slice().sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0)).slice(0, 8);
+  const card = (d: (typeof docs)[number]) => {
+    const e = entryFor(ctx, d.title);
+    const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
+    const sub = [e ? CAT_LABEL[e.cat] : '', d.meta?.created ? when(d.meta.created) : ''].filter(Boolean).join(' · ');
+    return `<button class="nw-card" data-action="wiki-pick" data-value="${esc(d.title)}">
+      <span class="nw-card-img${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
+      <b>${esc(e?.name ?? d.title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</button>`;
+  };
+  // 작성이 필요한 문서: 문서 안에서 가리키지만 아직 없는 제목, 많이 가리킬수록 앞
+  const c = canon(ctx);
+  const want = new Map<string, number>();
+  for (const d of docs) for (const t of docLinks(d.body, c)) if (!saved.has(t)) want.set(t, (want.get(t) ?? 0) + 1);
+  const wanted = [...want].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko')).slice(0, 24);
+  const chips = wanted.map(([t, n]) => {
+    const e = entryFor(ctx, t);
+    return `<button class="nw-chip none" data-action="wiki-open" data-value="${esc(t)}">${face(ctx, e, ' xs')}<span>${esc(e?.name ?? t)}</span>${n > 1 ? `<small>${n}</small>` : ''}</button>`;
+  }).join('');
+  return `<div class="nw-home">
+    <section class="nw-hero">
+      <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>이면세계 위키</h2><small>문서 ${docs.length}개</small></div></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off">
+        <button class="gx-mini" data-action="wiki-random" ${docs.length ? '' : 'disabled'}>무작위 문서</button></div>
+    </section>
+    <section class="nw-hsec"><h3>최근 작성된 문서</h3>${recent.length ? `<div class="nw-cards">${recent.map(card).join('')}</div>` : `<p class="nw-hnone">아직 작성한 문서가 없어요.</p>`}</section>
+    ${wanted.length ? `<section class="nw-hsec"><h3>작성이 필요한 문서<b>${want.size}</b></h3><div class="nw-chips">${chips}</div></section>` : ''}
+  </div>`;
 }
 
 function paneHead(ctx: ChatContext, title: string, sub: string, right = '', e?: Entry): string {
@@ -430,7 +458,7 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'compose') return compose(ctx);
   if (wiki.view === 'settings') return settingsView(ctx);
   if (wiki.view === 'new') return newView(ctx);
-  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.wiki}</span><b>위키</b><p>문서를 고르거나 이름·제목을 검색하세요.</p></div>`;
+  return homeView(ctx);
 }
 
 export function wikiTab(ctx: ChatContext): string {
@@ -443,39 +471,55 @@ export function wikiTab(ctx: ChatContext): string {
   const status = `${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}`;
   const open = wiki.listOpen;
   return `<main class="gx-body ph-app nw nw-app${open ? ' list-open' : ''}">
-    <aside class="nw-side" aria-label="위키 목록">${rail(ctx)}
-      <div class="nw-panel"${open ? '' : ' inert'}><div class="nw-pin">
+    ${rail()}
+    <aside class="nw-panel" aria-label="위키 목록"${open ? '' : ' inert'}><div class="nw-pin">
         <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
         <div class="ph-content nw-list">${wikiList(ctx)}</div>
         ${fail}
-      </div></div>
-    </aside>
+      </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
     ${note}
   </main>`;
 }
 
-/** 모바일 서랍: 가나다 줄·목록을 오른쪽으로 밀면 펼치고 왼쪽으로 밀면 접는다 */
+/** 목록 서랍: 세로바를 옆으로 밀면(마우스 끌기 포함) 펼치고, 펼친 목록을 왼쪽으로 밀면 접는다 */
 export function bindWikiSide(root: HTMLElement, act: (value: string) => void): void {
-  const box = root.querySelector<HTMLElement>('.nw-app');
-  if (!box) return;
+  const bar = root.querySelector<HTMLElement>('.nw-rail');
+  const panel = root.querySelector<HTMLElement>('.nw-panel');
+  if (!bar || !panel) return;
   let x0: number | null = null;
-  let y0 = 0;
-  box.addEventListener('touchstart', (e) => {
-    const t = e.target as HTMLElement;
-    // 열려 있으면 어디서든 접기, 닫혀 있으면 가나다 줄에서만 펼치기
-    x0 = wiki.listOpen || t.closest('.nw-rail') ? (e.touches[0]?.clientX ?? null) : null;
-    y0 = e.touches[0]?.clientY ?? 0;
-  }, { passive: true });
-  box.addEventListener('touchend', (e) => {
+  let dragged = false;
+  // 손가락·마우스가 세로바 밖에서 떨어져도 알 수 있게 창 전체에서 받는다
+  const up = (e: PointerEvent) => {
     if (x0 === null) return;
-    const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-    const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+    const dx = e.clientX - x0;
     x0 = null;
-    if (Math.abs(dx) < 36 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (Math.abs(dx) < 30) return;
+    dragged = true;
     if (dx > 0 && !wiki.listOpen) act('open');
     else if (dx < 0 && wiki.listOpen) act('close');
+  };
+  bar.addEventListener('pointerdown', (e) => {
+    x0 = e.clientX;
+    dragged = false;
+    window.addEventListener('pointerup', up, { once: true });
+  });
+  // 끈 다음에 따라오는 누르기는 무시
+  bar.addEventListener('click', (e) => {
+    if (!dragged) return;
+    dragged = false;
+    e.stopPropagation();
+    e.preventDefault();
+  }, true);
+  let t0: { x: number; y: number } | null = null;
+  panel.addEventListener('touchstart', (e) => (t0 = { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }), { passive: true });
+  panel.addEventListener('touchend', (e) => {
+    if (!t0) return;
+    const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
+    const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
+    t0 = null;
+    if (dx < -36 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
   }, { passive: true });
 }
 
@@ -489,6 +533,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-home':
       go('home');
       wiki.history = [];
+      wiki.listOpen = false;
       break;
     case 'wiki-back': {
       // 문서 안 링크로 옮겨 다닌 길을 거슬러 가고, 처음 화면이면 목록으로
@@ -499,26 +544,19 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     }
     case 'wiki-list':
       wiki.listOpen = v === 'open' ? true : v === 'close' ? false : !wiki.listOpen;
-      if (!wiki.listOpen) wiki.key = '';
       env.render();
       if (wiki.listOpen && wide() && !v) document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
       return true;
-    case 'wiki-key': {
-      // 가나다 상자: 목록을 펴고 그 자음으로. 이미 펼친 채 같은 상자를 다시 누르면 접는다
-      if (wiki.listOpen && wiki.key === v && !wiki.query) {
-        Object.assign(wiki, { listOpen: false, key: '' });
-        break;
-      }
-      Object.assign(wiki, { listOpen: true, key: v, query: '' });
-      env.render();
-      const list = document.querySelector<HTMLElement>('.nw .nw-list');
-      const sec = list?.querySelector<HTMLElement>(`[data-ksec="${v}"]`);
-      if (list && sec) list.scrollTop = sec.offsetTop - list.offsetTop;
-      return true;
+    case 'wiki-random': {
+      const docs = listDocs(ctx.chat).filter((d) => d.title !== wiki.title);
+      if (!docs.length) break;
+      wiki.history = [];
+      go('doc', docs[Math.floor(Math.random() * docs.length)].title);
+      break;
     }
     case 'wiki-search':
       search(ctx, v);
-      if (wiki.view === 'compose' || wiki.view === 'doc') Object.assign(wiki, { listOpen: false, key: '' });
+      if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
       break;
     case 'wiki-pick':
       // 왼쪽 목록에서 고르기. PC는 열린 항목을 다시 누르면 닫힌다
@@ -529,7 +567,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.history = [];
       openTitle(ctx, v, 'search');
       // 고르면 목록을 접어 문서를 넓게
-      if (wiki.view !== 'home') Object.assign(wiki, { listOpen: false, key: '' });
+      if (wiki.view !== 'home') wiki.listOpen = false;
       break;
     case 'wiki-open':
       // 문서 안 링크·관련 문서 칩: 없는 문서는 부모 문서의 원본 자료를 물려받는다
@@ -539,12 +577,12 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       if (!v.trim()) break;
       wiki.newTitle = '';
       openTitle(ctx, v, 'direct');
-      if (wiki.view === 'compose' || wiki.view === 'doc') Object.assign(wiki, { listOpen: false, key: '' });
+      if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
       break;
     case 'wiki-new':
       if (wiki.view === 'new') go('home');
       else go('new');
-      if (!wide()) wiki.listOpen = false;
+      wiki.listOpen = false;
       break;
     case 'wiki-start':
       if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false);
@@ -580,7 +618,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-settings':
       if (wiki.view === 'settings') go('home');
       else go('settings');
-      if (!wide()) wiki.listOpen = false;
+      wiki.listOpen = false;
       break;
     case 'wiki-save-default':
       try {

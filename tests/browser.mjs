@@ -729,11 +729,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.evaluate((a) => { window.__llm = [{ type: 'success', result: a }]; }, article('아무 제목'));
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
-  await page.waitForSelector('.nw .ph-search');
+  await page.waitForSelector('.nw-rail');
   assert.equal(await page.locator('.gx-panel form').count(), 0, 'form을 쓰지 않음');
-  // 왼쪽 목록: 처음엔 펼쳐져 있고, 문서가 없으면 안내만
-  assert.equal(await page.locator('.nw-app.list-open').count(), 1);
-  assert.equal(await page.locator('.nw-key[data-action="wiki-key"]').count(), 0);
+  // 첫 화면은 위키 메인, 목록은 접혀 있다가 세로바를 누르면 펼쳐진다
+  await page.waitForSelector('.nw-home .nw-hero');
+  assert.equal(await page.locator('.nw-app.list-open').count(), 0);
+  await page.click('.nw-grab');
+  await page.waitForSelector('.nw-app.list-open');
   await page.fill('.nw .ph-search', '소라');
   await page.waitForSelector('.nw .ph-content .ph-sec');
   assert.ok((await page.textContent('.nw .ph-content')).includes('소라 랜드'), '입력하는 동안 명부 전체에서 걸러 보인다');
@@ -789,39 +791,51 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-toast');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
   await page.click('[data-action="wiki-settings"]');
-  // 가나다 목록: 상자 줄을 펴면 자음별로
-  await page.click('.nw-toggle');
+  // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
+  await page.click('.nw-rail [data-action="wiki-home"]');
+  await page.waitForSelector('.nw-home .nw-card');
+  assert.ok((await page.textContent('.nw-home')).includes('소라 랜드 괴담'), '작성이 필요한 문서');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-main.png` });
+  await page.click('.nw-card[data-value="소라 랜드"]');
+  await page.waitForSelector('.nw-doc');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-wide.png` });
+  // 세로바를 옆으로 끌면 목록이 본문 위로 펼쳐진다 (본문 칸 너비는 그대로)
+  const paneW = await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width);
+  const g = await page.locator('.nw-grab').boundingBox();
+  await page.mouse.move(g.x + 10, g.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(g.x + 120, g.y + 100, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForSelector('.nw-app.list-open');
+  assert.equal(await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width), paneW);
   await page.fill('.nw .ph-search', '');
   await page.dispatchEvent('.nw .ph-search', 'input');
   await page.waitForSelector('.nw .nw-list .nw-ksec');
   assert.equal((await page.textContent('.nw-ksec')).replace(/\d+/g, ''), 'ㅅ');
-  // 고르면 목록이 접히고 문서가 넓게
-  await page.click('.nw-list [data-action="wiki-pick"][data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-doc');
-  assert.equal(await page.locator('.nw-app.list-open').count(), 0, '고르면 접힘');
-  if (shots) await page.screenshot({ path: `${shots}/13-wiki-wide.png` });
-  // 상자를 누르면 그 자음으로 펼침
-  await page.click('[data-action="wiki-key"][data-value="ㅅ"]');
-  await page.waitForSelector('.nw-app.list-open');
+  await page.waitForTimeout(300);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-home.png` });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-list-mobile.png` });
-  await page.click('.nw-scrim', { position: { x: 370, y: 400 } });
+  await page.click('.nw-scrim', { position: { x: 300, y: 400 } });
   await page.waitForSelector('.nw-app:not(.list-open)');
+  await page.waitForTimeout(300);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
-  // 모바일: 상자 줄을 오른쪽으로 밀면 펼침, 왼쪽으로 밀면 접힘
-  const swipe = (sel, dx) => page.evaluate(([sel, dx]) => {
-    const el = document.querySelector(sel);
-    const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 })];
-    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(20), changedTouches: t(20) }));
-    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(20 + dx) }));
-  }, [sel, dx]);
-  await swipe('.nw-rail', 120);
+  await page.click('.nw-rail [data-action="wiki-home"]');
+  await page.waitForSelector('.nw-home');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-main-mobile.png` });
+  // 모바일: 펼친 목록을 왼쪽으로 밀면 접힘
+  await page.click('.nw-grab');
   await page.waitForSelector('.nw-app.list-open');
-  await swipe('.nw-list', -120);
+  await page.evaluate(() => {
+    const el = document.querySelector('.nw-list');
+    const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 })];
+    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(200), changedTouches: t(200) }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(60) }));
+  });
   await page.waitForSelector('.nw-app:not(.list-open)');
   await page.setViewportSize({ width: 1100, height: 900 });
+  await page.click('.nw-card[data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.waitForFunction(() => window.__chat.localLore.length === 0);
