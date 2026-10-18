@@ -396,7 +396,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (view.kind === 'started' && action.startsWith('set-')) {
-    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope);
+    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
     return;
   }
   if (action === 'upd-go') {
@@ -511,7 +511,7 @@ async function start(): Promise<void> {
       const theme = getPrefs().theme ?? 'dark';
       return {
         ...next,
-        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(next.scriptstate ?? {}) },
+        scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...(getPrefs().vars ?? {}), ...(next.scriptstate ?? {}) },
       };
     });
     if (!saved) throw new StartError('저장하지 못했어요.');
@@ -624,6 +624,11 @@ function render(): void {
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
   const logKeep = log && logRoom === (phone.room ?? '') ? (log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop) : -1;
+  // 괴담넷: 같은 글·쪽지를 보고 있으면 목록과 본문의 스크롤 자리를 지킨다 (답글을 누르면 맨 위로 튀던 문제)
+  const gnKey = `${gnet.sub}:${gnet.open}:${gnet.openDm}`;
+  const gnKeep = tab === 'gnet' && root.dataset.tab === 'gnet' && root.dataset.gn === gnKey
+    ? ['.gn .ph-content', '.gn-pane .gn-doc'].map((q) => root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0)
+    : null;
   root.dataset.theme = themeOf();
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
@@ -638,6 +643,11 @@ function render(): void {
     // 사진이 늦게 뜨면 높이가 바뀌므로 맨 아래를 보던 중이면 한 번 더
     if (logKeep < 0) nlog.querySelectorAll('img').forEach((img) => img.addEventListener('load', () => (nlog.scrollTop = nlog.scrollHeight), { once: true }));
   }
+  root.dataset.gn = gnKey;
+  if (gnKeep) ['.gn .ph-content', '.gn-pane .gn-doc'].forEach((q, i) => {
+    const el = root!.querySelector<HTMLElement>(q);
+    if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
+  });
   hydratePhotos(root);
   bindMapZoom(root);
   bindMbar(root, () => void handle('close'));
@@ -667,7 +677,7 @@ function startedBody(ctx: ChatContext): string {
     case 'phone':
       return phoneTab(ctx, phoneEnv);
     case 'settings':
-      return settingsTab(ctx, settingsUi.scope);
+      return settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
     default:
       return board(ctx);
   }

@@ -21,6 +21,7 @@ import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { runModel } from '../host/llm';
+import { saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 
 type Sub = 'contacts' | 'chats' | 'notices';
@@ -865,7 +866,7 @@ function settingsView(ctx: ChatContext): string {
     const st = phoneStorage(ctx.chat.scriptstate, k);
     return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
   };
-  return `<div class="ph-form">${paneHead('괴담톡 설정', '이 채팅에만 적용돼요')}
+  return `<div class="ph-form">${paneHead('괴담톡 설정', '지금 채팅에 적용돼요', `<span class="ph-act">${saveDefaultBtn('ph-save-default')}</span>`)}
     <div class="ph-form-body ps">
       ${group('답장', [
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
@@ -888,6 +889,9 @@ function settingsView(ctx: ChatContext): string {
       ].join(''))}
     </div></div>`;
 }
+
+/** 설정 화면 오른쪽 위: 지금 값을 새 채팅 기본값으로 */
+export const saveDefaultBtn = (action: string) => `<button class="gx-mini ps-save" data-action="${action}" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`;
 
 /** 왼쪽 목록 (연락처·대화·공지) */
 function listHtml(ctx: ChatContext, st: PState, d: Directory): string {
@@ -1163,6 +1167,14 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       phone.confirm = null;
       await deleteContact(ctx, env, v);
       return true;
+    case 'ph-save-default':
+      try {
+        await saveVarDefaults(['$ph_'], ctx.chat.scriptstate);
+        phone.notice = '지금 괴담톡 설정을 새 채팅 기본값으로 저장했어요.';
+      } catch (error) {
+        phone.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      break;
     case 'ph-cfg': {
       const [k, val] = v.split('=');
       const vars: Record<string, string> = { [PH(k)]: val };

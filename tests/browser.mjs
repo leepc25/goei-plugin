@@ -778,13 +778,20 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok(prev.includes('[이전 위키'), '새로고침은 이전 문서를 넘긴다');
   // 목록, 설정, 작성 지침, 삭제
   await page.click('[data-action="wiki-home"]');
-  await page.waitForSelector('.nw-settings');
+  // 설정은 따로 (괴담톡·괴담넷처럼), 「기본값으로 저장」은 플러그인 저장소에
+  await page.click('[data-action="wiki-settings"]');
+  await page.waitForSelector('.nw-setpane');
   await page.click('[data-action="wiki-length"][data-value="short"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
-  await page.click('.nw-req summary');
   await page.fill('.nw-reqbox', '목격담 위주로');
   await page.dispatchEvent('.nw-reqbox', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_writing_request === '목격담 위주로');
+  await page.click('[data-action="wiki-save-default"]');
+  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').vars?.$nw_length === 'short');
+  await page.waitForSelector('.gx-toast');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
+  await page.click('[data-action="wiki-settings"]');
+  await page.waitForSelector('[data-action="wiki-delete"]');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-home.png` });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
@@ -831,6 +838,10 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   if (shots) await page.screenshot({ path: `${shots}/14-gnet-post.png` });
   // 답글: 내 댓글은 먼저 저장, 반응과 선쪽지는 같은 응답으로
   await page.click('[data-action="gn-reply"][data-value="' + (B + 2) + ':2"]');
+  // 답글 입력줄은 그 댓글 바로 밑에 열리고, 아래 댓글 입력줄은 숨는다
+  assert.equal(await page.locator('.gn-c-compose [data-input="gn-draft"]').count(), 1);
+  assert.equal(await page.locator('[data-input="gn-draft"]').count(), 1);
+  if (shots) await page.screenshot({ path: `${shots}/14-gnet-reply.png` });
   await page.fill('[data-input="gn-draft"]', '그 폰 나도 꺼졌음');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ comments: [{ author: 'abc92', content: '헐 너도?', parent: 3 }, { author: '익명', content: '엉뚱', parent: 1 }], incoming: [{ nick: '관람차덕후', body: '혹시 몇 시쯤이었음?' }], activity: [{ id: 1846001, viewsDelta: 5 }] }) }]; });
   await page.click('[data-action="gn-send"]');
@@ -859,7 +870,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     await page.screenshot({ path: `${shots}/14-gnet-dm-mobile.png` });
     assert.equal(await page.locator('.gn-dm-inline').count(), 1, '모바일 쪽지는 목록 안에서 펼침');
     await page.click('[data-action="gn-sub"][data-value="board"]');
+    await page.screenshot({ path: `${shots}/14-gnet-post-mobile0.png` });
     await page.click('.gn-inline [data-action="gn-reply"] >> nth=0');
+    assert.equal(await page.locator('.gn-inline .gn-c-compose').count(), 1, '모바일 답글도 댓글 밑에서');
     await page.screenshot({ path: `${shots}/14-gnet-post-mobile.png` });
     await page.click('[data-action="gn-cancel"]');
     await page.click('.gn-row.on .gn-row-main');
@@ -1091,13 +1104,11 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
   await page.click('[data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
-  // 새 채팅 기본값: 플러그인 저장소에만, 이 채팅은 그대로
-  await page.click('[data-action="set-scope"][data-value="defaults"]');
-  await page.waitForFunction(() => document.querySelector('[data-action="set-scope"][data-value="defaults"]')?.getAttribute('aria-pressed') === 'true');
-  await page.click('[data-action="set-world"][data-value="random_cap:+"]');
-  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.random_cap === 2);
-  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_random_cap), '1', '기본값을 바꿔도 진행 중 채팅은 그대로');
-  await page.click('[data-action="set-scope"][data-value="chat"]');
+  // 설정은 하나: 「기본값으로 저장」을 누르면 지금 채팅 값이 새 채팅 기본값으로 (v0.16.23)
+  assert.equal(await page.$('[data-action="set-scope"][data-value="defaults"]'), null, '이 채팅/기본값 두 벌 없음');
+  await page.click('[data-action="set-save-default"]');
+  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.preset_cap === 3);
+  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, 'paper');
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
   await page.click('[data-action="set-agent"][data-value="n:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_agent_limit === '11');

@@ -10,6 +10,7 @@ import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
 import { directoryView } from './directory';
+import { toast } from './toast';
 
 export interface SettingsEnv {
   render: () => void;
@@ -19,7 +20,7 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { confirmOff: false, busy: false, notice: '', scope: 'chat' as SettingsScope };
+export const settingsUi = { confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -100,17 +101,22 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
   </div></div>`;
 }
 
+// v0.16.23 (사용자 설계): 「이 채팅 / 새 채팅 기본값」으로 같은 설정을 두 벌 두지 않는다. 설정은 하나(지금 채팅)이고,
+// 「기본값으로 저장」을 누르면 지금 값이 새 채팅 기본값이 된다. 채팅을 시작하기 전에는 기본값을 바로 고친다.
 const SCOPE_HELP: Record<SettingsScope, string> = {
-  chat: '지금 채팅에만 적용돼요.',
-  defaults: '앞으로 시작하는 채팅에 적용돼요. 이미 진행 중인 채팅은 그대로예요.',
+  chat: '지금 채팅에 적용돼요.',
+  defaults: '채팅을 시작하기 전이라 새 채팅 기본값을 고쳐요.',
   card: '이 카드의 괴이·특수·요원 정보예요.',
 };
 
 function scopeBar(scope: SettingsScope, canChat: boolean): string {
-  const items: [SettingsScope, string][] = [...(canChat ? ([['chat', '이 채팅']] as [SettingsScope, string][]) : []), ['defaults', '새 채팅 기본값'], ['card', '카드 명부']];
-  return `<div class="gx-segs st-scope">${items
+  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '카드 명부']];
+  const save = scope === 'chat'
+    ? `<button class="gx-mini ps-save" data-action="set-save-default" title="새 채팅도 지금 설정으로 시작해요" ${settingsUi.busy ? 'disabled' : ''}>기본값으로 저장</button>`
+    : '';
+  return `<div class="st-scopebar"><div class="gx-segs st-scope">${items
     .map(([k, label]) => `<button class="gx-seg${scope === k ? ' on' : ''}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`)
-    .join('')}</div><p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>`;
+    .join('')}</div>${save}</div><p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>`;
 }
 
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
@@ -150,6 +156,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
     ${updateGroup(ctx)}
     ${canChat ? '<p class="gx-muted">괴담넷·괴담톡·위키 설정은 각 탭 안에 있어요.</p>' : ''}
+    ${toast('st', settingsUi.info, (t) => {
+      if (settingsUi.info === t) settingsUi.info = '';
+    })}
   </main>`;
 }
 
@@ -204,6 +213,14 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
 export async function handleSettings(action: string, value: string | undefined, ctx: ChatContext, env: SettingsEnv, scope: SettingsScope = 'chat'): Promise<boolean> {
   const v = value ?? '';
   const lore = ctx.char.globalLore;
+  if (action === 'set-save-default') {
+    // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
+    const cur = current(ctx, 'chat');
+    await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
+    if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
+    env.render();
+    return true;
+  }
   if (action === 'set-scope') {
     settingsUi.scope = v === 'defaults' || v === 'card' ? v : 'chat';
     settingsUi.confirmOff = false;

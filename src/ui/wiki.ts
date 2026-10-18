@@ -8,9 +8,12 @@ import {
   type WikiMeta, type WikiSettings,
 } from '../core/wiki';
 import { runModel } from '../host/llm';
+import { saveVarDefaults } from '../host/prefs';
+import { ICONS } from './icons';
+import { toast } from './toast';
 import { updateChat, type ChatContext } from '../host/risu';
 
-type WikiView = 'home' | 'query' | 'compose' | 'doc';
+type WikiView = 'home' | 'query' | 'compose' | 'doc' | 'settings';
 
 interface WikiState {
   view: WikiView;
@@ -24,10 +27,12 @@ interface WikiState {
   confirmDelete: string | null;
   failure: { title: string; reason: string; raw: string } | null;
   notice: string;
+  /** 잠깐 떴다 사라지는 안내 */
+  info: string;
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '',
+  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '',
 };
 
 export function resetWiki() {
@@ -195,7 +200,7 @@ export function wikiSuggest(ctx: ChatContext, q: string): string {
 
 function searchBar(): string {
   // Risu 플러그인 창은 form 제출이 막힌 iframe이라 form을 쓰지 않는다 (Enter·버튼을 직접 처리)
-  return `<div class="nw-search"><input class="gx-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="문서 제목 검색 또는 새 제목" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="gx-mini" data-action="wiki-search" data-take="wiki-q">검색</button></div>
+  return `<div class="nw-search"><input class="gx-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="문서 제목 검색 또는 새 제목" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="gx-mini" data-action="wiki-search" data-take="wiki-q">검색</button>${settingsBtn()}</div>
     <div class="nw-suggest" role="listbox">${SUGGEST.html}</div>`;
 }
 
@@ -206,8 +211,31 @@ function requestBox(ctx: ChatContext): string {
     <p class="gx-muted">비우기 전까지 이후 모든 문서 작성에 쓰여요.</p></details>`;
 }
 
-function home(ctx: ChatContext): string {
+/** 위키 설정 버튼 (괴담톡·괴담넷처럼 설정 화면을 따로) */
+const settingsBtn = () =>
+  `<button class="ph-tool nw-cfg" data-action="wiki-settings" aria-label="위키 설정" title="위키 설정"${wiki.view === 'settings' ? ' aria-pressed="true"' : ''}>${ICONS.settings}</button>`;
+
+/** 위키 설정: 괴담톡·괴담넷 설정과 같은 줄 모양, 오른쪽 위 「기본값으로 저장」 */
+function settingsView(ctx: ChatContext): string {
   const s = wikiSettings(ctx.chat.scriptstate);
+  const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
+  const row = (label: string, control: string, hint = '') =>
+    `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+  return `<section class="nw-setpane">
+    <header class="nw-sethead"><div><h2>위키 설정</h2><small>지금 채팅에 적용돼요</small></div>
+      <button class="gx-mini ps-save" data-action="wiki-save-default" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button></header>
+    <div class="ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
+      ${row('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
+      ${row('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
+      ${row('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
+      ${row('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
+    </div></section>
+    <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section></div>
+  </section>`;
+}
+
+function home(ctx: ChatContext): string {
   const docs = listDocs(ctx.chat).slice().reverse();
   const rows = docs
     .map((d) => {
@@ -218,12 +246,7 @@ function home(ctx: ChatContext): string {
         <button class="gx-mini${confirm ? ' danger' : ''}" data-action="wiki-delete" data-value="${esc(d.title)}">${confirm ? '정말 삭제' : '삭제'}</button></div></li>`;
     })
     .join('');
-  return `${searchBar()}${requestBox(ctx)}
-    <div class="nw-settings">
-      <label>분량</label>${seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']])}
-      <label>작성 모드</label>${seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']])}
-      <label>모델</label>${seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']])}
-    </div>
+  return `${searchBar()}
     <section class="gx-sec"><h2>문서<small>${docs.length}</small></h2>
     ${docs.length ? `<ul class="gx-list gx-evs">${rows}</ul>` : '<p class="gx-none">아직 문서가 없어요. 위에서 제목을 검색하거나 새 제목을 적어 보세요.</p>'}</section>`;
 }
@@ -285,12 +308,15 @@ function docView(ctx: ChatContext): string {
 export function wikiTab(ctx: ChatContext): string {
   SUGGEST.html = wiki.view === 'query' ? '' : wikiSuggest(ctx, wiki.query);
   const back = wiki.history.length ? '<button class="gx-mini" data-action="wiki-back">← 뒤로</button>' : '';
-  const nav = `<div class="nw-nav">${back}<button class="gx-mini" data-action="wiki-home">목록</button></div>`;
-  const view = wiki.view === 'doc' ? docView(ctx) : wiki.view === 'compose' ? compose(ctx) : wiki.view === 'query' ? queryView(ctx) : home(ctx);
+  const nav = `<div class="nw-nav">${back}<button class="gx-mini" data-action="wiki-home">목록</button><span class="nw-nav-gap"></span>${wiki.view === 'query' ? '' : settingsBtn()}</div>`;
+  const view = wiki.view === 'doc' ? docView(ctx) : wiki.view === 'compose' ? compose(ctx) : wiki.view === 'query' ? queryView(ctx) : wiki.view === 'settings' ? settingsView(ctx) : home(ctx);
+  const note = toast('nw', wiki.info, (t) => {
+    if (wiki.info === t) wiki.info = '';
+  });
   const fail = wiki.failure
     ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc(wiki.failure.title)})</summary><p>${esc(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc(wiki.failure.raw)}</textarea></details>`
     : '';
-  return `<main class="gx-body nw">${wiki.view === 'home' ? '' : nav}${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}${view}${fail}</main>`;
+  return `<main class="gx-body nw">${wiki.view === 'home' ? '' : nav}${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}${view}${fail}${note}</main>`;
 }
 
 /** 위키 탭의 버튼. 처리했으면 true */
@@ -341,8 +367,24 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-length':
     case 'wiki-mode':
     case 'wiki-model':
+    case 'wiki-refresh_previous':
       await setVar(ctx, env, `$nw_${action.slice(5)}`, v);
       return true;
+    case 'wiki-settings':
+      if (wiki.view === 'settings') {
+        const prev = wiki.history.pop();
+        if (prev) Object.assign(wiki, prev, { confirmDelete: null, notice: '' });
+        else go('home');
+      } else go('settings');
+      break;
+    case 'wiki-save-default':
+      try {
+        await saveVarDefaults(['$nw_'], ctx.chat.scriptstate);
+        wiki.info = '지금 위키 설정을 새 채팅 기본값으로 저장했어요.';
+      } catch (error) {
+        wiki.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      break;
     default:
       return false;
   }

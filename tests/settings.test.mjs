@@ -71,3 +71,9 @@ test('asset pass numbers paragraphs, keeps the status block and enforces limits'
   // 이름 뒤 조사는 인정, 다른 단어의 일부는 아님
   assert.deepEqual(A.activeCharacters('이하은이 왔다. 에일린에게 말했다.', d), ['Aileen']);
 });
+
+test('feature defaults keep only setting variables', () => {
+  const p = S.setPrefs({ vars: { '$ph_model': 'main', '$lb_cfg_lb-gn.privacy': '3', '$nw_length': 'short', '$ph_state': '{}', '$gn_raw': 'x', '$nw_mode': 1 } });
+  assert.deepEqual(p.vars, { '$ph_model': 'main', '$lb_cfg_lb-gn.privacy': '3', '$nw_length': 'short' });
+  S.setPrefs({});
+});

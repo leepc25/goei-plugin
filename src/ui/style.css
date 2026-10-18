@@ -1381,3 +1381,64 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-gbody > .ph-topic:focus, .ph-gbody > .ph-topic:not(:placeholder-shown) { height: 76px; overflow: auto; }
 .ph-gbody > .ph-tabs { padding: 0; }
 @media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }
+/* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
+.gn-pane .gn-doc { gap: 14px; }
+.gn-pane .gn-post { padding: 0 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.gn-pane .gn-post-head { border-top: 0; padding-top: 16px; }
+.gn-pane .gn-post-body { border-bottom: 0; }
+.gn-pane .gn-csec { margin-top: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
+.gn-pane .gn-chead { padding: 12px 16px; border-bottom: 1px solid var(--line2); }
+.gn-pane .gn-c { padding-left: calc(16px + var(--gn-depth, 0) * 20px); padding-right: 10px; }
+.gn-pane .gn-cnone { border-bottom: 0; }
+.gn-c { border-bottom-color: var(--line); }
+.gn-comments > li:last-child { border-bottom: 0; }
+.gn-c.re { background: color-mix(in srgb, var(--panel) 70%, transparent); }
+/* 답글 입력줄: 그 댓글 바로 밑 */
+.gn-c-compose { padding: 8px 10px 10px calc(16px + var(--gn-depth, 1) * 20px); border-bottom: 1px solid var(--line); background: var(--accent-bg); }
+.gn-c-compose .gn-composer { padding: 0; border-top: 0; background: none; }
+.gn-c-compose .ph-back2 { display: none !important; }
+/* 모바일 펼친 글의 댓글 머리줄 오른쪽: 글쓴이 쪽지 또는 내 글 삭제 */
+.gn-chead-act { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; }
+.gn-chead-dm { display: inline-flex; align-items: center; gap: 4px; min-width: 0; color: var(--dim); }
+.gn-chead-dm svg { width: 15px; height: 15px; flex: none; }
+.gn-chead-dm .gn-nick { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 모바일: 여백을 줄여 한 화면에 더 많이 */
+@media (max-width: 760px) {
+  .gn-inline .gn-doc { padding: 0 4px 4px; }
+  .gn-inline .gn-post-body { min-height: 0; padding: 10px 6px 12px; font-size: 15px; line-height: 1.65; }
+  .gn-inline .gn-csec { margin-top: 2px; }
+  .gn-inline .gn-chead { padding: 4px 4px 4px 6px; border-bottom-width: 1px; }
+  .gn-inline .gn-ccount { font-size: 14px; }
+  .gn-c { gap: 0 8px; padding-top: 6px; padding-bottom: 6px; }
+  .gn-c-who { min-height: 24px; font-size: 13.5px; }
+  .gn-c-body { font-size: 14.5px; line-height: 1.55; }
+  .gn-reply { min-height: 24px; padding: 0 8px; font-size: 12.5px; }
+  .gn-c .ph-tool.gn-cdel { width: 24px; height: 24px; }
+  .gn-c-compose { padding: 6px 4px 8px calc(4px + var(--gn-depth, 1) * 14px); }
+}
+/* 설정 줄의 버튼 묶음이 길면 (괴담넷 사생활 다섯 칸) 모바일에서 줄을 넘기지 않고 접는다 */
+@media (max-width: 760px) {
+  .ps-ctl { max-width: 100%; min-width: 0; }
+  .ps-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
+  .ps-ctl .gx-seg { min-width: 0; padding: 0 10px; }
+}
+/* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
+.gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
+.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
+/* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
+.st-scopebar { display: flex; align-items: center; gap: 10px; }
+.st-scopebar .st-scope { flex: 1; min-width: 0; margin: 0; }
+.ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
+.ps-save:hover { background: var(--accent-bg); }
+.ph-room-head .ph-act .ps-save { margin-right: 4px; }
+.nw > .gx-toast, .gx-settings > .gx-toast { position: fixed; bottom: 96px; }
+/* 위키: 검색줄·위 줄 오른쪽 끝 설정 버튼, 설정 화면 */
+.nw-search .nw-cfg, .nw-nav .nw-cfg { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; }
+.nw-nav { align-items: center; }
+.nw-nav-gap { flex: 1; }
+.nw-setpane { display: flex; flex-direction: column; gap: 14px; }
+.nw-sethead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.nw-sethead h2 { margin: 0; font-size: 17px; }
+.nw-sethead small { color: var(--dim); font-size: 13px; }
+.nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
+.st-scopebar + .st-scope-help { margin: 6px 0 0; }

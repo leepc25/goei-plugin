@@ -87,9 +87,14 @@ export interface Prefs {
   basic: Partial<BasicSettings>;
   world: Partial<WorldSettings>;
   theme?: Theme;
+  /** 괴담톡·괴담넷·위키 설정의 새 채팅 기본값: 채팅 변수 이름 → 값 (각 설정 화면의 「기본값으로 저장」) */
+  vars?: Record<string, string>;
 }
 
 let prefs: Prefs = { basic: {}, world: {} };
+
+/** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request))$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -115,7 +120,11 @@ export function setPrefs(raw: unknown): Prefs {
     if (n !== null) world[f.key] = n;
   }
   const theme = o.theme === 'light' || o.theme === 'dark' || o.theme === 'paper' ? o.theme : undefined;
-  prefs = { basic, world, ...(theme ? { theme } : {}) };
+  const vars: Record<string, string> = {};
+  if (o.vars && typeof o.vars === 'object') {
+    for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
+  }
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}) };
   return prefs;
 }
 
