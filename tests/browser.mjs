@@ -80,7 +80,7 @@ const browser = await chromium.launch();
 // 실패하면 브라우저를 닫고 바로 끝낸다 (열린 브라우저 때문에 멈춘 채 남지 않게)
 process.on('unhandledRejection', async (e) => { console.error('FAIL', e); await browser.close().catch(() => {}); process.exit(1); });
 async function boot(char, chat, viewport = process.env.VP ? { width: +process.env.VP.split('x')[0], height: +process.env.VP.split('x')[1] } : { width: 1100, height: 900 }, opts = {}) {
-  const page = await browser.newPage({ viewport });
+  const page = await browser.newPage({ viewport, ...(opts.touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.exposeFunction('__readAsset', (p) => {
@@ -730,10 +730,49 @@ if (fixture.globalLore.some(packed)) {
     assert.ok(await page.locator('.nw-body .nw-fn').count() >= 8, '각주');
     assert.equal(await page.evaluate(() => (window.__calls.llm || []).length), 0, '기본 문서는 생성하지 않음');
     if (shots) { await page.waitForTimeout(800); await page.screenshot({ path: `${shots}/13-wiki-base.png`, fullPage: true }); }
+    // 각주: 마우스를 올리면 내용 창, 누르면 아래 목록으로
+    await page.hover('.nw-body .nw-fn[data-fn="2"]');
+    await page.waitForSelector('.nw-fnpop:not([hidden])');
+    const note2 = (await page.textContent('.nw-notes li[data-fn="2"]')).trim();
+    assert.ok((await page.textContent('.nw-fnpop')).includes(note2.slice(0, 20)));
+    if (shots) await page.screenshot({ path: `${shots}/13-wiki-fn-hover.png` });
+    await page.click('.nw-body .nw-fn[data-fn="2"]');
+    await page.waitForSelector('.nw-notes li[data-fn="2"].hit');
+    await page.waitForTimeout(700);
+    const seen = await page.evaluate(() => {
+      const li = document.querySelector('.nw-notes li[data-fn="2"]').getBoundingClientRect();
+      const doc = document.querySelector('.nw-doc').getBoundingClientRect();
+      return li.top >= doc.top && li.bottom <= doc.bottom;
+    });
+    assert.ok(seen, '누르면 각주 목록이 보이게 내려감');
   }
   assert.deepEqual(errors, []);
-  console.log('PASS 위키 카드 기본 문서');
   await page.close();
+  // 터치 화면: 누르면 내용 창만, 내려가지 않음
+  {
+    const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, { width: 390, height: 844 }, { touch: true });
+    const scrollTop = () => page.evaluate(() => document.querySelector('.nw-doc').scrollTop);
+    await startedWithReply(page);
+    await open(page);
+    await page.locator('[data-action="tab"][data-value="wiki"]:visible').first().click();
+    await page.waitForSelector('.nw-home');
+    await page.fill('.nw-home .gx-search', '소라 랜드');
+    await page.press('.nw-home .gx-search', 'Enter');
+    await page.waitForSelector('.nw-dochead');
+    await page.locator('.nw-body .nw-fn[data-fn="1"]').scrollIntoViewIfNeeded();
+    const top0 = await scrollTop();
+    await page.tap('.nw-body .nw-fn[data-fn="1"]');
+    await page.waitForSelector('.nw-fnpop:not([hidden])');
+    await page.waitForTimeout(500);
+    const top1 = await scrollTop();
+    assert.equal(top1, top0, '터치는 내려가지 않음');
+    if (shots) await page.screenshot({ path: `${shots}/13-wiki-fn-touch.png` });
+    await page.tap('.nw-body .nw-fn[data-fn="1"]');
+    await page.waitForSelector('.nw-fnpop[hidden]', { state: 'attached' });
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+  console.log('PASS 위키 카드 기본 문서, 각주 창');
 }
 
 // 13) 위키: 검색 → 작성 화면 → 생성·저장 → 링크 → 실패 시 기존 문서 유지 → 삭제 (기본 문서가 없는 카드로)

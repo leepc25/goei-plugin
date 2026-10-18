@@ -368,7 +368,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
       .replace(/✂️([^✂]+?)✂️/g, '<s>$1</s>')
       .replace(/📌([^📌]+?)📌/gu, (_all, t: string) => {
         notes.push(t);
-        return `<sup class="nw-fn">[${notes.length}]</sup>`;
+        return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
       });
   const lines = innerBody(body).split('\n');
   type Block = { tag: string; text: string };
@@ -443,7 +443,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
     }
   }
   flushList();
-  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ol>`);
+  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${n}</li>`).join('')}</ol>`);
   const links = (keys: string[]) => keys.map((k) => a[k]).filter((t): t is string => !!t && validTitle(t)).map((t) => o.canon(t));
   return { html: out.join(''), title: a.doc_title || '', related: links(['related1', 'related2', 'related3']), recent: links(['recent1', 'recent2', 'recent3']), headings: headings.map((h) => h.title) };
 }

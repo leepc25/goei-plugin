@@ -106,7 +106,7 @@ test('wiki: accept forces the title, escapes templates, cleans links; render bui
   assert.deepEqual(r.headings, ['개요', '소문']);
   assert.ok(r.html.includes('<table class="nw-infobox"') && r.html.includes('<b>폐장</b>'));
   assert.ok(r.html.includes('class="nw-link on" data-action="wiki-open" data-value="쟈알디"'));
-  assert.ok(r.html.includes('<sup class="nw-fn">[1]</sup>') && r.html.includes('<ol class="nw-notes"><li>1999년 기준.</li></ol>'));
+  assert.ok(r.html.includes('<sup class="nw-fn" data-fn="1" role="button" tabindex="0">[1]</sup>') && r.html.includes('<ol class="nw-notes"><li data-fn="1">1999년 기준.</li></ol>'));
   assert.ok(r.html.includes('<s>농담</s>') && r.html.includes('<cite>— 경비원</cite>') && r.html.includes('--nw:#123456'));
   assert.ok(r.html.includes('{{getvar::x}}'), '본문의 템플릿은 글자로 보인다 (창에서는 해석되지 않음)');
   assert.ok(!/<script/i.test(renderArticle('<lightboard-namuwiki>[Paragraph]<script>x</script></lightboard-namuwiki>', { saved: () => false, canon }).html));

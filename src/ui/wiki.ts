@@ -13,7 +13,7 @@ import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { saveVarDefaults } from '../host/prefs';
-import { ICONS } from './icons';
+import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
@@ -427,7 +427,7 @@ function homeView(ctx: ChatContext): string {
   const sec = (title: string, n: number, inner: string) => `<section class="nw-hsec"><h3>${title}${n ? `<b>${n}</b>` : ''}</h3>${inner}</section>`;
   return `<div class="nw-home">
     <section class="nw-hero">
-      <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
+      <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off"></div>
     </section>
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
@@ -573,6 +573,73 @@ export function wikiTab(ctx: ChatContext): string {
 }
 
 /** 목록 서랍: 세로바를 옆으로 밀면(마우스 끌기 포함) 펼치고, 펼친 목록을 왼쪽으로 밀면 접는다 */
+/**
+ * 각주: PC(마우스)는 번호에 올리면 내용 창, 누르면 아래 각주 목록으로 내려간다.
+ * 터치 화면은 누르면 내용 창만 (다시 누르거나 바깥을 누르면 닫힘). 문서를 다시 그릴 때마다 새로 붙인다
+ */
+export function bindFootnotes(root: HTMLElement): void {
+  const doc = root.querySelector<HTMLElement>('.nw-doc');
+  if (!doc?.querySelector('.nw-fn')) return;
+  const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const pop = document.createElement('div');
+  pop.className = 'nw-fnpop';
+  pop.hidden = true;
+  doc.appendChild(pop);
+  let cur: HTMLElement | null = null;
+  const hide = () => {
+    pop.hidden = true;
+    cur = null;
+  };
+  const show = (sup: HTMLElement) => {
+    const li = doc.querySelector<HTMLElement>(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+    if (!li) return;
+    cur = sup;
+    pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${li.innerHTML}`;
+    pop.hidden = false;
+    // 문서 칸 안에서 번호 바로 아래 (아래가 모자라면 위), 좌우는 칸 밖으로 안 나가게
+    const box = doc.getBoundingClientRect();
+    const r = sup.getBoundingClientRect();
+    const w = Math.min(360, box.width - 24);
+    pop.style.width = `${w}px`;
+    const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
+    let top = r.bottom - box.top + doc.scrollTop + 6;
+    if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+  };
+  const supOf = (e: Event) => (e.target as HTMLElement).closest<HTMLElement>('.nw-fn');
+  if (hover) {
+    doc.addEventListener('mouseover', (e) => {
+      const sup = supOf(e);
+      if (sup && sup !== cur) show(sup);
+    });
+    doc.addEventListener('mouseout', (e) => {
+      if (supOf(e) && !(e.relatedTarget as HTMLElement | null)?.closest?.('.nw-fn')) hide();
+    });
+  }
+  doc.addEventListener('click', (e) => {
+    const sup = supOf(e);
+    if (!sup) {
+      if (!hover && !(e.target as HTMLElement).closest('.nw-fnpop')) hide();
+      return;
+    }
+    e.preventDefault();
+    if (!hover) {
+      if (cur === sup) hide();
+      else show(sup);
+      return;
+    }
+    hide();
+    const li = doc.querySelector<HTMLElement>(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+    if (!li) return;
+    li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    li.classList.remove('hit');
+    void li.offsetWidth;
+    li.classList.add('hit');
+  });
+  doc.addEventListener('scroll', () => !hover && hide(), { passive: true });
+}
+
 export function bindWikiSide(root: HTMLElement, act: (value: string) => void): void {
   const bar = root.querySelector<HTMLElement>('.nw-rail');
   const panel = root.querySelector<HTMLElement>('.nw-panel');
