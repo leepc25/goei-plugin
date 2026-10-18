@@ -191,15 +191,18 @@ export function directoryPhotoList(ctx: ChatContext): string {
   if (!p) return '';
   const q = dirUi.pickQ.trim().toLowerCase();
   const near = p.english.toLowerCase();
-  const all = assetNames(ctx.char).filter((n) => !q || n.toLowerCase().includes(q));
-  const list = [...all.filter((n) => near && n.toLowerCase().startsWith(near)), ...all.filter((n) => !near || !n.toLowerCase().startsWith(near))].slice(0, 30);
-  if (!list.length) return `<p class="gx-muted dir-empty">${q ? '찾는 이름의 이미지가 없어요.' : '카드나 에셋 모듈에 이미지가 없어요.'}</p>`;
-  return list
+  // 모듈까지 수천 장이라 한 번에 30장만 그린다. 검색어가 없으면 영문명으로 시작하는 것(표정 세트)만
+  const all = assetNames(ctx.char);
+  const hits = q ? all.filter((n) => n.toLowerCase().includes(q)) : near ? all.filter((n) => n.toLowerCase().startsWith(near)) : [];
+  const list = [...hits.filter((n) => near && n.toLowerCase().startsWith(near)), ...hits.filter((n) => !near || !n.toLowerCase().startsWith(near))];
+  if (!list.length) return `<p class="gx-muted dir-empty">${q ? '찾는 이름의 이미지가 없어요.' : `이미지 ${all.length}장 중에서 이름으로 검색해 주세요.`}</p>`;
+  const more = list.length > 30 ? `<p class="gx-muted dir-empty">${list.length}장 중 30장만 보여요. 검색어를 더 적어 주세요.</p>` : '';
+  return list.slice(0, 30)
     .map((n) => {
       const url = imageUrl(ctx.char, n);
       return `<button class="dir-pic${p.photo === n ? ' on' : ''}" data-action="dir-photo-set" data-value="${esc(`${n}|${dirUi.pick}`)}" title="${esc(n)}"><span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : ''}</span><small>${esc(n)}</small></button>`;
     })
-    .join('');
+    .join('') + more;
 }
 
 function placePanel(p: PlaceRow, ctx: ChatContext): string {
