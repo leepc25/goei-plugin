@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.24
+//@version 0.16.25
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/host/user.ts
@@ -8605,9 +8605,18 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 카드 명부 */
 .dir { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
-.dir-help { padding: 14px 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
-.dir-help p { margin: 0 0 6px; font-size: 15px; line-height: 1.6; }
-.dir-help p:last-child { margin-bottom: 0; }
+.dir-help { border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.dir-help summary { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--sub); cursor: pointer; }
+.dir-help ul { margin: 0; padding: 0 16px 12px 32px; }
+.dir-help li { margin: 0 0 4px; font-size: 14px; line-height: 1.6; }
+.dir-help .gx-hint { margin: 0 14px 12px; }
+.gx-dirdrawer { display: none; }
+@media (max-width: 760px) {
+  .dir-kinds { position: sticky; top: 8px; z-index: 2; margin: 0; padding: 3px; box-shadow: 0 -8px 0 6px var(--void); }
+  .dir-qbox { display: none; }
+  .gx-dirdrawer { display: block; }
+  .gx-dirdrawer .dir-search { margin: 0; }
+}
 .dir-help code { font-family: inherit; font-size: 14px; padding: 1px 6px; border-radius: 6px; background: var(--panel2); color: var(--text); white-space: nowrap; }
 .dir-kinds { display: flex; }
 .dir-kinds .gx-seg { flex: 1; }
@@ -8636,10 +8645,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-in input { min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; }
 .dir-in small { font-size: 12px; color: var(--dim); }
 .dir-empty { padding: 16px 4px; }
-.dir-bar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 8px; margin: 4px -4px 0; padding: 10px 12px; border-radius: 14px; background: var(--sunk); border: 1px solid var(--line); box-shadow: 0 -8px 20px -12px rgba(0,0,0,.6); }
-.dir-status { flex: 1; min-width: 0; font-size: 14px; color: var(--dim); }
-.dir-status.on { color: var(--amber); font-weight: 600; }
-.dir-bar .gx-start { width: auto; min-height: 42px; padding: 0 18px; margin: 0; letter-spacing: 0; font-size: 15px; }
 .dir-kinds .gx-seg { white-space: nowrap; padding: 0 6px; }
 @media (max-width: 760px) {
   .dir-grid { grid-template-columns: 1fr; }
@@ -9470,8 +9475,30 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
 .gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
 /* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
-.st-scopebar { display: flex; align-items: center; gap: 10px; }
-.st-scopebar .st-scope { flex: 1; min-width: 0; margin: 0; }
+.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.st-scopebar .st-scope { flex: none; margin: 0; }
+/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
+.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
+/* 덮어쓰기·불러오기: 전환 탭과 달리 둥근 테두리 + 아이콘, 한 단계 작게 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--line2, var(--line)); border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.st-act svg { width: 16px; height: 16px; flex: none; }
+.st-act.save { border-color: var(--accent-line); color: var(--signal); }
+.st-act:hover:not(:disabled) { background: var(--accent-bg); border-color: var(--signal); color: var(--signal); }
+.st-act:disabled { opacity: .4; cursor: default; }
+/* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
+.st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: -6px; }
+.st-scopebar .st-scope { grid-column: span 2; display: flex; }
+.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
+/* PC: 덮어쓰기·불러오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
+.st-barbtns { grid-column: span 2; justify-self: end; display: flex; gap: 8px; }
+@media (max-width: 760px) {
+  .st-scopebar, .st-barbtns { gap: 6px; }
+  .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
+  .st-act { min-width: 0; min-height: 30px; padding: 0 6px; font-size: 13px; gap: 4px; }
+  .st-act svg { width: 14px; height: 14px; }
+}
+.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p { color: var(--text); }
 .ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
 .ps-save:hover { background: var(--accent-bg); }
 .ph-room-head .ph-act .ps-save { margin-right: 4px; }
@@ -9485,7 +9512,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-sethead h2 { margin: 0; font-size: 17px; }
 .nw-sethead small { color: var(--dim); font-size: 13px; }
 .nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
-.st-scopebar + .st-scope-help { margin: 6px 0 0; }
 /* ── 위키 (v0.16.23): 괴담톡·괴담넷과 같은 두 칸. 왼쪽 명부·작성한 문서, 오른쪽 문서 ── */
 .nw.nw-app .nw-search { display: block; }
 .nw-status:empty { display: none; }
@@ -9511,7 +9537,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-pane .nw-dochead { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 2px; }
 .nw-pane .nw-dochead small { color: var(--dim); font-size: 14px; }
 .nw-ibphoto { padding: 0 !important; background: var(--void) !important; }
-.nw-ibphoto img { display: block; width: 100%; max-height: 320px; object-fit: cover; object-position: top; }
+.nw-ibphoto img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; }
+.nw-ava img { object-position: top; }
 .nw-more { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
 .nw-more + .nw-more { border-top: 0; padding-top: 0; }
 .nw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -9610,9 +9637,16 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
 .nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
 .nw-tabs + .nw-groups { padding-right: 26px; }
-.nw-idx { position: absolute; z-index: 1; right: 2px; bottom: 8px; top: 64px; display: flex; flex-direction: column; justify-content: center; gap: 1px; width: 22px; touch-action: none; user-select: none; }
-.nw-idx button { flex: 0 1 22px; min-height: 14px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--dim); font: inherit; font-size: 11.5px; font-weight: 700; line-height: 1; cursor: pointer; }
-.nw-idx button:hover, .nw-idx button.on { background: var(--accent-bg); color: var(--signal); }
+.nw-kbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; margin-left: -10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.nw-kbtn b { color: var(--dim); font-weight: 600; }
+.nw-kbtn::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
+.nw-kbtn:hover { background: var(--accent-bg); color: var(--signal); }
+.nw-kgrid { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--void) 72%, transparent); }
+.nw-kgrid[hidden] { display: none; }
+.nw-kgrid-in { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.nw-kgrid-in button { height: 52px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
+.nw-kgrid-in button:hover:not(:disabled) { border-color: var(--signal); color: var(--signal); background: var(--accent-bg); }
+.nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
 .nw-card.none { opacity: .6; border-style: dashed; }
 .nw-more-btn { align-self: center; margin-top: 2px; }
 .nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
@@ -9983,7 +10017,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.24" : "0";
+var PLUGIN_VERSION = true ? "0.16.25" : "0";
 
 // src/ui/update.ts
 var esc5 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -10638,6 +10672,13 @@ async function setVar2(ctx, env2, key, value) {
 }
 var CAT_LABEL = { an: "괴이", ms: "특수", lm: "거점", ag: "인물", org: "조직" };
 var CAT_ICON = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
+function photoName(ctx, name) {
+  if (!name) return "";
+  const list5 = ctx.char.additionalAssets ?? [];
+  const want = `${name}_default`.toLowerCase();
+  const hit = list5.find((a) => Array.isArray(a) && typeof a[0] === "string" && a[0].toLowerCase() === want);
+  return hit ? hit[0] : name;
+}
 var entryCache = null;
 function entries(ctx) {
   if (entryCache && entryCache.lore === ctx.char.globalLore) return entryCache.list;
@@ -10645,7 +10686,7 @@ function entries(ctx) {
   const list5 = [];
   const dir2 = readDirectory(ctx.char.globalLore);
   for (const [cat, rows] of [["an", dir2.anomalies], ["ms", dir2.sites]]) {
-    for (const p of rows) list5.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: p.english, terms: [p.label, p.english, ...p.aliases] });
+    for (const p of rows) list5.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: photoName(ctx, p.english), terms: [p.label, p.english, ...p.aliases] });
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
@@ -10653,7 +10694,7 @@ function entries(ctx) {
     }
   } catch {
   }
-  for (const a of dir2.agents) list5.push({ cat: "ag", name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(" · ") || a.english, photo: a.english, terms: [a.name, a.english, ...a.aliases] });
+  for (const a of dir2.agents) list5.push({ cat: "ag", name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(" · ") || a.english, photo: photoName(ctx, a.english), terms: [a.name, a.english, ...a.aliases] });
   for (const f of factionList(ctx.char.globalLore)) {
     if (f.hidden) continue;
     list5.push({ cat: "org", name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : "", photo: f.photo ?? "", terms: [f.name, f.affiliation] });
@@ -10738,9 +10779,10 @@ function wikiList(ctx) {
   const keys = KEYS2.filter((k) => shown2.some((d) => keyOf(d.title) === k));
   const groups = keys.map((k) => {
     const rows = shown2.filter((d) => keyOf(d.title) === k);
-    return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${k}<b>${rows.length}</b></h4><ul class="ph-list">${rows.map((d) => dated(d, tab2 !== "story")).join("")}</ul>`;
+    const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
+    return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab2 !== "story")).join("")}</ul>`;
   }).join("");
-  const index = keys.length > 1 ? `<nav class="nw-idx" aria-label="가나다 색인">${keys.map((k) => `<button type="button" data-k="${k}" aria-label="${k}">${k}</button>`).join("")}</nav>` : "";
+  const index = keys.length > 1 ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS2.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? "" : "disabled"}>${k}</button>`).join("")}</div></div>` : "";
   return `${chips2}<div class="nw-groups">${groups}</div>${index}`;
 }
 function docCat(ctx, d) {
@@ -10939,24 +10981,26 @@ function bindWikiSide(root2, act) {
     e.stopPropagation();
     e.preventDefault();
   }, true);
-  const jump = (x, y) => {
-    const k = document.elementFromPoint(x, y)?.closest("[data-k]")?.dataset.k;
-    const box = panel.querySelector(".nw-groups");
-    const sec = k ? box?.querySelector(`[data-ksec="${k}"]`) : null;
-    if (box && sec) box.scrollTop = sec.offsetTop;
-    panel.querySelectorAll(".nw-idx [data-k]").forEach((b) => b.classList.toggle("on", b.dataset.k === k));
-  };
-  let indexing = false;
-  panel.addEventListener("pointerdown", (e) => {
-    if (!e.target.closest(".nw-idx")) return;
-    indexing = true;
-    e.preventDefault();
-    jump(e.clientX, e.clientY);
-    window.addEventListener("pointerup", () => indexing = false, { once: true });
+  panel.addEventListener("click", (e) => {
+    const t = e.target;
+    const grid = panel.querySelector(".nw-kgrid");
+    if (!grid) return;
+    if (t.closest("[data-kpick]")) {
+      grid.hidden = false;
+      return;
+    }
+    const k = t.closest(".nw-kgrid [data-k]")?.dataset.k;
+    if (k) {
+      const box = panel.querySelector(".nw-groups");
+      const sec = box?.querySelector(`[data-ksec="${k}"]`);
+      if (box && sec) box.scrollTop = sec.offsetTop;
+      grid.hidden = true;
+      return;
+    }
+    if (t.closest(".nw-kgrid") && !t.closest(".nw-kgrid-in button")) grid.hidden = true;
   });
-  panel.addEventListener("pointermove", (e) => indexing && jump(e.clientX, e.clientY));
   let t0 = null;
-  panel.addEventListener("touchstart", (e) => t0 = e.target.closest(".nw-idx") ? null : { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }, { passive: true });
+  panel.addEventListener("touchstart", (e) => t0 = e.target.closest(".nw-kgrid") ? null : { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }, { passive: true });
   panel.addEventListener("touchend", (e) => {
     if (!t0) return;
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
@@ -12004,12 +12048,14 @@ function directoryList(ctx) {
   const groups = [...new Set(rows.map(key))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
   return groups.map((g) => `<h3 class="dir-group${g ? "" : " warn"}">${esc10(g || "소속 미정")}<small>${rows.filter((r) => key(r) === g).length}</small></h3>${rows.filter((r) => key(r) === g).map((r) => agentRow(r, ctx, d, names3)).join("")}`).join("");
 }
+var directoryDone = () => dirUi.done;
+var directoryDoneClear = (text) => {
+  if (dirUi.done === text) dirUi.done = "";
+};
+var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc10(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">`;
+var barButtons = (off) => `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button>`;
 function directoryBar() {
-  const changed = dirty();
-  const status = dirUi.busy ? "저장하는 중…" : changed ? "고친 내용이 있어요" : dirUi.done || "카드에 저장된 값이에요";
-  return `<span class="dir-status${changed ? " on" : ""}">${esc10(status)}</span>
-    <button class="gx-mini" data-action="dir-reset" ${!changed || dirUi.busy ? "disabled" : ""}>되돌리기</button>
-    <button class="gx-start dir-save" data-action="dir-save" ${!changed || dirUi.busy ? "disabled" : ""}>카드에 저장</button>`;
+  return barButtons(!dirty() || dirUi.busy);
 }
 function directoryView(ctx) {
   const d = draftOf(ctx);
@@ -12020,17 +12066,20 @@ function directoryView(ctx) {
     ["org", "조직", d.orgs.length]
   ];
   return `<div class="dir">
-    <div class="dir-help">
-      <p><b>로어북 폴더에 넣으면 자동으로 들어와요.</b> 괴이는 <code>🚧괴이</code>, 특수(미스틱 사이트)는 <code>🎁파밍</code>, 요원은 <code>🙂요원</code> 폴더예요. 새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</p>
-      <p class="gx-muted">여기서 고친 값은 카드 로어북 「괴이봇 명부」에 저장돼서 카드를 공유하면 같이 가요. 이 카드의 모든 채팅에 바로 적용돼요.</p>
-      ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
-    </div>
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc10(dirUi.notice)}</div>` : ""}
     <div class="gx-segs dir-kinds">${kinds.map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? " on" : ""}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`).join("")}</div>
+    <details class="dir-help">
+      <summary>명부 사용법</summary>
+      <ul>
+        <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
+        <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
+        <li>고친 값은 위의 「저장」을 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
+      </ul>
+      ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
+    </details>
+    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc10(dirUi.notice)}</div>` : ""}
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
-    <input class="dir-search" data-input="dir-q" value="${esc10(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">
+    <div class="dir-qbox">${directorySearch()}</div>
     <div class="dir-list">${directoryList(ctx)}</div>
-    <div class="dir-bar">${directoryBar()}</div>
   </div>`;
 }
 var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
@@ -12264,11 +12313,12 @@ async function handleDirectory(action, value, ctx, env2) {
 
 // src/ui/settings.ts
 var THEME_KEY = "$st_fixed_theme";
-var settingsUi = { confirmOff: false, busy: false, notice: "", info: "", scope: "chat" };
+var settingsUi = { confirmOff: false, busy: false, notice: "", info: "", scope: "chat", confirm: "" };
 function resetSettings() {
   settingsUi.confirmOff = false;
   settingsUi.notice = "";
   settingsUi.scope = "chat";
+  settingsUi.confirm = "";
 }
 var esc11 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function seg4(action, cur, items, disabled = false) {
@@ -12316,18 +12366,30 @@ function worldKind(w, k, name, busy2) {
     ${k === "incident" ? worldRow(w, "landmark_share", "거점 비율", "%", busy2) : ""}
   </div></div>`;
 }
-var SCOPE_HELP = {
-  chat: "지금 채팅에 적용돼요.",
-  defaults: "채팅을 시작하기 전이라 새 채팅 기본값을 고쳐요.",
-  card: "이 카드의 괴이·특수·요원 정보예요."
+var CONFIRM = {
+  chat: {
+    save: ["지금 설정으로 새 채팅 기본값을 덮어쓸까요?", "덮어쓰기"],
+    load: ["저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.", "불러오기"]
+  },
+  card: {
+    save: ["고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.", "덮어쓰기"],
+    load: ["고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?", "되돌리기"]
+  }
 };
 function scopeBar(scope, canChat) {
-  const items = [[canChat ? "chat" : "defaults", "설정"], ["card", "카드 명부"]];
-  const save2 = scope === "chat" ? `<button class="gx-mini ps-save" data-action="set-save-default" title="새 채팅도 지금 설정으로 시작해요" ${settingsUi.busy ? "disabled" : ""}>기본값으로 저장</button>` : "";
-  return `<div class="st-scopebar"><div class="gx-segs st-scope">${items.map(([k, label]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`).join("")}</div>${save2}</div><p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>`;
+  const items = [[canChat ? "chat" : "defaults", "설정"], ["card", "명부"]];
+  const tabs2 = `<div class="gx-segs st-scope">${items.map(([k, label]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`).join("")}</div>`;
+  const btns = scope === "card" ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === "chat" ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : "";
+  const kind = scope === "card" ? "card" : "chat";
+  const c = settingsUi.confirm && scope !== "defaults" ? CONFIRM[kind][settingsUi.confirm] : null;
+  const yes = kind === "card" ? settingsUi.confirm === "save" ? "dir-save" : "dir-reset" : "set-bar-yes";
+  const confirm = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
+  return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm}`;
 }
 function settingsTab(ctx, scope = "chat", canChat = true) {
-  if (scope === "card") return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}</main>`;
+  if (scope === "card") {
+    return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
+  }
   const { basic: s5, world, theme } = current2(ctx, scope);
   const on = scope === "chat" ? worldOn(ctx.chat) : s5.anomalyOn;
   const busy2 = settingsUi.busy;
@@ -12411,16 +12473,44 @@ function nextWorld(w, v) {
 async function handleSettings(action, value, ctx, env2, scope = "chat") {
   const v = value ?? "";
   const lore = ctx.char.globalLore;
-  if (action === "set-save-default") {
-    const cur = current2(ctx, "chat");
-    await saveDefaults(env2, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-    if (!settingsUi.notice) settingsUi.info = "지금 설정을 새 채팅 기본값으로 저장했어요.";
+  if (action === "set-bar") {
+    settingsUi.confirm = v === "save" || v === "load" ? v : "";
     env2.render();
+    return true;
+  }
+  if (action === "set-bar-no") {
+    settingsUi.confirm = "";
+    env2.render();
+    return true;
+  }
+  if (action === "set-bar-yes") {
+    const what = settingsUi.confirm;
+    settingsUi.confirm = "";
+    if (what === "save") {
+      const cur = current2(ctx, "chat");
+      await saveDefaults(env2, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
+      if (!settingsUi.notice) settingsUi.info = "지금 설정을 새 채팅 기본값으로 저장했어요.";
+      env2.render();
+    } else if (what === "load") {
+      const d = current2(ctx, "defaults");
+      await save(ctx, env2, (chat) => {
+        const vars = { ...basicVars(d.basic), [THEME_KEY]: d.theme };
+        for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
+        if (worldOn(chat)) {
+          const ss = { ...chat.scriptstate ?? {}, ...vars };
+          Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
+        }
+        return vars;
+      });
+      if (!settingsUi.notice) settingsUi.info = "새 채팅 기본값을 지금 채팅에 불러왔어요.";
+      env2.render();
+    } else env2.render();
     return true;
   }
   if (action === "set-scope") {
     settingsUi.scope = v === "defaults" || v === "card" ? v : "chat";
     settingsUi.confirmOff = false;
+    settingsUi.confirm = "";
     env2.render();
     return true;
   }
@@ -12836,6 +12926,7 @@ async function handle(action, value) {
     return render();
   }
   if ((view.kind === "started" || view.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
+    if (action === "dir-save" || action === "dir-reset") settingsUi.confirm = "";
     await handleDirectory(action, value, view.ctx, settingsEnv);
     return;
   }
