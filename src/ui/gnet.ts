@@ -7,7 +7,7 @@ import {
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
   userNick, writeGnet, type GPost, type GSource, type GState, type IncomingOrigin, type IncomingPlan,
 } from '../core/gnet';
-import { commentPrompt, dmPrompt, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
+import { commentPrompt, dmPrompt, POST_REFRESH_ACTION, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
 import { toast } from './toast';
@@ -199,6 +199,43 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     gnet.sub = 'board';
     gnet.open = newId;
     return note;
+  });
+}
+
+/** 글 하나만 새로고침 (v0.16.26, 사용자 요청): 그 글에 새 댓글이 달리고 조회·추천이 는다. 다른 글·쪽지는 그대로 */
+function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
+  return run(ctx, env, '이 글을 새로 불러오는 중이에요.', async () => {
+    const chat = ctx.chat;
+    const st = readGnet(chat);
+    const target = findPost(st, postId);
+    if (!target) throw new GnetError('대상 글이 없어졌어요.');
+    const s = gnetSettings(chat.scriptstate);
+    const nick = userNick(chat.scriptstate);
+    const plan = incomingPlan(chat, st, { ...s, incoming: false }, nick, Math.random);
+    const prompt = commentPrompt({ char: ctx.char as RefSource['char'], chat }, st, postId, 0, '', plan, nick, names(ctx), POST_REFRESH_ACTION);
+    const snapshot = postKey(target);
+    const raw = await runModel(prompt.messages, s.model);
+    const value = withRaw(raw, () => parseJsonPayload(raw) as Record<string, unknown>);
+    let note = '';
+    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+      const cur = readGnet(latest);
+      const p = findPost(cur, postId);
+      if (!p || postKey(p) !== snapshot) {
+        note = '불러오는 동안 글이 바뀌어서 적용하지 않았어요. 다시 눌러 주세요.';
+        return null;
+      }
+      const got = acceptComments(value.comments, p.comments, { postId, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
+      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+      const n = got.comments.length;
+      p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+      p.votes += Math.floor(Math.random() * (n + 2));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      note = n ? '' : '새 댓글이 없어요.';
+      if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
+      if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
+      return writeGnet(latest, cur, { ack: viewing() });
+    });
+    return note.trim();
   });
 }
 
@@ -475,6 +512,7 @@ function postView(p: GPost, busy: boolean, inline = false): string {
       ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>`
       : tool('gn-del-post', ICONS.trash, '글 삭제', `data-value="${p.id}"`)
     : '';
+  const again = tool('gn-post-refresh', ICONS.refresh, '이 글 새로고침', `data-value="${p.id}" ${busy ? 'disabled' : ''}`);
   // 모바일 펼침: 목록 줄이 이미 제목·닉네임·시각·조회·추천을 보여 주므로 머리줄 없이 본문부터 (v0.16.23).
   // 글쓴이에게 쪽지·내 글 삭제는 댓글 머리줄 오른쪽에
   const who = p.mine ? '' : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc(p.nick)}</button>`;
@@ -483,8 +521,8 @@ function postView(p: GPost, busy: boolean, inline = false): string {
     : `<header class="gn-post-head"><h2 class="gn-post-title">${esc(p.title)}</h2>
           <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc(p.nick)}</b>` : who}</span>
             <span>${esc(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
-  const tail = inline ? `<span class="gn-chead-act">${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : '';
-  return `<div class="${inline ? 'gn-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead('게시판', `#${p.id}`, right)}
+  const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : '';
+  return `<div class="${inline ? 'gn-inline' : 'ph-room gn-pane'}">${inline ? '' : paneHead('게시판', `#${p.id}`, again + right)}
     <div class="gn-doc">
       <article class="gn-post">${head}
         <div class="gn-post-body">${body(p.body)}</div>
@@ -844,6 +882,9 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       }
       return true;
     }
+    case 'gn-post-refresh':
+      if (findPost(st(), a)) void refreshPost(ctx, env, a);
+      break;
     case 'gn-del-post':
       if (gnet.confirm !== `p:${a}`) {
         gnet.confirm = `p:${a}`;

@@ -929,6 +929,15 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const c2 = await page.evaluate(() => window.__calls.llm[1].messages[1].content);
   assert.ok(c2.includes('"replyTo":3') && c2.includes('"incomingAllowed":true'));
   assert.ok((await page.textContent('[data-value="dm"]')).includes('1'), '쪽지함 알림');
+  // 글 하나만 새로고침: 그 글에 새 댓글, 조회 증가, 다른 글은 그대로 (v0.16.26)
+  const views0 = Number(/P\|1846002\|[^|]*\|[^|]*\|[^|]*\|(\d+)/.exec(raw)[1]);
+  await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ comments: [{ author: '지나가던사람', content: '이 글 아직 살아있네', parent: 0 }, { author: '익명', content: '주인공 흉내', parent: 0 }], activity: [] }) }]; });
+  await page.click('.gn-pane [data-action="gn-post-refresh"]');
+  await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('이 글 아직 살아있네'), null, { timeout: 5000 });
+  const raw2 = await page.evaluate(() => window.__chat.scriptstate.$gn_raw);
+  assert.ok(!raw2.includes('주인공 흉내'), '주인공 닉네임 댓글은 뺌');
+  assert.ok(Number(/P\|1846002\|[^|]*\|[^|]*\|[^|]*\|(\d+)/.exec(raw2)[1]) > views0, '조회 증가');
+  assert.ok((await page.evaluate(() => window.__calls.llm[2].messages.at(-1).content)).includes('Time has passed'));
   // 쪽지 답장 (형식이 틀리면 한 번 다시 묻는다)
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.click('[data-action="gn-open-dm"][data-value="관람차덕후"]');
@@ -962,7 +971,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     await page.click('[data-action="gn-sub"][data-value="dm"]');
     await page.setViewportSize(vp);
   }
-  const retry = await page.evaluate(() => window.__calls.llm[4].messages);
+  const retry = await page.evaluate(() => window.__calls.llm[5].messages);
   assert.equal(retry.length, 4, '재시도는 이전 응답과 오류 안내를 붙인다');
   assert.ok(retry[3].content.includes('Validation error!'));
   assert.ok(retry[0].content.includes('ROLE BINDING'));

@@ -151,6 +151,7 @@ export interface CommentPrompt extends PublicPrompt {
 /** 내 댓글(이미 저장됨)에 대한 반응. replyTo: 방금 저장한 내 댓글 번호 (원본 react의 commentIndex) */
 export function commentPrompt(
   src: RefSource, st: GState, postId: number, replyTo: number, body: string, plan: IncomingPlan, nick: string, factionNames: Record<string, string>,
+  action = `The protagonist publicly commented: ${body}`,
 ): CommentPrompt {
   const b = gnetBooks(src);
   const p = findPost(st, postId);
@@ -173,13 +174,17 @@ export function commentPrompt(
   const comments = p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
   const task = JSON.stringify({
     post: { id: p.id, author: p.nick, title: p.title, content: p.body }, comments, commentCount: total, replyTo,
-    action: `The protagonist publicly commented: ${body}`, userHandle: nick,
+    action, userHandle: nick,
   });
   const activity = activityContext(st, p.id);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts)].join('\n\n');
   const extras = task + incomingTask(plan, activity.posts);
   return { ...pack(src, b, guideline, b.read('PUBLIC.REACT_FORMAT'), extras, factionNames), activity, supplied: selected, total };
 }
+
+/** 글 하나만 새로고침: 시간이 흘러 다른 사람들이 이 글에 댓글을 더 단다 (주인공은 아무것도 하지 않음) */
+export const POST_REFRESH_ACTION =
+  'Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.';
 
 /** 공개 글 참고 (원본 RC.gnetPublic): 쪽지에서 언급된 글을 앞에, 최대 8개 */
 export function publicBoard(st: GState, query: string): { access: string; posts: unknown[] } | null {
