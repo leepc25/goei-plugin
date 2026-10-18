@@ -30,10 +30,50 @@ async function load(path: string, ext: string): Promise<string | null> {
   }
 }
 
-/** 이름으로 캐릭터 에셋 URL. 없거나 못 읽으면 null */
+type Row = [string, string, string?];
+const isRow = (a: unknown): a is Row => Array.isArray(a) && typeof a[0] === 'string' && typeof a[1] === 'string';
+
+// 표정 세트(「이름_default」 등)는 카드가 아니라 따로 까는 에셋 모듈에 들어 있다. 창을 열 때 모듈 에셋 목록을 읽어 둔다
+let modRows: Row[] = [];
+let modVer = 0;
+let modBusy: Promise<boolean> | null = null;
+/** 모듈 에셋 목록을 다시 읽는다. 바뀌었으면 true (창을 열 때 한 번, 기다리지 않고 부른다) */
+export function loadModuleAssets(): Promise<boolean> {
+  modBusy ??= (async () => {
+    let rows: Row[] = [];
+    try {
+      const db = await risuai.getDatabase(['modules', 'enabledModules']);
+      const on = new Set(db?.enabledModules ?? []);
+      const mods = [...(db?.modules ?? [])].sort((a, b) => Number(on.has(b.id)) - Number(on.has(a.id)));
+      rows = mods.flatMap((m) => (Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
+    } catch {
+      /* 권한이 없거나 못 읽으면 카드 에셋만 쓴다 */
+    }
+    const changed = JSON.stringify(rows) !== JSON.stringify(modRows);
+    if (changed) (modRows = rows), modVer++;
+    return changed;
+  })().finally(() => {
+    modBusy = null;
+  });
+  return modBusy;
+}
+
+/** 모듈 에셋 목록을 언제 읽었는지 (목록 캐시 무효화용) */
+export const moduleAssetStamp = () => modVer;
+
+/** 카드 에셋 → 모듈 에셋 순으로 그 이름(대소문자 무시)의 줄 */
+function findRow(char: CharacterSnapshot, name: string): Row | undefined {
+  const lower = name.toLowerCase();
+  const card = ((char.additionalAssets ?? []) as unknown[]).filter(isRow);
+  return card.find((a) => a[0] === name) ?? card.find((a) => a[0].toLowerCase() === lower) ?? modRows.find((a) => a[0] === name) ?? modRows.find((a) => a[0].toLowerCase() === lower);
+}
+
+/** 그 이름의 에셋이 카드나 에셋 모듈에 있는지 */
+export const hasAsset = (char: CharacterSnapshot, name: string): boolean => !!name && !!findRow(char, name);
+
+/** 이름으로 캐릭터(없으면 에셋 모듈) 에셋 URL. 없거나 못 읽으면 null */
 export function assetUrl(char: CharacterSnapshot, name: string): Promise<string | null> {
-  const list = (char.additionalAssets ?? []) as unknown[];
-  const row = list.find((a): a is [string, string, string?] => Array.isArray(a) && a[0] === name && typeof a[1] === 'string');
+  const row = findRow(char, name);
   if (!row) return Promise.resolve(null);
   const key = `${String(char.chaId ?? char.name ?? '')}|${row[1]}`;
   let hit = cache.get(key);

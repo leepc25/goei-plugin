@@ -57,6 +57,9 @@ function draftOf(ctx: ChatContext): Directory {
 
 export const dirty = () => !!dirUi.draft && snapshot(dirUi.draft) !== dirUi.base;
 
+/** 덮어쓰기 전이라도 명부에서 고친 거점은 임무 지도에 바로 보이게 */
+export const draftBases = (): BaseRow[] | null => (dirty() ? dirUi.draft!.bases : null);
+
 function rowsOf(d: Directory, kind: Kind): (PlaceRow | AgentRow)[] {
   return kind === 'anomaly' ? d.anomalies : kind === 'site' ? d.sites : d.agents;
 }
@@ -312,7 +315,7 @@ function baseRow(b: BaseRow, ctx: ChatContext, d: Directory): string {
   const open = dirUi.open === b.name;
   return `<div class="dir-row${open ? ' open' : ''}">
     <button class="dir-head" data-action="dir-open" data-value="${esc(b.name)}" aria-expanded="${open}">
-      <span class="dir-name"><b>${esc(b.name)}</b><small>${esc(baseWhere(b))}</small></span>
+      <span class="dir-name"><b>${esc(b.name)}</b><small>${esc([b.org || '조직 없음', baseWhere(b)].join(' · '))}</small></span>
       ${b.show ? '' : '<span class="gx-badge">숨김</span>'}
     </button>${open ? basePanel(b, ctx, d) : ''}</div>`;
 }
@@ -320,11 +323,12 @@ function baseRow(b: BaseRow, ctx: ChatContext, d: Directory): string {
 function baseList(ctx: ChatContext, d: Directory, q: string): string {
   const rows = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
   const order = [...d.orgs.map((o) => o.name), ''];
-  const groups = [...new Set(rows.map((b) => b.org))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
+  // 조직마다 거점이 하나뿐이라 조직 제목을 따로 달지 않고, 조직 순서로 한 목록에 (조직은 줄 아래 작은 글씨)
+  const rank = (b: BaseRow) => (b.org ? order.indexOf(b.org) : order.length);
+  const sorted = [...rows].sort((x, y) => rank(x) - rank(y));
   return `<div class="dir-add"><input name="dir-base-new" placeholder="새 거점 이름" aria-label="새 거점 이름" autocomplete="off" data-enter="dir-base-new">
       <button class="gx-mini" data-action="dir-base-new" data-take="dir-base-new">거점 추가</button></div>
-    ${groups.map((g) => `<h3 class="dir-group">${esc(g || '조직 없음')}<small>${rows.filter((b) => b.org === g).length}</small></h3>${rows.filter((b) => b.org === g).map((b) => baseRow(b, ctx, d)).join('')}`).join('')
-      || '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
+    ${sorted.length ? sorted.map((b) => baseRow(b, ctx, d)).join('') : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
 }
 
 /** 새 거점 이름: 겹치면 뒤에 번호 */

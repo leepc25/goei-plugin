@@ -19,6 +19,7 @@ import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
 import { readDirectory } from '../core/world/directory';
+import { hasAsset, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
 import { lastStatusFields } from '../core/world/tags';
@@ -210,18 +211,15 @@ interface Entry {
 const CAT_LABEL: Record<Cat, string> = { an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
 const CAT_ICON: Record<Cat, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
 
-// 캐릭터 그림은 「이름_default」(세로 832×1216 표정 세트)가 있으면 그것, 없으면 이름 그대로
+// 캐릭터 그림은 「이름_default」(세로 832×1216 표정 세트, 보통 에셋 모듈에 있음)가 있으면 그것, 없으면 이름 그대로
 function photoName(ctx: ChatContext, name: string): string {
   if (!name) return '';
-  const list = (ctx.char.additionalAssets ?? []) as unknown[];
-  const want = `${name}_default`.toLowerCase();
-  const hit = list.find((a): a is [string, ...unknown[]] => Array.isArray(a) && typeof a[0] === 'string' && a[0].toLowerCase() === want);
-  return hit ? hit[0] : name;
+  return hasAsset(ctx.char, `${name}_default`) ? `${name}_default` : name;
 }
 
-let entryCache: { lore: unknown; list: Entry[] } | null = null;
+let entryCache: { lore: unknown; stamp: number; list: Entry[] } | null = null;
 function entries(ctx: ChatContext): Entry[] {
-  if (entryCache && entryCache.lore === ctx.char.globalLore) return entryCache.list;
+  if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
   const c = canon(ctx);
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
@@ -243,7 +241,7 @@ function entries(ctx: ChatContext): Entry[] {
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();
   const out = list.filter((e) => (seen.has(`${e.cat}|${e.title}`) ? false : (seen.add(`${e.cat}|${e.title}`), true)));
-  entryCache = { lore: ctx.char.globalLore, list: out };
+  entryCache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), list: out };
   return out;
 }
 

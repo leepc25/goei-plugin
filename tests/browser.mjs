@@ -67,7 +67,8 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       setChatToIndex: async (a, b, chat) => { window.__calls.setChat.push(clone(chat)); window.__chat = clone(chat); },
       runLLMModel: async (o) => { window.__calls.llm = window.__calls.llm || []; window.__calls.llm.push(o); await new Promise((r) => setTimeout(r, 150)); const next = (window.__llm || []).shift(); return next ?? { type: 'fail', result: 'no mock' }; },
       getCurrentLorebookEntries: async () => clone([...(window.__char.globalLore || []), ...(window.__moduleLore || [])]),
-      readImage: async (p) => { if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
+      getDatabase: async () => ({ modules: window.__modules || [], enabledModules: (window.__modules || []).map((m) => m.id) }),
+      readImage: async (p) => { (window.__calls.read = window.__calls.read || []).push(p); if (window.__assets[p]) return window.__assets[p]; const b64 = await window.__readAsset(p); if (!b64) throw new Error('no asset'); return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); },
       saveAsset: async (bytes) => { const p = 'assets/' + Object.keys(window.__assets).length.toString(16).padStart(8, 'a') + '.png'; window.__assets[p] = new Uint8Array(bytes); return p; },
       readInlay: async () => null,
       parseRisuChat: async (t) => String(t).replace(/\{\{user\}\}/g, window.__userName ?? '{{user}}'),
@@ -728,6 +729,11 @@ if (fixture.globalLore.some(packed)) {
     await page.waitForSelector('.nw-dochead');
     assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드');
     assert.ok(await page.locator('.nw-body .nw-fn').count() >= 8, '각주');
+    const under = await page.evaluate(() => {
+      const ib = document.querySelector('.nw-infobox')?.getBoundingClientRect();
+      return ib ? [...document.querySelectorAll('.nw-h, .nw-quote')].filter((h) => { const r = h.getBoundingClientRect(); return r.top < ib.bottom && r.bottom > ib.top && r.right > ib.left + 1; }).length : 0;
+    });
+    assert.equal(under, 0, '제목 줄·인용 상자가 정보표 밑으로 들어가지 않음');
     assert.equal(await page.evaluate(() => (window.__calls.llm || []).length), 0, '기본 문서는 생성하지 않음');
     if (shots) { await page.waitForTimeout(800); await page.screenshot({ path: `${shots}/13-wiki-base.png`, fullPage: true }); }
     // 각주: 마우스를 올리면 내용 창, 누르면 아래 목록으로
@@ -1778,6 +1784,85 @@ if (fixture.globalLore.some(packed)) {
   assert.deepEqual(errors, []);
   console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지)');
   await page.close();
+}
+
+// 17b) 설정 위 「설정·명부」 줄은 스크롤해도 위에 고정, 명부 탭에서는 그 아래 분류 줄도 함께 고정. 거점 탭은 조직 제목 없이 한 목록
+for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, vp);
+  await startedWithReply(page);
+  await open(page);
+  await page.locator('[data-action="tab"][data-value="settings"]:visible').first().click();
+  await page.waitForSelector('.gx-settings > .st-scopebar');
+  const stuck = (sel) => page.evaluate((sel) => {
+    const body = document.querySelector('.gx-settings');
+    body.scrollTop = body.scrollHeight;
+    const b = body.getBoundingClientRect();
+    const r = document.querySelector(sel).getBoundingClientRect();
+    return { gap: Math.round(r.top - b.top), scrolled: body.scrollTop > 200 };
+  }, sel);
+  const a = await stuck('.gx-settings > .st-scopebar');
+  assert.ok(a.scrolled && a.gap <= 2, `설정 줄 고정 ${JSON.stringify(a)}`);
+  const m = vp.width < 500 ? 'm' : 'pc';
+  if (shots) await page.screenshot({ path: `${shots}/17b-set-sticky-${m}.png` });
+  await page.click('[data-action="set-scope"][data-value="card"]');
+  await page.waitForSelector('.dir-kinds');
+  await page.click('[data-action="dir-kind"][data-value="agent"]');
+  await page.waitForTimeout(200);
+  const bar = await stuck('.gx-settings > .st-scopebar');
+  const kinds = await page.evaluate(() => {
+    const k = document.querySelector('.dir-kinds').getBoundingClientRect();
+    const t = document.querySelector('.gx-settings > .st-scopebar').getBoundingClientRect();
+    return Math.round(k.top - t.bottom);
+  });
+  assert.ok(bar.scrolled && bar.gap <= 2 && kinds >= 0 && kinds <= 10, `명부 두 줄 고정 ${JSON.stringify(bar)} ${kinds}`);
+  if (shots) await page.screenshot({ path: `${shots}/17b-dir-sticky-${m}.png` });
+  await page.click('[data-action="dir-kind"][data-value="base"]');
+  await page.waitForSelector('.dir-row');
+  assert.equal(await page.locator('.dir .dir-group').count(), 0, '거점 탭은 조직 제목 없음');
+  await page.evaluate(() => { document.querySelector('.gx-settings').scrollTop = 0; });
+  if (shots) await page.screenshot({ path: `${shots}/17b-bases-${m}.png` });
+  assert.deepEqual(errors, []);
+  await page.close();
+}
+console.log('PASS 설정·명부 줄 고정, 거점 목록');
+
+// 17c) 위키 인물 사진은 에셋 모듈의 「영문명_default」를 먼저 쓴다. 명부에서 거점을 추가하면 덮어쓰기 전에도 임무 지도에 보인다
+if (fixture.globalLore.some(packed)) {
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  await startedWithReply(page);
+  await page.evaluate(() => {
+    window.__assets['mod/ldh.png'] = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='), (c) => c.charCodeAt(0));
+    window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'mod/ldh.png', 'png']] }];
+  });
+  await open(page);
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.waitForSelector('.nw-home');
+  for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
+    await page.fill('.nw-home .gx-search', '이도형');
+    await page.press('.nw-home .gx-search', 'Enter');
+    await page.waitForSelector('.nw-dochead', { timeout: 4000 }).catch(() => {});
+  }
+  await page.waitForSelector('.nw-ibphoto img');
+  assert.ok(await page.evaluate(() => window.__calls.read.includes('mod/ldh.png')), '모듈의 _default 사진');
+  // 거점 추가 → 덮어쓰기 없이 임무 지도
+  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click('[data-action="set-scope"][data-value="card"]');
+  await page.click('[data-action="dir-kind"][data-value="base"]');
+  await page.fill('input[name="dir-base-new"]', '시험 거점');
+  await page.click('[data-action="dir-base-new"][data-take="dir-base-new"]');
+  await page.waitForSelector('.dir-row:has-text("시험 거점")');
+  assert.equal(await page.evaluate(() => window.__calls.setChar || 0), 0, '저장하지 않음');
+  const sido = await page.inputValue('.dir select[data-change^="dir-base-sido"], .dir select[name*="sido"]').catch(() => '02');
+  await page.click('[data-action="tab"][data-value="map"] >> nth=0');
+  await page.waitForSelector('.gx-field');
+  await page.selectOption('select[data-change="map-region"]', sido.split('=').pop() || '02');
+  await page.waitForTimeout(300);
+  const seen = await page.evaluate(() => [...document.querySelectorAll('.gx-field .fac')].some((p) => p.textContent.includes('시험 거점')));
+  assert.ok(seen, '새 거점이 임무 지도에 보임');
+  if (shots) await page.screenshot({ path: `${shots}/17c-map-newbase.png` });
+  assert.deepEqual(errors, []);
+  await page.close();
+  console.log('PASS 위키 모듈 사진, 저장 전 새 거점 지도 표시');
 }
 
 await browser.close();

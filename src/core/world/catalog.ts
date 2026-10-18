@@ -3,7 +3,7 @@
 import { extraNames, factionList, factionVars } from '../factions';
 import type { FactionCode, LoreEntry, ScriptState } from '../types';
 import { SIGUN } from './geo';
-import { displaySection, readDirectory } from './directory';
+import { displaySection, readDirectory, type BaseRow } from './directory';
 
 export interface WorldItem {
   name: string;
@@ -84,6 +84,13 @@ function worldRows(data: Record<string, unknown>, group: string, landmark: boole
   return rows.filter((r): r is unknown[] => Array.isArray(r) && r.length === (landmark ? 10 : 5) && r[0] === true);
 }
 
+/** 지도에 그릴 거점 (보이기 켠 것, 지역이 맞는 것만) */
+export function landmarksOf(bases: BaseRow[]): Landmark[] {
+  return bases
+    .filter((b) => b.show && b.name && SIGUN[b.sido]?.includes(b.gu))
+    .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
+}
+
 export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
   const list = lore ?? [];
   const dir = readDirectory(list);
@@ -95,9 +102,7 @@ export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
   const place = (p: { label: string; english: string; aliases: string[] }): WorldItem => ({ name: p.label, english: p.english, aliases: p.aliases });
   const anomalies = dir.anomalies.filter((p) => p.preset).map(place).filter((e) => e.name);
   const mysticSites = dir.sites.filter((p) => p.preset).map(place).filter((e) => e.name);
-  const landmarks: Landmark[] = dir.bases
-    .filter((b) => b.show && b.name && SIGUN[b.sido]?.includes(b.gu))
-    .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
+  const landmarks = landmarksOf(dir.bases);
 
   if (!dir.folders) {
     const rosterRaw = loreText(list, 'Agent roster');

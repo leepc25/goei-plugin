@@ -7,6 +7,7 @@ import {
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
+import { loadModuleAssets } from '../host/assets';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
@@ -320,6 +321,10 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   shown = true;
   await risuai.showContainer('fullscreen');
   await refresh();
+  // 에셋 모듈의 표정 세트(위키 인물 사진). 목록이 바뀌었으면 한 번 다시 그린다
+  void loadModuleAssets().then((changed) => {
+    if (shown && changed) render();
+  });
   // 유저 사진·이름 (ID카드). 읽히면 한 번 다시 그린다
   void readUser().then((u) => {
     if (shown && (u.name || u.photo)) render();
@@ -684,6 +689,8 @@ function render(): void {
   bindDrawer(root);
   bindWikiSide(root, (v) => void handle('wiki-list', v));
   bindFootnotes(root);
+  const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
+  if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
   bindSwipeBack(root, backStep);
   setCurrentTheme(themeName(root.dataset.theme));
 }

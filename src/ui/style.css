@@ -432,6 +432,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-toc a:hover { color: var(--signal); }
 .nw-list { margin: 0 0 12px; padding-left: 22px; }
 .nw-quote { margin: 0 0 12px; padding: 10px 14px; border-left: 4px solid var(--line); background: var(--void); border-radius: 0 10px 10px 0; }
+/* 정보표(오른쪽 띄움) 옆에서 제목 줄·인용 상자가 표 밑으로 들어가지 않게 */
+.nw-h, .nw-quote { display: flow-root; }
 .nw-quote cite { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--dim); }
 .nw-table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 15px; }
 .nw-table caption { padding: 6px; font-weight: 600; color: var(--mint); }
@@ -580,7 +582,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-help .gx-hint { margin: 0 14px 12px; }
 .gx-dirdrawer { display: none; }
 @media (max-width: 760px) {
-  .dir-kinds { position: sticky; top: 8px; z-index: 2; margin: 0; padding: 3px; box-shadow: 0 -8px 0 6px var(--void); }
+  .dir-kinds { margin: 0; padding: 3px; }
   .dir-qbox { display: none; }
   .gx-dirdrawer { display: block; }
   .gx-dirdrawer .dir-search { margin: 0; }
@@ -1535,10 +1537,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-setpane .ps-row > .nw-reqbox { margin: 0; }
 @media (max-width: 760px) {
   .nw-pane .nw-doc { padding: 12px 14px 20px; }
-  /* 목차는 한 줄 (옆으로 밀어 보기) */
-  .nw-toc { display: flex; flex-direction: row; align-items: center; gap: 12px; width: 100%; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding: 8px 12px; }
-  .nw-toc b { margin: 0; }
-  .nw-toc a.l2 { padding-left: 0; }
 }
 /* 위키 (v0.16.23 3차, 사용자 설계): 세로바(메인·작성·설정 + 펼치기 자리) + 본문 위로 덮는 목록 서랍. PC·모바일 같은 구조 */
 .gx-body.nw-app { grid-template-columns: 60px minmax(0, 1fr); }
@@ -1699,3 +1697,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 }
 .adv-num input { -moz-appearance: textfield; appearance: textfield; }
 .adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+/* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
+.gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
+.gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 9px 0 8px; margin-bottom: -14px; background: var(--void); }
+.gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
+

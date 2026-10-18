@@ -8,7 +8,7 @@ import { basicSettings, worldSettings } from '../core/settings';
 import {
   activeEvents, agentLocked, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
-  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, prevWorldVars,
+  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, prevWorldVars,
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
@@ -19,6 +19,7 @@ import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
 import { drawerBox } from './drawer';
+import { draftBases } from './directory';
 
 export type Target =
   | { type: 'event'; key: string; kind: EventKind; name: string; loc: string }
@@ -102,8 +103,10 @@ interface Ctx {
 
 function ctxOf(ctx: ChatContext, chat: Chat): Ctx {
   const lore = ctx.char.globalLore;
+  const catalog = parseCatalog(lore);
+  const bases = draftBases();
   return {
-    catalog: parseCatalog(lore),
+    catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
     world: readWorld(chat),
     faction: String(chat.scriptstate?.['$st_faction'] ?? ''),
     on: worldOn(chat),
