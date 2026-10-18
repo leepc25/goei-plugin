@@ -11,6 +11,7 @@ import { runModel } from '../host/llm';
 import { saveVarDefaults } from '../host/prefs';
 import { ICONS } from './icons';
 import { toast } from './toast';
+import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
 import { readDirectory } from '../core/world/directory';
 import { readWorld, worldOn } from '../core/world/output';
@@ -312,14 +313,19 @@ export function wikiList(ctx: ChatContext): string {
     const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
     const hits = matches(ctx, q).filter((e) => !saved.has(e.title));
     const exact = canon(ctx)(q);
-    const fresh = saved.has(exact) || hits.some((e) => e.title === exact)
-      ? ''
-      : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc(q)}」</b><small>이 제목으로 새 문서</small></span></button></li></ul>`;
+    // 검색과 작성은 하나 (v0.16.24, 사용자 설계): 결과가 없으면 「없어요 + 작성」, 있는데 딱 맞는 제목이 없으면 끝에 작성 줄
+    const known = saved.has(exact) || hits.some((e) => e.title === exact);
     const docPart = mine.length ? `<h4 class="ph-sec">문서<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => dated(d)).join('')}</ul>` : '';
     const rosterPart = hits.length
       ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row(ctx, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(' · '))).join('')}</ul>`
       : '';
-    return `<div class="nw-groups">${`${fresh}${docPart}${rosterPart}` || blank('검색 결과가 없어요.')}</div>`;
+    if (!docPart && !rosterPart) {
+      return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc(q)}">${ICONS.pen}작성하기</button></div></div>`;
+    }
+    const fresh = known
+      ? ''
+      : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
+    return `<div class="nw-groups">${docPart}${rosterPart}${fresh}</div>`;
   }
   if (!docs.length) return `<div class="nw-groups">${blank('아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.')}</div>`;
   const count = (t: Tab) => docs.filter((d) => inTab(ctx, d, t)).length;
@@ -353,7 +359,6 @@ function rail(): string {
   const label = open ? '목록 접기' : '목록 펼치기';
   return `<nav class="nw-rail" aria-label="위키 메뉴">
     ${tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '')}
-    ${tool('wiki-new', ICONS.pen, '새 문서', wiki.view === 'new' ? 'aria-pressed="true"' : '')}
     ${tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '')}
     <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open ? '' : ' flip'}">${ICONS.back}</span></button>
   </nav>`;
@@ -540,6 +545,11 @@ export function wikiTab(ctx: ChatContext): string {
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
+    ${drawerHtml([
+      tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
+      tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
+      tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
+    ].join(''))}
     ${note}
   </main>`;
 }

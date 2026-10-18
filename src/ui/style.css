@@ -1509,6 +1509,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-scrim { display: none; }
 .list-open .nw-scrim { display: block; position: absolute; z-index: 2; inset: 0 0 0 60px; border: 0; padding: 0; background: rgba(0, 0, 0, .28); }
 .nw-main { min-width: 0; }
+.nw-app > .ph-drawer { display: none; }
+.nw-nohit { flex-direction: column; gap: 14px; }
+.nw-nohit .gx-start { display: inline-flex; align-items: center; gap: 6px; width: auto; min-height: 44px; padding: 0 20px; font-size: 15px; letter-spacing: normal; }
+.nw-nohit .gx-start svg { width: 18px; height: 18px; }
 .nw-main .ph-room-head.nw-noback { padding-left: 16px; }
 .nw-main .nw-doc > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
 /* 위키 메인 */
@@ -1542,11 +1546,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-card small { align-self: start; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nw-chip small { color: var(--dim); font-size: 11.5px; font-weight: 600; }
 @media (max-width: 760px) {
-  .gx-body.nw-app { grid-template-columns: 52px minmax(0, 1fr); }
-  .nw-rail { padding-top: 8px; gap: 4px; }
-  .nw-rail > .ph-tool { width: 42px; height: 42px; }
-  .nw-panel { left: 52px; transform: translateX(calc(-100% - 52px)); max-width: calc(100% - 92px); }
-  .list-open .nw-scrim { inset: 0 0 0 52px; }
+  /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
+  .gx-body.nw-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .nw-rail { display: none; }
+  .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
+  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .nw-main { grid-row: 1; }
+  .nw-panel { left: 0; transform: translateX(-100%); max-width: calc(100% - 40px); }
+  .list-open .nw-scrim { inset: 0; }
   .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
   .nw-home { padding: 14px 14px 22px; gap: 18px; }
   .nw-home .nw-hero { padding: 16px; }

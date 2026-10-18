@@ -820,16 +820,24 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-list-mobile.png` });
-  await page.click('.nw-scrim', { position: { x: 300, y: 400 } });
+  await page.click('.nw-scrim', { position: { x: 370, y: 400 } });
   await page.waitForSelector('.nw-app:not(.list-open)');
   await page.waitForTimeout(300);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
-  await page.click('.nw-rail [data-action="wiki-home"]');
+  // 모바일: 세로바 없이 하단 서랍에 메인·목록·설정
+  assert.equal(await page.locator('.nw-rail').isVisible(), false);
+  if (!(await page.locator('.nw-app > .ph-drawer.open').count())) await page.click('.nw-app > .ph-drawer .ph-grip');
+  await page.click('.ph-drawer [data-action="wiki-home"]');
   await page.waitForSelector('.nw-home');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-main-mobile.png` });
-  // 모바일: 펼친 목록을 왼쪽으로 밀면 접힘
-  await page.click('.nw-grab');
+  // 검색과 작성은 하나: 결과가 없으면 「작성하기」
+  await page.click('.ph-drawer [data-action="wiki-list"]');
   await page.waitForSelector('.nw-app.list-open');
+  await page.fill('.nw .ph-search', '아무도모르는괴담');
+  await page.waitForSelector('.nw-nohit');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-nohit-mobile.png` });
+  await page.fill('.nw .ph-search', '');
+  // 모바일: 펼친 목록을 왼쪽으로 밀면 접힘
   await page.evaluate(() => {
     const el = document.querySelector('.nw-list');
     const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 })];
