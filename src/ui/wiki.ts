@@ -349,13 +349,25 @@ function homeView(ctx: ChatContext): string {
     const e = entryFor(ctx, t);
     return `<button class="nw-chip none" data-action="wiki-open" data-value="${esc(t)}">${face(ctx, e, ' xs')}<span>${esc(e?.name ?? t)}</span>${n > 1 ? `<small>${n}</small>` : ''}</button>`;
   }).join('');
+  // 전체 문서: 가나다 묶음마다 한 줄 (자음 + 문서 칩)
+  const sorted = sortedDocs(ctx);
+  const index = KEYS.map((k) => {
+    const list = sorted.filter((d) => keyOf(d.title) === k);
+    if (!list.length) return '';
+    const items = list.map((d) => {
+      const e = entryFor(ctx, d.title);
+      return `<button class="nw-chip" data-action="wiki-pick" data-value="${esc(d.title)}">${face(ctx, e, ' xs')}<span>${esc(e?.name ?? d.title)}</span></button>`;
+    }).join('');
+    return `<div class="nw-irow"><b class="nw-ikey">${k}</b><div class="nw-chips">${items}</div></div>`;
+  }).join('');
   return `<div class="nw-home">
     <section class="nw-hero">
-      <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>이면세계 위키</h2><small>문서 ${docs.length}개</small></div></div>
+      <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off">
         <button class="gx-mini" data-action="wiki-random" ${docs.length ? '' : 'disabled'}>무작위 문서</button></div>
     </section>
     <section class="nw-hsec"><h3>최근 작성된 문서</h3>${recent.length ? `<div class="nw-cards">${recent.map(card).join('')}</div>` : `<p class="nw-hnone">아직 작성한 문서가 없어요.</p>`}</section>
+    ${docs.length ? `<section class="nw-hsec"><h3>전체 문서<b>${docs.length}</b></h3><div class="nw-index">${index}</div></section>` : ''}
     ${wanted.length ? `<section class="nw-hsec"><h3>작성이 필요한 문서<b>${want.size}</b></h3><div class="nw-chips">${chips}</div></section>` : ''}
   </div>`;
 }
