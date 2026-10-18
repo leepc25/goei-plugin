@@ -1502,7 +1502,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .list-open .nw-panel { transform: none; visibility: visible; transition: transform .22s ease; }
 .nw-pin { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 12px 0; }
 .nw-pin .nw-search { flex: none; }
-.nw-pin .nw-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -12px; padding: 0 4px 12px; }
+.nw-pin .nw-list { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; gap: 6px; overflow: hidden; margin: 0 -12px; padding: 0; }
 .nw-pin .nw-fail { margin: 0 0 12px; }
 .nw-row .ph-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nw-scrim { display: none; }
@@ -1555,3 +1555,26 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-irow { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--panel2); }
 .nw-irow:last-child { border-bottom: 0; }
 .nw-ikey { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--panel2); color: var(--sub); font-size: 14px; }
+/* 위키 서랍 탭·색인, 메인 분류 (v0.16.23 4차: 기본 문서 141개) */
+.nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
+.nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
+.nw-tabs + .nw-groups { padding-right: 26px; }
+.nw-idx { position: absolute; z-index: 1; right: 2px; bottom: 8px; top: 64px; display: flex; flex-direction: column; justify-content: center; gap: 1px; width: 22px; touch-action: none; user-select: none; }
+.nw-idx button { flex: 0 1 22px; min-height: 14px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--dim); font: inherit; font-size: 11.5px; font-weight: 700; line-height: 1; cursor: pointer; }
+.nw-idx button:hover, .nw-idx button.on { background: var(--accent-bg); color: var(--signal); }
+.nw-card.none { opacity: .6; border-style: dashed; }
+.nw-more-btn { align-self: center; margin-top: 2px; }
+.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.nw-tile { display: flex; flex-direction: column; gap: 4px; padding: 8px 8px 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+.nw-tile:hover { border-color: var(--accent-line); }
+.nw-tile-pics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; aspect-ratio: 4 / 3; margin-bottom: 4px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); place-items: center; }
+.nw-tile-pics img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.nw-tile-pics:not(:has(img)) { display: grid; grid-template-columns: 1fr; }
+.nw-tile-pics svg { width: 30px; height: 30px; }
+.nw-tile.k-an .nw-tile-pics:not(:has(img)) { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-tile.k-ms .nw-tile-pics:not(:has(img)) { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-tile b { padding: 0 2px; font-size: 15px; }
+.nw-tile small { padding: 0 2px; color: var(--dim); font-size: 12px; }
+@media (max-width: 760px) {
+  .nw-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

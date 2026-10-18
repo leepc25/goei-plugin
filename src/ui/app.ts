@@ -611,7 +611,7 @@ function renderPicker(): void {
   else return render();
 }
 
-const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-list';
+const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups';
 
 function render(): void {
   if (!root) return;

@@ -795,7 +795,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.nw-rail [data-action="wiki-home"]');
   await page.waitForSelector('.nw-home .nw-card');
   assert.equal(await page.locator('[data-action="wiki-random"]').count(), 0);
-  assert.equal(await page.locator('.nw-index [data-action="wiki-pick"][data-value="소라 랜드"]').count(), 1, '전체 문서');
+  assert.ok((await page.textContent('.nw-home')).includes('이번 이야기에서 쓴 문서'));
+  assert.ok(await page.locator('.nw-tile[data-value="an"]').count(), '분류 칸');
   assert.ok((await page.textContent('.nw-hero h2')).includes('괴이위키'));
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-main.png` });
   await page.click('.nw-card[data-value="소라 랜드"]');
