@@ -15,6 +15,7 @@ import { bindDrawer, drawerHtml } from './drawer';
 import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
+import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
@@ -384,6 +385,7 @@ async function refresh(): Promise<void> {
 
 async function close(): Promise<void> {
   shown = false;
+  closeGame();
   await risuai.hideContainer();
 }
 
@@ -448,6 +450,10 @@ async function handle(action: string, value?: string): Promise<void> {
   switch (action) {
     case 'close':
       return close();
+    case 'game-open':
+      return openGame(view.kind === 'started' ? root?.querySelector('.gx-panel') ?? null : null);
+    case 'game-close':
+      return closeGame();
     case 'faction': {
       const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
       const f = findFaction(value ?? '', facs);
@@ -617,6 +623,7 @@ function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
+      <button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -687,6 +694,7 @@ function render(): void {
       if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
     }
   }
+  reattachGame(view.kind === 'started' ? root.querySelector('.gx-panel') : null);
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
@@ -719,7 +727,7 @@ function boardDrawer(): string {
   if (!matchMedia('(max-width: 760px)').matches) return '';
   const b = (action: string, value: string, icon: string, label: string) =>
     `<button class="ph-tool" data-action="${action}"${value ? ` data-value="${value}"` : ''} aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`;
-  return drawerHtml(b('id-card', '', ICONS.idcard, '신분증') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
+  return drawerHtml(b('id-card', '', ICONS.idcard, '신분증') + b('game-open', '', ICONS.game, '순찰') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
 }
 
 /** 모바일 뒤로가기 쓸기가 할 일: 지금 화면의 한 단계 앞. 갈 곳이 없으면 null (상황판이 맨 앞) */
@@ -728,6 +736,7 @@ function backStep(): (() => void) | null {
   if (view.kind === 'picker') return pickerPrefs ? go('prefs-close') : null;
   if (view.kind === 'opening') return go('repick');
   if (view.kind !== 'started') return null;
+  if (gameOpen()) return () => closeGame();
   switch (tab) {
     case 'wiki':
       if (wiki.listOpen) return go('wiki-list', 'close');

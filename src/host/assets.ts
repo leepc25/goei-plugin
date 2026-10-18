@@ -5,7 +5,7 @@ import type { CharacterSnapshot } from './risu';
 const MIME: Record<string, string> = { avif: 'image/avif', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
 const cache = new Map<string, Promise<string | null>>();
 
-function toBytes(data: unknown): Uint8Array | null {
+export function toBytes(data: unknown): Uint8Array | null {
   if (data instanceof Uint8Array) return data;
   if (data instanceof ArrayBuffer) return new Uint8Array(data);
   if (Array.isArray(data)) return new Uint8Array(data as number[]);
