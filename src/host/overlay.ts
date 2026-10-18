@@ -87,7 +87,7 @@ ${themeVars('[x-goei-fab]')}
 [x-goei-fab][x-goei-theme="light"] [data-gt] { color: var(--g-signal); animation: none; }
 /* 페이퍼: 종이 판에 잉크 도장. 빛줄기·글리치 대신 한 번 눌렸다 번지듯 */
 [x-goei-fab][x-goei-theme="paper"][x-goei-intro="true"] [data-gl] {
-  background: var(--g-panel); border: 1.5px solid var(--g-signal); border-radius: 4px; box-shadow: 0 8px 20px -12px rgba(60, 40, 10, .45);
+  background: var(--g-panel); border-color: color-mix(in srgb, var(--g-signal) 70%, transparent); box-shadow: 0 8px 20px -12px rgba(60, 40, 10, .45);
 }
 [x-goei-fab][x-goei-theme="paper"] [data-gs] { display: none; }
 [x-goei-fab][x-goei-theme="paper"] [data-gt] { color: var(--g-signal); animation: goei-in-stamp 620ms cubic-bezier(.3,1.4,.5,1) 380ms both; }
