@@ -285,12 +285,15 @@ export function directoryList(ctx: ChatContext): string {
     .join('');
 }
 
+/** 저장 결과 한 줄 (설정 위쪽 안내 자리) */
+export const directoryDone = (): string => dirUi.done;
+
+/** 설정 위쪽 줄의 「저장」「불러오기」 (설정·명부 공통, 누르면 확인) */
+export const barButtons = (off: boolean): string =>
+  `<button class="gx-mini ps-save" data-action="set-bar" data-value="save" ${off ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="set-bar" data-value="load" ${off ? 'disabled' : ''}>불러오기</button>`;
+
 export function directoryBar(): string {
-  const changed = dirty();
-  const status = dirUi.busy ? '저장하는 중…' : changed ? '고친 내용이 있어요' : dirUi.done || '카드에 저장된 값이에요';
-  return `<span class="dir-status${changed ? ' on' : ''}">${esc(status)}</span>
-    <button class="gx-mini" data-action="dir-reset" ${!changed || dirUi.busy ? 'disabled' : ''}>되돌리기</button>
-    <button class="gx-start dir-save" data-action="dir-save" ${!changed || dirUi.busy ? 'disabled' : ''}>카드에 저장</button>`;
+  return barButtons(!dirty() || dirUi.busy);
 }
 
 export function directoryView(ctx: ChatContext): string {
@@ -314,7 +317,6 @@ export function directoryView(ctx: ChatContext): string {
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ''}
     <input class="dir-search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">
     <div class="dir-list">${directoryList(ctx)}</div>
-    <div class="dir-bar">${directoryBar()}</div>
   </div>`;
 }
 

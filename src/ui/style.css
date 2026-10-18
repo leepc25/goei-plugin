@@ -597,10 +597,6 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-in input { min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; }
 .dir-in small { font-size: 12px; color: var(--dim); }
 .dir-empty { padding: 16px 4px; }
-.dir-bar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 8px; margin: 4px -4px 0; padding: 10px 12px; border-radius: 14px; background: var(--sunk); border: 1px solid var(--line); box-shadow: 0 -8px 20px -12px rgba(0,0,0,.6); }
-.dir-status { flex: 1; min-width: 0; font-size: 14px; color: var(--dim); }
-.dir-status.on { color: var(--amber); font-weight: 600; }
-.dir-bar .gx-start { width: auto; min-height: 42px; padding: 0 18px; margin: 0; letter-spacing: 0; font-size: 15px; }
 .dir-kinds .gx-seg { white-space: nowrap; padding: 0 6px; }
 @media (max-width: 760px) {
   .dir-grid { grid-template-columns: 1fr; }
@@ -1431,8 +1427,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
 .gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
 /* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
-.st-scopebar { display: flex; align-items: center; gap: 10px; }
-.st-scopebar .st-scope { flex: 1; min-width: 0; margin: 0; }
+.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.st-scopebar .st-scope { flex: none; margin: 0; }
+.st-scopebar .st-scope .gx-seg { flex: 0 0 auto; min-width: 0; min-height: 32px; padding: 0 14px; font-size: 14px; }
+.st-barbtns { display: flex; flex: none; align-items: center; gap: 6px; }
+.st-barbtns .gx-mini { min-height: 32px; padding: 0 12px; white-space: nowrap; }
+.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p { color: var(--text); }
 .ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
 .ps-save:hover { background: var(--accent-bg); }
 .ph-room-head .ph-act .ps-save { margin-right: 4px; }

@@ -388,6 +388,7 @@ async function handle(action: string, value?: string): Promise<void> {
     return render();
   }
   if ((view.kind === 'started' || (view.kind === 'picker' && pickerPrefs)) && action.startsWith('dir-')) {
+    if (action === 'dir-save' || action === 'dir-reset') settingsUi.confirm = '';
     await handleDirectory(action, value, view.ctx, settingsEnv);
     return;
   }

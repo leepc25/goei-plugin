@@ -1170,7 +1170,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
   // 설정은 하나: 「기본값으로 저장」을 누르면 지금 채팅 값이 새 채팅 기본값으로 (v0.16.23)
   assert.equal(await page.$('[data-action="set-scope"][data-value="defaults"]'), null, '이 채팅/기본값 두 벌 없음');
-  await page.click('[data-action="set-save-default"]');
+  await page.click('[data-action="set-bar"][data-value="save"]');
+  await page.waitForSelector('.st-barconfirm');
+  await page.click('[data-action="set-bar-yes"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.preset_cap === 3);
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, 'paper');
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
@@ -1254,12 +1256,12 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
   assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*12/.test(kinds), kinds);
-  assert.equal(await page.getAttribute('.dir-save', 'disabled'), '', '고친 게 없으면 저장 못 함');
+  assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   await page.fill('[data-input="dir-q"]', '명일');
   await page.click('.dir-head[data-value="명일 아파트"]');
   await page.click('[data-action="dir-set"][data-value="preset|0|명일 아파트"]');
-  await page.waitForFunction(() => document.querySelector('.dir-status.on'));
+  await page.waitForFunction(() => !document.querySelector('.dir-bar [data-value="save"]')?.disabled);
   // 다른 폴더에서 온 후보: 원본 World catalog의 조직·개체는 따로 묶고 출처 폴더를 보여 준다. 새 후보 추가
   await page.fill('[data-input="dir-q"]', '');
   await page.click('[data-action="dir-kind"][data-value="anomaly"]');
@@ -1283,6 +1285,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"]');
   await page.fill('[data-input="dir"][data-key="rank|쟈알디"]', '국장');
   if (shots) await page.screenshot({ path: `${shots}/17-directory.png` });
+  await page.click('.dir-bar [data-value="save"]');
   await page.click('[data-action="dir-save"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === '괴이봇 명부').content));
@@ -1294,7 +1297,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === '괴이봇 명부'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
-  await page.waitForFunction(() => document.querySelector('.dir-status')?.textContent.includes('저장했어요'));
+  await page.waitForFunction(() => document.querySelector('.st-scope-help')?.textContent.includes('저장했어요'));
   // 저장한 값으로 다시 읽힘: 새로고침 뒤에도 쟈알디는 테스트 조직
   await page.fill('[data-input="dir-q"]', '쟈알디');
   assert.ok((await page.textContent('.dir-list')).includes('테스트 조직'));
@@ -1527,6 +1530,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.dir-head[data-value="쟈알디"]');
   await page.click('[data-action="dir-org-pick"][data-value="테스트 결사|쟈알디"]');
   assert.ok((await page.textContent('.dir-panel')).includes('비밀 결사') || (await page.textContent('.dir-panel')).includes('테스트 결사'));
+  await page.click('.dir-bar [data-value="save"]');
   await page.click('[data-action="dir-save"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === '괴이봇 명부').content));

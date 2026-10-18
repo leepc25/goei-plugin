@@ -9,7 +9,7 @@ import { ASSET_NOTE } from '../core/asset';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
-import { directoryView } from './directory';
+import { barButtons, directoryBar, directoryDone, directoryView } from './directory';
 import { toast } from './toast';
 
 export interface SettingsEnv {
@@ -20,12 +20,13 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope };
+export const settingsUi = { confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
   settingsUi.notice = '';
   settingsUi.scope = 'chat';
+  settingsUi.confirm = '';
 }
 
 import { updateGroup } from './update';
@@ -106,17 +107,36 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 const SCOPE_HELP: Record<SettingsScope, string> = {
   chat: '지금 채팅에 적용돼요.',
   defaults: '채팅을 시작하기 전이라 새 채팅 기본값을 고쳐요.',
-  card: '이 카드의 괴이·특수·요원 정보예요.',
+  card: '이 카드의 괴이·특수·요원·조직 정보예요.',
+};
+
+// 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「저장」「불러오기」. 설정에서는 새 채팅 기본값을,
+// 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
+const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>> = {
+  chat: {
+    save: ['지금 설정을 새 채팅 기본값으로 저장할까요? 이전 기본값은 덮어써요.', '저장'],
+    load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
+  },
+  card: {
+    save: ['고친 명부를 카드에 저장할까요? 이 카드의 모든 채팅에 적용돼요.', '저장'],
+    load: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
+  },
 };
 
 function scopeBar(scope: SettingsScope, canChat: boolean): string {
-  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '카드 명부']];
-  const save = scope === 'chat'
-    ? `<button class="gx-mini ps-save" data-action="set-save-default" title="새 채팅도 지금 설정으로 시작해요" ${settingsUi.busy ? 'disabled' : ''}>기본값으로 저장</button>`
-    : '';
-  return `<div class="st-scopebar"><div class="gx-segs st-scope">${items
+  const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '명부']];
+  const tabs = `<div class="gx-segs gx-segs-sm st-scope">${items
     .map(([k, label]) => `<button class="gx-seg${scope === k ? ' on' : ''}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`)
-    .join('')}</div>${save}</div><p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>`;
+    .join('')}</div>`;
+  // 명부는 입력할 때마다 버튼만 다시 그린다 (directoryInput → .dir-bar)
+  const btns = scope === 'card' ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === 'chat' ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : '';
+  const kind = scope === 'card' ? 'card' : 'chat';
+  const c = settingsUi.confirm && scope !== 'defaults' ? CONFIRM[kind][settingsUi.confirm] : null;
+  const yes = kind === 'card' ? (settingsUi.confirm === 'save' ? 'dir-save' : 'dir-reset') : 'set-bar-yes';
+  const confirm = c
+    ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`
+    : '';
+  return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}<p class="gx-muted st-scope-help">${esc((scope === 'card' && directoryDone()) || SCOPE_HELP[scope])}</p>`;
 }
 
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
@@ -213,17 +233,46 @@ function nextWorld(w: WorldSettings, v: string): [WorldField['key'], number] | n
 export async function handleSettings(action: string, value: string | undefined, ctx: ChatContext, env: SettingsEnv, scope: SettingsScope = 'chat'): Promise<boolean> {
   const v = value ?? '';
   const lore = ctx.char.globalLore;
-  if (action === 'set-save-default') {
-    // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
-    const cur = current(ctx, 'chat');
-    await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-    if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
+  if (action === 'set-bar') {
+    settingsUi.confirm = v === 'save' || v === 'load' ? v : '';
     env.render();
+    return true;
+  }
+  if (action === 'set-bar-no') {
+    settingsUi.confirm = '';
+    env.render();
+    return true;
+  }
+  if (action === 'set-bar-yes') {
+    const what = settingsUi.confirm;
+    settingsUi.confirm = '';
+    if (what === 'save') {
+      // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
+      const cur = current(ctx, 'chat');
+      await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
+      if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
+      env.render();
+    } else if (what === 'load') {
+      // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
+      const d = current(ctx, 'defaults');
+      await save(ctx, env, (chat) => {
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme };
+        for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
+        if (worldOn(chat)) {
+          const ss = { ...(chat.scriptstate ?? {}), ...vars };
+          Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? '')));
+        }
+        return vars;
+      });
+      if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
+      env.render();
+    } else env.render();
     return true;
   }
   if (action === 'set-scope') {
     settingsUi.scope = v === 'defaults' || v === 'card' ? v : 'chat';
     settingsUi.confirmOff = false;
+    settingsUi.confirm = '';
     env.render();
     return true;
   }
