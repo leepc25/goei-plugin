@@ -1,11 +1,13 @@
 // 설정 → 「카드 명부」: 로어북 폴더에서 모은 괴이·미스틱 사이트·요원의 세부값 편집.
-// 고친 값은 카드 로어북 「괴이봇 명부」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
+// 고친 값은 카드 로어북 「Directory」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
 import {
   assignOrg, directoryData, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
 import { MAP_CODES, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
 import { assetUrl } from '../host/assets';
+import { LEGACY_DATA } from '../core/lorebooks';
+import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { avatar } from './images';
@@ -82,12 +84,15 @@ const draftExtras = (d: Directory) => d.orgs.filter((o) => !o.faction && o.spec.
 const codesOf = (d: Directory) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code!)];
 function namesOf(d: Directory, lore: ChatContext['char']['globalLore']): Record<string, string> {
   const out = factionDisplayNames(lore ?? []);
+  for (const f of BUILTIN) if (d.display.none?.[f]) out[f] = d.display.none[f];
   for (const o of draftExtras(d)) out[o.spec.code!] = o.name;
   return out;
 }
 const tabName = (o: OrgRow) => o.spec.tab || Array.from(o.name).slice(0, 2).join('');
 function tabsOf(d: Directory, lore: ChatContext['char']['globalLore']) {
-  const tabs = phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
+  const tabs = d.phoneTabs.tabs.length
+    ? d.phoneTabs.tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }))
+    : phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
   for (const o of draftExtras(d)) tabs.push({ id: extraTabId(o.spec.code!), name: tabName(o), visibleFor: [o.spec.code!] });
   return tabs;
 }
@@ -182,7 +187,7 @@ function factionBlock(o: OrgRow, ctx: ChatContext): string {
     ${area(k('blurb'), o.spec.blurb ?? '', '시작 화면 설명')}
     ${input(k('photo'), o.spec.photo ?? '', '사진 에셋 이름', o.faction ? '비우면 원래 사진(f01~f05)' : '카드 에셋 이름. 비우면 사진 없이')}`;
   if (o.faction) {
-    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg('dir-fac-hide', !o.spec.hidden, '보임', '숨김')}</div>${start}</div>`;
+    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg('dir-fac-hide', !o.spec.hidden, '보임', '숨김')}</div>${start}${builtinBlock(o.faction, dirUi.draft!)}</div>`;
   }
   const on = !!o.spec.playable;
   const ready = placeholdersReady(lore);
@@ -202,6 +207,23 @@ function factionBlock(o: OrgRow, ctx: ChatContext): string {
   </div>`;
 }
 
+/** 기본 세력: 다른 세력이 부르는 이름, 괴담톡 전용 탭 이름, 첫 장면마다 함께 넣을 로어북 */
+function builtinBlock(code: string, d: Directory): string {
+  const viewers = [['none', '기본'], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
+  const fallback = d.display.none?.[code] ?? '';
+  const names = viewers
+    .map(([v, label]) => `<label class="dir-in"><span>${esc(label)}</span><input data-input="dir" data-key="${esc(`disp:${v}|${code}`)}" value="${esc(d.display[v]?.[code] ?? '')}" placeholder="${esc(fallback)}" autocomplete="off"></label>`)
+    .join('');
+  const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code);
+  const tab = own ? input(`ptab:${own.id}`, own.name, '괴담톡 전용 탭 이름') : '';
+  const scenes = (SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? [])
+    .map((sc) => input(`seed:${code}-${sc.fm}`, (d.seeds[`${code}-${sc.fm}`] ?? []).join(', '), `${sc.fm}. ${esc(sc.label)}`))
+    .join('');
+  return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names}</div>
+    ${tab}
+    <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
+}
+
 function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
   const lore = ctx.char.globalLore ?? [];
   const names = namesOf(d, lore);
@@ -212,7 +234,7 @@ function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip('dir-org-toggle', `rosterFor|${f}|${o.name}`, names[f], o.rosterFor.includes(f))).join('')}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs.map((t) => chip('dir-org-toggle', `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join('')}</div></div>
     <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? '<p class="gx-muted">기본 플레이 세력이라 조직 이름은 Faction display 로어북을 따라요.</p>' : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
+    ${o.faction ? '' : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
       <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ''}>지우기</button></div>`}
     ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc(m.name)).join(', ')}</p>` : ''}
@@ -436,6 +458,25 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     if (field === 'aliases') b.aliases = splitList(value);
     else if (field === 'label' || field === 'lore' || field === 'english') b[field] = value.trim();
     else return;
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
+  if (key.startsWith('disp:') || key.startsWith('ptab:') || key.startsWith('seed:')) {
+    const [kind, rest] = [key.slice(0, 4), key.slice(5)];
+    if (kind === 'disp') {
+      const [viewer, code] = rest.split('|');
+      const m = (d.display[viewer] ??= {});
+      if (value.trim()) m[code] = value.trim();
+      else delete m[code];
+    } else if (kind === 'ptab') {
+      const t = d.phoneTabs.tabs.find((x) => x.id === rest);
+      if (t) t.name = value.trim() || t.id;
+    } else {
+      const names = splitList(value);
+      if (names.length) d.seeds[rest] = names;
+      else delete d.seeds[rest];
+    }
     dirUi.done = '';
     if (bar) bar.innerHTML = directoryBar();
     return;
@@ -726,8 +767,8 @@ export async function handleDirectory(action: string, value: string | undefined,
       try {
         const data = directoryData(d);
         let saved: ChatContext['char']['globalLore'] = undefined;
-        // 거점이 명부로 옮겨졌으니 옛 World catalog(폴더 있는 카드에서는 랜드마크만 남은 것)는 뺀다
-        await updateCharacterLore(ctx.charIndex, (lore) => (saved = withDirectory(lore, data).filter((e) => !d.folders || e.comment !== 'World catalog')));
+        // 거점·호칭·괴담톡 탭·첫 턴 로어북이 명부로 옮겨졌으니 옛 데이터 로어북은 뺀다
+        await updateCharacterLore(ctx.charIndex, (lore) => (saved = withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? '')))));
         dirUi.draft = null;
         dirUi.done = '카드 로어북에 저장했어요';
         // 지금 채팅의 새 세력 변수(태그·세력 로어북 자리표시자)를 바로 맞춘다. 다른 채팅은 다음 응답 때 맞춰진다

@@ -8882,6 +8882,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .dir-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
 .dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dir-grid > * { min-width: 0; }
+.dir-grid input { width: 100%; box-sizing: border-box; }
+.dir-grid.names { grid-template-columns: repeat(3, 1fr); }
 .dir-in { display: flex; flex-direction: column; gap: 4px; }
 .dir-in > span { font-size: 13px; color: var(--sub); font-weight: 600; }
 .dir-in input { min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; }
@@ -8890,6 +8893,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-kinds .gx-seg { white-space: nowrap; padding: 0 6px; }
 @media (max-width: 760px) {
   .dir-grid { grid-template-columns: 1fr; }
+  .dir-grid.names { grid-template-columns: 1fr 1fr; }
   .dir-kinds .long { display: none; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }
@@ -12133,12 +12137,13 @@ var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o
 var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
 function namesOf(d, lore) {
   const out = factionDisplayNames(lore ?? []);
+  for (const f of BUILTIN) if (d.display.none?.[f]) out[f] = d.display.none[f];
   for (const o of draftExtras(d)) out[o.spec.code] = o.name;
   return out;
 }
 var tabName = (o) => o.spec.tab || Array.from(o.name).slice(0, 2).join("");
 function tabsOf(d, lore) {
-  const tabs2 = phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
+  const tabs2 = d.phoneTabs.tabs.length ? d.phoneTabs.tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] })) : phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
   for (const o of draftExtras(d)) tabs2.push({ id: extraTabId(o.spec.code), name: tabName(o), visibleFor: [o.spec.code] });
   return tabs2;
 }
@@ -12218,7 +12223,7 @@ function factionBlock(o, ctx) {
     ${area(k("blurb"), o.spec.blurb ?? "", "시작 화면 설명")}
     ${input(k("photo"), o.spec.photo ?? "", "사진 에셋 이름", o.faction ? "비우면 원래 사진(f01~f05)" : "카드 에셋 이름. 비우면 사진 없이")}`;
   if (o.faction) {
-    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg5("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start2}</div>`;
+    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg5("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start2}${builtinBlock(o.faction, dirUi.draft)}</div>`;
   }
   const on = !!o.spec.playable;
   const ready = placeholdersReady(lore);
@@ -12235,6 +12240,17 @@ function factionBlock(o, ctx) {
     ${input(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc10(tabName(o))}」`)}
   </div>`;
 }
+function builtinBlock(code, d) {
+  const viewers = [["none", "기본"], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
+  const fallback = d.display.none?.[code] ?? "";
+  const names3 = viewers.map(([v, label]) => `<label class="dir-in"><span>${esc10(label)}</span><input data-input="dir" data-key="${esc10(`disp:${v}|${code}`)}" value="${esc10(d.display[v]?.[code] ?? "")}" placeholder="${esc10(fallback)}" autocomplete="off"></label>`).join("");
+  const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code);
+  const tab2 = own ? input(`ptab:${own.id}`, own.name, "괴담톡 전용 탭 이름") : "";
+  const scenes = (SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? []).map((sc) => input(`seed:${code}-${sc.fm}`, (d.seeds[`${code}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc10(sc.label)}`)).join("");
+  return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names3}</div>
+    ${tab2}
+    <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
+}
 function orgPanel(o, ctx, d) {
   const lore = ctx.char.globalLore ?? [];
   const names3 = namesOf(d, lore);
@@ -12245,7 +12261,7 @@ function orgPanel(o, ctx, d) {
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip("dir-org-toggle", `rosterFor|${f}|${o.name}`, names3[f], o.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
     <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? '<p class="gx-muted">기본 플레이 세력이라 조직 이름은 Faction display 로어북을 따라요.</p>' : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc10(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
+    ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc10(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
       <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc10(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
     ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc10(m.name)).join(", ")}</p>` : ""}
@@ -12424,6 +12440,25 @@ function directoryInput(key, value, bar) {
     if (field5 === "aliases") b.aliases = splitList(value);
     else if (field5 === "label" || field5 === "lore" || field5 === "english") b[field5] = value.trim();
     else return;
+    dirUi.done = "";
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
+  if (key.startsWith("disp:") || key.startsWith("ptab:") || key.startsWith("seed:")) {
+    const [kind, rest] = [key.slice(0, 4), key.slice(5)];
+    if (kind === "disp") {
+      const [viewer, code] = rest.split("|");
+      const m = d.display[viewer] ??= {};
+      if (value.trim()) m[code] = value.trim();
+      else delete m[code];
+    } else if (kind === "ptab") {
+      const t = d.phoneTabs.tabs.find((x) => x.id === rest);
+      if (t) t.name = value.trim() || t.id;
+    } else {
+      const names3 = splitList(value);
+      if (names3.length) d.seeds[rest] = names3;
+      else delete d.seeds[rest];
+    }
     dirUi.done = "";
     if (bar) bar.innerHTML = directoryBar();
     return;
@@ -12710,7 +12745,7 @@ async function handleDirectory(action, value, ctx, env2) {
       try {
         const data = directoryData(d);
         let saved = void 0;
-        await updateCharacterLore(ctx.charIndex, (lore) => saved = withDirectory(lore, data).filter((e) => !d.folders || e.comment !== "World catalog"));
+        await updateCharacterLore(ctx.charIndex, (lore) => saved = withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
         dirUi.draft = null;
         dirUi.done = "카드 로어북에 저장했어요";
         if (saved && (ctx.chat.message ?? []).length) {

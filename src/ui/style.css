@@ -601,6 +601,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .dir-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
 .dir-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dir-grid > * { min-width: 0; }
+.dir-grid input { width: 100%; box-sizing: border-box; }
+.dir-grid.names { grid-template-columns: repeat(3, 1fr); }
 .dir-in { display: flex; flex-direction: column; gap: 4px; }
 .dir-in > span { font-size: 13px; color: var(--sub); font-weight: 600; }
 .dir-in input { min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; }
@@ -609,6 +612,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-kinds .gx-seg { white-space: nowrap; padding: 0 6px; }
 @media (max-width: 760px) {
   .dir-grid { grid-template-columns: 1fr; }
+  .dir-grid.names { grid-template-columns: 1fr 1fr; }
   .dir-kinds .long { display: none; }
   .dir-line > span { min-width: 0; flex-basis: 100%; }
 }

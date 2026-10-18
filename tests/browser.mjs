@@ -1315,6 +1315,21 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="dir-org-add"]');
   await page.waitForSelector('.dir-head[data-value="테스트 조직"]');
   await page.click('[data-action="dir-org-toggle"][data-value="rosterFor|A00|테스트 조직"]');
+  // 기본 세력: 부르는 이름·괴담톡 전용 탭·첫 장면 로어북
+  await page.click('.dir-head[data-value="관리국"]');
+  await page.fill('[data-input="dir"][data-key="disp:B00|A00"]', '짝퉁 관리국');
+  await page.fill('[data-input="dir"][data-key="ptab:T01"]', '본부');
+  await page.fill('[data-input="dir"][data-key="seed:A00-8"]', '관리국, 쟈알디');
+  if (shots) {
+    await page.evaluate(() => document.querySelector('[data-key="ptab:T01"]').scrollIntoView({ block: 'center' }));
+    await page.screenshot({ path: `${shots}/17-directory-builtin.png` });
+    const vp = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(300);
+    await page.locator('[data-key="disp:none|A00"]').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${shots}/17-directory-builtin-mobile.png` });
+    await page.setViewportSize(vp);
+  }
   await page.click('[data-action="dir-kind"][data-value="agent"]');
   await page.fill('[data-input="dir-q"]', '쟈알디');
   await page.click('.dir-head[data-value="쟈알디"]');
@@ -1330,6 +1345,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.deepEqual([book.요원.쟈알디.affiliation, book.요원.쟈알디.rank, book.요원.쟈알디.roster_for], ['테스트 조직', '국장', ['D00', 'E00', 'A00']]);
   assert.deepEqual(book.조직['테스트 조직'].roster_for, ['D00', 'E00', 'A00']);
   assert.equal(book.요원.쟈알디.id, 'P001', 'ID 유지');
+  assert.equal(book.호칭.B00.A00, '짝퉁 관리국');
+  assert.equal(book['괴담톡 탭'].tabs.find((t) => t.id === 'T01').name, '본부');
+  assert.deepEqual(book['시작 로어북']['A00-8'], ['관리국', '쟈알디']);
   const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === 'Directory'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
