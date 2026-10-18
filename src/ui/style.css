@@ -1450,11 +1450,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .st-scopebar .st-scope { grid-column: span 2; display: flex; }
 .st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
-.st-barbtns { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.st-barbtns .st-act { min-height: 36px; }
+/* PC: 덮어쓰기·불러오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
+.st-barbtns { grid-column: span 2; justify-self: end; display: flex; gap: 8px; }
 @media (max-width: 760px) {
   .st-scopebar, .st-barbtns { gap: 6px; }
-  .st-barbtns .st-act { min-height: 32px; }
+  .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
   .st-act { min-width: 0; min-height: 30px; padding: 0 6px; font-size: 13px; gap: 4px; }
   .st-act svg { width: 14px; height: 14px; }
 }
