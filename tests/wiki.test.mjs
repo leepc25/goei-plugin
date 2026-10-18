@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import {
   evaluate, buildRegistry, resolveName, referenceEntries, termPresent, collectRefs, limitRefs, refText, recentTurns, storyText,
   policySections, factionCodesToNames, canonicalTitle, wikiPrompt, acceptArticle, renderArticle, saveDoc, listDocs, findDoc, deleteDoc,
-  WIKI_DEFAULTS, validTitle, sceneRecord, stripModules,
+  WIKI_DEFAULTS, validTitle, sceneRecord, stripModules, prepareBaseDocs, baseDocs, WIKI_PACK_HEAD,
 } from '../dist-test/core.mjs';
 
 const REAL = '/mnt/project-files/analysis/extracted/module.json';
@@ -138,6 +139,19 @@ test('wiki: chat lore storage round trip, update in place and delete', () => {
   const back = findDoc(deleteDoc(chat, 'B'), 'B', card);
   assert.ok(back.base && back.body.includes('[Paragraph]base'));
   assert.equal(findDoc(chat, 'C', card).meta, null);
+});
+
+test('packed card wiki docs: unpacked once, loose entries win, chat docs win', async () => {
+  const doc = (t, p) => `<lightboard-namuwiki doc_title="${t}" doc_type="other">\n[Paragraph]${p}\n</lightboard-namuwiki>`;
+  const packed = WIKI_PACK_HEAD + gzipSync(Buffer.from(JSON.stringify({ 가: doc('가', 'pack'), 나: doc('나', 'pack') }))).toString('base64');
+  const lore = [{ comment: '📖위키 기본 문서', content: packed }, { comment: 'WIKI｜나', content: doc('나', 'loose') }];
+  assert.deepEqual(baseDocs([...lore]).map((d) => d.title), ['나']); // 풀기 전에는 낱개 문서만
+  await prepareBaseDocs(lore);
+  const docs = baseDocs(lore);
+  assert.deepEqual(docs.map((d) => [d.title, d.base, d.body.includes('loose')]), [['나', true, true], ['가', true, false]]);
+  const chat = { message: [], localLore: [{ comment: 'WIKI｜가', content: doc('가', 'mine') }] };
+  assert.ok(findDoc(chat, '가', lore).body.includes('mine'));
+  assert.ok(findDoc({ message: [] }, '가', lore).body.includes('pack'));
 });
 
 test('wiki prompt from the real card: sections, references, faction names', { skip: !realLore }, () => {

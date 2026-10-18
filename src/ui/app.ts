@@ -6,6 +6,7 @@ import {
   activeEvents, type Catalog, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
+import { prepareBaseDocs } from '../core/wiki';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
@@ -329,6 +330,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
 async function refresh(): Promise<void> {
   try {
     const ctx = await loadContext();
+    if (ctx) await prepareBaseDocs(ctx.char.globalLore).catch(() => undefined);
     if (!ctx) {
       view = { kind: 'error', message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
     } else {

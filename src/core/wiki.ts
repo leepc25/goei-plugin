@@ -128,14 +128,49 @@ function docsIn(entries: LoreEntry[]): WikiDoc[] {
   return out;
 }
 
+// 카드 기본 문서 묶음: 카드 무게를 줄이려고 {제목: 본문} JSON을 gzip+base64로 줄여 로어북 항목 하나에 담는다 (tools/build_lite_card.py add_wiki_base)
+export const WIKI_PACK_HEAD = 'GOEIWIKI1:';
+let pack: { src: string; docs: WikiDoc[] } | null = null;
+
+function packEntry(lore: LoreEntry[]): string | null {
+  for (const e of lore) {
+    const c = e?.content;
+    if (typeof c === 'string' && c.startsWith(WIKI_PACK_HEAD)) return c;
+  }
+  return null;
+}
+
+/** 기본 문서 묶음을 풀어 둔다 (창을 열 때 한 번). 같은 묶음이면 다시 풀지 않는다. 풀 수 없는 환경이면 묶음 없이 지나간다 */
+export async function prepareBaseDocs(lore: unknown): Promise<void> {
+  if (!Array.isArray(lore)) return;
+  const src = packEntry(lore as LoreEntry[]);
+  if (!src || pack?.src === src || typeof DecompressionStream === 'undefined') return;
+  const bin = atob(src.slice(WIKI_PACK_HEAD.length));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const text = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  const map = JSON.parse(text) as Record<string, string>;
+  const docs: WikiDoc[] = [];
+  for (const [title, body] of Object.entries(map)) {
+    const doc = typeof body === 'string' ? parseDocContent(title, body) : null;
+    if (doc) docs.push(doc);
+  }
+  pack = { src, docs };
+}
+
 // 카드 기본 문서는 크고(수백 개) 거의 안 바뀌므로 카드 로어북마다 한 번만 읽는다
 const baseCache = new WeakMap<object, WikiDoc[]>();
 export function baseDocs(lore: unknown): WikiDoc[] {
   if (!Array.isArray(lore)) return [];
   let docs = baseCache.get(lore);
   if (!docs) {
-    docs = docsIn(lore as LoreEntry[]).map((d) => ({ ...d, base: true }));
-    baseCache.set(lore, docs);
+    const src = packEntry(lore as LoreEntry[]);
+    const ready = !src || pack?.src === src;
+    const loose = docsIn(lore as LoreEntry[]);
+    const have = new Set(loose.map((d) => d.title));
+    const packed = src && pack?.src === src ? pack.docs.filter((d) => !have.has(d.title)) : [];
+    docs = [...loose, ...packed].map((d) => ({ ...d, base: true }));
+    if (ready) baseCache.set(lore, docs); // 묶음을 아직 안 풀었으면 저장하지 않고 다음에 다시 본다
   }
   return docs;
 }

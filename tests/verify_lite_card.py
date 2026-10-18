@@ -27,7 +27,7 @@ MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog', 'Faction d
 TIDIED = ('GNet', 'Phone', 'Wiki')
 orig_books = [e for e in ms['lorebook'] if e['comment'] not in MOVED + TIDIED]
 orig_lore = {(e['comment'], e['content']) for e in orig_books}
-lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] != '📖위키']
+lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] not in ('📖위키', '📖위키 기본 문서')]
 FAC_VARS = re.compile(r'\{\{getvar::fac_(codes|ac|pool)\}\}')
 def unplaced(e):
     c = e['content']

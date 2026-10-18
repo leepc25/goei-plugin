@@ -11,6 +11,8 @@
 
 사용법: python3 tools/build_lite_card.py <원본.charx|원본.jpeg> <결과.charx>
 """
+import base64
+import gzip
 import hashlib
 import json
 import subprocess
@@ -227,9 +229,14 @@ WIKI_FOLDER_KEY = '\uf000folder:6f1c2a7e-wiki-0000-0000-goeiwiki0001'
 WIKI_FOLDER_NAME = '📖위키'
 
 
+WIKI_PACK_COMMENT = '📖위키 기본 문서'
+WIKI_PACK_HEAD = 'GOEIWIKI1:'  # core/wiki.ts WIKI_PACK_HEAD와 같게
+
+
 def add_wiki_base(entries):
-    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서)을 「📖위키」 폴더로 넣는다.
-    키 없는 비활성 항목이라 모델 프롬프트에는 들어가지 않고, 플러그인 위키만 읽는다"""
+    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서)을 「📖위키」 폴더의 항목 하나로 넣는다.
+    문서가 많아(2MB 넘음) 카드가 무거워지지 않게 {제목: 본문} JSON을 gzip+base64로 줄인다. 플러그인이 창을 열 때 한 번 푼다(core/wiki.ts prepareBaseDocs).
+    키 없는 비활성 항목이라 모델 프롬프트에는 들어가지 않는다"""
     path = ROOT / 'card' / 'wiki-base.json'
     if not path.exists():
         return entries
@@ -237,9 +244,10 @@ def add_wiki_base(entries):
     entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY]
     entries.append({'key': WIKI_FOLDER_KEY, 'comment': WIKI_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
                     'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
-    for title, body in docs.items():
-        entries.append({'key': '', 'secondkey': '', 'comment': f'WIKI｜{title}', 'content': body, 'mode': 'normal', 'insertorder': 0,
-                        'alwaysActive': False, 'selective': False, 'useRegex': False, 'folder': WIKI_FOLDER_KEY, 'bookVersion': 2})
+    raw = json.dumps(docs, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+    packed = WIKI_PACK_HEAD + base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode('ascii')
+    entries.append({'key': '', 'secondkey': '', 'comment': WIKI_PACK_COMMENT, 'content': packed, 'mode': 'normal', 'insertorder': 0,
+                    'alwaysActive': False, 'selective': False, 'useRegex': False, 'folder': WIKI_FOLDER_KEY, 'bookVersion': 2})
     return entries
 
 
