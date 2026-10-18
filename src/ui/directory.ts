@@ -34,13 +34,15 @@ export const dirUi = {
   /** 다른 폴더 로어북을 발생 후보로 고르는 칸 */
   adding: false,
   addQ: '',
+  /** 명부 사용법 펼침 */
+  help: false,
   /** 사진을 고르는 중인 괴이·특수 (로어북 이름) */
   pick: '',
   pickQ: '',
 };
 
 export function resetDirectory(): void {
-  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', pick: '', pickQ: '' });
+  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', help: false, pick: '', pickQ: '' });
 }
 
 const esc = (s: unknown) =>
@@ -390,9 +392,7 @@ function baseList(ctx: ChatContext, d: Directory, q: string): string {
   // 조직마다 거점이 하나뿐이라 조직 제목을 따로 달지 않고, 조직 순서로 한 목록에 (조직은 줄 아래 작은 글씨)
   const rank = (b: BaseRow) => (b.org ? order.indexOf(b.org) : order.length);
   const sorted = [...rows].sort((x, y) => rank(x) - rank(y));
-  return `<div class="dir-add"><input name="dir-base-new" placeholder="새 거점 이름" aria-label="새 거점 이름" autocomplete="off" data-enter="dir-base-new">
-      <button class="gx-mini" data-action="dir-base-new" data-take="dir-base-new">거점 추가</button></div>
-    ${sorted.length ? sorted.map((b) => baseRow(b, ctx, d)).join('') : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
+  return `    ${sorted.length ? sorted.map((b) => baseRow(b, ctx, d)).join('') : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
 }
 
 /** 새 거점 이름: 겹치면 뒤에 번호 */
@@ -430,9 +430,7 @@ export function directoryList(ctx: ChatContext): string {
   if (dirUi.kind === 'base') return baseList(ctx, d, q);
   if (dirUi.kind === 'org') {
     const rows = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
-    return `<div class="dir-add"><input name="dir-org-new" placeholder="새 조직 이름" aria-label="새 조직 이름" autocomplete="off" data-enter="dir-org-add">
-      <button class="gx-mini" data-action="dir-org-add" data-take="dir-org-new">조직 추가</button></div>
-      ${rows.map((o) => orgRow(o, ctx, d, names)).join('') || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
+    return `${rows.map((o) => orgRow(o, ctx, d, names)).join('') || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
   }
   if (dirUi.kind !== 'agent') {
     // 폴더 안 항목 → 다른 폴더에서 끌어온 후보(조직·개체 등, 원본 World catalog에서 온 것 포함) → 후보 추가
@@ -441,13 +439,9 @@ export function directoryList(ctx: ChatContext): string {
     const inside = rows.filter((r) => r.inFolder);
     const outside = rows.filter((r) => !r.inFolder);
     const folder = dirUi.kind === 'anomaly' ? '🚧괴이' : '🎁파밍';
-    const add = dirUi.adding
-      ? `<div class="dir-ext"><div class="dir-ext-head"><input class="gx-search" data-input="dir-ext-q" value="${esc(dirUi.addQ)}" placeholder="로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><button class="gx-mini" data-action="dir-ext-close">닫기</button></div>
-          <div class="dir-ext-list">${directoryExtList(ctx)}</div></div>`
-      : `<button class="dir-ext-open" data-action="dir-ext-open">＋ 다른 폴더에서 후보 추가</button>`;
     return `${inside.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside.length}</small></h3>${inside.map((r) => placeRow(r, ctx)).join('')}` : ''}
       ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, ctx, src.get(r.lore))).join('')}` : ''}
-      ${!rows.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ''}${q ? '' : add}`;
+      ${!rows.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ''}`;
   }
   const rows = d.agents.filter((r) => matches(r, q));
   if (!rows.length) return '<p class="gx-muted dir-empty">맞는 사람이 없어요.</p>';
@@ -493,8 +487,13 @@ export function directoryView(ctx: ChatContext): string {
     <div class="gx-segs dir-kinds">${kinds
       .map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? ' on' : ''}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`)
       .join('')}</div>
-    <details class="dir-help">
-      <summary>명부 사용법</summary>
+    <div class="dir-tools">
+      <div class="dir-qbox">${directorySearch()}</div>
+      ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? ' on' : ''}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ''}
+      <button class="dir-tool icon${dirUi.help ? ' on' : ''}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>
+    </div>
+    ${dirUi.adding ? addPanel(ctx) : ''}
+    ${dirUi.help ? `<div class="dir-help">
       <ul>
         <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
         <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
@@ -502,12 +501,25 @@ export function directoryView(ctx: ChatContext): string {
         <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
       </ul>
       ${d.folders ? '' : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
-    </details>
+    </div>` : ''}
     ${dirUi.notice ? `<div class="gx-err" role="alert">${esc(dirUi.notice)}</div>` : ''}
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ''}
-    <div class="dir-qbox">${directorySearch()}</div>
     <div class="dir-list">${directoryList(ctx)}</div>
   </div>`;
+}
+
+// 명부 위 한 줄 도구: 검색 · 추가 · 사용법 (요원은 로어북 폴더에서 들어오므로 추가 없음)
+const ADD_LABEL: Record<Kind, string> = { anomaly: '후보 추가', site: '후보 추가', agent: '', org: '조직 추가', base: '거점 추가' };
+
+/** 「추가」를 눌렀을 때만 펼치는 칸 */
+function addPanel(ctx: ChatContext): string {
+  if (dirUi.kind === 'org' || dirUi.kind === 'base') {
+    const [name, act, hint] = dirUi.kind === 'org' ? ['dir-org-new', 'dir-org-add', '새 조직 이름'] : ['dir-base-new', 'dir-base-new', '새 거점 이름'];
+    return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act}">
+      <button class="gx-mini" data-action="${act}" data-take="${name}">추가</button></div></div>`;
+  }
+  return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
+    <div class="dir-ext-list">${directoryExtList(ctx)}</div></div>`;
 }
 
 const unassigned = (d: Directory) => d.agents.filter((a) => !a.affiliation).length;
@@ -658,6 +670,7 @@ export async function handleDirectory(action: string, value: string | undefined,
       }
       d.orgs.push({ name, faction: '', rosterFor: ['D00', 'E00'], phoneTabs: [], spec: {} });
       dirUi.open = name;
+      dirUi.adding = false;
       dirUi.notice = '';
       dirUi.done = '';
       break;
@@ -709,6 +722,7 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.kind = 'base';
       dirUi.open = name;
       dirUi.q = '';
+      dirUi.adding = false;
       dirUi.notice = '';
       dirUi.done = '';
       break;
@@ -801,6 +815,13 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-ext-open':
       dirUi.adding = true;
       dirUi.addQ = '';
+      break;
+    case 'dir-add-toggle':
+      dirUi.adding = !dirUi.adding;
+      dirUi.addQ = '';
+      break;
+    case 'dir-help':
+      dirUi.help = !dirUi.help;
       break;
     case 'dir-photo-pick':
       dirUi.pick = dirUi.pick === v ? '' : v;

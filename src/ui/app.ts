@@ -35,7 +35,7 @@ import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, new
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
-import { basicDefaults, basicVars, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
+import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
 
 interface Draft {
   faction?: FactionCode;
@@ -684,6 +684,10 @@ function render(): void {
     : '';
   const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
   root.dataset.theme = themeOf();
+  // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
+  const pf = getPrefs();
+  root.dataset.nav = pf.nav ?? 'left';
+  root.style.setProperty('--dim', String((pf.dim ?? DIM_DEFAULT) / 100));
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
   root.dataset.tab = tab;

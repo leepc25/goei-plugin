@@ -89,7 +89,14 @@ export interface Prefs {
   theme?: Theme;
   /** 괴담톡·괴담넷·위키 설정의 새 채팅 기본값: 채팅 변수 이름 → 값 (각 설정 화면의 「기본값으로 저장」) */
   vars?: Record<string, string>;
+  /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
+  nav?: 'left' | 'right';
+  dim?: number;
 }
+
+/** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
+export const DIM_DEFAULT = 50;
+export const DIM_STEPS = [0, 25, 50, 75, 100];
 
 let prefs: Prefs = { basic: {}, world: {} };
 
@@ -124,7 +131,9 @@ export function setPrefs(raw: unknown): Prefs {
   if (o.vars && typeof o.vars === 'object') {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}) };
+  const nav = o.nav === 'right' ? 'right' : undefined;
+  const dim = int(o.dim, 0, 100);
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}) };
   return prefs;
 }
 

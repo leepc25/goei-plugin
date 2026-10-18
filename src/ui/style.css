@@ -58,9 +58,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex; align-items: center; justify-content: center;
   padding: 14px;
   /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
-  background: var(--scrim);
   color: var(--text);
 }
+/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」(--dim, 0~1) */
+.gx::before { content: ""; position: absolute; inset: 0; background: var(--scrim); opacity: var(--dim, .5); pointer-events: none; }
 .gx-panel {
   /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
@@ -90,6 +91,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 45%, transparent); border: 2px solid transparent; background-clip: padding-box; }
 .gx ::-webkit-scrollbar-corner { background: transparent; }
 .gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "nav head" "nav body"; }
+/* 메뉴를 오른쪽에 (설정 → 화면 「메뉴 위치」, PC만) */
+.gx[data-nav="right"] .gx-panel.has-nav { grid-template-columns: minmax(0, 1fr) 236px; grid-template-areas: "head nav" "body nav"; }
+.gx[data-nav="right"] .gx-nav { border-right: 0; border-left: 1px solid var(--panel2); }
 .gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
 .gx-content > .gx-body, .gx-content > main { flex: 1; min-height: 0; }
 .gx-head {
@@ -1699,7 +1703,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 /* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
 .gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
-.gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 9px 0 8px; margin-bottom: -14px; background: var(--void); }
+.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
 .gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
 
 
@@ -1738,3 +1742,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-gp-card { width: 100%; }
   .gx-gp-act { margin-top: auto; flex-direction: column; }
 }
+
+/* 명부 위 한 줄 도구 (검색 · 추가 · 사용법). 추가 칸·사용법은 누를 때만 펼친다 */
+.dir-tools { display: flex; gap: 8px; align-items: stretch; }
+.dir-tools .dir-qbox { flex: 1; min-width: 0; }
+.dir-tools .dir-search { margin: 0; height: 100%; }
+.dir-tool { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.dir-tool svg { width: 16px; height: 16px; }
+.dir-tool.icon { width: 44px; justify-content: center; padding: 0; font-size: 16px; }
+.dir-tool:hover, .dir-tool.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+.dir-help { padding-top: 10px; }
+@media (max-width: 760px) { .dir-tools { justify-content: flex-end; } }

@@ -1,7 +1,7 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
 import {
-  AGENT_MAX, basicDefaults, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
+  AGENT_MAX, basicDefaults, DIM_DEFAULT, DIM_STEPS, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
@@ -153,7 +153,11 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
-    ${group('화면', field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음).'))}
+    ${group('화면', [
+      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음).'),
+      field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
+      field('창 바깥 어둡기', seg('set-dim', String(getPrefs().dim ?? DIM_DEFAULT), DIM_STEPS.map((n) => [String(n), `${n}%`] as [string, string]), busy), '창 뒤의 채팅 화면을 얼마나 가릴지 정해요. 0%면 그대로 보여요.'),
+    ].join(''))}
     ${group('상황판', [
       field('괴이 발생 · 요원 시스템', anomaly, scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.'),
       field('요원 표시 인원', stepper('set-agent', 'n', `${s.agentLimit}명`, s.agentLimit > 0, s.agentLimit < AGENT_MAX, '요원 표시 인원', busy), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
@@ -269,6 +273,13 @@ export async function handleSettings(action: string, value: string | undefined, 
       if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
       env.render();
     } else env.render();
+    return true;
+  }
+  // 창 모양은 채팅·기본값 구분 없이 이 기기 설정으로
+  if (action === 'set-nav' || action === 'set-dim') {
+    const n = Number(v);
+    if (action === 'set-nav' && (v === 'left' || v === 'right')) await saveDefaults(env, (p) => ({ ...p, nav: v === 'right' ? 'right' : undefined }));
+    else if (action === 'set-dim' && DIM_STEPS.includes(n)) await saveDefaults(env, (p) => ({ ...p, dim: n }));
     return true;
   }
   if (action === 'set-scope') {

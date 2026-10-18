@@ -1403,7 +1403,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="dir-kind"][data-value="anomaly"]');
   const listText = await page.textContent('.dir-list');
   assert.ok(listText.includes('다른 폴더에서 온 후보') && listText.includes('🙂요원 · 개체') && listText.includes('🌆세력'), '출처 폴더 표시');
-  await page.click('[data-action="dir-ext-open"]');
+  await page.click('[data-action="dir-add-toggle"]');
   await page.fill('[data-input="dir-ext-q"]', '세력');
   const extName = await page.getAttribute('.dir-ext-item', 'data-value');
   assert.ok(extName);
@@ -1411,6 +1411,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector(`.dir-head[data-value="${extName}"][aria-expanded="true"]`);
   // 조직 추가 → 요원에게 고르기
   await page.click('[data-action="dir-kind"][data-value="org"]');
+  await page.click('[data-action="dir-add-toggle"]');
   await page.fill('[name="dir-org-new"]', '테스트 조직');
   await page.click('[data-action="dir-org-add"]');
   await page.waitForSelector('.dir-head[data-value="테스트 조직"]');
@@ -1662,6 +1663,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   await page.click('[data-action="dir-kind"][data-value="org"]');
+  await page.click('[data-action="dir-add-toggle"]');
   await page.fill('[name="dir-org-new"]', '테스트 결사');
   await page.click('[data-action="dir-org-add"]');
   await page.waitForSelector('[data-action="dir-fac-play"][data-value="1|테스트 결사"]');
@@ -1909,6 +1911,17 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   assert.ok(a.scrolled && a.gap <= 2, `설정 줄 고정 ${JSON.stringify(a)}`);
   const m = vp.width < 500 ? 'm' : 'pc';
   if (shots) await page.screenshot({ path: `${shots}/17b-set-sticky-${m}.png` });
+  if (m === 'pc') {
+    // 화면: 메뉴 오른쪽, 창 바깥 어둡기 0%
+    await page.click('[data-action="set-nav"][data-value="right"]');
+    await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
+    assert.ok(await page.evaluate(() => document.querySelector('.gx-nav').getBoundingClientRect().left > document.querySelector('.gx-content').getBoundingClientRect().left), '메뉴가 오른쪽');
+    await page.click('[data-action="set-dim"][data-value="0"]');
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.gx'), '::before').opacity === '0');
+    if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
+    await page.click('[data-action="set-nav"][data-value="left"]');
+    await page.click('[data-action="set-dim"][data-value="50"]');
+  }
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir-kinds');
   await page.click('[data-action="dir-kind"][data-value="agent"]');
@@ -1954,6 +1967,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.click('[data-action="dir-kind"][data-value="base"]');
+  await page.click('[data-action="dir-add-toggle"]');
   await page.fill('input[name="dir-base-new"]', '시험 거점');
   await page.click('[data-action="dir-base-new"][data-take="dir-base-new"]');
   await page.waitForSelector('.dir-row:has-text("시험 거점")');
