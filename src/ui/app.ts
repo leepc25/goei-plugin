@@ -687,7 +687,8 @@ function backStep(): (() => void) | null {
       break;
     case 'map':
     case 'mission': {
-      // 고른 장소·목표 풀기 (필터 줄 끝 「취소」와 같음)
+      // 편성 단계면 목표 단계로, 목표 단계면 고른 장소·목표 풀기 (필터 줄 끝 「취소」와 같음)
+      if (field.step === 'team') return go('field-step', 'goal');
       const undo = root?.querySelector<HTMLButtonElement>('.gx-unplace:not([disabled])');
       if (undo) return () => undo.click();
       break;

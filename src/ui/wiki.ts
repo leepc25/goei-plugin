@@ -123,9 +123,7 @@ function search(ctx: ChatContext, q: string) {
   const c = canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
-  const lower = query.toLowerCase();
-  if (!matches(ctx, query).length && !listDocs(ctx.chat, ctx.char.globalLore).some((d) => d.title.toLowerCase().includes(lower))) return openTitle(ctx, c.title, 'direct');
-  // 여러 개가 걸리면 목록을 펼쳐 고르게
+  // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)
   wiki.listOpen = true;
 }
 

@@ -1185,6 +1185,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-gmark.an.g-b { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 45%, transparent); }
 .gx-gmark.an.g-c { color: color-mix(in srgb, var(--danger) 80%, transparent); }
 .gx-gmark.an.g-d, .gx-gmark.an.g-e { color: color-mix(in srgb, var(--danger) 55%, transparent); }
+/* 밝은·종이 테마: 흰 글자 빛남은 옅은 바탕에서 번진 얼룩처럼 보여 글자가 안 읽힌다 → 진한 글자에 작은 빛 */
+.gx[data-theme="light"] .gx-gmark.an.g-s, .gx[data-theme="paper"] .gx-gmark.an.g-s { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 50%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-a, .gx[data-theme="paper"] .gx-gmark.an.g-a { color: var(--danger); text-shadow: 0 0 4px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-b, .gx[data-theme="paper"] .gx-gmark.an.g-b { text-shadow: none; }
 .gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
 .gx-evc .gx-gmark.ms { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
 .gx-evc .gx-gmark svg { width: 16px; height: 16px; }
