@@ -3,7 +3,7 @@ import { bodyVersion, BodyError, fetchBody } from './body';
 
 const CSS = `
 .gl-back{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,8,10,.72);font:14px/1.5 system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#E6EEEC;box-sizing:border-box}
-.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #24343B;border-radius:14px;background:#121B1F;box-sizing:border-box}
+.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #37464D;border-radius:14px;background:#232D32;box-sizing:border-box}
 .gl-card b{font-size:16px}
 .gl-card p{margin:0;color:#B5C4C0}
 .gl-msg{padding:8px 12px;border-radius:8px;background:#172328;color:#E6EEEC!important}
