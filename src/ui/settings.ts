@@ -105,11 +105,6 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 
 // v0.16.23 (사용자 설계): 「이 채팅 / 새 채팅 기본값」으로 같은 설정을 두 벌 두지 않는다. 설정은 하나(지금 채팅)이고,
 // 「기본값으로 저장」을 누르면 지금 값이 새 채팅 기본값이 된다. 채팅을 시작하기 전에는 기본값을 바로 고친다.
-const SCOPE_HELP: Record<SettingsScope, string> = {
-  chat: '지금 채팅에 적용돼요.',
-  defaults: '채팅을 시작하기 전이라 새 채팅 기본값을 고쳐요.',
-  card: '',
-};
 
 // 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「덮어쓰기」「불러오기」 (전환보다 한 단계 작게). 설정에서는 새 채팅 기본값을,
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
@@ -137,7 +132,7 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   const confirm = c
     ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`
     : '';
-  return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}${SCOPE_HELP[scope] ? `<p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>` : ''}`;
+  return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
