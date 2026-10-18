@@ -618,7 +618,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     await page.waitForFunction(() => window.__chat.message.at(-1).data.startsWith('%%SCENE_CARD:'));
     const last = await page.evaluate(() => window.__chat.message.at(-1).data);
     const html = await page.evaluate((t) => window.__calls.handlers.display(t), last);
-    assert.ok(html.includes('data-goei-cancel') && html.includes('전송 버튼'), html);
+    assert.ok(html.includes('data-goei-cancel') && html.includes('전송 대기'), html);
     assert.equal(await page.locator('.gx-err, .gx-notice').count(), 0, '창 안내 없음');
     await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'msg'; d.innerHTML = h; document.querySelector('.default-chat-screen').appendChild(d); }, html);
     await page.click('#msg [data-goei-cancel]');

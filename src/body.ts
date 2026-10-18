@@ -1,4 +1,4 @@
-import { clearUnsent } from './host/unsent';
+import { clearUnsent, unsentShown } from './host/unsent';
 import { isSceneUnsent } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
@@ -198,9 +198,10 @@ const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<'
 function sceneCardHtml(s: { target: string; party: string; unsent?: boolean }): string {
   const p = cardPalette();
   // 자동 전송이 막혀 아직 안 보낸 요청: 전송 안내와 취소 (host/unsent.ts)
+  if (s.unsent) unsentShown();
   const unsent = s.unsent
     ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">`
-      + `<span style="flex:1;color:${p.text}">채팅창의 전송 버튼을 누르면 보내져요.</span>`
+      + `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span>`
       + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button></span>`
     : '';
   return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap">`
