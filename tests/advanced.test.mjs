@@ -108,7 +108,7 @@ test('advanced: real card prompts follow reference toggles, persona, turns and l
 
 test('advanced: wiki main context sends the newest chat documents within the count and token cap', () => {
   let chat = { message: [], scriptstate: {}, localLore: [] };
-  const orig = { '$nw_adv_ctx_focus': '0', '$nw_adv_ctx_summary': '0', '$nw_adv_ctx_count': '1' };
+  const orig = { '$nw_adv_ctx_focus': '0', '$nw_adv_ctx_count': '1' };
   const meta = (title, created) => ({ title, mode: 'expand', model: 'main', created, length: 'short', sources: [], primarySources: [], writingRequest: '', direct: false });
   const body = (t) => `<lightboard-namuwiki>[Paragraph]${t}</lightboard-namuwiki>`;
   chat = saveDoc(chat, meta('옛 문서', 10), body('옛'));

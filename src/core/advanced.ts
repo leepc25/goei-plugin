@@ -141,8 +141,8 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
     {
       title: '본편 반영',
-      chips: [chip('ctx_focus', '본편에 나온 문서만', 1), chip('ctx_summary', '개요만', 1)],
-      items: [num('ctx_count', '넣을 문서', 2, 1, 50, '개'), num('ctx_tokens', '반영 토큰 상한', 3000, 0, 200000, TOK, { zero: '제한 없음' })],
+      chips: [chip('ctx_focus', '본편에 나온 문서만', 1), chip('ctx_lore', '로어북 있는 문서', 0), chip('ctx_created', '창작 문서', 1)],
+      items: [num('ctx_count', '넣을 문서', 2, 1, 50, '개'), num('ctx_tokens', '반영 토큰 상한', 8000, 0, 200000, TOK, { zero: '제한 없음' })],
     },
   ],
 };

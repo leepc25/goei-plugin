@@ -4101,8 +4101,8 @@ var ADV = {
     },
     {
       title: "본편 반영",
-      chips: [chip("ctx_focus", "본편에 나온 문서만", 1), chip("ctx_summary", "개요만", 1)],
-      items: [num2("ctx_count", "넣을 문서", 2, 1, 50, "개"), num2("ctx_tokens", "반영 토큰 상한", 3e3, 0, 2e5, TOK, { zero: "제한 없음" })]
+      chips: [chip("ctx_focus", "본편에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
+      items: [num2("ctx_count", "넣을 문서", 2, 1, 50, "개"), num2("ctx_tokens", "반영 토큰 상한", 8e3, 0, 2e5, TOK, { zero: "제한 없음" })]
     }
   ]
 };
@@ -5393,30 +5393,19 @@ function wikiMainContext(chat, rules2, focus) {
   const count = advNum(s4, "nw", "ctx_count");
   const cap = advNum(s4, "nw", "ctx_tokens");
   const onlyMentioned = advOn(s4, "nw", "ctx_focus");
-  const summary = advOn(s4, "nw", "ctx_summary");
-  const docs = listDocs(chat).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count);
+  const withLore = advOn(s4, "nw", "ctx_lore");
+  const created = advOn(s4, "nw", "ctx_created");
+  const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count);
   const kept = [];
   const payload = () => `[MODULE_CONTEXT_BEGIN]
 ${rules2}
 ${JSON.stringify({ feature: "wiki", records: kept })}
 [MODULE_CONTEXT_END]`;
   for (const { d } of docs) {
-    kept.unshift({ kind: "wiki_reference", title: d.title, mode: d.meta?.mode ?? "unknown", content: summary ? wikiSummary(d.body) : innerBody(d.body) });
+    kept.unshift({ kind: "wiki_reference", title: d.title, mode: d.meta?.mode ?? "unknown", content: innerBody(d.body) });
     if (cap > 0 && tokens(payload()) > cap) kept.shift();
   }
   return kept.length ? payload() : "";
-}
-function wikiSummary(body4) {
-  const lines = innerBody(body4).split(/\r?\n/);
-  const box = lines.filter((l) => l.startsWith("[Infobox]"));
-  const first = lines.findIndex((l) => l.startsWith("[Heading]"));
-  let paras;
-  if (first < 0) paras = lines.filter((l) => l.startsWith("[Paragraph]")).slice(0, 1);
-  else {
-    const next = lines.findIndex((l, i) => i > first && l.startsWith("[Heading]"));
-    paras = lines.slice(first + 1, next < 0 ? void 0 : next).filter((l) => l.startsWith("[Paragraph]"));
-  }
-  return paras.length ? [...box, ...paras].join("\n") : innerBody(body4);
 }
 function wikiContextRules(lore) {
   return policySections(lore, "Wiki").MAIN_CONTEXT?.trim() || null;
@@ -11706,7 +11695,7 @@ function settingsView3(ctx) {
       ${line("작성 모드", seg3("wiki-mode", s4.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
       ${line("모델", seg3("wiki-model", s4.model, [["main", "메인"], ["aux", "보조"]]))}
       ${line("새로고침 때 이전 문서 참고", seg3("wiki-refresh_previous", s4.refreshPrevious ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]))}
-      ${line("본편에 반영", seg3("wiki-context", wikiContextOn(ctx.chat.scriptstate) ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]), "본편에 나온 문서의 개요가 본편 요청에 참고로 붙어요")}
+      ${line("본편에 반영", seg3("wiki-context", wikiContextOn(ctx.chat.scriptstate) ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]), "본편에 나온 문서가 본편 요청에 참고로 붙어요")}
     </div></section>
     <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc8(req)}</textarea></div></div></section>

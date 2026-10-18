@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { focus as F, phone as P, advanced, mainContext, G_POST_BASE, addUserPost, wikiMainContext, wikiSummary, saveDoc } from '../dist-test/core.mjs';
+import { focus as F, phone as P, advanced, mainContext, G_POST_BASE, addUserPost, wikiMainContext, saveDoc } from '../dist-test/core.mjs';
 
 const reg = { entries: [], byTerm: new Map(), byLore: new Map() };
 const msg = (id, sender, text, who) => ({ id, sender, text, kind: 'text', audience: [who], time: '' });
@@ -49,15 +49,21 @@ test('focus: gnet main context keeps the newest post and dms, plus posts and dms
   assert.equal(got.filter((t) => t.startsWith('private_message')).length, 6);
 });
 
-test('focus: wiki sends only documents named in the scene, as the summary', () => {
-  const meta = (title, created) => ({ title, mode: 'expand', model: 'main', created, length: 'short', sources: [], primarySources: [], writingRequest: '', direct: false });
-  const body = (t) => `<lightboard-namuwiki>[Infobox]Title:${t}\n[Heading]Level:1|Title:개요\n[Paragraph]${t} 개요\n[Heading]Level:1|Title:상세\n[Paragraph]${t} 상세</lightboard-namuwiki>`;
+test('focus: wiki sends created documents named in the scene in full, lorebook documents only when turned on', () => {
+  const meta = (title, created, lore) => ({ title, mode: 'expand', model: 'main', created, length: 'short', sources: [], primarySources: lore ? [title] : [], writingRequest: '', direct: false });
+  const body = (t) => `<lightboard-namuwiki>[Heading]Level:1|Title:개요\n[Paragraph]${t} 개요\n[Heading]Level:1|Title:상세\n[Paragraph]${t} 상세</lightboard-namuwiki>`;
   let chat = { message: [], scriptstate: {}, localLore: [] };
-  chat = saveDoc(chat, meta('소라 랜드', 10), body('소라 랜드'));
-  chat = saveDoc(chat, meta('새 문서', 20), body('새 문서'));
-  const got = records(wikiMainContext(chat, 'R', F.makeFocus('소라 랜드에 다시 갔다', reg)));
-  assert.deepEqual(got.map((r) => r.title), ['소라 랜드']);
-  assert.equal(got[0].content, '[Infobox]Title:소라 랜드\n[Paragraph]소라 랜드 개요');
+  chat = saveDoc(chat, meta('소라 랜드', 10, true), body('소라 랜드'));
+  chat = saveDoc(chat, meta('검은 우체통', 20, false), body('검은 우체통'));
+  chat = saveDoc(chat, meta('새 문서', 30, false), body('새 문서'));
+  const scene = F.makeFocus('소라 랜드 앞의 검은 우체통을 열었다', reg);
+  const got = records(wikiMainContext(chat, 'R', scene));
+  assert.deepEqual(got.map((r) => r.title), ['검은 우체통'], '로어북 있는 문서는 기본으로 빠짐');
+  assert.ok(got[0].content.includes('검은 우체통 상세'), '전문');
+  chat.scriptstate = { '$nw_adv_ctx_lore': '1' };
+  assert.deepEqual(records(wikiMainContext(chat, 'R', scene)).map((r) => r.title), ['소라 랜드', '검은 우체통']);
+  chat.scriptstate = { '$nw_adv_ctx_lore': '1', '$nw_adv_ctx_created': '0' };
+  assert.deepEqual(records(wikiMainContext(chat, 'R', scene)).map((r) => r.title), ['소라 랜드']);
+  chat.scriptstate = {};
   assert.equal(wikiMainContext(chat, 'R', F.makeFocus('아무 일 없음', reg)), '');
-  assert.equal(wikiSummary('<lightboard-namuwiki>[Paragraph]하나\n[Paragraph]둘</lightboard-namuwiki>'), '[Paragraph]하나');
 });

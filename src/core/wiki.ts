@@ -424,9 +424,13 @@ export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null)
   const count = advNum(s, 'nw', 'ctx_count');
   const cap = advNum(s, 'nw', 'ctx_tokens');
   // 본편에 나온 문서만 (v0.16.27): 제목이나 그 항목의 다른 이름이 최근 본편에 나온 문서. 끄면 원본처럼 최근에 쓴 문서부터
+  // 로어북 있는 문서는 본편에 그 로어북이 이미 들어가니 기본은 뺀다. 로어북 없이 창작한 문서는 위키가 유일한 출처라 기본은 넣는다.
+  // 로어북 있는 주제도 창작으로 내용이 바뀔 수 있어 칩으로 따로 켤 수 있게 했다 (사용자 결정)
   const onlyMentioned = advOn(s, 'nw', 'ctx_focus');
-  const summary = advOn(s, 'nw', 'ctx_summary');
+  const withLore = advOn(s, 'nw', 'ctx_lore');
+  const created = advOn(s, 'nw', 'ctx_created');
   const docs = listDocs(chat)
+    .filter((d) => ((d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created))
     .filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title))
     .map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i }))
     .sort((a, b) => b.at - a.at || b.i - a.i)
@@ -434,24 +438,10 @@ export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null)
   const kept: Record<string, unknown>[] = [];
   const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'wiki', records: kept })}\n[MODULE_CONTEXT_END]`;
   for (const { d } of docs) {
-    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: summary ? wikiSummary(d.body) : innerBody(d.body) });
+    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: innerBody(d.body) });
     if (cap > 0 && tokens(payload()) > cap) kept.shift();
   }
   return kept.length ? payload() : '';
-}
-
-/** 문서 개요만: 정보 상자 + 첫 제목(보통 「개요」) 아래 문단. 제목이 없으면 첫 문단 */
-export function wikiSummary(body: string): string {
-  const lines = innerBody(body).split(/\r?\n/);
-  const box = lines.filter((l) => l.startsWith('[Infobox]'));
-  const first = lines.findIndex((l) => l.startsWith('[Heading]'));
-  let paras: string[];
-  if (first < 0) paras = lines.filter((l) => l.startsWith('[Paragraph]')).slice(0, 1);
-  else {
-    const next = lines.findIndex((l, i) => i > first && l.startsWith('[Heading]'));
-    paras = lines.slice(first + 1, next < 0 ? undefined : next).filter((l) => l.startsWith('[Paragraph]'));
-  }
-  return paras.length ? [...box, ...paras].join('\n') : innerBody(body);
 }
 
 export function wikiContextRules(lore: LoreEntry[] | undefined): string | null {
