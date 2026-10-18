@@ -240,15 +240,6 @@ export function reviewLinks(body: string, title: string, canon: (t: string) => s
   });
 }
 
-/** 문서가 가리키는 다른 문서 제목들 (본문 링크 + 상세·관련 문서) */
-export function docLinks(body: string, canon: (t: string) => string): string[] {
-  const out = new Set<string>();
-  for (const m of body.matchAll(/➡️([^➡\n]{1,120}?)➡️/g)) out.add(canon(m[1].trim()));
-  const open = /^<lightboard-namuwiki[^>]*>/.exec(body)?.[0] ?? '';
-  for (const m of open.matchAll(/(?:related|recent)\d="([^"]*)"/g)) if (m[1].trim()) out.add(canon(m[1].trim()));
-  return [...out].filter((t) => t && validTitle(t));
-}
-
 // ── 화면 ──
 
 export interface RenderOptions {

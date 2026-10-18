@@ -794,7 +794,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
   await page.click('.nw-rail [data-action="wiki-home"]');
   await page.waitForSelector('.nw-home .nw-card');
-  assert.ok((await page.textContent('.nw-home')).includes('소라 랜드 괴담'), '작성이 필요한 문서');
+  assert.equal(await page.locator('[data-action="wiki-random"]').count(), 0);
   assert.equal(await page.locator('.nw-index [data-action="wiki-pick"][data-value="소라 랜드"]').count(), 1, '전체 문서');
   assert.ok((await page.textContent('.nw-hero h2')).includes('괴이위키'));
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-main.png` });

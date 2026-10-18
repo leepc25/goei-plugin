@@ -4,7 +4,7 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
-  acceptArticle, canonicalTitle, deleteDoc, docLinks, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
+  acceptArticle, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
   type WikiMeta, type WikiSettings,
 } from '../core/wiki';
 import { runModel } from '../host/llm';
@@ -327,10 +327,9 @@ function rail(): string {
   </nav>`;
 }
 
-/** 위키 메인: 검색, 최근 문서, 작성이 필요한 문서 */
+/** 위키 메인: 검색, 최근 문서, 전체 문서 */
 function homeView(ctx: ChatContext): string {
   const docs = listDocs(ctx.chat);
-  const saved = new Set(docs.map((d) => d.title));
   const recent = docs.slice().sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0)).slice(0, 8);
   const card = (d: (typeof docs)[number]) => {
     const e = entryFor(ctx, d.title);
@@ -340,15 +339,6 @@ function homeView(ctx: ChatContext): string {
       <span class="nw-card-img${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
       <b>${esc(e?.name ?? d.title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</button>`;
   };
-  // 작성이 필요한 문서: 문서 안에서 가리키지만 아직 없는 제목, 많이 가리킬수록 앞
-  const c = canon(ctx);
-  const want = new Map<string, number>();
-  for (const d of docs) for (const t of docLinks(d.body, c)) if (!saved.has(t)) want.set(t, (want.get(t) ?? 0) + 1);
-  const wanted = [...want].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko')).slice(0, 24);
-  const chips = wanted.map(([t, n]) => {
-    const e = entryFor(ctx, t);
-    return `<button class="nw-chip none" data-action="wiki-open" data-value="${esc(t)}">${face(ctx, e, ' xs')}<span>${esc(e?.name ?? t)}</span>${n > 1 ? `<small>${n}</small>` : ''}</button>`;
-  }).join('');
   // 전체 문서: 가나다 묶음마다 한 줄 (자음 + 문서 칩)
   const sorted = sortedDocs(ctx);
   const index = KEYS.map((k) => {
@@ -363,12 +353,10 @@ function homeView(ctx: ChatContext): string {
   return `<div class="nw-home">
     <section class="nw-hero">
       <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off">
-        <button class="gx-mini" data-action="wiki-random" ${docs.length ? '' : 'disabled'}>무작위 문서</button></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off"></div>
     </section>
     <section class="nw-hsec"><h3>최근 작성된 문서</h3>${recent.length ? `<div class="nw-cards">${recent.map(card).join('')}</div>` : `<p class="nw-hnone">아직 작성한 문서가 없어요.</p>`}</section>
     ${docs.length ? `<section class="nw-hsec"><h3>전체 문서<b>${docs.length}</b></h3><div class="nw-index">${index}</div></section>` : ''}
-    ${wanted.length ? `<section class="nw-hsec"><h3>작성이 필요한 문서<b>${want.size}</b></h3><div class="nw-chips">${chips}</div></section>` : ''}
   </div>`;
 }
 
@@ -559,13 +547,6 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       env.render();
       if (wiki.listOpen && wide() && !v) document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
       return true;
-    case 'wiki-random': {
-      const docs = listDocs(ctx.chat).filter((d) => d.title !== wiki.title);
-      if (!docs.length) break;
-      wiki.history = [];
-      go('doc', docs[Math.floor(Math.random() * docs.length)].title);
-      break;
-    }
     case 'wiki-search':
       search(ctx, v);
       if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
