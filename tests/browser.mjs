@@ -760,7 +760,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok(lore[0].content.includes('doc_title="소라 랜드"'), '제목 고정');
   assert.ok((await page.textContent('.nw-body')).includes('폐장한 놀이공원'));
   assert.equal(await page.locator('.nw-infobox').count(), 1);
-  if (shots) await page.screenshot({ path: `${shots}/13-wiki-doc.png` });
+  if (shots) { await page.waitForTimeout(800); await page.screenshot({ path: `${shots}/13-wiki-doc.png` }); }
   // 문서 안 링크: 없는 문서 → 작성 화면 (부모 원본 자료를 물려받음)
   await page.click('.nw-body .nw-link');
   await page.waitForSelector('.nw-compose');

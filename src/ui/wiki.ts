@@ -205,6 +205,15 @@ interface Entry {
 const CAT_LABEL: Record<Cat, string> = { an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
 const CAT_ICON: Record<Cat, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
 
+// 캐릭터 그림은 「이름_default」(세로 832×1216 표정 세트)가 있으면 그것, 없으면 이름 그대로
+function photoName(ctx: ChatContext, name: string): string {
+  if (!name) return '';
+  const list = (ctx.char.additionalAssets ?? []) as unknown[];
+  const want = `${name}_default`.toLowerCase();
+  const hit = list.find((a): a is [string, ...unknown[]] => Array.isArray(a) && typeof a[0] === 'string' && a[0].toLowerCase() === want);
+  return hit ? hit[0] : name;
+}
+
 let entryCache: { lore: unknown; list: Entry[] } | null = null;
 function entries(ctx: ChatContext): Entry[] {
   if (entryCache && entryCache.lore === ctx.char.globalLore) return entryCache.list;
@@ -212,7 +221,7 @@ function entries(ctx: ChatContext): Entry[] {
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
   for (const [cat, rows] of [['an', dir.anomalies], ['ms', dir.sites]] as const) {
-    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: p.english, terms: [p.label, p.english, ...p.aliases] });
+    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: photoName(ctx, p.english), terms: [p.label, p.english, ...p.aliases] });
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
@@ -221,7 +230,7 @@ function entries(ctx: ChatContext): Entry[] {
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */
   }
-  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: a.english, terms: [a.name, a.english, ...a.aliases] });
+  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: photoName(ctx, a.english), terms: [a.name, a.english, ...a.aliases] });
   for (const f of factionList(ctx.char.globalLore)) {
     if (f.hidden) continue;
     list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: f.photo ?? '', terms: [f.name, f.affiliation] });
