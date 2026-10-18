@@ -187,7 +187,7 @@ async function open(page) {
   await page.close();
 }
 
-// 2-1) 자동 전송이 막히면(플러그인 모델) 창을 연 채로 안내
+// 2-1) 자동 전송이 막히면(플러그인 모델) 창은 닫고, 채팅 속 메시지에 「전송 대기」·취소. 취소하면 다시 고르기
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await page.evaluate(() => (window.__sendFail = true));
@@ -199,11 +199,22 @@ async function open(page) {
   await page.fill('[data-input="start-note"]', '시작');
   assert.equal(await page.isDisabled('.gx-start'), false);
   await page.click('.gx-start');
-  await page.waitForSelector('.gx-notice');
-  assert.ok((await page.textContent('.gx-notice')).includes('전송 버튼'));
-  assert.equal(await page.evaluate(() => window.__chat.message.length), 1, '메시지는 놓여 있음');
+  await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
+  await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('%%GOEI_UNSENT%%'));
+  const html = await page.evaluate(() => window.__calls.handlers.display(window.__chat.message[0].data));
+  assert.ok(html.startsWith('시작') && html.includes('data-goei-cancel') && html.includes('전송 대기') && !html.includes('%%'), html);
+  // 요청에는 표식이 가지 않는다
+  const req = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: window.__chat.message[0].data }], 'model'));
+  assert.equal(req.at(-1).content, '시작');
+  await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'msg'; d.innerHTML = h; document.querySelector('.default-chat-screen').appendChild(d); }, html);
+  // 요청 대기 표시를 끈다 (위 replacers 호출이 켠 것)
+  await page.evaluate(async () => { const c = window.__chat; await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify({ ...c, message: [] })), characterIndex: 0, chatIndex: 0, messageIndex: -1 }); });
+  await page.click('#msg [data-goei-cancel]');
+  await page.waitForFunction(() => window.__chat.message.length === 0);
+  await open(page);
+  await page.waitForSelector('.gx-start');
   assert.deepEqual(errors, []);
-  console.log('PASS 자동 전송 실패 → 안내');
+  console.log('PASS 자동 전송 실패 → 창 닫고 전송 대기·취소 → 다시 고르기');
   await page.close();
 }
 

@@ -157,6 +157,31 @@ export function isSceneUnsent(text: string): boolean {
   return hasSceneCard(text) && !!readScene(text)?.unsent;
 }
 
+// 기록 카드가 없는 메시지(시작 화면 직접 입력)는 끝에 표식을 붙여 「아직 안 보냄」을 적는다
+export const UNSENT_MARK = '%%GOEI_UNSENT%%';
+const UNSENT_RE = /\r?\n?%%GOEI_UNSENT%%/g;
+
+/** 자동 전송이 막혀 아직 안 보낸 메시지인지 (기록 카드든 직접 입력이든) */
+export function isUnsent(text: string): boolean {
+  return typeof text === 'string' && (text.includes(UNSENT_MARK) || isSceneUnsent(text));
+}
+
+export function setUnsent(text: string, on: boolean): string {
+  if (hasSceneCard(text)) return setSceneUnsent(text, on);
+  const plain = text.replace(UNSENT_RE, '');
+  return on ? `${plain}\n${UNSENT_MARK}` : plain;
+}
+
+/** 모델 요청용: 표식을 지운다 */
+export function stripUnsentMark(text: string): string {
+  return text.replace(UNSENT_RE, '');
+}
+
+/** 화면용: 표식 자리에 안내 줄 */
+export function renderUnsentMark(text: string, html: string): string {
+  return text.replace(UNSENT_RE, () => html);
+}
+
 /** 모델 요청용: 표식만 지우고 본문은 남긴다 */
 export function stripSceneCard(text: string): string {
   return text.replace(/%%SCENE_CARD:[0-9a-f]+%%\r?\n/g, '').replace(/\r?\n%%\/SCENE_CARD%%/g, '');

@@ -10,7 +10,7 @@ declare const __PLUGIN_VERSION__: string | undefined;
 const WATCH_MS = 1000;
 
 /** 이 봇 메시지·요청에만 있는 표식 (시드, 이동·전화 지시문, 시작 카드, 상태창) */
-const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
+const MARKS = ['%%SEED%%', '%%SCENE_CARD:', '%%PHONE_CALL:', '%%GOEI_UNSENT%%', 'data-goei="landing"', 'ANOMALY SIMULATION', '[▣'];
 const ours = (t: unknown) => typeof t === 'string' && MARKS.some((m) => t.includes(m));
 
 let body: Body | null = null;

@@ -1,6 +1,6 @@
 import { factionList, factionVars } from './factions';
 import { findFaction, findScenario, greetingKey, isFaction, isLang, SCENARIOS } from './scenarios';
-import { hasSceneCard } from './dispatch';
+import { hasSceneCard, UNSENT_MARK } from './dispatch';
 import { buildSeed } from './seed';
 import type { Chat, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
@@ -22,10 +22,11 @@ export function readManifest(lore: LoreEntry[] | undefined): Manifest | null {
 
 export type ChatPhase = 'fresh' | 'staged' | 'started';
 
-/** 커스텀 임무 첫 장면 지시문만 놓이고 아직 보내지 않은 채팅 (다시 고를 수 있다) */
+/** 커스텀 임무 첫 장면 지시문이나 보내지 못한 직접 입력만 놓인 채팅 (다시 고를 수 있다) */
 export function unsentOpening(chat: Chat): boolean {
   const m = chat.message ?? [];
-  return m.length === 1 && m[0]?.role === 'user' && hasSceneCard(String(m[0].data ?? ''));
+  const text = String(m[0]?.data ?? '');
+  return m.length === 1 && m[0]?.role === 'user' && (hasSceneCard(text) || text.includes(UNSENT_MARK));
 }
 
 /** fresh: 아직 선택 없음, staged: 선택했지만 첫 전송 전 (다시 고를 수 있음), started: 대화 진행 중 */

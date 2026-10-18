@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { isSceneUnsent } from './core/dispatch';
+import { isUnsent, renderUnsentMark, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
@@ -46,6 +46,9 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   setWaiting(true);
   // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
   messages = unwrapCalls(unwrapScenes(messages).messages).messages;
+  if (messages.some((m) => typeof m?.content === 'string' && m.content.includes(UNSENT_MARK))) {
+    messages = messages.map((m) => (typeof m?.content === 'string' && m.content.includes(UNSENT_MARK) ? { ...m, content: stripUnsentMark(m.content) } : m));
+  }
   if (liteNow) {
     messages = stripHistoryTags(messages);
     const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
@@ -160,7 +163,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       })) ?? now;
     }
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
-    if (now.message.some((m) => typeof m.data === 'string' && isSceneUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
+    if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 모델을 겹쳐 부르지 않게 차례로)
@@ -194,19 +197,28 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
 
 const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+/** 자동 전송이 막혀 아직 안 보낸 메시지의 안내와 취소 (host/unsent.ts) */
+function unsentRow(): string {
+  const p = cardPalette();
+  unsentShown();
+  return `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span>`
+    + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button>`;
+}
+
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
 function sceneCardHtml(s: { target: string; party: string; unsent?: boolean }): string {
   const p = cardPalette();
-  // 자동 전송이 막혀 아직 안 보낸 요청: 전송 안내와 취소 (host/unsent.ts)
-  if (s.unsent) unsentShown();
   const unsent = s.unsent
-    ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">`
-      + `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span>`
-      + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button></span>`
+    ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>`
     : '';
   return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s.target)}</span>`
     + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span>${unsent}</div>`;
+}
+
+/** 기록 카드 없이 놓인 메시지(시작 화면 직접 입력) 아래의 전송 대기 줄 */
+function unsentMarkHtml(): string {
+  return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
 }
 
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
@@ -241,13 +253,14 @@ function onDisplay(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
     if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
     if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
     if (hasCall(out)) out = renderCalls(out, callCardHtml);
+    if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
   if (ours && !out.includes('data-goei-user')) out += USER_MARK;

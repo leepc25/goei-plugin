@@ -32,7 +32,8 @@ import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
-import { SEND_FALLBACK, noticeClass, sendNow } from '../host/send';
+import { noticeClass, sendNow } from '../host/send';
+import { markUnsent } from '../host/unsent';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
@@ -579,10 +580,8 @@ async function start(): Promise<void> {
       return refresh();
     }
     draft.situation = '';
-    if (situation && !(await sendNow())) {
-      notice = SEND_FALLBACK;
-      return refresh();
-    }
+    // 자동 전송이 막혀도 창은 닫고, 채팅 속 메시지 아래에 「전송 대기」와 취소를 붙인다 (임무 요청과 같이)
+    if (situation && !(await sendNow())) await markUnsent(ctx.charIndex, ctx.chatIndex).catch(() => {});
     await close();
     await refresh();
   } catch (error) {
