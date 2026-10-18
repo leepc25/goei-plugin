@@ -756,8 +756,12 @@ if (fixture.globalLore.some(packed)) {
     await open(page);
     await page.locator('[data-action="tab"][data-value="wiki"]:visible').first().click();
     await page.waitForSelector('.nw-home');
-    await page.fill('.nw-home .gx-search', '소라 랜드');
-    await page.press('.nw-home .gx-search', 'Enter');
+    // 창이 늦게 한 번 더 그려지면(사용자 사진 읽기 등) 입력이 사라질 수 있어 문서가 뜰 때까지 다시 친다
+    for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
+      await page.fill('.nw-home .gx-search', '소라 랜드');
+      await page.press('.nw-home .gx-search', 'Enter');
+      await page.waitForSelector('.nw-dochead', { timeout: 4000 }).catch(() => {});
+    }
     await page.waitForSelector('.nw-dochead');
     await page.locator('.nw-body .nw-fn[data-fn="1"]').scrollIntoViewIfNeeded();
     const top0 = await scrollTop();

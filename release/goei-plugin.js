@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.27
+//@version 0.16.28
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/host/user.ts
@@ -4006,7 +4006,8 @@ var ADV = {
         { key: "lang", label: "생성 언어", type: "pick", def: "auto", opts: [["auto", "대화 언어"], ["ko", "한국어"], ["en", "영어"], ["ja", "일본어"]], hint: "괴담넷·괴담톡·위키가 쓸 언어" },
         num2("retries", "형식 오류 재시도", 1, 0, 3, "회"),
         { key: "retry_model", label: "재시도 모델", type: "pick", def: "same", opts: [["same", "같은 모델"], ["main", "메인"], ["aux", "보조"]] },
-        num2("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요" })
+        num2("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요" }),
+        num2("ctx_total", "본편 반영 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 본편 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요" })
       ]
     }
   ],
@@ -4212,6 +4213,23 @@ function fitPrompt(cap, build) {
   } finally {
     level = 0;
   }
+}
+function fitTotal(parts, total) {
+  const texts = parts.map((p) => p.build(p.cap));
+  if (total <= 0) return texts;
+  const size = texts.map((t) => t ? tokens(t) : 0);
+  if (size.reduce((a, b) => a + b, 0) <= total) return texts;
+  const weight = parts.map((p) => p.cap > 0 ? p.cap : total);
+  let remaining = total;
+  let left = weight.reduce((a, b) => a + b, 0);
+  const alloc = [];
+  for (const i of size.map((_, i2) => i2).sort((a, b) => size[a] - size[b])) {
+    const share = Math.floor(remaining * weight[i] / left);
+    alloc[i] = Math.min(size[i], share);
+    remaining -= alloc[i];
+    left -= weight[i];
+  }
+  return parts.map((p, i) => alloc[i] >= size[i] ? texts[i] : alloc[i] > 0 ? p.build(alloc[i]) : "");
 }
 
 // src/core/refs.ts
@@ -5127,13 +5145,43 @@ function docsIn(entries2) {
   }
   return out;
 }
+var WIKI_PACK_HEAD = "GOEIWIKI1:";
+var pack2 = null;
+function packEntry(lore) {
+  for (const e of lore) {
+    const c = e?.content;
+    if (typeof c === "string" && c.startsWith(WIKI_PACK_HEAD)) return c;
+  }
+  return null;
+}
+async function prepareBaseDocs(lore) {
+  if (!Array.isArray(lore)) return;
+  const src = packEntry(lore);
+  if (!src || pack2?.src === src || typeof DecompressionStream === "undefined") return;
+  const bin = atob(src.slice(WIKI_PACK_HEAD.length));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const text = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  const map = JSON.parse(text);
+  const docs = [];
+  for (const [title2, body4] of Object.entries(map)) {
+    const doc = typeof body4 === "string" ? parseDocContent(title2, body4) : null;
+    if (doc) docs.push(doc);
+  }
+  pack2 = { src, docs };
+}
 var baseCache = /* @__PURE__ */ new WeakMap();
 function baseDocs(lore) {
   if (!Array.isArray(lore)) return [];
   let docs = baseCache.get(lore);
   if (!docs) {
-    docs = docsIn(lore).map((d) => ({ ...d, base: true }));
-    baseCache.set(lore, docs);
+    const src = packEntry(lore);
+    const ready = !src || pack2?.src === src;
+    const loose = docsIn(lore);
+    const have = new Set(loose.map((d) => d.title));
+    const packed = src && pack2?.src === src ? pack2.docs.filter((d) => !have.has(d.title)) : [];
+    docs = [...loose, ...packed].map((d) => ({ ...d, base: true }));
+    if (ready) baseCache.set(lore, docs);
   }
   return docs;
 }
@@ -5307,7 +5355,7 @@ function renderArticle(body4, o) {
     return `<button class="nw-link${o.saved(c) ? " on" : ""}" data-action="wiki-open" data-value="${esc(c)}">${t}</button>`;
   }).replace(/❗([^❗]+?)❗/g, "<b>$1</b>").replace(/\*\*([^*]+?)\*\*/g, "<b>$1</b>").replace(/✂️([^✂]+?)✂️/g, "<s>$1</s>").replace(/📌([^📌]+?)📌/gu, (_all, t) => {
     notes.push(t);
-    return `<sup class="nw-fn">[${notes.length}]</sup>`;
+    return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
   });
   const lines = innerBody(body4).split("\n");
   const blocks = [];
@@ -5382,16 +5430,16 @@ ${line}`;
     }
   }
   flushList();
-  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n) => `<li>${n}</li>`).join("")}</ol>`);
+  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${n}</li>`).join("")}</ol>`);
   const links = (keys) => keys.map((k) => a[k]).filter((t) => !!t && validTitle(t)).map((t) => o.canon(t));
   return { html: out.join(""), title: a.doc_title || "", related: links(["related1", "related2", "related3"]), recent: links(["recent1", "recent2", "recent3"]), headings: headings.map((h) => h.title) };
 }
 var NW_CONTEXT = "$nw_context";
 var wikiContextOn = (state) => String(state?.[NW_CONTEXT] ?? "") === "1";
-function wikiMainContext(chat, rules2, focus) {
+function wikiMainContext(chat, rules2, focus, capOverride) {
   const s4 = chat.scriptstate;
   const count = advNum(s4, "nw", "ctx_count");
-  const cap = advNum(s4, "nw", "ctx_tokens");
+  const cap = capOverride ?? advNum(s4, "nw", "ctx_tokens");
   const onlyMentioned = advOn(s4, "nw", "ctx_focus");
   const withLore = advOn(s4, "nw", "ctx_lore");
   const created = advOn(s4, "nw", "ctx_created");
@@ -8872,7 +8920,8 @@ ${themeVars("[x-goei-fab]")}
 @media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-intro="true"] * { animation: none !important; } }
 
 /* 접속 효과 (v0.16.22, 사용자 설계): 위쪽 띠 대신 유령 버튼 자리에서. 버튼이 튀어나오며 고리가 퍼지고,
-   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다. 표는 테마와 상관없이 원래 어두운 배색 */
+   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다.
+   v0.16.28 (사용자 요청): 표도 테마를 따른다. 다크는 네온 빛줄기와 글리치, 라이트는 맑은 빛줄기만, 페이퍼는 도장 찍듯 눌리는 잉크 */
 [x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
 [x-goei-fab][x-goei-intro="true"] button::after { display: none; }
 [x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
@@ -8885,17 +8934,31 @@ ${themeVars("[x-goei-fab]")}
   --gl-dx: 12px;
   display: flex; align-items: center; gap: 8px; position: absolute; top: 50%; right: calc(100% + 12px);
   height: 36px; padding: 0 16px; box-sizing: border-box; border-radius: 10px; overflow: hidden; white-space: nowrap; pointer-events: none;
-  background: rgba(6, 18, 22, .94); border: 1px solid rgba(127, 227, 208, .45); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
-  color: #e8fffa; font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
+  background: color-mix(in srgb, var(--g-void) 94%, transparent); border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
+  color: var(--g-text); font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
   transform-origin: right center; opacity: 0; animation: goei-label ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) 260ms both;
 }
 [x-goei-fab][x-goei-side="left"][x-goei-intro="true"] [data-gl] { --gl-dx: -12px; right: auto; left: calc(100% + 12px); transform-origin: left center; }
 [x-goei-fab] [data-gs] {
   position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
-  background: linear-gradient(90deg, transparent, rgba(127, 227, 208, .28), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 28%, transparent), transparent);
   animation: goei-in-sweep 800ms ease-out 420ms both;
 }
 [x-goei-fab] [data-gt] { position: relative; animation: goei-in-glitch 520ms steps(1) 480ms 1; }
+/* 라이트: 밝은 판, 글리치 없이 빛줄기만 */
+[x-goei-fab][x-goei-theme="light"][x-goei-intro="true"] [data-gl] { background: color-mix(in srgb, var(--g-panel) 96%, transparent); box-shadow: 0 10px 24px -12px rgba(15, 60, 52, .35); }
+[x-goei-fab][x-goei-theme="light"] [data-gt] { color: var(--g-signal); animation: none; }
+/* 페이퍼: 종이 판에 잉크 도장. 빛줄기·글리치 대신 한 번 눌렸다 번지듯 */
+[x-goei-fab][x-goei-theme="paper"][x-goei-intro="true"] [data-gl] {
+  background: var(--g-panel); border-color: color-mix(in srgb, var(--g-signal) 70%, transparent); box-shadow: 0 8px 20px -12px rgba(60, 40, 10, .45);
+}
+[x-goei-fab][x-goei-theme="paper"] [data-gs] { display: none; }
+[x-goei-fab][x-goei-theme="paper"] [data-gt] { color: var(--g-signal); animation: goei-in-stamp 620ms cubic-bezier(.3,1.4,.5,1) 380ms both; }
+@keyframes goei-in-stamp {
+  0% { opacity: 0; transform: scale(1.35); letter-spacing: .32em; filter: blur(1.5px); }
+  55% { opacity: 1; transform: scale(.96); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
+}
 @keyframes goei-fab-pop {
   0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
   60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
@@ -9569,7 +9632,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
 .nw-link.on { color: #7fb8ff; text-decoration: none; }
 .nw-link:hover { text-decoration: underline; }
-.nw-fn { color: var(--signal); font-size: 12px; }
+.nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; }
+.nw-fn:hover, .nw-fn:focus-visible { background: var(--accent-bg); outline: none; }
+.nw-doc { position: relative; }
+.nw-fnpop { position: absolute; z-index: 5; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0, 0, 0, .35); font-size: 14px; line-height: 1.6; color: var(--text); pointer-events: none; }
+.nw-fnpop b { color: var(--signal); font-weight: 600; }
+.nw-notes li { padding: 2px 6px; margin: 0 -6px; border-radius: 6px; scroll-margin: 40px; }
+.nw-notes li.hit { animation: nw-fnhit 1.6s ease-out; }
+@keyframes nw-fnhit { from { background: var(--accent-bg); color: var(--text); } to { background: transparent; } }
 .nw-notes { margin: 18px 0 0; padding: 10px 10px 0 28px; border-top: 1px solid var(--line); font-size: 14px; color: var(--dim); }
 .nw-more { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; font-size: 14px; }
 .nw-more b { color: var(--dim); font-weight: 500; }
@@ -10694,8 +10764,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
 .nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
 .nw-hero-top { display: flex; align-items: center; gap: 12px; }
-.nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--accent-bg); color: var(--signal); border: 1px solid var(--accent-line); }
-.nw-hero-ico svg { width: 24px; height: 24px; }
+.nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; color: var(--signal); }
+.nw-hero-ico svg { width: 40px; height: 40px; }
 .nw-hero-t { display: flex; flex-direction: column; gap: 2px; }
 .nw-hero-t h2 { margin: 0; font-size: 20px; }
 .nw-hero-t small { color: var(--dim); font-size: 13px; }
@@ -10753,7 +10823,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
 .nw-card.none { opacity: .6; border-style: dashed; }
 .nw-more-btn { align-self: center; margin-top: 2px; }
-.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
 .nw-tile { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
 .nw-tile:hover { border-color: var(--accent-line); }
 .nw-tile-pics { grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); place-items: center; }
@@ -10765,7 +10835,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-tile b { align-self: end; font-size: 14px; }
 .nw-tile small { align-self: start; color: var(--dim); font-size: 12px; }
 @media (max-width: 760px) {
-  .nw-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nw-tiles { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
@@ -11165,7 +11235,7 @@ function planUpdate(char, payload) {
   }
   return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
 }
-var PLUGIN_VERSION = true ? "0.16.27" : "0";
+var PLUGIN_VERSION = true ? "0.16.28" : "0";
 
 // src/ui/update.ts
 var esc7 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -11672,7 +11742,7 @@ function homeView(ctx) {
   const sec = (title2, n, inner) => `<section class="nw-hsec"><h3>${title2}${n ? `<b>${n}</b>` : ""}</h3>${inner}</section>`;
   return `<div class="nw-home">
     <section class="nw-hero">
-      <div class="nw-hero-top"><span class="nw-hero-ico">${ICONS.wiki}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
+      <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off"></div>
     </section>
     ${liveCards ? sec("지금 얽힌 문서", 0, `<div class="nw-cards">${liveCards}</div>`) : ""}
@@ -11787,6 +11857,67 @@ function wikiTab(ctx) {
   ].join(""))}
     ${note}
   </main>`;
+}
+function bindFootnotes(root2) {
+  const doc = root2.querySelector(".nw-doc");
+  if (!doc?.querySelector(".nw-fn")) return;
+  const hover = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const pop = document.createElement("div");
+  pop.className = "nw-fnpop";
+  pop.hidden = true;
+  doc.appendChild(pop);
+  let cur = null;
+  const hide = () => {
+    pop.hidden = true;
+    cur = null;
+  };
+  const show = (sup) => {
+    const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+    if (!li) return;
+    cur = sup;
+    pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${li.innerHTML}`;
+    pop.hidden = false;
+    const box = doc.getBoundingClientRect();
+    const r = sup.getBoundingClientRect();
+    const w = Math.min(360, box.width - 24);
+    pop.style.width = `${w}px`;
+    const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
+    let top = r.bottom - box.top + doc.scrollTop + 6;
+    if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+  };
+  const supOf = (e) => e.target.closest(".nw-fn");
+  if (hover) {
+    doc.addEventListener("mouseover", (e) => {
+      const sup = supOf(e);
+      if (sup && sup !== cur) show(sup);
+    });
+    doc.addEventListener("mouseout", (e) => {
+      if (supOf(e) && !e.relatedTarget?.closest?.(".nw-fn")) hide();
+    });
+  }
+  doc.addEventListener("click", (e) => {
+    const sup = supOf(e);
+    if (!sup) {
+      if (!hover && !e.target.closest(".nw-fnpop")) hide();
+      return;
+    }
+    e.preventDefault();
+    if (!hover) {
+      if (cur === sup) hide();
+      else show(sup);
+      return;
+    }
+    hide();
+    const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
+    if (!li) return;
+    li.scrollIntoView({ behavior: "smooth", block: "center" });
+    li.classList.remove("hit");
+    void li.offsetWidth;
+    li.classList.add("hit");
+  });
+  doc.addEventListener("scroll", () => !hover && hide(), { passive: true });
 }
 function bindWikiSide(root2, act) {
   const bar = root2.querySelector(".nw-rail");
@@ -13890,6 +14021,7 @@ async function openApp(opts = {}) {
 async function refresh() {
   try {
     const ctx = await loadContext();
+    if (ctx) await prepareBaseDocs(ctx.char.globalLore).catch(() => void 0);
     if (!ctx) {
       view = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
     } else {
@@ -14207,6 +14339,7 @@ function render() {
   bindMbar(root, () => void handle("close"));
   bindDrawer(root);
   bindWikiSide(root, (v) => void handle("wiki-list", v));
+  bindFootnotes(root);
   bindSwipeBack(root, backStep);
   setCurrentTheme(themeName(root.dataset.theme));
 }
@@ -14495,20 +14628,33 @@ async function moduleContext(scene) {
     rulesCache = { charIndex, gnet: mainContextRules(src), phone: mainContextRules2(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
   }
   const focus = makeFocus(scene, rulesCache.registry);
-  const out = [];
-  if (wantGnet && rulesCache.gnet) {
+  const rules2 = rulesCache;
+  const parts = [];
+  if (wantGnet && rules2.gnet) {
     const st = readGnet(chat);
-    if (st.posts.length || st.dms.length) out.push(mainContext(st, userNick(ss), rulesCache.gnet, focus));
+    const own = CONTEXT.tokens;
+    if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rules2.gnet, focus)) });
   }
-  if (wantPhone && rulesCache.phone) {
+  if (wantPhone && rules2.phone) {
     try {
-      out.push(mainContext2(readPhone(chat), readBulletins(chat), phoneSettings(ss), rulesCache.phone, focus));
+      const st = readPhone(chat);
+      const notices = readBulletins(chat);
+      parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules2.phone, focus)) });
     } catch (error) {
       console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (wantWiki && rulesCache.wiki) out.push(wikiMainContext(chat, rulesCache.wiki, focus));
-  return out.filter(Boolean);
+  if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
+  return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
+}
+function withCap(box, key, cap, run3) {
+  const keep = box[key];
+  box[key] = cap;
+  try {
+    return run3();
+  } finally {
+    box[key] = keep;
+  }
 }
 function stripHistoryTags(messages) {
   if (!messages.some((m) => m?.role === "assistant" && typeof m.content === "string" && hasWorldTags(m.content))) return messages;
