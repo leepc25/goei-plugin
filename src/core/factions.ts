@@ -31,13 +31,15 @@ export interface FactionSpec {
   title?: string;
   blurb?: string;
   photo?: string;
+  /** 영문명: 위키 사진은 「영문명_default」 → 「영문명」 → photo 순 */
+  english?: string;
   gm_name?: string;
   gm_desc?: string;
   seed?: string[];
   tab?: string;
 }
 
-export const SPEC_KEYS = ['code', 'playable', 'hidden', 'type', 'title', 'blurb', 'photo', 'gm_name', 'gm_desc', 'seed', 'tab'] as const;
+export const SPEC_KEYS = ['code', 'playable', 'hidden', 'type', 'title', 'blurb', 'photo', 'english', 'gm_name', 'gm_desc', 'seed', 'tab'] as const;
 
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 const list = (v: unknown) => (Array.isArray(v) ? v.map(s).filter(Boolean) : []);
@@ -51,7 +53,7 @@ export function pickSpec(raw: unknown): FactionSpec {
   if (d.playable === true) out.playable = true;
   if (d.hidden === true) out.hidden = true;
   if (FACTION_TYPES.some((t) => t.id === d.type)) out.type = d.type as FactionType;
-  for (const k of ['title', 'blurb', 'photo', 'gm_name', 'gm_desc', 'tab'] as const) if (s(d[k])) out[k] = s(d[k]);
+  for (const k of ['title', 'blurb', 'photo', 'english', 'gm_name', 'gm_desc', 'tab'] as const) if (s(d[k])) out[k] = s(d[k]);
   if (Array.isArray(d.seed)) out.seed = list(d.seed);
   return out;
 }
@@ -105,6 +107,7 @@ export function factionList(lore: LoreEntry[] | undefined): Faction[] {
       name: spec.title || f.name,
       blurb: spec.blurb || f.blurb,
       photo: spec.photo || `f0${i + 1}`,
+      english: spec.english ?? '',
       type: builtinType(f.code),
       builtin: true,
       hidden: !!spec.hidden,
@@ -121,6 +124,7 @@ export function factionList(lore: LoreEntry[] | undefined): Faction[] {
         blurb: spec.blurb ?? '',
         scenarios: EXTRA_SCENARIOS,
         photo: spec.photo ?? '',
+        english: spec.english ?? '',
         type: spec.type ?? 'org',
         builtin: false,
         hidden: false,

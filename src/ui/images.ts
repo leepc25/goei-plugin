@@ -2,6 +2,8 @@
 // 다 읽히면 창을 한 번 다시 그린다. 못 읽은 이미지는 글자 아바타로 둔다.
 import { assetUrl } from '../host/assets';
 import { factionList } from '../core/factions';
+import { readDirectory } from '../core/world/directory';
+import type { LoreEntry } from '../core/types';
 import type { CharacterSnapshot } from '../host/risu';
 
 const urls = new Map<string, string | null | 'loading'>();
@@ -63,9 +65,22 @@ export function imageUrl(char: CharacterSnapshot, name: string | undefined): str
 
 const escAttr = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+// 명부에서 요원 사진을 따로 골랐으면 작은 사진에도 그것을 쓴다 (영문명 → 고른 사진)
+const picked = new WeakMap<object, Map<string, string>>();
+export function agentPic(char: CharacterSnapshot, english: string | undefined): string | undefined {
+  if (!english) return english;
+  const lore = (char.globalLore ?? []) as LoreEntry[];
+  let map = picked.get(lore);
+  if (!map) {
+    map = new Map(readDirectory(lore).agents.filter((a) => a.photo && a.english).map((a) => [a.english, a.photo!] as const));
+    picked.set(lore, map);
+  }
+  return map.get(english) ?? english;
+}
+
 /** 원형 아바타: 사진이 있으면 사진, 없으면 첫 글자 */
 export function avatar(char: CharacterSnapshot, english: string | undefined, name: string, cls = ''): string {
-  const url = imageUrl(char, english);
+  const url = imageUrl(char, agentPic(char, english));
   const first = escAttr(Array.from(name.trim())[0] ?? '?');
   return `<span class="gx-ava${cls ? ` ${cls}` : ''}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
 }

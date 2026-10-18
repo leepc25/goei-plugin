@@ -1832,7 +1832,8 @@ if (fixture.globalLore.some(packed)) {
   await startedWithReply(page);
   await page.evaluate(() => {
     window.__assets['mod/ldh.png'] = Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='), (c) => c.charCodeAt(0));
-    window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'mod/ldh.png', 'png']] }];
+    window.__assets['mod/org.png'] = window.__assets['mod/ldh.png'];
+    window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'mod/ldh.png', 'png'], ['Management Bureau_default', 'mod/org.png', 'png']] }];
   });
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
@@ -1860,9 +1861,42 @@ if (fixture.globalLore.some(packed)) {
   const seen = await page.evaluate(() => [...document.querySelectorAll('.gx-field .fac')].some((p) => p.textContent.includes('시험 거점')));
   assert.ok(seen, '새 거점이 임무 지도에 보임');
   if (shots) await page.screenshot({ path: `${shots}/17c-map-newbase.png` });
+  // 괴이 사진 고르기 → 저장하면 명부에 남음
+  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click('[data-action="set-scope"][data-value="card"]');
+  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
+  const first = await page.getAttribute('.dir-head >> nth=0', 'data-value');
+  await page.click('.dir-head >> nth=0');
+  await page.click(`[data-action="dir-photo-pick"]`);
+  await page.fill('[data-input="dir-photo-q"]', 'lee do');
+  await page.waitForSelector('.dir-pic[data-value^="Lee Do-hyeong|"]');
+  await page.waitForTimeout(300);
+  if (shots) await page.locator(".dir-pics").scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/17c-photo-pick.png` });
+  assert.equal(await page.inputValue('[data-input="dir-photo-q"]'), 'lee do', '사진이 늦게 와도 검색어 유지');
+  await page.click('.dir-pic[data-value^="Lee Do-hyeong|"]');
+  await page.waitForSelector('.dir-photo-name b:has-text("Lee Do-hyeong")');
+  if (shots) await page.screenshot({ path: `${shots}/17c-photo-picked.png` });
+  // 조직 영문명 → 위키 조직 사진은 「영문명_default」
+  await page.click('[data-action="dir-kind"][data-value="org"]');
+  await page.click('.dir-head[data-value="관리국"]');
+  await page.fill('[data-input="dir"][data-key="org:english|관리국"]', 'Management Bureau');
+  await page.click('.dir-bar [data-value="save"]');
+  await page.click('[data-action="dir-save"]');
+  await page.waitForFunction(() => window.__calls.setChar >= 1);
+  const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
+  assert.equal(book.괴이[first].photo, 'Lee Do-hyeong', '괴이 사진 저장');
+  assert.ok(book.거점['시험 거점'], '거점도 저장');
+  assert.equal(book.조직.관리국.english, 'Management Bureau');
+  await page.click('[data-action="tab"][data-value="wiki"] >> nth=0');
+  await page.waitForSelector('.nw-rail');
+  await page.click('.nw-grab');
+  await page.fill('.nw .ph-search', '관리국');
+  await page.press('.nw .ph-search', 'Enter');
+  await page.waitForSelector('.nw-dochead');
+  await page.waitForFunction(() => window.__calls.read.includes('mod/org.png'));
   assert.deepEqual(errors, []);
   await page.close();
-  console.log('PASS 위키 모듈 사진, 저장 전 새 거점 지도 표시');
+  console.log('PASS 위키 모듈 사진, 저장 전 새 거점 지도 표시, 괴이 사진 고르기');
 }
 
 await browser.close();

@@ -19,7 +19,7 @@ import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
 import { readDirectory } from '../core/world/directory';
-import { hasAsset, moduleAssetStamp } from '../host/assets';
+import { moduleAssetStamp, pictureName } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
 import { lastStatusFields } from '../core/world/tags';
@@ -211,12 +211,6 @@ interface Entry {
 const CAT_LABEL: Record<Cat, string> = { an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
 const CAT_ICON: Record<Cat, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
 
-// 캐릭터 그림은 「이름_default」(세로 832×1216 표정 세트, 보통 에셋 모듈에 있음)가 있으면 그것, 없으면 이름 그대로
-function photoName(ctx: ChatContext, name: string): string {
-  if (!name) return '';
-  return hasAsset(ctx.char, `${name}_default`) ? `${name}_default` : name;
-}
-
 let entryCache: { lore: unknown; stamp: number; list: Entry[] } | null = null;
 function entries(ctx: ChatContext): Entry[] {
   if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
@@ -224,7 +218,7 @@ function entries(ctx: ChatContext): Entry[] {
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
   for (const [cat, rows] of [['an', dir.anomalies], ['ms', dir.sites]] as const) {
-    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: photoName(ctx, p.english), terms: [p.label, p.english, ...p.aliases] });
+    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: pictureName(ctx.char, p.photo, p.english), terms: [p.label, p.english, ...p.aliases] });
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
@@ -233,10 +227,15 @@ function entries(ctx: ChatContext): Entry[] {
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */
   }
-  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: photoName(ctx, a.english), terms: [a.name, a.english, ...a.aliases] });
+  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: pictureName(ctx.char, a.photo, a.english), terms: [a.name, a.english, ...a.aliases] });
+  // 조직: 명부에서 고른 사진 → 영문명 그림 → 시작 화면 기본 사진(f01~f05)
+  const orgPic = (f: { code: string; affiliation: string; photo?: string }) => {
+    const o = dir.orgs.find((x) => (x.faction ? x.faction === f.code : x.name === f.affiliation));
+    return pictureName(ctx.char, o?.spec.photo, o?.spec.english ?? '', f.photo ?? '');
+  };
   for (const f of factionList(ctx.char.globalLore)) {
     if (f.hidden) continue;
-    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: f.photo ?? '', terms: [f.name, f.affiliation] });
+    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: orgPic(f), terms: [f.name, f.affiliation, f.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();

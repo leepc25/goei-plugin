@@ -68,6 +68,20 @@ function findRow(char: CharacterSnapshot, name: string): Row | undefined {
   return card.find((a) => a[0] === name) ?? card.find((a) => a[0].toLowerCase() === lower) ?? modRows.find((a) => a[0] === name) ?? modRows.find((a) => a[0].toLowerCase() === lower);
 }
 
+/** 사진으로 고를 수 있는 에셋 이름 (카드 → 모듈, 지도·세력 기본 그림 빼고) */
+export function assetNames(char: CharacterSnapshot): string[] {
+  const card = ((char.additionalAssets ?? []) as unknown[]).filter(isRow);
+  return [...new Set([...card, ...modRows].map((r) => r[0]))].filter((n) => !/^(map\d+|f0\d)$/i.test(n));
+}
+
+/** 괴이·특수·요원·조직 사진 이름 (넷 다 같은 규칙): 고른 사진 → 「영문명_default」 → 「영문명」 → 기본 그림(조직 f01~f05) */
+export function pictureName(char: CharacterSnapshot, photo: string | undefined, english: string, fallback = ''): string {
+  if (photo) return photo;
+  if (english && hasAsset(char, `${english}_default`)) return `${english}_default`;
+  if (english && hasAsset(char, english)) return english;
+  return fallback || english;
+}
+
 /** 그 이름의 에셋이 카드나 에셋 모듈에 있는지 */
 export const hasAsset = (char: CharacterSnapshot, name: string): boolean => !!name && !!findRow(char, name);
 

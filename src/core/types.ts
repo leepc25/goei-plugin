@@ -18,6 +18,8 @@ export interface Faction {
   scenarios: Scenario[];
   /** 시작 화면 사진 에셋 이름 */
   photo?: string;
+  /** 영문명 (위키 사진을 찾는 이름) */
+  english?: string;
   type?: FactionType;
   /** 기본 다섯 세력 */
   builtin?: boolean;

@@ -11,7 +11,7 @@ import {
   chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
-import { imageUrl, stChip } from './images';
+import { agentPic, imageUrl, stChip } from './images';
 import { readWorld, worldOn } from '../core/world/output';
 import { ICONS } from './icons';
 import { josa } from '../core/josa';
@@ -544,7 +544,7 @@ export const phKinds = (r: PRoom): UserKind[] => (r.kind === 'dm' ? ['image', 'p
 const initial = (name: string) => esc([...name][0] ?? '톡');
 /** 연락처 사진(카드 에셋, 영문 이름) 또는 첫 글자 */
 function face(ctx: ChatContext, who: { name: string; english?: string; custom?: boolean } | undefined, label: string, cls = ''): string {
-  const url = who && !who.custom ? imageUrl(ctx.char, who.english) : null;
+  const url = who && !who.custom ? imageUrl(ctx.char, agentPic(ctx.char, who.english)) : null;
   return `<span class="ph-avatar${cls}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : initial(label)}</span>`;
 }
 const shortTime = (t: string) => /(\d\d:\d\d)/.exec(t)?.[1] ?? '';

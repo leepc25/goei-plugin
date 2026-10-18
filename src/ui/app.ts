@@ -33,7 +33,7 @@ import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent,
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
-import { directoryExtList, directoryInput, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
+import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
 
 interface Draft {
@@ -246,6 +246,12 @@ function ensureRoot(): HTMLElement {
       dirUi.q = el.value;
       const box = root?.querySelector('.dir-list');
       if (box) box.innerHTML = directoryList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === 'dir-photo-q' && (view.kind === 'started' || view.kind === 'picker')) {
+      dirUi.pickQ = el.value;
+      const box = root?.querySelector('.dir-pics');
+      if (box) box.innerHTML = directoryPhotoList(view.ctx);
       return;
     }
     if (el?.dataset?.input === 'dir-ext-q' && (view.kind === 'started' || view.kind === 'picker')) {
@@ -664,10 +670,23 @@ function render(): void {
   const gnKeep = tab === 'gnet' && root.dataset.tab === 'gnet' && root.dataset.gn === gnKey
     ? ['.gn .ph-content', '.gn-pane .gn-doc'].map((q) => root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0)
     : null;
+  // 글을 치는 중에 다시 그려도(사진이 늦게 도착하는 등) 그 칸에 커서를 돌려준다
+  const act = document.activeElement as HTMLInputElement | null;
+  const focusSel = act && root.contains(act) && act.dataset?.input
+    ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ''}`
+    : '';
+  const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
   root.dataset.theme = themeOf();
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
   root.dataset.tab = tab;
+  if (focusSel) {
+    const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
+    if (el) {
+      el.focus({ preventScroll: true });
+      if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
+    }
+  }
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));

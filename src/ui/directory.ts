@@ -5,12 +5,12 @@ import {
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
 import { MAP_CODES, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
-import { assetUrl } from '../host/assets';
+import { assetNames, assetUrl, hasAsset, pictureName } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
-import { avatar } from './images';
+import { avatar, imageUrl } from './images';
 import { ICONS } from './icons';
 
 export interface DirectoryEnv {
@@ -34,10 +34,13 @@ export const dirUi = {
   /** 다른 폴더 로어북을 발생 후보로 고르는 칸 */
   adding: false,
   addQ: '',
+  /** 사진을 고르는 중인 괴이·특수 (로어북 이름) */
+  pick: '',
+  pickQ: '',
 };
 
 export function resetDirectory(): void {
-  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '' });
+  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', pick: '', pickQ: '' });
 }
 
 const esc = (s: unknown) =>
@@ -144,7 +147,62 @@ export function directoryExtList(ctx: ChatContext): string {
     .join('');
 }
 
-function placePanel(p: PlaceRow): string {
+/** 사진을 고를 대상: 괴이·특수·요원은 로어북 이름, 조직은 「org:이름」 */
+function picOf(d: Directory, key: string): { english: string; photo: string; fallback: string; set: (v: string) => void } | null {
+  if (key.startsWith('org:')) {
+    const o = d.orgs.find((x) => x.name === key.slice(4));
+    if (!o) return null;
+    const i = BUILTIN.indexOf(o.faction);
+    return {
+      english: o.spec.english ?? '',
+      photo: o.spec.photo ?? '',
+      fallback: i >= 0 ? `f0${i + 1}` : '',
+      set: (v) => (v ? (o.spec.photo = v) : delete o.spec.photo),
+    };
+  }
+  const r = findRow(d, key);
+  if (!r) return null;
+  return { english: r.english, photo: r.photo ?? '', fallback: '', set: (v) => (v ? (r.photo = v) : delete r.photo) };
+}
+
+/** 사진 칸 (괴이·특수·요원·조직 공통): 지금 사진 + 고르기 (카드·에셋 모듈의 이미지 목록) */
+function photoBlock(key: string, ctx: ChatContext, where: string): string {
+  const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
+  if (!p) return '';
+  const name = pictureName(ctx.char, p.photo, p.english, p.fallback);
+  const url = name ? imageUrl(ctx.char, name) : null;
+  const picking = dirUi.pick === key;
+  const why = p.photo ? where : name && hasAsset(ctx.char, name) ? `자동: ${esc(name)}` : '영문명과 같은 이름의 이미지가 없어요';
+  return `<div class="dir-in"><span>사진</span>
+    <div class="dir-photo">
+      <span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="">` : ICONS.spook}</span>
+      <span class="dir-photo-name"><b>${esc(p.photo || '자동')}</b><small>${why}</small></span>
+      ${p.photo ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc(`|${key}`)}">자동으로</button>` : ''}
+      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc(key)}">${picking ? '닫기' : '고르기'}</button>
+    </div>
+    <small>고르지 않으면 「영문명_default」, 「영문명」 이미지 순으로 찾아요.</small>
+    ${picking ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx)}</div></div>` : ''}
+  </div>`;
+}
+
+/** 사진 고르기 목록 (검색어로 거르고, 영문명과 닮은 이름 먼저) */
+export function directoryPhotoList(ctx: ChatContext): string {
+  const p = dirUi.draft ? picOf(dirUi.draft, dirUi.pick) : null;
+  if (!p) return '';
+  const q = dirUi.pickQ.trim().toLowerCase();
+  const near = p.english.toLowerCase();
+  const all = assetNames(ctx.char).filter((n) => !q || n.toLowerCase().includes(q));
+  const list = [...all.filter((n) => near && n.toLowerCase().startsWith(near)), ...all.filter((n) => !near || !n.toLowerCase().startsWith(near))].slice(0, 30);
+  if (!list.length) return `<p class="gx-muted dir-empty">${q ? '찾는 이름의 이미지가 없어요.' : '카드나 에셋 모듈에 이미지가 없어요.'}</p>`;
+  return list
+    .map((n) => {
+      const url = imageUrl(ctx.char, n);
+      return `<button class="dir-pic${p.photo === n ? ' on' : ''}" data-action="dir-photo-set" data-value="${esc(`${n}|${dirUi.pick}`)}" title="${esc(n)}"><span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : ''}</span><small>${esc(n)}</small></button>`;
+    })
+    .join('');
+}
+
+function placePanel(p: PlaceRow, ctx: ChatContext): string {
   const k = (f: string) => `${f}|${p.lore}`;
   return `<div class="dir-panel">
     <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
@@ -154,6 +212,7 @@ function placePanel(p: PlaceRow): string {
     ${input(k('label'), p.label, '표시 이름', '상황판과 지도에 보이는 이름')}
     ${input(k('english'), p.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
     ${input(k('aliases'), p.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
+    ${photoBlock(p.lore, ctx, '위키 문서 정보표에 나와요')}
     <p class="gx-muted">로어북: ${esc(p.lore)}${p.inFolder ? '' : ' (폴더 밖)'}</p>
     ${p.inFolder ? '' : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc(p.lore)}">후보 목록에서 빼기</button>`}
   </div>`;
@@ -174,7 +233,8 @@ function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
       ${input(k('rank'), a.rank, '직급')}
       ${input(k('department'), a.department, '부서')}
     </div>
-    ${input(k('english'), a.english, '영문명', '사진 에셋 이름과 같아야 사진이 나와요')}
+    ${input(k('english'), a.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
+    ${photoBlock(a.lore, ctx, '요원 사진과 위키 문서 정보표에 나와요')}
     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
   </div>`;
@@ -187,8 +247,7 @@ function factionBlock(o: OrgRow, ctx: ChatContext): string {
   const seg = (action: string, on: boolean, a: string, b: string) =>
     `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on ? ' on' : ''}" data-action="${action}" data-value="${esc(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on ? ' on' : ''}" data-action="${action}" data-value="${esc(`0|${o.name}`)}">${b}</button></div>`;
   const start = `${input(k('title'), o.spec.title ?? '', '시작 화면 이름', o.faction ? '비우면 원래 이름' : '비우면 조직 이름')}
-    ${area(k('blurb'), o.spec.blurb ?? '', '시작 화면 설명')}
-    ${input(k('photo'), o.spec.photo ?? '', '사진 에셋 이름', o.faction ? '비우면 원래 사진(f01~f05)' : '카드 에셋 이름. 비우면 사진 없이')}`;
+    ${area(k('blurb'), o.spec.blurb ?? '', '시작 화면 설명')}`;
   if (o.faction) {
     return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg('dir-fac-hide', !o.spec.hidden, '보임', '숨김')}</div>${start}${builtinBlock(o.faction, dirUi.draft!)}</div>`;
   }
@@ -233,6 +292,8 @@ function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
   const tabs = tabsOf(d, lore);
   const members = d.agents.filter((a) => a.affiliation === orgAffiliation(o));
   return `<div class="dir-panel">
+    ${input(`org:english|${o.name}`, o.spec.english ?? '', '영문명')}
+    ${photoBlock(`org:${o.name}`, ctx, '시작 화면과 위키 문서 정보표에 나와요')}
     ${factionBlock(o, ctx)}
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip('dir-org-toggle', `rosterFor|${f}|${o.name}`, names[f], o.rosterFor.includes(f))).join('')}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs.map((t) => chip('dir-org-toggle', `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join('')}</div></div>
@@ -338,14 +399,14 @@ function freeBaseName(d: Directory, want: string): string {
   return name;
 }
 
-function placeRow(p: PlaceRow, src = ''): string {
+function placeRow(p: PlaceRow, ctx: ChatContext, src = ''): string {
   const open = dirUi.open === p.lore;
   return `<div class="dir-row${open ? ' open' : ''}">
     <button class="dir-head" data-action="dir-open" data-value="${esc(p.lore)}" aria-expanded="${open}">
       <span class="dir-name"><b>${esc(p.label)}</b><small>${esc(p.english || '영문명 없음')}</small></span>
       ${p.inFolder ? '' : `<span class="gx-badge wait">${esc(src || '폴더 밖')}</span>`}
       <span class="gx-badge${p.preset ? ' live' : ''}">${p.preset ? '발생 후보' : '숨김'}</span>
-    </button>${open ? placePanel(p) : ''}</div>`;
+    </button>${open ? placePanel(p, ctx) : ''}</div>`;
 }
 
 function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<string, string>): string {
@@ -353,7 +414,7 @@ function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<str
   const sub = [a.affiliation ? orgName(d, names, a.affiliation) : '', a.rank, a.department].filter(Boolean).join(' · ');
   return `<div class="dir-row${open ? ' open' : ''}">
     <button class="dir-head" data-action="dir-open" data-value="${esc(a.lore)}" aria-expanded="${open}">
-      ${avatar(ctx.char, a.english, a.name)}
+      ${avatar(ctx.char, a.photo || a.english, a.name)}
       <span class="dir-name"><b>${esc(a.name)}</b><small>${esc(sub || '소속 미정')}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? '' : '<span class="gx-badge">목록 숨김</span>'}
     </button>${open ? agentPanel(a, ctx, d) : ''}</div>`;
@@ -381,8 +442,8 @@ export function directoryList(ctx: ChatContext): string {
       ? `<div class="dir-ext"><div class="dir-ext-head"><input class="gx-search" data-input="dir-ext-q" value="${esc(dirUi.addQ)}" placeholder="로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><button class="gx-mini" data-action="dir-ext-close">닫기</button></div>
           <div class="dir-ext-list">${directoryExtList(ctx)}</div></div>`
       : `<button class="dir-ext-open" data-action="dir-ext-open">＋ 다른 폴더에서 후보 추가</button>`;
-    return `${inside.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside.length}</small></h3>${inside.map((r) => placeRow(r)).join('')}` : ''}
-      ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, src.get(r.lore))).join('')}` : ''}
+    return `${inside.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside.length}</small></h3>${inside.map((r) => placeRow(r, ctx)).join('')}` : ''}
+      ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, ctx, src.get(r.lore))).join('')}` : ''}
       ${!rows.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ''}${q ? '' : add}`;
   }
   const rows = d.agents.filter((r) => matches(r, q));
@@ -491,7 +552,7 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     const o = d.orgs.find((x) => x.name === key.slice(at + 1));
     if (!o) return;
     if (field === 'seed') o.spec.seed = splitList(value);
-    else if (field === 'title' || field === 'blurb' || field === 'photo' || field === 'gm_name' || field === 'gm_desc' || field === 'tab') o.spec[field] = value.trim();
+    else if (field === 'title' || field === 'blurb' || field === 'photo' || field === 'english' || field === 'gm_name' || field === 'gm_desc' || field === 'tab') o.spec[field] = value.trim();
     else return;
     dirUi.done = '';
     if (bar) bar.innerHTML = directoryBar();
@@ -738,6 +799,19 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.adding = true;
       dirUi.addQ = '';
       break;
+    case 'dir-photo-pick':
+      dirUi.pick = dirUi.pick === v ? '' : v;
+      dirUi.pickQ = '';
+      break;
+    case 'dir-photo-set': {
+      const at = v.indexOf('|');
+      const p = picOf(d, v.slice(at + 1));
+      if (!p) break;
+      p.set(at > 0 ? v.slice(0, at) : '');
+      dirUi.pick = '';
+      dirUi.done = '';
+      break;
+    }
     case 'dir-ext-close':
       dirUi.adding = false;
       break;
