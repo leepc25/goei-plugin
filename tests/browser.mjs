@@ -705,7 +705,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로
   await page.click('.gx-mlist li:first-child [data-action="wiki-goto"]');
-  await page.waitForSelector('.nw-compose');
+  await page.waitForSelector('.nw-compose, .nw-dochead'); // 카드 기본 문서가 있으면 바로 문서, 없으면 작성 화면
   assert.equal((await page.textContent('.gx-nb.on:not(.mob)')).trim(), '위키');
   assert.equal((await page.textContent('.nw-title')).trim(), site);
   assert.deepEqual(errors, []);
@@ -713,9 +713,32 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.close();
 }
 
-// 13) 위키: 검색 → 작성 화면 → 생성·저장 → 링크 → 실패 시 기존 문서 유지 → 삭제
-{
+// 13a) 위키: 카드에 압축해 넣은 기본 문서는 창을 열 때 풀려서 검색하면 바로 문서가 열린다
+const packed = (e) => String(e.content ?? '').startsWith('GOEIWIKI1:');
+if (fixture.globalLore.some(packed)) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  await startedWithReply(page);
+  {
+    await open(page);
+    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+    await page.waitForSelector('.nw-rail');
+    await page.click('.nw-grab');
+    await page.fill('.nw .ph-search', '소라 랜드');
+    await page.press('.nw .ph-search', 'Enter');
+    await page.waitForSelector('.nw-dochead');
+    assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드');
+    assert.ok(await page.locator('.nw-body .nw-fn').count() >= 8, '각주');
+    assert.equal(await page.evaluate(() => (window.__calls.llm || []).length), 0, '기본 문서는 생성하지 않음');
+    if (shots) { await page.waitForTimeout(800); await page.screenshot({ path: `${shots}/13-wiki-base.png`, fullPage: true }); }
+  }
+  assert.deepEqual(errors, []);
+  console.log('PASS 위키 카드 기본 문서');
+  await page.close();
+}
+
+// 13) 위키: 검색 → 작성 화면 → 생성·저장 → 링크 → 실패 시 기존 문서 유지 → 삭제 (기본 문서가 없는 카드로)
+{
+  const { page, errors } = await boot({ ...fixture, globalLore: fixture.globalLore.filter((e) => !packed(e)) }, { message: [], scriptstate: {} });
   await startedWithReply(page);
   const article = (title, extra = '') => `<lightboard-namuwiki doc_title="${title}" doc_type="other" main_color="#27685b" asset_src="" related1="소라 랜드 괴담" recent1="쟈알디">
 [Infobox]Title:${title}|위치:서울|상태:❗폐장❗
