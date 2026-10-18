@@ -77,3 +77,54 @@ export async function runModel(messages: LlmMessage[], model: ModelChoice): Prom
   if (!text) throw new LlmError('모델이 빈 응답을 보냈어요.');
   return text;
 }
+
+/** 형식 오류 재시도 (원본 백엔드 「실패 시 재시도」·「재시도 모델」). 고급 설정 → 생성 공통 */
+export interface RetryOptions {
+  retries: number;
+  retryModel: 'same' | ModelChoice;
+  /** 다시 물을 요청문 (없으면 같은 요청에 오류를 덧붙임) */
+  fix?: (raw: string, reason: string) => LlmMessage[];
+}
+
+/** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
+const retryable = (error: unknown) => !(error instanceof LlmError);
+
+const defaultFix = (messages: LlmMessage[]) => (raw: string, reason: string): LlmMessage[] => [
+  ...messages,
+  ...(raw ? [{ role: 'assistant' as const, content: raw }] : []),
+  { role: 'user', content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}` },
+];
+
+/** 실패 화면에 원문을 보여 주도록 오류에 응답 원문을 붙인다 (이미 있으면 그대로) */
+function withRawText(error: unknown, raw: string): unknown {
+  if (raw && error && typeof error === 'object' && !(error as { raw?: string }).raw) {
+    try {
+      Object.defineProperty(error, 'raw', { value: raw, configurable: true });
+    } catch {
+      /* 원문을 못 붙여도 오류는 그대로 */
+    }
+  }
+  return error;
+}
+
+/** 모델을 부르고 parse로 검사한다. 형식이 틀리면 설정한 횟수만큼 다시 묻는다. 끝까지 실패하면 오류에 원문을 붙여 던진다 */
+export async function generate<T>(messages: LlmMessage[], model: ModelChoice, parse: (raw: string) => T, o: RetryOptions): Promise<{ raw: string; value: T }> {
+  const fix = o.fix ?? defaultFix(messages);
+  let ask = messages;
+  let use = model;
+  let earlier: unknown = null;
+  for (let attempt = 0; ; attempt++) {
+    let raw = '';
+    try {
+      raw = await runModel(ask, use);
+      return { raw, value: parse(raw) };
+    } catch (error) {
+      // 다시 물었는데 연결이 실패하면 처음 형식 오류(원문 포함)를 보여 준다
+      if (earlier && !retryable(error)) throw earlier;
+      if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
+      earlier = withRawText(error, raw);
+      ask = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+      use = o.retryModel === 'same' ? model : o.retryModel;
+    }
+  }
+}

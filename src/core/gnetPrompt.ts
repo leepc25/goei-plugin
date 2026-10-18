@@ -7,6 +7,8 @@ import {
   activityContext, findPost, gnetSettings, gnetVars, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
   type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow,
 } from './gnet';
+import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { cbsEnv, collectRefs, factionCodesToNames, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
 
 export type GnetOp = 'refresh' | 'post' | 'comment' | 'dm';
@@ -20,14 +22,18 @@ const REQUIRED_LB = ['SYSTEM', 'OUTPUT', 'JAILBREAK', 'JOB'];
 
 export interface GnetBooks {
   read(name: string): string;
+  /** 출력 언어 문장 (고급 설정 → 생성 언어) */
+  language: string;
 }
 
 /** GNet 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다. 생성 틀(SYSTEM 등)은 옛 카드면 LB Backend에 있다 */
 export function gnetBooks(src: RefSource): GnetBooks {
   const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, 'GNet') };
   for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
+  applyAdvanced(src.chat.scriptstate);
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
   return {
+    language: genSettings(src.chat.scriptstate).language ?? LANGUAGE,
     read(name: string) {
       const raw = g[name] ?? '';
       return evaluate(raw, env)
@@ -57,7 +63,7 @@ export function systemText(b: GnetBooks, guideline: string, format: string, iden
     .replace(/## Main Protagonist \([^\n]*\)/, '## User-controlled protagonist (narrator reference only)');
   let outro = fmt(b.read('OUTPUT'), '', format, guideline);
   if (identity) outro += `\nROLE BINDING (application-owned metadata):\n${JSON.stringify(identity)}`;
-  outro += `\n${LANGUAGE}`;
+  outro += `\n${b.language}`;
   return `${intro}\n${outro}${attachments ? `\n\n${b.read('ATTACHMENTS.READ')}` : ''}`;
 }
 
@@ -66,10 +72,12 @@ export interface GnetPrompt {
 }
 
 function pack(src: RefSource, b: GnetBooks, guideline: string, format: string, extras: string, factionNames: Record<string, string>, identity?: unknown): GnetPrompt {
-  const turns = recentTurns(src.chat, HISTORY.turns);
-  const story = storyText(turns);
+  const n = trimTurns(HISTORY.turns);
+  const story = n ? storyText(recentTurns(src.chat, n)) : '';
+  const t = refToggles(src.chat.scriptstate, 'gn');
   const rows = collectRefs(src, {
-    scope: 'gnet', text: `${extras}\n${story}`, related: false, secondary: false,
+    scope: 'gnet', text: `${extras}\n${story}`, description: t.description, authors: t.authors, persona: t.persona, active: t.active,
+    related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
     extra: [{ source: '현재 발생 상황', content: b.read('LB.EXTRA') }],
   });
   const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]\n${refText(rows)}\n[최근 본문]\n${story}\n[현재 작업]\n${extras}`;

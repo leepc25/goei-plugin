@@ -52,8 +52,10 @@ test('refs: collects base, primary, active, direct and secondary rows with CBS e
   assert.equal(rows[0].content, '설명 괴이봇');
   assert.equal(rows[3].content, 'A 시점');
   assert.match(refText(rows), /^\[공통: 봇 설명\]\n설명 괴이봇/);
-  assert.equal(limitRefs(rows, 4).length, 4);
-  assert.ok(!limitRefs(rows, 4).some((r) => r.kind === 'secondary'));
+  // 개수 제한은 관련·2차 참조만 센다 (원본 reference_count)
+  assert.equal(limitRefs(rows, 1).length, 5);
+  assert.equal(limitRefs(rows, 0).length, 4);
+  assert.ok(!limitRefs(rows, 0).some((r) => r.kind === 'secondary'));
 });
 
 test('refs: recent turns group user and char messages, hide tags and scene cards', () => {

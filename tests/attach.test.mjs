@@ -61,7 +61,7 @@ test('gnet power, auto refresh and DM retention', () => {
 test('phone storage and notice settings', () => {
   assert.deepEqual(P.phoneStorage({}, 'group'), { auto: true, limit: 100 });
   assert.deepEqual(P.phoneStorage({ $ph_storage_auto_dm: '0', $ph_storage_limit_dm: '7' }, 'dm'), { auto: false, limit: 7 });
-  assert.deepEqual(P.noticeSettings({ $ph_announcement_page_size: '35', $ph_announcement_gap: '5' }), { gap: 5, history: 10, page: 20 });
+  assert.deepEqual(P.noticeSettings({ $ph_announcement_page_size: '35', $ph_announcement_gap: '5' }), { gap: 5, history: 10, page: 30 });
   const r = { id: 'dm_x', kind: 'dm', members: ['x'], people: { x: { id: 'x', name: 'X' } }, messages: [], draft: '', unread: 0 };
   const st = { rooms: { dm_x: r }, order: ['dm_x'], mid: 0 };
   for (let i = 0; i < 50; i++) P.push(st, r, 'x', `m${i}`, '');

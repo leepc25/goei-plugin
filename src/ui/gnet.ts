@@ -16,7 +16,11 @@ import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachmen
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { runModel } from '../host/llm';
+import { generate, type RetryOptions } from '../host/llm';
+import { budgetFor, genSettings } from '../core/advanced';
+import { fitPrompt } from '../core/budget';
+import { advancedBox } from './advanced';
+import { personaText } from '../host/user';
 import { saveVarDefaults } from '../host/prefs';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -67,7 +71,8 @@ const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIn
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['char'], chat: ctx.chat });
+const retry = (chat: Chat): RetryOptions => genSettings(chat.scriptstate);
+const source = (ctx: ChatContext, chat = ctx.chat): RefSource => ({ char: ctx.char as RefSource['char'], chat, persona: personaText() });
 
 function names(ctx: ChatContext): Record<string, string> {
   try {
@@ -137,9 +142,8 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false) {
     const nick = userNick(ctx.chat.scriptstate);
     const s = gnetSettings(ctx.chat.scriptstate);
     const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
-    const prompt = refreshPrompt(source(ctx), before, plan, nick, names(ctx));
-    const raw = await runModel(prompt.messages, s.model);
-    const value = withRaw(raw, () => parseJsonPayload(raw));
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx)));
+    const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(ctx.chat));
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
@@ -173,10 +177,12 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
     const s = gnetSettings(ctx.chat.scriptstate);
     const draftPost: GPost = { id: 0, date: '', nick, title: '', body: input, views: 0, votes: 0, mine: true, comments: [] };
     const plan = incomingPlan(ctx.chat, st, s, nick, Math.random, { post: draftPost });
-    const prompt = postPrompt(source(ctx), st, input, plan, names(ctx));
-    const raw = await runModel(prompt.messages, s.model);
-    const value = withRaw(raw, () => parseJsonPayload(raw)) as Record<string, unknown>;
-    const draft = attachPostDraft(withRaw(raw, () => parsePostDraft(value)), input);
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => postPrompt(source(ctx), st, input, plan, names(ctx)));
+    const { value, draft: parsed } = (await generate(prompt.messages, s.model, (r) => {
+      const v = withRaw(r, () => parseJsonPayload(r)) as Record<string, unknown>;
+      return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
+    }, retry(ctx.chat))).value;
+    const draft = attachPostDraft(parsed, input);
     let note = '글을 올렸어요.';
     let newId = 0;
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
@@ -212,10 +218,9 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
     const s = gnetSettings(chat.scriptstate);
     const nick = userNick(chat.scriptstate);
     const plan = incomingPlan(chat, st, { ...s, incoming: false }, nick, Math.random);
-    const prompt = commentPrompt({ char: ctx.char as RefSource['char'], chat }, st, postId, 0, '', plan, nick, names(ctx), POST_REFRESH_ACTION);
+    const prompt = fitPrompt(budgetFor(chat.scriptstate, 'gn'), () => commentPrompt(source(ctx, chat), st, postId, 0, '', plan, nick, names(ctx), POST_REFRESH_ACTION));
     const snapshot = postKey(target);
-    const raw = await runModel(prompt.messages, s.model);
-    const value = withRaw(raw, () => parseJsonPayload(raw) as Record<string, unknown>);
+    const { value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(chat));
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
       const cur = readGnet(latest);
@@ -263,21 +268,15 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
     const target = findPost(st, postId)!;
     const plan = incomingPlan(saved, st, s, nick, Math.random, { post: target, commentIndex: index });
     // 원본과 같이 반응은 방금 단 내 댓글 아래로 (replyTo = 내 댓글 번호)
-    const prompt = commentPrompt({ char: ctx.char as RefSource['char'], chat: saved }, st, postId, index, body, plan, nick, names(ctx));
-    const snapshot = postKey(target);
-    let raw = '';
+    let value: Record<string, unknown>;
+    let prompt: ReturnType<typeof commentPrompt>;
     try {
-      raw = await runModel(prompt.messages, s.model);
+      prompt = fitPrompt(budgetFor(saved.scriptstate, 'gn'), () => commentPrompt(source(ctx, saved), st, postId, index, body, plan, nick, names(ctx)));
+      value = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r) as Record<string, unknown>), retry(saved))).value;
     } catch (error) {
-      throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`);
+      throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
-    const value = withRaw(raw, () => {
-      try {
-        return parseJsonPayload(raw) as Record<string, unknown>;
-      } catch (error) {
-        throw new GnetError(`댓글은 저장했어요. ${(error as Error).message}`, raw);
-      }
-    });
+    const snapshot = postKey(target);
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       const cur = readGnet(chat);
@@ -328,17 +327,11 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
   return run({ ...ctx, chat: saved }, env, `${nick}의 답장을 기다리는 중이에요.`, async () => {
     const st = readGnet(saved);
     const s = gnetSettings(saved.scriptstate);
-    const prompt = dmPrompt({ char: ctx.char as RefSource['char'], chat: saved }, st, nick, body, me, names(ctx));
     let reply: string;
     try {
-      const raw = await runModel(prompt.messages, s.model);
-      try {
-        reply = parseDmBody(raw);
-      } catch (error) {
-        // 원본과 같이 한 번만 고쳐 달라고 다시 묻는다
-        const again = await runModel(retryMessages(prompt, raw, (error as Error).message), s.model);
-        reply = withRaw(again, () => parseDmBody(again));
-      }
+      const prompt = fitPrompt(budgetFor(saved.scriptstate, 'gn'), () => dmPrompt(source(ctx, saved), st, nick, body, me, names(ctx)));
+      // 원본과 같이 고쳐 달라고 다시 묻는다 (횟수·모델은 고급 설정 → 생성 공통)
+      reply = (await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
     } catch (error) {
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
         const cur = readGnet(chat);
@@ -603,7 +596,7 @@ function settingsView(ctx: ChatContext, back = true): string {
         row('괴담넷 사용', seg('power', '1', [['1', '켜기'], ['0', '끄기']])),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
         row('새로고침', seg('lazy', v('lazy') === '0' ? '0' : '1', [['1', '수동'], ['0', '본편 응답마다']]), '본편 응답마다면 응답이 끝날 때마다 모델을 한 번 더 불러요'),
-        row('본편에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '최근 글 5개와 쪽지가 본편 요청에 참고로 붙어요'),
+        row('본편에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '최근 글과 쪽지가 본편 요청에 참고로 붙어요'),
         row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', '끄기'], ['1', '켜기']])),
       ].join(''))}
       ${group('게시판', [
@@ -618,7 +611,8 @@ function settingsView(ctx: ChatContext, back = true): string {
       ${group('쪽지', [
         row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']])),
         row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
-      ].join(''))}`
+      ].join(''))}
+      ${advancedBox('gn', ctx.chat.scriptstate)}`
     : group('괴담넷', row('괴담넷 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
   return `<div class="ph-form">${paneHead('괴담넷 설정', '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }

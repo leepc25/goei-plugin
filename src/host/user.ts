@@ -106,3 +106,16 @@ export async function readUser(): Promise<UserInfo> {
 }
 
 export const userInfo = (): UserInfo => cached;
+
+// 사용자 페르소나 설명 (위키·괴담넷·괴담톡 참고 자료). Risu의 {{persona}}를 풀어 읽는다 (데이터베이스 권한 없이)
+let persona = '';
+export async function readPersona(): Promise<string> {
+  try {
+    const t = String((await risuai.parseRisuChat('{{persona}}')) ?? '').trim();
+    persona = /\{\{\s*persona/i.test(t) ? '' : t;
+  } catch {
+    /* 채팅이 없으면 지난 값 */
+  }
+  return persona;
+}
+export const personaText = (): string => persona;

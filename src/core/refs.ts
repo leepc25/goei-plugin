@@ -20,6 +20,8 @@ export interface RefRow {
 export interface RefSource {
   char: { name?: string; desc?: string; globalLore?: LoreEntry[] };
   chat: Chat;
+  /** 사용자 페르소나 설명 ({{persona}}, 창을 열 때 읽어 둔 값) */
+  persona?: string;
 }
 
 /** 참고 자료로 쓰면 안 되는 내부 로어북 */
@@ -28,6 +30,7 @@ const INTERNAL = new Set([
   'Phone tabs', 'Settings', '⚙️설정', '괴이봇 플러그인 매니페스트', '괴이봇 명부', 'Plugin manifest', 'Directory', 'WIKI_DIAGNOSTIC',
 ]);
 export const ACTIVE_BOOKS = ['📜Faction', '🙂Roster'];
+export const PERSONA_SOURCE = '사용자 페르소나';
 
 export function allowedBook(e: LoreEntry): boolean {
   const name = String(e.comment ?? '');
@@ -83,6 +86,7 @@ export interface CollectOptions {
   text: string;
   description?: boolean;
   authors?: boolean;
+  persona?: boolean;
   active?: boolean;
   related?: boolean;
   secondary?: boolean;
@@ -116,6 +120,7 @@ export function collectRefs(src: RefSource, o: CollectOptions): RefRow[] {
   if (o.description !== false && src.char.desc) add('base', '봇 설명', stripModules(evaluate(src.char.desc, env)));
   const note = typeof src.chat.note === 'string' ? src.chat.note : '';
   if (o.authors !== false && note.trim()) add('base', '작가 노트', stripModules(evaluate(note, env)));
+  if (o.persona !== false && src.persona?.trim()) add('base', PERSONA_SOURCE, stripModules(evaluate(src.persona, env)));
   const seen = new Set<string>();
   const pull = (kind: RefKind, name: string) => {
     const key = name.trim().toLowerCase();
@@ -124,7 +129,7 @@ export function collectRefs(src: RefSource, o: CollectOptions): RefRow[] {
     for (const c of readBook(books, name, env)) add(kind, name, c);
   };
   for (const n of o.primaryNames ?? []) pull('primary', n);
-  if (o.active !== false) for (const x of o.extra ?? []) add('active', x.source, x.content);
+  for (const x of o.extra ?? []) add('active', x.source, x.content);
   if (o.active !== false) for (const n of ACTIVE_BOOKS) pull('active', n);
   if (o.related !== false) for (const e of referenceEntries(registry, o.text)) if (e.lore) pull('direct', e.lore);
   if (o.secondary) {
@@ -134,11 +139,12 @@ export function collectRefs(src: RefSource, o: CollectOptions): RefRow[] {
   return rows;
 }
 
-/** 개수 제한: 필수가 아닌 2차 참조, 그다음 직접 참조부터 뺀다 */
+/** 개수 제한 (원본 reference_count): 추가 참조(관련·2차)만 센다. 필수가 아닌 2차 참조, 그다음 관련 로어북부터 뺀다 */
 export function limitRefs(rows: RefRow[], max: number): RefRow[] {
   const out = rows.slice();
+  const extra = () => out.filter((r) => r.kind === 'direct' || r.kind === 'secondary').length;
   for (const kind of ['secondary', 'direct'] as RefKind[]) {
-    for (let i = out.length - 1; i >= 0 && out.length > max; i--) if (out[i].kind === kind && !out[i].required) out.splice(i, 1);
+    for (let i = out.length - 1; i >= 0 && extra() > max; i--) if (out[i].kind === kind && !out[i].required) out.splice(i, 1);
   }
   return out;
 }

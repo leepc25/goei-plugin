@@ -5,9 +5,13 @@ import { buildRegistry, searchRegistry, type Registry } from '../core/world/regi
 import { hasBook, type RefSource } from '../core/refs';
 import {
   type WikiDoc, acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
-  type WikiMeta, type WikiSettings,
+  type WikiMeta, type WikiSettings, wikiContextOn,
 } from '../core/wiki';
-import { runModel } from '../host/llm';
+import { generate as askModel } from '../host/llm';
+import { budgetFor, genSettings } from '../core/advanced';
+import { fitPrompt } from '../core/budget';
+import { advancedBox } from './advanced';
+import { personaText } from '../host/user';
 import { saveVarDefaults } from '../host/prefs';
 import { ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
@@ -81,7 +85,7 @@ function registry(ctx: ChatContext): Registry {
   if (!regCache || regCache.lore !== ctx.char.globalLore) regCache = { lore: ctx.char.globalLore, reg: buildRegistry(ctx.char.globalLore) };
   return regCache.reg;
 }
-const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['char'], chat: ctx.chat });
+const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() });
 function canon(ctx: ChatContext) {
   const r = registry(ctx);
   const src = source(ctx);
@@ -155,13 +159,13 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
         return {};
       }
     })();
-    const prompt = wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s, catalogNames, registry(ctx));
-    const raw = await runModel(prompt.messages, s.model);
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s, catalogNames, registry(ctx)));
     let body: string;
     try {
-      body = acceptArticle(raw, title, canon(ctx));
+      body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), genSettings(ctx.chat.scriptstate))).value;
     } catch (error) {
-      wiki.failure = { title, reason: error instanceof Error ? error.message : String(error), raw };
+      const raw = (error as { raw?: string }).raw;
+      if (raw) wiki.failure = { title, reason: error instanceof Error ? error.message : String(error), raw };
       throw error;
     }
     const meta: WikiMeta = {
@@ -450,9 +454,11 @@ function settingsView(ctx: ChatContext): string {
       ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
       ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
       ${line('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
+      ${line('본편에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '최근에 쓴 문서가 본편 요청에 참고로 붙어요')}
     </div></section>
     <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section></div>
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
+    ${advancedBox('nw', ctx.chat.scriptstate)}</div>
   </div>`;
 }
 
@@ -731,6 +737,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-mode':
     case 'wiki-model':
     case 'wiki-refresh_previous':
+    case 'wiki-context':
       await setVar(ctx, env, `$nw_${action.slice(5)}`, v);
       return true;
     case 'wiki-settings':

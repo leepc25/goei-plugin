@@ -58,8 +58,8 @@ export function noticeSettings(state: Record<string, unknown> | undefined): { ga
     const n = Number(state?.[PH(k)]);
     return Number.isInteger(n) && n >= lo && n <= hi ? n : d;
   };
-  const page = num('announcement_page_size', 20, 60, 20);
-  return { gap: num('announcement_gap', 1, 100, COOLDOWN.announcement), history: num('announcement_history', 1, 50, HISTORY.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 20 };
+  const page = num('announcement_page_size', 20, 60, 30);
+  return { gap: num('announcement_gap', 1, 100, COOLDOWN.announcement), history: num('announcement_history', 1, 50, HISTORY.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
 }
 const cooldownTurns = (chat: Chat, k: keyof typeof COOLDOWN) => (k === 'announcement' ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k]);
 const COOLDOWN_KEY = (k: keyof typeof COOLDOWN) => `$cooldown_received_${k}`;
@@ -891,7 +891,7 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
   for (const item of recent) {
     if (!item.notice && counted >= HISTORY.context) continue;
     kept.unshift(item.data);
-    if (tokens(payload()) > HISTORY.contextTokens) kept.shift();
+    if (HISTORY.contextTokens > 0 && tokens(payload()) > HISTORY.contextTokens) kept.shift();
     else if (!item.notice) counted++;
   }
   return kept.length ? payload() : '';

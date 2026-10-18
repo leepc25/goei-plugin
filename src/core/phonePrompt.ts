@@ -7,7 +7,9 @@ import {
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
   type PState, phoneTime, hiddenPause, cooldownReady,
 } from './phone';
-import { bookText, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
+import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { trimRelated, trimSecondary, trimTurns } from './budget';
+import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
 
 export interface PhonePrompt {
   messages: { role: 'system' | 'user'; content: string }[];
@@ -17,6 +19,7 @@ export interface PhonePrompt {
 const LANGUAGE = 'Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.';
 
 function sections(src: RefSource): Record<string, string> {
+  applyAdvanced(src.chat.scriptstate);
   const p = policySections(src.char.globalLore, 'Phone');
   if (!Object.keys(p).length) throw new PhoneError('Phone 로어북을 찾지 못했어요.');
   return p;
@@ -82,7 +85,7 @@ function rules(src: RefSource, body: Body, mode: 'REPLY' | 'REFRESH'): string {
   }
   if (manual) keys.push('MANUAL_CONTACT', 'CONTACT_CONTEXT', 'SINGLE_PASS_CONTACT');
   keys.push(`OUTPUT_${manual ? 'CONTACT_' : ''}${mode}`);
-  return [...keys.map((k) => section(p, k)), LANGUAGE].join('\n\n');
+  return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
 }
 
 // ── 자료 ──
@@ -169,11 +172,13 @@ interface Narrator {
   currentSceneEntries: number;
   currentSceneTime: string;
   factionLabels: Record<string, string>;
-  universe: { characterDescription: string; authorsNote: string; activeLoreBooks: { source: string; content: string; kind: string }[] };
+  universe: { characterDescription: string; authorsNote: string; userPersona?: string; activeLoreBooks: { source: string; content: string; kind: string }[] };
 }
 
 function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
-  const turns = recentTurns(src.chat, HISTORY.turns);
+  applyAdvanced(src.chat.scriptstate);
+  const n = trimTurns(HISTORY.turns);
+  const turns = n ? recentTurns(src.chat, n) : [];
   const recentStory: Narrator['recentStory'] = [];
   turns.forEach((t, i) => {
     if (t.user) recentStory.push({ role: 'user', text: t.user, turn: i + 1 });
@@ -181,11 +186,16 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
   });
   const last = turns[turns.length - 1];
   const faction = String(src.chat.scriptstate?.['$st_faction'] ?? '') || 'none';
-  const rows = collectRefs(src, { scope: 'phone', text: `${text}\n${recentStory.map((m) => m.text).join('\n')}`, related, secondary: false });
+  const t = refToggles(src.chat.scriptstate, 'ph');
+  const rows = collectRefs(src, {
+    scope: 'phone', text: `${text}\n${recentStory.map((m) => m.text).join('\n')}`, description: t.description, authors: t.authors, persona: t.persona,
+    active: t.active, related: related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
+  });
   const universe: Narrator['universe'] = { characterDescription: '', authorsNote: '', activeLoreBooks: [] };
   for (const r of rows) {
     if (r.sources.includes('봇 설명') && r.kind === 'base') universe.characterDescription = r.content;
     else if (r.sources.includes('작가 노트') && r.kind === 'base') universe.authorsNote = r.content;
+    else if (r.sources.includes(PERSONA_SOURCE) && r.kind === 'base') universe.userPersona = r.content;
     else universe.activeLoreBooks.push({ source: r.sources.join(' / '), content: r.content, kind: r.kind });
   }
   return {

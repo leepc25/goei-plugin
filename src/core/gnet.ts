@@ -77,8 +77,8 @@ export function gnetRetention(state: Record<string, unknown> | undefined): { aut
   return { auto: flag !== '0', limit };
 }
 export const LIMITS = { replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
-export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 16, turns: 8, dmKeep: 40, cooldown: 2 };
-export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 10000 };
+export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 50, turns: 8, dmKeep: 40, cooldown: 2 };
+export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 10000, includePosts: true, includeDms: true, ownOnly: false };
 export const QUANTITY: Record<string, { range: string; max: number; label: string }> = {
   '0': { range: '4-6', max: 6, label: '4~6' },
   '1': { range: '5-7', max: 7, label: '5~7' },
@@ -935,8 +935,10 @@ export function parseDmBody(raw: string): string {
 export function mainContext(st: GState, nick: string, rules: string): string {
   const items: { id: string; data: Record<string, unknown> }[] = [];
   let included = 0;
-  for (const p of st.posts) {
+  // 내가 쓴 것만: 내 글, 내 댓글이 달린 글(그 댓글과 위쪽 댓글만), 내가 주고받은 쪽지는 원래 모두 내 것 (원본 context_own_only)
+  for (const p of CONTEXT.includePosts ? st.posts : []) {
     if (included >= CONTEXT.posts) break;
+    if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
     const wanted = new Set<number>();
     const include = (n: number) => {
       if (n <= 0 || wanted.has(n) || !p.comments[n - 1]) return;
@@ -945,6 +947,7 @@ export function mainContext(st: GState, nick: string, rules: string): string {
     };
     let selected = 0;
     for (let j = p.comments.length; j >= 1 && selected < CONTEXT.comments; j--) {
+      if (CONTEXT.ownOnly && !p.mine && !p.comments[j - 1].mine) continue;
       include(j);
       selected++;
     }
@@ -955,7 +958,7 @@ export function mainContext(st: GState, nick: string, rules: string): string {
       data: { kind: 'public_post', title: p.title, date: p.date, author: p.nick, content: describe(p.body), comments, access: 'publicly accessible; reading by each character is not established' },
     });
   }
-  for (let i = st.dms.length - 1; i >= Math.max(0, st.dms.length - CONTEXT.dms); i--) {
+  for (let i = st.dms.length - 1; CONTEXT.includeDms && i >= Math.max(0, st.dms.length - CONTEXT.dms); i--) {
     const d = st.dms[i];
     items.push({
       id: `dm:${i + 1}`,
@@ -969,7 +972,7 @@ export function mainContext(st: GState, nick: string, rules: string): string {
   const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'gnet', records: kept })}\n[MODULE_CONTEXT_END]`;
   for (const item of items) {
     kept.unshift(item.data);
-    if (tokens(payload()) > CONTEXT.tokens) kept.shift();
+    if (CONTEXT.tokens > 0 && tokens(payload()) > CONTEXT.tokens) kept.shift();
   }
   return kept.length ? payload() : '';
 }

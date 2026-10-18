@@ -22,7 +22,11 @@ import type { RefSource } from '../core/refs';
 import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { runModel } from '../host/llm';
+import { generate as askModel } from '../host/llm';
+import { advNum, budgetFor, genSettings } from '../core/advanced';
+import { advancedBox } from './advanced';
+import { fitPrompt } from '../core/budget';
+import { personaText } from '../host/user';
 import { saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 
@@ -95,7 +99,7 @@ export const phoneBusy = (ctx: { charIndex: number; chatIndex: number }) => jobs
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const source = (ctx: ChatContext, chat = ctx.chat): RefSource => ({ char: ctx.char as RefSource['char'], chat });
+const source = (ctx: ChatContext, chat = ctx.chat): RefSource => ({ char: ctx.char as RefSource['char'], chat, persona: personaText() });
 
 function names(ctx: ChatContext): Record<string, string> {
   try {
@@ -161,9 +165,8 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
     let raw = '';
     let result: ReturnType<typeof parseReply>;
     try {
-      const prompt = replyPrompt(source(ctx, saved), st, r, d, names(ctx));
-      raw = await runModel(prompt.messages, phoneSettings(saved.scriptstate).model);
-      result = parseReply(raw, r, prompt.contactMode);
+      const prompt = fitPrompt(budgetFor(saved.scriptstate, 'ph'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
+      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), genSettings(saved.scriptstate)));
     } catch (error) {
       await markFailed(ctx, rid, req);
       const msg = error instanceof Error ? error.message : String(error);
@@ -340,18 +343,23 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     const startLength = ctx.chat.message?.length ?? 0;
     const st = readPhone(ctx.chat);
     const d = dir(ctx);
-    const plan = refreshPrompt(source(ctx), st, d, names(ctx), Math.random);
+    // 확률 검사(Math.random)는 처음 한 번만: 토큰 상한에 맞춰 다시 만들 때는 같은 결과를 쓴다
+    const rolls: number[] = [];
+    let k = 0;
+    const roll = () => (k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]));
+    const plan = fitPrompt(budgetFor(ctx.chat.scriptstate, 'ph'), () => {
+      k = 0;
+      const p = refreshPrompt(source(ctx), st, d, names(ctx), roll);
+      return { ...p, messages: p.prompt?.messages ?? [] };
+    });
     if (!plan.prompt) return automatic ? '' : plan.reason;
+    const prompt = plan.prompt;
     const model = phoneSettings(ctx.chat.scriptstate).model;
-    let raw = await runModel(plan.prompt.messages, model);
-    let result: ReturnType<typeof parseRefresh>;
-    try {
-      result = parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, plan.prompt.contactMode);
-    } catch (error) {
-      // 원본 설정(실패 시 재시도 1회)과 같이 같은 자료로 한 번 더
-      raw = await runModel(refreshRetry(plan.prompt, (error as Error).message), model);
-      result = parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, plan.prompt.contactMode);
-    }
+    // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
+    const { value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+      ...genSettings(ctx.chat.scriptstate),
+      fix: (_raw, reason) => refreshRetry(prompt, reason),
+    });
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
@@ -872,6 +880,10 @@ function settingsView(ctx: ChatContext): string {
   const pct = (k: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc(v(k))}" aria-label="확률"><span>%</span></span>`;
   const num = (k: string, cur: number, lo: number, hi: number, unit: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
   const notices = noticeSettings(ctx.chat.scriptstate);
+  const rest = (k: string) => {
+    const n = advNum(ctx.chat.scriptstate, 'ph', k);
+    return n ? `받은 뒤 ${n}턴 쉬어요` : '';
+  };
   const keep = (k: 'dm' | 'group' | 'notice', label: string) => {
     const st = phoneStorage(ctx.chat.scriptstate, k);
     return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
@@ -886,8 +898,8 @@ function settingsView(ctx: ChatContext): string {
       ].join(''))}
       ${group('새 메시지', [
         row('자동 새 메시지 확인', onoff('auto'), '본편 응답이 끝날 때마다 한 번 확인해요'),
-        row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, '받은 뒤 1턴 쉬어요'),
-        row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, '받은 뒤 3턴 쉬어요'),
+        row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
+        row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
         row('소속 공지 받기', onoff('announcements')),
         row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴')),
         row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개')),
@@ -897,6 +909,7 @@ function settingsView(ctx: ChatContext): string {
         keep('dm', '1:1 대화 정리'), keep('group', '단톡방 정리'), keep('notice', '공지 정리'),
         row('페이지당 공지', `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n) => `<button class="gx-seg${notices.page === n ? ' on' : ''}" data-action="ph-cfg" data-value="announcement_page_size=${n}" aria-pressed="${notices.page === n}">${n}</button>`).join('')}</div>`),
       ].join(''))}
+      ${advancedBox('ph', ctx.chat.scriptstate)}
     </div></div>`;
 }
 

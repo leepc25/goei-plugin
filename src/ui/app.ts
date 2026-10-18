@@ -22,7 +22,9 @@ import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
 import { savePhoto } from '../host/photo';
-import { readUser, userInfo } from '../host/user';
+import { readPersona, readUser, userInfo } from '../host/user';
+import { applyAdvanced } from '../core/advanced';
+import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
 import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
@@ -332,6 +334,10 @@ async function refresh(): Promise<void> {
     } else {
       const manifest = readManifest(ctx.char.globalLore);
       const phase = chatPhase(ctx.chat);
+      if (manifest) {
+        applyAdvanced(ctx.chat.scriptstate);
+        void readPersona();
+      }
       const chatKey = `${ctx.charIndex}:${ctx.chatIndex}`;
       if (chatKey !== lastChat) {
         lastChat = chatKey;
@@ -387,6 +393,10 @@ async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise
 
 async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
+  if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
+    await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
+    return;
+  }
   if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
   if (view.kind === 'started' && action.startsWith('gn-') && (await handleGnet(action, value, view.ctx, gnetEnv))) return;
   if (view.kind === 'started' && action.startsWith('ph-') && (await handlePhone(action, value, view.ctx, phoneEnv))) return;

@@ -1,5 +1,8 @@
 // 괴담위키: 원본 Namuwiki 모듈과 같은 저장 형식·프롬프트·검사 규칙.
 // 문서는 채팅 로어북 "WIKI｜제목" 항목(키 없음, 비활성)에 meta + <lightboard-namuwiki> 본문으로 둔다.
+import { advNum, genSettings, refToggles } from './advanced';
+import { tokens } from './gnet';
+import { trimPrevious, trimRelated, trimSecondary, trimTurns } from './budget';
 import { collectRefs, factionCodesToNames, hasBook, limitRefs, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
 import type { Chat, LoreEntry } from './types';
 import { buildRegistry, resolveName, type Registry } from './world/registry';
@@ -29,6 +32,8 @@ export function wikiSettings(state: Record<string, unknown> | undefined): WikiSe
     model: pick('$nw_model', ['main', 'aux'] as const, WIKI_DEFAULTS.model),
     length: pick('$nw_length', ['short', 'standard', 'detailed'] as const, WIKI_DEFAULTS.length),
     refreshPrevious: s['$nw_refresh_previous'] !== '0',
+    chatTurns: advNum(s, 'nw', 'turns'),
+    referenceCount: advNum(s, 'nw', 'ref_count'),
   };
 }
 
@@ -192,20 +197,27 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   const sec = policySections(src.char.globalLore, 'Wiki');
   for (const k of REQUIRED) if (!sec[k]) throw new WikiError(`Wiki 로어북의 ${k} 섹션이 없어요.`);
   const r = registry ?? buildRegistry(src.char.globalLore);
-  const turns = recentTurns(src.chat, s.chatTurns);
-  const story = storyText(turns);
+  const n = trimTurns(s.chatTurns);
+  const story = n ? storyText(recentTurns(src.chat, n)) : '';
   const primary = [req.title, ...(hasBook(src, req.title) ? [] : req.inherited)];
+  const t = refToggles(src.chat.scriptstate, 'nw');
   const rows = limitRefs(
-    collectRefs(src, { scope: 'wiki', primaryNames: primary, text: `${req.title}\n${req.writingRequest}\n${story}`, secondary: true, registry: r }),
+    collectRefs(src, {
+      scope: 'wiki', primaryNames: primary, text: `${req.title}\n${req.writingRequest}\n${story}`, registry: r, description: t.description, authors: t.authors,
+      persona: t.persona, active: t.active, related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
+    }),
     s.referenceCount,
   );
+  const previous = trimPrevious() ? null : req.previous;
   const lengthKey = { short: 'NW.LENGTH_SHORT', standard: 'NW.LENGTH_STANDARD', detailed: 'NW.LENGTH_DETAILED' }[s.length];
   const system = [sec['NW.GUIDE'], sec[s.mode === 'faithful' ? 'NW.FAITHFUL' : 'NW.EXPAND'], sec[lengthKey], sec['NW.LINKS_OPEN'], sec['NW.FORMAT']];
   if (story && sec['NW.HISTORY']) system.push(sec['NW.HISTORY']);
-  if (req.previous && sec['NW.PREVIOUS']) system.push(sec['NW.PREVIOUS']);
+  if (previous && sec['NW.PREVIOUS']) system.push(sec['NW.PREVIOUS']);
+  const language = genSettings(src.chat.scriptstate).language;
+  if (language) system.push(language);
   let user = `문서 제목: ${req.title}\n\n[참고 자료]\n${refText(rows)}`;
   if (story) user += `\n\n[최근 챗로그]\n${story}`;
-  if (req.previous) user += `\n\n[이전 위키 — 원본 사실과 최근 확인된 본문을 우선]\n${innerBody(req.previous)}`;
+  if (previous) user += `\n\n[이전 위키 — 원본 사실과 최근 확인된 본문을 우선]\n${innerBody(previous)}`;
   if (req.writingRequest.trim()) user += `\n\n[사용자 작성 지침]\n${req.writingRequest.trim()}`;
   const sources = [...new Set(rows.flatMap((x) => x.sources))];
   const primarySources = [...new Set(rows.filter((x) => x.kind === 'primary').flatMap((x) => x.sources))];
@@ -398,4 +410,31 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
   if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ol>`);
   const links = (keys: string[]) => keys.map((k) => a[k]).filter((t): t is string => !!t && validTitle(t)).map((t) => o.canon(t));
   return { html: out.join(''), title: a.doc_title || '', related: links(['related1', 'related2', 'related3']), recent: links(['recent1', 'recent2', 'recent3']), headings: headings.map((h) => h.title) };
+}
+
+// ── 본편 요청에 넣는 문서 (원본 RC.wikiContext, v0.16.27) ──
+// 이 채팅에서 쓴 문서를 최근에 만든 것부터 정한 개수만큼. 카드 기본 문서는 넣지 않는다 (원본도 저장 문서만).
+
+export const NW_CONTEXT = '$nw_context';
+export const wikiContextOn = (state: Record<string, unknown> | undefined): boolean => String(state?.[NW_CONTEXT] ?? '') === '1';
+
+export function wikiMainContext(chat: Chat, rules: string): string {
+  const s = chat.scriptstate;
+  const count = advNum(s, 'nw', 'ctx_count');
+  const cap = advNum(s, 'nw', 'ctx_tokens');
+  const docs = listDocs(chat)
+    .map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i }))
+    .sort((a, b) => b.at - a.at || b.i - a.i)
+    .slice(0, count);
+  const kept: Record<string, unknown>[] = [];
+  const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'wiki', records: kept })}\n[MODULE_CONTEXT_END]`;
+  for (const { d } of docs) {
+    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: innerBody(d.body) });
+    if (cap > 0 && tokens(payload()) > cap) kept.shift();
+  }
+  return kept.length ? payload() : '';
+}
+
+export function wikiContextRules(lore: LoreEntry[] | undefined): string | null {
+  return policySections(lore, 'Wiki').MAIN_CONTEXT?.trim() || null;
 }

@@ -1,10 +1,12 @@
-import { USER_MARK } from './host/user';
+import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
+import { applyAdvanced } from './core/advanced';
+import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
 import { autoRefresh } from './ui/phone';
 import { autoRefreshGnet } from './ui/gnet';
@@ -58,9 +60,9 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
 }
 
-let rulesCache: { charIndex: number; gnet: string | null; phone: string | null } | null = null;
+let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null } | null = null;
 
-/** 괴담넷 글·쪽지, 괴담톡 대화·공지를 본편 요청 끝에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext). 기록이 없거나 꺼 두면 빈 목록 */
+/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청 끝에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록 */
 async function moduleContext(): Promise<string[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chatIndex = await risuai.getCurrentChatIndex();
@@ -68,11 +70,13 @@ async function moduleContext(): Promise<string[]> {
   const ss = chat?.scriptstate;
   const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
-  if (!chat || (!wantGnet && !wantPhone)) return [];
+  const wantWiki = wikiContextOn(ss);
+  if (!chat || (!wantGnet && !wantPhone && !wantWiki)) return [];
+  applyAdvanced(ss);
   if (rulesCache?.charIndex !== charIndex) {
     const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
     const src = { char: { globalLore: char?.globalLore }, chat };
-    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src) };
+    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore) };
   }
   const out: string[] = [];
   if (wantGnet && rulesCache.gnet) {
@@ -86,6 +90,7 @@ async function moduleContext(): Promise<string[]> {
       console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  if (wantWiki && rulesCache.wiki) out.push(wikiMainContext(chat, rulesCache.wiki));
   return out.filter(Boolean);
 }
 
@@ -136,6 +141,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char: char as never, chat: c };
       };
       void (async () => {
+        applyAdvanced(now!.scriptstate);
+        await readPersona();
         if (phoneAuto) {
           await autoRefresh(await fresh(), arg.messageIndex).catch((error) =>
             console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`),
