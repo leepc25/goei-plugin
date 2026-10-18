@@ -138,6 +138,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-hmark .gx-mark-txt { display: inline-grid; }
 .gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
 .gx-hmark .gx-mark-txt small i { font-style: normal; }
+/* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
+.gx-hmark .gx-mark-txt small { padding-right: 3px; }
+.gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
 .gx-logo.mob { display: none; }
 /* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
