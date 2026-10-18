@@ -837,6 +837,23 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(60) }));
   });
   await page.waitForSelector('.nw-app:not(.list-open)');
+  // 모바일 뒤로가기 쓸기: 문서 → 위키 메인 → 상황판
+  const swipeRight = (sel) => page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 400 })];
+    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(120), changedTouches: t(120) }));
+    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(160), changedTouches: t(160) }));
+    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(260), changedTouches: t(260) }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(260) }));
+  }, sel);
+  await page.click('.nw-card[data-value="소라 랜드"]');
+  await page.waitForSelector('.nw-pane .nw-title');
+  await swipeRight('.nw-main');
+  await page.waitForSelector('.nw-home');
+  await swipeRight('.nw-main');
+  await page.waitForSelector('.gx-board');
+  await page.click('.gx-mbar .gx-nb[data-value="wiki"]');
+  await page.waitForSelector('.nw-home');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.click('.nw-card[data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');

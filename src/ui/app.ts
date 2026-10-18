@@ -10,6 +10,7 @@ import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer } from './drawer';
+import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
@@ -654,7 +655,41 @@ function render(): void {
   bindMbar(root, () => void handle('close'));
   bindDrawer(root);
   bindWikiSide(root, (v) => void handle('wiki-list', v));
+  bindSwipeBack(root, backStep);
   setCurrentTheme(themeName(root.dataset.theme));
+}
+
+/** 모바일 뒤로가기 쓸기가 할 일: 지금 화면의 한 단계 앞. 갈 곳이 없으면 null (상황판이 맨 앞) */
+function backStep(): (() => void) | null {
+  const go = (action: string, value?: string) => () => void handle(action, value);
+  if (view.kind === 'picker') return pickerPrefs ? go('prefs-close') : null;
+  if (view.kind === 'opening') return go('repick');
+  if (view.kind !== 'started') return null;
+  switch (tab) {
+    case 'wiki':
+      if (wiki.listOpen) return go('wiki-list', 'close');
+      if (wiki.view !== 'home') return go('wiki-back');
+      break;
+    case 'phone':
+      if (phone.view !== 'list' && phone.view !== 'notice') return go('ph-back');
+      if (phone.openNotice !== null) return go('ph-notice', String(phone.openNotice));
+      break;
+    case 'gnet':
+      if (gnet.settings || gnet.compose || gnet.open !== null || gnet.openDm !== null) return go('gn-back');
+      break;
+    case 'map':
+    case 'mission': {
+      // 고른 장소·목표 풀기 (필터 줄 끝 「취소」와 같음)
+      const undo = root?.querySelector<HTMLButtonElement>('.gx-unplace:not([disabled])');
+      if (undo) return () => undo.click();
+      break;
+    }
+    case 'settings':
+      if (dirUi.adding) return go('dir-ext-close');
+      if (dirUi.open) return go('dir-open', dirUi.open);
+      break;
+  }
+  return tab === 'board' ? null : go('tab', 'board');
 }
 
 /** 창 배색: 채팅의 테마 변수, 채팅이 없으면 새 채팅 기본값 */
