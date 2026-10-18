@@ -350,12 +350,15 @@ export function readPhone(chat: Chat): PState {
     r.draft ??= '';
     r.unread = Number(r.unread) || 0;
     for (const m of r.messages) m.kind ??= 'message';
+    // 예전에는 만들 때 참여자 이름을 이름으로 박아 뒀다. 그런 이름은 지워서 자동 이름으로 바꾼다
+    if (r.kind === 'group' && r.name && r.name === Object.values(r.people).map((p) => p.name).join(', ')) delete r.name;
   }
   return st;
 }
 
+/** 이름을 정하지 않은 단톡방은 지금 남아 있는 사람 이름으로 부른다 */
 export function roomLabel(r: PRoom): string {
-  if (r.kind === 'group') return r.name || '단톡방';
+  if (r.kind === 'group') return r.name || r.members.map((c) => r.people[c]?.name ?? c).join(', ') || '단톡방';
   return r.people[r.members[0]]?.name ?? r.people[Object.keys(r.people)[0]]?.name ?? '대화';
 }
 
@@ -377,6 +380,12 @@ export function membership(st: PState, r: PRoom, kind: 'invite' | 'exit', cid: s
 
 /** 문장부호만 있는 대기 표시는 기록하지 않는다 (원본 P.emptyPause) */
 export const emptyPause = (t: string) => String(t ?? '').replace(/[\s.…⋯．]/g, '') === '';
+
+/** 대기 줄은 「잠시 후」 같은 짧은 시간 표시만 남긴다. 모델이 지문(「○○가 기겁하며…」)을 쓰면 버린다 */
+export const hiddenPause = (t: string) => {
+  const s = String(t ?? '').trim();
+  return emptyPause(s) || [...s].length > 12 || /[다요][.!…]*$/.test(s);
+};
 
 export const listedRooms = (st: PState) =>
   Object.keys(st.rooms)
@@ -575,7 +584,7 @@ export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean): 
       events.push({ type: 'exit', participant: m.content });
     } else if (m.type === 'pause') {
       if (m.sender !== '-') fail('대기 형식이 잘못됐어요.');
-      if (!emptyPause(m.content)) events.push({ type: 'pause', text: m.content });
+      if (!hiddenPause(m.content)) events.push({ type: 'pause', text: m.content });
     } else fail('괴담톡에서 지원하지 않는 메시지 유형이에요.');
   }
   validateEvents(events, r);
@@ -631,7 +640,7 @@ export function applyEvents(st: PState, r: PRoom, events: PEvent[], time: string
         count++;
       }
     } else if (e.type === 'pause') {
-      if (!emptyPause(e.text)) push(st, r, 'system', e.text, time, 'pause');
+      if (!hiddenPause(e.text)) push(st, r, 'system', e.text, time, 'pause');
     } else membership(st, r, 'exit', e.participant, time);
   }
   r.unread = (r.unread || 0) + count;
@@ -771,7 +780,7 @@ export function invitationPacket(st: PState, candidates: string[], allowed: bool
   const ok = allowed && candidates.length >= 2;
   return {
     allowed: ok, maxNew: ok ? LIMITS.invitations : 0, candidates,
-    existingGroups: Object.values(st.rooms).filter((r) => r.kind === 'group').map((r) => ({ name: r.name ?? '', members: r.members })),
+    existingGroups: Object.values(st.rooms).filter((r) => r.kind === 'group').map((r) => ({ name: roomLabel(r), members: r.members })),
   };
 }
 
@@ -798,7 +807,7 @@ export function validateInvitations(rows: unknown, packet: InvitationCheck | nul
     const key = `${name}\0${sig(members)}`;
     if (fresh.has(key)) fail('같은 단톡방 초대가 중복됐어요.');
     fresh.add(key);
-    for (const r of Object.values(st.rooms)) if (r.kind === 'group' && (r.name ?? '').trim() === name && sig(r.members) === sig(members)) fail('같은 이름과 참여자의 단톡방이 이미 있어요.');
+    for (const r of Object.values(st.rooms)) if (r.kind === 'group' && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail('같은 이름과 참여자의 단톡방이 이미 있어요.');
     const room: PRoom = { id: '', kind: 'group', name, members: [...members], people, messages: [], draft: '', unread: 0, inviter: row.inviter };
     (room as PRoom & { events?: PEvent[] }).events = eventsFromPatch(row.patch, room, false).events;
     out.push(room);
@@ -869,7 +878,7 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
   if (set.contextMessages) {
     for (const r of Object.values(st.rooms)) {
       for (const m of r.messages) {
-        if (m.kind === 'pause' && emptyPause(m.text)) continue;
+        if (m.kind === 'pause' && hiddenPause(m.text)) continue;
         recent.push({
           order: m.id, id: `message:${m.id}`, notice: false,
           data: {

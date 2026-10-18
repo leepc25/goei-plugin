@@ -1112,15 +1112,25 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.deepEqual(again.rooms.map((r) => r.id).sort(), [group.id, 'dm_c_50303031'].sort());
   assert.equal(again.announcementCheck.allowed, false);
   assert.equal(again.invitationCheck.allowed, false);
-  // 단톡 만들기: 주제와 함께, 이름은 모델이 붙일 수 있다
+  // 단톡 만들기: 이름·주제와 함께. 모델이 이름을 바꾸려 해도 정한 이름이 남고, 지문 같은 대기 줄은 버린다
   await page.click('[data-action="ph-sub"][data-value="contacts"]');
   await page.click('[data-action="ph-group"]');
   await page.click('[data-action="ph-pick"][data-value="c_50303031"]');
   await page.click('[data-action="ph-pick"][data-value="c_50303034"]');
   await page.fill('[data-input="ph-topic"]', '내일 합동 조사 준비');
-  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '<lb-minitalk-patch>[{"op":"replace","path":"/name","value":"합동 조사"},{"op":"add","path":"/messages/-","value":{"content":"자료는 내가 올릴게.","sender":"c_50303034","type":"text"}}]</lb-minitalk-patch>' }]; });
+  await page.fill('[data-input="ph-gname"]', '야간조');
+  if (shots) {
+    await page.screenshot({ path: `${shots}/14-group-new.png` });
+    const vp = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `${shots}/14-group-new-mobile.png` });
+    await page.setViewportSize(vp);
+  }
+  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '<lb-minitalk-patch>[{"op":"replace","path":"/name","value":"합동 조사"},{"op":"add","path":"/messages/-","value":{"content":"-","sender":"-","type":"pause"}},{"op":"add","path":"/messages/-","value":{"content":"송주익이 기겁하며 급하게 메시지를 연타한다.","sender":"-","type":"pause"}},{"op":"add","path":"/messages/-","value":{"content":"자료는 내가 올릴게.","sender":"c_50303034","type":"text"}}]</lb-minitalk-patch>' }]; });
   await page.click('[data-action="ph-group-create"]');
-  await page.waitForSelector('.ph-room-title >> text=합동 조사', { timeout: 5000 });
+  await page.waitForSelector('.ph-room-title b >> text=야간조', { timeout: 5000 });
+  assert.ok(!(await page.textContent('.ph-room')).includes('기겁하며'), '지문 대기 줄은 보이지 않는다');
   const call3 = JSON.parse(await page.evaluate(() => window.__calls.llm[window.__calls.llm.length - 1].messages[1].content));
   assert.equal(call3.room.action.type, 'invite_initial');
   assert.equal(call3.room.privateDirection, '내일 합동 조사 준비');

@@ -8,7 +8,7 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, validateEvents, validCallTarget, writeBulletins, writePhone,
-  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES,
+  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
 import { imageUrl, stChip } from './images';
@@ -40,6 +40,7 @@ interface PhoneUi {
   invite: string | null;
   picked: string[];
   topic: string;
+  gname: string;
   draft: string;
   page: number;
   call: string;
@@ -60,14 +61,14 @@ interface PhoneUi {
 }
 
 export const phone: PhoneUi = {
-  sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', draft: '', page: 1, call: '', callText: '',
+  sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', gname: '', draft: '', page: 1, call: '', callText: '',
   addName: '', addNote: '', openNotice: null, noticePage: 1, attach: [], confirm: null, notice: '', failure: null, attachMenu: false, pickQuery: '',
   chatFilter: 'all', noticeFilter: 'all', pickTab: '',
 };
 
 export function resetPhone() {
   Object.assign(phone, {
-    sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', draft: '', page: 1, call: '', callText: '',
+    sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', gname: '', draft: '', page: 1, call: '', callText: '',
     addName: '', addNote: '', openNotice: null, noticePage: 1, attach: [], confirm: null, notice: '', failure: null, attachMenu: false, pickQuery: '',
     chatFilter: 'all', noticeFilter: 'all', pickTab: '',
   });
@@ -179,7 +180,6 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
       validateEvents(result.events, room);
       const unsolicitedRefresh = room.pending.action.type === 'refresh' && unsolicited(room);
       const added = applyEvents(cur, room, result.events, phoneTime(chat));
-      if (result.title && room.kind === 'group' && room.pending.action.type === 'invite_initial') room.name = result.title;
       room.pending = undefined;
       if (viewingRoom(env) === rid) readRoom(room);
       if (!added) note = room.kind === 'group' ? '아무도 말하지 않았어요.' : '답장이 없어요.';
@@ -275,6 +275,11 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
     return openDm(ctx, env, members[0]);
   }
   const topic = phone.topic.trim();
+  const gname = inviteRoom ? '' : phone.gname.trim();
+  if ([...gname].length > LIMITS.room_name) {
+    phone.notice = `단톡방 이름은 ${LIMITS.room_name}자 이내로 적어 주세요.`;
+    return env.render();
+  }
   if (tokens(topic) > LIMITS.topic_tokens) {
     phone.notice = `단톡 주제는 ${LIMITS.topic_tokens}토큰 이내로 적어 주세요.`;
     return env.render();
@@ -293,7 +298,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
         const old = r.id;
         do st.seq += 1;
         while (st.rooms[`g_${st.seq}`]);
-        r = { ...r, id: `g_${st.seq}`, kind: 'group', name: [...r.members.map((c) => r!.people[c]?.name ?? c), ...fresh.map((c) => d.map.get(c)!.name)].join(', ') };
+        r = { ...r, id: `g_${st.seq}`, kind: 'group', name: undefined };
         delete st.rooms[old];
         st.rooms[r.id] = r;
         const at = st.order.indexOf(old);
@@ -312,7 +317,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
       st.seq += 1;
       rid = `g_${st.seq}`;
       const people = Object.fromEntries(members.map((c) => [c, personOf(d.map.get(c)!)]));
-      const r: PRoom = { id: rid, kind: 'group', name: members.map((c) => d.map.get(c)!.name).join(', '), topic, members: [...members], people, messages: [], draft: '', unread: 0 };
+      const r: PRoom = { id: rid, kind: 'group', name: gname || undefined, topic, members: [...members], people, messages: [], draft: '', unread: 0 };
       st.rooms[rid] = r;
       st.order.push(rid);
       for (const cid of members) membership(st, r, 'invite', cid, time);
@@ -324,7 +329,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
     phone.notice = error || '저장하지 못했어요.';
     return env.render();
   }
-  Object.assign(phone, { invite: null, picked: [], topic: '', room: rid, view: 'room', sub: 'chats', page: 1 });
+  Object.assign(phone, { invite: null, picked: [], topic: '', gname: '', room: rid, view: 'room', sub: 'chats', page: 1 });
   await generate({ ...ctx, chat: saved }, env, rid, inviteRoom ? '초대한 사람들의 반응을 기다리는 중이에요.' : '단톡방을 여는 중이에요.');
 }
 
@@ -631,8 +636,9 @@ function roomView(ctx: ChatContext, st: PState, d: Directory, busy: boolean): st
   const r = phone.room ? st.rooms[phone.room] : undefined;
   if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
   const confirm = phone.confirm === `room:${r.id}`;
-  const shown = r.messages.slice(-PAGE * phone.page);
-  const more = r.messages.length > shown.length;
+  const visible = r.messages.filter((m) => m.kind !== 'pause' || !hiddenPause(m.text));
+  const shown = visible.slice(-PAGE * phone.page);
+  const more = visible.length > shown.length;
   const name = (cid: string) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
   const isMsg = (m: (typeof shown)[number] | undefined) => !!m && m.kind === 'message' && m.sender !== 'system';
   let lastDay = '';
@@ -736,6 +742,7 @@ function groupView(ctx: ChatContext, st: PState, d: Directory): string {
     ${paneHead(room ? `「${esc(roomLabel(room))}」에 초대` : '단톡방 만들기', `${picked}명 선택 · 상대 최대 ${LIMITS.members}명`,
       `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`)}
     <div class="ph-form-body ph-gbody">
+      ${room ? '' : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc(phone.gname)}" maxlength="${LIMITS.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
       ${room ? '' : `<textarea class="gx-search ph-topic${phone.topic.trim() ? ' filled' : ''}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc(phone.topic)}</textarea>`}
       ${tabs}
       <ul class="ph-list ph-pick">${phonePickList(ctx)}</ul>
@@ -1084,7 +1091,7 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       void refreshInbox(ctx, env);
       return true;
     case 'ph-group':
-      Object.assign(phone, { view: 'group', invite: null, picked: [], topic: '', pickQuery: '', pickTab: '' });
+      Object.assign(phone, { view: 'group', invite: null, picked: [], topic: '', gname: '', pickQuery: '', pickTab: '' });
       break;
     case 'ph-invite':
       Object.assign(phone, { view: 'group', invite: v, room: v, picked: [], pickQuery: '', pickTab: '' });
@@ -1266,6 +1273,9 @@ export function phoneInput(name: string, value: string, key?: string): boolean {
       return attachInput(phone.attach, key, value);
     case 'ph-topic':
       phone.topic = value;
+      return true;
+    case 'ph-gname':
+      phone.gname = value;
       return true;
     case 'ph-call-to':
       phone.call = value;

@@ -3324,11 +3324,12 @@ function readPhone(chat) {
     r.draft ??= "";
     r.unread = Number(r.unread) || 0;
     for (const m of r.messages) m.kind ??= "message";
+    if (r.kind === "group" && r.name && r.name === Object.values(r.people).map((p) => p.name).join(", ")) delete r.name;
   }
   return st;
 }
 function roomLabel(r) {
-  if (r.kind === "group") return r.name || "단톡방";
+  if (r.kind === "group") return r.name || r.members.map((c) => r.people[c]?.name ?? c).join(", ") || "단톡방";
   return r.people[r.members[0]]?.name ?? r.people[Object.keys(r.people)[0]]?.name ?? "대화";
 }
 function push(st, r, sender, text, time2, kind = "message") {
@@ -3346,6 +3347,10 @@ function membership(st, r, kind, cid, time2) {
   if (kind === "exit") r.members = r.members.filter((x) => x !== cid);
 }
 var emptyPause = (t) => String(t ?? "").replace(/[\s.…⋯．]/g, "") === "";
+var hiddenPause = (t) => {
+  const s4 = String(t ?? "").trim();
+  return emptyPause(s4) || [...s4].length > 12 || /[다요][.!…]*$/.test(s4);
+};
 var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
 function unsolicited(r) {
   if (r.kind !== "dm") return false;
@@ -3495,7 +3500,7 @@ function eventsFromPatch(patch, r, allowTitle) {
       events.push({ type: "exit", participant: m.content });
     } else if (m.type === "pause") {
       if (m.sender !== "-") fail("대기 형식이 잘못됐어요.");
-      if (!emptyPause(m.content)) events.push({ type: "pause", text: m.content });
+      if (!hiddenPause(m.content)) events.push({ type: "pause", text: m.content });
     } else fail("괴담톡에서 지원하지 않는 메시지 유형이에요.");
   }
   validateEvents(events, r);
@@ -3546,7 +3551,7 @@ function applyEvents(st, r, events, time2) {
         count++;
       }
     } else if (e.type === "pause") {
-      if (!emptyPause(e.text)) push(st, r, "system", e.text, time2, "pause");
+      if (!hiddenPause(e.text)) push(st, r, "system", e.text, time2, "pause");
     } else membership(st, r, "exit", e.participant, time2);
   }
   r.unread = (r.unread || 0) + count;
@@ -3631,7 +3636,7 @@ function invitationPacket(st, candidates, allowed) {
     allowed: ok,
     maxNew: ok ? LIMITS2.invitations : 0,
     candidates,
-    existingGroups: Object.values(st.rooms).filter((r) => r.kind === "group").map((r) => ({ name: r.name ?? "", members: r.members }))
+    existingGroups: Object.values(st.rooms).filter((r) => r.kind === "group").map((r) => ({ name: roomLabel(r), members: r.members }))
   };
 }
 function validateInvitations(rows, packet, st, dir2) {
@@ -3657,7 +3662,7 @@ function validateInvitations(rows, packet, st, dir2) {
     const key = `${name}\0${sig(members)}`;
     if (fresh.has(key)) fail("같은 단톡방 초대가 중복됐어요.");
     fresh.add(key);
-    for (const r of Object.values(st.rooms)) if (r.kind === "group" && (r.name ?? "").trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
+    for (const r of Object.values(st.rooms)) if (r.kind === "group" && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail("같은 이름과 참여자의 단톡방이 이미 있어요.");
     const room = { id: "", kind: "group", name, members: [...members], people, messages: [], draft: "", unread: 0, inviter: row4.inviter };
     room.events = eventsFromPatch(row4.patch, room, false).events;
     out.push(room);
@@ -3714,7 +3719,7 @@ function mainContext2(st, b, set2, rules2) {
   if (set2.contextMessages) {
     for (const r of Object.values(st.rooms)) {
       for (const m of r.messages) {
-        if (m.kind === "pause" && emptyPause(m.text)) continue;
+        if (m.kind === "pause" && hiddenPause(m.text)) continue;
         recent.push({
           order: m.id,
           id: `message:${m.id}`,
@@ -4146,7 +4151,7 @@ function postPrompt(src, st, input2, plan, factionNames2) {
   const extras = input2 + incomingTask(plan, activity.posts);
   return { ...pack(src, b, guideline, b.read("PUBLIC.POST_FORMAT"), extras, factionNames2), activity };
 }
-function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionNames2) {
+function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body4}`) {
   const b = gnetBooks(src);
   const p = findPost(st, postId2);
   if (!p) throw new GnetError("대상 글이 없어졌어요.");
@@ -4170,7 +4175,7 @@ function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionName
     comments,
     commentCount: total,
     replyTo,
-    action: `The protagonist publicly commented: ${body4}`,
+    action,
     userHandle: nick
   });
   const activity = activityContext(st, p.id);
@@ -4178,6 +4183,7 @@ function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionName
   const extras = task + incomingTask(plan, activity.posts);
   return { ...pack(src, b, guideline, b.read("PUBLIC.REACT_FORMAT"), extras, factionNames2), activity, supplied: selected, total };
 }
+var POST_REFRESH_ACTION = "Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.";
 function publicBoard(st, query) {
   const ranked = st.posts.map((p, i) => ({ p, i, hit: !!p.title && query.includes(p.title) || new RegExp(`#${p.id}(?![\\d.])`).test(query) }));
   ranked.sort((a, b) => a.hit !== b.hit ? a.hit ? -1 : 1 : a.i - b.i);
@@ -4427,7 +4433,7 @@ function rules(src, body4, mode2) {
   return [...keys.map((k) => section(p, k)), LANGUAGE2].join("\n\n");
 }
 function roomPacket(r) {
-  const messages = r.messages.slice(-HISTORY2.room).filter((m) => m.kind !== "pause" || !emptyPause(m.text)).map((m) => ({
+  const messages = r.messages.slice(-HISTORY2.room).filter((m) => m.kind !== "pause" || !hiddenPause(m.text)).map((m) => ({
     sender: m.sender === "system" ? "-" : m.sender,
     type: m.kind === "message" ? "text" : m.kind === "invite" ? "invited" : m.kind,
     time: m.time,
@@ -4541,7 +4547,7 @@ function crossRoom(body4, st) {
     if (knownBy.length) {
       records.push({
         room: e.room.id,
-        roomName: e.room.kind === "group" ? e.room.name : void 0,
+        roomName: e.room.kind === "group" ? roomLabel(e.room) : void 0,
         kind: e.room.kind,
         recordID: e.m.id,
         sender: e.m.sender,
@@ -5582,6 +5588,7 @@ var phone = {
   invite: null,
   picked: [],
   topic: "",
+  gname: "",
   draft: "",
   page: 1,
   call: "",
@@ -5610,6 +5617,7 @@ function resetPhone() {
     invite: null,
     picked: [],
     topic: "",
+    gname: "",
     draft: "",
     page: 1,
     call: "",
@@ -5716,7 +5724,6 @@ function generate(ctx, env2, rid, label) {
       validateEvents(result.events, room);
       const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
       const added = applyEvents(cur, room, result.events, phoneTime(chat));
-      if (result.title && room.kind === "group" && room.pending.action.type === "invite_initial") room.name = result.title;
       room.pending = void 0;
       if (viewingRoom(env2) === rid) readRoom(room);
       if (!added) note = room.kind === "group" ? "아무도 말하지 않았어요." : "답장이 없어요.";
@@ -5805,6 +5812,11 @@ async function createGroup(ctx, env2) {
     return openDm(ctx, env2, members[0]);
   }
   const topic = phone.topic.trim();
+  const gname = inviteRoom ? "" : phone.gname.trim();
+  if ([...gname].length > LIMITS2.room_name) {
+    phone.notice = `단톡방 이름은 ${LIMITS2.room_name}자 이내로 적어 주세요.`;
+    return env2.render();
+  }
   if (tokens(topic) > LIMITS2.topic_tokens) {
     phone.notice = `단톡 주제는 ${LIMITS2.topic_tokens}토큰 이내로 적어 주세요.`;
     return env2.render();
@@ -5824,7 +5836,7 @@ async function createGroup(ctx, env2) {
         do
           st.seq += 1;
         while (st.rooms[`g_${st.seq}`]);
-        r = { ...r, id: `g_${st.seq}`, kind: "group", name: [...r.members.map((c) => r.people[c]?.name ?? c), ...fresh.map((c) => d.map.get(c).name)].join(", ") };
+        r = { ...r, id: `g_${st.seq}`, kind: "group", name: void 0 };
         delete st.rooms[old];
         st.rooms[r.id] = r;
         const at = st.order.indexOf(old);
@@ -5843,7 +5855,7 @@ async function createGroup(ctx, env2) {
       st.seq += 1;
       rid = `g_${st.seq}`;
       const people = Object.fromEntries(members.map((c) => [c, personOf(d.map.get(c))]));
-      const r = { id: rid, kind: "group", name: members.map((c) => d.map.get(c).name).join(", "), topic, members: [...members], people, messages: [], draft: "", unread: 0 };
+      const r = { id: rid, kind: "group", name: gname || void 0, topic, members: [...members], people, messages: [], draft: "", unread: 0 };
       st.rooms[rid] = r;
       st.order.push(rid);
       for (const cid of members) membership(st, r, "invite", cid, time2);
@@ -5855,7 +5867,7 @@ async function createGroup(ctx, env2) {
     phone.notice = error || "저장하지 못했어요.";
     return env2.render();
   }
-  Object.assign(phone, { invite: null, picked: [], topic: "", room: rid, view: "room", sub: "chats", page: 1 });
+  Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
   await generate({ ...ctx, chat: saved }, env2, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
 }
 function refreshInbox(ctx, env2, automatic = false) {
@@ -6103,8 +6115,9 @@ function roomView(ctx, st, d, busy2) {
   const r = phone.room ? st.rooms[phone.room] : void 0;
   if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
   const confirm = phone.confirm === `room:${r.id}`;
-  const shown2 = r.messages.slice(-PAGE * phone.page);
-  const more = r.messages.length > shown2.length;
+  const visible = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
+  const shown2 = visible.slice(-PAGE * phone.page);
+  const more = visible.length > shown2.length;
   const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
   const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
   let lastDay = "";
@@ -6193,6 +6206,7 @@ function groupView(ctx, st, d) {
     `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc3(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
   )}
     <div class="ph-form-body ph-gbody">
+      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc3(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
       ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc3(phone.topic)}</textarea>`}
       ${tabs2}
       <ul class="ph-list ph-pick">${phonePickList(ctx)}</ul>
@@ -6499,7 +6513,7 @@ async function handlePhone(action, value, ctx, env2) {
       void refreshInbox(ctx, env2);
       return true;
     case "ph-group":
-      Object.assign(phone, { view: "group", invite: null, picked: [], topic: "", pickQuery: "", pickTab: "" });
+      Object.assign(phone, { view: "group", invite: null, picked: [], topic: "", gname: "", pickQuery: "", pickTab: "" });
       break;
     case "ph-invite":
       Object.assign(phone, { view: "group", invite: v, room: v, picked: [], pickQuery: "", pickTab: "" });
@@ -6682,6 +6696,9 @@ function phoneInput(name, value, key) {
     case "ph-topic":
       phone.topic = value;
       return true;
+    case "ph-gname":
+      phone.gname = value;
+      return true;
     case "ph-call-to":
       phone.call = value;
       return true;
@@ -6852,6 +6869,41 @@ function writePost(ctx, env2, input2) {
     gnet.sub = "board";
     gnet.open = newId;
     return note;
+  });
+}
+function refreshPost(ctx, env2, postId2) {
+  return run2(ctx, env2, "이 글을 새로 불러오는 중이에요.", async () => {
+    const chat = ctx.chat;
+    const st = readGnet(chat);
+    const target = findPost(st, postId2);
+    if (!target) throw new GnetError("대상 글이 없어졌어요.");
+    const s4 = gnetSettings(chat.scriptstate);
+    const nick = userNick(chat.scriptstate);
+    const plan = incomingPlan(chat, st, { ...s4, incoming: false }, nick, Math.random);
+    const prompt = commentPrompt({ char: ctx.char, chat }, st, postId2, 0, "", plan, nick, names2(ctx), POST_REFRESH_ACTION);
+    const snapshot2 = postKey(target);
+    const raw = await runModel(prompt.messages, s4.model);
+    const value = withRaw(raw, () => parseJsonPayload(raw));
+    let note = "";
+    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+      const cur = readGnet(latest);
+      const p = findPost(cur, postId2);
+      if (!p || postKey(p) !== snapshot2) {
+        note = "불러오는 동안 글이 바뀌어서 적용하지 않았어요. 다시 눌러 주세요.";
+        return null;
+      }
+      const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
+      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+      const n = got.comments.length;
+      p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+      p.votes += Math.floor(Math.random() * (n + 2));
+      const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      note = n ? "" : "새 댓글이 없어요.";
+      if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
+      if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+      return writeGnet(latest, cur, { ack: viewing() });
+    });
+    return note.trim();
   });
 }
 async function writeComment(ctx, env2, postId2, parent, body4) {
@@ -7079,12 +7131,13 @@ function postView(p, busy2, inline = false) {
   const reply = c?.kind === "comment" && c.post === p.id && c.parent > 0 ? c : null;
   const confirm = gnet.confirm === `p:${p.id}`;
   const right = p.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
+  const again = tool2("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy2 ? "disabled" : ""}`);
   const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc4(p.nick)}</button>`;
   const head = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc4(p.title)}</h2>
           <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc4(p.nick)}</b>` : who}</span>
             <span>${esc4(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
-  const tail = inline ? `<span class="gn-chead-act">${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
-  return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, right)}
+  const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
+  return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
     <div class="gn-doc">
       <article class="gn-post">${head}
         <div class="gn-post-body">${body(p.body)}</div>
@@ -7405,6 +7458,9 @@ async function handleGnet(action, value, ctx, env2) {
       }
       return true;
     }
+    case "gn-post-refresh":
+      if (findPost(st(), a)) void refreshPost(ctx, env2, a);
+      break;
     case "gn-del-post":
       if (gnet.confirm !== `p:${a}`) {
         gnet.confirm = `p:${a}`;
@@ -9592,10 +9648,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-notice-bar .gx-mini { margin: 0 8px 8px 0; }
 /* 단톡 만들기: 주제는 평소 한 줄, 적거나 누르면 넓어진다 */
 .ph-gbody { gap: 8px; }
+.ph-gbody > .ph-gname { height: 40px; min-height: 40px; padding: 9px 12px; flex: none; }
 .ph-gbody > .ph-topic { height: 40px; min-height: 40px; padding: 9px 12px; line-height: 1.4; resize: none; overflow: hidden; transition: height .15s ease; }
 .ph-gbody > .ph-topic:focus, .ph-gbody > .ph-topic:not(:placeholder-shown) { height: 76px; overflow: auto; }
 .ph-gbody > .ph-tabs { padding: 0; }
-@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }
+@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder, .ph-gbody > .ph-gname::placeholder { font-size: 12.5px; } }
 /* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
 .gn-pane .gn-doc { gap: 14px; }
 /* 글·댓글 카드는 줄어들지 않고 .gn-doc가 스크롤한다 (overflow: hidden 카드가 flex 안에서 줄어 댓글이 잘리던 문제) */

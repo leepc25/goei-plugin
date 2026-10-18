@@ -5,7 +5,7 @@ import { readGnet } from './gnet';
 import {
   agentStatus, announcementPacket, chancePassed, conversationState, hasAttachment, invitationPacket, LIMITS, HISTORY, listedRooms, phoneSettings,
   refreshAllowed, roomLabel, PhoneError, type AnnouncementCheck, type Contact, type Directory, type InvitationCheck, type PMsg, type PPerson, type PRoom,
-  type PState, phoneTime, emptyPause, cooldownReady,
+  type PState, phoneTime, hiddenPause, cooldownReady,
 } from './phone';
 import { bookText, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
 
@@ -106,7 +106,7 @@ interface RoomPacket {
 export function roomPacket(r: PRoom): RoomPacket {
   const messages = r.messages
     .slice(-HISTORY.room)
-    .filter((m) => m.kind !== 'pause' || !emptyPause(m.text))
+    .filter((m) => m.kind !== 'pause' || !hiddenPause(m.text))
     .map((m) => ({
       sender: m.sender === 'system' ? '-' : m.sender,
       type: m.kind === 'message' ? 'text' : m.kind === 'invite' ? 'invited' : m.kind,
@@ -224,7 +224,7 @@ function crossRoom(body: Body, st: PState): void {
     }
     if (knownBy.length) {
       records.push({
-        room: e.room.id, roomName: e.room.kind === 'group' ? e.room.name : undefined, kind: e.room.kind, recordID: e.m.id, sender: e.m.sender,
+        room: e.room.id, roomName: e.room.kind === 'group' ? roomLabel(e.room) : undefined, kind: e.room.kind, recordID: e.m.id, sender: e.m.sender,
         senderName: e.room.people[e.m.sender]?.name, time: e.m.time, content: e.m.text, knownBy: knownBy.sort(),
       });
     }

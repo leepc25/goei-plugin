@@ -240,6 +240,25 @@ def add_wiki_base(entries):
     return entries
 
 
+# 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
+LORE_PATCHES = [
+    ('Phone',
+     'For conversational pacing only, use type="pause", sender="-", content=a brief pause without external events.',
+     'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '
+     'A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC\'s own message text or omit them.'),
+]
+
+
+def patch_lore(entries):
+    for comment, old, new in LORE_PATCHES:
+        hit = [e for e in entries if e.get('comment') == comment and old in (e.get('content') or '')]
+        if not hit:
+            raise SystemExit(f'로어북 고치기 실패: {comment}')
+        for e in hit:
+            e['content'] = e['content'].replace(old, new)
+    return entries
+
+
 def drop_settings(entries):
     """설정값은 플러그인 창·저장소로 옮겼으므로 Settings 로어북은 Lite 카드에 넣지 않는다"""
     return [e for e in entries if e.get('comment') not in SETTINGS_BOOKS]
@@ -334,7 +353,7 @@ def main(src, dst):
     # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
     data['character_version'] = version
     lore = [e for e in lore if e.get('comment') != MANIFEST_COMMENT]
-    lore = add_wiki_base(migrate_directory(drop_settings(lore)))
+    lore = add_wiki_base(migrate_directory(patch_lore(drop_settings(lore))))
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,
         'content': json.dumps(manifest, ensure_ascii=False), 'mode': 'normal', 'alwaysActive': False,

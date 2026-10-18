@@ -191,3 +191,19 @@ test('call records show a card, send the request text, and absorb a typed follow
   assert.match(turns[0].user, /^주인공 places a phone call/);
   assert.equal(P.validCallTarget('a{b}'), false);
 });
+
+test('대기 줄은 짧은 시간 표시만 남기고 지문은 버린다', () => {
+  assert.equal(P.hiddenPause('잠시 후'), false);
+  assert.equal(P.hiddenPause('10분 후'), false);
+  assert.equal(P.hiddenPause('송주익이 기겁하며 급하게 메시지를 연타한다.'), true);
+  assert.equal(P.hiddenPause('답이 없다.'), true);
+  assert.equal(P.hiddenPause('…'), true);
+});
+
+test('이름을 정하지 않은 단톡방은 남은 사람 이름으로 부른다', () => {
+  const people = { a: { id: 'a', name: '사장' }, b: { id: 'b', name: '송주익' }, c: { id: 'c', name: '문혜란' } };
+  const room = { id: 'g_1', kind: 'group', name: '사장, 송주익, 문혜란', members: ['b'], people, messages: [], draft: '', unread: 0 };
+  const st = P.readPhone({ scriptstate: { [P.PH_STATE]: JSON.stringify({ version: 2, seq: 1, mid: 0, rooms: { g_1: room }, order: ['g_1'] }) } });
+  assert.equal(P.roomLabel(st.rooms.g_1), '송주익');
+  assert.equal(P.roomLabel({ ...room, name: '야간조' }), '야간조');
+});

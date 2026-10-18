@@ -1392,10 +1392,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-notice-bar .gx-mini { margin: 0 8px 8px 0; }
 /* 단톡 만들기: 주제는 평소 한 줄, 적거나 누르면 넓어진다 */
 .ph-gbody { gap: 8px; }
+.ph-gbody > .ph-gname { height: 40px; min-height: 40px; padding: 9px 12px; flex: none; }
 .ph-gbody > .ph-topic { height: 40px; min-height: 40px; padding: 9px 12px; line-height: 1.4; resize: none; overflow: hidden; transition: height .15s ease; }
 .ph-gbody > .ph-topic:focus, .ph-gbody > .ph-topic:not(:placeholder-shown) { height: 76px; overflow: auto; }
 .ph-gbody > .ph-tabs { padding: 0; }
-@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }
+@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder, .ph-gbody > .ph-gname::placeholder { font-size: 12.5px; } }
 /* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
 .gn-pane .gn-doc { gap: 14px; }
 /* 글·댓글 카드는 줄어들지 않고 .gn-doc가 스크롤한다 (overflow: hidden 카드가 flex 안에서 줄어 댓글이 잘리던 문제) */
