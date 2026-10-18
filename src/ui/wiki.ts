@@ -547,6 +547,7 @@ export function wikiTab(ctx: ChatContext): string {
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
     ${drawerHtml([
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
+      tool('wiki-find', ICONS.search, '위키 검색', '', '검색'),
       tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
       tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
     ].join(''))}
@@ -634,6 +635,12 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.listOpen = v === 'open' ? true : v === 'close' ? false : !wiki.listOpen;
       env.render();
       if (wiki.listOpen && wide() && !v) document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
+      return true;
+    case 'wiki-find':
+      // 모바일 하단 서랍의 검색: 목록을 펼치고 검색칸에 바로 커서 (위까지 손을 올리지 않게)
+      wiki.listOpen = true;
+      env.render();
+      document.querySelector<HTMLInputElement>('.nw .ph-search')?.focus();
       return true;
     case 'wiki-tab':
       wiki.tab = (TABS.some(([t]) => t === v) ? v : 'all') as Tab;

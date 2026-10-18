@@ -18,6 +18,7 @@ import { elapsedText, evCard, peopleChips } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
+import { drawerBox } from './drawer';
 
 export type Target =
   | { type: 'event'; key: string; kind: EventKind; name: string; loc: string }
@@ -188,6 +189,22 @@ function hotClass(list: WorldEvent[]): string {
   return ` hot hot-${kinds.size === 1 ? [...kinds][0] : 'all'}`;
 }
 
+const narrow = () => matchMedia('(max-width: 760px)').matches;
+
+/** 지역 고르기·장소 검색 줄 (PC는 지도 위, 모바일은 하단 서랍) */
+function mapBar(x: Ctx): string {
+  const code = field.region;
+  const options = ['01', ...MAP_CODES]
+    .map((c) => `<option value="${c}"${c === code ? ' selected' : ''}>${c === '01' ? '전국' : esc(regionName(c))}</option>`)
+    .join('');
+  const bar = `<div class="gx-mapbar">
+      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc(field.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+    </div>`;
+  return bar;
+}
+
 function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv): string {
   const code = field.region;
   const url = mapImage(ctx, code, env);
@@ -219,17 +236,11 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
       pins += pin('map-place', key, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
     }
   }
-  const options = ['01', ...MAP_CODES]
-    .map((c) => `<option value="${c}"${c === code ? ' selected' : ''}>${c === '01' ? '전국' : esc(regionName(c))}</option>`)
-    .join('');
   const img = url
     ? `<img class="gx-mapimg" src="${esc(url)}" alt="${esc(code === '01' ? '전국' : regionName(code))} 지도">`
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
-  return `<div class="gx-mapbar">
-      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
-      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc(field.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
-        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
-    </div>
+  // 모바일: 지역·장소 검색은 하단 바 위 서랍으로 (v0.16.24, 사용자 설계. 필터 줄은 숫자 때문에 위에 그대로)
+  return `${narrow() ? '' : mapBar(x)}
     <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
 }
 
@@ -379,10 +390,22 @@ function teamPanel(x: Ctx, goal: string | null, action: string, label: string, b
     <div class="gx-goal"><span>목표</span><b${goal ? '' : ' class="none"'}>${goal ? esc(goal) : '미정'}</b><em>${used + 1} / 4</em></div>
     ${roster.length || support ? `<div class="gx-acards pick">${chips}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
     ${roster.length ? '' : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ''}
-    <label class="gx-note">
-      <textarea rows="2" aria-label="작전 메모"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>
+    ${narrow() ? '' : noteBox()}
     <button class="gx-start" data-action="${action}" ${ready ? '' : 'disabled'}>${busy ? '보내는 중…' : esc(label)}</button>
   </section>`;
+}
+
+/** 작전 메모 (PC는 편성 칸 안, 모바일은 하단 서랍. 출발·요청 버튼은 서랍에 넣지 않는다) */
+function noteBox(): string {
+  return `<label class="gx-note">
+      <textarea rows="2" aria-label="작전 메모"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>`;
+}
+
+/** 모바일 하단 서랍: 목표 단계는 지역·검색(임무 탭만), 편성 단계는 작전 메모 */
+function fieldDrawer(x: Ctx, withMap: boolean): string {
+  if (!narrow()) return '';
+  if (field.step === 'team') return drawerBox(noteBox(), 'gx-notedrawer');
+  return withMap ? drawerBox(mapBar(x), 'gx-mapdrawer') : '';
 }
 
 // ── 탭 화면 ──
@@ -424,7 +447,7 @@ export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: bo
       ${notice ? `<div class="gx-err" role="alert">${esc(notice)}</div>` : ''}
       ${teamPanel(x, goal, 'depart', '출발', busy, ctx)}
     </div>
-  </main>`;
+  </main>${fieldDrawer(x, true)}`;
 }
 
 function missionCatalog(c: Catalog, kind: MissionKind): { name: string; sub: string }[] {
@@ -500,7 +523,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
       ${pend}
       ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy, opening ? undefined : ctx)}
     </div>
-  </main>`;
+  </main>${fieldDrawer(x, false)}`;
 }
 
 // ── 동작 ──

@@ -4,10 +4,17 @@
 
 let open = false;
 
-export function drawerHtml(tools: string, above = ''): string {
-  return `<div class="ph-drawer${open ? ' open' : ''}">
+export function drawerHtml(tools: string, above = '', cls = ''): string {
+  return `<div class="ph-drawer${cls ? ` ${cls}` : ''}${open ? ' open' : ''}">
     <button class="ph-grip" type="button" aria-label="${open ? '도구 접기' : '도구 펼치기'}" aria-expanded="${open}"><i></i></button>
     ${above}<div class="ph-tools">${tools}</div></div>`;
+}
+
+/** 도구 버튼이 아닌 내용(지역·검색, 작전 메모)을 담는 서랍. 모바일에서만 보인다 (임무·커스텀) */
+export function drawerBox(content: string, cls = ''): string {
+  return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ''}${open ? ' open' : ''}">
+    <button class="ph-grip" type="button" aria-label="${open ? '도구 접기' : '도구 펼치기'}" aria-expanded="${open}"><i></i></button>
+    <div class="ph-dbody">${content}</div></div>`;
 }
 
 function set(box: HTMLElement, on: boolean) {

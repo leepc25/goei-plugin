@@ -1550,7 +1550,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-body.nw-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .nw-rail { display: none; }
   .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
-  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .nw-main { grid-row: 1; }
   .nw-panel { left: 0; transform: translateX(-100%); max-width: calc(100% - 40px); }
   .list-open .nw-scrim { inset: 0; }
@@ -1585,4 +1585,19 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-tile small { align-self: start; color: var(--dim); font-size: 12px; }
 @media (max-width: 760px) {
   .nw-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
+.gx-content > .ph-drawer { margin: 0; }
+.ph-dbody { padding: 0 12px; }
+.gx-bdrawer .ph-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
+  .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
+  .gx-mdrawer .gx-mapbar { margin: 0; }
+  .gx-mdrawer .gx-note { display: block; margin: 0; }
+  .gx-mdrawer .gx-note textarea { width: 100%; }
+  /* 장소 검색 제안은 서랍 위로 펼친다 */
+  .gx-mdrawer .gx-mapfind { position: relative; }
+  .gx-mdrawer .gx-mapsug { top: auto; bottom: calc(100% + 6px); }
 }

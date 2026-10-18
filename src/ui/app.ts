@@ -9,7 +9,7 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
-import { bindDrawer } from './drawer';
+import { bindDrawer, drawerHtml } from './drawer';
 import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
@@ -659,6 +659,14 @@ function render(): void {
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
+/** 모바일 상황판 하단 서랍: 위 오른쪽에 있어 손이 먼 신분증·설정 (v0.16.24) */
+function boardDrawer(): string {
+  if (!matchMedia('(max-width: 760px)').matches) return '';
+  const b = (action: string, value: string, icon: string, label: string) =>
+    `<button class="ph-tool" data-action="${action}"${value ? ` data-value="${value}"` : ''} aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`;
+  return drawerHtml(b('id-card', '', ICONS.idcard, '신분증') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
+}
+
 /** 모바일 뒤로가기 쓸기가 할 일: 지금 화면의 한 단계 앞. 갈 곳이 없으면 null (상황판이 맨 앞) */
 function backStep(): (() => void) | null {
   const go = (action: string, value?: string) => () => void handle(action, value);
@@ -944,5 +952,5 @@ function board(ctx: ChatContext): string {
       ${col('ms', '특수', w.ms, ms, '출현한 특수가 없어요.')}
     </div>
     <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ''}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.'}</p>`}</section>
-  </main>`;
+  </main>${boardDrawer()}`;
 }
