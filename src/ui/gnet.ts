@@ -71,7 +71,7 @@ const chatKey = (ctx: { charIndex: number; chatIndex: number }) => `${ctx.charIn
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-const retry = (chat: Chat): RetryOptions => genSettings(chat.scriptstate);
+const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
 const source = (ctx: ChatContext, chat = ctx.chat): RefSource => ({ char: ctx.char as RefSource['char'], chat, persona: personaText() });
 
 function names(ctx: ChatContext): Record<string, string> {

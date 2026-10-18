@@ -1,6 +1,7 @@
 // 모델 호출 (위키·괴담넷·괴담톡 생성). 본편 요청과 따로, 사용자가 그 화면에서 누를 때만 부른다.
 import { prepareAttachments } from '../core/attach';
 import { photoData } from './photo';
+import { applyAdvanced } from '../core/advanced';
 export type ModelChoice = 'main' | 'aux';
 
 export interface LlmMessage {
@@ -84,6 +85,8 @@ export interface RetryOptions {
   retryModel: 'same' | ModelChoice;
   /** 다시 물을 요청문 (없으면 같은 요청에 오류를 덧붙임) */
   fix?: (raw: string, reason: string) => LlmMessage[];
+  /** 응답을 검사하기 전에 이 채팅의 고급 설정(길이 제한 등)으로 다시 맞춘다. 기다리는 동안 창이 다른 채팅을 열었을 수 있다 */
+  state?: Record<string, unknown>;
 }
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
@@ -117,6 +120,7 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
     let raw = '';
     try {
       raw = await runModel(ask, use);
+      if (o.state) applyAdvanced(o.state);
       return { raw, value: parse(raw) };
     } catch (error) {
       // 다시 물었는데 연결이 실패하면 처음 형식 오류(원문 포함)를 보여 준다

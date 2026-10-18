@@ -1,4 +1,5 @@
 import type { Chat, LoreEntry } from '../core/types';
+import { applyAdvanced } from '../core/advanced';
 
 export interface CharacterSnapshot {
   name?: string;
@@ -32,6 +33,8 @@ export async function updateChat(charIndex: number, chatIndex: number, mutate: (
   const latest = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   if (!latest) throw new Error('채팅을 찾을 수 없어요. 채팅을 다시 열어 주세요.');
   latest.message ??= [];
+  // 저장 직전에 이 채팅의 고급 설정으로 맞춘다 (길이 제한·보관 수를 다른 채팅 값으로 쓰지 않게)
+  applyAdvanced(latest.scriptstate);
   const next = mutate(latest);
   if (!next) return null;
   await risuai.setChatToIndex(charIndex, chatIndex, next);

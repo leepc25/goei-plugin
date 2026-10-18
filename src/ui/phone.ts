@@ -166,7 +166,7 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
     let result: ReturnType<typeof parseReply>;
     try {
       const prompt = fitPrompt(budgetFor(saved.scriptstate, 'ph'), () => replyPrompt(source(ctx, saved), st, r, d, names(ctx)));
-      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), genSettings(saved.scriptstate)));
+      ({ raw, value: result } = await askModel(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), state: saved.scriptstate }));
     } catch (error) {
       await markFailed(ctx, rid, req);
       const msg = error instanceof Error ? error.message : String(error);
@@ -358,6 +358,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     // 원본 설정(실패 시 재시도)과 같이 같은 자료로 다시 (횟수·모델은 고급 설정 → 생성 공통)
     const { value: result } = await askModel(prompt.messages, model, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
       ...genSettings(ctx.chat.scriptstate),
+      state: ctx.chat.scriptstate,
       fix: (_raw, reason) => refreshRetry(prompt, reason),
     });
     let note = '';
@@ -894,7 +895,6 @@ function settingsView(ctx: ChatContext): string {
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
         row('본편에 반영', onoff('context'), '대화 기록이 본편 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status')),
-        row('인물 로어북 참고', onoff('related')),
       ].join(''))}
       ${group('새 메시지', [
         row('자동 새 메시지 확인', onoff('auto'), '본편 응답이 끝날 때마다 한 번 확인해요'),
