@@ -4,7 +4,7 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
-  acceptArticle, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
+  acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
   type WikiMeta, type WikiSettings,
 } from '../core/wiki';
 import { runModel } from '../host/llm';
@@ -95,8 +95,8 @@ function openTitle(ctx: ChatContext, raw: string, from: 'link' | 'direct' | 'sea
     wiki.notice = '쓸 수 없는 제목이에요. 꺾쇠(<>), 줄바꿈, {{ }} 없이 300자 이내로 적어 주세요.';
     return;
   }
-  const parent = wiki.view === 'doc' ? findDoc(ctx.chat, wiki.title) : null;
-  if (findDoc(ctx.chat, title)) {
+  const parent = wiki.view === 'doc' ? findDoc(ctx.chat, wiki.title, ctx.char.globalLore) : null;
+  if (findDoc(ctx.chat, title, ctx.char.globalLore)) {
     go('doc', title);
     return;
   }
@@ -112,10 +112,10 @@ function search(ctx: ChatContext, q: string) {
   wiki.query = query;
   if (!query) return;
   const c = canonicalTitle(registry(ctx), source(ctx), query);
-  if (findDoc(ctx.chat, c.title)) return go('doc', c.title, query);
+  if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
   const lower = query.toLowerCase();
-  if (!matches(ctx, query).length && !listDocs(ctx.chat).some((d) => d.title.toLowerCase().includes(lower))) return openTitle(ctx, c.title, 'direct');
+  if (!matches(ctx, query).length && !listDocs(ctx.chat, ctx.char.globalLore).some((d) => d.title.toLowerCase().includes(lower))) return openTitle(ctx, c.title, 'direct');
   // 여러 개가 걸리면 목록을 펼쳐 고르게
   wiki.listOpen = true;
 }
@@ -130,10 +130,10 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
     return;
   }
   const s: WikiSettings = wikiSettings(ctx.chat.scriptstate);
-  const old = findDoc(ctx.chat, title);
+  const old = findDoc(ctx.chat, title, ctx.char.globalLore);
   const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : wiki.inherited;
   const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-  const previousDoc = regenerate ? (s.refreshPrevious ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle) : null;
+  const previousDoc = regenerate ? (s.refreshPrevious ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle, ctx.char.globalLore) : null;
   const writingRequest = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   jobs.set(key, { title, started: Date.now() });
   wiki.failure = null;
@@ -226,7 +226,11 @@ function entries(ctx: ChatContext): Entry[] {
   return out;
 }
 
-const entryFor = (ctx: ChatContext, title: string) => entries(ctx).find((e) => e.title === title);
+// 같은 문서로 이어지는 항목이 여럿이면 (예: 거점 「관리국 본부」와 조직 「관리국」) 이름이 제목과 같은 쪽
+const entryFor = (ctx: ChatContext, title: string) => {
+  const all = entries(ctx).filter((e) => e.title === title);
+  return all.find((e) => e.name === title) ?? all[0];
+};
 
 function matches(ctx: ChatContext, q: string): Entry[] {
   const lower = q.toLowerCase();
@@ -279,7 +283,7 @@ export function keyOf(title: string): string {
 }
 
 function sortedDocs(ctx: ChatContext) {
-  return listDocs(ctx.chat)
+  return listDocs(ctx.chat, ctx.char.globalLore)
     .map((d) => ({ d, k: KEYS.indexOf(keyOf(d.title)) }))
     .sort((x, y) => x.k - y.k || x.d.title.localeCompare(y.d.title, 'ko'))
     .map((x) => x.d);
@@ -329,8 +333,8 @@ function rail(): string {
 
 /** 위키 메인: 검색, 최근 문서, 전체 문서 */
 function homeView(ctx: ChatContext): string {
-  const docs = listDocs(ctx.chat);
-  const recent = docs.slice().sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0)).slice(0, 8);
+  const docs = listDocs(ctx.chat, ctx.char.globalLore);
+  const recent = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0)).slice(0, 8);
   const card = (d: (typeof docs)[number]) => {
     const e = entryFor(ctx, d.title);
     const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
@@ -416,13 +420,13 @@ function compose(ctx: ChatContext): string {
 }
 
 function docView(ctx: ChatContext): string {
-  const doc = findDoc(ctx.chat, wiki.title);
+  const doc = findDoc(ctx.chat, wiki.title, ctx.char.globalLore);
   if (!doc) {
     wiki.view = 'compose';
     return compose(ctx);
   }
   const c = canon(ctx);
-  const saved = new Set(listDocs(ctx.chat).map((d) => d.title));
+  const saved = new Set(listDocs(ctx.chat, ctx.char.globalLore).map((d) => d.title));
   const e = entryFor(ctx, doc.title);
   const photo = e?.photo ? imageUrl(ctx.char, e.photo) : null;
   const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo });
@@ -441,10 +445,15 @@ function docView(ctx: ChatContext): string {
        ${m.sources.length ? `<p>${esc(m.sources.join(', '))}</p>` : ''}${m.writingRequest ? `<p>작성 지침: ${esc(m.writingRequest)}</p>` : ''}</details>`
     : '';
   const confirm = wiki.confirmDelete === doc.title;
-  const right = `${tool('wiki-rewrite', ICONS.refresh, job?.title === doc.title ? '작성하는 중' : '새로고침', `data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}`)}${confirm
-    ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">정말 삭제</button>`
-    : tool('wiki-delete', ICONS.trash, '문서 삭제', `data-value="${esc(doc.title)}"`)}`;
-  const sub = [e ? CAT_LABEL[e.cat] : '', m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
+  // 기본 문서는 지울 수 없고, 채팅에서 새로 쓴 문서를 지우면 기본 문서로 돌아간다
+  const hasBase = baseDocs(ctx.char.globalLore).some((d) => d.title === doc.title);
+  const del = doc.base
+    ? ''
+    : confirm
+      ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">${hasBase ? '되돌리기' : '정말 삭제'}</button>`
+      : tool('wiki-delete', ICONS.trash, hasBase ? '기본 문서로 되돌리기' : '문서 삭제', `data-value="${esc(doc.title)}"`);
+  const right = `${tool('wiki-rewrite', ICONS.refresh, job?.title === doc.title ? '작성하는 중' : '새로고침', `data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}`)}${del}`;
+  const sub = [e ? CAT_LABEL[e.cat] : '', doc.base ? '기본 문서' : m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
   return `<div class="ph-room nw-pane">${paneHead(ctx, e?.name ?? doc.title, sub, right, e)}
     <article class="nw-doc">
       <header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>${e && e.sub && e.cat !== 'lm' ? `<small>${esc(e.sub)}</small>` : ''}</header>
@@ -591,7 +600,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
         break;
       }
       wiki.confirmDelete = null;
-      if (wiki.title === v && wiki.view === 'doc') Object.assign(wiki, { view: 'home', title: '', history: [] });
+      if (wiki.title === v && wiki.view === 'doc' && !baseDocs(ctx.char.globalLore).some((d) => d.title === v)) Object.assign(wiki, { view: 'home', title: '', history: [] });
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => deleteDoc(chat, v));
       await env.refresh();
       return true;

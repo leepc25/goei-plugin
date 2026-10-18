@@ -130,6 +130,12 @@ test('wiki: chat lore storage round trip, update in place and delete', () => {
   assert.deepEqual(listDocs(deleteDoc(chat, 'B')).map((d) => d.title), ['소라 랜드']);
   assert.equal(validTitle('a<b'), false);
   assert.equal(validTitle('WIKI｜x'), false);
+  // 카드 기본 문서: 채팅 문서 뒤에, 같은 제목은 채팅 문서가 이긴다. 채팅 문서를 지우면 기본 문서가 다시 보인다
+  const card = [{ comment: 'WIKI｜B', content: body.replace('[Paragraph]a', '[Paragraph]base') }, { comment: 'WIKI｜C', content: body }, { comment: 'Faction', content: 'x' }];
+  assert.deepEqual(listDocs(chat, card).map((d) => [d.title, !!d.base]), [['소라 랜드', false], ['B', false], ['C', true]]);
+  const back = findDoc(deleteDoc(chat, 'B'), 'B', card);
+  assert.ok(back.base && back.body.includes('[Paragraph]base'));
+  assert.equal(findDoc(chat, 'C', card).meta, null);
 });
 
 test('wiki prompt from the real card: sections, references, faction names', { skip: !realLore }, () => {

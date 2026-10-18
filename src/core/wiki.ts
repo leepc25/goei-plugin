@@ -48,6 +48,8 @@ export interface WikiDoc {
   title: string;
   meta: WikiMeta | null;
   body: string;
+  /** 카드에 미리 넣어 둔 기본 문서 (채팅에 같은 제목이 없을 때만) */
+  base?: boolean;
 }
 
 export class WikiError extends Error {}
@@ -103,11 +105,10 @@ export function parseDocContent(title: string, content: string): WikiDoc | null 
   return { title, meta, body };
 }
 
-/** 저장된 문서 목록 (로어북 순서 = 처음 만든 순서) */
-export function listDocs(chat: Chat): WikiDoc[] {
+function docsIn(entries: LoreEntry[]): WikiDoc[] {
   const out: WikiDoc[] = [];
   const seen = new Set<string>();
-  for (const e of localLore(chat)) {
+  for (const e of entries) {
     const name = String(e.comment ?? '');
     if (!name.startsWith(WIKI_PREFIX)) continue;
     const title = name.slice(WIKI_PREFIX.length);
@@ -121,8 +122,28 @@ export function listDocs(chat: Chat): WikiDoc[] {
   return out;
 }
 
-export function findDoc(chat: Chat, title: string): WikiDoc | null {
-  return listDocs(chat).find((d) => d.title === title) ?? null;
+// 카드 기본 문서는 크고(수백 개) 거의 안 바뀌므로 카드 로어북마다 한 번만 읽는다
+const baseCache = new WeakMap<object, WikiDoc[]>();
+export function baseDocs(lore: unknown): WikiDoc[] {
+  if (!Array.isArray(lore)) return [];
+  let docs = baseCache.get(lore);
+  if (!docs) {
+    docs = docsIn(lore as LoreEntry[]).map((d) => ({ ...d, base: true }));
+    baseCache.set(lore, docs);
+  }
+  return docs;
+}
+
+/** 저장된 문서 목록: 채팅 문서(처음 만든 순서) 다음에 카드 기본 문서. 같은 제목은 채팅 문서가 이긴다 */
+export function listDocs(chat: Chat, lore?: unknown): WikiDoc[] {
+  const mine = docsIn(localLore(chat));
+  if (lore === undefined) return mine;
+  const have = new Set(mine.map((d) => d.title));
+  return [...mine, ...baseDocs(lore).filter((d) => !have.has(d.title))];
+}
+
+export function findDoc(chat: Chat, title: string, lore?: unknown): WikiDoc | null {
+  return listDocs(chat, lore).find((d) => d.title === title) ?? null;
 }
 
 export function docContent(meta: WikiMeta, body: string): string {

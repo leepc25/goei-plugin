@@ -220,6 +220,26 @@ def migrate_directory(entries):
         return json.loads(dst.read_text(encoding='utf-8'))
 
 
+WIKI_FOLDER_KEY = '\uf000folder:6f1c2a7e-wiki-0000-0000-goeiwiki0001'
+WIKI_FOLDER_NAME = '📖위키'
+
+
+def add_wiki_base(entries):
+    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서)을 「📖위키」 폴더로 넣는다.
+    키 없는 비활성 항목이라 모델 프롬프트에는 들어가지 않고, 플러그인 위키만 읽는다"""
+    path = ROOT / 'card' / 'wiki-base.json'
+    if not path.exists():
+        return entries
+    docs = json.loads(path.read_text(encoding='utf-8'))
+    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY]
+    entries.append({'key': WIKI_FOLDER_KEY, 'comment': WIKI_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
+                    'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
+    for title, body in docs.items():
+        entries.append({'key': '', 'secondkey': '', 'comment': f'WIKI｜{title}', 'content': body, 'mode': 'normal', 'insertorder': 0,
+                        'alwaysActive': False, 'selective': False, 'useRegex': False, 'folder': WIKI_FOLDER_KEY, 'bookVersion': 2})
+    return entries
+
+
 def drop_settings(entries):
     """설정값은 플러그인 창·저장소로 옮겼으므로 Settings 로어북은 Lite 카드에 넣지 않는다"""
     return [e for e in entries if e.get('comment') not in SETTINGS_BOOKS]
@@ -314,7 +334,7 @@ def main(src, dst):
     # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
     data['character_version'] = version
     lore = [e for e in lore if e.get('comment') != MANIFEST_COMMENT]
-    lore = migrate_directory(drop_settings(lore))
+    lore = add_wiki_base(migrate_directory(drop_settings(lore)))
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,
         'content': json.dumps(manifest, ensure_ascii=False), 'mode': 'normal', 'alwaysActive': False,

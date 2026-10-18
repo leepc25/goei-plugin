@@ -1,0 +1,848 @@
+[
+ {
+  "no": 1,
+  "title": "소라 랜드",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 2,
+  "title": "인류의 신비전",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 3,
+  "title": "명일 아파트",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 4,
+  "title": "금지된 비디오",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 5,
+  "title": "교회",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 6,
+  "title": "강서 대학병원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 7,
+  "title": "강북 특설병원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 8,
+  "title": "강변",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 9,
+  "title": "예술가의 지하실",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 10,
+  "title": "미술관",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 11,
+  "title": "몽중몽",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 12,
+  "title": "인스피레이션 호텔",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 13,
+  "title": "뮤지컬 붉은 숙녀",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 14,
+  "title": "한여름 밤의 꿈",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 15,
+  "title": "꿈과 희망의 극단",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 16,
+  "title": "욕망의 방",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 17,
+  "title": "생체 공장",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 18,
+  "title": "살아있는 보육원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 19,
+  "title": "조계사",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 20,
+  "title": "청악메리병원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 21,
+  "title": "한설인육공장",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 22,
+  "title": "학교의 악몽",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 23,
+  "title": "광기로 점철된 성당",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 24,
+  "title": "기괴한 방탈출 카페",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 25,
+  "title": "원숭이 꿈 괴담",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 26,
+  "title": "성자의 도시",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 27,
+  "title": "불이 꺼진 관리국",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 28,
+  "title": "사망단길",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 29,
+  "title": "유쾌 테마파크",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 30,
+  "title": "플라워 골든 리조트",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 31,
+  "title": "눈먼 자들의 저택",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 32,
+  "title": "헝그리 행맨",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 33,
+  "title": "검은 그늘 속에서",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 34,
+  "title": "룩키마트",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 35,
+  "title": "반짝반짝 용궁",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 36,
+  "title": "성 안티쿠스 기숙학교",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 37,
+  "title": "지산마을 명절 축제",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 38,
+  "title": "화요퀴즈쇼",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 39,
+  "title": "심연교통공사",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 40,
+  "title": "해피엔딩 홀",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 41,
+  "title": "차원 승강기",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 42,
+  "title": "샛별 고시원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 43,
+  "title": "유계역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 44,
+  "title": "세광특별시",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 45,
+  "title": "세광역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 46,
+  "title": "자정역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 47,
+  "title": "한밤역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 48,
+  "title": "황혼역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 49,
+  "title": "오후역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 50,
+  "title": "한낮역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 51,
+  "title": "아침역",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 52,
+  "title": "유쾌연구소",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 53,
+  "title": "어두운 정원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 54,
+  "title": "거대한 세상",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 55,
+  "title": "영원마을",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 56,
+  "title": "프러스트 워터파크",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 57,
+  "title": "피어블 극장",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 58,
+  "title": "페어리테일 파크",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 59,
+  "title": "코즈믹 판타지 동물원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 60,
+  "title": "환상드라마 민속촌",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 61,
+  "title": "미스테리 월드 어드벤쳐 파크",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 62,
+  "title": "소토스 백화점",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 63,
+  "title": "탐미주의",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 64,
+  "title": "세크리엠",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 65,
+  "title": "발푸르기스 협회",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 66,
+  "title": "아벤샤",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 67,
+  "title": "무명찬란교",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 68,
+  "title": "흡혈귀",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 69,
+  "title": "병원",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 70,
+  "title": "극단",
+  "cat": "괴이",
+  "kind": "rumor"
+ },
+ {
+  "no": 71,
+  "title": "달빛 타투샵",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 72,
+  "title": "이정 책방",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 73,
+  "title": "도깨비 공방",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 74,
+  "title": "얼굴 없는 장터",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 75,
+  "title": "여우상담실",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 76,
+  "title": "착한 친구 키링",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 77,
+  "title": "무엇이든 자판기",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 78,
+  "title": "우주 쇼핑몰",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 79,
+  "title": "친절한 씨앗 키트",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 80,
+  "title": "이빨 요정",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 81,
+  "title": "가짜 관리국",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 82,
+  "title": "세계정치 게시판",
+  "cat": "특수",
+  "kind": "rumor"
+ },
+ {
+  "no": 83,
+  "title": "관리국",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 84,
+  "title": "백일몽",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 85,
+  "title": "협회",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 86,
+  "title": "기독교 상점",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 87,
+  "title": "이슬람",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 88,
+  "title": "중림 지하상가",
+  "cat": "거점",
+  "kind": "place"
+ },
+ {
+  "no": 89,
+  "title": "쟈알디",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 90,
+  "title": "스팡달",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 91,
+  "title": "잼트리",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 92,
+  "title": "에일린",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 93,
+  "title": "고르고디오",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 94,
+  "title": "큐라스",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 95,
+  "title": "데드폴",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 96,
+  "title": "게슈간",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 97,
+  "title": "로제몬",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 98,
+  "title": "콘쥬스",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 99,
+  "title": "고그니쟈",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 100,
+  "title": "데쥬레",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 101,
+  "title": "이도형",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 102,
+  "title": "고영훈",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 103,
+  "title": "노기균",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 104,
+  "title": "송주익",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 105,
+  "title": "곽성주",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 106,
+  "title": "조성춘",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 107,
+  "title": "윤병수",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 108,
+  "title": "김성진",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 109,
+  "title": "송진섭",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 110,
+  "title": "이길환",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 111,
+  "title": "이기석",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 112,
+  "title": "김조학",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 113,
+  "title": "도필헌",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 114,
+  "title": "사장",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 115,
+  "title": "백석주",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 116,
+  "title": "진나솔",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 117,
+  "title": "이성해",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 118,
+  "title": "이자헌",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 119,
+  "title": "은하제",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 120,
+  "title": "박민성",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 121,
+  "title": "백사헌",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 122,
+  "title": "고영은",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 123,
+  "title": "강이학",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 124,
+  "title": "장허운",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 125,
+  "title": "곽제강",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 126,
+  "title": "이연화",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 127,
+  "title": "이병진",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 128,
+  "title": "제이",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 129,
+  "title": "호유원",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 130,
+  "title": "청달래",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 131,
+  "title": "차여진",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 132,
+  "title": "서윤지",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 133,
+  "title": "고연지",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 134,
+  "title": "윤지아",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 135,
+  "title": "마덕희",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 136,
+  "title": "문혜란",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 137,
+  "title": "신유리",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 138,
+  "title": "블라렛",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 139,
+  "title": "살라딘",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 140,
+  "title": "브라우니",
+  "cat": "인물",
+  "kind": "person"
+ },
+ {
+  "no": 141,
+  "title": "프리랜서",
+  "cat": "조직",
+  "kind": "place"
+ }
+]
