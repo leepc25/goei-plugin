@@ -1297,7 +1297,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === '괴이봇 명부'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
-  await page.waitForFunction(() => document.querySelector('.st-scope-help')?.textContent.includes('저장했어요'));
+  await page.waitForFunction(() => document.querySelector('.gx-toast[data-toast="dir"]')?.textContent.includes('저장했어요'));
   // 저장한 값으로 다시 읽힘: 새로고침 뒤에도 쟈알디는 테스트 조직
   await page.fill('[data-input="dir-q"]', '쟈알디');
   assert.ok((await page.textContent('.dir-list')).includes('테스트 조직'));

@@ -566,9 +566,18 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 카드 명부 */
 .dir { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
-.dir-help { padding: 14px 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
-.dir-help p { margin: 0 0 6px; font-size: 15px; line-height: 1.6; }
-.dir-help p:last-child { margin-bottom: 0; }
+.dir-help { border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.dir-help summary { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--sub); cursor: pointer; }
+.dir-help ul { margin: 0; padding: 0 16px 12px 32px; }
+.dir-help li { margin: 0 0 4px; font-size: 14px; line-height: 1.6; }
+.dir-help .gx-hint { margin: 0 14px 12px; }
+.gx-dirdrawer { display: none; }
+@media (max-width: 760px) {
+  .dir-kinds { position: sticky; top: -4px; z-index: 2; margin: 0 -4px; padding: 3px; box-shadow: 0 0 0 4px var(--void); }
+  .dir-qbox { display: none; }
+  .gx-dirdrawer { display: block; }
+  .gx-dirdrawer .dir-search { margin: 0; }
+}
 .dir-help code { font-family: inherit; font-size: 14px; padding: 1px 6px; border-radius: 6px; background: var(--panel2); color: var(--text); white-space: nowrap; }
 .dir-kinds { display: flex; }
 .dir-kinds .gx-seg { flex: 1; }
@@ -1429,9 +1438,22 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
 .st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .st-scopebar .st-scope { flex: none; margin: 0; }
-.st-scopebar .st-scope .gx-seg { flex: 0 0 auto; min-width: 0; min-height: 32px; padding: 0 14px; font-size: 14px; }
-.st-barbtns { display: flex; flex: none; align-items: center; gap: 6px; }
-.st-barbtns .gx-mini { min-height: 32px; padding: 0 12px; white-space: nowrap; }
+.st-scopebar .st-scope .gx-seg { flex: 0 0 auto; min-width: 88px; min-height: 40px; padding: 0 20px; font-size: 15px; }
+.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
+/* 덮어쓰기·불러오기: 전환 탭과 달리 둥근 테두리 + 아이콘, 한 단계 작게 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 16px; border: 1px solid var(--line2, var(--line)); border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.st-act svg { width: 16px; height: 16px; flex: none; }
+.st-act.save { border-color: var(--accent-line); color: var(--signal); }
+.st-act:hover:not(:disabled) { background: var(--accent-bg); border-color: var(--signal); color: var(--signal); }
+.st-act:disabled { opacity: .4; cursor: default; }
+@media (max-width: 760px) {
+  .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .st-scopebar .st-scope { grid-column: span 2; display: flex; }
+  .st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; }
+  .st-barbtns { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .st-act { min-width: 0; padding: 0 6px; font-size: 13px; gap: 4px; }
+  .st-act svg { width: 14px; height: 14px; }
+}
 .st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .st-barconfirm p { color: var(--text); }
 .ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }

@@ -9,7 +9,8 @@ import { ASSET_NOTE } from '../core/asset';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
-import { barButtons, directoryBar, directoryDone, directoryView } from './directory';
+import { barButtons, directoryBar, directoryDone, directoryDoneClear, directorySearch, directoryView } from './directory';
+import { drawerBox } from './drawer';
 import { toast } from './toast';
 
 export interface SettingsEnv {
@@ -107,18 +108,18 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 const SCOPE_HELP: Record<SettingsScope, string> = {
   chat: '지금 채팅에 적용돼요.',
   defaults: '채팅을 시작하기 전이라 새 채팅 기본값을 고쳐요.',
-  card: '이 카드의 괴이·특수·요원·조직 정보예요.',
+  card: '',
 };
 
-// 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「저장」「불러오기」. 설정에서는 새 채팅 기본값을,
+// 위쪽 줄 하나 (v0.16.25, 사용자 설계): [설정|명부] 전환 + 「덮어쓰기」「불러오기」 (전환보다 한 단계 작게). 설정에서는 새 채팅 기본값을,
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
 const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>> = {
   chat: {
-    save: ['지금 설정을 새 채팅 기본값으로 저장할까요? 이전 기본값은 덮어써요.', '저장'],
+    save: ['지금 설정으로 새 채팅 기본값을 덮어쓸까요?', '덮어쓰기'],
     load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
   },
   card: {
-    save: ['고친 명부를 카드에 저장할까요? 이 카드의 모든 채팅에 적용돼요.', '저장'],
+    save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
     load: ['고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?', '되돌리기'],
   },
 };
@@ -136,11 +137,14 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   const confirm = c
     ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`
     : '';
-  return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}<p class="gx-muted st-scope-help">${esc((scope === 'card' && directoryDone()) || SCOPE_HELP[scope])}</p>`;
+  return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}${SCOPE_HELP[scope] ? `<p class="gx-muted st-scope-help">${SCOPE_HELP[scope]}</p>` : ''}`;
 }
 
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true): string {
-  if (scope === 'card') return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}</main>`;
+  // 명부: 모바일은 검색을 하단 서랍에 (괴이·특수·요원·조직 탭은 위에 고정)
+  if (scope === 'card') {
+    return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
+  }
   const { basic: s, world, theme } = current(ctx, scope);
   const on = scope === 'chat' ? worldOn(ctx.chat) : s.anomalyOn;
   const busy = settingsUi.busy;

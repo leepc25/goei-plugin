@@ -7,6 +7,7 @@ import {
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { avatar } from './images';
+import { ICONS } from './icons';
 
 export interface DirectoryEnv {
   render: () => void;
@@ -287,10 +288,16 @@ export function directoryList(ctx: ChatContext): string {
 
 /** 저장 결과 한 줄 (설정 위쪽 안내 자리) */
 export const directoryDone = (): string => dirUi.done;
+export const directoryDoneClear = (text: string): void => {
+  if (dirUi.done === text) dirUi.done = '';
+};
 
-/** 설정 위쪽 줄의 「저장」「불러오기」 (설정·명부 공통, 누르면 확인) */
+export const directorySearch = (): string =>
+  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">`;
+
+/** 설정 위쪽 줄의 「덮어쓰기」「불러오기」 (설정·명부 공통, 누르면 확인) */
 export const barButtons = (off: boolean): string =>
-  `<button class="gx-mini ps-save" data-action="set-bar" data-value="save" ${off ? 'disabled' : ''}>저장</button><button class="gx-mini" data-action="set-bar" data-value="load" ${off ? 'disabled' : ''}>불러오기</button>`;
+  `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? 'disabled' : ''}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? 'disabled' : ''}>${ICONS.refresh}불러오기</button>`;
 
 export function directoryBar(): string {
   return barButtons(!dirty() || dirUi.busy);
@@ -304,18 +311,23 @@ export function directoryView(ctx: ChatContext): string {
     ['agent', '요원', d.agents.length],
     ['org', '조직', d.orgs.length],
   ];
+  // 탭이 맨 위 (모바일은 고정), 사용법은 그 아래 접어 둔다
   return `<div class="dir">
-    <div class="dir-help">
-      <p><b>로어북 폴더에 넣으면 자동으로 들어와요.</b> 괴이는 <code>🚧괴이</code>, 특수(미스틱 사이트)는 <code>🎁파밍</code>, 요원은 <code>🙂요원</code> 폴더예요. 새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</p>
-      <p class="gx-muted">여기서 고친 값은 카드 로어북 「괴이봇 명부」에 저장돼서 카드를 공유하면 같이 가요. 이 카드의 모든 채팅에 바로 적용돼요.</p>
-      ${d.folders ? '' : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
-    </div>
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc(dirUi.notice)}</div>` : ''}
     <div class="gx-segs dir-kinds">${kinds
       .map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? ' on' : ''}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`)
       .join('')}</div>
+    <details class="dir-help">
+      <summary>명부 사용법</summary>
+      <ul>
+        <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
+        <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
+        <li>고친 값은 위의 「저장」을 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
+      </ul>
+      ${d.folders ? '' : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
+    </details>
+    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc(dirUi.notice)}</div>` : ''}
     ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ''}
-    <input class="dir-search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">
+    <div class="dir-qbox">${directorySearch()}</div>
     <div class="dir-list">${directoryList(ctx)}</div>
   </div>`;
 }
