@@ -573,7 +573,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-help .gx-hint { margin: 0 14px 12px; }
 .gx-dirdrawer { display: none; }
 @media (max-width: 760px) {
-  .dir-kinds { position: sticky; top: 8px; z-index: 2; margin: 0 -4px; padding: 3px; box-shadow: 0 -8px 0 6px var(--void); }
+  .dir-kinds { position: sticky; top: 8px; z-index: 2; margin: 0; padding: 3px; box-shadow: 0 -8px 0 6px var(--void); }
   .dir-qbox { display: none; }
   .gx-dirdrawer { display: block; }
   .gx-dirdrawer .dir-search { margin: 0; }
@@ -1438,10 +1438,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
 .st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .st-scopebar .st-scope { flex: none; margin: 0; }
-/* 전환 탭도 알약 모양으로 덮어쓰기·불러오기와 톤을 맞춘다 */
-.st-scopebar .st-scope { padding: 2px; border-color: var(--line2); border-radius: 999px; background: transparent; }
-.st-scopebar .st-scope .gx-seg { min-height: 32px; border-radius: 999px; font-size: 14px; }
-.st-scopebar .st-scope .gx-seg.on { background: var(--accent-bg); color: var(--signal); }
+/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
 .st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
 /* 덮어쓰기·불러오기: 전환 탭과 달리 둥근 테두리 + 아이콘, 한 단계 작게 */
 .st-act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--line2, var(--line)); border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
@@ -1452,14 +1449,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
 .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .st-scopebar .st-scope { grid-column: span 2; display: flex; }
-.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; }
+.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
 .st-barbtns { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .st-barbtns .st-act { min-height: 36px; }
 @media (max-width: 760px) {
   .st-scopebar, .st-barbtns { gap: 6px; }
   .st-barbtns .st-act { min-height: 32px; }
   .st-act { min-width: 0; min-height: 30px; padding: 0 6px; font-size: 13px; gap: 4px; }
-  .st-scopebar .st-scope .gx-seg { min-height: 28px; font-size: 13px; }
   .st-act svg { width: 14px; height: 14px; }
 }
 .st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }

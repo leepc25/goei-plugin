@@ -121,7 +121,7 @@ const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>
 
 function scopeBar(scope: SettingsScope, canChat: boolean): string {
   const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정'], ['card', '명부']];
-  const tabs = `<div class="gx-segs gx-segs-sm st-scope">${items
+  const tabs = `<div class="gx-segs st-scope">${items
     .map(([k, label]) => `<button class="gx-seg${scope === k ? ' on' : ''}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`)
     .join('')}</div>`;
   // 명부는 입력할 때마다 버튼만 다시 그린다 (directoryInput → .dir-bar)
