@@ -68,7 +68,15 @@ test('자리표시자: 원본 봇 로어북에서도 네 자리를 모두 찾음
   assert.doesNotMatch(out, /fac_pool/);
   assert.equal(fv.$fac_pool, '', '이미 배치 목록에 있는 이름은 다시 넣지 않음');
   const fac = evaluate(lore.find((e) => e.comment === '📜Faction').content, { vars: { ...vars, ...fv } });
-  assert.match(fac, /### Walpurgis Society \[F00\]\nSorcerers\.\nOrganization:/);
+  assert.match(fac, /### Walpurgis Society \[F00\]\nSorcerers\.\nOrganization:[^\n]*\n\n## Faction Doctrine/, '세력 목록 끝, 관계 절 앞');
+  // 옛 빌드처럼 글 끝(--- 뒤)에 붙은 카드는 자리를 옮긴다
+  const facText = r.lore.find((e) => e.comment === '📜Faction').content;
+  const old = r.lore.map((e) => (e.comment === '📜Faction' ? { ...e, content: `${facText.split('{{getvar::fac_extra}}').join('').replace(/\s+$/, '')}{{getvar::fac_extra}}\n` } : e));
+  assert.equal(placeholdersReady(old), false);
+  const moved = withFactionPlaceholders(old);
+  assert.equal(moved.changed, true);
+  assert.equal(moved.lore.find((e) => e.comment === '📜Faction').content, facText);
+  assert.equal(placeholdersReady(moved.lore), true);
 });
 
 test('세력 목록: 자리표시자가 있는 카드에서만 새 세력, 기본 세력은 이름·숨김만', () => {

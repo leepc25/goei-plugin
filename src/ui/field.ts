@@ -8,7 +8,7 @@ import { basicSettings, worldSettings } from '../core/settings';
 import {
   activeEvents, agentLocked, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
-  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc,
+  SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, prevWorldVars,
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
@@ -660,7 +660,8 @@ async function saveWorld(ctx: ChatContext, env: FieldEnv, change: (w: WorldState
       const w = structuredClone(x.world);
       const err = change(w, x);
       if (err) throw new Error(err);
-      return { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+      return { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
     });
     env.setBusy(false);
     await env.refresh();

@@ -78,7 +78,8 @@ function orgSpecs(lore: LoreEntry[]): [string, FactionSpec][] {
 /** 이 카드의 태그 로어북에 새 세력 자리표시자가 들어 있는지 */
 export function placeholdersReady(lore: LoreEntry[] | undefined): boolean {
   const tag = loreText(lore ?? [], TAG_BOOK);
-  return tag.includes('{{getvar::fac_codes}}') && tag.includes('{{getvar::fac_ac}}');
+  const fac = loreText(lore ?? [], FACTION_BOOK);
+  return tag.includes('{{getvar::fac_codes}}') && tag.includes('{{getvar::fac_ac}}') && (!fac || placeFactionExtra(fac) === fac);
 }
 
 const builtinType = (code: string): FactionType => (code === 'D00' ? 'civilian' : code === 'E00' ? 'freelancer' : 'org');
@@ -175,7 +176,7 @@ const TYPE_GM: Record<FactionType, string> = {
 
 /**
  * 태그·세력 로어북 자리표시자에 들어갈 채팅 변수. 새 세력이 없으면 모두 빈 값이라 원래 글과 같다.
- * $fac_codes: [AC] 코드 줄 뒤, $fac_ac: 코드별 이름 줄, $fac_pool: 배치 칸 세력 목록, $fac_extra: 📜Faction 끝.
+ * $fac_codes: [AC] 코드 줄 뒤, $fac_ac: 코드별 이름 줄, $fac_pool: 배치 칸 세력 목록, $fac_extra: 📜Faction 세력 목록 끝.
  */
 export function factionVars(lore: LoreEntry[] | undefined): ScriptState {
   const extras = extraFactions(lore);
@@ -210,6 +211,23 @@ const AC_CODES = /(code = A00 \| B00 \| C00 \| D00 \| E00)(?!\{\{getvar::fac_cod
 const AC_LAST = /(\n[ \t]*- E00 = [^\n]*)(?!\{\{getvar::fac_ac\}\})/;
 const POOL = /(\n[ \t]*- Faction pool:[^\n]*?)( \| etc\.)?(\n)/;
 
+const EXTRA = '{{getvar::fac_extra}}';
+
+/**
+ * 📜Faction에서 새 세력 설명이 들어갈 자리: 세력 목록(첫 「## 」 절)의 끝, 다음 「## 」 제목 바로 앞.
+ * 다음 제목이 없으면 글 끝. 옛 빌드처럼 글 끝(--- 뒤)에 붙어 있으면 그 자리로 옮긴다.
+ */
+function placeFactionExtra(text: string): string {
+  const bare = text.split(EXTRA).join('');
+  const body = bare.replace(/\s+$/, '');
+  const next = body.slice(1).search(/\n## /);
+  if (next < 0) return text.includes(EXTRA) ? text : `${body}${EXTRA}\n`;
+  const at = next + 1;
+  const want = `${body.slice(0, at).replace(/\s+$/, '')}${EXTRA}\n\n${body.slice(at).replace(/^\s+/, '')}\n`;
+  if (text.includes(EXTRA) && text.indexOf(EXTRA) === want.indexOf(EXTRA) && text.split(EXTRA).length === 2) return text;
+  return want;
+}
+
 export interface PlaceholderResult {
   lore: LoreEntry[];
   changed: boolean;
@@ -217,7 +235,7 @@ export interface PlaceholderResult {
   missing: string[];
 }
 
-/** 🏷️Tag의 [AC] 코드 목록·배치 세력 목록과 📜Faction 끝에 자리표시자를 넣는다. 이미 있으면 그대로 */
+/** 🏷️Tag의 [AC] 코드 목록·배치 세력 목록과 📜Faction 세력 목록 끝에 자리표시자를 넣는다. 이미 맞는 자리에 있으면 그대로 */
 export function withFactionPlaceholders(lore: LoreEntry[]): PlaceholderResult {
   const missing: string[] = [];
   let changed = false;
@@ -245,9 +263,13 @@ export function withFactionPlaceholders(lore: LoreEntry[]): PlaceholderResult {
     }
   }
   if (facAt < 0) missing.push(FACTION_BOOK);
-  else if (!(next[facAt].content as string).includes('{{getvar::fac_extra}}')) {
-    next[facAt] = { ...next[facAt], content: `${(next[facAt].content as string).replace(/\s+$/, '')}{{getvar::fac_extra}}\n` };
-    changed = true;
+  else {
+    const f = next[facAt].content as string;
+    const t = placeFactionExtra(f);
+    if (t !== f) {
+      next[facAt] = { ...next[facAt], content: t };
+      changed = true;
+    }
   }
   return { lore: next, changed, missing };
 }

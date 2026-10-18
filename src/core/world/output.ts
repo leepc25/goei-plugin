@@ -8,6 +8,26 @@ import { cleanOutput, hasWorldTags } from './tags';
 
 export const WORLD_KEY = '$goei_world';
 const LAST_KEY = '$goei_last';
+/** 마지막으로 반영한 응답 직전의 상태. 같은 자리에 다른 응답이 오면(리롤) 여기서 다시 시작한다 */
+const PREV_KEY = '$goei_prev';
+
+interface PrevState {
+  i: number;
+  world: string;
+  faction: string;
+  pick: string;
+  aff: string;
+}
+
+function readPrev(raw: unknown): PrevState | null {
+  if (typeof raw !== 'string' || !raw) return null;
+  try {
+    const p = JSON.parse(raw) as PrevState;
+    return typeof p?.i === 'number' && typeof p.world === 'string' ? p : null;
+  } catch {
+    return null;
+  }
+}
 
 export function worldOn(chat: Chat): boolean {
   return chat.scriptstate?.['$st_anomaly_on'] === '1';
@@ -68,10 +88,31 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   // 이미 처리한 응답에 리스너가 다시 불린 경우 (태그도 없고 지문도 같음)
   if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
 
-  const faction = String(state['$st_faction'] ?? '');
-  const result = applyOutput(readWorld(chat), c, s, faction, raw, rng);
+  // 리롤·다시 생성: 같은 자리의 이전 응답이 반영되기 전 상태로 돌아가서 이번 응답만 반영한다
+  const prev = readPrev(state[PREV_KEY]);
+  const reroll = prev?.i === index;
+  const before: PrevState = reroll
+    ? prev
+    : {
+        i: index,
+        world: String(state[WORLD_KEY] ?? ''),
+        faction: String(state['$st_faction'] ?? ''),
+        pick: String(state['$st_pick'] ?? ''),
+        aff: String(state['$ib_affiliation'] ?? ''),
+      };
+  const faction = before.faction;
+  const result = applyOutput(parseWorld(before.world), c, s, faction, raw, rng);
   const now = result.faction ?? faction;
-  const vars: ScriptState = { ...worldVars(result.world, c, s, now), [LAST_KEY]: fingerprint(index, clean) };
+  const vars: ScriptState = {
+    ...worldVars(result.world, c, s, now),
+    [LAST_KEY]: fingerprint(index, clean),
+    [PREV_KEY]: JSON.stringify(before),
+  };
+  if (reroll && !result.faction) {
+    vars.$st_faction = before.faction;
+    vars.$st_pick = before.pick;
+    vars.$ib_affiliation = before.aff;
+  }
   if (result.faction) {
     vars.$st_faction = result.faction;
     vars.$st_pick = result.faction;
@@ -80,4 +121,20 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   const message = messages.slice();
   message[index] = { ...msg, data: clean };
   return { ...chat, message, scriptstate: { ...state, ...vars } };
+}
+
+/**
+ * 상황판에서 손으로 바꾼 것(사건 종료 등)을 리롤 기준 상태에도 똑같이 반영한다.
+ * 안 그러면 그 응답을 리롤할 때 손으로 바꾼 것이 사라진다. 바꿀 기준 상태가 없으면 빈 값.
+ */
+export function prevWorldVars(state: ScriptState | undefined, change: (w: WorldState) => unknown): ScriptState {
+  const prev = readPrev(state?.[PREV_KEY]);
+  if (!prev) return {};
+  const w = parseWorld(prev.world);
+  try {
+    change(w);
+  } catch {
+    return {};
+  }
+  return { [PREV_KEY]: JSON.stringify({ ...prev, world: JSON.stringify(w) }) };
 }

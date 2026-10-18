@@ -250,6 +250,25 @@ test('processOutput: cleans the stored message, updates vars, ignores repeats an
   assert.equal(typeof next.scriptstate[WORLD_KEY], 'string');
 });
 
+test('processOutput: a reroll replaces the previous response instead of stacking on it', () => {
+  const vars = startWorldVars(catalog, S, 'A00', always);
+  const base = { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_pick: 'A00', $ib_affiliation: '관리국', ...vars } };
+  const A = '본문 A\n[AG|P001|사망|소라 랜드]\n[AC|C00]';
+  const B = '본문 B';
+  const afterA = processOutput({ ...base, message: [...base.message, { role: 'char', data: A }] }, 1, A, catalog, S, always);
+  assert.equal(afterA.scriptstate.$st_faction, 'C00');
+  assert.equal(readWorld(afterA).agents.P001.st, '사망');
+  const reroll = processOutput({ ...afterA, message: [afterA.message[0], { role: 'char', data: B }] }, 1, B, catalog, S, always);
+  const fresh = processOutput({ ...base, message: [...base.message, { role: 'char', data: B }] }, 1, B, catalog, S, always);
+  assert.deepEqual(readWorld(reroll), readWorld(fresh), '리롤은 이전 응답이 없었던 것처럼');
+  assert.equal(reroll.scriptstate.$st_faction, 'A00', '이전 응답의 소속 변경도 되돌림');
+  assert.equal(reroll.scriptstate.$ib_affiliation, '관리국');
+  // 다음 턴은 리롤된 응답 위에 쌓인다
+  const C = '본문 C';
+  const next = processOutput({ ...reroll, message: [...reroll.message, { role: 'user', data: '다음' }, { role: 'char', data: C }] }, 3, C, catalog, S, always);
+  assert.equal(readWorld(next).epoch, readWorld(reroll).epoch + 1);
+});
+
 test('custom mission: pending anomaly is briefed, registered from the model tag, and can be cancelled', () => {
   const w = emptyWorld();
   assert.equal(requestMission(w, catalog, noSpawn, 'an', '없는 괴이'), '목록에 없는 괴이예요.');

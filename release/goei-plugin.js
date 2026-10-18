@@ -360,7 +360,8 @@ function orgSpecs(lore) {
 }
 function placeholdersReady(lore) {
   const tag = loreText(lore ?? [], TAG_BOOK);
-  return tag.includes("{{getvar::fac_codes}}") && tag.includes("{{getvar::fac_ac}}");
+  const fac = loreText(lore ?? [], FACTION_BOOK);
+  return tag.includes("{{getvar::fac_codes}}") && tag.includes("{{getvar::fac_ac}}") && (!fac || placeFactionExtra(fac) === fac);
 }
 var builtinType = (code) => code === "D00" ? "civilian" : code === "E00" ? "freelancer" : "org";
 var extraTabId = (code) => `T${100 + code.charCodeAt(0) - 65}`;
@@ -459,6 +460,21 @@ function staleFactionVars(lore, ss) {
 var AC_CODES = /(code = A00 \| B00 \| C00 \| D00 \| E00)(?!\{\{getvar::fac_codes\}\})/;
 var AC_LAST = /(\n[ \t]*- E00 = [^\n]*)(?!\{\{getvar::fac_ac\}\})/;
 var POOL = /(\n[ \t]*- Faction pool:[^\n]*?)( \| etc\.)?(\n)/;
+var EXTRA = "{{getvar::fac_extra}}";
+function placeFactionExtra(text) {
+  const bare = text.split(EXTRA).join("");
+  const body4 = bare.replace(/\s+$/, "");
+  const next = body4.slice(1).search(/\n## /);
+  if (next < 0) return text.includes(EXTRA) ? text : `${body4}${EXTRA}
+`;
+  const at = next + 1;
+  const want = `${body4.slice(0, at).replace(/\s+$/, "")}${EXTRA}
+
+${body4.slice(at).replace(/^\s+/, "")}
+`;
+  if (text.includes(EXTRA) && text.indexOf(EXTRA) === want.indexOf(EXTRA) && text.split(EXTRA).length === 2) return text;
+  return want;
+}
 function withFactionPlaceholders(lore) {
   const missing = [];
   let changed = false;
@@ -486,10 +502,13 @@ function withFactionPlaceholders(lore) {
     }
   }
   if (facAt < 0) missing.push(FACTION_BOOK);
-  else if (!next[facAt].content.includes("{{getvar::fac_extra}}")) {
-    next[facAt] = { ...next[facAt], content: `${next[facAt].content.replace(/\s+$/, "")}{{getvar::fac_extra}}
-` };
-    changed = true;
+  else {
+    const f = next[facAt].content;
+    const t = placeFactionExtra(f);
+    if (t !== f) {
+      next[facAt] = { ...next[facAt], content: t };
+      changed = true;
+    }
   }
   return { lore: next, changed, missing };
 }
@@ -1733,6 +1752,16 @@ function agentLocked(rec) {
 // src/core/world/output.ts
 var WORLD_KEY = "$goei_world";
 var LAST_KEY = "$goei_last";
+var PREV_KEY = "$goei_prev";
+function readPrev(raw) {
+  if (typeof raw !== "string" || !raw) return null;
+  try {
+    const p = JSON.parse(raw);
+    return typeof p?.i === "number" && typeof p.world === "string" ? p : null;
+  } catch {
+    return null;
+  }
+}
 function worldOn(chat) {
   return chat.scriptstate?.["$st_anomaly_on"] === "1";
 }
@@ -1777,10 +1806,28 @@ function processOutput(chat, messageIndex, raw, c, s5, rng) {
   const state = chat.scriptstate ?? {};
   const clean = cleanOutput(raw);
   if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
-  const faction = String(state["$st_faction"] ?? "");
-  const result = applyOutput(readWorld(chat), c, s5, faction, raw, rng);
+  const prev = readPrev(state[PREV_KEY]);
+  const reroll = prev?.i === index;
+  const before = reroll ? prev : {
+    i: index,
+    world: String(state[WORLD_KEY] ?? ""),
+    faction: String(state["$st_faction"] ?? ""),
+    pick: String(state["$st_pick"] ?? ""),
+    aff: String(state["$ib_affiliation"] ?? "")
+  };
+  const faction = before.faction;
+  const result = applyOutput(parseWorld(before.world), c, s5, faction, raw, rng);
   const now = result.faction ?? faction;
-  const vars = { ...worldVars(result.world, c, s5, now), [LAST_KEY]: fingerprint(index, clean) };
+  const vars = {
+    ...worldVars(result.world, c, s5, now),
+    [LAST_KEY]: fingerprint(index, clean),
+    [PREV_KEY]: JSON.stringify(before)
+  };
+  if (reroll && !result.faction) {
+    vars.$st_faction = before.faction;
+    vars.$st_pick = before.pick;
+    vars.$ib_affiliation = before.aff;
+  }
   if (result.faction) {
     vars.$st_faction = result.faction;
     vars.$st_pick = result.faction;
@@ -1789,6 +1836,17 @@ function processOutput(chat, messageIndex, raw, c, s5, rng) {
   const message = messages.slice();
   message[index] = { ...msg, data: clean };
   return { ...chat, message, scriptstate: { ...state, ...vars } };
+}
+function prevWorldVars(state, change) {
+  const prev = readPrev(state?.[PREV_KEY]);
+  if (!prev) return {};
+  const w = parseWorld(prev.world);
+  try {
+    change(w);
+  } catch {
+    return {};
+  }
+  return { [PREV_KEY]: JSON.stringify({ ...prev, world: JSON.stringify(w) }) };
 }
 
 // src/core/attach.ts
@@ -11666,7 +11724,8 @@ async function saveWorld(ctx, env2, change) {
       const w = structuredClone(x.world);
       const err = change(w, x);
       if (err) throw new Error(err);
-      return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+      return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
     });
     env2.setBusy(false);
     await env2.refresh();
