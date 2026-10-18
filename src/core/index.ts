@@ -18,3 +18,4 @@ export * as asset from './asset';
 export * as attach from './attach';
 export * from './factions';
 export * from './update';
+export { OLD_DIRECTORY, OLD_MANIFEST, LEGACY_DATA, RETIRED, isDirectory } from './lorebooks';

@@ -1,8 +1,8 @@
 // 카드 업데이트 (선택지용사 방식): 저장소에 올린 카드 데이터(card-update.json)를 받아 지금 카드에 덮어쓴다.
-// 채팅·사진·에셋·이름은 그대로 두고, 로어북·정규식은 같은 이름끼리만 바꾸며, 사용자가 고친 「괴이봇 명부」는 지킨다.
+// 채팅·사진·에셋·이름은 그대로 두고, 로어북·정규식은 같은 이름끼리만 바꾸며, 사용자가 고친 명부(Directory)는 지킨다.
 // 플러그인 자체는 Risu 설정의 플러그인 탭이 //@update-url로 갱신한다.
-import { MANIFEST_COMMENT } from './start';
-import { DIRECTORY_COMMENT } from './world/directory';
+import { DIRECTORY_COMMENT, isDirectory, LEGACY_DATA, manifestEntry, OLD_DIRECTORY, RETIRED } from './lorebooks';
+import { migrateLore } from './world/directory';
 import type { LoreEntry } from './types';
 
 export const UPDATE_SCHEMA = 1;
@@ -27,7 +27,7 @@ export interface CardPayload {
 }
 
 /** 사용자 손을 탄 값이라 업데이트가 덮어쓰지 않는 로어북 */
-export const PROTECTED_LORE = [DIRECTORY_COMMENT];
+export const PROTECTED_LORE = [DIRECTORY_COMMENT, OLD_DIRECTORY];
 
 export function compareVersions(a: string, b: string): number {
   const pa = String(a).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
@@ -41,7 +41,7 @@ export function compareVersions(a: string, b: string): number {
 
 /** 지금 카드의 버전 (매니페스트 version, 없으면 0 = 업데이트 기능 이전 카드) */
 export function cardVersion(lore: LoreEntry[] | undefined): string {
-  const entry = (lore ?? []).find((e) => e.comment === MANIFEST_COMMENT);
+  const entry = manifestEntry(lore);
   try {
     const v = (JSON.parse(String(entry?.content ?? '')) as { version?: unknown }).version;
     return typeof v === 'string' && v ? v : '0';
@@ -109,9 +109,26 @@ export interface UpdatePlan {
   fields: string[];
 }
 
+/**
+ * 이름을 바꾼 로어북 맞추기: 옛 이름 명부(괴이봇 명부)는 새 카드의 Directory 자리로 옮겨 지키고,
+ * 더 쓰지 않는 로어북(옛 매니페스트·LB Backend)은 뺀다. 새 카드에도 같은 이름이 있으면 그대로 둔다.
+ */
+function renamed(current: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
+  const target = incoming.find((e) => e.comment === DIRECTORY_COMMENT);
+  const hasNew = current.some((e) => e.comment === DIRECTORY_COMMENT);
+  const keepNames = new Set(incoming.map((e) => e.comment));
+  return current
+    .filter((e) => !RETIRED.includes(String(e.comment ?? '')) || keepNames.has(e.comment))
+    .filter((e) => !(hasNew && e.comment === OLD_DIRECTORY))
+    .map((e) => (e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: (target as { folder?: string }).folder } : e))
+    .filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
+}
+
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
-  const lore = mergeByName((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
+  const lore = mergeByName(renamed((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore), payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
+  // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
+  if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
   const scripts = mergeByName((char.customscript as { comment?: string }[]) ?? [], payload.data.customscript, (r) => r.comment ?? '');
   const next: Record<string, unknown> = { ...char, globalLore: lore.list, customscript: scripts.list };

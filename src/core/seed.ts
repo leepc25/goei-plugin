@@ -1,24 +1,12 @@
 import type { LoreEntry } from './types';
+import { seedSection } from './world/directory';
 
 // 원본 Lua의 seedParse/seedLoad 이식.
-// "Start trigger" 로어북: "A00-1:관리국|쟈알디|..." 줄마다 시작 조합별로 첫 턴에 강제로 넣을 로어북 이름 목록.
+// 명부의 「시작 로어북」(옛 카드는 Start trigger 로어북): 시작 조합(A00-1)마다 첫 턴에 강제로 넣을 로어북 이름 목록.
 // 퍼메는 로어북 키워드 스캔 대상이 아니라서 첫 응답에 인물·세력 자료가 빠지는 것을 막는다.
-export const SEED_ENTRY = 'Start trigger';
+export { parseSeedManifest } from './lorebooks';
 export const SEED_OPEN = '%%SEED%%';
 export const SEED_CLOSE = '%%/SEED%%';
-
-export function parseSeedManifest(raw: string): Map<string, string[]> {
-  const map = new Map<string, string[]>();
-  for (const line of raw.split('\n')) {
-    const t = line.replace(/\r/g, '').trim();
-    if (!t || t.startsWith('#')) continue;
-    const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
-    if (!m) continue;
-    const names = m[2].split('|').map((s) => s.trim()).filter(Boolean);
-    if (names.length) map.set(m[1], names);
-  }
-  return map;
-}
 
 export interface SeedResult {
   text: string;
@@ -34,11 +22,7 @@ export function buildSeed(lore: LoreEntry[], faction: string, fm: number, names?
     if (!list.includes(e.content)) list.push(e.content);
     byComment.set(e.comment, list);
   }
-  if (!names) {
-    const manifest = byComment.get(SEED_ENTRY)?.join('\n');
-    if (!manifest) return { text: '', missing: [SEED_ENTRY] };
-    names = parseSeedManifest(manifest).get(`${faction}-${fm}`);
-  }
+  names ??= seedSection(lore)[`${faction}-${fm}`];
   if (!names?.length) return { text: '', missing: [] };
   const parts: string[] = [];
   const missing: string[] = [];

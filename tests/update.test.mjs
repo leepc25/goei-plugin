@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { compareVersions, cardVersion, mergeByName, planUpdate, isPayload, readManifest } from '../dist-test/core.mjs';
+import { compareVersions, cardVersion, mergeByName, planUpdate, isPayload, readManifest, directoryData, readDirectory } from '../dist-test/core.mjs';
 
 test('버전 비교', () => {
   assert.equal(compareVersions('0.15.3', '0.15.10'), -1);
@@ -50,4 +50,36 @@ test('실제 카드 업데이트 파일: 형식·매니페스트 버전', { skip
   // 같은 카드에 다시 적용하면 바뀌는 것이 없어야 한다
   const plan = planUpdate({ ...p.data }, p);
   assert.deepEqual([plan.fields, plan.lore.replaced, plan.lore.added, plan.lore.kept], [[], 0, 0, 0]);
+});
+
+const REAL = '/mnt/project-files/analysis/extracted/module.json';
+test('예전 카드 업데이트: 괴이봇 명부 → Directory, 옛 데이터 로어북은 명부로 옮기고 지움', { skip: !existsSync(PAYLOAD) || !existsSync(REAL) }, () => {
+  const index = JSON.parse(readFileSync(PAYLOAD, 'utf8'));
+  const p = JSON.parse(index.parts.map((n) => readFileSync(new URL(n, PAYLOAD), 'utf8')).join(''));
+  const m = JSON.parse(readFileSync(REAL, 'utf8'));
+  const orig = m.lorebook ?? m.module?.lorebook;
+  // v0.16.25 무렵 사용자 카드: 옛 이름 명부(요원 직급을 고침) + Faction display(고침)·Phone tabs·Start trigger·LB Backend·옛 매니페스트
+  const dir = directoryData(readDirectory(orig));
+  delete dir.호칭; delete dir['괴담톡 탭']; delete dir['시작 로어북'];
+  const agent = Object.keys(dir.요원)[0];
+  dir.요원[agent].rank = '내가 고친 직급';
+  const display = JSON.parse(orig.find((e) => e.comment === 'Faction display').content);
+  display.B00.A00 = '짝퉁 관리국';
+  const user = [
+    ...orig.filter((e) => !['Agent roster', 'Settings', '통합설정'].includes(e.comment)).map((e) => (e.comment === 'Faction display' ? { ...e, content: JSON.stringify(display) } : e)),
+    { comment: '괴이봇 명부', content: JSON.stringify(dir), key: '', mode: 'normal' },
+    { comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.16.25"}', key: '', mode: 'normal' },
+    { comment: '내 메모', content: '메모', key: '', mode: 'normal' },
+  ];
+  const plan = planUpdate({ globalLore: user, customscript: [] }, p);
+  const lore = plan.next.globalLore;
+  const names = lore.map((e) => e.comment);
+  for (const n of ['괴이봇 명부', '괴이봇 플러그인 매니페스트', 'LB Backend', 'Faction display', 'Phone tabs', 'Start trigger', 'World catalog']) assert.ok(!names.includes(n), n);
+  assert.equal(names.filter((n) => n === 'Directory').length, 1);
+  assert.ok(names.includes('내 메모'));
+  const saved = JSON.parse(lore.find((e) => e.comment === 'Directory').content);
+  assert.equal(saved.요원[agent].rank, '내가 고친 직급');
+  assert.equal(saved.호칭.B00.A00, '짝퉁 관리국');
+  assert.ok(saved['시작 로어북']['A00-1'].length && saved['괴담톡 탭'].tabs.length);
+  assert.equal(cardVersion(lore), p.version);
 });

@@ -3,7 +3,7 @@
 // 초대·방 만들기·공지 채널·시각·기록 번호는 앱이 정한다.
 import type { Chat, LoreEntry } from './types';
 import { readWorld } from './world/output';
-import { readDirectory, rosterOf } from './world/directory';
+import { phoneTabsSection, readDirectory, rosterOf } from './world/directory';
 import { BUILTIN, extraFactions, extraTabs, factionType, isFactionCode } from './factions';
 import { dateNow, storyTurns, tokens, cut } from './gnet';
 import { attachmentRecords, describe, stripForged } from './attach';
@@ -162,29 +162,16 @@ interface TabDef {
 const hex = (s: string) => Array.from(new TextEncoder().encode(s), (b) => b.toString(16).padStart(2, '0')).join('');
 export const contactId = (agentId: string) => `c_${hex(agentId)}`;
 
-function loreJson(lore: LoreEntry[], name: string): unknown {
-  const raw = lore.filter((e) => e.comment === name && typeof e.content === 'string').map((e) => e.content as string).join('\n').trim();
-  if (!raw) throw new PhoneError(`${name} 로어북이 없어요.`);
-  try {
-    return JSON.parse(raw.replace(/^﻿/, '').replace(/^```[\w-]*\s*\n/, '').replace(/\n\s*```\s*$/, ''));
-  } catch {
-    throw new PhoneError(`${name}: JSON 구문을 확인하세요.`);
-  }
-}
-
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 const list = (v: unknown) => (Array.isArray(v) ? v.map(s).filter(Boolean) : []);
 
 function tabCatalog(lore: LoreEntry[]): { entries: TabDef[]; orders: Record<string, string[]> } {
-  const data = loreJson(lore, 'Phone tabs') as { version?: number; tabs?: unknown[]; order_by_faction?: Record<string, unknown> };
-  if (data?.version !== 1 || !Array.isArray(data.tabs)) throw new PhoneError('Phone tabs: version 1 탭 설정이 필요해요.');
+  const data = phoneTabsSection(lore);
+  if (!data.tabs.length) throw new PhoneError('괴담톡 탭 설정이 없어요.');
   const entries: TabDef[] = [];
-  for (const row of data.tabs as Record<string, unknown>[]) {
-    const id = s(row?.id);
-    if (!/^[TX]\d+$/.test(id) || entries.some((e) => e.id === id)) continue;
-    const names: Record<string, string> = {};
-    if (row.name_by_faction && typeof row.name_by_faction === 'object') for (const [f, n] of Object.entries(row.name_by_faction as object)) if (s(n)) names[f] = s(n);
-    entries.push({ id, name: s(row.name) || id, names, visibleFor: new Set(list(row.visible_for)) });
+  for (const row of data.tabs) {
+    if (entries.some((e) => e.id === row.id)) continue;
+    entries.push({ id: row.id, name: row.name || row.id, names: { ...row.name_by_faction }, visibleFor: new Set(row.visible_for) });
   }
   // 새 세력: 기본 다섯 세력 모두에게 열린 탭은 새 세력에도 열고, 전용 탭을 덧붙인다
   const extra = extraFactions(lore).map((f) => f.code);
@@ -193,7 +180,7 @@ function tabCatalog(lore: LoreEntry[]): { entries: TabDef[]; orders: Record<stri
     for (const t of extraTabs(lore)) if (!entries.some((e) => e.id === t.id)) entries.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
   }
   const orders: Record<string, string[]> = {};
-  for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = list(order);
+  for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = [...order];
   return { entries, orders };
 }
 

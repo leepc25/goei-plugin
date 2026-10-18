@@ -14,7 +14,7 @@ const shots = process.argv[3];
 const fixtureDir = dirname(resolve(process.argv[2]));
 if (shots) mkdirSync(shots, { recursive: true });
 const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
-const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === '괴이봇 플러그인 매니페스트').content);
+const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
 
 function hostScript(char, chat, { rootDom = true } = {}) {
   return `
@@ -1324,13 +1324,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.dir-bar [data-value="save"]');
   await page.click('[data-action="dir-save"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
-  const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === '괴이봇 명부').content));
+  const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   assert.equal(book.괴이['명일 아파트'].preset, false);
   assert.equal(book.괴이[extName].preset, true, '다른 폴더 로어북을 발생 후보로 저장');
   assert.deepEqual([book.요원.쟈알디.affiliation, book.요원.쟈알디.rank, book.요원.쟈알디.roster_for], ['테스트 조직', '국장', ['D00', 'E00', 'A00']]);
   assert.deepEqual(book.조직['테스트 조직'].roster_for, ['D00', 'E00', 'A00']);
   assert.equal(book.요원.쟈알디.id, 'P001', 'ID 유지');
-  const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === '괴이봇 명부'));
+  const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === 'Directory'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
   await page.waitForFunction(() => document.querySelector('.gx-toast[data-toast="dir"]')?.textContent.includes('저장했어요'));
@@ -1569,7 +1569,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.dir-bar [data-value="save"]');
   await page.click('[data-action="dir-save"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
-  const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === '괴이봇 명부').content));
+  const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   const org = book.조직['테스트 결사'];
   assert.deepEqual([org.code, org.playable, org.type, org.title, org.gm_name], ['F00', true, 'freelancer', '비밀 결사', 'Test Society']);
   assert.deepEqual(book.codes_used, ['F00']);
@@ -1622,7 +1622,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const payload = JSON.parse(index.parts.map((n) => readFileSync(new URL(`../release/${n}`, import.meta.url), 'utf8')).join(''));
   payload.version = '9.0.0';
   payload.data.firstMessage = '새 첫 안내';
-  const man = payload.data.globalLore.find((e) => e.comment === '괴이봇 플러그인 매니페스트');
+  const man = payload.data.globalLore.find((e) => e.comment === 'Plugin manifest');
   man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0' });
   const { page, errors } = await boot(fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } });
   await page.evaluate((p) => {
@@ -1632,7 +1632,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' }
       : url.includes('card-update.json') ? { schema: 1, version: p.version, minPlugin: '0.0.1', parts: parts.map((_, i) => `card-update.${i + 1}.txt`), length: text.length }
       : (/card-update\.(\d+)\.txt/.exec(url) ? parts[+/card-update\.(\d+)\.txt/.exec(url)[1] - 1] : null);
-    const dir = window.__char.globalLore.find((e) => e.comment === '괴이봇 명부');
+    const dir = window.__char.globalLore.find((e) => e.comment === 'Directory');
     if (dir) dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
     window.__char.globalLore.push({ comment: '내가 넣은 로어북', content: '메모', key: '', mode: 'normal' });
   }, payload);
@@ -1659,7 +1659,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => window.__calls.setChar === 1);
   const ch = await page.evaluate(() => window.__char);
   assert.equal(ch.firstMessage, '새 첫 안내');
-  assert.match(ch.globalLore.find((e) => e.comment === '괴이봇 명부')?.content ?? '"내가 고친 값"', /내가 고친 값/, '명부는 보존');
+  assert.match(ch.globalLore.find((e) => e.comment === 'Directory')?.content ?? '"내가 고친 값"', /내가 고친 값/, '명부는 보존');
   assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
   assert.equal(ch.name, fixture.name, '이름 유지');
   await page.waitForSelector('.gx-hint');

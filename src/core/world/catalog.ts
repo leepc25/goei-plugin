@@ -1,9 +1,9 @@
 // 상황판 목록: 괴이·미스틱 사이트·요원은 카드 명부(directory.ts: 로어북 폴더 + 괴이봇 명부 + 옛 목록),
-// 거점도 카드 명부(옛 카드는 World catalog 랜드마크 줄), 세력 표시명은 Faction display.
+// 거점과 세력 호칭도 카드 명부(옛 카드는 World catalog 랜드마크 줄·Faction display).
 import { extraNames, factionList, factionVars } from '../factions';
 import type { FactionCode, LoreEntry, ScriptState } from '../types';
 import { SIGUN } from './geo';
-import { readDirectory } from './directory';
+import { displaySection, readDirectory } from './directory';
 
 export interface WorldItem {
   name: string;
@@ -120,15 +120,7 @@ export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
     .filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
   const refill = dir.refill;
 
-  let factionDisplay: Record<string, Record<string, string>> = {};
-  const displayRaw = loreText(list, 'Faction display');
-  if (displayRaw) {
-    try {
-      factionDisplay = parseJson(displayRaw, 'Faction display') as Record<string, Record<string, string>>;
-    } catch {
-      factionDisplay = {};
-    }
-  }
+  const factionDisplay = displaySection(list);
   const affiliations: Record<string, string> = {};
   for (const f of factionList(list)) affiliations[f.code] = f.affiliation;
   return { anomalies, mysticSites, landmarks, people, refill, factionDisplay, extraNames: extraNames(list), affiliations, factionVars: factionVars(list) };

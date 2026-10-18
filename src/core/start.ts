@@ -4,10 +4,12 @@ import { hasSceneCard } from './dispatch';
 import { buildSeed } from './seed';
 import type { Chat, LoreEntry, Manifest, ScriptState, StartChoice } from './types';
 
-export const MANIFEST_COMMENT = '괴이봇 플러그인 매니페스트';
+import { manifestEntry } from './lorebooks';
+
+export { MANIFEST_COMMENT } from './lorebooks';
 
 export function readManifest(lore: LoreEntry[] | undefined): Manifest | null {
-  const entry = (lore ?? []).find((e) => e.comment === MANIFEST_COMMENT);
+  const entry = manifestEntry(lore);
   if (!entry || typeof entry.content !== 'string') return null;
   try {
     const m = JSON.parse(entry.content) as Manifest;

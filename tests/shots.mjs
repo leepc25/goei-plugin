@@ -14,7 +14,7 @@ const shots = process.argv[3];
 const fixtureDir = dirname(resolve(process.argv[2]));
 if (shots) mkdirSync(shots, { recursive: true });
 const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
-const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === '괴이봇 플러그인 매니페스트').content);
+const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
 
 function hostScript(char, chat, { rootDom = true } = {}) {
   return `

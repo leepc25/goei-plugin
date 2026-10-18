@@ -1,10 +1,10 @@
 // 플레이 세력 목록: 기본 다섯(A00~E00, scenarios.json) + 「괴이봇 명부」 조직 중 플레이 가능으로 켠 것(F00~).
 // 새 세력은 시작 화면에서 직접 입력·커스텀 임무로 시작하고, 태그·세력 로어북의 자리표시자 변수로 모델에게 알린다.
+import { directoryEntries } from './lorebooks';
 import { SCENARIOS } from './scenarios';
 import type { Faction, FactionType, LoreEntry, Scenario, ScriptState } from './types';
 
 export const BUILTIN = ['A00', 'B00', 'C00', 'D00', 'E00'];
-const DIRECTORY_COMMENT = '괴이봇 명부';
 export const TAG_BOOK = '🏷️Tag';
 export const FACTION_BOOK = '📜Faction';
 
@@ -64,7 +64,7 @@ function loreText(lore: LoreEntry[], comment: string): string {
 }
 
 function orgSpecs(lore: LoreEntry[]): [string, FactionSpec][] {
-  const raw = loreText(lore, DIRECTORY_COMMENT).trim();
+  const raw = directoryEntries(lore).map((e) => String(e.content ?? '')).join('\n').trim();
   if (!raw) return [];
   try {
     const d = obj(JSON.parse(raw.replace(/^﻿/, '').replace(/^```[\w-]*\s*\n/, '').replace(/\n\s*```\s*$/, '')));

@@ -1,5 +1,5 @@
 // 괴담넷 요청문 만들기 (원본 RC.gnetPrompt + LB makeIntro/makeOutro).
-// 지침 문장은 카드의 GNet·LB Backend 로어북 섹션을 그대로 읽고, CBS는 직접 푼다.
+// 지침 문장은 카드의 GNet 로어북 섹션(옛 카드는 LB Backend도)을 그대로 읽고, CBS는 직접 푼다.
 // 결과는 언제나 두 메시지: system(틀 + 작업 지침 + 출력 형식) / user(참고 자료 + 최근 본문 + 현재 작업).
 import { hasAttachment } from './attach';
 import { evaluate } from './cbs';
@@ -22,16 +22,14 @@ export interface GnetBooks {
   read(name: string): string;
 }
 
-/** GNet·LB Backend 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다 */
+/** GNet 섹션을 읽는 함수. 섹션이 빠졌으면 바로 알린다. 생성 틀(SYSTEM 등)은 옛 카드면 LB Backend에 있다 */
 export function gnetBooks(src: RefSource): GnetBooks {
-  const g = policySections(src.char.globalLore, 'GNet');
-  const lb = policySections(src.char.globalLore, 'LB Backend');
-  for (const k of REQUIRED_GNET) if (g[k] === undefined) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
-  for (const k of REQUIRED_LB) if (lb[k] === undefined) throw new GnetError(`LB Backend 로어북의 ${k} 섹션이 없어요.`);
+  const g = { ...policySections(src.char.globalLore, 'LB Backend'), ...policySections(src.char.globalLore, 'GNet') };
+  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === undefined) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
   const env = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
   return {
     read(name: string) {
-      const raw = g[name] ?? lb[name] ?? '';
+      const raw = g[name] ?? '';
       return evaluate(raw, env)
         .replace(/__LIMIT_(\w+?)__/g, (m, k: string) => (k in LIMITS ? String(LIMITS[k as keyof typeof LIMITS]) : m))
         .replace(/<!--[\s\S]*?-->/g, '')

@@ -6,7 +6,8 @@
   - 시작/설정/지도/프리셋/괴담넷/위키/폰 패널 정규식 제거 (플러그인이 담당)
   - 285KB짜리 CBS 첫 메시지를 분기별 추가 인사말로 분리 (CBS 계산 없음)
   - 배경 HTML은 상태창·에셋 표시용 CSS만 남김
-  - 로어북은 그대로, 플러그인 매니페스트 엔트리 1개 추가
+  - 로어북: 옛 데이터 로어북은 명부(Directory)로 옮기고, LB Backend는 GNet에 합치고, 안 쓰는 지침 섹션은 빼고,
+    ⚙️설정 폴더에 플러그인 매니페스트(Plugin manifest) 1개 추가. card.json 로어북도 모듈과 똑같이 맞춘다
 
 사용법: python3 tools/build_lite_card.py <원본.charx|원본.jpeg> <결과.charx>
 """
@@ -29,7 +30,9 @@ ROOT = TOOLS.parent
 RPACK = (TOOLS / 'rpack_map.bin').read_bytes()
 ENCODE, DECODE = RPACK[:256], RPACK[256:]
 
-MANIFEST_COMMENT = '괴이봇 플러그인 매니페스트'
+MANIFEST_COMMENT = 'Plugin manifest'
+OLD_MANIFEST = '괴이봇 플러그인 매니페스트'
+SETTINGS_FOLDER_NAME = '⚙️설정'
 MANIFEST_KEY = ''  # 빈 키: Risu가 키워드로 활성화하지 않음
 KEEP_REGEX = ('🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거', '📊상태창')
 STATUS_CSS = re.compile(r'(\.dv-status|\.dv-time|\.dv-date|\.dv-wx|\.dv-loc|\.dv-target|\.ib-asset)')
@@ -212,7 +215,7 @@ SETTINGS_BOOKS = ('Settings', '통합설정')
 
 
 def migrate_directory(entries):
-    """괴이·미스틱 사이트·요원 목록을 「괴이봇 명부」로 옮긴다 (플러그인과 같은 코드를 node로 실행, 먼저 npm run build)"""
+    """괴이·미스틱 사이트·요원·거점·세력 호칭·괴담톡 탭·첫 턴 로어북을 명부(Directory)로 옮긴다 (플러그인과 같은 코드를 node로 실행, 먼저 npm run build)"""
     with tempfile.TemporaryDirectory() as tmp:
         src, dst = Path(tmp) / 'in.json', Path(tmp) / 'out.json'
         src.write_text(json.dumps(entries, ensure_ascii=False), encoding='utf-8')
@@ -257,6 +260,55 @@ def patch_lore(entries):
         for e in hit:
             e['content'] = e['content'].replace(old, new)
     return entries
+
+
+# 플러그인이 읽지 않는 섹션 (원본 Lightboard가 쓰던 것)
+DEAD_SECTIONS = {
+    'GNet': ['MANIFEST.LB', 'LB.FORMAT', 'LB.INTERACTION', 'LB.THOUGHTS', 'LB.THOUGHTS-INTERACTION', 'REACT.FORMAT',
+             'INCOMING.FORMAT', 'TITLE.FORMAT', 'LB.LEGACY_OUTPUT'],
+    'LB Backend': ['LBDATA', 'LIGHTBOARD-CHAR-DESC', 'LIGHTBOARD-MAX-CONTEXT', 'THOUGHTS', 'OUTRO'],
+}
+GUIDE_HEADERS = {
+    'GNet': '<!-- GNet: 괴담넷 생성 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->',
+    'Phone': '<!-- Phone: 괴담톡 생성 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->',
+    'Wiki': '<!-- Wiki: 위키 생성 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->',
+}
+
+
+def tidy_guides(entries):
+    """안 쓰는 섹션을 빼고, LB Backend(괴담넷 생성 틀)를 GNet 끝으로 합치고, 지침 머리 주석을 지금 구조에 맞게 바꾼다"""
+    by = {e.get('comment'): e for e in entries if e.get('comment') in ('GNet', 'LB Backend', 'Phone', 'Wiki')}
+    if set(by) != {'GNet', 'LB Backend', 'Phone', 'Wiki'}:
+        raise SystemExit(f'지침 로어북이 모자라요: {sorted(by)}')
+    for name, dead in DEAD_SECTIONS.items():
+        text = by[name]['content']
+        for sec in dead:
+            text, n = re.subn(r'@@SECTION ' + re.escape(sec) + r'\n[\s\S]*?\n@@END\n*', '', text)
+            if n != 1:
+                raise SystemExit(f'{name} 로어북에 {sec} 섹션이 없어요')
+        by[name]['content'] = text
+    lb = by['LB Backend']['content']
+    by['GNet']['content'] = by['GNet']['content'].rstrip() + '\n\n' + lb[re.search(r'^@@SECTION ', lb, re.M).start():].strip() + '\n'
+    for name, head in GUIDE_HEADERS.items():
+        text = by[name]['content']
+        by[name]['content'] = head + '\n\n' + re.sub(r'^\s*<!--[\s\S]*?-->\s*', '', text)
+    return [e for e in entries if e.get('comment') != 'LB Backend']
+
+
+def to_ccv3(e):
+    """모듈 로어북 항목 → card.json character_book 항목 (Risu가 내보내는 모양)"""
+    folder = e.get('mode') == 'folder'
+    out = {
+        'keys': [e.get('key', '')] if folder else str(e.get('key', '')).split(','),
+        'content': e.get('content', ''), 'extensions': {}, 'enabled': True, 'insertion_order': e.get('insertorder', 100),
+        'constant': bool(e.get('alwaysActive')), 'selective': bool(e.get('selective')), 'name': e.get('comment', ''),
+        'comment': e.get('comment', ''), 'case_sensitive': False, 'use_regex': bool(e.get('useRegex')), 'mode': e.get('mode', 'normal'),
+    }
+    if e.get('selective') and e.get('secondkey'):
+        out['secondary_keys'] = str(e['secondkey']).split(',')
+    if e.get('folder'):
+        out['folder'] = e['folder']
+    return out
 
 
 def drop_settings(entries):
@@ -352,12 +404,13 @@ def main(src, dst):
     }
     # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
     data['character_version'] = version
-    lore = [e for e in lore if e.get('comment') != MANIFEST_COMMENT]
-    lore = add_wiki_base(migrate_directory(patch_lore(drop_settings(lore))))
+    lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
+    lore = add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))
+    settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,
         'content': json.dumps(manifest, ensure_ascii=False), 'mode': 'normal', 'alwaysActive': False,
-        'selective': False, 'useRegex': False, 'bookVersion': 2,
+        'selective': False, 'useRegex': False, 'folder': settings['key'], 'bookVersion': 2,
     })
     kept_regex = [r for r in regex if r.get('comment') in KEEP_REGEX]
     missing = set(KEEP_REGEX) - {r.get('comment') for r in kept_regex}
@@ -374,8 +427,7 @@ def main(src, dst):
     risu.pop('triggerscript', None)
     risu.pop('customScripts', None)
     if data.get('character_book'):
-        data['character_book']['entries'] = drop_settings([e for e in data['character_book']['entries']
-                                                           if e.get('comment') != MANIFEST_COMMENT])
+        data['character_book']['entries'] = [to_ccv3(e) for e in lore]
 
     lite_module = {
         'name': f"{data['name']} Module",

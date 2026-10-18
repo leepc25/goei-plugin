@@ -154,8 +154,8 @@ function sceneDirective(d, dest, names3, support, opening) {
   return [d.sections.COMMON, d.sections[opening ? "OPENING" : "CONTINUATION"], d.sections.CONTEXT].map((t) => fill(t, values)).join("\n\n");
 }
 var TEAM_MAX = 3;
-function validTeam(named, support) {
-  return Number.isInteger(support) && support >= 0 && named >= 0 && named + support <= TEAM_MAX;
+function validTeam(named2, support) {
+  return Number.isInteger(support) && support >= 0 && named2 >= 0 && named2 + support <= TEAM_MAX;
 }
 var OPEN_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n/;
 var CARD_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n([\s\S]*?)\r?\n%%\/SCENE_CARD%%/g;
@@ -315,9 +315,36 @@ function greetingKey(faction, lang, fm) {
   return `${faction}-${lang}-${fm}`;
 }
 
+// src/core/lorebooks.ts
+var DIRECTORY_COMMENT = "Directory";
+var MANIFEST_COMMENT = "Plugin manifest";
+var OLD_DIRECTORY = "괴이봇 명부";
+var OLD_MANIFEST = "괴이봇 플러그인 매니페스트";
+var LEGACY_DATA = ["World catalog", "Agent roster", "Faction display", "Phone tabs", "Start trigger"];
+var RETIRED = ["LB Backend", OLD_MANIFEST];
+var isDirectory = (comment) => comment === DIRECTORY_COMMENT || comment === OLD_DIRECTORY;
+function named(lore, name, old) {
+  const list4 = lore ?? [];
+  const hit = list4.filter((e) => e.comment === name);
+  return hit.length ? hit : list4.filter((e) => e.comment === old);
+}
+var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
+var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
+function parseSeedManifest(raw) {
+  const map = /* @__PURE__ */ new Map();
+  for (const line of raw.split("\n")) {
+    const t = line.replace(/\r/g, "").trim();
+    if (!t || t.startsWith("#")) continue;
+    const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
+    if (!m) continue;
+    const names3 = m[2].split("|").map((s4) => s4.trim()).filter(Boolean);
+    if (names3.length) map.set(m[1], names3);
+  }
+  return map;
+}
+
 // src/core/factions.ts
 var BUILTIN = ["A00", "B00", "C00", "D00", "E00"];
-var DIRECTORY_COMMENT = "괴이봇 명부";
 var TAG_BOOK = "🏷️Tag";
 var FACTION_BOOK = "📜Faction";
 var FACTION_TYPES = [
@@ -348,7 +375,7 @@ function loreText(lore, comment) {
   return lore.filter((e) => e.comment === comment && typeof e.content === "string").map((e) => e.content).join("\n");
 }
 function orgSpecs(lore) {
-  const raw = loreText(lore, DIRECTORY_COMMENT).trim();
+  const raw = directoryEntries(lore).map((e) => String(e.content ?? "")).join("\n").trim();
   if (!raw) return [];
   try {
     const d = obj(JSON.parse(raw.replace(/^﻿/, "").replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "")));
@@ -568,7 +595,6 @@ function regionName(code) {
 }
 
 // src/core/world/directory.ts
-var DIRECTORY_COMMENT2 = "괴이봇 명부";
 var DIRECTORY_SCHEMA = 1;
 var s2 = (v) => typeof v === "string" ? v.trim() : "";
 var list2 = (v) => Array.isArray(v) ? v.map(s2).filter(Boolean) : [];
@@ -587,9 +613,40 @@ function book(lore, comment) {
   const parts = lore.filter((e) => e.comment === comment && typeof e.content === "string" && e.content.trim());
   return parts.length ? parse(parts.map((e) => e.content).join("\n")) : null;
 }
+var dataCache = /* @__PURE__ */ new WeakMap();
 function readDirectoryData(lore) {
-  const d = obj2(book(lore, DIRECTORY_COMMENT2));
-  return d.schema === DIRECTORY_SCHEMA ? d : null;
+  if (dataCache.has(lore)) return dataCache.get(lore);
+  const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
+  const d = obj2(parts.length ? parse(parts.map((e) => e.content).join("\n")) : null);
+  const out = d.schema === DIRECTORY_SCHEMA ? d : null;
+  dataCache.set(lore, out);
+  return out;
+}
+var strMap = (v) => Object.fromEntries(Object.entries(obj2(v)).map(([k, x]) => [k, s2(x)]).filter(([, x]) => x));
+function displaySection(lore) {
+  const d = readDirectoryData(lore)?.호칭;
+  const raw = d && typeof d === "object" ? d : obj2(book(lore, "Faction display"));
+  const out = {};
+  for (const [viewer, m] of Object.entries(obj2(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
+  return out;
+}
+function phoneTabsSection(lore) {
+  const saved = readDirectoryData(lore)?.["괴담톡 탭"];
+  const d = saved && typeof saved === "object" ? obj2(saved) : obj2(book(lore, "Phone tabs"));
+  const tabs2 = (Array.isArray(d.tabs) ? d.tabs : []).map(obj2).map((t) => {
+    const tab2 = { id: s2(t.id), name: s2(t.name), visible_for: list2(t.visible_for) };
+    const by = strMap(t.name_by_faction);
+    if (Object.keys(by).length) tab2.name_by_faction = by;
+    return tab2;
+  }).filter((t) => /^[TX]\d+$/.test(t.id));
+  const order = Object.fromEntries(Object.entries(obj2(d.order_by_faction)).map(([k, v]) => [k, list2(v)]).filter(([, v]) => v.length));
+  return Object.keys(order).length ? { order_by_faction: order, tabs: tabs2 } : { tabs: tabs2 };
+}
+function seedSection(lore) {
+  const saved = readDirectoryData(lore)?.["시작 로어북"];
+  if (saved && typeof saved === "object") return Object.fromEntries(Object.entries(obj2(saved)).map(([k, v]) => [k, list2(v)]));
+  const raw = lore.filter((e) => e.comment === "Start trigger" && typeof e.content === "string").map((e) => e.content).join("\n");
+  return Object.fromEntries(parseSeedManifest(raw));
 }
 var FOLDER_WORDS = { anomaly: "괴이", site: "파밍", agent: "요원" };
 var folderWord = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
@@ -722,9 +779,7 @@ function matchLegacy(rows, lore, used) {
   return void 0;
 }
 function phoneTabs(lore) {
-  const d = obj2(book(lore, "Phone tabs"));
-  const tabs2 = Array.isArray(d.tabs) ? d.tabs.map(obj2) : [];
-  const out = tabs2.map((t) => ({ id: s2(t.id), name: s2(t.name), visibleFor: list2(t.visible_for) })).filter((t) => /^[TX]\d+$/.test(t.id));
+  const out = phoneTabsSection(lore).tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }));
   const extra = extraFactions(lore).map((f) => f.code);
   if (!extra.length) return out;
   for (const t of out) if (BUILTIN.every((f) => t.visibleFor.includes(f))) t.visibleFor.push(...extra.filter((f) => !t.visibleFor.includes(f)));
@@ -733,8 +788,7 @@ function phoneTabs(lore) {
 }
 var FACTIONS = BUILTIN;
 function factionDisplayNames(lore) {
-  const d = obj2(book(lore, "Faction display"));
-  const m = obj2(d.none);
+  const m = displaySection(lore).none ?? {};
   const out = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
   for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
   return { ...extraNames(lore), ...out };
@@ -950,7 +1004,10 @@ function readDirectory(lore) {
     refill: savedRefill ?? ag.refill ?? 5,
     folders: !!members,
     saved: !!data,
-    usedCodes: list2(data?.codes_used)
+    usedCodes: list2(data?.codes_used),
+    display: displaySection(books),
+    phoneTabs: phoneTabsSection(books),
+    seeds: seedSection(books)
   };
   cache2.set(books, dir2);
   return dir2;
@@ -987,6 +1044,9 @@ function directoryData(dir2) {
     if (!b.show) d.show = false;
     out.거점[b.name] = d;
   }
+  if (Object.keys(dir2.display).length) out.호칭 = dir2.display;
+  if (dir2.phoneTabs.tabs.length) out["괴담톡 탭"] = dir2.phoneTabs;
+  if (Object.keys(dir2.seeds).length) out["시작 로어북"] = dir2.seeds;
   for (const p of dir2.anomalies) out.괴이[p.lore] = place2(p);
   for (const p of dir2.sites) out["미스틱 사이트"][p.lore] = place2(p);
   for (const a of dir2.agents) {
@@ -1016,15 +1076,16 @@ function cleanSpec(spec) {
 }
 var HELP = "괴이: 이면세계 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.";
 function directoryContent(data) {
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.거점 ? { 거점: data.거점 } : {}, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
+  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, "미스틱 사이트": data["미스틱 사이트"], 요원: data.요원, 조직: data.조직, ...data.거점 ? { 거점: data.거점 } : {}, ...data.호칭 ? { 호칭: data.호칭 } : {}, ...data["괴담톡 탭"] ? { "괴담톡 탭": data["괴담톡 탭"] } : {}, ...data["시작 로어북"] ? { "시작 로어북": data["시작 로어북"] } : {}, ...data.codes_used?.length ? { codes_used: data.codes_used } : {} }, null, 1);
 }
 function withDirectory(lore, data) {
   const content = directoryContent(data);
-  const at = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT2);
+  const own = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT);
+  const at = own >= 0 ? own : lore.findIndex((e) => isDirectory(e.comment));
   if (at >= 0) {
-    const next = lore.filter((e, i2) => i2 === at || e.comment !== DIRECTORY_COMMENT2);
-    const i = next.findIndex((e) => e.comment === DIRECTORY_COMMENT2);
-    next[i] = { ...next[i], content, key: "", alwaysActive: false };
+    const next = lore.filter((e, i2) => i2 === at || !isDirectory(e.comment));
+    const i = next.indexOf(lore[at]);
+    next[i] = { ...next[i], comment: DIRECTORY_COMMENT, content, key: "", alwaysActive: false };
     return next;
   }
   const settingsFolder = lore.find((e) => isFolder(e) && folderWord(s2(e.comment)) === "설정");
@@ -1032,7 +1093,7 @@ function withDirectory(lore, data) {
     key: "",
     secondkey: "",
     insertorder: 0,
-    comment: DIRECTORY_COMMENT2,
+    comment: DIRECTORY_COMMENT,
     content,
     mode: "normal",
     alwaysActive: false,
@@ -1042,6 +1103,10 @@ function withDirectory(lore, data) {
   };
   if (settingsFolder && typeof settingsFolder.key === "string") entry.folder = settingsFolder.key;
   return [...lore, entry];
+}
+function migrateLore(lore, dir2 = readDirectory(lore)) {
+  if (!dir2.folders) return lore;
+  return withDirectory(lore, directoryData(dir2)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? "")));
 }
 
 // src/core/world/catalog.ts
@@ -1096,15 +1161,7 @@ function parseCatalog(lore) {
     rosterFor: a.rosterFor
   })).filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
   const refill = dir2.refill;
-  let factionDisplay = {};
-  const displayRaw = loreText2(list4, "Faction display");
-  if (displayRaw) {
-    try {
-      factionDisplay = parseJson(displayRaw, "Faction display");
-    } catch {
-      factionDisplay = {};
-    }
-  }
+  const factionDisplay = displaySection(list4);
   const affiliations = {};
   for (const f of factionList(list4)) affiliations[f.code] = f.affiliation;
   return { anomalies, mysticSites, landmarks, people, refill, factionDisplay, extraNames: extraNames(list4), affiliations, factionVars: factionVars(list4) };
@@ -3191,29 +3248,15 @@ function chancePassed(n, rng) {
 }
 var hex2 = (s4) => Array.from(new TextEncoder().encode(s4), (b) => b.toString(16).padStart(2, "0")).join("");
 var contactId = (agentId) => `c_${hex2(agentId)}`;
-function loreJson(lore, name) {
-  const raw = lore.filter((e) => e.comment === name && typeof e.content === "string").map((e) => e.content).join("\n").trim();
-  if (!raw) throw new PhoneError(`${name} 로어북이 없어요.`);
-  try {
-    return JSON.parse(raw.replace(/^﻿/, "").replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, ""));
-  } catch {
-    throw new PhoneError(`${name}: JSON 구문을 확인하세요.`);
-  }
-}
 var s3 = (v) => typeof v === "string" ? v.trim() : "";
 var list3 = (v) => Array.isArray(v) ? v.map(s3).filter(Boolean) : [];
 function tabCatalog(lore) {
-  const data = loreJson(lore, "Phone tabs");
-  if (data?.version !== 1 || !Array.isArray(data.tabs)) throw new PhoneError("Phone tabs: version 1 탭 설정이 필요해요.");
+  const data = phoneTabsSection(lore);
+  if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
   const entries2 = [];
   for (const row4 of data.tabs) {
-    const id = s3(row4?.id);
-    if (!/^[TX]\d+$/.test(id) || entries2.some((e) => e.id === id)) continue;
-    const names3 = {};
-    if (row4.name_by_faction && typeof row4.name_by_faction === "object") {
-      for (const [f, n] of Object.entries(row4.name_by_faction)) if (s3(n)) names3[f] = s3(n);
-    }
-    entries2.push({ id, name: s3(row4.name) || id, names: names3, visibleFor: new Set(list3(row4.visible_for)) });
+    if (entries2.some((e) => e.id === row4.id)) continue;
+    entries2.push({ id: row4.id, name: row4.name || row4.id, names: { ...row4.name_by_faction }, visibleFor: new Set(row4.visible_for) });
   }
   const extra = extraFactions(lore).map((f) => f.code);
   if (extra.length) {
@@ -3221,7 +3264,7 @@ function tabCatalog(lore) {
     for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
   }
   const orders = {};
-  for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = list3(order);
+  for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = [...order];
   return { entries: entries2, orders };
 }
 function readCustom(chat) {
@@ -3880,6 +3923,8 @@ var INTERNAL = /* @__PURE__ */ new Set([
   "⚙️설정",
   "괴이봇 플러그인 매니페스트",
   "괴이봇 명부",
+  "Plugin manifest",
+  "Directory",
   "WIKI_DIAGNOSTIC"
 ]);
 var ACTIVE_BOOKS = ["📜Faction", "🙂Roster"];
@@ -4027,14 +4072,12 @@ var REQUIRED_GNET = [
 ];
 var REQUIRED_LB = ["SYSTEM", "OUTPUT", "JAILBREAK", "JOB"];
 function gnetBooks(src) {
-  const g = policySections(src.char.globalLore, "GNet");
-  const lb = policySections(src.char.globalLore, "LB Backend");
-  for (const k of REQUIRED_GNET) if (g[k] === void 0) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
-  for (const k of REQUIRED_LB) if (lb[k] === void 0) throw new GnetError(`LB Backend 로어북의 ${k} 섹션이 없어요.`);
+  const g = { ...policySections(src.char.globalLore, "LB Backend"), ...policySections(src.char.globalLore, "GNet") };
+  for (const k of [...REQUIRED_GNET, ...REQUIRED_LB]) if (g[k] === void 0) throw new GnetError(`GNet 로어북의 ${k} 섹션이 없어요.`);
   const env2 = { ...cbsEnv(src), vars: gnetVars(src.chat.scriptstate) };
   return {
     read(name) {
-      const raw = g[name] ?? lb[name] ?? "";
+      const raw = g[name] ?? "";
       return evaluate(raw, env2).replace(/__LIMIT_(\w+?)__/g, (m, k) => k in LIMITS ? String(LIMITS[k]) : m).replace(/<!--[\s\S]*?-->/g, "").trim();
     }
   };
@@ -4266,21 +4309,8 @@ function mainContextRules(src) {
 }
 
 // src/core/seed.ts
-var SEED_ENTRY = "Start trigger";
 var SEED_OPEN = "%%SEED%%";
 var SEED_CLOSE = "%%/SEED%%";
-function parseSeedManifest(raw) {
-  const map = /* @__PURE__ */ new Map();
-  for (const line of raw.split("\n")) {
-    const t = line.replace(/\r/g, "").trim();
-    if (!t || t.startsWith("#")) continue;
-    const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
-    if (!m) continue;
-    const names3 = m[2].split("|").map((s4) => s4.trim()).filter(Boolean);
-    if (names3.length) map.set(m[1], names3);
-  }
-  return map;
-}
 function buildSeed(lore, faction, fm, names3) {
   const byComment = /* @__PURE__ */ new Map();
   for (const e of lore) {
@@ -4289,11 +4319,7 @@ function buildSeed(lore, faction, fm, names3) {
     if (!list4.includes(e.content)) list4.push(e.content);
     byComment.set(e.comment, list4);
   }
-  if (!names3) {
-    const manifest = byComment.get(SEED_ENTRY)?.join("\n");
-    if (!manifest) return { text: "", missing: [SEED_ENTRY] };
-    names3 = parseSeedManifest(manifest).get(`${faction}-${fm}`);
-  }
+  names3 ??= seedSection(lore)[`${faction}-${fm}`];
   if (!names3?.length) return { text: "", missing: [] };
   const parts = [];
   const missing = [];
@@ -4697,9 +4723,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
 }
 
 // src/core/start.ts
-var MANIFEST_COMMENT = "괴이봇 플러그인 매니페스트";
 function readManifest(lore) {
-  const entry = (lore ?? []).find((e) => e.comment === MANIFEST_COMMENT);
+  const entry = manifestEntry(lore);
   if (!entry || typeof entry.content !== "string") return null;
   try {
     const m = JSON.parse(entry.content);
@@ -10172,7 +10197,7 @@ var CARD_FIELDS = [
   "virtualscript",
   "triggerscript"
 ];
-var PROTECTED_LORE = [DIRECTORY_COMMENT2];
+var PROTECTED_LORE = [DIRECTORY_COMMENT, OLD_DIRECTORY];
 function compareVersions(a, b) {
   const pa = String(a).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
   const pb = String(b).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
@@ -10183,7 +10208,7 @@ function compareVersions(a, b) {
   return 0;
 }
 function cardVersion(lore) {
-  const entry = (lore ?? []).find((e) => e.comment === MANIFEST_COMMENT);
+  const entry = manifestEntry(lore);
   try {
     const v = JSON.parse(String(entry?.content ?? "")).version;
     return typeof v === "string" && v ? v : "0";
@@ -10231,8 +10256,15 @@ function mergeByName(current3, incoming, name, keep = () => false) {
   return { list: list4, count };
 }
 var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
+function renamed(current3, incoming) {
+  const target = incoming.find((e) => e.comment === DIRECTORY_COMMENT);
+  const hasNew = current3.some((e) => e.comment === DIRECTORY_COMMENT);
+  const keepNames = new Set(incoming.map((e) => e.comment));
+  return current3.filter((e) => !RETIRED.includes(String(e.comment ?? "")) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
+}
 function planUpdate(char, payload) {
-  const lore = mergeByName(char.globalLore ?? [], payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
+  const lore = mergeByName(renamed(char.globalLore ?? [], payload.data.globalLore), payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
+  if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? "")))) lore.list = migrateLore(lore.list);
   const scripts = mergeByName(char.customscript ?? [], payload.data.customscript, (r) => r.comment ?? "");
   const next = { ...char, globalLore: lore.list, customscript: scripts.list };
   delete next.customscripts;

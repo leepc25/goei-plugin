@@ -1,11 +1,13 @@
 // 카드 명부: 로어북 폴더(🚧괴이·🎁파밍·🙂요원)에서 괴이·미스틱 사이트·요원을 모으고, 요원 소속은 조직 목록에서 고른다.
-// 세부값은 「괴이봇 명부」 로어북(플러그인 창에서 편집)에서 읽는다.
-// 값의 우선순위: 괴이봇 명부 > 옛 World catalog / Agent roster 줄 > 로어북 키에서 추정.
+// 세부값은 「Directory」 로어북(옛 이름 「괴이봇 명부」, 플러그인 창에서 편집)에서 읽는다.
+// 값의 우선순위: 명부 > 옛 World catalog / Agent roster 줄 > 로어북 키에서 추정.
+// 세력 호칭·괴담톡 탭·첫 턴 로어북도 명부에 두고, 옛 카드는 Faction display·Phone tabs·Start trigger에서 읽는다.
 // 폴더가 없는 카드는 옛 목록 그대로 쓴다.
 import { BUILTIN, extraFactions, extraNames, extraTabId, extraTabs, type FactionSpec, pickSpec } from '../factions';
+import { DIRECTORY_COMMENT, directoryEntries, isDirectory, LEGACY_DATA, parseSeedManifest } from '../lorebooks';
 import type { LoreEntry } from '../types';
 
-export const DIRECTORY_COMMENT = '괴이봇 명부';
+export { DIRECTORY_COMMENT } from '../lorebooks';
 export const DIRECTORY_SCHEMA = 1;
 
 export type PlaceKind = 'anomaly' | 'site';
@@ -78,6 +80,22 @@ export interface Directory {
   saved: boolean;
   /** 지금까지 새 세력에 준 코드 (지워도 다시 쓰지 않는다) */
   usedCodes: string[];
+  /** 내 소속(또는 none) → 소속 코드 → 부르는 이름 */
+  display: Record<string, Record<string, string>>;
+  phoneTabs: PhoneTabsData;
+  /** 「A00-1」 같은 시작 조합 → 첫 턴에 실을 로어북 이름 */
+  seeds: Record<string, string[]>;
+}
+
+export interface PhoneTabData {
+  id: string;
+  name: string;
+  name_by_faction?: Record<string, string>;
+  visible_for: string[];
+}
+export interface PhoneTabsData {
+  order_by_faction?: Record<string, string[]>;
+  tabs: PhoneTabData[];
 }
 
 export interface PlaceData {
@@ -118,6 +136,9 @@ export interface DirectoryData {
   요원?: Record<string, AgentData>;
   조직?: Record<string, OrgData>;
   거점?: Record<string, BaseData>;
+  호칭?: Record<string, Record<string, string>>;
+  '괴담톡 탭'?: PhoneTabsData;
+  '시작 로어북'?: Record<string, string[]>;
   /** 새 세력에 준 적 있는 코드 */
   codes_used?: string[];
 }
@@ -142,9 +163,47 @@ function book(lore: LoreEntry[], comment: string): unknown {
   return parts.length ? parse(parts.map((e) => e.content).join('\n')) : null;
 }
 
+const dataCache = new WeakMap<LoreEntry[], DirectoryData | null>();
+
 export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
-  const d = obj(book(lore, DIRECTORY_COMMENT));
-  return d.schema === DIRECTORY_SCHEMA ? (d as unknown as DirectoryData) : null;
+  if (dataCache.has(lore)) return dataCache.get(lore)!;
+  const parts = directoryEntries(lore).filter((e) => typeof e.content === 'string' && e.content.trim());
+  const d = obj(parts.length ? parse(parts.map((e) => e.content).join('\n')) : null);
+  const out = d.schema === DIRECTORY_SCHEMA ? (d as unknown as DirectoryData) : null;
+  dataCache.set(lore, out);
+  return out;
+}
+
+// ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
+
+const strMap = (v: unknown): Record<string, string> => Object.fromEntries(Object.entries(obj(v)).map(([k, x]) => [k, s(x)]).filter(([, x]) => x));
+
+export function displaySection(lore: LoreEntry[]): Record<string, Record<string, string>> {
+  const d = readDirectoryData(lore)?.호칭;
+  const raw = d && typeof d === 'object' ? d : obj(book(lore, 'Faction display'));
+  const out: Record<string, Record<string, string>> = {};
+  for (const [viewer, m] of Object.entries(obj(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
+  return out;
+}
+
+export function phoneTabsSection(lore: LoreEntry[]): PhoneTabsData {
+  const saved = readDirectoryData(lore)?.['괴담톡 탭'];
+  const d = saved && typeof saved === 'object' ? obj(saved) : obj(book(lore, 'Phone tabs'));
+  const tabs = (Array.isArray(d.tabs) ? (d.tabs as unknown[]) : []).map(obj).map((t) => {
+    const tab: PhoneTabData = { id: s(t.id), name: s(t.name), visible_for: list(t.visible_for) };
+    const by = strMap(t.name_by_faction);
+    if (Object.keys(by).length) tab.name_by_faction = by;
+    return tab;
+  }).filter((t) => /^[TX]\d+$/.test(t.id));
+  const order = Object.fromEntries(Object.entries(obj(d.order_by_faction)).map(([k, v]) => [k, list(v)]).filter(([, v]) => v.length));
+  return Object.keys(order).length ? { order_by_faction: order, tabs } : { tabs };
+}
+
+export function seedSection(lore: LoreEntry[]): Record<string, string[]> {
+  const saved = readDirectoryData(lore)?.['시작 로어북'];
+  if (saved && typeof saved === 'object') return Object.fromEntries(Object.entries(obj(saved)).map(([k, v]) => [k, list(v)]));
+  const raw = lore.filter((e) => e.comment === 'Start trigger' && typeof e.content === 'string').map((e) => e.content).join('\n');
+  return Object.fromEntries(parseSeedManifest(raw));
 }
 
 const FOLDER_WORDS: Record<'anomaly' | 'site' | 'agent', string> = { anomaly: '괴이', site: '파밍', agent: '요원' };
@@ -282,9 +341,7 @@ export interface TabInfo {
 }
 
 export function phoneTabs(lore: LoreEntry[]): TabInfo[] {
-  const d = obj(book(lore, 'Phone tabs'));
-  const tabs = Array.isArray(d.tabs) ? (d.tabs as unknown[]).map(obj) : [];
-  const out = tabs.map((t) => ({ id: s(t.id), name: s(t.name), visibleFor: list(t.visible_for) })).filter((t) => /^[TX]\d+$/.test(t.id));
+  const out = phoneTabsSection(lore).tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }));
   // 새 세력: 기본 다섯 세력 모두에게 열린 탭은 새 세력에도 열고, 전용 탭을 덧붙인다 (phone.ts tabCatalog와 같음)
   const extra = extraFactions(lore).map((f) => f.code);
   if (!extra.length) return out;
@@ -297,8 +354,7 @@ export function phoneTabs(lore: LoreEntry[]): TabInfo[] {
 export const FACTIONS = BUILTIN;
 
 export function factionDisplayNames(lore: LoreEntry[]): Record<string, string> {
-  const d = obj(book(lore, 'Faction display'));
-  const m = obj(d.none);
+  const m = displaySection(lore).none ?? {};
   const out: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
   for (const f of FACTIONS) if (s(m[f])) out[f] = s(m[f]);
   return { ...extraNames(lore), ...out };
@@ -563,6 +619,9 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
     folders: !!members,
     saved: !!data,
     usedCodes: list(data?.codes_used),
+    display: displaySection(books),
+    phoneTabs: phoneTabsSection(books),
+    seeds: seedSection(books),
   };
   cache.set(books, dir);
   return dir;
@@ -602,6 +661,9 @@ export function directoryData(dir: Directory): DirectoryData {
     if (!b.show) d.show = false;
     out.거점[b.name] = d;
   }
+  if (Object.keys(dir.display).length) out.호칭 = dir.display;
+  if (dir.phoneTabs.tabs.length) out['괴담톡 탭'] = dir.phoneTabs;
+  if (Object.keys(dir.seeds).length) out['시작 로어북'] = dir.seeds;
   for (const p of dir.anomalies) out.괴이![p.lore] = place(p);
   for (const p of dir.sites) out['미스틱 사이트']![p.lore] = place(p);
   for (const a of dir.agents) {
@@ -630,17 +692,19 @@ const HELP =
   '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
+  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */
 export function withDirectory(lore: LoreEntry[], data: DirectoryData): LoreEntry[] {
   const content = directoryContent(data);
-  const at = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT);
+  // 새 이름 항목을 먼저 쓰고, 없으면 옛 이름 항목을 새 이름으로 바꿔 쓴다. 남는 명부 항목은 지운다
+  const own = lore.findIndex((e) => e.comment === DIRECTORY_COMMENT);
+  const at = own >= 0 ? own : lore.findIndex((e) => isDirectory(e.comment));
   if (at >= 0) {
-    const next = lore.filter((e, i) => i === at || e.comment !== DIRECTORY_COMMENT);
-    const i = next.findIndex((e) => e.comment === DIRECTORY_COMMENT);
-    next[i] = { ...next[i], content, key: '', alwaysActive: false };
+    const next = lore.filter((e, i) => i === at || !isDirectory(e.comment));
+    const i = next.indexOf(lore[at]);
+    next[i] = { ...next[i], comment: DIRECTORY_COMMENT, content, key: '', alwaysActive: false };
     return next;
   }
   const settingsFolder = lore.find((e) => isFolder(e) && folderWord(s(e.comment)) === '설정');
@@ -657,10 +721,10 @@ export function sameData(a: DirectoryData, b: DirectoryData): boolean {
 }
 
 /**
- * 명부로 옮기기: 괴이봇 명부를 지금 값으로 적고, 옛 World catalog(괴이·미스틱 사이트·랜드마크)와 Agent roster를 뺀다.
- * 거점도 명부로 옮긴다. 폴더가 없는 카드는 그대로 돌려준다(옛 목록이 유일한 자료라서).
+ * 명부로 옮기기: 명부를 지금 값으로 적고(옛 이름이면 Directory로), 옮긴 옛 데이터 로어북
+ * (World catalog·Agent roster·Faction display·Phone tabs·Start trigger)을 뺀다. 폴더가 없는 카드는 그대로 돌려준다(옛 목록이 유일한 자료라서).
  */
 export function migrateLore(lore: LoreEntry[], dir: Directory = readDirectory(lore)): LoreEntry[] {
   if (!dir.folders) return lore;
-  return withDirectory(lore, directoryData(dir)).filter((e) => e.comment !== 'Agent roster' && e.comment !== 'World catalog');
+  return withDirectory(lore, directoryData(dir)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? '')));
 }

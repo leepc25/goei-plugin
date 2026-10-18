@@ -22,26 +22,34 @@ check('첫 메시지에 CBS 없음', '{{' not in cl['first_mes'], len(cl['first_
 bg = cl['extensions']['risuai']['backgroundHTML']
 check('배경 HTML 24KB 이하', len(bg) < 24000, len(bg))
 check('상태창 CSS 포함', '.dv.dv-status' in bg and '.ib-asset-hover' in bg)
-MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog')
-orig_books = [e for e in ms['lorebook'] if e['comment'] not in MOVED]
+MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog', 'Faction display', 'Phone tabs', 'Start trigger', 'LB Backend')
+# 지침은 고친 채로 들어간다 (안 쓰는 섹션 빼기·LB Backend 합치기·대기 줄 문구). 아래에서 따로 본다
+TIDIED = ('GNet', 'Phone', 'Wiki')
+orig_books = [e for e in ms['lorebook'] if e['comment'] not in MOVED + TIDIED]
 orig_lore = {(e['comment'], e['content']) for e in orig_books}
-lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, '괴이봇 명부', 'World catalog')]
+lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] != '📖위키']
 FAC_VARS = re.compile(r'\{\{getvar::fac_(codes|ac|pool)\}\}')
 def unplaced(e):
     c = e['content']
     if e['comment'] == '📜Faction':
-        return c.replace('{{getvar::fac_extra}}\n', '')
+        return re.sub(r'\s+', ' ', c.replace('{{getvar::fac_extra}}', '')).strip()
     return FAC_VARS.sub('', c) if e['comment'] == '🏷️Tag' else c
-orig_unplaced = {(e['comment'], e['content'].rstrip() if e['comment'] == '📜Faction' else e['content']) for e in orig_books}
+orig_unplaced = {(e['comment'], re.sub(r'\s+', ' ', e['content']).strip() if e['comment'] == '📜Faction' else e['content']) for e in orig_books}
 check('로어북 원본 그대로(옮긴 목록·새 세력 자리표시자만 제외)', {(e['comment'], unplaced(e)) for e in lite_lore} == orig_unplaced and len(lite_lore) == len(orig_books))
 tag = next(e for e in ml['lorebook'] if e['comment'] == '🏷️Tag')['content']
 fac = next(e for e in ml['lorebook'] if e['comment'] == '📜Faction')['content']
 check('🏷️Tag·📜Faction에 새 세력 자리표시자', all(f'{{{{getvar::fac_{k}}}}}' in tag for k in ('codes', 'ac', 'pool')) and '{{getvar::fac_extra}}' in fac)
-book = next((e for e in ml['lorebook'] if e['comment'] == '괴이봇 명부'), None)
-check('괴이봇 명부: 키 없음·상시 아님(모델에게 안 감)', book and book['key'] == '' and not book.get('alwaysActive'))
-check('Agent roster 없음', not any(e['comment'] == 'Agent roster' for e in ml['lorebook']))
-wc = json.loads(next(e for e in ml['lorebook'] if e['comment'] == 'World catalog')['content'])
-check('World catalog에는 랜드마크만', [k for k in wc if not k.startswith('_')] == ['랜드마크'] and wc['랜드마크'] == json.loads(next(e for e in ms['lorebook'] if e['comment'] == 'World catalog')['content'])['랜드마크'])
+book = next((e for e in ml['lorebook'] if e['comment'] == 'Directory'), None)
+check('Directory: 키 없음·상시 아님(모델에게 안 감)', book and book['key'] == '' and not book.get('alwaysActive'))
+check('옮긴 옛 데이터 로어북 없음', not any(e['comment'] in MOVED for e in ml['lorebook']))
+dd = json.loads(book['content'])
+check('명부에 거점·호칭·괴담톡 탭·시작 로어북', all(k in dd for k in ('거점', '호칭', '괴담톡 탭', '시작 로어북')) and len(dd['거점']) == 6)
+secs = lambda c: dict(re.findall(r'@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END', c))
+orig_s = {n: secs(next(e for e in ms['lorebook'] if e['comment'] == n)['content']) for n in TIDIED + ('LB Backend',)}
+lite_s = {n: secs(next(e for e in ml['lorebook'] if e['comment'] == n)['content']) for n in TIDIED}
+check('GNet에 LB Backend 생성 틀이 합쳐짐', all(lite_s['GNet'][k] == orig_s['LB Backend'][k] for k in ('SYSTEM', 'OUTPUT', 'JAILBREAK', 'JOB')))
+check('지침 섹션 본문은 원본 그대로 (대기 줄 문구만 고침)', all(lite_s[n][k] == {**orig_s['LB Backend'], **orig_s[n]}[k] for n in TIDIED for k in lite_s[n] if (n, k) != ('Phone', 'PATCH')))
+check('card.json 로어북 = 모듈 로어북', [e['comment'] for e in cl['character_book']['entries']] == [e['comment'] for e in ml['lorebook']])
 import subprocess, tempfile
 with tempfile.TemporaryDirectory() as tmp:
     a, b = Path(tmp) / 'a.json', Path(tmp) / 'b.json'
