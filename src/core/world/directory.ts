@@ -428,7 +428,14 @@ const ORG_ENGLISH: Record<string, string> = {
   A00: 'Management Bureau', B00: 'Fake Management Bureau', C00: 'Baekilmong', D00: 'Civilian', E00: 'Freelancer',
   특수재난대응협회: 'Special Disaster Response Association', '중림 지하상가': 'Jungnim Underground Shopping Center', 교황청: 'Vatican',
   이슬람: 'Islam', 발푸르기스: 'Walpurgis Society', 흡혈귀: 'Vampires',
+  무명찬란교: 'Mumyeong Chanrangyo', 극단: 'The Troupe', 병원: 'The Hospital', '세계정치 게시판': 'The World Politics Forum',
 };
+
+/** 로어북 폴더 「🌆세력」(또는 「조직」)의 항목들 */
+function orgFolder(lore: LoreEntry[]): LoreEntry[] {
+  const keys = new Set(lore.filter((e) => isFolder(e) && ['세력', '조직'].includes(folderWord(s(e.comment))) && typeof e.key === 'string').map((e) => e.key as string));
+  return keys.size ? lore.filter((e) => !isFolder(e) && keys.has(String(e.folder ?? '')) && s(e.comment)) : [];
+}
 
 /** 조직 목록: 다섯 플레이 세력 → 명부에 적힌 조직 → 요원 소속에만 있는 조직 */
 export function buildOrgs(lore: LoreEntry[], agents: AgentRow[], saved: Record<string, unknown>): OrgRow[] {
@@ -456,6 +463,18 @@ export function buildOrgs(lore: LoreEntry[], agents: AgentRow[], saved: Record<s
   for (const f of FACTIONS) make(names[f], f);
   for (const name of Object.keys(saved)) if (s(name) && !out.some((o) => o.name === name)) make(name, '');
   for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, '');
+  // 세력 폴더에 넣은 로어북도 조직으로 (이름이 같거나 한쪽이 다른 쪽을 품으면 이미 있는 조직: 협회 ↔ 특수재난대응협회)
+  for (const e of orgFolder(lore)) {
+    const name = s(e.comment);
+    const same = (o: OrgRow) => o.name === name || (Math.min(o.name.length, name.length) >= 2 && (o.name.includes(name) || name.includes(o.name)));
+    if (out.some(same)) continue;
+    make(name, '');
+    const o = out[out.length - 1];
+    if (!o.spec.english) {
+      const en = guessEnglish(e);
+      if (en) o.spec.english = en;
+    }
+  }
   return out;
 }
 

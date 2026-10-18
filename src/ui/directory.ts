@@ -56,6 +56,19 @@ function draftOf(ctx: ChatContext): Directory {
     dirUi.draft = structuredClone(readDirectory(lore));
     dirUi.base = snapshot(dirUi.draft);
     dirUi.from = lore;
+  } else if (dirUi.from !== lore) {
+    // 고친 값이 있는 채로 로어북이 바뀌었다(폴더에 새 항목 등): 고친 값은 두고 새로 생긴 줄만 끼워 넣는다
+    const fresh = readDirectory(lore);
+    const d = dirUi.draft;
+    const add = <T>(have: T[], next: T[], key: (r: T) => string) => {
+      const known = new Set(have.map(key));
+      for (const r of next) if (!known.has(key(r))) have.push(structuredClone(r));
+    };
+    add(d.anomalies, fresh.anomalies, (r) => r.lore);
+    add(d.sites, fresh.sites, (r) => r.lore);
+    add(d.agents, fresh.agents, (r) => r.lore);
+    add(d.orgs, fresh.orgs, (r) => r.name);
+    dirUi.from = lore;
   }
   return dirUi.draft;
 }
@@ -490,6 +503,7 @@ export function directoryView(ctx: ChatContext): string {
     <div class="dir-tools">
       <div class="dir-qbox">${directorySearch()}</div>
       ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? ' on' : ''}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ''}
+      <button class="dir-tool icon" data-action="dir-reload" aria-label="로어북 다시 읽기" title="로어북 다시 읽기">${ICONS.refresh}</button>
       <button class="dir-tool icon${dirUi.help ? ' on' : ''}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>
     </div>
     ${dirUi.adding ? addPanel(ctx) : ''}
@@ -861,6 +875,12 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.draft = null;
       dirUi.notice = '';
       break;
+    case 'dir-reload':
+      // 리수를 새로고침하지 않아도 로어북에 새로 넣은 항목을 읽는다 (고친 값은 그대로)
+      await env.refresh();
+      dirUi.done = '로어북을 다시 읽었어요.';
+      env.render();
+      return true;
     case 'dir-save': {
       if (!dirty() || dirUi.busy) return true;
       dirUi.busy = true;

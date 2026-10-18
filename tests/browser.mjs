@@ -1391,7 +1391,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*12/.test(kinds), kinds);
+  assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   await page.fill('[data-input="dir-q"]', '명일');
@@ -1985,6 +1985,20 @@ if (fixture.globalLore.some(packed)) {
   // 괴이 사진 고르기 → 저장하면 명부에 남음
   await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
   await page.click('[data-action="set-scope"][data-value="card"]');
+  // 고친 값이 있는 채로 로어북에 새 세력·괴이를 넣고 「다시 읽기」 → 새 줄만 들어오고 새 거점은 그대로
+  await page.evaluate(() => {
+    const lore = window.__char.globalLore;
+    const key = (name) => lore.find((e) => e.mode === 'folder' && e.comment === name)?.key;
+    lore.push({ comment: '시험 결사', content: '### Test Society', key: 'Test Society, 시험 결사', folder: key('🌆세력'), mode: 'normal' });
+    lore.push({ comment: '시험 괴이', content: '괴이', key: 'Test Anomaly', folder: key('🚧괴이'), mode: 'normal' });
+  });
+  await page.click('[data-action="dir-reload"]');
+  await page.click('[data-action="dir-kind"][data-value="org"]');
+  await page.waitForSelector('.dir-head[data-value="시험 결사"]');
+  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
+  await page.waitForSelector('.dir-head[data-value="시험 괴이"]');
+  await page.click('[data-action="dir-kind"][data-value="base"]');
+  await page.waitForSelector('.dir-head[data-value="시험 거점"]');
   await page.click('[data-action="dir-kind"][data-value="anomaly"]');
   const first = await page.getAttribute('.dir-head >> nth=0', 'data-value');
   await page.click('.dir-head >> nth=0');
