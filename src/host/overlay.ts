@@ -123,6 +123,9 @@ async function body(): Promise<{ doc: Safe; body: SafeEl } | null> {
   return b ? { doc, body: b } : null;
 }
 
+/** 이 봇 채팅 화면에서 아무 곳이나 눌렀을 때 (좌표로 직접 맞춰 본다) */
+export const docClicks = new Set<(doc: Safe, x: number, y: number) => void | Promise<void>>();
+
 export interface Fab {
   /** intro: 이 봇 채팅 화면에 막 들어왔을 때 버튼 자리에서 접속 효과 */
   setVisible(visible: boolean, intro?: boolean): Promise<void>;
@@ -292,6 +295,8 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
   };
   const onClick = async (ev: PointerEv) => {
     if (!visible) return;
+    // 채팅 속 카드 버튼(취소 등)도 이 리스너로 받는다 (Risu는 요소마다 리스너를 못 건다)
+    for (const f of docClicks) void f(doc, ev.clientX ?? -1, ev.clientY ?? -1);
     if (!inside(await rect(), ev.clientX, ev.clientY)) return;
     await loop;
     if (moved) return; // 끌고 놓은 뒤 따라오는 클릭

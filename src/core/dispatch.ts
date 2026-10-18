@@ -103,6 +103,8 @@ export function validTeam(named: number, support: number): boolean {
 export interface SceneSummary {
   target: string;
   party: string;
+  /** 자동 전송이 막혀 아직 안 보낸 요청 (카드에 「전송을 눌러 주세요」·취소) */
+  unsent?: boolean;
 }
 
 const OPEN_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n/;
@@ -131,10 +133,28 @@ export function readScene(text: string): SceneSummary | null {
   if (!m) return null;
   try {
     const s = JSON.parse(fromHex(m[1])) as SceneSummary;
-    return { target: String(s.target ?? ''), party: String(s.party ?? '') };
+    return { target: String(s.target ?? ''), party: String(s.party ?? ''), ...(s.unsent ? { unsent: true } : {}) };
   } catch {
     return null;
   }
+}
+
+/** 기록 카드의 「아직 안 보냄」 표시를 켜고 끈다 (본문은 그대로) */
+export function setSceneUnsent(text: string, on: boolean): string {
+  return text.replace(/%%SCENE_CARD:([0-9a-f]+)%%/g, (all, hex: string) => {
+    try {
+      const s = JSON.parse(fromHex(hex)) as SceneSummary;
+      if (!!s.unsent === on) return all;
+      const next: SceneSummary = { target: s.target, party: s.party, ...(on ? { unsent: true } : {}) };
+      return `%%SCENE_CARD:${toHex(JSON.stringify(next))}%%`;
+    } catch {
+      return all;
+    }
+  });
+}
+
+export function isSceneUnsent(text: string): boolean {
+  return hasSceneCard(text) && !!readScene(text)?.unsent;
 }
 
 /** 모델 요청용: 표식만 지우고 본문은 남긴다 */
@@ -147,7 +167,7 @@ export function renderSceneCards(text: string, render: (s: SceneSummary) => stri
   return text.replace(CARD_RE, (all, hex: string) => {
     try {
       const s = JSON.parse(fromHex(hex)) as SceneSummary;
-      return render({ target: String(s.target ?? ''), party: String(s.party ?? '') });
+      return render({ target: String(s.target ?? ''), party: String(s.party ?? ''), ...(s.unsent ? { unsent: true } : {}) });
     } catch {
       return all;
     }

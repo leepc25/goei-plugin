@@ -12,7 +12,8 @@ import {
 } from '../core/world';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
-import { SEND_FALLBACK, noticeClass, sendNow } from '../host/send';
+import { noticeClass, sendNow } from '../host/send';
+import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
 import { elapsedText, evCard, peopleChips } from './evcard';
 import { agentInner, stLabel } from './images';
@@ -574,14 +575,10 @@ async function compose(ctx: ChatContext, env: FieldEnv, build: (latest: Chat, x:
       return build(latest, x).chat;
     });
     resetField();
-    // 놓은 메시지를 바로 보낸다. 안 되면 창을 연 채로 안내 (채팅창 전송 버튼으로 보내면 된다)
+    // 놓은 요청을 바로 보낸다. 막혀 있으면(플러그인 모델 등) 채팅 속 카드에 「전송을 눌러 주세요」와 취소를 붙이고 창은 그대로 닫는다
     const sent = await sendNow();
     env.setBusy(false);
-    if (!sent) {
-      env.setNotice(SEND_FALLBACK);
-      await env.refresh();
-      return;
-    }
+    if (!sent) await markUnsent(ctx.charIndex, ctx.chatIndex).catch(() => {});
     await env.close();
     await env.refresh();
   } catch (error) {

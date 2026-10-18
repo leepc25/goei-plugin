@@ -598,6 +598,33 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="depart"]');
   await page.waitForFunction((n) => window.__chat.message.length === n + 1 && window.__chat.message.at(-1).data.includes('Subject: 서울특별시'), before);
   assert.ok((await page.evaluate(() => window.__chat.message.at(-1).data)).includes('Companions: No additional companions'));
+  // 자동 전송이 막히면: 창은 닫고, 채팅 속 카드에 「전송 버튼」 안내와 취소. 취소를 누르면 그 메시지를 지운다
+  {
+    // 위에서 요청 처리(replacer)를 불러 「응답 기다리는 중」이 켜져 있다. 응답이 붙은 것처럼 끈다 (기다리는 중에는 취소가 안 된다)
+    await page.evaluate(async () => {
+      const c = window.__chat;
+      const at = c.message.map((m) => m.role).lastIndexOf('char');
+      await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: at });
+      document.querySelector('.gx').style.display = 'none';
+    });
+    const n0 = await page.evaluate(() => window.__chat.message.length);
+    await page.evaluate(() => (window.__sendFail = true));
+    await open(page);
+    await page.waitForSelector('.gx-canvas');
+    await page.selectOption('.gx-select', '02');
+    await page.click('.gx-pin[data-value="02-1"]');
+    await page.click('[data-action="depart"]');
+    await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
+    await page.waitForFunction(() => window.__chat.message.at(-1).data.startsWith('%%SCENE_CARD:'));
+    const last = await page.evaluate(() => window.__chat.message.at(-1).data);
+    const html = await page.evaluate((t) => window.__calls.handlers.display(t), last);
+    assert.ok(html.includes('data-goei-cancel') && html.includes('전송 버튼'), html);
+    assert.equal(await page.locator('.gx-err, .gx-notice').count(), 0, '창 안내 없음');
+    await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'msg'; d.innerHTML = h; document.querySelector('.default-chat-screen').appendChild(d); }, html);
+    await page.click('#msg [data-goei-cancel]');
+    await page.waitForFunction((n) => window.__chat.message.length === n - 1, n0);
+    await page.evaluate(() => { document.getElementById('msg').remove(); window.__sendFail = false; });
+  }
   // 상황 종료: 두 번 눌러 확인
   await open(page);
   await page.waitForSelector('.gx-evc');

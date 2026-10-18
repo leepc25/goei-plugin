@@ -1,3 +1,5 @@
+import { clearUnsent } from './host/unsent';
+import { isSceneUnsent } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
@@ -157,6 +159,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       })) ?? now;
     }
+    // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
+    if (now.message.some((m) => typeof m.data === 'string' && isSceneUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 모델을 겹쳐 부르지 않게 차례로)
@@ -191,11 +195,17 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
 const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 /** 채팅 화면의 이동·커스텀 임무 기록 카드 (본문 대신 목표와 투입만) */
-function sceneCardHtml(s: { target: string; party: string }): string {
+function sceneCardHtml(s: { target: string; party: string; unsent?: boolean }): string {
   const p = cardPalette();
+  // 자동 전송이 막혀 아직 안 보낸 요청: 전송 안내와 취소 (host/unsent.ts)
+  const unsent = s.unsent
+    ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">`
+      + `<span style="flex:1;color:${p.text}">채팅창의 전송 버튼을 누르면 보내져요.</span>`
+      + `<button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button></span>`
+    : '';
   return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap">`
     + `<span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s.target)}</span>`
-    + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span></div>`;
+    + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span>${unsent}</div>`;
 }
 
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
