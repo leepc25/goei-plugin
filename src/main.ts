@@ -6,6 +6,8 @@ import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from '.
 import { hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
 import { applyAdvanced } from './core/advanced';
+import { makeFocus, sceneText } from './core/focus';
+import { buildRegistry, type Registry } from './core/world/registry';
 import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
 import { autoRefresh } from './ui/phone';
@@ -41,8 +43,13 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   messages = unwrapCalls(unwrapScenes(messages).messages).messages;
   if (liteNow) {
     messages = stripHistoryTags(messages);
-    const ctx = await moduleContext().catch(() => [] as string[]);
-    for (const c of ctx) messages = [...messages, { role: 'system', content: c } as M];
+    const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
+    if (ctx.length) {
+      // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
+      const at = messages.map((m) => m?.role).lastIndexOf('user');
+      const add = ctx.map((c) => ({ role: 'system', content: c }) as M);
+      messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+    }
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
@@ -60,10 +67,10 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
 }
 
-let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null } | null = null;
+let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
 
-/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청 끝에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록 */
-async function moduleContext(): Promise<string[]> {
+/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록 */
+async function moduleContext(scene: string): Promise<string[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chatIndex = await risuai.getCurrentChatIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
@@ -76,21 +83,22 @@ async function moduleContext(): Promise<string[]> {
   if (rulesCache?.charIndex !== charIndex) {
     const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
     const src = { char: { globalLore: char?.globalLore }, chat };
-    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore) };
+    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
   }
+  const focus = makeFocus(scene, rulesCache.registry);
   const out: string[] = [];
   if (wantGnet && rulesCache.gnet) {
     const st = readGnet(chat);
-    if (st.posts.length || st.dms.length) out.push(mainContext(st, userNick(ss), rulesCache.gnet));
+    if (st.posts.length || st.dms.length) out.push(mainContext(st, userNick(ss), rulesCache.gnet, focus));
   }
   if (wantPhone && rulesCache.phone) {
     try {
-      out.push(phoneMainContext(readPhone(chat), readBulletins(chat), phoneSettings(ss), rulesCache.phone));
+      out.push(phoneMainContext(readPhone(chat), readBulletins(chat), phoneSettings(ss), rulesCache.phone, focus));
     } catch (error) {
       console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (wantWiki && rulesCache.wiki) out.push(wikiMainContext(chat, rulesCache.wiki));
+  if (wantWiki && rulesCache.wiki) out.push(wikiMainContext(chat, rulesCache.wiki, focus));
   return out.filter(Boolean);
 }
 

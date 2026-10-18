@@ -7,7 +7,7 @@ import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, t
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
-  readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, validateEvents, validCallTarget, writeBulletins, writePhone,
+  readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
   chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
@@ -180,9 +180,9 @@ function generate(ctx: ChatContext, env: PhoneEnv, rid: string, label: string) {
         note = '대화 상태가 바뀌어서 답장을 저장하지 않았어요.';
         return null;
       }
-      validateEvents(result.events, room);
+      const events = keepValid(result.events, room);
       const unsolicitedRefresh = room.pending.action.type === 'refresh' && unsolicited(room);
-      const added = applyEvents(cur, room, result.events, phoneTime(chat));
+      const added = applyEvents(cur, room, events, phoneTime(chat));
       room.pending = undefined;
       if (viewingRoom(env) === rid) readRoom(room);
       if (!added) note = room.kind === 'group' ? '아무도 말하지 않았어요.' : '답장이 없어요.';
@@ -376,7 +376,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
         const r = cur.rooms[u.room] ?? plan.selected.get(u.room)!;
         if (r.pending) throw new PhoneError('확인하는 동안 대화 상태가 바뀌었어요. 다시 확인해 주세요.');
         if (u.events.length && !refreshAllowed(chat, r, set)[0]) throw new PhoneError('선톡 받기 설정이 바뀌었어요.');
-        validateEvents(u.events, r);
+        u.events = keepValid(u.events, r);
       }
       const visible = viewingRoom(e);
       for (const u of result.updates) {
@@ -410,10 +410,10 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
   });
 }
 
-/** 본편 응답이 끝난 뒤 (main.ts onOutput). 같은 응답에는 한 번만 */
-export async function autoRefresh(ctx: ChatContext, messageIndex: number): Promise<void> {
+/** 본편 응답이 끝난 뒤 (main.ts onOutput), 또는 「창을 열 때」면 괴담톡 탭을 열 때 (openCheck). 같은 응답에는 한 번만 */
+export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: PhoneEnv): Promise<void> {
   const set = phoneSettings(ctx.chat.scriptstate);
-  if (!set.auto || phoneBusy(ctx)) return;
+  if (!(env ? set.autoOpen : set.auto) || phoneBusy(ctx)) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
   let hash = 7;
@@ -427,7 +427,15 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number): Promi
   } catch {
     return; // 괴담톡 로어북이 없는 카드
   }
-  await refreshInbox({ ...ctx, chat: saved }, undefined, true);
+  await refreshInbox({ ...ctx, chat: saved }, env, true);
+}
+
+/** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 본편 응답을 아직 확인하지 않았으면 한 번 확인 */
+export function openCheck(ctx: ChatContext, env: PhoneEnv): void {
+  if (!phoneSettings(ctx.chat.scriptstate).autoOpen) return;
+  const at = lastReply(ctx.chat);
+  if (at < 0) return;
+  void autoRefresh(ctx, at, env).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 async function openDm(ctx: ChatContext, env: PhoneEnv, cid: string) {
@@ -864,6 +872,12 @@ function addView(): string {
     <div class="ph-form-foot"><button class="gx-start" data-action="ph-add-save">추가</button></div></div>`;
 }
 
+const AUTO_HINT: Record<string, string> = {
+  '0': '새로고침 버튼을 누를 때만 확인해요',
+  open: '본편이 진행된 뒤 괴담톡을 열면 한 번 확인해요',
+  '1': '본편 응답이 끝날 때마다 모델을 한 번 더 불러요',
+};
+
 function seg(key: string, cur: string, items: [string, string][]): string {
   return `<div class="gx-segs gx-segs-sm">${items
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`)
@@ -893,11 +907,11 @@ function settingsView(ctx: ChatContext): string {
     <div class="ph-form-body ps">
       ${group('답장', [
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
-        row('본편에 반영', onoff('context'), '대화 기록이 본편 요청에 참고로 붙어요'),
+        row('본편에 반영', onoff('context'), '지금 장면과 관련된 대화가 본편 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status')),
       ].join(''))}
       ${group('새 메시지', [
-        row('자동 새 메시지 확인', onoff('auto'), '본편 응답이 끝날 때마다 한 번 확인해요'),
+        row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
         row('소속 공지 받기', onoff('announcements')),

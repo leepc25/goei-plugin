@@ -36,7 +36,14 @@ test('patch accepts only appended rows from active members', () => {
   assert.throws(() => P.eventsFromPatch([add('[[ATTACH:gift]]꽃[[/ATTACH]]', 'c_1')], g, false), /선물/);
   const exit = P.eventsFromPatch([add('난 간다', 'c_2'), add('c_2', '-', 'exit')], g, false);
   assert.equal(exit.events[1].type, 'exit');
-  assert.throws(() => P.eventsFromPatch([add('c_2', '-', 'exit'), add('다시', 'c_2')], g, false), /참여하지 않은/);
+  // 틀린 말풍선만 빠지고 나머지는 남는다. 전부 틀렸을 때만 실패
+  const dropped = [];
+  const part = P.eventsFromPatch([add('c_2', '-', 'exit'), add('다시', 'c_2'), add('남음', 'c_1')], g, false, dropped);
+  assert.deepEqual(part.events.map((e) => e.type), ['exit', 'message']);
+  assert.equal(part.events[1].text, '남음');
+  assert.match(dropped[0], /참여하지 않은/);
+  assert.equal(P.eventsFromPatch([add('안녕', 'c_1'), add('누구', 'c_9'), { op: 'replace', path: '/messages/0', value: {} }], r, false).events.length, 1);
+  assert.equal(P.keepValid(Array.from({ length: 20 }, () => ({ type: 'message', sender: 'c_1', text: '응' })), r).length, P.LIMITS.events, '넘치는 말풍선은 잘라 낸다');
   const title = P.eventsFromPatch([{ op: 'replace', path: '/name', value: '조사팀' }], g, true);
   assert.equal(title.title, '조사팀');
 });
@@ -146,7 +153,11 @@ test('refresh covers directory, announcements and invitations, then commits', { 
   // 허용되지 않은 방·초과 공지는 거절
   assert.throws(() => P.parseRefresh('{"updates":[{"room":"dm_zzz","patch":[]}]}', plan.selected, plan.receive, plan.announce, plan.invite, st, d, false), /허용되지 않은/);
   const two = { issuer: 'x', category: '공지', title: 't', text: 'b' };
-  assert.throws(() => P.parseRefresh(JSON.stringify({ updates: [], announcements: [two, two] }), plan.selected, plan.receive, plan.announce, plan.invite, st, d, false), /공지 수/);
+  assert.equal(P.parseRefresh(JSON.stringify({ updates: [], announcements: [two, two] }), plan.selected, plan.receive, plan.announce, plan.invite, st, d, false).announcements.length, 1, '넘친 공지는 잘라 낸다');
+  assert.throws(() => P.parseRefresh(JSON.stringify({ updates: [], announcements: [{ ...two, category: '잡담' }] }), plan.selected, plan.receive, plan.announce, plan.invite, st, d, false), /분류/);
+  // 틀린 방은 빼고 맞는 방은 쓴다
+  const ok = P.parseRefresh(JSON.stringify({ updates: [{ room: 'dm_zzz', patch: [] }, ...JSON.parse(raw).updates] }), plan.selected, plan.receive, plan.announce, plan.invite, st, d, false);
+  assert.equal(ok.updates.length, JSON.parse(raw).updates.length);
 });
 
 test('refresh is skipped when incoming and invites are off and no notice is due', { skip: !realLore }, () => {

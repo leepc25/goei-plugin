@@ -984,9 +984,10 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw || '').includes('P|1846003|2025.01.01 02:47|익명|관람차 목격 모음|0|0|나 말고 본 사람 손|1'), null, { timeout: 5000 });
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('C|1846003|0|ㅁㄴㅇㄹ|손|0|0'), '올린 글은 바로 펼쳐지므로 읽음');
   if (shots) await page.screenshot({ path: `${shots}/14-gnet-board.png` });
-  // 본편 요청에 기록이 붙는다 (요청 끝 system 메시지)
+  // 본편 요청에 기록이 붙는다 (마지막 사용자 메시지 바로 앞 system 메시지)
   const req = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: 'u' }], 'model'));
-  const last = req[req.length - 1];
+  assert.equal(req[req.length - 1].content, 'u', '사용자 메시지가 맨 끝');
+  const last = req[req.length - 2];
   assert.equal(last.role, 'system');
   assert.ok(last.content.startsWith('[MODULE_CONTEXT_BEGIN]\nThese saved records are reference data'));
   assert.ok(last.content.includes('"kind":"private_message"'));
@@ -1148,9 +1149,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const card = await page.evaluate((r) => window.__calls.handlers.display(r), rec);
   assert.ok(card.includes('쟈알디') && card.includes('전화를 걸었다') && !card.includes('현장 상황 보고'));
   const req = await page.evaluate((r) => window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model'), rec);
-  assert.equal(req[0].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
-  // 본편 반영: 대화·공지가 요청 끝 system 메시지로
-  const ctx = req[req.length - 1];
+  assert.equal(req[req.length - 1].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
+  // 본편 반영: 대화·공지가 마지막 사용자 메시지 바로 앞 system 메시지로
+  const ctx = req[req.length - 2];
   assert.equal(ctx.role, 'system');
   assert.ok(ctx.content.includes('"feature":"phone"') && ctx.content.includes('선배 지금 어디예요?') && ctx.content.includes('지하 2층 출입 통제'));
   // 자동 확인: 본편 응답이 끝나면 한 번 (같은 응답에는 다시 안 함)
@@ -1169,13 +1170,32 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await fire();
   await new Promise((r) => setTimeout(r, 400));
   assert.equal(await page.evaluate(() => window.__calls.llm.length), n0 + 1, '같은 응답에는 한 번만');
+  // 창을 열 때: 본편 응답 뒤에는 안 부르고, 괴담톡 탭을 열 때 한 번
+  await page.evaluate(() => {
+    const c = window.__chat;
+    c.scriptstate.$ph_auto = 'open';
+    c.scriptstate.$cooldown_received_incoming = '-5';
+    c.message.push({ role: 'user', data: '다음' }, { role: 'char', data: '새 장면이 열렸다.' });
+    window.__llm = [{ type: 'success', result: '{"updates":[],"announcements":[],"invitations":[]}' }];
+  });
+  await fire();
+  await new Promise((r) => setTimeout(r, 400));
+  assert.equal(await page.evaluate(() => window.__calls.llm.length), n0 + 1, '창을 열 때 모드는 본편 응답 뒤에 안 부름');
   await open(page);
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="phone"]');
+  await page.waitForFunction((n) => window.__calls.llm.length === n + 2, n0, { timeout: 5000 });
+  await new Promise((r) => setTimeout(r, 400));
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="phone"]');
+  await new Promise((r) => setTimeout(r, 400));
+  assert.equal(await page.evaluate(() => window.__calls.llm.length), n0 + 2, '같은 응답에는 한 번만');
   await page.waitForSelector('.ph');
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/15-phone-mobile.png` });
   assert.deepEqual(errors, []);
-  console.log('PASS 괴담톡: 연락처·1:1 답장·재시도·새 메시지 확인(선톡·초대·공지)·단톡·전화·본편 반영·자동 확인');
+  console.log('PASS 괴담톡: 연락처·1:1 답장·재시도·새 메시지 확인(선톡·초대·공지)·단톡·전화·본편 반영·자동 확인(매 턴·창을 열 때)');
   await page.close();
 }
 

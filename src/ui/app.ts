@@ -17,7 +17,7 @@ import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindWikiSide, handleWiki, resetWiki, wiki, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
-import { gnet, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
+import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone } from '../core/phone';
@@ -27,7 +27,7 @@ import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
 import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
-import { agentContact, handlePhone, openAgentDm, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
+import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { SEND_FALLBACK, sendNow } from '../host/send';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
@@ -459,7 +459,11 @@ async function handle(action: string, value?: string): Promise<void> {
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
       field.confirmEnd = null;
       resetSettings();
-      return render();
+      render();
+      // 「창을 열 때」 확인: 본편이 진행됐으면 이 탭을 열 때 한 번
+      if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
+      if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
+      return;
     case 'board-map':
       // 상황판 행: 지도 탭에서 그 자리를 연다
       if (view.kind !== 'started' || !showOnMap(view.ctx, value ?? '')) return;
@@ -485,6 +489,7 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       resetField();
       if (!(await openAgentDm(view.ctx, phoneEnv, value ?? ''))) render();
+      if (view.kind === 'started') openCheck(view.ctx, phoneEnv);
       return;
     case 'wiki-goto':
       // 지도·커스텀 임무 목록의 「위키」: 위키 탭으로 넘어가 그 제목을 연다 (없으면 작성 화면)

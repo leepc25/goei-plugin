@@ -4,6 +4,7 @@
 import type { Chat } from './types';
 import { readWorld } from './world/output';
 import { attachmentRecords, bodyParts as parts, describe, hasAttachment, stripForged } from './attach';
+import { pickRecords, related, type Focus, type Pick } from './focus';
 
 export const G_POST_BASE = 1846000;
 export const GN_RAW = '$gn_raw';
@@ -78,7 +79,7 @@ export function gnetRetention(state: Record<string, unknown> | undefined): { aut
 }
 export const LIMITS = { replies: 4, post_tokens: 4000, title_tokens: 80, dm_tokens: 1500, comment_tokens: 1000, origin_tokens: 2000, quote_tokens: 1000, history_tokens: 1500 };
 export const HISTORY = { refresh: 10, post: 99999, comment: 30, dmHistory: 50, turns: 8, dmKeep: 40, cooldown: 2 };
-export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 10000, includePosts: true, includeDms: true, ownOnly: false };
+export const CONTEXT = { posts: 5, comments: 10, dms: 30, tokens: 3000, includePosts: true, includeDms: true, ownOnly: false, focus: true, recentPosts: 1, recentDms: 5 };
 export const QUANTITY: Record<string, { range: string; max: number; label: string }> = {
   '0': { range: '4-6', max: 6, label: '4~6' },
   '1': { range: '5-7', max: 7, label: '5~7' },
@@ -91,6 +92,8 @@ export interface GnetSettings {
   enabled: boolean;
   /** 본편 응답마다 자동 새로고침 (원본 lazy 0) */
   auto: boolean;
+  /** 괴담넷 탭을 열 때, 본편이 진행됐으면 새로고침 (lazy 'open', v0.16.27) */
+  autoOpen: boolean;
   model: 'main' | 'aux';
   quantity: string;
   subject: string;
@@ -123,6 +126,7 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
   return {
     enabled: s('mode') !== '0',
     auto: s('mode') !== '0' && s('lazy') === '0',
+    autoOpen: s('mode') !== '0' && s('lazy') === 'open',
     model: s('mode') === '1' ? 'main' : 'aux',
     quantity: q,
     subject: clean('subject'),
@@ -932,12 +936,10 @@ export function parseDmBody(raw: string): string {
 
 // ── 본편 요청에 넣는 기록 (원본 RC.gnetContext + contextPack) ──
 
-export function mainContext(st: GState, nick: string, rules: string): string {
-  const items: { id: string; data: Record<string, unknown> }[] = [];
-  let included = 0;
+export function mainContext(st: GState, nick: string, rules: string, focus?: Focus | null): string {
+  const posts: Pick<Record<string, unknown>>[] = [];
   // 내가 쓴 것만: 내 글, 내 댓글이 달린 글(그 댓글과 위쪽 댓글만), 내가 주고받은 쪽지는 원래 모두 내 것 (원본 context_own_only)
   for (const p of CONTEXT.includePosts ? st.posts : []) {
-    if (included >= CONTEXT.posts) break;
     if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
     const wanted = new Set<number>();
     const include = (n: number) => {
@@ -952,29 +954,30 @@ export function mainContext(st: GState, nick: string, rules: string): string {
       selected++;
     }
     const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, content: describe(c.body) })).filter((c) => wanted.has(c.id));
-    included++;
-    items.push({
-      id: `post:${p.id}`,
+    posts.push({
+      order: p.id,
+      related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}\n${p.body}\n${comments.map((c) => c.content).join('\n')}`),
       data: { kind: 'public_post', title: p.title, date: p.date, author: p.nick, content: describe(p.body), comments, access: 'publicly accessible; reading by each character is not established' },
     });
   }
-  for (let i = st.dms.length - 1; CONTEXT.includeDms && i >= Math.max(0, st.dms.length - CONTEXT.dms); i--) {
+  const dms: Pick<Record<string, unknown>>[] = [];
+  for (let i = 0; CONTEXT.includeDms && i < st.dms.length; i++) {
     const d = st.dms[i];
-    items.push({
-      id: `dm:${i + 1}`,
+    dms.push({
+      order: i + 1,
+      related: related(focus, [d.nick], d.body),
       data: {
         kind: 'private_message', sender: d.side === 'me' ? nick : d.nick, recipient: d.side === 'me' ? d.nick : nick, content: describe(d.body),
         ...(d.date ? { date: d.date } : {}), order: i + 1, access: 'sender and recipient only',
       },
     });
   }
-  const kept: Record<string, unknown>[] = [];
-  const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'gnet', records: kept })}\n[MODULE_CONTEXT_END]`;
-  for (const item of items) {
-    kept.unshift(item.data);
-    if (CONTEXT.tokens > 0 && tokens(payload()) > CONTEXT.tokens) kept.shift();
-  }
-  return kept.length ? payload() : '';
+  const payload = (records: unknown[]) => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'gnet', records })}\n[MODULE_CONTEXT_END]`;
+  const fits = (records: unknown[]) => !(CONTEXT.tokens > 0 && tokens(payload(records)) > CONTEXT.tokens);
+  const keptPosts = pickRecords(posts, { focus: CONTEXT.focus, recent: CONTEXT.recentPosts, max: CONTEXT.posts, fits });
+  const keptDms = pickRecords(dms, { focus: CONTEXT.focus, recent: CONTEXT.recentDms, max: CONTEXT.dms, fits: (k) => fits([...keptPosts, ...k]) });
+  const kept = [...keptPosts, ...keptDms];
+  return kept.length ? payload(kept) : '';
 }
 
 // 화면용 첨부 나누기는 attach.ts (예전 이름 그대로 내보냄)

@@ -7,6 +7,7 @@ import { phoneTabsSection, readDirectory, rosterOf } from './world/directory';
 import { BUILTIN, extraFactions, extraTabs, factionType, isFactionCode } from './factions';
 import { dateNow, storyTurns, tokens, cut } from './gnet';
 import { attachmentRecords, describe, stripForged } from './attach';
+import { pickRecords, related, type Focus, type Pick } from './focus';
 export { hasAttachment } from './attach';
 
 export class PhoneError extends Error {
@@ -25,7 +26,7 @@ export const PH_AUTO_LAST = PH('auto_last');
 export const PH_UNREAD = '$st_unread_phone';
 
 export const PH_DEFAULTS: Record<string, string> = {
-  model: 'aux', auto: '1', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
+  model: 'aux', auto: '0', status: '1', announcements: '1', all_contacts: '0', anomaly_contacts: '0', incoming: '1', group_invites: '1',
   incoming_chance: '100', group_invite_chance: '100', context: '1', context_messages: '1', context_announcements: '1', related: '0',
 };
 
@@ -34,7 +35,7 @@ export const LIMITS = {
   events: 12, reply_tokens: 1500, input_tokens: 4000, pause_tokens: 200, topic_tokens: 2000, memo_tokens: 2000, notices: 1, invitations: 1,
   members: 9, room_name: 60, notice_title: 80, notice_issuer: 60, notice_tokens: 1200,
 };
-export const HISTORY = { room: 100, announcement: 10, context: 200, contextNotices: 1, contextTokens: 20000, turns: 8 };
+export const HISTORY = { room: 100, announcement: 10, context: 200, contextNotices: 1, contextTokens: 4000, turns: 8, focus: true, contextRecent: 8 };
 export const STORAGE = { dm: 40, group: 100, notice: 20 };
 export const STORAGE_MAX = 20000;
 export const COOLDOWN = { incoming: 1, invitation: 3, announcement: 3 };
@@ -66,7 +67,10 @@ const COOLDOWN_KEY = (k: keyof typeof COOLDOWN) => `$cooldown_received_${k}`;
 
 export interface PhoneSettings {
   model: 'main' | 'aux';
+  /** 새 메시지 확인: 본편 응답마다 ('1') */
   auto: boolean;
+  /** 새 메시지 확인: 괴담톡 탭을 열 때, 본편이 진행됐으면 ('open') */
+  autoOpen: boolean;
   status: boolean;
   announcements: boolean;
   allContacts: boolean;
@@ -95,6 +99,7 @@ export function phoneSettings(state: Record<string, unknown> | undefined): Phone
   return {
     model: v('model') === 'main' ? 'main' : 'aux',
     auto: v('auto') === '1',
+    autoOpen: v('auto') === 'open',
     status: v('status') !== '0',
     announcements: v('announcements') !== '0',
     allContacts: v('all_contacts') === '1',
@@ -500,10 +505,6 @@ export function splitRecords(text: string): string[] {
   return out;
 }
 
-function checkGift(text: string, dm: boolean) {
-  if (!dm && /\[\[ATTACH:gift\]\]/i.test(text)) throw new PhoneError('단톡방에서는 선물을 보낼 수 없어요.');
-}
-
 // ── 모델 응답 읽기 ──
 
 /** 생각 블록·코드 울타리·허용된 바깥 태그만 벗기고, 끝의 쉼표 같은 확실한 형식 오류만 고친다 (원본 decodeObject) */
@@ -549,51 +550,74 @@ function fail(msg: string): never {
   throw new PhoneError(msg);
 }
 
-/** 미니톡 패치 → 대화 이벤트 (원본 eventsFromPatch + validateEvents) */
-export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean): { events: PEvent[]; title?: string } {
+/** 미니톡 패치 → 대화 이벤트 (원본 eventsFromPatch + validateEvents).
+ * 원본은 말풍선 하나만 틀려도 응답 전체를 버렸다. 여기서는 틀린 항목만 빼고, 남은 게 하나도 없을 때만 실패로 본다 */
+export function eventsFromPatch(patch: unknown, r: PRoom, allowTitle: boolean, dropped: string[] = []): { events: PEvent[]; title?: string } {
   if (!Array.isArray(patch)) fail('대화 변경 목록이 배열이 아니에요.');
-  if (patch.length > LIMITS.events + 1) fail('대화 변경 항목이 너무 많아요.');
   const events: PEvent[] = [];
+  const before = dropped.length;
   let title: string | undefined;
   for (const op of patch as Record<string, unknown>[]) {
-    if (!op || typeof op !== 'object') fail('대화 변경 항목은 객체여야 해요.');
-    if (op.op === 'replace' && op.path === '/name' && allowTitle) {
-      if (title || r.kind !== 'group' || typeof op.value !== 'string' || !op.value.trim() || [...op.value].length > LIMITS.room_name) fail('대화방 이름 형식이 잘못됐어요.');
-      title = op.value.trim();
-      continue;
-    }
-    if (op.op !== 'add' || op.path !== '/messages/-') fail('기존 기록은 고치거나 지울 수 없어요. 새 메시지만 추가하세요.');
-    const m = op.value as Record<string, unknown>;
-    if (!m || typeof m !== 'object' || typeof m.content !== 'string' || typeof m.sender !== 'string' || typeof m.type !== 'string') fail('메시지에는 content·sender·type 문자열이 필요해요.');
-    if (m.type === 'text') events.push({ type: 'message', sender: m.sender, text: m.content });
-    else if (m.type === 'exit') {
-      if (m.sender !== '-') fail('퇴장 형식이 잘못됐어요.');
-      events.push({ type: 'exit', participant: m.content });
-    } else if (m.type === 'pause') {
-      if (m.sender !== '-') fail('대기 형식이 잘못됐어요.');
-      if (!hiddenPause(m.content)) events.push({ type: 'pause', text: m.content });
-    } else fail('괴담톡에서 지원하지 않는 메시지 유형이에요.');
+    const reason = readOp(op, r, allowTitle && title === undefined, events, (t) => (title = t));
+    if (reason) dropped.push(reason);
   }
-  validateEvents(events, r);
-  return { events, title };
+  const kept = keepValid(events, r, dropped);
+  if (!kept.length && title === undefined && dropped.length > before) fail(dropped[before]);
+  return { events: kept, title };
 }
 
-export function validateEvents(events: PEvent[], r: PRoom): void {
-  if (events.length > LIMITS.events) fail('한 번에 추가할 수 있는 말풍선 수를 넘었어요.');
-  const active = new Set(r.members);
-  for (const e of events) {
-    if (e.type === 'message') {
-      if (!active.has(e.sender) || !e.text.trim()) fail('참여하지 않은 인물의 메시지예요.');
-      checkGift(e.text, r.kind === 'dm');
-      if (tokens(e.text) > LIMITS.reply_tokens) fail(`답장 한 개는 ${LIMITS.reply_tokens}토큰 이내여야 해요.`);
-    } else if (e.type === 'pause') {
-      if (!e.text.trim()) fail('대기 설명이 없어요.');
-      if (tokens(e.text) > LIMITS.pause_tokens) fail(`대기 설명은 ${LIMITS.pause_tokens}토큰 이내여야 해요.`);
-    } else {
-      if (r.kind !== 'group' || !active.has(e.participant)) fail('퇴장할 수 없는 참여자예요.');
-      active.delete(e.participant);
-    }
+/** 패치 항목 하나를 읽는다. 틀리면 이유를 돌려주고 아무것도 넣지 않는다 */
+function readOp(op: Record<string, unknown>, r: PRoom, allowTitle: boolean, events: PEvent[], setTitle: (t: string) => void): string | null {
+  if (!op || typeof op !== 'object') return '대화 변경 항목은 객체여야 해요.';
+  if (op.op === 'replace' && op.path === '/name' && allowTitle) {
+    if (r.kind !== 'group' || typeof op.value !== 'string' || !op.value.trim() || [...op.value].length > LIMITS.room_name) return '대화방 이름 형식이 잘못됐어요.';
+    setTitle(op.value.trim());
+    return null;
   }
+  if (op.op !== 'add' || op.path !== '/messages/-') return '기존 기록은 고치거나 지울 수 없어요. 새 메시지만 추가하세요.';
+  const m = op.value as Record<string, unknown>;
+  if (!m || typeof m !== 'object' || typeof m.content !== 'string' || typeof m.sender !== 'string' || typeof m.type !== 'string') return '메시지에는 content·sender·type 문자열이 필요해요.';
+  if (m.type === 'text') events.push({ type: 'message', sender: m.sender, text: m.content });
+  else if (m.type === 'exit') {
+    if (m.sender !== '-') return '퇴장 형식이 잘못됐어요.';
+    events.push({ type: 'exit', participant: m.content });
+  } else if (m.type === 'pause') {
+    if (m.sender !== '-') return '대기 형식이 잘못됐어요.';
+    if (!hiddenPause(m.content)) events.push({ type: 'pause', text: m.content });
+  } else return '괴담톡에서 지원하지 않는 메시지 유형이에요.';
+  return null;
+}
+
+/** 이 방에 넣을 수 있는 이벤트만 남긴다. 저장 직전에 최신 방 상태로 한 번 더 거른다 */
+export function keepValid(events: PEvent[], r: PRoom, dropped: string[] = []): PEvent[] {
+  const active = new Set(r.members);
+  const out: PEvent[] = [];
+  for (const e of events) {
+    const why = eventProblem(e, r, active);
+    if (why) {
+      dropped.push(why);
+      continue;
+    }
+    if (out.length >= LIMITS.events) {
+      dropped.push('한 번에 추가할 수 있는 말풍선 수를 넘었어요.');
+      break;
+    }
+    if (e.type === 'exit') active.delete(e.participant);
+    out.push(e);
+  }
+  return out;
+}
+
+function eventProblem(e: PEvent, r: PRoom, active: Set<string>): string | null {
+  if (e.type === 'message') {
+    if (!active.has(e.sender) || !e.text.trim()) return '참여하지 않은 인물의 메시지예요.';
+    if (r.kind !== 'dm' && /\[\[ATTACH:gift\]\]/i.test(e.text)) return '단톡방에서는 선물을 보낼 수 없어요.';
+    if (tokens(e.text) > LIMITS.reply_tokens) return `답장 한 개는 ${LIMITS.reply_tokens}토큰 이내여야 해요.`;
+  } else if (e.type === 'pause') {
+    if (!e.text.trim()) return '대기 설명이 없어요.';
+    if (tokens(e.text) > LIMITS.pause_tokens) return `대기 설명은 ${LIMITS.pause_tokens}토큰 이내여야 해요.`;
+  } else if (r.kind !== 'group' || !active.has(e.participant)) return '퇴장할 수 없는 참여자예요.';
+  return null;
 }
 
 /** 대화방 답장 응답 (<lb-minitalk-patch>[…]</lb-minitalk-patch>, 직접 추가한 연락처는 {contacts,result:{patch}}) */
@@ -726,16 +750,25 @@ export interface NoticeRow {
   text: string;
 }
 
-export function validateAnnouncements(rows: unknown, packet: AnnouncementCheck | null): NoticeRow[] {
-  const list = (rows ?? []) as NoticeRow[];
-  if (!Array.isArray(list) || list.length > (packet?.maxNew ?? 0)) fail('한 번에 받을 공지 수를 넘었어요.');
-  for (const row of list) {
-    if (!row || typeof row.issuer !== 'string' || typeof row.category !== 'string' || typeof row.title !== 'string' || typeof row.text !== 'string') fail('공지 형식이 잘못됐어요.');
-    if (!CATEGORIES.has(row.category)) fail('공지 분류가 올바르지 않아요.');
-    if (!row.issuer.trim() || [...row.issuer].length > LIMITS.notice_issuer || !row.title.trim() || [...row.title].length > LIMITS.notice_title || !row.text.trim()) fail('공지 발신처·제목·본문을 확인하세요.');
-    if (tokens(row.text) > LIMITS.notice_tokens) fail(`공지 한 개는 ${LIMITS.notice_tokens}토큰 이내여야 해요.`);
+/** 틀린 공지만 빼고, 받을 수 있는 수를 넘으면 앞에서부터 그만큼만 */
+export function validateAnnouncements(rows: unknown, packet: AnnouncementCheck | null, dropped: string[] = []): NoticeRow[] {
+  if (rows != null && !Array.isArray(rows)) fail('공지 목록이 배열이 아니에요.');
+  const out: NoticeRow[] = [];
+  for (const row of (rows ?? []) as NoticeRow[]) {
+    const why = noticeProblem(row);
+    if (why) dropped.push(why);
+    else if (out.length >= (packet?.maxNew ?? 0)) dropped.push('한 번에 받을 공지 수를 넘었어요.');
+    else out.push(row);
   }
-  return list;
+  return out;
+}
+
+function noticeProblem(row: NoticeRow): string | null {
+  if (!row || typeof row.issuer !== 'string' || typeof row.category !== 'string' || typeof row.title !== 'string' || typeof row.text !== 'string') return '공지 형식이 잘못됐어요.';
+  if (!CATEGORIES.has(row.category)) return '공지 분류가 올바르지 않아요.';
+  if (!row.issuer.trim() || [...row.issuer].length > LIMITS.notice_issuer || !row.title.trim() || [...row.title].length > LIMITS.notice_title || !row.text.trim()) return '공지 발신처·제목·본문을 확인하세요.';
+  if (tokens(row.text) > LIMITS.notice_tokens) return `공지 한 개는 ${LIMITS.notice_tokens}토큰 이내여야 해요.`;
+  return null;
 }
 
 export function commitAnnouncements(b: Bulletins, st: PState, rows: NoticeRow[], packet: AnnouncementCheck, time: string): number {
@@ -771,33 +804,41 @@ export function invitationPacket(st: PState, candidates: string[], allowed: bool
   };
 }
 
-export function validateInvitations(rows: unknown, packet: InvitationCheck | null, st: PState, dir: Directory): PRoom[] {
-  const list = (rows ?? []) as Record<string, unknown>[];
-  if (!Array.isArray(list) || list.length > (packet?.maxNew ?? 0)) fail('한 번에 받을 단톡방 초대 수를 넘었어요.');
+/** 틀린 초대만 빼고, 받을 수 있는 수를 넘으면 앞에서부터 그만큼만 */
+export function validateInvitations(rows: unknown, packet: InvitationCheck | null, st: PState, dir: Directory, dropped: string[] = []): PRoom[] {
+  if (rows != null && !Array.isArray(rows)) fail('단톡방 초대 목록이 배열이 아니에요.');
   const allowed = new Set(packet?.candidates ?? []);
   const sig = (m: string[]) => [...m].sort().join(',');
   const out: PRoom[] = [];
   const fresh = new Set<string>();
-  for (const row of list) {
-    if (!row || typeof row.inviter !== 'string' || !Array.isArray(row.members) || typeof row.name !== 'string' || !Array.isArray(row.patch)) fail('단톡방 초대 형식이 잘못됐어요.');
-    const name = row.name.trim();
-    if (!name || [...name].length > LIMITS.room_name) fail('초대할 단톡방 이름이 길이 제한을 넘었어요.');
-    const members = row.members as string[];
-    if (members.length < 2 || members.length > LIMITS.members) fail('단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.');
-    const people: Record<string, PPerson> = {};
-    for (const cid of members) {
-      const c = dir.map.get(cid);
-      if (typeof cid !== 'string' || !allowed.has(cid) || !c || people[cid]) fail('단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.');
-      people[cid] = personOf(c);
+  for (const row of (rows ?? []) as Record<string, unknown>[]) {
+    if (out.length >= (packet?.maxNew ?? 0)) {
+      dropped.push('한 번에 받을 단톡방 초대 수를 넘었어요.');
+      continue;
     }
-    if (!people[row.inviter]) fail('초대한 인물은 단톡방 참여자여야 해요.');
-    const key = `${name}\0${sig(members)}`;
-    if (fresh.has(key)) fail('같은 단톡방 초대가 중복됐어요.');
-    fresh.add(key);
-    for (const r of Object.values(st.rooms)) if (r.kind === 'group' && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail('같은 이름과 참여자의 단톡방이 이미 있어요.');
-    const room: PRoom = { id: '', kind: 'group', name, members: [...members], people, messages: [], draft: '', unread: 0, inviter: row.inviter };
-    (room as PRoom & { events?: PEvent[] }).events = eventsFromPatch(row.patch, room, false).events;
-    out.push(room);
+    try {
+      if (!row || typeof row.inviter !== 'string' || !Array.isArray(row.members) || typeof row.name !== 'string' || !Array.isArray(row.patch)) fail('단톡방 초대 형식이 잘못됐어요.');
+      const name = row.name.trim();
+      if (!name || [...name].length > LIMITS.room_name) fail('초대할 단톡방 이름이 길이 제한을 넘었어요.');
+      const members = row.members as string[];
+      if (members.length < 2 || members.length > LIMITS.members) fail('단톡방에는 NPC 2명 이상이 필요하고 최대 인원을 넘을 수 없어요.');
+      const people: Record<string, PPerson> = {};
+      for (const cid of members) {
+        const c = dir.map.get(cid);
+        if (typeof cid !== 'string' || !allowed.has(cid) || !c || people[cid]) fail('단톡방 초대에 허용되지 않거나 중복된 참여자가 있어요.');
+        people[cid] = personOf(c);
+      }
+      if (!people[row.inviter]) fail('초대한 인물은 단톡방 참여자여야 해요.');
+      const key = `${name}\0${sig(members)}`;
+      if (fresh.has(key)) fail('같은 단톡방 초대가 중복됐어요.');
+      for (const r of Object.values(st.rooms)) if (r.kind === 'group' && roomLabel(r).trim() === name && sig(r.members) === sig(members)) fail('같은 이름과 참여자의 단톡방이 이미 있어요.');
+      const room: PRoom = { id: '', kind: 'group', name, members: [...members], people, messages: [], draft: '', unread: 0, inviter: row.inviter };
+      (room as PRoom & { events?: PEvent[] }).events = eventsFromPatch(row.patch, room, false, dropped).events;
+      fresh.add(key);
+      out.push(room);
+    } catch (error) {
+      dropped.push((error as Error).message);
+    }
   }
   return out;
 }
@@ -839,35 +880,53 @@ export function parseRefresh(
     if (!value || typeof value !== 'object' || Array.isArray(value)) fail('새로고침 형식이 올바르지 않아요.');
     const updates = (value.updates ?? []) as Record<string, unknown>[];
     if (!Array.isArray(updates)) fail('updates는 배열이어야 해요.');
-    const announcements = validateAnnouncements(value.announcements, announce);
-    const invitations = validateInvitations(value.invitations, invite, st, dir);
+    // 틀린 방·공지·초대·말풍선은 그것만 빼고 나머지를 쓴다. 다 빠져서 남은 게 없을 때만 실패
+    const dropped: string[] = [];
+    const announcements = validateAnnouncements(value.announcements, announce, dropped);
+    const invitations = validateInvitations(value.invitations, invite, st, dir, dropped);
     const used = new Set<string>();
     const out: RefreshResult['updates'] = [];
     for (const u of updates) {
-      if (!u || typeof u.room !== 'string' || !selected.has(u.room) || used.has(u.room)) fail('중복되거나 허용되지 않은 대화방이에요.');
-      used.add(u.room);
-      const r = selected.get(u.room)!;
-      const { events } = eventsFromPatch(u.patch ?? [], r, false);
-      if (events.length && receive.get(u.room) === false) fail('선톡 받기 설정이나 이번 확률 검사에서 허용하지 않은 방이에요.');
-      out.push({ room: u.room, events });
+      try {
+        if (!u || typeof u.room !== 'string' || !selected.has(u.room) || used.has(u.room)) fail('중복되거나 허용되지 않은 대화방이에요.');
+        used.add(u.room);
+        const r = selected.get(u.room)!;
+        const { events } = eventsFromPatch(u.patch ?? [], r, false, dropped);
+        if (events.length && receive.get(u.room) === false) fail('선톡 받기 설정이나 이번 확률 검사에서 허용하지 않은 방이에요.');
+        out.push({ room: u.room, events });
+      } catch (error) {
+        dropped.push((error as Error).message);
+      }
     }
+    const got = out.some((u) => u.events.length) || announcements.length || invitations.length;
+    if (dropped.length && !got) fail(dropped[0]);
     return { updates: out, announcements, invitations };
   } catch (error) {
     throw new PhoneError((error as Error).message, raw);
   }
 }
 
-// ── 본편 요청에 넣는 기록 (원본 mainContext + RC.contextPack) ──
+/** 마지막 본편 응답 위치 (없으면 -1) */
+export function lastReply(chat: Chat): number {
+  const list = chat.message ?? [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i]?.role === 'char') return i;
+  return -1;
+}
 
-export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules: string): string {
+// ── 본편 요청에 넣는 기록 (원본 mainContext + RC.contextPack, 장면 관련 기록 먼저는 core/focus.ts) ──
+
+export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules: string, focus?: Focus | null): string {
   if (!set.context) return '';
-  const recent: { order: number; id: string; data: Record<string, unknown>; notice: boolean }[] = [];
+  const items: Pick<Record<string, unknown>>[] = [];
   if (set.contextMessages) {
     for (const r of Object.values(st.rooms)) {
+      // 방에 있는 사람 이름이 장면에 나오면 그 방 기록 전체가 관련
+      const names = [roomLabel(r), ...Object.values(r.people).flatMap((p) => [p.name, p.english ?? ''])];
+      const roomHit = related(focus, names);
       for (const m of r.messages) {
         if (m.kind === 'pause' && hiddenPause(m.text)) continue;
-        recent.push({
-          order: m.id, id: `message:${m.id}`, notice: false,
+        items.push({
+          order: m.id, related: roomHit || related(focus, [], m.text),
           data: {
             room: r.id, title: roomLabel(r), recipients: m.audience.map((c) => r.people[c]?.name ?? c), kind: m.kind,
             sender: m.sender === 'me' ? '주인공' : m.sender === 'system' ? 'system' : r.people[m.sender]?.name ?? m.sender, text: describe(m.text), time: m.time, order: m.id,
@@ -878,23 +937,18 @@ export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules:
   }
   if (set.contextAnnouncements) {
     for (const a of b.items.slice(-HISTORY.contextNotices)) {
-      recent.push({
-        order: a.order, id: `notice:${a.order}`, notice: true,
+      items.push({
+        order: a.order, related: true, free: true,
         data: { kind: 'announcement', channel: a.channel, title: a.title, sender: a.issuer, text: a.text, time: a.time, order: a.order, recipients: ['주인공'], access: 'received by owner; audience bounded by channel' },
       });
     }
   }
-  recent.sort((x, y) => y.order - x.order);
-  const kept: Record<string, unknown>[] = [];
-  const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'phone', records: kept })}\n[MODULE_CONTEXT_END]`;
-  let counted = 0;
-  for (const item of recent) {
-    if (!item.notice && counted >= HISTORY.context) continue;
-    kept.unshift(item.data);
-    if (HISTORY.contextTokens > 0 && tokens(payload()) > HISTORY.contextTokens) kept.shift();
-    else if (!item.notice) counted++;
-  }
-  return kept.length ? payload() : '';
+  const payload = (records: unknown[]) => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'phone', records })}\n[MODULE_CONTEXT_END]`;
+  const kept = pickRecords(items, {
+    focus: HISTORY.focus, recent: HISTORY.contextRecent, max: HISTORY.context,
+    fits: (k) => !(HISTORY.contextTokens > 0 && tokens(payload(k)) > HISTORY.contextTokens),
+  });
+  return kept.length ? payload(kept) : '';
 }
 
 // ── 전화 (원본 PHONE_CALL) ──

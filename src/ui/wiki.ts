@@ -454,7 +454,7 @@ function settingsView(ctx: ChatContext): string {
       ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
       ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
       ${line('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
-      ${line('본편에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '최근에 쓴 문서가 본편 요청에 참고로 붙어요')}
+      ${line('본편에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '본편에 나온 문서의 개요가 본편 요청에 참고로 붙어요')}
     </div></section>
     <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>

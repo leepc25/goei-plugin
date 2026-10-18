@@ -15,6 +15,7 @@ import { drawerHtml } from './drawer';
 import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
+import { lastReply } from '../core/phone';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate, type RetryOptions } from '../host/llm';
 import { budgetFor, genSettings } from '../core/advanced';
@@ -595,8 +596,8 @@ function settingsView(ctx: ChatContext, back = true): string {
     ? `${group('괴담넷', [
         row('괴담넷 사용', seg('power', '1', [['1', '켜기'], ['0', '끄기']])),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
-        row('새로고침', seg('lazy', v('lazy') === '0' ? '0' : '1', [['1', '수동'], ['0', '본편 응답마다']]), '본편 응답마다면 응답이 끝날 때마다 모델을 한 번 더 불러요'),
-        row('본편에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '최근 글과 쪽지가 본편 요청에 참고로 붙어요'),
+        row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
+        row('본편에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 본편 요청에 참고로 붙어요'),
         row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', '끄기'], ['1', '켜기']])),
       ].join(''))}
       ${group('게시판', [
@@ -687,10 +688,10 @@ async function currentChat(ctx: ChatContext): Promise<Chat | null> {
   }
 }
 
-/** 본편 응답이 끝난 뒤 (main.ts). 설정이 본편 응답마다일 때, 같은 응답에는 한 번만 (원본 lazy=0) */
-export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number): Promise<void> {
+/** 본편 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
+export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false): Promise<void> {
   const s = gnetSettings(ctx.chat.scriptstate);
-  if (!s.enabled || !s.auto || jobs.has(chatKey(ctx))) return;
+  if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
   if (!data.trim()) return;
   let hash = 7;
@@ -707,6 +708,21 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number): P
   await refreshBoard({ ...ctx, chat: saved }, target, true);
   if (target !== env) gnet.notice = notice;
 }
+
+/** 괴담넷 탭을 열 때: 「창을 열 때」 설정이고 마지막 본편 응답에 맞춰 아직 새로고침하지 않았으면 한 번 */
+export function gnetOpenCheck(ctx: ChatContext, env: GnetEnv): void {
+  liveEnv = env;
+  if (!gnetSettings(ctx.chat.scriptstate).autoOpen) return;
+  const at = lastReply(ctx.chat);
+  if (at < 0) return;
+  void autoRefreshGnet(ctx, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
+}
+
+const LAZY_HINT: Record<string, string> = {
+  '1': '새로고침 버튼을 누를 때만 불러요',
+  open: '본편이 진행된 뒤 괴담넷을 열면 한 번 불러요',
+  '0': '본편 응답이 끝날 때마다 모델을 한 번 더 불러요',
+};
 
 /** 괴담넷 탭 버튼. 처리했으면 true */
 export async function handleGnet(action: string, value: string | undefined, ctx: ChatContext, env: GnetEnv): Promise<boolean> {

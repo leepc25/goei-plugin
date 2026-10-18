@@ -1,6 +1,7 @@
 // 괴담위키: 원본 Namuwiki 모듈과 같은 저장 형식·프롬프트·검사 규칙.
 // 문서는 채팅 로어북 "WIKI｜제목" 항목(키 없음, 비활성)에 meta + <lightboard-namuwiki> 본문으로 둔다.
-import { advNum, genSettings, refToggles } from './advanced';
+import { advNum, advOn, genSettings, refToggles } from './advanced';
+import { related, type Focus } from './focus';
 import { tokens } from './gnet';
 import { trimPrevious, trimRelated, trimSecondary, trimTurns } from './budget';
 import { collectRefs, factionCodesToNames, hasBook, limitRefs, policySections, recentTurns, refText, storyText, type RefSource } from './refs';
@@ -418,21 +419,39 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
 export const NW_CONTEXT = '$nw_context';
 export const wikiContextOn = (state: Record<string, unknown> | undefined): boolean => String(state?.[NW_CONTEXT] ?? '') === '1';
 
-export function wikiMainContext(chat: Chat, rules: string): string {
+export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null): string {
   const s = chat.scriptstate;
   const count = advNum(s, 'nw', 'ctx_count');
   const cap = advNum(s, 'nw', 'ctx_tokens');
+  // 본편에 나온 문서만 (v0.16.27): 제목이나 그 항목의 다른 이름이 최근 본편에 나온 문서. 끄면 원본처럼 최근에 쓴 문서부터
+  const onlyMentioned = advOn(s, 'nw', 'ctx_focus');
+  const summary = advOn(s, 'nw', 'ctx_summary');
   const docs = listDocs(chat)
+    .filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title))
     .map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i }))
     .sort((a, b) => b.at - a.at || b.i - a.i)
     .slice(0, count);
   const kept: Record<string, unknown>[] = [];
   const payload = () => `[MODULE_CONTEXT_BEGIN]\n${rules}\n${JSON.stringify({ feature: 'wiki', records: kept })}\n[MODULE_CONTEXT_END]`;
   for (const { d } of docs) {
-    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: innerBody(d.body) });
+    kept.unshift({ kind: 'wiki_reference', title: d.title, mode: d.meta?.mode ?? 'unknown', content: summary ? wikiSummary(d.body) : innerBody(d.body) });
     if (cap > 0 && tokens(payload()) > cap) kept.shift();
   }
   return kept.length ? payload() : '';
+}
+
+/** 문서 개요만: 정보 상자 + 첫 제목(보통 「개요」) 아래 문단. 제목이 없으면 첫 문단 */
+export function wikiSummary(body: string): string {
+  const lines = innerBody(body).split(/\r?\n/);
+  const box = lines.filter((l) => l.startsWith('[Infobox]'));
+  const first = lines.findIndex((l) => l.startsWith('[Heading]'));
+  let paras: string[];
+  if (first < 0) paras = lines.filter((l) => l.startsWith('[Paragraph]')).slice(0, 1);
+  else {
+    const next = lines.findIndex((l, i) => i > first && l.startsWith('[Heading]'));
+    paras = lines.slice(first + 1, next < 0 ? undefined : next).filter((l) => l.startsWith('[Paragraph]'));
+  }
+  return paras.length ? [...box, ...paras].join('\n') : innerBody(body);
 }
 
 export function wikiContextRules(lore: LoreEntry[] | undefined): string | null {

@@ -39,7 +39,8 @@ test('advanced: applyAdvanced sets the shared limits and puts them back', () => 
   assert.equal(LIMITS.replies, 4);
   assert.equal(phone.LIMITS.members, 9);
   assert.equal(HISTORY.dmHistory, 50);
-  assert.equal(CONTEXT.tokens, 10000);
+  assert.equal(CONTEXT.tokens, 3000);
+  assert.equal(phone.HISTORY.contextTokens, 4000);
 });
 
 test('advanced: main context respects 게시글·쪽지 toggles and 내가 쓴 것만', () => {
@@ -48,7 +49,7 @@ test('advanced: main context respects 게시글·쪽지 toggles and 내가 쓴 �
   st.posts.push({ id: G_POST_BASE + 9, date: '', nick: 'x', title: '남의 글', views: 0, votes: 0, body: 'b', mine: false, comments: [] });
   addOutgoingDm(st, 'x', '안녕', '');
   const recs = (state) => {
-    applyAdvanced(state);
+    applyAdvanced({ '$lb_cfg_lb-gn.adv_ctx_focus': '0', ...state });
     const t = mainContext(st, '나', 'R');
     return t ? JSON.parse(t.split('\n')[2]).records : [];
   };
@@ -107,15 +108,17 @@ test('advanced: real card prompts follow reference toggles, persona, turns and l
 
 test('advanced: wiki main context sends the newest chat documents within the count and token cap', () => {
   let chat = { message: [], scriptstate: {}, localLore: [] };
+  const orig = { '$nw_adv_ctx_focus': '0', '$nw_adv_ctx_summary': '0', '$nw_adv_ctx_count': '1' };
   const meta = (title, created) => ({ title, mode: 'expand', model: 'main', created, length: 'short', sources: [], primarySources: [], writingRequest: '', direct: false });
   const body = (t) => `<lightboard-namuwiki>[Paragraph]${t}</lightboard-namuwiki>`;
   chat = saveDoc(chat, meta('옛 문서', 10), body('옛'));
   chat = saveDoc(chat, meta('새 문서', 20), body('새'));
   const rec = (c) => JSON.parse(wikiMainContext(c, 'R').split('\n')[2]).records;
+  chat.scriptstate = orig;
   assert.deepEqual(rec(chat).map((r) => r.title), ['새 문서']);
-  chat.scriptstate = { '$nw_adv_ctx_count': '2' };
+  chat.scriptstate = { ...orig, '$nw_adv_ctx_count': '2' };
   assert.deepEqual(rec(chat).map((r) => r.title), ['옛 문서', '새 문서']);
   assert.equal(rec(chat)[1].kind, 'wiki_reference');
-  chat.scriptstate = { '$nw_adv_ctx_count': '2', '$nw_adv_ctx_tokens': '1' };
+  chat.scriptstate = { ...orig, '$nw_adv_ctx_count': '2', '$nw_adv_ctx_tokens': '1' };
   assert.equal(wikiMainContext(chat, 'R'), '');
 });
