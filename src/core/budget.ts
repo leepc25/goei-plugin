@@ -37,3 +37,32 @@ export function fitPrompt<P extends { messages: { content: string }[] }>(cap: nu
     level = 0;
   }
 }
+
+// ── 본편 반영 총 상한 (v0.16.28, 사용자 요청) ──
+// 괴담톡·괴담넷·위키 기록은 본편 요청 하나에 같이 붙어 더해진다. 합이 총 상한을 넘으면
+// 각 기능의 반영 상한 비율로 나누되, 몫보다 작게 쓰는 기능의 남는 몫은 나머지에 돌린다.
+
+export interface ContextPart {
+  /** 그 기능의 반영 토큰 상한 (0 = 제한 없음) */
+  cap: number;
+  /** 상한을 주면 그 안에서 기록을 다시 고른다 */
+  build: (cap: number) => string;
+}
+
+export function fitTotal(parts: ContextPart[], total: number): string[] {
+  const texts = parts.map((p) => p.build(p.cap));
+  if (total <= 0) return texts;
+  const size = texts.map((t) => (t ? tokens(t) : 0));
+  if (size.reduce((a, b) => a + b, 0) <= total) return texts;
+  const weight = parts.map((p) => (p.cap > 0 ? p.cap : total));
+  let remaining = total;
+  let left = weight.reduce((a, b) => a + b, 0);
+  const alloc: number[] = [];
+  for (const i of size.map((_, i) => i).sort((a, b) => size[a] - size[b])) {
+    const share = Math.floor((remaining * weight[i]) / left);
+    alloc[i] = Math.min(size[i], share);
+    remaining -= alloc[i];
+    left -= weight[i];
+  }
+  return parts.map((p, i) => (alloc[i] >= size[i] ? texts[i] : alloc[i] > 0 ? p.build(alloc[i]) : ''));
+}

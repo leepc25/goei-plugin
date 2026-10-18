@@ -122,3 +122,15 @@ test('advanced: wiki main context sends the newest chat documents within the cou
   chat.scriptstate = { ...orig, '$nw_adv_ctx_count': '2', '$nw_adv_ctx_tokens': '1' };
   assert.equal(wikiMainContext(chat, 'R'), '');
 });
+
+test('budget: fitTotal splits the main-story total by each feature cap and gives unused share to the rest', () => {
+  // 길이 n 토큰짜리 글을 상한 안에서 만든다 (한글 1자 = 1토큰)
+  const part = (cap, want) => ({ cap, build: (c) => '가'.repeat(c > 0 ? Math.min(want, c) : want) });
+  const sizes = (r) => r.map((t) => t.length);
+  assert.deepEqual(sizes(budget.fitTotal([part(4000, 4000), part(3000, 3000)], 0)), [4000, 3000], '0이면 그대로');
+  assert.deepEqual(sizes(budget.fitTotal([part(4000, 4000), part(3000, 3000)], 7000)), [4000, 3000], '안 넘치면 그대로');
+  assert.deepEqual(sizes(budget.fitTotal([part(4000, 4000), part(4000, 4000)], 4000)), [2000, 2000], '비율대로');
+  // 적게 쓰는 기능의 남는 몫은 다른 기능에
+  assert.deepEqual(sizes(budget.fitTotal([part(4000, 500), part(4000, 4000)], 3000)), [500, 2500]);
+  assert.ok(sizes(budget.fitTotal([part(4000, 4000), part(3000, 3000), part(8000, 8000)], 5000)).reduce((a, b) => a + b) <= 5000);
+});
