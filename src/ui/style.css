@@ -60,8 +60,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
   color: var(--text);
 }
-/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」(--dim, 0~1) */
-.gx::before { content: ""; position: absolute; inset: 0; background: var(--scrim); opacity: var(--dim, .5); pointer-events: none; }
+/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」. 색은 app.ts가 .gx에 바로 칠한다 (100%면 완전히 가림) */
 .gx-panel {
   /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */

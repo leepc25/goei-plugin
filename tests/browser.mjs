@@ -1929,7 +1929,11 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
     assert.ok(await page.evaluate(() => document.querySelector('.gx-nav').getBoundingClientRect().left > document.querySelector('.gx-content').getBoundingClientRect().left), '메뉴가 오른쪽');
     await page.click('[data-action="set-dim"][data-value="0"]');
-    await page.waitForFunction(() => getComputedStyle(document.querySelector('.gx'), '::before').opacity === '0');
+    await page.waitForFunction(() => /rgba\(3, 7, 9, 0\)|transparent/.test(getComputedStyle(document.querySelector('.gx')).backgroundColor));
+    await page.click('[data-action="set-dim"][data-value="100"]');
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.gx')).backgroundColor === 'rgb(3, 7, 9)');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-hsep')).color === 'rgb(0, 0, 0)'), false, '글자색 변수 그대로');
+    await page.click('[data-action="set-dim"][data-value="0"]');
     if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
     await page.click('[data-action="set-nav"][data-value="left"]');
     await page.click('[data-action="set-dim"][data-value="50"]');

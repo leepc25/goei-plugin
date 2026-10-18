@@ -54,6 +54,8 @@ type View =
   | { kind: 'opening'; ctx: ChatContext }
   | { kind: 'picker'; ctx: ChatContext; manifest: Manifest; staged: boolean };
 
+/** 창 바깥 막 색 (테마별, 투명도는 설정 → 화면) */
+const VEIL = { dark: '3, 7, 9', light: '20, 30, 28', paper: '40, 30, 15' };
 let root: HTMLElement | null = null;
 let view: View = { kind: 'loading' };
 let draft: Draft = { lang: 'ko' };
@@ -693,7 +695,9 @@ function render(): void {
   // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
   const pf = getPrefs();
   root.dataset.nav = pf.nav ?? 'left';
-  root.style.setProperty('--dim', String((pf.dim ?? DIM_DEFAULT) / 100));
+  // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
+  const veil = VEIL[root.dataset.theme as keyof typeof VEIL] ?? VEIL.dark;
+  root.style.background = `rgba(${veil}, ${(pf.dim ?? DIM_DEFAULT) / 100})`;
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
   root.dataset.tab = tab;
