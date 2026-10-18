@@ -993,6 +993,11 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.ok(last.content.includes('"kind":"private_message"'));
   const sub = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'submodel'));
   assert.equal(sub.length, 1, '보조 모델 요청에는 안 붙임');
+  // 본편 반영 총 상한: 너무 작으면 아무 기록도 안 붙음
+  await page.evaluate(() => { window.__chat.scriptstate.$gen_ctx_total = '10'; });
+  const tight = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
+  assert.equal(tight.length, 1, '총 상한 안에 못 들면 빼기');
+  await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
   await page.click('[data-action="gn-settings"]');
   await page.click('[data-action="gn-cfg"][data-value="context=1"]');

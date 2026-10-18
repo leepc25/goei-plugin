@@ -47,6 +47,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
         num('retries', '형식 오류 재시도', 1, 0, 3, '회'),
         { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인'], ['aux', '보조']] },
         num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요' }),
+        num('ctx_total', '본편 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 본편 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
       ],
     },
   ],

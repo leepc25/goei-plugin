@@ -57,7 +57,8 @@ ${themeVars('[x-goei-fab]')}
 @media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-intro="true"] * { animation: none !important; } }
 
 /* 접속 효과 (v0.16.22, 사용자 설계): 위쪽 띠 대신 유령 버튼 자리에서. 버튼이 튀어나오며 고리가 퍼지고,
-   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다. 표는 테마와 상관없이 원래 어두운 배색 */
+   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다.
+   v0.16.28 (사용자 요청): 표도 테마를 따른다. 다크는 네온 빛줄기와 글리치, 라이트는 맑은 빛줄기만, 페이퍼는 도장 찍듯 눌리는 잉크 */
 [x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
 [x-goei-fab][x-goei-intro="true"] button::after { display: none; }
 [x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
@@ -70,17 +71,31 @@ ${themeVars('[x-goei-fab]')}
   --gl-dx: 12px;
   display: flex; align-items: center; gap: 8px; position: absolute; top: 50%; right: calc(100% + 12px);
   height: 36px; padding: 0 16px; box-sizing: border-box; border-radius: 10px; overflow: hidden; white-space: nowrap; pointer-events: none;
-  background: rgba(6, 18, 22, .94); border: 1px solid rgba(127, 227, 208, .45); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
-  color: #e8fffa; font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
+  background: color-mix(in srgb, var(--g-void) 94%, transparent); border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
+  color: var(--g-text); font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
   transform-origin: right center; opacity: 0; animation: goei-label ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) 260ms both;
 }
 [x-goei-fab][x-goei-side="left"][x-goei-intro="true"] [data-gl] { --gl-dx: -12px; right: auto; left: calc(100% + 12px); transform-origin: left center; }
 [x-goei-fab] [data-gs] {
   position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
-  background: linear-gradient(90deg, transparent, rgba(127, 227, 208, .28), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 28%, transparent), transparent);
   animation: goei-in-sweep 800ms ease-out 420ms both;
 }
 [x-goei-fab] [data-gt] { position: relative; animation: goei-in-glitch 520ms steps(1) 480ms 1; }
+/* 라이트: 밝은 판, 글리치 없이 빛줄기만 */
+[x-goei-fab][x-goei-theme="light"][x-goei-intro="true"] [data-gl] { background: color-mix(in srgb, var(--g-panel) 96%, transparent); box-shadow: 0 10px 24px -12px rgba(15, 60, 52, .35); }
+[x-goei-fab][x-goei-theme="light"] [data-gt] { color: var(--g-signal); animation: none; }
+/* 페이퍼: 종이 판에 잉크 도장. 빛줄기·글리치 대신 한 번 눌렸다 번지듯 */
+[x-goei-fab][x-goei-theme="paper"][x-goei-intro="true"] [data-gl] {
+  background: var(--g-panel); border: 1.5px solid var(--g-signal); border-radius: 4px; box-shadow: 0 8px 20px -12px rgba(60, 40, 10, .45);
+}
+[x-goei-fab][x-goei-theme="paper"] [data-gs] { display: none; }
+[x-goei-fab][x-goei-theme="paper"] [data-gt] { color: var(--g-signal); animation: goei-in-stamp 620ms cubic-bezier(.3,1.4,.5,1) 380ms both; }
+@keyframes goei-in-stamp {
+  0% { opacity: 0; transform: scale(1.35); letter-spacing: .32em; filter: blur(1.5px); }
+  55% { opacity: 1; transform: scale(.96); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
+}
 @keyframes goei-fab-pop {
   0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
   60% { opacity: 1; transform: scale(1.18) rotate(6deg); }

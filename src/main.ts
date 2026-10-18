@@ -1,11 +1,12 @@
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
-import { GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
+import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
-import { hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
+import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
-import { applyAdvanced } from './core/advanced';
+import { advNum, applyAdvanced } from './core/advanced';
+import { fitTotal, type ContextPart } from './core/budget';
 import { makeFocus, sceneText } from './core/focus';
 import { buildRegistry, type Registry } from './core/world/registry';
 import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
@@ -86,20 +87,36 @@ async function moduleContext(scene: string): Promise<string[]> {
     rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
   }
   const focus = makeFocus(scene, rulesCache.registry);
-  const out: string[] = [];
-  if (wantGnet && rulesCache.gnet) {
+  const rules = rulesCache;
+  // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
+  const parts: ContextPart[] = [];
+  if (wantGnet && rules.gnet) {
     const st = readGnet(chat);
-    if (st.posts.length || st.dms.length) out.push(mainContext(st, userNick(ss), rulesCache.gnet, focus));
+    const own = GN_CONTEXT.tokens;
+    if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(GN_CONTEXT, 'tokens', cap, () => mainContext(st, userNick(ss), rules.gnet!, focus)) });
   }
-  if (wantPhone && rulesCache.phone) {
+  if (wantPhone && rules.phone) {
     try {
-      out.push(phoneMainContext(readPhone(chat), readBulletins(chat), phoneSettings(ss), rulesCache.phone, focus));
+      const st = readPhone(chat);
+      const notices = readBulletins(chat);
+      parts.push({ cap: PH_HISTORY.contextTokens, build: (cap) => withCap(PH_HISTORY, 'contextTokens', cap, () => phoneMainContext(st, notices, phoneSettings(ss), rules.phone!, focus)) });
     } catch (error) {
       console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (wantWiki && rulesCache.wiki) out.push(wikiMainContext(chat, rulesCache.wiki, focus));
-  return out.filter(Boolean);
+  if (wantWiki && rules.wiki) parts.push({ cap: advNum(ss, 'nw', 'ctx_tokens'), build: (cap) => wikiMainContext(chat, rules.wiki!, focus, cap) });
+  return fitTotal(parts, advNum(ss, 'gen', 'ctx_total')).filter(Boolean);
+}
+
+/** 공용 상한 상수를 잠깐 바꿔 고르고 되돌린다 */
+function withCap<T extends Record<K, number>, K extends string>(box: T, key: K, cap: number, run: () => string): string {
+  const keep = box[key];
+  box[key] = cap as T[K];
+  try {
+    return run();
+  } finally {
+    box[key] = keep;
+  }
 }
 
 /** 혹시 저장 본문에 상황판 태그가 남아 있으면 요청에서만 지운다 (원본 editRequest와 같음) */
