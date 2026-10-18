@@ -11,9 +11,16 @@ import { runModel } from '../host/llm';
 import { saveVarDefaults } from '../host/prefs';
 import { ICONS } from './icons';
 import { toast } from './toast';
+import { drawerHtml } from './drawer';
+import { imageUrl } from './images';
+import { readDirectory } from '../core/world/directory';
+import { SIDO_NAME } from '../core/world/geo';
+import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 
-type WikiView = 'home' | 'query' | 'compose' | 'doc' | 'settings';
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new';
+/** 왼쪽 목록 묶음: 작성한 문서, 괴이·특수·거점·인물·조직 */
+type Cat = 'docs' | 'an' | 'ms' | 'lm' | 'ag' | 'org';
 
 interface WikiState {
   view: WikiView;
@@ -29,14 +36,17 @@ interface WikiState {
   notice: string;
   /** 잠깐 떴다 사라지는 안내 */
   info: string;
+  /** 왼쪽 목록 묶음 (null: 문서가 있으면 작성됨, 없으면 괴이) */
+  cat: Cat | null;
+  newTitle: string;
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '',
+  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', cat: null, newTitle: '',
 };
 
 export function resetWiki() {
-  Object.assign(wiki, { view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '' });
+  Object.assign(wiki, { view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '', newTitle: '' });
 }
 
 interface Job {
@@ -97,16 +107,15 @@ function openTitle(ctx: ChatContext, raw: string, from: 'link' | 'direct' | 'sea
   go('compose', title);
 }
 
+/** 검색줄 Enter·검색: 정확히 맞는 제목이면 바로 열고, 아무것도 안 맞으면 그 제목으로 작성 화면. 나머지는 왼쪽 목록이 걸러 보여 준다 */
 function search(ctx: ChatContext, q: string) {
   const query = q.trim();
+  wiki.query = query;
   if (!query) return;
   const c = canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
-  const docs = listDocs(ctx.chat).filter((d) => d.title.toLowerCase().includes(query.toLowerCase()));
-  const hits = searchRegistry(registry(ctx), query);
-  if (!docs.length && !hits.length) return openTitle(ctx, c.title, 'direct');
-  go('query', '', query);
+  if (!matches(ctx, query).length) openTitle(ctx, c.title, 'direct');
 }
 
 // ── 생성 ──
@@ -169,6 +178,63 @@ async function setVar(ctx: ChatContext, env: WikiEnv, key: string, value: string
 }
 
 // ── 화면 ──
+// v0.16.23 (사용자 승인 설계): 괴담톡·괴담넷과 같은 두 칸. 왼쪽은 카드 명부 전체(괴이·특수·거점·인물·조직)와 작성한 문서,
+// 오른쪽은 문서·작성 화면·설정. 모바일은 한 화면씩, 도구 줄은 맨 아래(모바일은 접는 서랍).
+
+interface Entry {
+  cat: Exclude<Cat, 'docs'>;
+  name: string;
+  /** 위키 문서 제목 (정식 이름) */
+  title: string;
+  sub: string;
+  /** 사진 에셋 이름 */
+  photo: string;
+  terms: string[];
+}
+
+const CAT_LABEL: Record<Cat, string> = { docs: '작성됨', an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
+const CAT_ICON: Record<Exclude<Cat, 'docs'>, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
+
+let entryCache: { lore: unknown; list: Entry[] } | null = null;
+function entries(ctx: ChatContext): Entry[] {
+  if (entryCache && entryCache.lore === ctx.char.globalLore) return entryCache.list;
+  const c = canon(ctx);
+  const list: Entry[] = [];
+  const dir = readDirectory(ctx.char.globalLore);
+  for (const [cat, rows] of [['an', dir.anomalies], ['ms', dir.sites]] as const) {
+    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: p.english, terms: [p.label, p.english, ...p.aliases] });
+  }
+  try {
+    for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
+      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: [SIDO_NAME[l.sido] ?? '', l.gu].filter(Boolean).join(' '), photo: '', terms: [l.name, l.english, ...l.aliases] });
+    }
+  } catch {
+    /* 목록 로어북이 없으면 거점만 뺀다 */
+  }
+  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: a.english, terms: [a.name, a.english, ...a.aliases] });
+  for (const f of factionList(ctx.char.globalLore)) {
+    if (f.hidden) continue;
+    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: f.photo ?? '', terms: [f.name, f.affiliation] });
+  }
+  // 같은 문서로 이어지는 항목은 하나만
+  const seen = new Set<string>();
+  const out = list.filter((e) => (seen.has(`${e.cat}|${e.title}`) ? false : (seen.add(`${e.cat}|${e.title}`), true)));
+  entryCache = { lore: ctx.char.globalLore, list: out };
+  return out;
+}
+
+const entryFor = (ctx: ChatContext, title: string) => entries(ctx).find((e) => e.title === title);
+
+function matches(ctx: ChatContext, q: string): Entry[] {
+  const lower = q.toLowerCase();
+  return entries(ctx).filter((e) => e.terms.some((t) => t && t.toLowerCase().includes(lower)));
+}
+
+/** 사진(카드 에셋) 또는 분류 아이콘 */
+function face(ctx: ChatContext, e: Entry | undefined, cls = ''): string {
+  const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
+  return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
+}
 
 function seg(action: string, cur: string, items: [string, string][]): string {
   return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
@@ -179,105 +245,116 @@ function busyLine(ctx: ChatContext): string {
   return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : '';
 }
 
-const SUGGEST = { html: '' };
+const tool = (action: string, icon: string, label: string, extra = '', short = '') =>
+  `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ''}</button>`;
 
-/** 입력하는 동안 보이는 후보: 저장된 문서, 로어북 이름, 이 제목으로 새로 쓰기 */
-export function wikiSuggest(ctx: ChatContext, q: string): string {
-  const query = q.trim();
-  if (!query) return '';
-  const lower = query.toLowerCase();
-  const docs = listDocs(ctx.chat).filter((d) => d.title.toLowerCase().includes(lower)).slice(0, 6);
-  const hits = searchRegistry(registry(ctx), query).filter((e) => e.lore && !docs.some((d) => d.title === e.lore)).slice(0, 8);
-  const items = [
-    ...docs.map((d) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc(d.title)}"><b>${esc(d.title)}</b><span class="gx-badge live">문서 있음</span></button>`),
-    ...hits.map((e) => `<button class="nw-sugg" data-action="wiki-open" data-value="${esc(e.lore)}"><b>${esc(e.name)}</b>${e.lore !== e.name ? `<span class="gx-loc">${esc(e.lore)}</span>` : ''}<span class="gx-badge wait">작성 화면</span></button>`),
-  ];
-  if (!docs.some((d) => d.title === query) && !hits.some((e) => e.lore === query || e.name === query)) {
-    items.push(`<button class="nw-sugg" data-action="wiki-write" data-value="${esc(query)}"><b>${esc(query)}</b><span class="gx-badge wait">이 제목으로 새로 쓰기</span></button>`);
+const blank = (text: string) => `<div class="ph-blank"><p>${text}</p></div>`;
+
+const when = (sec: number) => new Date(sec * 1000).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
+
+/** 목록 한 줄: 사진, 이름·부제, 오른쪽에 작성됨 점 (작성됨 묶음은 휴지통) */
+function row(ctx: ChatContext, e: Entry | undefined, title: string, saved: Set<string>, trash = false, sub?: string): string {
+  const on = (wiki.view === 'doc' || wiki.view === 'compose') && wiki.title === title;
+  const written = saved.has(title);
+  const confirm = wiki.confirmDelete === title;
+  const del = !trash
+    ? ''
+    : confirm
+      ? `<button class="gx-mini danger ph-rdel" data-action="wiki-delete" data-value="${esc(title)}">정말 삭제</button>`
+      : `<button class="ph-tool sm ph-rdel" data-action="wiki-delete" data-value="${esc(title)}" title="삭제" aria-label="${esc(title)} 삭제">${ICONS.trash}</button>`;
+  const name = e?.name ?? title;
+  const small = sub ?? (e ? [e.title !== e.name ? e.title : '', e.sub].filter(Boolean).join(' · ') : '');
+  return `<li class="ph-row"><button class="ph-main nw-row${on ? ' on' : ''}" data-action="wiki-pick" data-value="${esc(title)}">${face(ctx, e)}
+    <span class="ph-who"><span class="ph-who-top"><b>${esc(name)}</b>${written && !trash ? '<span class="nw-dot" title="작성됨" aria-label="작성됨"></span>' : ''}</span>${small ? `<small>${esc(small)}</small>` : ''}</span></button>${del}</li>`;
+}
+
+/** 왼쪽 목록 (검색어를 바꾸면 이것만 다시 그린다) */
+export function wikiList(ctx: ChatContext): string {
+  const docs = listDocs(ctx.chat).slice().reverse();
+  const saved = new Set(docs.map((d) => d.title));
+  const q = wiki.query.trim();
+  if (q) {
+    const hits = matches(ctx, q);
+    const mine = docs.filter((d) => d.title.toLowerCase().includes(q.toLowerCase()) && !hits.some((e) => e.title === d.title));
+    const exact = canon(ctx)(q);
+    const fresh = saved.has(exact) || hits.some((e) => e.title === exact)
+      ? ''
+      : `<li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc(q)}」</b><small>이 제목으로 새 문서</small></span></button></li>`;
+    const groups = (['an', 'ms', 'lm', 'ag', 'org'] as const)
+      .map((k) => ({ k, rows: hits.filter((e) => e.cat === k) }))
+      .filter((g) => g.rows.length)
+      .map((g) => `<h4 class="ph-sec">${CAT_LABEL[g.k]}<b>${g.rows.length}</b></h4><ul class="ph-list">${g.rows.map((e) => row(ctx, e, e.title, saved)).join('')}</ul>`)
+      .join('');
+    const other = mine.length ? `<h4 class="ph-sec">작성됨<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => row(ctx, undefined, d.title, saved)).join('')}</ul>` : '';
+    return `${fresh ? `<ul class="ph-list">${fresh}</ul>` : ''}${other}${groups}` || blank('검색 결과가 없어요.');
   }
-  return items.join('');
+  const all = entries(ctx);
+  const cat = wiki.cat ?? (docs.length ? 'docs' : 'an');
+  const count = (k: Cat) => (k === 'docs' ? docs.length : all.filter((e) => e.cat === k).length);
+  const cats = (['docs', 'an', 'ms', 'lm', 'ag', 'org'] as Cat[]).filter((k) => k === 'docs' || count(k));
+  const chips = `<div class="ph-tabs nw-cats" role="tablist">${cats
+    .map((k) => `<button class="ph-tab${k === cat ? ' on' : ''}" data-action="wiki-cat" data-value="${k}" aria-selected="${k === cat}">${CAT_LABEL[k]}<small>${count(k)}</small></button>`)
+    .join('')}</div>`;
+  if (cat === 'docs') {
+    if (!docs.length) return chips + blank('아직 작성한 문서가 없어요.<br>분류에서 항목을 고르거나 위에서 제목을 검색해 보세요.');
+    return `${chips}<ul class="ph-list">${docs.map((d) => row(ctx, entryFor(ctx, d.title), d.title, saved, true, d.meta?.created ? when(d.meta.created) : '')).join('')}</ul>`;
+  }
+  const rows = all.filter((e) => e.cat === cat);
+  return `${chips}<ul class="ph-list">${rows.map((e) => row(ctx, e, e.title, saved)).join('')}</ul>`;
 }
 
-function searchBar(): string {
-  // Risu 플러그인 창은 form 제출이 막힌 iframe이라 form을 쓰지 않는다 (Enter·버튼을 직접 처리)
-  return `<div class="nw-search"><input class="gx-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="문서 제목 검색 또는 새 제목" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"><button class="gx-mini" data-action="wiki-search" data-take="wiki-q">검색</button>${settingsBtn()}</div>
-    <div class="nw-suggest" role="listbox">${SUGGEST.html}</div>`;
+function paneHead(ctx: ChatContext, title: string, sub: string, right = '', e?: Entry): string {
+  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>
+    ${e ? face(ctx, e, ' sm') : ''}<div class="ph-room-title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
 }
 
-function requestBox(ctx: ChatContext): string {
-  const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
-  return `<details class="nw-req"${req ? ' open' : ''}><summary>작성 지침${req ? ' · 사용 중' : ''}</summary>
-    <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="예: 도시전설 게시판 말투로, 목격담 위주로">${esc(req)}</textarea>
-    <p class="gx-muted">비우기 전까지 이후 모든 문서 작성에 쓰여요.</p></details>`;
-}
-
-/** 위키 설정 버튼 (괴담톡·괴담넷처럼 설정 화면을 따로) */
-const settingsBtn = () =>
-  `<button class="ph-tool nw-cfg" data-action="wiki-settings" aria-label="위키 설정" title="위키 설정"${wiki.view === 'settings' ? ' aria-pressed="true"' : ''}>${ICONS.settings}</button>`;
-
-/** 위키 설정: 괴담톡·괴담넷 설정과 같은 줄 모양, 오른쪽 위 「기본값으로 저장」 */
+/** 위키 설정 */
 function settingsView(ctx: ChatContext): string {
   const s = wikiSettings(ctx.chat.scriptstate);
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
-  const row = (label: string, control: string, hint = '') =>
+  const line = (label: string, control: string, hint = '') =>
     `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-  return `<section class="nw-setpane">
-    <header class="nw-sethead"><div><h2>위키 설정</h2><small>지금 채팅에 적용돼요</small></div>
-      <button class="gx-mini ps-save" data-action="wiki-save-default" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button></header>
-    <div class="ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${row('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
-      ${row('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
-      ${row('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
-      ${row('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
+  return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '지금 채팅에 적용돼요', `<button class="gx-mini ps-save" data-action="wiki-save-default" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`)}
+    <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
+      ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
+      ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
+      ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
+      ${line('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
     </div></section>
     <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section></div>
-  </section>`;
+  </div>`;
 }
 
-function home(ctx: ChatContext): string {
-  const docs = listDocs(ctx.chat).slice().reverse();
-  const rows = docs
-    .map((d) => {
-      const confirm = wiki.confirmDelete === d.title;
-      return `<li class="gx-ev"><button class="gx-evmain" data-action="wiki-open" data-value="${esc(d.title)}"><span class="gx-row"><b>${esc(d.title)}</b></span>
-        ${d.meta?.created ? `<span class="gx-loc">${new Date(d.meta.created * 1000).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })}</span>` : ''}</button>
-        <div class="gx-evact"><button class="gx-mini" data-action="wiki-rewrite" data-value="${esc(d.title)}">재작성</button>
-        <button class="gx-mini${confirm ? ' danger' : ''}" data-action="wiki-delete" data-value="${esc(d.title)}">${confirm ? '정말 삭제' : '삭제'}</button></div></li>`;
-    })
-    .join('');
-  return `${searchBar()}
-    <section class="gx-sec"><h2>문서<small>${docs.length}</small></h2>
-    ${docs.length ? `<ul class="gx-list gx-evs">${rows}</ul>` : '<p class="gx-none">아직 문서가 없어요. 위에서 제목을 검색하거나 새 제목을 적어 보세요.</p>'}</section>`;
+/** 새 문서: 제목을 적고 작성 화면으로 */
+function newView(ctx: ChatContext): string {
+  return `<div class="ph-form">${paneHead(ctx, '새 문서', '')}
+    <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
+      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
 }
 
-function queryView(ctx: ChatContext): string {
-  const q = wiki.query.trim();
-  const docs = listDocs(ctx.chat).filter((d) => d.title.toLowerCase().includes(q.toLowerCase()));
-  const hits = searchRegistry(registry(ctx), q).filter((e) => !docs.some((d) => d.title === (e.lore || e.name)));
-  const exact = canon(ctx)(q);
-  const shown = new Set([...docs.map((d) => d.title), ...hits.map((e) => e.lore)]);
-  return `${searchBar()}
-    <section class="gx-sec"><h2>「${esc(q)}」 검색 결과</h2><ul class="gx-list gx-evs">
-      ${docs.map((d) => `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc(d.title)}"><span class="gx-row"><b>${esc(d.title)}</b><span class="gx-badge live">문서 있음</span></span></button></li>`).join('')}
-      ${hits.map((e) => (e.lore
-        ? `<li><button class="gx-evmain" data-action="wiki-open" data-value="${esc(e.lore)}"><span class="gx-row"><b>${esc(e.name)}</b><span class="gx-badge wait">작성 화면</span></span>${e.lore !== e.name ? `<span class="gx-loc">${esc(e.lore)}</span>` : ''}</button></li>`
-        : `<li><div class="gx-evmain"><span class="gx-row"><b>${esc(e.name)}</b><span class="gx-badge">연결 미지정</span></span></div></li>`)).join('')}
-      ${shown.has(exact) ? '' : `<li><button class="gx-evmain" data-action="wiki-write" data-value="${esc(q)}"><span class="gx-row"><b>${esc(q)}</b><span class="gx-badge wait">이 제목으로 작성</span></span></button></li>`}
-    </ul></section>`;
-}
-
+/** 아직 없는 문서: 원본 자료 안내와 작성 시작 하나 */
 function compose(ctx: ChatContext): string {
   const job = jobs.get(chatKey(ctx));
   const mine = job?.title === wiki.title;
   const lore = hasBook(source(ctx), wiki.title);
+  const e = entryFor(ctx, wiki.title);
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
-  return `<section class="nw-compose">
-    <h2 class="nw-title">${esc(wiki.title)}</h2>
-    <p class="gx-muted">${lore ? '같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요.' : wiki.inherited.length ? `로어북이 없어서 「${esc(wiki.previousTitle ?? '')}」 문서의 원본 자료(${esc(wiki.inherited.join(', '))})를 이어받아 작성해요.` : '같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.'}</p>
-    ${req ? `<p class="gx-hint">작성 지침: ${esc(req)}</p>` : ''}
-    <button class="gx-start" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '작성하는 중…' : '위키 작성 시작'}</button>
-  </section>${requestBox(ctx)}`;
+  const src = lore
+    ? '같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요.'
+    : wiki.inherited.length
+      ? `로어북이 없어서 「${esc(wiki.previousTitle ?? '')}」 문서의 원본 자료(${esc(wiki.inherited.join(', '))})를 이어받아 작성해요.`
+      : '같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.';
+  return `<div class="ph-form">${paneHead(ctx, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : '새 문서', '', e)}
+    <div class="ph-form-body"><section class="nw-compose">
+      ${face(ctx, e, ' lg')}
+      <h2 class="nw-title">${esc(wiki.title)}</h2>
+      <p class="nw-cmsg">이 문서는 아직 없어요.</p>
+      <p class="gx-muted">${src}</p>
+      ${req ? `<p class="nw-creq">작성 지침: ${esc(req)}</p>` : ''}
+    </section></div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '작성하는 중…' : '작성 시작'}</button></div></div>`;
 }
 
 function docView(ctx: ChatContext): string {
@@ -288,63 +365,121 @@ function docView(ctx: ChatContext): string {
   }
   const c = canon(ctx);
   const saved = new Set(listDocs(ctx.chat).map((d) => d.title));
-  const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c });
+  const e = entryFor(ctx, doc.title);
+  const photo = e?.photo ? imageUrl(ctx.char, e.photo) : null;
+  const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo });
   const job = jobs.get(chatKey(ctx));
+  // 상세·관련 문서: 사진이 붙은 칩, 아직 없는 문서는 흐리게
   const links = (label: string, list: string[]) =>
-    list.length ? `<div class="nw-more"><b>${label}</b>${list.map((t) => `<button class="nw-link${saved.has(t) ? ' on' : ''}" data-action="wiki-open" data-value="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : '';
+    list.length
+      ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list.map((t) => {
+          const le = entryFor(ctx, t);
+          return `<button class="nw-chip${saved.has(t) ? '' : ' none'}" data-action="wiki-open" data-value="${esc(t)}">${face(ctx, le, ' xs')}<span>${esc(le?.name ?? t)}</span></button>`;
+        }).join('')}</div></div>`
+      : '';
   const m = doc.meta;
   const info = m
     ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === 'faithful' ? '원본 충실' : '확장'} · ${({ short: '짧게', standard: '보통', detailed: '상세' } as Record<string, string>)[m.length] ?? m.length} · ${m.model === 'aux' ? '보조 모델' : '메인 모델'}</p>
        ${m.sources.length ? `<p>${esc(m.sources.join(', '))}</p>` : ''}${m.writingRequest ? `<p>작성 지침: ${esc(m.writingRequest)}</p>` : ''}</details>`
     : '';
-  return `<article class="nw-doc">
-    <header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>
-      <button class="gx-mini" data-action="wiki-rewrite" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${job?.title === doc.title ? '작성하는 중…' : '↻ 새로고침'}</button></header>
-    <div class="nw-body">${r.html}</div>
-    ${links('상세 문서', r.related)}${links('관련 문서', r.recent)}${info}
-  </article>`;
+  const confirm = wiki.confirmDelete === doc.title;
+  const right = `${tool('wiki-rewrite', ICONS.refresh, job?.title === doc.title ? '작성하는 중' : '새로고침', `data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}`)}${confirm
+    ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">정말 삭제</button>`
+    : tool('wiki-delete', ICONS.trash, '문서 삭제', `data-value="${esc(doc.title)}"`)}`;
+  const sub = [e ? CAT_LABEL[e.cat] : '', m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
+  return `<div class="ph-room nw-pane">${paneHead(ctx, e?.name ?? doc.title, sub, right, e)}
+    <article class="nw-doc">
+      <header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>${e && e.sub && e.cat !== 'lm' ? `<small>${esc(e.sub)}</small>` : ''}</header>
+      <div class="nw-body">${r.html}</div>
+      ${links('상세 문서', r.related)}${links('관련 문서', r.recent)}${info}
+    </article></div>`;
+}
+
+function paneHtml(ctx: ChatContext): string {
+  if (wiki.view === 'doc') return docView(ctx);
+  if (wiki.view === 'compose') return compose(ctx);
+  if (wiki.view === 'settings') return settingsView(ctx);
+  if (wiki.view === 'new') return newView(ctx);
+  return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.wiki}</span><b>위키</b><p>왼쪽에서 문서나 항목을 고르세요.</p></div>`;
 }
 
 export function wikiTab(ctx: ChatContext): string {
-  SUGGEST.html = wiki.view === 'query' ? '' : wikiSuggest(ctx, wiki.query);
-  const back = wiki.history.length ? '<button class="gx-mini" data-action="wiki-back">← 뒤로</button>' : '';
-  const nav = `<div class="nw-nav">${back}<button class="gx-mini" data-action="wiki-home">목록</button><span class="nw-nav-gap"></span>${wiki.view === 'query' ? '' : settingsBtn()}</div>`;
-  const view = wiki.view === 'doc' ? docView(ctx) : wiki.view === 'compose' ? compose(ctx) : wiki.view === 'query' ? queryView(ctx) : wiki.view === 'settings' ? settingsView(ctx) : home(ctx);
-  const note = toast('nw', wiki.info, (t) => {
-    if (wiki.info === t) wiki.info = '';
-  });
+  const job = jobs.get(chatKey(ctx));
   const fail = wiki.failure
     ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc(wiki.failure.title)})</summary><p>${esc(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc(wiki.failure.raw)}</textarea></details>`
     : '';
-  return `<main class="gx-body nw">${wiki.view === 'home' ? '' : nav}${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}${view}${fail}${note}</main>`;
+  const note = toast('nw', wiki.info, (t) => {
+    if (wiki.info === t) wiki.info = '';
+  });
+  const detail = wiki.view !== 'home';
+  const tools = [
+    tool('wiki-new', ICONS.pen, '새 문서', wiki.view === 'new' ? 'aria-pressed="true"' : '', '새 문서'),
+    tool('wiki-rewrite', ICONS.refresh, '이 문서 새로고침', wiki.view === 'doc' && !job ? `data-value="${esc(wiki.title)}"` : 'disabled', '새로고침'),
+    tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
+  ].join('');
+  const status = `${busyLine(ctx)}${wiki.notice ? `<div class="gx-err" role="alert">${esc(wiki.notice)}</div>` : ''}`;
+  return `<main class="gx-body ph ph-app nw ${detail ? 'is-detail' : 'is-list'}">
+    <section class="ph-side" aria-label="위키 목록">
+      <div class="ph-side-head nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
+      ${detail ? '' : status}
+      <div class="ph-content">${wikiList(ctx)}</div>
+      ${fail}
+      ${drawerHtml(tools)}
+    </section>
+    <section class="ph-pane">${detail ? `<div class="nw-status">${status}</div>` : ''}${paneHtml(ctx)}</section>
+    ${note}
+  </main>`;
 }
 
 /** 위키 탭의 버튼. 처리했으면 true */
 export async function handleWiki(action: string, value: string | undefined, ctx: ChatContext, env: WikiEnv): Promise<boolean> {
   const v = value ?? '';
+  if (action !== 'wiki-delete') wiki.confirmDelete = null;
   switch (action) {
     case 'wiki-home':
       go('home');
       wiki.history = [];
       break;
     case 'wiki-back': {
+      // 문서 안 링크로 옮겨 다닌 길을 거슬러 가고, 처음 화면이면 목록으로
       const prev = wiki.history.pop();
-      if (prev) Object.assign(wiki, prev, { confirmDelete: null, notice: '' });
+      if (prev && prev.view !== 'home') Object.assign(wiki, { view: prev.view, title: prev.title }, { confirmDelete: null, notice: '' });
+      else Object.assign(wiki, { view: 'home', title: '', notice: '' }, { history: [] });
       break;
     }
+    case 'wiki-cat':
+      wiki.cat = (['docs', 'an', 'ms', 'lm', 'ag', 'org'] as Cat[]).includes(v as Cat) ? (v as Cat) : null;
+      break;
     case 'wiki-search':
       search(ctx, v);
       break;
+    case 'wiki-pick':
+      // 왼쪽 목록에서 고르기. PC는 열린 항목을 다시 누르면 닫힌다
+      if ((wiki.view === 'doc' || wiki.view === 'compose') && canon(ctx)(v) === wiki.title && !matchMedia('(max-width: 760px)').matches) {
+        Object.assign(wiki, { view: 'home', title: '', history: [] });
+        break;
+      }
+      wiki.history = [];
+      openTitle(ctx, v, 'search');
+      break;
     case 'wiki-open':
+      // 문서 안 링크·관련 문서 칩: 없는 문서는 부모 문서의 원본 자료를 물려받는다
       openTitle(ctx, v, wiki.view === 'doc' ? 'link' : 'search');
       break;
     case 'wiki-write':
+      if (!v.trim()) break;
+      wiki.newTitle = '';
       openTitle(ctx, v, 'direct');
+      break;
+    case 'wiki-new':
+      if (wiki.view === 'new') go('home');
+      else go('new');
       break;
     case 'wiki-start':
       if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false);
       break;
     case 'wiki-rewrite':
+      if (!v) break;
       if (wiki.view !== 'doc') go('doc', v);
       void generate(ctx, env, v, true);
       break;
@@ -354,6 +489,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
         break;
       }
       wiki.confirmDelete = null;
+      if (wiki.title === v && wiki.view === 'doc') Object.assign(wiki, { view: 'home', title: '', history: [] });
       await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => deleteDoc(chat, v));
       await env.refresh();
       return true;
@@ -371,11 +507,8 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       await setVar(ctx, env, `$nw_${action.slice(5)}`, v);
       return true;
     case 'wiki-settings':
-      if (wiki.view === 'settings') {
-        const prev = wiki.history.pop();
-        if (prev) Object.assign(wiki, prev, { confirmDelete: null, notice: '' });
-        else go('home');
-      } else go('settings');
+      if (wiki.view === 'settings') go('home');
+      else go('settings');
       break;
     case 'wiki-save-default':
       try {
@@ -390,4 +523,10 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
   }
   env.render();
   return true;
+}
+
+/** 입력칸 (다시 그리지 않음) */
+export function wikiInput(name: string, value: string): boolean {
+  if (name === 'wiki-new') return void (wiki.newTitle = value), true;
+  return false;
 }

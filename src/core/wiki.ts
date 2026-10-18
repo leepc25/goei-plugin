@@ -246,6 +246,8 @@ export interface RenderOptions {
   /** 저장된 문서가 있는 링크인지 */
   saved: (title: string) => boolean;
   canon: (title: string) => string;
+  /** 정보 상자 맨 위에 넣을 사진 주소 (그 항목의 카드 에셋) */
+  photo?: string | null;
 }
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -335,7 +337,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
         const fields = splitFields(b.text).map(field);
         const head = fields.find(([k]) => k === 'Title')?.[1] ?? a.doc_title ?? '';
         const rows = fields.filter(([k]) => k !== 'Title' && k);
-        out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head)}</th></tr>${rows.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join('')}</table>`);
+        out.push(`<table class="nw-infobox" style="--nw:${color}"><tr><th colspan="2">${inline(head)}</th></tr>${o.photo ? `<tr><td colspan="2" class="nw-ibphoto"><img src="${esc(o.photo)}" alt=""></td></tr>` : ''}${rows.map(([k, v]) => `<tr><td>${inline(k)}</td><td>${inline(v)}</td></tr>`).join('')}</table>`);
         break;
       }
       case 'Toc':

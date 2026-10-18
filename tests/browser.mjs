@@ -729,17 +729,16 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.evaluate((a) => { window.__llm = [{ type: 'success', result: a }]; }, article('아무 제목'));
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
-  await page.waitForSelector('.nw-search');
+  await page.waitForSelector('.nw .ph-search');
   assert.equal(await page.locator('.gx-panel form').count(), 0, 'form을 쓰지 않음');
-  await page.fill('.nw-search input', '소라');
-  await page.waitForSelector('.nw-suggest .nw-sugg');
-  assert.ok((await page.textContent('.nw-suggest')).includes('소라 랜드'), '입력하는 동안 후보가 보인다');
-  await page.click('.nw-search [data-action="wiki-search"]');
-  await page.waitForSelector('.nw-compose, .gx-sec h2');
-  await page.click('[data-action="wiki-home"]');
-  await page.waitForSelector('.nw-search');
-  await page.fill('.nw-search input', 'Sora Land');
-  await page.press('.nw-search input', 'Enter');
+  // 왼쪽 목록: 문서가 없으면 괴이 묶음, 분류 칩마다 개수
+  assert.equal((await page.textContent('.nw .ph-tab.on')).replace(/\d+/g, ''), '괴이');
+  assert.ok((await page.$$eval('.nw .ph-tab', (b) => b.map((x) => x.firstChild.textContent))).join(',').includes('인물'));
+  await page.fill('.nw .ph-search', '소라');
+  await page.waitForSelector('.nw .ph-content .ph-sec');
+  assert.ok((await page.textContent('.nw .ph-content')).includes('소라 랜드'), '입력하는 동안 명부 전체에서 걸러 보인다');
+  await page.fill('.nw .ph-search', 'Sora Land');
+  await page.press('.nw .ph-search', 'Enter');
   await page.waitForSelector('.nw-compose');
   assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드', '별칭이 정식 이름으로');
   assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
@@ -769,7 +768,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.nw-doc');
   // 새로고침 실패: 기존 문서 유지, 원문 보관
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '형식이 틀린 응답' }]; });
-  await page.click('.nw-dochead [data-action="wiki-rewrite"]');
+  await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
   await page.waitForSelector('.gx-err', { timeout: 5000 });
   assert.ok((await page.textContent('.gx-err')).includes('기존 문서는 그대로'));
   assert.ok((await page.textContent('.nw-fail')).includes('최근 실패 원문'));
@@ -777,7 +776,6 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const prev = await page.evaluate(() => window.__calls.llm[1].messages[1].content);
   assert.ok(prev.includes('[이전 위키'), '새로고침은 이전 문서를 넘긴다');
   // 목록, 설정, 작성 지침, 삭제
-  await page.click('[data-action="wiki-home"]');
   // 설정은 따로 (괴담톡·괴담넷처럼), 「기본값으로 저장」은 플러그인 저장소에
   await page.click('[data-action="wiki-settings"]');
   await page.waitForSelector('.nw-setpane');
@@ -791,15 +789,23 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-toast');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
   await page.click('[data-action="wiki-settings"]');
-  await page.waitForSelector('[data-action="wiki-delete"]');
+  // 작성한 문서가 있으면 「작성됨」 묶음이 먼저
+  await page.fill('.nw .ph-search', '');
+  await page.dispatchEvent('.nw .ph-search', 'input');
+  await page.waitForSelector('.nw .ph-content [data-action="wiki-delete"]');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-home.png` });
+  await page.click('[data-action="wiki-cat"][data-value="ag"]');
+  assert.ok(await page.$('.nw .ph-content .nw-row'), '인물 묶음');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-people.png` });
+  await page.click('[data-action="wiki-cat"][data-value="docs"]');
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
-  await page.click('[data-action="wiki-open"][data-value="소라 랜드"]');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-list-mobile.png` });
+  await page.click('[data-action="wiki-pick"][data-value="소라 랜드"]');
   await page.waitForSelector('.nw-doc');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
+  await page.click('.nw-pane [data-action="wiki-back"]');
   await page.setViewportSize({ width: 1100, height: 900 });
-  await page.click('[data-action="wiki-home"]');
   await page.click('[data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.click('[data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.waitForFunction(() => window.__chat.localLore.length === 0);

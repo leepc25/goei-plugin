@@ -15,7 +15,7 @@ import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { handleWiki, resetWiki, wiki, wikiSuggest, wikiTab, type WikiEnv } from './wiki';
+import { handleWiki, resetWiki, wiki, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -208,10 +208,11 @@ function ensureRoot(): HTMLElement {
     const el = ev.target as HTMLInputElement;
     if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
       wiki.query = el.value;
-      const box = root?.querySelector('.nw-suggest');
-      if (box) box.innerHTML = wikiSuggest(view.ctx, el.value);
+      const box = root?.querySelector('.nw .ph-content');
+      if (box) box.innerHTML = wikiList(view.ctx);
       return;
     }
+    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
     if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
     if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
     if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);

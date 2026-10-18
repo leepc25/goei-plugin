@@ -1442,3 +1442,49 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-sethead small { color: var(--dim); font-size: 13px; }
 .nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
 .st-scopebar + .st-scope-help { margin: 6px 0 0; }
+/* ── 위키 (v0.16.23): 괴담톡·괴담넷과 같은 두 칸. 왼쪽 명부·작성한 문서, 오른쪽 문서 ── */
+.nw.ph-app .nw-search { display: block; }
+.nw-status:empty { display: none; }
+.nw-status { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px 0; }
+.nw-status .nw-busy, .nw-status .gx-err { margin: 0; }
+.ph-side > .nw-busy, .ph-side > .gx-err { margin: 0; }
+.nw-row .ph-who-top b { flex: 0 1 auto; }
+.nw-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
+.nw-ava { color: var(--dim); }
+.nw-ava svg { width: 22px; height: 22px; }
+.nw-ava.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-ava.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-ava.k-lm { color: var(--amber); background: var(--amber-bg); }
+.nw-ava.k-ag { color: var(--mint); }
+.nw-ava.k-org { color: var(--signal); background: var(--accent-bg); }
+.ph-avatar.xs { width: 24px; height: 24px; border-radius: 8px; font-size: 11px; }
+.ph-avatar.xs svg { width: 14px; height: 14px; }
+.ph-avatar.lg { width: 96px; height: 96px; border-radius: 26px; }
+.ph-avatar.lg svg { width: 40px; height: 40px; }
+.nw-newrow .ph-avatar { color: var(--signal); background: var(--accent-bg); }
+/* 문서 */
+.nw-pane .nw-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; gap: 14px; padding: 18px 24px 28px; }
+.nw-pane .nw-dochead { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 2px; }
+.nw-pane .nw-dochead small { color: var(--dim); font-size: 14px; }
+.nw-ibphoto { padding: 0 !important; background: var(--void) !important; }
+.nw-ibphoto img { display: block; width: 100%; max-height: 320px; object-fit: cover; object-position: top; }
+.nw-more { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nw-more + .nw-more { border-top: 0; padding-top: 0; }
+.nw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.nw-chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--text); font: inherit; font-size: 13.5px; font-weight: 600; }
+.nw-chip:hover { border-color: var(--accent-line); }
+.nw-chip.none { opacity: .55; border-style: dashed; }
+/* 아직 없는 문서 */
+.nw.ph-app .nw-compose { align-items: center; text-align: center; gap: 8px; margin: auto 0; padding: 28px 20px; border: 0; background: none; }
+.nw-cmsg { font-size: 16px; font-weight: 600; color: var(--text); }
+.nw-creq { font-size: 13px; color: var(--sub); padding: 8px 12px; border-radius: 10px; background: var(--panel); }
+.nw.ph-app .ph-form-body:has(> .nw-compose) { justify-content: center; }
+.nw-setpane .ps-row > .nw-reqbox { margin: 0; }
+@media (max-width: 760px) {
+  .nw-pane .nw-doc { padding: 12px 14px 20px; }
+  /* 목차는 한 줄 (옆으로 밀어 보기) */
+  .nw-toc { display: flex; flex-direction: row; align-items: center; gap: 12px; width: 100%; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding: 8px 12px; }
+  .nw-toc b { margin: 0; }
+  .nw-toc a.l2 { padding-left: 0; }
+}
+.nw .ph-tabs.nw-cats { flex-wrap: wrap; overflow: visible; }
