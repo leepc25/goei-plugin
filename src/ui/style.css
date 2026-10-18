@@ -573,7 +573,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-help .gx-hint { margin: 0 14px 12px; }
 .gx-dirdrawer { display: none; }
 @media (max-width: 760px) {
-  .dir-kinds { position: sticky; top: -4px; z-index: 2; margin: 0 -4px; padding: 3px; box-shadow: 0 0 0 4px var(--void); }
+  .dir-kinds { position: sticky; top: 8px; z-index: 2; margin: 0 -4px; padding: 3px; box-shadow: 0 -8px 0 6px var(--void); }
   .dir-qbox { display: none; }
   .gx-dirdrawer { display: block; }
   .gx-dirdrawer .dir-search { margin: 0; }
