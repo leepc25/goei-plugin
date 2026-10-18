@@ -10,6 +10,8 @@ import {
 import { commentPrompt, dmPrompt, postPrompt, refreshPrompt, retryMessages } from '../core/gnetPrompt';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { ICONS } from './icons';
+import { toast } from './toast';
+import { drawerHtml } from './drawer';
 import { attachAction, attachBody, attachEditor, emptyAttachment, type Attachments } from './attach';
 import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
@@ -588,28 +590,32 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   const fail = gnet.failure
     ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc(gnet.failure.raw)}</textarea></details>`
     : '';
-  const status = `${job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc(job)} 창을 닫아도 계속돼요.</div>` : ''}${gnet.notice ? `<div class="gx-hint gn-notice" role="status">${esc(gnet.notice)}</div>` : ''}`;
+  const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc(job)} 창을 닫아도 계속돼요.</div>` : '';
+  const note = toast('gn', gnet.notice, (t) => {
+    if (gnet.notice === t) gnet.notice = '';
+  });
+  const tools = [
+    tool('gn-refresh', ICONS.refresh, '게시판 새로고침', busy ? 'disabled' : '', '새로고침'),
+    tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기'),
+    tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지'),
+    tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임'),
+    tool('gn-settings', ICONS.settings, '괴담넷 설정', gnet.settings ? 'aria-pressed="true"' : '', '설정'),
+  ].join('');
   const subBtn = (id: 'board' | 'dm', label: string, extra = '') =>
     `<button class="ph-sub${gnet.sub === id ? ' on' : ''}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
   return `<main class="gx-body ph ph-app gn ${kind ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담넷 목록">
       <div class="ph-side-head">
         <div class="ph-subs">${subBtn('board', '게시판', boardUnread(st) ? '<span class="gn-dot"></span>' : '')}${subBtn('dm', '쪽지함', unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : '')}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc(me)}</b></span></div>
-        <div class="ph-tools">
-          ${tool('gn-refresh', ICONS.refresh, '게시판 새로고침', busy ? 'disabled' : '', '새로고침')}
-          ${tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기')}
-          ${tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지')}
-          ${tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임')}
-          ${tool('gn-settings', ICONS.settings, '괴담넷 설정', gnet.settings ? 'aria-pressed="true"' : '', '설정')}
-        </div>
-        ${nick}
       </div>
       ${kind ? '' : status}
       <div class="ph-content">${gnet.sub === 'board' ? boardList(st, busy, mobile) : dmList(st, busy, mobile)}</div>
       ${mobile && !kind ? inlineComposer(st, busy) : ''}
       ${fail}
+      ${drawerHtml(tools, nick)}
     </section>
     <section class="ph-pane">${kind ? status : ''}${paneHtml(ctx, st, kind, busy)}</section>
+    ${note}
   </main>`;
 }
 

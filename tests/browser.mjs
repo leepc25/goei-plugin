@@ -619,9 +619,15 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.equal(fixture.alternateGreetings[saved.fmIndex], '', '빈 첫 장면');
   assert.equal(saved.message.length, 0);
   assert.equal(await page.isDisabled('[data-action="mission-send"]'), true);
+  // 검색은 괴이·특수·거점을 한꺼번에: 괴이 칸에서 거점 이름을 찾아도 나온다
+  await page.click('[data-action="mission-kind"][data-value="lm"]');
+  const lmName = (await page.textContent('.gx-mlist li.gx-ev b')).trim();
+  await page.click('[data-action="mission-kind"][data-value="an"]');
+  await page.fill('.gx-search', lmName);
+  await page.waitForFunction(() => [...document.querySelectorAll('.gx-mlist li.gx-mgrp')].some((h) => h.textContent.startsWith('거점')));
   await page.fill('.gx-search', '소라');
-  await page.waitForFunction(() => document.querySelectorAll('.gx-mlist li').length === 1);
-  await page.click('.gx-mlist [data-action="mission-pick"]');
+  await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
+  await page.click('.gx-mlist li.gx-ev [data-action="mission-pick"]');
   // 위 종류 버튼을 바꿔 봐도 고른 목표는 그대로
   await page.click('[data-action="mission-kind"][data-value="lm"]');
   assert.equal((await page.textContent('.gx-goal b')).trim(), '소라 랜드');
@@ -667,8 +673,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.gx-start');
   await page.waitForSelector('.gx-search');
   await page.fill('.gx-search', '소라');
-  await page.waitForFunction(() => document.querySelectorAll('.gx-mlist li').length === 1);
-  await page.click('.gx-mlist [data-action="mission-pick"]');
+  await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
+  await page.click('.gx-mlist li.gx-ev [data-action="mission-pick"]');
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
   // 첫 전송은 시드를 유지 (지시문 + 덧붙인 글 = 한 번)
@@ -910,7 +916,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="phone"]');
   await page.waitForSelector('.ph');
-  const tabs = await page.$$eval('.ph-tabs .ph-tab', (b) => b.map((x) => x.textContent));
+  const tabs = await page.$$eval('.ph-tabs .ph-tab', (b) => b.map((x) => x.firstChild.textContent));
+  assert.ok((await page.$$eval('.ph-tabs .ph-tab small', (b) => b.map((x) => Number(x.textContent))))[0] > 0, '소속 칩 옆 연락처 수');
   assert.deepEqual(tabs, ['관리', '중립', '기타'], '관리국 소속에 공개된 탭');
   const first = await page.getAttribute('.ph-list [data-action="ph-dm"]', 'data-value');
   assert.equal(first, 'c_50303031', 'P001 쟈알디');

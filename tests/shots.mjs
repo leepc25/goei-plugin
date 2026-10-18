@@ -135,7 +135,7 @@ await page.evaluate(() => {
   const box = document.createElement('span');
   box.setAttribute('data-goei-user', '');
   box.hidden = true;
-  box.innerHTML = `<img src="/sw/img/${hex}" alt="">`;
+  box.innerHTML = `<img src="/sw/img/${hex}" alt=""><b data-goei-uname>한지우</b>`;
   document.body.appendChild(box);
 });
 const g = async (name) => { await page.waitForTimeout(250); await page.screenshot({ path: `${shots}/${name}.png` }); };
@@ -150,7 +150,7 @@ await g('m02-board-scroll');
 await page.click('.gx-board .gx-acard .gx-acard-sit').catch((e) => console.log('agpop', e.message));
 await g('m02b-agent-info');
 await page.click('.gx-agpop-x').catch(() => {});
-await page.click('.gx-mtrack .gx-nb[data-value=\"map\"] >> nth=1');
+await page.click('.gx-mtrack .gx-nb[data-value=\"map\"]');
 await g('m03-map');
 // 두 손가락으로 지도 확대 (충남 근처)
 {
@@ -196,11 +196,28 @@ await g('m05b-custom-goal');
 await page.click('.gx-mbox [data-action="mission-pick"]').catch((e) => console.log('mpick', e.message));
 await page.click('.gx-stepbar .gx-stepb >> nth=0').catch(() => {});
 await g('m05c-custom-cancel');
-await page.click('.gx-mtrack .gx-nb[data-value=\"phone\"] >> nth=1');
+await page.click('.gx-mtrack .gx-nb[data-value=\"phone\"]');
 await g('m06-phone');
+{
+  // 하단 바를 오른쪽으로 당기면 왼쪽 닫기가 끌려 나온다 (놓기 전)
+  const bar = await page.$('.gx-mbar');
+  const b = await bar.boundingBox();
+  await page.mouse.move(b.x + 120, b.y + b.height / 2);
+  await page.mouse.down();
+  for (let i = 1; i <= 10; i++) await page.mouse.move(b.x + 120 + i * 12, b.y + b.height / 2);
+  await g('m06z-mbar-pull');
+  for (let i = 11; i <= 14; i++) await page.mouse.move(b.x + 120 + i * 12, b.y + b.height / 2);
+  await g('m06z-mbar-ready');
+  await page.mouse.move(b.x + 140, b.y + b.height / 2);
+  await page.mouse.up();
+}
 await page.click('.ph-list [data-action="ph-dm"]').catch((e) => console.log('dm', e.message));
 await g('m06f-room');
+await page.click('[data-action="ph-send"]').catch(() => {});
+await g('m06f2-toast');
 await page.click('.ph-back').catch(() => {});
+await page.click('.ph-grip').catch((e) => console.log('grip', e.message));
+await g('m06h-drawer');
 await page.click('[data-action="ph-group"]').catch((e) => console.log('group', e.message));
 await g('m06g-group');
 await page.click('.ph-back').catch(() => {});
@@ -213,7 +230,7 @@ await page.click('[data-action="ph-sub"][data-value="notices"]');
 await g('m06d-notices');
 await page.click('[data-action="ph-notice"] >> nth=1').catch((e) => console.log('notice click', e.message));
 await g('m06e-notice-open');
-await page.click('.gx-mtrack .gx-nb[data-value=\"wiki\"] >> nth=1');
+await page.click('.gx-mtrack .gx-nb[data-value=\"wiki\"]');
 await g('m07-wiki');
 for (const t of await page.$$eval('[data-action^="wiki-"]', (els) => els.map((e) => `${e.dataset.action}|${e.dataset.value ?? ''}|${e.textContent.trim().slice(0, 12)}`))) console.log(t);
 await page.setViewportSize({ width: 1300, height: 860 });

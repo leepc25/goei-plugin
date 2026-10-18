@@ -453,13 +453,24 @@ export function missionList(ctx: ChatContext, opening = false): string {
   const x = readCtx(ctx);
   if (typeof x === 'string') return '';
   const q = field.query.trim().toLowerCase();
-  const rows = missionCatalog(x.catalog, field.mkind).filter((r) => !q || `${r.name} ${r.sub}`.toLowerCase().includes(q));
-  if (!rows.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-  return `<ul class="gx-list gx-mlist">${rows
-    .map((r) => `<li class="gx-ev${field.mname === r.name && field.mpick === field.mkind ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${esc(r.name)}">
-      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, field.mkind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>
-      ${opening ? '' : `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button></div>`}</li>`)
-    .join('')}</ul>`;
+  const row = (kind: MissionKind, r: { name: string; sub: string }) =>
+    `<li class="gx-ev${field.mname === r.name && field.mpick === kind ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${kind}:${esc(r.name)}">
+      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>
+      ${opening ? '' : `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button></div>`}</li>`;
+  const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
+  if (!q) {
+    const rows = missionCatalog(x.catalog, field.mkind);
+    if (!rows.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
+    return `<ul class="gx-list gx-mlist">${rows.map((r) => row(field.mkind, r)).join('')}</ul>`;
+  }
+  // 검색은 괴이·특수·거점을 한꺼번에 (고른 종류부터), 종류마다 작은 제목 아래로 묶는다
+  const order = [field.mkind, ...(['an', 'ms', 'lm'] as MissionKind[]).filter((k) => k !== field.mkind)];
+  const groups = order
+    .map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit) }))
+    .filter((g) => g.rows.length)
+    .map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row(g.k, r)).join('')}`)
+    .join('');
+  return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
 }
 
 export function missionTab(ctx: ChatContext, opening: boolean, notice: string, busy: boolean): string {
@@ -755,16 +766,21 @@ export async function handleField(action: string, value: string | undefined, ctx
       }
       env.render();
       return true;
-    case 'mission-pick':
-      if (isPC() && field.mname === v && field.mpick === field.mkind) {
+    case 'mission-pick': {
+      // 값은 "종류:이름" (검색 결과엔 여러 종류가 섞여 있다)
+      const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+      const kind = (m?.[1] as MissionKind | undefined) ?? field.mkind;
+      const name = m ? m[2] : v;
+      if (isPC() && field.mname === name && field.mpick === kind) {
         field.mname = null;
         env.render();
         return true;
       }
-      field.mname = v;
-      field.mpick = field.mkind;
+      field.mname = name;
+      field.mpick = kind;
       toStep('team', env);
       return true;
+    }
     case 'mission-cancel':
       if (v === 'an' || v === 'ms' || v === 'in') await saveWorld(ctx, env, (w) => (cancelMission(w, v), null));
       return true;

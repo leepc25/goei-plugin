@@ -9,6 +9,7 @@ import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
+import { bindDrawer } from './drawer';
 import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
@@ -639,7 +640,8 @@ function render(): void {
   }
   hydratePhotos(root);
   bindMapZoom(root);
-  bindMbar(root);
+  bindMbar(root, () => void handle('close'));
+  bindDrawer(root);
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
@@ -760,12 +762,11 @@ function tabs(): string {
     <span class="gx-nav-gap"></span>
     ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
     ${mbarHtml([
-      item('board', '상황판', ICONS.board),
+      item('wiki', '위키', ICONS.wiki),
       item('map', '임무', ICONS.map, 'mob'),
+      item('board', '상황판', ICONS.board, 'home'),
       item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
       ...(GNET_ON ? [item('gnet', '괴담넷', ICONS.gnet)] : []),
-      item('wiki', '위키', ICONS.wiki),
-      `<button class="gx-nb" data-action="close" aria-label="닫기">${ICONS.close}<span>닫기</span></button>`,
     ])}
   </nav>`;
 }

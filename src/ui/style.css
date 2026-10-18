@@ -373,6 +373,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
 /* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
 .gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
+.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.gx-mlist li.gx-mgrp:first-child { padding-top: 0; }
+.gx-mlist li.gx-mgrp small { font-weight: 400; }
 .gx-mapcol .gx-segs { align-self: flex-start; }
 /* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
 .gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -531,14 +534,25 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-nb .gx-nbadge { position: absolute; top: 5px; left: calc(50% + 6px); margin: 0; min-width: 18px; height: 18px; font-size: 11px; }
   /* 점 표시는 작게 (위 규칙이 숫자 배지 크기 18px로 키워 버렸다) */
   .gx-nb .gx-nbadge.dot { min-width: 8px; width: 8px; height: 8px; top: 10px; left: calc(50% + 9px); }
-  /* 하단 바 (v0.16.18): 한 화면에 5칸, 6번째(닫기)는 밀어서. 끝과 처음이 이어져 돈다 (ui/mbar.ts) */
-  /* 위아래 여백을 같게: 아래만 8px이라 아이콘이 위로 치우쳐 보였다 (v0.16.21) */
-  .gx-nav { padding: 4px 0 calc(4px + env(safe-area-inset-bottom)); }
+  /* 하단 바 (v0.16.23): 위키·임무·상황판·괴담톡·괴담넷 다섯 칸, 가운데 상황판이 홈. 닫기는 양 끝 밖에 숨었다가 당기면 나온다 (ui/mbar.ts) */
+  .gx-nav { padding: 2px 0 calc(2px + env(safe-area-inset-bottom)); }
   .gx-nav > .gx-nb { display: none; }
-  .gx-mbar { display: block; flex: 1; min-width: 0; }
-  .gx-mtrack { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
-  .gx-mtrack::-webkit-scrollbar { display: none; }
-  .gx-mtrack > .gx-nb { display: flex; flex: 0 0 20%; position: relative; scroll-snap-align: start; }
+  .gx-mbar { display: block; flex: 1; min-width: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .gx-mtrack { position: relative; display: flex; will-change: transform; }
+  .gx-mtrack.back { transition: transform .26s cubic-bezier(.2, .9, .3, 1.25); }
+  .gx-mtrack > .gx-nb { display: flex; flex: 1 1 0; min-width: 0; position: relative; min-height: 48px; gap: 2px; font-size: 11px; }
+  .gx-mtrack > .gx-nb svg { width: 21px; height: 21px; }
+  .gx-mtrack > .gx-nb .gx-nbadge.dot { top: 7px; }
+  /* 홈(상황판): 살짝 다른 색의 둥근 바탕 */
+  .gx-mtrack > .gx-nb.home { color: var(--mint); isolation: isolate; }
+  .gx-mtrack > .gx-nb.home::before { content: ''; position: absolute; inset: 4px 10%; border-radius: 14px; background: color-mix(in srgb, var(--signal) 9%, transparent); z-index: -1; }
+  .gx-mtrack > .gx-nb.home.on { color: var(--signal); }
+  .gx-mtrack > .gx-nb.home.on::before { background: color-mix(in srgb, var(--signal) 16%, transparent); }
+  .gx-mclose { position: absolute; top: 0; bottom: 0; width: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-size: 11px; transition: color .12s ease, background .12s ease; }
+  .gx-mclose svg { width: 21px; height: 21px; }
+  .gx-mclose.l { right: 100%; }
+  .gx-mclose.r { left: 100%; }
+  .gx-mclose.ready { color: #fff; background: var(--danger); }
   .gx-facs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: none; }
   .gx-fac { scroll-snap-align: start; }
   .gx-fac.has-img { min-height: 188px; }
@@ -1319,3 +1333,51 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-ndoc .ph-act .ph-tool { color: var(--dim); }
 .ph-ndoc .ph-act .ph-tool:hover { color: var(--danger); }
 @media (max-width: 760px) { .ph-ndoc-body { padding: 12px 14px 20px; } }
+
+/* ── v0.16.23 괴담톡·괴담넷 정리 ── */
+/* 위 탭은 낮게: 목록이 더 길게 보이도록 */
+.ph-sub { min-height: 38px; font-size: 14.5px; }
+.gx-body .ph-side { gap: 8px; padding-top: 10px; }
+/* 도구 줄: PC는 목록 맨 아래 (오른쪽 입력줄·만들기 줄과 같은 65px), 손잡이 없음 */
+.ph-drawer { flex: none; margin: 0 -14px; border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-grip { display: none; }
+.ph-drawer .ph-tools { height: 64px; padding: 10px 8px; align-items: center; }
+.ph-drawer .ph-tools .ph-tool { height: 44px; gap: 3px; }
+.ph-drawer .ph-tools .ph-tool svg { width: 20px; height: 20px; }
+.ph-drawer .ph-tool-l { font-size: 11px; }
+.ph-drawer .gn-nickform { margin: 10px 12px 0; }
+.ph-content { padding-bottom: 10px; }
+/* 모바일: 하단 바 위에 접힌 손잡이, 누르거나 위로 밀면 펼침 */
+@media (max-width: 760px) {
+  .ph-drawer { margin: 0 -12px; }
+  .ph-grip { display: flex; align-items: center; justify-content: center; width: 100%; height: 18px; padding: 0; border: 0; background: none; touch-action: none; }
+  .ph-grip i { width: 38px; height: 4px; border-radius: 4px; background: var(--line2); transition: background .15s ease; }
+  .ph-grip:hover i, .ph-drawer.open .ph-grip i { background: var(--dim); }
+  .ph-drawer .ph-tools { height: auto; max-height: 0; padding: 0 8px; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
+  .ph-drawer.open .ph-tools { max-height: 64px; padding: 0 8px 8px; }
+  .ph-drawer:not(.open) .gn-nickform { display: none; }
+  .ph-drawer .gn-nickform { margin: 0 12px 8px; }
+  .ph-side > .gn-composer { border-bottom: 0; }
+}
+/* 잠깐 떴다 사라지는 안내: 아래쪽 가운데에 떠서 줄을 차지하지 않는다 */
+.gx-body.ph-app { position: relative; }
+.gx-toast { position: absolute; left: 50%; bottom: 82px; z-index: 5; transform: translateX(-50%); width: max-content; max-width: min(88%, 420px); margin: 0; padding: 10px 16px; border-radius: 14px; background: color-mix(in srgb, var(--panel2) 94%, #000); border: 1px solid var(--line); color: var(--text); font-size: 14px; line-height: 1.5; text-align: center; box-shadow: 0 10px 28px -12px rgba(0, 0, 0, .6); pointer-events: none; animation: gx-toast-in .18s ease-out; transition: opacity .3s ease, transform .3s ease; }
+.gx-toast.out { opacity: 0; transform: translate(-50%, 6px); }
+@keyframes gx-toast-in { from { opacity: 0; transform: translate(-50%, 6px); } }
+@media (prefers-reduced-motion: reduce) { .gx-toast { animation: none; transition: none; } }
+/* 안 읽은 수: 빨간 동그라미에 흰 숫자 */
+.ph-badge { min-width: 19px; height: 19px; padding: 0 5px; color: #fff; font-size: 11.5px; line-height: 1; }
+.ph-sub .ph-badge { margin-left: 1px; }
+/* 묶음 칩: 이름 옆 작은 개수, 안읽음은 빨간 배지 */
+.ph-tab { display: inline-flex; align-items: center; gap: 5px; }
+.ph-tab small { font-size: 11.5px; font-weight: 500; color: var(--dim); }
+.ph-tab.on small { color: inherit; opacity: .75; }
+.ph-notice-bar { margin: 0; padding: 0; }
+.ph-notice-bar .ph-tabs { flex: 1; min-width: 0; }
+.ph-notice-bar .gx-mini { margin: 0 8px 8px 0; }
+/* 단톡 만들기: 주제는 평소 한 줄, 적거나 누르면 넓어진다 */
+.ph-gbody { gap: 8px; }
+.ph-gbody > .ph-topic { height: 40px; min-height: 40px; padding: 9px 12px; line-height: 1.4; resize: none; overflow: hidden; transition: height .15s ease; }
+.ph-gbody > .ph-topic:focus, .ph-gbody > .ph-topic:not(:placeholder-shown) { height: 76px; overflow: auto; }
+.ph-gbody > .ph-tabs { padding: 0; }
+@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }

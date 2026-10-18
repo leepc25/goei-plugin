@@ -1,0 +1,36 @@
+// 괴담톡·괴담넷 도구 줄 (v0.16.23, 사용자 설계). PC는 왼쪽 목록 맨 아래에 늘 보이고 (오른쪽 입력줄과 같은 높이),
+// 모바일은 하단 바 바로 위에 접혀 있다가 손잡이를 누르거나 위로 밀면 펼쳐지고, 다시 누르거나 아래로 밀면 접힌다.
+// 펼친 상태는 다시 그려도 그대로 (괴담톡·괴담넷 함께).
+
+let open = false;
+
+export function drawerHtml(tools: string, above = ''): string {
+  return `<div class="ph-drawer${open ? ' open' : ''}">
+    <button class="ph-grip" type="button" aria-label="${open ? '도구 접기' : '도구 펼치기'}" aria-expanded="${open}"><i></i></button>
+    ${above}<div class="ph-tools">${tools}</div></div>`;
+}
+
+function set(box: HTMLElement, on: boolean) {
+  open = on;
+  box.classList.toggle('open', on);
+  const grip = box.querySelector<HTMLElement>('.ph-grip');
+  grip?.setAttribute('aria-expanded', String(on));
+  grip?.setAttribute('aria-label', on ? '도구 접기' : '도구 펼치기');
+}
+
+export function bindDrawer(root: HTMLElement): void {
+  const box = root.querySelector<HTMLElement>('.ph-drawer');
+  const grip = box?.querySelector<HTMLElement>('.ph-grip');
+  if (!box || !grip) return;
+  grip.addEventListener('click', () => set(box, !open));
+  // 위아래로 밀기: 손잡이와 도구 줄 어디서든
+  let y0: number | null = null;
+  box.addEventListener('touchstart', (e) => (y0 = e.touches[0]?.clientY ?? null), { passive: true });
+  box.addEventListener('touchend', (e) => {
+    if (y0 === null) return;
+    const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+    y0 = null;
+    if (dy < -24 && !open) set(box, true);
+    else if (dy > 24 && open) set(box, false);
+  }, { passive: true });
+}

@@ -4,7 +4,7 @@
 // 이름은 {{user}}. 전체 데이터베이스 권한(페르소나 목록)은 경고 창이 3일마다 떠서 쓰지 않는다.
 
 /** 채팅 메시지 끝에 붙이는 숨은 칸 (display 핸들러). data- 속성은 Risu의 HTML 정리에서 살아남는다 */
-export const USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""></span>';
+export const USER_MARK = '<span data-goei-user hidden style="display:none"><img src="{{source::user}}" alt=""><b data-goei-uname>{{user}}</b></span>';
 
 export interface UserInfo {
   name: string;
@@ -15,6 +15,7 @@ const MIME: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg
 let cached: UserInfo = { name: '', photo: null };
 let lastSrc = '';
 const SRC_KEY = 'goei:user-src';
+const NAME_KEY = 'goei:user-name';
 
 function toBytes(data: unknown): Uint8Array | null {
   if (data instanceof Uint8Array) return data;
@@ -65,17 +66,17 @@ async function photoFrom(src: string): Promise<string | null> {
 /** 지금 채팅의 유저 이름·사진. 못 읽으면 지난 값(처음엔 빈 값) */
 export async function readUser(): Promise<UserInfo> {
   let name = cached.name;
-  try {
-    const n = String((await risuai.parseRisuChat('{{user}}')) ?? '').trim();
-    if (n && n !== '{{user}}') name = n;
-  } catch {
-    /* 채팅이 없으면 지난 이름 */
-  }
   let photo = cached.photo;
   try {
     const doc = await risuai.getRootDocument();
     const box = await doc.querySelector('[data-goei-user]');
     const html = box ? await box.getInnerHTML() : '';
+    // 이름: 채팅이 그려질 때 {{user}}가 페르소나 이름으로 바뀐 글자 (parseRisuChat은 환경에 따라 빈 값이 온다)
+    const shownName = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? '').trim();
+    if (shownName && shownName !== '{{user}}') {
+      if (shownName !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName).catch(() => {});
+      name = shownName;
+    }
     // 채팅에 숨은 칸이 아직 없으면(메시지가 하나도 안 그려졌을 때) 지난번에 읽은 주소를 쓴다
     let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? '');
     if (!src) src = String((await risuai.pluginStorage.getItem(SRC_KEY).catch(() => '')) ?? '');
@@ -91,6 +92,15 @@ export async function readUser(): Promise<UserInfo> {
   } catch (error) {
     console.log(`[goei] 유저 사진을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
   }
+  if (!name) {
+    try {
+      const n = String((await risuai.parseRisuChat('{{user}}')) ?? '').trim();
+      if (n && !n.includes('{{')) name = n;
+    } catch {
+      /* 채팅이 없으면 아래 저장값 */
+    }
+  }
+  if (!name) name = String((await risuai.pluginStorage.getItem(NAME_KEY).catch(() => '')) ?? '');
   cached = { name, photo };
   return cached;
 }
