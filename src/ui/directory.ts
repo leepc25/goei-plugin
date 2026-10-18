@@ -24,6 +24,8 @@ export const dirUi = {
   kind: 'anomaly' as Kind,
   q: '',
   open: '',
+  /** 통합 검색에서 고른 항목: 다시 그린 뒤 그 줄로 스크롤 */
+  scrollTo: '',
   draft: null as Directory | null,
   base: '',
   /** 초안을 만든 로어북 (카드가 바뀌면 새로 만든다) */
@@ -436,10 +438,26 @@ function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<str
     </button>${open ? agentPanel(a, ctx, d) : ''}</div>`;
 }
 
+/** 통합 검색: 검색어가 있으면 다섯 탭을 한꺼번에 찾아 탭별로 묶고, 고르면 그 탭으로 가서 연다 */
+function searchAll(ctx: ChatContext, d: Directory, q: string, names: Record<string, string>): string {
+  const jump = (kind: Kind, html: string) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key: string) => `data-action="dir-jump" data-value="${kind}|${key}"`);
+  const groups: [Kind, string, string[]][] = [
+    ['anomaly', '괴이', d.anomalies.filter((r) => matches(r, q)).map((r) => jump('anomaly', placeRow(r, ctx)))],
+    ['site', '특수', d.sites.filter((r) => matches(r, q)).map((r) => jump('site', placeRow(r, ctx)))],
+    ['agent', '요원', d.agents.filter((r) => matches(r, q)).map((r) => jump('agent', agentRow(r, ctx, d, names)))],
+    ['org', '조직', d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump('org', orgRow(o, ctx, d, names)))],
+    ['base', '거점', d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump('base', baseRow(b, ctx, d)))],
+  ];
+  const hit = groups.filter(([, , rows]) => rows.length);
+  if (!hit.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
+  return hit.map(([, label, rows]) => `<h3 class="dir-group">${label}<small>${rows.length}</small></h3>${rows.join('')}`).join('');
+}
+
 export function directoryList(ctx: ChatContext): string {
   const d = draftOf(ctx);
   const q = dirUi.q.trim().toLowerCase();
   const names = namesOf(d, ctx.char.globalLore);
+  if (q) return searchAll(ctx, d, q, names);
   if (dirUi.kind === 'base') return baseList(ctx, d, q);
   if (dirUi.kind === 'org') {
     const rows = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
@@ -473,10 +491,9 @@ export const directoryDoneClear = (text: string): void => {
   if (dirUi.done === text) dirUi.done = '';
 };
 
-const SEARCH_HINT: Record<Kind, string> = { anomaly: '이름·영문명 검색', site: '이름·영문명 검색', agent: '이름·영문명·부서 검색', org: '조직 이름 검색', base: '이름·조직·지역 검색' };
 
 export const directorySearch = (): string =>
-  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="${SEARCH_HINT[dirUi.kind]}" aria-label="명부 검색" autocomplete="off">`;
+  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점)" aria-label="명부 전체 검색" autocomplete="off">`;
 
 /** 설정 위쪽 줄의 「덮어쓰기」「불러오기」 (설정·명부 공통, 누르면 확인) */
 export const barButtons = (off: boolean): string =>
@@ -643,6 +660,16 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-open':
       dirUi.open = dirUi.open === v ? '' : v;
       break;
+    case 'dir-jump': {
+      // 통합 검색 결과: 그 탭으로 가서 펼친다
+      const cut = v.indexOf('|');
+      const kind = v.slice(0, cut);
+      if (kind === 'anomaly' || kind === 'site' || kind === 'agent' || kind === 'org' || kind === 'base') {
+        Object.assign(dirUi, { kind, open: v.slice(cut + 1), q: '', adding: false });
+        dirUi.scrollTo = v.slice(cut + 1);
+      }
+      break;
+    }
     case 'dir-set':
     case 'dir-toggle': {
       const [field, arg] = v.split('|', 2);

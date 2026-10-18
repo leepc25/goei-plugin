@@ -700,6 +700,11 @@ function render(): void {
   root.style.background = `rgba(${veil}, ${(pf.dim ?? DIM_DEFAULT) / 100})`;
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
+  if (dirUi.scrollTo) {
+    dirUi.scrollTo = '';
+    root.querySelector('.dir-row.open')?.scrollIntoView({ block: 'center' });
+  }
   root.dataset.tab = tab;
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);

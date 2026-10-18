@@ -1406,8 +1406,15 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
+  // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
+  await page.click('[data-action="dir-kind"][data-value="agent"]');
+  await page.fill('[data-input="dir-q"]', '관리국');
+  await page.waitForFunction(() => document.querySelectorAll('.dir-list .dir-group').length >= 2);
+  if (shots) await page.screenshot({ path: `${shots}/17-dir-search.png` });
   await page.fill('[data-input="dir-q"]', '명일');
-  await page.click('.dir-head[data-value="명일 아파트"]');
+  await page.click('.dir-head[data-value="anomaly|명일 아파트"]');
+  await page.waitForSelector('.dir-kinds [data-value="anomaly"].on');
+  assert.equal(await page.inputValue('[data-input="dir-q"]'), '');
   await page.click('[data-action="dir-set"][data-value="preset|0|명일 아파트"]');
   await page.waitForFunction(() => !document.querySelector('.dir-bar [data-value="save"]')?.disabled);
   // 다른 폴더에서 온 후보: 원본 World catalog의 조직·개체는 따로 묶고 출처 폴더를 보여 준다. 새 후보 추가
@@ -1445,7 +1452,7 @@ if (fixture.globalLore.some(packed)) {
   }
   await page.click('[data-action="dir-kind"][data-value="agent"]');
   await page.fill('[data-input="dir-q"]', '쟈알디');
-  await page.click('.dir-head[data-value="쟈알디"]');
+  await page.click('.dir-head[data-value="agent|쟈알디"]');
   await page.click('[data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"]');
   await page.fill('[data-input="dir"][data-key="rank|쟈알디"]', '국장');
   if (shots) await page.screenshot({ path: `${shots}/17-directory.png` });
@@ -1695,7 +1702,7 @@ if (fixture.globalLore.some(packed)) {
   // 요원 한 명을 새 세력으로
   await page.click('[data-action="dir-kind"][data-value="agent"]');
   await page.fill('[data-input="dir-q"]', '쟈알디');
-  await page.click('.dir-head[data-value="쟈알디"]');
+  await page.click('.dir-head[data-value="agent|쟈알디"]');
   await page.click('[data-action="dir-org-pick"][data-value="테스트 결사|쟈알디"]');
   assert.ok((await page.textContent('.dir-panel')).includes('비밀 결사') || (await page.textContent('.dir-panel')).includes('테스트 결사'));
   await page.click('.dir-bar [data-value="save"]');
