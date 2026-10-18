@@ -16,7 +16,9 @@ if (shots) mkdirSync(shots, { recursive: true });
 const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
 
-function hostScript(char, chat, { rootDom = true } = {}) {
+// 본체는 시작기가 pluginStorage에서 꺼낸다. 따로 시험하는 곳(noBody) 말고는 미리 넣어 둔다
+const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
     // SafeElement 흉내. Risu와 똑같이 addEventListener는 요소가 아니라 document 전체에 건다.
@@ -36,6 +38,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       remove: async () => { el.remove(); },
     });
     window.__store = {};
+    if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -1780,6 +1783,64 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
+// 시작기: Risu 플러그인 칸과 같은 격리(iframe sandbox + nonce CSP)에서 본체가 없으면 받기 창 → 받아서 실행
+{
+  const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.exposeFunction('__readAsset', (p) => {
+    try { return readFileSync(new URL(p, `file://${fixtureDir}/`)).toString('base64'); } catch { return null; }
+  });
+  const nonce = 'n' + Math.random().toString(36).slice(2);
+  // Risu src/ts/plugins/apiV3/factory.ts와 같은 정책
+  const csp = `connect-src 'none'; script-src 'nonce-${nonce}' 'wasm-unsafe-eval'; frame-src 'none'; object-src 'none'; style-src * 'unsafe-inline'; default-src 'none'; img-src * data: blob:; font-src * data: blob:; media-src * data: blob:; base-uri 'none';`;
+  const inner = hostScript(fixture, { message: [], scriptstate: {} }, { noBody: true })
+    + `\n(async () => { ${plugin}\n })().catch(e => { window.__bootError = String(e); });`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}" id="csp-meta"></head>`
+    + `<body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"></div>`
+    + `<script nonce="${nonce}">document.querySelector('meta#csp-meta')?.remove();\n${inner}</script></body></html>`;
+  await page.setContent('<!doctype html><html><body style="margin:0"><iframe style="display:block;width:100vw;height:100vh;border:0"></iframe></body></html>');
+  await page.evaluate(({ html, csp }) => {
+    const f = document.querySelector('iframe');
+    f.sandbox.add('allow-scripts');
+    f.sandbox.add('allow-modals');
+    f.setAttribute('csp', csp);
+    f.srcdoc = html;
+  }, { html, csp });
+  let frame = null;
+  for (let i = 0; i < 50 && !frame; i++) {
+    frame = page.frames().find((f) => f !== page.mainFrame());
+    if (!frame) await page.waitForTimeout(100);
+  }
+  await frame.waitForFunction(() => window.__calls?.replacers.length || window.__bootError);
+  assert.equal(await frame.evaluate(() => window.__bootError ?? null), null);
+  // 본체 없음 → 받기 실패 → 받기 창
+  await frame.waitForSelector('.gl-card');
+  if (shots) {
+    await page.screenshot({ path: `${shots}/loader-panel.png` });
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: `${shots}/loader-panel-m.png` });
+    await page.setViewportSize({ width: 1100, height: 900 });
+  }
+  const files = Object.fromEntries(['goei-body.json', ...JSON.parse(readFileSync(new URL('../dist/goei-body.json', import.meta.url), 'utf8')).parts]
+    .map((n) => [n, readFileSync(new URL(`../dist/${n}`, import.meta.url), 'utf8')]));
+  await frame.evaluate((files) => {
+    window.__fetch = (u) => { const name = u.split('?')[0].split('/').pop(); return files[name] ?? null; };
+  }, files);
+  await frame.click('[data-gl="get"]');
+  await frame.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 8000 });
+  assert.equal(await frame.locator('.gl-card').count(), 0, '받으면 창이 닫힘');
+  assert.match(await frame.evaluate(() => window.__store['p:goei:body'].slice(0, 40)), /^\/\/ goei-body /);
+  await frame.click('[x-goei-fab] button');
+  await frame.waitForSelector('.gx-fac');
+  // 시작 카드 표시도 본체가 맡는다
+  assert.match(await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">ANOMALY SIMULATION</div>')), /landing/);
+  assert.deepEqual(errors, []);
+  console.log('PASS 시작기: 격리 환경에서 본체 없음 → 받기 창 → 조각으로 받아 실행 → 창 열기');
+  await page.close();
+}
+
 // 관찰형 게임: 그림 팩이 없으면 받기 화면, 받은 뒤에는 바로 게임
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
@@ -1805,8 +1866,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-gp="get"]');
   await page.waitForSelector('.goei-game canvas');
   await page.waitForFunction(() => !document.querySelector('.gg-load'));
-  assert.equal(await page.evaluate(() => Object.keys(window.__assets).length), 19, '그림 19장을 에셋으로');
-  assert.ok(await page.evaluate(() => JSON.parse(window.__store['p:goei:game-pack:patrol']).paths.faces), '경로만 저장');
+  assert.equal(await page.evaluate(() => Object.keys(JSON.parse(window.__store['p:goei:game-pack:patrol']).files).length), 19, '그림 19장 저장');
   await page.waitForTimeout(1500);
   if (shots) {
     await page.screenshot({ path: `${shots}/game-pc.png` });
@@ -1821,7 +1881,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.goei-game canvas');
   assert.equal(await page.locator('.gx-gp').count(), 0, '받은 뒤에는 바로 게임');
   assert.deepEqual(errors, []);
-  console.log('PASS 관찰형 게임: 그림 팩 받기 실패 안내 → 받기 → 에셋 저장 → 다시 열면 바로 게임');
+  console.log('PASS 관찰형 게임: 그림 팩 받기 실패 안내 → 받기 → 저장 → 다시 열면 바로 게임');
   await page.close();
 }
 

@@ -8,5 +8,6 @@
 - 저장: `{ version: 1, squad, patrols, best, wipes, kills, depth }`를 바뀐 게 있을 때 5초 이상 간격으로 `host.save`. 순찰 도중 상태는 같은 페이지에서 다시 열 때만 이어진다.
 - 시간: 1/30초 고정 간격 계산, 화면은 requestAnimationFrame. 문서가 숨겨지면 멈춘다. 닫아 둔 동안의 진행은 없다. 응답을 기다리는 동안은 1.25배 빠르게.
 - 조정: 수치는 `data.ts`의 `AGENTS`·`ENEMIES`·`TUNE`.
-- 그림: GPT가 만든 시트(`game-src/`)를 `python3 tools/game_assets.py`로 프레임별로 잘라 `assets/`에 담는다. 크기는 바꾸지 않고, 화면은 기기 픽셀 기준 정수 배율로만 키운다.
+- 그림: GPT가 만든 시트(`game-src/`)를 `python3 tools/game_assets.py`로 프레임별로 잘라 `game-pack/patrol/`에 담는다. 크기는 바꾸지 않고, 화면은 기기 픽셀 기준 정수 배율로만 키운다.
+- 그림 팩: 플러그인에 넣지 않는다. 빌드가 `release/goei-game-patrol.pack` 한 파일로 묶고(`scripts/game-pack.mjs`), 게임 창이 처음 열릴 때 받거나 파일로 넣어 pluginStorage에 둔다(`src/host/gamepack.ts`). 팩 모양이 바뀌면 `assets.ts`의 `PACK_VERSION`을 올린다.
 - 시험: `npm run build` 뒤 `tests/game/demo.html`을 로컬 서버로 연다 (`?w=390&h=700`으로 창 크기). 계산은 `tests/game.test.mjs`.

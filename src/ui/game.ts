@@ -44,7 +44,9 @@ function packPanel(box: HTMLElement, old: boolean, done: () => void): void {
     btns.forEach((b) => (b.disabled = true));
     say('받는 중');
     try {
-      await installPack(await get(), (n, all) => say(`저장하는 중 ${n}/${all}`));
+      const bytes = await get();
+      say('저장하는 중');
+      await installPack(bytes);
       done();
     } catch (e) {
       say(errText(e));

@@ -16,6 +16,8 @@ if (shots) mkdirSync(shots, { recursive: true });
 const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
 
+// 본체는 시작기가 pluginStorage에서 꺼낸다 (src/main.ts)
+const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
 function hostScript(char, chat, { rootDom = true } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -35,7 +37,7 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       removeEventListener: async (type, id) => { await new Promise((r) => setTimeout(r, 30)); const l = listeners.get(id); if (l) { document.removeEventListener(l[0], l[1]); listeners.delete(id); } },
       remove: async () => { el.remove(); },
     });
-    window.__store = {};
+    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)} };
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;

@@ -1,13 +1,14 @@
-// 게임 그림 팩: 플러그인에 넣지 않고, 게임을 하려는 사람만 한 번 받아 Risu 에셋 저장소에 넣는다.
+// 게임 그림 팩: 플러그인에 넣지 않고, 게임을 하려는 사람만 한 번 받아 pluginStorage에 넣는다.
 // 받는 곳은 저장소 release 폴더(UPDATE_BASE). 저장소를 못 쓰게 돼도 팩 파일을 직접 넣을 수 있다.
-// pluginStorage에는 판·아틀라스·에셋 경로만 둔다 (그림 바이트를 넣으면 Risu 저장 데이터가 무거워진다).
+// pluginStorage는 큰 값을 Risu 저장 데이터 밖(콜드 스토리지)에 따로 두고, 새로 받으면 옛 값을 알아서 치운다
+// (에셋 저장소에 넣으면 다시 받을 때마다 옛 그림이 지워지지 않고 쌓인다).
 import { UPDATE_BASE } from '../core/update';
 import { PACK_FILES, PACK_ID, PACK_NAME, PACK_VERSION, parsePack, type Atlas, type GameArt } from '../game/assets';
 import { toBytes } from './assets';
 
 const KEY = `goei:game-pack:${PACK_ID}`;
 
-interface Stored { version: number; atlas: Atlas; paths: Record<string, string> }
+interface Stored { version: number; atlas: Atlas; files: Record<string, string> }
 
 export class PackError extends Error {}
 
@@ -15,7 +16,7 @@ async function stored(): Promise<Stored | null> {
   try {
     const raw: unknown = await risuai.pluginStorage.getItem(KEY);
     const v = typeof raw === 'string' ? (JSON.parse(raw) as Stored) : null;
-    return v && typeof v.version === 'number' && v.atlas && v.paths && PACK_FILES.every((f) => typeof v.paths[f] === 'string') ? v : null;
+    return v && typeof v.version === 'number' && v.atlas && v.files && PACK_FILES.every((f) => typeof v.files[f] === 'string') ? v : null;
   } catch {
     return null;
   }
@@ -55,20 +56,20 @@ export async function downloadPack(): Promise<Uint8Array> {
   throw new PackError('그림을 받지 못했어요. 잠시 뒤 다시 받거나 팩 파일을 직접 넣어 주세요.');
 }
 
-/** 팩 바이트를 풀어 에셋 저장소에 넣는다 */
-export async function installPack(bytes: Uint8Array, progress?: (done: number, total: number) => void): Promise<void> {
+function base64(b: Uint8Array): string {
+  let out = '';
+  for (let i = 0; i < b.length; i += 0x8000) out += String.fromCharCode(...b.subarray(i, i + 0x8000));
+  return btoa(out);
+}
+
+/** 팩 바이트를 풀어 저장한다 */
+export async function installPack(bytes: Uint8Array): Promise<void> {
   const pack = parsePack(bytes);
   if (!pack || pack.id !== PACK_ID) throw new PackError('괴이: 이면세계 순찰 그림 팩 파일이 아니에요.');
   if (pack.version !== PACK_VERSION) throw new PackError('플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.');
-  const paths: Record<string, string> = {};
-  let done = 0;
-  for (const name of PACK_FILES) {
-    const path: unknown = await risuai.saveAsset(pack.files.get(name)!);
-    if (typeof path !== 'string' || !path) throw new PackError('그림을 저장하지 못했어요.');
-    paths[name] = path;
-    progress?.(++done, PACK_FILES.length);
-  }
-  await risuai.pluginStorage.setItem(KEY, JSON.stringify({ version: pack.version, atlas: pack.atlas, paths } satisfies Stored));
+  const files: Record<string, string> = {};
+  for (const name of PACK_FILES) files[name] = base64(pack.files.get(name)!);
+  await risuai.pluginStorage.setItem(KEY, JSON.stringify({ version: pack.version, atlas: pack.atlas, files } satisfies Stored));
   art = null;
 }
 
@@ -80,15 +81,10 @@ export function loadArt(): Promise<GameArt> {
     const s = await stored();
     if (!s || s.version !== PACK_VERSION) throw new PackError('그림 팩이 없어요.');
     const urls = new Map<string, string>();
-    await Promise.all(
-      PACK_FILES.map(async (name) => {
-        const data: unknown = await risuai.readImage(s.paths[name]);
-        if (typeof data === 'string' && /^(data|blob):/.test(data)) return void urls.set(name, data);
-        const b = toBytes(data);
-        if (!b?.length) throw new PackError('그림 팩을 읽지 못했어요. 다시 받아 주세요.');
-        urls.set(name, URL.createObjectURL(new Blob([b as BlobPart], { type: 'image/png' })));
-      }),
-    );
+    for (const name of PACK_FILES) {
+      const b = Uint8Array.from(atob(s.files[name]), (c) => c.charCodeAt(0));
+      urls.set(name, URL.createObjectURL(new Blob([b as BlobPart], { type: 'image/png' })));
+    }
     return { atlas: s.atlas, url: (f: string) => urls.get(f) ?? '' };
   })();
   art.catch(() => (art = null));
