@@ -38,6 +38,8 @@ interface WikiState {
   view: WikiView;
   title: string;
   query: string;
+  /** 메인 화면 검색칸 (입력하는 대로 아래에 결과) */
+  homeQuery: string;
   history: { view: WikiView; title: string; query: string }[];
   /** 작성 화면: 링크로 들어왔으면 부모 문서의 원본 자료를 물려받는다 */
   inherited: string[];
@@ -56,11 +58,11 @@ interface WikiState {
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', newTitle: '',
+  view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', newTitle: '',
 };
 
 export function resetWiki() {
-  Object.assign(wiki, { view: 'home', title: '', query: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '', newTitle: '' });
+  Object.assign(wiki, { view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '', newTitle: '' });
 }
 
 interface Job {
@@ -255,6 +257,39 @@ function matches(ctx: ChatContext, q: string): Entry[] {
   return entries(ctx).filter((e) => e.terms.some((t) => t && t.toLowerCase().includes(lower)));
 }
 
+/** 띄어쓰기·기호·대소문자를 빼고 비교 */
+const squash = (t: string) => t.toLowerCase().replace(/[\s·.,!?'"「」『』()\[\]\-_~]/g, '');
+
+function editDistance(a: string, b: string): number {
+  const A = [...a], B = [...b];
+  let prev = Array.from({ length: B.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= A.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= B.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (A[i - 1] === B[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[B.length];
+}
+
+/** 비슷한 제목: 띄어쓰기만 다르거나 한두 글자 틀린 것 (가까운 순, 최대 6개) */
+function similar(q: string, titles: string[]): string[] {
+  const k = squash(q);
+  if (!k) return [];
+  const limit = Math.max(1, Math.floor([...k].length / 3));
+  return [...new Set(titles)]
+    .map((t) => {
+      const v = squash(t);
+      if (!v) return null;
+      if (v === k || v.includes(k) || (k.includes(v) && [...v].length >= 2)) return { t, d: 0 };
+      const d = editDistance(k, v);
+      return d <= limit ? { t, d } : null;
+    })
+    .filter((x): x is { t: string; d: number } => !!x)
+    .sort((a, b) => a.d - b.d || a.t.length - b.t.length)
+    .slice(0, 6)
+    .map((x) => x.t);
+}
+
 /** 사진(카드 에셋) 또는 분류 아이콘 */
 function face(ctx: ChatContext, e: Entry | undefined, cls = ''): string {
   const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
@@ -307,11 +342,16 @@ function sortedDocs(ctx: ChatContext) {
     .map((x) => x.d);
 }
 
+/** 메인 검색칸 결과: 입력하는 대로 바로 바뀐다 (서랍 검색과 같은 목록) */
+export function wikiHomeResults(ctx: ChatContext): string {
+  return wiki.homeQuery.trim() ? wikiList(ctx, wiki.homeQuery) : '';
+}
+
 /** 왼쪽 목록 (검색어를 바꾸면 이것만 다시 그린다) */
-export function wikiList(ctx: ChatContext): string {
+export function wikiList(ctx: ChatContext, query = wiki.query): string {
   const docs = sortedDocs(ctx);
   const saved = new Set(docs.map((d) => d.title));
-  const q = wiki.query.trim();
+  const q = query.trim();
   // 이번 이야기에서 쓰거나 새로고침한 문서는 이름 옆 점
   const dated = (d: (typeof docs)[number], dot = true) => {
     const e = entryFor(ctx, d.title);
@@ -328,13 +368,25 @@ export function wikiList(ctx: ChatContext): string {
     const rosterPart = hits.length
       ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row(ctx, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(' · '))).join('')}</ul>`
       : '';
-    if (!docPart && !rosterPart) {
+    // 띄어쓰기가 다르거나 조금 틀린 제목은 「비슷한 문서」로 먼저 제안 (예: 소라랜드 → 소라 랜드)
+    const shownTitles = new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
+    const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx).map((e) => e.title)]).filter((t) => !shownTitles.has(t));
+    const nearPart = near.length
+      ? `<h4 class="ph-sec">비슷한 문서<b>${near.length}</b></h4><ul class="ph-list">${near.map((t) => {
+          const d = docs.find((x) => x.title === t);
+          if (d) return dated(d);
+          const e = entries(ctx).find((x) => x.title === t)!;
+          return row(ctx, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(' · '));
+        }).join('')}</ul>`
+      : '';
+    if (!docPart && !rosterPart && !nearPart) {
       return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc(q)}">${ICONS.pen}작성하기</button></div></div>`;
     }
     const fresh = known
       ? ''
       : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
-    return `<div class="nw-groups">${docPart}${rosterPart}${fresh}</div>`;
+    const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : '';
+    return `<div class="nw-groups">${lead}${docPart}${rosterPart}${nearPart}${fresh}</div>`;
   }
   if (!docs.length) return `<div class="nw-groups">${blank('아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.')}</div>`;
   const count = (t: Tab) => docs.filter((d) => inTab(ctx, d, t)).length;
@@ -425,7 +477,8 @@ function homeView(ctx: ChatContext): string {
   return `<div class="nw-home">
     <section class="nw-hero">
       <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-enter="wiki-search" placeholder="이름·제목 검색" aria-label="위키 검색" autocomplete="off"></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
+      <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
     </section>
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
     ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
@@ -743,6 +796,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       Object.assign(wiki, { tab: (TABS.some(([t]) => t === v) ? v : 'all') as Tab, listOpen: true, query: '' });
       break;
     case 'wiki-search':
+      wiki.homeQuery = '';
       search(ctx, v);
       if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
       break;
@@ -753,6 +807,7 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
         break;
       }
       wiki.history = [];
+      wiki.homeQuery = '';
       openTitle(ctx, v, 'search');
       // 고르면 목록을 접어 문서를 넓게
       if (wiki.view !== 'home') wiki.listOpen = false;

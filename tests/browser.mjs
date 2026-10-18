@@ -809,6 +809,18 @@ if (fixture.globalLore.some(packed)) {
   // 첫 화면은 위키 메인, 목록은 접혀 있다가 세로바를 누르면 펼쳐진다
   await page.waitForSelector('.nw-home .nw-hero');
   assert.equal(await page.locator('.nw-app.list-open').count(), 0);
+  // 메인 검색칸도 입력하는 대로 결과가 바뀌고, 띄어쓰기가 다른 제목은 「비슷한 문서」로 제안한 뒤 새로 작성 줄
+  await page.fill('.nw-hero-q .gx-search', '소라랜드');
+  await page.waitForSelector('.nw-hero-res .ph-sec');
+  {
+    const t = await page.textContent('.nw-hero-res');
+    assert.ok(t.includes('비슷한 문서') && t.includes('소라 랜드'), t);
+    assert.equal(await page.locator('.nw-hero-res .nw-newrow').count(), 1, '새로 작성 줄');
+    assert.equal(await page.locator('.nw-hero-res .nw-nohit').count(), 0, '바로 「없어요」로 가지 않음');
+  }
+  await page.screenshot({ path: `${shots}/13-hero-search.png` });
+  await page.fill('.nw-hero-q .gx-search', '');
+  assert.equal(await page.locator('.nw-hero-res .ph-sec').count(), 0);
   await page.click('.nw-grab');
   await page.waitForSelector('.nw-app.list-open');
   await page.fill('.nw .ph-search', '소라');

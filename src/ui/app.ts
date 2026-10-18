@@ -19,7 +19,7 @@ import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -226,6 +226,12 @@ function ensureRoot(): HTMLElement {
       wiki.query = el.value;
       const box = root?.querySelector('.nw .ph-content');
       if (box) box.innerHTML = wikiList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === 'wiki-home-query' && view.kind === 'started') {
+      wiki.homeQuery = el.value;
+      const box = root?.querySelector('.nw-hero-res');
+      if (box) box.innerHTML = wikiHomeResults(view.ctx);
       return;
     }
     if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
@@ -621,7 +627,7 @@ function header(sub: string, extra = ''): string {
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       <button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
@@ -898,7 +904,6 @@ function tabs(): string {
 /** 왼쪽 위: 표지 + 세로 ID카드 */
 function brand(ctx: ChatContext): string {
   return `<div class="gx-nav-brand">
-      <div class="gx-mark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small>${BRAND.sub}</small></span></div>
       ${idCard(ctx)}
     </div>`;
 }
