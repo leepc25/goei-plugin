@@ -930,7 +930,8 @@ function idCard(ctx: ChatContext): string {
   // 소속 사진 패널: 맨 위 소속 이름 한 줄, 가로줄 아래 위치·목표 한 줄씩, 맨 아래 왼쪽 날짜·시각 / 오른쪽 날씨·온도
   const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>` : '');
   const meta = time || weather ? `<span class="gx-op-meta"><span>${esc(time)}</span><span>${esc(weather)}</span></span>` : '';
-  const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta;
+  // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
+  const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
   const u = userInfo();
   const name = u.name || '나';
   const photo = u.photo
@@ -1027,7 +1028,6 @@ function board(ctx: ChatContext): string {
   const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
     `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
-    ${w.minute === null ? '<p class="gx-hint">첫 응답이 오면 시각과 상태가 채워져요.</p>' : ''}
     <div class="gx-bd-cols">
       ${col('an', '괴이', w.an, an, '발생한 괴이가 없어요.')}
       ${col('in', '사건', w.inc, inc, '진행 중인 사건이 없어요.')}

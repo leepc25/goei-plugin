@@ -383,6 +383,17 @@ async function open(page) {
   await page.waitForFunction(() => window.__calls.setChat.length === 1);
   const world = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_world));
   const preset = world.an.find((e) => e.kind === 'preset');
+  // 첫 응답 전 상황판: 안내 줄 + 칸 배치가 응답 뒤와 같아야
+  if (shots) {
+    await page.evaluate(() => { window.__chat.message.push({ role: 'user', data: '출동' }); const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
+    await open(page);
+    await page.waitForSelector('.gx-board');
+    await page.screenshot({ path: `${shots}/9-board-pending.png` });
+    assert.ok((await page.textContent(".gx-id")).includes("첫 응답 뒤에"));
+    assert.equal(await page.locator(".gx-board > .gx-hint").count(), 0);
+    await page.evaluate(() => { window.__chat.message.pop(); const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
+  }
+
   const sido = { '02': '서울특별시', '03': '인천광역시', '04': '대전광역시', '05': '대구광역시', '06': '광주광역시', '07': '부산광역시', '08': '울산광역시', '09': '경기도', '10': '경기도', '11': '강원특별자치도', '12': '충청북도', '13': '충청남도', '14': '전북특별자치도', '15': '전라남도', '16': '경상북도', '17': '경상남도', '18': '제주특별자치도' };
   const geo = JSON.parse(readFileSync(new URL('../src/data/geo.json', import.meta.url), 'utf8'));
   const [code, idx] = preset.loc.split('-');
