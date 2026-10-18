@@ -42,13 +42,7 @@ export function buildRegistry(lore: LoreEntry[] | undefined): Registry {
   for (const [group, rows] of Object.entries(places)) {
     rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
   }
-  const world = json(books, 'World catalog');
-  const marks = Array.isArray(world?.['랜드마크']) ? (world!['랜드마크'] as unknown[][]) : [];
-  marks.forEach((r, i) => {
-    if (!Array.isArray(r)) return;
-    const name = s(r[1]);
-    if (name) add(`World catalog/랜드마크/${i + 1}`, name, s(r[3]), [s(r[4]), s(r[2]), ...list(r[9])]);
-  });
+  dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore, [b.english, b.label, ...b.aliases]));
   for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...a.aliases, ...a.legacyEnglish]);
   const byTerm = new Map<string, RegistryEntry[]>();
   const byLore = new Map<string, RegistryEntry[]>();

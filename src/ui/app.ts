@@ -144,6 +144,16 @@ function ensureRoot(): HTMLElement {
     }
     const zoom = t.closest<HTMLElement>('[data-zoom-photo]')?.querySelector('img');
     if (zoom?.getAttribute('src')) return zoomPhoto(zoom.src, zoom.alt);
+    // 명부 거점: 지역 지도를 누른 자리가 거점 위치 (%)
+    const pickMap = t.closest<HTMLElement>('[data-base-pick]');
+    if (pickMap) {
+      const img = pickMap.querySelector('img')?.getBoundingClientRect();
+      if (!img || !img.width || !img.height) return;
+      const x = ((ev as MouseEvent).clientX - img.left) / img.width * 100;
+      const y = ((ev as MouseEvent).clientY - img.top) / img.height * 100;
+      if (x < 0 || x > 100 || y < 0 || y > 100) return;
+      return void handle('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+    }
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     // data-take: 같은 창의 입력칸 값을 넘긴다 (form 제출은 플러그인 iframe에서 막혀 있음)

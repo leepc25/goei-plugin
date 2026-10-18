@@ -117,8 +117,11 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   assert.ok(d.agents.every((a) => a.inFolder));
   const moved = migrateLore(realLore);
   assert.ok(!moved.some((e) => e.comment === 'Agent roster'));
-  const world = JSON.parse(moved.find((e) => e.comment === 'World catalog').content);
-  assert.deepEqual(Object.keys(world).filter((k) => !k.startsWith('_')), ['랜드마크']);
+  assert.ok(!moved.some((e) => e.comment === 'World catalog'), '거점도 명부로 옮겨서 World catalog는 없앰');
+  const bases = readDirectory(moved).bases;
+  assert.equal(bases.length, 6);
+  assert.deepEqual(bases.map((b) => b.org), ['관리국', '백일몽', '특수재난대응협회', '교황청', '이슬람', '중림 지하상가']);
+  assert.deepEqual(bases, d.bases);
   const after = parseCatalog(moved);
   assert.equal(j(after), j(before));
   const ra = buildRegistry(realLore).entries.map(j);

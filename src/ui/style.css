@@ -618,6 +618,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-add input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 15px; }
 .dir-add .gx-mini, .dir-rename .gx-mini { min-height: 42px; padding: 0 14px; }
 .dir-rename .dir-in { flex: 1; min-width: 12em; }
+.dir-map { position: relative; width: 100%; max-width: 420px; margin: 4px 0 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); cursor: crosshair; user-select: none; -webkit-user-select: none; }
+.dir-map img { display: block; width: 100%; height: auto; pointer-events: none; }
+.dir-map.ph { aspect-ratio: 4 / 5; display: grid; place-items: center; color: var(--dim); font-size: 14px; cursor: default; }
+.dir-mappin { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); border: 2px solid var(--void); box-shadow: 0 0 0 2px var(--signal); transform: translate(-50%, -50%); pointer-events: none; }
+.dir-panel select.gx-select { width: 100%; }
 /* 실제 사진 (v0.11.0) */
 .at-add-image { border-style: solid; border-color: var(--accent-line); color: var(--signal); }
 .at-item-image { align-items: center; }

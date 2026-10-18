@@ -1,5 +1,5 @@
 // 상황판 목록: 괴이·미스틱 사이트·요원은 카드 명부(directory.ts: 로어북 폴더 + 괴이봇 명부 + 옛 목록),
-// 랜드마크는 World catalog, 세력 표시명은 Faction display.
+// 거점도 카드 명부(옛 카드는 World catalog 랜드마크 줄), 세력 표시명은 Faction display.
 import { extraNames, factionList, factionVars } from '../factions';
 import type { FactionCode, LoreEntry, ScriptState } from '../types';
 import { SIGUN } from './geo';
@@ -87,27 +87,17 @@ function worldRows(data: Record<string, unknown>, group: string, landmark: boole
 export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {
   const list = lore ?? [];
   const dir = readDirectory(list);
-  const worldRaw = loreText(list, 'World catalog');
-  if (!worldRaw && !dir.folders) throw new CatalogError('World catalog 로어북이 없어요.');
-  const world = worldRaw ? (parseJson(worldRaw, 'World catalog') as Record<string, unknown>) : {};
-  const item = (r: unknown[], nameAt: number, englishAt: number, aliasAt: number): WorldItem => ({
-    name: str(r[nameAt]),
-    english: str(r[englishAt]),
-    aliases: strList(r[aliasAt]),
-  });
+  if (!dir.folders) {
+    const worldRaw = loreText(list, 'World catalog');
+    if (!worldRaw) throw new CatalogError('World catalog 로어북이 없어요.');
+    parseJson(worldRaw, 'World catalog');
+  }
   const place = (p: { label: string; english: string; aliases: string[] }): WorldItem => ({ name: p.label, english: p.english, aliases: p.aliases });
   const anomalies = dir.anomalies.filter((p) => p.preset).map(place).filter((e) => e.name);
   const mysticSites = dir.sites.filter((p) => p.preset).map(place).filter((e) => e.name);
-  const landmarks: Landmark[] = (Array.isArray(world['랜드마크']) ? worldRows(world, '랜드마크', true) : [])
-    .map((r) => ({
-      ...item(r, 1, 4, 9),
-      label: str(r[2]),
-      sido: str(r[5]),
-      gu: str(r[6]),
-      x: Number(r[7]),
-      y: Number(r[8]),
-    }))
-    .filter((e) => e.name && SIGUN[e.sido]?.includes(e.gu));
+  const landmarks: Landmark[] = dir.bases
+    .filter((b) => b.show && b.name && SIGUN[b.sido]?.includes(b.gu))
+    .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
 
   if (!dir.folders) {
     const rosterRaw = loreText(list, 'Agent roster');

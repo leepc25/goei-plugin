@@ -42,11 +42,33 @@ export interface AgentRow {
   inFolder: boolean;
 }
 
+/** 지도 거점. 조직의 본거지이거나(org) 조직과 무관한 장소(org = '') */
+export interface BaseRow {
+  /** 표시명. 명부의 열쇠 */
+  name: string;
+  /** 지도 표시명 (비면 표시명) */
+  label: string;
+  /** 위키 문서로 이어질 로어북 이름 (없으면 '') */
+  lore: string;
+  english: string;
+  aliases: string[];
+  /** 조직 이름 (orgAffiliation이 아니라 OrgRow.name). 무관하면 '' */
+  org: string;
+  /** 시도 코드 (02 = 서울) */
+  sido: string;
+  gu: string;
+  /** 지역 지도 위 위치 (%) */
+  x: number;
+  y: number;
+  show: boolean;
+}
+
 export interface Directory {
   anomalies: PlaceRow[];
   sites: PlaceRow[];
   agents: AgentRow[];
   orgs: OrgRow[];
+  bases: BaseRow[];
   /** 요원 폴더의 구분선 이름 순서 */
   groups: string[];
   refill: number;
@@ -76,6 +98,18 @@ export interface AgentData {
   roster_for?: string[];
   phone_tabs?: string[];
 }
+export interface BaseData {
+  label?: string;
+  lore?: string;
+  english?: string;
+  aliases?: string[];
+  org?: string;
+  sido: string;
+  gu: string;
+  x: number;
+  y: number;
+  show?: boolean;
+}
 export interface DirectoryData {
   schema: number;
   refill?: number;
@@ -83,6 +117,7 @@ export interface DirectoryData {
   '미스틱 사이트'?: Record<string, PlaceData>;
   요원?: Record<string, AgentData>;
   조직?: Record<string, OrgData>;
+  거점?: Record<string, BaseData>;
   /** 새 세력에 준 적 있는 코드 */
   codes_used?: string[];
 }
@@ -160,6 +195,49 @@ function legacyPlaces(lore: LoreEntry[], group: '괴이' | '미스틱 사이트'
     out.push({ lore: s(r[2]) || label, label, english: s(r[3]), aliases: list(r[4]), preset: r[0] === true, inFolder: false });
   }
   return out;
+}
+
+/** 옛 World catalog의 랜드마크 줄 (노출, 표시명, 지도 표시명, 정식 로어북명, 영문명, 지역, 구, X, Y, 별칭) */
+function legacyBases(lore: LoreEntry[]): (BaseRow & { hint: string[] })[] {
+  const world = obj(book(lore, 'World catalog'));
+  const rows = Array.isArray(world['랜드마크']) ? (world['랜드마크'] as unknown[]) : [];
+  const out: (BaseRow & { hint: string[] })[] = [];
+  for (const r of rows) {
+    if (!Array.isArray(r) || r.length !== 10 || !s(r[1])) continue;
+    out.push({
+      name: s(r[1]), label: s(r[2]), lore: s(r[3]), english: s(r[4]), aliases: list(r[9]), org: '',
+      sido: s(r[5]), gu: s(r[6]), x: Number(r[7]), y: Number(r[8]), show: r[0] === true, hint: [s(r[3]), s(r[2]), s(r[1])].filter(Boolean),
+    });
+  }
+  return out;
+}
+
+const num = (v: unknown, d = 50) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : d);
+
+/** 명부의 거점 (있으면), 없으면 옛 World catalog 줄에서 조직을 짐작해 옮긴다 */
+function buildBases(lore: LoreEntry[], data: DirectoryData | null, orgs: OrgRow[]): BaseRow[] {
+  const orgName = (v: unknown) => {
+    const n = s(v);
+    return n && orgs.some((o) => o.name === n) ? n : '';
+  };
+  if (data && data.거점 && typeof data.거점 === 'object') {
+    return Object.entries(obj(data.거점)).filter(([name]) => s(name)).map(([name, raw]) => {
+      const d = obj(raw);
+      return {
+        name: s(name), label: s(d.label), lore: s(d.lore), english: s(d.english), aliases: list(d.aliases), org: orgName(d.org),
+        sido: s(d.sido), gu: s(d.gu), x: num(d.x), y: num(d.y), show: d.show !== false,
+      };
+    });
+  }
+  const names = factionDisplayNames(lore);
+  return legacyBases(lore).map(({ hint, ...b }) => {
+    const k = hint.map(squash);
+    const o =
+      orgs.find((x) => k.includes(squash(x.name))) ??
+      orgs.find((x) => x.faction && k.includes(squash(names[x.faction] ?? ''))) ??
+      orgs.find((x) => x.spec.title && k.includes(squash(x.spec.title)));
+    return { ...b, org: o?.name ?? '' };
+  });
 }
 
 function legacyAgents(lore: LoreEntry[]): { rows: AgentRow[]; refill: number | null } {
@@ -479,6 +557,7 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
     sites: places('site'),
     agents: ag.rows,
     orgs: ag.orgs,
+    bases: buildBases(books, data, ag.orgs),
     groups: ag.groups,
     refill: savedRefill ?? ag.refill ?? 5,
     folders: !!members,
@@ -512,6 +591,17 @@ export function directoryData(dir: Directory): DirectoryData {
   for (const o of dir.orgs) out.조직![o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
   const used = [...new Set([...dir.usedCodes, ...dir.orgs.map((o) => (o.faction ? '' : o.spec.code ?? ''))])].filter((c) => c && !BUILTIN.includes(c)).sort();
   if (used.length) out.codes_used = used;
+  out.거점 = {};
+  for (const b of dir.bases) {
+    const d: BaseData = { sido: b.sido, gu: b.gu, x: Math.round(b.x * 10) / 10, y: Math.round(b.y * 10) / 10 };
+    if (b.label && b.label !== b.name) d.label = b.label;
+    if (b.lore) d.lore = b.lore;
+    if (b.english) d.english = b.english;
+    if (b.aliases.length) d.aliases = b.aliases;
+    if (b.org) d.org = b.org;
+    if (!b.show) d.show = false;
+    out.거점[b.name] = d;
+  }
   for (const p of dir.anomalies) out.괴이![p.lore] = place(p);
   for (const p of dir.sites) out['미스틱 사이트']![p.lore] = place(p);
   for (const a of dir.agents) {
@@ -537,10 +627,10 @@ function cleanSpec(spec: FactionSpec): FactionSpec {
 
 const HELP =
   '괴이: 이면세계 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. ' +
-  '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 모델에게는 보내지 않습니다.';
+  '괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 모델에게는 보내지 않습니다.';
 
 export function directoryContent(data: DirectoryData): string {
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
+  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}) }, null, 1);
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */
@@ -567,21 +657,10 @@ export function sameData(a: DirectoryData, b: DirectoryData): boolean {
 }
 
 /**
- * 명부로 옮기기: 괴이봇 명부를 지금 값으로 적고, 옛 World catalog의 괴이·미스틱 사이트 줄과 Agent roster를 뺀다.
- * World catalog에는 랜드마크만 남는다. 폴더가 없는 카드는 그대로 돌려준다(옛 목록이 유일한 자료라서).
+ * 명부로 옮기기: 괴이봇 명부를 지금 값으로 적고, 옛 World catalog(괴이·미스틱 사이트·랜드마크)와 Agent roster를 뺀다.
+ * 거점도 명부로 옮긴다. 폴더가 없는 카드는 그대로 돌려준다(옛 목록이 유일한 자료라서).
  */
 export function migrateLore(lore: LoreEntry[], dir: Directory = readDirectory(lore)): LoreEntry[] {
   if (!dir.folders) return lore;
-  let next = withDirectory(lore, directoryData(dir));
-  next = next.filter((e) => e.comment !== 'Agent roster');
-  next = next.map((e) => {
-    if (e.comment !== 'World catalog') return e;
-    const w = obj(parse(e.content));
-    if (!Object.keys(w).length) return e;
-    const keep: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(w)) if (k !== '괴이' && k !== '미스틱 사이트' && k !== '_columns') keep[k] = v;
-    keep._help = '괴이·미스틱 사이트·요원은 로어북 폴더와 「괴이봇 명부」로 옮겼습니다. 여기에는 지도 랜드마크만 남습니다.';
-    return { ...e, content: JSON.stringify(keep, null, 1) };
-  });
-  return next;
+  return withDirectory(lore, directoryData(dir)).filter((e) => e.comment !== 'Agent roster' && e.comment !== 'World catalog');
 }

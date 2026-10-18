@@ -2,8 +2,10 @@
 // 고친 값은 카드 로어북 「괴이봇 명부」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
 import {
   assignOrg, directoryData, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
-  type PlaceRow, withDirectory,
+  type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
+import { MAP_CODES, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
+import { assetUrl } from '../host/assets';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { avatar } from './images';
@@ -14,7 +16,7 @@ export interface DirectoryEnv {
   refresh: () => Promise<void>;
 }
 
-type Kind = 'anomaly' | 'site' | 'agent' | 'org';
+type Kind = 'anomaly' | 'site' | 'agent' | 'org' | 'base';
 
 export const dirUi = {
   kind: 'anomaly' as Kind,
@@ -214,6 +216,10 @@ function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
       <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
       <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ''}>지우기</button></div>`}
     ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc(m.name)).join(', ')}</p>` : ''}
+    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases
+      .filter((b) => b.org === o.name)
+      .map((b) => chip('dir-base-goto', b.name, b.name, false))
+      .join('')}<button class="gx-chip" data-action="dir-base-new" data-value="${esc(o.name)}">＋ 거점 추가</button></div></div>
   </div>`;
 }
 
@@ -227,6 +233,83 @@ function orgRow(o: OrgRow, ctx: ChatContext, d: Directory, names: Record<string,
       <span class="dir-name"><b>${esc(o.name)}</b><small>${esc(sub)}</small></span>
       ${play ? `<span class="gx-badge live">플레이 ${esc(o.faction || o.spec.code)}</span>` : ''}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ''}<span class="gx-badge">${n}명</span>
     </button>${open ? orgPanel(o, ctx, d) : ''}</div>`;
+}
+
+// ── 거점 ──
+// 지도에 찍히는 장소. 조직의 본거지면 조직을 고르고, 아니면 「조직 없음」. 위치는 지역 지도를 눌러 정한다.
+
+const REGIONS = MAP_CODES.filter((c) => c !== '01');
+const baseMaps: Record<string, string | null | 'loading'> = {};
+
+function baseMap(ctx: ChatContext, code: string, env: DirectoryEnv | null): string | null {
+  const hit = baseMaps[code];
+  if (hit === undefined && env) {
+    baseMaps[code] = 'loading';
+    void assetUrl(ctx.char, `map${code}`).then((url) => {
+      baseMaps[code] = url;
+      env.render();
+    });
+    return null;
+  }
+  return hit === 'loading' || hit === undefined ? null : hit;
+}
+
+let mapEnv: DirectoryEnv | null = null;
+
+const baseWhere = (b: BaseRow) => [SIDO_NAME[b.sido] ?? '', b.gu].filter(Boolean).join(' ') || '위치 미정';
+
+function basePanel(b: BaseRow, ctx: ChatContext, d: Directory): string {
+  const k = (f: string) => `base:${f}|${b.name}`;
+  const url = baseMap(ctx, b.sido, mapEnv);
+  const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? ' selected' : ''}>${esc(regionName(c))}</option>`).join('');
+  const gus = (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc(g)}"${g === b.gu ? ' selected' : ''}>${esc(g)}</option>`).join('');
+  const map = url
+    ? `<div class="dir-map" data-base-pick="${esc(b.name)}"><img src="${esc(url)}" alt="${esc(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>`
+    : `<div class="dir-map ph">지도 불러오는 중…</div>`;
+  return `<div class="dir-panel">
+    <div class="dir-line"><span>지도에 보이기</span><div class="gx-segs gx-segs-sm">
+      <button class="gx-seg${b.show ? ' on' : ''}" data-action="dir-base-show" data-value="${esc(`1|${b.name}`)}">보임</button>
+      <button class="gx-seg${!b.show ? ' on' : ''}" data-action="dir-base-show" data-value="${esc(`0|${b.name}`)}">숨김</button></div></div>
+    <div class="dir-line"><span>조직</span><div class="dir-chips">${d.orgs.map((o) => chip('dir-base-org', `${o.name}|${b.name}`, o.name, b.org === o.name)).join('')}${chip('dir-base-org', `|${b.name}`, '조직 없음', !b.org)}</div></div>
+    <div class="dir-grid">
+      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc(b.name)}">${sido}</select></label>
+      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc(b.name)}">${gus}</select></label>
+    </div>
+    ${map}
+    ${input(k('label'), b.label, '지도 표시명', '비우면 거점 이름')}
+    ${input(k('lore'), b.lore, '위키 로어북', '이 거점을 설명하는 로어북 이름')}
+    ${input(k('english'), b.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
+    ${input(k('aliases'), b.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
+    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
+      <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
+      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc(b.name)}">지우기</button></div>
+  </div>`;
+}
+
+function baseRow(b: BaseRow, ctx: ChatContext, d: Directory): string {
+  const open = dirUi.open === b.name;
+  return `<div class="dir-row${open ? ' open' : ''}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc(b.name)}" aria-expanded="${open}">
+      <span class="dir-name"><b>${esc(b.name)}</b><small>${esc(baseWhere(b))}</small></span>
+      ${b.show ? '' : '<span class="gx-badge">숨김</span>'}
+    </button>${open ? basePanel(b, ctx, d) : ''}</div>`;
+}
+
+function baseList(ctx: ChatContext, d: Directory, q: string): string {
+  const rows = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
+  const order = [...d.orgs.map((o) => o.name), ''];
+  const groups = [...new Set(rows.map((b) => b.org))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
+  return `<div class="dir-add"><input name="dir-base-new" placeholder="새 거점 이름" aria-label="새 거점 이름" autocomplete="off" data-enter="dir-base-new">
+      <button class="gx-mini" data-action="dir-base-new" data-take="dir-base-new">거점 추가</button></div>
+    ${groups.map((g) => `<h3 class="dir-group">${esc(g || '조직 없음')}<small>${rows.filter((b) => b.org === g).length}</small></h3>${rows.filter((b) => b.org === g).map((b) => baseRow(b, ctx, d)).join('')}`).join('')
+      || '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
+}
+
+/** 새 거점 이름: 겹치면 뒤에 번호 */
+function freeBaseName(d: Directory, want: string): string {
+  let name = want;
+  for (let i = 2; d.bases.some((b) => b.name === name); i++) name = `${want} ${i}`;
+  return name;
 }
 
 function placeRow(p: PlaceRow, src = ''): string {
@@ -254,6 +337,7 @@ export function directoryList(ctx: ChatContext): string {
   const d = draftOf(ctx);
   const q = dirUi.q.trim().toLowerCase();
   const names = namesOf(d, ctx.char.globalLore);
+  if (dirUi.kind === 'base') return baseList(ctx, d, q);
   if (dirUi.kind === 'org') {
     const rows = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
     return `<div class="dir-add"><input name="dir-org-new" placeholder="새 조직 이름" aria-label="새 조직 이름" autocomplete="off" data-enter="dir-org-add">
@@ -292,8 +376,10 @@ export const directoryDoneClear = (text: string): void => {
   if (dirUi.done === text) dirUi.done = '';
 };
 
+const SEARCH_HINT: Record<Kind, string> = { anomaly: '이름·영문명 검색', site: '이름·영문명 검색', agent: '이름·영문명·부서 검색', org: '조직 이름 검색', base: '이름·조직·지역 검색' };
+
 export const directorySearch = (): string =>
-  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="이름·영문명·부서 검색" aria-label="명부 검색" autocomplete="off">`;
+  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="${SEARCH_HINT[dirUi.kind]}" aria-label="명부 검색" autocomplete="off">`;
 
 /** 설정 위쪽 줄의 「덮어쓰기」「불러오기」 (설정·명부 공통, 누르면 확인) */
 export const barButtons = (off: boolean): string =>
@@ -310,6 +396,7 @@ export function directoryView(ctx: ChatContext): string {
     ['site', '특수', d.sites.length],
     ['agent', '요원', d.agents.length],
     ['org', '조직', d.orgs.length],
+    ['base', '거점', d.bases.length],
   ];
   // 탭이 맨 위 (모바일은 고정), 사용법은 그 아래 접어 둔다
   return `<div class="dir">
@@ -321,7 +408,8 @@ export function directoryView(ctx: ChatContext): string {
       <ul>
         <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
         <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
-        <li>고친 값은 위의 「저장」을 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
+        <li>거점은 지도에 찍히는 장소예요. 「거점」 탭에서 추가하고 지도를 눌러 위치를 정해요.</li>
+        <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
       </ul>
       ${d.folders ? '' : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
     </details>
@@ -340,6 +428,18 @@ const splitList = (v: string) => v.split(',').map((t) => t.trim()).filter(Boolea
 export function directoryInput(key: string, value: string, bar: Element | null): void {
   const d = dirUi.draft;
   if (!d) return;
+  if (key.startsWith('base:')) {
+    const at = key.indexOf('|');
+    const field = key.slice(5, at);
+    const b = d.bases.find((x) => x.name === key.slice(at + 1));
+    if (!b) return;
+    if (field === 'aliases') b.aliases = splitList(value);
+    else if (field === 'label' || field === 'lore' || field === 'english') b[field] = value.trim();
+    else return;
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
   if (key.startsWith('org:')) {
     const at = key.indexOf('|');
     const field = key.slice(4, at);
@@ -394,9 +494,11 @@ export async function handleDirectory(action: string, value: string | undefined,
   if (!action.startsWith('dir-')) return false;
   const v = value ?? '';
   const d = draftOf(ctx);
+  mapEnv = env;
+  const baseOf = (name: string) => d.bases.find((b) => b.name === name);
   switch (action) {
     case 'dir-kind':
-      if (v === 'anomaly' || v === 'site' || v === 'agent' || v === 'org') {
+      if (v === 'anomaly' || v === 'site' || v === 'agent' || v === 'org' || v === 'base') {
         dirUi.kind = v;
         dirUi.open = '';
         dirUi.q = '';
@@ -460,6 +562,7 @@ export async function handleDirectory(action: string, value: string | undefined,
         break;
       }
       for (const a of d.agents) if (a.affiliation === o.name) a.affiliation = name;
+      for (const b of d.bases) if (b.org === o.name) b.org = name;
       o.name = name;
       dirUi.open = name;
       dirUi.notice = '';
@@ -470,10 +573,90 @@ export async function handleDirectory(action: string, value: string | undefined,
       const o = d.orgs.find((x) => x.name === v && !x.faction);
       if (!o || d.agents.some((a) => a.affiliation === o.name)) break;
       d.orgs = d.orgs.filter((x) => x !== o);
+      for (const b of d.bases) if (b.org === o.name) b.org = '';
       dirUi.open = '';
       dirUi.done = '';
       break;
     }
+    case 'dir-base-goto':
+      if (!baseOf(v)) break;
+      dirUi.kind = 'base';
+      dirUi.open = v;
+      dirUi.q = '';
+      break;
+    case 'dir-base-new': {
+      // 거점 탭에서는 적은 이름으로, 조직 칸에서는 그 조직 거점으로 만든다
+      const org = dirUi.kind === 'org' ? d.orgs.find((o) => o.name === v) : undefined;
+      const want = org ? `${org.name} 거점` : v.trim();
+      if (!want) break;
+      if (!org && baseOf(want)) {
+        dirUi.notice = `「${want}」 거점이 이미 있어요.`;
+        break;
+      }
+      const name = freeBaseName(d, want);
+      const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
+      const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : '02';
+      d.bases.push({ name, label: '', lore: org ? org.name : '', english: '', aliases: [], org: org?.name ?? '', sido, gu: SIGUN[sido]?.[0] ?? '', x: 50, y: 50, show: true });
+      dirUi.kind = 'base';
+      dirUi.open = name;
+      dirUi.q = '';
+      dirUi.notice = '';
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-base-show':
+    case 'dir-base-org': {
+      const at = v.indexOf('|');
+      const b = baseOf(v.slice(at + 1));
+      if (!b) break;
+      if (action === 'dir-base-show') b.show = v.slice(0, at) === '1';
+      else b.org = d.orgs.some((o) => o.name === v.slice(0, at)) ? v.slice(0, at) : '';
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-base-sido':
+    case 'dir-base-gu': {
+      const at = v.lastIndexOf('=');
+      const b = baseOf(v.slice(0, at));
+      const val = v.slice(at + 1);
+      if (!b) break;
+      if (action === 'dir-base-sido' && REGIONS.includes(val) && val !== b.sido) {
+        b.sido = val;
+        b.gu = SIGUN[val]?.[0] ?? '';
+        b.x = 50;
+        b.y = 50;
+      } else if (action === 'dir-base-gu' && SIGUN[b.sido]?.includes(val)) b.gu = val;
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-base-xy': {
+      const [x, y, ...rest] = v.split('|');
+      const b = baseOf(rest.join('|'));
+      if (!b) break;
+      b.x = Math.round(Math.min(100, Math.max(0, Number(x))) * 10) / 10;
+      b.y = Math.round(Math.min(100, Math.max(0, Number(y))) * 10) / 10;
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-base-rename': {
+      const b = baseOf(dirUi.open);
+      const name = v.trim();
+      if (!b || !name || name === b.name) break;
+      if (baseOf(name)) {
+        dirUi.notice = `「${name}」 거점이 이미 있어요.`;
+        break;
+      }
+      b.name = name;
+      dirUi.open = name;
+      dirUi.notice = '';
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-base-del':
+      d.bases = d.bases.filter((b) => b.name !== v);
+      dirUi.open = '';
+      dirUi.done = '';
+      break;
     case 'dir-fac-play':
     case 'dir-fac-hide':
     case 'dir-fac-type': {
@@ -543,7 +726,8 @@ export async function handleDirectory(action: string, value: string | undefined,
       try {
         const data = directoryData(d);
         let saved: ChatContext['char']['globalLore'] = undefined;
-        await updateCharacterLore(ctx.charIndex, (lore) => (saved = withDirectory(lore, data)));
+        // 거점이 명부로 옮겨졌으니 옛 World catalog(폴더 있는 카드에서는 랜드마크만 남은 것)는 뺀다
+        await updateCharacterLore(ctx.charIndex, (lore) => (saved = withDirectory(lore, data).filter((e) => !d.folders || e.comment !== 'World catalog')));
         dirUi.draft = null;
         dirUi.done = '카드 로어북에 저장했어요';
         // 지금 채팅의 새 세력 변수(태그·세력 로어북 자리표시자)를 바로 맞춘다. 다른 채팅은 다음 응답 때 맞춰진다
