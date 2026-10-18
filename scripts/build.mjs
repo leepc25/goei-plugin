@@ -26,7 +26,7 @@ const result = await build({
   charset: 'utf8',
   minify: false,
   legalComments: 'none',
-  loader: { '.css': 'text' },
+  loader: { '.css': 'text', '.png': 'dataurl' },
   write: false,
 });
 const code = header + result.outputFiles[0].text;
@@ -41,6 +41,25 @@ await build({
   target: 'es2022',
   charset: 'utf8',
   outfile: 'dist-test/core.mjs',
+});
+
+// 관찰형 게임 시험 페이지용 (tests/game/demo.html)
+await build({
+  entryPoints: ['src/game/demo.ts'],
+  bundle: true,
+  format: 'esm',
+  target: 'es2022',
+  charset: 'utf8',
+  loader: { '.css': 'text', '.png': 'dataurl' },
+  outfile: 'dist-test/game-demo.js',
+});
+await build({
+  entryPoints: ['src/game/sim.ts'],
+  bundle: true,
+  format: 'esm',
+  target: 'es2022',
+  charset: 'utf8',
+  outfile: 'dist-test/game-sim.mjs',
 });
 
 const info = {
