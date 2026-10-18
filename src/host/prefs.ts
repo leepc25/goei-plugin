@@ -29,6 +29,15 @@ export async function saveVarDefaults(prefixes: string[], state: Record<string, 
   });
 }
 
+/** 「불러오기」: 새 채팅 기본값을 지금 채팅 변수로. 기본값에 없는 항목은 비워서 원래 기본값으로 돌린다 */
+export function loadVarDefaults(prefixes: string[], state: Record<string, unknown> | undefined): Record<string, string> {
+  const mine = (k: string) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+  const saved = getPrefs().vars ?? {};
+  const out: Record<string, string> = {};
+  for (const k of [...new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? '');
+  return out;
+}
+
 /** 고친 값을 합쳐 저장한다 */
 export async function savePrefs(change: (p: Prefs) => Prefs): Promise<Prefs> {
   const next = setPrefs(change(structuredClone(getPrefs())));

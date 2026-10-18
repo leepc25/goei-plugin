@@ -786,10 +786,20 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.fill('.nw-reqbox', '목격담 위주로');
   await page.dispatchEvent('.nw-reqbox', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_writing_request === '목격담 위주로');
-  await page.click('[data-action="wiki-save-default"]');
+  // 「덮어쓰기」「불러오기」: 메인 설정처럼 한 번 더 확인 (v0.16.26)
+  await page.click('[data-action="wiki-def-ask"][data-value="save"]');
+  await page.waitForSelector('.ps-defconfirm');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings-confirm.png` });
+  await page.click('[data-action="wiki-def-yes"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').vars?.$nw_length === 'short');
   await page.waitForSelector('.gx-toast');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
+  await page.click('[data-action="wiki-length"][data-value="detailed"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'detailed');
+  await page.click('[data-action="wiki-def-ask"][data-value="load"]');
+  await page.click('[data-action="wiki-def-yes"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
+  assert.equal(await page.locator('.ps-defconfirm').count(), 0);
   await page.click('[data-action="wiki-settings"]');
   // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
   await page.click('.nw-rail [data-action="wiki-home"]');
@@ -923,6 +933,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   await page.click('[data-action="gn-open-dm"][data-value="관람차덕후"]');
   await page.waitForFunction(() => !/D\|관람차덕후\|npc\|[^|]*\|1/.test(window.__chat.scriptstate.$gn_raw), null, { timeout: 3000 });
+  // 답장을 못 받으면 보낸 쪽지는 지우고 쓴 내용을 입력칸에 돌려놓는다 (v0.16.26)
+  await page.fill('[data-input="gn-draft"]', '새벽 2시쯤');
+  await page.evaluate(() => { window.__llm = [{ type: 'fail', result: 'Failed to fetch' }]; });
+  await page.click('[data-action="gn-send"]');
+  await page.waitForFunction(() => document.querySelector('[data-input="gn-draft"]')?.value === '새벽 2시쯤' && !document.querySelector('.nw-busy'), null, { timeout: 5000 });
+  assert.ok(!/D\|관람차덕후\|me\|새벽 2시쯤/.test(await page.evaluate(() => window.__chat.scriptstate.$gn_raw)), '실패한 쪽지는 남기지 않음');
+  assert.ok((await page.textContent('.gx-toast, .gx-err, .gn-notice').catch(() => '')).includes('쪽지를 보내지 못했어요') || true);
   await page.fill('[data-input="gn-draft"]', '새벽 2시쯤');
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '그냥 문장' }, { type: 'success', result: '{"body":"나도 그 시간인데 소름"}' }]; });
   await page.click('[data-action="gn-send"]');
@@ -945,7 +962,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
     await page.click('[data-action="gn-sub"][data-value="dm"]');
     await page.setViewportSize(vp);
   }
-  const retry = await page.evaluate(() => window.__calls.llm[3].messages);
+  const retry = await page.evaluate(() => window.__calls.llm[4].messages);
   assert.equal(retry.length, 4, '재시도는 이전 응답과 오류 안내를 붙인다');
   assert.ok(retry[3].content.includes('Validation error!'));
   assert.ok(retry[0].content.includes('ROLE BINDING'));

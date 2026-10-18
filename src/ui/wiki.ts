@@ -10,6 +10,7 @@ import {
 import { runModel } from '../host/llm';
 import { saveVarDefaults } from '../host/prefs';
 import { ICONS } from './icons';
+import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
@@ -443,7 +444,7 @@ function settingsView(ctx: ChatContext): string {
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   const line = (label: string, control: string, hint = '') =>
     `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
-  return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '지금 채팅에 적용돼요', `<button class="gx-mini ps-save" data-action="wiki-save-default" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`)}
+  return `<div class="ph-form nw-setpane">${paneHead(ctx, '위키 설정', '', defaultsButtons('wiki'))}${defaultsConfirm('wiki')}
     <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
       ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
       ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
@@ -630,6 +631,16 @@ const wide = () => !matchMedia('(max-width: 760px)').matches;
 export async function handleWiki(action: string, value: string | undefined, ctx: ChatContext, env: WikiEnv): Promise<boolean> {
   const v = value ?? '';
   if (action !== 'wiki-delete') wiki.confirmDelete = null;
+  if (action.startsWith('wiki-def-')) {
+    try {
+      const msg = await defaultsAction('wiki', action, v, ctx, env.refresh);
+      if (msg) wiki.info = msg;
+    } catch (error) {
+      wiki.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env.render();
+    return true;
+  }
   switch (action) {
     case 'wiki-home':
       go('home');
@@ -726,14 +737,6 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       if (wiki.view === 'settings') go('home');
       else go('settings');
       wiki.listOpen = false;
-      break;
-    case 'wiki-save-default':
-      try {
-        await saveVarDefaults(['$nw_'], ctx.chat.scriptstate);
-        wiki.info = '지금 위키 설정을 새 채팅 기본값으로 저장했어요.';
-      } catch (error) {
-        wiki.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
       break;
     default:
       return false;

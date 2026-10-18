@@ -1398,11 +1398,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }
 /* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
 .gn-pane .gn-doc { gap: 14px; }
+/* 글·댓글 카드는 줄어들지 않고 .gn-doc가 스크롤한다 (overflow: hidden 카드가 flex 안에서 줄어 댓글이 잘리던 문제) */
+.gn-pane .gn-doc > * { flex: none; }
 .gn-pane .gn-post { padding: 0 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .gn-pane .gn-post-head { border-top: 0; padding-top: 16px; }
 .gn-pane .gn-post-body { border-bottom: 0; }
-.gn-pane .gn-csec { margin-top: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
-.gn-pane .gn-chead { padding: 12px 16px; border-bottom: 1px solid var(--line2); }
+.gn-pane .gn-csec { margin-top: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
+.gn-pane .gn-chead { padding: 16px 16px 12px; border-bottom: 1px solid var(--line2); }
 .gn-pane .gn-c { padding-left: calc(16px + var(--gn-depth, 0) * 20px); padding-right: 10px; }
 .gn-pane .gn-cnone { border-bottom: 0; }
 .gn-c { border-bottom-color: var(--line); }
@@ -1445,12 +1447,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .st-scopebar .st-scope { flex: none; margin: 0; }
 /* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
 .st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
-/* 덮어쓰기·불러오기: 전환 탭과 달리 둥근 테두리 + 아이콘, 한 단계 작게 */
-.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--line2, var(--line)); border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.st-act svg { width: 16px; height: 16px; flex: none; }
-.st-act.save { border-color: var(--accent-line); color: var(--signal); }
-.st-act:hover:not(:disabled) { background: var(--accent-bg); border-color: var(--signal); color: var(--signal); }
+/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.st-act svg { width: 14px; height: 14px; flex: none; }
+.st-act:hover:not(:disabled) { background: var(--accent-bg); }
 .st-act:disabled { opacity: .4; cursor: default; }
+.ps-defaults { display: flex; gap: 6px; }
+.ph-room-head .ps-defaults { margin-right: 4px; }
+.ps-defconfirm { margin: 12px 16px 0; }
 /* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
 .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: -6px; }
 .st-scopebar .st-scope { grid-column: span 2; display: flex; }
@@ -1460,8 +1464,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) {
   .st-scopebar, .st-barbtns { gap: 6px; }
   .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
-  .st-act { min-width: 0; min-height: 30px; padding: 0 6px; font-size: 13px; gap: 4px; }
-  .st-act svg { width: 14px; height: 14px; }
+  .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
+  .ps-defaults .st-act { padding: 0 8px; }
 }
 .st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .st-barconfirm p { color: var(--text); }

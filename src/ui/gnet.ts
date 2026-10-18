@@ -18,7 +18,7 @@ import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { runModel } from '../host/llm';
 import { saveVarDefaults } from '../host/prefs';
-import { saveDefaultBtn } from './phone';
+import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
 
 type Compose =
@@ -279,6 +279,8 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
     addOutgoingDm(st, nick, body, dateNow(chat), src);
     return writeGnet(chat, st);
   });
+  // 답장을 못 받으면 보낸 쪽지를 지우고 쓴 내용을 입력칸에 돌려놓는다 (사용자 요청 v0.16.26)
+  const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
   gnet.compose = null;
   gnet.draft = '';
   gnet.attach = [];
@@ -301,7 +303,16 @@ async function sendDm(ctx: ChatContext, env: GnetEnv, nick: string, body: string
         reply = withRaw(again, () => parseDmBody(again));
       }
     } catch (error) {
-      throw new GnetError(`보낸 쪽지는 저장했어요. 답장을 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        let i = cur.dms.length - 1;
+        while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === 'me')) i--;
+        if (i < 0) return null;
+        cur.dms.splice(i, 1);
+        return writeGnet(chat, cur);
+      }).catch(() => null);
+      if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
+      throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, (error as { raw?: string }).raw ?? '');
     }
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       const cur = readGnet(chat);
@@ -571,7 +582,7 @@ function settingsView(ctx: ChatContext, back = true): string {
         row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
       ].join(''))}`
     : group('괴담넷', row('괴담넷 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
-  return `<div class="ph-form">${paneHead('괴담넷 설정', '지금 채팅에 적용돼요', saveDefaultBtn('gn-save-default'), back)}<div class="ph-form-body ps">${rows}</div></div>`;
+  return `<div class="ph-form">${paneHead('괴담넷 설정', '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
 function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): string {
@@ -673,6 +684,16 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
   const st = () => readGnet(ctx.chat);
   if (!action.startsWith('gn-')) return false;
   if (action !== 'gn-del-post' && action !== 'gn-del-comment' && action !== 'gn-del-thread') gnet.confirm = null;
+  if (action.startsWith('gn-def-')) {
+    try {
+      const msg = await defaultsAction('gn', action, v, ctx, env.refresh);
+      if (msg) gnet.notice = msg;
+    } catch (error) {
+      gnet.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env.render();
+    return true;
+  }
   switch (action) {
     case 'gn-sub':
       gnet.sub = v === 'dm' ? 'dm' : 'board';
@@ -856,14 +877,6 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       gnet.editNick = false;
       await setVar(ctx, env, GN_NICK, v.trim().slice(0, 36));
       return true;
-    case 'gn-save-default':
-      try {
-        await saveVarDefaults(['$lb_cfg_lb-gn.', '$gn_storage_'], ctx.chat.scriptstate);
-        gnet.notice = '지금 괴담넷 설정을 새 채팅 기본값으로 저장했어요.';
-      } catch (error) {
-        gnet.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      break;
     case 'gn-cfg': {
       const [k, val] = v.split('=');
       if (k === 'power') {

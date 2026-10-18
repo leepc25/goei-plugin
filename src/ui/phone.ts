@@ -14,6 +14,8 @@ import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
 import { imageUrl, stChip } from './images';
 import { readWorld, worldOn } from '../core/world/output';
 import { ICONS } from './icons';
+import { josa } from '../core/josa';
+import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import type { RefSource } from '../core/refs';
@@ -241,7 +243,7 @@ async function roomRefresh(ctx: ChatContext, env: PhoneEnv, rid: string) {
   const st = readPhone(ctx.chat);
   const r = st.rooms[rid];
   if (!r || !r.members.length) return;
-  if (r.pending) return void generate(ctx, env, rid, `${roomLabel(r)}를 확인하는 중이에요.`);
+  if (r.pending) return void generate(ctx, env, rid, `${josa(roomLabel(r), '을', '를')} 확인하는 중이에요.`);
   const set = phoneSettings(ctx.chat.scriptstate);
   let [ok, why] = refreshAllowed(ctx.chat, r, set);
   if (ok && unsolicited(r)) [ok, why] = refreshAllowed(ctx.chat, r, set, chancePassed(set.incomingChance, Math.random));
@@ -256,7 +258,7 @@ async function roomRefresh(ctx: ChatContext, env: PhoneEnv, rid: string) {
     room.pending = { status: 'error', action: { type: 'refresh' } };
     return writePhone(chat, cur);
   });
-  if (saved) await generate({ ...ctx, chat: saved }, env, rid, `${roomLabel(r)}를 확인하는 중이에요.`);
+  if (saved) await generate({ ...ctx, chat: saved }, env, rid, `${josa(roomLabel(r), '을', '를')} 확인하는 중이에요.`);
 }
 
 /** 단톡 만들기 또는 초대 (원본 ph_group_create) */
@@ -867,7 +869,7 @@ function settingsView(ctx: ChatContext): string {
     const st = phoneStorage(ctx.chat.scriptstate, k);
     return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
   };
-  return `<div class="ph-form">${paneHead('괴담톡 설정', '지금 채팅에 적용돼요', `<span class="ph-act">${saveDefaultBtn('ph-save-default')}</span>`)}
+  return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
       ${group('답장', [
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
@@ -891,8 +893,6 @@ function settingsView(ctx: ChatContext): string {
     </div></div>`;
 }
 
-/** 설정 화면 오른쪽 위: 지금 값을 새 채팅 기본값으로 */
-export const saveDefaultBtn = (action: string) => `<button class="gx-mini ps-save" data-action="${action}" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`;
 
 /** 왼쪽 목록 (연락처·대화·공지) */
 function listHtml(ctx: ChatContext, st: PState, d: Directory): string {
@@ -979,6 +979,16 @@ export async function handlePhone(action: string, value: string | undefined, ctx
   liveEnv = env;
   const v = value ?? '';
   if (!['ph-room-del', 'ph-contact-del', 'ph-notice-del'].includes(action)) phone.confirm = null;
+  if (action.startsWith('ph-def-')) {
+    try {
+      const msg = await defaultsAction('ph', action, v, ctx, env.refresh);
+      if (msg) phone.notice = msg;
+    } catch (error) {
+      phone.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env.render();
+    return true;
+  }
   switch (action) {
     case 'ph-sub':
       // 대화방이 열려 있으면 (PC 두 칸 화면) 그대로 두고 목록만 바꾼다
@@ -1170,14 +1180,6 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       phone.confirm = null;
       await deleteContact(ctx, env, v);
       return true;
-    case 'ph-save-default':
-      try {
-        await saveVarDefaults(['$ph_'], ctx.chat.scriptstate);
-        phone.notice = '지금 괴담톡 설정을 새 채팅 기본값으로 저장했어요.';
-      } catch (error) {
-        phone.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      break;
     case 'ph-cfg': {
       const [k, val] = v.split('=');
       const vars: Record<string, string> = { [PH(k)]: val };

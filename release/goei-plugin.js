@@ -5156,127 +5156,12 @@ var ICONS = {
   close: stroke('<path d="M6 6l12 12M18 6 6 18"/>')
 };
 
-// src/ui/toast.ts
-var esc2 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var timers = /* @__PURE__ */ new Map();
-function toast(key, text, clear) {
-  if (!text) return "";
-  const cur = timers.get(key);
-  if (!cur || cur.text !== text) {
-    if (cur) clearTimeout(cur.id);
-    const ms = Math.min(8e3, 2500 + [...text].length * 50);
-    const id = setTimeout(() => {
-      timers.delete(key);
-      clear(text);
-      const el = document.querySelector(`.gx-toast[data-toast="${key}"]`);
-      if (!el) return;
-      el.classList.add("out");
-      setTimeout(() => el.remove(), 300);
-    }, ms);
-    timers.set(key, { text, id });
-  }
-  return `<div class="gx-toast gn-notice" data-toast="${key}" role="status">${esc2(text)}</div>`;
-}
-
-// src/ui/drawer.ts
-var open = false;
-function drawerHtml(tools, above = "", cls = "") {
-  return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
-    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
-    ${above}<div class="ph-tools">${tools}</div></div>`;
-}
-function drawerBox(content, cls = "", after = "") {
-  return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
-    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
-    <div class="ph-dbody">${content}</div>${after}</div>`;
-}
-function set(box, on) {
-  open = on;
-  box.classList.toggle("open", on);
-  const grip = box.querySelector(".ph-grip");
-  grip?.setAttribute("aria-expanded", String(on));
-  grip?.setAttribute("aria-label", on ? "도구 접기" : "도구 펼치기");
-}
-function bindDrawer(root2) {
-  const box = root2.querySelector(".ph-drawer");
-  const grip = box?.querySelector(".ph-grip");
-  if (!box || !grip) return;
-  grip.addEventListener("click", () => set(box, !open));
-  let y0 = null;
-  box.addEventListener("touchstart", (e) => y0 = e.touches[0]?.clientY ?? null, { passive: true });
-  box.addEventListener("touchend", (e) => {
-    if (y0 === null) return;
-    const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
-    y0 = null;
-    if (dy < -24 && !open) set(box, true);
-    else if (dy > 24 && open) set(box, false);
-  }, { passive: true });
-}
-
-// src/host/llm.ts
-var LlmError = class extends Error {
-  constructor(message, raw = "") {
-    super(message);
-    this.raw = raw;
-  }
-};
-function stripThoughts(s4) {
-  return s4.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<(?:thoughts|think)\b[^>]*>[\s\S]*$/gi, "");
-}
-async function readStream(stream) {
-  const reader = stream.getReader();
-  let last = "";
-  try {
-    for (; ; ) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (typeof value === "string") last = value;
-      else if (value && typeof value === "object") last = String(Object.values(value)[0] ?? last);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-  return last;
-}
-async function withPhotos(messages) {
-  return Promise.all(
-    messages.map(async (m) => {
-      if (!m.images?.length) return m;
-      const { images, ...rest } = m;
-      const data = await Promise.all(images.map(photoData));
-      const missing = data.map((d, i) => d ? 0 : i + 1).filter(Boolean);
-      return {
-        ...rest,
-        content: missing.length ? `${rest.content}
-Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
-        multimodals: data.filter((d) => !!d).map((base642) => ({ type: "image", base64: base642 }))
-      };
-    })
-  );
-}
-async function runModel(messages, model2) {
-  let res;
-  try {
-    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model2 === "aux" ? "submodel" : "model", allowPlugins: true });
-  } catch (error) {
-    throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  let text = "";
-  if (typeof res === "string") text = res;
-  else if (res && typeof res === "object") {
-    const r = res;
-    if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
-      throw new LlmError("Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.", String(r.result));
-    }
-    if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
-${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
-    if (r.type === "multiline" && Array.isArray(r.result)) text = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
-    else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text = await readStream(r.result);
-    else if (typeof r.result === "string") text = r.result;
-  }
-  text = stripThoughts(text).trim();
-  if (!text) throw new LlmError("모델이 빈 응답을 보냈어요.");
-  return text;
+// src/core/josa.ts
+function josa(word, withBatchim, without) {
+  const last = word.trim().slice(-1);
+  const code = last.charCodeAt(0) - 44032;
+  if (!(code >= 0 && code <= 11171)) return `${word}${withBatchim}(${without})`;
+  return `${word}${code % 28 ? withBatchim : without}`;
 }
 
 // src/core/settings.ts
@@ -5479,6 +5364,13 @@ async function saveVarDefaults(prefixes, state) {
     return { ...p, vars };
   });
 }
+function loadVarDefaults(prefixes, state) {
+  const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
+  const saved = getPrefs().vars ?? {};
+  const out = {};
+  for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
+  return out;
+}
 async function savePrefs(change) {
   const next = setPrefs(change(structuredClone(getPrefs())));
   await risuai.pluginStorage.setItem(KEY, JSON.stringify(next));
@@ -5512,6 +5404,172 @@ async function updateCharacterLore(charIndex, mutate3) {
   if (!next) return false;
   await risuai.setCharacterToIndex(charIndex, { ...latest, globalLore: next });
   return true;
+}
+
+// src/ui/defaults.ts
+var PREFIXES = {
+  ph: ["$ph_"],
+  gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
+  wiki: ["$nw_"]
+};
+var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키" };
+var defaultsAsk = { pane: "", what: "" };
+var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
+function defaultsConfirm(pane) {
+  if (defaultsAsk.pane !== pane || !defaultsAsk.what) return "";
+  const save2 = defaultsAsk.what === "save";
+  const text = save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
+  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
+}
+async function defaultsAction(pane, action, value, ctx, refresh2) {
+  const sub = action.slice(pane.length + 1);
+  if (sub === "def-ask") {
+    defaultsAsk.pane = pane;
+    defaultsAsk.what = value === "save" || value === "load" ? value : "";
+    return "";
+  }
+  if (sub === "def-no") {
+    defaultsAsk.pane = "";
+    defaultsAsk.what = "";
+    return "";
+  }
+  if (sub !== "def-yes") return null;
+  const what = defaultsAsk.pane === pane ? defaultsAsk.what : "";
+  defaultsAsk.pane = "";
+  defaultsAsk.what = "";
+  if (what === "save") {
+    await saveVarDefaults(PREFIXES[pane], ctx.chat.scriptstate);
+    return `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장했어요.`;
+  }
+  if (what === "load") {
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
+    await refresh2();
+    return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
+  }
+  return "";
+}
+
+// src/ui/toast.ts
+var esc2 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var timers = /* @__PURE__ */ new Map();
+function toast(key, text, clear) {
+  if (!text) return "";
+  const cur = timers.get(key);
+  if (!cur || cur.text !== text) {
+    if (cur) clearTimeout(cur.id);
+    const ms = Math.min(8e3, 2500 + [...text].length * 50);
+    const id = setTimeout(() => {
+      timers.delete(key);
+      clear(text);
+      const el = document.querySelector(`.gx-toast[data-toast="${key}"]`);
+      if (!el) return;
+      el.classList.add("out");
+      setTimeout(() => el.remove(), 300);
+    }, ms);
+    timers.set(key, { text, id });
+  }
+  return `<div class="gx-toast gn-notice" data-toast="${key}" role="status">${esc2(text)}</div>`;
+}
+
+// src/ui/drawer.ts
+var open = false;
+function drawerHtml(tools, above = "", cls = "") {
+  return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    ${above}<div class="ph-tools">${tools}</div></div>`;
+}
+function drawerBox(content, cls = "", after = "") {
+  return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    <div class="ph-dbody">${content}</div>${after}</div>`;
+}
+function set(box, on) {
+  open = on;
+  box.classList.toggle("open", on);
+  const grip = box.querySelector(".ph-grip");
+  grip?.setAttribute("aria-expanded", String(on));
+  grip?.setAttribute("aria-label", on ? "도구 접기" : "도구 펼치기");
+}
+function bindDrawer(root2) {
+  const box = root2.querySelector(".ph-drawer");
+  const grip = box?.querySelector(".ph-grip");
+  if (!box || !grip) return;
+  grip.addEventListener("click", () => set(box, !open));
+  let y0 = null;
+  box.addEventListener("touchstart", (e) => y0 = e.touches[0]?.clientY ?? null, { passive: true });
+  box.addEventListener("touchend", (e) => {
+    if (y0 === null) return;
+    const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+    y0 = null;
+    if (dy < -24 && !open) set(box, true);
+    else if (dy > 24 && open) set(box, false);
+  }, { passive: true });
+}
+
+// src/host/llm.ts
+var LlmError = class extends Error {
+  constructor(message, raw = "") {
+    super(message);
+    this.raw = raw;
+  }
+};
+function stripThoughts(s4) {
+  return s4.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<(?:thoughts|think)\b[^>]*>[\s\S]*$/gi, "");
+}
+async function readStream(stream) {
+  const reader = stream.getReader();
+  let last = "";
+  try {
+    for (; ; ) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (typeof value === "string") last = value;
+      else if (value && typeof value === "object") last = String(Object.values(value)[0] ?? last);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return last;
+}
+async function withPhotos(messages) {
+  return Promise.all(
+    messages.map(async (m) => {
+      if (!m.images?.length) return m;
+      const { images, ...rest } = m;
+      const data = await Promise.all(images.map(photoData));
+      const missing = data.map((d, i) => d ? 0 : i + 1).filter(Boolean);
+      return {
+        ...rest,
+        content: missing.length ? `${rest.content}
+Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
+        multimodals: data.filter((d) => !!d).map((base642) => ({ type: "image", base64: base642 }))
+      };
+    })
+  );
+}
+async function runModel(messages, model2) {
+  let res;
+  try {
+    res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model2 === "aux" ? "submodel" : "model", allowPlugins: true });
+  } catch (error) {
+    throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  let text = "";
+  if (typeof res === "string") text = res;
+  else if (res && typeof res === "object") {
+    const r = res;
+    if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
+      throw new LlmError("Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.", String(r.result));
+    }
+    if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
+${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
+    if (r.type === "multiline" && Array.isArray(r.result)) text = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
+    else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text = await readStream(r.result);
+    else if (typeof r.result === "string") text = r.result;
+  }
+  text = stripThoughts(text).trim();
+  if (!text) throw new LlmError("모델이 빈 응답을 보냈어요.");
+  return text;
 }
 
 // src/ui/phone.ts
@@ -5717,7 +5775,7 @@ async function roomRefresh(ctx, env2, rid) {
   const st = readPhone(ctx.chat);
   const r = st.rooms[rid];
   if (!r || !r.members.length) return;
-  if (r.pending) return void generate(ctx, env2, rid, `${roomLabel(r)}를 확인하는 중이에요.`);
+  if (r.pending) return void generate(ctx, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
   const set2 = phoneSettings(ctx.chat.scriptstate);
   let [ok, why] = refreshAllowed(ctx.chat, r, set2);
   if (ok && unsolicited(r)) [ok, why] = refreshAllowed(ctx.chat, r, set2, chancePassed(set2.incomingChance, Math.random));
@@ -5732,7 +5790,7 @@ async function roomRefresh(ctx, env2, rid) {
     room.pending = { status: "error", action: { type: "refresh" } };
     return writePhone(chat, cur);
   });
-  if (saved) await generate({ ...ctx, chat: saved }, env2, rid, `${roomLabel(r)}를 확인하는 중이에요.`);
+  if (saved) await generate({ ...ctx, chat: saved }, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
 }
 async function createGroup(ctx, env2) {
   const d = dir(ctx);
@@ -6240,7 +6298,7 @@ function settingsView(ctx) {
     const st = phoneStorage(ctx.chat.scriptstate, k);
     return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${st.auto ? num3(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX2, "개") : ""}</span>`, "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요");
   };
-  return `<div class="ph-form">${paneHead("괴담톡 설정", "지금 채팅에 적용돼요", `<span class="ph-act">${saveDefaultBtn("ph-save-default")}</span>`)}
+  return `<div class="ph-form">${paneHead("괴담톡 설정", "", `<span class="ph-act">${defaultsButtons("ph")}</span>`)}${defaultsConfirm("ph")}
     <div class="ph-form-body ps">
       ${group("답장", [
     row("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인"], ["aux", "보조"]])),
@@ -6265,7 +6323,6 @@ function settingsView(ctx) {
   ].join(""))}
     </div></div>`;
 }
-var saveDefaultBtn = (action) => `<button class="gx-mini ps-save" data-action="${action}" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`;
 function listHtml(ctx, st, d) {
   if (phone.query.trim()) return searchView(ctx, st, d);
   return phone.sub === "contacts" ? contactsView(ctx, d, st) : phone.sub === "chats" ? chatsView(ctx, st, d) : noticesView(ctx);
@@ -6340,6 +6397,16 @@ async function handlePhone(action, value, ctx, env2) {
   liveEnv = env2;
   const v = value ?? "";
   if (!["ph-room-del", "ph-contact-del", "ph-notice-del"].includes(action)) phone.confirm = null;
+  if (action.startsWith("ph-def-")) {
+    try {
+      const msg = await defaultsAction("ph", action, v, ctx, env2.refresh);
+      if (msg) phone.notice = msg;
+    } catch (error) {
+      phone.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env2.render();
+    return true;
+  }
   switch (action) {
     case "ph-sub":
       Object.assign(phone, { sub: v, query: "", ...phone.view === "room" ? {} : { view: "list", invite: null, picked: [] } });
@@ -6527,14 +6594,6 @@ async function handlePhone(action, value, ctx, env2) {
       phone.confirm = null;
       await deleteContact(ctx, env2, v);
       return true;
-    case "ph-save-default":
-      try {
-        await saveVarDefaults(["$ph_"], ctx.chat.scriptstate);
-        phone.notice = "지금 괴담톡 설정을 새 채팅 기본값으로 저장했어요.";
-      } catch (error) {
-        phone.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      break;
     case "ph-cfg": {
       const [k, val] = v.split("=");
       const vars = { [PH(k)]: val };
@@ -6869,6 +6928,7 @@ async function sendDm(ctx, env2, nick, body4, src) {
     addOutgoingDm(st, nick, body4, dateNow(chat), src);
     return writeGnet(chat, st);
   });
+  const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
   gnet.compose = null;
   gnet.draft = "";
   gnet.attach = [];
@@ -6890,7 +6950,16 @@ async function sendDm(ctx, env2, nick, body4, src) {
         reply = withRaw(again, () => parseDmBody(again));
       }
     } catch (error) {
-      throw new GnetError(`보낸 쪽지는 저장했어요. 답장을 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        let i = cur.dms.length - 1;
+        while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === "me")) i--;
+        if (i < 0) return null;
+        cur.dms.splice(i, 1);
+        return writeGnet(chat, cur);
+      }).catch(() => null);
+      if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
+      throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
     }
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       const cur = readGnet(chat);
@@ -7095,7 +7164,7 @@ function settingsView2(ctx, back = true) {
     row2("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
     row2("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
   ].join(""))}` : group2("괴담넷", row2("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
-  return `<div class="ph-form">${paneHead2("괴담넷 설정", "지금 채팅에 적용돼요", saveDefaultBtn("gn-save-default"), back)}<div class="ph-form-body ps">${rows}</div></div>`;
+  return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 function paneHtml2(ctx, st, kind, busy2) {
   if (kind === "settings") return settingsView2(ctx);
@@ -7185,6 +7254,16 @@ async function handleGnet(action, value, ctx, env2) {
   const st = () => readGnet(ctx.chat);
   if (!action.startsWith("gn-")) return false;
   if (action !== "gn-del-post" && action !== "gn-del-comment" && action !== "gn-del-thread") gnet.confirm = null;
+  if (action.startsWith("gn-def-")) {
+    try {
+      const msg = await defaultsAction("gn", action, v, ctx, env2.refresh);
+      if (msg) gnet.notice = msg;
+    } catch (error) {
+      gnet.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env2.render();
+    return true;
+  }
   switch (action) {
     case "gn-sub":
       gnet.sub = v === "dm" ? "dm" : "board";
@@ -7359,14 +7438,6 @@ async function handleGnet(action, value, ctx, env2) {
       gnet.editNick = false;
       await setVar(ctx, env2, GN_NICK, v.trim().slice(0, 36));
       return true;
-    case "gn-save-default":
-      try {
-        await saveVarDefaults(["$lb_cfg_lb-gn.", "$gn_storage_"], ctx.chat.scriptstate);
-        gnet.notice = "지금 괴담넷 설정을 새 채팅 기본값으로 저장했어요.";
-      } catch (error) {
-        gnet.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      break;
     case "gn-cfg": {
       const [k, val] = v.split("=");
       if (k === "power") {
@@ -9527,11 +9598,13 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder { font-size: 12.5px; } }
 /* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
 .gn-pane .gn-doc { gap: 14px; }
+/* 글·댓글 카드는 줄어들지 않고 .gn-doc가 스크롤한다 (overflow: hidden 카드가 flex 안에서 줄어 댓글이 잘리던 문제) */
+.gn-pane .gn-doc > * { flex: none; }
 .gn-pane .gn-post { padding: 0 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .gn-pane .gn-post-head { border-top: 0; padding-top: 16px; }
 .gn-pane .gn-post-body { border-bottom: 0; }
-.gn-pane .gn-csec { margin-top: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
-.gn-pane .gn-chead { padding: 12px 16px; border-bottom: 1px solid var(--line2); }
+.gn-pane .gn-csec { margin-top: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
+.gn-pane .gn-chead { padding: 16px 16px 12px; border-bottom: 1px solid var(--line2); }
 .gn-pane .gn-c { padding-left: calc(16px + var(--gn-depth, 0) * 20px); padding-right: 10px; }
 .gn-pane .gn-cnone { border-bottom: 0; }
 .gn-c { border-bottom-color: var(--line); }
@@ -9574,12 +9647,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .st-scopebar .st-scope { flex: none; margin: 0; }
 /* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
 .st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
-/* 덮어쓰기·불러오기: 전환 탭과 달리 둥근 테두리 + 아이콘, 한 단계 작게 */
-.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 14px; border: 1px solid var(--line2, var(--line)); border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.st-act svg { width: 16px; height: 16px; flex: none; }
-.st-act.save { border-color: var(--accent-line); color: var(--signal); }
-.st-act:hover:not(:disabled) { background: var(--accent-bg); border-color: var(--signal); color: var(--signal); }
+/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.st-act svg { width: 14px; height: 14px; flex: none; }
+.st-act:hover:not(:disabled) { background: var(--accent-bg); }
 .st-act:disabled { opacity: .4; cursor: default; }
+.ps-defaults { display: flex; gap: 6px; }
+.ph-room-head .ps-defaults { margin-right: 4px; }
+.ps-defconfirm { margin: 12px 16px 0; }
 /* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
 .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: -6px; }
 .st-scopebar .st-scope { grid-column: span 2; display: flex; }
@@ -9589,8 +9664,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 @media (max-width: 760px) {
   .st-scopebar, .st-barbtns { gap: 6px; }
   .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
-  .st-act { min-width: 0; min-height: 30px; padding: 0 6px; font-size: 13px; gap: 4px; }
-  .st-act svg { width: 14px; height: 14px; }
+  .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
+  .ps-defaults .st-act { padding: 0 8px; }
 }
 .st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .st-barconfirm p { color: var(--text); }
@@ -10953,7 +11028,7 @@ function settingsView3(ctx) {
   const s4 = wikiSettings(ctx.chat.scriptstate);
   const req = String(ctx.chat.scriptstate?.["$nw_writing_request"] ?? "");
   const line = (label, control, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control}</div></div>`;
-  return `<div class="ph-form nw-setpane">${paneHead3(ctx, "위키 설정", "지금 채팅에 적용돼요", `<button class="gx-mini ps-save" data-action="wiki-save-default" title="새 채팅도 지금 설정으로 시작해요">기본값으로 저장</button>`)}
+  return `<div class="ph-form nw-setpane">${paneHead3(ctx, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
     <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
       ${line("분량", seg3("wiki-length", s4.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
       ${line("작성 모드", seg3("wiki-mode", s4.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
@@ -11108,6 +11183,16 @@ var wide = () => !matchMedia("(max-width: 760px)").matches;
 async function handleWiki(action, value, ctx, env2) {
   const v = value ?? "";
   if (action !== "wiki-delete") wiki.confirmDelete = null;
+  if (action.startsWith("wiki-def-")) {
+    try {
+      const msg = await defaultsAction("wiki", action, v, ctx, env2.refresh);
+      if (msg) wiki.info = msg;
+    } catch (error) {
+      wiki.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    env2.render();
+    return true;
+  }
   switch (action) {
     case "wiki-home":
       go("home");
@@ -11198,14 +11283,6 @@ async function handleWiki(action, value, ctx, env2) {
       if (wiki.view === "settings") go("home");
       else go("settings");
       wiki.listOpen = false;
-      break;
-    case "wiki-save-default":
-      try {
-        await saveVarDefaults(["$nw_"], ctx.chat.scriptstate);
-        wiki.info = "지금 위키 설정을 새 채팅 기본값으로 저장했어요.";
-      } catch (error) {
-        wiki.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
       break;
     default:
       return false;
