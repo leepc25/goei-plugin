@@ -15,7 +15,7 @@ import { bindMapZoom } from './mapzoom';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { handleWiki, resetWiki, wiki, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
+import { bindWikiSide, handleWiki, resetWiki, wiki, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -611,7 +611,7 @@ function renderPicker(): void {
   else return render();
 }
 
-const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs';
+const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-list';
 
 function render(): void {
   if (!root) return;
@@ -653,6 +653,7 @@ function render(): void {
   bindMapZoom(root);
   bindMbar(root, () => void handle('close'));
   bindDrawer(root);
+  bindWikiSide(root, (v) => void handle('wiki-list', v));
   setCurrentTheme(themeName(root.dataset.theme));
 }
 

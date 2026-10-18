@@ -1443,7 +1443,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
 .st-scopebar + .st-scope-help { margin: 6px 0 0; }
 /* ── 위키 (v0.16.23): 괴담톡·괴담넷과 같은 두 칸. 왼쪽 명부·작성한 문서, 오른쪽 문서 ── */
-.nw.ph-app .nw-search { display: block; }
+.nw.nw-app .nw-search { display: block; }
 .nw-status:empty { display: none; }
 .nw-status { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px 0; }
 .nw-status .nw-busy, .nw-status .gx-err { margin: 0; }
@@ -1475,10 +1475,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-chip:hover { border-color: var(--accent-line); }
 .nw-chip.none { opacity: .55; border-style: dashed; }
 /* 아직 없는 문서 */
-.nw.ph-app .nw-compose { align-items: center; text-align: center; gap: 8px; margin: auto 0; padding: 28px 20px; border: 0; background: none; }
+.nw.nw-app .nw-compose { align-items: center; text-align: center; gap: 8px; margin: auto 0; padding: 28px 20px; border: 0; background: none; }
 .nw-cmsg { font-size: 16px; font-weight: 600; color: var(--text); }
 .nw-creq { font-size: 13px; color: var(--sub); padding: 8px 12px; border-radius: 10px; background: var(--panel); }
-.nw.ph-app .ph-form-body:has(> .nw-compose) { justify-content: center; }
+.nw.nw-app .ph-form-body:has(> .nw-compose) { justify-content: center; }
 .nw-setpane .ps-row > .nw-reqbox { margin: 0; }
 @media (max-width: 760px) {
   .nw-pane .nw-doc { padding: 12px 14px 20px; }
@@ -1487,4 +1487,43 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .nw-toc b { margin: 0; }
   .nw-toc a.l2 { padding-left: 0; }
 }
-.nw .ph-tabs.nw-cats { flex-wrap: wrap; overflow: visible; }
+/* 위키 목록 (v0.16.23 2차, 사용자 설계): 가나다 상자 줄 + 펼치는 목록. 모바일도 왼쪽 서랍 */
+.gx-body.nw-app { grid-template-columns: auto minmax(0, 1fr); }
+.nw-side { position: relative; z-index: 3; display: flex; min-height: 0; border-right: 1px solid var(--panel2); background: var(--void); }
+.nw-rail { flex: none; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 68px; min-height: 0; padding: 12px 0; }
+.nw-keys { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; padding: 2px 0; overflow-y: auto; scrollbar-width: none; }
+.nw-key { position: relative; flex: none; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; }
+.nw-key b { font-size: 17px; font-weight: 700; line-height: 1; }
+.nw-key small { position: absolute; right: 5px; bottom: 3px; font-size: 10px; font-weight: 600; color: var(--dim); line-height: 1; }
+.nw-key:hover { border-color: var(--accent-line); }
+.nw-key.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+.nw-key.on small { color: var(--signal); }
+.nw-toggle { color: var(--sub); }
+.nw-toggle svg { width: 20px; height: 20px; }
+.nw-railtools { flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 8px; border-top: 1px solid var(--panel2); width: 46px; }
+.nw-railtools .ph-tool { width: 44px; height: 40px; }
+.nw-panel { flex: none; width: 0; min-height: 0; overflow: hidden; transition: width .2s ease; }
+.list-open .nw-panel { width: 300px; border-left: 1px solid var(--panel2); }
+.nw-pin { display: flex; flex-direction: column; gap: 8px; width: 300px; height: 100%; padding: 12px 12px 0; }
+.nw-pin .nw-search { flex: none; }
+.nw-pin .nw-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -12px; padding: 0 4px 12px; }
+.nw-pin .nw-fail { margin: 0 0 12px; }
+.nw-row .ph-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-scrim { display: none; }
+.nw-main { min-width: 0; }
+.nw-main .ph-room-head.nw-noback { padding-left: 16px; }
+.nw-main .nw-doc > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+@media (max-width: 760px) {
+  .gx-body.nw-app { display: block; position: relative; }
+  .nw-side { position: absolute; left: 0; top: 0; bottom: 0; }
+  .nw-rail { width: 56px; padding: 10px 0; gap: 6px; }
+  .nw-key { width: 42px; height: 42px; border-radius: 12px; }
+  .nw-key b { font-size: 16px; }
+  .nw-railtools { width: 42px; }
+  .nw-railtools .ph-tool { width: 42px; height: 38px; }
+  .list-open .nw-panel { width: min(300px, calc(100vw - 96px)); box-shadow: 8px 0 24px rgba(0, 0, 0, .35); }
+  .nw-pin { width: min(300px, calc(100vw - 96px)); }
+  .nw-main { position: absolute; inset: 0 0 0 56px; }
+  .list-open .nw-scrim { display: block; position: absolute; inset: 0; z-index: 2; border: 0; padding: 0; background: rgba(0, 0, 0, .35); }
+  .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
+}

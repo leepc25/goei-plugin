@@ -731,9 +731,9 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
   await page.waitForSelector('.nw .ph-search');
   assert.equal(await page.locator('.gx-panel form').count(), 0, 'form을 쓰지 않음');
-  // 왼쪽 목록: 문서가 없으면 괴이 묶음, 분류 칩마다 개수
-  assert.equal((await page.textContent('.nw .ph-tab.on')).replace(/\d+/g, ''), '괴이');
-  assert.ok((await page.$$eval('.nw .ph-tab', (b) => b.map((x) => x.firstChild.textContent))).join(',').includes('인물'));
+  // 왼쪽 목록: 처음엔 펼쳐져 있고, 문서가 없으면 안내만
+  assert.equal(await page.locator('.nw-app.list-open').count(), 1);
+  assert.equal(await page.locator('.nw-key[data-action="wiki-key"]').count(), 0);
   await page.fill('.nw .ph-search', '소라');
   await page.waitForSelector('.nw .ph-content .ph-sec');
   assert.ok((await page.textContent('.nw .ph-content')).includes('소라 랜드'), '입력하는 동안 명부 전체에서 걸러 보인다');
@@ -789,25 +789,41 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-toast');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
   await page.click('[data-action="wiki-settings"]');
-  // 작성한 문서가 있으면 「작성됨」 묶음이 먼저
+  // 가나다 목록: 상자 줄을 펴면 자음별로
+  await page.click('.nw-toggle');
   await page.fill('.nw .ph-search', '');
   await page.dispatchEvent('.nw .ph-search', 'input');
-  await page.waitForSelector('.nw .ph-content [data-action="wiki-delete"]');
+  await page.waitForSelector('.nw .nw-list .nw-ksec');
+  assert.equal((await page.textContent('.nw-ksec')).replace(/\d+/g, ''), 'ㅅ');
+  // 고르면 목록이 접히고 문서가 넓게
+  await page.click('.nw-list [data-action="wiki-pick"][data-value="소라 랜드"]');
+  await page.waitForSelector('.nw-doc');
+  assert.equal(await page.locator('.nw-app.list-open').count(), 0, '고르면 접힘');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-wide.png` });
+  // 상자를 누르면 그 자음으로 펼침
+  await page.click('[data-action="wiki-key"][data-value="ㅅ"]');
+  await page.waitForSelector('.nw-app.list-open');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-home.png` });
-  await page.click('[data-action="wiki-cat"][data-value="ag"]');
-  assert.ok(await page.$('.nw .ph-content .nw-row'), '인물 묶음');
-  if (shots) await page.screenshot({ path: `${shots}/13-wiki-people.png` });
-  await page.click('[data-action="wiki-cat"][data-value="docs"]');
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-list-mobile.png` });
-  await page.click('[data-action="wiki-pick"][data-value="소라 랜드"]');
-  await page.waitForSelector('.nw-doc');
+  await page.click('.nw-scrim', { position: { x: 370, y: 400 } });
+  await page.waitForSelector('.nw-app:not(.list-open)');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
-  await page.click('.nw-pane [data-action="wiki-back"]');
+  // 모바일: 상자 줄을 오른쪽으로 밀면 펼침, 왼쪽으로 밀면 접힘
+  const swipe = (sel, dx) => page.evaluate(([sel, dx]) => {
+    const el = document.querySelector(sel);
+    const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 })];
+    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(20), changedTouches: t(20) }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(20 + dx) }));
+  }, [sel, dx]);
+  await swipe('.nw-rail', 120);
+  await page.waitForSelector('.nw-app.list-open');
+  await swipe('.nw-list', -120);
+  await page.waitForSelector('.nw-app:not(.list-open)');
   await page.setViewportSize({ width: 1100, height: 900 });
-  await page.click('[data-action="wiki-delete"][data-value="소라 랜드"]');
-  await page.click('[data-action="wiki-delete"][data-value="소라 랜드"]');
+  await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
+  await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.waitForFunction(() => window.__chat.localLore.length === 0);
   assert.deepEqual(errors, []);
   console.log('PASS 위키: 검색·작성 화면·생성 저장·링크 상속·실패 시 유지·설정·삭제');
