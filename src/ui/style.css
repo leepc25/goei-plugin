@@ -1320,8 +1320,12 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
    요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
 @media (min-width: 761px) {
-  .gx-board > .gx-bd-cols { flex: none; }
-  .gx-board .gx-bd-col > .gx-evcs { max-height: 316px; overflow-y: auto; overscroll-behavior: contain; }
+  /* 괴이·사건·특수 칸은 비어 있어도 같은 높이 (사용자: 괴이가 없으면 요원이 딸려 올라가면 안 됨) */
+  .gx-board > .gx-bd-cols { flex: none; height: 350px; align-items: stretch; }
+  .gx-board .gx-bd-col { display: flex; flex-direction: column; min-height: 0; }
+  .gx-board .gx-bd-col > .gx-evcs { flex: 1 1 0; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+  .gx-board .gx-bd-col > .gx-evcs > * { flex-shrink: 0; }
+  .gx-board .gx-bd-col > .gx-none { flex: 1 1 0; display: grid; place-items: center; text-align: center; }
   .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
   .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
 }
