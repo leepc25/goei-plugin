@@ -15,7 +15,7 @@ def check(name, ok, detail=''):
     checks.append((name, bool(ok), detail))
 
 check('Lua 트리거 없음', ml['trigger'] == [])
-check('정규식 4개만 유지', [r['comment'] for r in ml['regex']] == ['🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거', '📊상태창'])
+check('정규식 3개만 유지 (상태창은 플러그인)', [r['comment'] for r in ml['regex']] == ['🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거'])
 check('유지한 정규식은 원본과 동일', all(r in ms['regex'] for r in ml['regex']))
 check('저수준 접근 꺼짐', cl['extensions']['risuai'].get('lowLevelAccess') is False)
 check('첫 메시지에 CBS 없음', '{{' not in cl['first_mes'], len(cl['first_mes']))

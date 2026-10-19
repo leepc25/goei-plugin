@@ -36,7 +36,8 @@ MANIFEST_COMMENT = 'Plugin manifest'
 OLD_MANIFEST = '괴이봇 플러그인 매니페스트'
 SETTINGS_FOLDER_NAME = '⚙️설정'
 MANIFEST_KEY = ''  # 빈 키: Risu가 키워드로 활성화하지 않음
-KEEP_REGEX = ('🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거', '📊상태창')
+# 상태창(📊상태창)은 v0.16.31부터 플러그인이 그린다
+KEEP_REGEX = ('🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거')
 STATUS_CSS = re.compile(r'(\.dv-status|\.dv-time|\.dv-date|\.dv-wx|\.dv-loc|\.dv-target|\.ib-asset)')
 
 GHOST_SVG = (

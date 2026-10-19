@@ -1,3 +1,4 @@
+import { findStatusTags, statusMinute } from './status';
 // 모델 출력의 상황판 태그 읽기/지우기. 원본 Lua의 scanAnomalies, scanIncidents, scanMysticSites,
 // agParse, stripAnAgMeta, envToEnd, parseWorldMinute와 같은 규칙.
 export type AnState = '활성' | '소멸' | '격리' | '클리어';
@@ -130,21 +131,11 @@ export interface StatusLine {
 }
 
 export function scanStatus(text: string): StatusLine {
-  const all = [...text.matchAll(/\[▣\s*\|([^\]]*)\]/g)];
-  let minute: number | null = null;
-  let target: string | null = null;
-  const tm = /\[▣\s*\|\s*(\d{4})\.(\d{2})\.(\d{2})\s*\|\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])/.exec(text);
-  if (tm) {
-    let hh = Number(tm[4]);
-    const ap = tm[6].toUpperCase();
-    if (ap === 'AM' && hh === 12) hh = 0;
-    if (ap === 'PM' && hh !== 12) hh += 12;
-    minute = Math.floor(Date.UTC(Number(tm[1]), Number(tm[2]) - 1, Number(tm[3]), hh, Number(tm[5])) / 60000);
-  }
-  if (all.length === 1) {
-    const f = all[0][1].split('|').map((s) => s.trim());
-    if (f.length === 6 && f[5] !== '') target = f[5] === '없음' ? '' : f[5];
-  }
+  // 상태창은 너그럽게 읽는다 (status.ts). 태그가 둘 이상이면 목표는 정하지 않는다
+  const tags = findStatusTags(text);
+  const first = tags[0];
+  const minute = first ? statusMinute(first.date, first.time) : null;
+  const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
   return { minute, target };
 }
 
@@ -153,11 +144,10 @@ export interface StatusFields { date: string; time: string; weather: string; tem
 
 export function lastStatusFields(texts: string[]): StatusFields | null {
   for (let i = texts.length - 1; i >= 0; i--) {
-    const all = [...(texts[i] ?? '').matchAll(/\[▣\s*\|([^\]]*)\]/g)];
+    const all = findStatusTags(texts[i] ?? '');
     if (!all.length) continue;
-    const f = all[all.length - 1][1].split('|').map((s) => s.trim());
-    const [date = '', time = '', weather = '', temp = '', place = '', target = ''] = f;
-    return { date, time, weather, temp, place, target: target === '없음' ? '' : target };
+    const t = all[all.length - 1];
+    return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target };
   }
   return null;
 }
@@ -197,7 +187,7 @@ export function cleanOutput(text: string): string {
   if (prev !== null) keep.push(prev);
   const envs: string[] = [];
   const body = keep.filter((l) => {
-    if (/^\s*\[▣\s*\|/.test(l)) {
+    if (/^\s*[[【［]\s*▣\s*[|｜]/.test(l)) {
       envs.push(l.trim());
       return false;
     }

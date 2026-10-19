@@ -99,6 +99,9 @@ export function mergeByName<T>(current: T[], incoming: T[], name: (x: T) => stri
   return { list, count };
 }
 
+/** 카드 업데이트 때 지우는 옛 정규식 */
+export const RETIRED_SCRIPTS = ['📊상태창'];
+
 const loreName = (e: LoreEntry) => `${e.comment ?? ''}\u0001${(e as { folder?: string }).folder ?? ''}`;
 
 export interface UpdatePlan {
@@ -130,7 +133,10 @@ export function planUpdate(char: Record<string, unknown>, payload: CardPayload):
   // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
   if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
-  const scripts = mergeByName((char.customscript as { comment?: string }[]) ?? [], payload.data.customscript, (r) => r.comment ?? '');
+  // 상태창 정규식은 플러그인이 그리게 되어(v0.16.31) 옛 카드에서 뺀다 (새 카드에 같은 이름이 있으면 그대로)
+  const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ''));
+  const currentScripts = ((char.customscript as { comment?: string }[]) ?? []).filter((r) => !RETIRED_SCRIPTS.includes(r.comment ?? '') || incomingNames.has(r.comment ?? ''));
+  const scripts = mergeByName(currentScripts, payload.data.customscript, (r) => r.comment ?? '');
   const next: Record<string, unknown> = { ...char, globalLore: lore.list, customscript: scripts.list };
   delete next.customscripts;
   const fields: string[] = [];

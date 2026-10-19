@@ -81,6 +81,8 @@ interface SettingsBook {
 const cache = new WeakMap<LoreEntry[], SettingsBook>();
 
 export type Theme = 'light' | 'dark' | 'paper';
+/** 채팅 속 상태창 배색: 채팅 테마를 따르거나 하나로 고정, 또는 숨김 (태그는 그대로 나온다) */
+export type StatusStyle = 'auto' | Theme | 'off';
 
 /** 설정 창에서 고친 새 채팅 기본값 (플러그인 저장소). 없는 항목은 아래 단계 값을 쓴다 */
 export interface Prefs {
@@ -92,6 +94,8 @@ export interface Prefs {
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
   dim?: number;
+  /** 채팅 속 상태창 배색 (없으면 테마 따름) */
+  status?: StatusStyle;
 }
 
 /** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
@@ -133,7 +137,8 @@ export function setPrefs(raw: unknown): Prefs {
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
   const dim = int(o.dim, 0, 100);
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}) };
+  const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}) };
   return prefs;
 }
 

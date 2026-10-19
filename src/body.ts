@@ -1,4 +1,6 @@
 import { clearUnsent, unsentShown } from './host/unsent';
+import { refreshStatusContext, renderStatus, setWikiOpener } from './host/statusview';
+import { hasStatusTag } from './core/world';
 import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
@@ -29,7 +31,7 @@ import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
 import { cardPalette as themedCardPalette, currentTheme, onThemeChange, setCurrentTheme, themeName } from './ui/theme';
 import { getPrefs } from './core/settings';
-import { openApp } from './ui/app';
+import { openApp, openWiki } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
@@ -166,6 +168,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
+    // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
+    await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 모델을 겹쳐 부르지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
@@ -265,7 +269,7 @@ function onDisplay(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
@@ -273,6 +277,8 @@ function onDisplay(text: string): string {
     if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
     if (hasCall(out)) out = renderCalls(out, callCardHtml);
     if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
+    // 상태창은 카드 정규식 대신 플러그인이 그린다 (칸이 어긋나도 깨지지 않게, 설정의 배색으로)
+    if (hasStatusTag(out)) out = renderStatus(out);
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
@@ -326,7 +332,10 @@ function startWatcher(fab: Fab): () => void {
       const next = state.update(snap, lite);
       liteNow = state.lite;
       if (next.changed) {
-        if (next.fabVisible) await readTheme(snap).catch(() => {});
+        if (next.fabVisible) {
+          await readTheme(snap).catch(() => {});
+          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
+        }
         // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
         await fab.setVisible(next.fabVisible, next.intro);
       }
@@ -353,6 +362,7 @@ export interface BodyHandlers {
 /** 본체 시작: 설정을 읽고 플로팅 버튼·채팅 감시를 켠다. Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다 */
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
+  setWikiOpener((title) => void openWiki(title));
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {

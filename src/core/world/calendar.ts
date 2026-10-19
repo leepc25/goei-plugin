@@ -82,6 +82,8 @@ export interface DayInfo {
   /** 일요일·공휴일 (빨간 글씨) */
   red: boolean;
   saturday: boolean;
+  /** 음력 「4월 8일」·「윤4월 1일」 (브라우저가 음력을 모르면 빈 문자열) */
+  lunar: string;
 }
 
 const DATE_RE = /(\d{3,4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?/;
@@ -100,5 +102,6 @@ export function dayInfo(text: string): DayInfo | null {
   const names = baseHolidays(t);
   const holiday = names.length ? [...new Set(names)].join('·') : isSubstitute(t) ? '대체공휴일' : '';
   const wd = dt.getUTCDay();
-  return { date: date.trim(), weekday: WEEK[wd], holiday, red: wd === 0 || !!holiday, saturday: wd === 6 };
+  const l = lunar(t);
+  return { date: date.trim(), weekday: WEEK[wd], holiday, red: wd === 0 || !!holiday, saturday: wd === 6, lunar: l ? `${l.leap ? '윤' : ''}${l.m}월 ${l.d}일` : '' };
 }

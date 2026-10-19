@@ -2,7 +2,7 @@
 // 취소는 그 메시지를 지운다. 이미 보내져 응답을 만드는 중이면 지우지 않는다 (요청 도중 채팅을 저장하면 응답이 사라질 수 있다).
 import { isUnsent, setUnsent } from '../core/dispatch';
 import type { Chat } from '../core/types';
-import { body } from './overlay';
+import { armChatClick, elements, hit, onChatClick } from './chatclicks';
 import { updateChat } from './risu';
 import { isWaiting } from './waiting';
 
@@ -26,38 +26,14 @@ export function clearUnsent(chat: Chat): Chat | null {
 }
 
 let busy = false;
-/** 안 보낸 카드를 그린 적이 있을 때만 클릭마다 버튼을 찾는다 (다른 봇·평소에는 아무 일도 안 함) */
-let shown = false;
-let listening = false;
 
-/** 채팅에 안 보낸 카드를 그릴 때 (body.ts display). 클릭 리스너는 그때 한 번 건다 */
-export function unsentShown(): void {
-  shown = true;
-  if (!listening) void listen();
-}
-
-// Risu SafeElement 리스너는 건 요소 안의 이벤트만 받는다 (2026-10 #1610). 채팅 메시지 클릭까지 받으려고 body에 건다
-async function listen(): Promise<void> {
-  listening = true;
-  try {
-    const root = await body();
-    if (!root) return void (listening = false);
-    await root.body.addEventListener('click', ((ev: { clientX?: number; clientY?: number }) => void onClick(root.doc, ev.clientX ?? -1, ev.clientY ?? -1)) as (e: unknown) => void, { passive: true });
-  } catch {
-    listening = false;
-  }
-}
-
-async function onClick(doc: NonNullable<Awaited<ReturnType<typeof body>>>['doc'], x: number, y: number): Promise<void> {
-  if (!shown || busy) return;
-  const list = await risuai.unwarpSafeArray(await doc.querySelectorAll('[data-goei-cancel]')).catch(() => []);
-  if (!list.length) return void (shown = false);
-  let hit = false;
-  for (const el of list) {
-    const r = await el.getBoundingClientRect().catch(() => null);
-    if (r && x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height) hit = true;
-  }
-  if (!hit || isWaiting()) return;
+onChatClick('unsent', async (_doc, x, y) => {
+  if (busy) return false;
+  const list = await elements(_doc, '[data-goei-cancel]');
+  if (!list.length) return 'idle';
+  let on = false;
+  for (const el of list) if (await hit(el, x, y)) on = true;
+  if (!on || isWaiting()) return false;
   busy = true;
   try {
     const charIndex = await risuai.getCurrentCharacterIndex();
@@ -74,4 +50,10 @@ async function onClick(doc: NonNullable<Awaited<ReturnType<typeof body>>>['doc']
   } finally {
     busy = false;
   }
+  return true;
+});
+
+/** 채팅에 안 보낸 카드를 그릴 때 (body.ts display) */
+export function unsentShown(): void {
+  armChatClick('unsent');
 }

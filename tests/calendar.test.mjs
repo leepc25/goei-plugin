@@ -32,3 +32,39 @@ test('공휴일: 양력·음력·대체공휴일 (2025년 실제 달력)', () =>
   assert.equal(dayInfo('2025.03.16').red, true);
   assert.equal(dayInfo('2025.03.15').saturday, true);
 });
+
+import { findStatusTags, statusMinute, statusTimeline, sceneLabel, elapsedLabel, storyDay, scanStatus, lastStatusFields } from '../dist-test/core.mjs';
+
+test('상태창 태그: 너그럽게 읽기', () => {
+  const one = (s) => { const [t] = findStatusTags(s); return t && [t.date, t.time, t.weather, t.temp, t.place, t.target]; };
+  assert.deepEqual(one('[▣|2025.03.15|12:15 PM|☀️|12°C|관리국 본부|함평 소라 랜드]'), ['2025.03.15', '12:15 PM', '☀️', '12°C', '관리국 본부', '함평 소라 랜드']);
+  assert.deepEqual(one('[▣ | 2025.03.15 | 12:15 PM | ☀️ | 12°C | 관리국 본부 | 없음 ]'), ['2025.03.15', '12:15 PM', '☀️', '12°C', '관리국 본부', '']);
+  // 전각 기호, 닫는 괄호 없음
+  assert.deepEqual(one('【▣｜2025.03.15｜12:15 PM｜☀️｜12°C｜관리국 본부｜없음'), ['2025.03.15', '12:15 PM', '☀️', '12°C', '관리국 본부', '']);
+  // 날씨 칸 빠짐
+  assert.deepEqual(one('[▣|2025.03.15|12:15 PM|12°C|관리국 본부|소라 랜드]'), ['2025.03.15', '12:15 PM', '', '12°C', '관리국 본부', '소라 랜드']);
+  // 날씨·기온이 한 칸
+  assert.deepEqual(one('[▣|2025.03.15|12:15 PM|☀️ 12°C|관리국 본부]'), ['2025.03.15', '12:15 PM', '☀️', '12°C', '관리국 본부', '']);
+  // 순서가 바뀜
+  assert.deepEqual(one('[▣|12:15 PM|2025.03.15|☀️|12°C|관리국 본부|목표]'), ['2025.03.15', '12:15 PM', '☀️', '12°C', '관리국 본부', '목표']);
+  assert.equal(findStatusTags('그냥 글 [AN|x]').length, 0);
+  assert.equal(scanStatus('[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]').target, '');
+  assert.equal(lastStatusFields(['a', '[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|소라]']).target, '소라');
+});
+
+test('상태창 시각: 분·지난 장면·흐른 시간·며칠째', () => {
+  const a = statusMinute('2025.03.14', '09:10 PM');
+  const b = statusMinute('2025.03.15', '11:40 PM');
+  assert.equal(statusMinute('2025.03.15', '12:00 AM') % 1440, 0);
+  assert.equal(statusMinute('2025.03.15', '오후 3:05') % 1440, 15 * 60 + 5);
+  assert.equal(sceneLabel(a, b), '어제 오후 9:10');
+  assert.equal(sceneLabel(statusMinute('2025.03.15', '10:00 AM'), b), '오늘 오전 10:00');
+  assert.equal(sceneLabel(statusMinute('2025.03.10', '12:05 PM'), b), '3월 10일 오후 12:05');
+  assert.equal(elapsedLabel(a, b), '1일 2시간 30분');
+  assert.equal(elapsedLabel(b, b), '흐르지 않음');
+  assert.equal(storyDay(statusMinute('2025.03.13', '11:00 PM'), b), 3);
+  const tl = statusTimeline(['[▣|2025.03.13|11:00 PM|☀️|1°C|가|없음]', '[▣|2025.03.14|09:10 PM|☀️|1°C|나|없음]']);
+  assert.equal(tl.prev.get('[▣|2025.03.14|09:10 PM|☀️|1°C|나|없음]'), statusMinute('2025.03.13', '11:00 PM'));
+  assert.equal(tl.start, statusMinute('2025.03.13', '11:00 PM'));
+  assert.equal(tl.last.minute, a);
+});

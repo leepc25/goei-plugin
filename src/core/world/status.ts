@@ -1,0 +1,133 @@
+// 상태창 [▣|날짜|시각|날씨|기온|위치|목표]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
+// 플러그인이 너그럽게 읽는다: 칸이 모자라거나 남아도, 전각 기호·공백이 섞여도, 닫는 괄호가 없어도.
+
+export interface StatusTag {
+  /** 원문 (화면에서 바꿀 자리) */
+  raw: string;
+  date: string;
+  time: string;
+  weather: string;
+  temp: string;
+  place: string;
+  /** '없음'이면 빈 문자열 */
+  target: string;
+}
+
+// 여는 기호: [▣ 【▣ ［▣ (▣ 앞 공백 허용). 닫는 기호가 없으면 줄 끝까지
+const TAG_RE = /[[【［]\s*▣\s*[|｜]([^\]】］\r\n]*)(?:[\]】］]|(?=\r?\n|$))/g;
+const DATE_RE = /^\d{3,4}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\s*일?(?:\s*[(（]?\s*[일월화수목금토]\s*(?:요일)?\s*[)）]?)?$/;
+const TIME_RE = /^(?:(?:오전|오후|AM|PM|am|pm)\s*)?\d{1,2}\s*[:시]\s*\d{0,2}\s*분?\s*(?:AM|PM|am|pm|a\.m\.|p\.m\.)?$/;
+const TEMP_RE = /^[-−+]?\s*\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃|도)$/;
+
+export function hasStatusTag(text: string): boolean {
+  return typeof text === 'string' && /[[【［]\s*▣\s*[|｜]/.test(text);
+}
+
+/** 칸을 나눠 이름 붙이기. 여섯 칸이 정확하면 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
+function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
+  const f = inner.split(/[|｜]/).map((s) => s.trim());
+  while (f.length && f[f.length - 1] === '') f.pop();
+  const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
+  if (f.length === 6 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
+    return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]) };
+  }
+  const rest = [...f];
+  const take = (re: RegExp) => {
+    const i = rest.findIndex((x) => re.test(x));
+    return i < 0 ? '' : rest.splice(i, 1)[0];
+  };
+  const date = take(DATE_RE);
+  const time = take(TIME_RE);
+  const temp = take(TEMP_RE);
+  // 날씨는 이모지가 있거나 짧은 날씨 낱말. 남은 칸에서 맨 앞
+  let weather = '';
+  const wi = rest.findIndex((x) => /\p{Extended_Pictographic}/u.test(x) || /^(맑음|흐림|비|눈|안개|구름|소나기|천둥|번개|황사|바람)/.test(x));
+  if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
+  // 날씨와 기온이 한 칸에 붙어 온 경우 (☀️ 12°C)
+  if (!temp && weather) {
+    const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
+    if (m) return { date, time, weather: m[1], temp: m[2], place: rest[0] ?? '', target: clean(rest.slice(1).join(' | ')) };
+  }
+  return { date, time, weather, temp, place: rest[0] ?? '', target: clean(rest.slice(1).join(' | ')) };
+}
+
+/** 글 속 상태창 태그들 */
+export function findStatusTags(text: string): StatusTag[] {
+  if (!hasStatusTag(text)) return [];
+  return [...text.matchAll(TAG_RE)].map((m) => ({ raw: m[0], ...fieldsOf(m[1]) }));
+}
+
+/** 날짜·시각 → 분 (UTC 기준 그레고리력). 읽지 못하면 null */
+export function statusMinute(date: string, time: string): number | null {
+  const d = /(\d{3,4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/.exec(date ?? '');
+  if (!d) return null;
+  const t = /(\d{1,2})\s*[:시]\s*(\d{1,2})?/.exec(time ?? '');
+  let h = t ? Number(t[1]) : 0;
+  const min = t?.[2] ? Number(t[2]) : 0;
+  const pm = /PM|p\.m\.|오후/i.test(time ?? '');
+  const am = /AM|a\.m\.|오전/i.test(time ?? '');
+  if (pm && h < 12) h += 12;
+  if (am && h === 12) h = 0;
+  if (h > 23 || min > 59) return null;
+  const ms = Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), h, min);
+  return Number.isFinite(ms) ? Math.floor(ms / 60000) : null;
+}
+
+const DAY_MIN = 1440;
+
+/** 「오늘 오전 10:00」·「어제 오후 9:10」·「3월 12일 오후 9:10」 (지금 장면 기준) */
+export function sceneLabel(prev: number, now: number): string {
+  const p = new Date(prev * 60000);
+  const h = p.getUTCHours();
+  const clock = `${h < 12 ? '오전' : '오후'} ${h % 12 === 0 ? 12 : h % 12}:${String(p.getUTCMinutes()).padStart(2, '0')}`;
+  const days = Math.floor(now / DAY_MIN) - Math.floor(prev / DAY_MIN);
+  const when = days === 0 ? '오늘' : days === 1 ? '어제' : days === 2 ? '그저께' : `${p.getUTCFullYear() !== new Date(now * 60000).getUTCFullYear() ? `${p.getUTCFullYear()}년 ` : ''}${p.getUTCMonth() + 1}월 ${p.getUTCDate()}일`;
+  return `${when} ${clock}`;
+}
+
+/** 흐른 시간: 「2시간 15분」·「1일 2시간 30분」·「5분」. 거꾸로 가면 「-2시간」 */
+export function elapsedLabel(from: number, to: number): string {
+  let m = to - from;
+  const sign = m < 0 ? '-' : '';
+  m = Math.abs(m);
+  const d = Math.floor(m / DAY_MIN);
+  const h = Math.floor((m % DAY_MIN) / 60);
+  const mm = m % 60;
+  const parts = [d ? `${d}일` : '', h ? `${h}시간` : '', mm ? `${mm}분` : ''].filter(Boolean);
+  return parts.length ? sign + parts.join(' ') : '흐르지 않음';
+}
+
+/** 시작한 날을 1일째로 */
+export function storyDay(start: number, now: number): number {
+  return Math.floor(now / DAY_MIN) - Math.floor(start / DAY_MIN) + 1;
+}
+
+export interface StatusTimeline {
+  /** 상태창 원문 → 바로 앞 장면의 분 */
+  prev: Map<string, number>;
+  /** 이야기 첫 상태창의 분 */
+  start: number | null;
+  /** 마지막 상태창 (원문·분). 아직 모으지 못한 새 응답은 이것을 지난 장면으로 */
+  last: { raw: string; minute: number } | null;
+  /** 모은 상태창 원문 전부 */
+  seen: Set<string>;
+}
+
+/** 채팅 응답들의 상태창 시각을 차례로 모아 「지난 장면」을 찾는다 */
+export function statusTimeline(texts: string[]): StatusTimeline {
+  const prev = new Map<string, number>();
+  const seen = new Set<string>();
+  let start: number | null = null;
+  let last: { raw: string; minute: number } | null = null;
+  for (const t of texts) {
+    for (const tag of findStatusTags(t)) {
+      const m = statusMinute(tag.date, tag.time);
+      seen.add(tag.raw.trim());
+      if (m === null) continue;
+      if (start === null) start = m;
+      if (last !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last.minute);
+      last = { raw: tag.raw.trim(), minute: m };
+    }
+  }
+  return { prev, start, last, seen };
+}

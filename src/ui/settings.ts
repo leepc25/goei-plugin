@@ -1,7 +1,8 @@
 // 「설정」 탭: 원본 설정 창의 동작·요원창·캐릭터 이미지 항목. 값은 이 채팅의 $st_* 변수에 두고,
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
+import { repaintTheme } from './theme';
 import {
-  AGENT_MAX, basicDefaults, DIM_DEFAULT, DIM_STEPS, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
+  AGENT_MAX, basicDefaults, DIM_DEFAULT, DIM_STEPS, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
@@ -154,7 +155,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
     ${group('화면', [
-      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 상태창과 캐릭터 이미지 배경 배색이에요 (원본 테마와 같음).'),
+      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(테마 따름일 때) 배색이에요.'),
+      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마 따름'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('창 바깥 어둡기', seg('set-dim', String(getPrefs().dim ?? DIM_DEFAULT), DIM_STEPS.map((n) => [String(n), `${n}%`] as [string, string]), busy), '창 뒤의 채팅 화면을 얼마나 가릴지 정해요. 0%면 그대로 보여요.'),
     ].join(''))}
@@ -276,6 +278,11 @@ export async function handleSettings(action: string, value: string | undefined, 
     return true;
   }
   // 창 모양은 채팅·기본값 구분 없이 이 기기 설정으로
+  if (action === 'set-status' && ['auto', 'dark', 'light', 'paper', 'off'].includes(v ?? '')) {
+    await saveDefaults(env, (p) => ({ ...p, status: v === 'auto' ? undefined : (v as StatusStyle) }));
+    repaintTheme();
+    return true;
+  }
   if (action === 'set-nav' || action === 'set-dim') {
     const n = Number(v);
     if (action === 'set-nav' && (v === 'left' || v === 'right')) await saveDefaults(env, (p) => ({ ...p, nav: v === 'right' ? 'right' : undefined }));

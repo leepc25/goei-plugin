@@ -36,6 +36,10 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
       addEventListener: async (type, fn) => { const id = String(Math.random()); const h = (e) => { const ev = { type: e.type, clientX: e.clientX, clientY: e.clientY, button: e.button, buttons: e.buttons }; setTimeout(() => fn(ev), 5); }; listeners.set(id, [type, h]); document.addEventListener(type, h); return id; },
       removeEventListener: async (type, id) => { await new Promise((r) => setTimeout(r, 30)); const l = listeners.get(id); if (l) { document.removeEventListener(l[0], l[1]); listeners.delete(id); } },
       remove: async () => { el.remove(); },
+      addClass: async (c) => { el.classList.add(c); },
+      removeClass: async (c) => { el.classList.remove(c); },
+      hasClass: async (c) => el.classList.contains(c),
+      textContent: async () => el.textContent,
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
@@ -416,7 +420,7 @@ async function open(page) {
   }, reply);
   // 응답이 들어온 직후 화면 표시: 태그 숨김
   const shown = await page.evaluate((reply) => window.__calls.handlers.display(reply), reply);
-  assert.ok(!shown.includes('[AN|') && !shown.includes('[AG|') && shown.includes('[▣|'), shown);
+  assert.ok(!shown.includes('[AN|') && !shown.includes('[AG|') && !shown.includes('[▣|') && shown.includes('data-goei-status'), shown);
   assert.ok(shown.includes('data-goei-user') && shown.includes('{{source::user}}'), '이 봇 채팅엔 유저 사진 숨은 칸');
   await page.evaluate(async () => {
     const c = window.__chat;
@@ -520,6 +524,67 @@ async function open(page) {
   assert.deepEqual(errors, []);
   console.log('PASS 상황판: 태그 반영·본문 정리·탭 표시, 다른 봇 무시');
   await page.close();
+}
+
+// 9-3) 상태창: 플러그인이 그리고(요일·공휴일·지난 장면), 말풍선·위키 이름·설정 배색
+{
+  const tags = ['[▣|2025.10.04|09:10 PM|☀️|14°C|관리국 본부|없음]', '[▣|2025.10.05|11:40 PM|🌫️|-3°C|서울 명일 아파트 정문 앞|명일 아파트 조사 마무리]'];
+  const chat = { message: [{ role: 'user', data: '시작' }, { role: 'char', data: `첫 장면.\n${tags[0]}` }, { role: 'user', data: '출동' }, { role: 'char', data: `둘째 장면.\n${tags[1]}` }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } };
+  for (const [vp, name] of [[{ width: 1100, height: 700 }, 'pc'], [{ width: 360, height: 740 }, 'm']]) {
+    const { page, errors } = await boot(fixture, chat, vp);
+    await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
+    // 채팅을 열 때 지난 장면 목록을 모은다
+    await page.waitForTimeout(400);
+    const html = await page.evaluate((t) => window.__calls.handlers.display(t), chat.message[3].data);
+    assert.ok(html.includes('data-goei-status') && !html.includes('[▣'), html);
+    assert.ok(html.includes('어제 오후 9:10') && html.includes('1일 2시간 30분') && html.includes('2일째'), '지난 장면·흐른 시간·며칠째');
+    assert.ok(html.includes('gst-date hol') && html.includes('추석') && html.includes('음력'), '공휴일(일요일 추석)');
+    assert.ok(/data-goei-wiki="1">명일 아파트</.test(html), '위키 이름만 밑줄');
+    // 가장 최근 메시지의 상태창만 (Risu는 최신 메시지가 맨 앞). 지우면 남은 것 중 최근 것이 보인다
+    const older = await page.evaluate((t) => window.__calls.handlers.display(t), chat.message[1].data);
+    const shown = await page.evaluate(([a, b]) => {
+      const d = document.querySelector('.default-chat-screen');
+      d.innerHTML = `<div class="flex flex-col-reverse"><div class="chat-message-container" id="c3"><div class="risu-chat">출동</div></div><div class="chat-message-container" id="c2"><div class="risu-chat">${a}</div></div><div class="chat-message-container" id="c1"><div class="risu-chat">${b}</div></div></div><div class="risu-chat" id="fm">${b}</div>`;
+      const vis = () => [...d.querySelectorAll('.gst')].map((g) => getComputedStyle(g).display !== 'none');
+      const before = vis();
+      d.querySelector('#c2').remove();
+      return [before, vis()];
+    }, [html, older]);
+    assert.deepEqual(shown, [[true, false, false], [true, false]], '최근 상태창만: ' + JSON.stringify(shown));
+    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '24px'; d.innerHTML = `<div id="msg" style="color:#ddd;max-width:760px;margin:0 auto">둘째 장면.${h}</div>`; }, html);
+    if (shots) await page.screenshot({ path: `${shots}/9-status-${name}.png` });
+    // 요일 배지를 누르면 말풍선, 바깥을 누르면 닫힘
+    await page.click('#msg .gst-wd');
+    await page.waitForFunction(() => document.querySelector('#msg .gst-wd').classList.contains('open'));
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .gst-wd .gst-tip')).visibility), 'visible');
+    if (shots) { await new Promise((r) => setTimeout(r, 250)); await page.screenshot({ path: `${shots}/9-status-tip-${name}.png` }); }
+    await page.click('#msg .gst-clock');
+    await page.waitForFunction(() => document.querySelector('#msg .gst-clock').classList.contains('open') && !document.querySelector('#msg .gst-wd').classList.contains('open'));
+    if (shots) { await new Promise((r) => setTimeout(r, 250)); await page.screenshot({ path: `${shots}/9-status-clock-${name}.png` }); }
+    await page.mouse.click(5, vp.height - 5);
+    await page.waitForFunction(() => !document.querySelector('#msg .gst-clock').classList.contains('open'));
+    // 한 줄 머리: 시각·날짜·날씨가 줄바꿈 없이
+    const topH = await page.evaluate(() => document.querySelector('#msg .gst-top').getBoundingClientRect().height);
+    assert.ok(topH < 42, `머리 한 줄 (${topH})`);
+    if (name === 'pc') {
+      // 위키 이름을 누르면 창이 그 위키 문서로
+      await page.click('#msg .gst-link');
+      await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 6000 });
+      // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
+      await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+      await page.click('[data-action="set-status"][data-value="paper"]');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').status === 'paper');
+      assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .gst')).backgroundColor), 'rgb(250, 245, 233)');
+      if (shots) await page.screenshot({ path: `${shots}/9-status-settings.png` });
+      await page.click('[data-action="set-status"][data-value="off"]');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .gst')).display === 'none');
+      await page.click('[data-action="set-status"][data-value="auto"]');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .gst')).backgroundColor === 'rgb(35, 45, 50)');
+    }
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+  console.log('PASS 상태창: 플러그인 그리기·요일·공휴일·지난 장면·말풍선·위키 이름·배색 설정');
 }
 
 // 10) 상황판 없이 시작한 채팅에서 켜기

@@ -31,6 +31,11 @@ export function setCurrentTheme(t: ThemeName): void {
   for (const f of listeners) f(t);
 }
 
+/** 배색 설정(상태창 등)이 바뀌었을 때: 같은 테마로 다시 칠한다 */
+export function repaintTheme(): void {
+  for (const f of listeners) f(current);
+}
+
 export function onThemeChange(f: (t: ThemeName) => void): () => void {
   listeners.add(f);
   return () => listeners.delete(f);

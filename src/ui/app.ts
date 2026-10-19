@@ -349,6 +349,12 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   void checkLatest(settingsEnv); // 새 버전이 있으면 설정 → 업데이트에 표시 (세션에 한 번)
 }
 
+/** 채팅 속 상태창의 위키 이름을 눌렀을 때: 창을 그 위키 문서로 연다 */
+export async function openWiki(title: string): Promise<void> {
+  await openApp({ quietIfNotLite: true });
+  if (view.kind === 'started') await handle('wiki-goto', title);
+}
+
 async function refresh(): Promise<void> {
   try {
     const ctx = await loadContext();
