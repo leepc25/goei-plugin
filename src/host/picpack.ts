@@ -51,29 +51,46 @@ async function fetchPicture(p: Picture): Promise<Uint8Array> {
  * 고른 사진을 모두 받은 뒤에만 에셋 저장소에 넣고, 바뀐 에셋 목록을 돌려준다 (하나라도 못 받으면 아무것도 바꾸지 않음).
  * 같은 이름 줄은 경로만 새 것으로 바꾸고, 새 이름은 뒤에 붙인다.
  */
-export async function fetchPictures(assets: unknown, plan: PicPlan, progress: (done: number) => void): Promise<unknown[]> {
+export async function fetchPictures(
+  assets: unknown,
+  plan: PicPlan,
+  progress: (done: number, phase: 'get' | 'save') => void,
+): Promise<unknown[]> {
   const got: [Picture, Uint8Array][] = [];
   let i = 0;
   const worker = async () => {
     while (i < plan.get.length) {
       const p = plan.get[i++];
       got.push([p, await fetchPicture(p)]);
-      progress(got.length);
+      progress(got.length, 'get');
     }
   };
   await Promise.all([worker(), worker(), worker(), worker()]);
-  const rows = ((Array.isArray(assets) ? assets : []) as unknown[]).map((r) => (isRow(r) ? ([...r] as Row) : r));
-  for (const [p, bytes] of got) {
-    let path: unknown;
-    try {
-      path = await risuai.saveAsset(bytes);
-    } catch (error) {
-      throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+  // 저장도 몇 장씩 함께 (한 장씩 차례로 넣으면 160장에 한참 걸림)
+  const paths: string[] = new Array(got.length);
+  let j = 0;
+  let saved = 0;
+  progress(0, 'save');
+  const saver = async () => {
+    while (j < got.length) {
+      const k = j++;
+      let path: unknown;
+      try {
+        path = await risuai.saveAsset(got[k][1]);
+      } catch (error) {
+        throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      if (typeof path !== 'string' || !path) throw new PicError('사진을 저장하지 못했어요.');
+      paths[k] = path;
+      progress(++saved, 'save');
     }
-    if (typeof path !== 'string' || !path) throw new PicError('사진을 저장하지 못했어요.');
+  };
+  await Promise.all([saver(), saver(), saver(), saver()]);
+  const rows = ((Array.isArray(assets) ? assets : []) as unknown[]).map((r) => (isRow(r) ? ([...r] as Row) : r));
+  got.forEach(([p], k) => {
     const row = rows.find((r): r is Row => isRow(r) && r[0] === p[0]);
-    if (row) (row[1] = path), (row[2] = p[2]);
-    else rows.push([p[0], path, p[2]]);
-  }
+    if (row) (row[1] = paths[k]), (row[2] = p[2]);
+    else rows.push([p[0], paths[k], p[2]]);
+  });
   return rows;
 }

@@ -20,7 +20,7 @@ export const updateUi: {
   plan: UpdatePlan | null;
   /** 받아 바꿀 카드 사진 */
   pics: PicPlan | null;
-  /** 사진 받는 중 「k/n」 */
+  /** 진행 표시 「사진 받는 중 k/n」 「사진 저장 중 k/n」 「카드에 적용 중…」 */
   progress: string;
   done: string;
 } = { busy: false, notice: '', latest: null, payload: null, plan: null, pics: null, progress: '', done: '' };
@@ -169,7 +169,7 @@ export function updateGroup(ctx: ChatContext): string {
   let actions = `<button class="gx-mini" data-action="upd-check" ${busy ? 'disabled' : ''}>${busy && !updateUi.payload ? '확인 중…' : '새 버전 확인'}</button>`;
   if (cardNew && !needPlugin) {
     actions += updateUi.plan
-      ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? (updateUi.progress ? `사진 받는 중 ${esc(updateUi.progress)}` : '적용 중…') : '카드에 적용'}</button>`
+      ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? esc(updateUi.progress || '적용 중…') : '카드에 적용'}</button>`
       : `<button class="gx-mini primary" data-action="upd-prepare" ${busy ? 'disabled' : ''}>카드 업데이트 준비</button>`;
   }
   const plan = updateUi.plan;
@@ -237,18 +237,20 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
       const pics = planPictures(char.additionalAssets, readManifest(char.globalLore as never), readManifest(updateUi.payload.data.globalLore));
       if (pics.get.length) {
         let last = 0;
-        updateUi.progress = `0/${pics.get.length}`;
+        updateUi.progress = `사진 받는 중 0/${pics.get.length}`;
         env.render();
         try {
-          plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n) => {
-            updateUi.progress = `${n}/${pics.get.length}`;
-            if (n - last >= 5 || n === pics.get.length) (last = n), env.render();
+          plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n, phase) => {
+            if (n === 0) last = 0;
+            updateUi.progress = `사진 ${phase === 'get' ? '받는' : '저장'} 중 ${n}/${pics.get.length}`;
+            if (n - last >= 5 || n === 0 || n === pics.get.length) (last = n), env.render();
           });
         } catch (error) {
-          throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
-        } finally {
           updateUi.progress = '';
+          throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
         }
+        updateUi.progress = '카드에 적용 중…';
+        env.render();
       }
       await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
       if (pics.get.length) forgetImages();
@@ -256,6 +258,7 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
       updateUi.payload = null;
       updateUi.plan = null;
       updateUi.pics = null;
+      updateUi.progress = '';
       updateUi.busy = false;
       await env.refresh();
       return true;
@@ -263,6 +266,7 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
   } catch (error) {
     updateUi.notice = error instanceof Error ? error.message : String(error);
   }
+  updateUi.progress = '';
   updateUi.busy = false;
   env.render();
   return true;
