@@ -3,8 +3,8 @@
 // 한 번에 받을 수 있게(웹 Risu 프록시는 요청당 약 1MB) base64 없이 바이트 그대로 둔다. src/host/gamepack.ts가 읽는다.
 import { readFileSync, readdirSync } from 'node:fs';
 
-export function buildPack(dir, id, version) {
-  const names = readdirSync(dir).filter((f) => f.endsWith('.png')).sort();
+export function buildPack(dir, id, version, include = null) {
+  const names = readdirSync(dir).filter((f) => f.endsWith('.png') && (!include || include.includes(f.slice(0,-4)))).sort();
   const atlas = JSON.parse(readFileSync(`${dir}/atlas.json`, 'utf8'));
   const bufs = names.map((n) => readFileSync(`${dir}/${n}`));
   let at = 0;
