@@ -2,6 +2,9 @@
 import { cardVersion, compareVersions, isPayload, planUpdate, PLUGIN_VERSION, UPDATE_BASE, type CardPayload, type UpdatePlan } from '../core/update';
 import { readManifest } from '../core/start';
 import type { ChatContext } from '../host/risu';
+import { fetchPictures } from '../host/picpack';
+import { planPictures, type PicPlan } from '../core/pictures';
+import { forgetImages } from './images';
 import type { SettingsEnv } from './settings';
 
 const esc = (s: unknown) =>
@@ -15,8 +18,12 @@ export const updateUi: {
   latest: Latest | null;
   payload: CardPayload | null;
   plan: UpdatePlan | null;
+  /** 받아 바꿀 카드 사진 */
+  pics: PicPlan | null;
+  /** 사진 받는 중 「k/n」 */
+  progress: string;
   done: string;
-} = { busy: false, notice: '', latest: null, payload: null, plan: null, done: '' };
+} = { busy: false, notice: '', latest: null, payload: null, plan: null, pics: null, progress: '', done: '' };
 
 let checked = false;
 /** 「건너뛰기」한 버전 ("카드|플러그인"). 같은 조합이면 안내를 다시 띄우지 않는다 */
@@ -162,28 +169,25 @@ export function updateGroup(ctx: ChatContext): string {
   let actions = `<button class="gx-mini" data-action="upd-check" ${busy ? 'disabled' : ''}>${busy && !updateUi.payload ? '확인 중…' : '새 버전 확인'}</button>`;
   if (cardNew && !needPlugin) {
     actions += updateUi.plan
-      ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? '적용 중…' : '카드에 적용'}</button>`
+      ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? (updateUi.progress ? `사진 받는 중 ${esc(updateUi.progress)}` : '적용 중…') : '카드에 적용'}</button>`
       : `<button class="gx-mini primary" data-action="upd-prepare" ${busy ? 'disabled' : ''}>카드 업데이트 준비</button>`;
   }
   const plan = updateUi.plan;
+  const pics = updateUi.pics;
   const summary = plan
     ? `<ul class="upd-plan">
         <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc(plan.fields.map(fieldName).join(', '))})</small>` : ''}</li>
         <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ''}</li>
         <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.${assetsChanged(ctx) ? ' <b>이번 판은 사진도 바뀌었어요.</b> 사진은 카드 업데이트로 옮길 수 없어서 zip 안의 카드를 다시 가져와야 들어와요.' : ''}</p>`
+        ${pics?.get.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added} <small>(약 ${mb(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ''}
+      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>`
     : '';
   return section(rows.join('') + `<div class="upd-act">${actions}</div>${summary}`
     + (updateUi.notice ? `<div class="gx-err" role="alert">${esc(updateUi.notice)}</div>` : '')
     + (updateUi.done ? `<p class="gx-hint">${esc(updateUi.done)}</p>` : ''));
 }
 
-/** 새 카드의 사진 지문이 지금 카드와 다른지 (지금 카드에 지문이 없으면 옛 판이라 사진은 그대로였던 것으로 본다) */
-function assetsChanged(ctx: ChatContext): boolean {
-  const next = updateUi.payload ? readManifest(updateUi.payload.data.globalLore)?.assets : undefined;
-  const cur = readManifest(ctx.char.globalLore)?.assets;
-  return typeof next === 'string' && typeof cur === 'string' && next !== cur;
-}
+const mb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`);
 
 function section(body: string): string {
   return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body}</div></section>`;
@@ -208,6 +212,7 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
   if (action === 'upd-check') {
     updateUi.payload = null;
     updateUi.plan = null;
+    updateUi.pics = null;
     updateUi.done = '';
     await checkLatest(env, true);
     return true;
@@ -224,13 +229,33 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;
       updateUi.plan = planUpdate(char, p);
+      updateUi.pics = planPictures(char.additionalAssets, readManifest(char.globalLore as never), readManifest(p.data.globalLore));
     } else if (action === 'upd-apply' && updateUi.payload) {
       // 준비한 뒤 카드가 바뀌었을 수 있으니 저장 직전에 다시 합친다
       const plan = planUpdate(char, updateUi.payload);
+      // 사진은 다 받은 뒤에만 넣는다. 하나라도 못 받으면 카드도 바꾸지 않고 다시 누르게 한다
+      const pics = planPictures(char.additionalAssets, readManifest(char.globalLore as never), readManifest(updateUi.payload.data.globalLore));
+      if (pics.get.length) {
+        let last = 0;
+        updateUi.progress = `0/${pics.get.length}`;
+        env.render();
+        try {
+          plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n) => {
+            updateUi.progress = `${n}/${pics.get.length}`;
+            if (n - last >= 5 || n === pics.get.length) (last = n), env.render();
+          });
+        } catch (error) {
+          throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
+        } finally {
+          updateUi.progress = '';
+        }
+      }
       await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
-      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요. 채팅을 다시 열면 새 내용이 보여요.`;
+      if (pics.get.length) forgetImages();
+      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ''} 채팅을 다시 열면 새 내용이 보여요.`;
       updateUi.payload = null;
       updateUi.plan = null;
+      updateUi.pics = null;
       updateUi.busy = false;
       await env.refresh();
       return true;

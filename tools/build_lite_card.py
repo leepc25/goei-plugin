@@ -414,6 +414,49 @@ def add_wiki_assets(data, others):
     return added
 
 
+def shrink_maps(others):
+    """원본 지도(1402px)를 assets/maps 의 줄인 지도(1100px, AVIF 품질 50)로 바꾼다. 이름·경로는 그대로"""
+    swapped = 0
+    for f in sorted((ROOT / 'assets' / 'maps').glob('map*.avif')):
+        path = f'assets/other/image/{f.name}'
+        if path in others:
+            others[path] = f.read_bytes()
+            swapped += 1
+    return swapped
+
+
+PIC_DIR = 'pic'
+
+
+def card_pictures(data, others):
+    """카드 사진 목록 [이름, 지문, 확장자, 바이트]. 창의 업데이트가 지문이 바뀐 카드 사진만 받아 바꾼다 (src/host/picpack.ts)"""
+    out = []
+    for a in data.get('assets', []):
+        path = str(a.get('uri', '')).replace('embeded://', '')
+        if a.get('type') != 'x-risu-asset' or path not in others:
+            continue
+        b = others[path]
+        out.append([a['name'], hashlib.sha1(b).hexdigest()[:12], a.get('ext') or Path(path).suffix[1:], len(b)])
+    return out
+
+
+def write_pictures(folder, pictures, data, others):
+    """사진을 「pic/지문.확장자」로 쓴다 (저장소 release 폴더에서 창이 받는다). 지난 판 파일은 지운다"""
+    folder = Path(folder) / PIC_DIR
+    folder.mkdir(parents=True, exist_ok=True)
+    by_name = {a['name']: str(a.get('uri', '')).replace('embeded://', '') for a in data.get('assets', [])}
+    keep = set()
+    for name, digest, ext, _ in pictures:
+        f = folder / f'{digest}.{ext}'
+        keep.add(f.name)
+        if not f.exists():
+            f.write_bytes(others[by_name[name]])
+    for old in folder.iterdir():
+        if old.name not in keep:
+            old.unlink()
+    return len(keep)
+
+
 def main(src, dst):
     scenarios = load_scenarios()
     with zipfile.ZipFile(src) as z:
@@ -424,6 +467,8 @@ def main(src, dst):
 
     data = card['data']
     wiki_assets = add_wiki_assets(data, others)
+    maps = shrink_maps(others)
+    pictures = card_pictures(data, others)
     risu = data.setdefault('extensions', {}).setdefault('risuai', {})
     lore = (module or {}).get('lorebook') or (data.get('character_book') or {}).get('entries') or []
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
@@ -439,6 +484,8 @@ def main(src, dst):
         'source': {'name': data.get('name'), 'version': data.get('character_version')},
         'greetings': greeting_index,
         # 사진·에셋 지문: 카드 업데이트(글 내용만 옮김)로 못 옮기는 사진이 바뀌었는지 창이 알 수 있게
+        # 카드 사진 [이름, 지문, 확장자, 바이트]: 업데이트가 지문이 바뀐 것만 받아 바꾼다
+        'pictures': pictures,
         'assets': hashlib.sha1(''.join(f'{n}:{hashlib.sha1(b).hexdigest()};' for n, b in sorted(others.items())).encode()).hexdigest()[:12],
     }
     # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
@@ -485,11 +532,12 @@ def main(src, dst):
             z.writestr(name, blob, compress_type=zipfile.ZIP_STORED)
     payload = update_payload(data, risu, lite_module, version, min_plugin)
     parts = write_update(Path(dst).parent, payload)
+    pic_files = write_pictures(Path(dst).parent, pictures, data, others)
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
-        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets,
+        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets, 'maps': maps, 'pictures': pic_files,
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))
 

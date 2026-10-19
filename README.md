@@ -17,10 +17,12 @@ RisuAI용 괴담 시뮬레이션 「괴이 ː 이면세계」의 전용 플러�
 ## 업데이트
 
 - 플러그인: Risu 설정 → 플러그인 탭에서 업데이트합니다. 본체는 괴이 카드를 열 때 알아서 새로 받습니다.
-- 카드: 유령 버튼 → 설정 → 업데이트에서 「카드 업데이트 준비」 → 「카드에 적용」. 채팅과 사진은 그대로입니다.
+- 카드: 유령 버튼 → 설정 → 업데이트에서 「카드 업데이트 준비」 → 「카드에 적용」. 채팅과 직접 넣은 사진은 그대로이고, 카드가 준 사진은 바뀐 것만 받아 바꿉니다.
 
 ## 개발
 
 - `npm run build`: `dist/goei-plugin.js`(시작기, `src/main.ts`), `dist/goei-body.js`(본체, `src/body.ts`)와 받기용 조각 `dist/goei-body.json`·`goei-body.N.txt`, 게임 그림 팩.
 - 릴리스 때 `release/`에 `goei-plugin.js`와 함께 `goei-body.json`·`goei-body.*.txt`도 복사합니다. 시작기는 자기 판과 같은 본체만 받습니다.
 - 시작기는 Risu 플러그인 칸의 nonce를 붙인 `<script>`로 본체를 실행합니다(그 칸은 eval·blob이 막혀 있음). 시험: `tests/browser.mjs`의 「시작기」.
+- 카드 사진: `tools/build_lite_card.py`가 카드 사진마다 [이름, 지문, 확장자, 크기]를 매니페스트(`pictures`)에 적고 사진 파일을 결과 폴더의 `pic/지문.확장자`로 씁니다. 릴리스 때 `release/pic/`도 함께 올리면, 창의 카드 업데이트가 지문이 바뀐 카드 사진과 새 사진만 받아 바꿉니다(`src/host/picpack.ts`). 다 받지 못하면 카드도 바꾸지 않습니다.
+- 지도: `assets/maps/`의 1100px·AVIF 품질 50 지도로 원본 지도(1402px)를 바꿔 넣습니다.

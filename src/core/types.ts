@@ -58,6 +58,8 @@ export interface Manifest {
   version?: string;
   /** 사진·에셋 지문 (build_lite_card.py). 카드 업데이트로 못 옮기는 사진이 바뀌었는지 비교용 */
   assets?: string;
+  /** 카드 사진 [이름, 지문, 확장자, 바이트]. 창의 업데이트가 지문이 바뀐 것만 받아 바꾼다 (host/picpack.ts) */
+  pictures?: [string, string, string, number][];
 }
 
 export interface StartChoice {

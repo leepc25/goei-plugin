@@ -11,6 +11,12 @@ const urls = new Map<string, string | null | 'loading'>();
 let redraw: () => void = () => {};
 let queued = false;
 
+/** 카드 사진을 바꾼 뒤: 읽어 둔 이미지를 잊고 다시 읽는다 */
+export function forgetImages(): void {
+  urls.clear();
+  schedule();
+}
+
 export function setImageRedraw(fn: () => void): void {
   redraw = fn;
 }

@@ -4,6 +4,7 @@
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import assert from 'node:assert/strict';
 
@@ -1882,14 +1883,24 @@ if (fixture.globalLore.some(packed)) {
   payload.version = '9.0.0';
   payload.data.firstMessage = '새 첫 안내';
   const man = payload.data.globalLore.find((e) => e.comment === 'Plugin manifest');
-  man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0' });
+  // 사진: 카드 사진 하나는 지문이 바뀌고 하나는 새로 생긴다 (나머지는 지문이 같아 받지 않음)
+  const picBytes = [1, 2, 3, 4, 5];
+  const picHash = createHash('sha1').update(Buffer.from(picBytes)).digest('hex').slice(0, 12);
+  const pics = (manifest.pictures ?? []).map((x) => [...x]);
+  assert.ok(pics.length > 100, '카드 매니페스트에 사진 목록');
+  const changed = pics[0][0];
+  pics[0] = [changed, picHash, 'avif', 5];
+  pics.push(['NewPic', picHash, 'avif', 5]);
+  man.content = JSON.stringify({ ...JSON.parse(man.content), version: '9.0.0', pictures: pics });
   const { page, errors } = await boot(fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } });
+  await page.evaluate((bytes) => { window.__picBytes = bytes; }, picBytes);
   await page.evaluate((p) => {
     // 실제처럼 목록(card-update.json)과 조각(card-update.N.txt)으로 나눠 준다
     const text = JSON.stringify(p);
     const parts = [text.slice(0, 1000), text.slice(1000, 50000), text.slice(50000)];
     window.__fetch = (url) => url.includes('version.json') ? { card: '9.0.0', plugin: '0.0.1', minPlugin: '0.0.1' }
       : url.includes('card-update.json') ? { schema: 1, version: p.version, minPlugin: '0.0.1', parts: parts.map((_, i) => `card-update.${i + 1}.txt`), length: text.length }
+      : url.includes('/pic/') ? new Uint8Array(window.__picBytes)
       : (/card-update\.(\d+)\.txt/.exec(url) ? parts[+/card-update\.(\d+)\.txt/.exec(url)[1] - 1] : null);
     const dir = window.__char.globalLore.find((e) => e.comment === 'Directory');
     if (dir) dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
@@ -1914,9 +1925,16 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.upd-plan');
   if (shots) await page.locator('.upd-plan').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-settings.png` });
   assert.match(await page.textContent('.upd-plan'), /첫 안내/);
+  assert.match(await page.textContent('.upd-plan'), /카드 사진: 바뀜 1 · 새로 1/);
   await page.click('[data-action="upd-apply"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
   const ch = await page.evaluate(() => window.__char);
+  const before = fixture.additionalAssets.find((r) => r[0] === changed);
+  const after = ch.additionalAssets.find((r) => r[0] === changed);
+  assert.notEqual(after[1], before[1], '지문이 바뀐 카드 사진은 새 것으로');
+  assert.ok(ch.additionalAssets.some((r) => r[0] === 'NewPic'), '새 카드 사진 추가');
+  assert.equal(ch.additionalAssets.length, fixture.additionalAssets.length + 1, '나머지 사진은 그대로');
+  assert.equal((await page.evaluate(() => window.__calls.fetch.filter((u) => u.includes('/pic/')))).length, 2, '바뀐 사진만 받음');
   assert.equal(ch.firstMessage, '새 첫 안내');
   assert.match(ch.globalLore.find((e) => e.comment === 'Directory')?.content ?? '"내가 고친 값"', /내가 고친 값/, '명부는 보존');
   assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
@@ -1926,7 +1944,7 @@ if (fixture.globalLore.some(packed)) {
   assert.match(await page.textContent('.gx-settings'), /v9\.0\.0으로 바꿨어요/);
   assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);
-  console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지)');
+  console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지, 바뀐 카드 사진만 받기)');
   await page.close();
 }
 
