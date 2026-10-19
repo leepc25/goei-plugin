@@ -1412,6 +1412,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .ph-grip:hover i, .ph-drawer.open .ph-grip i { background: var(--dim); }
   .ph-drawer .ph-tools { height: auto; max-height: 0; padding: 0 8px; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
   .ph-drawer.open .ph-tools { max-height: 64px; padding: 0 8px 8px; }
+  /* 펼치면 위 경계를 또렷하게 (내용과 서랍이 붙어 보였다) */
+  .ph-drawer.open { border-top-color: var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .55); }
   .ph-drawer:not(.open) .gn-nickform { display: none; }
   .ph-drawer .gn-nickform { margin: 0 12px 8px; }
   .ph-side > .gn-composer { border-bottom: 0; }
@@ -1680,7 +1682,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
 .gx-content > .ph-drawer { margin: 0; }
 .ph-dbody { padding: 0 12px; }
-.gx-bdrawer .ph-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* 신분증·순찰·설정 세 칸 (두 칸이면 설정이 둘째 줄로 밀려 잘렸다) */
+.gx-bdrawer .ph-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 760px) {
   .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
   .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
