@@ -26,16 +26,16 @@ function corner(pos: string, p: Palette): string {
 
 // 넓은 화면에서 글 오른쪽만 휑하지 않게: 유령·글 묶음을 가운데로, 카드 폭도 조금 좁게 (사용자 2026-10-19). 크기 격리(container-type) 때문에 fit-content는 못 씀
 export function landingHtml(p: Palette): string {
-  const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="50" height="50"');
+  const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="92" height="92"');
   return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:37em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;`
     + `background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:left;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)">`
     + `<span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;`
     + `background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>`
     + corner('top left', p) + corner('top right', p) + corner('bottom left', p) + corner('bottom right', p)
     + `<div data-goei-part="row" style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px 26px">`
-    // 왼쪽: 유령
-    + `<div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:84px;height:84px;border-radius:24px;`
-    + `background:${p.accentBg};border:1px solid ${p.accentLine};color:${p.signal}">${ghost}</div>`
+    // 유령은 상자 없이 크게 (사용자 2026-10-19). 은은한 빛만 뒤에
+    + `<div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;`
+    + `color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div>`
     // 오른쪽: 글
     + `<div data-goei-part="text" style="flex:0 1 auto;min-width:0">`
     + `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em">`
@@ -79,8 +79,8 @@ export const LANDING_CSS = `
   [data-goei-card="landing"] [data-goei-part="text"] { flex-basis: 100% !important; text-align: center !important; }
   [data-goei-card="landing"] [data-goei-part="text"] > div:first-child { justify-content: center !important; }
   [data-goei-card="landing"] [data-goei-part="text"] > div:last-child { justify-content: center !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 68px !important; height: 68px !important; border-radius: 20px !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 40px; height: 40px; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 80px !important; height: 80px !important; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 76px; height: 76px; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-goei-card="landing"] [data-goei-part] { animation: none !important; }
