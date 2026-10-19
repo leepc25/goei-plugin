@@ -1794,3 +1794,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-crop-size { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); }
 .dir-crop-size input { flex: 1; accent-color: var(--signal); }
 .dir-crop > .gx-mini { align-self: flex-start; }
+
+/* 1인 검증판 / 기존 순찰 선택. 작은 화면에서도 닫기 버튼을 밀어내지 않는다. */
+.gx-game [data-game-mode] { font: inherit; font-size: 11px; padding: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+.gx-game [data-game-mode][aria-pressed="true"] { border-color: var(--signal, #c4a776); background: var(--panel2); }
+@media (max-width: 520px) { .gx-game > .gx-head { flex-wrap: wrap; gap: 4px; } }

@@ -80,6 +80,20 @@ await build({
   outfile: 'dist-test/game-sim.mjs',
 });
 
+// 1인 액션 검증판과 순수 전투 로직 시험용.
+await build({ ...common, entryPoints: ['src/game/action/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/action-demo.js' });
+await build({ entryPoints: ['src/game/action/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/action-sim.mjs' });
+
+await build({ ...common, entryPoints: ['src/ui/game.ts'], format: 'esm', write: true, outfile: 'dist-test/action-ui.js' });
+
+// 설치 없이 여는 단일 HTML 검증판. 필요한 기존 그림 4장만 포함한다.
+const actionArt = {
+  atlas: JSON.parse(readFileSync('game-pack/patrol/atlas.json', 'utf8')),
+  files: Object.fromEntries(['a-jyaldi', 'e-corner', 'e-watchman', 'bg-belt-school'].map(name => [name, `data:image/png;base64,${readFileSync(`game-pack/patrol/${name}.png`).toString('base64')}`])),
+};
+const actionCode = readFileSync('dist-test/action-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
+writeFileSync('dist/goei-action-demo.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>관리국 1인 전투 검증판</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script>window.__GOEI_ACTION_ART__=${JSON.stringify(actionArt)}</script><script type="module">${actionCode}</script></html>`);
+
 // 게임 그림 팩: 플러그인과 따로, 원하는 사람만 게임 창에서 받는다 (release/ 폴더에서 바로 받거나 파일로 넣기).
 // 그림이 그대로면 바이트도 같아서 매번 써도 바뀐 것으로 잡히지 않는다
 const PACK_VERSION = Number(/PACK_VERSION = (\d+)/.exec(readFileSync('src/game/assets.ts', 'utf8'))[1]);

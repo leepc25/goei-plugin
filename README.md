@@ -21,6 +21,7 @@ RisuAI용 괴담 시뮬레이션 「괴이 ː 이면세계」의 전용 플러�
 
 ## 개발
 
+- 1인 전투 검증판: [구현 범위·실행 방법](src/game/action/README.md). 빌드 후 `tests/game/action.html`에서 시험하거나 플러그인 게임 창에서 선택합니다. 기존 순찰과 저장은 분리됩니다.
 - 게임 기획: [관리국 괴이 탐사 게임 상세 기획서](docs/관리국_괴이탐사_게임_상세기획서.md). 기존 관찰형 순찰에서 1인 벨트스크롤 탐사형으로 확장하기 위한 설계 초안이며, 현재 구현 범위와는 구분합니다.
 - `npm run build`: `dist/goei-plugin.js`(시작기, `src/main.ts`), `dist/goei-body.js`(본체, `src/body.ts`)와 받기용 조각 `dist/goei-body.json`·`goei-body.N.txt`, 게임 그림 팩.
 - 릴리스 때 `release/`에 `goei-plugin.js`와 함께 `goei-body.json`·`goei-body.*.txt`도 복사합니다. 시작기는 자기 판과 같은 본체만 받습니다.
