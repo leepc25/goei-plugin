@@ -24,9 +24,10 @@ function corner(pos: string, p: Palette): string {
     + `border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
 }
 
+// 넓은 화면에서 글 오른쪽만 휑하지 않게: 유령·글 묶음을 가운데로, 카드 폭도 조금 좁게 (사용자 2026-10-19). 크기 격리(container-type) 때문에 fit-content는 못 씀
 export function landingHtml(p: Palette): string {
   const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="50" height="50"');
-  return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:40em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;`
+  return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:37em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;`
     + `background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:left;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)">`
     + `<span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;`
     + `background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>`
@@ -36,7 +37,7 @@ export function landingHtml(p: Palette): string {
     + `<div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:84px;height:84px;border-radius:24px;`
     + `background:${p.accentBg};border:1px solid ${p.accentLine};color:${p.signal}">${ghost}</div>`
     // 오른쪽: 글
-    + `<div data-goei-part="text" style="flex:1 1 15em;min-width:0">`
+    + `<div data-goei-part="text" style="flex:0 1 auto;min-width:0">`
     + `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em">`
     + `<span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span>`
     + `<span style="display:inline-flex;align-items:center;gap:6px;color:${p.sub};letter-spacing:.2em">`
