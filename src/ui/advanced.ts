@@ -3,7 +3,8 @@
 import { ADV, advChanged, advItem, advResetVars, advValue, advVar, type AdvFeature, type AdvItem } from '../core/advanced';
 import { getPrefs } from '../core/settings';
 import { savePrefs } from '../host/prefs';
-import { updateChat, type ChatContext } from '../host/risu';
+import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
+import { syncDecorators, type LoreMode } from '../core/lore';
 import { ICONS } from './icons';
 import { keepOpen } from './panels';
 
@@ -126,7 +127,10 @@ export async function handleAdvanced(action: string, value: string | undefined, 
     env.render();
     return true;
   }
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...patch } }));
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...patch } }));
+  // 로어북 보내는 방식을 바꾸면 카드 로어북 첫 줄(@@dont_activate)도 바로 맞춘다
+  const mode = advValue(saved?.scriptstate, 'gen', 'lore_mode') as LoreMode;
+  if (syncDecorators(ctx.char.globalLore, mode)) await updateCharacterLore(ctx.charIndex, (lore) => syncDecorators(lore, mode)).catch(() => false);
   await env.refresh();
   return true;
 }

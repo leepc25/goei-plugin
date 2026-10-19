@@ -26,7 +26,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput } from './core/w
 import { missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { updateChat } from './host/risu';
+import { updateCharacterLore, updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -37,7 +37,7 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { setWaiting } from './host/waiting';
-import { computeLore, loreOptions, patchSlots, sameVars, type LoreMode } from './core/lore';
+import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 
@@ -95,10 +95,18 @@ function loreFor(char: LoreChar, chat: Chat, input?: string) {
 
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
 async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  let char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
   if (!char || !readManifest(char.globalLore)) return;
+  // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
+  const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
+  const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
+  if (syncDecorators(char.globalLore, mode)) {
+    await updateCharacterLore(charIndex, (lore) => syncDecorators(lore, mode));
+    char = ((await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null) ?? char;
+  }
+  const c = char;
   await updateChat(charIndex, chatIndex, (cur) => {
-    const got = loreFor(char, cur, input);
+    const got = loreFor(c, cur, input);
     if (!got || sameVars(cur.scriptstate, got.vars)) return null;
     return { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...got.vars } };
   });

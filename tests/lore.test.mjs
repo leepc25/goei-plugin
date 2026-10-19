@@ -18,14 +18,15 @@ const BOOKS = [
   entry(F.ag, '이도형', 'Do-hyeong, 이도형, 도형', 600),
   entry(F.ag, '제이', 'Jay, 제이, 경비반장', 600),
   { comment: '내가 넣은 요원', key: '아무개', folder: F.ag, insertorder: 600, mode: 'normal', content: '데코 없음' },
+  ...['Faction', 'Mystic', 'Anomaly', 'Agent'].map((n) => ({ comment: `📚Lore slot · ${n}`, key: '', alwaysActive: true, mode: 'normal', content: '' })),
 ];
 const entries = lore.managedEntries(BOOKS);
 const pick = (texts, state = {}) =>
   lore.pickLore(entries, texts.map((t, i) => (typeof t === 'string' ? { role: i % 2 ? 'char' : 'user', data: t } : t)), { target: '', board: [], deployed: [], ...state }, { depth: 10, budget: 0 }).map((p) => p.entry.name);
 
-test('@@dont_activate가 붙은 네 폴더 항목만 고른다', () => {
-  assert.equal(entries.length, 10);
-  assert.ok(!entries.some((e) => e.name === '내가 넣은 요원'));
+test('자리 항목이 있는 카드에서 네 폴더의 키 있는 항목을 고른다', () => {
+  assert.equal(entries.length, 11);
+  assert.deepEqual(lore.managedEntries(BOOKS.filter((e) => !String(e.comment).startsWith('📚'))), [], '자리 항목이 없으면 아무것도');
   assert.equal(entries.find((e) => e.name === '어두운 정원').keys.find((k) => k.text === '어두운 정원').rule, 'confirm');
   assert.equal(entries.find((e) => e.name === '차여진').keys.find((k) => k.text === '여진').rule, 'alias');
   assert.equal(entries.find((e) => e.name === '제이').keys.find((k) => k.text === '제이').rule, 'plain');
@@ -124,4 +125,20 @@ test('카드 업데이트: 사용자가 고친 키는 남긴다', () => {
   assert.equal(by.A.key, 'a');
   assert.equal(by.B.key, 'b, mine');
   assert.equal(by.B.content, 'new');
+});
+
+test('보내는 방식에 맞게 @@dont_activate 줄을 붙이고 뗀다', () => {
+  assert.equal(lore.syncDecorators(BOOKS.filter((e) => !String(e.comment).startsWith('📚')), 'plugin'), null, '자리 항목이 없으면 그대로');
+  const got = lore.syncDecorators(BOOKS, 'plugin');
+  assert.equal(got.find((e) => e.comment === '내가 넣은 요원').content, '@@dont_activate\n데코 없음');
+  assert.equal(got.filter((e, i) => e !== BOOKS[i]).length, 1, '다른 항목은 그대로');
+  assert.equal(lore.syncDecorators(got, 'plugin'), null);
+  const risu = lore.syncDecorators(got, 'risu');
+  assert.equal(risu.find((e) => e.comment === '제이').content, '제이');
+  assert.ok(risu.every((e) => !String(e.content).includes('@@dont_activate')));
+  assert.equal(risu.find((e) => e.comment.startsWith('📚')).alwaysActive, true, '자리 항목은 그대로');
+  const chat = { message: [{ role: 'user', data: '제이' }], scriptstate: {} };
+  const r = lore.computeLore(risu, chat, { mode: 'risu', depth: 10, budget: 0, env: { vars: {} } });
+  assert.deepEqual(r.picks.map((p) => p.entry.name), ['제이'], 'Risu가 켤 것 추정');
+  assert.equal(r.vars.$goei_lore_agent, '', 'Risu가 직접 켤 때는 자리를 비움');
 });

@@ -116,23 +116,66 @@ export function stripDecorators(content: string): string {
 
 const cache = new WeakMap<LoreEntry[], ManagedEntry[]>();
 
-/** 플러그인이 고르는 항목: 네 폴더 안에서 @@dont_activate가 붙은 것. 붙지 않은 항목은 Risu가 지금처럼 켠다 */
-export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
-  const books = lore ?? [];
-  const hit = cache.get(books);
-  if (hit) return hit;
+/** 자리 항목 4개가 다 있는 카드인지 (없으면 고른 글이 들어갈 곳이 없어 아무것도 하지 않는다) */
+export function hasSlots(lore: LoreEntry[] | undefined): boolean {
+  const names = new Set((lore ?? []).map((e) => str(e.comment)));
+  return LORE_KINDS.every((k) => names.has(SLOTS[k].comment));
+}
+
+/** 네 폴더 안의 키 있는 보통 항목인지 */
+function folderKeys(books: LoreEntry[]): Map<string, LoreKind> {
   const kinds = new Map<string, LoreKind>();
   for (const e of books) {
     const k = e.mode === 'folder' ? FOLDER_KIND[folderWord(str(e.comment))] : undefined;
     if (k && typeof e.key === 'string') kinds.set(e.key, k);
   }
+  return kinds;
+}
+const managedHere = (e: LoreEntry, kinds: Map<string, LoreKind>) => e.mode !== 'folder' && kinds.has(str(e.folder)) && !!str(e.key).trim() && !e.alwaysActive;
+
+/**
+ * 보내는 방식에 맞게 네 폴더 항목의 첫 줄을 맞춘다. 플러그인이 고름: @@dont_activate를 붙여 Risu가 켜지 않게
+ * (사용자가 새로 넣은 항목 포함). Risu가 직접: 그 줄을 떼어 Risu가 예전처럼 켜게. 바꿀 것이 없으면 null
+ */
+export function syncDecorators(lore: LoreEntry[] | undefined, mode: LoreMode): LoreEntry[] | null {
+  const books = lore ?? [];
+  if (!hasSlots(books)) return null;
+  const kinds = folderKeys(books);
+  let n = 0;
+  const next = books.map((e) => {
+    if (!managedHere(e, kinds)) return e;
+    const content = str(e.content);
+    const on = hasDontActivate(content);
+    if (mode === 'plugin' && !on) {
+      n++;
+      return { ...e, content: `${DONT_ACTIVATE}\n${content}` };
+    }
+    if (mode === 'risu' && on) {
+      n++;
+      return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, '') };
+    }
+    return e;
+  });
+  return n ? next : null;
+}
+
+/** 플러그인이 고르는 항목: 자리 항목이 있는 카드에서 네 폴더 안의 키 있는 항목 (첫 줄은 syncDecorators가 맞춘다) */
+export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
+  const books = lore ?? [];
+  const hit = cache.get(books);
+  if (hit) return hit;
+  if (!hasSlots(books)) {
+    cache.set(books, []);
+    return [];
+  }
+  const kinds = folderKeys(books);
   const groups = new Map<string, string[]>();
   for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? '' : a.affiliation].filter(Boolean));
   const out: ManagedEntry[] = [];
   books.forEach((e, index) => {
     const kind = kinds.get(str(e.folder));
     const content = str(e.content);
-    if (!kind || e.mode === 'folder' || !hasDontActivate(content)) return;
+    if (!kind || !managedHere(e, kinds)) return;
     const raw = keysOf(e);
     const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
     const keys: LoreKey[] = [];
@@ -359,8 +402,9 @@ export function computeLore(lore: LoreEntry[] | undefined, chat: Chat, o: LoreOp
   if (!entries.length) return null;
   const msgs = loreMessages(chat, o.input, o.mode === 'risu');
   const picks = o.mode === 'risu' ? pickLoreRisu(entries, msgs, o.depth) : pickLore(entries, msgs, loreState(chat), o, msgs.at(-1)?.role === 'user');
-  const texts = slotTexts(picks, o.env);
-  return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts[k]])) };
+  // Risu가 직접 켤 때는 자리를 비운다 (picks는 확인 화면에 보일 Risu 방식 추정)
+  const texts = o.mode === 'risu' ? null : slotTexts(picks, o.env);
+  return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ''])) };
 }
 
 /** 채팅 변수가 이미 이 값인지 (같으면 저장하지 않는다) */

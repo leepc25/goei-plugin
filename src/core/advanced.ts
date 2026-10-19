@@ -53,7 +53,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     {
       title: '본편 로어북',
       items: [
-        { key: 'lore_mode', label: '로어북 켜기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인 규칙'], ['risu', 'Risu 방식']], hint: '세력·특수·괴이·요원 로어북을 이름이 나왔을 때 켜요. Risu 방식은 낱말 속 글자도 걸려요' },
+        { key: 'lore_mode', label: '로어북 보내기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인이 고름'], ['risu', 'Risu가 직접']], hint: '세력·특수·괴이·요원 로어북을 누가 켤지 정해요. Risu가 직접 켜면 낱말 속 글자에도 걸려요' },
       ],
     },
   ],

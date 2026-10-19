@@ -26,17 +26,17 @@ export function loreCheckBox(ctx: ChatContext): string {
   const names = (l: LorePick[]) => new Set(l.map((p) => p.entry.name));
   const mine = names(now.picks);
   const theirs = names(other.picks);
-  const size = Object.values(now.vars).reduce((n, v) => n + tokens(v), 0);
+  const size = now.picks.reduce((n, p) => n + tokens(p.entry.content), 0);
   const list = now.picks.length ? now.picks.map((p) => item(p, mode === 'risu')).join('') : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
   const only = (l: LorePick[], not: Set<string>, risu: boolean) => l.filter((p) => !not.has(p.entry.name)).map((p) => item(p, risu)).join('');
-  const otherName = mode === 'risu' ? '플러그인 규칙' : 'Risu 방식';
+  const otherIf = mode === 'risu' ? '플러그인이 고르면' : 'Risu가 직접 켜면';
   const more = only(other.picks, mine, mode !== 'risu');
   const less = only(now.picks, theirs, mode === 'risu');
   const diff = more || less
-    ? `${more ? `<h4 class="lc-sub">${otherName}이면 더 켜짐</h4>${more}` : ''}${less ? `<h4 class="lc-sub">${otherName}이면 안 켜짐</h4>${less}` : ''}`
-    : `<p class="ps-note">${otherName}과 같아요.</p>`;
+    ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ''}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ''}`
+    : '<p class="ps-note">달라지는 것이 없어요.</p>';
   return `<details class="ps-adv" data-keep="lore-check"${keepOpen('lore-check')}><summary class="ps-adv-sum"><b>본편 로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
-    <section class="ps-group"><h3>다음 요청에 넣을 로어북</h3><div class="ps-rows">${list}</div></section>
-    <section class="ps-group"><h3>${otherName}과 비교</h3><div class="ps-rows">${diff}</div></section>
+    <section class="ps-group"><h3>${mode === 'risu' ? 'Risu가 켤 로어북' : '다음 요청에 넣을 로어북'}</h3><div class="ps-rows">${list}</div></section>
+    <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;
 }

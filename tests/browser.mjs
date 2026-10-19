@@ -333,6 +333,15 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.evaluate(() => { window.__chat.message = Array.from({ length: 12 }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: '아무도 없다.' })); });
   const sent2 = await page.evaluate((m) => window.__calls.replacers[0](m, 'model'), req);
   assert.equal(sent2[0].content, '앞\n\n\n\n뒤', '깊이 밖으로 밀리면 뺀다');
+  // 보내는 방식 「Risu가 직접」: 카드 로어북의 @@dont_activate 줄을 떼고 자리를 비운다. 되돌리면 다시 붙인다
+  const lore = (name) => page.evaluate((n) => window.__char.globalLore.find((e) => e.comment === n).content, name);
+  await page.evaluate(() => { window.__chat.scriptstate.$gen_lore_mode = 'risu'; });
+  await page.evaluate(() => window.__calls.handlers.input('차여진이 웃었다.'));
+  assert.ok(!(await lore('차여진')).startsWith('@@dont_activate'), 'Risu가 직접: 줄을 뗌');
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$goei_lore_agent), '', 'Risu가 직접: 자리 비움');
+  await page.evaluate(() => { window.__chat.scriptstate.$gen_lore_mode = ''; });
+  await page.evaluate(() => window.__calls.handlers.input('차여진이 웃었다.'));
+  assert.ok((await lore('차여진')).startsWith('@@dont_activate\n'), '플러그인이 고름: 다시 붙임');
   assert.deepEqual(errors, []);
   console.log('PASS 본편 로어북: 보낼 때 고르기, 요청 직전 맞추기');
   await page.close();
