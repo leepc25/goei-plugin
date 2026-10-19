@@ -32,6 +32,9 @@ export function landingHtml(p: Palette): string {
     + `<span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;`
     + `background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>`
     + corner('top left', p) + corner('top right', p) + corner('bottom left', p) + corner('bottom right', p)
+    // STANDBY는 제목 줄이 아니라 카드 오른쪽 위 모서리에 (사용자 2026-10-19)
+    + `<span style="position:absolute;top:13px;right:34px;display:inline-flex;align-items:center;gap:6px;font-family:${MONO};font-size:10px;letter-spacing:.2em;color:${p.sub}">`
+    + `<span data-goei-part="dot" style="width:6px;height:6px;border-radius:50%;background:${p.signal}"></span>STANDBY</span>`
     + `<div data-goei-part="row" style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px 26px">`
     // 유령은 상자 없이 크게 (사용자 2026-10-19). 은은한 빛만 뒤에
     + `<div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;`
@@ -40,8 +43,7 @@ export function landingHtml(p: Palette): string {
     + `<div data-goei-part="text" style="flex:0 1 auto;min-width:0">`
     + `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em">`
     + `<span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span>`
-    + `<span style="display:inline-flex;align-items:center;gap:6px;color:${p.sub};letter-spacing:.2em">`
-    + `<span data-goei-part="dot" style="width:7px;height:7px;border-radius:50%;background:${p.signal}"></span>STANDBY</span></div>`
+    + `</div>`
     + title(p)
     + `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}">`
     + `<span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div>`
