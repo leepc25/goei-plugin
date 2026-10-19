@@ -75,9 +75,9 @@
     const bytes = new Uint8Array((hex3.match(/../g) ?? []).map((h) => parseInt(h, 16)));
     return new TextDecoder().decode(bytes);
   }
-  function sceneRecord(summary, body4) {
+  function sceneRecord(summary, body5) {
     return `%%SCENE_CARD:${toHex(JSON.stringify(summary))}%%
-${body4}
+${body5}
 %%/SCENE_CARD%%`;
   }
   function hasSceneCard(text) {
@@ -130,7 +130,7 @@ ${text}
     return text.replace(/%%GOEI_START%%\r?\n/g, "").replace(/\r?\n%%\/GOEI_START%%/g, "");
   }
   function renderStartCards(text, render2) {
-    return text.replace(START_RE, (_all, body4, unsent) => render2(body4, !!unsent));
+    return text.replace(START_RE, (_all, body5, unsent) => render2(body5, !!unsent));
   }
   function stripUnsentMark(text) {
     return text.replace(UNSENT_RE, "");
@@ -151,10 +151,10 @@ ${text}
       }
     });
   }
-  function withUserInput(d, body4, extra) {
-    if (!extra.trim()) return body4;
+  function withUserInput(d, body5, extra) {
+    if (!extra.trim()) return body5;
     const tpl = d?.format.user_input ?? "Situation:\n[[INPUT]]";
-    return `${body4}
+    return `${body5}
 
 ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   }
@@ -669,14 +669,14 @@ ${TYPE_GM[f.type ?? "org"]}`).join("")
   var EXTRA = "{{getvar::fac_extra}}";
   function placeFactionExtra(text) {
     const bare = text.split(EXTRA).join("");
-    const body4 = bare.replace(/\s+$/, "");
-    const next = body4.slice(1).search(/\n## /);
-    if (next < 0) return text.includes(EXTRA) ? text : `${body4}${EXTRA}
+    const body5 = bare.replace(/\s+$/, "");
+    const next = body5.slice(1).search(/\n## /);
+    if (next < 0) return text.includes(EXTRA) ? text : `${body5}${EXTRA}
 `;
     const at = next + 1;
-    const want = `${body4.slice(0, at).replace(/\s+$/, "")}${EXTRA}
+    const want = `${body5.slice(0, at).replace(/\s+$/, "")}${EXTRA}
 
-${body4.slice(at).replace(/^\s+/, "")}
+${body5.slice(at).replace(/^\s+/, "")}
 `;
     if (text.includes(EXTRA) && text.indexOf(EXTRA) === want.indexOf(EXTRA) && text.split(EXTRA).length === 2) return text;
     return want;
@@ -1622,14 +1622,14 @@ ${body4.slice(at).replace(/^\s+/, "")}
     }
     if (prev !== null) keep.push(prev);
     const envs = [];
-    const body4 = keep.filter((l) => {
+    const body5 = keep.filter((l) => {
       if (/^\s*[[【［]\s*▣\s*[|｜]/.test(l)) {
         envs.push(l.trim());
         return false;
       }
       return !/^\s*\[AC\s*\|/.test(l) && !/^\s*\[◎\s*\|/.test(l);
     });
-    let s4 = body4.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
+    let s4 = body5.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
     if (envs.length) s4 = (s4 ? `${s4}
 ` : "") + envs.join("\n");
     return s4;
@@ -3047,8 +3047,8 @@ ${themeVars("[x-goei-fab]")}
     const records = items.filter((a) => a.kind === "image" || a.content.trim()).map((a) => attachRecord(a.kind, a.content, a.asset));
     return [...records, message.trim()].filter(Boolean).join("\n");
   }
-  function attachmentRecords(body4) {
-    return [...String(body4 ?? "").matchAll(ANY())].map((m) => ({ start: m.index, end: m.index + m[0].length, text: m[0] }));
+  function attachmentRecords(body5) {
+    return [...String(body5 ?? "").matchAll(ANY())].map((m) => ({ start: m.index, end: m.index + m[0].length, text: m[0] }));
   }
   function unhex(s4) {
     if (s4.length % 2) return "";
@@ -3071,8 +3071,8 @@ ${themeVars("[x-goei-fab]")}
       return null;
     }
   }
-  function bodyParts(body4) {
-    const text = String(body4 ?? "");
+  function bodyParts(body5) {
+    const text = String(body5 ?? "");
     const out = [];
     let last = 0;
     for (const m of text.matchAll(ANY())) {
@@ -3087,11 +3087,11 @@ ${themeVars("[x-goei-fab]")}
     if (last < text.length) out.push({ kind: "text", text: text.slice(last) });
     return out.filter((p) => p.kind !== "text" || p.text.trim());
   }
-  function describe(body4, brief = false) {
-    return bodyParts(body4).map((p) => p.kind === "text" ? p.text : `[${ATTACH_LABELS[p.kind]}${brief ? "" : p.kind === "image" ? ` 첨부: 실제 이미지${p.text ? ` (설명: ${p.text})` : ""}` : ` 첨부 내용: ${p.text}`}]`).join("");
+  function describe(body5, brief = false) {
+    return bodyParts(body5).map((p) => p.kind === "text" ? p.text : `[${ATTACH_LABELS[p.kind]}${brief ? "" : p.kind === "image" ? ` 첨부: 실제 이미지${p.text ? ` (설명: ${p.text})` : ""}` : ` 첨부 내용: ${p.text}`}]`).join("");
   }
-  function previewText(body4) {
-    return bodyParts(body4).map((p) => p.kind === "text" ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`).join(" ");
+  function previewText(body5) {
+    return bodyParts(body5).map((p) => p.kind === "text" ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`).join(" ");
   }
   function attachUrl(content) {
     const m = /^(https?:\/\/[^\s<>"']+)$/.exec(String(content ?? "").trim());
@@ -3112,13 +3112,13 @@ ${themeVars("[x-goei-fab]")}
     const known = /* @__PURE__ */ new Map();
     const out = messages.map((m) => {
       if (m.role === "system" || typeof m.content !== "string" || !hasAttachment(m.content)) return m;
-      const content = m.content.replace(ANY(), (whole, kind, body4, code) => {
+      const content = m.content.replace(ANY(), (whole, kind, body5, code) => {
         let a = null;
         if (code !== void 0) {
           const p = decodeLegacy(code);
           if (p) a = { kind: p.kind, content: p.text, ...p.asset ? { asset: p.asset } : {} };
-        } else if (kind && isKind(kind.toLowerCase()) && unescapeJson(body4 ?? "").trim()) {
-          a = { kind: kind.toLowerCase(), content: unescapeJson(body4 ?? "").trim() };
+        } else if (kind && isKind(kind.toLowerCase()) && unescapeJson(body5 ?? "").trim()) {
+          a = { kind: kind.toLowerCase(), content: unescapeJson(body5 ?? "").trim() };
         }
         if (!a) return "[지원하지 않는 첨부]";
         const key = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
@@ -3168,13 +3168,13 @@ ${themeVars("[x-goei-fab]")}
     const queue = o.focus ? [...newest.filter((x, i) => x.free || i < o.recent), ...newest.filter((x, i) => !x.free && i >= o.recent && x.related)] : newest;
     const kept = [];
     let counted = 0;
-    for (const item2 of queue) {
-      if (kept.includes(item2)) continue;
-      if (!item2.free && counted >= o.max) continue;
-      const next = [...kept, item2].sort((a, b) => a.order - b.order);
+    for (const item3 of queue) {
+      if (kept.includes(item3)) continue;
+      if (!item3.free && counted >= o.max) continue;
+      const next = [...kept, item3].sort((a, b) => a.order - b.order);
       if (!o.fits(next.map((x) => x.data))) continue;
       kept.splice(0, kept.length, ...next);
-      if (!item2.free) counted++;
+      if (!item3.free) counted++;
     }
     return kept.map((x) => x.data);
   }
@@ -3480,14 +3480,14 @@ ${themeVars("[x-goei-fab]")}
     const unread = boardUnread(st) || dmUnread(st);
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
   }
-  function addUserPost(st, nick, title2, body4, date) {
+  function addUserPost(st, nick, title2, body5, date) {
     st.seq += 1;
     const p = {
       id: st.seq,
       date: validDate(date),
       nick: cut(nick, 80),
       title: trimTokens(title2, LIMITS.title_tokens),
-      body: trimTokens(body4, LIMITS.post_tokens),
+      body: trimTokens(body5, LIMITS.post_tokens),
       views: 0,
       votes: 0,
       mine: true,
@@ -3496,11 +3496,11 @@ ${themeVars("[x-goei-fab]")}
     st.posts.unshift(p);
     return p;
   }
-  function addUserComment(st, postIdValue, parent, nick, body4, now = "") {
+  function addUserComment(st, postIdValue, parent, nick, body5, now = "") {
     const p = findPost(st, postIdValue);
     if (!p) throw new GnetError("대상 글이 없어졌어요.");
     if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
-    p.comments.push({ parent, nick, body: trimTokens(body4, LIMITS.comment_tokens), mine: true, unread: false });
+    p.comments.push({ parent, nick, body: trimTokens(body5, LIMITS.comment_tokens), mine: true, unread: false });
     stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
     return p.comments.length;
   }
@@ -3571,12 +3571,12 @@ ${themeVars("[x-goei-fab]")}
       quoteAuthor: c ? c.nick : ""
     };
   }
-  function addOutgoingDm(st, nick, body4, date, source4) {
+  function addOutgoingDm(st, nick, body5, date, source4) {
     if (!st.sources[nick]) {
       const s4 = source4 ?? findPublicSource(st, nick);
       if (s4) st.sources[nick] = s4;
     }
-    st.dms.push({ nick, side: "me", body: trimTokens(body4, LIMITS.dm_tokens), unread: false, date });
+    st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });
   }
   function parseJsonPayload(raw) {
     let text = String(raw ?? "").replace(/^﻿/, "").trim();
@@ -3944,20 +3944,20 @@ ${themeVars("[x-goei-fab]")}
     return { ...plan, allowed: true, post, comment, commentIndex: ci };
   }
   function incomingTask(plan, activityPosts) {
-    const body4 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
+    const body5 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
     if (plan.allowed && plan.post) {
-      body4.incomingOrigin = {
+      body5.incomingOrigin = {
         title: plan.post.title,
         author: plan.post.nick,
         content: plan.post.body,
         ...plan.comment ? { comment: { author: plan.comment.nick, content: plan.comment.body } } : {}
       };
-      body4.previousIncoming = plan.history;
+      body5.previousIncoming = plan.history;
     }
-    if (activityPosts) body4.activityPosts = activityPosts;
+    if (activityPosts) body5.activityPosts = activityPosts;
     return `
 COMBINED OUTPUT OPTIONS:
-${JSON.stringify(body4)}`;
+${JSON.stringify(body5)}`;
   }
   function commitIncoming(st, rows, plan, date, postOverride) {
     if (!plan.allowed || !plan.post) return false;
@@ -3975,13 +3975,13 @@ ${JSON.stringify(body4)}`;
       if (pick2) return;
       if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
       const nick = str(c.nick).trim();
-      const body4 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
+      const body5 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
       if (nick === "__NONE__") return void quiet++;
       if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
       if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
-      if (!body4 || body4 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
-      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body4)) return void quiet++;
-      pick2 = { nick, body: body4 };
+      if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
+      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
+      pick2 = { nick, body: body5 };
     });
     if (!pick2) {
       if (!reasons.length) return false;
@@ -4004,9 +4004,9 @@ ${JSON.stringify(body4)}`;
     } catch {
       throw new GnetError('Expected {"body":"reply text"}.', raw);
     }
-    const body4 = isObj(value) ? stripForged(str(value.body)).trim() : "";
-    if (!body4) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
-    return trimTokens(body4, LIMITS.dm_tokens);
+    const body5 = isObj(value) ? stripForged(str(value.body)).trim() : "";
+    if (!body5) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
+    return trimTokens(body5, LIMITS.dm_tokens);
   }
   function mainContext(st, nick, rules2, focus) {
     const posts = [];

@@ -1,4 +1,4 @@
-) || prev.sender !== m.sender;
+ev) || prev.sender !== m.sender;
       const last = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
@@ -795,7 +795,7 @@
       return note.trim();
     });
   }
-  async function writeComment(ctx2, env2, postId2, parent, body4) {
+  async function writeComment(ctx2, env2, postId2, parent, body5) {
     const key = chatKey2(ctx2);
     if (jobs2.has(key)) {
       gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
@@ -805,7 +805,7 @@
     let index = 0;
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readGnet(chat);
-      index = addUserComment(st, postId2, parent, nick, body4, dateNow(chat));
+      index = addUserComment(st, postId2, parent, nick, body5, dateNow(chat));
       return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index }) }), st);
     });
     gnet.compose = null;
@@ -820,7 +820,7 @@
       let value;
       let prompt;
       try {
-        prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => commentPrompt(source2(ctx2, saved), st, postId2, index, body4, plan, nick, names3(ctx2)));
+        prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => commentPrompt(source2(ctx2, saved), st, postId2, index, body5, plan, nick, names3(ctx2)));
         value = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved))).value;
       } catch (error) {
         throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
@@ -847,7 +847,7 @@
       return note.trim();
     });
   }
-  async function sendDm(ctx2, env2, nick, body4, src) {
+  async function sendDm(ctx2, env2, nick, body5, src) {
     const key = chatKey2(ctx2);
     if (jobs2.has(key)) {
       gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
@@ -860,7 +860,7 @@
     }
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
       const st = readGnet(chat);
-      addOutgoingDm(st, nick, body4, dateNow(chat), src);
+      addOutgoingDm(st, nick, body5, dateNow(chat), src);
       return writeGnet(chat, st);
     });
     const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
@@ -876,7 +876,7 @@
       const s4 = gnetSettings(saved.scriptstate);
       let reply;
       try {
-        const prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => dmPrompt(source2(ctx2, saved), st, nick, body4, me, names3(ctx2)));
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => dmPrompt(source2(ctx2, saved), st, nick, body5, me, names3(ctx2)));
         reply = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
       } catch (error) {
         await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
@@ -1642,9 +1642,9 @@
   function finishAsset(job, response, d, limit) {
     const patches = parsePatches(response);
     if (!patches.length) return null;
-    const body4 = applyPatches(job.paras, patches, limit, d);
-    return job.trailing ? `${body4}
-${job.trailing}` : body4;
+    const body5 = applyPatches(job.paras, patches, limit, d);
+    return job.trailing ? `${body5}
+${job.trailing}` : body5;
   }
 
   // src/host/asset.ts
@@ -3037,4 +3037,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
   .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
 }
-/* 사진+톡·위키 칸: PC는 없는 셈 
+/* 사진+톡·위키 칸: PC는 없는 셈

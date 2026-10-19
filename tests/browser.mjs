@@ -2082,6 +2082,8 @@ if (fixture.globalLore.some(packed)) {
   await startedWithReply(page);
   await page.click('[x-goei-fab] button');
   await page.click('[data-action="game-open"] >> nth=0');
+  // 게임 창 기본은 1인 전투 검증판 (main 액션 작업). 이 시험은 기존 순찰
+  await page.click('[data-game-mode="patrol"]');
   await page.waitForSelector('.gx-gp');
   if (shots) {
     await page.screenshot({ path: `${shots}/game-pack.png` });

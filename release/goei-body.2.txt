@@ -532,16 +532,16 @@ ${JSON.stringify({ feature: "phone", records })}
   var CALL_RE = /%%PHONE_CALL:([0-9a-f]*)%%\r?\n([\s\S]*?)\r?\n%%\/PHONE_CALL%%/g;
   var fromHex2 = (h) => new TextDecoder().decode(new Uint8Array((h.match(/../g) ?? []).map((x) => parseInt(x, 16))));
   function callRecord(target, purpose) {
-    const body4 = `{{user}} places a phone call to ${target}.${purpose.trim() ? `
+    const body5 = `{{user}} places a phone call to ${target}.${purpose.trim() ? `
 
 ${purpose.trim()}` : ""}`;
     return `%%PHONE_CALL:${hex2(target)}%%
-${body4}
+${body5}
 %%/PHONE_CALL%%`;
   }
   var hasCall = (t) => typeof t === "string" && t.includes("%%PHONE_CALL:");
   function stripCall(t) {
-    return t.replace(CALL_RE, (_, __, body4) => body4);
+    return t.replace(CALL_RE, (_, __, body5) => body5);
   }
   function renderCalls(t, render2) {
     return t.replace(CALL_RE, (all, h) => {
@@ -698,20 +698,20 @@ ${body4}
   var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", gen: "$gen_" };
   var advItems = (f) => ADV[f].flatMap((g) => [...g.chips ?? [], ...g.items]);
   var advItem = (f, key) => advItems(f).find((i) => i.key === key);
-  var advVar = (f, item2) => item2.v ?? `${PREFIX[f]}${item2.key}`;
-  function advCheck(item2, raw) {
+  var advVar = (f, item3) => item3.v ?? `${PREFIX[f]}${item3.key}`;
+  function advCheck(item3, raw) {
     if (raw === void 0 || raw === null) return null;
     const s4 = String(raw).trim();
     if (!s4 || s4 === "null") return null;
-    if (item2.type === "bool") return s4 === "1" || s4 === "0" ? s4 : null;
-    if (item2.type === "pick") return item2.opts?.some(([v]) => v === s4) ? s4 : null;
+    if (item3.type === "bool") return s4 === "1" || s4 === "0" ? s4 : null;
+    if (item3.type === "pick") return item3.opts?.some(([v]) => v === s4) ? s4 : null;
     const n = Number(s4);
-    return Number.isInteger(n) && n >= (item2.min ?? 0) && n <= (item2.max ?? Infinity) ? String(n) : null;
+    return Number.isInteger(n) && n >= (item3.min ?? 0) && n <= (item3.max ?? Infinity) ? String(n) : null;
   }
   function advValue(state, f, key) {
-    const item2 = advItem(f, key);
-    if (!item2) return "";
-    return advCheck(item2, state?.[advVar(f, item2)]) ?? String(item2.def);
+    const item3 = advItem(f, key);
+    if (!item3) return "";
+    return advCheck(item3, state?.[advVar(f, item3)]) ?? String(item3.def);
   }
   var advNum = (state, f, key) => Number(advValue(state, f, key));
   var advOn = (state, f, key) => advValue(state, f, key) === "1";
@@ -1154,8 +1154,8 @@ ${body4}
           continue;
         }
         const yes = head.startsWith("#if") ? truthy(evaluate(head.replace(/^#if(::)?/, ""), env2).trim()) : whenCond(head, env2);
-        const body4 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
-        out += evaluate(body4, env2);
+        const body5 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
+        out += evaluate(body5, env2);
         i = b.end;
         continue;
       }
@@ -1352,8 +1352,8 @@ ${c}`)]).join("\n\n");
     return Array.isArray(chat.localLore) ? chat.localLore : [];
   }
   function parseDocContent(title2, content) {
-    const body4 = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(content)?.[0];
-    if (!body4) return null;
+    const body5 = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(content)?.[0];
+    if (!body5) return null;
     let meta = null;
     const m = /<!--NW_META:([\s\S]*?)-->/.exec(content);
     if (m) {
@@ -1363,7 +1363,7 @@ ${c}`)]).join("\n\n");
         meta = null;
       }
     }
-    return { title: title2, meta, body: body4 };
+    return { title: title2, meta, body: body5 };
   }
   function docsIn(entries2) {
     const out = [];
@@ -1400,8 +1400,8 @@ ${c}`)]).join("\n\n");
     const text = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     const map = JSON.parse(text);
     const docs = [];
-    for (const [title2, body4] of Object.entries(map)) {
-      const doc = typeof body4 === "string" ? parseDocContent(title2, body4) : null;
+    for (const [title2, body5] of Object.entries(map)) {
+      const doc = typeof body5 === "string" ? parseDocContent(title2, body5) : null;
       if (doc) docs.push(doc);
     }
     pack = { src, docs };
@@ -1430,17 +1430,17 @@ ${c}`)]).join("\n\n");
   function findDoc(chat, title2, lore) {
     return listDocs(chat, lore).find((d) => d.title === title2) ?? null;
   }
-  function docContent(meta, body4) {
+  function docContent(meta, body5) {
     const json = JSON.stringify(meta).replace(/--/g, "-\\u002d");
     return `[NW_PRIVATE_BEGIN]
 <!--NW_META:${json}-->
-${body4}
+${body5}
 [NW_PRIVATE_END]`;
   }
-  function saveDoc(chat, meta, body4) {
+  function saveDoc(chat, meta, body5) {
     const lore = localLore(chat).slice();
     const name = WIKI_PREFIX + meta.title;
-    const content = docContent(meta, body4);
+    const content = docContent(meta, body5);
     const i = lore.findIndex((e) => e.comment === name);
     const entry = {
       key: "",
@@ -1520,8 +1520,8 @@ ${req.writingRequest.trim()}`;
       primarySources
     };
   }
-  function innerBody(body4) {
-    return body4.replace(/^<lightboard-namuwiki[^>]*>\s*/, "").replace(/\s*<\/lightboard-namuwiki>\s*$/, "");
+  function innerBody(body5) {
+    return body5.replace(/^<lightboard-namuwiki[^>]*>\s*/, "").replace(/\s*<\/lightboard-namuwiki>\s*$/, "");
   }
   var ARROW = /➡️|➡︎|➡/g;
   function acceptArticle(raw, title2, canon2) {
@@ -1532,20 +1532,20 @@ ${req.writingRequest.trim()}`;
       if (/<lightboard-namuwiki[\s>]/.test(text)) throw new WikiError("문서가 끝까지 오지 않았어요 (닫는 태그 없음). 응답 길이 한도에 걸렸을 수 있어요. 분량을 줄이거나 다시 시도해 주세요.");
       throw new WikiError("위키 형식(<lightboard-namuwiki>)이 아닌 응답이에요.");
     }
-    let body4 = m[0];
-    if (!body4.includes("[Paragraph]")) throw new WikiError("본문 문단([Paragraph])이 없는 응답이에요.");
-    body4 = body4.replace(ARROW, "➡️").replace(/\{\{/g, "&#123;&#123;").replace(/\}\}/g, "&#125;&#125;");
+    let body5 = m[0];
+    if (!body5.includes("[Paragraph]")) throw new WikiError("본문 문단([Paragraph])이 없는 응답이에요.");
+    body5 = body5.replace(ARROW, "➡️").replace(/\{\{/g, "&#123;&#123;").replace(/\}\}/g, "&#125;&#125;");
     const safeTitle = title2.replace(/"/g, "&quot;");
-    body4 = body4.replace(/^<lightboard-namuwiki([^>]*)>/, (_all, attrs2) => {
+    body5 = body5.replace(/^<lightboard-namuwiki([^>]*)>/, (_all, attrs2) => {
       const rest = attrs2.replace(/\sdoc_title="[^"]*"/, "");
       return `<lightboard-namuwiki doc_title="${safeTitle}"${rest}>`;
     });
-    return reviewLinks(body4, title2, canon2);
+    return reviewLinks(body5, title2, canon2);
   }
-  function reviewLinks(body4, title2, canon2) {
+  function reviewLinks(body5, title2, canon2) {
     const seen = /* @__PURE__ */ new Set();
     const self = canon2(title2);
-    return body4.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
+    return body5.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
       const t = label.trim();
       if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label;
       const c = canon2(t);
@@ -1580,8 +1580,8 @@ ${req.writingRequest.trim()}`;
     const i = f.indexOf(":");
     return i < 0 ? ["", f.trim()] : [f.slice(0, i).trim(), f.slice(i + 1).trim()];
   }
-  function renderArticle(body4, o) {
-    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body4)?.[0] ?? "";
+  function renderArticle(body5, o) {
+    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
     const a = attrs(open3);
     const color = /^#[0-9a-fA-F]{3,8}$/.test(a.main_color ?? "") ? a.main_color : "#27685b";
     const notes = [];
@@ -1593,7 +1593,7 @@ ${req.writingRequest.trim()}`;
       notes.push(t);
       return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
     });
-    const lines = innerBody(body4).split("\n");
+    const lines = innerBody(body5).split("\n");
     const blocks = [];
     for (const line of lines) {
       const m = /^\s*\[(\w+)\](.*)$/.exec(line);
@@ -2171,7 +2171,7 @@ ${commentTimeRule(dateNow(src.chat))}`;
     return { ...pack2(src, b, guideline, `${b.read("PUBLIC.POST_FORMAT")}
 ${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity };
   }
-  function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body4}`) {
+  function commentPrompt(src, st, postId2, replyTo, body5, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body5}`) {
     const b = gnetBooks(src);
     const p = findPost(st, postId2);
     if (!p) throw new GnetError("대상 글이 없어졌어요.");
@@ -2371,38 +2371,38 @@ ${next.content.trim()}`;
   function mainContextRules2(src) {
     return policySections(src.char.globalLore, "Phone").MAIN_CONTEXT?.trim() || null;
   }
-  function rules(src, body4, mode2) {
+  function rules(src, body5, mode3) {
     const p = sections(src);
     const keys = ["COMMON"];
     let direct = false;
     let group4 = false;
-    for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
+    for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
       if (r.receiveMessages === false) continue;
       if (r.kind === "group") group4 = true;
       else direct = true;
     }
-    if (body4.invitationCheck?.allowed) group4 = true;
-    const manual = body4.participants.some((x) => x.manuallySavedContact);
+    if (body5.invitationCheck?.allowed) group4 = true;
+    const manual = body5.participants.some((x) => x.manuallySavedContact);
     if (direct || group4) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
       if (group4) keys.push("GROUP_ROOMS");
-      if (body4.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
-      if (body4.crossRoomMessages?.length || (body4.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
-      if (hasAttachment(JSON.stringify(body4))) keys.push("ATTACHMENT_READ");
+      if (body5.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
+      if (body5.crossRoomMessages?.length || (body5.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
+      if (hasAttachment(JSON.stringify(body5))) keys.push("ATTACHMENT_READ");
       keys.push("ATTACHMENT_OUTPUT", "PATCH");
     }
-    keys.push(mode2);
-    if (mode2 === "REPLY") {
-      const action = body4.room?.action?.type ?? "refresh";
+    keys.push(mode3);
+    if (mode3 === "REPLY") {
+      const action = body5.room?.action?.type ?? "refresh";
       const map = { send: "ACTION_SEND", invite_initial: "ACTION_INVITE_INITIAL", invite_more: "ACTION_INVITE_MORE", refresh: "ACTION_REFRESH" };
       keys.push(map[action] ?? "ACTION_REFRESH");
     } else {
-      if (body4.invitationCheck?.allowed) keys.push("GROUP_INVITES");
-      if (body4.announcementCheck?.allowed) keys.push("ANNOUNCEMENTS");
+      if (body5.invitationCheck?.allowed) keys.push("GROUP_INVITES");
+      if (body5.announcementCheck?.allowed) keys.push("ANNOUNCEMENTS");
     }
     if (manual) keys.push("MANUAL_CONTACT", "CONTACT_CONTEXT", "SINGLE_PASS_CONTACT");
-    keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode2}`);
+    keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode3}`);
     return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE2].join("\n\n");
   }
   function roomPacket(r) {
@@ -2503,10 +2503,10 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       universe
     };
   }
-  function crossRoom(body4, st) {
-    const wanted = new Set(body4.participants.map((p) => p.sender));
+  function crossRoom(body5, st) {
+    const wanted = new Set(body5.participants.map((p) => p.sender));
     if (!wanted.size) return;
-    const covered = new Set((body4.rooms ?? (body4.room ? [body4.room] : [])).map((r) => r.id));
+    const covered = new Set((body5.rooms ?? (body5.room ? [body5.room] : [])).map((r) => r.id));
     const counts = /* @__PURE__ */ new Map();
     const candidates = [];
     for (const [rid, r] of Object.entries(st.rooms)) {
@@ -2544,45 +2544,45 @@ ${recentStory.map((m) => m.text).join("\n")}`,
         });
       }
     }
-    if (records.length) body4.crossRoomMessages = records.reverse();
+    if (records.length) body5.crossRoomMessages = records.reverse();
   }
-  function contactSources(body4) {
+  function contactSources(body5) {
     const out = [];
     const add = (kind, text, sender) => {
       const t = String(text ?? "").trim();
       if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...sender ? { sender } : {} });
     };
-    const u = body4.narratorOnly.universe;
+    const u = body5.narratorOnly.universe;
     add("world", u.characterDescription);
     add("author_note", u.authorsNote);
     for (const b of u.activeLoreBooks) add("world", b.content);
-    for (const m of body4.narratorOnly.recentStory) add(m.role === "user" ? "story_input" : "story", m.text);
-    for (const p of body4.participants) {
+    for (const m of body5.narratorOnly.recentStory) add(m.role === "user" ? "story_input" : "story", m.text);
+    for (const p of body5.participants) {
       add("character", p.lore, p.sender);
       add("contact_memo", p.contactMemo, p.sender);
       if (p.narratorOnlyAgentStatus) add("status", JSON.stringify(p.narratorOnlyAgentStatus), p.sender);
     }
-    for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
+    for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
       for (const c of r.activeMembers) add("private_direction", r.privateDirection, c);
       for (const m of r.messages) if (m.type === "text") {
         for (const c of m.audience ?? []) if (c !== m.sender) add("received_message", m.content, c);
       }
     }
-    for (const m of body4.crossRoomMessages ?? []) for (const c of m.knownBy) if (c !== m.sender) add("received_message", m.content, c);
-    for (const post of body4.publicBoard?.posts ?? []) add("public_board", JSON.stringify(post));
+    for (const m of body5.crossRoomMessages ?? []) for (const c of m.knownBy) if (c !== m.sender) add("received_message", m.content, c);
+    for (const post of body5.publicBoard?.posts ?? []) add("public_board", JSON.stringify(post));
     return out;
   }
-  function finish(src, body4, mode2, names4) {
-    const contactMode = body4.participants.some((p) => p.manuallySavedContact);
+  function finish(src, body5, mode3, names4) {
+    const contactMode = body5.participants.some((p) => p.manuallySavedContact);
     if (contactMode) {
-      body4.recipientEvidenceSources = contactSources(body4);
-      body4.singlePassContact = true;
+      body5.recipientEvidenceSources = contactSources(body5);
+      body5.singlePassContact = true;
     }
-    const system = rules(src, body4, mode2);
+    const system = rules(src, body5, mode3);
     return {
       messages: [
         { role: "system", content: factionCodesToNames(system, names4) },
-        { role: "user", content: factionCodesToNames(JSON.stringify(body4), names4) }
+        { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
       ],
       contactMode
     };
@@ -2598,10 +2598,10 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const set2 = phoneSettings(src.chat.scriptstate);
     const packet = roomPacket(r);
     const participants = r.members.map((cid) => participant(src, dir2.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set2.related, set2.status, names4));
-    const body4 = { room: packet, participants, narratorOnly: narrator(src, names4, set2.related, JSON.stringify(packet)) };
-    crossRoom(body4, st);
-    body4.publicBoard = gnetBoard(src, JSON.stringify(packet));
-    return finish(src, body4, "REPLY", names4);
+    const body5 = { room: packet, participants, narratorOnly: narrator(src, names4, set2.related, JSON.stringify(packet)) };
+    crossRoom(body5, st);
+    body5.publicBoard = gnetBoard(src, JSON.stringify(packet));
+    return finish(src, body5, "REPLY", names4);
   }
   function refreshPrompt2(src, st, dir2, names4, rng) {
     const chat = src.chat;
@@ -2652,7 +2652,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const { channel: _channel, ...publicAnnounce } = announce;
     void _channel;
     const invite = invitationPacket(st, participants.map((p) => p.sender), inviteOn);
-    const body4 = {
+    const body5 = {
       rooms,
       participants,
       narratorOnly: narrator(src, names4, set2.related, JSON.stringify(rooms)),
@@ -2660,9 +2660,9 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       activityCheck: { incoming: incomingOn, groupInvites: inviteOn },
       invitationCheck: invite
     };
-    crossRoom(body4, st);
-    body4.publicBoard = gnetBoard(src, JSON.stringify(rooms));
-    return { prompt: finish(src, body4, "REFRESH", names4), selected, receive, announce, invite, reason: "" };
+    crossRoom(body5, st);
+    body5.publicBoard = gnetBoard(src, JSON.stringify(rooms));
+    return { prompt: finish(src, body5, "REFRESH", names4), selected, receive, announce, invite, reason: "" };
   }
   function personOfContact(c) {
     const p = { id: c.id, name: c.name };
@@ -3095,9 +3095,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var stLabel = (st) => st === "작전투입" ? "작전" : st;
   var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
   var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
-  function agentInner(char, p, st, situation = "", act = "") {
+  function agentInner(char, p, st, situation = "", act2 = "") {
     const role = [p.department, p.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
   }
   function showIdCard(html) {
     const box = document.createElement("div");
@@ -3482,15 +3482,15 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     if (en2) {
       const words = key.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
       if (!words.length || words.every((w) => EN_STOP.has(w))) return null;
-      const body5 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
-      return new RegExp(`(?<![a-z0-9])${body5}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
+      const body6 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
+      return new RegExp(`(?<![a-z0-9])${body6}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
     }
     const parts = key.split(/\s+/).filter(Boolean);
     if (!parts.length) return null;
     const gap = !person && syllables(key) >= 3 ? "\\s*" : "";
     const word = (p) => [...p].map(escRe).join(gap);
-    const body4 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
-    return new RegExp(`(?<![\\p{L}\\p{N}])${body4}`, "giu");
+    const body5 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
+    return new RegExp(`(?<![\\p{L}\\p{N}])${body5}`, "giu");
   }
   function keysOf2(e) {
     const all = str2(e.key).split(",");
@@ -3518,7 +3518,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     return kinds;
   }
   var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
-  function syncDecorators(lore, mode2) {
+  function syncDecorators(lore, mode3) {
     const books = lore ?? [];
     if (!hasSlots(books)) return null;
     const kinds = folderKeys(books);
@@ -3527,12 +3527,12 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       if (!managedHere(e, kinds)) return e;
       const content = str2(e.content);
       const on2 = hasDontActivate(content);
-      if (mode2 === "plugin" && !on2) {
+      if (mode3 === "plugin" && !on2) {
         n++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (mode2 === "risu" && on2) {
+      if (mode3 === "risu" && on2) {
         n++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
@@ -3708,14 +3708,14 @@ ${content}` };
     return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
   }
   var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
-  function loreOptions(char, chat, mode2, user = "") {
+  function loreOptions(char, chat, mode3, user = "") {
     const ls = char.loreSettings ?? {};
     const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
     const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
     const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
     const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n, e) => n + tokens(str2(e.content)), 0);
     return {
-      mode: mode2,
+      mode: mode3,
       depth,
       budget: total ? Math.max(1, Math.floor((total - always) * 0.9)) : 0,
       env: { vars: chat.scriptstate ?? {}, char: char.name, ...user ? { user } : {} }
@@ -3770,19 +3770,19 @@ ${after}`);
   // src/ui/advanced.ts
   var esc5 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var advUi = { confirm: "" };
-  function control(f, item2, cur) {
-    const id = `${f}:${item2.key}`;
-    if (item2.type === "pick") {
-      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc5(label)}</button>`).join("")}</div>`;
+  function control(f, item3, cur) {
+    const id = `${f}:${item3.key}`;
+    if (item3.type === "pick") {
+      return `<div class="gx-segs gx-segs-sm">${(item3.opts ?? []).map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc5(label)}</button>`).join("")}</div>`;
     }
-    const zero = cur === "0" && item2.zero;
-    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item2.min ?? 0}" max="${item2.max ?? ""}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? "" : esc5(cur)}"${item2.zero ? ` placeholder="${esc5(item2.zero)}"` : ""} aria-label="${esc5(item2.label)}"><span>${esc5(item2.unit ?? "")}</span></span>`;
+    const zero = cur === "0" && item3.zero;
+    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item3.min ?? 0}" max="${item3.max ?? ""}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? "" : esc5(cur)}"${item3.zero ? ` placeholder="${esc5(item3.zero)}"` : ""} aria-label="${esc5(item3.label)}"><span>${esc5(item3.unit ?? "")}</span></span>`;
   }
-  function row(f, item2, state) {
-    const cur = advValue(state, f, item2.key);
-    const changed = cur !== String(item2.def);
-    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item2.key}" aria-label="${esc5(item2.label)} 기본값으로" title="기본값 ${esc5(item2.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
-    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc5(item2.label)}</b>${item2.hint ? `<small>${esc5(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}${reset}</div></div>`;
+  function row(f, item3, state) {
+    const cur = advValue(state, f, item3.key);
+    const changed = cur !== String(item3.def);
+    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item3.key}" aria-label="${esc5(item3.label)} 기본값으로" title="기본값 ${esc5(item3.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
+    return `<div class="ps-row adv-row${item3.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc5(item3.label)}</b>${item3.hint ? `<small>${esc5(item3.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item3, cur)}${reset}</div></div>`;
   }
   function chips(f, items, state) {
     return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
@@ -3793,29 +3793,29 @@ ${after}`);
   function advancedBox(f, state) {
     const n = advChanged(state, f).length;
     const groups = ADV[f].map((g, gi) => {
-      const body4 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
+      const body5 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
       if (g.fold) {
-        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc5(g.title)}</summary><div class="ps-rows">${body4}</div></details>`;
+        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc5(g.title)}</summary><div class="ps-rows">${body5}</div></details>`;
       }
-      return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body4}</div></section>`;
+      return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body5}</div></section>`;
     }).join("");
     const foot = n ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
     return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
   }
-  var blank2 = (item2) => item2.v ? String(item2.def) : "";
+  var blank2 = (item3) => item3.v ? String(item3.def) : "";
   function parse2(value) {
     const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
     if (!m) return null;
     const f = m[1];
-    const item2 = advItem(f, m[2]);
-    if (!item2) return null;
+    const item3 = advItem(f, m[2]);
+    if (!item3) return null;
     let v = m[3].trim();
-    if (item2.type === "num") {
+    if (item3.type === "num") {
       const n = Number(v);
-      if (v === "" || !Number.isFinite(n)) return [f, item2, blank2(item2)];
-      v = String(Math.min(item2.max ?? Infinity, Math.max(item2.min ?? 0, Math.round(n))));
-    } else if (item2.type === "bool" ? v !== "0" && v !== "1" : !item2.opts?.some(([o]) => o === v)) return null;
-    return [f, item2, v === String(item2.def) ? blank2(item2) : v];
+      if (v === "" || !Number.isFinite(n)) return [f, item3, blank2(item3)];
+      v = String(Math.min(item3.max ?? Infinity, Math.max(item3.min ?? 0, Math.round(n))));
+    } else if (item3.type === "bool" ? v !== "0" && v !== "1" : !item3.opts?.some(([o]) => o === v)) return null;
+    return [f, item3, v === String(item3.def) ? blank2(item3) : v];
   }
   async function handleAdvanced(action, value, ctx2, env2, scope = "chat") {
     const v = value ?? "";
@@ -3830,8 +3830,8 @@ ${after}`);
       if (hit2) vars = { [advVar(hit2[0], hit2[1])]: hit2[2] };
     } else if (action === "adv-reset") {
       const [f, key] = v.split(":");
-      const item2 = f in ADV ? advItem(f, key) : void 0;
-      if (item2) vars = { [advVar(f, item2)]: blank2(item2) };
+      const item3 = f in ADV ? advItem(f, key) : void 0;
+      if (item3) vars = { [advVar(f, item3)]: blank2(item3) };
     } else if (action === "adv-reset-yes") {
       advUi.confirm = "";
       if (v in ADV) vars = advResetVars(v);
@@ -3854,8 +3854,8 @@ ${after}`);
       return true;
     }
     const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
-    const mode2 = advValue(saved?.scriptstate, "gen", "lore_mode");
-    if (syncDecorators(ctx2.char.globalLore, mode2)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode2)).catch(() => false);
+    const mode3 = advValue(saved?.scriptstate, "gen", "lore_mode");
+    if (syncDecorators(ctx2.char.globalLore, mode3)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode3)).catch(() => false);
     await env2.refresh();
     return true;
   }
@@ -4424,4 +4424,4 @@ ${after}`);
       const prev = shown2[i - 1];
       const next = shown2[i + 1];
       const me = m.sender === "me";
-      const first = !!sep || !isMsg(prev
+      const first = !!sep || !isMsg(pr

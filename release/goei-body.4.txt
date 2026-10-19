@@ -1,4 +1,4 @@
-치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+ 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
 .gx-acard-side { display: contents; }
 /* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
 @media (max-width: 760px) {
@@ -544,6 +544,11 @@
 .lc-kind { flex: none; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font-size: 12px; line-height: 1.6; }
 .lc-sub { margin: 0; padding: 10px 14px 4px; font-size: 13px; font-weight: 600; color: var(--dim); }
 .ps-rows > .ps-note { margin: 0; padding: 12px 14px; }
+
+/* 1인 검증판 / 기존 순찰 선택. 작은 화면에서도 닫기 버튼을 밀어내지 않는다. */
+.gx-game [data-game-mode] { font: inherit; font-size: 11px; padding: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+.gx-game [data-game-mode][aria-pressed="true"] { border-color: var(--signal, #c4a776); background: var(--panel2); }
+@media (max-width: 520px) { .gx-game > .gx-head { flex-wrap: wrap; gap: 4px; } }
 `;
 
   // src/ui/mbar.ts
@@ -623,13 +628,13 @@
     }
     return false;
   }
-  function bindSwipeBack(root2, step2) {
+  function bindSwipeBack(root2, step3) {
     if (bound.has(root2)) return;
     bound.add(root2);
     let x0 = 0;
     let y0 = 0;
-    let mode2 = "off";
-    let act = null;
+    let mode3 = "off";
+    let act2 = null;
     let sign = 1;
     let box = null;
     const reset = (animate) => {
@@ -642,24 +647,24 @@
       box = null;
     };
     root2.addEventListener("touchstart", (e) => {
-      mode2 = "off";
+      mode3 = "off";
       if (e.touches.length !== 1 || !matchMedia("(max-width: 760px)").matches) return;
       const t = e.target;
       if (t.closest(SKIP) || inSideScroller(t, root2)) return;
       x0 = e.touches[0].clientX;
       y0 = e.touches[0].clientY;
-      mode2 = "wait";
+      mode3 = "wait";
     }, { passive: true });
     root2.addEventListener("touchmove", (e) => {
-      if (mode2 === "off") return;
+      if (mode3 === "off") return;
       const dx = e.touches[0].clientX - x0;
       const dy = e.touches[0].clientY - y0;
-      if (mode2 === "wait") {
+      if (mode3 === "wait") {
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        act = Math.abs(dx) > Math.abs(dy) * 1.4 ? step2(dx > 0 ? -1 : 1) : null;
+        act2 = Math.abs(dx) > Math.abs(dy) * 1.4 ? step3(dx > 0 ? -1 : 1) : null;
         sign = dx > 0 ? 1 : -1;
-        if (!act) return void (mode2 = "off");
-        mode2 = "back";
+        if (!act2) return void (mode3 = "off");
+        mode3 = "back";
         box = root2.querySelector(".gx-content");
       }
       if (box) {
@@ -669,17 +674,17 @@
       }
     }, { passive: true });
     const end = (e) => {
-      if (mode2 !== "back") return void (mode2 = "off");
-      mode2 = "off";
+      if (mode3 !== "back") return void (mode3 = "off");
+      mode3 = "off";
       const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-      const run3 = dx * sign >= FIRE ? act : null;
-      act = null;
+      const run3 = dx * sign >= FIRE ? act2 : null;
+      act2 = null;
       reset(!run3);
       run3?.();
     };
     root2.addEventListener("touchend", end, { passive: true });
     root2.addEventListener("touchcancel", () => {
-      mode2 = "off";
+      mode3 = "off";
       reset(true);
     }, { passive: true });
   }
@@ -781,13 +786,13 @@
       if (e.pointerType !== "mouse" || e.button !== 0 || v.z === 1 || e.target.closest(".gx-zoom")) return;
       const sx = e.clientX, sy = e.clientY, sv = { ...v };
       dragged = false;
-      const move = (m) => {
+      const move2 = (m) => {
         const dx = m.clientX - sx, dy = m.clientY - sy;
         if (Math.hypot(dx, dy) > MOVE) dragged = true;
         if (dragged) v = { ...sv, x: sv.x + dx, y: sv.y + dy }, apply();
       };
-      const up = () => (window.removeEventListener("pointermove", move), window.removeEventListener("pointerup", up));
-      window.addEventListener("pointermove", move);
+      const up = () => (window.removeEventListener("pointermove", move2), window.removeEventListener("pointerup", up));
+      window.addEventListener("pointermove", move2);
       window.addEventListener("pointerup", up);
     });
   }
@@ -823,21 +828,23 @@
   var FACE_FILE = "faces";
   var PACK_FILES = [...Object.values(SHEET_FILES), ...Object.values(BACK_FILES), FACE_FILE];
   var PACK_NAME = `goei-game-${PACK_ID}.pack`;
-  function parsePack(b) {
+  function parsePack(b, required = PACK_FILES) {
     try {
       if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
       const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
       const head = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
-      if (typeof head.id !== "string" || typeof head.version !== "number" || !head.atlas || !Array.isArray(head.files)) return null;
+      if (typeof head.id !== "string" || typeof head.version !== "number" || !head.atlas || !Array.isArray(head.files))
+        return null;
       const base = 12 + len;
       const files = /* @__PURE__ */ new Map();
       for (const row5 of head.files) {
         if (!Array.isArray(row5)) return null;
         const [name, at, n] = row5;
-        if (typeof name !== "string" || typeof at !== "number" || typeof n !== "number" || base + at + n > b.length) return null;
+        if (typeof name !== "string" || typeof at !== "number" || typeof n !== "number" || base + at + n > b.length)
+          return null;
         files.set(name, b.slice(base + at, base + at + n));
       }
-      if (!PACK_FILES.every((f) => files.has(f))) return null;
+      if (!required.every((f) => files.has(f))) return null;
       return { id: head.id, version: head.version, atlas: head.atlas, files };
     } catch {
       return null;
@@ -1031,7 +1038,7 @@
     formSquad(run3, meta.squad, "walk");
     return run3;
   }
-  function formSquad(run3, squad, act) {
+  function formSquad(run3, squad, act2) {
     const order = [...squad].sort((a, b) => agentDef(a).range - agentDef(b).range);
     const keep = new Map(run3.units.filter(isAgent).map((u) => [u.kind, u]));
     run3.units = run3.units.filter((u) => !isAgent(u));
@@ -1039,7 +1046,7 @@
       const u = makeAgent(run3, id, slot, run3.x);
       const old = keep.get(id);
       if (old) u.hp = Math.max(1, old.hp), u.gauge = old.gauge;
-      u.act = act;
+      u.act = act2;
       run3.units.push(u);
     });
   }
@@ -1245,9 +1252,9 @@
     }
     const dx = goal - u.x;
     if (Math.abs(dx) > 0.5) {
-      const step2 = Math.sign(dx) * Math.min(Math.abs(dx), TUNE.walkSpeed * 1.25 * dt);
-      u.x += step2;
-      u.stride += Math.abs(step2);
+      const step3 = Math.sign(dx) * Math.min(Math.abs(dx), TUNE.walkSpeed * 1.25 * dt);
+      u.x += step3;
+      u.stride += Math.abs(step3);
       if (u.act !== "walk") u.act = "walk", u.t = 0;
       return;
     }
@@ -1314,9 +1321,9 @@
     }
     const gap = u.x - target.x;
     if (gap > d.range) {
-      const step2 = Math.min(gap - d.range, d.speed * dt);
-      u.x -= step2;
-      u.stride += step2;
+      const step3 = Math.min(gap - d.range, d.speed * dt);
+      u.x -= step3;
+      u.stride += step3;
       if (u.act !== "walk") u.act = "walk", u.t = 0;
       return;
     }
@@ -1772,11 +1779,11 @@
     root2.addEventListener("click", (ev) => {
       const t = ev.target.closest("button");
       if (!t || !run3) return;
-      const act = t.dataset.act;
-      if (act === "squad") return openSquad();
-      if (act === "rec") return openRecord();
-      if (act === "close") return void (sheet.hidden = true);
-      if (act === "apply" && picking.length === 4) {
+      const act2 = t.dataset.act;
+      if (act2 === "squad") return openSquad();
+      if (act2 === "rec") return openRecord();
+      if (act2 === "close") return void (sheet.hidden = true);
+      if (act2 === "apply" && picking.length === 4) {
         applySquad(run3, meta, picking);
         dirty2 = true;
         cardKey = topKey = "";
@@ -1845,6 +1852,955 @@
       save2(true);
       style.remove();
       root2.remove();
+    };
+  }
+
+  // src/game/action/style.css
+  var style_default3 = ".ga {\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  background: #09121c;\n  color: #e6e2cd;\n  font: 13px monospace;\n  box-sizing: border-box;\n  overflow: hidden;\n  outline: none;\n  color-scheme: dark;\n}\n.ga * {\n  box-sizing: border-box;\n}\n.ga button {\n  font: inherit;\n  color: inherit;\n  background: #172b3b;\n  border: 2px solid #667e86;\n  border-radius: 0;\n  padding: 7px 10px;\n  cursor: pointer;\n  touch-action: none;\n}\n.ga button:focus-visible {\n  outline: 3px solid #ffd899;\n  outline-offset: 1px;\n}\n.ga button:disabled {\n  opacity: 0.4;\n  cursor: default;\n}\n.ga-hud {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  align-items: center;\n  padding: 8px;\n  border-bottom: 2px solid #354e5b;\n}\n.ga-hud progress {\n  width: 95px;\n  height: 10px;\n  accent-color: #e3a666;\n}\n.ga-hud span {\n  white-space: nowrap;\n}\n.ga-fit {\n  flex: 1;\n  min-height: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  background: #040a10;\n  overflow: hidden;\n}\n.ga canvas {\n  display: block;\n  image-rendering: pixelated;\n  touch-action: none;\n  outline: none;\n}\n.ga-foot {\n  flex: none;\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 5px;\n  padding: 6px;\n  border-top: 2px solid #354e5b;\n}\n.ga-note {\n  font-size: 11px;\n  color: #a9bdc3;\n  padding: 4px 8px;\n  margin: 0;\n}\n.ga-msg {\n  flex: 1;\n  min-width: 140px;\n  color: #ffda9b;\n}\n.ga-controls {\n  display: flex;\n  gap: 5px;\n  flex-wrap: wrap;\n}\n.ga-menu {\n  position: absolute;\n  inset: 0;\n  background: #07121aef;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 16px;\n  padding: 20px;\n  text-align: center;\n  z-index: 2;\n}\n.ga-menu[hidden] {\n  display: none;\n}\n.ga-menu p {\n  max-width: 500px;\n  margin: 0;\n  line-height: 1.8;\n}\n.ga [data-busy] {\n  color: #a9bdc3;\n}\n.ga[data-save-error='true'] [data-busy] {\n  color: #ff9981;\n}\n@media (max-width: 760px) {\n  .ga {\n    font-size: 11px;\n  }\n  .ga-hud {\n    gap: 5px;\n    padding: 4px;\n  }\n  .ga-hud progress {\n    width: 52px;\n  }\n  .ga button {\n    padding: 7px;\n    min-height: 40px;\n  }\n  .ga-foot {\n    gap: 4px;\n  }\n  .ga-controls {\n    flex: 1;\n    justify-content: flex-end;\n  }\n  .ga-note {\n    font-size: 10px;\n  }\n  .ga-msg {\n    width: 100%;\n    flex: auto;\n    order: 2;\n  }\n  .ga-controls button {\n    min-width: 44px;\n    min-height: 44px;\n  }\n}\n\n.ga-stick {\n  position: relative;\n  flex: none;\n  width: 110px;\n  height: 90px;\n  border: 2px solid #607b89;\n  background: repeating-linear-gradient(0deg, #162633 0 15px, #1c303c 15px 16px);\n  touch-action: none;\n  user-select: none;\n  display: grid;\n  place-items: center;\n  overflow: hidden;\n}\n.ga-stick span {\n  position: absolute;\n  top: 3px;\n  font-size: 10px;\n  color: #9cb7c4;\n}\n.ga-stick i {\n  display: block;\n  width: 34px;\n  height: 30px;\n  border: 3px solid #d8b981;\n  background: #2e4b5c;\n  pointer-events: none;\n}\n@media (max-width: 760px) {\n  .ga-foot {\n    display: grid;\n    grid-template-columns: 132px minmax(0, 1fr);\n    gap: 6px;\n    padding: 6px;\n  }\n  .ga-stick {\n    width: 124px;\n    height: 124px;\n    align-self: center;\n    grid-column: 1;\n    grid-row: 1;\n  }\n  .ga-controls {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 4px;\n    grid-column: 2;\n    grid-row: 1;\n  }\n  .ga-controls button {\n    padding: 3px;\n    min-width: 0;\n    min-height: 44px;\n    font-size: 10px;\n  }\n  .ga-msg {\n    grid-column: 1/-1;\n    grid-row: 2;\n    min-width: 0;\n  }\n  .ga-foot [data-busy] {\n    grid-column: 1;\n    grid-row: 3;\n  }\n  .ga-foot > [data-do='restart'] {\n    grid-column: 2;\n    grid-row: 3;\n  }\n  .ga-note {\n    line-height: 1.6;\n  }\n}\n";
+
+  // src/game/action/space.ts
+  var SCENE = {
+    width: 1280,
+    height: 720,
+    backgroundWidth: 640,
+    backgroundHeight: 360,
+    floorBack: 360,
+    floorMin: 400,
+    floorMax: 655,
+    referenceY: 530,
+    adultHeight: 160,
+    // 배경 원본 640x360에서 일반 문 높이 105~115px, 성인 약 80px.
+    doorHeight: 220
+  };
+  function depthScale(footY2) {
+    return Math.max(0.93, Math.min(1.07, 1 + (footY2 - SCENE.referenceY) * 5e-4));
+  }
+  var GAIT = { walk: 128, run: 224 };
+
+  // src/game/action/sim.ts
+  var WIDTH = 1280;
+  var HEIGHT = 720;
+  var SAVE_VERSION2 = 2;
+  var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  var body3 = (id, kind, x, y, hp) => ({
+    id,
+    kind,
+    x,
+    y,
+    z: 0,
+    vz: 0,
+    dir: kind === "jyaldi" ? 1 : -1,
+    hp,
+    max: hp,
+    act: "idle",
+    t: 0,
+    duration: 0,
+    fired: false,
+    inv: 0,
+    flash: 0,
+    cooldown: 0,
+    armor: false,
+    stride: 0,
+    speed: 0
+  });
+  function newRun2() {
+    return {
+      version: SAVE_VERSION2,
+      player: { ...body3(1, "jyaldi", 220, 510, 200), energy: 100, gauge: 100, guard: 100, dashCd: 0, items: [3, 2, 2] },
+      enemies: [
+        body3(2, "corner", 760, 480, 130),
+        body3(3, "watchman", 1030, 560, 145),
+        body3(4, "corner", 1130, 440, 130),
+        body3(5, "watchman", 940, 610, 145)
+      ],
+      bolts: [],
+      effects: [],
+      time: 0,
+      auto: false,
+      phase: "combat",
+      nextId: 6,
+      cutin: 0,
+      hitstop: 0,
+      kills: 0,
+      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기"
+    };
+  }
+  function act(b, name, duration) {
+    b.act = name;
+    b.t = 0;
+    b.duration = duration;
+    b.fired = false;
+  }
+  function fx(r, kind, x, y, z = 65) {
+    if (r.effects.length >= 64) r.effects.shift();
+    const duration = kind === "blast" ? 0.55 : 0.22;
+    r.effects.push({ x, y, z, t: 0, duration, kind });
+  }
+  function facing(a, b) {
+    return (b.x - a.x) * a.dir >= -8;
+  }
+  function damage2(r, b, amount, source4, down = false) {
+    if (b.hp <= 0 || b.inv > 0) return;
+    const p = r.player;
+    if (b === p && (p.act === "guard" || p.act === "crouch") && facing(p, source4) && p.guard > 0) {
+      p.guard = Math.max(0, p.guard - amount * 2);
+      fx(r, "guard", p.x + p.dir * 25, p.y);
+      if (!p.guard) {
+        act(p, "hurt", 0.65);
+        r.message = "가드 붕괴! 거리를 확보하세요.";
+      }
+      return;
+    }
+    b.hp = Math.max(0, b.hp - amount);
+    b.flash = 0.12;
+    fx(r, "hit", b.x, b.y, b.z + 75);
+    r.hitstop = down ? 0.055 : 0.025;
+    b.x = clamp2(b.x + source4.dir * (down ? 44 : 12), 55, WIDTH - 55);
+    if (b === p) {
+      p.inv = 0.5;
+      p.gauge = clamp2(p.gauge + 7, 0, 100);
+    } else p.gauge = clamp2(p.gauge + amount * 0.35, 0, 100);
+    if (b.hp <= 0) {
+      act(b, "dead", 1);
+      if (b !== p) r.kills++;
+    } else if (!b.armor) act(b, down ? "down" : "hurt", down ? 0.9 : 0.23);
+  }
+  function move(b, x, y, speed, dt, face3 = true) {
+    const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
+    b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
+    b.y = clamp2(b.y + y / len * speed * dt, 400, 655);
+    const distance = Math.hypot(b.x - ox, b.y - oy);
+    b.speed = distance / dt;
+    if (b.z === 0 && b.act !== "dash") b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
+    if (x && face3) b.dir = x > 0 ? 1 : -1;
+  }
+  function nearTarget(r) {
+    const p = r.player;
+    return r.enemies.find(
+      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && Math.abs(e.z - p.z) < 60
+    );
+  }
+  function bolt(r, b, enemy) {
+    if (r.bolts.length >= 48) return;
+    r.bolts.push({
+      id: r.nextId++,
+      x: b.x + b.dir * (enemy ? 34 : 64),
+      y: b.y,
+      z: b.z + (enemy ? 82 : 113),
+      vx: b.dir * (enemy ? 410 : 1e3),
+      life: 1.7,
+      enemy
+    });
+    fx(r, "shot", b.x + b.dir * (enemy ? 40 : 64), b.y, b.z + (enemy ? 82 : 113));
+  }
+  function item(r, i) {
+    const p = r.player;
+    if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
+    if (i === 0) {
+      if (p.hp >= p.max) return;
+      p.hp = Math.min(p.max, p.hp + 70);
+    }
+    if (i === 1) {
+      if (p.guard >= 100) return;
+      p.guard = 100;
+    }
+    if (i === 2) {
+      if (p.energy >= 100) return;
+      p.energy = 100;
+    }
+    p.items[i]--;
+    r.message = ["회복제 사용", "방어 회복제 사용", "능력 회복제 사용"][i];
+  }
+  function autoInput(r) {
+    const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
+    const e = live.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+    if (!e) return { x: 0, y: 0 };
+    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find((e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30);
+    return {
+      x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
+      run: Math.abs(dx) > 260,
+      y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
+      attack: Math.abs(dy) < 26,
+      skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
+      dash: !!threat,
+      ult: p.gauge >= 100 && live.length >= 2,
+      item: p.hp < 95 ? 0 : void 0
+    };
+  }
+  function step2(r, raw, dt) {
+    if (!Number.isFinite(dt) || dt <= 0) return;
+    dt = Math.min(dt, 1 / 30);
+    if (r.phase !== "combat") return;
+    if (r.cutin > 0) {
+      r.cutin = Math.max(0, r.cutin - dt);
+      return;
+    }
+    if (r.hitstop > 0) {
+      r.hitstop = Math.max(0, r.hitstop - dt);
+      return;
+    }
+    r.time += dt;
+    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
+    const p = r.player, input2 = r.auto ? autoInput(r) : raw;
+    for (const b of [p, ...r.enemies]) {
+      b.t += dt;
+      b.inv = Math.max(0, b.inv - dt);
+      b.flash = Math.max(0, b.flash - dt);
+      b.cooldown = Math.max(0, b.cooldown - dt);
+      if (b.z > 0 || b.vz > 0) {
+        b.vz -= 1e3 * dt;
+        b.z = Math.max(0, b.z + b.vz * dt);
+        if (!b.z) {
+          b.vz = 0;
+          if (b === p && ["jump", "walk", "run", "idle"].includes(b.act)) act(b, "land", 0.14);
+        }
+      }
+      if (b.act === "down" && b.t >= b.duration) {
+        act(b, "rise", 0.35);
+        b.inv = 0.55;
+      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch"].includes(b.act) && b.t >= b.duration) {
+        const next = b === p && input2.attack && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && input2.attack && b.z === 0 && b.act === "melee2" ? "melee3" : null;
+        if (next) act(b, next, next === "melee2" ? 0.34 : 0.52);
+        else {
+          if (b === p && b.act === "melee3") b.cooldown = 0.18;
+          act(b, "idle", 0);
+        }
+        b.armor = false;
+      }
+    }
+    p.energy = Math.min(100, p.energy + dt * 9);
+    p.dashCd = Math.max(0, p.dashCd - dt);
+    if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
+    if (input2.item !== void 0) item(r, input2.item);
+    if (["idle", "walk", "run", "jump", "guard", "crouch"].includes(p.act)) {
+      if (r.auto) {
+        const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+        if (target) p.dir = target.x >= p.x ? 1 : -1;
+      }
+      if (input2.x && !r.auto) p.dir = input2.x > 0 ? 1 : -1;
+      if (input2.jump && p.z === 0) p.vz = 500;
+      if (input2.ult && p.gauge >= 100) {
+        p.gauge = 0;
+        act(p, "ult", 0.85);
+        p.armor = true;
+        p.inv = 1.05;
+        r.cutin = 0.75;
+        r.message = "집중 파괴";
+      } else if (input2.dash && p.dashCd <= 0) {
+        if (input2.x) p.dir = Math.sign(input2.x);
+        act(p, "dash", 0.22);
+        p.inv = 0.24;
+        p.dashCd = 0.8;
+      } else if (input2.guard && !p.z) {
+        p.act = input2.y > 0 ? "crouch" : "guard";
+        if (input2.x) p.dir = Math.sign(input2.x);
+      } else if (input2.skill && p.energy >= 35) {
+        p.energy -= 35;
+        act(p, "skill", 0.62);
+        p.armor = true;
+      } else if (input2.attack && p.cooldown <= 0) {
+        if (!p.z && nearTarget(r)) {
+          act(p, "melee1", 0.28);
+          p.cooldown = 0;
+        } else {
+          act(p, "shot", 0.32);
+          p.cooldown = 0.36;
+        }
+      } else {
+        const x = clamp2(input2.x, -1, 1), y = clamp2(input2.y, -1, 1);
+        const running2 = !!input2.run;
+        move(p, x, y, p.z ? 200 : running2 ? 240 : 125, dt, !r.auto);
+        p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running2 ? "run" : "walk" : "idle";
+      }
+    }
+    if (p.act === "dash") move(p, input2.x || p.dir, input2.y, 800, dt);
+    if (p.act.startsWith("melee") && p.t >= (p.act === "melee1" ? 0.14 : p.act === "melee2" ? 0.17 : 0.26) && !p.fired) {
+      p.fired = true;
+      const finish2 = p.act === "melee3";
+      const oldX = p.x;
+      p.x = clamp2(p.x + p.dir * (finish2 ? 8 : 5), 55, 1225);
+      for (const e of r.enemies)
+        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < (finish2 ? 135 : 120) && Math.abs(e.y - p.y) < 35 && Math.abs(e.z - p.z) < 60)
+          damage2(r, e, finish2 ? 38 : p.act === "melee2" ? 24 : 18, p, finish2);
+      if (finish2) fx(r, "blast", p.x + p.dir * 90, p.y, 95);
+      r.message = finish2 ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 제압" : "근접 1타 · 장타";
+    }
+    if (p.act === "shot" && p.t >= 0.16 && !p.fired) {
+      p.fired = true;
+      bolt(r, p, false);
+    }
+    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.25 : 0.28) && !p.fired) {
+      p.fired = true;
+      const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
+      fx(r, "blast", x, p.y, 70);
+      for (const e of r.enemies)
+        if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
+          damage2(r, e, ultimate ? 70 : 45, p, true);
+    }
+    for (const e of r.enemies) {
+      if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
+      if (e.act === "shot") {
+        if (!e.fired && e.t >= e.duration - 0.12) {
+          e.fired = true;
+          if (e.kind === "watchman") bolt(r, e, true);
+          else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
+            damage2(r, p, 16, e, true);
+        }
+        continue;
+      }
+      const dx = p.x - e.x, dy = p.y - e.y, range = e.kind === "watchman" ? 550 : 90;
+      e.dir = dx >= 0 ? 1 : -1;
+      if (Math.abs(dx) < range && Math.abs(dy) < 25 && e.cooldown <= 0) {
+        act(e, "shot", e.kind === "watchman" ? 0.85 : 0.65);
+        e.cooldown = e.kind === "watchman" ? 1.7 : 1.2;
+      } else {
+        move(
+          e,
+          Math.abs(dx) > range * 0.8 ? Math.sign(dx) : 0,
+          Math.abs(dy) > 15 ? Math.sign(dy) : 0,
+          e.kind === "watchman" ? 75 : 125,
+          dt
+        );
+        e.act = "walk";
+      }
+    }
+    for (const b of r.bolts) {
+      const old = b.x;
+      b.x += b.vx * dt;
+      b.life -= dt;
+      const targets = b.enemy ? [p] : r.enemies;
+      const candidates = targets.filter(
+        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 55 : 155) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
+      ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
+      if (candidates[0]) {
+        damage2(r, candidates[0], b.enemy ? 12 : 18, { ...p, x: old, dir: Math.sign(b.vx) });
+        b.life = 0;
+      }
+    }
+    r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
+    if (p.hp <= 0) {
+      r.phase = "evacuated";
+      r.message = "작전 지속 불가 · 본부 후송";
+    } else if (r.enemies.every((e) => e.hp <= 0)) {
+      r.phase = "cleared";
+      r.message = "훈련 완료 · 전원 제압";
+    }
+  }
+  function serialize(r) {
+    return JSON.stringify(r);
+  }
+  function restore(raw) {
+    try {
+      if (!raw || raw.length > 12e4) return null;
+      const r = JSON.parse(raw);
+      if (r?.version === 1 && r.player && Array.isArray(r.enemies)) {
+        for (const b of [r.player, ...r.enemies]) {
+          b.stride = 0;
+          b.speed = 0;
+        }
+        r.version = SAVE_VERSION2;
+      }
+      const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
+      const actions = [
+        "idle",
+        "walk",
+        "run",
+        "jump",
+        "land",
+        "melee1",
+        "melee2",
+        "melee3",
+        "shot",
+        "skill",
+        "ult",
+        "dash",
+        "guard",
+        "crouch",
+        "hurt",
+        "down",
+        "rise",
+        "dead"
+      ];
+      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, 400, 655) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200);
+      if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
+        return null;
+      const p = r.player;
+      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
+        return null;
+      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || typeof r.message !== "string" || r.message.length > 150)
+        return null;
+      if (r.phase === "combat" && (p.hp <= 0 || r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
+        return null;
+      if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
+        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, 400, 655) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
+      ))
+        return null;
+      r.effects = [];
+      return r;
+    } catch {
+      return null;
+    }
+  }
+
+  // src/game/action/render.ts
+  var ActionRenderer = class {
+    constructor(canvas) {
+      this.canvas = canvas;
+      canvas.width = WIDTH;
+      canvas.height = HEIGHT;
+      this.ctx = canvas.getContext("2d");
+    }
+    images = /* @__PURE__ */ new Map();
+    art = null;
+    disposed = false;
+    preview = null;
+    ctx;
+    async load(art2) {
+      this.art = art2;
+      await Promise.all(
+        ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
+          const img = new Image();
+          await new Promise((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
+            img.src = art2.url(name);
+          });
+          if (!this.disposed) this.images.set(name, img);
+        })
+      );
+    }
+    dispose() {
+      this.disposed = true;
+      this.images.clear();
+      this.art = null;
+    }
+    rect(x, y, w, h, color) {
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+    sprite(b, frame, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : 1.57, x = b.x, y = b.y - b.z) {
+      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null, img = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
+      if (!f || !img) return;
+      scale *= depthScale(b.y);
+      const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
+      c.save();
+      c.translate(Math.round(x), Math.round(y));
+      c.scale(b.dir, 1);
+      if (b.flash > 0) c.filter = "brightness(1.8)";
+      c.drawImage(
+        img,
+        sx,
+        sy,
+        w,
+        h,
+        Math.round(-ax * scale),
+        Math.round(-ay * scale),
+        Math.round(w * scale),
+        Math.round(h * scale)
+      );
+      c.restore();
+    }
+    drawPose(run3, clip, phase) {
+      this.preview = { clip, phase };
+      this.draw(run3);
+      this.preview = null;
+    }
+    frame(b, r) {
+      const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
+      if (b.kind === "jyaldi") {
+        const clips = this.art?.atlas.action?.clips;
+        if (this.preview) {
+          const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
+          return frames[Math.min(frames.length - 1, Math.floor(this.preview.phase * frames.length))];
+        }
+        let name = b.act === "idle" ? "idle" : b.act;
+        if (b.z > 0 && !["shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
+          name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
+        if (name === "skill" || name === "ult") name = "melee1";
+        if (name === "dead") name = "down";
+        const clip = clips?.[name] ?? clips?.idle ?? [48];
+        const phase = b.act === "walk" || b.act === "run" ? b.stride : name === "jump_up" ? b.vz > 430 ? 0 : 0.8 : progress;
+        return clip[Math.min(clip.length - 1, Math.floor(phase * clip.length))];
+      }
+      if (b.act === "dead" || b.act === "down") return 22;
+      if (b.act === "rise" || b.act === "hurt") return 19;
+      if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
+      return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
+    }
+    draw(r) {
+      const c = this.ctx, p = r.player;
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.imageSmoothingEnabled = false;
+      this.rect(0, 0, WIDTH, HEIGHT, "#0a111b");
+      const bg = this.images.get("bg-bureau-action");
+      if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
+      for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
+        if (b.hp <= 0 && b.t > 1) continue;
+        const ground = depthScale(b.y), air = Math.max(0.25, 1 - b.z / 240);
+        this.rect(b.x - 23 * ground, b.y - 3, 46 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
+        this.rect(b.x - 16 * ground, b.y - 2, 32 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
+        if (b.kind === "jyaldi" && b.z === 0) {
+          const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
+          for (const [dx, dy] of contact) this.rect(b.x + dx * b.dir * ground - 5, b.y + dy * ground - 1, 10, 3, "#02070bc0");
+        }
+        if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
+          const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
+          this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
+          this.rect(b.x - 7, b.y - 200, 14, 20, "#ffb35c");
+        }
+        this.sprite(b, this.frame(b, r));
+        if (b.armor && b.hp > 0) {
+          this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
+        }
+        if (b.act === "guard" || b.act === "crouch") {
+          const sy = b.y - (b.act === "crouch" ? 65 : 105);
+          for (let i = 0; i < 4; i++) this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
+        }
+        if (b.kind !== "jyaldi" && b.hp > 0) {
+          this.rect(b.x - 34, b.y - 175 * depthScale(b.y), 68, 6, "#060c12");
+          this.rect(b.x - 34, b.y - 175 * depthScale(b.y), 68 * b.hp / b.max, 6, "#e9896d");
+        }
+        if (b === p && p.inv > 0) {
+          this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
+        }
+      }
+      for (const b of r.bolts) {
+        this.rect(b.x - 12, b.y - b.z, 24, 4, b.enemy ? "#ff7b6b" : "#ffe5ad");
+      }
+      for (const f of r.effects) {
+        const t = f.t / f.duration, radius = f.kind === "blast" ? 20 + t * 190 : 8 + t * 22, x = f.x, y = f.y - f.z;
+        c.globalAlpha = 1 - t;
+        const color = f.kind === "guard" ? "#9ce5ff" : "#ffd18b";
+        const rays = f.kind === "blast" ? 20 : 8;
+        for (let i = 0; i < rays; i++) {
+          const angle = i / rays * Math.PI * 2, rad = radius * (i % 2 ? 0.7 : 1);
+          const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3, py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
+          this.rect(px, py, f.kind === "blast" ? 6 : 3, f.kind === "blast" ? 6 : 3, color);
+        }
+        if (t < 0.35) {
+          this.rect(x - 5, y - 16, 10, 32, "#fff1d0");
+          this.rect(x - 16, y - 5, 32, 10, "#fff1d0");
+        }
+        c.globalAlpha = 1;
+      }
+      if (r.cutin > 0) {
+        this.rect(0, 0, WIDTH, HEIGHT, "#030b17bb");
+        this.rect(0, 165, WIDTH, 320, "#172c46");
+        for (let i = 0; i < 18; i++) this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
+        this.sprite(
+          { ...p, dir: 1 },
+          this.art?.atlas.action?.clips.melee3?.[2] ?? this.art?.atlas.action?.clips.idle?.[0] ?? 0,
+          (this.art?.atlas.action?.scale ?? 1) * 2.3,
+          340 + (1 - r.cutin / 0.75) * 80,
+          530
+        );
+        c.fillStyle = "#ffdf9e";
+        c.font = "bold 58px monospace";
+        c.fillText("집중 파괴", 660, 330);
+        c.font = "22px monospace";
+        c.fillText("쟈알디 · 집중 파괴", 665, 380);
+      }
+      if (r.phase !== "combat") {
+        this.rect(250, 245, 780, 210, "#07121aee");
+        c.strokeStyle = "#d9b67a";
+        c.lineWidth = 4;
+        c.strokeRect(250, 245, 780, 210);
+        c.fillStyle = "#f4dfb2";
+        c.font = "bold 42px monospace";
+        c.textAlign = "center";
+        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 640, 330);
+        c.font = "24px monospace";
+        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 640, 390);
+        c.textAlign = "left";
+      }
+    }
+  };
+
+  // src/game/action/index.ts
+  var writes = /* @__PURE__ */ new WeakMap();
+  function mountAction(box, host2) {
+    const root2 = document.createElement("section");
+    root2.className = "ga";
+    root2.tabIndex = 0;
+    root2.setAttribute("aria-label", "쟈알디 1인 전투 검증판");
+    const style = document.createElement("style");
+    style.textContent = style_default3;
+    root2.innerHTML = `<div class="ga-hud"><b>쟈알디 · 체형 개선 시연판</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
+  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
+    box.append(style, root2);
+    const $ = (s4) => root2.querySelector(s4);
+    const canvas = $("canvas"), fit = $(".ga-fit"), menu = $(".ga-menu"), renderer = new ActionRenderer(canvas);
+    let run3 = newRun2(), ready = false, disposed = false, paused = true, raf = 0, last = 0, acc = 0, dirty2 = false, saving = false, lastSave = 0, saveError = false;
+    let stickId = null, stickX = 0, stickY = 0;
+    const stick = $(".ga-stick"), thumb = $(".ga-stick i");
+    let target = null;
+    const keys = /* @__PURE__ */ new Set(), pointers = /* @__PURE__ */ new Map();
+    let edges = {};
+    const clear = () => {
+      keys.clear();
+      pointers.clear();
+      edges = {};
+      target = null;
+      stickId = null;
+      stickX = stickY = 0;
+      thumb.style.transform = "translate(0,0)";
+    };
+    const text = (selector, value) => {
+      const e = $(selector);
+      if (e.textContent !== value) e.textContent = value;
+    };
+    const hud = () => {
+      const p = run3.player;
+      for (const [name, value] of Object.entries({ hp: p.hp, energy: p.energy, guard: p.guard, gauge: p.gauge }))
+        $(`[data-meter="${name}"]`).value = value;
+      text("[data-hp]", String(Math.ceil(p.hp)));
+      text('[data-do="auto"]', run3.auto ? "F 자동 ON" : "F 수동");
+      text(".ga-msg", run3.message);
+      text("[data-busy]", saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty2 ? "진행 중" : "저장됨");
+      root2.dataset.saveError = String(saveError);
+      ["Q 회복", "W 방어", "E 능력"].forEach((label, i) => {
+        const b = $(`[data-item="${i}"]`);
+        b.textContent = `${label} ${p.items[i]}`;
+        b.disabled = run3.phase !== "combat" || p.items[i] <= 0;
+      });
+    };
+    const save2 = async (force = false) => {
+      if (!ready || !dirty2) return;
+      if (saving && !force) return;
+      if (!force && performance.now() - lastSave < 5e3) return;
+      const data = serialize(run3);
+      dirty2 = false;
+      saving = true;
+      lastSave = performance.now();
+      const task = (writes.get(host2) ?? Promise.resolve()).then(() => host2.save(data));
+      writes.set(
+        host2,
+        task.catch(() => {
+        })
+      );
+      try {
+        await task;
+        saveError = false;
+      } catch {
+        dirty2 = true;
+        saveError = true;
+      } finally {
+        saving = false;
+        if (!disposed) hud();
+      }
+    };
+    const pause = (value) => {
+      paused = value;
+      clear();
+      acc = 0;
+      last = 0;
+      menu.hidden = !value;
+      text("[data-menu-title]", "일시정지");
+      text(
+        "[data-menu-text]",
+        "Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. F로 자동 전투를 켜고 끌 수 있습니다."
+      );
+      $('[data-do="resume"]').disabled = !ready;
+      if (value) void save2(true);
+    };
+    const restart = () => {
+      if (!ready) return;
+      run3 = newRun2();
+      dirty2 = true;
+      pause(false);
+      void save2(true);
+      root2.focus();
+      hud();
+    };
+    const toggle = () => {
+      if (!ready || paused) return;
+      clear();
+      run3.auto = !run3.auto;
+      dirty2 = true;
+      void save2(true);
+      hud();
+    };
+    const manual = () => {
+      if (run3.auto) {
+        run3.auto = false;
+        dirty2 = true;
+      }
+    };
+    const codes = {
+      ArrowUp: "up",
+      ArrowDown: "down",
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      KeyZ: "attack",
+      KeyA: "guard",
+      ShiftLeft: "run",
+      ShiftRight: "run"
+    };
+    const once = {
+      KeyX: "jump",
+      KeyC: "skill",
+      ShiftLeft: "dash",
+      ShiftRight: "dash",
+      KeyS: "ult"
+    };
+    const abort = new AbortController(), signal = abort.signal;
+    root2.addEventListener(
+      "keydown",
+      (ev) => {
+        const e = ev;
+        if (e.target.matches("input,textarea,select,[contenteditable=true]")) return;
+        if (e.code === "Escape") {
+          e.preventDefault();
+          if (!e.repeat && ready) pause(!paused);
+          return;
+        }
+        if (paused || !ready) return;
+        if (e.code === "KeyF") {
+          e.preventDefault();
+          if (!e.repeat) toggle();
+          return;
+        }
+        if (!codes[e.code] && !once[e.code] && !["KeyQ", "KeyW", "KeyE"].includes(e.code)) return;
+        e.preventDefault();
+        manual();
+        target = null;
+        if (codes[e.code]) keys.add(codes[e.code]);
+        if (!e.repeat && once[e.code]) edges[once[e.code]] = true;
+        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code)) edges.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
+      },
+      { signal }
+    );
+    root2.addEventListener(
+      "keyup",
+      (ev) => {
+        const e = ev;
+        if (codes[e.code]) keys.delete(codes[e.code]);
+      },
+      { signal }
+    );
+    root2.addEventListener(
+      "focusout",
+      (e) => {
+        if (!root2.contains(e.relatedTarget)) {
+          clear();
+          if (ready && !run3.auto && !paused) pause(true);
+        }
+      },
+      { signal }
+    );
+    window.addEventListener(
+      "blur",
+      () => {
+        if (ready) pause(true);
+      },
+      { signal }
+    );
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden && ready) pause(true);
+      },
+      { signal }
+    );
+    root2.addEventListener(
+      "click",
+      (e) => {
+        const b = e.target.closest("[data-do]");
+        if (!b) return;
+        if (b.dataset.do === "auto") toggle();
+        if (b.dataset.do === "pause" && ready) pause(!paused);
+        if (b.dataset.do === "resume" && ready) {
+          pause(false);
+          root2.focus();
+        }
+        if (b.dataset.do === "restart") restart();
+      },
+      { signal }
+    );
+    root2.addEventListener(
+      "pointerdown",
+      (e) => {
+        const b = e.target.closest("[data-hold],[data-edge],[data-item]");
+        if (!b || b.disabled || paused || !ready) return;
+        e.preventDefault();
+        root2.focus();
+        manual();
+        target = null;
+        b.setPointerCapture(e.pointerId);
+        if (b.dataset.hold) pointers.set(e.pointerId, b.dataset.hold);
+        if (b.dataset.edge) {
+          edges[b.dataset.edge] = true;
+          if (b.dataset.edge === "dash") pointers.set(e.pointerId, "run");
+        }
+        if (b.dataset.item !== void 0) edges.item = Number(b.dataset.item);
+      },
+      { signal }
+    );
+    const updateStick = (e) => {
+      const b = stick.getBoundingClientRect(), dx = (e.clientX - b.left - b.width / 2) / (b.width * 0.35), dy = (e.clientY - b.top - b.height / 2) / (b.height * 0.35), len = Math.max(1, Math.hypot(dx, dy));
+      stickX = Math.abs(dx) < 0.18 ? 0 : dx / len;
+      stickY = Math.abs(dy) < 0.18 ? 0 : dy / len;
+      thumb.style.transform = `translate(${stickX * 28}px,${stickY * 28}px)`;
+    };
+    stick.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (!ready || paused || stickId !== null) return;
+        e.preventDefault();
+        root2.focus();
+        manual();
+        target = null;
+        stickId = e.pointerId;
+        stick.setPointerCapture(e.pointerId);
+        updateStick(e);
+      },
+      { signal }
+    );
+    stick.addEventListener(
+      "pointermove",
+      (e) => {
+        if (e.pointerId === stickId) updateStick(e);
+      },
+      { signal }
+    );
+    const release = (e) => {
+      pointers.delete(e.pointerId);
+      if (e.pointerId === stickId) {
+        stickId = null;
+        stickX = stickY = 0;
+        thumb.style.transform = "translate(0,0)";
+      }
+    };
+    root2.addEventListener("pointerup", release, { signal });
+    root2.addEventListener("pointercancel", release, { signal });
+    root2.addEventListener("lostpointercapture", release, { signal });
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault(), { signal });
+    canvas.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (paused || !ready) return;
+        e.preventDefault();
+        root2.focus();
+        manual();
+        const b = canvas.getBoundingClientRect();
+        const x = (e.clientX - b.left) / b.width * 1280, y = (e.clientY - b.top) / b.height * 720;
+        if (e.button === 2) {
+          edges.dash = true;
+          target = { x, y, attack: false };
+          return;
+        }
+        const enemy = run3.enemies.find((a) => a.hp > 0 && Math.abs(a.x - x) < 65 && y > a.y - 180 && y < a.y + 20);
+        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : { x, y: Math.max(400, Math.min(655, y)), attack: false };
+      },
+      { signal }
+    );
+    const input2 = () => {
+      const held = /* @__PURE__ */ new Set([...keys, ...pointers.values()]);
+      const p = run3.player;
+      let x = Number(held.has("right")) - Number(held.has("left")) + stickX, y = Number(held.has("down")) - Number(held.has("up")) + stickY, attack = held.has("attack");
+      if (target?.id) {
+        const e = run3.enemies.find((e2) => e2.id === target?.id && e2.hp > 0);
+        if (e) {
+          target.x = e.x;
+          target.y = e.y;
+        } else target = null;
+      }
+      if (target) {
+        const dx = target.x - p.x, dy = target.y - p.y;
+        x = Math.abs(dx) > (target.attack ? 300 : 10) ? Math.sign(dx) : 0;
+        y = Math.abs(dy) > 12 ? Math.sign(dy) : 0;
+        attack = target.attack && Math.abs(dx) < 600 && Math.abs(dy) < 25;
+        if (target.attack) p.dir = dx >= 0 ? 1 : -1;
+        if (!target.attack && !x && !y) target = null;
+      }
+      const result = {
+        x,
+        y,
+        attack,
+        run: held.has("run") || Math.hypot(stickX, stickY) > 0.95,
+        guard: held.has("guard"),
+        ...edges
+      };
+      edges = {};
+      return result;
+    };
+    const resize = () => {
+      const scale = Math.max(0.01, Math.min(fit.clientWidth / 1280, fit.clientHeight / 720));
+      canvas.style.width = `${Math.floor(1280 * scale)}px`;
+      canvas.style.height = `${Math.floor(720 * scale)}px`;
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(fit);
+    let waiting = host2.waiting();
+    const offWaiting = host2.onWaiting((value) => {
+      waiting = value;
+    });
+    let hudTime = 0;
+    const frame = (now) => {
+      if (disposed) return;
+      if (ready && !paused && !document.hidden && run3.phase === "combat") {
+        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0) * (waiting && run3.auto ? 1.25 : 1);
+        let ticks = 0;
+        while (acc >= 1 / 60 && ticks++ < 8) {
+          step2(run3, input2(), 1 / 60);
+          acc -= 1 / 60;
+          dirty2 = true;
+        }
+        void save2(run3.phase !== "combat");
+      } else acc = 0;
+      last = now;
+      if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run3);
+      if (now - hudTime > 120) {
+        hud();
+        hudTime = now;
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    void (async () => {
+      try {
+        const [raw, art2] = await Promise.all([
+          (writes.get(host2) ?? Promise.resolve()).then(() => host2.load()),
+          host2.art()
+        ]);
+        if (disposed) return;
+        const restored = restore(raw);
+        run3 = restored ?? newRun2();
+        await renderer.load(art2);
+        if (disposed) return;
+        ready = true;
+        if (raw && !restored) {
+          run3.message = "저장을 읽지 못해 새 훈련을 시작합니다.";
+        }
+        pause(true);
+        text("[data-menu-title]", "쟈알디 · 1인 전투 검증판");
+        text(
+          "[data-menu-text]",
+          "계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다."
+        );
+        $('[data-do="restart"]').hidden = false;
+        resize();
+        hud();
+      } catch (e) {
+        if (!disposed) {
+          text("[data-menu-title]", "검증판을 열지 못했습니다");
+          text("[data-menu-text]", e instanceof Error ? e.message : String(e));
+        }
+      }
+    })();
+    raf = requestAnimationFrame(frame);
+    return () => {
+      if (disposed) return;
+      clear();
+      void save2(true);
+      disposed = true;
+      cancelAnimationFrame(raf);
+      abort.abort();
+      observer.disconnect();
+      offWaiting();
+      renderer.dispose();
+      root2.remove();
+      style.remove();
     };
   }
 
@@ -2050,28 +3006,104 @@
     return art;
   }
 
+  // src/host/actionpack.ts
+  var ACTION_FILES = ["a-jyaldi-action", "bg-bureau-action", "e-corner", "e-watchman"];
+  var KEY3 = "goei:game-pack:action";
+  var VERSION = 2;
+  var loaded = null;
+  async function stored2() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY3);
+      if (typeof raw !== "string") return null;
+      const s4 = JSON.parse(raw);
+      return s4 && s4.version === VERSION && s4.atlas?.action && ACTION_FILES.every((f) => typeof s4.files?.[f] === "string") ? s4 : null;
+    } catch {
+      return null;
+    }
+  }
+  async function actionPackState() {
+    return await stored2() ? "ready" : "none";
+  }
+  async function installActionPack(bytes) {
+    const pack3 = parsePack(bytes, ACTION_FILES);
+    if (!pack3 || pack3.id !== "action" || pack3.version !== VERSION || !pack3.atlas.action)
+      throw new PackError("1인 액션용 그림 팩이 아닙니다. goei-game-action.pack을 넣어 주세요.");
+    const files = {};
+    for (const [name, b] of pack3.files) {
+      let str3 = "";
+      for (let i = 0; i < b.length; i += 32768) str3 += String.fromCharCode(...b.subarray(i, i + 32768));
+      files[name] = btoa(str3);
+    }
+    await risuai.pluginStorage.setItem(KEY3, JSON.stringify({ version: VERSION, atlas: pack3.atlas, files }));
+    loaded = null;
+  }
+  async function downloadActionPack() {
+    const url = `${UPDATE_BASE}/goei-game-action.pack`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true });
+        const b = r.ok ? toBytes3(r.data) : null;
+        if (b && parsePack(b, ACTION_FILES)) return b;
+      } catch {
+      }
+    }
+    try {
+      const r = await risuai.nativeFetch(url, { method: "GET" });
+      if (r.ok) {
+        const b = new Uint8Array(await r.arrayBuffer());
+        if (parsePack(b, ACTION_FILES)) return b;
+      }
+    } catch {
+    }
+    throw new PackError("새 액션 그림을 받지 못했어요. goei-game-action.pack을 파일로 넣어 주세요.");
+  }
+  function loadActionArt() {
+    loaded ??= (async () => {
+      const s4 = await stored2();
+      if (!s4) throw new PackError("새 액션 그림이 없습니다.");
+      return { atlas: s4.atlas, url: (name) => s4.files[name] ? `data:image/png;base64,${s4.files[name]}` : "" };
+    })();
+    loaded.catch(() => {
+      loaded = null;
+    });
+    return loaded;
+  }
+
   // src/ui/game.ts
-  var KEY3 = "goei:game";
+  var KEY4 = "goei:game";
   var layer = null;
   var unmount = null;
+  var mode2 = "action";
+  var generation = 0;
   var host = {
     load: async () => {
-      const v = await risuai.pluginStorage.getItem(KEY3);
+      const v = await risuai.pluginStorage.getItem(KEY4);
       return typeof v === "string" ? v : null;
     },
-    save: (data) => risuai.pluginStorage.setItem(KEY3, data),
+    save: (data) => risuai.pluginStorage.setItem(KEY4, data),
     waiting: isWaiting,
     onWaiting,
     narrow: () => matchMedia("(max-width: 760px)").matches,
     art: loadArt
   };
+  var actionHost = {
+    ...host,
+    load: async () => {
+      const value = await risuai.pluginStorage.getItem("goei:game-action:v1");
+      return typeof value === "string" ? value : null;
+    },
+    save: (data) => risuai.pluginStorage.setItem("goei:game-action:v1", data),
+    art: loadActionArt
+  };
   var errText = (e) => e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
   function packPanel(box, old, done) {
+    const action = mode2 === "action";
     box.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
-      <b>${old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
+      <b>${action ? "새 액션 그림 받기" : old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
       <p>${old ? "플러그인이 바뀌어 그림을 새로 받아야 해요." : "게임 그림은 처음 한 번만 받아요. 받은 그림은 Risu에 저장돼요."}</p>
       <p class="gx-gp-msg" hidden></p>
-      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">그림 받기 (0.7MB)</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
+      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">${action ? "액션 그림 받기" : "순찰 그림 받기 (0.7MB)"}</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
     </div></div>`;
     const msg = box.querySelector(".gx-gp-msg");
     const btns = [...box.querySelectorAll(".gx-gp-btn")];
@@ -2087,14 +3119,14 @@
       try {
         const bytes = await get();
         say("저장하는 중");
-        await installPack(bytes);
+        await (action ? installActionPack(bytes) : installPack(bytes));
         done();
       } catch (e) {
         say(errText(e));
         btns.forEach((b) => b.disabled = false);
       }
     };
-    box.querySelector('[data-gp="get"]').addEventListener("click", () => void run3(downloadPack));
+    box.querySelector('[data-gp="get"]').addEventListener("click", () => void run3(action ? downloadActionPack : downloadPack));
     box.querySelector('[data-gp="file"]').addEventListener("click", () => picker2.click());
     picker2.addEventListener("change", () => {
       const f = picker2.files?.[0];
@@ -2103,31 +3135,45 @@
     });
   }
   async function start(box) {
-    const state = await packState();
-    if (!layer || layer.querySelector(".gx-game-box") !== box) return;
+    const current3 = ++generation;
+    unmount?.();
+    unmount = null;
+    const isAction = mode2 === "action";
+    const state = await (isAction ? actionPackState() : packState());
+    if (current3 !== generation || !layer || layer.querySelector(".gx-game-box") !== box) return;
     if (state !== "ready") return packPanel(box, state === "old", () => void start(box));
     try {
-      await loadArt();
+      await (isAction ? loadActionArt() : loadArt());
     } catch {
-      if (layer?.querySelector(".gx-game-box") === box) packPanel(box, false, () => void start(box));
+      if (current3 === generation && layer?.querySelector(".gx-game-box") === box)
+        packPanel(box, false, () => void start(box));
       return;
     }
-    if (!layer || layer.querySelector(".gx-game-box") !== box) return;
+    if (current3 !== generation || !layer || layer.querySelector(".gx-game-box") !== box) return;
     box.innerHTML = "";
-    unmount = mountGame(box, host);
+    unmount = mode2 === "action" ? mountAction(box, actionHost) : mountGame(box, host);
   }
   var gameOpen = () => !!layer;
   function openGame(panel) {
     if (layer || !panel) return;
     layer = document.createElement("div");
     layer.className = "gx-game";
-    layer.innerHTML = `<header class="gx-head"><div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>관리국 순찰</b></div></div>
+    layer.innerHTML = `<header class="gx-head"><div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>관리국 훈련</b></div></div>
+    <div><button type="button" data-game-mode="action" aria-pressed="${mode2 === "action"}">1인 전투 검증판</button><button type="button" data-game-mode="patrol" aria-pressed="${mode2 === "patrol"}">기존 순찰</button></div>
     <div class="gx-head-act"><button class="gx-x" data-action="game-close" aria-label="순찰 닫기">${ICONS.close}</button></div></header>
     <div class="gx-game-box"></div>`;
     panel.append(layer);
+    layer.addEventListener("click", (e) => {
+      const value = e.target.closest("[data-game-mode]")?.dataset.gameMode;
+      if (value !== "action" && value !== "patrol" || value === mode2 || !layer) return;
+      mode2 = value;
+      layer.querySelectorAll("[data-game-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.gameMode === mode2)));
+      void start(layer.querySelector(".gx-game-box"));
+    });
     void start(layer.querySelector(".gx-game-box"));
   }
   function closeGame() {
+    generation++;
     unmount?.();
     unmount = null;
     layer?.remove();
@@ -2258,13 +3304,13 @@
   var lastDirect = "";
   async function getJson(name) {
     const text = await getText(name);
-    let body4 = text;
+    let body5 = text;
     try {
-      for (let i = 0; i < 2 && typeof body4 === "string"; i++) body4 = JSON.parse(body4.replace(/^\uFEFF/, ""));
+      for (let i = 0; i < 2 && typeof body5 === "string"; i++) body5 = JSON.parse(body5.replace(/^\uFEFF/, ""));
     } catch {
       throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text ?? "").length}자)`);
     }
-    return body4;
+    return body5;
   }
   async function loadPayload() {
     const index = await getJson("card-update.json");
@@ -2365,8 +3411,8 @@
     return section2(rows.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc9(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc9(updateUi.done)}</p>` : ""));
   }
   var mb = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`;
-  function section2(body4) {
-    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body4}</div></section>`;
+  function section2(body5) {
+    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body5}</div></section>`;
   }
   var FIELD_NAMES = {
     characterVersion: "캐릭터 버전",
@@ -2552,9 +3598,9 @@
         }
       })();
       const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s4, catalogNames, registry(ctx2)));
-      let body4;
+      let body5;
       try {
-        body4 = (await generate(prompt.messages, s4.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
+        body5 = (await generate(prompt.messages, s4.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
       } catch (error) {
         const raw = error.raw;
         if (raw) wiki.failure = { title: title2, reason: error instanceof Error ? error.message : String(error), raw };
@@ -2571,7 +3617,7 @@
         writingRequest,
         direct
       };
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body4));
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body5));
       const cur = env2.current();
       if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) wiki.view = "doc";
     } catch (error) {
@@ -2835,753 +3881,4 @@
     const job = jobs3.get(chatKey3(ctx2));
     const mine = job?.title === wiki.title;
     const lore = hasBook(source3(ctx2), wiki.title);
-    const e = entryFor(ctx2, wiki.title);
-    const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc10(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc10(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
-    return `<div class="ph-form">${paneHead3(ctx2, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : "새 문서", "", e)}
-    <div class="ph-form-body"><section class="nw-compose">
-      ${face2(ctx2, e, " lg")}
-      <h2 class="nw-title">${esc10(wiki.title)}</h2>
-      <p class="nw-cmsg">이 문서는 아직 없어요.</p>
-      <p class="gx-muted">${src}</p>
-      ${req ? `<p class="nw-creq">작성 지침: ${esc10(req)}</p>` : ""}
-    </section></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc10(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
-  }
-  function docView(ctx2) {
-    const doc = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
-    if (!doc) {
-      wiki.view = "compose";
-      return compose(ctx2);
-    }
-    const c = canon(ctx2);
-    const saved = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
-    const e = entryFor(ctx2, doc.title);
-    const photo = e?.photo ? imageUrl(ctx2.char, e.photo) : null;
-    const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo });
-    const job = jobs3.get(chatKey3(ctx2));
-    const links = (label, list4) => list4.length ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list4.map((t) => {
-      const le = entryFor(ctx2, t);
-      return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc10(t)}">${face2(ctx2, le, " xs")}<span>${esc10(le?.name ?? t)}</span></button>`;
-    }).join("")}</div></div>` : "";
-    const m = doc.meta;
-    const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc10(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>작성 지침: ${esc10(m.writingRequest)}</p>` : ""}</details>` : "";
-    const confirm = wiki.confirmDelete === doc.title;
-    const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc.title);
-    const del = doc.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc10(doc.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc10(doc.title)}"`);
-    const right = `${tool3("wiki-rewrite", ICONS.refresh, job?.title === doc.title ? "작성하는 중" : "새로고침", `data-value="${esc10(doc.title)}" ${job ? "disabled" : ""}`)}${del}`;
-    const sub = [e ? CAT_LABEL[e.cat] : "", doc.base ? "기본 문서" : m?.created ? when(m.created) : ""].filter(Boolean).join(" · ");
-    return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc.title, sub, right, e)}
-    <article class="nw-doc">
-      <header class="nw-dochead"><h2 class="nw-title">${esc10(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc10(e.sub)}</small>` : ""}</header>
-      <div class="nw-body">${r.html}</div>
-      ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
-    </article></div>`;
-  }
-  function paneHtml3(ctx2) {
-    if (wiki.view === "doc") return docView(ctx2);
-    if (wiki.view === "compose") return compose(ctx2);
-    if (wiki.view === "settings") return settingsView3(ctx2);
-    if (wiki.view === "new") return newView(ctx2);
-    return homeView(ctx2);
-  }
-  function wikiTab(ctx2) {
-    const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc10(wiki.failure.title)})</summary><p>${esc10(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc10(wiki.failure.raw)}</textarea></details>` : "";
-    const note = toast("nw", wiki.info, (t) => {
-      if (wiki.info === t) wiki.info = "";
-    });
-    const status = `${busyLine(ctx2)}${wiki.notice ? `<div class="gx-err" role="alert">${esc10(wiki.notice)}</div>` : ""}`;
-    const open3 = wiki.listOpen;
-    return `<main class="gx-body ph-app nw nw-app${open3 ? " list-open" : ""}">
-    ${rail()}
-    <aside class="nw-panel" aria-label="위키 목록"${open3 ? "" : " inert"}><div class="nw-pin">
-        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc10(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
-        <div class="ph-content nw-list">${wikiList(ctx2)}</div>
-        ${fail3}
-      </div></aside>
-    <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
-    <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml3(ctx2)}</section>
-    ${drawerHtml([
-      tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "", "메인"),
-      tool3("wiki-find", ICONS.search, "위키 검색", "", "검색"),
-      tool3("wiki-list", ICONS.list, open3 ? "목록 접기" : "목록 펼치기", `aria-pressed="${open3}"`, "목록"),
-      tool3("wiki-settings", ICONS.settings, "위키 설정", wiki.view === "settings" ? 'aria-pressed="true"' : "", "설정")
-    ].join(""))}
-    ${note}
-  </main>`;
-  }
-  function bindFootnotes(root2) {
-    const doc = root2.querySelector(".nw-doc");
-    if (!doc?.querySelector(".nw-fn")) return;
-    const hover = matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const pop = document.createElement("div");
-    pop.className = "nw-fnpop";
-    pop.hidden = true;
-    doc.appendChild(pop);
-    let cur = null;
-    const hide = () => {
-      pop.hidden = true;
-      cur = null;
-    };
-    const show = (sup) => {
-      const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
-      if (!li) return;
-      cur = sup;
-      pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${li.innerHTML}`;
-      pop.hidden = false;
-      const box = doc.getBoundingClientRect();
-      const r = sup.getBoundingClientRect();
-      const w = Math.min(360, box.width - 24);
-      pop.style.width = `${w}px`;
-      const left = Math.max(12, Math.min(r.left - box.left - w / 2 + r.width / 2, box.width - w - 12));
-      let top = r.bottom - box.top + doc.scrollTop + 6;
-      if (r.bottom + pop.offsetHeight + 12 > box.bottom && r.top - pop.offsetHeight - 12 > box.top) top = r.top - box.top + doc.scrollTop - pop.offsetHeight - 6;
-      pop.style.left = `${left}px`;
-      pop.style.top = `${top}px`;
-    };
-    const supOf = (e) => e.target.closest(".nw-fn");
-    if (hover) {
-      doc.addEventListener("mouseover", (e) => {
-        const sup = supOf(e);
-        if (sup && sup !== cur) show(sup);
-      });
-      doc.addEventListener("mouseout", (e) => {
-        if (supOf(e) && !e.relatedTarget?.closest?.(".nw-fn")) hide();
-      });
-    }
-    doc.addEventListener("click", (e) => {
-      const sup = supOf(e);
-      if (!sup) {
-        if (!hover && !e.target.closest(".nw-fnpop")) hide();
-        return;
-      }
-      e.preventDefault();
-      if (!hover) {
-        if (cur === sup) hide();
-        else show(sup);
-        return;
-      }
-      hide();
-      const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
-      if (!li) return;
-      li.scrollIntoView({ behavior: "smooth", block: "center" });
-      li.classList.remove("hit");
-      void li.offsetWidth;
-      li.classList.add("hit");
-    });
-    doc.addEventListener("scroll", () => !hover && hide(), { passive: true });
-  }
-  function bindWikiSide(root2, act) {
-    const bar = root2.querySelector(".nw-rail");
-    const panel = root2.querySelector(".nw-panel");
-    if (!bar || !panel) return;
-    let x0 = null;
-    let dragged = false;
-    const up = (e) => {
-      if (x0 === null) return;
-      const dx = e.clientX - x0;
-      x0 = null;
-      if (Math.abs(dx) < 30) return;
-      dragged = true;
-      if (dx > 0 && !wiki.listOpen) act("open");
-      else if (dx < 0 && wiki.listOpen) act("close");
-    };
-    bar.addEventListener("pointerdown", (e) => {
-      x0 = e.clientX;
-      dragged = false;
-      window.addEventListener("pointerup", up, { once: true });
-    });
-    bar.addEventListener("click", (e) => {
-      if (!dragged) return;
-      dragged = false;
-      e.stopPropagation();
-      e.preventDefault();
-    }, true);
-    panel.addEventListener("click", (e) => {
-      const t = e.target;
-      const grid = panel.querySelector(".nw-kgrid");
-      if (!grid) return;
-      if (t.closest("[data-kpick]")) {
-        grid.hidden = false;
-        return;
-      }
-      const k = t.closest(".nw-kgrid [data-k]")?.dataset.k;
-      if (k) {
-        const box = panel.querySelector(".nw-groups");
-        const sec = box?.querySelector(`[data-ksec="${k}"]`);
-        if (box && sec) box.scrollTop = sec.offsetTop;
-        grid.hidden = true;
-        return;
-      }
-      if (t.closest(".nw-kgrid") && !t.closest(".nw-kgrid-in button")) grid.hidden = true;
-    });
-    let t0 = null;
-    panel.addEventListener("touchstart", (e) => t0 = e.target.closest(".nw-kgrid") ? null : { x: e.touches[0]?.clientX ?? 0, y: e.touches[0]?.clientY ?? 0 }, { passive: true });
-    panel.addEventListener("touchend", (e) => {
-      if (!t0) return;
-      const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
-      const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
-      t0 = null;
-      if (dx < -36 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act("close");
-    }, { passive: true });
-  }
-  var wide = () => !matchMedia("(max-width: 760px)").matches;
-  async function handleWiki(action, value, ctx2, env2) {
-    const v = value ?? "";
-    if (action !== "wiki-delete") wiki.confirmDelete = null;
-    if (action.startsWith("wiki-def-")) {
-      try {
-        const msg = await defaultsAction("wiki", action, v, ctx2, env2.refresh);
-        if (msg) wiki.info = msg;
-      } catch (error) {
-        wiki.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-      }
-      env2.render();
-      return true;
-    }
-    switch (action) {
-      case "wiki-home":
-        go("home");
-        wiki.history = [];
-        wiki.listOpen = false;
-        break;
-      case "wiki-back": {
-        const prev = wiki.history.pop();
-        if (prev && prev.view !== "home") Object.assign(wiki, { view: prev.view, title: prev.title }, { confirmDelete: null, notice: "" });
-        else Object.assign(wiki, { view: "home", title: "", notice: "" }, { history: [] });
-        break;
-      }
-      case "wiki-list":
-        wiki.listOpen = v === "open" ? true : v === "close" ? false : !wiki.listOpen;
-        env2.render();
-        if (wiki.listOpen && wide() && !v) document.querySelector(".nw .ph-search")?.focus();
-        return true;
-      case "wiki-find":
-        wiki.listOpen = true;
-        env2.render();
-        document.querySelector(".nw .ph-search")?.focus();
-        return true;
-      case "wiki-tab":
-        wiki.tab = TABS.some(([t]) => t === v) ? v : "all";
-        break;
-      case "wiki-browse":
-        Object.assign(wiki, { tab: TABS.some(([t]) => t === v) ? v : "all", listOpen: true, query: "" });
-        break;
-      case "wiki-search":
-        wiki.homeQuery = "";
-        search(ctx2, v);
-        if (wiki.view === "compose" || wiki.view === "doc") wiki.listOpen = false;
-        break;
-      case "wiki-pick":
-        if ((wiki.view === "doc" || wiki.view === "compose") && canon(ctx2)(v) === wiki.title && wide()) {
-          Object.assign(wiki, { view: "home", title: "", history: [] });
-          break;
-        }
-        wiki.history = [];
-        wiki.homeQuery = "";
-        openTitle(ctx2, v, "search");
-        if (wiki.view !== "home") wiki.listOpen = false;
-        break;
-      case "wiki-open":
-        openTitle(ctx2, v, wiki.view === "doc" ? "link" : "search");
-        break;
-      case "wiki-write":
-        if (!v.trim()) break;
-        wiki.newTitle = "";
-        openTitle(ctx2, v, "direct");
-        if (wiki.view === "compose" || wiki.view === "doc") wiki.listOpen = false;
-        break;
-      case "wiki-new":
-        if (wiki.view === "new") go("home");
-        else go("new");
-        wiki.listOpen = false;
-        break;
-      case "wiki-start":
-        if (wiki.view === "compose" && wiki.title === v) void generate3(ctx2, env2, v, false);
-        break;
-      case "wiki-rewrite":
-        if (!v) break;
-        if (wiki.view !== "doc") go("doc", v);
-        void generate3(ctx2, env2, v, true);
-        break;
-      case "wiki-delete":
-        if (wiki.confirmDelete !== v) {
-          wiki.confirmDelete = v;
-          break;
-        }
-        wiki.confirmDelete = null;
-        if (wiki.title === v && wiki.view === "doc" && !baseDocs(ctx2.char.globalLore).some((d) => d.title === v)) Object.assign(wiki, { view: "home", title: "", history: [] });
-        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => deleteDoc(chat, v));
-        await env2.refresh();
-        return true;
-      case "wiki-jump": {
-        document.getElementById(v)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        return true;
-      }
-      case "wiki-request":
-        await setVar2(ctx2, env2, "$nw_writing_request", v.trim());
-        return true;
-      case "wiki-length":
-      case "wiki-mode":
-      case "wiki-model":
-      case "wiki-refresh_previous":
-      case "wiki-context":
-        await setVar2(ctx2, env2, `$nw_${action.slice(5)}`, v);
-        return true;
-      case "wiki-settings":
-        if (wiki.view === "settings") go("home");
-        else go("settings");
-        wiki.listOpen = false;
-        break;
-      default:
-        return false;
-    }
-    env2.render();
-    return true;
-  }
-  function wikiInput(name, value) {
-    if (name === "wiki-new") return void (wiki.newTitle = value), true;
-    return false;
-  }
-
-  // src/ui/evcard.ts
-  var esc11 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND = { an: "괴이", in: "사건", ms: "특수" };
-  var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
-  function peopleChips(char, names4, agents2) {
-    return names4.filter((n) => n && n !== "없음").map((n) => agents2.has(n) ? `<span class="gx-pchip">${avatar(char, agents2.get(n).english, n, "xs")}${esc11(n)}</span>` : `<span class="gx-badge">${esc11(n)}</span>`).join("");
-  }
-  function elapsedText(minute, since) {
-    if (minute === null || since === null) return "";
-    const m = Math.max(0, minute - since);
-    const h = Math.floor(m / 60);
-    if (!m) return "방금 발생";
-    return `발생 ${h ? `${h}시간 ` : ""}${m % 60 || !h ? `${m % 60}분 ` : ""}경과`;
-  }
-  function evCard(c) {
-    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
-    const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc11(grade)}등급` : ""}">${grade ? esc11(grade) : MARK[c.kind]}</i>`;
-    const title2 = `<span class="gx-evc-name"><b>${esc11(c.name)}</b></span>`;
-    if (!c.key) {
-      return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
-    }
-    const key = esc11(c.key);
-    const acts = `<span class="gx-evc-act">
-      ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc11(c.name)}" title="위키" aria-label="${esc11(c.name)} 위키">${ICONS.wiki}</button>` : ""}
-      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc11(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
-    const open3 = c.open ? ` data-action="${c.open}" data-value="${key}"` : "";
-    return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open3}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
-  }
-
-  // src/host/send.ts
-  var QUICK_FAIL_MS = 700;
-  async function sendNow() {
-    let sent;
-    try {
-      sent = Promise.resolve(risuai.sendChat("")).then(
-        (r) => r !== false,
-        (e) => {
-          console.log(`[goei] 자동 전송 실패: ${e instanceof Error ? e.message : String(e)}`);
-          return false;
-        }
-      );
-    } catch {
-      return false;
-    }
-    return Promise.race([sent, new Promise((r) => setTimeout(() => r(true), QUICK_FAIL_MS))]);
-  }
-  var SEND_FALLBACK = "채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.";
-  var noticeClass = (text) => text === SEND_FALLBACK ? "gx-err info" : "gx-err";
-
-  // src/ui/directory.ts
-  var dirUi = {
-    kind: "anomaly",
-    q: "",
-    open: "",
-    /** 통합 검색에서 고른 항목: 다시 그린 뒤 그 줄로 스크롤 */
-    scrollTo: "",
-    draft: null,
-    base: "",
-    /** 초안을 만든 로어북 (카드가 바뀌면 새로 만든다) */
-    from: null,
-    busy: false,
-    notice: "",
-    done: "",
-    /** 다른 폴더 로어북을 발생 후보로 고르는 칸 */
-    adding: false,
-    addQ: "",
-    /** 명부 사용법 펼침 */
-    help: false,
-    /** 사진을 고르는 칸 「main>열쇠」·「face>열쇠」 */
-    pick: "",
-    pickQ: "",
-    /** 얼굴 틀을 맞추는 항목 (열쇠) */
-    crop: ""
-  };
-  function resetDirectory() {
-    Object.assign(dirUi, { kind: "anomaly", q: "", open: "", draft: null, base: "", from: null, busy: false, notice: "", done: "", adding: false, addQ: "", help: false, pick: "", pickQ: "", crop: "" });
-  }
-  var esc12 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var snapshot = (d) => JSON.stringify(directoryData(d));
-  function draftOf(ctx2) {
-    const lore = ctx2.char.globalLore ?? [];
-    if (!dirUi.draft || dirUi.from !== lore && !dirty()) {
-      dirUi.draft = structuredClone(readDirectory(lore));
-      dirUi.base = snapshot(dirUi.draft);
-      dirUi.from = lore;
-    } else if (dirUi.from !== lore) {
-      const fresh = readDirectory(lore);
-      const d = dirUi.draft;
-      const add = (have, next, key) => {
-        const known = new Set(have.map(key));
-        for (const r of next) if (!known.has(key(r))) have.push(structuredClone(r));
-      };
-      add(d.anomalies, fresh.anomalies, (r) => r.lore);
-      add(d.sites, fresh.sites, (r) => r.lore);
-      add(d.agents, fresh.agents, (r) => r.lore);
-      add(d.orgs, fresh.orgs, (r) => r.name);
-      dirUi.from = lore;
-    }
-    return dirUi.draft;
-  }
-  var dirty = () => !!dirUi.draft && snapshot(dirUi.draft) !== dirUi.base;
-  var draftBases = () => dirty() ? dirUi.draft.bases : null;
-  function rowsOf(d, kind) {
-    return kind === "anomaly" ? d.anomalies : kind === "site" ? d.sites : d.agents;
-  }
-  var orgName = (d, names4, aff) => orgOf(d.orgs, aff)?.name ?? names4[aff] ?? aff;
-  function findRow2(d, lore) {
-    return rowsOf(d, dirUi.kind).find((r) => r.lore === lore);
-  }
-  function matches3(r, q) {
-    if (!q) return true;
-    const a = r;
-    return [a.lore, a.label, a.name, a.english, a.rank, a.department, ...a.aliases ?? []].some((t) => t && t.toLowerCase().includes(q));
-  }
-  var input = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><input data-input="dir" data-key="${esc12(key)}" value="${esc12(value)}" autocomplete="off">${help ? `<small>${help}</small>` : ""}</label>`;
-  var chip2 = (action, value, label, on2) => `<button class="gx-chip${on2 ? " on" : ""}" data-action="${action}" data-value="${esc12(value)}" aria-pressed="${on2}">${esc12(label)}</button>`;
-  var draftExtras = (d) => d.orgs.filter((o) => !o.faction && o.spec.playable && o.spec.code);
-  var codesOf = (d) => [...BUILTIN, ...draftExtras(d).map((o) => o.spec.code)];
-  function namesOf(d, lore) {
-    const out = factionDisplayNames(lore ?? []);
-    for (const f of BUILTIN) if (d.display.none?.[f]) out[f] = d.display.none[f];
-    for (const o of draftExtras(d)) out[o.spec.code] = o.name;
-    return out;
-  }
-  var tabName = (o) => o.spec.tab || Array.from(o.name).slice(0, 2).join("");
-  function tabsOf(d, lore) {
-    const tabs2 = d.phoneTabs.tabs.length ? d.phoneTabs.tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] })) : phoneTabs(lore ?? []).filter((t) => !/^T1\d\d$/.test(t.id));
-    for (const o of draftExtras(d)) tabs2.push({ id: extraTabId(o.spec.code), name: tabName(o), visibleFor: [o.spec.code] });
-    return tabs2;
-  }
-  var area = (key, value, label, help = "") => `<label class="dir-in"><span>${label}</span><textarea data-input="dir" data-key="${esc12(key)}" rows="3">${esc12(value)}</textarea>${help ? `<small>${help}</small>` : ""}</label>`;
-  var SEP = /^\s*-{2,}\s*(.*?)\s*-{2,}\s*$/;
-  var sourceCache = /* @__PURE__ */ new WeakMap();
-  function loreSources(lore) {
-    const books = lore ?? [];
-    const hit2 = sourceCache.get(books);
-    if (hit2) return hit2;
-    const folders = new Map(books.filter((e) => e.mode === "folder" && typeof e.key === "string").map((e) => [e.key, String(e.comment ?? "")]));
-    const out = /* @__PURE__ */ new Map();
-    const divider = /* @__PURE__ */ new Map();
-    for (const e of books) {
-      if (e.mode === "folder") continue;
-      const name = String(e.comment ?? "").trim();
-      const folder = folders.get(String(e.folder ?? "")) ?? "";
-      const sep = SEP.exec(name);
-      if (sep) {
-        divider.set(folder, sep[1]);
-        continue;
-      }
-      if (name) out.set(name, [folder, divider.get(folder)].filter(Boolean).join(" · "));
-    }
-    sourceCache.set(books, out);
-    return out;
-  }
-  function directoryExtList(ctx2) {
-    const d = draftOf(ctx2);
-    const rows = dirUi.kind === "anomaly" ? d.anomalies : d.sites;
-    const have = new Set(rows.map((r) => r.lore));
-    const own = dirUi.kind === "anomaly" ? "괴이" : "파밍";
-    const q = dirUi.addQ.trim().toLowerCase();
-    const list4 = [...loreSources(ctx2.char.globalLore)].filter(([name, src]) => src && !have.has(name) && !/설정/.test(src) && src.replace(/[^\p{L}\p{N}]/gu, "") !== own && (!q || name.toLowerCase().includes(q) || src.toLowerCase().includes(q))).slice(0, 60);
-    if (!list4.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
-    return list4.map(([name, src]) => `<button class="dir-ext-item" data-action="dir-ext-add" data-value="${esc12(name)}"><b>${esc12(name)}</b><small>${esc12(src)}</small><span>＋ 후보로</span></button>`).join("");
-  }
-  function picOf(d, key) {
-    const put = (o) => (slot, v) => {
-      const f = slot === "main" ? "photo" : slot;
-      if (v) o[f] = v;
-      else delete o[f];
-    };
-    if (key.startsWith("org:")) {
-      const o = d.orgs.find((x) => x.name === key.slice(4));
-      if (!o) return null;
-      return { english: o.spec.english ?? "", photo: o.spec.photo, face: o.spec.face, crop: o.spec.crop, person: false, set: put(o.spec) };
-    }
-    const r = findRow2(d, key);
-    if (!r) return null;
-    return { english: r.english, photo: r.photo, face: r.face, crop: r.crop, person: "rank" in r, set: put(r) };
-  }
-  var pickOf = (v) => {
-    const at = v.indexOf(">");
-    return { slot: v.slice(0, at) === "face" ? "face" : "main", key: v.slice(at + 1) };
-  };
-  function cropValue(key) {
-    const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
-    return parseCrop(p?.crop) ?? parseCrop(DEFAULT_CROP);
-  }
-  function setCrop(key, crop) {
-    const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
-    if (!p) return;
-    p.set("crop", crop.map((n) => Math.round(n)).join(","));
-    dirUi.done = "";
-  }
-  function photoBlock(key, ctx2) {
-    const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
-    if (!p) return "";
-    const main = mainPic(ctx2.char, p);
-    const face3 = facePic(ctx2.char, p, p.person);
-    const cut2 = !!main && splitPic(face3).crop !== null;
-    const line = (slot, label, pic, picked, why, extra = "") => {
-      const url = pic ? imageUrl(ctx2.char, pic) : null;
-      const picking2 = dirUi.pick === `${slot}>${key}`;
-      return `<div class="dir-photo">
-      <span class="dir-pic-img">${url ? `<img src="${esc12(url)}" alt="">` : ICONS.spook}</span>
-      <span class="dir-photo-name"><b>${label} · ${esc12(picked || "자동")}</b><small>${why}</small></span>
-      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc12(`|${slot}>${key}`)}">자동으로</button>` : ""}${extra}
-      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc12(`${slot}>${key}`)}">${picking2 ? "닫기" : "고르기"}</button>
-    </div>`;
-    };
-    const mainWhy = p.photo ? "직접 고름" : main ? `자동: ${esc12(main)}` : "「영문명_default」·「영문명」 이미지가 없어요";
-    const faceWhy = p.face ? "직접 고름" : cut2 ? "대표 사진에서 잘라요" : face3 ? `자동: ${esc12(splitPic(face3).name)}` : "「영문명」 이미지가 없어요";
-    const cropping = cut2 && dirUi.crop === key;
-    const cropBtn = cut2 ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc12(key)}">${cropping ? "완료" : "틀 맞추기"}</button>` : "";
-    const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const list4 = picking?.key === key ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc12(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx2)}</div></div>` : "";
-    return `<div class="dir-in"><span>사진</span>
-    ${line("main", "대표", main, p.photo, mainWhy)}
-    ${line("face", "얼굴", face3, p.face, faceWhy, cropBtn)}
-    ${cropping ? cropBox(ctx2, key, main) : ""}
-    ${list4}
-  </div>`;
-  }
-  function cropBox(ctx2, key, main) {
-    const url = imageUrl(ctx2.char, main);
-    const [x, y, w] = cropValue(key);
-    return `<div class="dir-crop">
-    <div class="dir-crop-img" data-crop="${esc12(key)}">${url ? `<img src="${esc12(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ""}</div>
-    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc12(key)}" aria-label="얼굴 틀 크기"></label>
-    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc12(key)}">기본 틀로</button>
-  </div>`;
-  }
-  function directoryPhotoList(ctx2) {
-    const at = dirUi.pick ? pickOf(dirUi.pick) : null;
-    const p = at && dirUi.draft ? picOf(dirUi.draft, at.key) : null;
-    if (!at || !p) return "";
-    const cur = at.slot === "face" ? p.face : p.photo;
-    const q = dirUi.pickQ.trim().toLowerCase();
-    const near = p.english.toLowerCase();
-    const all = assetNames(ctx2.char);
-    const hits = q ? all.filter((n) => n.toLowerCase().includes(q)) : near ? all.filter((n) => n.toLowerCase().startsWith(near)) : [];
-    const list4 = [...hits.filter((n) => near && n.toLowerCase().startsWith(near)), ...hits.filter((n) => !near || !n.toLowerCase().startsWith(near))];
-    if (!list4.length) return `<p class="gx-muted dir-empty">${q ? "찾는 이름의 이미지가 없어요." : `이미지 ${all.length}장 중에서 이름으로 검색해 주세요.`}</p>`;
-    const more = list4.length > 30 ? `<p class="gx-muted dir-empty">${list4.length}장 중 30장만 보여요. 검색어를 더 적어 주세요.</p>` : "";
-    return list4.slice(0, 30).map((n) => {
-      const url = imageUrl(ctx2.char, n);
-      return `<button class="dir-pic${cur === n ? " on" : ""}" data-action="dir-photo-set" data-value="${esc12(`${n}|${dirUi.pick}`)}" title="${esc12(n)}"><span class="dir-pic-img">${url ? `<img src="${esc12(url)}" alt="" loading="lazy">` : ""}</span><small>${esc12(n)}</small></button>`;
-    }).join("") + more;
-  }
-  function placePanel(p, ctx2) {
-    const k = (f) => `${f}|${p.lore}`;
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc12(`preset|1|${p.lore}`)}">ON</button>
-      <button class="gx-seg${!p.preset ? " on" : ""}" data-action="dir-set" data-value="${esc12(`preset|0|${p.lore}`)}">OFF</button></div></div>
-    <p class="gx-muted">OFF여도 직접 고르거나 대화에 나오면 상황판에 기록돼요.</p>
-    ${input(k("label"), p.label, "표시 이름", "상황판과 지도에 보이는 이름")}
-    ${input(k("english"), p.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${input(k("aliases"), p.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    ${photoBlock(p.lore, ctx2)}
-    <p class="gx-muted">로어북: ${esc12(p.lore)}${p.inFolder ? "" : " (폴더 밖)"}</p>
-    ${p.inFolder ? "" : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc12(p.lore)}">후보 목록에서 빼기</button>`}
-  </div>`;
-  }
-  function agentPanel(a, ctx2, d) {
-    const lore = ctx2.char.globalLore ?? [];
-    const names4 = namesOf(d, lore);
-    const tabs2 = tabsOf(d, lore);
-    const k = (f) => `${f}|${a.lore}`;
-    const cur = orgOf(d.orgs, a.affiliation);
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>소속 조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-org-pick", `${o.name}|${a.lore}`, o.name, cur === o)).join("")}${chip2("dir-org-pick", `|${a.lore}`, "미정", !a.affiliation)}</div></div>
-    <p class="gx-muted">조직을 고르면 아래 두 값이 그 조직 기준으로 채워져요. 새 조직은 「조직」 탭에서 만들어요.</p>
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-toggle", `rosterFor|${f}|${a.lore}`, names4[f], a.rosterFor.includes(f))).join("")}</div></div>
-    <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-toggle", `phoneTabs|${t.id}|${a.lore}`, t.name || t.id, a.phoneTabs.includes(t.id))).join("")}</div></div>
-    <div class="dir-grid">
-      ${input(k("rank"), a.rank, "직급")}
-      ${input(k("department"), a.department, "부서")}
-    </div>
-    ${input(k("english"), a.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${photoBlock(a.lore, ctx2)}
-    ${input(k("aliases"), a.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <p class="gx-muted">로어북: ${esc12(a.lore)} · ID ${esc12(a.id)}${a.inFolder ? "" : " (폴더 밖)"}</p>
-  </div>`;
-  }
-  function factionBlock(o, ctx2) {
-    const lore = ctx2.char.globalLore ?? [];
-    const k = (f) => `org:${f}|${o.name}`;
-    const seg5 = (action, on3, a, b) => `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on3 ? " on" : ""}" data-action="${action}" data-value="${esc12(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on3 ? " on" : ""}" data-action="${action}" data-value="${esc12(`0|${o.name}`)}">${b}</button></div>`;
-    const start4 = `${input(k("title"), o.spec.title ?? "", "시작 화면 이름", o.faction ? "비우면 원래 이름" : "비우면 조직 이름")}
-    ${area(k("blurb"), o.spec.blurb ?? "", "시작 화면 설명")}`;
-    if (o.faction) {
-      return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg5("dir-fac-hide", !o.spec.hidden, "보임", "숨김")}</div>${start4}${builtinBlock(o.faction, dirUi.draft)}</div>`;
-    }
-    const on2 = !!o.spec.playable;
-    const ready = placeholdersReady(lore);
-    const head = `<div class="dir-line"><span>플레이 세력${on2 && o.spec.code ? ` <b class="dir-code">${esc12(o.spec.code)}</b>` : ""}</span>${seg5("dir-fac-play", on2, "ON", "OFF")}</div>`;
-    if (!on2) return `<div class="dir-fac">${head}<p class="gx-muted">켜면 이 조직으로 시작할 수 있어요. 첫 장면은 직접 입력과 커스텀 임무로 시작해요.</p></div>`;
-    const patch = ready ? "" : `<div class="gx-hint">이 카드의 🏷️Tag 로어북에 새 세력 자리가 없어서 아직 시작 화면에 안 보여요. <button class="gx-mini" data-action="dir-fac-patch">로어북에 자리 넣기</button></div>`;
-    return `<div class="dir-fac">${head}${patch}
-    <div class="dir-line"><span>유형</span><div class="dir-chips">${FACTION_TYPES.map((x) => chip2("dir-fac-type", `${x.id}|${o.name}`, x.label, (o.spec.type ?? "org") === x.id)).join("")}</div></div>
-    <p class="gx-muted">${esc12(FACTION_TYPES.find((x) => x.id === (o.spec.type ?? "org")).help)}</p>
-    ${start4}
-    ${input(k("gm_name"), o.spec.gm_name ?? "", "모델용 영어 이름", "소속 변경 태그 목록과 세력 설명 제목에 써요. 비우면 조직 이름")}
-    ${area(k("gm_desc"), o.spec.gm_desc ?? "", "모델용 세력 설명", "📜Faction 로어북 끝에 붙어요. 영어로 적으면 다른 세력 설명과 어울려요")}
-    ${input(k("seed"), (o.spec.seed ?? [o.name]).join(", "), "시작 때 함께 넣을 로어북", "쉼표로 나눠 적어요. 첫 응답에 이 로어북들이 꼭 들어가요")}
-    ${input(k("tab"), o.spec.tab ?? "", "괴담톡 전용 탭 이름", `비우면 「${esc12(tabName(o))}」`)}
-  </div>`;
-  }
-  function builtinBlock(code, d) {
-    const viewers = [["none", "기본"], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
-    const fallback = d.display.none?.[code] ?? "";
-    const names4 = viewers.map(([v, label]) => `<label class="dir-in"><span>${esc12(label)}</span><input data-input="dir" data-key="${esc12(`disp:${v}|${code}`)}" value="${esc12(d.display[v]?.[code] ?? "")}" placeholder="${esc12(fallback)}" autocomplete="off"></label>`).join("");
-    const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code);
-    const tab2 = own ? input(`ptab:${own.id}`, own.name, "괴담톡 전용 탭 이름") : "";
-    const scenes = (SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? []).map((sc) => input(`seed:${code}-${sc.fm}`, (d.seeds[`${code}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc12(sc.label)}`)).join("");
-    return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names4}</div>
-    ${tab2}
-    <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
-  }
-  function orgPanel(o, ctx2, d) {
-    const lore = ctx2.char.globalLore ?? [];
-    const names4 = namesOf(d, lore);
-    const tabs2 = tabsOf(d, lore);
-    const members = d.agents.filter((a) => a.affiliation === orgAffiliation(o));
-    return `<div class="dir-panel">
-    ${input(`org:english|${o.name}`, o.spec.english ?? "", "영문명")}
-    ${photoBlock(`org:${o.name}`, ctx2)}
-    ${factionBlock(o, ctx2)}
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-org-toggle", `rosterFor|${f}|${o.name}`, names4[f], o.rosterFor.includes(f))).join("")}</div></div>
-    <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
-    <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
-    ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc12(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
-      <button class="gx-mini" data-action="dir-org-rename" data-take="dir-org-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-org-del" data-value="${esc12(o.name)}" ${members.length ? 'disabled title="소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
-    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc12(m.name)).join(", ")}</p>` : ""}
-    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc12(o.name)}">＋ 거점 추가</button></div></div>
-  </div>`;
-  }
-  function orgRow(o, ctx2, d, names4) {
-    const open3 = dirUi.open === o.name;
-    const n = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
-    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
-    const play = o.faction || o.spec.playable && o.spec.code;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc12(o.name)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc12(o.name)}</b><small>${esc12(sub)}</small></span>
-      ${play ? `<span class="gx-badge live">플레이 ${esc12(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n}명</span>
-    </button>${open3 ? orgPanel(o, ctx2, d) : ""}</div>`;
-  }
-  var REGIONS = MAP_CODES.filter((c) => c !== "01");
-  var baseMaps = {};
-  function baseMap(ctx2, code, env2) {
-    const hit2 = baseMaps[code];
-    if (hit2 === void 0 && env2) {
-      baseMaps[code] = "loading";
-      void assetUrl(ctx2.char, `map${code}`).then((url) => {
-        baseMaps[code] = url;
-        env2.render();
-      });
-      return null;
-    }
-    return hit2 === "loading" || hit2 === void 0 ? null : hit2;
-  }
-  var mapEnv = null;
-  var baseWhere = (b) => placeWhere(b.sido, b.gu) || "위치 미정";
-  function basePanel(b, ctx2, d) {
-    const k = (f) => `base:${f}|${b.name}`;
-    const url = baseMap(ctx2, b.sido, mapEnv);
-    const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? " selected" : ""}>${esc12(regionName(c))}</option>`).join("");
-    const gus = `<option value=""${b.gu ? "" : " selected"}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc12(g)}"${g === b.gu ? " selected" : ""}>${esc12(g)}</option>`).join("");
-    const map = url ? `<div class="dir-map" data-base-pick="${esc12(b.name)}"><img src="${esc12(url)}" alt="${esc12(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>` : `<div class="dir-map ph">지도 불러오는 중…</div>`;
-    return `<div class="dir-panel">
-    <div class="dir-line"><span>지도에 보이기</span><div class="gx-segs gx-segs-sm">
-      <button class="gx-seg${b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc12(`1|${b.name}`)}">보임</button>
-      <button class="gx-seg${!b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc12(`0|${b.name}`)}">숨김</button></div></div>
-    <div class="dir-line"><span>조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-base-org", `${o.name}|${b.name}`, o.name, b.org === o.name)).join("")}${chip2("dir-base-org", `|${b.name}`, "조직 없음", !b.org)}</div></div>
-    <div class="dir-grid">
-      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc12(b.name)}">${sido}</select></label>
-      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc12(b.name)}">${gus}</select></label>
-    </div>
-    ${map}
-    ${input(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
-    ${input(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
-    ${input(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${input(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc12(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
-      <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc12(b.name)}">지우기</button></div>
-  </div>`;
-  }
-  function baseRow(b, ctx2, d) {
-    const open3 = dirUi.open === b.name;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc12(b.name)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc12(b.name)}</b><small>${esc12([b.org || "조직 없음", baseWhere(b)].join(" · "))}</small></span>
-      ${b.show ? "" : '<span class="gx-badge">숨김</span>'}
-    </button>${open3 ? basePanel(b, ctx2, d) : ""}</div>`;
-  }
-  function baseList(ctx2, d, q) {
-    const rows = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
-    const order = [...d.orgs.map((o) => o.name), ""];
-    const rank = (b) => b.org ? order.indexOf(b.org) : order.length;
-    const sorted = [...rows].sort((x, y) => rank(x) - rank(y));
-    return `    ${sorted.length ? sorted.map((b) => baseRow(b, ctx2, d)).join("") : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
-  }
-  function freeBaseName(d, want) {
-    let name = want;
-    for (let i = 2; d.bases.some((b) => b.name === name); i++) name = `${want} ${i}`;
-    return name;
-  }
-  function placeRow(p, ctx2, src = "") {
-    const open3 = dirUi.open === p.lore;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc12(p.lore)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc12(p.label)}</b><small>${esc12(p.english || "영문명 없음")}</small></span>
-      ${p.inFolder ? "" : `<span class="gx-badge wait">${esc12(src || "폴더 밖")}</span>`}
-      <span class="gx-badge${p.preset ? " live" : ""}">${p.preset ? "발생 후보" : "숨김"}</span>
-    </button>${open3 ? placePanel(p, ctx2) : ""}</div>`;
-  }
-  function agentRow(a, ctx2, d, names4, order) {
-    const open3 = dirUi.open === a.lore;
-    const sub = [a.affiliation ? orgName(d, names4, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
-    const move = order ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc12(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span><button class="dir-step" data-action="dir-move" data-value="up|${esc12(a.lore)}" aria-label="${esc12(a.name)} 위로" ${order.first ? "disabled" : ""}>${ICONS.up}</button><button class="dir-step" data-action="dir-move" data-value="down|${esc12(a.lore)}" aria-label="${esc12(a.name)} 아래로" ${order.last ? "disabled" : ""}>${ICONS.down}</button></span>` : "";
-    return `<div class="dir-row${open3 ? " open" : ""}"${order ? ` data-agent-row="${esc12(a.lore)}" data-agent-group="${esc12(agentGroup(a))}"` : ""}><div class="dir-headrow">
-    <button class="dir-head" data-action="dir-open" data-value="${esc12(a.lore)}" aria-expanded="${open3}">
-      ${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}
-      <span class="dir-name"><b>${esc12(a.name)}</b><small>${esc12(sub || "소속 미정")}</small></span>
-      ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? "" : '<span class="gx-badge">목록 숨김</span>'}
-    </button>${move}</div>${open3 ? agentPanel(a, ctx2, d) : ""}</div>`;
-  }
-  function searchAll(ctx2, d, q, names4) {
-    const jump = (kind, html) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key) => `data-action="dir-jump" data-value="${kind}|${key}"`);
-    const groups = [
-      ["anomaly", "괴이", d.anomalies.filter((r) => matches3(r, q)).map((r) => jump("anomaly", placeRow(r, ctx2)))],
-      ["site", "특수", d.sites.filter((r) => matches3(r, q)).map((r) => jump("site", placeRow(r, ctx2)))],
-      ["agent", "요원", d.agents.filter((r) => matches3(r, q)).map((r) => jump("agent", agentRow(r, ctx2, d, names4)))],
-      ["org", "조직", d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump("org", orgRow(o, ctx2, d, names4)))],
-      ["base", "거점"
+    const e = entryFor(
