@@ -17,8 +17,8 @@ import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
-import { factionPic, imageUrl } from './images';
-import { readDirectory } from '../core/world/directory';
+import { imageUrl } from './images';
+import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
 import { facePic, mainPic, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
@@ -221,8 +221,10 @@ function entries(ctx: ChatContext): Entry[] {
   const c = canon(ctx);
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
+  // 괴이 폴더 밖에서 발생 후보로 들어온 요원·세력 로어북(흡혈귀·탐미주의 등)은 인물·조직 항목으로만 보인다
+  const other = new Set([...dir.agents.map((a) => a.lore), ...orgLores(ctx.char.globalLore ?? [])]);
   for (const [cat, rows] of [['an', dir.anomalies], ['ms', dir.sites]] as const) {
-    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: mainPic(ctx.char, p), face: facePic(ctx.char, p), terms: [p.label, p.english, ...p.aliases] });
+    for (const p of rows) if (p.inFolder || !other.has(p.lore)) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: mainPic(ctx.char, p), face: facePic(ctx.char, p), terms: [p.label, p.english, ...p.aliases] });
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
@@ -232,9 +234,17 @@ function entries(ctx: ChatContext): Entry[] {
     /* 목록 로어북이 없으면 거점만 뺀다 */
   }
   for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: mainPic(ctx.char, a), face: facePic(ctx.char, a, true), terms: [a.name, a.english, ...a.aliases] });
-  for (const f of factionList(ctx.char.globalLore)) {
-    if (f.hidden) continue;
-    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: factionPic(ctx.char, f), face: factionPic(ctx.char, f, 'face'), terms: [f.name, f.affiliation, f.english ?? ''] });
+  // 조직: 명부의 조직 전부 (플레이 세력이면 시작 화면 이름). 문서는 세력 폴더 로어북 이름 (발푸르기스 → 발푸르기스 협회)
+  const lore = ctx.char.globalLore ?? [];
+  const facs = factionList(lore);
+  const hasLore = new Set(lore.map((e) => String(e.comment ?? '').trim()));
+  for (const o of dir.orgs) {
+    const f = o.faction ? facs.find((x) => x.code === o.faction) : facs.find((x) => !x.builtin && x.affiliation === o.name);
+    if (f?.hidden) continue;
+    const doc = orgLoreName(lore, o.name);
+    if (!f && !hasLore.has(doc)) continue; // 요원 소속에만 있는 이름(미분류 등)
+    const name = f?.name ?? o.name;
+    list.push({ cat: 'org', name, title: c(doc), sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, o.spec), face: facePic(ctx.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();

@@ -449,6 +449,15 @@ function orgFolder(lore: LoreEntry[]): LoreEntry[] {
   return keys.size ? lore.filter((e) => !isFolder(e) && keys.has(String(e.folder ?? '')) && s(e.comment)) : [];
 }
 
+/** 세력 폴더 로어북 이름들 */
+export const orgLores = (lore: LoreEntry[]): string[] => orgFolder(lore).map((e) => s(e.comment));
+
+/** 조직의 로어북 이름 (세력 폴더에서 같은 이름이거나 한쪽이 다른 쪽을 품는 것: 발푸르기스 ↔ 발푸르기스 협회). 없으면 조직 이름 */
+export function orgLoreName(lore: LoreEntry[], name: string): string {
+  const all = orgLores(lore);
+  return all.find((n) => n === name) ?? all.find((n) => Math.min(n.length, name.length) >= 2 && (n.includes(name) || name.includes(n))) ?? name;
+}
+
 /** 조직 목록: 다섯 플레이 세력 → 명부에 적힌 조직 → 요원 소속에만 있는 조직 */
 export function buildOrgs(lore: LoreEntry[], agents: AgentRow[], saved: Record<string, unknown>): OrgRow[] {
   const names = factionDisplayNames(lore);
