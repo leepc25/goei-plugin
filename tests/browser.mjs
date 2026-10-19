@@ -122,6 +122,8 @@ async function open(page) {
   await page.waitForSelector('.gx-settings');
   assert.equal(await page.$('[data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
   assert.ok(await page.$('[data-action="set-scope"][data-value="card"]'), '시작 전에도 카드 명부');
+  assert.equal(await page.evaluate(() => document.querySelector('.st-world').open), false, '괴이 발생은 접혀 있음');
+  await page.click('.st-world > summary');
   await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
   await page.click('[data-action="set-theme"][data-value="dark"]');
@@ -1012,6 +1014,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal((await page.textContent('.nw-title')).trim(), '소라 랜드', '별칭이 정식 이름으로');
   assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
   assert.equal(await page.evaluate(() => (window.__calls.llm || []).length), 0, '여는 것만으로는 생성하지 않음');
+  await page.fill('[data-input="wiki-docreq"]', '폐장 이유 위주로');
   await page.click('[data-action="wiki-start"]');
   await page.waitForSelector('.nw-busy');
   await page.waitForSelector('.nw-doc', { timeout: 5000 });
@@ -1021,6 +1024,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(call.messages.length, 2);
   assert.ok(call.messages[1].content.startsWith('문서 제목: 소라 랜드\n\n[참고 자료]'), call.messages[1].content.slice(0, 200));
   assert.ok(call.messages[1].content.includes('[주제 원본: 소라 랜드]'));
+  assert.ok(call.messages[1].content.endsWith('이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n폐장 이유 위주로'), '이 문서 지침');
   const lore = await page.evaluate(() => window.__chat.localLore);
   assert.equal(lore.length, 1);
   assert.equal(lore[0].comment, 'WIKI｜소라 랜드');
@@ -1038,12 +1042,18 @@ if (fixture.globalLore.some(packed)) {
   // 새로고침 실패: 기존 문서 유지, 원문 보관
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '형식이 틀린 응답' }]; });
   await page.click('.nw-pane .ph-room-head [data-action="wiki-rewrite"]');
+  await page.waitForSelector('.nw-rewrite');
+  assert.equal(await page.inputValue('.nw-rewrite [data-input="wiki-docreq"]'), '폐장 이유 위주로', '지난 지침을 채워 둔다');
+  if (shots) await page.screenshot({ path: `${shots}/13-wiki-rewrite.png` });
+  await page.fill('.nw-rewrite [data-input="wiki-docreq"]', '목격담 추가');
+  await page.click('[data-action="wiki-rw-go"]');
   await page.waitForSelector('.gx-err', { timeout: 5000 });
   assert.ok((await page.textContent('.gx-err')).includes('기존 문서는 그대로'));
   assert.ok((await page.textContent('.nw-fail')).includes('최근 실패 원문'));
   assert.ok((await page.evaluate(() => window.__chat.localLore[0].content)).includes('폐장한 놀이공원'));
   const prev = await page.evaluate(() => window.__calls.llm[1].messages[1].content);
-  assert.ok(prev.includes('[이전 위키'), '새로고침은 이전 문서를 넘긴다');
+  assert.ok(prev.includes('[이전 위키'), '다시 쓰기는 이전 문서를 넘긴다');
+  assert.ok(prev.endsWith('\n목격담 추가'), '다시 쓰기 지침');
   // 목록, 설정, 작성 지침, 삭제
   // 설정은 따로 (괴담톡·괴담넷처럼), 「기본값으로 저장」은 플러그인 저장소에
   await page.click('[data-action="wiki-settings"]');
@@ -1503,6 +1513,7 @@ if (fixture.globalLore.some(packed)) {
   const kinds = await page.textContent('.ps-cards');
   assert.ok(kinds.includes('2개') && kinds.includes('100%') && kinds.includes('48시간'), kinds);
   // 괴이 생성 수치: 이 채팅에만 ($wg_*)
+  await page.evaluate(() => { const d = document.querySelector('.st-world'); if (!d.open) d.querySelector('summary').click(); });
   await page.click('[data-action="set-world"][data-value="preset_cap:+"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
   await page.click('[data-action="set-world"][data-value="incident_p:-"]');
@@ -2010,7 +2021,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
   assert.equal(ch.name, fixture.name, '이름 유지');
   await page.waitForSelector('.gx-hint');
-  if (shots) await page.locator('.gx-hint').last().scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-done.png` });
+  if (shots) await page.locator('.gx-hint').last().scrollIntoViewIfNeeded().catch(() => {}), await page.screenshot({ path: `${shots}/update-done.png` });
   assert.match(await page.textContent('.gx-settings'), /v9\.0\.0으로 바꿨어요/);
   assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);
@@ -2155,6 +2166,19 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
     await page.click('[data-action="set-nav"][data-value="left"]');
     await setDim(page, 50);
+    // 기능별 설정: 맨 위 단추로 그 탭의 설정을 바로 연다
+    assert.ok(await page.evaluate(() => document.querySelector('.gx-settings .ps-group h3')?.textContent === '기능별 설정'), '기능별 설정이 맨 위');
+    await page.click('[data-action="feature-set"][data-value="wiki"]');
+    await page.waitForSelector('.nw-setpane');
+    await page.click('[data-action="tab"][data-value="settings"]');
+    await page.click('[data-action="feature-set"][data-value="gnet"]');
+    await page.waitForFunction(() => document.querySelector('[data-action="gn-settings"]')?.getAttribute('aria-pressed') === 'true');
+    await page.click('[data-action="tab"][data-value="settings"]');
+    await page.waitForSelector('.gx-settings .st-feats');
+    if (shots) {
+      await page.evaluate(() => document.querySelector('.st-world').scrollIntoView({ block: 'start' }));
+      await page.screenshot({ path: `${shots}/16-settings-lower.png` });
+    }
   }
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir-kinds');

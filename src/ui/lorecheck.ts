@@ -1,4 +1,4 @@
-// 설정 → 「본편 로어북 확인」: 다음 요청에 넣을 세력·특수·괴이·요원 로어북과 켠 까닭, Risu 방식이었다면 달랐을 것 (core/lore.ts)
+// 설정 → 「로어북 확인」: 다음 요청에 넣을 세력·특수·괴이·요원 로어북과 켠 까닭, Risu 방식이었다면 달랐을 것 (core/lore.ts)
 import { advValue } from '../core/advanced';
 import { tokens } from '../core/gnet';
 import { computeLore, loreOptions, SLOTS, type LoreMode, type LorePick, type LoreReason } from '../core/lore';
@@ -35,7 +35,7 @@ export function loreCheckBox(ctx: ChatContext): string {
   const diff = more || less
     ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ''}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ''}`
     : '<p class="ps-note">달라지는 것이 없어요.</p>';
-  return `<details class="ps-adv" data-keep="lore-check"${keepOpen('lore-check')}><summary class="ps-adv-sum"><b>본편 로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
+  return `<details class="ps-adv" data-keep="lore-check"${keepOpen('lore-check')}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
     <section class="ps-group"><h3>${mode === 'risu' ? 'Risu가 켤 로어북' : '다음 요청에 넣을 로어북'}</h3><div class="ps-rows">${list}</div></section>
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;

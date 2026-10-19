@@ -1,5 +1,5 @@
 // 「괴담톡」 탭: 연락처·대화방·공지·전화. 원본 괴담톡(폰)과 같은 저장 형식과 규칙.
-// 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 본편 응답이 끝날 때마다 한 번.
+// 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 채팅 응답이 끝날 때마다 한 번.
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { keepOpen } from './panels';
@@ -338,7 +338,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
   await generate({ ...ctx, chat: saved }, env, rid, inviteRoom ? '초대한 사람들의 반응을 기다리는 중이에요.' : '단톡방을 여는 중이에요.');
 }
 
-/** 전체 새 메시지 확인 (원본 refreshInbox). automatic: 본편 응답 뒤 자동 확인 */
+/** 전체 새 메시지 확인 (원본 refreshInbox). automatic: 채팅 응답 뒤 자동 확인 */
 export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false) {
   const e = envOr(env);
   return run(ctx, e, automatic ? '새 메시지를 자동으로 확인하는 중이에요.' : '새 메시지를 확인하는 중이에요.', async () => {
@@ -366,7 +366,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
-        note = '본편이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.';
+        note = '채팅이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.';
         return null;
       }
       const cur = readPhone(chat);
@@ -412,7 +412,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
   });
 }
 
-/** 본편 응답이 끝난 뒤 (main.ts onOutput), 또는 「창을 열 때」면 괴담톡 탭을 열 때 (openCheck). 같은 응답에는 한 번만 */
+/** 채팅 응답이 끝난 뒤 (main.ts onOutput), 또는 「창을 열 때」면 괴담톡 탭을 열 때 (openCheck). 같은 응답에는 한 번만 */
 export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: PhoneEnv): Promise<void> {
   const set = phoneSettings(ctx.chat.scriptstate);
   if (!(env ? set.autoOpen : set.auto) || phoneBusy(ctx)) return;
@@ -432,7 +432,7 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: 
   await refreshInbox({ ...ctx, chat: saved }, env, true);
 }
 
-/** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 본편 응답을 아직 확인하지 않았으면 한 번 확인 */
+/** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답을 아직 확인하지 않았으면 한 번 확인 */
 export function openCheck(ctx: ChatContext, env: PhoneEnv): void {
   if (!phoneSettings(ctx.chat.scriptstate).autoOpen) return;
   const at = lastReply(ctx.chat);
@@ -889,8 +889,8 @@ function addView(): string {
 
 const AUTO_HINT: Record<string, string> = {
   '0': '새로고침 버튼을 누를 때만 확인해요',
-  open: '본편이 진행된 뒤 괴담톡을 열면 한 번 확인해요',
-  '1': '본편 응답이 끝날 때마다 모델을 한 번 더 불러요',
+  open: '채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요',
+  '1': '채팅 응답이 끝날 때마다 모델을 한 번 더 불러요',
 };
 
 function seg(key: string, cur: string, items: [string, string][]): string {
@@ -922,7 +922,7 @@ function settingsView(ctx: ChatContext): string {
     <div class="ph-form-body ps">
       ${group('답장', [
         row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
-        row('본편에 반영', onoff('context'), '지금 장면과 관련된 대화가 본편 요청에 참고로 붙어요'),
+        row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
         row('요원 상태 참고', onoff('status')),
       ].join(''))}
       ${group('새 메시지', [

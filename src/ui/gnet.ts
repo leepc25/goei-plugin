@@ -137,7 +137,7 @@ const viewing = () => ({ post: gnet.sub === 'board' ? gnet.open : null, nick: gn
 // ── 작업 ──
 
 function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false) {
-  return run(ctx, env, automatic ? '본편 응답에 맞춰 게시판을 새로 불러오는 중이에요.' : '게시판을 불러오는 중이에요.', async () => {
+  return run(ctx, env, automatic ? '채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요.' : '게시판을 불러오는 중이에요.', async () => {
     const startLength = ctx.chat.message?.length ?? 0;
     const before = readGnet(ctx.chat);
     const nick = userNick(ctx.chat.scriptstate);
@@ -148,7 +148,7 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false) {
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
-        note = '본편이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.';
+        note = '채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.';
         return null;
       }
       const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s, date: dateNow(chat) }));
@@ -604,7 +604,7 @@ function settingsView(ctx: ChatContext, back = true): string {
         row('괴담넷 사용', seg('power', '1', [['1', '켜기'], ['0', '끄기']])),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
         row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
-        row('본편에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 본편 요청에 참고로 붙어요'),
+        row('채팅에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
         row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', '끄기'], ['1', '켜기']])),
       ].join(''))}
       ${group('게시판', [
@@ -621,7 +621,7 @@ function settingsView(ctx: ChatContext, back = true): string {
         row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
       ].join(''))}
       ${advancedBox('gn', ctx.chat.scriptstate)}`
-    : group('괴담넷', row('괴담넷 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
+    : group('괴담넷', row('괴담넷 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
   return `<div class="ph-form">${paneHead('괴담넷 설정', '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -695,7 +695,7 @@ async function currentChat(ctx: ChatContext): Promise<Chat | null> {
   }
 }
 
-/** 본편 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
+/** 채팅 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
 export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false): Promise<void> {
   const s = gnetSettings(ctx.chat.scriptstate);
   if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
@@ -716,7 +716,7 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
   if (target !== env) gnet.notice = notice;
 }
 
-/** 괴담넷 탭을 열 때: 「창을 열 때」 설정이고 마지막 본편 응답에 맞춰 아직 새로고침하지 않았으면 한 번 */
+/** 괴담넷 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답에 맞춰 아직 새로고침하지 않았으면 한 번 */
 export function gnetOpenCheck(ctx: ChatContext, env: GnetEnv): void {
   liveEnv = env;
   if (!gnetSettings(ctx.chat.scriptstate).autoOpen) return;
@@ -727,8 +727,8 @@ export function gnetOpenCheck(ctx: ChatContext, env: GnetEnv): void {
 
 const LAZY_HINT: Record<string, string> = {
   '1': '새로고침 버튼을 누를 때만 불러요',
-  open: '본편이 진행된 뒤 괴담넷을 열면 한 번 불러요',
-  '0': '본편 응답이 끝날 때마다 모델을 한 번 더 불러요',
+  open: '채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요',
+  '0': '채팅 응답이 끝날 때마다 모델을 한 번 더 불러요',
 };
 
 /** 괴담넷 탭 버튼. 처리했으면 true */

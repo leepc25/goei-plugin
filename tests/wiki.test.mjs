@@ -171,7 +171,7 @@ test('wiki prompt from the real card: sections, references, faction names', { sk
   assert.ok(u.startsWith('문서 제목: 소라 랜드\n\n[참고 자료]\n[공통: 봇 설명]'));
   assert.ok(u.includes('[주제 원본: 소라 랜드]'), u.slice(0, 500));
   assert.ok(u.includes('[활성 로어북: 📜Faction]') && u.includes('[관련 로어북: 쟈알디]'));
-  assert.ok(u.includes('[최근 챗로그]\n[user]\n쟈알디와 소라 랜드에 간다') && u.endsWith('[사용자 작성 지침]\n무섭게'));
+  assert.ok(u.includes('[최근 챗로그]\n[user]\n쟈알디와 소라 랜드에 간다') && u.endsWith('[사용자 작성 지침 — 모든 문서 공통]\n무섭게'));
   assert.ok(!u.includes('{{getvar'), 'CBS 해석됨');
   assert.ok(!/\[A00\]/.test(u), '소속 코드는 이름으로');
   assert.ok(p.primarySources.includes('소라 랜드'));

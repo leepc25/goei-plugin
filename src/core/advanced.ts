@@ -1,4 +1,4 @@
-// 고급 설정 (v0.16.27, 사용자 설계): 원본 설정 창의 세부 항목(참고 자료, 본편 반영, 수신 대기, 길이·개수 제한, 토큰 상한, 백엔드)을
+// 고급 설정 (v0.16.27, 사용자 설계): 원본 설정 창의 세부 항목(참고 자료, 채팅 반영, 수신 대기, 길이·개수 제한, 토큰 상한, 백엔드)을
 // 기능마다 접힌 칸 하나에 모은다. 손대지 않아도 원본 기본값으로 돌아간다. 값은 이 채팅의 변수에 두고,
 // 각 설정 화면의 「덮어쓰기」로 새 채팅 기본값에 같이 담긴다.
 import { CONTEXT as GN_CONTEXT, HISTORY as GN_HISTORY, LIMITS as GN_LIMITS } from './gnet';
@@ -35,8 +35,8 @@ export interface AdvGroup {
 const chip = (key: string, label: string, def: 0 | 1, v?: string): AdvItem => ({ key, label, type: 'bool', def: String(def), ...(v ? { v } : {}) });
 const num = (key: string, label: string, def: number, min: number, max: number, unit: string, extra: Partial<AdvItem> = {}): AdvItem => ({ key, label, type: 'num', def, min, max, unit, ...extra });
 const TOK = '토큰';
-const budget = num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '공통', hint: '넘으면 2차 참조, 관련 로어북, 오래된 본편 순으로 줄여요' });
-const turns = (def: number) => num('turns', '본편 참고', def, 0, 200, '턴', { zero: '안 봄' });
+const budget = num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '공통', hint: '넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요' });
+const turns = (def: number) => num('turns', '채팅 참고', def, 0, 200, '턴', { zero: '안 봄' });
 
 export const ADV: Record<AdvFeature, AdvGroup[]> = {
   gen: [
@@ -47,11 +47,11 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
         num('retries', '형식 오류 재시도', 1, 0, 3, '회'),
         { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인'], ['aux', '보조']] },
         num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요' }),
-        num('ctx_total', '본편 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 본편 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
+        num('ctx_total', '채팅 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
       ],
     },
     {
-      title: '본편 로어북',
+      title: '로어북',
       items: [
         { key: 'lore_mode', label: '로어북 보내기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인이 고름'], ['risu', 'Risu가 직접']], hint: '세력·특수·괴이·요원 로어북을 누가 켤지 정해요. Risu가 직접 켜면 낱말 속 글자에도 걸려요' },
       ],
@@ -70,7 +70,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       ],
     },
     {
-      title: '본편 반영',
+      title: '채팅 반영',
       chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_posts', '게시글·댓글', 1), chip('ctx_dms', '쪽지', 1), chip('ctx_own', '내가 쓴 것만', 0)],
       items: [
         num('ctx_post_count', '넣을 게시글', 5, 1, 200, '개'),
@@ -108,7 +108,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       items: [turns(8), num('room_history', '방마다 참고할 말풍선', 100, 10, 1000, '개'), budget],
     },
     {
-      title: '본편 반영',
+      title: '채팅 반영',
       chips: [chip('ctx_focus', '장면 관련 먼저', 1), chip('ctx_messages', '메시지', 1, '$ph_context_messages'), chip('ctx_notices_on', '공지', 1, '$ph_context_announcements')],
       items: [
         num('ctx_history', '넣을 말풍선', 200, 1, 1000, '개'),
@@ -144,11 +144,11 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     {
       title: '참고 자료',
       chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 1), chip('secondary', '2차 참조', 1)],
-      items: [turns(8), num('ref_count', '관련·2차 참조 최대', 20, 1, 200, '개'), { ...budget, hint: '넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 본편 순으로 줄여요' }],
+      items: [turns(8), num('ref_count', '관련·2차 참조 최대', 20, 1, 200, '개'), { ...budget, hint: '넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요' }],
     },
     {
-      title: '본편 반영',
-      chips: [chip('ctx_focus', '본편에 나온 문서만', 1), chip('ctx_lore', '로어북 있는 문서', 0), chip('ctx_created', '창작 문서', 1)],
+      title: '채팅 반영',
+      chips: [chip('ctx_focus', '채팅에 나온 문서만', 1), chip('ctx_lore', '로어북 있는 문서', 0), chip('ctx_created', '창작 문서', 1)],
       items: [num('ctx_count', '넣을 문서', 2, 1, 50, '개'), num('ctx_tokens', '반영 토큰 상한', 8000, 0, 200000, TOK, { zero: '제한 없음' })],
     },
   ],
@@ -234,7 +234,7 @@ export function genSettings(state: State): GenSettings {
 }
 
 // 깊은 곳(응답 검사, 저장 정리)에서 쓰는 상수 묶음은 지금 채팅 값으로 맞춰 둔다.
-// 창을 열거나 고칠 때, 본편 요청 전, 자동 새로고침 전에 부른다 (모두 한 번에 한 채팅만 다룬다).
+// 창을 열거나 고칠 때, 채팅 요청 전, 자동 새로고침 전에 부른다 (모두 한 번에 한 채팅만 다룬다).
 const GN_LIMIT_KEYS = Object.keys(GN_LIMITS) as (keyof typeof GN_LIMITS)[];
 const PH_LIMIT_KEYS = Object.keys(PH_LIMITS) as (keyof typeof PH_LIMITS)[];
 

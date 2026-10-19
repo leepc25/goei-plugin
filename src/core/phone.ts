@@ -67,9 +67,9 @@ const COOLDOWN_KEY = (k: keyof typeof COOLDOWN) => `$cooldown_received_${k}`;
 
 export interface PhoneSettings {
   model: 'main' | 'aux';
-  /** 새 메시지 확인: 본편 응답마다 ('1') */
+  /** 새 메시지 확인: 채팅 응답마다 ('1') */
   auto: boolean;
-  /** 새 메시지 확인: 괴담톡 탭을 열 때, 본편이 진행됐으면 ('open') */
+  /** 새 메시지 확인: 괴담톡 탭을 열 때, 채팅이 진행됐으면 ('open') */
   autoOpen: boolean;
   status: boolean;
   announcements: boolean;
@@ -482,7 +482,7 @@ export function refreshAllowed(chat: Chat, r: PRoom, set: PhoneSettings, incomin
   if (r.kind === 'group' || !unsolicited(r)) return [true, ''];
   if (r.followupSent) return [false, '상대의 후속 메시지에 대한 답장을 기다리고 있어요.'];
   if (!set.incoming) return [false, '선톡 받기가 꺼져 있어요. 설정에서 켜면 다시 확인할 수 있어요.'];
-  if (!cooldownReady(chat, 'incoming')) return [false, `선톡을 받은 뒤 대기 중이에요. 본편 응답이 ${cooldownLeft(chat, 'incoming')}턴 더 쌓이면 다시 확인해요.`];
+  if (!cooldownReady(chat, 'incoming')) return [false, `선톡을 받은 뒤 대기 중이에요. 채팅 응답이 ${cooldownLeft(chat, 'incoming')}턴 더 쌓이면 다시 확인해요.`];
   if (incomingPassed === false) return [false, '이번 확인은 선톡 요청 확률에 따라 건너뛰었어요.'];
   return [true, ''];
 }
@@ -906,14 +906,14 @@ export function parseRefresh(
   }
 }
 
-/** 마지막 본편 응답 위치 (없으면 -1) */
+/** 마지막 채팅 응답 위치 (없으면 -1) */
 export function lastReply(chat: Chat): number {
   const list = chat.message ?? [];
   for (let i = list.length - 1; i >= 0; i--) if (list[i]?.role === 'char') return i;
   return -1;
 }
 
-// ── 본편 요청에 넣는 기록 (원본 mainContext + RC.contextPack, 장면 관련 기록 먼저는 core/focus.ts) ──
+// ── 채팅 요청에 넣는 기록 (원본 mainContext + RC.contextPack, 장면 관련 기록 먼저는 core/focus.ts) ──
 
 export function mainContext(st: PState, b: Bulletins, set: PhoneSettings, rules: string, focus?: Focus | null): string {
   if (!set.context) return '';

@@ -55,14 +55,19 @@ interface WikiState {
   /** 서랍 목록 탭: 전체·이번 이야기·분류·기타 */
   tab: Tab;
   newTitle: string;
+  /** 작성·다시 쓰기 화면의 「이 문서 지침」 */
+  docReq: string;
+  /** 다시 쓰기 칸을 연 문서 제목, 그 칸의 「이전 문서 참고」 */
+  rewrite: string | null;
+  rewritePrev: boolean;
 }
 
 export const wiki: WikiState = {
-  view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', newTitle: '',
+  view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, failure: null, notice: '', info: '', listOpen: false, tab: 'all', newTitle: '', docReq: '', rewrite: null, rewritePrev: true,
 };
 
 export function resetWiki() {
-  Object.assign(wiki, { view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '', newTitle: '' });
+  Object.assign(wiki, { view: 'home', title: '', query: '', homeQuery: '', history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: '', newTitle: '', docReq: '', rewrite: null });
 }
 
 interface Job {
@@ -98,11 +103,18 @@ function canon(ctx: ChatContext) {
 function go(view: WikiView, title = '', query = wiki.query) {
   if (wiki.view !== view || wiki.title !== title) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
   if (wiki.history.length > 30) wiki.history.shift();
+  if (wiki.view !== view || wiki.title !== title) Object.assign(wiki, { docReq: '', rewrite: null });
   wiki.view = view;
   wiki.title = title;
   wiki.query = query;
   wiki.confirmDelete = null;
   wiki.notice = '';
+}
+
+/** 메인 설정의 「위키」 버튼: 위키 설정을 바로 연다 */
+export function openWikiSettings() {
+  if (wiki.view !== 'settings') go('settings');
+  wiki.listOpen = false;
 }
 
 /** 제목 열기: 저장된 문서면 보기, 없으면 작성 화면 (열기만으로는 생성하지 않음) */
@@ -137,7 +149,7 @@ function search(ctx: ChatContext, q: string) {
 
 // ── 생성 ──
 
-async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean): Promise<void> {
+async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerate: boolean, docRequest = '', usePrevious?: boolean): Promise<void> {
   const key = chatKey(ctx);
   if (jobs.has(key)) {
     wiki.notice = `「${jobs.get(key)!.title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
@@ -148,7 +160,7 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
   const old = findDoc(ctx.chat, title, ctx.char.globalLore);
   const inherited = regenerate ? (old?.meta && !old.meta.direct ? old.meta.primarySources : []) : wiki.inherited;
   const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-  const previousDoc = regenerate ? (s.refreshPrevious ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle, ctx.char.globalLore) : null;
+  const previousDoc = regenerate ? ((usePrevious ?? s.refreshPrevious) ? old : null) : wiki.previousTitle ? findDoc(ctx.chat, wiki.previousTitle, ctx.char.globalLore) : null;
   const writingRequest = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   jobs.set(key, { title, started: Date.now() });
   wiki.failure = null;
@@ -162,7 +174,7 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
         return {};
       }
     })();
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s, catalogNames, registry(ctx)));
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s, catalogNames, registry(ctx)));
     let body: string;
     try {
       body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), state: ctx.chat.scriptstate })).value;
@@ -174,11 +186,12 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
     const meta: WikiMeta = {
       title, mode: s.mode, model: s.model, created: Math.floor(Date.now() / 1000), length: s.length, sources: prompt.sources,
       primarySources: prompt.primarySources.length ? prompt.primarySources : inherited, writingRequest, direct,
+      ...(docRequest.trim() ? { docRequest: docRequest.trim() } : {}),
     };
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => saveDoc(chat, meta, body));
     // 아직 그 작성 화면을 보고 있으면 문서로 넘어간다
     const cur = env.current();
-    if (cur && chatKey(cur) === key && (wiki.view === 'compose' || wiki.view === 'doc') && wiki.title === title) wiki.view = 'doc';
+    if (cur && chatKey(cur) === key && (wiki.view === 'compose' || wiki.view === 'doc') && wiki.title === title) Object.assign(wiki, { view: 'doc', rewrite: null, docReq: '' });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     wiki.notice = `「${title}」 문서를 만들지 못했어요. ${msg}${old ? ' 기존 문서는 그대로 두었어요.' : ''}`;
@@ -510,11 +523,11 @@ function settingsView(ctx: ChatContext): string {
       ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
       ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
       ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
-      ${line('새로고침 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
-      ${line('본편에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '본편에 나온 문서가 본편 요청에 참고로 붙어요')}
+      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
+      ${line('채팅에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
     </div></section>
-    <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
+    <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
     ${advancedBox('nw', ctx.chat.scriptstate)}</div>
   </div>`;
 }
@@ -525,6 +538,12 @@ function newView(ctx: ChatContext): string {
     <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
       <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
+}
+
+/** 작성·다시 쓰기의 지침 칸: 공용 지침은 보여 주기만, 이 문서 지침은 여기서 적는다 */
+function docReqBox(shared: string): string {
+  return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc(wiki.docReq)}</textarea></label>
+      ${shared ? `<p class="nw-creq">공용 지침: ${esc(shared)}</p>` : ''}`;
 }
 
 /** 아직 없는 문서: 원본 자료 안내와 작성 시작 하나 */
@@ -545,7 +564,7 @@ function compose(ctx: ChatContext): string {
       <h2 class="nw-title">${esc(wiki.title)}</h2>
       <p class="nw-cmsg">이 문서는 아직 없어요.</p>
       <p class="gx-muted">${src}</p>
-      ${req ? `<p class="nw-creq">작성 지침: ${esc(req)}</p>` : ''}
+      ${docReqBox(req)}
     </section></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '작성하는 중…' : '작성 시작'}</button></div></div>`;
 }
@@ -573,7 +592,7 @@ function docView(ctx: ChatContext): string {
   const m = doc.meta;
   const info = m
     ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === 'faithful' ? '원본 충실' : '확장'} · ${({ short: '짧게', standard: '보통', detailed: '상세' } as Record<string, string>)[m.length] ?? m.length} · ${m.model === 'aux' ? '보조 모델' : '메인 모델'}</p>
-       ${m.sources.length ? `<p>${esc(m.sources.join(', '))}</p>` : ''}${m.writingRequest ? `<p>작성 지침: ${esc(m.writingRequest)}</p>` : ''}</details>`
+       ${m.sources.length ? `<p>${esc(m.sources.join(', '))}</p>` : ''}${m.writingRequest ? `<p>공용 지침: ${esc(m.writingRequest)}</p>` : ''}${m.docRequest ? `<p>이 문서 지침: ${esc(m.docRequest)}</p>` : ''}</details>`
     : '';
   const confirm = wiki.confirmDelete === doc.title;
   // 기본 문서는 지울 수 없고, 채팅에서 새로 쓴 문서를 지우면 기본 문서로 돌아간다
@@ -583,11 +602,18 @@ function docView(ctx: ChatContext): string {
     : confirm
       ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc(doc.title)}">${hasBase ? '되돌리기' : '정말 삭제'}</button>`
       : tool('wiki-delete', ICONS.trash, hasBase ? '기본 문서로 되돌리기' : '문서 삭제', `data-value="${esc(doc.title)}"`);
-  const right = `${tool('wiki-rewrite', ICONS.refresh, job?.title === doc.title ? '작성하는 중' : '새로고침', `data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}`)}${del}`;
+  const open = wiki.rewrite === doc.title;
+  const right = `${tool('wiki-rewrite', ICONS.pen, job?.title === doc.title ? '작성하는 중' : '다시 쓰기', `data-value="${esc(doc.title)}" ${open ? 'aria-pressed="true"' : ''} ${job ? 'disabled' : ''}`)}${del}`;
+  const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
+  const rewrite = open
+    ? `<section class="nw-rewrite">${docReqBox(req)}
+        <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${([['1', '켜기'], ['0', '끄기']] as const).map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? '1' : '0') === v ? ' on' : ''}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${job?.title === doc.title ? '작성하는 중…' : '다시 쓰기'}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>`
+    : '';
   const sub = [e ? CAT_LABEL[e.cat] : '', doc.base ? '기본 문서' : m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');
   return `<div class="ph-room nw-pane">${paneHead(ctx, e?.name ?? doc.title, sub, right, e)}
     <article class="nw-doc">
-      <header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>${e && e.sub && e.cat !== 'lm' ? `<small>${esc(e.sub)}</small>` : ''}</header>
+      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc(doc.title)}</h2>${e && e.sub && e.cat !== 'lm' ? `<small>${esc(e.sub)}</small>` : ''}</header>
       <div class="nw-body">${r.html}</div>
       ${links('상세 문서', r.related)}${links('관련 문서', r.recent)}${info}
     </article></div>`;
@@ -836,12 +862,29 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       wiki.listOpen = false;
       break;
     case 'wiki-start':
-      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false);
+      if (wiki.view === 'compose' && wiki.title === v) void generate(ctx, env, v, false, wiki.docReq);
       break;
-    case 'wiki-rewrite':
+    case 'wiki-rewrite': {
+      // 다시 쓰기 칸을 연다: 지난번 이 문서 지침을 채워 둔다
       if (!v) break;
-      if (wiki.view !== 'doc') go('doc', v);
-      void generate(ctx, env, v, true);
+      if (wiki.view !== 'doc' || wiki.title !== v) go('doc', v);
+      if (wiki.rewrite === v) {
+        wiki.rewrite = null;
+        break;
+      }
+      const old = findDoc(ctx.chat, v, ctx.char.globalLore);
+      Object.assign(wiki, { rewrite: v, docReq: old?.meta?.docRequest ?? '', rewritePrev: wikiSettings(ctx.chat.scriptstate).refreshPrevious });
+      break;
+    }
+    case 'wiki-rw-prev':
+      wiki.rewritePrev = v === '1';
+      break;
+    case 'wiki-rw-cancel':
+      Object.assign(wiki, { rewrite: null, docReq: '' });
+      break;
+    case 'wiki-rw-go':
+      if (!v || wiki.rewrite !== v) break;
+      void generate(ctx, env, v, true, wiki.docReq, wiki.rewritePrev);
       break;
     case 'wiki-delete':
       if (wiki.confirmDelete !== v) {
@@ -882,5 +925,6 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
 /** 입력칸 (다시 그리지 않음) */
 export function wikiInput(name: string, value: string): boolean {
   if (name === 'wiki-new') return void (wiki.newTitle = value), true;
+  if (name === 'wiki-docreq') return void (wiki.docReq = value), true;
   return false;
 }

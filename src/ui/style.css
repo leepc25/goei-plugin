@@ -1828,7 +1828,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-crop-size input { flex: 1; accent-color: var(--signal); }
 .dir-crop > .gx-mini { align-self: flex-start; }
 
-/* 설정 → 본편 로어북 확인 */
+/* 설정 → 로어북 확인 */
 .lc-row { align-items: center; }
 .lc-row .ps-label small { word-break: break-all; }
 .lc-kind { flex: none; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font-size: 12px; line-height: 1.6; }
@@ -1844,3 +1844,23 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
 .st-range input { flex: 1; accent-color: var(--signal); }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
+
+/* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
+.gx .st-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
+.gx .st-feat { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; white-space: nowrap; }
+.gx .st-feat svg { width: 16px; height: 16px; flex: none; }
+.gx .ps-group > .ps-adv { margin: 10px 0 0; }
+
+/* 위키: 이 문서 지침 칸 (작성 화면·다시 쓰기) */
+.nw-reqlabel { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 560px; font-size: 13px; font-weight: 600; color: var(--sub); text-align: left; }
+.nw-reqlabel .nw-reqbox { margin-top: 0; width: 100%; box-sizing: border-box; font-weight: 400; }
+.nw.nw-app .nw-compose .nw-creq { max-width: 560px; width: 100%; box-sizing: border-box; text-align: left; }
+.nw-rewrite { display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.nw-rewrite .nw-reqlabel { max-width: none; }
+.nw-rewrite .nw-creq { background: var(--panel); }
+.nw-rwrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--sub); }
+.nw-rewrite .gx-row-btns { justify-content: flex-end; }
+@media (max-width: 640px) {
+  .gx .ps-ctl:has(> .st-range) { width: 100%; }
+  .gx .st-range { width: 100%; }
+}

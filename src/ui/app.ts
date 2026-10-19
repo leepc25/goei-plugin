@@ -21,7 +21,7 @@ import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, openWikiSettings, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -598,6 +598,17 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
       if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
       return;
+    case 'feature-set':
+      // 메인 설정 맨 위 「기능별 설정」: 그 탭으로 넘어가 설정 화면을 연다
+      if (view.kind !== 'started') return;
+      if (value === 'phone') Object.assign(phone, { view: 'settings', invite: null, picked: [] });
+      else if (value === 'gnet' && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
+      else if (value === 'wiki') openWikiSettings();
+      else return;
+      tab = value as Tab;
+      notice = '';
+      resetSettings();
+      return render();
     case 'board-map':
       // 상황판 행: 지도 탭에서 그 자리를 연다
       if (view.kind !== 'started' || !showOnMap(view.ctx, value ?? '')) return;

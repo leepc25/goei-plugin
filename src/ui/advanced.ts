@@ -46,6 +46,13 @@ function chips(f: AdvFeature, items: AdvItem[], state: State): string {
     .join('')}</div></div>`;
 }
 
+/** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
+export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}): string {
+  return ADV[f]
+    .map((g, gi) => `<section class="ps-group"><h3>${esc(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`)
+    .join('');
+}
+
 /** 기능 설정 맨 아래에 붙이는 접힌 칸 */
 export function advancedBox(f: AdvFeature, state: State): string {
   const n = advChanged(state, f).length;

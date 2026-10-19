@@ -47,6 +47,7 @@ export interface WikiMeta {
   sources: string[];
   primarySources: string[];
   writingRequest: string;
+  docRequest?: string;
   direct: boolean;
 }
 
@@ -220,6 +221,8 @@ export interface WikiRequest {
   inherited: string[];
   previous: string | null;
   writingRequest: string;
+  /** 이 문서에만 덧붙이는 지침 (작성·다시 쓰기 화면에서 적음) */
+  docRequest?: string;
   direct: boolean;
 }
 
@@ -239,7 +242,7 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   const t = refToggles(src.chat.scriptstate, 'nw');
   const rows = limitRefs(
     collectRefs(src, {
-      scope: 'wiki', primaryNames: primary, text: `${req.title}\n${req.writingRequest}\n${story}`, registry: r, description: t.description, authors: t.authors,
+      scope: 'wiki', primaryNames: primary, text: `${req.title}\n${req.writingRequest}\n${req.docRequest ?? ''}\n${story}`, registry: r, description: t.description, authors: t.authors,
       persona: t.persona, active: t.active, related: t.related && !trimRelated(), secondary: t.secondary && !trimSecondary(),
     }),
     s.referenceCount,
@@ -254,7 +257,8 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   let user = `문서 제목: ${req.title}\n\n[참고 자료]\n${refText(rows)}`;
   if (story) user += `\n\n[최근 챗로그]\n${story}`;
   if (previous) user += `\n\n[이전 위키 — 원본 사실과 최근 확인된 본문을 우선]\n${innerBody(previous)}`;
-  if (req.writingRequest.trim()) user += `\n\n[사용자 작성 지침]\n${req.writingRequest.trim()}`;
+  if (req.writingRequest.trim()) user += `\n\n[사용자 작성 지침 — 모든 문서 공통]\n${req.writingRequest.trim()}`;
+  if (req.docRequest?.trim()) user += `\n\n[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]\n${req.docRequest.trim()}`;
   const sources = [...new Set(rows.flatMap((x) => x.sources))];
   const primarySources = [...new Set(rows.filter((x) => x.kind === 'primary').flatMap((x) => x.sources))];
   return {
