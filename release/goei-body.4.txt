@@ -1,4 +1,346 @@
-r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
+치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+.gx-acard-side { display: contents; }
+/* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
+@media (max-width: 760px) {
+  .gx-board .gx-acard, .gx-acard.pick.wide { flex-wrap: nowrap; align-items: center; gap: 10px; padding: 10px; }
+  .gx-board .gx-acard .gx-ava, .gx-acard.pick.wide .gx-ava { width: 60px; height: 60px; border-radius: 14px; font-size: 22px; }
+  .gx-board .gx-acard-act, .gx-acard.pick.wide .gx-acard-act { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; margin: 0; }
+  .gx-board .gx-acard-tool, .gx-acard.pick.wide .gx-acard-tool { width: 36px; height: 34px; }
+  .gx-board .gx-acard-tool svg, .gx-acard.pick.wide .gx-acard-tool svg { width: 18px; height: 18px; }
+  /* 이름·상태 줄은 버튼 자리만큼 비우고, 딱지는 높이 고정 (줄이 바뀌어도 찌그러지지 않게) */
+  .gx-board .gx-acard-top, .gx-acard.pick.wide .gx-acard-top { flex-wrap: wrap; row-gap: 4px; column-gap: 6px; padding-right: 76px; }
+  .gx-board .gx-acard-top b, .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; max-width: 100%; }
+  .gx-board .gx-st, .gx-acard.pick.wide .gx-st { flex: none; height: 20px; line-height: 20px; padding: 0 7px; font-size: 11.5px; }
+  .gx-board .gx-acard-txt small, .gx-acard.pick.wide .gx-acard-txt small, .gx-board .gx-acard-sit, .gx-acard.pick.wide .gx-acard-sit { white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
+  .gx-board .gx-acard { cursor: pointer; }
+}
+.gx-agpop { position: fixed; inset: 0; z-index: 2147483647; display: grid; place-items: center; padding: 20px; background: var(--scrim); }
+.gx-agpop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 340px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); color: var(--text); }
+.gx-agpop-card .gx-ava { width: 200px; height: 200px; border-radius: 22px; flex: none; font-size: 64px; }
+/* 사진 아래 한 줄: 이름·상태 왼쪽, 부서·직급 오른쪽. 상황은 그 아래 전체 폭 */
+.gx-agpop-txt { align-self: stretch; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 10px; row-gap: 8px; min-width: 0; padding: 0 4px; }
+.gx-agpop-txt small { text-align: right; }
+.gx-agpop-txt .gx-acard-sit { grid-column: 1 / -1; }
+.gx-agpop-txt .gx-acard-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gx-agpop-txt .gx-acard-top b { font-size: 16px; }
+.gx-agpop-txt small { font-size: 13px; color: var(--dim); }
+.gx-agpop-txt .gx-acard-sit { display: block; -webkit-line-clamp: unset; overflow: visible; font-size: 14px; line-height: 1.55; color: var(--sub); white-space: pre-wrap; }
+.gx-agpop-x { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border: 0; border-radius: 8px; background: var(--panel2); color: var(--sub); }
+
+/* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
+   요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
+@media (min-width: 761px) {
+  .gx-board > .gx-bd-cols { flex: none; }
+  .gx-board .gx-bd-col > .gx-evcs { max-height: 316px; overflow-y: auto; overscroll-behavior: contain; }
+  .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
+  .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+}
+
+/* 괴담넷 (v0.16.22): 괴담톡과 같은 두 칸. 왼쪽 목록, 오른쪽 글·쪽지·새 글·설정 */
+.gn-off { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.gn-nickform { display: flex; gap: 6px; }
+.gn-nickform .gx-search { flex: 1; min-width: 0; }
+.gn-mynick { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: 0; padding: 0 6px 2px; line-height: 1.25; }
+.gn-mynick small { font-size: 11px; color: var(--dim); }
+.gn-mynick b { max-width: 100%; font-size: 14px; color: var(--signal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-list { gap: 4px; padding: 0 8px; }
+.gn-row { border-radius: 12px; }
+.gn-row-main { width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.gn-row-main:hover { background: var(--panel); }
+.gn-row.on .gn-row-main { background: var(--accent-bg); border-color: var(--accent-line); }
+.gn-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gn-title b { min-width: 0; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-title em { flex: none; font-style: normal; font-size: 13px; font-weight: 700; color: var(--amber); }
+.gn-title .gn-dot { margin-left: 0; flex: none; }
+.gn-row-meta { display: flex; gap: 10px; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; }
+.gn-row.mine .gn-row-nick { color: var(--signal); }
+.gn-ava { color: var(--signal); background: var(--accent-bg); }
+.gn-ava svg { width: 24px; height: 24px; }
+.gn-dm-t { font-size: 11px; color: var(--dim); padding: 0 6px; }
+/* 글 본문 + 댓글: 게시판 글 모양 (제목줄·구분선·댓글 줄). 가운데만 스크롤, 아래 입력줄 고정 */
+.gn-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; padding: 16px 22px 24px; }
+.gn-post { display: flex; flex-direction: column; }
+.gn-post-head { padding: 14px 4px 12px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.gn-post-title { margin: 0 0 8px; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
+.gn-post-meta { display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.gn-post-who { font-size: 14px; }
+.gn-post-stat { margin-left: auto; display: flex; gap: 12px; }
+.gn-post-body { min-height: 120px; padding: 22px 4px 28px; font-size: 16px; line-height: 1.8; overflow-wrap: anywhere; border-bottom: 1px solid var(--line); }
+.gn-csec { display: flex; flex-direction: column; margin-top: 20px; }
+.gn-chead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 10px 4px; border-bottom: 2px solid var(--line2); }
+.gn-ccount { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.gn-ccount b { color: var(--amber); }
+.gn-cnone { margin: 0; padding: 24px; text-align: center; color: var(--dim); font-size: 14px; border-bottom: 1px solid var(--line); }
+.gn-comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.gn-c { display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; align-items: start; gap: 4px 14px; padding: 12px 4px 12px calc(4px + var(--gn-depth, 0) * 20px); border-bottom: 1px solid var(--panel2); }
+.gn-c.re { background: color-mix(in srgb, var(--panel) 45%, transparent); }
+.gn-c.unread .gn-c-body { color: var(--text); font-weight: 600; }
+.gn-c.target { background: var(--accent-bg); }
+.gn-c-who { display: flex; align-items: center; gap: 4px; min-width: 0; min-height: 28px; font-size: 14px; overflow: hidden; }
+.gn-c-who > b, .gn-c-who > button { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-re { flex: none; color: var(--dim); font-size: 14px; }
+.gn-c-body { padding-top: 3px; font-size: 15px; line-height: 1.65; color: var(--sub); overflow-wrap: anywhere; }
+.gn-c-act { display: flex; align-items: center; gap: 2px; }
+.gn-c-time { margin-right: 6px; font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
+.gn-reply { min-height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.gn-reply:hover { background: var(--panel2); color: var(--text); }
+.gn-c .ph-tool.gn-cdel { width: 28px; height: 28px; }
+.gn-c .ph-tool.gn-cdel, .gn-pane .ph-act .ph-tool { color: var(--dim); }
+.gn-c .ph-tool.gn-cdel:hover, .gn-pane .ph-act .ph-tool:hover { color: var(--danger); }
+.gn-nick { border: 0; background: none; padding: 0; color: var(--mint); font: inherit; font-weight: 700; cursor: pointer; }
+.gn-nick:hover { text-decoration: underline; text-underline-offset: 3px; }
+.gn-me { color: var(--signal); font-weight: 700; }
+.gn-replyto { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 4px 4px 14px; border-radius: 12px; background: var(--accent-bg); color: var(--signal); font-size: 13px; font-weight: 600; }
+.gn-replyto span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gn-to { margin: 0; font-size: 14px; color: var(--sub); }
+.gn-text { min-height: 140px; padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.ps-text { width: 260px; max-width: 100%; }
+@media (max-width: 760px) {
+  .gn-doc { padding: 10px 12px 16px; }
+  .gn-post-title { font-size: 18px; }
+  .gn-post-stat { margin-left: 0; }
+  .gn-c { grid-template-columns: minmax(0, 1fr) auto; padding-left: calc(4px + var(--gn-depth, 0) * 14px); }
+  .gn-c-body { grid-column: 1 / -1; grid-row: 2; padding-top: 0; }
+  .ps-text { width: 100%; }
+}
+/* 모바일 괴담넷: 목록 안에서 펼침 */
+.gn-inline { display: flex; flex-direction: column; margin: 0 0 8px; border-top: 1px solid var(--line); }
+.gn-inline .gn-doc { flex: none; overflow: visible; padding: 4px 6px 8px; }
+.gn-inline .gn-post-head { border-top: 0; padding-top: 8px; }
+.gn-inline .gn-post-meta { align-items: center; }
+.gn-inline-del { margin-left: auto; }
+.ph-side > .gn-composer { margin: 0 -12px; }
+.ph-side > .gn-composer .ph-back2 { display: none !important; }
+.gn-dm-inline .ph-log { flex: none; overflow: visible; padding: 8px 6px; }
+.ph-row:has(> .gn-dm-inline) { flex-wrap: wrap; padding-right: 0; }
+.ph-row > .gn-dm-inline { flex: 1 0 100%; }
+.gn-row.on:has(> .gn-inline) .gn-row-main { border-color: transparent; }
+.gn-row:has(> .gn-inline) { background: var(--panel); border: 1px solid var(--line); }
+/* 괴담톡 공지 본문: 공지문 모양 (상자 없이 제목줄·구분선·서명) */
+.ph-ndoc-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 24px 28px; }
+.ph-ndoc-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 4px 14px; border-top: 2px solid var(--line2); border-bottom: 1px solid var(--line); }
+.ph-ndoc-head h3 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.4; color: var(--text); overflow-wrap: anywhere; }
+.ph-ndoc-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--dim); }
+.ph-ndoc-text { padding: 22px 4px 26px; font-size: 15px; line-height: 1.85; color: var(--text); word-break: keep-all; overflow-wrap: anywhere; }
+.ph-ndoc-meta b { color: var(--sub); font-weight: 600; }
+.ph-ndoc .ph-act .ph-tool { color: var(--dim); }
+.ph-ndoc .ph-act .ph-tool:hover { color: var(--danger); }
+@media (max-width: 760px) { .ph-ndoc-body { padding: 12px 14px 20px; } }
+
+/* ── v0.16.23 괴담톡·괴담넷 정리 ── */
+/* 위 탭은 낮게: 목록이 더 길게 보이도록 */
+.ph-sub { min-height: 38px; font-size: 14.5px; }
+.gx-body .ph-side { gap: 8px; padding-top: 10px; }
+/* 도구 줄: PC는 목록 맨 아래 (오른쪽 입력줄·만들기 줄과 같은 65px), 손잡이 없음 */
+.ph-drawer { flex: none; margin: 0 -14px; border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-grip { display: none; }
+.ph-drawer .ph-tools { height: 64px; padding: 10px 8px; align-items: center; }
+.ph-drawer .ph-tools .ph-tool { height: 44px; gap: 3px; }
+.ph-drawer .ph-tools .ph-tool svg { width: 20px; height: 20px; }
+.ph-drawer .ph-tool-l { font-size: 11px; }
+.ph-drawer .gn-nickform { margin: 10px 12px 0; }
+.ph-content { padding-bottom: 10px; }
+/* 모바일: 하단 바 위에 접힌 손잡이, 누르거나 위로 밀면 펼침 */
+@media (max-width: 760px) {
+  .ph-drawer { margin: 0 -12px; }
+  .ph-grip { display: flex; align-items: center; justify-content: center; width: 100%; height: 18px; padding: 0; border: 0; background: none; touch-action: none; }
+  .ph-grip i { width: 38px; height: 4px; border-radius: 4px; background: var(--line2); transition: background .15s ease; }
+  .ph-grip:hover i, .ph-drawer.open .ph-grip i { background: var(--dim); }
+  .ph-drawer .ph-tools { height: auto; max-height: 0; padding: 0 8px; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
+  .ph-drawer.open .ph-tools { max-height: 64px; padding: 0 8px 8px; }
+  /* 펼치면 위 경계를 또렷하게 (내용과 서랍이 붙어 보였다) */
+  .ph-drawer.open { border-top-color: var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .55); }
+  .ph-drawer:not(.open) .gn-nickform { display: none; }
+  .ph-drawer .gn-nickform { margin: 0 12px 8px; }
+  .ph-side > .gn-composer { border-bottom: 0; }
+}
+/* 잠깐 떴다 사라지는 안내: 아래쪽 가운데에 떠서 줄을 차지하지 않는다 */
+.gx-body.ph-app { position: relative; }
+.gx-toast { position: absolute; left: 50%; bottom: 82px; z-index: 5; transform: translateX(-50%); width: max-content; max-width: min(88%, 420px); margin: 0; padding: 10px 16px; border-radius: 14px; background: color-mix(in srgb, var(--panel2) 94%, #000); border: 1px solid var(--line); color: var(--text); font-size: 14px; line-height: 1.5; text-align: center; box-shadow: 0 10px 28px -12px rgba(0, 0, 0, .6); pointer-events: none; animation: gx-toast-in .18s ease-out; transition: opacity .3s ease, transform .3s ease; }
+.gx-toast.out { opacity: 0; transform: translate(-50%, 6px); }
+@keyframes gx-toast-in { from { opacity: 0; transform: translate(-50%, 6px); } }
+@media (prefers-reduced-motion: reduce) { .gx-toast { animation: none; transition: none; } }
+/* 안 읽은 수: 빨간 동그라미에 흰 숫자 */
+.ph-badge { min-width: 19px; height: 19px; padding: 0 5px; color: #fff; font-size: 11.5px; line-height: 1; }
+.ph-sub .ph-badge { margin-left: 1px; }
+/* 묶음 칩: 이름 옆 작은 개수, 안읽음은 빨간 배지 */
+.ph-tab { display: inline-flex; align-items: center; gap: 5px; }
+.ph-tab small { font-size: 11.5px; font-weight: 500; color: var(--dim); }
+.ph-tab.on small { color: inherit; opacity: .75; }
+.ph-notice-bar { margin: 0; padding: 0; }
+.ph-notice-bar .ph-tabs { flex: 1; min-width: 0; }
+.ph-notice-bar .gx-mini { margin: 0 8px 8px 0; }
+/* 단톡 만들기: 주제는 평소 한 줄, 적거나 누르면 넓어진다 */
+.ph-gbody { gap: 8px; }
+.ph-gbody > .ph-gname { height: 40px; min-height: 40px; padding: 9px 12px; flex: none; }
+.ph-gbody > .ph-topic { height: 40px; min-height: 40px; padding: 9px 12px; line-height: 1.4; resize: none; overflow: hidden; transition: height .15s ease; }
+.ph-gbody > .ph-topic:focus, .ph-gbody > .ph-topic:not(:placeholder-shown) { height: 76px; overflow: auto; }
+.ph-gbody > .ph-tabs { padding: 0; }
+@media (max-width: 760px) { .ph-gbody > .ph-topic::placeholder, .ph-gbody > .ph-gname::placeholder { font-size: 12.5px; } }
+/* 괴담넷 글 (v0.16.23): PC는 본문과 댓글을 다른 바탕의 두 덩어리로, 댓글 사이 구분선은 또렷하게 */
+.gn-pane .gn-doc { gap: 14px; }
+/* 글·댓글 카드는 줄어들지 않고 .gn-doc가 스크롤한다 (overflow: hidden 카드가 flex 안에서 줄어 댓글이 잘리던 문제) */
+.gn-pane .gn-doc > * { flex: none; }
+.gn-pane .gn-post { padding: 0 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.gn-pane .gn-post-head { border-top: 0; padding-top: 16px; }
+.gn-pane .gn-post-body { border-bottom: 0; }
+.gn-pane .gn-csec { margin-top: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--void); overflow: hidden; }
+.gn-pane .gn-chead { padding: 16px 16px 12px; border-bottom: 1px solid var(--line2); }
+.gn-pane .gn-c { padding-left: calc(16px + var(--gn-depth, 0) * 20px); padding-right: 10px; }
+.gn-pane .gn-cnone { border-bottom: 0; }
+.gn-c { border-bottom-color: var(--line); }
+.gn-comments > li:last-child { border-bottom: 0; }
+.gn-c.re { background: color-mix(in srgb, var(--panel) 70%, transparent); }
+/* 답글 입력줄: 그 댓글 바로 밑 */
+.gn-c-compose { padding: 8px 10px 10px calc(16px + var(--gn-depth, 1) * 20px); border-bottom: 1px solid var(--line); background: var(--accent-bg); }
+.gn-c-compose .gn-composer { padding: 0; border-top: 0; background: none; }
+.gn-c-compose .ph-back2 { display: none !important; }
+/* 모바일 펼친 글의 댓글 머리줄 오른쪽: 글쓴이 쪽지 또는 내 글 삭제 */
+.gn-chead-act { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; }
+.gn-chead-dm { display: inline-flex; align-items: center; gap: 4px; min-width: 0; color: var(--dim); }
+.gn-chead-dm svg { width: 15px; height: 15px; flex: none; }
+.gn-chead-dm .gn-nick { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 모바일: 여백을 줄여 한 화면에 더 많이 */
+@media (max-width: 760px) {
+  .gn-inline .gn-doc { padding: 0 4px 4px; }
+  .gn-inline .gn-post-body { min-height: 0; padding: 10px 6px 12px; font-size: 15px; line-height: 1.65; }
+  .gn-inline .gn-csec { margin-top: 2px; }
+  .gn-inline .gn-chead { padding: 4px 4px 4px 6px; border-bottom-width: 1px; }
+  .gn-inline .gn-ccount { font-size: 14px; }
+  .gn-c { gap: 0 8px; padding-top: 6px; padding-bottom: 6px; }
+  .gn-c-who { min-height: 24px; font-size: 13.5px; }
+  .gn-c-body { font-size: 14.5px; line-height: 1.55; }
+  .gn-reply { min-height: 24px; padding: 0 8px; font-size: 12.5px; }
+  .gn-c .ph-tool.gn-cdel { width: 24px; height: 24px; }
+  .gn-c-compose { padding: 6px 4px 8px calc(4px + var(--gn-depth, 1) * 14px); }
+}
+/* 설정 줄의 버튼 묶음이 길면 (괴담넷 사생활 다섯 칸) 모바일에서 줄을 넘기지 않고 접는다 */
+@media (max-width: 760px) {
+  .ps-ctl { max-width: 100%; min-width: 0; }
+  .ps-ctl .gx-segs { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; }
+  .ps-ctl .gx-seg { min-width: 0; padding: 0 10px; }
+}
+/* 모바일 펼친 글: 선택 배경은 위 두 모서리만 둥글게 (아래는 본문으로 이어진다) */
+.gn-row:has(> .gn-inline) .gn-row-main { border-radius: 11px 11px 0 0; }
+.gn-row:has(> .gn-dm-inline) .gn-row-main, .ph-row:has(> .gn-dm-inline) > .ph-main { border-radius: 13px 13px 0 0; }
+/* 설정 화면 「기본값으로 저장」 (v0.16.23): 설정은 하나, 지금 값을 새 채팅 기본값으로 */
+.st-scopebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.st-scopebar .st-scope { flex: none; margin: 0; }
+/* 전환 탭은 아래 괴이·특수·요원·조직 탭과 같은 모양 */
+.st-barbtns { display: flex; flex: none; align-items: center; gap: 8px; }
+/* 덮어쓰기·불러오기 (v0.16.26): 괴담톡·괴담넷·위키 설정의 옛 「기본값으로 저장」 테두리로 통일. 메인 설정·명부·기능 설정 모두 같은 모양 */
+.st-act { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--void); color: var(--signal); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.st-act svg { width: 14px; height: 14px; flex: none; }
+.st-act:hover:not(:disabled) { background: var(--accent-bg); }
+.st-act:disabled { opacity: .4; cursor: default; }
+.ps-defaults { display: flex; gap: 6px; }
+.ph-room-head .ps-defaults { margin-right: 4px; }
+.ps-defconfirm { margin: 12px 16px 0; }
+/* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
+.st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: -6px; }
+.st-scopebar .st-scope { grid-column: span 2; display: flex; }
+.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
+/* PC: 덮어쓰기·불러오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
+.st-barbtns { grid-column: span 2; justify-self: end; display: flex; gap: 8px; }
+@media (max-width: 760px) {
+  .st-scopebar, .st-barbtns { gap: 6px; }
+  .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
+  .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
+  .ps-defaults .st-act { padding: 0 8px; }
+}
+.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p { color: var(--text); }
+.ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
+.ps-save:hover { background: var(--accent-bg); }
+.ph-room-head .ph-act .ps-save { margin-right: 4px; }
+.nw > .gx-toast, .gx-settings > .gx-toast { position: fixed; bottom: 96px; }
+/* 위키: 검색줄·위 줄 오른쪽 끝 설정 버튼, 설정 화면 */
+.nw-search .nw-cfg, .nw-nav .nw-cfg { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; }
+.nw-nav { align-items: center; }
+.nw-nav-gap { flex: 1; }
+.nw-setpane { display: flex; flex-direction: column; gap: 14px; }
+.nw-sethead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.nw-sethead h2 { margin: 0; font-size: 17px; }
+.nw-sethead small { color: var(--dim); font-size: 13px; }
+.nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
+/* ── 위키 (v0.16.23): 괴담톡·괴담넷과 같은 두 칸. 왼쪽 명부·작성한 문서, 오른쪽 문서 ── */
+.nw.nw-app .nw-search { display: block; }
+.nw-status:empty { display: none; }
+.nw-status { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px 0; }
+.nw-status .nw-busy, .nw-status .gx-err { margin: 0; }
+.ph-side > .nw-busy, .ph-side > .gx-err { margin: 0; }
+.nw-row .ph-who-top b { flex: 0 1 auto; }
+.nw-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
+.nw-ava { color: var(--dim); }
+.nw-ava svg { width: 22px; height: 22px; }
+.nw-ava.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-ava.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-ava.k-lm { color: var(--amber); background: var(--amber-bg); }
+.nw-ava.k-ag { color: var(--mint); }
+.nw-ava.k-org { color: var(--signal); background: var(--accent-bg); }
+.ph-avatar.xs { width: 24px; height: 24px; border-radius: 8px; font-size: 11px; }
+.ph-avatar.xs svg { width: 14px; height: 14px; }
+.ph-avatar.lg { width: 96px; height: 96px; border-radius: 26px; }
+.ph-avatar.lg svg { width: 40px; height: 40px; }
+.nw-newrow .ph-avatar { color: var(--signal); background: var(--accent-bg); }
+/* 문서 */
+.nw-pane .nw-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; gap: 14px; padding: 18px 24px 28px; }
+.nw-pane .nw-dochead { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 2px; }
+.nw-pane .nw-dochead small { color: var(--dim); font-size: 14px; }
+.nw-ibphoto { padding: 0 !important; background: var(--void) !important; }
+.nw-ibphoto img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; }
+.nw-ava img { object-position: top; }
+.nw-more { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nw-more + .nw-more { border-top: 0; padding-top: 0; }
+.nw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.nw-chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--text); font: inherit; font-size: 13.5px; font-weight: 600; }
+.nw-chip:hover { border-color: var(--accent-line); }
+.nw-chip.none { opacity: .55; border-style: dashed; }
+/* 아직 없는 문서 */
+.nw.nw-app .nw-compose { align-items: center; text-align: center; gap: 8px; margin: auto 0; padding: 28px 20px; border: 0; background: none; }
+.nw-cmsg { font-size: 16px; font-weight: 600; color: var(--text); }
+.nw-creq { font-size: 13px; color: var(--sub); padding: 8px 12px; border-radius: 10px; background: var(--panel); }
+.nw.nw-app .ph-form-body:has(> .nw-compose) { justify-content: center; }
+.nw-setpane .ps-row > .nw-reqbox { margin: 0; }
+@media (max-width: 760px) {
+  .nw-pane .nw-doc { padding: 12px 14px 20px; }
+}
+/* 위키 (v0.16.23 3차, 사용자 설계): 세로바(메인·작성·설정 + 펼치기 자리) + 본문 위로 덮는 목록 서랍. PC·모바일 같은 구조 */
+.gx-body.nw-app { grid-template-columns: 60px minmax(0, 1fr); }
+.nw-edge { display: none; }
+.nw-rail { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; padding: 12px 0 0; border-right: 1px solid var(--panel2); background: var(--void); }
+.nw-rail > .ph-tool { width: 44px; height: 44px; }
+.nw-rail > .ph-tool svg { width: 21px; height: 21px; }
+.nw-grab { flex: 1; align-self: stretch; display: grid; place-items: center; margin-top: 6px; padding: 0; border: 0; border-top: 1px solid var(--panel2); background: none; color: var(--dim); cursor: pointer; touch-action: pan-y; }
+.nw-grab:hover { background: var(--panel); color: var(--text); }
+.nw-grab-ico { display: grid; place-items: center; width: 28px; height: 56px; border-radius: 999px; background: var(--panel); }
+.nw-grab:hover .nw-grab-ico { background: var(--panel2); }
+.nw-grab-ico svg { width: 18px; height: 18px; }
+.nw-grab-ico.flip svg { transform: scaleX(-1); }
+.nw-panel { position: absolute; z-index: 3; top: 0; bottom: 0; left: 60px; width: 320px; max-width: calc(100% - 100px); border-right: 1px solid var(--panel2); background: var(--void); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(-100% - 60px)); visibility: hidden; transition: transform .22s ease, visibility 0s linear .22s; }
+.list-open .nw-panel { transform: none; visibility: visible; transition: transform .22s ease; }
+.nw-pin { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 12px 0; }
+.nw-pin .nw-search { flex: none; }
+.nw-pin .nw-list { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; gap: 6px; overflow: hidden; margin: 0 -12px; padding: 0; }
+.nw-pin .nw-fail { margin: 0 0 12px; }
+.nw-row .ph-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-scrim { display: none; }
+.list-open .nw-scrim { display: block; position: absolute; z-index: 2; inset: 0 0 0 60px; border: 0; padding: 0; background: rgba(0, 0, 0, .28); }
+.nw-main { min-width: 0; }
+.nw-app > .ph-drawer { display: none; }
+.nw-nohit { flex-direction: column; gap: 14px; }
+.nw-near-lead { margin: 10px 8px 4px; font-size: 13px; color: var(--sub); line-height: 1.5; }
+.nw-hero-res:empty { display: none; }
+.nw-hero-res { margin-top: 10px; max-height: 360px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.nw-hero-res .nw-groups { padding: 4px 4px 8px; }
+.nw-nohit .gx-start { display: inline-flex; align-items: center; gap: 6px; width: auto; min-height: 44px; padding: 0 20px; font-size: 15px; letter-spacing: normal; }
+.nw-nohit .gx-start svg { width: 18px; height: 18px; }
+.nw-main .ph-room-head.nw-noback { padding-left: 16px; }
+.nw-main .nw-doc > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+/* 위키 메인 */
+.nw-home { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 22px 24px 28px; }
+.nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+.nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
 .nw-hero-top { display: flex; align-items: center; gap: 12px; }
 .nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; color: var(--signal); }
 .nw-hero-ico svg { width: 40px; height: 40px; }
@@ -27,8 +369,12 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
 .nw-chip small { color: var(--dim); font-size: 11.5px; font-weight: 600; }
 @media (max-width: 760px) {
   /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
-  .gx-body.nw-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .gx-body.nw-app { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .nw-rail { display: none; }
+  /* 목록 서랍을 여는 왼쪽 가장자리 손잡이 (2026-10-19 사용자). 목록이 펼쳐지면 숨김 */
+  .nw-edge { position: absolute; left: 0; top: 50%; z-index: 3; display: grid; place-items: center; width: 22px; height: 64px; margin-top: -32px; padding: 0; border: 1px solid var(--line2); border-left: 0; border-radius: 0 12px 12px 0; background: var(--panel); color: var(--sub); box-shadow: 2px 4px 12px -6px rgba(0, 0, 0, .45); }
+  .nw-edge svg { width: 15px; height: 15px; }
+  .list-open .nw-edge { display: none; }
   .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
   .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .nw-main { grid-row: 1; }
@@ -191,6 +537,13 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
 .dir-crop-size { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); }
 .dir-crop-size input { flex: 1; accent-color: var(--signal); }
 .dir-crop > .gx-mini { align-self: flex-start; }
+
+/* 설정 → 본편 로어북 확인 */
+.lc-row { align-items: center; }
+.lc-row .ps-label small { word-break: break-all; }
+.lc-kind { flex: none; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font-size: 12px; line-height: 1.6; }
+.lc-sub { margin: 0; padding: 10px 14px 4px; font-size: 13px; font-weight: 600; color: var(--dim); }
+.ps-rows > .ps-note { margin: 0; padding: 12px 14px; }
 `;
 
   // src/ui/mbar.ts
@@ -277,6 +630,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     let y0 = 0;
     let mode2 = "off";
     let act = null;
+    let sign = 1;
     let box = null;
     const reset = (animate) => {
       if (!box) return;
@@ -302,14 +656,15 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
       const dy = e.touches[0].clientY - y0;
       if (mode2 === "wait") {
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        act = dx > 0 && dx > Math.abs(dy) * 1.4 ? step2() : null;
+        act = Math.abs(dx) > Math.abs(dy) * 1.4 ? step2(dx > 0 ? -1 : 1) : null;
+        sign = dx > 0 ? 1 : -1;
         if (!act) return void (mode2 = "off");
         mode2 = "back";
         box = root2.querySelector(".gx-content");
       }
       if (box) {
-        const d = Math.max(0, Math.min(dx * 0.6, 120));
-        box.style.transform = `translateX(${d}px)`;
+        const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
+        box.style.transform = `translateX(${d * sign}px)`;
         box.style.opacity = String(1 - d / 400);
       }
     }, { passive: true });
@@ -317,7 +672,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
       if (mode2 !== "back") return void (mode2 = "off");
       mode2 = "off";
       const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-      const run3 = dx >= FIRE ? act : null;
+      const run3 = dx * sign >= FIRE ? act : null;
       act = null;
       reset(!run3);
       run3?.();
@@ -1578,8 +1933,38 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     const keepNames = new Set(incoming.map((e) => e.comment));
     return current3.filter((e) => !RETIRED.includes(String(e.comment ?? "")) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
   }
+  function keyPrint(key) {
+    const norm = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
+    let h = 2166136261;
+    for (const b of new TextEncoder().encode(norm)) h = Math.imul(h ^ b, 16777619) >>> 0;
+    return h.toString(16).padStart(8, "0");
+  }
+  function shippedKeys(lore) {
+    try {
+      const k = JSON.parse(String(manifestEntry(lore)?.content ?? "")).keys;
+      return k && typeof k === "object" ? k : {};
+    } catch {
+      return {};
+    }
+  }
+  function keepUserKeys(current3, list4, shipped) {
+    const ck = keyed(current3, loreName);
+    const cur = new Map(ck.map((k, i) => [k, current3[i]]));
+    const lk = keyed(list4, loreName);
+    let kept = 0;
+    list4.forEach((e, i) => {
+      const prints = shipped[String(e.comment ?? "")];
+      const old = cur.get(lk[i]);
+      if (!prints || !old || old === e || keyPrint(old.key) === keyPrint(e.key) || prints.includes(keyPrint(old.key))) return;
+      list4[i] = { ...e, key: old.key, secondkey: old.secondkey ?? e.secondkey };
+      kept++;
+    });
+    return kept;
+  }
   function planUpdate(char, payload) {
-    const lore = mergeByName(renamed(char.globalLore ?? [], payload.data.globalLore), payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
+    const current3 = renamed(char.globalLore ?? [], payload.data.globalLore);
+    const lore = mergeByName(current3, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
+    keepUserKeys(current3, lore.list, shippedKeys(payload.data.globalLore));
     if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? "")))) lore.list = migrateLore(lore.list);
     const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ""));
     const currentScripts = (char.customscript ?? []).filter((r) => !RETIRED_SCRIPTS.includes(r.comment ?? "") || incomingNames.has(r.comment ?? ""));
@@ -1594,7 +1979,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.31" : "0";
+  var PLUGIN_VERSION = true ? "0.16.32" : "0";
 
   // src/host/gamepack.ts
   var KEY2 = `goei:game-pack:${PACK_ID}`;
@@ -1793,23 +2178,35 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
       while (i < plan.get.length) {
         const p = plan.get[i++];
         got.push([p, await fetchPicture(p)]);
-        progress(got.length);
+        progress(got.length, "get");
       }
     };
     await Promise.all([worker(), worker(), worker(), worker()]);
-    const rows = (Array.isArray(assets) ? assets : []).map((r) => isRow2(r) ? [...r] : r);
-    for (const [p, bytes] of got) {
-      let path;
-      try {
-        path = await risuai.saveAsset(bytes);
-      } catch (error) {
-        throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    const paths = new Array(got.length);
+    let j = 0;
+    let saved = 0;
+    progress(0, "save");
+    const saver = async () => {
+      while (j < got.length) {
+        const k = j++;
+        let path;
+        try {
+          path = await risuai.saveAsset(got[k][1]);
+        } catch (error) {
+          throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
+        paths[k] = path;
+        progress(++saved, "save");
       }
-      if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
+    };
+    await Promise.all([saver(), saver(), saver(), saver()]);
+    const rows = (Array.isArray(assets) ? assets : []).map((r) => isRow2(r) ? [...r] : r);
+    got.forEach(([p], k) => {
       const row5 = rows.find((r) => isRow2(r) && r[0] === p[0]);
-      if (row5) row5[1] = path, row5[2] = p[2];
-      else rows.push([p[0], path, p[2]]);
-    }
+      if (row5) row5[1] = paths[k], row5[2] = p[2];
+      else rows.push([p[0], paths[k], p[2]]);
+    });
     return rows;
   }
 
@@ -1931,7 +2328,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
   }
   function updateGroup(ctx2) {
-    const busy3 = updateUi.busy;
+    const busy4 = updateUi.busy;
     const rows = [];
     const cur = cardVersion(ctx2.char.globalLore);
     const lite = !!readManifest(ctx2.char.globalLore);
@@ -1953,9 +2350,9 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
       `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc9(cur)}`}${cardNew ? ` → <b>v${esc9(L.card)}</b>` : ""}</span>`,
       !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
     ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy3 ? "disabled" : ""}>${busy3 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
+    let actions = `<button class="gx-mini" data-action="upd-check" ${busy4 ? "disabled" : ""}>${busy4 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
     if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy3 ? "disabled" : ""}>${busy3 ? updateUi.progress ? `사진 받는 중 ${esc9(updateUi.progress)}` : "적용 중…" : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy3 ? "disabled" : ""}>카드 업데이트 준비</button>`;
+      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc9(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
     }
     const plan = updateUi.plan;
     const pics = updateUi.pics;
@@ -2024,18 +2421,20 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
         const pics = planPictures(char.additionalAssets, readManifest(char.globalLore), readManifest(updateUi.payload.data.globalLore));
         if (pics.get.length) {
           let last = 0;
-          updateUi.progress = `0/${pics.get.length}`;
+          updateUi.progress = `사진 받는 중 0/${pics.get.length}`;
           env2.render();
           try {
-            plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n) => {
-              updateUi.progress = `${n}/${pics.get.length}`;
-              if (n - last >= 5 || n === pics.get.length) last = n, env2.render();
+            plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n, phase) => {
+              if (n === 0) last = 0;
+              updateUi.progress = `사진 ${phase === "get" ? "받는" : "저장"} 중 ${n}/${pics.get.length}`;
+              if (n - last >= 5 || n === 0 || n === pics.get.length) last = n, env2.render();
             });
           } catch (error) {
-            throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
-          } finally {
             updateUi.progress = "";
+            throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
           }
+          updateUi.progress = "카드에 적용 중…";
+          env2.render();
         }
         await risuai.setCharacterToIndex(ctx2.charIndex, plan.next);
         if (pics.get.length) forgetImages();
@@ -2043,6 +2442,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
         updateUi.payload = null;
         updateUi.plan = null;
         updateUi.pics = null;
+        updateUi.progress = "";
         updateUi.busy = false;
         await env2.refresh();
         return true;
@@ -2050,6 +2450,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     } catch (error) {
       updateUi.notice = error instanceof Error ? error.message : String(error);
     }
+    updateUi.progress = "";
     updateUi.busy = false;
     env2.render();
     return true;
@@ -2500,6 +2901,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
         ${fail3}
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
+    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml3(ctx2)}</section>
     ${drawerHtml([
       tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "", "메인"),
@@ -2748,8 +3150,8 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
   var esc11 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var KIND = { an: "괴이", in: "사건", ms: "특수" };
   var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
-  function peopleChips(char, names3, agents2) {
-    return names3.filter((n) => n && n !== "없음").map((n) => agents2.has(n) ? `<span class="gx-pchip">${avatar(char, agents2.get(n).english, n, "xs")}${esc11(n)}</span>` : `<span class="gx-badge">${esc11(n)}</span>`).join("");
+  function peopleChips(char, names4, agents2) {
+    return names4.filter((n) => n && n !== "없음").map((n) => agents2.has(n) ? `<span class="gx-pchip">${avatar(char, agents2.get(n).english, n, "xs")}${esc11(n)}</span>` : `<span class="gx-badge">${esc11(n)}</span>`).join("");
   }
   function elapsedText(minute, since) {
     if (minute === null || since === null) return "";
@@ -2850,7 +3252,7 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
   function rowsOf(d, kind) {
     return kind === "anomaly" ? d.anomalies : kind === "site" ? d.sites : d.agents;
   }
-  var orgName = (d, names3, aff) => orgOf(d.orgs, aff)?.name ?? names3[aff] ?? aff;
+  var orgName = (d, names4, aff) => orgOf(d.orgs, aff)?.name ?? names4[aff] ?? aff;
   function findRow2(d, lore) {
     return rowsOf(d, dirUi.kind).find((r) => r.lore === lore);
   }
@@ -3010,14 +3412,14 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
   }
   function agentPanel(a, ctx2, d) {
     const lore = ctx2.char.globalLore ?? [];
-    const names3 = namesOf(d, lore);
+    const names4 = namesOf(d, lore);
     const tabs2 = tabsOf(d, lore);
     const k = (f) => `${f}|${a.lore}`;
     const cur = orgOf(d.orgs, a.affiliation);
     return `<div class="dir-panel">
     <div class="dir-line"><span>소속 조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-org-pick", `${o.name}|${a.lore}`, o.name, cur === o)).join("")}${chip2("dir-org-pick", `|${a.lore}`, "미정", !a.affiliation)}</div></div>
     <p class="gx-muted">조직을 고르면 아래 두 값이 그 조직 기준으로 채워져요. 새 조직은 「조직」 탭에서 만들어요.</p>
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-toggle", `rosterFor|${f}|${a.lore}`, names3[f], a.rosterFor.includes(f))).join("")}</div></div>
+    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-toggle", `rosterFor|${f}|${a.lore}`, names4[f], a.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-toggle", `phoneTabs|${t.id}|${a.lore}`, t.name || t.id, a.phoneTabs.includes(t.id))).join("")}</div></div>
     <div class="dir-grid">
       ${input(k("rank"), a.rank, "직급")}
@@ -3056,24 +3458,24 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
   function builtinBlock(code, d) {
     const viewers = [["none", "기본"], ...BUILTIN.map((f) => [f, `${d.display.none?.[f] || f} 소속`])];
     const fallback = d.display.none?.[code] ?? "";
-    const names3 = viewers.map(([v, label]) => `<label class="dir-in"><span>${esc12(label)}</span><input data-input="dir" data-key="${esc12(`disp:${v}|${code}`)}" value="${esc12(d.display[v]?.[code] ?? "")}" placeholder="${esc12(fallback)}" autocomplete="off"></label>`).join("");
+    const names4 = viewers.map(([v, label]) => `<label class="dir-in"><span>${esc12(label)}</span><input data-input="dir" data-key="${esc12(`disp:${v}|${code}`)}" value="${esc12(d.display[v]?.[code] ?? "")}" placeholder="${esc12(fallback)}" autocomplete="off"></label>`).join("");
     const own = d.phoneTabs.tabs.find((t) => t.visible_for.length === 1 && t.visible_for[0] === code);
     const tab2 = own ? input(`ptab:${own.id}`, own.name, "괴담톡 전용 탭 이름") : "";
     const scenes = (SCENARIOS.factions.find((f) => f.code === code)?.scenarios ?? []).map((sc) => input(`seed:${code}-${sc.fm}`, (d.seeds[`${code}-${sc.fm}`] ?? []).join(", "), `${sc.fm}. ${esc12(sc.label)}`)).join("");
-    return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names3}</div>
+    return `<div class="dir-line"><span>부르는 이름</span></div><div class="dir-grid names">${names4}</div>
     ${tab2}
     <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
   }
   function orgPanel(o, ctx2, d) {
     const lore = ctx2.char.globalLore ?? [];
-    const names3 = namesOf(d, lore);
+    const names4 = namesOf(d, lore);
     const tabs2 = tabsOf(d, lore);
     const members = d.agents.filter((a) => a.affiliation === orgAffiliation(o));
     return `<div class="dir-panel">
     ${input(`org:english|${o.name}`, o.spec.english ?? "", "영문명")}
     ${photoBlock(`org:${o.name}`, ctx2)}
     ${factionBlock(o, ctx2)}
-    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-org-toggle", `rosterFor|${f}|${o.name}`, names3[f], o.rosterFor.includes(f))).join("")}</div></div>
+    <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-org-toggle", `rosterFor|${f}|${o.name}`, names4[f], o.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-org-toggle", `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join("")}</div></div>
     <p class="gx-muted">바꾸면 이 조직 요원 ${members.length}명 모두에게 적용돼요. 한 사람만 다르게 하려면 요원 탭에서 바꿔요.</p>
     ${o.faction ? "" : `<div class="dir-rename"><label class="dir-in"><span>조직 이름</span><input name="dir-org-name" value="${esc12(o.name)}" autocomplete="off" data-enter="dir-org-rename"></label>
@@ -3083,10 +3485,10 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
     <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc12(o.name)}">＋ 거점 추가</button></div></div>
   </div>`;
   }
-  function orgRow(o, ctx2, d, names3) {
+  function orgRow(o, ctx2, d, names4) {
     const open3 = dirUi.open === o.name;
     const n = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
-    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names3[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
+    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
     const play = o.faction || o.spec.playable && o.spec.code;
     return `<div class="dir-row${open3 ? " open" : ""}">
     <button class="dir-head" data-action="dir-open" data-value="${esc12(o.name)}" aria-expanded="${open3}">
@@ -3164,714 +3566,22 @@ r(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent
       <span class="gx-badge${p.preset ? " live" : ""}">${p.preset ? "발생 후보" : "숨김"}</span>
     </button>${open3 ? placePanel(p, ctx2) : ""}</div>`;
   }
-  function agentRow(a, ctx2, d, names3) {
+  function agentRow(a, ctx2, d, names4, order) {
     const open3 = dirUi.open === a.lore;
-    const sub = [a.affiliation ? orgName(d, names3, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
-    return `<div class="dir-row${open3 ? " open" : ""}">
+    const sub = [a.affiliation ? orgName(d, names4, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
+    const move = order ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc12(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span><button class="dir-step" data-action="dir-move" data-value="up|${esc12(a.lore)}" aria-label="${esc12(a.name)} 위로" ${order.first ? "disabled" : ""}>${ICONS.up}</button><button class="dir-step" data-action="dir-move" data-value="down|${esc12(a.lore)}" aria-label="${esc12(a.name)} 아래로" ${order.last ? "disabled" : ""}>${ICONS.down}</button></span>` : "";
+    return `<div class="dir-row${open3 ? " open" : ""}"${order ? ` data-agent-row="${esc12(a.lore)}" data-agent-group="${esc12(agentGroup(a))}"` : ""}><div class="dir-headrow">
     <button class="dir-head" data-action="dir-open" data-value="${esc12(a.lore)}" aria-expanded="${open3}">
       ${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}
       <span class="dir-name"><b>${esc12(a.name)}</b><small>${esc12(sub || "소속 미정")}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? "" : '<span class="gx-badge">목록 숨김</span>'}
-    </button>${open3 ? agentPanel(a, ctx2, d) : ""}</div>`;
+    </button>${move}</div>${open3 ? agentPanel(a, ctx2, d) : ""}</div>`;
   }
-  function searchAll(ctx2, d, q, names3) {
+  function searchAll(ctx2, d, q, names4) {
     const jump = (kind, html) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key) => `data-action="dir-jump" data-value="${kind}|${key}"`);
     const groups = [
       ["anomaly", "괴이", d.anomalies.filter((r) => matches3(r, q)).map((r) => jump("anomaly", placeRow(r, ctx2)))],
       ["site", "특수", d.sites.filter((r) => matches3(r, q)).map((r) => jump("site", placeRow(r, ctx2)))],
-      ["agent", "요원", d.agents.filter((r) => matches3(r, q)).map((r) => jump("agent", agentRow(r, ctx2, d, names3)))],
-      ["org", "조직", d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump("org", orgRow(o, ctx2, d, names3)))],
-      ["base", "거점", d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump("base", baseRow(b, ctx2, d)))]
-    ];
-    const hit2 = groups.filter(([, , rows]) => rows.length);
-    if (!hit2.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
-    return hit2.map(([, label, rows]) => `<h3 class="dir-group">${label}<small>${rows.length}</small></h3>${rows.join("")}`).join("");
-  }
-  function directoryList(ctx2) {
-    const d = draftOf(ctx2);
-    const q = dirUi.q.trim().toLowerCase();
-    const names3 = namesOf(d, ctx2.char.globalLore);
-    if (q) return searchAll(ctx2, d, q, names3);
-    if (dirUi.kind === "base") return baseList(ctx2, d, q);
-    if (dirUi.kind === "org") {
-      const rows2 = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
-      return `${rows2.map((o) => orgRow(o, ctx2, d, names3)).join("") || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
-    }
-    if (dirUi.kind !== "agent") {
-      const rows2 = (dirUi.kind === "anomaly" ? d.anomalies : d.sites).filter((r) => matches3(r, q));
-      const src = loreSources(ctx2.char.globalLore);
-      const inside2 = rows2.filter((r) => r.inFolder);
-      const outside = rows2.filter((r) => !r.inFolder);
-      const folder = dirUi.kind === "anomaly" ? "🚧괴이" : "🎁파밍";
-      return `${inside2.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside2.length}</small></h3>${inside2.map((r) => placeRow(r, ctx2)).join("")}` : ""}
-      ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, ctx2, src.get(r.lore))).join("")}` : ""}
-      ${!rows2.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ""}`;
-    }
-    const rows = d.agents.filter((r) => matches3(r, q));
-    if (!rows.length) return '<p class="gx-muted dir-empty">맞는 사람이 없어요.</p>';
-    const key = (a) => a.affiliation ? orgName(d, names3, a.affiliation) : "";
-    const order = ["", ...d.orgs.map((o) => o.name)];
-    const groups = [...new Set(rows.map(key))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
-    return groups.map((g) => `<h3 class="dir-group${g ? "" : " warn"}">${esc12(g || "소속 미정")}<small>${rows.filter((r) => key(r) === g).length}</small></h3>${rows.filter((r) => key(r) === g).map((r) => agentRow(r, ctx2, d, names3)).join("")}`).join("");
-  }
-  var directoryDone = () => dirUi.done;
-  var directoryDoneClear = (text) => {
-    if (dirUi.done === text) dirUi.done = "";
-  };
-  var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc12(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점)" aria-label="명부 전체 검색" autocomplete="off">`;
-  var barButtons = (off) => `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button>`;
-  function directoryBar() {
-    return barButtons(!dirty() || dirUi.busy);
-  }
-  function directoryView(ctx2) {
-    const d = draftOf(ctx2);
-    const kinds = [
-      ["anomaly", "괴이", d.anomalies.length],
-      ["site", "특수", d.sites.length],
-      ["agent", "요원", d.agents.length],
-      ["org", "조직", d.orgs.length],
-      ["base", "거점", d.bases.length]
-    ];
-    return `<div class="dir">
-    <div class="gx-segs dir-kinds">${kinds.map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? " on" : ""}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`).join("")}</div>
-    <div class="dir-tools">
-      <div class="dir-qbox">${directorySearch()}</div>
-      ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? " on" : ""}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ""}
-      <button class="dir-tool icon" data-action="dir-reload" aria-label="로어북 다시 읽기" title="로어북 다시 읽기">${ICONS.refresh}</button>
-      <button class="dir-tool icon${dirUi.help ? " on" : ""}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>
-    </div>
-    ${dirUi.adding ? addPanel(ctx2) : ""}
-    ${dirUi.help ? `<div class="dir-help">
-      <ul>
-        <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
-        <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
-        <li>거점은 지도에 찍히는 장소예요. 「거점」 탭에서 추가하고 지도를 눌러 위치를 정해요.</li>
-        <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
-      </ul>
-      ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
-    </div>` : ""}
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc12(dirUi.notice)}</div>` : ""}
-    ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
-    <div class="dir-list">${directoryList(ctx2)}</div>
-  </div>`;
-  }
-  var ADD_LABEL = { anomaly: "후보 추가", site: "후보 추가", agent: "", org: "조직 추가", base: "거점 추가" };
-  function addPanel(ctx2) {
-    if (dirUi.kind === "org" || dirUi.kind === "base") {
-      const [name, act, hint] = dirUi.kind === "org" ? ["dir-org-new", "dir-org-add", "새 조직 이름"] : ["dir-base-new", "dir-base-new", "새 거점 이름"];
-      return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act}">
-      <button class="gx-mini" data-action="${act}" data-take="${name}">추가</button></div></div>`;
-    }
-    return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc12(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
-    <div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>`;
-  }
-  var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
-  var splitList = (v) => v.split(",").map((t) => t.trim()).filter(Boolean);
-  function directoryInput(key, value, bar) {
-    const d = dirUi.draft;
-    if (!d) return;
-    if (key.startsWith("base:")) {
-      const at2 = key.indexOf("|");
-      const field5 = key.slice(5, at2);
-      const b = d.bases.find((x) => x.name === key.slice(at2 + 1));
-      if (!b) return;
-      if (field5 === "aliases") b.aliases = splitList(value);
-      else if (field5 === "label" || field5 === "lore" || field5 === "english") b[field5] = value.trim();
-      else return;
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    if (key.startsWith("disp:") || key.startsWith("ptab:") || key.startsWith("seed:")) {
-      const [kind, rest] = [key.slice(0, 4), key.slice(5)];
-      if (kind === "disp") {
-        const [viewer, code] = rest.split("|");
-        const m = d.display[viewer] ??= {};
-        if (value.trim()) m[code] = value.trim();
-        else delete m[code];
-      } else if (kind === "ptab") {
-        const t = d.phoneTabs.tabs.find((x) => x.id === rest);
-        if (t) t.name = value.trim() || t.id;
-      } else {
-        const names3 = splitList(value);
-        if (names3.length) d.seeds[rest] = names3;
-        else delete d.seeds[rest];
-      }
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    if (key.startsWith("org:")) {
-      const at2 = key.indexOf("|");
-      const field5 = key.slice(4, at2);
-      const o = d.orgs.find((x) => x.name === key.slice(at2 + 1));
-      if (!o) return;
-      if (field5 === "seed") o.spec.seed = splitList(value);
-      else if (field5 === "title" || field5 === "blurb" || field5 === "photo" || field5 === "english" || field5 === "gm_name" || field5 === "gm_desc" || field5 === "tab") o.spec[field5] = value.trim();
-      else return;
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    const at = key.indexOf("|");
-    const field4 = key.slice(0, at);
-    const row5 = findRow2(d, key.slice(at + 1));
-    if (!row5) return;
-    if (field4 === "aliases") row5.aliases = splitList(value);
-    else if (field4 === "label") row5.label = value.trim() || row5.lore;
-    else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row5[field4] = value.trim();
-    else return;
-    dirUi.done = "";
-    if (bar) bar.innerHTML = directoryBar();
-  }
-  function setPlayable(d, o, on2) {
-    if (on2 === !!o.spec.playable) return;
-    if (on2 && !o.spec.code) {
-      const code2 = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? "")]);
-      if (!code2) {
-        dirUi.notice = "더 줄 수 있는 세력 코드가 없어요 (F00~Z00).";
-        return;
-      }
-      o.spec.code = code2;
-      d.usedCodes = [...d.usedCodes, code2];
-    }
-    const code = o.spec.code;
-    const tab2 = extraTabId(code);
-    o.spec.playable = on2;
-    const edit = (xs, x) => on2 ? xs.includes(x) ? xs : [...xs, x] : xs.filter((y) => y !== x);
-    o.rosterFor = edit(o.rosterFor, code);
-    o.phoneTabs = edit(o.phoneTabs, tab2);
-    for (const a of d.agents) {
-      if (a.affiliation !== orgAffiliation(o)) continue;
-      a.rosterFor = edit(a.rosterFor, code);
-      a.phoneTabs = edit(a.phoneTabs, tab2);
-    }
-    dirUi.notice = "";
-  }
-  async function handleDirectory(action, value, ctx2, env2) {
-    if (!action.startsWith("dir-")) return false;
-    const v = value ?? "";
-    const d = draftOf(ctx2);
-    mapEnv = env2;
-    const baseOf = (name) => d.bases.find((b) => b.name === name);
-    switch (action) {
-      case "dir-kind":
-        if (v === "anomaly" || v === "site" || v === "agent" || v === "org" || v === "base") {
-          dirUi.kind = v;
-          dirUi.open = "";
-          dirUi.q = "";
-          dirUi.adding = false;
-        }
-        break;
-      case "dir-open":
-        dirUi.open = dirUi.open === v ? "" : v;
-        break;
-      case "dir-jump": {
-        const cut2 = v.indexOf("|");
-        const kind = v.slice(0, cut2);
-        if (kind === "anomaly" || kind === "site" || kind === "agent" || kind === "org" || kind === "base") {
-          Object.assign(dirUi, { kind, open: v.slice(cut2 + 1), q: "", adding: false });
-          dirUi.scrollTo = v.slice(cut2 + 1);
-        }
-        break;
-      }
-      case "dir-set":
-      case "dir-toggle": {
-        const [field4, arg] = v.split("|", 2);
-        const row5 = findRow2(d, v.slice(field4.length + arg.length + 2));
-        if (!row5) break;
-        if (field4 === "preset") row5.preset = arg === "1";
-        else if (field4 === "affiliation") row5.affiliation = arg;
-        else if (field4 === "rosterFor" || field4 === "phoneTabs") {
-          const cur = row5[field4];
-          row5[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
-        }
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-pick": {
-        const at = v.indexOf("|");
-        const row5 = d.agents.find((a) => a.lore === v.slice(at + 1));
-        if (!row5) break;
-        assignOrg(row5, d.orgs.find((o) => o.name === v.slice(0, at)));
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-toggle": {
-        const [field4, arg] = v.split("|", 2);
-        const o = d.orgs.find((x) => x.name === v.slice(field4.length + arg.length + 2));
-        if (!o || field4 !== "rosterFor" && field4 !== "phoneTabs") break;
-        o[field4] = o[field4].includes(arg) ? o[field4].filter((x) => x !== arg) : [...o[field4], arg];
-        for (const a of d.agents) if (a.affiliation === orgAffiliation(o)) a[field4] = [...o[field4]];
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-add": {
-        const name = v.trim();
-        dirUi.kind = "org";
-        if (!name) break;
-        if (d.orgs.some((o) => o.name === name || o.faction === name)) {
-          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
-          break;
-        }
-        d.orgs.push({ name, faction: "", rosterFor: ["D00", "E00"], phoneTabs: [], spec: {} });
-        dirUi.open = name;
-        dirUi.adding = false;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-rename": {
-        const o = d.orgs.find((x) => x.name === dirUi.open && !x.faction);
-        const name = v.trim();
-        if (!o || !name || name === o.name) break;
-        if (d.orgs.some((x) => x.name === name || x.faction === name)) {
-          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
-          break;
-        }
-        for (const a of d.agents) if (a.affiliation === o.name) a.affiliation = name;
-        for (const b of d.bases) if (b.org === o.name) b.org = name;
-        o.name = name;
-        dirUi.open = name;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-del": {
-        const o = d.orgs.find((x) => x.name === v && !x.faction);
-        if (!o || d.agents.some((a) => a.affiliation === o.name)) break;
-        d.orgs = d.orgs.filter((x) => x !== o);
-        for (const b of d.bases) if (b.org === o.name) b.org = "";
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-goto":
-        if (!baseOf(v)) break;
-        dirUi.kind = "base";
-        dirUi.open = v;
-        dirUi.q = "";
-        break;
-      case "dir-base-new": {
-        const org = dirUi.kind === "org" ? d.orgs.find((o) => o.name === v) : void 0;
-        const want = org ? `${org.name} 거점` : v.trim();
-        if (!want) break;
-        if (!org && baseOf(want)) {
-          dirUi.notice = `「${want}」 거점이 이미 있어요.`;
-          break;
-        }
-        const name = freeBaseName(d, want);
-        const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
-        const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : "02";
-        d.bases.push({ name, label: "", lore: org ? org.name : "", english: "", aliases: [], org: org?.name ?? "", sido, gu: "", x: 50, y: 50, show: true });
-        dirUi.kind = "base";
-        dirUi.open = name;
-        dirUi.q = "";
-        dirUi.adding = false;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-show":
-      case "dir-base-org": {
-        const at = v.indexOf("|");
-        const b = baseOf(v.slice(at + 1));
-        if (!b) break;
-        if (action === "dir-base-show") b.show = v.slice(0, at) === "1";
-        else b.org = d.orgs.some((o) => o.name === v.slice(0, at)) ? v.slice(0, at) : "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-sido":
-      case "dir-base-gu": {
-        const at = v.lastIndexOf("=");
-        const b = baseOf(v.slice(0, at));
-        const val = v.slice(at + 1);
-        if (!b) break;
-        if (action === "dir-base-sido" && REGIONS.includes(val) && val !== b.sido) {
-          b.sido = val;
-          b.gu = "";
-          b.x = 50;
-          b.y = 50;
-        } else if (action === "dir-base-gu" && (!val || SIGUN[b.sido]?.includes(val))) b.gu = val;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-xy": {
-        const [x, y, ...rest] = v.split("|");
-        const b = baseOf(rest.join("|"));
-        if (!b) break;
-        b.x = Math.round(Math.min(100, Math.max(0, Number(x))) * 10) / 10;
-        b.y = Math.round(Math.min(100, Math.max(0, Number(y))) * 10) / 10;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-rename": {
-        const b = baseOf(dirUi.open);
-        const name = v.trim();
-        if (!b || !name || name === b.name) break;
-        if (baseOf(name)) {
-          dirUi.notice = `「${name}」 거점이 이미 있어요.`;
-          break;
-        }
-        b.name = name;
-        dirUi.open = name;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-del":
-        d.bases = d.bases.filter((b) => b.name !== v);
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      case "dir-fac-play":
-      case "dir-fac-hide":
-      case "dir-fac-type": {
-        const at = v.indexOf("|");
-        const arg = v.slice(0, at);
-        const o = d.orgs.find((x) => x.name === v.slice(at + 1));
-        if (!o) break;
-        if (action === "dir-fac-hide") o.spec.hidden = arg === "0";
-        else if (action === "dir-fac-type") o.spec.type = arg;
-        else if (!o.faction) setPlayable(d, o, arg === "1");
-        dirUi.done = "";
-        break;
-      }
-      case "dir-fac-patch": {
-        dirUi.busy = true;
-        env2.render();
-        try {
-          let missing = [];
-          await updateCharacterLore(ctx2.charIndex, (lore) => {
-            const r = withFactionPlaceholders(lore);
-            missing = r.missing;
-            return r.changed ? r.lore : null;
-          });
-          dirUi.notice = missing.length ? `로어북에서 자리를 못 찾은 부분이 있어요: ${missing.join(", ")}` : "";
-          dirUi.done = missing.length ? "" : "🏷️Tag·📜Faction 로어북에 새 세력 자리를 넣었어요";
-        } catch (error) {
-          dirUi.notice = `로어북을 고치지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        dirUi.busy = false;
-        await env2.refresh();
-        return true;
-      }
-      case "dir-ext-open":
-        dirUi.adding = true;
-        dirUi.addQ = "";
-        break;
-      case "dir-add-toggle":
-        dirUi.adding = !dirUi.adding;
-        dirUi.addQ = "";
-        break;
-      case "dir-help":
-        dirUi.help = !dirUi.help;
-        break;
-      case "dir-photo-pick":
-        dirUi.pick = dirUi.pick === v ? "" : v;
-        dirUi.pickQ = "";
-        break;
-      case "dir-photo-set": {
-        const at = v.indexOf("|");
-        const { slot, key } = pickOf(v.slice(at + 1));
-        const p = picOf(d, key);
-        if (!p) break;
-        p.set(slot, at > 0 ? v.slice(0, at) : "");
-        dirUi.pick = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-crop":
-        dirUi.crop = dirUi.crop === v ? "" : v;
-        dirUi.pick = "";
-        break;
-      case "dir-crop-reset":
-        picOf(d, v)?.set("crop", "");
-        dirUi.done = "";
-        break;
-      case "dir-ext-close":
-        dirUi.adding = false;
-        break;
-      case "dir-ext-add": {
-        const rows = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
-        if (!rows || !v || rows.some((r) => r.lore === v) || !loreSources(ctx2.char.globalLore).has(v)) break;
-        rows.push({ lore: v, label: v, english: "", aliases: [], preset: true, inFolder: false });
-        dirUi.open = v;
-        dirUi.adding = false;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-ext-del": {
-        const rows = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
-        const i = rows ? rows.findIndex((r) => r.lore === v && !r.inFolder) : -1;
-        if (!rows || i < 0) break;
-        rows.splice(i, 1);
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-reset":
-        dirUi.draft = null;
-        dirUi.notice = "";
-        break;
-      case "dir-reload":
-        await env2.refresh();
-        dirUi.done = "로어북을 다시 읽었어요.";
-        env2.render();
-        return true;
-      case "dir-save": {
-        if (!dirty() || dirUi.busy) return true;
-        dirUi.busy = true;
-        dirUi.notice = "";
-        env2.render();
-        try {
-          const data = directoryData(d);
-          let saved = void 0;
-          await updateCharacterLore(ctx2.charIndex, (lore) => saved = withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
-          dirUi.draft = null;
-          dirUi.done = "카드 로어북에 저장했어요";
-          if (saved && (ctx2.chat.message ?? []).length) {
-            const lore = saved;
-            await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-              const vars = staleFactionVars(lore, chat.scriptstate);
-              return vars ? { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } } : null;
-            }).catch(() => null);
-          }
-        } catch (error) {
-          dirUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        dirUi.busy = false;
-        await env2.refresh();
-        return true;
-      }
-      default:
-        return false;
-    }
-    env2.render();
-    return true;
-  }
-
-  // src/ui/field.ts
-  var field2 = {
-    region: "01",
-    filter: "all",
-    place: null,
-    target: null,
-    team: [],
-    support: 0,
-    mkind: "an",
-    mname: null,
-    mpick: "an",
-    note: "",
-    step: "goal",
-    query: "",
-    mapq: "",
-    confirmEnd: null
-  };
-  var mapUrls = {};
-  var esc13 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND_LABEL2 = { an: "괴이", in: "사건", ms: "특수" };
-  var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
-  function resetField(all = false) {
-    field2.target = null;
-    field2.team = [];
-    field2.support = 0;
-    field2.mname = null;
-    field2.note = "";
-    field2.step = "goal";
-    field2.confirmEnd = null;
-    field2.place = null;
-    if (all) {
-      field2.region = "01";
-      field2.filter = "all";
-      field2.query = "";
-      field2.mkind = "an";
-    }
-  }
-  function ctxOf(ctx2, chat) {
-    const lore = ctx2.char.globalLore;
-    const catalog = parseCatalog(lore);
-    const bases = draftBases();
-    return {
-      catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
-      world: readWorld(chat),
-      faction: String(chat.scriptstate?.["$st_faction"] ?? ""),
-      on: worldOn(chat),
-      settings: worldSettings(lore, chat.scriptstate),
-      supportOn: basicSettings(lore, chat.scriptstate).supportOn,
-      char: ctx2.char
-    };
-  }
-  function readCtx(ctx2) {
-    try {
-      return ctxOf(ctx2, ctx2.chat);
-    } catch (error) {
-      return error instanceof Error ? error.message : String(error);
-    }
-  }
-  function sidoOf(loc) {
-    return loc.split("-")[0];
-  }
-  function placeKey(ev, c) {
-    if (ev.kind === "in") {
-      const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
-      if (lm) return `fac:${lm.name}`;
-    }
-    return ev.loc;
-  }
-  function placeTarget(key) {
-    return key.startsWith("fac:") ? { type: "facility", name: key.slice(4) } : { type: "place", loc: key };
-  }
-  function targetName(t) {
-    if (t.type === "event") return t.name;
-    if (t.type === "facility") return t.name;
-    return locName(t.loc);
-  }
-  var isPC = () => !matchMedia("(max-width: 760px)").matches;
-  function sameTarget(a, key) {
-    if (!a) return false;
-    if (a.type === "event") return a.key === key;
-    return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key;
-  }
-  function mapImage(ctx2, code, env2) {
-    const hit2 = mapUrls[code];
-    if (hit2 === void 0) {
-      mapUrls[code] = "loading";
-      void assetUrl(ctx2.char, `map${code}`).then((url) => {
-        mapUrls[code] = url;
-        env2.render();
-      });
-      return null;
-    }
-    return hit2 === "loading" ? null : hit2;
-  }
-  function pin(action, value, label, x, y, cls, count = 0) {
-    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc13(value)}" aria-label="${esc13(label)}">
-    <span class="gx-dot"></span><span class="gx-pname">${esc13(label)}${count ? `<b>${count}</b>` : ""}</span></button>`;
-  }
-  function hotClass(list4) {
-    if (!list4.length) return "";
-    const kinds = new Set(list4.map((e) => e.kind));
-    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
-  }
-  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
-  function mapBar(x) {
-    const code = field2.region;
-    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc13(regionName(c))}</option>`).join("");
-    const bar = `<div class="gx-mapbar">
-      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
-      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc13(field2.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
-        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
-    </div>`;
-    return bar;
-  }
-  function mapCanvas(ctx2, x, events, env2) {
-    const code = field2.region;
-    const url = mapImage(ctx2, code, env2);
-    const byPlace = /* @__PURE__ */ new Map();
-    for (const e of events) {
-      const k = placeKey(e, x.catalog);
-      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
-    }
-    let pins = "";
-    if (code === "01") {
-      for (const [nn, label, px, py] of NATION_PINS) {
-        const here = events.filter((e) => sidoOf(e.loc) === nn);
-        pins += pin("map-region", nn, label, px, py, `nation${hotClass(here)}`, here.length);
-      }
-    } else {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        const xy = REGION_PINS[code]?.[i];
-        const loc = `${code}-${i}`;
-        if (!xy) return;
-        const here = byPlace.get(loc) ?? [];
-        const sel = field2.place === loc || sameTarget(field2.target, loc) ? " sel" : "";
-        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
-      });
-      for (const lm of x.catalog.landmarks) {
-        if (lm.sido !== code) continue;
-        const key = `fac:${lm.name}`;
-        const here = byPlace.get(key) ?? [];
-        const sel = field2.place === key || sameTarget(field2.target, key) ? " sel" : "";
-        pins += pin("map-place", key, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
-      }
-    }
-    const img = url ? `<img class="gx-mapimg" src="${esc13(url)}" alt="${esc13(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
-    return `${narrow2() ? "" : mapBar(x)}
-    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== "01") : ""}</div>`;
-  }
-  function mapSuggest(c) {
-    const q = field2.mapq.trim().toLowerCase();
-    if (!q) return "";
-    const hits = [];
-    for (const code of MAP_CODES) {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
-      });
-    }
-    for (const lm of c.landmarks) {
-      if (!MAP_CODES.includes(lm.sido)) continue;
-      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
-    }
-    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
-    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc13(h.value)}"><b>${esc13(h.name)}</b><small>${esc13(h.sub)}</small></button>`).join("");
-  }
-  function mapSuggestFor(ctx2, q) {
-    field2.mapq = q;
-    const x = readCtx(ctx2);
-    return typeof x === "string" ? "" : mapSuggest(x.catalog);
-  }
-  function eventRow(e, x, agents2) {
-    const w = x.world;
-    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
-    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
-    const an = e.kind === "an" ? w.an[e.index] : void 0;
-    const badge2 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
-    const names3 = e.kind === "in" ? [] : codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
-    return evCard({
-      kind: e.kind,
-      name: e.name,
-      grade: e.grade,
-      loc: `${esc13(locName(e.loc))}${since ? ` · ${since}` : ""}`,
-      badge: badge2,
-      chips: peopleChips(x.char, names3, agents2),
-      extra: e.report ? `<span class="gx-evc-sit">${esc13(e.report)}</span>` : "",
-      key: e.key,
-      open: "pick-event",
-      selected: field2.target?.type === "event" && field2.target.key === e.key,
-      confirmEnd: field2.confirmEnd === e.key
-    });
-  }
-  function placeCard(key, c, on2) {
-    let name;
-    let sub;
-    let wiki2;
-    if (key.startsWith("fac:")) {
-      const lm = c.landmarks.find((l) => l.name === key.slice(4));
-      name = lm?.label || lm?.name || key.slice(4);
-      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
-      wiki2 = lm?.name ?? name;
-    } else {
-      const full = locName(key);
-      const cut2 = full.lastIndexOf(" ");
-      name = cut2 > 0 ? full.slice(cut2 + 1) : full;
-      sub = cut2 > 0 ? full.slice(0, cut2) : "";
-      wiki2 = full;
-    }
-    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
-    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc13(key)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc13(name)}</b>${tag}</span>
-    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc13(wiki2)}" title="위키" aria-label="${esc13(name)} 위키">${ICONS.wiki}</button></span></span>
-    <small>${esc13(sub || "장소")}</small></span></li>`;
-  }
-  function situations(x, events) {
-    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
-    for (const e of events) counts[e.kind]++;
-    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
-    const agents2 = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
-    const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
-    const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
-    const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
-    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
-    return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
-    ${shown2.length || place2 ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents2)).join("")}</ul>` : `<p clas
+      ["agent", "요원", d.agents.filter((r) => matches3(r, q)).map((r) => jump("agent", agentRow(r, ctx2, d, names4)))],
+      ["org", "조직", d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump("org", orgRow(o, ctx2, d, names4)))],
+      ["base", "거점"

@@ -1,6 +1,6 @@
 {
   "name": "goei-plugin",
-  "version": "0.16.31",
+  "version": "0.16.32",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,6 +15,6 @@
   },
   "goei": {
     "updateBase": "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release",
-    "minPlugin": "0.16.31"
+    "minPlugin": "0.16.32"
   }
 }

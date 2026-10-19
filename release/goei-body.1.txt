@@ -1,4 +1,4 @@
-// goei-body 0.16.31
+// goei-body 0.16.32
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -51,15 +51,15 @@
     if (list4.length === 2) return list4[0] + f.pair_separator + list4[1];
     return list4.slice(0, -1).join(f.separator) + f.last_separator + list4[list4.length - 1];
   }
-  function partyClause(d, names3, support) {
+  function partyClause(d, names4, support) {
     const f = d.format.party;
-    const members = [...names3];
+    const members = [...names4];
     if (support > 0) members.push(fill(support === 1 ? f.support_one : f.support_many, { COUNT: support }));
     if (!members.length) return fill(f.solo, {});
     return fill(f.group, { MEMBERS: joinNames(d, members) });
   }
-  function sceneDirective(d, dest, names3, support, opening) {
-    const values = { DEST: dest, PARTY: partyClause(d, names3, support) };
+  function sceneDirective(d, dest, names4, support, opening) {
+    const values = { DEST: dest, PARTY: partyClause(d, names4, support) };
     return [d.sections.COMMON, d.sections[opening ? "OPENING" : "CONTINUATION"], d.sections.CONTEXT].map((t) => fill(t, values)).join("\n\n");
   }
   var TEAM_MAX = 3;
@@ -224,7 +224,10 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
     siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
     spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
-    close: stroke('<path d="M6 6l12 12M18 6 6 18"/>')
+    close: stroke('<path d="M6 6l12 12M18 6 6 18"/>'),
+    up: stroke('<path d="m6 15 6-6 6 6"/>'),
+    down: stroke('<path d="m6 9 6 6 6-6"/>'),
+    grip: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>'
   };
 
   // src/ui/brand.ts
@@ -250,8 +253,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     return `<span aria-hidden="true" style="position:absolute;${v}:10px;${h}:10px;width:14px;height:14px;border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
   }
   function landingHtml(p) {
-    const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="50" height="50"');
-    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:40em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:left;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<div data-goei-part="row" style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px 26px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:84px;height:84px;border-radius:24px;background:${p.accentBg};border:1px solid ${p.accentLine};color:${p.signal}">${ghost}</div><div data-goei-part="text" style="flex:1 1 15em;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em"><span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span><span style="display:inline-flex;align-items:center;gap:6px;color:${p.sub};letter-spacing:.2em"><span data-goei-part="dot" style="width:7px;height:7px;border-radius:50%;background:${p.signal}"></span>STANDBY</span></div>` + title(p) + `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
+    const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="92" height="92"');
+    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:23em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<span style="position:absolute;top:13px;right:34px;display:inline-flex;align-items:center;gap:6px;font-family:${MONO};font-size:10px;letter-spacing:.2em;color:${p.sub}"><span data-goei-part="dot" style="width:6px;height:6px;border-radius:50%;background:${p.signal}"></span>STANDBY</span><div data-goei-part="row" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div><div data-goei-part="text" style="width:100%;min-width:0"><div style="display:flex;align-items:center;justify-content:center;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em"><span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span></div>` + title(p) + `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
   }
   var LANDING_CSS = `
 [data-goei-card="landing"] { container-type: inline-size; }
@@ -278,13 +281,10 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
 [data-goei-card="landing"] [data-goei-part="label"] { display: inline-block; animation: goei-l-label 3.8s linear infinite; }
 [data-goei-card="landing"] [data-goei-part="ghost"] { animation: goei-l-float 3.2s ease-in-out infinite; }
 [data-goei-card="landing"] [data-goei-part="scan"] { animation: goei-l-scan 5s ease-in-out infinite; }
-/* 인라인 style을 이겨야 해서 !important */
-@container (max-width: 30em) {
-  [data-goei-card="landing"] [data-goei-part="text"] { flex-basis: 100% !important; text-align: center !important; }
-  [data-goei-card="landing"] [data-goei-part="text"] > div:first-child { justify-content: center !important; }
-  [data-goei-card="landing"] [data-goei-part="text"] > div:last-child { justify-content: center !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 68px !important; height: 68px !important; border-radius: 20px !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 40px; height: 40px; }
+/* 좁은 화면: 유령만 조금 작게 (인라인 style을 이겨야 해서 !important) */
+@container (max-width: 24em) {
+  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 80px !important; height: 80px !important; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 76px; height: 76px; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-goei-card="landing"] [data-goei-part] { animation: none !important; }
@@ -404,8 +404,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
       if (!t || t.startsWith("#")) continue;
       const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
       if (!m) continue;
-      const names3 = m[2].split("|").map((s4) => s4.trim()).filter(Boolean);
-      if (names3.length) map.set(m[1], names3);
+      const names4 = m[2].split("|").map((s4) => s4.trim()).filter(Boolean);
+      if (names4.length) map.set(m[1], names4);
     }
     return map;
   }
@@ -856,10 +856,10 @@ ${body4.slice(at).replace(/^\s+/, "")}
         };
       });
     }
-    const names3 = factionDisplayNames(lore);
+    const names4 = factionDisplayNames(lore);
     return legacyBases(lore).map(({ hint, ...b }) => {
       const k = hint.map(squash);
-      const o = orgs.find((x) => k.includes(squash(x.name))) ?? orgs.find((x) => x.faction && k.includes(squash(names3[x.faction] ?? ""))) ?? orgs.find((x) => x.spec.title && k.includes(squash(x.spec.title)));
+      const o = orgs.find((x) => k.includes(squash(x.name))) ?? orgs.find((x) => x.faction && k.includes(squash(names4[x.faction] ?? ""))) ?? orgs.find((x) => x.spec.title && k.includes(squash(x.spec.title)));
       return { ...b, org: o?.name ?? "" };
     });
   }
@@ -918,11 +918,11 @@ ${body4.slice(at).replace(/^\s+/, "")}
     for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
     return { ...extraNames(lore), ...out };
   }
-  function groupFaction(group4, names3) {
+  function groupFaction(group4, names4) {
     let best = "";
     let len = 0;
     for (const f of FACTIONS) {
-      const n = names3[f];
+      const n = names4[f];
       if (n && group4.includes(n) && n.length > len) {
         best = f;
         len = n.length;
@@ -976,7 +976,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
     return all.find((n) => n === name) ?? all.find((n) => Math.min(n.length, name.length) >= 2 && (n.includes(name) || name.includes(n))) ?? name;
   }
   function buildOrgs(lore, agents2, saved) {
-    const names3 = factionDisplayNames(lore);
+    const names4 = factionDisplayNames(lore);
     const tabs2 = phoneTabs(lore);
     const out = [];
     const make = (name, faction) => {
@@ -997,7 +997,7 @@ ${body4.slice(at).replace(/^\s+/, "")}
         phoneTabs: Array.isArray(d.phone_tabs) ? list2(d.phone_tabs) : mode(members.map((m) => m.phoneTabs)) ?? base.phoneTabs
       });
     };
-    for (const f of FACTIONS) make(names3[f], f);
+    for (const f of FACTIONS) make(names4[f], f);
     for (const name of Object.keys(saved)) if (s2(name) && !out.some((o) => o.name === name)) make(name, "");
     for (const a of agents2) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
     for (const e of orgFolder(lore)) {
@@ -1279,6 +1279,27 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function migrateLore(lore, dir2 = readDirectory(lore)) {
     if (!dir2.folders) return lore;
     return withDirectory(lore, directoryData(dir2)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? "")));
+  }
+  var agentGroup = (a) => a.affiliation || "";
+  function moveAgent(d, lore, how, target = "") {
+    const from = d.agents.findIndex((a) => a.lore === lore);
+    if (from < 0) return false;
+    const g = agentGroup(d.agents[from]);
+    const same = d.agents.map((a, i) => [a, i]).filter(([a]) => agentGroup(a) === g).map(([, i]) => i);
+    const k = same.indexOf(from);
+    if (how === "up" || how === "down") {
+      const j = how === "up" ? k - 1 : k + 1;
+      if (j < 0 || j >= same.length) return false;
+      const to2 = same[j];
+      [d.agents[from], d.agents[to2]] = [d.agents[to2], d.agents[from]];
+      return true;
+    }
+    const to = d.agents.findIndex((a) => a.lore === target);
+    if (to < 0 || to === from || agentGroup(d.agents[to]) !== g) return false;
+    const [row5] = d.agents.splice(from, 1);
+    const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
+    d.agents.splice(at, 0, row5);
+    return true;
   }
 
   // src/core/world/catalog.ts
@@ -2323,9 +2344,9 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function isSubstitute(t) {
     let owed = 0;
     for (let x = t - 14 * DAY; x <= t; x += DAY) {
-      const names3 = baseHolidays(x);
+      const names4 = baseHolidays(x);
       const wd = new Date(x).getUTCDay();
-      if (!names3.length) {
+      if (!names4.length) {
         if (wd !== 0 && wd !== 6 && owed > 0) {
           if (x === t) return true;
           owed--;
@@ -2333,11 +2354,11 @@ ${body4.slice(at).replace(/^\s+/, "")}
         continue;
       }
       const year = new Date(x).getUTCFullYear();
-      const hit2 = names3.some((n) => {
+      const hit2 = names4.some((n) => {
         const from = SUBST_FROM[n];
         if (!from || year < from) return false;
         const lunarGroup = n === "설날" || n === "추석";
-        return names3.length > 1 || wd === 0 || !lunarGroup && wd === 6;
+        return names4.length > 1 || wd === 0 || !lunarGroup && wd === 6;
       });
       if (hit2) owed++;
     }
@@ -2353,8 +2374,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
     const dt = new Date(t);
     if (dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
     const date = text.slice(0, m.index + m[0].length).trim() + text.slice(m.index + m[0].length).replace(WEEK_RE, "");
-    const names3 = baseHolidays(t);
-    const holiday = names3.length ? [...new Set(names3)].join("·") : isSubstitute(t) ? "대체공휴일" : "";
+    const names4 = baseHolidays(t);
+    const holiday = names4.length ? [...new Set(names4)].join("·") : isSubstitute(t) ? "대체공휴일" : "";
     const wd = dt.getUTCDay();
     const l = lunar(t);
     return { date: date.trim(), weekday: WEEK[wd], holiday, red: wd === 0 || !!holiday, saturday: wd === 6, lunar: l ? `${l.leap ? "윤" : ""}${l.m}월 ${l.d}일` : "" };
@@ -2420,9 +2441,12 @@ ${body4.slice(at).replace(/^\s+/, "")}
     paper: { panel: "#FAF5E9", line: "#D3C29E", text: "#2B2418", sub: "#4A3F2C", pin: "#2F6F62", tgt: "#8F5B00", red: "#B3261E", blue: "#2C5AA0", shadow: "rgba(60,40,10,.2)" }
   };
   function statusCss(style, theme) {
-    if (style === "off") return ".gst{display:none!important}";
+    if (style === "off") return risuClasses(".gst{display:none!important}");
     const v = VARS[style === "auto" ? theme : style];
-    return `.gst{${Object.entries(v).map(([k, c]) => `--gs-${k}:${c};`).join("")}}${STATUS_CSS}`;
+    return risuClasses(`.gst{${Object.entries(v).map(([k, c]) => `--gs-${k}:${c};`).join("")}}${STATUS_CSS}`);
+  }
+  function risuClasses(css) {
+    return css.replace(/\.(gst[\w-]*|sat|sun|hol)(?![\w-])/g, ":is(.$1,.x-risu-$1)");
   }
   var STATUS_CSS = `
 .chat-message-container:has(.gst) ~ .chat-message-container .gst,
@@ -2637,7 +2661,8 @@ ${body4.slice(at).replace(/^\s+/, "")}
   }
 
   // src/host/overlay.ts
-  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + statusCss(getPrefs().status ?? "auto", t);
+  var OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
+  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t);
   function themeVars(sel) {
     return Object.keys(PALETTES).map((t) => {
       const p = PALETTES[t];
@@ -3133,9 +3158,9 @@ ${themeVars("[x-goei-fab]")}
     const terms = scene.trim() ? referenceEntries(registry2, scene).flatMap((e) => e.terms) : [];
     return { scene, terms: [...new Set(terms)].filter((t) => [...t].length >= 2) };
   }
-  function related(f, names3, text = "") {
+  function related(f, names4, text = "") {
     if (!f) return false;
-    if (names3.some((n) => [...n.trim()].length >= 2 && termPresent(f.scene, n.trim()))) return true;
+    if (names4.some((n) => [...n.trim()].length >= 2 && termPresent(f.scene, n.trim()))) return true;
     return !!text && f.terms.some((t) => termPresent(text, t));
   }
   function pickRecords(items, o) {
@@ -3143,13 +3168,13 @@ ${themeVars("[x-goei-fab]")}
     const queue = o.focus ? [...newest.filter((x, i) => x.free || i < o.recent), ...newest.filter((x, i) => !x.free && i >= o.recent && x.related)] : newest;
     const kept = [];
     let counted = 0;
-    for (const item of queue) {
-      if (kept.includes(item)) continue;
-      if (!item.free && counted >= o.max) continue;
-      const next = [...kept, item].sort((a, b) => a.order - b.order);
+    for (const item2 of queue) {
+      if (kept.includes(item2)) continue;
+      if (!item2.free && counted >= o.max) continue;
+      const next = [...kept, item2].sort((a, b) => a.order - b.order);
       if (!o.fits(next.map((x) => x.data))) continue;
       kept.splice(0, kept.length, ...next);
-      if (!item.free) counted++;
+      if (!item2.free) counted++;
     }
     return kept.map((x) => x.data);
   }
@@ -3269,18 +3294,18 @@ ${themeVars("[x-goei-fab]")}
   function fields2(line) {
     const out = [];
     let cur = "";
-    let esc16 = false;
+    let esc17 = false;
     for (const c of line) {
-      if (esc16) {
+      if (esc17) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc16 = false;
-      } else if (c === "\\") esc16 = true;
+        esc17 = false;
+      } else if (c === "\\") esc17 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc16) cur += "\\";
+    if (esc17) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -3313,7 +3338,7 @@ ${themeVars("[x-goei-fab]")}
         }
       } else if (p[0] === "C" && p.length >= 6) {
         const post = map.get(Number(p[1]));
-        if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1" });
+        if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === "1", unread: p[6] === "1", ...validDate(p[7]) ? { time: validDate(p[7]) } : {} });
       } else if (p[0] === "D" && p.length >= 4) {
         st.dms.push({ nick: cut(p[1], 80), side: p[2] === "me" ? "me" : "npc", body: p[3], unread: p[4] === "1", date: validDate(p[5] ?? "") });
       }
@@ -3329,7 +3354,7 @@ ${themeVars("[x-goei-fab]")}
     const out = ["GN1", `Q|${st.seq || G_POST_BASE}`];
     for (const p of st.posts) {
       out.push(["P", p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? "1" : "0"].join("|"));
-      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0"].join("|"));
+      for (const c of p.comments) out.push(["C", p.id, c.parent, en(c.nick), en(c.body), c.mine ? "1" : "0", c.unread ? "1" : "0", en(c.time ?? "")].join("|"));
     }
     for (const [nick, s4] of Object.entries(st.sources)) out.push(["T", en(nick), s4.postid || 0, en(s4.title), en(s4.body), en(s4.author), en(s4.quote), en(s4.quoteAuthor)].join("|"));
     for (const d of st.dms) out.push(["D", en(d.nick), d.side, en(d.body), d.unread ? "1" : "0", en(d.date)].join("|"));
@@ -3471,11 +3496,12 @@ ${themeVars("[x-goei-fab]")}
     st.posts.unshift(p);
     return p;
   }
-  function addUserComment(st, postIdValue, parent, nick, body4) {
+  function addUserComment(st, postIdValue, parent, nick, body4, now = "") {
     const p = findPost(st, postIdValue);
     if (!p) throw new GnetError("대상 글이 없어졌어요.");
     if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
     p.comments.push({ parent, nick, body: trimTokens(body4, LIMITS.comment_tokens), mine: true, unread: false });
+    stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
     return p.comments.length;
   }
   function deletePost(st, id) {
@@ -3649,6 +3675,7 @@ ${themeVars("[x-goei-fab]")}
           sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
         }
       }
+      const raws = [];
       comments.forEach((c, i) => {
         const n = i + 1;
         if (!isObj(c)) return void remap.set(n, false);
@@ -3663,9 +3690,11 @@ ${themeVars("[x-goei-fab]")}
           return void remap.set(n, false);
         }
         q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
+        raws.push(str(c.time).trim());
         sigs.set(sig, q.comments.length);
         remap.set(n, q.comments.length);
       });
+      stampComments(q, q.comments.length - raws.length, raws, o.date);
       if (!q.title.trim() && !q.body.trim()) continue;
       posts.push(q);
     }
@@ -3703,10 +3732,95 @@ ${themeVars("[x-goei-fab]")}
       const sig = `${author}\0${content}`;
       if (seen.has(sig)) return bad();
       seen.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n });
+      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
       map.set(own, base + out.length);
     });
     return { comments: out, dropped };
+  }
+  function stampMinutes(stamp) {
+    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
+    if (!m) return null;
+    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
+  }
+  function minutesStamp(min) {
+    const d = new Date(min * 6e4);
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  }
+  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
+  function clockMinutes(raw) {
+    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
+    if (!m) return null;
+    const h = +m[1];
+    const mi = +m[2];
+    return h < 24 && mi < 60 ? h * 60 + mi : null;
+  }
+  function stampComments(p, from, raws, now) {
+    const nowMin = stampMinutes(now);
+    const postMin = stampMinutes(p.date);
+    const floorOf = (i) => {
+      const c = p.comments[i];
+      const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
+      const known = cands.filter((x) => x !== null);
+      return known.length ? Math.max(...known) : null;
+    };
+    const pending = [];
+    const settle = (upto) => {
+      if (!pending.length) return;
+      const lo = floorOf(pending[0]);
+      const hi = upto ?? nowMin ?? lo;
+      if (lo === null || hi === null) return void (pending.length = 0);
+      const span = Math.max(0, hi - lo);
+      pending.forEach((idx, k) => {
+        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending.length + 1)));
+        p.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
+      });
+      pending.length = 0;
+    };
+    for (let i = from; i < p.comments.length; i++) {
+      const c = p.comments[i];
+      const raw = String(raws[i - from] ?? "").trim();
+      const lo = floorOf(i);
+      const clock2 = raw ? clockMinutes(raw) : null;
+      if (clock2 === null || lo === null && nowMin === null) {
+        pending.push(i);
+        continue;
+      }
+      const hi = nowMin ?? Number.POSITIVE_INFINITY;
+      const base = lo ?? nowMin - 24 * 60;
+      let pick2 = null;
+      for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
+        const t = day * 1440 + clock2;
+        if (t >= base && t <= hi) {
+          pick2 = t;
+          break;
+        }
+      }
+      if (pick2 === null) {
+        const ahead = 1 + i % 3;
+        const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock2 > nowMin;
+        if (future && (lo === null || lo <= nowMin)) pick2 = nowMin;
+        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick2 = lo + ahead;
+        else pick2 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
+      }
+      settle(pick2);
+      c.time = minutesStamp(pick2);
+    }
+    settle(null);
+  }
+  function commentWhen(p, c) {
+    if (!c.time) return "";
+    return c.time.slice(0, 10) === String(p.date).slice(0, 10) ? hhmm(c.time) : c.time;
+  }
+  var whenField = (p, c) => {
+    const t = commentWhen(p, c);
+    return t ? { time: t } : {};
+  };
+  function pushComments(p, rows, now) {
+    const from = p.comments.length;
+    for (const c of rows) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+    stampComments(p, from, rows.map((c) => c.time ?? ""), now);
   }
   function parsePostDraft(value) {
     if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
@@ -3754,7 +3868,7 @@ ${themeVars("[x-goei-fab]")}
         date: p.date,
         views: p.views,
         upvotes: p.votes,
-        comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, content: c.body })).filter((c) => selected.has(c.index)),
+        comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body })).filter((c) => selected.has(c.index)),
         commentCount: p.comments.length,
         commentsAllowed: allowed
       });
@@ -3762,7 +3876,7 @@ ${themeVars("[x-goei-fab]")}
     }
     return { posts, snapshots };
   }
-  function applyActivity(st, rows, snapshots, nick) {
+  function applyActivity(st, rows, snapshots, nick, now = "") {
     if (rows === void 0 || rows === null) return [false, 0];
     if (!Array.isArray(rows)) return [false, 1];
     let changed = false;
@@ -3789,7 +3903,7 @@ ${themeVars("[x-goei-fab]")}
       const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
       p.views += delta(u.viewsDelta);
       p.votes += delta(u.upvotesDelta);
-      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+      pushComments(p, got.comments, now);
       if (got.dropped) skipped2++;
       changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
     }
@@ -3910,7 +4024,7 @@ ${JSON.stringify(body4)}`;
         include(j);
         selected++;
       }
-      const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, content: describe(c.body) })).filter((c) => wanted.has(c.id));
+      const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
       posts.push({
         order: p.id,
         related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}
@@ -4126,117 +4240,4 @@ ${JSON.stringify({ feature: "gnet", records })}
         visible: false,
         saved: false
       };
-      c.visible = c.tabs.some((t) => visible.has(t));
-      map.set(c.id, c);
-      if (c.visible) contacts.push(c);
-      for (const name of [english, ...list3(row5.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
-    }
-    for (const entry of readCustom(chat).items) {
-      let c = map.get(entry.id);
-      if (c) {
-        if (!c.tabs.includes("T05")) c.tabs = [...c.tabs, "T05"];
-        if (!c.visible && visible.has("T05")) {
-          c.visible = true;
-          contacts.push(c);
-        }
-      } else {
-        c = { id: entry.id, name: entry.name, english: "", lore: "", group: "미분류", rank: "", department: "", note: entry.note ?? "", custom: true, tabs: ["T05"], terms: [entry.name, entry.note ?? ""], visible: visible.has("T05"), saved: true };
-        map.set(c.id, c);
-        if (c.visible) contacts.push(c);
-      }
-      c.saved = true;
-    }
-    return { tabs: tabs2, contacts, map, faction };
-  }
-  function personOf(c) {
-    const p = { id: c.id, name: c.name };
-    for (const k of ["agentId", "english", "lore", "group", "rank", "department", "note"]) if (c[k]) p[k] = c[k];
-    if (c.custom) p.custom = true;
-    return p;
-  }
-  function contactDetails(c) {
-    return [c?.rank, c?.department].filter(Boolean).join(" · ");
-  }
-  var blankState = () => ({ version: 2, seq: 0, mid: 0, rooms: {}, order: [] });
-  function readPhone(chat) {
-    const raw = String(chat.scriptstate?.[PH_STATE] ?? "");
-    if (!raw || raw === "null") return blankState();
-    let st;
-    try {
-      st = JSON.parse(raw);
-    } catch {
-      throw new PhoneError("메시지 기록을 읽지 못했어요. 기존 기록은 그대로 둬요.");
-    }
-    if (!st || typeof st.rooms !== "object" || !Array.isArray(st.order)) throw new PhoneError("메시지 기록을 읽지 못했어요. 기존 기록은 그대로 둬요.");
-    st.version = 2;
-    st.seq = Number(st.seq) || 0;
-    st.mid = Number(st.mid) || 0;
-    for (const [id, r] of Object.entries(st.rooms)) {
-      r.id = r.id || id;
-      r.people ??= {};
-      r.members ??= [];
-      r.messages ??= [];
-      r.draft ??= "";
-      r.unread = Number(r.unread) || 0;
-      for (const m of r.messages) m.kind ??= "message";
-      if (r.kind === "group" && r.name && r.name === Object.values(r.people).map((p) => p.name).join(", ")) delete r.name;
-    }
-    return st;
-  }
-  function roomLabel(r) {
-    if (r.kind === "group") return r.name || r.members.map((c) => r.people[c]?.name ?? c).join(", ") || "단톡방";
-    return r.people[r.members[0]]?.name ?? r.people[Object.keys(r.people)[0]]?.name ?? "대화";
-  }
-  function push(st, r, sender, text, time2, kind = "message") {
-    if (!r.messages.length && !r.conversationBaseline && r.readThrough === void 0) r.readThrough = 0;
-    st.mid = (st.mid || 0) + 1;
-    const m = { id: st.mid, sender, text, time: time2, kind, audience: [...r.members] };
-    r.messages.push(m);
-    return m;
-  }
-  function membership(st, r, kind, cid, time2) {
-    const p = r.people[cid];
-    if (!p) throw new PhoneError("참여자 정보를 찾지 못했어요.");
-    const m = push(st, r, "system", `${p.name}님이 ${kind === "invite" ? "초대되었습니다." : "나갔습니다."}`, time2, kind);
-    m.participant = cid;
-    if (kind === "exit") r.members = r.members.filter((x) => x !== cid);
-  }
-  var emptyPause = (t) => String(t ?? "").replace(/[\s.…⋯．]/g, "") === "";
-  var hiddenPause = (t) => {
-    const s4 = String(t ?? "").trim();
-    return emptyPause(s4) || [...s4].length > 12 || /[다요][.!…]*$/.test(s4);
-  };
-  var listedRooms = (st) => Object.keys(st.rooms).filter((k) => st.rooms[k].messages.length > 0).sort((a, b) => st.rooms[b].messages[st.rooms[b].messages.length - 1].id - st.rooms[a].messages[st.rooms[a].messages.length - 1].id);
-  function unsolicited(r) {
-    if (r.kind !== "dm") return false;
-    for (let i = r.messages.length - 1; i >= 0; i--) if (r.messages[i].kind === "message") return r.messages[i].sender !== "me";
-    return true;
-  }
-  function readRoom(r) {
-    let latest = r.readThrough ?? 0;
-    for (const m of r.messages) latest = Math.max(latest, m.id);
-    r.readThrough = latest;
-    r.unread = 0;
-  }
-  var roomUnread = (st) => Object.values(st.rooms).some((r) => r.unread > 0);
-  var unreadCount = (st) => Object.values(st.rooms).reduce((n, r) => n + (r.unread || 0), 0);
-  function conversationState(r) {
-    let out = { ownerHasSpoken: false, npcMessagesSinceOwner: 0, senders: [], readReceipt: "unknown" };
-    let senders = /* @__PURE__ */ new Map();
-    if (r.conversationBaseline && typeof r.conversationBaseline === "object") {
-      out = JSON.parse(JSON.stringify(r.conversationBaseline));
-      for (const row5 of out.senders ?? []) senders.set(row5.sender, row5);
-      out.senders = [];
-    }
-    for (const m of r.messages) {
-      if (m.kind !== "message" || m.sender === "system") continue;
-      out.lastSender = m.sender;
-      out.lastMessageTime = m.time || "";
-      if (m.sender === "me") {
-        out.ownerHasSpoken = true;
-        out.lastOwnerRecordID = m.id;
-        out.lastOwnerTime = m.time || "";
-        out.npcMessagesSinceOwner = 0;
-        senders = /* @__PURE__ */ new Map();
-      } else {
-        out.npcMessagesSinceOwner
+      c.visible = c.tabs.some((t) => v

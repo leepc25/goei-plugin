@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.31
+//@version 0.16.32
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/loader/body.ts
@@ -143,7 +143,7 @@ function showPanel(version, install2) {
 }
 
 // src/main.ts
-var VERSION = true ? "0.16.31" : "";
+var VERSION = true ? "0.16.32" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
@@ -206,6 +206,9 @@ async function onOutput(arg) {
   const b = body ?? (loading ? await loading : null);
   if (b) await b.output(arg);
 }
+async function onInput(text) {
+  return body ? body.input(text) : text;
+}
 async function onDisplay(text) {
   if (body) return body.display(text);
   if (!ours(text)) return text;
@@ -237,6 +240,10 @@ for (const permission of ["replacer", "mainDom", "sendChat"]) {
 await risuai.addRisuReplacer("beforeRequest", onBeforeRequest);
 await risuai.addRisuChatListener("output", onOutput);
 await risuai.addRisuScriptHandler("display", onDisplay);
+try {
+  await risuai.addRisuScriptHandler("input", onInput);
+} catch {
+}
 watch();
 await risuai.onUnload(async () => {
   stopped = true;
@@ -245,4 +252,6 @@ await risuai.onUnload(async () => {
   await risuai.removeRisuReplacer("beforeRequest", onBeforeRequest);
   await risuai.removeRisuChatListener("output", onOutput);
   await risuai.removeRisuScriptHandler("display", onDisplay);
+  await risuai.removeRisuScriptHandler("input", onInput).catch(() => {
+  });
 });
