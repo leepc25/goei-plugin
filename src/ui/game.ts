@@ -2,6 +2,7 @@
 // 덮개는 창 그리기(innerHTML)와 따로 들고 있다가 그린 뒤 다시 붙인다.
 import { mountGame, type GameHost } from '../game';
 import { mountAction } from '../game/action';
+import { actionPackState, loadActionArt, downloadActionPack, installActionPack } from '../host/actionpack';
 import { downloadPack, installPack, loadArt, packState, PackError } from '../host/gamepack';
 import { isWaiting, onWaiting } from '../host/waiting';
 import { ICONS } from './icons';
@@ -33,17 +34,20 @@ const actionHost: GameHost = {
     return typeof value === 'string' ? value : null;
   },
   save: (data) => risuai.pluginStorage.setItem('goei:game-action:v1', data),
+  art: loadActionArt,
 };
 
-const errText = (e: unknown) => (e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
+const errText = (e: unknown) =>
+  e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
 
 /** 그림 팩이 없을 때: 받기 · 파일로 넣기 */
 function packPanel(box: HTMLElement, old: boolean, done: () => void): void {
+  const action = mode === 'action';
   box.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
-      <b>${old ? '순찰 그림 새로 받기' : '순찰 그림 받기'}</b>
+      <b>${action ? '새 액션 그림 받기' : old ? '순찰 그림 새로 받기' : '순찰 그림 받기'}</b>
       <p>${old ? '플러그인이 바뀌어 그림을 새로 받아야 해요.' : '게임 그림은 처음 한 번만 받아요. 받은 그림은 Risu에 저장돼요.'}</p>
       <p class="gx-gp-msg" hidden></p>
-      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">그림 받기 (0.7MB)</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
+      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">${action ? '액션 그림 받기' : '순찰 그림 받기 (0.7MB)'}</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
     </div></div>`;
   const msg = box.querySelector<HTMLElement>('.gx-gp-msg')!;
   const btns = [...box.querySelectorAll<HTMLButtonElement>('.gx-gp-btn')];
@@ -59,14 +63,16 @@ function packPanel(box: HTMLElement, old: boolean, done: () => void): void {
     try {
       const bytes = await get();
       say('저장하는 중');
-      await installPack(bytes);
+      await (action ? installActionPack(bytes) : installPack(bytes));
       done();
     } catch (e) {
       say(errText(e));
       btns.forEach((b) => (b.disabled = false));
     }
   };
-  box.querySelector('[data-gp="get"]')!.addEventListener('click', () => void run(downloadPack));
+  box
+    .querySelector('[data-gp="get"]')!
+    .addEventListener('click', () => void run(action ? downloadActionPack : downloadPack));
   // 파일 고르기 창은 클릭 안에서 바로 열어야 한다
   box.querySelector('[data-gp="file"]')!.addEventListener('click', () => picker.click());
   picker.addEventListener('change', () => {
@@ -78,15 +84,18 @@ function packPanel(box: HTMLElement, old: boolean, done: () => void): void {
 
 async function start(box: HTMLElement): Promise<void> {
   const current = ++generation;
-  unmount?.(); unmount = null;
-  const state = await packState();
+  unmount?.();
+  unmount = null;
+  const isAction = mode === 'action';
+  const state = await (isAction ? actionPackState() : packState());
   if (current !== generation || !layer || layer.querySelector('.gx-game-box') !== box) return;
   if (state !== 'ready') return packPanel(box, state === 'old', () => void start(box));
   try {
-    await loadArt();
+    await (isAction ? loadActionArt() : loadArt());
   } catch {
     // 에셋이 지워졌거나 못 읽으면 다시 받게 한다
-    if (current === generation && layer?.querySelector('.gx-game-box') === box) packPanel(box, false, () => void start(box));
+    if (current === generation && layer?.querySelector('.gx-game-box') === box)
+      packPanel(box, false, () => void start(box));
     return;
   }
   if (current !== generation || !layer || layer.querySelector('.gx-game-box') !== box) return;
@@ -109,7 +118,9 @@ export function openGame(panel: Element | null): void {
     const value = (e.target as HTMLElement).closest<HTMLElement>('[data-game-mode]')?.dataset.gameMode;
     if ((value !== 'action' && value !== 'patrol') || value === mode || !layer) return;
     mode = value;
-    layer.querySelectorAll<HTMLElement>('[data-game-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gameMode === mode)));
+    layer
+      .querySelectorAll<HTMLElement>('[data-game-mode]')
+      .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gameMode === mode)));
     void start(layer.querySelector<HTMLElement>('.gx-game-box')!);
   });
   void start(layer.querySelector<HTMLElement>('.gx-game-box')!);

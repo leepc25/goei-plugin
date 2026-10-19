@@ -1,9 +1,27 @@
+import {GAIT} from './space';
 /** 방 하나의 1인 전투 검증판. DOM/호스트와 무관한 고정 시간 시뮬레이션. */
 export const WIDTH = 1280,
   HEIGHT = 720,
-  SAVE_VERSION = 1;
+  SAVE_VERSION = 2;
 export type Act =
-  'idle' | 'walk' | 'shot' | 'skill' | 'ult' | 'dash' | 'guard' | 'crouch' | 'hurt' | 'down' | 'rise' | 'dead';
+  | 'idle'
+  | 'walk'
+  | 'run'
+  | 'jump'
+  | 'land'
+  | 'melee1'
+  | 'melee2'
+  | 'melee3'
+  | 'shot'
+  | 'skill'
+  | 'ult'
+  | 'dash'
+  | 'guard'
+  | 'crouch'
+  | 'hurt'
+  | 'down'
+  | 'rise'
+  | 'dead';
 export interface Body {
   id: number;
   kind: 'jyaldi' | 'corner' | 'watchman';
@@ -22,6 +40,8 @@ export interface Body {
   flash: number;
   cooldown: number;
   armor: boolean;
+  stride: number;
+  speed: number;
 }
 export interface Player extends Body {
   energy: number;
@@ -66,6 +86,7 @@ export interface Input {
   x: number;
   y: number;
   attack?: boolean;
+  run?: boolean;
   jump?: boolean;
   dash?: boolean;
   guard?: boolean;
@@ -92,6 +113,8 @@ const body = (id: number, kind: Body['kind'], x: number, y: number, hp: number):
   flash: 0,
   cooldown: 0,
   armor: false,
+  stride: 0,
+  speed: 0,
 });
 export function newRun(): Run {
   return {
@@ -112,7 +135,7 @@ export function newRun(): Run {
     cutin: 0,
     hitstop: 0,
     kills: 0,
-    message: '훈련 구역 · 적 4체 제압 / S 필살기 사용 가능',
+    message: 'Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기',
   };
 }
 function act(b: Body, name: Act, duration: number) {
@@ -155,24 +178,41 @@ function damage(r: Run, b: Body, amount: number, source: Body, down = false) {
     if (b !== p) r.kills++;
   } else if (!b.armor) act(b, down ? 'down' : 'hurt', down ? 0.9 : 0.23);
 }
-function move(b: Body, x: number, y: number, speed: number, dt: number) {
-  const len = Math.max(1, Math.hypot(x, y));
+function move(b: Body, x: number, y: number, speed: number, dt: number, face = true) {
+  const len = Math.max(1, Math.hypot(x, y)),
+    ox = b.x,
+    oy = b.y;
   b.x = clamp(b.x + (x / len) * speed * dt, 55, WIDTH - 55);
   b.y = clamp(b.y + (y / len) * speed * dt, 400, 655);
-  if (x) b.dir = x > 0 ? 1 : -1;
+  const distance = Math.hypot(b.x - ox, b.y - oy);
+  b.speed = distance / dt;
+  // 1주기의 실제 보폭과 재생 위상을 연결. 벽에 막히면 위상도 정지한다.
+  if (b.z === 0 && b.act !== 'dash') b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
+  if (x && face) b.dir = x > 0 ? 1 : -1;
+}
+function nearTarget(r: Run) {
+  const p = r.player;
+  return r.enemies.find(
+    (e) =>
+      e.hp > 0 &&
+      (e.x - p.x) * p.dir >= -8 &&
+      Math.abs(e.x - p.x) < 118 &&
+      Math.abs(e.y - p.y) < 32 &&
+      Math.abs(e.z - p.z) < 60,
+  );
 }
 function bolt(r: Run, b: Body, enemy: boolean) {
   if (r.bolts.length >= 48) return;
   r.bolts.push({
     id: r.nextId++,
-    x: b.x + b.dir * 34,
+    x: b.x + b.dir * (enemy ? 34 : 64),
     y: b.y,
-    z: b.z + 82,
+    z: b.z + (enemy ? 82 : 113),
     vx: b.dir * (enemy ? 410 : 1000),
     life: 1.7,
     enemy,
   });
-  fx(r, 'shot', b.x + b.dir * 40, b.y, b.z + 82);
+  fx(r, 'shot', b.x + b.dir * (enemy ? 40 : 64), b.y, b.z + (enemy ? 82 : 113));
 }
 function item(r: Run, i: number) {
   const p = r.player;
@@ -202,7 +242,8 @@ export function autoInput(r: Run): Input {
     dy = e.y - p.y,
     threat = live.find((e) => e.act === 'shot' && e.duration - e.t < 0.25 && Math.abs(e.y - p.y) < 30);
   return {
-    x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 330 ? Math.sign(dx) : Math.abs(dx) < 170 ? -Math.sign(dx) : 0,
+    x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
+    run: Math.abs(dx) > 260,
     y: threat ? (p.y > 540 ? -1 : 1) : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
     attack: Math.abs(dy) < 26,
     skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
@@ -235,13 +276,26 @@ export function step(r: Run, raw: Input, dt: number) {
     if (b.z > 0 || b.vz > 0) {
       b.vz -= 1000 * dt;
       b.z = Math.max(0, b.z + b.vz * dt);
-      if (!b.z) b.vz = 0;
+      if (!b.z) {
+        b.vz = 0;
+        if (b === p && ['jump', 'walk', 'run', 'idle'].includes(b.act)) act(b, 'land', 0.14);
+      }
     }
     if (b.act === 'down' && b.t >= b.duration) {
       act(b, 'rise', 0.35);
       b.inv = 0.55;
-    } else if (!['dead', 'idle', 'walk', 'guard', 'crouch'].includes(b.act) && b.t >= b.duration) {
-      act(b, 'idle', 0);
+    } else if (!['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(b.act) && b.t >= b.duration) {
+      const next =
+        b === p && input.attack && b.z === 0 && b.act === 'melee1'
+          ? 'melee2'
+          : b === p && input.attack && b.z === 0 && b.act === 'melee2'
+            ? 'melee3'
+            : null;
+      if (next) act(b, next, next === 'melee2' ? 0.34 : 0.52);
+      else {
+        if (b === p && b.act === 'melee3') b.cooldown = 0.18;
+        act(b, 'idle', 0);
+      }
       b.armor = false;
     }
   }
@@ -249,7 +303,7 @@ export function step(r: Run, raw: Input, dt: number) {
   p.dashCd = Math.max(0, p.dashCd - dt);
   if (p.act !== 'guard' && p.act !== 'crouch') p.guard = Math.min(100, p.guard + dt * 15);
   if (input.item !== undefined) item(r, input.item);
-  if (['idle', 'walk', 'guard', 'crouch'].includes(p.act)) {
+  if (['idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(p.act)) {
     if (r.auto) {
       const target = r.enemies
         .filter((e) => e.hp > 0)
@@ -278,17 +332,40 @@ export function step(r: Run, raw: Input, dt: number) {
       act(p, 'skill', 0.62);
       p.armor = true;
     } else if (input.attack && p.cooldown <= 0) {
-      act(p, 'shot', 0.32);
-      p.cooldown = 0.36;
+      if (!p.z && nearTarget(r)) {
+        act(p, 'melee1', 0.28);
+        p.cooldown = 0;
+      } else {
+        act(p, 'shot', 0.32);
+        p.cooldown = 0.36;
+      }
     } else {
       const x = clamp(input.x, -1, 1),
         y = clamp(input.y, -1, 1);
-      move(p, x, y, p.z ? 235 : 255, dt);
-      p.act = x || y ? 'walk' : 'idle';
+      const running = !!input.run;
+      move(p, x, y, p.z ? 200 : running ? 240 : 125, dt, !r.auto);
+      p.act = p.z > 0 || p.vz > 0 ? 'jump' : x || y ? (running ? 'run' : 'walk') : 'idle';
     }
   }
   if (p.act === 'dash') move(p, input.x || p.dir, input.y, 800, dt);
-  if (p.act === 'shot' && p.t >= 0.1 && !p.fired) {
+  if (p.act.startsWith('melee') && p.t >= (p.act === 'melee1' ? 0.14 : p.act === 'melee2' ? 0.17 : 0.26) && !p.fired) {
+    p.fired = true;
+    const finish = p.act === 'melee3';
+    const oldX = p.x;
+    p.x = clamp(p.x + p.dir * (finish ? 8 : 5), 55, 1225);
+    for (const e of r.enemies)
+      if (
+        e.hp > 0 &&
+        (e.x - oldX) * p.dir >= -8 &&
+        Math.abs(e.x - oldX) < (finish ? 135 : 120) &&
+        Math.abs(e.y - p.y) < 35 &&
+        Math.abs(e.z - p.z) < 60
+      )
+        damage(r, e, finish ? 38 : p.act === 'melee2' ? 24 : 18, p, finish);
+    if (finish) fx(r, 'blast', p.x + p.dir * 90, p.y, 95);
+    r.message = finish ? '근접 3타 · 파괴 충격' : p.act === 'melee2' ? '근접 2타 · 제압' : '근접 1타 · 장타';
+  }
+  if (p.act === 'shot' && p.t >= 0.16 && !p.fired) {
     p.fired = true;
     bolt(r, p, false);
   }
@@ -370,11 +447,24 @@ export function restore(raw: string | null): Run | null {
   try {
     if (!raw || raw.length > 120_000) return null;
     const r = JSON.parse(raw) as Run;
+    if (r?.version === 1 && r.player && Array.isArray(r.enemies)) {
+      for (const b of [r.player, ...r.enemies]) {
+        b.stride = 0;
+        b.speed = 0;
+      }
+      r.version = SAVE_VERSION;
+    }
     const finite = (n: unknown, lo: number, hi: number) =>
       typeof n === 'number' && Number.isFinite(n) && n >= lo && n <= hi;
     const actions: Act[] = [
       'idle',
       'walk',
+      'run',
+      'jump',
+      'land',
+      'melee1',
+      'melee2',
+      'melee3',
       'shot',
       'skill',
       'ult',
@@ -405,7 +495,9 @@ export function restore(raw: string | null): Run | null {
       finite(b.flash, 0, 10) &&
       finite(b.cooldown, 0, 10) &&
       typeof b.fired === 'boolean' &&
-      typeof b.armor === 'boolean';
+      typeof b.armor === 'boolean' &&
+      finite(b.stride, 0, 1) &&
+      finite(b.speed, 0, 1200);
     if (
       !r ||
       r.version !== SAVE_VERSION ||

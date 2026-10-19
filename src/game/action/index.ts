@@ -13,9 +13,9 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   root.setAttribute('aria-label', '쟈알디 1인 전투 검증판');
   const style = document.createElement('style');
   style.textContent = css;
-  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 전투 검증판</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
-  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 공격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기존 순찰 도트 재사용 · 새 전용 동작 제작 전 검증판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 공격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 도트 동작·UI 글꼴·컷인은 임시</p>`;
+  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 체형 개선 시연판</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
+  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
   box.append(style, root);
   const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
   const canvas = $<HTMLCanvasElement>('canvas'),
@@ -104,7 +104,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     text('[data-menu-title]', '일시정지');
     text(
       '[data-menu-text]',
-      'Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. 전용 점프·가드 도트는 아직 임시 포즈입니다.',
+      'Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. F로 자동 전투를 켜고 끌 수 있습니다.',
     );
     $<HTMLButtonElement>('[data-do="resume"]').disabled = !ready;
     if (value) void save(true);
@@ -139,6 +139,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     ArrowRight: 'right',
     KeyZ: 'attack',
     KeyA: 'guard',
+    ShiftLeft: 'run',
+    ShiftRight: 'run',
   };
   const once: Record<string, keyof Input> = {
     KeyX: 'jump',
@@ -234,7 +236,10 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       target = null;
       b.setPointerCapture(e.pointerId);
       if (b.dataset.hold) pointers.set(e.pointerId, b.dataset.hold);
-      if (b.dataset.edge) edges[b.dataset.edge as keyof Input] = true as never;
+      if (b.dataset.edge) {
+        edges[b.dataset.edge as keyof Input] = true as never;
+        if (b.dataset.edge === 'dash') pointers.set(e.pointerId, 'run');
+      }
       if (b.dataset.item !== undefined) edges.item = Number(b.dataset.item);
     },
     { signal },
@@ -325,7 +330,14 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       if (target.attack) p.dir = dx >= 0 ? 1 : -1;
       if (!target.attack && !x && !y) target = null;
     }
-    const result = { x, y, attack, guard: held.has('guard'), ...edges };
+    const result = {
+      x,
+      y,
+      attack,
+      run: held.has('run') || Math.hypot(stickX, stickY) > 0.95,
+      guard: held.has('guard'),
+      ...edges,
+    };
     edges = {};
     return result;
   };

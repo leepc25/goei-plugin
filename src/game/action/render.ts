@@ -1,12 +1,13 @@
 import type { GameArt, Frame } from '../assets';
-import { AF } from '../data';
 import { WIDTH, HEIGHT, type Run, type Body } from './sim';
+import { depthScale } from './space';
 
-/** 기존 팩의 세 시트만 디코딩한다. 점프·가드·컷인은 임시 재사용 포즈다. */
+/** 전용 동작 아틀라스와 640×360 배경을 정수 좌표로 표시한다. */
 export class ActionRenderer {
   private images = new Map<string, HTMLImageElement>();
   private art: GameArt | null = null;
   private disposed = false;
+  private preview: {clip:string;phase:number}|null=null;
   readonly ctx: CanvasRenderingContext2D;
   constructor(readonly canvas: HTMLCanvasElement) {
     canvas.width = WIDTH;
@@ -16,7 +17,7 @@ export class ActionRenderer {
   async load(art: GameArt) {
     this.art = art;
     await Promise.all(
-      ['a-jyaldi', 'e-corner', 'e-watchman', 'bg-belt-school'].map(async (name) => {
+      ['a-jyaldi-action', 'e-corner', 'e-watchman', 'bg-bureau-action'].map(async (name) => {
         const img = new Image();
         await new Promise<void>((resolve, reject) => {
           img.onload = () => resolve();
@@ -36,10 +37,17 @@ export class ActionRenderer {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   }
-  private sprite(b: Body, frame: number, scale = 1.57, x = b.x, y = b.y - b.z) {
-    const f: Frame = this.art?.atlas[b.kind]?.[frame] ?? null,
-      img = this.images.get(b.kind === 'jyaldi' ? 'a-jyaldi' : `e-${b.kind}`);
+  private sprite(
+    b: Body,
+    frame: number,
+    scale = b.kind === 'jyaldi' ? (this.art?.atlas.action?.scale ?? 1) : 1.57,
+    x = b.x,
+    y = b.y - b.z,
+  ) {
+    const f: Frame = (b.kind === 'jyaldi' ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null,
+      img = this.images.get(b.kind === 'jyaldi' ? 'a-jyaldi-action' : `e-${b.kind}`);
     if (!f || !img) return;
+    scale*=depthScale(b.y);
     const [sx, sy, w, h, ax, ay] = f,
       c = this.ctx;
     c.save();
@@ -59,18 +67,28 @@ export class ActionRenderer {
     );
     c.restore();
   }
+  drawPose(run:Run,clip:string,phase:number){
+    this.preview={clip,phase};this.draw(run);this.preview=null;
+  }
   private frame(b: Body, r: Run) {
-    const p = b.kind === 'jyaldi',
-      progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
-    if (b.act === 'dead' || b.act === 'down') return p ? AF.down[Math.min(2, Math.floor(progress * 3))] : 22;
-    if (b.act === 'rise') return p ? AF.rise[Math.min(1, Math.floor(progress * 2))] : 19;
-    if (b.act === 'hurt') return p ? AF.hurt : 19;
-    if (b.act === 'skill' || b.act === 'ult') return AF.skill[Math.min(5, Math.floor(progress * 6))];
-    if (b.act === 'shot')
-      return p ? AF.attack[Math.min(3, Math.floor(progress * 4))] : 7 + Math.min(4, Math.floor(progress * 5));
-    if (b.act === 'walk' || b.act === 'dash')
-      return p ? AF.walk[Math.floor(r.time * (b.act === 'dash' ? 20 : 11)) % 12] : Math.floor(r.time * 8) % 6;
-    return p ? AF.idle : 0;
+    const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
+    if (b.kind === 'jyaldi') {
+      const clips = this.art?.atlas.action?.clips;
+      if(this.preview){const frames=clips?.[this.preview.clip]??clips?.idle??[0];return frames[Math.min(frames.length-1,Math.floor(this.preview.phase*frames.length))];}
+      let name = b.act === 'idle' ? 'idle' : b.act;
+      if (b.z > 0 && !['shot', 'skill', 'ult', 'hurt', 'down', 'dead'].includes(b.act))
+        name = b.vz > 100 ? 'jump_up' : b.vz < -100 ? 'jump_down' : 'jump_apex';
+      if (name === 'skill' || name === 'ult') name = 'melee1';
+      if (name === 'dead') name = 'down';
+      const clip = clips?.[name] ?? clips?.idle ?? [48];
+      const phase =
+        b.act === 'walk' || b.act === 'run' ? b.stride : name === 'jump_up' ? (b.vz > 430 ? 0 : 0.8) : progress;
+      return clip[Math.min(clip.length - 1, Math.floor(phase * clip.length))];
+    }
+    if (b.act === 'dead' || b.act === 'down') return 22;
+    if (b.act === 'rise' || b.act === 'hurt') return 19;
+    if (b.act === 'shot') return 7 + Math.min(4, Math.floor(progress * 5));
+    return b.act === 'walk' ? Math.floor(b.stride * 6) % 6 : 0;
   }
   draw(r: Run) {
     const c = this.ctx,
@@ -78,40 +96,33 @@ export class ActionRenderer {
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
     this.rect(0, 0, WIDTH, HEIGHT, '#0a111b');
-    const bg = this.images.get('bg-belt-school');
+    const bg = this.images.get('bg-bureau-action');
     if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
-    this.rect(0, 385, WIDTH, 300, '#17232caa');
-    for (let y = 400; y < 680; y += 48) this.rect(0, y, WIDTH, 2, '#65818a22');
-    for (let x = 0; x < WIDTH; x += 128) this.rect(x, 390, 2, 280, '#65818a22');
-    this.rect(40, 395, 1200, 3, '#e0b367');
-    this.rect(40, 665, 1200, 3, '#e0b367');
     for (const b of [...r.enemies, p].sort((a, b) => a.y - b.y)) {
       if (b.hp <= 0 && b.t > 1) continue;
-      this.rect(b.x - 24, b.y - 5, 48, 8, '#0008');
+      const ground=depthScale(b.y),air=Math.max(.25,1-b.z/240);
+      this.rect(b.x-23*ground,b.y-3,46*ground,6,`rgba(0,6,10,${.24*air})`);
+      this.rect(b.x-16*ground,b.y-2,32*ground,4,`rgba(0,6,10,${.28*air})`);
+      if(b.kind==='jyaldi'&&b.z===0){
+        const index=this.frame(b,r),contact=this.art?.atlas.action?.contacts?.[index]??[];
+        for(const [dx,dy] of contact)this.rect(b.x+dx*b.dir*ground-5,b.y+dy*ground-1,10,3,'#02070bc0');
+      }
       if (b.act === 'shot' && b.kind !== 'jyaldi' && !b.fired) {
         const x = b.dir > 0 ? b.x : b.x - (b.kind === 'watchman' ? 600 : 100);
         this.rect(x, b.y - 24, b.kind === 'watchman' ? 600 : 100, 48, '#ff574433');
         this.rect(b.x - 7, b.y - 200, 14, 20, '#ffb35c');
       }
-      if (b.armor && b.hp > 0) {
-        c.strokeStyle = '#e8bd72';
-        c.lineWidth = 3;
-        c.strokeRect(b.x - 48, b.y - b.z - 170, 96, 176);
-      }
       this.sprite(b, this.frame(b, r));
+      if (b.armor && b.hp > 0) {
+        this.rect(b.x - 10, b.y + 8, 20, 3, '#e8bd72');
+      }
       if (b.act === 'guard' || b.act === 'crouch') {
-        this.rect(
-          b.x + b.dir * 35 - 4,
-          b.y - (b.act === 'crouch' ? 90 : 150),
-          8,
-          b.act === 'crouch' ? 90 : 150,
-          '#80d5e9bb',
-        );
-        if (b.act === 'crouch') this.rect(b.x - 20, b.y - 100, 40, 4, '#80d5e9');
+        const sy = b.y - (b.act === 'crouch' ? 65 : 105);
+        for (let i = 0; i < 4; i++) this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, '#8bdbe3aa');
       }
       if (b.kind !== 'jyaldi' && b.hp > 0) {
-        this.rect(b.x - 34, b.y - 188, 68, 6, '#060c12');
-        this.rect(b.x - 34, b.y - 188, (68 * b.hp) / b.max, 6, '#e9896d');
+        this.rect(b.x - 34, b.y - 175*depthScale(b.y), 68, 6, '#060c12');
+        this.rect(b.x - 34, b.y - 175*depthScale(b.y), (68 * b.hp) / b.max, 6, '#e9896d');
       }
       if (b === p && p.inv > 0) {
         this.rect(p.x - 28, p.y + 5, 56, 3, '#90dfed');
@@ -126,28 +137,37 @@ export class ActionRenderer {
         x = f.x,
         y = f.y - f.z;
       c.globalAlpha = 1 - t;
-      c.strokeStyle = f.kind === 'guard' ? '#9ce5ff' : '#ffd18b';
-      c.lineWidth = f.kind === 'blast' ? 8 : 4;
-      c.strokeRect(
-        Math.round(x - radius),
-        Math.round(y - radius * 0.65),
-        Math.round(radius * 2),
-        Math.round(radius * 1.3),
-      );
-      this.rect(x - 4, y - radius, 8, radius * 2, '#fff1c1');
-      this.rect(x - radius, y - 4, radius * 2, 8, '#fff1c1');
+      const color = f.kind === 'guard' ? '#9ce5ff' : '#ffd18b';
+      const rays = f.kind === 'blast' ? 20 : 8;
+      for (let i = 0; i < rays; i++) {
+        const angle = (i / rays) * Math.PI * 2,
+          rad = radius * (i % 2 ? 0.7 : 1);
+        const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3,
+          py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
+        this.rect(px, py, f.kind === 'blast' ? 6 : 3, f.kind === 'blast' ? 6 : 3, color);
+      }
+      if (t < 0.35) {
+        this.rect(x - 5, y - 16, 10, 32, '#fff1d0');
+        this.rect(x - 16, y - 5, 32, 10, '#fff1d0');
+      }
       c.globalAlpha = 1;
     }
     if (r.cutin > 0) {
       this.rect(0, 0, WIDTH, HEIGHT, '#030b17bb');
       this.rect(0, 165, WIDTH, 320, '#172c46');
       for (let i = 0; i < 18; i++) this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, '#cc864b');
-      this.sprite({ ...p, dir: 1 }, AF.skill[2], 3.5, 340 + (1 - r.cutin / 0.75) * 80, 530);
+      this.sprite(
+        { ...p, dir: 1 },
+        this.art?.atlas.action?.clips.melee3?.[2] ?? this.art?.atlas.action?.clips.idle?.[0] ?? 0,
+        (this.art?.atlas.action?.scale ?? 1) * 2.3,
+        340 + (1 - r.cutin / 0.75) * 80,
+        530,
+      );
       c.fillStyle = '#ffdf9e';
       c.font = 'bold 58px monospace';
       c.fillText('집중 파괴', 660, 330);
       c.font = '22px monospace';
-      c.fillText('쟈알디 · 임시 도트 컷인', 665, 380);
+      c.fillText('쟈알디 · 집중 파괴', 665, 380);
     }
     if (r.phase !== 'combat') {
       this.rect(250, 245, 780, 210, '#07121aee');

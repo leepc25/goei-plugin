@@ -60,7 +60,7 @@ try {
   await page.keyboard.press('KeyZ');
   await page.waitForTimeout(100);
   let saved = await snapshot(page);
-  assert.ok(saved.player.x > 280);
+  assert.ok(saved.player.x > 260);
   assert.ok(saved.player.z > 0);
   const x = saved.player.x;
   await page.evaluate(() => window.__reopen());
@@ -164,6 +164,17 @@ try {
       'goei:game-pack:patrol': JSON.stringify({ version: head.version, atlas: head.atlas, files }),
       'goei:game': 'old-patrol-record',
     };
+    const actionBytes = new Uint8Array(await (await fetch('/dist-test/goei-game-action.pack')).arrayBuffer());
+    const alen = new DataView(actionBytes.buffer).getUint32(8, true),
+      ah = JSON.parse(new TextDecoder().decode(actionBytes.slice(12, 12 + alen)));
+    const afiles = {};
+    for (const [name, at, n] of ah.files) {
+      const data = actionBytes.slice(12 + alen + at, 12 + alen + at + n);
+      let str = '';
+      for (let i = 0; i < data.length; i += 0x8000) str += String.fromCharCode(...data.slice(i, i + 0x8000));
+      afiles[name] = btoa(str);
+    }
+    window.__store['goei:game-pack:action'] = JSON.stringify({ version: ah.version, atlas: ah.atlas, files: afiles });
     window.risuai = {
       pluginStorage: {
         getItem: async (k) => window.__store[k] ?? null,

@@ -130,3 +130,43 @@ test('잘못된 저장·구형 순찰·비정상 값은 실행하지 않는다',
   }
   assert.ok(restore(serialize(newRun())));
 });
+
+test('근접 Z는 3연계 후 다운을 만들고 먼 표적에는 사격한다', () => {
+  const r = newRun();
+  r.player.gauge = 0;
+  r.enemies.forEach((e, i) => {
+    e.x = i ? 1200 : 300;
+    e.y = i ? 650 : 510;
+    e.cooldown = 9;
+  });
+  r.enemies[0].hp = r.enemies[0].max = 500;
+  const seen = new Set();
+  for (let i = 0; i < 90; i++) {
+    step(r, { x: 0, y: 0, attack: true }, 1 / 60);
+    seen.add(r.player.act);
+  }
+  assert.ok(seen.has('melee1') && seen.has('melee2') && seen.has('melee3'));
+  assert.ok(r.enemies[0].hp < 500);
+  assert.equal(r.bolts.length, 0);
+  const distant = newRun();
+  step(distant, { x: 0, y: 0, attack: true }, 1 / 60);
+  assert.equal(distant.player.act, 'shot');
+});
+test('보행 위상은 실제 거리만 누적하고 벽에서 미끄러지지 않는다', () => {
+  const r = newRun();
+  step(r, { x: 1, y: 0 }, 1 / 60);
+  assert.ok(r.player.stride > 0);
+  const before = r.player.stride;
+  step(r, { x: 0, y: 0 }, 1 / 60);
+  assert.equal(r.player.stride, before);
+  r.player.x = 1225;
+  step(r, { x: 1, y: 0 }, 1 / 60);
+  assert.equal(r.player.stride, before);
+  assert.equal(r.player.speed, 0);
+  const fast = newRun(),
+    slow = newRun();
+  step(fast, { x: 1, y: 0, run: true }, 1 / 60);
+  step(slow, { x: 1, y: 0 }, 1 / 60);
+  assert.equal(fast.player.act, 'run');
+  assert.ok(fast.player.x > slow.player.x);
+});
