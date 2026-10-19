@@ -2,7 +2,7 @@
 // 봇 설명, 작가 노트, 제목과 같은 이름의 로어북, 글에 이름이 나온 로어북, 상시 참고(📜Faction·🙂Roster),
 // 그 로어북들 속 이름으로 한 번 더 찾은 2차 참조를 모아 "[종류: 출처]\n내용" 블록으로 만든다.
 import { evaluate, type CbsEnv } from './cbs';
-import { readScene, stripSceneCard } from './dispatch';
+import { readScene, stripSceneCard, stripStartCard, stripUnsentMark } from './dispatch';
 import { hasCall, stripCall } from './phone';
 import type { Chat, LoreEntry } from './types';
 import { cleanOutput, hasWorldTags } from './world/tags';
@@ -163,7 +163,7 @@ export interface Turn {
 }
 
 function messageText(data: string): string {
-  let t = String(data ?? '');
+  let t = stripStartCard(stripUnsentMark(String(data ?? '')));
   if (t.includes('%%SCENE_CARD:')) {
     const s = readScene(t);
     t = s ? `[이동] 목표: ${s.target} / 투입: ${s.party}` : stripSceneCard(t);

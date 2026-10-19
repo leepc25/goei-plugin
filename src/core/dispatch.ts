@@ -172,6 +172,23 @@ export function setUnsent(text: string, on: boolean): string {
   return on ? `${plain}\n${UNSENT_MARK}` : plain;
 }
 
+// 시작 화면 직접 입력: 적은 첫 상황을 채팅에서 카드로 보이게 표식으로 감싼다 (요청에는 글만 간다)
+const START_RE = /%%GOEI_START%%\r?\n([\s\S]*?)\r?\n%%\/GOEI_START%%(\r?\n?%%GOEI_UNSENT%%)?/g;
+export const START_MARK = '%%GOEI_START%%';
+
+export function startRecord(text: string): string {
+  return `${START_MARK}\n${text}\n%%/GOEI_START%%`;
+}
+
+export function stripStartCard(text: string): string {
+  return text.replace(/%%GOEI_START%%\r?\n/g, '').replace(/\r?\n%%\/GOEI_START%%/g, '');
+}
+
+/** 화면용: 감싼 글을 카드 하나로 (뒤에 붙은 「안 보냄」 표식도 카드 안에서) */
+export function renderStartCards(text: string, render: (body: string, unsent: boolean) => string): string {
+  return text.replace(START_RE, (_all, body: string, unsent?: string) => render(body, !!unsent));
+}
+
 /** 모델 요청용: 표식을 지운다 */
 export function stripUnsentMark(text: string): string {
   return text.replace(UNSENT_RE, '');

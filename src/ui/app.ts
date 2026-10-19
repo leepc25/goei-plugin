@@ -34,6 +34,7 @@ import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent,
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
+import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
@@ -562,7 +563,7 @@ async function start(): Promise<void> {
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (chatPhase(chat) === 'started') throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
       const next = applyStart(chat, plan);
-      if (situation) next.message = [...(next.message ?? []), newMessage(situation)];
+      if (situation) next.message = [...(next.message ?? []), newMessage(startRecord(situation))];
       // 새 채팅 기본값(설정 창)을 이 채팅에 적어 둔다. 나중에 기본값을 바꿔도 이 채팅은 그대로 (원본 ensureDefaults)
       const theme = getPrefs().theme ?? 'dark';
       return {

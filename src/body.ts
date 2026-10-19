@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { isUnsent, renderUnsentMark, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
+import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
@@ -46,8 +46,9 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   setWaiting(true);
   // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
   messages = unwrapCalls(unwrapScenes(messages).messages).messages;
-  if (messages.some((m) => typeof m?.content === 'string' && m.content.includes(UNSENT_MARK))) {
-    messages = messages.map((m) => (typeof m?.content === 'string' && m.content.includes(UNSENT_MARK) ? { ...m, content: stripUnsentMark(m.content) } : m));
+  const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
+  if (messages.some((m) => marked(m?.content))) {
+    messages = messages.map((m) => (marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m));
   }
   if (liteNow) {
     messages = stripHistoryTags(messages);
@@ -216,6 +217,17 @@ function sceneCardHtml(s: { target: string; party: string; unsent?: boolean }): 
     + `<span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s.party)}</span>${unsent}</div>`;
 }
 
+/** 시작 화면 직접 입력의 첫 상황 카드 (적은 글 전체를 보인다) */
+function startCardHtml(body: string, unsent: boolean): string {
+  const p = cardPalette();
+  const row = unsent
+    ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>`
+    : '';
+  return `<div data-goei-card="start" style="${cardStyle()}display:block">`
+    + `<span style="display:block;color:${p.signal};font-weight:600;margin-bottom:4px">첫 상황</span>`
+    + `<span style="display:block;color:${p.text};white-space:pre-wrap">${escHtml(body.trim())}</span>${row}</div>`;
+}
+
 /** 기록 카드 없이 놓인 메시지(시작 화면 직접 입력) 아래의 전송 대기 줄 */
 function unsentMarkHtml(): string {
   return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
@@ -253,13 +265,14 @@ function onDisplay(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || /\[▣\s*\|/.test(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
     if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
     if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
     if (hasCall(out)) out = renderCalls(out, callCardHtml);
+    if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만

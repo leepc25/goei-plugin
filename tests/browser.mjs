@@ -181,7 +181,12 @@ async function open(page) {
   const saved = await page.evaluate(() => window.__calls.setChat[0]);
   assert.equal(fixture.alternateGreetings[saved.fmIndex], '');
   assert.equal(saved.message.length, 1);
-  assert.equal(saved.message[0].data, '새벽 편의점, 냉장고 안에서 노크 소리');
+  assert.equal(saved.message[0].data, '%%GOEI_START%%\n새벽 편의점, 냉장고 안에서 노크 소리\n%%/GOEI_START%%');
+  // 채팅에서는 「첫 상황」 카드, 요청에는 적은 글만
+  const card = await page.evaluate((t) => window.__calls.handlers.display(t), saved.message[0].data);
+  assert.ok(card.includes('data-goei-card="start"') && card.includes('첫 상황') && card.includes('냉장고 안에서') && !card.includes('%%'), card);
+  const sent = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }], 'model'), saved.message[0].data);
+  assert.equal(sent.at(-1).content, '새벽 편의점, 냉장고 안에서 노크 소리');
   await page.waitForFunction(() => window.__calls.send?.length === 1 && window.__calls.hide >= 1);
   console.log('PASS 직접 입력 → 빈 인사말 + 적은 상황을 바로 전송');
   await page.close();
@@ -202,13 +207,14 @@ async function open(page) {
   await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
   await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('%%GOEI_UNSENT%%'));
   const html = await page.evaluate(() => window.__calls.handlers.display(window.__chat.message[0].data));
-  assert.ok(html.startsWith('시작') && html.includes('data-goei-cancel') && html.includes('전송 대기') && !html.includes('%%'), html);
+  assert.ok(html.includes('data-goei-card="start"') && html.includes('data-goei-cancel') && html.includes('전송 대기') && !html.includes('%%'), html);
   // 요청에는 표식이 가지 않는다
   const req = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: window.__chat.message[0].data }], 'model'));
   assert.equal(req.at(-1).content, '시작');
   await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'msg'; d.innerHTML = h; document.querySelector('.default-chat-screen').appendChild(d); }, html);
   // 요청 대기 표시를 끈다 (위 replacers 호출이 켠 것)
   await page.evaluate(async () => { const c = window.__chat; await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify({ ...c, message: [] })), characterIndex: 0, chatIndex: 0, messageIndex: -1 }); });
+  if (shots) await page.screenshot({ path: `${shots}/2-start-card-unsent.png` });
   await page.click('#msg [data-goei-cancel]');
   await page.waitForFunction(() => window.__chat.message.length === 0);
   await open(page);
