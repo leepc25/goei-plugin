@@ -965,7 +965,7 @@ if (fixture.globalLore.some(packed)) {
     assert.equal(await page.locator('.nw-hero-res .nw-newrow').count(), 1, '새로 작성 줄');
     assert.equal(await page.locator('.nw-hero-res .nw-nohit').count(), 0, '바로 「없어요」로 가지 않음');
   }
-  await page.screenshot({ path: `${shots}/13-hero-search.png` });
+  if (shots) await page.screenshot({ path: `${shots}/13-hero-search.png` });
   await page.fill('.nw-hero-q .gx-search', '');
   assert.equal(await page.locator('.nw-hero-res .ph-sec').count(), 0);
   await page.click('.nw-grab');
