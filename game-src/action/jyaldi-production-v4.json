@@ -1,7 +1,7 @@
 {
   "version": 4,
   "date": "2026-10-20",
-  "status": "core-actions-playable-candidate",
+  "status": "rejected-character-identity-inconsistent-do-not-reuse-images",
   "spec": "docs/캐릭터_도트_생성_및_액션_제작규격_v4.md",
   "references": "docs/캐릭터_액션_공개레퍼런스_조사.md",
   "layout": "game-src/action/normal-v4/layout.json",
@@ -66,7 +66,11 @@
     "userApproved": false,
     "footSlipMeasured": false,
     "fullMotionSetComplete": false,
-    "notes": "시작/정지/반전, 상세 가드 전환, 호흡 대기 등 미완성. 기본/전투 대기는 현재 각1장. 핵심 자세·앵커·강약·실제 입력 연결을 시험하는 첫 후보."
+    "notes": "사용자 반려: 대기/걷기/달리기/점프/공격/총격의 인물·체격이 서로 다름. 모든 기존 캐릭터 이미지 재활용 금지. 하나의 신규 기준 아래 모든 동작·캐릭터 컷인을 새로 그릴 것. 기술 시험 통과는 시각 합격이 아님.",
+    "characterConsistencyPassed": false,
+    "existingCharacterImageReuseAllowed": false,
+    "requiresFullCharacterRedraw": true,
+    "handoff": "docs/다음방_작업인계_캐릭터전면재제작.md"
   },
   "drawings": {
     "newReferenced": 59,

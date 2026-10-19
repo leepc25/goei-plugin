@@ -839,7 +839,7 @@
     ]
   },
   "background": "normal-v3/bureau-corridor.png",
-  "releaseReady": true,
+  "releaseReady": false,
   "visualReview": "2026-10-20: v4 production candidate. New key poses, per-pose holds/contact hitstop, explicit anchors and unused-frame pruning. GDC/SLYNYRD/Proko references. Not full motion-library completion; visual quality remains subject to gameplay review.",
   "replacementSheets": [
     {
@@ -1282,5 +1282,8 @@
   },
   "baseFrameCount": 162,
   "sourceFrameCount": 222,
-  "replacementClipIndexSpace": "base sheets followed by replacement sheets before pruning"
+  "replacementClipIndexSpace": "base sheets followed by replacement sheets before pruning",
+  "characterImagesRejected": true,
+  "existingCharacterImageReuseAllowed": false,
+  "rejectionReason": "2026-10-20 사용자 지시: 동작별 인물·체격 불일치. 기존 캐릭터 이미지 재활용 금지, 통일된 신규 기준으로 모든 동작·컷인 전면 재제작."
 }

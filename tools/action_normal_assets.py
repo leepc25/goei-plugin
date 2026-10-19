@@ -54,6 +54,8 @@ def enemy_sheet(name, legacy):
 def build():
     v4=SRC/'normal-v4/layout.json'
     layout=json.loads((v4 if v4.exists() else SRC/'normal-v3/layout.json').read_text())
+    if layout.get('characterImagesRejected') or layout.get('existingCharacterImageReuseAllowed') is False:
+        raise ValueError('사용자 반려: 기존 캐릭터 이미지 재활용 금지. docs/다음방_작업인계_캐릭터전면재제작.md를 읽고 통일된 신규 원본 전용 제작 경로를 구성하세요.')
     plan=json.loads((SRC/'jyaldi-production-v3.json').read_text())
     source=ROOT/plan['sample']['source']
     if hashlib.sha256(source.read_bytes()).hexdigest()!=plan['sample']['sourceSha256']:

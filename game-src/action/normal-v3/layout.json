@@ -798,6 +798,9 @@
     ]
   },
   "background": "normal-v3/bureau-corridor.png",
-  "releaseReady": true,
-  "visualReview": "2026-10-19: normal-body source sheets and actual browser gameplay reviewed. Integer2x actors, larger doors/floor, 12-frame walk/run, 10/12/16 melee, independent skill/ultimate/cutin, airborne virtual-ground anchors. Not the full326 planned drawing set."
+  "releaseReady": false,
+  "visualReview": "2026-10-19: normal-body source sheets and actual browser gameplay reviewed. Integer2x actors, larger doors/floor, 12-frame walk/run, 10/12/16 melee, independent skill/ultimate/cutin, airborne virtual-ground anchors. Not the full326 planned drawing set.",
+  "characterImagesRejected": true,
+  "existingCharacterImageReuseAllowed": false,
+  "rejectionReason": "2026-10-20 사용자 지시: 동작별 인물·체격 불일치. 기존 캐릭터 이미지 재활용 금지, 통일된 신규 기준으로 모든 동작·컷인 전면 재제작."
 }
