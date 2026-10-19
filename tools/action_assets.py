@@ -47,6 +47,8 @@ def read_sheet(config):
 def build():
     OUT.mkdir(exist_ok=True,parents=True)
     layout=json.loads((SRC/'layout.json').read_text())
+    if layout.get('profile','').startswith('normal-'):
+        raise ValueError('일반 체형은 python3 tools/action_normal_assets.py로 빌드하세요.')
     frames=[]
     for config in layout['sheets']:frames.extend(read_sheet(config))
     expected=layout['frameCount']

@@ -1,8 +1,9 @@
 import { GAIT, MOTION, SCENE } from './space';
+import { ATTACK, isStrike, strikeContact, strikeDuration } from './motion';
 /** 방 하나의 1인 전투 검증판. DOM/호스트와 무관한 고정 시간 시뮬레이션. */
 export const WIDTH = 1280,
   HEIGHT = 720,
-  SAVE_VERSION = 3;
+  SAVE_VERSION = 4;
 export type Act =
   | 'idle'
   | 'walk'
@@ -18,6 +19,13 @@ export type Act =
   | 'dash'
   | 'guard'
   | 'crouch'
+  | 'crouchwalk'
+  | 'lowkick'
+  | 'airattack'
+  | 'dashattack'
+  | 'stun'
+  | 'victory'
+  | 'defeat'
   | 'hurt'
   | 'down'
   | 'rise'
@@ -42,6 +50,7 @@ export interface Body {
   armor: boolean;
   stride: number;
   speed: number;
+  push: number;
 }
 export interface Player extends Body {
   energy: number;
@@ -49,6 +58,8 @@ export interface Player extends Body {
   guard: number;
   dashCd: number;
   items: number[];
+  attackBuffer: number;
+  crouching: boolean;
 }
 export interface Bolt {
   id: number;
@@ -81,6 +92,8 @@ export interface Run {
   hitstop: number;
   kills: number;
   message: string;
+  shake: number;
+  practice: boolean;
 }
 export interface Input {
   x: number;
@@ -115,6 +128,7 @@ const body = (id: number, kind: Body['kind'], x: number, y: number, hp: number):
   armor: false,
   stride: 0,
   speed: 0,
+  push: 0,
 });
 export function newRun(): Run {
   return {
@@ -126,6 +140,8 @@ export function newRun(): Run {
       guard: 100,
       dashCd: 0,
       items: [3, 2, 2],
+      attackBuffer: 0,
+      crouching: false,
     },
     enemies: [
       body(2, 'corner', 760, 480, 130),
@@ -143,7 +159,29 @@ export function newRun(): Run {
     hitstop: 0,
     kills: 0,
     message: 'Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기',
+    shake: 0,
+    practice: false,
   };
+}
+/** 실제 전투와 같은 판정으로 동작을 시험하되 표적은 먼저 공격하지 않는다. */
+export function practiceRun(): Run {
+  const r = newRun();
+  r.practice = true;
+  r.player.x = 440;
+  r.player.y = 570;
+  r.message = '동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격';
+  r.enemies.forEach((e, i) => {
+    e.x = i ? 1200 : 530;
+    e.y = i ? 680 : 570;
+    e.hp = i ? 0 : 1000;
+    e.max = i ? e.max : 1000;
+    if (i) {
+      e.act = 'dead';
+      e.t = 2;
+    }
+  });
+  r.kills = 3;
+  return r;
 }
 function act(b: Body, name: Act, duration: number) {
   b.act = name;
@@ -159,24 +197,45 @@ function fx(r: Run, kind: Effect['kind'], x: number, y: number, z = 65) {
 function facing(a: Body, b: Body) {
   return (b.x - a.x) * a.dir >= -8;
 }
-function damage(r: Run, b: Body, amount: number, source: Body, down = false) {
-  if (b.hp <= 0 || b.inv > 0) return;
+function damage(
+  r: Run,
+  b: Body,
+  amount: number,
+  source: Body,
+  down = false,
+  stop = down ? 5 / 60 : 3 / 60,
+  push = down ? 66 : 18,
+): boolean {
+  if (b.hp <= 0 || b.inv > 0) return false;
   const p = r.player;
-  if (b === p && (p.act === 'guard' || p.act === 'crouch') && facing(p, source) && p.guard > 0) {
+  if (
+    b === p &&
+    ['guard', 'crouch', 'crouchwalk'].includes(p.act) &&
+    facing(p, source) &&
+    p.guard > 0
+  ) {
     p.guard = Math.max(0, p.guard - amount * 2);
     p.flash = 0.08;
     fx(r, 'guard', p.x + p.dir * 40, p.y, p.act === 'crouch' ? 105 : 165);
     if (!p.guard) {
-      act(p, 'hurt', 0.65);
+      act(p, 'stun', 0.65);
       r.message = '가드 붕괴! 거리를 확보하세요.';
     }
-    return;
+    return false;
   }
   b.hp = Math.max(0, b.hp - amount);
   b.flash = 0.12;
-  fx(r, 'hit', b.x, b.y, b.z + 125);
-  r.hitstop = down ? 0.07 : 0.04;
-  b.x = clamp(b.x + source.dir * (down ? 44 : 12), 55, WIDTH - 55);
+  const impactHeight =
+    source.act === 'lowkick'
+      ? 35
+      : source.act === 'airattack'
+        ? Math.min(190, source.z + 105)
+        : 165;
+  fx(r, 'hit', b.x, b.y, b.z + impactHeight);
+  r.hitstop = Math.max(r.hitstop, stop);
+  r.shake = Math.max(r.shake, down ? 6 : 2);
+  // 정지 뒤 관성이 풀린다. 맞는 즉시 대상 좌표를 순간이동시키지 않는다.
+  b.push = source.dir * push * 8;
   if (b === p) {
     p.inv = 0.5;
     p.gauge = clamp(p.gauge + 7, 0, 100);
@@ -185,6 +244,7 @@ function damage(r: Run, b: Body, amount: number, source: Body, down = false) {
     act(b, 'dead', 1);
     if (b !== p) r.kills++;
   } else if (!b.armor) act(b, down ? 'down' : 'hurt', down ? 0.9 : 0.23);
+  return true;
 }
 function move(b: Body, x: number, y: number, speed: number, dt: number, face = true) {
   const len = Math.max(1, Math.hypot(x, y)),
@@ -196,7 +256,11 @@ function move(b: Body, x: number, y: number, speed: number, dt: number, face = t
   b.speed = Math.min(1200, distance / dt);
   // 1주기의 실제 보폭과 재생 위상을 연결. 벽에 막히면 위상도 정지한다.
   if (b.z === 0 && b.act !== 'dash')
-    b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
+    b.stride =
+      (b.stride +
+        distance /
+          (b.act === 'run' ? GAIT.run : b.act === 'crouchwalk' ? GAIT.crouch : GAIT.walk)) %
+      1;
   if (x && face) b.dir = x > 0 ? 1 : -1;
 }
 function nearTarget(r: Run) {
@@ -207,21 +271,23 @@ function nearTarget(r: Run) {
       (e.x - p.x) * p.dir >= -8 &&
       Math.abs(e.x - p.x) < 118 &&
       Math.abs(e.y - p.y) < 32 &&
-      Math.abs(e.z - p.z) < 60,
+      (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60),
   );
 }
 function bolt(r: Run, b: Body, enemy: boolean) {
   if (r.bolts.length >= 48) return;
+  const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
+  const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
   r.bolts.push({
     id: r.nextId++,
-    x: b.x + b.dir * (enemy ? 48 : 96),
+    x: b.x + b.dir * muzzleX,
     y: b.y,
-    z: b.z + (enemy ? 135 : 178),
+    z: b.z + muzzleHeight,
     vx: b.dir * (enemy ? 410 : 1000),
     life: 1.7,
     enemy,
   });
-  fx(r, 'shot', b.x + b.dir * (enemy ? 48 : 96), b.y, b.z + (enemy ? 135 : 178));
+  fx(r, 'shot', b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
 }
 function item(r: Run, i: number) {
   const p = r.player;
@@ -245,16 +311,21 @@ function item(r: Run, i: number) {
 export function autoInput(r: Run): Input {
   const p = r.player,
     live = r.enemies.filter((e) => e.hp > 0);
-  const e = live.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+  const e = live.sort(
+    (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y),
+  )[0];
   if (!e) return { x: 0, y: 0 };
   const dx = e.x - p.x,
     dy = e.y - p.y,
-    threat = live.find((e) => e.act === 'shot' && e.duration - e.t < 0.25 && Math.abs(e.y - p.y) < 30);
+    threat = live.find(
+      (e) => e.act === 'shot' && e.duration - e.t < 0.25 && Math.abs(e.y - p.y) < 30,
+    );
   return {
     x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
     run: Math.abs(dx) > 260,
     y: threat ? (p.y > 540 ? -1 : 1) : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-    attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || (Math.abs(dx) > 360 && r.time % 1.8 < 0.45)),
+    attack:
+      Math.abs(dy) < 26 && (Math.abs(dx) < 120 || (Math.abs(dx) > 360 && r.time % 1.8 < 0.45)),
     skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
     dash: !!threat,
     ult: p.gauge >= 100 && live.length >= 2,
@@ -264,7 +335,17 @@ export function autoInput(r: Run): Input {
 export function step(r: Run, raw: Input, dt: number) {
   if (!Number.isFinite(dt) || dt <= 0) return;
   dt = Math.min(dt, 1 / 30);
-  if (r.phase !== 'combat') return;
+  r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
+  r.shake = Math.max(0, r.shake - dt * 24);
+  if (r.phase !== 'combat') {
+    r.player.t += dt;
+    for (const enemy of r.enemies) if (enemy.act === 'dead') enemy.t += dt;
+    return;
+  }
+  const p = r.player,
+    input = r.auto ? autoInput(r) : raw;
+  // 히트스톱 중에도 입력을 받는다. 대상·공격 자세와 물리는 멈추고 섬광은 진행한다.
+  p.attackBuffer = input.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
   if (r.cutin > 0) {
     r.cutin = Math.max(0, r.cutin - dt);
     return;
@@ -274,37 +355,42 @@ export function step(r: Run, raw: Input, dt: number) {
     return;
   }
   r.time += dt;
-  r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
-  const p = r.player,
-    input = r.auto ? autoInput(r) : raw;
   for (const b of [p, ...r.enemies]) {
     b.t += dt;
     b.inv = Math.max(0, b.inv - dt);
     b.flash = Math.max(0, b.flash - dt);
     b.cooldown = Math.max(0, b.cooldown - dt);
+    if (b.push) {
+      b.x = clamp(b.x + b.push * dt, 55, WIDTH - 55);
+      b.push *= Math.exp(-dt * 10);
+      if (Math.abs(b.push) < 1) b.push = 0;
+    }
     if (b.z > 0 || b.vz > 0) {
       b.vz -= 1000 * dt;
       b.z = Math.max(0, b.z + b.vz * dt);
       if (!b.z) {
         b.vz = 0;
-        if (b === p && ['jump', 'walk', 'run', 'idle'].includes(b.act)) act(b, 'land', 0.22);
+        if (b === p && ['jump', 'walk', 'run', 'idle', 'airattack', 'shot'].includes(b.act))
+          act(b, 'land', 0.12);
       }
     }
     if (b.act === 'down' && b.t >= b.duration) {
       act(b, 'rise', 0.35);
       b.inv = 0.55;
     } else if (
-      !['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(b.act) &&
+      !['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch', 'crouchwalk'].includes(b.act) &&
       b.t >= b.duration
     ) {
       const next =
-        b === p && input.attack && b.z === 0 && b.act === 'melee1'
+        b === p && p.attackBuffer > 0 && b.z === 0 && b.act === 'melee1'
           ? 'melee2'
-          : b === p && input.attack && b.z === 0 && b.act === 'melee2'
+          : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === 'melee2'
             ? 'melee3'
             : null;
-      if (next) act(b, next, next === 'melee2' ? 0.36 : 0.52);
-      else {
+      if (next) {
+        act(b, next, strikeDuration(next));
+        p.attackBuffer = 0;
+      } else {
         if (b === p && b.act === 'melee3') b.cooldown = 0.18;
         act(b, 'idle', 0);
       }
@@ -315,7 +401,7 @@ export function step(r: Run, raw: Input, dt: number) {
   p.dashCd = Math.max(0, p.dashCd - dt);
   if (p.act !== 'guard' && p.act !== 'crouch') p.guard = Math.min(100, p.guard + dt * 15);
   if (input.item !== undefined) item(r, input.item);
-  if (['idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(p.act)) {
+  if (['idle', 'walk', 'run', 'jump', 'guard', 'crouch', 'crouchwalk'].includes(p.act)) {
     if (r.auto) {
       const target = r.enemies
         .filter((e) => e.hp > 0)
@@ -323,7 +409,12 @@ export function step(r: Run, raw: Input, dt: number) {
       if (target) p.dir = target.x >= p.x ? 1 : -1;
     }
     if (input.x && !r.auto) p.dir = input.x > 0 ? 1 : -1;
-    if (input.jump && p.z === 0) p.vz = 600;
+    if (input.jump && p.z === 0) {
+      p.vz = 600;
+      p.crouching = false;
+    }
+    if (input.guard && input.y > 0 && !p.z && !p.vz) p.crouching = true;
+    if (!input.guard) p.crouching = false;
     if (input.ult && p.gauge >= 100) {
       p.gauge = 0;
       act(p, 'ult', 0.9);
@@ -336,16 +427,26 @@ export function step(r: Run, raw: Input, dt: number) {
       act(p, 'dash', 0.3);
       p.inv = 0.24;
       p.dashCd = 0.8;
-    } else if (input.guard && !p.z) {
-      p.act = input.y > 0 ? 'crouch' : 'guard';
+    } else if (input.guard && !p.z && !p.vz) {
+      p.act = p.crouching ? (input.x ? 'crouchwalk' : 'crouch') : 'guard';
       if (input.x) p.dir = Math.sign(input.x);
+      if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
+        act(p, 'lowkick', strikeDuration('lowkick'));
+        p.attackBuffer = 0;
+        p.cooldown = 0.35;
+      } else if (p.act === 'crouchwalk') move(p, input.x, 0, 85, dt);
     } else if (input.skill && p.energy >= 35) {
       p.energy -= 35;
       act(p, 'skill', 0.48);
       p.armor = true;
-    } else if (input.attack && p.cooldown <= 0) {
-      if (!p.z && nearTarget(r)) {
-        act(p, 'melee1', 0.3);
+    } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
+      p.attackBuffer = 0;
+      if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
+        act(p, 'airattack', strikeDuration('airattack'));
+      } else if (!p.z && !p.vz && input.run && input.x) {
+        act(p, 'dashattack', strikeDuration('dashattack'));
+      } else if (!p.z && !p.vz && nearTarget(r)) {
+        act(p, 'melee1', strikeDuration('melee1'));
         p.cooldown = 0;
       } else {
         act(p, 'shot', 0.24);
@@ -355,31 +456,59 @@ export function step(r: Run, raw: Input, dt: number) {
       const x = clamp(input.x, -1, 1),
         y = clamp(input.y, -1, 1);
       const running = !!input.run;
-      move(p, x, y, p.z ? 240 : running ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
       p.act = p.z > 0 || p.vz > 0 ? 'jump' : x || y ? (running ? 'run' : 'walk') : 'idle';
+      move(p, x, y, p.z ? 240 : running ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
     }
   }
+  if (p.act === 'dash' && p.attackBuffer > 0 && p.t < 0.16) {
+    act(p, 'dashattack', strikeDuration('dashattack'));
+    p.attackBuffer = 0;
+    p.inv = 0;
+  }
   if (p.act === 'dash' && p.t >= 0.04 && p.t < 0.16) move(p, input.x || p.dir, input.y, 1200, dt);
-  if (
-    p.act.startsWith('melee') &&
-    p.t >= (p.act === 'melee1' ? 0.09 : p.act === 'melee2' ? 0.1 : 0.15) &&
-    !p.fired
-  ) {
+  if (p.act === 'dashattack' && p.t < strikeContact('dashattack'))
+    move(p, p.dir, 0, 420, dt, false);
+  if (p.act === 'airattack' && p.z > 0) move(p, p.dir, 0, 160, dt, false);
+  if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
     p.fired = true;
-    const finish = p.act === 'melee3';
+    const finish = p.act === 'melee3',
+      attack = ATTACK[p.act];
     const oldX = p.x;
-    p.x = clamp(p.x + p.dir * (finish ? 8 : 5), 55, 1225);
+    let connected = false;
     for (const e of r.enemies)
       if (
         e.hp > 0 &&
         (e.x - oldX) * p.dir >= -8 &&
-        Math.abs(e.x - oldX) < (finish ? 135 : 120) &&
+        Math.abs(e.x - oldX) < attack.reach &&
         Math.abs(e.y - p.y) < 35 &&
-        Math.abs(e.z - p.z) < 60
+        (p.act === 'airattack' ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
       )
-        damage(r, e, finish ? 38 : p.act === 'melee2' ? 24 : 18, p, finish);
-    if (finish) fx(r, 'blast', p.x + p.dir * 120, p.y, 150);
-    r.message = finish ? '근접 3타 · 파괴 충격' : p.act === 'melee2' ? '근접 2타 · 제압' : '근접 1타 · 장타';
+        connected =
+          damage(
+            r,
+            e,
+            attack.damage,
+            p,
+            finish || p.act === 'dashattack',
+            attack.stop / 60,
+            attack.push,
+          ) || connected;
+    // 큰 dt에서도 접촉 자세를 넘어가서 회수 포즈에 얼지 않게 한다.
+    if (connected) p.t = strikeContact(p.act);
+    if (finish && connected) fx(r, 'blast', p.x + p.dir * 120, p.y, 150);
+    r.message =
+      p.act === 'lowkick'
+        ? '하단차기'
+        : p.act === 'airattack'
+          ? '공중차기'
+          : p.act === 'dashattack'
+            ? '대시 어깨치기'
+            : finish
+              ? '근접 3타 · 파괴 충격'
+              : p.act === 'melee2'
+                ? '근접 2타 · 오른 장타'
+                : '근접 1타 · 왼 장타';
+    if (connected) return;
   }
   if (p.act === 'shot' && p.t >= 0.03 && !p.fired) {
     p.fired = true;
@@ -399,6 +528,7 @@ export function step(r: Run, raw: Input, dt: number) {
         damage(r, e, ultimate ? 70 : 45, p, true);
   }
   for (const e of r.enemies) {
+    if (r.practice) continue;
     if (e.hp <= 0 || ['hurt', 'down', 'rise'].includes(e.act)) continue;
     if (e.act === 'shot') {
       if (!e.fired && e.t >= e.duration - 0.12) {
@@ -446,16 +576,22 @@ export function step(r: Run, raw: Input, dt: number) {
       )
       .sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
     if (candidates[0]) {
-      damage(r, candidates[0], b.enemy ? 12 : 18, { ...p, x: old, dir: Math.sign(b.vx) });
+      damage(r, candidates[0], b.enemy ? 12 : 18, {
+        ...p,
+        x: old,
+        dir: Math.sign(b.vx),
+      });
       b.life = 0;
     }
   }
   r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
   if (p.hp <= 0) {
     r.phase = 'evacuated';
+    act(p, 'defeat', 0.8);
     r.message = '작전 지속 불가 · 본부 후송';
-  } else if (r.enemies.every((e) => e.hp <= 0)) {
+  } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
     r.phase = 'cleared';
+    act(p, 'victory', 0.7);
     r.message = '훈련 완료 · 전원 제압';
   }
 }
@@ -467,14 +603,19 @@ export function restore(raw: string | null): Run | null {
   try {
     if (!raw || raw.length > 120_000) return null;
     const r = JSON.parse(raw) as Run;
-    if ((r?.version === 1 || r?.version === 2) && r.player && Array.isArray(r.enemies)) {
+    if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
       for (const b of [r.player, ...r.enemies]) {
         b.stride = b.stride ?? 0;
         b.speed = b.speed ?? 0;
+        b.push = 0;
         b.y = clamp(b.y, SCENE.floorMin, SCENE.floorMax);
       }
       for (const bolt of r.bolts ?? []) bolt.y = clamp(bolt.y, SCENE.floorMin, SCENE.floorMax);
       r.version = SAVE_VERSION;
+      r.shake = 0;
+      r.practice = false;
+      r.player.attackBuffer = 0;
+      r.player.crouching = false;
     }
     const finite = (n: unknown, lo: number, hi: number) =>
       typeof n === 'number' && Number.isFinite(n) && n >= lo && n <= hi;
@@ -493,6 +634,13 @@ export function restore(raw: string | null): Run | null {
       'dash',
       'guard',
       'crouch',
+      'crouchwalk',
+      'lowkick',
+      'airattack',
+      'dashattack',
+      'stun',
+      'victory',
+      'defeat',
       'hurt',
       'down',
       'rise',
@@ -519,7 +667,8 @@ export function restore(raw: string | null): Run | null {
       typeof b.fired === 'boolean' &&
       typeof b.armor === 'boolean' &&
       finite(b.stride, 0, 1) &&
-      finite(b.speed, 0, 1200);
+      finite(b.speed, 0, 1200) &&
+      finite(b.push, -1200, 1200);
     if (
       !r ||
       r.version !== SAVE_VERSION ||
@@ -535,6 +684,8 @@ export function restore(raw: string | null): Run | null {
     if (
       ![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) ||
       !finite(p.dashCd, 0, 10) ||
+      !finite(p.attackBuffer, 0, 0.13) ||
+      typeof p.crouching !== 'boolean' ||
       !Array.isArray(p.items) ||
       p.items.length !== 3 ||
       !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9))
@@ -550,12 +701,14 @@ export function restore(raw: string | null): Run | null {
       !['combat', 'cleared', 'evacuated'].includes(r.phase) ||
       !finite(r.cutin, 0, 1) ||
       !finite(r.hitstop, 0, 1) ||
+      !finite(r.shake, 0, 10) ||
+      typeof r.practice !== 'boolean' ||
       typeof r.message !== 'string' ||
       r.message.length > 150
     )
       return null;
     if (
-      (r.phase === 'combat' && (p.hp <= 0 || r.enemies.every((e) => !e.hp))) ||
+      (r.phase === 'combat' && (p.hp <= 0 || (!r.practice && r.enemies.every((e) => !e.hp)))) ||
       (r.phase === 'cleared' && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0))) ||
       (r.phase === 'evacuated' && p.hp > 0)
     )

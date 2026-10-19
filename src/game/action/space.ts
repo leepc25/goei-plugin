@@ -18,5 +18,5 @@ export const SCENE = {
 export function depthScale(_footY: number): number {
   return 1;
 }
-export const GAIT = { walk: 224, run: 300 } as const;
+export const GAIT = { walk: 160, run: 192, crouch: 112 } as const;
 export const MOTION = { walkSpeed: 200, runSpeed: 360 } as const;

@@ -49,7 +49,9 @@ const snapshot = async (page) => {
   return page.evaluate(() => JSON.parse(localStorage.getItem('goei-action-demo:v1')));
 };
 try {
-  const page = await browser.newPage({ viewport: { width: 1300, height: 950 } });
+  const page = await browser.newPage({
+    viewport: { width: 1300, height: 950 },
+  });
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(url);
   await open(page);
@@ -105,7 +107,9 @@ try {
     {},
     { timeout: 60000 },
   );
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem('goei-action-demo:v1')).phase === 'cleared');
+  await page.waitForFunction(
+    () => JSON.parse(localStorage.getItem('goei-action-demo:v1')).phase === 'cleared',
+  );
   await page.screenshot({ path: '/tmp/goei-action-result.png' });
   await page.locator('.ga-foot [data-do=restart]').click();
   await page.screenshot({ path: '/tmp/goei-action-desktop.png' });
@@ -127,7 +131,7 @@ try {
   });
   await open(page);
   assert.match(await page.locator('.ga-msg').textContent(), /근접 배치 검증/);
-  assert.equal(await page.locator('.ga').getAttribute('data-art-profile'), 'normal-v3');
+  assert.equal(await page.locator('.ga').getAttribute('data-art-profile'), 'normal-v4');
   await page.keyboard.down('KeyZ');
   await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'melee1');
   await page.waitForTimeout(160);
@@ -136,12 +140,50 @@ try {
   assert.ok(melee.player.act.startsWith('melee'));
   assert.ok(melee.enemies[0].hp < melee.enemies[0].max);
   assert.equal(melee.bolts.length, 0, '근접에서 권총으로 되돌아가지 않음');
-  await page.evaluate(() => {document.querySelector('.ga-menu').hidden = true;});
-  await page.screenshot({path:'/tmp/goei-normal-verified-melee.png'});
+  await page.evaluate(() => {
+    document.querySelector('.ga-menu').hidden = true;
+  });
+  await page.screenshot({ path: '/tmp/goei-normal-verified-melee.png' });
+  // 새 동작은 실제 키 입력과 훈련 배치에서 검증한다.
+  await page.locator('[data-do=practice]').click();
+  await page.keyboard.down('KeyA');
+  await page.keyboard.down('ArrowDown');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'crouch');
+  await page.keyboard.up('ArrowDown');
+  await page.keyboard.down('ArrowRight');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'crouchwalk');
+  await page.keyboard.up('ArrowRight');
+  await page.keyboard.down('KeyZ');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'lowkick');
+  await page.screenshot({ path: '/tmp/goei-v4-lowkick.png' });
+  await page.keyboard.up('KeyZ');
+  await page.keyboard.up('KeyA');
+  await page.locator('[data-do=practice]').click();
+  await page.keyboard.press('KeyX');
+  await page.keyboard.down('KeyZ');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'airattack');
+  await page.screenshot({ path: '/tmp/goei-v4-airattack.png' });
+  await page.keyboard.up('KeyZ');
+  await page.locator('[data-do=practice]').click();
+  await page.keyboard.down('ArrowRight');
+  await page.keyboard.down('ShiftLeft');
+  await page.keyboard.down('KeyZ');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'dashattack');
+  await page.screenshot({ path: '/tmp/goei-v4-dashattack.png' });
+  await page.keyboard.up('KeyZ');
+  await page.keyboard.up('ShiftLeft');
+  await page.keyboard.up('ArrowRight');
+  const practice = await snapshot(page);
+  assert.equal(practice.practice, true);
+  assert.equal(practice.player.hp, 200, '훈련 표적은 선제 공격하지 않음');
   // 게임 해제 뒤 RAF가 화면이나 저장을 다시 만들지 않는다.
   await page.evaluate(() => window.__close());
   assert.equal(await page.locator('.ga').count(), 0);
-  const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const mobile = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
   const m = await mobile.newPage();
   m.on('pageerror', (e) => errors.push(String(e)));
   await m.goto(url + '?w=390&h=844');
@@ -158,7 +200,10 @@ try {
     ],
   });
   await m.waitForTimeout(500);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
   await m.locator('[data-do=pause]').click();
   await m.waitForTimeout(100);
   const ms = await m.evaluate(() => JSON.parse(localStorage.getItem('goei-action-demo:v1')));
@@ -174,36 +219,52 @@ try {
   await open(standalone);
   assert.equal(await standalone.locator('canvas').count(), 1);
   // 실제 게임 창의 두 모드 전환과 저장 키 분리를 모의 Risu host에서 확인한다.
-  const integrated = await browser.newPage({ viewport: { width: 1300, height: 950 } });
+  const integrated = await browser.newPage({
+    viewport: { width: 1300, height: 950 },
+  });
   integrated.on('pageerror', (e) => errors.push(String(e)));
   await integrated.goto(url);
   await integrated.evaluate(async () => {
     window.__close();
-    const bytes = new Uint8Array(await (await fetch('/dist-test/goei-game-patrol.pack')).arrayBuffer());
+    const bytes = new Uint8Array(
+      await (await fetch('/dist-test/goei-game-patrol.pack')).arrayBuffer(),
+    );
     const length = new DataView(bytes.buffer).getUint32(8, true),
       head = JSON.parse(new TextDecoder().decode(bytes.slice(12, 12 + length)));
     const files = {};
     for (const [name, at, n] of head.files) {
       const data = bytes.slice(12 + length + at, 12 + length + at + n);
       let str = '';
-      for (let i = 0; i < data.length; i += 0x8000) str += String.fromCharCode(...data.slice(i, i + 0x8000));
+      for (let i = 0; i < data.length; i += 0x8000)
+        str += String.fromCharCode(...data.slice(i, i + 0x8000));
       files[name] = btoa(str);
     }
     window.__store = {
-      'goei:game-pack:patrol': JSON.stringify({ version: head.version, atlas: head.atlas, files }),
+      'goei:game-pack:patrol': JSON.stringify({
+        version: head.version,
+        atlas: head.atlas,
+        files,
+      }),
       'goei:game': 'old-patrol-record',
     };
-    const actionBytes = new Uint8Array(await (await fetch('/dist-test/goei-game-action.pack')).arrayBuffer());
+    const actionBytes = new Uint8Array(
+      await (await fetch('/dist-test/goei-game-action.pack')).arrayBuffer(),
+    );
     const alen = new DataView(actionBytes.buffer).getUint32(8, true),
       ah = JSON.parse(new TextDecoder().decode(actionBytes.slice(12, 12 + alen)));
     const afiles = {};
     for (const [name, at, n] of ah.files) {
       const data = actionBytes.slice(12 + alen + at, 12 + alen + at + n);
       let str = '';
-      for (let i = 0; i < data.length; i += 0x8000) str += String.fromCharCode(...data.slice(i, i + 0x8000));
+      for (let i = 0; i < data.length; i += 0x8000)
+        str += String.fromCharCode(...data.slice(i, i + 0x8000));
       afiles[name] = btoa(str);
     }
-    window.__store['goei:game-pack:action-normal'] = JSON.stringify({ version: ah.version, atlas: ah.atlas, files: afiles });
+    window.__store['goei:game-pack:action-normal-v4'] = JSON.stringify({
+      version: ah.version,
+      atlas: ah.atlas,
+      files: afiles,
+    });
     window.risuai = {
       pluginStorage: {
         getItem: async (k) => window.__store[k] ?? null,
@@ -237,7 +298,7 @@ try {
   assert.equal(await integrated.locator('.gx-game').count(), 0);
   assert.deepEqual(errors, []);
   console.log(
-    'PASS: keyboard, jump+shot, QWE single use, focus, restore, auto clear, unmount, touch joystick+attack, mobile layout',
+    'PASS: keyboard, jump+shot, QWE single use, focus, restore, auto clear, unmount, touch joystick+attack, mobile layout, v4 crouch/lowkick/airattack/dashattack',
   );
 } finally {
   await browser.close();

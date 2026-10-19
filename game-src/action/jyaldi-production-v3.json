@@ -790,5 +790,6 @@
     "dash": 16,
     "fullRequiredSetCompleted": false,
     "remaining": "시작/정지/반전/뒤걸음, 상세 가드/피격/기상, 점프 추가 중간 그림, 무장 전환 등"
-  }
+  },
+  "implementationSupersededBy": "game-src/action/jyaldi-production-v4.json"
 }

@@ -1,0 +1,82 @@
+{
+  "version": 4,
+  "date": "2026-10-20",
+  "status": "core-actions-playable-candidate",
+  "spec": "docs/캐릭터_도트_생성_및_액션_제작규격_v4.md",
+  "references": "docs/캐릭터_액션_공개레퍼런스_조사.md",
+  "layout": "game-src/action/normal-v4/layout.json",
+  "playable": "release/demo/goei-jyaldi-action-v4.html",
+  "nativeStandingHeight": 128,
+  "displayScale": 2,
+  "frameCount": 120,
+  "clips": {
+    "walk": 4,
+    "run": 4,
+    "melee1": 5,
+    "melee2": 5,
+    "melee3": 6,
+    "shot": 6,
+    "draw": 3,
+    "guard": 1,
+    "guard_hit": 1,
+    "crouch": 1,
+    "jump_up": 3,
+    "jump_apex": 1,
+    "jump_down": 1,
+    "land": 2,
+    "hurt": 2,
+    "down": 3,
+    "rise": 3,
+    "skill": 14,
+    "ult": 24,
+    "idle": 1,
+    "dash": 4,
+    "cutin": 12,
+    "relaxed": 1,
+    "airattack": 3,
+    "crouchwalk": 4,
+    "lowkick": 3,
+    "stun": 2,
+    "victory": 2,
+    "defeat": 2,
+    "dashattack": 4,
+    "airfire": 3,
+    "master": 1
+  },
+  "files": {
+    "game-pack/action/a-jyaldi-action.png": {
+      "bytes": 280190,
+      "sha256": "f6b9e256036eb6364f588818884c860ab04d90566391ce9de893774b917d00bf"
+    },
+    "release/goei-game-action-normal-v4.pack": {
+      "bytes": 481771,
+      "sha256": "f67da25cde296d72a181be3922f5a31de19aeda3e80d6ddd55f181621645d82c"
+    },
+    "release/demo/goei-jyaldi-action-v4.html": {
+      "bytes": 691156,
+      "sha256": "eb39d4a54e0121f4b6b3dbc426e2b813484ecadb025410f57bb723e029798a47"
+    }
+  },
+  "decodedAtlas": {
+    "width": 1024,
+    "height": 1547,
+    "rgbaBytes": 6336512
+  },
+  "review": {
+    "userApproved": false,
+    "footSlipMeasured": false,
+    "fullMotionSetComplete": false,
+    "notes": "시작/정지/반전, 상세 가드 전환, 호흡 대기 등 미완성. 기본/전투 대기는 현재 각1장. 핵심 자세·앵커·강약·실제 입력 연결을 시험하는 첫 후보."
+  },
+  "drawings": {
+    "newReferenced": 59,
+    "retainedFromV3": 60,
+    "historicalReferencePose": 1
+  },
+  "verification": {
+    "build": true,
+    "typecheck": true,
+    "unitTestFilesPassed": 19,
+    "browser": "keyboard, touch, auto clear, restore, standalone HTML, fake Risu host, crouch walk, low kick, air kick, dash attack"
+  }
+}

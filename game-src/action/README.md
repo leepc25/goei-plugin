@@ -1,3 +1,5 @@
+> **현재 제작 후보: normal-v4** — [제작규격](../../docs/캐릭터_도트_생성_및_액션_제작규격_v4.md), [실제 적용 시연판](../../release/demo/goei-jyaldi-action-v4.html), [변경·미완성 범위](../../release/demo/README.md). 빌드는 `python3 tools/action_normal_assets.py`를 사용한다. 아래 v3 수량·평가는 이전 구현 기록이다.
+
 # 쟈알디 도트 제작 자료 — 체형 개선 시연판
 
 > 신규 목표는 `jyaldi-production-v3.json` 및 [일반 체형 v0.3 명세](../../docs/쟈알디_일반체형_도트규격_및_동작프레임_v3.md)다. 128px 원본·2배 표시, 약 6등신과 상하체 매스 균형·조금 큰 손을 사용한다. 현재 일반 체형 게임은 `normal-v3/layout.json`과 `tools/action_normal_assets.py`를 사용하며 `release/demo/goei-jyaldi-normal.html`에 실제 반영되어 있다. 아래 160px/44프레임 부문은 이전 구현 기록이다.

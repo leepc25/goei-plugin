@@ -128,7 +128,7 @@ await build({
 });
 
 // 새 액션 그림 팩은 구형 순찰 팩과 분리한다.
-const actionPack = buildPack('game-pack/action', 'action', 3, [
+const actionPack = buildPack('game-pack/action', 'action', 4, [
   'a-jyaldi-action',
   'bg-bureau-action',
   'e-corner',
@@ -138,7 +138,7 @@ writeFileSync('dist/goei-game-action.pack', actionPack);
 mkdirSync('dist-test', { recursive: true });
 writeFileSync('dist-test/goei-game-action.pack', actionPack);
 const actionReviewed = JSON.parse(readFileSync('game-src/action/layout.json', 'utf8')).releaseReady === true;
-if (actionReviewed) writeFileSync('release/goei-game-action-normal.pack', actionPack);
+if (actionReviewed) writeFileSync('release/goei-game-action-normal-v4.pack', actionPack);
 
 // 설치 없이 여는 단일 HTML 검증판. 필요한 새 액션 그림만 포함한다.
 const actionArt = {
@@ -169,11 +169,12 @@ if (actionReviewed) {
   writeFileSync('release/demo/goei-action-demo.html', playable);
   const actionProfile = actionArt.atlas.action?.profile;
   writeFileSync(
-    actionProfile === 'normal-v3'
+    actionProfile?.startsWith('normal-')
       ? 'release/demo/goei-jyaldi-normal.html'
       : 'release/demo/goei-jyaldi-slender.html',
     playable,
   );
+  if (actionProfile === 'normal-v4') writeFileSync('release/demo/goei-jyaldi-action-v4.html', playable);
   writeFileSync('release/demo/goei-jyaldi-motions.html', readFileSync('dist/goei-jyaldi-motions.html'));
 }
 

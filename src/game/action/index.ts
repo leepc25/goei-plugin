@@ -2,7 +2,7 @@ import type { GameHost } from '../index';
 import css from './style.css';
 import { ActionRenderer } from './render';
 import { SCENE } from './space';
-import { newRun, restore, serialize, step, type Input } from './sim';
+import { newRun, practiceRun, restore, serialize, step, type Input } from './sim';
 
 // 같은 호스트를 닫았다 다시 열어도 최신 쓰기 완료를 기다린 뒤 복원한다.
 const writes = new WeakMap<GameHost, Promise<void>>();
@@ -14,9 +14,9 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   root.setAttribute('aria-label', '쟈알디 1인 전투 검증판');
   const style = document.createElement('style');
   style.textContent = css;
-  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
+  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
   <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
   box.append(style, root);
   const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
   const canvas = $<HTMLCanvasElement>('canvas'),
@@ -119,9 +119,9 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     $<HTMLButtonElement>('[data-do="resume"]').disabled = !ready;
     if (value) void save(true);
   };
-  const restart = () => {
+  const restart = (practice = false) => {
     if (!ready) return;
-    run = newRun();
+    run = practice ? practiceRun() : newRun();
     dirty = true;
     pause(false);
     void save(true);
@@ -233,13 +233,16 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
         root.focus();
       }
       if (b.dataset.do === 'restart') restart();
+      if (b.dataset.do === 'practice') restart(true);
     },
     { signal },
   );
   root.addEventListener(
     'pointerdown',
     (e) => {
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-hold],[data-edge],[data-item]');
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>(
+        '[data-hold],[data-edge],[data-item]',
+      );
       if (!b || b.disabled || paused || !ready) return;
       e.preventDefault();
       root.focus();
@@ -309,7 +312,11 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
         y = ((e.clientY - b.top) / b.height) * 720;
       if (e.button === 2) {
         edges.dash = true;
-        target = { x, y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)), attack: false };
+        target = {
+          x,
+          y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+          attack: false,
+        };
         return;
       }
       const enemy = run.enemies.find(
@@ -317,7 +324,11 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       );
       target = enemy
         ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id }
-        : { x, y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)), attack: false };
+        : {
+            x,
+            y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+            attack: false,
+          };
     },
     { signal },
   );
@@ -368,15 +379,16 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   let hudTime = 0;
   const frame = (now: number) => {
     if (disposed) return;
-    if (ready && !paused && !document.hidden && run.phase === 'combat') {
-      acc += Math.min(0.1, last ? (now - last) / 1000 : 0) * (waiting && run.auto ? 1.25 : 1);
+    if (ready && !paused && !document.hidden) {
+      const wasCombat = run.phase === 'combat';
+      acc += Math.min(0.1, last ? (now - last) / 1000 : 0);
       let ticks = 0;
       while (acc >= 1 / 60 && ticks++ < 8) {
         step(run, input(), 1 / 60);
         acc -= 1 / 60;
         dirty = true;
       }
-      void save(run.phase !== 'combat');
+      void save(wasCombat && run.phase !== 'combat');
     } else acc = 0;
     last = now;
     if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run);

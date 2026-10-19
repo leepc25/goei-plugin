@@ -5,6 +5,7 @@ import { clipIndex } from './animation';
 
 /** 전용 동작 아틀라스와 640×360 배경을 정수 좌표로 표시한다. */
 export class ActionRenderer {
+  debugGround = false;
   private images = new Map<string, HTMLImageElement>();
   private art: GameArt | null = null;
   private disposed = false;
@@ -46,7 +47,8 @@ export class ActionRenderer {
     y = b.y - b.z,
   ) {
     const f: Frame =
-        (b.kind === 'jyaldi' ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null,
+        (b.kind === 'jyaldi' ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ??
+        null,
       img = this.images.get(b.kind === 'jyaldi' ? 'a-jyaldi-action' : `e-${b.kind}`);
     if (!f || !img) return;
     scale *= depthScale(b.y);
@@ -84,18 +86,32 @@ export class ActionRenderer {
       if (this.preview) {
         const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
         return frames[
-          clipIndex(this.preview.phase, frames, this.art?.atlas.action?.frameTimes?.[this.preview.clip])
+          clipIndex(
+            this.preview.phase,
+            frames,
+            this.art?.atlas.action?.frameTimes?.[this.preview.clip],
+          )
         ];
       }
       let name: string = b.act === 'idle' ? 'idle' : b.act;
+      if (
+        name === 'idle' &&
+        clips?.relaxed &&
+        !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70)
+      )
+        name = 'relaxed';
       if (b.act === 'guard' && b.flash > 0) name = 'guard_hit';
-      if (b.z > 0 && !['shot', 'skill', 'ult', 'hurt', 'down', 'dead'].includes(b.act))
+      if (
+        (b.z > 0 || b.vz > 0) &&
+        !['airattack', 'shot', 'skill', 'ult', 'hurt', 'down', 'dead'].includes(b.act)
+      )
         name = b.vz > 100 ? 'jump_up' : b.vz < -100 ? 'jump_down' : 'jump_apex';
       // 능력과 필살기는 전용 클립을 사용한다.
       if (name === 'dead') name = 'down';
+      if (name === 'shot' && b.z > 0 && clips?.airfire) name = 'airfire';
       const clip = clips?.[name] ?? clips?.idle ?? [0];
       const phase =
-        b.act === 'walk' || b.act === 'run'
+        b.act === 'walk' || b.act === 'run' || b.act === 'crouchwalk'
           ? b.stride
           : name === 'idle'
             ? (r.time % 1.2) / 1.2
@@ -110,8 +126,10 @@ export class ActionRenderer {
                     : progress;
       return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
     }
-    if (b.act === 'dead' || b.act === 'down') return 22;
-    if (b.act === 'rise' || b.act === 'hurt') return 19;
+    if (b.act === 'dead' || b.act === 'down')
+      return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
+    if (b.act === 'rise') return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
+    if (b.act === 'hurt') return progress < 0.4 ? 19 : 20;
     if (b.act === 'shot') return 7 + Math.min(4, Math.floor(progress * 5));
     return b.act === 'walk' ? Math.floor(b.stride * 6) % 6 : 0;
   }
@@ -121,11 +139,20 @@ export class ActionRenderer {
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
     this.rect(0, 0, WIDTH, HEIGHT, '#0a111b');
+    const shake = Math.round((Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake) / 2) * 2;
+    c.translate(shake, 0);
     const bg = this.images.get('bg-bureau-action');
     if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
+    if (this.debugGround) {
+      for (let x = 0; x < WIDTH; x += 32)
+        this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, '#b4e2e533');
+      for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
+        this.rect(0, y, WIDTH, 1, '#b4e2e533');
+    }
     for (const b of [...r.enemies, p].sort((a, b) => a.y - b.y)) {
-      if (b.hp <= 0 && b.t > 1) continue;
-      const visualFrame = b.kind === 'jyaldi' ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
+      if (b !== p && b.hp <= 0 && b.t > 1) continue;
+      const visualFrame =
+        b.kind === 'jyaldi' ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
       const lift = visualFrame
         ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2)
         : 0;
@@ -150,13 +177,26 @@ export class ActionRenderer {
         this.rect(x, b.y - 24, b.kind === 'watchman' ? 600 : 100, 48, '#ff574433');
         this.rect(b.x - 7, b.y - 280, 14, 20, '#ffb35c');
       }
-      this.sprite(b, this.frame(b, r));
+      // 충격은 카메라 전체보다 대상의 몸에 먼저 읽히게 한다.
+      const jolt =
+        b.act === 'hurt' && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
+      this.sprite(b, this.frame(b, r), undefined, b.x + jolt, b.y - b.z);
+      if (b.act === 'stun') {
+        for (let i = 0; i < 3; i++) {
+          const angle = r.time * 7 + (i * Math.PI * 2) / 3;
+          const x = b.x + Math.cos(angle) * 28,
+            y = b.y - b.z - 252 + Math.sin(angle) * 8;
+          this.rect(x - 4, y - 2, 8, 4, '#ffe6a1');
+          this.rect(x - 2, y - 4, 4, 8, '#ffe6a1');
+        }
+      }
       if (b.armor && b.hp > 0) {
         this.rect(b.x - 10, b.y + 8, 20, 3, '#e8bd72');
       }
-      if (b.act === 'guard' || b.act === 'crouch') {
+      if (b.act === 'guard' || b.act === 'crouch' || b.act === 'crouchwalk') {
         const sy = b.y - (b.act === 'crouch' ? 95 : 165);
-        for (let i = 0; i < 4; i++) this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, '#8bdbe3aa');
+        for (let i = 0; i < 4; i++)
+          this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, '#8bdbe3aa');
       }
       if (b.kind !== 'jyaldi' && b.hp > 0) {
         const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
@@ -192,6 +232,7 @@ export class ActionRenderer {
       }
       c.globalAlpha = 1;
     }
+    c.setTransform(1, 0, 0, 1, 0, 0);
     if (r.cutin > 0) {
       this.rect(0, 0, WIDTH, HEIGHT, '#030b17bb');
       this.rect(0, 165, WIDTH, 320, '#172c46');
@@ -215,17 +256,17 @@ export class ActionRenderer {
       c.font = '22px monospace';
       c.fillText('쟈알디 · 집중 파괴', 665, 380);
     }
-    if (r.phase !== 'combat') {
-      this.rect(250, 245, 780, 210, '#07121aee');
+    if (r.phase !== 'combat' && p.t > 0.8) {
+      this.rect(390, 52, 790, 150, '#07121aee');
       c.strokeStyle = '#d9b67a';
       c.lineWidth = 4;
-      c.strokeRect(250, 245, 780, 210);
+      c.strokeRect(390, 52, 790, 150);
       c.fillStyle = '#f4dfb2';
       c.font = 'bold 42px monospace';
       c.textAlign = 'center';
-      c.fillText(r.phase === 'cleared' ? '훈련 완료' : '본부 후송', 640, 330);
+      c.fillText(r.phase === 'cleared' ? '훈련 완료' : '본부 후송', 785, 115);
       c.font = '24px monospace';
-      c.fillText('아래의 새 훈련 버튼으로 다시 시작', 640, 390);
+      c.fillText('아래의 새 훈련 버튼으로 다시 시작', 785, 165);
       c.textAlign = 'left';
     }
   }
