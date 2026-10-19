@@ -99,7 +99,7 @@ export interface PicSource {
 }
 
 /** 얼굴 틀을 따로 맞추지 않은 요원: 카우보이샷의 위쪽 가운데 */
-export const DEFAULT_CROP = '50,19,40';
+export const DEFAULT_CROP = '50,16,44';
 
 /** 「가로,세로,크기」(%) → 틀 중심(가로·세로)과 한 변(그림 너비 대비). 잘못된 값은 null */
 export function parseCrop(s: string | undefined): [number, number, number] | null {
