@@ -164,7 +164,8 @@ function damage(r: Run, b: Body, amount: number, source: Body, down = false) {
   const p = r.player;
   if (b === p && (p.act === 'guard' || p.act === 'crouch') && facing(p, source) && p.guard > 0) {
     p.guard = Math.max(0, p.guard - amount * 2);
-    fx(r, 'guard', p.x + p.dir * 25, p.y);
+    p.flash = 0.08;
+    fx(r, 'guard', p.x + p.dir * 40, p.y, p.act === 'crouch' ? 105 : 165);
     if (!p.guard) {
       act(p, 'hurt', 0.65);
       r.message = '가드 붕괴! 거리를 확보하세요.';

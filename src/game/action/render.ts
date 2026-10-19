@@ -87,7 +87,8 @@ export class ActionRenderer {
           clipIndex(this.preview.phase, frames, this.art?.atlas.action?.frameTimes?.[this.preview.clip])
         ];
       }
-      let name = b.act === 'idle' ? 'idle' : b.act;
+      let name: string = b.act === 'idle' ? 'idle' : b.act;
+      if (b.act === 'guard' && b.flash > 0) name = 'guard_hit';
       if (b.z > 0 && !['shot', 'skill', 'ult', 'hurt', 'down', 'dead'].includes(b.act))
         name = b.vz > 100 ? 'jump_up' : b.vz < -100 ? 'jump_down' : 'jump_apex';
       // 능력과 필살기는 전용 클립을 사용한다.
