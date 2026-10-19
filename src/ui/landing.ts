@@ -24,10 +24,10 @@ function corner(pos: string, p: Palette): string {
     + `border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
 }
 
-// 유령 위, 글 아래로 가운데 정렬한 세로 카드 (PC·모바일 같게, 사용자 2026-10-19: 유령이 옆에 있으면 균형이 깨짐)
+// 유령 위, 글 아래로 가운데 정렬한 세로 카드 (PC도 모바일과 같은 폭·모양, 사용자 2026-10-19: 유령이 옆에 있으면 균형이 깨지고 PC는 넓기만 함)
 export function landingHtml(p: Palette): string {
   const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="92" height="92"');
-  return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:30em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;`
+  return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:23em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;`
     + `background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)">`
     + `<span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;`
     + `background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>`
