@@ -1914,23 +1914,83 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     height: 720,
     backgroundWidth: 640,
     backgroundHeight: 360,
-    floorBack: 360,
-    floorMin: 400,
-    floorMax: 655,
+    floorBack: 460,
+    floorMin: 480,
+    floorMax: 680,
     referenceY: 530,
-    adultHeight: 160,
-    // 배경 원본 640x360에서 일반 문 높이 105~115px, 성인 약 80px.
-    doorHeight: 220
+    nativeAdultHeight: 128,
+    actorScale: 2,
+    adultHeight: 256,
+    enemyScale: 2,
+    doorHeight: 340
   };
-  function depthScale(footY2) {
-    return Math.max(0.93, Math.min(1.07, 1 + (footY2 - SCENE.referenceY) * 5e-4));
+  function depthScale(_footY) {
+    return 1;
   }
-  var GAIT = { walk: 128, run: 224 };
+  var GAIT = { walk: 160, run: 192, crouch: 112 };
+  var MOTION = { walkSpeed: 200, runSpeed: 360 };
+
+  // src/game/action/motion.ts
+  var ATTACK = {
+    melee1: {
+      ticks: [4, 1, 2, 3, 6],
+      contact: 5,
+      damage: 18,
+      reach: 124,
+      stop: 3,
+      push: 18
+    },
+    melee2: {
+      ticks: [4, 1, 2, 4, 7],
+      contact: 5,
+      damage: 24,
+      reach: 132,
+      stop: 3,
+      push: 24
+    },
+    melee3: {
+      ticks: [5, 3, 1, 3, 6, 10],
+      contact: 9,
+      damage: 38,
+      reach: 148,
+      stop: 5,
+      push: 66
+    },
+    lowkick: {
+      ticks: [5, 3, 11],
+      contact: 5,
+      damage: 22,
+      reach: 150,
+      stop: 3,
+      push: 26
+    },
+    airattack: {
+      ticks: [4, 5, 9],
+      contact: 4,
+      damage: 26,
+      reach: 155,
+      stop: 4,
+      push: 35
+    },
+    dashattack: {
+      ticks: [4, 2, 4, 12],
+      contact: 6,
+      damage: 32,
+      reach: 142,
+      stop: 4,
+      push: 48
+    }
+  };
+  var strikeDuration = (name) => ATTACK[name].ticks.reduce((a, b) => a + b, 0) / 60;
+  var strikeContact = (name) => ATTACK[name].contact / 60;
+  function isStrike(name) {
+    return name in ATTACK;
+  }
 
   // src/game/action/sim.ts
   var WIDTH = 1280;
   var HEIGHT = 720;
-  var SAVE_VERSION2 = 2;
+  var SAVE_VERSION2 = 4;
   var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
   var body3 = (id, kind, x, y, hp) => ({
     id,
@@ -1951,16 +2011,26 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     cooldown: 0,
     armor: false,
     stride: 0,
-    speed: 0
+    speed: 0,
+    push: 0
   });
   function newRun2() {
     return {
       version: SAVE_VERSION2,
-      player: { ...body3(1, "jyaldi", 220, 510, 200), energy: 100, gauge: 100, guard: 100, dashCd: 0, items: [3, 2, 2] },
+      player: {
+        ...body3(1, "jyaldi", 220, 510, 200),
+        energy: 100,
+        gauge: 100,
+        guard: 100,
+        dashCd: 0,
+        items: [3, 2, 2],
+        attackBuffer: 0,
+        crouching: false
+      },
       enemies: [
         body3(2, "corner", 760, 480, 130),
         body3(3, "watchman", 1030, 560, 145),
-        body3(4, "corner", 1130, 440, 130),
+        body3(4, "corner", 1130, 510, 130),
         body3(5, "watchman", 940, 610, 145)
       ],
       bolts: [],
@@ -1972,8 +2042,29 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       cutin: 0,
       hitstop: 0,
       kills: 0,
-      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기"
+      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기",
+      shake: 0,
+      practice: false
     };
+  }
+  function practiceRun() {
+    const r = newRun2();
+    r.practice = true;
+    r.player.x = 440;
+    r.player.y = 570;
+    r.message = "동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격";
+    r.enemies.forEach((e, i) => {
+      e.x = i ? 1200 : 530;
+      e.y = i ? 680 : 570;
+      e.hp = i ? 0 : 1e3;
+      e.max = i ? e.max : 1e3;
+      if (i) {
+        e.act = "dead";
+        e.t = 2;
+      }
+    });
+    r.kills = 3;
+    return r;
   }
   function act(b, name, duration) {
     b.act = name;
@@ -1989,23 +2080,26 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   function facing(a, b) {
     return (b.x - a.x) * a.dir >= -8;
   }
-  function damage2(r, b, amount, source4, down = false) {
-    if (b.hp <= 0 || b.inv > 0) return;
+  function damage2(r, b, amount, source4, down = false, stop = down ? 5 / 60 : 3 / 60, push2 = down ? 66 : 18) {
+    if (b.hp <= 0 || b.inv > 0) return false;
     const p = r.player;
-    if (b === p && (p.act === "guard" || p.act === "crouch") && facing(p, source4) && p.guard > 0) {
+    if (b === p && ["guard", "crouch", "crouchwalk"].includes(p.act) && facing(p, source4) && p.guard > 0) {
       p.guard = Math.max(0, p.guard - amount * 2);
-      fx(r, "guard", p.x + p.dir * 25, p.y);
+      p.flash = 0.08;
+      fx(r, "guard", p.x + p.dir * 40, p.y, p.act === "crouch" ? 105 : 165);
       if (!p.guard) {
-        act(p, "hurt", 0.65);
+        act(p, "stun", 0.65);
         r.message = "가드 붕괴! 거리를 확보하세요.";
       }
-      return;
+      return false;
     }
     b.hp = Math.max(0, b.hp - amount);
     b.flash = 0.12;
-    fx(r, "hit", b.x, b.y, b.z + 75);
-    r.hitstop = down ? 0.055 : 0.025;
-    b.x = clamp2(b.x + source4.dir * (down ? 44 : 12), 55, WIDTH - 55);
+    const impactHeight = source4.act === "lowkick" ? 35 : source4.act === "airattack" ? Math.min(190, source4.z + 105) : 165;
+    fx(r, "hit", b.x, b.y, b.z + impactHeight);
+    r.hitstop = Math.max(r.hitstop, stop);
+    r.shake = Math.max(r.shake, down ? 6 : 2);
+    b.push = source4.dir * push2 * 8;
     if (b === p) {
       p.inv = 0.5;
       p.gauge = clamp2(p.gauge + 7, 0, 100);
@@ -2014,34 +2108,38 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       act(b, "dead", 1);
       if (b !== p) r.kills++;
     } else if (!b.armor) act(b, down ? "down" : "hurt", down ? 0.9 : 0.23);
+    return true;
   }
   function move(b, x, y, speed, dt, face3 = true) {
     const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
     b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
-    b.y = clamp2(b.y + y / len * speed * dt, 400, 655);
+    b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
     const distance = Math.hypot(b.x - ox, b.y - oy);
-    b.speed = distance / dt;
-    if (b.z === 0 && b.act !== "dash") b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
+    b.speed = Math.min(1200, distance / dt);
+    if (b.z === 0 && b.act !== "dash")
+      b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
     if (x && face3) b.dir = x > 0 ? 1 : -1;
   }
   function nearTarget(r) {
     const p = r.player;
     return r.enemies.find(
-      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && Math.abs(e.z - p.z) < 60
+      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
     );
   }
   function bolt(r, b, enemy) {
     if (r.bolts.length >= 48) return;
+    const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
+    const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
     r.bolts.push({
       id: r.nextId++,
-      x: b.x + b.dir * (enemy ? 34 : 64),
+      x: b.x + b.dir * muzzleX,
       y: b.y,
-      z: b.z + (enemy ? 82 : 113),
+      z: b.z + muzzleHeight,
       vx: b.dir * (enemy ? 410 : 1e3),
       life: 1.7,
       enemy
     });
-    fx(r, "shot", b.x + b.dir * (enemy ? 40 : 64), b.y, b.z + (enemy ? 82 : 113));
+    fx(r, "shot", b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
   }
   function item(r, i) {
     const p = r.player;
@@ -2063,14 +2161,18 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   }
   function autoInput(r) {
     const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
-    const e = live.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+    const e = live.sort(
+      (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y)
+    )[0];
     if (!e) return { x: 0, y: 0 };
-    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find((e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30);
+    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find(
+      (e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30
+    );
     return {
       x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
       run: Math.abs(dx) > 260,
       y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-      attack: Math.abs(dy) < 26,
+      attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || Math.abs(dx) > 360 && r.time % 1.8 < 0.45),
       skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
       dash: !!threat,
       ult: p.gauge >= 100 && live.length >= 2,
@@ -2080,7 +2182,15 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   function step2(r, raw, dt) {
     if (!Number.isFinite(dt) || dt <= 0) return;
     dt = Math.min(dt, 1 / 30);
-    if (r.phase !== "combat") return;
+    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
+    r.shake = Math.max(0, r.shake - dt * 24);
+    if (r.phase !== "combat") {
+      r.player.t += dt;
+      for (const enemy of r.enemies) if (enemy.act === "dead") enemy.t += dt;
+      return;
+    }
+    const p = r.player, input2 = r.auto ? autoInput(r) : raw;
+    p.attackBuffer = input2.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
     if (r.cutin > 0) {
       r.cutin = Math.max(0, r.cutin - dt);
       return;
@@ -2090,28 +2200,34 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       return;
     }
     r.time += dt;
-    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
-    const p = r.player, input2 = r.auto ? autoInput(r) : raw;
     for (const b of [p, ...r.enemies]) {
       b.t += dt;
       b.inv = Math.max(0, b.inv - dt);
       b.flash = Math.max(0, b.flash - dt);
       b.cooldown = Math.max(0, b.cooldown - dt);
+      if (b.push) {
+        b.x = clamp2(b.x + b.push * dt, 55, WIDTH - 55);
+        b.push *= Math.exp(-dt * 10);
+        if (Math.abs(b.push) < 1) b.push = 0;
+      }
       if (b.z > 0 || b.vz > 0) {
         b.vz -= 1e3 * dt;
         b.z = Math.max(0, b.z + b.vz * dt);
         if (!b.z) {
           b.vz = 0;
-          if (b === p && ["jump", "walk", "run", "idle"].includes(b.act)) act(b, "land", 0.14);
+          if (b === p && ["jump", "walk", "run", "idle", "airattack", "shot"].includes(b.act))
+            act(b, "land", 0.12);
         }
       }
       if (b.act === "down" && b.t >= b.duration) {
         act(b, "rise", 0.35);
         b.inv = 0.55;
-      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch"].includes(b.act) && b.t >= b.duration) {
-        const next = b === p && input2.attack && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && input2.attack && b.z === 0 && b.act === "melee2" ? "melee3" : null;
-        if (next) act(b, next, next === "melee2" ? 0.34 : 0.52);
-        else {
+      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(b.act) && b.t >= b.duration) {
+        const next = b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee2" ? "melee3" : null;
+        if (next) {
+          act(b, next, strikeDuration(next));
+          p.attackBuffer = 0;
+        } else {
           if (b === p && b.act === "melee3") b.cooldown = 0.18;
           act(b, "idle", 0);
         }
@@ -2122,64 +2238,97 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     p.dashCd = Math.max(0, p.dashCd - dt);
     if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
     if (input2.item !== void 0) item(r, input2.item);
-    if (["idle", "walk", "run", "jump", "guard", "crouch"].includes(p.act)) {
+    if (["idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(p.act)) {
       if (r.auto) {
         const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
         if (target) p.dir = target.x >= p.x ? 1 : -1;
       }
       if (input2.x && !r.auto) p.dir = input2.x > 0 ? 1 : -1;
-      if (input2.jump && p.z === 0) p.vz = 500;
+      if (input2.jump && p.z === 0) {
+        p.vz = 600;
+        p.crouching = false;
+      }
+      if (input2.guard && input2.y > 0 && !p.z && !p.vz) p.crouching = true;
+      if (!input2.guard) p.crouching = false;
       if (input2.ult && p.gauge >= 100) {
         p.gauge = 0;
-        act(p, "ult", 0.85);
+        act(p, "ult", 0.9);
         p.armor = true;
         p.inv = 1.05;
         r.cutin = 0.75;
         r.message = "집중 파괴";
       } else if (input2.dash && p.dashCd <= 0) {
         if (input2.x) p.dir = Math.sign(input2.x);
-        act(p, "dash", 0.22);
+        act(p, "dash", 0.3);
         p.inv = 0.24;
         p.dashCd = 0.8;
-      } else if (input2.guard && !p.z) {
-        p.act = input2.y > 0 ? "crouch" : "guard";
+      } else if (input2.guard && !p.z && !p.vz) {
+        p.act = p.crouching ? input2.x ? "crouchwalk" : "crouch" : "guard";
         if (input2.x) p.dir = Math.sign(input2.x);
+        if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
+          act(p, "lowkick", strikeDuration("lowkick"));
+          p.attackBuffer = 0;
+          p.cooldown = 0.35;
+        } else if (p.act === "crouchwalk") move(p, input2.x, 0, 85, dt);
       } else if (input2.skill && p.energy >= 35) {
         p.energy -= 35;
-        act(p, "skill", 0.62);
+        act(p, "skill", 0.48);
         p.armor = true;
-      } else if (input2.attack && p.cooldown <= 0) {
-        if (!p.z && nearTarget(r)) {
-          act(p, "melee1", 0.28);
+      } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
+        p.attackBuffer = 0;
+        if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
+          act(p, "airattack", strikeDuration("airattack"));
+        } else if (!p.z && !p.vz && input2.run && input2.x) {
+          act(p, "dashattack", strikeDuration("dashattack"));
+        } else if (!p.z && !p.vz && nearTarget(r)) {
+          act(p, "melee1", strikeDuration("melee1"));
           p.cooldown = 0;
         } else {
-          act(p, "shot", 0.32);
-          p.cooldown = 0.36;
+          act(p, "shot", 0.24);
+          p.cooldown = 0.28;
         }
       } else {
         const x = clamp2(input2.x, -1, 1), y = clamp2(input2.y, -1, 1);
         const running2 = !!input2.run;
-        move(p, x, y, p.z ? 200 : running2 ? 240 : 125, dt, !r.auto);
         p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running2 ? "run" : "walk" : "idle";
+        move(p, x, y, p.z ? 240 : running2 ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
       }
     }
-    if (p.act === "dash") move(p, input2.x || p.dir, input2.y, 800, dt);
-    if (p.act.startsWith("melee") && p.t >= (p.act === "melee1" ? 0.14 : p.act === "melee2" ? 0.17 : 0.26) && !p.fired) {
-      p.fired = true;
-      const finish2 = p.act === "melee3";
-      const oldX = p.x;
-      p.x = clamp2(p.x + p.dir * (finish2 ? 8 : 5), 55, 1225);
-      for (const e of r.enemies)
-        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < (finish2 ? 135 : 120) && Math.abs(e.y - p.y) < 35 && Math.abs(e.z - p.z) < 60)
-          damage2(r, e, finish2 ? 38 : p.act === "melee2" ? 24 : 18, p, finish2);
-      if (finish2) fx(r, "blast", p.x + p.dir * 90, p.y, 95);
-      r.message = finish2 ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 제압" : "근접 1타 · 장타";
+    if (p.act === "dash" && p.attackBuffer > 0 && p.t < 0.16) {
+      act(p, "dashattack", strikeDuration("dashattack"));
+      p.attackBuffer = 0;
+      p.inv = 0;
     }
-    if (p.act === "shot" && p.t >= 0.16 && !p.fired) {
+    if (p.act === "dash" && p.t >= 0.04 && p.t < 0.16) move(p, input2.x || p.dir, input2.y, 1200, dt);
+    if (p.act === "dashattack" && p.t < strikeContact("dashattack"))
+      move(p, p.dir, 0, 420, dt, false);
+    if (p.act === "airattack" && p.z > 0) move(p, p.dir, 0, 160, dt, false);
+    if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
+      p.fired = true;
+      const finish2 = p.act === "melee3", attack = ATTACK[p.act];
+      const oldX = p.x;
+      let connected = false;
+      for (const e of r.enemies)
+        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < attack.reach && Math.abs(e.y - p.y) < 35 && (p.act === "airattack" ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60))
+          connected = damage2(
+            r,
+            e,
+            attack.damage,
+            p,
+            finish2 || p.act === "dashattack",
+            attack.stop / 60,
+            attack.push
+          ) || connected;
+      if (connected) p.t = strikeContact(p.act);
+      if (finish2 && connected) fx(r, "blast", p.x + p.dir * 120, p.y, 150);
+      r.message = p.act === "lowkick" ? "하단차기" : p.act === "airattack" ? "공중차기" : p.act === "dashattack" ? "대시 어깨치기" : finish2 ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 오른 장타" : "근접 1타 · 왼 장타";
+      if (connected) return;
+    }
+    if (p.act === "shot" && p.t >= 0.03 && !p.fired) {
       p.fired = true;
       bolt(r, p, false);
     }
-    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.25 : 0.28) && !p.fired) {
+    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.3 : 0.14) && !p.fired) {
       p.fired = true;
       const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
       fx(r, "blast", x, p.y, 70);
@@ -2188,6 +2337,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
           damage2(r, e, ultimate ? 70 : 45, p, true);
     }
     for (const e of r.enemies) {
+      if (r.practice) continue;
       if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
       if (e.act === "shot") {
         if (!e.fired && e.t >= e.duration - 0.12) {
@@ -2220,19 +2370,25 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       b.life -= dt;
       const targets = b.enemy ? [p] : r.enemies;
       const candidates = targets.filter(
-        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 55 : 155) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
+        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 125 : 245) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
       ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
       if (candidates[0]) {
-        damage2(r, candidates[0], b.enemy ? 12 : 18, { ...p, x: old, dir: Math.sign(b.vx) });
+        damage2(r, candidates[0], b.enemy ? 12 : 18, {
+          ...p,
+          x: old,
+          dir: Math.sign(b.vx)
+        });
         b.life = 0;
       }
     }
     r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
     if (p.hp <= 0) {
       r.phase = "evacuated";
+      act(p, "defeat", 0.8);
       r.message = "작전 지속 불가 · 본부 후송";
-    } else if (r.enemies.every((e) => e.hp <= 0)) {
+    } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
       r.phase = "cleared";
+      act(p, "victory", 0.7);
       r.message = "훈련 완료 · 전원 제압";
     }
   }
@@ -2243,12 +2399,19 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     try {
       if (!raw || raw.length > 12e4) return null;
       const r = JSON.parse(raw);
-      if (r?.version === 1 && r.player && Array.isArray(r.enemies)) {
+      if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
         for (const b of [r.player, ...r.enemies]) {
-          b.stride = 0;
-          b.speed = 0;
+          b.stride = b.stride ?? 0;
+          b.speed = b.speed ?? 0;
+          b.push = 0;
+          b.y = clamp2(b.y, SCENE.floorMin, SCENE.floorMax);
         }
+        for (const bolt2 of r.bolts ?? []) bolt2.y = clamp2(bolt2.y, SCENE.floorMin, SCENE.floorMax);
         r.version = SAVE_VERSION2;
+        r.shake = 0;
+        r.practice = false;
+        r.player.attackBuffer = 0;
+        r.player.crouching = false;
       }
       const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
       const actions = [
@@ -2266,23 +2429,30 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         "dash",
         "guard",
         "crouch",
+        "crouchwalk",
+        "lowkick",
+        "airattack",
+        "dashattack",
+        "stun",
+        "victory",
+        "defeat",
         "hurt",
         "down",
         "rise",
         "dead"
       ];
-      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, 400, 655) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200);
+      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200) && finite(b.push, -1200, 1200);
       if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
         return null;
       const p = r.player;
-      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
+      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !finite(p.attackBuffer, 0, 0.13) || typeof p.crouching !== "boolean" || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
         return null;
-      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || typeof r.message !== "string" || r.message.length > 150)
+      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || !finite(r.shake, 0, 10) || typeof r.practice !== "boolean" || typeof r.message !== "string" || r.message.length > 150)
         return null;
-      if (r.phase === "combat" && (p.hp <= 0 || r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
+      if (r.phase === "combat" && (p.hp <= 0 || !r.practice && r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
         return null;
       if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
-        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, 400, 655) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
+        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
       ))
         return null;
       r.effects = [];
@@ -2290,6 +2460,21 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     } catch {
       return null;
     }
+  }
+
+  // src/game/action/animation.ts
+  function clipIndex(phase, frames, times) {
+    if (!frames.length) return 0;
+    const p = Math.max(0, Math.min(0.999999, phase));
+    if (!times || times.length !== frames.length) return Math.floor(p * frames.length);
+    const duration = times.reduce((sum, value) => sum + value, 0);
+    if (duration <= 0) return 0;
+    let cursor = p * duration;
+    for (let i = 0; i < times.length; i++) {
+      if (cursor < times[i]) return i;
+      cursor -= times[i];
+    }
+    return frames.length - 1;
   }
 
   // src/game/action/render.ts
@@ -2300,6 +2485,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       canvas.height = HEIGHT;
       this.ctx = canvas.getContext("2d");
     }
+    debugGround = false;
     images = /* @__PURE__ */ new Map();
     art = null;
     disposed = false;
@@ -2328,7 +2514,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       this.ctx.fillStyle = color;
       this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     }
-    sprite(b, frame, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : 1.57, x = b.x, y = b.y - b.z) {
+    sprite(b, frame, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
       const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null, img = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
       if (!f || !img) return;
       scale *= depthScale(b.y);
@@ -2351,8 +2537,11 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       c.restore();
     }
     drawPose(run3, clip, phase) {
-      this.preview = { clip, phase };
+      const previousCutin = run3.cutin;
+      this.preview = { clip: clip === "cutin" ? "idle" : clip, phase };
+      if (clip === "cutin") run3.cutin = Math.max(1e-3, 0.75 * (1 - phase));
       this.draw(run3);
+      run3.cutin = previousCutin;
       this.preview = null;
     }
     frame(b, r) {
@@ -2361,19 +2550,28 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         const clips = this.art?.atlas.action?.clips;
         if (this.preview) {
           const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
-          return frames[Math.min(frames.length - 1, Math.floor(this.preview.phase * frames.length))];
+          return frames[clipIndex(
+            this.preview.phase,
+            frames,
+            this.art?.atlas.action?.frameTimes?.[this.preview.clip]
+          )];
         }
         let name = b.act === "idle" ? "idle" : b.act;
-        if (b.z > 0 && !["shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
+        if (name === "idle" && clips?.relaxed && !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70))
+          name = "relaxed";
+        if (b.act === "guard" && b.flash > 0) name = "guard_hit";
+        if ((b.z > 0 || b.vz > 0) && !["airattack", "shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
           name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
-        if (name === "skill" || name === "ult") name = "melee1";
         if (name === "dead") name = "down";
-        const clip = clips?.[name] ?? clips?.idle ?? [48];
-        const phase = b.act === "walk" || b.act === "run" ? b.stride : name === "jump_up" ? b.vz > 430 ? 0 : 0.8 : progress;
-        return clip[Math.min(clip.length - 1, Math.floor(phase * clip.length))];
+        if (name === "shot" && b.z > 0 && clips?.airfire) name = "airfire";
+        const clip = clips?.[name] ?? clips?.idle ?? [0];
+        const phase = b.act === "walk" || b.act === "run" || b.act === "crouchwalk" ? b.stride : name === "idle" ? r.time % 1.2 / 1.2 : name === "guard" || name === "crouch" ? r.time % 1 : name === "jump_up" ? Math.max(0, Math.min(0.999, (600 - b.vz) / 500)) : name === "jump_apex" ? Math.max(0, Math.min(0.999, (100 - b.vz) / 200)) : name === "jump_down" ? Math.min(0.999, -b.vz / 600) : progress;
+        return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
       }
-      if (b.act === "dead" || b.act === "down") return 22;
-      if (b.act === "rise" || b.act === "hurt") return 19;
+      if (b.act === "dead" || b.act === "down")
+        return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
+      if (b.act === "rise") return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
+      if (b.act === "hurt") return progress < 0.4 ? 19 : 20;
       if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
       return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
     }
@@ -2382,33 +2580,62 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.imageSmoothingEnabled = false;
       this.rect(0, 0, WIDTH, HEIGHT, "#0a111b");
+      const shake = Math.round(Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake / 2) * 2;
+      c.translate(shake, 0);
       const bg = this.images.get("bg-bureau-action");
       if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
+      if (this.debugGround) {
+        for (let x = 0; x < WIDTH; x += 32)
+          this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, "#b4e2e533");
+        for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
+          this.rect(0, y, WIDTH, 1, "#b4e2e533");
+      }
       for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
-        if (b.hp <= 0 && b.t > 1) continue;
-        const ground = depthScale(b.y), air = Math.max(0.25, 1 - b.z / 240);
-        this.rect(b.x - 23 * ground, b.y - 3, 46 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
-        this.rect(b.x - 16 * ground, b.y - 2, 32 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
+        if (b !== p && b.hp <= 0 && b.t > 1) continue;
+        const visualFrame = b.kind === "jyaldi" ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
+        const lift = visualFrame ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2) : 0;
+        const ground = depthScale(b.y), air = Math.max(0.25, 1 - (b.z + lift) / 240);
+        this.rect(b.x - 32 * ground, b.y - 3, 64 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
+        this.rect(b.x - 24 * ground, b.y - 2, 48 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
         if (b.kind === "jyaldi" && b.z === 0) {
           const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
-          for (const [dx, dy] of contact) this.rect(b.x + dx * b.dir * ground - 5, b.y + dy * ground - 1, 10, 3, "#02070bc0");
+          for (const [dx, dy] of contact)
+            this.rect(
+              b.x + dx * b.dir * ground * (this.art?.atlas.action?.scale ?? 2) - 7,
+              b.y + dy * ground * (this.art?.atlas.action?.scale ?? 2) - 1,
+              14,
+              3,
+              "#02070bc0"
+            );
         }
         if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
           const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
           this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
-          this.rect(b.x - 7, b.y - 200, 14, 20, "#ffb35c");
+          this.rect(b.x - 7, b.y - 280, 14, 20, "#ffb35c");
         }
-        this.sprite(b, this.frame(b, r));
+        const jolt = b.act === "hurt" && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
+        this.sprite(b, this.frame(b, r), void 0, b.x + jolt, b.y - b.z);
+        if (b.act === "stun") {
+          for (let i = 0; i < 3; i++) {
+            const angle = r.time * 7 + i * Math.PI * 2 / 3;
+            const x = b.x + Math.cos(angle) * 28, y = b.y - b.z - 252 + Math.sin(angle) * 8;
+            this.rect(x - 4, y - 2, 8, 4, "#ffe6a1");
+            this.rect(x - 2, y - 4, 4, 8, "#ffe6a1");
+          }
+        }
         if (b.armor && b.hp > 0) {
           this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
         }
-        if (b.act === "guard" || b.act === "crouch") {
-          const sy = b.y - (b.act === "crouch" ? 65 : 105);
-          for (let i = 0; i < 4; i++) this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
+        if (b.act === "guard" || b.act === "crouch" || b.act === "crouchwalk") {
+          const sy = b.y - (b.act === "crouch" ? 95 : 165);
+          for (let i = 0; i < 4; i++)
+            this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
         }
         if (b.kind !== "jyaldi" && b.hp > 0) {
-          this.rect(b.x - 34, b.y - 175 * depthScale(b.y), 68, 6, "#060c12");
-          this.rect(b.x - 34, b.y - 175 * depthScale(b.y), 68 * b.hp / b.max, 6, "#e9896d");
+          const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
+          const healthTop = b.y - (enemyFrame?.[5] ?? 120) * SCENE.enemyScale - 12;
+          this.rect(b.x - 34, healthTop, 68, 6, "#060c12");
+          this.rect(b.x - 34, healthTop, 68 * b.hp / b.max, 6, "#e9896d");
         }
         if (b === p && p.inv > 0) {
           this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
@@ -2433,14 +2660,19 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         }
         c.globalAlpha = 1;
       }
+      c.setTransform(1, 0, 0, 1, 0, 0);
       if (r.cutin > 0) {
         this.rect(0, 0, WIDTH, HEIGHT, "#030b17bb");
         this.rect(0, 165, WIDTH, 320, "#172c46");
-        for (let i = 0; i < 18; i++) this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
+        for (let i = 0; i < 18; i++)
+          this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
         this.sprite(
           { ...p, dir: 1 },
-          this.art?.atlas.action?.clips.melee3?.[2] ?? this.art?.atlas.action?.clips.idle?.[0] ?? 0,
-          (this.art?.atlas.action?.scale ?? 1) * 2.3,
+          this.art?.atlas.action?.clips.cutin?.[Math.min(
+            (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
+            Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
+          )] ?? 0,
+          (this.art?.atlas.action?.scale ?? 2) * 1.5,
           340 + (1 - r.cutin / 0.75) * 80,
           530
         );
@@ -2450,17 +2682,17 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         c.font = "22px monospace";
         c.fillText("쟈알디 · 집중 파괴", 665, 380);
       }
-      if (r.phase !== "combat") {
-        this.rect(250, 245, 780, 210, "#07121aee");
+      if (r.phase !== "combat" && p.t > 0.8) {
+        this.rect(390, 52, 790, 150, "#07121aee");
         c.strokeStyle = "#d9b67a";
         c.lineWidth = 4;
-        c.strokeRect(250, 245, 780, 210);
+        c.strokeRect(390, 52, 790, 150);
         c.fillStyle = "#f4dfb2";
         c.font = "bold 42px monospace";
         c.textAlign = "center";
-        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 640, 330);
+        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 785, 115);
         c.font = "24px monospace";
-        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 640, 390);
+        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 785, 165);
         c.textAlign = "left";
       }
     }
@@ -2475,9 +2707,9 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     root2.setAttribute("aria-label", "쟈알디 1인 전투 검증판");
     const style = document.createElement("style");
     style.textContent = style_default3;
-    root2.innerHTML = `<div class="ga-hud"><b>쟈알디 · 체형 개선 시연판</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
+    root2.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
   <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
     box.append(style, root2);
     const $ = (s4) => root2.querySelector(s4);
     const canvas = $("canvas"), fit = $(".ga-fit"), menu = $(".ga-menu"), renderer = new ActionRenderer(canvas);
@@ -2502,12 +2734,21 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     };
     const hud = () => {
       const p = run3.player;
-      for (const [name, value] of Object.entries({ hp: p.hp, energy: p.energy, guard: p.guard, gauge: p.gauge }))
+      if (root2.dataset.action !== p.act) root2.dataset.action = p.act;
+      for (const [name, value] of Object.entries({
+        hp: p.hp,
+        energy: p.energy,
+        guard: p.guard,
+        gauge: p.gauge
+      }))
         $(`[data-meter="${name}"]`).value = value;
       text("[data-hp]", String(Math.ceil(p.hp)));
       text('[data-do="auto"]', run3.auto ? "F 자동 ON" : "F 수동");
       text(".ga-msg", run3.message);
-      text("[data-busy]", saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty2 ? "진행 중" : "저장됨");
+      text(
+        "[data-busy]",
+        saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty2 ? "진행 중" : "저장됨"
+      );
       root2.dataset.saveError = String(saveError);
       ["Q 회복", "W 방어", "E 능력"].forEach((label, i) => {
         const b = $(`[data-item="${i}"]`);
@@ -2554,9 +2795,9 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       $('[data-do="resume"]').disabled = !ready;
       if (value) void save2(true);
     };
-    const restart = () => {
+    const restart = (practice = false) => {
       if (!ready) return;
-      run3 = newRun2();
+      run3 = practice ? practiceRun() : newRun2();
       dirty2 = true;
       pause(false);
       void save2(true);
@@ -2617,7 +2858,8 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         target = null;
         if (codes[e.code]) keys.add(codes[e.code]);
         if (!e.repeat && once[e.code]) edges[once[e.code]] = true;
-        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code)) edges.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
+        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code))
+          edges.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
       },
       { signal }
     );
@@ -2665,13 +2907,16 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
           root2.focus();
         }
         if (b.dataset.do === "restart") restart();
+        if (b.dataset.do === "practice") restart(true);
       },
       { signal }
     );
     root2.addEventListener(
       "pointerdown",
       (e) => {
-        const b = e.target.closest("[data-hold],[data-edge],[data-item]");
+        const b = e.target.closest(
+          "[data-hold],[data-edge],[data-item]"
+        );
         if (!b || b.disabled || paused || !ready) return;
         e.preventDefault();
         root2.focus();
@@ -2734,14 +2979,24 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         root2.focus();
         manual();
         const b = canvas.getBoundingClientRect();
-        const x = (e.clientX - b.left) / b.width * 1280, y = (e.clientY - b.top) / b.height * 720;
+        const x = Math.max(55, Math.min(1225, (e.clientX - b.left) / b.width * 1280)), y = (e.clientY - b.top) / b.height * 720;
         if (e.button === 2) {
           edges.dash = true;
-          target = { x, y, attack: false };
+          target = {
+            x,
+            y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+            attack: false
+          };
           return;
         }
-        const enemy = run3.enemies.find((a) => a.hp > 0 && Math.abs(a.x - x) < 65 && y > a.y - 180 && y < a.y + 20);
-        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : { x, y: Math.max(400, Math.min(655, y)), attack: false };
+        const enemy = run3.enemies.find(
+          (a) => a.hp > 0 && Math.abs(a.x - x) < 90 && y > a.y - SCENE.adultHeight && y < a.y + 20
+        );
+        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : {
+          x,
+          y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+          attack: false
+        };
       },
       { signal }
     );
@@ -2789,15 +3044,16 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     let hudTime = 0;
     const frame = (now) => {
       if (disposed) return;
-      if (ready && !paused && !document.hidden && run3.phase === "combat") {
-        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0) * (waiting && run3.auto ? 1.25 : 1);
+      if (ready && !paused && !document.hidden) {
+        const wasCombat = run3.phase === "combat";
+        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0);
         let ticks = 0;
         while (acc >= 1 / 60 && ticks++ < 8) {
           step2(run3, input2(), 1 / 60);
           acc -= 1 / 60;
           dirty2 = true;
         }
-        void save2(run3.phase !== "combat");
+        void save2(wasCombat && run3.phase !== "combat");
       } else acc = 0;
       last = now;
       if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run3);
@@ -2817,6 +3073,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         const restored = restore(raw);
         run3 = restored ?? newRun2();
         await renderer.load(art2);
+        root2.dataset.artProfile = art2.atlas.action?.profile ?? "unknown";
         if (disposed) return;
         ready = true;
         if (raw && !restored) {
@@ -3058,8 +3315,8 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
 
   // src/host/actionpack.ts
   var ACTION_FILES = ["a-jyaldi-action", "bg-bureau-action", "e-corner", "e-watchman"];
-  var KEY3 = "goei:game-pack:action";
-  var VERSION = 2;
+  var KEY3 = "goei:game-pack:action-normal-v4";
+  var VERSION = 4;
   var loaded = null;
   async function stored2() {
     try {
@@ -3077,22 +3334,32 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   async function installActionPack(bytes) {
     const pack3 = parsePack(bytes, ACTION_FILES);
     if (!pack3 || pack3.id !== "action" || pack3.version !== VERSION || !pack3.atlas.action)
-      throw new PackError("1인 액션용 그림 팩이 아닙니다. goei-game-action.pack을 넣어 주세요.");
+      throw new PackError(
+        "1인 액션용 그림 팩이 아닙니다. goei-game-action-normal-v4.pack을 넣어 주세요."
+      );
     const files = {};
     for (const [name, b] of pack3.files) {
       let str3 = "";
-      for (let i = 0; i < b.length; i += 32768) str3 += String.fromCharCode(...b.subarray(i, i + 32768));
+      for (let i = 0; i < b.length; i += 32768)
+        str3 += String.fromCharCode(...b.subarray(i, i + 32768));
       files[name] = btoa(str3);
     }
-    await risuai.pluginStorage.setItem(KEY3, JSON.stringify({ version: VERSION, atlas: pack3.atlas, files }));
+    await risuai.pluginStorage.setItem(
+      KEY3,
+      JSON.stringify({ version: VERSION, atlas: pack3.atlas, files })
+    );
     loaded = null;
   }
   async function downloadActionPack() {
-    const url = `${UPDATE_BASE}/goei-game-action.pack`;
+    const url = `${UPDATE_BASE}/goei-game-action-normal-v4.pack`;
     const legacy = risuai.risuFetch;
     if (legacy) {
       try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true });
+        const r = await legacy(url, {
+          method: "GET",
+          plainFetchForce: true,
+          rawResponse: true
+        });
         const b = r.ok ? toBytes3(r.data) : null;
         if (b && parsePack(b, ACTION_FILES)) return b;
       } catch {
@@ -3106,13 +3373,18 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       }
     } catch {
     }
-    throw new PackError("새 액션 그림을 받지 못했어요. goei-game-action.pack을 파일로 넣어 주세요.");
+    throw new PackError(
+      "새 액션 그림을 받지 못했어요. goei-game-action-normal-v4.pack을 파일로 넣어 주세요."
+    );
   }
   function loadActionArt() {
     loaded ??= (async () => {
       const s4 = await stored2();
       if (!s4) throw new PackError("새 액션 그림이 없습니다.");
-      return { atlas: s4.atlas, url: (name) => s4.files[name] ? `data:image/png;base64,${s4.files[name]}` : "" };
+      return {
+        atlas: s4.atlas,
+        url: (name) => s4.files[name] ? `data:image/png;base64,${s4.files[name]}` : ""
+      };
     })();
     loaded.catch(() => {
       loaded = null;
@@ -3776,122 +4048,4 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
     const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
     return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}">${face2(ctx2, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc10(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc10(small)}</small>` : ""}</span></button></li>`;
-  }
-  var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-  var PLAIN = { ㄲ: "ㄱ", ㄸ: "ㄷ", ㅃ: "ㅂ", ㅆ: "ㅅ", ㅉ: "ㅈ" };
-  var KEYS2 = [..."ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ", "A", "#"];
-  function keyOf(title2) {
-    const ch = title2.trim().charAt(0);
-    const c = ch.charCodeAt(0);
-    if (c >= 44032 && c <= 55203) {
-      const j = CHO[Math.floor((c - 44032) / 588)];
-      return PLAIN[j] ?? j;
-    }
-    if (CHO.includes(ch)) return PLAIN[ch] ?? ch;
-    return /[a-z]/i.test(ch) ? "A" : "#";
-  }
-  function sortedDocs(ctx2) {
-    return listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => ({ d, k: KEYS2.indexOf(keyOf(d.title)) })).sort((x, y) => x.k - y.k || x.d.title.localeCompare(y.d.title, "ko")).map((x) => x.d);
-  }
-  function wikiHomeResults(ctx2) {
-    return wiki.homeQuery.trim() ? wikiList(ctx2, wiki.homeQuery) : "";
-  }
-  function wikiList(ctx2, query = wiki.query) {
-    const docs = sortedDocs(ctx2);
-    const saved = new Set(docs.map((d) => d.title));
-    const q = query.trim();
-    const dated = (d, dot = true) => {
-      const e = entryFor(ctx2, d.title);
-      return row4(ctx2, e, d.title, e ? void 0 : d.meta?.created ? when(d.meta.created) : "", dot && !d.base);
-    };
-    if (q) {
-      const lower = q.toLowerCase();
-      const mine = docs.filter((d) => d.title.toLowerCase().includes(lower) || entryFor(ctx2, d.title)?.terms.some((t) => t && t.toLowerCase().includes(lower)));
-      const hits = matches2(ctx2, q).filter((e) => !saved.has(e.title));
-      const exact = canon(ctx2)(q);
-      const known = saved.has(exact) || hits.some((e) => e.title === exact);
-      const docPart = mine.length ? `<h4 class="ph-sec">문서<b>${mine.length}</b></h4><ul class="ph-list">${mine.map((d) => dated(d)).join("")}</ul>` : "";
-      const rosterPart = hits.length ? `<h4 class="ph-sec">명부<b>${hits.length}</b></h4><ul class="ph-list">${hits.map((e) => row4(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "))).join("")}</ul>` : "";
-      const shownTitles = /* @__PURE__ */ new Set([...mine.map((d) => d.title), ...hits.map((e) => e.title)]);
-      const near = known ? [] : similar(q, [...docs.map((d) => d.title), ...entries(ctx2).map((e) => e.title)]).filter((t) => !shownTitles.has(t));
-      const nearPart = near.length ? `<h4 class="ph-sec">비슷한 문서<b>${near.length}</b></h4><ul class="ph-list">${near.map((t) => {
-        const d = docs.find((x) => x.title === t);
-        if (d) return dated(d);
-        const e = entries(ctx2).find((x) => x.title === t);
-        return row4(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "));
-      }).join("")}</ul>` : "";
-      if (!docPart && !rosterPart && !nearPart) {
-        return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc10(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc10(q)}">${ICONS.pen}작성하기</button></div></div>`;
-      }
-      const fresh = known ? "" : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc10(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc10(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
-      const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc10(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : "";
-      return `<div class="nw-groups">${lead}${docPart}${rosterPart}${nearPart}${fresh}</div>`;
-    }
-    if (!docs.length) return `<div class="nw-groups">${blank4("아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.")}</div>`;
-    const count = (t) => docs.filter((d) => inTab(ctx2, d, t)).length;
-    const tabs2 = TABS.filter(([t]) => t === "all" || count(t));
-    const tab2 = tabs2.some(([t]) => t === wiki.tab) ? wiki.tab : "all";
-    const shown2 = docs.filter((d) => inTab(ctx2, d, tab2));
-    const chips3 = `<div class="ph-tabs nw-tabs" role="tablist">${tabs2.map(([t, label]) => `<button class="ph-tab${t === tab2 ? " on" : ""}" data-action="wiki-tab" data-value="${t}" aria-selected="${t === tab2}">${label}<small>${count(t)}</small></button>`).join("")}</div>`;
-    const keys = KEYS2.filter((k) => shown2.some((d) => keyOf(d.title) === k));
-    const groups = keys.map((k) => {
-      const rows = shown2.filter((d) => keyOf(d.title) === k);
-      const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
-      return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab2 !== "story")).join("")}</ul>`;
-    }).join("");
-    const index = keys.length > 1 ? `<div class="nw-kgrid" hidden><div class="nw-kgrid-in" role="group" aria-label="가나다 색인">${KEYS2.map((k) => `<button type="button" data-k="${k}" ${keys.includes(k) ? "" : "disabled"}>${k}</button>`).join("")}</div></div>` : "";
-    return `${chips3}<div class="nw-groups">${groups}</div>${index}`;
-  }
-  function docCat(ctx2, d) {
-    const e = entryFor(ctx2, d.title);
-    if (e) return e.cat === "lm" || e.cat === "org" ? "fac" : e.cat;
-    return /doc_type="person"/.test(d.body.slice(0, 300)) ? "ag" : "etc";
-  }
-  var inTab = (ctx2, d, t) => t === "all" ? true : t === "story" ? !d.base : docCat(ctx2, d) === t;
-  function rail() {
-    const open3 = wiki.listOpen;
-    const label = open3 ? "목록 접기" : "목록 펼치기";
-    return `<nav class="nw-rail" aria-label="위키 메뉴">
-    ${tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "")}
-    ${tool3("wiki-settings", ICONS.settings, "위키 설정", wiki.view === "settings" ? 'aria-pressed="true"' : "")}
-    <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open3}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open3 ? "" : " flip"}">${ICONS.back}</span></button>
-  </nav>`;
-  }
-  function homeView(ctx2) {
-    const docs = listDocs(ctx2.chat, ctx2.char.globalLore);
-    const saved = new Set(docs.map((d) => d.title));
-    const c = canon(ctx2);
-    const card2 = (title2, sub) => {
-      const e = entryFor(ctx2, title2);
-      const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-      const none = !saved.has(title2);
-      return `<button class="nw-card${none ? " none" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}">
-      <span class="nw-card-img${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc10(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
-      <b>${esc10(e?.name ?? title2)}</b>${sub ? `<small>${esc10(sub)}</small>` : ""}</button>`;
-    };
-    const live = [];
-    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
-    const target = st?.target.trim() ?? "";
-    if (worldOn(ctx2.chat)) {
-      const w = readWorld(ctx2.chat);
-      const kind = { an: "괴이", in: "사건", ms: "특수" };
-      const here = activeEvents(w).filter((ev) => ev.name && (ev.name.trim() === target || w.an.some((a) => a.exploring && a.name === ev.name)));
-      for (const ev of here) live.push([c(ev.name), `${kind[ev.kind]} · 탐사 중`]);
-      const deploy = here.map((ev) => ev.people ?? "").join(" ");
-      for (const a of readDirectory(ctx2.char.globalLore).agents) {
-        const s4 = w.agents[a.id]?.st;
-        const sent = deploy && (deploy.includes(a.id) || a.name && deploy.includes(a.name));
-        if (sent || s4 === "작전투입") live.push([c(a.lore || a.name), "인물 · 작전투입"]);
-      }
-    } else if (target) live.push([c(target), "탐사 중"]);
-    if (st?.place && entryFor(ctx2, c(st.place))) live.push([c(st.place), "현재 위치"]);
-    const seen = /* @__PURE__ */ new Set();
-    const liveCards = live.filter(([t]) => seen.has(t) ? false : (seen.add(t), true)).slice(0, 8).map(([t, sub]) => card2(t, sub)).join("");
-    const story = docs.filter((d) => !d.base).sort((a, b) => (b.meta?.created ?? 0) - (a.meta?.created ?? 0));
-    const storyCards = story.slice(0, 8).map((d) => card2(d.title, d.meta?.created ? when(d.meta.created) : "")).join("");
-    const tiles = TABS.filter(([t]) => t !== "all" && t !== "story").map(([t, label]) => {
-      const list4 = docs.filter((d) => inTab(ctx2, d, t));
-      if (!list4.length) return "";
-      const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc10(u)}" alt="" loading="lazy">`).join("");
-      return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === "an" ? CAT_ICON.an : t === "ms" ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list4.length}
+    <span class="ph-who"><span class="ph-who-top"><b>${esc10(e?.name ??

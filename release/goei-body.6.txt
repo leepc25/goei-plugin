@@ -1,0 +1,107 @@
+tCards(out, startCardHtml);
+      if (hasStatusTag(out)) out = renderStatus(out);
+      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
+      if (wantsOpeningHint(text)) out += openingHintHtml();
+    }
+    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
+    return out;
+  }
+  async function readSnapshot(fab) {
+    const none = { charIndex: -1, chatIndex: -1, chatScreen: false };
+    try {
+      const charIndex = await risuai.getCurrentCharacterIndex();
+      if (!Number.isInteger(charIndex) || charIndex < 0) return none;
+      const chatIndex = await risuai.getCurrentChatIndex();
+      const chatScreen = await fab.chatScreenVisible();
+      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
+    } catch {
+      return none;
+    }
+  }
+  async function isLiteCharacter(charIndex) {
+    if (charIndex < 0) return false;
+    try {
+      const char = await risuai.getCharacterFromIndex(charIndex);
+      const lite = !!readManifest(char?.globalLore);
+      if (lite && char) prefetchFactions(char);
+      return lite;
+    } catch {
+      return false;
+    }
+  }
+  async function readTheme(snap) {
+    if (snap.chatIndex < 0) return;
+    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
+    if (!chat) return;
+    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
+  }
+  function startWatcher(fab) {
+    const state = new WatchState();
+    let stopped = false;
+    let timer2;
+    const tick2 = async () => {
+      try {
+        const snap = await readSnapshot(fab);
+        const lite = state.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
+        if (stopped) return;
+        const next = state.update(snap, lite);
+        liteNow = state.lite;
+        if (next.changed) {
+          if (next.fabVisible) {
+            await readTheme(snap).catch(() => {
+            });
+            await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
+            });
+            await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
+            });
+          }
+          await fab.setVisible(next.fabVisible, next.intro);
+        }
+      } catch (error) {
+        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (!stopped) timer2 = setTimeout(() => void tick2(), WATCH_MS);
+      }
+    };
+    void tick2();
+    return () => {
+      stopped = true;
+      clearTimeout(timer2);
+    };
+  }
+  async function start3() {
+    await loadPrefs();
+    setWikiOpener((title2) => void openWiki2(title2));
+    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+    let stopWatcher = null;
+    let fab = null;
+    try {
+      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+      const f = fab;
+      void f.setTheme(currentTheme());
+      onThemeChange((t) => void f.setTheme(t).catch(() => {
+      }));
+      stopWatcher = startWatcher(fab);
+    } catch (error) {
+      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      await risuai.registerButton(
+        { name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` },
+        () => void openApp({ quietIfNotLite: true })
+      );
+    }
+    return {
+      beforeRequest: onBeforeRequest,
+      input: onInput,
+      output: onOutput,
+      display: onDisplay,
+      unload: async () => {
+        stopWatcher?.();
+        await fab?.remove().catch(() => {
+        });
+      }
+    };
+  }
+
+  // src/body-entry.ts
+  globalThis.__goeiBody = { version: "0.16.33", start: start3 };
+})();
