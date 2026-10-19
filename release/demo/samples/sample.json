@@ -1,0 +1,23 @@
+{
+  "source": "game-src/action/normal-v3/sample-source.png",
+  "sourceSha256": "8ec3c333260711b7891cdd00dbeea9b8a50554cf23a5c9f216ee6949c4a147cd",
+  "trim": [
+    375,
+    30,
+    994,
+    1231
+  ],
+  "nativeSize": [
+    66,
+    128
+  ],
+  "displaySize": [
+    132,
+    256
+  ],
+  "uniformScale": 0.10657785179017486,
+  "displayScale": 2,
+  "colors": 53,
+  "bodyGeometryEditedByCompiler": false,
+  "status": "single-pose-candidate-not-game-animation"
+}
