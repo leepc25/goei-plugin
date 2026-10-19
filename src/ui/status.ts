@@ -79,9 +79,17 @@ const VARS: Record<Theme, Record<string, string>> = {
 
 /** 본 화면 style에 넣는 상태창 CSS. theme: 지금 채팅 테마 (테마 따름일 때) */
 export function statusCss(style: StatusStyle, theme: Theme): string {
-  if (style === 'off') return '.gst{display:none!important}';
+  if (style === 'off') return risuClasses('.gst{display:none!important}');
   const v = VARS[style === 'auto' ? theme : style];
-  return `.gst{${Object.entries(v).map(([k, c]) => `--gs-${k}:${c};`).join('')}}${STATUS_CSS}`;
+  return risuClasses(`.gst{${Object.entries(v).map(([k, c]) => `--gs-${k}:${c};`).join('')}}${STATUS_CSS}`);
+}
+
+/**
+ * Risu는 채팅 메시지 속 class 이름마다 「x-risu-」를 붙인다 (parser DOMPurify 훅). 그래서 .gst는 실제로 .x-risu-gst가 된다.
+ * 우리 class(gst…·sat·sun·hol)는 두 이름을 다 잡게 바꾼다. open은 그린 뒤 addClass로 붙여 그대로다
+ */
+function risuClasses(css: string): string {
+  return css.replace(/\.(gst[\w-]*|sat|sun|hol)(?![\w-])/g, ':is(.$1,.x-risu-$1)');
 }
 
 // 말풍선은 시안처럼 위로.

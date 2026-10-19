@@ -1,5 +1,6 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
 import { factionList } from '../core/factions';
+import { setOpeningHint } from '../host/openinghint';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
 import type { FactionCode, LangCode, Manifest } from '../core/types';
 import {
@@ -609,6 +610,8 @@ async function start(): Promise<void> {
     // 직접 입력: 적어 둔 상황을 첫 메시지로 놓고 바로 보낸다
     const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
     if (plan.kind === 'direct' && !situation) throw new StartError('시작할 상황을 적어 주세요.');
+    // 시작 메시지: 자동 전송 없이 첫 장면 아래에 「적고 전송」 안내 (Risu가 첫 장면을 다시 그리기 전에 켠다)
+    setOpeningHint(plan.kind === 'opening' ? (ctx.char.alternateGreetings?.[plan.fmIndex] ?? null) : null);
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (chatPhase(chat) === 'started') throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
       const next = applyStart(chat, plan);

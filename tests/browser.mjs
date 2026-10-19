@@ -155,6 +155,30 @@ async function open(page) {
   assert.match(saved.scriptstate.$ag_report, /- code: P\d+ /, '백일몽 요원 명단');
   assert.ok(JSON.parse(saved.scriptstate.$goei_world).an.length >= 2);
   await page.waitForFunction(() => window.__calls.hide >= 1);
+  // 시작 메시지: 자동 전송 없이 첫 장면 아래에 「적고 전송」 안내 + 재선택 (다른 글에는 안 붙음)
+  assert.equal(await page.evaluate(() => (window.__calls.send ?? []).length), 0, '시작 메시지는 자동 전송 안 함');
+  const fmText = fixture.alternateGreetings[saved.fmIndex];
+  const hinted = await page.evaluate((t) => window.__calls.handlers.display(t), fmText);
+  assert.ok(hinted.includes('data-goei-card="opening"') && hinted.includes('data-goei-repick') && hinted.includes('적고 전송'), '첫 장면 아래 안내');
+  assert.ok(!(await page.evaluate(() => window.__calls.handlers.display('다른 글'))).includes('data-goei-card="opening"'), '다른 글에는 안내 없음');
+  const hintVis = await page.evaluate((h) => {
+    const d = document.querySelector('.default-chat-screen');
+    d.innerHTML = `<div class="risu-chat" id="fm">${h}</div>`;
+    const v1 = getComputedStyle(d.querySelector('[data-goei-card="opening"]')).display !== 'none';
+    d.insertAdjacentHTML('afterbegin', '<div class="chat-message-container"><div class="risu-chat">첫 행동</div></div>');
+    const v2 = getComputedStyle(d.querySelector('[data-goei-card="opening"]')).display !== 'none';
+    d.querySelector('.chat-message-container').remove();
+    return [v1, v2];
+  }, hinted);
+  assert.deepEqual(hintVis, [true, false], '대화가 시작되면 안내 숨김');
+  if (shots) {
+    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '96px 24px 24px'; d.innerHTML = `<div class="risu-chat" style="color:#ddd;max-width:760px;margin:0 auto">…그리고 그 방 한가운데에, 극도로 기괴한 것이 존재했다.${h.slice(h.indexOf('<div data-goei-card="opening"'))}</div>`; }, hinted);
+    await page.screenshot({ path: `${shots}/1-opening-hint.png`, clip: { x: 0, y: 60, width: 1100, height: 220 } });
+  }
+  await page.click('[data-goei-repick]');
+  await page.waitForSelector('.gx-fac.on');
+  await page.click('[data-action="close"]');
+  await page.waitForFunction(() => window.__calls.hide >= 2);
   // 다시 열면 '첫 전송 전' 상태로 기존 선택이 복원된다
   await open(page);
   await page.waitForSelector('.gx-fac.on');
@@ -541,46 +565,48 @@ async function open(page) {
     assert.ok(html.includes('어제 오후 9:10') && html.includes('1일 2시간 30분') && html.includes('2일째'), '지난 장면·흐른 시간·며칠째');
     assert.ok(html.includes('gst-date hol') && html.includes('추석') && html.includes('음력'), '공휴일(일요일 추석)');
     assert.ok(/data-goei-wiki="1">명일 아파트</.test(html), '위키 이름만 밑줄');
+    // Risu는 채팅 메시지 속 class마다 x-risu-를 붙인다 (parser.svelte.ts DOMPurify 훅). 그대로 흉내 낸다
+    const risu = (h) => h.replace(/class="([^"]*)"/g, (_, v) => `class="${v.split(' ').map((c) => (c.startsWith('x-risu-') || c.startsWith('hljs') ? c : `x-risu-${c}`)).join(' ')}"`);
     // 가장 최근 메시지의 상태창만 (Risu는 최신 메시지가 맨 앞). 지우면 남은 것 중 최근 것이 보인다
     const older = await page.evaluate((t) => window.__calls.handlers.display(t), chat.message[1].data);
     const shown = await page.evaluate(([a, b]) => {
       const d = document.querySelector('.default-chat-screen');
       d.innerHTML = `<div class="flex flex-col-reverse"><div class="chat-message-container" id="c3"><div class="risu-chat">출동</div></div><div class="chat-message-container" id="c2"><div class="risu-chat">${a}</div></div><div class="chat-message-container" id="c1"><div class="risu-chat">${b}</div></div></div><div class="risu-chat" id="fm">${b}</div>`;
-      const vis = () => [...d.querySelectorAll('.gst')].map((g) => getComputedStyle(g).display !== 'none');
+      const vis = () => [...d.querySelectorAll('.x-risu-gst')].map((g) => getComputedStyle(g).display !== 'none');
       const before = vis();
       d.querySelector('#c2').remove();
       return [before, vis()];
-    }, [html, older]);
+    }, [risu(html), risu(older)]);
     assert.deepEqual(shown, [[true, false, false], [true, false]], '최근 상태창만: ' + JSON.stringify(shown));
-    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '96px 24px 24px'; d.innerHTML = `<div id="msg" style="color:#ddd;max-width:760px;margin:0 auto">둘째 장면.${h}</div>`; }, html);
+    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '96px 24px 24px'; d.innerHTML = `<div id="msg" style="color:#ddd;max-width:760px;margin:0 auto">둘째 장면.${h}</div>`; }, risu(html));
     if (shots) await page.screenshot({ path: `${shots}/9-status-${name}.png` });
     // 요일 배지를 누르면 말풍선, 바깥을 누르면 닫힘
-    await page.click('#msg .gst-wd');
-    await page.waitForFunction(() => document.querySelector('#msg .gst-wd').classList.contains('open'));
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .gst-wd .gst-tip')).visibility), 'visible');
+    await page.click('#msg .x-risu-gst-wd');
+    await page.waitForFunction(() => document.querySelector('#msg .x-risu-gst-wd').classList.contains('open'));
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .x-risu-gst-wd .x-risu-gst-tip')).visibility), 'visible');
     if (shots) { await new Promise((r) => setTimeout(r, 250)); await page.screenshot({ path: `${shots}/9-status-tip-${name}.png` }); }
-    await page.click('#msg .gst-clock');
-    await page.waitForFunction(() => document.querySelector('#msg .gst-clock').classList.contains('open') && !document.querySelector('#msg .gst-wd').classList.contains('open'));
+    await page.click('#msg .x-risu-gst-clock');
+    await page.waitForFunction(() => document.querySelector('#msg .x-risu-gst-clock').classList.contains('open') && !document.querySelector('#msg .x-risu-gst-wd').classList.contains('open'));
     if (shots) { await new Promise((r) => setTimeout(r, 250)); await page.screenshot({ path: `${shots}/9-status-clock-${name}.png` }); }
     await page.mouse.click(5, vp.height - 5);
-    await page.waitForFunction(() => !document.querySelector('#msg .gst-clock').classList.contains('open'));
+    await page.waitForFunction(() => !document.querySelector('#msg .x-risu-gst-clock').classList.contains('open'));
     // 한 줄 머리: 시각·날짜·날씨가 줄바꿈 없이
-    const topH = await page.evaluate(() => document.querySelector('#msg .gst-top').getBoundingClientRect().height);
+    const topH = await page.evaluate(() => document.querySelector('#msg .x-risu-gst-top').getBoundingClientRect().height);
     assert.ok(topH < 42, `머리 한 줄 (${topH})`);
     if (name === 'pc') {
       // 위키 이름을 누르면 창이 그 위키 문서로
-      await page.click('#msg .gst-link');
+      await page.click('#msg .x-risu-gst-link');
       await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 6000 });
       // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
       await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
       await page.click('[data-action="set-status"][data-value="paper"]');
       await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').status === 'paper');
-      assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .gst')).backgroundColor), 'rgb(250, 245, 233)');
+      assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).backgroundColor), 'rgb(250, 245, 233)');
       if (shots) await page.screenshot({ path: `${shots}/9-status-settings.png` });
       await page.click('[data-action="set-status"][data-value="off"]');
-      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .gst')).display === 'none');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).display === 'none');
       await page.click('[data-action="set-status"][data-value="auto"]');
-      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .gst')).backgroundColor === 'rgb(35, 45, 50)');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).backgroundColor === 'rgb(35, 45, 50)');
     }
     assert.deepEqual(errors, []);
     await page.close();

@@ -1,5 +1,6 @@
 import { clearUnsent, unsentShown } from './host/unsent';
 import { refreshStatusContext, renderStatus, setWikiOpener } from './host/statusview';
+import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
 import { readPersona, USER_MARK } from './host/user';
@@ -46,6 +47,7 @@ let liteNow = false;
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
   setWaiting(true);
+  setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
   // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
   messages = unwrapCalls(unwrapScenes(messages).messages).messages;
   const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
@@ -237,6 +239,15 @@ function unsentMarkHtml(): string {
   return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
 }
 
+/** 시작 메시지로 시작한 첫 장면 아래: 첫 행동을 적어 보내라는 안내와 재선택 (host/openinghint.ts) */
+function openingHintHtml(): string {
+  const p = cardPalette();
+  openingShown();
+  return `<div data-goei-card="opening" style="${cardStyle()}display:flex;flex-wrap:wrap;margin-top:14px">`
+    + `<span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span>`
+    + `<button type="button" data-goei-repick="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">재선택</button></div>`;
+}
+
 /** 채팅 화면의 전화 기록 카드 (원본 ph-call-card: 상대만 보이고 요청 본문은 숨김) */
 function callCardHtml(target: string): string {
   const p = cardPalette();
@@ -280,6 +291,7 @@ function onDisplay(text: string): string {
     // 상태창은 카드 정규식 대신 플러그인이 그린다 (칸이 어긋나도 깨지지 않게, 설정의 배색으로)
     if (hasStatusTag(out)) out = renderStatus(out);
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
+    if (wantsOpeningHint(text)) out += openingHintHtml();
   }
   // 유저 사진 주소를 Risu가 채워 주는 숨은 칸 (host/user.ts). 이 봇 메시지에만
   if (ours && !out.includes('data-goei-user')) out += USER_MARK;
@@ -335,6 +347,7 @@ function startWatcher(fab: Fab): () => void {
         if (next.fabVisible) {
           await readTheme(snap).catch(() => {});
           await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
+          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
         }
         // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
         await fab.setVisible(next.fabVisible, next.intro);
@@ -363,6 +376,7 @@ export interface BodyHandlers {
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
   setWikiOpener((title) => void openWiki(title));
+  setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
   try {
