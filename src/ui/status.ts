@@ -84,6 +84,7 @@ export function statusCss(style: StatusStyle, theme: Theme): string {
   return `.gst{${Object.entries(v).map(([k, c]) => `--gs-${k}:${c};`).join('')}}${STATUS_CSS}`;
 }
 
+// 말풍선은 시안처럼 위로.
 // 상태창은 가장 최근 메시지 하나에만. Risu는 최신 메시지를 맨 앞에 두므로(.chat-message-container, 뒤집힌 열)
 // 상태창이 있는 메시지 뒤쪽의 상태창은 숨긴다. 메시지를 지우면 남은 것 중 가장 최근 것이 다시 보인다
 const STATUS_CSS = `
@@ -107,8 +108,8 @@ const STATUS_CSS = `
 .gst-tgt{font-weight:600;color:var(--gs-tgt)}
 .gst-link{cursor:pointer;text-decoration:underline dotted;text-decoration-color:color-mix(in srgb,currentColor 50%,transparent);text-underline-offset:3px}
 [data-gst-tip]{cursor:pointer}
-.gst-tip{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:6px 10px;border-radius:9px;background:var(--gs-text);color:var(--gs-panel);font-size:12px;font-weight:600;line-height:1.4;letter-spacing:0;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}
-.gst-tip::before{content:'';position:absolute;left:50%;bottom:100%;margin-left:-5px;border:5px solid transparent;border-bottom-color:var(--gs-text)}
+.gst-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:5;padding:6px 10px;border-radius:9px;background:var(--gs-text);color:var(--gs-panel);font-size:12px;font-weight:600;line-height:1.4;letter-spacing:0;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s}
+.gst-tip::before{content:'';position:absolute;left:50%;top:100%;margin-left:-5px;border:5px solid transparent;border-top-color:var(--gs-text)}
 .gst-clock .gst-tip{left:0;transform:none}.gst-clock .gst-tip::before{left:20px}
 .gst-kv{display:grid;grid-template-columns:auto auto;gap:2px 10px;align-items:baseline;text-align:left}
 .gst-kv i{font-style:normal;font-size:11px;opacity:.7}.gst-kv em{font-style:normal;font-weight:700}

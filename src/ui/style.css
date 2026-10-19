@@ -147,8 +147,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (min-width: 761px) {
   .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
   .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 9px; }
-  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; padding-top: 0; }
-  .gx-panel.has-nav .gx-content > .gx-body > :first-child:is(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
   .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
 }
 /* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */

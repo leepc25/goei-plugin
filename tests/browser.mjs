@@ -551,7 +551,7 @@ async function open(page) {
       return [before, vis()];
     }, [html, older]);
     assert.deepEqual(shown, [[true, false, false], [true, false]], '최근 상태창만: ' + JSON.stringify(shown));
-    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '24px'; d.innerHTML = `<div id="msg" style="color:#ddd;max-width:760px;margin:0 auto">둘째 장면.${h}</div>`; }, html);
+    await page.evaluate((h) => { const d = document.querySelector('.default-chat-screen'); d.style.background = '#2b2b33'; d.style.padding = '96px 24px 24px'; d.innerHTML = `<div id="msg" style="color:#ddd;max-width:760px;margin:0 auto">둘째 장면.${h}</div>`; }, html);
     if (shots) await page.screenshot({ path: `${shots}/9-status-${name}.png` });
     // 요일 배지를 누르면 말풍선, 바깥을 누르면 닫힘
     await page.click('#msg .gst-wd');
