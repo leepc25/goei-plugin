@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "status": "working-master",
+  "source": "game-src/action/jyaldi-master.png",
+  "runtime": "game-pack/action/jyaldi-master.png",
+  "sourceSha256": "90cab2f9f9363c081b88a21ff4f05c3aed247b7f6dc173c067795a05000e5b40",
+  "runtimeSha256": "01870b7b6958d5e357ea827816d8313f3fedc1cd564f2f9970481c51bcd1d278",
+  "runtimeSize": [
+    55,
+    160
+  ],
+  "geometryPolicy": "uniform-scale-only; no per-frame height normalization",
+  "standingGuides": {
+    "crown": 0,
+    "chin": 22,
+    "shoulder": 29,
+    "waist": 52,
+    "pelvis": 73,
+    "crotch": 79,
+    "knee": 116,
+    "ankle": 151,
+    "sole": 160
+  },
+  "standingMeasures": {
+    "headHeight": 22,
+    "shoulderWidth": 32,
+    "shoulderToCrotch": 50,
+    "crotchToKnee": 37,
+    "kneeToAnkle": 35
+  },
+  "measureTolerancePx": {
+    "headHeight": 1,
+    "shoulderWidth": 2,
+    "shoulderToCrotch": 2,
+    "crotchToKnee": 2,
+    "kneeToAnkle": 2
+  },
+  "reviewPolicy": {
+    "batchGeneration": false,
+    "nextClip": "walk",
+    "nextStageRequires": "walk proportion + contact + loop visual review",
+    "automaticApproval": false,
+    "allGeneratedSheetsAccepted": false
+  },
+  "annotationNote": "정자세 기준 이미지를 위한 수동 검수 가이드. 웅크림/회전 포즈의 y좌표나 바운딩 박스 높이를 이 값에 강제로 맞추지 않는다. 동작은 신체 길이와 머리 크기를 자세/투영을 고려해 사람이 검수한다."
+}
