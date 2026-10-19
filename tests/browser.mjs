@@ -1160,7 +1160,18 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.nw-pane .nw-title');
   await swipeRight('.nw-main');
   await page.waitForSelector('.nw-home');
+  // 상황판 카드의 위키 단추로 문서를 연 뒤 뒤로 쓸면 상황판으로 (위키 메인이 아니라)
+  await page.click('.gx-mbar .gx-nb[data-value="board"]');
+  await page.waitForSelector('.gx-board');
+  await page.click('.gx-board [data-action="wiki-goto"]');
+  await page.waitForSelector('.nw-pane .nw-title, .nw-compose');
+  await swipeRight('.nw-main');
+  await page.waitForSelector('.gx-board');
+  await page.click('.gx-mbar .gx-nb[data-value="wiki"]');
+  await page.waitForSelector('.nw-main');
   await page.setViewportSize({ width: 1100, height: 900 });
+  await page.click('.nw-rail [data-action="wiki-home"]');
+  await page.waitForSelector('.nw-home');
   await page.click('.nw-card[data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
   await page.click('.nw-pane [data-action="wiki-delete"][data-value="소라 랜드"]');
