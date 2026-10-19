@@ -72,8 +72,13 @@ check('추가 인사말 = 원본 분기 렌더 결과', not bad, bad[:5])
 check('분기 수', len(man['greetings']) == 66, len(man['greetings']))
 names_s = set(zs.namelist()) - {'card.json', 'module.risum', 'charx.json'}
 names_l = set(zl.namelist()) - {'card.json', 'module.risum'}
-check('에셋 파일 전부 유지', names_s == names_l, len(names_l))
-check('에셋 목록 유지', cs.get('assets') == cl.get('assets'))
+# 원본 에셋은 옛 세력 기본 그림(f01~f05)만 빼고 그대로, 위키 이미지(wikiNNN)가 더해진다
+dropped = {a['uri'].replace('embeded://', '') for a in cs.get('assets', []) if a['name'] in ('f01', 'f02', 'f03', 'f04', 'f05')}
+dropped |= {f"x_meta/{Path(u).stem}.json" for u in dropped}
+wiki_files = {n for n in names_l if re.match(r'(assets/other/image|x_meta)/wiki\d{3}\.(avif|json)$', n)}
+check('에셋 파일: 원본 유지(f01~f05 제외) + 위키 이미지', names_s - dropped == names_l - wiki_files and len(wiki_files) >= 2 * 80, len(wiki_files) // 2)
+kept = [a for a in cs.get('assets', []) if a['name'] not in ('f01', 'f02', 'f03', 'f04', 'f05')]
+check('에셋 목록: 원본 유지 + 위키 이미지', cl.get('assets', [])[:len(kept)] == kept and all(a['uri'].startswith('embeded://assets/other/image/wiki') for a in cl['assets'][len(kept):]))
 check('설명·로어북 외 필드 유지', cs['description'] == cl['description'])
 for name, ok, detail in checks:
     print(('PASS' if ok else 'FAIL'), name, detail if detail != '' else '')

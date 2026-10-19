@@ -2,7 +2,7 @@
  "schema": 2,
  "encoding": {
   "format": "AVIF",
-  "quality": 60,
+  "quality": 45,
   "subsampling": "4:2:0",
   "from": "codex/wiki-images-avif (AVIF q90) 재변환"
  },
@@ -14,8 +14,8 @@
    "path": "assets/wiki/Anomalies/Sora Land.avif",
    "use": "괴이",
    "asset": "Sora Land",
-   "bytes": 77641,
-   "sha256": "63a53e37fa096d6725069cc61b30d84447460352deef2eb9249a18b3e9f32faf",
+   "bytes": 43390,
+   "sha256": "c3d7bfdd4858af19a9adb8ca196966e00a8ae1ceac84f74b7df97cd18f4fc4be",
    "from": "assets/wiki/Anomalies/Sora Land.avif"
   },
   {
@@ -25,8 +25,8 @@
    "path": "assets/wiki/Anomalies/exhibition of humanity's mysteries.avif",
    "use": "괴이",
    "asset": "exhibition of humanity's mysteries",
-   "bytes": 44956,
-   "sha256": "9fefece04b83ebbb5a66d127a5b20915542499026937c8df6b3907243b7d67e6",
+   "bytes": 26641,
+   "sha256": "25d6eba382f39805ee0235e12ed50a0893211d44cdc9fb3aee4b54077cdb4ed5",
    "from": "assets/wiki/Anomalies/exhibition of humanity's mysteries.avif"
   },
   {
@@ -36,8 +36,8 @@
    "path": "assets/wiki/Anomalies/Myeongil Apartment.avif",
    "use": "괴이",
    "asset": "Myeongil Apartment",
-   "bytes": 57823,
-   "sha256": "5ad3b1f375a93c6b5b918b2ed854c0d3c5ef5cc3442ef6e24a52380e9d844a97",
+   "bytes": 32422,
+   "sha256": "5028a3e04338458f9a23afad833a0e1580c33e56ad5183a1036cfd95048a0b96",
    "from": "assets/wiki/Anomalies/Myeongil Apartment.avif"
   },
   {
@@ -47,8 +47,8 @@
    "path": "assets/wiki/Anomalies/Forbidden Video.avif",
    "use": "괴이",
    "asset": "Forbidden Video",
-   "bytes": 37723,
-   "sha256": "321d8f0a6e353726fbcabb4a0b84df421b9ea2d3ddb788239afbc83ef412b6ff",
+   "bytes": 20534,
+   "sha256": "8e29676608b2ee3bcb90d19b6b0b5fe071a834bc0c0107383833a9efee8334de",
    "from": "assets/wiki/Anomalies/Forbidden Video.avif"
   },
   {
@@ -58,8 +58,8 @@
    "path": "assets/wiki/Anomalies/The Church.avif",
    "use": "괴이",
    "asset": "The Church",
-   "bytes": 63002,
-   "sha256": "4674c9cc2cdc83b2a328a5ccd45dda5ebfa9073f0e2da0c99c1f7609cba57a00",
+   "bytes": 35415,
+   "sha256": "02aa6a700b73c5548b8c33b5284ed5e85ce0397daa9b32d1b2517897cd91b8c4",
    "from": "assets/wiki/Anomalies/The Church.avif"
   },
   {
@@ -69,8 +69,8 @@
    "path": "assets/wiki/Anomalies/Gangseo University Hospital.avif",
    "use": "괴이",
    "asset": "Gangseo University Hospital",
-   "bytes": 67297,
-   "sha256": "5019adb83cbf0510ef541cbdc0ed4452ac45da3980706a608bea0130f09f27cb",
+   "bytes": 38520,
+   "sha256": "dd279e05465b54dc680b7ff91a66a280c26f977d1eb62d041035d21e726d9352",
    "from": "assets/wiki/Anomalies/Gangseo University Hospital.avif"
   },
   {
@@ -80,8 +80,8 @@
    "path": "assets/wiki/Anomalies/Gangbuk Special Hospital.avif",
    "use": "괴이",
    "asset": "Gangbuk Special Hospital",
-   "bytes": 30427,
-   "sha256": "29bffea31db7a3bd15044bff78ef80fc9ba5ff5cf182f931077ee59649abb7b7",
+   "bytes": 18639,
+   "sha256": "44e09d58a07439d935b8bac36165925d3bd43a5767cd19e807ec24ca553fbf99",
    "from": "assets/wiki/Anomalies/Gangbuk Special Hospital.avif"
   },
   {
@@ -91,8 +91,8 @@
    "path": "assets/wiki/Anomalies/The Riverside.avif",
    "use": "괴이",
    "asset": "The Riverside",
-   "bytes": 58289,
-   "sha256": "9f1d0d5b00eca7a71c5dbfa3e6d5f62af920ed60141a2d3654f675ab1f06538b",
+   "bytes": 33322,
+   "sha256": "ea98aa835f86460dbb15592dddd2d572816f29b8524cd28d920ed028ce181d92",
    "from": "assets/wiki/Anomalies/The Riverside.avif"
   },
   {
@@ -102,8 +102,8 @@
    "path": "assets/wiki/Anomalies/The Basement.avif",
    "use": "괴이",
    "asset": "The Basement",
-   "bytes": 66601,
-   "sha256": "319803395e68c0fc57a208e2b57af2a1c326cf954b1722b9436c421bf00d231f",
+   "bytes": 36240,
+   "sha256": "6f9ef05a4e2dbc2ab108fea8f23beff3d0aa0fbb52a0cf2aee9a88b3c4d26cb2",
    "from": "assets/wiki/Anomalies/The Basement.avif"
   },
   {
@@ -113,8 +113,8 @@
    "path": "assets/wiki/Anomalies/Art Museum.avif",
    "use": "괴이",
    "asset": "Art Museum",
-   "bytes": 65426,
-   "sha256": "9f9328b263adf26a5e05d2804d3cf06858861018c03040d915a92ddde46dee69",
+   "bytes": 37536,
+   "sha256": "2628e4b41bf40ef1765d9acb1d267f7c9555605a8988858767829ecbc46a76f6",
    "from": "assets/wiki/Anomalies/Art Museum.avif"
   },
   {
@@ -124,8 +124,8 @@
    "path": "assets/wiki/Anomalies/Dreamsception.avif",
    "use": "괴이",
    "asset": "Dreamsception",
-   "bytes": 71565,
-   "sha256": "978adc06196e56942cdaacf2714e13077b269d51fd4b36c88958ba358d7011fa",
+   "bytes": 39374,
+   "sha256": "2ac9f1095fefefb4b56cbd1651217389b14450b9ae1df536dc9033d8c0089ef8",
    "from": "assets/wiki/Anomalies/Dreamsception.avif"
   },
   {
@@ -135,8 +135,8 @@
    "path": "assets/wiki/Anomalies/Hotel Inspiration.avif",
    "use": "괴이",
    "asset": "Hotel Inspiration",
-   "bytes": 81352,
-   "sha256": "6c470a9605e38e4dbb26666a59eaa98fd2e6119b18e207b6e613369dba0f0999",
+   "bytes": 44662,
+   "sha256": "44246798c56a09dcd8fe4973a9bcc48a2081a23ee3f172cf0acc5ef78edc3991",
    "from": "assets/wiki/Anomalies/Hotel Inspiration.avif"
   },
   {
@@ -146,8 +146,8 @@
    "path": "assets/wiki/Anomalies/Red Lady's Musical Theater.avif",
    "use": "괴이",
    "asset": "Red Lady's Musical Theater",
-   "bytes": 42856,
-   "sha256": "d98be5e1347ca1adf554841f6fe5a97005c7512db7286ea4bd0dfdd208eb0b09",
+   "bytes": 25146,
+   "sha256": "2bda1937b100a8c2bd7a0a2024df69f45bc9fc5e193425ee8d88a7496b76ad57",
    "from": "assets/wiki/Anomalies/Red Lady's Musical Theater.avif"
   },
   {
@@ -157,8 +157,8 @@
    "path": "assets/wiki/Anomalies/Midsummer Night's Dream.avif",
    "use": "괴이",
    "asset": "Midsummer Night's Dream",
-   "bytes": 76447,
-   "sha256": "697b035f7696f464f3a6982546afbc3ced01cf4c0fa5e57b581c2b027fcb1c66",
+   "bytes": 44399,
+   "sha256": "84cc4669e4d5bade469a149a25743438a6617860510b6bcf97ea3e1730266b88",
    "from": "assets/wiki/Anomalies/Midsummer Night's Dream.avif"
   },
   {
@@ -168,8 +168,8 @@
    "path": "assets/wiki/Anomalies/Dream and Hope Theater.avif",
    "use": "괴이",
    "asset": "Dream and Hope Theater",
-   "bytes": 72929,
-   "sha256": "754c7f9045038acf5fa7cea05164bdc0b063d4fc83e4de5126e490f649253683",
+   "bytes": 41055,
+   "sha256": "8f20bf1e5e7d0b6e6fd72ab3f55e07883bf938e06aa178dd1948b1b9140885a5",
    "from": "assets/wiki/Anomalies/Dream and Hope Theater.avif"
   },
   {
@@ -179,8 +179,8 @@
    "path": "assets/wiki/Anomalies/Desire Room.avif",
    "use": "괴이",
    "asset": "Desire Room",
-   "bytes": 29066,
-   "sha256": "f97d212415a4e99a9f8406b2162278202486575293db8b8922f0c065c6cf4390",
+   "bytes": 17187,
+   "sha256": "ab0356622216b5fc76daa0118bf726e605dc188130e141f74ecfe51dd2da0709",
    "from": "assets/wiki/Anomalies/Desire Room.avif"
   },
   {
@@ -190,8 +190,8 @@
    "path": "assets/wiki/Anomalies/Bio-Assembly Factory.avif",
    "use": "괴이",
    "asset": "Bio-Assembly Factory",
-   "bytes": 74082,
-   "sha256": "6494a21410e8a9ddc69a3bed1302005f6af52209791f2563e46f02141e572ce6",
+   "bytes": 42441,
+   "sha256": "c866197793723b43d2f67f618dbec0d61013c790916fbddc3450756cf5b5e363",
    "from": "assets/wiki/Anomalies/Bio-Assembly Factory.avif"
   },
   {
@@ -201,8 +201,8 @@
    "path": "assets/wiki/Anomalies/Living Orphanage.avif",
    "use": "괴이",
    "asset": "Living Orphanage",
-   "bytes": 45433,
-   "sha256": "692405dbcbe220126e17b2e4d749ad97800a7e4787469681eb7d13f31dc94650",
+   "bytes": 26399,
+   "sha256": "53dea25b79e3fac444794012a737fa10833fdee7522b86dcfce11ccaa6eaed4a",
    "from": "assets/wiki/Anomalies/Living Orphanage.avif"
   },
   {
@@ -212,8 +212,8 @@
    "path": "assets/wiki/Anomalies/Jogyesa.avif",
    "use": "괴이",
    "asset": "Jogyesa",
-   "bytes": 81847,
-   "sha256": "1945fff395cca407669e1650f2eedb8f6e402252c23d7efa6d5893a10ec9910e",
+   "bytes": 44581,
+   "sha256": "ab998d099e6d39326dfed1ea3ccad0c3ecf1dc544fc5c4c48353878ca4cbf81d",
    "from": "assets/wiki/Anomalies/Jogyesa.avif"
   },
   {
@@ -223,8 +223,8 @@
    "path": "assets/wiki/Anomalies/Cheongak Mary Hospital.avif",
    "use": "괴이",
    "asset": "Cheongak Mary Hospital",
-   "bytes": 55018,
-   "sha256": "b939f178fdd3636209a2f2f3cdb0be8f68c3315e0f79578d935da3aa70d133b2",
+   "bytes": 31620,
+   "sha256": "a876a63f293b4763437715b43f60a95b7f548aa48990cf3e8f433e67d2e3d896",
    "from": "assets/wiki/Anomalies/Cheongak Mary Hospital.avif"
   },
   {
@@ -234,8 +234,8 @@
    "path": "assets/wiki/Anomalies/Hanseol Human Meat Factory.avif",
    "use": "괴이",
    "asset": "Hanseol Human Meat Factory",
-   "bytes": 70577,
-   "sha256": "21a68cc7744ba398ec25ac42481bb88edd3f0df86a7e693490c997b31cab06d0",
+   "bytes": 40028,
+   "sha256": "16703c62abe7bf796ff9760521f0bd51c2be143665a357ae202de4b78cc02a8d",
    "from": "assets/wiki/Anomalies/Hanseol Human Meat Factory.avif"
   },
   {
@@ -245,8 +245,8 @@
    "path": "assets/wiki/Anomalies/School of Nightmare.avif",
    "use": "괴이",
    "asset": "School of Nightmare",
-   "bytes": 44465,
-   "sha256": "6c1ba3c68b9ca330f2ef9946035d8f6997e1318d405e4703df2fc8d5c2ec539a",
+   "bytes": 25260,
+   "sha256": "cbb2bbd7faa7d06056caab64ead7e55cf86d0a0cd8b06a886c9078e5f270ff39",
    "from": "assets/wiki/Anomalies/School of Nightmare.avif"
   },
   {
@@ -256,8 +256,8 @@
    "path": "assets/wiki/Anomalies/Corrupted cathedral.avif",
    "use": "괴이",
    "asset": "Corrupted cathedral",
-   "bytes": 91725,
-   "sha256": "d44dd5cb5f919a921e106b76eaf64d43c44ea16aad7b71aeb55eb4e881755a37",
+   "bytes": 52603,
+   "sha256": "0d827cf391341766b1ed76726eabab2246ecaf6236fed87e5a185f7b34c3d22a",
    "from": "assets/wiki/Anomalies/Corrupted cathedral.avif"
   },
   {
@@ -267,8 +267,8 @@
    "path": "assets/wiki/Anomalies/Strange Escape Room Café.avif",
    "use": "괴이",
    "asset": "Strange Escape Room Café",
-   "bytes": 38220,
-   "sha256": "f2c0448ebdb0a0df2a0000abaf99082c7399acc2e1d7eb111cef3ad59a5b1b41",
+   "bytes": 22449,
+   "sha256": "90fc9307ab074642b40400c3ff8ea37f6fd4c7b2dfec21dc9739acdf5f05b996",
    "from": "assets/wiki/Anomalies/Strange Escape Room Café.avif"
   },
   {
@@ -278,8 +278,8 @@
    "path": "assets/wiki/Anomalies/Monkey Dream.avif",
    "use": "괴이",
    "asset": "Monkey Dream",
-   "bytes": 51486,
-   "sha256": "49079d6ceeb6622f60802ceeb5eeaf0419ffca2dd566a35bd0dd22c9e8722567",
+   "bytes": 28907,
+   "sha256": "2818fee2a3daa9794c9e3861c4956da708eb8220fef23643c2b4a31f3c858e1e",
    "from": "assets/wiki/Anomalies/Monkey Dream.avif"
   },
   {
@@ -289,8 +289,8 @@
    "path": "assets/wiki/Anomalies/Saint's City.avif",
    "use": "괴이",
    "asset": "Saint's City",
-   "bytes": 87560,
-   "sha256": "14e7de93bb650d07301f72a9873a7dd15e1164e49699e4023d92cbc92e313b95",
+   "bytes": 50168,
+   "sha256": "31499d64f759b45c4803c72eeab0c2e443081a12c439b9c4b8b225e2fc9ad842",
    "from": "assets/wiki/Anomalies/Saint's City.avif"
   },
   {
@@ -300,8 +300,8 @@
    "path": "assets/wiki/Anomalies/Bureau with the Lights Out.avif",
    "use": "괴이",
    "asset": "Bureau with the Lights Out",
-   "bytes": 41478,
-   "sha256": "88eaa6ea25c55849421b6570f61243aa93f353ea6a51f6cef383f89b1f637c94",
+   "bytes": 23160,
+   "sha256": "7728464db87628daecc2765007e0f33e5c7e1574dbb5d2f7327877d311b3d6c1",
    "from": "assets/wiki/Anomalies/Bureau with the Lights Out.avif"
   },
   {
@@ -311,8 +311,8 @@
    "path": "assets/wiki/Anomalies/Samangdan.avif",
    "use": "괴이",
    "asset": "Samangdan",
-   "bytes": 92065,
-   "sha256": "f7a64dbab7e3b3733085f3b361ac0449c512f27334d89b9709e5a7cc01607ea0",
+   "bytes": 51554,
+   "sha256": "ec755a97e0195f0cd59fe7e67636a8349d3364e58b9dfb2d443059fec12ea313",
    "from": "assets/wiki/Anomalies/Samangdan.avif"
   },
   {
@@ -322,8 +322,8 @@
    "path": "assets/wiki/Anomalies/Yukoae Theme Park.avif",
    "use": "괴이",
    "asset": "Yukoae Theme Park",
-   "bytes": 91735,
-   "sha256": "23cd4150734d3724c0ae57de0c46e693228adaf59b4d735f4c69e477426534c4",
+   "bytes": 52642,
+   "sha256": "76ed68ee6735537cac96d524b7d5ed55a6c4702617c205ae570d6b4749c3d766",
    "from": "assets/wiki/Anomalies/Yukoae Theme Park.avif"
   },
   {
@@ -333,8 +333,8 @@
    "path": "assets/wiki/Anomalies/Flower Golden Resort.avif",
    "use": "괴이",
    "asset": "Flower Golden Resort",
-   "bytes": 93604,
-   "sha256": "ee55dbc3d5ff9bedcbbc5bac68cb11ff07ae30505beed0181e75f23fe61bd998",
+   "bytes": 53033,
+   "sha256": "c27ce9c4d42aafb5d68254584c1cf6c0dd61bc84ffef1b96a0e8b31bd03bac97",
    "from": "assets/wiki/Anomalies/Flower Golden Resort.avif"
   },
   {
@@ -344,8 +344,8 @@
    "path": "assets/wiki/Anomalies/Mansion of the Blind.avif",
    "use": "괴이",
    "asset": "Mansion of the Blind",
-   "bytes": 56360,
-   "sha256": "c8f3f4c71a29169e552ac5bea132d5152d436c2c3ed51a8ad61f962477227c2d",
+   "bytes": 32131,
+   "sha256": "509c4e90278d7968784871faf7ef4bcf0229d742c354abb1c898b746fc0e7830",
    "from": "assets/wiki/Anomalies/Mansion of the Blind.avif"
   },
   {
@@ -355,8 +355,8 @@
    "path": "assets/wiki/Anomalies/Hungry Hangman.avif",
    "use": "괴이",
    "asset": "Hungry Hangman",
-   "bytes": 49654,
-   "sha256": "fcf5ea7953ad3f0aa452c96b1fca2cae723054d46ef889ddbc242d350edb8730",
+   "bytes": 30171,
+   "sha256": "7b8b0fb8110c919ce7a9c061130ea56702208e80805b1c5e0facdbba8b5da2dd",
    "from": "assets/wiki/Anomalies/Hungry Hangman.avif"
   },
   {
@@ -366,8 +366,8 @@
    "path": "assets/wiki/Anomalies/In the Black Shadow.avif",
    "use": "괴이",
    "asset": "In the Black Shadow",
-   "bytes": 38172,
-   "sha256": "58d49b486b6aca8e34307e71b21335cd0ec09642687f69d26dffea231a714cac",
+   "bytes": 22892,
+   "sha256": "a713e0935bb8889bc74ff607302d7ff7528362f644da5c37e38a00570f4f2cdd",
    "from": "assets/wiki/Anomalies/In the Black Shadow.avif"
   },
   {
@@ -377,8 +377,8 @@
    "path": "assets/wiki/Anomalies/Lookymart.avif",
    "use": "괴이",
    "asset": "Lookymart",
-   "bytes": 68406,
-   "sha256": "9afc7c27c52be98a3da679e0f041257adbf59b35cc6a148dcb9ef05153d72919",
+   "bytes": 39236,
+   "sha256": "0ad3e6e72bd5216a4fa04b429666a4752e7874050be62e622a46decbfda8b084",
    "from": "assets/wiki/Anomalies/Lookymart.avif"
   },
   {
@@ -388,8 +388,8 @@
    "path": "assets/wiki/Anomalies/Twinkle Dragon Palace.avif",
    "use": "괴이",
    "asset": "Twinkle Dragon Palace",
-   "bytes": 130459,
-   "sha256": "2617cbe6f6cb727fd078cb4bafb732b89b37cddb8c026202364e98514a3d67ad",
+   "bytes": 75279,
+   "sha256": "0164cc14060504177d18b5a6a47bc49422835272a7aadfa9f1677e83ea7a7e03",
    "from": "assets/wiki/Anomalies/Twinkle Dragon Palace.avif"
   },
   {
@@ -399,8 +399,8 @@
    "path": "assets/wiki/Anomalies/Saint Anticus Boarding School.avif",
    "use": "괴이",
    "asset": "Saint Anticus Boarding School",
-   "bytes": 54870,
-   "sha256": "25f2dee4db1f50f22474dd576fb9feb4f5a006fb3f90dd06ee58fa607060704a",
+   "bytes": 32724,
+   "sha256": "ff1605a97af22fcede60933b0fc1e7541e469e1d12628f09af12597d626993be",
    "from": "assets/wiki/Anomalies/Saint Anticus Boarding School.avif"
   },
   {
@@ -410,8 +410,8 @@
    "path": "assets/wiki/Anomalies/Jisan Village Festival.avif",
    "use": "괴이",
    "asset": "Jisan Village Festival",
-   "bytes": 80640,
-   "sha256": "1bbb1e289c081a6554d28a078ee46c049734adbaeec0146faf139750aebff433",
+   "bytes": 45627,
+   "sha256": "50b16569d752d67edef73f109755b027740d69b287770b22dc6348a47443b509",
    "from": "assets/wiki/Anomalies/Jisan Village Festival.avif"
   },
   {
@@ -421,8 +421,8 @@
    "path": "assets/wiki/Anomalies/Tuesday Quiz Show.avif",
    "use": "괴이",
    "asset": "Tuesday Quiz Show",
-   "bytes": 60807,
-   "sha256": "76da37b1da181ede1a14f3a17a2d76612d00766c880631f83f947d1b04dd0bf2",
+   "bytes": 36228,
+   "sha256": "ecacc7aa29b27c65985c9d22b044a0919a0d221ec9bd8496da634eededebc3e2",
    "from": "assets/wiki/Anomalies/Tuesday Quiz Show.avif"
   },
   {
@@ -432,8 +432,8 @@
    "path": "assets/wiki/Anomalies/Abyss Transit Authority.avif",
    "use": "괴이",
    "asset": "Abyss Transit Authority",
-   "bytes": 54771,
-   "sha256": "71abd429a85988f60a336c6e1cc1b5ef8c3d15a55faaf6686a8ca3bbfa03be1d",
+   "bytes": 31558,
+   "sha256": "3306005e00b9759e1c4e82bd1d9115d22f7a6907b3979cd0bd36ef46482b4ed5",
    "from": "assets/wiki/Anomalies/Abyss Transit Authority.avif"
   },
   {
@@ -443,8 +443,8 @@
    "path": "assets/wiki/Anomalies/Happy Ending Hall.avif",
    "use": "괴이",
    "asset": "Happy Ending Hall",
-   "bytes": 50908,
-   "sha256": "781a3267b87d2cbe0e648d806608fc44b01f3f81ce0258695709029d3435cb01",
+   "bytes": 29563,
+   "sha256": "c367f3822a8939d4d3e82b247055de3c3675a27b5c10a340c1f009c73ea8ed8c",
    "from": "assets/wiki/Anomalies/Happy Ending Hall.avif"
   },
   {
@@ -454,8 +454,8 @@
    "path": "assets/wiki/Anomalies/Dimensional Elevator.avif",
    "use": "괴이",
    "asset": "Dimensional Elevator",
-   "bytes": 50581,
-   "sha256": "1820333e0d09c234e6d196f4657bc7494ff152d24f41b42f508ec727958dd473",
+   "bytes": 28894,
+   "sha256": "b433bcc28bb4ed852e510cceaf449c44a86cedc8dcbe495162550e66119b77dd",
    "from": "assets/wiki/Anomalies/Dimensional Elevator.avif"
   },
   {
@@ -465,8 +465,8 @@
    "path": "assets/wiki/Anomalies/Saetbyeol Goshiwon.avif",
    "use": "괴이",
    "asset": "Saetbyeol Goshiwon",
-   "bytes": 56245,
-   "sha256": "7b878c7604030e7f92353a50af6fec8ede870739b2e357cb3dabfd2e3c5c13cc",
+   "bytes": 30931,
+   "sha256": "2119c151f3a3eca09a58d5cf7aae04b26c54bbbb824b8910ca1817cd2e74c405",
    "from": "assets/wiki/Anomalies/Saetbyeol Goshiwon.avif"
   },
   {
@@ -476,8 +476,8 @@
    "path": "assets/wiki/Anomalies/Yu-gye Station.avif",
    "use": "괴이",
    "asset": "Yu-gye Station",
-   "bytes": 79346,
-   "sha256": "7ff4508ae5d250171bf88b642dea20114ac6c13bdb64e2bc38492ef1d67aa9bb",
+   "bytes": 44097,
+   "sha256": "3870809f80e2ae1263079e9f0bb17b368c5ee776f01153edc15977e0794e2389",
    "from": "assets/wiki/Anomalies/Yu-gye Station.avif"
   },
   {
@@ -487,8 +487,8 @@
    "path": "assets/wiki/Anomalies/Segwang Special City.avif",
    "use": "괴이",
    "asset": "Segwang Special City",
-   "bytes": 42009,
-   "sha256": "d53be23e60eb7ae0e3914cf693734d257ae6330539d92e88196af5734b07415b",
+   "bytes": 24346,
+   "sha256": "bd8dd6e4b5d00fe504861369664d125fbe5166fbe40817d50ee86d99746ea7a8",
    "from": "assets/wiki/Anomalies/Segwang Special City.avif"
   },
   {
@@ -498,8 +498,8 @@
    "path": "assets/wiki/Anomalies/Segwang Station.avif",
    "use": "괴이",
    "asset": "Segwang Station",
-   "bytes": 73457,
-   "sha256": "e0967d5815c825d92a35c2d48ed2037162bd4ec1381927bb1e2d995ebc7e4c64",
+   "bytes": 40022,
+   "sha256": "9ef8ca75fda5dc7652512a460f451faeb4e5b2a893f4328b6bb3c9486578c388",
    "from": "assets/wiki/Anomalies/Segwang Station.avif"
   },
   {
@@ -509,8 +509,8 @@
    "path": "assets/wiki/Anomalies/Midnight Station.avif",
    "use": "괴이",
    "asset": "Midnight Station",
-   "bytes": 86735,
-   "sha256": "9a10b45614d45b9795bbe98862ed27936304fdf3746d13edbb5cd529a80997bd",
+   "bytes": 48789,
+   "sha256": "429e760228f7f6056141b6001dfc1d8f70857a462299fde0f116b618d663aa49",
    "from": "assets/wiki/Anomalies/Midnight Station.avif"
   },
   {
@@ -520,8 +520,8 @@
    "path": "assets/wiki/Anomalies/Deep Night Station.avif",
    "use": "괴이",
    "asset": "Deep Night Station",
-   "bytes": 57761,
-   "sha256": "97ca720b32c1c6e6772ff53004437d1e5c858eab741ee0b7aa4d24a0e62e6483",
+   "bytes": 33100,
+   "sha256": "ba890436917eea5850b02f9f783e9cdc719808fd9585484ead6b07e2f9127210",
    "from": "assets/wiki/Anomalies/Deep Night Station.avif"
   },
   {
@@ -531,8 +531,8 @@
    "path": "assets/wiki/Anomalies/Dusk Station.avif",
    "use": "괴이",
    "asset": "Dusk Station",
-   "bytes": 69496,
-   "sha256": "97190b5ebdc219353e27fc82bebd8ce91aa3b5eb83149dc8649c4bb80fe22a72",
+   "bytes": 40482,
+   "sha256": "8e3f7d0a2ec0a175fff1f5f478c2907fcc255e4dfd1bd0706bf6267532ee77f3",
    "from": "assets/wiki/Anomalies/Dusk Station.avif"
   },
   {
@@ -542,8 +542,8 @@
    "path": "assets/wiki/Anomalies/Afternoon Station.avif",
    "use": "괴이",
    "asset": "Afternoon Station",
-   "bytes": 66039,
-   "sha256": "9bb07046fe41e4073164d0a6356e5dc4e934180f17c0f70dc1150b7db4488c20",
+   "bytes": 38126,
+   "sha256": "c86bd1eca15efa7a4f28de04f373c6c3f171c848f870a4ec485a4c6f9672a55b",
    "from": "assets/wiki/Anomalies/Afternoon Station.avif"
   },
   {
@@ -553,8 +553,8 @@
    "path": "assets/wiki/Anomalies/Midday Station.avif",
    "use": "괴이",
    "asset": "Midday Station",
-   "bytes": 114248,
-   "sha256": "6dc0044f94d58436a30bb24d1588dc13c2e735e4a8f22ad9d475076720bc4174",
+   "bytes": 66137,
+   "sha256": "e534e12892f34296b571a539ea94a5e284c2f099619c35ec11f2969ca2d16c21",
    "from": "assets/wiki/Anomalies/Midday Station.avif"
   },
   {
@@ -564,8 +564,8 @@
    "path": "assets/wiki/Anomalies/Morning Station.avif",
    "use": "괴이",
    "asset": "Morning Station",
-   "bytes": 38923,
-   "sha256": "3b34e38e8738fcf21a8dadc9b279545b014cc5ab98969b2674c7aba54e2cff30",
+   "bytes": 23701,
+   "sha256": "9515ead99dc69028682ec3194f59faee08dacaf5064bdd1f0abe589ddc9c449f",
    "from": "assets/wiki/Anomalies/Morning Station.avif"
   },
   {
@@ -575,8 +575,8 @@
    "path": "assets/wiki/Anomalies/Yukwae Research Institute.avif",
    "use": "괴이",
    "asset": "Yukwae Research Institute",
-   "bytes": 67625,
-   "sha256": "a1a8032942f31fa294d16a2ccb00e0e6348f2a87b30bf908fbaa357f524b0b26",
+   "bytes": 38942,
+   "sha256": "c21dda10e285cc0c1bebc62c49e1ec50a8879b2ca53c283fe174b8bfb1f506f7",
    "from": "assets/wiki/Anomalies/Yukwae Research Institute.avif"
   },
   {
@@ -586,8 +586,8 @@
    "path": "assets/wiki/Anomalies/Dark Garden.avif",
    "use": "괴이",
    "asset": "Dark Garden",
-   "bytes": 105502,
-   "sha256": "0a3f80e7671833c3ce990624f3dfb912795988278e5a65fe5a1445d1b08ab320",
+   "bytes": 58806,
+   "sha256": "405190ee83aa20929c40f0bf75e15cee8f06c69ba305338205339ae2bffadef4",
    "from": "assets/wiki/Anomalies/Dark Garden.avif"
   },
   {
@@ -597,8 +597,8 @@
    "path": "assets/wiki/Anomalies/Giant World.avif",
    "use": "괴이",
    "asset": "Giant World",
-   "bytes": 55818,
-   "sha256": "8bf689e7bd38e748d155e61493a6672fd8d6fb175fbfafa07eda589889d94caf",
+   "bytes": 31829,
+   "sha256": "abfe6aa5ba1806a96eb361338ae42dff70d75ef95e300fca4bb9e21fe722aa2f",
    "from": "assets/wiki/Anomalies/Giant World.avif"
   },
   {
@@ -608,8 +608,8 @@
    "path": "assets/wiki/Anomalies/Yeongwon Village.avif",
    "use": "괴이",
    "asset": "Yeongwon Village",
-   "bytes": 69027,
-   "sha256": "c06ddff06cc5debe49622d56898f1c350cafdc729ef9a3da5293eb7b88521875",
+   "bytes": 38194,
+   "sha256": "4fc9e990d9d226b7e30457b455ea0276388c02ed5120481f41245393df4cb288",
    "from": "assets/wiki/Anomalies/Yeongwon Village.avif"
   },
   {
@@ -619,8 +619,8 @@
    "path": "assets/wiki/Anomalies/Frost Waterpark.avif",
    "use": "괴이",
    "asset": "Frost Waterpark",
-   "bytes": 83752,
-   "sha256": "bacf493c2ece4d8db75169c14efbd20daac299b75da2edff117f2ffece16bf64",
+   "bytes": 46893,
+   "sha256": "7d6baed97612b5011ea8b1152bde6d979b18fa6a4ed6ac8d1040bf7eb9bad17f",
    "from": "assets/wiki/Anomalies/Frost Waterpark.avif"
   },
   {
@@ -630,8 +630,8 @@
    "path": "assets/wiki/Anomalies/Fearble Theater.avif",
    "use": "괴이",
    "asset": "Fearble Theater",
-   "bytes": 40997,
-   "sha256": "694c884c2cb2ccb5e6a47f9a7925cffb8f95920034a027b5ca3f595662e97251",
+   "bytes": 23821,
+   "sha256": "6e417c7edb2e83363345131ae762fc437f1585ec6acfc0de74745ba30272c199",
    "from": "assets/wiki/Anomalies/Fearble Theater.avif"
   },
   {
@@ -641,8 +641,8 @@
    "path": "assets/wiki/Anomalies/Fairytale Park.avif",
    "use": "괴이",
    "asset": "Fairytale Park",
-   "bytes": 92930,
-   "sha256": "1749b7d3eab81a96830c160600fad1fc0778ef0850bd1e7c1614b430a07d3348",
+   "bytes": 50240,
+   "sha256": "60b5616e849f9295a7f32afc04497ba2de8b3d10bc9c67907c0aba85d2536cff",
    "from": "assets/wiki/Anomalies/Fairytale Park.avif"
   },
   {
@@ -652,8 +652,8 @@
    "path": "assets/wiki/Anomalies/Cosmic Fantasy Zoo.avif",
    "use": "괴이",
    "asset": "Cosmic Fantasy Zoo",
-   "bytes": 80877,
-   "sha256": "e7df820a876d8bf57bbed59c2ab69a6b638bbc335d16711486373e0bc7d3c2d7",
+   "bytes": 44904,
+   "sha256": "8ad2b2fa5da32552a78811dd879206104806491b0506afdc2d75fffd5d877e85",
    "from": "assets/wiki/Anomalies/Cosmic Fantasy Zoo.avif"
   },
   {
@@ -663,8 +663,8 @@
    "path": "assets/wiki/Anomalies/Fantasy Drama Folk Village.avif",
    "use": "괴이",
    "asset": "Fantasy Drama Folk Village",
-   "bytes": 83450,
-   "sha256": "200849db5e8b693fa42cd4fb008a6fdeb45c7f50dc51035927b680ac12f4ae73",
+   "bytes": 45644,
+   "sha256": "65e41bfff84d46d15651db71ba11760423da086334d896855571cd08a5ab2f55",
    "from": "assets/wiki/Anomalies/Fantasy Drama Folk Village.avif"
   },
   {
@@ -674,8 +674,8 @@
    "path": "assets/wiki/Anomalies/Mystery World Adventure Park.avif",
    "use": "괴이",
    "asset": "Mystery World Adventure Park",
-   "bytes": 79613,
-   "sha256": "19de26115a7d34f255dc9cf2c1afe05e41e5651043c2744f5daa3d0187f31eae",
+   "bytes": 45218,
+   "sha256": "fe1719c583f75a6f221b75bc10003436ae6337eea68e94c47624038af895d601",
    "from": "assets/wiki/Anomalies/Mystery World Adventure Park.avif"
   },
   {
@@ -685,8 +685,8 @@
    "path": "assets/wiki/Anomalies/Sotos Department Store.avif",
    "use": "괴이",
    "asset": "Sotos Department Store",
-   "bytes": 89144,
-   "sha256": "c79954fded998ce1453f90a1a83a542297c663c19a67571c597e079e6054e983",
+   "bytes": 51604,
+   "sha256": "109681cb40f1a01deadfbc599d10694cf76babc35a6828ae79985934c5211d7e",
    "from": "assets/wiki/Anomalies/Sotos Department Store.avif"
   },
   {
@@ -696,8 +696,8 @@
    "path": "assets/wiki/Unused/Aestheticism.avif",
    "use": "인물(요원)이라 쓰지 않음",
    "asset": "Aestheticism",
-   "bytes": 69677,
-   "sha256": "17e51085934fc9b6b12f3823bea43c58e38ba6c9291d5c2f2e13e961ecbc9faf",
+   "bytes": 41035,
+   "sha256": "e9ad88c249674b23091da7e7e76e9a90a56fee0e8497a323e75311cc728b66e2",
    "from": "assets/wiki/Anomalies/Aestheticism.avif"
   },
   {
@@ -707,8 +707,8 @@
    "path": "assets/wiki/Unused/Secriem.avif",
    "use": "인물(요원)이라 쓰지 않음",
    "asset": "Secriem",
-   "bytes": 66097,
-   "sha256": "6a23e61d254f847e80b415e197d1956ea34c0dc1b2918cfb26e12f1bece2dd23",
+   "bytes": 38249,
+   "sha256": "8efbadee3f64dd894ff038a522168c3da006b0964648f64d95cc603c07e926d6",
    "from": "assets/wiki/Anomalies/Secriem.avif"
   },
   {
@@ -718,8 +718,8 @@
    "path": "assets/wiki/Unused/Walpurgis Society.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "Walpurgis Society",
-   "bytes": 48553,
-   "sha256": "b4b1df47d9f4cb3a0d8a4b7abb321fadfec07ad7868e27eefaefedb5b05b0d56",
+   "bytes": 27927,
+   "sha256": "0829976e1bf4d5eee29fc081a1939208c9f0813310aba22b6f477ffe0c268937",
    "from": "assets/wiki/Anomalies/Walpurgis Society.avif"
   },
   {
@@ -729,8 +729,8 @@
    "path": "assets/wiki/Unused/Avensha.avif",
    "use": "인물(요원)이라 쓰지 않음",
    "asset": "Avensha",
-   "bytes": 88172,
-   "sha256": "0abd6c6dc6414c5adf2a2a9027e1a19d91c55f4e9f0742fb88ec9d0e9eb9b0f9",
+   "bytes": 50509,
+   "sha256": "1c9c3181e7ca33d2a62975ee46c3a871f8ab572eaae646d7d3d6b6398e1ee804",
    "from": "assets/wiki/Anomalies/Avensha.avif"
   },
   {
@@ -740,8 +740,8 @@
    "path": "assets/wiki/Unused/Mumyeong Chanran-gyo.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "Mumyeong Chanran-gyo",
-   "bytes": 47867,
-   "sha256": "cfdce8b3d6519fd8ed5c48cfaa24afde822b81a33384db01adaf62189d53c7d4",
+   "bytes": 28306,
+   "sha256": "ea855f000de334243dd9d06d3f055bc750bcd8acc878e1702e13501bc97b1395",
    "from": "assets/wiki/Anomalies/Mumyeong Chanran-gyo.avif"
   },
   {
@@ -751,8 +751,8 @@
    "path": "assets/wiki/Unused/Vampires.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "Vampires",
-   "bytes": 61504,
-   "sha256": "0be57fd275c1b5acf0baa5c6733a4223b600853f23a289f34ebbe317653e7343",
+   "bytes": 35903,
+   "sha256": "eadf236b898ff552317c464aca19cddb204f8837738dbb790ee1ed8f3efa1b88",
    "from": "assets/wiki/Anomalies/Vampires.avif"
   },
   {
@@ -762,8 +762,8 @@
    "path": "assets/wiki/Factions/The Hospital.avif",
    "use": "세력 대표",
    "asset": "The Hospital",
-   "bytes": 43739,
-   "sha256": "094f51e9747c619c9251d85aa9122e4284252d71c3dc2c9490802041ade89cf3",
+   "bytes": 27002,
+   "sha256": "dc557cdd45c64d7af792e5e561a3fddda7b1a9278fd7b2a01114c29a68c32fac",
    "from": "assets/wiki/Anomalies/The Hospital.avif"
   },
   {
@@ -773,8 +773,8 @@
    "path": "assets/wiki/Unused/The Troupe.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "The Troupe",
-   "bytes": 52518,
-   "sha256": "4c63df2b8f7fb630538a551814ceb886b9f9697be39f0bfa94c906609fd83822",
+   "bytes": 30023,
+   "sha256": "d972634f4f2c3da9b9b4ad9f5041609a1ca79b21d300d8771b5ae971918e1ad2",
    "from": "assets/wiki/Anomalies/The Troupe.avif"
   },
   {
@@ -784,8 +784,8 @@
    "path": "assets/wiki/Mystic Sites/Moonlight Tattoo Shop.avif",
    "use": "특수",
    "asset": "Moonlight Tattoo Shop",
-   "bytes": 67995,
-   "sha256": "3fde80f42328709ac1bb2f43575e88705927c1fabee1bf791a0d09fc780894d4",
+   "bytes": 39013,
+   "sha256": "471752c7eef51df3fb555edef9529d98e72ded5a1a82f7e0fc586c5f3f203f2e",
    "from": "assets/wiki/Mystic Sites/Moonlight Tattoo Shop.avif"
   },
   {
@@ -795,8 +795,8 @@
    "path": "assets/wiki/Mystic Sites/Yijeong Bookshop.avif",
    "use": "특수",
    "asset": "Yijeong Bookshop",
-   "bytes": 84460,
-   "sha256": "7ead9a4b1cd80b45fc926bfee76b335fc6f54d82ddacf79d637f5c410600e7df",
+   "bytes": 47745,
+   "sha256": "3089cbf4e881cfbc10ad3fbfc46d014c08b623269051667efde67c318a855f46",
    "from": "assets/wiki/Mystic Sites/Yijeong Bookshop.avif"
   },
   {
@@ -806,8 +806,8 @@
    "path": "assets/wiki/Mystic Sites/Dokkaebi Workshop.avif",
    "use": "특수",
    "asset": "Dokkaebi Workshop",
-   "bytes": 72756,
-   "sha256": "fd3e9ca27ead3fa1b2626edec5b074f34f16f64aa3b73099e3c8cc6903311eeb",
+   "bytes": 40808,
+   "sha256": "ca4c08bc7ffd1b6408a64907031d84bfa25c5e046e8f7047d288dc52720c161f",
    "from": "assets/wiki/Mystic Sites/Dokkaebi Workshop.avif"
   },
   {
@@ -817,8 +817,8 @@
    "path": "assets/wiki/Mystic Sites/Faceless Bazaar.avif",
    "use": "특수",
    "asset": "Faceless Bazaar",
-   "bytes": 102437,
-   "sha256": "de57069e44293ada208ded3b4c1ac112acab425f311adcced74bd75e30d07e4d",
+   "bytes": 54658,
+   "sha256": "7a3de5f7064f7feefdb62505b73cd98c24551aa7533c30d7dde1eae197e8c832",
    "from": "assets/wiki/Mystic Sites/Faceless Bazaar.avif"
   },
   {
@@ -828,8 +828,8 @@
    "path": "assets/wiki/Mystic Sites/Fox Counseling.avif",
    "use": "특수",
    "asset": "Fox Counseling",
-   "bytes": 73823,
-   "sha256": "7b7eaa3729731e32834d63e6c386a4c076fd69e8dbc1ebd9121f34521cb19e13",
+   "bytes": 42751,
+   "sha256": "63e1867f9cf6c5658e1f035d64ce145d907eca40b9fe10b2571f771c064471b4",
    "from": "assets/wiki/Mystic Sites/Fox Counseling.avif"
   },
   {
@@ -839,8 +839,8 @@
    "path": "assets/wiki/Mystic Sites/Good friend.avif",
    "use": "특수",
    "asset": "Good friend",
-   "bytes": 38842,
-   "sha256": "d7b7586a29da2155fff8671c3add8f118ea5168befab269a36a1d2ea9cf3a29b",
+   "bytes": 23034,
+   "sha256": "4e605656b599a7f757bec2d64ab1c1e7bbb12a8165d77109c074fe1d5f50a90b",
    "from": "assets/wiki/Mystic Sites/Good friend.avif"
   },
   {
@@ -850,8 +850,8 @@
    "path": "assets/wiki/Mystic Sites/Anything Vending Machine.avif",
    "use": "특수",
    "asset": "Anything Vending Machine",
-   "bytes": 37885,
-   "sha256": "046f77300eb6258adce884ef15e2e7d2ef8a43359e72860ea0569163bcd0ed4b",
+   "bytes": 22558,
+   "sha256": "d086cc919f3fc97b6a90c645896d97e9850714f600c4f241d3c9b006d2eed01c",
    "from": "assets/wiki/Mystic Sites/Anything Vending Machine.avif"
   },
   {
@@ -861,8 +861,8 @@
    "path": "assets/wiki/Mystic Sites/Space Shopping Mall.avif",
    "use": "특수",
    "asset": "Space Shopping Mall",
-   "bytes": 67129,
-   "sha256": "7be04b1097cb06f1ae657f18a2e2fa10e734f01fbba3441b5e2c4df02a017d8f",
+   "bytes": 38428,
+   "sha256": "954416bc96a0d9d2ddf0290e33c52261a22df0909473b1b0e8baa1e3a1ea477a",
    "from": "assets/wiki/Mystic Sites/Space Shopping Mall.avif"
   },
   {
@@ -872,8 +872,8 @@
    "path": "assets/wiki/Mystic Sites/Kind Seed Kit.avif",
    "use": "특수",
    "asset": "Kind Seed Kit",
-   "bytes": 114717,
-   "sha256": "54ed441846119f06c5b86320a10033fffd2657499d5180c8b56e61dd64d34e38",
+   "bytes": 63908,
+   "sha256": "fe43ceb497be45e858cc7c461078511cdc953a46a9b44e31c2d6a500f22f5332",
    "from": "assets/wiki/Mystic Sites/Kind Seed Kit.avif"
   },
   {
@@ -883,8 +883,8 @@
    "path": "assets/wiki/Mystic Sites/Tooth Fairy.avif",
    "use": "특수",
    "asset": "Tooth Fairy",
-   "bytes": 43787,
-   "sha256": "f35c84cf7b00699d07589b5746b8e59b399846514634628112e0081424089bab",
+   "bytes": 26005,
+   "sha256": "532196176a0016bee18bf2e26c0c5520daac83049db19c5db17f22dd6666ebef",
    "from": "assets/wiki/Mystic Sites/Tooth Fairy.avif"
   },
   {
@@ -894,8 +894,8 @@
    "path": "assets/wiki/Factions/Management Bureau.avif",
    "use": "세력 대표",
    "asset": "Management Bureau",
-   "bytes": 57216,
-   "sha256": "648e025688d01e2840e4d2df69630ed0ccd1e08244c06f106cee84cdc3026cce",
+   "bytes": 29975,
+   "sha256": "d6eabcf23be08b17f5409177f830fb2fd08ede856decb469c6bf065e7d66556e",
    "from": "assets/wiki/Factions/Management Bureau/Management Bureau_Underground Containment Wing.avif"
   },
   {
@@ -905,8 +905,8 @@
    "path": "assets/wiki/Factions/Fake Management Bureau.avif",
    "use": "세력 대표",
    "asset": "Fake Management Bureau",
-   "bytes": 66432,
-   "sha256": "05e0dbfba9080ba4f6b9a557f6edd9d0c2c63e9715a98d792e4f2695e997a6da",
+   "bytes": 37718,
+   "sha256": "8a167d4dfec3bfaa71f26360583e4ab233ca68c127266406b39ffa7ce0ddb9a7",
    "from": "assets/wiki/Factions/Fake Management Bureau/Fake Management Bureau_Implanted Memories.avif"
   },
   {
@@ -916,8 +916,8 @@
    "path": "assets/wiki/Factions/Baekilmong.avif",
    "use": "세력 대표",
    "asset": "Baekilmong",
-   "bytes": 63109,
-   "sha256": "3dbead6cfddc725f53b03fcd1d85c7bbeeb93b8ca47849e8b8c0dca90002baaf",
+   "bytes": 34351,
+   "sha256": "d6beaa8c880743ee4ae055e2b745d7f220e4c1ab2c03b56bb93c7bbba2f8c04c",
    "from": "assets/wiki/Factions/Baekilmong/Baekilmong_Dream Collector.avif"
   },
   {
@@ -927,8 +927,8 @@
    "path": "assets/wiki/Factions/Special Disaster Response Association.avif",
    "use": "세력 대표",
    "asset": "Special Disaster Response Association",
-   "bytes": 54492,
-   "sha256": "a8710ffe62195a50e4fce4e7596e8603fbe22556ab1df7eac18669fae779d123",
+   "bytes": 30904,
+   "sha256": "124e35d79f5fb3b2a368755730f3e71119621976b8fe785f69225755ca707a15",
    "from": "assets/wiki/Factions/Special Disaster Response Association/Special Disaster Response Association_Mission Reception Counter.avif"
   },
   {
@@ -938,8 +938,8 @@
    "path": "assets/wiki/Factions/Jungnim Underground Shopping Center.avif",
    "use": "세력 대표",
    "asset": "Jungnim Underground Shopping Center",
-   "bytes": 66882,
-   "sha256": "05adaccb1eda90eb5d13eb12087c0ba40f84a01a8935bfab035a7adb15cc483f",
+   "bytes": 36222,
+   "sha256": "6c687e5e3bb2998308ee1b8fa5ec7f81278c113c17df1042abd05b37713ac253",
    "from": "assets/wiki/Factions/Jungnim Underground Shopping Center/Jungnim Underground Shopping Center_default.avif"
   },
   {
@@ -949,8 +949,8 @@
    "path": "assets/wiki/Factions/Vatican.avif",
    "use": "세력 대표",
    "asset": "Vatican",
-   "bytes": 92930,
-   "sha256": "e01675f7185394b340fb5a8a9cacb6850739b20acf2f391e41a6ab23c38c1775",
+   "bytes": 51984,
+   "sha256": "07e6d936e75c46cb005cd4c268975b421f97e27e8eef24a9a8a66482327c596a",
    "from": "assets/wiki/Factions/Vatican/Vatican_Christian Goods Shop.avif"
   },
   {
@@ -960,8 +960,8 @@
    "path": "assets/wiki/Factions/Islam.avif",
    "use": "세력 대표",
    "asset": "Islam",
-   "bytes": 65100,
-   "sha256": "bb4d1c438c4001adf3b7ce6bf83060ac6ce772fa23595a3b775033e1eecd9fce",
+   "bytes": 37187,
+   "sha256": "119a1487b213c9542d8775c13824ddc6f9f3abbda8332034565ffb4988a5fdc8",
    "from": "assets/wiki/Factions/Islam/Islam_default.avif"
   },
   {
@@ -971,8 +971,8 @@
    "path": "assets/wiki/Factions/Walpurgis Society.avif",
    "use": "세력 대표",
    "asset": "Walpurgis Society",
-   "bytes": 47985,
-   "sha256": "66b16ec5d4c4c19cf315046eca1fd6e13d4aa4d9c6f2d6a2ee3fcf2bc33c3cdd",
+   "bytes": 26857,
+   "sha256": "cbaf1a12eedadc94d33de988c7d12e2d2dbca8a26cfe5304bafd608f86b758de",
    "from": "assets/wiki/Factions/Walpurgis Society/Walpurgis Society_Ten Seats.avif"
   },
   {
@@ -982,8 +982,8 @@
    "path": "assets/wiki/Factions/Vampires.avif",
    "use": "세력 대표",
    "asset": "Vampires",
-   "bytes": 66147,
-   "sha256": "072a59b4a641c4486899db14c4411dfdcf0f0519d5f7cf4fed33ea282446a0ad",
+   "bytes": 38927,
+   "sha256": "179aaedd45fffee722076db29e344f3d711b7d76a60b89d495f767fad9f57f38",
    "from": "assets/wiki/Factions/Vampires/Vampires_Domain of Night.avif"
   },
   {
@@ -993,8 +993,8 @@
    "path": "assets/wiki/Factions/Mumyeong Chanrangyo.avif",
    "use": "세력 대표",
    "asset": "Mumyeong Chanrangyo",
-   "bytes": 36766,
-   "sha256": "fe53fd081207815b2f7361ea62a46370dbdbb985af30264067685acdacc7911d",
+   "bytes": 21214,
+   "sha256": "285b2a241b9d3630bc0d1df8ceba8017e1128f0145f0bb45435edc8276c37f67",
    "from": "assets/wiki/Factions/Mumyeong Chanrangyo/Mumyeong Chanrangyo_default.avif"
   },
   {
@@ -1004,8 +1004,8 @@
    "path": "assets/wiki/Unused/Mumyeong Chanrangyo_Stolen Narrative.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "Mumyeong Chanrangyo_Stolen Narrative",
-   "bytes": 60125,
-   "sha256": "2068a35072b6a83977fb481892615ca7e275963c66728753986cad20779bc75a",
+   "bytes": 32146,
+   "sha256": "87b4942cdc3b07b522f6b67099cc79f4fbfb44a80f9ddf91bd54274b5519a9e7",
    "from": "assets/wiki/Factions/Mumyeong Chanrangyo/Mumyeong Chanrangyo_Stolen Narrative.avif"
   },
   {
@@ -1015,8 +1015,8 @@
    "path": "assets/wiki/Unused/Mumyeong Chanrangyo_The Name That Remains at the End.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "Mumyeong Chanrangyo_The Name That Remains at the End",
-   "bytes": 111790,
-   "sha256": "36645d7f2ec0b57e9016f59ae500f4371538fcf62412c4a322851af4737d7965",
+   "bytes": 62969,
+   "sha256": "300634c21e9c5be20d3f52095dd11bc09a3dc649899aff9f8c2802b2bf1c021d",
    "from": "assets/wiki/Factions/Mumyeong Chanrangyo/Mumyeong Chanrangyo_The Name That Remains at the End.avif"
   },
   {
@@ -1026,8 +1026,8 @@
    "path": "assets/wiki/Unused/The Hospital_Routine Consultation.avif",
    "use": "세력 대표로 고르지 않은 장면",
    "asset": "The Hospital_Routine Consultation",
-   "bytes": 83879,
-   "sha256": "951d3115c54f9ba1560cab055578abf7acdcf443e7a800f032b6a70cf2704f01",
+   "bytes": 47258,
+   "sha256": "7b1235f83c3e491b93d281affaa843bf4064c8823183edf9fd36e0b2ee285ef5",
    "from": "assets/wiki/Factions/The Hospital/The Hospital_Routine Consultation.avif"
   },
   {
@@ -1037,8 +1037,8 @@
    "path": "assets/wiki/Factions/The Troupe.avif",
    "use": "세력 대표",
    "asset": "The Troupe",
-   "bytes": 85510,
-   "sha256": "1a20a416fb4f74479f089434425ec3da3049a8a234d3e4b1cfaf06fb5d448249",
+   "bytes": 46016,
+   "sha256": "86fc09d7871ad22fe47a572a2aff4c92ee4ac9e7fde67e57903e2dde8da9b7cd",
    "from": "assets/wiki/Factions/The Troupe/The Troupe_The Final Act Stage.avif"
   },
   {
@@ -1048,8 +1048,8 @@
    "path": "assets/wiki/Factions/The World Politics Forum.avif",
    "use": "세력 대표",
    "asset": "The World Politics Forum",
-   "bytes": 51015,
-   "sha256": "a828ba2e4bff4c2023a045c6977fa62b12954c96ead2035db3dfa1a0f83c300f",
+   "bytes": 29313,
+   "sha256": "7361a71d88de04ecd76c11f6cb33a3d143db61e3d241eaef86f80e7d34ac1309",
    "from": "assets/wiki/Factions/The World Politics Forum/The World Politics Forum_default.avif"
   },
   {
@@ -1059,8 +1059,8 @@
    "path": "assets/wiki/Factions/Civilian.avif",
    "use": "세력 대표",
    "asset": "Civilian",
-   "bytes": 82104,
-   "sha256": "39af8edaf7f71e94c80c82b3f46c8aba311d7d44f6d80d717ffea63197dde45b",
+   "bytes": 43158,
+   "sha256": "b9f8cffcb264b0a6f8e37771a4ea81ae1a012d915b0ce922c710f8cb4163abd0",
    "from": "사용자 업로드 2026-10-19 (1254→832)"
   },
   {
@@ -1070,8 +1070,8 @@
    "path": "assets/wiki/Factions/Freelancer.avif",
    "use": "세력 대표",
    "asset": "Freelancer",
-   "bytes": 59848,
-   "sha256": "fec9a97cce3f7a63011ecdad80176d74e3963b93e645a083c8d637243febec9a",
+   "bytes": 33076,
+   "sha256": "bdb801ea0d21095eca7160b034755fd5ac782f9c740cc913ecfc0dd64a5e1973",
    "from": "사용자 업로드 2026-10-19 (1254→832)"
   }
  ]

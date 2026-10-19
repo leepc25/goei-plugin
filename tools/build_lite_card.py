@@ -385,6 +385,35 @@ def update_payload(data, risu, module, version, min_plugin):
     }
 
 
+# 위키 이미지 (assets/wiki 의 괴이·특수·세력). 파일명이 곧 에셋 이름 = 명부 영문명 (src/host/assets.ts mainPic·facePic)
+WIKI_DIRS = ('Anomalies', 'Mystic Sites', 'Factions')
+# 예전 시작 화면 세력 기본 그림. 사진 규칙에서 뺐다 (세력 그림은 명부 영문명)
+DROP_ASSETS = {'f01', 'f02', 'f03', 'f04', 'f05'}
+
+
+def add_wiki_assets(data, others):
+    """카드 에셋에 위키 이미지를 넣는다. 카드에 같은 이름(대소문자 무시)이 있으면 카드 것을 둔다"""
+    assets = data.setdefault('assets', [])
+    for a in [a for a in assets if a.get('name') in DROP_ASSETS]:
+        assets.remove(a)
+        path = a.get('uri', '').replace('embeded://', '')
+        others.pop(path, None)
+        others.pop(f"x_meta/{Path(path).stem}.json", None)
+    have = {str(a.get('name', '')).lower() for a in assets}
+    added = 0
+    for folder in WIKI_DIRS:
+        for f in sorted((ROOT / 'assets' / 'wiki' / folder).glob('*.avif')):
+            if f.stem.lower() in have:
+                continue
+            have.add(f.stem.lower())
+            added += 1
+            path = f'assets/other/image/wiki{added:03d}.avif'
+            assets.append({'type': 'x-risu-asset', 'uri': f'embeded://{path}', 'name': f.stem, 'ext': 'avif'})
+            others[path] = f.read_bytes()
+            others[f'x_meta/wiki{added:03d}.json'] = b'{"type":"AVIF"}'
+    return added
+
+
 def main(src, dst):
     scenarios = load_scenarios()
     with zipfile.ZipFile(src) as z:
@@ -394,6 +423,7 @@ def main(src, dst):
         others = {n: z.read(n) for n in names if n not in ('card.json', 'module.risum', 'charx.json')}
 
     data = card['data']
+    wiki_assets = add_wiki_assets(data, others)
     risu = data.setdefault('extensions', {}).setdefault('risuai', {})
     lore = (module or {}).get('lorebook') or (data.get('character_book') or {}).get('entries') or []
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
@@ -459,7 +489,7 @@ def main(src, dst):
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
-        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex),
+        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets,
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))
 
