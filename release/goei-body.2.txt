@@ -1,5 +1,3 @@
-isible.has(t));
-      map.set(c.id, c);
       if (c.visible) contacts.push(c);
       for (const name of [english, ...list3(row5.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
     }
@@ -147,7 +145,7 @@ isible.has(t));
     if (r.kind === "group" || !unsolicited(r)) return [true, ""];
     if (r.followupSent) return [false, "상대의 후속 메시지에 대한 답장을 기다리고 있어요."];
     if (!set2.incoming) return [false, "선톡 받기가 꺼져 있어요. 설정에서 켜면 다시 확인할 수 있어요."];
-    if (!cooldownReady(chat, "incoming")) return [false, `선톡을 받은 뒤 대기 중이에요. 본편 응답이 ${cooldownLeft(chat, "incoming")}턴 더 쌓이면 다시 확인해요.`];
+    if (!cooldownReady(chat, "incoming")) return [false, `선톡을 받은 뒤 대기 중이에요. 채팅 응답이 ${cooldownLeft(chat, "incoming")}턴 더 쌓이면 다시 확인해요.`];
     if (incomingPassed === false) return [false, "이번 확인은 선톡 요청 확률에 따라 건너뛰었어요."];
     return [true, ""];
   }
@@ -578,8 +576,8 @@ ${body5}
   var chip = (key, label, def, v) => ({ key, label, type: "bool", def: String(def), ...v ? { v } : {} });
   var num3 = (key, label, def, min, max, unit, extra = {}) => ({ key, label, type: "num", def, min, max, unit, ...extra });
   var TOK = "토큰";
-  var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 본편 순으로 줄여요" });
-  var turns = (def) => num3("turns", "본편 참고", def, 0, 200, "턴", { zero: "안 봄" });
+  var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" });
+  var turns = (def) => num3("turns", "채팅 참고", def, 0, 200, "턴", { zero: "안 봄" });
   var ADV = {
     gen: [
       {
@@ -589,11 +587,11 @@ ${body5}
           num3("retries", "형식 오류 재시도", 1, 0, 3, "회"),
           { key: "retry_model", label: "재시도 모델", type: "pick", def: "same", opts: [["same", "같은 모델"], ["main", "메인"], ["aux", "보조"]] },
           num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요" }),
-          num3("ctx_total", "본편 반영 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 본편 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요" })
+          num3("ctx_total", "채팅 반영 총 상한", 0, 0, 2e5, TOK, { zero: "제한 없음", hint: "괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요" })
         ]
       },
       {
-        title: "본편 로어북",
+        title: "로어북",
         items: [
           { key: "lore_mode", label: "로어북 보내기", type: "pick", def: "plugin", opts: [["plugin", "플러그인이 고름"], ["risu", "Risu가 직접"]], hint: "세력·특수·괴이·요원 로어북을 누가 켤지 정해요. Risu가 직접 켜면 낱말 속 글자에도 걸려요" }
         ]
@@ -612,7 +610,7 @@ ${body5}
         ]
       },
       {
-        title: "본편 반영",
+        title: "채팅 반영",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_posts", "게시글·댓글", 1), chip("ctx_dms", "쪽지", 1), chip("ctx_own", "내가 쓴 것만", 0)],
         items: [
           num3("ctx_post_count", "넣을 게시글", 5, 1, 200, "개"),
@@ -650,7 +648,7 @@ ${body5}
         items: [turns(8), num3("room_history", "방마다 참고할 말풍선", 100, 10, 1e3, "개"), budget]
       },
       {
-        title: "본편 반영",
+        title: "채팅 반영",
         chips: [chip("ctx_focus", "장면 관련 먼저", 1), chip("ctx_messages", "메시지", 1, "$ph_context_messages"), chip("ctx_notices_on", "공지", 1, "$ph_context_announcements")],
         items: [
           num3("ctx_history", "넣을 말풍선", 200, 1, 1e3, "개"),
@@ -686,11 +684,11 @@ ${body5}
       {
         title: "참고 자료",
         chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "관련 로어북", 1), chip("secondary", "2차 참조", 1)],
-        items: [turns(8), num3("ref_count", "관련·2차 참조 최대", 20, 1, 200, "개"), { ...budget, hint: "넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 본편 순으로 줄여요" }]
+        items: [turns(8), num3("ref_count", "관련·2차 참조 최대", 20, 1, 200, "개"), { ...budget, hint: "넘으면 이전 문서, 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" }]
       },
       {
-        title: "본편 반영",
-        chips: [chip("ctx_focus", "본편에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
+        title: "채팅 반영",
+        chips: [chip("ctx_focus", "채팅에 나온 문서만", 1), chip("ctx_lore", "로어북 있는 문서", 0), chip("ctx_created", "창작 문서", 1)],
         items: [num3("ctx_count", "넣을 문서", 2, 1, 50, "개"), num3("ctx_tokens", "반영 토큰 상한", 8e3, 0, 2e5, TOK, { zero: "제한 없음" })]
       }
     ]
@@ -1475,6 +1473,7 @@ ${body5}
         primaryNames: primary,
         text: `${req.title}
 ${req.writingRequest}
+${req.docRequest ?? ""}
 ${story}`,
         registry: r,
         description: t.description,
@@ -1507,8 +1506,12 @@ ${story}`;
 ${innerBody(previous)}`;
     if (req.writingRequest.trim()) user += `
 
-[사용자 작성 지침]
+[사용자 작성 지침 — 모든 문서 공통]
 ${req.writingRequest.trim()}`;
+    if (req.docRequest?.trim()) user += `
+
+[사용자 작성 지침 — 이 문서만, 공통 지침과 부딪치면 이쪽을 우선]
+${req.docRequest.trim()}`;
     const sources = [...new Set(rows.flatMap((x) => x.sources))];
     const primarySources = [...new Set(rows.filter((x) => x.kind === "primary").flatMap((x) => x.sources))];
     return {
@@ -2964,6 +2967,27 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     return [...new Set([...card2, ...modRows].map((r) => r[0]))].filter((n) => !/^map\d+$/i.test(n));
   }
   var DEFAULT_CROP = "50,16,44";
+  var AGENT_CROPS = {
+    "Aestheticism": "53,18,40",
+    "Aileen": "48,17,44",
+    "Baek Sa-heon": "50,18,44",
+    "Cha Yeo-jin": "54,18,44",
+    "Cho Seong-choon": "48,18,44",
+    "Do Pil-heon": "48,16,44",
+    "Go Young-eun": "46,16,44",
+    "Jang Heo-un": "52,18,44",
+    "Jay": "53,16,44",
+    "Jyaldi": "56,18,44",
+    "Kwak Je-gang": "56,19,44",
+    "Kyuras": "49,19,44",
+    "Lee Do-hyeong": "61,16,44",
+    "Ma Deok-hee": "49,19,44",
+    "Mun Hye-ran": "46,18,44",
+    "Secriem": "54,16,44",
+    "Seo Yun-ji": "46,18,44",
+    "Spangdal": "52,18,44"
+  };
+  var personCrop = (p) => parseCrop(p.crop) ?? parseCrop(!p.photo && AGENT_CROPS[p.english ?? ""] || DEFAULT_CROP);
   function parseCrop(s4) {
     const n = String(s4 ?? "").split(",").map(Number);
     if (n.length !== 3 || n.some((x) => !Number.isFinite(x))) return null;
@@ -2984,9 +3008,11 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
   function facePic(char, p, person = false) {
     if (p.face) return p.face;
-    if (p.english && hasAsset(char, p.english)) return p.english;
+    const en2 = p.english ?? "";
+    if (person && !p.photo && en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default#${personCrop(p).join(",")}`;
+    if (en2 && hasAsset(char, en2)) return en2;
     const main = mainPic(char, p);
-    const crop = parseCrop(p.crop) ?? (person ? parseCrop(DEFAULT_CROP) : null);
+    const crop = person ? personCrop(p) : parseCrop(p.crop);
     return main && crop ? `${main}#${crop.join(",")}` : main;
   }
   var hasAsset = (char, name) => !!name && !!findRow(char, splitPic(name).name);
@@ -3790,6 +3816,9 @@ ${after}`);
       return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc5(i.label)}</button>`;
     }).join("")}</div></div>`;
   }
+  function advSections(f, state, extra = {}) {
+    return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
+  }
   function advancedBox(f, state) {
     const n = advChanged(state, f).length;
     const groups = ADV[f].map((g, gi) => {
@@ -4178,7 +4207,7 @@ ${after}`);
       let note = "";
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         if (automatic && (chat.message?.length ?? 0) !== startLength) {
-          note = "본편이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.";
+          note = "채팅이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.";
           return null;
         }
         const cur = readPhone(chat);
@@ -4402,26 +4431,4 @@ ${after}`);
     }).join("")}</ul>`;
   }
   function roomDel(id, pending, label) {
-    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}" title="삭제" aria-label="${esc6(label)} 삭제" ${pending ? "disabled" : ""}>${ICONS.trash}</button>`;
-  }
-  var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
-  function roomView(ctx2, st, d, busy4) {
-    const r = phone.room ? st.rooms[phone.room] : void 0;
-    if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
-    const confirm = phone.confirm === `room:${r.id}`;
-    const visible = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
-    const shown2 = visible.slice(-PAGE * phone.page);
-    const more = visible.length > shown2.length;
-    const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
-    const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
-    let lastDay = "";
-    const bubbles = shown2.map((m, i) => {
-      const dm = dayOf(m.time);
-      const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
-      const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
-      if (day) lastDay = day;
-      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc6(m.text)}</div>`;
-      const prev = shown2[i - 1];
-      const next = shown2[i + 1];
-      const me = m.sender === "me";
-      const first = !!sep || !isMsg(pr
+    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}" title="삭제" aria-label="${esc6(label)} 삭제" ${pending ? "disabled" : 

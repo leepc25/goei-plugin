@@ -515,6 +515,8 @@ def update_payload(data, risu, module, version, min_plugin):
 
 # 위키 이미지 (assets/wiki 의 괴이·특수·세력). 파일명이 곧 에셋 이름 = 명부 영문명 (src/host/assets.ts mainPic·facePic)
 WIKI_DIRS = ('Anomalies', 'Mystic Sites', 'Factions')
+# 요원 기본 그림 「영문명_default」 (사용자가 2026-10-19 올림). 큰 사진이자 얼굴 틀로 자르는 원본 (src/host/assets.ts AGENT_CROPS)
+AGENT_DIR = 'agents'
 # 예전 시작 화면 세력 기본 그림. 사진 규칙에서 뺐다 (세력 그림은 명부 영문명)
 DROP_ASSETS = {'f01', 'f02', 'f03', 'f04', 'f05'}
 
@@ -529,16 +531,17 @@ def add_wiki_assets(data, others):
         others.pop(f"x_meta/{Path(path).stem}.json", None)
     have = {str(a.get('name', '')).lower() for a in assets}
     added = 0
-    for folder in WIKI_DIRS:
-        for f in sorted((ROOT / 'assets' / 'wiki' / folder).glob('*.avif')):
-            if f.stem.lower() in have:
-                continue
-            have.add(f.stem.lower())
-            added += 1
-            path = f'assets/other/image/wiki{added:03d}.avif'
-            assets.append({'type': 'x-risu-asset', 'uri': f'embeded://{path}', 'name': f.stem, 'ext': 'avif'})
-            others[path] = f.read_bytes()
-            others[f'x_meta/wiki{added:03d}.json'] = b'{"type":"AVIF"}'
+    files = [f for folder in WIKI_DIRS for f in sorted((ROOT / 'assets' / 'wiki' / folder).glob('*.avif'))]
+    files += sorted((ROOT / 'assets' / AGENT_DIR).glob('*_default.avif'))
+    for f in files:
+        if f.stem.lower() in have:
+            continue
+        have.add(f.stem.lower())
+        added += 1
+        path = f'assets/other/image/wiki{added:03d}.avif'
+        assets.append({'type': 'x-risu-asset', 'uri': f'embeded://{path}', 'name': f.stem, 'ext': 'avif'})
+        others[path] = f.read_bytes()
+        others[f'x_meta/wiki{added:03d}.json'] = b'{"type":"AVIF"}'
     return added
 
 

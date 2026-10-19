@@ -1,4 +1,4 @@
-// goei-body 0.16.32
+// goei-body 0.16.33
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -2519,7 +2519,6 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var cache3 = /* @__PURE__ */ new WeakMap();
   var DIM_DEFAULT = 50;
-  var DIM_STEPS = [0, 25, 50, 75, 100];
   var prefs = { basic: {}, world: {} };
   var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$gen_[a-z_]+)$/;
   function getPrefs() {
@@ -4240,4 +4239,5 @@ ${JSON.stringify({ feature: "gnet", records })}
         visible: false,
         saved: false
       };
-      c.visible = c.tabs.some((t) => v
+      c.visible = c.tabs.some((t) => visible.has(t));
+      map.set(c.id, c);

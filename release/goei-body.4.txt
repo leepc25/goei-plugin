@@ -1,4 +1,25 @@
- 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
+n srgb, var(--blue) 16%, transparent); color: var(--blue); }
+.gx-evc .gx-gmark svg { width: 16px; height: 16px; }
+/* 진행 중인 행은 눌러서 지도로, 오른쪽 위 아이콘 (v0.16.17) */
+#gx-sec-ag { scroll-margin-top: 12px; }
+#gx-sec-ag h2 { font-size: 15px; margin-bottom: 8px; }
+/* 요원 카드: 사진 크게 */
+.gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
+.gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
+.gx-acard-tool:hover { color: var(--signal); }
+.gx-acard-tool svg { width: 18px; height: 18px; }
+.gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
+.gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px; }
+.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; }
+.gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
+@media (max-width: 760px) {
+  /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
+  .gx-board .gx-acards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .gx-board .gx-acard-top b { font-size: 13.5px; }
+  .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
+  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
+}
+/* 사진+톡·위키 칸: PC는 없는 셈 치고(사진은 그대로, 버튼은 카드 오른쪽 위) */
 .gx-acard-side { display: contents; }
 /* 모바일 요원 카드 (상황판·임무 편성 공통, v0.16.18): 한 줄에 한 명이라 PC와 같은 배치. 사진만 조금 작게, 톡·위키는 오른쪽 위에 손가락 크기로 */
 @media (max-width: 760px) {
@@ -30,8 +51,12 @@
 /* PC 상황판 (v0.16.21): 창 전체는 스크롤하지 않는다. 괴이·사건·특수는 진행 중 카드 세 장 높이까지, 넘치면 그 칸 안에서 스크롤.
    요원은 남은 높이를 다 쓰고 넘치면 요원 칸 안에서 스크롤. 창 높이 950은 진행 중 괴이 3개 + 요원 4줄(설명 두 줄)이 딱 들어가는 높이 */
 @media (min-width: 761px) {
-  .gx-board > .gx-bd-cols { flex: none; }
-  .gx-board .gx-bd-col > .gx-evcs { max-height: 316px; overflow-y: auto; overscroll-behavior: contain; }
+  /* 괴이·사건·특수 칸은 비어 있어도 같은 높이 (사용자: 괴이가 없으면 요원이 딸려 올라가면 안 됨) */
+  .gx-board > .gx-bd-cols { flex: none; height: 350px; align-items: stretch; }
+  .gx-board .gx-bd-col { display: flex; flex-direction: column; min-height: 0; }
+  .gx-board .gx-bd-col > .gx-evcs { flex: 1 1 0; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
+  .gx-board .gx-bd-col > .gx-evcs > * { flex-shrink: 0; }
+  .gx-board .gx-bd-col > .gx-none { flex: 1 1 0; display: grid; place-items: center; text-align: center; }
   .gx-board > #gx-sec-ag { flex: 1 1 0; min-height: 240px; display: flex; flex-direction: column; }
   .gx-board > #gx-sec-ag > .gx-acards { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; }
 }
@@ -538,7 +563,7 @@
 .dir-crop-size input { flex: 1; accent-color: var(--signal); }
 .dir-crop > .gx-mini { align-self: flex-start; }
 
-/* 설정 → 본편 로어북 확인 */
+/* 설정 → 로어북 확인 */
 .lc-row { align-items: center; }
 .lc-row .ps-label small { word-break: break-all; }
 .lc-kind { flex: none; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font-size: 12px; line-height: 1.6; }
@@ -549,6 +574,31 @@
 .gx-game [data-game-mode] { font: inherit; font-size: 11px; padding: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
 .gx-game [data-game-mode][aria-pressed="true"] { border-color: var(--signal, #c4a776); background: var(--panel2); }
 @media (max-width: 520px) { .gx-game > .gx-head { flex-wrap: wrap; gap: 4px; } }
+
+/* 설정 → 창 바깥 불투명도 막대 */
+.st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
+.st-range input { flex: 1; accent-color: var(--signal); }
+.st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
+
+/* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
+.gx .st-feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 12px; }
+.gx .st-feat { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; white-space: nowrap; }
+.gx .st-feat svg { width: 16px; height: 16px; flex: none; }
+.gx .ps-group > .ps-adv { margin: 10px 0 0; }
+
+/* 위키: 이 문서 지침 칸 (작성 화면·다시 쓰기) */
+.nw-reqlabel { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 560px; font-size: 13px; font-weight: 600; color: var(--sub); text-align: left; }
+.nw-reqlabel .nw-reqbox { margin-top: 0; width: 100%; box-sizing: border-box; font-weight: 400; }
+.nw.nw-app .nw-compose .nw-creq { max-width: 560px; width: 100%; box-sizing: border-box; text-align: left; }
+.nw-rewrite { display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.nw-rewrite .nw-reqlabel { max-width: none; }
+.nw-rewrite .nw-creq { background: var(--panel); }
+.nw-rwrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--sub); }
+.nw-rewrite .gx-row-btns { justify-content: flex-end; }
+@media (max-width: 640px) {
+  .gx .ps-ctl:has(> .st-range) { width: 100%; }
+  .gx .st-range { width: 100%; }
+}
 `;
 
   // src/ui/mbar.ts
@@ -2935,7 +2985,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.32" : "0";
+  var PLUGIN_VERSION = true ? "0.16.33" : "0";
 
   // src/host/gamepack.ts
   var KEY2 = `goei:game-pack:${PACK_ID}`;
@@ -3519,10 +3569,13 @@
     info: "",
     listOpen: false,
     tab: "all",
-    newTitle: ""
+    newTitle: "",
+    docReq: "",
+    rewrite: null,
+    rewritePrev: true
   };
   function resetWiki() {
-    Object.assign(wiki, { view: "home", title: "", query: "", homeQuery: "", history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: "", newTitle: "" });
+    Object.assign(wiki, { view: "home", title: "", query: "", homeQuery: "", history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: "", newTitle: "", docReq: "", rewrite: null });
   }
   var jobs3 = /* @__PURE__ */ new Map();
   var chatKey3 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
@@ -3541,11 +3594,16 @@
   function go(view2, title2 = "", query = wiki.query) {
     if (wiki.view !== view2 || wiki.title !== title2) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
     if (wiki.history.length > 30) wiki.history.shift();
+    if (wiki.view !== view2 || wiki.title !== title2) Object.assign(wiki, { docReq: "", rewrite: null });
     wiki.view = view2;
     wiki.title = title2;
     wiki.query = query;
     wiki.confirmDelete = null;
     wiki.notice = "";
+  }
+  function openWikiSettings() {
+    if (wiki.view !== "settings") go("settings");
+    wiki.listOpen = false;
   }
   function openTitle(ctx2, raw, from) {
     const title2 = canon(ctx2)(raw.trim());
@@ -3572,7 +3630,7 @@
     if (c.known) return openTitle(ctx2, c.title, "direct");
     wiki.listOpen = true;
   }
-  async function generate3(ctx2, env2, title2, regenerate) {
+  async function generate3(ctx2, env2, title2, regenerate, docRequest = "", usePrevious) {
     const key = chatKey3(ctx2);
     if (jobs3.has(key)) {
       wiki.notice = `「${jobs3.get(key).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
@@ -3583,7 +3641,7 @@
     const old = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
     const inherited = regenerate ? old?.meta && !old.meta.direct ? old.meta.primarySources : [] : wiki.inherited;
     const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-    const previousDoc = regenerate ? s4.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
+    const previousDoc = regenerate ? usePrevious ?? s4.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
     const writingRequest = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     jobs3.set(key, { title: title2, started: Date.now() });
     wiki.failure = null;
@@ -3597,7 +3655,7 @@
           return {};
         }
       })();
-      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, direct }, s4, catalogNames, registry(ctx2)));
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s4, catalogNames, registry(ctx2)));
       let body5;
       try {
         body5 = (await generate(prompt.messages, s4.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
@@ -3615,11 +3673,12 @@
         sources: prompt.sources,
         primarySources: prompt.primarySources.length ? prompt.primarySources : inherited,
         writingRequest,
-        direct
+        direct,
+        ...docRequest.trim() ? { docRequest: docRequest.trim() } : {}
       };
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body5));
       const cur = env2.current();
-      if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) wiki.view = "doc";
+      if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) Object.assign(wiki, { view: "doc", rewrite: null, docReq: "" });
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       wiki.notice = `「${title2}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
@@ -3835,50 +3894,4 @@
       const list4 = docs.filter((d) => inTab(ctx2, d, t));
       if (!list4.length) return "";
       const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc10(u)}" alt="" loading="lazy">`).join("");
-      return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === "an" ? CAT_ICON.an : t === "ms" ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list4.length}개</small></button>`;
-    }).join("");
-    const sec = (title2, n, inner) => `<section class="nw-hsec"><h3>${title2}${n ? `<b>${n}</b>` : ""}</h3>${inner}</section>`;
-    return `<div class="nw-home">
-    <section class="nw-hero">
-      <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc10(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
-      <div class="nw-hero-res">${wikiHomeResults(ctx2)}</div>
-    </section>
-    ${liveCards ? sec("지금 얽힌 문서", 0, `<div class="nw-cards">${liveCards}</div>`) : ""}
-    ${sec("이번 이야기에서 쓴 문서", story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ""}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
-    ${tiles ? sec("분류", 0, `<div class="nw-tiles">${tiles}</div>`) : ""}
-  </div>`;
-  }
-  function paneHead3(ctx2, title2, sub, right = "", e) {
-    const back = wiki.history.some((h) => h.view !== "home") ? `<button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : "";
-    return `<header class="ph-room-head${back ? "" : " nw-noback"}">${back}
-    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc10(title2)}</b>${sub ? `<small>${esc10(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
-  }
-  function settingsView3(ctx2) {
-    const s4 = wikiSettings(ctx2.chat.scriptstate);
-    const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const line = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-    return `<div class="ph-form nw-setpane">${paneHead3(ctx2, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
-    <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${line("분량", seg3("wiki-length", s4.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
-      ${line("작성 모드", seg3("wiki-mode", s4.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
-      ${line("모델", seg3("wiki-model", s4.model, [["main", "메인"], ["aux", "보조"]]))}
-      ${line("새로고침 때 이전 문서 참고", seg3("wiki-refresh_previous", s4.refreshPrevious ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]))}
-      ${line("본편에 반영", seg3("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]), "본편에 나온 문서가 본편 요청에 참고로 붙어요")}
-    </div></section>
-    <section class="ps-group"><h3>작성 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서 작성에 덧붙일 말투·형식·관점">${esc10(req)}</textarea></div></div></section>
-    ${advancedBox("nw", ctx2.chat.scriptstate)}</div>
-  </div>`;
-  }
-  function newView(ctx2) {
-    return `<div class="ph-form">${paneHead3(ctx2, "새 문서", "")}
-    <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
-      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc10(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
-  }
-  function compose(ctx2) {
-    const job = jobs3.get(chatKey3(ctx2));
-    const mine = job?.title === wiki.title;
-    const lore = hasBook(source3(ctx2), wiki.title);
-    const e = entryFor(
+      return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === "an" ? CAT_ICON.an : t === "ms" ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list4.length}

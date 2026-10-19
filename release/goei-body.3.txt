@@ -1,4 +1,26 @@
-ev) || prev.sender !== m.sender;
+""}>${ICONS.trash}</button>`;
+  }
+  var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
+  function roomView(ctx2, st, d, busy4) {
+    const r = phone.room ? st.rooms[phone.room] : void 0;
+    if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
+    const confirm = phone.confirm === `room:${r.id}`;
+    const visible = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
+    const shown2 = visible.slice(-PAGE * phone.page);
+    const more = visible.length > shown2.length;
+    const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
+    const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
+    let lastDay = "";
+    const bubbles = shown2.map((m, i) => {
+      const dm = dayOf(m.time);
+      const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
+      const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
+      if (day) lastDay = day;
+      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc6(m.text)}</div>`;
+      const prev = shown2[i - 1];
+      const next = shown2[i + 1];
+      const me = m.sender === "me";
+      const first = !!sep || !isMsg(prev) || prev.sender !== m.sender;
       const last = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
@@ -174,8 +196,8 @@ ev) || prev.sender !== m.sender;
   }
   var AUTO_HINT = {
     "0": "새로고침 버튼을 누를 때만 확인해요",
-    open: "본편이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
-    "1": "본편 응답이 끝날 때마다 모델을 한 번 더 불러요"
+    open: "채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
+    "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
   };
   function seg(key, cur, items) {
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
@@ -200,7 +222,7 @@ ev) || prev.sender !== m.sender;
     <div class="ph-form-body ps">
       ${group("답장", [
       row2("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인"], ["aux", "보조"]])),
-      row2("본편에 반영", onoff("context"), "지금 장면과 관련된 대화가 본편 요청에 참고로 붙어요"),
+      row2("채팅에 반영", onoff("context"), "지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요"),
       row2("요원 상태 참고", onoff("status"))
     ].join(""))}
       ${group("새 메시지", [
@@ -692,7 +714,7 @@ ev) || prev.sender !== m.sender;
   }
   var viewing = () => ({ post: gnet.sub === "board" ? gnet.open : null, nick: gnet.sub === "dm" ? gnet.openDm : null });
   function refreshBoard(ctx2, env2, automatic = false) {
-    return run2(ctx2, env2, automatic ? "본편 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
+    return run2(ctx2, env2, automatic ? "채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
       const startLength = ctx2.chat.message?.length ?? 0;
       const before = readGnet(ctx2.chat);
       const nick = userNick(ctx2.chat.scriptstate);
@@ -703,7 +725,7 @@ ev) || prev.sender !== m.sender;
       let note = "";
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         if (automatic && (chat.message?.length ?? 0) !== startLength) {
-          note = "본편이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.";
+          note = "채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.";
           return null;
         }
         const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s4, date: dateNow(chat) }));
@@ -1083,7 +1105,7 @@ ev) || prev.sender !== m.sender;
       row3("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
       row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
       row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
-      row3("본편에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 본편 요청에 참고로 붙어요"),
+      row3("채팅에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
       row3("다양성 강화", seg2("sampling", v("sampling") === "1" ? "1" : "0", [["0", "끄기"], ["1", "켜기"]]))
     ].join(""))}
       ${group2("게시판", [
@@ -1099,7 +1121,7 @@ ev) || prev.sender !== m.sender;
       row3("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
       row3("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
     ].join(""))}
-      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
+      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
     return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows}</div></div>`;
   }
   function paneHtml2(ctx2, st, kind, busy4) {
@@ -1192,8 +1214,8 @@ ev) || prev.sender !== m.sender;
   }
   var LAZY_HINT = {
     "1": "새로고침 버튼을 누를 때만 불러요",
-    open: "본편이 진행된 뒤 괴담넷을 열면 한 번 불러요",
-    "0": "본편 응답이 끝날 때마다 모델을 한 번 더 불러요"
+    open: "채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요",
+    "0": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
   };
   async function handleGnet(action, value, ctx2, env2) {
     liveEnv2 = env2;
@@ -1777,8 +1799,10 @@ ${job.trailing}` : body5;
   --scrim: rgba(3, 7, 9, .8);
   --font: 'IBM Plex Sans KR', 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   --mono: 'JetBrains Mono', 'IBM Plex Sans KR', 'Pretendard', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-  color-scheme: dark;
 }
+/* color-scheme은 문서 뿌리(:root)에 두면 안 된다: Risu 화면과 다르면 브라우저가 이 iframe 뒤를 불투명하게 칠해
+   창 바깥이 늘 깜깜했다 (창 바깥 불투명도가 듣지 않던 원인). 창(.gx) 안에만 */
+.gx { color-scheme: dark; }
 .gx[data-theme="light"] {
   --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #D5DDDA; --line2: #C3CECA;
   --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
@@ -3016,25 +3040,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx[data-theme="light"] .gx-gmark.an.g-a, .gx[data-theme="paper"] .gx-gmark.an.g-a { color: var(--danger); text-shadow: 0 0 4px color-mix(in srgb, var(--danger) 35%, transparent); }
 .gx[data-theme="light"] .gx-gmark.an.g-b, .gx[data-theme="paper"] .gx-gmark.an.g-b { text-shadow: none; }
 .gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
-.gx-evc .gx-gmark.ms { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
-.gx-evc .gx-gmark svg { width: 16px; height: 16px; }
-/* 진행 중인 행은 눌러서 지도로, 오른쪽 위 아이콘 (v0.16.17) */
-#gx-sec-ag { scroll-margin-top: 12px; }
-#gx-sec-ag h2 { font-size: 15px; margin-bottom: 8px; }
-/* 요원 카드: 사진 크게 */
-.gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
-.gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
-.gx-acard-tool:hover { color: var(--signal); }
-.gx-acard-tool svg { width: 18px; height: 18px; }
-.gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 60px; }
-.gx-board .gx-acards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 8px; }
-.gx-board .gx-acard { align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; }
-.gx-board .gx-acard .gx-ava { width: 72px; height: 72px; border-radius: 16px; font-size: 26px; }
-@media (max-width: 760px) {
-  /* 모바일 요원 카드: 한 줄에 한 명 (v0.16.18 사용자 결정) */
-  .gx-board .gx-acards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .gx-board .gx-acard-top b { font-size: 13.5px; }
-  .gx-board .gx-acard-txt small, .gx-board .gx-acard-sit { font-size: 12px; white-space: normal; }
-  .gx-board .gx-acard:has(.gx-acard-act) .gx-acard-top { padding-right: 0; }
-}
-/* 사진+톡·위키 칸: PC는 없는 셈
+.gx-evc .gx-gmark.ms { background: color-mix(i

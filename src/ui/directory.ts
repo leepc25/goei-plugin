@@ -5,7 +5,7 @@ import {
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
 import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
-import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, splitPic, type PicSource } from '../host/assets';
+import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, personCrop, splitPic, type PicSource } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
@@ -200,7 +200,7 @@ const pickOf = (v: string): { slot: Slot; key: string } => {
 /** 얼굴 틀 「가로,세로,크기」 (맞춘 값, 없으면 기본 틀) */
 export function cropValue(key: string): [number, number, number] {
   const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
-  return parseCrop(p?.crop) ?? parseCrop(DEFAULT_CROP)!;
+  return p ? personCrop(p) : parseCrop(DEFAULT_CROP)!;
 }
 
 /** 얼굴 틀 바꾸기 (창의 틀 맞추기 칸에서 끌거나 크기를 바꿀 때) */

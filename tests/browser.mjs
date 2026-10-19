@@ -2213,7 +2213,7 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
 }
 console.log('PASS 설정·명부 줄 고정, 거점 목록');
 
-// 17c) 위키 인물 사진은 에셋 모듈의 「영문명_default」를 먼저 쓴다. 명부에서 거점을 추가하면 덮어쓰기 전에도 임무 지도에 보인다
+// 17c) 위키 사진은 에셋 모듈의 「영문명_default」도 찾는다. 명부에서 거점을 추가하면 덮어쓰기 전에도 임무 지도에 보인다
 if (fixture.globalLore.some(packed)) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
@@ -2226,12 +2226,13 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
   await page.waitForSelector('.nw-home');
   for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
-    await page.fill('.nw-home .gx-search', '이도형');
+    await page.fill('.nw-home .gx-search', '관리국');
     await page.press('.nw-home .gx-search', 'Enter');
     await page.waitForSelector('.nw-dochead', { timeout: 4000 }).catch(() => {});
   }
   await page.waitForSelector('.nw-ibphoto img');
-  assert.ok(await page.evaluate(() => window.__calls.read.includes('mod/ldh.png')), '모듈의 _default 사진');
+  // 요원 기본 그림은 이제 카드에 있다 (v0.16.33). 모듈에서 찾기는 카드에 없는 「관리국」 대표 그림으로 본다
+  assert.ok(await page.evaluate(() => window.__calls.read.includes('mod/org.png')), '모듈의 _default 사진');
   // 거점 추가 → 덮어쓰기 없이 임무 지도
   await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
   await page.click('[data-action="set-scope"][data-value="card"]');

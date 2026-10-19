@@ -1,4 +1,54 @@
-ctx2, wiki.title);
+개</small></button>`;
+    }).join("");
+    const sec = (title2, n, inner) => `<section class="nw-hsec"><h3>${title2}${n ? `<b>${n}</b>` : ""}</h3>${inner}</section>`;
+    return `<div class="nw-home">
+    <section class="nw-hero">
+      <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc10(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
+      <div class="nw-hero-res">${wikiHomeResults(ctx2)}</div>
+    </section>
+    ${liveCards ? sec("지금 얽힌 문서", 0, `<div class="nw-cards">${liveCards}</div>`) : ""}
+    ${sec("이번 이야기에서 쓴 문서", story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ""}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
+    ${tiles ? sec("분류", 0, `<div class="nw-tiles">${tiles}</div>`) : ""}
+  </div>`;
+  }
+  function paneHead3(ctx2, title2, sub, right = "", e) {
+    const back = wiki.history.some((h) => h.view !== "home") ? `<button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : "";
+    return `<header class="ph-room-head${back ? "" : " nw-noback"}">${back}
+    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc10(title2)}</b>${sub ? `<small>${esc10(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+  }
+  function settingsView3(ctx2) {
+    const s4 = wikiSettings(ctx2.chat.scriptstate);
+    const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
+    const line = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+    return `<div class="ph-form nw-setpane">${paneHead3(ctx2, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
+    <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
+      ${line("분량", seg3("wiki-length", s4.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
+      ${line("작성 모드", seg3("wiki-mode", s4.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
+      ${line("모델", seg3("wiki-model", s4.model, [["main", "메인"], ["aux", "보조"]]))}
+      ${line("다시 쓸 때 이전 문서 참고", seg3("wiki-refresh_previous", s4.refreshPrevious ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]))}
+      ${line("채팅에 반영", seg3("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]), "채팅에 나온 문서가 채팅 요청에 참고로 붙어요")}
+    </div></section>
+    <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc10(req)}</textarea></div></div></section>
+    ${advancedBox("nw", ctx2.chat.scriptstate)}</div>
+  </div>`;
+  }
+  function newView(ctx2) {
+    return `<div class="ph-form">${paneHead3(ctx2, "새 문서", "")}
+    <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
+      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc10(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
+  }
+  function docReqBox(shared) {
+    return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc10(wiki.docReq)}</textarea></label>
+      ${shared ? `<p class="nw-creq">공용 지침: ${esc10(shared)}</p>` : ""}`;
+  }
+  function compose(ctx2) {
+    const job = jobs3.get(chatKey3(ctx2));
+    const mine = job?.title === wiki.title;
+    const lore = hasBook(source3(ctx2), wiki.title);
+    const e = entryFor(ctx2, wiki.title);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc10(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc10(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
     return `<div class="ph-form">${paneHead3(ctx2, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : "새 문서", "", e)}
@@ -7,7 +57,7 @@ ctx2, wiki.title);
       <h2 class="nw-title">${esc10(wiki.title)}</h2>
       <p class="nw-cmsg">이 문서는 아직 없어요.</p>
       <p class="gx-muted">${src}</p>
-      ${req ? `<p class="nw-creq">작성 지침: ${esc10(req)}</p>` : ""}
+      ${docReqBox(req)}
     </section></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc10(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
   }
@@ -29,15 +79,20 @@ ctx2, wiki.title);
     }).join("")}</div></div>` : "";
     const m = doc.meta;
     const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc10(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>작성 지침: ${esc10(m.writingRequest)}</p>` : ""}</details>` : "";
+       ${m.sources.length ? `<p>${esc10(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc10(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc10(m.docRequest)}</p>` : ""}</details>` : "";
     const confirm = wiki.confirmDelete === doc.title;
     const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc.title);
     const del = doc.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc10(doc.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc10(doc.title)}"`);
-    const right = `${tool3("wiki-rewrite", ICONS.refresh, job?.title === doc.title ? "작성하는 중" : "새로고침", `data-value="${esc10(doc.title)}" ${job ? "disabled" : ""}`)}${del}`;
+    const open3 = wiki.rewrite === doc.title;
+    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc10(doc.title)}" ${open3 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
+    const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
+    const rewrite = open3 ? `<section class="nw-rewrite">${docReqBox(req)}
+        <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${[["1", "켜기"], ["0", "끄기"]].map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? "1" : "0") === v ? " on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</div></div>
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc10(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
     const sub = [e ? CAT_LABEL[e.cat] : "", doc.base ? "기본 문서" : m?.created ? when(m.created) : ""].filter(Boolean).join(" · ");
     return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc.title, sub, right, e)}
     <article class="nw-doc">
-      <header class="nw-dochead"><h2 class="nw-title">${esc10(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc10(e.sub)}</small>` : ""}</header>
+      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc10(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc10(e.sub)}</small>` : ""}</header>
       <div class="nw-body">${r.html}</div>
       ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
     </article></div>`;
@@ -262,12 +317,28 @@ ctx2, wiki.title);
         wiki.listOpen = false;
         break;
       case "wiki-start":
-        if (wiki.view === "compose" && wiki.title === v) void generate3(ctx2, env2, v, false);
+        if (wiki.view === "compose" && wiki.title === v) void generate3(ctx2, env2, v, false, wiki.docReq);
         break;
-      case "wiki-rewrite":
+      case "wiki-rewrite": {
         if (!v) break;
-        if (wiki.view !== "doc") go("doc", v);
-        void generate3(ctx2, env2, v, true);
+        if (wiki.view !== "doc" || wiki.title !== v) go("doc", v);
+        if (wiki.rewrite === v) {
+          wiki.rewrite = null;
+          break;
+        }
+        const old = findDoc(ctx2.chat, v, ctx2.char.globalLore);
+        Object.assign(wiki, { rewrite: v, docReq: old?.meta?.docRequest ?? "", rewritePrev: wikiSettings(ctx2.chat.scriptstate).refreshPrevious });
+        break;
+      }
+      case "wiki-rw-prev":
+        wiki.rewritePrev = v === "1";
+        break;
+      case "wiki-rw-cancel":
+        Object.assign(wiki, { rewrite: null, docReq: "" });
+        break;
+      case "wiki-rw-go":
+        if (!v || wiki.rewrite !== v) break;
+        void generate3(ctx2, env2, v, true, wiki.docReq, wiki.rewritePrev);
         break;
       case "wiki-delete":
         if (wiki.confirmDelete !== v) {
@@ -306,6 +377,7 @@ ctx2, wiki.title);
   }
   function wikiInput(name, value) {
     if (name === "wiki-new") return void (wiki.newTitle = value), true;
+    if (name === "wiki-docreq") return void (wiki.docReq = value), true;
     return false;
   }
 
@@ -495,7 +567,7 @@ ctx2, wiki.title);
   };
   function cropValue(key) {
     const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
-    return parseCrop(p?.crop) ?? parseCrop(DEFAULT_CROP);
+    return p ? personCrop(p) : parseCrop(DEFAULT_CROP);
   }
   function setCrop(key, crop) {
     const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
@@ -1891,7 +1963,7 @@ ${note.trim()}` : card2;
     const more = only(other.picks, mine, mode3 !== "risu");
     const less = only(now.picks, theirs, mode3 === "risu");
     const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
-    return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>본편 로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
+    return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
     <section class="ps-group"><h3>${mode3 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;
@@ -1913,6 +1985,7 @@ ${note.trim()}` : card2;
   function field3(label, control2, help) {
     return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
   }
+  var dimSlider = (n, busy4) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy4 ? " disabled" : ""}><output>${n}%</output></label>`;
   var group3 = (title2, body5, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
   function worldOffVars() {
     return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
@@ -1986,18 +2059,25 @@ ${note.trim()}` : card2;
     return `<main class="gx-body gx-settings">
     ${scopeBar(scope, canChat)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc15(settingsUi.notice)}</div>` : ""}
+    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki]].map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon}${label} 설정</button>`).join("")}</div>`) : ""}
     ${group3("화면", [
       field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy4), "채팅 화면의 캐릭터 이미지 배경과 상태창(테마 따름일 때) 배색이에요."),
       field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy4), "채팅 속 상태창의 배색이에요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
       field3("메뉴 위치", seg4("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy4), "PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
-      field3("창 바깥 어둡기", seg4("set-dim", String(getPrefs().dim ?? DIM_DEFAULT), DIM_STEPS.map((n) => [String(n), `${n}%`]), busy4), "창 뒤의 채팅 화면을 얼마나 가릴지 정해요. 0%면 그대로 보여요.")
+      field3("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy4), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.")
     ].join(""))}
+    ${group3("캐릭터 이미지", [
+      field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy4), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
+      s4.assetOn ? field3("출력 모델", seg4("set-asset-model", s4.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy4), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
+      s4.assetOn && s4.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s4.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy4), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
+    ].join(""))}
+    ${scope === "chat" && s4.assetOn && s4.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc15(note)}</p>` : ""}
     ${group3("상황판", [
       field3("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
       field3("요원 표시 인원", stepper("set-agent", "n", `${s4.agentLimit}명`, s4.agentLimit > 0, s4.agentLimit < AGENT_MAX, "요원 표시 인원", busy4), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
       field3("지원 투입", seg4("set-support", s4.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy4), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.")
     ].join(""))}
-    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
+    <details class="ps-adv st-world" data-keep="world-gen"${keepOpen("world-gen")}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world, "preset", "프리셋 괴이", busy4)}${worldKind(world, "random", "랜덤 괴이", busy4)}
         ${worldKind(world, "incident", "사건", busy4)}${worldKind(world, "mystic", "특수", busy4)}
@@ -2005,17 +2085,9 @@ ${note.trim()}` : card2;
           ${worldRow(world, "extra_cap", "괴이", "개", busy4)}${worldRow(world, "extra_in_cap", "사건", "개", busy4)}${worldRow(world, "extra_ms_cap", "특수", "개", busy4)}</div>
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
-    </section>
-    ${group3("캐릭터 이미지", [
-      field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy4), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
-      s4.assetOn ? field3("출력 모델", seg4("set-asset-model", s4.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy4), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
-      s4.assetOn && s4.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s4.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy4), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
-    ].join(""))}
-    ${scope === "chat" && s4.assetOn && s4.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc15(note)}</p>` : ""}
-    ${advancedBox("gen", scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars)}
-    ${scope === "chat" && canChat ? loreCheckBox(ctx2) : ""}
+    </div></details>
+    ${advSections("gen", scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars, scope === "chat" && canChat ? { 1: loreCheckBox(ctx2) } : {})}
     ${updateGroup(ctx2)}
-    ${canChat ? '<p class="gx-muted">괴담넷·괴담톡·위키 설정은 각 탭 안에 있어요.</p>' : ""}
     ${toast("st", settingsUi.info, (t) => {
       if (settingsUi.info === t) settingsUi.info = "";
     })}
@@ -2109,7 +2181,7 @@ ${note.trim()}` : card2;
     if (action === "set-nav" || action === "set-dim") {
       const n = Number(v);
       if (action === "set-nav" && (v === "left" || v === "right")) await saveDefaults(env2, (p) => ({ ...p, nav: v === "right" ? "right" : void 0 }));
-      else if (action === "set-dim" && DIM_STEPS.includes(n)) await saveDefaults(env2, (p) => ({ ...p, dim: n }));
+      else if (action === "set-dim" && Number.isInteger(n) && n >= 0 && n <= 100) await saveDefaults(env2, (p) => ({ ...p, dim: n }));
       return true;
     }
     if (action === "set-scope") {
@@ -2226,6 +2298,10 @@ ${note.trim()}` : card2;
 
   // src/ui/app.ts
   var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
   var root = null;
   var view = { kind: "loading" };
   var draft = { lang: "ko" };
@@ -2446,6 +2522,12 @@ ${note.trim()}` : card2;
     });
     root.addEventListener("input", (ev) => {
       const el = ev.target;
+      if (el?.dataset?.input === "dim" && root) {
+        paintVeil(root, Number(el.value));
+        const out = el.parentElement?.querySelector("output");
+        if (out) out.textContent = `${el.value}%`;
+        return;
+      }
       if (el?.dataset?.input === "wiki-query" && view.kind === "started") {
         wiki.query = el.value;
         const box2 = root?.querySelector(".nw .ph-content");
@@ -2710,6 +2792,16 @@ ${note.trim()}` : card2;
         if (view.kind === "started" && tab === "phone") openCheck(view.ctx, phoneEnv);
         if (view.kind === "started" && tab === "gnet") gnetOpenCheck(view.ctx, gnetEnv);
         return;
+      case "feature-set":
+        if (view.kind !== "started") return;
+        if (value === "phone") Object.assign(phone, { view: "settings", invite: null, picked: [] });
+        else if (value === "gnet" && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
+        else if (value === "wiki") openWikiSettings();
+        else return;
+        tab = value;
+        notice = "";
+        resetSettings();
+        return render();
       case "board-map":
         if (view.kind !== "started" || !showOnMap(view.ctx, value ?? "")) return;
         tab = "map";
@@ -2884,8 +2976,7 @@ ${note.trim()}` : card2;
     root.dataset.theme = themeOf();
     const pf = getPrefs();
     root.dataset.nav = pf.nav ?? "left";
-    const veil = VEIL[root.dataset.theme] ?? VEIL.dark;
-    root.style.background = `rgba(${veil}, ${(pf.dim ?? DIM_DEFAULT) / 100})`;
+    paintVeil(root, pf.dim ?? DIM_DEFAULT);
     root.innerHTML = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body4()}</div>`;
     if (dirUi.scrollTo) {
       dirUi.scrollTo = "";
@@ -3509,5 +3600,5 @@ ${note.trim()}` : card2;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.32", start: start3 };
+  globalThis.__goeiBody = { version: "0.16.33", start: start3 };
 })();

@@ -101,6 +101,31 @@ export interface PicSource {
 /** 얼굴 틀을 따로 맞추지 않은 요원: 카우보이샷의 위쪽 가운데 */
 export const DEFAULT_CROP = '50,16,44';
 
+/** 카드에 든 요원 기본 그림(영문명_default, assets/agents)마다 맞춘 얼굴 틀. 없으면 DEFAULT_CROP (2026-10-19 그림을 보고 맞춤) */
+export const AGENT_CROPS: Record<string, string> = {
+  'Aestheticism': '53,18,40',
+  'Aileen': '48,17,44',
+  'Baek Sa-heon': '50,18,44',
+  'Cha Yeo-jin': '54,18,44',
+  'Cho Seong-choon': '48,18,44',
+  'Do Pil-heon': '48,16,44',
+  'Go Young-eun': '46,16,44',
+  'Jang Heo-un': '52,18,44',
+  'Jay': '53,16,44',
+  'Jyaldi': '56,18,44',
+  'Kwak Je-gang': '56,19,44',
+  'Kyuras': '49,19,44',
+  'Lee Do-hyeong': '61,16,44',
+  'Ma Deok-hee': '49,19,44',
+  'Mun Hye-ran': '46,18,44',
+  'Secriem': '54,16,44',
+  'Seo Yun-ji': '46,18,44',
+  'Spangdal': '52,18,44',
+};
+
+/** 명부에서 맞춘 틀 → 그 요원 그림의 틀 → 기본 틀 */
+export const personCrop = (p: PicSource) => parseCrop(p.crop) ?? parseCrop((!p.photo && AGENT_CROPS[p.english ?? '']) || DEFAULT_CROP)!;
+
 /** 「가로,세로,크기」(%) → 틀 중심(가로·세로)과 한 변(그림 너비 대비). 잘못된 값은 null */
 export function parseCrop(s: string | undefined): [number, number, number] | null {
   const n = String(s ?? '').split(',').map(Number);
@@ -131,9 +156,12 @@ export function mainPic(char: CharacterSnapshot, p: PicSource): string {
  */
 export function facePic(char: CharacterSnapshot, p: PicSource, person = false): string {
   if (p.face) return p.face;
-  if (p.english && hasAsset(char, p.english)) return p.english;
+  // 요원: 기본 그림(영문명_default)이 있으면 옛 작은 얼굴 그림보다 그 그림의 얼굴을 쓴다 (2026-10-19 사용자: 기본 그림을 카드에 넣고 얼굴을 맞춤)
+  const en = p.english ?? '';
+  if (person && !p.photo && en && hasAsset(char, `${en}_default`)) return `${en}_default#${personCrop(p).join(',')}`;
+  if (en && hasAsset(char, en)) return en;
   const main = mainPic(char, p);
-  const crop = parseCrop(p.crop) ?? (person ? parseCrop(DEFAULT_CROP) : null);
+  const crop = person ? personCrop(p) : parseCrop(p.crop);
   return main && crop ? `${main}#${crop.join(',')}` : main;
 }
 
