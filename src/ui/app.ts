@@ -796,12 +796,12 @@ function render(): void {
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
-/** 모바일 상황판 하단 서랍: 위 오른쪽에 있어 손이 먼 신분증·설정 (v0.16.24) */
+/** 모바일 상황판 하단 서랍: 순찰·설정 (2026-10-19 사용자: 신분증은 위에만, 순찰은 위에서 빼고 여기만) */
 function boardDrawer(): string {
   if (!matchMedia('(max-width: 760px)').matches) return '';
   const b = (action: string, value: string, icon: string, label: string) =>
     `<button class="ph-tool" data-action="${action}"${value ? ` data-value="${value}"` : ''} aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`;
-  return drawerHtml(b('id-card', '', ICONS.idcard, '신분증') + b('game-open', '', ICONS.game, '순찰') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
+  return drawerHtml(b('game-open', '', ICONS.game, '순찰') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
 }
 
 /** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */

@@ -618,6 +618,7 @@ export function wikiTab(ctx: ChatContext): string {
         ${fail}
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
+    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
     ${drawerHtml([
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
