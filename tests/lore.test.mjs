@@ -101,8 +101,18 @@ test('상한을 넘으면 점수 낮은 것부터 뺀다', () => {
 test('요청 보정: 넣어 둔 글을 새로 고른 글로', () => {
   const msgs = [{ role: 'system', content: 'A\n\n옛 요원 글\n\nB' }, { role: 'user', content: 'x' }];
   const r = lore.patchSlots(msgs, { $goei_lore_agent: '옛 요원 글' }, { $goei_lore_agent: '새 글', $goei_lore_org: '세력' });
-  assert.equal(r.changed, 1);
-  assert.equal(r.messages[0].content, 'A\n\n새 글\n\nB');
+  assert.equal(r.changed, 2);
+  assert.equal(r.messages[0].content, 'A\n\n세력\n\n새 글\n\nB');
+});
+
+test('요청 보정: 비어 있던 자리는 이웃 자리 글 옆에', () => {
+  const msgs = [{ role: 'system', content: 'A\n\n세력 글\n\nB' }];
+  const r = lore.patchSlots(msgs, { $goei_lore_org: '세력 글', $goei_lore_agent: '' }, { $goei_lore_org: '세력 글', $goei_lore_agent: '요원 글' });
+  assert.equal(r.messages[0].content, 'A\n\n세력 글\n\n요원 글\n\nB');
+  const r2 = lore.patchSlots(msgs, { $goei_lore_agent: '' }, { $goei_lore_agent: '요원 글' });
+  assert.equal(r2.changed, 0, '이웃이 모두 비면 그대로');
+  const r3 = lore.patchSlots([{ content: 'X\n\n요원 글' }], { $goei_lore_org: '', $goei_lore_agent: '요원 글' }, { $goei_lore_org: '세력 글', $goei_lore_agent: '요원 글' });
+  assert.equal(r3.messages[0].content, 'X\n\n세력 글\n\n요원 글', '앞 이웃이 없으면 뒷자리 앞');
 });
 
 test('카드 업데이트: 사용자가 고친 키는 남긴다', () => {

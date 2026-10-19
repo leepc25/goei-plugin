@@ -384,18 +384,37 @@ export function loreOptions(char: { name?: string; globalLore?: LoreEntry[]; lor
 
 /**
  * 요청 직전 보정: 입력 때 넣어 둔 글(old)과 지금 다시 고른 글(next)이 다르면 요청 속 그 글을 바꾼다.
- * 다시 굴리기처럼 입력 처리를 거치지 않은 요청을 맞춘다. 비어 있던 자리는 찾을 수 없어 그대로 둔다
+ * 다시 굴리기처럼 입력 처리를 거치지 않은 요청을 맞춘다. 비어 있던 자리는 요청에서 찾을 수 없어서,
+ * 이웃 자리 글(앞 자리 뒤, 없으면 뒷자리 앞)에 붙여 넣는다. 이웃도 모두 비어 있으면 그대로 둔다
  */
 export function patchSlots<M extends { content?: unknown }>(messages: M[], old: Record<string, unknown> | undefined, next: Record<string, string>): { messages: M[]; changed: number } {
   let changed = 0;
   let out = messages;
-  for (const [k, v] of Object.entries(next)) {
-    const prev = String(old?.[k] ?? '');
-    if (!prev || prev === v) continue;
-    const at = out.findIndex((m) => typeof m?.content === 'string' && m.content.includes(prev));
-    if (at < 0) continue;
-    out = out.map((m, i) => (i === at ? { ...m, content: (m.content as string).replace(prev, () => v) } : m));
+  const vars = LORE_KINDS.map(slotVar);
+  /** 지금 요청에 들어 있는 자리마다의 글 */
+  const cur = vars.map((k) => String(old?.[k] ?? ''));
+  const find = (text: string) => (text ? out.findIndex((m) => typeof m?.content === 'string' && m.content.includes(text)) : -1);
+  const swap = (at: number, from: string, to: string) => {
+    out = out.map((m, i) => (i === at ? { ...m, content: (m.content as string).replace(from, () => to) } : m));
+  };
+  vars.forEach((k, i) => {
+    if (!(k in next)) return;
+    const v = next[k];
+    const prev = cur[i];
+    if (prev === v) return;
+    if (prev) {
+      const at = find(prev);
+      if (at < 0) return;
+      swap(at, prev, v);
+    } else {
+      const before = [...cur.slice(0, i)].reverse().find((t) => t && find(t) >= 0);
+      const after = cur.slice(i + 1).find((t) => t && find(t) >= 0);
+      if (before) swap(find(before), before, `${before}\n\n${v}`);
+      else if (after) swap(find(after), after, `${v}\n\n${after}`);
+      else return;
+    }
+    cur[i] = v;
     changed++;
-  }
+  });
   return { messages: out, changed };
 }
