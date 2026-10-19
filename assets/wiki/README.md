@@ -9,4 +9,4 @@
 
 플러그인은 대표(큰 사진)를 「영문명_default」 → 「영문명」, 얼굴(작은 사진)을 「영문명」 → 대표 순으로 찾습니다 (`src/host/assets.ts`).
 
-AVIF 품질 45, 4:2:0, 832×832. GPT가 올린 `codex/wiki-images-avif`(품질 90)를 다시 변환했습니다 (평균 약 36KB). 원본 파일명과의 대응은 `manifest.json`.
+AVIF 품질 50, 4:2:0, 832×832. GPT가 올린 `codex/wiki-images-avif`(품질 90)를 다시 변환했습니다 (평균 약 44KB). 원본 파일명과의 대응은 `manifest.json`.
