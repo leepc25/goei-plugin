@@ -8,7 +8,7 @@ import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
   membership, parseRefresh, parseReply, personOf, phoneSettings, phoneTime, phoneValue, PH, PH_AUTO_LAST, PH_CONTACTS, PhoneError, push, readBulletins,
   readCustom, readPhone, readRoom, refreshAllowed, roomLabel, unreadCount, unsolicited, keepValid, lastReply, validCallTarget, writeBulletins, writePhone,
-  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause,
+  chancePassed, type Contact, type Directory, type PRoom, type PState, contactId, splitRecords, noticeSettings, phoneStorage, STORAGE_MAX, NOTICE_PAGE_SIZES, hiddenPause, noticeLabel,
 } from '../core/phone';
 import { refreshPrompt, refreshRetry, replyPrompt } from '../core/phonePrompt';
 import { agentFace, imageUrl, stChip } from './images';
@@ -60,6 +60,8 @@ interface PhoneUi {
   /** 대화·공지 목록: 전체 / 안 읽음만 */
   chatFilter: 'all' | 'unread';
   noticeFilter: 'all' | 'unread';
+  /** 공지 목록: 이 세력 공지만 (빈칸 = 모두). 세력이 둘 이상 섞였을 때만 고를 수 있다 */
+  noticeFaction: string;
   /** 단톡 만들기·초대 목록의 소속 탭 */
   pickTab: string;
 }
@@ -67,14 +69,14 @@ interface PhoneUi {
 export const phone: PhoneUi = {
   sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', gname: '', draft: '', page: 1, call: '', callText: '',
   addName: '', addNote: '', openNotice: null, noticePage: 1, attach: [], confirm: null, notice: '', failure: null, attachMenu: false, pickQuery: '',
-  chatFilter: 'all', noticeFilter: 'all', pickTab: '',
+  chatFilter: 'all', noticeFilter: 'all', noticeFaction: '', pickTab: '',
 };
 
 export function resetPhone() {
   Object.assign(phone, {
     sub: 'contacts', tab: '', query: '', view: 'list', room: null, invite: null, picked: [], topic: '', gname: '', draft: '', page: 1, call: '', callText: '',
     addName: '', addNote: '', openNotice: null, noticePage: 1, attach: [], confirm: null, notice: '', failure: null, attachMenu: false, pickQuery: '',
-    chatFilter: 'all', noticeFilter: 'all', pickTab: '',
+    chatFilter: 'all', noticeFilter: 'all', noticeFaction: '', pickTab: '',
   });
 }
 
@@ -775,8 +777,13 @@ function noticesView(ctx: ChatContext): string {
   } catch (error) {
     return `<p class="gx-none">${esc((error as Error).message)}</p>`;
   }
-  const every = [...b.items].reverse();
-  if (!every.length) return blank('아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.');
+  const received = [...b.items].reverse();
+  if (!received.length) return blank('아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.');
+  // 세력을 바꿔도 지난 공지는 남는다. 세력이 섞였을 때만 세력별로 묶어 보는 칩을 둔다 (사용자 결정 2026-10-19)
+  const label = noticeFactionLabel(names(ctx));
+  const factions = [...new Set(received.map((r) => r.channel))];
+  if (factions.length < 2 || !factions.includes(phone.noticeFaction)) phone.noticeFaction = '';
+  const every = phone.noticeFaction ? received.filter((r) => r.channel === phone.noticeFaction) : received;
   const unreadN = every.filter((r) => r.read === false).length;
   const all = phone.noticeFilter === 'unread' ? every.filter((r) => r.read === false) : every;
   const size = noticeSettings(ctx.chat.scriptstate).page;
@@ -787,16 +794,24 @@ function noticesView(ctx: ChatContext): string {
   const head = `<div class="ph-notice-bar">${chips('ph-notice-filter', phone.noticeFilter, [
     { id: 'all', label: '전체', count: every.length },
     { id: 'unread', label: '안읽음', alert: unreadN },
-  ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ''}</div>`;
+  ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ''}</div>`
+    + (factions.length > 1
+      ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? ' on' : ''}" data-action="ph-notice-faction" data-value="${esc(f)}" aria-pressed="${phone.noticeFaction === f}">${esc(label(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join('')}</div>`
+      : '');
   if (!all.length) return head + blank('안 읽은 공지가 없어요.');
   const nav = pages > 1
     ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? 'disabled' : ''}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? 'disabled' : ''}>다음 ›</button></div>`
     : '';
-  return `${head}${noticeList(items)}${nav}`;
+  return `${head}${noticeList(items, label)}${nav}`;
+}
+
+/** 공지를 받은 세력 이름: 지금 명부 이름 → 받을 때 적어 둔 이름 → 코드 */
+function noticeFactionLabel(names: Record<string, string>) {
+  return (code: string, saved?: string) => (code ? noticeLabel(code, names) : '') || saved || code || '소속 없음';
 }
 
 /** 공지 목록 (v0.16.22, 사용자 설계): 첫 줄 분류 딱지·발신·시각과 오른쪽 끝 휴지통, 둘째 줄 제목. 본문은 오른쪽(모바일은 다음 화면)에 */
-function noticeList(items: ReturnType<typeof readBulletins>['items']): string {
+function noticeList(items: ReturnType<typeof readBulletins>['items'], label: (code: string, saved?: string) => string): string {
   return `<ul class="ph-list ph-notices">${items
     .map((r) => {
       const on = phone.view === 'notice' && phone.openNotice === r.id;
@@ -807,7 +822,7 @@ function noticeList(items: ReturnType<typeof readBulletins>['items']): string {
       // 모바일은 목록 안에서 미리보기 → 펼치기, PC는 목록엔 제목만 두고 본문은 오른쪽 칸 (CSS로 나눈다)
       const open = phone.openNotice === r.id;
       return `<li class="ph-notice${on ? ' on' : ''}${open ? ' open' : ''}${r.read === false ? ' new' : ''}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on}" aria-expanded="${open}">
-        <span class="ph-ncard-top"><span class="gx-badge">${esc(r.category)}</span><small>${esc(r.issuer)}${r.time ? ` · ${esc(r.time)}` : ''}</small></span>
+        <span class="ph-ncard-top"><span class="gx-badge">${esc(r.category)}</span><span class="ph-nfac">${esc(label(r.channel, r.channelName))}</span><small>${esc(r.issuer)}${r.time ? ` · ${esc(r.time)}` : ''}</small></span>
         <span class="ph-ncard-title"><b>${esc(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ''}</span>
 </button>${del}
         ${open ? `<div class="ph-notice-body">${esc(r.text).replace(/\n/g, '<br>')}</div>` : ''}</li>`;
@@ -851,7 +866,7 @@ function searchView(ctx: ChatContext, st: PState, d: Directory): string {
   }
   if (!people.length && !rooms.length && !notes.length) return blank('검색 결과가 없어요.');
   const sec = (title: string, n: number, html: string) => (n ? `<h4 class="ph-sec">${title}<b>${n}</b></h4>${html}` : '');
-  return sec('연락처', people.length, contactList(ctx, people, st)) + sec('대화', rooms.length, chatList(ctx, rooms, d)) + sec('공지', notes.length, noticeList(notes));
+  return sec('연락처', people.length, contactList(ctx, people, st)) + sec('대화', rooms.length, chatList(ctx, rooms, d)) + sec('공지', notes.length, noticeList(notes, noticeFactionLabel(names(ctx))));
 }
 
 function callView(): string {
@@ -1043,6 +1058,10 @@ export async function handlePhone(action: string, value: string | undefined, ctx
       break;
     case 'ph-notice-filter':
       phone.noticeFilter = v === 'unread' ? 'unread' : 'all';
+      phone.noticePage = 1;
+      break;
+    case 'ph-notice-faction':
+      phone.noticeFaction = phone.noticeFaction === v ? '' : v;
       phone.noticePage = 1;
       break;
     case 'ph-pick-tab':
