@@ -1,0 +1,773 @@
+{
+  "version": 3,
+  "status": "planning-not-implemented",
+  "supersedes": "slender 160px production target",
+  "nativeHeight": 128,
+  "displayScale": 2,
+  "displayHeight": 256,
+  "headCountTarget": 6,
+  "paletteTarget": 64,
+  "paletteMax": 96,
+  "standingCell": [
+    128,
+    160
+  ],
+  "attackCell": [
+    192,
+    160
+  ],
+  "largeAttackCell": [
+    256,
+    192
+  ],
+  "standingOrigin": [
+    64,
+    144
+  ],
+  "noFractionalBodyScale": true,
+  "proportionGuides": {
+    "crown": 0,
+    "chin": 22,
+    "shoulder": 28,
+    "waist": 48,
+    "pelvis": 63,
+    "crotch": 69,
+    "knee": 100,
+    "ankle": 122,
+    "sole": 128
+  },
+  "massGuides": {
+    "headWidth": [
+      16,
+      18
+    ],
+    "shoulderWidth": [
+      32,
+      35
+    ],
+    "chestWidth": [
+      27,
+      31
+    ],
+    "waistWidth": [
+      23,
+      27
+    ],
+    "pelvisWidth": [
+      26,
+      29
+    ],
+    "upperArmThickness": [
+      7,
+      9
+    ],
+    "forearmThickness": [
+      6,
+      8
+    ],
+    "thighThickness": [
+      9,
+      11
+    ],
+    "calfThickness": [
+      7,
+      9
+    ],
+    "handSize": [
+      9,
+      10
+    ]
+  },
+  "motions": [
+    {
+      "id": "idle_relaxed",
+      "name": "비전투 대기",
+      "frames": 6,
+      "scope": "확장",
+      "readability": "호흡·어깨·머리카락의 시간차",
+      "group": "대기·이동"
+    },
+    {
+      "id": "idle_combat",
+      "name": "전투 대기",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "양발 체중 배분·호흡·손의 긴장",
+      "group": "대기·이동"
+    },
+    {
+      "id": "ready_enter",
+      "name": "전투 자세 진입",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "발 재배치→무릎 하강→손 준비",
+      "group": "대기·이동"
+    },
+    {
+      "id": "ready_exit",
+      "name": "경계 해제",
+      "frames": 4,
+      "scope": "확장",
+      "readability": "무게중심과 손을 풀기",
+      "group": "대기·이동"
+    },
+    {
+      "id": "turn_ground",
+      "name": "지상 방향 전환",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "지지발→골반→어깨→머리 순서",
+      "group": "대기·이동"
+    },
+    {
+      "id": "walk_start",
+      "name": "걷기 시작",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "중심 선행·첫 디딤",
+      "group": "대기·이동"
+    },
+    {
+      "id": "walk_loop",
+      "name": "걷기 한 주기",
+      "frames": 12,
+      "scope": "필수",
+      "readability": "좌우 각각 접지·압축·통과·상승",
+      "group": "대기·이동"
+    },
+    {
+      "id": "walk_stop",
+      "name": "걷기 정지",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "제동발·골반 감속·상체 복귀",
+      "group": "대기·이동"
+    },
+    {
+      "id": "step_back",
+      "name": "경계 뒤걸음",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "적을 보며 지지발 교대",
+      "group": "대기·이동"
+    },
+    {
+      "id": "strafe",
+      "name": "바닥 앞뒤 이동",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "전투 방향 유지·골반 이동",
+      "group": "대기·이동"
+    },
+    {
+      "id": "run_start",
+      "name": "달리기 시작",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "전경 자세·강한 첫 추진",
+      "group": "대기·이동"
+    },
+    {
+      "id": "run_loop",
+      "name": "달리기 한 주기",
+      "frames": 12,
+      "scope": "필수",
+      "readability": "착지·압축·추진·체공",
+      "group": "대기·이동"
+    },
+    {
+      "id": "run_stop",
+      "name": "달리기 급정지",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "제동발·무릎 압축·머리카락 관성",
+      "group": "대기·이동"
+    },
+    {
+      "id": "run_turn",
+      "name": "달리기 반전",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "감속→딛기→방향 전환",
+      "group": "대기·이동"
+    },
+    {
+      "id": "evade_enter",
+      "name": "회피 준비",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "중심 낮춤·지지발 추진",
+      "group": "대기·이동"
+    },
+    {
+      "id": "evade_travel",
+      "name": "회피 이동",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "고유 낮은 자세·이동 궤적",
+      "group": "대기·이동"
+    },
+    {
+      "id": "evade_recover",
+      "name": "회피 복귀",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "제동→상체 복귀→다음 행동",
+      "group": "대기·이동"
+    },
+    {
+      "id": "jump_takeoff",
+      "name": "점프 준비·도약",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "무릎 압축→발목 추진→이륙",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "jump_rise",
+      "name": "점프 상승",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "다리 회수·옷의 지연",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "jump_apex",
+      "name": "점프 정점",
+      "frames": 2,
+      "scope": "필수",
+      "readability": "상승에서 낙하로 자세 전환",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "jump_fall",
+      "name": "낙하",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "무릎·발목 착지 준비",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "land_soft",
+      "name": "보통 착지",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "발 접촉→압축→복귀",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "land_heavy",
+      "name": "강한 착지",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "큰 압축·회복 지연",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "crouch_enter",
+      "name": "앉기 진입",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "고관절과 무릎 함께 굽힘",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "crouch_hold",
+      "name": "앉기 유지",
+      "frames": 3,
+      "scope": "필수",
+      "readability": "낮은 중심·작은 호흡",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "crouch_exit",
+      "name": "일어서기",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "발 지지→골반 상승→상체",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "guard_enter",
+      "name": "가드 준비",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "보호 위치로 팔·어깨 정렬",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "guard_hold",
+      "name": "가드 유지",
+      "frames": 3,
+      "scope": "필수",
+      "readability": "방어 방향·긴장 유지",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "guard_hit",
+      "name": "가드 충격",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "충격 흡수→뒤꿈치 버팀→재정렬",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "guard_break",
+      "name": "가드 붕괴",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "팔 벌어짐·중심 손실·빈틈",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "guard_exit",
+      "name": "가드 해제",
+      "frames": 4,
+      "scope": "필수",
+      "readability": "이동·공격 대기로 연결",
+      "group": "점프·낮은 자세·방어"
+    },
+    {
+      "id": "melee_1",
+      "name": "근접 1타: 장타",
+      "frames": 10,
+      "scope": "필수",
+      "readability": "디딤→골반 전달→손바닥 타격→회수",
+      "group": "공격·능력"
+    },
+    {
+      "id": "melee_2",
+      "name": "근접 2타: 팔꿈치 제압",
+      "frames": 12,
+      "scope": "필수",
+      "readability": "반대 체중 이동·몸통 회전·다른 궤도",
+      "group": "공격·능력"
+    },
+    {
+      "id": "melee_3",
+      "name": "근접 3타: 근거리 파괴 충격",
+      "frames": 16,
+      "scope": "필수",
+      "readability": "강한 디딤→손 고정→능력 방출→반동",
+      "group": "공격·능력"
+    },
+    {
+      "id": "melee_end",
+      "name": "연계 중단·복귀",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "1·2타 종료점별 자연스러운 회수",
+      "group": "공격·능력"
+    },
+    {
+      "id": "draw_pistol",
+      "name": "권총 뽑기",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "허리→손→조준 접점",
+      "group": "공격·능력"
+    },
+    {
+      "id": "aim_pistol",
+      "name": "조준 유지",
+      "frames": 3,
+      "scope": "필수",
+      "readability": "손목·팔·총구 축 유지",
+      "group": "공격·능력"
+    },
+    {
+      "id": "fire_pistol",
+      "name": "발사·반동·복귀",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "발사 이벤트→손목·팔꿈치 반동→재조준",
+      "group": "공격·능력"
+    },
+    {
+      "id": "holster_pistol",
+      "name": "권총 수납·근접 전환",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "총과 손을 정리하며 접근 자세로",
+      "group": "공격·능력"
+    },
+    {
+      "id": "reload_pistol",
+      "name": "재장전",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "탄창·양손·총의 접점",
+      "group": "공격·능력"
+    },
+    {
+      "id": "dash_attack",
+      "name": "달리기 공격",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "접근 관성→제동 타격→회수",
+      "group": "공격·능력"
+    },
+    {
+      "id": "jump_attack",
+      "name": "공중 근접 공격",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "공중 회전·반동·착지 연결",
+      "group": "공격·능력"
+    },
+    {
+      "id": "air_fire",
+      "name": "공중 권총 사격",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "전용 하체 균형·반동",
+      "group": "공격·능력"
+    },
+    {
+      "id": "ability_quick",
+      "name": "C: 짧은 파괴 능력",
+      "frames": 14,
+      "scope": "필수",
+      "readability": "고유 준비→방출→반작용→회수",
+      "group": "공격·능력"
+    },
+    {
+      "id": "ability_charge",
+      "name": "능력 집중·유지",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "출력 상승·유지 루프",
+      "group": "공격·능력"
+    },
+    {
+      "id": "ability_release",
+      "name": "집중 파괴 방출",
+      "frames": 16,
+      "scope": "확장",
+      "readability": "큰 출력·상체 반동·회수",
+      "group": "공격·능력"
+    },
+    {
+      "id": "ultimate_body",
+      "name": "S: 필살기 본체",
+      "frames": 24,
+      "scope": "필수",
+      "readability": "준비·집중·방출·반동·회복의 전용 동작",
+      "group": "공격·능력"
+    },
+    {
+      "id": "grab_start",
+      "name": "붙잡기 진입",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "손과 대상 접점; 쟈알디 지급 여부 별도",
+      "group": "공격·능력"
+    },
+    {
+      "id": "grab_hold",
+      "name": "포획 유지",
+      "frames": 3,
+      "scope": "확장",
+      "readability": "체격 차이별 접점",
+      "group": "공격·능력"
+    },
+    {
+      "id": "throw_release",
+      "name": "밀어내기·투척",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "발→골반→어깨→대상 힘 전달",
+      "group": "공격·능력"
+    },
+    {
+      "id": "hurt_light",
+      "name": "약한 피격",
+      "frames": 5,
+      "scope": "필수",
+      "readability": "맞은 부위 반응·짧은 회수",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "hurt_heavy",
+      "name": "강한 피격",
+      "frames": 8,
+      "scope": "필수",
+      "readability": "중심 이동·발 밀림·회복",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "hurt_air",
+      "name": "공중 피격",
+      "frames": 6,
+      "scope": "필수",
+      "readability": "중심 잃음·낙하 전환",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "knockdown",
+      "name": "넘어짐·추락",
+      "frames": 10,
+      "scope": "필수",
+      "readability": "균형 상실→몸 회전→바닥 접촉",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "down_hold",
+      "name": "다운 유지",
+      "frames": 2,
+      "scope": "필수",
+      "readability": "바닥에 닿은 몸·잔여 움직임",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "getup",
+      "name": "기상",
+      "frames": 12,
+      "scope": "필수",
+      "readability": "손→무릎→발 순서로 체중 지지",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "getup_quick",
+      "name": "빠른 기상·탈출",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "짧은 탈출 이동·중심 회복",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "item_use",
+      "name": "아이템 사용",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "손동작·사용 완료 이벤트",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "exhausted",
+      "name": "작전 지속 불가·후송 대기",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "힘이 풀리는 과정·영구 사망과 구분",
+      "group": "피격·다운·회복"
+    },
+    {
+      "id": "interact_hand",
+      "name": "문·패널 조작",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "손과 손잡이·버튼 접점",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "pick_up",
+      "name": "물건 회수",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "골반·무릎 굽힘·손 도달",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "inspect",
+      "name": "조사·확인",
+      "frames": 6,
+      "scope": "확장",
+      "readability": "시선·손·짧은 멈춤",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "talk_gesture",
+      "name": "대화 몸짓",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "고개·눈·손의 작은 변화",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "adjust_gloves",
+      "name": "장갑 정리",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "양손 접점·쟈알디의 준비 습관",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "return_react",
+      "name": "귀환·긴장 해제",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "호흡·어깨·자세 이완",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "carry",
+      "name": "물건 운반",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "하중에 맞는 팔·보행",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "sit_down",
+      "name": "의자에 앉기",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "의자·골반·발 접점",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "sit_idle",
+      "name": "앉아서 대기",
+      "frames": 6,
+      "scope": "확장",
+      "readability": "상체 호흡·체중 이동",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "stand_up",
+      "name": "의자에서 일어나기",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "앞으로 중심 이동→발로 추진",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "desk_work",
+      "name": "서류·업무",
+      "frames": 8,
+      "scope": "확장",
+      "readability": "책상·손·문서 접점",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "drink",
+      "name": "음료 마시기",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "컵·손·입의 접점",
+      "group": "탐색·본부·대화"
+    },
+    {
+      "id": "deploy_body",
+      "name": "투입 본체 동작",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "착지·장비 확인·전투 자세 연결",
+      "group": "투입·철수·시네마틱"
+    },
+    {
+      "id": "retreat_body",
+      "name": "철수 본체 동작",
+      "frames": 10,
+      "scope": "확장",
+      "readability": "뒤 확인·방향 전환·이탈",
+      "group": "투입·철수·시네마틱"
+    },
+    {
+      "id": "evacuate_body",
+      "name": "후송 상호작용",
+      "frames": 12,
+      "scope": "확장",
+      "readability": "부상 자세·구조자 접점",
+      "group": "투입·철수·시네마틱"
+    },
+    {
+      "id": "ultimate_cutin",
+      "name": "필살기 별도 컷인",
+      "frames": 12,
+      "scope": "필수",
+      "readability": "전용 상반신·눈·손·머리카락 움직임",
+      "group": "투입·철수·시네마틱"
+    }
+  ],
+  "counts": {
+    "actions": 75,
+    "drawingsBeforeDedup": 601,
+    "requiredActions": 45,
+    "requiredDrawings": 326
+  },
+  "headStylization": "mild exaggeration for facial readability, not SD",
+  "handStylization": "10-15% larger than first normal-body sample; wrist and forearm continuity",
+  "attackTiming": {
+    "melee_1": {
+      "drawings": [
+        3,
+        2,
+        5
+      ],
+      "milliseconds": [
+        90,
+        40,
+        170
+      ]
+    },
+    "melee_2": {
+      "drawings": [
+        3,
+        2,
+        7
+      ],
+      "milliseconds": [
+        100,
+        50,
+        210
+      ]
+    },
+    "melee_3": {
+      "drawings": [
+        5,
+        3,
+        8
+      ],
+      "milliseconds": [
+        150,
+        70,
+        300
+      ]
+    },
+    "fire_pistol": {
+      "drawings": [
+        1,
+        1,
+        4
+      ],
+      "milliseconds": [
+        30,
+        20,
+        190
+      ]
+    },
+    "ability_quick": {
+      "drawings": [
+        4,
+        3,
+        7
+      ],
+      "milliseconds": [
+        140,
+        70,
+        270
+      ]
+    },
+    "ultimate_body": {
+      "drawings": [
+        8,
+        4,
+        12
+      ],
+      "milliseconds": [
+        300,
+        120,
+        480
+      ]
+    }
+  },
+  "sample": {
+    "source": "game-src/action/normal-v3/sample-source.png",
+    "sourceSha256": "8ec3c333260711b7891cdd00dbeea9b8a50554cf23a5c9f216ee6949c4a147cd",
+    "native": "release/demo/samples/jyaldi-normal-native.png",
+    "display": "release/demo/samples/jyaldi-normal-2x.png",
+    "status": "candidate",
+    "notes": "일반 체형 첫 샘플에서 하체 폭 감소, 흉곽/복부/팔 보강, 양손 소폭 확대를 이미지 편집으로 반영한 단일 포즈. 애니메이션 구현 아님."
+  }
+}
