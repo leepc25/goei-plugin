@@ -1089,22 +1089,33 @@ if (fixture.globalLore.some(packed)) {
     el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(60) }));
   });
   await page.waitForSelector('.nw-app:not(.list-open)');
-  // 모바일 뒤로가기 쓸기: 문서 → 위키 메인 → 상황판
-  const swipeRight = (sel) => page.evaluate((sel) => {
+  // 모바일 앞뒤로 쓸기 (브라우저 ←·→ 처럼): 오른쪽 = 뒤로, 왼쪽 = 앞으로. 탭을 오가도 그대로 돌아간다
+  const swipe = (sel, dir) => page.evaluate(([sel, dir]) => {
     const el = document.querySelector(sel);
+    const x0 = dir > 0 ? 120 : 300;
     const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 400 })];
-    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(120), changedTouches: t(120) }));
-    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(160), changedTouches: t(160) }));
-    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(260), changedTouches: t(260) }));
-    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(260) }));
-  }, sel);
+    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(x0), changedTouches: t(x0) }));
+    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(x0 + dir * 40), changedTouches: t(x0 + dir * 40) }));
+    el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: t(x0 + dir * 140), changedTouches: t(x0 + dir * 140) }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(x0 + dir * 140) }));
+  }, [sel, dir]);
+  const swipeRight = (sel) => swipe(sel, 1);
+  const swipeLeft = (sel) => swipe(sel, -1);
   await page.click('.nw-card[data-value="소라 랜드"]');
   await page.waitForSelector('.nw-pane .nw-title');
   await swipeRight('.nw-main');
   await page.waitForSelector('.nw-home');
-  await swipeRight('.nw-main');
+  await swipeLeft('.nw-main');
+  await page.waitForSelector('.nw-pane .nw-title');
+  await page.click('.gx-mbar .gx-nb[data-value="board"]');
   await page.waitForSelector('.gx-board');
-  await page.click('.gx-mbar .gx-nb[data-value="wiki"]');
+  await swipeRight('.gx-board');
+  await page.waitForSelector('.nw-pane .nw-title');
+  await swipeLeft('.nw-main');
+  await page.waitForSelector('.gx-board');
+  await swipeRight('.gx-board');
+  await page.waitForSelector('.nw-pane .nw-title');
+  await swipeRight('.nw-main');
   await page.waitForSelector('.nw-home');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.click('.nw-card[data-value="소라 랜드"]');

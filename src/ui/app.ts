@@ -1,6 +1,7 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
 import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
+import { NavHistory } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
 import type { FactionCode, LangCode, Manifest } from '../core/types';
 import {
@@ -415,6 +416,7 @@ async function refresh(): Promise<void> {
       const chatKey = `${ctx.charIndex}:${ctx.chatIndex}`;
       if (chatKey !== lastChat) {
         lastChat = chatKey;
+        navHist.clear();
         resetField(true);
         resetWiki();
         resetGnet();
@@ -789,7 +791,8 @@ function render(): void {
   bindFootnotes(root);
   const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
-  bindSwipeBack(root, backStep);
+  bindSwipeBack(root, navStep);
+  if (view.kind === 'started') navHist.record(navState());
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
@@ -801,39 +804,53 @@ function boardDrawer(): string {
   return drawerHtml(b('id-card', '', ICONS.idcard, '신분증') + b('game-open', '', ICONS.game, '순찰') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
 }
 
-/** 모바일 뒤로가기 쓸기가 할 일: 지금 화면의 한 단계 앞. 갈 곳이 없으면 null (상황판이 맨 앞) */
-function backStep(): (() => void) | null {
+/** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */
+interface NavState {
+  tab: Tab;
+  w?: { view: string; title: string; list: boolean };
+  p?: { sub: string; tab: string; view: string; room: string | null; n: number | null };
+  g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
+  f?: 'goal' | 'team';
+  d?: string;
+}
+const navHist = new NavHistory<NavState>();
+
+function navState(): NavState {
+  const s: NavState = { tab };
+  if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
+  if (tab === 'phone') s.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
+  // 괴담넷 글쓰기·새 쪽지 화면만 기록 (댓글 답글 칸은 화면 이동이 아니다)
+  if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
+  if (tab === 'map' || tab === 'mission') s.f = field.step;
+  if (tab === 'settings') s.d = dirUi.open;
+  return s;
+}
+
+function applyNav(s: NavState): void {
+  tab = s.tab;
+  notice = '';
+  field.confirmEnd = null;
+  if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list });
+  if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
+  if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
+  if (s.d !== undefined) dirUi.open = s.d;
+  // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
+  if (s.f && s.f !== field.step) return void handle('field-step', s.f);
+  render();
+}
+
+/** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
+function navStep(dir: -1 | 1): (() => void) | null {
   const go = (action: string, value?: string) => () => void handle(action, value);
-  if (view.kind === 'picker') return pickerPrefs ? go('prefs-close') : null;
-  if (view.kind === 'opening') return go('repick');
+  if (view.kind === 'picker') return dir < 0 && pickerPrefs ? go('prefs-close') : null;
+  if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
-  if (gameOpen()) return () => closeGame();
-  switch (tab) {
-    case 'wiki':
-      if (wiki.listOpen) return go('wiki-list', 'close');
-      if (wiki.view !== 'home') return go('wiki-back');
-      break;
-    case 'phone':
-      if (phone.view !== 'list' && phone.view !== 'notice') return go('ph-back');
-      if (phone.openNotice !== null) return go('ph-notice', String(phone.openNotice));
-      break;
-    case 'gnet':
-      if (gnet.settings || gnet.compose || gnet.open !== null || gnet.openDm !== null) return go('gn-back');
-      break;
-    case 'map':
-    case 'mission': {
-      // 편성 단계면 목표 단계로, 목표 단계면 고른 장소·목표 풀기 (필터 줄 끝 「취소」와 같음)
-      if (field.step === 'team') return go('field-step', 'goal');
-      const undo = root?.querySelector<HTMLButtonElement>('.gx-unplace:not([disabled])');
-      if (undo) return () => undo.click();
-      break;
-    }
-    case 'settings':
-      if (dirUi.adding) return go('dir-ext-close');
-      if (dirUi.open) return go('dir-open', dirUi.open);
-      break;
-  }
-  return tab === 'board' ? null : go('tab', 'board');
+  if (gameOpen()) return dir < 0 ? () => closeGame() : null;
+  if (!navHist.can(dir)) return null;
+  return () => {
+    const s = navHist.go(dir);
+    if (s) applyNav(s);
+  };
 }
 
 /** 창 배색: 채팅의 테마 변수, 채팅이 없으면 새 채팅 기본값 */

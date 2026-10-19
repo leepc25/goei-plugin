@@ -23,3 +23,4 @@ export { OLD_DIRECTORY, OLD_MANIFEST, LEGACY_DATA, RETIRED, isDirectory } from '
 export * as advanced from './advanced';
 export * as budget from './budget';
 export * as focus from './focus';
+export * from './navhist';
