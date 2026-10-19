@@ -5,3 +5,4 @@ export * from './engine';
 export * from './output';
 export * from './registry';
 export * from './directory';
+export * from './calendar';
