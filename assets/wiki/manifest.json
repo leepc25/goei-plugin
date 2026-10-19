@@ -1051,6 +1051,28 @@
    "bytes": 51015,
    "sha256": "a828ba2e4bff4c2023a045c6977fa62b12954c96ead2035db3dfa1a0f83c300f",
    "from": "assets/wiki/Factions/The World Politics Forum/The World Politics Forum_default.avif"
+  },
+  {
+   "source": "민간인.png",
+   "korean": "민간인",
+   "english": "Civilian",
+   "path": "assets/wiki/Factions/Civilian_default.avif",
+   "use": "세력 대표",
+   "asset": "Civilian_default",
+   "bytes": 82104,
+   "sha256": "39af8edaf7f71e94c80c82b3f46c8aba311d7d44f6d80d717ffea63197dde45b",
+   "from": "사용자 업로드 2026-10-19 (1254→832)"
+  },
+  {
+   "source": "프리랜서.png",
+   "korean": "프리랜서",
+   "english": "Freelancer",
+   "path": "assets/wiki/Factions/Freelancer_default.avif",
+   "use": "세력 대표",
+   "asset": "Freelancer_default",
+   "bytes": 59848,
+   "sha256": "fec9a97cce3f7a63011ecdad80176d74e3963b93e645a083c8d637243febec9a",
+   "from": "사용자 업로드 2026-10-19 (1254→832)"
   }
  ]
 }

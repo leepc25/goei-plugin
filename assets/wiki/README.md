@@ -4,10 +4,9 @@
 
 - `Anomalies/` 괴이 62장: 「영문명」 (명부 괴이 영문명과 같음)
 - `Mystic Sites/` 특수 10장: 「영문명」
-- `Factions/` 세력 13장: 「영문명_default」 (명부 조직 영문명)
+- `Factions/` 세력 15장: 「영문명_default」 (명부 조직 영문명)
 - `Unused/` 10장: 쓰지 않는 그림. 인물(탐미주의·세크리엠·아벤샤)을 괴이로 그린 것과 세력 대표로 고르지 않은 장면.
 
 플러그인은 대표(큰 사진)를 「영문명_default」 → 「영문명」, 얼굴(작은 사진)을 「영문명」 → 대표 순으로 찾습니다 (`src/host/assets.ts`).
-아직 없는 그림: 세력 민간인(`Civilian_default`)·프리랜서(`Freelancer_default`).
 
 AVIF 품질 60, 4:2:0, 832×832. GPT가 올린 `codex/wiki-images-avif`(품질 90)를 다시 변환했습니다. 원본 파일명과의 대응은 `manifest.json`.
