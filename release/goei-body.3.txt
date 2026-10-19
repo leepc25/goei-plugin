@@ -1,15 +1,896 @@
-case "gn-open-dm": {
+sign(phone, { view: "list", invite: null, picked: [] });
+        break;
+      case "ph-more":
+        phone.page += 1;
+        break;
+      case "ph-att-add":
+      case "ph-att-del": {
+        const r = readPhone(ctx2.chat).rooms[phone.room ?? ""];
+        if (r) attachAction(phone.attach, action === "ph-att-add" ? "add" : "del", v, phKinds(r));
+        break;
+      }
+      case "ph-send": {
+        if (!phone.draft.trim() && !phone.attach.length) {
+          phone.notice = "메시지를 입력해 주세요.";
+          break;
+        }
+        if (emptyAttachment(phone.attach)) {
+          phone.notice = "첨부 내용을 입력하거나 ✕로 빼 주세요.";
+          break;
+        }
+        void send(ctx2, env2, v, composeBody(phone.attach, phone.draft));
+        return true;
+      }
+      case "ph-retry": {
+        const r = readPhone(ctx2.chat).rooms[v];
+        if (r?.pending) void generate2(ctx2, env2, v, `${roomLabel(r)}의 답장을 다시 기다리는 중이에요.`);
+        return true;
+      }
+      case "ph-skip":
+        if (phoneBusy(ctx2)) break;
+        await mutate(ctx2, env2, (st) => {
+          const r = st.rooms[v];
+          if (!r?.pending) return false;
+          r.pending = void 0;
+        });
+        return true;
+      case "ph-room-refresh":
+        void roomRefresh(ctx2, env2, v);
+        return true;
+      case "ph-refresh":
+        void refreshInbox(ctx2, env2);
+        return true;
+      case "ph-group":
+        Object.assign(phone, { view: "group", invite: null, picked: [], topic: "", gname: "", pickQuery: "", pickTab: "" });
+        break;
+      case "ph-invite":
+        Object.assign(phone, { view: "group", invite: v, room: v, picked: [], pickQuery: "", pickTab: "" });
+        break;
+      case "ph-pick": {
+        const set2 = new Set(phone.picked);
+        if (set2.has(v)) set2.delete(v);
+        else {
+          const existing = phone.invite ? readPhone(ctx2.chat).rooms[phone.invite]?.members.length ?? 0 : 0;
+          if (set2.size + existing >= LIMITS2.members) {
+            phone.notice = `상대는 최대 ${LIMITS2.members}명까지예요.`;
+            break;
+          }
+          set2.add(v);
+        }
+        phone.picked = [...set2];
+        break;
+      }
+      case "ph-group-create":
+        await createGroup(ctx2, env2);
+        return true;
+      case "ph-room-del":
+        if (phone.confirm !== `room:${v}`) {
+          phone.confirm = `room:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        await mutate(ctx2, env2, (st) => {
+          const r = st.rooms[v];
+          if (!r || r.pending) return false;
+          delete st.rooms[v];
+          st.order = st.order.filter((x) => x !== v);
+        });
+        if (phone.room === v) Object.assign(phone, { view: phone.view === "room" ? "list" : phone.view, room: null });
+        return true;
+      case "ph-notice": {
+        const id = Number(v);
+        if (matchMedia("(max-width: 760px)").matches) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === "notice" ? "list" : phone.view });
+        else if (phone.view === "notice" && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: "list" });
+        else Object.assign(phone, { openNotice: id, view: "notice" });
+        {
+          const b = readBulletins(ctx2.chat);
+          const row5 = b.items.find((x) => x.id === id);
+          if (row5 && row5.read === false) {
+            row5.read = true;
+            await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+            return true;
+          }
+        }
+        break;
+      }
+      case "ph-notice-page":
+        phone.noticePage = Math.max(1, Number(v) || 1);
+        phone.openNotice = null;
+        break;
+      case "ph-notice-all": {
+        const b = readBulletins(ctx2.chat);
+        if (!b.items.some((x) => x.read === false)) break;
+        for (const row5 of b.items) row5.read = true;
+        await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+        return true;
+      }
+      case "ph-notice-del": {
+        if (phone.confirm !== `notice:${v}`) {
+          phone.confirm = `notice:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        const b = readBulletins(ctx2.chat);
+        b.items = b.items.filter((x) => x.id !== Number(v));
+        if (phone.openNotice === Number(v)) Object.assign(phone, { openNotice: null, view: phone.view === "notice" ? "list" : phone.view });
+        await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+        return true;
+      }
+      case "ph-call":
+        Object.assign(phone, { view: "call", call: v, callText: "" });
+        break;
+      case "ph-call-place":
+        await placeCall(ctx2, env2, phone.call, phone.callText);
+        return true;
+      case "ph-add":
+        Object.assign(phone, { view: "add", addName: "", addNote: "" });
+        break;
+      case "ph-add-save":
+        await addContact(ctx2, env2);
+        return true;
+      case "ph-contact-del":
+        if (phone.confirm !== `contact:${v}`) {
+          phone.confirm = `contact:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        await deleteContact(ctx2, env2, v);
+        return true;
+      case "ph-cfg": {
+        const [k, val] = v.split("=");
+        const vars = { [PH(k)]: val };
+        if (k === "all_contacts" || k === "anomaly_contacts") phone.tab = "";
+        if (k === "announcement_page_size") phone.noticePage = 1;
+        await setVars(ctx2, env2, vars);
+        return true;
+      }
+      case "ph-num": {
+        const [k, val] = v.split("=");
+        const range = {
+          incoming_chance: [0, 100],
+          group_invite_chance: [0, 100],
+          announcement_gap: [1, 100],
+          announcement_history: [1, 50],
+          storage_limit_dm: [1, STORAGE_MAX2],
+          storage_limit_group: [1, STORAGE_MAX2],
+          storage_limit_notice: [1, STORAGE_MAX2]
+        };
+        const r = range[k];
+        const n = Math.floor(Number(val));
+        if (r && Number.isFinite(n)) await setVars(ctx2, env2, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n))) });
+        else env2.render();
+        return true;
+      }
+      default:
+        return false;
+    }
+    env2.render();
+    return true;
+  }
+  async function addContact(ctx2, env2) {
+    const name = phone.addName.trim();
+    if (!validCallTarget(name)) {
+      phone.notice = "이름은 60자 이내로, 줄바꿈·괄호 없이 적어 주세요.";
+      return env2.render();
+    }
+    if (tokens(phone.addNote) > LIMITS2.memo_tokens) {
+      phone.notice = `인물 메모는 ${LIMITS2.memo_tokens}토큰 이내로 적어 주세요.`;
+      return env2.render();
+    }
+    const d = dir(ctx2);
+    const key = name.toLowerCase();
+    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key || c.terms.some((t) => t.toLowerCase() === key));
+    if (found.length > 1) {
+      phone.notice = "같은 이름의 연락처가 여럿이에요. 정확한 이름을 적어 주세요.";
+      return env2.render();
+    }
+    const match = found[0];
+    if (match?.visible) {
+      Object.assign(phone, { view: "list", sub: "contacts", tab: match.tabs[0] ?? "", query: "", notice: "이미 등록된 연락처예요." });
+      return env2.render();
+    }
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const data = readCustom(chat);
+      if (match) data.items.push({ id: match.id, name: match.name, agentId: match.agentId });
+      else {
+        data.seq += 1;
+        data.items.push({ id: contactId(`custom:${data.seq}`), name, note: phone.addNote.trim() });
+      }
+      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data) } };
+    });
+    Object.assign(phone, { view: "list", sub: "contacts", tab: "T05", query: "", notice: "연락처를 기타에 추가했어요." });
+    await env2.refresh();
+  }
+  async function deleteContact(ctx2, env2, cid) {
+    if (phoneBusy(ctx2)) return;
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const data = readCustom(chat);
+      data.items = data.items.filter((x) => x.id !== cid);
+      const st = readPhone(chat);
+      for (const [rid, r] of Object.entries(st.rooms)) if (r.kind === "dm" && (rid === `dm_${cid}` || r.members.includes(cid))) delete st.rooms[rid];
+      st.order = st.order.filter((x) => st.rooms[x]);
+      return writePhone({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data) } }, st);
+    });
+    phone.notice = "연락처와 1:1 대화 기록을 지웠어요.";
+    await env2.refresh();
+  }
+  function phoneInput(name, value, key) {
+    switch (name) {
+      case "ph-draft":
+        phone.draft = value;
+        return true;
+      case "ph-att":
+        return attachInput(phone.attach, key, value);
+      case "ph-topic":
+        phone.topic = value;
+        return true;
+      case "ph-gname":
+        phone.gname = value;
+        return true;
+      case "ph-call-to":
+        phone.call = value;
+        return true;
+      case "ph-call-text":
+        phone.callText = value;
+        return true;
+      case "ph-add-name":
+        phone.addName = value;
+        return true;
+      case "ph-add-note":
+        phone.addNote = value;
+        return true;
+      case "ph-pick-q":
+        phone.pickQuery = value;
+        return true;
+      default:
+        return false;
+    }
+  }
+  function phoneUnread(ctx2) {
+    try {
+      return unreadCount(readPhone(ctx2.chat)) > 0 || bulletinUnread(readBulletins(ctx2.chat));
+    } catch {
+      return false;
+    }
+  }
+
+  // src/ui/gnet.ts
+  var gnet = {
+    sub: "board",
+    open: null,
+    openDm: null,
+    compose: null,
+    draft: "",
+    attach: [],
+    to: "",
+    confirm: null,
+    editNick: false,
+    nick: "",
+    notice: "",
+    failure: null,
+    settings: false,
+    attachMenu: false
+  };
+  var GN_KINDS = ["image", "photo", "video", "file", "link"];
+  function resetGnet() {
+    Object.assign(gnet, { sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, notice: "", failure: null, settings: false, attachMenu: false });
+  }
+  var jobs2 = /* @__PURE__ */ new Map();
+  var chatKey2 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
+  var esc7 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var retry = (chat) => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
+  var source2 = (ctx2, chat = ctx2.chat) => ({ char: ctx2.char, chat, persona: personaText() });
+  function names2(ctx2) {
+    try {
+      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
+    } catch {
+      return {};
+    }
+  }
+  var ORIGIN_KEY = "$gn_incoming_origin";
+  function savedOrigin(chat) {
+    try {
+      const v = JSON.parse(String(chat.scriptstate?.[ORIGIN_KEY] ?? ""));
+      return v && Number.isInteger(v.post) ? v : null;
+    } catch {
+      return null;
+    }
+  }
+  function withVars(chat, vars) {
+    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } };
+  }
+  function saveIncoming(chat, st, rows, plan, post) {
+    try {
+      if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: "새 쪽지가 왔어요." };
+      return { vars: {}, note: "" };
+    } catch (error) {
+      return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
+    }
+  }
+  async function run2(ctx2, env2, label, work) {
+    const key = chatKey2(ctx2);
+    if (jobs2.has(key)) {
+      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+      env2.render();
+      return;
+    }
+    jobs2.set(key, label);
+    gnet.notice = "";
+    gnet.failure = null;
+    env2.render();
+    try {
+      gnet.notice = await work();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      gnet.notice = msg;
+      const raw = error.raw;
+      if (raw) gnet.failure = { label, reason: msg, raw };
+    } finally {
+      jobs2.delete(key);
+      await env2.refresh();
+    }
+  }
+  var viewing = () => ({ post: gnet.sub === "board" ? gnet.open : null, nick: gnet.sub === "dm" ? gnet.openDm : null });
+  function refreshBoard(ctx2, env2, automatic = false) {
+    return run2(ctx2, env2, automatic ? "본편 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
+      const startLength = ctx2.chat.message?.length ?? 0;
+      const before = readGnet(ctx2.chat);
+      const nick = userNick(ctx2.chat.scriptstate);
+      const s4 = gnetSettings(ctx2.chat.scriptstate);
+      const plan = incomingPlan(ctx2.chat, before, s4, nick, Math.random, void 0, savedOrigin(ctx2.chat));
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => refreshPrompt(source2(ctx2), before, plan, nick, names2(ctx2)));
+      const { raw, value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(ctx2.chat));
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (automatic && (chat.message?.length ?? 0) !== startLength) {
+          note = "본편이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.";
+          return null;
+        }
+        const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s4, date: dateNow(chat) }));
+        const inc = saveIncoming(chat, res.st, value.incoming, plan);
+        note = [res.notice, res.emptyComments ? "이번 게시판에는 댓글이 하나도 없어요." : "", inc.note].filter(Boolean).join(" ");
+        return writeGnet(withVars(chat, inc.vars), res.st, { ack: viewing() });
+      });
+      if (!automatic) gnet.open = null;
+      else if (gnet.open !== null && !findPost(readGnet(await currentChat(ctx2) ?? ctx2.chat), gnet.open)) gnet.open = null;
+      return note;
+    });
+  }
+  function withRaw(raw, f) {
+    try {
+      return f();
+    } catch (error) {
+      if (error instanceof GnetError && !error.raw) throw new GnetError(error.message, raw);
+      throw error;
+    }
+  }
+  function writePost(ctx2, env2, input2) {
+    return run2(ctx2, env2, "글을 올리는 중이에요.", async () => {
+      const st = readGnet(ctx2.chat);
+      const nick = userNick(ctx2.chat.scriptstate);
+      const s4 = gnetSettings(ctx2.chat.scriptstate);
+      const draftPost = { id: 0, date: "", nick, title: "", body: input2, views: 0, votes: 0, mine: true, comments: [] };
+      const plan = incomingPlan(ctx2.chat, st, s4, nick, Math.random, { post: draftPost });
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => postPrompt(source2(ctx2), st, input2, plan, names2(ctx2)));
+      const { value, draft: parsed } = (await generate(prompt.messages, s4.model, (r) => {
+        const v = withRaw(r, () => parseJsonPayload(r));
+        return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
+      }, retry(ctx2.chat))).value;
+      const draft2 = attachPostDraft(parsed, input2);
+      let note = "글을 올렸어요.";
+      let newId = 0;
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        const p = addUserPost(cur, nick, draft2.title, draft2.content, dateNow(chat));
+        newId = p.id;
+        const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: /* @__PURE__ */ new Set() }, nick);
+        for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+        trimBoard(cur, s4);
+        const inc = saveIncoming(chat, cur, value.incoming, plan, p);
+        if (!got.comments.length) note = "글을 올렸어요. 아직 댓글은 없어요.";
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        if (inc.note) note += ` ${inc.note}`;
+        return writeGnet(withVars(chat, { ...inc.vars, [ORIGIN_KEY]: JSON.stringify({ post: p.id }) }), cur, { ack: { post: p.id } });
+      });
+      gnet.compose = null;
+      gnet.draft = "";
+      gnet.attach = [];
+      gnet.sub = "board";
+      gnet.open = newId;
+      return note;
+    });
+  }
+  function refreshPost(ctx2, env2, postId2) {
+    return run2(ctx2, env2, "이 글을 새로 불러오는 중이에요.", async () => {
+      const chat = ctx2.chat;
+      const st = readGnet(chat);
+      const target = findPost(st, postId2);
+      if (!target) throw new GnetError("대상 글이 없어졌어요.");
+      const s4 = gnetSettings(chat.scriptstate);
+      const nick = userNick(chat.scriptstate);
+      const plan = incomingPlan(chat, st, { ...s4, incoming: false }, nick, Math.random);
+      const prompt = fitPrompt(budgetFor(chat.scriptstate, "gn"), () => commentPrompt(source2(ctx2, chat), st, postId2, 0, "", plan, nick, names2(ctx2), POST_REFRESH_ACTION));
+      const snapshot2 = postKey(target);
+      const { value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(chat));
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const cur = readGnet(latest);
+        const p = findPost(cur, postId2);
+        if (!p || postKey(p) !== snapshot2) {
+          note = "불러오는 동안 글이 바뀌어서 적용하지 않았어요. 다시 눌러 주세요.";
+          return null;
+        }
+        const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
+        for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+        const n = got.comments.length;
+        p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+        p.votes += Math.floor(Math.random() * (n + 2));
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+        note = n ? "" : "새 댓글이 없어요.";
+        if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        return writeGnet(latest, cur, { ack: viewing() });
+      });
+      return note.trim();
+    });
+  }
+  async function writeComment(ctx2, env2, postId2, parent, body4) {
+    const key = chatKey2(ctx2);
+    if (jobs2.has(key)) {
+      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+      return env2.render();
+    }
+    const nick = userNick(ctx2.chat.scriptstate);
+    let index = 0;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      index = addUserComment(st, postId2, parent, nick, body4);
+      return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index }) }), st);
+    });
+    gnet.compose = null;
+    gnet.draft = "";
+    gnet.attach = [];
+    if (!saved) return env2.refresh();
+    return run2({ ...ctx2, chat: saved }, env2, "댓글 반응을 기다리는 중이에요.", async () => {
+      const st = readGnet(saved);
+      const s4 = gnetSettings(saved.scriptstate);
+      const target = findPost(st, postId2);
+      const plan = incomingPlan(saved, st, s4, nick, Math.random, { post: target, commentIndex: index });
+      let value;
+      let prompt;
+      try {
+        prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => commentPrompt(source2(ctx2, saved), st, postId2, index, body4, plan, nick, names2(ctx2)));
+        value = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved))).value;
+      } catch (error) {
+        throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
+      }
+      const snapshot2 = postKey(target);
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        const p = findPost(cur, postId2);
+        if (!p || postKey(p) !== snapshot2) {
+          note = "생성하는 동안 글이 바뀌어서 답글을 적용하지 않았어요. 내 댓글은 저장돼 있어요.";
+          return null;
+        }
+        const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
+        for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+        const inc = saveIncoming(chat, cur, value.incoming, plan, p);
+        note = got.comments.length ? "" : "등록했어요. 추가 답글은 없어요.";
+        if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        if (inc.note) note += ` ${inc.note}`;
+        return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing() });
+      });
+      return note.trim();
+    });
+  }
+  async function sendDm(ctx2, env2, nick, body4, src) {
+    const key = chatKey2(ctx2);
+    if (jobs2.has(key)) {
+      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+      return env2.render();
+    }
+    const me = userNick(ctx2.chat.scriptstate);
+    if (nick === me) {
+      gnet.notice = "나에게는 쪽지를 보낼 수 없어요.";
+      return env2.render();
+    }
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      addOutgoingDm(st, nick, body4, dateNow(chat), src);
+      return writeGnet(chat, st);
+    });
+    const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
+    gnet.compose = null;
+    gnet.draft = "";
+    gnet.attach = [];
+    gnet.to = "";
+    gnet.sub = "dm";
+    gnet.openDm = nick;
+    if (!saved) return env2.refresh();
+    return run2({ ...ctx2, chat: saved }, env2, `${nick}의 답장을 기다리는 중이에요.`, async () => {
+      const st = readGnet(saved);
+      const s4 = gnetSettings(saved.scriptstate);
+      let reply;
+      try {
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => dmPrompt(source2(ctx2, saved), st, nick, body4, me, names2(ctx2)));
+        reply = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
+      } catch (error) {
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const cur = readGnet(chat);
+          let i = cur.dms.length - 1;
+          while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === "me")) i--;
+          if (i < 0) return null;
+          cur.dms.splice(i, 1);
+          return writeGnet(chat, cur);
+        }).catch(() => null);
+        if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
+        throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
+      }
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        cur.dms.push({ nick, side: "npc", body: reply, unread: true, date: dateNow(chat) });
+        return writeGnet(chat, cur, { ack: viewing() });
+      });
+      return "";
+    });
+  }
+  async function mutate2(ctx2, env2, f, vars = {}, reconcile = true) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      if (f(st, chat) === false) return null;
+      return writeGnet(withVars(chat, vars), st, { reconcile });
+    });
+    await env2.refresh();
+  }
+  async function setVar(ctx2, env2, key, value) {
+    await setVars2(ctx2, env2, { [key]: value });
+  }
+  async function setVars2(ctx2, env2, vars) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, vars));
+    await env2.refresh();
+  }
+  var MODE_PREV = "$gn_mode_prev";
+  function seg2(key, cur, items) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
+  }
+  var body2 = (text) => attachBody(text, true);
+  function time(date) {
+    return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
+  }
+  var tool2 = (action, icon, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  function paneHead2(title2, sub, right = "", back = true) {
+    return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+  }
+  var narrow = () => matchMedia("(max-width: 760px)").matches;
+  function paneKind(st, mobile = narrow()) {
+    if (gnet.settings) return "settings";
+    const c = gnet.compose;
+    if (c && (c.kind === "post" || c.kind === "newdm" || c.kind === "dm" && !st.dms.some((d) => d.nick === c.nick))) return "compose";
+    if (mobile) return null;
+    if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) return "post";
+    if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return "dm";
+    return null;
+  }
+  function inlineComposer(st, busy3) {
+    const c = gnet.compose;
+    if (c && c.kind !== "comment" && c.kind !== "dm") return "";
+    if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) {
+      if (c?.kind === "comment" && c.post === gnet.open && c.parent > 0) return "";
+      return composer(busy3, "댓글 입력");
+    }
+    if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
+      const ph = c?.kind === "dm" && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+      return composer(busy3, ph);
+    }
+    return "";
+  }
+  function composer(busy3, placeholder, chip3 = "") {
+    return `<div class="ph-composer gn-composer">
+    ${chip3}
+    ${attachEditor("gn", gnet.attach, GN_KINDS, busy3, "", gnet.attachMenu)}
+    <div class="ph-compose">
+      <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc7(placeholder)}" ${busy3 ? "disabled" : ""}>${esc7(gnet.draft)}</textarea>
+      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy3 ? "disabled" : ""}>${ICONS.send}</button>
+      <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
+    </div>
+  </div>`;
+  }
+  function composeView(c, busy3) {
+    const post = c.kind === "post";
+    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc7(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc7(c.nick)}</b></p>` : "";
+    const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
+    return `<div class="ph-form gn-cpane">${paneHead2(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc7(c.label) : "")}
+    <div class="ph-form-body">${to}
+      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc7(ph)}" aria-label="내용">${esc7(gnet.draft)}</textarea>
+      ${attachEditor("gn", gnet.attach, GN_KINDS, busy3)}
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy3 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
+  }
+  function replyBox(label, busy3, depth) {
+    const chip3 = `<div class="gn-replyto"><span>${esc7(label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
+    return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy3, "답글 입력", chip3)}</li>`;
+  }
+  function commentTree(p, busy3) {
+    const kids = /* @__PURE__ */ new Map();
+    p.comments.forEach((c, i) => {
+      const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
+      kids.set(parent, [...kids.get(parent) ?? [], i + 1]);
+    });
+    const out = [];
+    const seen = /* @__PURE__ */ new Set();
+    const target = gnet.compose?.kind === "comment" && gnet.compose.post === p.id ? gnet.compose.parent : 0;
+    const walk = (n, depth) => {
+      for (const k of kids.get(n) ?? []) {
+        if (seen.has(k)) continue;
+        seen.add(k);
+        const c = p.comments[k - 1];
+        const confirm = gnet.confirm === `c:${p.id}:${k}`;
+        const author = c.mine ? `<b class="gn-me">${esc7(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc7(c.nick)}</button>`;
+        const del = c.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>` : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>` : "";
+        out.push(`<li class="gn-c${depth ? " re" : ""}${c.unread ? " unread" : ""}${target === k ? " target" : ""}" style="--gn-depth:${Math.min(depth, 3)}">
+        <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ""}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}</div>
+        <div class="gn-c-body">${body2(c.body)}</div>
+        <div class="gn-c-act"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
+        if (target === k && gnet.compose?.kind === "comment") out.push(replyBox(gnet.compose.label, busy3, depth + 1));
+        walk(k, depth + 1);
+      }
+    };
+    walk(0, 0);
+    return out.join("");
+  }
+  function postView(p, busy3, inline = false) {
+    const c = gnet.compose;
+    const reply = c?.kind === "comment" && c.post === p.id && c.parent > 0 ? c : null;
+    const confirm = gnet.confirm === `p:${p.id}`;
+    const right = p.mine ? confirm ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
+    const again = tool2("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy3 ? "disabled" : ""}`);
+    const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc7(p.nick)}</button>`;
+    const head = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
+          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc7(p.nick)}</b>` : who}</span>
+            <span>${esc7(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
+    const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
+    return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
+    <div class="gn-doc">
+      <article class="gn-post">${head}
+        <div class="gn-post-body">${body2(p.body)}</div>
+      </article>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail}</div>
+        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy3)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
+    </div>
+    ${inline || reply ? "" : composer(busy3, "댓글 입력")}
+  </div>`;
+  }
+  function dmPane(st, nick, busy3, inline = false) {
+    const t = dmThreads(st).find((x) => x.nick === nick);
+    if (!t) return "";
+    const confirm = gnet.confirm === `d:${nick}`;
+    const right = confirm ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc7(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc7(nick)}"`);
+    const src = st.sources[nick];
+    const c = gnet.compose;
+    const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2(esc7(nick), `${t.rows.length}통`, right)}
+    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc7(src.title)}」</div>` : ""}
+      ${t.rows.map((d, i) => {
+      const first = i === 0 || t.rows[i - 1].side !== d.side;
+      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc7(d.date)}</small>` : ""}</div></div>`;
+    }).join("")}
+    </div>
+    ${inline ? "" : composer(busy3, ph)}
+  </div>`;
+  }
+  function boardList(st, busy3, mobile) {
+    if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
+    return `<ul class="ph-list gn-list">${st.posts.map((p) => {
+      const on2 = gnet.open === p.id && !gnet.settings;
+      return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
+        <span class="gn-title"><b>${esc7(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
+        <span class="gn-row-meta"><span class="gn-row-nick">${esc7(p.nick)}</span><span>${esc7(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
+      </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy3, true) : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  function dmList(st, busy3, mobile) {
+    const threads = dmThreads(st);
+    if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
+    return `<ul class="ph-list gn-list">${threads.map((t) => {
+      const on2 = gnet.openDm === t.nick && !gnet.settings;
+      const last = t.rows[t.rows.length - 1];
+      const confirm = gnet.confirm === `d:${t.nick}`;
+      const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}" aria-label="${esc7(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc7(t.nick)}" aria-pressed="${on2}">
+        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc7(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc7(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last.side === "me" ? "나: " : ""}${esc7([...previewText(last.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy3, true) : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  var row3 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var group2 = (title2, rows) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows}</div></section>`;
+  function settingsView2(ctx2, back = true) {
+    const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
+    const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc7(v(k) === "-" ? "" : v(k))}" placeholder="${esc7(ph)}">`;
+    const keep = gnetRetention(ctx2.chat.scriptstate);
+    const on2 = v("mode") !== "0";
+    const rows = on2 ? `${group2("괴담넷", [
+      row3("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
+      row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
+      row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
+      row3("본편에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 본편 요청에 참고로 붙어요"),
+      row3("다양성 강화", seg2("sampling", v("sampling") === "1" ? "1" : "0", [["0", "끄기"], ["1", "켜기"]]))
+    ].join(""))}
+      ${group2("게시판", [
+      row3("게시글 수", seg2("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+      row3("사생활", seg2("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]])),
+      row3("주제", text("subject", "비우면 세계관에 맞는 다양한 주제")),
+      row3("분위기·말투", text("mood", "비우면 익명 커뮤니티 말투")),
+      row3("보호 대상", text("protagonist", "비우면 주인공")),
+      row3("새로고침 시 내 글", seg2("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]])),
+      row3("내 댓글 있는 글", seg2("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]]))
+    ].join(""))}
+      ${group2("쪽지", [
+      row3("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
+      row3("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
+    ].join(""))}
+      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 본편 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
+    return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows}</div></div>`;
+  }
+  function paneHtml2(ctx2, st, kind, busy3) {
+    if (kind === "settings") return settingsView2(ctx2);
+    if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy3);
+    if (kind === "post") return postView(findPost(st, gnet.open), busy3);
+    if (kind === "dm") return dmPane(st, gnet.openDm, busy3);
+    return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>괴담넷</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
+  }
+  function gnetTab(ctx2, env2) {
+    if (env2) liveEnv2 = env2;
+    if (!gnetSettings(ctx2.chat.scriptstate).enabled) {
+      const off = toast("gn", gnet.notice, (t) => {
+        if (gnet.notice === t) gnet.notice = "";
+      });
+      return `<main class="gx-body gn gn-off">${settingsView2(ctx2, false)}${off}</main>`;
+    }
+    const st = readGnet(ctx2.chat);
+    const me = userNick(ctx2.chat.scriptstate);
+    const job = jobs2.get(chatKey2(ctx2));
+    const busy3 = !!job;
+    const unreadDm = st.dms.filter((d) => d.unread).length;
+    const mobile = narrow();
+    const kind = paneKind(st, mobile);
+    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc7(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
+    const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc7(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc7(gnet.failure.raw)}</textarea></details>` : "";
+    const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const note = toast("gn", gnet.notice, (t) => {
+      if (gnet.notice === t) gnet.notice = "";
+    });
+    const tools = [
+      tool2("gn-refresh", ICONS.refresh, "게시판 새로고침", busy3 ? "disabled" : "", "새로고침"),
+      tool2("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기"),
+      tool2("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지"),
+      tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임"),
+      tool2("gn-settings", ICONS.settings, "괴담넷 설정", gnet.settings ? 'aria-pressed="true"' : "", "설정")
+    ].join("");
+    const subBtn = (id, label, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
+    return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
+    <section class="ph-side" aria-label="괴담넷 목록">
+      <div class="ph-side-head">
+        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc7(me)}</b></span></div>
+      </div>
+      ${kind ? "" : status}
+      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy3, mobile) : dmList(st, busy3, mobile)}</div>
+      ${mobile && !kind ? inlineComposer(st, busy3) : ""}
+      ${fail3}
+      ${drawerHtml(tools, nick)}
+    </section>
+    <section class="ph-pane">${kind ? status : ""}${paneHtml2(ctx2, st, kind, busy3)}</section>
+    ${note}
+  </main>`;
+  }
+  var AUTO_LAST = "$gn_auto_last";
+  var quietEnv2 = { render: () => {
+  }, refresh: async () => {
+  }, current: () => null };
+  var liveEnv2 = null;
+  async function currentChat(ctx2) {
+    try {
+      return await risuai.getChatFromIndex(ctx2.charIndex, ctx2.chatIndex);
+    } catch {
+      return null;
+    }
+  }
+  async function autoRefreshGnet(ctx2, messageIndex, open3 = false) {
+    const s4 = gnetSettings(ctx2.chat.scriptstate);
+    if (!s4.enabled || !(open3 ? s4.autoOpen : s4.auto) || jobs2.has(chatKey2(ctx2))) return;
+    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data.trim()) return;
+    let hash = 7;
+    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash}`;
+    if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
+    if (!saved) return;
+    const env2 = liveEnv2 ?? quietEnv2;
+    const showing = env2.current();
+    const target = showing && chatKey2(showing) === chatKey2(ctx2) ? env2 : { ...quietEnv2 };
+    const notice2 = gnet.notice;
+    await refreshBoard({ ...ctx2, chat: saved }, target, true);
+    if (target !== env2) gnet.notice = notice2;
+  }
+  function gnetOpenCheck(ctx2, env2) {
+    liveEnv2 = env2;
+    if (!gnetSettings(ctx2.chat.scriptstate).autoOpen) return;
+    const at = lastReply(ctx2.chat);
+    if (at < 0) return;
+    void autoRefreshGnet(ctx2, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
+  }
+  var LAZY_HINT = {
+    "1": "새로고침 버튼을 누를 때만 불러요",
+    open: "본편이 진행된 뒤 괴담넷을 열면 한 번 불러요",
+    "0": "본편 응답이 끝날 때마다 모델을 한 번 더 불러요"
+  };
+  async function handleGnet(action, value, ctx2, env2) {
+    liveEnv2 = env2;
+    const v = value ?? "";
+    const [a, b] = v.split(":").map(Number);
+    const st = () => readGnet(ctx2.chat);
+    if (!action.startsWith("gn-")) return false;
+    if (action !== "gn-del-post" && action !== "gn-del-comment" && action !== "gn-del-thread") gnet.confirm = null;
+    if (action.startsWith("gn-def-")) {
+      try {
+        const msg = await defaultsAction("gn", action, v, ctx2, env2.refresh);
+        if (msg) gnet.notice = msg;
+      } catch (error) {
+        gnet.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      env2.render();
+      return true;
+    }
+    switch (action) {
+      case "gn-sub":
+        gnet.sub = v === "dm" ? "dm" : "board";
+        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+        break;
+      case "gn-back":
+        if (gnet.settings) gnet.settings = false;
+        else if (gnet.compose && (gnet.compose.kind === "post" || gnet.compose.kind === "newdm" || gnet.compose.kind === "dm" && !st().dms.some((d) => d.nick === gnet.compose.nick))) gnet.compose = null;
+        else if (gnet.sub === "board") gnet.open = null;
+        else gnet.openDm = null;
+        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+        gnet.attachMenu = false;
+        break;
+      case "gn-settings":
+        gnet.settings = !gnet.settings;
+        break;
+      case "gn-att-menu":
+        gnet.attachMenu = !gnet.attachMenu;
+        break;
+      case "gn-open": {
+        gnet.open = gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== "comment") ? null : a;
+        gnet.settings = false;
+        if (gnet.compose && gnet.compose.kind !== "post") gnet.compose = null;
+        if (gnet.compose?.kind === "post") gnet.compose = null;
+        const p = gnet.open !== null ? findPost(st(), gnet.open) : void 0;
+        if (p && postUnread(p)) {
+          const id = p.id;
+          await mutate2(ctx2, env2, (s4) => acknowledge(s4, id), {}, false);
+          return true;
+        }
+        break;
+      }
+      case "gn-open-dm": {
         gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
         gnet.settings = false;
         gnet.compose = null;
         if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
-          await mutate2(ctx, env2, (s4) => acknowledge(s4, void 0, v), {}, false);
+          await mutate2(ctx2, env2, (s4) => acknowledge(s4, void 0, v), {}, false);
           return true;
         }
         break;
       }
       case "gn-refresh":
-        void refreshBoard(ctx, env2);
+        void refreshBoard(ctx2, env2);
         return true;
       case "gn-write":
         gnet.settings = false;
@@ -94,21 +975,21 @@ case "gn-open-dm": {
           gnet.notice = `첨부 내용과 글이 작성 상한(${cap}토큰)을 넘었어요. 조금 줄여 주세요.`;
           break;
         }
-        if (c.kind === "post") void writePost(ctx, env2, text);
-        else if (c.kind === "comment") void writeComment(ctx, env2, c.post, c.parent, text);
-        else if (c.kind === "dm") void sendDm(ctx, env2, c.nick, text, c.source);
+        if (c.kind === "post") void writePost(ctx2, env2, text);
+        else if (c.kind === "comment") void writeComment(ctx2, env2, c.post, c.parent, text);
+        else if (c.kind === "dm") void sendDm(ctx2, env2, c.nick, text, c.source);
         else {
           const to = gnet.to.trim().slice(0, 80);
           if (!to) {
             gnet.notice = "받는 사람 닉네임을 적어 주세요.";
             break;
           }
-          void sendDm(ctx, env2, to, text);
+          void sendDm(ctx2, env2, to, text);
         }
         return true;
       }
       case "gn-post-refresh":
-        if (findPost(st(), a)) void refreshPost(ctx, env2, a);
+        if (findPost(st(), a)) void refreshPost(ctx2, env2, a);
         break;
       case "gn-del-post":
         if (gnet.confirm !== `p:${a}`) {
@@ -117,7 +998,7 @@ case "gn-open-dm": {
         }
         gnet.confirm = null;
         gnet.open = null;
-        await mutate2(ctx, env2, (s4) => deletePost(s4, a));
+        await mutate2(ctx2, env2, (s4) => deletePost(s4, a));
         return true;
       case "gn-del-comment":
         if (gnet.confirm !== `c:${a}:${b}`) {
@@ -125,7 +1006,7 @@ case "gn-open-dm": {
           break;
         }
         gnet.confirm = null;
-        await mutate2(ctx, env2, (s4) => deleteComment(s4, a, b));
+        await mutate2(ctx2, env2, (s4) => deleteComment(s4, a, b));
         return true;
       case "gn-del-thread":
         if (gnet.confirm !== `d:${v}`) {
@@ -134,39 +1015,39 @@ case "gn-open-dm": {
         }
         gnet.confirm = null;
         gnet.openDm = null;
-        await mutate2(ctx, env2, (s4) => deleteThread(s4, v));
+        await mutate2(ctx2, env2, (s4) => deleteThread(s4, v));
         return true;
       case "gn-nick":
         gnet.editNick = true;
         break;
       case "gn-nick-save":
         gnet.editNick = false;
-        await setVar(ctx, env2, GN_NICK, v.trim().slice(0, 36));
+        await setVar(ctx2, env2, GN_NICK, v.trim().slice(0, 36));
         return true;
       case "gn-cfg": {
         const [k, val] = v.split("=");
         if (k === "power") {
-          const cur = String(ctx.chat.scriptstate?.[CFG("mode")] ?? GN_DEFAULTS.mode);
-          if (val === "0" && cur !== "0") await setVars2(ctx, env2, { [CFG("mode")]: "0", [MODE_PREV]: cur === "1" ? "1" : "2" });
-          else if (val === "1" && cur === "0") await setVar(ctx, env2, CFG("mode"), String(ctx.chat.scriptstate?.[MODE_PREV] ?? "") === "1" ? "1" : "2");
+          const cur = String(ctx2.chat.scriptstate?.[CFG("mode")] ?? GN_DEFAULTS.mode);
+          if (val === "0" && cur !== "0") await setVars2(ctx2, env2, { [CFG("mode")]: "0", [MODE_PREV]: cur === "1" ? "1" : "2" });
+          else if (val === "1" && cur === "0") await setVar(ctx2, env2, CFG("mode"), String(ctx2.chat.scriptstate?.[MODE_PREV] ?? "") === "1" ? "1" : "2");
           return true;
         }
         if (k === "storage") {
-          await setVar(ctx, env2, GN_STORAGE_AUTO, val === "0" ? "0" : "1");
+          await setVar(ctx2, env2, GN_STORAGE_AUTO, val === "0" ? "0" : "1");
           return true;
         }
-        if (k in GN_DEFAULTS) await setVar(ctx, env2, CFG(k), val);
+        if (k in GN_DEFAULTS) await setVar(ctx2, env2, CFG(k), val);
         return true;
       }
       case "gn-keep": {
         const n = Math.floor(Number(v));
-        if (Number.isFinite(n) && n >= 1 && n <= STORAGE_MAX) await setVar(ctx, env2, GN_STORAGE_LIMIT, String(n));
+        if (Number.isFinite(n) && n >= 1 && n <= STORAGE_MAX) await setVar(ctx2, env2, GN_STORAGE_LIMIT, String(n));
         else env2.render();
         return true;
       }
       case "gn-text": {
         const [k, ...rest] = v.split("=");
-        if (["subject", "mood", "protagonist"].includes(k)) await setVar(ctx, env2, CFG(k), rest.join("=").trim());
+        if (["subject", "mood", "protagonist"].includes(k)) await setVar(ctx2, env2, CFG(k), rest.join("=").trim());
         return true;
       }
       default:
@@ -472,479 +1353,45 @@ ${job.trailing}` : body4;
     }
   };
 
-  // src/core/fab.ts
-  var FAB_SIZE = 48;
-  var FAB_MARGIN = 8;
-  var DEFAULT_FAB_POS = { right: 16, bottom: 96 };
-  var DRAG_THRESHOLD = 6;
-  function inside(rect, x, y) {
-    if (!rect || typeof x !== "number" || typeof y !== "number") return false;
-    return x >= rect.left && x <= rect.left + rect.width && y >= rect.top && y <= rect.top + rect.height;
-  }
-  function clampPos(pos, viewW, viewH) {
-    const maxR = Math.max(FAB_MARGIN, viewW - FAB_SIZE - FAB_MARGIN);
-    const maxB = Math.max(FAB_MARGIN, viewH - FAB_SIZE - FAB_MARGIN);
-    const r = Number.isFinite(pos.right) ? pos.right : DEFAULT_FAB_POS.right;
-    const b = Number.isFinite(pos.bottom) ? pos.bottom : DEFAULT_FAB_POS.bottom;
-    return {
-      right: Math.round(Math.min(maxR, Math.max(FAB_MARGIN, r))),
-      bottom: Math.round(Math.min(maxB, Math.max(FAB_MARGIN, b)))
-    };
-  }
-  function dragTo(start4, dx, dy, viewW, viewH) {
-    return clampPos({ right: start4.right - dx, bottom: start4.bottom - dy }, viewW, viewH);
-  }
-  function parsePos(raw) {
-    try {
-      const p = JSON.parse(raw ?? "");
-      if (p && Number.isFinite(p.right) && Number.isFinite(p.bottom)) return { right: p.right, bottom: p.bottom };
-    } catch {
-    }
-    return { ...DEFAULT_FAB_POS };
-  }
-
-  // src/ui/brand.ts
-  var BRAND = {
-    /** 창 머리·표지 이름 */
-    name: "괴이 ː 이면세계",
-    /** 표지 아래 작은 영문 */
-    sub: "ANOMALY SIM",
-    /** 떠 있는 여는 버튼에 마우스를 올렸을 때 */
-    fab: "괴이 ː 이면세계"
-  };
-  var CARD_FILE = "괴이_이면세계.charx";
-
-  // src/ui/landing.ts
-  var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
-  function title(p) {
-    const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
-    const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
-    return `<div style="margin:6px 0 0;${font}">${line}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line}</div></div>`;
-  }
-  function corner(pos, p) {
-    const [v, h] = pos.split(" ");
-    return `<span aria-hidden="true" style="position:absolute;${v}:10px;${h}:10px;width:14px;height:14px;border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
-  }
-  function landingHtml(p) {
-    const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="50" height="50"');
-    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:40em;margin:18px auto;padding:26px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:left;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<div data-goei-part="row" style="position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:18px 26px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:84px;height:84px;border-radius:24px;background:${p.accentBg};border:1px solid ${p.accentLine};color:${p.signal}">${ghost}</div><div data-goei-part="text" style="flex:1 1 15em;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-family:${MONO};font-size:11px;letter-spacing:.28em"><span data-goei-part="label" style="color:${p.signal}">ANOMALY SIMULATION</span><span style="display:inline-flex;align-items:center;gap:6px;color:${p.sub};letter-spacing:.2em"><span data-goei-part="dot" style="width:7px;height:7px;border-radius:50%;background:${p.signal}"></span>STANDBY</span></div>` + title(p) + `<div style="display:flex;align-items:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
-  }
-  var LANDING_CSS = `
-[data-goei-card="landing"] { container-type: inline-size; }
-@keyframes goei-l-blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
-@keyframes goei-l-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(.7); } }
-@keyframes goei-l-mirror {
-  0%, 100% { transform: scaleY(-1) skewX(0deg) translateX(0); opacity: .3; }
-  25% { transform: scaleY(-1.04) skewX(5deg) translateX(-2px); opacity: .22; }
-  50% { transform: scaleY(-.97) skewX(-3deg) translateX(2px); opacity: .34; }
-  75% { transform: scaleY(-1.02) skewX(4deg) translateX(-1px); opacity: .25; }
-}
-@keyframes goei-l-label {
-  0%, 86%, 100% { opacity: .9; transform: translateX(0); }
-  88% { opacity: .3; transform: translateX(2px); }
-  90% { opacity: 1; transform: translateX(-2px); }
-  92% { opacity: .5; transform: translateX(1px); }
-  94% { opacity: .95; transform: translateX(0); }
-}
-@keyframes goei-l-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-@keyframes goei-l-scan { 0% { transform: translateY(-100%); opacity: 0; } 15% { opacity: .55; } 70% { opacity: .55; } 100% { transform: translateY(260%); opacity: 0; } }
-[data-goei-card="landing"] [data-goei-part="hint"] { animation: goei-l-blink 1.6s ease-in-out infinite; }
-[data-goei-card="landing"] [data-goei-part="dot"] { animation: goei-l-dot 1.6s ease-in-out infinite; }
-[data-goei-card="landing"] [data-goei-part="mirror"] { animation: goei-l-mirror 4.5s ease-in-out infinite; }
-[data-goei-card="landing"] [data-goei-part="label"] { display: inline-block; animation: goei-l-label 3.8s linear infinite; }
-[data-goei-card="landing"] [data-goei-part="ghost"] { animation: goei-l-float 3.2s ease-in-out infinite; }
-[data-goei-card="landing"] [data-goei-part="scan"] { animation: goei-l-scan 5s ease-in-out infinite; }
-/* 인라인 style을 이겨야 해서 !important */
-@container (max-width: 30em) {
-  [data-goei-card="landing"] [data-goei-part="text"] { flex-basis: 100% !important; text-align: center !important; }
-  [data-goei-card="landing"] [data-goei-part="text"] > div:first-child { justify-content: center !important; }
-  [data-goei-card="landing"] [data-goei-part="text"] > div:last-child { justify-content: center !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 68px !important; height: 68px !important; border-radius: 20px !important; }
-  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 40px; height: 40px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-goei-card="landing"] [data-goei-part] { animation: none !important; }
-}
-`;
-
-  // src/ui/theme.ts
-  var PALETTES = {
-    dark: { void: "#0B1215", panel: "#121B1F", line: "#24343B", text: "#E6EEEC", sub: "#B5C4C0", signal: "#5EEAD4", accentBg: "#10302C", accentLine: "#2C6E63", scrim: "rgba(3, 7, 9, .9)" },
-    light: { void: "#F4F6F5", panel: "#FFFFFF", line: "#DCE3E1", text: "#13201D", sub: "#3B4B47", signal: "#0F8C7A", accentBg: "#DDF3EE", accentLine: "#8FCFC3", scrim: "rgba(236, 242, 240, .94)" },
-    paper: { void: "#EFE6D2", panel: "#F8F2E4", line: "#D8C9A8", text: "#2B2418", sub: "#4A3F2C", signal: "#8A4B12", accentBg: "#F1DEC2", accentLine: "#C99A63", scrim: "rgba(239, 230, 210, .94)" }
-  };
-  function themeName(v, fallback = "dark") {
-    return v === "light" || v === "paper" || v === "dark" ? v : fallback;
-  }
-  var current = "dark";
-  var listeners = /* @__PURE__ */ new Set();
-  function currentTheme() {
-    return current;
-  }
-  function setCurrentTheme(t) {
-    if (t === current) return;
-    current = t;
-    for (const f of listeners) f(t);
-  }
-  function onThemeChange(f) {
-    listeners.add(f);
-    return () => listeners.delete(f);
-  }
-  var KEYS = Object.keys(PALETTES.dark);
-  function cardPalette(t) {
-    const p = PALETTES[t];
-    return Object.fromEntries(KEYS.map((k) => [k, `var(--goei-${k}, ${p[k]})`]));
-  }
-  function cardVarsCss(t) {
-    const p = PALETTES[t];
-    return `[data-goei-card] { ${KEYS.map((k) => `--goei-${k}: ${p[k]};`).join(" ")} }`;
-  }
-
-  // src/host/overlay.ts
-  function themeVars(sel) {
-    return Object.keys(PALETTES).map((t) => {
-      const p = PALETTES[t];
-      return `${sel}${t === "dark" ? "" : `[x-goei-theme="${t}"]`} { --g-void: ${p.void}; --g-panel: ${p.panel}; --g-line: ${p.line}; --g-text: ${p.text}; --g-sub: ${p.sub}; --g-signal: ${p.signal}; --g-acc: ${p.accentBg}; --g-acc-line: ${p.accentLine}; --g-scrim: ${p.scrim}; }`;
-    }).join("\n");
-  }
-  var INTRO_MS = 2e3;
-  var FAB_CSS = `
-${themeVars("[x-goei-fab]")}
-[x-goei-fab] {
-  position: fixed; right: 16px; bottom: 96px; z-index: 100;
-  display: none;
-}
-[x-goei-fab] button {
-  position: relative; display: flex; align-items: center; justify-content: center;
-  width: 48px; height: 48px; padding: 0; box-sizing: border-box;
-  border: 1px solid var(--g-acc-line); border-radius: 14px; touch-action: none; user-select: none; -webkit-user-select: none;
-  background: var(--g-acc); color: var(--g-signal); cursor: pointer;
-  box-shadow: 0 6px 18px -6px rgba(0,0,0,.45);
-  transition: transform .15s ease, box-shadow .2s ease, background-color .15s ease, color .15s ease;
-}
-[x-goei-fab] button:hover {
-  transform: translateY(-3px) scale(1.08);
-  background: var(--g-signal); color: var(--g-acc); border-color: var(--g-signal);
-  box-shadow: 0 10px 24px -6px rgba(0,0,0,.5), 0 0 0 5px color-mix(in srgb, var(--g-signal) 28%, transparent), 0 0 22px 2px color-mix(in srgb, var(--g-signal) 45%, transparent);
-}
-[x-goei-fab] button:hover svg { transform: rotate(-8deg) scale(1.06); }
-[x-goei-fab] button svg { transition: transform .15s ease; }
-[x-goei-fab] button:active { transform: translateY(0) scale(.96); }
-[x-goei-fab][x-goei-drag="true"] button { cursor: grabbing; transform: scale(1.06); box-shadow: 0 10px 26px -6px rgba(0,0,0,.55), 0 0 0 4px color-mix(in srgb, var(--g-signal) 24%, transparent); }
-[x-goei-fab] button svg { width: 26px; height: 26px; pointer-events: none; }
-@keyframes goei-fab-glow {
-  0%, 100% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 0 transparent; }
-  50% { box-shadow: 0 6px 18px -6px rgba(0,0,0,.45), 0 0 0 7px color-mix(in srgb, var(--g-signal) 22%, transparent), 0 0 26px 6px color-mix(in srgb, var(--g-signal) 35%, transparent); }
-}
-@media (prefers-reduced-motion: reduce) { [x-goei-fab][x-goei-intro="true"] * { animation: none !important; } }
-
-/* 접속 효과 (v0.16.22, 사용자 설계): 위쪽 띠 대신 유령 버튼 자리에서. 버튼이 튀어나오며 고리가 퍼지고,
-   버튼 옆으로 「ANOMALY SIMULATION」 표가 잠깐 펼쳐졌다 사라진다.
-   v0.16.28 (사용자 요청): 표도 테마를 따른다. 다크는 네온 빛줄기와 글리치, 라이트는 맑은 빛줄기만, 페이퍼는 도장 찍듯 눌리는 잉크 */
-[x-goei-fab] [data-gr], [x-goei-fab] [data-gl] { display: none; }
-[x-goei-fab][x-goei-intro="true"] button { animation: goei-fab-pop 560ms cubic-bezier(.2,1.5,.4,1) both, goei-fab-glow 1.2s ease-in-out 560ms 1; }
-[x-goei-fab][x-goei-intro="true"] [data-gr] {
-  display: block; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
-  border: 2px solid var(--g-signal); opacity: 0; animation: goei-ring 1100ms ease-out 120ms both;
-}
-[x-goei-fab][x-goei-intro="true"] [data-gr] + [data-gr] { animation-delay: 480ms; }
-[x-goei-fab][x-goei-intro="true"] [data-gl] {
-  --gl-dx: 12px;
-  display: flex; align-items: center; gap: 8px; position: absolute; top: 50%; right: calc(100% + 12px);
-  height: 36px; padding: 0 16px; box-sizing: border-box; border-radius: 10px; overflow: hidden; white-space: nowrap; pointer-events: none;
-  background: color-mix(in srgb, var(--g-void) 94%, transparent); border: 1px solid color-mix(in srgb, var(--g-signal) 45%, transparent); box-shadow: 0 10px 26px -10px rgba(0,0,0,.65);
-  color: var(--g-text); font: 700 12.5px/1 'IBM Plex Sans KR', system-ui, -apple-system, "Noto Sans KR", sans-serif; letter-spacing: .2em;
-  transform-origin: right center; opacity: 0; animation: goei-label ${INTRO_MS}ms cubic-bezier(.2,.8,.2,1) 260ms both;
-}
-[x-goei-fab][x-goei-side="left"][x-goei-intro="true"] [data-gl] { --gl-dx: -12px; right: auto; left: calc(100% + 12px); transform-origin: left center; }
-[x-goei-fab] [data-gs] {
-  position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--g-signal) 28%, transparent), transparent);
-  animation: goei-in-sweep 800ms ease-out 420ms both;
-}
-[x-goei-fab] [data-gt] { position: relative; animation: goei-in-glitch 520ms steps(1) 480ms 1; }
-/* 라이트: 밝은 판, 글리치 없이 빛줄기만 */
-[x-goei-fab][x-goei-theme="light"][x-goei-intro="true"] [data-gl] { background: color-mix(in srgb, var(--g-panel) 96%, transparent); box-shadow: 0 10px 24px -12px rgba(15, 60, 52, .35); }
-[x-goei-fab][x-goei-theme="light"] [data-gt] { color: var(--g-signal); animation: none; }
-/* 페이퍼: 종이 판에 잉크 도장. 빛줄기·글리치 대신 한 번 눌렸다 번지듯 */
-[x-goei-fab][x-goei-theme="paper"][x-goei-intro="true"] [data-gl] {
-  background: var(--g-panel); border-color: color-mix(in srgb, var(--g-signal) 70%, transparent); box-shadow: 0 8px 20px -12px rgba(60, 40, 10, .45);
-}
-[x-goei-fab][x-goei-theme="paper"] [data-gs] { display: none; }
-[x-goei-fab][x-goei-theme="paper"] [data-gt] { color: var(--g-signal); animation: goei-in-stamp 620ms cubic-bezier(.3,1.4,.5,1) 380ms both; }
-@keyframes goei-in-stamp {
-  0% { opacity: 0; transform: scale(1.35); letter-spacing: .32em; filter: blur(1.5px); }
-  55% { opacity: 1; transform: scale(.96); filter: blur(0); }
-  100% { opacity: 1; transform: scale(1); letter-spacing: .2em; }
-}
-@keyframes goei-fab-pop {
-  0% { opacity: 0; transform: scale(.2) rotate(-25deg); }
-  60% { opacity: 1; transform: scale(1.18) rotate(6deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0); }
-}
-@keyframes goei-ring { 0% { opacity: .9; transform: scale(.7); } 100% { opacity: 0; transform: scale(2.6); } }
-@keyframes goei-label {
-  0% { opacity: 0; transform: translate(var(--gl-dx), -50%) scaleX(.5); }
-  16% { opacity: 1; transform: translate(0, -50%) scaleX(1); }
-  82% { opacity: 1; transform: translate(0, -50%) scaleX(1); }
-  100% { opacity: 0; transform: translate(0, -50%) scaleX(1); }
-}
-@keyframes goei-in-sweep { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
-@keyframes goei-in-glitch {
-  0% { transform: translate(0); text-shadow: 2px 0 #ff5a7a, -2px 0 #4fe0ff; }
-  20% { transform: translate(-1px, 0); }
-  40% { transform: translate(1px, 0); text-shadow: -1px 0 #ff5a7a, 1px 0 #4fe0ff; }
-  60% { transform: translate(0); text-shadow: none; }
-  100% { transform: translate(0); }
-}
-`;
-  var FAB_HTML = (label) => `<span data-gr></span><span data-gr></span>
-<span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
-<button type="button" aria-label="${label}">${GHOST_ICON}</button>`;
-  async function body2() {
-    const doc = await risuai.getRootDocument();
-    if (!doc) return null;
-    const b = await doc.querySelector("body");
-    return b ? { doc, body: b } : null;
-  }
-  var POS_KEY = "goei-plugin:fab-pos";
-  async function loadPos() {
-    try {
-      return parsePos(await risuai.safeLocalStorage.getItem(POS_KEY));
-    } catch {
-      return { ...DEFAULT_FAB_POS };
-    }
-  }
-  async function removeLeftovers(doc) {
-    try {
-      const list4 = await risuai.unwarpSafeArray(await doc.querySelectorAll("[x-goei-fab], [x-goei-intro]"));
-      for (const el of list4) await el.remove().catch(() => {
-      });
-    } catch {
-    }
-  }
-  async function createFab(onOpen) {
-    const root2 = await body2();
-    if (!root2) throw new Error("Risu 화면 접근 권한이 없어요.");
-    const { doc } = root2;
-    await removeLeftovers(doc);
-    const host2 = await doc.createElement("div");
-    await host2.setAttribute("x-goei-fab", "true");
-    await host2.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
-    const style = await doc.createElement("style");
-    await style.setTextContent(FAB_CSS);
-    await host2.appendChild(style);
-    const cardStyle2 = await doc.createElement("style");
-    await cardStyle2.setTextContent(cardVarsCss("dark") + LANDING_CSS);
-    await host2.appendChild(cardStyle2);
-    await root2.body.appendChild(host2);
-    const button = await host2.querySelector("button");
-    if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
-    let pos = await loadPos();
-    const applyPos = async () => {
-      await host2.setStyle("right", `${pos.right}px`);
-      await host2.setStyle("bottom", `${pos.bottom}px`);
-    };
-    await applyPos();
-    let visible = false;
-    let shown2 = null;
-    let introTimer;
-    const endIntro = () => {
-      if (introTimer === void 0) return;
-      clearTimeout(introTimer);
-      introTimer = void 0;
-      void host2.setAttribute("x-goei-intro", "false").catch(() => {
-      });
-    };
-    let drag = null;
-    let moved = false;
-    let pending = null;
-    let loop = null;
-    const rect = async () => visible ? await button.getBoundingClientRect() : null;
-    const viewport = async () => {
-      const r = await root2.body.getBoundingClientRect();
-      return { vw: r.width, vh: r.height };
-    };
-    const savePos = async () => {
-      try {
-        await risuai.safeLocalStorage.setItem(POS_KEY, JSON.stringify(pos));
-      } catch {
-      }
-    };
-    const runDrag = async () => {
-      try {
-        while (pending && drag) {
-          const d = drag;
-          const p = pending;
-          pending = null;
-          const hit = await d.hit;
-          if (drag !== d) continue;
-          if (!hit) {
-            drag = null;
-            break;
-          }
-          const dx = p.x - d.x;
-          const dy = p.y - d.y;
-          if (!moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) continue;
-          if (!moved) {
-            moved = true;
-            await host2.setAttribute("x-goei-drag", "true");
-          }
-          pos = dragTo(d.start, dx, dy, hit.vw, hit.vh);
-          await applyPos();
-        }
-      } catch {
-        drag = null;
-      } finally {
-        loop = null;
-      }
-    };
-    const onDown = (ev) => {
-      drag = null;
-      pending = null;
-      moved = false;
-      if (!visible || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
-      if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
-      const x = ev.clientX;
-      const y = ev.clientY;
-      drag = {
-        x,
-        y,
-        start: { ...pos },
-        hit: (async () => {
-          const r = await rect();
-          if (!inside(r, x, y)) return null;
-          return { rect: r, ...await viewport() };
-        })().catch(() => null)
-      };
-    };
-    const onMove = (ev) => {
-      if (!drag || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
-      if (ev.buttons !== void 0 && ev.buttons !== 1) {
-        drag = null;
-        return;
-      }
-      pending = { x: ev.clientX, y: ev.clientY };
-      loop ??= runDrag();
-    };
-    const onUp = () => {
-      const d = drag;
-      void (loop ?? Promise.resolve()).then(async () => {
-        if (drag === d) drag = null;
-        if (moved) {
-          await host2.setAttribute("x-goei-drag", "false");
-          await savePos();
-        }
-      });
-    };
-    const onClick = async (ev) => {
-      if (!visible) return;
-      if (!inside(await rect(), ev.clientX, ev.clientY)) return;
-      await loop;
-      if (moved) return;
-      onOpen();
-    };
-    let ids = [];
-    const unbind = async () => {
-      const old = ids;
-      ids = [];
-      for (const { type, id } of old) await host2.removeEventListener(type, id).catch(() => {
-      });
-    };
-    const bind = async () => {
-      await unbind();
-      for (const [type, fn2] of [
-        ["pointerdown", onDown],
-        ["pointermove", onMove],
-        ["pointerup", onUp],
-        ["pointercancel", onUp],
-        ["click", onClick]
-      ]) {
-        ids.push({ type, id: await host2.addEventListener(type, fn2, { passive: true }) });
-      }
-    };
-    await bind();
-    return {
-      async setVisible(next, intro = false) {
-        if (shown2 === next && !intro) return;
-        const reappear = next && !shown2;
-        shown2 = next;
-        if (reappear) await bind().catch(() => {
-        });
-        visible = next;
-        if (!next) {
-          drag = null;
-          pending = null;
-        } else {
-          const { vw, vh } = await viewport();
-          pos = clampPos(pos, vw, vh);
-          await applyPos();
-        }
-        endIntro();
-        if (next && intro) {
-          const { vw } = await viewport();
-          await host2.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
-          await host2.setAttribute("x-goei-intro", "true");
-          introTimer = setTimeout(endIntro, INTRO_MS + 400);
-        }
-        await host2.setStyle("display", next ? "block" : "none");
-      },
-      endIntro,
-      async setTheme(theme) {
-        await host2.setAttribute("x-goei-theme", theme);
-        await cardStyle2.setTextContent(cardVarsCss(theme) + LANDING_CSS);
-      },
-      async chatScreenVisible() {
-        return !!await doc.querySelector(".default-chat-screen");
-      },
-      async remove() {
-        visible = false;
-        drag = null;
-        pending = null;
-        await host2.remove();
-        await unbind();
-      }
-    };
-  }
-
   // src/ui/style.css
   var style_default = `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
 /* 디자인 시안 v1 (2026-10-16): 다크 기본, 라이트·페이퍼는 채팅 테마($st_fixed_theme)를 따른다 */
 :root {
-  --void: #0B1215;      /* 바탕 */
-  --sunk: #0E171A;
-  --panel: #121B1F;     /* 카드 */
-  --panel2: #18242A;    /* 올린 면 */
-  --line: #24343B;
-  --line2: #2B3B42;
-  --text: #E6EEEC;
-  --sub: #B5C4C0;
-  --dim: #8FA39F;
-  --mint: #9DB0AC;      /* 소제목 */
+  /* 다크 (v0.16.31 개편): 올블랙이 아니라 차분한 짙은 청회색. 면 층마다 밝기 차이를 분명히 */
+  --void: #1A2226;      /* 창 바탕 */
+  --sunk: #151C1F;      /* 들어간 면 (대화창·문서 칸) */
+  --panel: #232D32;     /* 카드 */
+  --panel2: #2C383E;    /* 올린 면 (칩·입력칸) */
+  --line: #37464D;
+  --line2: #46565D;
+  --text: #E9F0EE;
+  --sub: #BECBC8;
+  --dim: #97A9A5;
+  --mint: #A6B8B4;      /* 소제목 */
   --signal: #5EEAD4;    /* 강조 */
   --on-signal: #052A25;
-  --accent-bg: #10302C;
-  --accent-line: #2C6E63;
+  --accent-bg: #1D403A;
+  --accent-line: #3F8879;
   --amber: #F5B544;
-  --amber-bg: #3A2E14;
+  --amber-bg: #45381C;
   --danger: #FF7A6B;
-  --danger-bg: #3A1E1A;
+  --danger-bg: #4A2A27;
   --blue: #7DB8F5;
   --violet: #C9A7FF;
-  --shadow: 0 40px 80px -30px rgba(0, 0, 0, .9);
+  --shadow: 0 40px 80px -30px rgba(0, 0, 0, .65);
   --scrim: rgba(3, 7, 9, .8);
   --font: 'IBM Plex Sans KR', 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   --mono: 'JetBrains Mono', 'IBM Plex Sans KR', 'Pretendard', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   color-scheme: dark;
 }
 .gx[data-theme="light"] {
-  --void: #F4F6F5; --sunk: #ECF0EF; --panel: #FFFFFF; --panel2: #F1F4F3; --line: #DCE3E1; --line2: #CBD5D2;
+  --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #D5DDDA; --line2: #C3CECA;
   --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
   --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
   --blue: #2F6FB5; --violet: #7A4FC4; --shadow: 0 30px 60px -30px rgba(20, 40, 36, .45); --scrim: rgba(20, 30, 28, .58); color-scheme: light;
 }
 .gx[data-theme="paper"] {
-  --void: #EFE6D2; --sunk: #E7DCC4; --panel: #F8F2E4; --panel2: #EFE5CF; --line: #D8C9A8; --line2: #C9B78F;
+  --void: #EFE6D2; --sunk: #E5D9BF; --panel: #FAF5E9; --panel2: #F3EBDA; --line: #D3C29E; --line2: #C2AE85;
   --text: #2B2418; --sub: #4A3F2C; --dim: #6E6046; --mint: #5E5138; --signal: #8A4B12; --on-signal: #FFF8EC;
   --accent-bg: #F1DEC2; --accent-line: #C99A63; --amber: #8A5A00; --amber-bg: #F3E2BC; --danger: #A8361F; --danger-bg: #F2D6CB;
   --blue: #2F5F95; --violet: #6D4AA8; --shadow: 0 30px 60px -30px rgba(60, 40, 10, .45); --scrim: rgba(40, 30, 15, .58); color-scheme: light;
@@ -970,8 +1417,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
   color: var(--text);
 }
-/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」(--dim, 0~1) */
-.gx::before { content: ""; position: absolute; inset: 0; background: var(--scrim); opacity: var(--dim, .5); pointer-events: none; }
+/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」. 색은 app.ts가 .gx에 바로 칠한다 (100%면 완전히 가림) */
 .gx-panel {
   /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
   /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
@@ -1029,7 +1475,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-brand > div { min-width: 0; }
 .gx-brand small { display: block; font-size: 14px; color: var(--dim); font-family: var(--mono); letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-brand small .y { opacity: .8; }
-.gx-logo { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-bg); color: var(--signal); flex: none; }
+.gx-logo { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); flex: none; }
 .gx-logo svg { width: 26px; height: 26px; }
 .gx-head-act { display: flex; align-items: center; gap: 8px; flex: none; }
 .gx-x { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font-size: 18px; flex: none; }
@@ -1057,7 +1503,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (min-width: 761px) {
   .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
   .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 9px; }
-  .gx-panel.has-nav .gx-content > .gx-body > :first-child { margin-top: 0; padding-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
   .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
 }
 /* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
@@ -1141,6 +1588,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .gx-foot { padding: 12px 20px 18px; border-top: 1px solid var(--panel2); background: var(--void); display: flex; flex-direction: column; gap: 8px; }
 .gx-foot-sum { font-size: 15px; color: var(--dim); }
+.gx-err.info { border-color: var(--accent-line); background: var(--accent-bg); color: var(--text); }
 .gx-err { margin-bottom: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-bg); color: var(--danger); font-size: 15px; }
 .gx-start {
   width: 100%; min-height: 56px; border: 0; border-radius: 16px;
@@ -1159,6 +1607,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* ── 상황판 ── */
 .gx-board { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
 .gx-board > section { padding: 0; }
+/* 칸이 많아 넘칠 때 줄어들어 서로 겹치지 않게 (응답 전 안내 줄이 눌려 글씨가 위로 쏠렸다) */
+.gx-board > * { flex-shrink: 0; }
+.gx-board > .gx-hint { margin: 0; }
 .gx-board > .gx-alert { padding: 14px 16px; }
 .gx-alert { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--danger-bg); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); }
 .gx-alert.calm { background: var(--accent-bg); border-color: var(--accent-line); }
@@ -1201,13 +1652,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-ava { position: relative; flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--panel2); color: var(--signal); font-weight: 700; }
 .gx-ava.sq { border-radius: 14px; }
 .gx-ava img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.gx-badge, .gx-grade { font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px; color: var(--dim); background: var(--panel2); font-weight: 600; white-space: nowrap; }
-.gx-badge.wait { background: transparent; border: 1px dashed var(--line2); }
-.gx-badge.live { color: var(--signal); background: var(--accent-bg); }
-.gx-badge.new { color: var(--danger); background: var(--danger-bg); }
-.gx-badge.hot, .gx-badge.hurt { color: var(--amber); background: var(--amber-bg); }
-.gx-badge.op, .gx-badge.out { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); }
-.gx-badge.bad, .gx-badge.dead { color: var(--danger); background: var(--danger-bg); }
+.gx-badge, .gx-grade { font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px; color: var(--sub); background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); font-weight: 600; white-space: nowrap; }
+.gx-badge.wait { background: transparent; box-shadow: none; border: 1px dashed var(--line2); }
+.gx-badge.live { color: var(--signal); background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.gx-badge.new { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-badge.hot, .gx-badge.hurt { color: var(--amber); background: var(--amber-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 35%, transparent); }
+.gx-badge.op, .gx-badge.out { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent); }
+.gx-badge.bad, .gx-badge.dead { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
 .gx-badge.dead { text-decoration: line-through; }
 .gx-grade { font-weight: 700; color: var(--text); }
 .gx-grade.gS, .gx-grade.gA { color: var(--danger); }
@@ -1266,7 +1717,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-pin.hot .gx-dot { background: var(--amber); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(224, 163, 60, .35); }
 .gx-pin.hot-an .gx-dot { background: var(--danger); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(255, 143, 143, .3); }
 .gx-pin.hot-ms .gx-dot { background: #c9a7ff; box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(201, 167, 255, .3); }
-.gx-pin.sel .gx-pname { background: var(--signal); color: #04201c; }
+.gx-pin.sel .gx-pname { background: var(--signal); color: var(--on-signal); }
 .gx-pin:hover .gx-pname { outline: 1px solid var(--signal); }
 .gx-mini {
   min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
@@ -1605,7 +2056,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-acard.pick.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
 .gx-acard.pick.on .gx-acard-top b { color: var(--signal); }
 .gx-acard.pick:disabled { opacity: .45; }
-.gx-acard-check { display: none; position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--signal); color: #04201c; font-size: 13px; font-weight: 800; place-items: center; }
+.gx-acard-check { display: none; position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--signal); color: var(--on-signal); font-size: 13px; font-weight: 800; place-items: center; }
 .gx-acard.pick.on .gx-acard-check { display: grid; }
 
 /* ── 괴담톡 (v0.12.0): 메신저 화면. PC는 목록|대화 두 칸, 모바일은 한 칸씩. 고정 높이 상자 없이 창 높이를 나눠 쓰고, 입력창은 늘 아래 ── */
@@ -1667,14 +2118,14 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-wait { color: var(--amber) !important; }
 .ph-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
 .ph-act { display: flex; align-items: center; gap: 2px; flex: none; }
-.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place-items: center; color: #04201c; font-size: 13px; font-weight: 800; }
+.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place-items: center; color: var(--on-signal); font-size: 13px; font-weight: 800; }
 .ph-main.on .ph-check { background: var(--signal); border-color: var(--signal); }
 
 /* 오른쪽 칸 */
 .gx-body .ph-pane { padding: 0; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; background: var(--sunk); }
 .ph-pane > .nw-busy, .ph-pane > .gn-notice { margin: 10px 14px 0; }
 .ph-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--dim); text-align: center; padding: 24px; }
-.ph-empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--accent-bg); color: var(--signal); }
+.ph-empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
 .ph-empty-ico svg { width: 32px; height: 32px; }
 .ph-empty b { color: var(--text); font-size: 17px; }
 .ph-empty p { margin: 0; font-size: 14px; }
@@ -1711,22 +2162,22 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
 .ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
 /* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
-.ph-msg.npc .ph-bubble { background: #1F2E35; border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
 .gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
-.ph-msg.me .ph-bubble { background: var(--signal); color: #04201c; }
+.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
 .ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
 .ph-bubble p { margin: 0; }
 .ph-bubble p + p { margin-top: 4px; }
 .ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
-.ph-msg.me .ph-bubble .at-card { background: rgba(4, 32, 28, .14); color: #04201c; }
-.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: #04201c; }
+.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
 .ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
 .ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
 .ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
 .ph-msg.npc .ph-meta-t { align-items: flex-start; }
 .ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
-.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 70%, transparent); color: var(--sub); font-size: 13px; text-align: center; }
-.ph-sys.pause { font-style: italic; background: none; }
+.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
+.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
 .ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
 .ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
 .ph-typing i:nth-child(2) { animation-delay: .15s; }
@@ -1742,7 +2193,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-input:focus { outline: none; border-color: var(--accent-line); }
 .ph-plus { width: 42px; height: 42px; border-radius: 50%; }
 .ph-plus.on svg { transform: rotate(45deg); }
-.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: #04201c; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
+.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
 .ph-send svg { width: 22px; height: 22px; }
 .ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .ph-send:active:not(:disabled) { transform: scale(.94); }
@@ -2098,6 +2549,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
 .gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
 .gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.gx-op-wait { font-size: 12px; line-height: 1.45; color: var(--sub); text-align: center; word-break: keep-all; }
 /* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
 
 /* 상황판 다시 설계 (v0.16.13) */
@@ -2505,432 +2957,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 위키 메인 */
 .nw-home { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 22px 24px 28px; }
 .nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
-.nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
-.nw-hero-top { display: flex; align-items: center; gap: 12px; }
-.nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; color: var(--signal); }
-.nw-hero-ico svg { width: 40px; height: 40px; }
-.nw-hero-t { display: flex; flex-direction: column; gap: 2px; }
-.nw-hero-t h2 { margin: 0; font-size: 20px; }
-.nw-hero-t small { color: var(--dim); font-size: 13px; }
-.nw-hero-q { display: flex; gap: 8px; align-items: center; }
-.nw-hero-q .gx-search { flex: 1; min-width: 0; margin: 0; }
-.nw-hero-q .gx-mini { flex: none; height: 40px; padding: 0 14px; }
-.nw-home .nw-hsec { padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.nw-hsec h3 { display: flex; align-items: center; gap: 6px; margin: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 15px; }
-.nw-hsec h3 b { color: var(--dim); font-size: 13px; font-weight: 600; }
-.nw-hnone { margin: 0; padding: 18px 12px; text-align: center; color: var(--dim); font-size: 14px; }
-.nw-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-.nw-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-content: center; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
-.nw-card:hover { border-color: var(--accent-line); }
-.nw-card-img { grid-row: 1 / 3; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); }
-.nw-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.nw-card-img svg { width: 22px; height: 22px; }
-.nw-card-img.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
-.nw-card-img.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
-.nw-card-img.k-lm { color: var(--amber); background: var(--amber-bg); }
-.nw-card-img.k-org { color: var(--signal); background: var(--accent-bg); }
-.nw-card b { align-self: end; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nw-card small { align-self: start; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nw-chip small { color: var(--dim); font-size: 11.5px; font-weight: 600; }
-@media (max-width: 760px) {
-  /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
-  .gx-body.nw-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-  .nw-rail { display: none; }
-  .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
-  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .nw-main { grid-row: 1; }
-  .nw-panel { left: 0; transform: translateX(-100%); max-width: calc(100% - 40px); }
-  .list-open .nw-scrim { inset: 0; }
-  .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
-  .nw-home { padding: 14px 14px 22px; gap: 18px; }
-  .nw-home .nw-hero { padding: 16px; }
-  .nw-cards { grid-template-columns: minmax(0, 1fr); }
-}
-.nw-index { display: flex; flex-direction: column; }
-.nw-irow { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--panel2); }
-.nw-irow:last-child { border-bottom: 0; }
-.nw-ikey { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--panel2); color: var(--sub); font-size: 14px; }
-/* 위키 서랍 탭·색인, 메인 분류 (v0.16.23 4차: 기본 문서 141개) */
-.nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
-.nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
-.nw-tabs + .nw-groups { padding-right: 26px; }
-.nw-kbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; margin-left: -10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; cursor: pointer; }
-.nw-kbtn b { color: var(--dim); font-weight: 600; }
-.nw-kbtn::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
-.nw-kbtn:hover { background: var(--accent-bg); color: var(--signal); }
-.nw-kgrid { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--void) 72%, transparent); }
-.nw-kgrid[hidden] { display: none; }
-.nw-kgrid-in { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
-.nw-kgrid-in button { height: 52px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
-.nw-kgrid-in button:hover:not(:disabled) { border-color: var(--signal); color: var(--signal); background: var(--accent-bg); }
-.nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
-.nw-card.none { opacity: .6; border-style: dashed; }
-.nw-more-btn { align-self: center; margin-top: 2px; }
-.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-.nw-tile { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
-.nw-tile:hover { border-color: var(--accent-line); }
-.nw-tile-pics { grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); place-items: center; }
-.nw-tile-pics img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.nw-tile-pics:not(:has(img)) { display: grid; grid-template-columns: 1fr; }
-.nw-tile-pics svg { width: 22px; height: 22px; }
-.nw-tile.k-an .nw-tile-pics:not(:has(img)) { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
-.nw-tile.k-ms .nw-tile-pics:not(:has(img)) { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
-.nw-tile b { align-self: end; font-size: 14px; }
-.nw-tile small { align-self: start; color: var(--dim); font-size: 12px; }
-@media (max-width: 760px) {
-  .nw-tiles { grid-template-columns: minmax(0, 1fr); }
-}
-
-/* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
-.gx-content > .ph-drawer { margin: 0; }
-.ph-dbody { padding: 0 12px; }
-.gx-bdrawer .ph-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (max-width: 760px) {
-  .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
-  .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
-  .gx-mdrawer .gx-mapbar { margin: 0; }
-  .gx-mdrawer .gx-note { display: block; margin: 0; }
-  .gx-mdrawer .gx-note textarea { width: 100%; }
-  .gx-mgo { padding: 0 12px 10px; }
-  .gx-mgo .gx-start { min-height: 46px; border-radius: 12px; font-size: 16px; }
-  /* 장소 검색 제안은 서랍 위로 펼친다 */
-  .gx-mdrawer .gx-mapfind { position: relative; }
-  .gx-mdrawer .gx-mapsug { top: auto; bottom: calc(100% + 6px); }
-}
-
-/* 고급 설정 (v0.16.27): 기능 설정 맨 아래 접힌 칸. 열기 전에는 한 줄 */
-.ps-adv { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
-.ps-adv-sum { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 14px; cursor: pointer; }
-.ps-adv-sum::-webkit-details-marker, .ps-adv-sub > summary::-webkit-details-marker { display: none; }
-.ps-adv-sum b { font-size: 15px; font-weight: 600; }
-.ps-adv-sum::after, .ps-adv-sub > summary::after { content: ''; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--dim); border-bottom: 2px solid var(--dim); transform: translateY(-2px) rotate(45deg); }
-.ps-adv[open] > .ps-adv-sum::after, .ps-adv-sub[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
-.adv-count { padding: 2px 8px; border: 1px solid var(--accent-line); border-radius: 999px; color: var(--signal); font-size: 12px; white-space: nowrap; }
-.ps-adv-body { display: flex; flex-direction: column; gap: 16px; padding: 4px 12px 14px; border-top: 1px solid var(--line); }
-.ps-adv-body > .ps-group:first-child { margin-top: 10px; }
-.ps-adv .ps-rows { background: var(--void); }
-.adv-row .ps-ctl { align-items: center; gap: 4px; }
-.adv-reset { flex: none; width: 32px; height: 32px; }
-.adv-numrow { flex-wrap: nowrap; }
-.adv-numrow .ps-label { flex: 1 1 auto; }
-.adv-num input::placeholder { color: var(--dim); opacity: 1; }
-.adv-row.changed .ps-label b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
-.adv-num { display: inline-flex; align-items: center; gap: 6px; }
-.adv-num input { width: 96px; min-height: 34px; padding: 0 10px; text-align: right; }
-.adv-num span { min-width: 2.4em; font-size: 13px; color: var(--dim); white-space: nowrap; }
-.adv-chips .gx-chips { margin: 0; }
-.adv-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
-.ps-adv-sub { border: 1px solid var(--line); border-radius: 16px; background: var(--void); }
-.ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 46px; padding: 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
-.ps-adv-sub > .ps-rows { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
-.adv-foot { display: flex; justify-content: flex-end; }
-.adv-foot .gx-mini { display: inline-flex; align-items: center; gap: 6px; }
-.adv-foot .gx-mini svg { width: 15px; height: 15px; }
-.adv-foot.st-confirm { justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-@media (max-width: 760px) {
-  .ps-adv-body { padding: 4px 10px 12px; }
-  .adv-num input { width: 80px; }
-  .adv-numrow { padding: 10px 8px 10px 12px; gap: 8px; }
-}
-.adv-num input { -moz-appearance: textfield; appearance: textfield; }
-.adv-num input::-webkit-inner-spin-button, .adv-num input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-/* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
-.gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
-.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
-.gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
-
-
-/* 명부 괴이·특수 사진 고르기 */
-.dir-photo { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); }
-.dir-photo .dir-pic-img { width: 52px; height: 52px; }
-.dir-photo-name { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.dir-photo-name b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dir-photo-name small { font-size: 12px; color: var(--dim); }
-.dir-pic-img { flex: none; display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); }
-.dir-pic-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.dir-pic-img svg { width: 24px; height: 24px; }
-.dir-pics { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; max-height: 340px; overflow-y: auto; padding: 2px; }
-.dir-pic { display: flex; flex-direction: column; gap: 4px; padding: 4px; border: 1px solid transparent; border-radius: 12px; background: none; color: var(--text); font: inherit; cursor: pointer; min-width: 0; }
-.dir-pic:hover { background: var(--accent-bg); }
-.dir-pic.on { border-color: var(--accent-line); background: var(--accent-bg); }
-.dir-pic small { font-size: 11px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
-@media (max-width: 760px) { .dir-pics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-
-/* 관찰형 게임 「관리국 순찰」: 창 전체를 덮는다 (ui/game.ts) */
-.gx-panel { position: relative; }
-.gx-game { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--void); }
-.gx-game > .gx-head { flex: none; }
-.gx-game-box { flex: 1; min-height: 0; display: flex; }
-.gx-gp { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; margin: 0; min-height: 0; }
-.gx-gp-card { display: flex; flex-direction: column; gap: 10px; width: min(420px, 100%); padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
-.gx-gp-card b { font-size: 16px; }
-.gx-gp-card p { margin: 0; color: var(--dim); }
-.gx-gp-card .gx-gp-msg { color: var(--text); padding: 8px 12px; border-radius: 8px; background: var(--panel2); }
-.gx-gp-act { display: flex; gap: 8px; margin-top: 6px; }
-.gx-gp-btn { flex: 1; min-height: 42px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
-.gx-gp-btn.primary { border-color: var(--signal); background: var(--accent-bg); color: var(--signal); }
-.gx-gp-btn[disabled] { opacity: .5; cursor: default; }
-@media (max-width: 760px) {
-  .gx-gp { align-items: stretch; }
-  .gx-gp-card { width: 100%; }
-  .gx-gp-act { margin-top: auto; flex-direction: column; }
-}
-
-/* 명부 위 한 줄 도구 (검색 · 추가 · 사용법). 추가 칸·사용법은 누를 때만 펼친다 */
-.dir-tools { display: flex; gap: 8px; align-items: stretch; }
-.dir-tools .dir-qbox { flex: 1; min-width: 0; }
-.dir-tools .dir-search { margin: 0; height: 100%; }
-.dir-tool { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-.dir-tool svg { width: 16px; height: 16px; }
-.dir-tool.icon { width: 44px; justify-content: center; padding: 0; font-size: 16px; }
-.dir-tool:hover, .dir-tool.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
-.dir-help { padding-top: 10px; }
-@media (max-width: 760px) { .dir-tools { justify-content: flex-end; } }
-`;
-
-  // src/ui/mbar.ts
-  function mbarHtml(items) {
-    const x = (side) => `<span class="gx-mclose ${side}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>닫기</span></span>`;
-    return `<div class="gx-mbar"><div class="gx-mtrack">${x("l")}${items.join("")}${x("r")}</div></div>`;
-  }
-  var rubber = (dx, w) => Math.sign(dx) * (Math.abs(dx) / (1 + Math.abs(dx) / (4 * w)));
-  function bindMbar(root2, onClose) {
-    const bar = root2.querySelector(".gx-mbar");
-    const track = bar?.querySelector(".gx-mtrack");
-    if (!bar || !track) return;
-    const closeW = () => track.querySelector(".gx-mclose")?.offsetWidth || 72;
-    let x0 = 0;
-    let y0 = 0;
-    let id = null;
-    let dragging = false;
-    let shown2 = 0;
-    let ready = false;
-    const paint = () => {
-      track.style.transform = shown2 ? `translateX(${shown2}px)` : "";
-      const was = ready;
-      ready = Math.abs(shown2) >= closeW();
-      track.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
-      if (ready && !was) navigator.vibrate?.(8);
-    };
-    const end = () => {
-      if (id === null) return;
-      id = null;
-      if (!dragging) return;
-      const close2 = ready;
-      track.classList.add("back");
-      shown2 = 0;
-      paint();
-      setTimeout(() => track.classList.remove("back"), 260);
-      if (close2) onClose();
-    };
-    bar.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
-      id = e.pointerId;
-      x0 = e.clientX;
-      y0 = e.clientY;
-      dragging = false;
-      track.classList.remove("back");
-    });
-    bar.addEventListener("pointermove", (e) => {
-      if (e.pointerId !== id) return;
-      const dx = e.clientX - x0;
-      if (!dragging) {
-        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
-        dragging = true;
-        bar.setPointerCapture?.(e.pointerId);
-      }
-      shown2 = rubber(dx, closeW());
-      paint();
-    });
-    bar.addEventListener("pointerup", end);
-    bar.addEventListener("pointercancel", end);
-    bar.addEventListener("click", (e) => {
-      if (!dragging) return;
-      dragging = false;
-      e.stopPropagation();
-      e.preventDefault();
-    }, true);
-  }
-
-  // src/ui/swipeback.ts
-  var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .ph-drawer";
-  var FIRE = 72;
-  var bound = /* @__PURE__ */ new WeakSet();
-  function inSideScroller(el, root2) {
-    for (let n = el; n && n !== root2; n = n.parentElement) {
-      if (n.scrollWidth > n.clientWidth + 2) {
-        const ox = getComputedStyle(n).overflowX;
-        if (ox === "auto" || ox === "scroll") return true;
-      }
-    }
-    return false;
-  }
-  function bindSwipeBack(root2, step2) {
-    if (bound.has(root2)) return;
-    bound.add(root2);
-    let x0 = 0;
-    let y0 = 0;
-    let mode2 = "off";
-    let act = null;
-    let box = null;
-    const reset = (animate) => {
-      if (!box) return;
-      const el = box;
-      el.style.transition = animate ? "transform .2s ease, opacity .2s ease" : "";
-      el.style.transform = "";
-      el.style.opacity = "";
-      if (animate) setTimeout(() => el.style.transition = "", 220);
-      box = null;
-    };
-    root2.addEventListener("touchstart", (e) => {
-      mode2 = "off";
-      if (e.touches.length !== 1 || !matchMedia("(max-width: 760px)").matches) return;
-      const t = e.target;
-      if (t.closest(SKIP) || inSideScroller(t, root2)) return;
-      x0 = e.touches[0].clientX;
-      y0 = e.touches[0].clientY;
-      mode2 = "wait";
-    }, { passive: true });
-    root2.addEventListener("touchmove", (e) => {
-      if (mode2 === "off") return;
-      const dx = e.touches[0].clientX - x0;
-      const dy = e.touches[0].clientY - y0;
-      if (mode2 === "wait") {
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        act = dx > 0 && dx > Math.abs(dy) * 1.4 ? step2() : null;
-        if (!act) return void (mode2 = "off");
-        mode2 = "back";
-        box = root2.querySelector(".gx-content");
-      }
-      if (box) {
-        const d = Math.max(0, Math.min(dx * 0.6, 120));
-        box.style.transform = `translateX(${d}px)`;
-        box.style.opacity = String(1 - d / 400);
-      }
-    }, { passive: true });
-    const end = (e) => {
-      if (mode2 !== "back") return void (mode2 = "off");
-      mode2 = "off";
-      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-      const run3 = dx >= FIRE ? act : null;
-      act = null;
-      reset(!run3);
-      run3?.();
-    };
-    root2.addEventListener("touchend", end, { passive: true });
-    root2.addEventListener("touchcancel", () => {
-      mode2 = "off";
-      reset(true);
-    }, { passive: true });
-  }
-
-  // src/ui/mapzoom.ts
-  var MAX = 4;
-  var MOVE = 6;
-  var views = /* @__PURE__ */ new Map();
-  function mapZoomControls(nation = false) {
-    return `<div class="gx-zoom" aria-label="지도 확대">
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
-      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
-    </div>`;
-  }
-  function clamp(v, w, h) {
-    const z = Math.min(MAX, Math.max(1, v.z));
-    return { z, x: Math.min(0, Math.max(w - w * z, v.x)), y: Math.min(0, Math.max(h - h * z, v.y)) };
-  }
-  function bindMapZoom(root2) {
-    const canvas = root2.querySelector(".gx-canvas[data-map]");
-    const layer2 = canvas?.querySelector(".gx-mapzoom");
-    if (!canvas || !layer2) return;
-    const key = canvas.dataset.map ?? "";
-    let v = views.get(key) ?? { z: 1, x: 0, y: 0 };
-    const apply = () => {
-      v = clamp(v, canvas.clientWidth, canvas.clientHeight);
-      views.set(key, v);
-      layer2.style.transform = v.z === 1 ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
-      layer2.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
-      canvas.classList.toggle("zoomed", v.z > 1);
-    };
-    const zoomAt = (z, cx, cy) => {
-      const nz = Math.min(MAX, Math.max(1, z));
-      v = { z: nz, x: cx - (cx - v.x) / v.z * nz, y: cy - (cy - v.y) / v.z * nz };
-      apply();
-    };
-    const local = (px, py) => {
-      const r = canvas.getBoundingClientRect();
-      return [px - r.left, py - r.top];
-    };
-    const img = canvas.querySelector(".gx-mapimg");
-    if (img && !img.complete) img.addEventListener("load", apply, { once: true });
-    apply();
-    canvas.querySelector(".gx-zoom")?.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-zoom]");
-      if (!b) return;
-      e.stopPropagation();
-      const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
-      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: 0 }, apply();
-      else zoomAt(v.z * (b.dataset.zoom === "in" ? 1.6 : 1 / 1.6), w, h);
-    });
-    let dragged = false;
-    canvas.addEventListener("click", (e) => {
-      if (dragged && !e.target.closest(".gx-zoom")) e.stopPropagation(), e.preventDefault();
-      dragged = false;
-    }, true);
-    let start4 = null;
-    const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    canvas.addEventListener("touchstart", (e) => {
-      const t = e.touches;
-      dragged = false;
-      if (e.target.closest(".gx-zoom")) return start4 = null;
-      if (t.length === 2) {
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        start4 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-      } else if (t.length === 1) start4 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-    }, { passive: true });
-    canvas.addEventListener("touchmove", (e) => {
-      const t = e.touches;
-      if (!start4) return;
-      if (t.length === 2 && start4.d) {
-        e.preventDefault();
-        dragged = true;
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        const nz = Math.min(MAX, Math.max(1, start4.v.z * dist(t) / start4.d));
-        v = { z: nz, x: mx - (start4.mx - start4.v.x) / start4.v.z * nz, y: my - (start4.my - start4.v.y) / start4.v.z * nz };
-        apply();
-      } else if (t.length === 1 && v.z > 1 && !start4.d) {
-        e.preventDefault();
-        const dx = t[0].clientX - start4.x, dy = t[0].clientY - start4.y;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        v = { ...start4.v, x: start4.v.x + dx, y: start4.v.y + dy };
-        apply();
-      }
-    }, { passive: false });
-    canvas.addEventListener("touchend", (e) => {
-      const t = e.touches;
-      start4 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
-    }, { passive: true });
-    canvas.addEventListener("wheel", (e) => {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
-      const [cx, cy] = local(e.clientX, e.clientY);
-      zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
-    }, { passive: false });
-    canvas.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse" || e.button !== 0 || v.z === 1 || e.target.closest(".gx-zoom")) return;
-      const sx = e.clientX, sy = e.clientY, sv = { ...v };
-      dragged = false;
-      const move = (m) => {
-        const dx = m.clientX - sx, dy = m.clientY - sy;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        if (dragged) v = { ...sv, x: sv.x + dx, y: sv.y + dy }, apply();
-      };
-      const up = () => (window.removeEventListener("pointermove", move), window.removeEventListener("pointerup", up));
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", up);
-    });
-  }
-
-  // src/game/style.css
-  var style_default2 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canva
+.nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid va

@@ -1,7 +1,7 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.30
+//@version 0.16.31
 //@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/main/release/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/loader/body.ts
@@ -81,7 +81,7 @@ function isGoeiCard(char) {
 // src/loader/panel.ts
 var CSS = `
 .gl-back{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,8,10,.72);font:14px/1.5 system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#E6EEEC;box-sizing:border-box}
-.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #24343B;border-radius:14px;background:#121B1F;box-sizing:border-box}
+.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #37464D;border-radius:14px;background:#232D32;box-sizing:border-box}
 .gl-card b{font-size:16px}
 .gl-card p{margin:0;color:#B5C4C0}
 .gl-msg{padding:8px 12px;border-radius:8px;background:#172328;color:#E6EEEC!important}
@@ -143,9 +143,9 @@ function showPanel(version, install2) {
 }
 
 // src/main.ts
-var VERSION = true ? "0.16.30" : "";
+var VERSION = true ? "0.16.31" : "";
 var WATCH_MS = 1e3;
-var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
+var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));
 var body = null;
 var loading = null;
