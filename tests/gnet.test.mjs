@@ -184,3 +184,44 @@ test('prompts from the real card: frame, CBS settled, privacy branch, references
   assert.ok(d.messages[1].content.includes('YOU ARE: x'));
   assert.ok(d.messages[1].content.includes('No verified public post links'));
 });
+
+test('댓글 시각: 모델 시각을 글·부모·지금 사이로 맞추고, 틀리면 앱이 고친다', async () => {
+  const { stampComments, decode, encode, commentWhen } = await import('../dist-test/core.mjs');
+  const post = (date, comments = []) => ({ id: 1, date, nick: 'a', title: 't', views: 0, votes: 0, body: 'b', mine: false, comments });
+  const c = (parent = 0, time) => ({ parent, nick: 'n', body: 'x', mine: false, unread: false, ...(time ? { time } : {}) });
+  const now = '2025.05.13 14:40';
+  // 정상
+  let p = post('2025.05.13 14:02', [c(), c(1), c()]);
+  stampComments(p, 0, ['14:11', '14:23', '14:37'], now);
+  assert.deepEqual(p.comments.map((x) => x.time), ['2025.05.13 14:11', '2025.05.13 14:23', '2025.05.13 14:37']);
+  // 글보다 이름 → 글 1–3분 뒤, 미래 → 지금, 순서 거꾸로 → 앞 댓글 뒤
+  p = post('2025.05.13 14:02', [c(), c(), c()]);
+  stampComments(p, 0, ['13:50', '15:30', '14:00'], now);
+  const [a, b, d] = p.comments.map((x) => x.time);
+  assert.ok(a > '2025.05.13 14:02' && a <= '2025.05.13 14:05', a);
+  assert.equal(b, '2025.05.13 14:40');
+  assert.ok(d >= b && d <= now, d);
+  // 비었거나 이상한 값 → 사이로 채움
+  p = post('2025.05.13 14:00', [c(), c(), c()]);
+  stampComments(p, 0, ['14:10', 'soon', '14:30'], now);
+  const mid = p.comments[1].time;
+  assert.ok(mid > '2025.05.13 14:10' && mid < '2025.05.13 14:30', mid);
+  // 자정 넘김: 글 23:50, 지금 다음 날 00:30, 모델 00:10 → 다음 날
+  p = post('2025.05.13 23:50', [c()]);
+  stampComments(p, 0, ['00:10'], '2025.05.14 00:30');
+  assert.equal(p.comments[0].time, '2025.05.14 00:10');
+  // 답글은 부모보다 뒤
+  p = post('2025.05.13 14:00', [c(0, '2025.05.13 14:30'), c(1)]);
+  stampComments(p, 1, ['14:20'], now);
+  assert.ok(p.comments[1].time > '2025.05.13 14:30', p.comments[1].time);
+  // 저장·읽기에 시각이 남고, 옛 댓글(시각 없음)도 그대로 읽힌다
+  const st = { seq: 100001, posts: [post('2025.05.13 14:00', [c(0, '2025.05.13 14:30'), c()])], sources: {}, dms: [] };
+  const back = decode(encode(st));
+  assert.equal(back.posts[0].comments[0].time, '2025.05.13 14:30');
+  assert.equal(back.posts[0].comments[1].time, undefined);
+  assert.equal(commentWhen(back.posts[0], back.posts[0].comments[0]), '14:30');
+  // 날짜도 시각도 모르면 비워 둔다
+  p = post('', [c()]);
+  stampComments(p, 0, ['14:00'], '');
+  assert.equal(p.comments[0].time, undefined);
+});

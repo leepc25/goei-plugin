@@ -202,6 +202,48 @@ function ensureRoot(): HTMLElement {
     box.addEventListener('pointerup', up);
     box.addEventListener('pointercancel', up);
   });
+  // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
+  root.addEventListener('pointerdown', (ev) => {
+    const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
+    const row = grip?.closest<HTMLElement>('[data-agent-row]');
+    if (!grip || !row || !root) return;
+    ev.preventDefault();
+    const box = root;
+    const group = row.dataset.agentGroup ?? '';
+    const rows = [...box.querySelectorAll<HTMLElement>('[data-agent-row]')].filter((r) => r !== row && r.dataset.agentGroup === group);
+    let drop: { el: HTMLElement; after: boolean } | null = null;
+    const mark = (next: typeof drop) => {
+      drop?.el.classList.remove('drop-before', 'drop-after');
+      drop = next;
+      drop?.el.classList.add(drop.after ? 'drop-after' : 'drop-before');
+    };
+    const move = (e: PointerEvent) => {
+      let best: typeof drop = null;
+      let gap = Infinity;
+      for (const r of rows) {
+        const b = r.getBoundingClientRect();
+        const d = Math.abs(e.clientY - (b.top + b.height / 2));
+        if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+      }
+      if (best?.el !== drop?.el || best?.after !== drop?.after) mark(best);
+    };
+    row.classList.add('dragging');
+    box.classList.add('dir-dragging');
+    grip.setPointerCapture?.(ev.pointerId);
+    const up = () => {
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', up);
+      grip.removeEventListener('pointercancel', up);
+      row.classList.remove('dragging');
+      box.classList.remove('dir-dragging');
+      const target = drop;
+      mark(null);
+      if (target) void handle('dir-move', `${target.after ? 'after' : 'before'}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+    grip.addEventListener('pointercancel', up);
+  });
   // 틀 크기 막대: 끄는 동안은 틀만 바꾸고, 놓으면 다시 그려 얼굴 사진을 새로 자른다
   root.addEventListener('change', (ev) => {
     if ((ev.target as HTMLElement).dataset?.input === 'dir-crop-size') render();

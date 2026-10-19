@@ -1,7 +1,7 @@
 // 설정 → 「카드 명부」: 로어북 폴더에서 모은 괴이·미스틱 사이트·요원의 세부값 편집.
 // 고친 값은 카드 로어북 「Directory」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
 import {
-  assignOrg, directoryData, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
+  agentGroup, assignOrg, directoryData, moveAgent, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
 import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
@@ -480,16 +480,23 @@ function placeRow(p: PlaceRow, ctx: ChatContext, src = ''): string {
     </button>${open ? placePanel(p, ctx) : ''}</div>`;
 }
 
-function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<string, string>): string {
+function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<string, string>, order?: { first: boolean; last: boolean }): string {
   const open = dirUi.open === a.lore;
   const sub = [a.affiliation ? orgName(d, names, a.affiliation) : '', a.rank, a.department].filter(Boolean).join(' · ');
-  return `<div class="dir-row${open ? ' open' : ''}">
+  // 순서 바꾸기 (검색 중에는 없음): PC는 손잡이를 끌고, 모바일은 ▲▼. 같은 조직 안에서만 움직인다
+  const move = order
+    ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span>`
+      + `<button class="dir-step" data-action="dir-move" data-value="up|${esc(a.lore)}" aria-label="${esc(a.name)} 위로" ${order.first ? 'disabled' : ''}>${ICONS.up}</button>`
+      + `<button class="dir-step" data-action="dir-move" data-value="down|${esc(a.lore)}" aria-label="${esc(a.name)} 아래로" ${order.last ? 'disabled' : ''}>${ICONS.down}</button></span>`
+    : '';
+  return `<div class="dir-row${open ? ' open' : ''}"${order ? ` data-agent-row="${esc(a.lore)}" data-agent-group="${esc(agentGroup(a))}"` : ''}><div class="dir-headrow">
     <button class="dir-head" data-action="dir-open" data-value="${esc(a.lore)}" aria-expanded="${open}">
       ${picAvatar(ctx.char, facePic(ctx.char, a, true), a.name)}
       <span class="dir-name"><b>${esc(a.name)}</b><small>${esc(sub || '소속 미정')}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? '' : '<span class="gx-badge">목록 숨김</span>'}
-    </button>${open ? agentPanel(a, ctx, d) : ''}</div>`;
+    </button>${move}</div>${open ? agentPanel(a, ctx, d) : ''}</div>`;
 }
+
 
 /** 통합 검색: 검색어가 있으면 다섯 탭을 한꺼번에 찾아 탭별로 묶고, 고르면 그 탭으로 가서 연다 */
 function searchAll(ctx: ChatContext, d: Directory, q: string, names: Record<string, string>): string {
@@ -534,7 +541,12 @@ export function directoryList(ctx: ChatContext): string {
   const order = ['', ...d.orgs.map((o) => o.name)];
   const groups = [...new Set(rows.map(key))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
   return groups
-    .map((g) => `<h3 class="dir-group${g ? '' : ' warn'}">${esc(g || '소속 미정')}<small>${rows.filter((r) => key(r) === g).length}</small></h3>${rows.filter((r) => key(r) === g).map((r) => agentRow(r, ctx, d, names)).join('')}`)
+    .map((g) => {
+      const list = rows.filter((r) => key(r) === g);
+      // 검색어가 없을 때만 순서를 바꿀 수 있다 (걸러진 목록에서 옮기면 사이에 숨은 사람이 헷갈린다)
+      const body = list.map((r, i) => agentRow(r, ctx, d, names, q ? undefined : { first: i === 0, last: i === list.length - 1 })).join('');
+      return `<h3 class="dir-group${g ? '' : ' warn'}">${esc(g || '소속 미정')}<small>${list.length}</small></h3>${body}`;
+    })
     .join('');
 }
 
@@ -713,6 +725,12 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-open':
       dirUi.open = dirUi.open === v ? '' : v;
       break;
+    case 'dir-move': {
+      // up|로어 · down|로어 · before|로어|대상 · after|로어|대상
+      const [how, lore, target] = v.split('|');
+      if ((how === 'up' || how === 'down' || how === 'before' || how === 'after') && moveAgent(d, lore ?? '', how, target ?? '')) dirUi.done = '';
+      break;
+    }
     case 'dir-jump': {
       // 통합 검색 결과: 그 탭으로 가서 펼친다
       const cut = v.indexOf('|');

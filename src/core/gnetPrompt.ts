@@ -5,7 +5,7 @@ import { hasAttachment } from './attach';
 import { evaluate } from './cbs';
 import {
   activityContext, findPost, gnetSettings, gnetVars, HISTORY, incomingTask, LIMITS, protectedPost, QUANTITY, trimTokens, postLimit,
-  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow,
+  type ActivityPost, type ActivitySnapshot, type GPost, type GState, type GnetSettings, type IncomingPlan, GnetError, dateNow, whenField,
 } from './gnet';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
@@ -98,12 +98,22 @@ function activityRules(b: GnetBooks, posts: ActivityPost[]): string {
   return b.read(posts.length ? 'ACTIVITY.GUIDELINE' : 'ACTIVITY.DISABLED');
 }
 
+/**
+ * 댓글 시각 (v0.16.32): 새 댓글마다 모델이 「HH:MM」을 쓴다. 앱이 글 시각·부모 댓글·지금 사이로 맞추므로(gnet.ts stampComments)
+ * 형식만 알려 준다. 옛 카드 지침에는 time 칸이 없어서 코드에서 붙인다.
+ */
+export function commentTimeRule(now: string): string {
+  return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. `
+    + `It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ''}. `
+    + 'Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.';
+}
+
 /** 저장된 글을 출력 형식(AUTO.FORMAT)과 같은 모양으로 */
 export function boardJson(posts: GPost[]): string {
   return JSON.stringify({
     posts: posts.map((p) => ({
       author: p.nick, id: p.id, title: p.title, time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? '', date: p.date, views: p.views, upvotes: p.votes,
-      content: p.body, mine: p.mine, comments: p.comments.map((c) => ({ author: c.nick, content: c.body, parent: c.parent, mine: c.mine })),
+      content: p.body, mine: p.mine, comments: p.comments.map((c) => ({ author: c.nick, ...whenField(p, c), content: c.body, parent: c.parent, mine: c.mine })),
     })),
   });
 }
@@ -119,7 +129,7 @@ export function refreshPrompt(src: RefSource, st: GState, plan: IncomingPlan, ni
     b.read('AUTO.GUIDELINE').replace(/__GN_POST_RANGE__/g, range),
     `${b.read('ATTACHMENTS')}\n${incomingRules(b, plan)}`,
   ].join('\n\n');
-  let format = b.read('AUTO.FORMAT');
+  let format = `${b.read('AUTO.FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`;
   if (s.sampling) {
     format += '\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample each from low-probability possibilities below 0.10 and order them by probability descending. The application validates both and uses alternativePosts, the second candidate.';
   }
@@ -146,7 +156,7 @@ export function postPrompt(src: RefSource, st: GState, input: string, plan: Inco
   const activity = activityContext(st, null);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('TITLE.GUIDELINE'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts)].join('\n\n');
   const extras = input + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, guideline, b.read('PUBLIC.POST_FORMAT'), extras, factionNames), activity };
+  return { ...pack(src, b, guideline, `${b.read('PUBLIC.POST_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity };
 }
 
 export interface CommentPrompt extends PublicPrompt {
@@ -177,7 +187,7 @@ export function commentPrompt(
       n = p.comments[n - 1].parent;
     }
   }
-  const comments = p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
+  const comments = p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
   const task = JSON.stringify({
     post: { id: p.id, author: p.nick, title: p.title, content: p.body }, comments, commentCount: total, replyTo,
     action, userHandle: nick,
@@ -185,7 +195,7 @@ export function commentPrompt(
   const activity = activityContext(st, p.id);
   const guideline = [b.read('LB'), b.read('ATTACHMENTS'), b.read('REACT.GUIDELINE'), b.read('PUBLIC.GUIDELINE'), incomingRules(b, plan), activityRules(b, activity.posts)].join('\n\n');
   const extras = task + incomingTask(plan, activity.posts);
-  return { ...pack(src, b, guideline, b.read('PUBLIC.REACT_FORMAT'), extras, factionNames), activity, supplied: selected, total };
+  return { ...pack(src, b, guideline, `${b.read('PUBLIC.REACT_FORMAT')}\n${commentTimeRule(dateNow(src.chat))}`, extras, factionNames), activity, supplied: selected, total };
 }
 
 /** 글 하나만 새로고침: 시간이 흘러 다른 사람들이 이 글에 댓글을 더 단다 (주인공은 아무것도 하지 않음) */
@@ -201,7 +211,7 @@ export function publicBoard(st: GState, query: string): { access: string; posts:
   const cap = 6000;
   for (const { p } of ranked) {
     if (rows.length >= 8) break;
-    const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, content: trimTokens(c.body, LIMITS.quote_tokens) }));
+    const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
     const row = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
     while (JSON.stringify(row).length > (cap - used) * 2 && row.comments.length) row.comments.shift();
     const n = Math.ceil(JSON.stringify(row).length / 2);

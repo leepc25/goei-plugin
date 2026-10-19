@@ -18,6 +18,8 @@ export interface GComment {
   body: string;
   mine: boolean;
   unread: boolean;
+  /** 단 시각 「YYYY.MM.DD HH:MM」 (이야기 속 시각). v0.16.32 전 댓글은 없음 */
+  time?: string;
 }
 export interface GPost {
   id: number;
@@ -231,7 +233,7 @@ export function decode(raw: unknown): GState {
       }
     } else if (p[0] === 'C' && p.length >= 6) {
       const post = map.get(Number(p[1]));
-      if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === '1', unread: p[6] === '1' });
+      if (post) post.comments.push({ parent: Math.max(0, Math.floor(Number(p[2]) || 0)), nick: cut(p[3], 80), body: p[4], mine: p[5] === '1', unread: p[6] === '1', ...(validDate(p[7]) ? { time: validDate(p[7]) } : {}) });
     } else if (p[0] === 'D' && p.length >= 4) {
       st.dms.push({ nick: cut(p[1], 80), side: p[2] === 'me' ? 'me' : 'npc', body: p[3], unread: p[4] === '1', date: validDate(p[5] ?? '') });
     }
@@ -249,7 +251,7 @@ export function encode(st: GState): string {
   const out = ['GN1', `Q|${st.seq || G_POST_BASE}`];
   for (const p of st.posts) {
     out.push(['P', p.id, en(p.date), en(p.nick), en(p.title), p.views, p.votes, en(p.body), p.mine ? '1' : '0'].join('|'));
-    for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0'].join('|'));
+    for (const c of p.comments) out.push(['C', p.id, c.parent, en(c.nick), en(c.body), c.mine ? '1' : '0', c.unread ? '1' : '0', en(c.time ?? '')].join('|'));
   }
   for (const [nick, s] of Object.entries(st.sources)) out.push(['T', en(nick), s.postid || 0, en(s.title), en(s.body), en(s.author), en(s.quote), en(s.quoteAuthor)].join('|'));
   for (const d of st.dms) out.push(['D', en(d.nick), d.side, en(d.body), d.unread ? '1' : '0', en(d.date)].join('|'));
@@ -412,11 +414,12 @@ export function addUserPost(st: GState, nick: string, title: string, body: strin
   return p;
 }
 
-export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string): number {
+export function addUserComment(st: GState, postIdValue: number, parent: number, nick: string, body: string, now = ''): number {
   const p = findPost(st, postIdValue);
   if (!p) throw new GnetError('대상 글이 없어졌어요.');
   if (parent > 0 && !p.comments[parent - 1]) throw new GnetError('답글을 달 댓글이 없어졌어요.');
   p.comments.push({ parent, nick, body: trimTokens(body, LIMITS.comment_tokens), mine: true, unread: false });
+  stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ''], now);
   return p.comments.length;
 }
 
@@ -625,6 +628,7 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
         sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
       }
     }
+    const raws: string[] = [];
     comments.forEach((c, i) => {
       const n = i + 1;
       if (!isObj(c)) return void remap.set(n, false);
@@ -639,9 +643,12 @@ export function applyBoard(before: GState, current: GState, value: unknown, o: B
         return void remap.set(n, false);
       }
       q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: (remap.get(parent) as number | undefined) ?? 0, mine: false, unread: false });
+      raws.push(str(c.time).trim());
       sigs.set(sig, q.comments.length);
       remap.set(n, q.comments.length);
     });
+    // 새 댓글 시각: 모델이 쓴 「HH:MM」을 글 시각과 지금 사이로 맞춘다 (틀리면 앱이 고침)
+    stampComments(q, q.comments.length - raws.length, raws, o.date);
     if (!q.title.trim() && !q.body.trim()) continue;
     posts.push(q);
   }
@@ -668,10 +675,10 @@ export interface CommentTarget {
 /** 모델이 쓴 새 댓글 검사 (원본 react onValidate + filterOwnerComments). 잘못된 것은 하나씩 버린다 */
 export function acceptComments(
   rows: unknown, existing: GComment[], t: CommentTarget, nick: string, base = t.total,
-): { comments: { author: string; content: string; parent: number }[]; dropped: number } {
+): { comments: NewComment[]; dropped: number } {
   const list = Array.isArray(rows) ? rows.slice(0, LIMITS.replies) : [];
   let dropped = Array.isArray(rows) ? Math.max(0, rows.length - LIMITS.replies) : 0;
-  const out: { author: string; content: string; parent: number }[] = [];
+  const out: NewComment[] = [];
   const map = new Map<number, number | false>();
   const seen = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
   list.forEach((c, i) => {
@@ -695,10 +702,126 @@ export function acceptComments(
     const sig = `${author}\0${content}`;
     if (seen.has(sig)) return bad();
     seen.add(sig);
-    out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n });
+    out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
     map.set(own, base + out.length);
   });
   return { comments: out, dropped };
+}
+
+/** 모델이 쓴 새 댓글 (time: 모델이 적은 「HH:MM」 그대로, 앱이 stampComments로 맞춘다) */
+export interface NewComment {
+  author: string;
+  content: string;
+  parent: number;
+  time?: string;
+}
+
+// ── 댓글 시각 (v0.16.32, 사용자 결정: 모델이 시각을 쓰고 앱이 검사·보정) ──
+
+/** 「YYYY.MM.DD HH:MM」 → 분 (못 읽으면 null) */
+export function stampMinutes(stamp: string | undefined): number | null {
+  const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? '').trim());
+  if (!m) return null;
+  const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+  return Number.isFinite(t) ? Math.floor(t / 60000) : null;
+}
+export function minutesStamp(min: number): string {
+  const d = new Date(min * 60000);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+}
+/** 「HH:MM」 (모델에게 줄 때·목록에 보일 때) */
+export const hhmm = (stamp: string | undefined) => /(\d\d:\d\d)/.exec(String(stamp ?? ''))?.[1] ?? '';
+/** 모델이 쓴 시각 → 하루 안의 분 (「14:05」「2:05」「14:05:30」「2025.05.13 14:05」 모두) */
+function clockMinutes(raw: string): number | null {
+  const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
+  if (!m) return null;
+  const h = +m[1];
+  const mi = +m[2];
+  return h < 24 && mi < 60 ? h * 60 + mi : null;
+}
+
+/**
+ * from번째(0부터)부터의 새 댓글에 시각을 붙인다. raws[i]는 모델이 쓴 시각(없으면 빈칸).
+ * 규칙: 글 시각·부모 댓글·바로 앞 댓글보다 늦고 지금보다 이르지 않게.
+ * - 「HH:MM」만 오므로 날짜는 허용 범위 안에서 맞는 날로 (자정 넘김 포함)
+ * - 범위보다 이르면 아래 경계 1–3분 뒤, 늦으면(미래) 지금으로
+ * - 비었거나 못 읽으면 앞뒤 댓글 사이로 나눠 채운다
+ * 모델이 정한 순서(답글 번호가 여기에 묶임)는 바꾸지 않는다. 글 시각도 지금도 모르면 비워 둔다.
+ */
+export function stampComments(p: GPost, from: number, raws: string[], now: string): void {
+  const nowMin = stampMinutes(now);
+  const postMin = stampMinutes(p.date);
+  const floorOf = (i: number): number | null => {
+    const c = p.comments[i];
+    const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : undefined), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
+    const known = cands.filter((x): x is number => x !== null);
+    return known.length ? Math.max(...known) : null;
+  };
+  const pending: number[] = [];
+  const settle = (upto: number | null) => {
+    // 비어 있던 댓글들을 앞 댓글 시각과 upto 사이에 고르게
+    if (!pending.length) return;
+    const lo = floorOf(pending[0]);
+    const hi = upto ?? nowMin ?? lo;
+    if (lo === null || hi === null) return void (pending.length = 0);
+    const span = Math.max(0, hi - lo);
+    pending.forEach((idx, k) => {
+      const min = Math.max(floorOf(idx) ?? lo, lo + Math.round((span * (k + 1)) / (pending.length + 1)));
+      p.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
+    });
+    pending.length = 0;
+  };
+  for (let i = from; i < p.comments.length; i++) {
+    const c = p.comments[i];
+    const raw = String(raws[i - from] ?? '').trim();
+    const lo = floorOf(i);
+    const clock = raw ? clockMinutes(raw) : null;
+    if (clock === null || (lo === null && nowMin === null)) {
+      pending.push(i);
+      continue;
+    }
+    const hi = nowMin ?? Number.POSITIVE_INFINITY;
+    const base = lo ?? (nowMin as number) - 24 * 60;
+    // 아래 경계 날부터 하루씩 보며 그 시각이 범위 안에 드는 첫날
+    let pick: number | null = null;
+    for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
+      const t = day * 1440 + clock;
+      if (t >= base && t <= hi) {
+        pick = t;
+        break;
+      }
+    }
+    if (pick === null) {
+      // 범위 밖: 오늘 그 시각이 지금보다 뒤면 미래 → 지금. 아니면 글(앞 댓글)보다 이른 것 → 1–3분 뒤
+      const ahead = 1 + (i % 3);
+      const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock > nowMin;
+      if (future && (lo === null || lo <= nowMin!)) pick = nowMin!;
+      else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick = lo + ahead;
+      else pick = lo !== null && nowMin !== null && lo > nowMin ? lo : (nowMin ?? base);
+    }
+    settle(pick);
+    c.time = minutesStamp(pick);
+  }
+  settle(null);
+}
+
+/** 모델에게 보일 댓글 시각: 글과 같은 날이면 「HH:MM」, 다른 날이면 「YYYY.MM.DD HH:MM」. 시각 없는 옛 댓글은 빈칸 */
+export function commentWhen(p: GPost, c: GComment): string {
+  if (!c.time) return '';
+  return c.time.slice(0, 10) === String(p.date).slice(0, 10) ? hhmm(c.time) : c.time;
+}
+/** 댓글 줄에 붙일 시각 칸 (없으면 칸을 아예 뺀다) */
+export const whenField = (p: GPost, c: GComment): { time?: string } => {
+  const t = commentWhen(p, c);
+  return t ? { time: t } : {};
+};
+
+/** 모델이 쓴 새 댓글을 글에 붙이고 시각을 맞춘다 */
+export function pushComments(p: GPost, rows: NewComment[], now: string): void {
+  const from = p.comments.length;
+  for (const c of rows) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+  stampComments(p, from, rows.map((c) => c.time ?? ''), now);
 }
 
 export function parsePostDraft(value: unknown): { title: string; content: string } {
@@ -740,7 +863,7 @@ export interface ActivityPost {
   date: string;
   views: number;
   upvotes: number;
-  comments: { index: number; parent: number; author: string; content: string }[];
+  comments: { index: number; parent: number; author: string; time?: string; content: string }[];
   commentCount: number;
   commentsAllowed: boolean;
 }
@@ -769,7 +892,7 @@ export function activityContext(st: GState, targetId: number | null): { posts: A
     const allowed = p.id !== targetId;
     posts.push({
       id: p.id, author: p.nick, title: p.title, content: p.body, date: p.date, views: p.views, upvotes: p.votes,
-      comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, content: c.body })).filter((c) => selected.has(c.index)),
+      comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body })).filter((c) => selected.has(c.index)),
       commentCount: p.comments.length, commentsAllowed: allowed,
     });
     snapshots.set(p.id, { head: postHead(p), rows: p.comments.map(commentKey), count: p.comments.length, selected, commentsAllowed: allowed });
@@ -778,7 +901,7 @@ export function activityContext(st: GState, targetId: number | null): { posts: A
 }
 
 /** 줄마다 따로 검사해서 맞는 것만 반영. [바뀌었는지, 버린 줄 수] */
-export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string): [boolean, number] {
+export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, ActivitySnapshot>, nick: string, now = ''): [boolean, number] {
   if (rows === undefined || rows === null) return [false, 0];
   if (!Array.isArray(rows)) return [false, 1];
   let changed = false;
@@ -806,7 +929,7 @@ export function applyActivity(st: GState, rows: unknown, snapshots: Map<number, 
     const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
     p.views += delta(u.viewsDelta);
     p.votes += delta(u.upvotesDelta);
-    for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+    pushComments(p, got.comments, now);
     if (got.dropped) skipped++;
     changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
   }
@@ -953,7 +1076,7 @@ export function mainContext(st: GState, nick: string, rules: string, focus?: Foc
       include(j);
       selected++;
     }
-    const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, content: describe(c.body) })).filter((c) => wanted.has(c.id));
+    const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
     posts.push({
       order: p.id,
       related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}\n${p.body}\n${comments.map((c) => c.content).join('\n')}`),

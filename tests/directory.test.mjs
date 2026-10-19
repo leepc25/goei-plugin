@@ -134,3 +134,28 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   // 두 번 옮겨도 같음
   assert.equal(j(migrateLore(moved)), j(moved));
 });
+
+test('요원 순서: 같은 소속 안에서만 옮기고, 저장하면 노출 순서(catalog.people)도 바뀐다', async () => {
+  const { moveAgent } = await import('../dist-test/core.mjs');
+  const d = { agents: [
+    { lore: 'a1', affiliation: 'A00' }, { lore: 'b1', affiliation: 'B00' }, { lore: 'a2', affiliation: 'A00' }, { lore: 'a3', affiliation: 'A00' },
+  ] };
+  const order = () => d.agents.map((a) => a.lore).join(',');
+  assert.equal(moveAgent(d, 'a1', 'up'), false, '맨 위는 더 못 올라감');
+  assert.equal(moveAgent(d, 'a1', 'down'), true);
+  assert.equal(order(), 'a2,b1,a1,a3', '다른 소속(b1)은 건너뛰고 같은 소속끼리 자리를 바꾼다');
+  assert.equal(moveAgent(d, 'a3', 'before', 'a2'), true);
+  assert.equal(order(), 'a3,a2,b1,a1');
+  assert.equal(moveAgent(d, 'a3', 'after', 'a1'), true);
+  assert.equal(order(), 'a2,b1,a1,a3');
+  assert.equal(moveAgent(d, 'a2', 'after', 'b1'), false, '다른 소속 옆으로는 못 옮김');
+  if (realLore) {
+    const dir = readDirectory(realLore);
+    const ids = dir.agents.filter((a) => a.affiliation === dir.agents[0].affiliation).map((a) => a.lore);
+    moveAgent(dir, ids[1], 'up');
+    const saved = withDirectory(realLore, directoryData(dir));
+    const people = parseCatalog(saved).people.map((p) => p.lore ?? p.name);
+    assert.equal(readDirectory(saved).agents[0].lore, ids[1], '저장한 순서를 다시 읽어도 그대로');
+    assert.ok(people.length > 0);
+  }
+});

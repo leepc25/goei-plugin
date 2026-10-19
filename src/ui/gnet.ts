@@ -1,7 +1,7 @@
 // 「괴담넷」 탭: 게시판·쪽지함. 생성은 새로고침·글 올리기·댓글·쪽지 보내기를 눌렀을 때만 한 번씩 부른다.
 // 원본은 채팅 입력창을 빌려 썼지만 여기서는 창 안의 입력칸에 쓴다. 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import {
-  acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, attachPostDraft, boardUnread, CFG, commitIncoming,
+  acceptComments, acknowledge, addOutgoingDm, addUserComment, addUserPost, applyActivity, applyBoard, pushComments, hhmm, attachPostDraft, boardUnread, CFG, commitIncoming,
   dateNow, deleteComment, deletePost, deleteThread, dmThreads, dmUnread, findPost, GN_COOLDOWN, GN_DEFAULTS, GN_NICK, GnetError, gnetSettings,
   GN_STORAGE_AUTO, GN_STORAGE_LIMIT, gnetRetention, incomingPlan, LIMITS, parseDmBody, parseJsonPayload, parsePostDraft, postKey, postUnread, QUANTITY,
   readGnet, sourceFor, STORAGE_MAX, storyTurns, tokens, trimBoard,
@@ -191,8 +191,8 @@ function writePost(ctx: ChatContext, env: GnetEnv, input: string) {
       const p = addUserPost(cur, nick, draft.title, draft.content, dateNow(chat));
       newId = p.id;
       const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: new Set() }, nick);
-      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      pushComments(p, got.comments, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
       trimBoard(cur, s);
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       if (!got.comments.length) note = '글을 올렸어요. 아직 댓글은 없어요.';
@@ -231,11 +231,11 @@ function refreshPost(ctx: ChatContext, env: GnetEnv, postId: number) {
         return null;
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
-      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+      pushComments(p, got.comments, dateNow(latest));
       const n = got.comments.length;
       p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
       p.votes += Math.floor(Math.random() * (n + 2));
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest));
       note = n ? '' : '새 댓글이 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
       if (skipped) note += ` 다른 글 활동 ${skipped}건은 형식이 맞지 않아 뺐어요.`;
@@ -256,7 +256,7 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
   // 내 댓글은 먼저 저장한다 (원본과 같음). 반응 생성이 실패해도 남는다
   const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
     const st = readGnet(chat);
-    index = addUserComment(st, postId, parent, nick, body);
+    index = addUserComment(st, postId, parent, nick, body, dateNow(chat));
     return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId, comment: index }) }), st);
   });
   gnet.compose = null;
@@ -287,8 +287,8 @@ async function writeComment(ctx: ChatContext, env: GnetEnv, postId: number, pare
         return null;
       }
       const got = acceptComments(value.comments, p.comments, { postId, replyTo: index, total: prompt.total, supplied: prompt.supplied }, nick);
-      for (const c of got.comments) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick);
+      pushComments(p, got.comments, dateNow(chat));
+      const [, skipped] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
       const inc = saveIncoming(chat, cur, value.incoming, plan, p);
       note = got.comments.length ? '' : '등록했어요. 추가 답글은 없어요.';
       if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
@@ -488,13 +488,20 @@ function commentTree(p: GPost, busy: boolean): string {
       out.push(`<li class="gn-c${depth ? ' re' : ''}${c.unread ? ' unread' : ''}${target === k ? ' target' : ''}" style="--gn-depth:${Math.min(depth, 3)}">
         <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ''}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ''}</div>
         <div class="gn-c-body">${body(c.body)}</div>
-        <div class="gn-c-act"><button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
+        <div class="gn-c-act">${commentClock(p, c)}<button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
       if (target === k && gnet.compose?.kind === 'comment') out.push(replyBox(gnet.compose.label, busy, depth + 1));
       walk(k, depth + 1);
     }
   };
   walk(0, 0);
   return out.join('');
+}
+
+/** 댓글 시각: 글과 같은 날이면 「14:23」, 다른 날이면 「05.14 09:10」 (시각 없는 옛 댓글은 없음) */
+function commentClock(p: GPost, c: GPost['comments'][number]): string {
+  if (!c.time) return '';
+  const same = c.time.slice(0, 10) === String(p.date).slice(0, 10);
+  return `<time class="gn-c-time">${esc(same ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
 }
 
 function postView(p: GPost, busy: boolean, inline = false): string {

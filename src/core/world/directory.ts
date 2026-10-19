@@ -791,3 +791,36 @@ export function migrateLore(lore: LoreEntry[], dir: Directory = readDirectory(lo
   if (!dir.folders) return lore;
   return withDirectory(lore, directoryData(dir)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? '')));
 }
+
+// ── 요원 순서 ──
+
+/** 요원 순서를 묶는 단위: 소속 (명부 요원 탭의 조직 묶음과 같다) */
+export const agentGroup = (a: AgentRow) => a.affiliation || '';
+
+/**
+ * 요원을 같은 소속 안에서 옮긴다. 명부 요원 순서가 곧 상황판·편성 노출 순서(앞에서부터 「요원 표시 인원」명)라서
+ * 저장하면 실제 노출 순위도 바뀐다 (core/world/engine.ts rosterFor).
+ * how: 'up' | 'down' 한 칸, 'before' | 'after' target 앞뒤로
+ */
+export function moveAgent(d: Directory, lore: string, how: 'up' | 'down' | 'before' | 'after', target = ''): boolean {
+  const from = d.agents.findIndex((a) => a.lore === lore);
+  if (from < 0) return false;
+  const g = agentGroup(d.agents[from]);
+  const same = d.agents.map((a, i) => [a, i] as const).filter(([a]) => agentGroup(a) === g).map(([, i]) => i);
+  const k = same.indexOf(from);
+  if (how === 'up' || how === 'down') {
+    // 한 칸: 같은 소속 바로 앞(뒤) 사람과 자리를 바꾼다. 사이에 있는 다른 소속은 그대로
+    const j = how === 'up' ? k - 1 : k + 1;
+    if (j < 0 || j >= same.length) return false;
+    const to = same[j];
+    [d.agents[from], d.agents[to]] = [d.agents[to], d.agents[from]];
+    return true;
+  }
+  const to = d.agents.findIndex((a) => a.lore === target);
+  if (to < 0 || to === from || agentGroup(d.agents[to]) !== g) return false;
+  const [row] = d.agents.splice(from, 1);
+  // 빼고 나면 뒤쪽 번호가 하나씩 당겨진다
+  const at = (to > from ? to - 1 : to) + (how === 'after' ? 1 : 0);
+  d.agents.splice(at, 0, row);
+  return true;
+}

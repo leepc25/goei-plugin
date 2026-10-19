@@ -631,6 +631,23 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-row.open { border-color: var(--accent-line); }
 .dir-head { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px; border: 0; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
 .dir-head .gx-ava { width: 40px; height: 40px; font-size: 15px; }
+.dir-headrow { display: flex; align-items: center; }
+.dir-headrow > .dir-head { flex: 1; min-width: 0; }
+/* 요원 순서: PC는 손잡이(끌기), 모바일은 ▲▼ */
+.dir-move { display: flex; align-items: center; gap: 2px; padding-right: 8px; flex: none; }
+.dir-grip { display: grid; place-items: center; width: 28px; height: 40px; border-radius: 8px; color: var(--dim); cursor: grab; touch-action: none; }
+.dir-grip:hover { color: var(--text); background: var(--panel2); }
+.dir-step { display: none; place-items: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel2); color: var(--sub); }
+.dir-step:disabled { opacity: .35; }
+.dir-step svg { width: 18px; height: 18px; }
+.dir-row.dragging { opacity: .45; }
+.dir-row.drop-before { box-shadow: 0 -3px 0 0 var(--signal); }
+.dir-row.drop-after { box-shadow: 0 3px 0 0 var(--signal); }
+.gx.dir-dragging, .gx.dir-dragging * { cursor: grabbing !important; user-select: none; }
+@media (max-width: 760px), (pointer: coarse) {
+  .dir-grip { display: none; }
+  .dir-step { display: grid; }
+}
 .dir-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .dir-name b { font-size: 16px; font-weight: 600; }
 .dir-name small { font-size: 13px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1349,6 +1366,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-re { flex: none; color: var(--dim); font-size: 14px; }
 .gn-c-body { padding-top: 3px; font-size: 15px; line-height: 1.65; color: var(--sub); overflow-wrap: anywhere; }
 .gn-c-act { display: flex; align-items: center; gap: 2px; }
+.gn-c-time { margin-right: 6px; font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
 .gn-reply { min-height: 28px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--dim); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .gn-reply:hover { background: var(--panel2); color: var(--text); }
 .gn-c .ph-tool.gn-cdel { width: 28px; height: 28px; }
