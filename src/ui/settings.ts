@@ -2,7 +2,7 @@
 // 범위: 이 채팅($st_*·$wg_*) / 새 채팅 기본값(플러그인 저장소) / 카드 명부(directory.ts, 카드 로어북).
 import { repaintTheme } from './theme';
 import {
-  AGENT_MAX, basicDefaults, DIM_DEFAULT, DIM_STEPS, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
+  AGENT_MAX, basicDefaults, DIM_DEFAULT, basicSettings, basicVars, type BasicSettings, getPrefs, type Prefs, type StatusStyle, type Theme, WORLD_SPEC, type WorldField, wgKey, worldDefaults, worldSettings,
 } from '../core/settings';
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
@@ -48,6 +48,10 @@ function seg(action: string, cur: string, items: [string, string][], disabled = 
 function field(label: string, control: string, help: string): string {
   return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
 }
+
+/** 0–100% 막대. 끄는 동안은 창 바깥만 바로 바꾸고(app.ts), 놓으면 저장 */
+const dimSlider = (n: number, busy: boolean) =>
+  `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy ? ' disabled' : ''}><output>${n}%</output></label>`;
 
 const group = (title: string, body: string, note = '') =>
   `<section class="ps-group"><h3>${title}</h3>${note ? `<p class="ps-note">${note}</p>` : ''}<div class="ps-rows">${body}</div></section>`;
@@ -159,7 +163,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(테마 따름일 때) 배색이에요.'),
       field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마 따름'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
-      field('창 바깥 어둡기', seg('set-dim', String(getPrefs().dim ?? DIM_DEFAULT), DIM_STEPS.map((n) => [String(n), `${n}%`] as [string, string]), busy), '창 뒤의 채팅 화면을 얼마나 가릴지 정해요. 0%면 그대로 보여요.'),
+      field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),
     ].join(''))}
     ${group('상황판', [
       field('괴이 발생 · 요원 시스템', anomaly, scope === 'chat' ? 'ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요.' : '새 채팅을 상황판을 켠 채로 시작할지 정해요.'),
@@ -288,7 +292,7 @@ export async function handleSettings(action: string, value: string | undefined, 
   if (action === 'set-nav' || action === 'set-dim') {
     const n = Number(v);
     if (action === 'set-nav' && (v === 'left' || v === 'right')) await saveDefaults(env, (p) => ({ ...p, nav: v === 'right' ? 'right' : undefined }));
-    else if (action === 'set-dim' && DIM_STEPS.includes(n)) await saveDefaults(env, (p) => ({ ...p, dim: n }));
+    else if (action === 'set-dim' && Number.isInteger(n) && n >= 0 && n <= 100) await saveDefaults(env, (p) => ({ ...p, dim: n }));
     return true;
   }
   if (action === 'set-scope') {

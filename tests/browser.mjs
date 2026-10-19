@@ -2141,19 +2141,20 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   const m = vp.width < 500 ? 'm' : 'pc';
   if (shots) await page.screenshot({ path: `${shots}/17b-set-sticky-${m}.png` });
   if (m === 'pc') {
-    // 화면: 메뉴 오른쪽, 창 바깥 어둡기 0%
+    // 화면: 메뉴 오른쪽, 창 바깥 불투명도 0%
+    const setDim = (pg, n) => pg.$eval('input[data-input="dim"]', (el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }, n);
     await page.click('[data-action="set-nav"][data-value="right"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
     assert.ok(await page.evaluate(() => document.querySelector('.gx-nav').getBoundingClientRect().left > document.querySelector('.gx-content').getBoundingClientRect().left), '메뉴가 오른쪽');
-    await page.click('[data-action="set-dim"][data-value="0"]');
+    await setDim(page, 0);
     await page.waitForFunction(() => /rgba\(3, 7, 9, 0\)|transparent/.test(getComputedStyle(document.querySelector('.gx')).backgroundColor));
-    await page.click('[data-action="set-dim"][data-value="100"]');
+    await setDim(page, 100);
     await page.waitForFunction(() => getComputedStyle(document.querySelector('.gx')).backgroundColor === 'rgb(3, 7, 9)');
     assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-hsep')).color === 'rgb(0, 0, 0)'), false, '글자색 변수 그대로');
-    await page.click('[data-action="set-dim"][data-value="0"]');
+    await setDim(page, 0);
     if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
     await page.click('[data-action="set-nav"][data-value="left"]');
-    await page.click('[data-action="set-dim"][data-value="50"]');
+    await setDim(page, 50);
   }
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir-kinds');

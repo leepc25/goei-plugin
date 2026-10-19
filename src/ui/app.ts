@@ -60,6 +60,11 @@ type View =
 
 /** 창 바깥 막 색 (테마별, 투명도는 설정 → 화면) */
 const VEIL = { dark: '3, 7, 9', light: '20, 30, 28', paper: '40, 30, 15' };
+/** 창 바깥 막 (설정 → 화면 「창 바깥 불투명도」). 0이면 투명 */
+function paintVeil(el: HTMLElement, dim: number): void {
+  const veil = VEIL[el.dataset.theme as keyof typeof VEIL] ?? VEIL.dark;
+  el.style.background = `rgba(${veil}, ${dim / 100})`;
+}
 let root: HTMLElement | null = null;
 let view: View = { kind: 'loading' };
 let draft: Draft = { lang: 'ko' };
@@ -305,6 +310,12 @@ function ensureRoot(): HTMLElement {
   // 검색어는 목록만 다시 그린다 (입력창 포커스 유지)
   root.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement;
+    if (el?.dataset?.input === 'dim' && root) {
+      paintVeil(root, Number(el.value));
+      const out = el.parentElement?.querySelector('output');
+      if (out) out.textContent = `${el.value}%`;
+      return;
+    }
     if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
       wiki.query = el.value;
       const box = root?.querySelector('.nw .ph-content');
@@ -792,8 +803,7 @@ function render(): void {
   const pf = getPrefs();
   root.dataset.nav = pf.nav ?? 'left';
   // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
-  const veil = VEIL[root.dataset.theme as keyof typeof VEIL] ?? VEIL.dark;
-  root.style.background = `rgba(${veil}, ${(pf.dim ?? DIM_DEFAULT) / 100})`;
+  paintVeil(root, pf.dim ?? DIM_DEFAULT);
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
   root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
