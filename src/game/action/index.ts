@@ -1,6 +1,7 @@
 import type { GameHost } from '../index';
 import css from './style.css';
 import { ActionRenderer } from './render';
+import { SCENE } from './space';
 import { newRun, restore, serialize, step, type Input } from './sim';
 
 // 같은 호스트를 닫았다 다시 열어도 최신 쓰기 완료를 기다린 뒤 복원한다.
@@ -13,7 +14,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   root.setAttribute('aria-label', '쟈알디 1인 전투 검증판');
   const style = document.createElement('style');
   style.textContent = css;
-  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 체형 개선 시연판</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
+  root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="pause">Esc 메뉴</button></div>
   <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
   <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 낮은 방어 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
   box.append(style, root);
@@ -57,12 +58,21 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   };
   const hud = () => {
     const p = run.player;
-    for (const [name, value] of Object.entries({ hp: p.hp, energy: p.energy, guard: p.guard, gauge: p.gauge }))
+    if (root.dataset.action !== p.act) root.dataset.action = p.act;
+    for (const [name, value] of Object.entries({
+      hp: p.hp,
+      energy: p.energy,
+      guard: p.guard,
+      gauge: p.gauge,
+    }))
       $<HTMLProgressElement>(`[data-meter="${name}"]`).value = value;
     text('[data-hp]', String(Math.ceil(p.hp)));
     text('[data-do="auto"]', run.auto ? 'F 자동 ON' : 'F 수동');
     text('.ga-msg', run.message);
-    text('[data-busy]', saveError ? '저장 실패 · 재시도 중' : saving ? '저장 중' : dirty ? '진행 중' : '저장됨');
+    text(
+      '[data-busy]',
+      saveError ? '저장 실패 · 재시도 중' : saving ? '저장 중' : dirty ? '진행 중' : '저장됨',
+    );
     root.dataset.saveError = String(saveError);
     ['Q 회복', 'W 방어', 'E 능력'].forEach((label, i) => {
       const b = $<HTMLButtonElement>(`[data-item="${i}"]`);
@@ -174,7 +184,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       target = null;
       if (codes[e.code]) keys.add(codes[e.code]);
       if (!e.repeat && once[e.code]) edges[once[e.code]] = true as never;
-      if (!e.repeat && ['KeyQ', 'KeyW', 'KeyE'].includes(e.code)) edges.item = ['KeyQ', 'KeyW', 'KeyE'].indexOf(e.code);
+      if (!e.repeat && ['KeyQ', 'KeyW', 'KeyE'].includes(e.code))
+        edges.item = ['KeyQ', 'KeyW', 'KeyE'].indexOf(e.code);
     },
     { signal },
   );
@@ -294,17 +305,19 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       root.focus();
       manual();
       const b = canvas.getBoundingClientRect();
-      const x = ((e.clientX - b.left) / b.width) * 1280,
+      const x = Math.max(55, Math.min(1225, ((e.clientX - b.left) / b.width) * 1280)),
         y = ((e.clientY - b.top) / b.height) * 720;
       if (e.button === 2) {
         edges.dash = true;
-        target = { x, y, attack: false };
+        target = { x, y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)), attack: false };
         return;
       }
-      const enemy = run.enemies.find((a) => a.hp > 0 && Math.abs(a.x - x) < 65 && y > a.y - 180 && y < a.y + 20);
+      const enemy = run.enemies.find(
+        (a) => a.hp > 0 && Math.abs(a.x - x) < 90 && y > a.y - SCENE.adultHeight && y < a.y + 20,
+      );
       target = enemy
         ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id }
-        : { x, y: Math.max(400, Math.min(655, y)), attack: false };
+        : { x, y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)), attack: false };
     },
     { signal },
   );
@@ -383,6 +396,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       const restored = restore(raw);
       run = restored ?? newRun();
       await renderer.load(art);
+      root.dataset.artProfile = art.atlas.action?.profile ?? 'unknown';
       if (disposed) return;
       ready = true;
       if (raw && !restored) {

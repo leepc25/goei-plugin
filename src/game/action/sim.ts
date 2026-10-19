@@ -1,8 +1,8 @@
-import {GAIT} from './space';
+import { GAIT, MOTION, SCENE } from './space';
 /** 방 하나의 1인 전투 검증판. DOM/호스트와 무관한 고정 시간 시뮬레이션. */
 export const WIDTH = 1280,
   HEIGHT = 720,
-  SAVE_VERSION = 2;
+  SAVE_VERSION = 3;
 export type Act =
   | 'idle'
   | 'walk'
@@ -119,11 +119,18 @@ const body = (id: number, kind: Body['kind'], x: number, y: number, hp: number):
 export function newRun(): Run {
   return {
     version: SAVE_VERSION,
-    player: { ...body(1, 'jyaldi', 220, 510, 200), energy: 100, gauge: 100, guard: 100, dashCd: 0, items: [3, 2, 2] },
+    player: {
+      ...body(1, 'jyaldi', 220, 510, 200),
+      energy: 100,
+      gauge: 100,
+      guard: 100,
+      dashCd: 0,
+      items: [3, 2, 2],
+    },
     enemies: [
       body(2, 'corner', 760, 480, 130),
       body(3, 'watchman', 1030, 560, 145),
-      body(4, 'corner', 1130, 440, 130),
+      body(4, 'corner', 1130, 510, 130),
       body(5, 'watchman', 940, 610, 145),
     ],
     bolts: [],
@@ -166,8 +173,8 @@ function damage(r: Run, b: Body, amount: number, source: Body, down = false) {
   }
   b.hp = Math.max(0, b.hp - amount);
   b.flash = 0.12;
-  fx(r, 'hit', b.x, b.y, b.z + 75);
-  r.hitstop = down ? 0.055 : 0.025;
+  fx(r, 'hit', b.x, b.y, b.z + 125);
+  r.hitstop = down ? 0.07 : 0.04;
   b.x = clamp(b.x + source.dir * (down ? 44 : 12), 55, WIDTH - 55);
   if (b === p) {
     p.inv = 0.5;
@@ -183,11 +190,12 @@ function move(b: Body, x: number, y: number, speed: number, dt: number, face = t
     ox = b.x,
     oy = b.y;
   b.x = clamp(b.x + (x / len) * speed * dt, 55, WIDTH - 55);
-  b.y = clamp(b.y + (y / len) * speed * dt, 400, 655);
+  b.y = clamp(b.y + (y / len) * speed * dt, SCENE.floorMin, SCENE.floorMax);
   const distance = Math.hypot(b.x - ox, b.y - oy);
-  b.speed = distance / dt;
+  b.speed = Math.min(1200, distance / dt);
   // 1주기의 실제 보폭과 재생 위상을 연결. 벽에 막히면 위상도 정지한다.
-  if (b.z === 0 && b.act !== 'dash') b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
+  if (b.z === 0 && b.act !== 'dash')
+    b.stride = (b.stride + distance / (speed > 180 ? GAIT.run : GAIT.walk)) % 1;
   if (x && face) b.dir = x > 0 ? 1 : -1;
 }
 function nearTarget(r: Run) {
@@ -205,14 +213,14 @@ function bolt(r: Run, b: Body, enemy: boolean) {
   if (r.bolts.length >= 48) return;
   r.bolts.push({
     id: r.nextId++,
-    x: b.x + b.dir * (enemy ? 34 : 64),
+    x: b.x + b.dir * (enemy ? 48 : 96),
     y: b.y,
-    z: b.z + (enemy ? 82 : 113),
+    z: b.z + (enemy ? 135 : 178),
     vx: b.dir * (enemy ? 410 : 1000),
     life: 1.7,
     enemy,
   });
-  fx(r, 'shot', b.x + b.dir * (enemy ? 40 : 64), b.y, b.z + (enemy ? 82 : 113));
+  fx(r, 'shot', b.x + b.dir * (enemy ? 48 : 96), b.y, b.z + (enemy ? 135 : 178));
 }
 function item(r: Run, i: number) {
   const p = r.player;
@@ -245,7 +253,7 @@ export function autoInput(r: Run): Input {
     x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
     run: Math.abs(dx) > 260,
     y: threat ? (p.y > 540 ? -1 : 1) : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-    attack: Math.abs(dy) < 26,
+    attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || (Math.abs(dx) > 360 && r.time % 1.8 < 0.45)),
     skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
     dash: !!threat,
     ult: p.gauge >= 100 && live.length >= 2,
@@ -278,20 +286,23 @@ export function step(r: Run, raw: Input, dt: number) {
       b.z = Math.max(0, b.z + b.vz * dt);
       if (!b.z) {
         b.vz = 0;
-        if (b === p && ['jump', 'walk', 'run', 'idle'].includes(b.act)) act(b, 'land', 0.14);
+        if (b === p && ['jump', 'walk', 'run', 'idle'].includes(b.act)) act(b, 'land', 0.22);
       }
     }
     if (b.act === 'down' && b.t >= b.duration) {
       act(b, 'rise', 0.35);
       b.inv = 0.55;
-    } else if (!['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(b.act) && b.t >= b.duration) {
+    } else if (
+      !['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch'].includes(b.act) &&
+      b.t >= b.duration
+    ) {
       const next =
         b === p && input.attack && b.z === 0 && b.act === 'melee1'
           ? 'melee2'
           : b === p && input.attack && b.z === 0 && b.act === 'melee2'
             ? 'melee3'
             : null;
-      if (next) act(b, next, next === 'melee2' ? 0.34 : 0.52);
+      if (next) act(b, next, next === 'melee2' ? 0.36 : 0.52);
       else {
         if (b === p && b.act === 'melee3') b.cooldown = 0.18;
         act(b, 'idle', 0);
@@ -311,17 +322,17 @@ export function step(r: Run, raw: Input, dt: number) {
       if (target) p.dir = target.x >= p.x ? 1 : -1;
     }
     if (input.x && !r.auto) p.dir = input.x > 0 ? 1 : -1;
-    if (input.jump && p.z === 0) p.vz = 500;
+    if (input.jump && p.z === 0) p.vz = 600;
     if (input.ult && p.gauge >= 100) {
       p.gauge = 0;
-      act(p, 'ult', 0.85);
+      act(p, 'ult', 0.9);
       p.armor = true;
       p.inv = 1.05;
       r.cutin = 0.75;
       r.message = '집중 파괴';
     } else if (input.dash && p.dashCd <= 0) {
       if (input.x) p.dir = Math.sign(input.x);
-      act(p, 'dash', 0.22);
+      act(p, 'dash', 0.3);
       p.inv = 0.24;
       p.dashCd = 0.8;
     } else if (input.guard && !p.z) {
@@ -329,26 +340,30 @@ export function step(r: Run, raw: Input, dt: number) {
       if (input.x) p.dir = Math.sign(input.x);
     } else if (input.skill && p.energy >= 35) {
       p.energy -= 35;
-      act(p, 'skill', 0.62);
+      act(p, 'skill', 0.48);
       p.armor = true;
     } else if (input.attack && p.cooldown <= 0) {
       if (!p.z && nearTarget(r)) {
-        act(p, 'melee1', 0.28);
+        act(p, 'melee1', 0.3);
         p.cooldown = 0;
       } else {
-        act(p, 'shot', 0.32);
-        p.cooldown = 0.36;
+        act(p, 'shot', 0.24);
+        p.cooldown = 0.28;
       }
     } else {
       const x = clamp(input.x, -1, 1),
         y = clamp(input.y, -1, 1);
       const running = !!input.run;
-      move(p, x, y, p.z ? 200 : running ? 240 : 125, dt, !r.auto);
+      move(p, x, y, p.z ? 240 : running ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
       p.act = p.z > 0 || p.vz > 0 ? 'jump' : x || y ? (running ? 'run' : 'walk') : 'idle';
     }
   }
-  if (p.act === 'dash') move(p, input.x || p.dir, input.y, 800, dt);
-  if (p.act.startsWith('melee') && p.t >= (p.act === 'melee1' ? 0.14 : p.act === 'melee2' ? 0.17 : 0.26) && !p.fired) {
+  if (p.act === 'dash' && p.t >= 0.04 && p.t < 0.16) move(p, input.x || p.dir, input.y, 1200, dt);
+  if (
+    p.act.startsWith('melee') &&
+    p.t >= (p.act === 'melee1' ? 0.09 : p.act === 'melee2' ? 0.1 : 0.15) &&
+    !p.fired
+  ) {
     p.fired = true;
     const finish = p.act === 'melee3';
     const oldX = p.x;
@@ -362,20 +377,24 @@ export function step(r: Run, raw: Input, dt: number) {
         Math.abs(e.z - p.z) < 60
       )
         damage(r, e, finish ? 38 : p.act === 'melee2' ? 24 : 18, p, finish);
-    if (finish) fx(r, 'blast', p.x + p.dir * 90, p.y, 95);
+    if (finish) fx(r, 'blast', p.x + p.dir * 120, p.y, 150);
     r.message = finish ? '근접 3타 · 파괴 충격' : p.act === 'melee2' ? '근접 2타 · 제압' : '근접 1타 · 장타';
   }
-  if (p.act === 'shot' && p.t >= 0.16 && !p.fired) {
+  if (p.act === 'shot' && p.t >= 0.03 && !p.fired) {
     p.fired = true;
     bolt(r, p, false);
   }
-  if ((p.act === 'skill' || p.act === 'ult') && p.t >= (p.act === 'ult' ? 0.25 : 0.28) && !p.fired) {
+  if ((p.act === 'skill' || p.act === 'ult') && p.t >= (p.act === 'ult' ? 0.3 : 0.14) && !p.fired) {
     p.fired = true;
     const ultimate = p.act === 'ult',
       x = p.x + p.dir * (ultimate ? 280 : 190);
     fx(r, 'blast', x, p.y, 70);
     for (const e of r.enemies)
-      if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
+      if (
+        e.hp > 0 &&
+        Math.abs(e.x - x) < (ultimate ? 550 : 220) &&
+        Math.abs(e.y - p.y) < (ultimate ? 260 : 100)
+      )
         damage(r, e, ultimate ? 70 : 45, p, true);
   }
   for (const e of r.enemies) {
@@ -420,7 +439,7 @@ export function step(r: Run, raw: Input, dt: number) {
           t.inv <= 0 &&
           Math.abs(t.y - b.y) < 28 &&
           b.z >= t.z + 10 &&
-          b.z <= t.z + (t.act === 'crouch' ? 55 : 155) &&
+          b.z <= t.z + (t.act === 'crouch' ? 125 : 245) &&
           Math.max(old, b.x) >= t.x - 28 &&
           Math.min(old, b.x) <= t.x + 28,
       )
@@ -447,11 +466,13 @@ export function restore(raw: string | null): Run | null {
   try {
     if (!raw || raw.length > 120_000) return null;
     const r = JSON.parse(raw) as Run;
-    if (r?.version === 1 && r.player && Array.isArray(r.enemies)) {
+    if ((r?.version === 1 || r?.version === 2) && r.player && Array.isArray(r.enemies)) {
       for (const b of [r.player, ...r.enemies]) {
-        b.stride = 0;
-        b.speed = 0;
+        b.stride = b.stride ?? 0;
+        b.speed = b.speed ?? 0;
+        b.y = clamp(b.y, SCENE.floorMin, SCENE.floorMax);
       }
+      for (const bolt of r.bolts ?? []) bolt.y = clamp(bolt.y, SCENE.floorMin, SCENE.floorMax);
       r.version = SAVE_VERSION;
     }
     const finite = (n: unknown, lo: number, hi: number) =>
@@ -482,7 +503,7 @@ export function restore(raw: string | null): Run | null {
       finite(b.id, 1, 1e8) &&
       ['jyaldi', 'corner', 'watchman'].includes(b.kind) &&
       finite(b.x, 55, 1225) &&
-      finite(b.y, 400, 655) &&
+      finite(b.y, SCENE.floorMin, SCENE.floorMax) &&
       finite(b.z, 0, 500) &&
       finite(b.vz, -1500, 600) &&
       (b.dir === 1 || b.dir === -1) &&
@@ -546,7 +567,7 @@ export function restore(raw: string | null): Run | null {
           Number.isInteger(b.id) &&
           finite(b.id, 1, 1e8) &&
           finite(b.x, -30, 1310) &&
-          finite(b.y, 400, 655) &&
+          finite(b.y, SCENE.floorMin, SCENE.floorMax) &&
           finite(b.z, 0, 600) &&
           finite(b.vx, -1000, 1000) &&
           finite(b.life, 0, 2) &&

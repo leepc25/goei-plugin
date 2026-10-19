@@ -1,14 +1,22 @@
-/** 배경 소품·바닥·캐릭터가 공유하는 화면 공간 규격. */
+/** 일반 체형 도트와 배경이 공유하는 화면 공간. 원본 128px, 정수 2배 표시. */
 export const SCENE = {
-  width:1280,height:720,backgroundWidth:640,backgroundHeight:360,
-  floorBack:360,floorMin:400,floorMax:655,referenceY:530,adultHeight:160,
-  // 배경 원본 640x360에서 일반 문 높이 105~115px, 성인 약 80px.
-  doorHeight:220,
+  width: 1280,
+  height: 720,
+  backgroundWidth: 640,
+  backgroundHeight: 360,
+  floorBack: 460,
+  floorMin: 480,
+  floorMax: 680,
+  referenceY: 530,
+  nativeAdultHeight: 128,
+  actorScale: 2,
+  adultHeight: 256,
+  enemyScale: 2,
+  doorHeight: 340,
 } as const;
-/** 얕은 벨트스크롤 원근. 점프 z가 아닌 바닥 발 위치로만 배율을 정한다. */
-export function depthScale(footY:number):number {
-  return Math.max(.93,Math.min(1.07,1+(footY-SCENE.referenceY)*.0005));
+/** 얕은 벨트스크롤 원근. 도트는 정수 배율을 유지하고 앞뒤는 바닥 정렬로 표현한다. */
+export function depthScale(_footY: number): number {
+  return 1;
 }
-
-/** 전용 보행 시트의 발목 간격에 맞춘 1주기 이동 거리(px). */
-export const GAIT = {walk:128,run:224} as const;
+export const GAIT = { walk: 224, run: 300 } as const;
+export const MOTION = { walkSpeed: 200, runSpeed: 360 } as const;

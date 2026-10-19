@@ -109,6 +109,35 @@ try {
   await page.screenshot({ path: '/tmp/goei-action-result.png' });
   await page.locator('.ga-foot [data-do=restart]').click();
   await page.screenshot({ path: '/tmp/goei-action-desktop.png' });
+  // 새 체형의 실제 근접 동작/피해를 브라우저에서 검증한다. 불법 저장이 초기화된 것을 명중으로 오인하지 않는다.
+  await snapshot(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('goei-action-demo:v1'));
+    r.message = '근접 배치 검증';
+    r.auto = false;
+    r.bolts = [];
+    r.effects = [];
+    r.enemies.forEach((e, i) => {
+      e.x = i ? 1200 : r.player.x + 75;
+      e.y = i ? 670 : r.player.y;
+      e.cooldown = 9;
+    });
+    localStorage.setItem('goei-action-demo:v1', JSON.stringify(r));
+    window.__reopen();
+  });
+  await open(page);
+  assert.match(await page.locator('.ga-msg').textContent(), /근접 배치 검증/);
+  assert.equal(await page.locator('.ga').getAttribute('data-art-profile'), 'normal-v3');
+  await page.keyboard.down('KeyZ');
+  await page.waitForFunction(() => document.querySelector('.ga').dataset.action === 'melee1');
+  await page.waitForTimeout(160);
+  await page.keyboard.up('KeyZ');
+  const melee = await snapshot(page);
+  assert.ok(melee.player.act.startsWith('melee'));
+  assert.ok(melee.enemies[0].hp < melee.enemies[0].max);
+  assert.equal(melee.bolts.length, 0, '근접에서 권총으로 되돌아가지 않음');
+  await page.evaluate(() => {document.querySelector('.ga-menu').hidden = true;});
+  await page.screenshot({path:'/tmp/goei-normal-verified-melee.png'});
   // 게임 해제 뒤 RAF가 화면이나 저장을 다시 만들지 않는다.
   await page.evaluate(() => window.__close());
   assert.equal(await page.locator('.ga').count(), 0);
@@ -174,7 +203,7 @@ try {
       for (let i = 0; i < data.length; i += 0x8000) str += String.fromCharCode(...data.slice(i, i + 0x8000));
       afiles[name] = btoa(str);
     }
-    window.__store['goei:game-pack:action'] = JSON.stringify({ version: ah.version, atlas: ah.atlas, files: afiles });
+    window.__store['goei:game-pack:action-normal'] = JSON.stringify({ version: ah.version, atlas: ah.atlas, files: afiles });
     window.risuai = {
       pluginStorage: {
         getItem: async (k) => window.__store[k] ?? null,

@@ -4,7 +4,7 @@ import { newRun, step, serialize, restore } from '../dist-test/action-sim.mjs';
 const tick = (r, seconds, input = { x: 0, y: 0 }) => {
   for (let i = 0; i < Math.ceil(seconds * 60); i++) step(r, input, 1 / 60);
 };
-const bullet = (r, { front = true, height = 82 } = {}) => {
+const bullet = (r, { front = true, height = 135 } = {}) => {
   const p = r.player;
   r.bolts.push({
     id: r.nextId++,
@@ -169,4 +169,19 @@ test('보행 위상은 실제 거리만 누적하고 벽에서 미끄러지지 �
   step(slow, { x: 1, y: 0 }, 1 / 60);
   assert.equal(fast.player.act, 'run');
   assert.ok(fast.player.x > slow.player.x);
+});
+
+// 표시 크기 변경 후 회피 속도와 바닥 범위가 저장 복원을 깨뜨리지 않아야 한다.
+test('일반 체형 회피 도중 저장과 이전 바닥 좌표를 복원한다', () => {
+  const r = newRun();
+  tick(r, 0.18, {x:1,y:0,dash:true});
+  assert.ok(restore(serialize(r)), '회피 중 최대 속도의 부동소수 오차를 허용');
+  const old = newRun();
+  old.version = 2;
+  old.player.y = 400;
+  old.enemies[0].y = 440;
+  const migrated = restore(serialize(old));
+  assert.ok(migrated);
+  assert.equal(migrated.player.y,480);
+  assert.equal(migrated.enemies[0].y,480);
 });

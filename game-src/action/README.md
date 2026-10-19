@@ -1,6 +1,6 @@
 # 쟈알디 도트 제작 자료 — 체형 개선 시연판
 
-> 신규 목표는 `jyaldi-production-v3.json` 및 [일반 체형 v0.3 명세](../../docs/쟈알디_일반체형_도트규격_및_동작프레임_v3.md)다. 128px 원본·2배 표시, 약 6등신과 상하체 매스 균형·조금 큰 손을 사용한다. 아래 배포판/160px 자료는 이전 구현 기록이며 새 규격을 적용한 결과물이 아니다.
+> 신규 목표는 `jyaldi-production-v3.json` 및 [일반 체형 v0.3 명세](../../docs/쟈알디_일반체형_도트규격_및_동작프레임_v3.md)다. 128px 원본·2배 표시, 약 6등신과 상하체 매스 균형·조금 큰 손을 사용한다. 현재 일반 체형 게임은 `normal-v3/layout.json`과 `tools/action_normal_assets.py`를 사용하며 `release/demo/goei-jyaldi-normal.html`에 실제 반영되어 있다. 아래 160px/44프레임 부문은 이전 구현 기록이다.
 
 인상·머리·눈·복장의 참고 자료는 사용자가 첨부한 **Jyaldi_default.png**다. 사용자의 정정에 따라 해당 그림의 체형을 그대로 확장하거나 복사하는 규칙은 적용하지 않는다. 전신 체형은 자연스럽고 미형인 성인 여성으로 별도 설계한다. 저장소 설정의 일반 설명이나 생성된 다른 그림이 이 원본을 대체하지 않는다. 첨부 원본의 Windows 경로는 클라우드 작업 환경의 파일 경로가 아니므로 직접 읽었다고 간주하지 않는다. 이미지 생성에는 대화에 첨부된 실제 이미지를 참조한다.
 
@@ -12,7 +12,7 @@
 - 전체 키를 유지하며 몸통·복부·골반을 충분히 확보한다. 사타구니를 지나치게 높이지 않고 긴 종아리를 줄여 자연스럽게 맞춘다.
 - 첨부 원본에 보이지 않는 하체의 세부는 게임용 보완안이며 원본 그대로라고 주장하지 않는다.
 
-현재 적용 상태 (2026-10-19):
+이전 늘씬한 체형 적용 기록 (v0.2):
 
 - `jyaldi-master.png`는 고정한 전신 체형 기준이다. 사용자에게 최종 승인을 받았다고 주장하지 않는다.
 - `motions/`는 이 기준을 참조해 새로 제작하고 실제 160px에서 검토한 동작 원본이다. 과거 SD 동작 초안은 배포하지 않는다.
@@ -51,3 +51,19 @@ python3 tools/action_master.py
 ## 일반 체형 샘플 v0.3
 
 `normal-v3/sample-source.png`의 인체·손 크기 수정은 이미지 제작에서 수행했다. `python3 tools/action_sample.py`는 이 원본을 전체 동일 배율로 패킹해 `release/demo/samples/`의 128px 원본·256px 표시·비교 HTML을 만든다. 신규 계획은 75동작/601장 예산, 필수 45동작/326장이다. 단일 샘플은 기존 플레이판의 체형·애니메이션을 교체하지 않는다.
+
+## 일반 체형 게임 적용판
+
+현재 실제 게임은 `normal-v3/layout.json`과 `python3 tools/action_normal_assets.py`로 패킹한 자산을 사용한다. `layout.json`은 같은 활성 설정의 사본이며 이전 늘씬한 설정은 `slender-v2-layout.json`에 보관한다.
+
+`normal-v3/motions/*.webp`는 이미지 도구에서 만든 원본을 무손실 WebP로 보관한 제작 자료다. 변환 전후 알파와 게임에 쓰는 RGBA 픽셀을 대조했고, 동일한 런타임 PNG/아틀라스를 바이트 단위로 재현했다. `originalPngSha256`은 변환 전 원본 지문이다. 소스 압축 과정에서 인체를 변형하지 않았다.
+
+```sh
+python3 tools/action_normal_assets.py
+npm run build
+npm test
+```
+
+실제 전달 파일은 `release/demo/goei-jyaldi-normal.html`이다. 재현에는 Pillow(WebP 지원), numpy, scipy와 npm 의존성이 필요하다. 본체 이미지 약 365KiB, RGBA 디코딩 약 7.4MiB, 전체 액션 그림 팩 약 563KiB, 단일 플레이 HTML 약 791KiB다. 제작 원본은 게임에 넣지 않는다.
+
+기존 160px `jyaldi-master.png`와 `tools/action_master.py`는 과거 비율 비교용으로 남긴다. 신규 샘플은 `normal-v3/sample-source.png`이고 신규 게임의 아틀라스 `master` 클립도 128px 샘플을 사용한다. 과거 마스터를 신규 게임의 기준 포즈로 혼용하지 않는다. 실제 적용 수량과 추가 제작 범위는 `release/demo/README.md`를 따른다.
