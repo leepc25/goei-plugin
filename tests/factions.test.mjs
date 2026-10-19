@@ -88,7 +88,7 @@ test('세력 목록: 자리표시자가 있는 카드에서만 새 세력, 기�
   assert.deepEqual([f.name, f.affiliation, f.photo, f.type, f.builtin], ['마법사 결사', '발푸르기스 협회', 'walpurgis', 'civilian', false]);
   assert.deepEqual(f.scenarios.map((s) => s.kind), ['direct', 'preset']);
   assert.equal(factionType('F00', lore), 'civilian');
-  assert.equal(list.find((x) => x.code === 'A00').photo, 'f01');
+  assert.equal(list.find((x) => x.code === 'A00').photo, '');
   // 기본 세력 고치기: 명부의 같은 code 칸
   const d = readDirectory(lore);
   const a00 = d.orgs.find((o) => o.faction === 'A00');

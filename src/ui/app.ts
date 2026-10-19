@@ -13,7 +13,7 @@ import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, drawerHtml } from './drawer';
 import { bindSwipeBack } from './swipeback';
-import { agentInner, avatar, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
+import { agentInner, avatar, factionPic, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
 import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
@@ -36,7 +36,7 @@ import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
-import { directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
+import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
 
 interface Draft {
@@ -169,6 +169,41 @@ function ensureRoot(): HTMLElement {
     const take = el.dataset.take ? root?.querySelector<HTMLInputElement>(`[name="${el.dataset.take}"]`)?.value : undefined;
     void handle(el.dataset.action!, take ?? el.dataset.value);
   });
+  // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
+  root.addEventListener('pointerdown', (ev) => {
+    const box = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-crop]');
+    const img = box?.querySelector('img');
+    if (!box || !img) return;
+    ev.preventDefault();
+    const key = box.dataset.crop ?? '';
+    const frame = box.querySelector<HTMLElement>('.dir-crop-frame');
+    const move = (e: PointerEvent) => {
+      const r = img.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const w = cropValue(key)[2];
+      const half = ((w / 100) * r.width) / 2;
+      const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
+      const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
+      const c: [number, number, number] = [(px / r.width) * 100, (py / r.height) * 100, w];
+      setCrop(key, c);
+      if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
+    };
+    move(ev);
+    box.setPointerCapture?.(ev.pointerId);
+    const up = () => {
+      box.removeEventListener('pointermove', move);
+      box.removeEventListener('pointerup', up);
+      box.removeEventListener('pointercancel', up);
+      render();
+    };
+    box.addEventListener('pointermove', move);
+    box.addEventListener('pointerup', up);
+    box.addEventListener('pointercancel', up);
+  });
+  // 틀 크기 막대: 끄는 동안은 틀만 바꾸고, 놓으면 다시 그려 얼굴 사진을 새로 자른다
+  root.addEventListener('change', (ev) => {
+    if ((ev.target as HTMLElement).dataset?.input === 'dir-crop-size') render();
+  });
   // 작성칸에 사진 붙여넣기·끌어놓기 (원본처럼)
   const photoTarget = (el: EventTarget | null) => {
     const box = (el as HTMLElement | null)?.closest?.('.gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room');
@@ -257,6 +292,14 @@ function ensureRoot(): HTMLElement {
       dirUi.q = el.value;
       const box = root?.querySelector('.dir-list');
       if (box) box.innerHTML = directoryList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === 'dir-crop-size') {
+      const key = el.dataset.key ?? '';
+      const [x, y] = cropValue(key);
+      setCrop(key, [x, y, Number(el.value)]);
+      const frame = root?.querySelector<HTMLElement>('[data-crop] .dir-crop-frame');
+      if (frame) frame.style.width = `${el.value}%`;
       return;
     }
     if (el?.dataset?.input === 'dir-photo-q' && (view.kind === 'started' || view.kind === 'picker')) {
@@ -848,7 +891,7 @@ function picker(): string {
     .filter((x) => !x.hidden)
     .map(
       (x) => {
-        const img = view.kind === 'picker' ? imageUrl(view.ctx.char, x.photo) : null;
+        const img = view.kind === 'picker' ? imageUrl(view.ctx.char, factionPic(view.ctx.char, x)) : null;
         return `<button class="gx-fac${x.code === draft.faction ? ' on' : ''}${img ? ' has-img' : ''}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
         ${img ? `<span class="gx-fac-img" style="background-image:url('${esc(img)}')"></span>` : ''}<span class="gx-fac-txt"><b>${esc(x.name)}</b><span>${esc(x.blurb)}</span></span></button>`;
       },
@@ -929,7 +972,7 @@ function idCard(ctx: ChatContext): string {
   const facs = factionList(ctx.char.globalLore);
   const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '') || currentChoice(ctx.chat).faction || '';
   const f = code ? findFaction(code, facs) : undefined;
-  const img = f ? imageUrl(ctx.char, f.photo) : null;
+  const img = f ? imageUrl(ctx.char, factionPic(ctx.char, f)) : null;
   const w = worldOn(ctx.chat) ? readWorld(ctx.chat) : null;
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const time = (w ? clock(w.minute) : '') || [st?.date, st?.time].filter(Boolean).join(' ');

@@ -1,7 +1,8 @@
-// 창에서 쓰는 카드 에셋 이미지(세력 f01~f05, 요원·연락처 초상). 처음 부를 때 읽기 시작하고,
+// 창에서 쓰는 카드·모듈 에셋 이미지(세력 사진, 요원·연락처 초상). 처음 부를 때 읽기 시작하고,
 // 다 읽히면 창을 한 번 다시 그린다. 못 읽은 이미지는 글자 아바타로 둔다.
-import { assetUrl } from '../host/assets';
+import { assetUrl, facePic, mainPic, splitPic } from '../host/assets';
 import { factionList } from '../core/factions';
+import type { Faction } from '../core/types';
 import { readDirectory } from '../core/world/directory';
 import type { LoreEntry } from '../core/types';
 import type { CharacterSnapshot } from '../host/risu';
@@ -25,20 +26,33 @@ function schedule(): void {
 
 /** 창에 보일 크기보다 훨씬 큰 사진(세력 사진 1200×600 AVIF 등)은 미리 줄인 사본을 쓴다. 매번 큰 원본을 풀고 줄여 그리느라 끊겼다 (v0.10.2) */
 const MAX_SIDE = 720;
-async function shrink(url: string): Promise<string> {
+/** 얼굴로 자른 사진의 한 변 (작은 사진이라 이 정도면 충분) */
+const FACE_SIDE = 256;
+/** crop: 얼굴 틀 [가로 중심, 세로 중심, 한 변(그림 너비 대비)] % */
+async function shrink(url: string, crop: [number, number, number] | null = null): Promise<string> {
   try {
     const im = new Image();
     im.src = url;
     await im.decode();
-    const scale = MAX_SIDE / Math.max(im.naturalWidth, im.naturalHeight);
-    if (!(scale < 1)) return url;
+    const W = im.naturalWidth;
+    const H = im.naturalHeight;
+    // 자를 네모 (원본 좌표). 그림 밖으로 나가지 않게 민다
+    let [sx, sy, sw, sh] = [0, 0, W, H];
+    if (crop) {
+      const side = Math.min(W, H, (crop[2] / 100) * W);
+      sx = Math.min(W - side, Math.max(0, (crop[0] / 100) * W - side / 2));
+      sy = Math.min(H - side, Math.max(0, (crop[1] / 100) * H - side / 2));
+      sw = sh = side;
+    }
+    const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
+    if (!crop && !(scale < 1)) return url;
     const canvas = document.createElement('canvas');
-    canvas.width = Math.round(im.naturalWidth * scale);
-    canvas.height = Math.round(im.naturalHeight * scale);
+    canvas.width = Math.max(1, Math.round(sw * scale));
+    canvas.height = Math.max(1, Math.round(sh * scale));
     const g = canvas.getContext('2d');
     if (!g) return url;
     g.imageSmoothingQuality = 'high';
-    g.drawImage(im, 0, 0, canvas.width, canvas.height);
+    g.drawImage(im, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/webp', 0.88));
     return blob ? URL.createObjectURL(blob) : url;
   } catch {
@@ -46,15 +60,16 @@ async function shrink(url: string): Promise<string> {
   }
 }
 
-/** 이름의 에셋 URL. 아직 읽는 중이거나 없으면 null */
-export function imageUrl(char: CharacterSnapshot, name: string | undefined): string | null {
-  if (!name) return null;
-  const key = `${String(char.chaId ?? char.name ?? '')}|${name}`;
+/** 이름의 에셋 URL (「이름#가로,세로,크기」면 그 틀로 자른 얼굴). 아직 읽는 중이거나 없으면 null */
+export function imageUrl(char: CharacterSnapshot, pic: string | undefined): string | null {
+  if (!pic) return null;
+  const key = `${String(char.chaId ?? char.name ?? '')}|${pic}`;
   const hit = urls.get(key);
   if (hit === undefined) {
     urls.set(key, 'loading');
+    const { name, crop } = splitPic(pic);
     void assetUrl(char, name).then(async (raw) => {
-      const url = raw ? await shrink(raw) : null;
+      const url = raw ? await shrink(raw, crop) : null;
       urls.set(key, url);
       if (url) schedule();
     });
@@ -65,29 +80,33 @@ export function imageUrl(char: CharacterSnapshot, name: string | undefined): str
 
 const escAttr = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-// 명부에서 요원 사진을 따로 골랐으면 작은 사진에도 그것을 쓴다 (영문명 → 고른 사진)
-const picked = new WeakMap<object, Map<string, string>>();
-export function agentPic(char: CharacterSnapshot, english: string | undefined): string | undefined {
-  if (!english) return english;
-  const lore = (char.globalLore ?? []) as LoreEntry[];
-  let map = picked.get(lore);
-  if (!map) {
-    map = new Map(readDirectory(lore).agents.filter((a) => a.photo && a.english).map((a) => [a.english, a.photo!] as const));
-    picked.set(lore, map);
-  }
-  return map.get(english) ?? english;
+/** 요원 얼굴 사진 이름 (영문명으로 명부의 요원을 찾아 고른 얼굴·대표 사진까지 본다) */
+export function agentFace(char: CharacterSnapshot, english: string | undefined): string {
+  if (!english) return '';
+  const a = readDirectory((char.globalLore ?? []) as LoreEntry[]).agents.find((x) => x.english === english);
+  return facePic(char, a ?? { english }, true);
 }
 
-/** 원형 아바타: 사진이 있으면 사진, 없으면 첫 글자 */
-export function avatar(char: CharacterSnapshot, english: string | undefined, name: string, cls = ''): string {
-  const url = imageUrl(char, agentPic(char, english));
+/** 세력·조직 사진 이름 (명부 조직 칸의 고른 사진·영문명). slot: 대표(main) 또는 얼굴(face) */
+export function factionPic(char: CharacterSnapshot, f: Pick<Faction, 'code' | 'affiliation'> & { photo?: string; english?: string }, slot: 'main' | 'face' = 'main'): string {
+  const o = readDirectory((char.globalLore ?? []) as LoreEntry[]).orgs.find((x) => (x.faction ? x.faction === f.code : x.name === f.affiliation));
+  const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english };
+  return slot === 'face' ? facePic(char, src) : mainPic(char, src);
+}
+
+/** 원형 아바타: 그 이름의 사진이 있으면 사진, 없으면 첫 글자 */
+export function picAvatar(char: CharacterSnapshot, pic: string, name: string, cls = ''): string {
+  const url = imageUrl(char, pic);
   const first = escAttr(Array.from(name.trim())[0] ?? '?');
   return `<span class="gx-ava${cls ? ` ${cls}` : ''}">${url ? `<img src="${escAttr(url)}" alt="" loading="lazy">` : `<span>${first}</span>`}</span>`;
 }
 
-/** 시작 화면 세력 사진(f01~f05, 명부에서 바꾼 사진)을 미리 읽는다. 괴이봇 Lite 채팅에 들어왔을 때 부른다 */
+/** 요원 아바타 (영문명으로 얼굴 사진을 찾는다) */
+export const avatar = (char: CharacterSnapshot, english: string | undefined, name: string, cls = ''): string => picAvatar(char, agentFace(char, english), name, cls);
+
+/** 시작 화면 세력 사진을 미리 읽는다. 괴이봇 Lite 채팅에 들어왔을 때 부른다 */
 export function prefetchFactions(char: CharacterSnapshot): void {
-  for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, f.photo);
+  for (const f of factionList(char.globalLore)) if (!f.hidden) imageUrl(char, factionPic(char, f));
 }
 
 /** 요원 상태 색 (상황판·편성 공통) */

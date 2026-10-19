@@ -16,9 +16,9 @@ export interface Faction {
   affiliation: string;
   blurb: string;
   scenarios: Scenario[];
-  /** 시작 화면 사진 에셋 이름 */
+  /** 명부에서 고른 대표 사진 (비우면 영문명으로 찾는다, ui/images factionPic) */
   photo?: string;
-  /** 영문명 (위키 사진을 찾는 이름) */
+  /** 영문명 (사진을 찾는 이름) */
   english?: string;
   type?: FactionType;
   /** 기본 다섯 세력 */

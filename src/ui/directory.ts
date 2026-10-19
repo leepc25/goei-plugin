@@ -5,12 +5,12 @@ import {
   type BaseRow, type PlaceRow, withDirectory,
 } from '../core/world/directory';
 import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
-import { assetNames, assetUrl, hasAsset, pictureName } from '../host/assets';
+import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, splitPic, type PicSource } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
-import { avatar, imageUrl } from './images';
+import { imageUrl, picAvatar } from './images';
 import { ICONS } from './icons';
 
 export interface DirectoryEnv {
@@ -38,13 +38,15 @@ export const dirUi = {
   addQ: '',
   /** 명부 사용법 펼침 */
   help: false,
-  /** 사진을 고르는 중인 괴이·특수 (로어북 이름) */
+  /** 사진을 고르는 칸 「main>열쇠」·「face>열쇠」 */
   pick: '',
   pickQ: '',
+  /** 얼굴 틀을 맞추는 항목 (열쇠) */
+  crop: '',
 };
 
 export function resetDirectory(): void {
-  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', help: false, pick: '', pickQ: '' });
+  Object.assign(dirUi, { kind: 'anomaly', q: '', open: '', draft: null, base: '', from: null, busy: false, notice: '', done: '', adding: false, addQ: '', help: false, pick: '', pickQ: '', crop: '' });
 }
 
 const esc = (s: unknown) =>
@@ -165,47 +167,98 @@ export function directoryExtList(ctx: ChatContext): string {
 }
 
 /** 사진을 고를 대상: 괴이·특수·요원은 로어북 이름, 조직은 「org:이름」 */
-function picOf(d: Directory, key: string): { english: string; photo: string; fallback: string; set: (v: string) => void } | null {
+type Slot = 'main' | 'face' | 'crop';
+interface PicOf extends PicSource {
+  english: string;
+  /** 사람(요원)이면 얼굴 틀을 따로 안 맞춰도 기본 틀로 자른다 */
+  person: boolean;
+  set: (slot: Slot, v: string) => void;
+}
+
+function picOf(d: Directory, key: string): PicOf | null {
+  const put = (o: { photo?: string; face?: string; crop?: string }) => (slot: Slot, v: string) => {
+    const f = slot === 'main' ? 'photo' : slot;
+    if (v) o[f] = v;
+    else delete o[f];
+  };
   if (key.startsWith('org:')) {
     const o = d.orgs.find((x) => x.name === key.slice(4));
     if (!o) return null;
-    const i = BUILTIN.indexOf(o.faction);
-    return {
-      english: o.spec.english ?? '',
-      photo: o.spec.photo ?? '',
-      fallback: i >= 0 ? `f0${i + 1}` : '',
-      set: (v) => (v ? (o.spec.photo = v) : delete o.spec.photo),
-    };
+    return { english: o.spec.english ?? '', photo: o.spec.photo, face: o.spec.face, crop: o.spec.crop, person: false, set: put(o.spec) };
   }
   const r = findRow(d, key);
   if (!r) return null;
-  return { english: r.english, photo: r.photo ?? '', fallback: '', set: (v) => (v ? (r.photo = v) : delete r.photo) };
+  return { english: r.english, photo: r.photo, face: r.face, crop: r.crop, person: 'rank' in r, set: put(r) };
 }
 
-/** 사진 칸 (괴이·특수·요원·조직 공통): 지금 사진 + 고르기 (카드·에셋 모듈의 이미지 목록) */
-function photoBlock(key: string, ctx: ChatContext, where: string): string {
+/** dirUi.pick 「main>열쇠」·「face>열쇠」 */
+const pickOf = (v: string): { slot: Slot; key: string } => {
+  const at = v.indexOf('>');
+  return { slot: v.slice(0, at) === 'face' ? 'face' : 'main', key: v.slice(at + 1) };
+};
+
+/** 얼굴 틀 「가로,세로,크기」 (맞춘 값, 없으면 기본 틀) */
+export function cropValue(key: string): [number, number, number] {
+  const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
+  return parseCrop(p?.crop) ?? parseCrop(DEFAULT_CROP)!;
+}
+
+/** 얼굴 틀 바꾸기 (창의 틀 맞추기 칸에서 끌거나 크기를 바꿀 때) */
+export function setCrop(key: string, crop: [number, number, number]): void {
+  const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
+  if (!p) return;
+  p.set('crop', crop.map((n) => Math.round(n)).join(','));
+  dirUi.done = '';
+}
+
+/** 사진 칸 (괴이·특수·요원·조직 공통): 대표(큰 사진)·얼굴(작은 사진) 두 줄 + 고르기 + 얼굴 틀 맞추기 */
+function photoBlock(key: string, ctx: ChatContext): string {
   const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
   if (!p) return '';
-  const name = pictureName(ctx.char, p.photo, p.english, p.fallback);
-  const url = name ? imageUrl(ctx.char, name) : null;
-  const picking = dirUi.pick === key;
-  const why = p.photo ? where : name && hasAsset(ctx.char, name) ? `자동: ${esc(name)}` : '영문명과 같은 이름의 이미지가 없어요';
-  return `<div class="dir-in"><span>사진</span>
-    <div class="dir-photo">
+  const main = mainPic(ctx.char, p);
+  const face = facePic(ctx.char, p, p.person);
+  const cut = !!main && splitPic(face).crop !== null;
+  const line = (slot: 'main' | 'face', label: string, pic: string, picked: string | undefined, why: string, extra = '') => {
+    const url = pic ? imageUrl(ctx.char, pic) : null;
+    const picking = dirUi.pick === `${slot}>${key}`;
+    return `<div class="dir-photo">
       <span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="">` : ICONS.spook}</span>
-      <span class="dir-photo-name"><b>${esc(p.photo || '자동')}</b><small>${why}</small></span>
-      ${p.photo ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc(`|${key}`)}">자동으로</button>` : ''}
-      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc(key)}">${picking ? '닫기' : '고르기'}</button>
-    </div>
-    <small>고르지 않으면 「영문명_default」, 「영문명」 이미지 순으로 찾아요.</small>
-    ${picking ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx)}</div></div>` : ''}
+      <span class="dir-photo-name"><b>${label} · ${esc(picked || '자동')}</b><small>${why}</small></span>
+      ${picked ? `<button class="gx-mini" data-action="dir-photo-set" data-value="${esc(`|${slot}>${key}`)}">자동으로</button>` : ''}${extra}
+      <button class="gx-mini" data-action="dir-photo-pick" data-value="${esc(`${slot}>${key}`)}">${picking ? '닫기' : '고르기'}</button>
+    </div>`;
+  };
+  const mainWhy = p.photo ? '직접 고름' : main ? `자동: ${esc(main)}` : '「영문명_default」·「영문명」 이미지가 없어요';
+  const faceWhy = p.face ? '직접 고름' : cut ? '대표 사진에서 잘라요' : face ? `자동: ${esc(splitPic(face).name)}` : '「영문명」 이미지가 없어요';
+  const cropping = cut && dirUi.crop === key;
+  const cropBtn = cut ? `<button class="gx-mini" data-action="dir-crop" data-value="${esc(key)}">${cropping ? '완료' : '틀 맞추기'}</button>` : '';
+  const picking = dirUi.pick ? pickOf(dirUi.pick) : null;
+  const list = picking?.key === key ? `<div class="dir-ext"><input class="gx-search" data-input="dir-photo-q" value="${esc(dirUi.pickQ)}" placeholder="이미지 이름 검색" aria-label="이미지 이름 검색" autocomplete="off"><div class="dir-pics">${directoryPhotoList(ctx)}</div></div>` : '';
+  return `<div class="dir-in"><span>사진</span>
+    ${line('main', '대표', main, p.photo, mainWhy)}
+    ${line('face', '얼굴', face, p.face, faceWhy, cropBtn)}
+    ${cropping ? cropBox(ctx, key, main) : ''}
+    ${list}
+  </div>`;
+}
+
+/** 얼굴 틀 맞추기: 대표 사진 위 네모 틀을 끌어 옮기고, 아래 막대로 크기를 바꾼다 */
+function cropBox(ctx: ChatContext, key: string, main: string): string {
+  const url = imageUrl(ctx.char, main);
+  const [x, y, w] = cropValue(key);
+  return `<div class="dir-crop">
+    <div class="dir-crop-img" data-crop="${esc(key)}">${url ? `<img src="${esc(url)}" alt="" draggable="false"><span class="dir-crop-frame" style="left:${x}%;top:${y}%;width:${w}%"></span>` : ''}</div>
+    <label class="dir-crop-size"><span>크기</span><input type="range" min="10" max="100" step="1" value="${w}" data-input="dir-crop-size" data-key="${esc(key)}" aria-label="얼굴 틀 크기"></label>
+    <button class="gx-mini" data-action="dir-crop-reset" data-value="${esc(key)}">기본 틀로</button>
   </div>`;
 }
 
 /** 사진 고르기 목록 (검색어로 거르고, 영문명과 닮은 이름 먼저) */
 export function directoryPhotoList(ctx: ChatContext): string {
-  const p = dirUi.draft ? picOf(dirUi.draft, dirUi.pick) : null;
-  if (!p) return '';
+  const at = dirUi.pick ? pickOf(dirUi.pick) : null;
+  const p = at && dirUi.draft ? picOf(dirUi.draft, at.key) : null;
+  if (!at || !p) return '';
+  const cur = at.slot === 'face' ? p.face : p.photo;
   const q = dirUi.pickQ.trim().toLowerCase();
   const near = p.english.toLowerCase();
   // 모듈까지 수천 장이라 한 번에 30장만 그린다. 검색어가 없으면 영문명으로 시작하는 것(표정 세트)만
@@ -217,7 +270,7 @@ export function directoryPhotoList(ctx: ChatContext): string {
   return list.slice(0, 30)
     .map((n) => {
       const url = imageUrl(ctx.char, n);
-      return `<button class="dir-pic${p.photo === n ? ' on' : ''}" data-action="dir-photo-set" data-value="${esc(`${n}|${dirUi.pick}`)}" title="${esc(n)}"><span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : ''}</span><small>${esc(n)}</small></button>`;
+      return `<button class="dir-pic${cur === n ? ' on' : ''}" data-action="dir-photo-set" data-value="${esc(`${n}|${dirUi.pick}`)}" title="${esc(n)}"><span class="dir-pic-img">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : ''}</span><small>${esc(n)}</small></button>`;
     })
     .join('') + more;
 }
@@ -232,7 +285,7 @@ function placePanel(p: PlaceRow, ctx: ChatContext): string {
     ${input(k('label'), p.label, '표시 이름', '상황판과 지도에 보이는 이름')}
     ${input(k('english'), p.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
     ${input(k('aliases'), p.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
-    ${photoBlock(p.lore, ctx, '위키 문서 정보표에 나와요')}
+    ${photoBlock(p.lore, ctx)}
     <p class="gx-muted">로어북: ${esc(p.lore)}${p.inFolder ? '' : ' (폴더 밖)'}</p>
     ${p.inFolder ? '' : `<button class="gx-mini danger" data-action="dir-ext-del" data-value="${esc(p.lore)}">후보 목록에서 빼기</button>`}
   </div>`;
@@ -254,7 +307,7 @@ function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
       ${input(k('department'), a.department, '부서')}
     </div>
     ${input(k('english'), a.english, '영문명', '영어 응답에서도 이 이름을 알아봐요')}
-    ${photoBlock(a.lore, ctx, '요원 사진과 위키 문서 정보표에 나와요')}
+    ${photoBlock(a.lore, ctx)}
     ${input(k('aliases'), a.aliases.join(', '), '별칭', '쉼표로 나눠 적어요')}
     <p class="gx-muted">로어북: ${esc(a.lore)} · ID ${esc(a.id)}${a.inFolder ? '' : ' (폴더 밖)'}</p>
   </div>`;
@@ -313,7 +366,7 @@ function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
   const members = d.agents.filter((a) => a.affiliation === orgAffiliation(o));
   return `<div class="dir-panel">
     ${input(`org:english|${o.name}`, o.spec.english ?? '', '영문명')}
-    ${photoBlock(`org:${o.name}`, ctx, '시작 화면과 위키 문서 정보표에 나와요')}
+    ${photoBlock(`org:${o.name}`, ctx)}
     ${factionBlock(o, ctx)}
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip('dir-org-toggle', `rosterFor|${f}|${o.name}`, names[f], o.rosterFor.includes(f))).join('')}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs.map((t) => chip('dir-org-toggle', `phoneTabs|${t.id}|${o.name}`, t.name || t.id, o.phoneTabs.includes(t.id))).join('')}</div></div>
@@ -432,7 +485,7 @@ function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<str
   const sub = [a.affiliation ? orgName(d, names, a.affiliation) : '', a.rank, a.department].filter(Boolean).join(' · ');
   return `<div class="dir-row${open ? ' open' : ''}">
     <button class="dir-head" data-action="dir-open" data-value="${esc(a.lore)}" aria-expanded="${open}">
-      ${avatar(ctx.char, a.photo || a.english, a.name)}
+      ${picAvatar(ctx.char, facePic(ctx.char, a, true), a.name)}
       <span class="dir-name"><b>${esc(a.name)}</b><small>${esc(sub || '소속 미정')}</small></span>
       ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? '' : '<span class="gx-badge">목록 숨김</span>'}
     </button>${open ? agentPanel(a, ctx, d) : ''}</div>`;
@@ -870,13 +923,22 @@ export async function handleDirectory(action: string, value: string | undefined,
       break;
     case 'dir-photo-set': {
       const at = v.indexOf('|');
-      const p = picOf(d, v.slice(at + 1));
+      const { slot, key } = pickOf(v.slice(at + 1));
+      const p = picOf(d, key);
       if (!p) break;
-      p.set(at > 0 ? v.slice(0, at) : '');
+      p.set(slot, at > 0 ? v.slice(0, at) : '');
       dirUi.pick = '';
       dirUi.done = '';
       break;
     }
+    case 'dir-crop':
+      dirUi.crop = dirUi.crop === v ? '' : v;
+      dirUi.pick = '';
+      break;
+    case 'dir-crop-reset':
+      picOf(d, v)?.set('crop', '');
+      dirUi.done = '';
+      break;
     case 'dir-ext-close':
       dirUi.adding = false;
       break;

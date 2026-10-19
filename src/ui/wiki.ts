@@ -17,9 +17,9 @@ import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
-import { imageUrl } from './images';
+import { factionPic, imageUrl } from './images';
 import { readDirectory } from '../core/world/directory';
-import { moduleAssetStamp, pictureName } from '../host/assets';
+import { facePic, mainPic, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
 import { lastStatusFields } from '../core/world/tags';
@@ -205,8 +205,10 @@ interface Entry {
   /** 위키 문서 제목 (정식 이름) */
   title: string;
   sub: string;
-  /** 사진 에셋 이름 */
+  /** 대표 사진 (문서 정보표) */
   photo: string;
+  /** 얼굴 사진 (목록·카드·분류 타일) */
+  face: string;
   terms: string[];
 }
 
@@ -220,24 +222,19 @@ function entries(ctx: ChatContext): Entry[] {
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
   for (const [cat, rows] of [['an', dir.anomalies], ['ms', dir.sites]] as const) {
-    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: pictureName(ctx.char, p.photo, p.english), terms: [p.label, p.english, ...p.aliases] });
+    for (const p of rows) list.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: mainPic(ctx.char, p), face: facePic(ctx.char, p), terms: [p.label, p.english, ...p.aliases] });
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
-      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: '', terms: [l.name, l.english, ...l.aliases] });
+      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: '', face: '', terms: [l.name, l.english, ...l.aliases] });
     }
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */
   }
-  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: pictureName(ctx.char, a.photo, a.english), terms: [a.name, a.english, ...a.aliases] });
-  // 조직: 명부에서 고른 사진 → 영문명 그림 → 시작 화면 기본 사진(f01~f05)
-  const orgPic = (f: { code: string; affiliation: string; photo?: string }) => {
-    const o = dir.orgs.find((x) => (x.faction ? x.faction === f.code : x.name === f.affiliation));
-    return pictureName(ctx.char, o?.spec.photo, o?.spec.english ?? '', f.photo ?? '');
-  };
+  for (const a of dir.agents) list.push({ cat: 'ag', name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(' · ') || a.english, photo: mainPic(ctx.char, a), face: facePic(ctx.char, a, true), terms: [a.name, a.english, ...a.aliases] });
   for (const f of factionList(ctx.char.globalLore)) {
     if (f.hidden) continue;
-    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: orgPic(f), terms: [f.name, f.affiliation, f.english ?? ''] });
+    list.push({ cat: 'org', name: f.name, title: c(f.name), sub: f.affiliation && f.affiliation !== f.name ? f.affiliation : '', photo: factionPic(ctx.char, f), face: factionPic(ctx.char, f, 'face'), terms: [f.name, f.affiliation, f.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();
@@ -292,7 +289,7 @@ function similar(q: string, titles: string[]): string[] {
 
 /** 사진(카드 에셋) 또는 분류 아이콘 */
 function face(ctx: ChatContext, e: Entry | undefined, cls = ''): string {
-  const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
+  const url = e?.face ? imageUrl(ctx.char, e.face) : null;
   return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
 }
 
@@ -435,7 +432,7 @@ function homeView(ctx: ChatContext): string {
   const c = canon(ctx);
   const card = (title: string, sub: string) => {
     const e = entryFor(ctx, title);
-    const url = e?.photo ? imageUrl(ctx.char, e.photo) : null;
+    const url = e?.face ? imageUrl(ctx.char, e.face) : null;
     const none = !saved.has(title);
     return `<button class="nw-card${none ? ' none' : ''}" data-action="wiki-pick" data-value="${esc(title)}">
       <span class="nw-card-img${e ? ` k-${e.cat}` : ''}">${url ? `<img src="${esc(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
@@ -468,7 +465,7 @@ function homeView(ctx: ChatContext): string {
     .map(([t, label]) => {
       const list = docs.filter((d) => inTab(ctx, d, t));
       if (!list.length) return '';
-      const pics = list.map((d) => entryFor(ctx, d.title)?.photo).filter((x): x is string => !!x).slice(0, 4)
+      const pics = list.map((d) => entryFor(ctx, d.title)?.face).filter((x): x is string => !!x).slice(0, 4)
         .map((ph) => imageUrl(ctx.char, ph)).filter(Boolean)
         .map((u) => `<img src="${esc(u!)}" alt="" loading="lazy">`).join('');
       return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === 'an' ? CAT_ICON.an : t === 'ms' ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list.length}개</small></button>`;

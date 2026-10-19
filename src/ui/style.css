@@ -1782,3 +1782,15 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-tool:hover, .dir-tool.on { border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
 .dir-help { padding-top: 10px; }
 @media (max-width: 760px) { .dir-tools { justify-content: flex-end; } }
+/* 명부 사진 칸: 대표·얼굴 두 줄 + 얼굴 틀 맞추기 */
+.dir-in > .dir-photo + .dir-photo { margin-top: 2px; }
+.dir-in .dir-photo { flex-wrap: wrap; }
+.dir-in .dir-photo-name { min-width: 120px; }
+.dir-crop { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); }
+.dir-crop-img { position: relative; align-self: center; max-width: 100%; touch-action: none; cursor: crosshair; user-select: none; }
+.dir-crop-img img { display: block; max-width: 100%; max-height: 360px; border-radius: 8px; pointer-events: none; }
+.dir-crop-frame { position: absolute; aspect-ratio: 1; transform: translate(-50%, -50%); border: 2px solid var(--signal); border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, .45); pointer-events: none; }
+.dir-crop-img { overflow: hidden; border-radius: 8px; }
+.dir-crop-size { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); }
+.dir-crop-size input { flex: 1; accent-color: var(--signal); }
+.dir-crop > .gx-mini { align-self: flex-start; }

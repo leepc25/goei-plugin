@@ -61,29 +61,84 @@ export function loadModuleAssets(): Promise<boolean> {
 /** 모듈 에셋 목록을 언제 읽었는지 (목록 캐시 무효화용) */
 export const moduleAssetStamp = () => modVer;
 
+// 모듈 에셋은 수천 장이라 이름 → 줄 색인을 둔다 (그대로·소문자). 목록이 바뀌면 다시 만든다
+let modIndex: { exact: Map<string, Row>; lower: Map<string, Row> } | null = null;
+let modIndexVer = -1;
+function modRow(name: string): Row | undefined {
+  if (!modIndex || modIndexVer !== modVer) {
+    modIndex = { exact: new Map(), lower: new Map() };
+    for (const r of modRows) {
+      if (!modIndex.exact.has(r[0])) modIndex.exact.set(r[0], r);
+      if (!modIndex.lower.has(r[0].toLowerCase())) modIndex.lower.set(r[0].toLowerCase(), r);
+    }
+    modIndexVer = modVer;
+  }
+  return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
+}
+
 /** 카드 에셋 → 모듈 에셋 순으로 그 이름(대소문자 무시)의 줄 */
 function findRow(char: CharacterSnapshot, name: string): Row | undefined {
   const lower = name.toLowerCase();
   const card = ((char.additionalAssets ?? []) as unknown[]).filter(isRow);
-  return card.find((a) => a[0] === name) ?? card.find((a) => a[0].toLowerCase() === lower) ?? modRows.find((a) => a[0] === name) ?? modRows.find((a) => a[0].toLowerCase() === lower);
+  return card.find((a) => a[0] === name) ?? card.find((a) => a[0].toLowerCase() === lower) ?? modRow(name);
 }
 
-/** 사진으로 고를 수 있는 에셋 이름 (카드 → 모듈, 지도·세력 기본 그림 빼고) */
+/** 사진으로 고를 수 있는 에셋 이름 (카드 → 모듈, 지도 그림 빼고) */
 export function assetNames(char: CharacterSnapshot): string[] {
   const card = ((char.additionalAssets ?? []) as unknown[]).filter(isRow);
-  return [...new Set([...card, ...modRows].map((r) => r[0]))].filter((n) => !/^(map\d+|f0\d)$/i.test(n));
+  return [...new Set([...card, ...modRows].map((r) => r[0]))].filter((n) => !/^map\d+$/i.test(n));
 }
 
-/** 괴이·특수·요원·조직 사진 이름 (넷 다 같은 규칙): 고른 사진 → 「영문명_default」 → 「영문명」 → 기본 그림(조직 f01~f05) */
-export function pictureName(char: CharacterSnapshot, photo: string | undefined, english: string, fallback = ''): string {
-  if (photo) return photo;
-  if (english && hasAsset(char, `${english}_default`)) return `${english}_default`;
-  if (english && hasAsset(char, english)) return english;
-  return fallback || english;
+/** 사진을 찾을 재료 (괴이·특수·요원·조직 공통): 명부에서 고른 얼굴·대표 사진과 영문명 */
+export interface PicSource {
+  face?: string;
+  photo?: string;
+  english?: string;
+  /** 대표 사진에서 얼굴로 자를 틀 「가로,세로,크기」 (%) */
+  crop?: string;
+}
+
+/** 얼굴 틀을 따로 맞추지 않은 요원: 카우보이샷의 위쪽 가운데 */
+export const DEFAULT_CROP = '50,19,40';
+
+/** 「가로,세로,크기」(%) → 틀 중심(가로·세로)과 한 변(그림 너비 대비). 잘못된 값은 null */
+export function parseCrop(s: string | undefined): [number, number, number] | null {
+  const n = String(s ?? '').split(',').map(Number);
+  if (n.length !== 3 || n.some((x) => !Number.isFinite(x))) return null;
+  const c = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
+  return [c(n[0], 0, 100), c(n[1], 0, 100), c(n[2], 5, 100)];
+}
+
+/** 사진 이름 「이름#가로,세로,크기」 → 에셋 이름과 자를 틀 */
+export function splitPic(pic: string): { name: string; crop: [number, number, number] | null } {
+  const at = pic.lastIndexOf('#');
+  const crop = at > 0 ? parseCrop(pic.slice(at + 1)) : null;
+  return crop ? { name: pic.slice(0, at), crop } : { name: pic, crop: null };
+}
+
+/** 대표 사진 (위키 문서 정보표·시작 화면 세력 카드·ID카드 배경): 고른 대표 → 「영문명_default」 → 「영문명」 */
+export function mainPic(char: CharacterSnapshot, p: PicSource): string {
+  const en = p.english ?? '';
+  if (p.photo) return p.photo;
+  if (en && hasAsset(char, `${en}_default`)) return `${en}_default`;
+  if (en && hasAsset(char, en)) return en;
+  return '';
+}
+
+/**
+ * 얼굴 사진 (요원 카드·명부 목록·위키 목록·괴담톡): 고른 얼굴 → 「영문명」 → 대표 사진에서 얼굴 틀만큼 자른 것.
+ * 틀은 명부에서 맞춘 값, 없으면 사람(요원)만 기본 틀. 사람이 아니면 대표 사진을 그대로 쓴다
+ */
+export function facePic(char: CharacterSnapshot, p: PicSource, person = false): string {
+  if (p.face) return p.face;
+  if (p.english && hasAsset(char, p.english)) return p.english;
+  const main = mainPic(char, p);
+  const crop = parseCrop(p.crop) ?? (person ? parseCrop(DEFAULT_CROP) : null);
+  return main && crop ? `${main}#${crop.join(',')}` : main;
 }
 
 /** 그 이름의 에셋이 카드나 에셋 모듈에 있는지 */
-export const hasAsset = (char: CharacterSnapshot, name: string): boolean => !!name && !!findRow(char, name);
+export const hasAsset = (char: CharacterSnapshot, name: string): boolean => !!name && !!findRow(char, splitPic(name).name);
 
 /** 이름으로 캐릭터(없으면 에셋 모듈) 에셋 URL. 없거나 못 읽으면 null */
 export function assetUrl(char: CharacterSnapshot, name: string): Promise<string | null> {

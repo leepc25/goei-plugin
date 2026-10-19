@@ -22,8 +22,12 @@ export interface PlaceRow {
   /** 무작위 발생 후보(프리셋 노출) */
   preset: boolean;
   inFolder: boolean;
-  /** 위키 사진 에셋 이름 (비우면 영문명으로 찾는다) */
+  /** 대표 사진 에셋 이름 (비우면 「영문명_default」 → 「영문명」) */
   photo?: string;
+  /** 얼굴 사진 에셋 이름 (비우면 「영문명」 → 대표 사진) */
+  face?: string;
+  /** 대표 사진에서 얼굴로 자를 틀 「가로,세로,크기」 (%) */
+  crop?: string;
 }
 
 export interface AgentRow {
@@ -44,8 +48,12 @@ export interface AgentRow {
   /** 폴더 안 구분선 이름 (예: 관리국). 조직을 짐작할 때 참고만 한다. 없으면 '' */
   group: string;
   inFolder: boolean;
-  /** 사진 에셋 이름 (비우면 영문명으로 찾는다) */
+  /** 대표 사진 에셋 이름 (비우면 「영문명_default」 → 「영문명」) */
   photo?: string;
+  /** 얼굴 사진 에셋 이름 (비우면 「영문명」 → 대표 사진) */
+  face?: string;
+  /** 대표 사진에서 얼굴로 자를 틀 「가로,세로,크기」 (%) */
+  crop?: string;
 }
 
 /** 지도 거점. 조직의 본거지이거나(org) 조직과 무관한 장소(org = '') */
@@ -108,6 +116,8 @@ export interface PlaceData {
   english?: string;
   aliases?: string[];
   photo?: string;
+  face?: string;
+  crop?: string;
 }
 export interface AgentData {
   id?: string;
@@ -121,6 +131,8 @@ export interface AgentData {
   roster_for?: string[];
   phone_tabs?: string[];
   photo?: string;
+  face?: string;
+  crop?: string;
 }
 export interface BaseData {
   label?: string;
@@ -423,7 +435,7 @@ function orgDefaults(code: string, tabs: TabInfo[]): { rosterFor: string[]; phon
   return { rosterFor: ['D00', 'E00'], phoneTabs: open ? [open.id] : [] };
 }
 
-// 조직 영문명 기본값 (📜Faction·조직 로어북에 쓰인 영어 이름). 위키 사진은 「영문명_default」 → 「영문명」 순으로 찾는다
+// 조직 영문명 기본값 (📜Faction·조직 로어북에 쓰인 영어 이름). 사진은 host/assets.ts mainPic·facePic
 const ORG_ENGLISH: Record<string, string> = {
   A00: 'Management Bureau', B00: 'Fake Management Bureau', C00: 'Baekilmong', D00: 'Civilian', E00: 'Freelancer',
   특수재난대응협회: 'Special Disaster Response Association', '중림 지하상가': 'Jungnim Underground Shopping Center', 교황청: 'Vatican',
@@ -542,6 +554,8 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
       english: typeof d.english === 'string' ? s(d.english) : base.english,
       aliases: Array.isArray(d.aliases) ? list(d.aliases) : base.aliases,
       ...(s(d.photo) ? { photo: s(d.photo) } : {}),
+      ...(s(d.face) ? { face: s(d.face) } : {}),
+      ...(s(d.crop) ? { crop: s(d.crop) } : {}),
     });
     for (const e of folder) {
       const name = s(e.comment);
@@ -589,6 +603,8 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
       rank: typeof d.rank === 'string' ? s(d.rank) : base.rank,
       department: typeof d.department === 'string' ? s(d.department) : base.department,
       ...(s(d.photo) ? { photo: s(d.photo) } : {}),
+      ...(s(d.face) ? { face: s(d.face) } : {}),
+      ...(s(d.crop) ? { crop: s(d.crop) } : {}),
       rosterFor: Array.isArray(d.roster_for) ? list(d.roster_for) : base.rosterFor,
       phoneTabs: Array.isArray(d.phone_tabs) ? list(d.phone_tabs) : base.phoneTabs,
     });
@@ -680,7 +696,7 @@ export function rosterOf(dir: Directory): Record<string, unknown>[] {
 
 /** 지금 명부 전체를 저장 형식으로 (창에서 고친 값 포함) */
 export function directoryData(dir: Directory): DirectoryData {
-  const place = (p: PlaceRow): PlaceData => ({ preset: p.preset, label: p.label, english: p.english, aliases: p.aliases, ...(p.photo ? { photo: p.photo } : {}) });
+  const place = (p: PlaceRow): PlaceData => ({ preset: p.preset, label: p.label, english: p.english, aliases: p.aliases, ...(p.photo ? { photo: p.photo } : {}), ...(p.face ? { face: p.face } : {}), ...(p.crop ? { crop: p.crop } : {}) });
   const out: DirectoryData = { schema: DIRECTORY_SCHEMA, refill: dir.refill, 괴이: {}, '미스틱 사이트': {}, 요원: {}, 조직: {} };
   for (const o of dir.orgs) out.조직![o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
   const used = [...new Set([...dir.usedCodes, ...dir.orgs.map((o) => (o.faction ? '' : o.spec.code ?? ''))])].filter((c) => c && !BUILTIN.includes(c)).sort();
@@ -708,6 +724,8 @@ export function directoryData(dir: Directory): DirectoryData {
     };
     if (a.legacyEnglish.length) d.legacy_english = a.legacyEnglish;
     if (a.photo) d.photo = a.photo;
+    if (a.face) d.face = a.face;
+    if (a.crop) d.crop = a.crop;
     out.요원![a.lore] = d;
   }
   return out;

@@ -2177,4 +2177,64 @@ if (fixture.globalLore.some(packed)) {
   console.log('PASS 위키 모듈 사진, 저장 전 새 거점 지도 표시, 괴이 사진 고르기');
 }
 
+// 17d) 얼굴 사진: 「영문명」 그림이 없으면 대표(「영문명_default」)에서 얼굴 틀만큼 잘라 쓴다. 명부에서 틀을 맞추면 저장된다
+if (fixture.globalLore.some(packed)) {
+  for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
+    const mobile = vp.width < 760;
+    const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, vp);
+    await startedWithReply(page);
+    // 픽스처 옆에 face-test.avif(카우보이샷)가 있으면 그것을, 없으면 세로 그림을 만들어 쓴다
+    const real = await page.evaluate(() => window.__readAsset('face-test.avif'));
+    await page.evaluate(async (real) => {
+      if (!real) {
+        const c = Object.assign(document.createElement('canvas'), { width: 200, height: 300 });
+        const g = c.getContext('2d');
+        g.fillStyle = '#ccc'; g.fillRect(0, 0, 200, 300);
+        g.fillStyle = '#c33'; g.beginPath(); g.arc(100, 60, 30, 0, 7); g.fill();
+        const b = await new Promise((r) => c.toBlob(r, 'image/png'));
+        window.__assets['face-test.avif'] = new Uint8Array(await b.arrayBuffer());
+      }
+      window.__char.additionalAssets = window.__char.additionalAssets.filter((a) => a[0] !== 'Lee Do-hyeong');
+      window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'face-test.avif', 'avif']] }];
+    }, real);
+    await open(page);
+    await page.locator('[data-action="tab"][data-value="settings"]:visible').first().click();
+    await page.click('[data-action="set-scope"][data-value="card"]');
+    await page.click('[data-action="dir-kind"][data-value="agent"]');
+    const row = page.locator('.dir-row', { has: page.locator('.dir-name b', { hasText: '이도형' }) });
+    await row.locator('.dir-head').click();
+    await page.waitForSelector('.dir-photo-name small:has-text("대표 사진에서 잘라요")');
+    await page.click('[data-action="dir-crop"]');
+    await page.waitForSelector('[data-crop] img');
+    const box = await page.locator('[data-crop] img').boundingBox();
+    // 틀을 오른쪽 아래로 끌어 옮긴다
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.3, { steps: 4 });
+    await page.mouse.up();
+    await page.waitForTimeout(400);
+    if (shots) await page.locator('.dir-crop').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/17d-face-crop-${mobile ? 'm' : 'pc'}.png` });
+    // 요원 목록 줄 아바타도 잘린 얼굴
+    assert.ok(await row.locator('.dir-head .gx-ava img').count(), '목록 줄에 얼굴');
+    const size = await row.locator('.dir-head .gx-ava img').evaluate((im) => [im.naturalWidth, im.naturalHeight]);
+    assert.equal(size[0], size[1], `얼굴은 네모로 잘림 (${size})`);
+    if (!mobile) {
+      await page.click('.dir-bar [data-value="save"]');
+      await page.click('[data-action="dir-save"]');
+      await page.waitForFunction(() => window.__calls.setChar >= 1);
+      const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
+      const saved = Object.values(book.요원).find((a) => a.english === 'Lee Do-hyeong');
+      const [x, y] = saved.crop.split(',').map(Number);
+      assert.ok(x > 55 && y > 25, `틀 위치 저장 (${saved.crop})`);
+      // 상황판 요원 카드도 얼굴 사진
+      await page.click('[data-action="tab"][data-value="board"] >> nth=0');
+      await page.waitForTimeout(500);
+      if (shots) await page.screenshot({ path: `${shots}/17d-board-pc.png` });
+    }
+    assert.deepEqual(errors, []);
+    await page.close();
+  }
+  console.log('PASS 얼굴 사진: 대표 사진에서 자르기, 틀 맞추기 저장');
+}
+
 await browser.close();
