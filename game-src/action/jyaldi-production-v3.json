@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "status": "planning-not-implemented",
+  "status": "normal-body-integrated-core-animation-partial",
   "supersedes": "slender 160px production target",
   "nativeHeight": 128,
   "displayScale": 2,
@@ -769,5 +769,27 @@
     "display": "release/demo/samples/jyaldi-normal-2x.png",
     "status": "candidate",
     "notes": "일반 체형 첫 샘플에서 하체 폭 감소, 흉곽/복부/팔 보강, 양손 소폭 확대를 이미지 편집으로 반영한 단일 포즈. 애니메이션 구현 아님."
-  }
+  },
+  "implementation": {
+    "playable": "release/demo/goei-jyaldi-normal.html",
+    "atlas": "game-pack/action/atlas.json",
+    "layout": "game-src/action/normal-v3/layout.json",
+    "runtimeProfile": "normal-v3",
+    "packedFrameCount": 163,
+    "walk": 12,
+    "run": 12,
+    "melee": [
+      10,
+      12,
+      16
+    ],
+    "shot": 6,
+    "skill": 14,
+    "ultimateBody": 24,
+    "ultimateCutin": 12,
+    "dash": 16,
+    "fullRequiredSetCompleted": false,
+    "remaining": "시작/정지/반전/뒤걸음, 상세 가드/피격/기상, 점프 추가 중간 그림, 무장 전환 등"
+  },
+  "implementationSupersededBy": "game-src/action/jyaldi-production-v4.json"
 }

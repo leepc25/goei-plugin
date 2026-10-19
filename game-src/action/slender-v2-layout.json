@@ -1,0 +1,221 @@
+{
+  "version": 2,
+  "frameCount": 43,
+  "sheets": [
+    {
+      "file": "motions/walk-contact.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "1d417a8784fd6669bc178bce1ad62ef189ae11bef70d43ebc96643e8150ae07b",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.22535211267605634
+    },
+    {
+      "file": "motions/walk-passing.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "78fa399ac4c273cf76c6be3dfdae692f93eb03a858fb450906467af9f08ae8e6",
+      "count": 2,
+      "cols": 2,
+      "scale": 0.11204481792717087
+    },
+    {
+      "file": "motions/walk-opposite.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "deac4e7a8f06f22da577957ce6b2c3b40847e539543bb84a28a519c6691aea90",
+      "count": 1,
+      "cols": 1,
+      "scale": 0.1111111111111111
+    },
+    {
+      "file": "motions/run.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "d30cfea70990caeb0b043389239695c712beb01abd89f55d04244102b26c5b49",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.21476510067114093
+    },
+    {
+      "file": "motions/melee1.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "d157d8f40a0c22c9cbc1774255523a542e2ee83f8f1fc05f9d8dfbade197daff",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.21333333333333335
+    },
+    {
+      "file": "motions/melee2.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "29aceaa93ece5b34128de1132003dcfd4144382efff637409dc3a3e0e4e05cfc",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.21333333333333335
+    },
+    {
+      "file": "motions/melee3.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "639d50b51c3c5153ac0e0d81661abc8890fb4605ddcdd76dd842cd7d72e55657",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.2222222222222222
+    },
+    {
+      "file": "motions/shot.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "c03d0d198459a049ce4ffbf9aecba5b129bbe7c34360c47b6ec747655e35d42e",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.21621621621621623
+    },
+    {
+      "file": "motions/defence.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "701779d7a20f842a3b2e1a6596049178689a2a115bdba4e4fc0a54016cd4bb64",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.2
+    },
+    {
+      "file": "motions/jump.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "177ceedb920fd639df5ccf1b96eeca6380daf09d49bc61b6a74a7b78f78844ed",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.2
+    },
+    {
+      "file": "motions/reaction.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "f349a2e9154dc02066d627736a1199b643f2a59f869184c7e659596d36b4102e",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.18604651162790697
+    },
+    {
+      "file": "motions/run-between.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "23ae8793e86bfdbd4bc22be3690904e531cbba2603fd9d18d0550ed40b00c532",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.21476510067114093
+    }
+  ],
+  "clips": {
+    "walk": [
+      0,
+      1,
+      4,
+      6,
+      3,
+      5
+    ],
+    "run": [
+      7,
+      39,
+      8,
+      40,
+      9,
+      41,
+      10,
+      42
+    ],
+    "melee1": [
+      11,
+      12,
+      13,
+      14
+    ],
+    "melee2": [
+      15,
+      16,
+      17,
+      18
+    ],
+    "melee3": [
+      19,
+      20,
+      21,
+      22
+    ],
+    "shot": [
+      23,
+      24,
+      25,
+      26
+    ],
+    "idle": [
+      27,
+      28
+    ],
+    "guard": [
+      29
+    ],
+    "crouch": [
+      30
+    ],
+    "jump_up": [
+      31
+    ],
+    "jump_apex": [
+      32
+    ],
+    "jump_down": [
+      33
+    ],
+    "land": [
+      34
+    ],
+    "dash": [
+      8,
+      10
+    ],
+    "hurt": [
+      35
+    ],
+    "down": [
+      36,
+      37
+    ],
+    "rise": [
+      38
+    ]
+  },
+  "masterSha256": "90cab2f9f9363c081b88a21ff4f05c3aed247b7f6dc173c067795a05000e5b40",
+  "visualReview": "2026-10-19: new sources + 160px runtime contact sheet reviewed against master. Narrow adult silhouette across locomotion/combat/defence/reactions; floor contacts and naturally shorter crouch/down retained. Old rejected SD sheets excluded. No per-frame body stretching.",
+  "releaseReady": true
+}

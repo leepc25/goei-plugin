@@ -9,10 +9,15 @@ export const PACK_ID = 'patrol';
 export type Frame = [number, number, number, number, number, number, number] | null;
 
 export interface ActionAtlas {
+  profile?: string;
+  nativeHeight?: number;
+  displayHeight?: number;
+  source?: string;
   frames: Frame[];
   clips: Record<string, number[]>;
   scale: number;
-  contacts?: [number,number][][];
+  contacts?: [number, number][][];
+  frameTimes?: Record<string, number[]>;
 }
 export type Atlas = Record<AgentId | EnemyId, Frame[]> & { action?: ActionAtlas };
 
@@ -71,14 +76,24 @@ export function parsePack(b: Uint8Array, required: readonly string[] = PACK_FILE
       atlas: unknown;
       files: unknown;
     };
-    if (typeof head.id !== 'string' || typeof head.version !== 'number' || !head.atlas || !Array.isArray(head.files))
+    if (
+      typeof head.id !== 'string' ||
+      typeof head.version !== 'number' ||
+      !head.atlas ||
+      !Array.isArray(head.files)
+    )
       return null;
     const base = 12 + len;
     const files = new Map<string, Uint8Array>();
     for (const row of head.files as unknown[]) {
       if (!Array.isArray(row)) return null;
       const [name, at, n] = row as [unknown, unknown, unknown];
-      if (typeof name !== 'string' || typeof at !== 'number' || typeof n !== 'number' || base + at + n > b.length)
+      if (
+        typeof name !== 'string' ||
+        typeof at !== 'number' ||
+        typeof n !== 'number' ||
+        base + at + n > b.length
+      )
         return null;
       files.set(name, b.slice(base + at, base + at + n));
     }

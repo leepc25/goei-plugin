@@ -1,0 +1,806 @@
+{
+  "version": 3,
+  "profile": "normal-v3",
+  "frameCount": 162,
+  "sheets": [
+    {
+      "file": "normal-v3/motions/walk-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "79e16492d2bdbd0d8e4d0f076a4f0c1a2d1adf77f0d726f0ee1a971a0c5e9d16",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "86496be6a99aa10e138cd03d105b56199a11525264b0a82abd46d0d97365a52f"
+    },
+    {
+      "file": "normal-v3/motions/walk-b.webp",
+      "size": [
+        1051,
+        1497
+      ],
+      "sha256": "e5a5f7a79539bd5f1d5b3a9b4b8bc61a4099ba6ff8f7ec5f5fd4d9e1362068a3",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.18028169014084508,
+      "originalPngSha256": "a02987cfb106feae608b50e26f9c98796af674e2f1970a66babd33242e44a8c7"
+    },
+    {
+      "file": "normal-v3/motions/walk-c.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "865b0f594c331a306e305296fae089ded4457fab75c1d62703fba91c7779adc3",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.18028169014084508,
+      "originalPngSha256": "c6b1fe374b30a64d0fde30b19e6a316eef298deff7206428edc716ed5ec1794b"
+    },
+    {
+      "file": "normal-v3/motions/run-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "aef3e87a8cbe07e0ebdd114b64c3437183ad496371bf00de13f9103f57574f28",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17297297297297298,
+      "anchorLift": [
+        0,
+        0,
+        0,
+        4
+      ],
+      "originalPngSha256": "5e11602a0992252e8aed15046180add12988e765f0cb4a3c8c92eb4ecc16d6a6"
+    },
+    {
+      "file": "normal-v3/motions/run-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "461d3cb3439b9a785077b40dccdf193a2c9daf4efb15aa97b11db95a998b24de",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17297297297297298,
+      "anchorLift": [
+        36,
+        0,
+        0,
+        0
+      ],
+      "originalPngSha256": "757b291f5835136b5a4fa65080f278937d5aa3f61979fbedb09c302801537b16"
+    },
+    {
+      "file": "normal-v3/motions/run-c.webp",
+      "size": [
+        1065,
+        1477
+      ],
+      "sha256": "c7db2ef203f375103055e9a13252a26cb3e05eb02f145540a99060938a36caed",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17297297297297298,
+      "anchorLift": [
+        0,
+        0,
+        27,
+        0
+      ],
+      "originalPngSha256": "c9f6ab323fc13b69a02761a9b524e8ba2f4f4978642cd44b6e66916388165faa"
+    },
+    {
+      "file": "normal-v3/motions/m1-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "4918fa736a2b8321b0d309065689679a860f788cfc3af8297446f6c4ae7003d6",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "cabbd234a1f9d09a10ada1c2e1b52d0cfc88955dfcd356b0669eefce7b41227f"
+    },
+    {
+      "file": "normal-v3/motions/m1-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "0d8931c75ad0c1ed007094c779b69f259153a0c5f3a9b1bd2ffa52f9f727d368",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "a0f44965f90d6e7c0fae9241c2c1a446502933f5790b4cdbfc0156c6a66a8ef0"
+    },
+    {
+      "file": "normal-v3/motions/m1-c.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "16db9d4b4db4dfbafae338a500abaa57e0cc6f3018df597e83e7cc14b88b980c",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "36acdaaf352e5de5a541b5432b6f547ebb6c71bf7b05c7354753ffc54979a81a"
+    },
+    {
+      "file": "normal-v3/motions/m2-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "1662b7ad2054f21b4cc753d0e29dd1fd5b07b13ea22058cdaedd1083bd79a3e9",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "f98af02acfcca82b05505713b9d85c55547d6070c0edfc7802a5a78ab42da86b"
+    },
+    {
+      "file": "normal-v3/motions/m2-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "2f8c14a77f7bcc58d2d44d0df7ffb6585fefce8761079e6b576fcb7e5a5a7d8d",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "7cc780f249df1a87d8f8b2c2065e501f329e39c0d1a7117c1eb24147a1e0d58b"
+    },
+    {
+      "file": "normal-v3/motions/m2-c.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "a0737ae8f374e627a1d24b504d2160a8d972e1fb9a4253252b10dd8c3e792507",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "13ed14d070b439a0a5c9d597b495946cec0af6d9329d827e76ba3fa9e83274c0"
+    },
+    {
+      "file": "normal-v3/motions/m3-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "3b8aa2f00e08a0db4d07af7e4894ccd17563843e4e8826aac33762a414daa480",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "af95d0e8eb5e255667536d03874ec91f4d0829e463938af6514e8ef2a049b4ac"
+    },
+    {
+      "file": "normal-v3/motions/m3-b.webp",
+      "size": [
+        1073,
+        1466
+      ],
+      "sha256": "aa563a6bc74128cc5ee14f76d0f783598a467ee2b3fd0f5f78680278762f53ee",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "a95b01b74ceb6c19f6d4843686fcf9e575e48d30ec0098bafa9c4c25aa1ffd42"
+    },
+    {
+      "file": "normal-v3/motions/m3-c.webp",
+      "size": [
+        1086,
+        1448
+      ],
+      "sha256": "b31598d56b36cc11f9fe07be1b58de427aa3ffedafced13e289e9e63984d67e4",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "89694be9e861d17a30187c0c6e5e63e041303a2829ce9324379b1675133c8dec"
+    },
+    {
+      "file": "normal-v3/motions/m3-d.webp",
+      "size": [
+        1076,
+        1461
+      ],
+      "sha256": "811efe11effa495d2b5826e187edc8e5cbb70daa9dadaeaac473451e88071aae",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "c7dec41c5d338b2949f64fe53547c8f89494cdac7c37f95df833d3c0eb7432ef"
+    },
+    {
+      "file": "normal-v3/motions/shot-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "4213426a9394cf84f5b735f6118026129bfb8b75be803e11ce76f9b7640a5224",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "41c6919855bdf3f712acd04a93d510a641645f3fd7c6ea20fe6bc74efe93ed8c"
+    },
+    {
+      "file": "normal-v3/motions/shot-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "5e16f34fef134405190859f3d6a2cd38780bc4cd46fc2783dd4523771eed5e57",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "c8255027e88ecc43806c689962e1c8ebfd85b1202c8f2b0c6e858fa30b51b027"
+    },
+    {
+      "file": "normal-v3/motions/defence.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "da87afa2b5da11b7bd0cd53494a7e09bf48609b66235be9ea7ccd761b1d1a668",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "582751ec211bf80d1b8f7cedd7e4777809771f66b0f9c3c2e2c10f07f596ada7"
+    },
+    {
+      "file": "normal-v3/motions/jump-a.webp",
+      "size": [
+        1122,
+        1402
+      ],
+      "sha256": "9a42ea3c8636f7c8a5a084eb8c90bbf134548d562a1028e709fb27244a42478a",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.16,
+      "anchorLift": [
+        0,
+        8,
+        12,
+        37
+      ],
+      "originalPngSha256": "0372bdd24eccd28ad958d80ef1c09875a04450339989f5c1bd64e39dc555482a"
+    },
+    {
+      "file": "normal-v3/motions/jump-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "a905dcfe86c3f5e804ba596f51f2fe90c6fd96180915ee44ca07a556ce630fa3",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.16,
+      "originalPngSha256": "bda94f1810606ecac00eecf3e3292e68a3eb534347f3be9a0cffa643b5775c32"
+    },
+    {
+      "file": "normal-v3/motions/reaction.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "26255abec21d07c6480a7e4a22377d6f2b526772cf13da51ef683761afddae1f",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.16,
+      "originalPngSha256": "58e8d3c66486d5bccde88844a577e1284cebe7714de8424c6bf1d0befea505c0"
+    },
+    {
+      "file": "normal-v3/motions/ult-a.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b36dae89db71d285a162b7a41ea96c747490b1652ef841e30fda0f5faf52678c",
+      "count": 6,
+      "cols": 3,
+      "scale": 0.2612244897959184,
+      "originalPngSha256": "4ef0118b69c7ed094147d52976d35e0feedce344818e8078f240d3fc4a1d2da5"
+    },
+    {
+      "file": "normal-v3/motions/ult-b.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "657eee38845de6e260705152bdcb79632721944bf4f0afd0f71069aa5ebfc53f",
+      "count": 6,
+      "cols": 3,
+      "scale": 0.2612244897959184,
+      "originalPngSha256": "9e84e0523920ccb4624b4774ed1f4f77ab58ec6f0e3f71b1339ea5a9de346f63"
+    },
+    {
+      "file": "normal-v3/motions/ult-c.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "69eaa433d7e941ce5fabfaaa5f0ef77fc9624024a3d6eef68d19028458e95bf4",
+      "count": 6,
+      "cols": 3,
+      "scale": 0.2612244897959184,
+      "originalPngSha256": "49253f391aa06fb197f10b195d85312bb36b000c741f41052cae7a5056d5e9d2"
+    },
+    {
+      "file": "normal-v3/motions/ult-d.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "fcdcd733cf227fca27b9f1e9372e93df6471ec19c2c94b9ac18e1d49a72b0b2d",
+      "count": 6,
+      "cols": 3,
+      "scale": 0.2612244897959184,
+      "originalPngSha256": "6a44cb467ee70d1c2b6ab22a246d9528d1260709046dd6508d902b9080d0247a"
+    },
+    {
+      "file": "normal-v3/motions/skill-a.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "ea5423cae56c6b60b866a1ddad1d63a9ce514505d1e8aa557f91ac68a8e2d267",
+      "count": 6,
+      "cols": 3,
+      "scale": 0.2612244897959184,
+      "originalPngSha256": "3509e30e343e4e6c9115331c5cd60c7ebebba2f00c47a1f193c21dba16ec8b9a"
+    },
+    {
+      "file": "normal-v3/motions/skill-b.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "af5f728c6351ccbfbb36467653ea9af0e3eb61f4cd038a39f4e0aa9fe89c2260",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "170164df2901c9f0aa31af0b5337b580aa1cd3f116186793eeced453ab75ed14"
+    },
+    {
+      "file": "normal-v3/motions/skill-c.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "0ed44ccccbcb0313d964ca810f6487c4d971bb49ea70e2f8ea295938c1322b48",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "8dda3b5e4698e45a05e3701d5453e50e64df49d252956d96dfff7f6e237b1756"
+    },
+    {
+      "file": "normal-v3/motions/idle-a.webp",
+      "size": [
+        1073,
+        1466
+      ],
+      "sha256": "e061eac91d954e92f735ffc8c94f79d9ace17fa3cf8f8f8723101e6bf7373404",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "0883e648508007be0205f1b363bd3d290a6ae367c895643146dd09349029675e"
+    },
+    {
+      "file": "normal-v3/motions/idle-b.webp",
+      "size": [
+        1073,
+        1466
+      ],
+      "sha256": "1990fff875b48d8545670f0ffadf714b11300496cc135428232d14d8ca1a63b3",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "437a19e2c3353fac795adf08bdd91c71daaad3f44ac6e23efc0c3c25797c0974"
+    },
+    {
+      "file": "normal-v3/motions/dash-a.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "d20a3abe31d7bb46a0d7212c6aa82e3e2490d5533038a7918881ad2a981d1cc9",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.16623376623376623,
+      "originalPngSha256": "38af288761211f8f7a02b0518a28cccda2b4bad4d1e337eaa877df4068373b90"
+    },
+    {
+      "file": "normal-v3/motions/dash-b.webp",
+      "size": [
+        1069,
+        1471
+      ],
+      "sha256": "02a3269255dfbddfd9879b461a2768c2b319bb927eed7d6c99433280144995cf",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "cf094979e41c420f54d026450199fdaae2986529a31c4d0f1fb8383bbccd48c9"
+    },
+    {
+      "file": "normal-v3/motions/dash-c.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "6355a696dc4cb389a8168d33cddcf496e23ce7f78c3bd825a83593dddb870b79",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "7f810ad1a2aa80c140184e73eb5c1cad9c1db1c7d746abdf68483e5584a1b6a9"
+    },
+    {
+      "file": "normal-v3/motions/dash-d.webp",
+      "size": [
+        1086,
+        1448
+      ],
+      "sha256": "296ef4ffa53e25cdddf03290fc5957d5a4ebd98edf7b3f7a2d7db54037da9c85",
+      "count": 4,
+      "cols": 2,
+      "scale": 0.17777777777777778,
+      "originalPngSha256": "f4d1f9e299de0bd9117b32ef7c6cf8638e6b18ca719b7e8089fd8187a2906de4"
+    },
+    {
+      "file": "normal-v3/motions/cutin.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "b3b96a06078f4777584d5cd13f801c00bb7e30682a3af1e5dc0e6bd6168e4e1e",
+      "count": 12,
+      "cols": 3,
+      "scale": 0.5,
+      "portraitGrid": true,
+      "originalPngSha256": "a53e2d5f96ab6d7982ceb278abe9ad7fc5261bdbf0ec9de4e1b7ff25abe6bcc9"
+    }
+  ],
+  "clips": {
+    "walk": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "run": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "melee1": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "melee2": [
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47
+    ],
+    "melee3": [
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63
+    ],
+    "shot": [
+      66,
+      67,
+      68,
+      69,
+      70,
+      71
+    ],
+    "draw": [
+      64,
+      65,
+      66
+    ],
+    "guard": [
+      73
+    ],
+    "guard_hit": [
+      74
+    ],
+    "crouch": [
+      75
+    ],
+    "jump_up": [
+      76,
+      77,
+      78
+    ],
+    "jump_apex": [
+      79,
+      78,
+      80
+    ],
+    "jump_down": [
+      81
+    ],
+    "land": [
+      82,
+      83,
+      126
+    ],
+    "hurt": [
+      84
+    ],
+    "down": [
+      85,
+      86
+    ],
+    "rise": [
+      87,
+      82,
+      83,
+      126
+    ],
+    "skill": [
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125
+    ],
+    "ult": [
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
+    ],
+    "idle": [
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133
+    ],
+    "dash": [
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      146,
+      140,
+      141,
+      142,
+      143,
+      147,
+      144,
+      145,
+      148,
+      149
+    ],
+    "cutin": [
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161
+    ]
+  },
+  "frameTimes": {
+    "melee1": [
+      30,
+      30,
+      30,
+      20,
+      20,
+      34,
+      34,
+      34,
+      34,
+      34
+    ],
+    "melee2": [
+      33.333333333333336,
+      33.333333333333336,
+      33.333333333333336,
+      25,
+      25,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30
+    ],
+    "melee3": [
+      30,
+      30,
+      30,
+      30,
+      30,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5
+    ],
+    "shot": [
+      30,
+      20,
+      47.5,
+      47.5,
+      47.5,
+      47.5
+    ],
+    "skill": [
+      35,
+      35,
+      35,
+      35,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332,
+      38.57142857142857,
+      38.57142857142857,
+      38.57142857142857,
+      38.57142857142857,
+      38.57142857142857,
+      38.57142857142857,
+      38.57142857142857
+    ],
+    "ult": [
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      37.5,
+      30,
+      30,
+      30,
+      30,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40
+    ],
+    "dash": [
+      10,
+      10,
+      10,
+      10,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332,
+      23.333333333333332
+    ],
+    "land": [
+      70,
+      80,
+      70
+    ],
+    "rise": [
+      70,
+      90,
+      100,
+      90
+    ]
+  },
+  "background": "normal-v3/bureau-corridor.png",
+  "releaseReady": false,
+  "visualReview": "2026-10-19: normal-body source sheets and actual browser gameplay reviewed. Integer2x actors, larger doors/floor, 12-frame walk/run, 10/12/16 melee, independent skill/ultimate/cutin, airborne virtual-ground anchors. Not the full326 planned drawing set.",
+  "characterImagesRejected": true,
+  "existingCharacterImageReuseAllowed": false,
+  "rejectionReason": "2026-10-20 사용자 지시: 동작별 인물·체격 불일치. 기존 캐릭터 이미지 재활용 금지, 통일된 신규 기준으로 모든 동작·컷인 전면 재제작."
+}

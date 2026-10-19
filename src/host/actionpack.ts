@@ -4,8 +4,8 @@ import { parsePack, type GameArt } from '../game/assets';
 import { toBytes } from './assets';
 import { PackError } from './gamepack';
 export const ACTION_FILES = ['a-jyaldi-action', 'bg-bureau-action', 'e-corner', 'e-watchman'];
-const KEY = 'goei:game-pack:action',
-  VERSION = 2;
+const KEY = 'goei:game-pack:action-normal-v4',
+  VERSION = 4;
 interface Stored {
   version: number;
   atlas: GameArt['atlas'];
@@ -17,7 +17,10 @@ async function stored(): Promise<Stored | null> {
     const raw: unknown = await risuai.pluginStorage.getItem(KEY);
     if (typeof raw !== 'string') return null;
     const s = JSON.parse(raw) as Stored;
-    return s && s.version === VERSION && s.atlas?.action && ACTION_FILES.every((f) => typeof s.files?.[f] === 'string')
+    return s &&
+      s.version === VERSION &&
+      s.atlas?.action &&
+      ACTION_FILES.every((f) => typeof s.files?.[f] === 'string')
       ? s
       : null;
   } catch {
@@ -30,26 +33,39 @@ export async function actionPackState(): Promise<'none' | 'old' | 'ready'> {
 export async function installActionPack(bytes: Uint8Array) {
   const pack = parsePack(bytes, ACTION_FILES);
   if (!pack || pack.id !== 'action' || pack.version !== VERSION || !pack.atlas.action)
-    throw new PackError('1인 액션용 그림 팩이 아닙니다. goei-game-action.pack을 넣어 주세요.');
+    throw new PackError(
+      '1인 액션용 그림 팩이 아닙니다. goei-game-action-normal-v4.pack을 넣어 주세요.',
+    );
   const files: Record<string, string> = {};
   for (const [name, b] of pack.files) {
     let str = '';
-    for (let i = 0; i < b.length; i += 0x8000) str += String.fromCharCode(...b.subarray(i, i + 0x8000));
+    for (let i = 0; i < b.length; i += 0x8000)
+      str += String.fromCharCode(...b.subarray(i, i + 0x8000));
     files[name] = btoa(str);
   }
-  await risuai.pluginStorage.setItem(KEY, JSON.stringify({ version: VERSION, atlas: pack.atlas, files }));
+  await risuai.pluginStorage.setItem(
+    KEY,
+    JSON.stringify({ version: VERSION, atlas: pack.atlas, files }),
+  );
   loaded = null;
 }
 export async function downloadActionPack(): Promise<Uint8Array> {
-  const url = `${UPDATE_BASE}/goei-game-action.pack`;
+  const url = `${UPDATE_BASE}/goei-game-action-normal-v4.pack`;
   const legacy = (
     risuai as unknown as {
-      risuFetch?: (url: string, args: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown }>;
+      risuFetch?: (
+        url: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ ok: boolean; data: unknown }>;
     }
   ).risuFetch;
   if (legacy) {
     try {
-      const r = await legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true });
+      const r = await legacy(url, {
+        method: 'GET',
+        plainFetchForce: true,
+        rawResponse: true,
+      });
       const b = r.ok ? toBytes(r.data) : null;
       if (b && parsePack(b, ACTION_FILES)) return b;
     } catch {
@@ -65,13 +81,18 @@ export async function downloadActionPack(): Promise<Uint8Array> {
   } catch {
     /* 수동 설치 안내 */
   }
-  throw new PackError('새 액션 그림을 받지 못했어요. goei-game-action.pack을 파일로 넣어 주세요.');
+  throw new PackError(
+    '새 액션 그림을 받지 못했어요. goei-game-action-normal-v4.pack을 파일로 넣어 주세요.',
+  );
 }
 export function loadActionArt(): Promise<GameArt> {
   loaded ??= (async () => {
     const s = await stored();
     if (!s) throw new PackError('새 액션 그림이 없습니다.');
-    return { atlas: s.atlas, url: (name: string) => (s.files[name] ? `data:image/png;base64,${s.files[name]}` : '') };
+    return {
+      atlas: s.atlas,
+      url: (name: string) => (s.files[name] ? `data:image/png;base64,${s.files[name]}` : ''),
+    };
   })();
   loaded.catch(() => {
     loaded = null;
