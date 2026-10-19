@@ -162,7 +162,7 @@ export interface Turn {
   char: string[];
 }
 
-function messageText(data: string): string {
+export function messageText(data: string): string {
   let t = stripStartCard(stripUnsentMark(String(data ?? '')));
   if (t.includes('%%SCENE_CARD:')) {
     const s = readScene(t);

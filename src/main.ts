@@ -84,6 +84,11 @@ async function onOutput(arg: Parameters<Body['output']>[0]): Promise<void> {
   if (b) await b.output(arg);
 }
 
+/** 보낼 글: 본체가 떠 있을 때만 (로어북 고르기). 다른 봇에서는 그대로 */
+async function onInput(text: string): Promise<string> {
+  return body ? body.input(text) : text;
+}
+
 async function onDisplay(text: string): Promise<string> {
   if (body) return body.display(text);
   if (!ours(text)) return text;
@@ -122,6 +127,11 @@ for (const permission of ['replacer', 'mainDom', 'sendChat']) {
 await risuai.addRisuReplacer('beforeRequest', onBeforeRequest);
 await risuai.addRisuChatListener('output', onOutput);
 await risuai.addRisuScriptHandler('display', onDisplay);
+try {
+  await risuai.addRisuScriptHandler('input', onInput);
+} catch {
+  // 입력 처리기가 없는 옛 Risu: 로어북은 응답 뒤·요청 직전에만 고른다
+}
 watch();
 
 await risuai.onUnload(async () => {
@@ -130,4 +140,5 @@ await risuai.onUnload(async () => {
   await risuai.removeRisuReplacer('beforeRequest', onBeforeRequest);
   await risuai.removeRisuChatListener('output', onOutput);
   await risuai.removeRisuScriptHandler('display', onDisplay);
+  await risuai.removeRisuScriptHandler('input', onInput).catch(() => {});
 });

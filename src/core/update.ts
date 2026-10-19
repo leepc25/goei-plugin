@@ -127,9 +127,45 @@ function renamed(current: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
     .filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
 }
 
+/** 키 지문 (tools/build_lite_card.py key_print와 같게): 쉼표로 나눠 다듬고 다시 이은 글의 FNV-1a 32비트 */
+export function keyPrint(key: unknown): string {
+  const norm = String(key ?? '').split(',').map((k) => k.trim()).filter(Boolean).join(',');
+  let h = 0x811c9dc5;
+  for (const b of new TextEncoder().encode(norm)) h = Math.imul(h ^ b, 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, '0');
+}
+
+/** 새 카드 매니페스트의 「카드가 낸 적 있는 키」 지문 {로어북 이름: [지문…]} */
+function shippedKeys(lore: LoreEntry[]): Record<string, string[]> {
+  try {
+    const k = (JSON.parse(String(manifestEntry(lore)?.content ?? '')) as { keys?: unknown }).keys;
+    return k && typeof k === 'object' ? (k as Record<string, string[]>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** 사용자가 고친 호출 키는 남긴다: 지금 키가 카드가 낸 키(지문)와 다르면 그 키를 새 항목에 옮긴다 */
+function keepUserKeys(current: LoreEntry[], list: LoreEntry[], shipped: Record<string, string[]>): number {
+  const ck = keyed(current, loreName);
+  const cur = new Map(ck.map((k, i) => [k, current[i]]));
+  const lk = keyed(list, loreName);
+  let kept = 0;
+  list.forEach((e, i) => {
+    const prints = shipped[String(e.comment ?? '')];
+    const old = cur.get(lk[i]);
+    if (!prints || !old || old === e || keyPrint(old.key) === keyPrint(e.key) || prints.includes(keyPrint(old.key))) return;
+    list[i] = { ...e, key: old.key, secondkey: old.secondkey ?? e.secondkey };
+    kept++;
+  });
+  return kept;
+}
+
 /** 지금 캐릭터에 업데이트를 합친 결과 (저장은 하지 않음) */
 export function planUpdate(char: Record<string, unknown>, payload: CardPayload): UpdatePlan {
-  const lore = mergeByName(renamed((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore), payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
+  const current = renamed((char.globalLore as LoreEntry[]) ?? [], payload.data.globalLore);
+  const lore = mergeByName(current, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ''));
+  keepUserKeys(current, lore.list, shippedKeys(payload.data.globalLore));
   // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
   if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)

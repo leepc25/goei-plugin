@@ -252,6 +252,134 @@ def add_wiki_base(entries):
     return entries
 
 
+# 본편 로어북 고르기 (플러그인 core/lore.ts). 네 폴더 항목은 @@dont_activate로 Risu가 켜지 않고,
+# 플러그인이 고른 글을 자리 항목 4개가 채팅 변수로 읽는다. 키 정리: docs/호출키_검토_1019.md
+MANAGED_FOLDERS = {'세력': 'org', '조직': 'org', '파밍': 'site', '괴이': 'anomaly', '요원': 'agent'}
+LORE_SLOTS = [  # core/lore.ts SLOTS와 같게
+    ('📚Lore slot · Faction', 'goei_lore_org', 200),
+    ('📚Lore slot · Mystic', 'goei_lore_site', 400),
+    ('📚Lore slot · Anomaly', 'goei_lore_anomaly', 500),
+    ('📚Lore slot · Agent', 'goei_lore_agent', 600),
+]
+DONT_ACTIVATE = '@@dont_activate'
+# 순서가 100이던 요원 넷: 다른 요원과 같은 600으로
+AGENT_ORDER_FIX = {'큐라스', '송주익', '윤병수', '제이'}
+# {로어북: (뺄 키, 더할 키)}. 없는 키를 빼라고 하면 빌드를 멈춘다 (원본이 바뀌었는지 알 수 있게)
+KEY_EDITS = {
+    '관리국': (['bureau'], []),
+    '백일몽': ([], ['백일몽 주식회사']),
+    '협회': (['프리랜서', 'freelancer', 'Association'], []),
+    '교황청': (['수녀'], []),
+    '이슬람 서울중앙성원': (['성전사'], []),
+    '발푸르기스 협회': (['마녀', 'Witch', 'Sorcerer', 'Sorcery'], []),
+    '무명찬란교': (['Chanrangyo', 'Ireum'], []),
+    '병원': (['Hospital'], []),
+    '극단': (['Troupe'], []),
+    '세계정치 게시판': ([], ['세계정치 게시판']),
+    '사장': (['President'], []),
+    '도필헌': (['Guk-jang', 'Gukjang'], []),
+    '제이': (['Ban-jang', 'Banjang', 'Guard Chief'], []),
+    '고연지': (['Son-gil', 'Songil', 'Ui-won', 'Uiwon'], []),
+    '윤지아': (['Son-gil', 'Songil', 'Ui-won', 'Uiwon', 'Jia', 'Ji-a'], []),
+    '마덕희': (['Heol-gap', 'Heolgap', 'Mae-ip', 'Maeip'], []),
+    '문혜란': (['Dae-bak', 'Daebak', 'Al-seon', 'Alseon'], []),
+    '신유리': (['Consulting', 'Yeong-chang', 'Yeongchang', 'Yuri'], []),
+    '블라렛': (['교황청', '바티칸', '수녀', '기독교 상점', 'Vatican', 'Christian goods shop'], []),
+    '살라딘': (['이슬람', '지하드', 'Islam', 'Jihad'], []),
+    '아벤샤': (['발푸르기스', '마도사', '마법사', '마녀', 'Walpurgis', 'Sorcerer', 'Sorceress', 'Witch'], []),
+    '세크리엠': (['흡혈귀', '뱀파이어', 'Vampire'], []),
+    '탐미주의': (['심미주의', 'Aesthete'], []),
+    '인류의 신비전': (['humanity', 'mysteries', 'mystery'], []),
+    '예술가의 지하실': (['Basement'], ['예술가의 지하실']),
+    '교회': (['Church'], []),
+    '강변': (['Riverside'], []),
+    '미술관': (['Art Museum'], []),
+    '인스피레이션 호텔': (['Inspiration'], []),
+    '한여름 밤의 꿈': (['Midsummer Night', "Midsummer Night's Dream"], []),
+    '꿈과 희망의 극단': (['Dream and Hope'], []),
+    '살아있는 보육원': (['보육원', 'Orphanage'], []),
+    '생체 공장': (['Bio Factory', 'Biofactory'], []),
+    '강서 대학병원': (['University Hospital'], []),
+    '강북 특설병원': (['Special Hospital'], []),
+    '한설인육공장': (['butcher shop', 'Human Meat Factory'], []),
+    '광기로 점철된 성당': (['Corrupted cathedral', 'Beelzebub'], []),
+    '기괴한 방탈출 카페': (['방탈출', 'Escape Room'], ['기괴한 방탈출 카페']),
+    '유쾌 테마파크': (['AMUSEMENT THEME PARK'], []),
+    '헝그리 행맨': (['abandoned kindergarten', '버려진 유지원'], []),
+    '반짝반짝 용궁': (['용궁', 'Dragon Palace'], ['반짝반짝 용궁']),
+    '성 안티쿠스 기숙학교': (['기숙학교', 'Boarding School'], []),
+    '화요퀴즈쇼': (['브라우니', 'Brownie'], []),
+    '해피엔딩 홀': (['무명찬란교', 'Mumyeong Chanran-gyo', 'Happy Ending'], ['해피엔딩 홀']),
+    '세광역': (['세광특별시', 'Segwang Special City'], []),
+    '차원 승강기': (['승강기', '차원승강기'], []),
+    '어두운 정원': (['Dark Garden'], []),
+    '거대한 세상': (['Giant World'], []),
+    '욕망의 방': (['Desire Room'], []),
+    '달빛 타투샵': (['달빛타투샵'], []),
+    '이정 책방': (['이정책방', 'Yijeong Bookstore'], []),
+    '도깨비 공방': (['도깨비공방'], []),
+    '얼굴 없는 장터': (['Faceless Market'], []),
+    '여우상담실': (['여우 상담실'], []),
+    '착한 친구 키링': (['착한 친구', '좋은 친구', 'Good friend', 'Kind friend'], ['착한 친구 키링']),
+    '우주 쇼핑몰': (['우주쇼핑'], []),
+    '친절한 씨앗 키트': (['씨앗 키트', 'Seed Kit'], ['친절한 씨앗 키트']),
+    '이빨 요정': (['Tooth Fairy', '이빨나무', '이빨요정', '치아 나무', '치아나무', '치아 요정', '치아요정'], []),
+}
+
+
+def key_print(key):
+    """키 지문 (core/update.ts keyPrint와 같게): 쉼표로 나눠 다듬고 다시 이은 글의 FNV-1a 32비트"""
+    norm = ','.join(k.strip() for k in str(key or '').split(',') if k.strip())
+    h = 0x811c9dc5
+    for b in norm.encode('utf-8'):
+        h = ((h ^ b) * 0x01000193) & 0xffffffff
+    return f'{h:08x}'
+
+
+def _folder_word(name):
+    return re.sub(r'[^\w]', '', name or '').replace('_', '')
+
+
+def lore_activation(entries):
+    """키 정리 + @@dont_activate + 자리 항목. 카드가 낸 적 있는 키 지문(원래 키, 정리한 키)을 돌려준다 (매니페스트 keys)"""
+    kinds = {e['key']: MANAGED_FOLDERS[w] for e in entries if e.get('mode') == 'folder' and (w := _folder_word(e.get('comment'))) in MANAGED_FOLDERS}
+    edits = dict(KEY_EDITS)
+    prints = {}
+    for e in entries:
+        kind = kinds.get(e.get('folder'))
+        if not kind or e.get('mode') == 'folder' or not str(e.get('key') or '').strip():
+            continue
+        name = e.get('comment', '')
+        keys = [k.strip() for k in str(e['key']).split(',') if k.strip()]
+        before = key_print(e['key'])
+        drop, add = edits.pop(name, ([], []))
+        missing = [k for k in drop if k not in keys]
+        if missing:
+            raise SystemExit(f'키 정리 실패: {name}에 {missing} 키가 없어요')
+        keys = [k for k in keys if k not in drop]
+        if kind == 'agent':
+            # 로마자는 하이픈 쓴 것 하나만 (Gi-seok, Giseok → Gi-seok). 플러그인이 하이픈·띄어쓰기 변형을 같게 본다
+            hyph = {k.replace('-', '').lower() for k in keys if '-' in k}
+            keys = [k for k in keys if '-' in k or k.lower() not in hyph]
+        keys += [k for k in add if k not in keys]
+        e['key'] = ', '.join(keys)
+        if name in AGENT_ORDER_FIX:
+            e['insertorder'] = 600
+        if not e.get('content', '').lstrip().startswith(DONT_ACTIVATE):
+            e['content'] = DONT_ACTIVATE + '\n' + e.get('content', '')
+        prints[name] = sorted({before, key_print(e['key'])})
+    if edits:
+        raise SystemExit(f'키 정리 실패: 로어북을 찾지 못했어요 {sorted(edits)}')
+    settings = next(e for e in entries if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    names = {c for c, _, _ in LORE_SLOTS}
+    entries = [e for e in entries if e.get('comment') not in names]
+    for comment, var, order in LORE_SLOTS:
+        entries.append({'key': '', 'secondkey': '', 'comment': comment, 'content': '{{getvar::' + var + '}}', 'mode': 'normal',
+                        'insertorder': order, 'alwaysActive': True, 'selective': False, 'useRegex': False,
+                        'folder': settings['key'], 'bookVersion': 2})
+    return entries, prints
+
+
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
     ('Phone',
@@ -492,6 +620,7 @@ def main(src, dst):
     data['character_version'] = version
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
     lore = add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))
+    lore, manifest['keys'] = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,

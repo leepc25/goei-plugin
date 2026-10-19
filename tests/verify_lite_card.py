@@ -27,14 +27,17 @@ MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog', 'Faction d
 TIDIED = ('GNet', 'Phone', 'Wiki')
 orig_books = [e for e in ms['lorebook'] if e['comment'] not in MOVED + TIDIED]
 orig_lore = {(e['comment'], e['content']) for e in orig_books}
-lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] not in ('📖위키', '📖위키 기본 문서')]
+lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] not in ('📖위키', '📖위키 기본 문서') and not e['comment'].startswith('📚Lore slot')]
 FAC_VARS = re.compile(r'\{\{getvar::fac_(codes|ac|pool)\}\}')
 def unplaced(e):
-    c = e['content']
+    # 네 폴더 항목은 앞에 @@dont_activate 한 줄 (플러그인이 고른다)
+    c = e['content'].removeprefix('@@dont_activate\n')
     if e['comment'] == '📜Faction':
         return re.sub(r'\s+', ' ', c.replace('{{getvar::fac_extra}}', '')).strip()
     return FAC_VARS.sub('', c) if e['comment'] == '🏷️Tag' else c
 orig_unplaced = {(e['comment'], re.sub(r'\s+', ' ', e['content']).strip() if e['comment'] == '📜Faction' else e['content']) for e in orig_books}
+slots = [e for e in ml['lorebook'] if e['comment'].startswith('📚Lore slot')]
+check('로어북 자리 항목 4개 (늘 켜짐, getvar)', len(slots) == 4 and all(e['alwaysActive'] and e['content'].startswith('{{getvar::goei_lore_') for e in slots))
 check('로어북 원본 그대로(옮긴 목록·새 세력 자리표시자만 제외)', {(e['comment'], unplaced(e)) for e in lite_lore} == orig_unplaced and len(lite_lore) == len(orig_books))
 tag = next(e for e in ml['lorebook'] if e['comment'] == '🏷️Tag')['content']
 fac = next(e for e in ml['lorebook'] if e['comment'] == '📜Faction')['content']

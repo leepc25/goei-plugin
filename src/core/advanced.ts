@@ -50,6 +50,12 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
         num('ctx_total', '본편 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 본편 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
       ],
     },
+    {
+      title: '본편 로어북',
+      items: [
+        { key: 'lore_mode', label: '로어북 켜기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인 규칙'], ['risu', 'Risu 방식']], hint: '세력·특수·괴이·요원 로어북을 이름이 나왔을 때 켜요. Risu 방식은 낱말 속 글자도 걸려요' },
+      ],
+    },
   ],
   gn: [
     {

@@ -7,6 +7,7 @@ import {
 import type { WorldSettings } from '../core/world/engine';
 import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
 import { advancedBox } from './advanced';
+import { loreCheckBox } from './lorecheck';
 import { ASSET_NOTE } from '../core/asset';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
@@ -181,6 +182,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ].join(''))}
     ${scope === 'chat' && s.assetOn && s.assetModel === 'aux' && note ? `<p class="gx-hint">최근 보충: ${esc(note)}</p>` : ''}
     ${advancedBox('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars)}
+    ${scope === 'chat' && canChat ? loreCheckBox(ctx) : ''}
     ${updateGroup(ctx)}
     ${canChat ? '<p class="gx-muted">괴담넷·괴담톡·위키 설정은 각 탭 안에 있어요.</p>' : ''}
     ${toast('st', settingsUi.info, (t) => {

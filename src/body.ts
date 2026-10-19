@@ -37,6 +37,9 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { setWaiting } from './host/waiting';
+import { computeLore, loreOptions, patchSlots, sameVars, type LoreMode } from './core/lore';
+import { advValue } from './core/advanced';
+import { userInfo } from './host/user';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -56,6 +59,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
   if (liteNow) {
     messages = stripHistoryTags(messages);
+    messages = await fixLore(messages).catch(() => messages);
     const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
     if (ctx.length) {
       // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
@@ -78,6 +82,48 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     console.log(`[goei] beforeRequest 실패: ${error instanceof Error ? error.message : String(error)}`);
     return messages;
   }
+}
+
+// ── 본편 로어북 고르기 (core/lore.ts) ──
+
+type LoreChar = { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknown };
+
+function loreFor(char: LoreChar, chat: Chat, input?: string) {
+  const mode = advValue(chat.scriptstate, 'gen', 'lore_mode') as LoreMode;
+  return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userInfo().name), input });
+}
+
+/** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
+async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  if (!char || !readManifest(char.globalLore)) return;
+  await updateChat(charIndex, chatIndex, (cur) => {
+    const got = loreFor(char, cur, input);
+    if (!got || sameVars(cur.scriptstate, got.vars)) return null;
+    return { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...got.vars } };
+  });
+}
+
+/** 보낼 때: 채팅창에 적은 글까지 보고 고른다. 글은 바꾸지 않는다 */
+async function onInput(text: string): Promise<string> {
+  if (!liteNow || typeof text !== 'string') return text;
+  try {
+    await storeLore(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex(), text);
+  } catch (error) {
+    console.log(`[goei] 로어북 고르기 실패: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  return text;
+}
+
+/** 요청 직전: 다시 굴리기·자동 전송처럼 입력을 거치지 않았으면 지금 채팅으로 다시 골라 요청 속 글을 바꾼다 */
+async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
+  if (!char || !chat) return messages;
+  const got = loreFor(char, chat);
+  if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
+  return patchSlots(messages, chat.scriptstate, got.vars).messages;
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
@@ -167,6 +213,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       })) ?? now;
     }
+    // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
+    await storeLore(arg.characterIndex, arg.chatIndex).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
@@ -367,6 +415,7 @@ function startWatcher(fab: Fab): () => void {
 
 export interface BodyHandlers {
   beforeRequest: typeof onBeforeRequest;
+  input: typeof onInput;
   output: typeof onOutput;
   display: typeof onDisplay;
   unload: () => Promise<void>;
@@ -395,6 +444,7 @@ export async function start(): Promise<BodyHandlers> {
   }
   return {
     beforeRequest: onBeforeRequest,
+    input: onInput,
     output: onOutput,
     display: onDisplay,
     unload: async () => {

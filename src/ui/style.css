@@ -1825,3 +1825,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-crop-size { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); }
 .dir-crop-size input { flex: 1; accent-color: var(--signal); }
 .dir-crop > .gx-mini { align-self: flex-start; }
+
+/* 설정 → 본편 로어북 확인 */
+.lc-row { align-items: center; }
+.lc-row .ps-label small { word-break: break-all; }
+.lc-kind { flex: none; padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--dim); font-size: 12px; line-height: 1.6; }
+.lc-sub { margin: 0; padding: 10px 14px 4px; font-size: 13px; font-weight: 600; color: var(--dim); }
+.ps-rows > .ps-note { margin: 0; padding: 12px 14px; }

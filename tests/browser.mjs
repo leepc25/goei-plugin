@@ -314,6 +314,30 @@ async function open(page) {
   await page.close();
 }
 
+// 5-1) 본편 로어북 고르기: 보낼 때 채팅 변수에 넣고, 요청 직전에 다시 골라 맞춘다 (카드에 자리 항목이 있을 때)
+if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot'))) {
+  const { page, errors } = await boot(fixture, { message: [{ role: 'char', data: '조용한 밤이다.' }], scriptstate: { $st_faction: 'A00' } });
+  await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
+  const out = await page.evaluate(() => window.__calls.handlers.input('차여진이 웃었다. 극단적인 소리였다.'));
+  assert.equal(out, '차여진이 웃었다. 극단적인 소리였다.', '보낼 글은 그대로');
+  const ss = await page.evaluate(() => window.__chat.scriptstate);
+  assert.ok(ss.$goei_lore_agent.includes('Cha Yeo-jin') || ss.$goei_lore_agent.length > 100, '요원 자리에 차여진');
+  assert.equal(ss.$goei_lore_org, '', '「극단적」으로 세력 극단이 켜지지 않음');
+  assert.ok(!ss.$goei_lore_agent.includes('@@dont_activate'));
+  // 다시 굴리기: 입력을 거치지 않고 채팅이 바뀌었으면 요청 속 글을 바꾼다
+  const before = ss.$goei_lore_agent;
+  await page.evaluate(() => { window.__chat.message.push({ role: 'user', data: '차여진이 웃었다. 극단적인 소리였다.' }, { role: 'char', data: '…' }, { role: 'user', data: '아무도 없다.' }); });
+  const req = [{ role: 'system', content: `앞\n\n${before}\n\n뒤` }, { role: 'user', content: '아무도 없다.' }];
+  const sent = await page.evaluate((m) => window.__calls.replacers[0](m, 'model'), req);
+  assert.equal(sent[0].content.includes(before), true, '검색 깊이 안이면 그대로');
+  await page.evaluate(() => { window.__chat.message = Array.from({ length: 12 }, (_, i) => ({ role: i % 2 ? 'char' : 'user', data: '아무도 없다.' })); });
+  const sent2 = await page.evaluate((m) => window.__calls.replacers[0](m, 'model'), req);
+  assert.equal(sent2[0].content, '앞\n\n\n\n뒤', '깊이 밖으로 밀리면 뺀다');
+  assert.deepEqual(errors, []);
+  console.log('PASS 본편 로어북: 보낼 때 고르기, 요청 직전 맞추기');
+  await page.close();
+}
+
 // 6) 모바일 화면
 {
   const { page } = await boot(fixture, { message: [], scriptstate: {} }, { width: 390, height: 844 });
