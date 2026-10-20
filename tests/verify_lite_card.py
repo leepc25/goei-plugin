@@ -22,6 +22,7 @@ check('첫 메시지에 CBS 없음', '{{' not in cl['first_mes'], len(cl['first_
 bg = cl['extensions']['risuai']['backgroundHTML']
 check('배경 HTML 24KB 이하', len(bg) < 24000, len(bg))
 check('상태창 CSS 포함', '.dv.dv-status' in bg and '.ib-asset-hover' in bg)
+check('에셋 그림 상자 배경 투명', re.findall(r'\.ib-asset-hover \{[^}]*?background-color:\s*([^;]+);', bg) == ['transparent'] * 3)
 MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog', 'Faction display', 'Phone tabs', 'Start trigger', 'LB Backend')
 # 지침은 고친 채로 들어간다 (안 쓰는 섹션 빼기·LB Backend 합치기·대기 줄 문구). 아래에서 따로 본다
 TIDIED = ('GNet', 'Phone', 'Wiki')

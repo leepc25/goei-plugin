@@ -178,6 +178,8 @@ def status_css(background_html):
     parts = []
     for theme, cond in THEMES:
         rules = keep_status_rules(render(css, {'st_fixed_theme': theme or 'null'}))
+        # 에셋 그림 상자는 배경색 없이: 투명 PNG·AVIF의 빈 곳으로 테마 색이 비치지 않게
+        rules = [re.sub(r'(\.ib-asset-hover \{[^}]*?background-color:\s*)[^;]+;', r'\1transparent;', r) for r in rules]
         if '{{' in ''.join(rules):
             raise ValueError('배경 CSS에 해석되지 않은 CBS가 남았습니다')
         parts.append(cond + '\n' + '\n'.join(rules) + '\n' + '{{/if}}' * cond.count('{{#if'))
