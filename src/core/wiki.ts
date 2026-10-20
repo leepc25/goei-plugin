@@ -486,3 +486,21 @@ export function wikiMainContext(chat: Chat, rules: string, focus?: Focus | null,
 export function wikiContextRules(lore: LoreEntry[] | undefined): string | null {
   return policySections(lore, 'Wiki').MAIN_CONTEXT?.trim() || null;
 }
+
+/** 문서 첫 문단을 짧게 (상황판 카드·커스텀 목록 설명). 꾸밈표는 걷어 내고 각주·지운 글은 뺀다 */
+export function docSummary(body: string, max = 150): string {
+  const para = /^\[Paragraph\](.+)$/m.exec(body)?.[1] ?? '';
+  const text = para
+    .replace(/📌[^📌]*?📌/gu, '')
+    .replace(/✂️[^✂]*?✂️/g, '')
+    .replace(/➡️([^➡]+?)➡️/g, '$1')
+    .replace(/❗([^❗]+?)❗/g, '$1')
+    .replace(/\*\*([^*]+?)\*\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if ([...text].length <= max) return text;
+  // 문장 끝에서 자를 수 있으면 거기서
+  const cut = [...text].slice(0, max).join('');
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('다. '), cut.lastIndexOf('.'));
+  return end > max * 0.5 ? cut.slice(0, end + 1) : `${cut}…`;
+}

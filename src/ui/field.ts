@@ -1,5 +1,6 @@
 // 「지도」·「커스텀 임무」 탭: 목표를 고르고, 요원·지원 인원을 편성해 채팅에 이동 지시문 카드를 놓는다.
 // 원본 Lua의 지도 작업 공간(WG.map)과 커스텀 임무 창(preparePreset/commitPreset)을 옮겼다.
+import { evArt } from './evpic';
 import {
   destination, DirectiveError, hasSceneCard, parseDirective, sceneDirective, sceneRecord, TEAM_MAX, validTeam,
 } from '../core/dispatch';
@@ -39,6 +40,8 @@ interface FieldState {
   support: number;
   mkind: MissionKind;
   mname: string | null;
+  /** 커스텀 목록에서 펼친 줄 「종류:이름」 */
+  mopen: string;
   /** mname을 고른 종류 (위 종류 버튼을 바꿔도 고른 목표는 그대로) */
   mpick: MissionKind;
   /** 지시문 뒤에 붙여 함께 보낼 말 */
@@ -54,7 +57,7 @@ interface FieldState {
 
 export const field: FieldState = {
   region: '01', filter: 'all', place: null, target: null, team: [], support: 0,
-  mkind: 'an', mname: null, mpick: 'an', note: '', step: 'goal', query: '', mapq: '', confirmEnd: null,
+  mkind: 'an', mname: null, mpick: 'an', mopen: '', note: '', step: 'goal', query: '', mapq: '', confirmEnd: null,
 };
 
 export interface FieldEnv {
@@ -278,6 +281,9 @@ export function mapSuggestFor(ctx: ChatContext, q: string): string {
 
 // ── 상황 목록 ──
 
+/** 상황 카드 그림을 찾을 채팅 (mapTab이 그릴 때마다 맞춘다) */
+let artCtx: ChatContext | null = null;
+
 function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string }>): string {
   // 상황판과 같은 카드 (ui/evcard.ts). 누르면 목표로 고르고 그 지역 지도를 연다 (v0.16.22: 지도 아이콘은 뺐다)
   const w = x.world;
@@ -292,7 +298,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
     extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
-    key: e.key, open: 'pick-event',
+    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name) : undefined,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
 }
@@ -440,6 +446,7 @@ function toStep(step: 'goal' | 'team', env: FieldEnv): void {
 }
 
 export function mapTab(ctx: ChatContext, env: FieldEnv, notice: string, busy: boolean): string {
+  artCtx = ctx;
   const x = readCtx(ctx);
   if (typeof x === 'string') return `<div class="gx-empty">${esc(x)}</div>`;
   const events = x.on ? activeEvents(x.world) : [];
@@ -485,10 +492,28 @@ export function missionList(ctx: ChatContext, opening = false): string {
   const x = readCtx(ctx);
   if (typeof x === 'string') return '';
   const q = field.query.trim().toLowerCase();
-  const row = (kind: MissionKind, r: { name: string; sub: string }) =>
-    `<li class="gx-ev${field.mname === r.name && field.mpick === kind ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${kind}:${esc(r.name)}">
-      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>
-      ${opening ? '' : `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button></div>`}</li>`;
+  const wiki = (name: string) => `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(name)}" title="위키" aria-label="${esc(name)} 위키">${ICONS.wiki}</button></div>`;
+  const row = (kind: MissionKind, r: { name: string; sub: string }) => {
+    const sel = field.mname === r.name && field.mpick === kind;
+    const val = `${kind}:${esc(r.name)}`;
+    // 거점은 그림이 없어 누르면 바로 고른다. 괴이·특수는 누르면 그 줄이 펼쳐져 그림·설명·선택 버튼 (2026-10-20 시안)
+    if (kind === 'lm') {
+      return `<li class="gx-ev${sel ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${val}">
+      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>${opening ? '' : wiki(r.name)}</li>`;
+    }
+    if (field.mopen !== `${kind}:${r.name}`) {
+      return `<li class="gx-ev${sel ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-open" data-value="${val}" aria-expanded="false">
+      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>${opening ? '' : wiki(r.name)}</li>`;
+    }
+    const art = evArt(ctx, r.name);
+    return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}">
+      <button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="true" aria-label="${esc(r.name)} 접기"${art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : ''}>
+        <span class="gx-evart-cap"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span></button>
+      <div class="gx-mx-body">${missionStatus(x, kind, r.name) ? `<span class="gx-row">${missionStatus(x, kind, r.name)}</span>` : ''}
+        ${art.desc ? `<p class="gx-evc-desc">${esc(art.desc)}</p>` : '<p class="gx-evc-desc gx-muted">아직 위키 문서가 없어요.</p>'}
+        <div class="gx-mx-btns"><button class="gx-start gx-mx-pick" data-action="mission-pick" data-value="${val}">${sel ? '선택됨' : `이 ${kind === 'an' ? '괴이' : '특수'}로 선택`}</button>
+          ${opening ? '' : `<button class="gx-mini" data-action="wiki-goto" data-value="${esc(r.name)}">${ICONS.wiki}위키</button>`}</div></div></li>`;
+  };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {
     const rows = missionCatalog(x.catalog, field.mkind);
@@ -795,12 +820,16 @@ export async function handleField(action: string, value: string | undefined, ctx
       }
       env.render();
       return true;
+    case 'mission-open':
+      field.mopen = field.mopen === v ? '' : v;
+      env.render();
+      return true;
     case 'mission-pick': {
       // 값은 "종류:이름" (검색 결과엔 여러 종류가 섞여 있다)
       const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
       const kind = (m?.[1] as MissionKind | undefined) ?? field.mkind;
       const name = m ? m[2] : v;
-      if (isPC() && field.mname === name && field.mpick === kind) {
+      if (isPC() && field.mname === name && field.mpick === kind && field.mopen !== `${kind}:${name}`) {
         field.mname = null;
         env.render();
         return true;

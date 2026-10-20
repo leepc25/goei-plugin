@@ -1911,3 +1911,52 @@ button.mk-go:hover { color: var(--signal); }
 .ph-talk svg { width: 15px; height: 15px; }
 .ph-talk.new { color: var(--signal); }
 .ph-talk.new svg { fill: color-mix(in srgb, var(--signal) 25%, transparent); }
+
+/* 그림 카드 (2026-10-20 시안): 그림 위에 등급·상태·이름, 아래에 배치 요원과 설명. 접으면 가로 띠, 펴면 정사각 */
+.gx-evc.art { display: block; padding: 0; overflow: hidden; border-radius: 14px; flex-shrink: 0; }
+.gx-evart { position: relative; aspect-ratio: 2.4 / 1; background: #0d1214 center 42% / cover no-repeat; }
+.gx-evc.art.open .gx-evart { aspect-ratio: 1 / 1; background-position: center; }
+.gx-evc.art.wait .gx-evart { aspect-ratio: 3.4 / 1; filter: saturate(.55) brightness(.8); }
+.gx-evart::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .4) 42%, rgba(6, 10, 12, 0) 68%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 34%); }
+.gx-evart.none.k-an { background: radial-gradient(circle at 72% 45%, #5a1f1b 0%, #1d1213 62%); }
+.gx-evart.none.k-in { background: radial-gradient(circle at 72% 45%, #5a4416 0%, #1e1a10 62%); }
+.gx-evart.none.k-ms { background: radial-gradient(circle at 72% 45%, #183e55 0%, #0f1a21 62%); }
+.gx-evart-ico { position: absolute; right: 7%; top: 50%; transform: translateY(-50%); font: 700 64px/1 var(--mono); opacity: .32; }
+.gx-evart-ico svg { width: 72px; height: 72px; }
+.k-an > .gx-evart-ico { color: #ff8a7a; }
+.k-in > .gx-evart-ico { color: #ffc35a; }
+.k-ms > .gx-evart-ico { color: #8cc8ff; }
+.gx-evart-top { position: absolute; z-index: 1; top: 8px; left: 8px; right: 8px; display: flex; align-items: center; gap: 6px; }
+.gx-evart .gx-gmark { width: 28px; height: 28px; border-radius: 8px; font-size: 14px; box-shadow: 0 1px 6px rgba(0, 0, 0, .45); }
+.gx-evart-act { margin-left: auto; display: flex; gap: 4px; }
+.gx-evbtn { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 9px; display: grid; place-items: center; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
+.gx-evbtn svg { width: 17px; height: 17px; }
+.gx-evbtn:hover { background: rgba(8, 12, 14, .82); }
+.gx-evart-cap { position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 9px; display: flex; flex-direction: column; gap: 1px; color: #fff; text-shadow: 0 1px 4px rgba(0, 0, 0, .7); min-width: 0; }
+.gx-evart-cap b { font-size: 16.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evart-cap small { font-size: 12px; color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc.art.open .gx-evart-cap b { font-size: 19px; }
+.gx-evc-body { display: flex; flex-direction: column; gap: 6px; padding: 8px 12px 11px; }
+.gx-evc-body .gx-evc-who { margin-top: 0; }
+.gx-evc-desc { margin: 0; font-size: 13px; line-height: 1.5; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gx-evc.art.open .gx-evc-desc, .gx-evc.art.open .gx-evc-sit { display: block; -webkit-line-clamp: unset; }
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+
+/* 커스텀 목록: 펼친 줄 (2026-10-20 시안). 두 칸을 다 쓰고, 그림 위에 이름, 아래에 설명과 선택 버튼 */
+.gx-mlist li.gx-mx { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); align-items: stretch; }
+.gx-mx-art { position: relative; aspect-ratio: 1 / 1; border: 0; padding: 0; background: #0d1214 center / cover no-repeat; text-align: left; cursor: pointer; }
+.gx-mx-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .3) 40%, rgba(6, 10, 12, 0) 65%); }
+.gx-mx-art.none.k-an { background: radial-gradient(circle at 70% 40%, #5a1f1b 0%, #1d1213 65%); }
+.gx-mx-art.none.k-ms { background: radial-gradient(circle at 70% 40%, #183e55 0%, #0f1a21 65%); }
+.gx-mx-art .gx-evart-cap b { font-size: 19px; }
+.gx-mx-body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; min-width: 0; }
+.gx-mx-body .gx-evc-desc { display: block; -webkit-line-clamp: unset; font-size: 14px; line-height: 1.65; }
+.gx-mx-btns { margin-top: auto; display: flex; gap: 8px; align-items: center; }
+.gx-mx-btns .gx-mx-pick { flex: 1; margin: 0; min-height: 44px; font-size: 15px; letter-spacing: .02em; }
+.gx-mx-btns .gx-mini { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 14px; }
+.gx-mx-btns .gx-mini svg { width: 16px; height: 16px; }
+@media (max-width: 760px) {
+  .gx-mlist li.gx-mx { grid-template-columns: minmax(0, 1fr); }
+  .gx-mx-body { padding: 12px 14px 14px; }
+}
