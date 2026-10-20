@@ -7,7 +7,7 @@ import {
 import type { Chat } from '../core/types';
 import { basicSettings, worldSettings } from '../core/settings';
 import {
-  activeEvents, agentLocked, endedShown, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
+  activeEvents, agentLocked, endedShown, factionNames, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
@@ -296,7 +296,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
   const names = e.kind === 'in' ? [] : codesToNames(e.people || '없음', x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
   return evCard({
     kind: e.kind, name: e.name, grade: e.grade,
-    loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
+    loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ''),
     extra: e.report ? `<span class="gx-evc-sit" title="${esc(e.report)}">${esc(e.report)}</span>` : '',
     key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind) : undefined, pop: e.key,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,

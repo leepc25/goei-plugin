@@ -2109,3 +2109,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evc.art.ended { opacity: .78; }
 .gx-evc.art.ended .gx-evart-l1 > b { text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .55); text-decoration-thickness: 1.5px; }
 .gx-evc.art.ended.go:hover .gx-evart { filter: grayscale(1) brightness(.75); }
+/* 다른 세력만 들어간 상황은 노랑, 우리와 함께면 초록 아이콘에 노랑 점 (2026-10-20 사용자) */
+.gx-evdep.other { color: #ffc35a; filter: drop-shadow(0 0 4px rgba(255, 195, 90, .5)); }
+.gx-evdep { position: relative; }
+.gx-evdep.mix::after { content: ''; position: absolute; right: 1px; top: 1px; width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 0 1.5px rgba(10, 14, 16, .9); }

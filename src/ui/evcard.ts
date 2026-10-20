@@ -40,10 +40,11 @@ export interface EvCard {
 }
 
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
-export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>): string {
+/** own: 우리 세력 이름 (이 이름이 적히면 요원이 아니어도 우리 편으로 친다) */
+export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>, own = ''): string {
   return names
     .filter((n, i, all) => n && n !== '없음' && all.indexOf(n) === i)
-    .map((n) => (agents.has(n) ? `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge">${esc(n)}</span>`))
+    .map((n) => (agents.has(n) ? `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge${own && n === own ? ' own' : ''}">${esc(n)}</span>`))
     .join('');
 }
 
@@ -74,14 +75,20 @@ function statusNote(c: EvCard): string {
   if (!c.key) return text ? `<em class="gx-evc-note wait">${esc(text)}</em>` : '';
   return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc(text)}</em>` : '';
 }
-/** 투입 표시 (2026-10-20 사용자): 누가·몇 명이 아니라 됐는지 안 됐는지만. 이름 줄 끝 사람 아이콘 하나,
- *  투입이면 요원 카드 「작전」처럼 켜지고 아니면 흐리다. 누가 갔는지는 상세 창에 */
+/** 투입 표시 (2026-10-20 사용자): 누가·몇 명이 아니라 어느 편이 들어갔는지만. 이름 줄 끝 사람 아이콘,
+ *  초록 = 우리 요원·우리 세력, 노랑 = 다른 세력·외부인만, 회색 = 아무도 없음. 우리와 다른 세력이 함께면 초록 + 노랑 점.
+ *  누가 갔는지는 상세 창에 */
 function depMark(c: EvCard): string {
   // 사건은 투입 기록이 없다 (상황판 태그에 투입 칸이 없음). 늘 「미투입」으로 보이면 틀린 말이라 표시하지 않는다
   if (!c.key || c.kind === 'in') return '';
-  const names = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)">|$)/g)?.map((h) => h.replace(/<[^>]+>/g, '').trim()) ?? [];
+  const items = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge[^"]*)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)|$)/g) ?? [];
+  const strip = (h: string) => h.replace(/<[^>]+>/g, '').trim();
+  const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);
+  const others = items.filter((h) => h.startsWith('<span class="gx-badge">')).map(strip);
   const verb = c.kind === 'ms' ? '방문' : '투입';
-  return `<i class="gx-evdep${names.length ? ' on' : ''}" title="${names.length ? `${verb}: ${esc(names.join(', '))}` : `미${verb}`}" aria-label="${names.length ? verb : `미${verb}`}">${ICONS.person}</i>`;
+  const cls = ours.length ? 'on' : others.length ? 'other' : '';
+  const title = [ours.length ? `우리: ${ours.join(', ')}` : '', others.length ? `다른 세력: ${others.join(', ')}` : ''].filter(Boolean).join(' / ') || `미${verb}`;
+  return `<i class="gx-evdep${cls ? ` ${cls}` : ''}${ours.length && others.length ? ' mix' : ''}" title="${esc(title)}" aria-label="${esc(title)}">${ICONS.person}</i>`;
 }
 
 /** 그림 카드 (2026-10-20 사용자): 상황판·임무 탭 모두 같은 띠. 누르면 상세 창.

@@ -1210,6 +1210,7 @@ function board(ctx: ChatContext): string {
   // 괴이·사건·특수는 한 줄짜리 행 (v0.16.15: 큰 카드를 늘어놓으니 한 화면에 안 들어왔다)
   // 괴이·사건·특수 카드는 임무 탭과 같은 모양 (ui/evcard.ts). 진행 중인 카드는 누르면 지도로
   const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
+  const ownName = factionNames(catalog, faction)[faction] ?? '';
   const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
   const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
@@ -1223,7 +1224,7 @@ function board(ctx: ChatContext): string {
       if (wait) return '';
       const since = elapsedText(w.minute, e.since);
       const badge = wait ? pending : e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`;
-      return one('an', i, { name: e.name || '이름 미확인', grade: e.grade, loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: wait ? '' : peopleChips(ctx.char, names(e.deploy), byName) });
+      return one('an', i, { name: e.name || '이름 미확인', grade: e.grade, loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: wait ? '' : peopleChips(ctx.char, names(e.deploy), byName, ownName) });
     })
     .join('');
   const inc = w.inc
@@ -1238,7 +1239,7 @@ function board(ctx: ChatContext): string {
     .map((e, i) => {
       const wait = e.state === '발생대기';
       if (wait) return '';
-      return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName) });
+      return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName, ownName) });
     })
     .join('');
   // 막 끝난 상황은 이름 막기와 같은 동안 칸 맨 아래에 흐리게 (2026-10-20 사용자)
