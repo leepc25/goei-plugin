@@ -2,7 +2,7 @@
 // 괴이·특수는 명부 사진(대표 → 영문명_default → 영문명), 설명은 위키 문서 첫 문단. 그림이 없으면 null (종류별 공용 그림 자리)
 import type { ChatContext } from '../host/risu';
 import { readDirectory } from '../core/world/directory';
-import { mainPic, moduleAssetStamp } from '../host/assets';
+import { hasAsset, mainPic, moduleAssetStamp } from '../host/assets';
 import { docSummary, findDoc } from '../core/wiki';
 import { imageUrl } from './images';
 
@@ -23,9 +23,13 @@ function rows(ctx: ChatContext): Map<string, Row> {
 
 const descs = new Map<string, string>();
 
-export function evArt(ctx: ChatContext, name: string): { pic: string | null; desc: string } {
+/** 그림이 없는 상황의 종류별 공용 그림 (카드 에셋, assets/wiki/Situations) */
+const SHARED: Record<string, string> = { an: 'Situation Anomaly', in: 'Situation Incident', ms: 'Situation Mystic' };
+
+export function evArt(ctx: ChatContext, name: string, kind?: string): { pic: string | null; desc: string } {
   const r = rows(ctx).get(name);
-  const pic = r?.pic ? imageUrl(ctx.char, r.pic) : null;
+  const shared = kind && hasAsset(ctx.char, SHARED[kind] ?? '') ? SHARED[kind] : '';
+  const pic = imageUrl(ctx.char, r?.pic || shared);
   const title = r?.title ?? name;
   let desc = descs.get(title);
   if (desc === undefined) {

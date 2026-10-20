@@ -53,29 +53,30 @@ export function elapsedText(minute: number | null, since: number | null): string
   return `발생 ${h ? `${h}시간 ` : ''}${m % 60 || !h ? `${m % 60}분 ` : ''}경과`;
 }
 
-/** 그림 카드: 그림 위에 등급·이름·상태, 아래에 배치 요원과 설명. 접으면 가로 띠, 펴면 정사각 */
+/** 그림 카드 (2026-10-20 사용자): 모든 정보가 그림 안에. 접으면 같은 높이의 띠(등급·상태·이름·위치·요원 얼굴),
+ *  펴면 정사각 그림 안에 버튼·요원·설명까지. 그림 아래 칸은 없다 */
 function artCard(c: EvCard): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : '';
   const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}" title="${KIND[c.kind]}${grade ? ` ${esc(grade)}등급` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
   const open = !!c.fold?.open;
   const key = c.key ? esc(c.key) : '';
-  const acts = c.key
-    ? `${c.name !== '이름 미확인' ? `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>` : ''}
+  const acts = c.key && open
+    ? `<span class="gx-evart-act">${c.name !== '이름 미확인' ? `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>` : ''}
       ${c.fold ? `<button class="gx-evbtn" data-action="board-map" data-value="${key}" title="지도" aria-label="${esc(c.name)} 지도에서 보기">${ICONS.map}</button>` : ''}
       ${c.confirmEnd
         ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>`
-        : `<button class="gx-evbtn" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`}`
+        : `<button class="gx-evbtn" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`
     : '';
   const act = c.fold ? ` data-action="ev-fold" data-value="${esc(c.fold.id)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
   const pic = c.art?.pic;
   const desc = c.art?.desc ?? '';
-  const body = `${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc ? `<p class="gx-evc-desc">${esc(desc)}</p>` : ''}`;
+  const more = open ? `${c.extra ?? ''}${desc ? `<span class="gx-evc-desc">${esc(desc)}</span>` : ''}` : '';
   return `<li class="gx-evc art${act ? ' go' : ''}${open ? ' open' : ''}${c.selected ? ' sel' : ''}${c.key ? '' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${pic ? '' : ' none'}"${pic ? ` style="background-image:url('${esc(pic)}')"` : ''}>
-      ${pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind] === '?' ? '?' : MARK[c.kind]}</span>`}
-      <span class="gx-evart-top">${mark}<span class="gx-evc-tags">${c.badge}</span><span class="gx-evart-act">${acts}</span></span>
-      <span class="gx-evart-cap"><b>${esc(c.name)}</b><small>${c.loc}</small></span>
-    </div>${body ? `<div class="gx-evc-body">${body}</div>` : ''}</li>`;
+      ${pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`}
+      <span class="gx-evart-top">${mark}<span class="gx-evc-tags">${c.badge}</span>${acts}</span>
+      <span class="gx-evart-cap"><span class="gx-evart-line"><span class="gx-evart-name"><b>${esc(c.name)}</b><small>${c.loc}</small></span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}</span>${more}</span>
+    </div></li>`;
 }
 
 export function evCard(c: EvCard): string {

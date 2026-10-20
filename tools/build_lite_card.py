@@ -514,7 +514,7 @@ def update_payload(data, risu, module, version, min_plugin):
 
 
 # 위키 이미지 (assets/wiki 의 괴이·특수·세력). 파일명이 곧 에셋 이름 = 명부 영문명 (src/host/assets.ts mainPic·facePic)
-WIKI_DIRS = ('Anomalies', 'Mystic Sites', 'Factions')
+WIKI_DIRS = ('Anomalies', 'Mystic Sites', 'Factions', 'Situations')  # Situations: 그림 없는 상황의 종류별 공용 그림
 # 요원 기본 그림 「영문명_default」 (사용자가 2026-10-19 올림). 큰 사진이자 얼굴 틀로 자르는 원본 (src/host/assets.ts AGENT_CROPS)
 AGENT_DIR = 'agents'
 # 예전 시작 화면 세력 기본 그림. 사진 규칙에서 뺐다 (세력 그림은 명부 영문명)

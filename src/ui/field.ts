@@ -298,7 +298,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
     extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
-    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name) : undefined,
+    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind) : undefined,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
 }
@@ -501,18 +501,21 @@ export function missionList(ctx: ChatContext, opening = false): string {
       return `<li class="gx-ev${sel ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${val}">
       <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>${opening ? '' : wiki(r.name)}</li>`;
     }
-    if (field.mopen !== `${kind}:${r.name}`) {
-      return `<li class="gx-ev${sel ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-open" data-value="${val}" aria-expanded="false">
-      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>${opening ? '' : wiki(r.name)}</li>`;
+    // 괴이·특수: 한 칸짜리 그림 띠. 누르면 같은 칸에서 정사각으로 펴지고 설명·선택·위키가 그림 안에 (2026-10-20 사용자)
+    const open = field.mopen === `${kind}:${r.name}`;
+    const art = evArt(ctx, r.name, kind);
+    const status = missionStatus(x, kind, r.name);
+    const bg = art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : '';
+    const cap = `<span class="gx-evart-name"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
+    if (!open) {
+      return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+        ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button></li>`;
     }
-    const art = evArt(ctx, r.name);
-    return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}">
-      <button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="true" aria-label="${esc(r.name)} 접기"${art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : ''}>
-        <span class="gx-evart-cap"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span></button>
-      <div class="gx-mx-body">${missionStatus(x, kind, r.name) ? `<span class="gx-row">${missionStatus(x, kind, r.name)}</span>` : ''}
-        ${art.desc ? `<p class="gx-evc-desc">${esc(art.desc)}</p>` : '<p class="gx-evc-desc gx-muted">아직 위키 문서가 없어요.</p>'}
-        <div class="gx-mx-btns"><button class="gx-start gx-mx-pick" data-action="mission-pick" data-value="${val}">${sel ? '선택됨' : `이 ${kind === 'an' ? '괴이' : '특수'}로 선택`}</button>
-          ${opening ? '' : `<button class="gx-mini" data-action="wiki-goto" data-value="${esc(r.name)}">${ICONS.wiki}위키</button>`}</div></div></li>`;
+    return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
+      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button></span></span>
+      <span class="gx-evart-cap">${cap}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}
+        <span class="gx-mx-btns"><button class="gx-start gx-mx-pick" data-action="mission-pick" data-value="${val}">${sel ? '선택됨' : `이 ${kind === 'an' ? '괴이' : '특수'}로 선택`}</button>
+          ${opening ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`}</span></span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {

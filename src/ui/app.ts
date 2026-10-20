@@ -1208,7 +1208,7 @@ function board(ctx: ChatContext): string {
   const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
     const id = `${kind}${i}:${c.name}`;
-    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name), fold: { id, open: evOpen.has(id) } });
+    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), fold: { id, open: evOpen.has(id) } });
   };
   const an = w.an
     .map((e, i) => {
