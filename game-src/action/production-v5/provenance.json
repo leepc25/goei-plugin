@@ -1,0 +1,11 @@
+{
+  "version": 5,
+  "status": "candidate-not-runtime-approved",
+  "master": "master-source.png",
+  "identityReference": "assets/agents/Jyaldi_default.avif",
+  "prompt": "NEW FINAL-PRODUCTION MODEL CANDIDATE, pixel-art character turnaround model sheet. Original portrait attached is identity reference only: adult woman Jyaldi, long straight black hair, red eyes, pale skin, black fitted trouser business suit with WHITE SHIRT AND BLACK NECKTIE, black gloves and black low-heeled practical shoes. DESIGN PRIORITY: unified compact readable 128px-tall game adult approximately SIX heads tall, not lanky fashion illustration, NOT chibi. Torso and pelvis substantial, arms and legs readable thickness, hands large enough to express fist at 128px. No long skinny legs. Very deliberate bold pixel clusters, clean silhouette, 3 shadow values per material, no micro-noise, no painterly gradients, no scattered tiny wrinkles. Exactly THREE standing figures, one horizontal row: front, exact RIGHT side, RIGHT facing three-quarter gameplay view. All three are the SAME model with identical skull size, neck, shoulder width, torso length, hip height, leg length, same suit cut and hair length. Relaxed standing arms slightly away so hands visible, no action. Full body including shoes, equal common baseline and crown line, generous transparent space all around each. Original native design is 128px tall shown as crisp enlarged nearest-neighbor pixel art, meaningful pixels visibly square and big. Plain TRANSPARENT background, no text, labels, grid, shadows, props, weapons. Do not replicate original portrait's realistic tall proportions. Consistency across all views is essential. Face calm stern mature woman. The reference portrait is an original source, no prior rejected game sprites are input.",
+  "scalePolicy": "One fixed scale from neutral master. Never normalize each pose.",
+  "nativeStandingHeight": 128,
+  "displayScale": 2,
+  "releaseReady": false
+}

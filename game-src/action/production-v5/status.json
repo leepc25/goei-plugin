@@ -1,0 +1,22 @@
+{
+  "version": 5,
+  "releaseReady": false,
+  "standard": "docs/JYALDI_PRODUCTION_STANDARD.md",
+  "priority": "Consistent identity, anatomy, costume and pixel scale across every action",
+  "master": "master-source.png",
+  "latestPoseCandidate": "core-poses-candidate-02.png",
+  "review": {
+    "candidate01": "Rejected crouch lunge and straight punch instead of hook",
+    "candidate02": "Bent hook and lower pelvis improved; support foot, limb lengths, native-pixel cleanup and continuity still require review",
+    "runtimeIntegrated": false,
+    "completeAnimationClips": 0
+  },
+  "implemented": ["Separate melee Z and ranged D inputs including touch buttons", "Distance-independent ground/air attack selection"],
+  "validation": {"simulationTestsPassed": 17, "typecheck": "not run: compiler unavailable", "browser": "pending"},
+  "next": [
+    "Validate master and representative poses at fixed native 128px scale",
+    "Create full-body idle, walking, running, crouch walking and alternating-arm melee cycles",
+    "Integrate newly reviewed assets without rejected legacy character art",
+    "Implement remaining production-standard actions and validate playable HTML"
+  ]
+}

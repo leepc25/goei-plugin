@@ -82,7 +82,7 @@ test('방향키의 대각 이동이 더 빠르지 않고 점프와 공격을 함
   const r = newRun();
   step(r, { x: 0, y: 0, jump: true, attack: true }, 1 / 60);
   assert.ok(r.player.vz > 0);
-  assert.equal(r.player.act, 'shot');
+  assert.equal(r.player.act, 'airattack');
 });
 test('소모품은 효과가 있을 때만 쓰고 종류별 자원을 복구한다', () => {
   const r = newRun();
@@ -131,7 +131,7 @@ test('잘못된 저장·구형 순찰·비정상 값은 실행하지 않는다',
   assert.ok(restore(serialize(newRun())));
 });
 
-test('근접 Z는 3연계 후 다운을 만들고 먼 표적에는 사격한다', () => {
+test('근접 Z는 3연계 후 다운을 만들고 먼 표적에도 근접 공격한다', () => {
   const r = newRun();
   r.player.gauge = 0;
   r.enemies.forEach((e, i) => {
@@ -150,7 +150,7 @@ test('근접 Z는 3연계 후 다운을 만들고 먼 표적에는 사격한다'
   assert.equal(r.bolts.length, 0);
   const distant = newRun();
   step(distant, { x: 0, y: 0, attack: true }, 1 / 60);
-  assert.equal(distant.player.act, 'shot');
+  assert.equal(distant.player.act, 'melee1');
 });
 test('보행 위상은 실제 거리만 누적하고 벽에서 미끄러지지 않는다', () => {
   const r = newRun();
@@ -269,4 +269,19 @@ test('패배·승리 상태에서도 본체 동작 시간이 진행된다', () =
   assert.equal(win.player.act, 'victory');
   tick(win, 0.5);
   assert.ok(win.player.t >= 0.49);
+});
+
+
+test('근접과 원거리 명령은 거리와 공중 여부에 관계없이 구분된다', () => {
+  for (const air of [false, true]) {
+    const melee = newRun(); melee.practice = true; melee.enemies = [];
+    step(melee, {x: 0, y: 0, attack: true, jump: air}, 1/60);
+    assert.equal(melee.player.act, air ? 'airattack' : 'melee1');
+    tick(melee, .15); assert.equal(melee.bolts.filter(b => !b.enemy).length, 0);
+    const ranged = newRun(); ranged.practice = true;
+    ranged.enemies[0].x = ranged.player.x + 60; ranged.enemies[0].y = ranged.player.y;
+    step(ranged, {x: 0, y: 0, ranged: true, jump: air}, 1/60);
+    assert.equal(ranged.player.act, 'shot');
+    tick(ranged, .12); assert.ok(ranged.effects.some(f => f.kind === 'shot'));
+  }
 });

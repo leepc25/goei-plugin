@@ -99,6 +99,7 @@ export interface Input {
   x: number;
   y: number;
   attack?: boolean;
+  ranged?: boolean;
   run?: boolean;
   jump?: boolean;
   dash?: boolean;
@@ -324,8 +325,8 @@ export function autoInput(r: Run): Input {
     x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
     run: Math.abs(dx) > 260,
     y: threat ? (p.y > 540 ? -1 : 1) : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-    attack:
-      Math.abs(dy) < 26 && (Math.abs(dx) < 120 || (Math.abs(dx) > 360 && r.time % 1.8 < 0.45)),
+    attack: Math.abs(dy) < 26 && Math.abs(dx) < 120,
+    ranged: Math.abs(dy) < 26 && Math.abs(dx) > 360 && r.time % 1.8 < 0.45,
     skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
     dash: !!threat,
     ult: p.gauge >= 100 && live.length >= 2,
@@ -441,17 +442,17 @@ export function step(r: Run, raw: Input, dt: number) {
       p.armor = true;
     } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
       p.attackBuffer = 0;
-      if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
+      if (p.z > 0 || p.vz > 0) {
         act(p, 'airattack', strikeDuration('airattack'));
       } else if (!p.z && !p.vz && input.run && input.x) {
         act(p, 'dashattack', strikeDuration('dashattack'));
-      } else if (!p.z && !p.vz && nearTarget(r)) {
+      } else {
         act(p, 'melee1', strikeDuration('melee1'));
         p.cooldown = 0;
-      } else {
-        act(p, 'shot', 0.24);
-        p.cooldown = 0.28;
       }
+    } else if (input.ranged && p.cooldown <= 0) {
+      act(p, 'shot', 0.24);
+      p.cooldown = 0.28;
     } else {
       const x = clamp(input.x, -1, 1),
         y = clamp(input.y, -1, 1);

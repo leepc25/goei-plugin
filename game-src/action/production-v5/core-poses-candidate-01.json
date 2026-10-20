@@ -1,0 +1,12 @@
+{
+  "prompt": "Create a NEW pixel art representative action model validation sheet from the attached NEW production master. This is identity reference, not separate characters. Exactly SIX full body figures in 3 columns x 2 rows, transparent background. SAME adult woman, long straight black hair, red eyes, black trouser suit, white shirt black necktie gloves low practical shoes. SAME skull, limb lengths and thickness, torso and pelvis size and costume throughout. No per-pose scaling. Same camera gameplay three-quarter facing RIGHT. Use crisp low resolution pixel clusters designed for native standing 128px height. Enough clean space around figures. Top row: neutral standing at rest; walking contact pose right foot forward nearly extended knee, left arm forward slightly bent, opposite shoulder/pelvis counterrotation; RUNNING contact pose leaning entire torso forward, rear leg extending backwards, front knee lifting, both elbows bent and opposing feet. Bottom row: crouched step pelvis lowered by folded knees with SAME full-sized head torso thighs and calves, one rear supporting foot and other lifting forward, no crawling; POWERFUL LEAD LEFT HOOK contact with feet pivoting, pelvis and shoulders driving around, torso leaning forward, bent left arm horizontal at chest height across front, rear right hand guarding; pistol aiming facing right, torso slight forward incline, two handed grip. Hair and jacket follow movement, never fixed torso plus rotating limbs. Each figure uses the same anatomical model from reference, never shorter legs or larger head. All standing figures same crown to sole design height, crouch/run naturally lower silhouette WITHOUT resizing. No text, no labels, no floor, no shadows, no effects, no other characters. Keep clean bold pixel masses, no noisy wrinkles. This is a six-pose consistency check sheet, not a finished animation.",
+  "reference": "master-source.png",
+  "status": "rework-required",
+  "releaseReady": false,
+  "visualFindings": [
+    "Crouched locomotion is a lunge, not alternating low walking.",
+    "Requested lead hook became straight punch. Cannot represent combo third hit.",
+    "Native 128px cleanup, anatomical comparison and animation continuity still pending."
+  ],
+  "runtimeIntegration": false
+}

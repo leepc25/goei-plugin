@@ -15,8 +15,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   const style = document.createElement('style');
   style.textContent = css;
   root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
-  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
+  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접 · D 사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접</button><button data-hold="ranged">D 사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 Z 차기 · D 사격 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접 · D 사격 · F 자동 전투</p>`;
   box.append(style, root);
   const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
   const canvas = $<HTMLCanvasElement>('canvas'),
@@ -148,6 +148,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     ArrowLeft: 'left',
     ArrowRight: 'right',
     KeyZ: 'attack',
+    KeyD: 'ranged',
     KeyA: 'guard',
     ShiftLeft: 'run',
     ShiftRight: 'run',
@@ -348,9 +349,9 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     if (target) {
       const dx = target.x - p.x,
         dy = target.y - p.y;
-      x = Math.abs(dx) > (target.attack ? 300 : 10) ? Math.sign(dx) : 0;
+      x = Math.abs(dx) > (target.attack ? 95 : 10) ? Math.sign(dx) : 0;
       y = Math.abs(dy) > 12 ? Math.sign(dy) : 0;
-      attack = target.attack && Math.abs(dx) < 600 && Math.abs(dy) < 25;
+      attack = target.attack && Math.abs(dx) < 120 && Math.abs(dy) < 25;
       if (target.attack) p.dir = dx >= 0 ? 1 : -1;
       if (!target.attack && !x && !y) target = null;
     }
@@ -358,6 +359,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       x,
       y,
       attack,
+      ranged: held.has('ranged'),
       run: held.has('run') || Math.hypot(stickX, stickY) > 0.95,
       guard: held.has('guard'),
       ...edges,
@@ -418,7 +420,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       text('[data-menu-title]', '쟈알디 · 1인 전투 검증판');
       text(
         '[data-menu-text]',
-        '계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다.',
+        '계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 근접 · D 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다.',
       );
       $<HTMLButtonElement>('[data-do="restart"]').hidden = false;
       resize();
