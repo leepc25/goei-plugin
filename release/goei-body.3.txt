@@ -1,4 +1,29 @@
-""}>${ICONS.trash}</button>`;
+messages.some((m) => m.text.toLowerCase().includes(q))));
+  }
+  function chatsView(ctx2, st, d) {
+    const all = chatRooms(st, "");
+    if (!all.length) return blank3("아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
+    const unread = all.filter((r) => r.unread);
+    const head = chips2("ph-chat-filter", phone.chatFilter, [
+      { id: "all", label: "전체", count: all.length },
+      { id: "unread", label: "안읽음", alert: unread.reduce((n, r) => n + r.unread, 0) }
+    ]);
+    const rows2 = phone.chatFilter === "unread" ? unread : all;
+    return head + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
+  }
+  function chatList(ctx2, rows2, d) {
+    return `<ul class="ph-list ph-chats">${rows2.map((r) => {
+      const last2 = [...r.messages].reverse().find((m) => m.kind === "message") ?? r.messages[r.messages.length - 1];
+      const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
+      const preview = r.pending ? "답장을 기다리는 중…" : last2 ? last2.kind === "message" ? `${last2.sender === "me" ? "나: " : ""}${previewText(last2.text)}` : last2.text : "";
+      const on2 = phone.view === "room" && phone.room === r.id;
+      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc6(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
+        <span class="ph-who"><span class="ph-who-top"><b>${esc6(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc6(shortTime(last2.time))}</small>` : ""}</span>
+        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc6([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
+    }).join("")}</ul>`;
+  }
+  function roomDel(id, pending, label) {
+    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}" title="삭제" aria-label="${esc6(label)} 삭제" ${pending ? "disabled" : ""}>${ICONS.trash}</button>`;
   }
   var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
   function roomView(ctx2, st, d, busy4) {
@@ -21,12 +46,12 @@
       const next = shown2[i + 1];
       const me = m.sender === "me";
       const first = !!sep || !isMsg(prev) || prev.sender !== m.sender;
-      const last = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
+      const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
       const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
       const who2 = d.map.get(m.sender) ?? r.people[m.sender];
       const pic = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
       const head = !me && first ? `<b class="ph-name">${esc6(name(m.sender))}</b>` : "";
-      const meta = last || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last ? esc6(shortTime(m.time)) : ""}</span>` : "";
+      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc6(shortTime(m.time)) : ""}</span>` : "";
       return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
     }).join("");
     const pending = r.pending ? r.pending.status === "working" || busy4 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc6(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc6(r.id)}">건너뛰기</button></div>` : "";
@@ -71,10 +96,10 @@
     const q = phone.pickQuery.trim().toLowerCase();
     const fnames = names2(ctx2);
     const tab2 = pickTabOf(d);
-    const rows = d.contacts.filter((c) => !existing.has(c.id) && (q ? matches(c, q, fnames) : !tab2 || c.tabs.includes(tab2)));
+    const rows2 = d.contacts.filter((c) => !existing.has(c.id) && (q ? matches(c, q, fnames) : !tab2 || c.tabs.includes(tab2)));
     const picked = new Set(phone.picked);
-    if (!rows.length) return '<p class="gx-none">고를 수 있는 연락처가 없어요.</p>';
-    return rows.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
+    if (!rows2.length) return '<p class="gx-none">고를 수 있는 연락처가 없어요.</p>';
+    return rows2.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
         <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc6(c.name)}</b><small>${esc6(contactDetails(c))}</small></span></button></li>`).join("");
   }
   function pickTabOf(d) {
@@ -199,11 +224,11 @@
     open: "채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
     "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
   };
-  function seg(key, cur, items) {
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
+  function seg(key2, cur, items) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
   }
   var row2 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group = (title2, rows) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows}</div></section>`;
+  var group = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   function settingsView(ctx2) {
     const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
     const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]);
@@ -466,9 +491,9 @@
         else Object.assign(phone, { openNotice: id, view: "notice" });
         {
           const b = readBulletins(ctx2.chat);
-          const row5 = b.items.find((x) => x.id === id);
-          if (row5 && row5.read === false) {
-            row5.read = true;
+          const row6 = b.items.find((x) => x.id === id);
+          if (row6 && row6.read === false) {
+            row6.read = true;
             await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
             return true;
           }
@@ -482,7 +507,7 @@
       case "ph-notice-all": {
         const b = readBulletins(ctx2.chat);
         if (!b.items.some((x) => x.read === false)) break;
-        for (const row5 of b.items) row5.read = true;
+        for (const row6 of b.items) row6.read = true;
         await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
         return true;
       }
@@ -560,8 +585,8 @@
       return env2.render();
     }
     const d = dir(ctx2);
-    const key = name.toLowerCase();
-    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key || c.terms.some((t) => t.toLowerCase() === key));
+    const key2 = name.toLowerCase();
+    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key2 || c.terms.some((t) => t.toLowerCase() === key2));
     if (found.length > 1) {
       phone.notice = "같은 이름의 연락처가 여럿이에요. 정확한 이름을 적어 주세요.";
       return env2.render();
@@ -596,13 +621,13 @@
     phone.notice = "연락처와 1:1 대화 기록을 지웠어요.";
     await env2.refresh();
   }
-  function phoneInput(name, value, key) {
+  function phoneInput(name, value, key2) {
     switch (name) {
       case "ph-draft":
         phone.draft = value;
         return true;
       case "ph-att":
-        return attachInput(phone.attach, key, value);
+        return attachInput(phone.attach, key2, value);
       case "ph-topic":
         phone.topic = value;
         return true;
@@ -681,22 +706,22 @@
   function withVars(chat, vars) {
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } };
   }
-  function saveIncoming(chat, st, rows, plan, post) {
+  function saveIncoming(chat, st, rows2, plan, post) {
     try {
-      if (commitIncoming(st, rows, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: "새 쪽지가 왔어요." };
+      if (commitIncoming(st, rows2, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: "새 쪽지가 왔어요." };
       return { vars: {}, note: "" };
     } catch (error) {
       return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
     }
   }
   async function run2(ctx2, env2, label, work) {
-    const key = chatKey2(ctx2);
-    if (jobs2.has(key)) {
-      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
       env2.render();
       return;
     }
-    jobs2.set(key, label);
+    jobs2.set(key2, label);
     gnet.notice = "";
     gnet.failure = null;
     env2.render();
@@ -708,7 +733,7 @@
       const raw = error.raw;
       if (raw) gnet.failure = { label, reason: msg, raw };
     } finally {
-      jobs2.delete(key);
+      jobs2.delete(key2);
       await env2.refresh();
     }
   }
@@ -818,9 +843,9 @@
     });
   }
   async function writeComment(ctx2, env2, postId2, parent, body5) {
-    const key = chatKey2(ctx2);
-    if (jobs2.has(key)) {
-      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
       return env2.render();
     }
     const nick = userNick(ctx2.chat.scriptstate);
@@ -870,9 +895,9 @@
     });
   }
   async function sendDm(ctx2, env2, nick, body5, src) {
-    const key = chatKey2(ctx2);
-    if (jobs2.has(key)) {
-      gnet.notice = `${jobs2.get(key)} 끝난 뒤 다시 눌러 주세요.`;
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
       return env2.render();
     }
     const me = userNick(ctx2.chat.scriptstate);
@@ -928,22 +953,22 @@
     });
     await env2.refresh();
   }
-  async function setVar(ctx2, env2, key, value) {
-    await setVars2(ctx2, env2, { [key]: value });
+  async function setVar(ctx2, env2, key2, value) {
+    await setVars2(ctx2, env2, { [key2]: value });
   }
   async function setVars2(ctx2, env2, vars) {
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, vars));
     await env2.refresh();
   }
   var MODE_PREV = "$gn_mode_prev";
-  function seg2(key, cur, items) {
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
+  function seg2(key2, cur, items) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
   }
   var body2 = (text) => attachBody(text, true);
   function time(date) {
     return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
   }
-  var tool2 = (action, icon, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var tool2 = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   function paneHead2(title2, sub, right = "", back = true) {
     return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
   }
@@ -1004,12 +1029,12 @@
       kids.set(parent, [...kids.get(parent) ?? [], i + 1]);
     });
     const out = [];
-    const seen = /* @__PURE__ */ new Set();
+    const seen2 = /* @__PURE__ */ new Set();
     const target = gnet.compose?.kind === "comment" && gnet.compose.post === p.id ? gnet.compose.parent : 0;
     const walk = (n, depth) => {
       for (const k of kids.get(n) ?? []) {
-        if (seen.has(k)) continue;
-        seen.add(k);
+        if (seen2.has(k)) continue;
+        seen2.add(k);
         const c = p.comments[k - 1];
         const confirm = gnet.confirm === `c:${p.id}:${k}`;
         const author = c.mine ? `<b class="gn-me">${esc7(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc7(c.nick)}</button>`;
@@ -1085,23 +1110,23 @@
     if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
     return `<ul class="ph-list gn-list">${threads.map((t) => {
       const on2 = gnet.openDm === t.nick && !gnet.settings;
-      const last = t.rows[t.rows.length - 1];
+      const last2 = t.rows[t.rows.length - 1];
       const confirm = gnet.confirm === `d:${t.nick}`;
       const del = confirm ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}" aria-label="${esc7(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
       return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc7(t.nick)}" aria-pressed="${on2}">
         <span class="ph-avatar gn-ava">${ICONS.mail}</span>
         <span class="ph-who"><span class="ph-who-top"><b>${esc7(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc7(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
-        <span class="ph-who-bot"><small>${last.side === "me" ? "나: " : ""}${esc7([...previewText(last.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy4, true) : ""}</li>`;
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc7([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy4, true) : ""}</li>`;
     }).join("")}</ul>`;
   }
   var row3 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group2 = (title2, rows) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows}</div></section>`;
+  var group2 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
   function settingsView2(ctx2, back = true) {
     const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
     const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc7(v(k) === "-" ? "" : v(k))}" placeholder="${esc7(ph)}">`;
     const keep = gnetRetention(ctx2.chat.scriptstate);
     const on2 = v("mode") !== "0";
-    const rows = on2 ? `${group2("괴담넷", [
+    const rows2 = on2 ? `${group2("괴담넷", [
       row3("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
       row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
       row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
@@ -1122,7 +1147,7 @@
       row3("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
     ].join(""))}
       ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
-    return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows}</div></div>`;
+    return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows2}</div></div>`;
   }
   function paneHtml2(ctx2, st, kind, busy4) {
     if (kind === "settings") return settingsView2(ctx2);
@@ -1524,12 +1549,12 @@
   function paragraphs(text) {
     const out = [];
     let cur = [];
-    for (const line of `${text}
+    for (const line2 of `${text}
 `.split("\n").slice(0, -1)) {
-      if (/^\s*$/.test(line)) {
+      if (/^\s*$/.test(line2)) {
         if (cur.length) out.push(cur.join("\n"));
         cur = [];
-      } else cur.push(line);
+      } else cur.push(line2);
     }
     if (cur.length) out.push(cur.join("\n"));
     return out;
@@ -1747,10 +1772,10 @@ ${job.trailing}` : body5;
     at = -1;
     /** 지금 화면 상태를 적는다 (방금 적은 것과 같으면 그대로) */
     record(state) {
-      const key = JSON.stringify(state);
-      if (this.list[this.at] === key) return;
+      const key2 = JSON.stringify(state);
+      if (this.list[this.at] === key2) return;
       this.list = this.list.slice(0, this.at + 1);
-      this.list.push(key);
+      this.list.push(key2);
       if (this.list.length > LIMIT) this.list.shift();
       this.at = this.list.length - 1;
     }
@@ -1764,11 +1789,89 @@ ${job.trailing}` : body5;
       this.at += dir2;
       return JSON.parse(this.list[this.at]);
     }
+    /** 지나온 화면들, 최근 것부터 (같은 화면은 한 번만) */
+    recent() {
+      return [...new Set(this.list.slice(0, this.at + 1).reverse())].map((k) => JSON.parse(k));
+    }
     clear() {
       this.list = [];
       this.at = -1;
     }
   };
+
+  // src/ui/agents.ts
+  var agUi = { pop: "" };
+  var last = [];
+  var lastOrg = "";
+  var esc8 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var ORDER = { op: 0, ok: 1, lock: 2 };
+  var OSD = { op: "LIVE", ok: "STANDBY", lock: "OFFLINE" };
+  var line = (a) => a.situation || (a.side === "op" ? a.deployed : "") || "대기 중";
+  var tip = (a) => `data-agtip="${esc8(`${a.name} · ${a.st}`)}" data-agtip-text="${esc8(line(a))}"`;
+  function tile(a, i) {
+    return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc8(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
+    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, "0")}</span><span class="st"><i></i>${OSD[a.side]}</span></span>
+    <span class="gx-agmon-cap"><b>${esc8(a.name)}</b><small>${esc8(a.side === "op" && a.deployed ? a.deployed : line(a))}</small></span></span></li>`;
+  }
+  function row4(a) {
+    const tools = a.wiki !== null ? `<span class="gx-agrow-tools"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc8(a.id)}" title="괴담톡" aria-label="${esc8(a.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc8(a.wiki)}" title="위키" aria-label="${esc8(a.name)} 위키">${ICONS.wiki}</button></span>` : "";
+    return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc8(a.id)}" ${tip(a)}>${a.face}<b>${esc8(a.name)}</b><span class="gx-agrow-st"><i></i>${esc8(a.st)}</span><span class="gx-agrow-msg">${esc8(line(a))}</span>${tools}</li>`;
+  }
+  function agentPanel(items, view2, o) {
+    last = items;
+    lastOrg = o.org;
+    const list4 = [...items].sort((a, b) => ORDER[a.side] - ORDER[b.side]);
+    const op = items.filter((a) => a.side === "op").length;
+    const head = `<h2><b>요원</b><span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
+    const body5 = !list4.length ? `<p class="gx-none">${esc8(o.empty)}</p>` : view2 === "list" ? `<ul class="gx-agrows">${list4.map(row4).join("")}</ul>` : `<ul class="gx-agwall">${list4.map(tile).join("")}</ul>`;
+    return `<section class="gx-sec gx-agbox ${view2}" id="gx-sec-ag">${head}${o.extra}${body5}</section>`;
+  }
+  function agentPopup() {
+    const org = lastOrg;
+    const a = last.find((x) => x.id === agUi.pop);
+    if (!a) {
+      agUi.pop = "";
+      return "";
+    }
+    const btns = a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc8(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc8(a.wiki)}">${ICONS.wiki}위키</button>` : "";
+    const rows2 = [["소속", a.dept], ["직급", a.rank], ["투입", a.deployed], ["상황", a.situation || "대기 중"]].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd${k === "투입" ? ' class="dep"' : ""}>${esc8(v)}</dd>`).join("");
+    return `<button class="ev-scrim" data-action="agent-info" data-value="${esc8(a.id)}" aria-label="닫기"></button>
+    <div class="gx-agcard ${a.side}" role="dialog" aria-label="${esc8(a.name)}">
+      <div class="gx-agcard-band">AGENT ID<b>${esc8(org)}</b><button class="gx-agcard-x" data-action="agent-info" data-value="${esc8(a.id)}" aria-label="닫기">✕</button></div>
+      <div class="gx-agcard-main"><span class="gx-agcard-ph">${a.photo ? `<img src="${esc8(a.photo)}" alt="">` : a.face}</span>
+        <span class="gx-agcard-t"><span class="nm">${esc8(a.name)}</span>${a.english ? `<span class="en">${esc8(a.english)}</span>` : ""}<dl>${rows2}</dl></span></div>
+      <div class="gx-agcard-foot"><span class="code">NO. ${esc8(a.id.replace(/^([A-Z]+)(\d)/, "$1-$2"))}<u></u></span>${btns}</div>
+    </div>`;
+  }
+  function bindAgentTips(root2) {
+    let bub = null;
+    const hide = () => {
+      bub?.remove();
+      bub = null;
+    };
+    root2.addEventListener("mouseover", (ev) => {
+      if (!matchMedia("(hover: hover)").matches) return;
+      const el = ev.target.closest("[data-agtip]");
+      if (!el || el.contains(ev.relatedTarget)) return;
+      hide();
+      bub = document.createElement("div");
+      bub.className = "gx-agtip";
+      bub.innerHTML = `<b>${esc8(el.dataset.agtip ?? "")}</b>${esc8(el.dataset.agtipText ?? "")}`;
+      root2.appendChild(bub);
+      const r = el.getBoundingClientRect();
+      const w = bub.offsetWidth;
+      const x = Math.min(window.innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2));
+      bub.style.left = `${x}px`;
+      bub.style.top = `${r.top - bub.offsetHeight - 10}px`;
+      bub.style.setProperty("--tail", `${r.left + r.width / 2 - x}px`);
+    });
+    root2.addEventListener("mouseout", (ev) => {
+      const el = ev.target.closest("[data-agtip]");
+      if (el && !el.contains(ev.relatedTarget)) hide();
+    });
+    root2.addEventListener("click", hide, true);
+    root2.addEventListener("scroll", hide, true);
+  }
 
   // src/ui/style.css
   var style_default = `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -1918,10 +2021,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
 .gx-logo.mob { display: none; }
-/* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
+/* PC: 본문 첫 줄을 왼쪽 사원증 윗선 높이에 맞춘다 (v0.16.16, 2026-10-20 사원증 위치 18px에 다시 맞춤) */
 @media (min-width: 761px) {
   .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
-  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 9px; }
+  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
   .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
@@ -2970,74 +3073,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 
 /* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
 /* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
-.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
-.gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
-.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
-.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.gx-id-photo.none svg { width: 44px; height: 44px; }
-.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
-.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
-.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
-.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
-.gx-idbtn { display: none; overflow: hidden; padding: 0; }
-.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
-.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
-.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
-.gx-idpop-card .gx-id-photo { width: 160px; height: 160px; border-radius: 24px; }
-.gx-idpop-card .gx-agpop-x { z-index: 1; }
-@media (max-width: 760px) { .gx-idbtn { display: grid; } }
-.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
-.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
-.gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
-.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
-.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
-.gx-op-wait { font-size: 12px; line-height: 1.45; color: var(--sub); text-align: center; word-break: keep-all; }
-/* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
-
-/* 상황판 다시 설계 (v0.16.13) */
-/* 상황판 (v0.16.15 촘촘하게): 괴이·사건·특수 세 칸, 행은 한 줄. 위협도는 머리에만 (v0.16.16) */
-.gx-board { gap: 14px; }
-.gx-bd-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; align-items: start; }
-.gx-board .gx-bd-col { min-width: 0; padding: 0; }
-.gx-bd-col h2 { display: flex; align-items: baseline; gap: 6px; margin: 0 0 8px; font-size: 15px; color: var(--text); }
-.gx-bd-col h2 small { font-size: 13px; font-weight: 500; color: var(--dim); }
-.gx-bd-col .gx-none { margin: 0; padding: 10px 12px; font-size: 13px; border: 1px dashed var(--line); border-radius: 12px; }
-/* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
-.gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-/* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
-.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
-.gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.gx-evc.go { cursor: pointer; }
-.gx-evc.go:hover { border-color: var(--line2); }
-.gx-evc.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
-.gx-evc .gx-gmark { flex: none; width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-style: normal; }
-.gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-.gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
-.gx-evc-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.gx-evc-tags { display: flex; align-items: center; gap: 4px; flex: none; }
-.gx-evc-tags .gx-badge { font-size: 11.5px; padding: 3px 8px; }
-.gx-evc-name b { min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-evc-top > .gx-badge { flex: none; font-size: 11.5px; padding: 3px 8px; }
-.gx-evc-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-evc-who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
-.gx-evc-who .gx-pchip { height: 24px; font-size: 12px; padding-right: 8px; }
-.gx-evc-who .gx-badge { font-size: 11.5px; padding: 4px 8px; }
-.gx-evc-sit { margin-top: 2px; font-size: 12.5px; line-height: 1.45; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.gx-evc-act { display: flex; align-items: center; flex: none; margin: -4px -4px -4px auto; }
-.gx-evc-act .gx-icon { width: 26px; height: 26px; }
-.gx-evc-act .gx-icon svg { width: 15px; height: 15px; }
-.gx-evc-act .gx-mini { min-height: 26px; padding: 0 8px; font-size: 12px; }
-/* 상황 딱지 (v0.16.21, 사용자 요청: 알록달록해서 눈에 안 들어온다): 괴이는 붉은 계열, 사건은 노란 계열, 특수는 파란 계열로 통일.
-   괴이는 바탕은 모두 같고 등급 글자만 높을수록 밝게 빛난다 */
-.gx-evc .gx-gmark.an { background: var(--danger-bg); color: color-mix(in srgb, var(--danger) 70%, transparent); font-size: 14px; font-weight: 800; }
-.gx-gmark.an.g-s { color: #fff; text-shadow: 0 0 4px var(--danger), 0 0 10px var(--danger), 0 0 16px var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 60%, transparent); }
-.gx-gmark.an.g-a { color: color-mix(in srgb, var(--danger) 55%, #fff); text-shadow: 0 0 4px var(--danger), 0 0 9px color-mix(in srgb, var(--danger) 70%, transparent); }
-.gx-gmark.an.g-b { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 45%, transparent); }
-.gx-gmark.an.g-c { color: color-mix(in srgb, var(--danger) 80%, transparent); }
-.gx-gmark.an.g-d, .gx-gmark.an.g-e { color: color-mix(in srgb, var(--danger) 55%, transparent); }
-/* 밝은·종이 테마: 흰 글자 빛남은 옅은 바탕에서 번진 얼룩처럼 보여 글자가 안 읽힌다 → 진한 글자에 작은 빛 */
-.gx[data-theme="light"] .gx-gmark.an.g-s, .gx[data-theme="paper"] .gx-gmark.an.g-s { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 50%, transparent); }
-.gx[data-theme="light"] .gx-gmark.an.g-a, .gx[data-theme="paper"] .gx-gmark.an.g-a { color: var(--danger); text-shadow: 0 0 4px color-mix(in srgb, var(--danger) 35%, transparent); }
-.gx[data-theme="light"] .gx-gmark.an.g-b, .gx[data-theme="paper"] .gx-gmark.an.g-b { text-shadow: none; }
-.gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
-.gx-evc .gx-gmark.ms { background: color-mix(i
+.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line)

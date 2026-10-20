@@ -1,4 +1,4 @@
-// goei-body 0.16.33
+// goei-body 0.16.34
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -37,9 +37,9 @@
     return { sections: sections2, format };
   }
   function fill(template, values) {
-    return template.replace(/\[\[(\w+)\]\]/g, (_, key) => {
-      if (!(key in values)) throw new DirectiveError(`Directive에서 쓸 수 없는 치환 항목이에요: [[${key}]]`);
-      return String(values[key]);
+    return template.replace(/\[\[(\w+)\]\]/g, (_, key2) => {
+      if (!(key2 in values)) throw new DirectiveError(`Directive에서 쓸 수 없는 치환 항목이에요: [[${key2}]]`);
+      return String(values[key2]);
     });
   }
   function destination(d, name, location) {
@@ -206,6 +206,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     info: stroke('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
     refresh: stroke('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>'),
     group: stroke('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>'),
+    person: stroke('<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/>'),
+    org: stroke('<rect x="4" y="3.5" width="10" height="17" rx="1.5"/><path d="M14 9.5h4.5a1.5 1.5 0 0 1 1.5 1.5v9.5H14M7.5 7.5h3M7.5 11h3M7.5 14.5h3M10 20.5v-2.5"/>'),
     addUser: stroke('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/>'),
     pen: stroke('<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>'),
     mail: stroke('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>'),
@@ -217,6 +219,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
     back: stroke('<path d="m15 5-7 7 7 7"/>'),
     // 관찰형 게임 「관리국 순찰」: 게임패드
+    star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
     game: stroke('<path d="M7 8h10a4 4 0 0 1 4 4.5l-.6 3.6a2.4 2.4 0 0 1-4.2 1.1L14.5 15h-5l-1.7 2.2a2.4 2.4 0 0 1-4.2-1.1L3 12.5A4 4 0 0 1 7 8Z"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01"/>'),
     search: stroke('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
     list: stroke('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>'),
@@ -244,9 +247,9 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   // src/ui/landing.ts
   var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
   function title(p) {
-    const line = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
+    const line2 = `<span style="color:${p.text}">괴이</span><span style="color:${p.signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${p.signal}">이면세계</span>`;
     const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
-    return `<div style="margin:6px 0 0;${font}">${line}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line}</div></div>`;
+    return `<div style="margin:6px 0 0;${font}">${line2}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line2}</div></div>`;
   }
   function corner(pos, p) {
     const [v, h] = pos.split(" ");
@@ -399,8 +402,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
   function parseSeedManifest(raw) {
     const map = /* @__PURE__ */ new Map();
-    for (const line of raw.split("\n")) {
-      const t = line.replace(/\r/g, "").trim();
+    for (const line2 of raw.split("\n")) {
+      const t = line2.replace(/\r/g, "").trim();
       if (!t || t.startsWith("#")) continue;
       const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
       if (!m) continue;
@@ -699,7 +702,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         else missing.push("[AC] E00 줄");
       }
       if (!t.includes("{{getvar::fac_pool}}")) {
-        if (POOL2.test(t)) t = t.replace(POOL2, (_m, line, etc, nl) => `${line}{{getvar::fac_pool}}${etc ?? ""}${nl}`);
+        if (POOL2.test(t)) t = t.replace(POOL2, (_m, line2, etc, nl) => `${line2}{{getvar::fac_pool}}${etc ?? ""}${nl}`);
         else missing.push("Faction pool 줄");
       }
       if (t !== next[tagAt].content) {
@@ -799,9 +802,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function legacyPlaces(lore, group4) {
     const world = obj2(book(lore, "World catalog"));
-    const rows = Array.isArray(world[group4]) ? world[group4] : [];
+    const rows2 = Array.isArray(world[group4]) ? world[group4] : [];
     const out = [];
-    for (const r of rows) {
+    for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 5) continue;
       const label = s2(r[1]);
       if (!label) continue;
@@ -811,9 +814,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function legacyBases(lore) {
     const world = obj2(book(lore, "World catalog"));
-    const rows = Array.isArray(world["랜드마크"]) ? world["랜드마크"] : [];
+    const rows2 = Array.isArray(world["랜드마크"]) ? world["랜드마크"] : [];
     const out = [];
-    for (const r of rows) {
+    for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 10 || !s2(r[1])) continue;
       out.push({
         name: s2(r[1]),
@@ -866,11 +869,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function legacyAgents(lore) {
     const roster = obj2(book(lore, "Agent roster"));
     const chars = Array.isArray(roster.characters) ? roster.characters : [];
-    const rows = [];
+    const rows2 = [];
     for (const c of chars.map(obj2)) {
       const name = s2(c.name);
       if (!name) continue;
-      rows.push({
+      rows2.push({
         lore: s2(c.lore) || name,
         id: s2(c.id),
         name,
@@ -887,9 +890,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
       });
     }
     const refill = Number.isInteger(roster.refill) && roster.refill >= 0 ? roster.refill : null;
-    return { rows, refill };
+    return { rows: rows2, refill };
   }
-  function matchLegacy(rows, lore, used) {
+  function matchLegacy(rows2, lore, used) {
     const k = squash(lore);
     const tests = [
       (r) => r.lore === lore,
@@ -898,7 +901,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       (r) => r.aliases.some((a) => squash(a) === k)
     ];
     for (const t of tests) {
-      const hit2 = rows.find((r) => !used.has(r) && t(r));
+      const hit2 = rows2.find((r) => !used.has(r) && t(r));
       if (hit2) return hit2;
     }
     return void 0;
@@ -1031,14 +1034,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
     while (taken.has(`P${n}`)) n = n >= 99999 ? 1e4 : n + 1;
     return `P${n}`;
   }
-  function ordered(rows, saved, legacy, legacyLore) {
+  function ordered(rows2, saved, legacy, legacyLore) {
     const rank = (r, i) => {
       const a = saved.indexOf(r.lore);
       if (a >= 0) return a;
       const b = legacy.indexOf(legacyLore.get(r.lore) ?? r.lore);
       return b >= 0 ? 1e5 + b : 2e5 + i;
     };
-    return rows.map((r, i) => [rank(r, i), i, r]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
+    return rows2.map((r, i) => [rank(r, i), i, r]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
   }
   var cache2 = /* @__PURE__ */ new WeakMap();
   function readDirectory(lore) {
@@ -1057,7 +1060,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
       const out = [];
-      const seen = /* @__PURE__ */ new Set();
+      const seen2 = /* @__PURE__ */ new Set();
       const merge = (base, d) => ({
         ...base,
         preset: typeof d.preset === "boolean" ? d.preset : base.preset,
@@ -1070,8 +1073,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       });
       for (const e of folder) {
         const name = s2(e.comment);
-        if (seen.has(name)) continue;
-        seen.add(name);
+        if (seen2.has(name)) continue;
+        seen2.add(name);
         const old = matchLegacy(legacy, name, used);
         if (old) {
           used.add(old);
@@ -1081,13 +1084,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
         out.push(merge(base, obj2(saved[name])));
       }
       for (const [name, d] of Object.entries(saved)) {
-        if (seen.has(name) || !exists.has(name)) continue;
-        seen.add(name);
+        if (seen2.has(name) || !exists.has(name)) continue;
+        seen2.add(name);
         const old = legacy.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
         out.push(merge(old ?? { lore: name, label: name, english: guessEnglish(byLore.get(name)), aliases: [], preset: false, inFolder: false }, obj2(d)));
       }
-      for (const r of legacy) if (!used.has(r) && !seen.has(r.lore) && !(members?.[kind].length && data)) out.push(r);
+      for (const r of legacy) if (!used.has(r) && !seen2.has(r.lore) && !(members?.[kind].length && data)) out.push(r);
       return ordered(out, Object.keys(saved), legacy.map((r) => r.lore), legacyLore);
     };
     const agents2 = () => {
@@ -1098,7 +1101,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const fresh = /* @__PURE__ */ new Set();
       const out = [];
       const groups = [];
-      const seen = /* @__PURE__ */ new Set();
+      const seen2 = /* @__PURE__ */ new Set();
       const merge = (base, d) => ({
         ...base,
         id: /^P\d{3,}$/.test(s2(d.id)) ? s2(d.id) : base.id,
@@ -1124,8 +1127,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
           if (group4 && !groups.includes(group4)) groups.push(group4);
           continue;
         }
-        if (seen.has(name)) continue;
-        seen.add(name);
+        if (seen2.has(name)) continue;
+        seen2.add(name);
         const old = matchLegacy(legacy.rows, name, used);
         if (old) {
           used.add(old);
@@ -1134,18 +1137,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
         let base;
         if (old) base = { ...old, lore: name, group: group4, inFolder: true };
         else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group4, inFolder: true };
-        const row5 = merge(base, obj2(saved[name]));
-        if (!old && !saved[name]) fresh.add(row5);
-        out.push(row5);
+        const row6 = merge(base, obj2(saved[name]));
+        if (!old && !saved[name]) fresh.add(row6);
+        out.push(row6);
       }
       for (const [name, d] of Object.entries(saved)) {
-        if (seen.has(name) || !exists.has(name)) continue;
-        seen.add(name);
+        if (seen2.has(name) || !exists.has(name)) continue;
+        seen2.add(name);
         const old = legacy.rows.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
         out.push(merge(old ?? { lore: name, id: "", name, english: "", aliases: [], legacyEnglish: [], affiliation: "미분류", rosterFor: [], phoneTabs: [], rank: "", department: "", group: "", inFolder: false }, obj2(d)));
       }
-      for (const r of legacy.rows) if (!used.has(r) && !seen.has(r.lore) && !(members?.agent.length && data)) out.push(r);
+      for (const r of legacy.rows) if (!used.has(r) && !seen2.has(r.lore) && !(members?.agent.length && data)) out.push(r);
       const sorted = ordered(out, Object.keys(saved), legacy.rows.map((r) => r.lore), legacyLore);
       out.splice(0, out.length, ...sorted);
       const taken = /* @__PURE__ */ new Set();
@@ -1296,9 +1299,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     const to = d.agents.findIndex((a) => a.lore === target);
     if (to < 0 || to === from || agentGroup(d.agents[to]) !== g) return false;
-    const [row5] = d.agents.splice(from, 1);
+    const [row6] = d.agents.splice(from, 1);
     const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
-    d.agents.splice(at, 0, row5);
+    d.agents.splice(at, 0, row6);
     return true;
   }
 
@@ -1455,20 +1458,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function statusTimeline(texts) {
     const prev = /* @__PURE__ */ new Map();
-    const seen = /* @__PURE__ */ new Set();
+    const seen2 = /* @__PURE__ */ new Set();
     let start4 = null;
-    let last = null;
+    let last2 = null;
     for (const t of texts) {
       for (const tag of findStatusTags(t)) {
         const m = statusMinute(tag.date, tag.time);
-        seen.add(tag.raw.trim());
+        seen2.add(tag.raw.trim());
         if (m === null) continue;
         if (start4 === null) start4 = m;
-        if (last !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last.minute);
-        last = { raw: tag.raw.trim(), minute: m };
+        if (last2 !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last2.minute);
+        last2 = { raw: tag.raw.trim(), minute: m };
       }
     }
-    return { prev, start: start4, last, seen };
+    return { prev, start: start4, last: last2, seen: seen2 };
   }
 
   // src/core/world/tags.ts
@@ -1563,10 +1566,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
     });
   }
   function scanIncidents(text) {
-    return scanSites(text, "IN", ["진행", "종료"]).map(({ last, ...t }) => ({ ...t, situation: last }));
+    return scanSites(text, "IN", ["진행", "종료"]).map(({ last: last2, ...t }) => ({ ...t, situation: last2 }));
   }
   function scanMysticSites(text) {
-    return scanSites(text, "MS", ["출현", "소실"]).map(({ last, ...t }) => ({ ...t, visitors: last }));
+    return scanSites(text, "MS", ["출현", "소실"]).map(({ last: last2, ...t }) => ({ ...t, visitors: last2 }));
   }
   function scanAgents(text) {
     return fields(text, "AG").flatMap((f) => {
@@ -1606,18 +1609,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
     let prevHadTag = false;
     const ageOnly = (l) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
     for (const raw of lines) {
-      let line = raw;
-      if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line))) line = "";
-      if (prevHadTag) line = line.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
+      let line2 = raw;
+      if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
+      if (prevHadTag) line2 = line2.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
       let count = 0;
-      line = line.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
+      line2 = line2.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
         count++;
         return "";
       });
       const hadTag = count > 0;
       if (prev !== null && !(hadTag && ageOnly(prev))) keep.push(prev);
-      if (hadTag) line = line.replace(new RegExp(AGE_META.source, "g"), "");
-      prev = line;
+      if (hadTag) line2 = line2.replace(new RegExp(AGE_META.source, "g"), "");
+      prev = line2;
       prevHadTag = hadTag;
     }
     if (prev !== null) keep.push(prev);
@@ -1660,14 +1663,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
     agent_limit: 12
   };
   function emptyWorld() {
-    return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: "" };
+    return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: "", ended: [] };
   }
   function parseWorld(raw) {
     if (typeof raw !== "string" || !raw) return emptyWorld();
     try {
       const w = JSON.parse(raw);
       if (w && w.v === 1 && Array.isArray(w.an) && Array.isArray(w.inc) && Array.isArray(w.ms)) {
-        return { ...emptyWorld(), ...w, pending: { ...w.pending ?? {} } };
+        return { ...emptyWorld(), ...w, pending: { ...w.pending ?? {} }, ended: Array.isArray(w.ended) ? w.ended : [] };
       }
     } catch {
     }
@@ -1692,17 +1695,24 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function blocked(w, group4, name) {
     return (w.blocks[`${group4}:${name}`] ?? -1) >= w.epoch;
   }
+  function remember(w, kind, e, grade) {
+    if (e.state === "발생대기") return;
+    w.ended = [...(w.ended ?? []).filter((x) => !(x.kind === kind && x.name === e.name && x.loc === e.loc)), { kind, name: e.name, loc: e.loc, ...grade ? { grade } : {}, until: w.epoch + 1 }];
+  }
   function endAn(w, e) {
+    remember(w, "an", e, e.grade);
     block(w, "an", e.name);
     w.skip.an = e.loc;
     w.an = w.an.filter((x) => x !== e);
   }
   function endIn(w, e) {
+    remember(w, "in", e);
     block(w, "in", e.name);
     w.skip.in = e.loc;
     w.inc = w.inc.filter((x) => x !== e);
   }
   function endMs(w, e) {
+    remember(w, "ms", e);
     block(w, "ms", e.name);
     w.skip.ms = e.loc;
     w.ms = w.ms.filter((x) => x !== e);
@@ -1783,6 +1793,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function tick(w, c, s4, rng) {
     w.epoch += 1;
+    w.ended = (w.ended ?? []).filter((e) => e.until >= w.epoch);
     expire(w, s4);
     const groups = ["preset", "random", "incident", "mystic"];
     for (let i = groups.length - 1; i > 0; i--) {
@@ -1812,8 +1823,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function applyAgents(w, c, s4, faction, text) {
     const roster = rosterFor(w, c, faction, s4.agent_limit);
     for (const t of scanAgents(text)) {
-      const key = t.who.replace(/-/g, "").toUpperCase();
-      const p = roster.find((r) => r.id === key || r.english === t.who);
+      const key2 = t.who.replace(/-/g, "").toUpperCase();
+      const p = roster.find((r) => r.id === key2 || r.english === t.who);
       if (!p) continue;
       const rec = agentRecord(w, p.id);
       if (rec.st !== t.state || rec.since === null) rec.since = w.minute;
@@ -2082,20 +2093,24 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function activeEvents(w) {
     const out = [];
-    const key = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
+    const key2 = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
     w.an.forEach((e, index) => {
-      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key("an", e), grade: e.grade, people: e.deploy, report: "" });
+      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: "" });
     });
     w.inc.forEach((e, index) => {
-      if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key("in", e), grade: "", people: "", report: e.situation });
+      if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("in", e), grade: "", people: "", report: e.situation });
     });
     w.ms.forEach((e, index) => {
-      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key("ms", e), grade: "", people: e.visitors, report: "" });
+      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: "" });
     });
     return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
   }
-  function endEvent(w, key) {
-    const ev = activeEvents(w).find((e) => e.key === key);
+  function endedShown(w) {
+    const live = (k, name) => (k === "an" ? w.an : k === "in" ? w.inc : w.ms).some((e) => e.name === name && e.state !== "발생대기");
+    return (w.ended ?? []).filter((e) => e.until >= w.epoch && !(e.name && live(e.kind, e.name)));
+  }
+  function endEvent(w, key2) {
+    const ev = activeEvents(w).find((e) => e.key === key2);
     if (!ev) return false;
     if (ev.kind === "an") endAn(w, w.an[ev.index]);
     else if (ev.kind === "in") endIn(w, w.inc[ev.index]);
@@ -2234,14 +2249,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function buildRegistry(lore) {
     const books = lore ?? [];
     const entries2 = [];
-    const add = (key, name, loreName2, terms) => {
+    const add = (key2, name, loreName2, terms) => {
       const uniq = [...new Set([name, loreName2, ...terms].map((t) => t.trim()).filter(Boolean))];
-      entries2.push({ key, name, lore: loreName2, terms: uniq });
+      entries2.push({ key: key2, name, lore: loreName2, terms: uniq });
     };
     const dir2 = readDirectory(books);
     const places = { 괴이: dir2.anomalies, "미스틱 사이트": dir2.sites };
-    for (const [group4, rows] of Object.entries(places)) {
-      rows.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
+    for (const [group4, rows2] of Object.entries(places)) {
+      rows2.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
     }
     dir2.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore, [b.english, b.label, ...b.aliases]));
     for (const a of dir2.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...a.aliases, ...a.legacyEnglish]);
@@ -2254,8 +2269,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { entries: entries2, byTerm, byLore };
   }
   function resolveName(r, name) {
-    const key = name.trim().toLowerCase();
-    return r.byLore.get(key) ?? r.byTerm.get(key) ?? [];
+    const key2 = name.trim().toLowerCase();
+    return r.byLore.get(key2) ?? r.byTerm.get(key2) ?? [];
   }
   var SUFFIXES = ["님께서는", "님께서", "님에게", "선배님", "선배", "에게서", "에게는", "에게", "한테", "에서는", "에서", "으로는", "으로", "이랑", "처럼", "보다", "까지", "부터", "마저", "조차", "밖에", "께서", "께", "이는", "이가", "이야", "은", "는", "가", "를", "을", "와", "과", "랑", "의", "씨", "님", "야", "아", "이", "도", "만", "에", "로"];
   var isWord = (c) => c !== "" && /[\p{L}\p{N}_]/u.test(c);
@@ -2408,26 +2423,26 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     return out + esc(text.slice(i));
   }
-  var kv = (rows) => `<span class="gst-tip"><span class="gst-kv">${rows.map(([k, v]) => `<i>${esc(k)}</i><em>${esc(v)}</em>`).join("")}</span></span>`;
+  var kv = (rows2) => `<span class="gst-tip"><span class="gst-kv">${rows2.map(([k, v]) => `<i>${esc(k)}</i><em>${esc(v)}</em>`).join("")}</span></span>`;
   function statusHtml(tag, ctx2) {
     const now = statusMinute(tag.date, tag.time);
     const day = dayInfo(tag.date);
-    const rows = [];
+    const rows2 = [];
     const tl = ctx2.timeline;
     const known = tl?.prev.get(tag.raw.trim());
     const prev = known ?? (tl?.last && !tl.seen.has(tag.raw.trim()) ? tl.last.minute : void 0);
-    if (now !== null && prev !== void 0) rows.push(["지난 장면", sceneLabel(prev, now)], ["흐른 시간", elapsedLabel(prev, now)]);
+    if (now !== null && prev !== void 0) rows2.push(["지난 장면", sceneLabel(prev, now)], ["흐른 시간", elapsedLabel(prev, now)]);
     const start4 = ctx2.timeline?.start;
     if (now !== null && start4 !== null && start4 !== void 0 && now >= start4) {
       const s4 = new Date(start4 * 6e4);
-      rows.push(["시작부터", `${storyDay(start4, now)}일째 · ${s4.getUTCMonth() + 1}월 ${s4.getUTCDate()}일 시작`]);
+      rows2.push(["시작부터", `${storyDay(start4, now)}일째 · ${s4.getUTCMonth() + 1}월 ${s4.getUTCDate()}일 시작`]);
     }
-    const clock2 = tag.time ? `<span class="gst-clock"${rows.length ? ' data-gst-tip="1"' : ""}>${esc(tag.time)}${rows.length ? kv(rows) : ""}</span>` : "";
+    const clock2 = tag.time ? `<span class="gst-clock"${rows2.length ? ' data-gst-tip="1"' : ""}>${esc(tag.time)}${rows2.length ? kv(rows2) : ""}</span>` : "";
     let date = "";
     if (day) {
       const cls = day.saturday ? " sat" : day.weekday === "일" ? " sun" : "";
-      const tip = [["음력", day.lunar], ...day.holiday ? day.holiday.split("·").map((h) => ["공휴일", h]) : []].filter(([, v]) => v);
-      date = `<span class="gst-date${day.holiday ? " hol" : ""}"><span class="gst-dd">${esc(day.date)}</span><span class="gst-wd${cls}"${tip.length ? ' data-gst-tip="1"' : ""}>${day.weekday}${tip.length ? kv(tip) : ""}</span></span>`;
+      const tip2 = [["음력", day.lunar], ...day.holiday ? day.holiday.split("·").map((h) => ["공휴일", h]) : []].filter(([, v]) => v);
+      date = `<span class="gst-date${day.holiday ? " hol" : ""}"><span class="gst-dd">${esc(day.date)}</span><span class="gst-wd${cls}"${tip2.length ? ' data-gst-tip="1"' : ""}>${day.weekday}${tip2.length ? kv(tip2) : ""}</span></span>`;
     } else if (tag.date) date = `<span class="gst-date"><span class="gst-dd">${esc(tag.date)}</span></span>`;
     const wx = [tag.weather, tag.temp].filter(Boolean).join(" ");
     const top = clock2 || date || wx ? `<div class="gst-top">${clock2}${date}${wx ? `<span class="gst-wx">${esc(wx)}</span>` : ""}</div>` : "";
@@ -2510,14 +2525,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
     ["인시던트 RP 유지 시간", "incident_ttl", 8760, true],
     ["미스틱 사이트 RP 유지 시간", "mystic_ttl", 8760, true],
     ["인시던트 중 거점 비율", "landmark_share", 100, false]
-  ].map(([label, key, max, fraction]) => ({ key, label, max, fraction }));
-  var wgKey = (key) => `$wg_${key}`;
+  ].map(([label, key2, max, fraction]) => ({ key: key2, label, max, fraction }));
+  var wgKey = (key2) => `$wg_${key2}`;
   function worldValue(f, v) {
     const n = num2(v);
     if (n === null || n < 0 || f.max !== null && n > f.max || !f.fraction && !Number.isInteger(n)) return null;
     return n;
   }
   var cache3 = /* @__PURE__ */ new WeakMap();
+  var MARK_MAX = 5;
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
   var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$gen_[a-z_]+)$/;
@@ -2548,9 +2564,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
       for (const [k, v] of Object.entries(o.vars)) if (PREF_VAR.test(k) && typeof v === "string") vars[k] = v;
     }
     const nav = o.nav === "right" ? "right" : void 0;
+    const agents2 = o.agents === "list" ? "list" : void 0;
     const dim = int(o.dim, 0, 100);
     const status = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {} };
+    const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents2 ? { agents: agents2 } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -3073,17 +3091,17 @@ ${themeVars("[x-goei-fab]")}
   function bodyParts(body5) {
     const text = String(body5 ?? "");
     const out = [];
-    let last = 0;
+    let last2 = 0;
     for (const m of text.matchAll(ANY())) {
-      if (m.index > last) out.push({ kind: "text", text: text.slice(last, m.index) });
+      if (m.index > last2) out.push({ kind: "text", text: text.slice(last2, m.index) });
       if (m[3] !== void 0) out.push(decodeLegacy(m[3]) ?? { kind: "text", text: "[첨부 기록 오류]" });
       else {
         const kind = m[1].toLowerCase();
         out.push(isKind(kind) && m[2].trim() ? { kind, text: m[2].trim() } : { kind: "text", text: "[지원하지 않는 첨부]" });
       }
-      last = m.index + m[0].length;
+      last2 = m.index + m[0].length;
     }
-    if (last < text.length) out.push({ kind: "text", text: text.slice(last) });
+    if (last2 < text.length) out.push({ kind: "text", text: text.slice(last2) });
     return out.filter((p) => p.kind !== "text" || p.text.trim());
   }
   function describe(body5, brief = false) {
@@ -3120,12 +3138,12 @@ ${themeVars("[x-goei-fab]")}
           a = { kind: kind.toLowerCase(), content: unescapeJson(body5 ?? "").trim() };
         }
         if (!a) return "[지원하지 않는 첨부]";
-        const key = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
-        let n = known.get(key);
+        const key2 = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
+        let n = known.get(key2);
         if (!n) {
           list4.push(a);
           n = list4.length;
-          known.set(key, n);
+          known.set(key2, n);
         }
         return `[ATTACHMENT A${n}]`;
       });
@@ -3189,7 +3207,7 @@ ${themeVars("[x-goei-fab]")}
       this.raw = raw;
     }
   };
-  var CFG = (key) => `$lb_cfg_lb-gn.${key}`;
+  var CFG = (key2) => `$lb_cfg_lb-gn.${key2}`;
   var GN_DEFAULTS = {
     mode: "2",
     quantity: "1",
@@ -3290,21 +3308,21 @@ ${themeVars("[x-goei-fab]")}
     return Number.isInteger(n) && n >= 1 && n <= Number.MAX_SAFE_INTEGER ? n : null;
   }
   var en = (s4) => String(s4 ?? "").replace(/\\/g, "\\\\").replace(/\|/g, "\\p").replace(/\r/g, "").replace(/\n/g, "\\n");
-  function fields2(line) {
+  function fields2(line2) {
     const out = [];
     let cur = "";
-    let esc17 = false;
-    for (const c of line) {
-      if (esc17) {
+    let esc19 = false;
+    for (const c of line2) {
+      if (esc19) {
         cur += c === "n" ? "\n" : c === "p" ? "|" : c === "\\" ? "\\" : `\\${c}`;
-        esc17 = false;
-      } else if (c === "\\") esc17 = true;
+        esc19 = false;
+      } else if (c === "\\") esc19 = true;
       else if (c === "|") {
         out.push(cur);
         cur = "";
       } else cur += c;
     }
-    if (esc17) cur += "\\";
+    if (esc19) cur += "\\";
     out.push(cur);
     return out;
   }
@@ -3312,8 +3330,8 @@ ${themeVars("[x-goei-fab]")}
   function decode(raw) {
     const st = blank();
     const map = /* @__PURE__ */ new Map();
-    for (const line of String(raw ?? "").split("\n")) {
-      const p = fields2(line);
+    for (const line2 of String(raw ?? "").split("\n")) {
+      const p = fields2(line2);
       if (p[0] === "Q" && Number.isFinite(Number(p[1]))) st.seq = Math.max(st.seq, postId(p[1]) ?? 0);
       else if (p[0] === "T" && p.length >= 6) {
         st.sources[cut(p[1], 80)] = { postid: postId(p[2]) ?? 0, title: p[3], body: p[4], author: cut(p[5], 80), quote: p[6] ?? "", quoteAuthor: p[7] ?? "" };
@@ -3431,24 +3449,24 @@ ${themeVars("[x-goei-fab]")}
     if (c.mine) return false;
     if (p.mine) return true;
     let parent = c.parent;
-    const seen = /* @__PURE__ */ new Set();
-    while (parent && p.comments[parent - 1] && !seen.has(parent)) {
-      seen.add(parent);
-      const row5 = p.comments[parent - 1];
-      if (row5.mine) return true;
-      parent = row5.parent;
+    const seen2 = /* @__PURE__ */ new Set();
+    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
+      seen2.add(parent);
+      const row6 = p.comments[parent - 1];
+      if (row6.mine) return true;
+      parent = row6.parent;
     }
     return false;
   }
   function reconcileUnread(st, previous) {
     const old = new Map(previous.posts.map((p) => [p.id, p]));
-    const run3 = (rows, prior, side, wanted) => {
+    const run3 = (rows2, prior, side, wanted) => {
       const queue = /* @__PURE__ */ new Map();
       for (const r of prior) {
         const k = `${side(r)}\0${r.nick}\0${r.body}`;
         queue.set(k, [...queue.get(k) ?? [], r]);
       }
-      for (const r of rows) {
+      for (const r of rows2) {
         const before = queue.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
         r.unread = before ? before.unread : wanted(r);
         if (!wanted(r)) r.unread = false;
@@ -3626,18 +3644,18 @@ ${themeVars("[x-goei-fab]")}
   function applyBoard(before, current3, value, o) {
     if (snapshotKey(before) !== snapshotKey(current3)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
     if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
-    const rows = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
-    if (!Array.isArray(rows) || !rows.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
+    const rows2 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
+    if (!Array.isArray(rows2) || !rows2.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
     const st = structuredClone(current3);
     const old = new Map(st.posts.map((p) => [p.id, p]));
     const posts = [];
-    const seen = /* @__PURE__ */ new Set();
+    const seen2 = /* @__PURE__ */ new Set();
     let skippedPosts = 0;
     let skippedComments = 0;
     let commentTotal = 0;
     const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
     const floor = Math.max(1e5, current3.seq);
-    for (const raw of rows) {
+    for (const raw of rows2) {
       if (!isObj(raw)) continue;
       let pid = int2(raw.id);
       const prev = pid !== null ? old.get(pid) : void 0;
@@ -3646,9 +3664,9 @@ ${themeVars("[x-goei-fab]")}
         skippedPosts++;
         continue;
       }
-      if (!prev && (pid === null || pid <= floor || seen.has(pid))) pid = Math.max(st.seq, floor) + 1;
-      if (pid === null || seen.has(pid)) continue;
-      seen.add(pid);
+      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
+      if (pid === null || seen2.has(pid)) continue;
+      seen2.add(pid);
       st.seq = Math.max(st.seq, pid);
       const comments = Array.isArray(raw.comments) ? raw.comments : [];
       commentTotal += comments.length;
@@ -3698,18 +3716,18 @@ ${themeVars("[x-goei-fab]")}
       posts.push(q);
     }
     if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
-    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen.has(p.id)) posts.push(p);
+    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
     st.posts = posts;
     trimBoard(st, o.settings);
     const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
     return { st, notice: notice2, emptyComments: commentTotal === 0 };
   }
-  function acceptComments(rows, existing, t, nick, base = t.total) {
-    const list4 = Array.isArray(rows) ? rows.slice(0, LIMITS.replies) : [];
-    let dropped = Array.isArray(rows) ? Math.max(0, rows.length - LIMITS.replies) : 0;
+  function acceptComments(rows2, existing, t, nick, base = t.total) {
+    const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
+    let dropped = Array.isArray(rows2) ? Math.max(0, rows2.length - LIMITS.replies) : 0;
     const out = [];
     const map = /* @__PURE__ */ new Map();
-    const seen = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
+    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
     list4.forEach((c, i) => {
       const own = t.total + i + 1;
       const bad = () => {
@@ -3729,8 +3747,8 @@ ${themeVars("[x-goei-fab]")}
       } else if (n < 0 || n > 0 && !t.supplied.has(n) && n !== t.replyTo) return bad();
       if (t.replyTo > 0 && n !== t.replyTo && n <= t.total) return bad();
       const sig = `${author}\0${content}`;
-      if (seen.has(sig)) return bad();
-      seen.add(sig);
+      if (seen2.has(sig)) return bad();
+      seen2.add(sig);
       out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
       map.set(own, base + out.length);
     });
@@ -3816,10 +3834,10 @@ ${themeVars("[x-goei-fab]")}
     const t = commentWhen(p, c);
     return t ? { time: t } : {};
   };
-  function pushComments(p, rows, now) {
+  function pushComments(p, rows2, now) {
     const from = p.comments.length;
-    for (const c of rows) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-    stampComments(p, from, rows.map((c) => c.time ?? ""), now);
+    for (const c of rows2) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+    stampComments(p, from, rows2.map((c) => c.time ?? ""), now);
   }
   function parsePostDraft(value) {
     if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
@@ -3831,10 +3849,10 @@ ${themeVars("[x-goei-fab]")}
   function attachPostDraft(draft2, input2) {
     if (!hasAttachment(input2)) return draft2;
     const literal = /* @__PURE__ */ new Set();
-    for (const p of bodyParts(input2)) if (p.kind === "text") for (const line of p.text.split("\n")) literal.add(line.trim());
+    for (const p of bodyParts(input2)) if (p.kind === "text") for (const line2 of p.text.split("\n")) literal.add(line2.trim());
     const plain = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
-    const kept = plain.split("\n").filter((line) => {
-      const t = line.trim();
+    const kept = plain.split("\n").filter((line2) => {
+      const t = line2.trim();
       const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
       const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
       const dup = !!label && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label);
@@ -3875,13 +3893,13 @@ ${themeVars("[x-goei-fab]")}
     }
     return { posts, snapshots };
   }
-  function applyActivity(st, rows, snapshots, nick, now = "") {
-    if (rows === void 0 || rows === null) return [false, 0];
-    if (!Array.isArray(rows)) return [false, 1];
+  function applyActivity(st, rows2, snapshots, nick, now = "") {
+    if (rows2 === void 0 || rows2 === null) return [false, 0];
+    if (!Array.isArray(rows2)) return [false, 1];
     let changed = false;
     let skipped2 = 0;
     const done = /* @__PURE__ */ new Set();
-    for (const u of rows) {
+    for (const u of rows2) {
       const id = isObj(u) ? int2(u.id) : null;
       const ref = id !== null ? snapshots.get(id) : void 0;
       const p = id !== null ? findPost(st, id) : void 0;
@@ -3912,9 +3930,9 @@ ${themeVars("[x-goei-fab]")}
     const plan = { allowed: false, userHandle: nick, history: [] };
     for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
     if (!s4.incoming) return plan;
-    const last = Number(chat.scriptstate?.[GN_COOLDOWN]);
+    const last2 = Number(chat.scriptstate?.[GN_COOLDOWN]);
     const now = storyTurns(chat);
-    if (Number.isFinite(last) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last && now - last < HISTORY.cooldown) return plan;
+    if (Number.isFinite(last2) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last2 && now - last2 < HISTORY.cooldown) return plan;
     let post = origin?.post;
     let ci = origin?.commentIndex;
     if (!post && saved) {
@@ -3958,14 +3976,14 @@ ${themeVars("[x-goei-fab]")}
 COMBINED OUTPUT OPTIONS:
 ${JSON.stringify(body5)}`;
   }
-  function commitIncoming(st, rows, plan, date, postOverride) {
+  function commitIncoming(st, rows2, plan, date, postOverride) {
     if (!plan.allowed || !plan.post) return false;
-    if (rows === void 0 || rows === null) return false;
-    if (typeof rows === "string") {
-      if (rows.trim() === "D|__NONE__|__NONE__" || !rows.trim()) return false;
+    if (rows2 === void 0 || rows2 === null) return false;
+    if (typeof rows2 === "string") {
+      if (rows2.trim() === "D|__NONE__|__NONE__" || !rows2.trim()) return false;
       throw new GnetError("선쪽지 형식이 올바르지 않아요.");
     }
-    const list4 = Array.isArray(rows) ? rows : isObj(rows) ? [rows] : null;
+    const list4 = Array.isArray(rows2) ? rows2 : isObj(rows2) ? [rows2] : null;
     if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
     let pick2 = null;
     const reasons = [];
@@ -4067,7 +4085,7 @@ ${JSON.stringify({ feature: "gnet", records })}
       this.raw = raw;
     }
   };
-  var PH = (key) => `$ph_${key}`;
+  var PH = (key2) => `$ph_${key2}`;
   var PH_STATE = PH("state");
   var PH_CONTACTS = PH("contacts");
   var PH_BULLETINS = PH("bulletins");
@@ -4130,9 +4148,9 @@ ${JSON.stringify({ feature: "gnet", records })}
   }
   var cooldownTurns = (chat, k) => k === "announcement" ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k];
   var COOLDOWN_KEY = (k) => `$cooldown_received_${k}`;
-  function phoneValue(state, key) {
-    const v = state?.[PH(key)];
-    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key] ?? "" : String(v);
+  function phoneValue(state, key2) {
+    const v = state?.[PH(key2)];
+    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key2] ?? "" : String(v);
   }
   function phoneSettings(state) {
     const v = (k) => phoneValue(state, k);
@@ -4159,13 +4177,13 @@ ${JSON.stringify({ feature: "gnet", records })}
     };
   }
   function cooldownReady(chat, k) {
-    const last = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
     const now = storyTurns(chat);
-    return !Number.isFinite(last) || String(chat.scriptstate?.[COOLDOWN_KEY(k)] ?? "") === "" || now < last || now - last >= cooldownTurns(chat, k);
+    return !Number.isFinite(last2) || String(chat.scriptstate?.[COOLDOWN_KEY(k)] ?? "") === "" || now < last2 || now - last2 >= cooldownTurns(chat, k);
   }
   function cooldownLeft(chat, k) {
-    const last = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
-    return Number.isFinite(last) ? Math.max(0, cooldownTurns(chat, k) - (storyTurns(chat) - last)) : 0;
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    return Number.isFinite(last2) ? Math.max(0, cooldownTurns(chat, k) - (storyTurns(chat) - last2)) : 0;
   }
   var cooldownMark = (chat, k) => ({ [COOLDOWN_KEY(k)]: String(storyTurns(chat)) });
   function chancePassed(n, rng) {
@@ -4179,9 +4197,9 @@ ${JSON.stringify({ feature: "gnet", records })}
     const data = phoneTabsSection(lore);
     if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
     const entries2 = [];
-    for (const row5 of data.tabs) {
-      if (entries2.some((e) => e.id === row5.id)) continue;
-      entries2.push({ id: row5.id, name: row5.name || row5.id, names: { ...row5.name_by_faction }, visibleFor: new Set(row5.visible_for) });
+    for (const row6 of data.tabs) {
+      if (entries2.some((e) => e.id === row6.id)) continue;
+      entries2.push({ id: row6.id, name: row6.name || row6.id, names: { ...row6.name_by_faction }, visibleFor: new Set(row6.visible_for) });
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
@@ -4200,44 +4218,4 @@ ${JSON.stringify({ feature: "gnet", records })}
       if (d?.version === 1 && Array.isArray(d.items)) return { version: 1, seq: Number(d.seq) || 0, items: d.items.filter((c) => c && typeof c.id === "string" && typeof c.name === "string") };
     } catch {
     }
-    throw new PhoneError("추가 연락처를 읽지 못했어요. 기존 기록은 그대로 둬요.");
-  }
-  function directory(lore, chat) {
-    const books = lore ?? [];
-    const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
-    const set2 = phoneSettings(chat.scriptstate);
-    const cat = tabCatalog(books);
-    const tabs2 = [];
-    const visible = /* @__PURE__ */ new Set();
-    const add = (t) => {
-      if (!t || visible.has(t.id)) return;
-      const allowed = t.id.startsWith("T") ? set2.allContacts || t.visibleFor.has(faction) : set2.anomalyContacts && t.visibleFor.has(faction);
-      if (!allowed) return;
-      visible.add(t.id);
-      tabs2.push({ id: t.id, name: t.names[faction] ?? t.name });
-    };
-    for (const code of cat.orders[faction] ?? []) add(cat.entries.find((e) => e.id === code));
-    for (const t of cat.entries) add(t);
-    const roster = { characters: rosterOf(readDirectory(books)) };
-    const map = /* @__PURE__ */ new Map();
-    const contacts = [];
-    for (const row5 of roster.characters ?? []) {
-      const agentId = s3(row5?.id);
-      if (!/^P\d{3,}$/.test(agentId) || !s3(row5.name)) continue;
-      const english = s3(row5.english);
-      const c = {
-        id: contactId(agentId),
-        agentId,
-        name: s3(row5.name),
-        english,
-        lore: s3(row5.lore),
-        group: s3(row5.affiliation),
-        rank: s3(row5.rank),
-        department: s3(row5.department),
-        tabs: list3(row5.phone_tabs),
-        terms: [s3(row5.name), english, s3(row5.lore), ...list3(row5.aliases), ...list3(row5.legacy_english)].filter(Boolean),
-        visible: false,
-        saved: false
-      };
-      c.visible = c.tabs.some((t) => visible.has(t));
-      map.set(c.id, c);
+    throw 

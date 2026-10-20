@@ -1,8 +1,77 @@
-n srgb, var(--blue) 16%, transparent); color: var(--blue); }
+; border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
+.gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
+.gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
+.gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-id-photo.none svg { width: 44px; height: 44px; }
+.gx-id-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
+.gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
+.gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
+.gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
+.gx-idbtn { display: none; overflow: hidden; padding: 0; }
+.gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
+.gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
+.gx-idpop-card .gx-id { padding: 24px 18px 18px; }
+.gx-idpop-card .gx-id-photo { width: 160px; height: 160px; border-radius: 24px; }
+.gx-idpop-card .gx-agpop-x { z-index: 1; }
+@media (max-width: 760px) { .gx-idbtn { display: grid; } }
+.gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
+.gx-op-ln { display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: 12.5px; line-height: 1.4; }
+.gx-op-ln i { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-op-ln em { font-style: normal; font-weight: 600; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.gx-op-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 8px; margin-top: 2px; font-size: 11.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+.gx-op-wait { font-size: 12px; line-height: 1.45; color: var(--sub); text-align: center; word-break: keep-all; }
+/* 글이 사진 전체를 덮으니 위쪽도 어둡게 (v0.16.16: 소속 이름 위 빈 공간을 없앴다) */
+
+/* 상황판 다시 설계 (v0.16.13) */
+/* 상황판 (v0.16.15 촘촘하게): 괴이·사건·특수 세 칸, 행은 한 줄. 위협도는 머리에만 (v0.16.16) */
+.gx-board { gap: 14px; }
+.gx-bd-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; align-items: start; }
+.gx-board .gx-bd-col { min-width: 0; padding: 0; }
+.gx-bd-col h2 { display: flex; align-items: baseline; gap: 6px; margin: 0 0 8px; font-size: 15px; color: var(--text); }
+.gx-bd-col h2 small { font-size: 13px; font-weight: 500; color: var(--dim); }
+.gx-bd-col .gx-none { margin: 0; padding: 10px 12px; font-size: 13px; border: 1px dashed var(--line); border-radius: 12px; }
+/* 괴이·사건·특수 카드 한 장 (상황판·임무 탭 공통, v0.16.17) */
+.gx-evcs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+/* 임무 탭 상황 목록: 상황판 칸 너비(240px~)에 맞춰 한 줄에 두 장 이상 (v0.16.18) */
+.gx-sits .gx-evcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: stretch; }
+.gx-evc { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gx-evc.go { cursor: pointer; }
+.gx-evc.go:hover { border-color: var(--line2); }
+.gx-evc.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-evc .gx-gmark { flex: none; width: 28px; height: 28px; border-radius: 8px; font-size: 13px; font-style: normal; }
+.gx-evc-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.gx-evc-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; min-height: 26px; }
+.gx-evc-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gx-evc-tags { display: flex; align-items: center; gap: 4px; flex: none; }
+.gx-evc-tags .gx-badge { font-size: 11.5px; padding: 3px 8px; }
+.gx-evc-name b { min-width: 0; font-size: 14.5px; font-weight: 700; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc-top > .gx-badge { flex: none; font-size: 11.5px; padding: 3px 8px; }
+.gx-evc-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc-who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
+.gx-evc-who .gx-pchip { height: 24px; font-size: 12px; padding-right: 8px; }
+.gx-evc-who .gx-badge { font-size: 11.5px; padding: 4px 8px; }
+.gx-evc-sit { margin-top: 2px; font-size: 12.5px; line-height: 1.45; color: var(--sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gx-evc-act { display: flex; align-items: center; flex: none; margin: -4px -4px -4px auto; }
+.gx-evc-act .gx-icon { width: 26px; height: 26px; }
+.gx-evc-act .gx-icon svg { width: 15px; height: 15px; }
+.gx-evc-act .gx-mini { min-height: 26px; padding: 0 8px; font-size: 12px; }
+/* 상황 딱지 (v0.16.21, 사용자 요청: 알록달록해서 눈에 안 들어온다): 괴이는 붉은 계열, 사건은 노란 계열, 특수는 파란 계열로 통일.
+   괴이는 바탕은 모두 같고 등급 글자만 높을수록 밝게 빛난다 */
+.gx-evc .gx-gmark.an { background: var(--danger-bg); color: color-mix(in srgb, var(--danger) 70%, transparent); font-size: 14px; font-weight: 800; }
+.gx-gmark.an.g-s { color: #fff; text-shadow: 0 0 4px var(--danger), 0 0 10px var(--danger), 0 0 16px var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 60%, transparent); }
+.gx-gmark.an.g-a { color: color-mix(in srgb, var(--danger) 55%, #fff); text-shadow: 0 0 4px var(--danger), 0 0 9px color-mix(in srgb, var(--danger) 70%, transparent); }
+.gx-gmark.an.g-b { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 45%, transparent); }
+.gx-gmark.an.g-c { color: color-mix(in srgb, var(--danger) 80%, transparent); }
+.gx-gmark.an.g-d, .gx-gmark.an.g-e { color: color-mix(in srgb, var(--danger) 55%, transparent); }
+/* 밝은·종이 테마: 흰 글자 빛남은 옅은 바탕에서 번진 얼룩처럼 보여 글자가 안 읽힌다 → 진한 글자에 작은 빛 */
+.gx[data-theme="light"] .gx-gmark.an.g-s, .gx[data-theme="paper"] .gx-gmark.an.g-s { color: var(--danger); text-shadow: 0 0 6px color-mix(in srgb, var(--danger) 50%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-a, .gx[data-theme="paper"] .gx-gmark.an.g-a { color: var(--danger); text-shadow: 0 0 4px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx[data-theme="light"] .gx-gmark.an.g-b, .gx[data-theme="paper"] .gx-gmark.an.g-b { text-shadow: none; }
+.gx-evc .gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
+.gx-evc .gx-gmark.ms { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
 .gx-evc .gx-gmark svg { width: 16px; height: 16px; }
 /* 진행 중인 행은 눌러서 지도로, 오른쪽 위 아이콘 (v0.16.17) */
 #gx-sec-ag { scroll-margin-top: 12px; }
-#gx-sec-ag h2 { font-size: 15px; margin-bottom: 8px; }
 /* 요원 카드: 사진 크게 */
 .gx-acard-act { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; }
 .gx-acard-tool { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; }
@@ -448,7 +517,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
 /* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
 .gx-content > .ph-drawer { margin: 0; }
 .ph-dbody { padding: 0 12px; }
-.gx-bdrawer .ph-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gx-bdrawer .ph-tools { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 @media (max-width: 760px) {
   .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
   .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
@@ -599,6 +668,459 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   .gx .ps-ctl:has(> .st-range) { width: 100%; }
   .gx .st-range { width: 100%; }
 }
+
+/* 즐겨찾기 (2026-10-20): PC 메뉴 맨 아래 ‹ ★ ›, 모바일 상황판 서랍 다섯 칸, 둘 다 같은 ★ 창 */
+.gx-navhist { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 6px 4px 0; border-top: 1px solid var(--panel2); }
+.gx-nh { flex: 1 1 0; display: grid; place-items: center; height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); }
+.gx-nh svg { width: 21px; height: 21px; }
+.gx-nh.fwd svg { transform: scaleX(-1); }
+.gx-nh:hover:not(:disabled) { color: var(--text); background: var(--panel); }
+.gx-nh:disabled { opacity: .35; }
+.gx-nh.mk-star.on { color: var(--signal); background: var(--accent-bg); }
+.gx-nh.mk-star.marked svg { fill: currentColor; color: var(--signal); }
+.mk-scrim { position: absolute; inset: 0; z-index: 40; border: 0; padding: 0; background: rgba(0, 0, 0, .18); }
+.mk-pop { position: absolute; z-index: 41; left: 248px; bottom: 16px; width: 320px; max-height: min(560px, calc(100% - 32px)); overflow-y: auto; padding: 12px; border-radius: 16px; background: var(--panel); color: var(--text); border: 1px solid var(--panel2); box-shadow: 0 12px 36px rgba(0, 0, 0, .35); display: flex; flex-direction: column; gap: 8px; }
+.gx[data-nav="right"] .mk-pop { left: auto; right: 248px; }
+.mk-head { display: flex; align-items: center; gap: 8px; padding: 0 2px 0 6px; }
+.mk-head small { color: var(--dim); font-size: 13px; }
+.mk-head .ph-tool { margin-left: auto; }
+.mk-pop h4 { margin: 6px 6px 0; font-size: 13px; color: var(--dim); font-weight: 600; }
+.mk-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.mk-row { display: flex; align-items: center; gap: 6px; padding: 2px 4px 2px 0; border-radius: 10px; background: var(--panel2); }
+.mk-go { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font-size: 14.5px; text-align: left; }
+.mk-go svg { flex: none; width: 19px; height: 19px; color: var(--dim); }
+.mk-go span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.mk-go:hover { color: var(--signal); }
+.mk-here { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px dashed color-mix(in srgb, var(--signal) 55%, transparent); border-radius: 10px; background: transparent; color: var(--signal); font-size: 14px; font-weight: 600; text-align: left; }
+.mk-here svg { flex: none; width: 18px; height: 18px; }
+.mk-here span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-here:disabled { opacity: .45; }
+.mk-empty { margin: 4px 6px; color: var(--dim); font-size: 13.5px; }
+.mk-slot .ph-tool-l { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mk-slot.empty { color: var(--dim); opacity: .7; }
+.gx-bdrawer .ph-tools:has(> .mk-hint) { grid-template-columns: minmax(0, 1fr); }
+.mk-hint { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; border: 0; background: transparent; color: var(--dim); font-size: 14px; }
+.mk-hint svg { width: 18px; height: 18px; }
+@media (max-width: 760px) {
+  .gx-navhist { display: none; }
+  .mk-pop { left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); width: auto; max-height: calc(100% - 140px); }
+  .gx[data-nav="right"] .mk-pop { right: 12px; }
+}
+/* 괴담톡 연락처: 대화가 있는 사람 이름 옆 말풍선 (글자 없이) */
+.ph-talk { flex: none; display: inline-grid; place-items: center; color: var(--dim); }
+.ph-talk svg { width: 15px; height: 15px; }
+.ph-talk.new { color: var(--signal); }
+.ph-talk.new svg { fill: color-mix(in srgb, var(--signal) 25%, transparent); }
+
+/* 그림 카드 (2026-10-20 사용자): 정보는 전부 그림 안. 접으면 모두 같은 높이의 띠, 펴면 정사각. 그림 아래 칸 없음 */
+.gx-evc.art { display: block; padding: 0; overflow: hidden; border-radius: 14px; flex-shrink: 0; }
+/* 접힘은 요원 카드 높이에 맞춘다 (2026-10-20 사용자) */
+.gx-evart { position: relative; height: 92px; background: #0d1214 center 42% / cover no-repeat; }
+.gx-evc.art.open .gx-evart { height: auto; aspect-ratio: 1 / 1; background-position: center; }
+.gx-evc.art.wait .gx-evart { filter: saturate(.5) brightness(.78); }
+.gx-evart::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .45) 45%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 36%); }
+.gx-evc.art.open .gx-evart::after { background: linear-gradient(to top, rgba(6, 10, 12, .94) 0%, rgba(6, 10, 12, .78) 34%, rgba(6, 10, 12, 0) 66%), linear-gradient(to bottom, rgba(6, 10, 12, .55), rgba(6, 10, 12, 0) 28%); }
+.gx-evart.none.k-an, .gx-mx-art.none.k-an { background: radial-gradient(circle at 72% 45%, #5a1f1b 0%, #1d1213 62%); }
+.gx-evart.none.k-in { background: radial-gradient(circle at 72% 45%, #5a4416 0%, #1e1a10 62%); }
+.gx-evart.none.k-ms, .gx-mx-art.none.k-ms { background: radial-gradient(circle at 72% 45%, #183e55 0%, #0f1a21 62%); }
+.gx-evart-ico { position: absolute; right: 7%; top: 50%; transform: translateY(-50%); font: 700 64px/1 var(--mono); opacity: .32; }
+.gx-evart-ico svg { width: 72px; height: 72px; }
+.k-an > .gx-evart-ico { color: #ff8a7a; }
+.k-in > .gx-evart-ico { color: #ffc35a; }
+.k-ms > .gx-evart-ico { color: #8cc8ff; }
+.gx-evart-top { position: absolute; z-index: 1; top: 8px; left: 8px; right: 8px; display: flex; align-items: center; gap: 6px; }
+.gx-evart .gx-gmark { width: 28px; height: 28px; border-radius: 8px; font-size: 14px; box-shadow: 0 1px 6px rgba(0, 0, 0, .45); }
+.gx-evart-act { margin-left: auto; display: flex; gap: 4px; }
+.gx-evbtn { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 9px; display: grid; place-items: center; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
+.gx-evbtn svg { width: 17px; height: 17px; }
+.gx-evbtn:hover { background: rgba(8, 12, 14, .82); }
+.gx-evart-cap { position: absolute; z-index: 1; left: 12px; right: 10px; bottom: 9px; display: flex; flex-direction: column; gap: 6px; color: #fff; min-width: 0; max-height: calc(100% - 52px); overflow-y: auto; scrollbar-width: none; }
+.gx-evc.art:not(.open) .gx-evart-cap { max-height: none; overflow: visible; bottom: 7px; }
+.gx-evart-line { display: flex; align-items: flex-end; gap: 8px; min-width: 0; }
+.gx-evart-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; text-shadow: 0 1px 4px rgba(0, 0, 0, .7); }
+.gx-evart-name b { font-size: 16.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evart-name small { font-size: 12px; color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evc.art.open .gx-evart-name b { font-size: 19px; white-space: normal; }
+/* 요원: 접으면 얼굴만 겹쳐서, 펴면 얼굴+이름 */
+.gx-evart .gx-evc-who { flex: none; display: flex; align-items: center; margin: 0; gap: 0; }
+.gx-evc.art:not(.open) .gx-evc-who .gx-pchip { font-size: 0; gap: 0; padding: 0; height: auto; background: none; margin-left: -6px; }
+.gx-evc.art:not(.open) .gx-evc-who .gx-pchip > :first-child { width: 26px; height: 26px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(10, 14, 16, .9); }
+.gx-evc.art:not(.open) .gx-evc-who .gx-badge { display: none; }
+.gx-evc.art.open .gx-evart-line { flex-direction: column; align-items: stretch; }
+.gx-evc.art.open .gx-evc-who { flex-wrap: wrap; gap: 4px; }
+.gx-evart .gx-evc-sit, .gx-evart .gx-evc-desc { display: block; margin: 0; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .86); -webkit-line-clamp: unset; text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
+/* 진행 중인 상황은 종류 색의 옅은 테두리 (2026-10-20 사용자: 발생·미발생을 눈에 거슬리지 않게 구분) */
+.gx-evc.art.live { border-width: 1.5px; }
+.gx-evc.art.live:has(> .k-an) { border-color: rgba(255, 112, 96, .55); }
+.gx-evc.art.live:has(> .k-in) { border-color: rgba(255, 190, 80, .6); }
+.gx-evc.art.live:has(> .k-ms) { border-color: rgba(120, 190, 255, .55); }
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+
+/* 커스텀 목록 그림 띠 (2026-10-20 사용자): 칸은 그대로 한 칸, 접으면 띠, 펴면 정사각. 설명·버튼은 그림 안 */
+.gx-mlist li.gx-mx { display: block; padding: 0; overflow: hidden; }
+/* 커스텀 접힘은 상황판보다 낮은 띠 (2026-10-20 사용자: 한 칸일 때 너무 컸다) */
+.gx-mx-art { position: relative; display: block; width: 100%; height: 68px; border: 0; padding: 0; background: #0d1214 center 42% / cover no-repeat; text-align: left; cursor: pointer; color: #fff; }
+.gx-mx.open .gx-mx-art { height: auto; aspect-ratio: 1 / 1; background-position: center; cursor: default; }
+.gx-mx-art::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(6, 10, 12, .9) 0%, rgba(6, 10, 12, .4) 48%, rgba(6, 10, 12, 0) 75%); }
+.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .95) 0%, rgba(6, 10, 12, .8) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 26%); }
+.gx-mx .gx-evart-top { justify-content: flex-start; }
+.gx-mx .gx-evart-cap { max-height: calc(100% - 50px); }
+.gx-mx-btns { display: flex; gap: 6px; align-items: center; }
+.gx-mx-btns .gx-mx-pick { flex: 1; margin: 0; min-height: 40px; font-size: 14.5px; }
+.gx-mx-btns .gx-evbtn { width: 40px; height: 40px; }
+.gx-mx-art .gx-evc-desc { display: block; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .86); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
+.gx-mx.open .gx-evart-name b { font-size: 19px; white-space: normal; }
+/* 커스텀 목록: 그림 띠는 한 줄에 하나 (2026-10-20 사용자: 한 칸부터 보고 크면 두 칸으로). 넓은 칸이라 띠는 더 납작하게, 펴면 4:3 */
+.gx-mlist:has(> .gx-mx) { grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 761px) {
+  .gx-mx.open .gx-mx-art { aspect-ratio: 4 / 3; }
+}
+@media (max-width: 760px) {
+  .gx-evart { height: 84px; }
+}
+/* 커스텀 접힌 띠 (2026-10-20 사용자: 이름이 잘리고 그림이 날것이라 정신없다 → 너무 어두우니 오른쪽은 밝게).
+   그림은 ::before에 채도·밝기를 낮춰 깔고, 왼쪽부터 짙은 그라데이션 위에 이름을 세로 가운데로. 마우스를 올리면 그림이 살아난다 */
+.gx-mx:not(.open) .gx-mx-art::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-mx:not(.open) .gx-mx-art::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .7) 28%, rgba(10, 14, 16, .1) 62%, rgba(10, 14, 16, 0) 100%); }
+.gx-mx:not(.open) .gx-evart-cap { top: 50%; bottom: auto; right: 120px; transform: translateY(-50%); max-height: none; overflow: visible; }
+.gx-mx:not(.open) .gx-evart-top { top: 50%; left: auto; right: 12px; transform: translateY(-50%); }
+@media (hover: hover) {
+  .gx-mx:not(.open) .gx-mx-art:hover::before { filter: saturate(1.05) brightness(1.08); transform: scale(1.03); }
+}
+.gx-mx:not(.open) .gx-mx-art { overflow: hidden; }
+/* 그림 카드 띠 (2026-10-20 사용자): 1줄 등급·이름·상태(+투입 수), 2줄 장소·경과, 3줄 설명(줄임). 누르면 상세 창 */
+.gx-evc.art:not(.open) .gx-evart-cap { gap: 2px; bottom: 8px; }
+.gx-evart-l1 { display: flex; align-items: center; gap: 6px; min-width: 0; margin-bottom: 1px; text-shadow: 0 1px 4px rgba(0, 0, 0, .7); }
+.gx-evart-l1 > b { min-width: 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-evart-l1 > .gx-gmark { width: 22px; height: 22px; border-radius: 7px; font-size: 12px; flex: none; }
+.gx-evart-l1 > .gx-gmark svg { width: 14px; height: 14px; }
+.gx-evart-l1 > .gx-badge { flex: none; }
+.gx-evart-l2 { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gx-evc-dep { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 6px; border-radius: 9px; background: rgba(10, 14, 16, .62); color: #fff; font-size: 11.5px; }
+.gx-evc-dep svg { width: 12px; height: 12px; }
+.gx-evc-dep b + svg { margin-left: 5px; }
+.gx-evc.art:not(.open) .gx-evart-l2 > small { font-size: 12px; color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evc.art:not(.open) .gx-evc-sit { display: block; font-size: 12.5px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255, 255, 255, .9); }
+.gx-evc.art.go:hover .gx-evart { filter: brightness(1.08); }
+.gx-evc.art.wait.go:hover .gx-evart { filter: saturate(.6) brightness(.9); }
+/* 상세 창: 창 가운데 정사각 그림 카드 (요원 사진 창과 같은 방식) */
+.ev-scrim { position: absolute; inset: 0; z-index: 40; border: 0; padding: 0; background: var(--scrim, rgba(0, 0, 0, .45)); cursor: default; }
+.gx-evc.art.ev-pop { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100% - 32px), calc(100% - 32px)); max-height: calc(100% - 32px); box-shadow: 0 16px 48px rgba(0, 0, 0, .45); }
+.gx-evc.art.ev-pop .gx-evart { width: 100%; max-height: calc(100vh - 80px); }
+.gx-evpop-end { display: flex; justify-content: flex-end; margin-top: 2px; }
+.gx-evpop-end .gx-mini { background: rgba(10, 14, 16, .55); color: #fff; border-color: rgba(255, 255, 255, .25); }
+.gx-evpop-end .gx-mini.danger { background: var(--danger, #d9534f); border-color: transparent; }
+/* PC: 지도는 그대로 두고 상황 목록만 스크롤 (2026-10-20 사용자: 목록을 굴리면 지도까지 움직였다) */
+@media (min-width: 761px) {
+  .gx-field.gx-map > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
+  .gx-map > .gx-mapcol > .gx-canvas, .gx-map > .gx-mapcol > :not(.gx-sits) { flex: none; }
+  .gx-map > .gx-mapcol > .gx-sits { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .gx-map .gx-sits > .gx-sitbar { flex: none; }
+  /* 목록 칸이 남도록 지도는 본문 높이의 55%까지 */
+  .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 89px) * .55); }
+  .gx-map .gx-sits > .gx-evcs { flex: 1; align-content: start; grid-auto-rows: max-content; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 2px; }
+}
+/* 띠 다듬기 (2026-10-20 사용자): 세 줄을 세로 가운데로, 그림은 커스텀 띠처럼 채도를 낮춰 깔고 왼쪽부터 짙은 그라데이션 */
+.gx-evc.art:not(.open) .gx-evart { overflow: hidden; }
+.gx-evc.art:not(.open) .gx-evart::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-evc.art:not(.open) .gx-evart::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .72) 34%, rgba(10, 14, 16, .12) 70%, rgba(10, 14, 16, 0) 100%); }
+.gx-evc.art:not(.open) .gx-evart-cap { top: 50%; bottom: auto; transform: translateY(-50%); }
+.gx-evc.art.go:hover .gx-evart, .gx-evc.art.wait.go:hover .gx-evart { filter: none; }
+@media (hover: hover) {
+  .gx-evc.art.go:not(.open):hover .gx-evart::before { filter: saturate(1.05) brightness(1.08); transform: scale(1.03); }
+}
+/* 상태 딱지 (사용자: 알약이 세계관과 안 맞는다): 관리국 기록지의 분류 도장처럼 고정폭 글자·각진 테두리·종류 색 */
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge { --c: #c8d0d4; font: 700 11px/1 var(--mono); letter-spacing: .12em; padding: 4px 6px 4px 7px; border-radius: 3px; color: var(--c); background: rgba(8, 11, 13, .6); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent); text-shadow: none; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge::before { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 5px 1px 0; vertical-align: middle; background: currentColor; }
+.gx-evart.k-an .gx-badge { --c: #ff8a7a; }
+.gx-evart.k-in .gx-badge { --c: #ffc35a; }
+.gx-evart.k-ms .gx-badge { --c: #8cc8ff; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.op { --c: #b9a6ff; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.wait { --c: #9aa5aa; border: 0; box-shadow: inset 0 0 0 1px rgba(154, 165, 170, .5); }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.wait::before { background: none; box-shadow: inset 0 0 0 1px currentColor; }
+.gx-evc.art.live .gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge:not(.wait)::before { animation: gx-blink 1.6s steps(2, jump-none) infinite; }
+@keyframes gx-blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .gx-evc.art.live .gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge::before { animation: none; } }
+
+/* 2026-10-20 사용자: 띠 글자는 위에 붙이고, 상태+투입은 한 딱지로 경과 줄 오른쪽에. 상세 창 종료는 오른쪽 위 한 곳 */
+.gx-evc.art:not(.open) .gx-evart-cap { top: 10px; bottom: auto; transform: none; }
+.gx-evc-st { --c: #c8d0d4; margin-left: auto; flex: none; display: inline-flex; align-items: center; height: 19px; border-radius: 3px; background: rgba(8, 11, 13, .62); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent); color: var(--c); font: 700 11px/1 var(--mono); letter-spacing: .1em; text-shadow: none; }
+.gx-evart.k-an .gx-evc-st { --c: #ff8a7a; }
+.gx-evart.k-in .gx-evc-st { --c: #ffc35a; }
+.gx-evart.k-ms .gx-evc-st { --c: #8cc8ff; }
+.gx-evc.art.wait .gx-evc-st { --c: #9aa5aa; }
+.gx-evc-st > .gx-badge { all: unset; display: inline-flex; align-items: center; padding: 0 6px 0 7px; color: inherit; }
+.gx-evc-st > .gx-badge::before { content: ''; display: inline-block; width: 5px; height: 5px; margin-right: 5px; background: currentColor; }
+.gx-evc.art.wait .gx-evc-st > .gx-badge::before { background: none; box-shadow: inset 0 0 0 1px currentColor; }
+.gx-evc.art.live .gx-evc-st > .gx-badge::before { animation: gx-blink 1.6s steps(2, jump-none) infinite; }
+@media (prefers-reduced-motion: reduce) { .gx-evc.art.live .gx-evc-st > .gx-badge::before { animation: none; } }
+.gx-evc-st > .gx-evc-dep { margin: 0; height: 100%; padding: 0 6px; border-radius: 0; background: none; color: #fff; letter-spacing: 0; font: 600 11.5px/1 var(--sans, inherit); border-left: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+.gx-evart-act > .gx-evpop-end { display: inline-flex; align-items: center; margin: 0 0 0 2px; height: 30px; padding: 0 11px; border-radius: 9px; background: rgba(10, 14, 16, .6); color: #fff; border: 1px solid rgba(255, 255, 255, .25); }
+.gx-evart-act > .gx-evpop-end.danger { background: var(--danger, #d9534f); border-color: transparent; }
+
+/* 2026-10-20 사용자: 점 없이 글만, 바깥 테두리는 하나로 고정하고 종류 색은 안쪽 빛으로, 상세 창도 띠와 같은 배치 */
+.gx-evc-st > .gx-badge::before { content: none; animation: none; }
+.gx-evc-st > .gx-badge { padding: 0 7px; }
+.gx-evc-dep.none { color: rgba(255, 255, 255, .55); font-size: 11px; }
+.gx-evc.art.live, .gx-evc.art.live:has(> .k-an), .gx-evc.art.live:has(> .k-in), .gx-evc.art.live:has(> .k-ms) { border-width: 1px; border-color: var(--line2); }
+.gx-evc.art.sel { border-color: var(--signal); }
+.gx-evart.k-an { --kc: 255, 112, 96; }
+.gx-evart.k-in { --kc: 255, 190, 80; }
+.gx-evart.k-ms { --kc: 120, 190, 255; }
+.gx-evc.art.live .gx-evart::after { border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(var(--kc), .32), inset 0 0 26px rgba(var(--kc), .2); }
+.gx-evc.art.ev-pop { border: 1px solid var(--line2); }
+.gx-evc.art.ev-pop .gx-evart-top { justify-content: flex-end; }
+.gx-evc.art.open .gx-evart-l1 > b { font-size: 19px; white-space: normal; }
+.gx-evc.art.open .gx-evart-l1 > .gx-gmark { width: 26px; height: 26px; font-size: 13px; }
+.gx-evc.art.open .gx-evart-l2 > small { font-size: 12.5px; color: rgba(255, 255, 255, .82); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evbtn.end.danger { background: var(--danger, #d9534f); color: #fff; }
+.gx-evc.art.ev-pop .gx-evbtn { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+/* 2026-10-20 사용자: 테두리는 또렷하게, 딱지는 상태·투입 내용과 상관없이 같은 폭 */
+.gx-evc.art, .gx-evc.art.live, .gx-evc.art.live:has(> .k-an), .gx-evc.art.live:has(> .k-in), .gx-evc.art.live:has(> .k-ms) { border: 1px solid color-mix(in srgb, var(--text) 30%, transparent); }
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal); }
+.gx-evc.art.live .gx-evc-st > .gx-badge { width: 40px; justify-content: center; padding: 0; letter-spacing: .06em; }
+.gx-evc-st > .gx-evc-dep { width: 44px; justify-content: center; padding: 0; gap: 2px; }
+.gx-evart-l1 > .gx-evc-st { margin-left: auto; align-self: center; }
+.gx-evc.art.open .gx-evart-l1 { align-items: flex-start; }
+.gx-evc.art.open .gx-evart-l1 > .gx-evc-st { margin-top: 3px; }
+
+/* 2026-10-20 사용자: 상태 상자 없이. 상태는 카드 색·경과 시간, 다를 때만 둘째 줄 글. 투입은 오른쪽 동그란 얼굴 */
+.gx-evc-note { flex: none; font-size: 11.5px; font-weight: 600; font-style: normal; line-height: 1; color: rgba(255, 255, 255, .62); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evc-note::before { content: "·"; margin: 0 5px; color: rgba(255, 255, 255, .5); }
+.gx-evc-note.op { color: #c9b8ff; }
+.gx-evart-l2 { gap: 0; }
+.gx-evfaces { position: absolute; z-index: 2; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; }
+.gx-evface { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: rgba(10, 14, 16, .75); color: rgba(255, 255, 255, .85); box-shadow: 0 0 0 2px rgba(10, 14, 16, .9), 0 2px 6px rgba(0, 0, 0, .5); font: 700 12px/1 var(--mono); }
+.gx-evface + .gx-evface { margin-left: -10px; }
+.gx-evface > .gx-ava { width: 100%; height: 100%; border-radius: 50%; }
+.gx-evface svg { width: 17px; height: 17px; }
+.gx-evface.none { background: rgba(10, 14, 16, .4); color: rgba(255, 255, 255, .4); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .35); outline: 0; }
+.gx-evface.none { border: 1.5px dashed rgba(255, 255, 255, .45); box-shadow: none; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces) > .gx-evart-cap { right: 74px; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces .gx-evface:nth-child(2)) > .gx-evart-cap { right: 98px; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces .gx-evface:nth-child(3)) > .gx-evart-cap { right: 122px; }
+/* 투입 표시: 이름 줄 끝 사람 아이콘 하나 (2026-10-20 사용자) */
+.gx-evdep { margin-left: auto; flex: none; display: grid; place-items: center; width: 24px; height: 22px; color: rgba(255, 255, 255, .38); }
+.gx-evdep svg { width: 18px; height: 18px; stroke-width: 2.2; }
+.gx-evdep.on { color: #5fe6c6; filter: drop-shadow(0 0 4px rgba(95, 230, 198, .55)); }
+/* 막 끝난 상황 (2026-10-20 사용자): 다음 응답까지 칸 맨 아래 흐리게 */
+.gx-evc.art.ended .gx-evart { filter: grayscale(1) brightness(.62); }
+.gx-evc.art.ended { opacity: .78; }
+.gx-evc.art.ended .gx-evart-l1 > b { text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .55); text-decoration-thickness: 1.5px; }
+.gx-evc.art.ended.go:hover .gx-evart { filter: grayscale(1) brightness(.75); }
+/* 다른 세력만 들어간 상황은 노랑, 우리와 함께면 초록 아이콘에 노랑 점 (2026-10-20 사용자) */
+.gx-evdep.other { color: #ffc35a; filter: drop-shadow(0 0 4px rgba(255, 195, 90, .5)); }
+.gx-evdep { position: relative; }
+.gx-evdep.mix::after { content: ''; position: absolute; right: 1px; top: 1px; width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 0 1.5px rgba(10, 14, 16, .9); }
+
+/* ── 관제실 상황판 (2026-10-20 사용자 시안): 왼쪽 큰 보기(CCTV ↔ 위성 지도) + 오른쪽 상황 일지 ── */
+.gx-ops { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; height: 440px; }
+.gx-opview { position: relative; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: #0d1310; color: #fff; }
+.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+.gx-opview.feed > .gx-evart-ico { color: rgba(255, 255, 255, .5); }
+.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .55) 100%); }
+.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .95), rgba(8, 12, 14, .55) 45%, rgba(8, 12, 14, .05) 75%), linear-gradient(rgba(8, 12, 14, .5), transparent 24%); }
+.gx-opview.feed.k-an::after { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); }
+.gx-opview.feed.k-in::after { box-shadow: inset 0 0 40px rgba(255, 190, 80, .16); }
+.gx-opview.feed.k-ms::after { box-shadow: inset 0 0 40px rgba(120, 190, 255, .16); }
+.gx-opview.ended > .gx-opfeed { filter: grayscale(1) brightness(.55) contrast(1.1); }
+.gx-opbar { position: absolute; z-index: 3; top: 10px; left: 10px; right: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gx-opseg { display: flex; padding: 3px; border-radius: 9px; background: rgba(8, 12, 14, .72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); }
+.gx-opseg button { padding: 5px 13px; border: 0; border-radius: 7px; background: none; font: inherit; font-size: 12.5px; font-weight: 700; color: rgba(255, 255, 255, .6); cursor: pointer; }
+.gx-opseg button.on { background: rgba(79, 209, 181, .18); color: #5fe6c6; box-shadow: inset 0 0 0 1px rgba(79, 209, 181, .45); }
+.gx-opbar .gx-evart-act { margin-left: auto; }
+.gx-opview .gx-evbtn { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.gx-opview .gx-evbtn.end.danger { background: var(--danger, #d9534f); color: #fff; }
+.gx-oposd { position: absolute; z-index: 2; left: 14px; right: 14px; top: 52px; display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 7px; font: 600 11px/1 var(--mono); letter-spacing: .08em; color: rgba(235, 255, 240, .85); text-shadow: 0 0 4px rgba(0, 0, 0, .9); pointer-events: none; }
+.gx-oposd .rec { display: flex; align-items: center; gap: 6px; color: #ff6b5b; }
+.gx-oposd .rec i { width: 8px; height: 8px; border-radius: 50%; background: #ff3b2b; box-shadow: 0 0 6px #ff3b2b; animation: gx-blink 1.6s steps(2, jump-none) infinite; }
+.gx-opview.ended .gx-oposd .rec { color: rgba(255, 255, 255, .55); } .gx-opview.ended .gx-oposd .rec i { background: rgba(255, 255, 255, .5); box-shadow: none; animation: none; }
+.gx-oposd .cam { flex-basis: 100%; color: rgba(235, 255, 240, .7); }
+@media (prefers-reduced-motion: reduce) { .gx-oposd .rec i { animation: none; } }
+.gx-opcap { position: absolute; z-index: 2; left: 18px; right: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 6px; max-height: calc(100% - 110px); overflow-y: auto; scrollbar-width: none; }
+.gx-opcap .gx-evart-l1 { gap: 9px; }
+.gx-opcap .gx-evart-l1 > b { font-size: 22px; white-space: normal; }
+.gx-opcap .gx-evart-l1 > .gx-gmark { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
+.gx-opcap .gx-evdep { width: 26px; height: 24px; } .gx-opcap .gx-evdep svg { width: 20px; height: 20px; }
+.gx-opcap .gx-evart-l2 > small { font-size: 13px; color: rgba(255, 255, 255, .8); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-opcap .gx-evc-who { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; }
+.gx-opcap .gx-evc-who > :is(.gx-pchip, .gx-badge) { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 3px 11px 3px 3px; border-radius: 99px; background: rgba(8, 12, 14, .7); color: #fff; font-size: 12.5px; font-weight: 600; letter-spacing: 0; box-shadow: inset 0 0 0 1px rgba(255, 196, 90, .55); font-family: inherit; }
+.gx-opcap .gx-evc-who > :is(.gx-pchip, .gx-badge.own) { box-shadow: inset 0 0 0 1px rgba(95, 230, 198, .55); }
+.gx-opcap .gx-evc-who > .gx-badge:not(:has(.gx-ava)) { padding-left: 11px; }
+.gx-opcap .gx-evc-who > .gx-badge::before { content: none; }
+.gx-opcap .gx-evc-who .gx-ava { width: 24px; height: 24px; }
+.gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { display: block; margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, .88); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); white-space: normal; -webkit-line-clamp: unset; }
+.gx-opview.nosig { display: grid; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), #101614; }
+.gx-opnosig { display: flex; flex-direction: column; align-items: center; gap: 8px; } .gx-opnosig b { font: 700 20px var(--mono); letter-spacing: .3em; color: rgba(255, 255, 255, .45); } .gx-opnosig small { color: rgba(255, 255, 255, .5); }
+/* 위성 지도 */
+.gx-opview.map { display: flex; flex-direction: column; background: #0b1113; }
+.gx-oplive { font: 600 11px var(--mono); letter-spacing: .12em; color: #5fe6c6; display: flex; align-items: center; gap: 6px; padding-right: 4px; }
+.gx-oplive i { width: 6px; height: 6px; border-radius: 50%; background: #5fe6c6; box-shadow: 0 0 8px #5fe6c6; }
+.gx-opmap { position: relative; flex: 1 1 0; min-height: 0; margin-top: 50px; }
+.gx-opmapi { position: absolute; top: 4px; bottom: 8px; left: 50%; transform: translateX(-50%); aspect-ratio: 1100 / 880; max-width: calc(100% - 16px); }
+.gx-opmapi > img { width: 100%; height: 100%; display: block; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.42) contrast(1.35) saturate(1.4); }
+.gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 50%, rgba(5, 10, 12, .7) 100%); }
+.gx-oppin { position: absolute; z-index: 2; transform: translate(-6px, -50%); display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
+.gx-oppin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent), 0 0 14px var(--c); }
+.gx-oppin em { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(8, 12, 14, .78); white-space: nowrap; }
+.gx-oppin.sel em { background: #5fe6c6; color: #0c1a17; } .gx-oppin.sel i { outline: 2px solid #fff; outline-offset: 2px; }
+.gx-oppin.k-an { --c: #ff8a7a; } .gx-oppin.k-in { --c: #ffc35a; } .gx-oppin.k-ms { --c: #8cc8ff; }
+.gx-opcross { position: absolute; z-index: 1; width: 64px; height: 64px; transform: translate(-50%, -50%); border: 1px solid rgba(79, 209, 181, .7); border-radius: 50%; pointer-events: none; }
+.gx-opcross::before, .gx-opcross::after { content: ''; position: absolute; background: rgba(79, 209, 181, .6); }
+.gx-opcross::before { left: -18px; right: -18px; top: 50%; height: 1px; } .gx-opcross::after { top: -18px; bottom: -18px; left: 50%; width: 1px; }
+.gx-opcoord { position: absolute; right: 12px; bottom: 10px; z-index: 2; font: 600 10.5px var(--mono); letter-spacing: .08em; color: rgba(79, 209, 181, .85); background: rgba(5, 10, 12, .6); padding: 3px 7px; border-radius: 4px; }
+/* 상황 일지 */
+.gx-oplog { min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.gx-oplog > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-oplog > h2 > b { white-space: nowrap; }
+.gx-opcnt { display: flex; } .gx-opcnt em { font-style: normal; display: flex; align-items: baseline; gap: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; color: var(--dim); }
+.gx-opcnt em + em { border-left: 1px solid var(--line); }
+.gx-opcnt em i { font: 700 17px/1 var(--mono); font-style: normal; color: var(--c); }
+.gx-opcnt em u { text-decoration: none; font: 600 11px var(--mono); margin-left: -2px; }
+.gx-opcnt .an { --c: #e8685a; } .gx-opcnt .in { --c: #d99a2b; } .gx-opcnt .ms { --c: #4a9be0; } .gx-opcnt .sig { --c: var(--signal); }
+.gx-oplog > ul { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 0; list-style: none; }
+.gx-oplog > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
+.gx-oprow { display: flex; align-items: center; gap: 11px; padding: 8px 12px 8px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); cursor: pointer; }
+.gx-oprow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.gx-oprow.sel { background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 14%, transparent), color-mix(in srgb, var(--signal) 3%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--signal) 45%, transparent); }
+.gx-oprow-pic { flex: none; width: 44px; height: 44px; border-radius: 9px; overflow: hidden; display: grid; place-items: center; background: var(--panel2); }
+.gx-oprow-pic img { width: 100%; height: 100%; object-fit: cover; }
+.gx-oprow-ico { font: 700 18px var(--mono); color: var(--dim); } .gx-oprow-ico svg { width: 20px; height: 20px; }
+.gx-oprow-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gx-oprow-t > b { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 14px; }
+.gx-oprow-t > b > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oprow-t > b > .gx-gmark { flex: none; width: 19px; height: 19px; font-size: 11px; border-radius: 5px; } .gx-oprow-t > b > .gx-gmark svg { width: 12px; height: 12px; }
+.gx-oprow-t > small { display: flex; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; } .gx-oprow-t > small > span { overflow: hidden; text-overflow: ellipsis; }
+.gx-oprow .gx-evc-note { color: var(--dim); text-shadow: none; } .gx-oprow .gx-evc-note::before { color: var(--dim); } .gx-oprow .gx-evc-note.op { color: #8a74e8; }
+.gx-oprow .gx-evdep { margin-left: 0; color: color-mix(in srgb, var(--text) 30%, transparent); }
+.gx-oprow .gx-evdep.on { color: var(--signal); filter: none; } .gx-oprow .gx-evdep.other { color: #d99a2b; filter: none; }
+.gx-oprow.ended { opacity: .5; } .gx-oprow.ended img { filter: grayscale(1); } .gx-oprow.ended .gx-oprow-t > b > span { text-decoration: line-through; }
+@media (min-width: 761px) { .gx-board > .gx-ops { flex: none; } }
+@media (max-width: 760px) {
+  .gx-ops { display: flex; flex-direction: column; height: auto; }
+  .gx-opview { height: 340px; flex: none; scroll-margin-top: 8px; }
+  .gx-opcap .gx-evart-l1 > b { font-size: 19px; }
+  .gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { font-size: 13px; }
+  .gx-oplog > ul { max-height: 380px; }
+  .gx-opcnt em { padding: 4px 6px; }
+}
+.gx-ops .gx-gmark { font-style: normal; }
+.gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
+.gx-oppin:not(.sel) em { opacity: .85; font-size: 11px; }
+
+/* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로 */
+.gx-oposd { flex-wrap: nowrap; align-items: center; gap: 10px; }
+.gx-oposd .cam { flex: 1 1 auto; flex-basis: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { flex: none; }
+.gx-opwho { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 13px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+.gx-opwho em { font-style: normal; font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, .6); margin-right: 2px; }
+.gx-opwho i { font-style: normal; color: rgba(255, 255, 255, .4); }
+.gx-opwho .on { color: #5fe6c6; } .gx-opwho .other { color: #ffc35a; }
+.gx-opmap { position: absolute; inset: 0; margin: 0; overflow: hidden; container-type: size; }
+.gx-opmapi { --w: max(100cqw, calc(100cqh * 1.25)); top: clamp(calc(100cqh - var(--w) * .8), calc(50cqh - var(--w) * .8 * var(--py) / 100), 0px); bottom: auto; left: clamp(calc(100cqw - var(--w)), calc(50cqw - var(--w) * var(--px) / 100), 0px); transform: none; width: var(--w); height: calc(var(--w) * .8); max-width: none; aspect-ratio: auto; transition: left .35s ease, top .35s ease; }
+.gx-opview.map::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(8, 12, 14, .55), transparent 70px); }
+@media (prefers-reduced-motion: reduce) { .gx-opmapi { transition: none; } }
+.gx-oposd .rec { flex: none; white-space: nowrap; }
+@media (max-width: 760px) { .gx-oposd { font-size: 10px; letter-spacing: .04em; gap: 8px; } }
+/* 일지 칸: 일반 section 위 여백(14px)이 제목 위에 붙던 것 제거 */
+.gx-body .gx-oplog { padding: 0; margin: 0; }
+
+/* 상황판 요원 칸 (2026-10-20 사용자 시안): 일지처럼 제목줄이 상자 안. 모니터 벽(기본) 또는 근무 현황 목록.
+   칸 크기는 창 크기와 상관없이 고정이고, 요원이 많으면(최대 20명) 상자 안에서 스크롤 */
+.gx-body .gx-agbox { display: flex; flex-direction: column; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.gx-agbox > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-agbox > .gx-hint { margin: 8px 14px 0; }
+.gx-agbox > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
+.gx-opcnt .op { --c: #e8685a; }
+.gx-agwall, .gx-agrows { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; list-style: none; background: var(--panel); }
+@media (min-width: 761px) {
+  .gx-board { min-height: 100%; box-sizing: border-box; }
+  .gx-board > .gx-agbox { flex: 1 1 0; min-height: 330px; }
+}
+
+/* 모니터 벽: 감시 화면 한 칸에 한 명. 편성 가능은 밝게(살짝 눌러서), 작전 중은 가장자리·모서리만 붉게, 편성 불가는 어둡게 */
+.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: 150px; gap: 8px; align-content: start; padding: 8px; }
+.gx-agmon { --c: #5fe6c6; position: relative; display: flex; min-width: 0; min-height: 0; padding: 5px 5px 14px; border-radius: 7px; background: linear-gradient(180deg, #2a3236, #1d2427); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 2px 4px rgba(0, 0, 0, .4); cursor: pointer; }
+.gx-agmon::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: var(--c); box-shadow: 0 0 5px var(--c); }
+.gx-agmon.op { --c: #ff6b5b; } .gx-agmon.lock { --c: #6d7a77; } .gx-agmon.lock::after { box-shadow: none; }
+.gx-agmon-scr { position: relative; flex: 1; min-width: 0; overflow: hidden; border-radius: 3px; background: #050807; box-shadow: inset 0 0 0 1px #000; }
+.gx-agmon-scr > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; font-size: 34px; }
+.gx-agmon-scr > .gx-ava img { object-position: 50% 22%; filter: saturate(.85) brightness(.9); }
+.gx-agmon-scr::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .14) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, .35) 100%); }
+.gx-agmon-scr::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%); }
+.gx-agmon.op .gx-agmon-scr::after { background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%), radial-gradient(ellipse 80% 75% at 50% 45%, transparent 68%, rgba(225, 40, 28, .45) 100%); box-shadow: inset 0 0 14px rgba(230, 45, 30, .45); }
+.gx-agmon.lock .gx-agmon-scr > .gx-ava img { filter: grayscale(1) brightness(.35) contrast(1.15); }
+.gx-agmon.lock .gx-agmon-cap b { color: rgba(255, 255, 255, .55); }
+.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; gap: 4px; font: 600 9.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
+.gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; color: var(--c); }
+.gx-agmon-osd .st i { display: none; }
+.gx-agmon.op .gx-agmon-osd .st i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #ff3b2b; box-shadow: 0 0 5px #ff3b2b; }
+.gx-agmon-cap { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gx-agmon-cap b { font-size: 13px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon-cap small { font: 600 9.5px/1.2 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon:hover .gx-agmon-scr { box-shadow: inset 0 0 0 1px #000, 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
+
+/* 목록: 얼굴 · 이름 · 상태(점+글자) · 상황 · 톡·위키. PC 두 줄, 모바일 한 줄. 줄을 칠하지 않고 점 색으로만 */
+.gx-agrows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 54px; align-content: start; padding: 0; }
+.gx-agrow { --c: var(--signal); display: grid; grid-template-columns: 36px 4.6em auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-width: 0; padding: 0 8px 0 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.gx-agrow:nth-child(odd) { border-right: 1px solid var(--line); }
+.gx-agrow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.gx-agrow > .gx-ava { width: 36px; height: 36px; border-radius: 10px; font-size: 14px; }
+.gx-agrow > .gx-ava img { filter: brightness(.9); }
+.gx-agrow > b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agrow-st { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--c); white-space: nowrap; }
+.gx-agrow-st i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.gx-agrow.op { --c: #e8685a; } .gx-agrow.op .gx-agrow-st i { box-shadow: 0 0 6px #ff3b2b; }
+.gx-agrow.lock { --c: var(--dim); } .gx-agrow.lock > .gx-ava img { filter: grayscale(1) brightness(.5); } .gx-agrow.lock > b, .gx-agrow.lock .gx-agrow-msg { opacity: .55; }
+.gx-agrow-msg { min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agrow-tools { display: flex; gap: 0; }
+.gx-agrow-tools .gx-acard-tool { width: 30px; height: 30px; }
+
+/* 마우스를 올리면 머리 위 말풍선 (꼬리는 아래로, 칸 가운데를 가리킨다) */
+.gx-agtip { --tail: 24px; position: fixed; z-index: 70; max-width: 300px; padding: 9px 12px; border-radius: 10px; background: var(--panel2); color: var(--text); font-size: 13px; line-height: 1.5; box-shadow: 0 8px 24px rgba(0, 0, 0, .4), inset 0 0 0 1px var(--line2); pointer-events: none; }
+.gx-agtip b { display: block; margin-bottom: 3px; font-size: 12px; color: var(--dim); }
+.gx-agtip::after { content: ''; position: absolute; top: 100%; left: calc(var(--tail) - 8px); width: 16px; height: 9px; background: var(--panel2); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+/* 요원 사원증 창 (가로 명함 비율): 위 띠 · 직사각형 사진 + 신상 · 아래 번호와 톡·위키 */
+.gx-agcard { position: absolute; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(500px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; box-sizing: border-box; border-radius: 16px; background: var(--panel); border: 1px solid var(--line2); color: var(--text); box-shadow: 0 22px 60px rgba(0, 0, 0, .5); }
+.gx-agcard-band { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 6px 0 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 22%, var(--panel2)), var(--panel2)); border-bottom: 1px solid var(--line); font: 700 11px var(--mono); letter-spacing: .2em; color: var(--signal); }
+.gx-agcard-band b { font-family: inherit; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; color: var(--text); }
+.gx-agcard-x { margin-left: auto; width: 28px; height: 28px; border: 0; border-radius: 7px; background: none; color: var(--dim); font-size: 13px; cursor: pointer; }
+.gx-agcard-main { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; padding: 16px; }
+.gx-agcard-ph { position: relative; align-self: stretch; min-height: 168px; border-radius: 10px; overflow: hidden; background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line); }
+.gx-agcard-ph > img, .gx-agcard-ph > .gx-ava { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; object-fit: cover; object-position: 50% 12%; font-size: 40px; }
+.gx-agcard-ph > .gx-ava img { object-position: 50% 14%; }
+/* 큰 사진은 전신(832×1216)이라 상반신만 보이게 키운다 */
+.gx-agcard-ph > img { transform: scale(1.9); transform-origin: 50% 6%; }
+.gx-agcard-t { min-width: 0; display: flex; flex-direction: column; }
+.gx-agcard-t .nm { font-size: 24px; font-weight: 800; line-height: 1.15; }
+.gx-agcard-t .en { margin-top: 3px; font: 600 11px var(--mono); letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+.gx-agcard-t dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.5; }
+.gx-agcard-t dt { padding-top: 1px; font-size: 12px; font-weight: 700; color: var(--dim); }
+.gx-agcard-t dd { margin: 0; }
+.gx-agcard-t dd.dep { color: #e8685a; font-weight: 700; }
+.gx-agcard-foot { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px dashed var(--line); }
+.gx-agcard-foot .code { margin-right: auto; display: flex; align-items: center; gap: 10px; font: 700 11.5px var(--mono); letter-spacing: .14em; color: var(--dim); white-space: nowrap; }
+.gx-agcard-foot .code u { width: 96px; height: 18px; text-decoration: none; opacity: .5; background: repeating-linear-gradient(90deg, var(--text) 0 1px, transparent 1px 3px, var(--text) 3px 5px, transparent 5px 6px, var(--text) 6px 7px, transparent 7px 10px); }
+.gx-agcard-foot button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 92px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--panel2); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.gx-agcard-foot button:hover { color: var(--signal); }
+.gx-agcard-foot button svg { width: 15px; height: 15px; }
+@media (max-width: 760px) {
+  .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
+  .gx-agmon { aspect-ratio: 1; }
+  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { max-height: 560px; }
+  .gx-agrows { grid-template-columns: minmax(0, 1fr); }
+  .gx-agrow:nth-child(odd) { border-right: 0; }
+  .gx-agrow { grid-template-columns: 34px 4.6em auto minmax(0, 1fr) auto; gap: 8px; padding: 0 4px 0 10px; }
+  .gx-agrow-tools { display: none; }
+  .gx-agcard-main { grid-template-columns: 104px minmax(0, 1fr); gap: 12px; padding: 14px; }
+  .gx-agcard-ph { min-height: 136px; }
+  .gx-agcard-t .nm { font-size: 21px; }
+  .gx-agcard-foot { padding: 10px 14px; }
+  .gx-agcard-foot .code u { display: none; }
+  .gx-agcard-foot button { width: 84px; }
+}
 `;
 
   // src/ui/mbar.ts
@@ -663,6 +1185,53 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
       e.stopPropagation();
       e.preventDefault();
     }, true);
+  }
+
+  // src/ui/marks.ts
+  var esc9 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var key = (m) => JSON.stringify(m.s);
+  var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
+  var markUi = { pop: false };
+  var marks = () => getPrefs().marks ?? [];
+  var isMarked = (m) => marks().some((x) => key(x) === key(m));
+  async function addMark(m) {
+    if (isMarked(m) || marks().length >= MARK_MAX) return false;
+    await savePrefs((p) => ({ ...p, marks: [...p.marks ?? [], m] }));
+    return true;
+  }
+  async function removeMarkAt(i) {
+    await savePrefs((p) => ({ ...p, marks: (p.marks ?? []).filter((_, j) => j !== i) }));
+  }
+  var markCandidates = (recent, current3) => recent.filter((m) => !isMarked(m) && (!current3 || key(m) !== key(current3))).slice(0, 5);
+  function markPop(current3, recent) {
+    if (!markUi.pop) return "";
+    const list4 = marks();
+    const full = list4.length >= MARK_MAX;
+    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc9(m.name)}</span></button>
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc9(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc9(current3.name)}</span></button>` : "";
+    const cand = markCandidates(recent, current3);
+    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc9(m.name)}</span></span>
+        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc9(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
+    return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
+    <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
+      <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
+      ${mine}${here}${full ? '<p class="mk-empty">5개까지 넣을 수 있어요. 하나를 빼면 더 넣을 수 있어요.</p>' : ""}${more}
+    </div>`;
+  }
+  function navHistBar(current3) {
+    return `<div class="gx-navhist">
+    <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
+    <button class="gx-nh mk-star${markUi.pop ? " on" : ""}${current3 && isMarked(current3) ? " marked" : ""}" data-action="mk-pop" aria-label="즐겨찾기" title="즐겨찾기" aria-expanded="${markUi.pop}">${ICONS.star}</button>
+    <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
+  }
+  function markSlots() {
+    const list4 = marks();
+    if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
+    return Array.from({ length: MARK_MAX }, (_, i) => {
+      const m = list4[i];
+      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc9(m.name)}" title="${esc9(m.name)}">${icon(m)}<span class="ph-tool-l">${esc9(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
+    }).join("");
   }
 
   // src/ui/swipeback.ts
@@ -759,11 +1328,11 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     const canvas = root2.querySelector(".gx-canvas[data-map]");
     const layer2 = canvas?.querySelector(".gx-mapzoom");
     if (!canvas || !layer2) return;
-    const key = canvas.dataset.map ?? "";
-    let v = views.get(key) ?? { z: 1, x: 0, y: 0 };
+    const key2 = canvas.dataset.map ?? "";
+    let v = views.get(key2) ?? { z: 1, x: 0, y: 0 };
     const apply = () => {
       v = clamp(v, canvas.clientWidth, canvas.clientHeight);
-      views.set(key, v);
+      views.set(key2, v);
       layer2.style.transform = v.z === 1 ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
       layer2.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
       canvas.classList.toggle("zoomed", v.z > 1);
@@ -887,9 +1456,9 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
         return null;
       const base = 12 + len;
       const files = /* @__PURE__ */ new Map();
-      for (const row5 of head.files) {
-        if (!Array.isArray(row5)) return null;
-        const [name, at, n] = row5;
+      for (const row6 of head.files) {
+        if (!Array.isArray(row6)) return null;
+        const [name, at, n] = row6;
         if (typeof name !== "string" || typeof at !== "number" || typeof n !== "number" || base + at + n > b.length)
           return null;
         files.set(name, b.slice(base + at, base + at + n));
@@ -1121,9 +1690,9 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   }
   function spawnWave(run3, viewW) {
     const edge = Math.max(run3.x + 160, run3.cam + viewW + 30);
-    const last = run3.room === 2 && run3.waves.length === 0;
+    const last2 = run3.room === 2 && run3.waves.length === 0;
     const regular = ["corner", "watchman"];
-    if (last) {
+    if (last2) {
       const boss = run3.depth % 2 === 1 ? "statue" : "master";
       run3.units.push(makeEnemy(run3, boss, edge + 60, 1));
       run3.units.push(makeEnemy(run3, regular[Math.floor(rand(run3) * 2)], edge + 10, 0));
@@ -1725,7 +2294,7 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
   // src/game/index.ts
   var lastRun = null;
   var STEP = 1 / 30;
-  var esc8 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  var esc10 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
   var faces = "";
   function faceStyle(id, size) {
     return `background-image:url('${faces}');background-position:${-agentDef(id).face * size}px 0`;
@@ -1774,9 +2343,9 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     const drawTop = () => {
       if (!run3) return;
       const camp = run3.phase === "camp" || run3.phase === "retreat" && run3.pt > 0.6;
-      const key = `${camp}|${run3.room}|${run3.depth}`;
-      if (key === topKey) return;
-      topKey = key;
+      const key2 = `${camp}|${run3.room}|${run3.depth}`;
+      if (key2 === topKey) return;
+      topKey = key2;
       $(".gg-place").textContent = camp ? CAMP.name : ROOMS[run3.rooms[run3.room]].name;
       $(".gg-depth").textContent = `순찰 ${run3.depth}`;
       $(".gg-steps").innerHTML = camp ? "" : [0, 1, 2].map((i) => `<i class="${i < run3.room ? "done" : i === run3.room ? "now" : ""}${i === 2 ? " boss" : ""}"></i>`).join("");
@@ -1785,13 +2354,13 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     const drawCards = () => {
       if (!run3) return;
       const team = [...agents(run3)].sort((a, b) => meta.squad.indexOf(a.kind) - meta.squad.indexOf(b.kind));
-      const key = team.map((u) => u.uid).join(",");
-      if (key !== cardKey) {
-        cardKey = key;
+      const key2 = team.map((u) => u.uid).join(",");
+      if (key2 !== cardKey) {
+        cardKey = key2;
         squadEl.innerHTML = team.map((u) => {
           const d = agentDef(u.kind);
-          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc8(d.name)} ${esc8(d.skillName)}">
-          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc8(d.name)}</span>
+          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc10(d.name)} ${esc10(d.skillName)}">
+          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc10(d.name)}</span>
           <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
         }).join("");
       }
@@ -1815,12 +2384,12 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
     const drawSquadSheet = () => {
       sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><div class="gg-pick">${AGENTS.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
-        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc8(a.name)}</b><small>${esc8(a.role)} · ${esc8(a.skillName)}</small></button>`).join("")}</div></div>
+        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc10(a.name)}</b><small>${esc10(a.role)} · ${esc10(a.skillName)}</small></button>`).join("")}</div></div>
       <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
     };
     const openRecord = () => {
       sheet.hidden = false;
-      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc8(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
+      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc10(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
       sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><dl class="gg-rec">
         <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
@@ -2672,1380 +3241,4 @@ n srgb, var(--blue) 16%, transparent); color: var(--blue); }
             (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
             Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
           )] ?? 0,
-          (this.art?.atlas.action?.scale ?? 2) * 1.5,
-          340 + (1 - r.cutin / 0.75) * 80,
-          530
-        );
-        c.fillStyle = "#ffdf9e";
-        c.font = "bold 58px monospace";
-        c.fillText("집중 파괴", 660, 330);
-        c.font = "22px monospace";
-        c.fillText("쟈알디 · 집중 파괴", 665, 380);
-      }
-      if (r.phase !== "combat" && p.t > 0.8) {
-        this.rect(390, 52, 790, 150, "#07121aee");
-        c.strokeStyle = "#d9b67a";
-        c.lineWidth = 4;
-        c.strokeRect(390, 52, 790, 150);
-        c.fillStyle = "#f4dfb2";
-        c.font = "bold 42px monospace";
-        c.textAlign = "center";
-        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 785, 115);
-        c.font = "24px monospace";
-        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 785, 165);
-        c.textAlign = "left";
-      }
-    }
-  };
-
-  // src/game/action/index.ts
-  var writes = /* @__PURE__ */ new WeakMap();
-  function mountAction(box, host2) {
-    const root2 = document.createElement("section");
-    root2.className = "ga";
-    root2.tabIndex = 0;
-    root2.setAttribute("aria-label", "쟈알디 1인 전투 검증판");
-    const style = document.createElement("style");
-    style.textContent = style_default3;
-    root2.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
-  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
-    box.append(style, root2);
-    const $ = (s4) => root2.querySelector(s4);
-    const canvas = $("canvas"), fit = $(".ga-fit"), menu = $(".ga-menu"), renderer = new ActionRenderer(canvas);
-    let run3 = newRun2(), ready = false, disposed = false, paused = true, raf = 0, last = 0, acc = 0, dirty2 = false, saving = false, lastSave = 0, saveError = false;
-    let stickId = null, stickX = 0, stickY = 0;
-    const stick = $(".ga-stick"), thumb = $(".ga-stick i");
-    let target = null;
-    const keys = /* @__PURE__ */ new Set(), pointers = /* @__PURE__ */ new Map();
-    let edges = {};
-    const clear = () => {
-      keys.clear();
-      pointers.clear();
-      edges = {};
-      target = null;
-      stickId = null;
-      stickX = stickY = 0;
-      thumb.style.transform = "translate(0,0)";
-    };
-    const text = (selector, value) => {
-      const e = $(selector);
-      if (e.textContent !== value) e.textContent = value;
-    };
-    const hud = () => {
-      const p = run3.player;
-      if (root2.dataset.action !== p.act) root2.dataset.action = p.act;
-      for (const [name, value] of Object.entries({
-        hp: p.hp,
-        energy: p.energy,
-        guard: p.guard,
-        gauge: p.gauge
-      }))
-        $(`[data-meter="${name}"]`).value = value;
-      text("[data-hp]", String(Math.ceil(p.hp)));
-      text('[data-do="auto"]', run3.auto ? "F 자동 ON" : "F 수동");
-      text(".ga-msg", run3.message);
-      text(
-        "[data-busy]",
-        saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty2 ? "진행 중" : "저장됨"
-      );
-      root2.dataset.saveError = String(saveError);
-      ["Q 회복", "W 방어", "E 능력"].forEach((label, i) => {
-        const b = $(`[data-item="${i}"]`);
-        b.textContent = `${label} ${p.items[i]}`;
-        b.disabled = run3.phase !== "combat" || p.items[i] <= 0;
-      });
-    };
-    const save2 = async (force = false) => {
-      if (!ready || !dirty2) return;
-      if (saving && !force) return;
-      if (!force && performance.now() - lastSave < 5e3) return;
-      const data = serialize(run3);
-      dirty2 = false;
-      saving = true;
-      lastSave = performance.now();
-      const task = (writes.get(host2) ?? Promise.resolve()).then(() => host2.save(data));
-      writes.set(
-        host2,
-        task.catch(() => {
-        })
-      );
-      try {
-        await task;
-        saveError = false;
-      } catch {
-        dirty2 = true;
-        saveError = true;
-      } finally {
-        saving = false;
-        if (!disposed) hud();
-      }
-    };
-    const pause = (value) => {
-      paused = value;
-      clear();
-      acc = 0;
-      last = 0;
-      menu.hidden = !value;
-      text("[data-menu-title]", "일시정지");
-      text(
-        "[data-menu-text]",
-        "Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. F로 자동 전투를 켜고 끌 수 있습니다."
-      );
-      $('[data-do="resume"]').disabled = !ready;
-      if (value) void save2(true);
-    };
-    const restart = (practice = false) => {
-      if (!ready) return;
-      run3 = practice ? practiceRun() : newRun2();
-      dirty2 = true;
-      pause(false);
-      void save2(true);
-      root2.focus();
-      hud();
-    };
-    const toggle = () => {
-      if (!ready || paused) return;
-      clear();
-      run3.auto = !run3.auto;
-      dirty2 = true;
-      void save2(true);
-      hud();
-    };
-    const manual = () => {
-      if (run3.auto) {
-        run3.auto = false;
-        dirty2 = true;
-      }
-    };
-    const codes = {
-      ArrowUp: "up",
-      ArrowDown: "down",
-      ArrowLeft: "left",
-      ArrowRight: "right",
-      KeyZ: "attack",
-      KeyA: "guard",
-      ShiftLeft: "run",
-      ShiftRight: "run"
-    };
-    const once = {
-      KeyX: "jump",
-      KeyC: "skill",
-      ShiftLeft: "dash",
-      ShiftRight: "dash",
-      KeyS: "ult"
-    };
-    const abort = new AbortController(), signal = abort.signal;
-    root2.addEventListener(
-      "keydown",
-      (ev) => {
-        const e = ev;
-        if (e.target.matches("input,textarea,select,[contenteditable=true]")) return;
-        if (e.code === "Escape") {
-          e.preventDefault();
-          if (!e.repeat && ready) pause(!paused);
-          return;
-        }
-        if (paused || !ready) return;
-        if (e.code === "KeyF") {
-          e.preventDefault();
-          if (!e.repeat) toggle();
-          return;
-        }
-        if (!codes[e.code] && !once[e.code] && !["KeyQ", "KeyW", "KeyE"].includes(e.code)) return;
-        e.preventDefault();
-        manual();
-        target = null;
-        if (codes[e.code]) keys.add(codes[e.code]);
-        if (!e.repeat && once[e.code]) edges[once[e.code]] = true;
-        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code))
-          edges.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
-      },
-      { signal }
-    );
-    root2.addEventListener(
-      "keyup",
-      (ev) => {
-        const e = ev;
-        if (codes[e.code]) keys.delete(codes[e.code]);
-      },
-      { signal }
-    );
-    root2.addEventListener(
-      "focusout",
-      (e) => {
-        if (!root2.contains(e.relatedTarget)) {
-          clear();
-          if (ready && !run3.auto && !paused) pause(true);
-        }
-      },
-      { signal }
-    );
-    window.addEventListener(
-      "blur",
-      () => {
-        if (ready) pause(true);
-      },
-      { signal }
-    );
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden && ready) pause(true);
-      },
-      { signal }
-    );
-    root2.addEventListener(
-      "click",
-      (e) => {
-        const b = e.target.closest("[data-do]");
-        if (!b) return;
-        if (b.dataset.do === "auto") toggle();
-        if (b.dataset.do === "pause" && ready) pause(!paused);
-        if (b.dataset.do === "resume" && ready) {
-          pause(false);
-          root2.focus();
-        }
-        if (b.dataset.do === "restart") restart();
-        if (b.dataset.do === "practice") restart(true);
-      },
-      { signal }
-    );
-    root2.addEventListener(
-      "pointerdown",
-      (e) => {
-        const b = e.target.closest(
-          "[data-hold],[data-edge],[data-item]"
-        );
-        if (!b || b.disabled || paused || !ready) return;
-        e.preventDefault();
-        root2.focus();
-        manual();
-        target = null;
-        b.setPointerCapture(e.pointerId);
-        if (b.dataset.hold) pointers.set(e.pointerId, b.dataset.hold);
-        if (b.dataset.edge) {
-          edges[b.dataset.edge] = true;
-          if (b.dataset.edge === "dash") pointers.set(e.pointerId, "run");
-        }
-        if (b.dataset.item !== void 0) edges.item = Number(b.dataset.item);
-      },
-      { signal }
-    );
-    const updateStick = (e) => {
-      const b = stick.getBoundingClientRect(), dx = (e.clientX - b.left - b.width / 2) / (b.width * 0.35), dy = (e.clientY - b.top - b.height / 2) / (b.height * 0.35), len = Math.max(1, Math.hypot(dx, dy));
-      stickX = Math.abs(dx) < 0.18 ? 0 : dx / len;
-      stickY = Math.abs(dy) < 0.18 ? 0 : dy / len;
-      thumb.style.transform = `translate(${stickX * 28}px,${stickY * 28}px)`;
-    };
-    stick.addEventListener(
-      "pointerdown",
-      (e) => {
-        if (!ready || paused || stickId !== null) return;
-        e.preventDefault();
-        root2.focus();
-        manual();
-        target = null;
-        stickId = e.pointerId;
-        stick.setPointerCapture(e.pointerId);
-        updateStick(e);
-      },
-      { signal }
-    );
-    stick.addEventListener(
-      "pointermove",
-      (e) => {
-        if (e.pointerId === stickId) updateStick(e);
-      },
-      { signal }
-    );
-    const release = (e) => {
-      pointers.delete(e.pointerId);
-      if (e.pointerId === stickId) {
-        stickId = null;
-        stickX = stickY = 0;
-        thumb.style.transform = "translate(0,0)";
-      }
-    };
-    root2.addEventListener("pointerup", release, { signal });
-    root2.addEventListener("pointercancel", release, { signal });
-    root2.addEventListener("lostpointercapture", release, { signal });
-    canvas.addEventListener("contextmenu", (e) => e.preventDefault(), { signal });
-    canvas.addEventListener(
-      "pointerdown",
-      (e) => {
-        if (paused || !ready) return;
-        e.preventDefault();
-        root2.focus();
-        manual();
-        const b = canvas.getBoundingClientRect();
-        const x = Math.max(55, Math.min(1225, (e.clientX - b.left) / b.width * 1280)), y = (e.clientY - b.top) / b.height * 720;
-        if (e.button === 2) {
-          edges.dash = true;
-          target = {
-            x,
-            y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
-            attack: false
-          };
-          return;
-        }
-        const enemy = run3.enemies.find(
-          (a) => a.hp > 0 && Math.abs(a.x - x) < 90 && y > a.y - SCENE.adultHeight && y < a.y + 20
-        );
-        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : {
-          x,
-          y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
-          attack: false
-        };
-      },
-      { signal }
-    );
-    const input2 = () => {
-      const held = /* @__PURE__ */ new Set([...keys, ...pointers.values()]);
-      const p = run3.player;
-      let x = Number(held.has("right")) - Number(held.has("left")) + stickX, y = Number(held.has("down")) - Number(held.has("up")) + stickY, attack = held.has("attack");
-      if (target?.id) {
-        const e = run3.enemies.find((e2) => e2.id === target?.id && e2.hp > 0);
-        if (e) {
-          target.x = e.x;
-          target.y = e.y;
-        } else target = null;
-      }
-      if (target) {
-        const dx = target.x - p.x, dy = target.y - p.y;
-        x = Math.abs(dx) > (target.attack ? 300 : 10) ? Math.sign(dx) : 0;
-        y = Math.abs(dy) > 12 ? Math.sign(dy) : 0;
-        attack = target.attack && Math.abs(dx) < 600 && Math.abs(dy) < 25;
-        if (target.attack) p.dir = dx >= 0 ? 1 : -1;
-        if (!target.attack && !x && !y) target = null;
-      }
-      const result = {
-        x,
-        y,
-        attack,
-        run: held.has("run") || Math.hypot(stickX, stickY) > 0.95,
-        guard: held.has("guard"),
-        ...edges
-      };
-      edges = {};
-      return result;
-    };
-    const resize = () => {
-      const scale = Math.max(0.01, Math.min(fit.clientWidth / 1280, fit.clientHeight / 720));
-      canvas.style.width = `${Math.floor(1280 * scale)}px`;
-      canvas.style.height = `${Math.floor(720 * scale)}px`;
-    };
-    const observer = new ResizeObserver(resize);
-    observer.observe(fit);
-    let waiting = host2.waiting();
-    const offWaiting = host2.onWaiting((value) => {
-      waiting = value;
-    });
-    let hudTime = 0;
-    const frame = (now) => {
-      if (disposed) return;
-      if (ready && !paused && !document.hidden) {
-        const wasCombat = run3.phase === "combat";
-        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0);
-        let ticks = 0;
-        while (acc >= 1 / 60 && ticks++ < 8) {
-          step2(run3, input2(), 1 / 60);
-          acc -= 1 / 60;
-          dirty2 = true;
-        }
-        void save2(wasCombat && run3.phase !== "combat");
-      } else acc = 0;
-      last = now;
-      if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run3);
-      if (now - hudTime > 120) {
-        hud();
-        hudTime = now;
-      }
-      raf = requestAnimationFrame(frame);
-    };
-    void (async () => {
-      try {
-        const [raw, art2] = await Promise.all([
-          (writes.get(host2) ?? Promise.resolve()).then(() => host2.load()),
-          host2.art()
-        ]);
-        if (disposed) return;
-        const restored = restore(raw);
-        run3 = restored ?? newRun2();
-        await renderer.load(art2);
-        root2.dataset.artProfile = art2.atlas.action?.profile ?? "unknown";
-        if (disposed) return;
-        ready = true;
-        if (raw && !restored) {
-          run3.message = "저장을 읽지 못해 새 훈련을 시작합니다.";
-        }
-        pause(true);
-        text("[data-menu-title]", "쟈알디 · 1인 전투 검증판");
-        text(
-          "[data-menu-text]",
-          "계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다."
-        );
-        $('[data-do="restart"]').hidden = false;
-        resize();
-        hud();
-      } catch (e) {
-        if (!disposed) {
-          text("[data-menu-title]", "검증판을 열지 못했습니다");
-          text("[data-menu-text]", e instanceof Error ? e.message : String(e));
-        }
-      }
-    })();
-    raf = requestAnimationFrame(frame);
-    return () => {
-      if (disposed) return;
-      clear();
-      void save2(true);
-      disposed = true;
-      cancelAnimationFrame(raf);
-      abort.abort();
-      observer.disconnect();
-      offWaiting();
-      renderer.dispose();
-      root2.remove();
-      style.remove();
-    };
-  }
-
-  // src/core/update.ts
-  var UPDATE_SCHEMA = 1;
-  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
-  var CARD_FIELDS = [
-    "characterVersion",
-    "firstMessage",
-    "alternateGreetings",
-    "creatorNotes",
-    "desc",
-    "personality",
-    "scenario",
-    "exampleMessage",
-    "systemPrompt",
-    "postHistoryInstructions",
-    "backgroundHTML",
-    "lowLevelAccess",
-    "virtualscript",
-    "triggerscript"
-  ];
-  var PROTECTED_LORE = [DIRECTORY_COMMENT, OLD_DIRECTORY];
-  function compareVersions(a, b) {
-    const pa = String(a).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
-    const pb = String(b).split(/[.-]/).map((x) => Number.parseInt(x, 10) || 0);
-    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-      const d = (pa[i] ?? 0) - (pb[i] ?? 0);
-      if (d) return d < 0 ? -1 : 1;
-    }
-    return 0;
-  }
-  function cardVersion(lore) {
-    const entry = manifestEntry(lore);
-    try {
-      const v = JSON.parse(String(entry?.content ?? "")).version;
-      return typeof v === "string" && v ? v : "0";
-    } catch {
-      return "0";
-    }
-  }
-  function isPayload(x) {
-    const p = x;
-    return !!p && p.schema === UPDATE_SCHEMA && typeof p.version === "string" && !!p.data && Array.isArray(p.data.globalLore) && Array.isArray(p.data.customscript);
-  }
-  function keyed(list4, name) {
-    const seen = /* @__PURE__ */ new Map();
-    return list4.map((x) => {
-      const k = name(x);
-      const n = seen.get(k) ?? 0;
-      seen.set(k, n + 1);
-      return `${k}\0${n}`;
-    });
-  }
-  function mergeByName(current3, incoming, name, keep = () => false) {
-    const ck = keyed(current3, name);
-    const ik = keyed(incoming, name);
-    const cur = new Map(ck.map((k, i) => [k, current3[i]]));
-    const count = { replaced: 0, added: 0, kept: 0, protected: 0 };
-    const list4 = incoming.map((x, i) => {
-      const old = cur.get(ik[i]);
-      if (old === void 0) {
-        count.added++;
-        return x;
-      }
-      if (keep(old)) {
-        count.protected++;
-        return old;
-      }
-      if (JSON.stringify(old) !== JSON.stringify(x)) count.replaced++;
-      return x;
-    });
-    const used = new Set(ik);
-    ck.forEach((k, i) => {
-      if (used.has(k)) return;
-      count.kept++;
-      list4.push(current3[i]);
-    });
-    return { list: list4, count };
-  }
-  var RETIRED_SCRIPTS = ["📊상태창"];
-  var loreName = (e) => `${e.comment ?? ""}${e.folder ?? ""}`;
-  function renamed(current3, incoming) {
-    const target = incoming.find((e) => e.comment === DIRECTORY_COMMENT);
-    const hasNew = current3.some((e) => e.comment === DIRECTORY_COMMENT);
-    const keepNames = new Set(incoming.map((e) => e.comment));
-    return current3.filter((e) => !RETIRED.includes(String(e.comment ?? "")) || keepNames.has(e.comment)).filter((e) => !(hasNew && e.comment === OLD_DIRECTORY)).map((e) => e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: target.folder } : e).filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);
-  }
-  function keyPrint(key) {
-    const norm = String(key ?? "").split(",").map((k) => k.trim()).filter(Boolean).join(",");
-    let h = 2166136261;
-    for (const b of new TextEncoder().encode(norm)) h = Math.imul(h ^ b, 16777619) >>> 0;
-    return h.toString(16).padStart(8, "0");
-  }
-  function shippedKeys(lore) {
-    try {
-      const k = JSON.parse(String(manifestEntry(lore)?.content ?? "")).keys;
-      return k && typeof k === "object" ? k : {};
-    } catch {
-      return {};
-    }
-  }
-  function keepUserKeys(current3, list4, shipped) {
-    const ck = keyed(current3, loreName);
-    const cur = new Map(ck.map((k, i) => [k, current3[i]]));
-    const lk = keyed(list4, loreName);
-    let kept = 0;
-    list4.forEach((e, i) => {
-      const prints = shipped[String(e.comment ?? "")];
-      const old = cur.get(lk[i]);
-      if (!prints || !old || old === e || keyPrint(old.key) === keyPrint(e.key) || prints.includes(keyPrint(old.key))) return;
-      list4[i] = { ...e, key: old.key, secondkey: old.secondkey ?? e.secondkey };
-      kept++;
-    });
-    return kept;
-  }
-  function planUpdate(char, payload) {
-    const current3 = renamed(char.globalLore ?? [], payload.data.globalLore);
-    const lore = mergeByName(current3, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
-    keepUserKeys(current3, lore.list, shippedKeys(payload.data.globalLore));
-    if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? "")))) lore.list = migrateLore(lore.list);
-    const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ""));
-    const currentScripts = (char.customscript ?? []).filter((r) => !RETIRED_SCRIPTS.includes(r.comment ?? "") || incomingNames.has(r.comment ?? ""));
-    const scripts = mergeByName(currentScripts, payload.data.customscript, (r) => r.comment ?? "");
-    const next = { ...char, globalLore: lore.list, customscript: scripts.list };
-    delete next.customscripts;
-    const fields3 = [];
-    for (const f of CARD_FIELDS) {
-      if (!(f in payload.data)) continue;
-      if (JSON.stringify(char[f]) !== JSON.stringify(payload.data[f])) fields3.push(f);
-      next[f] = payload.data[f];
-    }
-    return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
-  }
-  var PLUGIN_VERSION = true ? "0.16.33" : "0";
-
-  // src/host/gamepack.ts
-  var KEY2 = `goei:game-pack:${PACK_ID}`;
-  var PackError = class extends Error {
-  };
-  async function stored() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY2);
-      const v = typeof raw === "string" ? JSON.parse(raw) : null;
-      return v && typeof v.version === "number" && v.atlas && v.files && PACK_FILES.every((f) => typeof v.files[f] === "string") ? v : null;
-    } catch {
-      return null;
-    }
-  }
-  async function packState() {
-    const s4 = await stored();
-    return !s4 ? "none" : s4.version !== PACK_VERSION ? "old" : "ready";
-  }
-  async function downloadPack() {
-    if (!UPDATE_BASE) throw new PackError("받을 곳이 정해지지 않았어요. 팩 파일을 직접 넣어 주세요.");
-    const url = `${UPDATE_BASE}/${PACK_NAME}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (b && parsePack(b)) return b;
-      } catch {
-      }
-    }
-    try {
-      const res = await risuai.nativeFetch(url, { method: "GET" });
-      if (res.ok) {
-        const b = new Uint8Array(await res.arrayBuffer());
-        if (parsePack(b)) return b;
-      }
-    } catch {
-    }
-    throw new PackError("그림을 받지 못했어요. 잠시 뒤 다시 받거나 팩 파일을 직접 넣어 주세요.");
-  }
-  function base642(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
-  }
-  async function installPack(bytes) {
-    const pack3 = parsePack(bytes);
-    if (!pack3 || pack3.id !== PACK_ID) throw new PackError("괴이 ː 이면세계 순찰 그림 팩 파일이 아니에요.");
-    if (pack3.version !== PACK_VERSION) throw new PackError("플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.");
-    const files = {};
-    for (const name of PACK_FILES) files[name] = base642(pack3.files.get(name));
-    await risuai.pluginStorage.setItem(KEY2, JSON.stringify({ version: pack3.version, atlas: pack3.atlas, files }));
-    art = null;
-  }
-  var art = null;
-  function loadArt() {
-    art ??= (async () => {
-      const s4 = await stored();
-      if (!s4 || s4.version !== PACK_VERSION) throw new PackError("그림 팩이 없어요.");
-      const urls2 = /* @__PURE__ */ new Map();
-      for (const name of PACK_FILES) {
-        const b = Uint8Array.from(atob(s4.files[name]), (c) => c.charCodeAt(0));
-        urls2.set(name, URL.createObjectURL(new Blob([b], { type: "image/png" })));
-      }
-      return { atlas: s4.atlas, url: (f) => urls2.get(f) ?? "" };
-    })();
-    art.catch(() => art = null);
-    return art;
-  }
-
-  // src/host/actionpack.ts
-  var ACTION_FILES = ["a-jyaldi-action", "bg-bureau-action", "e-corner", "e-watchman"];
-  var KEY3 = "goei:game-pack:action-normal-v4";
-  var VERSION = 4;
-  var loaded = null;
-  async function stored2() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY3);
-      if (typeof raw !== "string") return null;
-      const s4 = JSON.parse(raw);
-      return s4 && s4.version === VERSION && s4.atlas?.action && ACTION_FILES.every((f) => typeof s4.files?.[f] === "string") ? s4 : null;
-    } catch {
-      return null;
-    }
-  }
-  async function actionPackState() {
-    return await stored2() ? "ready" : "none";
-  }
-  async function installActionPack(bytes) {
-    const pack3 = parsePack(bytes, ACTION_FILES);
-    if (!pack3 || pack3.id !== "action" || pack3.version !== VERSION || !pack3.atlas.action)
-      throw new PackError(
-        "1인 액션용 그림 팩이 아닙니다. goei-game-action-normal-v4.pack을 넣어 주세요."
-      );
-    const files = {};
-    for (const [name, b] of pack3.files) {
-      let str3 = "";
-      for (let i = 0; i < b.length; i += 32768)
-        str3 += String.fromCharCode(...b.subarray(i, i + 32768));
-      files[name] = btoa(str3);
-    }
-    await risuai.pluginStorage.setItem(
-      KEY3,
-      JSON.stringify({ version: VERSION, atlas: pack3.atlas, files })
-    );
-    loaded = null;
-  }
-  async function downloadActionPack() {
-    const url = `${UPDATE_BASE}/goei-game-action-normal-v4.pack`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, {
-          method: "GET",
-          plainFetchForce: true,
-          rawResponse: true
-        });
-        const b = r.ok ? toBytes3(r.data) : null;
-        if (b && parsePack(b, ACTION_FILES)) return b;
-      } catch {
-      }
-    }
-    try {
-      const r = await risuai.nativeFetch(url, { method: "GET" });
-      if (r.ok) {
-        const b = new Uint8Array(await r.arrayBuffer());
-        if (parsePack(b, ACTION_FILES)) return b;
-      }
-    } catch {
-    }
-    throw new PackError(
-      "새 액션 그림을 받지 못했어요. goei-game-action-normal-v4.pack을 파일로 넣어 주세요."
-    );
-  }
-  function loadActionArt() {
-    loaded ??= (async () => {
-      const s4 = await stored2();
-      if (!s4) throw new PackError("새 액션 그림이 없습니다.");
-      return {
-        atlas: s4.atlas,
-        url: (name) => s4.files[name] ? `data:image/png;base64,${s4.files[name]}` : ""
-      };
-    })();
-    loaded.catch(() => {
-      loaded = null;
-    });
-    return loaded;
-  }
-
-  // src/ui/game.ts
-  var KEY4 = "goei:game";
-  var layer = null;
-  var unmount = null;
-  var mode2 = "action";
-  var generation = 0;
-  var host = {
-    load: async () => {
-      const v = await risuai.pluginStorage.getItem(KEY4);
-      return typeof v === "string" ? v : null;
-    },
-    save: (data) => risuai.pluginStorage.setItem(KEY4, data),
-    waiting: isWaiting,
-    onWaiting,
-    narrow: () => matchMedia("(max-width: 760px)").matches,
-    art: loadArt
-  };
-  var actionHost = {
-    ...host,
-    load: async () => {
-      const value = await risuai.pluginStorage.getItem("goei:game-action:v1");
-      return typeof value === "string" ? value : null;
-    },
-    save: (data) => risuai.pluginStorage.setItem("goei:game-action:v1", data),
-    art: loadActionArt
-  };
-  var errText = (e) => e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
-  function packPanel(box, old, done) {
-    const action = mode2 === "action";
-    box.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
-      <b>${action ? "새 액션 그림 받기" : old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
-      <p>${old ? "플러그인이 바뀌어 그림을 새로 받아야 해요." : "게임 그림은 처음 한 번만 받아요. 받은 그림은 Risu에 저장돼요."}</p>
-      <p class="gx-gp-msg" hidden></p>
-      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">${action ? "액션 그림 받기" : "순찰 그림 받기 (0.7MB)"}</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
-    </div></div>`;
-    const msg = box.querySelector(".gx-gp-msg");
-    const btns = [...box.querySelectorAll(".gx-gp-btn")];
-    const picker2 = document.createElement("input");
-    picker2.type = "file";
-    picker2.accept = ".pack";
-    picker2.hidden = true;
-    box.append(picker2);
-    const say = (t) => (msg.hidden = !t, msg.textContent = t);
-    const run3 = async (get) => {
-      btns.forEach((b) => b.disabled = true);
-      say("받는 중");
-      try {
-        const bytes = await get();
-        say("저장하는 중");
-        await (action ? installActionPack(bytes) : installPack(bytes));
-        done();
-      } catch (e) {
-        say(errText(e));
-        btns.forEach((b) => b.disabled = false);
-      }
-    };
-    box.querySelector('[data-gp="get"]').addEventListener("click", () => void run3(action ? downloadActionPack : downloadPack));
-    box.querySelector('[data-gp="file"]').addEventListener("click", () => picker2.click());
-    picker2.addEventListener("change", () => {
-      const f = picker2.files?.[0];
-      picker2.value = "";
-      if (f) void run3(async () => new Uint8Array(await f.arrayBuffer()));
-    });
-  }
-  async function start(box) {
-    const current3 = ++generation;
-    unmount?.();
-    unmount = null;
-    const isAction = mode2 === "action";
-    const state = await (isAction ? actionPackState() : packState());
-    if (current3 !== generation || !layer || layer.querySelector(".gx-game-box") !== box) return;
-    if (state !== "ready") return packPanel(box, state === "old", () => void start(box));
-    try {
-      await (isAction ? loadActionArt() : loadArt());
-    } catch {
-      if (current3 === generation && layer?.querySelector(".gx-game-box") === box)
-        packPanel(box, false, () => void start(box));
-      return;
-    }
-    if (current3 !== generation || !layer || layer.querySelector(".gx-game-box") !== box) return;
-    box.innerHTML = "";
-    unmount = mode2 === "action" ? mountAction(box, actionHost) : mountGame(box, host);
-  }
-  var gameOpen = () => !!layer;
-  function openGame(panel) {
-    if (layer || !panel) return;
-    layer = document.createElement("div");
-    layer.className = "gx-game";
-    layer.innerHTML = `<header class="gx-head"><div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>관리국 훈련</b></div></div>
-    <div><button type="button" data-game-mode="action" aria-pressed="${mode2 === "action"}">1인 전투 검증판</button><button type="button" data-game-mode="patrol" aria-pressed="${mode2 === "patrol"}">기존 순찰</button></div>
-    <div class="gx-head-act"><button class="gx-x" data-action="game-close" aria-label="순찰 닫기">${ICONS.close}</button></div></header>
-    <div class="gx-game-box"></div>`;
-    panel.append(layer);
-    layer.addEventListener("click", (e) => {
-      const value = e.target.closest("[data-game-mode]")?.dataset.gameMode;
-      if (value !== "action" && value !== "patrol" || value === mode2 || !layer) return;
-      mode2 = value;
-      layer.querySelectorAll("[data-game-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.gameMode === mode2)));
-      void start(layer.querySelector(".gx-game-box"));
-    });
-    void start(layer.querySelector(".gx-game-box"));
-  }
-  function closeGame() {
-    generation++;
-    unmount?.();
-    unmount = null;
-    layer?.remove();
-    layer = null;
-  }
-  function reattachGame(panel) {
-    if (layer && panel && layer.parentElement !== panel) panel.append(layer);
-  }
-
-  // src/host/picpack.ts
-  var isRow2 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
-  var PicError = class extends Error {
-  };
-  async function digest(b) {
-    try {
-      const h = new Uint8Array(await crypto.subtle.digest("SHA-1", b));
-      return [...h].map((x) => x.toString(16).padStart(2, "0")).join("").slice(0, 12);
-    } catch {
-      return null;
-    }
-  }
-  async function fetchPicture(p) {
-    const url = `${UPDATE_BASE}/pic/${p[1]}.${p[2]}`;
-    const ok = async (b) => !!b?.length && (await digest(b) ?? p[1]) === p[1];
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        const b = r?.ok ? toBytes3(r.data) : null;
-        if (await ok(b)) return b;
-      } catch {
-      }
-    }
-    try {
-      const res = await risuai.nativeFetch(url, { method: "GET" });
-      if (res.ok) {
-        const b = new Uint8Array(await res.arrayBuffer());
-        if (await ok(b)) return b;
-      }
-    } catch {
-    }
-    throw new PicError(`사진 「${p[0]}」을 받지 못했어요.`);
-  }
-  async function fetchPictures(assets, plan, progress) {
-    const got = [];
-    let i = 0;
-    const worker = async () => {
-      while (i < plan.get.length) {
-        const p = plan.get[i++];
-        got.push([p, await fetchPicture(p)]);
-        progress(got.length, "get");
-      }
-    };
-    await Promise.all([worker(), worker(), worker(), worker()]);
-    const paths = new Array(got.length);
-    let j = 0;
-    let saved = 0;
-    progress(0, "save");
-    const saver = async () => {
-      while (j < got.length) {
-        const k = j++;
-        let path;
-        try {
-          path = await risuai.saveAsset(got[k][1]);
-        } catch (error) {
-          throw new PicError(`사진을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-        }
-        if (typeof path !== "string" || !path) throw new PicError("사진을 저장하지 못했어요.");
-        paths[k] = path;
-        progress(++saved, "save");
-      }
-    };
-    await Promise.all([saver(), saver(), saver(), saver()]);
-    const rows = (Array.isArray(assets) ? assets : []).map((r) => isRow2(r) ? [...r] : r);
-    got.forEach(([p], k) => {
-      const row5 = rows.find((r) => isRow2(r) && r[0] === p[0]);
-      if (row5) row5[1] = paths[k], row5[2] = p[2];
-      else rows.push([p[0], paths[k], p[2]]);
-    });
-    return rows;
-  }
-
-  // src/core/pictures.ts
-  function pictures(m) {
-    const list4 = m?.pictures;
-    return Array.isArray(list4) ? list4.filter((p) => Array.isArray(p) && typeof p[0] === "string" && typeof p[1] === "string" && typeof p[2] === "string") : [];
-  }
-  var isRow3 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
-  function planPictures(assets, cur, next) {
-    const have = new Set((Array.isArray(assets) ? assets : []).filter(isRow3).map((r) => r[0]));
-    const known = new Map(pictures(cur).map((p) => [p[0], p[1]]));
-    const plan = { get: [], replaced: 0, added: 0, bytes: 0 };
-    for (const p of pictures(next)) {
-      if (have.has(p[0]) && known.get(p[0]) === p[1]) continue;
-      plan.get.push(p);
-      plan.bytes += Number(p[3]) || 0;
-      if (have.has(p[0])) plan.replaced++;
-      else plan.added++;
-    }
-    return plan;
-  }
-
-  // src/ui/update.ts
-  var esc9 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, pics: null, progress: "", done: "" };
-  var checked = false;
-  var skipped = "";
-  var SKIP_KEY = "goei:update-skip";
-  async function getText(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    lastDirect = legacy ? "" : "risuFetch 없음";
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-        lastDirect = `직접 받기 ${r?.status}: ${String(typeof r?.data === "string" ? r.data : Object.prototype.toString.call(r?.data)).slice(0, 80)}`;
-      } catch (error) {
-        lastDirect = `직접 받기 오류: ${String(error).slice(0, 80)}`;
-      }
-    }
-    const res = await risuai.nativeFetch(url, { method: "GET" }).catch((e) => {
-      throw new Error(`업데이트 정보를 받지 못했어요. (${String(e)}; ${lastDirect})`);
-    });
-    if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}; ${lastDirect}).`);
-    return String(await res.text() ?? "");
-  }
-  var lastDirect = "";
-  async function getJson(name) {
-    const text = await getText(name);
-    let body5 = text;
-    try {
-      for (let i = 0; i < 2 && typeof body5 === "string"; i++) body5 = JSON.parse(body5.replace(/^\uFEFF/, ""));
-    } catch {
-      throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text ?? "").length}자)`);
-    }
-    return body5;
-  }
-  async function loadPayload() {
-    const index = await getJson("card-update.json");
-    if (index && "card" in index) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
-    if (!Array.isArray(index?.parts)) return index;
-    let text = "";
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
-      text += await getText(name);
-    }
-    if (typeof index.length === "number" && text.length !== index.length) {
-      throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
-    }
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text.length}자)`);
-    }
-  }
-  function describe2(x) {
-    if (x === null || typeof x !== "object") return `${typeof x}`;
-    const o = x;
-    const d = o.data;
-    return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscript=${Array.isArray(d?.customscript) ? "list" : typeof d?.customscript}`;
-  }
-  async function checkLatest(env2, force = false) {
-    if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
-    checked = true;
-    updateUi.busy = force;
-    if (force) updateUi.notice = "", env2.render();
-    try {
-      if (!force) skipped = String(await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => "") ?? "");
-      const v = await getJson("version.json");
-      if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
-      updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
-    } catch (error) {
-      if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    updateUi.busy = false;
-    env2.render();
-  }
-  function newVersions(ctx2) {
-    const L = updateUi.latest;
-    if (!L) return {};
-    const lite = !!readManifest(ctx2.char.globalLore);
-    return {
-      card: lite && compareVersions(L.card, cardVersion(ctx2.char.globalLore)) > 0 ? L.card : void 0,
-      plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : void 0
-    };
-  }
-  var skipKey = (n) => `${n.card ?? ""}|${n.plugin ?? ""}`;
-  function hasUpdate(ctx2) {
-    const n = newVersions(ctx2);
-    return !!(n.card || n.plugin);
-  }
-  function updateBanner(ctx2) {
-    const n = newVersions(ctx2);
-    if (!(n.card || n.plugin) || skipKey(n) === skipped) return "";
-    const what = [n.plugin ? `플러그인 v${esc9(n.plugin)}` : "", n.card ? `카드 v${esc9(n.card)}` : ""].filter(Boolean).join(" · ");
-    return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
-    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
-  }
-  function updateGroup(ctx2) {
-    const busy4 = updateUi.busy;
-    const rows = [];
-    const cur = cardVersion(ctx2.char.globalLore);
-    const lite = !!readManifest(ctx2.char.globalLore);
-    const L = updateUi.latest;
-    const row5 = (label, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
-    if (!UPDATE_BASE) {
-      return section2(row5("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
-    }
-    const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
-    rows.push(row5(
-      "플러그인",
-      `<span class="upd-ver">v${esc9(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc9(L.plugin)}</b>` : ""}</span>`,
-      pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
-    ));
-    const cardNew = lite && L && compareVersions(L.card, cur) > 0;
-    const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
-    rows.push(row5(
-      "카드",
-      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc9(cur)}`}${cardNew ? ` → <b>v${esc9(L.card)}</b>` : ""}</span>`,
-      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
-    ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy4 ? "disabled" : ""}>${busy4 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
-    if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc9(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
-    }
-    const plan = updateUi.plan;
-    const pics = updateUi.pics;
-    const summary = plan ? `<ul class="upd-plan">
-        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc9(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
-        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
-        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-        ${pics?.get.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added} <small>(약 ${mb(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ""}
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>` : "";
-    return section2(rows.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc9(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc9(updateUi.done)}</p>` : ""));
-  }
-  var mb = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`;
-  function section2(body5) {
-    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body5}</div></section>`;
-  }
-  var FIELD_NAMES = {
-    characterVersion: "캐릭터 버전",
-    firstMessage: "첫 안내",
-    alternateGreetings: "첫 장면",
-    creatorNotes: "제작 노트",
-    desc: "설명",
-    personality: "성격",
-    scenario: "시나리오",
-    exampleMessage: "예시 대화",
-    systemPrompt: "시스템 프롬프트",
-    postHistoryInstructions: "탈옥 프롬프트",
-    backgroundHTML: "배경 HTML",
-    lowLevelAccess: "저수준 접근",
-    virtualscript: "가상 스크립트",
-    triggerscript: "트리거"
-  };
-  var fieldName = (f) => FIELD_NAMES[f] ?? f;
-  async function handleUpdate(action, ctx2, env2) {
-    if (!action.startsWith("upd-")) return false;
-    if (updateUi.busy) return true;
-    if (action === "upd-skip") {
-      skipped = skipKey(newVersions(ctx2));
-      await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {
-      });
-      env2.render();
-      return true;
-    }
-    if (action === "upd-check") {
-      updateUi.payload = null;
-      updateUi.plan = null;
-      updateUi.pics = null;
-      updateUi.done = "";
-      await checkLatest(env2, true);
-      return true;
-    }
-    updateUi.busy = true;
-    updateUi.notice = "";
-    env2.render();
-    try {
-      const char = await risuai.getCharacterFromIndex(ctx2.charIndex);
-      if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-      if (action === "upd-prepare") {
-        const p = await loadPayload();
-        if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe2(p)})`);
-        if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
-        updateUi.payload = p;
-        updateUi.plan = planUpdate(char, p);
-        updateUi.pics = planPictures(char.additionalAssets, readManifest(char.globalLore), readManifest(p.data.globalLore));
-      } else if (action === "upd-apply" && updateUi.payload) {
-        const plan = planUpdate(char, updateUi.payload);
-        const pics = planPictures(char.additionalAssets, readManifest(char.globalLore), readManifest(updateUi.payload.data.globalLore));
-        if (pics.get.length) {
-          let last = 0;
-          updateUi.progress = `사진 받는 중 0/${pics.get.length}`;
-          env2.render();
-          try {
-            plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n, phase) => {
-              if (n === 0) last = 0;
-              updateUi.progress = `사진 ${phase === "get" ? "받는" : "저장"} 중 ${n}/${pics.get.length}`;
-              if (n - last >= 5 || n === 0 || n === pics.get.length) last = n, env2.render();
-            });
-          } catch (error) {
-            updateUi.progress = "";
-            throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
-          }
-          updateUi.progress = "카드에 적용 중…";
-          env2.render();
-        }
-        await risuai.setCharacterToIndex(ctx2.charIndex, plan.next);
-        if (pics.get.length) forgetImages();
-        updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ""} 채팅을 다시 열면 새 내용이 보여요.`;
-        updateUi.payload = null;
-        updateUi.plan = null;
-        updateUi.pics = null;
-        updateUi.progress = "";
-        updateUi.busy = false;
-        await env2.refresh();
-        return true;
-      }
-    } catch (error) {
-      updateUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    updateUi.progress = "";
-    updateUi.busy = false;
-    env2.render();
-    return true;
-  }
-
-  // src/ui/wiki.ts
-  var TABS = [["all", "전체"], ["story", "이번 이야기"], ["an", "괴이"], ["ms", "특수"], ["ag", "인물"], ["fac", "세력"], ["etc", "기타"]];
-  var wiki = {
-    view: "home",
-    title: "",
-    query: "",
-    homeQuery: "",
-    history: [],
-    inherited: [],
-    previousTitle: null,
-    direct: false,
-    confirmDelete: null,
-    failure: null,
-    notice: "",
-    info: "",
-    listOpen: false,
-    tab: "all",
-    newTitle: "",
-    docReq: "",
-    rewrite: null,
-    rewritePrev: true
-  };
-  function resetWiki() {
-    Object.assign(wiki, { view: "home", title: "", query: "", homeQuery: "", history: [], inherited: [], previousTitle: null, direct: false, confirmDelete: null, notice: "", newTitle: "", docReq: "", rewrite: null });
-  }
-  var jobs3 = /* @__PURE__ */ new Map();
-  var chatKey3 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc10 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var regCache = null;
-  function registry(ctx2) {
-    if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
-    return regCache.reg;
-  }
-  var source3 = (ctx2) => ({ char: ctx2.char, chat: ctx2.chat, persona: personaText() });
-  function canon(ctx2) {
-    const r = registry(ctx2);
-    const src = source3(ctx2);
-    return (t) => canonicalTitle(r, src, t).title;
-  }
-  function go(view2, title2 = "", query = wiki.query) {
-    if (wiki.view !== view2 || wiki.title !== title2) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
-    if (wiki.history.length > 30) wiki.history.shift();
-    if (wiki.view !== view2 || wiki.title !== title2) Object.assign(wiki, { docReq: "", rewrite: null });
-    wiki.view = view2;
-    wiki.title = title2;
-    wiki.query = query;
-    wiki.confirmDelete = null;
-    wiki.notice = "";
-  }
-  function openWikiSettings() {
-    if (wiki.view !== "settings") go("settings");
-    wiki.listOpen = false;
-  }
-  function openTitle(ctx2, raw, from) {
-    const title2 = canon(ctx2)(raw.trim());
-    if (!validTitle(title2)) {
-      wiki.notice = "쓸 수 없는 제목이에요. 꺾쇠(<>), 줄바꿈, {{ }} 없이 300자 이내로 적어 주세요.";
-      return;
-    }
-    const parent = wiki.view === "doc" ? findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore) : null;
-    if (findDoc(ctx2.chat, title2, ctx2.char.globalLore)) {
-      go("doc", title2);
-      return;
-    }
-    wiki.inherited = from === "link" && parent?.meta ? parent.meta.primarySources : [];
-    wiki.previousTitle = from === "link" && parent ? parent.title : null;
-    wiki.direct = from !== "link";
-    go("compose", title2);
-  }
-  function search(ctx2, q) {
-    const query = q.trim();
-    wiki.query = query;
-    if (!query) return;
-    const c = canonicalTitle(registry(ctx2), source3(ctx2), query);
-    if (findDoc(ctx2.chat, c.title, ctx2.char.globalLore)) return go("doc", c.title, query);
-    if (c.known) return openTitle(ctx2, c.title, "direct");
-    wiki.listOpen = true;
-  }
-  async function generate3(ctx2, env2, title2, regenerate, docRequest = "", usePrevious) {
-    const key = chatKey3(ctx2);
-    if (jobs3.has(key)) {
-      wiki.notice = `「${jobs3.get(key).title}」 문서를 만드는 중이에요. 끝난 뒤 다시 눌러 주세요.`;
-      env2.render();
-      return;
-    }
-    const s4 = wikiSettings(ctx2.chat.scriptstate);
-    const old = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
-    const inherited = regenerate ? old?.meta && !old.meta.direct ? old.meta.primarySources : [] : wiki.inherited;
-    const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-    const previousDoc = regenerate ? usePrevious ?? s4.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
-    const writingRequest = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    jobs3.set(key, { title: title2, started: Date.now() });
-    wiki.failure = null;
-    wiki.notice = "";
-    env2.render();
-    try {
-      const catalogNames = (() => {
-        try {
-          return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
-        } catch {
-          return {};
-        }
-      })();
-      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s4, catalogNames, registry(ctx2)));
-      let body5;
-      try {
-        body5 = (await generate(prompt.messages, s4.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
-      } catch (error) {
-        const raw = error.raw;
-        if (raw) wiki.failure = { title: title2, reason: error instanceof Error ? error.message : String(error), raw };
-        throw error;
-      }
-      const meta = {
-        title: title2,
-        mode: s4.mode,
-        model: s4.model,
-        created: Math.floor(Date.now() / 1e3),
-        length: s4.length,
-        sources: prompt.sources,
-        primarySources: prompt.primarySources.length ? prompt.primarySources : inherited,
-        writingRequest,
-        direct,
-        ...docRequest.trim() ? { docRequest: docRequest.trim() } : {}
-      };
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => saveDoc(chat, meta, body5));
-      const cur = env2.current();
-      if (cur && chatKey3(cur) === key && (wiki.view === "compose" || wiki.view === "doc") && wiki.title === title2) Object.assign(wiki, { view: "doc", rewrite: null, docReq: "" });
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      wiki.notice = `「${title2}」 문서를 만들지 못했어요. ${msg}${old ? " 기존 문서는 그대로 두었어요." : ""}`;
-      if (!wiki.failure && !(error instanceof WikiError)) wiki.failure = { title: title2, reason: msg, raw: error.raw ?? "" };
-    } finally {
-      jobs3.delete(key);
-      await env2.refresh();
-    }
-  }
-  async function setVar2(ctx2, env2, key, value) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [key]: value } }));
-    await env2.refresh();
-  }
-  var CAT_LABEL = { an: "괴이", ms: "특수", lm: "거점", ag: "인물", org: "조직" };
-  var CAT_ICON = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
-  var entryCache = null;
-  function entries(ctx2) {
-    if (entryCache && entryCache.lore === ctx2.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
-    const c = canon(ctx2);
-    const list4 = [];
-    const dir2 = readDirectory(ctx2.char.globalLore);
-    const other = /* @__PURE__ */ new Set([...dir2.agents.map((a) => a.lore), ...orgLores(ctx2.char.globalLore ?? [])]);
-    for (const [cat, rows] of [["an", dir2.anomalies], ["ms", dir2.sites]]) {
-      for (const p of rows) if (p.inFolder || !other.has(p.lore)) list4.push({ cat, name: p.label, title: c(p.lore || p.label), sub: p.english, photo: mainPic(ctx2.char, p), face: facePic(ctx2.char, p), terms: [p.label, p.english, ...p.aliases] });
-    }
-    try {
-      for (const l of parseCatalog(ctx2.char.globalLore).landmarks) {
-        list4.push({ cat: "lm", name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: "", face: "", terms: [l.name, l.english, ...l.aliases] });
-      }
-    } catch {
-    }
-    for (const a of dir2.agents) list4.push({ cat: "ag", name: a.name, title: c(a.lore || a.name), sub: [a.rank, a.department].filter(Boolean).join(" · ") || a.english, photo: mainPic(ctx2.char, a), face: facePic(ctx2.char, a, true), terms: [a.name, a.english, ...a.aliases] });
-    const lore = ctx2.char.globalLore ?? [];
-    const facs = factionList(lore);
-    const hasLore = new Set(lore.map((e) => String(e.comment ?? "").trim()));
-    for (const o of dir2.orgs) {
-      const f = o.faction ? facs.find((x) => x.code === o.faction) : facs.find((x) => !x.builtin && x.affiliation === o.name);
-      if (f?.hidden) continue;
-      const doc = orgLoreName(lore, o.name);
-      if (!f && !hasLore.has(doc)) continue;
-      const name = f?.name ?? o.name;
-      list4.push({ cat: "org", name, title: c(doc), sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, o.spec), face: facePic(ctx2.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ""] });
-    }
-    const seen = /* @__PURE__ */ new Set();
-    const out = list4.filter((e) => seen.has(`${e.cat}|${e.title}`) ? false : (seen.add(`${e.cat}|${e.title}`), true));
-    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), list: out };
-    return out;
-  }
-  var entryFor = (ctx2, title2) => {
-    const all = entries(ctx2).filter((e) => e.title === title2);
-    return all.find((e) => e.name === title2) ?? all[0];
-  };
-  function matches2(ctx2, q) {
-    const lower = q.toLowerCase();
-    return entries(ctx2).filter((e) => e.terms.some((t) => t && t.toLowerCase().includes(lower)));
-  }
-  var squash2 = (t) => t.toLowerCase().replace(/[\s·.,!?'"「」『』()\[\]\-_~]/g, "");
-  function editDistance(a, b) {
-    const A = [...a], B = [...b];
-    let prev = Array.from({ length: B.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= A.length; i++) {
-      const cur = [i];
-      for (let j = 1; j <= B.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (A[i - 1] === B[j - 1] ? 0 : 1));
-      prev = cur;
-    }
-    return prev[B.length];
-  }
-  function similar(q, titles) {
-    const k = squash2(q);
-    if (!k) return [];
-    const limit = Math.max(1, Math.floor([...k].length / 3));
-    return [...new Set(titles)].map((t) => {
-      const v = squash2(t);
-      if (!v) return null;
-      if (v === k || v.includes(k) || k.includes(v) && [...v].length >= 2) return { t, d: 0 };
-      const d = editDistance(k, v);
-      return d <= limit ? { t, d } : null;
-    }).filter((x) => !!x).sort((a, b) => a.d - b.d || a.t.length - b.t.length).slice(0, 6).map((x) => x.t);
-  }
-  function face2(ctx2, e, cls = "") {
-    const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc10(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
-  }
-  function seg3(action, cur, items) {
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
-  }
-  function busyLine(ctx2) {
-    const job = jobs3.get(chatKey3(ctx2));
-    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc10(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
-  }
-  var tool3 = (action, icon, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  var blank4 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
-  var when = (sec) => new Date(sec * 1e3).toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
-  function row4(ctx2, e, title2, sub, dot = false) {
-    const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
-    const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
-    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc10(title2)}">${face2(ctx2, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc10(e?.name ??
+    
