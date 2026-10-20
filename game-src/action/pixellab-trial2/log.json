@@ -44,7 +44,8 @@
       "seed": 20261020,
       "charged": 4,
       "job": "70d22254-e5f2-4999-85ae-083390018a96",
-      "prompt": "A full running cycle in place facing right, same near-profile three-quarter camera as the input, body orientation never changes. Athletic adult jog-run: torso leans slightly forward, long strides with a clear flight phase where both feet leave the ground, knees lift, back leg pushes off from the toes. Both arms bent about 90 degrees at the elbow pump strongly forward and back from the shoulders, opposite to the legs, hands clearly visible in front of and behind the body. Hair streams back. Identical head size, limb lengths and body volume throughout. No turning toward the camera, no zoom."
+      "prompt": "A full running cycle in place facing right, same near-profile three-quarter camera as the input, body orientation never changes. Athletic adult jog-run: torso leans slightly forward, long strides with a clear flight phase where both feet leave the ground, knees lift, back leg pushes off from the toes. Both arms bent about 90 degrees at the elbow pump strongly forward and back from the shoulders, opposite to the legs, hands clearly visible in front of and behind the body. Hair streams back. Identical head size, limb lengths and body volume throughout. No turning toward the camera, no zoom.",
+      "useNote": "조깅에 가까운 꼿꼿한 달리기. 전투 달리기로는 반려(2026-10-20 사용자). 이벤트 장면(본부 이동·추격 전 등) 후보로 보관"
     },
     {
       "id": "run",
@@ -55,7 +56,8 @@
       "seed": 20261020,
       "charged": 4,
       "job": "3925b702-10a4-4b5b-9507-cac57474d389",
-      "prompt": "One complete looping running cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact stride pose. Sequence: flight with legs split, front foot lands under the hips, body compresses slightly, push off from the toes, flight, the other leg lands, compress, push off, return to the starting stride pose. Torso leans slightly forward. Both arms bent about 90 degrees pump strongly from the shoulders opposite to the legs on every frame, fists visible in front and behind. Hair streams back. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera."
+      "prompt": "One complete looping running cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact stride pose. Sequence: flight with legs split, front foot lands under the hips, body compresses slightly, push off from the toes, flight, the other leg lands, compress, push off, return to the starting stride pose. Torso leans slightly forward. Both arms bent about 90 degrees pump strongly from the shoulders opposite to the legs on every frame, fists visible in front and behind. Hair streams back. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera.",
+      "useNote": "조깅에 가까운 꼿꼿한 달리기. 전투 달리기로는 반려(2026-10-20 사용자). 이벤트 장면(본부 이동·추격 전 등) 후보로 보관"
     },
     {
       "id": "jab",
