@@ -297,7 +297,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
   return evCard({
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
-    extra: e.report ? `<span class="gx-evc-sit">${esc(e.report)}</span>` : '',
+    extra: e.report ? `<span class="gx-evc-sit" title="${esc(e.report)}">${esc(e.report)}</span>` : '',
     key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind) : undefined,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
