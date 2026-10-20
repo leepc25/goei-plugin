@@ -1,0 +1,30 @@
+{
+  "provider": "PixelLab MCP animate_image",
+  "jobId": "31243c19-0614-445c-9d92-5b3a135db9c8",
+  "assetId": "339d909a-2861-5825-9671-561b05ae2ed6",
+  "reference": "../production-v5/master-source.png, rightmost full-body view",
+  "input": "input.png",
+  "canvas": [
+    160,
+    160
+  ],
+  "neutralHeight": 128,
+  "generatedFrames": 8,
+  "displayScale": 2,
+  "perFrameRescale": false,
+  "anchor": [
+    80,
+    144
+  ],
+  "trialGenerationsUsed": 4,
+  "trialGenerationsRemaining": 36,
+  "paidCredits": 0,
+  "releaseReady": false,
+  "visualFindings": [
+    "Camera-facing torso drift during the cycle",
+    "Last generated pose does not close cleanly to first generated pose",
+    "Arm swing is subtle and needs further evaluation",
+    "No separately authored start/stop transitions"
+  ],
+  "demo": "release/demo/jyaldi-pixellab-trial.html"
+}

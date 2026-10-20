@@ -1,0 +1,20 @@
+{
+  "keyboardMove": true,
+  "stopReturnsToNeutral": true,
+  "walkFrames": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "frameSelection": true,
+  "slowMotion": true,
+  "pause": true,
+  "mobileOverflow": false,
+  "errors": [],
+  "visualApproval": false
+}
