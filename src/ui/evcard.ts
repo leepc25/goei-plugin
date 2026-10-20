@@ -64,18 +64,13 @@ function gradeMark(c: EvCard): string {
 }
 const artBg = (c: EvCard) => (c.art?.pic ? ` style="background-image:url('${esc(c.art.pic)}')"` : '');
 const artIco = (c: EvCard) => (c.art?.pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`);
-const endBtn = (c: EvCard, key: string) => c.confirmEnd
-  ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>`
-  : `<button class="gx-evbtn" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`;
-
 /** 그림 카드 (2026-10-20 사용자): 상황판·임무 탭 모두 같은 띠. 누르면 상세 창.
  *  1줄 등급·이름·상태, 2줄 장소·경과, 3줄 설명(사건은 상황 글, 그 밖은 문서 요약, 길면 줄임). 투입은 사람 수 표시만 */
 function artCard(c: EvCard): string {
-  // 이름 미확인 괴이는 보여 줄 그림·설명이 없어 창을 띄우지 않는다 (사용자). 띠에 종료 버튼, 누르면 지도로
-  const unknown = c.name === '이름 미확인';
   const key = c.key ? esc(c.key) : '';
-  if (c.pop && !unknown) seen.set(c.pop, c);
-  const act = c.pop && !unknown ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
+  // 이름 미확인도 창을 띄운다: 종료·지도 버튼이 창에만 있어서 (2026-10-20 사용자: 띠에 남은 ×가 어색했다)
+  if (c.pop) seen.set(c.pop, c);
+  const act = c.pop ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
   // 투입 표시 (사용자 2026-10-20): 자세히가 아니라 표시만. 요원은 사람 수, 요원이 아닌 이름(조직·외부인)은 조직 표시로 따로 센다
   const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
   const others = (c.chips?.match(/class="gx-badge"/g) ?? []).length;
@@ -86,7 +81,6 @@ function artCard(c: EvCard): string {
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-      ${unknown && c.key ? `<span class="gx-evart-top"><span class="gx-evart-act">${endBtn(c, key)}</span></span>` : ''}
       <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${c.badge}</span><span class="gx-evart-l2"><small>${c.loc}</small>${dep}</span>${line3}</span>
     </div></li>`;
 }
@@ -100,7 +94,7 @@ export function evPopup(): string {
   }
   const key = c.key ? esc(c.key) : '';
   const pick = c.open === 'pick-event';
-  const btns = `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>
+  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>`}
     ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="${pick ? '목표로 고르기' : '지도'}" aria-label="${esc(c.name)} ${pick ? '목표로 고르기' : '지도에서 보기'}">${pick ? ICONS.pin : ICONS.map}</button>` : ''}
     <button class="gx-evbtn" data-action="ev-pop" title="닫기" aria-label="닫기">${ICONS.close}</button>`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';

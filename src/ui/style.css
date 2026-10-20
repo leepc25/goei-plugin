@@ -2021,3 +2021,24 @@ button.mk-go:hover { color: var(--signal); }
   .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 89px) * .55); }
   .gx-map .gx-sits > .gx-evcs { flex: 1; align-content: start; grid-auto-rows: max-content; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 2px; }
 }
+/* 띠 다듬기 (2026-10-20 사용자): 세 줄을 세로 가운데로, 그림은 커스텀 띠처럼 채도를 낮춰 깔고 왼쪽부터 짙은 그라데이션 */
+.gx-evc.art:not(.open) .gx-evart { overflow: hidden; }
+.gx-evc.art:not(.open) .gx-evart::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-evc.art:not(.open) .gx-evart::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .72) 34%, rgba(10, 14, 16, .12) 70%, rgba(10, 14, 16, 0) 100%); }
+.gx-evc.art:not(.open) .gx-evart-cap { top: 50%; bottom: auto; transform: translateY(-50%); }
+.gx-evc.art.go:hover .gx-evart, .gx-evc.art.wait.go:hover .gx-evart { filter: none; }
+@media (hover: hover) {
+  .gx-evc.art.go:not(.open):hover .gx-evart::before { filter: saturate(1.05) brightness(1.08); transform: scale(1.03); }
+}
+/* 상태 딱지 (사용자: 알약이 세계관과 안 맞는다): 관리국 기록지의 분류 도장처럼 고정폭 글자·각진 테두리·종류 색 */
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge { --c: #c8d0d4; font: 700 11px/1 var(--mono); letter-spacing: .12em; padding: 4px 6px 4px 7px; border-radius: 3px; color: var(--c); background: rgba(8, 11, 13, .6); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, transparent); text-shadow: none; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge::before { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 5px 1px 0; vertical-align: middle; background: currentColor; }
+.gx-evart.k-an .gx-badge { --c: #ff8a7a; }
+.gx-evart.k-in .gx-badge { --c: #ffc35a; }
+.gx-evart.k-ms .gx-badge { --c: #8cc8ff; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.op { --c: #b9a6ff; }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.wait { --c: #9aa5aa; border: 0; box-shadow: inset 0 0 0 1px rgba(154, 165, 170, .5); }
+.gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge.wait::before { background: none; box-shadow: inset 0 0 0 1px currentColor; }
+.gx-evc.art.live .gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge:not(.wait)::before { animation: gx-blink 1.6s steps(2, jump-none) infinite; }
+@keyframes gx-blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .gx-evc.art.live .gx-evart :is(.gx-evart-l1, .gx-evc-tags) > .gx-badge::before { animation: none; } }
