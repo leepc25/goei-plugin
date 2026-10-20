@@ -136,6 +136,14 @@ export class ActionRenderer {
   draw(r: Run) {
     const c = this.ctx,
       p = r.player;
+    const productionPreview = this.art?.atlas.action?.profile === 'production-v5-preview';
+    if (productionPreview) {
+      this.canvas.dataset.action = p.act;
+      this.canvas.dataset.playerX = String(p.x);
+      this.canvas.dataset.playerY = String(p.y);
+      this.canvas.dataset.frame = String(this.frame(p, r));
+      this.canvas.dataset.kills = String(r.kills);
+    }
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
     this.rect(0, 0, WIDTH, HEIGHT, '#0a111b');
@@ -233,6 +241,14 @@ export class ActionRenderer {
       c.globalAlpha = 1;
     }
     c.setTransform(1, 0, 0, 1, 0, 0);
+    if (productionPreview) {
+      const names: Record<string,string> = {idle:'대기',walk:'걷기',run:'달리기',crouch:'앉기',crouchwalk:'앉아 이동',melee1:'근접 1타',melee2:'근접 2타',melee3:'근접 3타',shot:'사격'};
+      const hasPose = !!this.art?.atlas.action?.clips[p.act];
+      this.rect(16, 14, 830, 42, '#07121aeb');
+      c.font = '20px sans-serif';
+      c.fillStyle = hasPose ? '#d5eadc' : '#ffc78f';
+      c.fillText(`${names[p.act] ?? p.act} · ${hasPose ? '새 대표 자세 적용 / 연속 작화 미완성' : '전용 작화 미완성 / 기본 자세 임시 표시'}`, 28, 42);
+    }
     if (r.cutin > 0) {
       this.rect(0, 0, WIDTH, HEIGHT, '#030b17bb');
       this.rect(0, 165, WIDTH, 320, '#172c46');

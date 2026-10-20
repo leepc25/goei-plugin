@@ -411,6 +411,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       run = restored ?? newRun();
       await renderer.load(art);
       root.dataset.artProfile = art.atlas.action?.profile ?? 'unknown';
+      if (art.atlas.action?.profile === 'production-v5-preview')
+        text('.ga-hud > b', '쟈알디 · 신규 작화 적용 시연 · 제작 중');
       if (disposed) return;
       ready = true;
       if (raw && !restored) {

@@ -1,0 +1,13 @@
+{
+  "offline": true,
+  "profile": "production-v5-preview",
+  "seen": [
+    "walk",
+    "run",
+    "crouch",
+    "shot",
+    "melee3"
+  ],
+  "errors": [],
+  "scope": "Six representative poses integrated, not complete animation"
+}

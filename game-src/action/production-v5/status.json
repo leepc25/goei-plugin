@@ -8,11 +8,11 @@
   "review": {
     "candidate01": "Rejected crouch lunge and straight punch instead of hook",
     "candidate02": "Bent hook and lower pelvis improved; support foot, limb lengths, native-pixel cleanup and continuity still require review",
-    "runtimeIntegrated": false,
+    "runtimeIntegrated": "Six representative poses in jyaldi-v5-playable-preview.html; not full animation",
     "completeAnimationClips": 0
   },
   "implemented": ["Separate melee Z and ranged D inputs including touch buttons", "Distance-independent ground/air attack selection"],
-  "validation": {"simulationTestsPassed": 17, "typecheck": "not run: compiler unavailable", "browser": "pending"},
+  "validation": {"simulationTestsPassed": 17, "typecheck": "not run: compiler unavailable", "browser": "Offline load, keyboard walk/run/crouch/shoot/combo-third-hit and correct atlas frames pass; no page errors"},
   "next": [
     "Validate master and representative poses at fixed native 128px scale",
     "Create full-body idle, walking, running, crouch walking and alternating-arm melee cycles",

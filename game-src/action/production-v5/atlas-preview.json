@@ -1,0 +1,94 @@
+{
+  "profile": "production-v5-preview",
+  "nativeHeight": 128,
+  "displayHeight": 256,
+  "source": "production-v5/core-poses-candidate-02.png",
+  "scale": 2,
+  "frames": [
+    [
+      0,
+      0,
+      52,
+      128,
+      28,
+      128,
+      128
+    ],
+    [
+      192,
+      0,
+      79,
+      128,
+      37,
+      128,
+      128
+    ],
+    [
+      384,
+      0,
+      92,
+      122,
+      49,
+      122,
+      122
+    ],
+    [
+      0,
+      160,
+      89,
+      97,
+      47,
+      97,
+      97
+    ],
+    [
+      192,
+      160,
+      109,
+      117,
+      52,
+      117,
+      117
+    ],
+    [
+      384,
+      160,
+      98,
+      118,
+      43,
+      118,
+      118
+    ]
+  ],
+  "clips": {
+    "idle": [
+      0
+    ],
+    "relaxed": [
+      0
+    ],
+    "walk": [
+      1
+    ],
+    "run": [
+      2
+    ],
+    "crouch": [
+      3
+    ],
+    "crouchwalk": [
+      3
+    ],
+    "melee3": [
+      4
+    ],
+    "shot": [
+      5
+    ],
+    "airfire": [
+      5
+    ]
+  },
+  "previewOnly": true,
+  "sheetScale": 0.24806201550387597
+}
