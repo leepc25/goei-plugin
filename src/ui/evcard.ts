@@ -71,20 +71,14 @@ function statusNote(c: EvCard): string {
   if (!c.key) return text ? `<em class="gx-evc-note wait">${esc(text)}</em>` : '';
   return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc(text)}</em>` : '';
 }
-/** 투입 표시: 오른쪽에 동그란 얼굴을 겹쳐 세운다. 요원 아닌 이름(조직·외부인)은 조직 동그라미, 아무도 없으면 빈 점선 동그라미 */
-function faces(c: EvCard): string {
-  if (!c.key) return '';
-  const items = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)">|$)/g) ?? [];
+/** 투입 표시 (2026-10-20 사용자): 누가·몇 명이 아니라 됐는지 안 됐는지만. 이름 줄 끝 사람 아이콘 하나,
+ *  투입이면 요원 카드 「작전」처럼 켜지고 아니면 흐리다. 누가 갔는지는 상세 창에 */
+function depMark(c: EvCard): string {
+  // 사건은 투입 기록이 없다 (상황판 태그에 투입 칸이 없음). 늘 「미투입」으로 보이면 틀린 말이라 표시하지 않는다
+  if (!c.key || c.kind === 'in') return '';
+  const names = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)">|$)/g)?.map((h) => h.replace(/<[^>]+>/g, '').trim()) ?? [];
   const verb = c.kind === 'ms' ? '방문' : '투입';
-  if (!items.length) return `<span class="gx-evfaces"><span class="gx-evface none" title="${c.kind === 'ms' ? '미방문' : '미투입'}">${ICONS.person}</span></span>`;
-  // 조직·외부인은 몇이든 동그라미 하나 (사람 수처럼 세면 관리국 + 관리국 요원이 겹친다)
-  const strip = (h: string) => h.replace(/<[^>]+>/g, '').trim();
-  const people = items.filter((h) => h.startsWith('<span class="gx-pchip">'));
-  const orgs = items.filter((h) => !h.startsWith('<span class="gx-pchip">')).map(strip);
-  const shown = people.map((h) => `<span class="gx-evface" title="${esc(strip(h))}">${h.replace(/^<span class="gx-pchip">/, '').replace(/[^>]*<\/span>$/, '')}</span>`);
-  if (orgs.length) shown.push(`<span class="gx-evface org" title="${esc(orgs.join(', '))}">${ICONS.org}</span>`);
-  const list = shown.length > 3 ? [...shown.slice(0, 2), `<span class="gx-evface more">+${shown.length - 2}</span>`] : shown;
-  return `<span class="gx-evfaces" title="${verb}: ${esc(items.map(strip).join(', '))}">${list.join('')}</span>`;
+  return `<i class="gx-evdep${names.length ? ' on' : ''}" title="${names.length ? `${verb}: ${esc(names.join(', '))}` : `미${verb}`}" aria-label="${names.length ? verb : `미${verb}`}">${ICONS.person}</i>`;
 }
 
 /** 그림 카드 (2026-10-20 사용자): 상황판·임무 탭 모두 같은 띠. 누르면 상세 창.
@@ -97,7 +91,7 @@ function artCard(c: EvCard): string {
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-      ${faces(c)}<span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
+      ${c.key && c.chips ? `<span class="gx-evrib" aria-hidden="true">${c.kind === 'ms' ? '방문' : '투입'}</span>` : ''}<span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
     </div></li>`;
 }
 
@@ -121,7 +115,7 @@ export function evPopup(): string {
     <div class="gx-evc art open ev-pop${c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
 }
 

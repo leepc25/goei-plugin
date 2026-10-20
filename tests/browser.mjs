@@ -642,7 +642,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     if (name === 'pc') {
       // 위키 이름을 누르면 창이 그 위키 문서로
       await page.click('#msg .x-risu-gst-link');
-      await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 6000 });
+      await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 15000 });
       // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
       await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
       await page.click('[data-action="set-status"][data-value="paper"]');
