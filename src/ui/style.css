@@ -2113,3 +2113,98 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evdep.other { color: #ffc35a; filter: drop-shadow(0 0 4px rgba(255, 195, 90, .5)); }
 .gx-evdep { position: relative; }
 .gx-evdep.mix::after { content: ''; position: absolute; right: 1px; top: 1px; width: 7px; height: 7px; border-radius: 50%; background: #ffc35a; box-shadow: 0 0 0 1.5px rgba(10, 14, 16, .9); }
+
+/* ── 관제실 상황판 (2026-10-20 사용자 시안): 왼쪽 큰 보기(CCTV ↔ 위성 지도) + 오른쪽 상황 일지 ── */
+.gx-ops { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; height: 440px; }
+.gx-opview { position: relative; min-height: 0; border-radius: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); background: #0d1310; color: #fff; }
+.gx-opview.feed > .gx-opfeed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+.gx-opview.feed > .gx-evart-ico { color: rgba(255, 255, 255, .5); }
+.gx-opview.feed::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .55) 100%); }
+.gx-opview.feed::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to top, rgba(8, 12, 14, .95), rgba(8, 12, 14, .55) 45%, rgba(8, 12, 14, .05) 75%), linear-gradient(rgba(8, 12, 14, .5), transparent 24%); }
+.gx-opview.feed.k-an::after { box-shadow: inset 0 0 40px rgba(255, 112, 96, .18); }
+.gx-opview.feed.k-in::after { box-shadow: inset 0 0 40px rgba(255, 190, 80, .16); }
+.gx-opview.feed.k-ms::after { box-shadow: inset 0 0 40px rgba(120, 190, 255, .16); }
+.gx-opview.ended > .gx-opfeed { filter: grayscale(1) brightness(.55) contrast(1.1); }
+.gx-opbar { position: absolute; z-index: 3; top: 10px; left: 10px; right: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gx-opseg { display: flex; padding: 3px; border-radius: 9px; background: rgba(8, 12, 14, .72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); }
+.gx-opseg button { padding: 5px 13px; border: 0; border-radius: 7px; background: none; font: inherit; font-size: 12.5px; font-weight: 700; color: rgba(255, 255, 255, .6); cursor: pointer; }
+.gx-opseg button.on { background: rgba(79, 209, 181, .18); color: #5fe6c6; box-shadow: inset 0 0 0 1px rgba(79, 209, 181, .45); }
+.gx-opbar .gx-evart-act { margin-left: auto; }
+.gx-opview .gx-evbtn { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.gx-opview .gx-evbtn.end.danger { background: var(--danger, #d9534f); color: #fff; }
+.gx-oposd { position: absolute; z-index: 2; left: 14px; right: 14px; top: 52px; display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 7px; font: 600 11px/1 var(--mono); letter-spacing: .08em; color: rgba(235, 255, 240, .85); text-shadow: 0 0 4px rgba(0, 0, 0, .9); pointer-events: none; }
+.gx-oposd .rec { display: flex; align-items: center; gap: 6px; color: #ff6b5b; }
+.gx-oposd .rec i { width: 8px; height: 8px; border-radius: 50%; background: #ff3b2b; box-shadow: 0 0 6px #ff3b2b; animation: gx-blink 1.6s steps(2, jump-none) infinite; }
+.gx-opview.ended .gx-oposd .rec { color: rgba(255, 255, 255, .55); } .gx-opview.ended .gx-oposd .rec i { background: rgba(255, 255, 255, .5); box-shadow: none; animation: none; }
+.gx-oposd .cam { flex-basis: 100%; color: rgba(235, 255, 240, .7); }
+@media (prefers-reduced-motion: reduce) { .gx-oposd .rec i { animation: none; } }
+.gx-opcap { position: absolute; z-index: 2; left: 18px; right: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 6px; max-height: calc(100% - 110px); overflow-y: auto; scrollbar-width: none; }
+.gx-opcap .gx-evart-l1 { gap: 9px; }
+.gx-opcap .gx-evart-l1 > b { font-size: 22px; white-space: normal; }
+.gx-opcap .gx-evart-l1 > .gx-gmark { width: 28px; height: 28px; font-size: 14px; border-radius: 8px; }
+.gx-opcap .gx-evdep { width: 26px; height: 24px; } .gx-opcap .gx-evdep svg { width: 20px; height: 20px; }
+.gx-opcap .gx-evart-l2 > small { font-size: 13px; color: rgba(255, 255, 255, .8); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-opcap .gx-evc-who { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; }
+.gx-opcap .gx-evc-who > :is(.gx-pchip, .gx-badge) { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 3px 11px 3px 3px; border-radius: 99px; background: rgba(8, 12, 14, .7); color: #fff; font-size: 12.5px; font-weight: 600; letter-spacing: 0; box-shadow: inset 0 0 0 1px rgba(255, 196, 90, .55); font-family: inherit; }
+.gx-opcap .gx-evc-who > :is(.gx-pchip, .gx-badge.own) { box-shadow: inset 0 0 0 1px rgba(95, 230, 198, .55); }
+.gx-opcap .gx-evc-who > .gx-badge:not(:has(.gx-ava)) { padding-left: 11px; }
+.gx-opcap .gx-evc-who > .gx-badge::before { content: none; }
+.gx-opcap .gx-evc-who .gx-ava { width: 24px; height: 24px; }
+.gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { display: block; margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, .88); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); white-space: normal; -webkit-line-clamp: unset; }
+.gx-opview.nosig { display: grid; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), #101614; }
+.gx-opnosig { display: flex; flex-direction: column; align-items: center; gap: 8px; } .gx-opnosig b { font: 700 20px var(--mono); letter-spacing: .3em; color: rgba(255, 255, 255, .45); } .gx-opnosig small { color: rgba(255, 255, 255, .5); }
+/* 위성 지도 */
+.gx-opview.map { display: flex; flex-direction: column; background: #0b1113; }
+.gx-oplive { font: 600 11px var(--mono); letter-spacing: .12em; color: #5fe6c6; display: flex; align-items: center; gap: 6px; padding-right: 4px; }
+.gx-oplive i { width: 6px; height: 6px; border-radius: 50%; background: #5fe6c6; box-shadow: 0 0 8px #5fe6c6; }
+.gx-opmap { position: relative; flex: 1 1 0; min-height: 0; margin-top: 50px; }
+.gx-opmapi { position: absolute; top: 4px; bottom: 8px; left: 50%; transform: translateX(-50%); aspect-ratio: 1100 / 880; max-width: calc(100% - 16px); }
+.gx-opmapi > img { width: 100%; height: 100%; display: block; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.42) contrast(1.35) saturate(1.4); }
+.gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 50%, rgba(5, 10, 12, .7) 100%); }
+.gx-oppin { position: absolute; z-index: 2; transform: translate(-6px, -50%); display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
+.gx-oppin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent), 0 0 14px var(--c); }
+.gx-oppin em { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(8, 12, 14, .78); white-space: nowrap; }
+.gx-oppin.sel em { background: #5fe6c6; color: #0c1a17; } .gx-oppin.sel i { outline: 2px solid #fff; outline-offset: 2px; }
+.gx-oppin.k-an { --c: #ff8a7a; } .gx-oppin.k-in { --c: #ffc35a; } .gx-oppin.k-ms { --c: #8cc8ff; }
+.gx-opcross { position: absolute; z-index: 1; width: 64px; height: 64px; transform: translate(-50%, -50%); border: 1px solid rgba(79, 209, 181, .7); border-radius: 50%; pointer-events: none; }
+.gx-opcross::before, .gx-opcross::after { content: ''; position: absolute; background: rgba(79, 209, 181, .6); }
+.gx-opcross::before { left: -18px; right: -18px; top: 50%; height: 1px; } .gx-opcross::after { top: -18px; bottom: -18px; left: 50%; width: 1px; }
+.gx-opcoord { position: absolute; right: 12px; bottom: 10px; z-index: 2; font: 600 10.5px var(--mono); letter-spacing: .08em; color: rgba(79, 209, 181, .85); background: rgba(5, 10, 12, .6); padding: 3px 7px; border-radius: 4px; }
+/* 상황 일지 */
+.gx-oplog { min-height: 0; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
+.gx-oplog > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-oplog > h2 > b { white-space: nowrap; }
+.gx-opcnt { display: flex; } .gx-opcnt em { font-style: normal; display: flex; align-items: baseline; gap: 4px; padding: 4px 8px; font-size: 11.5px; font-weight: 600; color: var(--dim); }
+.gx-opcnt em + em { border-left: 1px solid var(--line); }
+.gx-opcnt em i { font: 700 17px/1 var(--mono); font-style: normal; color: var(--c); }
+.gx-opcnt em u { text-decoration: none; font: 600 11px var(--mono); margin-left: -2px; }
+.gx-opcnt .an { --c: #e8685a; } .gx-opcnt .in { --c: #d99a2b; } .gx-opcnt .ms { --c: #4a9be0; } .gx-opcnt .sig { --c: var(--signal); }
+.gx-oplog > ul { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 0; list-style: none; }
+.gx-oplog > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
+.gx-oprow { display: flex; align-items: center; gap: 11px; padding: 8px 12px 8px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); cursor: pointer; }
+.gx-oprow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.gx-oprow.sel { background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 14%, transparent), color-mix(in srgb, var(--signal) 3%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--signal) 45%, transparent); }
+.gx-oprow-pic { flex: none; width: 44px; height: 44px; border-radius: 9px; overflow: hidden; display: grid; place-items: center; background: var(--panel2); }
+.gx-oprow-pic img { width: 100%; height: 100%; object-fit: cover; }
+.gx-oprow-ico { font: 700 18px var(--mono); color: var(--dim); } .gx-oprow-ico svg { width: 20px; height: 20px; }
+.gx-oprow-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.gx-oprow-t > b { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 14px; }
+.gx-oprow-t > b > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oprow-t > b > .gx-gmark { flex: none; width: 19px; height: 19px; font-size: 11px; border-radius: 5px; } .gx-oprow-t > b > .gx-gmark svg { width: 12px; height: 12px; }
+.gx-oprow-t > small { display: flex; min-width: 0; font-size: 12px; color: var(--dim); white-space: nowrap; } .gx-oprow-t > small > span { overflow: hidden; text-overflow: ellipsis; }
+.gx-oprow .gx-evc-note { color: var(--dim); text-shadow: none; } .gx-oprow .gx-evc-note::before { color: var(--dim); } .gx-oprow .gx-evc-note.op { color: #8a74e8; }
+.gx-oprow .gx-evdep { margin-left: 0; color: color-mix(in srgb, var(--text) 30%, transparent); }
+.gx-oprow .gx-evdep.on { color: var(--signal); filter: none; } .gx-oprow .gx-evdep.other { color: #d99a2b; filter: none; }
+.gx-oprow.ended { opacity: .5; } .gx-oprow.ended img { filter: grayscale(1); } .gx-oprow.ended .gx-oprow-t > b > span { text-decoration: line-through; }
+@media (min-width: 761px) { .gx-board > .gx-ops { flex: none; } }
+@media (max-width: 760px) {
+  .gx-ops { display: flex; flex-direction: column; height: auto; }
+  .gx-opview { height: 340px; flex: none; scroll-margin-top: 8px; }
+  .gx-opcap .gx-evart-l1 > b { font-size: 19px; }
+  .gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { font-size: 13px; }
+  .gx-oplog > ul { max-height: 380px; }
+  .gx-opcnt em { padding: 4px 6px; }
+}
+.gx-ops .gx-gmark { font-style: normal; }
+.gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
+.gx-oppin:not(.sel) em { opacity: .85; font-size: 11px; }

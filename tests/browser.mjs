@@ -110,7 +110,13 @@ async function open(page) {
   await page.click('[x-goei-fab] button');
 }
 // 상황 그림 카드: 띠를 눌러 상세 창을 열고, 창 안의 버튼(지도·목표로 고르기·종료 등)을 누른다
+// 상황판(관제실): 일지 행을 눌러 큰 보기로 띄우고, 큰 보기의 버튼을 누른다
 async function cardAction(page, name, action, scope = '') {
+  if (scope !== '.gx-map' && await page.locator(`.gx-board li.gx-oprow:has-text("${name}")`).count()) {
+    await page.click(`.gx-board li.gx-oprow:has-text("${name}")`);
+    await page.click(`.gx-opview [data-action="${action}"]`);
+    return;
+  }
   if (!(await page.locator('.ev-pop').count())) await page.click(`${scope} li.gx-evc:has-text("${name}")`);
   await page.click(`.ev-pop [data-action="${action}"]`);
 }
@@ -793,10 +799,11 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   }
   // 상황 종료: 두 번 눌러 확인
   await open(page);
-  await page.waitForSelector('.gx-evc');
+  await page.waitForSelector('.gx-evc, .gx-oprow');
   await cardAction(page, preset.name, 'end-event');
-  assert.equal(await page.getAttribute('.ev-pop [data-action="end-event"]', 'aria-label'), `${preset.name} 정말 종료`);
-  await page.click('.ev-pop [data-action="end-event"]');
+  const endBtn = (await page.locator('.ev-pop').count()) ? '.ev-pop [data-action="end-event"]' : '.gx-opview [data-action="end-event"]';
+  assert.equal(await page.getAttribute(endBtn, 'aria-label'), `${preset.name} 정말 종료`);
+  await page.click(endBtn);
   await page.waitForFunction((name) => !JSON.parse(window.__chat.scriptstate.$goei_world).an.some((e) => e.name === name), preset.name);
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$an_report)).includes(`${preset.name}|활성`));
   assert.deepEqual(errors, []);

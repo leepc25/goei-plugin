@@ -185,6 +185,9 @@ function mapImage(ctx: ChatContext, code: string, env: FieldEnv): string | null 
   return hit === 'loading' ? null : hit;
 }
 
+/** 상황판 위성 지도용 전국 지도 */
+export const boardMapUrl = (ctx: ChatContext, env: FieldEnv): string | null => mapImage(ctx, '01', env);
+
 function pin(action: string, value: string, label: string, x: number, y: number, cls: string, count = 0): string {
   return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc(value)}" aria-label="${esc(label)}">
     <span class="gx-dot"></span><span class="gx-pname">${esc(label)}${count ? `<b>${count}</b>` : ''}</span></button>`;

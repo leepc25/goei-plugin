@@ -162,3 +162,13 @@ export function showAgentInfo(card: HTMLElement): void {
   });
   document.body.appendChild(box);
 }
+
+/** 조직·외부인 이름의 얼굴 사진 (상황판 투입 칩). 명부 조직 이름·세력 표시 이름으로 찾고, 프리랜서·민간인은 공용 그림 */
+export function orgFace(char: CharacterSnapshot, name: string, display: Record<string, string> = {}): string {
+  const orgs = readDirectory((char.globalLore ?? []) as LoreEntry[]).orgs;
+  const o = orgs.find((x) => x.name === name || (x.faction && display[x.faction] === name)) ?? orgs.find((x) => name.startsWith(x.name));
+  if (o) return facePic(char, { photo: o.spec.photo, face: o.spec.face, crop: o.spec.crop, english: o.spec.english });
+  if (name.startsWith('프리랜서')) return facePic(char, { english: 'Freelancer' });
+  if (name.startsWith('민간인') || name.startsWith('일반인')) return facePic(char, { english: 'Civilian' });
+  return '';
+}

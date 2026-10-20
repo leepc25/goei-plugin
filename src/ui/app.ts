@@ -33,10 +33,10 @@ import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
-import { elapsedText, endedCard, evCard, evPopup, evSeenReset, evUi, peopleChips, type EvCard, type EvKind } from './evcard';
+import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
-import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
+import { boardMapUrl, field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
@@ -647,6 +647,17 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       resetSettings();
       return render();
+    case 'ops-sel':
+      // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 모바일은 큰 보기로 올라간다
+      opsUi.sel = value ?? '';
+      field.confirmEnd = null;
+      if (opsUi.mode === 'map' && value) opsUi.mode = 'feed';
+      render();
+      if (matchMedia('(max-width: 760px)').matches) root?.querySelector('.gx-opview')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      return;
+    case 'ops-mode':
+      opsUi.mode = value === 'map' ? 'map' : 'feed';
+      return render();
     case 'ev-pop':
       // 그림 카드 상세 창: 카드를 누르면 열고, 바깥·×·Esc·뒤로 밀기로 닫는다
       evUi.pop = evUi.pop === value ? '' : value ?? '';
@@ -1204,47 +1215,32 @@ function board(ctx: ChatContext): string {
   }
   const w = readWorld(ctx.chat);
   const faction = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
-  const pending = '<span class="gx-badge wait">발생 예정</span>';
   const roster = rosterFor(w, catalog, faction, worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit);
   const byName = new Map(roster.map((p) => [p.name, p]));
   // 괴이·사건·특수는 한 줄짜리 행 (v0.16.15: 큰 카드를 늘어놓으니 한 화면에 안 들어왔다)
   // 괴이·사건·특수 카드는 임무 탭과 같은 모양 (ui/evcard.ts). 진행 중인 카드는 누르면 지도로
   const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
-  const ownName = factionNames(catalog, faction)[faction] ?? '';
+  const display = factionNames(catalog, faction);
+  const ownName = display[faction] ?? '';
   const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
-  const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
+  const chips = (codes: string) => peopleChips(ctx.char, names(codes), byName, ownName, display);
+  // 관제실 상황판 (2026-10-20 사용자): 진행 중인 것만 일지에. 발생 예정은 띄우지 않는다 (누를 것도 없고 다음 상황을 미리 알려 버린다)
+  const cards: OpsCard[] = [];
+  const add = (kind: EvKind, i: number, locCode: string, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
-    const id = key ?? `${kind}${i}:${c.name}`;
-    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), pop: id });
+    if (!key) return;
+    cards.push({ ...c, kind, key, id: key, locCode, open: 'board-map', confirmEnd: field.confirmEnd === key, art: evArt(ctx, c.name, kind) });
   };
-  // 발생 예정(모델 태그 전)은 띄우지 않는다 (2026-10-20 사용자: 누를 것도 없고 다음 상황을 미리 알려 버린다)
-  const an = w.an
-    .map((e, i) => {
-      const wait = e.state === '발생대기';
-      if (wait) return '';
-      const since = elapsedText(w.minute, e.since);
-      const badge = wait ? pending : e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`;
-      return one('an', i, { name: e.name || '이름 미확인', grade: e.grade, loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: wait ? '' : peopleChips(ctx.char, names(e.deploy), byName, ownName) });
-    })
-    .join('');
-  const inc = w.inc
-    .map((e, i) => {
-      const wait = e.state === '발생대기';
-      if (wait) return '';
-      const since = elapsedText(w.minute, e.since);
-      return one('in', i, { name: e.name || '이름 미확인', loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge: wait ? pending : '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit" title="${esc(e.situation)}">${esc(e.situation)}</span>` : '' });
-    })
-    .join('');
-  const ms = w.ms
-    .map((e, i) => {
-      const wait = e.state === '발생대기';
-      if (wait) return '';
-      return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName, ownName) });
-    })
-    .join('');
-  // 막 끝난 상황은 이름 막기와 같은 동안 칸 맨 아래에 흐리게 (2026-10-20 사용자)
-  const gone = endedShown(w);
-  const endedRows = (k: EvKind) => gone.filter((e) => e.kind === k).map((e) => endedCard(e, (n, kind) => evArt(ctx, n, kind))).join('');
+  const since = (m: number | null) => elapsedText(w.minute, m);
+  const locText = (loc: string, m: number | null) => `${esc(locName(loc))}${since(m) ? ` · ${since(m)}` : ''}`;
+  w.an.forEach((e, i) => add('an', i, e.loc, { name: e.name || '이름 미확인', grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips(e.deploy) }));
+  w.inc.forEach((e, i) => add('in', i, e.loc, { name: e.name || '이름 미확인', loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit">${esc(e.situation)}</span>` : '' }));
+  w.ms.forEach((e, i) => add('ms', i, e.loc, { name: e.name, loc: esc(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips(e.visitors) }));
+  // 막 끝난 상황은 이름 막기와 같은 동안 일지 맨 아래에 흐리게 (2026-10-20 사용자)
+  for (const e of endedShown(w)) {
+    const name = e.name || '이름 미확인';
+    cards.push({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx, name, e.kind) });
+  }
   const ag = roster
     .map((p) => {
       const rec = w.agents[p.id];
@@ -1261,16 +1257,13 @@ function board(ctx: ChatContext): string {
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
-  // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 개수는 각 칸 제목에 (위협도는 v0.16.19 다음에 완전히 뺐다)
-  const count = (list: { state: string }[], on: string) => (live(list) ? `${on} ${live(list)}` : '0');
-  const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
-    `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
+  // 일지 제목줄 숫자: 괴이·사건·특수·투입 (2026-10-20 사용자: 따로 현황 줄을 두지 않고 제목줄에)
+  const cnt = (cls: string, label: string, n: number, tail = '') => `<em class="${cls}">${label}<i>${n}</i>${tail}</em>`;
+  const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms)) + cnt('sig', '투입', onOp.length, `<u>/${roster.length}</u>`);
+  const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
+  const clock = [st?.date, st?.time].filter(Boolean).join(' ');
   return `<main class="gx-body gx-board">
-    <div class="gx-bd-cols">
-      ${col('an', '괴이', w.an, an + endedRows('an'), '발생한 괴이가 없어요.')}
-      ${col('in', '사건', w.inc, inc + endedRows('in'), '진행 중인 사건이 없어요.')}
-      ${col('ms', '특수', w.ms, ms + endedRows('ms'), '출현한 특수가 없어요.')}
-    </div>
+    ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
     <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ''}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.'}</p>`}</section>
   </main>${boardDrawer()}`;
 }

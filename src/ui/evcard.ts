@@ -1,9 +1,9 @@
 // 괴이·사건·특수 카드 한 장. 상황판과 임무 탭이 같은 모양을 쓴다 (v0.16.17, 사용자 요청: 두 곳 모양 통일).
 // 차이는 카드를 눌렀을 때 하는 일뿐이다. 종류(괴이·사건·특수)는 두 곳 모두 상태 딱지 왼쪽에 같은 모양 딱지로 (v0.16.18).
 import type { CharacterSnapshot } from '../host/risu';
-import { locName, type EndedEntry } from '../core/world';
+import { locName, NATION_PINS, type EndedEntry } from '../core/world';
 import { ICONS } from './icons';
-import { avatar } from './images';
+import { avatar, orgFace, picAvatar } from './images';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -40,11 +40,16 @@ export interface EvCard {
 }
 
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
-/** own: 우리 세력 이름 (이 이름이 적히면 요원이 아니어도 우리 편으로 친다) */
-export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>, own = ''): string {
+/** own: 우리 세력 이름 (이 이름이 적히면 요원이 아니어도 우리 편으로 친다).
+ *  display: 세력 코드 → 표시 이름. 주면 요원 아닌 이름도 조직 사진을 붙인다 (2026-10-20 사용자) */
+export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>, own = '', display?: Record<string, string>): string {
   return names
     .filter((n, i, all) => n && n !== '없음' && all.indexOf(n) === i)
-    .map((n) => (agents.has(n) ? `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge${own && n === own ? ' own' : ''}">${esc(n)}</span>`))
+    .map((n) => {
+      if (agents.has(n)) return `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>`;
+      const pic = display ? orgFace(char, n, display) : '';
+      return `<span class="gx-badge${own && n === own ? ' own' : ''}">${pic ? picAvatar(char, pic, n, 'xs') : ''}${esc(n)}</span>`;
+    })
     .join('');
 }
 
@@ -75,13 +80,26 @@ function statusNote(c: EvCard): string {
   if (!c.key) return text ? `<em class="gx-evc-note wait">${esc(text)}</em>` : '';
   return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc(text)}</em>` : '';
 }
+/** 칩 html을 칩 하나씩 (칩 안에 사진 span이 있어 정규식 한 번으로는 못 자른다) */
+function chipItems(html = ''): string[] {
+  const out: string[] = [];
+  const re = /<span class="gx-(?:pchip|badge[^"]*)">/g;
+  const starts: number[] = [];
+  for (let m = re.exec(html); m; m = re.exec(html)) {
+    // 칩 안쪽 사진의 gx-ava는 gx-pchip/gx-badge가 아니라 걸리지 않는다
+    starts.push(m.index);
+  }
+  starts.forEach((st, i) => out.push(html.slice(st, starts[i + 1] ?? html.length)));
+  return out;
+}
+
 /** 투입 표시 (2026-10-20 사용자): 누가·몇 명이 아니라 어느 편이 들어갔는지만. 이름 줄 끝 사람 아이콘,
  *  초록 = 우리 요원·우리 세력, 노랑 = 다른 세력·외부인만, 회색 = 아무도 없음. 우리와 다른 세력이 함께면 초록 + 노랑 점.
  *  누가 갔는지는 상세 창에 */
 function depMark(c: EvCard): string {
   // 사건은 투입 기록이 없다 (상황판 태그에 투입 칸이 없음). 늘 「미투입」으로 보이면 틀린 말이라 표시하지 않는다
   if (!c.key || c.kind === 'in') return '';
-  const items = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge[^"]*)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)|$)/g) ?? [];
+  const items = chipItems(c.chips);
   const strip = (h: string) => h.replace(/<[^>]+>/g, '').trim();
   const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);
   const others = items.filter((h) => h.startsWith('<span class="gx-badge">')).map(strip);
@@ -152,4 +170,89 @@ export function evCard(c: EvCard): string {
   const open = c.open ? ` data-action="${c.open}" data-value="${key}"` : '';
   return `<li class="gx-evc go${c.selected ? ' sel' : ''}"${open}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title}${acts}</span>
     <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ''}</span>${c.extra ?? ''}</span></li>`;
+}
+
+// ── 관제실 상황판 (2026-10-20 사용자 시안 「주요 상황 + 일지」) ──
+// 왼쪽 큰 보기(CCTV 화면 ↔ 위성 지도), 오른쪽 상황 일지. 일지 줄이나 지도 표시를 누르면 왼쪽이 그 상황으로 바뀐다.
+
+export const opsUi = { sel: '', mode: 'feed' as 'feed' | 'map' };
+
+export interface OpsCard extends EvCard {
+  /** 일지 줄 id (진행 중이면 상황 key, 끝났으면 end:…) */
+  id: string;
+  /** 지역 코드 (지도 표시 자리) */
+  locCode: string;
+}
+
+const GRADE_RANK: Record<string, number> = { S: 0, A: 1, B: 2, C: 3, D: 4 };
+/** 처음 띄울 상황: 우리 편이 들어간 것 → 등급 높은 것 → 먼저 난 것 */
+function firstPick(cards: OpsCard[]): string {
+  const live = cards.filter((c) => !c.ended);
+  const ours = (c: OpsCard) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? '');
+  const rank = (c: OpsCard) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? '').toUpperCase()] ?? 6);
+  return [...live].sort((a, b) => rank(a) - rank(b))[0]?.id ?? cards[0]?.id ?? '';
+}
+
+function opsRow(c: OpsCard, on: boolean): string {
+  const thumb = c.art?.pic ? `<img src="${esc(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
+  return `<li class="gx-oprow k-${c.kind}${on ? ' sel' : ''}${c.ended ? ' ended' : ''}" data-action="ops-sel" data-value="${esc(c.id)}" aria-current="${on}">
+    <span class="gx-oprow-pic">${thumb}</span>
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span></b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+}
+
+const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89) + 10).padStart(2, '0');
+
+function modeSeg(): string {
+  return `<span class="gx-opseg" role="tablist">${(['feed', 'map'] as const)
+    .map((m) => `<button role="tab" class="${opsUi.mode === m ? 'on' : ''}" data-action="ops-mode" data-value="${m}" aria-selected="${opsUi.mode === m}">${m === 'feed' ? '상황' : '지도'}</button>`)
+    .join('')}</span>`;
+}
+
+function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
+  if (!c) {
+    return `<div class="gx-opview feed nosig"><div class="gx-opbar">${modeSeg()}</div><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
+  }
+  const key = c.key ? esc(c.key) : '';
+  const name = esc(c.name);
+  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="임무 지도" aria-label="${name} 임무 지도에서 보기">${ICONS.map}</button>` : ''}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
+  const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+  const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
+  const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
+  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
+    <div class="gx-opbar">${modeSeg()}<span class="gx-evart-act">${btns}</span></div>
+    <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span><span class="ts">${esc(clock)}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc(region)}</span></div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</div>
+  </div>`;
+}
+
+function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string): string {
+  const per = new Map<string, number>();
+  const pins = cards
+    .filter((c) => !c.ended)
+    .map((c) => {
+      const sido = c.locCode.split('-')[0];
+      const at = NATION_PINS.find((p) => p[0] === sido);
+      if (!at) return '';
+      const n = per.get(sido) ?? 0;
+      per.set(sido, n + 1);
+      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? ' sel' : ''}" style="left:${at[2]}%;top:${at[3] + n * 4.2}%" data-action="ops-sel" data-value="${esc(c.id)}" aria-label="${esc(c.name)}"><i></i><em>${esc(c.name)}</em></button>`;
+    })
+    .join('');
+  const s = cards.find((c) => c.id === sel && !c.ended);
+  const sAt = s ? NATION_PINS.find((p) => p[0] === s.locCode.split('-')[0]) : undefined;
+  const sN = s ? cards.filter((c) => !c.ended && c.locCode.split('-')[0] === s.locCode.split('-')[0]).findIndex((c) => c.id === s.id) : 0;
+  const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : '';
+  return `<div class="gx-opview map"><div class="gx-opbar">${modeSeg()}<span class="gx-oplive"><i></i>위성 관측</span></div>
+    <div class="gx-opmap">${url ? `<div class="gx-opmapi"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}<span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div></div>`;
+}
+
+/** 관제실 상황판 본문. counts: 일지 제목줄 숫자 (html) */
+export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: string; counts: string; empty: string }): string {
+  if (!cards.some((c) => c.id === opsUi.sel)) opsUi.sel = firstPick(cards);
+  const sel = cards.find((c) => c.id === opsUi.sel);
+  const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
+  const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
+  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2><b>상황 일지</b><span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
 }
