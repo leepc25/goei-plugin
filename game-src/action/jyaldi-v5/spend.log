@@ -320,3 +320,4 @@ frames: 4
 si
 15:21:46 body 201/202/301 edit_image_pro_flash 3x6=18 gens, balance 9867
 15:38:39 body 203/204 (flat, rejected) 12 gens; poses2-202 edit 18 + shade 6; poses2-102 shade 6; sheet2 401-404 create_image_pro_flash 24 gens -> balance 9801
+15:52:06 poses2-401 edit 18 + shade 6; sheet3 401/405/406/407 create 24 -> balance 9753
