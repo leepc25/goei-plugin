@@ -1,0 +1,173 @@
+{
+ "status": "stage1-clips-generated; awaiting user visual review in release/demo/jyaldi-v5-action.html",
+ "by": "Claude via PixelLab MCP, 2026-10-20",
+ "tool": "create_image_pro_flash",
+ "charged_total": 30,
+ "balanceBefore": 10000,
+ "balanceAfter": 9970,
+ "prompt": "\"Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile three-quarter view. \"\n\"Tall adult Korean woman in her thirties, figure exactly 128 pixels tall from top of head to soles, long straight black hair falling to the waist, pale skin, \"\n\"red eyes with the near eye clearly visible as a red dot, calm expressionless face, slim long face. Black fitted two-piece pant suit (jacket and trousers), \"\n\"white dress shirt collar, black necktie, black leather gloves, black dress shoes. Pistol holster on the right hip. Posture straight and composed, weight even, \"\n\"arms relaxed down at the sides with gloved hands visible, both feet flat on one ground line slightly apart, toes pointing right. \"\n\"Clean readable pixel clusters, outlines in a dark hue of each color (no pure black outline), about 14 colors, light from the upper left, \"\n\"transparent background, the whole figure inside the canvas with the soles 16 pixels above the bottom edge.\"",
+ "candidates": [
+  {
+   "file": "cand-101.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 136,
+   "width": 47,
+   "colors": 12,
+   "seed": 101,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-102.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 138,
+   "width": 48,
+   "colors": 36,
+   "seed": 102,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-103p.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 140,
+   "width": 48,
+   "colors": 14,
+   "seed": 103,
+   "palette_locked": true,
+   "charged": 6
+  },
+  {
+   "file": "cand-104.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 131,
+   "width": 48,
+   "colors": 27,
+   "seed": 104,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-105.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 132,
+   "width": 47,
+   "colors": 34,
+   "seed": 105,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-106.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 129,
+   "width": 48,
+   "colors": 39,
+   "seed": 106,
+   "palette_locked": false,
+   "charged": 6
+  }
+ ],
+ "reference": "assets/agents/Jyaldi_default.avif (사용자 제공 원화, 참조 입력으로는 쓰지 않음. create는 참조 불가)",
+ "old_art_used": false,
+ "chosen_sheet": "cand-102 (asset 13b5085c-0c3f-56a4-88be-134ed8813335), user decision card 2026-10-20",
+ "poses": {
+  "tool": "edit_image_pro_flash method=text from cand-102",
+  "seed": 7,
+  "charged_each": 7,
+  "charged_total": 42,
+  "balanceAfter": 9928,
+  "keep_prefix": "\"Same woman as the source sprite: identical face, red eyes, long straight black hair to the waist, black pant suit, white shirt collar, black necktie, black gloves, black shoes, pistol holster on the right hip. Identical head size, body proportions, pixel style, outline hue and palette, same 160x160 canvas with the figure the same height, still facing right in the same near-profile three-quarter view, transparent background. Change ONLY the pose: \"",
+  "items": [
+   {
+    "name": "fight-idle",
+    "file": "poses/fight-idle-s7.png",
+    "asset_id": "3e211634-2d6c-55c4-91b1-81243713d46a",
+    "height": 130,
+    "width": 73,
+    "feet_y": 152
+   },
+   {
+    "name": "walk-contact",
+    "file": "poses/walk-contact-s7.png",
+    "asset_id": "097957cb-3e93-50a6-8ceb-5ea22b331fd2",
+    "height": 137,
+    "width": 77,
+    "feet_y": 151
+   },
+   {
+    "name": "run-contact",
+    "file": "poses/run-contact-s7.png",
+    "asset_id": "bf64065e-e51d-5766-84bb-16f64d964137",
+    "height": 126,
+    "width": 105,
+    "feet_y": 149
+   },
+   {
+    "name": "jump-apex",
+    "file": "poses/jump-apex-s7.png",
+    "asset_id": "51f7dfc6-1324-5040-aef9-b54526d8ea94",
+    "height": 117,
+    "width": 76,
+    "feet_y": 124
+   },
+   {
+    "name": "palm-strike",
+    "file": "poses/palm-strike-s7.png",
+    "asset_id": "6d964bba-79e5-5986-be72-0f8e3ddd3e93",
+    "height": 136,
+    "width": 93,
+    "feet_y": 152
+   },
+   {
+    "name": "pistol-fire",
+    "file": "poses/pistol-fire-s7.png",
+    "asset_id": "5eb8665f-7f64-5a34-b102-67e7635415ce",
+    "height": 137,
+    "width": 93,
+    "feet_y": 151
+   }
+  ]
+ },
+ "clips": {
+  "tool": "animate_image_pixminimax (1 gen per clip, seed 7/11), first/last pins from poses/ or sheet; walk/idle also made with animate_image for comparison (clips/compare/)",
+  "manifest": "manifest.json",
+  "regenerated": [
+   "melee1",
+   "melee3 (split a/b)",
+   "guard",
+   "guard-hit",
+   "reload"
+  ],
+  "old_versions": "scratchpad only (not committed)",
+  "charged_total_clips": 29,
+  "cutin": {
+   "tool": "image_to_pixelart_pro_flash from assets/agents/Jyaldi_default (user artwork crop)",
+   "charged": 6,
+   "rejected": [
+    "reinterp (smile)",
+    "faithful (not pixel art)"
+   ]
+  },
+  "balanceAfter": 9885,
+  "charged_total_session": 115
+ }
+}

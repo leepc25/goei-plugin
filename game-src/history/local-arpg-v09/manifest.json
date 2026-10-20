@@ -1,0 +1,98 @@
+{
+  "status": "historical-unapproved-art-do-not-reuse",
+  "canonicalRuntime": "src/game/action",
+  "cloudBase": "8f65fc320eb11613f1417258b1d9ec47479022c9",
+  "localVersion": "0.9.0",
+  "files": [
+    {
+      "path": "game-src/history/local-arpg-v09/ANIMATION_MODEL_V08.md",
+      "bytes": 2560,
+      "sha256": "7ed122fc2dc145e253cc6ff61d4c341bd9b153b55c183897c3222eb8833f7aee"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/ARTWORK_V09_PROMPTS.json",
+      "bytes": 11310,
+      "sha256": "84c7b33a3b90f6c2ded6462d04a4cb40ebbed0954ff9046db2f65c59fee04b73"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/build.py",
+      "bytes": 12521,
+      "sha256": "eb0da9b6ddde4a5439f2e6809a59bf577e8ae0595484fb1dc869545425800c33"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/inspect_v09_assets.py",
+      "bytes": 1901,
+      "sha256": "8371b2f442308b8daae06339ff6e3d31eb90b19d4d69061f8b62c7c8112607f5"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/MOTION_AUDIT_V08.md",
+      "bytes": 4102,
+      "sha256": "0b9691e05a942b2bdf07089bc3371ffe0609796eefb08321145fc46a8b1b4c26"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/pack_v09_assets.py",
+      "bytes": 5379,
+      "sha256": "03d1766bafea562be3db6bddddada88e0db11ade16ec0deadbeddfdac2be6b81"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/source.zip",
+      "bytes": 31456733,
+      "sha256": "b4d78d737621ceedd57631f413a719f11870e954dc441ec2a25f0eb241e48248"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/src/app.js",
+      "bytes": 19692,
+      "sha256": "52517b691ba3aa5725d4abe3e047e4b0e876806f6a387bf969d24910ab2ebba3"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/src/engine.js",
+      "bytes": 27609,
+      "sha256": "f54bf922761dc9944bd701f2960f1ad3f1c6726ebda0b84a6c571e1d81926ab4"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/src/renderer.js",
+      "bytes": 15020,
+      "sha256": "04d98d394704e285714ec9b0ff59caca2a4c3a8ed8d7779650b5ef7ef073e335"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/src/style.css",
+      "bytes": 7919,
+      "sha256": "a42f3c6bdb4ea14406b4f7f33dfa57d6e8c114ac94aa508be3d12268f6cb0da4"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/browser.cjs",
+      "bytes": 4521,
+      "sha256": "611d1f391c3883a43aff6b7464bdd49863464becb56a47d7f153dfaeb25515ac"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/regression.cjs",
+      "bytes": 6469,
+      "sha256": "30b5f87ad5cbd93b01e5c702adf7a89d8b0df7771cc8cba37a527e86ce00c7f6"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/render.cjs",
+      "bytes": 2263,
+      "sha256": "bab81d810f6d88016b51764f3c33aedeeb7104f0ebb07fc89eee1220b1dbdbd4"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/review-browser.cjs",
+      "bytes": 1492,
+      "sha256": "cd71c22820943c0cc31c688220f49d6ee5ef6b26587745f62fae60036fb92c8e"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/simulation.cjs",
+      "bytes": 4954,
+      "sha256": "b407c2af7e407345ddcf09b5d472e683a2b8ffa70c273006b217c44ade5372e5"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/ui.cjs",
+      "bytes": 8711,
+      "sha256": "b463ca7822f50ebcd346c0975aaa97e974f3031f843efff9d804334ae822a43b"
+    },
+    {
+      "path": "game-src/history/local-arpg-v09/tests/wholebody.cjs",
+      "bytes": 3308,
+      "sha256": "16b8b0321b5301ca4c6a2a8d8da9b9530386655e15546d99b44ae1bb0f706edf"
+    }
+  ]
+}

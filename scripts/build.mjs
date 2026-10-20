@@ -119,6 +119,17 @@ await build({
   outfile: 'dist-test/action-ui.js',
 });
 
+// 회색 상자 시험판 (그림 없음): 시험 페이지용 번들, 순수 시뮬레이션, 단일 HTML.
+await build({ ...common, entryPoints: ['src/game/action/graybox/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/graybox-demo.js' });
+await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
+{
+  const code = readFileSync('dist-test/graybox-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회색 상자 시험판 · 차원 승강기</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script type="module">${code}</script></html>`;
+  writeFileSync('dist/goei-graybox.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-graybox.html', html);
+}
+
 await build({
   ...common,
   entryPoints: ['src/game/action/motion-demo.ts'],

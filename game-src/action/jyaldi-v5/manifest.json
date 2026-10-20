@@ -1,0 +1,394 @@
+{
+ "agent": "jyaldi",
+ "version": "v5",
+ "frameW": 160,
+ "frameH": 160,
+ "footMargin": 8,
+ "clips": {
+  "idle": {
+   "file": "idle-mm",
+   "label": "기본 대기",
+   "fps": 6,
+   "loop": true,
+   "frames": 4,
+   "feet": [
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 16638
+  },
+  "fight": {
+   "file": "fight-idle",
+   "label": "전투 대기",
+   "fps": 6,
+   "loop": true,
+   "frames": 4,
+   "feet": [
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 15286
+  },
+  "walk": {
+   "file": "walk-mm",
+   "label": "걷기",
+   "fps": 10,
+   "loop": true,
+   "frames": 8,
+   "feet": [
+    151,
+    152,
+    152,
+    151,
+    151,
+    151,
+    151,
+    151
+   ],
+   "bytes": 23385
+  },
+  "run": {
+   "file": "run",
+   "label": "달리기",
+   "fps": 14,
+   "loop": true,
+   "frames": 8,
+   "feet": [
+    150,
+    150,
+    150,
+    146,
+    149,
+    149,
+    149,
+    149
+   ],
+   "bytes": 26221
+  },
+  "jump": {
+   "file": "jump",
+   "label": "점프",
+   "fps": 12,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    151,
+    150,
+    121,
+    141,
+    152,
+    152,
+    152
+   ],
+   "bytes": 61080
+  },
+  "melee1": {
+   "file": "melee1",
+   "label": "근접 1타",
+   "fps": 14,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 31621
+  },
+  "melee2": {
+   "file": "melee2",
+   "label": "근접 2타",
+   "fps": 14,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    151,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 38537
+  },
+  "melee3": {
+   "file": "melee3",
+   "label": "근접 3타",
+   "fps": 12,
+   "loop": false,
+   "frames": 13,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 72648
+  },
+  "dash": {
+   "file": "dash-attack",
+   "label": "돌진공격",
+   "fps": 14,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    149,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 34920
+  },
+  "air": {
+   "file": "air-attack",
+   "label": "공중 공격",
+   "fps": 12,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    124,
+    121,
+    154,
+    154,
+    153,
+    153,
+    153,
+    153,
+    152
+   ],
+   "bytes": 34423
+  },
+  "ready": {
+   "file": "ranged-ready",
+   "label": "원거리 준비",
+   "fps": 12,
+   "loop": false,
+   "frames": 5,
+   "feet": [
+    152,
+    152,
+    151,
+    151,
+    151
+   ],
+   "bytes": 23563
+  },
+  "fire": {
+   "file": "ranged-fire",
+   "label": "원거리 발사",
+   "fps": 16,
+   "loop": false,
+   "frames": 5,
+   "feet": [
+    151,
+    151,
+    151,
+    151,
+    151
+   ],
+   "bytes": 12613
+  },
+  "reload": {
+   "file": "reload",
+   "label": "재장전",
+   "fps": 10,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    151,
+    151,
+    151,
+    151,
+    151,
+    151,
+    151,
+    151,
+    151
+   ],
+   "bytes": 17755
+  },
+  "unique": {
+   "file": "unique-short",
+   "label": "고유기 짧게",
+   "fps": 12,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 51996
+  },
+  "charge": {
+   "file": "unique-charge",
+   "label": "고유기 충전",
+   "fps": 8,
+   "loop": true,
+   "frames": 4,
+   "feet": [
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 10169
+  },
+  "guard": {
+   "file": "guard",
+   "label": "가드",
+   "fps": 12,
+   "loop": false,
+   "frames": 5,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 13242
+  },
+  "guardhit": {
+   "file": "guard-hit",
+   "label": "가드 피격",
+   "fps": 12,
+   "loop": false,
+   "frames": 5,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 22037
+  },
+  "evade": {
+   "file": "evade",
+   "label": "회피",
+   "fps": 16,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 37003
+  },
+  "ult": {
+   "file": "ult",
+   "label": "필살기",
+   "fps": 12,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 35192
+  },
+  "hit": {
+   "file": "hit-light",
+   "label": "약 피격",
+   "fps": 12,
+   "loop": false,
+   "frames": 5,
+   "feet": [
+    152,
+    152,
+    152,
+    152,
+    152
+   ],
+   "bytes": 23270
+  },
+  "down": {
+   "file": "knockdown",
+   "label": "강 피격·다운",
+   "fps": 12,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    152,
+    152,
+    145,
+    127,
+    105,
+    112,
+    153,
+    150,
+    151
+   ],
+   "bytes": 48607
+  },
+  "getup": {
+   "file": "getup",
+   "label": "기상",
+   "fps": 10,
+   "loop": false,
+   "frames": 9,
+   "feet": [
+    151,
+    152,
+    152,
+    152,
+    151,
+    150,
+    150,
+    152,
+    152
+   ],
+   "bytes": 36494
+  }
+ }
+}
