@@ -23,7 +23,7 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
 <div class="gb-panel" data-panel="settle"></div>
 <div class="gb-panel" data-panel="pause"><h2>메뉴</h2><p>Esc 또는 계속으로 돌아간다.</p><div class="row"><button data-do="resume">계속</button><button data-do="tohq">본부로 (출동 포기 = 후송 취급)</button></div><p>조작: 방향키 이동(같은 방향 두 번 = 달리기) · A 근접 3연타 · S 원거리 · D 고유기 · Q 가드 · W 필살(게이지 100) · E 상호작용/인사 · Space 점프 · Shift 회피 · ↓ 앉기, 앉아 A 하단 · 달리며 A 돌진 · 공중 A · 1~4 아이템 · Z 지도 · X 자동(미구현) · 경직 중인 적에 닿으면 잡기</p></div>
 <div class="gb-panel" data-panel="size"><h2>크기 비교 (정자세 키 · 2배 표시)</h2><p>그림 없이 상자 높이만 바꾼다. 적·수호자는 요원 비례. 선택은 저장된다.</p><div class="row"><button data-size="128">128px (지금 기준, 256px 표시)</button><button data-size="96">96px (192px 표시)</button><button data-size="80">80px (160px 표시)</button></div><div class="row"><button data-do="closesize">닫기</button></div></div>
-<div class="gb-panel" data-panel="load"><h2>가짜 팩 부하 시험</h2><p>노이즈 PNG를 실제 장수·크기로 만들어 저장(IndexedDB, pluginStorage 대용)·읽기·디코딩·층 교체 10회를 잰다. 실제 RisuAI pluginStorage와 모바일 실기는 별도.</p><div class="row"><button data-load="128">128px로 시험</button><button data-load="96">96px로 시험</button><button data-load="80">80px로 시험</button><button data-do="closeload">닫기</button></div><pre data-load-out style="white-space:pre-wrap"></pre></div>
+<div class="gb-panel" data-panel="load"><h2>가짜 팩 부하 시험</h2><p>가짜 도트 PNG(16색 덩어리)를 실제 장수·크기로 만들어 저장(IndexedDB, pluginStorage 대용)·읽기·디코딩·층 교체 10회를 잰다. 실제 RisuAI pluginStorage와 모바일 실기는 별도.</p><div class="row"><button data-load="128">128px로 시험</button><button data-load="96">96px로 시험</button><button data-load="80">80px로 시험</button><button data-do="closeload">닫기</button></div><pre data-load-out style="white-space:pre-wrap"></pre></div>
 </div>
 <div class="gb-foot"><div class="gb-stick" aria-label="이동"><i></i></div><button data-hold="attack">A</button><button data-hold="shoot">S</button><button data-edge="unique">D</button><button data-hold="guard">Q</button><button data-edge="ult">W</button><button data-edge="interact">E</button><button data-edge="jump">Spc</button><button data-edge="evade">Shift</button><button data-edge="run">달리기</button><button data-item="0">1</button><button data-item="1">2</button><button data-item="2">3</button><button data-item="3">4</button><button data-choice="0">①</button><button data-choice="1">②</button><button data-choice="2">③</button><button data-edge="cancel">Esc</button></div>
 <p class="gb-note">방향키 이동 · A 근접 · S 원거리 · D 고유기 · Q 가드 · W 필살 · E 상호작용 · Space 점프 · Shift 회피 · 1~4 아이템 · 숫자 = 선택지 · Z 지도 · Esc 메뉴</p>`;
@@ -76,8 +76,16 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
   };
   const settleHtml = () => `<h2>정산 · ${run.ended === 'evac' ? '후송' : '귀환'}</h2>${settle(run, meta).map((l) => `<p>${l}</p>`).join('')}<p>가 본 층: ${run.visited.map((v) => `${depthLabel(v.depth)} ${TYPE_LABEL[v.type]}`).join(' → ')}</p><div class="row"><button data-choice="0">E 본부로</button></div>`;
   let shownPhase = '';
+  // 크기 비교·부하 시험 패널은 국면과 무관한 덮개라, 열려 있는 동안 국면 패널이 덮어쓰지 않는다
+  let overlay: 'size' | 'load' | null = null;
   const syncPanels = () => {
     const ph = run.phase;
+    $('[data-size-label]').textContent = `요원 ${meta.size}px`;
+    $('[data-busy]').textContent = saving ? '저장 중' : dirty ? '진행 중' : '저장됨';
+    if (overlay) {
+      panel(overlay);
+      return;
+    }
     if (ph === 'hq') {
       const html = hqHtml();
       const el = $('[data-panel=hq]');
@@ -90,10 +98,8 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
       if (shownPhase !== 'settle') $('[data-panel=settle]').innerHTML = settleHtml();
       panel('settle');
     } else if (paused) panel('pause');
-    else if (!root.querySelector('.gb-panel.on[data-panel=size], .gb-panel.on[data-panel=load]')) panel(null);
+    else panel(null);
     shownPhase = ph;
-    $('[data-size-label]').textContent = `요원 ${meta.size}px`;
-    $('[data-busy]').textContent = saving ? '저장 중' : dirty ? '진행 중' : '저장됨';
   };
   const input = (): Input => {
     const rev = (k: string) => keys.has(k);
@@ -144,7 +150,8 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
     if (!root.contains(t) && t !== document.body) return;
     if (ev.type === 'keydown') {
       if (ev.code === 'Escape') {
-        if (run.dialog || run.elevator) edges.cancel = true;
+        if (overlay) (overlay = null), syncPanels();
+        else if (run.dialog || run.elevator) edges.cancel = true;
         else if (run.phase === 'floor' || run.phase === 'service') (paused = !paused), syncPanels();
         else edges.cancel = true;
         ev.preventDefault();
@@ -219,15 +226,17 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
           edges.interact = true;
           break;
         case 'size':
-          panel('size');
+          overlay = 'size';
+          syncPanels();
           break;
         case 'closesize':
         case 'closeload':
-          panel(null);
+          overlay = null;
           syncPanels();
           break;
         case 'load':
-          panel('load');
+          overlay = 'load';
+          syncPanels();
           break;
         case 'reset':
           if (confirm('규칙서·재화·기록을 지우고 새로 시작할까요?')) {

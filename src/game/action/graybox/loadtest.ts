@@ -1,4 +1,4 @@
-// 가짜 팩 부하 시험 (구현가능성 검토 5.1): 노이즈 PNG를 실제 규격·장수로 만들어 저장·읽기·디코딩·교체를 재고 숫자를 돌려준다.
+// 가짜 팩 부하 시험 (구현가능성 검토 5.1): 가짜 도트 PNG를 실제 규격·장수로 만들어 저장·읽기·디코딩·교체를 재고 숫자를 돌려준다.
 export interface LoadSpec {
   size: 128 | 96 | 80;
   agents: number;
@@ -28,18 +28,32 @@ const canvasFor = (w: number, h: number) => {
   return c;
 };
 async function noisePng(w: number, h: number, seed: number): Promise<Blob> {
+  // 도트 그림 흉내: 16색 팔레트, 3×3 덩어리 단위로 색을 고르고 가장자리 일부를 투명하게 둔다.
+  // 순수 노이즈는 PNG가 거의 압축되지 않아 저장·읽기 시간을 실제보다 크게 보이게 하므로 쓰지 않는다.
   const c = canvasFor(w, h),
     ctx = c.getContext('2d')!;
   const img = ctx.createImageData(w, h);
   let s = seed >>> 0;
+  const next = () => (s = (s * 1664525 + 1013904223) >>> 0);
+  const pal: number[][] = [];
+  for (let i = 0; i < 16; i++) pal.push([next() & 255, next() & 255, next() & 255]);
   const d = img.data;
-  for (let i = 0; i < d.length; i += 4) {
-    s = (s * 1664525 + 1013904223) >>> 0;
-    d[i] = s & 255;
-    d[i + 1] = (s >>> 8) & 255;
-    d[i + 2] = (s >>> 16) & 255;
-    d[i + 3] = (s >>> 24) & 255 ? 255 : 0;
-  }
+  const blk = 3;
+  for (let by = 0; by < h; by += blk)
+    for (let bx = 0; bx < w; bx += blk) {
+      const col = pal[next() & 15];
+      const edge = bx < w * 0.12 || bx > w * 0.88 || by < h * 0.08;
+      const alpha = edge && (next() & 3) !== 0 ? 0 : 255;
+      for (let y = by; y < Math.min(h, by + blk); y++)
+        for (let x = bx; x < Math.min(w, bx + blk); x++) {
+          const i = (y * w + x) * 4;
+          const jitter = (next() & 31) === 0 ? pal[next() & 15] : col;
+          d[i] = jitter[0];
+          d[i + 1] = jitter[1];
+          d[i + 2] = jitter[2];
+          d[i + 3] = alpha;
+        }
+    }
   ctx.putImageData(img, 0, 0);
   return new Promise((ok, no) => c.toBlob((b) => (b ? ok(b) : no(new Error('toBlob 실패'))), 'image/png'));
 }
@@ -138,7 +152,7 @@ export async function runLoadTest(spec: LoadSpec, progress: (s: string) => void)
   const mb = (n: number) => (n / 1048576).toFixed(1) + 'MB';
   const lines = [
     `규격 ${spec.size}px (캔버스 ${canvas}, 트리밍 ${bodyW}×${bodyH}) · 요원 ${spec.agents}×${spec.framesPerAgent}장 · 적 ${spec.enemies}×${spec.framesPerEnemy}장 · 타일셋 ${spec.tilesets}`,
-    `파일 ${items.length}장 · PNG 합계 ${mb(bytes)} (노이즈라 실제 도트보다 큼) · base64 ${mb(bytes * 1.33)}`,
+    `파일 ${items.length}장 · PNG 합계 ${mb(bytes)} (16색 덩어리 가짜 도트, 실제와 비슷한 수준) · base64 ${mb(bytes * 1.33)}`,
     `펼친(디코딩) 크기 계산값 ${mb(decodedBytes)} ← 이 숫자가 램 부담`,
     `PNG 생성 ${encodeMs.toFixed(0)}ms · 저장 ${storeMs.toFixed(0)}ms · 읽기 ${readMs.toFixed(0)}ms · 디코딩 ${decodeMs.toFixed(0)}ms · 교체 10회 ${swapMs.toFixed(0)}ms`,
     `JS 힙 ${mb(heapBefore)} → ${mb(heapAfter)} (디코딩 비트맵은 힙 밖이라 작게 나옴)${ua !== null ? ` · 브라우저 측정 메모리 ${mb(ua)}` : ' · 브라우저 메모리 API 없음(크롬 작업 관리자로 확인)'}`,
