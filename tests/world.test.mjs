@@ -5,7 +5,7 @@ import {
   parseCatalog, DEFAULT_SETTINGS, emptyWorld, bootstrap, applyOutput, reports, tick, expire,
   scanAnomalies, scanIncidents, scanMysticSites, scanAgents, scanStatus, cleanOutput, hasWorldTags,
   locName, uniqueRegion, POOL, SEALED_LOC, codesToNames, processOutput, startWorldVars, readWorld, WORLD_KEY,
-  requestMission, cancelMission, activeEvents, endEvent, LOCKED_STATES, agentLocked,
+  requestMission, cancelMission, activeEvents, endEvent, endedShown, LOCKED_STATES, agentLocked,
 } from '../dist-test/core.mjs';
 
 const worldBook = {
@@ -317,6 +317,12 @@ test('map events: only live entries, stable keys, ending one blocks it', () => {
   assert.equal(endEvent(w, ev[0].key), true);
   assert.equal(w.an.length, 1);
   assert.equal(w.skip.an, '02-6');
+  // 막 끝난 상황은 이름 막기와 같은 동안 남는다
+  assert.deepEqual(endedShown(w).map((e) => e.loc), ['02-6']);
+  tick(w, catalog, noSpawn, always);
+  assert.equal(endedShown(w).length, 1, '다음 응답까지는 남는다');
+  tick(w, catalog, noSpawn, always);
+  assert.equal(endedShown(w).length, 0, '그다음 응답에서 사라진다');
   assert.ok(LOCKED_STATES.includes('작전투입'));
   assert.equal(agentLocked(undefined), false);
   assert.equal(agentLocked({ st: '미정', situation: '', since: null, dead: 0 }), false, '태그가 없던 요원은 편성 가능');

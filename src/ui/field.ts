@@ -7,7 +7,7 @@ import {
 import type { Chat } from '../core/types';
 import { basicSettings, worldSettings } from '../core/settings';
 import {
-  activeEvents, agentLocked, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
+  activeEvents, agentLocked, endedShown, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
@@ -16,7 +16,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, evCard, peopleChips } from './evcard';
+import { elapsedText, endedCard, evCard, peopleChips } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -338,13 +338,15 @@ function situations(x: Ctx, events: WorldEvent[]): string {
   // 누르면 장소와 목표가 함께 풀린다 (v0.16.22, 사용자 요청)
   const place = field.place ? placeCard(field.place, x.catalog, sameTarget(field.target, field.place)) : '';
   const cancel = cancelChip('map-unplace', !!(field.place || field.target));
+  // 막 끝난 상황 (상황판과 같이 맨 아래 흐리게). 장소를 골랐을 때는 그 장소 것만 보이니 뺀다
+  const gone = field.place ? '' : endedShown(x.world).filter((e) => field.filter === 'all' || e.kind === field.filter).map((e) => endedCard(e, (n, k) => (artCtx ? evArt(artCtx, n, k) : undefined))).join('');
   const empty = !x.on
     ? '상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.'
     : field.place || field.filter !== 'all'
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
   return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
-    ${shown.length || place ? `<ul class="gx-evcs">${place}${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown.length || place || gone ? `<ul class="gx-evcs">${place}${shown.map((e) => eventRow(e, x, agents)).join('')}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
 }
 
 

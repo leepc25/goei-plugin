@@ -5,7 +5,7 @@ import { NavHistory } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
 import type { FactionCode, LangCode, Manifest } from '../core/types';
 import {
-  activeEvents, type Catalog, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
+  activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
@@ -33,7 +33,7 @@ import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
-import { elapsedText, evCard, evPopup, evSeenReset, evUi, peopleChips, type EvCard, type EvKind } from './evcard';
+import { elapsedText, endedCard, evCard, evPopup, evSeenReset, evUi, peopleChips, type EvCard, type EvKind } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
@@ -1237,6 +1237,9 @@ function board(ctx: ChatContext): string {
       return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName) });
     })
     .join('');
+  // 막 끝난 상황은 이름 막기와 같은 동안 칸 맨 아래에 흐리게 (2026-10-20 사용자)
+  const gone = endedShown(w);
+  const endedRows = (k: EvKind) => gone.filter((e) => e.kind === k).map((e) => endedCard(e, (n, kind) => evArt(ctx, n, kind))).join('');
   const ag = roster
     .map((p) => {
       const rec = w.agents[p.id];
@@ -1260,9 +1263,9 @@ function board(ctx: ChatContext): string {
     `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
     <div class="gx-bd-cols">
-      ${col('an', '괴이', w.an, an, '발생한 괴이가 없어요.')}
-      ${col('in', '사건', w.inc, inc, '진행 중인 사건이 없어요.')}
-      ${col('ms', '특수', w.ms, ms, '출현한 특수가 없어요.')}
+      ${col('an', '괴이', w.an, an + endedRows('an'), '발생한 괴이가 없어요.')}
+      ${col('in', '사건', w.inc, inc + endedRows('in'), '진행 중인 사건이 없어요.')}
+      ${col('ms', '특수', w.ms, ms + endedRows('ms'), '출현한 특수가 없어요.')}
     </div>
     <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ''}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.'}</p>`}</section>
   </main>${boardDrawer()}`;

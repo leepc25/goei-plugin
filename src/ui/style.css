@@ -2104,3 +2104,8 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evdep { margin-left: auto; flex: none; display: grid; place-items: center; width: 24px; height: 22px; color: rgba(255, 255, 255, .38); }
 .gx-evdep svg { width: 18px; height: 18px; stroke-width: 2.2; }
 .gx-evdep.on { color: #5fe6c6; filter: drop-shadow(0 0 4px rgba(95, 230, 198, .55)); }
+/* 막 끝난 상황 (2026-10-20 사용자): 다음 응답까지 칸 맨 아래 흐리게 */
+.gx-evc.art.ended .gx-evart { filter: grayscale(1) brightness(.62); }
+.gx-evc.art.ended { opacity: .78; }
+.gx-evc.art.ended .gx-evart-l1 > b { text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .55); text-decoration-thickness: 1.5px; }
+.gx-evc.art.ended.go:hover .gx-evart { filter: grayscale(1) brightness(.75); }

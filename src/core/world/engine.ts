@@ -83,6 +83,17 @@ export interface WorldState {
   pending: { an?: string; ms?: string; in?: string };
   /** 커스텀 임무 등록 결과 안내 */
   notice: string;
+  /** 막 끝난 상황. 이름 막기(blocks)와 같은 동안만 상황판에 흐리게 남긴다 (2026-10-20 사용자) */
+  ended: EndedEntry[];
+}
+
+export interface EndedEntry {
+  kind: 'an' | 'in' | 'ms';
+  name: string;
+  loc: string;
+  grade?: string;
+  /** 이 회차까지 보인다 (blocks 값과 같음) */
+  until: number;
 }
 
 export interface WorldSettings {
@@ -137,7 +148,7 @@ export const DEFAULT_SETTINGS: WorldSettings = {
 export type Rng = () => number;
 
 export function emptyWorld(): WorldState {
-  return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: '' };
+  return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: '', ended: [] };
 }
 
 export function parseWorld(raw: unknown): WorldState {
@@ -145,7 +156,7 @@ export function parseWorld(raw: unknown): WorldState {
   try {
     const w = JSON.parse(raw) as WorldState;
     if (w && w.v === 1 && Array.isArray(w.an) && Array.isArray(w.inc) && Array.isArray(w.ms)) {
-      return { ...emptyWorld(), ...w, pending: { ...(w.pending ?? {}) } };
+      return { ...emptyWorld(), ...w, pending: { ...(w.pending ?? {}) }, ended: Array.isArray(w.ended) ? w.ended : [] };
     }
   } catch {
     /* 깨진 값은 새로 시작 */
@@ -187,17 +198,25 @@ function blocked(w: WorldState, group: string, name: string): boolean {
   return (w.blocks[`${group}:${name}`] ?? -1) >= w.epoch;
 }
 
+function remember(w: WorldState, kind: EndedEntry['kind'], e: { name: string; loc: string; state: string }, grade?: string) {
+  // 발생 예정이던 것은 시작도 안 했으니 남기지 않는다
+  if (e.state === '발생대기') return;
+  w.ended = [...(w.ended ?? []).filter((x) => !(x.kind === kind && x.name === e.name && x.loc === e.loc)), { kind, name: e.name, loc: e.loc, ...(grade ? { grade } : {}), until: w.epoch + 1 }];
+}
 function endAn(w: WorldState, e: AnEntry) {
+  remember(w, 'an', e, e.grade);
   block(w, 'an', e.name);
   w.skip.an = e.loc;
   w.an = w.an.filter((x) => x !== e);
 }
 function endIn(w: WorldState, e: InEntry) {
+  remember(w, 'in', e);
   block(w, 'in', e.name);
   w.skip.in = e.loc;
   w.inc = w.inc.filter((x) => x !== e);
 }
 function endMs(w: WorldState, e: MsEntry) {
+  remember(w, 'ms', e);
   block(w, 'ms', e.name);
   w.skip.ms = e.loc;
   w.ms = w.ms.filter((x) => x !== e);
@@ -278,6 +297,7 @@ export function expire(w: WorldState, s: WorldSettings) {
 /** 응답 한 번마다 한 번: 회차를 올리고, 오래된 항목을 끝내고, 네 그룹을 무작위 순서로 한 번씩 추첨 */
 export function tick(w: WorldState, c: Catalog, s: WorldSettings, rng: Rng) {
   w.epoch += 1;
+  w.ended = (w.ended ?? []).filter((e) => e.until >= w.epoch);
   expire(w, s);
   const groups = ['preset', 'random', 'incident', 'mystic'];
   for (let i = groups.length - 1; i > 0; i--) {
@@ -636,6 +656,12 @@ export function activeEvents(w: WorldState): WorldEvent[] {
     if (e.state === '출현') out.push({ kind: 'ms', index, loc: e.loc, name: e.name, key: key('ms', e), grade: '', people: e.visitors, report: '' });
   });
   return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
+}
+
+/** 상황판에 흐리게 남길 막 끝난 상황. 같은 이름이 다시 진행 중이면 뺀다 */
+export function endedShown(w: WorldState): EndedEntry[] {
+  const live = (k: EndedEntry['kind'], name: string) => (k === 'an' ? w.an : k === 'in' ? w.inc : w.ms).some((e) => e.name === name && e.state !== '발생대기');
+  return (w.ended ?? []).filter((e) => e.until >= w.epoch && !(e.name && live(e.kind, e.name)));
 }
 
 /** 유저가 상황을 끝낸다 (원본 상황 종료 버튼). 대상이 바뀌었으면 false */

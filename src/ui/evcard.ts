@@ -1,6 +1,7 @@
 // 괴이·사건·특수 카드 한 장. 상황판과 임무 탭이 같은 모양을 쓴다 (v0.16.17, 사용자 요청: 두 곳 모양 통일).
 // 차이는 카드를 눌렀을 때 하는 일뿐이다. 종류(괴이·사건·특수)는 두 곳 모두 상태 딱지 왼쪽에 같은 모양 딱지로 (v0.16.18).
 import type { CharacterSnapshot } from '../host/risu';
+import { locName, type EndedEntry } from '../core/world';
 import { ICONS } from './icons';
 import { avatar } from './images';
 
@@ -34,6 +35,8 @@ export interface EvCard {
   art?: { pic: string | null; desc: string };
   /** 그림 카드를 눌렀을 때 뜨는 상세 창의 id (상황판·임무 탭이 같은 id라 어느 쪽에서 열어도 같은 창) */
   pop?: string;
+  /** 막 끝난 상황 (다음 응답까지 흐리게) */
+  ended?: boolean;
 }
 
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
@@ -89,7 +92,7 @@ function artCard(c: EvCard): string {
   if (c.pop) seen.set(c.pop, c);
   const act = c.pop ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
-  return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
+  return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
       <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
     </div></li>`;
@@ -112,11 +115,17 @@ export function evPopup(): string {
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
-    <div class="gx-evc art open ev-pop${c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
+    <div class="gx-evc art open ev-pop${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
         <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
+}
+
+/** 막 끝난 상황 카드 (상황판·임무 탭 공통). 버튼은 위키만 */
+export function endedCard(e: EndedEntry, art: (name: string, kind: EvKind) => { pic: string | null; desc: string } | undefined): string {
+  const name = e.name || '이름 미확인';
+  return artCard({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art(name, e.kind) ?? { pic: null, desc: '' }, pop: `end:${e.kind}:${e.name}:${e.loc}` });
 }
 
 export function evCard(c: EvCard): string {
