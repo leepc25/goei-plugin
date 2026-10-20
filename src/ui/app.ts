@@ -1014,7 +1014,12 @@ function startedBody(ctx: ChatContext): string {
     case 'phone':
       return phoneTab(ctx, phoneEnv);
     case 'settings':
-      return settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
+    {
+      // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
+      // 명부는 자기 검색 서랍이 있어 그대로
+      const html = settingsTab(ctx, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
+      return html.includes('ph-drawer') ? html : html + boardDrawer();
+    }
     default:
       return board(ctx);
   }

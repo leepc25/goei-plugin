@@ -38,7 +38,7 @@ export function markPop(current: Mark | null, recent: Mark[]): string {
   const mine = list.length
     ? `<ul class="mk-rows">${list.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc(m.name)}</span></button>
         <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join('')}</ul>`
-    : '<p class="mk-empty">아직 없어요.</p>';
+    : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
   const here = current && !isMarked(current)
     ? `<button class="mk-here" data-action="mk-here" ${full ? 'disabled' : ''}>${ICONS.plus}<span>지금 화면 · ${esc(current.name)}</span></button>`
     : '';
