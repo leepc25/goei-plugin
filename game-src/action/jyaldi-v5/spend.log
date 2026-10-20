@@ -1,0 +1,79 @@
+06:43:34 edit-idle-1 edit_image_pro_flash -> {
+  "background_job_id": "e27cc180-8acf-4497-bffa-03110532f4ee",
+  "image_id": "8bb00e78-9e73-5b17-ba31-8bc50b9efb05",
+  "status": "processing",
+  "source_image_id": "8bb00e78-9e73-5b17-ba31-8bc50b9efb05",
+  "job_id": "e27cc180-8acf-4497-bffa-03110532f4ee",
+  "description": "Same woman, same face, same long straight black hair, same black trouser suit, white shirt, black necktie, black gloves, black shoes, same head size and body proportions. Change only the body orientation: a side-scrolling game standing pose facing RIGHT in a near-profile three-quarter view. Shoulder line almost side-on, ch
+06:5x edit-idle-1 charged 6
+06:45:00 walk-A1 animate_image -> id: 42b12cee-9e7b-496e-a721-69deaf28c853
+job_id: 42b12cee-9e7b-496e-a721-69deaf28c853
+action: A seamless full walking cycle in place facing right, fixed three-quarter side camera. Natural relaxed adult walking at moderate pace, not marching or running. Two complete alternating steps: left heel contact, weight transfer and passing, right heel contact, weight transfer and passing. Both arms swing from the shoulders opposite the legs with softly bent elbows. Hips and shoulders counter-rotate, torso subtly rises and falls with weight transfer, hair follows gently. Maintain identical head size, lim
+walk-A1 charged 4
+06:47:30 walk-A2 loop first=last=A1#7 animate_image -> id: ef376d8b-4098-4e23-9bab-c64afb5175d2
+job_id: ef376d8b-4098-4e23-9bab-c64afb5175d2
+action: One complete looping walk cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact contact pose. Sequence: front heel down, weight shifts onto front leg, back leg swings forward past the standing leg (passing), opposite heel contact with the other leg in front, weight shift, passing, return to the starting contact pose. Arms swing from the shoulders opposite to the legs, elbows softly bent, visible on every frame. Standing foot stays planted on the ground line. T
+walk-A2 charged 4
+08:58:26 runB1 animate_image -> id: 70d22254-e5f2-4999-85ae-083390018a96
+job_id: 70d22254-e5f2-4999-85ae-083390018a96
+action: A full running cycle in place facing right, same near-profile three-quarter camera as the input, body orientation never changes. Athletic adult jog-run: torso leans slightly forward, long strides with a clear flight phase where both feet leave the ground, knees lift, back leg pushes off from the toes. Both arms bent about 90 degrees at the elbow pump strongly forward and back from the shoulders, opposite to the legs, hands clearly visible in front of and behind the body. Hair streams back. Identical h
+runB1 job 70d22254-e5f2-4999-85ae-083390018a96
+08:58:26 atkC1 animate_image -> error: rate limit exceeded (1/1 jobs)
+
+hint: wait for a job to finish, then retry
+
+Free plan: 1 generation at a time. Upgrade for higher concurrency (more generations at once).
+runB1 job 70d22254-e5f2-4999-85ae-083390018a96 charged 4 (bal 18)
+09:01:41 runB2 animate_image -> id: 3925b702-10a4-4b5b-9507-cac57474d389
+job_id: 3925b702-10a4-4b5b-9507-cac57474d389
+action: One complete looping running cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact stride pose. Sequence: flight with legs split, front foot lands under the hips, body compresses slightly, push off from the toes, flight, the other leg lands, compress, push off, return to the starting stride pose. Torso leans slightly forward. Both arms bent about 90 degrees pump strongly from the shoulders opposite to the legs on every frame, fists visible in front and behind.
+runB2 job 3925b702-10a4-4b5b-9507-cac57474d389
+runB2 job 3925b702-10a4-4b5b-9507-cac57474d389 charged 4 (bal 14)
+09:05:18 atkC1 animate_image -> id: 3599557c-35ef-4e61-8609-1defb24b1bdb
+job_id: 3599557c-35ef-4e61-8609-1defb24b1bdb
+action: A quick lead jab punch to the right, then recover. Facing right, same near-profile three-quarter camera, body orientation never changes. Sequence: raise both fists to a guard, small step forward with the front foot, push off the back foot, hips and shoulder rotate into the punch, the front arm extends fully straight to the right at shoulder height with a clenched fist, short hold at full extension, arm retracts to guard, return to the relaxed starting pose. Rear fist stays near the chin. Identical hea
+atkC1 job 3599557c-35ef-4e61-8609-1defb24b1bdb
+atkC1 job 3599557c-35ef-4e61-8609-1defb24b1bdb (4)
+atkC1 charged 4 (bal 10)
+13:47:45 sheet seed=101 pal=False create_image_pro_flash -> {
+  "background_job_id": "4a55c39b-5e11-4789-981a-0dec575f0c6e",
+  "image_id": "91b52e9e-eaf6-58bf-b1e9-e36b795302d2",
+  "status": "processing",
+  "source_image_id": "91b52e9e-eaf6-58bf-b1e9-e36b795302d2",
+  "job_id": "4a55c39b-5e11-4789-981a-0dec575f0c6e",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+13:47:46 sheet seed=102 pal=False create_image_pro_flash -> {
+  "background_job_id": "da069865-374c-4aa9-b9d9-a3976f93c71b",
+  "image_id": "13b5085c-0c3f-56a4-88be-134ed8813335",
+  "status": "processing",
+  "source_image_id": "13b5085c-0c3f-56a4-88be-134ed8813335",
+  "job_id": "da069865-374c-4aa9-b9d9-a3976f93c71b",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+13:47:48 sheet seed=103 pal=True create_image_pro_flash -> {
+  "background_job_id": "ae7f1cfa-d475-432a-9344-507fbb2396f4",
+  "image_id": "32f9f079-e364-5511-a8a6-7199cb70e8bc",
+  "status": "processing",
+  "source_image_id": "32f9f079-e364-5511-a8a6-7199cb70e8bc",
+  "job_id": "ae7f1cfa-d475-432a-9344-507fbb2396f4",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+13:49:46 sheet seed=104 pal=False create_image_pro_flash -> {
+  "background_job_id": "da461a3b-aaad-4084-84e4-7330755beec2",
+  "image_id": "5581c56a-8b87-5e77-9c12-e7bf7563ec2e",
+  "status": "processing",
+  "source_image_id": "5581c56a-8b87-5e77-9c12-e7bf7563ec2e",
+  "job_id": "da461a3b-aaad-4084-84e4-7330755beec2",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+13:49:46 sheet seed=105 pal=False create_image_pro_flash -> {
+  "background_job_id": "25b1f078-ba0d-4fa0-b5f4-50aeaf4881ff",
+  "image_id": "dfc70976-eee4-55db-b6f6-9a0f5fb23677",
+  "status": "processing",
+  "source_image_id": "dfc70976-eee4-55db-b6f6-9a0f5fb23677",
+  "job_id": "25b1f078-ba0d-4fa0-b5f4-50aeaf4881ff",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+13:49:57 sheet seed=106 pal=False create_image_pro_flash -> {
+  "background_job_id": "2d441d08-40e9-48d3-93c7-267f61182d72",
+  "image_id": "7a7f9a8a-50d6-55bc-bf99-a5e6ae3e3ce4",
+  "status": "processing",
+  "source_image_id": "7a7f9a8a-50d6-55bc-bf99-a5e6ae3e3ce4",
+  "job_id": "2d441d08-40e9-48d3-93c7-267f61182d72",
+  "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre

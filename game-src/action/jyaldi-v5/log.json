@@ -1,0 +1,91 @@
+{
+ "status": "candidates-awaiting-user-choice",
+ "by": "Claude via PixelLab MCP, 2026-10-20",
+ "tool": "create_image_pro_flash",
+ "charged_total": 30,
+ "balanceBefore": 10000,
+ "balanceAfter": 9970,
+ "prompt": "\"Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile three-quarter view. \"\n\"Tall adult Korean woman in her thirties, figure exactly 128 pixels tall from top of head to soles, long straight black hair falling to the waist, pale skin, \"\n\"red eyes with the near eye clearly visible as a red dot, calm expressionless face, slim long face. Black fitted two-piece pant suit (jacket and trousers), \"\n\"white dress shirt collar, black necktie, black leather gloves, black dress shoes. Pistol holster on the right hip. Posture straight and composed, weight even, \"\n\"arms relaxed down at the sides with gloved hands visible, both feet flat on one ground line slightly apart, toes pointing right. \"\n\"Clean readable pixel clusters, outlines in a dark hue of each color (no pure black outline), about 14 colors, light from the upper left, \"\n\"transparent background, the whole figure inside the canvas with the soles 16 pixels above the bottom edge.\"",
+ "candidates": [
+  {
+   "file": "cand-101.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 136,
+   "width": 47,
+   "colors": 12,
+   "seed": 101,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-102.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 138,
+   "width": 48,
+   "colors": 36,
+   "seed": 102,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-103p.png",
+   "canvas": [
+    160,
+    160
+   ],
+   "height": 140,
+   "width": 48,
+   "colors": 14,
+   "seed": 103,
+   "palette_locked": true,
+   "charged": 6
+  },
+  {
+   "file": "cand-104.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 131,
+   "width": 48,
+   "colors": 27,
+   "seed": 104,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-105.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 132,
+   "width": 47,
+   "colors": 34,
+   "seed": 105,
+   "palette_locked": false,
+   "charged": 6
+  },
+  {
+   "file": "cand-106.png",
+   "canvas": [
+    148,
+    148
+   ],
+   "height": 129,
+   "width": 48,
+   "colors": 39,
+   "seed": 106,
+   "palette_locked": false,
+   "charged": 6
+  }
+ ],
+ "reference": "assets/agents/Jyaldi_default.avif (사용자 제공 원화, 참조 입력으로는 쓰지 않음. create는 참조 불가)",
+ "old_art_used": false
+}
