@@ -119,3 +119,202 @@ atkC1 charged 4 (bal 10)
   "source_image_id": "5eb8665f-7f64-5a34-b102-67e7635415ce",
   "job_id": "bf2b4ed1-947b-419f-b083-7f7874597bef",
   "description": "Same woman as the source
+14:18:52 clip walk-ai animate_image -> id: 6ad7442b-7eb5-4261-bee2-930de6f02958
+job_id: 6ad7442b-7eb5-4261-bee2-930de6f02958
+action: calm walk cycle facing right, one full stride that loops: the right leg swings forward, passes, lands, then the left leg does the same; arms swing a little at the shoulders opposite to the legs; upper body steady and upright; long hair sways one beat behind; feet stay on the same ground line
+frames: 8
+siz
+14:18:52 clip walk-mm animate_image_pixminimax -> id: d61d4ce7-4556-4ae8-91b8-570e9f46a460
+job_id: d61d4ce7-4556-4ae8-91b8-570e9f46a460
+description: calm walk cycle facing right, one full stride that loops: the right leg swings forward, passes, lands, then the left leg does the same; arms swing a little at the shoulders opposite to the legs; upper body steady and upright; long hair sways one beat behind; feet stay on the same ground line
+frames: 
+14:18:54 clip idle-ai animate_image -> id: 98aa6a17-00de-4952-a0ae-f820485c8ce5
+job_id: 98aa6a17-00de-4952-a0ae-f820485c8ce5
+action: subtle standing idle loop: slow breathing, shoulders and chest rise and fall by a pixel or two, hair tips sway slightly, feet planted, no other movement
+frames: 4
+size: 160x160px
+transparent: True — auto (input has transparency)
+last_frame: yes (interpolating to it)
+seed: 7
+asset_id: 517d0883-df6d-511d-b2
+14:18:54 clip idle-mm animate_image_pixminimax -> id: e499025c-4b35-4fbe-88c4-1ba1c24d2e99
+job_id: e499025c-4b35-4fbe-88c4-1ba1c24d2e99
+description: subtle standing idle loop: slow breathing, shoulders and chest rise and fall by a pixel or two, hair tips sway slightly, feet planted, no other movement
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes (animating toward it)
+seed: 7
+cost: 1 generation
+status: processing (~1-5 min)
+
+hint: ge
+14:26:20 clip fight-idle pixminimax -> id: 13cefc4e-852c-498c-82cb-c51139a9fb32
+job_id: 13cefc4e-852c-498c-82cb-c51139a9fb32
+description: combat stance idle loop: tiny weight shift, breathing, left hand held open in front, right hand near the hip, feet planted, hair tips sway
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes (a
+14:26:21 clip run pixminimax -> id: 60313fa7-66eb-4aa0-9d02-67b47892399f
+job_id: 60313fa7-66eb-4aa0-9d02-67b47892399f
+description: hard combat sprint facing right, one full stride that loops: upper body leaning forward, legs driving with long steps, arms bent and pumping opposite to the legs, long hair streaming behind, jacket hem
+14:26:22 clip jump pixminimax -> id: a8c5f7e1-3762-4380-ab0b-72c4a8dd05e9
+job_id: a8c5f7e1-3762-4380-ab0b-72c4a8dd05e9
+description: low short jump: quick knee bend, pushes off the ground, rises only a little with feet tucked, hangs briefly, lands on both feet with knees absorbing, upper body stays upright, returns to standing
+frame
+14:26:22 clip melee1 pixminimax -> id: 87d7a6d2-3f73-4299-977d-30f6b80cdf02
+job_id: 87d7a6d2-3f73-4299-977d-30f6b80cdf02
+description: first melee hit: steps half a step forward and pushes her open gloved left palm straight ahead at chest height, elbow angle barely changing, shoulders turning into the push, ends with the arm fully ext
+14:26:23 clip melee2 pixminimax -> id: 2bd1a470-44b6-41a5-9643-0193558d3693
+job_id: 2bd1a470-44b6-41a5-9643-0193558d3693
+description: second melee hit: from the extended left palm she swings her right hand across in a short backhand strike at head height, small body rotation, then pulls both hands back into the combat stance
+frames: 
+14:26:28 clip melee3 pixminimax -> id: b9b0e4ff-4356-4f02-8769-4c8f34367620
+job_id: b9b0e4ff-4356-4f02-8769-4c8f34367620
+description: third melee hit: steps in and places her open left hand forward at chest height as if resting it on an enemy chest, holds that pose for two frames, then a small round detonation bursts from the palm wh
+14:26:28 clip dash-attack pixminimax -> id: f6f8b00b-0d71-48e8-9f60-4c4f073ac92b
+job_id: f6f8b00b-0d71-48e8-9f60-4c4f073ac92b
+description: from a full sprint she drops low and slams forward with her right shoulder in a shoulder charge, body bent forward, hair whipping, then straightens up into the combat stance
+frames: 8
+size: 160x160px
+t
+14:26:29 clip air-attack pixminimax -> id: 64487a08-998a-4d83-9f7b-48573c1bf6d0
+job_id: 64487a08-998a-4d83-9f7b-48573c1bf6d0
+description: from the top of a jump she slams her open right palm straight downward while falling, lands on both feet with a small burst of dust at the hands, then stands up straight
+frames: 8
+size: 160x160px
+trans
+14:26:30 clip ranged-ready pixminimax -> id: 68b92471-5159-4c19-8a0f-6ace568b3b1d
+job_id: 68b92471-5159-4c19-8a0f-6ace568b3b1d
+description: draws the pistol from the holster on her right hip with her right hand and raises it to a level one-handed aim to the right
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes (animating toward
+14:26:30 clip ranged-fire pixminimax -> id: cfdf5b4f-ea25-4134-a6e9-503c6b2f2227
+job_id: cfdf5b4f-ea25-4134-a6e9-503c6b2f2227
+description: fires one pistol shot: muzzle flash at the barrel, the pistol and forearm kick up slightly from recoil, shoulder steady, returns to the same aim
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: 
+14:26:31 clip unique-short pixminimax -> id: a9b9f130-6c2c-49c8-8e5b-16aa33bd86bb
+job_id: a9b9f130-6c2c-49c8-8e5b-16aa33bd86bb
+description: extends her right hand forward with the palm open and a round explosion bursts two body-widths in front of her, her body barely moves, hair and jacket hem blown back by the blast, then the hand slowly 
+14:26:32 clip unique-charge pixminimax -> id: 96e70507-5960-4939-8ac0-2386c3904b42
+job_id: 96e70507-5960-4939-8ac0-2386c3904b42
+description: charging loop: right hand held out in front at chest height, gloved fingertips trembling, hair stirring as if in a faint wind, feet planted
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes (
+14:26:35 clip guard pixminimax -> id: 4c324d8a-6386-4432-b990-1a64156d8cd4
+job_id: 4c324d8a-6386-4432-b990-1a64156d8cd4
+description: raises her left forearm up in front of her face and chest to block, elbow bent, right hand stays near the hip, feet do not move, ends holding the block
+frames: 4
+size: 160x160px
+transparent: True
+seed:
+14:26:35 clip evade pixminimax -> id: a155740e-650c-4daf-a79d-7ba879a766c5
+job_id: a155740e-650c-4daf-a79d-7ba879a766c5
+description: quick short sidestep: pushes off and takes one fast short step back-left with a slight crouch and a lean, hair swinging across, then steps back into the combat stance; no roll
+frames: 8
+size: 160x160px
+14:26:36 clip ult pixminimax -> id: c5c78f34-0c27-4b81-b8e2-e1465f088534
+job_id: c5c78f34-0c27-4b81-b8e2-e1465f088534
+description: ultimate move: she tugs her right glove tighter with her left hand over two frames, takes one step forward and thrusts both open hands forward together, hair blown straight back by a huge blast in fron
+14:26:37 clip hit-light pixminimax -> id: 329e490f-5198-4e88-99d8-db2ade614556
+job_id: 329e490f-5198-4e88-99d8-db2ade614556
+description: takes a light hit: upper body jolts back slightly and the head tips, feet stay planted, snaps back to the combat stance
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes (animating toward it)
+14:26:38 clip knockdown pixminimax -> id: 05631c3a-1c30-490c-858f-5b2a40833c79
+job_id: 05631c3a-1c30-490c-858f-5b2a40833c79
+description: takes a heavy hit: thrown backward off her feet, flies back and falls onto her back, catches herself with one hand on the floor, ends lying on the ground on her back with the hair spread
+frames: 8
+size
+14:26:38 clip reload pixminimax -> id: dfd63eb7-4677-4ab2-86a8-3c6268599b1f
+job_id: dfd63eb7-4677-4ab2-86a8-3c6268599b1f
+description: reloads the pistol: lowers the pistol a little, the left hand swaps the magazine and racks the slide, raises back to the same one-handed aim
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: yes 
+14:29:04 cutin faithful image_to_pixelart -> id: 2190f744-3da4-4590-bf5a-9bb57093ec6c
+job_id: 2190f744-3da4-4590-bf5a-9bb57093ec6c
+source: 640x640px
+output: 256x256px
+faithful: True
+init_image_strength: 150
+seed: 7
+asset_id: 90ba84ff-b200-59ec-916f-ee603fe55615
+asset_status: pending (saved when generation completes)
+cost: 1 generation
+status: 
+14:29:11 cutin reinterp image_to_pixelart -> id: 6804332b-e185-4c36-a42c-f76e570395c4
+job_id: 6804332b-e185-4c36-a42c-f76e570395c4
+source: 640x640px
+output: 256x256px
+faithful: False
+init_image_strength: 0
+seed: 7
+asset_id: 826d8067-8dec-5720-ba07-10e02c98bb4e
+asset_status: pending (saved when generation completes)
+cost: 1 generation
+status: p
+14:30:44 cutin proflash image_to_pixelart_pro_flash -> {
+  "background_job_id": "921a37de-fe39-49c6-9a46-7696360f8ae8",
+  "image_id": "3ea6347e-be37-5ac3-b997-7d3511bd3548",
+  "status": "processing",
+  "source_image_id": "3ea6347e-be37-5ac3-b997-7d3511bd3548",
+  "job_id": "921a37de-fe39-49c6-9a46-7696360f8ae8",
+  "source_size": {
+    "width": 640,
+    "
+14:30:45 cutin faithful60 image_to_pixelart -> id: 4b924832-eec7-4d37-b747-de52f179552b
+job_id: 4b924832-eec7-4d37-b747-de52f179552b
+source: 640x640px
+output: 256x256px
+faithful: True
+init_image_strength: 60
+seed: 7
+asset_id: ecc17d5f-f369-56e8-b266-343493ce0621
+asset_status: pending (saved when generation completes)
+cost: 1 generation
+status: p
+14:33:13 clip2 guard-hit pixminimax -> id: 6fb592f3-8421-4aaa-ba24-ff9ecafea34f
+job_id: 6fb592f3-8421-4aaa-ba24-ff9ecafea34f
+description: while blocking with the left forearm raised, she takes a hit on the forearm: the upper body is pushed back one or two pixels and the arm jolts, feet stay planted, returns to the same block
+frames: 4
+si
+14:33:14 clip2 getup pixminimax -> id: c9427eb3-2fbb-4a9d-b023-d8f9c6c5b9e1
+job_id: c9427eb3-2fbb-4a9d-b023-d8f9c6c5b9e1
+description: gets up from lying on her back: pushes up with one hand on the floor, brings her knees under her, rises slowly to her feet without fixing her hair, ends standing in a combat ready stance facing right
+f
+14:39:53 clip3 melee1 pixminimax -> id: 83c0d4b7-f9e1-425e-a782-cfe80a5338c5
+job_id: 83c0d4b7-f9e1-425e-a782-cfe80a5338c5
+description: first melee hit, full motion: from the combat stance she steps half a step forward and pushes her open gloved left palm straight out at chest height (frames 2-4 the arm reaches full extension), holds o
+14:39:54 clip3 melee3a pixminimax -> id: c7c40485-6d2d-4160-91ff-a3a2e6428429
+job_id: c7c40485-6d2d-4160-91ff-a3a2e6428429
+description: she steps in and slowly places her open left hand forward at chest height as if resting it on an enemy chest, calm, ending with the arm extended
+frames: 4
+size: 160x160px
+transparent: True
+last_frame: 
+14:39:54 clip3 melee3b pixminimax -> id: 5b2b97ac-b386-478f-be13-7b594adac6a9
+job_id: 5b2b97ac-b386-478f-be13-7b594adac6a9
+description: with her left hand resting forward on an enemy chest, she holds still for two frames, then a small round detonation bursts from under her palm with red debris, her hair swings a beat late, she stays ba
+14:39:55 clip3 guard pixminimax -> id: 902cdd3f-925d-4643-ba0c-ca0d388140ae
+job_id: 902cdd3f-925d-4643-ba0c-ca0d388140ae
+description: she raises her left forearm vertically in front of her face and chest to block, the elbow pointing forward and the fist up near her forehead, right hand near the hip, feet unchanged, ends holding the b
+14:39:56 clip3 reload pixminimax -> id: 57305010-a256-4c17-b64b-5545b6539bec
+job_id: 57305010-a256-4c17-b64b-5545b6539bec
+description: reloads the pistol: tilts the pistol slightly, the left hand comes up to the grip, pulls the empty magazine out and down, slides a new magazine in from below, racks the slide, then the arm returns to t
+14:44:52 clip2 guard-hit pixminimax -> id: 22a837fd-3224-43ec-85b8-487cb5666252
+job_id: 22a837fd-3224-43ec-85b8-487cb5666252
+description: while blocking with the left forearm raised, she takes a hit on the forearm: the upper body is pushed back one or two pixels and the arm jolts, feet stay planted, returns to the same block
+frames: 4
+si

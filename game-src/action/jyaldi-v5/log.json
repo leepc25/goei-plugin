@@ -1,5 +1,5 @@
 {
- "status": "sheet-102-chosen-by-user; 6 key poses awaiting review",
+ "status": "stage1-clips-generated; awaiting user visual review in release/demo/jyaldi-v5-action.html",
  "by": "Claude via PixelLab MCP, 2026-10-20",
  "tool": "create_image_pro_flash",
  "charged_total": 30,
@@ -146,5 +146,28 @@
     "feet_y": 151
    }
   ]
+ },
+ "clips": {
+  "tool": "animate_image_pixminimax (1 gen per clip, seed 7/11), first/last pins from poses/ or sheet; walk/idle also made with animate_image for comparison (clips/compare/)",
+  "manifest": "manifest.json",
+  "regenerated": [
+   "melee1",
+   "melee3 (split a/b)",
+   "guard",
+   "guard-hit",
+   "reload"
+  ],
+  "old_versions": "scratchpad only (not committed)",
+  "charged_total_clips": 29,
+  "cutin": {
+   "tool": "image_to_pixelart_pro_flash from assets/agents/Jyaldi_default (user artwork crop)",
+   "charged": 6,
+   "rejected": [
+    "reinterp (smile)",
+    "faithful (not pixel art)"
+   ]
+  },
+  "balanceAfter": 9885,
+  "charged_total_session": 115
  }
 }

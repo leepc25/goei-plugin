@@ -66,11 +66,11 @@ function onKey(code, down) {
     else { if (performance.now() - G.shiftDown < 180 && !G.lock && !G.down) { G.fight = true; play('evade', { lock: true }); } G.runHeld = false; }
   }
   if (!down) { if (code === 'KeyD' && G.charging) { G.charging = false; play('unique', { lock: true }); } if (code === 'KeyQ') { G.guard = false; if (!G.lock) play('fight'); } return; }
-  if (G.down) { if (code === 'KeyK' && G.clip === 'down' && clipDone()) { play('getup', { lock: true }); } return; }
+  if (G.down) { if (code === 'KeyK' && G.lying) { G.lying = false; play('getup', { lock: true }); } return; }
   if (G.lock) { if (code === 'KeyA' && G.clip.startsWith('melee')) G.queued = 'A'; return; }
   const air = G.y < 0;
   switch (code) {
-    case 'Space': if (!air) { G.vy = -11; G.fight = true; play('jump', { lock: false }); } break;
+    case 'Space': if (!air) { G.vy = -11; G.y = -0.01; G.fight = true; play('jump', { lock: false }); } break;
     case 'KeyA':
       G.fight = true;
       if (air) play('air', { lock: true });
@@ -104,7 +104,7 @@ function update(now) {
   const mx = (keys.has('ArrowRight') ? 1 : 0) - (keys.has('ArrowLeft') ? 1 : 0);
   if (!G.lock && !G.down && !G.guard && !G.charging) {
     if (mx) G.dir = mx;
-    const air = G.y < 0;
+    const air = G.y < 0 || G.vy < 0;
     if (!air) {
       const want = mx ? (G.runHeld ? 'run' : 'walk') : idleClip();
       if (G.clip !== want) play(want);
@@ -128,7 +128,7 @@ function update(now) {
         if (G.next) { const n = G.next; G.next = null; play(n, { lock: true }); break; }
         if (G.queued === 'A' && G.clip.startsWith('melee')) { G.queued = null; G.combo = G.combo % 3 + 1; play('melee' + G.combo, { lock: true }); break; }
         G.queued = null;
-        if (G.clip === 'down') { G.lock = false; G.t = 0; break; } // 누운 채 유지, K로 기상
+        if (G.clip === 'down') { G.lock = false; G.lying = true; G.f = c.frames - 1; G.t = 0; break; } // 누운 채 유지, K로 기상
         if (G.clip === 'getup') { G.down = false; }
         if (G.clip === 'guard') { G.lock = false; G.t = 0; break; } // 가드 유지
         if (G.clip === 'guardhit') { play('guard', { lock: true }); G.f = MANIFEST.clips.guard.frames - 1; G.lock = false; break; }

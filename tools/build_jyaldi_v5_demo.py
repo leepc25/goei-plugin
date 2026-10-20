@@ -50,6 +50,10 @@ CLIP_DEFS = [
 
 
 def load_clip(prefix):
+    # 근접 3타는 두 클립(손 얹기 4장 + 폭파 8장)을 이어 붙인다. 두 번째 클립의 0번 장은 첫 클립의 끝 장과 같은 입력이라 뺀다.
+    if prefix == 'melee3':
+        a, b = load_clip('melee3a'), load_clip('melee3b')
+        return a + b[1:] if a and b else a or b
     frames = []
     i = 0
     while True:
