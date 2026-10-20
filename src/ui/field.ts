@@ -16,7 +16,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, evCard, evOpen, peopleChips } from './evcard';
+import { elapsedText, evCard, peopleChips } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -298,7 +298,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents),
     extra: e.report ? `<span class="gx-evc-sit" title="${esc(e.report)}">${esc(e.report)}</span>` : '',
-    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind) : undefined, fold: { id: e.key, open: evOpen.has(e.key) },
+    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind) : undefined, pop: e.key,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
 }
@@ -344,16 +344,9 @@ function situations(x: Ctx, events: WorldEvent[]): string {
       ? '조건에 맞는 상황이 없어요.'
       : '지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.';
   return `<div class="gx-chips gx-sitbar">${chips}${cancel}</div>
-    ${shown.length || place ? `${place ? `<ul class="gx-evcs gx-evplace">${place}</ul>` : ''}${evColumns(shown.map((e) => eventRow(e, x, agents)))}` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown.length || place ? `<ul class="gx-evcs">${place}${shown.map((e) => eventRow(e, x, agents)).join('')}</ul>` : `<p class="gx-none">${empty}</p>`}`;
 }
 
-/** 상황 카드를 두 열로 나눠 담는다: 한 장을 펴도 그 열만 길어진다 (2026-10-20 사용자).
- *  모바일은 한 열로 합치고 style order로 원래 순서를 지킨다 */
-function evColumns(cards: string[]): string {
-  if (!cards.length) return '';
-  const col = (k: number) => cards.map((c, i) => (i % 2 === k ? c.replace('<li class="gx-evc', `<li style="order:${i}" class="gx-evc`) : '')).join('');
-  return `<div class="gx-evcols"><ul class="gx-evcs">${col(0)}</ul><ul class="gx-evcs">${col(1)}</ul></div>`;
-}
 
 /** 선택 취소 칩: 고른 것이 없으면 꺼져 있다 */
 function cancelChip(action: string, on: boolean): string {

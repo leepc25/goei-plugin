@@ -109,10 +109,10 @@ async function open(page) {
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
   await page.click('[x-goei-fab] button');
 }
-// 상황 그림 카드: 접혀 있으면 펴고, 안의 버튼(지도·목표로 고르기·종료 등)을 누른다
+// 상황 그림 카드: 띠를 눌러 상세 창을 열고, 창 안의 버튼(지도·목표로 고르기·종료 등)을 누른다
 async function cardAction(page, name, action, scope = '') {
-  if (!(await page.locator(`${scope} .gx-evc.open:has-text("${name}")`).count())) await page.click(`${scope} .gx-evc:has-text("${name}") .gx-evart-name`);
-  await page.click(`${scope} .gx-evc.open:has-text("${name}") [data-action="${action}"]`);
+  if (!(await page.locator('.ev-pop').count())) await page.click(`${scope} li.gx-evc:has-text("${name}")`);
+  await page.click(`.ev-pop [data-action="${action}"]`);
 }
 // 커스텀 목록: 그림 띠를 눌러 펼친 뒤 「이 …로 선택」 (2026-10-20 그림 카드)
 async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
@@ -795,8 +795,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.waitForSelector('.gx-evc');
   await cardAction(page, preset.name, 'end-event');
-  assert.equal((await page.textContent(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`)).trim(), '정말 종료');
-  await page.click(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`);
+  assert.equal((await page.textContent('.ev-pop [data-action="end-event"]')).trim(), '정말 종료');
+  await page.click('.ev-pop [data-action="end-event"]');
   await page.waitForFunction((name) => !JSON.parse(window.__chat.scriptstate.$goei_world).an.some((e) => e.name === name), preset.name);
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$an_report)).includes(`${preset.name}|활성`));
   assert.deepEqual(errors, []);

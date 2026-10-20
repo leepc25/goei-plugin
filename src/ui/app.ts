@@ -33,7 +33,7 @@ import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
-import { elapsedText, evCard, evOpen, peopleChips, type EvCard, type EvKind } from './evcard';
+import { elapsedText, evCard, evPopup, evSeenReset, evUi, peopleChips, type EvCard, type EvKind } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
@@ -393,7 +393,13 @@ function ensureRoot(): HTMLElement {
     if (box && (view.kind === 'started' || view.kind === 'opening')) box.innerHTML = missionList(view.ctx, view.kind === 'opening');
   });
   document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape') void close();
+    if (ev.key !== 'Escape') return;
+    if (evUi.pop) {
+      evUi.pop = '';
+      render();
+      return;
+    }
+    void close();
   });
   return root;
 }
@@ -526,6 +532,8 @@ async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise
 
 async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
+  // 상황 상세 창 안의 버튼(위키·지도·목표)이나 다른 조작을 하면 창은 닫는다. 종료는 두 번 눌러야 해서 그대로 둔다
+  if (evUi.pop && action !== 'ev-pop' && action !== 'end-event') evUi.pop = '';
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
     await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
     return;
@@ -639,11 +647,9 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       resetSettings();
       return render();
-    case 'ev-fold':
-      // 상황판 그림 카드: 누르면 펴고 다시 누르면 접는다
-      if (!value) return;
-      if (evOpen.has(value)) evOpen.delete(value);
-      else evOpen.add(value);
+    case 'ev-pop':
+      // 그림 카드 상세 창: 카드를 누르면 열고, 바깥·×·Esc·뒤로 밀기로 닫는다
+      evUi.pop = evUi.pop === value ? '' : value ?? '';
       return render();
     case 'board-map':
       // 상황판 행: 지도 탭에서 그 자리를 연다
@@ -992,6 +998,7 @@ function navStep(dir: -1 | 1): (() => void) | null {
   if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
   if (gameOpen()) return dir < 0 ? () => closeGame() : null;
+  if (evUi.pop && dir < 0) return () => void handle('ev-pop', evUi.pop);
   if (!navHist.can(dir)) return null;
   return () => {
     const s = navHist.go(dir);
@@ -1044,7 +1051,8 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${markPop(markOf(navState()), recentMarks())}`;
+      evSeenReset();
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup()}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1206,7 +1214,7 @@ function board(ctx: ChatContext): string {
   const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
     const id = key ?? `${kind}${i}:${c.name}`;
-    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), fold: { id, open: evOpen.has(id) } });
+    return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), pop: id });
   };
   const an = w.an
     .map((e, i) => {
