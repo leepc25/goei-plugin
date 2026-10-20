@@ -77,3 +77,45 @@ atkC1 charged 4 (bal 10)
   "source_image_id": "7a7f9a8a-50d6-55bc-bf99-a5e6ae3e3ce4",
   "job_id": "2d441d08-40e9-48d3-93c7-267f61182d72",
   "description": "Pixel art game sprite for a side-scrolling beat-em-up, one full-body standing idle pose, facing right in a near-profile thre
+14:03:18 pose fight-idle seed=7 edit_image_pro_flash -> {
+  "background_job_id": "d2164185-5e48-47f5-82eb-4abb6cc408b0",
+  "image_id": "3e211634-2d6c-55c4-91b1-81243713d46a",
+  "status": "processing",
+  "source_image_id": "3e211634-2d6c-55c4-91b1-81243713d46a",
+  "job_id": "d2164185-5e48-47f5-82eb-4abb6cc408b0",
+  "description": "Same woman as the source
+14:03:23 pose walk-contact seed=7 edit_image_pro_flash -> {
+  "background_job_id": "2894699b-17aa-46c2-be09-7c45df92f32e",
+  "image_id": "097957cb-3e93-50a6-8ceb-5ea22b331fd2",
+  "status": "processing",
+  "source_image_id": "097957cb-3e93-50a6-8ceb-5ea22b331fd2",
+  "job_id": "2894699b-17aa-46c2-be09-7c45df92f32e",
+  "description": "Same woman as the source
+14:03:25 pose run-contact seed=7 edit_image_pro_flash -> {
+  "background_job_id": "097f6d4c-9087-497d-b1da-aeb240543889",
+  "image_id": "bf64065e-e51d-5766-84bb-16f64d964137",
+  "status": "processing",
+  "source_image_id": "bf64065e-e51d-5766-84bb-16f64d964137",
+  "job_id": "097f6d4c-9087-497d-b1da-aeb240543889",
+  "description": "Same woman as the source
+14:03:40 pose jump-apex seed=7 edit_image_pro_flash -> {
+  "background_job_id": "177a9361-e481-4d7b-b232-eca8a14373f4",
+  "image_id": "51f7dfc6-1324-5040-aef9-b54526d8ea94",
+  "status": "processing",
+  "source_image_id": "51f7dfc6-1324-5040-aef9-b54526d8ea94",
+  "job_id": "177a9361-e481-4d7b-b232-eca8a14373f4",
+  "description": "Same woman as the source
+14:03:43 pose palm-strike seed=7 edit_image_pro_flash -> {
+  "background_job_id": "e130990b-3149-40d0-9a03-c3e7dd9269c5",
+  "image_id": "6d964bba-79e5-5986-be72-0f8e3ddd3e93",
+  "status": "processing",
+  "source_image_id": "6d964bba-79e5-5986-be72-0f8e3ddd3e93",
+  "job_id": "e130990b-3149-40d0-9a03-c3e7dd9269c5",
+  "description": "Same woman as the source
+14:03:48 pose pistol-fire seed=7 edit_image_pro_flash -> {
+  "background_job_id": "bf2b4ed1-947b-419f-b083-7f7874597bef",
+  "image_id": "5eb8665f-7f64-5a34-b102-67e7635415ce",
+  "status": "processing",
+  "source_image_id": "5eb8665f-7f64-5a34-b102-67e7635415ce",
+  "job_id": "bf2b4ed1-947b-419f-b083-7f7874597bef",
+  "description": "Same woman as the source
