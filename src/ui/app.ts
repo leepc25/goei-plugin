@@ -33,7 +33,7 @@ import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
-import { elapsedText, evCard, peopleChips, type EvCard, type EvKind } from './evcard';
+import { elapsedText, evCard, evOpen, peopleChips, type EvCard, type EvKind } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
@@ -913,8 +913,6 @@ interface NavState {
   d?: string;
 }
 const navHist = new NavHistory<NavState>();
-/** 상황판에서 펼친 그림 카드 */
-const evOpen = new Set<string>();
 
 function navState(): NavState {
   const s: NavState = { tab };
@@ -1207,7 +1205,7 @@ function board(ctx: ChatContext): string {
   const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
   const one = (kind: EvKind, i: number, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
-    const id = `${kind}${i}:${c.name}`;
+    const id = key ?? `${kind}${i}:${c.name}`;
     return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), fold: { id, open: evOpen.has(id) } });
   };
   const an = w.an
@@ -1222,7 +1220,7 @@ function board(ctx: ChatContext): string {
     .map((e, i) => {
       const wait = e.state === '발생대기';
       const since = elapsedText(w.minute, e.since);
-      return one('in', i, { name: e.name || '이름 미확인', loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge: wait ? pending : '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit">${esc(e.situation)}</span>` : '' });
+      return one('in', i, { name: e.name || '이름 미확인', loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge: wait ? pending : '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit" title="${esc(e.situation)}">${esc(e.situation)}</span>` : '' });
     })
     .join('');
   const ms = w.ms

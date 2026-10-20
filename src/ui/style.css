@@ -1990,13 +1990,29 @@ button.mk-go:hover { color: var(--signal); }
   .gx-mx:not(.open) .gx-mx-art:hover::before { filter: saturate(1.05) brightness(1.08); transform: scale(1.03); }
 }
 .gx-mx:not(.open) .gx-mx-art { overflow: hidden; }
-/* 임무 탭 띠(펴지 않음, 2026-10-20 사용자): 상황판 접힌 띠와 같은 높이·겹친 얼굴. 사건은 요원 대신 상황 글 한 줄(전체는 마우스를 올리면) */
-.gx-evc.art.flat .gx-evart-cap { gap: 1px; }
-.gx-evc.art.flat .gx-evc-sit { display: block; font-size: 12px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-top { top: 6px; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart .gx-gmark { width: 24px; height: 24px; font-size: 12px; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-cap { bottom: 6px; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-name b { font-size: 15.5px; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-name { gap: 0; line-height: 1.2; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-top { top: 5px; }
-.gx-evc.art.flat:has(.gx-evc-sit) .gx-evart-cap { bottom: 5px; }
+/* 접힌 띠의 사건 상황 글 한 줄 (전체는 마우스를 올리거나 펼쳐서). 세 줄이 들어가게 위아래를 조금 줄인다 */
+.gx-evc.art:not(.open) .gx-evart-cap { gap: 1px; }
+.gx-evc.art:not(.open) .gx-evc-sit { display: block; font-size: 12px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-evc.art:not(.open):has(.gx-evc-sit) .gx-evart-top { top: 5px; }
+.gx-evc.art:not(.open):has(.gx-evc-sit) .gx-evart .gx-gmark { width: 24px; height: 24px; font-size: 12px; }
+.gx-evc.art:not(.open):has(.gx-evc-sit) .gx-evart-cap { bottom: 5px; }
+.gx-evc.art:not(.open):has(.gx-evc-sit) .gx-evart-name { gap: 0; line-height: 1.2; }
+.gx-evc.art:not(.open):has(.gx-evc-sit) .gx-evart-name b { font-size: 15.5px; }
+/* 임무 탭 상황 목록: 두 열이 따로 쌓여 한 장을 펴도 그 열만 길어진다 (2026-10-20 사용자). 모바일은 한 열 */
+.gx-evcols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; }
+.gx-evcols > .gx-evcs { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.gx-evplace { margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .gx-evcols { display: flex; flex-direction: column; align-items: stretch; }
+  .gx-evcols > .gx-evcs { display: contents; }
+}
+/* PC: 지도는 그대로 두고 상황 목록만 스크롤 (2026-10-20 사용자: 목록을 굴리면 지도까지 움직였다) */
+@media (min-width: 761px) {
+  .gx-field.gx-map > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
+  .gx-map > .gx-mapcol > .gx-canvas, .gx-map > .gx-mapcol > :not(.gx-sits) { flex: none; }
+  .gx-map > .gx-mapcol > .gx-sits { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .gx-map .gx-sits > .gx-sitbar, .gx-map .gx-sits > .gx-evplace { flex: none; }
+  /* 목록 칸이 남도록 지도는 본문 높이의 55%까지 */
+  .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 89px) * .55); }
+  .gx-map .gx-sits > .gx-evcols { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 2px; }
+}
