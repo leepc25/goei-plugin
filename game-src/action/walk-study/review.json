@@ -1,0 +1,21 @@
+{
+  "scope": "Stage 1: neutral to walking to neutral",
+  "status": "playable-review-not-accepted",
+  "source": "source.png",
+  "identityReference": "../production-v5/master-source.png",
+  "nativeNeutralHeight": 128,
+  "drawScale": 2,
+  "uniqueDrawings": 8,
+  "walkDrawings": 6,
+  "runtime": "Canonical action simulation and renderer, isolated movement-only scene",
+  "wholeBodyFrames": true,
+  "perFrameScaleAdjustment": false,
+  "browserValidation": "browser-validation.json",
+  "remainingVisualIssues": [
+    "Near/far leg ownership in opposite contact needs clearer overlap",
+    "Forward elbow remains more bent than intended",
+    "Lower row silhouettes are 123-124px versus neutral 128px; posture versus anatomical discrepancy requires redraw review",
+    "Body counterrotation is restrained; naturalness is not accepted solely because animation cycles"
+  ],
+  "nextStageAllowed": false
+}

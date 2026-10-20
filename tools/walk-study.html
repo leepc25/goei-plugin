@@ -1,0 +1,10 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쟈알디 — 정지·걷기 검수</title>
+<style>body{margin:0;background:#081018;color:#e9ecef;font:15px system-ui}main{max-width:1280px;margin:auto}header{padding:16px}h1{font-size:21px;margin:0 0 8px}p{margin:6px 0;color:#b7c8d6}canvas{display:block;width:100%;height:auto;image-rendering:pixelated;outline:none;background:#17232d}button,select{background:#263e50;color:#fff;border:1px solid #5f7e94;border-radius:5px;padding:9px 12px;margin:4px;cursor:pointer}label{margin:8px}.controls{display:flex;flex-wrap:wrap;align-items:center;padding:8px}#status{padding:10px 16px;background:#142331}.note{padding:0 16px 12px;color:#e8bf80}button[data-dir]{touch-action:none;min-width:65px}</style>
+<main><header><h1>1단계 · 정지 → 걷기 → 정지</h1><p>화면을 누른 뒤 방향키로 이동하세요. 파란 선은 바닥, 노란 선은 정지 자세의 정수리 기준입니다.</p></header>
+<canvas width="1280" height="720" tabindex="0" aria-label="방향키 걷기 검수 화면"></canvas>
+<div id="status">불러오는 중</div>
+<div class="controls"><button id="auto">정지·걷기 자동 반복</button><button id="pause">일시정지 / 재생</button><button id="next">다음 그림</button><select id="speed" aria-label="재생 속도"><option value="1">1배속</option><option value=".5">0.5배속</option><option value=".25">0.25배속</option></select><label><input type="checkbox" id="compare">정지 자세 겹쳐 보기</label><button data-dir="ArrowLeft">←</button><button data-dir="ArrowRight">→</button></div>
+<div id="frames" class="controls"><span>그림 선택:</span><button data-frame="0">정지</button><button data-frame="1">걷기 1</button><button data-frame="2">걷기 2</button><button data-frame="3">걷기 3</button><button data-frame="4">걷기 4</button><button data-frame="5">걷기 5</button><button data-frame="6">걷기 6</button><button data-frame="7">복귀</button></div>
+<p class="note">걷기 전용 검수판입니다. 같은 시트·같은 배율의 전신 그림을 재생합니다. 좌우 다리의 겹침과 팔꿈치 연결은 추가 검수 대상이며 최종 합격 처리하지 않았습니다.</p>
+</main><script>window.__GOEI_ACTION_ART__=__ART__</script><script type="importmap">__IMPORTS__</script><script type="module">import __ENTRY__;</script></html>
