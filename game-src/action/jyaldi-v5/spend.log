@@ -365,3 +365,23 @@ asset_id: 549e6e38-52a3-54ce-9c
   "image_id": "1f8030ce-79df-5376-9818-d1977d20c0d8",
   "status": "processing",
   "source_image_id": "1f8030ce-79df-5376-9818-d1977d20c
+17:03:55 sheet6 128 create_image_pro_flash -> {
+  "background_job_id": "454dd774-7911-4104-81c5-dbd924560b39",
+  "image_id": "6d5691bd-df09-57c2-b1af-efe59748f45a",
+  "status": "processing",
+  "source_image
+17:03:58 sheet6 128p create_image_pro_flash -> {
+  "background_job_id": "de50c1a5-f49f-436c-be83-7debd059e8e0",
+  "image_id": "5aa7de9b-051f-5bfc-94f0-80268efad396",
+  "status": "processing",
+  "source_image
+17:04:02 sheet6 160 create_image_pro_flash -> {
+  "background_job_id": "28bc093b-e108-4e97-b836-c2383ebde63d",
+  "image_id": "5001bfcc-164d-5808-9102-f191dafcce44",
+  "status": "processing",
+  "source_image
+17:04:13 sheet6 160p create_image_pro_flash -> {
+  "background_job_id": "9d577aac-60d2-4148-80fc-0303e4a34ff1",
+  "image_id": "2159f48b-a226-5e5b-8694-50cee0e0ae91",
+  "status": "processing",
+  "source_image
