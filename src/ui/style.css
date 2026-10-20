@@ -145,10 +145,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
 /* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
 .gx-logo.mob { display: none; }
-/* PC: 본문 첫 줄을 왼쪽 소속 패널 윗선 높이에 맞춘다 (v0.16.16). 머리 60px + 본문 위 여백 9px = 소속 패널 위치 */
+/* PC: 본문 첫 줄을 왼쪽 사원증 윗선 높이에 맞춘다 (v0.16.16, 2026-10-20 사원증 위치 18px에 다시 맞춤) */
 @media (min-width: 761px) {
   .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
-  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 9px; }
+  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
   .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
   .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
@@ -2209,7 +2209,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
 .gx-oppin:not(.sel) em { opacity: .85; font-size: 11px; }
 
-/* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로, 일지 제목줄 낮게 */
+/* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로 */
 .gx-oposd { flex-wrap: nowrap; align-items: center; gap: 10px; }
 .gx-oposd .cam { flex: 1 1 auto; flex-basis: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-oposd .ts { flex: none; }
@@ -2221,6 +2221,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opmapi { --w: max(100cqw, calc(100cqh * 1.25)); top: clamp(calc(100cqh - var(--w) * .8), calc(50cqh - var(--w) * .8 * var(--py) / 100), 0px); bottom: auto; left: clamp(calc(100cqw - var(--w)), calc(50cqw - var(--w) * var(--px) / 100), 0px); transform: none; width: var(--w); height: calc(var(--w) * .8); max-width: none; aspect-ratio: auto; transition: left .35s ease, top .35s ease; }
 .gx-opview.map::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(8, 12, 14, .55), transparent 70px); }
 @media (prefers-reduced-motion: reduce) { .gx-opmapi { transition: none; } }
-.gx-oplog > h2 { height: 38px; }
 .gx-oposd .rec { flex: none; white-space: nowrap; }
 @media (max-width: 760px) { .gx-oposd { font-size: 10px; letter-spacing: .04em; gap: 8px; } }
+/* 일지 칸: 일반 section 위 여백(14px)이 제목 위에 붙던 것 제거 */
+.gx-body .gx-oplog { padding: 0; margin: 0; }
