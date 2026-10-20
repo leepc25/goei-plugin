@@ -1,0 +1,28 @@
+{
+  "releaseReady": false,
+  "reference": "master-source.png",
+  "sources": {
+    "walk-guided-source.png": {
+      "method": "Generated full bodies with walk-planning-guide.png, an anatomical planning diagram, as a second reference",
+      "review": "Leg passing poses improve; near/far arm correspondence and torso consistency still fail final acceptance",
+      "runtimeIntegrated": false
+    },
+    "run-crouch-source.png": {
+      "review": "Opposite run contact repeats arm arrangement; crouch support-leg exchange unclear. Do not approve as complete gait",
+      "runtimeIntegrated": false
+    },
+    "melee-source.png": {
+      "review": "Cross and hook repeat arm ownership; rejected for final combo",
+      "runtimeIntegrated": false
+    },
+    "melee-revised-source.png": {
+      "review": "Torso rotation revised, but actual first/second/third arm sequence and stature against master remain unverified",
+      "runtimeIntegrated": false
+    },
+    "consumption-source.png": {
+      "review": "Complete food/drink bodies and prop contact present; cross-sheet head/body matching and native-pixel cleanup not accepted",
+      "runtimeIntegrated": false
+    }
+  },
+  "omissions": ["Complete consistent locomotion and combat cycles", "Grab/throw/victim animation", "Reload/bandage full-body animation", "All specified daily interactions and treatment variants", "Mission/headquarters/environment interactions", "Final animation viewer and performance validation"]
+}

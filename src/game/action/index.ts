@@ -17,6 +17,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
   root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
   <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접 · D 사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
   <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접</button><button data-hold="ranged">D 사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 Z 차기 · D 사격 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접 · D 사격 · F 자동 전투</p>`;
+  root.querySelector('.ga-controls')!.insertAdjacentHTML('beforeend','<button data-edge="reload">R 재장전</button><button data-edge="grab">G 잡기/던지기</button>');
+  root.querySelector('.ga-hud')!.insertAdjacentHTML('beforeend','<span data-ammo></span>');
   box.append(style, root);
   const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
   const canvas = $<HTMLCanvasElement>('canvas'),
@@ -67,6 +69,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     }))
       $<HTMLProgressElement>(`[data-meter="${name}"]`).value = value;
     text('[data-hp]', String(Math.ceil(p.hp)));
+    text('[data-ammo]', `탄약 ${p.ammo}/8 · 예비 ${p.reserve}`);
     text('[data-do="auto"]', run.auto ? 'F 자동 ON' : 'F 수동');
     text('.ga-msg', run.message);
     text(
@@ -74,7 +77,7 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
       saveError ? '저장 실패 · 재시도 중' : saving ? '저장 중' : dirty ? '진행 중' : '저장됨',
     );
     root.dataset.saveError = String(saveError);
-    ['Q 회복', 'W 방어', 'E 능력'].forEach((label, i) => {
+    ['Q 음식', 'W 붕대', 'E 음료'].forEach((label, i) => {
       const b = $<HTMLButtonElement>(`[data-item="${i}"]`);
       b.textContent = `${label} ${p.items[i]}`;
       b.disabled = run.phase !== 'combat' || p.items[i] <= 0;
@@ -154,6 +157,8 @@ export function mountAction(box: HTMLElement, host: GameHost): () => void {
     ShiftRight: 'run',
   };
   const once: Record<string, keyof Input> = {
+    KeyR: 'reload',
+    KeyG: 'grab',
     KeyX: 'jump',
     KeyC: 'skill',
     ShiftLeft: 'dash',

@@ -86,16 +86,77 @@ test('방향키의 대각 이동이 더 빠르지 않고 점프와 공격을 함
 });
 test('소모품은 효과가 있을 때만 쓰고 종류별 자원을 복구한다', () => {
   const r = newRun();
+  r.practice=true;
   step(r, { x: 0, y: 0, item: 0 }, 1 / 60);
   assert.equal(r.player.items[0], 3);
   r.player.hp = 100;
   step(r, { x: 0, y: 0, item: 0 }, 1 / 60);
+  assert.equal(r.player.hp, 100);
+  assert.equal(r.player.items[0],3);
+  tick(r,0.8);
   assert.equal(r.player.hp, 170);
   assert.equal(r.player.items[0], 2);
   r.player.energy = 10;
+  tick(r,0.4);
   step(r, { x: 0, y: 0, item: 2 }, 1 / 60);
+  tick(r,0.9);
   assert.equal(r.player.energy, 100);
   assert.equal(r.player.items[2], 1);
+});
+
+test('잔탄·재장전은 지정 이벤트에 한 번 적용되고 도중 저장이 이어진다',()=>{
+  const r=newRun();r.practice=true;r.player.ammo=1;
+  step(r,{x:0,y:0,ranged:true},1/60);tick(r,.3);
+  assert.equal(r.player.ammo,0);
+  step(r,{x:0,y:0,ranged:true},1/60);assert.equal(r.player.act,'dryfire');tick(r,.3);
+  step(r,{x:0,y:0,reload:true},1/60);tick(r,.4);
+  assert.equal(r.player.ammo,0);
+  const restored=restore(serialize(r));assert.ok(restored);
+  tick(restored,.6);assert.equal(restored.player.ammo,8);assert.equal(restored.player.reserve,24);
+  tick(restored,.5);assert.equal(restored.player.reserve,24);
+});
+
+test('섭취 접촉 전에 중단하면 소비와 회복이 없고 접촉 후에는 되돌리지 않는다',()=>{
+  for(const before of [true,false]){
+    const r=newRun();r.practice=true;r.player.hp=100;
+    step(r,{x:0,y:0,item:0},1/60);tick(r,before?.2:.8);
+    bullet(r);step(r,{x:0,y:0},1/60);tick(r,1);
+    assert.equal(r.player.items[0],before?3:2);
+    assert.equal(r.player.hp,before?88:158);
+  }
+});
+
+test('잡기 유지·타격·반대 던지기·착지·기상과 실패를 처리한다',()=>{
+  const r=newRun();r.practice=true;
+  const e=r.enemies[0];e.x=r.player.x+60;e.y=r.player.y;e.hp=e.max=500;
+  step(r,{x:0,y:0,grab:true},1/60);tick(r,.3);
+  assert.equal(r.player.act,'grabhold');assert.equal(e.act,'grabbed');
+  assert.ok(restore(serialize(r)));
+  step(r,{x:0,y:0,attack:true},1/60);tick(r,.5);
+  assert.equal(e.hp,488);
+  step(r,{x:-1,y:0,grab:true},1/60);
+  assert.equal(e.act,'thrown');assert.ok(e.vz>0);assert.ok(e.push<0);
+  tick(r,1);assert.equal(e.hp,453);assert.equal(e.act,'down');
+  tick(r,1.4);assert.equal(e.act,'idle');
+  e.x=1200;step(r,{x:0,y:0,grab:true},1/60);assert.equal(r.player.heldTarget,null);
+});
+
+test('잡기는 시간 초과와 피격에 풀리고 재장전은 접촉 전에 중단 가능하다',()=>{
+  for(const interrupt of [true,false]){
+    const r=newRun();r.practice=true;const e=r.enemies[0];e.x=r.player.x+60;e.y=r.player.y;
+    step(r,{x:0,y:0,grab:true},1/60);tick(r,.3);
+    if(interrupt){bullet(r);step(r,{x:0,y:0},1/60);tick(r,.2);}else tick(r,3);
+    assert.equal(r.player.heldTarget,null);assert.notEqual(e.act,'grabbed');
+  }
+  const r=newRun();r.practice=true;r.player.ammo=0;
+  step(r,{x:0,y:0,reload:true},1/60);tick(r,.3);bullet(r);step(r,{x:0,y:0},1/60);tick(r,1);
+  assert.equal(r.player.ammo,0);assert.equal(r.player.reserve,32);
+});
+
+test('원거리 적도 탄창이 비면 사격 대신 재장전하고 예비탄을 소비한다',()=>{
+  const r=newRun();const e=r.enemies[1];e.ammo=0;e.x=r.player.x+300;e.y=r.player.y;
+  step(r,{x:0,y:0},1/60);assert.equal(e.act,'reload');
+  tick(r,.85);assert.equal(e.ammo,8);assert.equal(e.reserve,24);
 });
 test('적은 준비 동작 후 공격하고 치명상은 후송으로 끝난다', () => {
   const r = newRun();

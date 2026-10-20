@@ -11,8 +11,9 @@
     "runtimeIntegrated": "Six representative poses in jyaldi-v5-playable-preview.html; not full animation",
     "completeAnimationClips": 0
   },
-  "implemented": ["Separate melee Z and ranged D inputs including touch buttons", "Distance-independent ground/air attack selection"],
-  "validation": {"simulationTestsPassed": 17, "typecheck": "not run: compiler unavailable", "browser": "Offline load, keyboard walk/run/crouch/shoot/combo-third-hit and correct atlas frames pass; no page errors"},
+  "implemented": ["Separate melee Z and ranged D inputs including touch buttons", "Distance-independent ground/air attack selection", "Player and ranged enemy magazines/reserve/reload events and interruption", "Grab attempt/hold/strike/release/timeout/throw/landing and collateral collision", "Timed food/drink/bandage consumption with pre/post-event interruption", "Version 5 saves and migration from versions 1-4"],
+  "validation": {"simulationTestsPassed": 22, "typecheck": "TypeScript 5.9.3 full project passed", "browser": "Previous six-pose preview only; new action artwork not integrated or accepted"},
+  "completion": "NOT COMPLETE: required art consistency and action coverage not met; do not label the six-pose demo or new sources as final",
   "next": [
     "Validate master and representative poses at fixed native 128px scale",
     "Create full-body idle, walking, running, crouch walking and alternating-arm melee cycles",

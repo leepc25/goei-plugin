@@ -3,7 +3,7 @@ import { ATTACK, isStrike, strikeContact, strikeDuration } from './motion';
 /** 방 하나의 1인 전투 검증판. DOM/호스트와 무관한 고정 시간 시뮬레이션. */
 export const WIDTH = 1280,
   HEIGHT = 720,
-  SAVE_VERSION = 4;
+  SAVE_VERSION = 5;
 export type Act =
   | 'idle'
   | 'walk'
@@ -30,6 +30,7 @@ export type Act =
   | 'down'
   | 'rise'
   | 'dead';
+export type ExtendedAct = 'reload' | 'dryfire' | 'grab' | 'grabhold' | 'grabstrike' | 'throw' | 'grabbed' | 'thrown' | 'eat' | 'drink' | 'bandage';
 export interface Body {
   id: number;
   kind: 'jyaldi' | 'corner' | 'watchman';
@@ -40,7 +41,7 @@ export interface Body {
   dir: number;
   hp: number;
   max: number;
-  act: Act;
+  act: Act | ExtendedAct;
   t: number;
   duration: number;
   fired: boolean;
@@ -51,6 +52,8 @@ export interface Body {
   stride: number;
   speed: number;
   push: number;
+  ammo: number;
+  reserve: number;
 }
 export interface Player extends Body {
   energy: number;
@@ -60,6 +63,9 @@ export interface Player extends Body {
   items: number[];
   attackBuffer: number;
   crouching: boolean;
+  heldTarget: number | null;
+  holdTime: number;
+  usingItem: number | null;
 }
 export interface Bolt {
   id: number;
@@ -100,6 +106,8 @@ export interface Input {
   y: number;
   attack?: boolean;
   ranged?: boolean;
+  reload?: boolean;
+  grab?: boolean;
   run?: boolean;
   jump?: boolean;
   dash?: boolean;
@@ -130,6 +138,8 @@ const body = (id: number, kind: Body['kind'], x: number, y: number, hp: number):
   stride: 0,
   speed: 0,
   push: 0,
+  ammo: 8,
+  reserve: 32,
 });
 export function newRun(): Run {
   return {
@@ -143,6 +153,11 @@ export function newRun(): Run {
       items: [3, 2, 2],
       attackBuffer: 0,
       crouching: false,
+      ammo: 8,
+      reserve: 32,
+      heldTarget: null,
+      holdTime: 0,
+      usingItem: null,
     },
     enemies: [
       body(2, 'corner', 760, 480, 130),
@@ -159,7 +174,7 @@ export function newRun(): Run {
     cutin: 0,
     hitstop: 0,
     kills: 0,
-    message: 'Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기',
+    message: 'Z 근접 · D 권총 · R 재장전 · G 잡기 / Shift 유지 달리기',
     shake: 0,
     practice: false,
   };
@@ -184,7 +199,7 @@ export function practiceRun(): Run {
   r.kills = 3;
   return r;
 }
-function act(b: Body, name: Act, duration: number) {
+function act(b: Body, name: Act | ExtendedAct, duration: number) {
   b.act = name;
   b.t = 0;
   b.duration = duration;
@@ -223,6 +238,12 @@ function damage(
       r.message = '가드 붕괴! 거리를 확보하세요.';
     }
     return false;
+  }
+  if(p.heldTarget!==null && (b===p || b.id===p.heldTarget)){
+    const held=r.enemies.find(e=>e.id===p.heldTarget);
+    if(held?.act==='grabbed')act(held,'hurt',0.2);
+    p.heldTarget=null;
+    if(b!==p && ['grab','grabhold','grabstrike'].includes(p.act))act(p,'idle',0);
   }
   b.hp = Math.max(0, b.hp - amount);
   b.flash = 0.12;
@@ -293,20 +314,11 @@ function bolt(r: Run, b: Body, enemy: boolean) {
 function item(r: Run, i: number) {
   const p = r.player;
   if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
-  if (i === 0) {
-    if (p.hp >= p.max) return;
-    p.hp = Math.min(p.max, p.hp + 70);
-  }
-  if (i === 1) {
-    if (p.guard >= 100) return;
-    p.guard = 100;
-  }
-  if (i === 2) {
-    if (p.energy >= 100) return;
-    p.energy = 100;
-  }
-  p.items[i]--;
-  r.message = ['회복제 사용', '방어 회복제 사용', '능력 회복제 사용'][i];
+  if (!['idle','walk','run','crouch'].includes(p.act) || p.z || p.vz) return;
+  if ((i===0 && p.hp>=p.max) || (i===1 && p.guard>=100) || (i===2 && p.energy>=100)) return;
+  p.usingItem=i;
+  act(p, (['eat','bandage','drink'] as const)[i], [1.1,1.8,1.3][i]);
+  r.message = ['음식 먹기','붕대 감기','음료 마시기'][i];
 }
 /** 자동도 같은 명령과 사거리·재사용 대기시간을 사용한다. */
 export function autoInput(r: Run): Input {
@@ -327,6 +339,7 @@ export function autoInput(r: Run): Input {
     y: threat ? (p.y > 540 ? -1 : 1) : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
     attack: Math.abs(dy) < 26 && Math.abs(dx) < 120,
     ranged: Math.abs(dy) < 26 && Math.abs(dx) > 360 && r.time % 1.8 < 0.45,
+    reload: p.ammo===0 && p.reserve>0,
     skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
     dash: !!threat,
     ult: p.gauge >= 100 && live.length >= 2,
@@ -356,13 +369,37 @@ export function step(r: Run, raw: Input, dt: number) {
     return;
   }
   r.time += dt;
+  if (p.usingItem !== null && !['eat','drink','bandage'].includes(p.act)) p.usingItem=null;
   for (const b of [p, ...r.enemies]) {
     b.t += dt;
+    if (!b.fired && b.act==='reload' && b.t>=0.8) {
+      const count=Math.min(8-b.ammo,b.reserve);
+      b.ammo+=count; b.reserve-=count; b.fired=true;
+      if(b===p)r.message=`장전 완료 · ${p.ammo}/8 · 예비 ${p.reserve}`;
+    }
+    if (b===p && p.usingItem!==null && ['eat','drink','bandage'].includes(b.act) && !b.fired && b.t>=b.duration*0.65) {
+      const i=p.usingItem;
+      if(p.items[i]>0){
+        p.items[i]--;
+        if(i===0)p.hp=Math.min(p.max,p.hp+70);
+        if(i===1)p.guard=100;
+        if(i===2)p.energy=100;
+      }
+      b.fired=true;
+    }
     b.inv = Math.max(0, b.inv - dt);
     b.flash = Math.max(0, b.flash - dt);
     b.cooldown = Math.max(0, b.cooldown - dt);
     if (b.push) {
-      b.x = clamp(b.x + b.push * dt, 55, WIDTH - 55);
+      const oldX=b.x, nextX=b.x + b.push * dt;
+      b.x = clamp(nextX, 55, WIDTH - 55);
+      if(b.act==='thrown'){
+        if(!b.fired){
+          const struck=r.enemies.find(e=>e!==b && e.hp>0 && Math.abs(e.y-b.y)<28 && Math.abs(e.z-b.z)<100 && e.x>=Math.min(oldX,b.x)-24 && e.x<=Math.max(oldX,b.x)+24);
+          if(struck){b.fired=true;damage(r,struck,22,{...p,dir:Math.sign(b.push)},true);}
+        }
+        if(nextX!==b.x){damage(r,b,35,{...p,dir:Math.sign(b.push)},true);b.z=0;b.vz=0;}
+      }
       b.push *= Math.exp(-dt * 10);
       if (Math.abs(b.push) < 1) b.push = 0;
     }
@@ -371,6 +408,11 @@ export function step(r: Run, raw: Input, dt: number) {
       b.z = Math.max(0, b.z + b.vz * dt);
       if (!b.z) {
         b.vz = 0;
+        if(b.act==='thrown'){
+          damage(r,b,35,p,true,0.08,15);
+          if(b.hp>0)act(b,'down',0.9);
+          fx(r,'hit',b.x,b.y,15);
+        }
         if (b === p && ['jump', 'walk', 'run', 'idle', 'airattack', 'shot'].includes(b.act))
           act(b, 'land', 0.12);
       }
@@ -379,9 +421,13 @@ export function step(r: Run, raw: Input, dt: number) {
       act(b, 'rise', 0.35);
       b.inv = 0.55;
     } else if (
-      !['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch', 'crouchwalk'].includes(b.act) &&
+      !['dead', 'idle', 'walk', 'run', 'jump', 'guard', 'crouch', 'crouchwalk','grabhold','grabbed','thrown'].includes(b.act) &&
       b.t >= b.duration
     ) {
+      if(b===p && (b.act==='grab' || b.act==='grabstrike') && p.heldTarget!==null){
+        act(p,'grabhold',0);
+        continue;
+      }
       const next =
         b === p && p.attackBuffer > 0 && b.z === 0 && b.act === 'melee1'
           ? 'melee2'
@@ -402,6 +448,30 @@ export function step(r: Run, raw: Input, dt: number) {
   p.dashCd = Math.max(0, p.dashCd - dt);
   if (p.act !== 'guard' && p.act !== 'crouch') p.guard = Math.min(100, p.guard + dt * 15);
   if (input.item !== undefined) item(r, input.item);
+  if(p.heldTarget!==null){
+    const target=r.enemies.find(e=>e.id===p.heldTarget);
+    p.holdTime+=dt;
+    if(!target || target.hp<=0 || !['grab','grabhold','grabstrike'].includes(p.act) || target.act!=='grabbed' || p.holdTime>=3){
+      if(target?.act==='grabbed'){act(target,'hurt',0.2);target.inv=0.3;}
+      p.heldTarget=null;
+      if(['grab','grabhold','grabstrike'].includes(p.act))act(p,'idle',0);
+    }else{
+      target.x=clamp(p.x+p.dir*52,55,WIDTH-55); target.y=p.y; target.dir=-p.dir;
+      if(p.act==='grabhold' && input.grab){
+        p.heldTarget=null;
+        if(input.x || input.y){
+          const dir=input.x ? Math.sign(input.x) : p.dir;
+          p.dir=dir;target.dir=dir;target.z=16;target.vz=350;target.push=dir*1100;
+          act(target,'thrown',3);act(p,'throw',0.55);r.message='던지기';
+        }else{act(target,'hurt',0.2);act(p,'idle',0);r.message='잡기 해제';}
+      }else if(p.act==='grabhold' && p.attackBuffer>0){
+        act(p,'grabstrike',0.45);p.attackBuffer=0;
+      }else if(p.act==='grabstrike' && p.t>=0.18 && !p.fired){
+        p.fired=true;target.hp=Math.max(0,target.hp-12);fx(r,'hit',target.x,target.y,160);r.hitstop=0.035;
+        if(!target.hp){act(target,'dead',1);r.kills++;p.heldTarget=null;}
+      }
+    }
+  }
   if (['idle', 'walk', 'run', 'jump', 'guard', 'crouch', 'crouchwalk'].includes(p.act)) {
     if (r.auto) {
       const target = r.enemies
@@ -416,7 +486,14 @@ export function step(r: Run, raw: Input, dt: number) {
     }
     if (input.guard && input.y > 0 && !p.z && !p.vz) p.crouching = true;
     if (!input.guard) p.crouching = false;
-    if (input.ult && p.gauge >= 100) {
+    if(input.reload && p.ammo<8 && p.reserve>0 && !p.z && !p.vz){
+      act(p,'reload',1.15);r.message='탄창 교체 중';
+    } else if(input.grab && !p.z && !p.vz){
+      const target=r.enemies.filter(e=>e.hp>0 && !['down','rise','thrown'].includes(e.act) && e.z===0 && facing(p,e) && Math.abs(e.x-p.x)<85 && Math.abs(e.y-p.y)<28).sort((a,b)=>Math.abs(a.x-p.x)-Math.abs(b.x-p.x))[0];
+      act(p,'grab',0.28);
+      if(target){p.heldTarget=target.id;p.holdTime=0;act(target,'grabbed',3);r.message='잡기 · Z 타격 · 방향+G 던지기 · G 놓기';}
+      else r.message='잡기 실패 · 대상에게 가까이 접근';
+    } else if (input.ult && p.gauge >= 100) {
       p.gauge = 0;
       act(p, 'ult', 0.9);
       p.armor = true;
@@ -451,8 +528,9 @@ export function step(r: Run, raw: Input, dt: number) {
         p.cooldown = 0;
       }
     } else if (input.ranged && p.cooldown <= 0) {
-      act(p, 'shot', 0.24);
+      act(p, p.ammo>0 ? 'shot':'dryfire', 0.24);
       p.cooldown = 0.28;
+      if(!p.ammo)r.message='탄창이 비었습니다 · R 재장전';
     } else {
       const x = clamp(input.x, -1, 1),
         y = clamp(input.y, -1, 1);
@@ -513,7 +591,7 @@ export function step(r: Run, raw: Input, dt: number) {
   }
   if (p.act === 'shot' && p.t >= 0.03 && !p.fired) {
     p.fired = true;
-    bolt(r, p, false);
+    if(p.ammo>0){p.ammo--;bolt(r, p, false);}
   }
   if ((p.act === 'skill' || p.act === 'ult') && p.t >= (p.act === 'ult' ? 0.3 : 0.14) && !p.fired) {
     p.fired = true;
@@ -530,11 +608,11 @@ export function step(r: Run, raw: Input, dt: number) {
   }
   for (const e of r.enemies) {
     if (r.practice) continue;
-    if (e.hp <= 0 || ['hurt', 'down', 'rise'].includes(e.act)) continue;
+    if (e.hp <= 0 || ['hurt', 'down', 'rise','grabbed','thrown','reload'].includes(e.act)) continue;
     if (e.act === 'shot') {
       if (!e.fired && e.t >= e.duration - 0.12) {
         e.fired = true;
-        if (e.kind === 'watchman') bolt(r, e, true);
+        if (e.kind === 'watchman') {if(e.ammo>0){e.ammo--;bolt(r,e,true);}}
         else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
           damage(r, p, 16, e, true);
       }
@@ -544,6 +622,8 @@ export function step(r: Run, raw: Input, dt: number) {
       dy = p.y - e.y,
       range = e.kind === 'watchman' ? 550 : 90;
     e.dir = dx >= 0 ? 1 : -1;
+    if(e.kind==='watchman' && !e.ammo && e.reserve>0){act(e,'reload',1.2);continue;}
+    if(e.kind==='watchman' && !e.ammo && !e.reserve){e.act='guard';continue;}
     if (Math.abs(dx) < range && Math.abs(dy) < 25 && e.cooldown <= 0) {
       act(e, 'shot', e.kind === 'watchman' ? 0.85 : 0.65);
       e.cooldown = e.kind === 'watchman' ? 1.7 : 1.2;
@@ -604,6 +684,11 @@ export function restore(raw: string | null): Run | null {
   try {
     if (!raw || raw.length > 120_000) return null;
     const r = JSON.parse(raw) as Run;
+    if([1,2,3,4].includes(r?.version) && r.player){
+      r.player.ammo=8;r.player.reserve=32;r.player.heldTarget=null;r.player.holdTime=0;r.player.usingItem=null;
+      for(const enemy of r.enemies ?? []){enemy.ammo=8;enemy.reserve=32;}
+      if(r.version===4)r.version=SAVE_VERSION;
+    }
     if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
       for (const b of [r.player, ...r.enemies]) {
         b.stride = b.stride ?? 0;
@@ -620,7 +705,8 @@ export function restore(raw: string | null): Run | null {
     }
     const finite = (n: unknown, lo: number, hi: number) =>
       typeof n === 'number' && Number.isFinite(n) && n >= lo && n <= hi;
-    const actions: Act[] = [
+    const actions: (Act | ExtendedAct)[] = [
+      'reload','dryfire','grab','grabhold','grabstrike','throw','grabbed','thrown','eat','drink','bandage',
       'idle',
       'walk',
       'run',
@@ -669,7 +755,9 @@ export function restore(raw: string | null): Run | null {
       typeof b.armor === 'boolean' &&
       finite(b.stride, 0, 1) &&
       finite(b.speed, 0, 1200) &&
-      finite(b.push, -1200, 1200);
+      finite(b.push, -1200, 1200) &&
+      Number.isInteger(b.ammo) && finite(b.ammo,0,8) &&
+      Number.isInteger(b.reserve) && finite(b.reserve,0,999);
     if (
       !r ||
       r.version !== SAVE_VERSION ||
@@ -683,6 +771,11 @@ export function restore(raw: string | null): Run | null {
       return null;
     const p = r.player;
     if (
+      !Number.isInteger(p.ammo) || !finite(p.ammo,0,8) ||
+      !Number.isInteger(p.reserve) || !finite(p.reserve,0,999) ||
+      !(p.heldTarget===null || r.enemies.some(e=>e.id===p.heldTarget && e.act==='grabbed' && e.hp>0)) ||
+      !finite(p.holdTime,0,4) ||
+      !(p.usingItem===null || (Number.isInteger(p.usingItem) && finite(p.usingItem,0,2))) ||
       ![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) ||
       !finite(p.dashCd, 0, 10) ||
       !finite(p.attackBuffer, 0, 0.13) ||
