@@ -2084,3 +2084,19 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evart-l1 > .gx-evc-st { margin-left: auto; align-self: center; }
 .gx-evc.art.open .gx-evart-l1 { align-items: flex-start; }
 .gx-evc.art.open .gx-evart-l1 > .gx-evc-st { margin-top: 3px; }
+
+/* 2026-10-20 사용자: 상태 상자 없이. 상태는 카드 색·경과 시간, 다를 때만 둘째 줄 글. 투입은 오른쪽 동그란 얼굴 */
+.gx-evc-note { flex: none; font-size: 11.5px; font-weight: 600; font-style: normal; line-height: 1; color: rgba(255, 255, 255, .62); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evc-note::before { content: "·"; margin: 0 5px; color: rgba(255, 255, 255, .5); }
+.gx-evc-note.op { color: #c9b8ff; }
+.gx-evart-l2 { gap: 0; }
+.gx-evfaces { position: absolute; z-index: 2; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; }
+.gx-evface { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: rgba(10, 14, 16, .75); color: rgba(255, 255, 255, .85); box-shadow: 0 0 0 2px rgba(10, 14, 16, .9), 0 2px 6px rgba(0, 0, 0, .5); font: 700 12px/1 var(--mono); }
+.gx-evface + .gx-evface { margin-left: -10px; }
+.gx-evface > .gx-ava { width: 100%; height: 100%; border-radius: 50%; }
+.gx-evface svg { width: 17px; height: 17px; }
+.gx-evface.none { background: rgba(10, 14, 16, .4); color: rgba(255, 255, 255, .4); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .35); outline: 0; }
+.gx-evface.none { border: 1.5px dashed rgba(255, 255, 255, .45); box-shadow: none; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces) > .gx-evart-cap { right: 74px; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces .gx-evface:nth-child(2)) > .gx-evart-cap { right: 98px; }
+.gx-evc.art:not(.open) .gx-evart:has(> .gx-evfaces .gx-evface:nth-child(3)) > .gx-evart-cap { right: 122px; }

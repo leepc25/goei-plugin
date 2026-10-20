@@ -64,20 +64,27 @@ function gradeMark(c: EvCard): string {
 }
 const artBg = (c: EvCard) => (c.art?.pic ? ` style="background-image:url('${esc(c.art.pic)}')"` : '');
 const artIco = (c: EvCard) => (c.art?.pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`);
-/** 상태+투입 한 딱지 (2026-10-20 사용자): 상태 글 │ 투입 표시. 이름 줄 오른쪽 끝, 폭 고정. 투입은 자세히가 아니라 있다·없다와 규모만.
- *  요원과 조직을 같이 세면 겹쳐 세기 쉬워서(관리국 + 관리국 요원) 요원이 있으면 요원 수만, 없을 때만 조직 표시 */
-function stateTag(c: EvCard): string {
-  const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
-  const others = (c.chips?.match(/class="gx-badge"/g) ?? []).length;
+/** 상태 글 상자는 두지 않는다 (2026-10-20 사용자: 상자 때문에 상황판 같지 않다).
+ *  진행 중이면 카드 색과 경과 시간이 곧 상태라 글이 없고, 예정·대기·탐사 중처럼 다를 때만 둘째 줄에 짧게 */
+function statusNote(c: EvCard): string {
+  const text = c.badge.replace(/<[^>]+>/g, '').trim();
+  if (!c.key) return text ? `<em class="gx-evc-note wait">${esc(text)}</em>` : '';
+  return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc(text)}</em>` : '';
+}
+/** 투입 표시: 오른쪽에 동그란 얼굴을 겹쳐 세운다. 요원 아닌 이름(조직·외부인)은 조직 동그라미, 아무도 없으면 빈 점선 동그라미 */
+function faces(c: EvCard): string {
+  if (!c.key) return '';
+  const items = (c.chips ?? '').match(/<span class="gx-(?:pchip|badge)">[\s\S]*?<\/span>(?=<span class="gx-(?:pchip|badge)">|$)/g) ?? [];
   const verb = c.kind === 'ms' ? '방문' : '투입';
-  const dep = !c.key
-    ? ''
-    : agentsIn
-      ? `<span class="gx-evc-dep" title="${verb}: 요원 ${agentsIn}명">${ICONS.person}<b>${agentsIn}</b></span>`
-      : others
-        ? `<span class="gx-evc-dep" title="${verb}: 요원 아닌 인원·조직">${ICONS.org}</span>`
-        : `<span class="gx-evc-dep none">${c.kind === 'ms' ? '미방문' : '미투입'}</span>`;
-  return `<span class="gx-evc-st">${c.badge}${dep}</span>`;
+  if (!items.length) return `<span class="gx-evfaces"><span class="gx-evface none" title="${c.kind === 'ms' ? '미방문' : '미투입'}">${ICONS.person}</span></span>`;
+  // 조직·외부인은 몇이든 동그라미 하나 (사람 수처럼 세면 관리국 + 관리국 요원이 겹친다)
+  const strip = (h: string) => h.replace(/<[^>]+>/g, '').trim();
+  const people = items.filter((h) => h.startsWith('<span class="gx-pchip">'));
+  const orgs = items.filter((h) => !h.startsWith('<span class="gx-pchip">')).map(strip);
+  const shown = people.map((h) => `<span class="gx-evface" title="${esc(strip(h))}">${h.replace(/^<span class="gx-pchip">/, '').replace(/[^>]*<\/span>$/, '')}</span>`);
+  if (orgs.length) shown.push(`<span class="gx-evface org" title="${esc(orgs.join(', '))}">${ICONS.org}</span>`);
+  const list = shown.length > 3 ? [...shown.slice(0, 2), `<span class="gx-evface more">+${shown.length - 2}</span>`] : shown;
+  return `<span class="gx-evfaces" title="${verb}: ${esc(items.map(strip).join(', '))}">${list.join('')}</span>`;
 }
 
 /** 그림 카드 (2026-10-20 사용자): 상황판·임무 탭 모두 같은 띠. 누르면 상세 창.
@@ -87,11 +94,10 @@ function artCard(c: EvCard): string {
   // 이름 미확인도 창을 띄운다: 종료·지도 버튼이 창에만 있어서 (2026-10-20 사용자: 띠에 남은 ×가 어색했다)
   if (c.pop) seen.set(c.pop, c);
   const act = c.pop ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
-  const state = stateTag(c);
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${state}</span><span class="gx-evart-l2"><small>${c.loc}</small></span>${line3}</span>
+      ${faces(c)}<span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
     </div></li>`;
 }
 
@@ -115,7 +121,7 @@ export function evPopup(): string {
     <div class="gx-evc art open ev-pop${c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${stateTag(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small></span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
 }
 
