@@ -58,7 +58,7 @@ const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:imag
 const $ = id => document.getElementById(id);
 
 // ---- 바닥 면 (벨트스크롤): z 0 = 먼 쪽, 1 = 가까운 쪽 ----
-const FAR_Y = 430, NEAR_Y = 690;
+const FAR_Y = 390, NEAR_Y = 690;
 const groundY = z => FAR_Y + (NEAR_Y - FAR_Y) * z;
 const MAG = 8, CLIPS_START = 2;
 
@@ -121,7 +121,7 @@ function onKey(code, down) {
     case 'KeyQ': G.fight = true; G.aim = false; G.guard = true; play('guard', { lock: true }); break;
     case 'KeyW': G.fight = true; G.aim = false; play('ult', { lock: true }); break;
     case 'KeyH': G.fight = true; G.aim = false; if (G.guard) { play('guardhit', { lock: true }); G.vx = -3; } else { play('hit', { lock: true }); G.vx = -4; } break;
-    case 'KeyK': G.fight = true; G.aim = false; G.guard = false; G.down = true; G.vx = -11; G.vy = -7; G.y = -0.01; play('down', { lock: true }); break;
+    case 'KeyK': G.fight = true; G.aim = false; G.guard = false; G.down = true; G.vx = -13; G.vy = -14; G.y = -0.01; play('down', { lock: true }); break;
   }
 }
 addEventListener('keydown', e => { if (e.repeat) return; if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'ShiftLeft', 'ShiftRight'].includes(e.code)) e.preventDefault(); onKey(e.code, true); });
@@ -260,20 +260,20 @@ function draw() {
   const shk = FX.shake > 0 && $('fx').checked ? FX.shake * 60 : 0;
   ctx.translate(Math.round((Math.random() - 0.5) * shk), Math.round((Math.random() - 0.5) * shk));
   if (bgMode === 'corr' && bgImg.complete && bgImg.naturalWidth) {
-    const s = FAR_Y / bgImg.naturalHeight, w = bgImg.naturalWidth * s;
-    for (let x = -((G.x * 0.2) % w); x < 1300; x += w) ctx.drawImage(bgImg, x, 0, w, FAR_Y);
-  } else { ctx.fillStyle = bgMode === 'dark' ? '#080a0e' : '#5a6470'; ctx.fillRect(-20, -20, 1320, 760); }
-  // 바닥 면
-  const fl = ctx.createLinearGradient(0, FAR_Y, 0, 720);
-  if (bgMode === 'dark') { fl.addColorStop(0, '#15181d'); fl.addColorStop(1, '#0b0d10'); }
-  else if (bgMode === 'grey') { fl.addColorStop(0, '#4c545c'); fl.addColorStop(1, '#3a4148'); }
-  else { fl.addColorStop(0, '#3a3f46'); fl.addColorStop(1, '#262a30'); }
-  ctx.fillStyle = fl; ctx.fillRect(-20, FAR_Y, 1320, 720 - FAR_Y + 20);
-  ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 2;
-  for (let i = 0; i <= 4; i++) { const y = groundY(i / 4); ctx.beginPath(); ctx.moveTo(-20, y); ctx.lineTo(1300, y); ctx.stroke(); }
-  const off = (G.x * 0.5) % 160;
-  for (let x = -off - 160; x < 1300; x += 160) { ctx.beginPath(); ctx.moveTo(x, FAR_Y); ctx.lineTo(x - 40, 720); ctx.stroke(); }
-  ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.moveTo(-20, FAR_Y); ctx.lineTo(1300, FAR_Y); ctx.stroke();
+    // 복도 그림은 자체 바닥(세로 50% 아래)이 있으니 그대로 바닥 면으로 쓴다
+    const s = 740 / bgImg.naturalHeight, w = bgImg.naturalWidth * s;
+    for (let x = -((G.x * 0.3) % w) - 10; x < 1300; x += w) ctx.drawImage(bgImg, x, -10, w, 740);
+  } else {
+    ctx.fillStyle = bgMode === 'dark' ? '#080a0e' : '#5a6470'; ctx.fillRect(-20, -20, 1320, 760);
+    const fl = ctx.createLinearGradient(0, FAR_Y, 0, 720);
+    if (bgMode === 'dark') { fl.addColorStop(0, '#15181d'); fl.addColorStop(1, '#0b0d10'); } else { fl.addColorStop(0, '#4c545c'); fl.addColorStop(1, '#3a4148'); }
+    ctx.fillStyle = fl; ctx.fillRect(-20, FAR_Y, 1320, 720 - FAR_Y + 20);
+    ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.lineWidth = 2;
+    for (let i = 0; i <= 4; i++) { const y = groundY(i / 4); ctx.beginPath(); ctx.moveTo(-20, y); ctx.lineTo(1300, y); ctx.stroke(); }
+    const off = (G.x * 0.5) % 160;
+    for (let x = -off - 160; x < 1300; x += 160) { ctx.beginPath(); ctx.moveTo(x, FAR_Y); ctx.lineTo(x - 40, 720); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.moveTo(-20, FAR_Y); ctx.lineTo(1300, FAR_Y); ctx.stroke();
+  }
   // 깊이 순서로 그리기
   const rim = $('rim').checked && bgMode !== 'grey';
   const order = [{ z: E.z, fn: drawEnemy }, { z: G.z, fn: drawPlayer }].sort((a, b) => a.z - b.z);
