@@ -1980,13 +1980,13 @@ button.mk-go:hover { color: var(--signal); }
   .gx-evart { height: 84px; }
   .gx-evc.art:not(.open) .gx-evart-top { top: 6px; }
 }
-/* 커스텀 접힌 띠 (2026-10-20 사용자: 이름이 잘리고 그림이 날것이라 정신없다).
+/* 커스텀 접힌 띠 (2026-10-20 사용자: 이름이 잘리고 그림이 날것이라 정신없다 → 너무 어두우니 오른쪽은 밝게).
    그림은 ::before에 채도·밝기를 낮춰 깔고, 왼쪽부터 짙은 그라데이션 위에 이름을 세로 가운데로. 마우스를 올리면 그림이 살아난다 */
-.gx-mx:not(.open) .gx-mx-art::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.55) brightness(.8); transition: filter .2s ease, transform .3s ease; }
-.gx-mx:not(.open) .gx-mx-art::after { background: linear-gradient(90deg, rgba(10, 14, 16, .94) 0%, rgba(10, 14, 16, .78) 30%, rgba(10, 14, 16, .25) 70%, rgba(10, 14, 16, .45) 100%); }
+.gx-mx:not(.open) .gx-mx-art::before { content: ''; position: absolute; inset: 0; background: inherit; filter: saturate(.8) brightness(.95); transition: filter .2s ease, transform .3s ease; }
+.gx-mx:not(.open) .gx-mx-art::after { background: linear-gradient(90deg, rgba(10, 14, 16, .92) 0%, rgba(10, 14, 16, .7) 28%, rgba(10, 14, 16, .1) 62%, rgba(10, 14, 16, 0) 100%); }
 .gx-mx:not(.open) .gx-evart-cap { top: 50%; bottom: auto; right: 120px; transform: translateY(-50%); max-height: none; overflow: visible; }
 .gx-mx:not(.open) .gx-evart-top { top: 50%; left: auto; right: 12px; transform: translateY(-50%); }
 @media (hover: hover) {
-  .gx-mx:not(.open) .gx-mx-art:hover::before { filter: saturate(.9) brightness(.95); transform: scale(1.03); }
+  .gx-mx:not(.open) .gx-mx-art:hover::before { filter: saturate(1.05) brightness(1.08); transform: scale(1.03); }
 }
 .gx-mx:not(.open) .gx-mx-art { overflow: hidden; }
