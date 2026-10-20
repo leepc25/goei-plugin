@@ -2,8 +2,10 @@
 import base64,io
 from PIL import Image
 D='../sheet4/'
-C=[('i2p-free','자유 변환 (image_to_pixelart, 1회)','외곽선이 가장 또렷하고 얼굴이 깔끔. 정장이 남색 쪽으로 감'),
-   ('pf-style','스타일 참고 생성 (Pro Flash, 6회)','일러스트 자세·비율을 가장 충실히 따름. 외곽선이 약함'),
+C=[('a-text','5차: 첫 일러스트 + 설명으로 다리 줄임 (6회)','빨간 눈 선명, 손이 머리보다 작아짐, 권총집 보임. 추천'),
+   ('a-short','5차: 첫 일러스트 다리를 미리 15% 줄인 참고판 (6회)','다리는 확실히 짧아졌지만 128px로 작아짐'),
+   ('i2p-free','자유 변환 (image_to_pixelart, 1회)','외곽선이 가장 또렷하고 얼굴이 깔끔. 정장이 남색 쪽으로 감'),
+   ('pf-style','4차: 팔 긴 판 스타일 참고 생성 (6회)','일러스트 자세·비율을 가장 충실히 따름. 외곽선이 약함'),
    ('pf-conv','Pro Flash 변환 (6회)','127px로 작게 나옴. 머리카락 청색 하이라이트'),
    ('i2p-f150','원본 충실 150 (1회)','일러스트 색 그대로, 외곽선 약하고 흐릿'),
    ('i2p-f250','원본 충실 250 (1회)','150과 거의 같음, 더 흐릿')]
@@ -15,7 +17,7 @@ def face(im):
     cx=max(xs)-12
     c=im.crop((cx-12,top,cx+16,top+28)); bg=Image.new('RGBA',c.size,(90,100,112,255)); bg.alpha_composite(c)
     return bg.resize((224,224),Image.NEAREST)
-ref=Image.open(D+'gpt-ref-longarm.png').convert('RGB'); ref.thumbnail((320,480))
+ref=Image.open(D+'gpt-ref-a.png').convert('RGB'); ref.thumbnail((320,480))
 cards=''; faces=''
 for k,t,n in C:
     im=Image.open(D+f'clean-{k}.png').convert('RGBA')
@@ -28,7 +30,7 @@ html=f'''<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewpo
 @media(max-width:520px){{.p img{{zoom:.66}}.p{{height:320px}}}}
 .faces{{display:flex;gap:10px;flex-wrap:wrap}}.f{{margin:0;width:224px;max-width:calc(50% - 5px)}}.f img{{display:block;width:100%;height:auto;image-rendering:pixelated;border-radius:6px}}.f figcaption{{font-size:12px}}
 .ref img{{max-width:100%;border-radius:6px}}</style>
-<div class="w"><h1>쟈알디 기준표 4차 · GPT 일러스트(팔 긴 판) → 도트 5가지</h1>
+<div class="w"><h1>쟈알디 기준표 4·5차 · GPT 일러스트 → 도트</h1>
 <label>배경 <select onchange="document.body.className=this.value"><option value="">중간 회색</option><option value="dark">어두움</option></select></label> · 3배 표시(게임은 2배)
 <h2>전신</h2><div class="g">{cards}</div>
 <h2>얼굴 8배 확대</h2><div class="faces">{faces}</div>
