@@ -2,19 +2,103 @@
   "status": "candidate-not-approved",
   "by": "Claude via PixelLab MCP (api.pixellab.ai/mcp), 2026-10-20",
   "balanceBefore": 36,
-  "balanceAfter": 22,
+  "balanceAfter": 10,
   "steps": [
-    {"id": "idle-candidate", "tool": "edit_image_pro_flash", "method": "text", "input": "production-v5/master-source.png right three-quarter figure, nearest-scaled to 128px tall on 160x160 (same as pixellab-trial/input.png)", "seed": 20261020, "charged": 6, "job": "e27cc180-8acf-4497-bffa-03110532f4ee",
-     "prompt": "Same woman, same face, same long straight black hair, same black trouser suit, white shirt, black necktie, black gloves, black shoes, same head size and body proportions. Change only the body orientation: a side-scrolling game standing pose facing RIGHT in a near-profile three-quarter view. Shoulder line almost side-on, chest and front of the jacket only slightly visible, face turned right showing the near eye clearly, both feet and toes pointing right, feet slightly apart on one ground line, arms relaxed down at the sides with hands visible. Relaxed neutral idle stance, weight even. Clean bold pixel clusters, crisp outline, no noise, full body inside the canvas, transparent background."},
-    {"id": "walk1", "tool": "animate_image", "first": "idle-candidate", "frames": 8, "seed": 20261020, "charged": 4, "job": "42b12cee-9e7b-496e-a721-69deaf28c853",
-     "prompt": "same text as pixellab-trial (GPT walk 01), only the input changed"},
-    {"id": "walk2", "tool": "animate_image", "first": "walk1 frame 7", "last": "walk1 frame 7", "frames": 8, "seed": 20261020, "charged": 4, "job": "ef376d8b-4098-4e23-9bab-c64afb5175d2",
-     "prompt": "One complete looping walk cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact contact pose. Sequence: front heel down, weight shifts onto front leg, back leg swings forward past the standing leg (passing), opposite heel contact with the other leg in front, weight shift, passing, return to the starting contact pose. Arms swing from the shoulders opposite to the legs, elbows softly bent, visible on every frame. Standing foot stays planted on the ground line. Torso dips slightly at contact and rises at passing. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera."}
+    {
+      "id": "idle-candidate",
+      "tool": "edit_image_pro_flash",
+      "method": "text",
+      "input": "production-v5/master-source.png right three-quarter figure, nearest-scaled to 128px tall on 160x160 (same as pixellab-trial/input.png)",
+      "seed": 20261020,
+      "charged": 6,
+      "job": "e27cc180-8acf-4497-bffa-03110532f4ee",
+      "prompt": "Same woman, same face, same long straight black hair, same black trouser suit, white shirt, black necktie, black gloves, black shoes, same head size and body proportions. Change only the body orientation: a side-scrolling game standing pose facing RIGHT in a near-profile three-quarter view. Shoulder line almost side-on, chest and front of the jacket only slightly visible, face turned right showing the near eye clearly, both feet and toes pointing right, feet slightly apart on one ground line, arms relaxed down at the sides with hands visible. Relaxed neutral idle stance, weight even. Clean bold pixel clusters, crisp outline, no noise, full body inside the canvas, transparent background."
+    },
+    {
+      "id": "walk1",
+      "tool": "animate_image",
+      "first": "idle-candidate",
+      "frames": 8,
+      "seed": 20261020,
+      "charged": 4,
+      "job": "42b12cee-9e7b-496e-a721-69deaf28c853",
+      "prompt": "same text as pixellab-trial (GPT walk 01), only the input changed"
+    },
+    {
+      "id": "walk2",
+      "tool": "animate_image",
+      "first": "walk1 frame 7",
+      "last": "walk1 frame 7",
+      "frames": 8,
+      "seed": 20261020,
+      "charged": 4,
+      "job": "ef376d8b-4098-4e23-9bab-c64afb5175d2",
+      "prompt": "One complete looping walk cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact contact pose. Sequence: front heel down, weight shifts onto front leg, back leg swings forward past the standing leg (passing), opposite heel contact with the other leg in front, weight shift, passing, return to the starting contact pose. Arms swing from the shoulders opposite to the legs, elbows softly bent, visible on every frame. Standing foot stays planted on the ground line. Torso dips slightly at contact and rises at passing. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera."
+    },
+    {
+      "id": "run-open",
+      "tool": "animate_image",
+      "first": "idle-candidate",
+      "last": null,
+      "frames": 8,
+      "seed": 20261020,
+      "charged": 4,
+      "job": "70d22254-e5f2-4999-85ae-083390018a96",
+      "prompt": "A full running cycle in place facing right, same near-profile three-quarter camera as the input, body orientation never changes. Athletic adult jog-run: torso leans slightly forward, long strides with a clear flight phase where both feet leave the ground, knees lift, back leg pushes off from the toes. Both arms bent about 90 degrees at the elbow pump strongly forward and back from the shoulders, opposite to the legs, hands clearly visible in front of and behind the body. Hair streams back. Identical head size, limb lengths and body volume throughout. No turning toward the camera, no zoom."
+    },
+    {
+      "id": "run",
+      "tool": "animate_image",
+      "first": "run-open frame 7",
+      "last": "run-open frame 7",
+      "frames": 8,
+      "seed": 20261020,
+      "charged": 4,
+      "job": "3925b702-10a4-4b5b-9507-cac57474d389",
+      "prompt": "One complete looping running cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact stride pose. Sequence: flight with legs split, front foot lands under the hips, body compresses slightly, push off from the toes, flight, the other leg lands, compress, push off, return to the starting stride pose. Torso leans slightly forward. Both arms bent about 90 degrees pump strongly from the shoulders opposite to the legs on every frame, fists visible in front and behind. Hair streams back. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera."
+    },
+    {
+      "id": "jab",
+      "tool": "animate_image",
+      "first": "idle-candidate",
+      "last": "idle-candidate",
+      "frames": 8,
+      "seed": 20261020,
+      "charged": 4,
+      "job": "3599557c-35ef-4e61-8609-1defb24b1bdb",
+      "prompt": "A quick lead jab punch to the right, then recover. Facing right, same near-profile three-quarter camera, body orientation never changes. Sequence: raise both fists to a guard, small step forward with the front foot, push off the back foot, hips and shoulder rotate into the punch, the front arm extends fully straight to the right at shoulder height with a clenched fist, short hold at full extension, arm retracts to guard, return to the relaxed starting pose. Rear fist stays near the chin. Identical head size, limb lengths and body volume. No turning toward the camera."
+    }
   ],
   "measure": {
-    "walk2_width": [38,33,51,59,46,33,34,52],
-    "walk2_foot_bottom": [143,143,143,143,142,142,142,143],
+    "walk2_width": [
+      38,
+      33,
+      51,
+      59,
+      46,
+      33,
+      34,
+      52
+    ],
+    "walk2_foot_bottom": [
+      143,
+      143,
+      143,
+      143,
+      142,
+      142,
+      142,
+      143
+    ],
     "walk2_stance_foot_shift_px_per_frame": 9,
-    "walk2_frame8_equals_input_bounds": true
+    "walk2_frame8_equals_input_bounds": true,
+    "run_stance_foot_shift_px_per_frame": 18,
+    "run_stance_foot_bottom": {
+      "first_half": 142,
+      "second_half": 139
+    },
+    "jab_extension_frames": [
+      5
+    ]
   }
 }
