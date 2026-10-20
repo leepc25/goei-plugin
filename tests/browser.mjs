@@ -538,20 +538,31 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.setViewportSize({ width: 390, height: 844 });
   if (shots) { await page.screenshot({ path: `${shots}/9-board-mobile.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-mobile-agents.png` }); }
   await page.setViewportSize({ width: 1280, height: 860 });
-  // 상황판 요원 카드의 톡·위키 바로가기
-  const agentCard = page.locator('.gx-board .gx-acard', { hasText: '쟈알디' });
-  // PC도 요원 카드를 누르면 큰 사진 창
-  await agentCard.locator('.gx-acard-top b').click();
-  await page.waitForSelector('.gx-agpop');
-  assert.equal(await page.$eval('.gx-agpop .gx-ava', (el) => el.getBoundingClientRect().width), 200);
-  await page.click('.gx-agpop-x');
-  assert.equal(await page.locator('.gx-agpop').count(), 0);
-  await agentCard.locator('[data-action="agent-talk"]').click();
+  // 상황판 요원 칸(모니터): 마우스를 올리면 머리 위 말풍선, 누르면 사원증 창. 톡·위키는 사원증 창에서
+  const agentTile = page.locator('.gx-board .gx-agmon', { hasText: '쟈알디' });
+  await agentTile.hover();
+  await page.waitForSelector('.gx-agtip');
+  const tipBox = await page.$eval('.gx-agtip', (el) => el.getBoundingClientRect().bottom);
+  const tileTop = (await agentTile.boundingBox()).y;
+  assert.ok(tipBox <= tileTop, '말풍선은 칸 위');
+  await agentTile.click();
+  await page.waitForSelector('.gx-agcard');
+  assert.ok((await page.textContent('.gx-agcard')).includes('쟈알디'));
+  await page.click('.gx-agcard-x');
+  assert.equal(await page.locator('.gx-agcard').count(), 0);
+  await agentTile.click();
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('.gx-agcard').count(), 0, 'Esc로 닫기');
+  assert.ok(await page.locator('.gx-panel').count(), 'Esc는 창이 아니라 사원증만 닫는다');
+  await agentTile.click();
+  await page.click('.gx-agcard [data-action="agent-talk"]');
   await page.waitForSelector('.ph-room');
   assert.ok((await page.textContent('.ph-room')).includes('쟈알디'));
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
-  await agentCard.locator('[data-action="wiki-goto"]').click();
+  assert.equal(await page.locator('.gx-agcard').count(), 0, '다른 탭에 갔다 오면 사원증은 닫힘');
+  await agentTile.click();
+  await page.click('.gx-agcard [data-action="wiki-goto"]');
   await page.waitForSelector('.nw-compose, .nw-doc');
   assert.ok((await page.textContent('.gx-panel')).includes('쟈알디'));
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
@@ -1560,6 +1571,14 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => document.querySelector('.st-step b')?.textContent.includes('11명'));
   const agCount = await page.evaluate(() => (window.__chat.scriptstate.$ag_report.match(/- code: P\d+/g) || []).length);
   assert.ok(agCount <= 11);
+  // 요원 칸 모양: 목록으로 바꾸면 이 기기 공통 저장, 상황판이 목록으로
+  await page.click('[data-action="set-agents"][data-value="list"]');
+  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').agents === 'list');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.waitForSelector('.gx-board .gx-agrow');
+  assert.equal(await page.locator('.gx-board .gx-agmon').count(), 0);
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+  await page.waitForSelector('[data-action="set-agents"]');
   // 지원 투입 끄기 → 지도 편성에서 지원 인원 칸이 사라진다
   await page.click('[data-action="set-support"][data-value="0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_support_on === '0');

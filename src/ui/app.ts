@@ -3,20 +3,21 @@ import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
 import { NavHistory } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
-import type { FactionCode, LangCode, Manifest } from '../core/types';
+import type { FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
-  activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, type WorldState, worldOn,
+  activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, type WorldState, worldOn,
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
-import { loadModuleAssets } from '../host/assets';
+import { loadModuleAssets, mainPic } from '../host/assets';
+import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
 import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
-import { agentInner, avatar, factionPic, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
+import { agentInner, avatar, factionPic, imageUrl, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
 import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
@@ -392,10 +393,11 @@ function ensureRoot(): HTMLElement {
     const box = root?.querySelector('.gx-mbox');
     if (box && (view.kind === 'started' || view.kind === 'opening')) box.innerHTML = missionList(view.ctx, view.kind === 'opening');
   });
+  bindAgentTips(root);
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
-    if (evUi.pop) {
-      evUi.pop = '';
+    if (evUi.pop || agUi.pop) {
+      evUi.pop = agUi.pop = '';
       render();
       return;
     }
@@ -534,6 +536,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
   // 상황 상세 창 안의 버튼(위키·지도·목표)이나 다른 조작을 하면 창은 닫는다. 종료는 두 번 눌러야 해서 그대로 둔다
   if (evUi.pop && action !== 'ev-pop' && action !== 'end-event') evUi.pop = '';
+  if (agUi.pop && action !== 'agent-info') agUi.pop = '';
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
     await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
     return;
@@ -674,12 +677,10 @@ async function handle(action: string, value?: string): Promise<void> {
       showIdCard(idCard(view.ctx));
       return;
     }
-    case 'agent-info': {
-      // 상황판 요원 카드: 큰 사진과 상태 전문 창 (v0.16.22부터 PC도)
-      const card = root?.querySelector<HTMLElement>(`.gx-board .gx-acard[data-value="${CSS.escape(value ?? '')}"]`);
-      if (card) showAgentInfo(card);
-      return;
-    }
+    case 'agent-info':
+      // 상황판 요원 칸: 사원증 창을 열고, 바깥·×·Esc·뒤로 밀기로 닫는다
+      agUi.pop = agUi.pop === value ? '' : value ?? '';
+      return render();
     case 'agent-talk':
       // 상황판 요원 카드의 톡: 괴담톡 탭으로 넘어가 그 요원과의 1:1 방을 연다
       if (view.kind !== 'started') return;
@@ -1010,6 +1011,7 @@ function navStep(dir: -1 | 1): (() => void) | null {
   if (view.kind !== 'started') return null;
   if (gameOpen()) return dir < 0 ? () => closeGame() : null;
   if (evUi.pop && dir < 0) return () => void handle('ev-pop', evUi.pop);
+  if (agUi.pop && dir < 0) return () => void handle('agent-info', agUi.pop);
   if (!navHist.can(dir)) return null;
   return () => {
     const s = navHist.go(dir);
@@ -1063,7 +1065,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup()}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup()}${tab === 'board' ? agentPopup() : ''}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1241,29 +1243,33 @@ function board(ctx: ChatContext): string {
     const name = e.name || '이름 미확인';
     cards.push({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx, name, e.kind) });
   }
-  const ag = roster
-    .map((p) => {
-      const rec = w.agents[p.id];
-      const st = rec?.st ?? '미정';
-      const c = agentContact(ctx, p.id);
-      const act = c
-        ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(p.id)}" title="괴담톡" aria-label="${esc(p.name)}에게 톡">${ICONS.phone}</button>`
-          + `<button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(c.wiki)}" title="위키" aria-label="${esc(p.name)} 위키">${ICONS.wiki}</button></span>`
-        : '';
-      // 카드를 누르면 상태 전문 (모바일은 상태가 두 줄에서 잘린다)
-      return `<li class="gx-acard${st === '작전투입' ? ' op' : ''}" title="${esc(p.id)}" data-action="agent-info" data-value="${esc(p.id)}">${agentInner(ctx.char, p, st, rec?.situation ?? '', act)}</li>`;
-    })
-    .join('');
+  // 요원 칸 (2026-10-20 사용자): 모니터 벽 또는 근무 현황 목록. 편성 기준으로 밝기를 나눈다
+  // 사건(inc)은 투입 인원을 따로 적지 않아 괴이만 본다
+  const deployedAt = (id: string) => w.an.find((e) => e.state === '활성' && e.deploy.split(',').map((x) => x.trim()).includes(id))?.name ?? '';
+  const dir = readDirectory((ctx.char.globalLore ?? []) as LoreEntry[]).agents;
+  const agents: AgentItem[] = roster.map((p) => {
+    const rec = w.agents[p.id];
+    const st = rec?.st ?? '미정';
+    const c = agentContact(ctx, p.id);
+    const big = p.english ? mainPic(ctx.char, dir.find((x) => x.english === p.english) ?? { english: p.english }) : '';
+    return {
+      id: p.id, name: p.name, english: p.english ?? '', st: stLabel(st),
+      side: st === '작전투입' ? 'op' : agentLocked(rec) ? 'lock' : 'ok',
+      situation: rec?.situation ?? '', dept: p.department ?? '', rank: p.rank ?? '',
+      face: avatar(ctx.char, p.english, p.name, 'sq'), photo: big ? imageUrl(ctx.char, big) : null,
+      deployed: st === '작전투입' ? deployedAt(p.id) : '', wiki: c ? c.wiki : null,
+    };
+  });
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
-  const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
-  // 일지 제목줄 숫자: 괴이·사건·특수·투입 (2026-10-20 사용자: 따로 현황 줄을 두지 않고 제목줄에)
-  const cnt = (cls: string, label: string, n: number, tail = '') => `<em class="${cls}">${label}<i>${n}</i>${tail}</em>`;
-  const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms)) + cnt('sig', '투입', onOp.length, `<u>/${roster.length}</u>`);
+  // 일지 제목줄 숫자: 괴이·사건·특수 (투입 수는 요원 칸 제목줄로 옮김, 2026-10-20 사용자)
+  const cnt = (cls: string, label: string, n: number) => `<em class="${cls}">${label}<i>${n}</i></em>`;
+  const limit = worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit;
+  const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms));
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const clock = [st?.date, st?.time].filter(Boolean).join(' ');
   return `<main class="gx-body gx-board">
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
-    <section class="gx-sec" id="gx-sec-ag"><h2>요원<small>${roster.length}명${onOp.length ? ` · ${onOp.length}명 작전 중` : ''}</small></h2>${promo}${roster.length ? `<ul class="gx-acards">${ag}</ul>` : `<p class="gx-none">${worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.'}</p>`}</section>
+    ${agentPanel(agents, getPrefs().agents ?? 'wall', { total: roster.length, org: findFaction(faction, factionList(ctx.char.globalLore))?.affiliation ?? '', extra: promo, empty: limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.' })}
   </main>${boardDrawer()}`;
 }

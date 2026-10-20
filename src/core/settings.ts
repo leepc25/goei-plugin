@@ -93,6 +93,8 @@ export interface Prefs {
   vars?: Record<string, string>;
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
+  /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
+  agents?: 'wall' | 'list';
   dim?: number;
   /** 채팅 속 상태창 배색 (없으면 테마 따름) */
   status?: StatusStyle;
@@ -145,13 +147,14 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
+  const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
   const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 
