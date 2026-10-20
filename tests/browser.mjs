@@ -795,7 +795,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.waitForSelector('.gx-evc');
   await cardAction(page, preset.name, 'end-event');
-  assert.equal((await page.textContent('.ev-pop [data-action="end-event"]')).trim(), '정말 종료');
+  assert.equal(await page.getAttribute('.ev-pop [data-action="end-event"]', 'aria-label'), `${preset.name} 정말 종료`);
   await page.click('.ev-pop [data-action="end-event"]');
   await page.waitForFunction((name) => !JSON.parse(window.__chat.scriptstate.$goei_world).an.some((e) => e.name === name), preset.name);
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$an_report)).includes(`${preset.name}|활성`));

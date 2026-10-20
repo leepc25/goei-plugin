@@ -39,7 +39,7 @@ export interface EvCard {
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
 export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>): string {
   return names
-    .filter((n) => n && n !== '없음')
+    .filter((n, i, all) => n && n !== '없음' && all.indexOf(n) === i)
     .map((n) => (agents.has(n) ? `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>` : `<span class="gx-badge">${esc(n)}</span>`))
     .join('');
 }
@@ -64,6 +64,22 @@ function gradeMark(c: EvCard): string {
 }
 const artBg = (c: EvCard) => (c.art?.pic ? ` style="background-image:url('${esc(c.art.pic)}')"` : '');
 const artIco = (c: EvCard) => (c.art?.pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`);
+/** 상태+투입 한 딱지 (2026-10-20 사용자): 상태 글 │ 투입 표시. 투입은 자세히가 아니라 있다·없다와 규모만.
+ *  요원과 조직을 같이 세면 겹쳐 세기 쉬워서(관리국 + 관리국 요원) 요원이 있으면 요원 수만, 없을 때만 조직 표시 */
+function stateTag(c: EvCard): string {
+  const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
+  const others = (c.chips?.match(/class="gx-badge"/g) ?? []).length;
+  const verb = c.kind === 'ms' ? '방문' : '투입';
+  const dep = !c.key
+    ? ''
+    : agentsIn
+      ? `<span class="gx-evc-dep" title="${verb}: 요원 ${agentsIn}명">${ICONS.person}<b>${agentsIn}</b></span>`
+      : others
+        ? `<span class="gx-evc-dep" title="${verb}: 요원 아닌 인원·조직">${ICONS.org}</span>`
+        : `<span class="gx-evc-dep none">${c.kind === 'ms' ? '방문 없음' : '미투입'}</span>`;
+  return `<span class="gx-evc-st">${c.badge}${dep}</span>`;
+}
+
 /** 그림 카드 (2026-10-20 사용자): 상황판·임무 탭 모두 같은 띠. 누르면 상세 창.
  *  1줄 등급·이름·상태, 2줄 장소·경과, 3줄 설명(사건은 상황 글, 그 밖은 문서 요약, 길면 줄임). 투입은 사람 수 표시만 */
 function artCard(c: EvCard): string {
@@ -71,15 +87,7 @@ function artCard(c: EvCard): string {
   // 이름 미확인도 창을 띄운다: 종료·지도 버튼이 창에만 있어서 (2026-10-20 사용자: 띠에 남은 ×가 어색했다)
   if (c.pop) seen.set(c.pop, c);
   const act = c.pop ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
-  // 투입 표시 (사용자 2026-10-20): 자세히가 아니라 표시만. 요원은 사람 수, 요원이 아닌 이름(조직·외부인)은 조직 표시로 따로 센다
-  const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
-  const others = (c.chips?.match(/class="gx-badge"/g) ?? []).length;
-  const verb = c.kind === 'ms' ? '방문' : '투입';
-  const dep = agentsIn || others
-    ? `<span class="gx-evc-dep" title="${verb}: ${agentsIn ? `요원 ${agentsIn}명` : ''}${agentsIn && others ? ', ' : ''}${others ? `그 밖 ${others}` : ''}">${agentsIn ? `${ICONS.person}<b>${agentsIn}</b>` : ''}${others ? `${ICONS.org}<b>${others}</b>` : ''}</span>`
-    : '';
-  // 상태와 투입을 한 딱지로 묶어 경과 줄 오른쪽에 (2026-10-20 사용자: 이름 옆 딱지를 따로 달지 말 것)
-  const state = `<span class="gx-evc-st">${c.badge}${dep}</span>`;
+  const state = stateTag(c);
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
@@ -97,15 +105,17 @@ export function evPopup(): string {
   }
   const key = c.key ? esc(c.key) : '';
   const pick = c.open === 'pick-event';
-  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="${pick ? '목표로 고르기' : '지도'}" aria-label="${esc(c.name)} ${pick ? '목표로 고르기' : '지도에서 보기'}">${pick ? ICONS.pin : ICONS.map}</button>` : ''}
-    ${c.key ? `<button class="gx-mini gx-evpop-end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}">${c.confirmEnd ? '정말 종료' : '상황 종료'}</button>` : ''}`;
+  const name = esc(c.name);
+  // 버튼 셋은 같은 크기 아이콘 (2026-10-20 사용자). 종료는 휴지통, 한 번 누르면 빨개지고 한 번 더 누르면 종료
+  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="${pick ? '목표로 고르기' : '지도'}" aria-label="${name} ${pick ? '목표로 고르기' : '지도에서 보기'}">${pick ? ICONS.pin : ICONS.map}</button>` : ''}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
     <div class="gx-evc art open ev-pop${c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-        <span class="gx-evart-top">${gradeMark(c)}<span class="gx-evc-tags">${c.badge}</span><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-name"><b>${esc(c.name)}</b><small>${c.loc}</small></span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
+        <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${stateTag(c)}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
 }
 

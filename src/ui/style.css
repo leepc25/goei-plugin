@@ -2058,3 +2058,21 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evc-st > .gx-evc-dep { margin: 0; height: 100%; padding: 0 6px; border-radius: 0; background: none; color: #fff; letter-spacing: 0; font: 600 11.5px/1 var(--sans, inherit); border-left: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
 .gx-evart-act > .gx-evpop-end { display: inline-flex; align-items: center; margin: 0 0 0 2px; height: 30px; padding: 0 11px; border-radius: 9px; background: rgba(10, 14, 16, .6); color: #fff; border: 1px solid rgba(255, 255, 255, .25); }
 .gx-evart-act > .gx-evpop-end.danger { background: var(--danger, #d9534f); border-color: transparent; }
+
+/* 2026-10-20 사용자: 점 없이 글만, 바깥 테두리는 하나로 고정하고 종류 색은 안쪽 빛으로, 상세 창도 띠와 같은 배치 */
+.gx-evc-st > .gx-badge::before { content: none; animation: none; }
+.gx-evc-st > .gx-badge { padding: 0 7px; }
+.gx-evc-dep.none { color: rgba(255, 255, 255, .55); font-size: 11px; }
+.gx-evc.art.live, .gx-evc.art.live:has(> .k-an), .gx-evc.art.live:has(> .k-in), .gx-evc.art.live:has(> .k-ms) { border-width: 1px; border-color: var(--line2); }
+.gx-evc.art.sel { border-color: var(--signal); }
+.gx-evart.k-an { --kc: 255, 112, 96; }
+.gx-evart.k-in { --kc: 255, 190, 80; }
+.gx-evart.k-ms { --kc: 120, 190, 255; }
+.gx-evc.art.live .gx-evart::after { border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(var(--kc), .32), inset 0 0 26px rgba(var(--kc), .2); }
+.gx-evc.art.ev-pop { border: 1px solid var(--line2); }
+.gx-evc.art.ev-pop .gx-evart-top { justify-content: flex-end; }
+.gx-evc.art.open .gx-evart-l1 > b { font-size: 19px; white-space: normal; }
+.gx-evc.art.open .gx-evart-l1 > .gx-gmark { width: 26px; height: 26px; font-size: 13px; }
+.gx-evc.art.open .gx-evart-l2 > small { font-size: 12.5px; color: rgba(255, 255, 255, .82); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evbtn.end.danger { background: var(--danger, #d9534f); color: #fff; }
+.gx-evc.art.ev-pop .gx-evbtn { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
