@@ -321,3 +321,37 @@ si
 15:21:46 body 201/202/301 edit_image_pro_flash 3x6=18 gens, balance 9867
 15:38:39 body 203/204 (flat, rejected) 12 gens; poses2-202 edit 18 + shade 6; poses2-102 shade 6; sheet2 401-404 create_image_pro_flash 24 gens -> balance 9801
 15:52:06 poses2-401 edit 18 + shade 6; sheet3 401/405/406/407 create 24 -> balance 9753
+16:39:51 sheet4 i2p-f150 image_to_pixelart(1) -> id: 2c123f16-ca8c-415f-a66f-817243133c60
+job_id: 2c123f16-ca8c-415f-a66f-817243133c60
+source: 960x1520px
+output: 92x146px
+faithful: True
+init_image_strength: 150
+seed: 1
+asset_id: c94fc978-803b-57e9-9
+16:39:54 sheet4 i2p-f250 image_to_pixelart(1) -> id: 21f32b79-a2f0-4850-8bcb-e19af68d1391
+job_id: 21f32b79-a2f0-4850-8bcb-e19af68d1391
+source: 960x1520px
+output: 92x146px
+faithful: True
+init_image_strength: 250
+seed: 1
+asset_id: 9964de4e-508d-50c9-a
+16:39:57 sheet4 i2p-free image_to_pixelart(1) -> id: 75bbce0b-c4d7-4e46-8aaa-14dcc5758664
+job_id: 75bbce0b-c4d7-4e46-8aaa-14dcc5758664
+source: 960x1520px
+output: 92x146px
+faithful: False
+init_image_strength: 0
+seed: 1
+asset_id: 549e6e38-52a3-54ce-9c
+16:39:59 sheet4 pf-conv image_to_pixelart_pro_flash(6) -> {
+  "background_job_id": "f813ef91-c46a-495b-9ed1-e6ebf8d1eb42",
+  "image_id": "958ce723-4585-51ef-960a-134f5f79a1df",
+  "status": "processing",
+  "source_image_id": "958ce723-4585-51ef-960a-134f5f79a
+16:40:03 sheet4 pf-style create_image_pro_flash(6) -> {
+  "background_job_id": "a377167d-e708-482f-832f-0cc34faf0b4b",
+  "image_id": "b5745161-375f-51e6-9216-eca633b2857d",
+  "status": "processing",
+  "source_image_id": "b5745161-375f-51e6-9216-eca633b28
