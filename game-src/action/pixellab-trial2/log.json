@@ -1,0 +1,20 @@
+{
+  "status": "candidate-not-approved",
+  "by": "Claude via PixelLab MCP (api.pixellab.ai/mcp), 2026-10-20",
+  "balanceBefore": 36,
+  "balanceAfter": 22,
+  "steps": [
+    {"id": "idle-candidate", "tool": "edit_image_pro_flash", "method": "text", "input": "production-v5/master-source.png right three-quarter figure, nearest-scaled to 128px tall on 160x160 (same as pixellab-trial/input.png)", "seed": 20261020, "charged": 6, "job": "e27cc180-8acf-4497-bffa-03110532f4ee",
+     "prompt": "Same woman, same face, same long straight black hair, same black trouser suit, white shirt, black necktie, black gloves, black shoes, same head size and body proportions. Change only the body orientation: a side-scrolling game standing pose facing RIGHT in a near-profile three-quarter view. Shoulder line almost side-on, chest and front of the jacket only slightly visible, face turned right showing the near eye clearly, both feet and toes pointing right, feet slightly apart on one ground line, arms relaxed down at the sides with hands visible. Relaxed neutral idle stance, weight even. Clean bold pixel clusters, crisp outline, no noise, full body inside the canvas, transparent background."},
+    {"id": "walk1", "tool": "animate_image", "first": "idle-candidate", "frames": 8, "seed": 20261020, "charged": 4, "job": "42b12cee-9e7b-496e-a721-69deaf28c853",
+     "prompt": "same text as pixellab-trial (GPT walk 01), only the input changed"},
+    {"id": "walk2", "tool": "animate_image", "first": "walk1 frame 7", "last": "walk1 frame 7", "frames": 8, "seed": 20261020, "charged": 4, "job": "ef376d8b-4098-4e23-9bab-c64afb5175d2",
+     "prompt": "One complete looping walk cycle in place facing right, same near-profile camera throughout. Starts and ends in this exact contact pose. Sequence: front heel down, weight shifts onto front leg, back leg swings forward past the standing leg (passing), opposite heel contact with the other leg in front, weight shift, passing, return to the starting contact pose. Arms swing from the shoulders opposite to the legs, elbows softly bent, visible on every frame. Standing foot stays planted on the ground line. Torso dips slightly at contact and rises at passing. Identical head size, limb lengths and body volume. Body orientation never changes, no turning toward the camera."}
+  ],
+  "measure": {
+    "walk2_width": [38,33,51,59,46,33,34,52],
+    "walk2_foot_bottom": [143,143,143,143,142,142,142,143],
+    "walk2_stance_foot_shift_px_per_frame": 9,
+    "walk2_frame8_equals_input_bounds": true
+  }
+}
