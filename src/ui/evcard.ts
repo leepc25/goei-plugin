@@ -76,13 +76,18 @@ function artCard(c: EvCard): string {
   const key = c.key ? esc(c.key) : '';
   if (c.pop && !unknown) seen.set(c.pop, c);
   const act = c.pop && !unknown ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
-  const n = (c.chips?.match(/class="gx-(?:pchip|badge)"/g) ?? []).length;
-  const dep = n ? `<span class="gx-evc-dep" title="${c.kind === 'ms' ? '방문' : '투입'} ${n}명">${ICONS.group}<b>${n}</b></span>` : '';
+  // 투입 표시 (사용자 2026-10-20): 자세히가 아니라 표시만. 요원은 사람 수, 요원이 아닌 이름(조직·외부인)은 조직 표시로 따로 센다
+  const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
+  const others = (c.chips?.match(/class="gx-badge"/g) ?? []).length;
+  const verb = c.kind === 'ms' ? '방문' : '투입';
+  const dep = agentsIn || others
+    ? `<span class="gx-evc-dep" title="${verb}: ${agentsIn ? `요원 ${agentsIn}명` : ''}${agentsIn && others ? ', ' : ''}${others ? `그 밖 ${others}` : ''}">${agentsIn ? `${ICONS.person}<b>${agentsIn}</b>` : ''}${others ? `${ICONS.org}<b>${others}</b>` : ''}</span>`
+    : '';
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
       ${unknown && c.key ? `<span class="gx-evart-top"><span class="gx-evart-act">${endBtn(c, key)}</span></span>` : ''}
-      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${c.badge}${dep}</span><small>${c.loc}</small>${line3}</span>
+      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${c.badge}</span><span class="gx-evart-l2"><small>${c.loc}</small>${dep}</span>${line3}</span>
     </div></li>`;
 }
 

@@ -1996,9 +1996,11 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evart-l1 > .gx-gmark { width: 22px; height: 22px; border-radius: 7px; font-size: 12px; flex: none; }
 .gx-evart-l1 > .gx-gmark svg { width: 14px; height: 14px; }
 .gx-evart-l1 > .gx-badge { flex: none; }
-.gx-evc-dep { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 7px 0 6px; border-radius: 11px; background: rgba(10, 14, 16, .62); color: #fff; font-size: 12px; }
-.gx-evc-dep svg { width: 13px; height: 13px; }
-.gx-evc.art:not(.open) .gx-evart-cap > small { font-size: 12px; color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.gx-evart-l2 { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gx-evc-dep { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 2px; height: 18px; padding: 0 6px; border-radius: 9px; background: rgba(10, 14, 16, .62); color: #fff; font-size: 11.5px; }
+.gx-evc-dep svg { width: 12px; height: 12px; }
+.gx-evc-dep b + svg { margin-left: 5px; }
+.gx-evc.art:not(.open) .gx-evart-l2 > small { font-size: 12px; color: rgba(255, 255, 255, .8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
 .gx-evc.art:not(.open) .gx-evc-sit { display: block; font-size: 12.5px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255, 255, 255, .9); }
 .gx-evc.art.go:hover .gx-evart { filter: brightness(1.08); }
 .gx-evc.art.wait.go:hover .gx-evart { filter: saturate(.6) brightness(.9); }
