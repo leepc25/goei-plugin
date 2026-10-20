@@ -3,7 +3,7 @@
 import type { CharacterSnapshot } from '../host/risu';
 import { locName, NATION_PINS, type EndedEntry } from '../core/world';
 import { ICONS } from './icons';
-import { avatar, orgFace, picAvatar } from './images';
+import { avatar } from './images';
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -42,13 +42,12 @@ export interface EvCard {
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
 /** own: 우리 세력 이름 (이 이름이 적히면 요원이 아니어도 우리 편으로 친다).
  *  display: 세력 코드 → 표시 이름. 주면 요원 아닌 이름도 조직 사진을 붙인다 (2026-10-20 사용자) */
-export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>, own = '', display?: Record<string, string>): string {
+export function peopleChips(char: CharacterSnapshot, names: string[], agents: Map<string, { english?: string }>, own = ''): string {
   return names
     .filter((n, i, all) => n && n !== '없음' && all.indexOf(n) === i)
     .map((n) => {
       if (agents.has(n)) return `<span class="gx-pchip">${avatar(char, agents.get(n)!.english, n, 'xs')}${esc(n)}</span>`;
-      const pic = display ? orgFace(char, n, display) : '';
-      return `<span class="gx-badge${own && n === own ? ' own' : ''}">${pic ? picAvatar(char, pic, n, 'xs') : ''}${esc(n)}</span>`;
+      return `<span class="gx-badge${own && n === own ? ' own' : ''}">${esc(n)}</span>`;
     })
     .join('');
 }
@@ -208,6 +207,16 @@ function modeSeg(): string {
     .join('')}</span>`;
 }
 
+/** CCTV 큰 보기의 투입 줄: 사진 칩 대신 글자만. 우리 편 녹색, 다른 세력 노란색 */
+function whoLine(chips = ''): string {
+  const items = chipItems(chips).map((h) => {
+    const ours = /^<span class="gx-(?:pchip|badge own)"/.test(h);
+    const text = h.replace(/<[^>]*>/g, '').trim();
+    return text ? `<span class="${ours ? 'on' : 'other'}">${text}</span>` : '';
+  }).filter(Boolean);
+  return items.length ? `<span class="gx-opwho"><em>투입</em>${items.join('<i>·</i>')}</span>` : '';
+}
+
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
     return `<div class="gx-opview feed nosig"><div class="gx-opbar">${modeSeg()}</div><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
@@ -222,8 +231,8 @@ function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
     <div class="gx-opbar">${modeSeg()}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span><span class="ts">${esc(clock)}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc(region)}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</div>
+    <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc(region)}</span><span class="ts">${esc(clock)}</span></div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
 
@@ -244,8 +253,10 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   const sAt = s ? NATION_PINS.find((p) => p[0] === s.locCode.split('-')[0]) : undefined;
   const sN = s ? cards.filter((c) => !c.ended && c.locCode.split('-')[0] === s.locCode.split('-')[0]).findIndex((c) => c.id === s.id) : 0;
   const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : '';
-  return `<div class="gx-opview map"><div class="gx-opbar">${modeSeg()}<span class="gx-oplive"><i></i>위성 관측</span></div>
-    <div class="gx-opmap">${url ? `<div class="gx-opmapi"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}<span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div></div>`;
+  // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
+  const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
+  return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>
+    <div class="gx-opbar">${modeSeg()}<span class="gx-oplive"><i></i>위성 관측</span></div><span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div>`;
 }
 
 /** 관제실 상황판 본문. counts: 일지 제목줄 숫자 (html) */

@@ -1223,7 +1223,7 @@ function board(ctx: ChatContext): string {
   const display = factionNames(catalog, faction);
   const ownName = display[faction] ?? '';
   const names = (codes: string) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
-  const chips = (codes: string) => peopleChips(ctx.char, names(codes), byName, ownName, display);
+  const chips = (codes: string) => peopleChips(ctx.char, names(codes), byName, ownName);
   // 관제실 상황판 (2026-10-20 사용자): 진행 중인 것만 일지에. 발생 예정은 띄우지 않는다 (누를 것도 없고 다음 상황을 미리 알려 버린다)
   const cards: OpsCard[] = [];
   const add = (kind: EvKind, i: number, locCode: string, c: Omit<EvCard, 'kind' | 'key'>) => {

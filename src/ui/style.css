@@ -2208,3 +2208,19 @@ button.mk-go:hover { color: var(--signal); }
 .gx-ops .gx-gmark { font-style: normal; }
 .gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
 .gx-oppin:not(.sel) em { opacity: .85; font-size: 11px; }
+
+/* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로, 일지 제목줄 낮게 */
+.gx-oposd { flex-wrap: nowrap; align-items: center; gap: 10px; }
+.gx-oposd .cam { flex: 1 1 auto; flex-basis: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { flex: none; }
+.gx-opwho { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 13px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+.gx-opwho em { font-style: normal; font-size: 11.5px; font-weight: 700; color: rgba(255, 255, 255, .6); margin-right: 2px; }
+.gx-opwho i { font-style: normal; color: rgba(255, 255, 255, .4); }
+.gx-opwho .on { color: #5fe6c6; } .gx-opwho .other { color: #ffc35a; }
+.gx-opmap { position: absolute; inset: 0; margin: 0; overflow: hidden; container-type: size; }
+.gx-opmapi { --w: max(100cqw, calc(100cqh * 1.25)); top: clamp(calc(100cqh - var(--w) * .8), calc(50cqh - var(--w) * .8 * var(--py) / 100), 0px); bottom: auto; left: clamp(calc(100cqw - var(--w)), calc(50cqw - var(--w) * var(--px) / 100), 0px); transform: none; width: var(--w); height: calc(var(--w) * .8); max-width: none; aspect-ratio: auto; transition: left .35s ease, top .35s ease; }
+.gx-opview.map::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(8, 12, 14, .55), transparent 70px); }
+@media (prefers-reduced-motion: reduce) { .gx-opmapi { transition: none; } }
+.gx-oplog > h2 { height: 38px; }
+.gx-oposd .rec { flex: none; white-space: nowrap; }
+@media (max-width: 760px) { .gx-oposd { font-size: 10px; letter-spacing: .04em; gap: 8px; } }
