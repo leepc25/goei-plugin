@@ -1,0 +1,19 @@
+.gb { width: 100%; height: 100%; display: flex; flex-direction: column; background: #05080c; color: #e6e2cd; font: 13px monospace; box-sizing: border-box; overflow: hidden; outline: none; color-scheme: dark; }
+.gb * { box-sizing: border-box; }
+.gb button { font: inherit; color: inherit; background: #172b3b; border: 2px solid #667e86; border-radius: 0; padding: 6px 10px; cursor: pointer; touch-action: none; }
+.gb button:disabled { opacity: 0.4; }
+.gb-top { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 8px; border-bottom: 1px solid #223; }
+.gb-fit { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+.gb-fit canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16/9; image-rendering: pixelated; outline: none; }
+.gb-panel { position: absolute; inset: 0; margin: auto; width: min(960px, 96%); height: min(600px, 96%); background: #0c1218; border: 2px solid #567; padding: 16px 20px; overflow: auto; display: none; }
+.gb-panel.on { display: block; }
+.gb-panel h2 { margin: 0 0 8px; font-size: 20px; color: #ffd080; }
+.gb-panel p { margin: 6px 0; }
+.gb-panel .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.gb-panel .sel { border-color: #ffd080; background: #3a2e14; }
+.gb-foot { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 8px; border-top: 1px solid #223; align-items: center; }
+.gb-foot button { padding: 10px 8px; min-width: 52px; }
+.gb-stick { width: 110px; height: 110px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }
+.gb-stick i { position: absolute; left: 35px; top: 35px; width: 36px; height: 36px; background: #8ab; border-radius: 50%; }
+.gb-note { margin: 0; padding: 4px 8px; color: #9ab; font-size: 12px; }
+@media (max-width: 760px) { .gb-note { display: none; } .gb-top { font-size: 12px; } }
