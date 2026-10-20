@@ -64,7 +64,7 @@ function gradeMark(c: EvCard): string {
 }
 const artBg = (c: EvCard) => (c.art?.pic ? ` style="background-image:url('${esc(c.art.pic)}')"` : '');
 const artIco = (c: EvCard) => (c.art?.pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`);
-/** 상태+투입 한 딱지 (2026-10-20 사용자): 상태 글 │ 투입 표시. 투입은 자세히가 아니라 있다·없다와 규모만.
+/** 상태+투입 한 딱지 (2026-10-20 사용자): 상태 글 │ 투입 표시. 이름 줄 오른쪽 끝, 폭 고정. 투입은 자세히가 아니라 있다·없다와 규모만.
  *  요원과 조직을 같이 세면 겹쳐 세기 쉬워서(관리국 + 관리국 요원) 요원이 있으면 요원 수만, 없을 때만 조직 표시 */
 function stateTag(c: EvCard): string {
   const agentsIn = (c.chips?.match(/class="gx-pchip"/g) ?? []).length;
@@ -76,7 +76,7 @@ function stateTag(c: EvCard): string {
       ? `<span class="gx-evc-dep" title="${verb}: 요원 ${agentsIn}명">${ICONS.person}<b>${agentsIn}</b></span>`
       : others
         ? `<span class="gx-evc-dep" title="${verb}: 요원 아닌 인원·조직">${ICONS.org}</span>`
-        : `<span class="gx-evc-dep none">${c.kind === 'ms' ? '방문 없음' : '미투입'}</span>`;
+        : `<span class="gx-evc-dep none">${c.kind === 'ms' ? '미방문' : '미투입'}</span>`;
   return `<span class="gx-evc-st">${c.badge}${dep}</span>`;
 }
 
@@ -91,7 +91,7 @@ function artCard(c: EvCard): string {
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${state}</span>${line3}</span>
+      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${state}</span><span class="gx-evart-l2"><small>${c.loc}</small></span>${line3}</span>
     </div></li>`;
 }
 
@@ -115,7 +115,7 @@ export function evPopup(): string {
     <div class="gx-evc art open ev-pop${c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${stateTag(c)}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${stateTag(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small></span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
 }
 
