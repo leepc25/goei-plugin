@@ -73,8 +73,10 @@ function artCard(c: EvCard): string {
   const act = fold ? ` data-action="ev-fold" data-value="${esc(fold.id)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
   const pic = c.art?.pic;
   const desc = c.art?.desc ?? '';
-  const more = open ? `${c.extra ?? ''}${desc ? `<span class="gx-evc-desc">${esc(desc)}</span>` : ''}` : '';
-  return `<li class="gx-evc art${act ? ' go' : ''}${open ? ' open' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
+  // 펴지 않는 임무 탭 띠는 예전 카드만큼 정보를 그대로 보인다 (2026-10-20 사용자): 요원 이름, 사건 상황
+  const flat = !c.fold;
+  const more = open ? `${c.extra ?? ''}${desc ? `<span class="gx-evc-desc">${esc(desc)}</span>` : ''}` : flat ? c.extra ?? '' : '';
+  return `<li class="gx-evc art${act ? ' go' : ''}${open ? ' open' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}${flat ? ' flat' : ''}"${act}>
     <div class="gx-evart k-${c.kind}${pic ? '' : ' none'}"${pic ? ` style="background-image:url('${esc(pic)}')"` : ''}>
       ${pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`}
       <span class="gx-evart-top">${mark}<span class="gx-evc-tags">${c.badge}</span>${acts}</span>
