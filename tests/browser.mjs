@@ -109,6 +109,11 @@ async function open(page) {
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 6000 });
   await page.click('[x-goei-fab] button');
 }
+// 커스텀 목록: 그림 띠를 눌러 펼친 뒤 「이 …로 선택」 (2026-10-20 그림 카드)
+async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
+  await page.locator(`${row} [data-action="mission-open"]`).first().click();
+  await page.click('.gx-mlist li.gx-mx.open [data-action="mission-pick"]');
+}
 
 // 1) 새 채팅: 백일몽 · English · 01 신입 OT
 {
@@ -509,7 +514,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await page.evaluate(() => { document.querySelector('.gx-body').scrollTop = 0; });
     await page.screenshot({ path: `${shots}/9-board-wide.png` });
     await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
-    await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
+    await pickCustom(page);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${shots}/9-mission-wide.png` });
     for (const t of ['board', 'map', 'mission', 'phone', 'wiki', 'settings']) {
@@ -543,7 +548,9 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.setViewportSize({ width: 390, height: 844 });
   // 상황판 행 → 임무(지도) 탭의 그 자리
   await page.setViewportSize({ width: 1280, height: 860 });
-  await page.click(`.gx-board li[data-action="board-map"]:has-text("${preset.name}") .gx-evc-name`);
+  // 그림 카드: 눌러 펼친 뒤 지도 버튼
+  await page.click(`.gx-board li.gx-evc:has-text("${preset.name}") .gx-evart-name`);
+  await page.click(`.gx-board li.gx-evc.open:has-text("${preset.name}") [data-action="board-map"]`);
   await page.waitForSelector('.gx-map .gx-placecard');
   assert.ok((await page.textContent('.gx-map .gx-sits')).includes(preset.name));
   if (shots) {
@@ -556,7 +563,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   }
   await page.setViewportSize({ width: 1280, height: 860 });
   // 취소: 장소를 고르면 켜지고, 누르면 장소와 목표가 함께 풀린다
-  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evart-name`);
   await page.waitForFunction(() => !document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
   assert.equal(await page.locator('.gx-map .gx-unplace:not([disabled])').count(), 1, '고르면 취소가 켜짐');
   await page.click('.gx-map .gx-unplace');
@@ -564,9 +571,9 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   assert.equal(await page.locator('.gx-map .gx-placecard').count(), 0, '취소하면 장소도 풀림');
   assert.equal(await page.locator('.gx-map .gx-unplace[disabled]').count(), 1, '고른 것이 없으면 취소는 꺼짐');
   // PC: 고른 상황을 한 번 더 누르면 풀린다
-  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evart-name`);
   await page.waitForFunction(() => !document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
-  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evc-name`);
+  await page.click(`.gx-map li[data-action="pick-event"]:has-text("${preset.name}") .gx-evart-name`);
   await page.waitForFunction(() => document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
@@ -701,7 +708,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.equal(await page.locator('.gx-pin.nation.hot').count() >= 1, true);
   if (shots) await page.screenshot({ path: `${shots}/11-map-nation.png` });
   // 상황 선택: 그 시도 지도로 바뀌고 목표가 채워진다
-  await page.click(`.gx-evc:has-text("${preset.name}") .gx-evc-main`);
+  await page.click(`.gx-evc:has-text("${preset.name}") .gx-evart-name`);
   await page.waitForFunction((c) => document.querySelector('.gx-select')?.value === c, code);
   assert.equal(await page.textContent('.gx-goal b'), preset.name);
   await page.waitForFunction(() => document.querySelector('.gx-mapimg')?.naturalWidth > 0, null, { timeout: 5000 });
@@ -783,6 +790,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 상황 종료: 두 번 눌러 확인
   await open(page);
   await page.waitForSelector('.gx-evc');
+  if (!(await page.locator(`.gx-evc.open:has-text("${preset.name}")`).count())) await page.click(`.gx-evc:has-text("${preset.name}") .gx-evart-name`);
   await page.click(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`);
   assert.equal((await page.textContent(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`)).trim(), '정말 종료');
   await page.click(`.gx-evc:has-text("${preset.name}") [data-action="end-event"]`);
@@ -813,7 +821,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForFunction(() => [...document.querySelectorAll('.gx-mlist li.gx-mgrp')].some((h) => h.textContent.startsWith('거점')));
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
-  await page.click('.gx-mlist li.gx-ev [data-action="mission-pick"]');
+  await pickCustom(page);
   // 위 종류 버튼을 바꿔 봐도 고른 목표는 그대로
   await page.click('[data-action="mission-kind"][data-value="lm"]');
   assert.equal((await page.textContent('.gx-goal b')).trim(), '소라 랜드');
@@ -833,7 +841,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-search');
   assert.equal(await page.locator('.gx-nav').count(), 0, '아직 플레이 화면 아님');
   await page.click('[data-action="mission-kind"][data-value="ms"]');
-  await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
+  await pickCustom(page);
   const site0 = (await page.textContent('.gx-goal b')).trim();
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction((n) => window.__chat.message.length === 1 && window.__chat.message[0].data.includes(n), site0);
@@ -860,7 +868,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-search');
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
-  await page.click('.gx-mlist li.gx-ev [data-action="mission-pick"]');
+  await pickCustom(page);
   await page.click('[data-action="mission-send"]');
   await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
   // 첫 전송은 시드를 유지 (지시문 + 덧붙인 글 = 한 번)
@@ -872,7 +880,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
   await page.click('[data-action="mission-kind"][data-value="ms"]');
-  await page.click('.gx-mlist li:first-child [data-action="mission-pick"]');
+  await pickCustom(page);
   const site = (await page.textContent('.gx-goal b')).trim();
   // 다른 탭에 다녀와도 고른 목표 유지
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
@@ -1547,7 +1555,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$st_support_on === '0');
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
   await page.waitForSelector('.gx-mbox');
-  await page.click('.gx-mbox [data-action="mission-pick"]');
+  await pickCustom(page, '.gx-mbox li.gx-mx');
   await page.waitForSelector('.gx-team');
   assert.equal(await page.locator('.gx-mission .gx-unplace:not([disabled])').count(), 1, '커스텀 목표를 고르면 취소가 켜짐');
   await page.click('.gx-mission .gx-unplace');

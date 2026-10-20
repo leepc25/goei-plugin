@@ -58,12 +58,12 @@ export function elapsedText(minute: number | null, since: number | null): string
 function artCard(c: EvCard): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : '';
   const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}" title="${KIND[c.kind]}${grade ? ` ${esc(grade)}등급` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
-  // 이름 미확인 괴이는 보여 줄 그림·설명이 없어 펴지 않는다 (2026-10-20 사용자). 진행 중이면 띠에 지도·종료 버튼, 누르면 지도로
+  // 이름 미확인 괴이는 보여 줄 그림·설명이 없어 펴지 않는다 (2026-10-20 사용자). 펴지 않는 카드(이름 미확인, 임무 탭)는 띠에 바로 위키·종료 버튼
   const unknown = c.name === '이름 미확인';
   const fold = unknown ? undefined : c.fold;
   const open = !!fold?.open;
   const key = c.key ? esc(c.key) : '';
-  const acts = c.key && (open || unknown)
+  const acts = c.key && (open || !fold)
     ? `<span class="gx-evart-act">${c.name !== '이름 미확인' ? `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>` : ''}
       ${fold ? `<button class="gx-evbtn" data-action="board-map" data-value="${key}" title="지도" aria-label="${esc(c.name)} 지도에서 보기">${ICONS.map}</button>` : ''}
       ${c.confirmEnd
