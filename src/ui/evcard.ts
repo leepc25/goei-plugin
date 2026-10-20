@@ -58,20 +58,23 @@ export function elapsedText(minute: number | null, since: number | null): string
 function artCard(c: EvCard): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : '';
   const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ''}" title="${KIND[c.kind]}${grade ? ` ${esc(grade)}등급` : ''}">${grade ? esc(grade) : MARK[c.kind]}</i>`;
-  const open = !!c.fold?.open;
+  // 이름 미확인 괴이는 보여 줄 그림·설명이 없어 펴지 않는다 (2026-10-20 사용자). 진행 중이면 띠에 지도·종료 버튼, 누르면 지도로
+  const unknown = c.name === '이름 미확인';
+  const fold = unknown ? undefined : c.fold;
+  const open = !!fold?.open;
   const key = c.key ? esc(c.key) : '';
-  const acts = c.key && open
+  const acts = c.key && (open || unknown)
     ? `<span class="gx-evart-act">${c.name !== '이름 미확인' ? `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.wiki}</button>` : ''}
-      ${c.fold ? `<button class="gx-evbtn" data-action="board-map" data-value="${key}" title="지도" aria-label="${esc(c.name)} 지도에서 보기">${ICONS.map}</button>` : ''}
+      ${fold ? `<button class="gx-evbtn" data-action="board-map" data-value="${key}" title="지도" aria-label="${esc(c.name)} 지도에서 보기">${ICONS.map}</button>` : ''}
       ${c.confirmEnd
         ? `<button class="gx-mini danger" data-action="end-event" data-value="${key}">정말 종료</button>`
         : `<button class="gx-evbtn" data-action="end-event" data-value="${key}" title="상황 종료" aria-label="${esc(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`
     : '';
-  const act = c.fold ? ` data-action="ev-fold" data-value="${esc(c.fold.id)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
+  const act = fold ? ` data-action="ev-fold" data-value="${esc(fold.id)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
   const pic = c.art?.pic;
   const desc = c.art?.desc ?? '';
   const more = open ? `${c.extra ?? ''}${desc ? `<span class="gx-evc-desc">${esc(desc)}</span>` : ''}` : '';
-  return `<li class="gx-evc art${act ? ' go' : ''}${open ? ' open' : ''}${c.selected ? ' sel' : ''}${c.key ? '' : ' wait'}"${act}>
+  return `<li class="gx-evc art${act ? ' go' : ''}${open ? ' open' : ''}${c.selected ? ' sel' : ''}${c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${pic ? '' : ' none'}"${pic ? ` style="background-image:url('${esc(pic)}')"` : ''}>
       ${pic ? '' : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`}
       <span class="gx-evart-top">${mark}<span class="gx-evc-tags">${c.badge}</span>${acts}</span>
