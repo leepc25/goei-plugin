@@ -1216,9 +1216,11 @@ function board(ctx: ChatContext): string {
     const id = key ?? `${kind}${i}:${c.name}`;
     return evCard({ ...c, kind, key, open: 'board-map', confirmEnd: !!key && field.confirmEnd === key, art: evArt(ctx, c.name, kind), pop: id });
   };
+  // 발생 예정(모델 태그 전)은 띄우지 않는다 (2026-10-20 사용자: 누를 것도 없고 다음 상황을 미리 알려 버린다)
   const an = w.an
     .map((e, i) => {
       const wait = e.state === '발생대기';
+      if (wait) return '';
       const since = elapsedText(w.minute, e.since);
       const badge = wait ? pending : e.exploring ? '<span class="gx-badge op">탐사 중</span>' : `<span class="gx-badge live">${esc(e.state)}</span>`;
       return one('an', i, { name: e.name || '이름 미확인', grade: e.grade, loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: wait ? '' : peopleChips(ctx.char, names(e.deploy), byName) });
@@ -1227,6 +1229,7 @@ function board(ctx: ChatContext): string {
   const inc = w.inc
     .map((e, i) => {
       const wait = e.state === '발생대기';
+      if (wait) return '';
       const since = elapsedText(w.minute, e.since);
       return one('in', i, { name: e.name || '이름 미확인', loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge: wait ? pending : '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit" title="${esc(e.situation)}">${esc(e.situation)}</span>` : '' });
     })
@@ -1234,6 +1237,7 @@ function board(ctx: ChatContext): string {
   const ms = w.ms
     .map((e, i) => {
       const wait = e.state === '발생대기';
+      if (wait) return '';
       return one('ms', i, { name: e.name, loc: esc(locName(e.loc)), badge: wait ? pending : '<span class="gx-badge live">출현</span>', chips: wait ? '' : peopleChips(ctx.char, names(e.visitors), byName) });
     })
     .join('');
@@ -1256,9 +1260,8 @@ function board(ctx: ChatContext): string {
   const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc(w.promoted.join(', '))}</p>` : '';
   const live = (list: { state: string }[]) => list.filter((e) => e.state !== '발생대기').length;
   const onOp = roster.filter((p) => w.agents[p.id]?.st === '작전투입');
-  const waiting = (list: { state: string }[]) => list.length - live(list);
   // v0.16.16: 위 띠(위협도·개수 버튼)를 없앴다. 개수는 각 칸 제목에 (위협도는 v0.16.19 다음에 완전히 뺐다)
-  const count = (list: { state: string }[], on: string) => [live(list) ? `${on} ${live(list)}` : '', waiting(list) ? `예정 ${waiting(list)}` : ''].filter(Boolean).join(' · ') || '0';
+  const count = (list: { state: string }[], on: string) => (live(list) ? `${on} ${live(list)}` : '0');
   const col = (id: string, title: string, list: { state: string }[], rows: string, empty: string) =>
     `<section class="gx-bd-col" id="gx-sec-${id}"><h2>${title}<small>${count(list, id === 'ms' ? '출현' : '진행')}</small></h2>${rows ? `<ul class="gx-evcs">${rows}</ul>` : `<p class="gx-none">${empty}</p>`}</section>`;
   return `<main class="gx-body gx-board">
