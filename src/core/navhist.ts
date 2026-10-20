@@ -28,6 +28,11 @@ export class NavHistory<T> {
     return JSON.parse(this.list[this.at]) as T;
   }
 
+  /** 지나온 화면들, 최근 것부터 (같은 화면은 한 번만) */
+  recent(): T[] {
+    return [...new Set(this.list.slice(0, this.at + 1).reverse())].map((k) => JSON.parse(k) as T);
+  }
+
   clear(): void {
     this.list = [];
     this.at = -1;

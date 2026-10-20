@@ -13,7 +13,8 @@ import { loadModuleAssets } from '../host/assets';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
 import { bindMbar, mbarHtml } from './mbar';
-import { bindDrawer, drawerHtml } from './drawer';
+import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
+import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
 import { agentInner, avatar, factionPic, imageUrl, setImageRedraw, showAgentInfo, showIdCard } from './images';
 import { bindMapZoom } from './mapzoom';
@@ -25,7 +26,8 @@ import { bindFootnotes, bindWikiSide, handleWiki, openWikiSettings, resetWiki, w
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
-import { readPhone } from '../core/phone';
+import { readPhone, roomLabel } from '../core/phone';
+import { findPost, readGnet } from '../core/gnet';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -39,7 +41,7 @@ import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
-import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf } from '../core/settings';
+import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 
 interface Draft {
   faction?: FactionCode;
@@ -598,6 +600,33 @@ async function handle(action: string, value?: string): Promise<void> {
       if (view.kind === 'started' && tab === 'phone') openCheck(view.ctx, phoneEnv);
       if (view.kind === 'started' && tab === 'gnet') gnetOpenCheck(view.ctx, gnetEnv);
       return;
+    case 'nav-back':
+    case 'nav-fwd': {
+      markUi.pop = false;
+      const run = navStep(action === 'nav-back' ? -1 : 1);
+      return run ? run() : render();
+    }
+    case 'mk-pop':
+      markUi.pop = !markUi.pop;
+      return render();
+    case 'mk-go': {
+      const m = marks()[Number(value)];
+      if (!m || view.kind !== 'started') return;
+      markUi.pop = false;
+      closeDrawer();
+      if (gameOpen()) closeGame();
+      return applyNav(openable(view.ctx, m.s as unknown as NavState));
+    }
+    case 'mk-here':
+    case 'mk-add': {
+      if (view.kind !== 'started') return;
+      const m = action === 'mk-here' ? markOf(navState()) : markCandidates(recentMarks(), markOf(navState()))[Number(value)];
+      if (m) await addMark(m);
+      return render();
+    }
+    case 'mk-del':
+      await removeMarkAt(Number(value));
+      return render();
     case 'feature-set':
       // 메인 설정 맨 위 「기능별 설정」: 그 탭으로 넘어가 설정 화면을 연다
       if (view.kind !== 'started') return;
@@ -849,22 +878,22 @@ function render(): void {
   hydratePhotos(root);
   bindMapZoom(root);
   bindMbar(root, () => void handle('close'));
-  bindDrawer(root);
+  bindDrawer(root, () => void handle('mk-pop'));
   bindWikiSide(root, (v) => void handle('wiki-list', v));
   bindFootnotes(root);
   const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
+  // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
+  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
-/** 모바일 상황판 하단 서랍: 순찰·설정 (2026-10-19 사용자: 신분증은 위에만, 순찰은 위에서 빼고 여기만) */
+/** 모바일 상황판 하단 서랍: 즐겨찾기 다섯 칸 (2026-10-20 사용자: 순찰·설정 두 버튼 자리를 즐겨찾기로. 설정은 위 머리에 있다) */
 function boardDrawer(): string {
   if (!matchMedia('(max-width: 760px)').matches) return '';
-  const b = (action: string, value: string, icon: string, label: string) =>
-    `<button class="ph-tool" data-action="${action}"${value ? ` data-value="${value}"` : ''} aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`;
-  return drawerHtml(b('game-open', '', ICONS.game, '순찰') + b('tab', 'settings', ICONS.settings, '설정'), '', 'gx-bdrawer');
+  return drawerHtml(markSlots(), '', 'gx-bdrawer');
 }
 
 /** 앞뒤 이동 기록에 적는 화면 상태: 지금 탭과 그 탭 안에서 어디를 보고 있는지 (입력 중인 글·고른 값은 넣지 않는다) */
@@ -887,6 +916,53 @@ function navState(): NavState {
   if (tab === 'map' || tab === 'mission') s.f = field.step;
   if (tab === 'settings') s.d = dirUi.open;
   return s;
+}
+
+/** 즐겨찾기로 적을 화면 상태: 쓰던 글·펼친 목록은 빼고 화면만 */
+function markState(s: NavState): NavState {
+  const o: NavState = JSON.parse(JSON.stringify(s));
+  if (o.w) o.w.list = false;
+  if (o.g) o.g.c = null;
+  if (o.p && o.p.view !== 'room' && o.p.view !== 'settings' && o.p.view !== 'notice') Object.assign(o.p, { view: 'list', room: null, n: null });
+  return o;
+}
+
+const PH_SUB: Record<string, string> = { contacts: '연락처', chats: '대화', notices: '공지' };
+
+/** 화면 상태 → 즐겨찾기 이름 (위키 문서 제목, 괴담톡 방 이름, 괴담넷 글 제목…) */
+function markOf(raw: NavState): Mark {
+  const s = markState(raw);
+  const ctx = view.kind === 'started' ? view.ctx : null;
+  let name = TAB_TITLE[s.tab];
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : '위키 메인';
+  if (s.p) {
+    const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
+    name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
+  }
+  if (s.g) {
+    const post = s.g.open !== null && ctx ? findPost(readGnet(ctx.chat), s.g.open) : undefined;
+    name = s.g.s ? '괴담넷 설정' : post ? post.title || '괴담넷 글' : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
+  }
+  if (s.f === 'team') name = `${name} 편성`;
+  if (s.tab === 'settings' && s.d) name = '명부';
+  return { s: s as unknown as Mark['s'], name };
+}
+
+/** 최근 본 화면 (설정은 빼고) */
+function recentMarks(): Mark[] {
+  const seen = new Set<string>();
+  return navHist.recent().filter((s) => s.tab !== 'settings').map(markOf).filter((m) => {
+    const k = JSON.stringify(m.s);
+    return !seen.has(k) && (seen.add(k), true);
+  });
+}
+
+/** 다른 채팅에서 넣은 즐겨찾기: 이 채팅에 없는 괴담톡 방은 목록으로 */
+function openable(ctx: ChatContext, s: NavState): NavState {
+  const o: NavState = JSON.parse(JSON.stringify(s));
+  if (!TABS.includes(o.tab)) o.tab = 'board';
+  if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
+  return o;
 }
 
 function applyNav(s: NavState): void {
@@ -956,7 +1032,7 @@ function body(): string {
         <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
       </div>`;
     case 'started':
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1030,8 +1106,9 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
-    <span class="gx-nav-gap"></span>
     ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
+    <span class="gx-nav-gap"></span>
+    ${ctx ? navHistBar(markOf(navState())) : ''}
     ${mbarHtml([
       item('wiki', '위키', ICONS.wiki),
       item('map', '임무', ICONS.map, 'mob'),

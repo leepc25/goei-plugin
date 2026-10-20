@@ -2364,4 +2364,61 @@ if (fixture.globalLore.some(packed)) {
   console.log('PASS 얼굴 사진: 대표 사진에서 자르기, 틀 맞추기 저장');
 }
 
+// 즐겨찾기: PC ‹ ★ › 창에서 넣기·가기·빼기, 뒤로, 모바일 서랍 안내·좌우 밀기·칸
+{
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, { width: 1280, height: 860 });
+  await startedWithReply(page);
+  await open(page);
+  const tabNow = () => page.evaluate(() => document.querySelector('.gx').dataset.tab);
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
+  await page.waitForSelector('.nw-home');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  assert.equal(await page.locator('.gx-nh[data-action="nav-back"]').isDisabled(), false, '뒤로 갈 곳이 있으면 켜짐');
+  await page.click('.gx-nh.mk-star');
+  await page.waitForSelector('.mk-pop');
+  assert.ok((await page.textContent('.mk-pop')).includes('위키 메인'), '최근 본 화면');
+  await page.click('.mk-pop [data-action="mk-add"]');
+  await page.click('.mk-pop [data-action="mk-here"]');
+  const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs']));
+  assert.deepEqual(saved.marks.map((m) => m.name), ['위키 메인', '상황판']);
+  if (shots) await page.screenshot({ path: `${shots}/19-marks-pop.png` });
+  await page.click('.mk-pop [data-action="mk-go"][data-value="0"]');
+  assert.equal(await tabNow(), 'wiki');
+  assert.equal(await page.locator('.mk-pop').count(), 0, '가면 창 닫힘');
+  await page.click('.gx-nh[data-action="nav-back"]');
+  assert.equal(await tabNow(), 'board', '‹ 는 바로 전 화면');
+  await page.click('.gx-nh.mk-star');
+  await page.click('.mk-pop [data-action="mk-del"][data-value="1"]');
+  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks.length, 1);
+  await page.click('.mk-head [data-action="mk-pop"]');
+  // 모바일: 서랍에 즐겨찾기 칸, 비었으면 안내, 펼친 서랍을 좌우로 밀면 ★ 창
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.click('[data-action="tab"][data-value="board"]:visible');
+  await page.click('.gx-bdrawer .ph-grip');
+  assert.equal(await page.locator('.gx-bdrawer .mk-slot:not(.empty)').count(), 1);
+  assert.equal(await page.locator('.gx-bdrawer [data-action="game-open"], .gx-bdrawer [data-value="settings"]').count(), 0, '순찰·설정 버튼은 뺌');
+  await page.click('.gx-bdrawer .mk-slot:not(.empty)');
+  assert.equal(await tabNow(), 'wiki', '칸을 누르면 그 화면');
+  assert.equal(await page.locator('.ph-drawer.open').count(), 0, '서랍에서 가면 서랍은 접힘');
+  await page.click('[data-action="tab"][data-value="board"]:visible');
+  await page.click('.gx-bdrawer .ph-grip');
+  await page.click('.gx-bdrawer .mk-slot.empty >> nth=0');
+  await page.waitForSelector('.mk-pop');
+  await page.click('.mk-pop [data-action="mk-del"][data-value="0"]');
+  await page.click('.mk-head [data-action="mk-pop"]');
+  await page.waitForSelector('.gx-bdrawer .mk-hint');
+  if (shots) await page.screenshot({ path: `${shots}/19-marks-mobile-hint.png` });
+  await page.evaluate(() => {
+    const el = document.querySelector('.gx-bdrawer .mk-hint');
+    const r = el.getBoundingClientRect();
+    const t = (x) => new Touch({ identifier: 1, target: el, clientX: x, clientY: r.top + 10 });
+    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [t(300)], changedTouches: [t(300)] }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [t(150)] }));
+  });
+  await page.waitForSelector('.mk-pop');
+  assert.deepEqual(errors, []);
+  await page.close();
+  console.log('PASS 즐겨찾기: ★ 창 넣기·가기·빼기, ‹ › 앞뒤, 모바일 서랍 칸·안내·좌우 밀기');
+}
+
 await browser.close();

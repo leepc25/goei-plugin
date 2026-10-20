@@ -96,7 +96,16 @@ export interface Prefs {
   dim?: number;
   /** 채팅 속 상태창 배색 (없으면 테마 따름) */
   status?: StatusStyle;
+  /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
+  marks?: Mark[];
 }
+
+/** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
+export interface Mark {
+  s: { tab: string } & Record<string, unknown>;
+  name: string;
+}
+export const MARK_MAX = 5;
 
 /** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
 export const DIM_DEFAULT = 50;
@@ -138,7 +147,11 @@ export function setPrefs(raw: unknown): Prefs {
   const nav = o.nav === 'right' ? 'right' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}) };
+  const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
+    .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
+    .slice(0, MARK_MAX)
+    .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

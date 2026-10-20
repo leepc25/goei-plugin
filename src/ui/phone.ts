@@ -591,6 +591,12 @@ function contactsView(ctx: ChatContext, d: Directory, st: PState): string {
 }
 
 /** 연락처 줄: 큰 사진, 이름 옆에 상황판 상태 딱지, 아래 직급·소속 */
+/** 연락처 이름 옆 말풍선: 이 사람과 나눈 대화가 있으면 (글자 없이 아이콘만, 안 읽은 게 있으면 강조) */
+const talking = (room: PRoom | undefined) =>
+  room?.messages.some((m) => m.kind === 'message')
+    ? `<span class="ph-talk${room.unread ? ' new' : ''}" role="img" aria-label="${room.unread ? '안 읽은 대화' : '대화 중'}">${ICONS.phone}</span>`
+    : '';
+
 function contactList(ctx: ChatContext, rows: Contact[], st: PState): string {
   const fnames = names(ctx);
   const states = agentStates(ctx);
@@ -600,7 +606,7 @@ function contactList(ctx: ChatContext, rows: Contact[], st: PState): string {
           const confirm = phone.confirm === `contact:${c.id}`;
           const on = phone.view === 'room' && phone.room === `dm_${c.id}`;
           return `<li class="ph-row"><button class="ph-main${on ? ' on' : ''}" data-action="ph-dm" data-value="${c.id}">${face(ctx, c, c.name)}
-            <span class="ph-who"><span class="ph-who-name"><b>${esc(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ''}</span><small>${esc(contactDetails(c) || (c.custom ? c.note || '직접 추가한 연락처' : fnames[c.group ?? ''] ?? ''))}</small></span>
+            <span class="ph-who"><span class="ph-who-name"><b>${esc(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ''}${talking(room)}</span><small>${esc(contactDetails(c) || (c.custom ? c.note || '직접 추가한 연락처' : fnames[c.group ?? ''] ?? ''))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
             <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc(c.name)}" title="전화" aria-label="${esc(c.name)}에게 전화">${ICONS.call}</button>
             ${c.custom ? '' : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc(c.lore || c.name)}" title="위키" aria-label="${esc(c.name)} 위키">${ICONS.book}</button>`}
