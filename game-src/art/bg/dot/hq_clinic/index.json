@@ -1,0 +1,94 @@
+{
+ "hq_clinic_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/hq_clinic_objects_1": {
+  "w": 56,
+  "h": 46,
+  "foot": [
+   28,
+   46
+  ]
+ },
+ "objects/hq_clinic_objects_2": {
+  "w": 61,
+  "h": 109,
+  "foot": [
+   30,
+   109
+  ]
+ },
+ "objects/hq_clinic_objects_3": {
+  "w": 126,
+  "h": 97,
+  "foot": [
+   63,
+   97
+  ]
+ },
+ "objects/hq_clinic_objects_4": {
+  "w": 61,
+  "h": 55,
+  "foot": [
+   30,
+   55
+  ]
+ },
+ "objects/hq_clinic_objects_5": {
+  "w": 55,
+  "h": 58,
+  "foot": [
+   27,
+   58
+  ]
+ },
+ "objects/hq_clinic_objects_6": {
+  "w": 32,
+  "h": 31,
+  "foot": [
+   16,
+   31
+  ]
+ },
+ "objects/hq_clinic_objects_7": {
+  "w": 31,
+  "h": 43,
+  "foot": [
+   15,
+   43
+  ]
+ },
+ "objects/hq_clinic_objects_8": {
+  "w": 25,
+  "h": 37,
+  "foot": [
+   12,
+   37
+  ]
+ },
+ "objects/hq_clinic_objects_9": {
+  "w": 38,
+  "h": 67,
+  "foot": [
+   19,
+   67
+  ]
+ },
+ "hq_clinic_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_clinic_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_clinic_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_clinic_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

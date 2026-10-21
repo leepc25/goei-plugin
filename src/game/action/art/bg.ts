@@ -161,7 +161,10 @@ export function placeFor(where: string, floorType: string | undefined, ref: stri
   if (ref === 'room:elevator_hall' || ref === 'room:exit_hall') return 'el_hall';
   if (ref === 'room:guardian_room') return `guardian:${({ chase: 'legs', replica: '405' } as Record<string, string>)[floorType ?? ''] ?? 'guard'}`;
   if (ref === 'room:trial_goal') return 'test';
-  return ({ lobby: 'lobby', chase: 'chase', trial: 'test', replica: 'apt', puzzle: 'test', silent: 'chase', dark: 'chase', deep: 'service' } as Record<string, string>)[floorType ?? ''] ?? 'lobby';
+  // 침묵·어둠·퍼즐·심층은 자기 그림(GPT요청_게임배경_층별)이 들어오면 그것, 아직이면 비슷한 층을 빌린다
+  const t = floorType ?? '';
+  if (['silent', 'dark', 'puzzle', 'deep'].includes(t) && walls(t).length) return t;
+  return ({ lobby: 'lobby', chase: 'chase', trial: 'test', replica: 'apt', puzzle: 'test', silent: 'chase', dark: 'chase', deep: 'service' } as Record<string, string>)[t] ?? 'lobby';
 }
 
 /** 폭이 정해진 칸(본부 장소처럼 640보다 좁거나 넓은 칸)에 벽 그림을 늘리지 않고 가운데를 잘라 채운다. */
@@ -185,7 +188,7 @@ export function drawWallCrop(ctx: CanvasRenderingContext2D, place: string, key: 
 
 /** 본부 장소 id → 그림 장소 (그림이 없는 장소는 비슷한 방을 빌린다). */
 export const HQ_PLACE: Record<string, string> = {
-  office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_office', supply: 'hq_workshop', pantry: 'hq_pantry', clinic: 'test', interview: 'hq_office',
+  office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_office', supply: 'hq_workshop', pantry: 'hq_pantry', clinic: 'hq_clinic', interview: 'hq_interview',
   training: 'hq_workshop', appraisal: 'hq_jaemtri', lab: 'test', tooth: 'service', gallery: 'chase',
   // 본부 평면도(hq/map.ts)의 장면 id·look. 그림이 아직 없는 곳은 비슷한 방을 빌린다(본부 배경 의뢰가 들어오면 바꾼다).
   street: 'hq_street', lobby: 'hq_lobby', f2: 'hq_corridor', corridor: 'hq_corridor', b2: 'chase', containment: 'chase', pasta: 'apt',
@@ -214,8 +217,9 @@ const BY_KIND: Record<string, ObjRef> = {
   desk_monitors: ['hq_jaemtri', 1], cardigan_chair: ['hq_office', 12], condensed_milk_coffee: ['hq_office', 16], mix_coffee_box: ['hq_office', 17],
   whiteboard: ['hq_office', 13], desk_row: ['hq_office', 10, 'hq_office', 11], copier: ['hq_office', 14], sofa: ['hq_office', 4],
   meeting_table: ['hq_office', 15], paper_pile: ['hq_office', 18], chief_desk: ['hq_office', 1], bookshelf: ['hq_jaemtri', 9], chair: ['hq_office', 2],
+  bed: ['hq_clinic', 1], iv_stand: ['hq_clinic', 2], curtain: ['hq_clinic', 3], med_cabinet: null, recorder: ['hq_interview', 4],
   coffee_machine: ['hq_pantry', 2], fridge: ['hq_pantry', 1], table_small: ['hq_pantry', 3], sink_counter: ['hq_pantry', 8],
-  locker_row: ['hq_workshop', 3], workbench: ['hq_workshop', 1], cargo_cart: ['hq_workshop', 2], shelf: ['hq_pantry', 8],
+  locker_row: ['hq_supply', 4], workbench: ['hq_workshop', 1], cargo_cart: ['hq_supply', 3], shelf: ['hq_supply', 1],
 };
 
 function objImage(place: string, n: number): HTMLImageElement | null {

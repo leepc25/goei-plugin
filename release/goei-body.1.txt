@@ -1,4 +1,4 @@
-// goei-body 0.16.37
+// goei-body 0.16.38
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -13,9 +13,9 @@
     heads.forEach((h, i) => {
       const name = h[1];
       if (name in sections2) throw new DirectiveError(`Directive 섹션이 중복됐어요: ${name}`);
-      const start4 = h.index + h[0].length;
+      const start3 = h.index + h[0].length;
       const end = i + 1 < heads.length ? heads[i + 1].index : raw.length;
-      sections2[name] = raw.slice(start4, end).trim();
+      sections2[name] = raw.slice(start3, end).trim();
     });
     let format;
     try {
@@ -75,9 +75,9 @@
     const bytes = new Uint8Array((hex3.match(/../g) ?? []).map((h) => parseInt(h, 16)));
     return new TextDecoder().decode(bytes);
   }
-  function sceneRecord(summary, body5) {
+  function sceneRecord(summary, body4) {
     return `%%SCENE_CARD:${toHex(JSON.stringify(summary))}%%
-${body5}
+${body4}
 %%/SCENE_CARD%%`;
   }
   function hasSceneCard(text) {
@@ -130,7 +130,7 @@ ${text}
     return text.replace(/%%GOEI_START%%\r?\n/g, "").replace(/\r?\n%%\/GOEI_START%%/g, "");
   }
   function renderStartCards(text, render2) {
-    return text.replace(START_RE, (_all, body5, unsent) => render2(body5, !!unsent));
+    return text.replace(START_RE, (_all, body4, unsent) => render2(body4, !!unsent));
   }
   function stripUnsentMark(text) {
     return text.replace(UNSENT_RE, "");
@@ -151,10 +151,10 @@ ${text}
       }
     });
   }
-  function withUserInput(d, body5, extra) {
-    if (!extra.trim()) return body5;
+  function withUserInput(d, body4, extra) {
+    if (!extra.trim()) return body4;
     const tpl = d?.format.user_input ?? "Situation:\n[[INPUT]]";
-    return `${body5}
+    return `${body4}
 
 ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   }
@@ -178,8 +178,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
       bottom: Math.round(Math.min(maxB, Math.max(FAB_MARGIN, b)))
     };
   }
-  function dragTo(start4, dx, dy, viewW, viewH) {
-    return clampPos({ right: start4.right - dx, bottom: start4.bottom - dy }, viewW, viewH);
+  function dragTo(start3, dx, dy, viewW, viewH) {
+    return clampPos({ right: start3.right - dx, bottom: start3.bottom - dy }, viewW, viewH);
   }
   function parsePos(raw) {
     try {
@@ -229,6 +229,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
     siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
     spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
+    expand: stroke('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
     close: stroke('<path d="M6 6l12 12M18 6 6 18"/>'),
     up: stroke('<path d="m6 15 6-6 6 6"/>'),
     down: stroke('<path d="m6 9 6 6 6-6"/>'),
@@ -397,8 +398,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   var isDirectory = (comment) => comment === DIRECTORY_COMMENT || comment === OLD_DIRECTORY;
   function named(lore, name, old) {
     const list4 = lore ?? [];
-    const hit2 = list4.filter((e) => e.comment === name);
-    return hit2.length ? hit2 : list4.filter((e) => e.comment === old);
+    const hit3 = list4.filter((e) => e.comment === name);
+    return hit3.length ? hit3 : list4.filter((e) => e.comment === old);
   }
   var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
   var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
@@ -577,8 +578,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
   var cache = /* @__PURE__ */ new WeakMap();
   function factionList(lore) {
     const books = lore ?? [];
-    const hit2 = cache.get(books);
-    if (hit2) return hit2;
+    const hit3 = cache.get(books);
+    if (hit3) return hit3;
     const specs = orgSpecs(books);
     const out = SCENARIOS.factions.map((f, i) => {
       const spec = specs.find(([, v]) => v.code === f.code)?.[1] ?? {};
@@ -674,14 +675,14 @@ ${TYPE_GM[f.type ?? "org"]}`).join("")
   var EXTRA = "{{getvar::fac_extra}}";
   function placeFactionExtra(text) {
     const bare = text.split(EXTRA).join("");
-    const body5 = bare.replace(/\s+$/, "");
-    const next = body5.slice(1).search(/\n## /);
-    if (next < 0) return text.includes(EXTRA) ? text : `${body5}${EXTRA}
+    const body4 = bare.replace(/\s+$/, "");
+    const next = body4.slice(1).search(/\n## /);
+    if (next < 0) return text.includes(EXTRA) ? text : `${body4}${EXTRA}
 `;
     const at = next + 1;
-    const want = `${body5.slice(0, at).replace(/\s+$/, "")}${EXTRA}
+    const want = `${body4.slice(0, at).replace(/\s+$/, "")}${EXTRA}
 
-${body5.slice(at).replace(/^\s+/, "")}
+${body4.slice(at).replace(/^\s+/, "")}
 `;
     if (text.includes(EXTRA) && text.indexOf(EXTRA) === want.indexOf(EXTRA) && text.split(EXTRA).length === 2) return text;
     return want;
@@ -727,21 +728,56 @@ ${body5.slice(at).replace(/^\s+/, "")}
   // src/core/sharedpics.ts
   var PLACES_AN = [
     ["Apartment", ["아파트", "빌라", "단지", "맨션", "오피스텔", "고시원", "복도"]],
-    ["School", ["학교", "교실", "기숙학교", "학원", "대학", "캠퍼스", "보육원", "유치원"]],
+    ["School", ["학교", "교실", "기숙학교", "학원", "대학", "캠퍼스", "보육원", "유치원", "폐교"]],
     ["Hospital", ["병원", "의원", "병동", "응급실", "요양", "진료"]],
     ["Subway", ["지하철", "승강장", "전철", "선로", "교통공사", "열차", "기차", "역"]],
     ["Road", ["도로", "국도", "고개", "차도", "사망단길"]],
-    ["Tunnel", ["터널", "지하도", "굴"]],
+    ["Tunnel", ["터널", "지하도", "동굴", "굴"]],
     ["Forest", ["숲", "산", "등산", "수목원", "정원", "공원"]],
     ["Amusement", ["놀이공원", "테마파크", "랜드", "파크", "워터파크", "동물원", "서커스", "극단", "축제", "민속촌", "쇼"]],
     ["Lodging", ["호텔", "모텔", "리조트", "숙소", "펜션", "여관", "민박"]],
-    ["Ruin", ["폐", "공장", "저택", "지하실", "창고", "미술관", "극장", "백화점", "연구소", "홀"]],
+    ["Ruin", ["폐", "공장", "저택", "지하실", "창고", "연구소", "폐가", "흉가"]],
     ["Elevator", ["엘리베이터", "승강기"]],
-    ["Village", ["마을", "시골", "농촌", "명절", "도시"]],
+    ["Village", ["마을", "시골", "농촌", "명절"]],
     ["Office", ["회사", "사무실", "빌딩", "오피스", "야근", "출근"]],
-    ["Sea", ["바다", "해변", "해수욕장", "섬", "항구", "등대", "배"]],
-    ["Shrine", ["신당", "사당", "무덤", "묘지", "납골", "장례", "절", "굿"]]
+    ["Sea", ["바다", "해변", "해수욕장", "섬", "항구", "등대", "어선", "선박", "여객선", "유람선"]],
+    ["Shrine", ["신당", "사당", "무덤", "묘지", "납골", "장례", "사찰", "암자", "법당", "굿"]],
+    // 2026-10-21 추가 (그림은 docs/공용그림_GPT요청서_2차.md). 그림이 오기 전에는 FALLBACK 장소 그림
+    ["Theater", ["영화관", "극장", "시네마", "상영관", "공연장", "무대", "객석", "콘서트홀", "홀"]],
+    ["Mall", ["백화점", "쇼핑몰", "몰", "아울렛", "지하상가", "상가", "마트", "매장"]],
+    ["Restaurant", ["식당", "음식점", "포장마차", "먹자골목", "횟집", "술집", "주점", "고깃집", "분식", "국밥", "중국집"]],
+    ["Church", ["교회", "성당", "예배당", "수도원", "기도원", "십자가"]],
+    ["Bathhouse", ["목욕탕", "찜질방", "사우나", "대중탕", "수영장"]],
+    ["Store", ["편의점", "슈퍼", "구멍가게", "가게", "상점"]],
+    ["Arcade", ["노래방", "노래연습장", "PC방", "피시방", "오락실", "만화방", "게임장", "볼링장", "코인"]],
+    ["Library", ["도서관", "박물관", "미술관", "기록관", "전시관", "갤러리", "서고", "서점"]],
+    ["Parking", ["주차장", "주차타워", "차고"]],
+    ["Rooftop", ["옥상", "물탱크", "루프탑"]],
+    ["Bridge", ["다리", "대교", "육교", "교량", "철교"]],
+    ["Police", ["경찰서", "파출소", "지구대", "교도소", "구치소", "감옥", "유치장", "법원"]],
+    ["Military", ["군부대", "부대", "막사", "초소", "벙커", "훈련소", "방공호", "사격장"]],
+    ["Restroom", ["화장실", "변소", "샤워실"]],
+    ["Bus", ["버스", "정류장", "정류소", "터미널", "종점", "택시"]],
+    ["Lake", ["저수지", "호수", "하천", "강변", "한강", "댐", "계곡", "개울", "우물"]]
   ];
+  var FALLBACK = {
+    Theater: "Ruin",
+    Mall: "Ruin",
+    Restaurant: "Village",
+    Church: "Shrine",
+    Bathhouse: "Lodging",
+    Store: "Road",
+    Arcade: "Ruin",
+    Library: "School",
+    Parking: "Tunnel",
+    Rooftop: "Office",
+    Bridge: "Road",
+    Police: "Office",
+    Military: "Ruin",
+    Restroom: "School",
+    Bus: "Road",
+    Lake: "Sea"
+  };
   var PLACES_IN = [
     ["Street", ["거리", "도심", "번화가", "사거리", "광장", "대로"]],
     ["Apartment", ["아파트", "빌라 단지", "단지", "맨션", "오피스텔"]],
@@ -786,10 +822,21 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const ch of seed) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
     return (h >>> 0) % Math.max(1, n);
   }
-  function rank(table, text, seed) {
-    const scored = table.map(([key2, words], i) => ({ key: key2, i, score: words.reduce((n, w) => n + (text.includes(w) ? w.length : 0), 0) }));
-    const start4 = pick(seed, table.length);
-    const turn = (i) => (i - start4 + table.length) % table.length;
+  var STOP = /부산|울산|안산|군산|익산|경산|양산|서산|오산|논산|아산|얼굴|지역|구역|영역|전역/g;
+  var one = /* @__PURE__ */ new Map();
+  function hit(text, w) {
+    if (w.length > 1) return text.includes(w);
+    let re = one.get(w);
+    if (!re) one.set(w, re = w === "폐" ? /(?<![가-힣])폐[가-힣]/ : new RegExp(`[가-힣]${w}(?![가-힣])|(?<![가-힣])${w}(?![가-힣])`));
+    return re.test(text);
+  }
+  var clean = (text) => text.replace(STOP, " ");
+  var score = (words, text) => words.reduce((n, w) => n + (hit(text, w) ? w.length : 0), 0);
+  function rank(table, name, text, seed) {
+    const n = clean(name), t = clean(text);
+    const scored = table.map(([key2, words], i) => ({ key: key2, i, score: score(words, n) * 2 + score(words, t) }));
+    const start3 = pick(seed, table.length);
+    const turn = (i) => (i - start3 + table.length) % table.length;
     return scored.sort((a, b) => b.score - a.score || turn(a.i) - turn(b.i)).map((x) => x.key);
   }
   var two = (prefix, seed) => pick(seed, 2) ? [`${prefix} 2`, `${prefix} 1`] : [`${prefix} 1`, `${prefix} 2`];
@@ -798,22 +845,21 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const k = SIT[kind];
     if (!k) return [];
     const table = kind === "an" ? PLACES_AN : kind === "in" ? PLACES_IN : KINDS_MS;
-    const hay = kind === "ms" ? name : `${name} ${text}`;
-    const keys = rank(table, hay, name);
-    const out = kind === "an" ? keys.flatMap((key2) => two(`Situation ${k} ${key2}`, name)) : keys.map((key2) => `Situation ${k} ${key2}`);
+    const keys = rank(table, name, kind === "ms" ? "" : text, name);
+    const out = kind === "an" ? [...new Set(keys.flatMap((key2) => [key2, ...FALLBACK[key2] ? [FALLBACK[key2]] : []]).flatMap((key2) => two(`Situation ${k} ${key2}`, name)))] : keys.map((key2) => `Situation ${k} ${key2}`);
     if (kind === "ms") out.push("Situation Mystic Door");
     out.push(`Situation ${k}`);
     return out;
   }
   function baseShared(name, label = "") {
-    const hay = `${name} ${label}`;
-    const hits = rank(KINDS_BASE, hay, name).filter((key2) => KINDS_BASE.find(([k]) => k === key2)[1].some((w) => hay.includes(w)));
+    const hay = clean(`${name} ${label}`);
+    const hits = rank(KINDS_BASE, name, label, name).filter((key2) => KINDS_BASE.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
     return [...hits, "Shared Base Hideout", "Shared Base Office"].map((k) => k.startsWith("Shared") ? k : `Shared Base ${k}`);
   }
   function orgShared(name, type = "org", text = "") {
     const head = type === "civilian" ? ["Civilian"] : type === "freelancer" ? ["Freelancer"] : [];
-    const hay = `${name} ${text}`;
-    const hits = rank(KINDS_ORG, hay, name).filter((key2) => KINDS_ORG.find(([k]) => k === key2)[1].some((w) => hay.includes(w)));
+    const hay = clean(`${name} ${text}`);
+    const hits = rank(KINDS_ORG, name, text, name).filter((key2) => KINDS_ORG.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
     return [...head, ...hits.map((k) => `Shared Org ${k}`), "Shared Org Office"];
   }
   var three = (prefix, seed) => {
@@ -1008,8 +1054,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       (r) => r.aliases.some((a) => squash(a) === k)
     ];
     for (const t of tests) {
-      const hit2 = rows2.find((r) => !used.has(r) && t(r));
-      if (hit2) return hit2;
+      const hit3 = rows2.find((r) => !used.has(r) && t(r));
+      if (hit3) return hit3;
     }
     return void 0;
   }
@@ -1085,12 +1131,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const all = orgLores(lore);
     return all.find((n) => n === name) ?? all.find((n) => Math.min(n.length, name.length) >= 2 && (n.includes(name) || name.includes(n))) ?? name;
   }
-  function buildOrgs(lore, agents2, saved) {
+  function buildOrgs(lore, agents, saved) {
     const names4 = factionDisplayNames(lore);
     const tabs2 = phoneTabs(lore);
     const out = [];
     const make = (name, faction) => {
-      const members = agents2.filter((a) => a.affiliation === (faction || name));
+      const members = agents.filter((a) => a.affiliation === (faction || name));
       const d = obj2(saved[name]);
       const spec = pickSpec(d);
       if (faction) {
@@ -1109,7 +1155,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     };
     for (const f of FACTIONS) make(names4[f], f);
     for (const name of Object.keys(saved)) if (s2(name) && !out.some((o) => o.name === name)) make(name, "");
-    for (const a of agents2) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
+    for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
     for (const e of orgFolder(lore)) {
       const name = s2(e.comment);
       const same = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
@@ -1153,8 +1199,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var cache2 = /* @__PURE__ */ new WeakMap();
   function readDirectory(lore) {
     const books = lore ?? [];
-    const hit2 = cache2.get(books);
-    if (hit2) return hit2;
+    const hit3 = cache2.get(books);
+    if (hit3) return hit3;
     const data = readDirectoryData(books);
     const members = folderMembers(books);
     const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s2(e.comment)));
@@ -1200,7 +1246,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       for (const r of legacy) if (!used.has(r) && !seen2.has(r.lore) && !(members?.[kind].length && data)) out.push(r);
       return ordered(out, Object.keys(saved), legacy.map((r) => r.lore), legacyLore);
     };
-    const agents2 = () => {
+    const agents = () => {
       const legacy = legacyAgents(books);
       const saved = obj2(data?.요원);
       const used = /* @__PURE__ */ new Set();
@@ -1272,7 +1318,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       }
       return { rows: out, groups, refill: legacy.refill, orgs };
     };
-    const ag = agents2();
+    const ag = agents();
     for (const o of ag.orgs) o.shared = orgShared(o.name, o.spec.type, o.spec.title ?? "");
     for (const r of ag.rows) {
       const o = orgOf(ag.orgs, r.affiliation);
@@ -1404,15 +1450,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (!data) return lore;
     const members = folderMembers(lore);
     const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s2(e.comment)));
-    let hit2 = false;
+    let hit3 = false;
     const strip = (group4) => {
       if (!group4) return group4;
       const next2 = { ...group4 };
-      for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit2 = true;
+      for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit3 = true;
       return next2;
     };
     const next = { ...data, 괴이: strip(data.괴이), "미스틱 사이트": strip(data["미스틱 사이트"]) };
-    return hit2 ? withDirectory(lore, next) : lore;
+    return hit3 ? withDirectory(lore, next) : lore;
   }
   var agentGroup = (a) => a.affiliation || "";
   function moveAgent(d, lore, how, target = "") {
@@ -1461,9 +1507,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return parts.length ? parts.map((e) => e.content).join("\n") : null;
   }
   function parseJson(raw, book2) {
-    const clean = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
+    const clean3 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
     try {
-      return JSON.parse(clean);
+      return JSON.parse(clean3);
     } catch {
       throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
     }
@@ -1536,9 +1582,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function fieldsOf(inner) {
     const f = inner.split(/[|｜]/).map((s4) => s4.trim());
     while (f.length && f[f.length - 1] === "") f.pop();
-    const clean = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const clean3 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
     if (f.length === 6 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
-      return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]) };
+      return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean3(f[5]) };
     }
     const rest = [...f];
     const take = (re) => {
@@ -1553,9 +1599,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
     if (!temp && weather) {
       const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
-      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", target: clean(rest.slice(1).join(" | ")) };
+      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", target: clean3(rest.slice(1).join(" | ")) };
     }
-    return { date, time: time2, weather, temp, place: rest[0] ?? "", target: clean(rest.slice(1).join(" | ")) };
+    return { date, time: time2, weather, temp, place: rest[0] ?? "", target: clean3(rest.slice(1).join(" | ")) };
   }
   function findStatusTags(text) {
     if (!hasStatusTag(text)) return [];
@@ -1581,8 +1627,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const h = p.getUTCHours();
     const clock2 = `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(p.getUTCMinutes()).padStart(2, "0")}`;
     const days = Math.floor(now / DAY_MIN) - Math.floor(prev / DAY_MIN);
-    const when2 = days === 0 ? "오늘" : days === 1 ? "어제" : days === 2 ? "그저께" : `${p.getUTCFullYear() !== new Date(now * 6e4).getUTCFullYear() ? `${p.getUTCFullYear()}년 ` : ""}${p.getUTCMonth() + 1}월 ${p.getUTCDate()}일`;
-    return `${when2} ${clock2}`;
+    const when3 = days === 0 ? "오늘" : days === 1 ? "어제" : days === 2 ? "그저께" : `${p.getUTCFullYear() !== new Date(now * 6e4).getUTCFullYear() ? `${p.getUTCFullYear()}년 ` : ""}${p.getUTCMonth() + 1}월 ${p.getUTCDate()}일`;
+    return `${when3} ${clock2}`;
   }
   function elapsedLabel(from, to) {
     let m = to - from;
@@ -1594,25 +1640,25 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const parts = [d ? `${d}일` : "", h ? `${h}시간` : "", mm ? `${mm}분` : ""].filter(Boolean);
     return parts.length ? sign + parts.join(" ") : "흐르지 않음";
   }
-  function storyDay(start4, now) {
-    return Math.floor(now / DAY_MIN) - Math.floor(start4 / DAY_MIN) + 1;
+  function storyDay(start3, now) {
+    return Math.floor(now / DAY_MIN) - Math.floor(start3 / DAY_MIN) + 1;
   }
   function statusTimeline(texts) {
     const prev = /* @__PURE__ */ new Map();
     const seen2 = /* @__PURE__ */ new Set();
-    let start4 = null;
+    let start3 = null;
     let last2 = null;
     for (const t of texts) {
       for (const tag of findStatusTags(t)) {
         const m = statusMinute(tag.date, tag.time);
         seen2.add(tag.raw.trim());
         if (m === null) continue;
-        if (start4 === null) start4 = m;
+        if (start3 === null) start3 = m;
         if (last2 !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last2.minute);
         last2 = { raw: tag.raw.trim(), minute: m };
       }
     }
-    return { prev, start: start4, last: last2, seen: seen2 };
+    return { prev, start: start3, last: last2, seen: seen2 };
   }
 
   // src/core/world/tags.ts
@@ -1679,8 +1725,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function normAgState(v) {
     const s4 = (v ?? "").trim();
     if (AG_STATES.includes(s4)) return s4;
-    const hit2 = AG_ALIAS[s4] ?? AG_ALIAS[s4.toLowerCase().replace(/\s+/g, " ")];
-    if (hit2) return hit2;
+    const hit3 = AG_ALIAS[s4] ?? AG_ALIAS[s4.toLowerCase().replace(/\s+/g, " ")];
+    if (hit3) return hit3;
     const bare = s4.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
     if (AG_STATES.includes(bare)) return bare;
     return AG_ALIAS[bare] ?? null;
@@ -1758,12 +1804,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
       let line2 = raw;
       if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
       if (prevHadTag) line2 = line2.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
-      let count = 0;
+      let count2 = 0;
       line2 = line2.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
-        count++;
+        count2++;
         return "";
       });
-      const hadTag = count > 0;
+      const hadTag = count2 > 0;
       if (prev !== null && !(hadTag && ageOnly(prev))) keep.push(prev);
       if (hadTag) line2 = line2.replace(new RegExp(AGE_META.source, "g"), "");
       prev = line2;
@@ -1771,14 +1817,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     if (prev !== null) keep.push(prev);
     const envs = [];
-    const body5 = keep.filter((l) => {
+    const body4 = keep.filter((l) => {
       if (/^\s*[[【［]\s*▣\s*[|｜]/.test(l)) {
         envs.push(l.trim());
         return false;
       }
       return !/^\s*\[AC\s*\|/.test(l) && !/^\s*\[◎\s*\|/.test(l);
     });
-    let s4 = body5.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
+    let s4 = body4.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
     if (envs.length) s4 = (s4 ? `${s4}
 ` : "") + envs.join("\n");
     return s4;
@@ -2002,7 +2048,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function matchAn(w, region, name) {
     let best;
-    let score = 0;
+    let score2 = 0;
     let tied = false;
     const r = region.trim().replace(/\s+/g, "");
     for (const e of w.an) {
@@ -2010,11 +2056,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (!regionMatch(region, ln)) continue;
       let points = r === ln.replace(/\s+/g, "") ? 10 : 1;
       if (name && (name === e.name || name === e.presetName)) points += 100;
-      if (points > score) {
+      if (points > score2) {
         best = e;
-        score = points;
+        score2 = points;
         tied = false;
-      } else if (points === score) tied = true;
+      } else if (points === score2) tied = true;
     }
     return tied ? void 0 : best;
   }
@@ -2249,14 +2295,14 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function activeEvents(w) {
     const out = [];
     const key2 = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
-    w.an.forEach((e, index) => {
-      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: e.situation ?? "" });
+    w.an.forEach((e, index2) => {
+      if (e.state === "활성") out.push({ kind: "an", index: index2, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: e.situation ?? "" });
     });
-    w.inc.forEach((e, index) => {
-      if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("in", e), grade: "", people: e.deploy ?? "", report: e.situation });
+    w.inc.forEach((e, index2) => {
+      if (e.state === "진행") out.push({ kind: "in", index: index2, loc: e.loc, name: e.name || "이름 미확인", key: key2("in", e), grade: "", people: e.deploy ?? "", report: e.situation });
     });
-    w.ms.forEach((e, index) => {
-      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: e.situation ?? "" });
+    w.ms.forEach((e, index2) => {
+      if (e.state === "출현") out.push({ kind: "ms", index: index2, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: e.situation ?? "" });
     });
     return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
   }
@@ -2334,33 +2380,33 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function startWorldVars(c, s4, faction, rng, player = "") {
     return worldVars(bootstrap(c, s4, rng, player), c, s4, faction);
   }
-  function fingerprint(index, text) {
+  function fingerprint(index2, text) {
     let h = 2166136261;
     for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
-    return `${index}:${text.length}:${(h >>> 0).toString(36)}`;
+    return `${index2}:${text.length}:${(h >>> 0).toString(36)}`;
   }
   function processOutput(chat, messageIndex, raw, c, s4, rng) {
     if (!worldOn(chat)) return null;
     const messages = chat.message ?? [];
-    let index = messageIndex;
-    if (messages[index]?.data !== raw) {
-      index = -1;
+    let index2 = messageIndex;
+    if (messages[index2]?.data !== raw) {
+      index2 = -1;
       for (let i = messages.length - 1; i >= 0; i--) {
         if (messages[i].role === "char" && messages[i].data === raw) {
-          index = i;
+          index2 = i;
           break;
         }
       }
     }
-    const msg = messages[index];
+    const msg = messages[index2];
     if (!msg || msg.role !== "char") return null;
     const state = chat.scriptstate ?? {};
-    const clean = cleanOutput(raw);
-    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
+    const clean3 = cleanOutput(raw);
+    if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index2, clean3)) return null;
     const prev = readPrev(state[PREV_KEY]);
-    const reroll = prev?.i === index;
+    const reroll = prev?.i === index2;
     const before = reroll ? prev : {
-      i: index,
+      i: index2,
       world: String(state[WORLD_KEY] ?? ""),
       faction: String(state["$st_faction"] ?? ""),
       pick: String(state["$st_pick"] ?? ""),
@@ -2371,7 +2417,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const now = result.faction ?? faction;
     const vars = {
       ...worldVars(result.world, c, s4, now),
-      [LAST_KEY]: fingerprint(index, clean),
+      [LAST_KEY]: fingerprint(index2, clean3),
       [PREV_KEY]: JSON.stringify(before)
     };
     if (reroll && !result.faction) {
@@ -2385,7 +2431,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       vars.$ib_affiliation = c.affiliations?.[result.faction] ?? findFaction(result.faction)?.affiliation ?? "미등록";
     }
     const message = messages.slice();
-    message[index] = { ...msg, data: clean };
+    message[index2] = { ...msg, data: clean3 };
     return { ...chat, message, scriptstate: { ...state, ...vars } };
   }
   function prevWorldVars(state, change) {
@@ -3045,13 +3091,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
         continue;
       }
       const year = new Date(x).getUTCFullYear();
-      const hit2 = names4.some((n) => {
+      const hit3 = names4.some((n) => {
         const from = SUBST_FROM[n];
         if (!from || year < from) return false;
         const lunarGroup = n === "설날" || n === "추석";
         return names4.length > 1 || wd === 0 || !lunarGroup && wd === 6;
       });
-      if (hit2) owed++;
+      if (hit3) owed++;
     }
     return false;
   }
@@ -3108,10 +3154,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const known = tl?.prev.get(tag.raw.trim());
     const prev = known ?? (tl?.last && !tl.seen.has(tag.raw.trim()) ? tl.last.minute : void 0);
     if (now !== null && prev !== void 0) rows2.push(["지난 장면", sceneLabel(prev, now)], ["흐른 시간", elapsedLabel(prev, now)]);
-    const start4 = ctx2.timeline?.start;
-    if (now !== null && start4 !== null && start4 !== void 0 && now >= start4) {
-      const s4 = new Date(start4 * 6e4);
-      rows2.push(["시작부터", `${storyDay(start4, now)}일째 · ${s4.getUTCMonth() + 1}월 ${s4.getUTCDate()}일 시작`]);
+    const start3 = ctx2.timeline?.start;
+    if (now !== null && start3 !== null && start3 !== void 0 && now >= start3) {
+      const s4 = new Date(start3 * 6e4);
+      rows2.push(["시작부터", `${storyDay(start3, now)}일째 · ${s4.getUTCMonth() + 1}월 ${s4.getUTCDate()}일 시작`]);
     }
     const clock2 = tag.time ? `<span class="gst-clock"${rows2.length ? ' data-gst-tip="1"' : ""}>${esc(tag.time)}${rows2.length ? kv(rows2) : ""}</span>` : "";
     let date = "";
@@ -3240,17 +3286,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
       for (const [k, v] of Object.entries(o.vars)) if (PREF_VAR.test(k) && typeof v === "string") vars[k] = v;
     }
     const nav = o.nav === "right" ? "right" : void 0;
-    const agents2 = o.agents === "list" ? "list" : void 0;
+    const agents = o.agents === "list" ? "list" : void 0;
     const dim = int(o.dim, 0, 100);
     const status = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents2 ? { agents: agents2 } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...theme ? { theme } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status ? { status } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
     const list4 = lore ?? [];
-    const hit2 = cache3.get(list4);
-    if (hit2) return hit2;
+    const hit3 = cache3.get(list4);
+    if (hit3) return hit3;
     let out = { basic: {}, world: {} };
     for (const name of ["Settings", "통합설정"]) {
       const books = list4.filter((e) => e.comment === name && typeof e.content === "string" && e.content.trim());
@@ -3483,22 +3529,22 @@ ${themeVars("[x-goei-fab]")}
     if (!root2) throw new Error("Risu 화면 접근 권한이 없어요.");
     const { doc } = root2;
     await removeLeftovers(doc);
-    const host2 = await doc.createElement("div");
-    await host2.setAttribute("x-goei-fab", "true");
-    await host2.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
+    const host = await doc.createElement("div");
+    await host.setAttribute("x-goei-fab", "true");
+    await host.setInnerHTML(FAB_HTML(`${BRAND.fab} 열기 (끌어서 옮기기)`));
     const style = await doc.createElement("style");
     await style.setTextContent(FAB_CSS);
-    await host2.appendChild(style);
+    await host.appendChild(style);
     const cardStyle2 = await doc.createElement("style");
     await cardStyle2.setTextContent(chatCss("dark"));
-    await host2.appendChild(cardStyle2);
-    await root2.body.appendChild(host2);
-    const button = await host2.querySelector("button");
+    await host.appendChild(cardStyle2);
+    await root2.body.appendChild(host);
+    const button = await host.querySelector("button");
     if (!button) throw new Error("여는 버튼을 만들지 못했어요.");
     let pos = await loadPos();
     const applyPos = async () => {
-      await host2.setStyle("right", `${pos.right}px`);
-      await host2.setStyle("bottom", `${pos.bottom}px`);
+      await host.setStyle("right", `${pos.right}px`);
+      await host.setStyle("bottom", `${pos.bottom}px`);
     };
     await applyPos();
     let visible2 = false;
@@ -3508,7 +3554,7 @@ ${themeVars("[x-goei-fab]")}
       if (introTimer === void 0) return;
       clearTimeout(introTimer);
       introTimer = void 0;
-      void host2.setAttribute("x-goei-intro", "false").catch(() => {
+      void host.setAttribute("x-goei-intro", "false").catch(() => {
       });
     };
     let drag = null;
@@ -3516,7 +3562,7 @@ ${themeVars("[x-goei-fab]")}
     let pending = null;
     let loop = null;
     const rect = async () => visible2 ? await button.getBoundingClientRect() : null;
-    const viewport = async () => {
+    const viewport2 = async () => {
       const r = await root2.body.getBoundingClientRect();
       return { vw: r.width, vh: r.height };
     };
@@ -3532,9 +3578,9 @@ ${themeVars("[x-goei-fab]")}
           const d = drag;
           const p = pending;
           pending = null;
-          const hit2 = await d.hit;
+          const hit3 = await d.hit;
           if (drag !== d) continue;
-          if (!hit2) {
+          if (!hit3) {
             drag = null;
             break;
           }
@@ -3543,9 +3589,9 @@ ${themeVars("[x-goei-fab]")}
           if (!moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) continue;
           if (!moved) {
             moved = true;
-            await host2.setAttribute("x-goei-drag", "true");
+            await host.setAttribute("x-goei-drag", "true");
           }
-          pos = dragTo(d.start, dx, dy, hit2.vw, hit2.vh);
+          pos = dragTo(d.start, dx, dy, hit3.vw, hit3.vh);
           await applyPos();
         }
       } catch {
@@ -3569,7 +3615,7 @@ ${themeVars("[x-goei-fab]")}
         hit: (async () => {
           const r = await rect();
           if (!inside(r, x, y)) return null;
-          return { rect: r, ...await viewport() };
+          return { rect: r, ...await viewport2() };
         })().catch(() => null)
       };
     };
@@ -3587,12 +3633,12 @@ ${themeVars("[x-goei-fab]")}
       void (loop ?? Promise.resolve()).then(async () => {
         if (drag === d) drag = null;
         if (moved) {
-          await host2.setAttribute("x-goei-drag", "false");
+          await host.setAttribute("x-goei-drag", "false");
           await savePos();
         }
       });
     };
-    const onClick = async (ev) => {
+    const onClick2 = async (ev) => {
       if (!visible2) return;
       if (!inside(await rect(), ev.clientX, ev.clientY)) return;
       await loop;
@@ -3603,7 +3649,7 @@ ${themeVars("[x-goei-fab]")}
     const unbind = async () => {
       const old = ids;
       ids = [];
-      for (const { type, id } of old) await host2.removeEventListener(type, id).catch(() => {
+      for (const { type, id } of old) await host.removeEventListener(type, id).catch(() => {
       });
     };
     const bind = async () => {
@@ -3613,9 +3659,9 @@ ${themeVars("[x-goei-fab]")}
         ["pointermove", onMove],
         ["pointerup", onUp],
         ["pointercancel", onUp],
-        ["click", onClick]
+        ["click", onClick2]
       ]) {
-        ids.push({ type, id: await host2.addEventListener(type, fn2, { passive: true }) });
+        ids.push({ type, id: await host.addEventListener(type, fn2, { passive: true }) });
       }
     };
     await bind();
@@ -3631,22 +3677,22 @@ ${themeVars("[x-goei-fab]")}
           drag = null;
           pending = null;
         } else {
-          const { vw, vh } = await viewport();
+          const { vw, vh } = await viewport2();
           pos = clampPos(pos, vw, vh);
           await applyPos();
         }
         endIntro();
         if (next && intro) {
-          const { vw } = await viewport();
-          await host2.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
-          await host2.setAttribute("x-goei-intro", "true");
+          const { vw } = await viewport2();
+          await host.setAttribute("x-goei-side", pos.right + FAB_SIZE / 2 > vw / 2 ? "left" : "right");
+          await host.setAttribute("x-goei-intro", "true");
           introTimer = setTimeout(endIntro, INTRO_MS + 400);
         }
-        await host2.setStyle("display", next ? "block" : "none");
+        await host.setStyle("display", next ? "block" : "none");
       },
       endIntro,
       async setTheme(theme) {
-        await host2.setAttribute("x-goei-theme", theme);
+        await host.setAttribute("x-goei-theme", theme);
         await cardStyle2.setTextContent(chatCss(theme));
       },
       async chatScreenVisible() {
@@ -3656,7 +3702,7 @@ ${themeVars("[x-goei-fab]")}
         visible2 = false;
         drag = null;
         pending = null;
-        await host2.remove();
+        await host.remove();
         await unbind();
       }
     };
@@ -3698,7 +3744,7 @@ ${themeVars("[x-goei-fab]")}
   async function elements(doc, selector) {
     return await risuai.unwarpSafeArray(await doc.querySelectorAll(selector)).catch(() => []);
   }
-  async function hit(el, x, y) {
+  async function hit2(el, x, y) {
     const r = await el.getBoundingClientRect().catch(() => null);
     return !!r && r.width > 0 && x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
   }
@@ -3730,8 +3776,8 @@ ${themeVars("[x-goei-fab]")}
       if (!validAsset(asset)) throw new Error("사진 저장 위치가 올바르지 않아요.");
       return `%%ATTACHMENT:${hex(JSON.stringify({ kind: "image", content: String(content ?? "").trim(), asset }))}%%`;
     }
-    const clean = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
-    return `[[ATTACH:${kind}]]${clean}[[/ATTACH]]`;
+    const clean3 = String(content ?? "").replace(/\[\[\/?ATTACH(:\w+)?\]\]/gi, "").replace(/%%ATTACHMENT[^%]*%%/g, "").trim();
+    return `[[ATTACH:${kind}]]${clean3}[[/ATTACH]]`;
   }
   function stripForged(text) {
     return String(text ?? "").replace(new RegExp(HEX, "g"), "[지원하지 않는 첨부]");
@@ -3740,8 +3786,8 @@ ${themeVars("[x-goei-fab]")}
     const records = items.filter((a) => a.kind === "image" || a.content.trim()).map((a) => attachRecord(a.kind, a.content, a.asset));
     return [...records, message.trim()].filter(Boolean).join("\n");
   }
-  function attachmentRecords(body5) {
-    return [...String(body5 ?? "").matchAll(ANY())].map((m) => ({ start: m.index, end: m.index + m[0].length, text: m[0] }));
+  function attachmentRecords(body4) {
+    return [...String(body4 ?? "").matchAll(ANY())].map((m) => ({ start: m.index, end: m.index + m[0].length, text: m[0] }));
   }
   function unhex(s4) {
     if (s4.length % 2) return "";
@@ -3764,8 +3810,8 @@ ${themeVars("[x-goei-fab]")}
       return null;
     }
   }
-  function bodyParts(body5) {
-    const text = String(body5 ?? "");
+  function bodyParts(body4) {
+    const text = String(body4 ?? "");
     const out = [];
     let last2 = 0;
     for (const m of text.matchAll(ANY())) {
@@ -3780,11 +3826,11 @@ ${themeVars("[x-goei-fab]")}
     if (last2 < text.length) out.push({ kind: "text", text: text.slice(last2) });
     return out.filter((p) => p.kind !== "text" || p.text.trim());
   }
-  function describe(body5, brief = false) {
-    return bodyParts(body5).map((p) => p.kind === "text" ? p.text : `[${ATTACH_LABELS[p.kind]}${brief ? "" : p.kind === "image" ? ` 첨부: 실제 이미지${p.text ? ` (설명: ${p.text})` : ""}` : ` 첨부 내용: ${p.text}`}]`).join("");
+  function describe(body4, brief = false) {
+    return bodyParts(body4).map((p) => p.kind === "text" ? p.text : `[${ATTACH_LABELS[p.kind]}${brief ? "" : p.kind === "image" ? ` 첨부: 실제 이미지${p.text ? ` (설명: ${p.text})` : ""}` : ` 첨부 내용: ${p.text}`}]`).join("");
   }
-  function previewText(body5) {
-    return bodyParts(body5).map((p) => p.kind === "text" ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`).join(" ");
+  function previewText(body4) {
+    return bodyParts(body4).map((p) => p.kind === "text" ? p.text.trim() : `[${ATTACH_LABELS[p.kind]}]`).join(" ");
   }
   function attachUrl(content) {
     const m = /^(https?:\/\/[^\s<>"']+)$/.exec(String(content ?? "").trim());
@@ -3805,13 +3851,13 @@ ${themeVars("[x-goei-fab]")}
     const known = /* @__PURE__ */ new Map();
     const out = messages.map((m) => {
       if (m.role === "system" || typeof m.content !== "string" || !hasAttachment(m.content)) return m;
-      const content = m.content.replace(ANY(), (whole, kind, body5, code) => {
+      const content = m.content.replace(ANY(), (whole, kind, body4, code) => {
         let a = null;
         if (code !== void 0) {
           const p = decodeLegacy(code);
           if (p) a = { kind: p.kind, content: p.text, ...p.asset ? { asset: p.asset } : {} };
-        } else if (kind && isKind(kind.toLowerCase()) && unescapeJson(body5 ?? "").trim()) {
-          a = { kind: kind.toLowerCase(), content: unescapeJson(body5 ?? "").trim() };
+        } else if (kind && isKind(kind.toLowerCase()) && unescapeJson(body4 ?? "").trim()) {
+          a = { kind: kind.toLowerCase(), content: unescapeJson(body4 ?? "").trim() };
         }
         if (!a) return "[지원하지 않는 첨부]";
         const key2 = `${a.kind}\0${a.content}\0${a.asset ?? ""}`;
@@ -3858,16 +3904,16 @@ ${themeVars("[x-goei-fab]")}
   }
   function pickRecords(items, o) {
     const newest = items.slice().sort((a, b) => b.order - a.order);
-    const queue = o.focus ? [...newest.filter((x, i) => x.free || i < o.recent), ...newest.filter((x, i) => !x.free && i >= o.recent && x.related)] : newest;
+    const queue2 = o.focus ? [...newest.filter((x, i) => x.free || i < o.recent), ...newest.filter((x, i) => !x.free && i >= o.recent && x.related)] : newest;
     const kept = [];
     let counted = 0;
-    for (const item3 of queue) {
-      if (kept.includes(item3)) continue;
-      if (!item3.free && counted >= o.max) continue;
-      const next = [...kept, item3].sort((a, b) => a.order - b.order);
+    for (const item2 of queue2) {
+      if (kept.includes(item2)) continue;
+      if (!item2.free && counted >= o.max) continue;
+      const next = [...kept, item2].sort((a, b) => a.order - b.order);
       if (!o.fits(next.map((x) => x.data))) continue;
       kept.splice(0, kept.length, ...next);
-      if (!item3.free) counted++;
+      if (!item2.free) counted++;
     }
     return kept.map((x) => x.data);
   }
@@ -3928,7 +3974,7 @@ ${themeVars("[x-goei-fab]")}
   function gnetSettings(state) {
     const v = gnetVars(state);
     const s4 = (k) => String(v[CFG(k)] ?? GN_DEFAULTS[k]).trim();
-    const clean = (k) => s4(k) === "-" ? "" : s4(k);
+    const clean3 = (k) => s4(k) === "-" ? "" : s4(k);
     const q = QUANTITY[s4("quantity")] ? s4("quantity") : "1";
     const chance = Number(s4("incoming_chance"));
     return {
@@ -3937,10 +3983,10 @@ ${themeVars("[x-goei-fab]")}
       autoOpen: s4("mode") !== "0" && s4("lazy") === "open",
       model: s4("mode") === "1" ? "main" : "aux",
       quantity: q,
-      subject: clean("subject"),
-      mood: clean("mood"),
+      subject: clean3("subject"),
+      mood: clean3("mood"),
       privacy: ["0", "1", "2", "3", "4"].includes(s4("privacy")) ? s4("privacy") : "1",
-      protagonist: clean("protagonist"),
+      protagonist: clean3("protagonist"),
       sampling: s4("sampling") === "1",
       keepOwn: s4("keepown") === "1",
       keepReplied: s4("keepreplied") === "1",
@@ -4137,13 +4183,13 @@ ${themeVars("[x-goei-fab]")}
   function reconcileUnread(st, previous) {
     const old = new Map(previous.posts.map((p) => [p.id, p]));
     const run3 = (rows2, prior, side, wanted) => {
-      const queue = /* @__PURE__ */ new Map();
+      const queue2 = /* @__PURE__ */ new Map();
       for (const r of prior) {
         const k = `${side(r)}\0${r.nick}\0${r.body}`;
-        queue.set(k, [...queue.get(k) ?? [], r]);
+        queue2.set(k, [...queue2.get(k) ?? [], r]);
       }
       for (const r of rows2) {
-        const before = queue.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
+        const before = queue2.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
         r.unread = before ? before.unread : wanted(r);
         if (!wanted(r)) r.unread = false;
       }
@@ -4173,14 +4219,14 @@ ${themeVars("[x-goei-fab]")}
     const unread = boardUnread(st) || dmUnread(st);
     return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
   }
-  function addUserPost(st, nick, title2, body5, date) {
+  function addUserPost(st, nick, title2, body4, date) {
     st.seq += 1;
     const p = {
       id: st.seq,
       date: validDate(date),
       nick: cut(nick, 80),
       title: trimTokens(title2, LIMITS.title_tokens),
-      body: trimTokens(body5, LIMITS.post_tokens),
+      body: trimTokens(body4, LIMITS.post_tokens),
       views: 0,
       votes: 0,
       mine: true,
@@ -4189,11 +4235,11 @@ ${themeVars("[x-goei-fab]")}
     st.posts.unshift(p);
     return p;
   }
-  function addUserComment(st, postIdValue, parent, nick, body5, now = "") {
+  function addUserComment(st, postIdValue, parent, nick, body4, now = "") {
     const p = findPost(st, postIdValue);
     if (!p) throw new GnetError("대상 글이 없어졌어요.");
     if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
-    p.comments.push({ parent, nick, body: trimTokens(body5, LIMITS.comment_tokens), mine: true, unread: false });
+    p.comments.push({ parent, nick, body: trimTokens(body4, LIMITS.comment_tokens), mine: true, unread: false });
     stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
     return p.comments.length;
   }
@@ -4264,70 +4310,8 @@ ${themeVars("[x-goei-fab]")}
       quoteAuthor: c ? c.nick : ""
     };
   }
-  function addOutgoingDm(st, nick, body5, date, source4) {
+  function addOutgoingDm(st, nick, body4, date, source4) {
     if (!st.sources[nick]) {
       const s4 = source4 ?? findPublicSource(st, nick);
       if (s4) st.sources[nick] = s4;
-    }
-    st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });
-  }
-  function parseJsonPayload(raw) {
-    let text = String(raw ?? "").replace(/^﻿/, "").trim();
-    for (let i = 0; i < 12; i++) {
-      const before = text;
-      if (text.startsWith("{")) break;
-      const tag = /^<(think|thoughts|analysis|lb-process)(?:\s[^>]*)?>/i.exec(text);
-      if (tag) {
-        const end = text.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
-        if (end >= 0) text = text.slice(end + tag[1].length + 3).trim();
-        else if (/\n\s*\{/.test(text)) text = text.slice(text.search(/\n\s*\{/)).trim();
-      } else {
-        const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text);
-        if (fence) text = fence[1].trim();
-        else {
-          const wrap = /^<(output|json|lb-gn)(\s[^>]*)?>([\s\S]*)<\/\1>\s*$/i.exec(text);
-          if (wrap) text = wrap[3].trim();
-        }
-      }
-      if (text === before) break;
-    }
-    try {
-      return JSON.parse(text);
-    } catch {
-      const dup = /^([\s\S]*\})\s*\{\s*"comments"\s*:\s*\[\s*\]\s*\}\s*$/.exec(text);
-      if (dup) {
-        try {
-          return JSON.parse(dup[1]);
-        } catch {
-        }
-      }
-      const a = text.indexOf("{");
-      const b = text.lastIndexOf("}");
-      if (a >= 0 && b > a) {
-        const body5 = text.slice(a, b + 1);
-        try {
-          return JSON.parse(body5);
-        } catch {
-          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
-          try {
-            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
-          } catch {
-          }
-        }
-      }
-      throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
-    }
-  }
-  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var str = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
-  var int2 = (v) => {
-    const n = typeof v === "string" && v.trim() ? Number(v) : v;
-    return typeof n === "number" && Number.isInteger(n) ? n : null;
-  };
-  function applyBoard(before, current3, value, o) {
-    if (snapshotKey(before) !== snapshotKey(current3)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
-    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
-    const rows2 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
-    if (!Array.isArray(rows2) || !rows2.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
-    const st = structuredClone(current3);
-    const old = ne
+  

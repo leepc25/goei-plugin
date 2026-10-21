@@ -14,17 +14,18 @@ import rig  # noqa: E402
 # 버림(결함 35·36): 생성기가 자세를 못 그림
 DROP_CLIPS = {'pushup', 'sleepside'}
 # 기본 클립 재설계(docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 4장): 장면·물건이 박혀 폐기. 같은 이름으로 다시 뽑는 9개(tie 등)는 새 그림이 덮어씀
-DROP_CLIPS |= set('''undress toilet bathin bathout showerin showerout toiletin toiletout handwash wash dishes coffee microwave board brief
+DROP_CLIPS |= set('''toilet bathin bathout showerin showerout toiletin toiletout handwash wash dishes coffee microwave board brief
 window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
 toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
 run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry'''.split())
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 # 샤워·목욕·용변·탈의는 GPT 납품(2026-10-22 4b904ee, 수건으로 가림, 샤워는 뒷모습 머리 감기). 옛 보정(머리색 바꾸기·가구 분리)은 옛 그림용이라 뺌
-GPT_CLIPS = {'shower', 'bath', 'toilet', 'undress'}
+# undress/showerturn were redrawn at final scale on 2026-10-22; no legacy resizing/recoloring.
+GPT_CLIPS = {'shower', 'bath', 'toilet'}
 DROP = {
     # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
-    'reload': [4, 5], 'deskslam': [2], 'shotgun': [3], 'undress': [6], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
+    'reload': [4, 5], 'deskslam': [2], 'shotgun': [3], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
     'super': [-1],                             # 다시 생성분 끝 장 뭉개짐
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4],
     'nausea': [-1], 'push': [-1], 'gearcheck': [-1], 'locker': [4, 5], 'giftbox': [0], 'button': [5],

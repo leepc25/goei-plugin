@@ -12833,6 +12833,32 @@
     }
    ]
   },
+  "undress": {
+   "label": "탈의: 정장 → 목욕 수건",
+   "fps": 5,
+   "loop": false,
+   "hits": [],
+   "adv": 0,
+   "origin": 0,
+   "hold": 0.0,
+   "group": "씻기·집안일·운동",
+   "frames": 7,
+   "bytes": 34439,
+   "prop": false
+  },
+  "showerturn": {
+   "label": "샤워 준비: 옆모습 → 뒷모습",
+   "fps": 5,
+   "loop": false,
+   "hits": [],
+   "adv": 0,
+   "origin": 0,
+   "hold": 0.0,
+   "group": "씻기·집안일·운동",
+   "frames": 3,
+   "bytes": 15306,
+   "prop": false
+  },
   "shower": {
    "label": "샤워: 뒷모습 머리 감기",
    "fps": 6,

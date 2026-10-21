@@ -28,3 +28,7 @@
 - 다시 뽑은 것: evade(낮게 숙여 뒤로), grab2(팔 끝까지), grabblast, chain, fall, super, step(보폭 20px, 빌더 adv=20), dash(35~45도 숙임), airkick(다리 수평으로 폄), blockfront(두 팔뚝 얼굴 앞). 뼈대는 `scripts/rig.py` 「수정 2차」.
 - 빌더: grabblast 장 순서 지정 삭제(새 그림은 효과가 4장에 순서대로).
 - 비용 33회 (9,035 → 실제 내 몫 33, 같은 시간에 생활 스레드도 사용).
+
+## 제7장 탈의·돌아서기 재제작 (2026-10-22 GPT)
+
+undress 00~06(7장), showerturn 00~02(3장)을 내장 image_gen으로 새로 제작했다. 완성 PNG는 192×144, 발바닥 y=135, 서 있는 머리끝 y=37~39다. 수건 옆모습 끝/시작 장은 동일 파일 내용으로 연결했다. 이전 undress 07은 gpt-redraw-20261022/superseded-undress-07.png에 보관했다. 시연판에서 탈의 → 돌아서기 → 기존 샤워로 이어진다. 신규 두 클립에는 이전 축소·색 보정·장 삭제를 적용하지 않는다. 제작 프롬프트와 실측: gpt-redraw-20261022/production.json, 비교판: contact.png. 사용자 최종 시각 승인을 뜻하지 않는다.
