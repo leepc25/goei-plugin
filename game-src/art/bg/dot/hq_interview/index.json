@@ -1,0 +1,82 @@
+{
+ "objects/hq_interview_objects_1": {
+  "w": 74,
+  "h": 46,
+  "foot": [
+   37,
+   46
+  ]
+ },
+ "objects/hq_interview_objects_2": {
+  "w": 50,
+  "h": 58,
+  "foot": [
+   25,
+   58
+  ]
+ },
+ "objects/hq_interview_objects_3": {
+  "w": 61,
+  "h": 58,
+  "foot": [
+   30,
+   58
+  ]
+ },
+ "objects/hq_interview_objects_4": {
+  "w": 15,
+  "h": 8,
+  "foot": [
+   7,
+   8
+  ]
+ },
+ "objects/hq_interview_objects_5": {
+  "w": 18,
+  "h": 10,
+  "foot": [
+   9,
+   10
+  ]
+ },
+ "objects/hq_interview_objects_6": {
+  "w": 14,
+  "h": 10,
+  "foot": [
+   7,
+   10
+  ]
+ },
+ "objects/hq_interview_objects_7": {
+  "w": 27,
+  "h": 31,
+  "foot": [
+   13,
+   31
+  ]
+ },
+ "objects/hq_interview_objects_8": {
+  "w": 41,
+  "h": 109,
+  "foot": [
+   20,
+   109
+  ]
+ },
+ "objects/hq_interview_objects_9": {
+  "w": 29,
+  "h": 79,
+  "foot": [
+   14,
+   79
+  ]
+ },
+ "hq_interview_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_interview_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}
