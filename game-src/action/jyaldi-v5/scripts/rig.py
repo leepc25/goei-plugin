@@ -70,8 +70,24 @@ STAND=lambda b=0,lh='down',rh='down',tilt=0: P((X,55+b),2,0,0,(X+6,G),(X-4,G),lh
 CROUCH=lambda d=0,b=0,lh=(17,2),rh='chin': P((X+d,79+b),6,-0.6,-0.4,(X+16+d,G),(X-19+d,G-1),lh,rh)  # 한쪽 무릎 세우고 앉음(뒷무릎 바닥)
 
 CLIPS={}   # 이름: (설명 동작, 소품 설명, [자세...])
+def _xs(a,b,c):
+    u=(b[0]-a[0],b[1]-a[1]); f=(c[0]-b[0],c[1]-b[1]); n=math.hypot(*u)*math.hypot(*f) or 1
+    return (u[0]*f[1]-u[1]*f[0])/n
+def _mirror(p,a,b):
+    # 점 p를 직선 a-b에 대해 뒤집음(관절 길이 유지)
+    dx,dy=b[0]-a[0],b[1]-a[1]; L=dx*dx+dy*dy or 1; t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L
+    q=(a[0]+t*dx,a[1]+t*dy); return (2*q[0]-p[0],2*q[1]-p[1])
+def anatomic(p):
+    """사람 관절은 한쪽으로만 꺾임(오른쪽을 보는 옆모습). 팔꿈치: 아래팔은 위팔의 앞쪽으로 접힘(cross(위팔,아래팔)<=0).
+    무릎: 정강이는 허벅지의 뒤쪽으로 접힘(cross>=0). 거꾸로면 팔꿈치·무릎을 어깨-손목(골반-발목) 선에 대해 뒤집음.
+    IK 선택·직접 지정·lerp 중간 장 모두 여기서 한 번에 바로잡힘. 검사: audit_joints.py"""
+    q=dict(p)
+    for s in ('RIGHT','LEFT'):
+        if _xs(q[f'{s} SHOULDER'],q[f'{s} ELBOW'],q[f'{s} ARM'])>0.12: q[f'{s} ELBOW']=_mirror(q[f'{s} ELBOW'],q[f'{s} SHOULDER'],q[f'{s} ARM'])
+        if _xs(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])<-0.12: q[f'{s} KNEE']=_mirror(q[f'{s} KNEE'],q[f'{s} HIP'],q[f'{s} LEG'])
+    return q
 def clip(name,action,poses,prop=''):
-    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=(action,prop,poses)
+    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=(action,prop,[anatomic(p) for p in poses])
 
 # 1 기본 대기: 반듯이 섬, 아주 작은 호흡 (4)
 clip('idle','calm standing idle, breathing',[STAND(0),STAND(0.5),STAND(1),STAND(0.5)])
@@ -688,6 +704,34 @@ clip('toilet','side view, seated pose with nothing under her, trousers at her kn
 clip('toiletout','side view: stands up from a seated pose, pulls her trousers up, reaches forward, then walks on',
      tail([TSX(),lerp(TSX(),STAND(0,lh=(8,23),rh=(6,23)),.6),STAND(0,lh=(8,20),rh=(6,20)),REACH,walkf(.25),STAND(0)],False),TPX)
 REDO2=['chairsit','deskwork','typing','transmit','sofa','feast','ladder','door','toiletin','toilet','toiletout']
+# 후송(침대 눕기) 다시: 무릎 세워 다리가 마름모꼴 → 다리 쭉 펴고 반듯이, 가구 없이(사용자 지적 2026-10-21)
+BLX=lambda b=0: P((X-6,74),-90,0,0,(X+39,75),(X+38,76),('r',4,22+b),('r',3,24),le=('e',1,12),re=('e',0,12))
+clip('bedlie','side view: lying flat on her back in the air with nothing under her, legs straight, asleep, slow breathing',tail([BLX(0),BLX(1),BLX(1),BLX(0)],True))
+# 짜증: 앞손 손바닥을 이마(얼굴 앞)에 대고 고개 숙여 한숨. 당황(뒷머리)과 겹치던 것 고침
+AYX=lambda t: P((X,55),4,0,0,(X+6,G),(X-4,G),('r',10,-12+t),'down',tilt=12+8*t,le=('e',13,3))
+clip('annoyed','side view: annoyed, presses her near palm to her forehead in front of her face, head bowed, sighs',
+     tail([STAND(0),lerp(STAND(0),AYX(0),.5),AYX(0),AYX(1),AYX(1),AYX(0)],False))
+# 설거지: 선 자세, 손은 조리대 높이(최종 캔버스 y≈80 = 뼈대 y≈52), 허리 살짝 숙임. 가구 없이
+DSX=lambda d: P((X+2,56),8,0,0,(X+8,G),(X-4,G),('r',18+3*d,21),('r',16-3*d,22),tilt=14,le=('e',8,16),re=('e',6,17))
+clip('dishes','side view: standing, scrubbing a plate with a sponge at counter height, counter not drawn',
+     tail([DSX(0),DSX(1),DSX(-1),DSX(1)],True),'a white plate and a sponge in her hands')
+# 밀대: 자루 한 직선 위에 두 손(앞손 아래, 먼 손 위), 밀대 머리는 바닥(뼈대 y=106 ≈ 최종 y 134)에 붙은 채 앞뒤로
+def mopx(d):
+    H=(X+40+d,106); T=(X+2+0.3*d,30)
+    at=lambda t:('a',H[0]+(T[0]-H[0])*t,H[1]+(T[1]-H[1])*t)
+    return P((X+1+0.3*d,57),10,0,0,(X+10,G),(X-6,G),at(.45),at(.78))
+clip('mop','side view: pushing a mop back and forth, both hands on one straight handle, head on the floor',
+     tail([mopx(0),mopx(6),mopx(10),mopx(4),mopx(-4),mopx(-8)],True),'a mop with a long straight handle held in both hands, mop head on the floor')
+# 화분 물 주기: 앞손으로 물뿌리개 손잡이를 쥐고 주둥이를 앞 아래로 기울여 부음. 화분 없음
+WTX=lambda a: P((X+1,56),8+6*a,0,0,(X+8,G),(X-4,G),('r',17+2*a,14-3*a),'down',tilt=12+4*a,le=('e',7,14))
+clip('water','side view: tilting a watering can held by its handle, spout forward and down, pouring',
+     tail([STAND(0),WTX(0),WTX(.6),WTX(1),WTX(1),WTX(.6),WTX(0)],False),'a green watering can held by its top handle in her near hand, long spout, water pouring from the spout')
+# 기지개: 깍지 낀 두 팔을 머리 위로 쭉, 등 살짝 젖히고 발뒤꿈치 듦 → 멈춤 → 팔 내리며 숨 내쉼
+STR=lambda u,b=0: P((X,55-3*u),2-10*u,0,0,(X+6,G-4*u),(X-4,G-4*u),('r',5+3*(1-u),-36*u+6*(1-u)),('r',4+3*(1-u),-35*u+7*(1-u)),
+                    tilt=-10*u,le=('e',6+6*(1-u),-16*u+8*(1-u)),re=('e',4+6*(1-u),-15*u+8*(1-u)))
+clip('stretch','side view: big stretch, fingers laced, arms straight up overhead, back arched, heels up, relaxes',
+     tail([STAND(0),STR(0),STR(.6),STR(1),STR(1),lerp(STR(1),STAND(0),.5),STAND(0)],False))
+REDO3=['bedlie','annoyed','dishes','mop','water','stretch']
 REDO=['seatrest','seatthink','doze','walllean','armscross','bored','situp','wallcry','phone','bedwake','hurtidle','limp','hide','doorclose','leadhand','victory','wave','walk_folder']
 # ── 수정 2차 (2026-10-21 결함 목록 3·13~16·18) ──
 # 정면 돌아감의 실제 원인: 뼈대 폭이 아니라 기준 그림. A2는 셔츠·넥타이가 보이는 3/4 각도라, 생성기가 A2를 따라가면 3/4,
