@@ -67,8 +67,12 @@ test('구절형 괴이 이름은 따옴표·괴담·상황판·상태창으로 �
 });
 
 test('영어: 단어 경계, 복수·소유격, 하이픈 변형', () => {
-  assert.deepEqual(pick(['Jay가 말했다']), ['제이']);
+  // Jay는 흔한 영어 이름이라 확증 키 (2026-10-21): 이름만으로는 안 켜고, 직함·따옴표·다른 키가 있으면 켠다
+  assert.deepEqual(pick(['Jay가 말했다']), []);
+  assert.deepEqual(pick(['Guard Chief Jay nodded']), ['제이']);
+  assert.deepEqual(pick(['「Jay」가 말했다']), ['제이']);
   assert.deepEqual(pick(['jaywalk']), []);
+  assert.deepEqual(pick(['제이 반장이 웃었다']), ['제이'], '띄고 붙은 호칭 뒤 조사');
   assert.deepEqual(pick(["the fake bureau's office"]), ['가짜 관리국']);
   assert.deepEqual(pick(['Yeojin smiled']), ['차여진']);
   assert.deepEqual(pick(['Yeo jin']), ['차여진']);

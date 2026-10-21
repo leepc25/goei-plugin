@@ -35,6 +35,8 @@ export const CONFIRM_KEYS = new Set([
   '어두운 정원', '거대한 세상', '욕망의 방', '학교의 악몽', '성자의 도시', '눈먼 자들의 저택', '검은 그늘 속에서', '한여름 밤의 꿈',
   '금지된 비디오', '금지된 영상', '생체 공장', '생체공장', '해피엔딩', '붉은 숙녀', '타락한 성당', '미스테리 월드', '어드벤쳐 파크',
   '교회', '강변', '지하실', '미술관', '병원', '극단', '세계정치', '세계 정치', '기독교 상점', '헐값 매입', '대박 알선', '사장', '국장',
+  // 흔한 영어 이름·낱말과 같은 키 (2026-10-21: Jay는 흔한 이름, 브라우니는 과자)
+  'Jay', 'Brownie', '브라우니',
 ]);
 
 /** 이름 뒤에 붙어도 되는 말: 조사·서술·부름·호칭. 이 뒤에는 무엇이 와도 된다 (여진이었다) */
@@ -49,6 +51,7 @@ const SUFFIXES = [...new Set([...HONOR, ...JOSA])].sort((a, b) => b.length - a.l
 const MARKERS = ['괴담', '괴이', '괴현상', '측', '소속', '직원', '쪽 사람'];
 const OPEN = '「『"\'“‘<《〈[(【';
 const CLOSE = '」』"\'”’>》〉])】';
+const EN_TITLE = /(?:^|[^a-z])(?:chief|ban-?jang|team-?jang|leader|agent|director|manager|officer|mr\.?|ms\.?|mrs\.?|sir|madam)\s+$/;
 const EN_STOP = new Set(['the', 'of', 'and', 'with', 'a', 'an', 'in', 'on', 'to', 'for']);
 
 const isLetter = (c: string | undefined) => !!c && /[\p{L}\p{N}]/u.test(c);
@@ -219,7 +222,9 @@ function rightOk(text: string, end: number): { ok: boolean; honor: boolean } {
   const tail = text.slice(end);
   if (!isLetter(tail[0])) {
     const next = tail.replace(/^\s+/, '');
-    return { ok: true, honor: tail.length !== next.length && HONOR.some((h) => next.startsWith(h) && !isLetter(next[h.length])) };
+    // 띄고 붙은 호칭: 「연지 씨」「제이 반장이」처럼 호칭 뒤에 조사가 와도 된다
+    const honorAt = (h: string) => next.startsWith(h) && (!isLetter(next[h.length]) || JOSA.some((j) => next.startsWith(j, h.length)));
+    return { ok: true, honor: tail.length !== next.length && HONOR.some(honorAt) };
   }
   const sfx = SUFFIXES.find((s) => tail.startsWith(s));
   if (!sfx) return { ok: false, honor: false };
@@ -237,7 +242,8 @@ export function findHits(text: string, entries: ManagedEntry[]): KeyHit[] {
       for (const m of lower.matchAll(key.re)) {
         const start = m.index ?? 0;
         const end = start + m[0].length;
-        const r = key.en ? { ok: true, honor: false } : rightOk(lower, end);
+        // 영어 이름은 앞의 직함으로 확증 (Guard Chief Jay, Agent Kyuras)
+        const r = key.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start - 16), start)) } : rightOk(lower, end);
         if (!r.ok) continue;
         const tail = lower.slice(end).replace(/^\s+/, '');
         const quoted = OPEN.includes(lower[start - 1] ?? '') && CLOSE.includes(lower[end] ?? '');
@@ -337,7 +343,7 @@ export function pickLore(entries: ManagedEntry[], messages: LoreMessage[], state
     if (hit.key.rule === 'plain') continue;
     const e = entries[hit.entry];
     const present = state.deployed.some((n) => names(e, n)) || state.board.some((n) => names(e, n));
-    const ok = hit.marked || present || picks.has(hit.entry) || (hit.key.rule === 'alias' && hit.honor);
+    const ok = hit.marked || present || picks.has(hit.entry) || hit.honor;
     if (ok) add(hit.entry, picks.has(hit.entry) || !hit.marked ? why : 'confirmed', hit.key.text, hit.snippet, score);
   }
   let list = [...picks.values()];
