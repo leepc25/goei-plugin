@@ -203,7 +203,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     if (e.type === 'enter:floor') {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
-      furnishFloor(field, e.floor, w.lane, () => w.rand());
+      // 지형(단·구덩이·좁은 길·낮은 천장) 위에도 놓지 않는다 (검수 12-2: TV가 단 모서리에 걸침)
+      const terr = ((e.floor as { stage?: { terrain?: { x0: number; x1: number }[] } }).stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 220 }));
+      furnishFloor(field, { ...e.floor, props: [...(e.floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr] }, w.lane, () => w.rand());
       // 그림이 없는 물건(회색 기둥처럼 보이는 아이콘 대역)은 층에 두지 않는다 (재검수 2-1)
       field.ents = field.ents.filter((q) => q.type !== 'prop' || PROP_ART.has(q.prop));
       syncCarry();

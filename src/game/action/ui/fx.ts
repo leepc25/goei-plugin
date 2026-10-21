@@ -96,7 +96,7 @@ export class Fx {
         this.shake(3 + s * 4, 0.1 + s * 0.06);
         this.burst(e.x, e.y, 10 + s * 7, e.target === 'player' ? '#ff6050' : '#ffe0a0', 3 + s * 1.5);
         this.ring(e.x, e.y, 16, 60 + s * 45, s === 3 ? '#fff' : '#ffd890', 4 + s * 3, 0.2 + s * 0.05);
-        if (e.dmg != null && Math.round(e.dmg) > 0 && this.opt.numbers) this.pop(e.x, e.y - 70, String(Math.round(e.dmg)), e.target === 'player' ? '#ff7060' : s === 3 ? '#ffe070' : '#fff', s >= 2);
+        if (e.dmg != null && Math.round(e.dmg) > 0 && this.opt.numbers) this.pop(e.x, e.y - 30, String(Math.round(e.dmg)), e.target === 'player' ? '#ff7060' : s === 3 ? '#ffe070' : '#fff', s >= 2);
         if (s === 3) this.flash('#fff', 0.08, 0.35);
         this.rumble?.(0.2 + s * 0.2, 60 + s * 30);
         break;
@@ -195,7 +195,11 @@ export class Fx {
     this.rings.push({ x, y, r0, r1, color, width, life, t: 0 });
   }
   pop(x: number, y: number, text: string, color: string, big: boolean) {
-    this.pops.push({ x: x + (Math.random() - 0.5) * 20, y, text, color, t: 0, big });
+    // 같은 자리의 앞 숫자와 겹치지 않게 엇갈린다: 가까운 숫자가 남아 있으면 옆·위로 한 칸씩 (검수 12-5)
+    let n = 0;
+    for (const p of this.pops) if (p.t < 0.6 && Math.abs(p.x - x) < 70 && Math.abs(p.y - y) < 90) n++;
+    const side = n % 2 ? 1 : -1;
+    this.pops.push({ x: x + (n ? side * (28 + 14 * n) : (Math.random() - 0.5) * 16), y: y - n * 34, text, color, t: 0, big });
   }
 
   /** 흔들림 오프셋: 카메라에 더한다 */

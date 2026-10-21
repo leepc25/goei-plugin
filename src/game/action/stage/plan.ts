@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, floorHasGrid, floorPattern, drawWallCell, placeFor, seamPillar } from '../art/bg';
+import { drawFloor, drawLedge, floorHasGrid, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -40,6 +40,7 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     if (s.role === 'resident') props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '주민 (사는 척)' });
     if (s.role === 'enemy' && s.data.harmless) props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '평범한 직원' });
   }
+  spreadProps(f, props, startX);
   // 싸움 구간: 조각마다 적 자리를 묶는다. 추격·B-12는 화면을 잠그지 않으므로 층 tick이 직접 부른다.
   const encounters: Encounter[] = [];
   if (!NOLOCK_TYPES.has(f.type)) {
@@ -47,7 +48,7 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     for (const s of f.spawns.filter((s) => s.role === 'enemy' && !s.data.harmless)) {
       const seg = segAt(f.segments, s.x);
       const waves = groups.get(seg.x) ?? [[], []];
-      waves[Math.min(1, s.wave)].push({ kind: s.kind, x: s.x, y: laneY(s.lane), elite: s.elite || undefined });
+      waves[Math.min(1, s.wave)].push({ kind: s.kind, x: s.x, y: clearOfProps(props, s.x, laneY(s.lane)), elite: s.elite || undefined });
       groups.set(seg.x, waves);
     }
     for (const [x, waves] of groups) {
@@ -155,6 +156,58 @@ export function endingPlan(id: string): StagePlan {
   };
   plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
   return plan;
+}
+
+/* ── 소품 겹침 금지 (검수 12-2) ──
+   기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
+   ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
+const FIXED_PROPS = new Set(['elevator', 'mirror', 'hatch', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const artW = (p: PropSpec) => Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
+
+function spreadProps(f: Floor, props: PropSpec[], startX: number) {
+  const wallY = Y_TOP + 40;
+  const keepOut: [number, number][] = [];
+  for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
+  const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === 'block' || t.kind === 'pit' || t.kind === 'narrow' || t.kind === 'low');
+  const taken: { a: number; b: number; y: number }[] = [];
+  // 갈림길·규칙 표지는 순서가 뜻이라 그대로
+  const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.rule || q.data.group !== undefined).map((q) => `p${q.id}`));
+  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
+  const free = (p: PropSpec, x: number) => {
+    const h = artW(p) / 2;
+    if (x - h < 40 || x + h > f.width - 40) return false;
+    if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
+    if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
+    if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false; // 구덩이·단은 앞쪽이 원근으로 넓어진다
+    return true;
+  };
+  for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => a.x - b.x)) {
+    let x = p.x;
+    for (let d = 0; d <= 480; d += 24) {
+      if (free(p, p.x + d)) {
+        x = p.x + d;
+        break;
+      }
+      if (d && free(p, p.x - d)) {
+        x = p.x - d;
+        break;
+      }
+    }
+    p.x = x;
+    taken.push({ a: x - artW(p) / 2, b: x + artW(p) / 2, y: p.y });
+  }
+}
+
+/** 적이 소품 한가운데 서지 않게: 그 자리에 소품이 있으면 깊이를 비켜 선다 */
+function clearOfProps(props: PropSpec[], x: number, y: number): number {
+  const hit = (yy: number) => props.some((p) => Math.abs(p.y - yy) < 70 && Math.abs(p.x - x) < artW(p) / 2 + 40);
+  if (!hit(y)) return y;
+  for (const d of [90, -90, 160, -160]) {
+    const yy = Math.max(Y_TOP + 10, Math.min(Y_BOTTOM - 10, y + d));
+    if (!hit(yy)) return yy;
+  }
+  return y;
 }
 
 function propH(kind: string): number {
@@ -415,43 +468,50 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       break;
     }
     case 'low': {
-      // 머리 높이로 내려온 굵은 배관 (도트: 4px 단위 색 띠, 이음 고리, 리벳, 녹 얼룩, 천장 걸쇠). 매끈한 그라데이션 금지 (검수 10)
-      const py = Math.round((y0 - 232) / 4) * 4;
-      const bands: [number, string][] = [[4, '#2a2d2e'], [8, '#5f6567'], [4, '#9aa09e'], [4, '#c3c7c4'], [8, '#7c8280'], [8, '#5a6062'], [6, '#3c4143'], [4, '#222527']];
+      // 낮은 천장: 천장에서 내려온 보(콘크리트 덩어리) + 그 밑면을 따라 붙은 배관. 공중에 뜬 원통이 아니라 천장 구조물로 읽히게 (검수 12-3)
       const x0 = Math.round(t.x0 / 4) * 4,
         x1 = Math.round(t.x1 / 4) * 4;
-      // 걸쇠: 천장에서 내려오는 각진 막대 + 배관을 감싼 띠쇠
-      for (let x = x0 + 64; x < x1 - 40; x += 160) {
-        ctx.fillStyle = '#1e2021';
-        ctx.fillRect(x, 0, 8, py);
-        ctx.fillStyle = '#4a4f51';
-        ctx.fillRect(x + 2, 0, 2, py);
-        ctx.fillStyle = '#1e2021';
-        ctx.fillRect(x - 8, py - 8, 24, 8);
-      }
-      let y = py;
-      for (const [h, c] of bands) {
+      const by = Math.round((y0 - 236) / 4) * 4; // 보 밑면
+      // 보 몸통: 위는 천장 그늘, 아래로 밝아지는 3단 + 밑면 모서리
+      const bands: [number, string][] = [[0.45, '#2b2c2e'], [0.3, '#45474a'], [0.25, '#5b5e61']];
+      let yy = 0;
+      for (const [k, c] of bands) {
+        const h = Math.round((by * k) / 4) * 4;
         ctx.fillStyle = c;
-        ctx.fillRect(x0, y, x1 - x0, h);
-        y += h;
+        ctx.fillRect(x0, yy, x1 - x0, h);
+        yy += h;
       }
-      const ph = y - py;
-      // 이음 고리(플랜지)와 리벳
-      for (let x = x0 + 24; x < x1 - 16; x += 128) {
-        ctx.fillStyle = '#2f3335';
-        ctx.fillRect(x, py - 4, 16, ph + 8);
-        ctx.fillStyle = '#8d9290';
-        ctx.fillRect(x + 4, py - 4, 4, ph + 8);
-        ctx.fillStyle = '#c9ccc9';
-        for (let ry = py + 4; ry < py + ph - 4; ry += 12) ctx.fillRect(x + 10, ry, 4, 4);
-      }
-      // 녹 얼룩·물방울 자국 (도트 덩어리)
-      for (let x = x0 + 72; x < x1 - 20; x += 196) {
-        ctx.fillStyle = '#7a4a2a';
-        ctx.fillRect(x, py + ph - 16, 12, 8);
-        ctx.fillRect(x + 4, py + ph - 8, 4, 8);
-        ctx.fillStyle = '#5a3420';
-        ctx.fillRect(x + 12, py + ph - 12, 8, 4);
+      ctx.fillStyle = '#5b5e61';
+      ctx.fillRect(x0, yy, x1 - x0, by - yy);
+      ctx.fillStyle = '#8a8d8f';
+      ctx.fillRect(x0, by - 8, x1 - x0, 4);
+      ctx.fillStyle = '#1c1d1f';
+      ctx.fillRect(x0, by - 4, x1 - x0, 4);
+      // 양 끝 그늘 면 (두께)
+      ctx.fillStyle = '#232426';
+      ctx.fillRect(x0, 0, 8, by);
+      ctx.fillRect(x1 - 8, 0, 8, by);
+      // 거푸집 자국·얼룩
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let x = x0 + 40; x < x1 - 20; x += 96) ctx.fillRect(x, 24, 4, by - 40);
+      ctx.fillStyle = 'rgba(90,60,40,0.35)';
+      for (let x = x0 + 60; x < x1 - 30; x += 150) ctx.fillRect(x, by - 28, 20, 12);
+      // 밑면 배관 (보에 붙은 두 줄, 4px 색 띠) + 띠쇠
+      const pipe = (py: number, ph: number) => {
+        const cs = ['#2a2d2e', '#7c8280', '#b9bdba', '#6a706f', '#3a3f41'];
+        const st = ph / cs.length;
+        cs.forEach((c, i) => {
+          ctx.fillStyle = c;
+          ctx.fillRect(x0 + 8, py + Math.round(i * st), x1 - x0 - 16, Math.ceil(st));
+        });
+      };
+      pipe(by, 20);
+      pipe(by + 20, 12);
+      for (let x = x0 + 32; x < x1 - 24; x += 112) {
+        ctx.fillStyle = '#1e2021';
+        ctx.fillRect(x, by - 2, 8, 36);
+        ctx.fillStyle = '#9a9e9c';
+        ctx.fillRect(x + 2, by, 2, 30);
       }
       break;
     }

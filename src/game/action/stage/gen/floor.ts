@@ -143,6 +143,8 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   if (fallback && type === 'chase') seq.splice(1, 0, { t: CHUNK_BY_ID.h_doors, flip: false });
   // 로비 L1 튜토리얼: 구덩이·낮은 천장 없는 쉬운 조각만 앞에
   if (type === 'lobby' && depth === 1) seq = seq.map((c, i) => (i < 2 && c.t.terrain.some((t) => t.kind === 'pit' || t.kind === 'low') ? { t: CHUNK_BY_ID.c_flat, flip: false } : c));
+  // 로비 L1에는 낮은 단(바닥을 가로지르는 판)을 두지 않는다: 매끈한 통로 판처럼 보인다 (검수 12-1). 조각의 소품은 그대로
+  if (type === 'lobby' && depth === 1) seq = seq.map((c) => (c.t.terrain.some((t) => t.kind === 'block') ? { ...c, t: { ...c.t, terrain: c.t.terrain.filter((t) => t.kind !== 'block') } } : c));
 
   const segments: FloorSegment[] = [];
   const placed: Placed[] = [];

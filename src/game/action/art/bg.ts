@@ -80,6 +80,37 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
   return true;
 }
 
+/** 벽 그림 속 바닥에 닿는 문·가구 자리 (그림 px, 그림 폭 320 기준). 벽에 붙는 소품이 이 앞을 가리지 않게 쓴다 (검수 12-2). */
+const WALL_SOLID: Record<string, [number, number][]> = {
+  apt_wall_1: [[68, 144]], apt_wall_2: [[196, 282]], apt_wall_3: [[160, 320]], apt_wall_4: [[20, 185], [210, 270]],
+  apt_red_wall_1: [[68, 148]], apt_red_wall_2: [[68, 142]], apt_vacant_wall_1: [[68, 142], [165, 280]], apt_vacant_wall_2: [[68, 142], [158, 205]],
+  chase_wall_1: [[118, 200]], chase_wall_4: [[40, 122]], dark_wall_2: [[0, 150], [200, 278]], dark_wall_3: [[22, 90]],
+  deep_wall_1: [[114, 205]], deep_wall_2: [[20, 240]], deep_wall_3: [[88, 140]], el_car_wall_4: [[75, 235]],
+  el_hall_wall_1: [[108, 212]], el_hall_wall_3: [[110, 210]], el_hall_wall_4: [[112, 190]],
+  guardian_guard_wall_2: [[180, 300]], guardian_legs_wall_2: [[120, 230]],
+  lobby_wall_2: [[65, 255]], lobby_wall_3: [[62, 145], [165, 250]], lobby_wall_4: [[38, 108]],
+  puzzle_wall_1: [[18, 105], [215, 305]], puzzle_wall_3: [[40, 95], [200, 275]], puzzle_wall_4: [[55, 145]],
+  service_wall_2: [[0, 160]], service_wall_3: [[112, 205]], service_wall_4: [[55, 125]],
+  silent_wall_2: [[228, 282]], silent_wall_3: [[112, 195]], silent_wall_4: [[25, 275]], test_wall_3: [[70, 250]],
+};
+
+/** drawWallCell과 같은 칸 고르기로, 조각(x, w) 벽 그림 속 문·가구가 차지한 월드 x 구간들 */
+export function wallSolidSpans(place: string, x: number, w: number, flip: boolean): [number, number][] {
+  const names = walls(place);
+  if (!names.length) return [];
+  const bays = Math.max(1, Math.round(w / 640));
+  const bw = w / bays;
+  const out: [number, number][] = [];
+  for (let i = 0; i < bays; i++) {
+    const k = Math.round((x + i * bw) / 640);
+    const name = names[(k + (hash(place) % names.length)) % names.length];
+    const bx = x + i * bw,
+      sc = bw / 320;
+    for (const [a, b] of WALL_SOLID[name] ?? []) out.push(flip ? [bx + bw - b * sc, bx + bw - a * sc] : [bx + a * sc, bx + b * sc]);
+  }
+  return out;
+}
+
 /** 벽 명암 단계: 천장 쪽 두 단, 걸레받이 쪽 한 단을 어둡게 (부드러운 그라데이션 대신 도트처럼 끊어진 띠). */
 function wallLight(ctx: CanvasRenderingContext2D, x: number, w: number, bottom: number) {
   // 천장 쪽 그늘과 걸레받이 그늘: 띠 세 겹은 무늬처럼 보여서(불합격 4) 매끈한 그라데이션으로
