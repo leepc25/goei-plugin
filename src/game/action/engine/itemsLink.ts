@@ -140,7 +140,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     if (carry.kind === 'prop') {
       const d = PROPS[carry.id];
       const s = Math.max(d?.w ?? 60, d?.h ?? 60);
-      drawItemIcon(c, carry.id, -s / 2, -s, s);
+      // 머리 위로 들어 올린 높이 (머리에 겹치지 않게 조금 띄움)
+      drawItemIcon(c, carry.id, -s / 2, -s - 18, s);
     } else if (!drawItemHeld(c, carry.id, deg)) {
       // 무기 그림의 손잡이 = 그림 아래쪽 1/4 지점. 각도 0 = 위로 세움, 시계 방향
       c.rotate(((deg + 45) * Math.PI) / 180);
@@ -241,7 +242,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         c.fill();
         const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
         const id = e.ref ?? e.kind;
-        drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
+        // 바닥 크기: 무기는 도트 2배 실제 길이에 가깝게, 아이템·회수물은 조금 크게
+        const sz = e.kind === 'weapon' ? 80 : e.kind === 'item' || e.kind === 'relic' ? 40 : 28;
+        drawItemIcon(c, id, x - sz / 2, y - sz - 6 + bob, sz);
       }
       for (const pj of field.projs) {
         c.fillStyle = '#d8e0e4';
