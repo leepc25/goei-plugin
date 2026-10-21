@@ -1,0 +1,58 @@
+{
+  "cut": "opening/c8",
+  "generator": "built-in image_gen",
+  "sources": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c8-1.png",
+    "game-src/art/cutscene/production/forward-sheets/opening-c8-2.png",
+    "game-src/art/cutscene/production/forward-sheets/opening-c8-3.png"
+  ],
+  "references": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c8-reference1.png",
+    "game-src/art/cutscene/production/forward-sheets/opening-c8-reference2.png"
+  ],
+  "prompts": [
+    "Create ONE single wide PIXEL ART cinematic keyframe, 16:9 landscape 1920x1080. This is a character lineup for a fictional arcade-game opening. Exactly EIGHT adult agents in ONE horizontal row, left to right: 1 Jyaldi, tall curvy adult Korean WOMAN waist-long straight black hair RED eyes black trouser suit white shirt black tie black gloves; 2 Eileen, short sturdy adult WOMAN faded platinum HIGH PONYTAIL, olive tactical vest over dark suit, rifle held safely muzzle DOWN; 3 Spangdal, slim adult WOMAN wavy PURPLE BOB, pale skin GOLD eyes, black skirt suit, half-smile; 4 Geshugan, athletic adult WOMAN short SNOW-WHITE hair BLUE eyes, loose WHITE SHIRT and dark trousers, small cube in hand; 5 Gorgodio, very LARGE muscular adult MAN, BALD with neat dark beard and black jacket; 6 Kyras, slim adult MAN slicked-back LIME GREEN hair, smiling, black motorcycle jacket over suit and keys in hand; 7 Deadfall, petite adult WOMAN long straight BLACK hair with BANGS, round eyes, neat black trouser suit and gloves; 8 Rosemon, petite adult WOMAN long wavy PURPLE hair PURPLE eyes, blouse skirt and cardigan, stern cute expression. Count exactly eight heads and eight complete bodies, ALL visible head to toe with space between silhouettes and margins at left and right. Same ground baseline. All eight occupy equal-width slots and all face forward, standing neutrally. An unusually WIDE brass elevator behind them is fully open, soft pale white interior backlight, dark charcoal marble lobby and floor. The whole group is lit enough to identify every outfit and hair color; later animation will dim lights. Jyaldi matches TOP woman of supplied reference; bottom brown-haired woman must not appear. Calm nonviolent team portrait. Weapons lowered, no combat. Bold dark pixel contours, large crisp pixel clusters, flat 2-3 tones, subdued colors. No antialiasing, no painterly texture, no lettering, no numbers, no logo.",
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C8 PART A, GROUP ENTRANCE. The reference is the final lineup of EXACTLY EIGHT adults; preserve their precise left-to-right order, individual hair silhouettes, outfits, relative heights, lobby and open elevator. In EVERY ONE of eight panels ALL EIGHT characters are present and visible HEAD TO TOE. All eight walk out TOGETHER from the white-backlit open elevator toward the viewer in a single shallow horizontal line, taking one short synchronized step then settling into the exact reference positions. First panel bodies strongly dark silhouettes against white interior; keep them mostly silhouettes through last panel, only subtle rim light and faint identifying hair colors. No spotlight reveal yet. Alternate lifted and planted feet naturally; no sliding, no disappearing, no person materializing or being replaced, no added ninth person. Frame1 group a little farther back in doorway; frames2-6 one short forward step;7-8 arrive and stand in the reference arrangement. Camera locked wide, fit every head and shoe inside each panel with margins. Each panel is the same whole scene, not one character per panel. Pixel art, no text.",
+    "Edit ONLY LIGHTING in this 2x4 eight-frame animation contact sheet. Preserve every person, all eight heads and bodies in every panel, every pose, walking legs, proportions, camera and background exactly. ALL EIGHT CHARACTERS must be DARK BACKLIT SILHOUETTES throughout ALL EIGHT panels including bottom row. Reduce their front-facing body/hair/skin/clothing colors to near-black charcoal; allow only a thin dim rim light defining their outlines. Do not reveal white shirts, faces, purple hair, green hair or olive vest yet. The bright elevator interior behind them stays bright white and floor reflections stay dim. No individual floor spotlights yet. This sheet is only the silhouette walk-out BEFORE the later reveal, so panel8 must still be just as dark as panel1. No added or removed person, no movement changes, no writing.",
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C8 PART B: FIRST FOUR PERSONAL GESTURES. Use the reference as exact character identity, eight-person order, size, ground positions, backdrop and camera. ALL EIGHT ADULTS are present fully head-to-toe in EVERY panel, standing in this exact row; no walking now. Start with all silhouettes except first person lit by a warm floor spotlight. Panels1-2: Jyaldi (leftmost long black hair pants suit) brings hands together and tugs glove cuff; only she is illuminated. Panels3-4: second person's floor light turns on too; Eileen platinum ponytail olive vest looks down and checks her lowered rifle with hands, muzzle downward and no firing. Panels5-6: third floor light turns on too; purple-bob Spangdal tilts head and gives a small hand wave. Panels7-8: fourth light turns on too; short white-haired Geshugan in white shirt turns her small cube in hand. Once revealed each person stays lit. Other four agents remain present as clear dark silhouettes in their original positions, never vanish. Keep silhouettes and anatomy constant. No text, no combat, no person appearing alone in a panel. Same wide frame and blank white elevator interior.",
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C8 PART C: LAST FOUR PERSONAL GESTURES. Use the reference as exact character identity, eight-person order, size, ground positions, backdrop and camera. ALL EIGHT ADULTS remain present fully head-to-toe in EVERY panel in the exact row. The first FOUR agents from the left already have warm floor spotlights and remain calmly still and lit. Panels1-2: spotlight turns on under FIFTH person, enormous BALD bearded man Gorgodio; he brings hands together and flexes/cracks his knuckles. Panels3-4: SIXTH person slim lime-haired man Kyras lights up, twirls motorcycle keys by one finger. Panels5-6: SEVENTH person petite long black-haired woman Deadfall lights up, eyes narrow slightly and right hand rests on her HOLSTERED pistol grip, gun remains holstered. Panels7-8: EIGHTH/rightmost woman Rosemon long PURPLE hair and cardigan lights up, crosses arms and gives a stern look, small PURPLE eye glint. All previously revealed people stay lit. Until their turn the last agents are visible dark silhouettes, not absent. Final panel shows the complete eight-person lit group, exactly the reference order. No firing, no targets, no text, no isolated-character panels."
+  ],
+  "layout": "2x4-sheet",
+  "whiteTransitionFrame": false,
+  "timing": {
+    "ms": [
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      375,
+      125,
+      375,
+      125,
+      375,
+      125,
+      375,
+      125,
+      375,
+      125,
+      375,
+      125,
+      375,
+      125,
+      1375
+    ]
+  },
+  "size": [
+    640,
+    360
+  ],
+  "colors": 64,
+  "sampling": "nearest-neighbor only; no dithering",
+  "paletteSha256": "29870d741fd5543836d5ba1c6142a98093c1ac31d78af3ebd67985a7c1841784",
+  "uniqueFrames": 24
+}
