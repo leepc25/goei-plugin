@@ -44,7 +44,7 @@ const flow = (tag: string, text: string, cls = '') => `<${tag} class="${cls ? `$
 // 오른쪽 위 화면 표시는 지금 상태 그대로 (2026-10-21 사용자: 모니터에서도 상태가 보여야)
 function tile(a: AgentItem, i: number): string {
   return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
-    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, '0')}</span><span class="st"><i></i>${esc(a.st)}</span></span>
+    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, '0')}</span><span class="st">${esc(a.st)}</span></span>
     <span class="gx-agmon-cap"><b>${esc(a.name)}</b>${flow('small', a.side === 'op' && a.deployed ? a.deployed : line(a))}</span></span></li>`;
 }
 

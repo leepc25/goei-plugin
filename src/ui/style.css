@@ -2256,8 +2256,6 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agmon.lock .gx-agmon-cap b { color: rgba(255, 255, 255, .55); }
 .gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; align-items: center; gap: 4px; font: 600 10.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
 .gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; padding: 2px 5px; border-radius: 3px; background: rgba(4, 8, 8, .55); color: var(--c); font: 700 11px/1.1 var(--font, inherit); letter-spacing: 0; }
-.gx-agmon-osd .st i { display: none; }
-.gx-agmon.op .gx-agmon-osd .st i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #ff3b2b; box-shadow: 0 0 5px #ff3b2b; }
 .gx-agmon-cap { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .gx-agmon-cap b { font-size: 14.5px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-agmon-cap small { font: 600 11px/1.25 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
