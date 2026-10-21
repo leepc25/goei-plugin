@@ -344,7 +344,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
   let added = 0;
   for (const id of kept) if (!s.rulebook.includes(id)) (s.rulebook.push(id), added++);
-  lines.push(`규칙서 +${added}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ''}`);
+  if (added || (evac && unsent.length)) lines.push(`규칙서 +${added}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ''}`);
 
   // 재화: 현금은 출동 안에서만, 귀환·철수 때 절반을 예산으로
   const cashToBudget = Math.floor(r.cash * CASH_RATE[r.how]);
@@ -374,7 +374,12 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   s.currencies.budget = Math.max(0, s.currencies.budget + budget);
   s.currencies.teeth += teeth;
   s.currencies.research += research;
-  lines.push(`현금 ${r.cash}${evac ? ' 전부 잃음' : ` → 예산 ${cashToBudget}`} · 예산 ${budget >= 0 ? '+' : ''}${budget} · 이빨 +${teeth}${research ? ` · 연구 자료 +${research}` : ''}${mult > 1 ? ` (깊이 배율 ×${mult.toFixed(1)})` : ''}`);
+  const got: string[] = [];
+  if (budget) got.push(`예산 ${budget > 0 ? '+' : ''}${budget}${cashToBudget > 0 ? ` (현금 ${r.cash}의 절반 포함${mult > 1 ? `, 깊이 배율 ×${mult.toFixed(1)}` : ''})` : mult > 1 && budget > 0 ? ` (깊이 배율 ×${mult.toFixed(1)})` : ''}`);
+  if (teeth) got.push(`이빨 +${teeth}`);
+  if (research) got.push(`연구 자료 +${research}`);
+  if (evac && r.cash > 0) got.push(`현금 ${r.cash} 잃음`);
+  lines.push(got.length ? got.join(' · ') : '얻은 재화 없음');
 
   // 회수물: 후송이면 절반, 나머지는 감정실로
   const bag = r.bag.filter((b): b is NonNullable<BagSlot> => !!b);
