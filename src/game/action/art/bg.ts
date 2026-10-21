@@ -51,6 +51,20 @@ function hash(s: string): number {
 }
 
 /** 조각 하나의 벽(0~wallBottom)을 칸 그림으로 채운다. 칸 하나 = 640 논리 px. */
+/** 층 벽 그림의 빈 명패 (도트 x0, y0, x1, y1): 장소에 맞는 방 이름·호수를 적는다 (검수 12-1: 빈 회색 명패). */
+const FLOOR_PLATES: Record<string, [number, number, number, number][]> = {
+  lobby_wall_3: [[45, 79, 63, 91], [262, 79, 282, 91]],
+  apt_wall_1: [[95, 40, 120, 48]],
+  apt_vacant_wall_1: [[95, 40, 120, 48]],
+  silent_wall_3: [[140, 30, 180, 37]],
+};
+const PLATE_NAMES: Record<string, string[]> = {
+  lobby: ['관리실', '자료실', '숙직실', '기계실', '상담실', '회의실', '창고'],
+  apt: ['301', '302', '303', '304', '404', '305'],
+  apt_vacant: ['501', '502', '503', '504'],
+  silent: ['열람실', '서고', '별관', '고문서실'],
+};
+
 export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: string, x: number, w: number, flip: boolean, wallBottom: number): boolean {
   const names = walls(place);
   if (!names.length) return false;
@@ -74,6 +88,19 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
       ctx.drawImage(im, 0, 0, bw, wallBottom);
       ctx.restore();
     } else ctx.drawImage(im, bx, 0, bw, wallBottom);
+    const name = names[(k + (hash(place) % names.length)) % names.length];
+    (FLOOR_PLATES[name] ?? []).forEach(([px0, py0, px1, py1], j) => {
+      const list = PLATE_NAMES[place.split(':')[0]] ?? PLATE_NAMES.lobby;
+      const text = list[hash(`${place}:${Math.round(bx)}:${j}`) % list.length];
+      const kx = bw / 320,
+        ky = wallBottom / 220;
+      const cx = flip ? bx + (320 - (px0 + px1) / 2) * kx : bx + ((px0 + px1) / 2) * kx;
+      ctx.fillStyle = /silent/.test(place) ? '#3a2a14' : /apt/.test(place) ? '#d8d4c8' : '#2b2f2c'; // 아파트 호수판은 어두운 판
+      ctx.font = `bold ${Math.max(9, Math.round((py1 - py0) * ky * 0.66))}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, cx, ((py0 + py1) / 2) * ky + ky / 2, (px1 - px0 - 2) * kx);
+    });
   }
   wallLight(ctx, x, w, wallBottom);
   ctx.restore();
@@ -96,7 +123,7 @@ function wallLight(ctx: CanvasRenderingContext2D, x: number, w: number, bottom: 
 }
 
 /** 무늬 자체가 바둑판·타일 줄인 바닥 (겹쳐 긋는 줄 생략). */
-const OWN_GRID = new Set(['hq_pantry', 'puzzle']);
+const OWN_GRID = new Set(['hq_pantry', 'hq_street', 'puzzle']);
 
 /** 바닥 띠(y0~y1)를 무늬로 깐다. 무늬는 월드 x에 붙고, 깊이는 모이는 줄과 뒤쪽 어둡게로 읽힌다. */
 export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, y0: number, y1: number): boolean {
@@ -482,10 +509,10 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
       ctx.drawImage(b, Math.round(sx), Math.round(y - b.height * 2), b.width * 2, b.height * 2);
     } else ok = false;
   } else ok = drawObj(ctx, ref[0], ref[1], sx, y) > 0;
-  // 빈 흰 판(로비 6번)에 글씨·무늬 (통합 검수 2-4: 빈 판처럼 보인다). 판 면 = 도트 (10,2)~(50,48)
+  // 빈 흰 판(로비 6번)에 포스터 그림 (통합 검수 2-4, 12-3). 판 면 = 도트 (16,5)~(64,61)
   if (ok && ref.length === 2 && ref[0] === 'lobby' && ref[1] === 6) {
     const im = objImage('lobby', 6)!;
-    boardFace(ctx, sx - im.width + 22, y - im.height * 2 + 6, 78, 88, kind, label ?? '');
+    boardFace(ctx, sx - im.width + 32, y - im.height * 2 + 10, 96, 112, kind, label ?? '');
   }
   ctx.restore();
   return ok;
@@ -493,39 +520,88 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
 
 /** 표지판 면: 머리 글씨 두 자 + 글줄 무늬. 종류마다 머리 글씨·무늬가 다르다. */
 function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, kind: string, label: string) {
+  // 글씨 머리띠(「안내」「점검」)와 점선 글줄은 층마다 반복되는 이름표처럼 보였다(검수 12-3): 내용을 도트 포스터 그림으로.
+  // 2px 한 칸. 같은 종류라도 자리(x)에 따라 그림을 바꿔 줄지어 같은 판이 서지 않게.
   const head =
     /시험|점수/.test(label) ? '시험' : /순서/.test(label) ? '순서' : /표지/.test(label) ? '표지' : kind === 'checklist' || /점검/.test(label) ? '점검' : kind === 'goalwall' || /목표/.test(label) ? '목표' : /긁힌/.test(label) ? '' : '안내';
   x = Math.round(x);
   y = Math.round(y);
+  const v = hash(`${kind}:${label}:${x}`) % 3;
+  const P = (cx: number, cy: number, cw: number, ch: number, c: string) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x + cx * 2, y + cy * 2, cw * 2, ch * 2);
+  };
+  // 그림은 가로 40칸 기준: 판 가운데로
+  const W = 40,
+    H = Math.floor(h / 2) - 4;
+  x += (Math.floor(w / 2) - W) & ~1;
+  y += 4;
+  const K = '#2e3036',
+    R = '#b0342c',
+    G = '#2f8a52',
+    B = '#2f5c96',
+    Y = '#e0b52c';
   ctx.save();
-  ctx.fillStyle = head === '시험' || head === '목표' ? '#7a2a26' : '#2c3c52';
-  ctx.fillRect(x, y, w, 22);
-  if (head) {
-    ctx.fillStyle = '#e8e2d2';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(head, x + w / 2, y + 12);
-  }
-  ctx.fillStyle = '#3a3a3e';
-  if (head === '순서') {
-    for (let i = 0; i < 3; i++) ctx.fillRect(x + 10 + i * 22, y + 36, 14, 14);
-    ctx.fillRect(x + 8, y + 62, w - 16, 4);
+  const lines = (cy: number, n: number, c = '#8a8c92') => {
+    for (let i = 0; i < n; i++) {
+      const lw = W - 8 - ((i * 7 + v * 3) % 9);
+      for (let gx = 0; gx < lw; gx += 4) P(4 + gx, cy + i * 3, Math.min(3, lw - gx), 1, c);
+    }
+  };
+  if (head === '안내') {
+    if (v === 0) {
+      // 층 안내도: 방 칸 + 현재 위치 빨간 점 + 화살표
+      P(3, 3, W - 6, 1, B);
+      for (const [rx, ry, rw, rh] of [[4, 7, 12, 9], [18, 7, 15, 9], [4, 18, 29, 8]] as const) {
+        P(rx, ry, rw, 1, K); P(rx, ry + rh, rw, 1, K); P(rx, ry, 1, rh, K); P(rx + rw - 1, ry, 1, rh + 1, K);
+      }
+      P(24, 21, 3, 3, R);
+      P(8, 30, 14, 1, K); P(20, 29, 1, 3, K); P(19, 28, 1, 5, K);
+      lines(35, 3);
+    } else if (v === 1) {
+      // 비상구 그림: 초록 판에 달리는 사람
+      P(4, 4, W - 8, 18, G);
+      P(10, 7, 3, 3, '#e8f0e6'); P(10, 10, 3, 6, '#e8f0e6'); P(8, 12, 7, 2, '#e8f0e6'); P(7, 16, 3, 3, '#e8f0e6'); P(13, 16, 3, 3, '#e8f0e6');
+      P(20, 9, 10, 8, '#e8f0e6'); P(22, 11, 6, 6, G);
+      lines(26, 5);
+    } else {
+      // 엘리베이터 이용 안내: 문 두 짝 그림 + 위아래 세모
+      P(8, 5, 22, 18, '#9aa0a6'); P(18, 5, 1, 18, K); P(8, 5, 22, 1, K);
+      P(13, 25, 3, 1, K); P(12, 26, 5, 1, K); P(22, 26, 5, 1, K); P(23, 27, 3, 1, K);
+      lines(31, 4);
+    }
+  } else if (head === '점검') {
+    // 점검표: 칸 표 + 체크 표시 + 빨간 도장
+    P(3, 3, W - 6, 2, K);
+    for (let r = 0; r < 6; r++) {
+      P(4, 8 + r * 5, W - 8, 1, '#9a9ca2');
+      lines(6 + r * 5, 1);
+      if ((r + v) % 3 !== 2) { P(W - 9, 9 + r * 5 - 2, 1, 1, G); P(W - 8, 9 + r * 5 - 1, 1, 1, G); P(W - 7, 9 + r * 5 - 3, 1, 2, G); }
+    }
+    P(W - 14, H - 10, 8, 1, R); P(W - 14, H - 4, 8, 1, R); P(W - 15, H - 9, 1, 5, R); P(W - 6, H - 9, 1, 5, R); P(W - 12, H - 7, 4, 1, R);
   } else if (head === '표지') {
-    // 화살표 머리만 (어느 쪽인지는 읽어야 안다)
-    ctx.fillRect(x + 18, y + 44, w - 36, 6);
-    ctx.fillRect(x + 10, y + 34, 6, 26);
-    ctx.fillRect(x + w - 16, y + 34, 6, 26);
-  } else if (!head) {
+    // 경고 표지: 노랑·검정 테두리, 양쪽 화살표 (어느 쪽인지는 읽어야 안다)
+    for (let i = 0; i < W; i += 4) { P(i, 0, 2, 2, Y); P(i + 2, 0, 2, 2, K); P(i, H - 2, 2, 2, K); P(i + 2, H - 2, 2, 2, Y); }
+    P(6, 20, W - 12, 3, K);
+    for (let k = 0; k < 6; k++) { P(6 + k, 21 - k, 1, 1 + k * 2, K); P(W - 7 - k, 21 - k, 1, 1 + k * 2, K); }
+    lines(30, 3);
+  } else if (head === '순서') {
+    for (let i = 0; i < 3; i++) {
+      P(5 + i * 11, 8, 8, 8, K); P(6 + i * 11, 9, 6, 6, '#e8e4d8');
+      for (let d = 0; d <= i; d++) P(7 + i * 11 + d * 2, 11, 1, 2, R);
+    }
+    P(5, 20, W - 10, 1, K);
+    lines(24, 5);
+  } else if (head === '목표' || head === '시험') {
+    // 붉은 테두리 + 과녁 (목표·시험 판은 다르게 보이게)
+    P(0, 0, W, 2, R); P(0, H - 2, W, 2, R); P(0, 0, 2, H, R); P(W - 2, 0, 2, H, R);
+    const cx = Math.floor(W / 2), cy = 14;
+    for (const [r, c] of [[9, R], [7, '#e8e4d8'], [5, R], [3, '#e8e4d8'], [1, R]] as const) P(cx - r, cy - r, r * 2 + 1, r * 2 + 1, c);
+    lines(28, 4);
+  } else {
     // 긁힌 글씨: 비뚤어진 긁힘
     ctx.fillStyle = '#5a2a2a';
-    for (let i = 0; i < 6; i++) ctx.fillRect(x + 6 + ((i * 13) % (w - 20)), y + 8 + i * 12, 14 + ((i * 7) % 20), 3);
-  } else {
-    // 글줄: 길이가 다른 짧은 줄 (작은 글씨처럼)
-    for (let i = 0; i < 5; i++) {
-      const lw = w - 16 - ((i * 17) % 28);
-      for (let gx = 0; gx < lw; gx += 8) ctx.fillRect(x + 8 + gx, y + 30 + i * 11, 6, 4);
-    }
+    for (let i = 0; i < 6; i++) ctx.fillRect(x + 6 + ((i * 13) % (W * 2 - 40)), y + 8 + i * 12, 14 + ((i * 7) % 20), 3);
   }
   ctx.restore();
 }
