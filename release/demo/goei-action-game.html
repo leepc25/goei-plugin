@@ -2082,6 +2082,7 @@ var Game = class {
       queueMicrotask(() => this.mods.boot?.(this));
     }
     const frame = (now) => {
+      if (this.dead) return;
       this.raf = requestAnimationFrame(frame);
       if (!this.last) this.last = now;
       let dt = (now - this.last) / 1e3;
@@ -2116,7 +2117,10 @@ var Game = class {
     this.scene.tick(p);
   }
   destroy() {
+    this.dead = true;
     cancelAnimationFrame(this.raf);
+    this.world = null;
+    this.run = null;
     this.input.detach();
     if (this.ownCanvas) this.canvas.remove();
     if (this.hqRoot) {
@@ -2143,6 +2147,7 @@ var Game = class {
     const stage = this.mods.stages.find((s2) => s2.id === stageId) ?? this.mods.stages[0];
     this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id });
   }
+  dead = false;
   /** 본부를 걷는 중인가 (엔진 벨트 장면) */
   inHub = false;
   showHq() {
@@ -18733,6 +18738,11 @@ function engineModules(box2, bridge) {
     boot: (g2) => bootFromUrl(g2),
     dispose: () => {
       unmountItems();
+      const g2 = globalThis;
+      delete g2.__goeiStory;
+      delete g2.__goeiStoryStart;
+      world = null;
+      game = null;
       window.removeEventListener("keydown", storyKeys, true);
       window.removeEventListener("keydown", hqKeys, true);
       saveFlags();
@@ -18923,6 +18933,9 @@ function mountGame(box2, bridge) {
     dead = true;
     offTouch?.();
     game?.destroy();
+    const g2 = globalThis;
+    if (g2.__goeiEngine === game) delete g2.__goeiEngine;
+    game = null;
     root.remove();
     st.remove();
   };
