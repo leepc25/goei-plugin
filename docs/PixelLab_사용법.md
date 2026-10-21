@@ -24,3 +24,11 @@
 3. 동작이 클수록 장 수를 늘린다(공격 연속은 16장 권장, 비공식: 넘어짐 8장 이상).
 4. 뻗는 쪽에 캔버스 여백을 충분히 둔다.
 5. 프롬프트는 외모 말고 움직임을 한 문장으로(속도·힘·무엇이 먼저 나가는지).
+
+## 웹 검색 결과 (2026-10-21)
+
+- 실사용 후기는 거의 없다. Reddit·한국어 후기는 찾지 못했고, YouTube 튜토리얼(공격 애니메이션 lf49lGl-2Kk)은 본문을 읽을 수 없었다.
+- [Jonathan Yu 리뷰](https://www.jonathanyu.xyz/2025/12/31/pixellab-review-the-best-ai-tool-for-2d-pixel-art-games/): 문서가 낡아 실험하다 크레딧을 많이 날린다고 지적. 작은 그림보다 큰 그림 결과가 낫다.
+- [공식 Animation to animation](https://www.pixellab.ai/docs/tools/animation-to-animation): 처음엔 2장처럼 적게 뽑아 좋은 장을 고르고, 그 장을 기준 그림으로 다시 뽑는다. 수작업 정리를 각오.
+- [공식 Animation with Text](https://www.pixellab.ai/docs/tools/animation): 큰 공격은 캐릭터를 캔버스 한쪽으로 옮겨 공간을 준다.
+- 타격 원칙 참고 [Slynyrd 근접 공격](https://www.slynyrd.com/blog/2018/9/8/pixelblog-9-melee-attacks): 자세(스탠스)부터. 예비동작이 길면 입력 지연, 회수가 길면 끈적함. 타격 순간 잠깐 멈춤, 번짐(smear)은 1장. 최대로 뻗은 장에서 팔을 살짝 늘이면 손맛·사거리 증가.
