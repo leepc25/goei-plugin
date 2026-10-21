@@ -627,6 +627,35 @@ function boardFace(ctx, x, y, w, h, kind, label3) {
   ctx.restore();
 }
 
+// src/game/action/engine/hint.ts
+var SHAPE = [
+  "..###..",
+  "..#o#..",
+  "..#o#..",
+  "###o###",
+  "#ooooo#",
+  ".#ooo#.",
+  "..#o#..",
+  "...#..."
+];
+var D = 6;
+function drawHintIcon(c, x, y, tick) {
+  const bob = Math.round(Math.sin(tick / 5) * 1.5) * D;
+  const w = SHAPE[0].length * D;
+  const ox = Math.round(x - w / 2);
+  const oy = Math.round(y - SHAPE.length * D + bob);
+  c.save();
+  c.imageSmoothingEnabled = false;
+  for (let r = 0; r < SHAPE.length; r++)
+    for (let k = 0; k < SHAPE[r].length; k++) {
+      const ch = SHAPE[r][k];
+      if (ch === ".") continue;
+      c.fillStyle = ch === "#" ? "#1a1410" : r < 3 ? "#fff4c8" : "#f0c860";
+      c.fillRect(ox + k * D, oy + r * D, D, D);
+    }
+  c.restore();
+}
+
 // src/game/action/engine/fighter.ts
 var GRAVITY = 2.6;
 var nextId = 1;
@@ -1047,6 +1076,7 @@ function makeRenderer(ctx, art3, opt) {
     return Math.abs(w.player.x - p.x) < 60;
   }
   function drawProps(w, camX) {
+    if (w.props.some((p) => p.label && near2(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
     for (const p of w.props) {
       const sx = p.x - camX;
       if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
@@ -1070,16 +1100,6 @@ function makeRenderer(ctx, art3, opt) {
         ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
         ctx.strokeStyle = "rgba(0,0,0,0.5)";
         ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-      }
-      if (p.label && near2(w, p)) {
-        ctx.font = "bold 15px sans-serif";
-        ctx.textAlign = "center";
-        const tw = ctx.measureText(`E ${p.label}`).width + 16;
-        ctx.fillStyle = "rgba(0,0,0,0.6)";
-        ctx.fillRect(sx - tw / 2, p.y - p.h - 30, tw, 22);
-        ctx.fillStyle = "#f0d890";
-        ctx.fillText(`E ${p.label}`, sx, p.y - p.h - 14);
-        ctx.textAlign = "left";
       }
     }
   }
@@ -2405,7 +2425,7 @@ var World = class {
         if (!(a instanceof Fighter) || !(b instanceof Fighter)) continue;
         if (a.phase === "held" || b.phase === "held" || a.phase === "down" || b.phase === "down" || a.phase === "dead" || b.phase === "dead") continue;
         if (a.invuln > 0 || b.invuln > 0) continue;
-        if (Math.abs(a.y - b.y) > 12) continue;
+        if (Math.abs(a.y - b.y) > 30) continue;
         const min = (a.width + b.width) * 0.8;
         const dx = b.x - a.x;
         if (Math.abs(dx) < min) {
@@ -7136,6 +7156,10 @@ var Hud = class {
     const t = Math.max(0, s2.timer.sec);
     label(c, `${s2.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`, W2 / 2, 40, 26, t < 10 ? C.hpLow : "#bfe0f0", "center", 900);
   }
+  /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
+  drawMessage(c, text, compact) {
+    this.message(c, text, compact);
+  }
   message(c, text, compact) {
     c.font = font(17, 600);
     let t = text;
@@ -7469,21 +7493,14 @@ var Fx = class {
   }
   drawTitle(c, t) {
     const inK = Math.min(1, t.t / 0.35), outK = t.t > 2.3 ? (t.t - 2.3) / 0.5 : 0;
-    const a = inK * (1 - outK);
-    const bar2 = 64 * easeOut(inK) * (1 - outK);
-    c.fillStyle = "rgba(0,0,0,0.85)";
-    c.fillRect(0, 0, W3, bar2);
-    c.fillRect(0, H3 - bar2, W3, bar2);
-    c.globalAlpha = a;
-    const y = H3 * 0.42;
-    c.fillStyle = "rgba(0,0,0,0.45)";
-    c.fillRect(0, y - 70, W3, 130);
-    label(c, t.depth, W3 / 2, y, 64, "#fff", "center", 900);
+    c.globalAlpha = inK * (1 - outK);
+    const text = !t.depth || t.name.startsWith(t.depth) ? t.name || t.depth : `${t.depth} · ${t.name}`;
+    const y = H3 * 0.24;
+    label(c, text, W3 / 2, y, 30, "#ece2c8", "center", 800);
     c.fillStyle = "rgba(240,180,90,0.9)";
-    const lw = 300 * easeOut(Math.min(1, t.t / 0.6));
-    c.fillRect(W3 / 2 - lw / 2, y + 14, lw, 2);
-    label(c, t.name, W3 / 2, y + 46, 24, "#e8dcc0", "center", 700);
-    if (t.variant) label(c, `변형 · ${t.variant}`, W3 / 2, y + 78, 16, "#f0b45a", "center");
+    const lw = 180 * easeOut(Math.min(1, t.t / 0.6));
+    c.fillRect(W3 / 2 - lw / 2, y + 12, lw, 2);
+    if (t.variant) label(c, `변형 · ${t.variant}`, W3 / 2, y + 40, 16, "#f0b45a", "center");
     c.globalAlpha = 1;
   }
   /** 전환: 가운데에서 mid 를 부르고 끝나면 풀린다 */
@@ -10258,33 +10275,6 @@ function drawEnemy(e, ctx) {
   ctx.beginPath();
   ctx.ellipse(e.x, e.y, e.def.w * 0.55, 9, 0, 0, Math.PI * 2);
   ctx.fill();
-  if (f?.tele && e.move?.danger) {
-    const blink = 0.35 + 0.3 * (e.st >> 2 & 1);
-    for (const d2 of e.move.danger) {
-      const a = e.x + d2.fx0 * e.dir, b = e.x + d2.fx1 * e.dir;
-      const cx = (a + b) / 2, rx = Math.max(24, Math.abs(b - a) / 2), ry = Math.max(8, Math.min(d2.dy, 26));
-      const g2 = ctx.createRadialGradient(cx, e.y, 2, cx, e.y, rx);
-      g2.addColorStop(0, "rgba(255,40,30,0.45)");
-      g2.addColorStop(1, "rgba(255,40,30,0)");
-      ctx.globalAlpha = blink * e.alpha;
-      ctx.fillStyle = g2;
-      ctx.beginPath();
-      ctx.ellipse(cx, e.y, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ff5a40";
-      for (let i = 0, n = Math.max(1, Math.min(4, Math.floor(rx / 40))); i < n; i++) {
-        const x = Math.min(a, b) + (i + 0.5) / n * Math.abs(b - a);
-        const s2 = 9;
-        ctx.beginPath();
-        ctx.moveTo(x + e.dir * s2, e.y);
-        ctx.lineTo(x - e.dir * s2 * 0.6, e.y - s2 * 0.7);
-        ctx.lineTo(x - e.dir * s2 * 0.2, e.y);
-        ctx.lineTo(x - e.dir * s2 * 0.6, e.y + s2 * 0.7);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-  }
   e.brain.drawUnder?.(e, ctx);
   ctx.restore();
   ctx.save();
@@ -10339,11 +10329,17 @@ function drawEnemy(e, ctx) {
 }
 function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
   const body = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+  ctx.save();
+  if (outline) {
+    ctx.shadowColor = outline;
+    ctx.shadowBlur = armorNow >= 2 ? 18 : 12;
+  }
   for (const b of body) {
     const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
     ctx.fillStyle = e.flash > 0 ? "#ffffff" : tint(e.def.color, PART_SHADE[b.part ?? "torso"] ?? 0);
     ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
   }
+  ctx.restore();
   if (body.length && e.state !== "dead" && e.state !== "down") {
     const top = Math.max(...body.map((b) => b.z1));
     ctx.fillStyle = e.state === "attack" ? "#ff4b3a" : "#f2efe6";
@@ -10358,13 +10354,6 @@ function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
     }
   }
   ctx.globalAlpha = alpha;
-  if (outline && body.length) {
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = armorNow >= 2 ? 4 : 3;
-    const xs = body.map((b) => toWorld2(b, e.x, e.y, e.z, e.dir));
-    const x0 = Math.min(...xs.map((b) => b.x0)), x1 = Math.max(...xs.map((b) => b.x1)), z1 = Math.max(...xs.map((b) => b.z1)), z0 = Math.min(...xs.map((b) => b.z0));
-    ctx.strokeRect(x0 - 3, e.y - z1 - 3, x1 - x0 + 6, z1 - z0 + 6);
-  }
 }
 function flat(e) {
   const w = Math.max(e.def.w, e.def.h * 0.8);
@@ -10430,11 +10419,22 @@ function approach(e, w, keep = e.def.keep, wait = false) {
   const adx = Math.abs(dx);
   const sp = e.speed();
   e.face(p.x);
-  const far = wait ? keep[1] + 140 : keep[1];
+  let rank = 0;
+  for (const b of w.bodies)
+    if (b !== e && b instanceof Enemy && b.alive && b.state !== "dead" && Math.sign(p.x - b.x) === Math.sign(dx) && Math.abs(p.x - b.x) < adx) rank++;
+  const back = Math.min(rank, 3) * 110;
+  const far = (wait ? keep[1] + 140 : keep[1]) + back;
+  const near2 = keep[0] + back;
   let mx = 0;
   if (adx > far) mx = Math.sign(dx);
-  else if (adx < keep[0]) mx = -Math.sign(dx);
-  for (const b of w.bodies) if (b !== e && b instanceof Enemy && b.alive && Math.abs(b.x - e.x) < 40 && Math.abs(b.y - e.y) < 20) e.y += b.y > e.y ? -0.8 : 0.8;
+  else if (adx < near2) mx = -Math.sign(dx);
+  let ny = 0;
+  for (const b of w.bodies)
+    if (b !== e && b instanceof Enemy && b.alive && Math.abs(b.x - e.x) < 90 && Math.abs(b.y - e.y) < 50) {
+      ny += b.y > e.y || b.y === e.y && b.id > e.id ? -1 : 1;
+      if (!mx) e.x += (b.x > e.x || b.x === e.x && b.id > e.id ? -1 : 1) * Math.min(1.5, sp * 0.4);
+    }
+  if (ny) e.y += Math.sign(ny) * Math.min(2, sp * 0.5);
   const ty = p.y + (wait ? e.laneOff : 0);
   const my = Math.abs(ty - e.y) > 4 ? Math.sign(ty - e.y) : 0;
   e.x += mx * sp;
@@ -12743,7 +12743,8 @@ function place(d2, i, area, r) {
   const y = d2.kind === "wallface" ? area.y0 : area.y0 + 10 + r() * (area.y1 - area.y0 - 20);
   if (inner) return { x: area.x0 + 160 + r() * (area.x1 - area.x0 - 320), y };
   const left = i % 2 === 0 ? r() < 0.7 : r() < 0.3;
-  return { x: left ? area.x0 - 40 - r() * 60 : area.x1 + 40 + r() * 60, y };
+  const gap = Math.floor(i / 2) * 120;
+  return { x: left ? area.x0 - 40 - gap - r() * 60 : area.x1 + 40 + gap + r() * 60, y };
 }
 function planEncounter(o) {
   let plan = buy2(o);
@@ -13972,13 +13973,67 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case "pit": {
-      ctx.fillStyle = "#000";
-      ctx.fillRect(t.x0, y0 - 2, w, 720 - y0 + 2);
-      ctx.strokeStyle = "#ff5050";
-      ctx.setLineDash([6, 6]);
-      ctx.strokeRect(t.x0, y0, w, 720 - y0);
-      ctx.setLineDash([]);
-      label2(ctx, "구덩이 (점프)", t.x0 + 4, y0 + 20, "#ff8080");
+      const tf = ctx.getTransform();
+      const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+      const k = 0.45 / (720 - y0);
+      const px = (x, y) => x + (x - mid) * k * (y - y0);
+      const jag = (i) => Math.sin(t.x0 * 0.13 + i * 2.7) * 7 + Math.sin(i * 5.1) * 4;
+      const n = 10;
+      const edge2 = (x, side) => {
+        const pts = [];
+        for (let i = 0; i <= n; i++) {
+          const y = y0 + (y1 + 30 - y0) * i / n;
+          pts.push([px(x, y) + side * jag(i + (side > 0 ? 20 : 0)), y]);
+        }
+        return pts;
+      };
+      const L = edge2(t.x0, 1), R = edge2(t.x1, -1);
+      const hole = new Path2D();
+      L.forEach(([x, y], i) => i ? hole.lineTo(x, y) : hole.moveTo(x, y));
+      for (let i = R.length - 1; i >= 0; i--) hole.lineTo(R[i][0], R[i][1]);
+      hole.closePath();
+      const g2 = ctx.createLinearGradient(0, y0, 0, 720);
+      g2.addColorStop(0, "#050506");
+      g2.addColorStop(0.5, "#0c0d10");
+      g2.addColorStop(1, "#16181c");
+      ctx.fillStyle = g2;
+      ctx.fill(hole);
+      ctx.save();
+      ctx.clip(hole);
+      ctx.fillStyle = "#5a5c5e";
+      ctx.fillRect(t.x0 - 40, y0, w + 80, 14);
+      ctx.fillStyle = "#3a3b3d";
+      ctx.fillRect(t.x0 - 40, y0 + 14, w + 80, 8);
+      ctx.fillStyle = "rgba(70,72,74,0.9)";
+      ctx.beginPath();
+      L.forEach(([x, y], i) => i ? ctx.lineTo(x + 12, y) : ctx.moveTo(x + 12, y));
+      for (let i = L.length - 1; i >= 0; i--) ctx.lineTo(L[i][0], L[i][1]);
+      ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = "rgba(200,196,186,0.55)";
+      ctx.lineWidth = 3;
+      for (const side of [L, R]) {
+        ctx.beginPath();
+        side.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "#6b4a32";
+      ctx.lineWidth = 3;
+      for (let i = 1; i < n; i += 3) {
+        const [lx, ly] = L[i], [rx, ry] = R[i];
+        ctx.beginPath();
+        ctx.moveTo(lx - 4, ly);
+        ctx.lineTo(lx + 26 + jag(i) * 2, ly + 10);
+        ctx.moveTo(rx + 4, ry);
+        ctx.lineTo(rx - 22 - jag(i + 3) * 2, ry + 12);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "#8d8a84";
+      for (let i = 0; i < 8; i++) {
+        const e = i % 2 ? L : R;
+        const [x, y] = e[i * 3 % e.length];
+        ctx.fillRect(Math.round(x + (i % 2 ? -14 : 8)), Math.round(y - 4), 6, 4);
+      }
       break;
     }
     case "block": {
@@ -13997,9 +14052,32 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
       };
       const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
       if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], "rgba(0,0,0,0.35)");
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], pal.floor);
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], "rgba(255,255,255,0.1)");
-      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], "rgba(0,0,0,0.5)");
+      const top = ctx.createLinearGradient(0, bk, 0, fr);
+      top.addColorStop(0, "#8a8478");
+      top.addColorStop(1, "#5c574f");
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], top);
+      ctx.strokeStyle = "rgba(0,0,0,0.22)";
+      ctx.lineWidth = 2;
+      for (let x = t.x0 + 48; x < t.x1 - 10; x += 48) {
+        ctx.beginPath();
+        ctx.moveTo(px(x, y0), bk);
+        ctx.lineTo(px(x, y1), fr);
+        ctx.stroke();
+      }
+      for (let y = y0 + 60; y < y1 - 10; y += 60) {
+        ctx.beginPath();
+        ctx.moveTo(px(t.x0, y), y - h);
+        ctx.lineTo(px(t.x1, y), y - h);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(40,30,20,0.25)";
+      for (let i = 0; i < 6; i++) {
+        const yy = y0 + (y1 - y0) * (i + 0.5) / 6;
+        const xx = t.x0 + (Math.sin(t.x0 + i * 3.1) + 1) / 2 * (w - 40) + 10;
+        ctx.fillRect(px(xx, yy), yy - h, 22, 3);
+      }
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y0), bk + 3], [px(t.x0, y0), bk + 3]], "rgba(255,255,255,0.35)");
+      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], "#3e3a35");
       ctx.save();
       ctx.beginPath();
       ctx.rect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
@@ -14018,15 +14096,27 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
       ctx.restore();
       break;
     }
-    case "low":
-      ctx.fillStyle = "rgba(90,90,90,0.85)";
-      ctx.fillRect(t.x0, y0 - 230, w, 46);
-      ctx.fillStyle = "rgba(0,0,0,0.3)";
-      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 230, 4, 46);
-      ctx.fillStyle = "rgba(255,210,120,0.08)";
-      ctx.fillRect(t.x0, y0, w, y1 - y0);
-      label2(ctx, "낮은 천장 (앉아서)", t.x0 + 4, y0 - 236, "#ffd27a");
+    case "low": {
+      const py = y0 - 230, ph = 46;
+      ctx.fillStyle = "#2a2b2c";
+      for (let x = t.x0 + 60; x < t.x1 - 30; x += 160) ctx.fillRect(x, 0, 6, py + 4);
+      const g2 = ctx.createLinearGradient(0, py, 0, py + ph);
+      g2.addColorStop(0, "#5d6264");
+      g2.addColorStop(0.3, "#a3a8a6");
+      g2.addColorStop(0.55, "#6f7573");
+      g2.addColorStop(1, "#2c3031");
+      ctx.fillStyle = g2;
+      ctx.fillRect(t.x0, py, w, ph);
+      for (let x = t.x0 + 20; x < t.x1 - 10; x += 120) {
+        ctx.fillStyle = "#3a3d3e";
+        ctx.fillRect(x, py - 5, 14, ph + 10);
+        ctx.fillStyle = "#8c918f";
+        ctx.fillRect(x + 2, py - 3, 3, ph + 6);
+      }
+      ctx.fillStyle = "rgba(120,70,40,0.35)";
+      for (let x = t.x0 + 70; x < t.x1; x += 210) ctx.fillRect(x, py + ph - 10, 26, 8);
       break;
+    }
     case "narrow": {
       const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
       const row = (label3, y) => {
@@ -14041,11 +14131,31 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
         ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
-      if (b < y1 && !row("사물함", y1 + 24)) {
-        ctx.fillStyle = pal.trim;
-        ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
-        ctx.fillStyle = "rgba(255,255,255,0.1)";
-        ctx.fillRect(t.x0, b + 4, w, 6);
+      if (b < y1) {
+        const fy = Math.min(y1 + 10, b + 70);
+        for (let x = t.x0 + 10; x < t.x1 - 10; x += 120) {
+          const x2 = Math.min(t.x1 - 10, x + 110);
+          ctx.fillStyle = "rgba(0,0,0,0.3)";
+          ctx.fillRect(x - 6, fy - 4, x2 - x + 12, 8);
+          for (const px of [x, x2 - 10]) {
+            ctx.fillStyle = "#2b2d30";
+            ctx.fillRect(px - 8, fy - 6, 26, 8);
+            ctx.fillStyle = "#5d6166";
+            ctx.fillRect(px, fy - 64, 10, 60);
+            ctx.fillStyle = "#878c91";
+            ctx.fillRect(px, fy - 64, 3, 60);
+          }
+          for (const ry of [fy - 58, fy - 34]) {
+            for (let sx = x; sx < x2; sx += 16) {
+              ctx.fillStyle = (sx - x) / 16 % 2 ? "#1d1d1f" : "#e2b23a";
+              ctx.fillRect(sx, ry, Math.min(16, x2 - sx), 12);
+            }
+            ctx.fillStyle = "rgba(255,255,255,0.18)";
+            ctx.fillRect(x, ry, x2 - x, 2);
+            ctx.fillStyle = "rgba(0,0,0,0.35)";
+            ctx.fillRect(x, ry + 10, x2 - x, 2);
+          }
+        }
       }
       break;
     }
@@ -17919,7 +18029,7 @@ var isAgent = (a) => a in AGENTS2;
 var nameOf = (a) => isAgent(a) ? AGENTS2[a].name : a;
 var J = CAST.jaemtri.name;
 var K2 = CAST.konjyuce.name;
-var D = CAST.dejure.name;
+var D2 = CAST.dejure.name;
 var G = CAST.gognija.name;
 var hqLines = (tag, c) => {
   const r = c.rand;
@@ -17939,8 +18049,8 @@ var hqLines = (tag, c) => {
       if (boss2) return t(K2, "부장님! 오늘 뭐 챙겨 가세요?", "아이템 네 칸, 유물 두 칸이요. 부장님은 아시죠?", "부장님, 저도 이 팀 정식 멤버거든요! 마스코트 아니에요!");
       return male ? t(K2, "아저씨, 오셨어요? 아, 아니 오빠!", "오빠, 안녕하세요! 오늘 뭐 챙겨 가요?", "아이템 네 칸, 유물 두 칸이요. 무거운 건 제가 들어 드릴게요.") : t(K2, "선배님, 오셨어요?", "언니! 오늘 뭐 챙겨 가요?", "아이템 네 칸, 유물 두 칸이요. 무거운 건 제가 들어 드릴게요.", "저도 이 팀 정식 멤버거든요! 마스코트 아니에요!");
     case "npc:appraisal":
-      if (a === "spangdal") return [{ who: D, text: "아, 아와와…!" }, { who: nameOf("spangdal"), text: `${D}. 그 애, 원래 내 후배였지. 미안해. 후후.` }];
-      return t(D, "아, 아와와…! 아, 요원님이시구나… 죄송해요…", "저기… 그… 회수물… 있으세요…?", "본 적 있는 걸 다시 보여 드릴 수 있어요. 진술로 복원한 거라… 조금 달라요.");
+      if (a === "spangdal") return [{ who: D2, text: "아, 아와와…!" }, { who: nameOf("spangdal"), text: `${D2}. 그 애, 원래 내 후배였지. 미안해. 후후.` }];
+      return t(D2, "아, 아와와…! 아, 요원님이시구나… 죄송해요…", "저기… 그… 회수물… 있으세요…?", "본 적 있는 걸 다시 보여 드릴 수 있어요. 진술로 복원한 거라… 조금 달라요.");
     case "npc:lab":
       return t(G, "왔는가! 데쥬레!!! 커피 좀 타 오게! 달달한 걸로, 빨리!!!", "오오! 살아 돌아왔군! 훌륭하네! 표본은 가져왔나?", "차원 승강기 말인가! 인사하면 대우가 달라진다니, 예절을 아는 의식이란 말일세!", "감정한 자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!");
     case "npc:office":
@@ -17980,14 +18090,14 @@ var hqLines = (tag, c) => {
 };
 function pantry(a, r) {
   const n = nameOf;
-  if (a === "spangdal") return [{ who: n("spangdal"), text: `있잖아, ${J}. ${D} 아직도 나 보면 펄쩍 뛰어?` }, { who: J, text: "응. 오늘 아침에도." }, { who: n("spangdal"), text: "후후. 귀여워." }, { who: J, text: "스팡달, 입." }];
+  if (a === "spangdal") return [{ who: n("spangdal"), text: `있잖아, ${J}. ${D2} 아직도 나 보면 펄쩍 뛰어?` }, { who: J, text: "응. 오늘 아침에도." }, { who: n("spangdal"), text: "후후. 귀여워." }, { who: J, text: "스팡달, 입." }];
   if (a === "gorgodio" || a === "kyuras") return [{ who: n("kyuras"), text: "형님이 앞에서 다 받아 주니까 편하지!" }, { who: n("gorgodio"), text: "니가 뒤에서 다 태워 주니까 편하지." }];
   if (a === "eileen") return [{ who: K2, text: "언니, 그거 뭐예요? 저도 해 봐도…" }, { who: n("eileen"), text: "만지지 마." }, { who: K2, text: "저도 정식 멤버거든요!" }];
   if (a === "deadpole" || a === "geshugan" || a === "rojemon") return [{ who: n("deadpole"), text: "게슈간 씨, 타자 연습 오늘도 하실 거예요?" }, { who: n("geshugan"), text: "…안 해." }, { who: n("rojemon"), text: "해. 보고서 나 혼자 쓰기 싫어." }];
   return pick4(
     [
       [{ who: J, text: "부장님, 연유 커피 한 번만 드셔 보세요. 한 모금만." }, { who: n("jyaldi"), text: "블랙." }],
-      [{ who: D, text: "미, 믹스커피가 제일이에요…" }, { who: G, text: "믹스는 진리일세!!! 블랙 마시는 자는 설탕 두 스푼 추가일세!!!" }]
+      [{ who: D2, text: "미, 믹스커피가 제일이에요…" }, { who: G, text: "믹스는 진리일세!!! 블랙 마시는 자는 설탕 두 스푼 추가일세!!!" }]
     ],
     r
   );
@@ -18295,6 +18405,7 @@ ${who}: ${text.replace(/\n/g, " ")}
       flags.called_run = 0;
     }
     if (name === "combat:clear" && data.final) name = "win";
+    if (name === "enter:floor" || name === "floor:enter") return;
     const b = picker.pick(name, agent(), now);
     if (b) bark("agent", b.text, b.tag === "ult" || b.tag === "boss" ? 2e3 : 2600);
   };
@@ -19980,7 +20091,6 @@ function makeHub(host, whereIs2) {
   let pending = null;
   let enterTick = -1;
   let fadeOut = 0;
-  let bubble = null;
   let barked = null;
   const sceneOf = (id) => view.scenes.find((s2) => s2.id === id) ?? view.scenes[0];
   const build = (id, x) => {
@@ -19988,7 +20098,6 @@ function makeHub(host, whereIs2) {
     const sc = sceneOf(id);
     scene = sc;
     barked = null;
-    bubble = null;
     enterTick = -1;
     const props2 = [
       ...sc.doors.map((d2) => ({ id: `door:${d2.id}`, kind: "hubdoor", x: d2.x, y: TOP, w: DOOR_W[d2.kind], h: DOOR_H })),
@@ -20035,40 +20144,11 @@ function makeHub(host, whereIs2) {
         const px = w.player.x;
         const nd = sc.doors.find((d2) => Math.abs(d2.x - px) < 60);
         const ns = !nd ? sc.spots.find((s2) => s2.open && Math.abs(s2.x - px) < 60) : null;
-        if (nd || ns) {
-          const x2 = (nd?.x ?? ns.x) - camX;
-          const txt = ns ? `E ${ns.verb}` : "E";
-          c.font = "bold 18px sans-serif";
-          c.textAlign = "center";
-          const tw = c.measureText(txt).width + 18;
-          const y = nd ? TOP - DOOR_H - 34 : TOP - 150;
-          c.fillStyle = "rgba(0,0,0,0.6)";
-          c.fillRect(x2 - tw / 2, y, tw, 26);
-          c.fillStyle = "#f0d890";
-          c.fillText(txt, x2, y + 19);
-          c.textAlign = "left";
-        }
-        if (bubble && bubble.t > 0) {
-          bubble.t--;
-          drawBubble(c, `${bubble.who}: ${bubble.text}`, bubble.x - camX, TOP - 190, Math.min(1, bubble.t / 10));
-        }
-        if (age < 45) {
-          const a = age < 8 ? age / 8 : age > 35 ? (45 - age) / 10 : 1;
-          c.save();
-          c.globalAlpha = a;
-          c.font = "bold 22px sans-serif";
-          c.textAlign = "center";
-          c.fillStyle = "rgba(0,0,0,0.55)";
-          const tw = c.measureText(sc.name).width + 40;
-          c.fillRect(SCREEN_W / 2 - tw / 2, 96, tw, 36);
-          c.fillStyle = "#ece6d4";
-          c.fillText(sc.name, SCREEN_W / 2, 121);
-          c.restore();
-        }
+        if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark2 > 0) {
           c.fillStyle = `rgba(0,0,0,${dark2})`;
-          c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+          c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H);
         }
       }
     };
@@ -20107,7 +20187,7 @@ function makeHub(host, whereIs2) {
       if (sp && sp.place !== barked) {
         barked = sp.place;
         const l = host.bark(sp.place);
-        if (l) bubble = { who: l.who, text: l.text, x: sp.x, t: 110 };
+        if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
       } else if (!sp) barked = null;
     },
     onInteract(_a, _floor, prop) {
@@ -20255,27 +20335,6 @@ function door(c, d2, camX) {
     c.fillStyle = "rgba(0,0,0,0.35)";
     c.fillRect(x, y, w, DOOR_H);
   }
-}
-function drawBubble(c, text, x, y, a) {
-  c.save();
-  c.globalAlpha = a;
-  c.font = "17px sans-serif";
-  const tw = Math.min(520, c.measureText(text).width + 24);
-  const bx = Math.max(12, Math.min(SCREEN_W - tw - 12, x - tw / 2));
-  c.fillStyle = "#f4f1e8";
-  c.strokeStyle = "#4b8f8c";
-  c.lineWidth = 2;
-  c.fillRect(bx, y - 34, tw, 34);
-  c.strokeRect(bx, y - 34, tw, 34);
-  c.beginPath();
-  c.moveTo(x - 7, y);
-  c.lineTo(x + 7, y);
-  c.lineTo(x, y + 10);
-  c.fill();
-  c.fillStyle = "#1b1f22";
-  c.textBaseline = "middle";
-  c.fillText(text, bx + 12, y - 17, tw - 24);
-  c.restore();
 }
 function tint2(kind) {
   let h = 0;
@@ -20675,6 +20734,7 @@ function engineModules(box2, bridge) {
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
@@ -20695,12 +20755,7 @@ function engineModules(box2, bridge) {
       runAgent = run.agent;
       if (run.stageId !== "hq" && run.launch && local("goei-first-entry").load() !== "1") {
         local("goei-first-entry").save("1");
-        const lines2 = [
-          ["elevator", "띵. 1층입니다. 문이 열립니다.", 300],
-          ["radio", "(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.", 2e3],
-          ["agent", "로비 같은데, 로비가 아니다.", 5200]
-        ];
-        for (const [who, text, at2] of lines2) setTimeout(() => world === w && story.bark(who, text, 2800), at2);
+        setTimeout(() => world === w && w.say("(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.", 3), 4600);
       }
       w.hitFx = false;
       if (run.stageId === "hq") return;

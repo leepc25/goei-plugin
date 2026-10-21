@@ -377,6 +377,11 @@ export class Hud {
     label(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, W / 2, 40, 26, t < 10 ? C.hpLow : '#bfe0f0', 'center', 900);
   }
 
+  /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
+  drawMessage(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
+    this.message(c, text, compact);
+  }
+
   private message(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
     c.font = font(17, 600);
     let t = text;

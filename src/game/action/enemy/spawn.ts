@@ -54,7 +54,9 @@ function place(d: EnemyDef, i: number, area: Area, r: () => number): { x: number
   const y = d.kind === 'wallface' ? area.y0 : area.y0 + 10 + r() * (area.y1 - area.y0 - 20);
   if (inner) return { x: area.x0 + 160 + r() * (area.x1 - area.x0 - 320), y };
   const left = i % 2 === 0 ? r() < 0.7 : r() < 0.3;
-  return { x: left ? area.x0 - 40 - r() * 60 : area.x1 + 40 + r() * 60, y };
+  // 같은 쪽에서 나오는 적은 줄지어 (한 덩어리로 겹쳐 들어오지 않게)
+  const gap = Math.floor(i / 2) * 120;
+  return { x: left ? area.x0 - 40 - gap - r() * 60 : area.x1 + 40 + gap + r() * 60, y };
 }
 
 export interface PlanOpts {

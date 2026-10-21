@@ -244,13 +244,74 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case 'pit': {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(t.x0, y0 - 2, w, 720 - y0 + 2);
-      ctx.strokeStyle = '#ff5050';
-      ctx.setLineDash([6, 6]);
-      ctx.strokeRect(t.x0, y0, w, 720 - y0);
-      ctx.setLineDash([]);
-      label(ctx, '구덩이 (점프)', t.x0 + 4, y0 + 20, '#ff8080');
+      // 무너진 바닥: 원근에 맞춘 깨진 가장자리, 슬래브 단면, 철근, 아래로 깊어지는 어둠 (검은 직사각형·점선·글씨 없음)
+      const tf = ctx.getTransform();
+      const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+      const k = 0.45 / (720 - y0);
+      const px = (x: number, y: number) => x + (x - mid) * k * (y - y0);
+      const jag = (i: number) => Math.sin(t.x0 * 0.13 + i * 2.7) * 7 + Math.sin(i * 5.1) * 4;
+      const n = 10;
+      const edge = (x: number, side: number) => {
+        const pts: [number, number][] = [];
+        for (let i = 0; i <= n; i++) {
+          const y = y0 + ((y1 + 30 - y0) * i) / n;
+          pts.push([px(x, y) + side * jag(i + (side > 0 ? 20 : 0)), y]);
+        }
+        return pts;
+      };
+      const L = edge(t.x0, 1),
+        R = edge(t.x1, -1);
+      const hole = new Path2D();
+      L.forEach(([x, y], i) => (i ? hole.lineTo(x, y) : hole.moveTo(x, y)));
+      for (let i = R.length - 1; i >= 0; i--) hole.lineTo(R[i][0], R[i][1]);
+      hole.closePath();
+      const g = ctx.createLinearGradient(0, y0, 0, 720);
+      g.addColorStop(0, '#050506');
+      g.addColorStop(0.5, '#0c0d10');
+      g.addColorStop(1, '#16181c');
+      ctx.fillStyle = g;
+      ctx.fill(hole);
+      // 먼 쪽 슬래브 단면 (두께가 보이는 콘크리트 띠)
+      ctx.save();
+      ctx.clip(hole);
+      ctx.fillStyle = '#5a5c5e';
+      ctx.fillRect(t.x0 - 40, y0, w + 80, 14);
+      ctx.fillStyle = '#3a3b3d';
+      ctx.fillRect(t.x0 - 40, y0 + 14, w + 80, 8);
+      // 양옆 단면 그림자
+      ctx.fillStyle = 'rgba(70,72,74,0.9)';
+      ctx.beginPath();
+      L.forEach(([x, y], i) => (i ? ctx.lineTo(x + 12, y) : ctx.moveTo(x + 12, y)));
+      for (let i = L.length - 1; i >= 0; i--) ctx.lineTo(L[i][0], L[i][1]);
+      ctx.fill();
+      ctx.restore();
+      // 깨진 가장자리 밝은 테두리와 튀어나온 철근
+      ctx.strokeStyle = 'rgba(200,196,186,0.55)';
+      ctx.lineWidth = 3;
+      for (const side of [L, R]) {
+        ctx.beginPath();
+        side.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        ctx.stroke();
+      }
+      ctx.strokeStyle = '#6b4a32';
+      ctx.lineWidth = 3;
+      for (let i = 1; i < n; i += 3) {
+        const [lx, ly] = L[i],
+          [rx, ry] = R[i];
+        ctx.beginPath();
+        ctx.moveTo(lx - 4, ly);
+        ctx.lineTo(lx + 26 + jag(i) * 2, ly + 10);
+        ctx.moveTo(rx + 4, ry);
+        ctx.lineTo(rx - 22 - jag(i + 3) * 2, ry + 12);
+        ctx.stroke();
+      }
+      // 가장자리 부스러기
+      ctx.fillStyle = '#8d8a84';
+      for (let i = 0; i < 8; i++) {
+        const e = i % 2 ? L : R;
+        const [x, y] = e[(i * 3) % e.length];
+        ctx.fillRect(Math.round(x + (i % 2 ? -14 : 8)), Math.round(y - 4), 6, 4);
+      }
       break;
     }
     case 'block': {
@@ -262,7 +323,7 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       const h = Math.min(t.h, 28);
       const bk = y0 - h,
         fr = y1 - h;
-      const quad = (pts: [number, number][], fill: string) => {
+      const quad = (pts: [number, number][], fill: string | CanvasGradient) => {
         ctx.fillStyle = fill;
         ctx.beginPath();
         pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
@@ -272,9 +333,33 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       // 안쪽 옆면 (화면 가운데 쪽 면이 보인다)
       const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
       if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], 'rgba(0,0,0,0.35)');
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], pal.floor);
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], 'rgba(255,255,255,0.1)');
-      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], 'rgba(0,0,0,0.5)');
+      // 윗면: 바닥보다 따뜻한 콘크리트 단, 뒤가 밝고 앞이 어두운 결 + 원근 줄눈 + 긁힘 (회색 판처럼 보이지 않게)
+      const top = ctx.createLinearGradient(0, bk, 0, fr);
+      top.addColorStop(0, '#8a8478');
+      top.addColorStop(1, '#5c574f');
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], top);
+      ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+      ctx.lineWidth = 2;
+      for (let x = t.x0 + 48; x < t.x1 - 10; x += 48) {
+        ctx.beginPath();
+        ctx.moveTo(px(x, y0), bk);
+        ctx.lineTo(px(x, y1), fr);
+        ctx.stroke();
+      }
+      for (let y = y0 + 60; y < y1 - 10; y += 60) {
+        ctx.beginPath();
+        ctx.moveTo(px(t.x0, y), y - h);
+        ctx.lineTo(px(t.x1, y), y - h);
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(40,30,20,0.25)';
+      for (let i = 0; i < 6; i++) {
+        const yy = y0 + ((y1 - y0) * (i + 0.5)) / 6;
+        const xx = t.x0 + ((Math.sin(t.x0 + i * 3.1) + 1) / 2) * (w - 40) + 10;
+        ctx.fillRect(px(xx, yy), yy - h, 22, 3);
+      }
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y0), bk + 3], [px(t.x0, y0), bk + 3]], 'rgba(255,255,255,0.35)');
+      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], '#3e3a35');
       // 앞 모서리 경고 띠
       ctx.save();
       ctx.beginPath();
@@ -294,16 +379,29 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       ctx.restore();
       break;
     }
-    case 'low':
-      // 머리 높이로 내려온 배관 (바닥 띠 전체 위)
-      ctx.fillStyle = 'rgba(90,90,90,0.85)';
-      ctx.fillRect(t.x0, y0 - 230, w, 46);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 230, 4, 46);
-      ctx.fillStyle = 'rgba(255,210,120,0.08)';
-      ctx.fillRect(t.x0, y0, w, y1 - y0);
-      label(ctx, '낮은 천장 (앉아서)', t.x0 + 4, y0 - 236, '#ffd27a');
+    case 'low': {
+      // 머리 높이로 내려온 굵은 배관: 둥근 음영, 이음 고리, 천장에 매단 걸쇠 (바닥 띠·글씨 없음, 검수 4-3)
+      const py = y0 - 230,
+        ph = 46;
+      ctx.fillStyle = '#2a2b2c';
+      for (let x = t.x0 + 60; x < t.x1 - 30; x += 160) ctx.fillRect(x, 0, 6, py + 4);
+      const g = ctx.createLinearGradient(0, py, 0, py + ph);
+      g.addColorStop(0, '#5d6264');
+      g.addColorStop(0.3, '#a3a8a6');
+      g.addColorStop(0.55, '#6f7573');
+      g.addColorStop(1, '#2c3031');
+      ctx.fillStyle = g;
+      ctx.fillRect(t.x0, py, w, ph);
+      for (let x = t.x0 + 20; x < t.x1 - 10; x += 120) {
+        ctx.fillStyle = '#3a3d3e';
+        ctx.fillRect(x, py - 5, 14, ph + 10);
+        ctx.fillStyle = '#8c918f';
+        ctx.fillRect(x + 2, py - 3, 3, ph + 6);
+      }
+      ctx.fillStyle = 'rgba(120,70,40,0.35)';
+      for (let x = t.x0 + 70; x < t.x1; x += 210) ctx.fillRect(x, py + ph - 10, 26, 8);
       break;
+    }
     case 'narrow': {
       // 좁은 길: 막힌 칸에 물건 그림(캐비닛·사물함)을 늘어놓아 막는다. 그림이 없으면 벽·칸막이 단색
       const a = laneYIn(t.lane0, y0, y1),
@@ -320,11 +418,32 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
         ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
-      if (b < y1 && !row('사물함', y1 + 24)) {
-        ctx.fillStyle = pal.trim;
-        ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
-        ctx.fillStyle = 'rgba(255,255,255,0.1)';
-        ctx.fillRect(t.x0, b + 4, w, 6);
+      // 앞줄(화면 아래)은 키 큰 사물함이 싸움을 가리므로 낮은 공사 차단대 줄로 막는다 (기둥·노랑검정 가로대·받침)
+      if (b < y1) {
+        const fy = Math.min(y1 + 10, b + 70);
+        for (let x = t.x0 + 10; x < t.x1 - 10; x += 120) {
+          const x2 = Math.min(t.x1 - 10, x + 110);
+          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+          ctx.fillRect(x - 6, fy - 4, x2 - x + 12, 8);
+          for (const px of [x, x2 - 10]) {
+            ctx.fillStyle = '#2b2d30';
+            ctx.fillRect(px - 8, fy - 6, 26, 8);
+            ctx.fillStyle = '#5d6166';
+            ctx.fillRect(px, fy - 64, 10, 60);
+            ctx.fillStyle = '#878c91';
+            ctx.fillRect(px, fy - 64, 3, 60);
+          }
+          for (const ry of [fy - 58, fy - 34]) {
+            for (let sx = x; sx < x2; sx += 16) {
+              ctx.fillStyle = ((sx - x) / 16) % 2 ? '#1d1d1f' : '#e2b23a';
+              ctx.fillRect(sx, ry, Math.min(16, x2 - sx), 12);
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            ctx.fillRect(x, ry, x2 - x, 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.fillRect(x, ry + 10, x2 - x, 2);
+          }
+        }
       }
       break;
     }
