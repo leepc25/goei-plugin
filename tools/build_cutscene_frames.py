@@ -4,7 +4,8 @@ Run with bundled Python/Pillow. No interpolating filter or dithering is used.
 Production sheets are candidates: passing this packer is not visual approval.
 """
 from pathlib import Path
-import argparse, base64, hashlib, json
+import argparse, base64, hashlib, json, subprocess
+from io import BytesIO
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -109,6 +110,35 @@ def build(partial=False,only=None):
     (ART/'production/validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({'cuts':len(report),'frames':sum(x['frames'] for x in report),'scenes':len(groups),'player':str(target)}))
 
+def check_cut(key,ref=None):
+    path='game-src/art/cutscene/frames/'+key
+    try:
+        if ref:
+            def read(name):
+                return subprocess.check_output(['git','show',ref+':'+path+'/'+name],cwd=ROOT,stderr=subprocess.DEVNULL)
+            names=subprocess.check_output(['git','ls-tree','-r','--name-only',ref,'--',path],cwd=ROOT,text=True).splitlines()
+            names=[p[len(path)+1:] for p in names]
+        else:
+            folder=ROOT/path
+            names=[p.name for p in folder.iterdir() if p.is_file()]
+            def read(name):return (folder/name).read_bytes()
+        timing=json.loads(read('timing.json'))
+        ms=timing['ms']
+        assert isinstance(ms,list) and ms and all(isinstance(n,(int,float)) and not isinstance(n,bool) and n>0 for n in ms),'invalid durations'
+        pngs=sorted(n for n in names if n.lower().endswith('.png'))
+        assert len(pngs)==len(ms),f'PNG count {len(pngs)} != ms count {len(ms)}'
+        assert pngs==[f'{i:04d}.png' for i in range(1,len(ms)+1)],'nonconsecutive frames'
+        if 'loop' in timing:
+            loop=timing['loop']
+            assert isinstance(loop,list) and len(loop)==2 and all(isinstance(n,int) for n in loop) and 1<=loop[0]<=loop[1]<=len(ms),'invalid loop'
+        for name in pngs:
+            with Image.open(BytesIO(read(name))) as image:
+                assert image.format=='PNG' and image.size==(640,360),'invalid PNG size or format'
+                image.load()
+        return {'cut':key,'valid':True,'frames':len(pngs),'ref':ref}
+    except Exception as error:
+        return {'cut':key,'valid':False,'reason':str(error),'ref':ref}
+
 def register(scene):
     manifest=json.loads(MANIFEST.read_text(encoding='utf-8-sig'))
     expected=[c for c in manifest['cuts'] if c['scene']==scene]
@@ -121,7 +151,7 @@ def register(scene):
         assert [p.stem for p in paths]==[f'{i:04d}' for i in range(1,len(paths)+1)]
         if 'loop' not in timing: assert sum(timing['ms'])==c['duration']
         for p in paths:
-            with Image.open(p) as im: assert im.size==(640,360) and im.mode=='P'
+            with Image.open(p) as im: assert im.size==(640,360)
     index=ART/'frames/index.json'
     names=json.loads(index.read_text(encoding='utf-8-sig')) if index.exists() else []
     if scene not in names:names.append(scene)
@@ -140,6 +170,11 @@ if __name__ == '__main__':
     parser.add_argument('--partial',action='store_true')
     parser.add_argument('--register')
     parser.add_argument('--only')
+    parser.add_argument('--check')
+    parser.add_argument('--ref')
     args=parser.parse_args()
-    build(args.partial,args.only)
-    if args.register:register(args.register)
+    if args.check:
+        print(json.dumps(check_cut(args.check,args.ref)))
+    else:
+        build(args.partial,args.only)
+        if args.register:register(args.register)
