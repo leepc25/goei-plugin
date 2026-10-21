@@ -108,6 +108,7 @@ export class TouchPad {
     const scale = Math.min(bw / vw, bh / 720);
     const stageW = vw * scale,
       stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s.touchSize;
     const u = this.u;
     const flip = s.lefty ? -1 : 1;
@@ -158,12 +159,53 @@ export class TouchPad {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.restBase();
   }
+  /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+   *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  private layoutSide(bw: number, bh: number, side: number) {
+    const s = this.st();
+    const g = 4;
+    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g) / 5.55)) * s.touchSize;
+    const u = this.u;
+    this.root.style.setProperty('--tp-u', `${u}px`);
+    this.root.style.setProperty('--tp-a', String(s.touchAlpha));
+    const edge = 6;
+    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge - u * 0.6;
+    const colL = side >= u * 0.7 ? side / 2 : edge + u * 0.36;
+    const mir = (x: number) => (s.lefty ? bw - x : x);
+    const place = (id: string, cx: number, cy: number, d: number) => {
+      const b = this.btns.find((x) => x.id === id)!;
+      const r = (d * u) / 2;
+      cx = mir(cx);
+      Object.assign(b, { cx, cy, r });
+      const el = b.el!;
+      el.style.width = el.style.height = `${r * 2}px`;
+      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+    };
+    const stack = (ids: string[], x: number, d: number[], fromBottom: boolean) => {
+      let y = fromBottom ? bh - edge : edge;
+      ids.forEach((id, i) => {
+        const r = (d[i] * u) / 2;
+        y += fromBottom ? -r : r;
+        place(id, x, y, d[i]);
+        y += fromBottom ? -r - g : r + g;
+      });
+    };
+    stack(['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
+    const inner = colR - Math.max(side, u * 1.15) / 2 - g - u * 0.4;
+    stack(['guard', 'interact', 'reload', 'support'], inner, [0.8, 0.8, 0.8, 0.8], true);
+    stack(['menu', 'map', 'item1', 'item2', 'item3', 'item4'], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    const zw = bw * 0.42,
+      zt = bh * 0.3;
+    this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+    Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.restBase();
+  }
   private restBase() {
     const s = this.st();
     const zr = this.zr;
     const u = this.u;
-    const x = s.lefty ? zr.w - u * 1.25 : u * 1.25;
-    const y = zr.h - u * 1.25;
+    const x = s.lefty ? zr.w - u * 1.55 : u * 1.55;
+    const y = zr.h - u * 1.0;
     this.placeBase(x, y);
     this.knob.style.transform = '';
     this.base.classList.remove('on');

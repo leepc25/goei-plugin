@@ -21,7 +21,14 @@ if __name__=='__main__':
     names=sys.argv[1:]
     b0=gen_all.bal(); print('before',b0,flush=True); log('before '+b0)
     pend={}
+    resume={}
+    if '--resume' in names:   # 넣고 못 받은 일감(spend.log의 마지막 job id)만 받음
+        names=[n for n in names if n!='--resume']
+        for ln in open('../spend.log'):
+            m=re.search(r'gen_fix2 (\S+) \d+f -> id: ([0-9a-f-]{36})',ln)
+            if m: resume[m.group(1)]=m.group(2)
     for n in names:
+        if n in resume: pend[n]=resume[n]; continue
         j,t=submit(n)
         if j: pend[n]=j; print('sub',n,flush=True)
         else: print('SUBFAIL',n,t[:300],flush=True)
@@ -32,6 +39,7 @@ if __name__=='__main__':
             except Exception: continue
             lo=txt.lower()
             if 'complet' in lo:
+                os.makedirs(f'{gen_all.OUT}/{n}',exist_ok=True)
                 for f in os.listdir(f'{gen_all.OUT}/{n}'): os.remove(f'{gen_all.OUT}/{n}/{f}')
                 gen_all.fetch(n,j); del pend[n]; print('done',n,flush=True); log(f'{n} done')
             elif 'fail' in lo:
