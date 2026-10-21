@@ -90,5 +90,77 @@
  "el_hall_wall_4": {
   "w": 320,
   "h": 220
+ },
+ "objects/el_hall_objects_10": {
+  "w": 117,
+  "h": 164,
+  "foot": [
+   58,
+   164
+  ]
+ },
+ "objects/el_hall_objects_11": {
+  "w": 113,
+  "h": 164,
+  "foot": [
+   56,
+   164
+  ]
+ },
+ "objects/el_hall_objects_12": {
+  "w": 171,
+  "h": 187,
+  "foot": [
+   85,
+   187
+  ]
+ },
+ "objects/el_hall_objects_13": {
+  "w": 186,
+  "h": 187,
+  "foot": [
+   93,
+   187
+  ]
+ },
+ "objects/el_hall_objects_14": {
+  "w": 20,
+  "h": 48,
+  "foot": [
+   10,
+   48
+  ]
+ },
+ "objects/el_hall_objects_15": {
+  "w": 82,
+  "h": 26,
+  "foot": [
+   41,
+   26
+  ]
+ },
+ "objects/el_hall_objects_16": {
+  "w": 190,
+  "h": 179,
+  "foot": [
+   95,
+   179
+  ]
+ },
+ "objects/el_hall_objects_17": {
+  "w": 176,
+  "h": 187,
+  "foot": [
+   88,
+   187
+  ]
+ },
+ "objects/el_hall_objects_18": {
+  "w": 199,
+  "h": 179,
+  "foot": [
+   99,
+   179
+  ]
  }
 }

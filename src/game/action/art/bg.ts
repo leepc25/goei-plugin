@@ -473,7 +473,7 @@ const BY_LABEL: [RegExp, ObjRef][] = [
 ];
 const DOOR: Record<string, number> = { apt: 1, chase: 1, lobby: 9, test: 9, hq_office: 9, hq_workshop: 9, hq_pantry: 9 };
 const BY_KIND: Record<string, ObjRef> = {
-  elevator: ['el_hall', 1, 'el_hall', 2], chasedoor: ['chase', 1], servicedoor: ['hq_workshop', 9], hatch: ['service', 9], shutter: ['chase', 6],
+  elevator: ['el_hall', 12], chasedoor: ['chase', 1], servicedoor: ['hq_workshop', 9], hatch: ['service', 9], shutter: ['chase', 6],
   table: ['apt', 3], switch: ['test', 3], checklist: ['lobby', 6], sign: ['lobby', 6], symbol: null, goalwall: ['lobby', 6], belonging: ['service', 6],
   item: ['service', 7], up: ['service', 9], down: ['service', 9], fall: ['service', 9], ladder_up: ['service', 1], ladder_down: ['service', 1],
   rope: ['service', 2], pack: ['service', 6], gear: ['service', 3], memo: ['lobby', 6], map: ['lobby', 6], intercom: ['test', 3],
