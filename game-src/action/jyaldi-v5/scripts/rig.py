@@ -759,6 +759,21 @@ clip('airkick','mid-air flying side kick: lead leg fully extended straight forwa
 BF2=P((X-2,63),10,-0.7,-0.4,(X+13,G),(X-13,G-2),(15,-15),(12,-11),tilt=16,le=ELB_OUT,re=ELB_OUT)
 clip('blockfront','covering up: both forearms raised vertically in front of the face, elbows together, chin tucked',[G0,lerp(G0,BF2,.5),BF2,BF2])
 
+# ── 수정 3차 (2026-10-21 사용자: 달리기가 조깅 같음, 쇠파이프가 찌르기 방향) ──
+# 4 달리기(전력 질주 8, 제자리 순환): 상체 22도, 보폭 ±24, 뒤로 찬 발 높이, 두 발 다 뜬 장(0.25·0.75), 팔 크게 엇갈림
+def sprint(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t); fl=abs(sn)
+    lf=(X+8+24*c-10*max(0,-sn), G-18*max(0,-sn)-5*fl); rf=(X+8-24*c-10*max(0,sn), G-18*max(0,sn)-5*fl)
+    return P((X+10,60-5*fl),22,0.45*c,0.35*c,lf,rf,(10-20*c,12+5*c),(4+20*c,12-5*c),head=(6,-6),lk=KNEE_FWD,rk=KNEE_FWD)
+clip('run','full-speed sprint: torso leaning well forward, long strides, knees driving high, both feet leave the ground, arms pumping hard, hair streaming back',[sprint(i/8) for i in range(8)])
+# 38 쇠파이프 내려치기(7): 두 손 잡음 → 뒤 어깨 위로 치켜듦 → 머리 위 → 앞으로 크게 내려침(타격 3장) → 아래로 따라감 → 회수
+PW1=P((X-3,58),-8,0.6,0.3,(X+12,G),(X-12,G-1),(-8,-14),(-6,-10),le=ELB_UP,re=ELB_UP)
+PW2=P((X,58),-2,0.2,0.1,(X+13,G),(X-11,G-1),(4,-24),(2,-20),le=ELB_UP,re=ELB_UP)
+PW3=P((X+8,61),16,-0.8,-0.5,(X+22,G),(X-10,G-2),(30,4),(24,6))
+PW4=P((X+10,63),26,-1.0,-0.6,(X+23,G),(X-9,G-2),(24,28),(18,28))
+clip('pipe2','two-handed overhead smash with a steel pipe: raises it high behind her shoulder, swings it over her head and smashes it down in front, follow-through low',
+     [PI,PW1,PW2,PW3,PW4,lerp(PW4,PI,.5),PI],'gripping a long steel pipe with both hands, the whole pipe clearly visible in every frame')
+
 A_KP=skel.A
 def kp(p):
     out=[]

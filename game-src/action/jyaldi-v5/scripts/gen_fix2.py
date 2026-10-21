@@ -4,7 +4,7 @@ import sys,time,base64,re,os
 sys.path.insert(0,'.'); import mcp,rig,gen_all
 REF='data:image/png;base64,'+base64.b64encode(open('../full/clips/guard/00.png','rb').read()).decode()
 REF_KP=rig.kp(rig.GUARD(0,0))
-DESC=gen_all.DESC+', seen strictly from the side in profile facing right, jacket closed, character only, no background, no furniture'
+DESC=gen_all.DESC+', seen strictly from the side in profile facing right, jacket closed, character only, no background, no furniture, no visual effects, no explosions, no sparks, no light or glow'
 def log(s): open('../spend.log','a').write(time.strftime('%H:%M:%S')+' gen_fix2 '+s+'\n')
 def submit(n,seed=11):
     act,prop,ps=rig.CLIPS[n]
