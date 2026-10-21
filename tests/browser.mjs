@@ -561,6 +561,12 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
   assert.equal(await page.locator('.gx-agcard').count(), 0, '다른 탭에 갔다 오면 사원증은 닫힘');
+  // 제목줄 아이콘으로 목록 ↔ 모니터 (설정과 같은 값)
+  await page.click('.gx-agseg [data-value="list"]');
+  await page.waitForSelector('.gx-board .gx-agrow');
+  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').agents === 'list');
+  await page.click('.gx-agseg [data-value="wall"]');
+  await page.waitForSelector('.gx-board .gx-agmon');
   await agentTile.click();
   await page.click('.gx-agcard [data-action="wiki-goto"]');
   await page.waitForSelector('.nw-compose, .nw-doc');

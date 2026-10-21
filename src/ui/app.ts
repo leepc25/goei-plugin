@@ -10,6 +10,7 @@ import {
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
 import { loadModuleAssets, mainPic } from '../host/assets';
+import { savePrefs } from '../host/prefs';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
@@ -677,6 +678,11 @@ async function handle(action: string, value?: string): Promise<void> {
       showIdCard(idCard(view.ctx));
       return;
     }
+    case 'agents-view':
+      // 상황판 요원 칸 제목줄의 모니터·목록 아이콘 (설정 「요원 칸」과 같은 기기 공통 값)
+      if (value !== 'wall' && value !== 'list') return;
+      await savePrefs((p) => ({ ...p, agents: value === 'list' ? 'list' : undefined }));
+      return render();
     case 'agent-info':
       // 상황판 요원 칸: 사원증 창을 열고, 바깥·×·Esc·뒤로 밀기로 닫는다
       agUi.pop = agUi.pop === value ? '' : value ?? '';
