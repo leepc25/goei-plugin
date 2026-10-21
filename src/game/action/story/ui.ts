@@ -148,9 +148,10 @@ export class StoryUI {
     this.captionLeft = ms / 1000;
   }
 
-  fade(to: 'black' | 'clear', ms: number) {
+  /** dim: 무대 그림이 없을 때(통합판 컷신) 멈춘 게임 화면을 어둡게 가린다 */
+  fade(to: 'black' | 'clear' | 'dim', ms: number) {
     this.fadeEl.style.transition = `opacity ${Math.max(0, ms)}ms linear`;
-    this.fadeEl.style.opacity = to === 'black' ? '1' : '0';
+    this.fadeEl.style.opacity = to === 'black' ? '1' : to === 'dim' ? '0.86' : '0';
   }
 
   private place(b: Bubble) {
