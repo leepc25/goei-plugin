@@ -301,7 +301,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ''),
     extra: e.report ? `<span class="gx-evc-sit" title="${esc(e.report)}">${esc(e.report)}</span>` : '',
-    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ''}`) : undefined, pop: e.key,
+    key: e.key, open: 'pick-event', art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ''}`) : undefined, pop: e.key, locCode: e.loc,
     selected: field.target?.type === 'event' && field.target.key === e.key, confirmEnd: field.confirmEnd === e.key,
   });
 }
