@@ -293,3 +293,21 @@
 기존 파일 유지: `puzzle_wall_4..1` 4장, `dark` 6장, `silent` 6장. 물건 시트는 마젠타 배경 대체 방식이며 생성 색 편차를 고려한 배경 제거가 필요하다. 벽·바닥의 정밀 이음새, 도트화 및 게임 연결은 요청서의 후속 작업이다.
 
 [전체 요청문·커밋·30개 파일 검사 기록](ui-floor-reverse-20261022-production.json). UI 두 장의 파일 목록은 [UI README](../../ui/raw/README.md)에 있다.
+
+
+## 배경 보강 원본 · 2026-10-22
+
+`docs/GPT요청_배경보강.md`의 8개 경로를 순서대로 확인했다. 사용자 지시에 따라 기존 파일은 건너뛰어 바닥 2장은 덮어쓰지 않았다. 나머지 6장은 내장 image_gen으로 새로 그리고 한 장마다 main에 커밋·push했다.
+
+| 경로 | 처리 | 개별 커밋 |
+|---|---|---|
+| `signs/signs_objects.png` | 신규: 표지판 9종 | `8d44aa0f` |
+| `plates/plates_objects.png` | 신규: 문 옆 명패 9종 | `763db8d3` |
+| `boards/boards_objects.png` | 신규: 게시판·액자 9종 | `ad8f7006` |
+| `el_hall/el_hall_objects_2.png` | 신규: 엘리베이터 문·제어판 9종 | `de159f44` |
+| `hq_pantry/hq_pantry_floor.png` | 기존 파일 유지·건너뜀 | — |
+| `hq_street/hq_street_floor.png` | 기존 파일 유지·건너뜀 | — |
+| `props/props_objects.png` | 신규: 낮은 장애물 9종 | `db36a6b4` |
+| `props/props_objects_2.png` | 신규: 층 소품 9종 | `4f63ece2` |
+
+신규 6장은 1536×1024 RGBA PNG이며 투명 픽셀을 확인했다. 기존 바닥 2장은 1024×1024다. 원본 납품이며 도트화·물건별 자르기·이음새·게임 연결과 후속 시각 검수는 별도다. 기존 바닥의 재제작 요구는 이번 건너뛰기 지시로 수행하지 않았다.
