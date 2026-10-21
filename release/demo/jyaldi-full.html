@@ -255,7 +255,15 @@ function callAlly() {
   Object.assign(ALLY, { on: true, x: -80, z: Math.min(1, G.z + 0.18), dir: 1, clip: 'walk', f: 0, t: 0, phase: 'in', target: Math.max(140, G.x - 160) });
   hitText(640, 140, '「길 비켜.」');
 }
-addEventListener('keydown', e => { if (e.repeat) return; if (e.code.startsWith('Arrow') || e.code === 'Space' || e.code.startsWith('Shift')) e.preventDefault(); onKey(e.code, true); });
+// 게임 키는 꾹 누른 반복 입력까지 전부 스크롤·선택 상자 변경을 막는다(PC에서 ↓·Space가 페이지를 내리던 문제)
+const GAME_KEY = c => c.startsWith('Arrow') || c === 'Space' || c.startsWith('Shift') || c.startsWith('Key') || c.startsWith('Digit');
+addEventListener('keydown', e => {
+  if (!GAME_KEY(e.code)) return;
+  e.preventDefault();
+  if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+  if (e.repeat) return;
+  onKey(e.code, true);
+}, { passive: false });
 addEventListener('keyup', e => onKey(e.code, false));
 for (const b of document.querySelectorAll('#pad button')) {
   const k = b.dataset.k;
