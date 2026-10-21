@@ -4,12 +4,15 @@ import sys,time,base64,re,os,shutil
 sys.path.insert(0,'.'); import mcp,rig,gen_all
 OUT='../full/clips'
 def log(s): open('../spend.log','a').write(time.strftime('%Y-%m-%d %H:%M:%S')+' gen_redo '+s+'\n')
-REF='data:image/png;base64,'+base64.b64encode(open('../full/A2-pad.png','rb').read()).decode()
-NOFURN=', character only on an empty transparent background, no furniture, no chair, no bed, no wall, no floor drawn'
+# 기준 그림: 옆모습 기본 대기 idle/00.png(뼈대 STAND(0)). A2는 3/4 각도라 생성기가 정면 쪽으로 따라감(전투 스레드 확인)
+BASE='../full/base-idle-side.png'
+REF='data:image/png;base64,'+base64.b64encode(open(BASE,'rb').read()).decode()
+BASE_KP=rig.kp(rig.anatomic(rig.STAND(0)))
+NOFURN=', character only, empty transparent background'
 def submit(n,seed=11):
     act,prop,ps=rig.CLIPS[n]
     args={'description':gen_all.DESC+(', '+prop if prop else '')+NOFURN,'action':act[:100],'direction':'east','first_frame_url':REF,
-          'first_frame_keypoints':rig.kp(rig.A_KP),'keypoints':[rig.kp(p) for p in ps],'seed':seed}
+          'first_frame_keypoints':BASE_KP,'keypoints':[rig.kp(p) for p in ps],'seed':seed}
     t=''
     for k in range(4):
         try: t=mcp.text(mcp.tool('animate_with_skeleton_v3',args)); break

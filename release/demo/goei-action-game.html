@@ -4332,7 +4332,11 @@ function createGameAudio(opts = {}) {
       graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
     }
   }
+  let wantSong = null;
   function ensure() {
+    return disposed ? null : out;
+  }
+  function create() {
     if (disposed) return null;
     if (out) return out;
     const AC = window.AudioContext ?? window.webkitAudioContext;
@@ -4349,8 +4353,16 @@ function createGameAudio(opts = {}) {
     return out;
   }
   async function unlock() {
-    const o = ensure();
+    const fresh = !out;
+    const o = create();
     if (!o || !ctx) return false;
+    if (fresh) {
+      if (scene) {
+        amb = startAmbience(o, scene);
+        music(SCENE_SONG[scene], 1.2);
+      } else if (wantSong) music(wantSong);
+      wantSong = null;
+    }
     try {
       const nav = navigator;
       if (nav.audioSession && nav.audioSession.type !== "playback") nav.audioSession.type = "playback";
@@ -4445,7 +4457,10 @@ function createGameAudio(opts = {}) {
   }
   function music(id, fade = 1) {
     const o = ensure();
-    if (!o || !ctx) return;
+    if (!o || !ctx) {
+      wantSong = id;
+      return;
+    }
     clearTimeout(jingleTimer);
     resumeSong = null;
     if (song?.id === id && !song.player.ended) return;
@@ -4480,10 +4495,10 @@ function createGameAudio(opts = {}) {
     g2.setTargetAtTime(1, t + sec, 0.3);
   }
   function floor(s2) {
-    const o = ensure();
-    if (!o) return;
     if (s2 === scene) return;
     scene = s2;
+    const o = ensure();
+    if (!o) return;
     amb?.stop();
     amb = s2 ? startAmbience(o, s2) : null;
     music(s2 ? SCENE_SONG[s2] : null, 1.2);
@@ -5627,7 +5642,7 @@ function idbSaves(dbName = "goei-hq-demo") {
 }
 
 // src/game/action/ui/ui.css
-var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.62); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.item u { position: absolute; right: 6px; bottom: 4px; text-decoration: none; font-size: calc(var(--tp-u) * 0.18); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 7px; top: 4px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
+var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-r, var(--tp-u)) * 2); height: calc(var(--tp-r, var(--tp-u)) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-r, var(--tp-u)) * 0.95); height: calc(var(--tp-r, var(--tp-u)) * 0.95); margin: calc(var(--tp-r, var(--tp-u)) * -0.475) 0 0 calc(var(--tp-r, var(--tp-u)) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.17); }\n.tp-b.item u { position: absolute; right: 5px; bottom: 2px; text-decoration: none; font-size: calc(var(--tp-u) * 0.16); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 6px; top: 2px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
 
 // src/game/action/ui/stage.ts
 var W = 1280;
@@ -5656,8 +5671,8 @@ function mountStage(box2) {
   const fns = [];
   let keepPortrait = false;
   let fill = false;
-  let turn = false;
   const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+  let turn = coarse();
   const s2 = {
     root,
     stage: stageEl,
@@ -7180,7 +7195,7 @@ var DEFAULT_SETTINGS2 = {
   sfx: 0.9,
   touch: "auto",
   touchSize: 1,
-  touchAlpha: 0.75,
+  touchAlpha: 0.55,
   stickRun: true,
   lefty: false,
   vibrate: true,
@@ -7282,6 +7297,10 @@ var TouchPad = class {
   runSince = 0;
   runTimer = 0;
   u = 64;
+  /** 스틱 받침 반지름과 쉴 때 자리(바깥 가장자리에서) */
+  sr = 64;
+  restX = 64 * 1.55;
+  restY = 64;
   /** 스틱 자리 (층 기준 px) */
   zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
@@ -7301,11 +7320,16 @@ var TouchPad = class {
     const vw = this.vw();
     const scale = Math.min(bw / vw, bh / 720);
     const stageW = vw * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s2.touchSize;
     const u = this.u;
     const flip = s2.lefty ? -1 : 1;
     this.root.style.setProperty("--tp-u", `${u}px`);
     this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+    this.sr = u;
+    this.restX = u * 1.55;
+    this.restY = u;
+    this.root.style.setProperty("--tp-r", `${u}px`);
     const safeB = 10, safeS = 14;
     const ax = s2.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
     const ay = bh - safeB - u * 0.85;
@@ -7345,18 +7369,69 @@ var TouchPad = class {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.restBase();
   }
+  /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+   *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  layoutSide(bw, bh, side) {
+    const s2 = this.st();
+    const g2 = 4;
+    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g2) / 5.55)) * s2.touchSize;
+    const u = this.u;
+    this.root.style.setProperty("--tp-u", `${u}px`);
+    this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+    const edge2 = 6;
+    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge2 - u * 0.6;
+    const colL = side >= u * 0.7 ? side / 2 : edge2 + u * 0.36;
+    const mir = (x) => s2.lefty ? bw - x : x;
+    const place2 = (id, cx, cy, d2) => {
+      const b = this.btns.find((x) => x.id === id);
+      const r = d2 * u / 2;
+      cx = mir(cx);
+      Object.assign(b, { cx, cy, r });
+      const el = b.el;
+      el.style.width = el.style.height = `${r * 2}px`;
+      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+    };
+    const stack = (ids, x, d2, fromBottom) => {
+      let y2 = fromBottom ? bh - edge2 : edge2;
+      ids.forEach((id, i) => {
+        const r = d2[i] * u / 2;
+        y2 += fromBottom ? -r : r;
+        place2(id, x, y2, d2[i]);
+        y2 += fromBottom ? -r - g2 : r + g2;
+      });
+    };
+    stack(["attack", "jump", "evade", "shoot", "unique", "ult"], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
+    const right = ["attack", "jump", "evade", "shoot", "unique", "ult"].map((id) => this.btns.find((x) => x.id === id));
+    const di = 0.64, ri = di * u / 2;
+    let y = bh - edge2;
+    for (const id of ["guard", "interact", "reload", "support"]) {
+      y -= ri;
+      let left = colR;
+      for (const b of right) if (Math.abs((b.cy ?? 0) - y) < (b.r ?? 0) + ri) left = Math.min(left, mir(b.cx ?? 0) - (b.r ?? 0));
+      place2(id, left - g2 - ri, y, di);
+      y -= ri + g2;
+    }
+    stack(["menu", "map", "item1", "item2", "item3", "item4"], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    const zw = bw * 0.42, zt = bh * 0.3;
+    this.zr = { x: s2.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+    Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.sr = u * 0.82;
+    this.root.style.setProperty("--tp-r", `${this.sr}px`);
+    this.restX = Math.max(edge2 + this.sr, side + 60 - this.sr);
+    this.restY = edge2 + this.sr;
+    this.restBase();
+  }
   restBase() {
     const s2 = this.st();
     const zr = this.zr;
-    const u = this.u;
-    const x = s2.lefty ? zr.w - u * 1.25 : u * 1.25;
-    const y = zr.h - u * 1.25;
+    const x = s2.lefty ? zr.w - this.restX : this.restX;
+    const y = zr.h - this.restY;
     this.placeBase(x, y);
     this.knob.style.transform = "";
     this.base.classList.remove("on");
   }
   placeBase(x, y) {
-    this.base.style.transform = `translate(${x - this.u}px, ${y - this.u}px)`;
+    this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
     this.baseX = x;
     this.baseY = y;
   }
@@ -7475,7 +7550,7 @@ var TouchPad = class {
     }
   }
   stickTo(x, y) {
-    const R = this.u * 0.95;
+    const R = this.sr * 0.95;
     let dx = x - this.baseX, dy = y - this.baseY;
     const m = Math.hypot(dx, dy);
     if (m > R * 1.5) {
@@ -7679,7 +7754,7 @@ function mountGameShell(box2, o = {}) {
         id: "title",
         look: "title",
         title: o.title ?? "차원 승강기",
-        sub: o.sub ?? "띵. 1층입니다. 문이 열립니다.",
+        sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
         noBack: true,
         items: [
           ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
@@ -15988,6 +16063,51 @@ var DROP_TABLES = {
     { p: 0.6, kind: "relic", pool: ["rustkey", "oddcoin", "photo"] }
   ]
 };
+var VENDORS = {
+  madeokhee: {
+    id: "madeokhee",
+    name: "마덕희",
+    title: "중림 상인",
+    appear: 0.35,
+    greet: ["현금만 받아요. 관리국 결재는 여기서 안 통하고.", "주운 거 있으면 보여 줘요. 값은 내가 매겨."],
+    bye: "또 살아서 오면 단골 해 줄게."
+  },
+  backalley: {
+    id: "backalley",
+    name: "고연지·윤지아",
+    title: "중림 뒷골목 의사",
+    appear: 0.12,
+    greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."],
+    bye: "다음엔 덜 다쳐서 와."
+  },
+  shinyuri: {
+    id: "shinyuri",
+    name: "신유리",
+    title: "중림 사채",
+    appear: 0.1,
+    greet: ["급하지? 돈은 있어. 이자도 있고.", "관리국 예산으로 갚으면 돼. 못 갚으면 물건으로 받고."],
+    bye: "날짜 잊지 마."
+  },
+  vending: {
+    id: "vending",
+    name: "무엇이든 자판기",
+    title: "특수 장소",
+    appear: 0.08,
+    greet: ["[동전을 넣으십시오. 또는 다른 것을.]"],
+    bye: "[이용해 주셔서 감사합니다.]"
+  }
+};
+var CLINIC = [
+  { id: "patch", name: "응급 봉합", price: 40, desc: "체력 50% 회복, 출혈 제거", heal: 0.5, cure: ["bleed"] },
+  { id: "full", name: "전신 처치", price: 110, desc: "체력 전부 회복, 부상 제거", heal: 1, cure: ["bleed", "injury"] },
+  { id: "purge", name: "오염 세척", price: 90, desc: "오염 전부 제거", heal: 0, cure: ["taint"] }
+];
+var LOANS = [
+  { cash: 60, debt: 90 },
+  { cash: 120, debt: 190 },
+  { cash: 200, debt: 330 }
+];
+var priceAt = (base, depth) => Math.round(base * (1 + Math.min(depth, 20) * 0.04));
 
 // src/game/action/items/inventory.ts
 var SLOT_COUNT = 4;
@@ -16508,6 +16628,103 @@ function stepField(field, run, actor, input, targets, dt, ctx, melee) {
   return ev;
 }
 
+// src/game/action/items/shop.ts
+function openShop(vendor, run, depth, seed) {
+  const st = { seed: seed | 0 || 7 };
+  const v = VENDORS[vendor];
+  const offers = [];
+  const greet = v.greet[Math.floor(rand(st) * v.greet.length)];
+  if (vendor === "madeokhee") {
+    const pool = ["medkit", "bandage", "antidote", "salt", "flash", "smoke", "charm", "energy", "adrenaline"];
+    const picks = ["medkit"];
+    while (picks.length < 4) {
+      const id = pool[Math.floor(rand(st) * pool.length)];
+      if (!picks.includes(id)) picks.push(id);
+    }
+    for (const id of picks) {
+      const d2 = ITEMS[id];
+      offers.push({ key: "i:" + id, kind: "item", ref: id, name: d2.name, desc: d2.desc, price: priceAt(d2.price, depth), stock: id === "medkit" ? 3 : 2 });
+    }
+    const sig = SIGNATURES[run.agent];
+    if (sig && sig.ammo !== "none") {
+      const a = AMMO_PICKUP[sig.ammo];
+      offers.push({ key: "ammo", kind: "ammo", ref: sig.ammo, name: a.name, desc: `${sig.ranged} 예비 +${a.amount}`, price: priceAt(sig.ammo === "rifle" ? 30 : 15, depth), stock: 4 });
+    }
+    if (rand(st) < 0.6) {
+      const ws = ["pipe", "kitchenknife", "servicepistol", "shotgun", "smg"];
+      const id = ws[Math.floor(rand(st) * ws.length)];
+      const w = WEAPONS[id];
+      offers.push({ key: "w:" + id, kind: "weapon", ref: id, name: w.name, desc: `${w.cls === "gun" ? "총" : "한 손 근접"} · ${w.cls === "gun" ? "탄" : "내구"} ${w.uses} · ${w.desc}`, price: priceAt(w.cls === "gun" ? 55 : 30, depth), stock: 1 });
+    }
+  } else if (vendor === "backalley") {
+    for (const c of CLINIC) offers.push({ key: "c:" + c.id, kind: "clinic", ref: c.id, name: c.name, desc: c.desc, price: priceAt(c.price, depth), stock: 1 });
+  } else if (vendor === "shinyuri") {
+    LOANS.forEach(
+      (l, i) => offers.push({ key: "l:" + i, kind: "loan", ref: String(i), name: `현금 ${l.cash}`, desc: `귀환 후 예산 ${l.debt} 상환. 못 갚으면 유물 압류`, price: 0, stock: 1, debt: l.debt })
+    );
+  } else {
+    offers.push({ key: "g:cash", kind: "gamble", ref: "cash", name: "동전 넣기", desc: "무작위 아이템 하나", price: priceAt(25, depth), stock: 3 });
+    offers.push({ key: "g:hp", kind: "gamble", ref: "hp", name: "다른 것을 넣기", desc: "체력 20%를 내고 무작위 아이템 하나", price: 0, stock: 2, hpCost: 0.2 });
+  }
+  return { vendor, depth, seed: st.seed, offers, buys: vendor === "madeokhee", greet };
+}
+function buy2(shop, run, key) {
+  const o = shop.offers.find((x) => x.key === key);
+  if (!o || o.stock <= 0) return { ok: false, why: "stock" };
+  if (run.cash < o.price) return { ok: false, why: "cash" };
+  let res;
+  switch (o.kind) {
+    case "item":
+      if (!canAddItem(run, o.ref)) return { ok: false, why: "full" };
+      addItem2(run, o.ref);
+      res = { ok: true, got: o.name };
+      break;
+    case "ammo":
+      if (!addAmmo(run)) return { ok: false, why: "ammoFull" };
+      res = { ok: true, got: o.name };
+      break;
+    case "weapon":
+      equip2(run, o.ref);
+      res = { ok: true, got: o.name };
+      break;
+    case "clinic": {
+      const c = CLINIC.find((x) => x.id === o.ref);
+      res = { ok: true, got: o.name, heal: c.heal, cure: c.cure };
+      break;
+    }
+    case "loan": {
+      if (run.debt > 0) return { ok: false, why: "loan" };
+      const l = LOANS[+o.ref];
+      run.cash += l.cash;
+      run.debt += l.debt;
+      for (const x of shop.offers) if (x.kind === "loan") x.stock = 0;
+      return { ok: true, got: o.name };
+    }
+    case "gamble": {
+      const st = { seed: shop.seed };
+      const ids = Object.keys(ITEMS).filter((id2) => canAddItem(run, id2));
+      if (!ids.length) return { ok: false, why: "full" };
+      const id = ids[Math.floor(rand(st) * ids.length)];
+      shop.seed = st.seed;
+      addItem2(run, id);
+      res = { ok: true, got: ITEMS[id].name, hpCost: o.hpCost };
+      break;
+    }
+  }
+  run.cash -= o.price;
+  o.stock--;
+  return res;
+}
+function sell(shop, run, bagIndex) {
+  const b = run.bag[bagIndex];
+  if (!shop.buys || !b) return 0;
+  const price = Math.round((RELICS2[b.id]?.value ?? b.value) * (1 + shop.depth * 0.03));
+  run.bag[bagIndex] = null;
+  run.cash += price;
+  return price;
+}
+var sellPrice = (shop, value) => Math.round(value * (1 + shop.depth * 0.03));
+
 // src/game/action/items/icons.ts
 var C2 = {
   heal: "#5fbf6a",
@@ -16837,8 +17054,232 @@ function toGameEvents(events, x, ammo = 0) {
   return out;
 }
 
+// src/game/action/items/link.ts
+var ENEMY_WEAPONS = {
+  fb_smg: { p: 0.3, pool: ["smg"] },
+  fb_sword: { p: 0.5, pool: ["katana"] },
+  fb_chief: { p: 0.35, pool: ["servicepistol", "shotgun"] },
+  fb_shield: { p: 0.2, pool: ["pipe"] },
+  dd_member: { p: 0.1, pool: ["kitchenknife"] }
+};
+var COMMON_RELICS = ["scrap", "oddcoin", "tooth", "photo"];
+function spawnEnemyDrops(field, run, drops, x, y, kind = "") {
+  const ev = [];
+  const put = (k, ref, amount = 1) => {
+    spawnPickup(field, k, x, y, ref, amount);
+    ev.push({ t: "drop", kind: k, ref, x, y });
+  };
+  for (const d2 of drops) {
+    switch (d2.item) {
+      case "cash": {
+        const parts = Math.min(4, Math.max(1, Math.ceil(d2.n / 10)));
+        let left = d2.n;
+        for (let i = 0; i < parts; i++) {
+          const k = i === parts - 1 ? left : Math.ceil(d2.n / parts);
+          left -= k;
+          if (k > 0) put("cash", void 0, k);
+        }
+        break;
+      }
+      case "shard":
+        for (let i = 0; i < d2.n; i++) put("shard");
+        break;
+      case "heal":
+        for (let i = 0; i < d2.n; i++) put("heal");
+        break;
+      case "ammo":
+        if (usesAmmo(run)) for (let i = 0; i < d2.n; i++) put("ammo");
+        else put("cash", void 0, 4 * d2.n);
+        break;
+      case "relic":
+        for (let i = 0; i < d2.n; i++) put("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
+        break;
+      case "dream":
+        put("relic", "dreamcatcher");
+        break;
+      case "key":
+        put("relic", "rustkey");
+        break;
+    }
+  }
+  if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put("ammo");
+  const w = ENEMY_WEAPONS[kind];
+  if (w && rand(field) < w.p) put("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
+  return ev;
+}
+function strikeProps(field, run, hits, seen2, targets = []) {
+  const ev = [];
+  if (!hits.length) return ev;
+  for (const e of field.ents.slice()) {
+    if (e.type !== "prop" || !field.ents.includes(e)) continue;
+    const d2 = PROPS[e.prop];
+    if (d2.use === "throw") continue;
+    for (const h of hits) {
+      const key = h.attackId + ":" + e.id;
+      if (seen2.has(key)) continue;
+      if (h.x1 < e.x - d2.w / 2 || h.x0 > e.x + d2.w / 2 || h.z0 > d2.h + 110 || h.z1 < 0 || Math.abs(h.y - e.y) > (h.dy ?? 18) + 24) continue;
+      seen2.add(key);
+      ev.push(...damageProp(field, run, e, Math.max(6, h.dmg), targets));
+      break;
+    }
+  }
+  if (seen2.size > 400) seen2.clear();
+  return ev;
+}
+function furnishFloor(field, floor, lane, r = () => rand(field)) {
+  const pick5 = (a) => a[Math.floor(r() * a.length)];
+  const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
+  const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
+  const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
+  const spot = () => {
+    for (let i = 0; i < 12; i++) {
+      const x = x0 + r() * (x1 - x0);
+      if (!taken.some(([a, b]) => x > a && x < b)) {
+        taken.push([x - 90, x + 90]);
+        return x;
+      }
+    }
+    return null;
+  };
+  const front = lane[1] - 20, back = lane[0] + 10;
+  const put = (id, y) => {
+    const x = spot();
+    if (x !== null) placeProp(field, id, x, y);
+  };
+  put(pick5(["chair", "bin", "pot"]), front - r() * 40);
+  put(pick5(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
+  put(pick5(["crate", "crate", "drawer", "mailbox"]), back);
+  put(pick5(["barrel", "locker", "crate"]), back + r() * 20);
+  const wx = spot();
+  if (wx !== null) {
+    const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick5(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
+    Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
+  }
+}
+
+// src/game/action/items/shopPanel.ts
+var CSS = `
+.gi-shop{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:12px;box-sizing:border-box;pointer-events:auto;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ecee}
+.gi-shop[hidden]{display:none}
+.gi-shop .panel{background:#1b2226;border:1px solid #3a464d;border-radius:14px;width:min(560px,100%);max-height:100%;overflow:auto;padding:14px 16px;box-sizing:border-box}
+.gi-shop header{display:flex;align-items:center;gap:10px}
+.gi-shop header div{display:flex;flex-direction:column}
+.gi-shop header small{color:#8a969c}
+.gi-shop .cash{margin-left:auto;color:#e6d36a;font-weight:700}
+.gi-shop .say{color:#cfd6da;margin:10px 0}
+.gi-shop h4{margin:14px 0 6px;color:#8a969c;font-size:13px}
+.gi-shop .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#232d32;border:1px solid #33404a;border-radius:10px;color:inherit;font:inherit;padding:8px 10px;margin:0 0 6px;cursor:pointer}
+.gi-shop .row:disabled{opacity:.45;cursor:default}
+.gi-shop .row.sel{border-color:#e6d36a}
+.gi-shop .t{display:flex;flex-direction:column;flex:1;min-width:0}
+.gi-shop .t small{color:#8a969c;font-size:12px}
+.gi-shop .p{display:flex;flex-direction:column;align-items:flex-end;color:#e6d36a;font-weight:700;white-space:nowrap}
+.gi-shop .p small{color:#8a969c;font-weight:400;font-size:11px}
+.gi-shop .msg{min-height:20px;color:#9fd9a6;margin:8px 0}
+.gi-shop footer{display:flex;justify-content:flex-end}
+.gi-shop footer button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #4a565d;background:#2c383e;color:#e8ecee;cursor:pointer}
+`;
+var WHY = { cash: "현금이 모자라", stock: "품절", full: "1~4칸이 가득", ammoFull: "탄이 가득", loan: "빚부터 갚아" };
+function createShopPanel(root) {
+  if (!document.getElementById("gi-shop-css")) {
+    const s2 = document.createElement("style");
+    s2.id = "gi-shop-css";
+    s2.textContent = CSS;
+    document.head.appendChild(s2);
+  }
+  const box2 = document.createElement("div");
+  box2.className = "gi-shop";
+  box2.hidden = true;
+  root.appendChild(box2);
+  let cur = null;
+  let sel = 0;
+  let msg = "";
+  const render = () => {
+    if (!cur) return;
+    const { shop, run } = cur;
+    const v = VENDORS[shop.vendor];
+    const icon = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
+    const rows = shop.offers.map(
+      (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon(o)}"></canvas>
+        <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
+        <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
+    ).join("");
+    const bag = shop.buys ? `<h4>회수물 팔기</h4>${run.bag.map((b, i) => b ? `<button class="row" data-sell="${i}"><canvas width="40" height="40" data-icon="${b.id}"></canvas><span class="t"><b>${b.name}</b></span><span class="p">${sellPrice(shop, b.value)}원</span></button>` : "").join("") || '<p class="say">가방이 비었다</p>'}` : "";
+    box2.innerHTML = `<div class="panel"><header><canvas width="44" height="44" data-icon="${shop.vendor}"></canvas><div><b>${v.name}</b><small>${v.title}</small></div><span class="cash">현금 ${run.cash}${run.debt ? ` · 빚 ${run.debt}` : ""}</span></header>
+      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
+    box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
+    const list = [...box2.querySelectorAll(".row")];
+    sel = Math.max(0, Math.min(sel, list.length - 1));
+    list[sel]?.classList.add("sel");
+  };
+  const press = (b) => {
+    if (!cur) return;
+    if (b.dataset.close !== void 0) return close();
+    if (b.dataset.sell !== void 0) {
+      msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
+      return render();
+    }
+    const k = b.dataset.k;
+    if (!k) return;
+    const r = buy2(cur.shop, cur.run, k);
+    if (r.ok) {
+      cur.onBuy(r);
+      msg = `받음: ${r.got}`;
+    } else msg = WHY[r.why];
+    render();
+  };
+  box2.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b) press(b);
+  });
+  const onKey = (e) => {
+    if (!cur) return;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    if (e.repeat) return;
+    const list = [...box2.querySelectorAll(".row")];
+    if (e.code === "Escape" || e.code === "KeyQ") close();
+    else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
+      sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
+      render();
+      list[sel]?.scrollIntoView({ block: "nearest" });
+    } else if (["KeyA", "KeyE", "Enter", "Space"].includes(e.code) && list[sel] && !list[sel].disabled) press(list[sel]);
+  };
+  window.addEventListener("keydown", onKey, true);
+  function close() {
+    if (!cur) return;
+    const c = cur.onClose;
+    cur = null;
+    box2.hidden = true;
+    box2.innerHTML = "";
+    c?.();
+  }
+  return {
+    open(shop, run, onBuy, onClose) {
+      cur = { shop, run, onBuy, onClose };
+      sel = 0;
+      msg = "";
+      box2.hidden = false;
+      render();
+    },
+    close,
+    isOpen: () => !!cur,
+    dispose() {
+      window.removeEventListener("keydown", onKey, true);
+      box2.remove();
+    }
+  };
+}
+
 // src/game/action/engine/itemsLink.ts
 var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
+var shopPanel = null;
+var itemsBlocking = () => !!shopPanel?.isOpen();
+function mountItemsOverlay(root) {
+  shopPanel?.dispose();
+  shopPanel = createShopPanel(root);
+  return () => (shopPanel?.dispose(), shopPanel = null);
+}
 function linkItems(w, run) {
   const loadout = run.launch?.items ?? [{ id: "medkit", n: 2 }, { id: "flash", n: 2 }, { id: "adrenaline", n: 1 }, null];
   const ir = createItemRun("jyaldi", loadout.map((s2) => s2 ? { id: s2.id, n: s2.n } : null));
@@ -16848,6 +17289,7 @@ function linkItems(w, run) {
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   w.itemRun = ir;
+  w.itemField = () => field;
   const syncSlots = () => {
     w.items = ir.loadout.map((s2) => s2 ? { id: s2.id, label: ITEMS[s2.id]?.name ?? s2.id, n: s2.n } : null);
   };
@@ -16942,23 +17384,41 @@ function linkItems(w, run) {
   w.on((e) => {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-      const sx = e.floor.startX ?? 200;
-      const ym = (w.lane[0] + w.lane[1]) / 2;
-      const pick5 = (a) => a[Math.floor(w.rand() * a.length)];
-      placeProp(field, pick5(["chair", "bin", "pot"]), Math.min(e.floor.length - 100, sx + 380), ym + 30);
-      placeProp(field, pick5(["tv", "extinguisher", "chair"]), Math.min(e.floor.length - 100, sx + 900), ym - 20);
-      spawnPickup(field, "weapon", Math.min(e.floor.length - 100, sx + 600), ym, pick5(["pipe", "chairleg", "kitchenknife", "servicepistol"]));
+      furnishFloor(field, e.floor, w.lane, () => w.rand());
       syncCarry();
     }
-    if (e.type === "enemyDie") apply(dropFromKill(field, ir, DROP_TABLE[e.kind] ?? "anomaly", e.x, w.player.y));
+    if (e.type === "enemyDie" && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
+    if (e.type === "custom" && e.name === "enemyDrop") {
+      const d2 = e.data;
+      apply(spawnEnemyDrops(field, ir, d2.drops, d2.x, d2.y, d2.kind));
+    }
   });
+  let shopSeed = run.seed ^ 20817;
+  w.interactHooks.push((prop) => {
+    if (prop?.kind !== "merchant" || !shopPanel || shopPanel.isOpen()) return;
+    const ids = Object.keys(VENDORS);
+    const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? "madeokhee";
+    const shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
+    lastReserve = ir.reserve = p.reserve;
+    shopPanel.open(shop, ir, (r) => {
+      if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
+      if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
+      apply([]);
+      syncCarry();
+      w.emit({ type: "pickup", x: p.x, id: "shop" });
+    }, () => w.say(VENDORS[vendor].bye, 2));
+  });
+  const hitSeen = /* @__PURE__ */ new Set();
   return {
     run: ir,
     tick() {
       lastReserve = ir.reserve = p.reserve;
+      const hits = p.frame().hit;
+      if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       syncCarry();
       w.notes.cash = ir.cash;
+      w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
       w.notes.shards = ir.shards;
       w.notes.debt = ir.debt;
       w.notes.bag = ir.bag.map((b) => b ? { id: b.id, name: b.name } : null);
@@ -17131,16 +17591,20 @@ function hudState(w, shell) {
     maxEnergy: 75,
     gauge: p.gauge,
     armor: p.armor,
-    weapon: { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 6 : null },
+    weapon: heldWeapon(w) ?? { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 6 : null },
     items: w.items.map((it) => ({ label: it?.label ?? "", count: it?.n ?? 0 })),
     floor: { depth: d2 ? d2 <= 3 ? `L${d2}` : `B-${d2 - 3}` : "", name: f.title },
     favor: 0,
-    money: { cash: 0, budget: 0, research: 0, teeth: 0 },
+    money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
     boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
     message: w.subtitle?.text,
     meters: [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }],
     compact: shell.touchShown
   };
+}
+function heldWeapon(w) {
+  const h = w.notes.held;
+  return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
 }
 function engineModules(box2, bridge) {
   const audio = createGameAudio(local("goei-game-audio"));
@@ -17189,6 +17653,7 @@ function engineModules(box2, bridge) {
   const storyRoot = document.createElement("div");
   storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
   shell.stage.root.appendChild(storyRoot);
+  const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
       return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
@@ -17270,7 +17735,7 @@ function engineModules(box2, bridge) {
     enemyFactory,
     hq: hq2,
     hud: false,
-    blocking: () => story.isBlocking(),
+    blocking: () => story.isBlocking() || itemsBlocking(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -17337,6 +17802,7 @@ function engineModules(box2, bridge) {
     },
     toHqResult,
     dispose: () => {
+      unmountItems();
       window.removeEventListener("keydown", storyKeys, true);
       saveFlags();
       story.dispose();
@@ -17354,7 +17820,7 @@ function engineModules(box2, bridge) {
 }
 
 // src/game/action/engine/touch.ts
-var CSS = `
+var CSS2 = `
 .gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
 .gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
 .gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
@@ -17381,7 +17847,7 @@ var BTNS = [
 ];
 function mountTouch(root, input) {
   const st = document.createElement("style");
-  st.textContent = CSS;
+  st.textContent = CSS2;
   const wrap = document.createElement("div");
   wrap.className = "gt-wrap";
   wrap.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
@@ -17467,7 +17933,7 @@ function mountTouch(root, input) {
 }
 
 // src/game/action/main.ts
-var CSS2 = `
+var CSS3 = `
 .goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
 .goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
@@ -17476,7 +17942,7 @@ var CSS2 = `
 `;
 function mountGame(box2, bridge) {
   const st = document.createElement("style");
-  st.textContent = CSS2;
+  st.textContent = CSS3;
   const root = document.createElement("div");
   root.className = "goei-engine";
   const stage = document.createElement("div");

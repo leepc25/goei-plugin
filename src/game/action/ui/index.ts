@@ -16,6 +16,7 @@ export type { HudState, HudItem, MapState } from './hud';
 export { drawHud, drawMap, label, plate, font, FONT } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
+export { drawTitleBg } from './title';
 export * from './keys';
 
 export interface ShellOptions {
@@ -215,7 +216,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         id: 'title',
         look: 'title',
         title: o.title ?? '차원 승강기',
-        sub: o.sub ?? '띵. 1층입니다. 문이 열립니다.',
+        sub: o.sub ?? 'ANOMALY SIMULATION · 관리국 액션',
         noBack: true,
         items: [
           ...(has ? [{ type: 'button' as const, label: '이어하기', act: () => o.onContinue?.() }] : []),

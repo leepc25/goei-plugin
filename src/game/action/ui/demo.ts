@@ -35,8 +35,6 @@ const save = () => {
 const inRun = () => run.phase === 'floor' || run.phase === 'service';
 
 const shell = mountGameShell(box, {
-  title: '차원 승강기',
-  sub: '띵. 1층입니다. 문이 열립니다.',
   hasSave: () => inRun(),
   onNew: () => void startNew(),
   onContinue: () => {

@@ -1573,7 +1573,7 @@ function restore(text) {
 }
 
 // src/game/action/ui/ui.css
-var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.62); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.item u { position: absolute; right: 6px; bottom: 4px; text-decoration: none; font-size: calc(var(--tp-u) * 0.18); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 7px; top: 4px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
+var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-r, var(--tp-u)) * 2); height: calc(var(--tp-r, var(--tp-u)) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-r, var(--tp-u)) * 0.95); height: calc(var(--tp-r, var(--tp-u)) * 0.95); margin: calc(var(--tp-r, var(--tp-u)) * -0.475) 0 0 calc(var(--tp-r, var(--tp-u)) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.17); }\n.tp-b.item u { position: absolute; right: 5px; bottom: 2px; text-decoration: none; font-size: calc(var(--tp-u) * 0.16); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 6px; top: 2px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
 
 // src/game/action/ui/stage.ts
 var W2 = 1280;
@@ -1602,8 +1602,8 @@ function mountStage(box2) {
   const fns = [];
   let keepPortrait = false;
   let fill = false;
-  let turn = false;
   const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+  let turn = coarse();
   const s = {
     root,
     stage: stageEl,
@@ -2261,7 +2261,7 @@ var Fx = class {
   /** 엔진 GameEvent(engine/contract.ts)를 그대로 받는다. y 는 화면 y(발 위치 − 높이), 없으면 opt.y */
   onGameEvent(e, opt = {}) {
     const n = (k, d = 0) => typeof e[k] === "number" ? e[k] : d;
-    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") - 80 : opt.y ?? 520;
+    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") : opt.y ?? 520;
     switch (e.type) {
       case "hit":
         return this.onEvent({ type: "hit", x, y, strength: Math.max(1, Math.min(3, n("strength", 1))), dmg: n("dmg"), target: e.target === "player" ? "player" : "enemy" });
@@ -2581,6 +2581,54 @@ var Fx = class {
 var easeOut = (k) => 1 - (1 - k) * (1 - k);
 var easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 
+// src/game/action/ui/title.ts
+function drawTitleBg(c, t2) {
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  const W5 = c.canvas.width, H5 = c.canvas.height;
+  const g = c.createLinearGradient(0, 0, 0, H5);
+  g.addColorStop(0, "#0b1014");
+  g.addColorStop(1, "#1a1410");
+  c.fillStyle = g;
+  c.fillRect(0, 0, W5, H5);
+  const dx = 820, dw = 340, dy = 170, dh = 470;
+  c.fillStyle = "#2a2f33";
+  c.fillRect(dx - 30, dy - 30, dw + 60, dh + 30);
+  const open = Math.max(0, Math.sin(t2 * 0.35)) ** 6 * 30;
+  for (const side of [0, 1]) {
+    const x = side ? dx + dw / 2 + open : dx - open;
+    const dg = c.createLinearGradient(x, 0, x + dw / 2, 0);
+    dg.addColorStop(0, "#4c5458");
+    dg.addColorStop(1, "#3a4044");
+    c.fillStyle = dg;
+    c.fillRect(x, dy, dw / 2, dh);
+  }
+  c.fillStyle = "#000";
+  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
+  c.fillStyle = "rgba(255,60,30,0.25)";
+  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
+  c.fillStyle = "#100604";
+  c.fillRect(dx + dw / 2 - 70, dy - 110, 140, 60);
+  const flick = Math.sin(t2 * 13) > 0.92 || Math.sin(t2 * 2.1) > 0.97;
+  const floors = ["1", "B1", "B3", "B7", "B12", "??"];
+  label(c, flick ? floors[Math.floor(t2 * 7) % floors.length] : floors[Math.floor(t2 / 3) % floors.length], dx + dw / 2, dy - 66, 36, flick ? "#ff3020" : "#ff8a40", "center", 900);
+  c.fillStyle = "#d8d0bc";
+  c.fillRect(dx - 110, dy + 120, 60, 84);
+  c.fillStyle = "rgba(0,0,0,0.5)";
+  for (let i = 0; i < 6; i++) c.fillRect(dx - 104, dy + 132 + i * 11, 48, 2);
+  c.fillStyle = "rgba(236,230,212,0.25)";
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 197 + t2 * 12 * (1 + i % 3)) % W5, y = (i * 131 + t2 * 8 * (1 + i % 2)) % H5;
+    c.fillRect(x, y, 2, 2);
+  }
+  const v = c.createRadialGradient(W5 / 2, H5 / 2, H5 * 0.3, W5 / 2, H5 / 2, H5);
+  v.addColorStop(0, "rgba(0,0,0,0)");
+  v.addColorStop(1, "rgba(0,0,0,0.75)");
+  c.fillStyle = v;
+  c.fillRect(0, 0, W5, H5);
+  c.restore();
+}
+
 // src/game/action/ui/demo-world.ts
 var PROP_COLOR = { sign: "#e0c060", door: "#8ab", lockdoor: "#a88", key: "#ee8", servicedoor: "#c8a060", hatch: "#c8a060", panel: "#9cf", mirror: "#cde", rope: "#e0b070", phone: "#9f9", pickup: "#8f8", table: "#b98", checklist: "#ff9", crate: "#a97", exit: "#0f0" };
 function currentFloor(run2) {
@@ -2767,51 +2815,6 @@ function drawWorld(c, run2, fx3, size2) {
   c.save();
   c.translate(-cam + sh.x, sh.y);
   fx3.drawWorld(c);
-  c.restore();
-}
-function drawTitleBg(c, t2) {
-  c.save();
-  c.setTransform(1, 0, 0, 1, 0, 0);
-  const g = c.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, "#0b1014");
-  g.addColorStop(1, "#1a1410");
-  c.fillStyle = g;
-  c.fillRect(0, 0, W, H);
-  const dx = 820, dw = 340, dy = 170, dh = 470;
-  c.fillStyle = "#2a2f33";
-  c.fillRect(dx - 30, dy - 30, dw + 60, dh + 30);
-  const open = Math.max(0, Math.sin(t2 * 0.35)) ** 6 * 30;
-  for (const side of [0, 1]) {
-    const x = side ? dx + dw / 2 + open : dx - open;
-    const dg = c.createLinearGradient(x, 0, x + dw / 2, 0);
-    dg.addColorStop(0, "#4c5458");
-    dg.addColorStop(1, "#3a4044");
-    c.fillStyle = dg;
-    c.fillRect(x, dy, dw / 2, dh);
-  }
-  c.fillStyle = "#000";
-  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
-  c.fillStyle = "rgba(255,60,30,0.25)";
-  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
-  c.fillStyle = "#100604";
-  c.fillRect(dx + dw / 2 - 70, dy - 110, 140, 60);
-  const flick = Math.sin(t2 * 13) > 0.92 || Math.sin(t2 * 2.1) > 0.97;
-  const floors = ["1", "B1", "B3", "B7", "B12", "??"];
-  label(c, flick ? floors[Math.floor(t2 * 7) % floors.length] : floors[Math.floor(t2 / 3) % floors.length], dx + dw / 2, dy - 66, 36, flick ? "#ff3020" : "#ff8a40", "center", 900);
-  c.fillStyle = "#d8d0bc";
-  c.fillRect(dx - 110, dy + 120, 60, 84);
-  c.fillStyle = "rgba(0,0,0,0.5)";
-  for (let i = 0; i < 6; i++) c.fillRect(dx - 104, dy + 132 + i * 11, 48, 2);
-  c.fillStyle = "rgba(236,230,212,0.25)";
-  for (let i = 0; i < 40; i++) {
-    const x = (i * 197 + t2 * 12 * (1 + i % 3)) % W, y = (i * 131 + t2 * 8 * (1 + i % 2)) % H;
-    c.fillRect(x, y, 2, 2);
-  }
-  const v = c.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H);
-  v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,0.75)");
-  c.fillStyle = v;
-  c.fillRect(0, 0, W, H);
   c.restore();
 }
 
@@ -3400,7 +3403,7 @@ var DEFAULT_SETTINGS = {
   sfx: 0.9,
   touch: "auto",
   touchSize: 1,
-  touchAlpha: 0.75,
+  touchAlpha: 0.55,
   stickRun: true,
   lefty: false,
   vibrate: true,
@@ -3470,6 +3473,10 @@ var TouchPad = class {
     __publicField(this, "runSince", 0);
     __publicField(this, "runTimer", 0);
     __publicField(this, "u", 64);
+    /** 스틱 받침 반지름과 쉴 때 자리(바깥 가장자리에서) */
+    __publicField(this, "sr", 64);
+    __publicField(this, "restX", 64 * 1.55);
+    __publicField(this, "restY", 64);
     /** 스틱 자리 (층 기준 px) */
     __publicField(this, "zr", { x: 0, y: 0, w: 0, h: 0 });
     /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
@@ -3523,11 +3530,16 @@ var TouchPad = class {
     const vw = this.vw();
     const scale = Math.min(bw / vw, bh / 720);
     const stageW = vw * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s.touchSize;
     const u = this.u;
     const flip = s.lefty ? -1 : 1;
     this.root.style.setProperty("--tp-u", `${u}px`);
     this.root.style.setProperty("--tp-a", String(s.touchAlpha));
+    this.sr = u;
+    this.restX = u * 1.55;
+    this.restY = u;
+    this.root.style.setProperty("--tp-r", `${u}px`);
     const safeB = 10, safeS = 14;
     const ax = s.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
     const ay = bh - safeB - u * 0.85;
@@ -3567,18 +3579,69 @@ var TouchPad = class {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.restBase();
   }
+  /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+   *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  layoutSide(bw, bh, side) {
+    const s = this.st();
+    const g = 4;
+    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g) / 5.55)) * s.touchSize;
+    const u = this.u;
+    this.root.style.setProperty("--tp-u", `${u}px`);
+    this.root.style.setProperty("--tp-a", String(s.touchAlpha));
+    const edge = 6;
+    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge - u * 0.6;
+    const colL = side >= u * 0.7 ? side / 2 : edge + u * 0.36;
+    const mir = (x) => s.lefty ? bw - x : x;
+    const place = (id, cx, cy, d) => {
+      const b = this.btns.find((x) => x.id === id);
+      const r = d * u / 2;
+      cx = mir(cx);
+      Object.assign(b, { cx, cy, r });
+      const el = b.el;
+      el.style.width = el.style.height = `${r * 2}px`;
+      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+    };
+    const stack = (ids, x, d, fromBottom) => {
+      let y2 = fromBottom ? bh - edge : edge;
+      ids.forEach((id, i) => {
+        const r = d[i] * u / 2;
+        y2 += fromBottom ? -r : r;
+        place(id, x, y2, d[i]);
+        y2 += fromBottom ? -r - g : r + g;
+      });
+    };
+    stack(["attack", "jump", "evade", "shoot", "unique", "ult"], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
+    const right = ["attack", "jump", "evade", "shoot", "unique", "ult"].map((id) => this.btns.find((x) => x.id === id));
+    const di = 0.64, ri = di * u / 2;
+    let y = bh - edge;
+    for (const id of ["guard", "interact", "reload", "support"]) {
+      y -= ri;
+      let left = colR;
+      for (const b of right) if (Math.abs((b.cy ?? 0) - y) < (b.r ?? 0) + ri) left = Math.min(left, mir(b.cx ?? 0) - (b.r ?? 0));
+      place(id, left - g - ri, y, di);
+      y -= ri + g;
+    }
+    stack(["menu", "map", "item1", "item2", "item3", "item4"], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    const zw = bw * 0.42, zt = bh * 0.3;
+    this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+    Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.sr = u * 0.82;
+    this.root.style.setProperty("--tp-r", `${this.sr}px`);
+    this.restX = Math.max(edge + this.sr, side + 60 - this.sr);
+    this.restY = edge + this.sr;
+    this.restBase();
+  }
   restBase() {
     const s = this.st();
     const zr = this.zr;
-    const u = this.u;
-    const x = s.lefty ? zr.w - u * 1.25 : u * 1.25;
-    const y = zr.h - u * 1.25;
+    const x = s.lefty ? zr.w - this.restX : this.restX;
+    const y = zr.h - this.restY;
     this.placeBase(x, y);
     this.knob.style.transform = "";
     this.base.classList.remove("on");
   }
   placeBase(x, y) {
-    this.base.style.transform = `translate(${x - this.u}px, ${y - this.u}px)`;
+    this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
     this.baseX = x;
     this.baseY = y;
   }
@@ -3695,7 +3758,7 @@ var TouchPad = class {
     }
   }
   stickTo(x, y) {
-    const R = this.u * 0.95;
+    const R = this.sr * 0.95;
     let dx = x - this.baseX, dy = y - this.baseY;
     const m = Math.hypot(dx, dy);
     if (m > R * 1.5) {
@@ -3899,7 +3962,7 @@ function mountGameShell(box2, o = {}) {
         id: "title",
         look: "title",
         title: o.title ?? "차원 승강기",
-        sub: o.sub ?? "띵. 1층입니다. 문이 열립니다.",
+        sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
         noBack: true,
         items: [
           ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
@@ -4011,8 +4074,6 @@ var save = () => {
 };
 var inRun = () => run.phase === "floor" || run.phase === "service";
 var shell = mountGameShell(box, {
-  title: "차원 승강기",
-  sub: "띵. 1층입니다. 문이 열립니다.",
   hasSave: () => inRun(),
   onNew: () => void startNew(),
   onContinue: () => {

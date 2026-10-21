@@ -12,7 +12,7 @@ import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
 import { mountStory, type StoryApi } from '../story';
-import { linkItems } from './itemsLink';
+import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
 
@@ -104,16 +104,22 @@ function hudState(w: World, shell: Shell): HudState {
     maxEnergy: 75,
     gauge: p.gauge,
     armor: p.armor,
-    weapon: { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
+    weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
     items: w.items.map((it) => ({ label: it?.label ?? '', count: it?.n ?? 0 })),
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
-    money: { cash: 0, budget: 0, research: 0, teeth: 0 },
+    money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
     boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
     message: w.subtitle?.text,
     meters: [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }],
     compact: shell.touchShown,
   };
+}
+
+/** 임시 무기를 든 동안 무기 칸은 그 무기의 남은 횟수·탄 (아이템 모듈이 notes.held에 남김) */
+function heldWeapon(w: World) {
+  const h = w.notes.held as { name: string; uses: number; max: number } | null | undefined;
+  return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
 }
 
 export interface Wiring {
@@ -172,6 +178,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
+  const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
       return JSON.parse(localStorage.getItem('goei-game-story') ?? 'null') ?? undefined;
@@ -256,7 +263,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking(),
+    blocking: () => story.isBlocking() || itemsBlocking(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -324,6 +331,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     toHqResult,
     dispose: () => {
+      unmountItems();
       window.removeEventListener('keydown', storyKeys, true);
       saveFlags();
       story.dispose();
