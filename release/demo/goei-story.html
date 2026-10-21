@@ -1,5 +1,5 @@
 <!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>대사와 컷신 시연판 · 차원 승강기</title><style>html,body{margin:0;height:100%;background:#0b0f12}#box{position:relative;width:100vw;height:100dvh;max-width:1100px;margin:0 auto}</style><div id="box"></div><script type="module">// src/game/action/story/style.css
-var style_default = ".gst{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gst-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gst-bubbles{position:absolute;inset:0}\n.gst-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gst-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gst-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gst-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gst-bubble.free::after{display:none}\n.gst-bubble.out{opacity:0}\n.gst-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gst-caption.out{opacity:0}\n.gst-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gst-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gst-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gst-box[hidden],.gst-choices[hidden],.gst-caption[hidden],.gst-skip[hidden],.gst-talk[hidden]{display:none}\n.gst-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gst-photo[hidden]{display:none}\n.gst-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gst-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gst-body{flex:1;min-width:0}\n.gst-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gst-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gst-box.narr{border-top-color:#555}\n.gst-box.narr .gst-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gst-box[data-mood=serious] .gst-photo{filter:saturate(.7) brightness(.9)}\n.gst-box[data-mood=hurt] .gst-photo{filter:saturate(.6)}\n.gst-box[data-mood=surprise] .gst-photo{animation:gst-hop .25s}\n@keyframes gst-hop{50%{transform:translateY(-4px)}}\n.gst-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gst-box.done:not(.asking) .gst-next{opacity:.9;animation:gst-blink 1s infinite}\n@keyframes gst-blink{50%{opacity:.2}}\n.gst-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gst-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gst-choices button:hover,.gst-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gst-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gst-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gst-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gst-talk-head .gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gst-talk-head .gst-photo span{font-size:18px}\n.gst-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gst-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gst-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gst-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gst-talk-log .npc{align-self:flex-start;background:#26323a}\n.gst-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gst-talk-log .wait{opacity:.6;animation:gst-blink 1s infinite}\n.gst-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gst-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gst-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gst-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gst-photo{flex-basis:56px;width:56px;height:56px}.gst-text{font-size:15px}.gst-box{min-height:96px;padding:10px 12px 12px}}\n.gst-top .gst-dock{top:var(--gst-dock-top,auto);bottom:auto;flex-direction:column-reverse}\n";
+var style_default = ".gst{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gst-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gst-bubbles{position:absolute;inset:0}\n.gst-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gst-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gst-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gst-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gst-bubble.free::after{display:none}\n.gst-bubble.out{opacity:0}\n.gst-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gst-caption.out{opacity:0}\n.gst-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gst-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gst-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gst-box[hidden],.gst-choices[hidden],.gst-caption[hidden],.gst-skip[hidden],.gst-talk[hidden]{display:none}\n.gst-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gst-photo[hidden]{display:none}\n.gst-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gst-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gst-body{flex:1;min-width:0}\n.gst-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gst-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gst-box.narr{border-top-color:#555}\n.gst-box.narr .gst-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gst-box[data-mood=serious] .gst-photo{filter:saturate(.7) brightness(.9)}\n.gst-box[data-mood=hurt] .gst-photo{filter:saturate(.6)}\n.gst-box[data-mood=surprise] .gst-photo{animation:gst-hop .25s}\n@keyframes gst-hop{50%{transform:translateY(-4px)}}\n.gst-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gst-box.done:not(.asking) .gst-next{opacity:.9;animation:gst-blink 1s infinite}\n@keyframes gst-blink{50%{opacity:.2}}\n.gst-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gst-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gst-choices button:hover,.gst-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gst-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gst-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gst-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gst-talk-head .gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gst-talk-head .gst-photo span{font-size:18px}\n.gst-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gst-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gst-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gst-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gst-talk-log .npc{align-self:flex-start;background:#26323a}\n.gst-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gst-talk-log .wait{opacity:.6;animation:gst-blink 1s infinite}\n.gst-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gst-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gst-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gst-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gst-photo{flex-basis:56px;width:56px;height:56px}.gst-text{font-size:15px}.gst-box{min-height:96px;padding:10px 12px 12px}}\n.gst-top .gst-dock{top:var(--gst-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gst-box,.gst-choices{width:min(52%,560px)}.gst-dock{align-items:flex-start;padding-left:17%}.gst-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gst-photo span{font-size:18px}.gst-name{font-size:12px;margin-bottom:2px}.gst-text{font-size:13px;line-height:1.45;min-height:2.9em}.gst-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gst-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gst-dock{gap:5px}.gst-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}\n";
 
 // src/game/action/story/script.ts
 var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
@@ -2382,9 +2382,10 @@ var StoryUI = class {
     this.captionEl.classList.remove("out");
     this.captionLeft = ms / 1e3;
   }
+  /** dim: 무대 그림이 없을 때(통합판 컷신) 멈춘 게임 화면을 어둡게 가린다 */
   fade(to, ms) {
     this.fadeEl.style.transition = `opacity ${Math.max(0, ms)}ms linear`;
-    this.fadeEl.style.opacity = to === "black" ? "1" : "0";
+    this.fadeEl.style.opacity = to === "black" ? "1" : to === "dim" ? "0.86" : "0";
   }
   place(b) {
     const p = b.anchor();
@@ -2481,12 +2482,23 @@ var TalkPanel = class {
   }
 };
 
+// src/game/action/story/hooks.ts
+var J = CAST.jaemtri.name;
+var K = CAST.konjyuce.name;
+var D = CAST.dejure.name;
+var G = CAST.gognija.name;
+
 // src/game/action/story/index.ts
+var CUSTOM = {
+  ruleBroken: "rule:break",
+  guardianCleared: "win"
+};
 function mountStory(root2, host, opts = {}) {
   const saved = opts.saved;
   const style2 = document.createElement("style");
   style2.textContent = style_default;
   root2.append(style2);
+  if (opts.dock !== "bottom") root2.classList.add("gst-top");
   const rng = Math.random;
   const flags = { favor: 0, rules: 0, ...saved ?? {} };
   const lib = buildLibrary();
@@ -2596,15 +2608,19 @@ ${who}: ${text.replace(/\n/g, " ")}
 `, "line");
     say(tmp);
   };
+  let sceneVeiled = false;
   const io = {
-    bg: (s) => host.bg?.(s),
-    fade: (to, ms) => ui.fade(to, ms),
+    bg: (s) => {
+      if (host.bg) host.bg(s);
+      else sceneVeiled = true;
+    },
+    fade: (to, ms) => ui.fade(to === "clear" && sceneVeiled ? "dim" : to, ms),
     caption: (t, ms) => ui.caption(t, ms),
     sfx: (n) => host.sfx?.(n),
     shake: (ms, amp) => host.shake?.(ms, amp),
     actor: (id, to, ms) => host.actor?.(id, to, ms),
     camera: (to, ms) => host.camera?.(to.x, to.y, to.zoom, ms),
-    panel: (t, ms) => host.panel?.(t, ms),
+    panel: (t, ms) => host.panel ? host.panel(t, ms) : ms > 0 && ui.caption(t, ms),
     bark: (who, t, ms) => bark(who, t, ms),
     emit: (e, a) => host.emit?.(e, a),
     dialogue: (id) => say(id),
@@ -2622,8 +2638,13 @@ ${who}: ${text.replace(/\n/g, " ")}
   };
   const cutscene = (id, onDone) => {
     const def = CUTSCENES[id];
-    if (!def) throw new Error(`없는 컷신: ${id}`);
+    if (!def) {
+      console.warn("[goei] 없는 컷신:", id);
+      onDone?.();
+      return;
+    }
     syncAgent();
+    sceneVeiled = false;
     scene = new Cutscene(def, io);
     sceneDone = onDone;
     flags[`seen.cs.${id}`] = 1;
@@ -2669,14 +2690,24 @@ ${who}: ${text.replace(/\n/g, " ")}
     panel.open(c, c.photo ? host.photo?.(c.photo) : void 0, greet[npc] ?? (AGENTS[npc] ? lookupLine(npc, "offer", flags, rng) ?? "…" : "…"));
     refresh();
   };
+  let bossUp = false;
   const event = (name, data = {}) => {
     syncAgent();
+    if (name === "custom") {
+      name = CUSTOM[String(data.name)] ?? "";
+      data = data.data ?? {};
+      if (!name) return;
+    }
+    if (name === "down" && data.who === "enemy") return;
+    if (name === "combat:boss") bossUp = true;
+    if (name === "combat:clear" && bossUp) bossUp = false, name = "win";
+    if (name === "enter:floor") bossUp = false;
     if (name === "enter:floor" || name === "floor:enter") {
       const f = data.floor ?? data;
       if (f.depth !== void 0) flags.depth = Number(f.depth);
       if (f.type !== void 0) flags.ftype = String(f.type);
       if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
-      if (Number(flags.announced) !== Number(flags.depth)) {
+      if (opts.announce && Number(flags.announced) !== Number(flags.depth)) {
         const t = lookupLine(agent2(), "el:announce", flags, rng);
         if (t) bark("elevator", t, 2400);
       }
@@ -2689,7 +2720,8 @@ ${who}: ${text.replace(/\n/g, " ")}
     }
     if (name === "rule:break") flags.broke_rule = 1;
     if (name === "run:end") {
-      flags.result = String(data.result ?? "return");
+      const how = String(data.result ?? data.how ?? "return");
+      flags.result = how === "withdraw" ? "retreat" : how;
       flags.called_run = 0;
     }
     if (name === "combat:clear" && data.final) name = "win";
@@ -3487,7 +3519,7 @@ var story = mountStory(
     emit: (e, a) => setTimeout(() => onEmit(e, a), 0),
     photo: (k) => P[k]
   },
-  { saved: save.flags, eager: true }
+  { saved: save.flags, eager: true, announce: true, dock: "bottom" }
 );
 var mode = "pick";
 var STATIONS = [

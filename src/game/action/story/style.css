@@ -49,4 +49,6 @@
 .gst-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}
 .gst-talk form button:disabled{opacity:.5}
 @media (max-width:560px){.gst-photo{flex-basis:56px;width:56px;height:56px}.gst-text{font-size:15px}.gst-box{min-height:96px;padding:10px 12px 12px}}
-.gst-top .gst-dock{top:var(--gst-dock-top,auto);bottom:auto;flex-direction:column-reverse}
+.gst-top .gst-dock{top:var(--gst-dock-top,16%);bottom:auto;flex-direction:column-reverse}
+/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */
+@media (max-height:500px){.gst-box,.gst-choices{width:min(52%,560px)}.gst-dock{align-items:flex-start;padding-left:17%}.gst-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gst-photo span{font-size:18px}.gst-name{font-size:12px;margin-bottom:2px}.gst-text{font-size:13px;line-height:1.45;min-height:2.9em}.gst-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gst-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gst-dock{gap:5px}.gst-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}
