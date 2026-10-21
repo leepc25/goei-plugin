@@ -12,9 +12,9 @@ const LAST: Record<Fx, number> = { tear: 260, lost: 1500, shade: 1400, text: 750
 const AN_ONLY: Fx[] = ['shade', 'text', 'breath'];
 /** 같은 효과가 다시 나기까지 최소 간격(ms): 확률이 겹쳐도 연달아 나오지 않게 */
 const GAP: Record<Fx, number> = { tear: 4000, lost: 20000, shade: 20000, text: 10000, breath: 15000 };
-/** 화면을 처음 볼 때 하나 (사용자: 1분씩 들여다보는 사람은 없다). 그 화면을 다시 보면 2분 뒤부터 또 */
+/** 화면이 새로 뜰 때마다 하나 (사용자: 1분씩 들여다보는 사람은 없다). 직전 틱에 없던 화면이면 새로 뜬 것 */
 const FIRST: Fx[] = ['shade', 'shade', 'text', 'text', 'tear', 'lost'];
-const greeted = new Map<string, number>();
+let visible = new Set<string>();
 const lastAt = new Map<Fx, number>();
 const GRADE: Record<string, number> = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
 const BLOCKS = '█▓▒░#?¿§';
@@ -57,12 +57,13 @@ export function fireFx(view: HTMLElement, fx: Fx): void {
 }
 
 function tick(root: HTMLElement): void {
+  const now = new Set<string>();
   for (const view of root.querySelectorAll<HTMLElement>('.gx-opview.feed:not(.ended):not(.nosig)')) {
     const an = view.classList.contains('k-an');
     // 처음 보는 화면: 1~2.5초 안에 하나 (괴이는 아무거나, 사건·특수는 찢김)
     const key = view.dataset.fxkey ?? '';
-    if (key && Date.now() - (greeted.get(key) ?? 0) > 120000) {
-      greeted.set(key, Date.now());
+    now.add(key);
+    if (key && !visible.has(key)) {
       const fx = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : 'tear';
       lastAt.set(fx, Date.now());
       setTimeout(() => view.isConnected && fireFx(view, fx), Math.random() * 1500);
@@ -76,6 +77,7 @@ function tick(root: HTMLElement): void {
       fireFx(view, fx);
     }
   }
+  visible = now;
 }
 
 export function startCctvFx(root: HTMLElement): void {
@@ -87,4 +89,5 @@ export function startCctvFx(root: HTMLElement): void {
 export function stopCctvFx(): void {
   if (timer) clearInterval(timer);
   timer = null;
+  visible = new Set();
 }
