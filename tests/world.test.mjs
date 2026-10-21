@@ -68,7 +68,12 @@ test('geo: names, unique region, sealed city', () => {
 
 test('tag scanners read from the tail and normalise', () => {
   const t = scanAnomalies('본문 [AN|3|서울 종로구|배치: 종로 지하상가|활성|위협등급: b|P001]');
-  assert.deepEqual(t, [{ region: '서울 종로구', name: '종로 지하상가', state: '활성', grade: 'B', deploy: 'P001' }]);
+  assert.deepEqual(t, [{ region: '서울 종로구', name: '종로 지하상가', state: '활성', grade: 'B', deploy: 'P001', situation: '' }]);
+  // 상황 칸 (2026-10-21): 슬롯 번호가 있어도, 없어도 꼬리 칸이 상황
+  assert.equal(scanAnomalies('[AN|서울 종로구|x|활성|C|P001|승강장에 안개가 차오름]')[0].situation, '승강장에 안개가 차오름');
+  assert.deepEqual(scanAnomalies('[AN|2|서울 종로구|x|활성|C|P001|안개]')[0], { region: '서울 종로구', name: 'x', state: '활성', grade: 'C', deploy: 'P001', situation: '안개' });
+  assert.deepEqual(scanMysticSites('[MS|부산 중구|달빛 서점|출현|프리랜서|책장이 저절로 넘어감]')[0], { region: '부산 중구', name: '달빛 서점', state: '출현', visitors: '프리랜서', situation: '책장이 저절로 넘어감' });
+  assert.equal(scanMysticSites('[MS|1|부산 중구|달빛 서점|출현|없음]')[0].region, '부산 중구');
   assert.equal(scanAnomalies('[AN|서울 종로구|x|cleared|C|없음]')[0].state, '클리어');
   assert.deepEqual(scanIncidents('[IN|서울 종로구|관리국 본부|진행|정전]')[0], { region: '서울 종로구', name: '관리국 본부', state: '진행', situation: '정전' });
   assert.equal(scanIncidents('[IN|서울|x|이상함|y]').length, 0);
@@ -102,9 +107,9 @@ test('bootstrap spawns one of each group with default settings', () => {
   const locs = [...w.an, ...w.inc, ...w.ms].map((e) => e.loc);
   assert.equal(new Set(locs).size, locs.length, '같은 자리에 겹치지 않음');
   const r = reports(w, catalog, S, 'A00');
-  assert.match(r.an, /^NEW \[AN\|.+\|소라 랜드\|활성\|<등급>\|<배치>\]/m);
+  assert.match(r.an, /^NEW \[AN\|.+\|소라 랜드\|활성\|<등급>\|<배치>\|<상황>\]/m);
   assert.match(r.an, /NEW \[AN\|.+\|<발생지점>\|활성/);
-  assert.match(r.ms, /NEW \[MS\|.+\|달빛 서점\|출현\|<방문자>\]/);
+  assert.match(r.ms, /NEW \[MS\|.+\|달빛 서점\|출현\|<방문자>\|<상황>\]/);
   assert.equal(r.ag, 'NEW [AG|P001|<상태>|<상황>]\nNEW [AG|P002|<상태>|<상황>]\n\n- code: P001 쟈알디 (Jyaldi) | P002 스팡달 (Spangdal)');
 });
 
@@ -139,7 +144,7 @@ test('model tags fill pending anomalies by region and keep preset names fixed', 
   assert.equal(jongno.since, world.minute);
   assert.equal(sora.name, '소라 랜드', '프리셋 괴이 이름은 모델이 바꿔 불러도 고정');
   const r = reports(world, catalog, noSpawn, 'A00');
-  assert.match(r.an, /\[AN\|서울특별시 종로구\|종로 폐역\|활성\|B\|P001\] \{0시간 0분 전\}/);
+  assert.match(r.an, /\[AN\|서울특별시 종로구\|종로 폐역\|활성\|B\|P001\|<상황>\] \{0시간 0분 전\}/);
 });
 
 test('terminal states end the entry and block it for the next draw', () => {
@@ -331,4 +336,14 @@ test('map events: only live entries, stable keys, ending one blocks it', () => {
   const t = applyOutput(emptyWorld(), catalog, noSpawn, 'A00', '[AG|P001|실종|]', always).world;
   assert.equal(agentLocked(t.agents.P001), true);
   assert.equal(t.agents.P001.tagged, true);
+});
+
+test('anomaly and mystic site situations are stored, reported and kept when the tag omits them', () => {
+  let w = applyOutput(started(), catalog, noSpawn, 'A00', '[AN|부산 기장군|소라 랜드|활성|A|P001|회전목마가 혼자 돈다]', always).world;
+  assert.equal(w.an.find((e) => e.name === '소라 랜드').situation, '회전목마가 혼자 돈다');
+  assert.match(reports(w, catalog, S, 'A00').an, /\|A\|P001\|회전목마가 혼자 돈다\]/);
+  assert.equal(activeEvents(w).find((e) => e.kind === 'an').report, '회전목마가 혼자 돈다');
+  // 옛 다섯 칸 태그: 상황은 그대로
+  w = applyOutput(w, catalog, noSpawn, 'A00', '[AN|부산 기장군|소라 랜드|활성|A|P001]', always).world;
+  assert.equal(w.an.find((e) => e.name === '소라 랜드').situation, '회전목마가 혼자 돈다');
 });

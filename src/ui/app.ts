@@ -1243,10 +1243,12 @@ function board(ctx: ChatContext): string {
     cards.push({ ...c, kind, key, id: key, locCode, open: 'board-map', confirmEnd: field.confirmEnd === key, art: evArt(ctx, c.name, kind) });
   };
   const since = (m: number | null) => elapsedText(w.minute, m);
+  // 상황 글: 바깥 띠엔 상황 글(없으면 위키 요약), 상세 창·CCTV엔 상황 글과 위키 요약을 함께 (2026-10-21 사용자)
+  const sit = (t?: string) => (t ? `<span class="gx-evc-sit">${esc(t)}</span>` : '');
   const locText = (loc: string, m: number | null) => `${esc(locName(loc))}${since(m) ? ` · ${since(m)}` : ''}`;
-  w.an.forEach((e, i) => add('an', i, e.loc, { name: e.name || '이름 미확인', grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips(e.deploy) }));
-  w.inc.forEach((e, i) => add('in', i, e.loc, { name: e.name || '이름 미확인', loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit">${esc(e.situation)}</span>` : '' }));
-  w.ms.forEach((e, i) => add('ms', i, e.loc, { name: e.name, loc: esc(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips(e.visitors) }));
+  w.an.forEach((e, i) => add('an', i, e.loc, { name: e.name || '이름 미확인', grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips(e.deploy), extra: sit(e.situation) }));
+  w.inc.forEach((e, i) => add('in', i, e.loc, { name: e.name || '이름 미확인', loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', extra: sit(e.situation) }));
+  w.ms.forEach((e, i) => add('ms', i, e.loc, { name: e.name, loc: esc(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips(e.visitors), extra: sit(e.situation) }));
   // 막 끝난 상황은 이름 막기와 같은 동안 일지 맨 아래에 흐리게 (2026-10-20 사용자)
   for (const e of endedShown(w)) {
     const name = e.name || '이름 미확인';

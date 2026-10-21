@@ -384,6 +384,14 @@ def lore_activation(entries):
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 괴이·특수에도 현장 상황 칸 (2026-10-21 사용자: 랜덤 괴이·특수도 상황 글이 보여야). 플러그인 v0.16.35부터 읽는다
+    ('🏷️Tag', '\n\n#### Incident\n',
+     '\n- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.\n\n#### Incident\n'),
+    ('🏷️Tag', '- 방문자: current individuals or groups visiting or using the site. | 없음\n',
+     '- 방문자: current individuals or groups visiting or using the site. | 없음\n'
+     '- 상황: What is happening at the site right now: its current state, notable visitors\' activity, or unusual occurrences. One short sentence.\n'),
+    ('🏷️Tag', '[AN|지역|발생지점|상태|등급|배치]', '[AN|지역|발생지점|상태|등급|배치|상황]'),
+    ('🏷️Tag', '[MS|지역|명칭|상태|방문자]', '[MS|지역|명칭|상태|방문자|상황]'),
     ('Phone',
      'For conversational pacing only, use type="pause", sender="-", content=a brief pause without external events.',
      'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '

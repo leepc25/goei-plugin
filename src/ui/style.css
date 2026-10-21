@@ -2366,3 +2366,6 @@ button.mk-go:hover { color: var(--signal); }
 @media (max-width: 760px) {
   .gx-content { touch-action: pan-y pinch-zoom; }
 }
+/* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
+:where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
+:where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }

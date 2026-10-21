@@ -31,6 +31,8 @@ export interface AnEntry {
   born: number | null;
   /** 유저가 지금 탐사 중이면 자동 종료하지 않는다 */
   exploring: boolean;
+  /** 현장 상황 (2026-10-21 추가. 옛 상태엔 없다) */
+  situation?: string;
 }
 
 export interface InEntry {
@@ -49,6 +51,8 @@ export interface MsEntry {
   name: string;
   state: '발생대기' | '출현';
   visitors: string;
+  /** 현장 상황 (2026-10-21 추가. 옛 상태엔 없다) */
+  situation?: string;
   origin: Origin;
   since: number | null;
   born: number | null;
@@ -395,7 +399,7 @@ function firstRegion(region: string): string | null {
   return null;
 }
 
-function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, text: string) {
+function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: string, text: string) {
   const pending = w.pending.an;
   let handled = false;
   for (const t of scanAnomalies(text)) {
@@ -455,6 +459,8 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, text: strin
     if (e.state !== '활성' || e.since === null) e.since = w.minute;
     e.state = '활성';
     if (t.grade) e.grade = t.grade;
+    // 상황 칸이 없는 옛 카드 지침이면 비워 둔다 (그때는 위키 요약이 대신 보인다)
+    if (t.situation) e.situation = codesToNames(t.situation, c, faction);
   }
   if (pending && handled) w.pending.an = undefined;
   else if (pending) w.notice = `${pending}: 발생 태그를 기다리는 중이에요. 다음 응답에서 다시 안내해요.`;
@@ -497,7 +503,7 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   }
 }
 
-function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, text: string) {
+function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, faction: string, text: string) {
   for (const t of scanMysticSites(text)) {
     let e = w.ms.find((x) => x.name === t.name);
     if (e) {
@@ -518,6 +524,7 @@ function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, text: str
       continue;
     }
     e.visitors = t.visitors || '없음';
+    if (t.situation) e.situation = codesToNames(t.situation, c, faction);
     if (e.since === null) e.since = w.minute;
     e.state = '출현';
   }
@@ -552,9 +559,9 @@ export function applyOutput(prev: WorldState, c: Catalog, s: WorldSettings, fact
   }
   const now = newFaction ?? faction;
 
-  applyAnomalies(w, c, s, text);
+  applyAnomalies(w, c, s, now, text);
   applyIncidents(w, c, s, now, text);
-  applyMysticSites(w, c, s, text);
+  applyMysticSites(w, c, s, now, text);
   applyExploration(w, status.target);
   tick(w, c, s, rng);
 
@@ -588,8 +595,8 @@ export interface Reports {
 export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: string): Reports {
   const an = w.an.map((e) => {
     const ln = locName(e.loc);
-    if (e.state === '발생대기') return `NEW [AN|${ln}|${e.name || '<발생지점>'}|활성|<등급>|<배치>]`;
-    return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || '없음'}]${age(w, e.since)}`;
+    if (e.state === '발생대기') return `NEW [AN|${ln}|${e.name || '<발생지점>'}|활성|<등급>|<배치>|<상황>]`;
+    return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}`;
   });
   const inc = w.inc.map((e) => {
     const ln = locName(e.loc);
@@ -598,11 +605,11 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   });
   const ms = w.ms.map((e) => {
     const ln = locName(e.loc);
-    if (e.state === '발생대기') return `NEW [MS|${ln}|${e.name}|출현|<방문자>]`;
-    return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || '없음'}]${age(w, e.since)}`;
+    if (e.state === '발생대기') return `NEW [MS|${ln}|${e.name}|출현|<방문자>|<상황>]`;
+    return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}`;
   });
   if (w.pending.an && !w.an.some((e) => e.presetName === w.pending.an || e.name === w.pending.an)) {
-    an.push(`NEW [AN|<발생 지역: 시도와 시군구>|${w.pending.an}|활성|<등급>|<배치>]`);
+    an.push(`NEW [AN|<발생 지역: 시도와 시군구>|${w.pending.an}|활성|<등급>|<배치>|<상황>]`);
   }
   if (w.pending.in && !w.inc.some((e) => e.name === w.pending.in)) {
     const lm = c.landmarks.find((l) => l.name === w.pending.in);
@@ -610,7 +617,7 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
     inc.push(`NEW [IN|${loc ? locName(loc) : '<발생 지역: 시도와 시군구>'}|${w.pending.in}|진행|<상황>]`);
   }
   if (w.pending.ms && !w.ms.some((e) => e.name === w.pending.ms)) {
-    ms.push(`NEW [MS|<발생 지역: 시도와 시군구>|${w.pending.ms}|출현|<방문자>]`);
+    ms.push(`NEW [MS|<발생 지역: 시도와 시군구>|${w.pending.ms}|출현|<방문자>|<상황>]`);
   }
   const lines: string[] = [];
   const map: string[] = [];
@@ -647,13 +654,13 @@ export function activeEvents(w: WorldState): WorldEvent[] {
   const out: WorldEvent[] = [];
   const key = (kind: string, e: { loc: string; name: string; born: number | null }) => `${kind}|${e.loc}|${e.name}|${e.born ?? ''}`;
   w.an.forEach((e, index) => {
-    if (e.state === '활성') out.push({ kind: 'an', index, loc: e.loc, name: e.name || '이름 미확인', key: key('an', e), grade: e.grade, people: e.deploy, report: '' });
+    if (e.state === '활성') out.push({ kind: 'an', index, loc: e.loc, name: e.name || '이름 미확인', key: key('an', e), grade: e.grade, people: e.deploy, report: e.situation ?? '' });
   });
   w.inc.forEach((e, index) => {
     if (e.state === '진행') out.push({ kind: 'in', index, loc: e.loc, name: e.name || '이름 미확인', key: key('in', e), grade: '', people: '', report: e.situation });
   });
   w.ms.forEach((e, index) => {
-    if (e.state === '출현') out.push({ kind: 'ms', index, loc: e.loc, name: e.name, key: key('ms', e), grade: '', people: e.visitors, report: '' });
+    if (e.state === '출현') out.push({ kind: 'ms', index, loc: e.loc, name: e.name, key: key('ms', e), grade: '', people: e.visitors, report: e.situation ?? '' });
   });
   return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
 }

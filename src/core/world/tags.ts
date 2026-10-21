@@ -9,6 +9,8 @@ export interface AnTag {
   state: AnState;
   grade: string;
   deploy: string;
+  /** 현장 상황 (v0.16.35부터 꼬리 칸. 옛 태그엔 없다) */
+  situation: string;
 }
 export interface InTag {
   region: string;
@@ -21,6 +23,8 @@ export interface MsTag {
   name: string;
   state: '출현' | '소실';
   visitors: string;
+  /** 현장 상황 (v0.16.35부터 꼬리 칸. 옛 태그엔 없다) */
+  situation: string;
 }
 export interface AgTag {
   who: string;
@@ -80,34 +84,34 @@ function fields(text: string, kind: string): string[][] {
   return out;
 }
 
-/** 꼬리에서 읽는다: 모델이 앞에 슬롯 번호를 붙여도 깨지지 않게 */
+/** 앞의 슬롯 번호는 건너뛴다. 지역 뒤로 이름|상태|등급|배치, 그다음이 상황 (2026-10-21: 상황 칸 추가, 옛 다섯 칸 태그도 읽는다) */
 export function scanAnomalies(text: string): AnTag[] {
   return fields(text, 'AN').flatMap((f) => {
-    const n = f.length;
-    let region = f[0] ?? '';
-    if (/^\d+$/.test(region) && n >= 6) region = f[1] ?? '';
-    if (n < 5 || !region) return [];
-    return [{ region, name: stripLabel(f[n - 4]), state: normAnState(f[n - 3]), grade: normGrade(f[n - 2]), deploy: stripLabel(f[n - 1]) }];
+    const slot = /^\d+$/.test(f[0] ?? '') && f.length >= 6 ? 1 : 0;
+    const region = f[slot] ?? '';
+    const r = f.slice(slot + 1);
+    if (r.length < 4 || !region) return [];
+    return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(' ')) }];
   });
 }
 
+/** 상태 칸을 찾아 그 앞을 이름, 뒤를 차례로 읽는다 (IN: 상황, MS: 방문자|상황) */
 function scanSites<S extends string>(text: string, kind: string, states: readonly S[]) {
   return fields(text, kind).flatMap((f) => {
-    const n = f.length;
+    const i = f.findIndex((v, k) => k >= 2 && (states as readonly string[]).includes(stripLabel(v)));
+    if (i < 0) return [];
     let region = f[0] ?? '';
-    if (/^\d+$/.test(region) && n >= 5) region = f[1] ?? '';
-    const st = stripLabel(f[n - 2]);
-    if (n < 4 || !(states as readonly string[]).includes(st)) return [];
-    return [{ region, name: stripLabel(f[n - 3]), state: st as S, last: stripLabel(f[n - 1]) }];
+    if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? '';
+    return [{ region, name: stripLabel(f[i - 1]), state: stripLabel(f[i]) as S, rest: f.slice(i + 1).map(stripLabel) }];
   });
 }
 
 export function scanIncidents(text: string): InTag[] {
-  return scanSites(text, 'IN', ['진행', '종료'] as const).map(({ last, ...t }) => ({ ...t, situation: last }));
+  return scanSites(text, 'IN', ['진행', '종료'] as const).map(({ rest, ...t }) => ({ ...t, situation: rest.join(' ') }));
 }
 
 export function scanMysticSites(text: string): MsTag[] {
-  return scanSites(text, 'MS', ['출현', '소실'] as const).map(({ last, ...t }) => ({ ...t, visitors: last }));
+  return scanSites(text, 'MS', ['출현', '소실'] as const).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? '', situation: rest.slice(1).join(' ') }));
 }
 
 export function scanAgents(text: string): AgTag[] {

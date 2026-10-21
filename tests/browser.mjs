@@ -504,7 +504,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   });
   const after = await page.evaluate(() => window.__chat);
   assert.equal(after.message[1].data, '쟈알디가 무전기를 들었다.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]');
-  assert.match(after.scriptstate.$an_report, new RegExp(`\\[AN\\|${where}\\|${preset.name}\\|활성\\|B\\|P001\\] \\{0시간 0분 전\\}`));
+  assert.match(after.scriptstate.$an_report, new RegExp(`\\[AN\\|${where}\\|${preset.name}\\|활성\\|B\\|P001\\|<상황>\\] \\{0시간 0분 전\\}`));
   assert.match(after.scriptstate.$ag_report, /\[AG\|P001\|작전투입\|현장 지휘\]/);
   // 같은 응답에 다시 불려도 그대로
   const before = after.scriptstate.$goei_world;
