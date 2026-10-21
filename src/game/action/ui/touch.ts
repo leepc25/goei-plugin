@@ -1,5 +1,6 @@
 // 모바일 터치 조작: 왼쪽 떠다니는 스틱 + 오른쪽 버튼 무리. 손가락을 떼지 않고 옆 버튼으로 미끄러져도 눌린다.
 // 모든 버튼은 키보드와 같은 키 코드를 InputHub 에 누르고 뗀다.
+import { drawHudItemIcon } from './hud';
 import type { InputHub } from './input';
 import type { UiSettings } from './settings';
 import { portraitTop } from './stage';
@@ -255,12 +256,21 @@ export class TouchPad {
   get shown() {
     return !this.root.classList.contains('hide');
   }
-  setItems(items: { count: number; label: string }[]) {
+  /** 아이템 칸: 글자 대신 아이콘 + 개수 */
+  setItems(items: { count: number; label: string; id?: string }[]) {
     items.forEach((it, i) => {
       const b = this.btns.find((x) => x.id === `item${i + 1}`);
       if (!b?.el) return;
-      const html = `<b>${it.label}</b><i>${i + 1}</i><u>${it.count}</u>`;
-      if (b.el.innerHTML !== html) b.el.innerHTML = html;
+      const key = `${it.id ?? ''}|${it.label}`;
+      if (b.el.dataset.icon !== key) {
+        b.el.dataset.icon = key;
+        b.el.innerHTML = `<canvas width="64" height="64"></canvas><i>${i + 1}</i><u></u>`;
+        const g = b.el.querySelector('canvas')!.getContext('2d');
+        if (g && (it.label || it.id)) drawHudItemIcon(g, it, 4, 4, 56);
+      }
+      const u = b.el.querySelector('u')!;
+      const n = it.label || it.id ? String(it.count) : '';
+      if (u.textContent !== n) u.textContent = n;
       b.el.classList.toggle('empty', it.count <= 0);
     });
   }

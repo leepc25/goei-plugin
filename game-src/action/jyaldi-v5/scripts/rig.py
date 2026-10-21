@@ -944,6 +944,14 @@ for _n in ('down','getup','collapse'):
     CLIPS[_n]=(_a,_pr,[{k:((v[0],min(v[1],129-DY)) if 'ELBOW' in k else v) for k,v in q.items()} for q in _ps])
 # 쇠파이프 합본(생성 0회): 16:40판 머리 위 치켜듦(PU2) + 28e8170판 앞 위 치켜듦(PW3)·내려침(PW4). 16:40판 타격 장은 파이프가 바닥에 꽂혀 불합격
 CLIPS['pipe3']=(CLIPS['pipe2'][0],CLIPS['pipe2'][1],[anatomic(PU2),anatomic(PW3),anatomic(PW4)])
+# 산탄총 대기·달리기: 걷기(16:40)와 같은 총·같은 손 자리(앞손 펌프, 뒷손 손잡이, 개머리판 뒷팔 아래)
+SGP='holding a long black pump shotgun with a wooden stock in both hands, front hand on the pump, rear hand on the grip, stock under the rear arm, as long as her arm'
+clip('idle_shotgun','side view in profile: standing ready while carrying a long pump shotgun level in both hands',
+     [P((X,57+b),3,0,0,(X+8,G),(X-6,G),(24,16),(4,12),le=('e',8,14),re=('e',0,14)) for b in (0,.5,1,.5)],SGP)
+def rung(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+8,58+2.5*abs(sn)),12,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),(24,16),(4,12),le=('e',8,14),re=('e',0,14))
+clip('run_shotgun','side view in profile: running while carrying a long pump shotgun level in both hands',[rung(i/8) for i in range(8)],SGP)
 REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A

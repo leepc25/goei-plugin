@@ -6,6 +6,7 @@ import type { AiKind, EnemyDef } from './roster';
 import type { Armor, Body, Debuff, FrameBoxes, Hit, HitResult, LocalBox, Move, Part, PartBox, RuleSignal, WBox, WorldView } from './types';
 import { rollDrops, fireDropHook } from './drops';
 import { armDebuff, checkDebuffs } from './debuff';
+import { drawFigure, drawSwing } from './look';
 
 export type St = 'spawn' | 'idle' | 'walk' | 'attack' | 'hurt' | 'air' | 'down' | 'getup' | 'bound' | 'grabbing' | 'dormant' | 'hidden' | 'flee' | 'dead' | 'stunned';
 export type Affix = 'bleed' | 'armor' | 'fast' | 'regen';
@@ -592,41 +593,12 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
   if (e.state === 'dead') alpha *= 1 - e.deadT / 24;
   if (e.state === 'spawn') alpha *= e.st / 12;
   ctx.globalAlpha = alpha;
-  const body = e.state === 'down' || e.state === 'getup' || e.state === 'dead' ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
-  for (const b of body) {
-    const wb = toWorld(b, e.x, e.y, e.z, e.dir);
-    ctx.fillStyle = e.flash > 0 ? '#ffffff' : tint(e.def.color, PART_SHADE[b.part ?? 'torso'] ?? 0);
-    ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
-  }
-  // 바라보는 쪽 눈
-  if (body.length && e.state !== 'dead' && e.state !== 'down') {
-    const top = Math.max(...body.map((b) => b.z1));
-    ctx.fillStyle = e.state === 'attack' ? '#ff4b3a' : '#f2efe6';
-    ctx.fillRect(e.x + e.dir * (e.def.w * 0.18) - 4, e.y - e.z - top + 12, 8, 6);
-  }
-  // 공격 상자 (유효 장)는 반투명 흰 칼날
-  if (f?.hit.length) {
-    ctx.globalAlpha = 0.5 * alpha;
-    ctx.fillStyle = '#fff3e0';
-    for (const b of f.hit) {
-      const wb = toWorld(b, e.x, e.y, e.z, e.dir);
-      ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
-    }
-  }
-  ctx.globalAlpha = alpha;
   // 예고 테두리 (빨강 깜빡임) · 슈퍼아머 (노랑 점멸, E.7)
   const armorNow = Math.max(e.armorBase, f?.armor ?? 0);
   const outline = f?.tele ? ((e.st >> 1) & 1 ? '#ff3030' : '#ffb0a0') : armorNow >= 1 && e.state === 'attack' ? ((e.age >> 2) & 1 ? '#ffd23c' : '#a08020') : e.elite ? '#b46cff' : '';
-  if (outline && body.length) {
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = armorNow >= 2 ? 4 : 3;
-    const xs = body.map((b) => toWorld(b, e.x, e.y, e.z, e.dir));
-    const x0 = Math.min(...xs.map((b) => b.x0)),
-      x1 = Math.max(...xs.map((b) => b.x1)),
-      z1 = Math.max(...xs.map((b) => b.z1)),
-      z0 = Math.min(...xs.map((b) => b.z0));
-    ctx.strokeRect(x0 - 3, e.y - z1 - 3, x1 - x0 + 6, z1 - z0 + 6);
-  }
+  if (drawFigure(e, ctx, outline)) drawSwing(e, ctx, alpha);
+  else drawBoxes(e, ctx, f, alpha, outline, armorNow);
+  ctx.globalAlpha = alpha;
   if (f?.tele && e.mf < 6) {
     ctx.fillStyle = '#ff3030';
     ctx.font = 'bold 34px sans-serif';
@@ -668,6 +640,42 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
     ctx.fillText(e.bubble, e.x, top + 23);
   }
   ctx.restore();
+}
+
+/** 모양이 없는 종 (도형·집·얼룩·벽 얼굴 등): 판정 상자를 칠한다 */
+function drawBoxes(e: Enemy, ctx: CanvasRenderingContext2D, f: ReturnType<Enemy['frameNow']>, alpha: number, outline: string, armorNow: number) {
+  const body = e.state === 'down' || e.state === 'getup' || e.state === 'dead' ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+  for (const b of body) {
+    const wb = toWorld(b, e.x, e.y, e.z, e.dir);
+    ctx.fillStyle = e.flash > 0 ? '#ffffff' : tint(e.def.color, PART_SHADE[b.part ?? 'torso'] ?? 0);
+    ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
+  }
+  // 바라보는 쪽 눈
+  if (body.length && e.state !== 'dead' && e.state !== 'down') {
+    const top = Math.max(...body.map((b) => b.z1));
+    ctx.fillStyle = e.state === 'attack' ? '#ff4b3a' : '#f2efe6';
+    ctx.fillRect(e.x + e.dir * (e.def.w * 0.18) - 4, e.y - e.z - top + 12, 8, 6);
+  }
+  // 공격 상자 (유효 장)는 반투명 흰 칼날
+  if (f?.hit.length) {
+    ctx.globalAlpha = 0.5 * alpha;
+    ctx.fillStyle = '#fff3e0';
+    for (const b of f.hit) {
+      const wb = toWorld(b, e.x, e.y, e.z, e.dir);
+      ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
+    }
+  }
+  ctx.globalAlpha = alpha;
+  if (outline && body.length) {
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = armorNow >= 2 ? 4 : 3;
+    const xs = body.map((b) => toWorld(b, e.x, e.y, e.z, e.dir));
+    const x0 = Math.min(...xs.map((b) => b.x0)),
+      x1 = Math.max(...xs.map((b) => b.x1)),
+      z1 = Math.max(...xs.map((b) => b.z1)),
+      z0 = Math.min(...xs.map((b) => b.z0));
+    ctx.strokeRect(x0 - 3, e.y - z1 - 3, x1 - x0 + 6, z1 - z0 + 6);
+  }
 }
 
 function flat(e: Enemy): LocalBox[] {
