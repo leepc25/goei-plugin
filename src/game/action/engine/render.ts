@@ -1,5 +1,6 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
 import { drawPropArt } from '../art/bg';
+import { drawHintIcon } from './hint';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
 import type { Art } from './art';
 import { Bullet } from './bodies';
@@ -88,6 +89,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   }
 
   function drawProps(w: World, camX: number) {
+    // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
+    if (w.props.some((p) => p.label && near(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
     for (const p of w.props) {
       const sx = p.x - camX;
       if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
@@ -114,17 +117,6 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
         ctx.strokeStyle = 'rgba(0,0,0,0.5)';
         ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-      }
-      // 이름은 E가 닿는 거리에서만 작게 (상시 떠 있는 글씨 금지)
-      if (p.label && near(w, p)) {
-        ctx.font = 'bold 15px sans-serif';
-        ctx.textAlign = 'center';
-        const tw = ctx.measureText(`E ${p.label}`).width + 16;
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(sx - tw / 2, p.y - p.h - 30, tw, 22);
-        ctx.fillStyle = '#f0d890';
-        ctx.fillText(`E ${p.label}`, sx, p.y - p.h - 14);
-        ctx.textAlign = 'left';
       }
     }
   }

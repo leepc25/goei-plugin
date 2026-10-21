@@ -5,6 +5,7 @@
 import type { FloorPlan, PropSpec, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt } from '../art/bg';
+import { drawHintIcon } from './hint';
 import type { HqDoor, HqMapView, HqScene, HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -35,7 +36,6 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let pending: { scene: string; x: number } | null = null;
   let enterTick = -1;
   let fadeOut = 0;
-  let bubble: { who: string; text: string; x: number; t: number } | null = null;
   let barked: string | null = null;
 
   const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
@@ -45,7 +45,6 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const sc = sceneOf(id);
     scene = sc;
     barked = null;
-    bubble = null;
     enterTick = -1;
     const props: PropSpec[] = [
       ...sc.doors.map((d) => ({ id: `door:${d.id}`, kind: 'hubdoor', x: d.x, y: TOP, w: DOOR_W[d.kind], h: DOOR_H })),
@@ -93,46 +92,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (enterTick < 0) enterTick = now;
         const age = (now - enterTick) / (1000 / 30);
         const px = w.player.x;
-        // 가까운 문·자리: 작은 E (자리는 짧은 동사)
+        // 가까운 문·자리: 요원 머리 위에 작은 도트 아이콘만 (글씨·말풍선 없음, 검수 4-2)
         const nd = sc.doors.find((d) => Math.abs(d.x - px) < 60);
         const ns = !nd ? sc.spots.find((s) => s.open && Math.abs(s.x - px) < 60) : null;
-        if (nd || ns) {
-          const x = (nd?.x ?? ns!.x) - camX;
-          const txt = ns ? `E ${ns.verb}` : 'E';
-          c.font = 'bold 18px sans-serif';
-          c.textAlign = 'center';
-          const tw = c.measureText(txt).width + 18;
-          const y = nd ? TOP - DOOR_H - 34 : TOP - 150;
-          c.fillStyle = 'rgba(0,0,0,0.6)';
-          c.fillRect(x - tw / 2, y, tw, 26);
-          c.fillStyle = '#f0d890';
-          c.fillText(txt, x, y + 19);
-          c.textAlign = 'left';
-        }
-        // 자리 주인 목소리
-        if (bubble && bubble.t > 0) {
-          bubble.t--;
-          drawBubble(c, `${bubble.who}: ${bubble.text}`, bubble.x - camX, TOP - 190, Math.min(1, bubble.t / 10));
-        }
-        // 방 이름: 들어갈 때 1초쯤 작게
-        if (age < 45) {
-          const a = age < 8 ? age / 8 : age > 35 ? (45 - age) / 10 : 1;
-          c.save();
-          c.globalAlpha = a;
-          c.font = 'bold 22px sans-serif';
-          c.textAlign = 'center';
-          c.fillStyle = 'rgba(0,0,0,0.55)';
-          const tw = c.measureText(sc.name).width + 40;
-          c.fillRect(SCREEN_W / 2 - tw / 2, 96, tw, 36);
-          c.fillStyle = '#ece6d4';
-          c.fillText(sc.name, SCREEN_W / 2, 121);
-          c.restore();
-        }
+        if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         // 암전: 들어올 때 밝아지고, 나갈 때 어두워진다
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {
           c.fillStyle = `rgba(0,0,0,${dark})`;
-          c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+          c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H); // 이 그림판은 이미 -camX 만큼 옮겨져 있다
         }
       },
     };
@@ -168,13 +136,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           enterTick = -1;
         } else a.finish('next');
       }
-      // 자리에 가까이 가면 주인 목소리 한 줄
+      // 자리에 가까이 가면 주인 목소리 한 줄 (자막)
       const px = a.world.player.x;
       const sp = scene?.spots.find((s) => s.open && Math.abs(s.x - px) < 170);
       if (sp && sp.place !== barked) {
         barked = sp.place;
         const l = host.bark(sp.place);
-        if (l) bubble = { who: l.who, text: l.text, x: sp.x, t: 110 };
+        // 벽 가운데 말풍선 대신 아래 자막 한 줄 (검수 4-2)
+        if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
       } else if (!sp) barked = null;
     },
     onInteract(_a, _floor, prop) {
@@ -329,28 +298,6 @@ function door(c: CanvasRenderingContext2D, d: Door, camX: number) {
     c.fillStyle = 'rgba(0,0,0,0.35)';
     c.fillRect(x, y, w, DOOR_H);
   }
-}
-
-function drawBubble(c: CanvasRenderingContext2D, text: string, x: number, y: number, a: number) {
-  c.save();
-  c.globalAlpha = a;
-  c.font = '17px sans-serif';
-  const tw = Math.min(520, c.measureText(text).width + 24);
-  const bx = Math.max(12, Math.min(SCREEN_W - tw - 12, x - tw / 2));
-  c.fillStyle = '#f4f1e8';
-  c.strokeStyle = '#4b8f8c';
-  c.lineWidth = 2;
-  c.fillRect(bx, y - 34, tw, 34);
-  c.strokeRect(bx, y - 34, tw, 34);
-  c.beginPath();
-  c.moveTo(x - 7, y);
-  c.lineTo(x + 7, y);
-  c.lineTo(x, y + 10);
-  c.fill();
-  c.fillStyle = '#1b1f22';
-  c.textBaseline = 'middle';
-  c.fillText(text, bx + 12, y - 17, tw - 24);
-  c.restore();
 }
 
 function tint(kind: string): string {

@@ -400,6 +400,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -419,15 +420,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent as AgentId;
-      // 첫 출동: 화면을 가리는 컷신 대신 바로 조작하면서 말풍선 세 줄 (검은 화면 10초 금지, 검수 2번)
+      // 첫 출동: 말풍선 없이 아래 자막 한 줄씩 (검수 4-7: 글자 여러 겹 금지). 층 안내 자막은 층 모듈이 먼저 낸다
       if (run.stageId !== 'hq' && (run as Launch).launch && local('goei-first-entry').load() !== '1') {
         local('goei-first-entry').save('1');
-        const lines: [SpeakerId, string, number][] = [
-          ['elevator', '띵. 1층입니다. 문이 열립니다.', 300],
-          ['radio', '(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.', 2000],
-          ['agent', '로비 같은데, 로비가 아니다.', 5200],
-        ];
-        for (const [who, text, at] of lines) setTimeout(() => world === w && story.bark(who, text, 2800), at);
+        setTimeout(() => world === w && w.say('(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.', 3), 4600);
       }
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음

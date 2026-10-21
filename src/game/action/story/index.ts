@@ -368,6 +368,8 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
       flags.called_run = 0;
     }
     if (name === 'combat:clear' && data.final) name = 'win';
+    // 층에 들어설 때는 층 안내 자막 하나만 (검수 4-7: 요원 말풍선을 겹치지 않는다)
+    if (name === 'enter:floor' || name === 'floor:enter') return;
     const b = picker.pick(name, agent(), now);
     if (b) bark('agent', b.text, b.tag === 'ult' || b.tag === 'boss' ? 2000 : 2600);
   };

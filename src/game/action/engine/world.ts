@@ -353,7 +353,7 @@ export class World implements WorldView {
         if (!(a instanceof Fighter) || !(b instanceof Fighter)) continue;
         if (a.phase === 'held' || b.phase === 'held' || a.phase === 'down' || b.phase === 'down' || a.phase === 'dead' || b.phase === 'dead') continue;
         if (a.invuln > 0 || b.invuln > 0) continue;
-        if (Math.abs(a.y - b.y) > 12) continue;
+        if (Math.abs(a.y - b.y) > 30) continue; // 깊이가 조금 달라도 몸이 겹쳐 보이면 민다 (검수 4-10)
         const min = (a.width + b.width) * 0.8;
         const dx = b.x - a.x;
         if (Math.abs(dx) < min) {

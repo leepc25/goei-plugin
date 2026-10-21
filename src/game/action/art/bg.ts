@@ -2,6 +2,8 @@
 // 시연판은 window.__GOEI_BG_ART__에 내장. 그림이 없는 장소는 false를 돌려주고 부른 쪽이 단색 대역을 그린다.
 // 도트 1px = 화면 2px. 벽 칸 320×220 도트 = 화면 640×440, 바닥 무늬 128 도트.
 
+import { HQ_SCENES } from '../hq/map';
+
 export type BgPack = Record<string, Record<string, string>>; // 장소 → 이름 → data URL
 
 declare global {
@@ -80,19 +82,23 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
 
 /** 벽 명암 단계: 천장 쪽 두 단, 걸레받이 쪽 한 단을 어둡게 (부드러운 그라데이션 대신 도트처럼 끊어진 띠). */
 function wallLight(ctx: CanvasRenderingContext2D, x: number, w: number, bottom: number) {
-  const bands: [number, number, number][] = [
-    [0, 0.1, 0.42],
-    [0.1, 0.2, 0.24],
-    [0.2, 0.3, 0.1],
-    [0.94, 1, 0.3],
-  ];
-  for (const [a, b, k] of bands) {
-    ctx.fillStyle = `rgba(8,8,14,${k})`;
-    ctx.fillRect(x, Math.round(bottom * a), w, Math.round(bottom * (b - a)));
-  }
+  // 천장 쪽 그늘과 걸레받이 그늘: 띠 세 겹은 무늬처럼 보여서(불합격 4) 매끈한 그라데이션으로
+  const top = ctx.createLinearGradient(0, 0, 0, bottom * 0.32);
+  top.addColorStop(0, 'rgba(8,8,14,0.42)');
+  top.addColorStop(1, 'rgba(8,8,14,0)');
+  ctx.fillStyle = top;
+  ctx.fillRect(x, 0, w, Math.round(bottom * 0.32));
+  const foot = ctx.createLinearGradient(0, bottom * 0.9, 0, bottom);
+  foot.addColorStop(0, 'rgba(8,8,14,0)');
+  foot.addColorStop(1, 'rgba(8,8,14,0.34)');
+  ctx.fillStyle = foot;
+  ctx.fillRect(x, Math.round(bottom * 0.9), w, Math.round(bottom * 0.1) + 1);
 }
 
-/** 바닥 띠(y0~y1)를 무늬로 깐다. 뒤쪽 줄일수록 좁고 납작하게(원근), 무늬는 월드 x에 붙는다. */
+/** 무늬 자체가 바둑판·타일 줄인 바닥 (겹쳐 긋는 줄 생략). */
+const OWN_GRID = new Set(['hq_pantry', 'puzzle']);
+
+/** 바닥 띠(y0~y1)를 무늬로 깐다. 무늬는 월드 x에 붙고, 깊이는 모이는 줄과 뒤쪽 어둡게로 읽힌다. */
 export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, y0: number, y1: number): boolean {
   place = place.split(':')[0];
   if (!Object.keys(pack()[place] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[place]) place = FLOOR_ALT[place];
@@ -108,19 +114,14 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
   if (!pat) return false;
   ctx.save();
   ctx.imageSmoothingEnabled = false;
-  const step = 6;
-  for (let y = y0; y < y1; y += step) {
-    const t = (y - y0) / Math.max(1, y1 - y0); // 0 = 뒤, 1 = 앞
-    const sx = 2 * (0.7 + 0.3 * t);
-    const sy = sx * 0.5;
-    // 화면 위쪽에서 시작하는 무늬의 세로 위치: 뒤에서 앞으로 누적된 깊이
-    const depth = (y - y0) / sy;
-    pat.setTransform(new DOMMatrix([sx, 0, 0, sy, 0, y - depth * sy]));
-    ctx.fillStyle = pat;
-    ctx.fillRect(x0, y, x1 - x0, Math.min(step, y1 - y));
-  }
+  // 무늬는 한 배율(가로 2, 세로 1)로 통째로 깐다: 줄마다 배율을 바꾸면 바둑판이 계단처럼 어긋난다(모아레, 불합격 4)
+  pat.setTransform(new DOMMatrix([2, 0, 0, 1, 0, y0]));
+  ctx.fillStyle = pat;
+  ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
   // 바닥 타일 줄: 앞으로 올수록 간격이 넓어지는 가로줄 + 화면 가운데로 모이는 세로줄 (월드 x에 붙음)
+  // 바둑판처럼 무늬에 줄이 이미 있는 바닥은 줄을 겹쳐 긋지 않는다
   const t = ctx.getTransform();
+  const ownGrid = OWN_GRID.has(place);
   const vanish = (ctx.canvas.width / 2 - t.e) / t.a; // 화면 가운데의 월드 x
   ctx.save();
   ctx.beginPath();
@@ -129,7 +130,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
   ctx.strokeStyle = 'rgba(10,10,16,0.45)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  for (let d = 0, k = 0; ; k++) {
+  for (let d = 0, k = 0; !ownGrid; k++) {
     const y = Math.round(y0 + d);
     if (y >= y1) break;
     ctx.moveTo(x0, y);
@@ -137,7 +138,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
     d += 22 + k * 9;
   }
   const tile = 128;
-  for (let wx = Math.floor((x0 - 400) / tile) * tile; wx < x1 + 400; wx += tile) {
+  for (let wx = Math.floor((x0 - 400) / tile) * tile; !ownGrid && wx < x1 + 400; wx += tile) {
     const top = vanish + (wx - vanish) * 0.62;
     if (Math.max(top, wx) < x0 || Math.min(top, wx) > x1) continue;
     ctx.moveTo(top, y0);
@@ -220,7 +221,16 @@ const DOOR_WALLS: Record<string, [number, number, 'door' | 'stairs' | 'elevator'
 /** 본부에서 쓰지 않는 벽 칸 (문이 둘이라 엔진 문과 맞출 수 없음, 막다른 골목 입구). */
 const HQ_SKIP = new Set(['hq_office_wall_5', 'hq_street_wall_4']);
 /** 특정 문에 쓸 벽 칸: 장면:문 → 그림 이름. */
-const DOOR_FOR: Record<string, string> = { 'street:main': 'hq_street_wall_1', 'street:pasta': 'hq_street_wall_3', 'lobby:main': 'lobby_wall_1' };
+const DOOR_FOR: Record<string, string> = {
+  'street:main': 'hq_street_wall_1', 'street:pasta': 'hq_street_wall_3', 'lobby:main': 'lobby_wall_1',
+  // 2층 복도: 의무실은 흰 여닫이문, 면담실은 나무문 (같은 문 둘이 나란하면 칸막이처럼 보인다)
+  'f2:clinic': 'hq_corridor_wall_4', 'f2:interview': 'hq_corridor_wall_3',
+};
+/** 문 옆 빈 명패 (도트 x0, y0, x1, y1): 문이 이어지는 방 이름을 적는다. */
+const PLATES: Record<string, [number, number, number, number]> = {
+  hq_corridor_wall_3: [220, 52, 247, 63], hq_corridor_wall_4: [209, 62, 236, 72],
+};
+const SCENE_NAME = new Map(HQ_SCENES.map((s) => [s.id as string, s.name]));
 
 function doorType(kind: string): 'door' | 'stairs' | 'elevator' {
   return kind.startsWith('stairs') ? 'stairs' : kind === 'elevator' ? 'elevator' : 'door';
@@ -230,7 +240,7 @@ function doorType(kind: string): 'door' | 'stairs' | 'elevator' {
  * 본부 장면 벽: 엔진 문 자리에 문이 그려진 벽 칸을 문 구멍이 맞게 놓고, 사이는 문 없는 칸으로 채운다.
  * 칸끼리 겹치면 가운데서 자르고 기둥을 세운다. 돌려주는 집합 = 벽 그림이 문을 대신한 문 id (엔진은 그 문을 그리지 않는다).
  */
-export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId: string, length: number, wallBottom: number, doors: { id: string; x: number; kind: string }[]): Set<string> | null {
+export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId: string, length: number, wallBottom: number, doors: { id: string; x: number; kind: string; to?: string }[]): Set<string> | null {
   const cands: [string, string][] = [];
   for (const src of HQ_WALLS[place] ?? [place]) {
     const [p, only] = src.split(':');
@@ -241,7 +251,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
   const fill = plain.length ? plain : cands;
   const k = wallBottom / 220; // 화면 px / 도트
   const bayW = 320 * k;
-  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string };
+  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string; flip?: boolean; label?: string };
   const pieces: Piece[] = [];
   for (const d of [...doors].sort((a, b) => a.x - b.x)) {
     const want = DOOR_FOR[`${sceneId}:${d.id}`];
@@ -252,7 +262,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     if (!pick) continue;
     const [x0, x1] = DOOR_WALLS[pick[1]];
     const bx = d.x - ((x0 + x1) / 2) * k;
-    pieces.push({ p: pick[0], n: pick[1], x: bx, a: bx, b: bx + bayW, door: d.id });
+    pieces.push({ p: pick[0], n: pick[1], x: bx, a: bx, b: bx + bayW, door: d.id, label: d.to && SCENE_NAME.get(d.to) });
   }
   // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다)
   for (let i = 1; i < pieces.length; i++) {
@@ -274,8 +284,10 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
   if (cur < length) gaps.push([cur, length]);
   for (const [g0, g1] of gaps) {
     for (let x = g0; x < g1; x += bayW) {
+      // 문 없는 칸이 적으면 번갈아 좌우를 뒤집어 같은 칸이 줄지어 보이지 않게
+      const flip = fill.length < 3 && Math.floor(idx / fill.length) % 2 === 1;
       const [p, n] = fill[idx++ % fill.length];
-      fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1) });
+      fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1), flip });
     }
   }
   ctx.save();
@@ -286,8 +298,24 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     if (!im) continue;
     const a = Math.max(pc.a, pc.x), b = Math.min(pc.b, pc.x + bayW);
     if (b <= a) continue;
-    ctx.drawImage(im, (a - pc.x) / k, 0, (b - a) / k, im.height, a, 0, b - a, wallBottom);
+    if (pc.flip) {
+      // 뒤집힌 칸: 화면 구간 [a, b]는 그림에서 오른쪽 끝부터 잰 같은 폭
+      ctx.save();
+      ctx.translate(a + b, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(im, (pc.x + bayW - b) / k, 0, (b - a) / k, im.height, a, 0, b - a, wallBottom);
+      ctx.restore();
+    } else ctx.drawImage(im, (a - pc.x) / k, 0, (b - a) / k, im.height, a, 0, b - a, wallBottom);
     if (pc.door) covered.add(pc.door);
+    const pl = PLATES[pc.n];
+    if (pl && pc.label && pc.x + pl[0] * k >= a && pc.x + pl[2] * k <= b) {
+      const [x0, y0, x1, y1] = pl;
+      ctx.fillStyle = '#2b2f2c';
+      ctx.font = `bold ${Math.round((y1 - y0) * k * 0.62)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pc.label, pc.x + ((x0 + x1) / 2) * k, ((y0 + y1) / 2) * k + k / 2, (x1 - x0 - 3) * k);
+    }
   }
   // 이 장소 벽 그림에 엘리베이터가 없으면 2층 복도 엘리베이터(문틀째)를 잘라 붙인다
   const el = image('hq_corridor', 'hq_corridor_wall_1');
@@ -300,14 +328,59 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
   }
   // 잘린 이음매에 기둥
   for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && e - pc.x > 2 && pc.x + bayW - e > 2) seamPillar(ctx, e, wallBottom, 14);
+  // 이웃 칸 끝 색이 크게 다르면(나무 책장 ↔ 크림 벽, 유리 ↔ 베이지) 기둥으로 갈라 이음매가 아니라 벽 모서리로 읽히게
+  const all = [...fills, ...pieces].sort((u, v) => u.a - v.a);
+  for (let i = 1; i < all.length; i++) {
+    const L = all[i - 1], R = all[i];
+    if (Math.abs(L.b - R.a) > 2 || R.a <= 0 || R.a >= length) continue;
+    const cl = edgeColor(L.p, L.n, L.flip ? 'l' : 'r'), cr = edgeColor(R.p, R.n, R.flip ? 'r' : 'l');
+    if (cl && cr && Math.abs(cl[0] - cr[0]) + Math.abs(cl[1] - cr[1]) + Math.abs(cl[2] - cr[2]) > 70) seamPillar(ctx, R.a, wallBottom, 30);
+  }
   wallLight(ctx, 0, length, wallBottom);
   ctx.restore();
   return covered;
 }
 
+const edges = new Map<string, [number, number, number] | null>();
+/** 벽 칸 왼쪽/오른쪽 끝 띠(16도트)의 평균 색 (벽 가운데 높이). */
+function edgeColor(place: string, name: string, side: 'l' | 'r'): [number, number, number] | null {
+  const key = `${place}/${name}/${side}`;
+  if (edges.has(key)) return edges.get(key)!;
+  const im = image(place, name);
+  if (!im) return null;
+  let out: [number, number, number] | null = null;
+  try {
+    const cv = document.createElement('canvas');
+    cv.width = 16;
+    cv.height = 120;
+    const g = cv.getContext('2d', { willReadFrequently: true })!;
+    g.drawImage(im, side === 'l' ? 8 : im.width - 24, 50, 16, 120, 0, 0, 16, 120);
+    const d = g.getImageData(0, 0, 16, 120).data;
+    const sum = [0, 0, 0];
+    for (let i = 0; i < d.length; i += 4) for (let c = 0; c < 3; c++) sum[c] += d[i + c];
+    const n = d.length / 4;
+    out = [sum[0] / n, sum[1] / n, sum[2] / n];
+  } catch {
+    out = null;
+  }
+  edges.set(key, out);
+  return out;
+}
+
 /** 장소가 바뀌는 이음매·잘린 칸 이음매의 기둥 (도트 마감: 어두운 몸통 + 밝은 모서리). */
 export function seamPillar(ctx: CanvasRenderingContext2D, x: number, wallBottom: number, w = 36) {
   const x0 = Math.round(x - w / 2);
+  // 기둥 양옆 그늘: 벽이 기둥 뒤로 꺾여 들어가는 것처럼 (색이 바로 맞붙어 보이지 않게)
+  if (w >= 24) {
+    const s = w * 2;
+    for (const [from, to] of [[x0, x0 - s], [x0 + w, x0 + w + s]]) {
+      const g = ctx.createLinearGradient(from, 0, to, 0);
+      g.addColorStop(0, 'rgba(6,6,10,0.5)');
+      g.addColorStop(1, 'rgba(6,6,10,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(Math.min(from, to), 0, s, wallBottom);
+    }
+  }
   ctx.fillStyle = '#22262a';
   ctx.fillRect(x0, 0, w, wallBottom);
   ctx.fillStyle = '#3a4045';
@@ -315,6 +388,13 @@ export function seamPillar(ctx: CanvasRenderingContext2D, x: number, wallBottom:
   ctx.fillStyle = '#121416';
   ctx.fillRect(x0 + w - 2, 0, 2, wallBottom);
   ctx.fillRect(x0, 0, 2, wallBottom);
+  if (w >= 24) {
+    // 걸레받이 받침
+    ctx.fillStyle = '#2e3337';
+    ctx.fillRect(x0 - 4, wallBottom - 18, w + 8, 18);
+    ctx.fillStyle = '#121416';
+    ctx.fillRect(x0 - 4, wallBottom - 18, w + 8, 2);
+  }
 }
 
 // ── 소품 그림 (물건 모음 → objects/<장소>_objects_N). 회색 상자 대신. 도트 1px = 화면 2px, 발(아래 가운데)을 바닥 y에.
@@ -374,6 +454,8 @@ function drawObj(ctx: CanvasRenderingContext2D, place: string, n: number, x: num
 
 /** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
 export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
+  // 부수는·던지는 물건(item_*)은 아이템 그림이 따로 있다: 배경 물건 대신 그것을 쓰게 (청록 상자처럼 보이던 아파트 TV 대역)
+  if (kind.startsWith('item_') && typeof window !== 'undefined' && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
   let ref: ObjRef | undefined;
   if (kind === 'door') {
     const p = placeFor('floor', floorType, '');
