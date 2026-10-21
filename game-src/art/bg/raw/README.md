@@ -269,3 +269,27 @@
 - `puzzle/puzzle_wall_2.png`
 - `puzzle/puzzle_wall_3.png`
 - `puzzle/puzzle_wall_4.png`
+
+
+## 층별 배경 역순 추가 · 2026-10-22
+
+요청서 28개 경로 모두 확인. 이번 역순 작업에서 12장을 내장 image_gen으로 신규 생성해 한 장마다 커밋·push했고, 최신 main에 존재한 16장은 건너뛰었다. 생성·확인 순서는 빈집 2→1, 붉은 벽 2→1, 심층 물건→바닥→벽 4→3→2→1, 퍼즐 물건→바닥→벽 4→3→2→1, 어둠 물건→바닥→벽 4→3→2→1, 침묵 물건→바닥→벽 4→3→2→1이다.
+
+| 신규 원본 | 크기 | 개별 커밋 |
+|---|---|---|
+| [apt_vacant/apt_vacant_wall_2.png](apt_vacant/apt_vacant_wall_2.png) | 1536×1024 | `0a89c44` |
+| [apt_vacant/apt_vacant_wall_1.png](apt_vacant/apt_vacant_wall_1.png) | 1536×1024 | `321e35e` |
+| [apt_red/apt_red_wall_2.png](apt_red/apt_red_wall_2.png) | 1536×1024 | `61e1f8d` |
+| [apt_red/apt_red_wall_1.png](apt_red/apt_red_wall_1.png) | 1536×1024 | `2bc6509` |
+| [deep/deep_objects.png](deep/deep_objects.png) | 1536×1024 | `5afa493` |
+| [deep/deep_floor.png](deep/deep_floor.png) | 1024×1024 | `16b58b3` |
+| [deep/deep_wall_4.png](deep/deep_wall_4.png) | 1536×1024 | `990a6ab` |
+| [deep/deep_wall_3.png](deep/deep_wall_3.png) | 1536×1024 | `b94a9b6` |
+| [deep/deep_wall_2.png](deep/deep_wall_2.png) | 1536×1024 | `d8563b3` |
+| [deep/deep_wall_1.png](deep/deep_wall_1.png) | 1536×1024 | `d5f47db` |
+| [puzzle/puzzle_objects.png](puzzle/puzzle_objects.png) | 1536×1024 | `f30f2bc` |
+| [puzzle/puzzle_floor.png](puzzle/puzzle_floor.png) | 1024×1024 | `6d965be` |
+
+기존 파일 유지: `puzzle_wall_4..1` 4장, `dark` 6장, `silent` 6장. 물건 시트는 마젠타 배경 대체 방식이며 생성 색 편차를 고려한 배경 제거가 필요하다. 벽·바닥의 정밀 이음새, 도트화 및 게임 연결은 요청서의 후속 작업이다.
+
+[전체 요청문·커밋·30개 파일 검사 기록](ui-floor-reverse-20261022-production.json). UI 두 장의 파일 목록은 [UI README](../../ui/raw/README.md)에 있다.
