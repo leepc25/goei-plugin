@@ -25,3 +25,4 @@ export * as budget from './budget';
 export * as focus from './focus';
 export * from './navhist';
 export * as lore from './lore';
+export * from './sharedpics';

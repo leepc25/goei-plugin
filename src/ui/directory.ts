@@ -2,7 +2,7 @@
 // 고친 값은 카드 로어북 「Directory」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
 import {
   agentGroup, assignOrg, directoryData, moveAgent, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
-  type BaseRow, type PlaceRow, withDirectory,
+  type BaseRow, type PlaceRow, withDirectory, agentGender, loreGender,
 } from '../core/world/directory';
 import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
 import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, personCrop, splitPic, type PicSource } from '../host/assets';
@@ -300,6 +300,7 @@ function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
   return `<div class="dir-panel">
     <div class="dir-line"><span>소속 조직</span><div class="dir-chips">${d.orgs.map((o) => chip('dir-org-pick', `${o.name}|${a.lore}`, o.name, cur === o)).join('')}${chip('dir-org-pick', `|${a.lore}`, '미정', !a.affiliation)}</div></div>
     <p class="gx-muted">조직을 고르면 아래 두 값이 그 조직 기준으로 채워져요. 새 조직은 「조직」 탭에서 만들어요.</p>
+    <div class="dir-line"><span>성별</span><div class="dir-chips">${(['F', 'M', 'X'] as const).map((x) => chip('dir-gender', `${x}|${a.lore}`, { F: '여', M: '남', X: '미정' }[x], (agentGender(a, lore) || 'X') === x)).join('')}</div></div>
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip('dir-toggle', `rosterFor|${f}|${a.lore}`, names[f], a.rosterFor.includes(f))).join('')}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs.map((t) => chip('dir-toggle', `phoneTabs|${t.id}|${a.lore}`, t.name || t.id, a.phoneTabs.includes(t.id))).join('')}</div></div>
     <div class="dir-grid">
@@ -760,6 +761,17 @@ export async function handleDirectory(action: string, value: string | undefined,
       const row = d.agents.find((a) => a.lore === v.slice(at + 1));
       if (!row) break;
       assignOrg(row, d.orgs.find((o) => o.name === v.slice(0, at)));
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-gender': {
+      const at = v.indexOf('|');
+      const row = d.agents.find((a) => a.lore === v.slice(at + 1));
+      const g = v.slice(0, at);
+      if (!row || (g !== 'F' && g !== 'M' && g !== 'X')) break;
+      // 로어북 성별 줄과 같으면 따로 적지 않는다 (로어북을 고치면 따라가게)
+      if (g === loreGender(ctx.char.globalLore ?? [], row.lore) || (g === 'X' && !loreGender(ctx.char.globalLore ?? [], row.lore))) delete row.gender;
+      else row.gender = g;
       dirUi.done = '';
       break;
     }

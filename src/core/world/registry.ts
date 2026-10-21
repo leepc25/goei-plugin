@@ -1,7 +1,7 @@
 // 이름 → 정식 로어북 찾기. 원본 WG.registry / resolve / termPresent / referenceEntries와 같은 규칙.
 // 카드 명부(숨긴 항목 포함)와 World catalog 랜드마크의 표시명·영문명·로어북명·별칭을 모두 쓴다.
 import type { LoreEntry } from '../types';
-import { readDirectory } from './directory';
+import { orgLoreName, readDirectory } from './directory';
 
 export interface RegistryEntry {
   key: string;
@@ -42,7 +42,8 @@ export function buildRegistry(lore: LoreEntry[] | undefined): Registry {
   for (const [group, rows] of Object.entries(places)) {
     rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
   }
-  dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore, [b.english, b.label, ...b.aliases]));
+  // 거점 로어북이 비면 연결 조직의 로어북 (거점에서 걸든 조직에서 걸든 같은 칸 b.org)
+  dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ''), [b.english, b.label, ...b.aliases]));
   for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...a.aliases, ...a.legacyEnglish]);
   const byTerm = new Map<string, RegistryEntry[]>();
   const byLore = new Map<string, RegistryEntry[]>();

@@ -75,7 +75,9 @@ test('tag scanners read from the tail and normalise', () => {
   assert.deepEqual(scanMysticSites('[MS|부산 중구|달빛 서점|출현|프리랜서|책장이 저절로 넘어감]')[0], { region: '부산 중구', name: '달빛 서점', state: '출현', visitors: '프리랜서', situation: '책장이 저절로 넘어감' });
   assert.equal(scanMysticSites('[MS|1|부산 중구|달빛 서점|출현|없음]')[0].region, '부산 중구');
   assert.equal(scanAnomalies('[AN|서울 종로구|x|cleared|C|없음]')[0].state, '클리어');
-  assert.deepEqual(scanIncidents('[IN|서울 종로구|관리국 본부|진행|정전]')[0], { region: '서울 종로구', name: '관리국 본부', state: '진행', situation: '정전' });
+  assert.deepEqual(scanIncidents('[IN|서울 종로구|관리국 본부|진행|정전]')[0], { region: '서울 종로구', name: '관리국 본부', state: '진행', deploy: '', situation: '정전' });
+  // 배치 칸이 붙은 새 태그 (2026-10-21)
+  assert.deepEqual(scanIncidents('[IN|서울 종로구|관리국 본부|진행|P001, 교황청|정전]')[0], { region: '서울 종로구', name: '관리국 본부', state: '진행', deploy: 'P001, 교황청', situation: '정전' });
   assert.equal(scanIncidents('[IN|서울|x|이상함|y]').length, 0);
   assert.equal(scanMysticSites('[MS|부산 중구|달빛 서점|출현|없음]')[0].visitors, '없음');
   assert.deepEqual(scanAgents('[AG|P-001|injured|병원]'), [{ who: 'P-001', state: '부상', situation: '병원' }]);
@@ -176,6 +178,10 @@ test('incidents: landmark by name, random pending gets its first name, 종료 en
   assert.equal(a.inc[0].situation, '스팡달가 출동', '요원 코드는 이름으로');
   assert.equal(a.inc[1].loc, '02-6');
   assert.equal(a.inc[1].origin, 'model');
+  const d = applyOutput(a, catalog, noSpawn, 'A00', '[IN|서울 종로구|관리국 본부|진행|P001|진화 중]', always).world;
+  assert.equal(d.inc[1].deploy, 'P001', '배치 칸');
+  assert.equal(d.inc[1].situation, '진화 중');
+  assert.match(reports(d, catalog, noSpawn, 'A00').in, /\[IN\|서울특별시 종로구\|관리국 본부\|진행\|P001\|진화 중\]/);
   const b = applyOutput(a, catalog, noSpawn, 'A00', '[IN|서울 종로구|관리국 본부|종료|복구]', always).world;
   assert.equal(b.inc.length, 1);
 });

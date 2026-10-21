@@ -5,6 +5,7 @@
 // 폴더가 없는 카드는 옛 목록 그대로 쓴다.
 import { BUILTIN, extraFactions, extraNames, extraTabId, extraTabs, type FactionSpec, pickSpec } from '../factions';
 import { DIRECTORY_COMMENT, directoryEntries, isDirectory, LEGACY_DATA, parseSeedManifest } from '../lorebooks';
+import { agentShared, orgShared } from '../sharedpics';
 import type { LoreEntry } from '../types';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
@@ -54,7 +55,13 @@ export interface AgentRow {
   face?: string;
   /** 대표 사진에서 얼굴로 자를 틀 「가로,세로,크기」 (%) */
   crop?: string;
+  /** 성별 F·M, X = 일부러 미정. 비우면 로어북의 Gender 줄 (agentGender) */
+  gender?: Gender;
+  /** 사진이 없을 때 쓸 공용 그림 후보 (저장하지 않음, core/sharedpics) */
+  shared?: string[];
 }
+
+export type Gender = 'F' | 'M' | 'X';
 
 /** 지도 거점. 조직의 본거지이거나(org) 조직과 무관한 장소(org = '') */
 export interface BaseRow {
@@ -133,6 +140,7 @@ export interface AgentData {
   photo?: string;
   face?: string;
   crop?: string;
+  gender?: Gender;
 }
 export interface BaseData {
   label?: string;
@@ -404,6 +412,8 @@ export interface OrgRow {
   phoneTabs: string[];
   /** 시작 화면·세력 값 (새 세력은 code·playable, 기본 세력은 이름·설명·사진·숨김) */
   spec: FactionSpec;
+  /** 사진이 없을 때 쓸 공용 그림 후보 (저장하지 않음, core/sharedpics) */
+  shared?: string[];
 }
 
 export interface OrgData extends FactionSpec {
@@ -614,6 +624,7 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
       ...(s(d.photo) ? { photo: s(d.photo) } : {}),
       ...(s(d.face) ? { face: s(d.face) } : {}),
       ...(s(d.crop) ? { crop: s(d.crop) } : {}),
+      ...(d.gender === 'F' || d.gender === 'M' || d.gender === 'X' ? { gender: d.gender } : {}),
       rosterFor: Array.isArray(d.roster_for) ? list(d.roster_for) : base.rosterFor,
       phoneTabs: Array.isArray(d.phone_tabs) ? list(d.phone_tabs) : base.phoneTabs,
     });
@@ -667,6 +678,12 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
   };
 
   const ag = agents();
+  // 사진이 없을 때의 공용 그림 후보: 조직은 유형·이름, 요원은 소속 조직·성별 (2026-10-21)
+  for (const o of ag.orgs) o.shared = orgShared(o.name, o.spec.type, o.spec.title ?? '');
+  for (const r of ag.rows) {
+    const o = orgOf(ag.orgs, r.affiliation);
+    r.shared = agentShared(o?.name ?? r.affiliation, o?.faction ?? '', agentGender(r, books), r.lore);
+  }
   const savedRefill = data && Number.isInteger(data.refill) && (data.refill as number) >= 0 ? (data.refill as number) : null;
   const dir: Directory = {
     anomalies: places('anomaly'),
@@ -735,6 +752,7 @@ export function directoryData(dir: Directory): DirectoryData {
     if (a.photo) d.photo = a.photo;
     if (a.face) d.face = a.face;
     if (a.crop) d.crop = a.crop;
+    if (a.gender) d.gender = a.gender;
     out.요원![a.lore] = d;
   }
   return out;
@@ -824,3 +842,17 @@ export function moveAgent(d: Directory, lore: string, how: 'up' | 'down' | 'befo
   d.agents.splice(at, 0, row);
   return true;
 }
+
+/** 요원 로어북의 성별 줄 (카드 요원은 「Gender: Female」 꼴, 직접 쓴 로어북은 「성별: 여」도) */
+export function loreGender(lore: LoreEntry[], name: string): 'F' | 'M' | '' {
+  const text = lore.find((e) => s(e.comment) === name)?.content;
+  const m = typeof text === 'string' ? /(?:Gender|Sex|성별)\s*[:：]\s*\**\s*([^\s,|*]+)/i.exec(text) : null;
+  if (!m) return '';
+  const v = m[1].toLowerCase();
+  if (/^(female|woman|girl|f|여|여성|여자)/.test(v)) return 'F';
+  if (/^(male|man|boy|m|남|남성|남자)/.test(v)) return 'M';
+  return '';
+}
+
+/** 요원 성별: 명부 「성별」 칸 → 로어북 성별 줄. 모르면 '' (2026-10-21 공용 요원 그림 고르기) */
+export const agentGender = (a: AgentRow, lore: LoreEntry[]): 'F' | 'M' | '' => (a.gender === 'X' ? '' : a.gender || loreGender(lore, a.lore));

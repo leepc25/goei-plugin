@@ -17,7 +17,8 @@ import type { RefSource } from '../core/refs';
 import type { Chat } from '../core/types';
 import { lastReply } from '../core/phone';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { generate, type RetryOptions } from '../host/llm';
+import { generate, type LlmMessage, type RetryOptions } from '../host/llm';
+import type { Joint } from '../host/joint';
 import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
@@ -136,7 +137,7 @@ const viewing = () => ({ post: gnet.sub === 'board' ? gnet.open : null, nick: gn
 
 // ── 작업 ──
 
-function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false) {
+function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false, joint?: Joint) {
   return run(ctx, env, automatic ? '채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요.' : '게시판을 불러오는 중이에요.', async () => {
     const startLength = ctx.chat.message?.length ?? 0;
     const before = readGnet(ctx.chat);
@@ -144,7 +145,8 @@ function refreshBoard(ctx: ChatContext, env: GnetEnv, automatic = false) {
     const s = gnetSettings(ctx.chat.scriptstate);
     const plan = incomingPlan(ctx.chat, before, s, nick, Math.random, undefined, savedOrigin(ctx.chat));
     const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'gn'), () => refreshPrompt(source(ctx), before, plan, nick, names(ctx)));
-    const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(ctx.chat));
+    const first = joint && ((m: LlmMessage[]) => joint.ask('gnet', m));
+    const { raw, value } = await generate(prompt.messages, s.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx.chat), first });
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (automatic && (chat.message?.length ?? 0) !== startLength) {
@@ -696,7 +698,7 @@ async function currentChat(ctx: ChatContext): Promise<Chat | null> {
 }
 
 /** 채팅 응답이 끝난 뒤 (main.ts, 매 턴 = 원본 lazy 0), 또는 「창을 열 때」면 괴담넷 탭을 열 때 (gnetOpenCheck). 같은 응답에는 한 번만 */
-export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false): Promise<void> {
+export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, open = false, joint?: Joint): Promise<void> {
   const s = gnetSettings(ctx.chat.scriptstate);
   if (!s.enabled || !(open ? s.autoOpen : s.auto) || jobs.has(chatKey(ctx))) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
@@ -712,7 +714,7 @@ export async function autoRefreshGnet(ctx: ChatContext, messageIndex: number, op
   // 창이 다른 채팅을 보고 있으면 그 화면의 알림은 건드리지 않는다
   const target = showing && chatKey(showing) === chatKey(ctx) ? env : { ...quietEnv };
   const notice = gnet.notice;
-  await refreshBoard({ ...ctx, chat: saved }, target, true);
+  await refreshBoard({ ...ctx, chat: saved }, target, true, joint);
   if (target !== env) gnet.notice = notice;
 }
 

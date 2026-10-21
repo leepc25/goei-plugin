@@ -14,6 +14,8 @@ export interface WorldItem {
 export interface Landmark extends WorldItem {
   /** 지도 표시명 */
   label: string;
+  /** 연결 조직 (명부 조직 이름, 없으면 '') */
+  org: string;
   sido: string;
   gu: string;
   x: number;
@@ -88,7 +90,7 @@ function worldRows(data: Record<string, unknown>, group: string, landmark: boole
 export function landmarksOf(bases: BaseRow[]): Landmark[] {
   return bases
     .filter((b) => b.show && b.name && SIGUN[b.sido] && (!b.gu || SIGUN[b.sido].includes(b.gu)))
-    .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
+    .map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, org: b.org, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
 }
 
 export function parseCatalog(lore: LoreEntry[] | undefined): Catalog {

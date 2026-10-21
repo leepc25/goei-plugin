@@ -18,6 +18,7 @@ import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
+import { baseLink, basePic as baseArt } from './evpic';
 import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
 import { facePic, mainPic, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
@@ -97,7 +98,12 @@ const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['
 function canon(ctx: ChatContext) {
   const r = registry(ctx);
   const src = source(ctx);
-  return (t: string) => canonicalTitle(r, src, t).title;
+  return (t: string) => ownDoc(ctx, t) ?? canonicalTitle(r, src, t).title;
+}
+/** 그 제목 그대로 된 문서가 있으면 별칭보다 먼저 (거점 「백일몽 본사」는 조직 「백일몽」과 다른 문서, 2026-10-21 사용자) */
+function ownDoc(ctx: ChatContext, t: string): string | null {
+  const title = t.trim();
+  return title && findDoc(ctx.chat, title, ctx.char.globalLore) ? title : null;
 }
 
 function go(view: WikiView, title = '', query = wiki.query) {
@@ -140,7 +146,8 @@ function search(ctx: ChatContext, q: string) {
   const query = q.trim();
   wiki.query = query;
   if (!query) return;
-  const c = canonicalTitle(registry(ctx), source(ctx), query);
+  const own = ownDoc(ctx, query);
+  const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
   // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)
@@ -228,9 +235,10 @@ interface Entry {
 const CAT_LABEL: Record<Cat, string> = { an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
 const CAT_ICON: Record<Cat, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
 
-let entryCache: { lore: unknown; stamp: number; list: Entry[] } | null = null;
+let entryCache: { lore: unknown; stamp: number; viewer: string; list: Entry[] } | null = null;
 function entries(ctx: ChatContext): Entry[] {
-  if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
+  const viewer = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
+  if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp() && entryCache.viewer === viewer) return entryCache.list;
   const c = canon(ctx);
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
@@ -241,7 +249,8 @@ function entries(ctx: ChatContext): Entry[] {
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
-      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: '', face: '', terms: [l.name, l.english, ...l.aliases] });
+      const link = baseLink(ctx, l.name);
+      list.push({ cat: 'lm', name: l.name, title: c(link.doc), sub: [link.org, placeWhere(l.sido, l.gu)].filter(Boolean).join(' · '), photo: baseArt(ctx, l.name), face: baseArt(ctx, l.name), terms: [l.name, l.english, ...l.aliases] });
     }
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */
@@ -257,20 +266,25 @@ function entries(ctx: ChatContext): Entry[] {
     const doc = orgLoreName(lore, o.name);
     if (!f && !hasLore.has(doc)) continue; // 요원 소속에만 있는 이름(미분류 등)
     const name = f?.name ?? o.name;
-    list.push({ cat: 'org', name, title: c(doc), sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, o.spec), face: facePic(ctx.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ''] });
+    // 문서 제목: 로어북 이름(이슬람 서울중앙성원)과 기본 문서 제목(이슬람)이 다를 수 있어 문서가 있는 쪽 (2026-10-21)
+    const title = [c(doc), c(o.name), c(name)].find((t) => findDoc(ctx.chat, t, lore)) ?? c(doc);
+    list.push({ cat: 'org', name, title, sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, { ...o.spec, shared: o.shared }), face: facePic(ctx.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc, o.spec.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();
   const out = list.filter((e) => (seen.has(`${e.cat}|${e.title}`) ? false : (seen.add(`${e.cat}|${e.title}`), true)));
-  entryCache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), list: out };
+  entryCache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out };
   return out;
 }
 
 // 같은 문서로 이어지는 항목이 여럿이면 (예: 거점 「관리국 본부」와 조직 「관리국」) 이름이 제목과 같은 쪽
+// 거점은 조직 문서를 같이 가리킬 뿐이라 (서울중앙성원 → 이슬람) 다른 항목이 있으면 그쪽 이름으로 보인다
 const entryFor = (ctx: ChatContext, title: string) => {
   const all = entries(ctx).filter((e) => e.title === title);
-  return all.find((e) => e.name === title) ?? all[0];
+  return all.find((e) => e.name === title) ?? all.find((e) => e.cat !== 'lm') ?? all[0];
 };
+/** 목록에 보이는 이름 (가나다 묶음·정렬도 이 이름으로: 문서 「협회」는 「특수재난대응협회」로 ㅌ에) */
+const shownName = (ctx: ChatContext, title: string) => entryFor(ctx, title)?.name ?? title;
 
 function matches(ctx: ChatContext, q: string): Entry[] {
   const lower = q.toLowerCase();
@@ -357,8 +371,9 @@ export function keyOf(title: string): string {
 
 function sortedDocs(ctx: ChatContext) {
   return listDocs(ctx.chat, ctx.char.globalLore)
-    .map((d) => ({ d, k: KEYS.indexOf(keyOf(d.title)) }))
-    .sort((x, y) => x.k - y.k || x.d.title.localeCompare(y.d.title, 'ko'))
+    .map((d) => ({ d, n: shownName(ctx, d.title) }))
+    .map((x) => ({ ...x, k: KEYS.indexOf(keyOf(x.n)) }))
+    .sort((x, y) => x.k - y.k || x.n.localeCompare(y.n, 'ko'))
     .map((x) => x.d);
 }
 
@@ -416,9 +431,10 @@ export function wikiList(ctx: ChatContext, query = wiki.query): string {
   const chips = `<div class="ph-tabs nw-tabs" role="tablist">${tabs
     .map(([t, label]) => `<button class="ph-tab${t === tab ? ' on' : ''}" data-action="wiki-tab" data-value="${t}" aria-selected="${t === tab}">${label}<small>${count(t)}</small></button>`)
     .join('')}</div>`;
-  const keys = KEYS.filter((k) => shown.some((d) => keyOf(d.title) === k));
+  const keyOfDoc = (d: (typeof docs)[number]) => keyOf(shownName(ctx, d.title));
+  const keys = KEYS.filter((k) => shown.some((d) => keyOfDoc(d) === k));
   const groups = keys.map((k) => {
-    const rows = shown.filter((d) => keyOf(d.title) === k);
+    const rows = shown.filter((d) => keyOfDoc(d) === k);
     const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
     return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab !== 'story')).join('')}</ul>`;
   }).join('');
@@ -644,7 +660,7 @@ export function wikiTab(ctx: ChatContext): string {
         ${fail}
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
+    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
     ${drawerHtml([
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
@@ -778,7 +794,19 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
     const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
     t0 = null;
-    if (dx < -36 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
+    // PC는 왼쪽에서, 모바일은 오른쪽에서 열리므로 접는 방향도 반대
+    const out = wide() ? dx < -36 : dx > 36;
+    if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
+  }, { passive: true });
+  // 모바일 책갈피를 왼쪽으로 끌어도 열린다
+  const edge = root.querySelector<HTMLElement>('.nw-edge');
+  let e0: number | null = null;
+  edge?.addEventListener('touchstart', (e) => (e0 = e.touches[0]?.clientX ?? null), { passive: true });
+  edge?.addEventListener('touchend', (e) => {
+    if (e0 === null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
+    e0 = null;
+    if (dx < -24 && !wiki.listOpen) act('open');
   }, { passive: true });
 }
 

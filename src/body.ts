@@ -18,6 +18,7 @@ import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
 import { autoRefresh } from './ui/phone';
 import { autoRefreshGnet } from './ui/gnet';
+import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
 import { SEED_OPEN } from './core/seed';
 import { readManifest } from './core/start';
@@ -229,7 +230,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
     await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
-    // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 모델을 겹쳐 부르지 않게 차례로)
+    // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
     const gnetAuto = gnetSettings(now.scriptstate).auto;
     if (phoneAuto || gnetAuto) {
@@ -241,16 +242,20 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       void (async () => {
         applyAdvanced(now!.scriptstate);
         await readPersona();
-        if (phoneAuto) {
-          await autoRefresh(await fresh(), arg.messageIndex).catch((error) =>
-            console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`),
-          );
+        const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+        const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+        // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
+        const model = phoneSettings(now!.scriptstate).model;
+        if (phoneAuto && gnetAuto && gnetSettings(now!.scriptstate).model === model) {
+          const joint = new Joint(model);
+          await Promise.all([
+            autoRefresh(await fresh(), arg.messageIndex, undefined, joint).catch(phoneFail).finally(() => joint.done('phone')),
+            autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
+          ]);
+          return;
         }
-        if (gnetAuto) {
-          await autoRefreshGnet(await fresh(), arg.messageIndex).catch((error) =>
-            console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`),
-          );
-        }
+        if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
+        if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
       })();
     }
   } catch (error) {

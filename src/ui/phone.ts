@@ -23,6 +23,7 @@ import { tokens } from '../core/gnet';
 import type { Chat } from '../core/types';
 import { factionNames, parseCatalog } from '../core/world/catalog';
 import { generate as askModel } from '../host/llm';
+import type { Joint } from '../host/joint';
 import { advNum, budgetFor, genSettings } from '../core/advanced';
 import { advancedBox } from './advanced';
 import { fitPrompt } from '../core/budget';
@@ -339,7 +340,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
 }
 
 /** 전체 새 메시지 확인 (원본 refreshInbox). automatic: 채팅 응답 뒤 자동 확인 */
-export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false) {
+export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false, joint?: Joint) {
   const e = envOr(env);
   return run(ctx, e, automatic ? '새 메시지를 자동으로 확인하는 중이에요.' : '새 메시지를 확인하는 중이에요.', async () => {
     const startLength = ctx.chat.message?.length ?? 0;
@@ -362,6 +363,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
       ...genSettings(ctx.chat.scriptstate),
       state: ctx.chat.scriptstate,
       fix: (_raw, reason) => refreshRetry(prompt, reason),
+      first: joint && ((m) => joint.ask('phone', m)),
     });
     let note = '';
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
@@ -413,7 +415,7 @@ export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false
 }
 
 /** 채팅 응답이 끝난 뒤 (main.ts onOutput), 또는 「창을 열 때」면 괴담톡 탭을 열 때 (openCheck). 같은 응답에는 한 번만 */
-export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: PhoneEnv): Promise<void> {
+export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: PhoneEnv, joint?: Joint): Promise<void> {
   const set = phoneSettings(ctx.chat.scriptstate);
   if (!(env ? set.autoOpen : set.auto) || phoneBusy(ctx)) return;
   const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
@@ -429,7 +431,7 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: 
   } catch {
     return; // 괴담톡 로어북이 없는 카드
   }
-  await refreshInbox({ ...ctx, chat: saved }, env, true);
+  await refreshInbox({ ...ctx, chat: saved }, env, true, joint);
 }
 
 /** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답을 아직 확인하지 않았으면 한 번 확인 */

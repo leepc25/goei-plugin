@@ -87,6 +87,8 @@ export interface RetryOptions {
   fix?: (raw: string, reason: string) => LlmMessage[];
   /** 응답을 검사하기 전에 이 채팅의 고급 설정(길이 제한 등)으로 다시 맞춘다. 기다리는 동안 창이 다른 채팅을 열었을 수 있다 */
   state?: Record<string, unknown>;
+  /** 첫 요청을 대신 보낼 곳 (괴담넷·괴담톡 자동 확인 한 번에 묶기, host/joint.ts). 다시 묻기는 따로 보낸다 */
+  first?: (messages: LlmMessage[]) => Promise<string>;
 }
 
 /** 원본과 같이 응답 형식이 틀렸을 때만 다시 묻는다. 모델 연결 실패(LlmError)는 다시 불러도 대개 같다 */
@@ -119,7 +121,7 @@ export async function generate<T>(messages: LlmMessage[], model: ModelChoice, pa
   for (let attempt = 0; ; attempt++) {
     let raw = '';
     try {
-      raw = await runModel(ask, use);
+      raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
       if (o.state) applyAdvanced(o.state);
       return { raw, value: parse(raw) };
     } catch (error) {
