@@ -11605,8 +11605,8 @@ function ruleText(id, epochIndex) {
 var CHUNK_W = 640;
 var ROOM_W = 1280;
 var LANE_DEPTH = 160;
-var Y_TOP = 500;
-var Y_BOTTOM = 680;
+var Y_TOP = 440;
+var Y_BOTTOM = 690;
 var laneY = (lane) => Y_TOP + lane / LANE_DEPTH * (Y_BOTTOM - Y_TOP);
 var DEEP_TYPES = ["chase", "replica", "trial", "dark", "silent", "puzzle"];
 
@@ -12462,7 +12462,7 @@ function cellPlan(z, cell, id, startX) {
     type: "service",
     depth: z.depth,
     length: cell.width,
-    lane: [560, 660],
+    lane: [Y_TOP, Y_BOTTOM],
     startX,
     exitX: Infinity,
     encounters: [],
@@ -12477,13 +12477,13 @@ function cellPlan(z, cell, id, startX) {
 }
 function carPlan(id, buttons, depth) {
   const props2 = [
-    { id: "getoff", kind: "getoff", x: 90, y: 500, w: 60, h: 160, label: "내렸다 다시 타기" },
-    { id: "greet", kind: "greet", x: 260, y: 500, w: 60, h: 110, label: "인사하기 (E)" },
-    { id: "mirror", kind: "mirror", x: 420, y: 500, w: 70, h: 150, label: "거울" },
-    { id: "close", kind: "close", x: 600, y: 500, w: 40, h: 60, label: "닫힘 버튼" }
+    { id: "getoff", kind: "getoff", x: 90, y: Y_TOP, w: 60, h: 160, label: "내렸다 다시 타기" },
+    { id: "greet", kind: "greet", x: 260, y: Y_TOP, w: 60, h: 110, label: "인사하기 (E)" },
+    { id: "mirror", kind: "mirror", x: 420, y: Y_TOP, w: 70, h: 150, label: "거울" },
+    { id: "close", kind: "close", x: 600, y: Y_TOP, w: 40, h: 60, label: "닫힘 버튼" }
   ];
   buttons.forEach(
-    (b, i) => props2.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: 500, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
+    (b, i) => props2.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: Y_TOP, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
   );
   const pal = { wall: "#5d5146", floor: "#3a332c", trim: "#221d18", accent: "#ffcf70", fog: "rgba(0,0,0,0)" };
   const segs = [{ ref: "room:car", x: 0, w: ROOM_W, flip: false, terrain: [] }];
@@ -12493,7 +12493,7 @@ function carPlan(id, buttons, depth) {
     type: "car",
     depth,
     length: ROOM_W,
-    lane: [540, 660],
+    lane: [Y_TOP, Y_BOTTOM],
     startX: 160,
     exitX: Infinity,
     encounters: [],
@@ -12518,7 +12518,7 @@ function endingPlan(id) {
     startX: 200,
     exitX: Infinity,
     encounters: [],
-    props: [{ id: "van", kind: "van", x: 1e3, y: 500, w: 220, h: 140, label: "관리국 차량 (귀환)" }],
+    props: [{ id: "van", kind: "van", x: 1e3, y: Y_TOP, w: 220, h: 140, label: "관리국 차량 (귀환)" }],
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: "문을 열고 나왔다. 로비였다. 진짜.",
     stage: { where: "ending", terrain: [], fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
@@ -12532,45 +12532,59 @@ function propH(kind) {
 function segAt(segs, x) {
   return segs.find((s2) => x >= s2.x && x < s2.x + s2.w) ?? segs[segs.length - 1];
 }
-var WALL_TOP = 150;
+var CEIL = 40;
 function drawBack(ctx, camX, segs, pal, plan) {
   const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
   const vx0 = camX - 40, vx1 = camX + 1320;
+  const cx = camX + 640;
   for (const s2 of segs) {
     if (s2.x + s2.w < vx0 || s2.x > vx1) continue;
     const room = s2.ref.startsWith("room:");
     const place3 = placeFor(plan.stage.where, plan.stage.floor?.type, s2.ref);
-    const art = drawWallCell(ctx, place3, s2.ref, s2.x, s2.w, s2.flip, y0);
-    if (art) {
-      if (!drawFloor(ctx, place3, s2.x, s2.x + s2.w, y0, y1 + 30)) {
+    if (drawWallCell(ctx, place3, s2.ref, s2.x, s2.w, s2.flip, y0)) {
+      if (!drawFloor(ctx, place3, s2.x, s2.x + s2.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
-        ctx.fillRect(s2.x, y0, s2.w, y1 - y0 + 30);
+        ctx.fillRect(s2.x, y0, s2.w, 720 - y0);
       }
-      for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1);
       continue;
     }
     ctx.fillStyle = pal.wall;
-    ctx.fillRect(s2.x, WALL_TOP, s2.w, y0 - WALL_TOP);
+    ctx.fillRect(s2.x, CEIL, s2.w, y0 - CEIL);
     ctx.fillStyle = pal.trim;
-    ctx.fillRect(s2.x, WALL_TOP, 3, y0 - WALL_TOP);
-    ctx.fillRect(s2.x, y0 - 14, s2.w, 14);
-    ctx.fillRect(s2.x, WALL_TOP - 20, s2.w, 20);
+    ctx.fillRect(s2.x, 0, s2.w, CEIL);
+    ctx.fillRect(s2.x, y0 - 18, s2.w, 18);
+    ctx.fillRect(s2.x, CEIL, 3, y0 - CEIL);
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(s2.x, CEIL + 40, s2.w, 8);
     ctx.fillStyle = pal.floor;
-    ctx.fillRect(s2.x, y0, s2.w, y1 - y0 + 30);
-    ctx.strokeStyle = "rgba(0,0,0,0.25)";
-    ctx.lineWidth = 1;
-    for (let k = 1; k < 3; k++) {
-      const yy = y0 + (y1 - y0) * k / 3;
+    ctx.fillRect(s2.x, y0, s2.w, 720 - y0);
+    ctx.strokeStyle = "rgba(0,0,0,0.28)";
+    ctx.lineWidth = 2;
+    for (const f of [0.12, 0.28, 0.48, 0.72]) {
+      const yy = y0 + (y1 - y0) * f;
       ctx.beginPath();
       ctx.moveTo(s2.x, yy);
       ctx.lineTo(s2.x + s2.w, yy);
       ctx.stroke();
     }
-    ctx.fillStyle = room ? pal.accent : "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(0,0,0,0.2)";
+    for (let x = Math.ceil(s2.x / 120) * 120; x < s2.x + s2.w; x += 120) {
+      ctx.beginPath();
+      ctx.moveTo(cx + (x - cx) * 0.78, y0);
+      ctx.lineTo(cx + (x - cx) * 1.12, 720);
+      ctx.stroke();
+    }
+    const g2 = ctx.createLinearGradient(0, y0, 0, y0 + 40);
+    g2.addColorStop(0, "rgba(0,0,0,0.35)");
+    g2.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g2;
+    ctx.fillRect(s2.x, y0, s2.w, 40);
+    ctx.fillStyle = room ? pal.accent : "rgba(255,255,255,0.3)";
     ctx.font = "14px monospace";
-    ctx.fillText(room ? roomName(s2.ref) : `${s2.ref.slice(6)}${s2.flip ? " ⇄" : ""}`, s2.x + 10, WALL_TOP + 18);
-    for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1);
+    ctx.fillText(room ? roomName(s2.ref) : `${s2.ref.slice(6)}${s2.flip ? " ⇄" : ""}`, s2.x + 10, CEIL + 24);
   }
+  for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1);
   void CHUNK_W;
 }
 function roomName(ref) {
@@ -12581,27 +12595,31 @@ function drawTerrain(ctx, t, pal, y0, y1) {
   switch (t.kind) {
     case "pit": {
       ctx.fillStyle = "#000";
-      ctx.fillRect(t.x0, y0 - 2, w, y1 - y0 + 34);
+      ctx.fillRect(t.x0, y0 - 2, w, 720 - y0 + 2);
       ctx.strokeStyle = "#ff5050";
       ctx.setLineDash([6, 6]);
-      ctx.strokeRect(t.x0, y0, w, y1 - y0 + 30);
+      ctx.strokeRect(t.x0, y0, w, 720 - y0);
       ctx.setLineDash([]);
-      label2(ctx, "구덩이 (점프)", t.x0 + 4, y1 + 20, "#ff8080");
+      label2(ctx, "구덩이 (점프)", t.x0 + 4, y0 + 20, "#ff8080");
       break;
     }
     case "block":
       ctx.fillStyle = pal.trim;
       ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0 + t.h);
       ctx.fillStyle = "rgba(255,255,255,0.12)";
-      ctx.fillRect(t.x0, y0 - t.h, w, 6);
+      ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0);
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fillRect(t.x0, y1 - t.h, w, t.h);
       label2(ctx, `단 ${t.h} (점프)`, t.x0 + 4, y0 - t.h - 6, "#ddd");
       break;
     case "low":
-      ctx.fillStyle = "#5b5b5b";
-      ctx.fillRect(t.x0, y0 - 160, w, 40);
+      ctx.fillStyle = "rgba(90,90,90,0.85)";
+      ctx.fillRect(t.x0, y0 - 230, w, 46);
       ctx.fillStyle = "rgba(0,0,0,0.3)";
-      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 160, 4, 40);
-      label2(ctx, "낮은 천장 (↓ 앉아서)", t.x0 + 4, y0 - 166, "#ffd27a");
+      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 230, 4, 46);
+      ctx.fillStyle = "rgba(255,210,120,0.08)";
+      ctx.fillRect(t.x0, y0, w, y1 - y0);
+      label2(ctx, "낮은 천장 (앉아서)", t.x0 + 4, y0 - 236, "#ffd27a");
       break;
     case "narrow": {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
@@ -12624,7 +12642,7 @@ function drawTerrain(ctx, t, pal, y0, y1) {
         ctx.lineTo(x + 12, y0 + x * 13 % (y1 - y0));
         ctx.stroke();
       }
-      label2(ctx, "깨진 유리 (소리)", t.x0 + 4, y1 + 20, "#bfe8ff");
+      label2(ctx, "깨진 유리 (소리)", t.x0 + 4, y0 + 20, "#bfe8ff");
       break;
   }
 }
@@ -12799,6 +12817,11 @@ function createElevatorStage(store, hooks = {}) {
     hurtCd: 0,
     red: false
   });
+  let later = [];
+  const defer = (run) => (res) => {
+    const plan = rt?.plan.id;
+    if (plan) later.push({ plan, run: (api) => run(api, res) });
+  };
   const placedOf = (prop) => prop.id.startsWith("p") ? rt?.plan.stage.floor?.placed.find((p) => `p${p.id}` === prop.id) : void 0;
   const hookOf = (id) => id.startsWith("h") ? rt?.plan.stage.floor?.spawns.find((s2) => `h${s2.id}` === id) : void 0;
   const foundRule = (api, id, x) => {
@@ -13185,6 +13208,11 @@ ${RULE[id].variant.text}` : ""}`, 4);
       const r = rt;
       const p = api.world.player;
       if (r.t === 0) onEnter(api);
+      if (later.length) {
+        const now = later.filter((l) => l.plan === r.plan.id);
+        later = [];
+        for (const l of now) l.run(api);
+      }
       r.t += DT;
       r.hurtCd -= DT;
       const where = r.plan.stage.where;
@@ -13264,7 +13292,10 @@ ${RULE[id].variant.text}` : ""}`, 4);
         case "mirror": {
           const tired = rng(mix(o.seed, o.ride, o.depth, 55))() < 0.35;
           foundRule(api, "mirror", p.x);
-          if (r.plan.stage.where === "car") {
+          const inCar = r.plan.stage.where === "car";
+          if (inCar) o.tired = tired;
+          if (hooks.mirror?.({ tired, inCar, agent: o.agent }, defer((api2, res) => res.off && inCar && finishWith(api2, { to: "car" })))) break;
+          if (inCar) {
             if (tired) o.tired = true, api.world.say("거울 속 얼굴이 피곤해 보인다. (내려서 다시 타면 바뀐다. 그대로 가면 다음 층 위협 +30%)", 4);
             else o.tired = false, api.world.say("거울 속 얼굴은 괜찮아 보인다.", 2);
           } else api.world.say(tired ? "거울 속 얼굴이 피곤해 보인다." : "거울 속 얼굴. 나다. 아마도.", 2.5);
@@ -13475,37 +13506,17 @@ ${RULE[id].variant.text}` : ""}`, 4);
           api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
           break;
         case "merchant":
-          api.world.say("중림 상인: 「현금 있어? 물건은 많아.」 (상점은 아이템 작업에서)", 3);
           break;
+        // 상점 창은 아이템 모듈이 엔진 interactHooks에서 연다
         // ── 승강기 안
-        case "greet": {
-          if (o.greeted) {
-            api.world.say(greetLine(meta.favor, false, false), 2);
-            break;
-          }
-          o.greeted = true;
-          foundRule(api, "greet", p.x);
-          if (o.flags.includes("greet_flip")) {
-            addFavor(meta, o, -1, "말 걸지 말라는 날 인사함");
-            api.world.say(greetLine(meta.favor, false, true), 2.5);
-          } else {
-            const gain = rng(mix(o.seed, o.ride, 31))() < 0.5 ? 1 : 0;
-            if (gain) addFavor(meta, o, 1, "인사");
-            api.world.say(greetLine(meta.favor, !!gain, false), 2.5);
-            if (meta.favor >= 3 && !meta.lonelyHeard) meta.lonelyHeard = true, api.world.say(LONELY_LINE, 5);
-          }
-          save2();
+        case "greet":
+          if (o.greeted) api.world.say(greetLine(meta.favor, false, false), 2);
+          else doGreet(api, true);
           break;
-        }
         case "close":
           o.closeCount++;
-          if (o.closeCount >= 3 || o.flags.includes("close_any") && o.closeCount === 1) {
-            addFavor(meta, o, -1, "닫힘 연타");
-            foundRule(api, "close", p.x);
-            api.world.say(CLOSE_SPAM_LINE, 2.5);
-            o.closeCount = -99;
-            save2();
-          } else api.world.say("딸깍.", 0.8);
+          if (o.closeCount >= 3 || o.flags.includes("close_any") && o.closeCount === 1) doSpam(api, true);
+          else api.world.say("딸깍.", 0.8);
           break;
         case "getoff":
           finishWith(api, { to: "car" });
@@ -13537,6 +13548,29 @@ ${RULE[id].variant.text}` : ""}`, 4);
       }
     }
   };
+  const doGreet = (api, talk, given) => {
+    const o = out;
+    o.greeted = true;
+    foundRule(api, "greet", api.world.player.x);
+    if (o.flags.includes("greet_flip")) {
+      addFavor(meta, o, -1, "말 걸지 말라는 날 인사함");
+      if (talk) api.world.say(greetLine(meta.favor, false, true), 2.5);
+    } else {
+      const gain = given !== void 0 ? Math.max(0, Math.min(1, given - meta.favor)) : rng(mix(o.seed, o.ride, 31))() < 0.5 ? 1 : 0;
+      if (gain) addFavor(meta, o, 1, "인사");
+      if (talk) api.world.say(greetLine(meta.favor, !!gain, false), 2.5);
+      if (talk && meta.favor >= 3 && !meta.lonelyHeard) meta.lonelyHeard = true, api.world.say(LONELY_LINE, 5);
+    }
+    save2();
+  };
+  const doSpam = (api, talk) => {
+    const o = out;
+    addFavor(meta, o, -1, "닫힘 연타");
+    foundRule(api, "close", api.world.player.x);
+    if (talk) api.world.say(CLOSE_SPAM_LINE, 2.5);
+    o.closeCount = -99;
+    save2();
+  };
   const onEnter = (api) => {
     const r = rt;
     const o = out;
@@ -13548,9 +13582,25 @@ ${RULE[id].variant.text}` : ""}`, 4);
     if (plan.stage.where === "floor") {
       const f = plan.stage.floor;
       api.world.emit({ type: "ding", x: plan.startX });
-      api.world.say(o.depth === 1 && o.visited.length === 1 ? "띵. 1층입니다. 문이 열립니다. …로비 같은데, 로비가 아니다." : announce(f.depth, f.type), 4);
+      const first = o.depth === 1 && o.visited.length === 1;
+      const told = hooks.announce?.({ depth: f.depth, type: f.type, label: FLOOR_TYPES[f.type].label, hint: FLOOR_TYPES[f.type].hint, first, agent: o.agent });
+      if (!told) api.world.say(first ? "띵. 1층입니다. 문이 열립니다. …로비 같은데, 로비가 아니다." : announce(f.depth, f.type), 4);
       if (f.goal && !o.flags.includes("trial_mid")) api.world.say(`벽에 큰 글씨: 「${f.goal.text}」 (E로 읽기)`, 4);
     } else if (plan.stage.where === "car") {
+      const info = { depth: o.depth, ftype: o.lastTypes.at(-1) ?? "", favor: meta.favor, agent: o.agent, ride: o.ride, stuck: Math.max(0, o.stuck), greetFlip: o.flags.includes("greet_flip"), closeAny: o.flags.includes("close_any") };
+      const byStory = hooks.board?.(
+        info,
+        defer((api2, res) => {
+          if (res.act === "greet" && !out.greeted) doGreet(api2, false, res.favor);
+          else if (res.act === "spam" && out.closeCount >= 0) doSpam(api2, false);
+        })
+      );
+      if (byStory) {
+        api.setProp("greet", null);
+        api.setProp("close", null);
+        if (o.stuck > 0) log("총애가 낮아 문이 안 닫힌다 (10초)");
+        return;
+      }
       const lines2 = hooks.elevator;
       const n = o.ride;
       const call = rng(mix(o.seed, n, 7))() < 0.4 ? lines2?.callout?.(o.agent, meta.favor, n) ?? defaultCallout(o.agent, meta.favor) : MUTTER[n % MUTTER.length];
@@ -13568,6 +13618,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
     if (!h) return;
     const kind = h.kind;
     const fork = !!h.data.fork;
+    if (!r.talked.has(prop.id)) {
+      const info = { kind, honest: !!h.data.honest, long: !!h.data.long, fork, knowsRule: currentKnown(meta).includes("passenger"), agent: o.agent, depth: o.depth };
+      if (hooks.meetPassenger?.(info, defer((api2, res) => applyPassenger(api2, prop, h, res.choice)))) {
+        r.talked.add(prop.id);
+        return;
+      }
+    }
     const lines2 = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
     api.world.say(`${PASSENGER_LABEL[kind]}: ${lines2.join(" ")}`, 5);
     if (r.talked.has(prop.id)) return;
@@ -13590,33 +13647,40 @@ ${RULE[id].variant.text}` : ""}`, 4);
     const p = api.world.player;
     if (ch.choice === "deal") {
       clearChoices(api, "deal:");
-      const cost = o.items.find((i) => i === "gear" || i === "checklist") ?? o.items[0];
-      if (!cost) return api.world.say("인터폰: 「줄 게 없으면 거래도 없어요.」", 2.5);
-      o.items.splice(o.items.indexOf(cost), 1);
-      o.deals++;
-      const truth = dealTruth(meta.favor, rng(mix(o.seed, o.deals, meta.favor, 11))());
-      log(`승강기와 거래: ${ch.deal} (${itemName2(cost)} 줌) · ${truth ? "참" : "거짓"}`);
-      if (ch.deal === "reveal") {
-        o.reveal = true;
-        const ty = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, truth ? 3 : 4);
-        api.world.say(`인터폰: 「다음은 ${FLOOR_TYPES[ty].label}예요.」${truth ? "" : " (…정말일까)"}`, 3.5);
-      } else if (ch.deal === "skip") {
-        const d2 = o.serviceDepth + (truth ? 3 : 1);
-        api.world.say(`인터폰: 「아래로 모셔다 드릴게요.」`, 2.5);
-        finishWith(api, { to: "floor", depth: d2, type: pickType(d2, o.lastTypes, o.seed, meta.epoch, 77), sub: null });
-      } else {
-        api.world.say(truth ? "인터폰: 「매트 밑을 봐요.」 (회복약 2개)" : "인터폰: 「매트 밑을 봐요.」 …아무것도 없다.", 3);
-        if (truth) o.items.push("heal", "heal"), api.heal(30);
-      }
-      save2();
-      return;
+      return applyDeal(api, ch.deal);
     }
-    const h = ch.hook;
+    clearChoices(api, `h${ch.hook.id}:`);
+    applyPassenger(api, prop, ch.hook, ch.choice);
+  };
+  const applyDeal = (api, deal) => {
+    const o = out;
+    const cost = o.items.find((i) => i === "gear" || i === "checklist") ?? o.items[0];
+    if (!cost) return api.world.say("인터폰: 「줄 게 없으면 거래도 없어요.」", 2.5);
+    o.items.splice(o.items.indexOf(cost), 1);
+    o.deals++;
+    const truth = dealTruth(meta.favor, rng(mix(o.seed, o.deals, meta.favor, 11))());
+    log(`승강기와 거래: ${deal} (${itemName2(cost)} 줌) · ${truth ? "참" : "거짓"}`);
+    if (deal === "reveal") {
+      o.reveal = true;
+      const ty = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, truth ? 3 : 4);
+      api.world.say(`인터폰: 「다음은 ${FLOOR_TYPES[ty].label}예요.」${truth ? "" : " (…정말일까)"}`, 3.5);
+    } else if (deal === "skip") {
+      const d2 = o.serviceDepth + (truth ? 3 : 1);
+      api.world.say(`인터폰: 「아래로 모셔다 드릴게요.」`, 2.5);
+      finishWith(api, { to: "floor", depth: d2, type: pickType(d2, o.lastTypes, o.seed, meta.epoch, 77), sub: null });
+    } else {
+      api.world.say(truth ? "인터폰: 「매트 밑을 봐요.」 (회복약 2개)" : "인터폰: 「매트 밑을 봐요.」 …아무것도 없다.", 3);
+      if (truth) o.items.push("heal", "heal"), api.heal(30);
+    }
+    save2();
+  };
+  const applyPassenger = (api, prop, h, c) => {
+    const o = out;
+    const p = api.world.player;
     const kind = h.kind;
-    clearChoices(api, `h${h.id}:`);
     const honest = !!h.data.honest;
-    const c = ch.choice;
-    log(`승객 조우: ${PASSENGER_LABEL[kind]} · ${c === "help" ? "돕기" : c === "ignore" ? "무시" : "뺏기"} · ${honest ? "진실" : "거짓"}`);
+    log(`승객 조우: ${PASSENGER_LABEL[kind]} · ${{ help: "돕기", ignore: "무시", rob: "뺏기", follow: "따라가기" }[c]} · ${honest ? "진실" : "거짓"}`);
+    if (c === "follow" && kind !== "three_years") c = "ignore";
     if (c === "ignore") return void api.world.say("지나쳤다.", 1.5);
     if (c === "rob") {
       api.setProp(`h${h.id}`, null);
@@ -13664,6 +13728,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
   const offerDeal = (api, prop) => {
     const r = rt;
     const hookStub = { id: 0, role: "passenger", kind: "deal", x: 0, lane: 0, wave: 0, elite: false, data: {} };
+    if (hooks.deal?.({ favor: meta.favor, items: [...out.items] }, defer((api2, res) => res.deal && applyDeal(api2, res.deal)))) return;
     api.world.say(`인터폰: 「거래할래요? 회수물 하나면 돼요.」 (가진 것: ${out.items.map(itemName2).join(", ") || "없음"})`, 4);
     [
       ["reveal", "다음 층 유형"],
@@ -18125,7 +18190,7 @@ function linkItems(w, run) {
 
 // src/game/action/engine/hub.ts
 var LANE = [440, 690];
-var WALL_TOP2 = 70;
+var WALL_TOP = 70;
 function makeHub(places, openPlace) {
   let cur = [];
   const floor = () => {
@@ -18152,18 +18217,18 @@ function makeHub(places, openPlace) {
         for (const p of cur) {
           if (p.x + p.w < camX - 40 || p.x > camX + 1320) continue;
           c.fillStyle = p.color ?? "#2b343a";
-          c.fillRect(p.x, WALL_TOP2, p.w, top - WALL_TOP2);
+          c.fillRect(p.x, WALL_TOP, p.w, top - WALL_TOP);
           c.fillStyle = "rgba(0,0,0,0.25)";
-          c.fillRect(p.x + p.w - 6, WALL_TOP2, 26, top - WALL_TOP2);
+          c.fillRect(p.x + p.w - 6, WALL_TOP, 26, top - WALL_TOP);
           c.fillStyle = "rgba(0,0,0,0.45)";
-          c.fillRect(p.x + 16, WALL_TOP2 + 16, p.w - 32, 44);
+          c.fillRect(p.x + 16, WALL_TOP + 16, p.w - 32, 44);
           c.fillStyle = p.open ? "#ece6d4" : "#6d767b";
           c.font = "bold 22px sans-serif";
           c.textAlign = "center";
-          c.fillText(p.name, p.x + p.w / 2, WALL_TOP2 + 46);
+          c.fillText(p.name, p.x + p.w / 2, WALL_TOP + 46);
           c.font = "15px sans-serif";
           c.fillStyle = "#9aa6ad";
-          if (p.floor) c.fillText(p.floor, p.x + p.w / 2, WALL_TOP2 + 80);
+          if (p.floor) c.fillText(p.floor, p.x + p.w / 2, WALL_TOP + 80);
           const dw = Math.min(140, p.w * 0.5);
           const dx = p.x + p.w / 2 - dw / 2;
           c.fillStyle = p.open ? "rgba(20,26,30,0.85)" : "rgba(10,12,14,0.9)";
