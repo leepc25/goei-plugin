@@ -652,10 +652,9 @@ async function handle(action: string, value?: string): Promise<void> {
       resetSettings();
       return render();
     case 'ops-sel':
-      // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 모바일은 큰 보기로 올라간다
+      // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
       opsUi.sel = value ?? '';
       field.confirmEnd = null;
-      if (opsUi.mode === 'map' && value) opsUi.mode = 'feed';
       render();
       if (matchMedia('(max-width: 760px)').matches) root?.querySelector('.gx-opview')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
       return;

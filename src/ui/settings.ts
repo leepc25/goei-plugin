@@ -165,8 +165,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       .map(([k, label, icon]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon}${label} 설정</button>`)
       .join('')}</div>`) : ''}
     ${group('화면', [
-      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(테마 따름일 때) 배색이에요.'),
-      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마 따름'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
+      field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), '채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요.'),
+      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요.'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.'),

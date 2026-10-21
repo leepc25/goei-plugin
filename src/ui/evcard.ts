@@ -118,7 +118,7 @@ function artCard(c: EvCard): string {
   const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
+      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
     </div></li>`;
 }
 
@@ -135,14 +135,17 @@ export function evPopup(): string {
   const name = esc(c.name);
   // 버튼 셋은 같은 크기 아이콘 (2026-10-20 사용자). 종료는 휴지통, 한 번 누르면 빨개지고 한 번 더 누르면 종료
   const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="${pick ? '목표로 고르기' : '지도'}" aria-label="${name} ${pick ? '목표로 고르기' : '지도에서 보기'}">${pick ? ICONS.pin : ICONS.map}</button>` : ''}
+    ${c.key && c.open && !pick ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="지도" aria-label="${name} 지도에서 보기">${ICONS.map}</button>` : ''}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
+  // 임무 탭: 목표로 고르기는 오른쪽 아래 글자 단추로 (2026-10-21 사용자: 위 아이콘 사이에 숨어 뭔지 몰랐다)
+  const pickBtn = pick && c.key ? `<button class="gx-evpick${c.selected ? ' on' : ''}" data-action="pick-event" data-value="${key}">${ICONS.pin}${c.selected ? '목표 해제' : '목표로 선택'}</button>` : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
     <div class="gx-evc art open ev-pop${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
         <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
+        ${pickBtn}
       </div></div>`;
 }
 
@@ -218,24 +221,37 @@ function whoLine(chips = ''): string {
   return items.length ? `<span class="gx-opwho"><em>투입</em>${items.join('<i>·</i>')}</span>` : '';
 }
 
+/** 큰 보기 왼쪽 위 화면 표시: 첫 줄 신호(REC·LIVE)와 카메라 이름, 둘째 줄 날짜·시각 (2026-10-21 사용자) */
+function osd(sig: string, cam: string, clock: string): string {
+  return `<div class="gx-oposd"><span class="l1">${sig}<span class="cam">${cam}</span></span>${clock ? `<span class="ts">${esc(clock)}</span>` : ''}</div>`;
+}
+
+/** 큰 보기 오른쪽 위 버튼: 위키 · 임무 지도 · 종료 (CCTV·위성 공통) */
+function evBtns(c: OpsCard): string {
+  const key = c.key ? esc(c.key) : '';
+  const name = esc(c.name);
+  return `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="임무 지도" aria-label="${name} 임무 지도에서 보기">${ICONS.map}</button>` : ''}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
+}
+
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
     return `<div class="gx-opview feed nosig"><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
   }
-  const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
-  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="임무 지도" aria-label="${name} 임무 지도에서 보기">${ICONS.map}</button>` : ''}
-    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
+  const btns = evBtns(c);
   const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
-    <div class="gx-opbar"><span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc(region)}</span><span class="ts">${esc(clock)}</span></div>
+    <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, `CAM-${camNo(c.locCode)} · ${esc(region)}`, clock)}<span class="gx-evart-act">${btns}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
+
+/** 지도 위 자리(%)를 대략의 위경도로 (화면 표시용) */
+const track = (px: number, py: number) => `N${(38.7 - py * 0.058).toFixed(2)} E${(124.6 + px * 0.056).toFixed(2)}`;
 
 function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string): string {
   const per = new Map<string, number>();
@@ -257,7 +273,7 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
   const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
   return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>
-    <div class="gx-opbar"><span class="gx-oplive"><i></i>위성 관측</span></div><span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div>`;
+    <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock)}${s ? `<span class="gx-evart-act">${evBtns(s)}</span>` : ''}</div></div>`;
 }
 
 /** 관제실 상황판 본문. counts: 일지 제목줄 숫자 (html) */
@@ -266,5 +282,5 @@ export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: st
   const sel = cards.find((c) => c.id === opsUi.sel);
   const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
   const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
-  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.satellite]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
+  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
 }

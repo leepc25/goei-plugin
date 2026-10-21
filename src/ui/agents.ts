@@ -39,17 +39,20 @@ const OSD: Record<AgentSide, string> = { op: 'LIVE', ok: 'STANDBY', lock: 'OFFLI
 const line = (a: AgentItem) => a.situation || (a.side === 'op' ? a.deployed : '') || '대기 중';
 const tip = (a: AgentItem) => `data-agtip="${esc(`${a.name} · ${a.st}`)}" data-agtip-text="${esc(line(a))}"`;
 
+/** 전광판 글: 넘치면 같은 글을 한 번 더 붙여 왼쪽으로만 끊김 없이 흐른다 */
+const flow = (tag: string, text: string, cls = '') => `<${tag} class="${cls ? `${cls} ` : ''}gx-flow"><span data-t="${esc(text)}">${esc(text)}</span></${tag}>`;
+
 function tile(a: AgentItem, i: number): string {
   return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
     <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, '0')}</span><span class="st"><i></i>${OSD[a.side]}</span></span>
-    <span class="gx-agmon-cap"><b>${esc(a.name)}</b><small>${esc(a.side === 'op' && a.deployed ? a.deployed : line(a))}</small></span></span></li>`;
+    <span class="gx-agmon-cap"><b>${esc(a.name)}</b>${flow('small', a.side === 'op' && a.deployed ? a.deployed : line(a))}</span></span></li>`;
 }
 
 function row(a: AgentItem): string {
   const tools = a.wiki !== null
     ? `<span class="gx-agrow-tools"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc(a.id)}" title="괴담톡" aria-label="${esc(a.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc(a.wiki)}" title="위키" aria-label="${esc(a.name)} 위키">${ICONS.wiki}</button></span>`
     : '';
-  return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc(a.id)}" ${tip(a)}>${a.face}<b>${esc(a.name)}</b><span class="gx-agrow-st"><i></i>${esc(a.st)}</span><span class="gx-agrow-msg">${esc(line(a))}</span>${tools}</li>`;
+  return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc(a.id)}" ${tip(a)}>${a.face}<b>${esc(a.name)}</b><span class="gx-agrow-st"><i></i>${esc(a.st)}</span>${flow('span', line(a), 'gx-agrow-msg')}${tools}</li>`;
 }
 
 /** 요원 칸 본문. 작전 중 → 편성 가능 → 불가 순서. total: 명단 인원 */
@@ -121,5 +124,31 @@ export function bindAgentTips(root: HTMLElement): void {
     if (el && !el.contains(ev.relatedTarget as Node | null)) hide();
   });
   root.addEventListener('click', hide, true);
+  // 잘리는 상황 글은 전광판처럼 흐르게 (2026-10-21 사용자). 창을 다시 그릴 때마다 넘치는 칸만 골라 거리·시간을 정한다
+  let queued = 0;
+  const measure = () => {
+    queued = 0;
+    for (const box of root.querySelectorAll<HTMLElement>('.gx-flow')) {
+      const inner = box.firstElementChild as HTMLElement | null;
+      if (!inner) continue;
+      // 켜져 있으면 뒤에 붙은 글(간격 3em 포함)까지 재므로 반으로 되돌려 잰다
+      const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
+      const on = box.classList.contains('on');
+      const w = on ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
+      const over = w - box.clientWidth > 2;
+      box.classList.toggle('on', over);
+      if (over) {
+        const d = w + gap;
+        box.style.setProperty('--fd', `${-d}px`);
+        // 초당 16px로 한 바퀴, 맨 앞에서 잠깐 멈춤(전체의 15%)
+        box.style.setProperty('--ft', `${(d / 16 / 0.85).toFixed(1)}s`);
+      }
+    }
+  };
+  const schedule = () => {
+    if (!queued) queued = requestAnimationFrame(measure);
+  };
+  new MutationObserver(schedule).observe(root, { childList: true, subtree: true });
+  window.addEventListener('resize', schedule);
   root.addEventListener('scroll', hide, true);
 }

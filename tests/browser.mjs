@@ -538,6 +538,15 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.setViewportSize({ width: 390, height: 844 });
   if (shots) { await page.screenshot({ path: `${shots}/9-board-mobile.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-mobile-agents.png` }); }
   await page.setViewportSize({ width: 1280, height: 860 });
+  // 위성 지도를 보던 중 일지 줄을 고르면 지도 그대로, 표적만 그 상황으로
+  if (await page.locator('.gx-oplog li.gx-oprow').count() > 1) {
+    await page.click('.gx-oplog .gx-hseg [data-value="map"]');
+    await page.waitForSelector('.gx-opview.map');
+    await page.click('.gx-oplog li.gx-oprow >> nth=1');
+    await page.waitForSelector('.gx-oplog li.gx-oprow.sel >> nth=0');
+    assert.equal(await page.locator('.gx-opview.map').count(), 1, '일지 줄을 골라도 위성 화면 유지');
+    await page.click('.gx-oplog .gx-hseg [data-value="feed"]');
+  }
   // 상황판 요원 칸(모니터): 마우스를 올리면 머리 위 말풍선, 누르면 사원증 창. 톡·위키는 사원증 창에서
   const agentTile = page.locator('.gx-board .gx-agmon', { hasText: '쟈알디' });
   await agentTile.hover();
