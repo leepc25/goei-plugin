@@ -20080,20 +20080,43 @@ var ICONS = {
     rect(g2, C2.dark, 10, 23, 12, 3);
   }
 };
+var thinImgs = /* @__PURE__ */ new Map();
 function drawItemIcon(ctx, id, x, y, size2) {
+  const all = typeof window !== "undefined" ? window.__GOEI_ITEM_ART__ : void 0;
+  const a = all?.[id];
+  if (a && a.w > a.h * 2.2 && size2 <= 72 && a.src) {
+    const src = a.src;
+    let im = thinImgs.get(src);
+    if (!im) thinImgs.set(src, im = Object.assign(new Image(), { src }));
+    if (!im.complete || !im.naturalWidth) {
+      im.addEventListener("load", () => drawItemIcon(ctx, id, x, y, size2), { once: true });
+      return;
+    }
+    const k = size2 * 1.3 / a.w;
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.translate(x + size2 / 2, y + size2 / 2);
+    ctx.rotate(-Math.PI / 4);
+    ctx.drawImage(im, -a.w * k / 2, -a.h * k / 2, a.w * k, a.h * k);
+    ctx.restore();
+    return;
+  }
   if (drawItemArt(ctx, id, x, y, size2)) return;
+  if (a) {
+    const src = a.src;
+    if (src) {
+      const im = new Image();
+      im.onload = () => drawItemIcon(ctx, id, x, y, size2);
+      im.src = src;
+    }
+    return;
+  }
+  const d2 = ICONS[id];
+  if (!d2) return;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(size2 / 32, size2 / 32);
-  const d2 = ICONS[id];
-  if (d2) d2(ctx);
-  else {
-    rect(ctx, C2.dark, 6, 6, 20, 20);
-    ctx.fillStyle = C2.white;
-    ctx.font = "bold 16px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("?", 16, 22);
-  }
+  d2(ctx);
   ctx.restore();
 }
 

@@ -278,20 +278,47 @@ const ICONS: Record<string, Draw> = {
 };
 export const hasIcon = (id: string) => id in ICONS;
 /** (x, y) 왼쪽 위, size 크기 정사각에 물건 하나. 모르는 id는 물음표 상자. */
+const thinImgs = new Map<string, HTMLImageElement>();
 export function drawItemIcon(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, size: number): void {
   // GPT 그림을 도트화한 것이 있으면 그것 (art/items). 없으면 아래 코드 아이콘.
+  const all = typeof window !== 'undefined' ? (window as { __GOEI_ITEM_ART__?: Record<string, { w: number; h: number; src?: string }> }).__GOEI_ITEM_ART__ : undefined;
+  const a = all?.[id];
+  if (a && a.w > a.h * 2.2 && size <= 72 && a.src) {
+    // 가늘고 긴 그림(주사기 등)은 작은 칸에서 점선처럼 보인다: 칸 가운데에 대각선으로 눕혀 채운다
+    const src = a.src;
+    let im = thinImgs.get(src);
+    if (!im) thinImgs.set(src, (im = Object.assign(new Image(), { src })));
+    if (!im.complete || !im.naturalWidth) {
+      im.addEventListener('load', () => drawItemIcon(ctx, id, x, y, size), { once: true });
+      return;
+    }
+    const k = (size * 1.3) / a.w;
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.translate(x + size / 2, y + size / 2);
+    ctx.rotate(-Math.PI / 4);
+    ctx.drawImage(im, (-a.w * k) / 2, (-a.h * k) / 2, a.w * k, a.h * k);
+    ctx.restore();
+    return;
+  }
   if (drawItemArt(ctx, id, x, y, size)) return;
+  // 그림은 있는데 아직 불러오는 중: 비워 두고, 다 불러오면 같은 자리에 다시 그린다
+  // (터치 아이템 칸처럼 한 번만 그리는 캔버스가 다른 모양의 코드 아이콘으로 굳지 않게)
+  if (a) {
+    const src = a.src;
+    if (src) {
+      const im = new Image();
+      im.onload = () => drawItemIcon(ctx, id, x, y, size);
+      im.src = src;
+    }
+    return;
+  }
+  const d = ICONS[id];
+  // 모르는 아이템은 빈 칸
+  if (!d) return;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(size / 32, size / 32);
-  const d = ICONS[id];
-  if (d) d(ctx);
-  else {
-    rect(ctx, C.dark, 6, 6, 20, 20);
-    ctx.fillStyle = C.white;
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('?', 16, 22);
-  }
+  d(ctx);
   ctx.restore();
 }
