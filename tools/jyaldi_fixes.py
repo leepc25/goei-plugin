@@ -139,7 +139,10 @@ def anchors(src, idx):
     for raw in idx:
         w, e, w2, _ = wrists(src, raw)
         ang = float(np.degrees(np.arctan2(w[1] - e[1], w[0] - e[0])))
-        out.append({'hand': [round(w[0]), round(w[1])], 'hand2': [round(w2[0]), round(w2[1])], 'angle': round(ang)})
+        p = rig.CLIPS[src][2][min(raw, len(rig.CLIPS[src][2]) - 1)]
+        hip = [(p['RIGHT HIP'][0] + p['LEFT HIP'][0]) / 2 + rig.DX, (p['RIGHT HIP'][1] + p['LEFT HIP'][1]) / 2 + rig.DY]
+        out.append({'hand': [round(w[0]), round(w[1])], 'hand2': [round(w2[0]), round(w2[1])], 'angle': round(ang),
+                    'hip': [round(hip[0]), round(hip[1])]})   # 앉기·눕기: 엔진이 의자 좌판·침대 면을 이 점에 맞춤
     return out
 
 
