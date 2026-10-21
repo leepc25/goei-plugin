@@ -109,16 +109,6 @@ writeFileSync(
   JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
 
-// 플러그인 창 게임 시연판 (Risu 없이 폰에서): 가짜 risuai + 실제 게임 창 + 게임 코드 팩을 한 HTML에
-{
-  const demo = await build({ ...common, entryPoints: ['src/game/host-demo.ts'], format: 'iife' });
-  const esc = (t) => t.replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>괴이 ː 이면세계 · 게임 창 시연</title><body><script>window.__GOEI_GAME_CODE__=${esc(JSON.stringify(gameCode))}</script><script>${esc(demo.outputFiles[0].text)}</script></body></html>`;
-  writeFileSync('dist/goei-plugin-game.html', html);
-  mkdirSync('release/demo', { recursive: true });
-  writeFileSync('release/demo/goei-plugin-game.html', html);
-}
-
 // 테스트용: 순수 로직만 묶은 모듈
 await build({
   define,

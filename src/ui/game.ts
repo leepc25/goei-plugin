@@ -7,7 +7,7 @@ import { RECORD_COMMENT } from '../core/gamelink';
 import { codeState, codeStats, installGameCode, loadGameCode } from '../host/game/code';
 import { fetchStats, forgetIndex, gameIndex, type GameIndex } from '../host/game/fetch';
 import { downloadGamePack, installGamePack, liveUrls, packStateOf, releaseAll } from '../host/game/packs';
-import { gameSaves, copySlot } from '../host/game/saves';
+import { gameSaves } from '../host/game/saves';
 import { clearRecord, dropReport, onReports, pendingReports, postReport, readCard, recordReport, type PendingReport } from '../host/game/card';
 import { makeBridge } from '../host/game';
 import { makeViewport, type ViewportCtl } from '../host/game/viewport';
@@ -68,19 +68,12 @@ function filesHtml(f: Files): string {
     <div class="gx-gl-act"><button class="gx-gp-btn primary" data-g="get"${busy ? ' disabled' : ''}>받기${size}</button><button class="gx-gp-btn" data-g="file"${busy ? ' disabled' : ''}>파일로 넣기</button></div></section>`;
 }
 
-function slotsHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
-  const by = new Map(slots.map((s) => [s.slot, s]));
-  const cont = last != null ? by.get(last) : undefined;
-  const row = (n: SlotId) => {
-    const s = by.get(n);
-    return `<li class="gx-gl-slot${s ? '' : ' empty'}"><div><b>${SLOT_NAME(n)}</b><span>${s ? `${esc(s.title)} · ${when(s.savedAt)}` : '비어 있음'}</span>${s?.summary ? `<small>${esc(s.summary)}</small>` : ''}</div>
-      <div class="gx-gl-sact"><button class="gx-gp-btn${s ? '' : ' primary'}" data-g="play" data-slot="${n}"${ready ? '' : ' disabled'}>${s ? '불러오기' : '새로 시작'}</button>
-      ${s && n === 0 ? `<button class="gx-gp-btn" data-g="keep" aria-label="자동 저장을 빈 칸에 보관"${slots.length >= 4 ? ' disabled' : ''}>보관</button>` : ''}
-      ${s ? `<button class="gx-gp-btn" data-g="del" data-slot="${n}" aria-label="${SLOT_NAME(n)} 지우기">${ICONS.trash}</button>` : ''}</div></li>`;
-  };
+// 저장 칸 고르기·불러오기는 게임 안 본부가 맡는다(hq 모듈, bridge.saves). 여기서는 시작 버튼과 마지막 저장만 보인다
+function startHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
+  const s = slots.find((x) => x.slot === last) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
   return `<section class="gx-gl-card"><b>차원 승강기</b>
-    ${cont ? `<button class="gx-gp-btn primary gx-gl-cont" data-g="play" data-slot="${cont.slot}"${ready ? '' : ' disabled'}>이어하기 · ${SLOT_NAME(cont.slot)} · ${esc(cont.title)}</button>` : ''}
-    <ul class="gx-gl-slots">${SLOT_IDS.map(row).join('')}</ul></section>`;
+    <p>${s ? `마지막 저장: ${esc(s.title)} · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '저장 칸은 게임 안 본부에서 고르고 불러와요.'}</p>
+    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? '' : ' disabled'}>${s ? '이어하기' : '게임 시작'}</button></section>`;
 }
 
 function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: number): string {
@@ -129,7 +122,7 @@ async function home(): Promise<void> {
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
   box.innerHTML = `<div class="gx-gl">
     ${notice || busy ? `<p class="gx-gp-msg gx-gl-msg">${esc(busy || notice)}</p>` : ''}
-    ${filesHtml(f)}${slotsHtml(slots, last, f.code === 'ready' && !f.need.length)}${linkHtml(card, reports, record)}${legacyHtml()}${statsHtml()}
+    ${filesHtml(f)}${startHtml(slots, last, f.code === 'ready' && !f.need.length)}${linkHtml(card, reports, record)}${legacyHtml()}${statsHtml()}
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));
 }
@@ -236,7 +229,6 @@ function setHead(): void {
 async function onClick(e: MouseEvent): Promise<void> {
   const t = (e.target as HTMLElement).closest<HTMLElement>('[data-g]');
   if (!t || !layer || (t as HTMLButtonElement).disabled) return;
-  const slot = Number(t.dataset.slot) as SlotId;
   const at = Number(t.dataset.at);
   const find = async () => (await pendingReports()).find((p) => p.at === at);
   try {
@@ -248,7 +240,7 @@ async function onClick(e: MouseEvent): Promise<void> {
         return layer.querySelector<HTMLInputElement>('[data-g-file]')?.click();
       case 'play':
         notice = '';
-        return void (await play(slot, 'play'));
+        return void (await play(0, 'play'));
       case 'legacy':
         return void (await play(null, t.dataset.mode === 'action' ? 'action' : 'patrol'));
       case 'home':
@@ -257,17 +249,6 @@ async function onClick(e: MouseEvent): Promise<void> {
         if (viewport?.full) await viewport.exit();
         else await viewport?.enter();
         return setHead();
-      case 'del':
-        if (!confirm(`${SLOT_NAME(slot)}을 지울까요?`)) return;
-        await gameSaves.remove(slot);
-        return say(`${SLOT_NAME(slot)}을 지웠어요.`);
-      case 'keep': {
-        const used = new Set((await gameSaves.list()).map((s) => s.slot));
-        const free = SLOT_IDS.find((n) => n > 0 && !used.has(n));
-        if (!free) return say('빈 칸이 없어요.');
-        await copySlot(0, free);
-        return say(`자동 저장을 ${SLOT_NAME(free)}에 보관했어요.`);
-      }
       case 'post': {
         const p = await find();
         if (!p) return;
