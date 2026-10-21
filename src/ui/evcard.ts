@@ -2,6 +2,7 @@
 // 차이는 카드를 눌렀을 때 하는 일뿐이다. 종류(괴이·사건·특수)는 두 곳 모두 상태 딱지 왼쪽에 같은 모양 딱지로 (v0.16.18).
 import type { CharacterSnapshot } from '../host/risu';
 import { locName, NATION_PINS, type EndedEntry } from '../core/world';
+import { ensureClouds } from './clouds';
 import { ICONS } from './icons';
 import { avatar } from './images';
 
@@ -270,6 +271,7 @@ function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
 const track = (px: number, py: number) => `N${(38.7 - py * 0.058).toFixed(2)} E${(124.6 + px * 0.056).toFixed(2)}`;
 
 function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string): string {
+  if (url) ensureClouds();
   const per = new Map<string, number>();
   const pins = cards
     .filter((c) => !c.ended)
@@ -288,7 +290,7 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : '';
   // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
   const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
-  return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>${SKY}
+  return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>${url ? SKY : ''}
     <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock)}${s ? `<span class="gx-evart-act">${opsPick(s)}${evBtns(s)}</span>` : ''}</div></div>`;
 }
 
