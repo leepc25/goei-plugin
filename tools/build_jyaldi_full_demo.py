@@ -56,14 +56,14 @@ DEFS = [
     D('eat', 'eat', '28 먹기', 6),
     D('bandage', 'bandage', '29 자기 치료', 7),
     D('hit', 'hit', '30 약 피격', 14),
-    D('down', 'down', '31 강 피격·다운', 12, rng=(0, 7)),
+    D('down', 'down', '31 강 피격·다운', 12),
     D('getup', 'getup', '32 기상', 8),
     D('talk', '_talk', '33 말하기', 6, loop=True),
     D('papers', 'papers', '34 본부: 서류 검토', 4, loop=True),
     D('smoke', 'smoke', '34 본부: 담배', 4),
     D('chain', 'chain', '36 숙련 3: 연쇄 폭파', 10, hits=[1, 3, 5], hold=0.05),
     D('wall', 'wall', '37 숙련 6: 벽 통째로', 10, hits=[4], hold=0.15),
-    D('pipe', 'pipe2', '38 임시 둔기 휘두르기', 12, hits=[2], hold=0.06, order=[3, 3, 4, 4, 4]),   # 28e8170 재생성본: 옆모습인 3(치켜듦)·4(내려침)만. 0~2장은 등을 보이며 돌아서고 5~6장은 파이프가 사라져 뺌
+    D('pipe', 'pipe2', '38 임시 둔기 휘두르기', 12, hits=[5], hold=0.06),   # 16:40 재생성(머리 위 앞쪽으로 치켜듦 → 내려침, 8장)
     D('shotgun', 'shotgun2', '39 임시 총 사격(견착)', 12, order=[2, 0, 1, 3, 4, 5], hits=[1]),
     D('tired', 'tired', '41 피로·부상 대기', 4, loop=True),
     D('engage', 'engage', '2 전투 대기 진입(해제 = 역재생)', 12),

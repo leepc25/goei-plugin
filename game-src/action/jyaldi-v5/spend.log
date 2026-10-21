@@ -1736,3 +1736,38 @@ description: tall slim adult woman agent, long straight black hair to the
 15:54:20 gen_fix2 lookback done
 15:54:21 gen_fix2 after generations_remaining: 8731
 15:54:32 gen_fix2 lookback 2차(어깨 비틀기+왼쪽 옆얼굴 뼈대): 약 3회, 불합격(3/4 정면), 커밋 안 함. after 8731 (shared)
+16:39:30 gen_fix2 before generations_remaining: 8731
+16:39:37 gen_fix2 blast 8f -> id: 5a855c23-2edc-4f4e-8ac3-717a6c9aae87
+job_id: 5a855c23-2edc-4f4e-8ac3-717a6c9aae87
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:41 gen_fix2 grabknee 5f -> id: f7ebbbae-9600-48e1-8986-686b246915b3
+job_id: f7ebbbae-9600-48e1-8986-686b246915b3
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:43 gen_fix2 drink 7f -> id: 4339c9bb-2193-4e8f-a403-7a3adff84233
+job_id: 4339c9bb-2193-4e8f-a403-7a3adff84233
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:44 gen_fix2 down 8f -> id: 359b0a80-573f-4e95-afdc-6c1ee4d5e03f
+job_id: 359b0a80-573f-4e95-afdc-6c1ee4d5e03f
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:45 gen_fix2 getup 8f -> id: d9cecebe-9f90-4bde-bba9-7a3c9f3d4938
+job_id: d9cecebe-9f90-4bde-bba9-7a3c9f3d4938
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:50 gen_fix2 collapse 8f -> id: 3533148e-2431-43d4-9da8-0cb63af60ea0
+job_id: 3533148e-2431-43d4-9da8-0cb63af60ea0
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:51 gen_fix2 pipe2 8f -> id: 6f19e568-705f-423b-bfc1-c4c5eefe4f21
+job_id: 6f19e568-705f-423b-bfc1-c4c5eefe4f21
+description: tall slim adult woman agent, long straight black hair to the 
+16:39:52 gen_fix2 walk_shotgun 8f -> id: 4ef40d1c-e279-487d-a30b-e17cd2dc5dbd
+job_id: 4ef40d1c-e279-487d-a30b-e17cd2dc5dbd
+description: tall slim adult woman agent, long straight black hair to the 
+16:44:49 gen_fix2 grabknee done
+16:45:03 gen_fix2 down done
+16:46:32 gen_fix2 blast done
+16:47:01 gen_fix2 getup done
+16:47:52 gen_fix2 collapse done
+16:48:19 gen_fix2 pipe2 done
+16:48:41 gen_fix2 walk_shotgun done
+16:49:32 gen_fix2 drink done
+16:49:35 gen_fix2 after generations_remaining: 8707
+16:52:19 gen_fix2 깨진 8개 다시 뽑기(뼈대 수정: 어깨 간격·파이프 앞쪽 치켜듦·누운 팔꿈치·무릎): 8731 -> 8707, 24회. grabknee는 또 3/4 정면(불합격, 재시도 안 함)
