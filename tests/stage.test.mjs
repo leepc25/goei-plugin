@@ -279,6 +279,13 @@ test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·�
       const out = stage.outing();
       if (out.depth >= 9 && mode === 'down') mode = 'service';
       const kk = bot(eng); bot.lastK = kk; eng.step(kk);
+      // 사물함 뒤 깊이에 숨지 않는다 (검수 16-1·18-1)
+      if (eng.plan.stage.where === 'floor')
+        for (const t of eng.plan.stage.terrain) {
+          const bs = t.kind === 'narrow' ? S.narrowBackSpan(t, eng.plan.stage.terrain) : null;
+          const lane = ((eng.p.y - 440) / 250) * 160;
+          if (bs) assert.ok(!(eng.p.x > bs[0] + 20 && eng.p.x < bs[1] - 20 && lane < t.lane0 - 4), `seed ${seed}: 사물함 뒤 x=${Math.round(eng.p.x)} lane=${Math.round(lane)} ${JSON.stringify(t)} span=${bs.map(Math.round)}`);
+        }
     }
     const out = stage.outing();
     assert.equal(eng.ended, 'return', `seed ${seed}: 로프로 귀환 (깊이 ${out.depth}, ${eng.plan.title}) x=${Math.round(eng.p.x)} y=${Math.round(eng.p.y)} enc=${eng.encActive} en=${eng.enemies.filter((e) => e.alive).map((e) => `${e.kind}@${Math.round(e.x)},${Math.round(e.y)}`)} terr=${JSON.stringify(eng.plan.stage.terrain.filter((t) => Math.abs(t.x0 - eng.p.x) < 300))} k=${JSON.stringify(bot.lastK)} props=${eng.props.filter((q) => Math.abs(q.x - eng.p.x) < 300).map((q) => q.kind + '@' + q.x + (q.solid ? 'S' : ''))}`);

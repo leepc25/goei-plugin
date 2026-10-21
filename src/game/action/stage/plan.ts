@@ -21,22 +21,32 @@ export interface StagePlan extends FloorPlan {
   };
 }
 
-/** 좁은 길 뒷줄 사물함 그림이 차지하는 월드 x 구간 (사물함 한 칸 = 화면 252px, 100px 간격, 가운데 기준).
- * 층 tick은 이 구간 전체에서 사물함 뒤 깊이로 못 들어가게 막는다 (검수 16-1). 뒷줄이 없으면 null. */
-export function narrowBackSpan(t: Terrain, terr: readonly Terrain[] = []): [number, number] | null {
+/** 좁은 길 뒷줄: 사물함 자리(가운데 x들)와 그 그림이 차지하는 월드 x 구간.
+ * 층 tick은 이 구간 전체에서 사물함 뒤 깊이로 못 들어가게 막는다 (검수 16-1).
+ * 이웃 좁은 길(지그재그 미로)과는 사이 가운데까지만 쓰고, 사물함을 그 안에 맞춰 놓는다: 그림이 막힌 구간 밖으로 삐져나오면 그 뒤에 몸이 숨는다 (검수 18-1).
+ * 사물함 한 칸(화면 252px)도 안 들어가는 좁은 틈은 낮은 차단대(xs 빈 배열)로. 뒷줄이 없으면 null. */
+export function narrowBack(t: Terrain, terr: readonly Terrain[] = []): { span: [number, number]; xs: number[] } | null {
   if (t.kind !== 'narrow' || t.lane0 <= 0) return null;
-  let lastX = t.x0 + 50;
-  while (lastX + 100 < t.x1 - 20) lastX += 100;
-  let a = t.x0 - 76,
-    b = lastX + 126;
-  // 이웃 좁은 길(지그재그 미로)과는 사이 가운데까지만: 줄을 바꿀 틈을 남긴다
+  const H = 126;
+  const xs: number[] = [];
+  for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
+  if (!xs.length) xs.push((t.x0 + t.x1) / 2);
+  let a = xs[0] - H,
+    b = xs[xs.length - 1] + H;
+  let clipped = false;
   for (const o of terr) {
     if (o === t || o.kind !== 'narrow') continue;
-    if (o.x1 <= t.x0) a = Math.max(a, (o.x1 + t.x0) / 2);
-    else if (o.x0 >= t.x1) b = Math.min(b, (t.x1 + o.x0) / 2);
+    if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) (a = (o.x1 + t.x0) / 2), (clipped = true);
+    else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) (b = (t.x1 + o.x0) / 2), (clipped = true);
   }
-  return [a, b];
+  if (!clipped) return { span: [a, b], xs };
+  if (b - a < 2 * H) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+  const fit: number[] = [];
+  for (let x = a + H; x <= b - H; x += 100) fit.push(x);
+  if (fit[fit.length - 1] < b - H - 1) fit.push(b - H);
+  return { span: [a, b], xs: fit };
 }
+export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [number, number] | null => narrowBack(t, terr)?.span ?? null;
 
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
@@ -363,6 +373,42 @@ function roomName(ref: string): string {
   return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
+/** 공사 차단대 줄: 길 폭을 같은 너비 차단대 n개로 나눈다 (끝에 기둥 하나짜리 조각이 남지 않게, 검수 14-2).
+ * 좁은 칸(폭 80)도 기둥 둘 + 가로대 한 벌(폭 160)로, 칸 가운데에. fy = 받침이 닿는 바닥 y */
+function drawBarricade(ctx: CanvasRenderingContext2D, x0: number, x1: number, fy: number) {
+  const w = x1 - x0;
+  const bw = Math.max(w, 160),
+    bx0 = x0 + (w - bw) / 2;
+  const n = Math.max(1, Math.round((bw - 20) / 170)),
+    sw = (bw - 20) / n;
+  for (let i = 0; i < n; i++) {
+    const x = Math.round(bx0 + 10 + i * sw),
+      x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
+    for (const px of [x, x2 - 16]) {
+      ctx.fillStyle = '#2b2d30';
+      ctx.fillRect(px - 14, fy - 10, 44, 12);
+      ctx.fillStyle = '#5d6166';
+      ctx.fillRect(px, fy - 132, 16, 124);
+      ctx.fillStyle = '#878c91';
+      ctx.fillRect(px, fy - 132, 5, 124);
+      ctx.fillStyle = '#3c3f43';
+      ctx.fillRect(px + 12, fy - 132, 4, 124);
+    }
+    for (const ry of [fy - 122, fy - 72]) {
+      for (let sx = x; sx < x2; sx += 24) {
+        ctx.fillStyle = ((sx - x) / 24) % 2 ? '#1d1d1f' : '#e2b23a';
+        ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      ctx.fillRect(x, ry, x2 - x, 3);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(x, ry + 20, x2 - x, 4);
+    }
+  }
+}
+
 export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '', layers?: NonNullable<StagePlan['depthLayers']>, segTerrain: readonly Terrain[] = []) {
   const w = t.x1 - t.x0;
   switch (t.kind) {
@@ -593,9 +639,10 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       };
       // 뒷줄 사물함은 배경이 아니라 깊이 줄로(엔진이 몸과 y 순서로 섞어 그린다): 그 뒤에 선 몸은 가려지고 앞에 선 몸은 위에 (검수 9)
       if (a > y0 && layers) {
-        const [sx0, sx1] = narrowBackSpan(t, segTerrain)!;
-        layers.push({ y: a, x0: sx0, x1: sx1, draw: (c) => {
-          for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
+        const nb = narrowBack(t, segTerrain)!;
+        layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
+          if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          for (const x of nb.xs) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
         } });
       } else if (a > y0 && !row('사물함', a)) {
         ctx.fillStyle = pal.wall;
@@ -608,38 +655,7 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       if (b < y1) {
         // 실제 공사 차단대 크기: 기둥 ≈ 쟈알디 엉덩이 높이(130px), 가로대 두 줄 (검수 7)
         const fy = Math.min(y1 + 10, b + 150);
-        // 길 폭을 같은 너비 차단대 n개로 나눈다: 끝에 기둥 하나짜리 조각이 남지 않게 (검수 14-2)
-        // 기둥 사이 좁은 칸(폭 80)도 기둥 둘 + 가로대 한 벌(폭 140)로, 칸 가운데에
-        const bw = Math.max(w, 160),
-          bx0 = t.x0 + (w - bw) / 2;
-        const n = Math.max(1, Math.round((bw - 20) / 170)),
-          sw = (bw - 20) / n;
-        for (let i = 0; i < n; i++) {
-          const x = Math.round(bx0 + 10 + i * sw),
-            x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
-          ctx.fillStyle = 'rgba(0,0,0,0.3)';
-          ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
-          for (const px of [x, x2 - 16]) {
-            ctx.fillStyle = '#2b2d30';
-            ctx.fillRect(px - 14, fy - 10, 44, 12);
-            ctx.fillStyle = '#5d6166';
-            ctx.fillRect(px, fy - 132, 16, 124);
-            ctx.fillStyle = '#878c91';
-            ctx.fillRect(px, fy - 132, 5, 124);
-            ctx.fillStyle = '#3c3f43';
-            ctx.fillRect(px + 12, fy - 132, 4, 124);
-          }
-          for (const ry of [fy - 122, fy - 72]) {
-            for (let sx = x; sx < x2; sx += 24) {
-              ctx.fillStyle = ((sx - x) / 24) % 2 ? '#1d1d1f' : '#e2b23a';
-              ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
-            }
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.fillRect(x, ry, x2 - x, 3);
-            ctx.fillStyle = 'rgba(0,0,0,0.35)';
-            ctx.fillRect(x, ry + 20, x2 - x, 4);
-          }
-        }
+        drawBarricade(ctx, t.x0, t.x1, fy);
       }
       break;
     }

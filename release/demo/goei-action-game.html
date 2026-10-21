@@ -1446,6 +1446,17 @@ function propArtRef(kind, label3, sx, floorType) {
   if (ref === void 0 && kind === "prop") ref = floorType === "deep" && objImage("deep", 1) ? ["deep", 1 + Math.abs(Math.round(sx / 97)) % 9] : ["chase", 5];
   return ref;
 }
+function propArtSize(kind, label3, floorType) {
+  const r = propArtRef(kind, label3, 0, floorType);
+  if (!r) return null;
+  const a = objImage(r[0], r[1]);
+  if (!a) return null;
+  if (r.length === 4) {
+    const b = objImage(r[2], r[3]);
+    return b ? { w: (a.width + b.width) * 2, h: Math.max(a.height, b.height) * 2 } : null;
+  }
+  return { w: a.width * 2, h: a.height * 2 };
+}
 function isStandBoard(kind, label3, floorType) {
   const r = propArtRef(kind, label3, 0, floorType);
   return !!r && r.length === 2 && r[0] === "lobby" && r[1] === 6;
@@ -14508,18 +14519,27 @@ function defaultTalk(kind, long, hasFork) {
 var CHOICE_LABEL = { help: "돕는다 (E)", ignore: "무시한다 (E)", rob: "뺏는다 (E)" };
 
 // src/game/action/stage/plan.ts
-function narrowBackSpan(t, terr = []) {
+function narrowBack(t, terr = []) {
   if (t.kind !== "narrow" || t.lane0 <= 0) return null;
-  let lastX = t.x0 + 50;
-  while (lastX + 100 < t.x1 - 20) lastX += 100;
-  let a = t.x0 - 76, b = lastX + 126;
+  const H6 = 126;
+  const xs = [];
+  for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
+  if (!xs.length) xs.push((t.x0 + t.x1) / 2);
+  let a = xs[0] - H6, b = xs[xs.length - 1] + H6;
+  let clipped = false;
   for (const o of terr) {
     if (o === t || o.kind !== "narrow") continue;
-    if (o.x1 <= t.x0) a = Math.max(a, (o.x1 + t.x0) / 2);
-    else if (o.x0 >= t.x1) b = Math.min(b, (t.x1 + o.x0) / 2);
+    if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) a = (o.x1 + t.x0) / 2, clipped = true;
+    else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) b = (t.x1 + o.x0) / 2, clipped = true;
   }
-  return [a, b];
+  if (!clipped) return { span: [a, b], xs };
+  if (b - a < 2 * H6) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+  const fit2 = [];
+  for (let x = a + H6; x <= b - H6; x += 100) fit2.push(x);
+  if (fit2[fit2.length - 1] < b - H6 - 1) fit2.push(b - H6);
+  return { span: [a, b], xs: fit2 };
 }
+var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
 var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
 function floorPlan(f, id, startX = 240) {
   const props2 = f.placed.map((p) => ({
@@ -14803,6 +14823,36 @@ function drawBack(ctx, camX, segs, pal, plan) {
   for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === "floor" ? "" : s2.ref, plan.stage.floor?.sub), layers, allTerr);
   void CHUNK_W;
 }
+function drawBarricade(ctx, x0, x1, fy) {
+  const w = x1 - x0;
+  const bw = Math.max(w, 160), bx0 = x0 + (w - bw) / 2;
+  const n = Math.max(1, Math.round((bw - 20) / 170)), sw = (bw - 20) / n;
+  for (let i = 0; i < n; i++) {
+    const x = Math.round(bx0 + 10 + i * sw), x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
+    for (const px of [x, x2 - 16]) {
+      ctx.fillStyle = "#2b2d30";
+      ctx.fillRect(px - 14, fy - 10, 44, 12);
+      ctx.fillStyle = "#5d6166";
+      ctx.fillRect(px, fy - 132, 16, 124);
+      ctx.fillStyle = "#878c91";
+      ctx.fillRect(px, fy - 132, 5, 124);
+      ctx.fillStyle = "#3c3f43";
+      ctx.fillRect(px + 12, fy - 132, 4, 124);
+    }
+    for (const ry of [fy - 122, fy - 72]) {
+      for (let sx = x; sx < x2; sx += 24) {
+        ctx.fillStyle = (sx - x) / 24 % 2 ? "#1d1d1f" : "#e2b23a";
+        ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
+      }
+      ctx.fillStyle = "rgba(255,255,255,0.2)";
+      ctx.fillRect(x, ry, x2 - x, 3);
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(x, ry + 20, x2 - x, 4);
+    }
+  }
+}
 function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) {
   const w = t.x1 - t.x0;
   switch (t.kind) {
@@ -15005,9 +15055,10 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) 
         return ok;
       };
       if (a > y0 && layers) {
-        const [sx0, sx1] = narrowBackSpan(t, segTerrain);
-        layers.push({ y: a, x0: sx0, x1: sx1, draw: (c) => {
-          for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
+        const nb = narrowBack(t, segTerrain);
+        layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
+          if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          for (const x of nb.xs) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
         } });
       } else if (a > y0 && !row("사물함", a)) {
         ctx.fillStyle = pal.wall;
@@ -15018,33 +15069,7 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) 
       }
       if (b < y1) {
         const fy = Math.min(y1 + 10, b + 150);
-        const bw = Math.max(w, 160), bx0 = t.x0 + (w - bw) / 2;
-        const n = Math.max(1, Math.round((bw - 20) / 170)), sw = (bw - 20) / n;
-        for (let i = 0; i < n; i++) {
-          const x = Math.round(bx0 + 10 + i * sw), x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
-          ctx.fillStyle = "rgba(0,0,0,0.3)";
-          ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
-          for (const px of [x, x2 - 16]) {
-            ctx.fillStyle = "#2b2d30";
-            ctx.fillRect(px - 14, fy - 10, 44, 12);
-            ctx.fillStyle = "#5d6166";
-            ctx.fillRect(px, fy - 132, 16, 124);
-            ctx.fillStyle = "#878c91";
-            ctx.fillRect(px, fy - 132, 5, 124);
-            ctx.fillStyle = "#3c3f43";
-            ctx.fillRect(px + 12, fy - 132, 4, 124);
-          }
-          for (const ry of [fy - 122, fy - 72]) {
-            for (let sx = x; sx < x2; sx += 24) {
-              ctx.fillStyle = (sx - x) / 24 % 2 ? "#1d1d1f" : "#e2b23a";
-              ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
-            }
-            ctx.fillStyle = "rgba(255,255,255,0.2)";
-            ctx.fillRect(x, ry, x2 - x, 3);
-            ctx.fillStyle = "rgba(0,0,0,0.35)";
-            ctx.fillRect(x, ry + 20, x2 - x, 4);
-          }
-        }
+        drawBarricade(ctx, t.x0, t.x1, fy);
       }
       break;
     }
@@ -20782,22 +20807,36 @@ function createShopPanel(root) {
 // src/game/action/engine/propBlock.ts
 var PROP_DEPTH = 50;
 var STEP = 9;
+var backOf = (p) => p.back ?? PROP_DEPTH;
+function insideProp(p, x, y, pad = 0) {
+  const dy = y - p.y;
+  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < PROP_DEPTH + pad;
+}
 function blockByProps(bodies, props2, lane) {
   const stuck = /* @__PURE__ */ new Set();
   for (const b of bodies) {
     if (b.z > 4) continue;
     for (const p of props2) {
-      const dy = b.y - p.y;
-      if (Math.abs(b.x - p.x) >= p.w / 2 + 18 || Math.abs(dy) >= PROP_DEPTH) continue;
-      let s2 = dy === 0 ? p.y < (lane[0] + lane[1]) / 2 ? 1 : -1 : Math.sign(dy);
-      if (s2 < 0 && p.y - PROP_DEPTH < lane[0] || s2 > 0 && p.y + PROP_DEPTH > lane[1]) s2 = -s2;
-      const want = p.y + s2 * PROP_DEPTH;
+      if (!insideProp(p, b.x, b.y)) continue;
+      const front = p.y + PROP_DEPTH, rear = p.y - backOf(p);
+      const okF = front <= lane[1], okR = rear >= lane[0];
+      const want = okF && okR ? front - b.y < b.y - rear ? front : rear : okF ? front : okR ? rear : null;
+      if (b.px !== void 0 && !insideProp(p, b.px, b.y)) {
+        b.x = b.px;
+        if (want !== null) b.y = Math.max(lane[0], Math.min(lane[1], b.y + Math.max(-STEP / 3, Math.min(STEP / 3, want - b.y))));
+        continue;
+      }
+      if (want === null) {
+        const side = b.x < p.x ? -1 : 1;
+        b.x += side * STEP;
+        continue;
+      }
       b.y += Math.max(-STEP, Math.min(STEP, want - b.y));
       b.y = Math.max(lane[0], Math.min(lane[1], b.y));
     }
   }
   props2.forEach((p, i) => {
-    if (bodies.some((b) => b.z <= 4 && Math.abs(b.x - p.x) < p.w / 2 + 18 && Math.abs(b.y - p.y) < PROP_DEPTH - STEP)) stuck.add(i);
+    if (bodies.some((b) => b.z <= 4 && insideProp(p, b.x, b.y, -STEP))) stuck.add(i);
   });
   return stuck;
 }
@@ -20806,9 +20845,9 @@ function nudgeProp(p, bodies, others, x0, x1) {
   for (let d2 = 40; d2 < 800; d2 += 20) for (const x of [p.x + d2, p.x - d2]) if (clear2(x)) return void (p.x = x);
 }
 function clearSpot(x, y, props2, lane) {
-  const hit2 = (xx, yy) => props2.some((p) => Math.abs(p.x - xx) < p.w / 2 + 40 && Math.abs(p.y - yy) < PROP_DEPTH + 6);
+  const hit2 = (xx, yy) => props2.some((p) => insideProp(p, xx, yy, 22));
   if (!hit2(x, y)) return { x, y };
-  for (const d2 of [60, -60, 110, -110, 170, -170]) {
+  for (const d2 of [60, -60, 110, -110, 170, -170, 230, -230]) {
     const yy = y + d2;
     if (yy >= lane[0] && yy <= lane[1] && !hit2(x, yy)) return { x, y: yy };
   }
@@ -20968,6 +21007,9 @@ function linkItems(w, run) {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
+      const st = clearSpot(p.x, p.y, allSolids(), w.lane);
+      p.x = p.px = st.x;
+      p.y = p.py = st.y;
       field.ents = field.ents.filter((q) => q.type !== "prop" || PROP_ART.has(q.prop));
       syncCarry();
     }
@@ -20994,8 +21036,13 @@ function linkItems(w, run) {
   });
   const hitSeen = /* @__PURE__ */ new Set();
   const overlapT = /* @__PURE__ */ new WeakMap();
-  const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => ({ x: q.x, y: q.y, w: Math.max(q.w, 100) }));
-  const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w })), ...floorSolids()];
+  const lastX = /* @__PURE__ */ new WeakMap();
+  const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => {
+    const a = propArtSize(q.kind, q.label, w.floor?.type);
+    return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)) };
+  });
+  const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)) });
+  const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => itemSolid(e)), ...floorSolids()];
   w.spawnAdjust = (s2) => {
     const q = clearSpot(s2.x, s2.y, allSolids(), w.lane);
     return q.x === s2.x && q.y === s2.y ? s2 : { ...s2, x: q.x, y: q.y };
@@ -21015,11 +21062,17 @@ function linkItems(w, run) {
       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       const ents = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]);
-      const solids = ents.map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w }));
+      const solids = ents.map((e) => itemSolid(e));
       const fixed2 = floorSolids();
       if (solids.length || fixed2.length) {
-        const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral");
-        const stuck = blockByProps(bodies, [...solids, ...fixed2], w.lane);
+        const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral" && !b.kind.startsWith("proj"));
+        const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX.get(b) }));
+        const stuck = blockByProps(views, [...solids, ...fixed2], w.lane);
+        bodies.forEach((b, i) => {
+          b.x = views[i].x;
+          b.y = views[i].y;
+          lastX.set(b, b.x);
+        });
         ents.forEach((e, i) => {
           const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
           overlapT.set(e, n);

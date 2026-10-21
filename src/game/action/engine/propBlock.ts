@@ -4,17 +4,28 @@ export interface BlockProp {
   x: number;
   y: number;
   w: number;
+  /** 물건 뒤쪽 막는 깊이 (키 큰 상자 더미는 뒤에 서면 다리가 박혀 보인다). 없으면 PROP_DEPTH */
+  back?: number;
 }
 export interface BlockBody {
   x: number;
   y: number;
   z: number;
+  /** 지난 틱 x (요원 등 Fighter). 있으면 옆에서 걸어 들어오는 몸은 벽처럼 막는다 */
+  px?: number;
 }
 
-/** 물건 발치에서 이만큼(깊이 px) 떨어져야 겹쳐 보이지 않는다 */
+/** 물건 발치 앞쪽으로 이만큼(깊이 px) 떨어져야 겹쳐 보이지 않는다 */
 export const PROP_DEPTH = 50;
 /** 한 틱에 비켜 서는 최대 거리 (순간 이동처럼 보이지 않게) */
 const STEP = 9;
+
+const backOf = (p: BlockProp) => p.back ?? PROP_DEPTH;
+/** 이 자리(x, y)가 물건 막힌 칸 안인가: 요원·적·생성 자리 모두 이 하나로 잰다 (검수 18) */
+export function insideProp(p: BlockProp, x: number, y: number, pad = 0): boolean {
+  const dy = y - p.y;
+  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < PROP_DEPTH + pad;
+}
 
 /** 밀고 난 뒤에도 몸과 겹친 물건 번호들을 돌려준다 (제자리에 묶인 적: 숨은 적·잠든 적은 AI가 자리를 되돌린다) */
 export function blockByProps(bodies: BlockBody[], props: BlockProp[], lane: [number, number]): Set<number> {
@@ -22,18 +33,31 @@ export function blockByProps(bodies: BlockBody[], props: BlockProp[], lane: [num
   for (const b of bodies) {
     if (b.z > 4) continue; // 뛰어넘는 중
     for (const p of props) {
-      const dy = b.y - p.y;
-      if (Math.abs(b.x - p.x) >= p.w / 2 + 18 || Math.abs(dy) >= PROP_DEPTH) continue;
-      // 가까운 쪽(앞·뒤)으로. 그쪽이 길 끝이면 반대쪽
-      let s = dy === 0 ? (p.y < (lane[0] + lane[1]) / 2 ? 1 : -1) : Math.sign(dy);
-      if ((s < 0 && p.y - PROP_DEPTH < lane[0]) || (s > 0 && p.y + PROP_DEPTH > lane[1])) s = -s;
-      const want = p.y + s * PROP_DEPTH;
+      if (!insideProp(p, b.x, b.y)) continue;
+      const front = p.y + PROP_DEPTH,
+        rear = p.y - backOf(p);
+      const okF = front <= lane[1],
+        okR = rear >= lane[0];
+      const want: number | null = okF && okR ? (front - b.y < b.y - rear ? front : rear) : okF ? front : okR ? rear : null;
+      // 옆에서 걸어 들어오면(밀려 들어와도) 그 자리에서 막고, 가까운 앞·뒤로 조금씩 미끄러져 돌아가게
+      if (b.px !== undefined && !insideProp(p, b.px, b.y)) {
+        b.x = b.px;
+        if (want !== null) b.y = Math.max(lane[0], Math.min(lane[1], b.y + Math.max(-STEP / 3, Math.min(STEP / 3, want - b.y))));
+        continue;
+      }
+      // 이미 안에 있으면(순간 이동·생성·떨어짐) 가까운 앞·뒤로 비켜 선다. 그쪽이 길 밖이면 반대쪽
+      if (want === null) {
+        // 길 깊이 전체를 막는 물건: 옆으로
+        const side = b.x < p.x ? -1 : 1;
+        b.x += side * STEP;
+        continue;
+      }
       b.y += Math.max(-STEP, Math.min(STEP, want - b.y));
       b.y = Math.max(lane[0], Math.min(lane[1], b.y));
     }
   }
   props.forEach((p, i) => {
-    if (bodies.some((b) => b.z <= 4 && Math.abs(b.x - p.x) < p.w / 2 + 18 && Math.abs(b.y - p.y) < PROP_DEPTH - STEP)) stuck.add(i);
+    if (bodies.some((b) => b.z <= 4 && insideProp(p, b.x, b.y, -STEP))) stuck.add(i);
   });
   return stuck;
 }
@@ -47,9 +71,9 @@ export function nudgeProp(p: BlockProp, bodies: BlockBody[], others: BlockProp[]
 
 /** 몸을 세울 자리: 물건 발치(깊이 PROP_DEPTH, 폭 w/2+40) 밖으로. 깊이를 먼저 비키고, 안 되면 옆으로 (검수 17-1: 원탁 안에 생겨나는 적) */
 export function clearSpot(x: number, y: number, props: BlockProp[], lane: [number, number]): { x: number; y: number } {
-  const hit = (xx: number, yy: number) => props.some((p) => Math.abs(p.x - xx) < p.w / 2 + 40 && Math.abs(p.y - yy) < PROP_DEPTH + 6);
+  const hit = (xx: number, yy: number) => props.some((p) => insideProp(p, xx, yy, 22));
   if (!hit(x, y)) return { x, y };
-  for (const d of [60, -60, 110, -110, 170, -170]) {
+  for (const d of [60, -60, 110, -110, 170, -170, 230, -230]) {
     const yy = y + d;
     if (yy >= lane[0] && yy <= lane[1] && !hit(x, yy)) return { x, y: yy };
   }

@@ -543,6 +543,19 @@ export function propArtRef(kind: string, label: string | undefined, sx: number, 
   return ref;
 }
 
+/** 소품 그림의 화면 크기 (그림이 아직 안 읽혔으면 null). 몸 막기 폭·높이에 쓴다 */
+export function propArtSize(kind: string, label: string | undefined, floorType?: string): { w: number; h: number } | null {
+  const r = propArtRef(kind, label, 0, floorType);
+  if (!r) return null;
+  const a = objImage(r[0], r[1]);
+  if (!a) return null;
+  if (r.length === 4) {
+    const b = objImage(r[2], r[3]);
+    return b ? { w: (a.width + b.width) * 2, h: Math.max(a.height, b.height) * 2 } : null;
+  }
+  return { w: a.width * 2, h: a.height * 2 };
+}
+
 /** 이 소품이 서 있는 판(로비 6번 입간판 그림)으로 그려지는가 */
 export function isStandBoard(kind: string, label: string | undefined, floorType?: string): boolean {
   const r = propArtRef(kind, label, 0, floorType);

@@ -28,12 +28,12 @@ import {
   type Target,
 } from '../items';
 import { TICK_HZ, type Body, type RunConfigCore } from './contract';
-import { drawPropArt } from '../art/bg';
+import { drawPropArt, propArtSize } from '../art/bg';
 
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
-import { blockByProps, clearSpot, furnishAvoid, nudgeProp } from './propBlock';
+import { PROP_DEPTH, blockByProps, clearSpot, furnishAvoid, nudgeProp } from './propBlock';
 import type { World } from './world';
 
 // 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
@@ -206,6 +206,10 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       // 문·벽 가구 앞, 지형 위, 적이 생겨날 자리를 비운다 (검수 12-2, 17)
       furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== 'player')) }, w.lane, () => w.rand());
+      // 요원 시작 자리도 같은 규칙으로 물건 밖에
+      const st = clearSpot(p.x, p.y, allSolids(), w.lane);
+      p.x = p.px = st.x;
+      p.y = p.py = st.y;
       // 그림이 없는 물건(회색 기둥처럼 보이는 아이콘 대역)은 층에 두지 않는다 (재검수 2-1)
       field.ents = field.ents.filter((q) => q.type !== 'prop' || PROP_ART.has(q.prop));
       syncCarry();
@@ -236,9 +240,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
 
   const hitSeen = new Set<string>();
   const overlapT = new WeakMap<object, number>();
+  const lastX = new WeakMap<object, number>();
   // 층 바닥에 선 꾸밈 물건(상자 더미·탁자): 몸이 뚫지 않게 (검수 17-2). 벽에 붙은 것(깊이 맨 뒤)은 빼고
-  const floorSolids = () => w.props.filter((q) => (q.kind === 'prop' || q.kind === 'table' || q.kind === 'clutter') && q.y > w.lane[0] + 20).map((q) => ({ x: q.x, y: q.y, w: Math.max(q.w, 100) }));
-  const allSolids = () => [...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w })), ...floorSolids()];
+  // 그림 크기로 막는다: 폭 = 그림 폭, 뒤쪽 깊이 = 그림 키의 3/4 (키 큰 상자 더미 뒤에 서면 다리가 박혀 보인다, 검수 18-2)
+  const floorSolids = () =>
+    w.props
+      .filter((q) => (q.kind === 'prop' || q.kind === 'table' || q.kind === 'clutter') && q.y > w.lane[0] + 20)
+      .map((q) => {
+        const a = propArtSize(q.kind, q.label, w.floor?.type);
+        return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)) };
+      });
+  const itemSolid = (e: { x: number; y: number; prop: string }) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)) });
+  const allSolids = () => [...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => itemSolid(e as { x: number; y: number; prop: string })), ...floorSolids()];
   // 적은 처음부터 물건 밖에 생겨난다 (검수 17-1: 나중에 옮기면 첫 화면엔 겹쳐 보임)
   w.spawnAdjust = (s) => {
     const q = clearSpot(s.x, s.y, allSolids(), w.lane);
@@ -262,11 +275,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
-      const solids = ents.map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w }));
+      const solids = ents.map((e) => itemSolid(e as { x: number; y: number; prop: string }));
       const fixed = floorSolids();
       if (solids.length || fixed.length) {
-        const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral');
-        const stuck = blockByProps(bodies, [...solids, ...fixed], w.lane);
+        const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral' && !b.kind.startsWith('proj'));
+        // 요원과 적이 같은 규칙: 지난 틱 x로 옆에서 걸어 들어오는 몸은 막고, 이미 안에 있으면 앞뒤로 뺀다 (검수 18)
+        const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX.get(b) }));
+        const stuck = blockByProps(views, [...solids, ...fixed], w.lane);
+        bodies.forEach((b, i) => {
+          b.x = views[i].x;
+          b.y = views[i].y;
+          lastX.set(b, b.x);
+        });
         // 0.5초 넘게 겹쳐 있으면(제자리에 묶인 적) 물건을 옆으로 옮긴다
         ents.forEach((e, i) => {
           const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;

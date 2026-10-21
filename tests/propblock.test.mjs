@@ -45,3 +45,28 @@ test('제자리에 묶인 적과 겹친 물건은 물건 쪽이 옆으로 비킨
   assert.ok(Math.abs(t.x - still.x) >= t.w / 2 + 60, `x=${t.x}`);
   assert.ok(stuck instanceof Set);
 });
+
+test('요원(지난 x가 있는 몸)은 옆에서 걸어 들어오면 물건 안으로 못 들어가고 앞·뒤로 돌아간다', async () => {
+  const { insideProp } = await import('../dist-test/propblock.mjs');
+  const pile = { x: 1000, y: 600, w: 240, back: 110 };
+  for (const y0 of [560, 600, 630]) {
+    const p = { x: 820, y: y0, z: 0, px: 820 }; // 상자 더미 깊이로 걸어감
+    for (let t = 0; t < 200; t++) {
+      p.px = p.x;
+      p.x += 6;
+      blockByProps([p], [pile], lane);
+      assert.ok(!insideProp(pile, p.x, p.y), `y0=${y0} t=${t} (${p.x}, ${p.y}): 상자 더미 안`);
+    }
+    assert.ok(p.x > 1200, `y0=${y0}: 돌아서 지나간다 (x=${p.x})`);
+  }
+});
+
+test('순간 이동·밀려남으로 물건 안에 놓인 몸은 앞이나 뒤로 빠져나온다 (뒤쪽은 물건 키만큼)', async () => {
+  const { insideProp } = await import('../dist-test/propblock.mjs');
+  const pile = { x: 1000, y: 600, w: 240, back: 110 };
+  for (const y0 of [520, 560, 600, 630]) {
+    const p = { x: 1000, y: y0, z: 0, px: 1000 };
+    for (let t = 0; t < 30; t++) blockByProps([p], [pile], lane);
+    assert.ok(!insideProp(pile, p.x, p.y), `y0=${y0} → y=${p.y}`);
+  }
+});
