@@ -76,7 +76,12 @@ export function normAnState(v: string | undefined): AnState {
 export function normAgState(v: string | undefined): AgState | null {
   const s = (v ?? '').trim();
   if ((AG_STATES as readonly string[]).includes(s)) return s as AgState;
-  return AG_ALIAS[s] ?? AG_ALIAS[s.toLowerCase().replace(/\s+/g, ' ')] ?? null;
+  const hit = AG_ALIAS[s] ?? AG_ALIAS[s.toLowerCase().replace(/\s+/g, ' ')];
+  if (hit) return hit;
+  // 「작전 투입」「휴게 (On-duty break)」「외근 중」「사망.」처럼 지침 글을 베끼거나 띄어 쓴 값
+  const bare = s.replace(/[(（][^)）]*[)）]/g, '').replace(/[\s.。!]/g, '').replace(/중$/, '');
+  if ((AG_STATES as readonly string[]).includes(bare)) return bare as AgState;
+  return AG_ALIAS[bare] ?? null;
 }
 
 function fields(text: string, kind: string): string[][] {
@@ -100,18 +105,24 @@ export function scanAnomalies(text: string): AnTag[] {
 /** 상태 칸을 찾아 그 앞을 이름, 뒤를 차례로 읽는다 (IN: 상황, MS: 방문자|상황) */
 function scanSites<S extends string>(text: string, kind: string, states: readonly S[]) {
   return fields(text, kind).flatMap((f) => {
-    const i = f.findIndex((v, k) => k >= 2 && (states as readonly string[]).includes(stripLabel(v)));
+    // 「출현 (Appeared)」처럼 괄호 설명을 붙여도 상태로 본다
+    const bare = (v: string) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, '').trim();
+    const i = f.findIndex((v, k) => k >= 2 && (states as readonly string[]).includes(bare(v)));
     if (i < 0) return [];
     let region = f[0] ?? '';
     if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? '';
-    return [{ region, name: stripLabel(f[i - 1]), state: stripLabel(f[i]) as S, rest: f.slice(i + 1).map(stripLabel) }];
+    return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]) as S, rest: f.slice(i + 1).map(stripLabel) }];
   });
 }
 
-/** 상태 뒤로 배치|상황 (2026-10-21 배치 칸 추가). 칸이 하나뿐이면 옛 태그라 상황으로 읽는다 */
+/** 요원 코드 목록이나 「없음」뿐인 칸 (배치 칸으로 본다) */
+const DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
+
+/** 상태 뒤로 배치|상황 (2026-10-21 배치 칸 추가). 칸이 하나뿐이면 옛 태그라 상황으로 읽는다 (코드·없음뿐이면 상황을 빼먹은 새 태그) */
 export function scanIncidents(text: string): InTag[] {
   return scanSites(text, 'IN', ['진행', '종료'] as const).map(({ rest, ...t }) =>
-    rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(' ') } : { ...t, deploy: '', situation: rest.join(' ') });
+    rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(' ') }
+      : DEPLOY_ONLY.test(rest[0] ?? '') ? { ...t, deploy: rest[0], situation: '' } : { ...t, deploy: '', situation: rest.join(' ') });
 }
 
 export function scanMysticSites(text: string): MsTag[] {

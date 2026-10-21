@@ -122,6 +122,10 @@ test('activity: deltas and new comments per post, changed or disallowed rows ski
 test('parsing helpers tolerate fences, wrappers and a duplicated empty comments object', () => {
   assert.deepEqual(parseJsonPayload('```json\n{"comments":[]}\n```'), { comments: [] });
   assert.deepEqual(parseJsonPayload('<output>{"a":1}</output>'), { a: 1 });
+  // 괴담톡과 같은 손질 (2026-10-21): 끝 쉼표, 글 속 날것 줄바꿈, 닫히지 않은 생각 칸
+  assert.deepEqual(parseJsonPayload('{"posts":[{"a":1},],"incoming":[]}'), { posts: [{ a: 1 }], incoming: [] });
+  assert.deepEqual(parseJsonPayload('{"body":"첫 줄\n둘째 줄"}'.replace('\\n', '\n')), { body: '첫 줄\n둘째 줄' });
+  assert.deepEqual(parseJsonPayload('<think>생각 {a}\n{"body":"x"}'), { body: 'x' });
   assert.deepEqual(parseJsonPayload('{"comments":[{"author":"a"}]}\n{"comments":[]}'), { comments: [{ author: 'a' }] });
   assert.equal(parseDmBody('{"body":" 응 "}'), '응');
   assert.throws(() => parseDmBody('그냥 문장'), GnetError);

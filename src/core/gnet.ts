@@ -522,6 +522,8 @@ export function parseJsonPayload(raw: string): unknown {
     if (tag) {
       const end = text.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
       if (end >= 0) text = text.slice(end + tag[1].length + 3).trim();
+      // 닫히지 않은 생각 칸: 생각 속 중괄호를 JSON으로 잘못 잡지 않게, 줄 첫머리에서 시작하는 { 부터
+      else if (/\n\s*\{/.test(text)) text = text.slice(text.search(/\n\s*\{/)).trim();
     } else {
       const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text);
       if (fence) text = fence[1].trim();
@@ -544,14 +546,20 @@ export function parseJsonPayload(raw: string): unknown {
         /* 아래 */
       }
     }
-    // 앞뒤 설명이 붙었으면 가장 바깥 중괄호만
+    // 앞뒤 설명이 붙었으면 가장 바깥 중괄호만. 그다음 괴담톡과 같은 손질: 끝 쉼표, 글 속 날것 줄바꿈 (2026-10-21)
     const a = text.indexOf('{');
     const b = text.lastIndexOf('}');
     if (a >= 0 && b > a) {
+      const body = text.slice(a, b + 1);
       try {
-        return JSON.parse(text.slice(a, b + 1));
+        return JSON.parse(body);
       } catch {
-        /* 아래 */
+        const fixed = body.replace(/,(\s*[}\]])/g, '$1').replace(/[\u0000-\u001f]/g, (c) => (c === '\n' || c === '\r' || c === '\t' ? c : ''));
+        try {
+          return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')));
+        } catch {
+          /* 아래 */
+        }
       }
     }
     throw new GnetError('AI 응답을 JSON으로 읽지 못했어요.', raw);

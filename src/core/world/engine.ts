@@ -341,8 +341,10 @@ export function codesToNames(text: string, c: Catalog, faction: string): string 
 function applyAgents(w: WorldState, c: Catalog, s: WorldSettings, faction: string, text: string) {
   const roster = rosterFor(w, c, faction, s.agent_limit);
   for (const t of scanAgents(text)) {
-    const key = t.who.replace(/-/g, '').toUpperCase();
-    const p = roster.find((r) => r.id === key || r.english === t.who);
+    // 코드(P001·p-001·「쟈알디(P001)」)를 먼저, 없으면 이름·영문명으로 찾는다
+    const key = (/[A-Z]-?\d{3}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, '').toUpperCase();
+    const who = t.who.trim().toLowerCase();
+    const p = roster.find((r) => r.id === key) ?? roster.find((r) => r.name === t.who.trim() || (!!r.english && r.english.toLowerCase() === who));
     if (!p) continue;
     const rec = agentRecord(w, p.id);
     if (rec.st !== t.state || rec.since === null) rec.since = w.minute;

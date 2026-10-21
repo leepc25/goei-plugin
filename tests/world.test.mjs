@@ -81,9 +81,22 @@ test('tag scanners read from the tail and normalise', () => {
   assert.equal(scanIncidents('[IN|서울|x|이상함|y]').length, 0);
   assert.equal(scanMysticSites('[MS|부산 중구|달빛 서점|출현|없음]')[0].visitors, '없음');
   assert.deepEqual(scanAgents('[AG|P-001|injured|병원]'), [{ who: 'P-001', state: '부상', situation: '병원' }]);
+  // 지침 글을 베끼거나 띄어 쓴 상태 (2026-10-21 점검)
+  for (const [v, st] of [['작전 투입', '작전투입'], ['휴게 (On-duty break)', '휴게'], ['외근 중', '외근'], ['사망.', '사망'], ['대기 중', '휴게']]) assert.equal(scanAgents(`[AG|P001|${v}|x]`)[0]?.state, st, v);
+  assert.equal(scanMysticSites('[MS|부산 중구|달빛 서점|출현 (Appeared)|없음|조용]')[0].state, '출현');
+  assert.deepEqual(scanIncidents('[IN|서울 종로구|관리국 본부|진행|P001]')[0].deploy, 'P001', '상황을 빼먹은 새 태그는 배치로');
   const st = scanStatus('[▣|2025.01.01|12:30 AM|☀️|4°C|서울|소라 랜드]');
   assert.equal(st.target, '소라 랜드');
   assert.equal(scanStatus('[▣|2025.01.01|01:30 AM|☀️|4°C|서울|없음]').minute - st.minute, 60);
+});
+
+test('AG tags find agents by code inside text, Korean name or English name', () => {
+  const w = started();
+  const p1 = catalog.people[0];
+  const p2 = catalog.people[1];
+  const { world } = applyOutput(w, catalog, noSpawn, 'A00', `[AG|${p1.name}(${p1.id})|부상|병원]\n[AG|${p2.name}|작전 투입|현장]`, always);
+  assert.equal(world.agents[p1.id].st, '부상');
+  assert.equal(world.agents[p2.id].st, '작전투입');
 });
 
 test('cleanOutput removes tags, age meta and [AC], keeps prose and moves status to the end', () => {
