@@ -5,8 +5,13 @@
 - `Anomalies/` 괴이 62장: 「영문명」 (명부 괴이 영문명과 같음)
 - `Mystic Sites/` 특수 10장: 「영문명」
 - `Factions/` 세력 15장: 「영문명」 (명부 조직 영문명)
+- `Situations/` 상황 공용 그림: 종류별 1장(720×480) + 괴이 30·사건 12·특수 8 (GPT, 2026-10-21). 고르는 규칙은 `src/core/sharedpics.ts`
+- `Shared/` 공용 조직 8장(안쪽) · 공용 거점 6장(바깥) 「Shared Org/Base 종류」
+- `Bases/` 기본 거점 바깥 7장 「Base 거점 영문명」 (`src/ui/evpic.ts`)
 - `Unused/` 10장: 쓰지 않는 그림. 인물(탐미주의·세크리엠·아벤샤)을 괴이로 그린 것과 세력 대표로 고르지 않은 장면.
 
 플러그인은 대표(큰 사진)를 「영문명_default」 → 「영문명」, 얼굴(작은 사진)을 「영문명」 → 대표 순으로 찾습니다 (`src/host/assets.ts`).
 
 AVIF 품질 50, 4:2:0, 832×832. GPT가 올린 `codex/wiki-images-avif`(품질 90)를 다시 변환했습니다 (평균 약 46KB). 원본 파일명과의 대응은 `manifest.json`.
+
+공용 그림 71장(`Situations/` 50장, `Shared/`, `Bases/`)은 GPT 1024px PNG를 720×720 AVIF 품질 50으로 줄였습니다 (평균 약 39KB). 요청문은 `docs/공용그림_GPT요청서.md`.
