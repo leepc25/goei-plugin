@@ -3,7 +3,7 @@
 import json, re, sys, zipfile
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from build_lite_card import read_module, MANIFEST_COMMENT  # noqa: E402
+from build_lite_card import read_module, MANIFEST_COMMENT, LORE_PATCHES  # noqa: E402
 from cbs import render  # noqa: E402
 
 src, lite = sys.argv[1], sys.argv[2]
@@ -27,6 +27,11 @@ MOVED = ('Settings', '통합설정', 'Agent roster', 'World catalog', 'Faction d
 # 지침은 고친 채로 들어간다 (안 쓰는 섹션 빼기·LB Backend 합치기·대기 줄 문구). 아래에서 따로 본다
 TIDIED = ('GNet', 'Phone', 'Wiki')
 orig_books = [e for e in ms['lorebook'] if e['comment'] not in MOVED + TIDIED]
+# 카드가 일부러 고친 로어북 (LORE_PATCHES)은 원본에도 같이 적용해서 비교
+for _c, _old, _new in LORE_PATCHES:
+    for e in orig_books:
+        if e['comment'] == _c and _old in e['content']:
+            e['content'] = e['content'].replace(_old, _new, 1)
 orig_lore = {(e['comment'], e['content']) for e in orig_books}
 lite_lore = [e for e in ml['lorebook'] if e['comment'] not in (MANIFEST_COMMENT, 'Directory') + TIDIED and not e['comment'].startswith('WIKI｜') and e['comment'] not in ('📖위키', '📖위키 기본 문서') and not e['comment'].startswith('📚Lore slot')]
 FAC_VARS = re.compile(r'\{\{getvar::fac_(codes|ac|pool)\}\}')

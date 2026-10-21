@@ -1,4 +1,19 @@
-new PhoneError("추가 연락처를 읽지 못했어요. 기존 기록은 그대로 둬요.");
+or (const f of extra) e.visibleFor.add(f);
+      for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
+    }
+    const orders = {};
+    for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = [...order];
+    return { entries: entries2, orders };
+  }
+  function readCustom(chat) {
+    const raw = String(chat.scriptstate?.[PH_CONTACTS] ?? "");
+    if (!raw || raw === "null") return { version: 1, seq: 0, items: [] };
+    try {
+      const d = JSON.parse(raw);
+      if (d?.version === 1 && Array.isArray(d.items)) return { version: 1, seq: Number(d.seq) || 0, items: d.items.filter((c) => c && typeof c.id === "string" && typeof c.name === "string") };
+    } catch {
+    }
+    throw new PhoneError("추가 연락처를 읽지 못했어요. 기존 기록은 그대로 둬요.");
   }
   function directory(lore, chat) {
     const books = lore ?? [];
@@ -3357,8 +3372,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     let last2 = "";
     try {
       for (; ; ) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done: done2, value } = await reader.read();
+        if (done2) break;
         if (typeof value === "string") last2 = value;
         else if (value && typeof value === "object") last2 = String(Object.values(value)[0] ?? last2);
       }
@@ -4443,11 +4458,4 @@ ${after}`);
       return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
             <span class="ph-who"><span class="ph-who-name"><b>${esc6(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc6(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
             ${badge(room?.unread ?? 0)}</button>
-            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
-            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc6(c.lore || c.name)}" title="위키" aria-label="${esc6(c.name)} 위키">${ICONS.book}</button>`}
-            ${c.saved && c.custom ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
-    }).join("")}</ul>`;
-  }
-  function chatRooms(st, q) {
-    const keys = [.../* @__PURE__ */ new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
-    return keys.map((k) => st.rooms[k]).filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.
+            <span class="ph-act"><button class="ph-tool

@@ -1,4 +1,245 @@
-; border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
+flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
+.dir-fac > .gx-muted { margin: -4px 0 0; font-size: 13px; }
+.dir-fac .gx-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dir-code { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--signal); color: var(--void); font-size: 12px; letter-spacing: .04em; }
+.dir-in textarea { min-height: 84px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.5; resize: vertical; }
+.dir-in textarea:focus { outline: none; border-color: var(--signal); }
+
+/* ── v0.14.0: 모바일 정리 · 상황판 작전 현황 · 괴담톡 공지 카드 ── */
+/* 상황판 맨 위: 위협도 + 개수 칩(누르면 그 목록으로) + 누가 어디에 투입됐는지 */
+.gx-gmark.op { background: color-mix(in srgb, var(--blue) 18%, transparent); color: var(--blue); }
+.gx-sec { scroll-margin-top: 8px; }
+/* 배치·방문자 줄: 꼬리표 + 요원 칩(사진+이름) + 세력 이름표 */
+.gx-list p.gx-people { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.gx-people-l { font-size: 13px; font-weight: 600; color: var(--dim); margin-right: 2px; }
+.gx-pchip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px 0 3px; border-radius: 999px; background: var(--panel2); color: var(--text); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.gx-ava.xs { width: 24px; height: 24px; font-size: 11px; }
+
+/* 괴담톡: 빈 목록 안내는 목록 칸 한가운데 */
+.ph-content { display: flex; flex-direction: column; }
+.ph-blank { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px 20px; text-align: center; }
+.ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
+/* 괴담톡 공지: 대화 목록과 같은 줄 (테두리 없음, 마우스 올리면 판 색, 고르면 민트) */
+.ph-notices { gap: 2px; padding: 0; }
+.ph-notice { position: relative; border-radius: 14px; background: none; overflow: hidden; }
+.ph-notice:hover { background: var(--panel); }
+.ph-notice.on, .ph-notice.on:hover { background: var(--accent-bg); }
+.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 40px; min-height: 26px; }
+.ph-ncard-top small { flex: 1; min-width: 0; font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-nfac { flex: none; max-width: 9em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line2); background: var(--panel2); color: var(--sub); font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-notice-facs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0 8px; }
+.ph-notice-facs .gx-chip small { margin-left: 4px; font-family: var(--mono); font-size: 11px; opacity: .75; }
+.ph-ncard-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ph-ncard-title b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-notice .ph-ndel { position: absolute; top: 8px; right: 8px; }
+.ph-notice .ph-tool.ph-ndel { width: 34px; height: 34px; }
+.ph-notice-bar { padding: 0 8px; }
+/* 모바일에서 펼친 공지는 판 색 바탕으로 읽기 쉽게 */
+@media (max-width: 760px) { .ph-notice.open, .ph-notice.open:hover { background: var(--panel); } }
+.ph-notice-body { margin: 0 14px 14px; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
+.ph-notice.open .ph-ncard-title b { white-space: normal; }
+/* PC는 목록에 첫 줄·제목만, 본문은 오른쪽 칸 */
+@media (min-width: 761px) { .ph-notice-body { display: none; } }
+.ph-row .ph-rdel { flex: none; }
+.ph-row .ph-tool.ph-rdel { width: 34px; height: 34px; color: var(--dim); }
+.ph-row .ph-tool.ph-rdel:hover { color: var(--danger); }
+.ph-notice .ph-tool.ph-ndel { color: var(--dim); }
+.ph-notice .ph-tool.ph-ndel:hover { color: var(--danger); }
+
+/* 위키 설정 등 작은 선택 버튼: 글자가 칸 밖으로 넘치지 않게 */
+.gx-segs-sm .gx-seg { flex: 0 0 auto; }
+
+@media (max-width: 760px) {
+  /* 커스텀 임무: 모바일은 한 칸 (예전엔 .gx-field.gx-mission 두 칸 규칙이 이겨서 안내문이 세로로 한 글자씩 깨졌다) */
+  .gx-field.gx-mission { grid-template-columns: minmax(0, 1fr); }
+  /* 위키 설정: 선택 버튼 줄을 칸 너비만큼 */
+  .nw-settings .gx-segs { justify-self: stretch; display: flex; }
+  .nw-settings .gx-seg { flex: 1 0 auto; }
+}
+@media (max-width: 520px) {
+  /* 머리글: 날짜·시간이 잘리지 않게 위협도 알약은 숫자만 */
+  .gx-head-act { gap: 6px; }
+  .gx-brand { gap: 10px; }
+  .gx-brand small { overflow: visible; text-overflow: clip; }
+}
+
+/* v0.15 지도 확대: 칸은 그대로, 안쪽 그림만 확대·이동 */
+.gx-mapzoom { position: relative; transform-origin: 0 0; }
+.gx-canvas.ph .gx-mapzoom { position: absolute; inset: 0; }
+.gx-mapzoom .gx-pin { transform: translate(-50%, -50%) scale(var(--pz, 1)); }
+.gx-canvas[data-map] { touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
+.gx-canvas:is(.zoomed, .pan) { touch-action: none; cursor: grab; }
+.gx-canvas:is(.zoomed, .pan):active { cursor: grabbing; }
+.gx-mapimg { -webkit-user-drag: none; pointer-events: none; }
+.gx-zbtn.txt { font-size: 12px; font-weight: 700; letter-spacing: -.02em; }
+.gx-zoom { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.gx-zbtn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--void) 88%, transparent); color: var(--text);
+  font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1; padding: 0; display: grid; place-items: center; cursor: pointer;
+}
+.gx-zbtn:hover { border-color: var(--signal); }
+.gx-zbtn.reset { display: none; font-size: 16px; }
+.gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
+@media (max-width: 760px) { .gx-zbtn { width: 40px; height: 40px; } }
+
+/* v0.15 왼쪽 위 간이 상태창 */
+.gx-stat { list-style: none; margin: 0; padding: 10px 12px; display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.gx-stat li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 13px; }
+.gx-stat span { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
+.gx-stat b { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.gx-stat b .y { opacity: .7; }
+
+/* 설정 → 업데이트 */
+.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
+.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
+.upd-ver b { color: var(--signal); }
+.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
+.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
+.upd-plan small { color: var(--dim); }
+.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
+.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
+.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
+.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
+.upd-banner-t b { color: var(--text); margin-right: 4px; }
+.upd-banner-b { display: flex; gap: 6px; flex: none; }
+.gx-x { position: relative; }
+.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
+
+/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
+.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
+.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
+.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
+.gx-team .gx-note { margin-top: 0; }
+/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
+.gx-team .gx-note textarea { min-height: 0; }
+.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
+.gx-notice { margin: 12px 20px 0; }
+/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
+.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
+.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
+.gx-scard .gx-ava svg { width: 26px; height: 26px; }
+.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
+.gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.gx-scard-step .gx-step { width: 32px; height: 32px; border-radius: 9px; color: var(--text); }
+.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
+@media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
+
+/* 모바일 단계 바 (v0.16.9): 목표 고르기와 편성을 한 화면씩. PC는 두 칸이라 숨김 */
+.gx-stepbar { display: none; }
+@media (max-width: 760px) {
+  .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr 84px; }
+  /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
+  .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .gx-stepswap svg { width: 16px; height: 16px; }
+  .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+  .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
+  .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
+  .gx-stepb b { font-size: 15px; }
+  .gx-stepb small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-stepb.on { border-color: var(--signal); background: var(--accent-bg); }
+  .gx-stepb.on i { background: var(--signal); color: var(--void); }
+  .gx-stepb.on small { color: var(--sub); }
+  .gx-field[data-step="goal"] .gx-team { display: none; }
+  .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 한 줄에 한 명 (v0.16.18: 두 칸은 글이 너무 좁았다, 사용자 결정) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); }
+  .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
+  /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
+  .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
+  .gx-acard.pick .gx-acard-top b { flex: 0 1 auto; padding-right: 0; }
+  .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
+  .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 14px; }
+  .gx-acard.pick small { white-space: normal; font-size: 12px; line-height: 1.35; }
+  .gx-acard.pick .gx-acard-sit { display: none; }
+  .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
+}
+@media (max-width: 760px) {
+  /* 모바일 편성 단계 (v0.16.11, 사용자 요청): 작전 메모·작전 개시는 아래에 두고 요원 목록만 스크롤 */
+  .gx-field[data-step="team"] { display: flex; flex-direction: column; align-items: stretch; overflow: hidden; padding-bottom: 12px; }
+  .gx-field[data-step="team"] > .gx-sidecol { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team { flex: 1; min-height: 0; }
+  .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+}
+
+/* 아이콘만 있는 작은 버튼 (상황 행의 지도·위키·종료 등, v0.16.17: 글자 버튼 상자가 눈에 띄었다) */
+.gx-icon { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; flex: none; }
+.gx-icon:hover { color: var(--signal); background: var(--panel2); }
+.gx-icon svg { width: 17px; height: 17px; }
+.gx-ev { position: relative; }
+.gx-ev > .gx-evact { position: absolute; top: 6px; right: 6px; flex-direction: row; align-items: center; gap: 0; padding: 0; }
+.gx-evs .gx-ev .gx-evmain > .gx-row:first-child { padding-right: 96px; }
+.gx-mlist .gx-ev .gx-evmain { padding-right: 44px; }
+/* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
+.gx-field.gx-map > .gx-mapcol { position: static; }
+.gx-mapcol > .gx-sits { padding: 4px 0 0; }
+/* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
+.gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.gx-sitbar .gx-chip { flex: none; }
+.gx-unplace { margin-left: 4px; border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--danger); font-weight: 700; }
+.gx-unplace:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 26%, var(--panel)); }
+/* 고른 것이 없을 때는 자리만 지키고 흐리게 (2026-10-21 사용자: 구석이라 안 보여서 특수 칩 바로 오른쪽, 색 바탕) */
+.gx-unplace:disabled { border-color: var(--line); background: none; color: var(--dim); font-weight: 600; opacity: .5; cursor: default; }
+.gx-mfilter .gx-unplace { margin-left: 0; }
+.gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
+.gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
+/* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
+.gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
+.gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
+.gx-acard.pick.wide:hover:not(.off) { border-color: var(--line2); }
+.gx-acard.pick.wide.off { opacity: .45; cursor: not-allowed; }
+.gx-acard.pick.wide .gx-acard-top { padding-right: 60px; }
+.gx-acard.pick.wide .gx-acard-sit { -webkit-line-clamp: 2; }
+.gx-acard.pick.wide .gx-acard-check { top: auto; bottom: 8px; right: 10px; transform: none; }
+@media (min-width: 761px) {
+  .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
+  /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
+  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 98px); }
+  /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
+  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 98px); }
+  .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
+  .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
+  .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
+  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start, .gx-mission .gx-team > .gx-note, .gx-mission .gx-team > .gx-start { flex: none; }
+}
+@media (max-width: 760px) {
+  /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
+  .gx-field { padding-top: 10px; row-gap: 12px; }
+  /* 목표·편성·전환 줄은 위에 고정, 아래만 스크롤 (사용자 요청) */
+  .gx-stepbar { gap: 6px; position: sticky; top: -10px; z-index: 3; margin: -10px -16px 0; padding: 10px 16px 8px; background: var(--void); }
+  .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
+  .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
+  .gx-stepb span { flex-direction: row; align-items: baseline; gap: 6px; }
+  .gx-stepb b { font-size: 14px; flex: none; }
+  /* 편성 단계: 요원 목록이 넓게. 작전 메모는 한 줄로 접어 두고 누르면 펼친다 */
+  /* 목표·인원은 위 목표·편성 줄에 이미 나온다 */
+  .gx-team > .gx-goal { display: none; }
+  .gx-field[data-step="team"] .gx-note { gap: 4px; }
+  /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
+  .gx-note textarea { scrollbar-width: none; }
+  .gx-note textarea::-webkit-scrollbar { display: none; }
+  .gx-field[data-step="team"] .gx-note textarea { min-height: 0; height: 42px; padding: 9px 12px; resize: none; }
+  .gx-field[data-step="team"] .gx-note textarea:focus, .gx-field[data-step="team"] .gx-note textarea.filled { height: 96px; }
+  .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gx-field[data-step="team"] .gx-team { gap: 8px; }
+  /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
+  .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
+  .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
+  .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
+}
+
+/* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
+/* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
+.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--panel); isolation: isolate; text-align: center; }
 .gx-id-bg { position: absolute; inset: 0; z-index: -1; background-size: cover; background-position: center 30%; opacity: .38; -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .55) 45%, transparent 85%); }
 .gx-id-photo { position: relative; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 20px; overflow: hidden; background: var(--panel2); color: var(--dim); border: 1px solid var(--line); flex: none; }
 .gx-id-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -766,9 +1007,6 @@ button.mk-go:hover { color: var(--signal); }
 .gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .95) 0%, rgba(6, 10, 12, .8) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 26%); }
 .gx-mx .gx-evart-top { justify-content: flex-start; }
 .gx-mx .gx-evart-cap { max-height: calc(100% - 50px); }
-.gx-mx-btns { display: flex; gap: 6px; align-items: center; }
-.gx-mx-btns .gx-mx-pick { flex: 1; margin: 0; min-height: 40px; font-size: 14.5px; }
-.gx-mx-btns .gx-evbtn { width: 40px; height: 40px; }
 .gx-mx-art .gx-evc-desc { display: block; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .86); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
 .gx-mx.open .gx-evart-name b { font-size: 19px; white-space: normal; }
 /* 커스텀 목록: 그림 띠는 한 줄에 하나 (2026-10-20 사용자: 한 칸부터 보고 크면 두 칸으로). 넓은 칸이라 띠는 더 납작하게, 펴면 4:3 */
@@ -813,12 +1051,12 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evpop-end .gx-mini.danger { background: var(--danger, #d9534f); border-color: transparent; }
 /* PC: 지도는 그대로 두고 상황 목록만 스크롤 (2026-10-20 사용자: 목록을 굴리면 지도까지 움직였다) */
 @media (min-width: 761px) {
-  .gx-field.gx-map > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
+  .gx-field.gx-map > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 98px); }
   .gx-map > .gx-mapcol > .gx-canvas, .gx-map > .gx-mapcol > :not(.gx-sits) { flex: none; }
   .gx-map > .gx-mapcol > .gx-sits { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .gx-map .gx-sits > .gx-sitbar { flex: none; }
   /* 목록 칸이 남도록 지도는 본문 높이의 55%까지 */
-  .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 89px) * .55); }
+  .gx-map .gx-mapimg { max-height: calc((min(100vh - 28px, 950px) - 98px) * .55); }
   .gx-map .gx-sits > .gx-evcs { flex: 1; align-content: start; grid-auto-rows: max-content; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-bottom: 2px; }
 }
 /* 띠 다듬기 (2026-10-20 사용자): 세 줄을 세로 가운데로, 그림은 커스텀 띠처럼 채도를 낮춰 깔고 왼쪽부터 짙은 그라데이션 */
@@ -871,7 +1109,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evc.art.live .gx-evart::after { border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(var(--kc), .32), inset 0 0 26px rgba(var(--kc), .2); }
 .gx-evc.art.ev-pop { border: 1px solid var(--line2); }
 .gx-evc.art.ev-pop .gx-evart-top { justify-content: flex-end; }
-.gx-evc.art.open .gx-evart-l1 > b { font-size: 19px; white-space: normal; }
+.gx-evc.art.open .gx-evart-l1 > b { font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-evc.art.open .gx-evart-l1 > .gx-gmark { width: 26px; height: 26px; font-size: 13px; }
 .gx-evc.art.open .gx-evart-l2 > small { font-size: 12.5px; color: rgba(255, 255, 255, .82); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
 .gx-evbtn.end.danger { background: var(--danger, #d9534f); color: #fff; }
@@ -882,7 +1120,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evc.art.live .gx-evc-st > .gx-badge { width: 40px; justify-content: center; padding: 0; letter-spacing: .06em; }
 .gx-evc-st > .gx-evc-dep { width: 44px; justify-content: center; padding: 0; gap: 2px; }
 .gx-evart-l1 > .gx-evc-st { margin-left: auto; align-self: center; }
-.gx-evc.art.open .gx-evart-l1 { align-items: flex-start; }
+.gx-evc.art.open .gx-evart-l1 { align-items: center; }
 .gx-evc.art.open .gx-evart-l1 > .gx-evc-st { margin-top: 3px; }
 
 /* 2026-10-20 사용자: 상태 상자 없이. 상태는 카드 색·경과 시간, 다를 때만 둘째 줄 글. 투입은 오른쪽 동그란 얼굴 */
@@ -959,8 +1197,8 @@ button.mk-go:hover { color: var(--signal); }
 .gx-oplive i { width: 6px; height: 6px; border-radius: 50%; background: #5fe6c6; box-shadow: 0 0 8px #5fe6c6; }
 .gx-opmap { position: relative; flex: 1 1 0; min-height: 0; margin-top: 50px; }
 .gx-opmapi { position: absolute; top: 4px; bottom: 8px; left: 50%; transform: translateX(-50%); aspect-ratio: 1100 / 880; max-width: calc(100% - 16px); }
-.gx-opmapi > img { width: 100%; height: 100%; display: block; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.42) contrast(1.35) saturate(1.4); }
-.gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .07) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 50%, rgba(5, 10, 12, .7) 100%); }
+.gx-opmapi > img { width: 100%; height: 100%; display: block; filter: grayscale(.85) sepia(.25) hue-rotate(120deg) brightness(.62) contrast(1.3) saturate(1.4); }
+.gx-opmapi::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), repeating-linear-gradient(90deg, rgba(79, 209, 181, .13) 0 1px, transparent 1px 34px), radial-gradient(ellipse at center, transparent 55%, rgba(5, 10, 12, .55) 100%); }
 .gx-oppin { position: absolute; z-index: 2; transform: translate(-6px, -50%); display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
 .gx-oppin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 25%, transparent), 0 0 14px var(--c); }
 .gx-oppin em { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(8, 12, 14, .78); white-space: nowrap; }
@@ -1030,6 +1268,11 @@ button.mk-go:hover { color: var(--signal); }
    칸 크기는 창 크기와 상관없이 고정이고, 요원이 많으면(최대 20명) 상자 안에서 스크롤 */
 .gx-body .gx-agbox { display: flex; flex-direction: column; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; }
 .gx-agbox > h2 { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 46px; margin: 0; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.gx-hseg { display: flex; gap: 2px; margin-left: -6px; padding: 2px; border-radius: 9px; background: var(--void); box-shadow: inset 0 0 0 1px var(--line); }
+.gx-hseg button { display: grid; place-items: center; width: 34px; height: 28px; padding: 0; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
+.gx-hseg button:hover { color: var(--text); }
+.gx-hseg button.on { background: var(--accent-bg); color: var(--signal); }
+.gx-hseg svg { width: 19px; height: 19px; }
 .gx-agbox > .gx-hint { margin: 8px 14px 0; }
 .gx-agbox > .gx-none { margin: auto; padding: 20px; border: 0; text-align: center; }
 .gx-opcnt .op { --c: #e8685a; }
@@ -1040,7 +1283,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 
 /* 모니터 벽: 감시 화면 한 칸에 한 명. 편성 가능은 밝게(살짝 눌러서), 작전 중은 가장자리·모서리만 붉게, 편성 불가는 어둡게 */
-.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: 150px; gap: 8px; align-content: start; padding: 8px; }
+.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: max(150px, calc((100% - 24px) / 2)); gap: 8px; align-content: start; padding: 8px; }
 .gx-agmon { --c: #5fe6c6; position: relative; display: flex; min-width: 0; min-height: 0; padding: 5px 5px 14px; border-radius: 7px; background: linear-gradient(180deg, #2a3236, #1d2427); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 2px 4px rgba(0, 0, 0, .4); cursor: pointer; }
 .gx-agmon::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: var(--c); box-shadow: 0 0 5px var(--c); }
 .gx-agmon.op { --c: #ff6b5b; } .gx-agmon.lock { --c: #6d7a77; } .gx-agmon.lock::after { box-shadow: none; }
@@ -1052,13 +1295,11 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agmon.op .gx-agmon-scr::after { background: linear-gradient(to top, rgba(4, 8, 8, .8), transparent 38%), linear-gradient(rgba(4, 8, 8, .45), transparent 22%), radial-gradient(ellipse 80% 75% at 50% 45%, transparent 68%, rgba(225, 40, 28, .45) 100%); box-shadow: inset 0 0 14px rgba(230, 45, 30, .45); }
 .gx-agmon.lock .gx-agmon-scr > .gx-ava img { filter: grayscale(1) brightness(.35) contrast(1.15); }
 .gx-agmon.lock .gx-agmon-cap b { color: rgba(255, 255, 255, .55); }
-.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; gap: 4px; font: 600 9.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
-.gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; color: var(--c); }
-.gx-agmon-osd .st i { display: none; }
-.gx-agmon.op .gx-agmon-osd .st i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #ff3b2b; box-shadow: 0 0 5px #ff3b2b; }
+.gx-agmon-osd { position: absolute; z-index: 2; left: 6px; right: 6px; top: 5px; display: flex; justify-content: space-between; align-items: center; gap: 4px; font: 600 10.5px/1 var(--mono); letter-spacing: .06em; color: rgba(220, 255, 240, .75); white-space: nowrap; }
+.gx-agmon-osd .st { display: flex; align-items: center; gap: 4px; padding: 2px 5px; border-radius: 3px; background: rgba(4, 8, 8, .55); color: var(--c); font: 700 11px/1.1 var(--font, inherit); letter-spacing: 0; }
 .gx-agmon-cap { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gx-agmon-cap b { font-size: 13px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-agmon-cap small { font: 600 9.5px/1.2 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon-cap b { font-size: 14.5px; color: #fff; text-shadow: 0 1px 3px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agmon-cap small { font: 600 11px/1.25 var(--mono); color: var(--c); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-agmon:hover .gx-agmon-scr { box-shadow: inset 0 0 0 1px #000, 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
 
 /* 목록: 얼굴 · 이름 · 상태(점+글자) · 상황 · 톡·위키. PC 두 줄, 모바일 한 줄. 줄을 칠하지 않고 점 색으로만 */
@@ -1109,7 +1350,9 @@ button.mk-go:hover { color: var(--signal); }
 @media (max-width: 760px) {
   .gx-agwall { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: auto; gap: 6px; padding: 6px; }
   .gx-agmon { aspect-ratio: 1; }
-  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { max-height: 560px; }
+  .gx-agmon-cap b { font-size: 13.5px; } .gx-agmon-cap small { font-size: 10px; } .gx-agmon-osd { font-size: 9.5px; }
+  /* 모바일은 화면 전체가 넘어가니 요원 칸 안쪽 스크롤 없음 (2026-10-21 사용자) */
+  .gx-agbox .gx-agwall, .gx-agbox .gx-agrows { flex: none; max-height: none; overflow: visible; }
   .gx-agrows { grid-template-columns: minmax(0, 1fr); }
   .gx-agrow:nth-child(odd) { border-right: 0; }
   .gx-agrow { grid-template-columns: 34px 4.6em auto minmax(0, 1fr) auto; gap: 8px; padding: 0 4px 0 10px; }
@@ -1121,6 +1364,91 @@ button.mk-go:hover { color: var(--signal); }
   .gx-agcard-foot .code u { display: none; }
   .gx-agcard-foot button { width: 84px; }
 }
+
+/* 잘리는 상황 글: 넘칠 때만 왼쪽으로 흘렀다가 돌아온다 (전광판). 움직임 줄이기 설정이면 말줄임표 그대로 */
+.gx-flow > span { display: inline-block; }
+.gx-flow.on { text-overflow: clip; }
+.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear infinite; will-change: transform; }
+.gx-flow.on > span::after { content: attr(data-t); padding-left: 3em; }
+@keyframes gx-flow { 0%, 15% { transform: translateX(0); } 100% { transform: translateX(var(--fd, 0)); } }
+@media (prefers-reduced-motion: reduce) { .gx-flow.on { text-overflow: ellipsis; } .gx-flow.on > span { animation: none; display: inline; } .gx-flow.on > span::after { content: none; } }
+.gx-flow.on { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
+
+/* 큰 보기 화면 표시 (2026-10-21 사용자): 버튼이 빠진 맨 윗줄에 REC·카메라, 그 아래 날짜. 위성도 같은 틀(LIVE·SAT-2) */
+.gx-opbar { align-items: flex-start; }
+.gx-opbar .gx-oposd { position: static; flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 7px 10px; padding: 6px 0 0 4px; }
+/* 날짜는 둘째 줄에서 카메라 이름과 같은 들여쓰기 */
+.gx-oposd .l1 { display: contents; }
+.gx-oposd .ts { grid-column: 2; }
+.gx-oposd .l1 .cam { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oposd .ts { color: rgba(235, 255, 240, .7); }
+.gx-oposd .rec.sat { color: #5fe6c6; } .gx-oposd .rec.sat i { background: #5fe6c6; box-shadow: 0 0 6px #5fe6c6; }
+/* 모바일 설정: 칸 고르기는 한 줄 (상태창 5칸이 두 줄로 밀리던 것, 2026-10-21 사용자) */
+@media (max-width: 760px) {
+  .ps-ctl .gx-segs { flex-wrap: nowrap; max-width: 100%; }
+  .ps-ctl .gx-seg { flex: 0 1 auto; min-width: 0; padding: 0 9px; white-space: nowrap; }
+}
+/* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
+.gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
+.gx-evart-l1 .gx-goaltag { flex: none; }
+.gx-evpick { flex: none; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
+.gx-evpick svg { width: 17px; height: 17px; }
+.gx-evpick.on { background: rgba(8, 12, 14, .72); color: #f2f6f5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
+/* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
+/* 커스텀 띠의 위키 (2026-10-21 사용자): 접힌 띠에선 오른쪽 끝, 상태 표시는 그 왼쪽 */
+.gx-mlist li.gx-mx { position: relative; }
+.gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
+.gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
+/* 모바일 좌우 쓸기 (2026-10-21 사용자: 단추 위에서 시작하면 안 넘어간다): 가로 끌기는 브라우저가 가져가지 않게 세로 스크롤만 맡긴다.
+   가로로 넘기는 줄·지도는 자기 touch-action이 따로 있다 */
+@media (max-width: 760px) {
+  .gx-content { touch-action: pan-y pinch-zoom; }
+}
+/* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
+:where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
+:where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
+/* PC 임무 탭 지도 (2026-10-21 사용자): 그림은 칸 폭을 꽉 채우고, 칸 높이는 줄여 위아래는 끌어서 본다.
+   칸 높이 = 본문 높이 − (지역 줄 36 + 칸 사이 10×2 + 필터·카드 세 줄 342 + 틀 2) */
+@media (min-width: 761px) {
+  .gx-map .gx-mapbar .gx-select, .gx-map .gx-mapbar .gx-search { min-height: 36px; }
+  .gx-map > .gx-mapcol > .gx-canvas:not(.ph) { width: 100%; margin: 0; height: calc(min(100vh - 28px, 950px) - 98px - 400px); background: #0c1315; }
+  .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { width: 100%; }
+  .gx-map .gx-mapimg { width: 100%; max-width: none; max-height: none; }
+}
+/* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
+   안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
+.gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
+.gx-tgt svg { display: block; }
+.gx-tgt .dot { fill: #ff3b30; opacity: 0; }
+.gx-tgt:hover { color: rgba(255, 255, 255, .9); }
+.gx-tgt.on { color: #fff; }
+.gx-tgt.on .dot { opacity: 1; }
+.gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: 30px; height: 30px; margin: 0; border-radius: 9px; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
+.gx-evbtn.gx-tgt:hover { background: rgba(8, 12, 14, .82); }
+.gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
+.gx-mx.open .gx-evart-name .gx-evart-l1 > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-opcap .gx-evart-l1 > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 10.5px; }
+.gx-evart-l1 > b:has(+ .gx-tgt), .gx-evart-l1 > .gx-tgt { align-self: baseline; }
+.gx-evart-l1 > .gx-tgt { height: auto; font-size: 12px; }
+/* CCTV 잡음·위성 구름 (transform만 움직임) */
+.gx-opfx { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; border-radius: inherit; }
+.gx-opfx > .n { position: absolute; inset: -96px; opacity: .26; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 4 -1.75'/%3E%3C/filter%3E%3Crect width='192' height='192' filter='url(%23f)'/%3E%3C/svg%3E"); will-change: transform; animation: gx-opnoise .48s steps(1) infinite; }
+.gx-opfx > .r { position: absolute; left: 0; right: 0; top: 0; height: 26%; background: linear-gradient(transparent, rgba(255, 255, 255, .05) 45%, rgba(255, 255, 255, .09) 52%, transparent); will-change: transform; animation: gx-oproll 7.5s linear infinite; }
+@keyframes gx-opnoise { 0% { transform: translate(0, 0); } 17% { transform: translate(-61px, 23px); } 33% { transform: translate(37px, -71px); } 50% { transform: translate(-19px, 54px); } 67% { transform: translate(72px, 11px); } 83% { transform: translate(-44px, -38px); } }
+@keyframes gx-oproll { 0% { transform: translateY(-110%); } 100% { transform: translateY(420%); } }
+@keyframes gx-opjit { 0%, 91%, 93.5%, 100% { transform: none; } 91.5% { transform: translate(2px, -1px); } 92.5% { transform: translate(-3px, 1px) skewX(-1.5deg); } 93% { transform: translate(1px, 0); } }
+.gx-opview.feed > .gx-opfeed { animation: gx-opjit 6.3s steps(1) infinite; }
+.gx-opview.nosig > .gx-opfx > .n { opacity: .6; }
+.gx-opview.ended > .gx-opfx > .n, .gx-opview.ended > .gx-opfeed { animation: none; }
+.gx-opview.ended > .gx-opfx > .r { display: none; }
+@media (prefers-reduced-motion: reduce) { .gx-opfx > *, .gx-opview > .gx-opfeed { animation: none !important; } }
+.gx-opfx.sky > i { position: absolute; top: 0; left: 0; width: calc(100% + 820px); height: 100%; background-size: 512px 512px; will-change: transform; animation: gx-opsky 64s linear infinite; }
+.gx-opfx.sky > .c0 { background-position: 16px 20px; }
+.gx-opfx.sky > .c1 { opacity: .9; }
+.gx-opfx.sky > .c2 { opacity: .35; background-size: 820px 820px; background-position: 300px 140px; animation: gx-opsky2 120s linear infinite; }
+@keyframes gx-opsky { from { transform: translateX(-512px); } to { transform: translateX(0); } }
+@keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
 `;
 
   // src/ui/mbar.ts
@@ -1131,9 +1459,9 @@ button.mk-go:hover { color: var(--signal); }
   var rubber = (dx, w) => Math.sign(dx) * (Math.abs(dx) / (1 + Math.abs(dx) / (4 * w)));
   function bindMbar(root2, onClose) {
     const bar = root2.querySelector(".gx-mbar");
-    const track = bar?.querySelector(".gx-mtrack");
-    if (!bar || !track) return;
-    const closeW = () => track.querySelector(".gx-mclose")?.offsetWidth || 72;
+    const track2 = bar?.querySelector(".gx-mtrack");
+    if (!bar || !track2) return;
+    const closeW = () => track2.querySelector(".gx-mclose")?.offsetWidth || 72;
     let x0 = 0;
     let y0 = 0;
     let id = null;
@@ -1141,10 +1469,10 @@ button.mk-go:hover { color: var(--signal); }
     let shown2 = 0;
     let ready = false;
     const paint = () => {
-      track.style.transform = shown2 ? `translateX(${shown2}px)` : "";
+      track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
       const was = ready;
       ready = Math.abs(shown2) >= closeW();
-      track.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
+      track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
       if (ready && !was) navigator.vibrate?.(8);
     };
     const end = () => {
@@ -1152,10 +1480,10 @@ button.mk-go:hover { color: var(--signal); }
       id = null;
       if (!dragging) return;
       const close2 = ready;
-      track.classList.add("back");
+      track2.classList.add("back");
       shown2 = 0;
       paint();
-      setTimeout(() => track.classList.remove("back"), 260);
+      setTimeout(() => track2.classList.remove("back"), 260);
       if (close2) onClose();
     };
     bar.addEventListener("pointerdown", (e) => {
@@ -1164,7 +1492,7 @@ button.mk-go:hover { color: var(--signal); }
       x0 = e.clientX;
       y0 = e.clientY;
       dragging = false;
-      track.classList.remove("back");
+      track2.classList.remove("back");
     });
     bar.addEventListener("pointermove", (e) => {
       if (e.pointerId !== id) return;
@@ -1188,7 +1516,7 @@ button.mk-go:hover { color: var(--signal); }
   }
 
   // src/ui/marks.ts
-  var esc9 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc10 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var key = (m) => JSON.stringify(m.s);
   var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
   var markUi = { pop: false };
@@ -1207,12 +1535,12 @@ button.mk-go:hover { color: var(--signal); }
     if (!markUi.pop) return "";
     const list4 = marks();
     const full = list4.length >= MARK_MAX;
-    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc9(m.name)}</span></button>
-        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc9(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc9(current3.name)}</span></button>` : "";
+    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
     const cand = markCandidates(recent, current3);
-    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc9(m.name)}</span></span>
-        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc9(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
+    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
+        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
     return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
     <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
       <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
@@ -1230,7 +1558,7 @@ button.mk-go:hover { color: var(--signal); }
     if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
     return Array.from({ length: MARK_MAX }, (_, i) => {
       const m = list4[i];
-      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc9(m.name)}" title="${esc9(m.name)}">${icon(m)}<span class="ph-tool-l">${esc9(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
+      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc10(m.name)}" title="${esc10(m.name)}">${icon(m)}<span class="ph-tool-l">${esc10(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
     }).join("");
   }
 
@@ -1320,22 +1648,26 @@ button.mk-go:hover { color: var(--signal); }
       ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
     </div>`;
   }
-  function clamp(v, w, h) {
+  function clamp(v, cw, ch, lw, lh) {
     const z = Math.min(MAX, Math.max(1, v.z));
-    return { z, x: Math.min(0, Math.max(w - w * z, v.x)), y: Math.min(0, Math.max(h - h * z, v.y)) };
+    const fit = (p, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p));
+    return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
   }
   function bindMapZoom(root2) {
     const canvas = root2.querySelector(".gx-canvas[data-map]");
     const layer2 = canvas?.querySelector(".gx-mapzoom");
     if (!canvas || !layer2) return;
     const key2 = canvas.dataset.map ?? "";
-    let v = views.get(key2) ?? { z: 1, x: 0, y: 0 };
+    let v = views.get(key2) ?? { z: 1, x: 0, y: Number.NaN };
+    const canPan = () => layer2.offsetWidth * v.z > canvas.clientWidth + 1 || layer2.offsetHeight * v.z > canvas.clientHeight + 1;
     const apply = () => {
-      v = clamp(v, canvas.clientWidth, canvas.clientHeight);
+      if (Number.isNaN(v.y)) v = { ...v, y: (canvas.clientHeight - layer2.offsetHeight) / 2 };
+      v = clamp(v, canvas.clientWidth, canvas.clientHeight, layer2.offsetWidth, layer2.offsetHeight);
       views.set(key2, v);
-      layer2.style.transform = v.z === 1 ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
+      layer2.style.transform = v.z === 1 && !v.x && !v.y ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
       layer2.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
       canvas.classList.toggle("zoomed", v.z > 1);
+      canvas.classList.toggle("pan", canPan());
     };
     const zoomAt = (z, cx, cy) => {
       const nz = Math.min(MAX, Math.max(1, z));
@@ -1344,7 +1676,7 @@ button.mk-go:hover { color: var(--signal); }
     };
     const local = (px, py) => {
       const r = canvas.getBoundingClientRect();
-      return [px - r.left, py - r.top];
+      return [px - r.left - canvas.clientLeft, py - r.top - canvas.clientTop];
     };
     const img = canvas.querySelector(".gx-mapimg");
     if (img && !img.complete) img.addEventListener("load", apply, { once: true });
@@ -1354,7 +1686,7 @@ button.mk-go:hover { color: var(--signal); }
       if (!b) return;
       e.stopPropagation();
       const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
-      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: 0 }, apply();
+      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: Number.NaN }, apply();
       else zoomAt(v.z * (b.dataset.zoom === "in" ? 1.6 : 1 / 1.6), w, h);
     });
     let dragged = false;
@@ -1383,7 +1715,7 @@ button.mk-go:hover { color: var(--signal); }
         const nz = Math.min(MAX, Math.max(1, start4.v.z * dist(t) / start4.d));
         v = { z: nz, x: mx - (start4.mx - start4.v.x) / start4.v.z * nz, y: my - (start4.my - start4.v.y) / start4.v.z * nz };
         apply();
-      } else if (t.length === 1 && v.z > 1 && !start4.d) {
+      } else if (t.length === 1 && canPan() && !start4.d) {
         e.preventDefault();
         const dx = t[0].clientX - start4.x, dy = t[0].clientY - start4.y;
         if (Math.hypot(dx, dy) > MOVE) dragged = true;
@@ -1402,7 +1734,7 @@ button.mk-go:hover { color: var(--signal); }
       zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
     }, { passive: false });
     canvas.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse" || e.button !== 0 || v.z === 1 || e.target.closest(".gx-zoom")) return;
+      if (e.pointerType !== "mouse" || e.button !== 0 || !canPan() || e.target.closest(".gx-zoom")) return;
       const sx = e.clientX, sy = e.clientY, sv = { ...v };
       dragged = false;
       const move2 = (m) => {
@@ -2294,7 +2626,7 @@ button.mk-go:hover { color: var(--signal); }
   // src/game/index.ts
   var lastRun = null;
   var STEP = 1 / 30;
-  var esc10 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  var esc11 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
   var faces = "";
   function faceStyle(id, size) {
     return `background-image:url('${faces}');background-position:${-agentDef(id).face * size}px 0`;
@@ -2359,8 +2691,8 @@ button.mk-go:hover { color: var(--signal); }
         cardKey = key2;
         squadEl.innerHTML = team.map((u) => {
           const d = agentDef(u.kind);
-          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc10(d.name)} ${esc10(d.skillName)}">
-          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc10(d.name)}</span>
+          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc11(d.name)} ${esc11(d.skillName)}">
+          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc11(d.name)}</span>
           <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
         }).join("");
       }
@@ -2384,12 +2716,12 @@ button.mk-go:hover { color: var(--signal); }
     const drawSquadSheet = () => {
       sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><div class="gg-pick">${AGENTS.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
-        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc10(a.name)}</b><small>${esc10(a.role)} · ${esc10(a.skillName)}</small></button>`).join("")}</div></div>
+        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc11(a.name)}</b><small>${esc11(a.role)} · ${esc11(a.skillName)}</small></button>`).join("")}</div></div>
       <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
     };
     const openRecord = () => {
       sheet.hidden = false;
-      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc10(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
+      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc11(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
       sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><dl class="gg-rec">
         <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
@@ -2496,749 +2828,4 @@ button.mk-go:hover { color: var(--signal); }
   function depthScale(_footY) {
     return 1;
   }
-  var GAIT = { walk: 160, run: 192, crouch: 112 };
-  var MOTION = { walkSpeed: 200, runSpeed: 360 };
-
-  // src/game/action/motion.ts
-  var ATTACK = {
-    melee1: {
-      ticks: [4, 1, 2, 3, 6],
-      contact: 5,
-      damage: 18,
-      reach: 124,
-      stop: 3,
-      push: 18
-    },
-    melee2: {
-      ticks: [4, 1, 2, 4, 7],
-      contact: 5,
-      damage: 24,
-      reach: 132,
-      stop: 3,
-      push: 24
-    },
-    melee3: {
-      ticks: [5, 3, 1, 3, 6, 10],
-      contact: 9,
-      damage: 38,
-      reach: 148,
-      stop: 5,
-      push: 66
-    },
-    lowkick: {
-      ticks: [5, 3, 11],
-      contact: 5,
-      damage: 22,
-      reach: 150,
-      stop: 3,
-      push: 26
-    },
-    airattack: {
-      ticks: [4, 5, 9],
-      contact: 4,
-      damage: 26,
-      reach: 155,
-      stop: 4,
-      push: 35
-    },
-    dashattack: {
-      ticks: [4, 2, 4, 12],
-      contact: 6,
-      damage: 32,
-      reach: 142,
-      stop: 4,
-      push: 48
-    }
-  };
-  var strikeDuration = (name) => ATTACK[name].ticks.reduce((a, b) => a + b, 0) / 60;
-  var strikeContact = (name) => ATTACK[name].contact / 60;
-  function isStrike(name) {
-    return name in ATTACK;
-  }
-
-  // src/game/action/sim.ts
-  var WIDTH = 1280;
-  var HEIGHT = 720;
-  var SAVE_VERSION2 = 4;
-  var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
-  var body3 = (id, kind, x, y, hp) => ({
-    id,
-    kind,
-    x,
-    y,
-    z: 0,
-    vz: 0,
-    dir: kind === "jyaldi" ? 1 : -1,
-    hp,
-    max: hp,
-    act: "idle",
-    t: 0,
-    duration: 0,
-    fired: false,
-    inv: 0,
-    flash: 0,
-    cooldown: 0,
-    armor: false,
-    stride: 0,
-    speed: 0,
-    push: 0
-  });
-  function newRun2() {
-    return {
-      version: SAVE_VERSION2,
-      player: {
-        ...body3(1, "jyaldi", 220, 510, 200),
-        energy: 100,
-        gauge: 100,
-        guard: 100,
-        dashCd: 0,
-        items: [3, 2, 2],
-        attackBuffer: 0,
-        crouching: false
-      },
-      enemies: [
-        body3(2, "corner", 760, 480, 130),
-        body3(3, "watchman", 1030, 560, 145),
-        body3(4, "corner", 1130, 510, 130),
-        body3(5, "watchman", 940, 610, 145)
-      ],
-      bolts: [],
-      effects: [],
-      time: 0,
-      auto: false,
-      phase: "combat",
-      nextId: 6,
-      cutin: 0,
-      hitstop: 0,
-      kills: 0,
-      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기",
-      shake: 0,
-      practice: false
-    };
-  }
-  function practiceRun() {
-    const r = newRun2();
-    r.practice = true;
-    r.player.x = 440;
-    r.player.y = 570;
-    r.message = "동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격";
-    r.enemies.forEach((e, i) => {
-      e.x = i ? 1200 : 530;
-      e.y = i ? 680 : 570;
-      e.hp = i ? 0 : 1e3;
-      e.max = i ? e.max : 1e3;
-      if (i) {
-        e.act = "dead";
-        e.t = 2;
-      }
-    });
-    r.kills = 3;
-    return r;
-  }
-  function act(b, name, duration) {
-    b.act = name;
-    b.t = 0;
-    b.duration = duration;
-    b.fired = false;
-  }
-  function fx(r, kind, x, y, z = 65) {
-    if (r.effects.length >= 64) r.effects.shift();
-    const duration = kind === "blast" ? 0.55 : 0.22;
-    r.effects.push({ x, y, z, t: 0, duration, kind });
-  }
-  function facing(a, b) {
-    return (b.x - a.x) * a.dir >= -8;
-  }
-  function damage2(r, b, amount, source4, down = false, stop = down ? 5 / 60 : 3 / 60, push2 = down ? 66 : 18) {
-    if (b.hp <= 0 || b.inv > 0) return false;
-    const p = r.player;
-    if (b === p && ["guard", "crouch", "crouchwalk"].includes(p.act) && facing(p, source4) && p.guard > 0) {
-      p.guard = Math.max(0, p.guard - amount * 2);
-      p.flash = 0.08;
-      fx(r, "guard", p.x + p.dir * 40, p.y, p.act === "crouch" ? 105 : 165);
-      if (!p.guard) {
-        act(p, "stun", 0.65);
-        r.message = "가드 붕괴! 거리를 확보하세요.";
-      }
-      return false;
-    }
-    b.hp = Math.max(0, b.hp - amount);
-    b.flash = 0.12;
-    const impactHeight = source4.act === "lowkick" ? 35 : source4.act === "airattack" ? Math.min(190, source4.z + 105) : 165;
-    fx(r, "hit", b.x, b.y, b.z + impactHeight);
-    r.hitstop = Math.max(r.hitstop, stop);
-    r.shake = Math.max(r.shake, down ? 6 : 2);
-    b.push = source4.dir * push2 * 8;
-    if (b === p) {
-      p.inv = 0.5;
-      p.gauge = clamp2(p.gauge + 7, 0, 100);
-    } else p.gauge = clamp2(p.gauge + amount * 0.35, 0, 100);
-    if (b.hp <= 0) {
-      act(b, "dead", 1);
-      if (b !== p) r.kills++;
-    } else if (!b.armor) act(b, down ? "down" : "hurt", down ? 0.9 : 0.23);
-    return true;
-  }
-  function move(b, x, y, speed, dt, face3 = true) {
-    const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
-    b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
-    b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
-    const distance = Math.hypot(b.x - ox, b.y - oy);
-    b.speed = Math.min(1200, distance / dt);
-    if (b.z === 0 && b.act !== "dash")
-      b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
-    if (x && face3) b.dir = x > 0 ? 1 : -1;
-  }
-  function nearTarget(r) {
-    const p = r.player;
-    return r.enemies.find(
-      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
-    );
-  }
-  function bolt(r, b, enemy) {
-    if (r.bolts.length >= 48) return;
-    const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
-    const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
-    r.bolts.push({
-      id: r.nextId++,
-      x: b.x + b.dir * muzzleX,
-      y: b.y,
-      z: b.z + muzzleHeight,
-      vx: b.dir * (enemy ? 410 : 1e3),
-      life: 1.7,
-      enemy
-    });
-    fx(r, "shot", b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
-  }
-  function item(r, i) {
-    const p = r.player;
-    if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
-    if (i === 0) {
-      if (p.hp >= p.max) return;
-      p.hp = Math.min(p.max, p.hp + 70);
-    }
-    if (i === 1) {
-      if (p.guard >= 100) return;
-      p.guard = 100;
-    }
-    if (i === 2) {
-      if (p.energy >= 100) return;
-      p.energy = 100;
-    }
-    p.items[i]--;
-    r.message = ["회복제 사용", "방어 회복제 사용", "능력 회복제 사용"][i];
-  }
-  function autoInput(r) {
-    const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
-    const e = live.sort(
-      (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y)
-    )[0];
-    if (!e) return { x: 0, y: 0 };
-    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find(
-      (e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30
-    );
-    return {
-      x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
-      run: Math.abs(dx) > 260,
-      y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-      attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || Math.abs(dx) > 360 && r.time % 1.8 < 0.45),
-      skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
-      dash: !!threat,
-      ult: p.gauge >= 100 && live.length >= 2,
-      item: p.hp < 95 ? 0 : void 0
-    };
-  }
-  function step2(r, raw, dt) {
-    if (!Number.isFinite(dt) || dt <= 0) return;
-    dt = Math.min(dt, 1 / 30);
-    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
-    r.shake = Math.max(0, r.shake - dt * 24);
-    if (r.phase !== "combat") {
-      r.player.t += dt;
-      for (const enemy of r.enemies) if (enemy.act === "dead") enemy.t += dt;
-      return;
-    }
-    const p = r.player, input2 = r.auto ? autoInput(r) : raw;
-    p.attackBuffer = input2.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
-    if (r.cutin > 0) {
-      r.cutin = Math.max(0, r.cutin - dt);
-      return;
-    }
-    if (r.hitstop > 0) {
-      r.hitstop = Math.max(0, r.hitstop - dt);
-      return;
-    }
-    r.time += dt;
-    for (const b of [p, ...r.enemies]) {
-      b.t += dt;
-      b.inv = Math.max(0, b.inv - dt);
-      b.flash = Math.max(0, b.flash - dt);
-      b.cooldown = Math.max(0, b.cooldown - dt);
-      if (b.push) {
-        b.x = clamp2(b.x + b.push * dt, 55, WIDTH - 55);
-        b.push *= Math.exp(-dt * 10);
-        if (Math.abs(b.push) < 1) b.push = 0;
-      }
-      if (b.z > 0 || b.vz > 0) {
-        b.vz -= 1e3 * dt;
-        b.z = Math.max(0, b.z + b.vz * dt);
-        if (!b.z) {
-          b.vz = 0;
-          if (b === p && ["jump", "walk", "run", "idle", "airattack", "shot"].includes(b.act))
-            act(b, "land", 0.12);
-        }
-      }
-      if (b.act === "down" && b.t >= b.duration) {
-        act(b, "rise", 0.35);
-        b.inv = 0.55;
-      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(b.act) && b.t >= b.duration) {
-        const next = b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee2" ? "melee3" : null;
-        if (next) {
-          act(b, next, strikeDuration(next));
-          p.attackBuffer = 0;
-        } else {
-          if (b === p && b.act === "melee3") b.cooldown = 0.18;
-          act(b, "idle", 0);
-        }
-        b.armor = false;
-      }
-    }
-    p.energy = Math.min(100, p.energy + dt * 9);
-    p.dashCd = Math.max(0, p.dashCd - dt);
-    if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
-    if (input2.item !== void 0) item(r, input2.item);
-    if (["idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(p.act)) {
-      if (r.auto) {
-        const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
-        if (target) p.dir = target.x >= p.x ? 1 : -1;
-      }
-      if (input2.x && !r.auto) p.dir = input2.x > 0 ? 1 : -1;
-      if (input2.jump && p.z === 0) {
-        p.vz = 600;
-        p.crouching = false;
-      }
-      if (input2.guard && input2.y > 0 && !p.z && !p.vz) p.crouching = true;
-      if (!input2.guard) p.crouching = false;
-      if (input2.ult && p.gauge >= 100) {
-        p.gauge = 0;
-        act(p, "ult", 0.9);
-        p.armor = true;
-        p.inv = 1.05;
-        r.cutin = 0.75;
-        r.message = "집중 파괴";
-      } else if (input2.dash && p.dashCd <= 0) {
-        if (input2.x) p.dir = Math.sign(input2.x);
-        act(p, "dash", 0.3);
-        p.inv = 0.24;
-        p.dashCd = 0.8;
-      } else if (input2.guard && !p.z && !p.vz) {
-        p.act = p.crouching ? input2.x ? "crouchwalk" : "crouch" : "guard";
-        if (input2.x) p.dir = Math.sign(input2.x);
-        if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
-          act(p, "lowkick", strikeDuration("lowkick"));
-          p.attackBuffer = 0;
-          p.cooldown = 0.35;
-        } else if (p.act === "crouchwalk") move(p, input2.x, 0, 85, dt);
-      } else if (input2.skill && p.energy >= 35) {
-        p.energy -= 35;
-        act(p, "skill", 0.48);
-        p.armor = true;
-      } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
-        p.attackBuffer = 0;
-        if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
-          act(p, "airattack", strikeDuration("airattack"));
-        } else if (!p.z && !p.vz && input2.run && input2.x) {
-          act(p, "dashattack", strikeDuration("dashattack"));
-        } else if (!p.z && !p.vz && nearTarget(r)) {
-          act(p, "melee1", strikeDuration("melee1"));
-          p.cooldown = 0;
-        } else {
-          act(p, "shot", 0.24);
-          p.cooldown = 0.28;
-        }
-      } else {
-        const x = clamp2(input2.x, -1, 1), y = clamp2(input2.y, -1, 1);
-        const running2 = !!input2.run;
-        p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running2 ? "run" : "walk" : "idle";
-        move(p, x, y, p.z ? 240 : running2 ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
-      }
-    }
-    if (p.act === "dash" && p.attackBuffer > 0 && p.t < 0.16) {
-      act(p, "dashattack", strikeDuration("dashattack"));
-      p.attackBuffer = 0;
-      p.inv = 0;
-    }
-    if (p.act === "dash" && p.t >= 0.04 && p.t < 0.16) move(p, input2.x || p.dir, input2.y, 1200, dt);
-    if (p.act === "dashattack" && p.t < strikeContact("dashattack"))
-      move(p, p.dir, 0, 420, dt, false);
-    if (p.act === "airattack" && p.z > 0) move(p, p.dir, 0, 160, dt, false);
-    if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
-      p.fired = true;
-      const finish2 = p.act === "melee3", attack = ATTACK[p.act];
-      const oldX = p.x;
-      let connected = false;
-      for (const e of r.enemies)
-        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < attack.reach && Math.abs(e.y - p.y) < 35 && (p.act === "airattack" ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60))
-          connected = damage2(
-            r,
-            e,
-            attack.damage,
-            p,
-            finish2 || p.act === "dashattack",
-            attack.stop / 60,
-            attack.push
-          ) || connected;
-      if (connected) p.t = strikeContact(p.act);
-      if (finish2 && connected) fx(r, "blast", p.x + p.dir * 120, p.y, 150);
-      r.message = p.act === "lowkick" ? "하단차기" : p.act === "airattack" ? "공중차기" : p.act === "dashattack" ? "대시 어깨치기" : finish2 ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 오른 장타" : "근접 1타 · 왼 장타";
-      if (connected) return;
-    }
-    if (p.act === "shot" && p.t >= 0.03 && !p.fired) {
-      p.fired = true;
-      bolt(r, p, false);
-    }
-    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.3 : 0.14) && !p.fired) {
-      p.fired = true;
-      const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
-      fx(r, "blast", x, p.y, 70);
-      for (const e of r.enemies)
-        if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
-          damage2(r, e, ultimate ? 70 : 45, p, true);
-    }
-    for (const e of r.enemies) {
-      if (r.practice) continue;
-      if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
-      if (e.act === "shot") {
-        if (!e.fired && e.t >= e.duration - 0.12) {
-          e.fired = true;
-          if (e.kind === "watchman") bolt(r, e, true);
-          else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
-            damage2(r, p, 16, e, true);
-        }
-        continue;
-      }
-      const dx = p.x - e.x, dy = p.y - e.y, range = e.kind === "watchman" ? 550 : 90;
-      e.dir = dx >= 0 ? 1 : -1;
-      if (Math.abs(dx) < range && Math.abs(dy) < 25 && e.cooldown <= 0) {
-        act(e, "shot", e.kind === "watchman" ? 0.85 : 0.65);
-        e.cooldown = e.kind === "watchman" ? 1.7 : 1.2;
-      } else {
-        move(
-          e,
-          Math.abs(dx) > range * 0.8 ? Math.sign(dx) : 0,
-          Math.abs(dy) > 15 ? Math.sign(dy) : 0,
-          e.kind === "watchman" ? 75 : 125,
-          dt
-        );
-        e.act = "walk";
-      }
-    }
-    for (const b of r.bolts) {
-      const old = b.x;
-      b.x += b.vx * dt;
-      b.life -= dt;
-      const targets = b.enemy ? [p] : r.enemies;
-      const candidates = targets.filter(
-        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 125 : 245) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
-      ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
-      if (candidates[0]) {
-        damage2(r, candidates[0], b.enemy ? 12 : 18, {
-          ...p,
-          x: old,
-          dir: Math.sign(b.vx)
-        });
-        b.life = 0;
-      }
-    }
-    r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
-    if (p.hp <= 0) {
-      r.phase = "evacuated";
-      act(p, "defeat", 0.8);
-      r.message = "작전 지속 불가 · 본부 후송";
-    } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
-      r.phase = "cleared";
-      act(p, "victory", 0.7);
-      r.message = "훈련 완료 · 전원 제압";
-    }
-  }
-  function serialize(r) {
-    return JSON.stringify(r);
-  }
-  function restore(raw) {
-    try {
-      if (!raw || raw.length > 12e4) return null;
-      const r = JSON.parse(raw);
-      if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
-        for (const b of [r.player, ...r.enemies]) {
-          b.stride = b.stride ?? 0;
-          b.speed = b.speed ?? 0;
-          b.push = 0;
-          b.y = clamp2(b.y, SCENE.floorMin, SCENE.floorMax);
-        }
-        for (const bolt2 of r.bolts ?? []) bolt2.y = clamp2(bolt2.y, SCENE.floorMin, SCENE.floorMax);
-        r.version = SAVE_VERSION2;
-        r.shake = 0;
-        r.practice = false;
-        r.player.attackBuffer = 0;
-        r.player.crouching = false;
-      }
-      const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
-      const actions = [
-        "idle",
-        "walk",
-        "run",
-        "jump",
-        "land",
-        "melee1",
-        "melee2",
-        "melee3",
-        "shot",
-        "skill",
-        "ult",
-        "dash",
-        "guard",
-        "crouch",
-        "crouchwalk",
-        "lowkick",
-        "airattack",
-        "dashattack",
-        "stun",
-        "victory",
-        "defeat",
-        "hurt",
-        "down",
-        "rise",
-        "dead"
-      ];
-      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200) && finite(b.push, -1200, 1200);
-      if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
-        return null;
-      const p = r.player;
-      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !finite(p.attackBuffer, 0, 0.13) || typeof p.crouching !== "boolean" || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
-        return null;
-      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || !finite(r.shake, 0, 10) || typeof r.practice !== "boolean" || typeof r.message !== "string" || r.message.length > 150)
-        return null;
-      if (r.phase === "combat" && (p.hp <= 0 || !r.practice && r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
-        return null;
-      if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
-        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
-      ))
-        return null;
-      r.effects = [];
-      return r;
-    } catch {
-      return null;
-    }
-  }
-
-  // src/game/action/animation.ts
-  function clipIndex(phase, frames, times) {
-    if (!frames.length) return 0;
-    const p = Math.max(0, Math.min(0.999999, phase));
-    if (!times || times.length !== frames.length) return Math.floor(p * frames.length);
-    const duration = times.reduce((sum, value) => sum + value, 0);
-    if (duration <= 0) return 0;
-    let cursor = p * duration;
-    for (let i = 0; i < times.length; i++) {
-      if (cursor < times[i]) return i;
-      cursor -= times[i];
-    }
-    return frames.length - 1;
-  }
-
-  // src/game/action/render.ts
-  var ActionRenderer = class {
-    constructor(canvas) {
-      this.canvas = canvas;
-      canvas.width = WIDTH;
-      canvas.height = HEIGHT;
-      this.ctx = canvas.getContext("2d");
-    }
-    debugGround = false;
-    images = /* @__PURE__ */ new Map();
-    art = null;
-    disposed = false;
-    preview = null;
-    ctx;
-    async load(art2) {
-      this.art = art2;
-      await Promise.all(
-        ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = () => resolve();
-            img.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
-            img.src = art2.url(name);
-          });
-          if (!this.disposed) this.images.set(name, img);
-        })
-      );
-    }
-    dispose() {
-      this.disposed = true;
-      this.images.clear();
-      this.art = null;
-    }
-    rect(x, y, w, h, color) {
-      this.ctx.fillStyle = color;
-      this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-    }
-    sprite(b, frame, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
-      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null, img = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
-      if (!f || !img) return;
-      scale *= depthScale(b.y);
-      const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
-      c.save();
-      c.translate(Math.round(x), Math.round(y));
-      c.scale(b.dir, 1);
-      if (b.flash > 0) c.filter = "brightness(1.8)";
-      c.drawImage(
-        img,
-        sx,
-        sy,
-        w,
-        h,
-        Math.round(-ax * scale),
-        Math.round(-ay * scale),
-        Math.round(w * scale),
-        Math.round(h * scale)
-      );
-      c.restore();
-    }
-    drawPose(run3, clip, phase) {
-      const previousCutin = run3.cutin;
-      this.preview = { clip: clip === "cutin" ? "idle" : clip, phase };
-      if (clip === "cutin") run3.cutin = Math.max(1e-3, 0.75 * (1 - phase));
-      this.draw(run3);
-      run3.cutin = previousCutin;
-      this.preview = null;
-    }
-    frame(b, r) {
-      const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
-      if (b.kind === "jyaldi") {
-        const clips = this.art?.atlas.action?.clips;
-        if (this.preview) {
-          const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
-          return frames[clipIndex(
-            this.preview.phase,
-            frames,
-            this.art?.atlas.action?.frameTimes?.[this.preview.clip]
-          )];
-        }
-        let name = b.act === "idle" ? "idle" : b.act;
-        if (name === "idle" && clips?.relaxed && !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70))
-          name = "relaxed";
-        if (b.act === "guard" && b.flash > 0) name = "guard_hit";
-        if ((b.z > 0 || b.vz > 0) && !["airattack", "shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
-          name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
-        if (name === "dead") name = "down";
-        if (name === "shot" && b.z > 0 && clips?.airfire) name = "airfire";
-        const clip = clips?.[name] ?? clips?.idle ?? [0];
-        const phase = b.act === "walk" || b.act === "run" || b.act === "crouchwalk" ? b.stride : name === "idle" ? r.time % 1.2 / 1.2 : name === "guard" || name === "crouch" ? r.time % 1 : name === "jump_up" ? Math.max(0, Math.min(0.999, (600 - b.vz) / 500)) : name === "jump_apex" ? Math.max(0, Math.min(0.999, (100 - b.vz) / 200)) : name === "jump_down" ? Math.min(0.999, -b.vz / 600) : progress;
-        return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
-      }
-      if (b.act === "dead" || b.act === "down")
-        return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
-      if (b.act === "rise") return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
-      if (b.act === "hurt") return progress < 0.4 ? 19 : 20;
-      if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
-      return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
-    }
-    draw(r) {
-      const c = this.ctx, p = r.player;
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      c.imageSmoothingEnabled = false;
-      this.rect(0, 0, WIDTH, HEIGHT, "#0a111b");
-      const shake = Math.round(Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake / 2) * 2;
-      c.translate(shake, 0);
-      const bg = this.images.get("bg-bureau-action");
-      if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
-      if (this.debugGround) {
-        for (let x = 0; x < WIDTH; x += 32)
-          this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, "#b4e2e533");
-        for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
-          this.rect(0, y, WIDTH, 1, "#b4e2e533");
-      }
-      for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
-        if (b !== p && b.hp <= 0 && b.t > 1) continue;
-        const visualFrame = b.kind === "jyaldi" ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
-        const lift = visualFrame ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2) : 0;
-        const ground = depthScale(b.y), air = Math.max(0.25, 1 - (b.z + lift) / 240);
-        this.rect(b.x - 32 * ground, b.y - 3, 64 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
-        this.rect(b.x - 24 * ground, b.y - 2, 48 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
-        if (b.kind === "jyaldi" && b.z === 0) {
-          const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
-          for (const [dx, dy] of contact)
-            this.rect(
-              b.x + dx * b.dir * ground * (this.art?.atlas.action?.scale ?? 2) - 7,
-              b.y + dy * ground * (this.art?.atlas.action?.scale ?? 2) - 1,
-              14,
-              3,
-              "#02070bc0"
-            );
-        }
-        if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
-          const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
-          this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
-          this.rect(b.x - 7, b.y - 280, 14, 20, "#ffb35c");
-        }
-        const jolt = b.act === "hurt" && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
-        this.sprite(b, this.frame(b, r), void 0, b.x + jolt, b.y - b.z);
-        if (b.act === "stun") {
-          for (let i = 0; i < 3; i++) {
-            const angle = r.time * 7 + i * Math.PI * 2 / 3;
-            const x = b.x + Math.cos(angle) * 28, y = b.y - b.z - 252 + Math.sin(angle) * 8;
-            this.rect(x - 4, y - 2, 8, 4, "#ffe6a1");
-            this.rect(x - 2, y - 4, 4, 8, "#ffe6a1");
-          }
-        }
-        if (b.armor && b.hp > 0) {
-          this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
-        }
-        if (b.act === "guard" || b.act === "crouch" || b.act === "crouchwalk") {
-          const sy = b.y - (b.act === "crouch" ? 95 : 165);
-          for (let i = 0; i < 4; i++)
-            this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
-        }
-        if (b.kind !== "jyaldi" && b.hp > 0) {
-          const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
-          const healthTop = b.y - (enemyFrame?.[5] ?? 120) * SCENE.enemyScale - 12;
-          this.rect(b.x - 34, healthTop, 68, 6, "#060c12");
-          this.rect(b.x - 34, healthTop, 68 * b.hp / b.max, 6, "#e9896d");
-        }
-        if (b === p && p.inv > 0) {
-          this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
-        }
-      }
-      for (const b of r.bolts) {
-        this.rect(b.x - 12, b.y - b.z, 24, 4, b.enemy ? "#ff7b6b" : "#ffe5ad");
-      }
-      for (const f of r.effects) {
-        const t = f.t / f.duration, radius = f.kind === "blast" ? 20 + t * 190 : 8 + t * 22, x = f.x, y = f.y - f.z;
-        c.globalAlpha = 1 - t;
-        const color = f.kind === "guard" ? "#9ce5ff" : "#ffd18b";
-        const rays = f.kind === "blast" ? 20 : 8;
-        for (let i = 0; i < rays; i++) {
-          const angle = i / rays * Math.PI * 2, rad = radius * (i % 2 ? 0.7 : 1);
-          const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3, py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
-          this.rect(px, py, f.kind === "blast" ? 6 : 3, f.kind === "blast" ? 6 : 3, color);
-        }
-        if (t < 0.35) {
-          this.rect(x - 5, y - 16, 10, 32, "#fff1d0");
-          this.rect(x - 16, y - 5, 32, 10, "#fff1d0");
-        }
-        c.globalAlpha = 1;
-      }
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      if (r.cutin > 0) {
-        this.rect(0, 0, WIDTH, HEIGHT, "#030b17bb");
-        this.rect(0, 165, WIDTH, 320, "#172c46");
-        for (let i = 0; i < 18; i++)
-          this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
-        this.sprite(
-          { ...p, dir: 1 },
-          this.art?.atlas.action?.clips.cutin?.[Math.min(
-            (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
-            Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
-          )] ?? 0,
-    
+  var GAIT = { walk: 160, run

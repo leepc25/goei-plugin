@@ -1,4 +1,11 @@
-messages.some((m) => m.text.toLowerCase().includes(q))));
+ sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
+            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc6(c.lore || c.name)}" title="위키" aria-label="${esc6(c.name)} 위키">${ICONS.book}</button>`}
+            ${c.saved && c.custom ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
+    }).join("")}</ul>`;
+  }
+  function chatRooms(st, q) {
+    const keys = [.../* @__PURE__ */ new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
+    return keys.map((k) => st.rooms[k]).filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
   }
   function chatsView(ctx2, st, d) {
     const all = chatRooms(st, "");
@@ -1799,31 +1806,299 @@ ${job.trailing}` : body5;
     }
   };
 
+  // src/ui/clouds.ts
+  var N = 256;
+  function lattice(seed, g) {
+    const a = new Float32Array(g * g);
+    let s4 = seed >>> 0;
+    for (let i = 0; i < a.length; i++) {
+      s4 = s4 * 1664525 + 1013904223 >>> 0;
+      a[i] = s4 / 4294967296;
+    }
+    return a;
+  }
+  function noise(lat, g, x, y) {
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const fx2 = x - xi, fy = y - yi;
+    const sx = fx2 * fx2 * (3 - 2 * fx2), sy = fy * fy * (3 - 2 * fy);
+    const x0 = (xi % g + g) % g, y0 = (yi % g + g) % g, x1 = (x0 + 1) % g, y1 = (y0 + 1) % g;
+    const a = lat[y0 * g + x0] + (lat[y0 * g + x1] - lat[y0 * g + x0]) * sx;
+    const b = lat[y1 * g + x0] + (lat[y1 * g + x1] - lat[y1 * g + x0]) * sx;
+    return a + (b - a) * sy;
+  }
+  function fbm(seed, base, oct) {
+    const lats = Array.from({ length: oct }, (_, o) => lattice(seed + o * 101, base << o));
+    return (u, v) => {
+      let t = 0, amp = 0.5, sum = 0;
+      for (let o = 0; o < oct; o++) {
+        const g = base << o;
+        t += noise(lats[o], g, u * g, v * g) * amp;
+        sum += amp;
+        amp *= 0.5;
+      }
+      return t / sum;
+    };
+  }
+  function draw(seed) {
+    const c = document.createElement("canvas");
+    c.width = c.height = N;
+    const x = c.getContext("2d");
+    if (!x) return null;
+    const main = fbm(seed, 4, 6);
+    const warp = fbm(seed + 7, 3, 3);
+    const img = x.createImageData(N, N);
+    const sh = x.createImageData(N, N);
+    for (let j = 0; j < N; j++) {
+      for (let i = 0; i < N; i++) {
+        const u = i / N, v = j / N;
+        const w = warp(u, v) - 0.5;
+        const n = main(u + w * 0.35, v + w * 0.2);
+        const d = Math.min(1, Math.max(0, (n - 0.5) / 0.22));
+        const a = d * d * (3 - 2 * d);
+        const k = (j * N + i) * 4;
+        const tone = 196 + 59 * Math.min(1, a * 1.3);
+        img.data[k] = tone;
+        img.data[k + 1] = tone + 2;
+        img.data[k + 2] = Math.min(255, tone + 6);
+        img.data[k + 3] = Math.round(a * 235);
+        sh.data[k] = 0;
+        sh.data[k + 1] = 4;
+        sh.data[k + 2] = 8;
+        sh.data[k + 3] = Math.round(a * 120);
+      }
+    }
+    x.putImageData(img, 0, 0);
+    const cloud = c.toDataURL("image/png");
+    x.putImageData(sh, 0, 0);
+    return { cloud, shadow: c.toDataURL("image/png") };
+  }
+  var done = false;
+  function ensureClouds() {
+    if (done) return;
+    done = true;
+    try {
+      const a = draw(20251021);
+      if (!a) return;
+      const st = document.createElement("style");
+      st.textContent = `.gx-opfx.sky > :is(.c1, .c2) { background-image: url(${a.cloud}); } .gx-opfx.sky > .c0 { background-image: url(${a.shadow}); }`;
+      document.head.appendChild(st);
+    } catch {
+    }
+  }
+
+  // src/ui/evcard.ts
+  var esc8 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var KIND = { an: "괴이", in: "사건", ms: "특수" };
+  var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
+  function peopleChips(char, names4, agents2, own = "") {
+    return names4.filter((n, i, all) => n && n !== "없음" && all.indexOf(n) === i).map((n) => {
+      if (agents2.has(n)) return `<span class="gx-pchip">${avatar(char, agents2.get(n).english, n, "xs")}${esc8(n)}</span>`;
+      return `<span class="gx-badge${own && n === own ? " own" : ""}">${esc8(n)}</span>`;
+    }).join("");
+  }
+  function elapsedText(minute, since) {
+    if (minute === null || since === null) return "";
+    const m = Math.max(0, minute - since);
+    const h = Math.floor(m / 60);
+    if (!m) return "방금 발생";
+    return `발생 ${h ? `${h}시간 ` : ""}${m % 60 || !h ? `${m % 60}분 ` : ""}경과`;
+  }
+  var evUi = { pop: "" };
+  var seen = /* @__PURE__ */ new Map();
+  var evSeenReset = () => seen.clear();
+  function gradeMark(c) {
+    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
+    return `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc8(grade)}등급` : ""}">${grade ? esc8(grade) : MARK[c.kind]}</i>`;
+  }
+  var artBg = (c) => c.art?.pic ? ` style="background-image:url('${esc8(c.art.pic)}')"` : "";
+  var artIco = (c) => c.art?.pic ? "" : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+  function statusNote(c) {
+    const text = c.badge.replace(/<[^>]+>/g, "").trim();
+    if (!c.key) return text ? `<em class="gx-evc-note wait">${esc8(text)}</em>` : "";
+    return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc8(text)}</em>` : "";
+  }
+  function chipItems(html = "") {
+    const out = [];
+    const re = /<span class="gx-(?:pchip|badge[^"]*)">/g;
+    const starts = [];
+    for (let m = re.exec(html); m; m = re.exec(html)) {
+      starts.push(m.index);
+    }
+    starts.forEach((st, i) => out.push(html.slice(st, starts[i + 1] ?? html.length)));
+    return out;
+  }
+  function depMark(c) {
+    if (!c.key || c.kind === "in") return "";
+    const items = chipItems(c.chips);
+    const strip = (h) => h.replace(/<[^>]+>/g, "").trim();
+    const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);
+    const others = items.filter((h) => h.startsWith('<span class="gx-badge">')).map(strip);
+    const verb = c.kind === "ms" ? "방문" : "투입";
+    const cls = ours.length ? "on" : others.length ? "other" : "";
+    const title2 = [ours.length ? `우리: ${ours.join(", ")}` : "", others.length ? `다른 세력: ${others.join(", ")}` : ""].filter(Boolean).join(" / ") || `미${verb}`;
+    return `<i class="gx-evdep${cls ? ` ${cls}` : ""}${ours.length && others.length ? " mix" : ""}" title="${esc8(title2)}" aria-label="${esc8(title2)}">${ICONS.person}</i>`;
+  }
+  function artCard(c) {
+    const key2 = c.key ? esc8(c.key) : "";
+    if (c.pop) seen.set(c.pop, c);
+    const act2 = c.pop ? ` data-action="ev-pop" data-value="${esc8(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key2}"` : "";
+    const line3 = (c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc8(c.art.desc)}</span>` : "")).replace(/^<span class="gx-evc-sit"([^>]*)>([^<]*)<\/span>$/, (_m, attr, t) => `<span class="gx-evc-sit gx-flow"${attr}><span data-t="${t}">${t}</span></span>`);
+    return `<li class="gx-evc art${act2 ? " go" : ""}${c.selected ? " sel" : ""}${c.ended ? " wait ended" : c.key ? " live" : " wait"}"${act2}>
+    <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
+      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc8(c.name)}</b>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ""}${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
+    </div></li>`;
+  }
+  var TGT = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle class="dot" cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>';
+  function targetMark(on2, action, value, btn = false) {
+    return `<button class="${btn ? "gx-evbtn " : ""}gx-tgt${on2 ? " on" : ""}" data-action="${action}" data-value="${esc8(value)}" aria-pressed="${on2}" title="${on2 ? "목표 해제" : "목표로 지정"}" aria-label="${on2 ? "목표 해제" : "목표로 지정"}">${TGT}${btn ? "" : `<span>${on2 ? "해제" : "선택"}</span>`}</button>`;
+  }
+  function evPopup() {
+    const c = evUi.pop ? seen.get(evUi.pop) : void 0;
+    if (!c) {
+      evUi.pop = "";
+      return "";
+    }
+    const key2 = c.key ? esc8(c.key) : "";
+    const pick2 = c.open === "pick-event";
+    const name = esc8(c.name);
+    const btns = `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
+    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc8(c.art.desc)}</span>` : "";
+    const pickBtn = pick2 && c.key ? targetMark(!!c.selected, "pick-event", c.key) : "";
+    return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
+    <div class="gx-evc art open ev-pop${c.ended ? " wait ended" : c.key ? " live" : " wait"}" role="dialog" aria-label="${esc8(c.name)}">
+      <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
+        <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${pickBtn}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== "in" ? `<em class="gx-evc-note">${c.kind === "ms" ? "미방문" : "미투입"}</em>` : ""}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ""}${c.extra ?? ""}${desc}</span>
+      </div></div>`;
+  }
+  function endedCard(e, art2) {
+    const name = e.name || "이름 미확인";
+    return artCard({ kind: e.kind, name, grade: e.grade, loc: esc8(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art2(name, e.kind) ?? { pic: null, desc: "" }, pop: `end:${e.kind}:${e.name}:${e.loc}` });
+  }
+  function evCard(c) {
+    if (c.art) return artCard(c);
+    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
+    const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc8(grade)}등급` : ""}">${grade ? esc8(grade) : MARK[c.kind]}</i>`;
+    const title2 = `<span class="gx-evc-name"><b>${esc8(c.name)}</b></span>`;
+    if (!c.key) {
+      return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
+    }
+    const key2 = esc8(c.key);
+    const acts = `<span class="gx-evc-act">
+      ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc8(c.name)}" title="위키" aria-label="${esc8(c.name)} 위키">${ICONS.wiki}</button>` : ""}
+      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key2}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key2}" title="상황 종료" aria-label="${esc8(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
+    const open3 = c.open ? ` data-action="${c.open}" data-value="${key2}"` : "";
+    return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open3}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
+    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
+  }
+  var opsUi = { sel: "", mode: "feed" };
+  var GRADE_RANK = { S: 0, A: 1, B: 2, C: 3, D: 4 };
+  function firstPick(cards) {
+    const live = cards.filter((c) => !c.ended);
+    const ours = (c) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? "");
+    const rank = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
+    return [...live].sort((a, b) => rank(a) - rank(b))[0]?.id ?? cards[0]?.id ?? "";
+  }
+  function opsRow(c, on2) {
+    const thumb = c.art?.pic ? `<img src="${esc8(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
+    return `<li class="gx-oprow k-${c.kind}${on2 ? " sel" : ""}${c.ended ? " ended" : ""}" data-action="ops-sel" data-value="${esc8(c.id)}" aria-current="${on2}">
+    <span class="gx-oprow-pic">${thumb}</span>
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc8(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ""}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+  }
+  var camNo = (loc) => String(Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89 + 10).padStart(2, "0");
+  function headSeg(action, cur, items) {
+    return `<span class="gx-hseg" role="tablist">${items.map(([v, label, icon2]) => `<button role="tab" class="${cur === v ? "on" : ""}" data-action="${action}" data-value="${v}" aria-selected="${cur === v}" title="${label}" aria-label="${label}">${icon2}</button>`).join("")}</span>`;
+  }
+  function whoLine(chips3 = "") {
+    const items = chipItems(chips3).map((h) => {
+      const ours = /^<span class="gx-(?:pchip|badge own)"/.test(h);
+      const text = h.replace(/<[^>]*>/g, "").trim();
+      return text ? `<span class="${ours ? "on" : "other"}">${text}</span>` : "";
+    }).filter(Boolean);
+    return items.length ? `<span class="gx-opwho"><em>투입</em>${items.join("<i>·</i>")}</span>` : "";
+  }
+  function osd(sig, cam, clock2) {
+    return `<div class="gx-oposd"><span class="l1">${sig}<span class="cam">${cam}</span></span>${clock2 ? `<span class="ts">${esc8(clock2)}</span>` : ""}</div>`;
+  }
+  function evBtns(c) {
+    const key2 = c.key ? esc8(c.key) : "";
+    const name = esc8(c.name);
+    return `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
+  }
+  var STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
+  var SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
+  function opsPick(c) {
+    return c?.key && !c.ended ? targetMark(!!c.selected, "pick-event", c.key, true) : "";
+  }
+  function opsFeed(c, clock2, empty) {
+    if (!c) {
+      return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc8(empty)}</small></div></div>`;
+    }
+    const name = esc8(c.name);
+    const btns = evBtns(c);
+    const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc8(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc8(c.art.desc)}</span>` : "";
+    const region = locName(c.locCode).split(" ").slice(0, 2).join(" ");
+    return `<div class="gx-opview feed k-${c.kind}${c.ended ? " ended" : ""}">${pic}${STATIC}
+    <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? "END" : "REC"}</span>`, `CAM-${camNo(c.locCode)} · ${esc8(region)}`, clock2)}<span class="gx-evart-act">${btns}</span></div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, "pick-event", c.key) : ""}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ""}${desc}</div>
+  </div>`;
+  }
+  var track = (px, py) => `N${(38.7 - py * 0.058).toFixed(2)} E${(124.6 + px * 0.056).toFixed(2)}`;
+  function opsMap(cards, sel, url, clock2) {
+    if (url) ensureClouds();
+    const per = /* @__PURE__ */ new Map();
+    const pins = cards.filter((c) => !c.ended).map((c) => {
+      const sido = c.locCode.split("-")[0];
+      const at = NATION_PINS.find((p) => p[0] === sido);
+      if (!at) return "";
+      const n = per.get(sido) ?? 0;
+      per.set(sido, n + 1);
+      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? " sel" : ""}" style="left:${at[2]}%;top:${at[3] + n * 4.2}%" data-action="ops-sel" data-value="${esc8(c.id)}" aria-label="${esc8(c.name)}"><i></i><em>${esc8(c.name)}</em></button>`;
+    }).join("");
+    const s4 = cards.find((c) => c.id === sel && !c.ended);
+    const sAt = s4 ? NATION_PINS.find((p) => p[0] === s4.locCode.split("-")[0]) : void 0;
+    const sN = s4 ? cards.filter((c) => !c.ended && c.locCode.split("-")[0] === s4.locCode.split("-")[0]).findIndex((c) => c.id === s4.id) : 0;
+    const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : "";
+    const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : "--px:55;--py:50";
+    return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc8(url)}" alt="전국 지도">${cross}${pins}</div>` : ""}</div>${url ? SKY : ""}
+    <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock2)}${s4 ? `<span class="gx-evart-act">${opsPick(s4)}${evBtns(s4)}</span>` : ""}</div></div>`;
+  }
+  function opsBoard(cards, o) {
+    if (!cards.some((c) => c.id === opsUi.sel)) opsUi.sel = firstPick(cards);
+    const sel = cards.find((c) => c.id === opsUi.sel);
+    const view2 = opsUi.mode === "map" ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
+    const rows2 = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join("");
+    return `<div class="gx-ops">${view2}<section class="gx-oplog"><h2>${headSeg("ops-mode", opsUi.mode, [["feed", "CCTV", ICONS.cctv], ["map", "위성 지도", ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows2 ? `<ul>${rows2}</ul>` : `<p class="gx-none">${esc8(o.empty)}</p>`}</section></div>`;
+  }
+
   // src/ui/agents.ts
   var agUi = { pop: "" };
   var last = [];
   var lastOrg = "";
-  var esc8 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc9 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var ORDER = { op: 0, ok: 1, lock: 2 };
-  var OSD = { op: "LIVE", ok: "STANDBY", lock: "OFFLINE" };
   var line = (a) => a.situation || (a.side === "op" ? a.deployed : "") || "대기 중";
-  var tip = (a) => `data-agtip="${esc8(`${a.name} · ${a.st}`)}" data-agtip-text="${esc8(line(a))}"`;
+  var tip = (a) => `data-agtip="${esc9(`${a.name} · ${a.st}`)}" data-agtip-text="${esc9(line(a))}"`;
+  var flow = (tag, text, cls = "") => `<${tag} class="${cls ? `${cls} ` : ""}gx-flow"><span data-t="${esc9(text)}">${esc9(text)}</span></${tag}>`;
   function tile(a, i) {
-    return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc8(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
-    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, "0")}</span><span class="st"><i></i>${OSD[a.side]}</span></span>
-    <span class="gx-agmon-cap"><b>${esc8(a.name)}</b><small>${esc8(a.side === "op" && a.deployed ? a.deployed : line(a))}</small></span></span></li>`;
+    return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc9(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
+    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, "0")}</span><span class="st">${esc9(a.st)}</span></span>
+    <span class="gx-agmon-cap"><b>${esc9(a.name)}</b>${flow("small", a.side === "op" && a.deployed ? a.deployed : line(a))}</span></span></li>`;
   }
   function row4(a) {
-    const tools = a.wiki !== null ? `<span class="gx-agrow-tools"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc8(a.id)}" title="괴담톡" aria-label="${esc8(a.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc8(a.wiki)}" title="위키" aria-label="${esc8(a.name)} 위키">${ICONS.wiki}</button></span>` : "";
-    return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc8(a.id)}" ${tip(a)}>${a.face}<b>${esc8(a.name)}</b><span class="gx-agrow-st"><i></i>${esc8(a.st)}</span><span class="gx-agrow-msg">${esc8(line(a))}</span>${tools}</li>`;
+    const tools = a.wiki !== null ? `<span class="gx-agrow-tools"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc9(a.id)}" title="괴담톡" aria-label="${esc9(a.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc9(a.wiki)}" title="위키" aria-label="${esc9(a.name)} 위키">${ICONS.wiki}</button></span>` : "";
+    return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc9(a.id)}" ${tip(a)}>${a.face}<b>${esc9(a.name)}</b><span class="gx-agrow-st"><i></i>${esc9(a.st)}</span>${flow("span", line(a), "gx-agrow-msg")}${tools}</li>`;
   }
   function agentPanel(items, view2, o) {
     last = items;
     lastOrg = o.org;
     const list4 = [...items].sort((a, b) => ORDER[a.side] - ORDER[b.side]);
     const op = items.filter((a) => a.side === "op").length;
-    const head = `<h2><b>요원</b><span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
-    const body5 = !list4.length ? `<p class="gx-none">${esc8(o.empty)}</p>` : view2 === "list" ? `<ul class="gx-agrows">${list4.map(row4).join("")}</ul>` : `<ul class="gx-agwall">${list4.map(tile).join("")}</ul>`;
+    const head = `<h2>${headSeg("agents-view", view2, [["wall", "요원 모니터", ICONS.grid], ["list", "요원 목록", ICONS.list]])}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
+    const body5 = !list4.length ? `<p class="gx-none">${esc9(o.empty)}</p>` : view2 === "list" ? `<ul class="gx-agrows">${list4.map(row4).join("")}</ul>` : `<ul class="gx-agwall">${list4.map(tile).join("")}</ul>`;
     return `<section class="gx-sec gx-agbox ${view2}" id="gx-sec-ag">${head}${o.extra}${body5}</section>`;
   }
   function agentPopup() {
@@ -1833,14 +2108,14 @@ ${job.trailing}` : body5;
       agUi.pop = "";
       return "";
     }
-    const btns = a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc8(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc8(a.wiki)}">${ICONS.wiki}위키</button>` : "";
-    const rows2 = [["소속", a.dept], ["직급", a.rank], ["투입", a.deployed], ["상황", a.situation || "대기 중"]].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd${k === "투입" ? ' class="dep"' : ""}>${esc8(v)}</dd>`).join("");
-    return `<button class="ev-scrim" data-action="agent-info" data-value="${esc8(a.id)}" aria-label="닫기"></button>
-    <div class="gx-agcard ${a.side}" role="dialog" aria-label="${esc8(a.name)}">
-      <div class="gx-agcard-band">AGENT ID<b>${esc8(org)}</b><button class="gx-agcard-x" data-action="agent-info" data-value="${esc8(a.id)}" aria-label="닫기">✕</button></div>
-      <div class="gx-agcard-main"><span class="gx-agcard-ph">${a.photo ? `<img src="${esc8(a.photo)}" alt="">` : a.face}</span>
-        <span class="gx-agcard-t"><span class="nm">${esc8(a.name)}</span>${a.english ? `<span class="en">${esc8(a.english)}</span>` : ""}<dl>${rows2}</dl></span></div>
-      <div class="gx-agcard-foot"><span class="code">NO. ${esc8(a.id.replace(/^([A-Z]+)(\d)/, "$1-$2"))}<u></u></span>${btns}</div>
+    const btns = a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc9(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc9(a.wiki)}">${ICONS.wiki}위키</button>` : "";
+    const rows2 = [["소속", a.dept], ["직급", a.rank], ["투입", a.deployed], ["상황", a.situation || "대기 중"]].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd${k === "투입" ? ' class="dep"' : ""}>${esc9(v)}</dd>`).join("");
+    return `<button class="ev-scrim" data-action="agent-info" data-value="${esc9(a.id)}" aria-label="닫기"></button>
+    <div class="gx-agcard ${a.side}" role="dialog" aria-label="${esc9(a.name)}">
+      <div class="gx-agcard-band">AGENT ID<b>${esc9(org)}</b><button class="gx-agcard-x" data-action="agent-info" data-value="${esc9(a.id)}" aria-label="닫기">✕</button></div>
+      <div class="gx-agcard-main"><span class="gx-agcard-ph">${a.photo ? `<img src="${esc9(a.photo)}" alt="">` : a.face}</span>
+        <span class="gx-agcard-t"><span class="nm">${esc9(a.name)}</span>${a.english ? `<span class="en">${esc9(a.english)}</span>` : ""}<dl>${rows2}</dl></span></div>
+      <div class="gx-agcard-foot"><span class="code">NO. ${esc9(a.id.replace(/^([A-Z]+)(\d)/, "$1-$2"))}<u></u></span>${btns}</div>
     </div>`;
   }
   function bindAgentTips(root2) {
@@ -1856,7 +2131,7 @@ ${job.trailing}` : body5;
       hide();
       bub = document.createElement("div");
       bub.className = "gx-agtip";
-      bub.innerHTML = `<b>${esc8(el.dataset.agtip ?? "")}</b>${esc8(el.dataset.agtipText ?? "")}`;
+      bub.innerHTML = `<b>${esc9(el.dataset.agtip ?? "")}</b>${esc9(el.dataset.agtipText ?? "")}`;
       root2.appendChild(bub);
       const r = el.getBoundingClientRect();
       const w = bub.offsetWidth;
@@ -1870,6 +2145,29 @@ ${job.trailing}` : body5;
       if (el && !el.contains(ev.relatedTarget)) hide();
     });
     root2.addEventListener("click", hide, true);
+    let queued2 = 0;
+    const measure = () => {
+      queued2 = 0;
+      for (const box of root2.querySelectorAll(".gx-flow")) {
+        const inner = box.firstElementChild;
+        if (!inner) continue;
+        const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
+        const on2 = box.classList.contains("on");
+        const w = on2 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
+        const over = w - box.clientWidth > 2;
+        box.classList.toggle("on", over);
+        if (over) {
+          const d = w + gap;
+          box.style.setProperty("--fd", `${-d}px`);
+          box.style.setProperty("--ft", `${(d / 16 / 0.85).toFixed(1)}s`);
+        }
+      }
+    };
+    const schedule2 = () => {
+      if (!queued2) queued2 = requestAnimationFrame(measure);
+    };
+    new MutationObserver(schedule2).observe(root2, { childList: true, subtree: true });
+    window.addEventListener("resize", schedule2);
     root2.addEventListener("scroll", hide, true);
   }
 
@@ -1907,7 +2205,7 @@ ${job.trailing}` : body5;
    창 바깥이 늘 깜깜했다 (창 바깥 불투명도가 듣지 않던 원인). 창(.gx) 안에만 */
 .gx { color-scheme: dark; }
 .gx[data-theme="light"] {
-  --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #D5DDDA; --line2: #C3CECA;
+  --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #BCC9C5; --line2: #A3B3AE;
   --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
   --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
   --blue: #2F6FB5; --violet: #7A4FC4; --shadow: 0 30px 60px -30px rgba(20, 40, 36, .45); --scrim: rgba(20, 30, 28, .58); color-scheme: light;
@@ -2833,244 +3131,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .dir-ext-item span { grid-area: a; font-size: 13px; font-weight: 600; color: var(--signal); white-space: nowrap; }
 
 /* 명부 → 조직: 플레이 세력 값 (v0.13.0) */
-.dir-fac { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
-.dir-fac > .gx-muted { margin: -4px 0 0; font-size: 13px; }
-.dir-fac .gx-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.dir-code { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--signal); color: var(--void); font-size: 12px; letter-spacing: .04em; }
-.dir-in textarea { min-height: 84px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.5; resize: vertical; }
-.dir-in textarea:focus { outline: none; border-color: var(--signal); }
-
-/* ── v0.14.0: 모바일 정리 · 상황판 작전 현황 · 괴담톡 공지 카드 ── */
-/* 상황판 맨 위: 위협도 + 개수 칩(누르면 그 목록으로) + 누가 어디에 투입됐는지 */
-.gx-gmark.op { background: color-mix(in srgb, var(--blue) 18%, transparent); color: var(--blue); }
-.gx-sec { scroll-margin-top: 8px; }
-/* 배치·방문자 줄: 꼬리표 + 요원 칩(사진+이름) + 세력 이름표 */
-.gx-list p.gx-people { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.gx-people-l { font-size: 13px; font-weight: 600; color: var(--dim); margin-right: 2px; }
-.gx-pchip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px 0 3px; border-radius: 999px; background: var(--panel2); color: var(--text); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.gx-ava.xs { width: 24px; height: 24px; font-size: 11px; }
-
-/* 괴담톡: 빈 목록 안내는 목록 칸 한가운데 */
-.ph-content { display: flex; flex-direction: column; }
-.ph-blank { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px 20px; text-align: center; }
-.ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
-/* 괴담톡 공지: 대화 목록과 같은 줄 (테두리 없음, 마우스 올리면 판 색, 고르면 민트) */
-.ph-notices { gap: 2px; padding: 0; }
-.ph-notice { position: relative; border-radius: 14px; background: none; overflow: hidden; }
-.ph-notice:hover { background: var(--panel); }
-.ph-notice.on, .ph-notice.on:hover { background: var(--accent-bg); }
-.ph-ncard { width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; border: 0; background: none; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
-.ph-ncard-top { display: flex; align-items: center; gap: 8px; min-width: 0; padding-right: 40px; min-height: 26px; }
-.ph-ncard-top small { flex: 1; min-width: 0; font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-nfac { flex: none; max-width: 9em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line2); background: var(--panel2); color: var(--sub); font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-notice-facs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0 8px; }
-.ph-notice-facs .gx-chip small { margin-left: 4px; font-family: var(--mono); font-size: 11px; opacity: .75; }
-.ph-ncard-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ph-ncard-title b { flex: 1; min-width: 0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-notice .ph-ndel { position: absolute; top: 8px; right: 8px; }
-.ph-notice .ph-tool.ph-ndel { width: 34px; height: 34px; }
-.ph-notice-bar { padding: 0 8px; }
-/* 모바일에서 펼친 공지는 판 색 바탕으로 읽기 쉽게 */
-@media (max-width: 760px) { .ph-notice.open, .ph-notice.open:hover { background: var(--panel); } }
-.ph-notice-body { margin: 0 14px 14px; padding: 12px 0 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
-.ph-notice.open .ph-ncard-title b { white-space: normal; }
-/* PC는 목록에 첫 줄·제목만, 본문은 오른쪽 칸 */
-@media (min-width: 761px) { .ph-notice-body { display: none; } }
-.ph-row .ph-rdel { flex: none; }
-.ph-row .ph-tool.ph-rdel { width: 34px; height: 34px; color: var(--dim); }
-.ph-row .ph-tool.ph-rdel:hover { color: var(--danger); }
-.ph-notice .ph-tool.ph-ndel { color: var(--dim); }
-.ph-notice .ph-tool.ph-ndel:hover { color: var(--danger); }
-
-/* 위키 설정 등 작은 선택 버튼: 글자가 칸 밖으로 넘치지 않게 */
-.gx-segs-sm .gx-seg { flex: 0 0 auto; }
-
-@media (max-width: 760px) {
-  /* 커스텀 임무: 모바일은 한 칸 (예전엔 .gx-field.gx-mission 두 칸 규칙이 이겨서 안내문이 세로로 한 글자씩 깨졌다) */
-  .gx-field.gx-mission { grid-template-columns: minmax(0, 1fr); }
-  /* 위키 설정: 선택 버튼 줄을 칸 너비만큼 */
-  .nw-settings .gx-segs { justify-self: stretch; display: flex; }
-  .nw-settings .gx-seg { flex: 1 0 auto; }
-}
-@media (max-width: 520px) {
-  /* 머리글: 날짜·시간이 잘리지 않게 위협도 알약은 숫자만 */
-  .gx-head-act { gap: 6px; }
-  .gx-brand { gap: 10px; }
-  .gx-brand small { overflow: visible; text-overflow: clip; }
-}
-
-/* v0.15 지도 확대: 칸은 그대로, 안쪽 그림만 확대·이동 */
-.gx-mapzoom { position: relative; transform-origin: 0 0; }
-.gx-canvas.ph .gx-mapzoom { position: absolute; inset: 0; }
-.gx-mapzoom .gx-pin { transform: translate(-50%, -50%) scale(var(--pz, 1)); }
-.gx-canvas[data-map] { touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
-.gx-canvas.zoomed { touch-action: none; cursor: grab; }
-.gx-canvas.zoomed:active { cursor: grabbing; }
-.gx-mapimg { -webkit-user-drag: none; pointer-events: none; }
-.gx-zbtn.txt { font-size: 12px; font-weight: 700; letter-spacing: -.02em; }
-.gx-zoom { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
-.gx-zbtn {
-  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line);
-  background: color-mix(in srgb, var(--void) 88%, transparent); color: var(--text);
-  font-family: inherit; font-size: 18px; font-weight: 600; line-height: 1; padding: 0; display: grid; place-items: center; cursor: pointer;
-}
-.gx-zbtn:hover { border-color: var(--signal); }
-.gx-zbtn.reset { display: none; font-size: 16px; }
-.gx-canvas.zoomed .gx-zbtn.reset { display: grid; }
-@media (max-width: 760px) { .gx-zbtn { width: 40px; height: 40px; } }
-
-/* v0.15 왼쪽 위 간이 상태창 */
-.gx-stat { list-style: none; margin: 0; padding: 10px 12px; display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-.gx-stat li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; align-items: baseline; font-size: 13px; }
-.gx-stat span { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
-.gx-stat b { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
-.gx-stat b .y { opacity: .7; }
-
-/* 설정 → 업데이트 */
-.gx-mini.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); font-weight: 600; }
-.upd-ver { font-family: var(--mono); font-size: 13px; color: var(--sub); white-space: nowrap; }
-.upd-ver b { color: var(--signal); }
-.upd-act { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--panel2); }
-.upd-plan { margin: 0; padding: 0 14px 4px 32px; display: grid; gap: 4px; font-size: 13px; color: var(--sub); }
-.upd-plan small { color: var(--dim); }
-.ps-rows > .ps-note { margin: 0; padding: 0 14px 12px; }
-.ps-rows > .gx-err, .ps-rows > .gx-hint { margin: 0 14px 14px; padding: 10px 12px; font-size: 14px; }
-.upd-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 8px var(--gx-pad, 20px) 4px; padding: 10px 12px 10px 14px; border-radius: 14px; background: var(--accent-bg); border: 1px solid var(--accent-line); }
-.upd-banner-t { font-size: 14px; color: var(--sub); min-width: 0; }
-.upd-banner-t b { color: var(--text); margin-right: 4px; }
-.upd-banner-b { display: flex; gap: 6px; flex: none; }
-.gx-x { position: relative; }
-.gx-xdot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--panel); }
-
-/* 추가 요청·시작할 상황 입력칸 (v0.16.7) */
-.gx-note { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
-.gx-note textarea { width: 100%; box-sizing: border-box; min-height: 76px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--void); color: var(--text); font: inherit; font-size: 15px; line-height: 1.55; resize: vertical; }
-.gx-note textarea:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent); }
-.gx-note textarea::placeholder { color: var(--dim); opacity: .8; }
-.gx-team .gx-note { margin-top: 0; }
-/* 편성 칸 (v0.16.21): 작전 메모는 PC 기본 두 줄, 출발·임무 요청 버튼은 낮게 (사용자 요청) */
-.gx-team .gx-note textarea { min-height: 0; }
-.gx-team .gx-start { min-height: 44px; border-radius: 12px; font-size: 16px; }
-.gx-notice { margin: 12px 20px 0; }
-/* 지원 인원 카드: 요원 카드와 같은 모양, 인원은 카드 안 −/+ */
-.gx-scard { grid-column: 1 / -1; align-items: center; cursor: default; }
-.gx-scard .gx-ava { color: var(--signal); background: var(--accent-bg); }
-.gx-scard .gx-ava svg { width: 26px; height: 26px; }
-.gx-scard-step { display: flex; align-items: center; gap: 6px; flex: none; }
-.gx-scard-step b { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
-.gx-scard-step .gx-step { width: 32px; height: 32px; border-radius: 9px; color: var(--text); }
-.gx-acard.pick.gx-scard.on { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
-.gx-acard.pick.gx-scard.on .gx-acard-top b { color: var(--signal); }
-@media (max-width: 760px) { .gx-acard.pick.gx-scard { padding-right: 8px; } }
-
-/* 모바일 단계 바 (v0.16.9): 목표 고르기와 편성을 한 화면씩. PC는 두 칸이라 숨김 */
-.gx-stepbar { display: none; }
-@media (max-width: 760px) {
-  .gx-stepbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .gx-stepbar.has-swap { grid-template-columns: 1fr 1fr 84px; }
-  /* 임무↔커스텀 전환: 단계 바 오른쪽 끝 (v0.16.18) */
-  .gx-stepswap { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
-  .gx-stepswap svg { width: 16px; height: 16px; }
-  .gx-stepb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
-  .gx-stepb i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--panel2); color: var(--dim); font-style: normal; font-size: 13px; font-family: var(--mono); }
-  .gx-stepb span { display: flex; flex-direction: column; min-width: 0; }
-  .gx-stepb b { font-size: 15px; }
-  .gx-stepb small { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .gx-stepb.on { border-color: var(--signal); background: var(--accent-bg); }
-  .gx-stepb.on i { background: var(--signal); color: var(--void); }
-  .gx-stepb.on small { color: var(--sub); }
-  .gx-field[data-step="goal"] .gx-team { display: none; }
-  .gx-field[data-step="team"] > .gx-mapcol, .gx-field[data-step="team"] .gx-sidecol > .gx-sec { display: none; }
-}
-@media (max-width: 760px) {
-  /* 편성 요원: 한 줄에 한 명 (v0.16.18: 두 칸은 글이 너무 좁았다, 사용자 결정) */
-  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); }
-  .gx-acard.pick { gap: 8px; padding: 8px; align-items: center; }
-  .gx-acard.pick .gx-ava { width: 40px; height: 40px; border-radius: 11px; }
-  /* 두 칸이면 이름 옆에 상태를 두면 이름이 잘려서, 이름 → 상태 → 부서 순으로 쌓는다 */
-  .gx-acard.pick .gx-acard-top { gap: 3px; flex-wrap: wrap; }
-  .gx-acard.pick .gx-acard-top b { flex: 0 1 auto; padding-right: 0; }
-  .gx-acard.pick .gx-st { flex: none; height: 18px; padding: 0 6px; gap: 4px; font-size: 11px; }
-  .gx-acard.pick .gx-st::before { width: 5px; height: 5px; }
-  .gx-acard.pick .gx-acard-top b { font-size: 14px; }
-  .gx-acard.pick small { white-space: normal; font-size: 12px; line-height: 1.35; }
-  .gx-acard.pick .gx-acard-sit { display: none; }
-  .gx-acard.pick .gx-acard-check { top: 6px; right: 6px; transform: none; width: 18px; height: 18px; font-size: 11px; }
-}
-@media (max-width: 760px) {
-  /* 모바일 편성 단계 (v0.16.11, 사용자 요청): 작전 메모·작전 개시는 아래에 두고 요원 목록만 스크롤 */
-  .gx-field[data-step="team"] { display: flex; flex-direction: column; align-items: stretch; overflow: hidden; padding-bottom: 12px; }
-  .gx-field[data-step="team"] > .gx-sidecol { flex: 1; min-height: 0; }
-  .gx-field[data-step="team"] .gx-team { flex: 1; min-height: 0; }
-  .gx-field[data-step="team"] .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
-}
-
-/* 아이콘만 있는 작은 버튼 (상황 행의 지도·위키·종료 등, v0.16.17: 글자 버튼 상자가 눈에 띄었다) */
-.gx-icon { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--dim); cursor: pointer; flex: none; }
-.gx-icon:hover { color: var(--signal); background: var(--panel2); }
-.gx-icon svg { width: 17px; height: 17px; }
-.gx-ev { position: relative; }
-.gx-ev > .gx-evact { position: absolute; top: 6px; right: 6px; flex-direction: row; align-items: center; gap: 0; padding: 0; }
-.gx-evs .gx-ev .gx-evmain > .gx-row:first-child { padding-right: 96px; }
-.gx-mlist .gx-ev .gx-evmain { padding-right: 44px; }
-/* 임무 탭 (v0.16.17): 지도 아래 상황 목록, 오른쪽 위 편성. 왼쪽 칸이 길어지니 붙여 두지 않는다 */
-.gx-field.gx-map > .gx-mapcol { position: static; }
-.gx-mapcol > .gx-sits { padding: 4px 0 0; }
-/* 상황 필터 줄 (v0.16.21): 종류 필터 + 오른쪽 끝 장소 선택 취소. 고른 장소는 목록 맨 앞 카드로 */
-.gx-sitbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-.gx-sitbar .gx-chip { flex: none; }
-.gx-unplace { margin-left: auto; color: color-mix(in srgb, var(--danger) 75%, var(--dim)); }
-.gx-unplace:hover:not(:disabled) { border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
-.gx-unplace:disabled { color: var(--dim); opacity: .45; cursor: default; }
-.gx-mfilter .gx-unplace { margin-left: 0; }
-.gx-evc .gx-gmark.pl { background: var(--accent-bg); color: var(--signal); }
-.gx-goaltag { flex: none; font-size: 11.5px; padding: 3px 8px; border-color: var(--accent-line); background: var(--accent-bg); color: var(--signal); }
-/* 임무 탭 편성 카드 (v0.16.17): 상황판 요원 카드와 같은 모양, 한 줄에 한 명, 배경만 다르다 */
-.gx-acard.pick.wide { cursor: pointer; align-items: center; gap: 12px; padding: 10px 12px; }
-.gx-acard.pick.wide .gx-ava { width: 64px; height: 64px; border-radius: 14px; font-size: 22px; }
-.gx-acard.pick.wide:hover:not(.off) { border-color: var(--line2); }
-.gx-acard.pick.wide.off { opacity: .45; cursor: not-allowed; }
-.gx-acard.pick.wide .gx-acard-top { padding-right: 60px; }
-.gx-acard.pick.wide .gx-acard-sit { -webkit-line-clamp: 2; }
-.gx-acard.pick.wide .gx-acard-check { top: auto; bottom: 8px; right: 10px; transform: none; }
-@media (min-width: 761px) {
-  .gx-map .gx-acards.pick, .gx-mission .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  /* PC 임무 탭: 오른쪽 편성은 창 높이에 붙여 두고 요원 목록만 스크롤, 작전 메모·출발은 아래 고정 (사용자 요청) */
-  /* 높이 = 창 높이 − 머리 60 − 본문 위아래 여백 9+16 − 창 테두리 2 − 소수점 여유 1. 테두리를 빼먹어 본문이 2px 넘쳐 휠마다 움찔거렸다 (v0.16.18) */
-  .gx-map > .gx-sidecol, .gx-mission > .gx-sidecol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
-  /* 커스텀 왼쪽 목록도 오른쪽 편성과 같은 높이로 끝을 맞춘다 */
-  .gx-mission > .gx-mapcol { position: sticky; top: 0; height: calc(min(100vh - 28px, 950px) - 89px); }
-  .gx-mission .gx-mbox { flex: 1; min-height: 0; max-height: none; }
-  .gx-map > .gx-sidecol > .gx-team, .gx-mission > .gx-sidecol > .gx-team { flex: 1; min-height: 0; }
-  .gx-map .gx-team .gx-acards.pick, .gx-mission .gx-team .gx-acards.pick { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; align-content: start; margin: 0 -4px; padding: 0 4px 2px; }
-  .gx-map .gx-team > .gx-note, .gx-map .gx-team > .gx-start, .gx-mission .gx-team > .gx-note, .gx-mission .gx-team > .gx-start { flex: none; }
-}
-@media (max-width: 760px) {
-  /* 모바일: 위 두 줄(임무·커스텀, 목표·편성)을 낮게 (v0.16.17) */
-  .gx-field { padding-top: 10px; row-gap: 12px; }
-  /* 목표·편성·전환 줄은 위에 고정, 아래만 스크롤 (사용자 요청) */
-  .gx-stepbar { gap: 6px; position: sticky; top: -10px; z-index: 3; margin: -10px -16px 0; padding: 10px 16px 8px; background: var(--void); }
-  .gx-stepb { gap: 8px; padding: 6px 10px; border-radius: 10px; }
-  .gx-stepb i { width: 20px; height: 20px; font-size: 12px; }
-  .gx-stepb span { flex-direction: row; align-items: baseline; gap: 6px; }
-  .gx-stepb b { font-size: 14px; flex: none; }
-  /* 편성 단계: 요원 목록이 넓게. 작전 메모는 한 줄로 접어 두고 누르면 펼친다 */
-  /* 목표·인원은 위 목표·편성 줄에 이미 나온다 */
-  .gx-team > .gx-goal { display: none; }
-  .gx-field[data-step="team"] .gx-note { gap: 4px; }
-  /* 작전 메모 칸: 누르면 늘어나니 스크롤 막대는 숨김 (v0.16.18) */
-  .gx-note textarea { scrollbar-width: none; }
-  .gx-note textarea::-webkit-scrollbar { display: none; }
-  .gx-field[data-step="team"] .gx-note textarea { min-height: 0; height: 42px; padding: 9px 12px; resize: none; }
-  .gx-field[data-step="team"] .gx-note textarea:focus, .gx-field[data-step="team"] .gx-note textarea.filled { height: 96px; }
-  .gx-field[data-step="team"] .gx-note textarea:not(:focus)::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .gx-field[data-step="team"] .gx-team { gap: 8px; }
-  /* 임무 탭 편성 카드: 상황판 모바일 요원 카드처럼 두 칸 가로 배치 */
-  .gx-acard.pick.wide .gx-acard-top { padding-right: 0; }
-  .gx-acard.pick.wide .gx-acard-top b { flex: 0 1 auto; padding-right: 0; font-size: 13.5px; }
-  .gx-acard.pick.wide .gx-acard-sit { display: -webkit-box; font-size: 12px; }
-}
-
-/* 소속 사진 패널 안의 상태 (v0.16.12: 따로 있던 간이 상태창을 패널 안으로) */
-/* 세로 ID카드 (v0.16.22): 맨 위 유저 사진·이름, 아래 소속과 상태. 소속 사진이 아래에서 위로 옅어지며 비친다 */
-.gx-id { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px 14px; border: 1px solid var(--line)
+.dir-fac { display: 

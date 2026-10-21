@@ -1,4 +1,307 @@
-auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy4), "채팅 속 상태창의 배색이에요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
+.at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body5 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  async function saveWorld(ctx2, env2, change) {
+    env2.setBusy(true);
+    env2.setNotice("");
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      });
+      env2.setBusy(false);
+      await env2.refresh();
+    } catch (error) {
+      env2.setBusy(false);
+      env2.setNotice(error instanceof Error ? error.message : String(error));
+      env2.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field2.region = sidoOf(ev.loc);
+    field2.place = placeKey(ev, x.catalog);
+    field2.filter = "all";
+    field2.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env2, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field2.place = null;
+        field2.confirmEnd = null;
+        env2.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code) || !key2) return true;
+          field2.region = code;
+          field2.mapq = "";
+          v2 = key2;
+        }
+        field2.confirmEnd = null;
+        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
+          field2.place = null;
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field2.target = placeTarget(v2);
+        env2.render();
+        return true;
+      }
+      case "map-unplace":
+        field2.place = null;
+        field2.target = null;
+        field2.confirmEnd = null;
+        toStep("goal", env2);
+        return true;
+      case "map-filter":
+        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env2.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field2.target, v)) {
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.target = placeTarget(v);
+        toStep("team", env2);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env2);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field2.target, ev.key)) {
+          field2.target = null;
+          field2.confirmEnd = null;
+          env2.render();
+          return true;
+        }
+        field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field2.region = sidoOf(ev.loc);
+        field2.confirmEnd = null;
+        toStep("team", env2);
+        return true;
+      }
+      case "end-event":
+        if (field2.confirmEnd !== v) {
+          field2.confirmEnd = v;
+          env2.render();
+          return true;
+        }
+        field2.confirmEnd = null;
+        if (field2.target?.type === "event" && field2.target.key === v) field2.target = null;
+        await saveWorld(ctx2, env2, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field2.team.indexOf(v);
+        if (i >= 0) field2.team.splice(i, 1);
+        else if (field2.team.length + field2.support < TEAM_MAX) field2.team.push(v);
+        env2.render();
+        return true;
+      }
+      case "support": {
+        const next = field2.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field2.team.length, next)) field2.support = next;
+        env2.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env2);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field2.mkind = v;
+          field2.query = "";
+        }
+        env2.render();
+        return true;
+      case "mission-open":
+        field2.mopen = field2.mopen === v ? "" : v;
+        env2.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field2.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field2.mname === name && field2.mpick === kind && field2.mopen !== `${kind}:${name}`) {
+          field2.mname = null;
+          env2.render();
+          return true;
+        }
+        field2.mname = name;
+        field2.mpick = kind;
+        toStep("team", env2);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env2, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        field2.mname = null;
+        toStep("goal", env2);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env2, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/lorecheck.ts
+  var esc16 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증" };
+  function item2(p, risu = false) {
+    const r = p.reasons[0];
+    const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
+  }
+  function loreCheckBox(ctx2) {
+    const mode3 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
+    const opts = (m) => loreOptions(ctx2.char, ctx2.chat, m);
+    const now = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode3));
+    if (!now) return "";
+    const other = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode3 === "risu" ? "plugin" : "risu"));
+    const names4 = (l) => new Set(l.map((p) => p.entry.name));
+    const mine = names4(now.picks);
+    const theirs = names4(other.picks);
+    const size = now.picks.reduce((n, p) => n + tokens(p.entry.content), 0);
+    const list4 = now.picks.length ? now.picks.map((p) => item2(p, mode3 === "risu")).join("") : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
+    const only = (l, not, risu) => l.filter((p) => !not.has(p.entry.name)).map((p) => item2(p, risu)).join("");
+    const otherIf = mode3 === "risu" ? "플러그인이 고르면" : "Risu가 직접 켜면";
+    const more = only(other.picks, mine, mode3 !== "risu");
+    const less = only(now.picks, theirs, mode3 === "risu");
+    const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
+    return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
+    <section class="ps-group"><h3>${mode3 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
+    <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
+  </div></details>`;
+  }
+
+  // src/ui/settings.ts
+  var THEME_KEY = "$st_fixed_theme";
+  var settingsUi = { confirmOff: false, busy: false, notice: "", info: "", scope: "chat", confirm: "" };
+  function resetSettings() {
+    settingsUi.confirmOff = false;
+    settingsUi.notice = "";
+    settingsUi.scope = "chat";
+    settingsUi.confirm = "";
+  }
+  var esc17 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function seg4(action, cur, items, disabled = false) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
+  }
+  function field3(label, control2, help) {
+    return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  }
+  var dimSlider = (n, busy4) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy4 ? " disabled" : ""}><output>${n}%</output></label>`;
+  var group3 = (title2, body5, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
+  function worldOffVars() {
+    return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
+  }
+  function current2(ctx2, scope) {
+    const lore = ctx2.char.globalLore;
+    if (scope !== "chat") return { basic: basicDefaults(lore), world: worldDefaults(lore), theme: getPrefs().theme ?? "dark" };
+    const cur = String(ctx2.chat.scriptstate?.[THEME_KEY] ?? "");
+    return {
+      basic: basicSettings(lore, ctx2.chat.scriptstate),
+      world: worldSettings(lore, ctx2.chat.scriptstate),
+      theme: cur === "dark" || cur === "paper" ? cur : "light"
+    };
+  }
+  function stepper(action, key2, shown2, canDown, canUp, label, busy4) {
+    return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key2}:-" ${!canDown || busy4 ? "disabled" : ""} aria-label="${esc17(label)} 줄이기">−</button>
+    <b>${esc17(shown2)}</b><button class="gx-step" data-action="${action}" data-value="${key2}:+" ${!canUp || busy4 ? "disabled" : ""} aria-label="${esc17(label)} 늘리기">+</button></div>`;
+  }
+  function worldStep(key2) {
+    if (key2.endsWith("_p") || key2 === "landmark_share") return 10;
+    if (key2.endsWith("_ttl")) return 6;
+    return 1;
+  }
+  function worldRow(w, key2, label, unit, busy4) {
+    const f = WORLD_SPEC.find((x) => x.key === key2);
+    const v = w[key2];
+    const max = f.max ?? 99;
+    return field3(esc17(label), stepper("set-world", key2, `${v}${unit}`, v > 0, v < max, label, busy4), "");
+  }
+  function worldKind(w, k, name, busy4) {
+    const expire2 = w[`${k}_expire`] === 1;
+    return `<div class="ps-card"><h4>${name}</h4><div class="ps-rows">
+    ${worldRow(w, `${k}_cap`, "동시 최대", "개", busy4)}
+    ${worldRow(w, `${k}_p`, "발생 확률", "%", busy4)}
+    ${field3("자동 종료", seg4("set-world", expire2 ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, "ON"], [`${k}_expire:0`, "OFF"]], busy4), "")}
+    ${expire2 ? worldRow(w, `${k}_ttl`, "RP 유지 시간", "시간", busy4) : ""}
+    ${k === "incident" ? worldRow(w, "landmark_share", "거점 비율", "%", busy4) : ""}
+  </div></div>`;
+  }
+  var CONFIRM = {
+    chat: {
+      save: ["지금 설정으로 새 채팅 기본값을 덮어쓸까요?", "덮어쓰기"],
+      load: ["저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.", "불러오기"]
+    },
+    card: {
+      save: ["고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.", "덮어쓰기"],
+      load: ["고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?", "되돌리기"]
+    }
+  };
+  function scopeBar(scope, canChat) {
+    const items = [[canChat ? "chat" : "defaults", "설정"], ["card", "명부"]];
+    const tabs2 = `<div class="gx-segs st-scope">${items.map(([k, label]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`).join("")}</div>`;
+    const btns = scope === "card" ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === "chat" ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : "";
+    const kind = scope === "card" ? "card" : "chat";
+    const c = settingsUi.confirm && scope !== "defaults" ? CONFIRM[kind][settingsUi.confirm] : null;
+    const yes = kind === "card" ? settingsUi.confirm === "save" ? "dir-save" : "dir-reset" : "set-bar-yes";
+    const confirm = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
+    return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm}`;
+  }
+  function settingsTab(ctx2, scope = "chat", canChat = true) {
+    if (scope === "card") {
+      return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
+    }
+    const { basic: s4, world, theme } = current2(ctx2, scope);
+    const on2 = scope === "chat" ? worldOn(ctx2.chat) : s4.anomalyOn;
+    const busy4 = settingsUi.busy;
+    const anomaly = settingsUi.confirmOff && scope === "chat" ? `<div class="st-confirm"><p>끄면 지금 상황판의 괴이·사건·특수·요원 상태를 비워요. 다시 켜도 이전 상태는 돌아오지 않아요.</p>
+        <div class="gx-row-btns"><button class="gx-mini danger" data-action="set-anomaly" data-value="off-yes" ${busy4 ? "disabled" : ""}>끄기</button>
+        <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>` : seg4("set-anomaly", on2 ? "on" : "off", [["on", "ON"], ["off", "OFF"]], busy4);
+    const note = String(ctx2.chat.scriptstate?.[ASSET_NOTE] ?? "");
+    return `<main class="gx-body gx-settings">
+    ${scopeBar(scope, canChat)}
+    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc17(settingsUi.notice)}</div>` : ""}
+    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon2}${label} 설정</button>`).join("")}</div>`) : ""}
+    ${group3("화면", [
+      field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy4), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요."),
+      field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy4), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
       field3("메뉴 위치", seg4("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy4), "PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
       field3("요원 칸", seg4("set-agents", getPrefs().agents ?? "wall", [["wall", "모니터"], ["list", "목록"]], busy4), "상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
       field3("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy4), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.")
@@ -733,6 +1036,9 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
         return renderPicker();
       case "start":
         return start2();
+      case "nav-tab":
+        if (value === tab && value !== "board" && !matchMedia("(max-width: 760px)").matches) value = "board";
+      // falls through
       case "tab":
         tab = TABS2.includes(value) ? value : "board";
         notice = "";
@@ -782,7 +1088,6 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
       case "ops-sel":
         opsUi.sel = value ?? "";
         field2.confirmEnd = null;
-        if (opsUi.mode === "map" && value) opsUi.mode = "feed";
         render();
         if (matchMedia("(max-width: 760px)").matches) root?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
         return;
@@ -802,6 +1107,10 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
         showIdCard(idCard(view.ctx));
         return;
       }
+      case "agents-view":
+        if (value !== "wall" && value !== "list") return;
+        await savePrefs((p) => ({ ...p, agents: value === "list" ? "list" : void 0 }));
+        return render();
       case "agent-info":
         agUi.pop = agUi.pop === value ? "" : value ?? "";
         return render();
@@ -1170,7 +1479,7 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
   function tabs() {
     const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
     const cur = tab === "mission" ? "map" : tab;
-    const item3 = (id, label, icon2, cls = "", badge2 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${(cls === "mob" ? cur === id : tab === id) ? " on" : ""}" data-action="tab" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label}</span>${badge2}</button>`;
+    const item3 = (id, label, icon2, cls = "", badge2 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${(cls === "mob" ? cur === id : tab === id) ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label}</span>${badge2}</button>`;
     const ctx2 = view.kind === "started" ? view.ctx : null;
     return `<nav class="gx-nav" aria-label="주요 화면">
     ${ctx2 ? brand(ctx2) : ""}
@@ -1256,13 +1565,14 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
     const add = (kind, i, locCode, c) => {
       const key2 = keys.get(`${kind}${i}`);
       if (!key2) return;
-      cards.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field2.confirmEnd === key2, art: evArt(ctx2, c.name, kind) });
+      cards.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field2.confirmEnd === key2, selected: field2.target?.type === "event" && field2.target.key === key2, art: evArt(ctx2, c.name, kind) });
     };
     const since = (m) => elapsedText(w.minute, m);
+    const sit = (t) => t ? `<span class="gx-evc-sit">${esc18(t)}</span>` : "";
     const locText = (loc, m) => `${esc18(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
-    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy) }));
-    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', extra: e.situation ? `<span class="gx-evc-sit">${esc18(e.situation)}</span>` : "" }));
-    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc18(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors) }));
+    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
+    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', extra: sit(e.situation) }));
+    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc18(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
     for (const e of endedShown(w)) {
       const name = e.name || "이름 미확인";
       cards.push({ kind: e.kind, name, grade: e.grade, loc: esc18(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind) });
@@ -1642,5 +1952,5 @@ auto", "테마 따름"], ["dark", "다크"], ["light", "라이트"], ["paper", "
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.34", start: start3 };
+  globalThis.__goeiBody = { version: "0.16.35", start: start3 };
 })();

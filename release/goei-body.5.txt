@@ -1,4 +1,749 @@
-      (this.art?.atlas.action?.scale ?? 2) * 1.5,
+: 192, crouch: 112 };
+  var MOTION = { walkSpeed: 200, runSpeed: 360 };
+
+  // src/game/action/motion.ts
+  var ATTACK = {
+    melee1: {
+      ticks: [4, 1, 2, 3, 6],
+      contact: 5,
+      damage: 18,
+      reach: 124,
+      stop: 3,
+      push: 18
+    },
+    melee2: {
+      ticks: [4, 1, 2, 4, 7],
+      contact: 5,
+      damage: 24,
+      reach: 132,
+      stop: 3,
+      push: 24
+    },
+    melee3: {
+      ticks: [5, 3, 1, 3, 6, 10],
+      contact: 9,
+      damage: 38,
+      reach: 148,
+      stop: 5,
+      push: 66
+    },
+    lowkick: {
+      ticks: [5, 3, 11],
+      contact: 5,
+      damage: 22,
+      reach: 150,
+      stop: 3,
+      push: 26
+    },
+    airattack: {
+      ticks: [4, 5, 9],
+      contact: 4,
+      damage: 26,
+      reach: 155,
+      stop: 4,
+      push: 35
+    },
+    dashattack: {
+      ticks: [4, 2, 4, 12],
+      contact: 6,
+      damage: 32,
+      reach: 142,
+      stop: 4,
+      push: 48
+    }
+  };
+  var strikeDuration = (name) => ATTACK[name].ticks.reduce((a, b) => a + b, 0) / 60;
+  var strikeContact = (name) => ATTACK[name].contact / 60;
+  function isStrike(name) {
+    return name in ATTACK;
+  }
+
+  // src/game/action/sim.ts
+  var WIDTH = 1280;
+  var HEIGHT = 720;
+  var SAVE_VERSION2 = 4;
+  var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  var body3 = (id, kind, x, y, hp) => ({
+    id,
+    kind,
+    x,
+    y,
+    z: 0,
+    vz: 0,
+    dir: kind === "jyaldi" ? 1 : -1,
+    hp,
+    max: hp,
+    act: "idle",
+    t: 0,
+    duration: 0,
+    fired: false,
+    inv: 0,
+    flash: 0,
+    cooldown: 0,
+    armor: false,
+    stride: 0,
+    speed: 0,
+    push: 0
+  });
+  function newRun2() {
+    return {
+      version: SAVE_VERSION2,
+      player: {
+        ...body3(1, "jyaldi", 220, 510, 200),
+        energy: 100,
+        gauge: 100,
+        guard: 100,
+        dashCd: 0,
+        items: [3, 2, 2],
+        attackBuffer: 0,
+        crouching: false
+      },
+      enemies: [
+        body3(2, "corner", 760, 480, 130),
+        body3(3, "watchman", 1030, 560, 145),
+        body3(4, "corner", 1130, 510, 130),
+        body3(5, "watchman", 940, 610, 145)
+      ],
+      bolts: [],
+      effects: [],
+      time: 0,
+      auto: false,
+      phase: "combat",
+      nextId: 6,
+      cutin: 0,
+      hitstop: 0,
+      kills: 0,
+      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기",
+      shake: 0,
+      practice: false
+    };
+  }
+  function practiceRun() {
+    const r = newRun2();
+    r.practice = true;
+    r.player.x = 440;
+    r.player.y = 570;
+    r.message = "동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격";
+    r.enemies.forEach((e, i) => {
+      e.x = i ? 1200 : 530;
+      e.y = i ? 680 : 570;
+      e.hp = i ? 0 : 1e3;
+      e.max = i ? e.max : 1e3;
+      if (i) {
+        e.act = "dead";
+        e.t = 2;
+      }
+    });
+    r.kills = 3;
+    return r;
+  }
+  function act(b, name, duration) {
+    b.act = name;
+    b.t = 0;
+    b.duration = duration;
+    b.fired = false;
+  }
+  function fx(r, kind, x, y, z = 65) {
+    if (r.effects.length >= 64) r.effects.shift();
+    const duration = kind === "blast" ? 0.55 : 0.22;
+    r.effects.push({ x, y, z, t: 0, duration, kind });
+  }
+  function facing(a, b) {
+    return (b.x - a.x) * a.dir >= -8;
+  }
+  function damage2(r, b, amount, source4, down = false, stop = down ? 5 / 60 : 3 / 60, push2 = down ? 66 : 18) {
+    if (b.hp <= 0 || b.inv > 0) return false;
+    const p = r.player;
+    if (b === p && ["guard", "crouch", "crouchwalk"].includes(p.act) && facing(p, source4) && p.guard > 0) {
+      p.guard = Math.max(0, p.guard - amount * 2);
+      p.flash = 0.08;
+      fx(r, "guard", p.x + p.dir * 40, p.y, p.act === "crouch" ? 105 : 165);
+      if (!p.guard) {
+        act(p, "stun", 0.65);
+        r.message = "가드 붕괴! 거리를 확보하세요.";
+      }
+      return false;
+    }
+    b.hp = Math.max(0, b.hp - amount);
+    b.flash = 0.12;
+    const impactHeight = source4.act === "lowkick" ? 35 : source4.act === "airattack" ? Math.min(190, source4.z + 105) : 165;
+    fx(r, "hit", b.x, b.y, b.z + impactHeight);
+    r.hitstop = Math.max(r.hitstop, stop);
+    r.shake = Math.max(r.shake, down ? 6 : 2);
+    b.push = source4.dir * push2 * 8;
+    if (b === p) {
+      p.inv = 0.5;
+      p.gauge = clamp2(p.gauge + 7, 0, 100);
+    } else p.gauge = clamp2(p.gauge + amount * 0.35, 0, 100);
+    if (b.hp <= 0) {
+      act(b, "dead", 1);
+      if (b !== p) r.kills++;
+    } else if (!b.armor) act(b, down ? "down" : "hurt", down ? 0.9 : 0.23);
+    return true;
+  }
+  function move(b, x, y, speed, dt, face3 = true) {
+    const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
+    b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
+    b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
+    const distance = Math.hypot(b.x - ox, b.y - oy);
+    b.speed = Math.min(1200, distance / dt);
+    if (b.z === 0 && b.act !== "dash")
+      b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
+    if (x && face3) b.dir = x > 0 ? 1 : -1;
+  }
+  function nearTarget(r) {
+    const p = r.player;
+    return r.enemies.find(
+      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
+    );
+  }
+  function bolt(r, b, enemy) {
+    if (r.bolts.length >= 48) return;
+    const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
+    const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
+    r.bolts.push({
+      id: r.nextId++,
+      x: b.x + b.dir * muzzleX,
+      y: b.y,
+      z: b.z + muzzleHeight,
+      vx: b.dir * (enemy ? 410 : 1e3),
+      life: 1.7,
+      enemy
+    });
+    fx(r, "shot", b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
+  }
+  function item(r, i) {
+    const p = r.player;
+    if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
+    if (i === 0) {
+      if (p.hp >= p.max) return;
+      p.hp = Math.min(p.max, p.hp + 70);
+    }
+    if (i === 1) {
+      if (p.guard >= 100) return;
+      p.guard = 100;
+    }
+    if (i === 2) {
+      if (p.energy >= 100) return;
+      p.energy = 100;
+    }
+    p.items[i]--;
+    r.message = ["회복제 사용", "방어 회복제 사용", "능력 회복제 사용"][i];
+  }
+  function autoInput(r) {
+    const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
+    const e = live.sort(
+      (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y)
+    )[0];
+    if (!e) return { x: 0, y: 0 };
+    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find(
+      (e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30
+    );
+    return {
+      x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
+      run: Math.abs(dx) > 260,
+      y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
+      attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || Math.abs(dx) > 360 && r.time % 1.8 < 0.45),
+      skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
+      dash: !!threat,
+      ult: p.gauge >= 100 && live.length >= 2,
+      item: p.hp < 95 ? 0 : void 0
+    };
+  }
+  function step2(r, raw, dt) {
+    if (!Number.isFinite(dt) || dt <= 0) return;
+    dt = Math.min(dt, 1 / 30);
+    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
+    r.shake = Math.max(0, r.shake - dt * 24);
+    if (r.phase !== "combat") {
+      r.player.t += dt;
+      for (const enemy of r.enemies) if (enemy.act === "dead") enemy.t += dt;
+      return;
+    }
+    const p = r.player, input2 = r.auto ? autoInput(r) : raw;
+    p.attackBuffer = input2.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
+    if (r.cutin > 0) {
+      r.cutin = Math.max(0, r.cutin - dt);
+      return;
+    }
+    if (r.hitstop > 0) {
+      r.hitstop = Math.max(0, r.hitstop - dt);
+      return;
+    }
+    r.time += dt;
+    for (const b of [p, ...r.enemies]) {
+      b.t += dt;
+      b.inv = Math.max(0, b.inv - dt);
+      b.flash = Math.max(0, b.flash - dt);
+      b.cooldown = Math.max(0, b.cooldown - dt);
+      if (b.push) {
+        b.x = clamp2(b.x + b.push * dt, 55, WIDTH - 55);
+        b.push *= Math.exp(-dt * 10);
+        if (Math.abs(b.push) < 1) b.push = 0;
+      }
+      if (b.z > 0 || b.vz > 0) {
+        b.vz -= 1e3 * dt;
+        b.z = Math.max(0, b.z + b.vz * dt);
+        if (!b.z) {
+          b.vz = 0;
+          if (b === p && ["jump", "walk", "run", "idle", "airattack", "shot"].includes(b.act))
+            act(b, "land", 0.12);
+        }
+      }
+      if (b.act === "down" && b.t >= b.duration) {
+        act(b, "rise", 0.35);
+        b.inv = 0.55;
+      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(b.act) && b.t >= b.duration) {
+        const next = b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee2" ? "melee3" : null;
+        if (next) {
+          act(b, next, strikeDuration(next));
+          p.attackBuffer = 0;
+        } else {
+          if (b === p && b.act === "melee3") b.cooldown = 0.18;
+          act(b, "idle", 0);
+        }
+        b.armor = false;
+      }
+    }
+    p.energy = Math.min(100, p.energy + dt * 9);
+    p.dashCd = Math.max(0, p.dashCd - dt);
+    if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
+    if (input2.item !== void 0) item(r, input2.item);
+    if (["idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(p.act)) {
+      if (r.auto) {
+        const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+        if (target) p.dir = target.x >= p.x ? 1 : -1;
+      }
+      if (input2.x && !r.auto) p.dir = input2.x > 0 ? 1 : -1;
+      if (input2.jump && p.z === 0) {
+        p.vz = 600;
+        p.crouching = false;
+      }
+      if (input2.guard && input2.y > 0 && !p.z && !p.vz) p.crouching = true;
+      if (!input2.guard) p.crouching = false;
+      if (input2.ult && p.gauge >= 100) {
+        p.gauge = 0;
+        act(p, "ult", 0.9);
+        p.armor = true;
+        p.inv = 1.05;
+        r.cutin = 0.75;
+        r.message = "집중 파괴";
+      } else if (input2.dash && p.dashCd <= 0) {
+        if (input2.x) p.dir = Math.sign(input2.x);
+        act(p, "dash", 0.3);
+        p.inv = 0.24;
+        p.dashCd = 0.8;
+      } else if (input2.guard && !p.z && !p.vz) {
+        p.act = p.crouching ? input2.x ? "crouchwalk" : "crouch" : "guard";
+        if (input2.x) p.dir = Math.sign(input2.x);
+        if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
+          act(p, "lowkick", strikeDuration("lowkick"));
+          p.attackBuffer = 0;
+          p.cooldown = 0.35;
+        } else if (p.act === "crouchwalk") move(p, input2.x, 0, 85, dt);
+      } else if (input2.skill && p.energy >= 35) {
+        p.energy -= 35;
+        act(p, "skill", 0.48);
+        p.armor = true;
+      } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
+        p.attackBuffer = 0;
+        if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
+          act(p, "airattack", strikeDuration("airattack"));
+        } else if (!p.z && !p.vz && input2.run && input2.x) {
+          act(p, "dashattack", strikeDuration("dashattack"));
+        } else if (!p.z && !p.vz && nearTarget(r)) {
+          act(p, "melee1", strikeDuration("melee1"));
+          p.cooldown = 0;
+        } else {
+          act(p, "shot", 0.24);
+          p.cooldown = 0.28;
+        }
+      } else {
+        const x = clamp2(input2.x, -1, 1), y = clamp2(input2.y, -1, 1);
+        const running2 = !!input2.run;
+        p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running2 ? "run" : "walk" : "idle";
+        move(p, x, y, p.z ? 240 : running2 ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
+      }
+    }
+    if (p.act === "dash" && p.attackBuffer > 0 && p.t < 0.16) {
+      act(p, "dashattack", strikeDuration("dashattack"));
+      p.attackBuffer = 0;
+      p.inv = 0;
+    }
+    if (p.act === "dash" && p.t >= 0.04 && p.t < 0.16) move(p, input2.x || p.dir, input2.y, 1200, dt);
+    if (p.act === "dashattack" && p.t < strikeContact("dashattack"))
+      move(p, p.dir, 0, 420, dt, false);
+    if (p.act === "airattack" && p.z > 0) move(p, p.dir, 0, 160, dt, false);
+    if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
+      p.fired = true;
+      const finish2 = p.act === "melee3", attack = ATTACK[p.act];
+      const oldX = p.x;
+      let connected = false;
+      for (const e of r.enemies)
+        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < attack.reach && Math.abs(e.y - p.y) < 35 && (p.act === "airattack" ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60))
+          connected = damage2(
+            r,
+            e,
+            attack.damage,
+            p,
+            finish2 || p.act === "dashattack",
+            attack.stop / 60,
+            attack.push
+          ) || connected;
+      if (connected) p.t = strikeContact(p.act);
+      if (finish2 && connected) fx(r, "blast", p.x + p.dir * 120, p.y, 150);
+      r.message = p.act === "lowkick" ? "하단차기" : p.act === "airattack" ? "공중차기" : p.act === "dashattack" ? "대시 어깨치기" : finish2 ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 오른 장타" : "근접 1타 · 왼 장타";
+      if (connected) return;
+    }
+    if (p.act === "shot" && p.t >= 0.03 && !p.fired) {
+      p.fired = true;
+      bolt(r, p, false);
+    }
+    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.3 : 0.14) && !p.fired) {
+      p.fired = true;
+      const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
+      fx(r, "blast", x, p.y, 70);
+      for (const e of r.enemies)
+        if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
+          damage2(r, e, ultimate ? 70 : 45, p, true);
+    }
+    for (const e of r.enemies) {
+      if (r.practice) continue;
+      if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
+      if (e.act === "shot") {
+        if (!e.fired && e.t >= e.duration - 0.12) {
+          e.fired = true;
+          if (e.kind === "watchman") bolt(r, e, true);
+          else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
+            damage2(r, p, 16, e, true);
+        }
+        continue;
+      }
+      const dx = p.x - e.x, dy = p.y - e.y, range = e.kind === "watchman" ? 550 : 90;
+      e.dir = dx >= 0 ? 1 : -1;
+      if (Math.abs(dx) < range && Math.abs(dy) < 25 && e.cooldown <= 0) {
+        act(e, "shot", e.kind === "watchman" ? 0.85 : 0.65);
+        e.cooldown = e.kind === "watchman" ? 1.7 : 1.2;
+      } else {
+        move(
+          e,
+          Math.abs(dx) > range * 0.8 ? Math.sign(dx) : 0,
+          Math.abs(dy) > 15 ? Math.sign(dy) : 0,
+          e.kind === "watchman" ? 75 : 125,
+          dt
+        );
+        e.act = "walk";
+      }
+    }
+    for (const b of r.bolts) {
+      const old = b.x;
+      b.x += b.vx * dt;
+      b.life -= dt;
+      const targets = b.enemy ? [p] : r.enemies;
+      const candidates = targets.filter(
+        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 125 : 245) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
+      ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
+      if (candidates[0]) {
+        damage2(r, candidates[0], b.enemy ? 12 : 18, {
+          ...p,
+          x: old,
+          dir: Math.sign(b.vx)
+        });
+        b.life = 0;
+      }
+    }
+    r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
+    if (p.hp <= 0) {
+      r.phase = "evacuated";
+      act(p, "defeat", 0.8);
+      r.message = "작전 지속 불가 · 본부 후송";
+    } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
+      r.phase = "cleared";
+      act(p, "victory", 0.7);
+      r.message = "훈련 완료 · 전원 제압";
+    }
+  }
+  function serialize(r) {
+    return JSON.stringify(r);
+  }
+  function restore(raw) {
+    try {
+      if (!raw || raw.length > 12e4) return null;
+      const r = JSON.parse(raw);
+      if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
+        for (const b of [r.player, ...r.enemies]) {
+          b.stride = b.stride ?? 0;
+          b.speed = b.speed ?? 0;
+          b.push = 0;
+          b.y = clamp2(b.y, SCENE.floorMin, SCENE.floorMax);
+        }
+        for (const bolt2 of r.bolts ?? []) bolt2.y = clamp2(bolt2.y, SCENE.floorMin, SCENE.floorMax);
+        r.version = SAVE_VERSION2;
+        r.shake = 0;
+        r.practice = false;
+        r.player.attackBuffer = 0;
+        r.player.crouching = false;
+      }
+      const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
+      const actions = [
+        "idle",
+        "walk",
+        "run",
+        "jump",
+        "land",
+        "melee1",
+        "melee2",
+        "melee3",
+        "shot",
+        "skill",
+        "ult",
+        "dash",
+        "guard",
+        "crouch",
+        "crouchwalk",
+        "lowkick",
+        "airattack",
+        "dashattack",
+        "stun",
+        "victory",
+        "defeat",
+        "hurt",
+        "down",
+        "rise",
+        "dead"
+      ];
+      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200) && finite(b.push, -1200, 1200);
+      if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
+        return null;
+      const p = r.player;
+      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !finite(p.attackBuffer, 0, 0.13) || typeof p.crouching !== "boolean" || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
+        return null;
+      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || !finite(r.shake, 0, 10) || typeof r.practice !== "boolean" || typeof r.message !== "string" || r.message.length > 150)
+        return null;
+      if (r.phase === "combat" && (p.hp <= 0 || !r.practice && r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
+        return null;
+      if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
+        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
+      ))
+        return null;
+      r.effects = [];
+      return r;
+    } catch {
+      return null;
+    }
+  }
+
+  // src/game/action/animation.ts
+  function clipIndex(phase, frames, times) {
+    if (!frames.length) return 0;
+    const p = Math.max(0, Math.min(0.999999, phase));
+    if (!times || times.length !== frames.length) return Math.floor(p * frames.length);
+    const duration = times.reduce((sum, value) => sum + value, 0);
+    if (duration <= 0) return 0;
+    let cursor = p * duration;
+    for (let i = 0; i < times.length; i++) {
+      if (cursor < times[i]) return i;
+      cursor -= times[i];
+    }
+    return frames.length - 1;
+  }
+
+  // src/game/action/render.ts
+  var ActionRenderer = class {
+    constructor(canvas) {
+      this.canvas = canvas;
+      canvas.width = WIDTH;
+      canvas.height = HEIGHT;
+      this.ctx = canvas.getContext("2d");
+    }
+    debugGround = false;
+    images = /* @__PURE__ */ new Map();
+    art = null;
+    disposed = false;
+    preview = null;
+    ctx;
+    async load(art2) {
+      this.art = art2;
+      await Promise.all(
+        ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
+          const img = new Image();
+          await new Promise((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
+            img.src = art2.url(name);
+          });
+          if (!this.disposed) this.images.set(name, img);
+        })
+      );
+    }
+    dispose() {
+      this.disposed = true;
+      this.images.clear();
+      this.art = null;
+    }
+    rect(x, y, w, h, color) {
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+    sprite(b, frame, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
+      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame] ?? null, img = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
+      if (!f || !img) return;
+      scale *= depthScale(b.y);
+      const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
+      c.save();
+      c.translate(Math.round(x), Math.round(y));
+      c.scale(b.dir, 1);
+      if (b.flash > 0) c.filter = "brightness(1.8)";
+      c.drawImage(
+        img,
+        sx,
+        sy,
+        w,
+        h,
+        Math.round(-ax * scale),
+        Math.round(-ay * scale),
+        Math.round(w * scale),
+        Math.round(h * scale)
+      );
+      c.restore();
+    }
+    drawPose(run3, clip, phase) {
+      const previousCutin = run3.cutin;
+      this.preview = { clip: clip === "cutin" ? "idle" : clip, phase };
+      if (clip === "cutin") run3.cutin = Math.max(1e-3, 0.75 * (1 - phase));
+      this.draw(run3);
+      run3.cutin = previousCutin;
+      this.preview = null;
+    }
+    frame(b, r) {
+      const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
+      if (b.kind === "jyaldi") {
+        const clips = this.art?.atlas.action?.clips;
+        if (this.preview) {
+          const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
+          return frames[clipIndex(
+            this.preview.phase,
+            frames,
+            this.art?.atlas.action?.frameTimes?.[this.preview.clip]
+          )];
+        }
+        let name = b.act === "idle" ? "idle" : b.act;
+        if (name === "idle" && clips?.relaxed && !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70))
+          name = "relaxed";
+        if (b.act === "guard" && b.flash > 0) name = "guard_hit";
+        if ((b.z > 0 || b.vz > 0) && !["airattack", "shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
+          name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
+        if (name === "dead") name = "down";
+        if (name === "shot" && b.z > 0 && clips?.airfire) name = "airfire";
+        const clip = clips?.[name] ?? clips?.idle ?? [0];
+        const phase = b.act === "walk" || b.act === "run" || b.act === "crouchwalk" ? b.stride : name === "idle" ? r.time % 1.2 / 1.2 : name === "guard" || name === "crouch" ? r.time % 1 : name === "jump_up" ? Math.max(0, Math.min(0.999, (600 - b.vz) / 500)) : name === "jump_apex" ? Math.max(0, Math.min(0.999, (100 - b.vz) / 200)) : name === "jump_down" ? Math.min(0.999, -b.vz / 600) : progress;
+        return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
+      }
+      if (b.act === "dead" || b.act === "down")
+        return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
+      if (b.act === "rise") return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
+      if (b.act === "hurt") return progress < 0.4 ? 19 : 20;
+      if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
+      return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
+    }
+    draw(r) {
+      const c = this.ctx, p = r.player;
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.imageSmoothingEnabled = false;
+      this.rect(0, 0, WIDTH, HEIGHT, "#0a111b");
+      const shake = Math.round(Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake / 2) * 2;
+      c.translate(shake, 0);
+      const bg = this.images.get("bg-bureau-action");
+      if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT);
+      if (this.debugGround) {
+        for (let x = 0; x < WIDTH; x += 32)
+          this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, "#b4e2e533");
+        for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
+          this.rect(0, y, WIDTH, 1, "#b4e2e533");
+      }
+      for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
+        if (b !== p && b.hp <= 0 && b.t > 1) continue;
+        const visualFrame = b.kind === "jyaldi" ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
+        const lift = visualFrame ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2) : 0;
+        const ground = depthScale(b.y), air = Math.max(0.25, 1 - (b.z + lift) / 240);
+        this.rect(b.x - 32 * ground, b.y - 3, 64 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
+        this.rect(b.x - 24 * ground, b.y - 2, 48 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
+        if (b.kind === "jyaldi" && b.z === 0) {
+          const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
+          for (const [dx, dy] of contact)
+            this.rect(
+              b.x + dx * b.dir * ground * (this.art?.atlas.action?.scale ?? 2) - 7,
+              b.y + dy * ground * (this.art?.atlas.action?.scale ?? 2) - 1,
+              14,
+              3,
+              "#02070bc0"
+            );
+        }
+        if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
+          const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
+          this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
+          this.rect(b.x - 7, b.y - 280, 14, 20, "#ffb35c");
+        }
+        const jolt = b.act === "hurt" && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
+        this.sprite(b, this.frame(b, r), void 0, b.x + jolt, b.y - b.z);
+        if (b.act === "stun") {
+          for (let i = 0; i < 3; i++) {
+            const angle = r.time * 7 + i * Math.PI * 2 / 3;
+            const x = b.x + Math.cos(angle) * 28, y = b.y - b.z - 252 + Math.sin(angle) * 8;
+            this.rect(x - 4, y - 2, 8, 4, "#ffe6a1");
+            this.rect(x - 2, y - 4, 4, 8, "#ffe6a1");
+          }
+        }
+        if (b.armor && b.hp > 0) {
+          this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
+        }
+        if (b.act === "guard" || b.act === "crouch" || b.act === "crouchwalk") {
+          const sy = b.y - (b.act === "crouch" ? 95 : 165);
+          for (let i = 0; i < 4; i++)
+            this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
+        }
+        if (b.kind !== "jyaldi" && b.hp > 0) {
+          const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
+          const healthTop = b.y - (enemyFrame?.[5] ?? 120) * SCENE.enemyScale - 12;
+          this.rect(b.x - 34, healthTop, 68, 6, "#060c12");
+          this.rect(b.x - 34, healthTop, 68 * b.hp / b.max, 6, "#e9896d");
+        }
+        if (b === p && p.inv > 0) {
+          this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
+        }
+      }
+      for (const b of r.bolts) {
+        this.rect(b.x - 12, b.y - b.z, 24, 4, b.enemy ? "#ff7b6b" : "#ffe5ad");
+      }
+      for (const f of r.effects) {
+        const t = f.t / f.duration, radius = f.kind === "blast" ? 20 + t * 190 : 8 + t * 22, x = f.x, y = f.y - f.z;
+        c.globalAlpha = 1 - t;
+        const color = f.kind === "guard" ? "#9ce5ff" : "#ffd18b";
+        const rays = f.kind === "blast" ? 20 : 8;
+        for (let i = 0; i < rays; i++) {
+          const angle = i / rays * Math.PI * 2, rad = radius * (i % 2 ? 0.7 : 1);
+          const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3, py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
+          this.rect(px, py, f.kind === "blast" ? 6 : 3, f.kind === "blast" ? 6 : 3, color);
+        }
+        if (t < 0.35) {
+          this.rect(x - 5, y - 16, 10, 32, "#fff1d0");
+          this.rect(x - 16, y - 5, 32, 10, "#fff1d0");
+        }
+        c.globalAlpha = 1;
+      }
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      if (r.cutin > 0) {
+        this.rect(0, 0, WIDTH, HEIGHT, "#030b17bb");
+        this.rect(0, 165, WIDTH, 320, "#172c46");
+        for (let i = 0; i < 18; i++)
+          this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
+        this.sprite(
+          { ...p, dir: 1 },
+          this.art?.atlas.action?.clips.cutin?.[Math.min(
+            (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
+            Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
+          )] ?? 0,
+          (this.art?.atlas.action?.scale ?? 2) * 1.5,
           340 + (1 - r.cutin / 0.75) * 80,
           530
         );
@@ -568,7 +1313,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.34" : "0";
+  var PLUGIN_VERSION = true ? "0.16.35" : "0";
 
   // src/host/gamepack.ts
   var KEY2 = `goei:game-pack:${PACK_ID}`;
@@ -745,7 +1490,7 @@
     art: loadActionArt
   };
   var errText = (e) => e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
-  function packPanel(box, old, done) {
+  function packPanel(box, old, done2) {
     const action = mode2 === "action";
     box.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
       <b>${action ? "새 액션 그림 받기" : old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
@@ -768,7 +1513,7 @@
         const bytes = await get();
         say("저장하는 중");
         await (action ? installActionPack(bytes) : installPack(bytes));
-        done();
+        done2();
       } catch (e) {
         say(errText(e));
         btns.forEach((b) => b.disabled = false);
@@ -925,7 +1670,7 @@
   }
 
   // src/ui/update.ts
-  var esc11 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc12 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, pics: null, progress: "", done: "" };
   var checked = false;
   var skipped = "";
@@ -1017,7 +1762,7 @@
   function updateBanner(ctx2) {
     const n = newVersions(ctx2);
     if (!(n.card || n.plugin) || skipKey(n) === skipped) return "";
-    const what = [n.plugin ? `플러그인 v${esc11(n.plugin)}` : "", n.card ? `카드 v${esc11(n.card)}` : ""].filter(Boolean).join(" · ");
+    const what = [n.plugin ? `플러그인 v${esc12(n.plugin)}` : "", n.card ? `카드 v${esc12(n.card)}` : ""].filter(Boolean).join(" · ");
     return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
     <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
   }
@@ -1034,29 +1779,29 @@
     const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
     rows2.push(row6(
       "플러그인",
-      `<span class="upd-ver">v${esc11(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc11(L.plugin)}</b>` : ""}</span>`,
+      `<span class="upd-ver">v${esc12(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc12(L.plugin)}</b>` : ""}</span>`,
       pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
     ));
     const cardNew = lite && L && compareVersions(L.card, cur) > 0;
     const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
     rows2.push(row6(
       "카드",
-      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc11(cur)}`}${cardNew ? ` → <b>v${esc11(L.card)}</b>` : ""}</span>`,
+      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc12(cur)}`}${cardNew ? ` → <b>v${esc12(L.card)}</b>` : ""}</span>`,
       !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
     ));
     let actions = `<button class="gx-mini" data-action="upd-check" ${busy4 ? "disabled" : ""}>${busy4 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
     if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc11(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
+      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc12(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
     }
     const plan = updateUi.plan;
     const pics = updateUi.pics;
     const summary = plan ? `<ul class="upd-plan">
-        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc11(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
+        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc12(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
         <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
         <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
         ${pics?.get.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added} <small>(약 ${mb(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ""}
       </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>` : "";
-    return section2(rows2.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc11(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc11(updateUi.done)}</p>` : ""));
+    return section2(rows2.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc12(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc12(updateUi.done)}</p>` : ""));
   }
   var mb = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`;
   function section2(body5) {
@@ -1177,7 +1922,7 @@
   }
   var jobs3 = /* @__PURE__ */ new Map();
   var chatKey3 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc12 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc13 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var regCache = null;
   function registry(ctx2) {
     if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
@@ -1358,14 +2103,14 @@
   }
   function face2(ctx2, e, cls = "") {
     const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc12(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
+    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc13(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
   }
   function seg3(action, cur, items) {
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
   }
   function busyLine(ctx2) {
     const job = jobs3.get(chatKey3(ctx2));
-    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc12(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
+    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc13(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
   }
   var tool3 = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var blank4 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
@@ -1373,8 +2118,8 @@
   function row5(ctx2, e, title2, sub, dot = false) {
     const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
     const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
-    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc12(title2)}">${face2(ctx2, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc12(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc12(small)}</small>` : ""}</span></button></li>`;
+    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc13(title2)}">${face2(ctx2, e)}
+    <span class="ph-who"><span class="ph-who-top"><b>${esc13(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc13(small)}</small>` : ""}</span></button></li>`;
   }
   var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
   var PLAIN = { ㄲ: "ㄱ", ㄸ: "ㄷ", ㅃ: "ㅂ", ㅆ: "ㅅ", ㅉ: "ㅈ" };
@@ -1420,10 +2165,10 @@
         return row5(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "));
       }).join("")}</ul>` : "";
       if (!docPart && !rosterPart && !nearPart) {
-        return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc12(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc12(q)}">${ICONS.pen}작성하기</button></div></div>`;
+        return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc13(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc13(q)}">${ICONS.pen}작성하기</button></div></div>`;
       }
-      const fresh = known ? "" : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc12(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc12(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
-      const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc12(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : "";
+      const fresh = known ? "" : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc13(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc13(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
+      const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc13(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : "";
       return `<div class="nw-groups">${lead}${docPart}${rosterPart}${nearPart}${fresh}</div>`;
     }
     if (!docs.length) return `<div class="nw-groups">${blank4("아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.")}</div>`;
@@ -1464,9 +2209,9 @@
       const e = entryFor(ctx2, title2);
       const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
       const none = !saved.has(title2);
-      return `<button class="nw-card${none ? " none" : ""}" data-action="wiki-pick" data-value="${esc12(title2)}">
-      <span class="nw-card-img${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc12(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
-      <b>${esc12(e?.name ?? title2)}</b>${sub ? `<small>${esc12(sub)}</small>` : ""}</button>`;
+      return `<button class="nw-card${none ? " none" : ""}" data-action="wiki-pick" data-value="${esc13(title2)}">
+      <span class="nw-card-img${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc13(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
+      <b>${esc13(e?.name ?? title2)}</b>${sub ? `<small>${esc13(sub)}</small>` : ""}</button>`;
     };
     const live = [];
     const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
@@ -1491,14 +2236,14 @@
     const tiles = TABS.filter(([t]) => t !== "all" && t !== "story").map(([t, label]) => {
       const list4 = docs.filter((d) => inTab(ctx2, d, t));
       if (!list4.length) return "";
-      const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc12(u)}" alt="" loading="lazy">`).join("");
+      const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc13(u)}" alt="" loading="lazy">`).join("");
       return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === "an" ? CAT_ICON.an : t === "ms" ? CAT_ICON.ms : ICONS.book)}</span><b>${label}</b><small>문서 ${list4.length}개</small></button>`;
     }).join("");
     const sec = (title2, n, inner) => `<section class="nw-hsec"><h3>${title2}${n ? `<b>${n}</b>` : ""}</h3>${inner}</section>`;
     return `<div class="nw-home">
     <section class="nw-hero">
       <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc12(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc13(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx2)}</div>
     </section>
     ${liveCards ? sec("지금 얽힌 문서", 0, `<div class="nw-cards">${liveCards}</div>`) : ""}
@@ -1509,7 +2254,7 @@
   function paneHead3(ctx2, title2, sub, right = "", e) {
     const back = wiki.history.some((h) => h.view !== "home") ? `<button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : "";
     return `<header class="ph-room-head${back ? "" : " nw-noback"}">${back}
-    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc12(title2)}</b>${sub ? `<small>${esc12(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc13(title2)}</b>${sub ? `<small>${esc13(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
   }
   function settingsView3(ctx2) {
     const s4 = wikiSettings(ctx2.chat.scriptstate);
@@ -1524,19 +2269,19 @@
       ${line2("채팅에 반영", seg3("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]), "채팅에 나온 문서가 채팅 요청에 참고로 붙어요")}
     </div></section>
     <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc12(req)}</textarea></div></div></section>
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc13(req)}</textarea></div></div></section>
     ${advancedBox("nw", ctx2.chat.scriptstate)}</div>
   </div>`;
   }
   function newView(ctx2) {
     return `<div class="ph-form">${paneHead3(ctx2, "새 문서", "")}
     <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
-      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc12(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
+      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc13(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
   }
   function docReqBox(shared) {
-    return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc12(wiki.docReq)}</textarea></label>
-      ${shared ? `<p class="nw-creq">공용 지침: ${esc12(shared)}</p>` : ""}`;
+    return `<label class="nw-reqlabel">이 문서 지침<textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" placeholder="이 문서에만 덧붙일 내용·관점·분량">${esc13(wiki.docReq)}</textarea></label>
+      ${shared ? `<p class="nw-creq">공용 지침: ${esc13(shared)}</p>` : ""}`;
   }
   function compose(ctx2) {
     const job = jobs3.get(chatKey3(ctx2));
@@ -1544,16 +2289,16 @@
     const lore = hasBook(source3(ctx2), wiki.title);
     const e = entryFor(ctx2, wiki.title);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc12(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc12(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
+    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc13(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc13(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
     return `<div class="ph-form">${paneHead3(ctx2, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : "새 문서", "", e)}
     <div class="ph-form-body"><section class="nw-compose">
       ${face2(ctx2, e, " lg")}
-      <h2 class="nw-title">${esc12(wiki.title)}</h2>
+      <h2 class="nw-title">${esc13(wiki.title)}</h2>
       <p class="nw-cmsg">이 문서는 아직 없어요.</p>
       <p class="gx-muted">${src}</p>
       ${docReqBox(req)}
     </section></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc12(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
+    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc13(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
   }
   function docView(ctx2) {
     const doc = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
@@ -1569,24 +2314,24 @@
     const job = jobs3.get(chatKey3(ctx2));
     const links = (label, list4) => list4.length ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list4.map((t) => {
       const le = entryFor(ctx2, t);
-      return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc12(t)}">${face2(ctx2, le, " xs")}<span>${esc12(le?.name ?? t)}</span></button>`;
+      return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc13(t)}">${face2(ctx2, le, " xs")}<span>${esc13(le?.name ?? t)}</span></button>`;
     }).join("")}</div></div>` : "";
     const m = doc.meta;
     const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc12(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc12(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc12(m.docRequest)}</p>` : ""}</details>` : "";
+       ${m.sources.length ? `<p>${esc13(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc13(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc13(m.docRequest)}</p>` : ""}</details>` : "";
     const confirm = wiki.confirmDelete === doc.title;
     const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc.title);
-    const del = doc.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc12(doc.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc12(doc.title)}"`);
+    const del = doc.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc13(doc.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc13(doc.title)}"`);
     const open3 = wiki.rewrite === doc.title;
-    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc12(doc.title)}" ${open3 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
+    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc13(doc.title)}" ${open3 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const rewrite = open3 ? `<section class="nw-rewrite">${docReqBox(req)}
         <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${[["1", "켜기"], ["0", "끄기"]].map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? "1" : "0") === v ? " on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</div></div>
-        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc12(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc13(doc.title)}" ${job ? "disabled" : ""}>${job?.title === doc.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
     const sub = [e ? CAT_LABEL[e.cat] : "", doc.base ? "기본 문서" : m?.created ? when(m.created) : ""].filter(Boolean).join(" · ");
     return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc.title, sub, right, e)}
     <article class="nw-doc">
-      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc12(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc12(e.sub)}</small>` : ""}</header>
+      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc13(doc.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc13(e.sub)}</small>` : ""}</header>
       <div class="nw-body">${r.html}</div>
       ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
     </article></div>`;
@@ -1599,16 +2344,16 @@
     return homeView(ctx2);
   }
   function wikiTab(ctx2) {
-    const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc12(wiki.failure.title)})</summary><p>${esc12(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc12(wiki.failure.raw)}</textarea></details>` : "";
+    const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc13(wiki.failure.title)})</summary><p>${esc13(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc13(wiki.failure.raw)}</textarea></details>` : "";
     const note = toast("nw", wiki.info, (t) => {
       if (wiki.info === t) wiki.info = "";
     });
-    const status = `${busyLine(ctx2)}${wiki.notice ? `<div class="gx-err" role="alert">${esc12(wiki.notice)}</div>` : ""}`;
+    const status = `${busyLine(ctx2)}${wiki.notice ? `<div class="gx-err" role="alert">${esc13(wiki.notice)}</div>` : ""}`;
     const open3 = wiki.listOpen;
     return `<main class="gx-body ph-app nw nw-app${open3 ? " list-open" : ""}">
     ${rail()}
     <aside class="nw-panel" aria-label="위키 목록"${open3 ? "" : " inert"}><div class="nw-pin">
-        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc12(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
+        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc13(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
         <div class="ph-content nw-list">${wikiList(ctx2)}</div>
         ${fail3}
       </div></aside>
@@ -1873,178 +2618,6 @@
     if (name === "wiki-new") return void (wiki.newTitle = value), true;
     if (name === "wiki-docreq") return void (wiki.docReq = value), true;
     return false;
-  }
-
-  // src/ui/evcard.ts
-  var esc13 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND = { an: "괴이", in: "사건", ms: "특수" };
-  var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
-  function peopleChips(char, names4, agents2, own = "") {
-    return names4.filter((n, i, all) => n && n !== "없음" && all.indexOf(n) === i).map((n) => {
-      if (agents2.has(n)) return `<span class="gx-pchip">${avatar(char, agents2.get(n).english, n, "xs")}${esc13(n)}</span>`;
-      return `<span class="gx-badge${own && n === own ? " own" : ""}">${esc13(n)}</span>`;
-    }).join("");
-  }
-  function elapsedText(minute, since) {
-    if (minute === null || since === null) return "";
-    const m = Math.max(0, minute - since);
-    const h = Math.floor(m / 60);
-    if (!m) return "방금 발생";
-    return `발생 ${h ? `${h}시간 ` : ""}${m % 60 || !h ? `${m % 60}분 ` : ""}경과`;
-  }
-  var evUi = { pop: "" };
-  var seen = /* @__PURE__ */ new Map();
-  var evSeenReset = () => seen.clear();
-  function gradeMark(c) {
-    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
-    return `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc13(grade)}등급` : ""}">${grade ? esc13(grade) : MARK[c.kind]}</i>`;
-  }
-  var artBg = (c) => c.art?.pic ? ` style="background-image:url('${esc13(c.art.pic)}')"` : "";
-  var artIco = (c) => c.art?.pic ? "" : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
-  function statusNote(c) {
-    const text = c.badge.replace(/<[^>]+>/g, "").trim();
-    if (!c.key) return text ? `<em class="gx-evc-note wait">${esc13(text)}</em>` : "";
-    return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc13(text)}</em>` : "";
-  }
-  function chipItems(html = "") {
-    const out = [];
-    const re = /<span class="gx-(?:pchip|badge[^"]*)">/g;
-    const starts = [];
-    for (let m = re.exec(html); m; m = re.exec(html)) {
-      starts.push(m.index);
-    }
-    starts.forEach((st, i) => out.push(html.slice(st, starts[i + 1] ?? html.length)));
-    return out;
-  }
-  function depMark(c) {
-    if (!c.key || c.kind === "in") return "";
-    const items = chipItems(c.chips);
-    const strip = (h) => h.replace(/<[^>]+>/g, "").trim();
-    const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);
-    const others = items.filter((h) => h.startsWith('<span class="gx-badge">')).map(strip);
-    const verb = c.kind === "ms" ? "방문" : "투입";
-    const cls = ours.length ? "on" : others.length ? "other" : "";
-    const title2 = [ours.length ? `우리: ${ours.join(", ")}` : "", others.length ? `다른 세력: ${others.join(", ")}` : ""].filter(Boolean).join(" / ") || `미${verb}`;
-    return `<i class="gx-evdep${cls ? ` ${cls}` : ""}${ours.length && others.length ? " mix" : ""}" title="${esc13(title2)}" aria-label="${esc13(title2)}">${ICONS.person}</i>`;
-  }
-  function artCard(c) {
-    const key2 = c.key ? esc13(c.key) : "";
-    if (c.pop) seen.set(c.pop, c);
-    const act2 = c.pop ? ` data-action="ev-pop" data-value="${esc13(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key2}"` : "";
-    const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc13(c.art.desc)}</span>` : "");
-    return `<li class="gx-evc art${act2 ? " go" : ""}${c.selected ? " sel" : ""}${c.ended ? " wait ended" : c.key ? " live" : " wait"}"${act2}>
-    <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
-      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc13(c.name)}</b>${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
-    </div></li>`;
-  }
-  function evPopup() {
-    const c = evUi.pop ? seen.get(evUi.pop) : void 0;
-    if (!c) {
-      evUi.pop = "";
-      return "";
-    }
-    const key2 = c.key ? esc13(c.key) : "";
-    const pick2 = c.open === "pick-event";
-    const name = esc13(c.name);
-    const btns = `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key2}" title="${pick2 ? "목표로 고르기" : "지도"}" aria-label="${name} ${pick2 ? "목표로 고르기" : "지도에서 보기"}">${pick2 ? ICONS.pin : ICONS.map}</button>` : ""}
-    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
-    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc13(c.art.desc)}</span>` : "";
-    return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
-    <div class="gx-evc art open ev-pop${c.ended ? " wait ended" : c.key ? " live" : " wait"}" role="dialog" aria-label="${esc13(c.name)}">
-      <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
-        <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== "in" ? `<em class="gx-evc-note">${c.kind === "ms" ? "미방문" : "미투입"}</em>` : ""}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ""}${c.extra ?? ""}${desc}</span>
-      </div></div>`;
-  }
-  function endedCard(e, art2) {
-    const name = e.name || "이름 미확인";
-    return artCard({ kind: e.kind, name, grade: e.grade, loc: esc13(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art2(name, e.kind) ?? { pic: null, desc: "" }, pop: `end:${e.kind}:${e.name}:${e.loc}` });
-  }
-  function evCard(c) {
-    if (c.art) return artCard(c);
-    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
-    const mark = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc13(grade)}등급` : ""}">${grade ? esc13(grade) : MARK[c.kind]}</i>`;
-    const title2 = `<span class="gx-evc-name"><b>${esc13(c.name)}</b></span>`;
-    if (!c.key) {
-      return `<li class="gx-evc">${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
-    }
-    const key2 = esc13(c.key);
-    const acts = `<span class="gx-evc-act">
-      ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc13(c.name)}" title="위키" aria-label="${esc13(c.name)} 위키">${ICONS.wiki}</button>` : ""}
-      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key2}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key2}" title="상황 종료" aria-label="${esc13(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
-    const open3 = c.open ? ` data-action="${c.open}" data-value="${key2}"` : "";
-    return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open3}>${mark}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
-    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
-  }
-  var opsUi = { sel: "", mode: "feed" };
-  var GRADE_RANK = { S: 0, A: 1, B: 2, C: 3, D: 4 };
-  function firstPick(cards) {
-    const live = cards.filter((c) => !c.ended);
-    const ours = (c) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? "");
-    const rank = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
-    return [...live].sort((a, b) => rank(a) - rank(b))[0]?.id ?? cards[0]?.id ?? "";
-  }
-  function opsRow(c, on2) {
-    const thumb = c.art?.pic ? `<img src="${esc13(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
-    return `<li class="gx-oprow k-${c.kind}${on2 ? " sel" : ""}${c.ended ? " ended" : ""}" data-action="ops-sel" data-value="${esc13(c.id)}" aria-current="${on2}">
-    <span class="gx-oprow-pic">${thumb}</span>
-    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc13(c.name)}</span></b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
-  }
-  var camNo = (loc) => String(Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89 + 10).padStart(2, "0");
-  function modeSeg() {
-    return `<span class="gx-opseg" role="tablist">${["feed", "map"].map((m) => `<button role="tab" class="${opsUi.mode === m ? "on" : ""}" data-action="ops-mode" data-value="${m}" aria-selected="${opsUi.mode === m}">${m === "feed" ? "상황" : "지도"}</button>`).join("")}</span>`;
-  }
-  function whoLine(chips3 = "") {
-    const items = chipItems(chips3).map((h) => {
-      const ours = /^<span class="gx-(?:pchip|badge own)"/.test(h);
-      const text = h.replace(/<[^>]*>/g, "").trim();
-      return text ? `<span class="${ours ? "on" : "other"}">${text}</span>` : "";
-    }).filter(Boolean);
-    return items.length ? `<span class="gx-opwho"><em>투입</em>${items.join("<i>·</i>")}</span>` : "";
-  }
-  function opsFeed(c, clock2, empty) {
-    if (!c) {
-      return `<div class="gx-opview feed nosig"><div class="gx-opbar">${modeSeg()}</div><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc13(empty)}</small></div></div>`;
-    }
-    const key2 = c.key ? esc13(c.key) : "";
-    const name = esc13(c.name);
-    const btns = `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key2}" title="임무 지도" aria-label="${name} 임무 지도에서 보기">${ICONS.map}</button>` : ""}
-    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
-    const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc13(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
-    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc13(c.art.desc)}</span>` : "";
-    const region = locName(c.locCode).split(" ").slice(0, 2).join(" ");
-    return `<div class="gx-opview feed k-${c.kind}${c.ended ? " ended" : ""}">${pic}
-    <div class="gx-opbar">${modeSeg()}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? "END" : "REC"}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc13(region)}</span><span class="ts">${esc13(clock2)}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ""}${desc}</div>
-  </div>`;
-  }
-  function opsMap(cards, sel, url, clock2) {
-    const per = /* @__PURE__ */ new Map();
-    const pins = cards.filter((c) => !c.ended).map((c) => {
-      const sido = c.locCode.split("-")[0];
-      const at = NATION_PINS.find((p) => p[0] === sido);
-      if (!at) return "";
-      const n = per.get(sido) ?? 0;
-      per.set(sido, n + 1);
-      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? " sel" : ""}" style="left:${at[2]}%;top:${at[3] + n * 4.2}%" data-action="ops-sel" data-value="${esc13(c.id)}" aria-label="${esc13(c.name)}"><i></i><em>${esc13(c.name)}</em></button>`;
-    }).join("");
-    const s4 = cards.find((c) => c.id === sel && !c.ended);
-    const sAt = s4 ? NATION_PINS.find((p) => p[0] === s4.locCode.split("-")[0]) : void 0;
-    const sN = s4 ? cards.filter((c) => !c.ended && c.locCode.split("-")[0] === s4.locCode.split("-")[0]).findIndex((c) => c.id === s4.id) : 0;
-    const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : "";
-    const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : "--px:55;--py:50";
-    return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc13(url)}" alt="전국 지도">${cross}${pins}</div>` : ""}</div>
-    <div class="gx-opbar">${modeSeg()}<span class="gx-oplive"><i></i>위성 관측</span></div><span class="gx-opcoord">SAT-2 · ${esc13(clock2)}</span></div>`;
-  }
-  function opsBoard(cards, o) {
-    if (!cards.some((c) => c.id === opsUi.sel)) opsUi.sel = firstPick(cards);
-    const sel = cards.find((c) => c.id === opsUi.sel);
-    const view2 = opsUi.mode === "map" ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
-    const rows2 = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join("");
-    return `<div class="gx-ops">${view2}<section class="gx-oplog"><h2><b>상황 일지</b><span class="gx-opcnt">${o.counts}</span></h2>${rows2 ? `<ul>${rows2}</ul>` : `<p class="gx-none">${esc13(o.empty)}</p>`}</section></div>`;
   }
 
   // src/ui/evpic.ts
@@ -3316,15 +3889,16 @@
       const status = missionStatus(x, kind, r.name);
       const bg = art2.pic ? ` style="background-image:url('${esc15(art2.pic)}')"` : "";
       const cap = `<span class="gx-evart-name"><b>${esc15(r.name)}</b>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
+      const capOpen = (mark2) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc15(r.name)}</b>${mark2}</span>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
+      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc15(r.name)}" title="위키" aria-label="${esc15(r.name)} 위키">${ICONS.wiki}</button>`;
       if (!open3) {
-        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}"><button class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
-        ${status ? `<span class="gx-evart-top">${status}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button></li>`;
+        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+        ${status ? `<span class="gx-evart-top">${status}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
       }
+      const mark = sel ? targetMark(true, "mission-unpick", "") : targetMark(false, "mission-pick", val);
       return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button></span></span>
-      <span class="gx-evart-cap">${cap}${art2.desc ? `<span class="gx-evc-desc">${esc15(art2.desc)}</span>` : ""}
-        <span class="gx-mx-btns"><button class="gx-start gx-mx-pick" data-action="mission-pick" data-value="${val}">${sel ? "선택됨" : `이 ${kind === "an" ? "괴이" : "특수"}로 선택`}</button>
-          ${opening ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc15(r.name)}" title="위키" aria-label="${esc15(r.name)} 위키">${ICONS.wiki}</button>`}</span></span></div></li>`;
+      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${capOpen(mark)}${art2.desc ? `<span class="gx-evc-desc">${esc15(art2.desc)}</span>` : ""}</span></div></li>`;
     };
     const hit2 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
     if (!q) {
@@ -3455,307 +4029,4 @@ ${note.trim()}` : card2;
       let chat = latest;
       if (x.on) {
         const w = structuredClone(x.world);
-        const last2 = (latest.message ?? []).at(-1);
-        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
-        const err = requestMission(w, x.catalog, x.settings, kind, name);
-        if (err) throw new DirectiveError(err);
-        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
-      }
-      const body5 = sceneDirective(d, dest, names4, support, opening);
-      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
-    });
-  }
-  async function saveWorld(ctx2, env2, change) {
-    env2.setBusy(true);
-    env2.setNotice("");
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
-        const x = ctxOf(ctx2, latest);
-        const w = structuredClone(x.world);
-        const err = change(w, x);
-        if (err) throw new Error(err);
-        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
-      });
-      env2.setBusy(false);
-      await env2.refresh();
-    } catch (error) {
-      env2.setBusy(false);
-      env2.setNotice(error instanceof Error ? error.message : String(error));
-      env2.render();
-    }
-  }
-  function showOnMap(ctx2, key2) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string" || !x.on) return false;
-    const ev = activeEvents(x.world).find((e) => e.key === key2);
-    if (!ev) return false;
-    field2.region = sidoOf(ev.loc);
-    field2.place = placeKey(ev, x.catalog);
-    field2.filter = "all";
-    field2.confirmEnd = null;
-    return true;
-  }
-  async function handleField(action, value, ctx2, env2, opening) {
-    const v = value ?? "";
-    switch (action) {
-      case "map-region":
-        field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
-        field2.place = null;
-        field2.confirmEnd = null;
-        env2.render();
-        return true;
-      case "map-jump":
-      case "map-place": {
-        let v2 = value ?? "";
-        if (action === "map-jump") {
-          const [code, key2] = v2.split("|");
-          if (!MAP_CODES.includes(code) || !key2) return true;
-          field2.region = code;
-          field2.mapq = "";
-          v2 = key2;
-        }
-        field2.confirmEnd = null;
-        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
-          field2.place = null;
-          field2.target = null;
-          env2.render();
-          return true;
-        }
-        field2.place = v2;
-        const x = readCtx(ctx2);
-        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
-        if (!here.length) field2.target = placeTarget(v2);
-        env2.render();
-        return true;
-      }
-      case "map-unplace":
-        field2.place = null;
-        field2.target = null;
-        field2.confirmEnd = null;
-        toStep("goal", env2);
-        return true;
-      case "map-filter":
-        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
-        env2.render();
-        return true;
-      case "pick-place":
-        if (isPC() && sameTarget(field2.target, v)) {
-          field2.target = null;
-          env2.render();
-          return true;
-        }
-        field2.target = placeTarget(v);
-        toStep("team", env2);
-        return true;
-      case "field-step":
-        toStep(v === "team" ? "team" : "goal", env2);
-        return true;
-      case "pick-event": {
-        const x = readCtx(ctx2);
-        if (typeof x === "string") return true;
-        const ev = activeEvents(x.world).find((e) => e.key === v);
-        if (!ev) return true;
-        if (isPC() && sameTarget(field2.target, ev.key)) {
-          field2.target = null;
-          field2.confirmEnd = null;
-          env2.render();
-          return true;
-        }
-        field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
-        field2.region = sidoOf(ev.loc);
-        field2.confirmEnd = null;
-        toStep("team", env2);
-        return true;
-      }
-      case "end-event":
-        if (field2.confirmEnd !== v) {
-          field2.confirmEnd = v;
-          env2.render();
-          return true;
-        }
-        field2.confirmEnd = null;
-        if (field2.target?.type === "event" && field2.target.key === v) field2.target = null;
-        await saveWorld(ctx2, env2, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
-        return true;
-      case "team-toggle": {
-        const tx = readCtx(ctx2);
-        if (typeof tx !== "string" && lockedState(tx, v)) return true;
-        const i = field2.team.indexOf(v);
-        if (i >= 0) field2.team.splice(i, 1);
-        else if (field2.team.length + field2.support < TEAM_MAX) field2.team.push(v);
-        env2.render();
-        return true;
-      }
-      case "support": {
-        const next = field2.support + (Number(v) > 0 ? 1 : -1);
-        if (next >= 0 && validTeam(field2.team.length, next)) field2.support = next;
-        env2.render();
-        return true;
-      }
-      case "depart":
-        await depart(ctx2, env2);
-        return true;
-      case "mission-kind":
-        if (v === "an" || v === "ms" || v === "lm") {
-          field2.mkind = v;
-          field2.query = "";
-        }
-        env2.render();
-        return true;
-      case "mission-open":
-        field2.mopen = field2.mopen === v ? "" : v;
-        env2.render();
-        return true;
-      case "mission-pick": {
-        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
-        const kind = m?.[1] ?? field2.mkind;
-        const name = m ? m[2] : v;
-        if (isPC() && field2.mname === name && field2.mpick === kind && field2.mopen !== `${kind}:${name}`) {
-          field2.mname = null;
-          env2.render();
-          return true;
-        }
-        field2.mname = name;
-        field2.mpick = kind;
-        toStep("team", env2);
-        return true;
-      }
-      case "mission-cancel":
-        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env2, (w) => (cancelMission(w, v), null));
-        return true;
-      case "mission-unpick":
-        field2.mname = null;
-        toStep("goal", env2);
-        return true;
-      case "mission-send":
-        await sendMission(ctx2, env2, opening);
-        return true;
-    }
-    return false;
-  }
-
-  // src/ui/lorecheck.ts
-  var esc16 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증" };
-  function item2(p, risu = false) {
-    const r = p.reasons[0];
-    const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
-    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
-  }
-  function loreCheckBox(ctx2) {
-    const mode3 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
-    const opts = (m) => loreOptions(ctx2.char, ctx2.chat, m);
-    const now = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode3));
-    if (!now) return "";
-    const other = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode3 === "risu" ? "plugin" : "risu"));
-    const names4 = (l) => new Set(l.map((p) => p.entry.name));
-    const mine = names4(now.picks);
-    const theirs = names4(other.picks);
-    const size = now.picks.reduce((n, p) => n + tokens(p.entry.content), 0);
-    const list4 = now.picks.length ? now.picks.map((p) => item2(p, mode3 === "risu")).join("") : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
-    const only = (l, not, risu) => l.filter((p) => !not.has(p.entry.name)).map((p) => item2(p, risu)).join("");
-    const otherIf = mode3 === "risu" ? "플러그인이 고르면" : "Risu가 직접 켜면";
-    const more = only(other.picks, mine, mode3 !== "risu");
-    const less = only(now.picks, theirs, mode3 === "risu");
-    const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
-    return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
-    <section class="ps-group"><h3>${mode3 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
-    <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
-  </div></details>`;
-  }
-
-  // src/ui/settings.ts
-  var THEME_KEY = "$st_fixed_theme";
-  var settingsUi = { confirmOff: false, busy: false, notice: "", info: "", scope: "chat", confirm: "" };
-  function resetSettings() {
-    settingsUi.confirmOff = false;
-    settingsUi.notice = "";
-    settingsUi.scope = "chat";
-    settingsUi.confirm = "";
-  }
-  var esc17 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function seg4(action, cur, items, disabled = false) {
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
-  }
-  function field3(label, control2, help) {
-    return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  }
-  var dimSlider = (n, busy4) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy4 ? " disabled" : ""}><output>${n}%</output></label>`;
-  var group3 = (title2, body5, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
-  function worldOffVars() {
-    return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
-  }
-  function current2(ctx2, scope) {
-    const lore = ctx2.char.globalLore;
-    if (scope !== "chat") return { basic: basicDefaults(lore), world: worldDefaults(lore), theme: getPrefs().theme ?? "dark" };
-    const cur = String(ctx2.chat.scriptstate?.[THEME_KEY] ?? "");
-    return {
-      basic: basicSettings(lore, ctx2.chat.scriptstate),
-      world: worldSettings(lore, ctx2.chat.scriptstate),
-      theme: cur === "dark" || cur === "paper" ? cur : "light"
-    };
-  }
-  function stepper(action, key2, shown2, canDown, canUp, label, busy4) {
-    return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key2}:-" ${!canDown || busy4 ? "disabled" : ""} aria-label="${esc17(label)} 줄이기">−</button>
-    <b>${esc17(shown2)}</b><button class="gx-step" data-action="${action}" data-value="${key2}:+" ${!canUp || busy4 ? "disabled" : ""} aria-label="${esc17(label)} 늘리기">+</button></div>`;
-  }
-  function worldStep(key2) {
-    if (key2.endsWith("_p") || key2 === "landmark_share") return 10;
-    if (key2.endsWith("_ttl")) return 6;
-    return 1;
-  }
-  function worldRow(w, key2, label, unit, busy4) {
-    const f = WORLD_SPEC.find((x) => x.key === key2);
-    const v = w[key2];
-    const max = f.max ?? 99;
-    return field3(esc17(label), stepper("set-world", key2, `${v}${unit}`, v > 0, v < max, label, busy4), "");
-  }
-  function worldKind(w, k, name, busy4) {
-    const expire2 = w[`${k}_expire`] === 1;
-    return `<div class="ps-card"><h4>${name}</h4><div class="ps-rows">
-    ${worldRow(w, `${k}_cap`, "동시 최대", "개", busy4)}
-    ${worldRow(w, `${k}_p`, "발생 확률", "%", busy4)}
-    ${field3("자동 종료", seg4("set-world", expire2 ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, "ON"], [`${k}_expire:0`, "OFF"]], busy4), "")}
-    ${expire2 ? worldRow(w, `${k}_ttl`, "RP 유지 시간", "시간", busy4) : ""}
-    ${k === "incident" ? worldRow(w, "landmark_share", "거점 비율", "%", busy4) : ""}
-  </div></div>`;
-  }
-  var CONFIRM = {
-    chat: {
-      save: ["지금 설정으로 새 채팅 기본값을 덮어쓸까요?", "덮어쓰기"],
-      load: ["저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.", "불러오기"]
-    },
-    card: {
-      save: ["고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.", "덮어쓰기"],
-      load: ["고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?", "되돌리기"]
-    }
-  };
-  function scopeBar(scope, canChat) {
-    const items = [[canChat ? "chat" : "defaults", "설정"], ["card", "명부"]];
-    const tabs2 = `<div class="gx-segs st-scope">${items.map(([k, label]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`).join("")}</div>`;
-    const btns = scope === "card" ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === "chat" ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : "";
-    const kind = scope === "card" ? "card" : "chat";
-    const c = settingsUi.confirm && scope !== "defaults" ? CONFIRM[kind][settingsUi.confirm] : null;
-    const yes = kind === "card" ? settingsUi.confirm === "save" ? "dir-save" : "dir-reset" : "set-bar-yes";
-    const confirm = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
-    return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm}`;
-  }
-  function settingsTab(ctx2, scope = "chat", canChat = true) {
-    if (scope === "card") {
-      return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
-    }
-    const { basic: s4, world, theme } = current2(ctx2, scope);
-    const on2 = scope === "chat" ? worldOn(ctx2.chat) : s4.anomalyOn;
-    const busy4 = settingsUi.busy;
-    const anomaly = settingsUi.confirmOff && scope === "chat" ? `<div class="st-confirm"><p>끄면 지금 상황판의 괴이·사건·특수·요원 상태를 비워요. 다시 켜도 이전 상태는 돌아오지 않아요.</p>
-        <div class="gx-row-btns"><button class="gx-mini danger" data-action="set-anomaly" data-value="off-yes" ${busy4 ? "disabled" : ""}>끄기</button>
-        <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>` : seg4("set-anomaly", on2 ? "on" : "off", [["on", "ON"], ["off", "OFF"]], busy4);
-    const note = String(ctx2.chat.scriptstate?.[ASSET_NOTE] ?? "");
-    return `<main class="gx-body gx-settings">
-    ${scopeBar(scope, canChat)}
-    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc17(settingsUi.notice)}</div>` : ""}
-    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon2}${label} 설정</button>`).join("")}</div>`) : ""}
-    ${group3("화면", [
-      field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy4), "채팅 화면의 캐릭터 이미지 배경과 상태창(테마 따름일 때) 배색이에요."),
-      field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["
+        const last2 = (latest.message ?? [])

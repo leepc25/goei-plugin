@@ -1,4 +1,4 @@
-// goei-body 0.16.34
+// goei-body 0.16.35
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -222,6 +222,8 @@ ${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
     star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
     game: stroke('<path d="M7 8h10a4 4 0 0 1 4 4.5l-.6 3.6a2.4 2.4 0 0 1-4.2 1.1L14.5 15h-5l-1.7 2.2a2.4 2.4 0 0 1-4.2-1.1L3 12.5A4 4 0 0 1 7 8Z"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01"/>'),
     search: stroke('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
+    cctv: stroke('<rect x="2.5" y="4.5" width="19" height="13" rx="2"/><path d="M8 21h8M12 17.5V21"/><circle cx="7" cy="9" r="1.5" fill="currentColor" stroke="none"/>'),
+    grid: stroke('<rect x="3.5" y="4" width="7" height="7" rx="1.5"/><rect x="13.5" y="4" width="7" height="7" rx="1.5"/><rect x="3.5" y="14" width="7" height="7" rx="1.5"/><rect x="13.5" y="14" width="7" height="7" rx="1.5"/>'),
     list: stroke('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>'),
     pin: stroke('<path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.8" r="2.3"/>'),
     // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
@@ -1548,28 +1550,27 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function scanAnomalies(text) {
     return fields(text, "AN").flatMap((f) => {
-      const n = f.length;
-      let region = f[0] ?? "";
-      if (/^\d+$/.test(region) && n >= 6) region = f[1] ?? "";
-      if (n < 5 || !region) return [];
-      return [{ region, name: stripLabel(f[n - 4]), state: normAnState(f[n - 3]), grade: normGrade(f[n - 2]), deploy: stripLabel(f[n - 1]) }];
+      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
+      const region = f[slot] ?? "";
+      const r = f.slice(slot + 1);
+      if (r.length < 4 || !region) return [];
+      return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
     });
   }
   function scanSites(text, kind, states) {
     return fields(text, kind).flatMap((f) => {
-      const n = f.length;
+      const i = f.findIndex((v, k) => k >= 2 && states.includes(stripLabel(v)));
+      if (i < 0) return [];
       let region = f[0] ?? "";
-      if (/^\d+$/.test(region) && n >= 5) region = f[1] ?? "";
-      const st = stripLabel(f[n - 2]);
-      if (n < 4 || !states.includes(st)) return [];
-      return [{ region, name: stripLabel(f[n - 3]), state: st, last: stripLabel(f[n - 1]) }];
+      if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? "";
+      return [{ region, name: stripLabel(f[i - 1]), state: stripLabel(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
     });
   }
   function scanIncidents(text) {
-    return scanSites(text, "IN", ["진행", "종료"]).map(({ last: last2, ...t }) => ({ ...t, situation: last2 }));
+    return scanSites(text, "IN", ["진행", "종료"]).map(({ rest, ...t }) => ({ ...t, situation: rest.join(" ") }));
   }
   function scanMysticSites(text) {
-    return scanSites(text, "MS", ["출현", "소실"]).map(({ last: last2, ...t }) => ({ ...t, visitors: last2 }));
+    return scanSites(text, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
   }
   function scanAgents(text) {
     return fields(text, "AG").flatMap((f) => {
@@ -1875,7 +1876,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const loc of POOL) if (regionMatch(region, locName(loc))) return loc;
     return null;
   }
-  function applyAnomalies(w, c, s4, text) {
+  function applyAnomalies(w, c, s4, faction, text) {
     const pending = w.pending.an;
     let handled = false;
     for (const t of scanAnomalies(text)) {
@@ -1951,6 +1952,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       if (e.state !== "활성" || e.since === null) e.since = w.minute;
       e.state = "활성";
       if (t.grade) e.grade = t.grade;
+      if (t.situation) e.situation = codesToNames(t.situation, c, faction);
     }
     if (pending && handled) w.pending.an = void 0;
     else if (pending) w.notice = `${pending}: 발생 태그를 기다리는 중이에요. 다음 응답에서 다시 안내해요.`;
@@ -1989,7 +1991,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       e.state = "진행";
     }
   }
-  function applyMysticSites(w, c, s4, text) {
+  function applyMysticSites(w, c, s4, faction, text) {
     for (const t of scanMysticSites(text)) {
       let e = w.ms.find((x) => x.name === t.name);
       if (e) {
@@ -2010,6 +2012,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         continue;
       }
       e.visitors = t.visitors || "없음";
+      if (t.situation) e.situation = codesToNames(t.situation, c, faction);
       if (e.since === null) e.since = w.minute;
       e.state = "출현";
     }
@@ -2032,9 +2035,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
       newFaction = ac;
     }
     const now = newFaction ?? faction;
-    applyAnomalies(w, c, s4, text);
+    applyAnomalies(w, c, s4, now, text);
     applyIncidents(w, c, s4, now, text);
-    applyMysticSites(w, c, s4, text);
+    applyMysticSites(w, c, s4, now, text);
     applyExploration(w, status.target);
     tick(w, c, s4, rng);
     if (!newFaction) applyAgents(w, c, s4, now, text);
@@ -2054,8 +2057,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function reports(w, c, s4, faction) {
     const an = w.an.map((e) => {
       const ln = locName(e.loc);
-      if (e.state === "발생대기") return `NEW [AN|${ln}|${e.name || "<발생지점>"}|활성|<등급>|<배치>]`;
-      return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || "없음"}]${age(w, e.since)}`;
+      if (e.state === "발생대기") return `NEW [AN|${ln}|${e.name || "<발생지점>"}|활성|<등급>|<배치>|<상황>]`;
+      return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || "없음"}|${e.situation || "<상황>"}]${age(w, e.since)}`;
     });
     const inc = w.inc.map((e) => {
       const ln = locName(e.loc);
@@ -2064,11 +2067,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
     });
     const ms = w.ms.map((e) => {
       const ln = locName(e.loc);
-      if (e.state === "발생대기") return `NEW [MS|${ln}|${e.name}|출현|<방문자>]`;
-      return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || "없음"}]${age(w, e.since)}`;
+      if (e.state === "발생대기") return `NEW [MS|${ln}|${e.name}|출현|<방문자>|<상황>]`;
+      return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || "없음"}|${e.situation || "<상황>"}]${age(w, e.since)}`;
     });
     if (w.pending.an && !w.an.some((e) => e.presetName === w.pending.an || e.name === w.pending.an)) {
-      an.push(`NEW [AN|<발생 지역: 시도와 시군구>|${w.pending.an}|활성|<등급>|<배치>]`);
+      an.push(`NEW [AN|<발생 지역: 시도와 시군구>|${w.pending.an}|활성|<등급>|<배치>|<상황>]`);
     }
     if (w.pending.in && !w.inc.some((e) => e.name === w.pending.in)) {
       const lm = c.landmarks.find((l) => l.name === w.pending.in);
@@ -2076,7 +2079,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       inc.push(`NEW [IN|${loc ? locName(loc) : "<발생 지역: 시도와 시군구>"}|${w.pending.in}|진행|<상황>]`);
     }
     if (w.pending.ms && !w.ms.some((e) => e.name === w.pending.ms)) {
-      ms.push(`NEW [MS|<발생 지역: 시도와 시군구>|${w.pending.ms}|출현|<방문자>]`);
+      ms.push(`NEW [MS|<발생 지역: 시도와 시군구>|${w.pending.ms}|출현|<방문자>|<상황>]`);
     }
     const lines = [];
     const map = [];
@@ -2095,13 +2098,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const out = [];
     const key2 = (kind, e) => `${kind}|${e.loc}|${e.name}|${e.born ?? ""}`;
     w.an.forEach((e, index) => {
-      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: "" });
+      if (e.state === "활성") out.push({ kind: "an", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("an", e), grade: e.grade, people: e.deploy, report: e.situation ?? "" });
     });
     w.inc.forEach((e, index) => {
       if (e.state === "진행") out.push({ kind: "in", index, loc: e.loc, name: e.name || "이름 미확인", key: key2("in", e), grade: "", people: "", report: e.situation });
     });
     w.ms.forEach((e, index) => {
-      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: "" });
+      if (e.state === "출현") out.push({ kind: "ms", index, loc: e.loc, name: e.name, key: key2("ms", e), grade: "", people: e.visitors, report: e.situation ?? "" });
     });
     return out.sort((a, b) => a.loc.localeCompare(b.loc) || a.kind.localeCompare(b.kind));
   }
@@ -3898,16 +3901,16 @@ ${themeVars("[x-goei-fab]")}
     if (!Array.isArray(rows2)) return [false, 1];
     let changed = false;
     let skipped2 = 0;
-    const done = /* @__PURE__ */ new Set();
+    const done2 = /* @__PURE__ */ new Set();
     for (const u of rows2) {
       const id = isObj(u) ? int2(u.id) : null;
       const ref = id !== null ? snapshots.get(id) : void 0;
       const p = id !== null ? findPost(st, id) : void 0;
-      if (!isObj(u) || id === null || done.has(id) || !ref || !p || postHead(p) !== ref.head || ref.rows.some((k, i) => !p.comments[i] || commentKey(p.comments[i]) !== k)) {
+      if (!isObj(u) || id === null || done2.has(id) || !ref || !p || postHead(p) !== ref.head || ref.rows.some((k, i) => !p.comments[i] || commentKey(p.comments[i]) !== k)) {
         skipped2++;
         continue;
       }
-      done.add(id);
+      done2.add(id);
       const delta = (v) => {
         const n = int2(v);
         return n !== null && n >= 0 ? Math.min(n, 1e7) : 0;
@@ -4203,19 +4206,4 @@ ${JSON.stringify({ feature: "gnet", records })}
     }
     const extra = extraFactions(lore).map((f) => f.code);
     if (extra.length) {
-      for (const e of entries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibleFor.add(f);
-      for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
-    }
-    const orders = {};
-    for (const [f, order] of Object.entries(data.order_by_faction ?? {})) orders[f] = [...order];
-    return { entries: entries2, orders };
-  }
-  function readCustom(chat) {
-    const raw = String(chat.scriptstate?.[PH_CONTACTS] ?? "");
-    if (!raw || raw === "null") return { version: 1, seq: 0, items: [] };
-    try {
-      const d = JSON.parse(raw);
-      if (d?.version === 1 && Array.isArray(d.items)) return { version: 1, seq: Number(d.seq) || 0, items: d.items.filter((c) => c && typeof c.id === "string" && typeof c.name === "string") };
-    } catch {
-    }
-    throw 
+      for (const e of entries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) f
