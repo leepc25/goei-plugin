@@ -1,90 +1,83 @@
-# GPT 요청서 · 컷신 그림 (2026-10-21)
+# GPT 요청서 · 컷신 장소 배경 (2026-10-21 정정판)
 
-주인: 「대사와 컷신」 스레드(Claude). 걷는 장면의 벽·바닥·물건은 여기 없다(`docs/GPT요청_게임배경.md`).
-GPT가 그리고, Claude가 검수·정리(자르기, 색 맞추기)해서 통합본 컷신에 넣는다. PixelLab은 쓰지 않는다.
+주인: 「대사와 컷신」 스레드(Claude).
 
-컷신 대본은 `src/game/action/story/scripts/cutscenes.ts`. 사무실·엘리베이터 홀·승강기 안·로비·다락방처럼 걸어 다니는 곳의 컷신은 게임 배경을 그대로 쓰고, 여기서는 **걷는 장면에 없는 곳(배경형 6장)** 과 **한 장 그림(8장)** 만 그린다.
+**컷신은 움직이는 도트씬이다(사용자 결정 2026-10-21).** 엔진이 도트화한 배경 위에서 쟈알디 등 기존 캐릭터 클립을 걷게·돌아보게·말하게 하고, 문·승강기 문 같은 물건은 따로 움직이고, 카메라·흔들림·빛·암전은 코드로 넣는다. 그래서 GPT는 **장소의 벽 칸·바닥·원경·물건 시트만** 그린다.
+
+- **캐릭터·사람이 든 그림은 그리지 않는다.** 이전 판(한 장 그림·쟈알디 그림)으로 이미 만든 것은 버린다(쓰지 않는다).
+- 규칙은 `docs/GPT요청_게임배경.md`와 똑같다: 공통 STYLE 문단, WALL BAY RULES, FLOOR / FAR / OBJECT SHEET RULES, 그리고 그 문서의 「정정 (16:15)」 CORRECTION 문단(적은 큰 모양, 굵은 외곽선, 정면 시점 물건, 투명 배경)을 모든 요청문 앞에 붙인다.
+- 크기: 벽 칸·원경 1536×1024, 바닥 1024×1024, 물건 시트 1536×1024 (게임 배경과 같음).
+- 도트화는 Claude가 「게임 타일과 배경」의 도구로 한다.
 
 ## GPT에게 (작업 방법)
 
-- 이 저장소(`leepc25/goei-plugin`)에 바로 올린다. 저장 경로: **`game-src/art/cutscene/raw/<파일 이름>.png`** (아래 목록 이름 그대로, 확장자 `.png`). 다 올린 뒤 `game-src/art/cutscene/raw/README.md` 에 받은 파일 목록을 적고 main에 커밋한다. `docs/GPT_요청_목록.md`의 이 요청 줄 상태를 「받음」으로 바꾼다.
-- 목록 14장을 쉬지 않고 순서대로 전부 만든다. 한 답변에 여러 장 만들어도 된다. 묻지 않는다. 한도에 걸리면 멈춘 번호부터 이어 한다.
-- 크기: **모두 1:1, 1024×1024.**
-- 도트(픽셀아트)로 그리지 않는다. 깨끗한 평면 채색 그림. 도트화·색 줄이기는 Claude가 한다.
-- 글자 금지: 간판·버튼·서류·벽 낙서에 글자·숫자·로고를 쓰지 않는다(빈칸으로). 숫자와 문장은 게임이 그 위에 띄운다.
+- 저장: **`game-src/art/cutscene/raw/<장소>/<파일 이름>.png`** (아래 이름 그대로). 다 올린 뒤 `game-src/art/cutscene/raw/README.md`에 받은 파일 목록을 적고 main에 커밋한다. `docs/GPT_요청_목록.md`의 컷신 줄 상태를 「받음」으로 바꾼다.
+- 목록을 쉬지 않고 순서대로 전부 만든다. 한 답변에 여러 장 만들어도 된다. 묻지 않는다. 한도에 걸리면 멈춘 번호부터 이어 한다.
+- 장소마다 **시간과 빛이 다르다.** 아래 PLACE 문단의 시간·빛을 꼭 지킨다(게임 배경은 대부분 밤이다).
 
-## 게임 화면에 넣는 법 (그릴 때 지킬 구도)
+## 이미 있는 게임 배경을 쓰는 컷신 (GPT가 그리지 않음)
 
-게임 화면은 1280×720(16:9) 하나다. 1:1 그림을 두 가지로 쓴다.
+| 컷신 | 쓰는 게임 배경 (`game-src/art/bg/raw/`) |
+| --- | --- |
+| 첫 출근 뒷부분 (사무실) | `hq_office` |
+| 첫 투입·첫 호명 (승강기 안 → 로비) | `el_car`, `lobby` |
+| 삼 년째 승객 (엘리베이터 홀) | `el_hall` |
+| 다락방 | `service` (`service_wall_4`) |
+| 귀환 앞부분 (승강로 로프) | `service` (`service_far_tall`, 로프 물건) |
 
-| 쓰임 | 넣는 법 | 그릴 때 |
-| --- | --- | --- |
-| **배경형** (`cs_bg_*`) | 그림 가운데 가로 띠 1024×576(위에서 224px ~ 800px)만 잘라 1.25배 → 1280×720 전체를 채운다. 그 위로 엔진이 요원(쟈알디 도트)을 걷게 한다 | 위 22%·아래 22%는 잘린다. 중요한 것은 가운데 띠 안에. 사람을 그리지 않는다. 바닥(사람이 설 자리)은 그림 높이의 62~76% 사이에 평평하게 |
-| **한 장 그림** (`cs_key_*`) | 그림 전체를 720×720으로 줄여 화면 가운데(가로 280~1000)에 놓고, 좌우는 검정. 자막은 그림 아래쪽, 대화창은 그림 위쪽 16% 근처에 겹친다 | 주인공·주제는 가운데 50% 안에. 맨 위 20%는 대화창에 가려도 괜찮은 벽·하늘·어둠으로 |
+## 새로 그릴 장소 4곳 (각 장소 = GPT 대화 하나)
 
-## 공통 스타일 (모든 요청문 맨 앞에 붙인다)
-
-게임 배경 요청서와 같은 문단을 쓴다. 화면이 서로 이어져 보이게 하려는 것이다.
-
-```
-STYLE (same for every image)
-2D side-scrolling beat-'em-up game art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim lighting. No text, letters, numbers, logos or signs with writing anywhere (sign plates, buttons and papers stay blank). Square 1:1, 1024x1024.
-```
-
-## 쟈알디 (사람이 나오는 그림에 붙인다)
+### 1. cs_street · 텅 빈 종로 거리 (첫 출근 앞부분) — 아침
 
 ```
-CHARACTER: JYALDI
-A tall Korean woman in her late 20s, the chief of a secret anomaly-response team. Long straight jet-black hair down to her waist, worn loose. Red eyes (the only strong color on her, clearly red even when small). Expressionless, calm face; upright, straight posture. Black pantsuit (jacket and trousers, never a skirt), white dress shirt, black necktie, black leather gloves. Curvy full-chested figure that the shirt buttons strain against, drawn plainly, not exaggerated. Carries a black handgun in a holster under the jacket (not drawn in hand unless stated). Palette: hair #15141a, suit #1c1d24/#2d2f3a, shirt #e8e6e0, skin #f0d6c4, eyes #d12b3a, gloves #111115.
+PLACE: an empty street in Jongno, central Seoul, at 8:40 on a weekday morning, completely deserted (no people, no cars, no birds). Time and light: early morning, flat cool grey daylight under an overcast sky, long soft shadows, no lamps lit. The "wall" is the row of old 4-6 storey office buildings and shops facing the street (facades: weathered beige and grey tile, dark window glass; pillars: the building corners / thick concrete columns between shopfronts). The sidewalk is the floor.
+1. cs_street_wall_1 — a shopfront with its metal roller shutter pulled down and a blank sign board above, windows of offices above.
+2. cs_street_wall_2 — the glass entrance of an old office building with a revolving door opening shown as an empty dark hole, blank brass name plates beside it.
+3. cs_street_wall_3 — a convenience-store-like shop with lights off behind the glass, a blank awning.
+4. cs_street_wall_4 — a narrow dark alley opening between two buildings, with a drainpipe and an air-conditioner unit on the wall.
+5. cs_street_floor — grey concrete sidewalk paving blocks with a yellow tactile strip, top-down.
+6. cs_street_far — the wide empty six-lane road and the buildings on the far side of the street, traffic lights on green, hazy grey morning.
+7. cs_street_objects — 1 street lamp post (unlit), 2 traffic light pole for pedestrians, 3 bus stop shelter with a blank panel, 4 public trash bin, 5 bench, 6 fire hydrant, 7 newspaper rack (empty), 8 tree in a sidewalk grate, 9 parked delivery scooter.
 ```
 
-## 장소 색감 (게임 배경 요청서와 맞춘 것)
-
-- 엘리베이터 홀: 옅은 베이지 대리석 벽, 놋쇠 테두리, 짙은 테라초 바닥, 빨간 표시등 하나만.
-- 승강기 안: 은색 헤어라인 철판, 아래쪽은 나무무늬 판, 둥근 버튼 줄, 작은 스피커 망.
-- 정비 구역·다락방: 녹슨 갈색 리벳 철판과 낡은 콘크리트, 철 I빔 기둥, 철망 씌운 주황 작업등, 아주 어두움.
-- 로비 층: 연회색 벽 판, 회색 돌 기둥, 차가운 흰 천장등.
-
-## 목록 (14장)
-
-### 배경형 6장 (사람 없음)
+### 2. cs_entrance · 낡은 사무실 건물 앞 (출구 컷신, 관리국 차량) — 새벽
 
 ```
-1. cs_bg_street — Jongno, central Seoul, at 8:40 on a weekday morning, completely empty: no people, no cars, no birds. A wide six-lane road and sidewalk seen from the side, old office buildings and shuttered shops behind, traffic lights on, soft grey morning light, an eerie stillness. The sidewalk (where a person would stand) is flat across the 62-76% height band.
-2. cs_bg_shaft — inside a deep vertical elevator shaft, seen from the side: rusty brown riveted steel walls, guide rails, thick steel cables, one rope hanging straight down in the center from a faint warm light far above, darkness below. Orange caged work lamps at two heights. (A character will be shown climbing the rope.)
-3. cs_bg_lobby_real — the real ground-floor lobby of an ordinary old Korean office building at early morning: light grey wall panels, grey stone columns, glass entrance doors on the right with pale morning sunlight streaming in, a closed elevator with brass trim on the left. Calm and safe-feeling, warmer than the night scenes. Flat floor in the 62-76% band.
-4. cs_bg_medbay — a small infirmary room in the team headquarters: one hospital bed with white sheets (empty), a bedside table with a paper coffee cup, a folding screen, a drip stand, fluorescent ceiling light, pale green walls. Quiet. Flat floor in the 62-76% band.
-5. cs_bg_exit_car — outside the old office building entrance at dawn: the building's glass doors behind, and at the curb a plain black government sedan with its engine running (exhaust vapor, headlights on, back door open, no driver visible). Empty street. Flat sidewalk in the 62-76% band.
-6. cs_bg_pasta — inside a small cozy neighborhood pasta restaurant near Jongno in the evening: warm yellow pendant lights, wooden tables, one long table pushed together with many plates of pasta, glasses and a bottle, chairs empty and slightly pulled out as if people just sat down. Brick wall and a chalkboard menu with no writing.
+PLACE: the front of the old Korean office building that hides the dimensional elevator, at dawn. Time and light: just before sunrise, deep blue sky turning pale orange at the bottom, the building's lobby lights still on (warm) inside the glass, street lamps still lit. Wall: the building's ground-floor facade (dark grey granite cladding, pillars: square granite columns).
+1. cs_entrance_wall_1 — the main glass entrance doors of the building (the door leaves are separate objects, draw the empty lit doorway), a small canopy above, blank address plate.
+2. cs_entrance_wall_2 — plain granite facade with a ground-floor window showing the lit lobby inside (marble, a closed elevator with brass trim far inside).
+3. cs_entrance_wall_3 — a side service door opening (dark), an electric meter box, a pipe.
+4. cs_entrance_floor — dark wet asphalt and granite curb paving, top-down.
+5. cs_entrance_far — the dawn sky over low city rooftops, a few lit windows, horizontally tileable.
+6. cs_entrance_objects — 1 black government sedan seen from the side, engine running, headlights on, back door closed (front view rules do not apply: draw this one car exactly from the side), 2 glass entrance door leaf (left), 3 glass entrance door leaf (right), 4 street lamp (lit), 5 standing ashtray, 6 potted shrub, 7 bollard, 8 "no parking" cone, 9 newspaper bundle on the ground.
 ```
 
-### 한 장 그림 8장
+### 3. cs_medbay · 본부 의무실 (후송 컷신) — 낮, 형광등
 
 ```
-7. cs_key_first_day — JYALDI (see CHARACTER) standing alone in the middle of the completely empty Jongno road at morning, seen from slightly behind and to the side, her long black hair moving a little in the wind, buildings towering on both sides, no people or cars anywhere. Lonely, eerie, cinematic.
-8. cs_key_checklist — close-up of an old elevator inspection checklist in a clear plastic sleeve fixed to a beige marble wall next to brass-framed elevator call buttons: rows of empty boxes and lines with NO writing, and the signature box at the bottom clearly empty. A black-gloved hand (JYALDI's) touches the empty signature box. Dim light, one red indicator lamp glowing above.
-9. cs_key_panel — close-up of the inside elevator button panel (brushed steel, faux-wood below): far too many round buttons in a long column going down off the bottom of the image, all faces blank (no numbers), a few glowing faintly, the lowest ones dark and scratched. A small speaker grille at the top. Unsettling.
-10. cs_key_intercom — extreme close-up of the small round speaker grille of an old elevator intercom on brushed steel, a faint warm light glowing behind the holes as if someone is about to speak. Nothing else.
-11. cs_key_attic — the "attic" hidden between elevator shafts where former agents rested: a cramped space of rusty brown steel plates and ducts, one hanging orange work lamp, an abandoned backpack and a sleeping mat, old chalk tally marks and a hand-scratched map of floors on the steel wall made only of lines and boxes (no letters), a coiled rope. Nobody there. Warm lamp in cold darkness.
-12. cs_key_passenger — in a dim elevator lobby with beige marble and brass trim, a thin middle-aged Korean man in a worn, outdated grey suit and loosened tie stands facing the viewer with a kind, tired smile, one hand pointing to the side toward a door out of frame. Half of his face in shadow. He looks friendly, and that is what feels wrong.
-13. cs_key_rope — JYALDI (see CHARACTER) climbing a single rope hand over hand up a dark vertical elevator shaft, seen from below and to the side, her long black hair hanging, jacket dusty, a faint warm light far above her. Rusty steel walls and cables around.
-14. cs_key_medbay — JYALDI (see CHARACTER) lying in a hospital bed in a small infirmary, jacket off (white shirt and black tie loosened), one bandage on her forehead, eyes just opened (red), looking at the ceiling, expressionless. A paper cup of black coffee on the bedside table. Fluorescent light, pale green wall.
+PLACE: a small infirmary room in the team's headquarters. Time and light: daytime but no windows, bright flat fluorescent light, slightly cold and clinical, very clean. Wall: pale mint-green painted wall with a white lower wainscot, pillars: plain white columns.
+1. cs_medbay_wall_1 — a wall-mounted cabinet with frosted glass doors and a hand sanitizer dispenser.
+2. cs_medbay_wall_2 — a plain wall with a curtain rail on the ceiling and a light-green privacy curtain hanging from it (half open), an oxygen outlet panel.
+3. cs_medbay_wall_3 — an empty doorway to the corridor, a wall clock without numbers, a light switch.
+4. cs_medbay_wall_4 — a small frosted window (light coming in) and a blank first-aid poster frame.
+5. cs_medbay_floor — pale grey linoleum floor with faint speckles.
+6. cs_medbay_objects — 1 hospital bed with white sheets (empty, front view, long side facing the viewer), 2 bedside table, 3 IV drip stand, 4 folding privacy screen, 5 stool, 6 medicine cart, 7 paper cup of black coffee (small object, still make it fill its cell), 8 metal trash bin with pedal, 9 wheelchair (folded).
+```
+
+### 4. cs_pasta · 종로 근처 파스타집 (회식 컷신) — 저녁, 따뜻한 빛
+
+```
+PLACE: a small cozy neighborhood pasta restaurant near Jongno. Time and light: evening, warm yellow pendant lights, dark blue night visible through the window, cozy and safe (the warmest place in the game). Wall: exposed red-brown brick with dark wooden trim, pillars: dark wooden posts.
+1. cs_pasta_wall_1 — a large front window with a dark blue evening street outside and a blank painted window sign.
+2. cs_pasta_wall_2 — a brick wall with a blank chalkboard menu (no writing) and two framed blank pictures.
+3. cs_pasta_wall_3 — the open kitchen pass-through window with warm light and pans hanging inside.
+4. cs_pasta_wall_4 — wooden wall shelves with wine bottles and jars (few, large), a coat hook rail.
+5. cs_pasta_floor — dark wooden plank floor.
+6. cs_pasta_objects — 1 long dining table pushed together, covered with plates of pasta, glasses and a bottle (front view), 2 wooden chair, 3 small round table for two, 4 pendant lamp (lit, hanging), 5 counter with cash register (no text), 6 potted olive tree, 7 coat stand with a black suit jacket on it, 8 wine bottle crate, 9 restaurant door leaf (wood with glass).
 ```
 
 ## Claude가 받은 뒤 하는 일
 
-1. 14장 검수: 글자가 들어갔는지, 쟈알디 외형(검은 긴 머리·붉은 눈·바지 정장·넥타이·장갑), 배경형의 바닥 높이와 사람 없음, 한 장 그림의 주제가 가운데 50% 안에 있는지.
-2. 고칠 것은 이 문서 아래 「수정 요청」에 번호별로 적고 GPT에 다시 맡긴다.
-3. 통과한 그림은 배경형은 1280×720, 한 장 그림은 720×720 AVIF로 줄여 `assets/game/cutscene/`에 넣고, 컷신 대본(`cutscenes.ts`)의 장면 이름에 연결한다. 엔진 쪽 그리기 자리는 「게임 전투와 조작」과 맞춘다.
-
-| 컷신 | 쓰는 그림 |
-| --- | --- |
-| 첫 출근 (first_day) | 7 → 1 → (사무실은 게임 배경) |
-| 첫 투입 (first_entry) | 8 → 9 → (로비는 게임 배경) |
-| 첫 호명 (first_call) | 10 |
-| 다락방 (attic) | 11 |
-| 삼 년째 승객 (three_years) | 12 |
-| 귀환 (return) | 13 → 2 → 3 |
-| 후송 (evac) | 14 → 4 |
-| 출구 (exit) | 9 → 5 |
-| 회식 (dinner) | 6 |
+1. 검수: 사람·글자가 없는지, 정면 시점, 큰 모양·굵은 외곽선, 장소의 시간·빛.
+2. 도트화(게임 타일과 배경 도구), 물건 높이 맞추기, `cutscenes.ts`의 장면 이름(`street`, `exit_car`, `medbay`, `pasta`)에 연결.
+3. 고칠 것은 이 문서 아래 「수정 요청」에 적고 GPT에 다시 맡긴다.
