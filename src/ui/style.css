@@ -1895,6 +1895,16 @@ details.gx-gl-card:not([open]) { gap: 0; }
 /* 전체화면: 창 안을 다 덮고, 세로로 든 폰이면 90도 돌려 가로로 (host/game/viewport.ts) */
 .gx-game.gx-full { position: fixed; inset: 0; z-index: 9999; }
 .gx-game.gx-full .gx-head { min-height: 0; padding-top: 4px; padding-bottom: 4px; }
+/* 게임 중: 머리는 자리를 차지하지 않고 오른쪽 위 작은 단추로만 (캔버스가 창을 다 쓰게) */
+.gx-game.gx-playing { background: #000; }
+.gx-game.gx-playing .gx-head { position: absolute; top: 6px; right: 6px; z-index: 50; padding: 0; margin: 0; min-height: 0; border: 0; background: none; box-shadow: none; }
+.gx-game.gx-playing .gx-head::after { display: none; }
+.gx-game.gx-playing .gx-brand { display: none; }
+.gx-game.gx-playing .gx-head-act { gap: 4px; }
+.gx-game.gx-playing .gx-head .gx-x { width: 30px; height: 30px; min-height: 0; padding: 0; border-radius: 8px; opacity: .55; background: rgba(0, 0, 0, .45); border-color: rgba(255, 255, 255, .18); color: #fff; }
+.gx-game.gx-playing .gx-head .gx-x:hover { opacity: 1; }
+.gx-game.gx-playing .gx-head .gx-x svg { width: 16px; height: 16px; }
+.gx-game.gx-playing .gx-game-in { position: relative; }
 /* 돌리기는 안쪽 상자에: 브라우저 전체화면(:fullscreen)은 그 요소의 transform을 지운다 */
 .gx-game-in { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .gx-game.gx-rot > .gx-game-in { position: fixed; top: 0; left: 0; width: 100vh; height: 100vw; transform: translateX(100vw) rotate(90deg); transform-origin: top left; background: var(--void); }

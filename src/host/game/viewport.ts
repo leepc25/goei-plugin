@@ -5,6 +5,8 @@
 import type { GameViewport } from '../../game/bridge';
 
 export interface ViewportCtl extends GameViewport {
+  /** 게임 중: 브라우저 전체화면은 묻지 않고 창(iframe) 전체를 덮는다. 세로로 든 폰이면 돌려 보인다 */
+  fill(on: boolean): void;
   dispose(): void;
 }
 
@@ -65,6 +67,12 @@ export function makeViewport(layer: HTMLElement): ViewportCtl {
       } catch {
         /* iframe이 막음: 창 안 전체화면 */
       }
+      apply();
+    },
+    fill(on) {
+      if (!on && document.fullscreenElement) return void vp.exit();
+      full = on;
+      wantRotate = on;
       apply();
     },
     async exit() {

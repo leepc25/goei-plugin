@@ -2165,7 +2165,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[x-goei-fab] button');
   await page.click('[data-action="game-open"] >> nth=0');
   await page.waitForSelector('.gx-gl [data-g="get"]');
-  assert.equal(await page.locator('.gx-gl [data-g="play"]:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
+  assert.equal(await page.locator('.gx-gl-cont:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
   await page.click('[data-g="get"]');
   await page.waitForSelector('.gx-gl-msg');
   assert.match(await page.textContent('.gx-gl-msg'), /받지 못했어요/);
@@ -2176,7 +2176,7 @@ if (fixture.globalLore.some(packed)) {
     window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
   }, gameFiles);
   await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl [data-g="play"][data-slot="1"]:not([disabled])');
+  await page.waitForSelector('.gx-gl .gx-gl-cont:not([disabled])');
   assert.match(await page.evaluate(() => window.__store['p:goei:game:code'].slice(0, 30)), /^\/\/ goei-game /);
   if (shots) {
     await page.screenshot({ path: `${shots}/game-home.png` });
@@ -2186,13 +2186,28 @@ if (fixture.globalLore.some(packed)) {
     await page.setViewportSize({ width: 1100, height: 900 });
   }
   assert.match(await page.textContent('.gx-gl'), /요원 \d+명/, '본편 명부를 읽음');
-  await page.click('[data-g="play"][data-slot="1"]');
+  await page.click('.gx-gl-cont');
   await page.waitForSelector('.gx-game-box .goei-engine canvas');
   // 쟈알디 그림 팩을 받아 두었고, 엔진이 그 그림(blob 주소)을 쓴다
   assert.match(await page.evaluate(() => window.__store['p:goei:game:pack:jyaldi'].slice(0, 20)), /"hash"/);
   await page.waitForFunction(() => window.__goeiGameStats.urls() >= 2);
-  // 본부가 고른 칸에 저장한다 (엔진·본부 모듈이 bridge.saves로 씀)
-  await page.waitForFunction(() => Object.keys(window.__store).some((k) => k.startsWith('p:goei:game:slot:')), null, { timeout: 15000 });
+  // 통합 규격 3장: 게임 중에는 캔버스가 창을 채운다 (폰 가로 높이 100%, 폰 세로는 돌려 채움, PC 1280×950에서 1280×720)
+  const fit = [];
+  for (const [w, h] of [[844, 390], [390, 844], [1280, 950], [1100, 900]]) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(400);
+    const r = await page.evaluate(() => {
+      const c = document.querySelector('.goei-engine canvas');
+      const b = c.getBoundingClientRect();
+      return { w: Math.round(b.width), h: Math.round(b.height), scroll: document.scrollingElement.scrollHeight - innerHeight };
+    });
+    fit.push(`${w}×${h} → ${r.w}×${r.h} (${Math.round((r.w * r.h * 100) / (w * h))}%)`);
+    if (shots) await page.screenshot({ path: `${shots}/game-engine-${w}x${h}.png` });
+    if (w === 844) assert.ok(r.h >= 389 || r.w >= 389, `폰 가로 캔버스 ${r.w}×${r.h}`);
+    if (w === 1280) assert.ok(r.w >= 1280, `PC 캔버스 ${r.w}×${r.h}`);
+    assert.ok((r.w * r.h) / (w * h) >= 0.5, `캔버스가 창의 절반도 안 됨 ${w}×${h} → ${r.w}×${r.h}`);
+  }
+  console.log('FIT 게임 캔버스', fit.join(' · '));
   // 정산 결과가 쌓였을 때 (엔진은 본부 정산에서 bridge.report를 부른다. 여기서는 결과를 직접 넣는다)
   const before = await page.evaluate(() => window.__calls.setChat.length);
   await page.evaluate(() => (window.__store['p:goei:game:reports'] = JSON.stringify([{ at: 1, report: { id: 't1', mission: '조사: 로비 규칙', outcome: 'return', depth: 'L2', agents: [{ id: 'jyaldi', name: '쟈알디' }], rules: ['인사는 두 번'], loot: [], summary: '로프로 귀환' } }])));
@@ -2218,14 +2233,11 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-gl-cont');
   await page.waitForSelector('.gx-game-box .goei-engine canvas');
   assert.equal(await page.evaluate(() => (window.__calls.fetch ?? []).filter((u) => /goei-game\.\d/.test(u)).length), 0, '코드는 저장해 둔 것');
-  // 모바일: 전체화면 → 세로면 돌려 보기
+  // 게임 중에는 창 전체, 세로로 든 폰이면 돌려 보기 (따로 누르지 않아도)
   await page.setViewportSize({ width: 390, height: 800 });
-  await page.click('[data-g="full"]');
   await page.waitForSelector('.gx-game.gx-full.gx-rot');
-  if (shots) await page.screenshot({ path: `${shots}/game-rotated-m.png` });
-  await page.click('[data-g="full"]');
-  await page.waitForSelector('.gx-game:not(.gx-full)');
   await page.setViewportSize({ width: 1100, height: 900 });
+  await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
   // 이전 시험판: 순찰은 예전처럼 그림 팩 받기
   await page.click('[data-g="home"]');
   await page.click('details[data-keep="game-legacy"] > summary');
@@ -2241,7 +2253,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.evaluate(() => Object.keys(JSON.parse(window.__store['p:goei:game-pack:patrol']).files).length), 19, '그림 19장 저장');
   await page.click('[data-action="game-close"]');
   assert.deepEqual(errors, []);
-  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기 → 칸 1 시작·저장 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기 → 이전 순찰');
+  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기 → 이전 순찰');
   await page.close();
 }
 
@@ -2272,10 +2284,10 @@ if (fixture.globalLore.some(packed)) {
   const homeMs = Date.now() - t0;
   const t1 = Date.now();
   await page.click('[data-g="get"]');
-  await page.waitForSelector('[data-g="play"][data-slot="1"]:not([disabled])');
+  await page.waitForSelector('.gx-gl-cont:not([disabled])');
   const getMs = Date.now() - t1;
   const t2 = Date.now();
-  await page.click('[data-g="play"][data-slot="1"]');
+  await page.click('.gx-gl-cont');
   await page.waitForSelector('.gx-game-box .goei-engine canvas');
   const playMs = Date.now() - t2;
   await page.waitForTimeout(3000);
@@ -2303,9 +2315,9 @@ if (fixture.globalLore.some(packed)) {
   await startedWithReply(page2);
   await page2.click('[x-goei-fab] button');
   await page2.click('[data-action="game-open"] >> nth=0');
-  await page2.waitForSelector('[data-g="play"][data-slot="1"]:not([disabled])');
+  await page2.waitForSelector('.gx-gl-cont:not([disabled])');
   const t3 = Date.now();
-  await page2.click('[data-g="play"][data-slot="1"]');
+  await page2.click('.gx-gl-cont');
   await page2.waitForSelector('.gx-game-box .goei-engine canvas');
   const warmMs = Date.now() - t3;
   const warm = await page2.evaluate(() => ({ ...window.__goeiGameStats.code, ...window.__goeiGameStats.game }));

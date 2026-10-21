@@ -183,6 +183,8 @@ async function play(slot: SlotId | null, mode: View): Promise<void> {
     gameStats.codeMs = Math.round(performance.now() - t0);
     if (me !== generation || !layer) return;
     view = mode;
+    // 게임은 창 전체를 쓴다(통합 규격 3장: 캔버스가 창 면적 80% 이상, 폰 가로는 높이 100%, 폰 세로는 돌려 꽉 채움)
+    viewport.fill(true);
     setHead();
     box.innerHTML = '';
     const bridge = makeBridge(viewport, slot ?? 0, closeGame);
@@ -195,6 +197,7 @@ async function play(slot: SlotId | null, mode: View): Promise<void> {
   } catch (e) {
     busy = '';
     view = 'home';
+    viewport.fill(false);
     setHead();
     say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
   }
@@ -211,6 +214,7 @@ function stop(): void {
 function toHome(): void {
   stop();
   view = 'home';
+  viewport?.fill(false);
   notice = '';
   setHead();
   void home();
@@ -220,6 +224,7 @@ function setHead(): void {
   const head = layer?.querySelector('.gx-head');
   if (!head) return;
   const inGame = view !== 'home';
+  layer?.classList.toggle('gx-playing', inGame);
   head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === 'patrol' ? '관리국 순찰' : view === 'action' ? '1인 전투 검증판' : '차원 승강기'}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ''}
     <button class="gx-x" data-g="full" aria-label="${viewport?.full ? '전체화면 끄기' : '전체화면'}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
@@ -246,8 +251,10 @@ async function onClick(e: MouseEvent): Promise<void> {
       case 'home':
         return toHome();
       case 'full':
-        if (viewport?.full) await viewport.exit();
+        if (document.fullscreenElement) await viewport?.exit();
+        else if (view === 'home' && viewport?.full) await viewport.exit();
         else await viewport?.enter();
+        if (view !== 'home') viewport?.fill(true);
         return setHead();
       case 'post': {
         const p = await find();
