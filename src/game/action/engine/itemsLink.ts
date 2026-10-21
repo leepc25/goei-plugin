@@ -27,6 +27,10 @@ import {
   type Target,
 } from '../items';
 import { TICK_HZ, type Body, type RunConfigCore } from './contract';
+import { drawPropArt } from '../art/bg';
+
+/** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
+const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
 import type { World } from './world';
 
@@ -161,6 +165,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       furnishFloor(field, e.floor, w.lane, () => w.rand());
+      // 그림이 없는 물건(회색 기둥처럼 보이는 아이콘 대역)은 층에 두지 않는다 (재검수 2-1)
+      field.ents = field.ents.filter((q) => q.type !== 'prop' || PROP_ART.has(q.prop));
       syncCarry();
     }
     if (e.type === 'enemyDie' && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
@@ -220,7 +226,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
           c.ellipse(e.x - camX, e.y, s * 0.4, 6, 0, 0, Math.PI * 2);
           c.fill();
           if (e.flash > 0) c.globalAlpha = 0.6;
-          drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
+          // 배경 물건 그림이 있으면 그것, 없으면 아이콘
+          if (!drawPropArt(c, `item_${e.prop}`, d?.name, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
           c.globalAlpha = 1;
           continue;
         }

@@ -82,6 +82,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
 
   /** world.interact와 같은 거리(가로 60) */
   function near(w: World, p: { x: number }) {
+    // 층에 막 들어와 시작 자리에 서 있는 동안은 띄우지 않는다 (걸어서 다가갔을 때만)
+    if (Math.abs(w.player.x - w.floor.startX) < 4) return false;
     return Math.abs(w.player.x - p.x) < 60;
   }
 

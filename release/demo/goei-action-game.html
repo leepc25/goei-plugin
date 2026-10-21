@@ -857,6 +857,7 @@ function makeRenderer(ctx, art2, opt) {
     }
   }
   function near2(w, p) {
+    if (Math.abs(w.player.x - w.floor.startX) < 4) return false;
     return Math.abs(w.player.x - p.x) < 60;
   }
   function drawProps(w, camX) {
@@ -2543,8 +2544,8 @@ var Game = class {
     if (this.mods.hq && this.run) {
       const run = this.run;
       const back = () => {
-        this.showHq();
         this.mods.hq.onReturn(this.mods.toHqResult?.(result, w) ?? result, run);
+        this.showHq();
       };
       if (this.mods.afterRun) {
         this.scene = this.idleScene("cutscene");
@@ -13786,18 +13787,19 @@ function drawTerrain(ctx, t, pal, y0, y1) {
       break;
     case "narrow": {
       const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
-      if (a > y0) {
+      const row = (label3, y) => {
+        let ok = true;
+        for (let x = t.x0 + 50; x < t.x1 - 20 && ok; x += 100) ok = drawPropArt(ctx, "clutter", label3, x, y);
+        return ok;
+      };
+      if (a > y0 && !row("사물함", a)) {
         ctx.fillStyle = pal.wall;
         ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
-        ctx.fillStyle = "rgba(0,0,0,0.25)";
-        ctx.fillRect(t.x0, a - 10, w, 10);
         ctx.fillStyle = pal.trim;
         ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
-      if (b < y1) {
-        ctx.fillStyle = "rgba(0,0,0,0.25)";
-        ctx.fillRect(t.x0, b, w, 8);
+      if (b < y1 && !row("사물함", y1 + 24)) {
         ctx.fillStyle = pal.trim;
         ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
         ctx.fillStyle = "rgba(255,255,255,0.1)";
@@ -13806,8 +13808,22 @@ function drawTerrain(ctx, t, pal, y0, y1) {
       break;
     }
     case "redfloor": {
-      ctx.fillStyle = "rgba(200,20,20,0.55)";
-      ctx.fillRect(t.x0, laneYIn(t.lane0, y0, y1), w, laneYIn(t.lane1, y0, y1) - laneYIn(t.lane0, y0, y1));
+      const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
+      const cy = (a + b) / 2, ry = Math.max(14, (b - a) / 2);
+      ctx.save();
+      for (let i = 0, n = Math.max(2, Math.round(w / 140)); i < n; i++) {
+        const cx = t.x0 + (i + 0.5) / n * w + Math.sin(t.x0 + i * 7.3) * 18;
+        const rx = w / n * 0.75;
+        const g2 = ctx.createRadialGradient(cx, cy, 4, cx, cy, rx);
+        g2.addColorStop(0, "rgba(120,8,10,0.62)");
+        g2.addColorStop(0.7, "rgba(90,6,8,0.35)");
+        g2.addColorStop(1, "rgba(60,0,0,0)");
+        ctx.fillStyle = g2;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry * (0.8 + 0.2 * Math.cos(i * 2.1)), 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
       label2(ctx, "붉은 바닥", t.x0 + 4, laneYIn(t.lane0, y0, y1) + 14, "#ffb0b0");
       break;
     }
@@ -19448,6 +19464,7 @@ function createShopPanel(root) {
 }
 
 // src/game/action/engine/itemsLink.ts
+var PROP_ART = /* @__PURE__ */ new Set(["chair", "pot", "tv", "table", "crate"]);
 var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
 var shopPanel = null;
 var itemsBlocking = () => !!shopPanel?.isOpen();
@@ -19561,6 +19578,7 @@ function linkItems(w, run) {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       furnishFloor(field, e.floor, w.lane, () => w.rand());
+      field.ents = field.ents.filter((q) => q.type !== "prop" || PROP_ART.has(q.prop));
       syncCarry();
     }
     if (e.type === "enemyDie" && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
@@ -19616,7 +19634,7 @@ function linkItems(w, run) {
           c.ellipse(e.x - camX, e.y, s2 * 0.4, 6, 0, 0, Math.PI * 2);
           c.fill();
           if (e.flash > 0) c.globalAlpha = 0.6;
-          drawItemIcon(c, e.prop, e.x - camX - s2 / 2, e.y - s2, s2);
+          if (!drawPropArt(c, `item_${e.prop}`, d2?.name, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s2 / 2, e.y - s2, s2);
           c.globalAlpha = 1;
           continue;
         }
@@ -19708,8 +19726,9 @@ function makeHub(host, whereIs2) {
         for (const t of sc.things) if (!t.wall) thing2(c, t, camX);
       },
       drawForeground(c, camX, w) {
-        if (enterTick < 0) enterTick = w.tick;
-        const age = w.tick - enterTick;
+        const now = performance.now();
+        if (enterTick < 0) enterTick = now;
+        const age = (now - enterTick) / (1e3 / 30);
         const px = w.player.x;
         const nd = sc.doors.find((d2) => Math.abs(d2.x - px) < 60);
         const ns = !nd ? sc.spots.find((s2) => s2.open && Math.abs(s2.x - px) < 60) : null;

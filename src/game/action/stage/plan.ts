@@ -1,4 +1,5 @@
 // 스테이지 자료 → 엔진 FloorPlan (docs/게임_모듈_연결.md). 배경·전경 그리기도 여기서 한다(회색 상자, 그림 없음).
+import { drawPropArt } from '../art/bg';
 import type { Encounter, FloorPlan, PropSpec, SpawnSpec, WorldView } from '../engine/contract';
 import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
@@ -268,21 +269,22 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       label(ctx, '낮은 천장 (앉아서)', t.x0 + 4, y0 - 236, '#ffd27a');
       break;
     case 'narrow': {
-      // 좁은 길: 검은 사각형 대신 뒤는 튀어나온 벽, 앞은 낮은 칸막이로 막는다 (검수 6번)
+      // 좁은 길: 막힌 칸에 물건 그림(캐비닛·사물함)을 늘어놓아 막는다. 그림이 없으면 벽·칸막이 단색
       const a = laneYIn(t.lane0, y0, y1),
         b = laneYIn(t.lane1, y0, y1);
-      if (a > y0) {
+      const row = (label: string, y: number) => {
+        let ok = true;
+        for (let x = t.x0 + 50; x < t.x1 - 20 && ok; x += 100) ok = drawPropArt(ctx, 'clutter', label, x, y);
+        return ok;
+      };
+      if (a > y0 && !row('사물함', a)) {
         ctx.fillStyle = pal.wall;
         ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(t.x0, a - 10, w, 10);
         ctx.fillStyle = pal.trim;
         ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
-      if (b < y1) {
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(t.x0, b, w, 8);
+      if (b < y1 && !row('사물함', y1 + 24)) {
         ctx.fillStyle = pal.trim;
         ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
@@ -291,8 +293,25 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       break;
     }
     case 'redfloor': {
-      ctx.fillStyle = 'rgba(200,20,20,0.55)';
-      ctx.fillRect(t.x0, laneYIn(t.lane0, y0, y1), w, laneYIn(t.lane1, y0, y1) - laneYIn(t.lane0, y0, y1));
+      // 붉은 바닥: 판정 상자처럼 보이는 납작한 직사각형 대신 바닥에 번진 얼룩 (재검수 2-5)
+      const a = laneYIn(t.lane0, y0, y1),
+        b = laneYIn(t.lane1, y0, y1);
+      const cy = (a + b) / 2,
+        ry = Math.max(14, (b - a) / 2);
+      ctx.save();
+      for (let i = 0, n = Math.max(2, Math.round(w / 140)); i < n; i++) {
+        const cx = t.x0 + ((i + 0.5) / n) * w + Math.sin(t.x0 + i * 7.3) * 18;
+        const rx = (w / n) * 0.75;
+        const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, rx);
+        g.addColorStop(0, 'rgba(120,8,10,0.62)');
+        g.addColorStop(0.7, 'rgba(90,6,8,0.35)');
+        g.addColorStop(1, 'rgba(60,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry * (0.8 + 0.2 * Math.cos(i * 2.1)), 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
       label(ctx, '붉은 바닥', t.x0 + 4, laneYIn(t.lane0, y0, y1) + 14, '#ffb0b0');
       break;
     }
