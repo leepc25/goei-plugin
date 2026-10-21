@@ -143,7 +143,7 @@ export class Fx {
   onGameEvent(e: { type: string; [k: string]: unknown }, opt: { y?: number } = {}) {
     const n = (k: string, d = 0) => (typeof e[k] === 'number' ? (e[k] as number) : d);
     const x = n('x'),
-      y = typeof e.y === 'number' ? n('y') - n('z') - 80 : opt.y ?? 520;
+      y = typeof e.y === 'number' ? n('y') - n('z') : opt.y ?? 520;
     switch (e.type) {
       case 'hit':
         return this.onEvent({ type: 'hit', x, y, strength: Math.max(1, Math.min(3, n('strength', 1))) as 1 | 2 | 3, dmg: n('dmg'), target: e.target === 'player' ? 'player' : 'enemy' });
