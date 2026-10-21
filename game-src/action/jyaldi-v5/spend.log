@@ -413,3 +413,21 @@ description: Side-view pixel art sprite for a 1990s
 job_id: 562d6351-7e74-424d-a2ae-097083668e0a
 model: pixen
 description: Side-view pixel art sprite for a 1990s
+04:16:21 keypose jab animate_image 8f 160x112 -> id: dfb78621-230e-4e69-b1ed-75b21ea9b3e3
+job_id: dfb78621-230e-4e69-b1ed-75b21ea9b3e3
+action: Beat-em-up jab, big and snappy: from the fighting stance she pushes off the back foot and takes a quick ha
+04:20:25 keypose straight animate_image 8f 160x112 -> id: c8c66b07-5232-467f-847c-218bb1fd552b
+job_id: c8c66b07-5232-467f-847c-218bb1fd552b
+action: Beat-em-up rear straight punch, deeper than a jab: the back foot pushes hard off the floor and pivots, hip
+04:23:10 keypose heavy animate_image 8f 160x112 -> id: 36532f09-4dc7-4641-ab34-d775c6552b57
+job_id: 36532f09-4dc7-4641-ab34-d775c6552b57
+action: Beat-em-up heavy finishing straight punch with full body weight: she crouches a little to load up, then ex
+04:25:34 keypose walk animate_image 8f 160x112 -> id: 9325e270-a505-43f6-a90d-6a385dc4caa1
+job_id: 9325e270-a505-43f6-a90d-6a385dc4caa1
+action: Walk cycle facing right, one full stride that loops: legs swing clearly forward and back with visible knee
+04:27:49 keypose run animate_image 8f 160x112 -> id: 520bf6f4-bdd2-4e75-9de1-14cefd5247ae
+job_id: 520bf6f4-bdd2-4e75-9de1-14cefd5247ae
+action: Hard combat sprint, one full stride that loops: upper body leaning far forward, long powerful strides with
+04:30:48 keypose jump animate_image 8f 160x112 -> id: 5800b23f-d86a-4a92-8a3d-94f426c79d08
+job_id: 5800b23f-d86a-4a92-8a3d-94f426c79d08
+action: Powerful jump: deep crouch with arms swinging back, explosive push-off with legs fully extended and arms t
