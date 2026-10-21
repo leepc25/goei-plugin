@@ -312,7 +312,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillText('GO →', SCREEN_W - 260, 300);
       ctx.restore();
     }
-    if (w.banner) {
+    if (w.banner && opt.hud) {
       const a = Math.min(1, w.banner.t / 15);
       ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
       ctx.fillRect(0, 170, SCREEN_W, 70);
@@ -322,7 +322,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
       ctx.textAlign = 'left';
     }
-    if (w.subtitle) {
+    if (w.subtitle && opt.hud) {
       ctx.font = '24px sans-serif';
       ctx.textAlign = 'center';
       const tw = ctx.measureText(w.subtitle.text).width;

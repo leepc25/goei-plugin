@@ -1,10 +1,18 @@
-// 최종 통합: 각 스레드 모듈을 엔진에 이어 붙이는 곳. 모듈이 없으면 엔진 기본(훈련장·임시 적·기본 HUD·기본 터치)을 쓴다.
+// 최종 통합: 각 스레드 모듈을 엔진에 이어 붙이는 곳.
+//   ui/    화면 틀·메뉴·HUD·터치·화면 효과 (mountGameShell)
+//   audio/ 효과음·음악 (createGameAudio)
+//   hq/    본부와 임무 흐름 (createHq)
+// 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
+import type { GameBridge } from '../../bridge';
 import { createGameAudio } from '../audio';
-import type { GameEvent } from './contract';
-import type { EngineModules } from './game';
+import { createHq, idbSaves, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+import { mountGameShell, type HudState, type Shell } from '../ui';
+import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore } from './contract';
+import type { EngineModules, Game } from './game';
 import { dummyStage, trainingStage } from './training';
+import type { World } from './world';
 
-const store = (key: string) => ({
+const local = (key: string) => ({
   load: () => {
     try {
       return localStorage.getItem(key);
@@ -21,25 +29,168 @@ const store = (key: string) => ({
   },
 });
 
-export function engineModules(): EngineModules {
-  const audio = createGameAudio(store('goei-game-audio'));
+type Launch = RunConfigCore & { launch?: MissionLaunch };
+
+/** 본부 모듈을 엔진 모양으로 감싼다 */
+function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>): HqModuleLike {
+  const hq = createHq();
+  return {
+    mount(root, host) {
+      hq.mount(root, {
+        deploy: (l) => host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
+        load: () => saves.read(0),
+        save: (d) => saves.write(0, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' }),
+        saves,
+        link: bridge?.card
+          ? {
+              card: async () => {
+                const c = await bridge.card!();
+                return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: '' })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
+              },
+              report: async (p: unknown) => {
+                bridge.report?.(p as never);
+                return '정산 결과를 넘겼습니다. 「본편에 기록」을 누르면 카드에 씁니다.';
+              },
+            } as never
+          : undefined,
+      });
+    },
+    onReturn(r, run) {
+      const l = (run as Launch).launch;
+      if (l) hq.onReturn(r as unknown as RunResult, l);
+    },
+    unmount: () => hq.unmount(),
+  };
+}
+
+/** 엔진 결과 → 본부 정산 모양 */
+function toHqResult(r: RunResultCore, w: World): RunResult {
+  const n = r.notes as Partial<RunResult> & Record<string, unknown>;
+  return {
+    how: r.how,
+    missionDone: (n.missionDone as boolean | undefined) ?? r.how === 'return',
+    depth: (n.depth as number | undefined) ?? Math.max(1, w.floor?.depth ?? r.floors),
+    floors: r.floors,
+    kills: r.kills,
+    cash: n.cash ?? 0,
+    shards: n.shards ?? 0,
+    debt: n.debt ?? 0,
+    budget: n.budget ?? 0,
+    teeth: n.teeth ?? 0,
+    bag: n.bag ?? [],
+    itemsLeft: n.itemsLeft ?? w.items.map((it) => (it && it.n > 0 ? { id: it.id, n: it.n } : null)),
+    found: n.found ?? [],
+    sent: n.sent ?? [],
+    rescued: n.rescued ?? [],
+    bigHit: !!n.bigHit,
+    seconds: r.timeSec,
+  };
+}
+
+function hudState(w: World, shell: Shell): HudState {
+  const p = w.player;
+  const boss = w.boss();
+  const f = w.floor;
+  const d = f.depth ?? 0;
+  return {
+    agent: { name: p.label ?? '쟈알디', color: '#c0453a' },
+    hp: p.hp,
+    maxHp: p.hpMax,
+    energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
+    maxEnergy: 75,
+    gauge: p.gauge,
+    armor: p.armor,
+    weapon: { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
+    items: w.items.map((it) => ({ label: it?.label ?? '', count: it?.n ?? 0 })),
+    floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
+    favor: 0,
+    money: { cash: 0, budget: 0, research: 0, teeth: 0 },
+    boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
+    message: w.subtitle?.text,
+    meters: [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }],
+    compact: shell.touchShown,
+  };
+}
+
+export interface Wiring {
+  mods: EngineModules;
+  /** 게임이 붙을 상자 (껍데기가 있으면 그 무대) */
+  box: HTMLElement;
+  bind(game: Game): void;
+}
+
+export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
+  const audio = createGameAudio(local('goei-game-audio'));
+  let game: Game | null = null;
+  const shell = mountGameShell(box, {
+    synth: true,
+    title: '차원 승강기',
+    sub: 'ANOMALY SIMULATION · 관리국 액션',
+    onNew: () => game?.start_new(),
+    onContinue: () => game?.start_new('dummy'),
+    hasSave: () => true,
+    onRetreat: () => game?.endRun('withdraw'),
+    onTitle: () => game?.toTitle(),
+    toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
+  });
+  const saves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
+  const hq = hqAdapter(saves, bridge);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
       if (e.type === 'super') audio.duck(1.4);
+      shell.fx.onGameEvent(e as never);
     },
   ];
-  return {
+  const mods: EngineModules = {
     stages: [trainingStage, dummyStage],
-    hud: true,
+    hq,
+    hud: false,
     listeners,
-    overlay: (_ctx, w) => {
-      if (w) audio.setListener(w.camX + 640, 640);
+    surface: { canvas: shell.canvas, ctx: shell.ctx },
+    paused: () => shell.paused,
+    openTitle: () => shell.openTitle(),
+    onPlay: () => shell.play(),
+    frame: (dt) => {
+      shell.frame(dt);
+      shell.input.endFrame();
+    },
+    overlay: (ctx, w, dt) => {
+      if (!w) return;
+      audio.setListener(w.camX + 640, 640);
+      ctx.save();
+      ctx.translate(-Math.round(w.camX), 0);
+      shell.fx.drawWorld(ctx);
+      ctx.restore();
+      shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+      const hs = hudState(w, shell);
+      shell.hud.draw(ctx, hs, dt);
+      shell.touch.setItems(hs.items);
+      shell.touch.setGauge(w.player.gauge / 100);
+      shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
+      shell.fx.drawTransition(ctx);
     },
     onScene: (name) => {
       if (name === 'title' || name === 'hq') audio.floor(name as never);
+      if (name === 'hq') shell.mode = 'title';
     },
     onPause: (p) => (p ? audio.pause() : audio.resume()),
-    dispose: () => audio.dispose(),
+    onWorld: (w) => {
+      w.on((e) => {
+        if (e.type === 'hp:low') w.notes.bigHit = true;
+      });
+    },
+    toHqResult,
+    dispose: () => {
+      audio.dispose();
+      shell.dispose();
+    },
+  };
+  return {
+    mods,
+    box: shell.stage.root,
+    bind: (g) => {
+      game = g;
+    },
   };
 }

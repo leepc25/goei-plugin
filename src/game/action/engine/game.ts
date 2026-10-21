@@ -1,4 +1,6 @@
-// 주 루프와 장면 관리. 30Hz 고정 틱 + 화면 주사율 그리기(보간). 장면: 제목 → (본부) → 출동(층 → 층) → 정산 → 제목/본부.
+// 주 루프와 장면 관리. 30Hz 고정 틱 + 화면 주사율 그리기(보간).
+// 장면: 제목 → 본부(hq 모듈, 없으면 바로 출동) → 출동(층 → 층 …) → 본부 정산 / 엔진 정산 화면 → 제목·본부.
+// 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -14,17 +16,32 @@ export interface EngineModules {
   listeners?: ((e: GameEvent) => void)[];
   /** 대사창이 전투를 멈추고 있는가 */
   blocking?: () => boolean;
-  /** ui 모듈이 HUD를 그리면 false */
+  /** 엔진 기본 HUD를 그릴지 (ui 모듈이 그리면 false) */
   hud?: boolean;
-  /** 그리기 뒤에 덧그리기 (ui 모듈 HUD 등) */
-  overlay?: (ctx: CanvasRenderingContext2D, world: World | null) => void;
+  /** 남이 준 캔버스 (ui 껍데기). 없으면 엔진이 만든다 */
+  surface?: { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D };
+  /** 밖(메뉴)에서 멈춤 */
+  paused?: () => boolean;
+  /** 밖의 제목 화면을 연다. 없으면 엔진 기본 제목 */
+  openTitle?: () => void;
+  /** 출동 시작 (껍데기를 놀이 모드로) */
+  onPlay?: () => void;
+  /** 매 화면 프레임 (dt 초) */
+  frame?: (dt: number) => void;
+  /** 세계 그리기 뒤에 덧그리기 (ui HUD·효과 등) */
+  overlay?: (ctx: CanvasRenderingContext2D, world: World | null, dt: number) => void;
   /** 장면 바뀜: 'title' | 'hq' | 'battle' | 'result' */
   onScene?: (name: string) => void;
   onPause?: (paused: boolean) => void;
+  /** 출동 결과를 본부 모양으로 바꿈 (hq 모듈이 있을 때) */
+  toHqResult?: (r: RunResultCore, w: World) => unknown;
+  /** 출동 시작 시 세계를 손봄 (아이템 모듈 연결 등) */
+  onWorld?: (w: World, run: RunConfigCore) => void;
   dispose?: () => void;
 }
 
 interface Scene {
+  name: string;
   tick(p: Pad): void;
   draw(alpha: number): void;
 }
@@ -36,6 +53,7 @@ export class Game {
   world: World | null = null;
   scene: Scene;
   paused = false;
+  private ownCanvas: boolean;
   private renderer: Renderer;
   private raf = 0;
   private acc = 0;
@@ -43,27 +61,35 @@ export class Game {
   private menuIndex = 0;
   private run: RunConfigCore | null = null;
   private runStage: StageModule | null = null;
-  private runStart = 0;
   lastResult: RunResultCore | null = null;
   private hqRoot: HTMLElement | null = null;
   private wasPaused = false;
+  private menuItems: { y0: number; y1: number }[] = [];
+  private titleItems: string[] = [];
 
   constructor(
     readonly box: HTMLElement,
     readonly art: Art,
     readonly mods: EngineModules,
   ) {
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = SCREEN_W;
-    this.canvas.height = SCREEN_H;
-    this.canvas.className = 'goei-engine-canvas';
-    box.appendChild(this.canvas);
-    this.ctx = this.canvas.getContext('2d')!;
+    if (mods.surface) {
+      this.canvas = mods.surface.canvas;
+      this.ctx = mods.surface.ctx;
+      this.ownCanvas = false;
+    } else {
+      this.canvas = document.createElement('canvas');
+      this.canvas.width = SCREEN_W;
+      this.canvas.height = SCREEN_H;
+      this.canvas.className = 'goei-engine-canvas';
+      box.appendChild(this.canvas);
+      this.ctx = this.canvas.getContext('2d')!;
+      this.ownCanvas = true;
+    }
     this.renderer = makeRenderer(this.ctx, art, { hud: mods.hud !== false });
     this.input.attach();
     this.canvas.addEventListener('pointerdown', (e) => this.onPointer(e));
-    this.scene = this.titleScene();
-    if (mods.hq) this.openHq();
+    this.scene = this.idleScene('title');
+    this.toTitle();
   }
 
   start() {
@@ -73,18 +99,20 @@ export class Game {
       let dt = (now - this.last) / 1000;
       this.last = now;
       if (dt > 0.25) dt = 0.25;
+      this.mods.frame?.(dt);
       this.acc += dt;
       const T = 1 / TICK_HZ;
       while (this.acc >= T) {
         this.acc -= T;
         this.tickOnce();
       }
-      if (this.paused !== this.wasPaused) {
-        this.wasPaused = this.paused;
-        this.mods.onPause?.(this.paused);
+      const paused = this.paused || !!this.mods.paused?.();
+      if (paused !== this.wasPaused) {
+        this.wasPaused = paused;
+        this.mods.onPause?.(paused);
       }
-      this.scene.draw(this.acc / T);
-      this.mods.overlay?.(this.ctx, this.world);
+      this.scene.draw(paused ? 1 : this.acc / T);
+      this.mods.overlay?.(this.ctx, this.world, dt);
     };
     this.raf = requestAnimationFrame(frame);
   }
@@ -97,45 +125,69 @@ export class Game {
 
   private tickOnce() {
     const p = this.input.sample();
-    if (document.hidden) return;
+    if (typeof document !== 'undefined' && document.hidden) return;
+    if (this.mods.paused?.() && this.scene.name === 'battle') return;
     this.scene.tick(p);
   }
 
   destroy() {
     cancelAnimationFrame(this.raf);
     this.input.detach();
-    this.canvas.remove();
-    this.closeHq();
+    if (this.ownCanvas) this.canvas.remove();
+    if (this.hqRoot) {
+      this.mods.hq?.unmount();
+      this.hqRoot.remove();
+    }
     this.mods.dispose?.();
   }
 
-  /* ───────── 본부 ───────── */
+  /* ───────── 제목·본부 ───────── */
 
-  private openHq() {
-    const hq = this.mods.hq;
-    if (!hq) return;
-    this.hqRoot = document.createElement('div');
-    this.hqRoot.className = 'goei-engine-hq';
-    this.box.appendChild(this.hqRoot);
-    this.canvas.style.visibility = 'hidden';
-    this.input.detach();
-    this.mods.onScene?.('hq');
-    hq.mount(this.hqRoot, {
-      deploy: (run) => {
-        this.closeHq();
-        this.deploy(run);
-      },
-      stages: () => this.mods.stages.map((s) => ({ id: s.id, label: s.label })),
-    });
+  toTitle() {
+    this.world = null;
+    this.paused = false;
+    if (this.hqRoot) this.hqRoot.hidden = true;
+    if (this.mods.openTitle) {
+      this.scene = this.idleScene('title');
+      this.mods.openTitle();
+    } else this.scene = this.titleScene();
+    this.mods.onScene?.('title');
   }
 
-  private closeHq() {
-    if (!this.hqRoot) return;
-    this.mods.hq?.unmount();
-    this.hqRoot.remove();
-    this.hqRoot = null;
-    this.canvas.style.visibility = '';
-    this.input.attach();
+  /** 새로 시작: 본부가 있으면 본부로, 없으면 첫 층 모듈로 바로 출동 */
+  start_new(stageId?: string) {
+    if (this.mods.hq && !stageId) return this.showHq();
+    const stage = this.mods.stages.find((s) => s.id === stageId) ?? this.mods.stages[0];
+    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
+  }
+
+  showHq() {
+    const hq = this.mods.hq!;
+    this.world = null;
+    this.scene = this.idleScene('hq');
+    this.canvas.style.visibility = 'hidden';
+    if (!this.hqRoot) {
+      this.hqRoot = document.createElement('div');
+      this.hqRoot.className = 'goei-engine-hq';
+      this.box.appendChild(this.hqRoot);
+      hq.mount(this.hqRoot, {
+        deploy: (run) => this.deploy(run),
+        stages: () => this.mods.stages.map((s) => ({ id: s.id, label: s.label })),
+      });
+    }
+    this.hqRoot.hidden = false;
+    this.mods.onScene?.('hq');
+  }
+
+  private idleScene(name: string): Scene {
+    return {
+      name,
+      tick: () => {},
+      draw: () => {
+        this.ctx.fillStyle = '#05080a';
+        this.ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      },
+    };
   }
 
   /* ───────── 출동 ───────── */
@@ -144,19 +196,24 @@ export class Game {
     const stage = this.mods.stages.find((s) => s.id === run.stageId) ?? this.mods.stages[0];
     this.run = run;
     this.runStage = stage;
+    if (this.hqRoot) this.hqRoot.hidden = true;
+    this.canvas.style.visibility = '';
     const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
     if (this.mods.itemUse) w.itemUse = this.mods.itemUse;
     for (const l of this.mods.listeners ?? []) w.on(l);
+    this.mods.onWorld?.(w, run);
     w.enterFloor(stage.firstFloor(run));
     this.world = w;
-    this.runStart = performance.now();
     this.paused = false;
     this.scene = this.battleScene(w);
+    this.mods.onPlay?.();
     this.mods.onScene?.('battle');
   }
 
-  private endRun(how: RunResultCore['how']) {
-    const w = this.world!;
+  /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
+  endRun(how: RunResultCore['how']) {
+    const w = this.world;
+    if (!w) return;
     const result: RunResultCore = {
       how,
       floors: w.floors,
@@ -168,11 +225,11 @@ export class Game {
     };
     w.emit({ type: 'run:end', how });
     this.lastResult = result;
-    void this.runStart;
+    this.world = null;
+    this.paused = false;
     if (this.mods.hq && this.run) {
-      this.world = null;
-      this.openHq();
-      this.mods.hq.onReturn(result, this.run);
+      this.showHq();
+      this.mods.hq.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, this.run);
       return;
     }
     this.scene = this.resultScene(result);
@@ -180,9 +237,11 @@ export class Game {
   }
 
   private battleScene(w: World): Scene {
+    const ownMenu = !this.mods.paused;
     return {
+      name: 'battle',
       tick: (p) => {
-        if (p.pressed.has('pause')) {
+        if (ownMenu && p.pressed.has('pause')) {
           this.paused = !this.paused;
           this.menuIndex = 0;
         }
@@ -213,29 +272,23 @@ export class Game {
   }
 
   private pick(i: number, w: World) {
-    if (i === 0) this.paused = false;
-    else if (i === 1) {
-      w.showBoxes = !w.showBoxes;
-      this.paused = false;
-    } else if (i === 2) {
-      this.paused = false;
-      this.endRun('withdraw');
-    } else {
-      this.paused = false;
-      this.world = null;
-      if (this.mods.hq) this.openHq();
-      else this.scene = this.titleScene();
-    }
+    this.paused = false;
+    if (i === 1) w.showBoxes = !w.showBoxes;
+    else if (i === 2) this.endRun('withdraw');
+    else if (i === 3) this.toTitle();
   }
 
-  private drawMenu(title: string, items: string[]) {
+  private drawMenu(title: string, items: string[], bg = true) {
     const c = this.ctx;
-    c.fillStyle = 'rgba(0,0,0,0.6)';
-    c.fillRect(0, 0, SCREEN_W, SCREEN_H);
-    c.fillStyle = '#e8eef0';
+    if (bg) {
+      c.fillStyle = 'rgba(0,0,0,0.6)';
+      c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      c.fillStyle = '#e8eef0';
+      c.textAlign = 'center';
+      c.font = 'bold 44px sans-serif';
+      c.fillText(title, SCREEN_W / 2, 210);
+    }
     c.textAlign = 'center';
-    c.font = 'bold 44px sans-serif';
-    c.fillText(title, SCREEN_W / 2, 210);
     c.font = '30px sans-serif';
     items.forEach((t, i) => {
       const y = 300 + i * 64;
@@ -247,38 +300,34 @@ export class Game {
     c.textAlign = 'left';
     this.menuItems = items.map((_, i) => ({ y0: 300 + i * 64 - 40, y1: 300 + i * 64 + 14 }));
   }
-  private menuItems: { y0: number; y1: number }[] = [];
 
   private onPointer(e: PointerEvent) {
     const r = this.canvas.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * SCREEN_W;
     const y = ((e.clientY - r.top) / r.height) * SCREEN_H;
+    if (this.scene.name === 'result') return this.leaveResult();
     if (Math.abs(x - SCREEN_W / 2) > 230) return;
     const i = this.menuItems.findIndex((m) => y >= m.y0 && y <= m.y1);
     if (i < 0) return;
     if (this.world && this.paused) this.pick(i, this.world);
-    else if (!this.world) this.titlePick(i);
+    else if (this.scene.name === 'title') this.titlePick(i);
   }
 
-  /* ───────── 제목·정산 ───────── */
-
-  private titleItems = ['출동 · 훈련장', '허수아비 연습'];
+  /* ───────── 엔진 기본 제목·정산 ───────── */
 
   private titlePick(i: number) {
-    const stage = i === 0 ? this.mods.stages[0] : this.mods.stages.find((s) => s.id === 'dummy') ?? this.mods.stages[0];
-    this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
+    if (i === 0) this.start_new();
+    else this.start_new(i === 1 && this.mods.hq ? this.mods.stages[0].id : 'dummy');
   }
 
   private titleScene(): Scene {
-    this.mods.onScene?.('title');
     this.menuIndex = 0;
     this.menuItems = [];
-    const stages = this.mods.stages;
-    this.titleItems = [stages[0] ? `출동 · ${stages[0].label}` : '출동', '허수아비 연습'];
-    let t = 0;
+    const first = this.mods.stages[0];
+    this.titleItems = this.mods.hq ? ['본부로 출근', `바로 출동 · ${first?.label ?? ''}`, '허수아비 연습'] : [`출동 · ${first?.label ?? ''}`, '허수아비 연습'];
     return {
+      name: 'title',
       tick: (p) => {
-        t++;
         const n = this.titleItems.length;
         if (p.pressed.has('up')) this.menuIndex = (this.menuIndex + n - 1) % n;
         if (p.pressed.has('down')) this.menuIndex = (this.menuIndex + 1) % n;
@@ -288,7 +337,6 @@ export class Game {
         const c = this.ctx;
         c.fillStyle = '#0d1114';
         c.fillRect(0, 0, SCREEN_W, SCREEN_H);
-        c.fillStyle = '#e8eef0';
         c.textAlign = 'center';
         c.font = 'bold 30px monospace';
         c.fillStyle = '#8e9aa1';
@@ -296,8 +344,7 @@ export class Game {
         c.font = 'bold 58px sans-serif';
         c.fillStyle = '#e8eef0';
         c.fillText('관리국 · 차원 승강기', SCREEN_W / 2, 190);
-        c.textAlign = 'left';
-        this.drawMenuNoBg(this.titleItems);
+        this.drawMenu('', this.titleItems, false);
         c.fillStyle = '#8e9aa1';
         c.font = '20px sans-serif';
         c.textAlign = 'center';
@@ -308,24 +355,13 @@ export class Game {
         ];
         help.forEach((h, i) => c.fillText(h, SCREEN_W / 2, 560 + i * 34));
         c.textAlign = 'left';
-        void t;
       },
     };
   }
 
-  private drawMenuNoBg(items: string[]) {
-    const c = this.ctx;
-    c.textAlign = 'center';
-    c.font = '30px sans-serif';
-    items.forEach((tx, i) => {
-      const y = 300 + i * 64;
-      c.fillStyle = i === this.menuIndex ? '#ffd36a' : 'rgba(255,255,255,0.1)';
-      c.fillRect(SCREEN_W / 2 - 230, y - 40, 460, 54);
-      c.fillStyle = i === this.menuIndex ? '#1a1f22' : '#e8eef0';
-      c.fillText(tx, SCREEN_W / 2, y - 3);
-    });
-    c.textAlign = 'left';
-    this.menuItems = items.map((_, i) => ({ y0: 300 + i * 64 - 40, y1: 300 + i * 64 + 14 }));
+  private leaveResult() {
+    if (this.mods.hq) this.showHq();
+    else this.toTitle();
   }
 
   private resultScene(r: RunResultCore): Scene {
@@ -334,11 +370,9 @@ export class Game {
     const how = { return: '귀환', withdraw: '철수', evac: '후송' }[r.how];
     let t = 0;
     return {
+      name: 'result',
       tick: (p) => {
-        if (++t > 20 && (p.pressed.has('attack') || p.pressed.has('jump') || p.pressed.has('interact') || p.pressed.has('pause'))) {
-          this.world = null;
-          this.scene = this.titleScene();
-        }
+        if (++t > 20 && (p.pressed.has('attack') || p.pressed.has('jump') || p.pressed.has('interact') || p.pressed.has('pause'))) this.leaveResult();
       },
       draw: () => {
         const c = this.ctx;
@@ -356,7 +390,6 @@ export class Game {
         c.font = '22px sans-serif';
         c.fillText('A 또는 화면을 누르면 처음으로', SCREEN_W / 2, 600);
         c.textAlign = 'left';
-        this.menuItems = [{ y0: 0, y1: SCREEN_H }];
       },
     };
   }

@@ -19,11 +19,10 @@ try {
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   await page.goto(url);
   await page.waitForFunction(() => window.__goeiEngine);
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(400);
   await S(page, 'pc-title');
-  // 허수아비 연습에서 조작 확인
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('KeyA');
+  // 제목 → 이어하기(허수아비 연습)에서 조작 확인
+  await page.getByText('이어하기').click();
   await page.waitForFunction(() => window.__goeiEngine.world);
   await page.waitForTimeout(400);
   await S(page, 'pc-start');
@@ -71,18 +70,25 @@ try {
   // 폭파
   await page.keyboard.press('KeyD'); await page.waitForTimeout(250);
   await S(page, 'pc-blast');
-  // 메뉴 → 처음으로 → 훈련장 출동
+  // 메뉴 → 타이틀로 → 새로 시작(본부) → 잼트리 → 임무 → 출동
   await page.waitForTimeout(600);
   await page.keyboard.press('Escape');
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(200);
   await S(page, 'pc-pause');
-  for (let i = 0; i < 3; i++) { await page.keyboard.press('ArrowDown'); await page.waitForTimeout(60); }
-  await page.waitForTimeout(100);
-  await page.keyboard.press('KeyA');
+  await page.getByText('타이틀로').click();
+  await page.getByText('예', { exact: true }).click();
   await page.waitForFunction(() => !window.__goeiEngine.world);
-  await page.waitForTimeout(100);
-  await page.keyboard.press('KeyA');
+  await page.getByText('새로 시작').click();
+  await page.waitForSelector('.hq-places button');
+  await S(page, 'pc-hq');
+  await page.click('[data-go=jaemtri]');
+  await page.waitForSelector('[data-mission]');
+  await page.click('[data-mission]');
+  await page.click('[data-act=brief]');
+  await page.waitForSelector('[data-act=deploy]');
+  await page.click('[data-act=deploy]');
   await page.waitForFunction(() => window.__goeiEngine.world);
+  await page.waitForTimeout(300);
   // 자동 진행: 오른쪽으로 걸으며 계속 때림 (훈련장 끝까지)
   const t0 = Date.now();
   let last;
@@ -99,6 +105,10 @@ try {
   console.log('진행', last);
   await page.waitForTimeout(800);
   await S(page, 'pc-end');
+  if (last && last.ended) {
+    await page.waitForTimeout(1500);
+    await S(page, 'pc-settle');
+  }
   // 모바일 가로
   const m = await browser.newPage({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
   m.on('pageerror', (e) => errors.push(String(e)));
@@ -106,7 +116,8 @@ try {
   await m.waitForFunction(() => window.__goeiEngine);
   await m.waitForTimeout(300);
   const box = await m.evaluate(() => { const r = document.querySelector('canvas').getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; });
-  await m.mouse.click(box[0] + box[2] / 2, box[1] + box[3] * (300 - 10) / 720);
+  void box;
+  await m.getByText('이어하기').click();
   await m.waitForFunction(() => window.__goeiEngine.world);
   await m.waitForTimeout(500);
   await S(m, 'm-start');

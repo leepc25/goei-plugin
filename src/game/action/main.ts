@@ -9,7 +9,7 @@ const CSS = `
 .goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
 .goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
-.goei-engine-hq{position:absolute;inset:0;overflow:auto}
+.goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
 
@@ -29,10 +29,12 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
   void loadArt(urlOf).then((art) => {
     if (dead) return;
-    stage.innerHTML = '';
-    game = new Game(stage, art, engineModules());
-    const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
-    if (coarse || /[?&]touch=1/.test(location.search)) offTouch = mountTouch(stage, game.input);
+    stage.remove();
+    root.style.display = 'block';
+    const wiring = engineModules(root, bridge);
+    game = new Game(wiring.box, art, wiring.mods);
+    wiring.bind(game);
+    if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
     game.start();
     (globalThis as { __goeiEngine?: Game }).__goeiEngine = game;
   });
