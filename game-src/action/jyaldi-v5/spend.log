@@ -1729,3 +1729,10 @@ description: tall slim adult woman agent, long straight black hair to the
 15:43:32 gen_fix2 carry1_run done
 15:43:34 gen_fix2 after generations_remaining: 8773
 15:44:27 gen_fix2 기본 클립 13개(carry2×3 carry1×3 sneak leadhand lookback hairflip embarrassed shrug headshake): 8815 -> 8773 (shared, 이 스레드 약 39)
+15:50:12 gen_fix2 before generations_remaining: 8734
+15:50:15 gen_fix2 lookback 6f -> id: ac140b2f-65af-45b8-bf11-998fdcabf11c
+job_id: ac140b2f-65af-45b8-bf11-998fdcabf11c
+description: tall slim adult woman agent, long straight black hair to the 
+15:54:20 gen_fix2 lookback done
+15:54:21 gen_fix2 after generations_remaining: 8731
+15:54:32 gen_fix2 lookback 2차(어깨 비틀기+왼쪽 옆얼굴 뼈대): 약 3회, 불합격(3/4 정면), 커밋 안 함. after 8731 (shared)
