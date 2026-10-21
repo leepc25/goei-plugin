@@ -3,7 +3,7 @@
 import json, re, sys, zipfile
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-from build_lite_card import read_module, MANIFEST_COMMENT, LORE_PATCHES  # noqa: E402
+from build_lite_card import read_module, MANIFEST_COMMENT, LORE_PATCHES, patch_desc  # noqa: E402
 from cbs import render  # noqa: E402
 
 src, lite = sys.argv[1], sys.argv[2]
@@ -88,7 +88,7 @@ wiki_files = {n for n in names_l if re.match(r'(assets/other/image|x_meta)/wiki\
 check('에셋 파일: 원본 유지(f01~f05 제외) + 위키 이미지', names_s - dropped == names_l - wiki_files and len(wiki_files) >= 2 * 80, len(wiki_files) // 2)
 kept = [a for a in cs.get('assets', []) if a['name'] not in ('f01', 'f02', 'f03', 'f04', 'f05')]
 check('에셋 목록: 원본 유지 + 위키 이미지', cl.get('assets', [])[:len(kept)] == kept and all(a['uri'].startswith('embeded://assets/other/image/wiki') for a in cl['assets'][len(kept):]))
-check('설명·로어북 외 필드 유지', cs['description'] == cl['description'])
+check('설명·로어북 외 필드 유지 (설명은 오타 패치만)', patch_desc(cs['description']) == cl['description'])
 for name, ok, detail in checks:
     print(('PASS' if ok else 'FAIL'), name, detail if detail != '' else '')
 sys.exit(0 if all(ok for _, ok, _ in checks) else 1)

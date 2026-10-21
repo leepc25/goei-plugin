@@ -384,6 +384,13 @@ def lore_activation(entries):
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 배치 칸 띄어쓰기 통일 (2026-10-21 점검)
+    ('🏷️Tag', '- 배치 : Agent code(s) | External faction name | 없음\n', '- 배치: Agent code(s) | External faction name | 없음\n'),
+    # 요원 상태 값만 한국어로 쓰게: 괄호 영어 풀이를 따로 줄로 (모델이 「휴게 (On-duty break)」를 그대로 베끼지 않게)
+    ('🏷️Tag',
+     '- 상태: 휴게 (On-duty break) | 내근 (Office work) | 외근 (Field work, non-operation) | 작전투입 (Mission deployed) | 비번 (Off duty) | 부상 (Injured) | 실종 (Missing) | 격리 (Quarantined) | 사망 (Dead)\n',
+     '- 상태: 휴게 | 내근 | 외근 | 작전투입 | 비번 | 부상 | 실종 | 격리 | 사망\n'
+     '   - Meaning: 휴게 = on-duty break, 내근 = office work, 외근 = field work (non-operation), 작전투입 = mission deployed, 비번 = off duty, 부상 = injured, 실종 = missing, 격리 = quarantined, 사망 = dead. Write only the Korean value.\n'),
     # 괴이·특수에도 현장 상황 칸 (2026-10-21 사용자: 랜덤 괴이·특수도 상황 글이 보여야). 플러그인 v0.16.35부터 읽는다
     ('🏷️Tag', '\n\n#### Incident\n',
      '\n- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.\n\n#### Incident\n'),
@@ -393,7 +400,7 @@ LORE_PATCHES = [
     # 사건에도 투입 인원 칸 (2026-10-21 사용자: 사건 카드에도 누가 나갔는지 보여야). 플러그인 v0.16.36부터 읽는다
     ('🏷️Tag', '   - 종료: MUST transition immediately once the urgent incident ends.\n',
      '   - 종료: MUST transition immediately once the urgent incident ends.\n'
-     '- 배치 : Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n'),
+     '- 배치: Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n'),
     ('🏷️Tag', '[IN|지역|발생지점|상태|상황]', '[IN|지역|발생지점|상태|배치|상황]'),
     ('🏷️Tag', '[AN|지역|발생지점|상태|등급|배치]', '[AN|지역|발생지점|상태|등급|배치|상황]'),
     ('🏷️Tag', '[MS|지역|명칭|상태|방문자]', '[MS|지역|명칭|상태|방문자|상황]'),
@@ -402,6 +409,20 @@ LORE_PATCHES = [
      'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '
      'A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC\'s own message text or omit them.'),
 ]
+
+# 캐릭터 설명 오타 (옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
+DESC_PATCHES = [
+    ('- Role-Based: Narrative: Many assign', '- Role-Based Narrative: Many assign'),
+    ('Once contained, It disappears from the site and later manifest elsewhere', 'Once contained, it disappears from the site and later manifests elsewhere'),
+]
+
+
+def patch_desc(text):
+    for old, new in DESC_PATCHES:
+        if old not in text:
+            raise SystemExit(f'설명 패치 대상 없음: {old[:40]}')
+        text = text.replace(old, new, 1)
+    return text
 
 
 def patch_lore(entries):
@@ -636,6 +657,7 @@ def main(src, dst):
     }
     # Risu 캐릭터 정보의 「캐릭터 버전」도 이 카드 버전으로 (원본의 2.4가 남지 않게)
     data['character_version'] = version
+    data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
     lore = add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))
     lore, manifest['keys'] = lore_activation(lore)
