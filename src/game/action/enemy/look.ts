@@ -181,6 +181,11 @@ function poseOf(e: Enemy): Pose {
 type Ctx = CanvasRenderingContext2D;
 type Paint = (part: Part) => string;
 
+/** 맞은 순간용 밝은 색 */
+function lighten(c: string, k: number): string {
+  const m = c.startsWith('#') ? [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)] : (c.match(/\d+/g) ?? ['0', '0', '0']).slice(0, 3).map(Number);
+  return `rgb(${m.map((v) => Math.round(v + (255 - v) * k)).join(',')})`;
+}
 /** 뒤쪽 팔다리용 어두운 색 */
 function dim(c: string, k = 0.7): string {
   if (c === '#ffffff') return c;
@@ -537,7 +542,8 @@ export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
     hair: L.hair ?? '#1c1a1a',
     detail: '#14161a',
   };
-  const flash = e.flash > 0;
+  // 맞은 순간 밝게 (흰 덩어리가 되지 않게 색은 남긴다). 쓰러지는 중·죽음에는 번쩍이지 않는다
+  const flash = e.flash > 0 && p.lie === 0 && e.state !== 'dead' && e.state !== 'down';
   const transform = (x: Board['x']) => {
     x.setTransform(1 / PIXEL, 0, 0, 1 / PIXEL, OX, OY + (e.mem.cling && L.shape === 'spider' ? -40 : 40));
     x.scale(e.dir, 1);
@@ -576,11 +582,11 @@ export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
     // 2) 색 (옷 덩어리), 틀 밖은 잘라냄
     const C = board(1);
     transform(C.x);
-    drawShape(C.x as Ctx, e, L, p, flash ? () => '#ffffff' : (part) => col[part]);
+    drawShape(C.x as Ctx, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
     C.x.setTransform(1, 0, 0, 1, 0, 0);
     C.x.globalCompositeOperation = 'destination-in';
     C.x.drawImage(M.c, 0, 0);
-    if (!flash) {
+    {
       // 3) 그늘 띠: 빛(위·앞)에서 먼 쪽 3도트
       const front = e.dir;
       const S = board(2);

@@ -669,7 +669,7 @@ function drawBoxes(e: Enemy, ctx: CanvasRenderingContext2D, f: ReturnType<Enemy[
   }
   for (const b of body) {
     const wb = toWorld(b, e.x, e.y, e.z, e.dir);
-    ctx.fillStyle = e.flash > 0 ? '#ffffff' : tint(e.def.color, PART_SHADE[b.part ?? 'torso'] ?? 0);
+    ctx.fillStyle = tint(e.def.color, (PART_SHADE[b.part ?? 'torso'] ?? 0) + (e.flash > 0 && e.state !== 'dead' ? 0.5 : 0));
     ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
   }
   ctx.restore();
