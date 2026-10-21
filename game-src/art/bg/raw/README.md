@@ -210,3 +210,13 @@
 - `hq_appraisal/hq_appraisal_wall_2.png`
 - `hq_appraisal/hq_appraisal_objects.png`
 
+
+
+## 본부 배경 추가 · 2026-10-22 · hq_lab
+
+요청서 신규 원본 3장. 벽·원경·물건 1536×1024, 바닥 1024×1024. 도트화·게임 반영은 후속 통합 작업.
+
+- `hq_lab/hq_lab_wall_1.png`
+- `hq_lab/hq_lab_wall_2.png`
+- `hq_lab/hq_lab_objects.png`
+
