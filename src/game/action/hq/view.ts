@@ -23,9 +23,36 @@ export interface HqHost {
   saves?: SaveSlots;
   link?: MainLink;
   rand?: () => number;
+  /** 메뉴 창을 다 닫으면 (엔진이 걷기를 다시 켠다) */
+  closed?(): void;
+  /** Esc 메뉴의 「장소로 가기」: 엔진이 쟈알디를 그 장소 문 앞으로 옮긴다 */
+  goto?(id: PlaceId): void;
+}
+/** 엔진이 본부 벨트 장면을 그릴 때 쓰는 장소 정보 (열림 판정은 본부가 한다) */
+export interface HqPlaceView {
+  id: PlaceId;
+  name: string;
+  floor: string;
+  x: number;
+  w: number;
+  npc: string | null;
+  color: string;
+  open: boolean;
+  /** 잠겨 있을 때 여는 조건 */
+  opens: string;
 }
 export interface HqModule {
-  mount(root: HTMLElement, host: HqHost): void;
+  /** walk:false = 엔진이 본부를 걷는 벨트 장면으로 그리고, root에는 메뉴 창만 띄운다 (게임_통합_규격 4장) */
+  mount(root: HTMLElement, host: HqHost, opt?: { walk?: boolean }): void;
+  places(): HqPlaceView[];
+  /** 그 장소 메뉴 창 (엔진: 문 앞에서 E) */
+  openPlace(id: PlaceId): void;
+  /** Esc 본부 메뉴 (보관함·저장·장소로 가기) */
+  openMenu(): void;
+  /** 메뉴 창이 열려 있나 (열려 있는 동안 엔진은 걷기를 멈춘다) */
+  isOpen(): boolean;
+  /** 열린 창을 하나 닫는다 (엔진: Esc) */
+  close(): void;
   onReturn(result: RunResult, launch: MissionLaunch): void;
   unmount(): void;
   /** 시험용 */
@@ -58,6 +85,7 @@ export function createHq(): HqModule {
   let selMission: string | null = null;
   let slotList: { slot: number; title: string; summary: string; savedAt: number }[] = [];
   let pickSlot = 0;
+  let walk = true;
   const rand = () => (host?.rand ?? Math.random)();
   const keys = new Set<string>();
   // 쉬는 요원 위치 (사무실·탕비실을 오간다)
@@ -273,10 +301,28 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
 <h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join('')}<h3>보관함</h3>${stashHtml()}<h3>유물</h3><p>${s.relicsOwned.map((r) => `${esc(RELICS[r].name)} <small>${esc(RELICS[r].effect)}</small>`).join('<br>') || '없음'}</p></div>
 <div><h3>요원</h3>${AGENTS.map((a) => `<p><b>${esc(a.name)}</b> 숙련 ${masteryLevel(s.agents[a.id].xp)} · 피로 ${s.agents[a.id].fatigue}${s.agents[a.id].injured ? ' · 부상' : ''}</p>`).join('')}
 <h3>저장</h3><p class="hq-dim">자동 저장: 장소 이동·구매·정산 때마다. 아래는 수동 슬롯.</p>${host?.saves ? [1, 2, 3].map((n) => { const m = slotList.find((x) => x.slot === n); return `<div class="hq-slotrow"><b>슬롯 ${n}</b><span>${m ? `${esc(m.title)} · ${esc(m.summary)}` : '비어 있음'}</span><button data-saveslot="${n}">여기 저장</button>${m ? `<button data-loadslot="${n}">불러오기</button>` : ''}</div>`; }).join('') : ''}
-<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div><div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
+<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? '' : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s, p.id)).map((p) => `<button data-go="${p.id}">${esc(p.name)}</button>`).join('')}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
 
+  const bar = () => `<div class="hq-bar"><b>본부 · ${s.day}일차</b><span>예산 ${s.currencies.budget}</span><span>연구 자료 ${s.currencies.research}</span><span>이빨 ${s.currencies.teeth}</span><span>규칙서 ${s.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
+  const renderFloat = () => {
+    const ov = wrap!.querySelector<HTMLElement>('.hq-over')!;
+    const open = !!(overlay || panel);
+    ov.hidden = !open;
+    if (!open) return void (ov.innerHTML = '');
+    const body = overlay === 'brief' ? briefHtml() : overlay === 'settle' ? settleHtml() : overlay === 'menu' ? menuHtml() : placeHtml(panel!);
+    ov.innerHTML = `<div class="hq-sheet">${bar()}${body}${overlay !== 'settle' && notice ? `<p class="hq-notice">${esc(notice)}</p>` : ''}</div>`;
+    wrap!.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+  };
+  const closeOne = () => {
+    if (overlay) overlay = null;
+    else panel = null;
+    notice = '';
+    render();
+    if (!overlay && !panel) host?.closed?.();
+  };
   const render = () => {
     if (!wrap) return;
+    if (!walk) return renderFloat();
     wrap.querySelector('.hq-head')!.innerHTML = top();
     const pane = wrap.querySelector<HTMLElement>('.hq-pane')!;
     pane.innerHTML = panel ? `${placeHtml(panel)}${notice ? `<p class="hq-notice">${esc(notice)}</p>` : ''}` : `<p class="hq-dim">←→로 걸어 다니다 E로 들어가거나, 위 장소 단추를 누르세요. ${notice ? `<span class="hq-notice">${esc(notice)}</span>` : ''}</p>`;
@@ -296,7 +342,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     s.x = p.x + p.w / 2;
     panel = id;
     notice = '';
-    if (overlay === 'brief') overlay = null;
+    if (overlay === 'brief' || overlay === 'menu') overlay = null;
+    if (!walk) host?.goto?.(id);
     barkPlace = id;
     const l = lines(`npc:${id}`, ctx())[0];
     if (l) bark = { ...l, t: 4, x: s.x };
@@ -349,6 +396,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         void refreshSlots();
         return render();
       case 'close':
+        if (!walk) return closeOne();
         overlay = null;
         notice = '';
         return render();
@@ -365,7 +413,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         panel = null;
         void save();
         render();
-        wrap!.hidden = true;
+        if (walk) wrap!.hidden = true;
         host.deploy(l);
         return;
       }
@@ -421,22 +469,27 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     get state() {
       return s;
     },
-    mount(r, h) {
+    mount(r, h, opt) {
       root = r;
       host = h;
+      walk = opt?.walk !== false;
       wrap = document.createElement('section');
-      wrap.className = 'hq';
+      wrap.className = walk ? 'hq' : 'hq hq-float';
       wrap.tabIndex = 0;
-      wrap.innerHTML = `<style>${css}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>`;
+      wrap.innerHTML = walk
+        ? `<style>${css}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>`
+        : `<style>${css}</style><div class="hq-over" hidden></div>`;
       root.append(wrap);
       canvas = wrap.querySelector('canvas');
       wrap.addEventListener('click', onClick);
-      wrap.addEventListener('pointerdown', onPointer);
-      window.addEventListener('pointerup', onPointer);
-      window.addEventListener('pointercancel', onPointer);
-      window.addEventListener('keydown', onKey);
-      window.addEventListener('keyup', onKey);
-      window.addEventListener('blur', blur);
+      if (walk) {
+        wrap.addEventListener('pointerdown', onPointer);
+        window.addEventListener('pointerup', onPointer);
+        window.addEventListener('pointercancel', onPointer);
+        window.addEventListener('keydown', onKey);
+        window.addEventListener('keyup', onKey);
+        window.addEventListener('blur', blur);
+      }
       render();
       void (async () => {
         const got = parseSave(await h.load().catch(() => null));
@@ -451,14 +504,34 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         wrap?.focus({ preventScroll: true });
       })();
       last = performance.now();
-      raf = requestAnimationFrame(tick);
+      if (walk) raf = requestAnimationFrame(tick);
     },
+    places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s, p.id), opens: p.opens })),
+    openPlace(id) {
+      if (!placeOpen(s, id)) return;
+      overlay = null;
+      panel = id;
+      notice = '';
+      s.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
+      void save();
+      render();
+    },
+    openMenu() {
+      overlay = 'menu';
+      notice = '';
+      void refreshSlots();
+      render();
+    },
+    isOpen: () => (walk ? !!overlay : !!(overlay || panel)),
+    close: () => (walk ? ((overlay = null), render()) : closeOne()),
     onReturn(result, l) {
       const ls = settle(s, l, result, rand);
       pending = null;
       overlay = 'settle';
-      if (result.how === 'evac') go('clinic');
-      else go('jaemtri');
+      if (walk) {
+        if (result.how === 'evac') go('clinic');
+        else go('jaemtri');
+      } else panel = null;
       overlay = 'settle';
       if (wrap) (wrap.hidden = false), wrap.focus({ preventScroll: true });
       void save();

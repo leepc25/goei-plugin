@@ -57,9 +57,9 @@ export interface HqSave {
   interviewed: string[];
   lostRelics: string[];
   /** 마지막 정산 (본부로 돌아와 다시 열면 보여 줌, 보고서 붙이기에 씀) */
-  last: null | { mission: string; agent: AgentId; how: RunResult['how']; lines: string[]; result: RunResult; day: number };
+  last: null | { runId: string; mission: string; agent: AgentId; how: RunResult['how']; lines: string[]; result: RunResult; day: number };
   /** 출동 중이면 그 출동 정보 (앱을 닫았다 열면 '출동 중' 표시) */
-  active: null | { mission: string; agent: AgentId; seed: number };
+  active: null | { runId: string; mission: string; agent: AgentId; seed: number };
   records: { bestFloors: number; bestKills: number; fastestReturn: number };
 }
 

@@ -248,7 +248,9 @@ export function launch(s: HqSave, missionId: string, seed: number): MissionLaunc
   if (s.active) return '이미 출동 중이에요.';
   const rec = s.agents[s.selected];
   const level = masteryLevel(rec.xp);
+  const runId = `${s.day}-${s.runs + 1}-${seed.toString(36)}`;
   const l: MissionLaunch = {
+    runId,
     seed,
     agent: s.selected,
     support: s.support && s.support !== s.selected && s.agents[s.support].injured === 0 ? s.support : null,
@@ -267,7 +269,7 @@ export function launch(s: HqSave, missionId: string, seed: number): MissionLaunc
   s.loadout = [null, null, null, null];
   s.coffee = null;
   s.mission = m.id;
-  s.active = { mission: m.id, agent: s.selected, seed };
+  s.active = { runId, mission: m.id, agent: s.selected, seed };
   return l;
 }
 
@@ -324,6 +326,10 @@ export const CASH_RATE = { return: 0.5, withdraw: 0.5, evac: 0 } as const;
 export const MASTERY_GAIN = (r: RunResult) => 20 + r.floors * 10 + (r.missionDone ? 30 : 0) + Math.min(30, r.kills);
 
 export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand): string[] {
+  // 같은 출동을 두 번 정산하지 않는다 (다시 열기·이중 호출)
+  const id = raw.runId ?? l.runId;
+  if (s.last?.runId === id && id) return s.last.lines;
+  if (s.active && l.runId && s.active.runId !== l.runId) return ['다른 출동의 결과라 정산하지 않았어요.'];
   const lines: string[] = [];
   const r0 = normalizeResult(raw);
   const r = { ...r0, missionDone: judgeMission(l.goal, r0) };
@@ -447,7 +453,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   s.mission = null;
   const { notes: _notes, ...lastResult } = r;
   void _notes;
-  s.last = { mission: m.id, agent: l.agent, how: r.how, lines, result: lastResult, day: s.day - 1 };
+  s.last = { runId: id ?? '', mission: m.id, agent: l.agent, how: r.how, lines, result: { ...lastResult, runId: id }, day: s.day - 1 };
   return lines;
 }
 
