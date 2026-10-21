@@ -1,0 +1,758 @@
+{
+  "date": "2026-10-22",
+  "tool": "built-in image_gen",
+  "verification_head": "6d965be2b7b0bf998679a666dfb33b938f455cfe",
+  "generated_count": 14,
+  "skipped_existing_count": 16,
+  "checks": [
+    {
+      "name": "jyaldi_face_sheet",
+      "path": "game-src/art/ui/raw/jyaldi_face_sheet.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "982507a6dc76fecddf04390605c7bc3d48b4495848a2ff22456eca6329311155",
+      "status": "generated"
+    },
+    {
+      "name": "ui_frame_sheet",
+      "path": "game-src/art/ui/raw/ui_frame_sheet.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "e0f079acc470f019bbb2b190b927a54f44144e503be2dd1ab7295a4a868a54d2",
+      "status": "generated"
+    },
+    {
+      "name": "apt_vacant_wall_2",
+      "path": "game-src/art/bg/raw/apt_vacant/apt_vacant_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "823f5421b40c81a370e0106808aa90e169aa52cbb33fee88b75e50d82b5b7f63",
+      "status": "generated"
+    },
+    {
+      "name": "apt_vacant_wall_1",
+      "path": "game-src/art/bg/raw/apt_vacant/apt_vacant_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "041afdac7a81c6413055a7ed04b001da767f322afbad612375d0b72b06562ad2",
+      "status": "generated"
+    },
+    {
+      "name": "apt_red_wall_2",
+      "path": "game-src/art/bg/raw/apt_red/apt_red_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "6916b4534e18d763f1b068fd8046bf1d328e795bcf1042f17a11aa45c2ecf9b1",
+      "status": "generated"
+    },
+    {
+      "name": "apt_red_wall_1",
+      "path": "game-src/art/bg/raw/apt_red/apt_red_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "91d0348c92f4be6d45f08561b1eeca25fbfe237d902592e26fe3967221364603",
+      "status": "generated"
+    },
+    {
+      "name": "deep_objects",
+      "path": "game-src/art/bg/raw/deep/deep_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "a2405171b59bb539395674ec6e9156f4352c7c53d6cf05e5a988cb64c4c8ba29",
+      "status": "generated"
+    },
+    {
+      "name": "deep_floor",
+      "path": "game-src/art/bg/raw/deep/deep_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "d134dac7ed3651cdcc84f8d775430c1799ff8f8773521127597c31416365fd29",
+      "status": "generated"
+    },
+    {
+      "name": "deep_wall_4",
+      "path": "game-src/art/bg/raw/deep/deep_wall_4.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "9db53acdd97cdfc55f5c7b7ae8b6968d3457c582fcd41ee4032732bc4cc50a6b",
+      "status": "generated"
+    },
+    {
+      "name": "deep_wall_3",
+      "path": "game-src/art/bg/raw/deep/deep_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "1cb767e1af74ae1c6515f443e8e081f29e6c68a0efd21a4ccd2bc8ff9adbac64",
+      "status": "generated"
+    },
+    {
+      "name": "deep_wall_2",
+      "path": "game-src/art/bg/raw/deep/deep_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "fd2b2cba850de32b60749c1228d339dd99017f3ef90c03c87a410ba5a5d9fa00",
+      "status": "generated"
+    },
+    {
+      "name": "deep_wall_1",
+      "path": "game-src/art/bg/raw/deep/deep_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "dc0309665a7da26c1dff8a8434ae996702d4f45318fd1cc774d4330a9a1792c1",
+      "status": "generated"
+    },
+    {
+      "name": "puzzle_objects",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "a94aeb4f97807cd6d824644274389c852524a0f366423bdbbffc94a19f4ee5d2",
+      "status": "generated"
+    },
+    {
+      "name": "puzzle_floor",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "f09ac6ffe7b0a8afa60f1ab54218702cff6b838fd9734176c78e1b7c80bf8873",
+      "status": "generated"
+    },
+    {
+      "name": "puzzle_wall_4",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_4.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "35031cc46a7fb4d8a360837368dd50e238a62bc193d3fa74ccd7dbdee3b0d0c6",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "puzzle_wall_3",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "ba077484e25128e08d3d96b4d3c999e144d1c8ac058812f17e7fdfcec5b87430",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "puzzle_wall_2",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "f5f74b4e1c8787abe8598e895eaea138985f9e0136dd0cd3a7e3e467566a8953",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "puzzle_wall_1",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "b36e271a559d00bb024e54e572926009bc2c24224429b8bd12b076becdacfbbb",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_objects",
+      "path": "game-src/art/bg/raw/dark/dark_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "d33a6a50ca7abdf37a8636eb8c2c2832b6cee340cc8dc34c1841f25aa1df32a7",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_floor",
+      "path": "game-src/art/bg/raw/dark/dark_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        193,
+        255
+      ],
+      "sha256": "bc845a68f96d8eed18f472dfe461cb9ea7500f23d07cac106d6d645d2f797a7e",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_wall_4",
+      "path": "game-src/art/bg/raw/dark/dark_wall_4.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "32be4c0545f7638a96ef5188371fccdfbf438f1f298be2f647318d06d42cc2f1",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_wall_3",
+      "path": "game-src/art/bg/raw/dark/dark_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "d05d32ab1fb2f67c82fb85e68d147d774a4b24d2ec35edda01e645dbaefa5c28",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_wall_2",
+      "path": "game-src/art/bg/raw/dark/dark_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "8273af22abbb718a8f176acf29e0a8494d077852d88f69a6ca0a40bdc8205d9b",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "dark_wall_1",
+      "path": "game-src/art/bg/raw/dark/dark_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "972ab0d6d0fcc5e6bc1fd431417a35d1e2cf94cc27c9b7bff0da5406c2029f90",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_objects",
+      "path": "game-src/art/bg/raw/silent/silent_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "31393c23f6a26453fc6ade935f6bff75cc1a266804cfdaf268f8658d1393ae9e",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_floor",
+      "path": "game-src/art/bg/raw/silent/silent_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        193,
+        255
+      ],
+      "sha256": "26690a5a5ba73053c883f8da1e0e750eb108dbc983060df2d04b6772a47f4cb1",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_wall_4",
+      "path": "game-src/art/bg/raw/silent/silent_wall_4.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "4736a0688c7a902e68ba6a0c1230a4739f2fa027cdffd9c78b4b3ce4972dbb6e",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_wall_3",
+      "path": "game-src/art/bg/raw/silent/silent_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "8ddfcdea6d3996288e3f21ba0bb0426705135fe8c398c244f77095d59575c621",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_wall_2",
+      "path": "game-src/art/bg/raw/silent/silent_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "f7bbda6b989bd1ab1c43e57fb175f8b01b5765135cab15072faf30d4a7f95c77",
+      "status": "skipped-existing"
+    },
+    {
+      "name": "silent_wall_1",
+      "path": "game-src/art/bg/raw/silent/silent_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "32911a5061f87ab8371ff97c1a978c896b225a721b7922324f4a77870178c119",
+      "status": "skipped-existing"
+    }
+  ],
+  "runs": [
+    {
+      "name": "jyaldi_face_sheet",
+      "path": "game-src/art/ui/raw/jyaldi_face_sheet.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n1990s arcade beat-'em-up game UI art (like Capcom's Dungeons & Dragons: Shadow over Mystara character portraits and menu frames), but for a present-day Korean paranormal agency. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines (6-8 px at this size), few large simple shapes (it will be shrunk to a tiny pixel-art screen), no painterly texture, no noise, no film grain, no blur. NOT pixel art (it will be pixelated later). Transparent background (if impossible, perfectly flat #FF00FF magenta with no shadow). NO text, letters, numbers or symbols anywhere.\n\nCHARACTER: Jyaldi, a Korean woman in her 30s, head of a paranormal response team. Long straight jet-black hair falling past the shoulders with straight-cut bangs, deep red eyes, pale skin, calm expressionless face by default, sharp tired eyes. Black trouser suit jacket, white shirt, black necktie, black leather gloves. Palette: hair #15141a/#2a2833, suit #1c1d24/#2d2f3a, shirt #e8e6e0, skin #f0d6c4/#d4b09a, eyes #d12b3a.\n\nSHEET: one 1024x1024 image split into a 2x2 grid of equal square cells (512x512 each), one portrait per cell, the SAME character, SAME camera, SAME size and position in every cell, so the four can swap in place like an arcade HUD face.\nCamera: head-and-shoulders bust, face turned 3/4 toward the viewer's RIGHT (she looks into the stage), eyes at 40% of the cell height, the head fills about 70% of the cell height, shoulders cut by the bottom edge of the cell. No background inside the cells (transparent), no frame, no border.\nCell 1 (top-left), NORMAL: calm, expressionless, mouth closed.\nCell 2 (top-right), HIT: wincing in pain, eyes squeezed half shut, teeth gritted, head jerked slightly back, a few strands of hair flying.\nCell 3 (bottom-left), DANGER (low health): exhausted and hurt, a thin line of blood from the temple down the cheek, a bruise on the cheekbone, hair messy over one eye, breathing through the mouth, still glaring.\nCell 4 (bottom-right), POWER (super move ready): cold intense stare, red eyes glowing brightly with a faint red light around them, a few hair strands lifting as if from heat, slight smirk at one corner of the mouth.\n\nPRODUCTION: Exact requested dimensions. No captions, no grid lines. Transparent background with clean alpha. Preserve all blank areas.",
+      "index": 0,
+      "head": "31ba936ddfc24edb7677bf6fc102ac1ec24394bb",
+      "total": 30,
+      "status": "generated",
+      "source": "output/ui-bg-reverse/jyaldi-face-1024.png",
+      "commit": "ada209d285a3725d17928a1de2cce2bbd27265f6",
+      "mode": "RGBA"
+    },
+    {
+      "name": "ui_frame_sheet",
+      "path": "game-src/art/ui/raw/ui_frame_sheet.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n1990s arcade beat-'em-up game UI art (like Capcom's Dungeons & Dragons: Shadow over Mystara character portraits and menu frames), but for a present-day Korean paranormal agency. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines (6-8 px at this size), few large simple shapes (it will be shrunk to a tiny pixel-art screen), no painterly texture, no noise, no film grain, no blur. NOT pixel art (it will be pixelated later). Transparent background (if impossible, perfectly flat #FF00FF magenta with no shadow). NO text, letters, numbers or symbols anywhere.\n\nSHEET: one 1536x1024 image with these separate pieces, each fully inside its own area, not touching others, all facing the viewer flat (no perspective, no rotation). Theme: an old Korean government building's elevator hall at night: dark brushed brass and gunmetal steel, small rivets, a thin warm amber inner line. Dark, low-key, so white game text stays readable on the panel center.\nPiece A (left half, about 700x700): a large rectangular MENU PANEL frame. Thick dark steel border with brass corner caps and rivets; the inside is a flat, very dark blue-grey (#141b20) solid area with NO texture and NO decoration (text will be printed on it). Corners decorated only within the corner squares; the four straight edges are a plain repeatable pattern so they can be stretched.\nPiece B (top right, about 640x96): a horizontal SELECTED ROW plate for the focused menu item: a dark bar with a glowing amber edge on top and bottom and a small brass arrow-shaped cap on the left end only. Middle part plain and stretchable.\nPiece C (right, about 200x200): a square PORTRAIT FRAME for the HUD face: thick brass-and-steel square frame, empty transparent center (the face is drawn behind it), small rivets at the four corners.\nPiece D (right, about 640x80): a long HEALTH BAR frame: a thick dark steel tube-like frame with brass end caps, empty transparent inside (the bar is drawn by code), the middle stretchable.\nPiece E (right, about 150x150): a square ITEM SLOT frame: smaller steel frame with brass corners, flat very dark inside (#141b20).\n\nPRODUCTION: Exact requested dimensions. No captions, no grid lines. Transparent background with clean alpha. Preserve all blank areas.",
+      "index": 1,
+      "head": "ada209d285a3725d17928a1de2cce2bbd27265f6",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-453cc694-52cf-4053-b8e5-7467a270a8ee.png",
+      "commit": "9367c9753f9597d860b5d980a90de305661054f9",
+      "mode": "RGBA"
+    },
+    {
+      "name": "apt_vacant_wall_2",
+      "path": "game-src/art/bg/raw/apt_vacant/apt_vacant_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the same Korean apartment complex corridor as apt_wall_1..4 (same camera, same door spacing), in two variants.\nDRAW ONLY THIS ONE IMAGE: apt_vacant_wall_2 — peeling grey walls, an unplugged old fridge pushed against the wall, a dusty mailbox row (blank).\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "apt_vacant",
+      "index": 2,
+      "head": "734dd929a1c0794ed61c2f10568ec4a8b0f12e6e",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-14f09457-c9f9-400f-bb48-0ed7d86f6a06.png",
+      "commit": "0a89c44d446b36dfd15f0964f7871e0427c5baf5",
+      "mode": "RGB"
+    },
+    {
+      "name": "apt_vacant_wall_1",
+      "path": "game-src/art/bg/raw/apt_vacant/apt_vacant_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the same Korean apartment complex corridor as apt_wall_1..4 (same camera, same door spacing), in two variants.\nDRAW ONLY THIS ONE IMAGE: apt_vacant_wall_1 — an abandoned corridor: door left ajar (dark hole), dust sheets taped over a window, an old shoe rack covered in dust.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "apt_vacant",
+      "index": 3,
+      "head": "0a89c44d446b36dfd15f0964f7871e0427c5baf5",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-bc4e2ab6-ef32-443e-b0cf-ea89444ec35d.png",
+      "commit": "321e35e403f9f2b3ed5c688d172499565bd51e49",
+      "mode": "RGB"
+    },
+    {
+      "name": "apt_red_wall_2",
+      "path": "game-src/art/bg/raw/apt_red/apt_red_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the same Korean apartment complex corridor as apt_wall_1..4 (same camera, same door spacing), in two variants.\nDRAW ONLY THIS ONE IMAGE: apt_red_wall_2 — red wallpaper corridor with an empty door frame (no door) and a red fuse box.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "apt_red",
+      "index": 4,
+      "head": "321e35e403f9f2b3ed5c688d172499565bd51e49",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-6d15b4c6-0219-4eb9-be64-d53944e2a96d.png",
+      "commit": "61e1f8dc30419191710bf5fe2b7cf78c239f5217",
+      "mode": "RGB"
+    },
+    {
+      "name": "apt_red_wall_1",
+      "path": "game-src/art/bg/raw/apt_red/apt_red_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the same Korean apartment complex corridor as apt_wall_1..4 (same camera, same door spacing), in two variants.\nDRAW ONLY THIS ONE IMAGE: apt_red_wall_1 — the corridor painted deep dull red, an apartment door with a red door frame, a dark hand-shaped mark on the wall (simple flat shape, not blood).\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "apt_red",
+      "index": 5,
+      "head": "61e1f8dc30419191710bf5fe2b7cf78c239f5217",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-5969bcff-ac9c-44b8-b5dd-55cf57af3445.png",
+      "commit": "2bc650937fb67504fa2a987a79e526bf3216baa6",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_objects",
+      "path": "game-src/art/bg/raw/deep/deep_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nOBJECT SHEET RULES\nA sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_objects — 1 a door frame standing alone, 2 a lone old wardrobe, 3 a pile of identical shoes, 4 a payphone on a post, 5 a child's tricycle, 6 an empty birdcage on a stand, 7 stack of old suitcases, 8 a ring of unlit candles, 9 a melted-looking chair.\nExactly 1536x1024. Nine equal 512x341 cells in 3 columns by 3 rows; one listed object group per cell, all visible. Flat front view, no rotation. Solid perfectly uniform #FF00FF magenta fallback background, no shadows, no halos. No grid lines or numbering.",
+      "kind": "objects",
+      "place": "deep",
+      "index": 6,
+      "head": "84f194e49709610cec4deef311079ba5b31580ec",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-b753503e-797f-4bfc-80bc-b62608055498.png",
+      "commit": "5afa493ccb508293d960097aa0addfedfc422a6d",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_floor",
+      "path": "game-src/art/bg/raw/deep/deep_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nFLOOR RULES\nSeamless tileable floor texture seen straight from above (top-down orthographic), 1024x1024. The left edge must continue into the right edge and the top into the bottom with no visible seam. Even lighting, no shadows of objects, no objects, no stains larger than a hand.\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_floor — floorboards that become apartment tiles in large patches.\nExactly 1024x1024, flat top-down orthographic, edges designed to repeat, no perspective or border. Specific requested patch/stain pattern overrides generic stain size restriction.",
+      "kind": "floor",
+      "place": "deep",
+      "index": 7,
+      "head": "5afa493ccb508293d960097aa0addfedfc422a6d",
+      "total": 30,
+      "status": "generated",
+      "source": "C:\\Users\\leepc\\.codex\\.chatgpt-projects\\g-p-6ad574b6d2408191ad09dc7eeda6768a\\output\\ui-bg-reverse\\deep_floor-sized.png",
+      "commit": "16b58b3816b98c73167d40730b1633b902ca1f19",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_wall_4",
+      "path": "game-src/art/bg/raw/deep/deep_wall_4.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_wall_4 — a wall of many old family photo frames, all blank, one large empty frame.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "deep",
+      "index": 8,
+      "head": "16b58b3816b98c73167d40730b1633b902ca1f19",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-e9806b39-a8d3-4c06-b8a9-13df582c44a0.png",
+      "commit": "990a6ab242772dda50a6c2f2688f96eff9dcbc45",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_wall_3",
+      "path": "game-src/art/bg/raw/deep/deep_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_wall_3 — a door placed too high on the wall, a small window at floor level.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "deep",
+      "index": 9,
+      "head": "990a6ab242772dda50a6c2f2688f96eff9dcbc45",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-fe6821f8-919b-4592-9621-7191727c78c7.png",
+      "commit": "b94a9b67061ea0115f3be7f0d87e78928a345368",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_wall_2",
+      "path": "game-src/art/bg/raw/deep/deep_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_wall_2 — a staircase rising up into the ceiling and ending, a handrail.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "deep",
+      "index": 10,
+      "head": "b94a9b67061ea0115f3be7f0d87e78928a345368",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-7001190e-51dd-41c2-b352-a621b3d5f061.png",
+      "commit": "d8563b35ebc9ded593da479605bc8cc10ce32c86",
+      "mode": "RGB"
+    },
+    {
+      "name": "deep_wall_1",
+      "path": "game-src/art/bg/raw/deep/deep_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: the deepest floors where several remembered places blur together: a corridor wall that turns into a house wall, a staircase going into the ceiling, doors at wrong heights. Keep it calm and eerie, NOT gory. PALETTE: dusty violet and ash grey with faded old-photo sepia.\nDRAW ONLY THIS ONE IMAGE: deep_wall_1 — an apartment corridor wall that changes halfway into old house wallpaper, a door frame with no door.\nSpecific listed contents override generic door/furniture exclusions for this requested variant. Strict flat FRONT ELEVATION, NO floor or ceiling plane, NO corridor perspective, wall fills image; bottom 4% baseboard only. Matching half-pillars at left and right edges. Exactly 1536x1024.",
+      "kind": "wall",
+      "place": "deep",
+      "index": 11,
+      "head": "d8563b35ebc9ded593da479605bc8cc10ce32c86",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-fb511efc-dd76-4d7a-8c0a-64a48a22fb8f.png",
+      "commit": "d5f47dbb8998907ee6a9b886c4796170606ce176",
+      "mode": "RGB"
+    },
+    {
+      "name": "puzzle_objects",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nOBJECT SHEET RULES\nA sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: a too-clean, repeating corridor of identical doors, like a hotel or government building copied many times; slightly wrong symmetry. PALETTE: pale mint and off-white with mustard yellow doors, black trims.\nDRAW ONLY THIS ONE IMAGE: puzzle_objects — 1 framed picture (plain landscape), 2 same framed picture hung upside down, 3 potted plant, 4 blank direction sign on a stand, 5 large wall switch box, 6 pedestal with a cube on it, 7 two identical stools, 8 small table with a bell, 9 hourglass on a stand.\nExactly 1536x1024. Nine equal 512x341 cells in 3 columns by 3 rows; one listed object group per cell, all visible. Flat front view, no rotation. Solid perfectly uniform #FF00FF magenta fallback background, no shadows, no halos. No grid lines or numbering.",
+      "kind": "objects",
+      "place": "puzzle",
+      "index": 12,
+      "head": "d5f47dbb8998907ee6a9b886c4796170606ce176",
+      "total": 30,
+      "status": "generated",
+      "source": "C:/Users/leepc/.codex/generated_images/01a15f8b-697c-7261-bd87-e4c70257512e/exec-b5e22e31-b054-45da-844e-5a0e92c18097.png",
+      "commit": "f30f2bc965fb362d0a247c3264edc66743d7dc22",
+      "mode": "RGB"
+    },
+    {
+      "name": "puzzle_floor",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nFLOOR RULES\nSeamless tileable floor texture seen straight from above (top-down orthographic), 1024x1024. The left edge must continue into the right edge and the top into the bottom with no visible seam. Even lighting, no shadows of objects, no objects, no stains larger than a hand.\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nUse exactly the STYLE, WALL BAY RULES, FLOOR RULES and OBJECT SHEET RULES from docs/GPT요청_게임배경.md, plus its CORRECTION: few large simple shapes (at most 5-8 items per wall), bold dark outlines, flat colors with 2-3 tone steps, no fine texture; object sheets: every object faces the viewer squarely (no 3/4 rotation), thin top strip only, transparent background, each object fills most of its cell. NO text, letters or numbers anywhere (signs, plates and boards stay blank). NO people, NO monsters, NO blood or gore. These are floors inside an uncanny \"dimension elevator\" building: ordinary Korean places that feel slightly wrong.\n\nPLACE: a too-clean, repeating corridor of identical doors, like a hotel or government building copied many times; slightly wrong symmetry. PALETTE: pale mint and off-white with mustard yellow doors, black trims.\nDRAW ONLY THIS ONE IMAGE: puzzle_floor — checkerboard of large mint and white tiles.\nExactly 1024x1024, flat top-down orthographic, edges designed to repeat, no perspective or border. Specific requested patch/stain pattern overrides generic stain size restriction.",
+      "kind": "floor",
+      "place": "puzzle",
+      "index": 13,
+      "head": "f30f2bc965fb362d0a247c3264edc66743d7dc22",
+      "total": 30,
+      "status": "generated",
+      "source": "C:\\Users\\leepc\\.codex\\.chatgpt-projects\\g-p-6ad574b6d2408191ad09dc7eeda6768a\\output\\ui-bg-reverse\\puzzle_floor-sized.png",
+      "commit": "6d965be2b7b0bf998679a666dfb33b938f455cfe",
+      "mode": "RGB"
+    },
+    {
+      "index": 14,
+      "name": "puzzle_wall_4",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_4.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 15,
+      "name": "puzzle_wall_3",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_3.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 16,
+      "name": "puzzle_wall_2",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_2.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 17,
+      "name": "puzzle_wall_1",
+      "path": "game-src/art/bg/raw/puzzle/puzzle_wall_1.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 18,
+      "name": "dark_objects",
+      "path": "game-src/art/bg/raw/dark/dark_objects.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 19,
+      "name": "dark_floor",
+      "path": "game-src/art/bg/raw/dark/dark_floor.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 20,
+      "name": "dark_wall_4",
+      "path": "game-src/art/bg/raw/dark/dark_wall_4.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 21,
+      "name": "dark_wall_3",
+      "path": "game-src/art/bg/raw/dark/dark_wall_3.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 22,
+      "name": "dark_wall_2",
+      "path": "game-src/art/bg/raw/dark/dark_wall_2.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 23,
+      "name": "dark_wall_1",
+      "path": "game-src/art/bg/raw/dark/dark_wall_1.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 24,
+      "name": "silent_objects",
+      "path": "game-src/art/bg/raw/silent/silent_objects.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 25,
+      "name": "silent_floor",
+      "path": "game-src/art/bg/raw/silent/silent_floor.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 26,
+      "name": "silent_wall_4",
+      "path": "game-src/art/bg/raw/silent/silent_wall_4.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 27,
+      "name": "silent_wall_3",
+      "path": "game-src/art/bg/raw/silent/silent_wall_3.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 28,
+      "name": "silent_wall_2",
+      "path": "game-src/art/bg/raw/silent/silent_wall_2.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    },
+    {
+      "index": 29,
+      "name": "silent_wall_1",
+      "path": "game-src/art/bg/raw/silent/silent_wall_1.png",
+      "status": "skipped-existing",
+      "head": "6d965be2b7b0bf998679a666dfb33b938f455cfe"
+    }
+  ],
+  "notes": [
+    "Each candidate checked against freshly fetched main before generation; each accepted generated PNG committed and pushed separately. Existing files were skipped in reverse order.",
+    "Square tool outputs were proportionally exported to requested 1024x1024 with FFmpeg Lanczos; generated source retained.",
+    "UI portrait retried to remove hand pose and face toward viewer right; original Jyaldi_default identity was visually inspected. Final sheet newly generated without image input.",
+    "UI frame sampled portrait and health-bar centers have alpha 0; panel center opaque.",
+    "Apartment variant walls use apt_wall_1 architecture reference; subsequent same-place walls use newly generated same-place wall references. Deep wall 4 anchors the four deep walls.",
+    "Deep objects empty door frame was corrected by removing generated door leaf.",
+    "Raw generated backgrounds may contain small color variations, wall edge/baseboard differences and non-exact floor seams. Pixelization, chroma removal, seam work, anchors and runtime integration are downstream tasks from the request."
+  ]
+}
