@@ -196,3 +196,14 @@ export interface RunResultCore {
   hpLeft: number;
   notes: Record<string, unknown>;
 }
+
+/** 본부 모듈 모양 (hq/). 엔진이 DOM 한 칸을 주고, 출동 버튼에서 deploy를 부르게 한다 */
+export interface HqHostCore {
+  deploy(run: RunConfigCore): void;
+  stages(): { id: string; label: string }[];
+}
+export interface HqModuleLike {
+  mount(root: HTMLElement, host: HqHostCore): void;
+  onReturn(result: RunResultCore, run: RunConfigCore): void;
+  unmount(): void;
+}

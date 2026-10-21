@@ -130,6 +130,21 @@ await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, for
   writeFileSync('release/demo/goei-graybox.html', html);
 }
 
+// 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
+await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/engine-demo.js' });
+{
+  const art = {
+    atlas: `data:image/png;base64,${readFileSync('game-pack/jyaldi/atlas.png').toString('base64')}`,
+    cutin: `data:image/png;base64,${readFileSync('game-pack/jyaldi/cutin.png').toString('base64')}`,
+    frames: JSON.parse(readFileSync('game-pack/jyaldi/frames.json', 'utf8')),
+  };
+  const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)}</script><script type="module">${code}</script></html>`;
+  writeFileSync('dist/goei-action-game.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-action-game.html', html);
+}
+
 await build({
   ...common,
   entryPoints: ['src/game/action/motion-demo.ts'],
