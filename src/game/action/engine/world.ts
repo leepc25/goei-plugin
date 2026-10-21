@@ -386,7 +386,8 @@ export class World implements WorldView {
       p.onConnect(this, !!r.killed);
       if (r.killed) this.kills++;
     }
-    this.emit({ type: 'hit', strength, x: at.x, y: at.y, z: at.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0 });
+    const mk = a.kind === 'bullet' ? 'bullet' : a !== p ? 'enemy' : ({ airkick: 'kick', lowkick: 'low', dash: 'dash', blast: 'blast', groundblast: 'blast', grabblast: 'blast', super: 'super', grabknee: 'kick' } as Record<string, 'kick' | 'low' | 'dash' | 'blast' | 'super'>)[p.moveKey] ?? 'punch';
+    this.emit({ type: 'hit', strength, x: at.x, y: at.y, z: at.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0, kind: mk });
     if (r.killed && t.team === 'enemy' && !(t instanceof Fighter)) this.emit({ type: 'enemyDie', x: t.x, kind: t.kind });
     if (a === p && p.moveKey === 'grabknee') p.keepHeld();
   }

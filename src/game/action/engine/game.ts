@@ -18,6 +18,10 @@ export interface EngineModules {
   hud?: boolean;
   /** 그리기 뒤에 덧그리기 (ui 모듈 HUD 등) */
   overlay?: (ctx: CanvasRenderingContext2D, world: World | null) => void;
+  /** 장면 바뀜: 'title' | 'hq' | 'battle' | 'result' */
+  onScene?: (name: string) => void;
+  onPause?: (paused: boolean) => void;
+  dispose?: () => void;
 }
 
 interface Scene {
@@ -42,6 +46,7 @@ export class Game {
   private runStart = 0;
   lastResult: RunResultCore | null = null;
   private hqRoot: HTMLElement | null = null;
+  private wasPaused = false;
 
   constructor(
     readonly box: HTMLElement,
@@ -74,6 +79,10 @@ export class Game {
         this.acc -= T;
         this.tickOnce();
       }
+      if (this.paused !== this.wasPaused) {
+        this.wasPaused = this.paused;
+        this.mods.onPause?.(this.paused);
+      }
       this.scene.draw(this.acc / T);
       this.mods.overlay?.(this.ctx, this.world);
     };
@@ -97,6 +106,7 @@ export class Game {
     this.input.detach();
     this.canvas.remove();
     this.closeHq();
+    this.mods.dispose?.();
   }
 
   /* ───────── 본부 ───────── */
@@ -109,6 +119,7 @@ export class Game {
     this.box.appendChild(this.hqRoot);
     this.canvas.style.visibility = 'hidden';
     this.input.detach();
+    this.mods.onScene?.('hq');
     hq.mount(this.hqRoot, {
       deploy: (run) => {
         this.closeHq();
@@ -141,6 +152,7 @@ export class Game {
     this.runStart = performance.now();
     this.paused = false;
     this.scene = this.battleScene(w);
+    this.mods.onScene?.('battle');
   }
 
   private endRun(how: RunResultCore['how']) {
@@ -164,6 +176,7 @@ export class Game {
       return;
     }
     this.scene = this.resultScene(result);
+    this.mods.onScene?.('result');
   }
 
   private battleScene(w: World): Scene {
@@ -257,6 +270,7 @@ export class Game {
   }
 
   private titleScene(): Scene {
+    this.mods.onScene?.('title');
     this.menuIndex = 0;
     this.menuItems = [];
     const stages = this.mods.stages;

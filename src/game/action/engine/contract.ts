@@ -66,7 +66,7 @@ export interface Body {
 
 /** 이벤트 이름은 효과음 스레드 목록과 같다. 소리·화면 효과·대사·층 모듈 모두 이 하나의 흐름을 듣는다 */
 export type GameEvent =
-  | { type: 'hit'; strength: 1 | 2 | 3; x: number; y: number; z: number; dmg: number; react: React; target: string; combo: number }
+  | { type: 'hit'; strength: 1 | 2 | 3; x: number; y: number; z: number; dmg: number; react: React; target: string; combo: number; kind?: 'punch' | 'kick' | 'low' | 'dash' | 'bullet' | 'blast' | 'super' | 'enemy' }
   | { type: 'whiff' | 'jump' | 'land' | 'evade' | 'step'; x: number }
   | { type: 'shot'; x: number; ammo: number }
   | { type: 'empty' | 'reload'; x: number }

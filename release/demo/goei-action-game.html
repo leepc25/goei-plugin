@@ -122,18 +122,18 @@ var Input = class {
     this.edgesUp.clear();
     const mx = (held.has("right") ? 1 : 0) - (held.has("left") ? 1 : 0);
     const my = (held.has("down") ? 1 : 0) - (held.has("up") ? 1 : 0);
-    let evade = false;
+    let evade2 = false;
     if (pressed.has("shift")) this.shiftTicks = 0;
     else if (this.shiftTicks >= 0 && held.has("shift")) this.shiftTicks++;
     if (released.has("shift")) {
-      if (this.shiftTicks >= 0 && this.shiftTicks < SHIFT_TAP) evade = true;
+      if (this.shiftTicks >= 0 && this.shiftTicks < SHIFT_TAP) evade2 = true;
       this.shiftTicks = -1;
     }
-    for (const d of ["left", "right"]) {
-      if (pressed.has(d)) {
-        const dir = d === "right" ? 1 : -1;
-        if (this.tick - (this.lastTap[d] ?? -99) <= DOUBLE_TAP) this.dashDir = dir;
-        this.lastTap[d] = this.tick;
+    for (const d2 of ["left", "right"]) {
+      if (pressed.has(d2)) {
+        const dir = d2 === "right" ? 1 : -1;
+        if (this.tick - (this.lastTap[d2] ?? -99) <= DOUBLE_TAP) this.dashDir = dir;
+        this.lastTap[d2] = this.tick;
       }
     }
     if (mx === 0 || mx !== this.dashDir) this.dashDir = mx !== 0 && mx === this.dashDir ? this.dashDir : 0;
@@ -143,7 +143,7 @@ var Input = class {
       this.lastTap.down = this.tick;
     }
     const run = held.has("shift") && this.shiftTicks >= SHIFT_TAP && mx !== 0 || this.dashDir !== 0 && mx === this.dashDir;
-    return { held, pressed, released, mx, my, evade, run, downDouble };
+    return { held, pressed, released, mx, my, evade: evade2, run, downDouble };
   }
 };
 
@@ -167,8 +167,8 @@ function makeRenderer(ctx, art, opt) {
     const wallTop = 110;
     ctx.fillStyle = pal.wall;
     ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
-    const step = 320;
-    for (let x = Math.floor(camX / step) * step; x < camX + SCREEN_W + step; x += step) {
+    const step2 = 320;
+    for (let x = Math.floor(camX / step2) * step2; x < camX + SCREEN_W + step2; x += step2) {
       const sx = x - camX;
       ctx.fillStyle = "rgba(0,0,0,0.22)";
       ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
@@ -406,17 +406,17 @@ function makeRenderer(ctx, art, opt) {
       ctx.fillText(`${p.combo} HIT`, SCREEN_W - 30, 80);
       ctx.restore();
     }
-    const boss = w.boss();
-    if (boss) {
+    const boss2 = w.boss();
+    if (boss2) {
       ctx.fillStyle = "rgba(0,0,0,0.6)";
       ctx.fillRect(240, SCREEN_H - 62, 800, 40);
       ctx.fillStyle = "#e8eef0";
       ctx.font = "bold 18px sans-serif";
-      ctx.fillText(boss.label, 252, SCREEN_H - 36);
+      ctx.fillText(boss2.label, 252, SCREEN_H - 36);
       ctx.fillStyle = "#5a1e1e";
       ctx.fillRect(470, SCREEN_H - 50, 556, 16);
       ctx.fillStyle = "#ff5148";
-      ctx.fillRect(470, SCREEN_H - 50, 556 * boss.hp / boss.hpMax, 16);
+      ctx.fillRect(470, SCREEN_H - 50, 556 * boss2.hp / boss2.hpMax, 16);
     }
   }
   function overlayText(w) {
@@ -594,32 +594,32 @@ var Fighter = class {
     this.until = until;
   }
   /** 맞음: 피해·반응·넉백. 가드·아머는 하위 클래스가 먼저 거른다 */
-  applyHit(hit, world) {
+  applyHit(hit2, world) {
     if (!this.alive || this.phase === "dead" || this.invuln > 0 || this.phase === "getup") return { kind: "immune" };
-    if (this.phase === "down" && this.z <= 0 && !hit.low) return { kind: "immune" };
-    this.hp = Math.max(0, this.hp - hit.dmg);
+    if (this.phase === "down" && this.z <= 0 && !hit2.low) return { kind: "immune" };
+    this.hp = Math.max(0, this.hp - hit2.dmg);
     this.flash = 3;
-    this.dir = -hit.dir;
+    this.dir = -hit2.dir;
     const killed = this.hp <= 0;
-    let react = hit.react;
+    let react = hit2.react;
     if (killed && react !== "none") react = "down";
     const rank = { none: 0, flinch: 1, stagger: 2, launch: 2, down: 3, bind: 3 }[react];
-    if (!killed && this.armor > 0 && !hit.armorBreak && rank <= this.armor) {
+    if (!killed && this.armor > 0 && !hit2.armorBreak && rank <= this.armor) {
       return { kind: "armor" };
     }
-    const push = hit.push ?? 4;
+    const push = hit2.push ?? 4;
     if (this.airborne && react !== "none") {
       this.juggle++;
-      this.vx = hit.dir * push;
-      this.vz = this.juggle <= MAX_JUGGLE ? Math.max(this.vz, (hit.lift ?? 10) * 0.8) : Math.min(this.vz, 0);
+      this.vx = hit2.dir * push;
+      this.vz = this.juggle <= MAX_JUGGLE ? Math.max(this.vz, (hit2.lift ?? 10) * 0.8) : Math.min(this.vz, 0);
       this.enter("air-hurt");
-      if (react === "down" || killed) this.vz = Math.max(this.vz, hit.lift ?? 10);
+      if (react === "down" || killed) this.vz = Math.max(this.vz, hit2.lift ?? 10);
     } else if (react === "flinch" || react === "stagger") {
-      this.vx = hit.dir * push;
+      this.vx = hit2.dir * push;
       this.enter("hurt", REACT_TICKS[react]);
     } else if (react === "launch" || react === "down") {
-      this.vx = hit.dir * push;
-      this.vz = hit.lift ?? (react === "launch" ? 16 : 11);
+      this.vx = hit2.dir * push;
+      this.vz = hit2.lift ?? (react === "launch" ? 16 : 11);
       this.z = Math.max(this.z, 1);
       this.juggle = 1;
       this.enter("air-hurt");
@@ -707,8 +707,8 @@ var Dummy = class extends Fighter {
     const lying = this.phase === "down";
     return { hit: [], hurt: [toWorld(this, -22, 22, 0, lying ? 30 : 170)] };
   }
-  applyHit(hit, world) {
-    const r = super.applyHit(hit, world);
+  applyHit(hit2, world) {
+    const r = super.applyHit(hit2, world);
     if (this.endless) {
       if (this.hp <= 0) this.hp = 1;
       if (this.phase === "dead") this.enter("down", 20);
@@ -755,13 +755,13 @@ var Thug = class extends Fighter {
   frame() {
     if (this.phase === "dead") return { hit: [], hurt: [] };
     const lying = this.phase === "down" || this.phase === "air-hurt" && this.z < 20;
-    const hurt = [toWorld(this, -24, 24, 0, lying ? 34 : this.tall)];
-    const hit = [];
+    const hurt2 = [toWorld(this, -24, 24, 0, lying ? 34 : this.tall)];
+    const hit2 = [];
     if (this.phase === "free" && this.ai === "strike" && this.aiT < 3) {
       const reach = this.boss ? 120 : 92;
-      hit.push({ ...toWorld(this, 10, reach, 90, 140, 16), attackId: this.atk, dmg: this.dmg, react: this.boss ? "down" : "stagger", dir: this.dir, push: this.boss ? 10 : 6, lift: 10, stop: 4, strength: 2 });
+      hit2.push({ ...toWorld(this, 10, reach, 90, 140, 16), attackId: this.atk, dmg: this.dmg, react: this.boss ? "down" : "stagger", dir: this.dir, push: this.boss ? 10 : 6, lift: 10, stop: 4, strength: 2 });
     }
-    return { hit, hurt };
+    return { hit: hit2, hurt: hurt2 };
   }
   onKilled(world) {
     world.emit({ type: "enemyDie", x: this.x, kind: this.kind });
@@ -1067,13 +1067,13 @@ var Player = class extends Fighter {
   frame() {
     const { info, origin } = this.frameInfo();
     const P = PIXEL;
-    const hurt = [];
+    const hurt2 = [];
     if (this.alive && this.phase !== "dead") {
       const h = info?.hurt;
-      if (h) hurt.push(toWorld(this, (h[0] - origin) * P, (h[1] - origin) * P, h[2] * P, h[3] * P, 16));
-      else hurt.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
+      if (h) hurt2.push(toWorld(this, (h[0] - origin) * P, (h[1] - origin) * P, h[2] * P, h[3] * P, 16));
+      else hurt2.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
     }
-    const hit = [];
+    const hit2 = [];
     if (this.move?.hits && this.phase === "free") {
       for (const mh of this.move.hits) {
         if (!mh.at.includes(this.mf)) continue;
@@ -1081,7 +1081,7 @@ var Player = class extends Fighter {
         if (!r) continue;
         const o = mh.box ? 0 : origin;
         const w = toWorld(this, (r[0] - o) * P, (r[1] - o) * P, r[2] * P, r[3] * P, mh.dy ?? 20);
-        hit.push({
+        hit2.push({
           ...w,
           attackId: this.attackId,
           dmg: mh.dmg,
@@ -1097,7 +1097,7 @@ var Player = class extends Fighter {
         });
       }
     }
-    return { hit, hurt };
+    return { hit: hit2, hurt: hurt2 };
   }
   /** 지금 보여 줄 클립·장 */
   anim() {
@@ -1132,13 +1132,13 @@ var Player = class extends Fighter {
     return this.gunOut > 0 ? loop("guard", 6) : loop("idle", 7);
   }
   /* ───────── 맞음 ───────── */
-  applyHit(hit, world) {
+  applyHit(hit2, world) {
     if (this.invuln > 0 || this.move?.invuln && this.mf >= this.move.invuln[0] && this.mf <= this.move.invuln[1]) return { kind: "immune" };
-    const front = hit.dir === -this.dir;
-    const blockable = !hit.grab && (!hit.low || this.crouching);
+    const front = hit2.dir === -this.dir;
+    const blockable = !hit2.grab && (!hit2.low || this.crouching);
     if (this.guarding && front && blockable && this.phase === "free") {
-      this.guardMeter -= (hit.dmg ?? 0) * 2.4;
-      this.x += hit.dir * Math.max(3, (hit.push ?? 4) * 1.6);
+      this.guardMeter -= (hit2.dmg ?? 0) * 2.4;
+      this.x += hit2.dir * Math.max(3, (hit2.push ?? 4) * 1.6);
       world.emit({ type: "guard", x: this.x });
       world.fx("ring", this.x + this.dir * 36, this.y, 90);
       if (this.guardMeter <= 0) {
@@ -1154,10 +1154,10 @@ var Player = class extends Fighter {
     this.armor = armorFrame;
     this.cancelMove();
     if (this.grabbed) this.releaseGrab();
-    const r = super.applyHit(hit, world);
+    const r = super.applyHit(hit2, world);
     if (r.kind === "hit" || r.kind === "armor") {
       this.gauge = Math.min(100, this.gauge + 4);
-      world.emit({ type: "hurt", x: this.x, dmg: hit.dmg, hp: this.hp });
+      world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
       if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
         this.lowWarned = true;
         world.emit({ type: "hp:low" });
@@ -1189,8 +1189,8 @@ var Player = class extends Fighter {
     else if (!this.airborne) this.vx = 0;
     this.vy = 0;
     this.skipZeroFrames();
-    const ability = key === "blast" || key === "groundblast" || key === "grabblast";
-    world.emit(ability ? { type: "ability", x: this.x, move: key } : key === "super" ? { type: "super", x: this.x, move: key } : key === "evade" ? { type: "evade", x: this.x } : { type: "custom", name: "move", data: key });
+    const ability2 = key === "blast" || key === "groundblast" || key === "grabblast";
+    world.emit(ability2 ? { type: "ability", x: this.x, move: key } : key === "super" ? { type: "super", x: this.x, move: key } : key === "evade" ? { type: "evade", x: this.x } : { type: "custom", name: "move", data: key });
   }
   skipZeroFrames() {
     const m = this.move;
@@ -1732,8 +1732,8 @@ var World = class {
     const p = this.player;
     let best = null;
     for (const pr of this.props) {
-      const d = Math.abs(pr.x - p.x);
-      if (d < 60 && (!best || d < Math.abs(best.x - p.x))) best = pr;
+      const d2 = Math.abs(pr.x - p.x);
+      if (d2 < 60 && (!best || d2 < Math.abs(best.x - p.x))) best = pr;
     }
     if (best && this.stage?.onInteract) {
       p.play("pickup", this);
@@ -1836,7 +1836,8 @@ var World = class {
       p.onConnect(this, !!r.killed);
       if (r.killed) this.kills++;
     }
-    this.emit({ type: "hit", strength, x: at.x, y: at.y, z: at.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0 });
+    const mk = a.kind === "bullet" ? "bullet" : a !== p ? "enemy" : { airkick: "kick", lowkick: "low", dash: "dash", blast: "blast", groundblast: "blast", grabblast: "blast", super: "super", grabknee: "kick" }[p.moveKey] ?? "punch";
+    this.emit({ type: "hit", strength, x: at.x, y: at.y, z: at.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0, kind: mk });
     if (r.killed && t.team === "enemy" && !(t instanceof Fighter)) this.emit({ type: "enemyDie", x: t.x, kind: t.kind });
     if (a === p && p.moveKey === "grabknee") p.keepHeld();
   }
@@ -1924,6 +1925,7 @@ var Game = class {
   runStart = 0;
   lastResult = null;
   hqRoot = null;
+  wasPaused = false;
   start() {
     const frame = (now) => {
       this.raf = requestAnimationFrame(frame);
@@ -1936,6 +1938,10 @@ var Game = class {
       while (this.acc >= T2) {
         this.acc -= T2;
         this.tickOnce();
+      }
+      if (this.paused !== this.wasPaused) {
+        this.wasPaused = this.paused;
+        this.mods.onPause?.(this.paused);
       }
       this.scene.draw(this.acc / T2);
       this.mods.overlay?.(this.ctx, this.world);
@@ -1957,17 +1963,19 @@ var Game = class {
     this.input.detach();
     this.canvas.remove();
     this.closeHq();
+    this.mods.dispose?.();
   }
   /* ───────── 본부 ───────── */
   openHq() {
-    const hq = this.mods.hq;
-    if (!hq) return;
+    const hq2 = this.mods.hq;
+    if (!hq2) return;
     this.hqRoot = document.createElement("div");
     this.hqRoot.className = "goei-engine-hq";
     this.box.appendChild(this.hqRoot);
     this.canvas.style.visibility = "hidden";
     this.input.detach();
-    hq.mount(this.hqRoot, {
+    this.mods.onScene?.("hq");
+    hq2.mount(this.hqRoot, {
       deploy: (run) => {
         this.closeHq();
         this.deploy(run);
@@ -1996,6 +2004,7 @@ var Game = class {
     this.runStart = performance.now();
     this.paused = false;
     this.scene = this.battleScene(w);
+    this.mods.onScene?.("battle");
   }
   endRun(how) {
     const w = this.world;
@@ -2018,6 +2027,7 @@ var Game = class {
       return;
     }
     this.scene = this.resultScene(result);
+    this.mods.onScene?.("result");
   }
   battleScene(w) {
     return {
@@ -2065,14 +2075,14 @@ var Game = class {
       else this.scene = this.titleScene();
     }
   }
-  drawMenu(title, items) {
+  drawMenu(title2, items) {
     const c = this.ctx;
     c.fillStyle = "rgba(0,0,0,0.6)";
     c.fillRect(0, 0, SCREEN_W, SCREEN_H);
     c.fillStyle = "#e8eef0";
     c.textAlign = "center";
     c.font = "bold 44px sans-serif";
-    c.fillText(title, SCREEN_W / 2, 210);
+    c.fillText(title2, SCREEN_W / 2, 210);
     c.font = "30px sans-serif";
     items.forEach((t, i) => {
       const y = 300 + i * 64;
@@ -2102,6 +2112,7 @@ var Game = class {
     this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id });
   }
   titleScene() {
+    this.mods.onScene?.("title");
     this.menuIndex = 0;
     this.menuItems = [];
     const stages = this.mods.stages;
@@ -2191,6 +2202,2219 @@ var Game = class {
   }
 };
 
+// src/game/action/audio/engine.ts
+var BUSES = ["master", "music", "sfx", "amb", "ui"];
+var DEFAULT_SETTINGS = { master: 0.8, music: 0.55, sfx: 0.9, amb: 0.7, ui: 0.6, muted: false };
+function cleanSettings(x) {
+  const o = x && typeof x === "object" ? x : {};
+  const out = { ...DEFAULT_SETTINGS };
+  for (const b of BUSES) {
+    const v = Number(o[b]);
+    if (Number.isFinite(v)) out[b] = Math.min(1, Math.max(0, v));
+  }
+  out.muted = o.muted === true;
+  return out;
+}
+var sliderGain = (v) => v * v;
+function makeNoise(ctx, sec, brown = false) {
+  const len = Math.floor(ctx.sampleRate * sec);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d2 = buf.getChannelData(0);
+  let seed = brown ? 7 : 3;
+  const rnd3 = () => (seed = seed * 1103515245 + 12345 >>> 0) / 4294967296 * 2 - 1;
+  let last = 0;
+  for (let i = 0; i < len; i++) {
+    const w = rnd3();
+    if (brown) {
+      last = (last + 0.02 * w) / 1.02;
+      d2[i] = last * 3.5;
+    } else d2[i] = w;
+  }
+  const fade = Math.min(2e3, len >> 3);
+  for (let i = 0; i < fade; i++) {
+    const a = i / fade;
+    d2[len - fade + i] = d2[len - fade + i] * (1 - a) + d2[i] * a;
+  }
+  return buf;
+}
+function makeImpulse(ctx, sec, decay, dark2 = 0.5) {
+  const len = Math.floor(ctx.sampleRate * sec);
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const d2 = buf.getChannelData(c);
+    let lp = 0;
+    let seed = 17 + c * 31;
+    for (let i = 0; i < len; i++) {
+      seed = seed * 1664525 + 1013904223 >>> 0;
+      const w = seed / 2147483648 - 1;
+      lp = lp + (w - lp) * (1 - dark2 * (i / len));
+      d2[i] = lp * Math.pow(1 - i / len, decay);
+    }
+  }
+  return buf;
+}
+var curves = /* @__PURE__ */ new Map();
+function driveCurve(k) {
+  let c = curves.get(k);
+  if (c) return c;
+  c = new Float32Array(1024);
+  for (let i = 0; i < 1024; i++) {
+    const x = i / 1023 * 2 - 1;
+    c[i] = (1 + k) * x / (1 + k * Math.abs(x));
+  }
+  curves.set(k, c);
+  return c;
+}
+var mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+function voice(o, dest, t, vol = 1, pan = 0, verb = 0, room = 0) {
+  const ctx = o.ctx;
+  const g = ctx.createGain();
+  g.gain.value = vol;
+  let tail = g;
+  if (pan) {
+    const p = ctx.createStereoPanner();
+    p.pan.value = Math.max(-1, Math.min(1, pan));
+    g.connect(p);
+    tail = p;
+  }
+  tail.connect(dest);
+  if (verb > 0) {
+    const s = ctx.createGain();
+    s.gain.value = verb;
+    tail.connect(s).connect(o.verb);
+  }
+  if (room > 0) {
+    const s = ctx.createGain();
+    s.gain.value = room;
+    tail.connect(s).connect(o.room);
+  }
+  void t;
+  return g;
+}
+function perc(p, t, a, peak, d2) {
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(1e-4, t);
+  p.linearRampToValueAtTime(peak, t + Math.max(1e-3, a));
+  p.exponentialRampToValueAtTime(1e-4, t + a + Math.max(5e-3, d2));
+}
+function adsr(p, t, a, d2, s, hold, r, peak = 1) {
+  p.cancelScheduledValues(t);
+  p.setValueAtTime(1e-4, t);
+  p.linearRampToValueAtTime(peak, t + Math.max(2e-3, a));
+  p.setTargetAtTime(peak * s, t + a, Math.max(3e-3, d2 / 3));
+  const end = t + Math.max(a + 5e-3, hold);
+  p.setTargetAtTime(1e-4, end, Math.max(5e-3, r / 4));
+  return end + r;
+}
+function osc(o, type, f, t, dur, dest) {
+  const n = o.ctx.createOscillator();
+  n.type = type;
+  n.frequency.setValueAtTime(f, t);
+  n.connect(dest);
+  n.start(t);
+  n.stop(t + dur + 0.05);
+  return n;
+}
+function noise(o, t, dur, dest, brown = false, rate = 1) {
+  const n = o.ctx.createBufferSource();
+  n.buffer = brown ? o.brown : o.noise;
+  n.loop = true;
+  n.playbackRate.value = rate;
+  n.connect(dest);
+  n.start(t, Math.random() * 1.5);
+  n.stop(t + dur + 0.05);
+  return n;
+}
+function filt(o, type, f, q = 0.7, dest) {
+  const n = o.ctx.createBiquadFilter();
+  n.type = type;
+  n.frequency.value = f;
+  n.Q.value = q;
+  if (dest) n.connect(dest);
+  return n;
+}
+function gainNode(o, v, dest) {
+  const g = o.ctx.createGain();
+  g.gain.value = v;
+  if (dest) g.connect(dest);
+  return g;
+}
+function shaper(o, k, dest) {
+  const n = o.ctx.createWaveShaper();
+  n.curve = driveCurve(k);
+  n.oversample = "2x";
+  if (dest) n.connect(dest);
+  return n;
+}
+function buildGraph(ctx, dest) {
+  const comp2 = ctx.createDynamicsCompressor();
+  comp2.threshold.value = -10;
+  comp2.knee.value = 8;
+  comp2.ratio.value = 6;
+  comp2.attack.value = 3e-3;
+  comp2.release.value = 0.18;
+  const master = ctx.createGain();
+  master.connect(comp2).connect(dest);
+  const bus = (v) => {
+    const g = ctx.createGain();
+    g.gain.value = v;
+    g.connect(master);
+    return g;
+  };
+  const music = bus(1);
+  const sfx = bus(1);
+  const amb = bus(1);
+  const ui = bus(1);
+  const duck = ctx.createGain();
+  duck.connect(music);
+  const verb = ctx.createConvolver();
+  verb.buffer = makeImpulse(ctx, 2.6, 2.4, 0.7);
+  const verbOut = ctx.createGain();
+  verbOut.gain.value = 0.55;
+  verb.connect(verbOut).connect(master);
+  const room = ctx.createConvolver();
+  room.buffer = makeImpulse(ctx, 0.45, 3, 0.3);
+  const roomOut = ctx.createGain();
+  roomOut.gain.value = 0.5;
+  room.connect(roomOut).connect(master);
+  const out = {
+    ctx,
+    sfx,
+    ui,
+    music: duck,
+    amb,
+    verb,
+    room,
+    noise: makeNoise(ctx, 2),
+    brown: makeNoise(ctx, 4, true)
+  };
+  return { out, gains: { master, music, sfx, amb, ui }, duck, comp: comp2 };
+}
+
+// src/game/action/audio/sfx.ts
+var rnd = (a, b) => a + Math.random() * (b - a);
+function thump(o, t, dest, f0, f1, dur, vol) {
+  const g = gainNode(o, 0, dest);
+  perc(g.gain, t, 2e-3, vol, dur);
+  const n = osc(o, "sine", f0, t, dur, g);
+  n.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur * 0.8);
+}
+function burst(o, t, dest, type, f, q, dur, vol, a = 1e-3) {
+  const g = gainNode(o, 0, dest);
+  perc(g.gain, t, a, vol, dur);
+  const fl = filt(o, type, f, q, g);
+  noise(o, t, dur + a, fl);
+  return fl;
+}
+function tone(o, t, dest, type, f, dur, vol, a = 3e-3) {
+  const g = gainNode(o, 0, dest);
+  perc(g.gain, t, a, vol, dur);
+  return osc(o, type, f, t, dur + a, g);
+}
+function bell(o, t, dest, f, dur, vol, ratio = 3.5, index = 3) {
+  const g = gainNode(o, 0, dest);
+  perc(g.gain, t, 2e-3, vol, dur);
+  const car = osc(o, "sine", f, t, dur, g);
+  const mg = gainNode(o, 0);
+  mg.gain.setValueAtTime(f * index, t);
+  mg.gain.exponentialRampToValueAtTime(f * 0.05, t + dur);
+  mg.connect(car.frequency);
+  osc(o, "sine", f * ratio, t, dur, mg);
+}
+function swoosh(o, t, dest, f0, f1, dur, vol) {
+  const g = gainNode(o, 0, dest);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(vol, t + dur * 0.35);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  const fl = filt(o, "bandpass", f0, 1.4, g);
+  fl.frequency.setValueAtTime(f0, t);
+  fl.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.4);
+  fl.frequency.exponentialRampToValueAtTime(f0 * 0.7, t + dur);
+  noise(o, t, dur, fl);
+}
+function hit(level) {
+  return (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.08 * level, 0.25);
+    const k = p.pitch * rnd(0.95, 1.05);
+    const len = [0.1, 0.16, 0.28][level - 1];
+    thump(o, t, v, [150, 130, 110][level - 1] * k, 40, len, [0.8, 0.95, 1.1][level - 1]);
+    burst(o, t, v, "bandpass", [2600, 2e3, 1500][level - 1] * k, 1.2, [0.03, 0.045, 0.07][level - 1], [0.7, 0.8, 0.9][level - 1]);
+    const body = gainNode(o, 0, v);
+    perc(body.gain, t, 1e-3, 0.35 + level * 0.1, len * 0.7);
+    const sh = shaper(o, 4 + level * 6, body);
+    const b = osc(o, "triangle", 320 * k, t, len, sh);
+    b.frequency.exponentialRampToValueAtTime(90 * k, t + len * 0.6);
+    if (level === 3) {
+      thump(o, t + 0.012, v, 70, 30, 0.35, 0.8);
+      burst(o, t, v, "lowpass", 900, 0.7, 0.22, 0.5);
+    }
+    return len + 0.4;
+  };
+}
+var whiff = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  swoosh(o, t, v, 600 * p.pitch, 2400 * p.pitch, 0.16, 0.45);
+  return 0.2;
+};
+var swingHeavy = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  swoosh(o, t, v, 300 * p.pitch, 1400 * p.pitch, 0.28, 0.6);
+  return 0.3;
+};
+var kick = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.2);
+  swoosh(o, t, v, 500, 1800, 0.12, 0.35);
+  thump(o, t + 0.08, v, 140 * p.pitch, 45, 0.14, 0.9);
+  burst(o, t + 0.08, v, "bandpass", 1800, 1, 0.05, 0.7);
+  return 0.4;
+};
+var lowKick = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+  swoosh(o, t, v, 250, 900, 0.1, 0.4);
+  thump(o, t + 0.05, v, 110, 40, 0.12, 0.9);
+  burst(o, t + 0.05, v, "lowpass", 1500, 0.8, 0.08, 0.6);
+  return 0.3;
+};
+var dashHit = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.2);
+  swoosh(o, t, v, 400, 3e3, 0.2, 0.5);
+  thump(o, t + 0.12, v, 120, 35, 0.3, 1.1);
+  burst(o, t + 0.12, v, "bandpass", 1300, 0.9, 0.09, 0.8);
+  return 0.6;
+};
+var gun = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+  const k = p.pitch * rnd(0.96, 1.04);
+  burst(o, t, v, "highpass", 1200 * k, 0.6, 0.06, 0.9);
+  burst(o, t, v, "bandpass", 500 * k, 0.8, 0.12, 0.8);
+  thump(o, t, v, 180 * k, 50, 0.1, 1);
+  tone(o, t + 0.07, v, "square", 2900 * k, 0.03, 0.06);
+  return 0.6;
+};
+var gunSilenced = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.15);
+  burst(o, t, v, "lowpass", 1400 * p.pitch, 0.9, 0.05, 0.6);
+  thump(o, t, v, 220, 80, 0.05, 0.4);
+  tone(o, t + 0.05, v, "square", 2600, 0.025, 0.05);
+  return 0.2;
+};
+var reload = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+  burst(o, t, v, "bandpass", 3e3, 3, 0.03, 0.5);
+  tone(o, t, v, "square", 1800, 0.02, 0.08);
+  burst(o, t + 0.22, v, "bandpass", 2200, 4, 0.04, 0.6);
+  tone(o, t + 0.22, v, "triangle", 900, 0.05, 0.2);
+  return 0.4;
+};
+var emptyClick = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  burst(o, t, v, "highpass", 4e3, 1, 0.015, 0.5);
+  tone(o, t, v, "square", 1400, 0.015, 0.1);
+  return 0.1;
+};
+var bulletHit = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+  burst(o, t, v, "bandpass", 1800 * p.pitch, 1.5, 0.04, 0.7);
+  thump(o, t, v, 130, 50, 0.07, 0.6);
+  return 0.15;
+};
+var ricochet = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol * 0.6, p.pan, 0.2);
+  const n = tone(o, t, v, "sine", 3800 * p.pitch, 0.35, 0.3);
+  n.frequency.exponentialRampToValueAtTime(1500, t + 0.35);
+  burst(o, t, v, "highpass", 3e3, 1, 0.02, 0.4);
+  return 0.5;
+};
+var guard = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.12, 0.3);
+  burst(o, t, v, "bandpass", 1100, 2, 0.05, 0.7);
+  tone(o, t, v, "square", 520 * p.pitch, 0.12, 0.12);
+  tone(o, t, v, "triangle", 1370 * p.pitch, 0.18, 0.18);
+  thump(o, t, v, 100, 60, 0.06, 0.5);
+  return 0.3;
+};
+var guardBreak = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.3);
+  const sh = shaper(o, 20, v);
+  burst(o, t, sh, "bandpass", 900, 1, 0.25, 0.6);
+  const n = tone(o, t, v, "sawtooth", 600, 0.4, 0.25);
+  n.frequency.exponentialRampToValueAtTime(90, t + 0.4);
+  thump(o, t, v, 90, 30, 0.3, 1);
+  for (let i = 0; i < 3; i++) tone(o, t + 0.25 + i * 0.12, v, "square", 1500 - i * 200, 0.06, 0.06);
+  return 0.7;
+};
+var parry = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.35);
+  bell(o, t, v, 1320 * p.pitch, 0.6, 0.4, 2.01, 2);
+  burst(o, t, v, "highpass", 5e3, 1, 0.04, 0.5);
+  return 0.8;
+};
+var evade = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  swoosh(o, t, v, 800, 3500, 0.22, 0.4);
+  burst(o, t + 0.15, v, "lowpass", 600, 0.7, 0.08, 0.25);
+  return 0.3;
+};
+var jump = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  burst(o, t, v, "lowpass", 700, 0.7, 0.06, 0.4);
+  swoosh(o, t, v, 500, 1500, 0.14, 0.2);
+  return 0.2;
+};
+var land = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.25);
+  thump(o, t, v, 90, 40, 0.1, 0.7);
+  burst(o, t, v, "lowpass", 900, 0.7, 0.08, 0.45);
+  return 0.2;
+};
+var hurt = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.05, 0.2);
+  thump(o, t, v, 120, 45, 0.15, 1);
+  burst(o, t, v, "bandpass", 1e3, 0.9, 0.08, 0.7);
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t + 0.02, 0.01, 0.25, 0.12);
+  const f1 = filt(o, "bandpass", 700, 6, g);
+  const f2 = filt(o, "bandpass", 1200, 6, g);
+  const n = noise(o, t + 0.02, 0.15, f1);
+  n.connect(f2);
+  return 0.3;
+};
+var down = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+  thump(o, t, v, 80, 30, 0.25, 1);
+  burst(o, t, v, "lowpass", 600, 0.7, 0.2, 0.6);
+  thump(o, t + 0.18, v, 70, 30, 0.12, 0.5);
+  burst(o, t + 0.18, v, "lowpass", 500, 0.7, 0.1, 0.3);
+  return 0.5;
+};
+var wakeup = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  swoosh(o, t, v, 400, 1200, 0.2, 0.3);
+  return 0.25;
+};
+var armor = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.2);
+  tone(o, t, v, "square", 220, 0.12, 0.2);
+  tone(o, t, v, "square", 331, 0.12, 0.15);
+  burst(o, t, v, "bandpass", 2400, 3, 0.05, 0.4);
+  return 0.3;
+};
+var ability = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.4, 0.3);
+  thump(o, t, v, 160, 28, 0.6, 1.2);
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t, 0.01, 0.8, 0.7);
+  const fl = filt(o, "lowpass", 3e3, 0.8, g);
+  fl.frequency.setValueAtTime(3e3, t);
+  fl.frequency.exponentialRampToValueAtTime(200, t + 0.7);
+  const sh = shaper(o, 8, fl);
+  noise(o, t, 0.75, sh, true, 2);
+  swoosh(o, t, v, 300, 1800, 0.5, 0.35);
+  return 1.2;
+};
+var superStart = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.6);
+  const n = tone(o, t, v, "sawtooth", 110, 0.9, 0.25, 0.01);
+  n.frequency.exponentialRampToValueAtTime(880, t + 0.6);
+  const n2 = tone(o, t, v, "sawtooth", 112, 0.9, 0.2, 0.01);
+  n2.frequency.exponentialRampToValueAtTime(887, t + 0.6);
+  burst(o, t, v, "highpass", 6e3, 0.7, 0.5, 0.25, 0.3);
+  bell(o, t + 0.55, v, 1760, 1.2, 0.35, 3.5, 4);
+  burst(o, t + 0.55, v, "bandpass", 3e3, 0.7, 0.15, 0.6);
+  return 1.8;
+};
+var superHit = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5, 0.3);
+  hit(3)(o, t, { ...p, dest: v, vol: 1, pan: 0 });
+  thump(o, t + 0.02, v, 60, 25, 0.9, 1.1);
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t, 5e-3, 0.9, 1.1);
+  const fl = filt(o, "lowpass", 2500, 0.7, g);
+  fl.frequency.exponentialRampToValueAtTime(120, t + 1.1);
+  noise(o, t, 1.2, shaper(o, 12, fl), true, 3);
+  return 1.6;
+};
+var heal = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+  [72, 76, 79, 84].forEach((m, i) => bell(o, t + i * 0.07, v, mtof(m) * p.pitch, 0.5, 0.18, 2, 1.2));
+  return 1;
+};
+var itemUse = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  burst(o, t, v, "bandpass", 2500, 2, 0.06, 0.5);
+  tone(o, t + 0.08, v, "square", 660, 0.06, 0.12);
+  tone(o, t + 0.15, v, "square", 990, 0.1, 0.12);
+  return 0.35;
+};
+var pickup = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.15);
+  tone(o, t, v, "square", 988 * p.pitch, 0.07, 0.15);
+  tone(o, t + 0.07, v, "square", 1319 * p.pitch, 0.15, 0.15);
+  return 0.3;
+};
+var enemyDie = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.35);
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t, 0.02, 0.6, 0.8);
+  const fl = filt(o, "bandpass", 3e3, 2, g);
+  fl.frequency.exponentialRampToValueAtTime(150, t + 0.8);
+  noise(o, t, 0.85, fl);
+  const n = tone(o, t, v, "triangle", 880 * p.pitch, 0.7, 0.2, 0.01);
+  n.frequency.exponentialRampToValueAtTime(110, t + 0.7);
+  return 1;
+};
+var enemyTell = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+  const n = tone(o, t, v, "sawtooth", 700 * p.pitch, 0.25, 0.18, 0.02);
+  n.frequency.exponentialRampToValueAtTime(1400 * p.pitch, t + 0.2);
+  tone(o, t, v, "sine", 1404 * p.pitch, 0.25, 0.12, 0.02);
+  return 0.35;
+};
+var ghostWail = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  const dur = 1.3;
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.35, t + 0.3);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  const f = 420 * p.pitch;
+  const a = osc(o, "sine", f, t, dur, g);
+  const b = osc(o, "triangle", f * 1.5, t, dur, gainNode(o, 0.3, g));
+  for (const n of [a, b]) {
+    n.frequency.linearRampToValueAtTime(f * 1.25 * (n === b ? 1.5 : 1), t + 0.5);
+    n.frequency.linearRampToValueAtTime(f * 0.8 * (n === b ? 1.5 : 1), t + dur);
+  }
+  const lg = gainNode(o, f * 0.03);
+  lg.connect(a.frequency);
+  osc(o, "sine", 6.5, t, dur, lg);
+  const ng = gainNode(o, 0, v);
+  ng.gain.setValueAtTime(1e-4, t);
+  ng.gain.linearRampToValueAtTime(0.12, t + 0.3);
+  ng.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  noise(o, t, dur, filt(o, "bandpass", f * 2, 3, ng));
+  return dur + 0.5;
+};
+var ghostAttack = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+  swoosh(o, t, v, 300, 2200, 0.25, 0.5);
+  const n = tone(o, t, v, "sawtooth", 300, 0.3, 0.2, 0.02);
+  n.frequency.exponentialRampToValueAtTime(900, t + 0.25);
+  return 0.4;
+};
+var crawler = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+  const n = 14;
+  for (let i = 0; i < n; i++) {
+    const tt = t + i * rnd(0.03, 0.055);
+    burst(o, tt, v, "bandpass", rnd(2200, 4200) * p.pitch, 6, 0.012, rnd(0.25, 0.5));
+  }
+  return 0.9;
+};
+var stomp = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.4);
+  thump(o, t, v, 60 * p.pitch, 25, 0.35, 1.2);
+  burst(o, t, v, "lowpass", 400, 0.7, 0.25, 0.6);
+  return 0.5;
+};
+var enemyShot = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+  burst(o, t, v, "bandpass", 900, 1.2, 0.08, 0.7);
+  thump(o, t, v, 150, 60, 0.08, 0.6);
+  return 0.3;
+};
+var enemySpawn = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.6);
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.exponentialRampToValueAtTime(0.5, t + 0.5);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + 0.7);
+  const fl = filt(o, "bandpass", 200, 3, g);
+  fl.frequency.exponentialRampToValueAtTime(2500, t + 0.5);
+  noise(o, t, 0.7, fl);
+  tone(o, t + 0.45, v, "sine", 55, 0.4, 0.5);
+  return 1;
+};
+var whisper = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  const syll = 6 + Math.floor(Math.random() * 4);
+  let tt = t;
+  for (let i = 0; i < syll; i++) {
+    const d2 = rnd(0.07, 0.16);
+    const g = gainNode(o, 0, v);
+    perc(g.gain, tt, d2 * 0.3, rnd(0.15, 0.3), d2);
+    const f1 = filt(o, "bandpass", rnd(500, 900), 8, g);
+    const f2 = filt(o, "bandpass", rnd(1200, 2600), 8, g);
+    const hs = filt(o, "highpass", 4e3, 0.7, gainNode(o, 0.4, g));
+    const n = noise(o, tt, d2 * 1.3, f1);
+    n.connect(f2);
+    n.connect(hs);
+    tt += d2 + rnd(0.01, 0.06);
+  }
+  return tt - t + 0.6;
+};
+var bossTell = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+  for (let i = 0; i < 3; i++) {
+    const tt = t + i * 0.16;
+    tone(o, tt, v, "square", 880, 0.1, 0.12);
+    tone(o, tt, v, "square", 932, 0.1, 0.1);
+  }
+  thump(o, t, v, 70, 35, 0.6, 0.8);
+  return 0.8;
+};
+var bossRoar = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  const dur = 1.6;
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.9, t + 0.15);
+  g.gain.setTargetAtTime(1e-4, t + dur * 0.6, 0.25);
+  const sh = shaper(o, 30, g);
+  const base = 70 * p.pitch;
+  const a = osc(o, "sawtooth", base, t, dur, sh);
+  const b = osc(o, "sawtooth", base * 1.47, t, dur, sh);
+  a.frequency.linearRampToValueAtTime(base * 0.75, t + dur);
+  b.frequency.linearRampToValueAtTime(base * 1.1, t + dur);
+  const am = gainNode(o, 0.35);
+  am.connect(g.gain);
+  osc(o, "sine", 23, t, dur, am);
+  const ng = gainNode(o, 0, v);
+  perc(ng.gain, t, 0.1, 0.4, dur);
+  noise(o, t, dur, filt(o, "bandpass", 500, 1.5, ng), true, 4);
+  return dur + 1;
+};
+var heartbeat = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  thump(o, t, v, 55, 35, 0.12, 0.9);
+  thump(o, t + 0.22, v, 50, 30, 0.15, 0.7);
+  return 0.5;
+};
+var enemyStep = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+  thump(o, t, v, 75 * p.pitch, 40, 0.15, 0.7);
+  burst(o, t, v, "bandpass", 500, 4, 0.1, 0.35);
+  return 0.3;
+};
+function step(s) {
+  return (o, t, p) => {
+    const k = p.pitch * rnd(0.9, 1.1);
+    const vol = p.vol * rnd(0.8, 1);
+    switch (s) {
+      case "marble": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.12, 0.3);
+        burst(o, t, v, "bandpass", 3200 * k, 2, 0.025, 0.5);
+        burst(o, t + 5e-3, v, "bandpass", 900 * k, 1.5, 0.05, 0.35);
+        return 0.15;
+      }
+      case "concrete": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.03, 0.25);
+        burst(o, t, v, "bandpass", 1400 * k, 1, 0.04, 0.5);
+        thump(o, t, v, 110 * k, 60, 0.05, 0.4);
+        return 0.12;
+      }
+      case "carpet": {
+        const v = voice(o, p.dest, t, vol, p.pan);
+        burst(o, t, v, "lowpass", 500 * k, 0.7, 0.07, 0.55, 8e-3);
+        return 0.12;
+      }
+      case "wood": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0, 0.3);
+        burst(o, t, v, "bandpass", 1100 * k, 2, 0.04, 0.45);
+        tone(o, t, v, "triangle", 190 * k, 0.07, 0.25);
+        if (Math.random() < 0.15) {
+          const n = tone(o, t + 0.05, v, "sawtooth", 380, 0.18, 0.04, 0.05);
+          n.frequency.linearRampToValueAtTime(330, t + 0.2);
+        }
+        return 0.3;
+      }
+      case "metal": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.1, 0.4);
+        burst(o, t, v, "bandpass", 2e3 * k, 1, 0.02, 0.4);
+        tone(o, t, v, "triangle", 517 * k, 0.18, 0.12);
+        tone(o, t, v, "sine", 1243 * k, 0.12, 0.08);
+        tone(o, t, v, "sine", 2071 * k, 0.08, 0.05);
+        return 0.25;
+      }
+      case "tile": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.08, 0.35);
+        burst(o, t, v, "highpass", 3500 * k, 1, 0.02, 0.5);
+        burst(o, t, v, "bandpass", 1200 * k, 1.5, 0.04, 0.3);
+        return 0.12;
+      }
+      case "wet": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.05, 0.2);
+        const g = gainNode(o, 0, v);
+        perc(g.gain, t, 5e-3, 1.6, 0.12);
+        const fl = filt(o, "bandpass", 600 * k, 5, g);
+        fl.frequency.exponentialRampToValueAtTime(1800 * k, t + 0.1);
+        noise(o, t, 0.13, fl);
+        return 0.2;
+      }
+      case "void": {
+        const v = voice(o, p.dest, t, vol, p.pan, 0.4);
+        thump(o, t, v, 60 * k, 45, 0.2, 0.5);
+        const n = tone(o, t, v, "sine", 880 * k, 0.25, 0.05, 0.08);
+        n.frequency.exponentialRampToValueAtTime(840 * k, t + 0.25);
+        return 0.4;
+      }
+    }
+  };
+}
+var ding = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.3);
+  bell(o, t, v, 1318.5 * p.pitch, 2.2, 0.45, 1, 1.5);
+  bell(o, t, v, 1318.5 * 2.76 * p.pitch, 1, 0.08, 1, 0.8);
+  return 2.6;
+};
+var dingDong = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.3);
+  bell(o, t, v, 1318.5 * p.pitch, 1.4, 0.4, 1, 1.4);
+  bell(o, t + 0.45, v, 1046.5 * p.pitch, 2, 0.4, 1, 1.4);
+  return 2.6;
+};
+function doorSlide(open) {
+  return (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+    const dur = 1.1;
+    const mg = gainNode(o, 0, v);
+    mg.gain.setValueAtTime(1e-4, t);
+    mg.gain.linearRampToValueAtTime(0.18, t + 0.15);
+    mg.gain.setValueAtTime(0.18, t + dur - 0.2);
+    mg.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const m = osc(o, "sawtooth", 95, t, dur, filt(o, "lowpass", 300, 1, mg));
+    m.frequency.linearRampToValueAtTime(open ? 110 : 85, t + dur);
+    const rg = gainNode(o, 0, v);
+    rg.gain.setValueAtTime(1e-4, t);
+    rg.gain.linearRampToValueAtTime(0.3, t + 0.2);
+    rg.gain.setValueAtTime(0.3, t + dur - 0.25);
+    rg.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    noise(o, t, dur, filt(o, "bandpass", 700, 0.8, rg), true, 6);
+    thump(o, t + dur - 0.05, v, open ? 120 : 90, 40, 0.12, open ? 0.4 : 0.9);
+    burst(o, t + dur - 0.05, v, "bandpass", 1500, 2, 0.04, open ? 0.2 : 0.5);
+    return dur + 0.3;
+  };
+}
+var panelButton = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+  burst(o, t, v, "bandpass", 3500, 3, 0.012, 0.6);
+  tone(o, t + 0.01, v, "sine", 1975 * p.pitch, 0.09, 0.2);
+  return 0.15;
+};
+var intercom = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  const dur = 0.9;
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.3, t + 0.03);
+  g.gain.setValueAtTime(0.3, t + dur - 0.15);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  const bp = filt(o, "bandpass", 1800, 1.2, g);
+  noise(o, t, dur, shaper(o, 30, bp));
+  for (let i = 0; i < 8; i++) burst(o, t + rnd(0, dur), v, "highpass", 2500, 1, 0.01, rnd(0.2, 0.5));
+  tone(o, t, v, "square", 1e3, 0.05, 0.08);
+  return dur + 0.2;
+};
+var elevatorRide = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+  const dur = 2.8;
+  thump(o, t, v, 70, 35, 0.2, 0.8);
+  burst(o, t, v, "lowpass", 500, 0.7, 0.15, 0.4);
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.5, t + 0.6);
+  g.gain.setValueAtTime(0.5, t + dur - 0.6);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  const h = osc(o, "sawtooth", 48, t, dur, filt(o, "lowpass", 220, 2, g));
+  h.frequency.linearRampToValueAtTime(52, t + dur * 0.5);
+  h.frequency.linearRampToValueAtTime(46, t + dur);
+  noise(o, t, dur, filt(o, "lowpass", 300, 0.7, gainNode(o, 0.6, g)), true);
+  swoosh(o, t + 0.5, v, 200, 700, dur - 0.8, 0.15);
+  thump(o, t + dur - 0.1, v, 80, 35, 0.15, 0.6);
+  return dur + 0.3;
+};
+var ropeCreak = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+  const dur = rnd(0.5, 0.9);
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.2, t + dur * 0.3);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  const f = rnd(18, 30);
+  const s = osc(o, "sawtooth", f, t, dur, filt(o, "bandpass", rnd(600, 1100), 12, g));
+  s.frequency.linearRampToValueAtTime(f * rnd(0.6, 1.4), t + dur);
+  return dur + 0.4;
+};
+var uiMove = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  tone(o, t, v, "square", 1760 * p.pitch, 0.03, 0.14);
+  return 0.06;
+};
+var uiOk = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.05);
+  tone(o, t, v, "square", 1320 * p.pitch, 0.05, 0.1);
+  tone(o, t + 0.05, v, "square", 1980 * p.pitch, 0.09, 0.1);
+  return 0.18;
+};
+var uiBack = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  tone(o, t, v, "square", 1320 * p.pitch, 0.05, 0.09);
+  tone(o, t + 0.05, v, "square", 880 * p.pitch, 0.08, 0.09);
+  return 0.16;
+};
+var uiError = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  tone(o, t, v, "square", 196, 0.09, 0.15);
+  tone(o, t + 0.11, v, "square", 185, 0.14, 0.15);
+  return 0.3;
+};
+var uiOpen = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  swoosh(o, t, v, 1500, 5e3, 0.12, 0.15);
+  tone(o, t + 0.04, v, "triangle", 1046, 0.1, 0.12);
+  return 0.2;
+};
+var uiClose = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  swoosh(o, t, v, 4e3, 1200, 0.1, 0.12);
+  return 0.15;
+};
+var textBlip = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan);
+  tone(o, t, v, "square", 600 * p.pitch * rnd(0.97, 1.03), 0.025, 0.05);
+  return 0.04;
+};
+var message = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  bell(o, t, v, 1568, 0.25, 0.2, 2, 1);
+  bell(o, t + 0.12, v, 2093, 0.4, 0.2, 2, 1);
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t, 0.01, 0.15, 0.25);
+  osc(o, "square", 150, t, 0.25, filt(o, "lowpass", 300, 1, g));
+  return 0.6;
+};
+var ruleStamp = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+  thump(o, t, v, 140, 50, 0.12, 1.1);
+  burst(o, t, v, "lowpass", 1800, 0.7, 0.09, 0.8);
+  burst(o, t, v, "bandpass", 4e3, 1, 0.03, 0.4);
+  [64, 68, 71, 76].forEach((m, i) => bell(o, t + 0.18 + i * 0.05, v, mtof(m), 0.9, 0.14, 1, 1.2));
+  return 1.2;
+};
+var save = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+  [67, 72, 79].forEach((m, i) => tone(o, t + i * 0.08, v, "triangle", mtof(m), 0.25, 0.15));
+  return 0.6;
+};
+var coin = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  tone(o, t, v, "square", 1975, 0.06, 0.12);
+  tone(o, t + 0.06, v, "square", 2637, 0.25, 0.12);
+  return 0.35;
+};
+var levelUp = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+  [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => tone(o, t + i * 0.05, v, "square", mtof(m), 0.12, 0.08));
+  bell(o, t + 0.36, v, mtof(84), 1, 0.25, 2, 2);
+  return 1.4;
+};
+var doorWood = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.4);
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.7, t + 0.1);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + 0.6);
+  const s = osc(o, "sawtooth", 24, t, 0.6, filt(o, "bandpass", 1300, 14, g));
+  s.frequency.linearRampToValueAtTime(14, t + 0.6);
+  return 0.7;
+};
+var doorSlam = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.4);
+  thump(o, t, v, 95, 40, 0.25, 1.1);
+  burst(o, t, v, "lowpass", 1200, 0.7, 0.18, 0.7);
+  burst(o, t, v, "bandpass", 2500, 2, 0.04, 0.4);
+  return 1;
+};
+var knock = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.5);
+  for (let i = 0; i < 3; i++) {
+    const tt = t + i * 0.22 + (i === 2 ? 0.05 : 0);
+    thump(o, tt, v, 160, 90, 0.06, 0.7);
+    burst(o, tt, v, "bandpass", 900, 3, 0.04, 0.5);
+  }
+  return 1;
+};
+var switchClick = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+  burst(o, t, v, "bandpass", 2800, 4, 0.015, 0.7);
+  thump(o, t, v, 300, 150, 0.03, 0.3);
+  return 0.1;
+};
+var crateBreak = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+  thump(o, t, v, 120, 50, 0.15, 0.8);
+  for (let i = 0; i < 7; i++) {
+    const tt = t + rnd(0, 0.25);
+    burst(o, tt, v, "bandpass", rnd(700, 2500), 3, rnd(0.02, 0.06), rnd(0.2, 0.5));
+  }
+  return 0.6;
+};
+var glassBreak = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.3);
+  burst(o, t, v, "highpass", 3e3, 0.7, 0.15, 0.7);
+  for (let i = 0; i < 9; i++) {
+    const tt = t + rnd(0.02, 0.5);
+    tone(o, tt, v, "sine", rnd(3e3, 7e3), rnd(0.05, 0.2), rnd(0.05, 0.12));
+  }
+  return 0.9;
+};
+var flicker = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  for (let i = 0; i < 5; i++) {
+    const tt = t + rnd(0, 0.5);
+    const d2 = rnd(0.02, 0.08);
+    const g = gainNode(o, 0, v);
+    perc(g.gain, tt, 2e-3, rnd(0.15, 0.3), d2);
+    osc(o, "sawtooth", 120, tt, d2, filt(o, "highpass", 800, 1, g));
+  }
+  return 0.7;
+};
+var drip = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  const n = tone(o, t, v, "sine", rnd(1400, 2200) * p.pitch, 0.08, 0.25, 1e-3);
+  n.frequency.exponentialRampToValueAtTime(n.frequency.value * 0.5 + 400, t + 0.06);
+  return 0.6;
+};
+var wallGrind = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.3);
+  const dur = 1.5;
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(1e-4, t);
+  g.gain.linearRampToValueAtTime(0.5, t + 0.2);
+  g.gain.setValueAtTime(0.5, t + dur - 0.3);
+  g.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+  noise(o, t, dur, shaper(o, 10, filt(o, "lowpass", 400, 4, g)), true, 8);
+  osc(o, "sawtooth", 41, t, dur, filt(o, "lowpass", 160, 1, gainNode(o, 0.5, g)));
+  return dur + 0.3;
+};
+var clockTick = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+  burst(o, t, v, "bandpass", 3800 * p.pitch, 8, 0.012, 0.5);
+  return 0.05;
+};
+var timerWarn = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+  tone(o, t, v, "square", 1046, 0.08, 0.12);
+  tone(o, t + 0.15, v, "square", 1046, 0.08, 0.12);
+  return 0.3;
+};
+var noiseUp = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+  const n = tone(o, t, v, "sine", 300, 0.4, 0.25, 0.05);
+  n.frequency.exponentialRampToValueAtTime(600, t + 0.4);
+  tone(o, t, v, "sine", 317, 0.4, 0.15, 0.05);
+  return 0.6;
+};
+var safeRoom = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  [67, 71, 74, 79].forEach((m, i) => bell(o, t + i * 0.12, v, mtof(m), 1.6, 0.16, 1, 1.4));
+  return 2.2;
+};
+var scare = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+  const dur = 1.2;
+  const g = gainNode(o, 0, v);
+  perc(g.gain, t, 5e-3, 0.7, dur);
+  const sh = shaper(o, 25, g);
+  [61, 62, 67, 68, 73].forEach((m) => osc(o, "sawtooth", mtof(m) * 0.5, t, dur, sh));
+  burst(o, t, v, "highpass", 2e3, 0.7, 0.8, 0.4);
+  thump(o, t, v, 50, 25, 0.8, 1);
+  return dur + 1;
+};
+var d = (label, group, fn, bus = "sfx") => ({ label, group, bus, fn });
+var SFX = {
+  hit1: d("1타 (약)", "combat", hit(1)),
+  hit2: d("2타 (보통)", "combat", hit(2)),
+  hit3: d("3타 (강)", "combat", hit(3)),
+  whiff: d("헛손질", "combat", whiff),
+  swingHeavy: d("큰 휘두르기", "combat", swingHeavy),
+  kick: d("점프 킥", "combat", kick),
+  lowKick: d("하단차기", "combat", lowKick),
+  dashHit: d("대시 공격", "combat", dashHit),
+  gun: d("권총", "combat", gun),
+  gunSilenced: d("소음기 권총", "combat", gunSilenced),
+  reload: d("재장전", "combat", reload),
+  emptyClick: d("탄 없음", "combat", emptyClick),
+  bulletHit: d("탄 명중", "combat", bulletHit),
+  ricochet: d("도탄", "combat", ricochet),
+  guard: d("가드", "combat", guard),
+  guardBreak: d("가드 붕괴", "combat", guardBreak),
+  parry: d("저스트 가드", "combat", parry),
+  evade: d("회피", "combat", evade),
+  jump: d("점프", "combat", jump),
+  land: d("착지", "combat", land),
+  hurt: d("피격", "combat", hurt),
+  down: d("다운", "combat", down),
+  wakeup: d("기상", "combat", wakeup),
+  armor: d("슈퍼아머", "combat", armor),
+  ability: d("능력 충격파", "combat", ability),
+  superStart: d("필살기 컷인", "combat", superStart),
+  superHit: d("필살기 명중", "combat", superHit),
+  heal: d("회복", "combat", heal),
+  itemUse: d("소모품 사용", "combat", itemUse),
+  pickup: d("줍기", "combat", pickup),
+  enemyDie: d("괴이 소멸", "enemy", enemyDie),
+  enemyTell: d("공격 예고", "enemy", enemyTell),
+  ghostWail: d("귀신 울음", "enemy", ghostWail),
+  ghostAttack: d("귀신 덮침", "enemy", ghostAttack),
+  crawler: d("다리 많은 것", "enemy", crawler),
+  stomp: d("무거운 발구름", "enemy", stomp),
+  enemyShot: d("경비 사격", "enemy", enemyShot),
+  enemySpawn: d("출현", "enemy", enemySpawn),
+  enemyStep: d("보이지 않는 발소리", "enemy", enemyStep),
+  whisper: d("속삭임", "enemy", whisper),
+  heartbeat: d("심장 소리", "enemy", heartbeat),
+  bossTell: d("수호자 예고", "enemy", bossTell),
+  bossRoar: d("수호자 포효", "enemy", bossRoar),
+  scare: d("공포 굉음", "enemy", scare),
+  stepMarble: d("대리석", "step", step("marble")),
+  stepConcrete: d("콘크리트", "step", step("concrete")),
+  stepCarpet: d("장판·카펫", "step", step("carpet")),
+  stepWood: d("나무 마루", "step", step("wood")),
+  stepMetal: d("철판·덕트", "step", step("metal")),
+  stepTile: d("타일", "step", step("tile")),
+  stepWet: d("젖은 바닥", "step", step("wet")),
+  stepVoid: d("알 수 없는 재질", "step", step("void")),
+  ding: d("띵", "elevator", ding),
+  dingDong: d("띵동", "elevator", dingDong),
+  doorOpen: d("문 열림", "elevator", doorSlide(true)),
+  doorClose: d("문 닫힘", "elevator", doorSlide(false)),
+  panelButton: d("패널 버튼", "elevator", panelButton),
+  intercom: d("인터폰 잡음", "elevator", intercom),
+  elevatorRide: d("승강기 이동", "elevator", elevatorRide),
+  ropeCreak: d("귀환 로프", "elevator", ropeCreak),
+  doorWood: d("문 삐걱", "world", doorWood),
+  doorSlam: d("문 쾅", "world", doorSlam),
+  knock: d("똑똑똑", "world", knock),
+  switchClick: d("스위치", "world", switchClick),
+  crateBreak: d("상자 부숨", "world", crateBreak),
+  glassBreak: d("유리 깨짐", "world", glassBreak),
+  flicker: d("형광등 지직", "world", flicker),
+  drip: d("물방울", "world", drip),
+  wallGrind: d("벽이 조여 옴", "world", wallGrind),
+  clockTick: d("시계 초침", "world", clockTick),
+  timerWarn: d("시간 경고", "world", timerWarn),
+  noiseUp: d("소리 게이지 상승", "world", noiseUp),
+  safeRoom: d("다락방 도착", "world", safeRoom),
+  uiMove: d("커서 이동", "ui", uiMove, "ui"),
+  uiOk: d("결정", "ui", uiOk, "ui"),
+  uiBack: d("취소", "ui", uiBack, "ui"),
+  uiError: d("안 됨", "ui", uiError, "ui"),
+  uiOpen: d("창 열기", "ui", uiOpen, "ui"),
+  uiClose: d("창 닫기", "ui", uiClose, "ui"),
+  textBlip: d("대사 글자", "ui", textBlip, "ui"),
+  message: d("괴담톡 알림", "ui", message, "ui"),
+  ruleStamp: d("규칙 발견 (도장)", "ui", ruleStamp, "ui"),
+  save: d("저장", "ui", save, "ui"),
+  coin: d("보상", "ui", coin, "ui"),
+  levelUp: d("강화", "ui", levelUp, "ui")
+};
+var SFX_IDS = Object.keys(SFX);
+var SURFACE_SFX = {
+  marble: "stepMarble",
+  concrete: "stepConcrete",
+  carpet: "stepCarpet",
+  wood: "stepWood",
+  metal: "stepMetal",
+  tile: "stepTile",
+  wet: "stepWet",
+  void: "stepVoid"
+};
+
+// src/game/action/audio/music.ts
+var PC = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
+function noteToMidi(s) {
+  const m = /^([a-gA-G])([#b]?)(-?\d)$/.exec(s);
+  if (!m) throw new Error(`음 표기 오류: ${s}`);
+  const acc = m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0;
+  return 12 * (Number(m[3]) + 1) + PC[m[1].toLowerCase()] + acc;
+}
+function parseNotes(src) {
+  const toks = [];
+  for (const raw of src.split(/\s+/)) {
+    if (!raw || raw === "|") continue;
+    const m = /^(.*)\*(\d+)$/.exec(raw);
+    if (m) {
+      const n = Number(m[2]);
+      if (m[1] === "." || m[1] === "-") for (let i = 0; i < n; i++) toks.push(m[1]);
+      else {
+        toks.push(m[1]);
+        for (let i = 1; i < n; i++) toks.push("-");
+      }
+    } else toks.push(raw);
+  }
+  const evs = [];
+  let cur = null;
+  toks.forEach((t, i) => {
+    if (t === "-") {
+      if (cur) cur.len++;
+      return;
+    }
+    cur = null;
+    if (t === ".") return;
+    let vel = 0.8;
+    let body = t;
+    if (body.endsWith("!")) vel = 1, body = body.slice(0, -1);
+    else if (body.endsWith("?")) vel = 0.5, body = body.slice(0, -1);
+    cur = { step: i, notes: body.split("+").map(noteToMidi), len: 1, vel };
+    evs.push(cur);
+  });
+  return { evs, steps: toks.length };
+}
+function parseDrums(src) {
+  const s = src.replace(/[\s|]/g, "");
+  const evs = [];
+  for (let i = 0; i < s.length; i++) if (s[i] !== ".") evs.push({ step: i, kind: s[i] });
+  return { evs, steps: s.length };
+}
+var QUAL = {
+  "": [0, 4, 7],
+  m: [0, 3, 7],
+  "7": [0, 4, 7, 10],
+  maj7: [0, 4, 7, 11],
+  m7: [0, 3, 7, 10],
+  dim: [0, 3, 6],
+  m7b5: [0, 3, 6, 10],
+  sus4: [0, 5, 7],
+  aug: [0, 4, 8],
+  "5": [0, 7],
+  add9: [0, 4, 7, 14],
+  madd9: [0, 3, 7, 14]
+};
+function chord(name) {
+  const m = /^([A-G])([#b]?)(.*)$/.exec(name);
+  if (!m || !(m[3] in QUAL)) throw new Error(`화음 표기 오류: ${name}`);
+  const root = PC[m[1].toLowerCase()] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0);
+  const tones = QUAL[m[3]].map((iv) => {
+    let n = 48 + (root + iv) % 12;
+    while (n < 52) n += 12;
+    if (iv >= 12) n += 12;
+    return n;
+  });
+  tones.sort((a, b) => a - b);
+  return { root: (root + 12) % 12, tones };
+}
+var NAMES = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
+var tok = (notes) => notes.map((n) => `${NAMES[n % 12]}${Math.floor(n / 12) - 1}`).join("+");
+function comp(chords, rhythm, shift = 0) {
+  return chords.split(/\s+/).filter(Boolean).map((c) => {
+    const ns = chord(c).tones.map((n) => n + shift);
+    return [...rhythm].map((ch) => ch === "x" ? tok(ns) : ch === "X" ? tok(ns) + "!" : ch).join(" ");
+  }).join(" ");
+}
+function bass(chords, rhythm, oct = 2) {
+  return chords.split(/\s+/).filter(Boolean).map((c) => {
+    const { root } = chord(c);
+    const r = 12 * (oct + 1) + root;
+    const pick = (ch) => ch === "r" ? r : ch === "o" ? r + 12 : ch === "f" ? r + 7 : ch === "b" ? r + 10 : -1;
+    return [...rhythm].map((ch) => pick(ch) >= 0 ? tok([pick(ch)]) : ch).join(" ");
+  }).join(" ");
+}
+function arp(chords, shape, shift = 12) {
+  return chords.split(/\s+/).filter(Boolean).map((c) => {
+    const ts = chord(c).tones;
+    return [...shape].map((ch) => {
+      if (!/\d/.test(ch)) return ch;
+      const i = Number(ch);
+      return tok([ts[i % ts.length] + 12 * Math.floor(i / ts.length) + shift]);
+    }).join(" ");
+  }).join(" ");
+}
+function fm(o, dest, t, f, dur, vel, ratio, idx, idxDecay, a, d2, s, r) {
+  const g = gainNode(o, 0, dest);
+  const end = adsr(g.gain, t, a, d2, s, dur, r, vel);
+  const car = osc(o, "sine", f, t, end - t, g);
+  const mg = gainNode(o, 0);
+  mg.gain.setValueAtTime(f * idx, t);
+  mg.gain.setTargetAtTime(f * idx * 0.15, t, idxDecay);
+  mg.connect(car.frequency);
+  osc(o, "sine", f * ratio, t, end - t, mg);
+}
+var INST = {
+  // 아케이드 리드: 네모파 + 톱니파, 늦게 들어오는 떨림
+  lead(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.01, 0.12, 0.7, dur, 0.08, vel * 0.32);
+    const lp = filt(o, "lowpass", 3200, 1.2, g);
+    const vib = gainNode(o, 0);
+    vib.gain.setValueAtTime(0, t);
+    vib.gain.linearRampToValueAtTime(f * 0.012, t + Math.min(0.4, dur));
+    const a = osc(o, "square", f, t, end - t, lp);
+    const b = osc(o, "sawtooth", f * 1.004, t, end - t, gainNode(o, 0.6, lp));
+    vib.connect(a.frequency);
+    vib.connect(b.frequency);
+    osc(o, "sine", 5.5, t, end - t, vib);
+  },
+  square(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 5e-3, 0.08, 0.5, dur, 0.05, vel * 0.25);
+    osc(o, "square", f, t, end - t, filt(o, "lowpass", 2500, 0.7, g));
+  },
+  // 금관 찌르기: 필터가 확 열렸다 닫힌다
+  brass(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.02, 0.2, 0.6, dur, 0.1, vel * 0.22);
+    const lp = filt(o, "lowpass", 400, 2, g);
+    lp.frequency.setValueAtTime(400, t);
+    lp.frequency.linearRampToValueAtTime(3500, t + 0.04);
+    lp.frequency.setTargetAtTime(900, t + 0.05, 0.12);
+    osc(o, "sawtooth", f, t, end - t, lp);
+    osc(o, "sawtooth", f * 1.006, t, end - t, lp);
+  },
+  epiano(o, dest, t, f, dur, vel) {
+    fm(o, dest, t, f, Math.min(dur, 1.6), vel * 0.28, 1, 1.8, 0.25, 3e-3, 0.9, 0.35, 0.3);
+    const g = gainNode(o, 0, dest);
+    perc(g.gain, t, 1e-3, vel * 0.04, 0.15);
+    osc(o, "sine", f * 14, t, 0.2, g);
+  },
+  fmbass(o, dest, t, f, dur, vel) {
+    fm(o, dest, t, f, dur, vel * 0.55, 1, 2.5, 0.06, 2e-3, 0.25, 0.55, 0.05);
+    const g = gainNode(o, 0, dest);
+    adsr(g.gain, t, 2e-3, 0.2, 0.7, dur, 0.05, vel * 0.3);
+    osc(o, "sine", f, t, dur + 0.1, g);
+  },
+  bass(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 3e-3, 0.15, 0.6, dur, 0.06, vel * 0.45);
+    const lp = filt(o, "lowpass", 1400, 3, g);
+    lp.frequency.setTargetAtTime(350, t, 0.06);
+    osc(o, "sawtooth", f, t, end - t, lp);
+  },
+  pad(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.6, 0.5, 0.8, dur, 1.2, vel * 0.09);
+    const lp = filt(o, "lowpass", 1100, 0.7, g);
+    for (const k of [0.995, 1, 1.006]) osc(o, "sawtooth", f * k, t, end - t, lp);
+  },
+  strings(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.12, 0.3, 0.85, dur, 0.4, vel * 0.13);
+    const lp = filt(o, "lowpass", 2600, 0.7, g);
+    const vib = gainNode(o, f * 6e-3);
+    for (const k of [0.997, 1.003]) vib.connect(osc(o, "sawtooth", f * k, t, end - t, lp).frequency);
+    osc(o, "sine", 5, t, end - t, vib);
+  },
+  bell(o, dest, t, f, dur, vel) {
+    fm(o, dest, t, f, 0.05, vel * 0.22, 3.5, 2.5, 0.4, 2e-3, 1.6, 1e-4, 1.2);
+  },
+  // 오르골: 사인 + 높은 배음, 짧게 사그라듦. 조금씩 음이 어긋난다
+  box(o, dest, t, f, dur, vel) {
+    const ff = f * (1 + (Math.random() - 0.5) * 8e-3);
+    const g = gainNode(o, 0, dest);
+    perc(g.gain, t, 2e-3, vel * 0.3, 1.4);
+    osc(o, "sine", ff, t, 1.5, g);
+    const h = gainNode(o, 0, dest);
+    perc(h.gain, t, 1e-3, vel * 0.08, 0.4);
+    osc(o, "sine", ff * 5.02, t, 0.5, h);
+    void dur;
+  },
+  organ(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.01, 0.1, 0.9, dur, 0.06, vel * 0.13);
+    const vib = gainNode(o, f * 4e-3);
+    for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.25], [0.5, 0.4]]) {
+      const n = osc(o, "sine", f * k, t, end - t, gainNode(o, v, g));
+      vib.connect(n.frequency);
+    }
+    osc(o, "sine", 6, t, end - t, vib);
+  },
+  pluck(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    perc(g.gain, t, 2e-3, vel * 0.3, Math.min(0.5, dur + 0.15));
+    const lp = filt(o, "lowpass", 3e3, 1, g);
+    lp.frequency.setTargetAtTime(500, t, 0.08);
+    osc(o, "triangle", f, t, 0.6, lp);
+    osc(o, "square", f, t, 0.6, gainNode(o, 0.2, lp));
+  },
+  // 사람 목소리 같은 '아—' (모음 대역 둘)
+  choir(o, dest, t, f, dur, vel) {
+    const g = gainNode(o, 0, dest);
+    const end = adsr(g.gain, t, 0.5, 0.4, 0.85, dur, 1, vel * 0.5);
+    const f1 = filt(o, "bandpass", 700, 5, g);
+    const f2 = filt(o, "bandpass", 1150, 6, g);
+    for (const k of [0.996, 1.004]) {
+      const s = osc(o, "sawtooth", f * k, t, end - t, f1);
+      s.connect(f2);
+    }
+  }
+};
+function drum(o, dest, t, kind, vel) {
+  const g = gainNode(o, vel, dest);
+  switch (kind) {
+    case "k": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, 0.9, 0.25);
+      const n = osc(o, "sine", 150, t, 0.3, e);
+      n.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+      const c = gainNode(o, 0, g);
+      perc(c.gain, t, 1e-3, 0.3, 0.02);
+      noise(o, t, 0.03, filt(o, "lowpass", 3e3, 0.7, c));
+      break;
+    }
+    case "s": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, 0.45, 0.16);
+      noise(o, t, 0.2, filt(o, "bandpass", 2200, 0.8, e));
+      const b = gainNode(o, 0, g);
+      perc(b.gain, t, 1e-3, 0.35, 0.08);
+      const n = osc(o, "triangle", 230, t, 0.1, b);
+      n.frequency.exponentialRampToValueAtTime(160, t + 0.08);
+      break;
+    }
+    case "x": {
+      for (let i = 0; i < 3; i++) {
+        const e = gainNode(o, 0, g);
+        perc(e.gain, t + i * 0.011, 1e-3, 0.4, i === 2 ? 0.12 : 0.01);
+        noise(o, t + i * 0.011, 0.14, filt(o, "bandpass", 1300, 1.5, e));
+      }
+      break;
+    }
+    case "h":
+    case "o": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, kind === "h" ? 0.18 : 0.15, kind === "h" ? 0.04 : 0.3);
+      noise(o, t, kind === "h" ? 0.06 : 0.35, filt(o, "highpass", 7e3, 0.7, e));
+      break;
+    }
+    case "c": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, 0.22, 1.4);
+      noise(o, t, 1.5, filt(o, "highpass", 4500, 0.5, e));
+      break;
+    }
+    case "t":
+    case "m": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, 0.6, 0.3);
+      const f0 = kind === "t" ? 110 : 170;
+      const n = osc(o, "sine", f0, t, 0.35, e);
+      n.frequency.exponentialRampToValueAtTime(f0 * 0.6, t + 0.3);
+      break;
+    }
+    case "r": {
+      const e = gainNode(o, 0, g);
+      perc(e.gain, t, 1e-3, 0.3, 0.03);
+      osc(o, "triangle", 1700, t, 0.05, filt(o, "bandpass", 1700, 4, e));
+      noise(o, t, 0.03, filt(o, "bandpass", 3e3, 3, e));
+      break;
+    }
+  }
+}
+function compileSong(def) {
+  const chans = {};
+  for (const [name, c] of Object.entries(def.chans)) chans[name] = { def: c, at: /* @__PURE__ */ new Map() };
+  let base = 0;
+  for (const entry of def.order) {
+    const m = /^([A-Za-z0-9_]+)([+-]\d+)?$/.exec(entry);
+    if (!m || !def.pats[m[1]]) throw new Error(`곡 순서 오류: ${entry}`);
+    const pat = def.pats[m[1]];
+    const tr = Number(m[2] ?? 0);
+    let len = 0;
+    const parsed = {};
+    for (const [name, src] of Object.entries(pat)) {
+      const c = def.chans[name];
+      if (!c) throw new Error(`없는 악기 줄: ${name}`);
+      parsed[name] = c.inst === "drums" ? parseDrums(src) : parseNotes(src);
+      len = Math.max(len, parsed[name].steps);
+    }
+    for (const [name, p] of Object.entries(parsed)) {
+      for (const e of p.evs) {
+        const ev = "notes" in e ? { ...e, notes: e.notes.map((n) => n + tr) } : e;
+        const at = chans[name].at;
+        const k = base + e.step;
+        (at.get(k) ?? at.set(k, []).get(k)).push(ev);
+      }
+    }
+    base += len;
+  }
+  return { def, steps: base, chans };
+}
+var stepSec = (bpm) => 60 / bpm / 4;
+var Player2 = class {
+  constructor(o, song, startAt) {
+    this.o = o;
+    this.song = song;
+    this.out = gainNode(o, 1, o.music);
+    this.nextTime = startAt;
+    for (const [name, c] of Object.entries(song.chans)) {
+      const d2 = c.def;
+      const g = gainNode(o, d2.vol ?? 1);
+      let tail = g;
+      if (d2.drive) tail = tail.connect(shaper(o, d2.drive));
+      if (d2.pan) {
+        const p = o.ctx.createStereoPanner();
+        p.pan.value = d2.pan;
+        tail = tail.connect(p);
+      }
+      tail.connect(this.out);
+      if (d2.verb) tail.connect(gainNode(o, d2.verb, o.verb));
+      this.chanNodes.set(name, g);
+    }
+  }
+  out;
+  chanNodes = /* @__PURE__ */ new Map();
+  step = 0;
+  nextTime;
+  ended = false;
+  /** until 시각까지의 칸을 미리 예약한다 */
+  schedule(until, now = -Infinity) {
+    const s = this.song;
+    const sec = stepSec(s.def.bpm);
+    while (!this.ended && this.nextTime < now - 0.05) {
+      this.step++;
+      this.nextTime += sec;
+      if (!s.def.loop && this.step >= s.steps) this.ended = true;
+    }
+    while (!this.ended && this.nextTime < until) {
+      const i = this.step % s.steps;
+      const swing = i % 2 === 1 ? (s.def.swing ?? 0) * sec : 0;
+      const t = this.nextTime + swing;
+      for (const [name, c] of Object.entries(s.chans)) {
+        const evs = c.at.get(i);
+        if (!evs) continue;
+        const dest = this.chanNodes.get(name);
+        for (const e of evs) {
+          if ("kind" in e) drum(this.o, dest, t, e.kind, 1);
+          else {
+            const inst = INST[c.def.inst];
+            for (const n of e.notes) {
+              const sour = s.def.wrong && Math.random() < s.def.wrong ? (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.7) : 0;
+              inst(this.o, dest, t, mtof(n + sour), e.len * sec * 0.95, e.vel);
+            }
+          }
+        }
+      }
+      this.step++;
+      this.nextTime += sec;
+      if (!s.def.loop && this.step >= s.steps) this.ended = true;
+    }
+  }
+  /** 끝나는 데 걸리는 시간(초). 반복곡은 한 바퀴 */
+  get lengthSec() {
+    return this.song.steps * stepSec(this.song.def.bpm);
+  }
+  fadeOut(t, sec) {
+    const g = this.out.gain;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(1e-4, t + sec);
+    this.ended = true;
+    setTimeout(() => this.out.disconnect(), (sec + 2) * 1e3);
+  }
+};
+
+// src/game/action/audio/songs.ts
+var rep = (s, n) => Array(n).fill(s).join(" ");
+var hq = {
+  label: "본부 · 관리국 사무실",
+  bpm: 112,
+  swing: 0.14,
+  loop: true,
+  chans: {
+    mel: { inst: "square", vol: 0.8, pan: 0.15, verb: 0.15 },
+    keys: { inst: "epiano", vol: 0.9, pan: -0.2, verb: 0.2 },
+    bass: { inst: "fmbass", vol: 0.9 },
+    dr: { inst: "drums", vol: 0.55 },
+    hat: { inst: "drums", vol: 0.35, pan: 0.3 }
+  },
+  pats: {
+    A: {
+      mel: "a4*2 c5*2 e5*3 d5 c5*2 a4*2 g4*4 | f4*2 a4*2 c5*4 . . d5 c5 a4*4 | bb4*3 a4 g4*2 f4*2 d4*2 f4*2 g4*4 | e4*2 g4*2 bb4*2 c5*2 e5*4 .*4",
+      keys: comp("Fmaj7 Dm7 Gm7 C7", "x-.x-.x--.x-...."),
+      bass: bass("F Dm Gm C7", "r..o..r.f..o.r.b"),
+      dr: rep("k...s..kk.k.s...", 4),
+      hat: rep("h.hhh.hhh.hhh.ho", 4)
+    },
+    B: {
+      mel: "c5*2 . c5 e5*2 d5*2 c5*3 a4 g4*4 | f#4*2 a4*2 c5*2 d5*2 f#5*4 e5*2 d5*2 | d5*3 c5 bb4*2 a4*2 g4*4 f4*2 g4*2 | bb4*2 a4*2 g4*2 e4*2 c4*4 .*4",
+      keys: comp("Am7 D7 Gm7 C7", "x-.x-.x--.x-...."),
+      bass: bass("A D Gm C7", "r..o..r.f..o.r.b"),
+      dr: rep("k...s..kk.k.s...", 3) + " k...s..ks.s.s.xx",
+      hat: rep("h.hhh.hhh.hhh.ho", 4)
+    }
+  },
+  order: ["A", "B", "A", "B"]
+};
+var lobby = {
+  label: "로비 · 어긋난 대기 음악",
+  bpm: 96,
+  loop: true,
+  wrong: 0.06,
+  chans: {
+    mel: { inst: "organ", vol: 1, verb: 0.3 },
+    keys: { inst: "epiano", vol: 0.75, pan: -0.25, verb: 0.3 },
+    bass: { inst: "bass", vol: 0.6 },
+    rim: { inst: "drums", vol: 0.4, pan: 0.2 },
+    hat: { inst: "drums", vol: 0.2, pan: -0.3 }
+  },
+  pats: {
+    A: {
+      mel: "g4*4 bb4*2 g4*2 f4*4 eb4*4 | g4*2 f4*2 eb4*2 c4*2 d4*8 | ab4*4 c5*2 ab4*2 g4*4 f4*4 | d4*2 f4*2 ab4*2 bb4*2 g4*8",
+      keys: comp("Ebmaj7 Cm7 Fm7 Bb7", "x.x..x.x.x..x.x."),
+      bass: bass("Eb Cm Fm Bb", "r-.f-.r.f-.r.f.."),
+      rim: rep("k..r..r.k..r..r.", 4),
+      hat: rep("hhhhhhhhhhhhhhhh", 4)
+    },
+    B: {
+      mel: "bb4*4 d5*2 bb4*2 a4*4 g4*4 | e4*2 g4*2 bb4*2 c5*2 bb4*8 | ab4*2 g4*2 f4*2 eb4*2 c4*8 | d4*4 f4*4 bb3*8",
+      keys: comp("Gm7 C7 Fm7 Bb7", "x.x..x.x.x..x.x."),
+      bass: bass("G C Fm Bb", "r-.f-.r.f-.r.f.."),
+      rim: rep("k..r..r.k..r..r.", 4),
+      hat: rep("hhhhhhhhhhhhhhhh", 4)
+    }
+  },
+  order: ["A", "B", "A", "B-1"]
+  // 마지막 바퀴는 반음 낮게 미끄러진다
+};
+var chase = {
+  label: "추격의 층",
+  bpm: 168,
+  loop: true,
+  chans: {
+    mel: { inst: "lead", vol: 0.9, verb: 0.12 },
+    stab: { inst: "brass", vol: 0.8, pan: -0.3 },
+    bass: { inst: "fmbass", vol: 1 },
+    dr: { inst: "drums", vol: 0.7 },
+    hat: { inst: "drums", vol: 0.3, pan: 0.3 }
+  },
+  pats: {
+    A: {
+      mel: "d5*2 . d5 f5*2 d5*2 a5*4 g5*2 f5*2 | e5*2 f5*2 e5*2 d5*2 c5*4 a4*4 | bb4*2 . bb4 d5*2 f5*2 bb5*4 a5*2 g5*2 | a5*4 g5*4 e5*4 c5*4",
+      stab: comp("Dm Dm Bb C", "X..x..x........."),
+      bass: bass("Dm Dm Bb C", "r.ror.orr.ror.oo"),
+      dr: "c.h.s.hkk.h.s.hs " + rep("k.h.s.hkk.h.s.hs", 2) + " k.s.s.kks.sssmtt",
+      hat: rep("hhhhhhhhhhhhhhhh", 4)
+    },
+    B: {
+      mel: "a5*3 a5 a5*2 g5*2 f5*2 e5*2 d5*4 | f5*2 e5*2 d5*2 c5*2 d5*8 | g5*3 g5 bb5*2 a5*2 g5*2 f5*2 e5*4 | c#5*4 e5*4 a5*4 c#6*4",
+      stab: comp("Dm Dm Gm A", "X..x..x........."),
+      bass: bass("Dm Dm Gm A", "r.ror.orr.ror.oo"),
+      dr: "c.h.s.hkk.h.s.hs " + rep("k.h.s.hkk.h.s.hs", 2) + " sssssssssmmmtttc",
+      hat: rep("hhhhhhhhhhhhhhhh", 4)
+    }
+  },
+  order: ["A", "B", "A+2", "B"]
+};
+var replica = {
+  label: "재현의 층 · 아파트",
+  bpm: 76,
+  loop: true,
+  chans: {
+    box: { inst: "box", vol: 1, verb: 0.45, pan: 0.1 },
+    acc: { inst: "pluck", vol: 0.45, pan: -0.2, verb: 0.3 },
+    pad: { inst: "pad", vol: 0.6, verb: 0.4 },
+    tick: { inst: "drums", vol: 0.12, pan: 0.5 }
+  },
+  pats: {
+    A: {
+      box: "e5*4 a5*4 c6*4 | b5*4 a5*4 e5*4 | f5*4 a5*4 d6*4 | c6*4 b5*4 g#5*4 | a5*4 c6*2 b5*2 a5*4 | e5*4 f5*4 a5*4 | g#5*4 b5*4 e5*4 | a5*12",
+      acc: bass("Am Am Dm E Am F E Am", "r...........", 3),
+      pad: "a3+e4*24 d4+a4*12 e4+g#4*12 a3+e4*12 f3+c4*12 e3+b3*12 a3+e4*12",
+      tick: rep("r...r...r...", 8)
+    },
+    B: {
+      // 둘째 바퀴: 오르골 태엽이 풀려 한 음씩 빠진다
+      box: "e5*4 .*4 c6*4 | b5*4 .*4 e5*4 | f5*4 a5*4 .*4 | c6*4 .*4 g#5*4 | a5*4 .*8 | e5*4 .*8 | g#5*4 .*4 e5*4 | a4*12",
+      acc: bass("Am Am Dm E Am F E Am", "r...........", 3),
+      pad: "a3+e4*24 d4+a4*12 e4+g#4*12 a3+e4*12 f3+c4*12 e3+b3*12 a3+e4*12",
+      tick: rep("r...r...r...", 8)
+    }
+  },
+  order: ["A", "B"]
+};
+var trial = {
+  label: "시험 층",
+  bpm: 132,
+  loop: true,
+  chans: {
+    mel: { inst: "square", vol: 0.9, pan: 0.2, verb: 0.2 },
+    arp: { inst: "bell", vol: 0.7, pan: -0.3, verb: 0.3 },
+    bass: { inst: "bass", vol: 0.8 },
+    dr: { inst: "drums", vol: 0.6 },
+    tick: { inst: "drums", vol: 0.3, pan: 0.4 }
+  },
+  pats: {
+    A: {
+      mel: "e5*2 .*2 f5*2 .*2 e5*2 b4*2 .*4 | f5*2 .*2 g5*2 .*2 f5*2 c5*2 .*4 | e5 f5 g5 a5 b5*4 .*2 a5*2 g5*2 f5*2 | e5*8 .*8",
+      arp: arp("Em F Em F", "0121012101210121"),
+      bass: bass("Em F Em F", "r.r.r.r.r.r.r.r."),
+      dr: rep("k...k...k...k...", 4),
+      tick: rep("r.r.r.r.r.r.r.r.", 4)
+    },
+    B: {
+      arp: arp("Em G F Em", "0123012301230123"),
+      bass: bass("Em G F Em", "r.r.o.r.r.r.o.r."),
+      dr: rep("k..sk...k..sk.s.", 3) + " k.s.k.s.ssssmmtt",
+      tick: rep("hhhhhhhhhhhhhhhh", 4)
+    }
+  },
+  order: ["A", "A", "B", "A+1"]
+};
+var dark = {
+  label: "어둠의 층",
+  bpm: 60,
+  loop: true,
+  chans: {
+    drone: { inst: "pad", vol: 0.9, verb: 0.5 },
+    voice: { inst: "choir", vol: 0.35, verb: 0.6, pan: -0.3 },
+    ping: { inst: "bell", vol: 0.45, verb: 0.9, pan: 0.4 },
+    beat: { inst: "drums", vol: 0.35 }
+  },
+  pats: {
+    A: {
+      drone: "c2+g2*64",
+      voice: ".*16 eb4*24 .*8 d4*16",
+      ping: ".*20 g5? .*13 f#5? .*21 c6? .*7",
+      beat: rep("k..k............", 4)
+    },
+    B: {
+      drone: "c#2+g#2*32 c2+g2*32",
+      voice: ".*8 e4*20 .*4 eb4*32",
+      ping: ".*9 b5? .*30 c5? .*23",
+      beat: rep("k..k............", 2) + " k..k....k..k.... k..k....k..k...."
+    }
+  },
+  order: ["A", "B"]
+};
+var puzzle = {
+  label: "퍼즐과 선택의 층",
+  bpm: 100,
+  loop: true,
+  chans: {
+    arp: { inst: "bell", vol: 0.8, verb: 0.4, pan: 0.25 },
+    low: { inst: "pad", vol: 0.7, verb: 0.3 },
+    bass: { inst: "pluck", vol: 0.7, pan: -0.2 },
+    dr: { inst: "drums", vol: 0.5 }
+  },
+  pats: {
+    A: {
+      arp: "c5 . e5 . g#5 . d5 . f#5 . a#5 . e5 . | c6 . a#5 . f#5 . d5 . g#5 . e5 . c5 .",
+      low: "c3+f#3*28",
+      bass: "c2*6 . d2*7 | c2*6 . a#1*7",
+      dr: "k.....s...k.s. k...t.s...k.sm"
+    }
+  },
+  order: ["A", "A+1", "A-2", "A+3", "A", "A-1"]
+};
+var service = {
+  label: "정비 구역 · 다락방",
+  bpm: 84,
+  loop: true,
+  chans: {
+    mel: { inst: "strings", vol: 0.8, verb: 0.4, pan: 0.15 },
+    keys: { inst: "epiano", vol: 0.8, verb: 0.35, pan: -0.2 },
+    bass: { inst: "fmbass", vol: 0.55 },
+    dr: { inst: "drums", vol: 0.25 }
+  },
+  pats: {
+    A: {
+      mel: "d5*6 c5*2 bb4*8 | g4*4 bb4*4 d5*8 | f5*6 d5*2 c5*4 bb4*4 | a4*12 .*4",
+      keys: arp("Gm7 Ebmaj7 Bbmaj7 F", "0.1.2.3.2.1.0.1.", 0),
+      bass: bass("Gm Eb Bb F", "r-------f---r---"),
+      dr: rep("k.......r.......", 4)
+    },
+    B: {
+      mel: "bb4*4 a4*4 g4*8 | g4*4 bb4*4 eb5*8 | eb5*6 d5*2 c5*8 | d5*4 c5*4 a4*4 f#4*4",
+      keys: arp("Gm7 Ebmaj7 Cm7 D7", "0.1.2.3.2.1.0.1.", 0),
+      bass: bass("Gm Eb Cm D", "r-------f---r---"),
+      dr: rep("k.......r.......", 4)
+    }
+  },
+  order: ["A", "B"]
+};
+var boss = {
+  label: "층 수호자",
+  bpm: 152,
+  loop: true,
+  chans: {
+    mel: { inst: "lead", vol: 1, verb: 0.15 },
+    stab: { inst: "brass", vol: 0.9, pan: -0.25, verb: 0.15 },
+    voice: { inst: "choir", vol: 0.4, verb: 0.5, pan: 0.3 },
+    bass: { inst: "fmbass", vol: 1, drive: 2 },
+    kick: { inst: "drums", vol: 0.75 },
+    hat: { inst: "drums", vol: 0.3, pan: 0.3 }
+  },
+  pats: {
+    A: {
+      mel: "c5*2 eb5*2 g5*4 f5*2 eb5*2 d5*2 eb5*2 | c5*4 g4*4 c5*2 d5*2 eb5*4 | f5*2 eb5*2 c5*4 ab5*4 g5*4 | b4*4 d5*4 f5*4 g5*4",
+      stab: comp("Cm Cm Ab G", "X..x..x...x..x.."),
+      voice: comp("Cm Cm Ab G", "x---------------"),
+      bass: bass("Cm Cm Ab G", "r.rrr.rrr.rrr.ro"),
+      kick: "c..k..s.k..k..s. " + rep("k..k..s.k..k..s.", 2) + " k..k..s.k.ssssss",
+      hat: rep("h.h.h.h.h.h.h.h.", 4)
+    },
+    B: {
+      mel: "ab5*4 g5*2 f5*2 c5*4 f5*4 | eb5*4 d5*2 c5*2 g4*8 | f5*4 ab5*4 db6*4 c6*4 | b5*8 g5*4 d5*4",
+      stab: comp("Fm Cm Db G", "X..x..x...x..x.."),
+      voice: comp("Fm Cm Db G", "x---------------"),
+      bass: bass("Fm Cm Db G", "r.rrr.rrr.rrr.ro"),
+      kick: "c..k..s.k..k..s. " + rep("k..k..s.k..k..s.", 2) + " kkkksssstttmmmmc",
+      hat: rep("h.h.h.h.h.h.h.h.", 4)
+    }
+  },
+  order: ["A", "B", "A", "B+1"]
+};
+var title = {
+  label: "제목 화면",
+  bpm: 116,
+  loop: true,
+  chans: {
+    mel: { inst: "strings", vol: 1, verb: 0.35 },
+    arp: { inst: "pluck", vol: 0.6, pan: -0.3, verb: 0.2 },
+    bass: { inst: "fmbass", vol: 0.9 },
+    dr: { inst: "drums", vol: 0.55 },
+    hat: { inst: "drums", vol: 0.25, pan: 0.3 }
+  },
+  pats: {
+    A: {
+      mel: "e5*6 d5*2 c5*4 b4*4 | a4*8 c5*4 f5*4 | g5*6 f5*2 e5*4 d5*4 | g#4*4 b4*4 e5*8",
+      arp: arp("Am F G E", "0120".repeat(4)),
+      bass: bass("Am F G E", "r.......r...r.o."),
+      dr: "c...s...k.k.s... " + rep("k...s...k.k.s...", 3),
+      hat: rep("..h...h...h...h.", 4)
+    },
+    B: {
+      mel: "a5*6 g5*2 e5*8 | f5*4 e5*4 c5*8 | d5*4 f5*4 a5*4 g5*4 | g#5*8 b5*4 e6*4",
+      arp: arp("Am F Dm E", "0120".repeat(4)),
+      bass: bass("Am F Dm E", "r.......r...r.o."),
+      dr: rep("k...s...k.k.s...", 3) + " k.k.s.s.ssssmmtc",
+      hat: rep("h.h.h.h.h.h.h.h.", 4)
+    }
+  },
+  order: ["A", "B"]
+};
+var clear = {
+  label: "층 돌파 (알림곡)",
+  bpm: 150,
+  loop: false,
+  chans: {
+    mel: { inst: "lead", vol: 1, verb: 0.3 },
+    stab: { inst: "brass", vol: 0.9, verb: 0.3 },
+    bass: { inst: "fmbass", vol: 0.9 },
+    dr: { inst: "drums", vol: 0.6 }
+  },
+  pats: {
+    A: {
+      mel: "g4 c5 e5 g5*3 e5 g5*9 | ab5*2 bb5*2 c6*12",
+      stab: "c4+e4+g4*2 .*6 c4+e4+g4*8 | ab3+c4+eb4*2 bb3+d4+f4*2 c4+e4+g4*12",
+      bass: "c3*2 .*6 c2*8 | ab2*2 bb2*2 c3*12",
+      dr: "k.s.k.sssc...... k.k.c..........."
+    }
+  },
+  order: ["A"]
+};
+var gameover = {
+  label: "후송 (알림곡)",
+  bpm: 70,
+  loop: false,
+  chans: {
+    mel: { inst: "strings", vol: 1, verb: 0.5 },
+    pad: { inst: "pad", vol: 0.8, verb: 0.5 },
+    bell: { inst: "bell", vol: 0.5, verb: 0.8 }
+  },
+  pats: {
+    A: {
+      mel: "e5*4 d#5*4 d5*4 c#5*4 | c5*16",
+      pad: "a3+c4+e4*16 f3+ab3+c4*16",
+      bell: ".*16 a4*16"
+    }
+  },
+  order: ["A"]
+};
+var discover = {
+  label: "규칙 발견 (알림곡)",
+  bpm: 140,
+  loop: false,
+  chans: {
+    b: { inst: "bell", vol: 0.9, verb: 0.5 },
+    pad: { inst: "strings", vol: 0.7, verb: 0.5 }
+  },
+  pats: { A: { b: "e5 g#5 b5 e6*13", pad: "e4+g#4+b4*16" } },
+  order: ["A"]
+};
+var SONGS = { title, hq, lobby, chase, replica, trial, dark, puzzle, service, boss, clear, gameover, discover };
+var SONG_IDS = Object.keys(SONGS);
+
+// src/game/action/audio/ambience.ts
+var AMBIENCE = {
+  title: { layers: [{ kind: "rumble", f: 120, vol: 0.12 }], events: [] },
+  hq: {
+    layers: [{ kind: "air", f: 900, vol: 0.02 }, { kind: "hum", f: 60, vol: 0.015 }],
+    events: [
+      { id: "typing", gap: [3, 9], vol: [0.15, 0.3], pan: 0.8 },
+      { id: "message", gap: [25, 50], vol: [0.08, 0.15], pan: 0.8 },
+      { id: "switchClick", gap: [12, 30], vol: [0.1, 0.2], pan: 0.8 }
+    ]
+  },
+  lobby: {
+    layers: [{ kind: "hum", f: 120, vol: 0.035 }, { kind: "air", f: 700, vol: 0.025 }],
+    events: [
+      { id: "flicker", gap: [6, 14], vol: [0.15, 0.35], pan: 0.7 },
+      { id: "intercom", gap: [20, 40], vol: [0.1, 0.2], pan: 0.5 },
+      { id: "ding", gap: [30, 60], vol: [0.05, 0.1], pitch: [0.94, 0.94], pan: 1 }
+    ]
+  },
+  chase: {
+    layers: [{ kind: "rumble", f: 160, vol: 0.22 }, { kind: "air", f: 400, vol: 0.05 }],
+    events: [
+      { id: "doorSlam", gap: [4, 9], vol: [0.2, 0.45], pan: 1 },
+      { id: "crawler", gap: [5, 11], vol: [0.25, 0.45], pan: 0.9 }
+    ]
+  },
+  replica: {
+    layers: [{ kind: "hum", f: 60, vol: 0.03 }],
+    events: [
+      { id: "clockTick", gap: [1, 1], vol: [0.12, 0.12], pan: 0 },
+      { id: "knock", gap: [15, 35], vol: [0.25, 0.4], pan: 1 },
+      { id: "whisper", gap: [18, 40], vol: [0.15, 0.3], pan: 1 },
+      { id: "doorWood", gap: [14, 30], vol: [0.15, 0.3], pan: 1 }
+    ]
+  },
+  trial: {
+    layers: [{ kind: "hum", f: 100, vol: 0.025 }, { kind: "air", f: 1200, vol: 0.015 }],
+    events: [{ id: "intercom", gap: [18, 35], vol: [0.1, 0.2], pan: 0.5 }]
+  },
+  dark: {
+    layers: [{ kind: "rumble", f: 90, vol: 0.18 }],
+    events: [
+      { id: "enemyStep", gap: [1.5, 5], vol: [0.25, 0.5], pan: 1 },
+      { id: "heartbeat", gap: [8, 15], vol: [0.25, 0.4], pan: 0 },
+      { id: "whisper", gap: [12, 25], vol: [0.12, 0.25], pan: 1 },
+      { id: "drip", gap: [4, 9], vol: [0.1, 0.25], pan: 1 }
+    ]
+  },
+  silent: {
+    // 원문: 아무 소리도 안 들림. 귀가 먹먹한 이명 하나만
+    layers: [{ kind: "ring", f: 7200, vol: 4e-3 }],
+    events: [{ id: "drip", gap: [25, 50], vol: [0.03, 0.06], pan: 1 }]
+  },
+  puzzle: {
+    layers: [{ kind: "air", f: 500, vol: 0.03 }, { kind: "hum", f: 82, vol: 0.02 }],
+    events: [
+      { id: "wallGrind", gap: [18, 35], vol: [0.15, 0.3], pan: 0.6 },
+      { id: "clockTick", gap: [2, 2], vol: [0.06, 0.06], pan: 0.3 }
+    ]
+  },
+  service: {
+    layers: [{ kind: "rumble", f: 140, vol: 0.2 }, { kind: "air", f: 300, vol: 0.04 }],
+    events: [
+      { id: "drip", gap: [2, 6], vol: [0.15, 0.3], pan: 1 },
+      { id: "ropeCreak", gap: [8, 16], vol: [0.2, 0.35], pan: 1 },
+      { id: "bossRoar", gap: [30, 60], vol: [0.05, 0.08], pitch: [0.6, 0.8], pan: 1 },
+      // 멀리서 포식자
+      { id: "stomp", gap: [20, 40], vol: [0.06, 0.12], pan: 1 }
+    ]
+  },
+  boss: { layers: [{ kind: "rumble", f: 120, vol: 0.18 }], events: [] }
+};
+var rnd2 = (a, b) => a + Math.random() * (b - a);
+function startAmbience(o, scene, fadeIn = 1.5) {
+  const ctx = o.ctx;
+  const spec = AMBIENCE[scene];
+  const out = gainNode(o, 0, o.amb);
+  const t0 = ctx.currentTime;
+  out.gain.setValueAtTime(1e-4, t0);
+  out.gain.linearRampToValueAtTime(1, t0 + fadeIn);
+  const long = 86400;
+  const srcs = [];
+  for (const l of spec.layers) {
+    const g = gainNode(o, l.vol, out);
+    if (l.kind === "hum") {
+      for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.3], [4, 0.15]]) srcs.push(osc(o, "sine", l.f * k, t0, long, gainNode(o, v, g)));
+      const wob = gainNode(o, l.vol * 0.3);
+      wob.connect(g.gain);
+      srcs.push(osc(o, "sine", 0.13, t0, long, wob));
+    } else if (l.kind === "rumble") {
+      srcs.push(noise(o, t0, long, filt(o, "lowpass", l.f, 1.5, g), true));
+      const wob = gainNode(o, l.vol * 0.4);
+      wob.connect(g.gain);
+      srcs.push(osc(o, "sine", 0.07, t0, long, wob));
+    } else if (l.kind === "air") {
+      srcs.push(noise(o, t0, long, filt(o, "bandpass", l.f, 0.6, g)));
+      const wob = gainNode(o, l.vol * 0.6);
+      wob.connect(g.gain);
+      srcs.push(osc(o, "sine", 0.05, t0, long, wob));
+    } else {
+      srcs.push(osc(o, "sine", l.f, t0, long, g));
+    }
+  }
+  const timers = [];
+  let live = true;
+  const fire = (e) => {
+    if (!live) return;
+    if (ctx.state !== "running") {
+      timers.push(window.setTimeout(() => fire(e), e.gap[0] * 1e3));
+      return;
+    }
+    const vol = rnd2(e.vol[0], e.vol[1]);
+    const pan = (Math.random() * 2 - 1) * (e.pan ?? 0);
+    const pitch = e.pitch ? rnd2(e.pitch[0], e.pitch[1]) : 1;
+    const t = ctx.currentTime + 0.05;
+    if (e.id === "typing") {
+      const n = 4 + Math.floor(Math.random() * 10);
+      for (let i = 0; i < n; i++) SFX.switchClick.fn(o, t + i * rnd2(0.07, 0.16), { vol: vol * rnd2(0.5, 1), pan, pitch: rnd2(1.2, 1.8), dest: out });
+    } else SFX[e.id].fn(o, t, { vol, pan, pitch, dest: out });
+    timers.push(window.setTimeout(() => fire(e), rnd2(e.gap[0], e.gap[1]) * 1e3));
+  };
+  for (const e of spec.events) timers.push(window.setTimeout(() => fire(e), rnd2(e.gap[0] * 0.3, e.gap[1] * 0.6) * 1e3));
+  return {
+    scene,
+    stop(fade = 1.2) {
+      live = false;
+      for (const id of timers) clearTimeout(id);
+      const t = ctx.currentTime;
+      out.gain.cancelScheduledValues(t);
+      out.gain.setValueAtTime(out.gain.value, t);
+      out.gain.linearRampToValueAtTime(1e-4, t + fade);
+      for (const n of srcs) try {
+        n.stop(t + fade + 0.1);
+      } catch {
+      }
+      window.setTimeout(() => out.disconnect(), (fade + 0.5) * 1e3);
+    }
+  };
+}
+
+// src/game/action/audio/index.ts
+var SCENE_SONG = {
+  title: "title",
+  hq: "hq",
+  lobby: "lobby",
+  chase: "chase",
+  replica: "replica",
+  trial: "trial",
+  dark: "dark",
+  silent: null,
+  puzzle: "puzzle",
+  service: "service",
+  boss: "boss"
+};
+var SCENE_SURFACE = {
+  title: "marble",
+  hq: "wood",
+  lobby: "marble",
+  chase: "concrete",
+  replica: "carpet",
+  trial: "tile",
+  dark: "wet",
+  silent: "concrete",
+  puzzle: "void",
+  service: "metal",
+  boss: "concrete"
+};
+var SCENES = /* @__PURE__ */ new Set(["title", "hq", "lobby", "chase", "replica", "trial", "dark", "silent", "puzzle", "service", "boss"]);
+function pickSfx(e, scene) {
+  switch (e.type) {
+    case "hit":
+      if (e.kind === "kick") return "kick";
+      if (e.kind === "low") return "lowKick";
+      if (e.kind === "dash") return "dashHit";
+      if (e.kind === "bullet") return "bulletHit";
+      if (e.kind === "super") return "superHit";
+      return e.strength && e.strength >= 3 ? "hit3" : e.strength === 2 ? "hit2" : "hit1";
+    case "whiff":
+      return e.strength && e.strength >= 3 ? "swingHeavy" : "whiff";
+    case "shot":
+      return e.kind === "silenced" ? "gunSilenced" : e.kind === "enemy" ? "enemyShot" : "gun";
+    case "empty":
+      return "emptyClick";
+    case "guard":
+      return e.perfect ? "parry" : "guard";
+    case "super":
+      return "superStart";
+    case "item":
+      return "itemUse";
+    case "step":
+      return SURFACE_SFX[e.surface ?? (scene ? SCENE_SURFACE[scene] : "concrete")];
+    case "door":
+      if (e.kind === "wood") return "doorWood";
+      if (e.kind === "slam") return "doorSlam";
+      return e.open === false ? "doorClose" : "doorOpen";
+    case "ruleFound":
+      return "ruleStamp";
+    case "hp:low":
+      return "heartbeat";
+    case "custom":
+      return e.name && e.name in SFX ? e.name : null;
+    default:
+      return e.type in SFX ? e.type : null;
+  }
+}
+var MIN_GAP = { textBlip: 0.03, uiMove: 0.03, heartbeat: 0.3 };
+var STEP_GAP = 0.07;
+var MAX_VOICES = 28;
+function createGameAudio(opts = {}) {
+  let settings = { ...DEFAULT_SETTINGS };
+  let ctx = null;
+  let graph = null;
+  let out = null;
+  let disposed = false;
+  let userPaused = false;
+  let scene = null;
+  let amb = null;
+  let song = null;
+  let resumeSong = null;
+  let jingleTimer = 0;
+  let pumpTimer = 0;
+  const lastAt = /* @__PURE__ */ new Map();
+  const voices = [];
+  let listener = { x: 0, half: 640 };
+  const compiled = /* @__PURE__ */ new Map();
+  const listeners = /* @__PURE__ */ new Set();
+  const ready = (async () => {
+    try {
+      const raw = await opts.load?.();
+      if (raw != null) settings = cleanSettings(typeof raw === "string" ? JSON.parse(raw) : raw);
+    } catch {
+    }
+    applyVolumes();
+  })();
+  let saveTimer = 0;
+  const persist = () => {
+    clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(() => {
+      try {
+        void opts.save?.(JSON.stringify(settings));
+      } catch {
+      }
+    }, 400);
+  };
+  function applyVolumes() {
+    if (!graph || !ctx) return;
+    const t = ctx.currentTime;
+    for (const b of BUSES) {
+      const v = b === "master" ? settings.muted ? 0 : sliderGain(settings.master) : sliderGain(settings[b]);
+      graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
+    }
+  }
+  function ensure() {
+    if (disposed) return null;
+    if (out) return out;
+    const AC = window.AudioContext ?? window.webkitAudioContext;
+    if (!AC) return null;
+    try {
+      ctx = new AC({ latencyHint: "interactive" });
+    } catch {
+      return null;
+    }
+    graph = buildGraph(ctx, ctx.destination);
+    out = graph.out;
+    applyVolumes();
+    ctx.addEventListener("statechange", () => listeners.forEach((f) => f()));
+    return out;
+  }
+  async function unlock() {
+    const o = ensure();
+    if (!o || !ctx) return false;
+    try {
+      const nav = navigator;
+      if (nav.audioSession && nav.audioSession.type !== "playback") nav.audioSession.type = "playback";
+    } catch {
+    }
+    if (ctx.state !== "running" && !userPaused) {
+      try {
+        const b = ctx.createBufferSource();
+        b.buffer = ctx.createBuffer(1, 1, 22050);
+        b.connect(ctx.destination);
+        b.start(0);
+        await ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    if (ctx.state === "running") detachUnlock();
+    return ctx.state === "running";
+  }
+  const UNLOCK_EVENTS = ["pointerdown", "touchend", "mousedown", "keydown"];
+  const onGesture = () => void unlock();
+  function attachUnlock() {
+    for (const ev of UNLOCK_EVENTS) window.addEventListener(ev, onGesture, { capture: true, passive: true });
+  }
+  function detachUnlock() {
+    for (const ev of UNLOCK_EVENTS) window.removeEventListener(ev, onGesture, { capture: true });
+  }
+  if (opts.autoUnlock !== false) attachUnlock();
+  const onVis = () => {
+    if (!ctx) return;
+    if (document.hidden) void ctx.suspend();
+    else if (!userPaused) void ctx.resume();
+  };
+  document.addEventListener("visibilitychange", onVis);
+  function play(id, o = {}) {
+    const ao = ensure();
+    if (!ao || !ctx || ctx.state !== "running") return false;
+    const def = SFX[id];
+    if (!def) return false;
+    const now = ctx.currentTime;
+    const gap = def.group === "step" ? STEP_GAP : MIN_GAP[id] ?? 0.015;
+    if (now - (lastAt.get(id) ?? -1) < gap) return false;
+    while (voices.length && voices[0] < now) voices.shift();
+    if (voices.length >= MAX_VOICES && (def.group === "step" || def.group === "world")) return false;
+    lastAt.set(id, now);
+    const t = Math.max(now, o.at ?? now) + 5e-3;
+    const dur = def.fn(ao, t, { vol: o.vol ?? 1, pan: o.pan ?? 0, pitch: o.pitch ?? 1, dest: ao[def.bus] });
+    const end = t + dur;
+    const i = voices.findIndex((v) => v > end);
+    voices.splice(i < 0 ? voices.length : i, 0, end);
+    return true;
+  }
+  function panOf(e) {
+    if (e.pan != null) return e.pan;
+    if (e.x == null) return 0;
+    return Math.max(-0.8, Math.min(0.8, (e.x - listener.x) / listener.half));
+  }
+  function event(e) {
+    switch (e.type) {
+      case "enter:floor":
+        if (e.floor?.type && SCENES.has(e.floor.type)) floor(e.floor.type);
+        return true;
+      case "combat:boss":
+        music("boss", 0.6);
+        return true;
+      case "combat:clear":
+        if (song?.id === "boss") jingle("clear", scene ? SCENE_SONG[scene] : null);
+        return true;
+      case "run:end":
+        jingle(e.how === "evac" ? "gameover" : "clear", null);
+        return true;
+    }
+    const id = pickSfx(e, scene);
+    if (!id) return false;
+    const far = e.x == null ? 1 : Math.max(0.35, 1 - Math.max(0, Math.abs(e.x - listener.x) - listener.half) / (listener.half * 2));
+    const ok = play(id, { vol: (e.vol ?? 1) * far, pan: panOf(e), pitch: e.pitch });
+    if (ok && e.type === "super") duck(1.6);
+    if (ok && e.type === "ruleFound") duck(1.2, 0.4);
+    return ok;
+  }
+  function songOf(id) {
+    let c = compiled.get(id);
+    if (!c) compiled.set(id, c = compileSong(SONGS[id]));
+    return c;
+  }
+  function pump() {
+    if (!ctx || !song) return;
+    song.player.schedule(ctx.currentTime + 0.4, ctx.currentTime);
+  }
+  function startPump() {
+    if (!pumpTimer) pumpTimer = window.setInterval(pump, 50);
+  }
+  function music(id, fade = 1) {
+    const o = ensure();
+    if (!o || !ctx) return;
+    clearTimeout(jingleTimer);
+    resumeSong = null;
+    if (song?.id === id && !song.player.ended) return;
+    const t = ctx.currentTime;
+    song?.player.fadeOut(t, fade);
+    song = null;
+    if (!id) return;
+    const player = new Player2(o, songOf(id), t + Math.min(0.15, fade * 0.3));
+    song = { id, player };
+    startPump();
+    pump();
+  }
+  function jingle(id, then) {
+    const o = ensure();
+    if (!o || !ctx) return;
+    const back = then !== void 0 ? then : resumeSong ?? song?.id ?? null;
+    music(id, 0.25);
+    resumeSong = back;
+    const len = song.player.lengthSec;
+    jingleTimer = window.setTimeout(() => {
+      const b = resumeSong;
+      resumeSong = null;
+      if (b) music(b, 0.5);
+    }, (len + 0.8) * 1e3);
+  }
+  function duck(sec, to = 0.25) {
+    if (!ctx || !graph) return;
+    const g = graph.duck.gain;
+    const t = ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setTargetAtTime(to, t, 0.04);
+    g.setTargetAtTime(1, t + sec, 0.3);
+  }
+  function floor(s) {
+    const o = ensure();
+    if (!o) return;
+    if (s === scene) return;
+    scene = s;
+    amb?.stop();
+    amb = s ? startAmbience(o, s) : null;
+    music(s ? SCENE_SONG[s] : null, 1.2);
+  }
+  return {
+    ready,
+    unlock,
+    get unlocked() {
+      return ctx?.state === "running";
+    },
+    get scene() {
+      return scene;
+    },
+    get song() {
+      return song?.id ?? null;
+    },
+    play,
+    event,
+    music,
+    jingle,
+    duck,
+    floor,
+    /** 소리의 좌우를 정할 기준: 화면 가운데 x와 화면 반 너비 */
+    setListener(x, half = 640) {
+      listener = { x, half: Math.max(1, half) };
+    },
+    get settings() {
+      return { ...settings };
+    },
+    setVolume(bus, v) {
+      settings = cleanSettings({ ...settings, [bus]: v });
+      applyVolumes();
+      persist();
+    },
+    setMuted(m) {
+      settings = { ...settings, muted: m };
+      applyVolumes();
+      persist();
+    },
+    /** 게임 일시정지: 모든 소리를 멈춘다 */
+    pause() {
+      userPaused = true;
+      void ctx?.suspend();
+    },
+    resume() {
+      userPaused = false;
+      void unlock();
+    },
+    onState(f) {
+      listeners.add(f);
+      return () => listeners.delete(f);
+    },
+    dispose() {
+      disposed = true;
+      detachUnlock();
+      document.removeEventListener("visibilitychange", onVis);
+      clearInterval(pumpTimer);
+      clearTimeout(jingleTimer);
+      amb?.stop(0.1);
+      void ctx?.close();
+      ctx = null;
+      out = null;
+      graph = null;
+    }
+  };
+}
+
 // src/game/action/engine/training.ts
 function trainingFloor() {
   const L = 4200;
@@ -2237,11 +4461,41 @@ var dummyStage = {
 };
 
 // src/game/action/engine/modules.ts
+var store = (key) => ({
+  load: () => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  save: (v) => {
+    try {
+      localStorage.setItem(key, v);
+    } catch {
+    }
+  }
+});
 function engineModules() {
+  const audio = createGameAudio(store("goei-game-audio"));
+  const listeners = [
+    (e) => {
+      audio.event(e);
+      if (e.type === "super") audio.duck(1.4);
+    }
+  ];
   return {
     stages: [trainingStage, dummyStage],
     hud: true,
-    listeners: []
+    listeners,
+    overlay: (_ctx, w) => {
+      if (w) audio.setListener(w.camX + 640, 640);
+    },
+    onScene: (name) => {
+      if (name === "title" || name === "hq") audio.floor(name);
+    },
+    onPause: (p) => p ? audio.pause() : audio.resume(),
+    dispose: () => audio.dispose()
   };
 }
 
@@ -2280,11 +4534,11 @@ function mountTouch(root, input) {
   root.append(st, wrap);
   const grid = wrap.querySelector(".gt-btns");
   for (const [b, label, cls] of BTNS) {
-    const d = document.createElement("div");
-    d.className = "gt-b" + (cls ? " " + cls : "");
-    d.dataset.b = b;
-    d.textContent = label;
-    grid.appendChild(d);
+    const d2 = document.createElement("div");
+    d2.className = "gt-b" + (cls ? " " + cls : "");
+    d2.dataset.b = b;
+    d2.textContent = label;
+    grid.appendChild(d2);
   }
   wrap.querySelectorAll(".gt-b").forEach((el) => {
     const b = el.dataset.b;
