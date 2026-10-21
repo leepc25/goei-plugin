@@ -4265,10 +4265,13 @@ var World = class {
     this.subtitle = { text, t: Math.round(seconds * 30) };
     this.subtitleAt = this.tick;
   }
+  /** 생성 자리 고치기 (바닥 물건 위에 생겨나지 않게, itemsLink가 단다) */
+  spawnAdjust = null;
   spawn(s2) {
+    if (this.spawnAdjust) s2 = this.spawnAdjust(s2);
     const b = this.enemyFactory(s2, this);
     this.add(b);
-    this.emit({ type: "enemySpawn", x: s2.x, kind: s2.kind });
+    this.emit({ type: "enemySpawn", x: b.x, kind: s2.kind });
     return b;
   }
   /* ───────── 층 ───────── */
@@ -14534,7 +14537,7 @@ function floorPlan(f, id, startX = 240) {
     if (s2.role === "resident") props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
     if (s2.role === "enemy" && s2.data.harmless) props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
   }
-  spreadProps(f, props2, startX);
+  const doorSpans = spreadProps(f, props2, startX);
   const encounters = [];
   if (!NOLOCK_TYPES.has(f.type)) {
     const groups = /* @__PURE__ */ new Map();
@@ -14566,6 +14569,7 @@ function floorPlan(f, id, startX = 240) {
     exitX: Infinity,
     encounters,
     props: props2,
+    keepOut: doorSpans,
     palette: { wall: f.palette.wall, floor: f.palette.floor, accent: f.palette.accent },
     banner: f.label,
     stage: { where: "floor", terrain: f.segments.flatMap((s2) => s2.terrain), floor: f, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
@@ -14654,6 +14658,7 @@ function spreadProps(f, props2, startX) {
   const wallY = Y_TOP + 40;
   const keepOut = [];
   for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor("floor", f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
+  const doorSpans = keepOut.slice();
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === "block" || t.kind === "pit" || t.kind === "narrow" || t.kind === "low");
   const taken = [];
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
@@ -14719,6 +14724,7 @@ function spreadProps(f, props2, startX) {
     if (boardLike(p)) kept.push(p);
     taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   }
+  return doorSpans;
 }
 function clearOfProps(props2, x, y) {
   const hit2 = (yy) => props2.some((p) => Math.abs(p.y - yy) < 70 && Math.abs(p.x - x) < artW(p) / 2 + 40);
@@ -20799,6 +20805,22 @@ function nudgeProp(p, bodies, others, x0, x1) {
   const clear2 = (x) => x > x0 && x < x1 && !bodies.some((b) => Math.abs(b.x - x) < p.w / 2 + 60 && Math.abs(b.y - p.y) < PROP_DEPTH) && !others.some((o) => o !== p && Math.abs(o.x - x) < (o.w + p.w) / 2 + 20 && Math.abs(o.y - p.y) < PROP_DEPTH);
   for (let d2 = 40; d2 < 800; d2 += 20) for (const x of [p.x + d2, p.x - d2]) if (clear2(x)) return void (p.x = x);
 }
+function clearSpot(x, y, props2, lane) {
+  const hit2 = (xx, yy) => props2.some((p) => Math.abs(p.x - xx) < p.w / 2 + 40 && Math.abs(p.y - yy) < PROP_DEPTH + 6);
+  if (!hit2(x, y)) return { x, y };
+  for (const d2 of [60, -60, 110, -110, 170, -170]) {
+    const yy = y + d2;
+    if (yy >= lane[0] && yy <= lane[1] && !hit2(x, yy)) return { x, y: yy };
+  }
+  for (let d2 = 40; d2 < 600; d2 += 20) for (const xx of [x + d2, x - d2]) if (!hit2(xx, y)) return { x: xx, y };
+  return { x, y };
+}
+function furnishAvoid(floor, bodies = []) {
+  const terr = (floor.stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
+  const doors = (floor.keepOut ?? []).map(([a, b]) => ({ x: (a + b) / 2, w: b - a + 260 }));
+  const foes = [...(floor.encounters ?? []).flatMap((en) => en.waves.flat()), ...bodies].map((s2) => ({ x: s2.x, w: 200 }));
+  return [...(floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr, ...doors, ...foes];
+}
 
 // src/game/action/engine/itemsLink.ts
 var PROP_ART = /* @__PURE__ */ new Set(["chair", "pot", "tv", "table", "crate"]);
@@ -20945,8 +20967,7 @@ function linkItems(w, run) {
   w.on((e) => {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-      const terr = (e.floor.stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
-      furnishFloor(field, { ...e.floor, props: [...(e.floor.props ?? []).map((p2) => ({ x: p2.x, w: Math.max(p2.w, 130) })), ...terr] }, w.lane, () => w.rand());
+      furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
       field.ents = field.ents.filter((q) => q.type !== "prop" || PROP_ART.has(q.prop));
       syncCarry();
     }
@@ -20973,6 +20994,12 @@ function linkItems(w, run) {
   });
   const hitSeen = /* @__PURE__ */ new Set();
   const overlapT = /* @__PURE__ */ new WeakMap();
+  const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => ({ x: q.x, y: q.y, w: Math.max(q.w, 100) }));
+  const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w })), ...floorSolids()];
+  w.spawnAdjust = (s2) => {
+    const q = clearSpot(s2.x, s2.y, allSolids(), w.lane);
+    return q.x === s2.x && q.y === s2.y ? s2 : { ...s2, x: q.x, y: q.y };
+  };
   Object.defineProperty(w, "itemField", { get: () => field, configurable: true });
   return {
     run: ir,
@@ -20989,9 +21016,10 @@ function linkItems(w, run) {
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       const ents = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]);
       const solids = ents.map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w }));
-      if (solids.length) {
+      const fixed2 = floorSolids();
+      if (solids.length || fixed2.length) {
         const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral");
-        const stuck = blockByProps(bodies, solids, w.lane);
+        const stuck = blockByProps(bodies, [...solids, ...fixed2], w.lane);
         ents.forEach((e, i) => {
           const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
           overlapT.set(e, n);

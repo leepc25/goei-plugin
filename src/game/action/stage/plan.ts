@@ -57,7 +57,7 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     if (s.role === 'resident') props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '주민 (사는 척)' });
     if (s.role === 'enemy' && s.data.harmless) props.push({ id: `h${s.id}`, kind: 'npc', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '평범한 직원' });
   }
-  spreadProps(f, props, startX);
+  const doorSpans = spreadProps(f, props, startX);
   // 싸움 구간: 조각마다 적 자리를 묶는다. 추격·B-12는 화면을 잠그지 않으므로 층 tick이 직접 부른다.
   const encounters: Encounter[] = [];
   if (!NOLOCK_TYPES.has(f.type)) {
@@ -90,6 +90,7 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     exitX: Infinity,
     encounters,
     props,
+    keepOut: doorSpans,
     palette: { wall: f.palette.wall, floor: f.palette.floor, accent: f.palette.accent },
     banner: f.label,
     stage: { where: 'floor', terrain: f.segments.flatMap((s) => s.terrain), floor: f, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } },
@@ -182,10 +183,11 @@ const FIXED_PROPS = new Set(['elevator', 'mirror', 'hatch', 'panel', 'chasedoor'
 const BOARD_GAP = 1400;
 const artW = (p: PropSpec) => Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
 
-function spreadProps(f: Floor, props: PropSpec[], startX: number) {
+function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, number][] {
   const wallY = Y_TOP + 40;
   const keepOut: [number, number][] = [];
   for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
+  const doorSpans = keepOut.slice();
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === 'block' || t.kind === 'pit' || t.kind === 'narrow' || t.kind === 'low');
   const taken: { a: number; b: number; y: number }[] = [];
   // 갈림길·규칙 표지는 순서가 뜻이라 그대로
@@ -260,6 +262,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number) {
     if (boardLike(p)) kept.push(p);
     taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   }
+  return doorSpans;
 }
 
 /** 적이 소품 한가운데 서지 않게: 그 자리에 소품이 있으면 깊이를 비켜 선다 */

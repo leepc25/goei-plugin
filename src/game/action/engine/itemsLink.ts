@@ -33,7 +33,7 @@ import { drawPropArt } from '../art/bg';
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
-import { blockByProps, nudgeProp } from './propBlock';
+import { blockByProps, clearSpot, furnishAvoid, nudgeProp } from './propBlock';
 import type { World } from './world';
 
 // 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
@@ -204,9 +204,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     if (e.type === 'enter:floor') {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
-      // 지형(단·구덩이·좁은 길·낮은 천장) 위에도 놓지 않는다 (검수 12-2: TV가 단 모서리에 걸침)
-      const terr = ((e.floor as { stage?: { terrain?: { x0: number; x1: number }[] } }).stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
-      furnishFloor(field, { ...e.floor, props: [...(e.floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr] }, w.lane, () => w.rand());
+      // 문·벽 가구 앞, 지형 위, 적이 생겨날 자리를 비운다 (검수 12-2, 17)
+      furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== 'player')) }, w.lane, () => w.rand());
       // 그림이 없는 물건(회색 기둥처럼 보이는 아이콘 대역)은 층에 두지 않는다 (재검수 2-1)
       field.ents = field.ents.filter((q) => q.type !== 'prop' || PROP_ART.has(q.prop));
       syncCarry();
@@ -237,6 +236,14 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
 
   const hitSeen = new Set<string>();
   const overlapT = new WeakMap<object, number>();
+  // 층 바닥에 선 꾸밈 물건(상자 더미·탁자): 몸이 뚫지 않게 (검수 17-2). 벽에 붙은 것(깊이 맨 뒤)은 빼고
+  const floorSolids = () => w.props.filter((q) => (q.kind === 'prop' || q.kind === 'table' || q.kind === 'clutter') && q.y > w.lane[0] + 20).map((q) => ({ x: q.x, y: q.y, w: Math.max(q.w, 100) }));
+  const allSolids = () => [...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w })), ...floorSolids()];
+  // 적은 처음부터 물건 밖에 생겨난다 (검수 17-1: 나중에 옮기면 첫 화면엔 겹쳐 보임)
+  w.spawnAdjust = (s) => {
+    const q = clearSpot(s.x, s.y, allSolids(), w.lane);
+    return q.x === s.x && q.y === s.y ? s : { ...s, x: q.x, y: q.y };
+  };
   // 검사 스크립트용: 바닥 물건 목록 (화면 검수에서 물건·몸 겹침을 숫자로 잰다)
   Object.defineProperty(w, 'itemField', { get: () => field, configurable: true });
   return {
@@ -256,9 +263,10 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
       const solids = ents.map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w }));
-      if (solids.length) {
+      const fixed = floorSolids();
+      if (solids.length || fixed.length) {
         const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral');
-        const stuck = blockByProps(bodies, solids, w.lane);
+        const stuck = blockByProps(bodies, [...solids, ...fixed], w.lane);
         // 0.5초 넘게 겹쳐 있으면(제자리에 묶인 적) 물건을 옆으로 옮긴다
         ents.forEach((e, i) => {
           const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;

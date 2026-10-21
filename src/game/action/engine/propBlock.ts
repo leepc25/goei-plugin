@@ -44,3 +44,27 @@ export function nudgeProp(p: BlockProp, bodies: BlockBody[], others: BlockProp[]
     x > x0 && x < x1 && !bodies.some((b) => Math.abs(b.x - x) < p.w / 2 + 60 && Math.abs(b.y - p.y) < PROP_DEPTH) && !others.some((o) => o !== p && Math.abs(o.x - x) < (o.w + p.w) / 2 + 20 && Math.abs(o.y - p.y) < PROP_DEPTH);
   for (let d = 40; d < 800; d += 20) for (const x of [p.x + d, p.x - d]) if (clear(x)) return void (p.x = x);
 }
+
+/** 몸을 세울 자리: 물건 발치(깊이 PROP_DEPTH, 폭 w/2+40) 밖으로. 깊이를 먼저 비키고, 안 되면 옆으로 (검수 17-1: 원탁 안에 생겨나는 적) */
+export function clearSpot(x: number, y: number, props: BlockProp[], lane: [number, number]): { x: number; y: number } {
+  const hit = (xx: number, yy: number) => props.some((p) => Math.abs(p.x - xx) < p.w / 2 + 40 && Math.abs(p.y - yy) < PROP_DEPTH + 6);
+  if (!hit(x, y)) return { x, y };
+  for (const d of [60, -60, 110, -110, 170, -170]) {
+    const yy = y + d;
+    if (yy >= lane[0] && yy <= lane[1] && !hit(x, yy)) return { x, y: yy };
+  }
+  for (let d = 40; d < 600; d += 20) for (const xx of [x + d, x - d]) if (!hit(xx, y)) return { x: xx, y };
+  return { x, y };
+}
+
+/** 층에 들·부술 물건을 놓을 때 피할 x 구간들: 층 소품, 지형(±180), 벽 그림 문·가구 앞, 적이 생겨날 자리 (검수 12-2, 17-3) */
+export function furnishAvoid(
+  floor: { props?: { x: number; w: number }[]; keepOut?: [number, number][]; encounters?: { waves: { x: number }[][] }[]; stage?: unknown },
+  bodies: { x: number }[] = [],
+): { x: number; w: number }[] {
+  const terr = ((floor.stage as { terrain?: { x0: number; x1: number }[] } | undefined)?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
+  // 물건 폭은 가운데만 검사되므로 가장 넓은 물건(우편함 242) 절반만큼 더 넓게
+  const doors = (floor.keepOut ?? []).map(([a, b]) => ({ x: (a + b) / 2, w: b - a + 260 }));
+  const foes = [...(floor.encounters ?? []).flatMap((en) => en.waves.flat()), ...bodies].map((s) => ({ x: s.x, w: 200 }));
+  return [...(floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr, ...doors, ...foes];
+}

@@ -200,10 +200,14 @@ export class World implements WorldView {
     this.subtitleAt = this.tick;
   }
 
+  /** 생성 자리 고치기 (바닥 물건 위에 생겨나지 않게, itemsLink가 단다) */
+  spawnAdjust: ((s: SpawnSpec) => SpawnSpec) | null = null;
+
   spawn(s: SpawnSpec): Body {
+    if (this.spawnAdjust) s = this.spawnAdjust(s);
     const b = this.enemyFactory(s, this);
     this.add(b);
-    this.emit({ type: 'enemySpawn', x: s.x, kind: s.kind });
+    this.emit({ type: 'enemySpawn', x: b.x, kind: s.kind });
     return b;
   }
 
