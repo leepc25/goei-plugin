@@ -432,6 +432,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     boot: (g) => bootFromUrl(g),
     dispose: () => {
       unmountItems();
+      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown };
+      delete g.__goeiStory;
+      delete g.__goeiStoryStart;
+      world = null;
+      game = null;
       window.removeEventListener('keydown', storyKeys, true);
       window.removeEventListener('keydown', hqKeys, true);
       saveFlags();

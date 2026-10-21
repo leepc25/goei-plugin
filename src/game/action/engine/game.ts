@@ -107,6 +107,7 @@ export class Game {
       queueMicrotask(() => this.mods.boot?.(this));
     }
     const frame = (now: number) => {
+      if (this.dead) return;
       this.raf = requestAnimationFrame(frame);
       if (!this.last) this.last = now;
       let dt = (now - this.last) / 1000;
@@ -144,7 +145,10 @@ export class Game {
   }
 
   destroy() {
+    this.dead = true;
     cancelAnimationFrame(this.raf);
+    this.world = null;
+    this.run = null;
     this.input.detach();
     if (this.ownCanvas) this.canvas.remove();
     if (this.hqRoot) {
@@ -175,6 +179,7 @@ export class Game {
     this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
   }
 
+  private dead = false;
   /** 본부를 걷는 중인가 (엔진 벨트 장면) */
   inHub = false;
 
