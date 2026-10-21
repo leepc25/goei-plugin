@@ -1,83 +1,117 @@
-# GPT 요청서 · 컷신 장소 배경 (2026-10-21 정정판)
+# GPT 요청서 · 오프닝과 클로즈업 레이어 (2026-10-21 최종 정정판)
 
-주인: 「대사와 컷신」 스레드(Claude).
+주인: 「대사와 컷신」 스레드(Claude). 이전 판(한 장 그림 14장, 장소 배경 4곳)은 **모두 취소**한다. 이미 만든 그림은 쓰지 않는다.
 
-**컷신은 움직이는 도트씬이다(사용자 결정 2026-10-21).** 엔진이 도트화한 배경 위에서 쟈알디 등 기존 캐릭터 클립을 걷게·돌아보게·말하게 하고, 문·승강기 문 같은 물건은 따로 움직이고, 카메라·흔들림·빛·암전은 코드로 넣는다. 그래서 GPT는 **장소의 벽 칸·바닥·원경·물건 시트만** 그린다.
+## 정한 것 (사용자 2026-10-21)
 
-- **캐릭터·사람이 든 그림은 그리지 않는다.** 이전 판(한 장 그림·쟈알디 그림)으로 이미 만든 것은 버린다(쓰지 않는다).
-- 규칙은 `docs/GPT요청_게임배경.md`와 똑같다: 공통 STYLE 문단, WALL BAY RULES, FLOOR / FAR / OBJECT SHEET RULES, 그리고 그 문서의 「정정 (16:15)」 CORRECTION 문단(적은 큰 모양, 굵은 외곽선, 정면 시점 물건, 투명 배경)을 모든 요청문 앞에 붙인다.
-- 크기: 벽 칸·원경 1536×1024, 바닥 1024×1024, 물건 시트 1536×1024 (게임 배경과 같음).
-- 도트화는 Claude가 「게임 타일과 배경」의 도구로 한다.
+- 컷신 9개는 **이벤트씬**이다. 게임 화면 안에서 게임 배경(`docs/GPT요청_게임배경.md`)과 쟈알디 등 기존 도트 클립이 대본대로 걷고, 마주 보고, 놀라고, 문을 연다. GPT 그림이 필요 없다.
+- GPT 그림은 **오락실식 도트 오프닝**(CPS2·네오지오 시절: 여러 층 스크롤 배경, 화면을 크게 채우는 인물이 실제로 움직임, 얼굴·눈 클로즈업, 빠른 컷 전환과 번쩍임, 마지막 로고)과 **꼭 필요한 클로즈업 3컷**에만 쓴다.
+- 그림은 컷마다 **레이어를 나눠 투명 배경**으로 받는다. Claude가 「게임 타일과 배경」의 B판 도구로 도트화하고, 엔진에서 레이어 시차·카메라·흔들림·번쩍임과 인물 레이어 움직임(숨쉬기, 머리카락, 옷자락, 고개, 팔)으로 움직인다.
 
 ## GPT에게 (작업 방법)
 
-- 저장: **`game-src/art/cutscene/raw/<장소>/<파일 이름>.png`** (아래 이름 그대로). 다 올린 뒤 `game-src/art/cutscene/raw/README.md`에 받은 파일 목록을 적고 main에 커밋한다. `docs/GPT_요청_목록.md`의 컷신 줄 상태를 「받음」으로 바꾼다.
+- 저장: **`game-src/art/cutscene/raw/<컷>/<레이어>.png`** (아래 이름 그대로). 다 올린 뒤 `game-src/art/cutscene/raw/README.md`에 받은 파일 목록을 적고 main에 커밋한다. `docs/GPT_요청_목록.md`의 컷신 줄 상태를 「받음」으로 바꾼다.
 - 목록을 쉬지 않고 순서대로 전부 만든다. 한 답변에 여러 장 만들어도 된다. 묻지 않는다. 한도에 걸리면 멈춘 번호부터 이어 한다.
-- 장소마다 **시간과 빛이 다르다.** 아래 PLACE 문단의 시간·빛을 꼭 지킨다(게임 배경은 대부분 밤이다).
+- **한 컷의 레이어는 모두 같은 크기(1536×1024)·같은 구도**로 그려서 겹치면 그대로 한 장면이 되게 한다. 레이어마다 자기 것만 그리고 나머지는 투명(안 되면 완전히 평평한 #FF00FF).
+- 배경·원경 레이어는 화면보다 넓게: 1536×1024 전체를 채운다(게임은 그 안의 약 1180×664 창을 움직이며 보여 준다). 중요한 것은 가운데 70% 안에.
+- 인물은 **움직일 부분을 따로** 그린다(아래 `char_*` 레이어). 따로 그린 부분은 이어지는 자리 아래까지 조금 더 그려서(겹침 여유) 돌려도 틈이 안 보이게 한다.
+- 컷마다 시간과 빛이 다르다. 각 컷 문단을 지킨다.
 
-## 이미 있는 게임 배경을 쓰는 컷신 (GPT가 그리지 않음)
-
-| 컷신 | 쓰는 게임 배경 (`game-src/art/bg/raw/`) |
-| --- | --- |
-| 첫 출근 뒷부분 (사무실) | `hq_office` |
-| 첫 투입·첫 호명 (승강기 안 → 로비) | `el_car`, `lobby` |
-| 삼 년째 승객 (엘리베이터 홀) | `el_hall` |
-| 다락방 | `service` (`service_wall_4`) |
-| 귀환 앞부분 (승강로 로프) | `service` (`service_far_tall`, 로프 물건) |
-
-## 새로 그릴 장소 4곳 (각 장소 = GPT 대화 하나)
-
-### 1. cs_street · 텅 빈 종로 거리 (첫 출근 앞부분) — 아침
+## 공통 스타일 (모든 요청문 맨 앞)
 
 ```
-PLACE: an empty street in Jongno, central Seoul, at 8:40 on a weekday morning, completely deserted (no people, no cars, no birds). Time and light: early morning, flat cool grey daylight under an overcast sky, long soft shadows, no lamps lit. The "wall" is the row of old 4-6 storey office buildings and shops facing the street (facades: weathered beige and grey tile, dark window glass; pillars: the building corners / thick concrete columns between shopfronts). The sidewalk is the floor.
-1. cs_street_wall_1 — a shopfront with its metal roller shutter pulled down and a blank sign board above, windows of offices above.
-2. cs_street_wall_2 — the glass entrance of an old office building with a revolving door opening shown as an empty dark hole, blank brass name plates beside it.
-3. cs_street_wall_3 — a convenience-store-like shop with lights off behind the glass, a blank awning.
-4. cs_street_wall_4 — a narrow dark alley opening between two buildings, with a drainpipe and an air-conditioner unit on the wall.
-5. cs_street_floor — grey concrete sidewalk paving blocks with a yellow tactile strip, top-down.
-6. cs_street_far — the wide empty six-lane road and the buildings on the far side of the street, traffic lights on green, hazy grey morning.
-7. cs_street_objects — 1 street lamp post (unlit), 2 traffic light pole for pedestrians, 3 bus stop shelter with a blank panel, 4 public trash bin, 5 bench, 6 fire hydrant, 7 newspaper rack (empty), 8 tree in a sidewalk grate, 9 parked delivery scooter.
+STYLE (same for every image)
+Layer art for a 1990s arcade game opening (CPS2 / Neo Geo era, like Capcom's Dungeons & Dragons: Shadow over Mystara or Metal Slug intros), set in present-day Seoul, South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines (about 6-8 px), few large simple shapes, large flat color areas, no fine texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later). Muted night colors with strong single accent lights. No text, letters, numbers or logos anywhere (sign plates, buttons and papers stay blank). Every layer is 1536x1024 with a transparent background except where the layer is a full background; all layers of one cut line up exactly.
 ```
 
-### 2. cs_entrance · 낡은 사무실 건물 앞 (출구 컷신, 관리국 차량) — 새벽
+## 쟈알디 (인물이 나오는 레이어에 붙인다)
 
 ```
-PLACE: the front of the old Korean office building that hides the dimensional elevator, at dawn. Time and light: just before sunrise, deep blue sky turning pale orange at the bottom, the building's lobby lights still on (warm) inside the glass, street lamps still lit. Wall: the building's ground-floor facade (dark grey granite cladding, pillars: square granite columns).
-1. cs_entrance_wall_1 — the main glass entrance doors of the building (the door leaves are separate objects, draw the empty lit doorway), a small canopy above, blank address plate.
-2. cs_entrance_wall_2 — plain granite facade with a ground-floor window showing the lit lobby inside (marble, a closed elevator with brass trim far inside).
-3. cs_entrance_wall_3 — a side service door opening (dark), an electric meter box, a pipe.
-4. cs_entrance_floor — dark wet asphalt and granite curb paving, top-down.
-5. cs_entrance_far — the dawn sky over low city rooftops, a few lit windows, horizontally tileable.
-6. cs_entrance_objects — 1 black government sedan seen from the side, engine running, headlights on, back door closed (front view rules do not apply: draw this one car exactly from the side), 2 glass entrance door leaf (left), 3 glass entrance door leaf (right), 4 street lamp (lit), 5 standing ashtray, 6 potted shrub, 7 bollard, 8 "no parking" cone, 9 newspaper bundle on the ground.
+CHARACTER: JYALDI
+A tall Korean woman in her late 20s, chief of a secret anomaly-response team. Long straight jet-black hair down to her waist, worn loose. Red eyes (the only strong color on her). Expressionless, calm face; upright posture. Black pantsuit (jacket and trousers, never a skirt), white dress shirt, black necktie, black leather gloves. Full-chested figure, drawn plainly, not exaggerated. A black handgun in a shoulder holster under the jacket. Palette: hair #15141a, suit #1c1d24/#2d2f3a, shirt #e8e6e0, skin #f0d6c4, eyes #d12b3a, gloves #111115.
 ```
 
-### 3. cs_medbay · 본부 의무실 (후송 컷신) — 낮, 형광등
+## 오프닝 (컷 7개)
+
+| 컷 | 길이 | 움직임 (엔진) |
+| --- | --- | --- |
+| op1_city | 4초 | 세 층 시차로 오른쪽으로 흐름, 빌딩 창 불 몇 개 깜빡 |
+| op2_building | 3초 | 위에서 아래로 내려옴(세로 이동), 표시등 빨갛게 깜빡 |
+| op3_checklist | 2초 | 천천히 확대, 마지막에 흰 번쩍 |
+| op4_jyaldi_back | 4초 | 숨쉬기, 머리카락·옷자락 흔들림, 끝에 머리 레이어를 바꿔 고개만 돌림 |
+| op5_eye | 1.5초 | 눈 반짝 빛 레이어가 지나감, 미세 흔들림 |
+| op6_draw | 2.5초 | 팔 레이어가 총집에서 앞으로 돌며 뽑힘(두 장 바꿔 끼움), 흰 번쩍 |
+| op7_panel | 4초 | 버튼 빛 레이어가 위에서 아래로 빠르게 켜짐, 컷 번쩍 두 번 |
+
+그 뒤 요원 얼굴 8장(기존 명부 사진)과 로고는 엔진이 만든다. GPT 그림 없음.
 
 ```
-PLACE: a small infirmary room in the team's headquarters. Time and light: daytime but no windows, bright flat fluorescent light, slightly cold and clinical, very clean. Wall: pale mint-green painted wall with a white lower wainscot, pillars: plain white columns.
-1. cs_medbay_wall_1 — a wall-mounted cabinet with frosted glass doors and a hand sanitizer dispenser.
-2. cs_medbay_wall_2 — a plain wall with a curtain rail on the ceiling and a light-green privacy curtain hanging from it (half open), an oxygen outlet panel.
-3. cs_medbay_wall_3 — an empty doorway to the corridor, a wall clock without numbers, a light switch.
-4. cs_medbay_wall_4 — a small frosted window (light coming in) and a blank first-aid poster frame.
-5. cs_medbay_floor — pale grey linoleum floor with faint speckles.
-6. cs_medbay_objects — 1 hospital bed with white sheets (empty, front view, long side facing the viewer), 2 bedside table, 3 IV drip stand, 4 folding privacy screen, 5 stool, 6 medicine cart, 7 paper cup of black coffee (small object, still make it fill its cell), 8 metal trash bin with pedal, 9 wheelchair (folded).
+op1_city — Seoul skyline at night from a high place, moonless cloudy sky glowing faintly orange from the city.
+  op1_city/far.png   — night sky with low clouds and a faint glow at the horizon (full background).
+  op1_city/mid.png   — distant high-rise silhouettes with scattered lit windows (transparent above the skyline).
+  op1_city/near.png  — close dark rooftops, water tanks and antennas along the bottom third (transparent above).
+  op1_city/lights.png — only the lit windows of mid.png as small warm squares (transparent elsewhere), for blinking.
+
+op2_building — an old 1990s six-storey office building in Jongno at night, seen straight from the front, one lit lobby at the bottom.
+  op2_building/far.png  — night sky and neighboring buildings (full background).
+  op2_building/bg.png   — the building facade, tall: the top of the building at the top of the image, the lit glass lobby entrance at the bottom (transparent sky).
+  op2_building/lamp.png — only one small red elevator indicator lamp glow seen through the lobby glass (transparent elsewhere).
+  op2_building/fg.png   — a dark street lamp and a railing in the foreground at the left edge (transparent elsewhere).
+
+op3_checklist — close-up: an old elevator inspection checklist in a clear plastic sleeve on a pale beige marble wall, dim light, red lamp glow from above.
+  op3_checklist/bg.png   — marble wall with brass trim (full background).
+  op3_checklist/paper.png — the checklist sheet: rows of empty boxes and lines with NO writing, the signature box at the bottom clearly empty (transparent elsewhere).
+  op3_checklist/hand.png — JYALDI's black-gloved right hand and wrist entering from the lower right, index finger touching the empty signature box (transparent elsewhere).
+
+op4_jyaldi_back — JYALDI seen from behind, full figure filling 80% of the image height, standing in front of closed brass-trimmed elevator doors in a marble lobby at night, one red indicator lamp above the doors.
+  op4_jyaldi_back/bg.png         — the elevator doors, marble wall, terrazzo floor (full background).
+  op4_jyaldi_back/body.png       — her body from behind without head and hair (suit, gloves, legs).
+  op4_jyaldi_back/hair.png       — her long black hair as one separate shape from the crown to the waist, slightly longer at the top so it overlaps the head.
+  op4_jyaldi_back/head_back.png  — her head from behind (back of the head, ears hidden by hair).
+  op4_jyaldi_back/head_turn.png  — her head turned to look over her right shoulder: profile with one red eye visible, same position as head_back.
+  op4_jyaldi_back/coat.png       — the lower part of her suit jacket (hem) as a separate shape that can sway.
+  op4_jyaldi_back/glow.png       — only the red lamp light falling on the doors and her shoulder (transparent elsewhere).
+
+op5_eye — extreme close-up of JYALDI's face: from the bridge of the nose to the eyebrows, one red eye looking straight at the viewer, strands of black hair across.
+  op5_eye/bg.png    — dark background (full).
+  op5_eye/face.png  — the face crop with the red eye open.
+  op5_eye/shut.png  — the same eye closed (for a blink), same position.
+  op5_eye/glint.png — a single sharp white glint on the eye and a thin red light streak (transparent elsewhere).
+
+op6_draw — waist-up shot of JYALDI from the front-side, drawing her handgun.
+  op6_draw/bg.png        — dark elevator hall, red lamp light from the side (full).
+  op6_draw/body.png      — her torso, head and hair without the right arm, jacket open showing the shoulder holster.
+  op6_draw/arm_holster.png — her right arm with the gloved hand gripping the gun still in the holster.
+  op6_draw/arm_aim.png   — her right arm extended toward the viewer's left aiming the handgun, same shoulder position.
+  op6_draw/flash.png     — a white light streak along the gun barrel (transparent elsewhere).
+
+op7_panel — close-up of the inside elevator button panel (brushed steel, faux-wood below), far too many round buttons in a long column going down off the bottom edge, all faces blank, the lowest ones dark and scratched.
+  op7_panel/bg.png     — the panel (full).
+  op7_panel/lights.png — only the button faces glowing warm (transparent elsewhere), for lighting one by one.
+  op7_panel/grille.png — the small speaker grille at the top with a faint glow behind the holes (transparent elsewhere).
 ```
 
-### 4. cs_pasta · 종로 근처 파스타집 (회식 컷신) — 저녁, 따뜻한 빛
+## 클로즈업 3컷 (이벤트씬 안에 잠깐 끼우는 것)
 
 ```
-PLACE: a small cozy neighborhood pasta restaurant near Jongno. Time and light: evening, warm yellow pendant lights, dark blue night visible through the window, cozy and safe (the warmest place in the game). Wall: exposed red-brown brick with dark wooden trim, pillars: dark wooden posts.
-1. cs_pasta_wall_1 — a large front window with a dark blue evening street outside and a blank painted window sign.
-2. cs_pasta_wall_2 — a brick wall with a blank chalkboard menu (no writing) and two framed blank pictures.
-3. cs_pasta_wall_3 — the open kitchen pass-through window with warm light and pans hanging inside.
-4. cs_pasta_wall_4 — wooden wall shelves with wine bottles and jars (few, large), a coat hook rail.
-5. cs_pasta_floor — dark wooden plank floor.
-6. cs_pasta_objects — 1 long dining table pushed together, covered with plates of pasta, glasses and a bottle (front view), 2 wooden chair, 3 small round table for two, 4 pendant lamp (lit, hanging), 5 counter with cash register (no text), 6 potted olive tree, 7 coat stand with a black suit jacket on it, 8 wine bottle crate, 9 restaurant door leaf (wood with glass).
+cu_intercom — elevator intercom speaker grille on brushed steel, extreme close-up (첫 호명).
+  cu_intercom/bg.png   — brushed steel panel with the round grille (full).
+  cu_intercom/glow.png — warm light behind the grille holes only.
+
+cu_attic_wall — the scratched wall of the agents' "attic" between elevator shafts: rusty brown steel plate, old chalk tally marks and a hand-scratched map of floors made only of lines and boxes (no letters), an orange caged work lamp (다락방).
+  cu_attic_wall/bg.png   — the wall (full).
+  cu_attic_wall/lamp.png — only the lamp and its warm light pool (transparent elsewhere), for flickering.
+
+cu_rope_hands — JYALDI's two black-gloved hands gripping a single rope, seen from above, the dark elevator shaft dropping away below with tiny orange lamps (귀환).
+  cu_rope_hands/far.png   — the shaft depth with small lamps far below (full).
+  cu_rope_hands/rope.png  — the rope (transparent elsewhere).
+  cu_rope_hands/hands.png — the two gloved hands and wrists on the rope (transparent elsewhere).
 ```
+
+합계: 오프닝 29장 + 클로즈업 7장 = 36장.
 
 ## Claude가 받은 뒤 하는 일
 
-1. 검수: 사람·글자가 없는지, 정면 시점, 큰 모양·굵은 외곽선, 장소의 시간·빛.
-2. 도트화(게임 타일과 배경 도구), 물건 높이 맞추기, `cutscenes.ts`의 장면 이름(`street`, `exit_car`, `medbay`, `pasta`)에 연결.
+1. 검수: 글자 없음, 레이어끼리 자리가 맞는지, 쟈알디 외형, 따로 그린 부분의 겹침 여유.
+2. B판 도구로 도트화(인물은 화면에서 커지므로 도트 크기를 게임과 같은 2배로), 엔진 오프닝·이벤트씬에 연결.
 3. 고칠 것은 이 문서 아래 「수정 요청」에 적고 GPT에 다시 맡긴다.
