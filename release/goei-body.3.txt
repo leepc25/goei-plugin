@@ -1,4 +1,164 @@
- sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
+icitedGot ? cooldownMark(chat, "incoming") : {},
+          ...result.invitations.length ? cooldownMark(chat, "invitation") : {},
+          ...notices ? cooldownMark(chat, "announcement") : {}
+        };
+        note = received || result.invitations.length || notices ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.` : automatic ? "" : "새 메시지가 없어요.";
+        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks2 });
+      });
+      return note;
+    });
+  }
+  async function autoRefresh(ctx2, messageIndex, env2, joint) {
+    const set2 = phoneSettings(ctx2.chat.scriptstate);
+    if (!(env2 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
+    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data.trim()) return;
+    let hash = 7;
+    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash}`;
+    if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
+    if (!saved) return;
+    try {
+      directory(ctx2.char.globalLore, saved);
+    } catch {
+      return;
+    }
+    await refreshInbox({ ...ctx2, chat: saved }, env2, true, joint);
+  }
+  function openCheck(ctx2, env2) {
+    if (!phoneSettings(ctx2.chat.scriptstate).autoOpen) return;
+    const at = lastReply(ctx2.chat);
+    if (at < 0) return;
+    void autoRefresh(ctx2, at, env2).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
+  }
+  async function openDm(ctx2, env2, cid) {
+    const d = dir(ctx2);
+    const c = d.map.get(cid);
+    if (!c) return;
+    const rid = `dm_${c.id}`;
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      dropEmpty(st, rid);
+      const r = st.rooms[rid];
+      if (r) {
+        readRoom(r);
+        return writePhone(chat, st);
+      }
+      st.rooms[rid] = { id: rid, kind: "dm", members: [c.id], people: { [c.id]: personOf(c) }, messages: [], draft: "", unread: 0, readThrough: 0 };
+      return writePhone(chat, st);
+    });
+    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
+    await env2.refresh();
+  }
+  function agentContact(ctx2, agentId) {
+    const c = dir(ctx2).map.get(contactId(agentId));
+    return c ? { id: c.id, wiki: c.lore || c.name } : null;
+  }
+  async function openAgentDm(ctx2, env2, agentId) {
+    const c = agentContact(ctx2, agentId);
+    if (!c) return false;
+    phone.query = "";
+    await openDm(ctx2, env2, c.id);
+    return true;
+  }
+  function dropEmpty(st, keep) {
+    const prev = phone.room;
+    if (!prev || prev === keep) return;
+    const r = st.rooms[prev];
+    if (r && !r.messages.length && !r.pending && !r.draft.trim()) {
+      delete st.rooms[prev];
+      st.order = st.order.filter((x) => x !== prev);
+    }
+  }
+  async function openRoom(ctx2, env2, rid) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r = st.rooms[rid];
+      if (!r) return null;
+      dropEmpty(st, rid);
+      readRoom(r);
+      return writePhone(chat, st);
+    });
+    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
+    await env2.refresh();
+  }
+  async function mutate(ctx2, env2, f, extra = () => ({})) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      if (f(st, chat) === false) return null;
+      return writePhone(chat, st, extra(chat));
+    });
+    await env2.refresh();
+  }
+  async function setVars(ctx2, env2, vars) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
+    await env2.refresh();
+  }
+  function newMessage(data) {
+    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return { role: "user", data, time: Date.now(), chatId: id };
+  }
+  async function placeCall(ctx2, env2, target, purpose) {
+    if (!validCallTarget(target)) {
+      phone.notice = "상대 이름을 확인해 주세요. (60자 이내, 줄바꿈·괄호 없이)";
+      return env2.render();
+    }
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const message = (chat.message ?? []).slice();
+      const last2 = message[message.length - 1];
+      const record = callRecord(target.trim(), purpose);
+      if (last2?.role === "user" && String(last2.data).includes("%%PHONE_CALL:")) message[message.length - 1] = { ...last2, data: record };
+      else message.push(newMessage(record));
+      return { ...chat, message };
+    });
+    Object.assign(phone, { view: "list", call: "", callText: "", notice: "" });
+    await env2.close();
+  }
+  var bubbleBody = (text) => attachBody(text);
+  var phKinds = (r) => r.kind === "dm" ? ["image", "photo", "video", "file", "link", "gift"] : ["image", "photo", "video", "file", "link"];
+  var initial = (name) => esc6([...name][0] ?? "톡");
+  function face(ctx2, who, label, cls = "") {
+    const url = who && !who.custom ? imageUrl(ctx2.char, agentFace(ctx2.char, who.english)) : null;
+    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc6(url)}" alt="" loading="lazy">` : initial(label)}</span>`;
+  }
+  var shortTime = (t) => /(\d\d:\d\d)/.exec(t)?.[1] ?? "";
+  function matches(c, q, fnames) {
+    return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
+  }
+  var tool = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var badge = (n) => n > 0 ? `<span class="ph-badge">${n > 99 ? "99+" : n}</span>` : "";
+  function chips2(action, cur, items) {
+    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc6(t.id)}" aria-selected="${t.id === cur}">${esc6(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
+  }
+  var blank3 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
+  function agentStates(ctx2) {
+    try {
+      if (!worldOn(ctx2.chat)) return {};
+      return Object.fromEntries(Object.entries(readWorld(ctx2.chat).agents).map(([k, v]) => [k, v.st]));
+    } catch {
+      return {};
+    }
+  }
+  function contactsView(ctx2, d, st) {
+    if (!d.tabs.length) return blank3("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
+    const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
+    const head = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
+    const rows2 = d.contacts.filter((c) => c.tabs.includes(tab2));
+    return head + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
+  }
+  var talking = (room) => room?.messages.some((m) => m.kind === "message") ? `<span class="ph-talk${room.unread ? " new" : ""}" role="img" aria-label="${room.unread ? "안 읽은 대화" : "대화 중"}">${ICONS.phone}</span>` : "";
+  function contactList(ctx2, rows2, st) {
+    const fnames = names2(ctx2);
+    const states = agentStates(ctx2);
+    return `<ul class="ph-list ph-contacts">${rows2.map((c) => {
+      const room = st.rooms[`dm_${c.id}`];
+      const confirm = phone.confirm === `contact:${c.id}`;
+      const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
+      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
+            <span class="ph-who"><span class="ph-who-name"><b>${esc6(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc6(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
+            ${badge(room?.unread ?? 0)}</button>
+            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
             ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc6(c.lore || c.name)}" title="위키" aria-label="${esc6(c.name)} 위키">${ICONS.book}</button>`}
             ${c.saved && c.custom ? `<button class="gx-mini${confirm ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
     }).join("")}</ul>`;
@@ -745,7 +905,7 @@
     }
   }
   var viewing = () => ({ post: gnet.sub === "board" ? gnet.open : null, nick: gnet.sub === "dm" ? gnet.openDm : null });
-  function refreshBoard(ctx2, env2, automatic = false) {
+  function refreshBoard(ctx2, env2, automatic = false, joint) {
     return run2(ctx2, env2, automatic ? "채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
       const startLength = ctx2.chat.message?.length ?? 0;
       const before = readGnet(ctx2.chat);
@@ -753,7 +913,8 @@
       const s4 = gnetSettings(ctx2.chat.scriptstate);
       const plan = incomingPlan(ctx2.chat, before, s4, nick, Math.random, void 0, savedOrigin(ctx2.chat));
       const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => refreshPrompt(source2(ctx2), before, plan, nick, names3(ctx2)));
-      const { raw, value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(ctx2.chat));
+      const first = joint && ((m) => joint.ask("gnet", m));
+      const { raw, value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx2.chat), first });
       let note = "";
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
         if (automatic && (chat.message?.length ?? 0) !== startLength) {
@@ -1219,7 +1380,7 @@
       return null;
     }
   }
-  async function autoRefreshGnet(ctx2, messageIndex, open3 = false) {
+  async function autoRefreshGnet(ctx2, messageIndex, open3 = false, joint) {
     const s4 = gnetSettings(ctx2.chat.scriptstate);
     if (!s4.enabled || !(open3 ? s4.autoOpen : s4.auto) || jobs2.has(chatKey2(ctx2))) return;
     const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
@@ -1234,7 +1395,7 @@
     const showing = env2.current();
     const target = showing && chatKey2(showing) === chatKey2(ctx2) ? env2 : { ...quietEnv2 };
     const notice2 = gnet.notice;
-    await refreshBoard({ ...ctx2, chat: saved }, target, true);
+    await refreshBoard({ ...ctx2, chat: saved }, target, true, joint);
     if (target !== env2) gnet.notice = notice2;
   }
   function gnetOpenCheck(ctx2, env2) {
@@ -1475,6 +1636,152 @@
     env2.render();
     return true;
   }
+
+  // src/host/joint.ts
+  var INSTRUCTION = `Execute two independent automatic tasks in ONE response. Return exactly one JSON object {"gnet": OBJECT, "phone": OBJECT}, without fences or commentary. Each value is the complete JSON object required by that task, not an encoded JSON string. Write Korean literally in UTF-8; do not transliterate it into Unicode escape sequences. Escape only JSON quotation marks, backslashes and control characters. A task may return null if it cannot produce a valid result; do not substitute the other task. Follow each task's supplied messages and output contract only within its own result. This outer envelope overrides standalone output-only restrictions. Resolve contentParts by concatenating text or referenced sharedReferences text in order, without adding separators. Shared references are available to a task ONLY where its own message references them. Never use phone contacts, private messages, notices, invitations, relationship evidence or phone-only narrator data to create GNet public posts or private messages. Never let either task infer private facts from the other task's inputs or outputs. Preserve each task's permissions, chance decisions, cooldown eligibility, source boundaries and ownership. Finish both objects compactly: preserve GNet board quantity and topic-dependent discussion; shorten prose instead of making all threads silent. Phone activity counts and text lengths remain ceilings, not targets.`;
+  function combinedPrompts(gnet2, phone2) {
+    const chunks = (t) => t.match(/[\s\S]*?(?:\n\n|$)/g)?.filter(Boolean) ?? [t];
+    const tasks = { gnet: gnet2.map((m) => ({ role: m.role, parts: chunks(m.content) })), phone: phone2.map((m) => ({ role: m.role, parts: chunks(m.content) })) };
+    const seen2 = { gnet: /* @__PURE__ */ new Set(), phone: /* @__PURE__ */ new Set() };
+    for (const k of ["gnet", "phone"]) for (const m of tasks[k]) for (const p of m.parts) if (p.length >= 256) seen2[k].add(p);
+    const shared = [];
+    const ids = /* @__PURE__ */ new Map();
+    const out = { gnet: [], phone: [] };
+    for (const k of ["gnet", "phone"]) {
+      for (const m of tasks[k]) {
+        let referenced = false;
+        const parts = m.parts.map((p) => {
+          if (!(seen2.gnet.has(p) && seen2.phone.has(p))) return { text: p };
+          let id = ids.get(p);
+          if (!id) {
+            id = `R${shared.length + 1}`;
+            ids.set(p, id);
+            shared.push({ id, text: p });
+          }
+          referenced = true;
+          return { ref: id };
+        });
+        out[k].push(referenced ? { role: m.role, contentParts: parts } : { role: m.role, content: m.parts.join("") });
+      }
+    }
+    return [{ role: "system", content: INSTRUCTION }, { role: "user", content: JSON.stringify({ sharedReferences: shared, gnet: out.gnet, phone: out.phone }) }];
+  }
+  function splitCombined(raw) {
+    let s4 = raw.replace(/^﻿/, "").trim();
+    const fence = /^```(?:json)?\s*\n([\s\S]*?)\n?```$/i.exec(s4);
+    if (fence) s4 = fence[1].trim();
+    let i = 0;
+    const n = s4.length;
+    const fail3 = (why) => {
+      throw new Error(`통합 응답 형식이 맞지 않아요: ${why}`);
+    };
+    const space = () => {
+      while (i < n && /\s/.test(s4[i])) i++;
+    };
+    const quoted = () => {
+      if (s4[i] !== '"') fail3("문자열 경계");
+      const first = i++;
+      while (i < n) {
+        if (s4[i] === "\\") i += 2;
+        else if (s4[i++] === '"') return s4.slice(first, i);
+      }
+      return fail3("끝나지 않은 문자열");
+    };
+    if (s4[i++] !== "{") fail3("JSON 객체가 없음");
+    const parts = {};
+    for (; ; ) {
+      space();
+      const key2 = JSON.parse(quoted());
+      if (key2 !== "gnet" && key2 !== "phone" || key2 in parts) fail3(`알 수 없는 칸 ${key2}`);
+      space();
+      if (s4[i++] !== ":") fail3("구분자");
+      space();
+      const first = i;
+      if (s4.startsWith("null", i)) {
+        i += 4;
+        parts[key2] = null;
+      } else {
+        if (s4[i] !== "{") fail3("결과가 객체가 아님");
+        const stack = ["}"];
+        i++;
+        while (i < n && stack.length) {
+          const c2 = s4[i];
+          if (c2 === '"') quoted();
+          else if (c2 === "{" || c2 === "[") stack.push(c2 === "{" ? "}" : "]"), i++;
+          else if (c2 === "}" || c2 === "]") {
+            if (c2 !== stack.pop()) fail3("괄호");
+            i++;
+          } else i++;
+        }
+        if (stack.length) fail3("중간에 잘림");
+        parts[key2] = s4.slice(first, i);
+      }
+      space();
+      const c = s4[i++];
+      if (c === "}") break;
+      if (c !== ",") fail3("결과 구분자");
+    }
+    space();
+    if (i < n || !("gnet" in parts) || !("phone" in parts)) fail3("결과가 빠졌거나 뒤에 다른 글이 붙음");
+    return parts;
+  }
+  var Joint = class {
+    constructor(model2) {
+      this.model = model2;
+      this.left = /* @__PURE__ */ new Set(["gnet", "phone"]);
+    }
+    waits = /* @__PURE__ */ new Map();
+    left;
+    fired = false;
+    /** 이 작업의 첫 요청. 다른 작업도 모이면 한 번에 보낸다 */
+    ask(kind, messages) {
+      if (this.fired || !this.left.has(kind) || messages.some((m) => m.images?.length)) {
+        this.done(kind);
+        return runModel(messages, this.model);
+      }
+      return new Promise((resolve, reject) => {
+        this.waits.set(kind, { messages, resolve, reject });
+        this.flush();
+      });
+    }
+    /** 이 작업은 더 묻지 않는다 (모델을 안 부르고 끝났거나 이미 받음) */
+    done(kind) {
+      this.left.delete(kind);
+      this.flush();
+    }
+    flush() {
+      if (this.fired || [...this.left].some((k) => !this.waits.has(k))) return;
+      this.fired = true;
+      const g = this.waits.get("gnet");
+      const p = this.waits.get("phone");
+      if (g && p) void this.both(g, p);
+      else for (const w of this.waits.values()) runModel(w.messages, this.model).then(w.resolve, w.reject);
+    }
+    async both(g, p) {
+      let raw = "";
+      try {
+        raw = await runModel(combinedPrompts(g.messages, p.messages), this.model);
+      } catch (error) {
+        g.reject(error);
+        p.reject(error);
+        return;
+      }
+      let parts;
+      try {
+        parts = splitCombined(raw);
+      } catch (error) {
+        const e = new LlmError(error instanceof Error ? error.message : String(error), raw);
+        g.reject(e);
+        p.reject(e);
+        return;
+      }
+      for (const [k, w] of [["gnet", g], ["phone", p]]) {
+        const part = parts[k];
+        if (part) w.resolve(part);
+        else runModel(w.messages, this.model).then(w.resolve, w.reject);
+      }
+    }
+  };
 
   // src/core/asset.ts
   var AssetError = class extends Error {
@@ -1959,12 +2266,12 @@ ${job.trailing}` : body5;
       return "";
     }
     const key2 = c.key ? esc8(c.key) : "";
-    const pick2 = c.open === "pick-event";
+    const pick3 = c.open === "pick-event";
     const name = esc8(c.name);
     const btns = `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
     const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc8(c.art.desc)}</span>` : "";
-    const pickBtn = pick2 && c.key ? targetMark(!!c.selected, "pick-event", c.key) : "";
+    const pickBtn = pick3 && c.key ? targetMark(!!c.selected, "pick-event", c.key) : "";
     return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
     <div class="gx-evc art open ev-pop${c.ended ? " wait ended" : c.key ? " live" : " wait"}" role="dialog" aria-label="${esc8(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
@@ -1997,8 +2304,8 @@ ${job.trailing}` : body5;
   function firstPick(cards) {
     const live = cards.filter((c) => !c.ended);
     const ours = (c) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? "");
-    const rank = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
-    return [...live].sort((a, b) => rank(a) - rank(b))[0]?.id ?? cards[0]?.id ?? "";
+    const rank2 = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
+    return [...live].sort((a, b) => rank2(a) - rank2(b))[0]?.id ?? cards[0]?.id ?? "";
   }
   function opsRow(c, on2) {
     const thumb = c.art?.pic ? `<img src="${esc8(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
@@ -2148,9 +2455,21 @@ ${job.trailing}` : body5;
     let queued2 = 0;
     const measure = () => {
       queued2 = 0;
+      const pc = matchMedia("(min-width: 761px)").matches;
+      for (const ul of root2.querySelectorAll(".gx-agwall, .gx-agrows")) {
+        if (!pc) ul.style.removeProperty("--agrow");
+        else if (ul.classList.contains("gx-agwall")) ul.style.setProperty("--agrow", `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);
+        else ul.style.setProperty("--agrow", `${Math.max(48, Math.floor(ul.clientHeight / 6))}px`);
+      }
       for (const box of root2.querySelectorAll(".gx-flow")) {
         const inner = box.firstElementChild;
         if (!inner) continue;
+        if (box.classList.contains("gx-agrow-msg")) {
+          box.classList.remove("on");
+          box.classList.add("two");
+          if (box.scrollHeight <= box.clientHeight + 1) continue;
+          box.classList.remove("two");
+        }
         const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
         const on2 = box.classList.contains("on");
         const w = on2 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
@@ -2159,7 +2478,9 @@ ${job.trailing}` : body5;
         if (over) {
           const d = w + gap;
           box.style.setProperty("--fd", `${-d}px`);
-          box.style.setProperty("--ft", `${(d / 16 / 0.85).toFixed(1)}s`);
+          const ft = d / 18;
+          box.style.setProperty("--ft", `${ft.toFixed(2)}s`);
+          box.style.setProperty("--fdl", `${(-(performance.now() / 1e3 % ft)).toFixed(2)}s`);
         }
       }
     };
@@ -2168,6 +2489,7 @@ ${job.trailing}` : body5;
     };
     new MutationObserver(schedule2).observe(root2, { childList: true, subtree: true });
     window.addEventListener("resize", schedule2);
+    if (typeof ResizeObserver === "function") new ResizeObserver(schedule2).observe(root2);
     root2.addEventListener("scroll", hide, true);
   }
 
@@ -2934,201 +3256,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-row:hover { background: var(--panel); }
 .ph-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px; border: 0; border-radius: 14px; background: none; text-align: left; color: var(--text); font: inherit; }
 .ph-main.on { background: var(--accent-bg); }
-.ph-row:has(> .ph-main.on), .ph-row:has(> .ph-main.on):hover { background: var(--accent-bg); }
-.ph-row:has(> .ph-rdel) .ph-main.on { background: none; }
-.ph-avatar { position: relative; overflow: hidden; flex: none; width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--panel2); color: var(--mint); font-weight: 700; font-size: 16px; }
-.ph-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ph-avatar.group { color: var(--amber); background: var(--amber-bg); }
-.ph-avatar.group svg { width: 22px; height: 22px; }
-.ph-avatar.group i { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 11px; font-weight: 800; }
-.ph-contacts .ph-avatar { width: 58px; height: 58px; border-radius: 17px; font-size: 19px; }
-.ph-who-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.ph-who-name b { min-width: 0; }
-.ph-who-name .gx-st { flex: none; }
-.ph-sec { display: flex; align-items: center; gap: 6px; margin: 10px 8px 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
-.ph-sec:first-child { margin-top: 2px; }
-.ph-sec b { color: var(--dim); font-weight: 600; }
-.ph-avatar.sm { width: 40px; height: 40px; border-radius: 13px; font-size: 14px; }
-.ph-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.ph-who b { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-who small { color: var(--dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ph-who-top, .ph-who-bot { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.ph-who-top b, .ph-who-bot small { flex: 1; min-width: 0; }
-.ph-time { flex: none !important; font-size: 12px !important; }
-.ph-wait { color: var(--amber) !important; }
-.ph-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
-.ph-act { display: flex; align-items: center; gap: 2px; flex: none; }
-.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place-items: center; color: var(--on-signal); font-size: 13px; font-weight: 800; }
-.ph-main.on .ph-check { background: var(--signal); border-color: var(--signal); }
-
-/* 오른쪽 칸 */
-.gx-body .ph-pane { padding: 0; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; background: var(--sunk); }
-.ph-pane > .nw-busy, .ph-pane > .gn-notice { margin: 10px 14px 0; }
-.ph-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--dim); text-align: center; padding: 24px; }
-.ph-empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
-.ph-empty-ico svg { width: 32px; height: 32px; }
-.ph-empty b { color: var(--text); font-size: 17px; }
-.ph-empty p { margin: 0; font-size: 14px; }
-.ph-room, .ph-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.ph-room-head { flex: none; display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 12px; border-bottom: 1px solid var(--panel2); background: var(--void); }
-/* 대화방 머리 도구 (새로고침·전화·초대·삭제): 누르기 쉽게 크게 (v0.16.22) */
-.ph-room-head .ph-act { display: flex; align-items: center; gap: 2px; }
-.ph-room-head .ph-act .ph-tool { width: 42px; height: 42px; }
-.ph-room-head .ph-act .ph-tool svg { width: 23px; height: 23px; }
-.ph-room-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.ph-room-title b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-head-q { flex: 0 1 220px; min-width: 0; min-height: 38px; }
-/* 단톡 만들기: 주제 칸은 고정, 사람 목록만 스크롤 */
-.ph-gbody { overflow: hidden; }
-.ph-gbody > textarea { flex: none; }
-.ph-gbody > .ph-pick { flex: 1; min-height: 0; overflow-y: auto; }
-.ph-room-title small { color: var(--dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ph-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px 10px; overscroll-behavior: contain; }
-.ph-more { align-self: center; margin-bottom: 6px; }
-.ph-day { align-self: center; margin: 10px 0 6px; }
-.ph-day span { display: inline-block; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 80%, transparent); color: var(--sub); font-size: 12px; }
-.ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }
-.ph-msg.first { margin-top: 8px; }
-.ph-msg.me { align-self: flex-end; flex-direction: row-reverse; }
-.ph-msg.npc { align-self: flex-start; }
-.ph-msg-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.ph-msg.me .ph-msg-col { align-items: flex-end; }
-.ph-face, .ph-face-gap { flex: none; width: 38px; height: 38px; border-radius: 13px; font-size: 14px; }
-.ph-name { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 2px; }
-.ph-line { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
-.ph-msg.me .ph-line { flex-direction: row-reverse; }
-.ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
-.ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
-/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
-.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
-.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
-.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
-.ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
-.ph-bubble p { margin: 0; }
-.ph-bubble p + p { margin-top: 4px; }
-.ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
-.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
-.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
-.ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
-.ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
-.ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
-.ph-msg.npc .ph-meta-t { align-items: flex-start; }
-.ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
-.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
-.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
-.ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
-.ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
-.ph-typing i:nth-child(2) { animation-delay: .15s; }
-.ph-typing i:nth-child(3) { animation-delay: .3s; }
-@keyframes ph-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .ph-typing i { animation: none; } }
-.ph-retry { align-self: center; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 8px 0; font-size: 13px; color: var(--amber); }
-/* 입력창: 늘 대화 아래 */
-.ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-composer .at-editor { gap: 8px; }
-.ph-compose { display: flex; align-items: flex-end; gap: 6px; }
-.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
-.ph-input:focus { outline: none; border-color: var(--accent-line); }
-.ph-plus { width: 42px; height: 42px; border-radius: 50%; }
-.ph-plus.on svg { transform: rotate(45deg); }
-.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
-.ph-send svg { width: 22px; height: 22px; }
-.ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-.ph-send:active:not(:disabled) { transform: scale(.94); }
-.ph-back2 { display: none; }
-@media (max-width: 760px) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
-.ph-send:disabled { background: var(--panel2); color: var(--dim); box-shadow: none; }
-/* 단톡·전화·연락처 추가·설정 */
-.ph-form-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
-.ph-form-foot { flex: none; display: flex; justify-content: flex-end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
-.ph-form-foot .gx-start { width: 100%; min-height: 44px; border-radius: 12px; font-size: 16px; letter-spacing: .08em; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.ph-form-foot .gx-start svg { width: 18px; height: 18px; }
-.ph-label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; margin-bottom: -4px; }
-.ph-label small { font-weight: 400; color: var(--dim); font-size: 13px; }
-.ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
-.ph-pick { flex: none; }
-.ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.ph-pct { width: 72px; min-height: 34px; }
-
-/* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
-.ps { gap: 16px; }
-.gx-body .ps-group, .ps-group { padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.ps-group h3 { margin: 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
-.ps-rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
-.ps-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 12px 14px; flex-wrap: wrap; }
-.ps-row + .ps-row { border-top: 1px solid var(--panel2); }
-.ps-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 200px; }
-.ps-label b { font-size: 15px; font-weight: 600; }
-.ps-label small { font-size: 13px; color: var(--dim); line-height: 1.45; }
-.ps-ctl { flex: 0 0 auto; display: flex; justify-content: flex-end; max-width: 100%; }
-.ps-ctl .gx-seg { flex: 0 0 auto; min-width: 56px; padding: 0 12px; }
-.ps-ctl .gx-segs { margin: 0; }
-
-/* 모바일: 목록 또는 대화 한 칸 */
-@media (max-width: 760px) {
-  .gx-body.ph-app { grid-template-columns: minmax(0, 1fr); padding: 0; }
-  .ph-app.is-list .ph-pane, .ph-app.is-detail .ph-side { display: none; }
-  .gx-body .ph-side { border-right: 0; padding: 12px 12px 0; }
-  .ph-content { margin: 0 -12px; padding: 0 4px 12px; }
-
-  .ph-room-head { min-height: 56px; padding: 6px 8px; gap: 8px; }
-  .ph-head-q { flex-basis: 150px; }
-  .ph-room-head .ph-act .ph-tool { width: 40px; height: 40px; }
-  .ph-msg { max-width: 84%; }
-  .ph-log { padding: 10px 12px 8px; }
-  .ph-composer { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
-  .ph-form-foot .gx-start { width: 100%; }
-}
-@media (min-width: 761px) and (max-width: 1080px) {
-  .gx-body.ph-app { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
-}
-
-/* 설정 탭 (v0.12.0): 묶음 카드 + 줄. 넓은 화면에서 너무 퍼지지 않게 가운데 */
-.gx-settings { display: flex; flex-direction: column; gap: 18px; }
-.gx-settings > * { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
-.ps-note { margin: 0 4px; font-size: 13px; color: var(--dim); line-height: 1.5; }
-.ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
-.ps-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.ps-card h4 { margin: 0 4px; font-size: 15px; font-weight: 700; }
-.ps-card .ps-row { padding: 9px 12px; }
-.ps-card .ps-label { flex-basis: 90px; }
-.ps-card .ps-label b { font-size: 14px; font-weight: 500; }
-.ps-row .st-step { gap: 8px; }
-.ps-row .st-step b { min-width: 3.4em; }
-.ps-row .st-confirm { max-width: 360px; }
-/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
-.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
-
-/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
-.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
-@media (max-width: 760px) {
-  .ps-row { padding: 12px; }
-  .ps-label { flex-basis: 180px; }
-}
-@media (max-width: 760px) {
-  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
-  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
-  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
-  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
-  .gx-acard.pick small { white-space: normal; }
-  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
-}
-/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
-.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
-.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radius: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
-.dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
-.dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
-.dir-ext-head { display: flex; gap: 6px; }
-.dir-ext-head .gx-search { flex: 1; min-width: 0; }
-.dir-ext-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
-.dir-ext-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n a" "s a"; align-items: center; gap: 0 10px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--text); text-align: left; font: inherit; }
-.dir-ext-item:hover { background: var(--accent-bg); }
-.dir-ext-item b { grid-area: n; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dir-ext-item small { grid-area: s; font-size: 12px; color: var(--dim); }
-.dir-ext-item span { grid-area: a; font-size: 13px; font-weight: 600; color: var(--signal); white-space: nowrap; }
-
-/* 명부 → 조직: 플레이 세력 값 (v0.13.0) */
-.dir-fac { display: 
+.ph-row:has(> .ph-main.on), .ph-row:has(> .ph-main.on):hover { backg

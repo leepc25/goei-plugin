@@ -1,4 +1,198 @@
-or (const f of extra) e.visibleFor.add(f);
+ !post.mine) return false;
+    st.sources[chosen.nick] = sourceFor(post, plan.commentIndex ?? 0);
+    st.dms.push({ nick: chosen.nick, side: "npc", body: chosen.body, unread: true, date });
+    return true;
+  }
+  function parseDmBody(raw) {
+    let value;
+    try {
+      value = parseJsonPayload(raw);
+    } catch {
+      throw new GnetError('Expected {"body":"reply text"}.', raw);
+    }
+    const body5 = isObj(value) ? stripForged(str(value.body)).trim() : "";
+    if (!body5) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
+    return trimTokens(body5, LIMITS.dm_tokens);
+  }
+  function mainContext(st, nick, rules2, focus) {
+    const posts = [];
+    for (const p of CONTEXT.includePosts ? st.posts : []) {
+      if (CONTEXT.ownOnly && !p.mine && !p.comments.some((c) => c.mine)) continue;
+      const wanted = /* @__PURE__ */ new Set();
+      const include = (n) => {
+        if (n <= 0 || wanted.has(n) || !p.comments[n - 1]) return;
+        wanted.add(n);
+        include(p.comments[n - 1].parent);
+      };
+      let selected = 0;
+      for (let j = p.comments.length; j >= 1 && selected < CONTEXT.comments; j--) {
+        if (CONTEXT.ownOnly && !p.mine && !p.comments[j - 1].mine) continue;
+        include(j);
+        selected++;
+      }
+      const comments = p.comments.map((c, i) => ({ id: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: describe(c.body) })).filter((c) => wanted.has(c.id));
+      posts.push({
+        order: p.id,
+        related: related(focus, [p.nick, p.title, ...comments.map((c) => c.author)], `${p.title}
+${p.body}
+${comments.map((c) => c.content).join("\n")}`),
+        data: { kind: "public_post", title: p.title, date: p.date, author: p.nick, content: describe(p.body), comments, access: "publicly accessible; reading by each character is not established" }
+      });
+    }
+    const dms = [];
+    for (let i = 0; CONTEXT.includeDms && i < st.dms.length; i++) {
+      const d = st.dms[i];
+      dms.push({
+        order: i + 1,
+        related: related(focus, [d.nick], d.body),
+        data: {
+          kind: "private_message",
+          sender: d.side === "me" ? nick : d.nick,
+          recipient: d.side === "me" ? d.nick : nick,
+          content: describe(d.body),
+          ...d.date ? { date: d.date } : {},
+          order: i + 1,
+          access: "sender and recipient only"
+        }
+      });
+    }
+    const payload = (records) => `[MODULE_CONTEXT_BEGIN]
+${rules2}
+${JSON.stringify({ feature: "gnet", records })}
+[MODULE_CONTEXT_END]`;
+    const fits = (records) => !(CONTEXT.tokens > 0 && tokens(payload(records)) > CONTEXT.tokens);
+    const keptPosts = pickRecords(posts, { focus: CONTEXT.focus, recent: CONTEXT.recentPosts, max: CONTEXT.posts, fits });
+    const keptDms = pickRecords(dms, { focus: CONTEXT.focus, recent: CONTEXT.recentDms, max: CONTEXT.dms, fits: (k) => fits([...keptPosts, ...k]) });
+    const kept = [...keptPosts, ...keptDms];
+    return kept.length ? payload(kept) : "";
+  }
+
+  // src/core/phone.ts
+  var PhoneError = class extends Error {
+    constructor(message, raw = "") {
+      super(message);
+      this.raw = raw;
+    }
+  };
+  var PH = (key2) => `$ph_${key2}`;
+  var PH_STATE = PH("state");
+  var PH_CONTACTS = PH("contacts");
+  var PH_BULLETINS = PH("bulletins");
+  var PH_AUTO_LAST = PH("auto_last");
+  var PH_UNREAD = "$st_unread_phone";
+  var PH_DEFAULTS = {
+    model: "aux",
+    auto: "0",
+    status: "1",
+    announcements: "1",
+    all_contacts: "0",
+    anomaly_contacts: "0",
+    incoming: "1",
+    group_invites: "1",
+    incoming_chance: "100",
+    group_invite_chance: "100",
+    context: "1",
+    context_messages: "1",
+    context_announcements: "1",
+    related: "0"
+  };
+  var LIMITS2 = {
+    events: 12,
+    reply_tokens: 1500,
+    input_tokens: 4e3,
+    pause_tokens: 200,
+    topic_tokens: 2e3,
+    memo_tokens: 2e3,
+    notices: 1,
+    invitations: 1,
+    members: 9,
+    room_name: 60,
+    notice_title: 80,
+    notice_issuer: 60,
+    notice_tokens: 1200
+  };
+  var HISTORY2 = { room: 100, announcement: 10, context: 200, contextNotices: 1, contextTokens: 4e3, turns: 8, focus: true, contextRecent: 8 };
+  var STORAGE = { dm: 40, group: 100, notice: 20 };
+  var STORAGE_MAX2 = 2e4;
+  var COOLDOWN = { incoming: 1, invitation: 3, announcement: 3 };
+  function phoneStorage(state, k) {
+    const n = Number(state?.[PH(`storage_limit_${k}`)]);
+    return {
+      auto: String(state?.[PH(`storage_auto_${k}`)] ?? "") !== "0",
+      limit: Number.isInteger(n) && n >= 1 && n <= STORAGE_MAX2 ? n : STORAGE[k]
+    };
+  }
+  var storageCap = (state, k) => {
+    const s4 = phoneStorage(state, k);
+    return s4.auto ? s4.limit : Infinity;
+  };
+  var NOTICE_PAGE_SIZES = [20, 30, 40, 50, 60];
+  function noticeSettings(state) {
+    const num4 = (k, lo, hi, d) => {
+      const n = Number(state?.[PH(k)]);
+      return Number.isInteger(n) && n >= lo && n <= hi ? n : d;
+    };
+    const page = num4("announcement_page_size", 20, 60, 30);
+    return { gap: num4("announcement_gap", 1, 100, COOLDOWN.announcement), history: num4("announcement_history", 1, 50, HISTORY2.announcement), page: NOTICE_PAGE_SIZES.includes(page) ? page : 30 };
+  }
+  var cooldownTurns = (chat, k) => k === "announcement" ? noticeSettings(chat.scriptstate).gap : COOLDOWN[k];
+  var COOLDOWN_KEY = (k) => `$cooldown_received_${k}`;
+  function phoneValue(state, key2) {
+    const v = state?.[PH(key2)];
+    return v === void 0 || v === null || v === "" || v === "null" ? PH_DEFAULTS[key2] ?? "" : String(v);
+  }
+  function phoneSettings(state) {
+    const v = (k) => phoneValue(state, k);
+    const pct = (k) => {
+      const n = Number(v(k));
+      return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.floor(n))) : 100;
+    };
+    return {
+      model: v("model") === "main" ? "main" : "aux",
+      auto: v("auto") === "1",
+      autoOpen: v("auto") === "open",
+      status: v("status") !== "0",
+      announcements: v("announcements") !== "0",
+      allContacts: v("all_contacts") === "1",
+      anomalyContacts: v("anomaly_contacts") === "1",
+      incoming: v("incoming") !== "0",
+      invites: v("group_invites") !== "0",
+      incomingChance: pct("incoming_chance"),
+      inviteChance: pct("group_invite_chance"),
+      context: v("context") !== "0",
+      contextMessages: v("context_messages") !== "0",
+      contextAnnouncements: v("context_announcements") !== "0",
+      related: v("related") === "1"
+    };
+  }
+  function cooldownReady(chat, k) {
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    const now = storyTurns(chat);
+    return !Number.isFinite(last2) || String(chat.scriptstate?.[COOLDOWN_KEY(k)] ?? "") === "" || now < last2 || now - last2 >= cooldownTurns(chat, k);
+  }
+  function cooldownLeft(chat, k) {
+    const last2 = Number(chat.scriptstate?.[COOLDOWN_KEY(k)]);
+    return Number.isFinite(last2) ? Math.max(0, cooldownTurns(chat, k) - (storyTurns(chat) - last2)) : 0;
+  }
+  var cooldownMark = (chat, k) => ({ [COOLDOWN_KEY(k)]: String(storyTurns(chat)) });
+  function chancePassed(n, rng) {
+    return n >= 100 || n > 0 && Math.floor(rng() * 100) + 1 <= n;
+  }
+  var hex2 = (s4) => Array.from(new TextEncoder().encode(s4), (b) => b.toString(16).padStart(2, "0")).join("");
+  var contactId = (agentId) => `c_${hex2(agentId)}`;
+  var s3 = (v) => typeof v === "string" ? v.trim() : "";
+  var list3 = (v) => Array.isArray(v) ? v.map(s3).filter(Boolean) : [];
+  function tabCatalog(lore) {
+    const data = phoneTabsSection(lore);
+    if (!data.tabs.length) throw new PhoneError("괴담톡 탭 설정이 없어요.");
+    const entries2 = [];
+    for (const row6 of data.tabs) {
+      if (entries2.some((e) => e.id === row6.id)) continue;
+      entries2.push({ id: row6.id, name: row6.name || row6.id, names: { ...row6.name_by_faction }, visibleFor: new Set(row6.visible_for) });
+    }
+    const extra = extraFactions(lore).map((f) => f.code);
+    if (extra.length) {
+      for (const e of entries2) if (BUILTIN.every((f) => e.visibleFor.has(f))) for (const f of extra) e.visibleFor.add(f);
       for (const t of extraTabs(lore)) if (!entries2.some((e) => e.id === t.id)) entries2.push({ id: t.id, name: t.name, names: {}, visibleFor: new Set(t.visibleFor) });
     }
     const orders = {};
@@ -839,7 +1033,19 @@ ${body5}
     chat.message ??= [];
     return { charIndex, chatIndex, char, chat };
   }
-  async function updateChat(charIndex, chatIndex, mutate3) {
+  var queues = /* @__PURE__ */ new Map();
+  function updateChat(charIndex, chatIndex, mutate3) {
+    const key2 = `${charIndex}:${chatIndex}`;
+    const run3 = (queues.get(key2) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate3));
+    const tail = run3.catch(() => {
+    });
+    queues.set(key2, tail);
+    void tail.then(() => {
+      if (queues.get(key2) === tail) queues.delete(key2);
+    });
+    return run3;
+  }
+  async function saveChat(charIndex, chatIndex, mutate3) {
     const latest = await risuai.getChatFromIndex(charIndex, chatIndex);
     if (!latest) throw new Error("채팅을 찾을 수 없어요. 채팅을 다시 열어 주세요.");
     latest.message ??= [];
@@ -1277,11 +1483,11 @@ ${body5}
     const add = (kind, source4, content) => {
       const text = content.trim();
       if (!text) return;
-      const rank = ["base", "primary", "active", "direct", "secondary"];
+      const rank2 = ["base", "primary", "active", "direct", "secondary"];
       const same = rows2.find((r) => r.content === text);
       if (same) {
         if (!same.sources.includes(source4)) same.sources.push(source4);
-        if (o.scope === "wiki" && rank.indexOf(kind) < rank.indexOf(same.kind)) same.kind = kind;
+        if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same.kind)) same.kind = kind;
         same.required = same.required || required(kind);
         return;
       }
@@ -1366,12 +1572,12 @@ ${c}`)]).join("\n\n");
   var WIKI_DEFAULTS = { mode: "expand", model: "main", length: "detailed", refreshPrevious: true, chatTurns: 8, referenceCount: 20 };
   function wikiSettings(state) {
     const s4 = state ?? {};
-    const pick2 = (key2, allowed, def) => allowed.includes(s4[key2]) ? s4[key2] : def;
+    const pick3 = (key2, allowed, def) => allowed.includes(s4[key2]) ? s4[key2] : def;
     return {
       ...WIKI_DEFAULTS,
-      mode: pick2("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
-      model: pick2("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
-      length: pick2("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
+      mode: pick3("$nw_mode", ["expand", "faithful"], WIKI_DEFAULTS.mode),
+      model: pick3("$nw_model", ["main", "aux"], WIKI_DEFAULTS.model),
+      length: pick3("$nw_length", ["short", "standard", "detailed"], WIKI_DEFAULTS.length),
       refreshPrevious: s4["$nw_refresh_previous"] !== "0",
       chatTurns: advNum(s4, "nw", "turns"),
       referenceCount: advNum(s4, "nw", "ref_count")
@@ -2032,11 +2238,11 @@ ${SEED_CLOSE}` : "", missing };
       const doc = await risuai.getRootDocument();
       const box = await doc.querySelector("[data-goei-user]");
       const html = box ? await box.getInnerHTML() : "";
-      const shownName = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
-      if (shownName && shownName !== "{{user}}") {
-        if (shownName !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName).catch(() => {
+      const shownName2 = unescape(html.match(/<b[^>]*data-goei-uname[^>]*>([^<]*)<\/b>/)?.[1] ?? "").trim();
+      if (shownName2 && shownName2 !== "{{user}}") {
+        if (shownName2 !== name) await risuai.pluginStorage.setItem(NAME_KEY, shownName2).catch(() => {
         });
-        name = shownName;
+        name = shownName2;
       }
       let src = unescape(html.match(/src="([^"]*)"/)?.[1] ?? "");
       if (!src) src = String(await risuai.pluginStorage.getItem(SRC_KEY).catch(() => "") ?? "");
@@ -3068,7 +3274,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     if (p.photo) return p.photo;
     if (en2 && hasAsset(char, `${en2}_default`)) return `${en2}_default`;
     if (en2 && hasAsset(char, en2)) return en2;
-    return "";
+    return p.shared?.find((n) => hasAsset(char, n)) ?? "";
   }
   function facePic(char, p, person = false) {
     if (p.face) return p.face;
@@ -3170,7 +3376,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
   function factionPic(char, f, slot = "main") {
     const o = readDirectory(char.globalLore ?? []).orgs.find((x) => x.faction ? x.faction === f.code : x.name === f.affiliation);
-    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english };
+    const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
     return slot === "face" ? facePic(char, src) : mainPic(char, src);
   }
   function picAvatar(char, pic, name, cls = "") {
@@ -3445,7 +3651,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     for (let attempt = 0; ; attempt++) {
       let raw = "";
       try {
-        raw = await runModel(ask, use);
+        raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
         if (o.state) applyAdvanced(o.state);
         return { raw, value: parse3(raw) };
       } catch (error) {
@@ -4240,7 +4446,7 @@ ${after}`);
     Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
     await generate2({ ...ctx2, chat: saved }, env2, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
   }
-  function refreshInbox(ctx2, env2, automatic = false) {
+  function refreshInbox(ctx2, env2, automatic = false, joint) {
     const e = envOr(env2);
     return run(ctx2, e, automatic ? "새 메시지를 자동으로 확인하는 중이에요." : "새 메시지를 확인하는 중이에요.", async () => {
       const startLength = ctx2.chat.message?.length ?? 0;
@@ -4260,7 +4466,8 @@ ${after}`);
       const { value: result } = await generate(prompt.messages, model2, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
         ...genSettings(ctx2.chat.scriptstate),
         state: ctx2.chat.scriptstate,
-        fix: (_raw, reason) => refreshRetry(prompt, reason)
+        fix: (_raw, reason) => refreshRetry(prompt, reason),
+        first: joint && ((m) => joint.ask("phone", m))
       });
       let note = "";
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
@@ -4298,164 +4505,4 @@ ${after}`);
         const b = readBulletins(chat);
         const notices = commitAnnouncements(b, cur, result.announcements, plan.announce, time2);
         const marks2 = {
-          ...unsolicitedGot ? cooldownMark(chat, "incoming") : {},
-          ...result.invitations.length ? cooldownMark(chat, "invitation") : {},
-          ...notices ? cooldownMark(chat, "announcement") : {}
-        };
-        note = received || result.invitations.length || notices ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.` : automatic ? "" : "새 메시지가 없어요.";
-        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks2 });
-      });
-      return note;
-    });
-  }
-  async function autoRefresh(ctx2, messageIndex, env2) {
-    const set2 = phoneSettings(ctx2.chat.scriptstate);
-    if (!(env2 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
-    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
-    if (!data.trim()) return;
-    let hash = 7;
-    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
-    const stamp = `${messageIndex}:${hash}`;
-    if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
-    if (!saved) return;
-    try {
-      directory(ctx2.char.globalLore, saved);
-    } catch {
-      return;
-    }
-    await refreshInbox({ ...ctx2, chat: saved }, env2, true);
-  }
-  function openCheck(ctx2, env2) {
-    if (!phoneSettings(ctx2.chat.scriptstate).autoOpen) return;
-    const at = lastReply(ctx2.chat);
-    if (at < 0) return;
-    void autoRefresh(ctx2, at, env2).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
-  }
-  async function openDm(ctx2, env2, cid) {
-    const d = dir(ctx2);
-    const c = d.map.get(cid);
-    if (!c) return;
-    const rid = `dm_${c.id}`;
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      dropEmpty(st, rid);
-      const r = st.rooms[rid];
-      if (r) {
-        readRoom(r);
-        return writePhone(chat, st);
-      }
-      st.rooms[rid] = { id: rid, kind: "dm", members: [c.id], people: { [c.id]: personOf(c) }, messages: [], draft: "", unread: 0, readThrough: 0 };
-      return writePhone(chat, st);
-    });
-    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
-    await env2.refresh();
-  }
-  function agentContact(ctx2, agentId) {
-    const c = dir(ctx2).map.get(contactId(agentId));
-    return c ? { id: c.id, wiki: c.lore || c.name } : null;
-  }
-  async function openAgentDm(ctx2, env2, agentId) {
-    const c = agentContact(ctx2, agentId);
-    if (!c) return false;
-    phone.query = "";
-    await openDm(ctx2, env2, c.id);
-    return true;
-  }
-  function dropEmpty(st, keep) {
-    const prev = phone.room;
-    if (!prev || prev === keep) return;
-    const r = st.rooms[prev];
-    if (r && !r.messages.length && !r.pending && !r.draft.trim()) {
-      delete st.rooms[prev];
-      st.order = st.order.filter((x) => x !== prev);
-    }
-  }
-  async function openRoom(ctx2, env2, rid) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      const r = st.rooms[rid];
-      if (!r) return null;
-      dropEmpty(st, rid);
-      readRoom(r);
-      return writePhone(chat, st);
-    });
-    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
-    await env2.refresh();
-  }
-  async function mutate(ctx2, env2, f, extra = () => ({})) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      if (f(st, chat) === false) return null;
-      return writePhone(chat, st, extra(chat));
-    });
-    await env2.refresh();
-  }
-  async function setVars(ctx2, env2, vars) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
-    await env2.refresh();
-  }
-  function newMessage(data) {
-    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    return { role: "user", data, time: Date.now(), chatId: id };
-  }
-  async function placeCall(ctx2, env2, target, purpose) {
-    if (!validCallTarget(target)) {
-      phone.notice = "상대 이름을 확인해 주세요. (60자 이내, 줄바꿈·괄호 없이)";
-      return env2.render();
-    }
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const message = (chat.message ?? []).slice();
-      const last2 = message[message.length - 1];
-      const record = callRecord(target.trim(), purpose);
-      if (last2?.role === "user" && String(last2.data).includes("%%PHONE_CALL:")) message[message.length - 1] = { ...last2, data: record };
-      else message.push(newMessage(record));
-      return { ...chat, message };
-    });
-    Object.assign(phone, { view: "list", call: "", callText: "", notice: "" });
-    await env2.close();
-  }
-  var bubbleBody = (text) => attachBody(text);
-  var phKinds = (r) => r.kind === "dm" ? ["image", "photo", "video", "file", "link", "gift"] : ["image", "photo", "video", "file", "link"];
-  var initial = (name) => esc6([...name][0] ?? "톡");
-  function face(ctx2, who, label, cls = "") {
-    const url = who && !who.custom ? imageUrl(ctx2.char, agentFace(ctx2.char, who.english)) : null;
-    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc6(url)}" alt="" loading="lazy">` : initial(label)}</span>`;
-  }
-  var shortTime = (t) => /(\d\d:\d\d)/.exec(t)?.[1] ?? "";
-  function matches(c, q, fnames) {
-    return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
-  }
-  var tool = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
-  var badge = (n) => n > 0 ? `<span class="ph-badge">${n > 99 ? "99+" : n}</span>` : "";
-  function chips2(action, cur, items) {
-    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc6(t.id)}" aria-selected="${t.id === cur}">${esc6(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
-  }
-  var blank3 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
-  function agentStates(ctx2) {
-    try {
-      if (!worldOn(ctx2.chat)) return {};
-      return Object.fromEntries(Object.entries(readWorld(ctx2.chat).agents).map(([k, v]) => [k, v.st]));
-    } catch {
-      return {};
-    }
-  }
-  function contactsView(ctx2, d, st) {
-    if (!d.tabs.length) return blank3("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
-    const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
-    const head = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
-    const rows2 = d.contacts.filter((c) => c.tabs.includes(tab2));
-    return head + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
-  }
-  var talking = (room) => room?.messages.some((m) => m.kind === "message") ? `<span class="ph-talk${room.unread ? " new" : ""}" role="img" aria-label="${room.unread ? "안 읽은 대화" : "대화 중"}">${ICONS.phone}</span>` : "";
-  function contactList(ctx2, rows2, st) {
-    const fnames = names2(ctx2);
-    const states = agentStates(ctx2);
-    return `<ul class="ph-list ph-contacts">${rows2.map((c) => {
-      const room = st.rooms[`dm_${c.id}`];
-      const confirm = phone.confirm === `contact:${c.id}`;
-      const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
-      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
-            <span class="ph-who"><span class="ph-who-name"><b>${esc6(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc6(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
-            ${badge(room?.unread ?? 0)}</button>
-            <span class="ph-act"><button class="ph-tool
+          ...unsol

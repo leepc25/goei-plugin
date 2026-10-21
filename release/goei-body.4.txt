@@ -1,4 +1,201 @@
-flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
+round: var(--accent-bg); }
+.ph-row:has(> .ph-rdel) .ph-main.on { background: none; }
+.ph-avatar { position: relative; overflow: hidden; flex: none; width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--panel2); color: var(--mint); font-weight: 700; font-size: 16px; }
+.ph-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ph-avatar.group { color: var(--amber); background: var(--amber-bg); }
+.ph-avatar.group svg { width: 22px; height: 22px; }
+.ph-avatar.group i { position: absolute; right: 3px; bottom: 2px; font-style: normal; font-size: 11px; font-weight: 800; }
+.ph-contacts .ph-avatar { width: 58px; height: 58px; border-radius: 17px; font-size: 19px; }
+.ph-who-name { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ph-who-name b { min-width: 0; }
+.ph-who-name .gx-st { flex: none; }
+.ph-sec { display: flex; align-items: center; gap: 6px; margin: 10px 8px 4px; font-size: 13px; font-weight: 700; color: var(--sub); }
+.ph-sec:first-child { margin-top: 2px; }
+.ph-sec b { color: var(--dim); font-weight: 600; }
+.ph-avatar.sm { width: 40px; height: 40px; border-radius: 13px; font-size: 14px; }
+.ph-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ph-who b { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-who small { color: var(--dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ph-who-top, .ph-who-bot { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ph-who-top b, .ph-who-bot small { flex: 1; min-width: 0; }
+.ph-time { flex: none !important; font-size: 12px !important; }
+.ph-wait { color: var(--amber) !important; }
+.ph-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #1a0b0b; font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; }
+.ph-act { display: flex; align-items: center; gap: 2px; flex: none; }
+.ph-check { flex: none; width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--line2); display: grid; place-items: center; color: var(--on-signal); font-size: 13px; font-weight: 800; }
+.ph-main.on .ph-check { background: var(--signal); border-color: var(--signal); }
+
+/* 오른쪽 칸 */
+.gx-body .ph-pane { padding: 0; display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; background: var(--sunk); }
+.ph-pane > .nw-busy, .ph-pane > .gn-notice { margin: 10px 14px 0; }
+.ph-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--dim); text-align: center; padding: 24px; }
+.ph-empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
+.ph-empty-ico svg { width: 32px; height: 32px; }
+.ph-empty b { color: var(--text); font-size: 17px; }
+.ph-empty p { margin: 0; font-size: 14px; }
+.ph-room, .ph-form { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.ph-room-head { flex: none; display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 8px 12px; border-bottom: 1px solid var(--panel2); background: var(--void); }
+/* 대화방 머리 도구 (새로고침·전화·초대·삭제): 누르기 쉽게 크게 (v0.16.22) */
+.ph-room-head .ph-act { display: flex; align-items: center; gap: 2px; }
+.ph-room-head .ph-act .ph-tool { width: 42px; height: 42px; }
+.ph-room-head .ph-act .ph-tool svg { width: 23px; height: 23px; }
+.ph-room-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ph-room-title b { font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-head-q { flex: 0 1 220px; min-width: 0; min-height: 38px; }
+/* 단톡 만들기: 주제 칸은 고정, 사람 목록만 스크롤 */
+.ph-gbody { overflow: hidden; }
+.ph-gbody > textarea { flex: none; }
+.ph-gbody > .ph-pick { flex: 1; min-height: 0; overflow-y: auto; }
+.ph-room-title small { color: var(--dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.ph-members { flex: none; margin: 0; padding: 6px 16px; font-size: 13px; color: var(--dim); border-bottom: 1px solid var(--panel2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px 10px; overscroll-behavior: contain; }
+.ph-more { align-self: center; margin-bottom: 6px; }
+.ph-day { align-self: center; margin: 10px 0 6px; }
+.ph-day span { display: inline-block; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--panel2) 80%, transparent); color: var(--sub); font-size: 12px; }
+.ph-msg { display: flex; gap: 8px; max-width: min(78%, 560px); }
+.ph-msg.first { margin-top: 8px; }
+.ph-msg.me { align-self: flex-end; flex-direction: row-reverse; }
+.ph-msg.npc { align-self: flex-start; }
+.ph-msg-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ph-msg.me .ph-msg-col { align-items: flex-end; }
+.ph-face, .ph-face-gap { flex: none; width: 38px; height: 38px; border-radius: 13px; font-size: 14px; }
+.ph-name { font-size: 13px; font-weight: 600; color: var(--sub); margin-left: 2px; }
+.ph-line { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
+.ph-msg.me .ph-line { flex-direction: row-reverse; }
+.ph-bubble { min-width: 0; padding: 8px 13px; border-radius: 18px; background: var(--panel2); color: var(--text); font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
+.ph-msg.npc.first .ph-bubble { border-top-left-radius: 6px; }
+/* 상대 말풍선: 대화 배경(--sunk)과 확실히 구분되게 카드 면 + 테두리 (v0.16.22) */
+.ph-msg.npc .ph-bubble { background: var(--panel2); border: 1px solid var(--line2); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.gx[data-theme="light"] .ph-msg.npc .ph-bubble, .gx[data-theme="paper"] .ph-msg.npc .ph-bubble { background: var(--panel); }
+.ph-msg.me .ph-bubble { background: color-mix(in srgb, var(--signal) 22%, var(--panel)); color: var(--text); border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); }
+.ph-msg.me.first .ph-bubble { border-top-right-radius: 6px; }
+.ph-bubble p { margin: 0; }
+.ph-bubble p + p { margin-top: 4px; }
+.ph-bubble .at-card { margin: 4px 0; background: color-mix(in srgb, var(--void) 55%, transparent); border-color: transparent; color: var(--text); }
+.ph-msg.me .ph-bubble .at-card { background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); }
+.ph-msg.me .ph-bubble .at-card small, .ph-msg.me .ph-bubble .at-ico { color: var(--sub); }
+.ph-bubble:has(> .at-card-image:only-child) { padding: 0; background: none; }
+.ph-bubble > .at-card-image:only-child { margin: 0; border-radius: 16px; }
+.ph-meta-t { flex: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--dim); white-space: nowrap; line-height: 1.3; }
+.ph-msg.npc .ph-meta-t { align-items: flex-start; }
+.ph-meta-t i { font-style: normal; font-weight: 800; color: var(--amber); }
+.ph-sys { align-self: center; max-width: 90%; margin: 6px 0; padding: 4px 12px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 13px; text-align: center; }
+.ph-sys.pause { font-style: italic; background: none; border-color: transparent; }
+.ph-typing { display: inline-flex; gap: 4px; align-items: center; padding: 12px 14px; }
+.ph-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); animation: ph-dot 1.2s infinite ease-in-out; }
+.ph-typing i:nth-child(2) { animation-delay: .15s; }
+.ph-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes ph-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ph-typing i { animation: none; } }
+.ph-retry { align-self: center; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 8px 0; font-size: 13px; color: var(--amber); }
+/* 입력창: 늘 대화 아래 */
+.ph-composer { flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-composer .at-editor { gap: 8px; }
+.ph-compose { display: flex; align-items: flex-end; gap: 6px; }
+.ph-input { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 21px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; line-height: 1.45; resize: none; field-sizing: content; }
+.ph-input:focus { outline: none; border-color: var(--accent-line); }
+.ph-plus { width: 42px; height: 42px; border-radius: 50%; }
+.ph-plus.on svg { transform: rotate(45deg); }
+.ph-send { display: grid; place-items: center; width: 44px; height: 44px; flex: none; padding: 0; border: 0; border-radius: 15px; background: var(--signal); color: var(--on-signal); box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: transform .12s ease, filter .12s ease; }
+.ph-send svg { width: 22px; height: 22px; }
+.ph-send:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.ph-send:active:not(:disabled) { transform: scale(.94); }
+.ph-back2 { display: none; }
+@media (max-width: 760px) { .ph-compose .ph-back2 { display: inline-grid; width: 44px; height: 44px; border-radius: 15px; background: var(--panel2); color: var(--text); } .ph-compose .ph-back2 svg { width: 22px; height: 22px; } }
+.ph-send:disabled { background: var(--panel2); color: var(--dim); box-shadow: none; }
+/* 단톡·전화·연락처 추가·설정 */
+.ph-form-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.ph-form-foot { flex: none; display: flex; justify-content: flex-end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--panel2); background: var(--void); }
+.ph-form-foot .gx-start { width: 100%; min-height: 44px; border-radius: 12px; font-size: 16px; letter-spacing: .08em; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.ph-form-foot .gx-start svg { width: 18px; height: 18px; }
+.ph-label { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; margin-bottom: -4px; }
+.ph-label small { font-weight: 400; color: var(--dim); font-size: 13px; }
+.ph-form textarea { resize: vertical; padding: 8px 10px; line-height: 1.5; }
+.ph-pick { flex: none; }
+.ph-inline { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ph-pct { width: 72px; min-height: 34px; }
+
+/* 설정 줄 (괴담톡 설정·설정 탭 공통): 묶음마다 카드, 줄마다 왼쪽 이름·설명 / 오른쪽 조작 */
+.ps { gap: 16px; }
+.gx-body .ps-group, .ps-group { padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ps-group h3 { margin: 0 4px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); }
+.ps-rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
+.ps-row { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 12px 14px; flex-wrap: wrap; }
+.ps-row + .ps-row { border-top: 1px solid var(--panel2); }
+.ps-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 200px; }
+.ps-label b { font-size: 15px; font-weight: 600; }
+.ps-label small { font-size: 13px; color: var(--dim); line-height: 1.45; }
+.ps-ctl { flex: 0 0 auto; display: flex; justify-content: flex-end; max-width: 100%; }
+.ps-ctl .gx-seg { flex: 0 0 auto; min-width: 56px; padding: 0 12px; }
+.ps-ctl .gx-segs { margin: 0; }
+
+/* 모바일: 목록 또는 대화 한 칸 */
+@media (max-width: 760px) {
+  .gx-body.ph-app { grid-template-columns: minmax(0, 1fr); padding: 0; }
+  .ph-app.is-list .ph-pane, .ph-app.is-detail .ph-side { display: none; }
+  .gx-body .ph-side { border-right: 0; padding: 12px 12px 0; }
+  .ph-content { margin: 0 -12px; padding: 0 4px 12px; }
+
+  .ph-room-head { min-height: 56px; padding: 6px 8px; gap: 8px; }
+  .ph-head-q { flex-basis: 150px; }
+  .ph-room-head .ph-act .ph-tool { width: 40px; height: 40px; }
+  .ph-msg { max-width: 84%; }
+  .ph-log { padding: 10px 12px 8px; }
+  .ph-composer { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
+  .ph-form-foot .gx-start { width: 100%; }
+}
+@media (min-width: 761px) and (max-width: 1080px) {
+  .gx-body.ph-app { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
+}
+
+/* 설정 탭 (v0.12.0): 묶음 카드 + 줄. 넓은 화면에서 너무 퍼지지 않게 가운데 */
+.gx-settings { display: flex; flex-direction: column; gap: 18px; }
+.gx-settings > * { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
+.ps-note { margin: 0 4px; font-size: 13px; color: var(--dim); line-height: 1.5; }
+.ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+.ps-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ps-card h4 { margin: 0 4px; font-size: 15px; font-weight: 700; }
+.ps-card .ps-row { padding: 9px 12px; }
+.ps-card .ps-label { flex-basis: 90px; }
+.ps-card .ps-label b { font-size: 14px; font-weight: 500; }
+.ps-row .st-step { gap: 8px; }
+.ps-row .st-step b { min-width: 3.4em; }
+.ps-row .st-confirm { max-width: 360px; }
+/* 괴담넷: 넓은 PC 화면에서 글 목록이 끝까지 퍼지지 않게 */
+.gx-body.gn:not(.ph) > * { max-width: 1000px; margin-left: auto; margin-right: auto; }
+
+/* 좁은 칸에서 버튼 글자가 두 줄로 쪼개지지 않게 (v0.12.0) */
+.gx-seg, .gx-mini, .gx-chip, .gx-badge, .gx-st, .ph-sub, .ph-tab, .at-add, .gx-start { white-space: nowrap; }
+@media (max-width: 760px) {
+  .ps-row { padding: 12px; }
+  .ps-label { flex-basis: 180px; }
+}
+@media (max-width: 760px) {
+  /* 편성 요원: 모바일은 한 줄에 한 명. 두 칸이면 상태·상황이 안 보이고 부서·직급이 잘렸다 (v0.14.0) */
+  .gx-acards.pick { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .gx-acard.pick { gap: 10px; padding: 8px 36px 8px 8px; align-items: center; }
+  .gx-acard.pick .gx-ava { width: 44px; height: 44px; border-radius: 12px; }
+  .gx-acard.pick .gx-acard-top b { font-size: 15px; }
+  .gx-acard.pick small { white-space: normal; }
+  .gx-acard.pick .gx-acard-check { top: 50%; right: 10px; transform: translateY(-50%); width: 20px; height: 20px; font-size: 12px; }
+}
+/* 명부: 다른 폴더에서 온 발생 후보 (v0.12.0) */
+.dir-group-help { margin: -4px 2px 8px; font-size: 13px; }
+.dir-ext-open { width: 100%; min-height: 44px; margin-top: 10px; border: 1px dashed var(--line2); border-radius: 12px; background: none; color: var(--signal); font: inherit; font-size: 14px; font-weight: 600; }
+.dir-ext-open:hover { border-color: var(--accent-line); background: var(--accent-bg); }
+.dir-ext { margin-top: 10px; padding: 12px; border: 1px solid var(--accent-line); border-radius: 14px; background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
+.dir-ext-head { display: flex; gap: 6px; }
+.dir-ext-head .gx-search { flex: 1; min-width: 0; }
+.dir-ext-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
+.dir-ext-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "n a" "s a"; align-items: center; gap: 0 10px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--text); text-align: left; font: inherit; }
+.dir-ext-item:hover { background: var(--accent-bg); }
+.dir-ext-item b { grid-area: n; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir-ext-item small { grid-area: s; font-size: 12px; color: var(--dim); }
+.dir-ext-item span { grid-area: a; font-size: 13px; font-weight: 600; color: var(--signal); white-space: nowrap; }
+
+/* 명부 → 조직: 플레이 세력 값 (v0.13.0) */
+.dir-fac { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunk); }
 .dir-fac > .gx-muted { margin: -4px 0 0; font-size: 13px; }
 .dir-fac .gx-hint { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .dir-code { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--signal); color: var(--void); font-size: 12px; letter-spacing: .04em; }
@@ -706,14 +903,17 @@ flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--
   /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
   .gx-body.nw-app { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .nw-rail { display: none; }
-  /* 목록 서랍을 여는 왼쪽 가장자리 손잡이 (2026-10-19 사용자). 목록이 펼쳐지면 숨김 */
-  .nw-edge { position: absolute; left: 0; top: 50%; z-index: 3; display: grid; place-items: center; width: 22px; height: 64px; margin-top: -32px; padding: 0; border: 1px solid var(--line2); border-left: 0; border-radius: 0 12px 12px 0; background: var(--panel); color: var(--sub); box-shadow: 2px 4px 12px -6px rgba(0, 0, 0, .45); }
-  .nw-edge svg { width: 15px; height: 15px; }
+  /* 목록 서랍 손잡이: 오른쪽 아래, 도구 서랍 바로 위의 긴 책갈피 (2026-10-21 사용자: 왼쪽 가운데 작은 손잡이는 누르기 힘들었다). 목록이 펼쳐지면 숨김 */
+  .nw-edge { position: absolute; right: 0; bottom: 34px; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 34px; height: 116px; padding: 0 0 0 2px; border: 1px solid var(--line2); border-right: 0; border-radius: 14px 0 0 14px; background: var(--panel); color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 800; line-height: 1.1; box-shadow: -3px 4px 14px -6px rgba(0, 0, 0, .5); cursor: pointer; transition: bottom .2s ease; }
+  .nw-edge svg { width: 17px; height: 17px; flex: none; }
+  .nw-edge span { writing-mode: vertical-rl; letter-spacing: .2em; color: var(--sub); }
+  .nw-app:has(> .ph-drawer.open) .nw-edge { bottom: 106px; }
   .list-open .nw-edge { display: none; }
   .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
   .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .nw-main { grid-row: 1; }
-  .nw-panel { left: 0; transform: translateX(-100%); max-width: calc(100% - 40px); }
+  /* 모바일 목록은 오른쪽에서 열린다 (손잡이가 오른쪽) */
+  .nw-panel { left: auto; right: 0; transform: translateX(100%); max-width: calc(100% - 40px); border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); }
   .list-open .nw-scrim { inset: 0; }
   .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
   .nw-home { padding: 14px 14px 22px; gap: 18px; }
@@ -1240,7 +1440,8 @@ button.mk-go:hover { color: var(--signal); }
   .gx-opview { height: 340px; flex: none; scroll-margin-top: 8px; }
   .gx-opcap .gx-evart-l1 > b { font-size: 19px; }
   .gx-opcap :is(.gx-evc-sit, .gx-evc-desc) { font-size: 13px; }
-  .gx-oplog > ul { max-height: 380px; }
+  /* 모바일 일지는 안쪽 스크롤 없이 화면 전체 스크롤로 (2026-10-21 사용자: 폰에서 일지 위에선 스크롤·쓸기가 안 먹었다) */
+  .gx-oplog > ul { flex: none; max-height: none; overflow: visible; overscroll-behavior: auto; }
   .gx-opcnt em { padding: 4px 6px; }
 }
 .gx-ops .gx-gmark { font-style: normal; }
@@ -1283,7 +1484,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 
 /* 모니터 벽: 감시 화면 한 칸에 한 명. 편성 가능은 밝게(살짝 눌러서), 작전 중은 가장자리·모서리만 붉게, 편성 불가는 어둡게 */
-.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: max(150px, calc((100% - 24px) / 2)); gap: 8px; align-content: start; padding: 8px; }
+.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: var(--agrow, max(150px, calc((100% - 24px) / 2))); gap: 8px; align-content: start; padding: 8px; }
 .gx-agmon { --c: #5fe6c6; position: relative; display: flex; min-width: 0; min-height: 0; padding: 5px 5px 14px; border-radius: 7px; background: linear-gradient(180deg, #2a3236, #1d2427); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 2px 4px rgba(0, 0, 0, .4); cursor: pointer; }
 .gx-agmon::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: var(--c); box-shadow: 0 0 5px var(--c); }
 .gx-agmon.op { --c: #ff6b5b; } .gx-agmon.lock { --c: #6d7a77; } .gx-agmon.lock::after { box-shadow: none; }
@@ -1303,7 +1504,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agmon:hover .gx-agmon-scr { box-shadow: inset 0 0 0 1px #000, 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
 
 /* 목록: 얼굴 · 이름 · 상태(점+글자) · 상황 · 톡·위키. PC 두 줄, 모바일 한 줄. 줄을 칠하지 않고 점 색으로만 */
-.gx-agrows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 54px; align-content: start; padding: 0; }
+.gx-agrows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: var(--agrow, 54px); align-content: start; padding: 0; }
 .gx-agrow { --c: var(--signal); display: grid; grid-template-columns: 36px 4.6em auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-width: 0; padding: 0 8px 0 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .gx-agrow:nth-child(odd) { border-right: 1px solid var(--line); }
 .gx-agrow:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
@@ -1315,6 +1516,8 @@ button.mk-go:hover { color: var(--signal); }
 .gx-agrow.op { --c: #e8685a; } .gx-agrow.op .gx-agrow-st i { box-shadow: 0 0 6px #ff3b2b; }
 .gx-agrow.lock { --c: var(--dim); } .gx-agrow.lock > .gx-ava img { filter: grayscale(1) brightness(.5); } .gx-agrow.lock > b, .gx-agrow.lock .gx-agrow-msg { opacity: .55; }
 .gx-agrow-msg { min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-agrow-msg.two { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; line-height: 1.35; }
+.gx-agrow-msg.two > span { display: inline; }
 .gx-agrow-tools { display: flex; gap: 0; }
 .gx-agrow-tools .gx-acard-tool { width: 30px; height: 30px; }
 
@@ -1368,9 +1571,9 @@ button.mk-go:hover { color: var(--signal); }
 /* 잘리는 상황 글: 넘칠 때만 왼쪽으로 흘렀다가 돌아온다 (전광판). 움직임 줄이기 설정이면 말줄임표 그대로 */
 .gx-flow > span { display: inline-block; }
 .gx-flow.on { text-overflow: clip; }
-.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear infinite; will-change: transform; }
+.gx-flow.on > span { animation: gx-flow var(--ft, 8s) linear var(--fdl, 0s) infinite; will-change: transform; }
 .gx-flow.on > span::after { content: attr(data-t); padding-left: 3em; }
-@keyframes gx-flow { 0%, 15% { transform: translateX(0); } 100% { transform: translateX(var(--fd, 0)); } }
+@keyframes gx-flow { from { transform: translateX(0); } to { transform: translateX(var(--fd, 0)); } }
 @media (prefers-reduced-motion: reduce) { .gx-flow.on { text-overflow: ellipsis; } .gx-flow.on > span { animation: none; display: inline; } .gx-flow.on > span::after { content: none; } }
 .gx-flow.on { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 10px), transparent); }
 
@@ -1563,7 +1766,7 @@ button.mk-go:hover { color: var(--signal); }
   }
 
   // src/ui/swipeback.ts
-  var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .ph-drawer";
+  var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer";
   var FIRE = 72;
   var bound = /* @__PURE__ */ new WeakSet();
   function inSideScroller(el, root2) {
@@ -2495,337 +2698,4 @@ button.mk-go:hover { color: var(--signal); }
         cv.height = 3;
         const cx = cv.getContext("2d");
         cx.drawImage(bg, 0, 0);
-        const d = cx.getImageData(0, 0, bg.width, 3).data;
-        let r = 0, gr = 0, b = 0;
-        for (let i = 0; i < d.length; i += 4) r += d[i], gr += d[i + 1], b += d[i + 2];
-        const n = d.length / 4;
-        v = `rgb(${Math.round(r / n)},${Math.round(gr / n)},${Math.round(b / n)})`;
-        this.tops.set(bg, v);
-      }
-      return v;
-    }
-    scaleOf(u) {
-      return u.side === "e" ? ENEMIES[u.kind].scale : 1;
-    }
-    shadow(u, cam) {
-      if (u.side === "e" && u.act === "dead" && u.gone > 0.8) return;
-      const c = this.ctx;
-      const s4 = this.scaleOf(u);
-      const x = Math.round(u.x - cam);
-      const y = footY(u);
-      c.fillStyle = "rgba(0,0,0,.35)";
-      c.fillRect(x - 14 * s4, y - 2, 28 * s4, 3);
-      c.fillRect(x - 10 * s4, y - 3, 20 * s4, 5);
-    }
-    unit(u, cam) {
-      const f = this.atlas[u.kind][frameOf(u)];
-      const img = this.sheets.get(u.kind);
-      if (!f || !img) return;
-      const [sx, sy, w, h, ax, ay] = f;
-      const s4 = this.scaleOf(u);
-      const c = this.ctx;
-      const x = Math.round(u.x - cam);
-      const y = footY(u);
-      if (x < -200 || x > this.w + 200) return;
-      c.save();
-      if (u.side === "e" && u.act === "dead") c.globalAlpha = Math.max(0, 1 - Math.max(0, u.gone - 0.8) / 0.8);
-      if (u.side === "e") {
-        c.translate(x, 0);
-        c.scale(-1, 1);
-        c.drawImage(img, sx, sy, w, h, -ax * s4, y - ay * s4, w * s4, h * s4);
-        if (u.flash > 0) this.flashOver(img, sx, sy, w, h, -ax * s4, y - ay * s4, s4);
-      } else {
-        c.drawImage(img, sx, sy, w, h, x - ax, y - ay, w, h);
-        if (u.flash > 0) this.flashOver(img, sx, sy, w, h, x - ax, y - ay, 1);
-      }
-      c.restore();
-      if (u.side === "e" && !ENEMIES[u.kind].boss && alive(u) && u.hp < u.max) {
-        const bw = 26;
-        const top = y - this.atlas[u.kind][0][6] - 8;
-        c.fillStyle = "rgba(0,0,0,.6)";
-        c.fillRect(x - bw / 2 - 1, top - 1, bw + 2, 4);
-        c.fillStyle = "#e0524a";
-        c.fillRect(x - bw / 2, top, Math.max(1, Math.round(bw * u.hp / u.max)), 2);
-      }
-    }
-    flashOver(img, sx, sy, w, h, dx, dy, s4) {
-      const c = this.ctx;
-      c.globalCompositeOperation = "lighter";
-      c.globalAlpha = 0.55;
-      c.drawImage(img, sx, sy, w, h, dx, dy, w * s4, h * s4);
-      c.globalCompositeOperation = "source-over";
-      c.globalAlpha = 1;
-    }
-    effects(run3, cam) {
-      const c = this.ctx;
-      for (const f of run3.fx) {
-        const p = f.t / f.life;
-        const x = Math.round(f.x - cam);
-        if (f.kind === "num" || f.kind === "heal") {
-          const y = Math.round(f.y - p * 16);
-          c.globalAlpha = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
-          c.font = `700 ${f.big ? 14 : 11}px system-ui, sans-serif`;
-          c.textAlign = "center";
-          c.lineWidth = 3;
-          c.strokeStyle = "rgba(0,0,0,.85)";
-          c.strokeText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
-          c.fillStyle = f.kind === "heal" ? "#7be3a3" : f.big ? "#ffd166" : "#f4f1ea";
-          c.fillText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
-          c.globalAlpha = 1;
-        } else if (f.kind === "boom") {
-          const r = Math.round(10 + p * 34);
-          c.globalAlpha = 1 - p;
-          c.fillStyle = "#ffb347";
-          pixelRing(c, x, Math.round(f.y), r, 3);
-          c.fillStyle = "#fff1c1";
-          pixelRing(c, x, Math.round(f.y), Math.round(r * 0.6), 2);
-          c.globalAlpha = 1;
-        } else if (f.kind === "ring") {
-          c.globalAlpha = 1 - p;
-          c.fillStyle = "#9ff0d0";
-          pixelRing(c, x, Math.round(f.y), Math.round(12 + p * 30), 2);
-          c.globalAlpha = 1;
-        } else if (f.kind === "bind") {
-          c.fillStyle = "rgba(190,140,255,.85)";
-          const ph = Math.floor(f.t * 8) % 2;
-          for (let i = 0; i < 6; i++) {
-            const a = i / 6 * Math.PI * 2 + ph * 0.5;
-            c.fillRect(Math.round(x + Math.cos(a) * 16) - 1, Math.round(f.y + Math.sin(a) * 6) - 1, 3, 2);
-          }
-        }
-      }
-    }
-    bossBar(run3) {
-      const boss = run3.units.find((u) => u.side === "e" && ENEMIES[u.kind].boss && alive(u));
-      if (!boss) return;
-      const c = this.ctx;
-      const bw = Math.min(260, this.w - 40);
-      const x = Math.round((this.w - bw) / 2);
-      c.fillStyle = "rgba(0,0,0,.65)";
-      const y = this.top + 10;
-      c.fillRect(x - 2, y, bw + 4, 8);
-      c.fillStyle = "#c8433b";
-      c.fillRect(x, y + 2, Math.max(1, Math.round(bw * boss.hp / boss.max)), 4);
-      c.font = "700 11px system-ui, sans-serif";
-      c.textAlign = "center";
-      c.lineWidth = 3;
-      c.strokeStyle = "rgba(0,0,0,.85)";
-      c.strokeText(ENEMIES[boss.kind].name, this.w / 2, y + 24);
-      c.fillStyle = "#f4f1ea";
-      c.fillText(ENEMIES[boss.kind].name, this.w / 2, y + 24);
-    }
-  };
-  function pixelRing(c, cx, cy, r, size) {
-    const n = Math.max(8, Math.round(r * 0.9));
-    for (let i = 0; i < n; i++) {
-      const a = i / n * Math.PI * 2;
-      c.fillRect(Math.round(cx + Math.cos(a) * r) - (size >> 1), Math.round(cy + Math.sin(a) * r * 0.45) - (size >> 1), size, size);
-    }
-  }
-
-  // src/game/index.ts
-  var lastRun = null;
-  var STEP = 1 / 30;
-  var esc11 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  var faces = "";
-  function faceStyle(id, size) {
-    return `background-image:url('${faces}');background-position:${-agentDef(id).face * size}px 0`;
-  }
-  function mountGame(box, host2) {
-    let disposed = false;
-    let raf = 0;
-    const root2 = document.createElement("div");
-    root2.className = "goei-game";
-    const style = document.createElement("style");
-    style.textContent = style_default2;
-    root2.innerHTML = `
-    <div class="gg-top"><span class="gg-place"></span><span class="gg-steps"></span><span class="gg-depth"></span><span class="gg-sp"></span>
-      <button class="gg-tb" data-act="squad">편성</button><button class="gg-tb" data-act="rec">기록</button></div>
-    <div class="gg-stage"><canvas aria-label="관리국 순찰 화면"></canvas><div class="gg-load">불러오는 중</div></div>
-    <div class="gg-squad"></div>
-    <div class="gg-sheet" hidden></div>`;
-    box.append(style, root2);
-    const $ = (sel) => root2.querySelector(sel);
-    const canvas = $("canvas");
-    const stage = $(".gg-stage");
-    const squadEl = $(".gg-squad");
-    const sheet = $(".gg-sheet");
-    const renderer = new Renderer(canvas);
-    let meta = readMeta(null);
-    let run3 = null;
-    let dirty2 = false;
-    let lastSave = Date.now();
-    let saving = false;
-    let speed = host2.waiting() ? TUNE.waitingSpeed : 1;
-    let picking = [];
-    const save2 = (force = false) => {
-      if (!dirty2 || saving || !force && Date.now() - lastSave < TUNE.saveGap) return;
-      dirty2 = false;
-      saving = true;
-      lastSave = Date.now();
-      host2.save(JSON.stringify(meta)).catch(() => dirty2 = true).finally(() => saving = false);
-    };
-    const fit = () => {
-      renderer.layout(stage.clientWidth, stage.clientHeight, window.devicePixelRatio || 1);
-      if (run3) renderer.draw(run3, true);
-    };
-    const ro = new ResizeObserver(() => !disposed && fit());
-    ro.observe(stage);
-    let topKey = "";
-    const drawTop = () => {
-      if (!run3) return;
-      const camp = run3.phase === "camp" || run3.phase === "retreat" && run3.pt > 0.6;
-      const key2 = `${camp}|${run3.room}|${run3.depth}`;
-      if (key2 === topKey) return;
-      topKey = key2;
-      $(".gg-place").textContent = camp ? CAMP.name : ROOMS[run3.rooms[run3.room]].name;
-      $(".gg-depth").textContent = `순찰 ${run3.depth}`;
-      $(".gg-steps").innerHTML = camp ? "" : [0, 1, 2].map((i) => `<i class="${i < run3.room ? "done" : i === run3.room ? "now" : ""}${i === 2 ? " boss" : ""}"></i>`).join("");
-    };
-    let cardKey = "";
-    const drawCards = () => {
-      if (!run3) return;
-      const team = [...agents(run3)].sort((a, b) => meta.squad.indexOf(a.kind) - meta.squad.indexOf(b.kind));
-      const key2 = team.map((u) => u.uid).join(",");
-      if (key2 !== cardKey) {
-        cardKey = key2;
-        squadEl.innerHTML = team.map((u) => {
-          const d = agentDef(u.kind);
-          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc11(d.name)} ${esc11(d.skillName)}">
-          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc11(d.name)}</span>
-          <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
-        }).join("");
-      }
-      const foesUp = run3.units.some((u) => u.side === "e" && alive(u));
-      for (const u of team) {
-        const el = squadEl.querySelector(`[data-uid="${u.uid}"]`);
-        if (!el) continue;
-        const hp = u.hp / u.max;
-        el.querySelector(".hp b").style.transform = `scaleX(${hp.toFixed(3)})`;
-        el.querySelector(".sk b").style.transform = `scaleX(${Math.min(1, u.gauge).toFixed(3)})`;
-        el.classList.toggle("ready", u.gauge >= 1 && alive(u) && run3.phase === "patrol" && foesUp);
-        el.classList.toggle("down", !alive(u) && u.act !== "rest");
-        el.classList.toggle("low", hp < 0.3);
-      }
-    };
-    const openSquad = () => {
-      picking = [...meta.squad];
-      sheet.hidden = false;
-      drawSquadSheet();
-    };
-    const drawSquadSheet = () => {
-      sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
-      <div class="gg-sh-body"><div class="gg-pick">${AGENTS.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
-        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc11(a.name)}</b><small>${esc11(a.role)} · ${esc11(a.skillName)}</small></button>`).join("")}</div></div>
-      <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
-    };
-    const openRecord = () => {
-      sheet.hidden = false;
-      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc11(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
-      sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
-      <div class="gg-sh-body"><dl class="gg-rec">
-        <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
-        <dt class="gg-sec">처치</dt>${kills}</dl></div>`;
-    };
-    root2.addEventListener("click", (ev) => {
-      const t = ev.target.closest("button");
-      if (!t || !run3) return;
-      const act2 = t.dataset.act;
-      if (act2 === "squad") return openSquad();
-      if (act2 === "rec") return openRecord();
-      if (act2 === "close") return void (sheet.hidden = true);
-      if (act2 === "apply" && picking.length === 4) {
-        applySquad(run3, meta, picking);
-        dirty2 = true;
-        cardKey = topKey = "";
-        sheet.hidden = true;
-        return;
-      }
-      if (t.dataset.pick) {
-        const id = t.dataset.pick;
-        if (picking.includes(id)) picking = picking.filter((x) => x !== id);
-        else if (picking.length < 4) picking.push(id);
-        return drawSquadSheet();
-      }
-      if (t.dataset.uid) trigger(run3, Number(t.dataset.uid));
-    });
-    const unwait = host2.onWaiting((w) => speed = w ? TUNE.waitingSpeed : 1);
-    let acc = 0;
-    let prev = 0;
-    let uiT = 0;
-    const frame = (now) => {
-      if (disposed) return;
-      raf = requestAnimationFrame(frame);
-      if (!run3 || document.hidden) {
-        prev = now;
-        return;
-      }
-      const dt = Math.min(0.25, prev ? (now - prev) / 1e3 : 0);
-      prev = now;
-      acc += dt * speed;
-      while (acc >= STEP) {
-        acc -= STEP;
-        if (step(run3, meta, STEP, renderer.w).changed) dirty2 = true;
-      }
-      renderer.draw(run3);
-      uiT += dt;
-      if (uiT > 0.1) {
-        uiT = 0;
-        drawTop();
-        drawCards();
-        save2();
-      }
-    };
-    void (async () => {
-      try {
-        const art2 = await host2.art();
-        faces = art2.url(FACE_FILE);
-        const [raw] = await Promise.all([host2.load().catch(() => null), renderer.load(art2)]);
-        if (disposed) return;
-        meta = readMeta(raw);
-        run3 = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);
-        $(".gg-load").remove();
-        fit();
-        drawTop();
-        drawCards();
-        raf = requestAnimationFrame(frame);
-      } catch {
-        if (!disposed) $(".gg-load").textContent = "그림을 불러오지 못했습니다";
-      }
-    })();
-    return () => {
-      if (disposed) return;
-      disposed = true;
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      unwait();
-      if (run3) lastRun = { run: run3, squad: meta.squad.join() };
-      save2(true);
-      style.remove();
-      root2.remove();
-    };
-  }
-
-  // src/game/action/style.css
-  var style_default3 = ".ga {\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  background: #09121c;\n  color: #e6e2cd;\n  font: 13px monospace;\n  box-sizing: border-box;\n  overflow: hidden;\n  outline: none;\n  color-scheme: dark;\n}\n.ga * {\n  box-sizing: border-box;\n}\n.ga button {\n  font: inherit;\n  color: inherit;\n  background: #172b3b;\n  border: 2px solid #667e86;\n  border-radius: 0;\n  padding: 7px 10px;\n  cursor: pointer;\n  touch-action: none;\n}\n.ga button:focus-visible {\n  outline: 3px solid #ffd899;\n  outline-offset: 1px;\n}\n.ga button:disabled {\n  opacity: 0.4;\n  cursor: default;\n}\n.ga-hud {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  align-items: center;\n  padding: 8px;\n  border-bottom: 2px solid #354e5b;\n}\n.ga-hud progress {\n  width: 95px;\n  height: 10px;\n  accent-color: #e3a666;\n}\n.ga-hud span {\n  white-space: nowrap;\n}\n.ga-fit {\n  flex: 1;\n  min-height: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  background: #040a10;\n  overflow: hidden;\n}\n.ga canvas {\n  display: block;\n  image-rendering: pixelated;\n  touch-action: none;\n  outline: none;\n}\n.ga-foot {\n  flex: none;\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 5px;\n  padding: 6px;\n  border-top: 2px solid #354e5b;\n}\n.ga-note {\n  font-size: 11px;\n  color: #a9bdc3;\n  padding: 4px 8px;\n  margin: 0;\n}\n.ga-msg {\n  flex: 1;\n  min-width: 140px;\n  color: #ffda9b;\n}\n.ga-controls {\n  display: flex;\n  gap: 5px;\n  flex-wrap: wrap;\n}\n.ga-menu {\n  position: absolute;\n  inset: 0;\n  background: #07121aef;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 16px;\n  padding: 20px;\n  text-align: center;\n  z-index: 2;\n}\n.ga-menu[hidden] {\n  display: none;\n}\n.ga-menu p {\n  max-width: 500px;\n  margin: 0;\n  line-height: 1.8;\n}\n.ga [data-busy] {\n  color: #a9bdc3;\n}\n.ga[data-save-error='true'] [data-busy] {\n  color: #ff9981;\n}\n@media (max-width: 760px) {\n  .ga {\n    font-size: 11px;\n  }\n  .ga-hud {\n    gap: 5px;\n    padding: 4px;\n  }\n  .ga-hud progress {\n    width: 52px;\n  }\n  .ga button {\n    padding: 7px;\n    min-height: 40px;\n  }\n  .ga-foot {\n    gap: 4px;\n  }\n  .ga-controls {\n    flex: 1;\n    justify-content: flex-end;\n  }\n  .ga-note {\n    font-size: 10px;\n  }\n  .ga-msg {\n    width: 100%;\n    flex: auto;\n    order: 2;\n  }\n  .ga-controls button {\n    min-width: 44px;\n    min-height: 44px;\n  }\n}\n\n.ga-stick {\n  position: relative;\n  flex: none;\n  width: 110px;\n  height: 90px;\n  border: 2px solid #607b89;\n  background: repeating-linear-gradient(0deg, #162633 0 15px, #1c303c 15px 16px);\n  touch-action: none;\n  user-select: none;\n  display: grid;\n  place-items: center;\n  overflow: hidden;\n}\n.ga-stick span {\n  position: absolute;\n  top: 3px;\n  font-size: 10px;\n  color: #9cb7c4;\n}\n.ga-stick i {\n  display: block;\n  width: 34px;\n  height: 30px;\n  border: 3px solid #d8b981;\n  background: #2e4b5c;\n  pointer-events: none;\n}\n@media (max-width: 760px) {\n  .ga-foot {\n    display: grid;\n    grid-template-columns: 132px minmax(0, 1fr);\n    gap: 6px;\n    padding: 6px;\n  }\n  .ga-stick {\n    width: 124px;\n    height: 124px;\n    align-self: center;\n    grid-column: 1;\n    grid-row: 1;\n  }\n  .ga-controls {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 4px;\n    grid-column: 2;\n    grid-row: 1;\n  }\n  .ga-controls button {\n    padding: 3px;\n    min-width: 0;\n    min-height: 44px;\n    font-size: 10px;\n  }\n  .ga-msg {\n    grid-column: 1/-1;\n    grid-row: 2;\n    min-width: 0;\n  }\n  .ga-foot [data-busy] {\n    grid-column: 1;\n    grid-row: 3;\n  }\n  .ga-foot > [data-do='restart'] {\n    grid-column: 2;\n    grid-row: 3;\n  }\n  .ga-note {\n    line-height: 1.6;\n  }\n}\n";
-
-  // src/game/action/space.ts
-  var SCENE = {
-    width: 1280,
-    height: 720,
-    backgroundWidth: 640,
-    backgroundHeight: 360,
-    floorBack: 460,
-    floorMin: 480,
-    floorMax: 680,
-    referenceY: 530,
-    nativeAdultHeight: 128,
-    actorScale: 2,
-    adultHeight: 256,
-    enemyScale: 2,
-    doorHeight: 340
-  };
-  function depthScale(_footY) {
-    return 1;
-  }
-  var GAIT = { walk: 160, run
+        con

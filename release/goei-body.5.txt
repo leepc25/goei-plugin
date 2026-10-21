@@ -1,4 +1,337 @@
-: 192, crouch: 112 };
+st d = cx.getImageData(0, 0, bg.width, 3).data;
+        let r = 0, gr = 0, b = 0;
+        for (let i = 0; i < d.length; i += 4) r += d[i], gr += d[i + 1], b += d[i + 2];
+        const n = d.length / 4;
+        v = `rgb(${Math.round(r / n)},${Math.round(gr / n)},${Math.round(b / n)})`;
+        this.tops.set(bg, v);
+      }
+      return v;
+    }
+    scaleOf(u) {
+      return u.side === "e" ? ENEMIES[u.kind].scale : 1;
+    }
+    shadow(u, cam) {
+      if (u.side === "e" && u.act === "dead" && u.gone > 0.8) return;
+      const c = this.ctx;
+      const s4 = this.scaleOf(u);
+      const x = Math.round(u.x - cam);
+      const y = footY(u);
+      c.fillStyle = "rgba(0,0,0,.35)";
+      c.fillRect(x - 14 * s4, y - 2, 28 * s4, 3);
+      c.fillRect(x - 10 * s4, y - 3, 20 * s4, 5);
+    }
+    unit(u, cam) {
+      const f = this.atlas[u.kind][frameOf(u)];
+      const img = this.sheets.get(u.kind);
+      if (!f || !img) return;
+      const [sx, sy, w, h, ax, ay] = f;
+      const s4 = this.scaleOf(u);
+      const c = this.ctx;
+      const x = Math.round(u.x - cam);
+      const y = footY(u);
+      if (x < -200 || x > this.w + 200) return;
+      c.save();
+      if (u.side === "e" && u.act === "dead") c.globalAlpha = Math.max(0, 1 - Math.max(0, u.gone - 0.8) / 0.8);
+      if (u.side === "e") {
+        c.translate(x, 0);
+        c.scale(-1, 1);
+        c.drawImage(img, sx, sy, w, h, -ax * s4, y - ay * s4, w * s4, h * s4);
+        if (u.flash > 0) this.flashOver(img, sx, sy, w, h, -ax * s4, y - ay * s4, s4);
+      } else {
+        c.drawImage(img, sx, sy, w, h, x - ax, y - ay, w, h);
+        if (u.flash > 0) this.flashOver(img, sx, sy, w, h, x - ax, y - ay, 1);
+      }
+      c.restore();
+      if (u.side === "e" && !ENEMIES[u.kind].boss && alive(u) && u.hp < u.max) {
+        const bw = 26;
+        const top = y - this.atlas[u.kind][0][6] - 8;
+        c.fillStyle = "rgba(0,0,0,.6)";
+        c.fillRect(x - bw / 2 - 1, top - 1, bw + 2, 4);
+        c.fillStyle = "#e0524a";
+        c.fillRect(x - bw / 2, top, Math.max(1, Math.round(bw * u.hp / u.max)), 2);
+      }
+    }
+    flashOver(img, sx, sy, w, h, dx, dy, s4) {
+      const c = this.ctx;
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.55;
+      c.drawImage(img, sx, sy, w, h, dx, dy, w * s4, h * s4);
+      c.globalCompositeOperation = "source-over";
+      c.globalAlpha = 1;
+    }
+    effects(run3, cam) {
+      const c = this.ctx;
+      for (const f of run3.fx) {
+        const p = f.t / f.life;
+        const x = Math.round(f.x - cam);
+        if (f.kind === "num" || f.kind === "heal") {
+          const y = Math.round(f.y - p * 16);
+          c.globalAlpha = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
+          c.font = `700 ${f.big ? 14 : 11}px system-ui, sans-serif`;
+          c.textAlign = "center";
+          c.lineWidth = 3;
+          c.strokeStyle = "rgba(0,0,0,.85)";
+          c.strokeText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
+          c.fillStyle = f.kind === "heal" ? "#7be3a3" : f.big ? "#ffd166" : "#f4f1ea";
+          c.fillText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
+          c.globalAlpha = 1;
+        } else if (f.kind === "boom") {
+          const r = Math.round(10 + p * 34);
+          c.globalAlpha = 1 - p;
+          c.fillStyle = "#ffb347";
+          pixelRing(c, x, Math.round(f.y), r, 3);
+          c.fillStyle = "#fff1c1";
+          pixelRing(c, x, Math.round(f.y), Math.round(r * 0.6), 2);
+          c.globalAlpha = 1;
+        } else if (f.kind === "ring") {
+          c.globalAlpha = 1 - p;
+          c.fillStyle = "#9ff0d0";
+          pixelRing(c, x, Math.round(f.y), Math.round(12 + p * 30), 2);
+          c.globalAlpha = 1;
+        } else if (f.kind === "bind") {
+          c.fillStyle = "rgba(190,140,255,.85)";
+          const ph = Math.floor(f.t * 8) % 2;
+          for (let i = 0; i < 6; i++) {
+            const a = i / 6 * Math.PI * 2 + ph * 0.5;
+            c.fillRect(Math.round(x + Math.cos(a) * 16) - 1, Math.round(f.y + Math.sin(a) * 6) - 1, 3, 2);
+          }
+        }
+      }
+    }
+    bossBar(run3) {
+      const boss = run3.units.find((u) => u.side === "e" && ENEMIES[u.kind].boss && alive(u));
+      if (!boss) return;
+      const c = this.ctx;
+      const bw = Math.min(260, this.w - 40);
+      const x = Math.round((this.w - bw) / 2);
+      c.fillStyle = "rgba(0,0,0,.65)";
+      const y = this.top + 10;
+      c.fillRect(x - 2, y, bw + 4, 8);
+      c.fillStyle = "#c8433b";
+      c.fillRect(x, y + 2, Math.max(1, Math.round(bw * boss.hp / boss.max)), 4);
+      c.font = "700 11px system-ui, sans-serif";
+      c.textAlign = "center";
+      c.lineWidth = 3;
+      c.strokeStyle = "rgba(0,0,0,.85)";
+      c.strokeText(ENEMIES[boss.kind].name, this.w / 2, y + 24);
+      c.fillStyle = "#f4f1ea";
+      c.fillText(ENEMIES[boss.kind].name, this.w / 2, y + 24);
+    }
+  };
+  function pixelRing(c, cx, cy, r, size) {
+    const n = Math.max(8, Math.round(r * 0.9));
+    for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2;
+      c.fillRect(Math.round(cx + Math.cos(a) * r) - (size >> 1), Math.round(cy + Math.sin(a) * r * 0.45) - (size >> 1), size, size);
+    }
+  }
+
+  // src/game/index.ts
+  var lastRun = null;
+  var STEP = 1 / 30;
+  var esc11 = (s4) => s4.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  var faces = "";
+  function faceStyle(id, size) {
+    return `background-image:url('${faces}');background-position:${-agentDef(id).face * size}px 0`;
+  }
+  function mountGame(box, host2) {
+    let disposed = false;
+    let raf = 0;
+    const root2 = document.createElement("div");
+    root2.className = "goei-game";
+    const style = document.createElement("style");
+    style.textContent = style_default2;
+    root2.innerHTML = `
+    <div class="gg-top"><span class="gg-place"></span><span class="gg-steps"></span><span class="gg-depth"></span><span class="gg-sp"></span>
+      <button class="gg-tb" data-act="squad">편성</button><button class="gg-tb" data-act="rec">기록</button></div>
+    <div class="gg-stage"><canvas aria-label="관리국 순찰 화면"></canvas><div class="gg-load">불러오는 중</div></div>
+    <div class="gg-squad"></div>
+    <div class="gg-sheet" hidden></div>`;
+    box.append(style, root2);
+    const $ = (sel) => root2.querySelector(sel);
+    const canvas = $("canvas");
+    const stage = $(".gg-stage");
+    const squadEl = $(".gg-squad");
+    const sheet = $(".gg-sheet");
+    const renderer = new Renderer(canvas);
+    let meta = readMeta(null);
+    let run3 = null;
+    let dirty2 = false;
+    let lastSave = Date.now();
+    let saving = false;
+    let speed = host2.waiting() ? TUNE.waitingSpeed : 1;
+    let picking = [];
+    const save2 = (force = false) => {
+      if (!dirty2 || saving || !force && Date.now() - lastSave < TUNE.saveGap) return;
+      dirty2 = false;
+      saving = true;
+      lastSave = Date.now();
+      host2.save(JSON.stringify(meta)).catch(() => dirty2 = true).finally(() => saving = false);
+    };
+    const fit = () => {
+      renderer.layout(stage.clientWidth, stage.clientHeight, window.devicePixelRatio || 1);
+      if (run3) renderer.draw(run3, true);
+    };
+    const ro = new ResizeObserver(() => !disposed && fit());
+    ro.observe(stage);
+    let topKey = "";
+    const drawTop = () => {
+      if (!run3) return;
+      const camp = run3.phase === "camp" || run3.phase === "retreat" && run3.pt > 0.6;
+      const key2 = `${camp}|${run3.room}|${run3.depth}`;
+      if (key2 === topKey) return;
+      topKey = key2;
+      $(".gg-place").textContent = camp ? CAMP.name : ROOMS[run3.rooms[run3.room]].name;
+      $(".gg-depth").textContent = `순찰 ${run3.depth}`;
+      $(".gg-steps").innerHTML = camp ? "" : [0, 1, 2].map((i) => `<i class="${i < run3.room ? "done" : i === run3.room ? "now" : ""}${i === 2 ? " boss" : ""}"></i>`).join("");
+    };
+    let cardKey = "";
+    const drawCards = () => {
+      if (!run3) return;
+      const team = [...agents(run3)].sort((a, b) => meta.squad.indexOf(a.kind) - meta.squad.indexOf(b.kind));
+      const key2 = team.map((u) => u.uid).join(",");
+      if (key2 !== cardKey) {
+        cardKey = key2;
+        squadEl.innerHTML = team.map((u) => {
+          const d = agentDef(u.kind);
+          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc11(d.name)} ${esc11(d.skillName)}">
+          <span class="gg-face" style="${faceStyle(d.id, 40)}"></span><span class="gg-nm">${esc11(d.name)}</span>
+          <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
+        }).join("");
+      }
+      const foesUp = run3.units.some((u) => u.side === "e" && alive(u));
+      for (const u of team) {
+        const el = squadEl.querySelector(`[data-uid="${u.uid}"]`);
+        if (!el) continue;
+        const hp = u.hp / u.max;
+        el.querySelector(".hp b").style.transform = `scaleX(${hp.toFixed(3)})`;
+        el.querySelector(".sk b").style.transform = `scaleX(${Math.min(1, u.gauge).toFixed(3)})`;
+        el.classList.toggle("ready", u.gauge >= 1 && alive(u) && run3.phase === "patrol" && foesUp);
+        el.classList.toggle("down", !alive(u) && u.act !== "rest");
+        el.classList.toggle("low", hp < 0.3);
+      }
+    };
+    const openSquad = () => {
+      picking = [...meta.squad];
+      sheet.hidden = false;
+      drawSquadSheet();
+    };
+    const drawSquadSheet = () => {
+      sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
+      <div class="gg-sh-body"><div class="gg-pick">${AGENTS.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
+        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc11(a.name)}</b><small>${esc11(a.role)} · ${esc11(a.skillName)}</small></button>`).join("")}</div></div>
+      <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
+    };
+    const openRecord = () => {
+      sheet.hidden = false;
+      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc11(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
+      sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
+      <div class="gg-sh-body"><dl class="gg-rec">
+        <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
+        <dt class="gg-sec">처치</dt>${kills}</dl></div>`;
+    };
+    root2.addEventListener("click", (ev) => {
+      const t = ev.target.closest("button");
+      if (!t || !run3) return;
+      const act2 = t.dataset.act;
+      if (act2 === "squad") return openSquad();
+      if (act2 === "rec") return openRecord();
+      if (act2 === "close") return void (sheet.hidden = true);
+      if (act2 === "apply" && picking.length === 4) {
+        applySquad(run3, meta, picking);
+        dirty2 = true;
+        cardKey = topKey = "";
+        sheet.hidden = true;
+        return;
+      }
+      if (t.dataset.pick) {
+        const id = t.dataset.pick;
+        if (picking.includes(id)) picking = picking.filter((x) => x !== id);
+        else if (picking.length < 4) picking.push(id);
+        return drawSquadSheet();
+      }
+      if (t.dataset.uid) trigger(run3, Number(t.dataset.uid));
+    });
+    const unwait = host2.onWaiting((w) => speed = w ? TUNE.waitingSpeed : 1);
+    let acc = 0;
+    let prev = 0;
+    let uiT = 0;
+    const frame = (now) => {
+      if (disposed) return;
+      raf = requestAnimationFrame(frame);
+      if (!run3 || document.hidden) {
+        prev = now;
+        return;
+      }
+      const dt = Math.min(0.25, prev ? (now - prev) / 1e3 : 0);
+      prev = now;
+      acc += dt * speed;
+      while (acc >= STEP) {
+        acc -= STEP;
+        if (step(run3, meta, STEP, renderer.w).changed) dirty2 = true;
+      }
+      renderer.draw(run3);
+      uiT += dt;
+      if (uiT > 0.1) {
+        uiT = 0;
+        drawTop();
+        drawCards();
+        save2();
+      }
+    };
+    void (async () => {
+      try {
+        const art2 = await host2.art();
+        faces = art2.url(FACE_FILE);
+        const [raw] = await Promise.all([host2.load().catch(() => null), renderer.load(art2)]);
+        if (disposed) return;
+        meta = readMeta(raw);
+        run3 = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);
+        $(".gg-load").remove();
+        fit();
+        drawTop();
+        drawCards();
+        raf = requestAnimationFrame(frame);
+      } catch {
+        if (!disposed) $(".gg-load").textContent = "그림을 불러오지 못했습니다";
+      }
+    })();
+    return () => {
+      if (disposed) return;
+      disposed = true;
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      unwait();
+      if (run3) lastRun = { run: run3, squad: meta.squad.join() };
+      save2(true);
+      style.remove();
+      root2.remove();
+    };
+  }
+
+  // src/game/action/style.css
+  var style_default3 = ".ga {\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  background: #09121c;\n  color: #e6e2cd;\n  font: 13px monospace;\n  box-sizing: border-box;\n  overflow: hidden;\n  outline: none;\n  color-scheme: dark;\n}\n.ga * {\n  box-sizing: border-box;\n}\n.ga button {\n  font: inherit;\n  color: inherit;\n  background: #172b3b;\n  border: 2px solid #667e86;\n  border-radius: 0;\n  padding: 7px 10px;\n  cursor: pointer;\n  touch-action: none;\n}\n.ga button:focus-visible {\n  outline: 3px solid #ffd899;\n  outline-offset: 1px;\n}\n.ga button:disabled {\n  opacity: 0.4;\n  cursor: default;\n}\n.ga-hud {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  align-items: center;\n  padding: 8px;\n  border-bottom: 2px solid #354e5b;\n}\n.ga-hud progress {\n  width: 95px;\n  height: 10px;\n  accent-color: #e3a666;\n}\n.ga-hud span {\n  white-space: nowrap;\n}\n.ga-fit {\n  flex: 1;\n  min-height: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  background: #040a10;\n  overflow: hidden;\n}\n.ga canvas {\n  display: block;\n  image-rendering: pixelated;\n  touch-action: none;\n  outline: none;\n}\n.ga-foot {\n  flex: none;\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 5px;\n  padding: 6px;\n  border-top: 2px solid #354e5b;\n}\n.ga-note {\n  font-size: 11px;\n  color: #a9bdc3;\n  padding: 4px 8px;\n  margin: 0;\n}\n.ga-msg {\n  flex: 1;\n  min-width: 140px;\n  color: #ffda9b;\n}\n.ga-controls {\n  display: flex;\n  gap: 5px;\n  flex-wrap: wrap;\n}\n.ga-menu {\n  position: absolute;\n  inset: 0;\n  background: #07121aef;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 16px;\n  padding: 20px;\n  text-align: center;\n  z-index: 2;\n}\n.ga-menu[hidden] {\n  display: none;\n}\n.ga-menu p {\n  max-width: 500px;\n  margin: 0;\n  line-height: 1.8;\n}\n.ga [data-busy] {\n  color: #a9bdc3;\n}\n.ga[data-save-error='true'] [data-busy] {\n  color: #ff9981;\n}\n@media (max-width: 760px) {\n  .ga {\n    font-size: 11px;\n  }\n  .ga-hud {\n    gap: 5px;\n    padding: 4px;\n  }\n  .ga-hud progress {\n    width: 52px;\n  }\n  .ga button {\n    padding: 7px;\n    min-height: 40px;\n  }\n  .ga-foot {\n    gap: 4px;\n  }\n  .ga-controls {\n    flex: 1;\n    justify-content: flex-end;\n  }\n  .ga-note {\n    font-size: 10px;\n  }\n  .ga-msg {\n    width: 100%;\n    flex: auto;\n    order: 2;\n  }\n  .ga-controls button {\n    min-width: 44px;\n    min-height: 44px;\n  }\n}\n\n.ga-stick {\n  position: relative;\n  flex: none;\n  width: 110px;\n  height: 90px;\n  border: 2px solid #607b89;\n  background: repeating-linear-gradient(0deg, #162633 0 15px, #1c303c 15px 16px);\n  touch-action: none;\n  user-select: none;\n  display: grid;\n  place-items: center;\n  overflow: hidden;\n}\n.ga-stick span {\n  position: absolute;\n  top: 3px;\n  font-size: 10px;\n  color: #9cb7c4;\n}\n.ga-stick i {\n  display: block;\n  width: 34px;\n  height: 30px;\n  border: 3px solid #d8b981;\n  background: #2e4b5c;\n  pointer-events: none;\n}\n@media (max-width: 760px) {\n  .ga-foot {\n    display: grid;\n    grid-template-columns: 132px minmax(0, 1fr);\n    gap: 6px;\n    padding: 6px;\n  }\n  .ga-stick {\n    width: 124px;\n    height: 124px;\n    align-self: center;\n    grid-column: 1;\n    grid-row: 1;\n  }\n  .ga-controls {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 4px;\n    grid-column: 2;\n    grid-row: 1;\n  }\n  .ga-controls button {\n    padding: 3px;\n    min-width: 0;\n    min-height: 44px;\n    font-size: 10px;\n  }\n  .ga-msg {\n    grid-column: 1/-1;\n    grid-row: 2;\n    min-width: 0;\n  }\n  .ga-foot [data-busy] {\n    grid-column: 1;\n    grid-row: 3;\n  }\n  .ga-foot > [data-do='restart'] {\n    grid-column: 2;\n    grid-row: 3;\n  }\n  .ga-note {\n    line-height: 1.6;\n  }\n}\n";
+
+  // src/game/action/space.ts
+  var SCENE = {
+    width: 1280,
+    height: 720,
+    backgroundWidth: 640,
+    backgroundHeight: 360,
+    floorBack: 460,
+    floorMin: 480,
+    floorMax: 680,
+    referenceY: 530,
+    nativeAdultHeight: 128,
+    actorScale: 2,
+    adultHeight: 256,
+    enemyScale: 2,
+    doorHeight: 340
+  };
+  function depthScale(_footY) {
+    return 1;
+  }
+  var GAIT = { walk: 160, run: 192, crouch: 112 };
   var MOTION = { walkSpeed: 200, runSpeed: 360 };
 
   // src/game/action/motion.ts
@@ -1313,7 +1646,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.35" : "0";
+  var PLUGIN_VERSION = true ? "0.16.36" : "0";
 
   // src/host/gamepack.ts
   var KEY2 = `goei:game-pack:${PACK_ID}`;
@@ -1895,6 +2228,60 @@
     return true;
   }
 
+  // src/ui/evpic.ts
+  var cache6 = null;
+  var viewerOf = (ctx2) => String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
+  function rows(ctx2) {
+    const viewer = viewerOf(ctx2);
+    if (cache6 && cache6.lore === ctx2.char.globalLore && cache6.stamp === moduleAssetStamp() && cache6.viewer === viewer) return cache6.map;
+    const map = /* @__PURE__ */ new Map();
+    const dir2 = readDirectory(ctx2.char.globalLore);
+    for (const p of [...dir2.anomalies, ...dir2.sites]) {
+      const row6 = { pic: mainPic(ctx2.char, p), title: p.lore || p.label };
+      for (const n of [p.label, p.lore, ...p.aliases]) if (n && !map.has(n)) map.set(n, row6);
+    }
+    let names4 = {};
+    try {
+      names4 = factionNames(parseCatalog(ctx2.char.globalLore), viewer);
+    } catch {
+    }
+    const fake = dir2.orgs.find((o) => o.faction === "B00");
+    for (const b of dir2.bases) {
+      let org = dir2.orgs.find((o) => o.name === b.org);
+      const swap = viewer === "B00" && org?.faction === "A00" && !!fake;
+      if (swap) org = fake;
+      const own = !swap && findDoc(ctx2.chat, b.name, ctx2.char.globalLore);
+      const lore = ctx2.char.globalLore ?? [];
+      const outside = (en2) => en2 && hasAsset(ctx2.char, `Base ${en2}`) ? `Base ${en2}` : "";
+      const pic = (swap ? outside(org.spec.english) : outside(b.english) || mainPic(ctx2.char, b)) || (org ? mainPic(ctx2.char, org.spec) : "");
+      const title2 = own ? b.name : swap ? orgLoreName(lore, org.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
+      const shared = pic ? "" : baseShared(b.name, b.label).find((n) => hasAsset(ctx2.char, n)) ?? "";
+      map.set(b.name, { pic: pic || shared, title: title2, org: org ? org.faction && names4[org.faction] || org.name : "" });
+    }
+    cache6 = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
+    return map;
+  }
+  var descs = /* @__PURE__ */ new Map();
+  var sharedFor = (kind, name, text) => kind === "lm" ? ["Situation Incident"] : situationShared(kind, name, text);
+  var basePic = (ctx2, name) => rows(ctx2).get(name)?.pic ?? "";
+  function baseLink(ctx2, name) {
+    const r = rows(ctx2).get(name);
+    return { doc: r?.title ?? name, org: r?.org ?? "" };
+  }
+  function evArt(ctx2, name, kind, text = "") {
+    const r = rows(ctx2).get(name);
+    const shared = !r?.pic && kind && sharedFor(kind, name, text).find((n) => hasAsset(ctx2.char, n)) || "";
+    const pic = imageUrl(ctx2.char, r?.pic || shared);
+    const title2 = r?.title ?? name;
+    let desc = descs.get(title2);
+    if (desc === void 0) {
+      const doc = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
+      desc = doc ? docSummary(doc.body) : "";
+      descs.set(title2, desc);
+    }
+    return { pic, desc };
+  }
+
   // src/ui/wiki.ts
   var TABS = [["all", "전체"], ["story", "이번 이야기"], ["an", "괴이"], ["ms", "특수"], ["ag", "인물"], ["fac", "세력"], ["etc", "기타"]];
   var wiki = {
@@ -1932,7 +2319,11 @@
   function canon(ctx2) {
     const r = registry(ctx2);
     const src = source3(ctx2);
-    return (t) => canonicalTitle(r, src, t).title;
+    return (t) => ownDoc(ctx2, t) ?? canonicalTitle(r, src, t).title;
+  }
+  function ownDoc(ctx2, t) {
+    const title2 = t.trim();
+    return title2 && findDoc(ctx2.chat, title2, ctx2.char.globalLore) ? title2 : null;
   }
   function go(view2, title2 = "", query = wiki.query) {
     if (wiki.view !== view2 || wiki.title !== title2) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
@@ -1968,7 +2359,8 @@
     const query = q.trim();
     wiki.query = query;
     if (!query) return;
-    const c = canonicalTitle(registry(ctx2), source3(ctx2), query);
+    const own = ownDoc(ctx2, query);
+    const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx2), source3(ctx2), query);
     if (findDoc(ctx2.chat, c.title, ctx2.char.globalLore)) return go("doc", c.title, query);
     if (c.known) return openTitle(ctx2, c.title, "direct");
     wiki.listOpen = true;
@@ -2039,7 +2431,8 @@
   var CAT_ICON = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
   var entryCache = null;
   function entries(ctx2) {
-    if (entryCache && entryCache.lore === ctx2.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
+    const viewer = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
+    if (entryCache && entryCache.lore === ctx2.char.globalLore && entryCache.stamp === moduleAssetStamp() && entryCache.viewer === viewer) return entryCache.list;
     const c = canon(ctx2);
     const list4 = [];
     const dir2 = readDirectory(ctx2.char.globalLore);
@@ -2049,7 +2442,8 @@
     }
     try {
       for (const l of parseCatalog(ctx2.char.globalLore).landmarks) {
-        list4.push({ cat: "lm", name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: "", face: "", terms: [l.name, l.english, ...l.aliases] });
+        const link = baseLink(ctx2, l.name);
+        list4.push({ cat: "lm", name: l.name, title: c(link.doc), sub: [link.org, placeWhere(l.sido, l.gu)].filter(Boolean).join(" · "), photo: basePic(ctx2, l.name), face: basePic(ctx2, l.name), terms: [l.name, l.english, ...l.aliases] });
       }
     } catch {
     }
@@ -2063,17 +2457,19 @@
       const doc = orgLoreName(lore, o.name);
       if (!f && !hasLore.has(doc)) continue;
       const name = f?.name ?? o.name;
-      list4.push({ cat: "org", name, title: c(doc), sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, o.spec), face: facePic(ctx2.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ""] });
+      const title2 = [c(doc), c(o.name), c(name)].find((t) => findDoc(ctx2.chat, t, lore)) ?? c(doc);
+      list4.push({ cat: "org", name, title: title2, sub: o.name !== name ? o.name : "", photo: mainPic(ctx2.char, { ...o.spec, shared: o.shared }), face: facePic(ctx2.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc, o.spec.english ?? ""] });
     }
     const seen2 = /* @__PURE__ */ new Set();
     const out = list4.filter((e) => seen2.has(`${e.cat}|${e.title}`) ? false : (seen2.add(`${e.cat}|${e.title}`), true));
-    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), list: out };
+    entryCache = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out };
     return out;
   }
   var entryFor = (ctx2, title2) => {
     const all = entries(ctx2).filter((e) => e.title === title2);
-    return all.find((e) => e.name === title2) ?? all[0];
+    return all.find((e) => e.name === title2) ?? all.find((e) => e.cat !== "lm") ?? all[0];
   };
+  var shownName = (ctx2, title2) => entryFor(ctx2, title2)?.name ?? title2;
   function matches2(ctx2, q) {
     const lower = q.toLowerCase();
     return entries(ctx2).filter((e) => e.terms.some((t) => t && t.toLowerCase().includes(lower)));
@@ -2135,7 +2531,7 @@
     return /[a-z]/i.test(ch) ? "A" : "#";
   }
   function sortedDocs(ctx2) {
-    return listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => ({ d, k: KEYS2.indexOf(keyOf(d.title)) })).sort((x, y) => x.k - y.k || x.d.title.localeCompare(y.d.title, "ko")).map((x) => x.d);
+    return listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => ({ d, n: shownName(ctx2, d.title) })).map((x) => ({ ...x, k: KEYS2.indexOf(keyOf(x.n)) })).sort((x, y) => x.k - y.k || x.n.localeCompare(y.n, "ko")).map((x) => x.d);
   }
   function wikiHomeResults(ctx2) {
     return wiki.homeQuery.trim() ? wikiList(ctx2, wiki.homeQuery) : "";
@@ -2177,9 +2573,10 @@
     const tab2 = tabs2.some(([t]) => t === wiki.tab) ? wiki.tab : "all";
     const shown2 = docs.filter((d) => inTab(ctx2, d, tab2));
     const chips3 = `<div class="ph-tabs nw-tabs" role="tablist">${tabs2.map(([t, label]) => `<button class="ph-tab${t === tab2 ? " on" : ""}" data-action="wiki-tab" data-value="${t}" aria-selected="${t === tab2}">${label}<small>${count(t)}</small></button>`).join("")}</div>`;
-    const keys = KEYS2.filter((k) => shown2.some((d) => keyOf(d.title) === k));
+    const keyOfDoc = (d) => keyOf(shownName(ctx2, d.title));
+    const keys = KEYS2.filter((k) => shown2.some((d) => keyOfDoc(d) === k));
     const groups = keys.map((k) => {
-      const rows2 = shown2.filter((d) => keyOf(d.title) === k);
+      const rows2 = shown2.filter((d) => keyOfDoc(d) === k);
       const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows2.length}</b></button>` : `${k}<b>${rows2.length}</b>`;
       return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows2.map((d) => dated(d, tab2 !== "story")).join("")}</ul>`;
     }).join("");
@@ -2358,7 +2755,7 @@
         ${fail3}
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
+    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml3(ctx2)}</section>
     ${drawerHtml([
       tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "", "메인"),
@@ -2481,7 +2878,17 @@
       const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
       const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
       t0 = null;
-      if (dx < -36 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act2("close");
+      const out = wide() ? dx < -36 : dx > 36;
+      if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act2("close");
+    }, { passive: true });
+    const edge = root2.querySelector(".nw-edge");
+    let e0 = null;
+    edge?.addEventListener("touchstart", (e) => e0 = e.touches[0]?.clientX ?? null, { passive: true });
+    edge?.addEventListener("touchend", (e) => {
+      if (e0 === null) return;
+      const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
+      e0 = null;
+      if (dx < -24 && !wiki.listOpen) act2("open");
     }, { passive: true });
   }
   var wide = () => !matchMedia("(max-width: 760px)").matches;
@@ -2618,35 +3025,6 @@
     if (name === "wiki-new") return void (wiki.newTitle = value), true;
     if (name === "wiki-docreq") return void (wiki.docReq = value), true;
     return false;
-  }
-
-  // src/ui/evpic.ts
-  var cache6 = null;
-  function rows(ctx2) {
-    if (cache6 && cache6.lore === ctx2.char.globalLore && cache6.stamp === moduleAssetStamp()) return cache6.map;
-    const map = /* @__PURE__ */ new Map();
-    const dir2 = readDirectory(ctx2.char.globalLore);
-    for (const p of [...dir2.anomalies, ...dir2.sites]) {
-      const row6 = { pic: mainPic(ctx2.char, p), title: p.lore || p.label };
-      for (const n of [p.label, p.lore, ...p.aliases]) if (n && !map.has(n)) map.set(n, row6);
-    }
-    cache6 = { lore: ctx2.char.globalLore, stamp: moduleAssetStamp(), map };
-    return map;
-  }
-  var descs = /* @__PURE__ */ new Map();
-  var SHARED = { an: "Situation Anomaly", in: "Situation Incident", ms: "Situation Mystic" };
-  function evArt(ctx2, name, kind) {
-    const r = rows(ctx2).get(name);
-    const shared = kind && hasAsset(ctx2.char, SHARED[kind] ?? "") ? SHARED[kind] : "";
-    const pic = imageUrl(ctx2.char, r?.pic || shared);
-    const title2 = r?.title ?? name;
-    let desc = descs.get(title2);
-    if (desc === void 0) {
-      const doc = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
-      desc = doc ? docSummary(doc.body) : "";
-      descs.set(title2, desc);
-    }
-    return { pic, desc };
   }
 
   // src/host/send.ts
@@ -2892,6 +3270,7 @@
     return `<div class="dir-panel">
     <div class="dir-line"><span>소속 조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-org-pick", `${o.name}|${a.lore}`, o.name, cur === o)).join("")}${chip2("dir-org-pick", `|${a.lore}`, "미정", !a.affiliation)}</div></div>
     <p class="gx-muted">조직을 고르면 아래 두 값이 그 조직 기준으로 채워져요. 새 조직은 「조직」 탭에서 만들어요.</p>
+    <div class="dir-line"><span>성별</span><div class="dir-chips">${["F", "M", "X"].map((x) => chip2("dir-gender", `${x}|${a.lore}`, { F: "여", M: "남", X: "미정" }[x], (agentGender(a, lore) || "X") === x)).join("")}</div></div>
     <div class="dir-line"><span>요원 목록에 보일 세력</span><div class="dir-chips">${codesOf(d).map((f) => chip2("dir-toggle", `rosterFor|${f}|${a.lore}`, names4[f], a.rosterFor.includes(f))).join("")}</div></div>
     <div class="dir-line"><span>괴담톡 연락처 탭</span><div class="dir-chips">${tabs2.map((t) => chip2("dir-toggle", `phoneTabs|${t.id}|${a.lore}`, t.name || t.id, a.phoneTabs.includes(t.id))).join("")}</div></div>
     <div class="dir-grid">
@@ -3021,8 +3400,8 @@
   function baseList(ctx2, d, q) {
     const rows2 = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
     const order = [...d.orgs.map((o) => o.name), ""];
-    const rank = (b) => b.org ? order.indexOf(b.org) : order.length;
-    const sorted = [...rows2].sort((x, y) => rank(x) - rank(y));
+    const rank2 = (b) => b.org ? order.indexOf(b.org) : order.length;
+    const sorted = [...rows2].sort((x, y) => rank2(x) - rank2(y));
     return `    ${sorted.length ? sorted.map((b) => baseRow(b, ctx2, d)).join("") : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
   }
   function freeBaseName(d, want) {
@@ -3279,6 +3658,16 @@
         const row6 = d.agents.find((a) => a.lore === v.slice(at + 1));
         if (!row6) break;
         assignOrg(row6, d.orgs.find((o) => o.name === v.slice(0, at)));
+        dirUi.done = "";
+        break;
+      }
+      case "dir-gender": {
+        const at = v.indexOf("|");
+        const row6 = d.agents.find((a) => a.lore === v.slice(at + 1));
+        const g = v.slice(0, at);
+        if (!row6 || g !== "F" && g !== "M" && g !== "X") break;
+        if (g === loreGender(ctx2.char.globalLore ?? [], row6.lore) || g === "X" && !loreGender(ctx2.char.globalLore ?? [], row6.lore)) delete row6.gender;
+        else row6.gender = g;
         dirUi.done = "";
         break;
       }
@@ -3712,321 +4101,4 @@
   var artCtx = null;
   function eventRow(e, x, agents2) {
     const w = x.world;
-    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
-    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
-    const an = e.kind === "an" ? w.an[e.index] : void 0;
-    const badge2 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
-    const names4 = e.kind === "in" ? [] : codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
-    return evCard({
-      kind: e.kind,
-      name: e.name,
-      grade: e.grade,
-      loc: `${esc15(locName(e.loc))}${since ? ` · ${since}` : ""}`,
-      badge: badge2,
-      chips: peopleChips(x.char, names4, agents2, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
-      extra: e.report ? `<span class="gx-evc-sit" title="${esc15(e.report)}">${esc15(e.report)}</span>` : "",
-      key: e.key,
-      open: "pick-event",
-      art: artCtx ? evArt(artCtx, e.name, e.kind) : void 0,
-      pop: e.key,
-      selected: field2.target?.type === "event" && field2.target.key === e.key,
-      confirmEnd: field2.confirmEnd === e.key
-    });
-  }
-  function placeCard(key2, c, on2) {
-    let name;
-    let sub;
-    let wiki2;
-    if (key2.startsWith("fac:")) {
-      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
-      name = lm?.label || lm?.name || key2.slice(4);
-      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
-      wiki2 = lm?.name ?? name;
-    } else {
-      const full = locName(key2);
-      const cut2 = full.lastIndexOf(" ");
-      name = cut2 > 0 ? full.slice(cut2 + 1) : full;
-      sub = cut2 > 0 ? full.slice(0, cut2) : "";
-      wiki2 = full;
-    }
-    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
-    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc15(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc15(name)}</b>${tag}</span>
-    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc15(wiki2)}" title="위키" aria-label="${esc15(name)} 위키">${ICONS.wiki}</button></span></span>
-    <small>${esc15(sub || "장소")}</small></span></li>`;
-  }
-  function situations(x, events) {
-    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
-    for (const e of events) counts[e.kind]++;
-    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field2.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL2[f]}<b>${counts[f]}</b></button>`).join("");
-    const agents2 = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
-    const shown2 = events.filter((e) => (field2.filter === "all" || e.kind === field2.filter) && (!field2.place || placeKey(e, x.catalog) === field2.place));
-    const place2 = field2.place ? placeCard(field2.place, x.catalog, sameTarget(field2.target, field2.place)) : "";
-    const cancel = cancelChip("map-unplace", !!(field2.place || field2.target));
-    const gone = field2.place ? "" : endedShown(x.world).filter((e) => field2.filter === "all" || e.kind === field2.filter).map((e) => endedCard(e, (n, k) => artCtx ? evArt(artCtx, n, k) : void 0)).join("");
-    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field2.place || field2.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
-    return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
-    ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents2)).join("")}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
-  }
-  function cancelChip(action, on2) {
-    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
-  }
-  function lockedState(x, id) {
-    const rec = x.world.agents[id];
-    return agentLocked(rec) ? rec.st : null;
-  }
-  function teamPanel(x, goal, action, label, busy4, ctx2) {
-    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
-    if (!x.supportOn) field2.support = 0;
-    const used = field2.team.length + field2.support;
-    const chips3 = roster.map((p) => {
-      const on2 = field2.team.includes(p.id);
-      const lock = lockedState(x, p.id);
-      const full = !on2 && used >= TEAM_MAX;
-      const st = x.world.agents[p.id]?.st ?? "미정";
-      const sit = x.world.agents[p.id]?.situation ?? "";
-      {
-        const c = ctx2 ? agentContact(ctx2, p.id) : null;
-        const act2 = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc15(p.id)}" title="괴담톡" aria-label="${esc15(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc15(c.wiki)}" title="위키" aria-label="${esc15(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
-        const off = !!lock || full;
-        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc15(p.id)}" aria-pressed="${on2}" aria-disabled="${off}"
-          ${lock ? `title="${esc15(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act2)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
-      }
-    }).join("");
-    const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field2.support > 0 ? " on" : ""}">
-      <span class="gx-ava sq">${ICONS.group}</span>
-      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
-      <span class="gx-scard-step">
-        <button class="gx-step" data-action="support" data-value="-1" ${field2.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
-        <b>${field2.support}</b>
-        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
-      </span>
-    </div>` : "";
-    const ready = !!goal && validTeam(field2.team.length, field2.support) && !busy4;
-    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy4 ? "보내는 중…" : esc15(label)}</button>`;
-    lastGo = go2;
-    return `<section class="gx-team">
-    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc15(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
-    ${roster.length || support ? `<div class="gx-acards pick">${chips3}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
-    ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
-    ${narrow2() ? "" : noteBox()}
-    ${narrow2() ? "" : go2}
-  </section>`;
-  }
-  var lastGo = "";
-  function noteBox() {
-    return `<label class="gx-note">
-      <textarea rows="2" aria-label="작전 메모"${field2.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc15(field2.note)}</textarea></label>`;
-  }
-  function fieldDrawer(x, withMap) {
-    if (!narrow2()) return "";
-    if (field2.step === "team") return drawerBox(noteBox(), "gx-notedrawer", `<div class="gx-mgo">${lastGo}</div>`);
-    return withMap ? drawerBox(mapBar(x), "gx-mapdrawer") : "";
-  }
-  function stepBar(goal, swap) {
-    const used = field2.team.length + field2.support + 1;
-    const b = (k, n, label, sub) => `<button class="gx-stepb${field2.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field2.step === k}"><i>${n}</i><span><b>${label}</b><small>${esc15(sub)}</small></span></button>`;
-    const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
-    return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
-  }
-  function toStep(step3, env2) {
-    field2.step = step3;
-    env2.render();
-    const body5 = document.querySelector(".gx .gx-body");
-    if (body5 && matchMedia("(max-width: 760px)").matches) body5.scrollTop = 0;
-  }
-  function mapTab(ctx2, env2, notice2, busy4) {
-    artCtx = ctx2;
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
-    const events = x.on ? activeEvents(x.world) : [];
-    const t = field2.target;
-    if (t?.type === "event" && !events.some((e) => e.key === t.key)) field2.target = null;
-    const goal = field2.target ? targetName(field2.target) : null;
-    return `<main class="gx-body gx-field gx-map" data-step="${field2.step}">
-    ${stepBar(goal, "mission")}
-    <div class="gx-mapcol">${mapCanvas(ctx2, x, events, env2)}
-      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
-    <div class="gx-sidecol">
-      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc15(notice2)}</div>` : ""}
-      ${teamPanel(x, goal, "depart", "출발", busy4, ctx2)}
-    </div>
-  </main>${fieldDrawer(x, true)}`;
-  }
-  function missionCatalog(c, kind) {
-    if (kind === "an") return c.anomalies.map((a) => ({ name: a.name, sub: a.english }));
-    if (kind === "ms") return c.mysticSites.map((m) => ({ name: m.name, sub: m.english }));
-    return c.landmarks.map((l) => ({ name: l.name, sub: placeWhere(l.sido, l.gu) }));
-  }
-  function missionStatus(x, kind, name) {
-    const w = x.world;
-    if (kind === "an") {
-      if (w.pending.an === name) return '<span class="gx-badge wait">요청 대기</span>';
-      const e = w.an.find((a) => a.presetName === name || a.name === name);
-      if (e) return `<span class="gx-badge ${e.state === "활성" ? "live" : "wait"}">${e.state === "활성" ? "발생 중" : "발생 예정"}</span>`;
-    } else if (kind === "ms") {
-      if (w.pending.ms === name) return '<span class="gx-badge wait">요청 대기</span>';
-      if (w.ms.some((m) => m.name === name)) return '<span class="gx-badge live">출현</span>';
-    } else {
-      if (w.pending.in === name) return '<span class="gx-badge wait">요청 대기</span>';
-      if (w.inc.some((i) => i.name === name)) return '<span class="gx-badge hot">사건 진행</span>';
-    }
-    return "";
-  }
-  function missionList(ctx2, opening = false) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return "";
-    const q = field2.query.trim().toLowerCase();
-    const wiki2 = (name) => `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc15(name)}" title="위키" aria-label="${esc15(name)} 위키">${ICONS.wiki}</button></div>`;
-    const row6 = (kind, r) => {
-      const sel = field2.mname === r.name && field2.mpick === kind;
-      const val = `${kind}:${esc15(r.name)}`;
-      if (kind === "lm") {
-        return `<li class="gx-ev${sel ? " sel" : ""}"><button class="gx-evmain" data-action="mission-pick" data-value="${val}">
-      <span class="gx-row"><b>${esc15(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc15(r.sub)}</span>` : ""}</button>${opening ? "" : wiki2(r.name)}</li>`;
-      }
-      const open3 = field2.mopen === `${kind}:${r.name}`;
-      const art2 = evArt(ctx2, r.name, kind);
-      const status = missionStatus(x, kind, r.name);
-      const bg = art2.pic ? ` style="background-image:url('${esc15(art2.pic)}')"` : "";
-      const cap = `<span class="gx-evart-name"><b>${esc15(r.name)}</b>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
-      const capOpen = (mark2) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc15(r.name)}</b>${mark2}</span>${r.sub ? `<small>${esc15(r.sub)}</small>` : ""}</span>`;
-      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc15(r.name)}" title="위키" aria-label="${esc15(r.name)} 위키">${ICONS.wiki}</button>`;
-      if (!open3) {
-        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
-        ${status ? `<span class="gx-evart-top">${status}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
-      }
-      const mark = sel ? targetMark(true, "mission-unpick", "") : targetMark(false, "mission-pick", val);
-      return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art2.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${capOpen(mark)}${art2.desc ? `<span class="gx-evc-desc">${esc15(art2.desc)}</span>` : ""}</span></div></li>`;
-    };
-    const hit2 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
-    if (!q) {
-      const rows2 = missionCatalog(x.catalog, field2.mkind);
-      if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
-      return `<ul class="gx-list gx-mlist">${rows2.map((r) => row6(field2.mkind, r)).join("")}</ul>`;
-    }
-    const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) => k !== field2.mkind)];
-    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit2) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
-    return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
-  }
-  function missionTab(ctx2, opening, notice2, busy4) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
-    const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
-    const p = x.world.pending;
-    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc15(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
-    const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
-    return `<main class="gx-body gx-field gx-mission" data-step="${field2.step}">
-    ${stepBar(field2.mname, opening ? void 0 : "map")}
-    <div class="gx-mapcol">
-      ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc15(field2.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field2.mname)}</div>
-      <div class="gx-mbox">${missionList(ctx2, opening)}</div>
-    </div>
-    <div class="gx-sidecol">
-      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc15(notice2)}</div>` : ""}
-      ${x.world.notice && x.on ? `<div class="gx-hint">${esc15(x.world.notice)}</div>` : ""}
-      ${pend}
-      ${teamPanel(x, field2.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy4, opening ? void 0 : ctx2)}
-    </div>
-  </main>${fieldDrawer(x, false)}`;
-  }
-  function newMessage2(data) {
-    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    return { role: "user", data, time: Date.now(), chatId: id };
-  }
-  function placeRecord(chat, card2, note) {
-    const record = note.trim() ? `${card2}
-
-${note.trim()}` : card2;
-    const message = (chat.message ?? []).slice();
-    const last2 = message[message.length - 1];
-    if (last2?.role === "user" && hasSceneCard(last2.data)) message[message.length - 1] = { ...last2, data: record };
-    else message.push(newMessage2(record));
-    return { ...chat, message };
-  }
-  function partyNames(x, team) {
-    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
-    return team.map((id) => {
-      const p = roster.find((r) => r.id === id);
-      if (!p || lockedState(x, id)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
-      return p.name || p.english;
-    });
-  }
-  function partyLabel(names4, support) {
-    return ["나", ...names4, ...support > 0 ? [`지원 ×${support}`] : []].join(", ");
-  }
-  async function compose2(ctx2, env2, build) {
-    env2.setBusy(true);
-    env2.setNotice("");
-    env2.render();
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
-        const x = ctxOf(ctx2, latest);
-        return build(latest, x).chat;
-      });
-      resetField();
-      const sent = await sendNow();
-      env2.setBusy(false);
-      if (!sent) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
-      });
-      await env2.close();
-      await env2.refresh();
-    } catch (error) {
-      env2.setBusy(false);
-      env2.setNotice(error instanceof Error ? error.message : String(error));
-      env2.render();
-    }
-  }
-  function depart(ctx2, env2) {
-    const target = field2.target;
-    const note = field2.note;
-    const team = [...field2.team];
-    const support = field2.support;
-    return compose2(ctx2, env2, (latest, x) => {
-      if (!target) throw new DirectiveError("목표가 정해지지 않았어요.");
-      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
-      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
-      const d = parseDirective(ctx2.char.globalLore);
-      let dest;
-      if (target.type === "event") {
-        const ev = activeEvents(x.world).find((e) => e.key === target.key);
-        if (!x.on || !ev) throw new DirectiveError("선택한 상황이 끝났거나 바뀌었어요. 다시 골라 주세요.");
-        dest = destination(d, ev.name, locName(ev.loc));
-      } else if (target.type === "facility") {
-        const lm = x.catalog.landmarks.find((l) => l.name === target.name);
-        if (!lm) throw new DirectiveError("시설 목록이 바뀌었어요. 다시 골라 주세요.");
-        dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ""));
-      } else {
-        dest = destination(d, locName(target.loc));
-      }
-      const names4 = partyNames(x, team);
-      const body5 = sceneDirective(d, dest, names4, support, false);
-      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body5), note) };
-    });
-  }
-  function sendMission(ctx2, env2, opening) {
-    const kind = field2.mpick;
-    const name = field2.mname;
-    const note = field2.note;
-    const team = [...field2.team];
-    const support = field2.support;
-    return compose2(ctx2, env2, (latest, x) => {
-      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
-      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
-      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
-      const d = parseDirective(ctx2.char.globalLore);
-      let dest = destination(d, name);
-      if (kind === "lm") {
-        const lm = x.catalog.landmarks.find((l) => l.name === name);
-        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
-      } else if (kind === "ms") {
-        const site = x.world.ms.find((m) => m.name === name);
-        if (site) dest = destination(d, name, locName(site.loc));
-      }
-      const names4 = partyNames(x, team);
-      let chat = latest;
-      if (x.on) {
-        const w = structuredClone(x.world);
-        const last2 = (latest.message ?? [])
+    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc
