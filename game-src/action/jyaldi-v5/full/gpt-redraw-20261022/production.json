@@ -1,0 +1,247 @@
+{
+  "date": "2026-10-22",
+  "request": "docs/캐릭터제작서/의뢰서_쟈알디_샤워·목욕·용변_GPT.md §7",
+  "tool": "built-in image_gen",
+  "calls": 9,
+  "pixellabCredits": 0,
+  "cost": "Built-in usage price/credits not exposed by tool",
+  "frames": {
+    "undress": 7,
+    "showerturn": 3
+  },
+  "sharedEndpoint": "undress/06.png == showerturn/00.png",
+  "export": {
+    "canvas": [
+      192,
+      144
+    ],
+    "uniformCanvasRasterSize": [
+      188,
+      141
+    ],
+    "horizontalTranslation": -2,
+    "footY": 135,
+    "alpha": "generated coverage quantized to binary for pixel sprites; RGBA originals preserved locally",
+    "nearestNeighbor": true
+  },
+  "prompts": [
+    {
+      "key": "undress/00",
+      "prompt": "Create ONE game sprite animation frame, undress/00.png. Use the supplied images as character/style references: first is the exact character identity, scale and idle silhouette; second demonstrates correct strict side-view pixel style. Draw a new neutral standing pose, arms relaxed straight down, feet on same horizontal ground, facing RIGHT in EXACT 90-degree profile. Adult woman in her 30s, long straight black hair to waist, tiny red eye, calm face, same proportions and head size as reference. Fully dressed in blue gray business jacket extending to hips, matching straight trousers, white shirt, narrow black tie, black shoes and black gloves. One shoulder visible, one eye, nose pointing right; no front-facing chest, no three-quarter view. Medium blue gray suit palette #3E4D59 #414E56 #2E353C, shadows #222629 #1A1E21, fine 1 logical pixel #0D1213 outline. Match softly modeled pixel shading of references, not thick cartoon outlines or smooth vector art. Transparent background, only character, empty hands, no cast shadow, no ground, no objects, no text.\nDELIVERY COMPOSITION: 4:3 landscape transparent canvas representing exactly a 192x144 logical pixel grid. Character's body center x=57, scalp top y=37, sole bottom y=135. Upright character is 99 logical pixels tall, narrow about 28 pixels wide. Preserve large empty space to the right. Render crisp actual low-resolution pixel art, if higher-resolution output is required use exactly 6x nearest-neighbor blocks on a 1152x864 canvas. Do not enlarge character to fill canvas."
+    },
+    {
+      "key": "u01",
+      "prompt": "Edit reference frame into undress/01: the character in the same blue-gray suit is undoing her jacket button with her near hand held in front of her lower chest, elbow bending naturally in FRONT of the torso (to the right). Other hand steadies the button area. Jacket still fully worn. Hands hold no detached garment. The legs, shoes, head, hair and upright torso remain unchanged. Keep exactly the input character identity, adult age 30s, head and body size, long waist-length black hair, red eye, strict right-facing profile, soft shaded fine pixel-art style, transparent landscape canvas composition and pixel grid. Scalp top y=37, sole bottom y=135, body center x=57 on the logical 192x144 canvas. Preserve all blank margins and scale. Single frame only. No environment, ground, shadows, text or loose clothing. No three-quarter front view."
+    },
+    {
+      "key": "u02",
+      "prompt": "Edit reference frame into undress/02: the jacket has disappeared completely. She stands in the same pose with arms relaxed down, wearing an opaque white long-sleeved collared shirt, narrow black necktie still worn, same blue-gray suit trousers and black shoes. Hands now bare, gloves gone. Strict side profile shows only a narrow edge of the tie. No jacket anywhere, no carried clothing. Keep exactly the input character identity, adult age 30s, head and body size, long waist-length black hair, red eye, strict right-facing profile, soft shaded fine pixel-art style, transparent landscape canvas composition and pixel grid. Scalp top y=37, sole bottom y=135, body center x=57 on the logical 192x144 canvas. Preserve all blank margins and scale. Single frame only. No environment, ground, shadows, text or loose clothing. No three-quarter front view."
+    },
+    {
+      "key": "u06",
+      "prompt": "Edit first reference frame into undress/06: same adult woman and same strict RIGHT-FACING SIDE PROFILE neutral standing pose, arms relaxed down. Replace ALL suit clothing and shoes with one opaque BEIGE BATH TOWEL wrapped securely from chest to knees, BARE FEET, bare arms. Towel color and cloth style from second reference; second reference is for towel material only, NOT back-facing pose or raised arms. All chest and pelvis completely covered by towel. No pants, no shoes, no gloves, no tie, no loose clothes at feet or in hands. Feet side by side grounded, neutral ordinary bathing preparation. Do not alter proportions or hair. Keep exactly the input character identity, adult age 30s, head and body size, long waist-length black hair, red eye, strict right-facing profile, soft shaded fine pixel-art style, transparent landscape canvas composition and pixel grid. Scalp top y=37, sole bottom y=135, body center x=57 on the logical 192x144 canvas. Preserve all blank margins and scale. Single frame only. No environment, ground, shadows, text or loose clothing. No three-quarter front view."
+    },
+    {
+      "key": "u03",
+      "prompt": "Edit this single animation frame into undress/03.png. Keep the exact same adult woman, head, waist-length black hair, red eye, clothing colors, body proportions, feet and fixed canvas placement. Only change the arms: raise near hand to the BLACK NECKTIE KNOT at front of neck, with elbow bent naturally in FRONT of the body to the RIGHT. The other hand rests at lower tie/chest. She is loosening her worn necktie, which remains attached at the collar. She still wears opaque long-sleeved white shirt, blue-gray trousers and black shoes. STRICT RIGHT-FACING 90-degree SIDE PROFILE, one eye and one shoulder, no turn toward viewer. Empty hands apart from touching the worn tie; no detached clothing. Transparent background. ONE sprite, identical canvas and logical pixel size to input. Keep the scalp height, foot baseline and horizontal anchor exactly fixed. No ground, shadow, text, water or furniture. Crisp fine pixel art with softly shaded color clusters."
+    },
+    {
+      "key": "u04",
+      "prompt": "Edit the first reference into undress/04. STRICT RIGHT-FACING 90-degree SIDE PROFILE. She stands upright exactly as in reference, arms down. She has the same beige chest-to-knee towel AND is still wearing her blue-gray suit TROUSERS AND BLACK SHOES underneath. The trousers are normally worn on the legs and visible below the towel hem down to the black shoes; no bare calves or feet in this frame. No shirt, no tie, no jacket, no gloves. Second reference shows the color/cut of trousers and shoes only. Same adult woman aged 30s, exact same head/body dimensions and waist-length straight black hair, same soft pixel-art shading. Opaque beige bath towel securely wrapped from chest to knees. No nudity or revealing pose. Empty hands, no objects or loose garments. Keep character size and location fixed to first reference: scalp y=37, foot soles y=135, body axis x=57 on 192x144 logical pixel grid; 4:3 landscape canvas with large empty area on right, transparent background. Preserve fine pixel grid and composition. Character only, no ground, shadows, water, furniture, text, effects, guides or red outline. ONE frame only."
+    },
+    {
+      "key": "s01",
+      "prompt": "Turn the adult towel-wearing woman from reference into a THREE-QUARTER BACK view (45 degrees between right profile and full rear view), showerturn/01. This is a restrained in-place pivot away from camera. Back of head and back of towel are visible, only a tiny right-side facial silhouette at the far right, NOT a front three-quarter view. Both arms hang naturally down at the sides. Bare feet stay on same ground line, pivot slightly to upper right. Towel covers chest through knees at all times. Do not walk or lean. Keep torso centered over same position. Same adult woman aged 30s, exact same head/body dimensions and waist-length straight black hair, same soft pixel-art shading. Opaque beige bath towel securely wrapped from chest to knees. No nudity or revealing pose. Empty hands, no objects or loose garments. Keep character size and location fixed to first reference: scalp y=37, foot soles y=135, body axis x=57 on 192x144 logical pixel grid; 4:3 landscape canvas with large empty area on right, transparent background. Preserve fine pixel grid and composition. Character only, no ground, shadows, water, furniture, text, effects, guides or red outline. ONE frame only."
+    },
+    {
+      "key": "s02",
+      "prompt": "Turn the adult towel-wearing woman from first reference into EXACT FULL BACK VIEW, showerturn/02. Standing upright facing directly away from viewer, centered at the SAME canvas location as first reference. Symmetric shoulders, long black hair down center of back to waist. BOTH ARMS RELAXED STRAIGHT DOWN at sides, empty hands beside thighs, no raised elbows. Bare feet grounded, heels visible. Match second reference's rear-view orientation, body position and beige towel but LOWER both arms; do not wash hair in this frame. Keep first reference's scale and character design. Same adult woman aged 30s, exact same head/body dimensions and waist-length straight black hair, same soft pixel-art shading. Opaque beige bath towel securely wrapped from chest to knees. No nudity or revealing pose. Empty hands, no objects or loose garments. Keep character size and location fixed to first reference: scalp y=37, foot soles y=135, body axis x=57 on 192x144 logical pixel grid; 4:3 landscape canvas with large empty area on right, transparent background. Preserve fine pixel grid and composition. Character only, no ground, shadows, water, furniture, text, effects, guides or red outline. ONE frame only."
+    },
+    {
+      "key": "u05",
+      "prompt": "Create the next sprite animation frame undress/05 from the reference. Same adult woman aged 30s, STRICT RIGHT-FACING SIDE PROFILE, wearing the same opaque beige towel securely from chest to knees, blue-gray trouser legs and black shoes underneath. She BENDS FORWARD AT THE HIPS about 40 degrees with knees gently flexed, BOTH EMPTY HANDS REACHING DOWN TO KNEE HEIGHT, preparing to lower trousers. Upper body and head move forward/right and downward as one articulated body, hips remain above heels, feet stay planted at exactly the same baseline and location. Preserve limb lengths and head size. Long straight black hair falls naturally forward with gravity, keep face/nose directed RIGHT. The towel stays wrapped and fully covers chest, waist and pelvis. Do NOT draw removed clothing, detached garments, trousers bunched around ankles, a clothing pile, anything held in hands, or any floor. The still-worn trousers remain simple legs below the towel; clothes disappear between frames in the game. Nonsexual everyday changing action, natural joints, no exposed chest or pelvis.\nUse the same pixel-art rendering and fine outlines as reference. Transparent background, only ONE character, no shadows, no water, no objects, no text or guides. Keep the exact same canvas size/composition and fixed physical scale as reference; 192x144 logical grid, body/hip axis x=57, soles y=135. The bent pose must be SHORTER in visible height than the standing reference, do not enlarge her to fill the old upright bounding box. No three-quarter torso or front view."
+    }
+  ],
+  "validation": [
+    {
+      "name": "undress/00.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 39,
+        "y0": 38,
+        "x1": 70,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/01.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 38,
+        "x1": 70,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/02.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 38,
+        "x1": 69,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/03.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        1
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 37,
+        "x1": 69,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/06.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 38,
+        "x1": 68,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "showerturn/00.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 38,
+        "x1": 68,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/04.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 40,
+        "y0": 38,
+        "x1": 69,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "showerturn/01.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        2
+      ],
+      "bounds": {
+        "x0": 42,
+        "y0": 38,
+        "x1": 71,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "showerturn/02.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        3
+      ],
+      "bounds": {
+        "x0": 42,
+        "y0": 39,
+        "x1": 72,
+        "y1": 135,
+        "soft": 0
+      }
+    },
+    {
+      "name": "undress/05.png",
+      "canvas": [
+        192,
+        144
+      ],
+      "translation": [
+        -2,
+        1
+      ],
+      "bounds": {
+        "x0": 49,
+        "y0": 52,
+        "x1": 98,
+        "y1": 135,
+        "soft": 0
+      }
+    }
+  ]
+}
