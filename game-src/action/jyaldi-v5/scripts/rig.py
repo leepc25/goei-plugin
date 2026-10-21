@@ -732,6 +732,20 @@ STR=lambda u,b=0: P((X,55-3*u),2-10*u,0,0,(X+6,G-4*u),(X-4,G-4*u),('r',5+3*(1-u)
 clip('stretch','side view: big stretch, fingers laced, arms straight up overhead, back arched, heels up, relaxes',
      tail([STAND(0),STR(0),STR(.6),STR(1),STR(1),lerp(STR(1),STAND(0),.5),STAND(0)],False))
 REDO3=['bedlie','annoyed','dishes','mop','water','stretch']
+# 쇠파이프 들고 대기·걷기·달리기: 가운데를 쥐고 수평으로 메던 것(여의봉) → 야구 방망이처럼 한쪽 끝을 두 손으로 쥐고
+# 자루를 어깨에 걸쳐 뒤 위로 비스듬히. 휘두르기 첫 장(뒤로 치켜듦)과 이어짐(사용자 지적 2026-10-21)
+PL=('r',9,15); PR=('r',7,12); PE=dict(le=('e',4,16),re=('e',2,15))
+PIPE='a long steel pipe gripped at one end with both hands like a baseball bat, resting on her near shoulder, angled up and back'
+clip('idle_pipe','side view: standing ready, holding a steel pipe like a bat resting on her shoulder',
+     tail([P((X,57+b),4,0,0,(X+10,G),(X-9,G-1),PL,PR,**PE) for b in (0,1,1.5,1)],True),PIPE)
+def walkp(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,56+1.2*abs(c)),4,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),PL,PR,**PE)
+clip('walk_pipe','side view: walking, steel pipe held like a bat resting on her shoulder',tail([walkp(i/8) for i in range(8)],True),PIPE)
+def runp(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+8,58+2.5*abs(sn)),14,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),PL,PR,**PE)
+clip('run_pipe','side view: running, steel pipe held like a bat resting on her shoulder',tail([runp(i/8) for i in range(8)],True),PIPE)
 REDO=['seatrest','seatthink','doze','walllean','armscross','bored','situp','wallcry','phone','bedwake','hurtidle','limp','hide','doorclose','leadhand','victory','wave','walk_folder']
 # ── 수정 2차 (2026-10-21 결함 목록 3·13~16·18) ──
 # 정면 돌아감의 실제 원인: 뼈대 폭이 아니라 기준 그림. A2는 셔츠·넥타이가 보이는 3/4 각도라, 생성기가 A2를 따라가면 3/4,

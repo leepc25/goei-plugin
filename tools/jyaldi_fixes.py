@@ -164,12 +164,6 @@ def apply(key, fr, pr=None, src=None, idx=None):
         for i, raw in ((0, 1), (2, 2)):   # (최종 장, 원본 장): 빌더 order=[1, 0, 2, 3]
             if i < len(fr):
                 w, e, _, _ = wrists('pipe2', raw); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
-    if key == 'idle_pipe':                     # 결함 2: 대기도 걷기처럼 어깨에 걸침 → 걷기 중 두 발 모인 장
-        from build_jyaldi_full_demo import frames_of
-        wp = frames_of('walk_pipe')[:7]
-        def spread(f):
-            a = np.array(f)[118:137, :, 3] > 40; xs = np.nonzero(a)[1]; return xs.max() - xs.min()
-        if wp: fr = [min(wp, key=spread)] * 4
     if 'brick' in key:                         # 결함 23
         fr = [replace_red(f) for f in fr]
     if key == 'reload':                        # 결함 21: 뒷손에 탄창
