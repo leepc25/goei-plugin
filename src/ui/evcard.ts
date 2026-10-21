@@ -242,20 +242,25 @@ function evBtns(c: OpsCard): string {
 }
 
 /** 위성 보기: 제목이 없어 오른쪽 위 단추 줄 맨 앞에 같은 표식 */
+/** CCTV·위성 잡음: 무늬는 한 번만 그리고 위치만 옮긴다 (transform만 움직여 다시 그리기 없음) */
+const STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
+/** 위성: 구름 두 겹이 천천히 흐른다 */
+const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c1"></i><i class="c2"></i></i>';
+
 function opsPick(c: OpsCard | undefined): string {
   return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
 }
 
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
-    return `<div class="gx-opview feed nosig"><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
+    return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
   }
   const name = esc(c.name);
   const btns = evBtns(c);
   const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
-  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
+  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}${STATIC}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, `CAM-${camNo(c.locCode)} · ${esc(region)}`, clock)}<span class="gx-evart-act">${btns}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
@@ -283,7 +288,7 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : '';
   // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
   const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
-  return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>
+  return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>${SKY}
     <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock)}${s ? `<span class="gx-evart-act">${opsPick(s)}${evBtns(s)}</span>` : ''}</div></div>`;
 }
 
