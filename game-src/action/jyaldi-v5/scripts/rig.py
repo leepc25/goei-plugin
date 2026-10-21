@@ -942,6 +942,8 @@ clip('walk_shotgun','side view in profile: walking while carrying a long pump sh
 for _n in ('down','getup','collapse'):
     _a,_pr,_ps=CLIPS[_n]
     CLIPS[_n]=(_a,_pr,[{k:((v[0],min(v[1],129-DY)) if 'ELBOW' in k else v) for k,v in q.items()} for q in _ps])
+# 쇠파이프 합본(생성 0회): 16:40판 머리 위 치켜듦(PU2) + 28e8170판 앞 위 치켜듦(PW3)·내려침(PW4). 16:40판 타격 장은 파이프가 바닥에 꽂혀 불합격
+CLIPS['pipe3']=(CLIPS['pipe2'][0],CLIPS['pipe2'][1],[anatomic(PU2),anatomic(PW3),anatomic(PW4)])
 REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A

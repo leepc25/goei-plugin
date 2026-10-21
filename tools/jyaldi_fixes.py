@@ -22,7 +22,7 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {
     # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
-    'reload': [4, 5], 'deskslam': [2], 'handshead': [1], 'pipe': [-1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
+    'reload': [4, 5], 'deskslam': [2], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
     'super': [-1],                             # 다시 생성분 끝 장 뭉개짐
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4],
     'nausea': [-1], 'push': [-1], 'gearcheck': [-1], 'locker': [4, 5], 'giftbox': [0], 'button': [5],
@@ -49,6 +49,7 @@ DETACHED = {'fire', 'shotgun', 'grabblast', 'super', 'support', 'smoke', 'hug', 
 OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
 LIGHT_ERASE = {
     'toss': [(5, 64, 78, 80, 94)],
+    'getup': [(1, 74, 103, 81, 110)],
     'carry1_walk': [(0, 68, 76, 82, 92)],
     'hurtidle': [(i, 64, 80, 78, 96) for i in range(4)],
     'push': [(1, 76, 108, 88, 137), (1, 28, 52, 44, 82), (2, 28, 52, 44, 82)],
@@ -215,6 +216,12 @@ def apply(key, fr, pr=None, src=None, idx=None):
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
     if key == 'pipe':                          # 16:40 재생성본: 떨어진 조각만 지움(옛 덧그림·갈고리 보정은 옛 그림용이라 뺌)
         fr = [keep_main(f) for f in fr]
+        for i, f in enumerate(fr):             # 28e8170 내려친 장 손 위로 솟은 1px 세로선
+            a = np.array(f); col = a[55:92, 100:116]
+            for x in range(1, col.shape[1] - 1):
+                thin = (col[:, x, 3] > 0) & (col[:, x - 1, 3] == 0) & (col[:, x + 1, 3] == 0)
+                if thin.sum() >= 4: col[thin, x] = 0
+            fr[i] = Image.fromarray(a)
     if 'brick' in key:                         # 결함 23
         fr = [replace_red(f) for f in fr]
     if key == 'reload':                        # 결함 21: 뒷손에 탄창
