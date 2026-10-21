@@ -129,6 +129,8 @@ export interface PropSpec {
   label?: string;
   solid?: boolean;
   breakable?: boolean;
+  /** 사람 대역: 플레이어 클립을 색만 바꿔 그린다 (본부 동료 등). 회색 상자로 사람을 그리지 않는다 */
+  actor?: { clip?: string; hue?: number; face?: 1 | -1; name?: string };
 }
 
 /** 층(또는 정비 구역 한 칸) 하나. 층 생성 모듈이 만든다 */
@@ -138,7 +140,7 @@ export interface FloorPlan {
   type?: string; // lobby chase replica trial dark silent puzzle service
   depth?: number;
   length: number;
-  /** 걸을 수 있는 깊이 [위, 아래]. 기본 [500, 680] */
+  /** 걸을 수 있는 깊이 [위, 아래]. 기본 [440, 690] (게임_통합_규격 2장) */
   lane?: [number, number];
   startX: number;
   /** 넘으면 구간 끝. 기본 length − 80. 층 모듈이 finish로만 끝내려면 Infinity */
@@ -206,4 +208,8 @@ export interface HqModuleLike {
   mount(root: HTMLElement, host: HqHostCore): void;
   onReturn(result: RunResultCore, run: RunConfigCore): void;
   unmount(): void;
+  /** 본부를 엔진 벨트 장면으로 걷게 할 때: 본부 층 (없으면 DOM 본부만) */
+  hub?(): StageModule;
+  /** 본부 메뉴 창이 열려 있나 (열린 동안 걷기 멈춤, 창 DOM을 보임) */
+  isOpen?(): boolean;
 }

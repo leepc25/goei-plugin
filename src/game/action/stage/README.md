@@ -6,7 +6,7 @@
 
 | 파일 | 하는 일 |
 | --- | --- |
-| `types.ts` | 조각·고정 방·얹는 것·적 자리(SpawnHook)·층·정비 구역 자료형. 좌표는 엔진과 같음(x, 깊이 y 500~680) |
+| `types.ts` | 조각·고정 방·얹는 것·적 자리(SpawnHook)·층·정비 구역 자료형. 좌표는 엔진과 같음(x, 깊이 y 440~690) |
 | `data/chunks.ts` | 조각 세트: 공용 10 + 로비 6 + 유형별 6~7 + 정비 구역 6. 조각 = 반 화면(640px), 지형 모양과 얹을 자리만 가진다 |
 | `data/rules.ts` | 규칙서 공통 12줄 + 유형별 줄, 재편 때 바뀌는 문장, 출동마다 뒤집히는 변형(flag) |
 | `data/floortypes.ts` | 유형 7종(로비·침묵·어둠·추격·퍼즐·재현·시험) + B-12, 팔레트·방송 힌트·수호자 후보·적 후보, 위협 예산 |
@@ -17,7 +17,7 @@
 | `state.ts` | 영구 기록(규칙서·총애·최저 깊이·재편 횟수)과 출동 상태, 송신, EXIT 재편 |
 | `plan.ts` | 층·정비 구역 칸·승강기 안·출구 → 엔진 `FloorPlan` + 회색 상자 배경·전경(어둠·추격 벽·조임) |
 | `module.ts` | `StageModule`: 지형 판정(구덩이·단·낮은 천장·좁은 길), 유형별 규칙 tick, 소품 E 처리, 이벤트(소리) |
-| `demo/` | 시연판(대역 엔진). `node scripts/build-stage.mjs` → `release/demo/goei-elevator-stage.html` |
+| `testing/harness.ts` | 시험용 대역 엔진(그리기 없음). 화면은 통합판 하나뿐이다(`docs/게임_통합_규격.md`) |
 
 ## 다른 작업과 나눈 것
 
@@ -29,4 +29,4 @@
 ## 시험
 
 - `node --test tests/stage.test.mjs`: 300 씨앗 × 유형 검증, 결정성, 깊이별 예산, 유형 뽑기, 정비 구역(200 씨앗), 승강기 버튼, EXIT 재편, 변형, 그리고 자동 조작으로 25 씨앗이 로비 L1 → 승강기 → 지하 여러 층 → 정비 구역 → 다락방 로프 귀환까지 완주.
-- `node tests/stage-browser.mjs`: 시연판 Chromium 연기 시험, PC·폰 스크린샷(`/tmp/stage-shots`).
+- 통합판 한 바퀴: `node tests/game-loop.mjs` (엔진 스레드 소유).

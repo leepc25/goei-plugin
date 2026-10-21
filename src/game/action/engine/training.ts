@@ -9,13 +9,13 @@ export function trainingFloor(): FloorPlan {
     type: 'lobby',
     depth: 0,
     length: L,
-    lane: [500, 680],
+    lane: [440, 690],
     startX: 200,
     exitX: L - 120,
     banner: '관리국 지하 훈련장 · 조작 연습',
     palette: { wall: '#2b343a', floor: '#3c4549', accent: '#6c7b83' },
     props: [
-      { id: 'sign1', kind: 'sign', x: 420, y: 505, w: 140, h: 60, label: 'A 연타 · ↓↓ 앉기 · Shift 회피/달리기' },
+      { id: 'sign1', kind: 'sign', x: 420, y: 445, w: 140, h: 60, label: 'A 연타 · ↓↓ 앉기 · Shift 회피/달리기' },
     ],
     encounters: [
       { triggerX: 500, lockFrom: 0, lockTo: 1400, waves: [[{ kind: 'dummy-once', x: 1000, y: 590 }], [{ kind: 'thug', x: 1300, y: 560 }, { kind: 'thug', x: 1350, y: 650 }]] },
@@ -43,7 +43,7 @@ export const dummyStage: StageModule = {
     startX: 360,
     exitX: Infinity,
     banner: '허수아비 연습 · H 판정 보기 · Esc 메뉴',
-    encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: 'dummy', x: 760, y: 590 }, { kind: 'dummy', x: 980, y: 560 }], [{ kind: 'dummy', x: 900, y: 600 }]] }],
+    encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: 'dummy', x: 760, y: 565 }, { kind: 'dummy', x: 980, y: 540 }], [{ kind: 'dummy', x: 900, y: 590 }]] }],
   }),
   nextFloor: () => null,
 };

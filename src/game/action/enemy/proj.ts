@@ -1,6 +1,8 @@
 // 적 발사체. 엔진 몸(Body, team 'enemy')으로 world.add 한다. 맞으면(플레이어 피격 상자와 겹치면) 다음 틱에 사라진다.
 import type { Body, Hit, HitResult, WBox, WorldView } from './types';
 import { overlap } from './geom';
+import { armDebuff, checkDebuffs } from './debuff';
+import type { Debuff } from './types';
 
 export interface ProjDef {
   label: string;
@@ -37,6 +39,7 @@ export const PROJ: Record<string, ProjDef> = {
   shard: { label: '조각', w: 24, h: 24, z: 110, speed: 9, life: 80, dmg: 8, react: 'flinch', push: 4, homeY: 1.2, color: '#a99cf0' },
   static: { label: '지지직', w: 40, h: 170, z: 0, speed: 6.5, life: 110, dmg: 7, react: 'stagger', push: 8, unblockable: true, debuff: { kind: 'headache', ticks: 60 }, color: '#9fd3e6' },
   table: { label: '밥상', w: 90, h: 40, z: 150, speed: 8, vz: 9, gravity: 0.55, life: 70, dmg: 18, react: 'down', push: 8, color: '#8a6a44' },
+  chair: { label: '날아오는 가구', w: 70, h: 60, z: 90, speed: 11, life: 140, dmg: 14, react: 'stagger', push: 10, color: '#7a5a36' },
   spoon: { label: '숟가락', w: 22, h: 6, z: 120, speed: 15, life: 50, dmg: 4, react: 'flinch', color: '#d8d8d8' },
   web: { label: '거미줄', w: 36, h: 36, z: 90, speed: 7, life: 90, dmg: 2, react: 'none', debuff: { kind: 'slow', ticks: 120 }, color: '#e8e2d0' },
   ring: { label: '충격파', w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: 'stagger', push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: '#e86b4f' },
@@ -107,11 +110,15 @@ export class Proj implements Body {
       armorBreak: d.unblockable,
       strength: d.react === 'down' ? 3 : d.react === 'stagger' ? 2 : 1,
     };
-    if (d.debuff) hit.debuff = d.debuff;
+    if (d.debuff) {
+      hit.debuff = d.debuff;
+      armDebuff(hit, d.debuff as Debuff, this.id);
+    }
     return { hit: [hit], hurt: [] };
   }
   step(world: WorldView): void {
     const d = this.def;
+    checkDebuffs(world);
     if (this.done) return void (this.alive = false);
     this.t++;
     if (d.every && this.t % d.every === 0) this.attackId = nextProjId++ * 7;

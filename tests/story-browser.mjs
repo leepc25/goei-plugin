@@ -28,10 +28,10 @@ async function drive(page, { pick = () => 0, skip = false, shot } = {}) {
   let n = 0;
   for (let i = 0; i < 300; i++) {
     const state = await page.evaluate(() => ({
-      skip: !document.querySelector('.gs-skip')?.hidden,
-      choices: !document.querySelector('.gs-choices')?.hidden ? [...document.querySelectorAll('.gs-choices button')].map((b) => b.textContent) : null,
-      box: !document.querySelector('.gs-box')?.hidden,
-      talk: !document.querySelector('.gs-talk')?.hidden,
+      skip: !document.querySelector('.gst-skip')?.hidden,
+      choices: !document.querySelector('.gst-choices')?.hidden ? [...document.querySelectorAll('.gst-choices button')].map((b) => b.textContent) : null,
+      box: !document.querySelector('.gst-box')?.hidden,
+      talk: !document.querySelector('.gst-talk')?.hidden,
       blocking: window.__story.isBlocking(),
       ctrl: document.querySelectorAll('.sd-ctrl button').length,
     }));
@@ -39,9 +39,9 @@ async function drive(page, { pick = () => 0, skip = false, shot } = {}) {
       if (shots) await page.screenshot({ path: join(shots, `${shot}.png`) });
       n++;
     }
-    if (state.skip && skip) await page.click('.gs-skip');
-    else if (state.choices) await page.click(`.gs-choices button >> nth=${pick(state.choices)}`);
-    else if (state.box) await page.click('.gs-box');
+    if (state.skip && skip) await page.click('.gst-skip');
+    else if (state.choices) await page.click(`.gst-choices button >> nth=${pick(state.choices)}`);
+    else if (state.box) await page.click('.gst-box');
     else if (!state.blocking && state.ctrl) return;
     await page.waitForTimeout(state.box || state.choices ? 30 : 120);
   }
@@ -89,7 +89,7 @@ try {
     assert.equal(f.depth, 1);
     // 층: 전투 사건 말풍선
     await page.click('[data-ev="combat:start"]');
-    await page.waitForSelector('.gs-bubble');
+    await page.waitForSelector('.gst-bubble');
     if (shots) await page.screenshot({ path: join(shots, `${label}-7-bark.png`) });
     for (const ev of ['hp:low', 'combat:ult', 'intrude:fake']) {
       await page.waitForTimeout(700);
@@ -122,14 +122,14 @@ try {
     // 자유 대화
     await page.click('[data-do=talk]');
     await page.click('.sd-sheet button[data-id=gognija]');
-    await page.waitForSelector('.gs-talk:not([hidden])');
-    await page.fill('.gs-talk input', '블랙 커피 주세요');
-    await page.press('.gs-talk input', 'Enter');
+    await page.waitForSelector('.gst-talk:not([hidden])');
+    await page.fill('.gst-talk input', '블랙 커피 주세요');
+    await page.press('.gst-talk input', 'Enter');
     await page.waitForTimeout(300);
-    const reply = await page.locator('.gs-talk-log p.npc').last().textContent();
+    const reply = await page.locator('.gst-talk-log p.npc').last().textContent();
     assert.match(reply, /믹스커피|설탕/);
     if (shots) await page.screenshot({ path: join(shots, `${label}-12-talk.png`) });
-    await page.click('.gs-talk [data-x]');
+    await page.click('.gst-talk [data-x]');
     // 후송
     await page.click('[data-visit=jaemtri]');
     await drive(page, { pick: (opts) => Math.max(0, opts.findIndex((t) => ['임무 게시판', '[진압]', '받을게요'].some((o) => t.includes(o)))) });

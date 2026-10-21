@@ -7,7 +7,7 @@ import { emptyResult, type MissionLaunch, type RunResult } from './contract';
 import { addBag, addItem, newInventory, openRunMenu, useItem, iconCanvas, type RunInventory } from './runmenu';
 import { itemName } from './logic';
 
-const GRAY_ITEMS = ['heal', 'guard', 'energy', 'torch'];
+const GRAY_ITEMS = ['medkit', 'charm', 'energy', 'flash'];
 
 export function runMission(box: HTMLElement, l: MissionLaunch, done: (r: RunResult) => void): () => void {
   const meta = newMeta();
@@ -70,13 +70,12 @@ export function runMission(box: HTMLElement, l: MissionLaunch, done: (r: RunResu
   };
   const apply = (id: string) => {
     const p = run.player;
-    const names: Record<string, string> = { heal: '회복약: 체력 +60', guard: '방어 강화 10초', energy: '능력 회복', torch: '손전등 3초', salt: '소금: 체력 +30', flash: '섬광탄: 주변 적 경직' };
-    if (id === 'heal') p.hp = Math.min(p.max, p.hp + 60);
-    if (id === 'guard') p.guardBuff = 10;
-    if (id === 'energy') (p.uniqueCd = 0), (p.gauge = Math.min(100, p.gauge + 30)), (p.energy = 100);
-    if (id === 'torch') p.lit = 3;
-    if (id === 'salt') p.hp = Math.min(p.max, p.hp + 30);
-    if (id === 'flash') for (const e of run.ents) if (e.alive && Math.abs(e.x - p.x) < 500) e.stun = 2;
+    const names: Record<string, string> = { medkit: '회복약: 체력 35%', bandage: '압박 붕대: 체력 10%', antidote: '정화제', salt: '소금 원', flash: '섬광탄: 주변 적 기절', smoke: '연막탄', charm: '부적: 다음 피격 무효', energy: '에너지 음료' };
+    if (id === 'medkit') p.hp = Math.min(p.max, p.hp + p.max * 0.35);
+    if (id === 'bandage') p.hp = Math.min(p.max, p.hp + p.max * 0.1);
+    if (id === 'charm') p.guardBuff = 10;
+    if (id === 'energy') (p.uniqueCd = 0), (p.energy = 100);
+    if (id === 'flash' || id === 'smoke' || id === 'salt') for (const e of run.ents) if (e.alive && Math.abs(e.x - p.x) < 300) e.stun = 2;
     run.message = names[id] ?? id;
     run.msgT = 2;
   };

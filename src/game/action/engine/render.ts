@@ -82,7 +82,30 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function drawProps(w: World, camX: number) {
     for (const p of w.props) {
       const sx = p.x - camX;
-      if (sx < -p.w || sx > SCREEN_W + p.w) continue;
+      if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
+      if (p.kind === 'hubdoor') continue; // 본부 문은 층 배경이 그린다
+      if (p.actor) {
+        // 사람 대역: 플레이어 클립을 색만 바꿔서
+        const a = p.actor;
+        const list = art.clips[a.clip ?? 'idle'];
+        const fr = list ? Math.floor(w.tick / 5) % list.length : 0;
+        ctx.save();
+        if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
+        const ok = sprite(a.clip ?? 'idle', fr, 0, sx, p.y, a.face ?? -1);
+        ctx.restore();
+        if (!ok) {
+          ctx.fillStyle = '#59636a';
+          ctx.fillRect(sx - 20, p.y - 200, 40, 200);
+        }
+        if (p.label) {
+          ctx.fillStyle = '#e8eef0';
+          ctx.font = '18px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(p.label, sx, p.y - 268);
+          ctx.textAlign = 'left';
+        }
+        continue;
+      }
       ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
       ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
       ctx.strokeStyle = 'rgba(0,0,0,0.5)';

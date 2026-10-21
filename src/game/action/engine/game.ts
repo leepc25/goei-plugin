@@ -37,6 +37,12 @@ export interface EngineModules {
   toHqResult?: (r: RunResultCore, w: World) => unknown;
   /** 출동 시작 시 세계를 손봄 (아이템 모듈 연결 등) */
   onWorld?: (w: World, run: RunConfigCore) => void;
+  /** 제목 등 빈 장면의 배경 그리기 */
+  drawIdle?: (name: string, ctx: CanvasRenderingContext2D, t: number) => void;
+  /** 출동이 끝난 뒤 본부로 가기 전 (귀환·후송 컷신). done을 부르면 본부 정산으로 */
+  afterRun?: (how: RunResultCore['how'], done: () => void) => void;
+  /** 시작 꼬리표(?start=) 처리. true면 제목 화면을 건너뛴다 */
+  boot?: (game: Game) => boolean;
   dispose?: () => void;
 }
 
@@ -92,8 +98,16 @@ export class Game {
     this.toTitle();
   }
 
+  /** 꼬리표 시작은 주 루프가 돈 뒤에 (start()에서) */
+  private booted = false;
+
   start() {
+    if (!this.booted) {
+      this.booted = true;
+      queueMicrotask(() => this.mods.boot?.(this));
+    }
     const frame = (now: number) => {
+      if (this.dead) return;
       this.raf = requestAnimationFrame(frame);
       if (!this.last) this.last = now;
       let dt = (now - this.last) / 1000;
@@ -131,7 +145,10 @@ export class Game {
   }
 
   destroy() {
+    this.dead = true;
     cancelAnimationFrame(this.raf);
+    this.world = null;
+    this.run = null;
     this.input.detach();
     if (this.ownCanvas) this.canvas.remove();
     if (this.hqRoot) {
@@ -145,6 +162,7 @@ export class Game {
 
   toTitle() {
     this.world = null;
+    this.inHub = false;
     this.paused = false;
     if (this.hqRoot) this.hqRoot.hidden = true;
     if (this.mods.openTitle) {
@@ -161,11 +179,15 @@ export class Game {
     this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id });
   }
 
+  private dead = false;
+  /** 본부를 걷는 중인가 (엔진 벨트 장면) */
+  inHub = false;
+
   showHq() {
     const hq = this.mods.hq!;
     this.world = null;
     this.scene = this.idleScene('hq');
-    this.canvas.style.visibility = 'hidden';
+    if (!hq.hub) this.canvas.style.visibility = 'hidden';
     if (!this.hqRoot) {
       this.hqRoot = document.createElement('div');
       this.hqRoot.className = 'goei-engine-hq';
@@ -176,6 +198,25 @@ export class Game {
       });
     }
     this.hqRoot.hidden = false;
+    if (hq.hub) {
+      // 본부 = 엔진 벨트 장면. 메뉴 창(DOM)은 열렸을 때만 보인다
+      const stage = hq.hub();
+      const run: RunConfigCore = { seed: Math.floor(Math.random() * 1e9), agent: 'jyaldi', stageId: stage.id };
+      this.hqRoot.hidden = !hq.isOpen?.();
+      this.hqRoot.classList.add('goei-engine-hq-panel');
+      this.canvas.style.visibility = '';
+      this.inHub = true;
+      const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
+      for (const l of this.mods.listeners ?? []) w.on(l);
+      this.mods.onWorld?.(w, run);
+      w.enterFloor(stage.firstFloor(run));
+      this.world = w;
+      this.runStage = stage;
+      this.inHub = true;
+      this.paused = false;
+      this.scene = this.battleScene(w);
+      this.mods.onPlay?.();
+    }
     this.mods.onScene?.('hq');
   }
 
@@ -186,6 +227,7 @@ export class Game {
       draw: () => {
         this.ctx.fillStyle = '#05080a';
         this.ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+        this.mods.drawIdle?.(name, this.ctx, performance.now() / 1000);
       },
     };
   }
@@ -194,6 +236,7 @@ export class Game {
 
   deploy(run: RunConfigCore) {
     const stage = this.mods.stages.find((s) => s.id === run.stageId) ?? this.mods.stages[0];
+    this.inHub = false;
     this.run = run;
     this.runStage = stage;
     if (this.hqRoot) this.hqRoot.hidden = true;
@@ -213,7 +256,7 @@ export class Game {
   /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
   endRun(how: RunResultCore['how']) {
     const w = this.world;
-    if (!w) return;
+    if (!w || this.inHub) return;
     const result: RunResultCore = {
       how,
       floors: w.floors,
@@ -228,8 +271,15 @@ export class Game {
     this.world = null;
     this.paused = false;
     if (this.mods.hq && this.run) {
-      this.showHq();
-      this.mods.hq.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, this.run);
+      const run = this.run;
+      const back = () => {
+        this.showHq();
+        this.mods.hq!.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, run);
+      };
+      if (this.mods.afterRun) {
+        this.scene = this.idleScene('cutscene');
+        this.mods.afterRun(how, back);
+      } else back();
       return;
     }
     this.scene = this.resultScene(result);
@@ -246,6 +296,11 @@ export class Game {
           this.menuIndex = 0;
         }
         if (this.paused) return this.pauseMenu(p, w);
+        if (this.inHub && this.hqRoot) {
+          const open = !!this.mods.hq?.isOpen?.();
+          this.hqRoot.hidden = !open;
+          if (open) return;
+        }
         if (this.mods.blocking?.()) return;
         w.step(p);
         if (w.ended) {

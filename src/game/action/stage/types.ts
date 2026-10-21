@@ -1,13 +1,13 @@
 // 차원 승강기 스테이지 · 공용 자료형. 엔진·화면과 무관하다(DOM 없음).
 // 층(벨트스크롤) 좌표: x = 가로 px, lane = 앞뒤 깊이 0(뒤)~LANE_DEPTH(앞), z = 점프 높이.
-// 엔진(docs/게임_모듈_연결.md)으로 넘길 때 lane은 laneY()로 화면 y(500~680)가 된다.
+// 엔진(docs/게임_모듈_연결.md)으로 넘길 때 lane은 laneY()로 화면 y(440~690, docs/게임_통합_규격.md 2장)가 된다.
 
 export const CHUNK_W = 640;
 export const ROOM_W = 1280;
 export const LANE_DEPTH = 160;
 /** 엔진 좌표: 걸을 수 있는 깊이 (화면 y) */
-export const Y_TOP = 500;
-export const Y_BOTTOM = 680;
+export const Y_TOP = 440;
+export const Y_BOTTOM = 690;
 /** 조각의 상대 깊이 lane(0~LANE_DEPTH)을 엔진 y로 */
 export const laneY = (lane: number) => Y_TOP + (lane / LANE_DEPTH) * (Y_BOTTOM - Y_TOP);
 

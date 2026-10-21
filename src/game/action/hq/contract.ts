@@ -43,6 +43,8 @@ export interface MissionGoal {
 }
 
 export interface MissionLaunch {
+  /** 출동 id (본부가 매김, 정산 결과에 그대로 돌려준다. 같은 출동을 두 번 정산하지 않게) */
+  runId: string;
   seed: number;
   agent: AgentId;
   support: AgentId | null;
@@ -66,6 +68,8 @@ export interface MissionLaunch {
 }
 
 export interface RunResult {
+  /** 이 결과가 어느 출동 것인지 (MissionLaunch.runId). 비어 있으면 본부가 지금 출동 것으로 본다 */
+  runId?: string;
   how: EndHow;
   missionDone: boolean;
   depth: number;
@@ -88,6 +92,8 @@ export interface RunResult {
   /** 체력 30% 아래로 떨어진 적이 있나 (후송 영구 부상 판정에 씀) */
   bigHit: boolean;
   seconds: number;
+  /** 엔진 World.notes 그대로 (층 모듈 stage.found·stage.rescued·stage.depth·stage.visited·stage.trial, bosses 등). 있으면 본부가 정리·판정한다 */
+  notes?: Record<string, unknown>;
 }
 
 export const emptyResult = (how: EndHow): RunResult => ({ how, missionDone: false, depth: 1, floors: 0, kills: 0, cash: 0, shards: 0, debt: 0, budget: 0, teeth: 0, bag: [], itemsLeft: [null, null, null, null], found: [], sent: [], rescued: [], bigHit: false, seconds: 0 });
