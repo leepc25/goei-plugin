@@ -896,6 +896,56 @@ clip('lookback_try2','side view: hips and legs stay facing right, shoulders twis
      [LBK2(0,False),LBK2(.6),LBK2(1),LBK2(1),LBK2(.6),LBK2(0,False)])
 BASE13=['carry2_idle','carry2_walk','carry2_run','carry1_idle','carry1_walk','carry1_run','sneak','leadhand','hairflip','embarrassed','shrug','headshake']
 
+# ── 독립 검수 깨짐 8개 다시 뽑기 (2026-10-21 16:36 사용자 승인) ──
+# 원인(뼈대): s(어깨 회전)가 -0.8~-1.2면 두 어깨가 16px 벌어져 생성기가 3/4 정면으로 그림(blast·grabknee·collapse).
+# 옆모습 = s -0.25 이하, h 0 근처. 손을 머리 뒤로 넘기면 등을 돌려 그림(pipe2) → 쇠파이프는 머리 위 앞쪽으로 치켜듦.
+SIDE=-0.25
+PREPb=P((X-2,61),0,SIDE,-0.1,(X+13,G),(X-14,G-1),(8,4),'chin')
+PALMb=P((X+6,60),10,SIDE,-0.15,(X+20,G),(X-12,G-2),'out','chin',head=(6,-6),re=('e',3,14))
+clip('blast','side view in profile: thrusts the open lead palm straight forward at a point ahead, then slowly lowers it',
+     [G0,PREPb,staged(PREPb,PALMb,.6),PALMb,PALMb,lerp(PALMb,G0,.25),lerp(PALMb,G0,.55),G0])
+# 잡기 무릎: 앞손은 멱살(앞으로 뻗음), 뒷무릎을 앞위로 올리되 정강이는 아래로 늘어뜨림(앞차기 아님)
+GRb=P((X+6,60),8,SIDE,-0.1,(X+20,G),(X-12,G-2),(28,2),'chin',re=('e',3,14))
+KNb=P((X+8,58),2,SIDE,-0.1,(X+20,G),(X+16,G-14),(26,4),(14,8),rk=KNEE_UP,re=('e',4,16))
+clip('grabknee','side view in profile: holding an enemy by the collar with the lead hand, drives the rear knee up high into them, shin hanging down',
+     [GRb,lerp(GRb,KNb,.5),KNb,KNb,lerp(KNb,GRb,.5)])
+# 마시기: 빈 손(캔은 엔진이 손 좌표에 붙임), 팔꿈치는 몸 앞 아래
+DRb=lambda t: P((X,55),2,0,0,(X+6,G),(X-4,G),(6,-1),'down',tilt=-18*t,le=('e',6,14))
+clip('drink','side view in profile: lifts the near hand to her mouth and tips her head back for a sip, empty loosely closed hand',
+     [STAND(0),lerp(STAND(0),DRb(0),.5),DRb(0),DRb(1),DRb(1),DRb(0),STAND(0)])
+# 다운: 누워서도 턱을 당겨 발 쪽을 봄(얼굴 옆모습이 보이게), 손은 바닥선 위
+K3b=P((X-18,84),-78,0,0,(X+16,G-32),(X+8,G-24),(2,-26),(-10,-14),lk=KNEE_UP,rk=KNEE_UP,tilt=25)
+K4b=P((X-14,93),-88,0,0,(X+28,G-4),(X+20,G),(14,0),(10,-4),lk=KNEE_UP,rk=KNEE_UP,tilt=35,re=ELB_UP,le=ELB_UP)
+K5b=P((X-12,95),-90,0,0,(X+32,G),(X+28,G),(16,0),(10,-4),tilt=35,re=ELB_UP,le=ELB_UP)
+clip('down','side view in profile: heavy hit, thrown backward through the air, lands on her back, chin tucked looking toward her feet',[K1,K2,K3b,K4b,K5b,K5b,K5b,K5b])
+# 기상: 누움 → 팔꿈치로 상체 일으킴 → 손 짚고 앉음 → 한 무릎 → 섬 (중간 장을 촘촘히)
+UPa=P((X-8,95),-60,0,0,(X+30,G),(X+26,G),(10,6),('a',X-16,G-2),tilt=20,lk=KNEE_UP,rk=KNEE_UP)
+clip('getup','side view in profile: getting up from lying on her back, props up on one hand, sits up, rises to one knee, then stands in guard',
+     [K5b,UPa,lerp(UPa,U1,.6),U1,U2,CROUCH(),lerp(CROUCH(),G0,.5),G0])
+# 쓰러짐: 발이 뜨지 않게(뒤로 휘청이는 장 낮춤), 마지막은 엎드려 얼굴을 옆으로 돌림(머리카락 뭉치 방지)
+HLb=P((X-2,60),-6,SIDE,-0.1,(X+13,G),(X-12,G-1),(14,6),(2,8),head=(4,-8))
+FDb=P((X-6,94),86,0,0,(X-48,G-2),(X-50,G),('a',X+20,G-2),('a',X+12,G-1),head=(7,-5),tilt=-30,le=ELB_UP,re=ELB_UP)
+clip('collapse','side view in profile: defeated, staggers, drops to her knees, then falls forward onto her front and stays still, face turned to the side',
+     [G0,HLb,lerp(HLb,KNEEL,.5),KNEEL,KNEEL,lerp(KNEEL,FDb,.5),FDb,FDb])
+# 쇠파이프 내려치기: 준비 → 머리 위 앞쪽으로 곧게 치켜듦(손이 이마 앞 위) → 앞으로 내려침 → 아래로 따라감
+PU1=P((X-2,57),-2,SIDE,-0.1,(X+12,G),(X-11,G-1),(10,-8),(8,-4),re=('e',4,2))
+PU2=P((X-3,57),-8,SIDE,-0.1,(X+12,G),(X-12,G-1),(8,-24),(6,-20),le=('e',8,-8),re=('e',6,-6))
+clip('pipe2','side view in profile: two-handed overhead smash with a steel pipe: lifts it straight up above her head in front, then smashes it down forward, follow-through low',
+     [PI,PU1,PU2,lerp(PU2,PW3,.5),PW3,PW4,PW4,lerp(PW4,PI,.5)],'gripping a long steel pipe with both hands, the whole pipe clearly visible in every frame')
+# 산탄총 걷기: 대기와 같은 손 간격을 넓게(앞손 총열 덮개, 뒷손 손잡이 가슴), 개머리판은 뒷팔 아래
+def walkg(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,56+1.2*abs(c)),3,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),(24,16),(4,12),le=('e',8,14),re=('e',0,14))
+clip('walk_shotgun','side view in profile: walking while carrying a long pump shotgun level in both hands',[walkg(i/8) for i in range(8)],
+     'holding a long black pump shotgun with a wooden stock in both hands, front hand on the pump, rear hand on the grip, stock under the rear arm, as long as her arm')
+# 누운·엎드린 장 팔꿈치가 바닥 아래로 가는 것(anatomic 보정 뒤) → 바닥선 위로 올림
+for _n in ('down','getup','collapse'):
+    _a,_pr,_ps=CLIPS[_n]
+    CLIPS[_n]=(_a,_pr,[{k:((v[0],min(v[1],129-DY)) if 'ELBOW' in k else v) for k,v in q.items()} for q in _ps])
+# 쇠파이프 합본(생성 0회): 16:40판 머리 위 치켜듦(PU2) + 28e8170판 앞 위 치켜듦(PW3)·내려침(PW4). 16:40판 타격 장은 파이프가 바닥에 꽂혀 불합격
+CLIPS['pipe3']=(CLIPS['pipe2'][0],CLIPS['pipe2'][1],[anatomic(PU2),anatomic(PW3),anatomic(PW4)])
+REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
+
 A_KP=skel.A
 def kp(p):
     out=[]
