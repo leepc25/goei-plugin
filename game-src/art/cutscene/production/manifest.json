@@ -1,0 +1,420 @@
+{
+  "request": "docs/GPT요청_컷신영상.md",
+  "generator": "built-in image_gen",
+  "cuts": [
+    {
+      "scene": "opening",
+      "cut": "c1",
+      "duration": 4000,
+      "start": 0,
+      "story": "밤의 서울 하늘과 빌딩 숲, 여러 층이 다른 속도로 흐름. 창 불빛 몇 개가 깜빡.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Empty panoramic Seoul skyline at NIGHT, layered foreground rooftops scrolling left faster than distant towers, a few windows blink. NO PEOPLE, NO INTERIOR. Eight sequential skyline-only frames."
+    },
+    {
+      "scene": "opening",
+      "cut": "c2",
+      "duration": 3000,
+      "start": 4,
+      "story": "종로의 낡은 6층 사무실 건물, 위에서 아래로 훑어 내려와 불 켜진 로비. 엘리베이터 위 빨간 표시등.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Exterior of the SAME old six-storey Jongno office building at NIGHT. Camera pans smoothly DOWN from roof to the warmly lit ground-floor lobby; through glass brass elevator and red indicator become visible. No people."
+    },
+    {
+      "scene": "opening",
+      "cut": "c3",
+      "duration": 2000,
+      "start": 7,
+      "story": "엘리베이터 옆 점검표, 칸은 전부 비었고 서명란도 비어 있음. 장갑 낀 손가락이 서명란을 짚음. 번쩍.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Close-up blank elevator maintenance chart on wall. All boxes and signature line empty, NO WORDS. Jyaldi's black leather gloved index finger moves in from right to point at blank signature line, then single white flash. No faces."
+    },
+    {
+      "scene": "opening",
+      "cut": "c4",
+      "duration": 4000,
+      "start": 9,
+      "story": "엘리베이터 문 앞의 쟈알디 전신 뒷모습. 머리카락과 재킷 자락이 흔들리고, 천천히 고개만 돌아봄.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Full-body rear view Jyaldi alone before closed brass elevator at night. Long straight black hair to waist, black trouser suit gloves. Body remains planted; hair and jacket hem flutter as only her HEAD slowly turns over shoulder. Eight progress poses."
+    },
+    {
+      "scene": "opening",
+      "cut": "c5",
+      "duration": 1500,
+      "start": 13,
+      "story": "붉은 눈 클로즈업, 빛이 번득임.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Extreme close-up of Jyaldi's RED eyes framed by straight black hair. Calm unblinking expression; small sharp light glint travels across red irises."
+    },
+    {
+      "scene": "opening",
+      "cut": "c6",
+      "duration": 2500,
+      "start": 14.5,
+      "story": "재킷 안에서 권총을 뽑아 겨눔. 빠른 컷, 흰 번쩍.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Waist-up Jyaldi in black trouser suit, white shirt black tie gloves, NIGHT. Right hand reaches UNDER open jacket to SHOULDER HOLSTER, draws ONE pistol, extends arms to aim. Fast anticipation draw aim then white flash. Same body and camera."
+    },
+    {
+      "scene": "opening",
+      "cut": "c7",
+      "duration": 4000,
+      "start": 17,
+      "story": "문이 열리고 승강기 안 버튼 패널. 버튼이 끝없이 아래로 이어지고 차례로 빠르게 켜짐(버튼에 숫자 없음).",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Close-up interior elevator bronze button panel at NIGHT. Door slides open to reveal it; blank round buttons extend impossibly downward, more rows sequentially light. NO DIGITS OR TEXT. No people."
+    },
+    {
+      "scene": "opening",
+      "cut": "c8",
+      "duration": 6000,
+      "start": 21,
+      "story": "엘리베이터 문이 활짝 열리고 안쪽 흰 빛을 등진 8명이 실루엣으로 걸어 나와 일렬로 섬. 한 명씩 발밑 조명이 켜지며 전신이 드러나고 짧은 고유 동작: 쟈알디 장갑 고쳐 끼기 → 에일린 소총 점검 → 스팡달 고개 갸웃하며 손 흔들기 → 게슈간 큐브 돌리기 → 고르고디오 손가락 꺾기 → 큐라스 오토바이 키 돌리기 → 데드폴 눈이 가늘어지며 총 손잡이 쥐기 → 로제몬 팔짱 끼고 노려보기(눈이 보랏빛으로 빛남).",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Wide full-body lineup of EIGHT distinct adult agents walking out of an open white-lit elevator. Initially eight silhouettes, then light reveals agents FROM LEFT TO RIGHT in order: Jyaldi adjusts glove; short platinum ponytail woman olive vest checks rifle; purple bob woman skirt suit tilts head waves; athletic short white-haired woman white shirt rotates cube; huge bald bearded man black jacket cracks knuckles; slick lime-haired man motorcycle jacket twirls keys; petite long black-haired woman suit grips pistol; petite long wavy purple-haired woman cardigan skirt crosses arms purple eyes. All eight remain together fullbody in every frame. Spotlight advances one person each frame."
+    },
+    {
+      "scene": "opening",
+      "cut": "c9",
+      "duration": 5000,
+      "start": 27,
+      "story": "화면이 번쩍이며 로고 **ANOMALY SIMULATION** 이 쾅 하고 들어옴. 엘리베이터 표시등처럼 빨간 점 하나가 깜빡.",
+      "light": "### 0. `opening` · 오프닝 (코인 넣고 시작 전) · 약 32초 · 밤",
+      "promptScene": "Game title on dark elevator background. EXACT two-line pixel lettering ANOMALY SIMULATION, no other text. A white flash resolves into large chunky metal pixel title which slams down and settles; one small red elevator indicator dot blinks. Keep letters correct in all visible frames."
+    },
+    {
+      "scene": "first_day",
+      "cut": "c1",
+      "duration": 4000,
+      "start": 0,
+      "story": "사람·차·비둘기 하나 없는 아침 종로 큰길. 신호등만 바뀜.",
+      "light": "### 1. `first_day` · 첫 출근 · 약 18초 · 평일 아침 8시 40분, 흐린 회색빛",
+      "promptScene": "Empty wide Jongno main street on OVERCAST MORNING, grey light. Absolutely no people cars birds. ONLY traffic signal changes green amber red over eight frames. Fixed camera."
+    },
+    {
+      "scene": "first_day",
+      "cut": "c2",
+      "duration": 4000,
+      "start": 4,
+      "story": "텅 빈 길 한가운데를 걸어가는 쟈알디 뒷모습. 머리카락이 바람에 조금 날림.",
+      "light": "### 1. `first_day` · 첫 출근 · 약 18초 · 평일 아침 8시 40분, 흐린 회색빛",
+      "promptScene": "Jyaldi alone WALKING AWAY along center of empty Jongno street on cloudy grey morning. Rear fullbody view, waist-length black hair sways, black TROUSERS not skirt. Eight successive walk-cycle poses with alternating planted feet, coherent stride."
+    },
+    {
+      "scene": "first_day",
+      "cut": "c3",
+      "duration": 6000,
+      "start": 8,
+      "story": "낡은 관공서 사무실 문이 열리고, 블라인드 사이 아침 햇빛 속 잼트리가 화면(신입 시점)을 보고 활짝 웃으며 말함.",
+      "light": "### 1. `first_day` · 첫 출근 · 약 18초 · 평일 아침 8시 40분, 흐린 회색빛",
+      "promptScene": "First-person view opening old government office door on grey morning. Warm sun strips through blinds. Jaemtri alone, long brown wavy hair GREEN eyes black office skirt suit heels tablet, opens door, looks at viewer, broadly smiles and speaks with varied mouth shapes. No Jyaldi visible."
+    },
+    {
+      "scene": "first_day",
+      "cut": "c4",
+      "duration": 4000,
+      "start": 14,
+      "story": "쟈알디 옆얼굴 클로즈업, 무표정, 한 번 눈 깜빡.",
+      "light": "### 1. `first_day` · 첫 출근 · 약 18초 · 평일 아침 8시 40분, 흐린 회색빛",
+      "promptScene": "Profile face CLOSE-UP Jyaldi, cloudy grey morning, straight black hair red eyes. Expressionless, exactly ONE blink: open, half closed, closed, half open, then open. Same head outline."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "밤의 낡은 사무실 건물 외경, 로비 불빛.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "Exterior of old six-storey Jongno office building at NIGHT, warm lobby glow and subtle flickering red elevator lamp seen through glass. Same old Korean masonry facade across frames. No people. Only a few lights change."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c2",
+      "duration": 4000,
+      "start": 3,
+      "story": "대리석 엘리베이터 홀, 놋쇠 테두리 엘리베이터 앞에 선 쟈알디 뒷모습. 빨간 표시등.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "Jyaldi fullbody rear view standing alone before brass-framed elevator in marble lobby at NIGHT. Long black hair black TROUSER suit. Red indicator pulses; hair tips subtly sway. Body and architecture stable."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c3",
+      "duration": 2000,
+      "start": 7,
+      "story": "점검표 서명란이 빈 것을 장갑 손이 짚음.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "Blank elevator inspection chart close-up. EMPTY boxes EMPTY signature line, no letters anywhere. Black leather gloved index finger enters and points precisely at blank bottom signature space. No face."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c4",
+      "duration": 4000,
+      "start": 9,
+      "story": "승강기 안 쟈알디 정면, 양쪽 문이 닫힘. 띵.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "FRONT view Jyaldi standing INSIDE brass elevator at NIGHT, black trouser suit red eyes long black hair. Doors on LEFT and RIGHT slide toward center progressively, finally meeting to fully obscure her. Same fixed camera."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c5",
+      "duration": 4000,
+      "start": 13,
+      "story": "버튼 패널에 없던 버튼들이 아래로 끝없이 생겨나 켜짐(숫자 없음). 살짝 흔들림.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "Close-up bronze elevator control panel. Blank circular buttons in ordered rows, NO numbers. Newly appearing rows extend endlessly downward and illuminate in descending sequence. Slight vibration. No people."
+    },
+    {
+      "scene": "first_entry",
+      "cut": "c6",
+      "duration": 3000,
+      "start": 17,
+      "story": "붉은 눈 클로즈업. 문이 다시 열리는 빛이 눈에 비침.",
+      "light": "### 2. `first_entry` · 첫 투입 (첫 출동 때) · 약 20초 · 밤",
+      "promptScene": "Extreme close-up of Jyaldi's red eyes at NIGHT. Thin reflected white slit from opening elevator doors widens across both eyes while her gaze remains calm. Straight black hair."
+    },
+    {
+      "scene": "first_call",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "승강기 안 쟈알디 옆모습, 천장등이 깜빡.",
+      "light": "### 3. `first_call` · 첫 호명 · 약 10초 · 승강기 안, 깜빡이는 천장등",
+      "promptScene": "Jyaldi in SIDE PROFILE inside brass elevator, long black hair, red eyes, black trouser suit white shirt black tie gloves. Fixed body and camera. Overhead fluorescent light flickers between dark cool blue and dim white."
+    },
+    {
+      "scene": "first_call",
+      "cut": "c2",
+      "duration": 4000,
+      "start": 3,
+      "story": "인터폰 스피커 구멍 클로즈업, 구멍 뒤로 따뜻한 빛이 차오름. 잡음.",
+      "light": "### 3. `first_call` · 첫 호명 · 약 10초 · 승강기 안, 깜빡이는 천장등",
+      "promptScene": "Extreme close-up perforated metal intercom speaker inside elevator, NO WORDS or numbers. Warm amber light progressively fills holes from behind. Slight static-like pixel flickers, fixed grille."
+    },
+    {
+      "scene": "first_call",
+      "cut": "c3",
+      "duration": 3000,
+      "start": 7,
+      "story": "쟈알디가 눈만 스피커 쪽으로 돌림.",
+      "light": "### 3. `first_call` · 첫 호명 · 약 10초 · 승강기 안, 깜빡이는 천장등",
+      "promptScene": "Close-up Jyaldi inside elevator. Head and neck remain absolutely still, ONLY RED EYES shift sideways toward wall intercom. Straight long black hair black suit. Cool dim flickering fluorescent."
+    },
+    {
+      "scene": "attic",
+      "cut": "c1",
+      "duration": 4000,
+      "start": 0,
+      "story": "녹슨 갈색 철판과 덕트 사이 비좁은 공간. 철망 씌운 작업등이 천천히 흔들림.",
+      "light": "### 4. `attic` · 다락방 · 약 14초 · 승강로 사이 아주 어두운 공간, 흔들리는 주황 작업등 하나",
+      "promptScene": "Cramped maintenance attic between lift shafts: rust-brown steel plates and ducts, one orange caged worklamp slowly swings LEFT then RIGHT on cord, moving light and shadows. No people."
+    },
+    {
+      "scene": "attic",
+      "cut": "c2",
+      "duration": 3000,
+      "start": 4,
+      "story": "바닥에 버려진 낡은 배낭, 말린 침낭, 감긴 로프.",
+      "light": "### 4. `attic` · 다락방 · 약 14초 · 승강로 사이 아주 어두운 공간, 흔들리는 주황 작업등 하나",
+      "promptScene": "Close-up abandoned worn backpack, rolled sleeping bag and coiled climbing rope on rusty attic floor. One swinging orange worklamp outside frame makes shadows slowly pass over objects. No people."
+    },
+    {
+      "scene": "attic",
+      "cut": "c3",
+      "duration": 3000,
+      "start": 7,
+      "story": "벽에 분필 표시와 긁어서 그린 층 지도(선과 네모만, 글자 없음). 등빛이 지나감.",
+      "light": "### 4. `attic` · 다락방 · 약 14초 · 승강로 사이 아주 어두운 공간, 흔들리는 주황 작업등 하나",
+      "promptScene": "Rusty attic wall with chalk floor map made ONLY of lines and empty squares, no letters or numbers. Orange swinging lamp sweep moves light over scratches. No people."
+    },
+    {
+      "scene": "attic",
+      "cut": "c4",
+      "duration": 4000,
+      "start": 10,
+      "story": "쪼그려 앉아 벽을 보는 쟈알디.",
+      "light": "### 4. `attic` · 다락방 · 약 14초 · 승강로 사이 아주 어두운 공간, 흔들리는 주황 작업등 하나",
+      "promptScene": "Jyaldi CROUCHING in cramped rusty attic facing wall map, long black hair black TROUSER suit gloves. She stays crouched studying wall while orange worklamp swings, subtly shifts head and hair. Same anatomy and crouch."
+    },
+    {
+      "scene": "three_years",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "엘리베이터 홀, 저 끝 벽에 기대 선 승객.",
+      "light": "### 5. `three_years` · 삼 년째 승객 · 약 12초 · 밤의 엘리베이터 홀, 빨간 표시등",
+      "promptScene": "Night elevator hall with red indicator. Thin middle-aged male passenger in outdated grey suit loose tie stubble leans against far end wall. He subtly lifts head and shifts weight, friendly but slightly wrong. No Jyaldi."
+    },
+    {
+      "scene": "three_years",
+      "cut": "c2",
+      "duration": 4000,
+      "start": 3,
+      "story": "승객 얼굴 클로즈업, 반은 그림자, 친절한 미소로 말함.",
+      "light": "### 5. `three_years` · 삼 년째 승객 · 약 12초 · 밤의 엘리베이터 홀, 빨간 표시등",
+      "promptScene": "Close-up SAME thin middle-aged male passenger, stubble, outdated grey suit loose tie. Half face in shadow, subtly wrong friendly smile; mouth opens and closes speaking, eyebrows barely move. Night red elevator glow."
+    },
+    {
+      "scene": "three_years",
+      "cut": "c3",
+      "duration": 2000,
+      "start": 7,
+      "story": "두 문 중 하나를 가리키는 손가락.",
+      "light": "### 5. `three_years` · 삼 년째 승객 · 약 12초 · 밤의 엘리베이터 홀, 빨간 표시등",
+      "promptScene": "Close-up grey-suited male passenger's hand pointing between TWO closed elevator doors at night. Index finger moves to decisively indicate LEFT door. Other fingers curled, anatomical hand. No writing."
+    },
+    {
+      "scene": "three_years",
+      "cut": "c4",
+      "duration": 3000,
+      "start": 9,
+      "story": "가늘어지는 쟈알디의 붉은 눈.",
+      "light": "### 5. `three_years` · 삼 년째 승객 · 약 12초 · 밤의 엘리베이터 홀, 빨간 표시등",
+      "promptScene": "Extreme close-up Jyaldi's red eyes under straight black hair. Her eyes slowly NARROW suspiciously at the passenger. Night red elevator glow. Keep eye placement and iris shape consistent."
+    },
+    {
+      "scene": "return",
+      "cut": "c1",
+      "duration": 4000,
+      "start": 0,
+      "story": "깊은 승강로를 아래에서 올려다봄. 작은 쟈알디가 로프 하나를 잡고 오름. 위에 빛.",
+      "light": "### 6. `return` · 귀환 · 약 14초 · 어두운 승강로 → 이른 아침 햇살",
+      "promptScene": "LOOKING UP from bottom of very deep dark elevator shaft. Tiny fullbody Jyaldi in black trouser suit, long black hair, climbs a SINGLE taut rope toward small white light far above. Eight climbing poses alternating hands and knees. Shaft geometry stable."
+    },
+    {
+      "scene": "return",
+      "cut": "c2",
+      "duration": 2000,
+      "start": 4,
+      "story": "로프를 번갈아 잡는 장갑 낀 두 손, 아래는 까마득한 어둠.",
+      "light": "### 6. `return` · 귀환 · 약 14초 · 어두운 승강로 → 이른 아침 햇살",
+      "promptScene": "Extreme close-up Jyaldi's TWO black leather gloved hands on a SINGLE vertical climbing rope over deep black shaft. Hands alternately reach higher and grip, left then right, while other hand supports weight. Same rope thickness."
+    },
+    {
+      "scene": "return",
+      "cut": "c3",
+      "duration": 2000,
+      "start": 6,
+      "story": "머리 위 철제 해치가 밀려 열리고 흰 빛이 쏟아짐.",
+      "light": "### 6. `return` · 귀환 · 약 14초 · 어두운 승강로 → 이른 아침 햇살",
+      "promptScene": "POV looking upward at closed heavy iron ceiling hatch. Black gloved hand pushes hatch UP on hinge; hatch progressively opens and brilliant morning daylight pours into dark shaft. Eight distinct opening stages."
+    },
+    {
+      "scene": "return",
+      "cut": "c4",
+      "duration": 6000,
+      "start": 8,
+      "story": "아침 햇살이 유리문으로 들어오는 진짜 로비. 먼지 묻은 쟈알디 뒷모습이 빛 속에 섬.",
+      "light": "### 6. `return` · 귀환 · 약 14초 · 어두운 승강로 → 이른 아침 햇살",
+      "promptScene": "Real building lobby in EARLY MORNING warm sun through glass doors, dust motes. Rear fullbody Jyaldi dusty black trouser suit long hair stands in sun. Hair subtly sways, dust drifts, camera fixed. No other people."
+    },
+    {
+      "scene": "evac",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "암흑 속 비스듬히 팽팽하게 당겨지는 로프. 크게 흔들림.",
+      "light": "### 7. `evac` · 후송 (쓰러졌을 때) · 약 12초 · 암흑 → 형광등 의무실",
+      "promptScene": "Near-black elevator shaft with one diagonal rope stretched taut, pulled sharply and swaying strongly. No people visible. Rope shifts through clear different curved/tensed states against near black."
+    },
+    {
+      "scene": "evac",
+      "cut": "c2",
+      "duration": 3000,
+      "start": 3,
+      "story": "누운 시점: 하얀 천장 형광등이 깜빡이다 켜짐.",
+      "light": "### 7. `evac` · 후송 (쓰러졌을 때) · 약 12초 · 암흑 → 형광등 의무실",
+      "promptScene": "Lying-down POV infirmary white ceiling fluorescent tube. Initially dim dark, fluorescent flickers several times then lights steadily cold white. No people, no text."
+    },
+    {
+      "scene": "evac",
+      "cut": "c3",
+      "duration": 4000,
+      "start": 6,
+      "story": "의무실 침대의 쟈알디(재킷 벗음, 셔츠, 넥타이 풀림, 이마에 붕대 하나), 눈을 뜸.",
+      "light": "### 7. `evac` · 후송 (쓰러졌을 때) · 약 12초 · 암흑 → 형광등 의무실",
+      "promptScene": "Jyaldi reclining in infirmary bed under cool fluorescent. Jacket REMOVED, white shirt loosened black tie, single forehead bandage, long black hair on pillow. Red eyes CLOSED initially, slowly open, waking exhausted. Same face body bed, no other people."
+    },
+    {
+      "scene": "evac",
+      "cut": "c4",
+      "duration": 2000,
+      "start": 10,
+      "story": "옆 탁자의 종이컵 블랙커피에서 김이 오름.",
+      "light": "### 7. `evac` · 후송 (쓰러졌을 때) · 약 12초 · 암흑 → 형광등 의무실",
+      "promptScene": "Close-up plain paper cup of black coffee on infirmary bedside table, cool white fluorescent, wisps of STEAM rise and curl in eight distinct shapes. No text on cup, no hands."
+    },
+    {
+      "scene": "exit",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "버튼 패널 맨 아래 처음 보는 버튼 하나가 초록빛으로 켜짐.",
+      "light": "### 8. `exit` · 출구 (승강기를 공략했을 때) · 약 14초 · 새벽, 창백한 푸른빛과 주황 하늘",
+      "promptScene": "Bottom of elevator brass button panel at DAWN. One unfamiliar BLANK circular button gradually glows GREEN, all others unlit. No letters digits or signs. No people."
+    },
+    {
+      "scene": "exit",
+      "cut": "c2",
+      "duration": 4000,
+      "start": 3,
+      "story": "문이 열리고 새벽빛 가득한 로비, 문간의 쟈알디가 역광 실루엣.",
+      "light": "### 8. `exit` · 출구 (승강기를 공략했을 때) · 약 14초 · 새벽, 창백한 푸른빛과 주황 하늘",
+      "promptScene": "Elevator doors slide OPEN to reveal lobby filled with pale blue and orange DAWN. Jyaldi in doorway as dark fullbody backlit silhouette, long black hair TROUSER suit. White slit widens then open doors reveal her silhouette. No second person."
+    },
+    {
+      "scene": "exit",
+      "cut": "c3",
+      "duration": 4000,
+      "start": 7,
+      "story": "건물 앞, 시동 걸린 검은 관용차. 전조등, 배기 김.",
+      "light": "### 8. `exit` · 출구 (승강기를 공략했을 때) · 약 14초 · 새벽, 창백한 푸른빛과 주황 하늘",
+      "promptScene": "Outside old office building at DAWN pale blue orange sky, one black government sedan idling, headlights on, exhaust vapor rhythmically curls. No people driver or writing. Fixed three-quarter car view, stable wheels."
+    },
+    {
+      "scene": "exit",
+      "cut": "c4",
+      "duration": 3000,
+      "start": 11,
+      "story": "밖에서 본 엘리베이터 문이 닫히고 위의 빨간 표시등이 꺼짐.",
+      "light": "### 8. `exit` · 출구 (승강기를 공략했을 때) · 약 14초 · 새벽, 창백한 푸른빛과 주황 하늘",
+      "promptScene": "View from lobby outside brass elevator at DAWN. Elevator doors progressively slide CLOSED, then red indicator above goes DARK. No people or readable text, same architecture."
+    },
+    {
+      "scene": "dinner",
+      "cut": "c1",
+      "duration": 3000,
+      "start": 0,
+      "story": "창에 노란 불이 켜진 종로 근처 작은 파스타집 외경, 푸른 저녁.",
+      "light": "### 9. `dinner` · 공략 완료 회식 · 약 14초 · 저녁, 따뜻한 노란 조명",
+      "promptScene": "Exterior of small Jongno pasta restaurant at BLUE EVENING, warm yellow windows, subtle steam from vent and window lamp flicker. Empty street. No people no lettering signage."
+    },
+    {
+      "scene": "dinner",
+      "cut": "c2",
+      "duration": 5000,
+      "start": 3,
+      "story": "긴 식탁에 파스타 접시가 가득. 앞쪽 왼쪽 메뉴판 든 잼트리, 오른쪽 커피잔 든 쟈알디, 뒤에 팀원들이 따뜻한 실루엣으로 웃고 떠듦.",
+      "light": "### 9. `dinner` · 공략 완료 회식 · 약 14초 · 저녁, 따뜻한 노란 조명",
+      "promptScene": "Warm yellow restaurant dinner. Long table with pasta plates. FOREGROUND LEFT Jaemtri brown wavy hair green eyes black skirt suit holding BLANK menu; FOREGROUND RIGHT Jyaldi long straight black hair red eyes black trouser suit black gloves holds black coffee cup. Background colleagues appear only as warm silhouettes laughing chatting. Jaemtri smiles talks, Jyaldi slowly raises coffee, no position swaps."
+    },
+    {
+      "scene": "dinner",
+      "cut": "c3",
+      "duration": 3000,
+      "start": 8,
+      "story": "메뉴판 위로 신난 잼트리 얼굴 클로즈업.",
+      "light": "### 9. `dinner` · 공략 완료 회식 · 약 14초 · 저녁, 따뜻한 노란 조명",
+      "promptScene": "Close-up Jaemtri happy excited face above a BLANK menu, long brown wavy hair soft GREEN eyes. Warm yellow restaurant light. She speaks smiling, changing mouth and eyebrows, friendly adult proportions. No Jyaldi no text."
+    },
+    {
+      "scene": "dinner",
+      "cut": "c4",
+      "duration": 3000,
+      "start": 11,
+      "story": "블랙커피 잔을 드는 쟈알디의 장갑 손.",
+      "light": "### 9. `dinner` · 공략 완료 회식 · 약 14초 · 저녁, 따뜻한 노란 조명",
+      "promptScene": "Close-up Jyaldi black LEATHER GLOVED hand lifts black coffee cup from table toward mouth, warm yellow restaurant light. Rising steam, wrist and cup follow coherent arc, no sloshing, no text."
+    }
+  ]
+}
