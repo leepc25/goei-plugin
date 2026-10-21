@@ -8,75 +8,75 @@
   "h": 128
  },
  "objects/hq_office_objects_1": {
-  "w": 84,
-  "h": 45,
+  "w": 86,
+  "h": 46,
   "foot": [
-   42,
-   45
+   43,
+   46
   ]
  },
  "objects/hq_office_objects_2": {
-  "w": 38,
-  "h": 60,
+  "w": 40,
+  "h": 61,
   "foot": [
-   19,
-   60
+   20,
+   61
   ]
  },
  "objects/hq_office_objects_3": {
-  "w": 44,
-  "h": 78,
+  "w": 46,
+  "h": 79,
   "foot": [
-   22,
-   78
+   23,
+   79
   ]
  },
  "objects/hq_office_objects_4": {
-  "w": 102,
-  "h": 51,
+  "w": 104,
+  "h": 52,
   "foot": [
-   51,
-   51
+   52,
+   52
   ]
  },
  "objects/hq_office_objects_5": {
-  "w": 72,
-  "h": 27,
+  "w": 74,
+  "h": 28,
   "foot": [
-   36,
-   27
+   37,
+   28
   ]
  },
  "objects/hq_office_objects_6": {
-  "w": 30,
-  "h": 72,
+  "w": 32,
+  "h": 73,
   "foot": [
-   15,
-   72
+   16,
+   73
   ]
  },
  "objects/hq_office_objects_7": {
-  "w": 55,
-  "h": 84,
+  "w": 57,
+  "h": 85,
   "foot": [
-   27,
-   84
+   28,
+   85
   ]
  },
  "objects/hq_office_objects_8": {
-  "w": 31,
-  "h": 108,
+  "w": 33,
+  "h": 109,
   "foot": [
-   15,
-   108
+   16,
+   109
   ]
  },
  "objects/hq_office_objects_9": {
-  "w": 75,
-  "h": 126,
+  "w": 77,
+  "h": 127,
   "foot": [
-   37,
-   126
+   38,
+   127
   ]
  },
  "hq_office_wall_1": {

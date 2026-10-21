@@ -4,75 +4,75 @@
   "h": 128
  },
  "objects/hq_workshop_objects_1": {
-  "w": 107,
-  "h": 54,
+  "w": 109,
+  "h": 55,
   "foot": [
-   53,
-   54
+   54,
+   55
   ]
  },
  "objects/hq_workshop_objects_2": {
-  "w": 63,
-  "h": 60,
+  "w": 65,
+  "h": 61,
   "foot": [
-   31,
-   60
+   32,
+   61
   ]
  },
  "objects/hq_workshop_objects_3": {
-  "w": 96,
-  "h": 114,
+  "w": 98,
+  "h": 115,
   "foot": [
-   48,
-   114
+   49,
+   115
   ]
  },
  "objects/hq_workshop_objects_4": {
-  "w": 46,
-  "h": 36,
+  "w": 48,
+  "h": 37,
   "foot": [
-   23,
-   36
+   24,
+   37
   ]
  },
  "objects/hq_workshop_objects_5": {
-  "w": 34,
-  "h": 54,
+  "w": 36,
+  "h": 55,
   "foot": [
-   17,
-   54
+   18,
+   55
   ]
  },
  "objects/hq_workshop_objects_6": {
-  "w": 71,
-  "h": 36,
+  "w": 73,
+  "h": 37,
   "foot": [
-   35,
-   36
+   36,
+   37
   ]
  },
  "objects/hq_workshop_objects_7": {
-  "w": 29,
-  "h": 27,
+  "w": 31,
+  "h": 28,
   "foot": [
-   14,
-   27
+   15,
+   28
   ]
  },
  "objects/hq_workshop_objects_8": {
-  "w": 36,
-  "h": 24,
+  "w": 38,
+  "h": 25,
   "foot": [
-   18,
-   24
+   19,
+   25
   ]
  },
  "objects/hq_workshop_objects_9": {
-  "w": 82,
-  "h": 126,
+  "w": 84,
+  "h": 127,
   "foot": [
-   41,
-   126
+   42,
+   127
   ]
  },
  "hq_workshop_wall_1": {

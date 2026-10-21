@@ -142,8 +142,12 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   const bg = {};
   const bgDir = 'game-src/art/bg/dot';
   for (const place of existsSync(bgDir) ? readdirSync(bgDir) : []) {
-    for (const f of readdirSync(`${bgDir}/${place}`).filter((f) => f.endsWith('.png'))) {
-      (bg[place] ??= {})[f.slice(0, -4)] = `data:image/png;base64,${readFileSync(`${bgDir}/${place}/${f}`).toString('base64')}`;
+    for (const sub of ['', 'objects/']) {
+      const dir = `${bgDir}/${place}/${sub}`;
+      if (!existsSync(dir)) continue;
+      for (const f of readdirSync(dir).filter((f) => f.endsWith('.png'))) {
+        (bg[place] ??= {})[sub + f.slice(0, -4)] = `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
+      }
     }
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
