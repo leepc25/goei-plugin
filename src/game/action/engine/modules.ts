@@ -279,16 +279,28 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shake: (ms, amp) => shell.fx.onGameEvent({ type: 'shake', ms, amp } as never),
       anchor: (id) => {
         if (id !== 'agent' || !world) return null;
-        // 화면을 돌려도 맞도록 변환 전 배치 좌표(offset*)로 계산
-        const cv = shell.canvas;
-        let ox = 0,
-          oy = 0;
-        for (let n: HTMLElement | null = cv; n && n !== storyRoot.offsetParent; n = n.offsetParent as HTMLElement | null) (ox += n.offsetLeft), (oy += n.offsetTop);
-        const k = cv.offsetWidth / 1280;
+        // 껍데기 root 좌표(돌린 화면이어도 root 안에서는 가로)로 계산: 게임 화면(.gs-stage)은 translate(tx,ty) scale(k)
+        const st = shell.canvas.parentElement as HTMLElement;
+        const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
+        const k = shell.stage.scale || 1;
+        const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft,
+          oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
         const p = world.player;
         // 말풍선은 머리 위, 화면 가장자리(터치 버튼 띠) 안쪽으로
         const gx = Math.max(200, Math.min(1000, p.x - world.camX));
-        return { x: ox - storyRoot.offsetLeft + gx * k, y: oy - storyRoot.offsetTop + Math.max(120, p.y - p.z - 270) * k };
+        // 보이는 터치 버튼(오른쪽 묶음)의 왼쪽 끝을 넘지 않게. 버튼 위치는 배치 좌표 translate라 회전과 무관
+        let maxX: number | undefined;
+        const tp = storyRoot.ownerDocument.querySelector<HTMLElement>('.tp');
+        if (tp && tp.offsetParent) {
+          let tx = 0;
+          for (let n: HTMLElement | null = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent as HTMLElement | null) tx += n.offsetLeft;
+          for (const b of tp.querySelectorAll<HTMLElement>('.tp-b:not(.item):not(.top)')) {
+            if (!b.offsetWidth || getComputedStyle(b).display === 'none') continue;
+            const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
+            if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
+          }
+        }
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 270) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
       paused: () => shell.paused,

@@ -1,4 +1,5 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
+import { drawPropArt } from '../art/bg';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
 import type { Art } from './art';
 import { Bullet } from './bodies';
@@ -106,10 +107,13 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         }
         continue;
       }
-      ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
-      ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-      ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+      // 배경 물건 그림(art/bg)이 있으면 그것, 없으면 회색 상자 대역
+      if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type)) {
+        ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
+        ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+        ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+      }
       if (p.label) {
         ctx.fillStyle = '#e8eef0';
         ctx.font = '18px sans-serif';

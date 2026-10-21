@@ -2,7 +2,8 @@
 import type { CastInfo } from './cast';
 import type { Mood } from './types';
 
-export type Anchor = () => { x: number; y: number } | null;
+/** maxX: 말풍선 오른쪽 끝이 넘지 말아야 할 x (터치 버튼 띠 왼쪽) */
+export type Anchor = () => { x: number; y: number; maxX?: number } | null;
 
 interface Bubble {
   el: HTMLElement;
@@ -164,7 +165,7 @@ export class StoryUI {
     // 화면 밖으로 나가지 않게 가로 위치를 당기고, 꼬리는 말하는 사람 쪽에 남긴다
     const w = b.el.offsetWidth,
       W = this.el.clientWidth;
-    const x = Math.max(w / 2 + 6, Math.min(W - w / 2 - 6, p.x));
+    const x = Math.max(w / 2 + 6, Math.min(Math.min(W, p.maxX ?? W) - w / 2 - 6, p.x));
     b.el.style.setProperty('--tail', `${Math.round(p.x - x)}px`);
     b.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(Math.max(p.y, 0))}px) translate(-50%, -100%)`;
   }

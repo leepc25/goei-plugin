@@ -41,6 +41,7 @@ export const ICONS = {
   // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
   siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
   spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
+  expand: stroke('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
   close: stroke('<path d="M6 6l12 12M18 6 6 18"/>'),
   up: stroke('<path d="m6 15 6-6 6 6"/>'),
   down: stroke('<path d="m6 9 6 6 6-6"/>'),
