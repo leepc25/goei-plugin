@@ -61,12 +61,12 @@
    "fps": 14,
    "loop": false,
    "hits": [],
-   "adv": 14,
+   "adv": 20,
    "origin": 0,
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 23275,
+   "bytes": 22293,
    "prop": false
   },
   "run": {
@@ -208,7 +208,7 @@
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 30500,
+   "bytes": 26302,
    "prop": false
   },
   "airkick": {
@@ -223,7 +223,7 @@
    "hold": 0.05,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 5,
-   "bytes": 20522,
+   "bytes": 17956,
    "prop": false
   },
   "draw": {
@@ -318,7 +318,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 4,
-   "bytes": 14238,
+   "bytes": 14060,
    "prop": false
   },
   "evade": {
@@ -331,7 +331,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 31519,
+   "bytes": 24125,
    "prop": false
   },
   "grab": {
@@ -344,7 +344,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 4,
-   "bytes": 18097,
+   "bytes": 16642,
    "prop": false
   },
   "grabknee": {
@@ -374,7 +374,7 @@
    "hold": 0.1,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 8,
-   "bytes": 46555,
+   "bytes": 29177,
    "prop": false
   },
   "super": {
@@ -389,7 +389,7 @@
    "hold": 0.2,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 10,
-   "bytes": 52517,
+   "bytes": 36313,
    "prop": false
   },
   "pickup": {
@@ -551,7 +551,7 @@
    "hold": 0.05,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 8,
-   "bytes": 34068,
+   "bytes": 23043,
    "prop": false
   },
   "wall": {
@@ -767,7 +767,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 3,
-   "bytes": 16603,
+   "bytes": 12430,
    "prop": false
   },
   "land": {
