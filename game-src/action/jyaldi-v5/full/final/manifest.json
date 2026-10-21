@@ -2935,7 +2935,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 21905,
+   "bytes": 21846,
    "prop": false,
    "anchors": [
     {
@@ -6273,7 +6273,7 @@
    "hold": 0.0,
    "group": "기본 클립 (몸만, 물건·장면은 엔진)",
    "frames": 8,
-   "bytes": 23661,
+   "bytes": 23316,
    "prop": false,
    "anchors": [
     {
@@ -8193,7 +8193,7 @@
    "hold": 0.0,
    "group": "탐사",
    "frames": 6,
-   "bytes": 18144,
+   "bytes": 17790,
    "prop": false,
    "anchors": [
     {
@@ -8868,7 +8868,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 4,
-   "bytes": 12358,
+   "bytes": 12145,
    "prop": false,
    "anchors": [
     {

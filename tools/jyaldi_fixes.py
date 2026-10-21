@@ -33,7 +33,11 @@ ERASE = {
     'hug': [(0, 90, 0, 192, 144), (1, 90, 0, 192, 144)],
     'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],
     'down': [(i, 0, 137, 192, 144) for i in range(8)],   # 독립 검수: 누운 장 아래팔이 바닥선 아래로 뚫음
-    'collapse': [(i, 0, 137, 192, 144) for i in range(8)],   # 생성기가 손 앞에 컵을 하나 더 띄워 그림
+    'collapse': [(i, 0, 137, 192, 144) for i in range(8)],
+    # 재검수(16:24) 남은 조각: 10배 격자로 자리 확인
+    'toss': [(5, 70, 82, 80, 92)],
+    'carry1_walk': [(0, 69, 74, 76, 79)] + [(i, 28, 59, 34, 68) for i in range(8)],
+    'hurtidle': [(i, 71, 83, 78, 93) for i in range(4)],   # 생성기가 손 앞에 컵을 하나 더 띄워 그림
 }
 
 OUTLINE = (24, 26, 30, 255)
@@ -43,6 +47,12 @@ DETACHED = {'fire', 'shotgun', 'grabblast', 'super', 'support', 'smoke', 'hug', 
             'idle_light', 'walk_light', 'run_light'}
 # 본체에 붙은 효과: 뼈대 몸 영역 밖의 밝은 회색·캐릭터 색표와 먼 색을 지움(총구 불꽃·광탄·잔상·연기·상자 조각)
 OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
+LIGHT_ERASE = {
+    'toss': [(5, 64, 78, 80, 94)],
+    'carry1_walk': [(0, 68, 76, 82, 92)],
+    'hurtidle': [(i, 64, 80, 78, 96) for i in range(4)],
+    'push': [(1, 76, 108, 88, 137), (1, 28, 52, 44, 82), (2, 28, 52, 44, 82)],
+}
 # 독립 검수(2026-10-21 16시) 회색 조각: 떼어 낸 물건·효과의 찌꺼기
 DEBRIS = set('floorrest hurtidle point nausea door carry1_walk pat gearcheck idle_light sneak seatmouth toss push'.split())
 OUTSIDE_FX |= DEBRIS; DETACHED |= DEBRIS
@@ -262,8 +272,12 @@ def apply(key, fr, pr=None, src=None, idx=None):
             a[al & (nb <= 1)] = 0
             return Image.fromarray(a)
         fr = [nogray(f) for f in fr]
+    for i, x0, y0, x1, y1 in LIGHT_ERASE.get(key, ()):   # 재검수(16:24): 남은 조각은 자리를 정해 밝은 회색만 지움
+        if i < len(fr):
+            a = np.array(fr[i]); b = a[y0:y1, x0:x1]; c = b[:, :, :3].astype(int)
+            b[(c.max(2) > 95) & (c.max(2) - c.min(2) < 40)] = 0; fr[i] = Image.fromarray(a)
     if key in DETACHED:
-        fr = [keep_main(f) for f in fr]
+        fr = [keep_main(f, gap=1 if key == 'carry1_walk' else 2) for f in fr]
     if key in DROP:
         n = len(fr)
         drop = {i % n for i in DROP[key]}
