@@ -340,15 +340,25 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const j = ls.find((l) => l.who === '잼트리') ?? ls[0];
     return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="hq-choice primary" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button class="hq-choice" data-go="supply">정비실 먼저</button><button class="hq-choice" data-act="close">다시 고를게</button>`, kit);
   };
+  // 정산: 본부 장면 위 대화창 (말한 사람 얼굴 + 큰 글씨 결과 몇 줄 + 확인)
+  const settleTalk = () => {
+    const l = s.last!;
+    const back = lines(`return:${l.how}`, ctx());
+    const first = back.find((x) => photoOf(x.who)) ?? back[0];
+    const who = first?.who || '잼트리';
+    const title = l.how === 'evac' ? '후송' : l.how === 'withdraw' ? '철수' : '귀환';
+    const res = `<ul class="hq-result">${l.lines.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    return talkBox(who, `${title}. ${first?.text ?? ''}`, `<div class="hq-choice-row"><button class="hq-choice primary" data-act="close">확인</button>${host?.link ? '<button class="hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ''}</div>`, res);
+  };
   const renderFloat = () => {
     const ov = wrap!.querySelector<HTMLElement>('.hq-over')!;
     const open = !!(overlay || panel);
     ov.hidden = !open;
     if (!open) return void (ov.innerHTML = '');
-    const talk = overlay === 'brief' || (!overlay && panel === 'jaemtri');
+    const talk = overlay === 'brief' || overlay === 'settle' || (!overlay && panel === 'jaemtri');
     ov.classList.toggle('talk', talk);
     if (talk) {
-      ov.innerHTML = (overlay === 'brief' ? briefTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : '');
+      ov.innerHTML = (overlay === 'brief' ? briefTalk() : overlay === 'settle' ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : '');
       return;
     }
     const body = overlay === 'brief' ? briefHtml() : overlay === 'settle' ? settleHtml() : overlay === 'menu' ? menuHtml() : placeHtml(panel!);
