@@ -88,8 +88,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         for (const t of sc.things) if (!t.wall) thing(c, t, camX);
       },
       drawForeground(c: CanvasRenderingContext2D, camX: number, w: WorldView) {
-        if (enterTick < 0) enterTick = w.tick;
-        const age = w.tick - enterTick;
+        // 시계는 실제 시간(틱 단위로 환산): 메뉴·정산 창이 열려 월드가 멈춰도 들어오는 암전은 끝난다
+        const now = performance.now();
+        if (enterTick < 0) enterTick = now;
+        const age = (now - enterTick) / (1000 / 30);
         const px = w.player.x;
         // 가까운 문·자리: 작은 E (자리는 짧은 동사)
         const nd = sc.doors.find((d) => Math.abs(d.x - px) < 60);

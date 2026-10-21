@@ -1,0 +1,31 @@
+{
+  "cut": "opening/c5",
+  "generator": "built-in image_gen",
+  "sources": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c5-1.png"
+  ],
+  "prompts": [
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C5, 1.5-second extreme close-up. The black-haired TOP woman in reference is Jyaldi. Only her two calm RED eyes, bridge of nose, eyebrows, black hair strands and skin in frame. No full face, no mouth, no other characters. Exact same eye shape and gaze throughout all eight panels; no blink. One small pale golden-white sharp glint passes across BOTH crimson irises LEFT to RIGHT in eight successive positions, then fades. Red iris stays red, not yellow or green. Strong shadows frame the face, quiet formidable expression, no smile. Large crisp pixel clusters, 64 color look, dark pixel outlines. Eight repeated close-up frames in the 2x4 contact sheet."
+  ],
+  "layout": "2x4-sheet",
+  "timing": {
+    "ms": [
+      250,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      500
+    ]
+  },
+  "size": [
+    640,
+    360
+  ],
+  "colors": 64,
+  "sampling": "nearest-neighbor only; no dithering",
+  "paletteSha256": "67e67d7da4dd1eaf6a955c9aa026b9fa1ca3dc020471ccc55326cc8783cabc25",
+  "uniqueFrames": 8
+}

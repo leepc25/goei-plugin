@@ -1,0 +1,614 @@
+{
+  "request": "docs/GPT요청_본부배경.md",
+  "date": "2026-10-22",
+  "tool": "built-in image_gen",
+  "pixelLabCalls": 0,
+  "imageGenerationCalls": 5,
+  "order": "Request filenames in reverse order; fetch main before each generation; retain files already present in main.",
+  "listedCount": 59,
+  "requestSummaryCount": 53,
+  "newlyCommitted": 3,
+  "skippedExisting": 56,
+  "assets": [
+    {
+      "name": "hq_pasta_objects",
+      "commit": "d752ee1",
+      "calls": 2,
+      "place": "hq_pasta",
+      "description": "1 long dining table with a checkered cloth, 2 wooden chair, 3 wooden chair (other side), 4 plate of pasta (small, fill the cell), 5 bottle and glasses (small), 6 potted basil, 7 coat rack, 8 menu stand (blank), 9 bread basket.",
+      "setting": "PLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.",
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_objects.png",
+      "type": "objects",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": true,
+      "grid": {
+        "verticalCrossings": 0,
+        "horizontalCrossings": 0,
+        "emptyCells": []
+      },
+      "tool": "built-in image_gen",
+      "prompt": "STYLE (same for every image)\r\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\r\n\n\nOBJECT SHEET RULES\r\nA sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.\r\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\r\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\r\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\r\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\r\n4. Everything else in the original request stays the same.\r\n\n\nPLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.\n\nCreate ONE image: hq_pasta_objects.png\n\n1 long dining table with a checkered cloth, 2 wooden chair, 3 wooden chair (other side), 4 plate of pasta (small, fill the cell), 5 bottle and glasses (small), 6 potted basil, 7 coat rack, 8 menu stand (blank), 9 bread basket.\n\nArrange the nine listed objects in exact numbered order left-to-right, top-to-bottom across the 3x3 grid, without drawing any numbers or grid borders. Chairs 2 and 3 must both face the camera squarely; they may show the seat-facing versus backrest-facing sides, without diagonal rotation. Exact 1536x1024 transparent PNG. Keep every object separate and fully inside its cell. The tablecloth is a simple large checkered pattern; other details are few and bold. No background restaurant scene, no floor or shadows, no humans.",
+      "repair": {
+        "prompt": "Edit the FIRST input (restaurant object sheet) to obey the precise layout of the SECOND input, which is ONLY a placement guide. Keep the same nine objects and their order. Each object must fit COMPLETELY INSIDE its corresponding guide rectangle with all sides separated by transparent gutters. In particular SHRINK the top-left table so it fits entirely in the FIRST THIRD of image width, x30..482; do not let it cross x512. Center the objects at x256,768,1280 in their columns. Three row centers y170,512,853. Each object fills most of its own cell; relative object scale is arbitrary.\nSIMPLIFY the rendering to flat arcade cel illustration: 2-3 large flat tone steps, thick dark outlines 6-8px; eliminate all woodgrain, straw texture, bread crumb speckles, tiny parmesan grains, brush texture and gradients. Pasta is a few thick simple noodle shapes. Keep table checkers large. Every object squarely front-facing, only a THIN strip of top visible, no diagonal rotation. Transparent RGBA background, no background color halos, no ground or cast shadow. Remove ALL guide rectangles, fills and lines. No text, numbers, borders or people.\nExact 1536x1024. Top row: checkered table, wooden chair, second wooden chair. Middle row: pasta plate, bottle plus glasses, basil pot. Bottom row: coat rack, blank menu stand, bread basket.",
+        "packing": "nine complete generated objects cropped without overlaps and fitted to equal 3x3 cells; actual alpha retained"
+      }
+    },
+    {
+      "name": "hq_pasta_floor",
+      "commit": "50c507e",
+      "calls": 1,
+      "place": "hq_pasta",
+      "description": "dark wooden floor boards.",
+      "setting": "PLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.",
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_floor.png",
+      "type": "floor",
+      "size": [
+        1024,
+        1024
+      ],
+      "alpha": false,
+      "grid": null,
+      "tool": "built-in image_gen",
+      "prompt": "STYLE (same for every image)\r\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\r\n\n\nFLOOR RULES\r\nSeamless tileable floor texture seen straight from above (top-down orthographic), 1024x1024. The left edge must continue into the right edge and the top into the bottom with no visible seam. Even lighting, no shadows of objects, no objects, no stains larger than a hand.\r\n\r\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\r\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\r\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\r\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\r\n4. Everything else in the original request stays the same.\r\n\n\nPLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.\n\nCreate ONE image named hq_pasta_floor.png: dark wooden floor boards.\n\nExact 1024x1024 opaque PNG. Flat top-down orthographic seamless wooden floor pattern. Use 6-8 broad parallel dark warm-brown floor boards with a few staggered large joints, identical brightness across all edges, no perspective. 2-3 flat tones, bold dark seams, almost no wood grain (only a few broad simple shapes). No vignette, light hotspots, shadows, objects, outlines around image or text. Board seams continue cleanly across opposite edges for repetition."
+    },
+    {
+      "name": "hq_pasta_wall_2",
+      "commit": "f8e4020",
+      "calls": 1,
+      "place": "hq_pasta",
+      "description": "a wall with a wine bottle shelf and a framed picture of an Italian village.",
+      "setting": "PLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.",
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_wall_2.png",
+      "type": "wall",
+      "size": [
+        1536,
+        1024
+      ],
+      "alpha": false,
+      "grid": null,
+      "tool": "built-in image_gen",
+      "prompt": "STYLE (same for every image)\r\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\r\n\n\nWALL BAY RULES\r\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\r\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\r\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\r\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\r\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\r\n4. Everything else in the original request stays the same.\r\n\n\nPLACE: the inside of a small warm Italian pasta restaurant across the street (wall: cream plaster with dark wood trim; pillars: wooden posts), warm yellow light.\n\nCreate ONE image: hq_pasta_wall_2.png — a wall with a wine bottle shelf and a framed picture of an Italian village.\n\nExact 1536x1024 landscape, opaque. Flat straight-on elevation. Warm cream plaster above a dark wooden wainscot, warm subdued yellow lighting. One simple fixed wine shelf with only 5 large bottles, and one framed simplified landscape picture of an Italian village (large shapes only, no lettering). At most 5-8 dominant grouped elements. Left and right edge are half-width warm dark timber structural posts; matching top beam and a thin baseboard at bottom 4%. No freestanding furniture, no visible floor, no ceiling perspective, no sidewall perspective, no heavy black separators between wall bays. Bold outlines and broad flat colors, no cracks, tiny details or textures. Do not draw objects on the floor. NO writing, people or silhouettes."
+    }
+  ],
+  "concurrentSkip": {
+    "name": "hq_pasta_wall_1",
+    "reason": "Generated after fresh-main absence check, but another task added the same file before push. Rebase skipped our image commit and preserved main commit 886a518.",
+    "uncommittedAlternativePrompt": "STYLE (same for every image)\r\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\r\n\nWALL BAY RULES\r\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\r\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\r\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\r\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\r\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\r\n4. Everything else in the original request stays the same.\r\n\nCreate hq_pasta_wall_1.png. Use the provided restaurant wall as the exact architectural continuity reference: keep the cream plaster, dark wooden wainscot, side timber half-posts, top beam, wall height, baseboard, outline thickness and subdued warm lighting in exactly the same positions. REPLACE the wine shelf and framed picture with ONE large rectangular kitchen pass-through opening in the central wall, with a stainless steel serving counter/sill and warm yellow light from inside the kitchen. Simplify the kitchen inside to a few broad built-in shapes; no people, utensils, pots, dishes or small clutter. Keep the two wall sconces and the same dark timber paneling below. Exact 1536x1024 opaque landscape. Strict front wall elevation, no visible floor, no sidewalls or ceiling plane, no freestanding furniture. Flat cel shading with 2-3 tone steps, bold dark outlines, broad simplified shapes. No text or logos."
+  },
+  "skipped": [
+    "game-src/art/bg/raw/hq_pasta/hq_pasta_wall_1.png",
+    "game-src/art/bg/raw/hq_tooth/hq_tooth_objects.png",
+    "game-src/art/bg/raw/hq_tooth/hq_tooth_wall_2.png",
+    "game-src/art/bg/raw/hq_tooth/hq_tooth_wall_1.png",
+    "game-src/art/bg/raw/hq_lab/hq_lab_objects.png",
+    "game-src/art/bg/raw/hq_lab/hq_lab_wall_2.png",
+    "game-src/art/bg/raw/hq_lab/hq_lab_wall_1.png",
+    "game-src/art/bg/raw/hq_appraisal/hq_appraisal_objects.png",
+    "game-src/art/bg/raw/hq_appraisal/hq_appraisal_wall_2.png",
+    "game-src/art/bg/raw/hq_appraisal/hq_appraisal_wall_1.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_objects.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_floor.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_wall_5.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_wall_4.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_wall_3.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_wall_2.png",
+    "game-src/art/bg/raw/hq_containment/hq_containment_wall_1.png",
+    "game-src/art/bg/raw/hq_training/hq_training_objects.png",
+    "game-src/art/bg/raw/hq_training/hq_training_floor.png",
+    "game-src/art/bg/raw/hq_training/hq_training_wall_4.png",
+    "game-src/art/bg/raw/hq_training/hq_training_wall_3.png",
+    "game-src/art/bg/raw/hq_training/hq_training_wall_2.png",
+    "game-src/art/bg/raw/hq_training/hq_training_wall_1.png",
+    "game-src/art/bg/raw/hq_supply/hq_supply_objects.png",
+    "game-src/art/bg/raw/hq_supply/hq_supply_wall_2.png",
+    "game-src/art/bg/raw/hq_supply/hq_supply_wall_1.png",
+    "game-src/art/bg/raw/hq_chief/hq_chief_objects.png",
+    "game-src/art/bg/raw/hq_chief/hq_chief_wall_2.png",
+    "game-src/art/bg/raw/hq_chief/hq_chief_wall_1.png",
+    "game-src/art/bg/raw/hq_office/hq_office_objects_2.png",
+    "game-src/art/bg/raw/hq_office/hq_office_wall_6.png",
+    "game-src/art/bg/raw/hq_office/hq_office_wall_5.png",
+    "game-src/art/bg/raw/hq_interview/hq_interview_objects.png",
+    "game-src/art/bg/raw/hq_interview/hq_interview_wall_2.png",
+    "game-src/art/bg/raw/hq_interview/hq_interview_wall_1.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_objects.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_floor.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_4.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_3.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_2.png",
+    "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_1.png",
+    "game-src/art/bg/raw/hq_corridor/hq_corridor_floor.png",
+    "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_4.png",
+    "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_3.png",
+    "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_2.png",
+    "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_1.png",
+    "game-src/art/bg/raw/hq_lobby/hq_lobby_objects.png",
+    "game-src/art/bg/raw/hq_lobby/hq_lobby_wall_2.png",
+    "game-src/art/bg/raw/hq_lobby/hq_lobby_wall_1.png",
+    "game-src/art/bg/raw/hq_street/hq_street_objects.png",
+    "game-src/art/bg/raw/hq_street/hq_street_far.png",
+    "game-src/art/bg/raw/hq_street/hq_street_floor.png",
+    "game-src/art/bg/raw/hq_street/hq_street_wall_4.png",
+    "game-src/art/bg/raw/hq_street/hq_street_wall_3.png",
+    "game-src/art/bg/raw/hq_street/hq_street_wall_2.png",
+    "game-src/art/bg/raw/hq_street/hq_street_wall_1.png"
+  ],
+  "verification": [
+    {
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "c6ff038469168c74e8461a9740ac067c2c7328f090291aa5f402c4d863a6a2ed",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "87a29682c62709f08f95825cf70ecaa392eec2dcddd28c02cb76fd110e20bf5f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "f412e2ffb603040337bf8e619e41855b378ec64826416a3986eb04a5d808e0ea",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_pasta/hq_pasta_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "9cbe15c201b9e5da44901dcc3d3597346aaacede85044a176ab7134de98dc923",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_tooth/hq_tooth_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "a5528a971adaf4969ddb98a59f41c3be8191e6fd381427bd21bd9fb2d92989dd",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_tooth/hq_tooth_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "659f18c6d743ff2aca74abe1f320e44ad520e432b4200ed23c47ecc6b610d9b5",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_tooth/hq_tooth_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "039faa7fd0a9b302fbcfa2118b263bb96fa362fd5b0bb9bc4c78af613468236c",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lab/hq_lab_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "7e72d7d1b69af7bac95cfca4ea1b66d993d77938d858ab3ff1c93666b2b94a4f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lab/hq_lab_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "0937aa9f15450024b16ffae443e2029d9b2d6d75a72652a09d57dff8de9aad79",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lab/hq_lab_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "7db7316603ca3033dc90093506af99bfaaed5d9ff2313f3a08f663ad4406a14f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_appraisal/hq_appraisal_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "f6725b2167ee6a4e581d6706d337fb9cfb0696dbafc5d1aaa81cfdc11ec7924a",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_appraisal/hq_appraisal_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "00b1a31de751970ccffbfdcbfe9ad5790dcbd6d5e8b6b89db4aea1e5d146dc21",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_appraisal/hq_appraisal_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "24fbe33273e04750013648c8d57f6a55da3c64796ec9ae0cf0be48f64bc8be21",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "315d5bc8dfb1b5ba337143dc7d613215fb75a06bcdb21d79f45c0b7eb7e31a63",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "0ca82fd23a2168f540fc623e1318bee3af37b0204c6d8e57c9aab3a0acdcfc38",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_wall_5.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "4f214552da89c0ae8ec70ffba1da551881420fc2993298b5fe54a45846d54693",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_wall_4.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "0392f4eeb10d54aaafa6bfebb434b2c34b36c4061ede23d3893c7c375791ed01",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_wall_3.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "77ceea06cdab86913263ee9ba505686248ee54f3a1826a27ac4abe6a69a9464d",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "c844a8cffd561fd34d307fea43f155dcda2743aba74a4a7e97b03e5578512412",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_containment/hq_containment_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "c4a79fd421c56461e4452f90537dd6470746551ba932b7b6b7bbf4bc7b374e34",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "6f62e245644ae83f9c305dde308b234f3dc1631b07f0078859b76a9d1be404ac",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "340ba8ac6a355516641b5a8f0a449e4fdf4e57fe72dbde3c6d07cfb9619693c2",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_wall_4.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "cccaab270d28455c5ad33284a307218bdaf65c740d248ccee4e458c434987b0f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_wall_3.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "9b4168b5261159f2b6b77ae7b1ec60f49804d7281f749111822380452657a872",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "de19105da223636a684960ce50b74cef91ff9d1b02c6d894ddc213ed4e9cade0",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_training/hq_training_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "bb7a8d4b29b31bfcc8f7183f3c5c3f7015ad17fef708310c9809435d143f1762",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_supply/hq_supply_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "b720605d0eb24811cbd66fd279a6db68ea87a1a56da5d62a05a79efe61aa6ae1",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_supply/hq_supply_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "861cce53894a7d17e95aa3e4150abab77a94e7720f00454a774f52439feda663",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_supply/hq_supply_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "1d3f1d9c1850af3e1736ec98132d82cbebf0599638a9177fcf16cef555195085",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_chief/hq_chief_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "ef21f627a4d4cdc2248c3959157f00c5e3cce48ee596a4b3aff210ca16d33086",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_chief/hq_chief_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "52c21ee4bc390913ed2f66ed3371610835783f33c506de26093e108138238254",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_chief/hq_chief_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "2aad38ae2c3c17e8918baf19d6643e33fe4d76c4644d57d7413003a27c25eea4",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_office/hq_office_objects_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "6a0a41a0cb0c343ef1f64095912c249afee7038ae5ee8939a3636ad91556010f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_office/hq_office_wall_6.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "a13dda21254c4531ee93d73a737329457e6d0bd7354bf79bf963c1758b6a1c6e",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_office/hq_office_wall_5.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "c7e4f4d6ac614a37b859907d8c41205fd3921bba51f06a8ff5f0fce745995f79",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_interview/hq_interview_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "05c1535ce85abb3ee3ec67c4e6d31eeadabac1043cae015580f08f3947e42adf",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_interview/hq_interview_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "34db623e32c37e3dcd91a9d8eec47d70f3b3df8a6f6225759f3876ad9e4cd334",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_interview/hq_interview_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "a172769d3a51743e19f9688927764ff0390aabdf2755c203af70164cb3bc4ae7",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "f29172f8b73365b4b5481b6ee22ce48b3b4ed2a40a16a6793cd9af89287936ef",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "8bc1bd337ce78bef828d010f2099076c113bfbd4c5d50ae69f7d06bc9806a635",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_4.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "9eddf278dd042d88a9b9745392cbeb412f39aa0f2bba0715fc61e1c03872769a",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_3.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "86984060bdc8ff8beeb8ee79653a8f33d8cf2b6c56e7a3d8cd3f6e76fa75657f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "78bce3ae7aef0d409d7dca3a75c6b3a0f454f09c137b5163ed1befb23e2049ee",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_clinic/hq_clinic_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "3b48b6d07e6e4add6453ce045e2762a9a01bfc990fe5933782a9098f1bac5fab",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_corridor/hq_corridor_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "50a0d6b0eccee7815b5ac4f1814048e015a53a697c1a82142c3ddc7f4863a80f",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_4.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "071512c70729605eca6d6fe2ac8d04531541cc5b2e0e00e8b42884215f4a3e10",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_3.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "a437c934f7e08c1afd313908e450a167900ed102c98731e7f8e72d4c6b3ae85a",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "5e85b1a40c9b68f11954e17a0978e32c834ba2787f206327af2a974746dddde6",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_corridor/hq_corridor_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "8a4c554edda2c02da7031be94851daf24d87d8ff31f450c8b1c6b6d664731033",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lobby/hq_lobby_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "c525c1a4133a8e732f1d32288134ba223474979dd8b8115d0b226354eb2bc9bb",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lobby/hq_lobby_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "7bbb465b31464a2212926e04f3d1d1835c8e6ec3e988f460357ccaf957c2c847",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_lobby/hq_lobby_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "e4169fba6e08818b95574abaaf56837cf0141544be7fa004611c79d95430cf1b",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_objects.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "da495703641bcda8e6df3b76fb08ec28a3373b9c5479c2dc9d172812e8cfafc9",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_far.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "33842af0c350bf2f41b3b851db559603809611434c6d2f70ebe15a16a3c50fea",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_floor.png",
+      "width": 1024,
+      "height": 1024,
+      "alpha": true,
+      "sha256": "3155ad7bc8277b1b49b839804457e95a63a92233bb9315208c576b5db3c365e7",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_wall_4.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "a6bf6991f4c097faf83a270dba5a3c874a643fdfc5500654821f9c86c683f782",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_wall_3.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "a35b25cec0f3fc5eefa94a99a75cdcb4064f6f93673ad709eef5cd990b3ecd60",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_wall_2.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "488de5127fcd08c60b0ca4063518959da965914a6f70e099a1fb2ef69b150cac",
+      "ok": true
+    },
+    {
+      "path": "game-src/art/bg/raw/hq_street/hq_street_wall_1.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha": false,
+      "sha256": "9fc135859560a7518fc13e4bd3dd9effb5236f10a99ca5e7cca9e2fc4fc9e528",
+      "ok": true
+    }
+  ],
+  "scope": "Raw source art only. Pixel conversion, tile seam matching, extraction and runtime integration remain separate."
+}

@@ -273,8 +273,9 @@ export class Game {
     if (this.mods.hq && this.run) {
       const run = this.run;
       const back = () => {
-        this.showHq();
+        // 정산을 먼저: 본부 지도의 시작 장면(후송이면 의무실)이 정산 결과를 보고 정해진다
         this.mods.hq!.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, run);
+        this.showHq();
       };
       if (this.mods.afterRun) {
         this.scene = this.idleScene('cutscene');
