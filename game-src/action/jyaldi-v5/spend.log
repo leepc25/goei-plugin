@@ -385,3 +385,31 @@ asset_id: 549e6e38-52a3-54ce-9c
   "image_id": "2159f48b-a226-5e5b-8694-50cee0e0ae91",
   "status": "processing",
   "source_image
+03:44:59 sheet7 flux-a create_image_pixflux -> id: 494b190c-b165-4698-aa24-cf65ef1af12f
+job_id: 494b190c-b165-4698-aa24-cf65ef1af12f
+description: Side-view pixel art sprite for a 1990s arcade belt-
+03:45:00 sheet7 flux-b create_image_pixflux -> id: ee77366d-f6a8-43d4-b5d7-37995baaf83d
+job_id: ee77366d-f6a8-43d4-b5d7-37995baaf83d
+description: Side-view pixel art sprite for a 1990s arcade belt-
+03:45:03 sheet7 flux-c create_image_pixflux -> id: 6130b85d-b3c1-4dcb-a8dd-e4bc7b72eeb4
+job_id: 6130b85d-b3c1-4dcb-a8dd-e4bc7b72eeb4
+description: Side-view pixel art sprite for a 1990s arcade belt-
+03:45:04 sheet7 flux-d create_image_pixflux -> id: ff34c212-6ffd-4b71-a04e-3cfa26da0ce5
+job_id: ff34c212-6ffd-4b71-a04e-3cfa26da0ce5
+description: Side-view pixel art sprite for a 1990s arcade belt-
+03:45:04 sheet7 pixen-a create_image_pixen -> id: a17a45e0-a5a3-403e-888b-8841e2bcf021
+job_id: a17a45e0-a5a3-403e-888b-8841e2bcf021
+model: pixen
+description: Side-view pixel art sprite for a 1990s
+03:45:04 sheet7 pixen-b create_image_pixen -> id: 00178017-14af-4b64-bfb5-94a9655907d9
+job_id: 00178017-14af-4b64-bfb5-94a9655907d9
+model: pixen
+description: Side-view pixel art sprite for a 1990s
+03:45:05 sheet7 pixen-c create_image_pixen -> id: 66dc8c98-8277-411e-b013-a3ab17e1fc7e
+job_id: 66dc8c98-8277-411e-b013-a3ab17e1fc7e
+model: pixen
+description: Side-view pixel art sprite for a 1990s
+03:45:05 sheet7 pixen-d create_image_pixen -> id: 562d6351-7e74-424d-a2ae-097083668e0a
+job_id: 562d6351-7e74-424d-a2ae-097083668e0a
+model: pixen
+description: Side-view pixel art sprite for a 1990s
