@@ -1,0 +1,94 @@
+{
+ "chase_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/chase_objects_1": {
+  "w": 90,
+  "h": 126,
+  "foot": [
+   45,
+   126
+  ]
+ },
+ "objects/chase_objects_2": {
+  "w": 68,
+  "h": 36,
+  "foot": [
+   34,
+   36
+  ]
+ },
+ "objects/chase_objects_3": {
+  "w": 62,
+  "h": 57,
+  "foot": [
+   31,
+   57
+  ]
+ },
+ "objects/chase_objects_4": {
+  "w": 59,
+  "h": 84,
+  "foot": [
+   29,
+   84
+  ]
+ },
+ "objects/chase_objects_5": {
+  "w": 70,
+  "h": 42,
+  "foot": [
+   35,
+   42
+  ]
+ },
+ "objects/chase_objects_6": {
+  "w": 145,
+  "h": 60,
+  "foot": [
+   72,
+   60
+  ]
+ },
+ "objects/chase_objects_7": {
+  "w": 43,
+  "h": 30,
+  "foot": [
+   21,
+   30
+  ]
+ },
+ "objects/chase_objects_8": {
+  "w": 29,
+  "h": 15,
+  "foot": [
+   14,
+   15
+  ]
+ },
+ "objects/chase_objects_9": {
+  "w": 56,
+  "h": 57,
+  "foot": [
+   28,
+   57
+  ]
+ },
+ "chase_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "chase_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "chase_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "chase_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

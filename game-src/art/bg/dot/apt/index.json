@@ -1,0 +1,98 @@
+{
+ "apt_far": {
+  "w": 384,
+  "h": 256
+ },
+ "apt_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/apt_objects_1": {
+  "w": 71,
+  "h": 120,
+  "foot": [
+   35,
+   120
+  ]
+ },
+ "objects/apt_objects_2": {
+  "w": 72,
+  "h": 60,
+  "foot": [
+   36,
+   60
+  ]
+ },
+ "objects/apt_objects_3": {
+  "w": 40,
+  "h": 21,
+  "foot": [
+   20,
+   21
+  ]
+ },
+ "objects/apt_objects_4": {
+  "w": 17,
+  "h": 9,
+  "foot": [
+   8,
+   9
+  ]
+ },
+ "objects/apt_objects_5": {
+  "w": 47,
+  "h": 36,
+  "foot": [
+   23,
+   36
+  ]
+ },
+ "objects/apt_objects_6": {
+  "w": 43,
+  "h": 72,
+  "foot": [
+   21,
+   72
+  ]
+ },
+ "objects/apt_objects_7": {
+  "w": 86,
+  "h": 114,
+  "foot": [
+   43,
+   114
+  ]
+ },
+ "objects/apt_objects_8": {
+  "w": 94,
+  "h": 60,
+  "foot": [
+   47,
+   60
+  ]
+ },
+ "objects/apt_objects_9": {
+  "w": 88,
+  "h": 66,
+  "foot": [
+   44,
+   66
+  ]
+ },
+ "apt_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "apt_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "apt_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "apt_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "test_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/test_objects_1": {
+  "w": 45,
+  "h": 60,
+  "foot": [
+   22,
+   60
+  ]
+ },
+ "objects/test_objects_2": {
+  "w": 65,
+  "h": 54,
+  "foot": [
+   32,
+   54
+  ]
+ },
+ "objects/test_objects_3": {
+  "w": 28,
+  "h": 66,
+  "foot": [
+   14,
+   66
+  ]
+ },
+ "objects/test_objects_4": {
+  "w": 16,
+  "h": 6,
+  "foot": [
+   8,
+   6
+  ]
+ },
+ "objects/test_objects_5": {
+  "w": 35,
+  "h": 24,
+  "foot": [
+   17,
+   24
+  ]
+ },
+ "objects/test_objects_6": {
+  "w": 76,
+  "h": 54,
+  "foot": [
+   38,
+   54
+  ]
+ },
+ "objects/test_objects_7": {
+  "w": 25,
+  "h": 36,
+  "foot": [
+   12,
+   36
+  ]
+ },
+ "objects/test_objects_8": {
+  "w": 26,
+  "h": 27,
+  "foot": [
+   13,
+   27
+  ]
+ },
+ "objects/test_objects_9": {
+  "w": 104,
+  "h": 126,
+  "foot": [
+   52,
+   126
+  ]
+ },
+ "test_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "test_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "test_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "test_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}
