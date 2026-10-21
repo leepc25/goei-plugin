@@ -456,6 +456,22 @@ def decorate_boards(places: set[str]) -> None:
         Image.fromarray(px, 'RGBA').save(f, optimize=True)
 
 
+# 무늬 대비가 너무 센 바닥 → 평균색 쪽으로 섞는 비율 (탕비실 바둑판, 검수 5)
+SOFT_FLOOR = {'hq_pantry': 0.55}
+
+
+def soften_floors(places: set[str]) -> None:
+    for pl, k in SOFT_FLOOR.items():
+        f = OUT / pl / f'{pl}_floor.png'
+        if pl not in places or not f.exists():
+            continue
+        px = np.asarray(Image.open(f).convert('RGBA')).copy()
+        rgb = px[:, :, :3].astype(float)
+        mean = rgb.reshape(-1, 3).mean(0)
+        px[:, :, :3] = np.clip(rgb * (1 - k) + mean * k, 0, 255).astype(np.uint8)
+        Image.fromarray(px, 'RGBA').save(f, optimize=True)
+
+
 def fill_doors(places: set[str]) -> None:
     """방금 다시 뽑은 장소의 벽만 채운다 (두 번 채우면 문짝 위에 문짝이 덧그려진다)."""
     for name, holes in DOOR_FILL.items():
@@ -483,6 +499,9 @@ def fill_doors(places: set[str]) -> None:
                 base = np.stack([196 - 60 * t, 170 - 58 * t, 122 - 46 * t], 1)
                 detail = (lum[ys, xs] / 40.0)[:, None]
                 rgb = base * (0.72 + 0.28 * detail)
+                if leaf == 'LIT':
+                    # 계단실: 판처럼 밝게 칠하지 않고 원래 어두운 계단 결을 살려 은은하게 (밝은 반투명 판처럼 보였다, 검수 5)
+                    rgb = a[ys, xs] * 2.4 + np.stack([58 - 24 * t, 44 - 20 * t, 26 - 12 * t], 1)
                 px[ys, xs, :3] = np.clip(rgb, 0, 255).astype(np.uint8)
                 if leaf == 'GLASS':
                     # 불 켜진 로비가 보이는 유리 여닫이문 두 짝: 안쪽 바닥 띠, 천장 등, 가운데·양옆 문틀, 손잡이
@@ -522,6 +541,7 @@ def main(argv: list[str]) -> None:
     if not __import__("os").environ.get("NOFILL"):
         fix_streaks()
         undash({p.name for p in places})
+        soften_floors({p.name for p in places})
         decorate_boards({p.name for p in places})
         fill_doors({p.name for p in places})
 

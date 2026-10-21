@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, drawWallCell, placeFor, seamPillar } from '../art/bg';
+import { drawFloor, drawLedge, floorPattern, drawWallCell, placeFor, seamPillar } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -323,7 +323,7 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       const h = Math.min(t.h, 28);
       const bk = y0 - h,
         fr = y1 - h;
-      const quad = (pts: [number, number][], fill: string | CanvasGradient) => {
+      const quad = (pts: [number, number][], fill: string | CanvasGradient | CanvasPattern) => {
         ctx.fillStyle = fill;
         ctx.beginPath();
         pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
@@ -333,11 +333,20 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       // 안쪽 옆면 (화면 가운데 쪽 면이 보인다)
       const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
       if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], 'rgba(0,0,0,0.35)');
-      // 윗면: 바닥보다 따뜻한 콘크리트 단, 뒤가 밝고 앞이 어두운 결 + 원근 줄눈 + 긁힘 (회색 판처럼 보이지 않게)
+      // 윗면: 이 층 바닥과 같은 무늬를 한 단 높이 깔고 살짝 어둡게 (따로 칠한 베이지 판은 바닥 조각처럼 떠 보였다, 검수 5)
+      const topPts: [number, number][] = [[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]];
+      const fp = floorPattern(ctx, place);
+      if (fp) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        fp.setTransform(new DOMMatrix([2, 0, 0, 1, 0, bk]));
+        quad(topPts, fp);
+        ctx.restore();
+      }
       const top = ctx.createLinearGradient(0, bk, 0, fr);
-      top.addColorStop(0, '#8a8478');
-      top.addColorStop(1, '#5c574f');
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], top);
+      top.addColorStop(0, fp ? 'rgba(10,10,16,0.08)' : '#8a8478');
+      top.addColorStop(1, fp ? 'rgba(10,10,16,0.3)' : '#5c574f');
+      quad(topPts, top);
       ctx.strokeStyle = 'rgba(0,0,0,0.22)';
       ctx.lineWidth = 2;
       for (let x = t.x0 + 48; x < t.x1 - 10; x += 48) {

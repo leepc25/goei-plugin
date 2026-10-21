@@ -534,6 +534,22 @@ function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
  * 지형 덩어리(좁은 길의 튀어나온 바닥·앞 칸막이, 단)를 그 층 바닥 무늬로 칠한다. 회색 상자 대신.
  * 윗면은 바닥 무늬를 밝게, face(px)만큼 아래쪽은 어두운 앞면. 바닥 그림이 없으면 false.
  */
+/** 장소 바닥 무늬 (바닥 그림이 없으면 FLOOR_ALT). 낮은 단 윗면처럼 바닥과 같은 재질로 칠할 때. */
+export function floorPattern(ctx: CanvasRenderingContext2D, place: string): CanvasPattern | null {
+  let p = place.split(':')[0];
+  if (!Object.keys(pack()[p] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[p]) p = FLOOR_ALT[p];
+  const name = Object.keys(pack()[p] ?? {}).find((n) => n.endsWith('_floor'));
+  const im = name ? image(p, name) : null;
+  if (!im) return null;
+  const key = `${p}/${name}`;
+  let pat = patterns.get(key);
+  if (pat === undefined) {
+    pat = ctx.createPattern(im, 'repeat');
+    patterns.set(key, pat);
+  }
+  return pat ?? null;
+}
+
 export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, yTop: number, yBot: number, face = 0): boolean {
   let p = place.split(':')[0];
   if (!Object.keys(pack()[p] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[p]) p = FLOOR_ALT[p];
