@@ -839,12 +839,18 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
+// 게임은 완성 전까지 숨긴다 (2026-10-21 사용자: 완성 안 된 게임은 릴리스 금지). 개발·시험만 window.__goeiGame = true 또는 localStorage 'goei:game' = '1'
+const gameShown = (): boolean => {
+  if ((globalThis as { __goeiGame?: boolean }).__goeiGame === true) return true;
+  try { return localStorage.getItem('goei:game') === '1'; } catch { return false; }
+};
+
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => (ch === ' ' ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`)).join('')}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      <button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>
+      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>

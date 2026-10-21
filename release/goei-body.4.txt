@@ -1,4 +1,6 @@
- border-bottom: 1px solid var(--line); font-size: 20px; color: var(--text); }
+r { content: ""; display: block; clear: both; }
+.nw-p { margin: 0 0 12px; }
+.nw-h { margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 20px; color: var(--text); }
 .nw-h span { color: var(--nw, var(--signal)); }
 h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-infobox { float: right; width: min(100%, 300px); margin: 0 0 12px 16px; border-collapse: collapse; font-size: 14px; border: 1px solid var(--nw); }
@@ -1355,7 +1357,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 /* 관찰형 게임 「관리국 순찰」: 창 전체를 덮는다 (ui/game.ts) */
 .gx-panel { position: relative; }
 .gx-game { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; background: var(--void); }
-.gx-game > .gx-head { flex: none; }
+.gx-game .gx-head { flex: none; }
 .gx-game-box { flex: 1; min-height: 0; display: flex; }
 .gx-gp { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; margin: 0; min-height: 0; }
 .gx-gp-card { display: flex; flex-direction: column; gap: 10px; width: min(420px, 100%); padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
@@ -1403,9 +1405,57 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ps-rows > .ps-note { margin: 0; padding: 12px 14px; }
 
 /* 1인 검증판 / 기존 순찰 선택. 작은 화면에서도 닫기 버튼을 밀어내지 않는다. */
+/* 게임 시작 화면 (ui/game.ts) */
+.gx-gl { flex: 1; min-height: 0; overflow: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); align-content: start; gap: 12px; padding: 16px; margin: 0; }
+.gx-gl-msg { grid-column: 1 / -1; margin: 0; padding: 10px 14px; border-radius: 10px; background: var(--panel2); color: var(--text); }
+.gx-gl-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 16px; margin: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-sizing: border-box; }
+.gx-gl-card > b, .gx-gl-card > summary { font-size: 16px; font-weight: 700; }
+.gx-gl-card > summary { cursor: pointer; }
+details.gx-gl-card:not([open]) { gap: 0; }
+.gx-gl-card p { margin: 0; color: var(--dim); }
+.gx-gl-act { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.gx-gl-act .gx-gp-btn { flex: 1 1 140px; }
+.gx-gl-note { flex: 1 1 100%; color: var(--sub); }
+.gx-gl-cont { min-height: 48px; text-align: left; }
+.gx-gl-slots { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0; margin: 0; }
+.gx-gl-slot, .gx-gl-rep { display: flex; gap: 10px; align-items: center; padding: 10px 12px; margin: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.gx-gl-slot > div:first-child, .gx-gl-rep > div:first-child { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.gx-gl-slot span, .gx-gl-rep span { color: var(--sub); font-size: 13px; }
+.gx-gl-slot small, .gx-gl-rep small { color: var(--dim); font-size: 12px; overflow-wrap: anywhere; }
+.gx-gl-slot.empty span { color: var(--dim); }
+.gx-gl-sact { display: flex; gap: 6px; flex: none; }
+.gx-gl-sact .gx-gp-btn { flex: none; min-height: 38px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; }
+.gx-gl-sact .gx-gp-btn svg { width: 18px; height: 18px; }
+.gx-gl-rep { flex-direction: column; align-items: stretch; }
+.gx-gl-rep .gx-gl-sact { flex-wrap: wrap; }
+.gx-gl-rep .gx-gl-sact .gx-gp-btn:not([aria-label]) { flex: 1 1 auto; }
+.gx-gl-stats p { font-family: var(--mono); font-size: 12px; }
+@media (max-width: 520px) {
+  .gx-gl { grid-template-columns: 1fr; padding: 12px; }
+  .gx-gl-slot:not(.empty) { flex-wrap: wrap; }
+  .gx-gl-slot:not(.empty) .gx-gl-sact { width: 100%; }
+  .gx-gl-slot:not(.empty) .gx-gl-sact .gx-gp-btn:first-child { flex: 1; }
+}
+/* 전체화면: 창 안을 다 덮고, 세로로 든 폰이면 90도 돌려 가로로 (host/game/viewport.ts) */
+.gx-game.gx-full { position: fixed; inset: 0; z-index: 9999; }
+.gx-game.gx-full .gx-head { min-height: 0; padding-top: 4px; padding-bottom: 4px; }
+/* 게임 중: 머리는 자리를 차지하지 않고 오른쪽 위 작은 단추로만 (캔버스가 창을 다 쓰게) */
+.gx-game.gx-playing { background: #000; }
+.gx-game.gx-playing .gx-head { position: absolute; top: 6px; right: 6px; z-index: 50; padding: 0; margin: 0; min-height: 0; border: 0; background: none; box-shadow: none; }
+.gx-game.gx-playing .gx-head::after { display: none; }
+.gx-game.gx-playing .gx-brand { display: none; }
+.gx-game.gx-playing .gx-head-act { gap: 4px; }
+.gx-game.gx-playing .gx-head .gx-x { width: 30px; height: 30px; min-height: 0; padding: 0; border-radius: 8px; opacity: .55; background: rgba(0, 0, 0, .45); border-color: rgba(255, 255, 255, .18); color: #fff; }
+.gx-game.gx-playing .gx-head .gx-x:hover { opacity: 1; }
+.gx-game.gx-playing .gx-head .gx-x svg { width: 16px; height: 16px; }
+.gx-game.gx-playing .gx-game-in { position: relative; }
+/* 돌리기는 안쪽 상자에: 브라우저 전체화면(:fullscreen)은 그 요소의 transform을 지운다 */
+.gx-game-in { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.gx-game.gx-rot > .gx-game-in { position: fixed; top: 0; left: 0; width: 100vh; height: 100vw; transform: translateX(100vw) rotate(90deg); transform-origin: top left; background: var(--void); }
+@supports (height: 100dvh) { .gx-game.gx-rot > .gx-game-in { width: 100dvh; height: 100dvw; transform: translateX(100dvw) rotate(90deg); } }
 .gx-game [data-game-mode] { font: inherit; font-size: 11px; padding: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
 .gx-game [data-game-mode][aria-pressed="true"] { border-color: var(--signal, #c4a776); background: var(--panel2); }
-@media (max-width: 520px) { .gx-game > .gx-head { flex-wrap: wrap; gap: 4px; } }
+@media (max-width: 520px) { .gx-game .gx-head { flex-wrap: wrap; gap: 4px; } }
 
 /* 설정 → 창 바깥 불투명도 막대 */
 .st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
@@ -2173,13 +2223,13 @@ button.mk-go:hover { color: var(--signal); }
     }
     return false;
   }
-  function bindSwipeBack(root2, step3) {
+  function bindSwipeBack(root2, step) {
     if (bound.has(root2)) return;
     bound.add(root2);
     let x0 = 0;
     let y0 = 0;
-    let mode3 = "off";
-    let act2 = null;
+    let mode2 = "off";
+    let act = null;
     let sign = 1;
     let box = null;
     const reset = (animate) => {
@@ -2192,112 +2242,26 @@ button.mk-go:hover { color: var(--signal); }
       box = null;
     };
     root2.addEventListener("touchstart", (e) => {
-      mode3 = "off";
+      mode2 = "off";
       if (e.touches.length !== 1 || !matchMedia("(max-width: 760px)").matches) return;
       const t = e.target;
       if (t.closest(SKIP) || inSideScroller(t, root2)) return;
       x0 = e.touches[0].clientX;
       y0 = e.touches[0].clientY;
-      mode3 = "wait";
+      mode2 = "wait";
     }, { passive: true });
     root2.addEventListener("touchmove", (e) => {
-      if (mode3 === "off") return;
+      if (mode2 === "off") return;
       const dx = e.touches[0].clientX - x0;
       const dy = e.touches[0].clientY - y0;
-      if (mode3 === "wait") {
+      if (mode2 === "wait") {
         if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        act2 = Math.abs(dx) > Math.abs(dy) * 1.4 ? step3(dx > 0 ? -1 : 1) : null;
+        act = Math.abs(dx) > Math.abs(dy) * 1.4 ? step(dx > 0 ? -1 : 1) : null;
         sign = dx > 0 ? 1 : -1;
-        if (!act2) return void (mode3 = "off");
-        mode3 = "back";
+        if (!act) return void (mode2 = "off");
+        mode2 = "back";
         box = root2.querySelector(".gx-content");
       }
       if (box) {
         const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
-        box.style.transform = `translateX(${d * sign}px)`;
-        box.style.opacity = String(1 - d / 400);
-      }
-    }, { passive: true });
-    const end = (e) => {
-      if (mode3 !== "back") return void (mode3 = "off");
-      mode3 = "off";
-      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-      const run3 = dx * sign >= FIRE ? act2 : null;
-      act2 = null;
-      reset(!run3);
-      run3?.();
-    };
-    root2.addEventListener("touchend", end, { passive: true });
-    root2.addEventListener("touchcancel", () => {
-      mode3 = "off";
-      reset(true);
-    }, { passive: true });
-  }
-
-  // src/ui/mapzoom.ts
-  var MAX = 4;
-  var MOVE = 6;
-  var views = /* @__PURE__ */ new Map();
-  function mapZoomControls(nation = false) {
-    return `<div class="gx-zoom" aria-label="지도 확대">
-      <button class="gx-zbtn reset" data-zoom="reset" aria-label="원래 크기"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
-      <button class="gx-zbtn" data-zoom="in" aria-label="확대">+</button>
-      <button class="gx-zbtn" data-zoom="out" aria-label="축소">−</button>
-      ${nation ? '<button class="gx-zbtn txt" data-action="map-region" data-value="01" aria-label="전국 지도">전국</button>' : ""}
-    </div>`;
-  }
-  function clamp(v, cw, ch, lw, lh) {
-    const z = Math.min(MAX, Math.max(1, v.z));
-    const fit = (p, c, l) => l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p));
-    return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
-  }
-  function bindMapZoom(root2) {
-    const canvas = root2.querySelector(".gx-canvas[data-map]");
-    const layer2 = canvas?.querySelector(".gx-mapzoom");
-    if (!canvas || !layer2) return;
-    const key2 = canvas.dataset.map ?? "";
-    let v = views.get(key2) ?? { z: 1, x: 0, y: Number.NaN };
-    const canPan = () => layer2.offsetWidth * v.z > canvas.clientWidth + 1 || layer2.offsetHeight * v.z > canvas.clientHeight + 1;
-    const apply = () => {
-      if (Number.isNaN(v.y)) v = { ...v, y: (canvas.clientHeight - layer2.offsetHeight) / 2 };
-      v = clamp(v, canvas.clientWidth, canvas.clientHeight, layer2.offsetWidth, layer2.offsetHeight);
-      views.set(key2, v);
-      layer2.style.transform = v.z === 1 && !v.x && !v.y ? "" : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
-      layer2.style.setProperty("--pz", String(Math.pow(v.z, 0.25) / v.z));
-      canvas.classList.toggle("zoomed", v.z > 1);
-      canvas.classList.toggle("pan", canPan());
-    };
-    const zoomAt = (z, cx, cy) => {
-      const nz = Math.min(MAX, Math.max(1, z));
-      v = { z: nz, x: cx - (cx - v.x) / v.z * nz, y: cy - (cy - v.y) / v.z * nz };
-      apply();
-    };
-    const local = (px, py) => {
-      const r = canvas.getBoundingClientRect();
-      return [px - r.left - canvas.clientLeft, py - r.top - canvas.clientTop];
-    };
-    const img = canvas.querySelector(".gx-mapimg");
-    if (img && !img.complete) img.addEventListener("load", apply, { once: true });
-    apply();
-    canvas.querySelector(".gx-zoom")?.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-zoom]");
-      if (!b) return;
-      e.stopPropagation();
-      const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
-      if (b.dataset.zoom === "reset") v = { z: 1, x: 0, y: Number.NaN }, apply();
-      else zoomAt(v.z * (b.dataset.zoom === "in" ? 1.6 : 1 / 1.6), w, h);
-    });
-    let dragged = false;
-    canvas.addEventListener("click", (e) => {
-      if (dragged && !e.target.closest(".gx-zoom")) e.stopPropagation(), e.preventDefault();
-      dragged = false;
-    }, true);
-    let start4 = null;
-    const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    canvas.addEventListener("touchstart", (e) => {
-      const t = e.touches;
-      dragged = false;
-      if (e.target.closest(".gx-zoom")) return start4 = null;
-      if (t.length === 2) {
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        start4 = { d: dist(t), mx, my, v: { ...v }, x: t[0].client
+        box.style.tran

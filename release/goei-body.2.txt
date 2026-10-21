@@ -1,4 +1,5 @@
-lse, date });
+  }
+    st.dms.push({ nick, side: "me", body: trimTokens(body4, LIMITS.dm_tokens), unread: false, date });
   }
   function parseJsonPayload(raw) {
     let text = String(raw ?? "").replace(/^﻿/, "").trim();
@@ -33,11 +34,11 @@ lse, date });
       const a = text.indexOf("{");
       const b = text.lastIndexOf("}");
       if (a >= 0 && b > a) {
-        const body5 = text.slice(a, b + 1);
+        const body4 = text.slice(a, b + 1);
         try {
-          return JSON.parse(body5);
+          return JSON.parse(body4);
         } catch {
-          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
+          const fixed = body4.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
           try {
             return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
           } catch {
@@ -131,8 +132,8 @@ lse, date });
     for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
     st.posts = posts;
     trimBoard(st, o.settings);
-    const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
-    return { st, notice: notice2, emptyComments: commentTotal === 0 };
+    const notice3 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
+    return { st, notice: notice3, emptyComments: commentTotal === 0 };
   }
   function acceptComments(rows2, existing, t, nick, base = t.total) {
     const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
@@ -338,7 +339,7 @@ lse, date });
     }
     return [changed, skipped2];
   }
-  function incomingPlan(chat, st, s4, nick, rand2, origin, saved) {
+  function incomingPlan(chat, st, s4, nick, rand, origin, saved) {
     const plan = { allowed: false, userHandle: nick, history: [] };
     for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
     if (!s4.incoming) return plan;
@@ -369,24 +370,24 @@ lse, date });
     }
     const comment = post && ci ? post.comments[ci - 1] : void 0;
     if (!post || ci && (!comment || !comment.mine) || !comment && !post.mine) return plan;
-    if (s4.incomingChance <= 0 || s4.incomingChance < 100 && Math.floor(rand2() * 100) + 1 > s4.incomingChance) return plan;
+    if (s4.incomingChance <= 0 || s4.incomingChance < 100 && Math.floor(rand() * 100) + 1 > s4.incomingChance) return plan;
     return { ...plan, allowed: true, post, comment, commentIndex: ci };
   }
   function incomingTask(plan, activityPosts) {
-    const body5 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
+    const body4 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
     if (plan.allowed && plan.post) {
-      body5.incomingOrigin = {
+      body4.incomingOrigin = {
         title: plan.post.title,
         author: plan.post.nick,
         content: plan.post.body,
         ...plan.comment ? { comment: { author: plan.comment.nick, content: plan.comment.body } } : {}
       };
-      body5.previousIncoming = plan.history;
+      body4.previousIncoming = plan.history;
     }
-    if (activityPosts) body5.activityPosts = activityPosts;
+    if (activityPosts) body4.activityPosts = activityPosts;
     return `
 COMBINED OUTPUT OPTIONS:
-${JSON.stringify(body5)}`;
+${JSON.stringify(body4)}`;
   }
   function commitIncoming(st, rows2, plan, date, postOverride) {
     if (!plan.allowed || !plan.post) return false;
@@ -404,13 +405,13 @@ ${JSON.stringify(body5)}`;
       if (pick3) return;
       if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
       const nick = str(c.nick).trim();
-      const body5 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
+      const body4 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
       if (nick === "__NONE__") return void quiet++;
       if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
       if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
-      if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
-      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
-      pick3 = { nick, body: body5 };
+      if (!body4 || body4 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
+      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body4)) return void quiet++;
+      pick3 = { nick, body: body4 };
     });
     if (!pick3) {
       if (!reasons.length) return false;
@@ -433,9 +434,9 @@ ${JSON.stringify(body5)}`;
     } catch {
       throw new GnetError('Expected {"body":"reply text"}.', raw);
     }
-    const body5 = isObj(value) ? stripForged(str(value.body)).trim() : "";
-    if (!body5) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
-    return trimTokens(body5, LIMITS.dm_tokens);
+    const body4 = isObj(value) ? stripForged(str(value.body)).trim() : "";
+    if (!body4) throw new GnetError('Expected {"body":"reply text"} with a non-empty body.', raw);
+    return trimTokens(body4, LIMITS.dm_tokens);
   }
   function mainContext(st, nick, rules2, focus) {
     const posts = [];
@@ -955,23 +956,23 @@ ${JSON.stringify({ feature: "gnet", records })}
     }
   }
   function applyEvents(st, r, events, time2) {
-    let count = 0;
+    let count2 = 0;
     const before = r.messages.length;
     const waiting = r.kind === "dm" && conversationState(r).ownerHasNotReplied;
     for (const e of events) {
       if (e.type === "message") {
         for (const rec of splitRecords(stripForged(e.text))) {
           push(st, r, e.sender, rec, time2);
-          count++;
+          count2++;
         }
       } else if (e.type === "pause") {
         if (!hiddenPause(e.text)) push(st, r, "system", e.text, time2, "pause");
       } else membership(st, r, "exit", e.participant, time2);
     }
-    r.unread = (r.unread || 0) + count;
+    r.unread = (r.unread || 0) + count2;
     r.silent = r.messages.length === before;
-    if (r.kind === "dm" && count > 0) r.followupSent = !!waiting;
-    return count;
+    if (r.kind === "dm" && count2 > 0) r.followupSent = !!waiting;
+    return count2;
   }
   function readBulletins(chat) {
     const raw = String(chat.scriptstate?.[PH_BULLETINS] ?? "");
@@ -1204,16 +1205,16 @@ ${JSON.stringify({ feature: "phone", records })}
   var CALL_RE = /%%PHONE_CALL:([0-9a-f]*)%%\r?\n([\s\S]*?)\r?\n%%\/PHONE_CALL%%/g;
   var fromHex2 = (h) => new TextDecoder().decode(new Uint8Array((h.match(/../g) ?? []).map((x) => parseInt(x, 16))));
   function callRecord(target, purpose) {
-    const body5 = `{{user}} places a phone call to ${target}.${purpose.trim() ? `
+    const body4 = `{{user}} places a phone call to ${target}.${purpose.trim() ? `
 
 ${purpose.trim()}` : ""}`;
     return `%%PHONE_CALL:${hex2(target)}%%
-${body5}
+${body4}
 %%/PHONE_CALL%%`;
   }
   var hasCall = (t) => typeof t === "string" && t.includes("%%PHONE_CALL:");
   function stripCall(t) {
-    return t.replace(CALL_RE, (_, __, body5) => body5);
+    return t.replace(CALL_RE, (_, __, body4) => body4);
   }
   function renderCalls(t, render2) {
     return t.replace(CALL_RE, (all, h) => {
@@ -1370,20 +1371,20 @@ ${body5}
   var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", gen: "$gen_" };
   var advItems = (f) => ADV[f].flatMap((g) => [...g.chips ?? [], ...g.items]);
   var advItem = (f, key2) => advItems(f).find((i) => i.key === key2);
-  var advVar = (f, item3) => item3.v ?? `${PREFIX[f]}${item3.key}`;
-  function advCheck(item3, raw) {
+  var advVar = (f, item2) => item2.v ?? `${PREFIX[f]}${item2.key}`;
+  function advCheck(item2, raw) {
     if (raw === void 0 || raw === null) return null;
     const s4 = String(raw).trim();
     if (!s4 || s4 === "null") return null;
-    if (item3.type === "bool") return s4 === "1" || s4 === "0" ? s4 : null;
-    if (item3.type === "pick") return item3.opts?.some(([v]) => v === s4) ? s4 : null;
+    if (item2.type === "bool") return s4 === "1" || s4 === "0" ? s4 : null;
+    if (item2.type === "pick") return item2.opts?.some(([v]) => v === s4) ? s4 : null;
     const n = Number(s4);
-    return Number.isInteger(n) && n >= (item3.min ?? 0) && n <= (item3.max ?? Infinity) ? String(n) : null;
+    return Number.isInteger(n) && n >= (item2.min ?? 0) && n <= (item2.max ?? Infinity) ? String(n) : null;
   }
   function advValue(state, f, key2) {
-    const item3 = advItem(f, key2);
-    if (!item3) return "";
-    return advCheck(item3, state?.[advVar(f, item3)]) ?? String(item3.def);
+    const item2 = advItem(f, key2);
+    if (!item2) return "";
+    return advCheck(item2, state?.[advVar(f, item2)]) ?? String(item2.def);
   }
   var advNum = (state, f, key2) => Number(advValue(state, f, key2));
   var advOn = (state, f, key2) => advValue(state, f, key2) === "1";
@@ -1838,8 +1839,8 @@ ${body5}
           continue;
         }
         const yes = head.startsWith("#if") ? truthy(evaluate(head.replace(/^#if(::)?/, ""), env2).trim()) : whenCond(head, env2);
-        const body5 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
-        out += evaluate(body5, env2);
+        const body4 = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
+        out += evaluate(body4, env2);
         i = b.end;
         continue;
       }
@@ -2036,8 +2037,8 @@ ${c}`)]).join("\n\n");
     return Array.isArray(chat.localLore) ? chat.localLore : [];
   }
   function parseDocContent(title2, content) {
-    const body5 = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(content)?.[0];
-    if (!body5) return null;
+    const body4 = /<lightboard-namuwiki[\s>][\s\S]*?<\/lightboard-namuwiki>/.exec(content)?.[0];
+    if (!body4) return null;
     let meta = null;
     const m = /<!--NW_META:([\s\S]*?)-->/.exec(content);
     if (m) {
@@ -2047,7 +2048,7 @@ ${c}`)]).join("\n\n");
         meta = null;
       }
     }
-    return { title: title2, meta, body: body5 };
+    return { title: title2, meta, body: body4 };
   }
   function docsIn(entries2) {
     const out = [];
@@ -2084,8 +2085,8 @@ ${c}`)]).join("\n\n");
     const text = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     const map = JSON.parse(text);
     const docs = [];
-    for (const [title2, body5] of Object.entries(map)) {
-      const doc = typeof body5 === "string" ? parseDocContent(title2, body5) : null;
+    for (const [title2, body4] of Object.entries(map)) {
+      const doc = typeof body4 === "string" ? parseDocContent(title2, body4) : null;
       if (doc) docs.push(doc);
     }
     pack = { src, docs };
@@ -2114,17 +2115,17 @@ ${c}`)]).join("\n\n");
   function findDoc(chat, title2, lore) {
     return listDocs(chat, lore).find((d) => d.title === title2) ?? null;
   }
-  function docContent(meta, body5) {
+  function docContent(meta, body4) {
     const json = JSON.stringify(meta).replace(/--/g, "-\\u002d");
     return `[NW_PRIVATE_BEGIN]
 <!--NW_META:${json}-->
-${body5}
+${body4}
 [NW_PRIVATE_END]`;
   }
-  function saveDoc(chat, meta, body5) {
+  function saveDoc(chat, meta, body4) {
     const lore = localLore(chat).slice();
     const name = WIKI_PREFIX + meta.title;
-    const content = docContent(meta, body5);
+    const content = docContent(meta, body4);
     const i = lore.findIndex((e) => e.comment === name);
     const entry = {
       key: "",
@@ -2209,8 +2210,8 @@ ${req.docRequest.trim()}`;
       primarySources
     };
   }
-  function innerBody(body5) {
-    return body5.replace(/^<lightboard-namuwiki[^>]*>\s*/, "").replace(/\s*<\/lightboard-namuwiki>\s*$/, "");
+  function innerBody(body4) {
+    return body4.replace(/^<lightboard-namuwiki[^>]*>\s*/, "").replace(/\s*<\/lightboard-namuwiki>\s*$/, "");
   }
   var ARROW = /➡️|➡︎|➡/g;
   function acceptArticle(raw, title2, canon2) {
@@ -2221,20 +2222,20 @@ ${req.docRequest.trim()}`;
       if (/<lightboard-namuwiki[\s>]/.test(text)) throw new WikiError("문서가 끝까지 오지 않았어요 (닫는 태그 없음). 응답 길이 한도에 걸렸을 수 있어요. 분량을 줄이거나 다시 시도해 주세요.");
       throw new WikiError("위키 형식(<lightboard-namuwiki>)이 아닌 응답이에요.");
     }
-    let body5 = m[0];
-    if (!body5.includes("[Paragraph]")) throw new WikiError("본문 문단([Paragraph])이 없는 응답이에요.");
-    body5 = body5.replace(ARROW, "➡️").replace(/\{\{/g, "&#123;&#123;").replace(/\}\}/g, "&#125;&#125;");
+    let body4 = m[0];
+    if (!body4.includes("[Paragraph]")) throw new WikiError("본문 문단([Paragraph])이 없는 응답이에요.");
+    body4 = body4.replace(ARROW, "➡️").replace(/\{\{/g, "&#123;&#123;").replace(/\}\}/g, "&#125;&#125;");
     const safeTitle = title2.replace(/"/g, "&quot;");
-    body5 = body5.replace(/^<lightboard-namuwiki([^>]*)>/, (_all, attrs2) => {
+    body4 = body4.replace(/^<lightboard-namuwiki([^>]*)>/, (_all, attrs2) => {
       const rest = attrs2.replace(/\sdoc_title="[^"]*"/, "");
       return `<lightboard-namuwiki doc_title="${safeTitle}"${rest}>`;
     });
-    return reviewLinks(body5, title2, canon2);
+    return reviewLinks(body4, title2, canon2);
   }
-  function reviewLinks(body5, title2, canon2) {
+  function reviewLinks(body4, title2, canon2) {
     const seen2 = /* @__PURE__ */ new Set();
     const self = canon2(title2);
-    return body5.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
+    return body4.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
       const t = label.trim();
       if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label;
       const c = canon2(t);
@@ -2270,8 +2271,8 @@ ${req.docRequest.trim()}`;
     const i = f.indexOf(":");
     return i < 0 ? ["", f.trim()] : [f.slice(0, i).trim(), f.slice(i + 1).trim()];
   }
-  function renderArticle(body5, o) {
-    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+  function renderArticle(body4, o) {
+    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body4)?.[0] ?? "";
     const a = attrs(open3);
     const color = /^#[0-9a-fA-F]{3,8}$/.test(a.main_color ?? "") ? a.main_color : "#27685b";
     const notes = [];
@@ -2283,7 +2284,7 @@ ${req.docRequest.trim()}`;
       notes.push(t);
       return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
     });
-    const lines = innerBody(body5).split("\n");
+    const lines = innerBody(body4).split("\n");
     const blocks = [];
     for (const line2 of lines) {
       const m = /^\s*\[(\w+)\](.*)$/.exec(line2);
@@ -2377,12 +2378,12 @@ ${line2}`;
   var wikiContextOn = (state) => String(state?.[NW_CONTEXT] ?? "") === "1";
   function wikiMainContext(chat, rules2, focus, capOverride) {
     const s4 = chat.scriptstate;
-    const count = advNum(s4, "nw", "ctx_count");
+    const count2 = advNum(s4, "nw", "ctx_count");
     const cap = capOverride ?? advNum(s4, "nw", "ctx_tokens");
     const onlyMentioned = advOn(s4, "nw", "ctx_focus");
     const withLore = advOn(s4, "nw", "ctx_lore");
     const created = advOn(s4, "nw", "ctx_created");
-    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count);
+    const docs = listDocs(chat).filter((d) => (d.meta?.primarySources?.length ?? 0) > 0 ? withLore : created).filter((d) => !onlyMentioned || related(focus, [d.title]) || !!focus?.terms.includes(d.title)).map((d, i) => ({ d, at: Number(d.meta?.created) || 0, i })).sort((a, b) => b.at - a.at || b.i - a.i).slice(0, count2);
     const kept = [];
     const payload = () => `[MODULE_CONTEXT_BEGIN]
 ${rules2}
@@ -2397,8 +2398,8 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
   function wikiContextRules(lore) {
     return policySections(lore, "Wiki").MAIN_CONTEXT?.trim() || null;
   }
-  function docSummary(body5, max = 150) {
-    const para = /^\[Paragraph\](.+)$/m.exec(body5)?.[1] ?? "";
+  function docSummary(body4, max = 150) {
+    const para = /^\[Paragraph\](.+)$/m.exec(body4)?.[1] ?? "";
     const text = para.replace(/📌[^📌]*?📌/gu, "").replace(/✂️[^✂]*?✂️/g, "").replace(/➡️([^➡]+?)➡️/g, "$1").replace(/❗([^❗]+?)❗/g, "$1").replace(/\*\*([^*]+?)\*\*/g, "$1").replace(/\s+/g, " ").trim();
     if ([...text].length <= max) return text;
     const cut2 = [...text].slice(0, max).join("");
@@ -2885,7 +2886,7 @@ ${commentTimeRule(dateNow(src.chat))}`;
     return { ...pack2(src, b, guideline, `${b.read("PUBLIC.POST_FORMAT")}
 ${commentTimeRule(dateNow(src.chat))}`, extras, factionNames2), activity };
   }
-  function commentPrompt(src, st, postId2, replyTo, body5, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body5}`) {
+  function commentPrompt(src, st, postId2, replyTo, body4, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body4}`) {
     const b = gnetBooks(src);
     const p = findPost(st, postId2);
     if (!p) throw new GnetError("대상 글이 없어졌어요.");
@@ -3185,15 +3186,15 @@ ${next.content.trim()}`;
     if (en2) {
       const words = key2.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
       if (!words.length || words.every((w) => EN_STOP.has(w))) return null;
-      const body6 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
-      return new RegExp(`(?<![a-z0-9])${body6}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
+      const body5 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
+      return new RegExp(`(?<![a-z0-9])${body5}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
     }
     const parts = key2.split(/\s+/).filter(Boolean);
     if (!parts.length) return null;
     const gap = !person && syllables(key2) >= 3 ? "\\s*" : "";
     const word = (p) => [...p].map(escRe).join(gap);
-    const body5 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
-    return new RegExp(`(?<![\\p{L}\\p{N}])${body5}`, "giu");
+    const body4 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
+    return new RegExp(`(?<![\\p{L}\\p{N}])${body4}`, "giu");
   }
   function keysOf2(e) {
     const all = str2(e.key).split(",");
@@ -3221,7 +3222,7 @@ ${next.content.trim()}`;
     return kinds;
   }
   var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
-  function syncDecorators(lore, mode3) {
+  function syncDecorators(lore, mode2) {
     const books = lore ?? [];
     if (!hasSlots(books)) return null;
     const kinds = folderKeys(books);
@@ -3230,12 +3231,12 @@ ${next.content.trim()}`;
       if (!managedHere(e, kinds)) return e;
       const content = str2(e.content);
       const on2 = hasDontActivate(content);
-      if (mode3 === "plugin" && !on2) {
+      if (mode2 === "plugin" && !on2) {
         n++;
         return { ...e, content: `${DONT_ACTIVATE}
 ${content}` };
       }
-      if (mode3 === "risu" && on2) {
+      if (mode2 === "risu" && on2) {
         n++;
         return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
       }
@@ -3255,7 +3256,7 @@ ${content}` };
     const groups = /* @__PURE__ */ new Map();
     for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
     const out = [];
-    books.forEach((e, index) => {
+    books.forEach((e, index2) => {
       const kind = kinds.get(str2(e.folder));
       const content = str2(e.content);
       if (!kind || !managedHere(e, kinds)) return;
@@ -3269,13 +3270,13 @@ ${content}` };
         const alias = kind === "agent" && !en2 && syllables(text) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text));
         keys.push({ text, en: en2, rule: CONFIRM_KEYS.has(text) ? "confirm" : alias ? "alias" : "plain", re });
       }
-      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
+      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index: index2, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
     });
     cache4.set(books, out);
     return out;
   }
-  function around(text, start4, end) {
-    let a = start4;
+  function around(text, start3, end) {
+    let a = start3;
     for (let n = 0; a > 0 && n < 2; ) if (/\s/.test(text[--a])) n++;
     let b = end;
     for (let n = 0; b < text.length && n < 2; b++) if (/\s/.test(text[b])) n++;
@@ -3300,15 +3301,15 @@ ${content}` };
       for (const key2 of e.keys) {
         key2.re.lastIndex = 0;
         for (const m of lower.matchAll(key2.re)) {
-          const start4 = m.index ?? 0;
-          const end = start4 + m[0].length;
-          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start4 - 16), start4)) } : rightOk(lower, end);
+          const start3 = m.index ?? 0;
+          const end = start3 + m[0].length;
+          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start3 - 16), start3)) } : rightOk(lower, end);
           if (!r.ok) continue;
           const tail = lower.slice(end).replace(/^\s+/, "");
-          const quoted = OPEN.includes(lower[start4 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
-          const before = lower.slice(Math.max(0, start4 - 20), start4).trimEnd();
+          const quoted = OPEN.includes(lower[start3 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
+          const before = lower.slice(Math.max(0, start3 - 20), start3).trimEnd();
           const marked = quoted || MARKERS2.some((w) => tail.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
-          hits.push({ entry: ei, key: key2, start: start4, end, marked, honor: r.honor, snippet: around(text, start4, end) });
+          hits.push({ entry: ei, key: key2, start: start3, end, marked, honor: r.honor, snippet: around(text, start3, end) });
         }
       }
     });
@@ -3412,14 +3413,14 @@ ${content}` };
     return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
   }
   var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
-  function loreOptions(char, chat, mode3, user = "") {
+  function loreOptions(char, chat, mode2, user = "") {
     const ls = char.loreSettings ?? {};
     const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
     const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
     const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
     const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n, e) => n + tokens(str2(e.content)), 0);
     return {
-      mode: mode3,
+      mode: mode2,
       depth,
       budget: total ? Math.max(1, Math.floor((total - always) * 0.9)) : 0,
       env: { vars: chat.scriptstate ?? {}, char: char.name, ...user ? { user } : {} }
@@ -3490,7 +3491,7 @@ ${after}`);
   var PLAYER_HEAD = "## Player Character";
   function playerBlock(lore, agent, env2) {
     const entry = (lore ?? []).find((e) => e.mode !== "folder" && String(e.comment ?? "") === agent.lore);
-    const body5 = entry ? stripDecorators(evaluate(String(entry.content ?? ""), env2)).trim() : "";
+    const body4 = entry ? stripDecorators(evaluate(String(entry.content ?? ""), env2)).trim() : "";
     const who = agent.english ? `${agent.name} (${agent.english})` : agent.name;
     return [
       PLAYER_HEAD,
@@ -3498,7 +3499,7 @@ ${after}`);
       "- Never write this character's dialogue, actions, thoughts or decisions. Narrate only the world and other characters' reactions.",
       "- This character already knows their own background, abilities, relationships and secrets, including anything the lore marks as hidden. Colleagues, superiors and acquaintances already know them and treat them according to the lore below.",
       "- Other characters address and refer to this character by this name.",
-      body5
+      body4
     ].filter(Boolean).join("\n");
   }
   function playerSource(src) {
@@ -3549,38 +3550,38 @@ ${after}`);
   function mainContextRules2(src) {
     return policySections(src.char.globalLore, "Phone").MAIN_CONTEXT?.trim() || null;
   }
-  function rules(src, body5, mode3) {
+  function rules(src, body4, mode2) {
     const p = sections(src);
     const keys = ["COMMON"];
     let direct = false;
     let group4 = false;
-    for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
+    for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
       if (r.receiveMessages === false) continue;
       if (r.kind === "group") group4 = true;
       else direct = true;
     }
-    if (body5.invitationCheck?.allowed) group4 = true;
-    const manual = body5.participants.some((x) => x.manuallySavedContact);
+    if (body4.invitationCheck?.allowed) group4 = true;
+    const manual = body4.participants.some((x) => x.manuallySavedContact);
     if (direct || group4) {
       keys.push("CONVERSATION");
       if (direct) keys.push("DIRECT_ROOMS");
       if (group4) keys.push("GROUP_ROOMS");
-      if (body5.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
-      if (body5.crossRoomMessages?.length || (body5.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
-      if (hasAttachment(JSON.stringify(body5))) keys.push("ATTACHMENT_READ");
+      if (body4.publicBoard?.posts?.length) keys.push("PUBLIC_BOARD");
+      if (body4.crossRoomMessages?.length || (body4.rooms?.length ?? 0) > 1) keys.push("CROSS_ROOM");
+      if (hasAttachment(JSON.stringify(body4))) keys.push("ATTACHMENT_READ");
       keys.push("ATTACHMENT_OUTPUT", "PATCH");
     }
-    keys.push(mode3);
-    if (mode3 === "REPLY") {
-      const action = body5.room?.action?.type ?? "refresh";
+    keys.push(mode2);
+    if (mode2 === "REPLY") {
+      const action = body4.room?.action?.type ?? "refresh";
       const map = { send: "ACTION_SEND", invite_initial: "ACTION_INVITE_INITIAL", invite_more: "ACTION_INVITE_MORE", refresh: "ACTION_REFRESH" };
       keys.push(map[action] ?? "ACTION_REFRESH");
     } else {
-      if (body5.invitationCheck?.allowed) keys.push("GROUP_INVITES");
-      if (body5.announcementCheck?.allowed) keys.push("ANNOUNCEMENTS");
+      if (body4.invitationCheck?.allowed) keys.push("GROUP_INVITES");
+      if (body4.announcementCheck?.allowed) keys.push("ANNOUNCEMENTS");
     }
     if (manual) keys.push("MANUAL_CONTACT", "CONTACT_CONTEXT", "SINGLE_PASS_CONTACT");
-    keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode3}`);
+    keys.push(`OUTPUT_${manual ? "CONTACT_" : ""}${mode2}`);
     return [...keys.map((k) => section(p, k)), genSettings(src.chat.scriptstate).language ?? LANGUAGE2].join("\n\n");
   }
   function roomPacket(r) {
@@ -3685,10 +3686,10 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       universe
     };
   }
-  function crossRoom(body5, st) {
-    const wanted = new Set(body5.participants.map((p) => p.sender));
+  function crossRoom(body4, st) {
+    const wanted = new Set(body4.participants.map((p) => p.sender));
     if (!wanted.size) return;
-    const covered = new Set((body5.rooms ?? (body5.room ? [body5.room] : [])).map((r) => r.id));
+    const covered = new Set((body4.rooms ?? (body4.room ? [body4.room] : [])).map((r) => r.id));
     const counts = /* @__PURE__ */ new Map();
     const candidates = [];
     for (const [rid, r] of Object.entries(st.rooms)) {
@@ -3726,45 +3727,45 @@ ${recentStory.map((m) => m.text).join("\n")}`,
         });
       }
     }
-    if (records.length) body5.crossRoomMessages = records.reverse();
+    if (records.length) body4.crossRoomMessages = records.reverse();
   }
-  function contactSources(body5) {
+  function contactSources(body4) {
     const out = [];
     const add = (kind, text, sender) => {
       const t = String(text ?? "").trim();
       if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...sender ? { sender } : {} });
     };
-    const u = body5.narratorOnly.universe;
+    const u = body4.narratorOnly.universe;
     add("world", u.characterDescription);
     add("author_note", u.authorsNote);
     for (const b of u.activeLoreBooks) add("world", b.content);
-    for (const m of body5.narratorOnly.recentStory) add(m.role === "user" ? "story_input" : "story", m.text);
-    for (const p of body5.participants) {
+    for (const m of body4.narratorOnly.recentStory) add(m.role === "user" ? "story_input" : "story", m.text);
+    for (const p of body4.participants) {
       add("character", p.lore, p.sender);
       add("contact_memo", p.contactMemo, p.sender);
       if (p.narratorOnlyAgentStatus) add("status", JSON.stringify(p.narratorOnlyAgentStatus), p.sender);
     }
-    for (const r of body5.rooms ?? (body5.room ? [body5.room] : [])) {
+    for (const r of body4.rooms ?? (body4.room ? [body4.room] : [])) {
       for (const c of r.activeMembers) add("private_direction", r.privateDirection, c);
       for (const m of r.messages) if (m.type === "text") {
         for (const c of m.audience ?? []) if (c !== m.sender) add("received_message", m.content, c);
       }
     }
-    for (const m of body5.crossRoomMessages ?? []) for (const c of m.knownBy) if (c !== m.sender) add("received_message", m.content, c);
-    for (const post of body5.publicBoard?.posts ?? []) add("public_board", JSON.stringify(post));
+    for (const m of body4.crossRoomMessages ?? []) for (const c of m.knownBy) if (c !== m.sender) add("received_message", m.content, c);
+    for (const post of body4.publicBoard?.posts ?? []) add("public_board", JSON.stringify(post));
     return out;
   }
-  function finish(src, body5, mode3, names4) {
-    const contactMode = body5.participants.some((p) => p.manuallySavedContact);
+  function finish(src, body4, mode2, names4) {
+    const contactMode = body4.participants.some((p) => p.manuallySavedContact);
     if (contactMode) {
-      body5.recipientEvidenceSources = contactSources(body5);
-      body5.singlePassContact = true;
+      body4.recipientEvidenceSources = contactSources(body4);
+      body4.singlePassContact = true;
     }
-    const system = rules(src, body5, mode3);
+    const system = rules(src, body4, mode2);
     return {
       messages: [
         { role: "system", content: factionCodesToNames(system, names4) },
-        { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
+        { role: "user", content: factionCodesToNames(JSON.stringify(body4), names4) }
       ],
       contactMode
     };
@@ -3780,10 +3781,10 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const set2 = phoneSettings(src.chat.scriptstate);
     const packet = roomPacket(r);
     const participants = r.members.map((cid) => participant(src, dir2.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set2.related, set2.status, names4));
-    const body5 = { room: packet, participants, narratorOnly: narrator(src, names4, set2.related, JSON.stringify(packet)) };
-    crossRoom(body5, st);
-    body5.publicBoard = gnetBoard(src, JSON.stringify(packet));
-    return finish(src, body5, "REPLY", names4);
+    const body4 = { room: packet, participants, narratorOnly: narrator(src, names4, set2.related, JSON.stringify(packet)) };
+    crossRoom(body4, st);
+    body4.publicBoard = gnetBoard(src, JSON.stringify(packet));
+    return finish(src, body4, "REPLY", names4);
   }
   function refreshPrompt2(src, st, dir2, names4, rng) {
     const chat = src.chat;
@@ -3818,7 +3819,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       return { prompt: null, selected, receive, announce, invite: emptyInvite, reason: why };
     }
     const rooms = [];
-    const memo = /* @__PURE__ */ new Map();
+    const memo2 = /* @__PURE__ */ new Map();
     for (const r of candidates) {
       const packet = roomPacket(r);
       packet.action = { type: "refresh" };
@@ -3827,14 +3828,14 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       selected.set(r.id, r);
       receive.set(r.id, packet.receiveMessages);
       for (const cid of r.members) {
-        if (!memo.has(cid)) memo.set(cid, participant(src, dir2.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set2.related, set2.status, names4));
+        if (!memo2.has(cid)) memo2.set(cid, participant(src, dir2.map.get(cid) ?? r.people[cid] ?? { id: cid, name: cid }, set2.related, set2.status, names4));
       }
     }
-    const participants = [...memo.values()];
+    const participants = [...memo2.values()];
     const { channel: _channel, ...publicAnnounce } = announce;
     void _channel;
     const invite = invitationPacket(st, participants.map((p) => p.sender), inviteOn);
-    const body5 = {
+    const body4 = {
       rooms,
       participants,
       narratorOnly: narrator(src, names4, set2.related, JSON.stringify(rooms)),
@@ -3842,9 +3843,9 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       activityCheck: { incoming: incomingOn, groupInvites: inviteOn },
       invitationCheck: invite
     };
-    crossRoom(body5, st);
-    body5.publicBoard = gnetBoard(src, JSON.stringify(rooms));
-    return { prompt: finish(src, body5, "REFRESH", names4), selected, receive, announce, invite, reason: "" };
+    crossRoom(body4, st);
+    body4.publicBoard = gnetBoard(src, JSON.stringify(rooms));
+    return { prompt: finish(src, body4, "REFRESH", names4), selected, receive, announce, invite, reason: "" };
   }
   function personOfContact(c) {
     const p = { id: c.id, name: c.name };
@@ -4065,13 +4066,13 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
   function attachBody(text, board2 = false) {
     const out = [];
-    const files = [];
+    const files2 = [];
     for (const p of bodyParts(text)) {
       if (p.kind === "text") out.push(`<p>${esc3(p.text.trim()).replace(/\n/g, "<br>")}</p>`);
-      else if (board2 && (p.kind === "file" || p.kind === "link")) files.push(card(p.kind, p.text));
+      else if (board2 && (p.kind === "file" || p.kind === "link")) files2.push(card(p.kind, p.text));
       else out.push(card(p.kind, p.text, p.asset));
     }
-    if (files.length) out.push(`<div class="at-files">${files.join("")}</div>`);
+    if (files2.length) out.push(`<div class="at-files">${files2.join("")}</div>`);
     return out.join("");
   }
 
@@ -4238,12 +4239,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       im.src = url;
       await im.decode();
       const W = im.naturalWidth;
-      const H2 = im.naturalHeight;
-      let [sx, sy, sw, sh] = [0, 0, W, H2];
+      const H = im.naturalHeight;
+      let [sx, sy, sw, sh] = [0, 0, W, H];
       if (crop) {
-        const side = Math.min(W, H2, crop[2] / 100 * W);
+        const side = Math.min(W, H, crop[2] / 100 * W);
         sx = Math.min(W - side, Math.max(0, crop[0] / 100 * W - side / 2));
-        sy = Math.min(H2 - side, Math.max(0, crop[1] / 100 * H2 - side / 2));
+        sy = Math.min(H - side, Math.max(0, crop[1] / 100 * H - side / 2));
         sw = sh = side;
       }
       const scale = Math.min(1, (crop ? FACE_SIDE : MAX_SIDE) / Math.max(sw, sh));
@@ -4300,9 +4301,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var stLabel = (st) => st === "작전투입" ? "작전" : st;
   var AGENT_COLOR = { 작전투입: "var(--signal)", 외근: "var(--blue)", 부상: "var(--amber)", 실종: "var(--danger)", 격리: "var(--danger)", 사망: "var(--danger)", 비번: "var(--dim)" };
   var stChip = (st) => `<em class="gx-st" style="--st:${AGENT_COLOR[st] ?? "var(--dim)"}">${escAttr(stLabel(st))}</em>`;
-  function agentInner(char, p, st, situation = "", act2 = "") {
+  function agentInner(char, p, st, situation = "", act = "") {
     const role = [p.department, p.rank].filter(Boolean).join(" · ");
-    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act2}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
+    return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
   }
   function showIdCard(html) {
     const box = document.createElement("div");
@@ -4469,9 +4470,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       if (onSide && open && box.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
       if (dy < -24 && !open) set(box, true);
       else if (dy > 24 && open) set(box, false);
-    }, { passive: true });
-  }
-
-  // src/host/llm.ts
-  var LlmError = class extends Error {
-    constructor(message, ra
+    }, { pa

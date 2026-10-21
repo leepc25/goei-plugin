@@ -1674,7 +1674,8 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
+  // 릴리스 가벼운 카드는 62, 원본 카드로 만든 시험 자료는 70
+  assert.ok(/괴이\s*(?:62|70)/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
@@ -2157,12 +2158,23 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
+// 게임 버튼은 릴리스에서 숨김 (완성 전). 시험은 개발 표시(window.__goeiGame)를 켜고 창을 다시 열어 버튼을 그린다
+async function showGame(p) {
+  if (await p.locator('[data-action="game-open"]').count()) return;
+  await p.evaluate(() => { window.__goeiGame = true; });
+  if (await p.locator('[data-action="close"]').count()) await p.click('[data-action="close"] >> nth=0');
+  await p.click('[x-goei-fab] button');
+}
+
 // 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
 // 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다. 이전 시험판(순찰)도 그대로 열린다.
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
+  // 게임 버튼은 완성 전까지 숨김: 기본은 없고, 개발 표시를 켜야 보인다
   await page.click('[x-goei-fab] button');
+  assert.equal(await page.locator('[data-action="game-open"]').count(), 0, '게임 버튼은 기본으로 숨김');
+  await showGame(page);
   await page.click('[data-action="game-open"] >> nth=0');
   await page.waitForSelector('.gx-gl [data-g="get"]');
   assert.equal(await page.locator('.gx-gl-cont:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
@@ -2228,6 +2240,7 @@ if (fixture.globalLore.some(packed)) {
   await page.evaluate(() => (window.__calls.fetch = []));
   await page.click('[data-action="game-close"]');
   assert.equal(await page.locator('.gx-game').count(), 0);
+  await showGame(page);
   await page.click('[data-action="game-open"] >> nth=0');
   await page.waitForSelector('.gx-gl-cont');
   await page.click('.gx-gl-cont');
@@ -2279,6 +2292,7 @@ if (fixture.globalLore.some(packed)) {
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   const base = await heapMB();
   const t0 = Date.now();
+  await showGame(page);
   await page.click('[data-action="game-open"] >> nth=0');
   await page.waitForSelector('[data-g="get"]');
   const homeMs = Date.now() - t0;
@@ -2297,6 +2311,7 @@ if (fixture.globalLore.some(packed)) {
     await page.click('[data-action="game-close"]');
     await page.waitForTimeout(100);
     cycles.push(await heapMB());
+    await showGame(page);
     await page.click('[data-action="game-open"] >> nth=0');
     await page.waitForSelector('.gx-gl-cont');
     await page.click('.gx-gl-cont');
@@ -2314,6 +2329,7 @@ if (fixture.globalLore.some(packed)) {
   await cdp2.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await startedWithReply(page2);
   await page2.click('[x-goei-fab] button');
+  await showGame(page2);
   await page2.click('[data-action="game-open"] >> nth=0');
   await page2.waitForSelector('.gx-gl-cont:not([disabled])');
   const t3 = Date.now();
