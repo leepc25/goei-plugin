@@ -65,3 +65,14 @@ IMAGES
 Correction: stop and restart from image 1 with the updated list below. The earlier images all looked the same (night, rain, blue-grey, one red light), so discard them. New rules: follow only the drawing technique of the reference images, not their colors or lighting. Each image now has its own TIME, LIGHT and WRONG THING; follow them exactly. Red light is allowed only in images 2, 14 and 26. Many images are daytime, dawn or dusk, and many are dry. The horror is one quietly impossible detail in an ordinary scene, no monsters. Same file names and save path as before.
 ```
 (정정문 뒤에 위 「요청문」 전체를 이어 붙인다.)
+
+## 받은 뒤 검수 (2026-10-22, Claude)
+
+32장 받음 (GPT 커밋 4b904ee). 장소·시간·색은 요청대로 다양하고 글자·사람 없음, 빨간 불은 2·14·26번만. 600×600 AVIF로 바꿔 `assets/wiki/Situations/` 에 넣음.
+이상한 점이 빠진 2장은 다시 요청한다. 저장 경로·파일 이름은 같음 (덮어쓰기).
+
+```
+Redo 2 images with the same style rules as before (same file names and save path, overwrite the old files). The earlier versions missed the WRONG THING; it must be clearly visible at a small size.
+6. Situation Anomaly Restaurant 2 — Small Korean restaurant interior, low tables with floor cushions and a few wooden chairs. TIME/LIGHT: morning, flat pale daylight, beige and wood tones. WRONG THING: every chair and every floor cushion is turned to face the bare wall, neatly, as if an audience is watching the wall. Make this obvious.
+7. Situation Anomaly Church 1 — Small hillside church. TIME/LIGHT: overcast winter noon, light snow, nearly black-and-white. WRONG THING: the cross on the roof is clearly upside down, and the church roof and steps have no snow at all while everything around is covered in snow. Make both obvious.
+```
