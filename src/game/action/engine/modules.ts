@@ -293,6 +293,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
+      // 컷신 프레임은 아직 게임 묶음에 없다: 저장소 주소를 추정해 받으려다 콘솔 오류가 나지 않게 비워 둔다 (프레임 팩이 생기면 그 주소)
+      videoUrl: () => undefined,
       paused: () => shell.paused,
     },
     { saved: savedFlags },
