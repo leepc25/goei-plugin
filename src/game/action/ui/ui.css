@@ -99,6 +99,9 @@
 .mn-title .mn-list { gap: 2px; overflow: visible; }
 .mn-title .mn-row { background: none; min-height: 52px; justify-content: center; font-size: 33px; color: #a89c84; text-shadow: 0 3px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 -2px 0 #000; }
 .mn-title .gk-btn.f, .mn-title .gk-btn:hover { border-image: none; }
+/* 메뉴는 초점(.f) 하나만 강조: 마우스는 pointermove 가 초점을 옮기므로 :hover·:focus 강조는 끈다 */
+.mn .gk-btn:not(.f):hover, .mn .gk-btn:not(.f):focus-visible { border-image: none; color: #b8ae96; }
+.mn-title .gk-btn:not(.f):hover { color: #a89c84; }
 .mn-title .mn-row span { position: relative; }
 .mn-title .mn-row.f { color: #ffe27a; animation: mn-blink 0.9s steps(1) infinite; }
 .mn-title .mn-row.f span::before { content: '▶'; position: absolute; right: calc(100% + 14px); color: #ff5a3a; font-size: 22px; top: 50%; transform: translateY(-50%); }

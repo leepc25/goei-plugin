@@ -1756,6 +1756,9 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .mn-title .mn-list { gap: 2px; overflow: visible; }
 .mn-title .mn-row { background: none; min-height: 52px; justify-content: center; font-size: 33px; color: #a89c84; text-shadow: 0 3px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 -2px 0 #000; }
 .mn-title .gk-btn.f, .mn-title .gk-btn:hover { border-image: none; }
+/* 메뉴는 초점(.f) 하나만 강조: 마우스는 pointermove 가 초점을 옮기므로 :hover·:focus 강조는 끈다 */
+.mn .gk-btn:not(.f):hover, .mn .gk-btn:not(.f):focus-visible { border-image: none; color: #b8ae96; }
+.mn-title .gk-btn:not(.f):hover { color: #a89c84; }
 .mn-title .mn-row span { position: relative; }
 .mn-title .mn-row.f { color: #ffe27a; animation: mn-blink 0.9s steps(1) infinite; }
 .mn-title .mn-row.f span::before { content: '▶'; position: absolute; right: calc(100% + 14px); color: #ff5a3a; font-size: 22px; top: 50%; transform: translateY(-50%); }
@@ -2310,7 +2313,7 @@ function statusHtml(s) {
   const m = s.money;
   const fav = s.favor > 0 ? `+${s.favor}` : String(s.favor);
   const rows = [
-    s.floor.depth || s.floor.name ? `<tr><th>층</th><td>${esc2([s.floor.depth, s.floor.name].filter(Boolean).join(" · "))}${s.floor.variant ? ` · ${esc2(s.floor.variant)}` : ""}</td></tr>` : "",
+    s.floor.depth || s.floor.name ? `<tr><th>층</th><td>${esc2((s.floor.depth && !s.floor.name.startsWith(s.floor.depth) ? [s.floor.depth, s.floor.name] : [s.floor.name || s.floor.depth]).filter(Boolean).join(" · "))}${s.floor.variant ? ` · ${esc2(s.floor.variant)}` : ""}</td></tr>` : "",
     `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget} · 연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
     `<tr><th>승강기 총애</th><td>${fav}</td></tr>`,
     s.ruleCount ? `<tr><th>규칙서</th><td>찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}</td></tr>` : "",
