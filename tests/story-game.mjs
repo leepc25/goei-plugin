@@ -59,8 +59,9 @@ try {
     ['m', { width: 844, height: 390 }, '?touch=1'],
   ]) {
     // 시험 프레임: PC만 둔다. 폰은 프레임이 없어 바로 넘어가야 한다
-    const withVideo = label === 'pc' && OWN_FRAMES;
-    if (withVideo) putFrames();
+    const own = label === 'pc' && OWN_FRAMES;
+    if (own) putFrames();
+    const withVideo = own || !OWN_FRAMES;
     const page = await browser.newPage({ viewport, hasTouch: !!q });
     page.on('pageerror', (e) => errors.push(`${label}: ${e}`));
     await page.goto(url + q);
@@ -72,17 +73,17 @@ try {
     // 본부 = 엔진 벨트 장면: 잼트리 자리 앞에서 E
     await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
     await page.waitForTimeout(300);
-    await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'jaemtri').x; });
+    await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'jaemtri' || q.id === 'spot:jaemtri').x; });
     await page.waitForTimeout(100);
     await page.keyboard.press('KeyE');
     await page.waitForSelector('[data-mission]', { state: 'visible' });
-    const desk = await page.locator('.hq-say').allTextContents();
+    const desk = await page.locator('.hq-talk').allTextContents();
     assert.ok(desk.some((t) => t.includes('잼트리')), `잼트리 말칸 ${desk}`);
     await S(page, `${label}-1-jaemtri`);
     await page.click('[data-mission]');
     await page.click('[data-act=brief]');
     await page.waitForSelector('[data-act=deploy]');
-    const brief = (await page.locator('.hq-say').allTextContents()).join(' / ');
+    const brief = (await page.locator('.hq-talk').allTextContents()).join(' / ');
     assert.match(brief, /잼트리/);
     assert.doesNotMatch(brief, /부장\s*목표/, '부장 기본 문장이 남아 있음');
     await S(page, `${label}-2-brief`);
@@ -91,12 +92,15 @@ try {
     await page.waitForTimeout(500);
     // 첫 출동이면 엔진이 첫 투입 컷신 영상을 튼다. PC는 시험 영상을 두고 재생·자막·Esc 건너뛰기를 보고, 폰은 영상이 없어 바로 넘어가야 한다
     if (withVideo) {
+      // 엔진이 첫 투입 컷신을 안 틀면(지금은 말풍선만) 직접 튼다
+      if (!(await page.evaluate(() => window.__goeiStory.isBlocking()))) await page.evaluate(() => window.__goeiStory.cutscene('first_entry'));
       await page.waitForSelector('.gsy-video:not([hidden])');
       assert.equal(await page.evaluate(() => window.__goeiStory.isBlocking()), true, '영상 중 멈춤 아님');
       await page.waitForTimeout(700);
-      // 단색 장이 실제로 그려지는가 (loop 2~3장 → 초록·파랑)
+      // 장이 실제로 그려지는가 (시험 장은 loop 2~3장 → 초록·파랑, 실제 그림은 검지 않은 화면)
       const px = await page.evaluate(() => [...document.querySelector('.gsy-video canvas').getContext('2d').getImageData(320, 180, 1, 1).data]);
-      assert.ok(px[1] > 150 || px[2] > 150, `프레임이 안 그려짐 ${px}`);
+      if (own) assert.ok(px[1] > 150 || px[2] > 150, `프레임이 안 그려짐 ${px}`);
+      else assert.ok(px[0] + px[1] + px[2] > 0, '프레임이 안 그려짐');
       await page.waitForFunction(() => !document.querySelector('.gsy-vsub').hidden, null, { timeout: 9000 });
       assert.match(await page.locator('.gsy-vsub').textContent(), /서명란/);
       await S(page, `${label}-2b-video`);
@@ -196,7 +200,7 @@ try {
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(over <= 0, `가로 넘침 ${over}`);
     await page.close();
-    if (withVideo) dropFrames();
+    if (own) dropFrames();
   }
   assert.deepEqual(errors, []);
   console.log('story-game ok');

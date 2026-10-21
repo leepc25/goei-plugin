@@ -60,7 +60,7 @@ export class VideoPlayer {
   }
 
   /** base = 컷 폴더 주소(끝에 /), cuts = 컷 길이(초), ready = 프레임이 있다고 알려졌나(false면 불러 보지 않고 끝) */
-  async play(base: string, cuts: number[], subs: VideoSub[], onDone: () => void, ready: Promise<boolean> = Promise.resolve(true)) {
+  async play(base: string, cuts: number[], subs: VideoSub[], onDone: () => void, ready: Promise<boolean> = Promise.resolve(true), sound = false) {
     this.finish();
     const token = ++this.token;
     this.subs = subs;
@@ -80,7 +80,7 @@ export class VideoPlayer {
     this.cuts[0] = first;
     // 나머지 컷은 재생하면서 불러온다. 못 불러온 컷은 앞 컷의 마지막 장을 둔다
     cuts.slice(1).forEach((_, i) => void loadCut(base, i + 2).then((c) => token === this.token && (this.cuts[i + 1] = c)));
-    this.startAudio(`${base}sound.ogg`, token);
+    if (sound) this.startAudio(`${base}sound.ogg`, token);
     this.started = performance.now();
     const tick = () => {
       if (token !== this.token) return;

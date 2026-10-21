@@ -17802,7 +17802,7 @@ var VideoPlayer = class {
     el.addEventListener("click", () => this.skipSoft());
   }
   /** base = 컷 폴더 주소(끝에 /), cuts = 컷 길이(초), ready = 프레임이 있다고 알려졌나(false면 불러 보지 않고 끝) */
-  async play(base, cuts, subs, onDone, ready = Promise.resolve(true)) {
+  async play(base, cuts, subs, onDone, ready = Promise.resolve(true), sound = false) {
     this.finish();
     const token = ++this.token;
     this.subs = subs;
@@ -17821,7 +17821,7 @@ var VideoPlayer = class {
     if (!first) return this.finish();
     this.cuts[0] = first;
     cuts.slice(1).forEach((_, i) => void loadCut(base, i + 2).then((c) => token === this.token && (this.cuts[i + 1] = c)));
-    this.startAudio(`${base}sound.ogg`, token);
+    if (sound) this.startAudio(`${base}sound.ogg`, token);
     this.started = performance.now();
     const tick = () => {
       if (token !== this.token) return;
@@ -18769,7 +18769,8 @@ ${who}: ${text.replace(/\n/g, " ")}
           refresh();
           onDone?.();
         },
-        listed(base.replace(/[^/]+\/$/, ""), id)
+        listed(base.replace(/[^/]+\/$/, ""), id),
+        !!v.sound
       );
       refresh();
       return;
@@ -21104,8 +21105,6 @@ function engineModules(box3, bridge) {
         return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
-      // 컷신 프레임은 아직 게임 묶음에 없다: 저장소 주소를 추정해 받으려다 콘솔 오류가 나지 않게 비워 둔다 (프레임 팩이 생기면 그 주소)
-      videoUrl: () => void 0,
       paused: () => shell.paused
     },
     { saved: savedFlags }

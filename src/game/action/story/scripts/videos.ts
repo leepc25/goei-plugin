@@ -13,6 +13,8 @@ export interface VideoDef {
   /** 컷 길이(초). 컷 이름은 c1, c2, … 순서 */
   cuts: number[];
   subs: VideoSub[];
+  /** sound.ogg가 있음 (없는 파일을 불러 콘솔 오류를 내지 않게, 받으면 켠다) */
+  sound?: boolean;
 }
 
 export const VIDEOS: Record<string, VideoDef> = {

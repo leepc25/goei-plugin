@@ -4,6 +4,7 @@
 고칠 것은 FIXES에 (컷신/컷, 종류, 상자) 로 적는다. 상자 밖과 다른 색은 건드리지 않는다.
 - red_eyes / grey_eyes: 상자 안 어두운 갈색·회색 홍채 색을 붉은 눈(#d12b3a 계열)으로
 - shirt: 상자 안 피부색을 흰 셔츠색으로 (셔츠 없이 맨살로 그려진 가슴)
+- sky_light: 파란 하늘을 흰 빛으로
 """
 import colorsys
 import shutil
@@ -18,8 +19,10 @@ ORIG = ROOT / 'game-src/art/cutscene/frames_orig'
 
 FIXES = [
     ('first_entry/c6', 'red_eyes', [(120, 150, 260, 250), (390, 150, 520, 250)]),
-    ('first_day/c4', 'grey_eyes', [(284, 109, 299, 130)]),
+    ('first_day/c4', 'grey_iris', [(284, 109, 299, 130)]),
     ('first_entry/c4', 'shirt', [(285, 58, 360, 130)]),
+    ('first_call/c3', 'grey_eyes', [(222, 100, 258, 126), (292, 100, 330, 126)]),
+    ('return/c3', 'sky_light', [(0, 0, 640, 360)]),
 ]
 
 
@@ -41,11 +44,25 @@ def red_eye(c):
 
 
 def grey_eye(c):
-    """회색으로 그려진 작은 홍채 (상자를 홍채에 꼭 맞게)"""
+    """회색으로 그려진 홍채. 눈꺼풀 그림자(따뜻한 갈색)는 빼고 무채색·찬 회색만"""
+    h, s, v = hsv(c)
+    hd = h * 360
+    if not (0.18 <= v <= 0.55 and (s < 0.08 or (s < 0.35 and 180 <= hd <= 360) or (s < 0.16 and hd <= 40))):
+        return None
+    return rgb(355 / 360, 0.78, min(0.8, v * 1.6 + 0.1))
+
+
+def grey_iris(c):
+    """상자를 홍채에 꼭 맞게 잡은 경우: 회색이면 다 칠한다"""
     h, s, v = hsv(c)
     if not (s < 0.35 and 0.18 <= v <= 0.5):
         return None
     return rgb(355 / 360, 0.78, min(0.8, v * 1.6 + 0.1))
+
+
+def eye_white(c):
+    h, s, v = hsv(c)
+    return s < 0.14 and v > 0.85
 
 
 def skin_to_shirt(c):
@@ -57,7 +74,16 @@ def skin_to_shirt(c):
     return rgb(h, s * 0.28, min(0.95, v * 1.05 + 0.04))
 
 
-KIND = {'red_eyes': red_eye, 'grey_eyes': grey_eye, 'shirt': skin_to_shirt}
+def sky_to_light(c):
+    """해치 너머 파란 하늘을 쏟아지는 흰 빛으로 (콘티: 흰 빛, 하늘 아님)"""
+    h, s, v = hsv(c)
+    hd = h * 360
+    if not (180 <= hd <= 230 and (s >= 0.3 and v >= 0.55 or s >= 0.08 and v >= 0.75)):
+        return None
+    return rgb(45 / 360, 0.06, min(1.0, 0.9 + v * 0.1))
+
+
+KIND = {'red_eyes': red_eye, 'grey_eyes': grey_eye, 'grey_iris': grey_iris, 'shirt': skin_to_shirt, 'sky_light': sky_to_light}
 
 
 def main():
@@ -77,6 +103,13 @@ def main():
             px = im.load()
             memo = {}
             for x0, y0, x1, y1 in boxes:
+                if kind == 'grey_eyes':
+                    # 눈을 감은 장(흰자 없음)은 건너뛰고, 흰자 둘레 몇 px 안만 칠한다
+                    wh = [(x, y) for y in range(y0, y1) for x in range(x0, x1) if eye_white(px[x, y])]
+                    if len(wh) < 4:
+                        continue
+                    x0, x1 = max(x0, min(x for x, _ in wh) - 4), min(x1, max(x for x, _ in wh) + 5)
+                    y0, y1 = max(y0, min(y for _, y in wh) - 4), min(y1, max(y for _, y in wh) + 5)
                 for y in range(max(0, y0), min(im.height, y1)):
                     for x in range(max(0, x0), min(im.width, x1)):
                         c = px[x, y]

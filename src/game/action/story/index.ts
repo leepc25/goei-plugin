@@ -271,6 +271,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
           onDone?.();
         },
         listed(base.replace(/[^/]+\/$/, ''), id),
+        !!v.sound,
       );
       refresh();
       return;
