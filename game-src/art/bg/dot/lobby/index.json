@@ -1,0 +1,98 @@
+{
+ "lobby_far": {
+  "w": 384,
+  "h": 256
+ },
+ "lobby_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/lobby_objects_1": {
+  "w": 150,
+  "h": 67,
+  "foot": [
+   75,
+   67
+  ]
+ },
+ "objects/lobby_objects_2": {
+  "w": 127,
+  "h": 52,
+  "foot": [
+   63,
+   52
+  ]
+ },
+ "objects/lobby_objects_3": {
+  "w": 80,
+  "h": 109,
+  "foot": [
+   40,
+   109
+  ]
+ },
+ "objects/lobby_objects_4": {
+  "w": 63,
+  "h": 97,
+  "foot": [
+   31,
+   97
+  ]
+ },
+ "objects/lobby_objects_5": {
+  "w": 28,
+  "h": 73,
+  "foot": [
+   14,
+   73
+  ]
+ },
+ "objects/lobby_objects_6": {
+  "w": 60,
+  "h": 85,
+  "foot": [
+   30,
+   85
+  ]
+ },
+ "objects/lobby_objects_7": {
+  "w": 102,
+  "h": 52,
+  "foot": [
+   51,
+   52
+  ]
+ },
+ "objects/lobby_objects_8": {
+  "w": 75,
+  "h": 61,
+  "foot": [
+   37,
+   61
+  ]
+ },
+ "objects/lobby_objects_9": {
+  "w": 71,
+  "h": 127,
+  "foot": [
+   35,
+   127
+  ]
+ },
+ "lobby_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "lobby_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "lobby_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "lobby_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

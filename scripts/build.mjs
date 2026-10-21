@@ -1,7 +1,8 @@
 import { build } from 'esbuild';
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { buildPack } from './game-pack.mjs';
+import { buildGamePack, buildPack } from './game-pack.mjs';
+import { rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 // 업데이트 주소: package.json의 goei.updateBase (저장소 release 폴더 raw 주소). 있으면 Risu 플러그인 탭이 이 주소로 플러그인을 갱신한다
@@ -63,6 +64,49 @@ const partNames = bodyParts.map((p, i) => {
 writeFileSync(
   'dist/goei-body.json',
   JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length }) + '\n',
+);
+
+// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
+// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
+const split = (str, max) => {
+  const out = [];
+  let buf = '';
+  let bytes = 0;
+  for (const ch of str) {
+    const n = Buffer.byteLength(ch);
+    if (bytes + n > max) (out.push(buf), (buf = ''), (bytes = 0));
+    buf += ch;
+    bytes += n;
+  }
+  if (buf) out.push(buf);
+  return out;
+};
+rmSync('dist/game', { recursive: true, force: true });
+mkdirSync('dist/game', { recursive: true });
+const gameOut = await build({ ...common, entryPoints: ['src/game/entry.ts'], format: 'iife' });
+const gameCode = `// goei-game ${pkg.version}\n` + gameOut.outputFiles[0].text;
+writeFileSync('dist/game/goei-game.js', gameCode);
+const gameParts = split(gameCode, 200_000).map((p, i) => {
+  const name = `goei-game.${i + 1}.txt`;
+  writeFileSync(`dist/game/${name}`, p);
+  return name;
+});
+const gamePacks = [];
+for (const d of existsSync('game-pack') ? readdirSync('game-pack') : []) {
+  if (!existsSync(`game-pack/${d}/pack.json`)) continue;
+  const p = buildGamePack(`game-pack/${d}`);
+  writeFileSync(`dist/game/${p.id}.pack`, p.bytes);
+  const parts = [];
+  for (let at = 0, i = 1; at < p.bytes.length; at += 512 * 1024, i++) {
+    const name = `${p.id}.${i}.bin`;
+    writeFileSync(`dist/game/${name}`, p.bytes.subarray(at, at + 512 * 1024));
+    parts.push(name);
+  }
+  gamePacks.push({ id: p.id, hash: p.hash, bytes: p.bytes.length, parts, required: p.required });
+}
+writeFileSync(
+  'dist/game/index.json',
+  JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
 
 // 테스트용: 순수 로직만 묶은 모듈
@@ -129,6 +173,45 @@ await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, for
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-graybox.html', html);
 }
+
+// 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
+await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/engine-demo.js' });
+{
+  const art = {
+    atlas: `data:image/png;base64,${readFileSync('game-pack/jyaldi/atlas.png').toString('base64')}`,
+    cutin: `data:image/png;base64,${readFileSync('game-pack/jyaldi/cutin.png').toString('base64')}`,
+    frames: JSON.parse(readFileSync('game-pack/jyaldi/frames.json', 'utf8')),
+  };
+  // 배경 그림 (tools/bg_pixelize.py → game-src/art/bg/dot/<장소>/*.png). 없으면 단색 대역.
+  const bg = {};
+  const bgDir = 'game-src/art/bg/dot';
+  for (const place of existsSync(bgDir) ? readdirSync(bgDir) : []) {
+    for (const sub of ['', 'objects/']) {
+      const dir = `${bgDir}/${place}/${sub}`;
+      if (!existsSync(dir)) continue;
+      for (const f of readdirSync(dir).filter((f) => f.endsWith('.png'))) {
+        (bg[place] ??= {})[sub + f.slice(0, -4)] = `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
+      }
+    }
+  }
+  const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)}</script><script type="module">${code}</script></html>`;
+  writeFileSync('dist/goei-action-game.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-action-game.html', html);
+}
+// 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
+{
+  const out = await build({ ...common, entryPoints: ['src/game/action/audio/demo.ts'], format: 'esm', minify: true });
+  const code = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실 · 차원 승강기</title><body><script type="module">${code}</script></body></html>`;
+  writeFileSync('dist/goei-sound.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-sound.html', html);
+  const lib = await build({ ...common, entryPoints: ['src/game/action/audio/index.ts'], format: 'esm', minify: true });
+  console.log(`소리 모듈 ${(lib.outputFiles[0].contents.length / 1024).toFixed(1)}KB (압축 전 최소화)`);
+}
+await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
 
 await build({
   ...common,
@@ -204,7 +287,18 @@ const info = {
   bytes: Buffer.byteLength(code),
   bodyBytes: Buffer.byteLength(bodyCode),
   bodyParts: partNames.length,
+  gameBytes: Buffer.byteLength(gameCode),
+  gameParts: gameParts.length,
+  gamePacks: gamePacks.map((p) => `${p.id} ${p.bytes}`),
   sha256: createHash('sha256').update(code).digest('hex'),
 };
 writeFileSync('dist/build-info.json', JSON.stringify(info, null, 2) + '\n');
 console.log(info);
+
+// 게임 모듈 시험용 묶음 (dist-test/*): 시험이 쓰는 파일을 한 번에 만든다. 단독 시연판은 개발용(게임_통합_규격 7장)
+await import('./build-ui.mjs');
+await import('./build-enemy.mjs');
+{
+  const story = await import('./build-story.mjs');
+  await story.buildStoryPure();
+}

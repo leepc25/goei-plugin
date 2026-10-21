@@ -1,0 +1,94 @@
+{
+ "el_hall_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/el_hall_objects_1": {
+  "w": 79,
+  "h": 127,
+  "foot": [
+   39,
+   127
+  ]
+ },
+ "objects/el_hall_objects_2": {
+  "w": 77,
+  "h": 127,
+  "foot": [
+   38,
+   127
+  ]
+ },
+ "objects/el_hall_objects_3": {
+  "w": 22,
+  "h": 55,
+  "foot": [
+   11,
+   55
+  ]
+ },
+ "objects/el_hall_objects_4": {
+  "w": 70,
+  "h": 85,
+  "foot": [
+   35,
+   85
+  ]
+ },
+ "objects/el_hall_objects_5": {
+  "w": 68,
+  "h": 28,
+  "foot": [
+   34,
+   28
+  ]
+ },
+ "objects/el_hall_objects_6": {
+  "w": 23,
+  "h": 37,
+  "foot": [
+   11,
+   37
+  ]
+ },
+ "objects/el_hall_objects_7": {
+  "w": 28,
+  "h": 43,
+  "foot": [
+   14,
+   43
+  ]
+ },
+ "objects/el_hall_objects_8": {
+  "w": 105,
+  "h": 64,
+  "foot": [
+   52,
+   64
+  ]
+ },
+ "objects/el_hall_objects_9": {
+  "w": 95,
+  "h": 58,
+  "foot": [
+   47,
+   58
+  ]
+ },
+ "el_hall_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "el_hall_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "el_hall_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "el_hall_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

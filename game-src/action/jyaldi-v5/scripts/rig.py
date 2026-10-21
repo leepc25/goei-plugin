@@ -41,7 +41,10 @@ def P(hip,lean=4,s=0,h=0,lf=None,rf=None,lh='down',rh='down',head=(5,-7),tilt=0,
         elif t=='down': tgt=add(sh,(2 if side=='RIGHT' else -1,29))
         elif t=='hip': tgt=add(hip,(-4,4))
         elif isinstance(t,tuple) and t[0]=='a': tgt=(t[1],t[2])
+        elif isinstance(t,tuple) and t[0]=='r': tgt=add(N,rot((t[1],t[2]),lean))   # 목 기준, 몸통 기울기 따라 돎
         else: tgt=add(N,t)
+        if isinstance(pick,tuple) and pick[0]=='e':   # 팔꿈치 직접 지정(목 기준, 몸통 기울기 따라 돎). 가슴 앞 손에서 IK가 팔꿈치를 등 뒤로 보내는 것 방지
+            p[f'{side} ELBOW']=add(N,rot((pick[1],pick[2]),lean)); p[f'{side} ARM']=tgt; return
         e,w=ik(sh,tgt,UARM,FARM,pick); p[f'{side} ELBOW']=e; p[f'{side} ARM']=w
     hand('RIGHT',lh,le); hand('LEFT',rh,re)
     lf=lf or (hip[0]+8,G); rf=rf or (hip[0]-6,G)
@@ -67,8 +70,24 @@ STAND=lambda b=0,lh='down',rh='down',tilt=0: P((X,55+b),2,0,0,(X+6,G),(X-4,G),lh
 CROUCH=lambda d=0,b=0,lh=(17,2),rh='chin': P((X+d,79+b),6,-0.6,-0.4,(X+16+d,G),(X-19+d,G-1),lh,rh)  # 한쪽 무릎 세우고 앉음(뒷무릎 바닥)
 
 CLIPS={}   # 이름: (설명 동작, 소품 설명, [자세...])
+def _xs(a,b,c):
+    u=(b[0]-a[0],b[1]-a[1]); f=(c[0]-b[0],c[1]-b[1]); n=math.hypot(*u)*math.hypot(*f) or 1
+    return (u[0]*f[1]-u[1]*f[0])/n
+def _mirror(p,a,b):
+    # 점 p를 직선 a-b에 대해 뒤집음(관절 길이 유지)
+    dx,dy=b[0]-a[0],b[1]-a[1]; L=dx*dx+dy*dy or 1; t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L
+    q=(a[0]+t*dx,a[1]+t*dy); return (2*q[0]-p[0],2*q[1]-p[1])
+def anatomic(p):
+    """사람 관절은 한쪽으로만 꺾임(오른쪽을 보는 옆모습). 팔꿈치: 아래팔은 위팔의 앞쪽으로 접힘(cross(위팔,아래팔)<=0).
+    무릎: 정강이는 허벅지의 뒤쪽으로 접힘(cross>=0). 거꾸로면 팔꿈치·무릎을 어깨-손목(골반-발목) 선에 대해 뒤집음.
+    IK 선택·직접 지정·lerp 중간 장 모두 여기서 한 번에 바로잡힘. 검사: audit_joints.py"""
+    q=dict(p)
+    for s in ('RIGHT','LEFT'):
+        if _xs(q[f'{s} SHOULDER'],q[f'{s} ELBOW'],q[f'{s} ARM'])>0.12: q[f'{s} ELBOW']=_mirror(q[f'{s} ELBOW'],q[f'{s} SHOULDER'],q[f'{s} ARM'])
+        if _xs(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])<-0.12: q[f'{s} KNEE']=_mirror(q[f'{s} KNEE'],q[f'{s} HIP'],q[f'{s} LEG'])
+    return q
 def clip(name,action,poses,prop=''):
-    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=(action,prop,poses)
+    assert 3<=len(poses)<=15,(name,len(poses)); CLIPS[name]=(action,prop,[anatomic(p) for p in poses])
 
 # 1 기본 대기: 반듯이 섬, 아주 작은 호흡 (4)
 clip('idle','calm standing idle, breathing',[STAND(0),STAND(0.5),STAND(1),STAND(0.5)])
@@ -283,12 +302,12 @@ TR=lambda a: P((X,56),8,0,0,(X+6,G),(X-4,G),(16,14-2*a),(12,16-2*(1-a)),tilt=12)
 clip('transmit','operating a small field radio transmitter on a table in front of her, pressing keys',[TR(0),TR(1),TR(0),TR(1)],'a small field radio transmitter')
 # 44 출동 중 부상: 가드 유지하나 구부정, 뒷손 옆구리 / 절뚝 걷기(뒷다리 끌기)
 HU=lambda b: P((X,63+b),12,-0.6,-0.3,(X+12,G),(X-12,G-1),(17,4),(2,20),tilt=10)
-clip('hurtidle','injured combat stance: hunched, guard lowered, rear hand pressed to her side, labored breathing',[HU(0),HU(1),HU(2),HU(1)])
+clip('hurtidle','side view: injured, hunched over, near hand clutching her stomach, no guard, heavy breathing',[HU(0),HU(1),HU(2),HU(1)])
 def limp(t):
     c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
     dip=3*max(0,c)
     return P((X+2,58+dip),9,0.1*c,0.15*c,(X+2+10*c,G-4*max(0,-sn)),(X+2-10*c,G-1*max(0,sn)),(14,10),(2,20),tilt=8)
-clip('limp','injured limping walk, dragging the rear leg, hand pressed to her side',[limp(i/8) for i in range(8)])
+clip('limp','side view: limping walk, stiff rear leg dragging on the floor, hand clutching her stomach',[limp(i/8) for i in range(8)])
 # 45 쓰러짐(체력 0): 비틀 → 무릎 → 앞으로 엎어짐
 KNEEL=P((X,78),10,0,0,(X-32,G-2),(X-36,G-3),(10,22),(6,22),tilt=16)
 FD=P((X-6,94),86,0,0,(X-48,G-2),(X-50,G),('a',X+26,G),('a',X+18,G),tilt=10)
@@ -301,7 +320,7 @@ BED=P((X-2,76),2,0,0,(X+18,G),(X+12,G),(14,18),(10,20),lk=KNEE_UP,rk=KNEE_UP)
 clip('bedlie','lying on her back in an infirmary bed, asleep, slow breathing',[BL(0),BL(1),BL(1),BL(0)])
 clip('bedwake','waking up in an infirmary bed: sits up slowly, then swings her legs down to sit on the edge',[BL(0),BS1,BS2,lerp(BS2,BED,.5),BED,BED])
 # 47 승리·귀환: 스탠스 풀고 장갑 고쳐 끼고 반듯이
-clip('victory','after winning: drops her guard, adjusts her glove, stands straight and calm',[G0,lerp(G0,STAND(0),.5),STAND(0),gl(0),gl(3),gl(0),STAND(0,tilt=-4)])
+clip('victory','side view: victory fist pump, thrusts the fist high above her head, then stands straight',[G0,lerp(G0,STAND(0),.5),STAND(0),gl(0),gl(3),gl(0),STAND(0,tilt=-4)])
 # 48 귀환 로프 오르기(제자리 순환, 위로 이동은 코드): 로프 x=X+14
 RP=lambda a: P((X+2,60),-4,0,0,('a',X+12,90-6*a) if 0 else (X+12,90-6*a),(X+4,96),('a',X+14,8-14*a),('a',X+14,22-14*(1-a)),lk=KNEE_UP,rk=KNEE_UP,le=ELB_OUT,re=ELB_OUT)
 clip('rope','climbing a vertical rope hand over hand, legs gripping the rope',[RP(0),RP(.33),RP(.66),RP(1),RP(.66),RP(.33)],'a thick vertical rope')
@@ -331,7 +350,7 @@ clip('button','pressing an elevator panel button with the near hand',[STAND(0),s
 SIT=lambda lean=2,lh=(14,18),rh=(10,20),tilt=0,b=0: P((X-6,77+b),lean,0,0,(X+16,G),(X+12,G),lh,rh,tilt=tilt,lk=KNEE_UP,rk=KNEE_UP)
 CRS=((4,14),(2,12))   # 팔짱
 clip('chairsit','sitting down on a chair',[STAND(0),lerp(STAND(0),SIT(14),.5),SIT(14),SIT()])
-clip('seatrest','sitting on a chair, leaning back, arms crossed, calm',[SIT(-8,*CRS),SIT(-8,*CRS,b=0.5),SIT(-8,*CRS,b=1),SIT(-8,*CRS,b=0.5)])
+clip('seatrest','side view, seated pose with nothing under her, leaning back, arms folded, calm',[SIT(-8,*CRS),SIT(-8,*CRS,b=0.5),SIT(-8,*CRS,b=1),SIT(-8,*CRS,b=0.5)])
 DK=lambda a: SIT(12,('a',X+22,62-6*a),('a',X+16,63),tilt=14)
 clip('deskwork','seated at an office desk doing paperwork: signing papers and stamping approvals',[DK(0),DK(.5),DK(1),DK(0),DK(1),DK(0)],'a pen and a rubber stamp, papers on the desk')
 clip('seatthink','seated, leaning back in the chair with eyes closed, thinking, arms crossed',[SIT(-14,*CRS,tilt=-8),SIT(-14,*CRS,tilt=-8,b=0.5),SIT(-14,*CRS,tilt=-8,b=1),SIT(-14,*CRS,tilt=-8,b=0.5)])
@@ -395,11 +414,11 @@ holdset('cup',(10,12),'down','a paper coffee cup')
 LB=lambda a: P((X,55),2,0.6*a,0.2*a,(X+6,G),(X-4,G),'down','down',head=(5-10*a,-7))
 clip('lookback','glancing back over her shoulder warily, then facing forward again',[LB(0),LB(.5),LB(1),LB(1),LB(.5),LB(0)])
 HD=lambda b=0: P((X-4,82+b),24,-0.3,0,(X+12,G),(X-16,G-1),(7,-4),(4,10),tilt=4,lk=KNEE_UP)
-clip('hide','hiding crouched behind cover, holding her breath with a hand over her mouth',[G0,lerp(G0,HD(),.5),HD(0),HD(1),HD(0)])
+clip('hide','side view: crouching low in hiding, hands on knees, face visible, peeking forward warily',[G0,lerp(G0,HD(),.5),HD(0),HD(1),HD(0)])
 DO=lambda r: P((X+2*r,55),4+6*r,-0.4*r,0,(X+6+4*r,G),(X-4,G),('a',X+24+8*r,52),'down')
 clip('door','opening a door: grabs the handle, turns it and pushes the door open, steps through',[STAND(0),DO(0),DO(.5),DO(1),walkf(.25),walkf(.5)])
 DC=lambda r: P((X,55),-2,0.6,0.2,(X+6,G),(X-4,G),'down',('a',X-20+6*r,52),head=(-4,-7))
-clip('doorclose','reaching behind to pull a door shut while moving forward',[STAND(0),DC(0),DC(1),STAND(0)])
+clip('doorclose','side view: hurrying forward, near arm reaching straight back to push something shut',[STAND(0),DC(0),DC(1),STAND(0)])
 KK=lambda r: P((X,55),4,-0.3,0,(X+6,G),(X-4,G),('a',X+22+3*r,40),'down')
 clip('knock','knocking on a door with the knuckles',[STAND(0),KK(0),KK(1),KK(0),KK(1),STAND(0)])
 def push(t):
@@ -417,7 +436,7 @@ clip('notebook','writing notes in a small notebook held in one hand',[NB(0),NB(1
 def lead(t):
     c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
     return P((X+2,56+1.2*abs(c)),5,0.4,0.2*c,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),(2-6*c,28),(-24,18),head=(3,-7))
-clip('leadhand','walking forward while pulling someone along by the hand behind her, glancing back',[lead(i/8) for i in range(8)])
+clip('leadhand','side view: walking forward, near arm stretched straight back, pulling someone by the hand',[lead(i/8) for i in range(8)])
 clip('elevwait','standing in an elevator, looking up at the floor indicator',[STAND(0,tilt=-14),STAND(.5,tilt=-14),STAND(1,tilt=-12),STAND(.5,tilt=-14)])
 BP=lambda r: P((X,79),20,-0.4,-0.3,(X+16,G),(X-19,G-1),('a',X+28+3*r,G-8),('a',X+24-2*r,G-6),tilt=14)
 clip('backpack','kneeling and rummaging through a backpack on the floor',[CROUCH(),BP(0),BP(1),BP(0),BP(1),CROUCH()],'a worn backpack on the floor')
@@ -445,7 +464,7 @@ clip('board','pinning a paper to a notice board on the wall',[STAND(0),BD2(0),BD
 BR=lambda a: P((X,55),2,-0.4,0,(X+6,G),(X-4,G),(30,-14) if a else (16,8),'down')
 clip('brief','briefing: points at a board, then gestures toward the listeners',[STAND(0),BR(1),BR(1),BR(0),BR(0)])
 # 욕구·여가
-clip('doze','dozing in a chair: head slowly drops, then jerks back up',[SIT(-6,*CRS,tilt=0),SIT(-6,*CRS,tilt=16),SIT(-6,*CRS,tilt=30),SIT(-6,*CRS,tilt=4)])
+clip('doze','side view, seated pose with nothing under her, arms folded, dozing: head drops, then jerks up',[SIT(-6,*CRS,tilt=0),SIT(-6,*CRS,tilt=16),SIT(-6,*CRS,tilt=30),SIT(-6,*CRS,tilt=4)])
 SO=lambda b=0: P((X-6,74),-90,0,0,(X+34,72),(X+30,74),(6,-12+b),(4,-10+b),re=ELB_UP,le=ELB_UP)
 clip('sofa','lying on her back on a sofa, holding a phone above her face',[SO(0),SO(1),SO(0),SO(1)],'a black smartphone')
 PS=lambda b=0: P((X,55+b),3,0,0,(X+6,G),(X-4,G),(10,10),(8,12),tilt=20)
@@ -590,6 +609,350 @@ clip('showerout','step out of shower booth, then dry hair with towel',list(rever
 clip('bathin',CLIPS['bathin'][0],[ENTRY,REACH,BATH_STEP,lerp(BATH_STEP,BATH_SEATED,.5),BATH_SEATED,BATH_SEATED],BATH_PROP)
 clip('bathout',CLIPS['bathout'][0],list(reversed(CLIPS['bathin'][2])),BATH_PROP)
 clip('bath',CLIPS['bath'][0],[BATH_SEATED,jit(BATH_SEATED,0,.4,['NECK','SHOULDER','NOSE','EYE','EAR']),BATH_SEATED,jit(BATH_SEATED,0,.2,['NECK','SHOULDER','NOSE','EYE','EAR'])],BATH_PROP)
+
+# ── 결함 목록 재생성 (docs/캐릭터제작서/쟈알디_결함목록_2026-10-21.md 4·12·25~30·34) ──
+# 원인(실측): 손이 가슴 앞(팔짱·전화·서류철)이면 ELB_DOWN IK가 팔꿈치를 등 뒤(목보다 x 10px 뒤)로 보냄.
+# 옆모습으로는 불가능한 관절이라 생성기가 몸을 정면으로 돌려 맞춤. 또 s>0(먼 어깨가 앞)이면 가슴이 화면 쪽으로 열림.
+# 고침: 팔꿈치를 몸 앞에 직접 지정, 생활 자세는 s=h=0(옆모습).
+XA=dict(lh=('r',8,12),rh=('r',9,10),le=('e',6,17),re=('e',8,15))      # 팔짱(옆모습): 두 팔꿈치 가슴 앞, 손은 가슴 앞
+def SITX(lean,tilt=0,b=0): return P((X-6,77+b),lean,0,0,(X+16,G),(X+12,G),tilt=tilt,lk=KNEE_UP,rk=KNEE_UP,**XA)
+clip('seatrest','side view, seated pose with nothing under her, leaning back, arms folded, calm',[SITX(-8),SITX(-8,b=.5),SITX(-8,b=1),SITX(-8,b=.5)])
+clip('seatthink','side view, seated pose with nothing under her, leaning back with eyes closed, arms folded, thinking',[SITX(-14,-8),SITX(-14,-8,.5),SITX(-14,-8,1),SITX(-14,-8,.5)])
+clip('doze','side view, seated pose with nothing under her, arms folded, dozing: head drops, then jerks up',[SITX(-6,0),SITX(-6,16),SITX(-6,30),SITX(-6,4)])
+WLX=lambda b=0: P((X-4,55+b),-6,0,0,(X+10,G),(X-2,G),tilt=-2,**XA)
+clip('walllean','side view: standing leaning slightly back, arms folded across the chest, relaxed',[WLX(0),WLX(.5),WLX(1),WLX(.5)])
+STXX=lambda b=0,u=0: P((X,55+b),2,0,0,(X+6,G-3*u),(X-4,G),**XA)
+clip('armscross','side view: standing with arms folded across the chest, listening',[STXX(0),STXX(.5),STXX(1),STXX(.5)])
+clip('bored','side view: bored, arms folded, tapping the front foot on the floor',[STXX(0,0),STXX(0,1),STXX(0,0),STXX(0,1)])
+# 윗몸일으키기: 등을 대고 누움 → 상체 60도. 손은 뒤통수, 팔꿈치는 무릎 쪽(몸 앞)
+SU3=lambda a: P((X-6,96),-90+60*a,0,0,(X+14,G),(X+10,G),('r',-3,-9),('r',-2,-10),tilt=10*a,lk=KNEE_UP,rk=KNEE_UP,le=('e',9,-7),re=('e',8,-8))
+clip('situp','side view: doing sit-ups on the floor, hands behind her head, elbows forward, knees bent',[SU3(0),SU3(.5),SU3(1),SU3(.5)])
+# 벽 기대 울기: 가까운 손이 눈을 가림(팔꿈치 앞), 먼 손은 내림
+WCX=lambda b: P((X-6,58+b),-6,0,0,(X+8,G),(X-6,G),('r',6,-10),'down',head=(4,-7),tilt=22,le=('e',13,4))
+clip('wallcry','side view: standing leaning slightly back and crying, near hand covering her eyes, shoulders shaking',[WCX(0),WCX(1),WCX(0),WCX(1)])
+# 전화: 가까운 손이 가까운 귀에, 팔꿈치는 앞 어깨 높이
+PHX=lambda t: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',-1,-8),'down',tilt=t,le=('e',11,5))
+clip('phone','side view: standing and talking on a mobile phone held to her near ear, elbow forward',[PHX(0),PHX(3),PHX(0),PHX(-2)],'a black smartphone')
+# 12 침대에서 일어나기: 가구는 게임이 따로 그림(2026-10-21 규칙) → 침대 없이 자세만. 침대 모양 불일치가 사라짐
+BWS1=P((X-6,74),-45,0,0,(X+34,74),(X+32,76),('r',8,16),('a',X-20,76),le=('e',6,14))
+BWS2=P((X-4,74),-4,0,0,(X+36,72),(X+34,74),('r',10,18),('r',8,20),le=('e',5,16),re=('e',3,16))
+BWED=P((X-2,76),2,0,0,(X+18,G),(X+12,G),('r',12,20),('r',10,22),lk=KNEE_UP,rk=KNEE_UP,le=('e',5,16),re=('e',3,16))
+clip('bedwake','side view: waking up from lying on her back, sits up slowly, then swings her legs down to sit',[BL(0),BWS1,BWS2,lerp(BWS2,BWED,.5),BWED,BWED])
+# 25 부상 대기·절뚝 걷기: 구부정, 가까운 손은 배를 감쌈, 먼 손은 늘어뜨림. 가드 없음
+HUX=lambda b: P((X,64+b),20,0,0,(X+10,G),(X-8,G),('r',7,22),('r',6,26),tilt=16,le=('e',3,15),re=('e',0,15))
+clip('hurtidle','side view: injured, hunched over, near hand clutching her stomach, no guard, heavy breathing',[HUX(0),HUX(1.5),HUX(3),HUX(1.5)])
+def limpx(t):
+    # 앞발(성한 다리)은 빨리 내딛고 뒷발(다친 다리)은 바닥에 끌림(들지 않음). 다친 다리에 실릴 때 골반이 크게 꺼짐
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    dip=6*max(0,-c)
+    return P((X+2,60+dip),16+4*max(0,-c),0,0,(X+2+11*c,G-6*max(0,-sn)),(X+2-7*c,G),('r',7,22),('r',6,26),tilt=12,le=('e',3,15),re=('e',0,15),rk=KNEE_UP)
+clip('limp','side view: limping walk, stiff rear leg dragging on the floor, hand clutching her stomach',[limpx(i/8) for i in range(8)])
+# 26 숨기: 웅크려 숨어 앞을 엿봄. 얼굴을 가리지 않음
+HDX=lambda b=0: P((X-4,82+b),18,0,0,(X+12,G),(X-16,G-1),('r',12,16),('r',10,18),head=(6,-6),lk=KNEE_UP,le=('e',5,14),re=('e',3,14))
+clip('hide','side view: crouching low in hiding, hands on knees, face visible, peeking forward warily',[G0,lerp(G0,HDX(),.5),HDX(0),HDX(1),HDX(0)])
+# 27 뒤로 문 닫기: 앞으로 걸으며 가까운 팔을 뒤로 쭉 뻗어 문을 밀어 닫음
+DCX=lambda t,r: P((X+2,56),6,0,0,(X+2+11*math.cos(2*math.pi*t),G-4*max(0,-math.sin(2*math.pi*t))),(X+2-11*math.cos(2*math.pi*t),G-4*max(0,math.sin(2*math.pi*t))),('a',X-30+10*r,50),(4,26),head=(3,-8),le=('e',-12,14))
+clip('doorclose','side view: hurrying forward, near arm reaching straight back to push something shut',[walkf(0),DCX(.125,0),DCX(.25,0),DCX(.375,.6),DCX(.5,1),walkf(.625)])
+# 28 손잡고 이끌기: 가까운 손을 뒤로 쭉 뻗어 누군가의 손을 잡고 걸음
+def leadx(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+4,57+1.2*abs(c)),10,0,0,(X+4+11*c,G-4*max(0,-sn)),(X+4-11*c,G-4*max(0,sn)),('r',-30,16),(2+7*c,28),head=(4,-7),le=('e',-14,12))
+clip('leadhand','side view: walking forward, near arm stretched straight back, pulling someone by the hand',[leadx(i/8) for i in range(8)])
+# 29 승리: 가드 풀고 → 주먹 낮게 당김 → 머리 위로 크게 치켜듦 → 유지 → 내려 반듯이
+VC0=P((X,57),8,0,0,(X+8,G),(X-6,G),('r',4,22),'down',le=('e',-2,14))
+VUP=P((X,53),-6,0,0,(X+8,G),(X-6,G),('r',8,-34),'down',head=(5,-8),tilt=-10,le=('e',6,-14))
+clip('victory','side view: victory fist pump, thrusts the fist high above her head, then stands straight',
+     [G0,STAND(0),VC0,lerp(VC0,VUP,.5),VUP,sh(VUP,0,-1),lerp(VUP,STAND(0),.5),STAND(0)])
+# 30 손 흔들기: 가까운 손을 머리 위로 높이 들고 손목을 앞뒤로 크게 흔듦
+WVX=lambda d: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',12+7*d,-30),'down',le=('e',10,-10))
+clip('wave','side view: raising her near hand high above her head and waving it widely back and forth',[STAND(0),WVX(0),WVX(1),WVX(-1),WVX(1),WVX(-1),WVX(0),STAND(0)])
+# 34 서류철 걷기: 대기·달리기처럼 가슴에 안음(두 팔꿈치 몸 앞)
+FO=dict(le=('e',4,16),re=('e',2,14))
+def walkfo(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,56+1.2*abs(c)),3,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),('r',9,13),('r',8,10),**FO)
+clip('walk_folder','side view: walking while hugging a folder of documents flat against her chest with both arms',[walkfo(i/8) for i in range(8)],'holding a folder of documents hugged against the chest')
+# ── 가구 못 떼어 낸 클립, 가구 없이 다시 (2026-10-21, 쟈알디 결함 목록 정리 스레드 요청) ──
+# 앉는 자세는 빈 공간에, 가구는 게임이 따로 그림. 생성기가 끝 장을 기준 그림으로 되돌리는 버릇이 있어 끝에 버릴 장 1개를 덧붙임
+# (빌더 auto_trim이 뺌. 반복 클립은 첫 장, 아닌 것은 끝 장 복사).
+def tail(ps,loop): return ps+[ps[0] if loop else ps[-1]]
+LAP=dict(lh=('r',14,20),rh=('r',12,22),le=('e',5,16),re=('e',3,16))   # 앉아 무릎 위 손
+SITF=lambda lean=2,tilt=0,b=0,**k: P((X-6,77+b),lean,0,0,(X+16,G),(X+12,G),tilt=tilt,lk=KNEE_UP,rk=KNEE_UP,**({**LAP,**k}))
+clip('chairsit','side view: lowers herself into a seated pose with nothing under her, hands resting on her thighs',
+     tail([STAND(0),lerp(STAND(0),SITF(14),.5),SITF(14),SITF()],False))
+DKX=lambda a: SITF(12,14,lh=('r',20,10-5*a),rh=('r',16,12),le=('e',9,14),re=('e',7,15))
+clip('deskwork','side view, seated pose with nothing in front: signing papers and stamping, hands at desk height',
+     tail([DKX(0),DKX(.5),DKX(1),DKX(0),DKX(1),DKX(0)],True),'a pen and a rubber stamp in her hands')
+TYX=lambda r: SITF(10,12,lh=('r',20,12-2*r),rh=('r',17,12-2*(1-r)),le=('e',8,15),re=('e',6,16))
+clip('typing','side view, seated pose with nothing in front: typing in the air at desk height, fingers moving',tail([TYX(0),TYX(1),TYX(0),TYX(1)],True))
+TRX=lambda a: P((X,56),8,0,0,(X+6,G),(X-4,G),('r',17,15-2*a),('r',14,16-2*(1-a)),tilt=12,le=('e',8,14),re=('e',6,15))
+clip('transmit','side view: standing, pressing keys on a small radio held at waist height in front of her',tail([TRX(0),TRX(1),TRX(0),TRX(1)],True),'a small black field radio in her hands')
+clip('sofa','side view: lying on her back in the air with nothing under her, holding a phone above her face',tail([SO(0),SO(1),SO(0),SO(1)],True),'a black smartphone')
+FEX=lambda u: SITF(10,6,lh=('r',18,14),rh=('r',6,-1) if u else ('r',16,12),le=('e',8,15),re=('e',10,6) if u else ('e',6,15))
+clip('feast','side view, seated pose with nothing under or in front of her: eating pasta with a fork, calm',tail([FEX(1),FEX(0),FEX(1),FEX(0)],True),'a fork in her hand')
+clip('ladder','side view: climbing motion, hands and feet alternating as if on ladder rungs, ladder not drawn',tail([lad(i/8) for i in range(8)],True))
+DOX=lambda r: P((X+2*r,55),4+6*r,0,0,(X+6+4*r,G),(X-4,G),('a',X+24+8*r,52),'down',le=('e',10+4*r,10))
+clip('door','side view: reaches forward, grips and turns a handle, pushes forward, then steps on; door not drawn',tail([STAND(0),DOX(0),DOX(.5),DOX(1),walkf(.25),walkf(.5)],False))
+TPX=('jacket and white shirt on, black trousers pulled down to her knees while seated, ordinary everyday bathroom routine, '
+     'no toilet or cubicle drawn')
+TSX=lambda b=0,**k: SITF(7,12,b=b,**k)
+clip('toiletin','side view: steps forward, lowers her trousers and sits down in a seated pose with nothing under her',
+     tail([ENTRY,walkf(.25),STAND(0,lh=(8,23),rh=(6,23)),lerp(STAND(0,lh=(8,23),rh=(6,23)),TSX(),.6),TSX(),TSX()],False),TPX)
+PHN=dict(lh=('r',16,8),rh=('r',14,10),le=('e',8,14),re=('e',6,15))
+clip('toilet','side view, seated pose with nothing under her, trousers at her knees, reading a smartphone',
+     tail([TSX(0,**PHN),TSX(.5,**PHN),TSX(1,**PHN),TSX(.5,**PHN)],True),TPX+', small black smartphone in her hands')
+clip('toiletout','side view: stands up from a seated pose, pulls her trousers up, reaches forward, then walks on',
+     tail([TSX(),lerp(TSX(),STAND(0,lh=(8,23),rh=(6,23)),.6),STAND(0,lh=(8,20),rh=(6,20)),REACH,walkf(.25),STAND(0)],False),TPX)
+REDO2=['chairsit','deskwork','typing','transmit','sofa','feast','ladder','door','toiletin','toilet','toiletout']
+# 후송(침대 눕기) 다시: 무릎 세워 다리가 마름모꼴 → 다리 쭉 펴고 반듯이, 가구 없이(사용자 지적 2026-10-21)
+BLX=lambda b=0: P((X-6,74),-90,0,0,(X+39,75),(X+38,76),('r',4,22+b),('r',3,24),le=('e',1,12),re=('e',0,12))
+clip('bedlie','side view: lying flat on her back in the air with nothing under her, legs straight, asleep, slow breathing',tail([BLX(0),BLX(1),BLX(1),BLX(0)],True))
+# 짜증: 앞손 손바닥을 이마(얼굴 앞)에 대고 고개 숙여 한숨. 당황(뒷머리)과 겹치던 것 고침
+AYX=lambda t: P((X,55),4,0,0,(X+6,G),(X-4,G),('r',10,-12+t),'down',tilt=12+8*t,le=('e',13,3))
+clip('annoyed','side view: annoyed, presses her near palm to her forehead in front of her face, head bowed, sighs',
+     tail([STAND(0),lerp(STAND(0),AYX(0),.5),AYX(0),AYX(1),AYX(1),AYX(0)],False))
+# 설거지: 선 자세, 손은 조리대 높이(최종 캔버스 y≈80 = 뼈대 y≈52), 허리 살짝 숙임. 가구 없이
+DSX=lambda d: P((X+2,56),8,0,0,(X+8,G),(X-4,G),('r',18+3*d,21),('r',16-3*d,22),tilt=14,le=('e',8,16),re=('e',6,17))
+clip('dishes','side view: standing, scrubbing a plate with a sponge at counter height, counter not drawn',
+     tail([DSX(0),DSX(1),DSX(-1),DSX(1)],True),'a white plate and a sponge in her hands')
+# 밀대: 자루 한 직선 위에 두 손(앞손 아래, 먼 손 위), 밀대 머리는 바닥(뼈대 y=106 ≈ 최종 y 134)에 붙은 채 앞뒤로
+def mopx(d):
+    H=(X+40+d,106); T=(X+2+0.3*d,30)
+    at=lambda t:('a',H[0]+(T[0]-H[0])*t,H[1]+(T[1]-H[1])*t)
+    return P((X+1+0.3*d,57),10,0,0,(X+10,G),(X-6,G),at(.45),at(.78))
+clip('mop','side view: pushing a mop back and forth, both hands on one straight handle, head on the floor',
+     tail([mopx(0),mopx(6),mopx(10),mopx(4),mopx(-4),mopx(-8)],True),'a mop with a long straight handle held in both hands, mop head on the floor')
+# 화분 물 주기: 앞손으로 물뿌리개 손잡이를 쥐고 주둥이를 앞 아래로 기울여 부음. 화분 없음
+WTX=lambda a: P((X+1,56),8+6*a,0,0,(X+8,G),(X-4,G),('r',17+2*a,14-3*a),'down',tilt=12+4*a,le=('e',7,14))
+clip('water','side view: tilting a watering can held by its handle, spout forward and down, pouring',
+     tail([STAND(0),WTX(0),WTX(.6),WTX(1),WTX(1),WTX(.6),WTX(0)],False),'a green watering can held by its top handle in her near hand, long spout, water pouring from the spout')
+# 기지개: 깍지 낀 두 팔을 머리 위로 쭉, 등 살짝 젖히고 발뒤꿈치 듦 → 멈춤 → 팔 내리며 숨 내쉼
+STR=lambda u,b=0: P((X,55-3*u),2-10*u,0,0,(X+6,G-4*u),(X-4,G-4*u),('r',5+3*(1-u),-36*u+6*(1-u)),('r',4+3*(1-u),-35*u+7*(1-u)),
+                    tilt=-10*u,le=('e',6+6*(1-u),-16*u+8*(1-u)),re=('e',4+6*(1-u),-15*u+8*(1-u)))
+clip('stretch','side view: big stretch, fingers laced, arms straight up overhead, back arched, heels up, relaxes',
+     tail([STAND(0),STR(0),STR(.6),STR(1),STR(1),lerp(STR(1),STAND(0),.5),STAND(0)],False))
+REDO3=['bedlie','annoyed','dishes','mop','water','stretch']
+# 쇠파이프 들고 대기·걷기·달리기: 가운데를 쥐고 수평으로 메던 것(여의봉) → 야구 방망이처럼 한쪽 끝을 두 손으로 쥐고
+# 자루를 어깨에 걸쳐 뒤 위로 비스듬히. 휘두르기 첫 장(뒤로 치켜듦)과 이어짐(사용자 지적 2026-10-21)
+PL=('r',9,15); PR=('r',7,12); PE=dict(le=('e',4,16),re=('e',2,15))
+PIPE='a long steel pipe gripped at one end with both hands like a baseball bat, resting on her near shoulder, angled up and back'
+clip('idle_pipe','side view: standing ready, holding a steel pipe like a bat resting on her shoulder',
+     tail([P((X,57+b),4,0,0,(X+10,G),(X-9,G-1),PL,PR,**PE) for b in (0,1,1.5,1)],True),PIPE)
+def walkp(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,56+1.2*abs(c)),4,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),PL,PR,**PE)
+clip('walk_pipe','side view: walking, steel pipe held like a bat resting on her shoulder',tail([walkp(i/8) for i in range(8)],True),PIPE)
+def runp(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+8,58+2.5*abs(sn)),14,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),PL,PR,**PE)
+clip('run_pipe','side view: running, steel pipe held like a bat resting on her shoulder',tail([runp(i/8) for i in range(8)],True),PIPE)
+# ── 기본 클립(몸만) 2026-10-21 재설계안 5장 생활 몫 13개 (docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md) ──
+# 프롬프트엔 몸 자세만(물건·가구·장면 이름 없음). 기준 그림 = 옆모습 대기(base-idle-side.png). 손은 빈 손 쥔 모양.
+# 끝 장은 생성기가 기준 그림으로 되돌리는 버릇 → tail()로 버릴 장 덧붙임.
+SU_=lambda lf,rf,hip,lean=6,lh='down',rh='down',**k: P(hip,lean,0,0,lf,rf,lh,rh,**k)
+clip('stepup','side view: steps up to a higher level, near knee lifts, foot plants high, pushes up, rear foot joins',
+     tail([STAND(0),SU_((X+12,G-22),(X-4,G),(X+1,56),8,lk=KNEE_UP),SU_((X+16,G-16),(X-4,G),(X+4,54),12,lk=KNEE_UP),
+           SU_((X+16,G-16),(X-2,G-6),(X+12,44),10,lk=KNEE_UP),SU_((X+16,G-16),(X+8,G-22),(X+15,40),4,rk=KNEE_UP),
+           SU_((X+16,G-16),(X+12,G-16),(X+14,39),2)],False))
+clip('stepover','side view: lifts near leg high over a knee-high edge, steps across, then swings the rear leg over',
+     tail([STAND(0),SU_((X+12,G-30),(X-4,G),(X+1,56),4,lk=KNEE_UP),SU_((X+28,G),(X-4,G),(X+12,58),8),
+           SU_((X+28,G),(X+14,G-30),(X+22,55),4,rk=KNEE_UP),SU_((X+28,G),(X+20,G),(X+24,55),2)],False))
+LIE=lambda lean,b=0,lh=('r',6,18),rh=('r',4,20),le=('e',2,12),re=('e',0,12): P((X-6,74+b),lean,0,0,(X+39,75),(X+38,76),lh,rh,le=le,re=re)
+clip('liesit','side view: lying flat on her back, legs straight, slowly sits up, legs stay straight out in front',
+     tail([LIE(-90),LIE(-62),LIE(-35),LIE(-12,lh=('r',14,22),rh=('r',12,24),le=('e',6,14),re=('e',4,14)),
+           LIE(-4,lh=('r',16,24),rh=('r',14,26),le=('e',6,15),re=('e',4,15))],False))
+HW_=lambda d: P((X+1,56),12,0,0,(X+8,G),(X-4,G),('r',18+2*d,24-d),('r',17-2*d,25+d),tilt=16,le=('e',8,17),re=('e',6,18))
+clip('handswork','side view: standing, leaning slightly forward, both hands together at waist height in front, rubbing',tail([HW_(0),HW_(1),HW_(-1),HW_(1)],True))
+HH_=lambda d: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',2+d,-17),('r',0-d,-16),tilt=4,le=('e',12,-5),re=('e',9,-4))
+clip('handshead','side view: raises both hands to the top of her head, elbows forward, fingers rubbing the scalp',
+     tail([STAND(0),lerp(STAND(0),HH_(0),.5),HH_(0),HH_(2),HH_(-2),HH_(2)],False))
+SM_=lambda t: SITF(6,6,lh=('r',14+(-7)*t,20-22*t),le=('e',6+6*t,16-6*t))
+clip('seatmouth','side view, seated pose, near hand rises from the lap up to her mouth and back down, as if eating',tail([SM_(0),SM_(.5),SM_(1),SM_(.5)],True))
+HD_=dict(lh=('r',15,10),rh=('r',13,12),le=('e',8,15),re=('e',6,16))
+clip('seathold','side view, seated pose, both hands together in front of her chest, head bowed, looking at her hands',
+     tail([SITF(6,18,**HD_),SITF(6,18,b=.5,**HD_),SITF(6,18,b=1,**HD_),SITF(6,18,b=.5,**HD_)],True))
+HLK=lambda b: P((X,55+b),3,0,0,(X+6,G),(X-4,G),tilt=18,**HD_)
+clip('holdlook','side view: standing, both hands together in front of her chest, head bowed, looking at her hands',tail([HLK(0),HLK(.5),HLK(1),HLK(.5)],True))
+HE_=lambda t: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',-5,-10),'down',tilt=t,le=('e',9,2))   # 손은 귀(뒤통수 쪽), 볼 앞이면 담배 피우는 것처럼 보임
+clip('handear','side view: standing, near hand held against her ear, elbow forward, small head movements',tail([HE_(0),HE_(3),HE_(0),HE_(-2)],True))
+def swp(d):
+    H=(X+40+d,106); T=(X+2+0.3*d,30)
+    at=lambda t:('a',H[0]+(T[0]-H[0])*t,H[1]+(T[1]-H[1])*t)
+    return P((X+1+0.3*d,57),10,0,0,(X+10,G),(X-6,G),at(.45),at(.78))
+clip('sweep','side view: both fists held one above the other on a diagonal line, pushing forward and pulling back',
+     tail([swp(0),swp(6),swp(10),swp(4),swp(-4),swp(-8)],True))
+LH_=lambda b: P((X-6,74),-90,0,0,(X+39,75),(X+38,76),('r',20,-8+b),('r',19,-6+b),le=('e',9,2),re=('e',8,3))
+clip('liehold','side view: lying flat on her back, legs straight, both hands raised above her face, looking at them',tail([LH_(0),LH_(1),LH_(0),LH_(1)],True))
+TI_=lambda d: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',6,3+d),('r',5,5-d),tilt=-6,le=('e',11,13),re=('e',9,14))
+clip('tie','side view: both hands at her collar, adjusting and tightening the knot at her throat, chin raised',
+     tail([STAND(0),lerp(STAND(0),TI_(0),.5),TI_(0),TI_(3),TI_(-1),TI_(2),STAND(0)],False))
+clip('stretch','side view: big stretch, fingers laced, arms straight up overhead, back arched, heels up, relaxes',
+     tail([STAND(0),STR(0),STR(.6),STR(1),STR(1),lerp(STR(1),STAND(0),.5),STAND(0)],False))
+BASE13=['stepup','stepover','liesit','handswork','handshead','seatmouth','seathold','holdlook','handear','sweep','liehold','tie','stretch']
+REDO=['seatrest','seatthink','doze','walllean','armscross','bored','situp','wallcry','phone','bedwake','hurtidle','limp','hide','doorclose','leadhand','victory','wave','walk_folder']
+# ── 수정 2차 (2026-10-21 결함 목록 3·13~16·18) ──
+# 정면 돌아감의 실제 원인: 뼈대 폭이 아니라 기준 그림. A2는 셔츠·넥타이가 보이는 3/4 각도라, 생성기가 A2를 따라가면 3/4,
+# 뼈대를 따라가면 옆모습이 나옴(같은 G0 뼈대인 guard·step은 옆모습, evade·grab2는 처음부터 끝까지 3/4).
+# 그래서 다시 생성분은 옆모습으로 나온 guard/00.png(뼈대 = G0)를 기준 그림으로 씀(gen_fix2.py). 아래는 약했던 동작의 뼈대.
+# 20 회피: 몸을 낮게 숙이며 뒷발로 크게 물러났다(그림 안 -18px) 다시 스탠스로
+EVA=P((X-8,68),14,-0.9,-0.5,(X+4,G-7),(X-24,G),(16,6),'chin',tilt=10)
+EVB=P((X-18,72),16,-0.9,-0.5,(X-6,G),(X-32,G-2),(16,8),'chin',tilt=12)
+clip('evade','quick low evasive back-step: ducks low and hops back, then returns to the boxing guard',[G0,EVA,EVB,EVB,lerp(EVB,G0,.5),G0])
+# 21 잡기: 앞손을 끝까지 뻗어 멱살을 잡고(팔 다 펴짐) 당겨 붙임 → 끝 자세 GR2(잡기 타격·폭파와 이어짐)
+GRF=P((X+8,60),12,-1.3,-0.7,(X+24,G),(X-10,G-2),(44,2),'chin')
+clip('grab2','lunging reach with the lead arm fully extended, grabs an enemy by the collar and pulls them close',[G0,staged(G0,GRF,.5),GRF,lerp(GRF,GR2,.6)])
+clip('grab','lunging reach with the lead arm fully extended, grabs an enemy by the collar',[G0,staged(G0,GRF,.5),GRF,lerp(GRF,GR,.6)])
+# 3b 전투 걸음: 앞발을 높이 들어 크게(20px) 내딛고 뒷발이 끌려옴. 끝에서 코드가 20px 이동(빌더 adv=20)
+clip('step','boxing footwork: lead foot lifts and steps far forward, rear foot slides after, guard up',
+     [shuffle(8,0,8,0),shuffle(16,0,7,0),shuffle(20,0,0,0),shuffle(20,7,0,7),shuffle(20,15,0,5),shuffle(20,20,0,0)])
+# 12 돌진: 상체를 크게(35~45도) 숙이고 앞어깨를 내밀어 들이받음, 머리는 어깨 뒤
+DSL=P((X+12,68),36,-1.8,-1.0,(X+30,G),(X-12,G-4),(10,16),(2,12),head=(6,-4),tilt=8)
+DSH=P((X+26,70),46,-2.0,-1.1,(X+44,G),(X-8,G-8),(12,18),(4,14),head=(6,-4),tilt=8)
+clip('dash','running shoulder charge: torso bent low and forward, lead shoulder driving into the enemy, rear leg pushing hard',[DASH0,DSL,DSH,sh(DSH,3),lerp(DSH,GUARD(20),.5),GUARD(22)])
+# 13 점프 킥: 앞다리를 거의 수평으로 끝까지 폄, 뒷무릎은 가슴까지 접음, 상체는 뒤로
+KK=lambda e: P((X-4*e,54),-6-6*e,-0.6,-0.4,(X+14+32*e,G-20-14*e),(X-2,G-36),(13,0),'chin',rk=KNEE_UP)
+clip('airkick','mid-air flying side kick: lead leg fully extended straight forward, rear knee tucked to the chest',[air(12),KK(.45),KK(1),KK(1),KK(.5),air(10)])
+# 18 전면 가드: 팔꿈치를 앞으로 모아 두 팔뚝을 세워 얼굴을 덮음, 고개 숙이고 몸을 웅크림
+BF2=P((X-2,63),10,-0.7,-0.4,(X+13,G),(X-13,G-2),(15,-15),(12,-11),tilt=16,le=ELB_OUT,re=ELB_OUT)
+clip('blockfront','covering up: both forearms raised vertically in front of the face, elbows together, chin tucked',[G0,lerp(G0,BF2,.5),BF2,BF2])
+
+# ── 수정 3차 (2026-10-21 사용자: 달리기가 조깅 같음, 쇠파이프가 찌르기 방향) ──
+# 4 달리기(전력 질주 8, 제자리 순환): 상체 22도, 보폭 ±24, 뒤로 찬 발 높이, 두 발 다 뜬 장(0.25·0.75), 팔 크게 엇갈림
+def sprint(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t); fl=abs(sn)
+    lf=(X+8+24*c-10*max(0,-sn), G-18*max(0,-sn)-5*fl); rf=(X+8-24*c-10*max(0,sn), G-18*max(0,sn)-5*fl)
+    return P((X+10,60-5*fl),22,0.45*c,0.35*c,lf,rf,(10-20*c,12+5*c),(4+20*c,12-5*c),head=(6,-6),lk=KNEE_FWD,rk=KNEE_FWD)
+clip('run','full-speed sprint: torso leaning well forward, long strides, knees driving high, both feet leave the ground, arms pumping hard, hair streaming back',[sprint(i/8) for i in range(8)])
+# 38 쇠파이프 내려치기(7): 두 손 잡음 → 뒤 어깨 위로 치켜듦 → 머리 위 → 앞으로 크게 내려침(타격 3장) → 아래로 따라감 → 회수
+PW1=P((X-3,58),-8,0.6,0.3,(X+12,G),(X-12,G-1),(-8,-14),(-6,-10),le=ELB_UP,re=ELB_UP)
+PW2=P((X,58),-2,0.2,0.1,(X+13,G),(X-11,G-1),(4,-24),(2,-20),le=ELB_UP,re=ELB_UP)
+PW3=P((X+8,61),16,-0.8,-0.5,(X+22,G),(X-10,G-2),(30,4),(24,6))
+PW4=P((X+10,63),26,-1.0,-0.6,(X+23,G),(X-9,G-2),(24,28),(18,28))
+clip('pipe2','two-handed overhead smash with a steel pipe: raises it high behind her shoulder, swings it over her head and smashes it down in front, follow-through low',
+     [PI,PW1,PW2,PW3,PW4,lerp(PW4,PI,.5),PI],'gripping a long steel pipe with both hands, the whole pipe clearly visible in every frame')
+
+# ── 기본 클립 재설계 (2026-10-21 사용자 승인, docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 5장) — 전투 스레드 몫 13개 ──
+# 몸만: 빈 손, 설명에 물건·장면 이름 없음. 물건은 게임이 손목 좌표에 따로 그림. 팔꿈치는 모두 직접 지정(몸 앞·옆).
+C2=dict(lh=('r',17,15),rh=('r',15,17),le=('e',3,16),re=('e',1,17))      # 두 손: 아래팔 수평, 손은 가슴 앞에서 마주 봄
+C1=dict(lh=('r',11,12),le=('e',3,16))                                   # 한 손: 앞손 주먹을 가슴 높이
+def walkb(t,**k):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    k.setdefault('rh',(-1+7*c,28))
+    return P((X+2,56+1.2*abs(c)),4,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),**k)
+def runb(t,**k):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    k.setdefault('rh',(2+14*c,14-4*c))
+    return P((X+8,58+2.5*abs(sn)),14,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),**k)
+for tag,k,txt in (('carry2',C2,'both forearms held level in front of the chest, open hands facing each other, elbows bent at the sides'),
+                  ('carry1',C1,'near hand closed in a loose fist held at chest height in front of her, elbow bent, other arm relaxed')):
+    clip(f'{tag}_idle',f'side view: standing still, {txt}',[P((X,56+b),3,0,0,(X+8,G),(X-6,G),**{**k,**({'rh':'down'} if tag=='carry1' else {})}) for b in (0,.5,1,.5)])
+    clip(f'{tag}_walk',f'side view: walking, {txt}',[walkb(i/8,**k) for i in range(8)])
+    clip(f'{tag}_run',f'side view: running, {txt}',[runb(i/8,**k) for i in range(8)])
+# 살금 걷기: 무릎을 앞으로 굽힌 채 발끝으로 천천히, 상체 살짝 숙임, 두 손은 허리 앞에서 균형
+def sneakb(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,64+abs(c)),14,0,0,(X+4+10*c,G-2-5*max(0,-sn)),(X+4-10*c,G-2-5*max(0,sn)),('r',14,20),('r',10,22),tilt=8,
+             lk=KNEE_UP,rk=KNEE_UP,le=('e',4,16),re=('e',2,17))
+clip('sneak','side view: tiptoeing slowly, knees bent forward, upper body slightly lowered, hands held low in front for balance',[sneakb(i/8) for i in range(8)])
+# 뒤돌아보기 시도(불합격: 생성기가 뒤가 아니라 화면 쪽으로 얼굴을 돌림 → 이전 lookback 유지, 결과는 커밋하지 않음)
+def LBK(a):
+    p=P((X,55),2,0.9*a,0.35*a,(X+6,G),(X-4,G),'down','down',head=(5-11*a,-7))
+    n=p['NOSE']
+    for k in ('RIGHT EYE','LEFT EYE','RIGHT EAR','LEFT EAR'):   # 얼굴이 뒤를 향하면 눈·귀도 코 뒤쪽 → 앞쪽으로 넘어감
+        p[k]=(n[0]+(p[k][0]-n[0])*(1-2*a),p[k][1])
+    return p
+clip('lookback_try','side view: turns her shoulders and upper body back and looks behind over her shoulder, then faces forward again',[LBK(0),LBK(.5),LBK(.9),LBK(.9),LBK(.5),LBK(0)])
+# 머리 넘기기: 앞손을 이마 앞에서 정수리 위를 지나 뒤로 쓸어 넘김, 팔꿈치는 앞·위
+HFB=lambda a: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',9-15*a,-15-3*a),'down',tilt=-6*a,le=('e',12-2*a,-2-6*a))
+clip('hairflip','side view: sweeps her near hand from her forehead over the top of her head and pushes her long hair back, elbow raised in front',
+     [STAND(0),HFB(0),HFB(.5),HFB(1),HFB(1),STAND(0)])
+# 당황: 고개 숙이고 앞손으로 뒷머리를 긁음, 팔꿈치는 얼굴 옆 앞으로
+EMB=lambda d: P((X,55),2,0,0,(X+6,G),(X-4,G),('r',-7+d,-11),'down',tilt=12,le=('e',11,-4))
+clip('embarrassed','side view: embarrassed, head lowered, scratches the back of her head with her near hand, elbow pointing forward',
+     [STAND(0),EMB(0),EMB(2),EMB(0),EMB(2),STAND(0)])
+# 어깨 으쓱: 두 어깨를 올리고 팔꿈치를 옆구리에 붙인 채 아래팔을 앞으로, 손바닥 위
+def SRB(a):
+    p=P((X,55),2,0,0,(X+6,G),(X-4,G),('r',15,20),('r',13,21),tilt=6*a,le=('e',1,16),re=('e',0,16))
+    return jit(p,0,-3*a,['SHOULDER','ELBOW',' ARM'])
+clip('shrug','side view: shrugs, both shoulders raised, elbows at her sides, forearms forward with palms turned up, head tilted',[STAND(0),SRB(.5),SRB(1),SRB(1),SRB(.5),STAND(0)])
+# 고개 젓기: 몸은 그대로, 머리만 좌우로 작게
+def SKB(d):
+    p=P((X,55),2,0,0,(X+6,G),(X-4,G),'down','down'); return jit(p,2*d,0,['NOSE','EYE','EAR'])
+clip('headshake','side view: shakes her head slightly from side to side, body completely still',[SKB(0),SKB(-1),SKB(1),SKB(-1),SKB(1),SKB(0)])
+# 손잡고 이끌기: 앞으로 걸으며 가까운 팔을 몸 뒤 아래로 쭉 뻗음(손은 엉덩이 뒤 아래), 고개 살짝 뒤로
+def leadb(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+4,57+1.2*abs(c)),10,0,0,(X+4+11*c,G-4*max(0,-sn)),(X+4-11*c,G-4*max(0,sn)),('r',-24,24),(2+7*c,28),head=(4,-7),le=('e',-9,13))
+clip('leadhand','side view: walking forward, near arm stretched straight back and down behind her body, hand open',[leadb(i/8) for i in range(8)])
+# 뒤돌아보기 2차(불합격: 어깨를 벌리자 몸 전체가 3/4 정면으로, 얼굴도 화면 쪽. 커밋 안 함): 하체·골반은 오른쪽 옆모습 그대로, 어깨선만 화면 안쪽으로 30~45도(앞어깨가 앞으로, 뒷어깨가 뒤로 벌어짐),
+# 머리는 완전히 왼쪽을 보는 옆얼굴(코가 귀보다 왼쪽). 목 길이(NECK–NOSE)는 대기와 같음. 중간 장도 코를 확실히 왼쪽에 둠(정면 얼굴 방지)
+def LBK2(a,back=True):
+    p=P((X,55),2,-1.1*a,0,(X+6,G),(X-4,G),'down','down',le=('e',-1,14),re=('e',-2,14))
+    if back:
+        N=p['NECK']; n=(N[0]-5,N[1]-7); p['NOSE']=n
+        for k,v in (('RIGHT EYE',(3,-3)),('LEFT EYE',(0,-4)),('RIGHT EAR',(8,-2)),('LEFT EAR',(6,-3))): p[k]=(n[0]+v[0],n[1]+v[1])
+    return p
+clip('lookback_try2','side view: hips and legs stay facing right, shoulders twist back, head turned fully to look left behind her, then faces right again',
+     [LBK2(0,False),LBK2(.6),LBK2(1),LBK2(1),LBK2(.6),LBK2(0,False)])
+BASE13=['carry2_idle','carry2_walk','carry2_run','carry1_idle','carry1_walk','carry1_run','sneak','leadhand','hairflip','embarrassed','shrug','headshake']
+
+# ── 독립 검수 깨짐 8개 다시 뽑기 (2026-10-21 16:36 사용자 승인) ──
+# 원인(뼈대): s(어깨 회전)가 -0.8~-1.2면 두 어깨가 16px 벌어져 생성기가 3/4 정면으로 그림(blast·grabknee·collapse).
+# 옆모습 = s -0.25 이하, h 0 근처. 손을 머리 뒤로 넘기면 등을 돌려 그림(pipe2) → 쇠파이프는 머리 위 앞쪽으로 치켜듦.
+SIDE=-0.25
+PREPb=P((X-2,61),0,SIDE,-0.1,(X+13,G),(X-14,G-1),(8,4),'chin')
+PALMb=P((X+6,60),10,SIDE,-0.15,(X+20,G),(X-12,G-2),'out','chin',head=(6,-6),re=('e',3,14))
+clip('blast','side view in profile: thrusts the open lead palm straight forward at a point ahead, then slowly lowers it',
+     [G0,PREPb,staged(PREPb,PALMb,.6),PALMb,PALMb,lerp(PALMb,G0,.25),lerp(PALMb,G0,.55),G0])
+# 잡기 무릎: 앞손은 멱살(앞으로 뻗음), 뒷무릎을 앞위로 올리되 정강이는 아래로 늘어뜨림(앞차기 아님)
+GRb=P((X+6,60),8,SIDE,-0.1,(X+20,G),(X-12,G-2),(28,2),'chin',re=('e',3,14))
+KNb=P((X+8,58),2,SIDE,-0.1,(X+20,G),(X+16,G-14),(26,4),(14,8),rk=KNEE_UP,re=('e',4,16))
+clip('grabknee','side view in profile: holding an enemy by the collar with the lead hand, drives the rear knee up high into them, shin hanging down',
+     [GRb,lerp(GRb,KNb,.5),KNb,KNb,lerp(KNb,GRb,.5)])
+# 마시기: 빈 손(캔은 엔진이 손 좌표에 붙임), 팔꿈치는 몸 앞 아래
+DRb=lambda t: P((X,55),2,0,0,(X+6,G),(X-4,G),(6,-1),'down',tilt=-18*t,le=('e',6,14))
+clip('drink','side view in profile: lifts the near hand to her mouth and tips her head back for a sip, empty loosely closed hand',
+     [STAND(0),lerp(STAND(0),DRb(0),.5),DRb(0),DRb(1),DRb(1),DRb(0),STAND(0)])
+# 다운: 누워서도 턱을 당겨 발 쪽을 봄(얼굴 옆모습이 보이게), 손은 바닥선 위
+K3b=P((X-18,84),-78,0,0,(X+16,G-32),(X+8,G-24),(2,-26),(-10,-14),lk=KNEE_UP,rk=KNEE_UP,tilt=25)
+K4b=P((X-14,93),-88,0,0,(X+28,G-4),(X+20,G),(14,0),(10,-4),lk=KNEE_UP,rk=KNEE_UP,tilt=35,re=ELB_UP,le=ELB_UP)
+K5b=P((X-12,95),-90,0,0,(X+32,G),(X+28,G),(16,0),(10,-4),tilt=35,re=ELB_UP,le=ELB_UP)
+clip('down','side view in profile: heavy hit, thrown backward through the air, lands on her back, chin tucked looking toward her feet',[K1,K2,K3b,K4b,K5b,K5b,K5b,K5b])
+# 기상: 누움 → 팔꿈치로 상체 일으킴 → 손 짚고 앉음 → 한 무릎 → 섬 (중간 장을 촘촘히)
+UPa=P((X-8,95),-60,0,0,(X+30,G),(X+26,G),(10,6),('a',X-16,G-2),tilt=20,lk=KNEE_UP,rk=KNEE_UP)
+clip('getup','side view in profile: getting up from lying on her back, props up on one hand, sits up, rises to one knee, then stands in guard',
+     [K5b,UPa,lerp(UPa,U1,.6),U1,U2,CROUCH(),lerp(CROUCH(),G0,.5),G0])
+# 쓰러짐: 발이 뜨지 않게(뒤로 휘청이는 장 낮춤), 마지막은 엎드려 얼굴을 옆으로 돌림(머리카락 뭉치 방지)
+HLb=P((X-2,60),-6,SIDE,-0.1,(X+13,G),(X-12,G-1),(14,6),(2,8),head=(4,-8))
+FDb=P((X-6,94),86,0,0,(X-48,G-2),(X-50,G),('a',X+20,G-2),('a',X+12,G-1),head=(7,-5),tilt=-30,le=ELB_UP,re=ELB_UP)
+clip('collapse','side view in profile: defeated, staggers, drops to her knees, then falls forward onto her front and stays still, face turned to the side',
+     [G0,HLb,lerp(HLb,KNEEL,.5),KNEEL,KNEEL,lerp(KNEEL,FDb,.5),FDb,FDb])
+# 쇠파이프 내려치기: 준비 → 머리 위 앞쪽으로 곧게 치켜듦(손이 이마 앞 위) → 앞으로 내려침 → 아래로 따라감
+PU1=P((X-2,57),-2,SIDE,-0.1,(X+12,G),(X-11,G-1),(10,-8),(8,-4),re=('e',4,2))
+PU2=P((X-3,57),-8,SIDE,-0.1,(X+12,G),(X-12,G-1),(8,-24),(6,-20),le=('e',8,-8),re=('e',6,-6))
+clip('pipe2','side view in profile: two-handed overhead smash with a steel pipe: lifts it straight up above her head in front, then smashes it down forward, follow-through low',
+     [PI,PU1,PU2,lerp(PU2,PW3,.5),PW3,PW4,PW4,lerp(PW4,PI,.5)],'gripping a long steel pipe with both hands, the whole pipe clearly visible in every frame')
+# 산탄총 걷기: 대기와 같은 손 간격을 넓게(앞손 총열 덮개, 뒷손 손잡이 가슴), 개머리판은 뒷팔 아래
+def walkg(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,56+1.2*abs(c)),3,0,0,(X+2+11*c,G-4*max(0,-sn)),(X+2-11*c,G-4*max(0,sn)),(24,16),(4,12),le=('e',8,14),re=('e',0,14))
+clip('walk_shotgun','side view in profile: walking while carrying a long pump shotgun level in both hands',[walkg(i/8) for i in range(8)],
+     'holding a long black pump shotgun with a wooden stock in both hands, front hand on the pump, rear hand on the grip, stock under the rear arm, as long as her arm')
+# 누운·엎드린 장 팔꿈치가 바닥 아래로 가는 것(anatomic 보정 뒤) → 바닥선 위로 올림
+for _n in ('down','getup','collapse'):
+    _a,_pr,_ps=CLIPS[_n]
+    CLIPS[_n]=(_a,_pr,[{k:((v[0],min(v[1],129-DY)) if 'ELBOW' in k else v) for k,v in q.items()} for q in _ps])
+# 쇠파이프 합본(생성 0회): 16:40판 머리 위 치켜듦(PU2) + 28e8170판 앞 위 치켜듦(PW3)·내려침(PW4). 16:40판 타격 장은 파이프가 바닥에 꽂혀 불합격
+CLIPS['pipe3']=(CLIPS['pipe2'][0],CLIPS['pipe2'][1],[anatomic(PU2),anatomic(PW3),anatomic(PW4)])
+# 산탄총 대기·달리기: 걷기(16:40)와 같은 총·같은 손 자리(앞손 펌프, 뒷손 손잡이, 개머리판 뒷팔 아래)
+SGP='holding a long black pump shotgun with a wooden stock in both hands, front hand on the pump, rear hand on the grip, stock under the rear arm, as long as her arm'
+clip('idle_shotgun','side view in profile: standing ready while carrying a long pump shotgun level in both hands',
+     [P((X,57+b),3,0,0,(X+8,G),(X-6,G),(24,16),(4,12),le=('e',8,14),re=('e',0,14)) for b in (0,.5,1,.5)],SGP)
+def rung(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+8,58+2.5*abs(sn)),12,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),(24,16),(4,12),le=('e',8,14),re=('e',0,14))
+clip('run_shotgun','side view in profile: running while carrying a long pump shotgun level in both hands',[rung(i/8) for i in range(8)],SGP)
+REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A
 def kp(p):

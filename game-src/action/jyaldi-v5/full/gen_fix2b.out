@@ -1,0 +1,12 @@
+before generations_remaining: 8969
+sub blockfront
+sub grabblast
+sub chain
+sub super
+sub fall
+done fall
+done blockfront
+done grabblast
+done chain
+done super
+after generations_remaining: 8952

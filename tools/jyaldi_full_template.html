@@ -60,7 +60,7 @@
       <button data-k="KeyA">A 근접</button><button data-k="KeyS">S 권총</button><button data-k="KeyD">D 폭파</button><button data-k="KeyQ">Q 가드</button><button data-k="KeyW">W 필살</button>
       <button data-k="KeyR">R 장전</button><button data-k="KeyF">F 숙련3</button><button data-k="KeyG">G 숙련6</button><button data-k="KeyC">C 지원</button><button data-k="KeyT">T 말</button>
       <button data-k="Digit1">1 커피</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button>
-      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 서류</button><button data-k="KeyO">O 담배</button><button data-k="KeyL">L 장갑</button>
+      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 들고 보기</button><button data-k="KeyO">O 전화</button><button data-k="KeyL">L 장갑</button>
     </div>
   </div>
   <div class="keys">
@@ -95,7 +95,7 @@ function measure(k, im) {
   }
   boxes[k] = out;
 }
-for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => { loaded++; measure(k, im); }; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
+for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => { loaded++; if (M.clips[k]) measure(k, im); }; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:image/png;base64,' + BG64;
 const cutImg = new Image(); cutImg.onload = () => loaded++; cutImg.src = 'data:image/png;base64,' + CUT64;
 if (M.missing && M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
@@ -110,7 +110,7 @@ const G = { x: 360, z: 0.55, y: 0, vy: 0, vx: 0, dir: 1, clip: 'idle', f: 0, t: 
   crouch: false, downTap: 0, grab: null, grabN: 0, down: false, lying: false, lyingT: 0, tired: false, hq: false, weapon: null, wUses: 0, carry: null,
   hp: 100, gauge: 100, inv: 0, trail: [], air: false, phase: '', shiftDown: 0, runHeld: false, talkT: 0, talkLine: '', items: { coffee: 2, snack: 2, bandage: 2 } };
 const keys = new Set();
-const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], booms: [], text: [], flash: 0, cut: 0, slow: 0 };
+const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], booms: [], text: [], flash: 0, cut: 0, slow: 0, fade: 0 };
 const ENEMIES = [mkE(820, 0.5), mkE(1040, 0.7)];
 function mkE(x, z) { return { x, z, y: 0, vx: 0, vy: 0, hp: 12, state: 'idle', t: 0, flash: 0, face: -1, home: x }; }
 const WALL = { x: 1230, hp: 1, broken: false, t: 0 };
@@ -122,14 +122,19 @@ let lineI = 0;
 
 function play(k, o = {}) {
   if (!has(k)) { FX.text.push({ x: G.x, y: groundY(G.z) - 320, s: '그림 없음: ' + k, t: 0.8 }); return false; }
+  if (NUDE.has(k) !== NUDE.has(G.clip)) FX.fade = 0.32;   // 결함 45: 정장 ↔ 맨몸이 바뀌는 순간 짧게 암전
+  if (k === 'hit') { G.hurtT = 0.16; FX.shake = Math.max(FX.shake, 0.22); FX.stop = Math.max(FX.stop, 0.07); }   // 결함 19
   G.clip = k; G.f = o.rev ? M.clips[k].frames - 1 : 0; G.t = 0; G.rev = !!o.rev; G.lock = !!o.lock; G.next = o.next || null; G.hold = 0; G.hitsDone = new Set(); return true;
 }
 const C = () => M.clips[G.clip];
+const NUDE = new Set(['showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout']);
 const heldTag = () => G.carry || G.weapon;   // 'brick' | 'pipe' | 'shotgun' | null
+// 집는 물건(벽돌 등)은 그림에 없고 두 손 들기 기본 클립(carry2_*) + 손 좌표에 엔진이 붙임. 무기는 무기별 클립(idle_pipe 등)
+const heldClip = (base) => G.carry ? 'carry2_' + base : base + '_' + G.weapon;
 function idleClip() {
   if (G.crouch) return 'crouch';
   if (G.guard) return 'block';
-  if (heldTag() && has('idle_' + heldTag())) return 'idle_' + heldTag();
+  if (heldTag() && has(heldClip('idle'))) return heldClip('idle');
   if (G.tired) return 'tired';
   if (G.fight) return 'guard';
   return 'idle';
@@ -154,6 +159,7 @@ function onKey(code, down) {
   if (FX.cut > 0) return;
   if (G.down) { if (code === 'KeyK' && G.lying) standUp(); return; }
   if (G.lock) {
+    if (code === 'KeyA' && G.air && !G.down) { attackA(); return; }   // 점프 중(잠금 상태)에도 공중 킥
     if (code === 'KeyA' && ['jab', 'cross'].includes(G.clip)) G.queued = 'A';
     if (code === 'KeyA' && G.clip === 'grabknee') G.queued = 'A';
     return;
@@ -175,13 +181,13 @@ function onKey(code, down) {
     case 'Digit1': useItem('coffee', 'drink'); break;
     case 'Digit2': useItem('snack', 'eat'); break;
     case 'Digit3': useItem('bandage', 'bandage'); break;
-    case 'KeyH': if (G.guard) { G.vx = -4; sparks(G.x + G.dir * 50 * S, groundY(G.z) - 120 * S / 2, 6); FX.stop = Math.max(FX.stop, 0.06); FX.shake = Math.max(FX.shake, 0.08); } else { play('hit', { lock: true }); G.vx = -5; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break;
+    case 'KeyH': { const away = awayDir(); if (G.guard) { G.vx = 4 * away * G.dir; sparks(G.x + G.dir * 50 * S, groundY(G.z) - 120 * S / 2, 6); FX.stop = Math.max(FX.stop, 0.06); FX.shake = Math.max(FX.shake, 0.08); } else { play('hit', { lock: true }); G.vx = 8 * away * G.dir; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break; }
     case 'KeyK': knockdown(); break;
     case 'KeyT': G.talkT = 2.2; G.talkLine = LINES[lineI++ % LINES.length]; play('talk'); break;
     case 'KeyV': G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 330, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); break;
     case 'KeyB': { const wasF = G.fight && G.clip === 'guard'; G.hq = !G.hq; G.fight = false; G.aim = false; hitText(640, 120, G.hq ? '본부' : '현장'); if (wasF && has('engage')) play('engage', { lock: true, rev: true }); else play(idleClip()); break; }
-    case 'KeyP': play('papers', { lock: false }); G.busy = 3; break;
-    case 'KeyO': play('smoke', { lock: true }); break;
+    case 'KeyP': play('holdlook', { lock: false }); G.busy = 3; break;
+    case 'KeyO': play('handear', { lock: true }); break;
     case 'KeyL': play('glove', { lock: true }); break;
     case 'ArrowDown': {
       const now = performance.now();
@@ -229,15 +235,22 @@ function reload() {
 }
 function evade(mx) {
   dropHeld(); G.fight = true; G.aim = false; G.inv = 0.32; G.trail = [];
-  G.evDir = mx || -G.dir; G.vx = 0; G.evV = 15; play('evade', { lock: true });
+  const mz = (keys.has('ArrowDown') ? 1 : 0) - (keys.has('ArrowUp') ? 1 : 0);   // 위·아래도 같이 누르면 대각선 회피
+  G.evDir = mx || (mz ? 0 : -G.dir); G.evZ = mz; if (mx && mz) G.evDir *= 0.75; G.vx = 0; G.evV = 15; play('evade', { lock: true });
   for (let i = 0; i < 5; i++) FX.dust.push({ x: G.x, y: groundY(G.z), vx: -G.evDir * (2 + i), vy: -1 - Math.random(), t: 0.35 });
 }
+const CUT_T = 0.45;   // 필살기 연출로 화면이 멈추는 시간(전엔 1.1초라 멈춘 것처럼 보였음)
 function superMove() {
   G.fight = true; G.aim = false;
   if (G.gauge < 100) { hitText(G.x, groundY(G.z) - 330, '필살 게이지 부족'); return; }
-  G.gauge = 0; FX.cut = 1.1; play('super', { lock: true });
+  G.gauge = 0; FX.cut = CUT_T; play('super', { lock: true });
 }
-function knockdown() { G.fight = true; G.aim = false; G.guard = false; G.crouch = false; G.down = true; G.lying = false; G.vxK = -12 * G.dir; G.vy = -13; G.air = true; G.y = -1; play('down', { lock: true }); G.hp = Math.max(1, G.hp - 15); }
+// 맞은 쪽 반대로 밀려남: 시험용 H·K는 가장 가까운 적이 때린 것으로 친다(적이 없으면 보는 방향 반대)
+function awayDir() {
+  let best = null; for (const e of ENEMIES) if (e.state !== 'down' && (!best || Math.abs(e.x - G.x) < Math.abs(best.x - G.x))) best = e;
+  return best && best.x !== G.x ? Math.sign(G.x - best.x) : -G.dir;
+}
+function knockdown() { G.fight = true; G.aim = false; G.guard = false; G.crouch = false; G.down = true; G.lying = false; G.vxK = 12 * awayDir(); G.vy = -13; G.air = true; G.y = -1; play('down', { lock: true }); G.hp = Math.max(1, G.hp - 15); }
 function standUp() { G.lying = false; play('getup', { lock: true }); }
 function useItem(kind, clip) {
   if (!onGround() || G.items[kind] <= 0) { hitText(G.x, groundY(G.z) - 330, '없음'); return; }
@@ -416,7 +429,7 @@ function update(now) {
     else {
       if (mx) G.dir = mx;
       const run = G.runHeld && mx;
-      let want = (run ? 'run' : 'walk') + (heldTag() && has('walk_' + heldTag()) ? '_' + heldTag() : ''); if (!has(want)) want = 'walk_' + heldTag();
+      let want = heldTag() ? heldClip(run ? 'run' : 'walk') : (run ? 'run' : 'walk'); if (!has(want)) want = heldTag() ? heldClip('walk') : 'walk';
       if (G.clip !== want) play(want);
       const sp = run ? 7.5 : 3.2;
       G.x += mx * sp * dt * 60 * S / 2; G.z = Math.max(0, Math.min(1, G.z + mz * 0.006 * dt * 60));
@@ -435,17 +448,21 @@ function update(now) {
   if (!G.fight && !G.hq && !G.tired && G.clip === 'idle' && Math.random() < dt * 0.06) play('glove', { lock: true }); // 가끔 장갑 고쳐 끼기
   // 이동 속도
   if (G.vx) { G.x += G.dir * G.vx * dt * 60; G.vx *= Math.pow(0.82, dt * 60); if (Math.abs(G.vx) < 0.3) G.vx = 0; }
-  if (G.evV) { G.x += G.evDir * G.evV * dt * 60; G.evV *= Math.pow(0.85, dt * 60); if (G.evV < 0.5) G.evV = 0; G.trail.push({ x: G.x, f: G.f, clip: G.clip, t: 0.22 }); if (G.trail.length > 6) G.trail.shift(); }
+  if (G.evV) { G.x += G.evDir * G.evV * dt * 60; G.z = Math.max(0, Math.min(1, G.z + (G.evZ || 0) * G.evV * 0.0016 * dt * 60)); G.evV *= Math.pow(0.85, dt * 60); if (G.evV < 0.5) G.evV = 0; G.trail.push({ x: G.x, f: G.f, clip: G.clip, t: 0.22 }); if (G.trail.length > 6) G.trail.shift(); }
   for (const tr of G.trail) tr.t -= dt; G.trail = G.trail.filter(t => t.t > 0);
   if (G.inv > 0) G.inv -= dt;
   // 점프 물리
-  if (G.clip === 'jump' && G.phase === 'pre' && G.f >= 1) { G.phase = 'air'; G.air = true; G.vy = -15; G.y = -1; G.kicked = false; G.vx = mx ? 4 * mx * G.dir : 0; }
+  if (G.clip === 'jump' && G.phase === 'pre' && G.f >= 1) { G.phase = 'air'; G.air = true; G.vy = -15; G.y = -1; G.kicked = false; G.airVX = mx * (G.runHeld ? 7.5 : 4.5); if (mx) G.dir = mx; }
   if (G.air) {
     G.vy += 0.85 * dt * 60; G.y += G.vy * dt * 60 * S / 2;
     if (G.vxK) { G.x += G.vxK * dt * 60 * S / 2; }
+    else {   // 공중 좌우 조작: 뛰기 전 속도를 유지하고, 방향키로 조금씩 틀 수 있음
+      if (mx) G.airVX += (mx * Math.max(4.5, Math.abs(G.airVX || 0)) - (G.airVX || 0)) * Math.min(1, 0.08 * dt * 60);
+      G.x += (G.airVX || 0) * dt * 60 * S / 2;
+    }
     if (G.clip === 'jump') { G.f = G.vy < -6 ? 2 : G.vy < 0 ? 3 : G.vy < 6 ? 4 : 5; G.t = 0; }
     if (G.y >= 0) {
-      G.y = 0; G.vy = 0; G.air = false; G.vxK = 0;
+      G.y = 0; G.vy = 0; G.air = false; G.vxK = 0; G.airVX = 0;
       for (let i = 0; i < 4; i++) FX.dust.push({ x: G.x, y: groundY(G.z), vx: (i - 1.5) * 2.5, vy: -1.5, t: 0.3 });
       if (G.clip === 'airkick') { FX.booms.push({ x: G.x + G.dir * 50 * S, y: groundY(G.z) - 10, r: 0, R: 38 * S / 2, t: 0, d: 0 }); for (const e of ENEMIES) if (Math.abs(e.x - (G.x + G.dir * 100)) < 90 && Math.abs(e.z - G.z) < 0.2 && e.state !== 'fly') launch(e, G.dir * 8, 1); }
       if (G.clip === 'down') { FX.shake = Math.max(FX.shake, 0.15); }
@@ -485,7 +502,7 @@ function update(now) {
   for (let i = PROJ.length - 1; i >= 0; i--) if (PROJ[i].dead) { FX.dust.push({ x: PROJ[i].x, y: groundY(PROJ[i].z), vx: 0, vy: -1, t: 0.3 }); PROJ.splice(i, 1); }
   updateAlly(dt);
   // 효과
-  FX.shake = Math.max(0, FX.shake - dt); FX.flash = Math.max(0, FX.flash - dt);
+  FX.shake = Math.max(0, FX.shake - dt); FX.flash = Math.max(0, FX.flash - dt); FX.fade = Math.max(0, FX.fade - dt); G.hurtT = Math.max(0, (G.hurtT || 0) - dt);
   for (const s of FX.sparks) { s.r += s.v * dt * 60; s.t -= dt; } FX.sparks = FX.sparks.filter(s => s.t > 0);
   for (const d of FX.dust) { d.x += d.vx * dt * 60; d.y += d.vy * dt * 60; d.vy += 0.1; d.t -= dt; } FX.dust = FX.dust.filter(d => d.t > 0);
   for (const r of FX.rings) { r.t += dt; } FX.rings = FX.rings.filter(r => r.t < 0.25);
@@ -516,12 +533,19 @@ function updateAlly(dt) {
 // ── 그리기 ──
 const cv = $('c'), ctx = cv.getContext('2d');
 // 생활 동작용 가구·지형(시연판 전용 회색 상자). 좌표 = 그림 칸(192×144) 안 px, 바닥 136
-const WOOD = '#5a4a3c', MET = '#59626b';
+const WOOD = '#5a4a3c', MET = '#59626b', PLATE = '#4c555e';
 const CHAIR = [[36, 72, 4, 40, WOOD], [36, 108, 28, 4, WOOD], [38, 112, 3, 24, WOOD], [59, 112, 3, 24, WOOD]];
 const DESK = [[68, 90, 46, 4, WOOD], [70, 94, 3, 42, WOOD], [109, 94, 3, 42, WOOD]];
 const PROPS = {   // 생성기가 가구를 직접 그린 동작(책상·침대·사다리·문·상자 등)은 빼고, 안 그린 것만
   seatphone: CHAIR, seatread: CHAIR, seatdrink: CHAIR, seatgame: CHAIR, toast: [...CHAIR, ...DESK], seatnoodle: [...CHAIR, ...DESK],
   deskslam: [[78, 92, 46, 4, WOOD], [80, 96, 3, 40, WOOD], [119, 96, 3, 40, WOOD]], mantle: [[73, 88, 70, 48, MET]], vault: [[77, 88, 14, 48, MET]],
+  // 결함 38·39: 떠 있던 가전 아래 조리대, 레버·버튼 뒤 벽판
+  microwave: [[64, 74, 100, 62, WOOD], [64, 74, 100, 3, '#7a6650']], dishes: [[68, 84, 52, 52, WOOD], [68, 84, 52, 3, '#7a6650']],
+  // 기본 클립용 시연 오브젝트(게임에선 무대 오브젝트가 대신함): 침대·계단·욕조·세면대·식탁
+  liesit: [[14, 107, 160, 6, '#c9c4b8'], [14, 113, 160, 23, WOOD]], liehold: [[14, 109, 160, 6, '#c9c4b8'], [14, 115, 160, 21, WOOD]],
+  stepup: [[68, 120, 64, 16, MET]], stepover: [[78, 104, 80, 32, '#d8dde2'], [78, 104, 80, 3, '#ffffff']], handswork: [[72, 92, 50, 44, '#d8dde2'], [72, 92, 50, 3, '#ffffff']],
+  seatmouth: [...CHAIR, [62, 100, 46, 4, WOOD], [100, 104, 3, 32, WOOD]], seathold: CHAIR,
+  lever: [[80, 24, 21, 32, PLATE]], button: [[104, 46, 19, 38, PLATE]], readwall: [[89, 26, 60, 42, '#d6cebb'], [89, 26, 60, 2, '#ece6d6']],
 };
 function drawProps(k, x, y, dir) {
   const r = PROPS[k]; if (!r) return;
@@ -529,10 +553,14 @@ function drawProps(k, x, y, dir) {
   for (const [px, py, w, h, col] of r) { ctx.fillStyle = col; ctx.fillRect(px - ANC, py - FOOT, w, h); }
   ctx.restore();
 }
+let SPR_FILTER = '';
 function sprite(k, f, x, y, dir, alpha = 1, rim = false, origin = 0) {
   const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
   if (rim) ctx.filter = `drop-shadow(${1 / S}px 0 0 rgba(150,170,200,.5)) drop-shadow(${-1 / S}px 0 0 rgba(150,170,200,.5)) drop-shadow(0 ${-1 / S}px 0 rgba(150,170,200,.5))`;
+  const pim = imgs['prop:' + k];   // 가구 층(생성기가 같이 그린 가구를 떼어 낸 것)
+  if (pim && pim.complete) ctx.drawImage(pim, f * FW, 0, FW, FH, -(ANC + origin), -FOOT, FW, FH);
+  if (SPR_FILTER) ctx.filter = SPR_FILTER;
   ctx.drawImage(im, f * FW, 0, FW, FH, -(ANC + origin), -FOOT, FW, FH);
   ctx.restore();
 }
@@ -621,6 +649,7 @@ function draw() {
   ctx.font = 'bold 22px system-ui'; ctx.textAlign = 'center';
   for (const t of FX.text) { ctx.fillStyle = `rgba(255,230,200,${Math.min(1, t.t * 3)})`; ctx.fillText(t.s, t.x, t.y - (0.7 - t.t) * 40); }
   if (FX.flash > 0) { ctx.fillStyle = `rgba(255,250,235,${FX.flash * 2})`; ctx.fillRect(-20, -20, 1320, 760); }
+  if (FX.fade > 0) { ctx.fillStyle = `rgba(0,0,0,${Math.min(1, FX.fade / 0.16)})`; ctx.fillRect(-20, -20, 1320, 760); }
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (FX.cut > 0) drawCutin();
   hud();
@@ -632,7 +661,11 @@ function drawPlayer() {
   for (const tr of G.trail) sprite(tr.clip, tr.f, tr.x, gy + G.y, G.dir, tr.t * 2.2, false, M.clips[tr.clip].origin);
   if (G.clip === 'charge') { const p = (performance.now() % 500) / 500; ctx.strokeStyle = `rgba(230,60,80,${1 - p})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(frontX(), gy - 100 * S / 2, 8 + p * 40, 0, Math.PI * 2); ctx.stroke(); }
   drawProps(G.clip, G.x, gy + G.y, G.dir);
-  sprite(G.clip, G.f, G.x, gy + G.y, G.dir, G.inv > 0 && Math.floor(performance.now() / 50) % 2 ? 0.6 : 1, $('rim').checked && $('bg').value !== 'grey', c ? c.origin : 0);
+  const jit = G.clip === 'charge' ? (Math.random() < 0.5 ? -1 : 1) * S : 0;   // 결함 20: 힘 모을 때 몸 떨림
+  SPR_FILTER = G.hurtT > 0.08 ? 'brightness(0) invert(1)' : G.hurtT > 0 ? 'brightness(1.8)' : '';                              // 결함 19: 맞는 순간 하얗게
+  sprite(G.clip, G.f, G.x + jit, gy + G.y, G.dir, G.inv > 0 && Math.floor(performance.now() / 50) % 2 ? 0.6 : 1, $('rim').checked && $('bg').value !== 'grey', c ? c.origin : 0);
+  SPR_FILTER = '';
+  drawEmote(G.clip, G.x, gy + G.y, G.dir);
   if (G.talkT > 0) { ctx.font = 'bold 20px system-ui'; const w = ctx.measureText(G.talkLine).width + 28, bx = G.x - w / 2, by = gy - 112 * S; ctx.fillStyle = 'rgba(245,242,232,.95)'; ctx.fillRect(bx, by - 30, w, 40); ctx.fillStyle = '#1a1a1e'; ctx.textAlign = 'center'; ctx.fillText(G.talkLine, G.x, by - 3); }
   if ($('box').checked && c) {
     const b = boxes[G.clip] && boxes[G.clip][G.f];
@@ -646,16 +679,51 @@ function drawPlayer() {
     }
   }
 }
+// 결함 31·32: 얼굴이 10px 남짓이라 표정이 안 읽히는 감정 동작에 머리 위 표시(도트 게임 관례)
+const ICON = {
+  vein: ['.R...R.', 'RR...RR', '.......', '.......', 'RR...RR', '.R...R.'],
+  bang: ['.W.', '.W.', '.W.', '.W.', '...', '.W.'],
+  bang2: ['.W..W.', '.W..W.', '.W..W.', '.W..W.', '......', '.W..W.'],
+  dots: ['.......', '.......', '.......', '.......', '.......', 'W.W.W..'],
+  ask: ['.WWW.', 'W...W', '...W.', '..W..', '.....', '..W..'],
+  spark: ['...Y...', '...Y...', 'YYYYYYY', '...Y...', '...Y...', '.......'],
+  scrib: ['.DDDD.', 'D.DD.D', '.D..D.', 'D.DD.D', '.DDDD.', '......'],
+  note: ['..WW', '..W.', '..W.', 'WWW.', 'WWW.', '....'],
+  wave: ['W...W', '.W.W.', 'W...W', '.W.W.', '.....', '.....'],
+};
+const ICOL = { R: '#e0303c', W: '#f4efe4', Y: '#ffd860', D: '#9aa3ad' };
+const EMOTE = { angry: 'vein', annoyed: 'scrib', surprise: 'bang', shout: 'bang2', sigh: 'puff', bored: 'dots', gesture: 'ask', shrug: 'ask', smile: 'spark', headshake: 'wave', music: 'note' };
+function drawIcon(name, x, y, px) {
+  const g = ICON[name];
+  g.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== '.') { ctx.fillStyle = '#1a1c20'; ctx.fillRect(x + i * px - 1, y + j * px - 1, px + 2, px + 2); } }));
+  g.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== '.') { ctx.fillStyle = ICOL[ch]; ctx.fillRect(x + i * px, y + j * px, px, px); } }));
+}
+function drawEmote(k, x, y, dir) {
+  const e = EMOTE[k]; if (!e) return;
+  const t = performance.now() / 1000, px = 2 * S;
+  const hx = x + dir * 8 * S, hy = y + (33 - FOOT) * S;   // 머리 꼭대기(y≈36) 바로 위
+  if (e === 'puff') {   // 한숨: 입 앞에서 흐린 김이 나와 흩어짐
+    const p = (t % 1.2) / 1.2; ctx.fillStyle = `rgba(230,235,240,${0.7 * (1 - p)})`;
+    for (let i = 0; i < 3; i++) ctx.fillRect(x + dir * (14 + p * 22 + i * 4) * S, y + (52 - FOOT - p * 6 - i * 2) * S, px * 2, px * 2);
+    return;
+  }
+  if (e === 'note') {   // 음악: 음표가 번갈아 떠오름
+    for (let i = 0; i < 2; i++) { const p = ((t + i * 0.6) % 1.2) / 1.2; ctx.globalAlpha = 1 - p; drawIcon('note', hx + dir * (6 + i * 10) * S, hy - p * 18 * S - 6 * S, px); }
+    ctx.globalAlpha = 1; return;
+  }
+  const bob = Math.round(Math.sin(t * 6) * 1.5) * S;
+  drawIcon(e, hx - 3 * px, hy - ICON[e].length * px + bob, px);
+}
 function drawCutin() {
-  const k = 1 - FX.cut / 1.1;
+  const k = 1 - FX.cut / CUT_T;
   ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(0, 0, 1280, 720);
-  const bandY = 200, bandH = 320, slide = Math.min(1, k * 4);
+  const bandY = 260, bandH = 200, slide = Math.min(1, k * 4);
   ctx.fillStyle = '#1a0608'; ctx.fillRect(0, bandY, 1280, bandH);
   ctx.fillStyle = '#c0182a'; ctx.fillRect(0, bandY, 1280, 6); ctx.fillRect(0, bandY + bandH - 6, 1280, 6);
-  if (cutImg.complete) { const s = 9, w = cutImg.width * s; ctx.imageSmoothingEnabled = false; ctx.drawImage(cutImg, 1280 - w - 80 + (1 - slide) * 400, bandY + (bandH - cutImg.height * s) / 2, w, cutImg.height * s); }
+  // 얼굴 컷인 그림은 뺌(2026-10-21 사용자: 얼굴이 이상함). 필요하면 픽셀 컷씬 그림을 따로 받아 여기 넣는다
   if (k > 0.3 && Math.sin(k * 30) > 0.6) { ctx.fillStyle = 'rgba(255,40,60,.35)'; ctx.fillRect(0, bandY, 1280, bandH); }
-  ctx.fillStyle = '#f4ece0'; ctx.font = 'bold 64px system-ui'; ctx.textAlign = 'left'; ctx.fillText('구역 폭파', 90 - (1 - slide) * 300, bandY + 150);
-  ctx.font = '26px system-ui'; ctx.fillStyle = '#d9cfc2'; ctx.fillText('「보면 안다. 터진다.」', 94 - (1 - slide) * 300, bandY + 200);
+  ctx.fillStyle = '#f4ece0'; ctx.font = 'bold 64px system-ui'; ctx.textAlign = 'left'; ctx.fillText('구역 폭파', 90 - (1 - slide) * 300, bandY + 100);
+  ctx.font = '26px system-ui'; ctx.fillStyle = '#d9cfc2'; ctx.fillText('「보면 안다. 터진다.」', 94 - (1 - slide) * 300, bandY + 150);
 }
 function hud() {
   ctx.textAlign = 'left'; ctx.font = 'bold 20px system-ui';

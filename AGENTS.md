@@ -1,5 +1,9 @@
 # 게임 작업 전달 기준
 
+## 게임 플러그인 탑재 · 2026-10-21
+
+- 게임은 플러그인 창 머리의 게임 버튼 → 시작 화면에서 연다. 게임 코드는 본체가 아니라 코드 팩(`src/game/entry.ts` → `dist/game/`)이고, 게임은 `src/game/bridge.ts`의 다리만 쓴다(저장 칸·자산 팩·본편 스냅숏·결과·화면). 자산은 `game-pack/<폴더>/pack.json`. 릴리스 때 `dist/game/`을 `release/game/`으로 복사. 상세 `docs/게임_플러그인_탑재.md`.
+
 ## PixelLab 생성 규칙 · 2026-10-21 (사용자 지시, 모든 작업자 공통)
 
 - **생성 전에 조사한다.** 처음 쓰는 도구·방식은 공식 문서(api.pixellab.ai/mcp/docs, api.pixellab.ai/v2/openapi.json, pixellab.ai/docs)와 MCP `search_help`(무료)로 사용법을 먼저 확인한다. 정리본: `docs/PixelLab_사용법.md`.

@@ -9,6 +9,10 @@ export interface GrayHost {
   load(): Promise<string | null>;
   save(data: string): Promise<void>;
   narrow(): boolean;
+  /** 정산 화면이 뜰 때 (플러그인: 본편에 넘길 결과를 만든다) */
+  onSettle?(run: Run, meta: Meta, lines: string[]): void;
+  /** 화면 좌표 → 요소 기준 좌표 (플러그인 창에서 게임을 돌려 보일 때) */
+  toLocal?(clientX: number, clientY: number, el: Element): { x: number; y: number };
 }
 export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
   const root = document.createElement('section');
@@ -95,7 +99,10 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
       if (shownPhase !== 'brief') $('[data-panel=brief]').innerHTML = briefHtml();
       panel('brief');
     } else if (ph === 'settle') {
-      if (shownPhase !== 'settle') $('[data-panel=settle]').innerHTML = settleHtml();
+      if (shownPhase !== 'settle') {
+        $('[data-panel=settle]').innerHTML = settleHtml();
+        host.onSettle?.(run, meta, settle(run, meta));
+      }
       panel('settle');
     } else if (paused) panel('pause');
     else panel(null);
@@ -274,9 +281,12 @@ export function mountGraybox(box: HTMLElement, host: GrayHost): () => void {
       thumb.style.transform = '';
       return;
     }
+    const w = stick.offsetWidth / 2 || 1,
+      h = stick.offsetHeight / 2 || 1;
     const r = stick.getBoundingClientRect();
-    const dx = (ev.clientX - r.left - r.width / 2) / (r.width / 2),
-      dy = (ev.clientY - r.top - r.height / 2) / (r.height / 2);
+    const p = host.toLocal ? host.toLocal(ev.clientX, ev.clientY, stick) : { x: ev.clientX - r.left, y: ev.clientY - r.top };
+    const dx = (p.x - w) / w,
+      dy = (p.y - h) / h;
     stickX = Math.max(-1, Math.min(1, dx));
     stickY = Math.max(-1, Math.min(1, dy));
     runHeld = Math.hypot(dx, dy) > 0.9;
