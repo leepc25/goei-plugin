@@ -1,0 +1,22 @@
+{
+ "hq_corridor_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "hq_corridor_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_corridor_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_corridor_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_corridor_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

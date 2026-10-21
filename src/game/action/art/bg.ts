@@ -187,6 +187,8 @@ export function drawWallCrop(ctx: CanvasRenderingContext2D, place: string, key: 
 export const HQ_PLACE: Record<string, string> = {
   office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_office', supply: 'hq_workshop', pantry: 'hq_pantry', clinic: 'test', interview: 'hq_office',
   training: 'hq_workshop', appraisal: 'hq_jaemtri', lab: 'test', tooth: 'service', gallery: 'chase',
+  // 본부 평면도(hq/map.ts)의 장면 id·look. 그림이 아직 없는 곳은 비슷한 방을 빌린다(본부 배경 의뢰가 들어오면 바꾼다).
+  street: 'hq_street', lobby: 'hq_lobby', f2: 'hq_corridor', corridor: 'hq_corridor', b2: 'chase', containment: 'chase', pasta: 'apt',
 };
 
 // ── 소품 그림 (물건 모음 → objects/<장소>_objects_N). 회색 상자 대신. 도트 1px = 화면 2px, 발(아래 가운데)을 바닥 y에.
@@ -205,6 +207,15 @@ const BY_KIND: Record<string, ObjRef> = {
   table: ['apt', 3], switch: ['test', 3], checklist: ['lobby', 6], sign: ['lobby', 6], symbol: null, goalwall: ['lobby', 6], belonging: ['service', 6],
   // 승강기 안: 거울·버튼판은 벽 그림에 있다. 상호작용 자리는 그림 없이 (가까이 가면 엔진이 안내)
   mirror: null, panel: null, button: null, getoff: null, greet: null, close: null, mark: null, b12: null,
+  // 본부 평면도(hq/map.ts) 물건. 창문·블라인드처럼 벽에 붙은 것은 벽 그림에 있다.
+  window: null, blinds: null, glass_door: null, hydrant_box: null, kitchen_window: null, mailboxes: null, coat_chair: null,
+  streetlamp: ['hq_street', 1], bike: ['hq_street', 7],
+  guard_desk: ['hq_lobby', 1], plant: ['hq_lobby', 5],
+  desk_monitors: ['hq_jaemtri', 1], cardigan_chair: ['hq_office', 12], condensed_milk_coffee: ['hq_office', 16], mix_coffee_box: ['hq_office', 17],
+  whiteboard: ['hq_office', 13], desk_row: ['hq_office', 10, 'hq_office', 11], copier: ['hq_office', 14], sofa: ['hq_office', 4],
+  meeting_table: ['hq_office', 15], paper_pile: ['hq_office', 18], chief_desk: ['hq_office', 1], bookshelf: ['hq_jaemtri', 9], chair: ['hq_office', 2],
+  coffee_machine: ['hq_pantry', 2], fridge: ['hq_pantry', 1], table_small: ['hq_pantry', 3], sink_counter: ['hq_pantry', 8],
+  locker_row: ['hq_workshop', 3], workbench: ['hq_workshop', 1], cargo_cart: ['hq_workshop', 2], shelf: ['hq_pantry', 8],
 };
 
 function objImage(place: string, n: number): HTMLImageElement | null {

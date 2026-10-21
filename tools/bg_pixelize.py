@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from collections import deque
 from pathlib import Path
@@ -39,7 +40,9 @@ KEY = (255, 0, 255)
 
 
 def kind_of(stem: str) -> str:
-    for k in ('far_tall', 'far', 'floor', 'objects'):
+    if re.search(r'_objects(_\d+)?$', stem):
+        return 'objects'
+    for k in ('far_tall', 'far', 'floor'):
         if stem.endswith('_' + k):
             return k
     return 'wall' if '_wall' in stem else 'other'
@@ -212,17 +215,23 @@ def run_place(place: Path) -> dict:
             jobs.append((f.stem, aspect_crop(tone(src, 1.05 if k == 'floor' else CONTRAST), size), size, k))
         elif k == 'objects':
             hs = HEIGHTS.get(f.stem, [])
+            # 두 번째 시트(<장소>_objects_2)는 번호를 이어 붙인다: 10~18
+            m = re.match(r'(.*_objects)(?:_(\d+))?$', f.stem)
+            base, off = m.group(1), (int(m.group(2) or 1) - 1) * 9
             for i, o in enumerate(cut_objects(src), 1):
                 nh = max(1, round((hs[i - 1] if i <= len(hs) else 1.0) * DPM))
-                jobs.append((f'objects/{f.stem}_{i}', tone(o), (max(1, round(o.width * nh / o.height)), nh), k))
+                jobs.append((f'objects/{base}_{i + off}', tone(o), (max(1, round(o.width * nh / o.height)), nh), k))
     if not jobs:
         return {}
-    pal = place_palette([j[1] for j in jobs])
+    # 벽·바닥과 물건은 팔레트를 따로: 큰 벽이 색을 다 차지하면 작은 물건 색(파란 모니터, 빨간 의자)이 사라진다
+    scene = [j[1] for j in jobs if j[3] != 'objects']
+    objs = [j[1].convert('RGB') for j in jobs if j[3] == 'objects']
+    pals = {'scene': place_palette(scene) if scene else None, 'objects': place_palette(objs) if objs else None}
     out_dir = OUT / place.name
     (out_dir / 'objects').mkdir(parents=True, exist_ok=True)
     meta: dict = {}
     for name, im, size, k in jobs:
-        q = mode_down(im, size, pal)
+        q = mode_down(im, size, pals['objects' if k == 'objects' else 'scene'])
         if k == 'objects':
             # 바깥 테두리 1도트가 들어가도록 한 칸씩 여유
             pad = Image.new('RGBA', (q.width + 2, q.height + 1))
