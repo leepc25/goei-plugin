@@ -1,0 +1,25 @@
+{
+  "name": "dark_objects",
+  "detail": "1 knocked-over office chair, 2 dead fluorescent tube fixture lying on the floor, 3 pipe section with valve, 4 steel desk with an old dark monitor, 5 water-damaged cardboard boxes, 6 flashlight lying on its side (off), 7 fallen ceiling tiles pile, 8 metal bucket under a drip, 9 standing floor lamp (off).",
+  "place": "PLACE: an abandoned basement office floor with every light dead; only cold emergency light. Draw it readable, mid-dark, NOT pitch black (the game darkens it further in code). PALETTE: cold navy and slate grey with one sick green emergency light.",
+  "folder": "dark",
+  "path": "game-src/art/bg/raw/dark/dark_objects.png",
+  "index": 12,
+  "total": 28,
+  "exists": false,
+  "base": "08c113464dda95646f96f36c24cf1adf3004a671",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\n\nA sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nNO people, monsters, blood or gore. Ordinary Korean places inside an uncanny dimension-elevator building.\nPLACE: an abandoned basement office floor with every light dead; only cold emergency light. Draw it readable, mid-dark, NOT pitch black (the game darkens it further in code). PALETTE: cold navy and slate grey with one sick green emergency light.\nExactly 1536x1024 RGBA transparent canvas. Nine groups in row-major order. Center each in its equal 512x341 cell. Keep all shapes 30px away from every cell boundary. Maximum object group width 440px, height 270px. No background, no glow, no ground shadows. Strictly front-facing, no visible side panels, no three-quarter rotation. Intentional fallen objects lie in the picture plane. Thin top strips only. No grid lines or labels.\nCreate ONLY dark_objects: 1 knocked-over office chair, 2 dead fluorescent tube fixture lying on the floor, 3 pipe section with valve, 4 steel desk with an old dark monitor, 5 water-damaged cardboard boxes, 6 flashlight lying on its side (off), 7 fallen ceiling tiles pile, 8 metal bucket under a drip, 9 standing floor lamp (off).",
+  "type": "objects",
+  "generator": "built-in image_gen",
+  "size": [
+    1536,
+    1024
+  ],
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "d33a6a50ca7abdf37a8636eb8c2c2832b6cee340cc8dc34c1841f25aa1df32a7",
+  "integration": "Raw production source; pixel conversion and game integration are separate."
+}
