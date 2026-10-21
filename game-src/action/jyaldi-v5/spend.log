@@ -440,3 +440,9 @@ action: Heavy finishing punch, much bigger than a normal straight: she drops her
 07:36:30 keypose run2 animate_image 8f 160x112 -> id: c2baa0bd-ecf7-450a-9087-af4bab9ab9fd
 job_id: c2baa0bd-ecf7-450a-9087-af4bab9ab9fd
 action: Fast combat sprint toward the right, one full stride that loops: torso leaning strongly forward about 30 d
+09:19:36 skel punchkeys 4f -> id: dc2a9a97-dfb1-47c0-b36a-cead7bd7b669
+job_id: dc2a9a97-dfb1-47c0-b36a-cead7bd7b669
+description: tall slim adult woman agent, long straight black hair to the waist, pale skin, red eyes, black pant s
+09:21:28 skel combo 15f -> id: 54a1fe80-85a5-4129-8848-d4aeba7400ac
+job_id: 54a1fe80-85a5-4129-8848-d4aeba7400ac
+description: tall slim adult woman agent, long straight black hair to the waist, pale skin, red eyes, black pant s
