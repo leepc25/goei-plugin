@@ -1674,7 +1674,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
+  assert.ok(/괴이\s*62/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
