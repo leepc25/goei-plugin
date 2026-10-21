@@ -321,7 +321,12 @@ export interface RenderOptions {
   canon: (title: string) => string;
   /** 정보 상자 맨 위에 넣을 사진 주소 (그 항목의 카드 에셋) */
   photo?: string | null;
+  /** 탈출법·금기 같은 정답 문단을 접어 둔다 (클리어 전 괴이 문서) */
+  fold?: boolean;
 }
+
+/** 접어 둘 정답 문단 제목 (나무위키 스포일러 접기처럼 누르면 펼친다) */
+export const SPOILER_HEADING = /탈출|출구|금기|공략|해법|해결|클리어|생환|대처|수칙|정답|파훼|봉인|퇴치|살아남|빠져나|규칙|격리 ?(?:방법|절차)|약점/;
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 /** 모델이 이미 바꿔 둔 &#123; 같은 것은 살린다 */
@@ -403,8 +408,19 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
     if (list.length) out.push(`<ul class="nw-list">${list.map((x) => `<li>${x}</li>`).join('')}</ul>`);
     list = [];
   };
+  // 접는 중인 문단: 그 제목 수준과 시작 위치. 같거나 높은 제목이 나오면 닫는다
+  let spoil: { level: number; at: number } | null = null;
+  const hidden = new Set<number>();
+  const closeSpoil = () => {
+    if (!spoil) return;
+    const inner = out.splice(spoil.at).join('');
+    if (inner) out.push(`<details class="nw-spoil"><summary>스포일러 · 눌러서 보기</summary><div class="nw-spoil-in">${inner}</div></details>`);
+    spoil = null;
+  };
   for (const b of blocks) {
     if (b.tag !== 'List') flushList();
+    if (b.tag === 'Heading' && spoil && (headings[hi]?.level ?? 1) <= spoil.level) closeSpoil();
+    const n0 = notes.length;
     switch (b.tag) {
       case 'Infobox': {
         const fields = splitFields(b.text).map(field);
@@ -419,6 +435,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
       case 'Heading': {
         const h = headings[hi++];
         if (h) out.push(`<h${h.level + 2} class="nw-h" id="nw-h-${h.id}" style="--nw:${color}"><span>${h.id}.</span> ${inline(h.title)}</h${h.level + 2}>`);
+        if (h && o.fold && !spoil && SPOILER_HEADING.test(h.title)) spoil = { level: h.level, at: out.length };
         break;
       }
       case 'List':
@@ -445,9 +462,12 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
       default:
         if (b.text.trim()) out.push(`<p class="nw-p">${inline(b.text.trim()).replace(/\n/g, '<br>')}</p>`);
     }
+    // 접은 문단 속 각주는 아래 각주 목록에서도 가린다
+    if (spoil) for (let i = n0; i < notes.length; i++) hidden.add(i);
   }
   flushList();
-  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${n}</li>`).join('')}</ol>`);
+  closeSpoil();
+  if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n}</span></details>` : n}</li>`).join('')}</ol>`);
   const links = (keys: string[]) => keys.map((k) => a[k]).filter((t): t is string => !!t && validTitle(t)).map((t) => o.canon(t));
   return { html: out.join(''), title: a.doc_title || '', related: links(['related1', 'related2', 'related3']), recent: links(['recent1', 'recent2', 'recent3']), headings: headings.map((h) => h.title) };
 }

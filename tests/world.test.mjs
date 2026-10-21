@@ -167,6 +167,7 @@ test('terminal states end the entry and block it for the next draw', () => {
   const { world } = applyOutput(w0, catalog, S, 'A00', '[AN|부산 기장군|소라 랜드|클리어|A|없음]', always);
   assert.ok(!world.an.some((e) => e.name === '소라 랜드' && e.loc === '07-0'));
   assert.ok(!world.an.some((e) => e.presetName === '소라 랜드'), '막 끝난 프리셋은 바로 다시 뽑히지 않음');
+  assert.deepEqual(world.cleared, ['소라 랜드'], '클리어한 괴이는 위키 정답을 펼치려고 기억');
 });
 
 test('model-invented anomalies use the extra pool and need an unambiguous free region', () => {

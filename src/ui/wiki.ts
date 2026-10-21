@@ -585,6 +585,13 @@ function compose(ctx: ChatContext): string {
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc(wiki.title)}" ${job ? 'disabled' : ''}>${mine ? '작성하는 중…' : '작성 시작'}</button></div></div>`;
 }
 
+/** 괴이 문서의 정답 문단을 접을지: 이 채팅에서 그 괴이를 클리어했으면 처음부터 펼친다 */
+function spoilerFold(ctx: ChatContext, title: string, e: Entry | undefined): boolean {
+  if (e?.cat !== 'an') return false;
+  const cleared = new Set(readWorld(ctx.chat).cleared ?? []);
+  return ![title, e.name, e.title].some((n) => cleared.has(n));
+}
+
 function docView(ctx: ChatContext): string {
   const doc = findDoc(ctx.chat, wiki.title, ctx.char.globalLore);
   if (!doc) {
@@ -595,7 +602,7 @@ function docView(ctx: ChatContext): string {
   const saved = new Set(listDocs(ctx.chat, ctx.char.globalLore).map((d) => d.title));
   const e = entryFor(ctx, doc.title);
   const photo = e?.photo ? imageUrl(ctx.char, e.photo) : null;
-  const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo });
+  const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx, doc.title, e) });
   const job = jobs.get(chatKey(ctx));
   // 상세·관련 문서: 사진이 붙은 칩, 아직 없는 문서는 흐리게
   const links = (label: string, list: string[]) =>
@@ -694,7 +701,7 @@ export function bindFootnotes(root: HTMLElement): void {
     const li = doc.querySelector<HTMLElement>(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
     if (!li) return;
     cur = sup;
-    pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${li.innerHTML}`;
+    pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${(li.querySelector<HTMLElement>('.nw-fn-t') ?? li).innerHTML}`;
     pop.hidden = false;
     // 문서 칸 안에서 번호 바로 아래 (아래가 모자라면 위), 좌우는 칸 밖으로 안 나가게
     const box = doc.getBoundingClientRect();
@@ -925,7 +932,11 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       await env.refresh();
       return true;
     case 'wiki-jump': {
-      document.getElementById(v)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const el = document.getElementById(v);
+      // 접힌 정답 문단 속 소제목이면 펼치고 간다
+      const fold = el?.closest('details');
+      if (fold) fold.open = true;
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return true;
     }
     case 'wiki-request':

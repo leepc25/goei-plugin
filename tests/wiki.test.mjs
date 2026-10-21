@@ -195,3 +195,16 @@ test('wiki prompt from the real card: sections, references, faction names', { sk
   assert.ok(!/\[A00\]/.test(u), '소속 코드는 이름으로');
   assert.ok(p.primarySources.includes('소라 랜드'));
 });
+
+test('renderArticle: fold면 정답 문단(탈출·금기 등)만 접고 각주도 가린다', () => {
+  const body = '<lightboard-namuwiki doc_title="t">\n[Heading]Level:1|Title:개요\n[Paragraph]겉 이야기\n[Heading]Level:1|Title:출구\n[Paragraph]정답📌비밀 각주📌\n[Heading]Level:2|Title:세부\n[List]목록\n[Heading]Level:1|Title:여담\n[Paragraph]끝';
+  const o = { saved: () => false, canon: (t) => t };
+  const open = renderArticle(body, o).html;
+  assert.ok(!open.includes('nw-spoil'));
+  const html = renderArticle(body, { ...o, fold: true }).html;
+  assert.equal((html.match(/<details class="nw-spoil">/g) || []).length, 1);
+  const inside = html.slice(html.indexOf('<details class="nw-spoil">'), html.indexOf('</details>'));
+  assert.ok(inside.includes('정답') && inside.includes('세부') && inside.includes('목록') && !inside.includes('끝'));
+  assert.ok(html.includes('겉 이야기') && html.indexOf('겉 이야기') < html.indexOf('<details'));
+  assert.ok(html.includes('<details class="nw-spoil fn">'));
+});

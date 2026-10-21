@@ -91,6 +91,8 @@ export interface WorldState {
   notice: string;
   /** 막 끝난 상황. 이름 막기(blocks)와 같은 동안만 상황판에 흐리게 남긴다 (2026-10-20 사용자) */
   ended: EndedEntry[];
+  /** 이 채팅에서 클리어한 괴이 이름 (위키 정답 문단을 처음부터 펼친다) */
+  cleared?: string[];
 }
 
 export interface EndedEntry {
@@ -454,6 +456,10 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: st
     }
     if (!e) continue;
     if (t.state !== '활성') {
+      if (t.state === '클리어') {
+        const names = [e.presetName, e.name, t.name].filter((n): n is string => validName(n));
+        w.cleared = [...new Set([...(w.cleared ?? []), ...names])].slice(-200);
+      }
       endAn(w, e);
       continue;
     }
