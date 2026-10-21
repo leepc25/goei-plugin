@@ -5,13 +5,16 @@
 type Fx = 'tear' | 'lost' | 'shade' | 'text' | 'breath';
 
 /** 1초 틱마다 일어날 확률 (B등급 괴이 기준) */
-const BASE: Record<Fx, number> = { tear: 0.09, lost: 0.018, shade: 0.012, text: 0.03, breath: 0.02 };
+const BASE: Record<Fx, number> = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
 /** 효과가 붙어 있는 시간(ms) */
 const LAST: Record<Fx, number> = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
 /** 괴이만 쓰는 효과 */
 const AN_ONLY: Fx[] = ['shade', 'text', 'breath'];
 /** 같은 효과가 다시 나기까지 최소 간격(ms): 확률이 겹쳐도 연달아 나오지 않게 */
-const GAP: Record<Fx, number> = { tear: 4000, lost: 30000, shade: 60000, text: 15000, breath: 25000 };
+const GAP: Record<Fx, number> = { tear: 4000, lost: 20000, shade: 20000, text: 10000, breath: 15000 };
+/** 화면을 처음 볼 때 하나 (사용자: 1분씩 들여다보는 사람은 없다). 그 화면을 다시 보면 2분 뒤부터 또 */
+const FIRST: Fx[] = ['shade', 'shade', 'text', 'text', 'tear', 'lost'];
+const greeted = new Map<string, number>();
 const lastAt = new Map<Fx, number>();
 const GRADE: Record<string, number> = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
 const BLOCKS = '█▓▒░#?¿§';
@@ -56,6 +59,15 @@ export function fireFx(view: HTMLElement, fx: Fx): void {
 function tick(root: HTMLElement): void {
   for (const view of root.querySelectorAll<HTMLElement>('.gx-opview.feed:not(.ended):not(.nosig)')) {
     const an = view.classList.contains('k-an');
+    // 처음 보는 화면: 1~2.5초 안에 하나 (괴이는 아무거나, 사건·특수는 찢김)
+    const key = view.dataset.fxkey ?? '';
+    if (key && Date.now() - (greeted.get(key) ?? 0) > 120000) {
+      greeted.set(key, Date.now());
+      const fx = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : 'tear';
+      lastAt.set(fx, Date.now());
+      setTimeout(() => view.isConnected && fireFx(view, fx), Math.random() * 1500);
+      continue;
+    }
     const scale = an ? GRADE[view.dataset.grade ?? ''] ?? 1 : 0.4;
     for (const fx of Object.keys(BASE) as Fx[]) {
       if (!an && AN_ONLY.includes(fx)) continue;
@@ -69,6 +81,7 @@ function tick(root: HTMLElement): void {
 export function startCctvFx(root: HTMLElement): void {
   if (timer || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   timer = setInterval(() => tick(root), 1000);
+  tick(root);
 }
 
 export function stopCctvFx(): void {

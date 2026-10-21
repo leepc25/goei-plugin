@@ -264,7 +264,8 @@ function feedView(c: EvCard, clock: string, cls = ''): string {
   const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? ` data-grade="${c.grade.toLowerCase()}"` : '';
   // 찢김 띠는 같은 그림을 배경으로 깔아 잘라 쓴다
   const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc(c.art.pic)}')"><i></i><i></i></i>` : '';
-  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
+  const fxkey = ` data-fxkey="${esc(`${cls ? 'pop' : 'board'}:${c.key ?? c.name}`)}"`;
+  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}${fxkey}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
