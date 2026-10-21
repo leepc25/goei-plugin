@@ -291,6 +291,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         return { x: ox - storyRoot.offsetLeft + gx * k, y: oy - storyRoot.offsetTop + Math.max(120, p.y - p.z - 270) * k };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
+      paused: () => shell.paused,
     },
     { saved: savedFlags },
   );

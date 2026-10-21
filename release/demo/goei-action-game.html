@@ -7837,12 +7837,12 @@ var TouchPad = class {
 function drawTitleBg(c, t) {
   c.save();
   c.setTransform(1, 0, 0, 1, 0, 0);
-  const W4 = c.canvas.width, H5 = c.canvas.height;
-  const g2 = c.createLinearGradient(0, 0, 0, H5);
+  const W5 = c.canvas.width, H6 = c.canvas.height;
+  const g2 = c.createLinearGradient(0, 0, 0, H6);
   g2.addColorStop(0, "#0b1014");
   g2.addColorStop(1, "#1a1410");
   c.fillStyle = g2;
-  c.fillRect(0, 0, W4, H5);
+  c.fillRect(0, 0, W5, H6);
   const dx = 820, dw = 340, dy = 170, dh = 470;
   c.fillStyle = "#2a2f33";
   c.fillRect(dx - 30, dy - 30, dw + 60, dh + 30);
@@ -7870,14 +7870,14 @@ function drawTitleBg(c, t) {
   for (let i = 0; i < 6; i++) c.fillRect(dx - 104, dy + 132 + i * 11, 48, 2);
   c.fillStyle = "rgba(236,230,212,0.25)";
   for (let i = 0; i < 40; i++) {
-    const x = (i * 197 + t * 12 * (1 + i % 3)) % W4, y = (i * 131 + t * 8 * (1 + i % 2)) % H5;
+    const x = (i * 197 + t * 12 * (1 + i % 3)) % W5, y = (i * 131 + t * 8 * (1 + i % 2)) % H6;
     c.fillRect(x, y, 2, 2);
   }
-  const v = c.createRadialGradient(W4 / 2, H5 / 2, H5 * 0.3, W4 / 2, H5 / 2, H5);
+  const v = c.createRadialGradient(W5 / 2, H6 / 2, H6 * 0.3, W5 / 2, H6 / 2, H6);
   v.addColorStop(0, "rgba(0,0,0,0)");
   v.addColorStop(1, "rgba(0,0,0,0.75)");
   c.fillStyle = v;
-  c.fillRect(0, 0, W4, H5);
+  c.fillRect(0, 0, W5, H6);
   c.restore();
 }
 
@@ -13805,7 +13805,7 @@ function itemName2(id) {
 }
 
 // src/game/action/story/style.css
-var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gsy-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}\n";
+var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gsy-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);max-width:min(86%,900px);margin:0;padding:8px 14px;background:rgba(0,0,0,.72);border-radius:8px;font-size:clamp(13px,2.4vh,20px);line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#e8c66a;font-weight:700;margin-right:4px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:12px;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n";
 
 // src/game/action/story/script.ts
 var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
@@ -15819,6 +15819,257 @@ var Cutscene = class {
   }
 };
 
+// src/game/action/story/video.ts
+var W4 = 640;
+var H5 = 360;
+var VideoPlayer = class {
+  el;
+  canvas;
+  ctx;
+  audio = null;
+  sub;
+  skipBtn;
+  soundBtn;
+  subs = [];
+  cuts = [];
+  lens = [];
+  done = null;
+  token = 0;
+  raf = 0;
+  started = 0;
+  /** 재생 중인가 (불러오는 중 포함) */
+  open = false;
+  constructor(root) {
+    const el = document.createElement("div");
+    el.className = "gsy-video";
+    el.hidden = true;
+    el.innerHTML = `<canvas width="${W4}" height="${H5}"></canvas><p class="gsy-vsub" hidden></p>
+<button class="gsy-vsound" hidden>🔊 소리 켜기</button><button class="gsy-vskip">건너뛰기 ▶▶</button>`;
+    root.append(el);
+    this.el = el;
+    this.canvas = el.querySelector("canvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.sub = el.querySelector(".gsy-vsub");
+    this.skipBtn = el.querySelector(".gsy-vskip");
+    this.soundBtn = el.querySelector(".gsy-vsound");
+    this.skipBtn.addEventListener("click", (e) => (e.stopPropagation(), this.finish()));
+    this.soundBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (this.audio) this.audio.muted = false;
+      this.soundBtn.hidden = true;
+    });
+    el.addEventListener("click", () => this.skipSoft());
+  }
+  /** base = 컷 폴더 주소(끝에 /), cuts = 컷 길이(초), ready = 프레임이 있다고 알려졌나(false면 불러 보지 않고 끝) */
+  async play(base, cuts, subs, onDone, ready = Promise.resolve(true)) {
+    this.finish();
+    const token = ++this.token;
+    this.subs = subs;
+    this.lens = cuts;
+    this.cuts = cuts.map(() => void 0);
+    this.done = onDone;
+    this.open = true;
+    this.started = performance.now();
+    this.el.hidden = false;
+    this.sub.hidden = true;
+    this.soundBtn.hidden = true;
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(0, 0, W4, H5);
+    const first = await ready && token === this.token ? await loadCut(base, 1) : null;
+    if (token !== this.token) return;
+    if (!first) return this.finish();
+    this.cuts[0] = first;
+    cuts.slice(1).forEach((_, i) => void loadCut(base, i + 2).then((c) => token === this.token && (this.cuts[i + 1] = c)));
+    this.startAudio(`${base}sound.ogg`, token);
+    this.started = performance.now();
+    const tick = () => {
+      if (token !== this.token) return;
+      const t = (performance.now() - this.started) / 1e3;
+      if (t >= this.lens.reduce((a, b) => a + b, 0)) return this.finish();
+      this.draw(t);
+      this.showSub(t);
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+  startAudio(url, token) {
+    const a = new Audio(url);
+    this.audio = a;
+    a.addEventListener("error", () => this.soundBtn.hidden = true);
+    a.play().catch(() => {
+      if (token !== this.token || a.error) return;
+      a.muted = true;
+      a.play().then(() => token === this.token && (this.soundBtn.hidden = false)).catch(() => {
+      });
+    });
+  }
+  draw(t) {
+    let i = 0;
+    let at2 = t;
+    while (i < this.lens.length - 1 && at2 >= this.lens[i]) at2 -= this.lens[i++];
+    let cut = this.cuts[i];
+    let f;
+    if (cut) f = frameAt(cut, at2 * 1e3);
+    else {
+      while (i > 0 && !this.cuts[i]) i--;
+      cut = this.cuts[i];
+      if (!cut) return;
+      f = cut.frames - 1;
+    }
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.drawImage(cut.imgs[f], 0, 0, W4, H5);
+  }
+  showSub(t) {
+    let cur = null;
+    this.subs.forEach((s2, i) => {
+      const end = s2.t + (s2.dur ?? (this.subs[i + 1] ? this.subs[i + 1].t - s2.t : 3));
+      if (t >= s2.t && t < end) cur = s2;
+    });
+    const c = cur;
+    this.sub.hidden = !c;
+    if (c) this.sub.innerHTML = `${c.who ? `<b>${esc3(c.who)}</b> ` : ""}${esc3(c.text)}`;
+  }
+  /** 화면 누르기·확인 키: 시작 1초 뒤부터 건너뜀 (실수 방지) */
+  skipSoft() {
+    if (performance.now() - this.started > 1e3) this.finish();
+  }
+  /** 건너뛰기·끝·실패 모두 여기로 */
+  finish() {
+    if (!this.open) return;
+    this.open = false;
+    this.token++;
+    cancelAnimationFrame(this.raf);
+    this.audio?.pause();
+    this.audio = null;
+    this.el.hidden = true;
+    const cb = this.done;
+    this.done = null;
+    cb?.();
+  }
+};
+var lists = /* @__PURE__ */ new Map();
+function listed(dir, id) {
+  if (!lists.has(dir))
+    lists.set(
+      dir,
+      fetch(`${dir}index.json`).then((r) => r.ok ? r.json() : []).then((a) => Array.isArray(a) ? a.map(String) : []).catch(() => [])
+    );
+  return lists.get(dir).then((a) => a.includes(id));
+}
+async function loadCut(base, n) {
+  try {
+    const res = await fetch(`${base}c${n}/timing.json`);
+    if (!res.ok) return null;
+    const meta = await res.json();
+    if (!Array.isArray(meta.ms) || !meta.ms.length) return null;
+    const imgs = await Promise.all(
+      meta.ms.map(async (_, k) => {
+        const img2 = new Image();
+        img2.src = `${base}c${n}/${String(k + 1).padStart(4, "0")}.png`;
+        await img2.decode();
+        return img2;
+      })
+    );
+    return { imgs, meta, frames: imgs.length };
+  } catch {
+    return null;
+  }
+}
+function frameAt(cut, ms) {
+  const d2 = (k) => Math.max(16, cut.meta.ms[k] || 100);
+  let acc = 0;
+  for (let k = 0; k < cut.frames; k++) {
+    acc += d2(k);
+    if (ms < acc) return k;
+  }
+  const loop = cut.meta.loop;
+  if (!loop) return cut.frames - 1;
+  const a = Math.max(0, Math.min(loop[0] - 1, cut.frames - 1));
+  const b = Math.max(a, Math.min(loop[1] - 1, cut.frames - 1));
+  let span = 0;
+  for (let k = a; k <= b; k++) span += d2(k);
+  let r = (ms - acc) % span;
+  for (let k = a; k <= b; k++) {
+    r -= d2(k);
+    if (r < 0) return k;
+  }
+  return b;
+}
+var esc3 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+function repoRoot(href = location.href) {
+  const i = href.search(/\/(release\/demo|dist)\//);
+  return i >= 0 ? href.slice(0, i + 1) : new URL("./", href).href;
+}
+
+// src/game/action/story/scripts/videos.ts
+var VIDEOS = {
+  opening: { cuts: [4, 3, 2, 4, 1.5, 2.5, 4, 6, 5], subs: [] },
+  first_day: {
+    cuts: [4, 4, 6, 4],
+    subs: [
+      { t: 8, who: "잼트리", text: "어머, 후배, 왔어?" },
+      { t: 10.5, who: "잼트리", text: "길에 아무도 없어서 놀랐지? 인식의 장막이야." },
+      { t: 14, who: "잼트리", text: "오늘 첫 건은 벌써 들어와 있어. 차원 승강기." }
+    ]
+  },
+  first_entry: {
+    cuts: [3, 4, 2, 4, 4, 3],
+    subs: [
+      { t: 4, dur: 4.5, who: "무전(잼트리)", text: "점검표 서명란이 비어 있으면 그게 입구래요." },
+      { t: 10, dur: 5, who: "무전(잼트리)", text: "타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프." },
+      { t: 17.5, who: "승강기", text: "띵. 1층입니다. 문이 열립니다." }
+    ]
+  },
+  first_call: {
+    cuts: [3, 4, 3],
+    subs: [
+      { t: 3.5, dur: 1.3, who: "승강기", text: "…" },
+      { t: 5, who: "승강기", text: "{call}" },
+      { t: 8, who: "승강기", text: "이번 층에서는 꼭 살아남아요." }
+    ]
+  },
+  attic: {
+    cuts: [4, 3, 3, 4],
+    subs: [
+      { t: 2, dur: 4, who: "무전(잼트리)", text: "선배들의 다락방이래요. 로프를 걸어 뒀고요." },
+      { t: 8, dur: 2.5, text: "「여기 오래 있지 마」" },
+      { t: 11, who: "무전(잼트리)", text: "…오래 있지는 마세요." }
+    ]
+  },
+  three_years: {
+    cuts: [3, 4, 2, 3],
+    subs: [
+      { t: 3.5, dur: 3.3, who: "승객", text: "나 여기 삼 년째야. 그러니까 내 말 들어." },
+      { t: 7, who: "승객", text: "저쪽 문 말고 이쪽." }
+    ]
+  },
+  return: { cuts: [4, 2, 2, 6], subs: [{ t: 9, dur: 4, text: "문을 열고 나왔다. 로비였다. 진짜." }] },
+  evac: {
+    cuts: [3, 3, 4, 2],
+    subs: [
+      { t: 1, dur: 2.5, text: "로프가 당겨진다. 누가 끌어올리고 있다." },
+      { t: 7, dur: 2.8, who: "잼트리", text: "송신한 건 다 받았어. 나머지는 절반. 괜찮아." },
+      { t: 10, who: "잼트리", text: "다음에 또 가면 돼." }
+    ]
+  },
+  exit: {
+    cuts: [3, 4, 4, 3],
+    subs: [
+      { t: 1, dur: 2.6, who: "승강기", text: "거기, 그 버튼. 눌러도 돼요. 당신은." },
+      { t: 4, dur: 3, who: "승강기", text: "…1층입니다. 문이 열립니다." },
+      { t: 12, who: "승강기", text: "또 와요." }
+    ]
+  },
+  dinner: {
+    cuts: [3, 5, 3, 3],
+    subs: [
+      { t: 8.5, dur: 2.8, who: "잼트리", text: "자, 오늘은 언니가 쏜다. 아니, 회사가 쏜다." },
+      { t: 11.5, who: "쟈알디", text: "…블랙." }
+    ]
+  }
+};
+var VIDEO_DIR = "game-src/art/cutscene/frames/";
+
 // src/game/action/story/ai.ts
 var PERSONAS = {
   jaemtri: {
@@ -16061,7 +16312,7 @@ var FreeTalk = class {
 };
 
 // src/game/action/story/ui.ts
-var esc3 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+var esc4 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 var StoryUI = class {
   constructor(root, photo) {
     this.photo = photo;
@@ -16146,7 +16397,7 @@ var StoryUI = class {
     this.nameEl.textContent = cast.name;
     const src = cast.photo ? this.photo(cast.photo) : void 0;
     this.photoEl.hidden = !cast.name;
-    this.photoEl.innerHTML = src ? `<img alt="" src="${esc3(src)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
+    this.photoEl.innerHTML = src ? `<img alt="" src="${esc4(src)}">` : `<span>${esc4(cast.name.slice(0, 1))}</span>`;
     this.full = text;
     this.shown = 0;
     this.textEl.textContent = "";
@@ -16155,7 +16406,7 @@ var StoryUI = class {
     this.completeTyping();
     this.box.classList.add("asking");
     this.choicesEl.hidden = false;
-    this.choicesEl.innerHTML = options.map((o, n) => `<button data-i="${o.index}"><kbd>${n + 1}</kbd>${esc3(o.text)}</button>`).join("");
+    this.choicesEl.innerHTML = options.map((o, n) => `<button data-i="${o.index}"><kbd>${n + 1}</kbd>${esc4(o.text)}</button>`).join("");
   }
   close() {
     this.box.hidden = true;
@@ -16171,7 +16422,7 @@ var StoryUI = class {
     const el = document.createElement("div");
     el.className = "gsy-bubble";
     el.style.setProperty("--who", color);
-    el.innerHTML = `${name ? `<b>${esc3(name)}</b>` : ""}${esc3(text)}`;
+    el.innerHTML = `${name ? `<b>${esc4(name)}</b>` : ""}${esc4(text)}`;
     this.bubbleLayer.append(el);
     for (const b of this.bubbles)
       if (b.key === key) {
@@ -16200,8 +16451,8 @@ var StoryUI = class {
       return;
     }
     b.el.classList.remove("free");
-    const w = b.el.offsetWidth, W4 = this.el.clientWidth;
-    const x = Math.max(w / 2 + 6, Math.min(W4 - w / 2 - 6, p.x));
+    const w = b.el.offsetWidth, W5 = this.el.clientWidth;
+    const x = Math.max(w / 2 + 6, Math.min(W5 - w / 2 - 6, p.x));
     b.el.style.setProperty("--tail", `${Math.round(p.x - x)}px`);
     b.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(Math.max(p.y, 0))}px) translate(-50%, -100%)`;
   }
@@ -16262,7 +16513,7 @@ var TalkPanel = class {
     this.el.hidden = false;
     this.el.style.setProperty("--who", cast.color);
     this.el.querySelector(".gsy-talk-head b").textContent = cast.name;
-    this.el.querySelector(".gsy-talk-head .gsy-photo").innerHTML = photo ? `<img alt="" src="${esc3(photo)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
+    this.el.querySelector(".gsy-talk-head .gsy-photo").innerHTML = photo ? `<img alt="" src="${esc4(photo)}">` : `<span>${esc4(cast.name.slice(0, 1))}</span>`;
     this.log.innerHTML = "";
     this.add("npc", greeting);
     this.input.focus({ preventScroll: true });
@@ -16468,7 +16719,8 @@ function mountStory(root, host, opts = {}) {
     }
     refresh();
   };
-  const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen);
+  const video = new VideoPlayer(root);
+  const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen || video.open);
   const evacWrap = (id) => {
     const pairs = EVAC_PAIRS[agent()] ?? [];
     if (!pairs.length) return id;
@@ -16491,6 +16743,10 @@ agent: ${p.lines[1]}
     show(runner.start(id === "evac_wake" || id === "cs_evac" ? evacWrap(id) : id));
   };
   const advance = () => {
+    if (video.open) {
+      video.skipSoft();
+      return;
+    }
     if (panel.isOpen) return;
     if (runner.current.kind === "say") {
       if (ui.typing) ui.completeTyping();
@@ -16550,6 +16806,33 @@ ${who}: ${text.replace(/\n/g, " ")}
     }
   };
   const cutscene = (id, onDone) => {
+    if (opts.cutscenes !== "script") {
+      const v = VIDEOS[id];
+      flags[`seen.cs.${id}`] = 1;
+      if (!v) {
+        onDone?.();
+        return;
+      }
+      syncAgent();
+      const subs = v.subs.map((s2) => s2.text.includes("{call}") ? { ...s2, text: s2.text.replace("{call}", lookupLine(agent(), "el:call", flags, rng2) ?? "…") } : s2);
+      const base = host.videoUrl ? host.videoUrl(id) : `${repoRoot()}${VIDEO_DIR}${id}/`;
+      if (!base) {
+        onDone?.();
+        return;
+      }
+      void video.play(
+        base,
+        v.cuts,
+        subs,
+        () => {
+          refresh();
+          onDone?.();
+        },
+        listed(base.replace(/[^/]+\/$/, ""), id)
+      );
+      refresh();
+      return;
+    }
     const def = CUTSCENES[id];
     if (!def) {
       console.warn("[goei] 없는 컷신:", id);
@@ -16668,10 +16951,12 @@ ${who}: ${text.replace(/\n/g, " ")}
     talk,
     advance,
     choose,
-    skip: () => scene?.skip(),
+    skip: () => video.open ? video.finish() : scene?.skip(),
     isBlocking: () => blocking,
     update(dt) {
       now += dt;
+      const p = !!host.paused?.();
+      if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
       ui.update(dt);
       if (scene) {
         scene.update(dt);
@@ -16688,6 +16973,8 @@ ${who}: ${text.replace(/\n/g, " ")}
     },
     dispose() {
       root.removeEventListener("keydown", keys);
+      video.finish();
+      video.el.remove();
       ui.dispose();
       panel.el.remove();
       style.remove();
@@ -18639,7 +18926,8 @@ function engineModules(box2, bridge) {
         const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
         return { x: ox - storyRoot.offsetLeft + gx * k, y: oy - storyRoot.offsetTop + Math.max(120, p.y - p.z - 270) * k };
       },
-      emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } })
+      emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
+      paused: () => shell.paused
     },
     { saved: savedFlags }
   );

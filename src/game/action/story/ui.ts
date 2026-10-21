@@ -20,7 +20,7 @@ export class StoryUI {
   private textEl: HTMLElement;
   private photoEl: HTMLElement;
   private choicesEl: HTMLElement;
-  private bubbleLayer: HTMLElement;
+  readonly bubbleLayer: HTMLElement;
   private captionEl: HTMLElement;
   private fadeEl: HTMLElement;
   private skipEl: HTMLButtonElement;

@@ -4,6 +4,33 @@ import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { deflateSync } from 'node:zlib';
+// 시험 컷신 프레임: first_entry 폴더가 없을 때만 c1에 640×360 단색 3장 + timing.json을 잠깐 두고 index.json에 이름을 넣는다
+const FDIR = resolve('game-src/art/cutscene/frames/first_entry');
+const INDEX = resolve('game-src/art/cutscene/frames/index.json');
+const OWN_FRAMES = !existsSync(FDIR);
+const index0 = existsSync(INDEX) ? readFileSync(INDEX, 'utf8') : null;
+function png(r, g, b) {
+  const crcT = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  const crc = (buf) => { let c = 0xffffffff; for (const x of buf) c = crcT[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+  const chunk = (type, data) => { const len = Buffer.alloc(4); len.writeUInt32BE(data.length); const td = Buffer.concat([Buffer.from(type), data]); const c = Buffer.alloc(4); c.writeUInt32BE(crc(td)); return Buffer.concat([len, td, c]); };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(640, 0); ihdr.writeUInt32BE(360, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const row = Buffer.alloc(1 + 640 * 3); for (let x = 0; x < 640; x++) row.set([r, g, b], 1 + x * 3);
+  const raw = Buffer.concat(Array.from({ length: 360 }, () => row));
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0))]);
+}
+function putFrames() {
+  mkdirSync(`${FDIR}/c1`, { recursive: true });
+  [[200, 30, 30], [30, 200, 30], [30, 30, 200]].forEach((c, i) => writeFileSync(`${FDIR}/c1/000${i + 1}.png`, png(...c)));
+  writeFileSync(`${FDIR}/c1/timing.json`, JSON.stringify({ ms: [100, 100, 100], loop: [2, 3] }));
+  writeFileSync(INDEX, JSON.stringify([...JSON.parse(index0 ?? '[]'), 'first_entry']));
+}
+function dropFrames() {
+  rmSync(FDIR, { recursive: true, force: true });
+  if (index0 === null) rmSync(INDEX, { force: true });
+  else writeFileSync(INDEX, index0);
+}
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || `${execSync('npm root -g').toString().trim()}/playwright`);
 const shots = process.env.SHOTS;
@@ -17,7 +44,8 @@ const bubbles = (page) => page.evaluate(() => [...document.querySelectorAll('.gs
 async function finish(page) {
   const c = { timeout: 800 };
   for (let i = 0; i < 60 && (await page.evaluate(() => window.__goeiStory.isBlocking())); i++) {
-    if (await page.locator('.gsy-skip:not([hidden])').count()) await page.locator('.gsy-skip').click(c).catch(() => {});
+    if (await page.locator('.gsy-video:not([hidden])').count()) await page.locator('.gsy-vskip').click(c).catch(() => {});
+    else if (await page.locator('.gsy-skip:not([hidden])').count()) await page.locator('.gsy-skip').click(c).catch(() => {});
     else if (await page.locator('.gsy-choices:not([hidden]) button').count()) await page.locator('.gsy-choices button').first().click(c).catch(() => {});
     else if (await page.locator('.gsy-box:not([hidden])').count()) await page.locator('.gsy-box').click(c).catch(() => {});
     await page.waitForTimeout(150);
@@ -30,6 +58,9 @@ try {
     ['pc', { width: 1280, height: 720 }, ''],
     ['m', { width: 844, height: 390 }, '?touch=1'],
   ]) {
+    // 시험 프레임: PC만 둔다. 폰은 프레임이 없어 바로 넘어가야 한다
+    const withVideo = label === 'pc' && OWN_FRAMES;
+    if (withVideo) putFrames();
     const page = await browser.newPage({ viewport, hasTouch: !!q });
     page.on('pageerror', (e) => errors.push(`${label}: ${e}`));
     await page.goto(url + q);
@@ -58,12 +89,25 @@ try {
     await page.click('[data-act=deploy]');
     await page.waitForFunction(() => window.__goeiEngine.world);
     await page.waitForTimeout(500);
-    // 첫 출동이면 엔진이 첫 투입 컷신을 튼다: 화면을 찍고 끝까지 넘긴다
-    if (await page.evaluate(() => window.__goeiStory.isBlocking())) {
-      await page.waitForTimeout(3000);
-      await S(page, `${label}-2b-first-entry`);
-      await finish(page);
+    // 첫 출동이면 엔진이 첫 투입 컷신 영상을 튼다. PC는 시험 영상을 두고 재생·자막·Esc 건너뛰기를 보고, 폰은 영상이 없어 바로 넘어가야 한다
+    if (withVideo) {
+      await page.waitForSelector('.gsy-video:not([hidden])');
+      assert.equal(await page.evaluate(() => window.__goeiStory.isBlocking()), true, '영상 중 멈춤 아님');
+      await page.waitForTimeout(700);
+      // 단색 장이 실제로 그려지는가 (loop 2~3장 → 초록·파랑)
+      const px = await page.evaluate(() => [...document.querySelector('.gsy-video canvas').getContext('2d').getImageData(320, 180, 1, 1).data]);
+      assert.ok(px[1] > 150 || px[2] > 150, `프레임이 안 그려짐 ${px}`);
+      await page.waitForFunction(() => !document.querySelector('.gsy-vsub').hidden, null, { timeout: 9000 });
+      assert.match(await page.locator('.gsy-vsub').textContent(), /서명란/);
+      await S(page, `${label}-2b-video`);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      assert.equal(await page.evaluate(() => document.querySelector('.gsy-video').hidden), true, '영상이 안 닫힘');
+    } else {
+      await page.waitForTimeout(600);
+      assert.equal(await page.evaluate(() => document.querySelector('.gsy-video').hidden), true, '영상 없는데 막힘');
     }
+    await finish(page);
     // 첫 층: 대화창이 막지 않는다
     assert.equal(await page.evaluate(() => document.querySelector('.gsy-box')?.hidden ?? true), true, '층 들어가자마자 대화창이 열림');
     // 전투 사건 → 요원 말풍선 (요원 위에)
@@ -72,6 +116,13 @@ try {
     const b1 = await bubbles(page);
     assert.ok(b1.length >= 1, '전투 시작 말풍선 없음');
     await S(page, `${label}-3-bark`);
+    // 일시정지 메뉴가 열리면 말풍선을 숨긴다
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => document.querySelector('.gsy-bubbles').hidden), true, '일시정지 중 말풍선이 보임');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+    assert.equal(await page.evaluate(() => document.querySelector('.gsy-bubbles').hidden), false, '일시정지 풀고도 말풍선 숨김');
     // 적이 쓰러진 down은 요원 「쓰러짐」 대사를 내지 않는다
     await page.waitForTimeout(1500);
     await page.evaluate(() => window.__goeiEngine.world.emit({ type: 'down', x: 0, who: 'enemy' }));
@@ -127,9 +178,9 @@ try {
     // 컷신: 무대 그림이 없으니 어둡게 가리고 자막·대화
     for (const id of ['first_entry', 'evac']) {
       await page.evaluate((id) => window.__goeiStory.cutscene(id), id);
-      await page.waitForTimeout(3600);
-      await S(page, `${label}-6-cs-${id}`);
+      await page.waitForTimeout(600);
       await page.locator('.gsy-skip').click({ timeout: 800 }).catch(() => {});
+      await page.locator('.gsy-video:not([hidden]) .gsy-vskip').click({ timeout: 800 }).catch(() => {});
       for (let i = 0; i < 30 && (await page.evaluate(() => window.__goeiStory.isBlocking())); i++) {
         const c = { timeout: 800 };
         if (await page.locator('.gsy-choices:not([hidden]) button').count()) await page.locator('.gsy-choices button').first().click(c).catch(() => {});
@@ -145,9 +196,11 @@ try {
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(over <= 0, `가로 넘침 ${over}`);
     await page.close();
+    if (withVideo) dropFrames();
   }
   assert.deepEqual(errors, []);
   console.log('story-game ok');
 } finally {
+  if (OWN_FRAMES) dropFrames();
   await browser.close();
 }

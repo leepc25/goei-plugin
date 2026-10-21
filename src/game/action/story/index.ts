@@ -10,6 +10,8 @@ import { lookupLine } from './lines';
 import { AGENTS, EVAC_PAIRS } from './lines/agents';
 import { BarkPicker } from './director';
 import { Cutscene, type CutsceneIO } from './cutscene';
+import { VideoPlayer, listed, repoRoot } from './video';
+import { VIDEOS, VIDEO_DIR } from './scripts/videos';
 import { CUTSCENES } from './scripts/cutscenes';
 import { FreeTalk, type TalkModel, type TalkNpcId } from './ai';
 import { StoryUI, TalkPanel, type Anchor } from './ui';
@@ -39,6 +41,10 @@ export interface StoryHost {
   photo?(key: string): string | undefined;
   /** 자유 대화에 쓸 모델 (플러그인: risu.ts의 risuMainModel) */
   talkModel?: TalkModel;
+  /** 컷신 프레임 폴더 주소 (컷신 id → 끝이 /인 URL). 없으면 저장소 game-src/art/cutscene/frames/<id>/ 를 추정 */
+  videoUrl?(id: string): string | undefined;
+  /** 일시정지 메뉴가 열렸나. 열려 있으면 말풍선을 숨긴다 */
+  paused?(): boolean;
 }
 
 export interface StoryApi {
@@ -69,6 +75,8 @@ export interface StoryOptions {
   eager?: boolean;
   /** 대화창 자리. 기본 top: 게임 화면 위쪽(HUD 아래)에 띄워 아래쪽 아이템 칸·터치 버튼과 겹치지 않게 한다 */
   dock?: 'top' | 'bottom';
+  /** 컷신 방식. video(기본): 도트 애니메이션 프레임(없으면 건너뜀). script: 대본 컷신 (단독 시연판) */
+  cutscenes?: 'video' | 'script';
   /** 층에 내릴 때 승강기 안내를 말풍선으로 띄운다. 통합판은 층 모듈이 안내하므로 끈다 (시연판만 true) */
   announce?: boolean;
 }
@@ -146,7 +154,8 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     refresh();
   };
 
-  const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen);
+  const video = new VideoPlayer(root);
+  const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen || video.open);
 
   /** 후송 깨어남: 옆에 있던 동료의 주고받기를 앞에 붙인 임시 대본 */
   const evacWrap = (id: string) => {
@@ -169,6 +178,10 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   };
 
   const advance = () => {
+    if (video.open) {
+      video.skipSoft();
+      return;
+    }
     if (panel.isOpen) return;
     if (runner.current.kind === 'say') {
       if (ui.typing) ui.completeTyping();
@@ -233,6 +246,35 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   };
 
   const cutscene = (id: string, onDone?: () => void) => {
+    if (opts.cutscenes !== 'script') {
+      // 도트 영상. 목록에 없거나 파일을 못 불러오면 바로 끝(onDone)
+      const v = VIDEOS[id];
+      flags[`seen.cs.${id}`] = 1;
+      if (!v) {
+        onDone?.();
+        return;
+      }
+      syncAgent();
+      const subs = v.subs.map((s) => (s.text.includes('{call}') ? { ...s, text: s.text.replace('{call}', lookupLine(agent(), 'el:call', flags, rng) ?? '…') } : s));
+      const base = host.videoUrl ? host.videoUrl(id) : `${repoRoot()}${VIDEO_DIR}${id}/`;
+      if (!base) {
+        onDone?.();
+        return;
+      }
+      // 받은 컷신은 프레임 폴더 index.json에 이름이 있다
+      void video.play(
+        base,
+        v.cuts,
+        subs,
+        () => {
+          refresh();
+          onDone?.();
+        },
+        listed(base.replace(/[^/]+\/$/, ''), id),
+      );
+      refresh();
+      return;
+    }
     const def = CUTSCENES[id];
     if (!def) {
       console.warn('[goei] 없는 컷신:', id);
@@ -358,10 +400,12 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     talk,
     advance,
     choose,
-    skip: () => scene?.skip(),
+    skip: () => (video.open ? video.finish() : scene?.skip()),
     isBlocking: () => blocking,
     update(dt: number) {
       now += dt;
+      const p = !!host.paused?.();
+      if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
       ui.update(dt);
       if (scene) {
         scene.update(dt);
@@ -378,6 +422,8 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     },
     dispose() {
       root.removeEventListener('keydown', keys);
+      video.finish();
+      video.el.remove();
       ui.dispose();
       panel.el.remove();
       style.remove();
