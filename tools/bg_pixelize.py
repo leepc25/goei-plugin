@@ -30,8 +30,8 @@ FLOOR = 128              # 화면 256 정사각 무늬
 FAR = (384, 256)         # 화면 768×512, 느리게 흐름
 FAR_TALL = (256, 384)
 COLORS = 32
-DIM = 0.9                # 명도
-DESAT = 1.0              # 채도
+DIM = 0.85               # 명도
+DESAT = 1.1              # 채도
 # 물건 크기: GPT 그림 안 비율은 믿지 않고 heights.json의 실제 높이(m)로 맞춘다. 쟈알디 대기 키 99도트 = 1.65m.
 DPM = 99 / 1.65
 HEIGHTS = json.loads((ROOT / 'game-src/art/bg/heights.json').read_text()) if (ROOT / 'game-src/art/bg/heights.json').exists() else {}
@@ -45,9 +45,15 @@ def kind_of(stem: str) -> str:
     return 'wall' if '_wall' in stem else 'other'
 
 
-def tone(im: Image.Image) -> Image.Image:
+CONTRAST = 1.35         # 명암 단계가 또렷하게 (통합 검수 2026-10-22: 물 빠진 사진 같다)
+EDGE = 80                # 이웃 칸 밝기 차가 이보다 크면 어두운 쪽을 외곽선 색으로
+OUTLINE = (24, 22, 26)   # 물건 바깥 외곽선 (쟈알디 외곽선과 같은 거의 검정)
+
+
+def tone(im: Image.Image, contrast: float = CONTRAST) -> Image.Image:
     rgb = im.convert('RGB')
     rgb = ImageEnhance.Color(rgb).enhance(DESAT)
+    rgb = ImageEnhance.Contrast(rgb).enhance(contrast)
     rgb = ImageEnhance.Brightness(rgb).enhance(DIM)
     if im.mode == 'RGBA':
         rgb.putalpha(im.getchannel('A'))
@@ -170,6 +176,29 @@ def mode_down(im: Image.Image, size: tuple[int, int], pal: Image.Image) -> Image
     return o
 
 
+def ink(im: Image.Image, solid_edge: bool) -> Image.Image:
+    """도트 외곽선: 밝기 경계의 어두운 쪽 칸을 한 단계 더 어둡게(선처럼), 물건은 바깥 테두리 1도트."""
+    a = np.asarray(im.convert('RGBA')).copy()
+    rgb = a[:, :, :3].astype(np.int32)
+    lum = rgb @ np.array([299, 587, 114]) // 1000
+    dark = np.zeros(lum.shape, bool)
+    for dy, dx in ((0, 1), (1, 0)):
+        l0 = lum[: lum.shape[0] - dy, : lum.shape[1] - dx]
+        l1 = lum[dy:, dx:]
+        d = l1 - l0
+        m = np.abs(d) > EDGE
+        dark[: lum.shape[0] - dy, : lum.shape[1] - dx] |= m & (d > 0)   # 왼/위가 더 어두움
+        dark[dy:, dx:] |= m & (d < 0)
+    a[dark, :3] = (a[dark, :3].astype(np.int32) * 55 // 100).astype(np.uint8)
+    if solid_edge:
+        al = a[:, :, 3] > 0
+        ring = np.zeros_like(al)
+        ring[1:] |= al[:-1]; ring[:-1] |= al[1:]; ring[:, 1:] |= al[:, :-1]; ring[:, :-1] |= al[:, 1:]
+        ring &= ~al
+        a[ring] = (*OUTLINE, 255)
+    return Image.fromarray(a, 'RGBA')
+
+
 def run_place(place: Path) -> dict:
     jobs: list[tuple[str, Image.Image, tuple[int, int], str]] = []
     for f in sorted(place.glob('*.png')):
@@ -179,7 +208,8 @@ def run_place(place: Path) -> dict:
         if size:
             if k == 'wall':
                 src = trim_bottom(src)
-            jobs.append((f.stem, aspect_crop(tone(src), size), size, k))
+            # 바닥은 잔무늬가 지글거리지 않게 명암을 덜 올린다(줄은 코드가 긋는다)
+            jobs.append((f.stem, aspect_crop(tone(src, 1.05 if k == 'floor' else CONTRAST), size), size, k))
         elif k == 'objects':
             hs = HEIGHTS.get(f.stem, [])
             for i, o in enumerate(cut_objects(src), 1):
@@ -193,6 +223,13 @@ def run_place(place: Path) -> dict:
     meta: dict = {}
     for name, im, size, k in jobs:
         q = mode_down(im, size, pal)
+        if k == 'objects':
+            # 바깥 테두리 1도트가 들어가도록 한 칸씩 여유
+            pad = Image.new('RGBA', (q.width + 2, q.height + 1))
+            pad.paste(q, (1, 0))
+            q = ink(pad, True)
+        elif k == 'wall':
+            q = ink(q, False)
         if k == 'floor':
             q = seamless(q)
         q.save(out_dir / f'{name}.png', optimize=True)
