@@ -26,6 +26,7 @@ try {
   for (const [name, vp, mobile] of [
     ['pc', { width: 1280, height: 950 }, false],
     ['m', { width: 390, height: 844 }, true],
+    ['ml', { width: 844, height: 390 }, true],
   ]) {
     const ctx = await browser.newContext({ viewport: vp, hasTouch: mobile, isMobile: mobile, deviceScaleFactor: mobile ? 2 : 1 });
     const page = await ctx.newPage();
@@ -85,7 +86,7 @@ try {
     await page.waitForTimeout(1200);
     await page.screenshot({ path: `${out}/${name}-12-end.png` });
     assert.equal(await page.evaluate(() => window.__es.eng.ended), 'return');
-    if (mobile) {
+    if (name === 'm') {
       // 터치 버튼으로도 움직이는가
       await page.click('[data-do=again]');
       await page.waitForTimeout(300);
@@ -93,7 +94,8 @@ try {
       const box = await page.locator('.stick').boundingBox();
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 5, box.y + box.height / 2);
+      // 세로 폰은 판이 90° 돌아가 있어 화면 아래쪽 = 판의 오른쪽
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height - 5);
       await page.waitForTimeout(800);
       await page.mouse.up();
       const after = await page.evaluate(() => window.__es.eng.p.x);

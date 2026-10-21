@@ -186,8 +186,11 @@ const onStick = (ev: PointerEvent) => {
     return;
   }
   const r = stick.getBoundingClientRect();
-  sx = Math.max(-1, Math.min(1, (ev.clientX - r.left - r.width / 2) / (r.width / 2)));
-  sy = Math.max(-1, Math.min(1, (ev.clientY - r.top - r.height / 2) / (r.height / 2)));
+  const dx = (ev.clientX - r.left - r.width / 2) / (r.width / 2),
+    dy = (ev.clientY - r.top - r.height / 2) / (r.height / 2);
+  // 판이 90° 돌아가 있으면 화면 아래쪽이 판의 오른쪽이다
+  sx = Math.max(-1, Math.min(1, rotated ? dy : dx));
+  sy = Math.max(-1, Math.min(1, rotated ? -dx : dy));
   thumb.style.transform = `translate(${sx * 34}px,${sy * 34}px)`;
 };
 for (const t of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel'] as const) stick.addEventListener(t, onStick);
@@ -233,7 +236,7 @@ function hud(camX: number) {
   const m = stage.meta();
   const out = stage.outing();
   const W = canvas.width,
-    S = W < 1000 ? 1.45 : 1;
+    S = hudScale;
   const font = (px: number, bold = false) => `${bold ? 'bold ' : ''}${Math.round(px * S)}px sans-serif`;
   ctx.save();
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
@@ -382,12 +385,28 @@ function frame(now: number) {
   }
 }
 // 세로 폰: 화면 논리 폭을 좁혀 글씨·상자가 커 보이게
+// 폰: 세로로 들고 있으면 판 전체를 90° 돌려 가로 화면으로 쓰고, 조작 버튼은 화면 위에 겹친다.
+// 캔버스 논리 폭은 화면 비율에 맞춰 늘려(760~1600) 좌우 빈칸 없이 꽉 채운다.
+const touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+let rotated = false;
+let hudScale = 1;
 function fit() {
+  const es = $('.es');
+  es.classList.toggle('touch', touch);
+  rotated = touch && innerHeight > innerWidth;
+  es.classList.toggle('rot', rotated);
+  if (rotated) {
+    es.style.width = `${innerHeight}px`;
+    es.style.height = `${innerWidth}px`;
+  } else es.style.width = es.style.height = '';
   const v = $('.es-view');
-  const narrow = v.clientWidth / Math.max(1, v.clientHeight) < 1.1;
-  const w = narrow ? 760 : 1280;
+  const vw = v.clientWidth,
+    vh = Math.max(1, v.clientHeight);
+  const w = Math.max(760, Math.min(1600, Math.round((720 * vw) / vh)));
   if (canvas.width !== w) canvas.width = w;
   canvas.style.aspectRatio = `${w} / 720`;
+  // 화면에 실제로 보이는 배율이 작을수록 글씨를 키운다
+  hudScale = Math.max(1, Math.min(1.9, (0.72 * 720) / Math.min(vh, (vw * 720) / w)));
   if (eng) eng.viewW = w;
 }
 addEventListener('resize', fit);

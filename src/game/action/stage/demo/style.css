@@ -26,3 +26,17 @@ html, body { margin: 0; background: #05070a; color: #e8e4d4; font: 14px/1.5 syst
 .es-help { margin: 0; padding: 4px 10px 8px; color: #8a9; font-size: 12px; }
 @media (hover: hover) and (pointer: fine) and (min-width: 900px) { .es-pad { display: none; } }
 @media (max-width: 700px) { .es-help { display: none; } .es-top b { display: none; } .es-top { font-size: 12px; gap: 4px; } .es-top button { padding: 4px 8px; } .es-top [data-do=map] { display: none; } .es-pad { padding: 6px 8px; } }
+
+/* 폰: 조작 버튼을 화면 위에 반투명으로 겹친다 */
+.es.touch .es-help { display: none; }
+.es.touch .es-top { font-size: 12px; gap: 4px; padding: 3px 8px; }
+.es.touch .es-top b { display: none; }
+.es.touch .es-top button { padding: 3px 8px; }
+.es.touch .es-pad { position: absolute; left: 0; right: 0; bottom: 0; border: 0; padding: 10px 14px; pointer-events: none; background: none; }
+.es.touch .es-pad > * { pointer-events: auto; }
+.es.touch .stick { background: rgba(20, 30, 40, 0.25); border-color: rgba(140, 170, 190, 0.6); }
+.es.touch .btns button { background: rgba(27, 42, 54, 0.55); border-color: rgba(140, 170, 190, 0.6); }
+.es.touch { position: relative; }
+.es.touch .es-pad { z-index: 3; }
+.es-panel { z-index: 5; }
+.es.rot { position: fixed; top: 0; left: 0; transform-origin: top left; transform: rotate(90deg) translateY(-100%); max-width: none; }
