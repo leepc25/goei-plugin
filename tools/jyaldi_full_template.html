@@ -95,7 +95,7 @@ function measure(k, im) {
   }
   boxes[k] = out;
 }
-for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => { loaded++; measure(k, im); }; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
+for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => { loaded++; if (M.clips[k]) measure(k, im); }; im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.onload = () => loaded++; bgImg.src = 'data:image/png;base64,' + BG64;
 const cutImg = new Image(); cutImg.onload = () => loaded++; cutImg.src = 'data:image/png;base64,' + CUT64;
 if (M.missing && M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
@@ -110,7 +110,7 @@ const G = { x: 360, z: 0.55, y: 0, vy: 0, vx: 0, dir: 1, clip: 'idle', f: 0, t: 
   crouch: false, downTap: 0, grab: null, grabN: 0, down: false, lying: false, lyingT: 0, tired: false, hq: false, weapon: null, wUses: 0, carry: null,
   hp: 100, gauge: 100, inv: 0, trail: [], air: false, phase: '', shiftDown: 0, runHeld: false, talkT: 0, talkLine: '', items: { coffee: 2, snack: 2, bandage: 2 } };
 const keys = new Set();
-const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], booms: [], text: [], flash: 0, cut: 0, slow: 0 };
+const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], booms: [], text: [], flash: 0, cut: 0, slow: 0, fade: 0 };
 const ENEMIES = [mkE(820, 0.5), mkE(1040, 0.7)];
 function mkE(x, z) { return { x, z, y: 0, vx: 0, vy: 0, hp: 12, state: 'idle', t: 0, flash: 0, face: -1, home: x }; }
 const WALL = { x: 1230, hp: 1, broken: false, t: 0 };
@@ -122,9 +122,12 @@ let lineI = 0;
 
 function play(k, o = {}) {
   if (!has(k)) { FX.text.push({ x: G.x, y: groundY(G.z) - 320, s: '그림 없음: ' + k, t: 0.8 }); return false; }
+  if (NUDE.has(k) !== NUDE.has(G.clip)) FX.fade = 0.32;   // 결함 45: 정장 ↔ 맨몸이 바뀌는 순간 짧게 암전
+  if (k === 'hit') { G.hurtT = 0.16; FX.shake = Math.max(FX.shake, 0.22); FX.stop = Math.max(FX.stop, 0.07); }   // 결함 19
   G.clip = k; G.f = o.rev ? M.clips[k].frames - 1 : 0; G.t = 0; G.rev = !!o.rev; G.lock = !!o.lock; G.next = o.next || null; G.hold = 0; G.hitsDone = new Set(); return true;
 }
 const C = () => M.clips[G.clip];
+const NUDE = new Set(['showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout']);
 const heldTag = () => G.carry || G.weapon;   // 'brick' | 'pipe' | 'shotgun' | null
 function idleClip() {
   if (G.crouch) return 'crouch';
@@ -175,7 +178,7 @@ function onKey(code, down) {
     case 'Digit1': useItem('coffee', 'drink'); break;
     case 'Digit2': useItem('snack', 'eat'); break;
     case 'Digit3': useItem('bandage', 'bandage'); break;
-    case 'KeyH': if (G.guard) { G.vx = -4; sparks(G.x + G.dir * 50 * S, groundY(G.z) - 120 * S / 2, 6); FX.stop = Math.max(FX.stop, 0.06); FX.shake = Math.max(FX.shake, 0.08); } else { play('hit', { lock: true }); G.vx = -5; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break;
+    case 'KeyH': if (G.guard) { G.vx = -4; sparks(G.x + G.dir * 50 * S, groundY(G.z) - 120 * S / 2, 6); FX.stop = Math.max(FX.stop, 0.06); FX.shake = Math.max(FX.shake, 0.08); } else { play('hit', { lock: true }); G.vx = -8 * G.dir; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break;
     case 'KeyK': knockdown(); break;
     case 'KeyT': G.talkT = 2.2; G.talkLine = LINES[lineI++ % LINES.length]; play('talk'); break;
     case 'KeyV': G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 330, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); break;
@@ -485,7 +488,7 @@ function update(now) {
   for (let i = PROJ.length - 1; i >= 0; i--) if (PROJ[i].dead) { FX.dust.push({ x: PROJ[i].x, y: groundY(PROJ[i].z), vx: 0, vy: -1, t: 0.3 }); PROJ.splice(i, 1); }
   updateAlly(dt);
   // 효과
-  FX.shake = Math.max(0, FX.shake - dt); FX.flash = Math.max(0, FX.flash - dt);
+  FX.shake = Math.max(0, FX.shake - dt); FX.flash = Math.max(0, FX.flash - dt); FX.fade = Math.max(0, FX.fade - dt); G.hurtT = Math.max(0, (G.hurtT || 0) - dt);
   for (const s of FX.sparks) { s.r += s.v * dt * 60; s.t -= dt; } FX.sparks = FX.sparks.filter(s => s.t > 0);
   for (const d of FX.dust) { d.x += d.vx * dt * 60; d.y += d.vy * dt * 60; d.vy += 0.1; d.t -= dt; } FX.dust = FX.dust.filter(d => d.t > 0);
   for (const r of FX.rings) { r.t += dt; } FX.rings = FX.rings.filter(r => r.t < 0.25);
@@ -516,12 +519,15 @@ function updateAlly(dt) {
 // ── 그리기 ──
 const cv = $('c'), ctx = cv.getContext('2d');
 // 생활 동작용 가구·지형(시연판 전용 회색 상자). 좌표 = 그림 칸(192×144) 안 px, 바닥 136
-const WOOD = '#5a4a3c', MET = '#59626b';
+const WOOD = '#5a4a3c', MET = '#59626b', PLATE = '#4c555e';
 const CHAIR = [[36, 72, 4, 40, WOOD], [36, 108, 28, 4, WOOD], [38, 112, 3, 24, WOOD], [59, 112, 3, 24, WOOD]];
 const DESK = [[68, 90, 46, 4, WOOD], [70, 94, 3, 42, WOOD], [109, 94, 3, 42, WOOD]];
 const PROPS = {   // 생성기가 가구를 직접 그린 동작(책상·침대·사다리·문·상자 등)은 빼고, 안 그린 것만
   seatphone: CHAIR, seatread: CHAIR, seatdrink: CHAIR, seatgame: CHAIR, toast: [...CHAIR, ...DESK], seatnoodle: [...CHAIR, ...DESK],
   deskslam: [[78, 92, 46, 4, WOOD], [80, 96, 3, 40, WOOD], [119, 96, 3, 40, WOOD]], mantle: [[73, 88, 70, 48, MET]], vault: [[77, 88, 14, 48, MET]],
+  // 결함 38·39: 떠 있던 가전 아래 조리대, 레버·버튼 뒤 벽판
+  microwave: [[64, 74, 100, 62, WOOD], [64, 74, 100, 3, '#7a6650']], dishes: [[68, 110, 52, 26, WOOD], [68, 110, 52, 3, '#7a6650']],
+  lever: [[80, 24, 21, 32, PLATE]], button: [[104, 46, 19, 38, PLATE]], readwall: [[89, 26, 60, 42, '#d6cebb'], [89, 26, 60, 2, '#ece6d6']],
 };
 function drawProps(k, x, y, dir) {
   const r = PROPS[k]; if (!r) return;
@@ -529,10 +535,14 @@ function drawProps(k, x, y, dir) {
   for (const [px, py, w, h, col] of r) { ctx.fillStyle = col; ctx.fillRect(px - ANC, py - FOOT, w, h); }
   ctx.restore();
 }
+let SPR_FILTER = '';
 function sprite(k, f, x, y, dir, alpha = 1, rim = false, origin = 0) {
   const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
   if (rim) ctx.filter = `drop-shadow(${1 / S}px 0 0 rgba(150,170,200,.5)) drop-shadow(${-1 / S}px 0 0 rgba(150,170,200,.5)) drop-shadow(0 ${-1 / S}px 0 rgba(150,170,200,.5))`;
+  const pim = imgs['prop:' + k];   // 가구 층(생성기가 같이 그린 가구를 떼어 낸 것)
+  if (pim && pim.complete) ctx.drawImage(pim, f * FW, 0, FW, FH, -(ANC + origin), -FOOT, FW, FH);
+  if (SPR_FILTER) ctx.filter = SPR_FILTER;
   ctx.drawImage(im, f * FW, 0, FW, FH, -(ANC + origin), -FOOT, FW, FH);
   ctx.restore();
 }
@@ -621,6 +631,7 @@ function draw() {
   ctx.font = 'bold 22px system-ui'; ctx.textAlign = 'center';
   for (const t of FX.text) { ctx.fillStyle = `rgba(255,230,200,${Math.min(1, t.t * 3)})`; ctx.fillText(t.s, t.x, t.y - (0.7 - t.t) * 40); }
   if (FX.flash > 0) { ctx.fillStyle = `rgba(255,250,235,${FX.flash * 2})`; ctx.fillRect(-20, -20, 1320, 760); }
+  if (FX.fade > 0) { ctx.fillStyle = `rgba(0,0,0,${Math.min(1, FX.fade / 0.16)})`; ctx.fillRect(-20, -20, 1320, 760); }
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (FX.cut > 0) drawCutin();
   hud();
@@ -632,7 +643,11 @@ function drawPlayer() {
   for (const tr of G.trail) sprite(tr.clip, tr.f, tr.x, gy + G.y, G.dir, tr.t * 2.2, false, M.clips[tr.clip].origin);
   if (G.clip === 'charge') { const p = (performance.now() % 500) / 500; ctx.strokeStyle = `rgba(230,60,80,${1 - p})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(frontX(), gy - 100 * S / 2, 8 + p * 40, 0, Math.PI * 2); ctx.stroke(); }
   drawProps(G.clip, G.x, gy + G.y, G.dir);
-  sprite(G.clip, G.f, G.x, gy + G.y, G.dir, G.inv > 0 && Math.floor(performance.now() / 50) % 2 ? 0.6 : 1, $('rim').checked && $('bg').value !== 'grey', c ? c.origin : 0);
+  const jit = G.clip === 'charge' ? (Math.random() < 0.5 ? -1 : 1) * S : 0;   // 결함 20: 힘 모을 때 몸 떨림
+  SPR_FILTER = G.hurtT > 0.08 ? 'brightness(0) invert(1)' : G.hurtT > 0 ? 'brightness(1.8)' : '';                              // 결함 19: 맞는 순간 하얗게
+  sprite(G.clip, G.f, G.x + jit, gy + G.y, G.dir, G.inv > 0 && Math.floor(performance.now() / 50) % 2 ? 0.6 : 1, $('rim').checked && $('bg').value !== 'grey', c ? c.origin : 0);
+  SPR_FILTER = '';
+  drawEmote(G.clip, G.x, gy + G.y, G.dir);
   if (G.talkT > 0) { ctx.font = 'bold 20px system-ui'; const w = ctx.measureText(G.talkLine).width + 28, bx = G.x - w / 2, by = gy - 112 * S; ctx.fillStyle = 'rgba(245,242,232,.95)'; ctx.fillRect(bx, by - 30, w, 40); ctx.fillStyle = '#1a1a1e'; ctx.textAlign = 'center'; ctx.fillText(G.talkLine, G.x, by - 3); }
   if ($('box').checked && c) {
     const b = boxes[G.clip] && boxes[G.clip][G.f];
@@ -645,6 +660,41 @@ function drawPlayer() {
       ctx.strokeStyle = '#fff'; ctx.beginPath(); ctx.moveTo(G.x - 10, gy); ctx.lineTo(G.x + 10, gy); ctx.stroke();
     }
   }
+}
+// 결함 31·32: 얼굴이 10px 남짓이라 표정이 안 읽히는 감정 동작에 머리 위 표시(도트 게임 관례)
+const ICON = {
+  vein: ['.R...R.', 'RR...RR', '.......', '.......', 'RR...RR', '.R...R.'],
+  bang: ['.W.', '.W.', '.W.', '.W.', '...', '.W.'],
+  bang2: ['.W..W.', '.W..W.', '.W..W.', '.W..W.', '......', '.W..W.'],
+  dots: ['.......', '.......', '.......', '.......', '.......', 'W.W.W..'],
+  ask: ['.WWW.', 'W...W', '...W.', '..W..', '.....', '..W..'],
+  spark: ['...Y...', '...Y...', 'YYYYYYY', '...Y...', '...Y...', '.......'],
+  scrib: ['.DDDD.', 'D.DD.D', '.D..D.', 'D.DD.D', '.DDDD.', '......'],
+  note: ['..WW', '..W.', '..W.', 'WWW.', 'WWW.', '....'],
+  wave: ['W...W', '.W.W.', 'W...W', '.W.W.', '.....', '.....'],
+};
+const ICOL = { R: '#e0303c', W: '#f4efe4', Y: '#ffd860', D: '#9aa3ad' };
+const EMOTE = { angry: 'vein', annoyed: 'scrib', surprise: 'bang', shout: 'bang2', sigh: 'puff', bored: 'dots', gesture: 'ask', shrug: 'ask', smile: 'spark', headshake: 'wave', music: 'note' };
+function drawIcon(name, x, y, px) {
+  const g = ICON[name];
+  g.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== '.') { ctx.fillStyle = '#1a1c20'; ctx.fillRect(x + i * px - 1, y + j * px - 1, px + 2, px + 2); } }));
+  g.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== '.') { ctx.fillStyle = ICOL[ch]; ctx.fillRect(x + i * px, y + j * px, px, px); } }));
+}
+function drawEmote(k, x, y, dir) {
+  const e = EMOTE[k]; if (!e) return;
+  const t = performance.now() / 1000, px = 2 * S;
+  const hx = x + dir * 8 * S, hy = y + (33 - FOOT) * S;   // 머리 꼭대기(y≈36) 바로 위
+  if (e === 'puff') {   // 한숨: 입 앞에서 흐린 김이 나와 흩어짐
+    const p = (t % 1.2) / 1.2; ctx.fillStyle = `rgba(230,235,240,${0.7 * (1 - p)})`;
+    for (let i = 0; i < 3; i++) ctx.fillRect(x + dir * (14 + p * 22 + i * 4) * S, y + (52 - FOOT - p * 6 - i * 2) * S, px * 2, px * 2);
+    return;
+  }
+  if (e === 'note') {   // 음악: 음표가 번갈아 떠오름
+    for (let i = 0; i < 2; i++) { const p = ((t + i * 0.6) % 1.2) / 1.2; ctx.globalAlpha = 1 - p; drawIcon('note', hx + dir * (6 + i * 10) * S, hy - p * 18 * S - 6 * S, px); }
+    ctx.globalAlpha = 1; return;
+  }
+  const bob = Math.round(Math.sin(t * 6) * 1.5) * S;
+  drawIcon(e, hx - 3 * px, hy - ICON[e].length * px + bob, px);
 }
 function drawCutin() {
   const k = 1 - FX.cut / 1.1;
