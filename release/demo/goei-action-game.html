@@ -3229,6 +3229,38 @@ var scare = (o, t, p) => {
   thump(o, t, v, 50, 25, 0.8, 1);
   return dur + 1;
 };
+var heels = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+  for (let i = 0; i < 4; i++) {
+    const tt = t + i * 0.32;
+    burst(o, tt, v, "bandpass", 3600, 4, 0.02, 0.6);
+    tone(o, tt, v, "triangle", 1250, 0.03, 0.15);
+  }
+  return 1.6;
+};
+var duct = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.5);
+  for (let i = 0; i < 3; i++) {
+    const tt = t + i * rnd(0.35, 0.5);
+    thump(o, tt, v, 90, 50, 0.2, 0.6);
+    tone(o, tt, v, "triangle", rnd(300, 420), 0.4, 0.15);
+    tone(o, tt, v, "sine", rnd(900, 1300), 0.25, 0.06);
+  }
+  return 1.8;
+};
+var hatch = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.4);
+  burst(o, t, v, "bandpass", 2600, 5, 0.03, 0.7);
+  tone(o, t, v, "square", 820, 0.04, 0.1);
+  const g2 = gainNode(o, 0, v);
+  g2.gain.setValueAtTime(1e-4, t + 0.1);
+  g2.gain.linearRampToValueAtTime(0.5, t + 0.2);
+  g2.gain.exponentialRampToValueAtTime(1e-4, t + 0.7);
+  const s2 = osc(o, "sawtooth", 30, t + 0.1, 0.6, filt(o, "bandpass", 1500, 12, g2));
+  s2.frequency.linearRampToValueAtTime(18, t + 0.7);
+  thump(o, t + 0.7, v, 110, 45, 0.15, 0.7);
+  return 1;
+};
 var d = (label3, group, fn, bus = "sfx") => ({ label: label3, group, bus, fn });
 var SFX = {
   hit1: d("1타 (약)", "combat", hit(1)),
@@ -3304,6 +3336,9 @@ var SFX = {
   timerWarn: d("시간 경고", "world", timerWarn),
   noiseUp: d("소리 게이지 상승", "world", noiseUp),
   safeRoom: d("다락방 도착", "world", safeRoom),
+  heels: d("구두 소리", "world", heels),
+  duct: d("덕트 기어가기", "world", duct),
+  hatch: d("해치 열기", "world", hatch),
   uiMove: d("커서 이동", "ui", uiMove, "ui"),
   uiOk: d("결정", "ui", uiOk, "ui"),
   uiBack: d("취소", "ui", uiBack, "ui"),
@@ -4211,6 +4246,7 @@ var SCENE_SURFACE = {
   boss: "concrete"
 };
 var SCENES = /* @__PURE__ */ new Set(["title", "hq", "lobby", "chase", "replica", "trial", "dark", "silent", "puzzle", "service", "boss"]);
+var ALIAS = { doors: "doorOpen", rope: "ropeCreak", stamp: "ruleStamp", knockknock: "knock", static: "intercom" };
 function pickSfx(e, scene) {
   switch (e.type) {
     case "hit":
@@ -4243,6 +4279,7 @@ function pickSfx(e, scene) {
     case "hp:low":
       return "heartbeat";
     case "custom":
+      if (e.name && e.name in ALIAS) return ALIAS[e.name];
       return e.name && e.name in SFX ? e.name : null;
     default:
       return e.type in SFX ? e.type : null;
@@ -6537,7 +6574,7 @@ var CODE = {
   reload: "KeyR",
   hitbox: "KeyH"
 };
-var ALIAS = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
+var ALIAS2 = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
 var KEY_OF = {
   ArrowLeft: "ArrowLeft",
   ArrowRight: "ArrowRight",
@@ -6753,7 +6790,7 @@ var InputHub = class {
     return () => this.listeners = this.listeners.filter((f) => f !== fn);
   }
   press(code, src) {
-    code = ALIAS[code] ?? code;
+    code = ALIAS2[code] ?? code;
     this.last = src;
     if (this.capture?.(code, true, src)) return;
     const set = this.bySrc.get(src);
@@ -6768,7 +6805,7 @@ var InputHub = class {
     }
   }
   release(code, src) {
-    code = ALIAS[code] ?? code;
+    code = ALIAS2[code] ?? code;
     const set = this.bySrc.get(src);
     if (!set.delete(code)) {
       this.capture?.(code, false, src);
@@ -11275,10 +11312,10 @@ function makeService(ctx) {
       cells.push({ col: c, row: rw, kind: "plain", open: { u: false, r: false, d: false, l: false }, duct: { r: false, l: false }, width: ROOM_W, segments: [], things: [], label: "" });
   const seen = /* @__PURE__ */ new Set([idx(...entryCell)]);
   const stack = [entryCell];
-  const link = (a, b, duct = false) => {
+  const link = (a, b, duct2 = false) => {
     const A = cells[idx(...a)], B2 = cells[idx(...b)];
-    if (b[0] > a[0]) A.open.r = B2.open.l = true, A.duct.r = B2.duct.l = duct;
-    else if (b[0] < a[0]) A.open.l = B2.open.r = true, A.duct.l = B2.duct.r = duct;
+    if (b[0] > a[0]) A.open.r = B2.open.l = true, A.duct.r = B2.duct.l = duct2;
+    else if (b[0] < a[0]) A.open.l = B2.open.r = true, A.duct.l = B2.duct.r = duct2;
     else if (b[1] > a[1]) A.open.d = B2.open.u = true;
     else A.open.u = B2.open.d = true;
   };
@@ -14532,7 +14569,7 @@ var EVENT_RULES = {
   down: { tag: "down", chance: 1, prio: 4 },
   revive: { tag: "evac", chance: 1, prio: 4 }
 };
-var ALIAS2 = {
+var ALIAS3 = {
   enemyDie: "combat:kill",
   evade: "combat:dodge",
   super: "combat:ult",
@@ -14542,7 +14579,7 @@ var ALIAS2 = {
   item: "item:use",
   ruleFound: "find:rule"
 };
-for (const [k, v] of Object.entries(ALIAS2)) EVENT_RULES[k] = EVENT_RULES[v];
+for (const [k, v] of Object.entries(ALIAS3)) EVENT_RULES[k] = EVENT_RULES[v];
 var BarkPicker = class {
   constructor(rng2 = Math.random) {
     this.rng = rng2;
@@ -16777,6 +16814,33 @@ function engineModules(box2, bridge) {
       return void 0;
     }
   })();
+  shell.menu.onSound = (k) => audio.play(k === "move" ? "uiMove" : k === "ok" ? "uiOk" : "uiBack");
+  let vol = "";
+  const syncVolume = () => {
+    const s2 = shell.settings;
+    const key = `${s2.master}/${s2.music}/${s2.sfx}`;
+    if (key === vol) return;
+    vol = key;
+    audio.setVolume("master", s2.master);
+    audio.setVolume("music", s2.music);
+    audio.setVolume("sfx", s2.sfx);
+    audio.setVolume("amb", s2.sfx * 0.8);
+    audio.setVolume("ui", s2.sfx * 0.7);
+  };
+  let foot = { x: 0, y: 0, d: 0, w: null };
+  const footsteps = (w) => {
+    const p = w.player;
+    if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
+    const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
+    foot.x = p.x;
+    foot.y = p.y;
+    if (p.airborne || moved > 60) return void (foot.d = 0);
+    foot.d += moved;
+    if (foot.d >= (p.running ? 75 : 55)) {
+      foot.d = 0;
+      audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
+    }
+  };
   const story = mountStory(
     storyRoot,
     {
@@ -16814,7 +16878,6 @@ function engineModules(box2, bridge) {
   const listeners = [
     (e) => {
       audio.event(e);
-      if (e.type === "super") audio.duck(1.4);
       shell.fx.onGameEvent(e);
       story.event(e.type, e);
       if (e.type === "run:end") saveFlags();
@@ -16832,6 +16895,7 @@ function engineModules(box2, bridge) {
     openTitle: () => shell.openTitle(),
     onPlay: () => shell.play(),
     frame: (dt) => {
+      syncVolume();
       story.update(dt);
       shell.frame(dt);
       shell.input.endFrame();
@@ -16839,6 +16903,7 @@ function engineModules(box2, bridge) {
     overlay: (ctx, w, dt) => {
       if (!w) return;
       audio.setListener(w.camX + 640, 640);
+      footsteps(w);
       ctx.save();
       ctx.translate(-Math.round(w.camX), 0);
       shell.fx.drawWorld(ctx);

@@ -52,6 +52,8 @@ export class TouchPad {
   /** 스틱 자리 (층 기준 px) */
   private zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
+  /** 캔버스 논리 폭 (채우기면 1280 보다 넓다) */
+  vw: () => number = () => 1280;
   toLocal: ((clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number }) | null = null;
   visible = false;
   private seenTouch = false;
@@ -102,8 +104,9 @@ export class TouchPad {
     const bw = this.layer.clientWidth || 800,
       bh = this.layer.clientHeight || 400;
     const portrait = bh > bw * 1.05;
-    const scale = Math.min(bw / 1280, bh / 720);
-    const stageW = 1280 * scale,
+    const vw = this.vw();
+    const scale = Math.min(bw / vw, bh / 720);
+    const stageW = vw * scale,
       stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s.touchSize;
     const u = this.u;
@@ -131,11 +134,13 @@ export class TouchPad {
       else {
         const i = b.id === 'menu' ? 0 : 1;
         if (topInSide) {
+          // 옆 검은 띠 안에 세로로
           cx = s.lefty ? side / 2 : bw - side / 2;
           cy = 12 + u * 0.35 + i * u * 0.8;
         } else {
-          cx = s.lefty ? safeS + u * 0.35 + i * u * 0.75 : bw - safeS - u * 0.35 - i * u * 0.75;
-          cy = 10 + u * 0.35;
+          // 띠가 없으면 가운데 위 (터치 HUD 는 가운데 위를 비워 둔다)
+          cx = bw / 2 + (i === 0 ? 0.4 : -0.4) * u;
+          cy = (portrait ? 10 : 8) + u * 0.32;
         }
       }
       const d = ri >= 0 ? 0.8 : b.d;
