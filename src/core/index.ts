@@ -27,3 +27,4 @@ export * from './navhist';
 export * as lore from './lore';
 export * from './sharedpics';
 export * from './player';
+export * from './gamelink';

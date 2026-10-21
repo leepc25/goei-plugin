@@ -1771,3 +1771,14 @@ description: tall slim adult woman agent, long straight black hair to the
 16:49:32 gen_fix2 drink done
 16:49:35 gen_fix2 after generations_remaining: 8707
 16:52:19 gen_fix2 깨진 8개 다시 뽑기(뼈대 수정: 어깨 간격·파이프 앞쪽 치켜듦·누운 팔꿈치·무릎): 8731 -> 8707, 24회. grabknee는 또 3/4 정면(불합격, 재시도 안 함)
+17:04:45 gen_fix2 before generations_remaining: 8707
+17:04:48 gen_fix2 idle_shotgun 4f -> id: ff49b24f-afda-4b8c-a974-d3bb96e92976
+job_id: ff49b24f-afda-4b8c-a974-d3bb96e92976
+description: tall slim adult woman agent, long straight black hair to the 
+17:04:53 gen_fix2 run_shotgun 8f -> id: 58e8fbf4-e78e-4061-ba51-01bdf1c1d201
+job_id: 58e8fbf4-e78e-4061-ba51-01bdf1c1d201
+description: tall slim adult woman agent, long straight black hair to the 
+17:09:37 gen_fix2 idle_shotgun done
+17:10:44 gen_fix2 run_shotgun done
+17:10:50 gen_fix2 after generations_remaining: 8701
+17:11:33 gen_fix2 산탄총 대기·달리기를 걷기와 같은 긴 펌프식으로: 8707 -> 8701, 6회
