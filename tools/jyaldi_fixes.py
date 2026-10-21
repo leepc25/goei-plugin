@@ -33,7 +33,7 @@ OUTLINE = (24, 26, 30, 255)
 DETACHED = {'fire', 'shotgun', 'grabblast', 'super', 'support', 'smoke', 'hug', 'deskslam', 'inspect', 'tie', 'push',
             'idle_light', 'walk_light', 'run_light'}
 # 본체에 붙은 효과: 뼈대 몸 영역 밖의 밝은 회색·캐릭터 색표와 먼 색을 지움(총구 불꽃·광탄·잔상·연기·상자 조각)
-OUTSIDE_FX = {'fire', 'shotgun', 'super', 'support', 'smoke', 'hug', 'deskslam', 'push'}
+OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
 
 
 def wrists(clip, i):
@@ -193,12 +193,6 @@ def apply(key, fr, pr=None, src=None, idx=None):
     if key in OUTSIDE_FX and src in rig.CLIPS:
         ps = rig.CLIPS[src][2]
         fr = [strip_outside(f, ps[min(r, len(ps) - 1)]) for f, r in zip(fr, idx)]
-    if key == 'super':                         # 손에 붙은 광탄 고리(주황·빨강, 얼굴 아래만)
-        def noorb(f):
-            a = np.array(f); rgb = a[:, :, :3].astype(int)
-            m = (rgb[:, :, 0] > 150) & (rgb[:, :, 0] - rgb[:, :, 2] > 60); m[:50] = False
-            a[m & (a[:, :, 3] > 0)] = 0; return Image.fromarray(a)
-        fr = [noorb(f) for f in fr]
     if key == 'push':                          # 손 앞 상자 조각(갈색, 얼굴 아래만)
         def nobox(f):
             a = np.array(f); rgb = a[:, :, :3].astype(int)
