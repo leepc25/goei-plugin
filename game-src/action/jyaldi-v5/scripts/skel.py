@@ -14,10 +14,11 @@ def mv(p,**d):  # 관절 덮어쓰기
 def shift(p,dx,dy,keys):
     return {k:((v[0]+dx,v[1]+dy) if k in keys else v) for k,v in p.items()}
 HEAD=['NOSE','RIGHT EYE','LEFT EYE','RIGHT EAR','LEFT EAR']
-# 강한 스트레이트: 낮게 싣기 → 앞발 길게 내딛기 → 뒷손(LEFT)이 어깨째 앞으로, 뒷다리 쭉 펴짐, 상체가 앞무릎 위로
-load=shift(mv(A,NECK=(67,39),RIGHT_SHOULDER=(71,44),LEFT_SHOULDER=(60,44),RIGHT_ELBOW=(84,50),RIGHT_ARM=(96,44),LEFT_ELBOW=(50,57),LEFT_ARM=(52,50),
+# 강한 스트레이트(3타, 앞손 = RIGHT): 2타(뒷손)에서 손이 바뀜. 낮게 싣기 → 앞발 길게 내딛기 → 앞손이 어깨째 앞으로 끝까지,
+# 뒷손(LEFT)은 턱 앞으로 당김, 뒷다리 쭉 펴짐, 상체가 앞무릎 위로
+load=shift(mv(A,NECK=(67,39),RIGHT_SHOULDER=(71,44),LEFT_SHOULDER=(60,44),RIGHT_ELBOW=(80,52),RIGHT_ARM=(88,44),LEFT_ELBOW=(56,56),LEFT_ARM=(66,46),
    RIGHT_HIP=(71,66),LEFT_HIP=(61,66),RIGHT_KNEE=(86,78),LEFT_KNEE=(48,86)),-3,4,HEAD)
-hit=shift(mv(A,NECK=(97,44),RIGHT_SHOULDER=(90,48),LEFT_SHOULDER=(102,44),RIGHT_ELBOW=(88,58),RIGHT_ARM=(97,51),LEFT_ELBOW=(124,43),LEFT_ARM=(148,42),
+hit=shift(mv(A,NECK=(97,44),RIGHT_SHOULDER=(104,45),LEFT_SHOULDER=(90,47),RIGHT_ELBOW=(126,43),RIGHT_ARM=(150,42),LEFT_ELBOW=(90,58),LEFT_ARM=(100,46),
    RIGHT_HIP=(86,68),LEFT_HIP=(78,68),RIGHT_KNEE=(112,78),RIGHT_LEG=(122,100),LEFT_KNEE=(60,86),LEFT_LEG=(42,100)),28,10,HEAD)
 def lerp(a,b,t): return {k:(round(a[k][0]+(b[k][0]-a[k][0])*t,1),round(a[k][1]+(b[k][1]-a[k][1])*t,1)) for k in J}
 CLIPS={'heavy':[load,lerp(load,hit,.35),lerp(load,hit,.75),hit,hit,hit,lerp(hit,A,.25),lerp(hit,A,.5)]}
