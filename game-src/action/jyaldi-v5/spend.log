@@ -1260,3 +1260,19 @@ description: tall slim adult woman agent, long straight black hair to the
 13:17:28 gen_all kneelcry done
 13:17:52 gen_all mop done
 13:18:51 gen_all wash done
+2026-10-21 GPT shower-bath-toilet rows 158-167: generation submissions=0; charged=0; blocked before submission: PixelLab MCP tools/search_help unavailable in this session; plugin discovery returned no PixelLab plugin. Estimate only: approximately 30 generations, not spent.
+2026-10-21 GPT gen_all showerin 6f -> id: b98d6fff-bd6b-4f81-8869-3dae137ab378; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all shower 6f -> id: 382d1d71-9045-41fb-af6a-49f5b84ebd14; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all showerout 6f -> id: fddfe692-8042-45b7-b100-4c6e21cc3a15; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all bathin 6f -> id: ac44e189-f127-418e-92b9-47805383eb7b; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all bath 4f -> id: b46b52a0-26ed-48bd-9363-1fbd2a534001; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all bathout 6f -> id: 3de34182-1bb3-4980-8c7f-a17dd23b77f5; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all toiletin 6f -> id: f0e43b9e-bd19-409f-82b5-31f83575e7b3; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all toilet 4f -> id: 476e51c6-e4de-45ae-a540-3515b5d3a5c7; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all toiletout 6f -> id: e121e21f-1499-4648-9556-47bab43465e4; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT gen_all handwash 6f -> id: 8844d197-9a36-43ae-92d3-998a56e43b6b; cost=3; user-approved nonsexual adult bathroom scene
+2026-10-21 GPT correction showerin -> id: 012e28ba-6e68-4b75-9df8-e428309bf980; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction bathin -> id: 397fc61c-3ad7-4f34-92ef-3ad3cff221fd; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction toilet -> id: a499d24b-a56d-456e-972f-5139e2701832; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction toiletout -> id: 39ed76e0-8e52-4927-a01f-d09feec4cde6; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction bath -> id: de11b83d-7648-47a7-b953-1d15dd216749; animate_image 4 generated frames (input excluded); charged=2. Total 44 generations; balance 9079 -> 9035.

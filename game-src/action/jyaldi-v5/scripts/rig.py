@@ -544,6 +544,53 @@ clip('wallcry','leaning her back against a wall and crying, one hand over her ey
 KC=lambda b: P((X,78+b),24,0,0,(X-32,G-2),(X-36,G-3),(5,-8),(4,-6),tilt=26)
 clip('kneelcry','collapsed on her knees, face buried in both hands, shoulders shaking',[KC(0),KC(1),KC(0),KC(1)])
 
+# 158~167 bathroom: fixed canvas anchor, planted feet; user-approved nonsexual adult nudity.
+BATH_BODY = ('unclothed adult woman, natural adult body anatomy at small game sprite resolution, '
+             'nonsexual everyday hygiene, no towel or artificial censorship, no clothing or weapons')
+SHOWER_PROP = BATH_BODY + ', open clear shower enclosure on right, metal shower head, water droplets'
+BATH_PROP = BATH_BODY + ', ordinary white bathtub on right with clear bath water, no foam'
+TOILET_PROP = ('adult woman wearing white shirt and black jacket, black trousers and underwear lowered to knees while seated, '
+               'ordinary white toilet, nonsexual everyday bathroom routine, no censorship panel')
+ENTRY = STAND(0, lh=(15,10))
+REACH = STAND(0, lh=(26,0))
+INSIDE = STAND(0, lh=(8,10), rh=(4,12))
+STEP_OVER = P((X,53),8,0,0,(X+22,G-23),(X-4,G),('a',X+26,65),(8,15),lk=KNEE_UP)
+SOAP = lambda t: STAND(0,lh=(1+t,-9),rh=(-3-t,-6),tilt=9)
+clip('showerin','enter shower booth, reach for handle, step in, close clear door',
+     [ENTRY,REACH,walkf(.0),walkf(.25),INSIDE,INSIDE], SHOWER_PROP)
+clip('shower','wash hair with both hands, then rub shoulders under shower, gentle loop',
+     [SOAP(0),SOAP(3),SOAP(0),STAND(0,lh=(8,9),rh=(1,12)),STAND(0,lh=(4,12),rh=(7,8)),SOAP(0)], SHOWER_PROP)
+clip('showerout','turn off shower, open frosted door, step out and stand naturally',
+     [REACH,ENTRY,walkf(.25),walkf(.5),INSIDE,STAND(0,lh=(5,12))],SHOWER_PROP)
+BT = lambda b=0: P((X-6,82+b),-18,0,0,(X+27,92),(X+22,94),(17,17),(12,19),tilt=-9,lk=KNEE_UP,rk=KNEE_UP)
+clip('bathin','hold tub rim, step one leg over rim, sit down and settle in bath',
+     [ENTRY,REACH,STEP_OVER,lerp(STEP_OVER,BT(),.45),BT(),BT()],BATH_PROP)
+clip('bath','rest in bathtub with head tilted back and eyes closed, slow breathing loop',
+     [BT(0),BT(.5),BT(1),BT(.5)],BATH_PROP)
+clip('bathout','hold tub rim, rise carefully, step over rim and stand naturally',
+     [BT(),lerp(BT(),STEP_OVER,.45),STEP_OVER,ENTRY,INSIDE,INSIDE],BATH_PROP)
+TS = lambda b=0: SIT(7,lh=(15,16),rh=(10,18),tilt=12,b=b)
+clip('toiletin','open cubicle door, enter, shut privacy door and lower trousers and sit on toilet',
+     [ENTRY,REACH,walkf(.25),ENTRY,lerp(ENTRY,TS(),.6),TS()],TOILET_PROP)
+clip('toilet','sit quietly on toilet with trousers lowered, read smartphone, breathing loop',
+     [TS(0),TS(.5),TS(1),TS(.5)],TOILET_PROP+', small black smartphone held in front')
+clip('toiletout','stand and pull up trousers, press flush, open cubicle door and step out',
+     [TS(),lerp(TS(),ENTRY,.6),STAND(0,lh=(8,23)),REACH,walkf(.25),STAND(0)],TOILET_PROP)
+HW = lambda t: P((X,55),15,0,0,(X+6,G),(X-4,G),(20+t,20),(19-t,22),tilt=16)
+clip('handwash','turn tap on, rub palms together, wash backs of hands, rinse, turn tap off',
+     [REACH,HW(0),HW(3),HW(-3),HW(0),REACH],
+     'black trouser suit, white shirt, black tie, bare hands without gloves, white sink and chrome tap on right, running water')
+
+# Corrected bathroom paths: furniture-bearing reference required (see prepare_jyaldi_bathroom.py).
+SHOWER_INSIDE=sh(INSIDE,55)
+BATH_STEP=sh(STEP_OVER,25)
+BATH_SEATED=P((X+39,63),-28,0,0,(X+80,82),(X+74,84),(20,16),(14,17),tilt=-9,lk=KNEE_UP,rk=KNEE_UP)
+clip('showerin',CLIPS['showerin'][0],[ENTRY,REACH,sh(walkf(0),20),sh(walkf(.25),40),SHOWER_INSIDE,SHOWER_INSIDE],SHOWER_PROP)
+clip('showerout','step out of shower booth, then dry hair with towel',list(reversed(CLIPS['showerin'][2])),SHOWER_PROP)
+clip('bathin',CLIPS['bathin'][0],[ENTRY,REACH,BATH_STEP,lerp(BATH_STEP,BATH_SEATED,.5),BATH_SEATED,BATH_SEATED],BATH_PROP)
+clip('bathout',CLIPS['bathout'][0],list(reversed(CLIPS['bathin'][2])),BATH_PROP)
+clip('bath',CLIPS['bath'][0],[BATH_SEATED,jit(BATH_SEATED,0,.4,['NECK','SHOULDER','NOSE','EYE','EAR']),BATH_SEATED,jit(BATH_SEATED,0,.2,['NECK','SHOULDER','NOSE','EYE','EAR'])],BATH_PROP)
+
 A_KP=skel.A
 def kp(p):
     out=[]

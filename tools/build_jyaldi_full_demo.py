@@ -169,7 +169,9 @@ def main():
         fr = talk_frames() if d['src'] == '@talk' else frames_of(d['src'])
         if d['key'] == 'getup' and fr:  # 생성된 0·1장에 회색 얼룩 → 다운 마지막 누운 장으로 대체
             fr = frames_of('down')[6:7] + fr[2:]
-        if d.get('group', '').startswith('전투') is False and fr:
+        # Bathroom clips are reviewed explicitly; preserve the commissioned 4/6 frames.
+        bathroom = {'showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout', 'toiletin', 'toilet', 'toiletout', 'handwash'}
+        if d.get('group', '').startswith('전투') is False and fr and d['key'] not in bathroom:
             fr = auto_trim(fr)
         if d['order'] and fr:
             fr = [fr[i] for i in d['order'] if i < len(fr)]

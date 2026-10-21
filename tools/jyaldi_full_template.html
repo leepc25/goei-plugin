@@ -37,7 +37,7 @@
   .miss { color: #ff9a8a; }
 </style>
 <div class="wrap">
-  <h1>쟈알디 전 동작 시연판 · 기준표 A(재킷 고침) · 계획안 41행 + 생활·감정·지형 116개</h1>
+  <h1>쟈알디 전 동작 시연판 · 기준표 A(재킷 고침) · 계획안 41행 + 생활·감정·지형 126개</h1>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="crt"> CRT</label>
@@ -371,6 +371,7 @@ function breakWall() { WALL.broken = true; WALL.t = 1; FX.shake = Math.max(FX.sh
 let last = performance.now();
 function frameDone() {
   const c = C(), k = G.clip;
+  if (k === 'showerout' && has('towel')) { G.lock = false; play('towel', { lock: false }); return; }
   if (c.adv) G.x += G.dir * c.adv * S;
   if (G.next) { const n = G.next; G.next = null; play(n, { lock: true }); return; }
   if (k === 'jump') return; // 점프는 물리가 끝낸다
