@@ -368,6 +368,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
       drawProps(w, camX);
+      for (const u of w.underlays) u(ctx, camX);
       const all = [w.player as Body, ...w.bodies].filter((b) => b.alive);
       const pos = (b: Body) => {
         const f = b as Partial<Fighter>;

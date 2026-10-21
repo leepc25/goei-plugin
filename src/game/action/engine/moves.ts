@@ -55,7 +55,7 @@ export const MOVES: Record<string, MoveDef> = {
     hits: [{ at: [3], dmg: 10, react: 'flinch', push: 5, stop: 4, strength: 2, noise: 0.2 }],
   },
   power: {
-    clip: 'power', ticks: T(2, 2, 2, 7, 5, 4), origin: 16, adv: 20, lunge: [6, 0.75], armor: [2, 3, 1],
+    clip: 'power', ticks: T(2, 2, 3, 7, 6), origin: 16, adv: 20, lunge: [6, 0.75], armor: [2, 3, 1],
     hits: [{ at: [3], dmg: 18, react: 'down', push: 11, lift: 13, stop: 7, strength: 3, shake: 6, noise: 0.35 }],
   },
   // 달리며 A: 어깨 돌진
@@ -87,7 +87,7 @@ export const MOVES: Record<string, MoveDef> = {
   draw: { clip: 'draw', ticks: T(1, 1, 1, 1, 1) },
   reload: { clip: 'reload', ticks: T(3, 3, 3, 3, 3, 3) },
   evade: { clip: 'evade', ticks: T(1, 2, 2, 2, 2, 2), invuln: [0, 4], lunge: [15, 0.84] },
-  land: { clip: 'land', ticks: T(0, 0, 2, 2, 2), free: true },
+  land: { clip: 'land', ticks: T(1, 2, 2), free: true },
   // 잡기 타격: 무릎. 세 번째는 잡기 폭파로 넘어감
   grabknee: {
     clip: 'grabknee', ticks: T(2, 2, 4, 3),

@@ -68,6 +68,8 @@ export class Player extends Fighter {
   // 그리기
   animClock = 0;
   lowWarned = false;
+  /** 부적: 피격 무효 남은 횟수 */
+  ward = 0;
   /** 이 틱에 요청한 일 (world가 처리) */
   wantInteract = false;
   wantItem = 0;
@@ -146,13 +148,13 @@ export class Player extends Fighter {
       case 'hurt':
         return { clip: 'hit', frame: Math.min(3, Math.floor((this.t / Math.max(1, this.until)) * 4)), origin: 0 };
       case 'air-hurt':
-        return { clip: 'down', frame: this.vz > 4 ? 0 : this.vz > -6 ? 1 : 2, origin: 0 };
+        return { clip: 'down', frame: this.vz > 0 ? 0 : 1, origin: 0 };
       case 'down':
-        return { clip: 'down', frame: Math.min(6, 3 + Math.floor(this.t / 3)), origin: 0 };
+        return { clip: 'down', frame: Math.min(4, 2 + Math.floor(this.t / 3)), origin: 0 };
       case 'getup':
         return { clip: 'getup', frame: Math.min(4, Math.floor((this.t / this.until) * 5)), origin: 0 };
       case 'dead':
-        return { clip: 'down', frame: 6, origin: 0 };
+        return { clip: 'down', frame: 4, origin: 0 };
       default:
     }
     if (this.move) return { clip: this.move.clip, frame: this.mf, origin: this.move.origin ?? 0 };
@@ -187,6 +189,13 @@ export class Player extends Fighter {
         this.enter('hurt', 30);
       }
       return { kind: 'guard' };
+    }
+    if (this.ward > 0 && hit.dmg > 0) {
+      this.ward--;
+      this.invuln = 20;
+      world.fx('ring', this.x, this.y, 100, '3');
+      world.say('부적이 대신 맞았다', 1);
+      return { kind: 'immune' };
     }
     const armorFrame = this.move?.armor && this.mf >= this.move.armor[0] && this.mf <= this.move.armor[1] ? this.move.armor[2] : 0;
     this.armor = armorFrame;

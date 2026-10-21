@@ -9,6 +9,7 @@ import { createHq, idbSaves, type MissionLaunch, type RunResult, type SaveSlots 
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore } from './contract';
 import type { EngineModules, Game } from './game';
+import { linkItems } from './itemsLink';
 import { dummyStage, trainingStage } from './training';
 import type { World } from './world';
 
@@ -175,10 +176,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (name === 'hq') shell.mode = 'title';
     },
     onPause: (p) => (p ? audio.pause() : audio.resume()),
-    onWorld: (w) => {
+    onWorld: (w, run) => {
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
       });
+      const items = linkItems(w, run);
+      w.hooks.push(() => items.tick());
+      w.underlays.push((c, camX) => items.draw(c, camX));
     },
     toHqResult,
     dispose: () => {

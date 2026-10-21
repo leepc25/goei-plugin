@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """게임 엔진용 쟈알디 그림 묶음 (2026-10-21).
 
-game-src/action/jyaldi-v5/full/clips/ 의 기존 클립을 한 픽셀도 바꾸지 않고, 장마다 투명 테두리만 잘라 아틀라스 한 장에 담는다.
+game-src/action/jyaldi-v5/full/final/ 의 게임용 최종 스트립을 한 픽셀도 바꾸지 않고, 장마다 투명 테두리만 잘라 아틀라스 한 장에 담는다.
 장마다 판정 상자를 그림에서 재서 함께 적는다 (엔진 판정 보기 H로 확인, 손으로 고칠 때는 OVERRIDE에).
   hurt = 몸통 상자 (불투명 픽셀 x의 10~90% 범위, 머리끝~발)
   reach = 그림의 가장 앞쪽 점 근처 상자 (때리는 장의 공격 판정 후보)
@@ -17,27 +17,23 @@ SRC = os.path.join(ROOT, 'game-src', 'action', 'jyaldi-v5', 'full')
 OUT = os.path.join(ROOT, 'game-pack', 'jyaldi')
 FOOT, ANCHOR = 136, 57
 
-# 엔진 키: (원본 클립, 장 선택) — 장 선택은 build_jyaldi_full_demo.py의 범위·순서와 같다
+# 게임용 최종 스트립 (game-src/action/jyaldi-v5/full/final/<클립>.png, 192×144 장을 가로로 이음, 보정 반영).
+# 엔진 키 → 최종 스트립 이름
 CLIPS = {
-    'idle': ('idle', None), 'guard': ('guard', None), 'engage': ('engage', None),
-    'walk': ('walk', None), 'step': ('step', None), 'run': ('run', None),
-    'jump': ('jump', None), 'land': ('land', None), 'fall': ('fall', None),
-    'crouch': ('crouch', None), 'crouchwalk': ('duckwalk', list(range(0, 7))),
-    'lowkick': ('lowkick', None), 'groundblast': ('lowstrike', None),
-    'jab': ('combo', list(range(0, 5))), 'cross': ('combo', list(range(4, 10))), 'power': ('combo', list(range(9, 15))),
-    'dash': ('dash', None), 'airkick': ('airkick', list(range(0, 5))),
-    'draw': ('draw', None), 'fire': ('fire', [3, 0, 2, 1]), 'reload': ('reload', None),
-    'blast': ('blast', None), 'block': ('blockfront', None), 'evade': ('evade', None),
-    'grab': ('grab2', None), 'grabknee': ('grabknee2', None), 'grabblast': ('grabblast', [0, 1, 2, 3, 4, 7, 5, 6]),
-    'super': ('super', None), 'hit': ('hit', None), 'down': ('down', list(range(0, 7))), 'getup': ('getup', None),
-    'collapse': ('collapse', None), 'tired': ('tired', None),
-    'drink': ('drink', None), 'eat': ('eat', None), 'bandage': ('bandage', None), 'pickup': ('pickup', None), 'toss': ('toss', None),
+    'idle': 'idle', 'guard': 'guard', 'engage': 'engage', 'walk': 'walk', 'step': 'step', 'run': 'run',
+    'jump': 'jump', 'land': 'land', 'fall': 'fall', 'crouch': 'crouch', 'crouchwalk': 'crouchwalk',
+    'lowkick': 'lowstrike', 'groundblast': 'groundblast', 'jab': 'jab', 'cross': 'cross', 'power': 'power',
+    'dash': 'dash', 'airkick': 'airkick', 'draw': 'draw', 'fire': 'fire', 'reload': 'reload', 'blast': 'blast',
+    'block': 'block', 'evade': 'evade', 'grab': 'grab', 'grabknee': 'grabknee', 'grabblast': 'grabblast',
+    'super': 'super', 'hit': 'hit', 'down': 'down', 'getup': 'getup', 'collapse': 'collapse', 'tired': 'tired',
+    'drink': 'drink', 'eat': 'eat', 'bandage': 'bandage', 'pickup': 'pickup', 'toss': 'toss',
 }
+FW, FH = 192, 144
 
 
-def frames_of(src):
-    d = os.path.join(SRC, 'clips', src)
-    return [Image.open(os.path.join(d, f)).convert('RGBA') for f in sorted(os.listdir(d)) if f.endswith('.png')]
+def frames_of(name):
+    strip = Image.open(os.path.join(SRC, 'final', name + '.png')).convert('RGBA')
+    return [strip.crop((i * FW, 0, (i + 1) * FW, FH)) for i in range(strip.width // FW)]
 
 
 def measure(im):
@@ -66,12 +62,8 @@ def measure(im):
 def main():
     os.makedirs(OUT, exist_ok=True)
     cells, meta = [], {}
-    for key, (src, sel) in CLIPS.items():
+    for key, src in CLIPS.items():
         fr = frames_of(src)
-        if key == 'getup':  # 생성된 0·1장 회색 얼룩 → 다운 마지막 누운 장으로 대체 (시연판 빌더와 같음)
-            fr = frames_of('down')[6:7] + fr[2:]
-        if sel:
-            fr = [fr[i] for i in sel if i < len(fr)]
         info = []
         for im in fr:
             bb, hurt, reach = measure(im)

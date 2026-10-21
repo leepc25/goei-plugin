@@ -79,6 +79,10 @@ export class World implements WorldView {
   private listeners: ((e: GameEvent) => void)[] = [];
   private stageApi: StageApi;
   enemyFactory: EnemyFactory;
+  /** 모듈이 매 틱 덧붙이는 일 (아이템 등) */
+  hooks: (() => void)[] = [];
+  /** 몸 아래에 덧그리기 (바닥 물건 등). ctx는 화면 좌표 */
+  underlays: ((ctx: CanvasRenderingContext2D, camX: number) => void)[] = [];
   itemUse: ItemUse | null = null;
   items: ({ id: string; label: string; n: number } | null)[] = [
     { id: 'bandage', label: '붕대', n: 2 },
@@ -263,6 +267,7 @@ export class World implements WorldView {
       if (b instanceof Fighter && b.phase === 'dead' && b.t > 30) b.alive = false;
       return b.alive;
     });
+    for (const h of this.hooks) h();
     // 싸움 구간·층
     this.stepEncounters();
     if (this.stage?.tick) this.stage.tick(this.stageApi, this.floor);
