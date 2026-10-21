@@ -10,6 +10,15 @@ import {
   createItemRun,
   drawItemIcon,
   dropFromKill,
+  spawnEnemyDrops,
+  strikeProps,
+  furnishFloor,
+  openShop,
+  createShopPanel,
+  VENDORS,
+  type ShopPanel,
+  type VendorId,
+  type EnemyDrop,
   stepField,
   toGameEvents,
   type Field,
@@ -21,7 +30,17 @@ import { TICK_HZ, type Body, type RunConfigCore } from './contract';
 import { Fighter } from './fighter';
 import type { World } from './world';
 
+// 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
 const DROP_TABLE: Record<string, string> = { thug: 'anomaly', dummy: 'anomaly' };
+
+// 중림 상인 거래 창 (무대 위에 겹침). 열려 있으면 전투를 멈춘다: modules.ts의 blocking에서 itemsBlocking()
+let shopPanel: ShopPanel | null = null;
+export const itemsBlocking = () => !!shopPanel?.isOpen();
+export function mountItemsOverlay(root: HTMLElement) {
+  shopPanel?.dispose();
+  shopPanel = createShopPanel(root);
+  return () => (shopPanel?.dispose(), (shopPanel = null));
+}
 
 export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({ id: string; n: number } | null)[] } }) {
   const loadout = run.launch?.items ?? [{ id: 'medkit', n: 2 }, { id: 'flash', n: 2 }, { id: 'adrenaline', n: 1 }, null];
@@ -32,6 +51,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   (w as unknown as { itemRun: ItemRun }).itemRun = ir;
+  (w as unknown as { itemField: () => Field }).itemField = () => field;
 
   const syncSlots = () => {
     w.items = ir.loadout.map((s) => (s ? { id: s.id, label: ITEMS[s.id]?.name ?? s.id, n: s.n } : null));
@@ -139,18 +159,35 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   w.on((e) => {
     if (e.type === 'enter:floor') {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-      // 층마다 들 수 있는 물건 둘, 임시 무기 하나 (층 모듈이 자리를 정하기 전까지 임시 배치)
-      const sx = e.floor.startX ?? 200;
-      const ym = (w.lane[0] + w.lane[1]) / 2;
-      const pick = <T,>(a: T[]) => a[Math.floor(w.rand() * a.length)];
-      placeProp(field, pick(['chair', 'bin', 'pot']), Math.min(e.floor.length - 100, sx + 380), ym + 30);
-      placeProp(field, pick(['tv', 'extinguisher', 'chair']), Math.min(e.floor.length - 100, sx + 900), ym - 20);
-      spawnPickup(field, 'weapon', Math.min(e.floor.length - 100, sx + 600), ym, pick(['pipe', 'chairleg', 'kitchenknife', 'servicepistol']));
+      // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
+      furnishFloor(field, e.floor, w.lane, () => w.rand());
       syncCarry();
     }
-    if (e.type === 'enemyDie') apply(dropFromKill(field, ir, DROP_TABLE[e.kind] ?? 'anomaly', e.x, w.player.y));
+    if (e.type === 'enemyDie' && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
+    if (e.type === 'custom' && e.name === 'enemyDrop') {
+      const d = e.data as { kind: string; x: number; y: number; drops: EnemyDrop[] };
+      apply(spawnEnemyDrops(field, ir, d.drops, d.x, d.y, d.kind));
+    }
   });
 
+  // 중림 상인: 층 모듈의 merchant 소품 앞 E
+  let shopSeed = run.seed ^ 0x5151;
+  w.interactHooks.push((prop) => {
+    if (prop?.kind !== 'merchant' || !shopPanel || shopPanel.isOpen()) return;
+    const ids = Object.keys(VENDORS) as VendorId[];
+    const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? 'madeokhee';
+    const shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
+    lastReserve = ir.reserve = p.reserve;
+    shopPanel.open(shop, ir, (r) => {
+      if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
+      if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
+      apply([]);
+      syncCarry();
+      w.emit({ type: 'pickup', x: p.x, id: 'shop' });
+    }, () => w.say(VENDORS[vendor].bye, 2));
+  });
+
+  const hitSeen = new Set<string>();
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
@@ -161,9 +198,13 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     },
     tick() {
       lastReserve = ir.reserve = p.reserve;
+      // 플레이어 공격 상자로 상자·서랍장·드럼통 부수기
+      const hits = p.frame().hit;
+      if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       syncCarry();
       w.notes.cash = ir.cash;
+      w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
       w.notes.shards = ir.shards;
       w.notes.debt = ir.debt;
       w.notes.bag = ir.bag.map((b) => (b ? { id: b.id, name: b.name } : null));

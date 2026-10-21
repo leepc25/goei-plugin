@@ -884,6 +884,16 @@ def leadb(t):
     c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
     return P((X+4,57+1.2*abs(c)),10,0,0,(X+4+11*c,G-4*max(0,-sn)),(X+4-11*c,G-4*max(0,sn)),('r',-24,24),(2+7*c,28),head=(4,-7),le=('e',-9,13))
 clip('leadhand','side view: walking forward, near arm stretched straight back and down behind her body, hand open',[leadb(i/8) for i in range(8)])
+# 뒤돌아보기 2차(불합격: 어깨를 벌리자 몸 전체가 3/4 정면으로, 얼굴도 화면 쪽. 커밋 안 함): 하체·골반은 오른쪽 옆모습 그대로, 어깨선만 화면 안쪽으로 30~45도(앞어깨가 앞으로, 뒷어깨가 뒤로 벌어짐),
+# 머리는 완전히 왼쪽을 보는 옆얼굴(코가 귀보다 왼쪽). 목 길이(NECK–NOSE)는 대기와 같음. 중간 장도 코를 확실히 왼쪽에 둠(정면 얼굴 방지)
+def LBK2(a,back=True):
+    p=P((X,55),2,-1.1*a,0,(X+6,G),(X-4,G),'down','down',le=('e',-1,14),re=('e',-2,14))
+    if back:
+        N=p['NECK']; n=(N[0]-5,N[1]-7); p['NOSE']=n
+        for k,v in (('RIGHT EYE',(3,-3)),('LEFT EYE',(0,-4)),('RIGHT EAR',(8,-2)),('LEFT EAR',(6,-3))): p[k]=(n[0]+v[0],n[1]+v[1])
+    return p
+clip('lookback_try2','side view: hips and legs stay facing right, shoulders twist back, head turned fully to look left behind her, then faces right again',
+     [LBK2(0,False),LBK2(.6),LBK2(1),LBK2(1),LBK2(.6),LBK2(0,False)])
 BASE13=['carry2_idle','carry2_walk','carry2_run','carry1_idle','carry1_walk','carry1_run','sneak','leadhand','hairflip','embarrassed','shrug','headshake']
 
 A_KP=skel.A
