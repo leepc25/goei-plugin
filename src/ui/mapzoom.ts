@@ -21,9 +21,11 @@ export function mapZoomControls(nation = false): string {
     </div>`;
 }
 
-function clamp(v: View, w: number, h: number): View {
+/** 보이는 칸(cw·ch) 안에서 그림(lw·lh × z)이 빈틈없이 덮게. 그림이 칸보다 작은 쪽은 가운데 */
+function clamp(v: View, cw: number, ch: number, lw: number, lh: number): View {
   const z = Math.min(MAX, Math.max(1, v.z));
-  return { z, x: Math.min(0, Math.max(w - w * z, v.x)), y: Math.min(0, Math.max(h - h * z, v.y)) };
+  const fit = (p: number, c: number, l: number) => (l * z <= c ? (c - l * z) / 2 : Math.min(0, Math.max(c - l * z, p)));
+  return { z, x: fit(v.x, cw, lw), y: fit(v.y, ch, lh) };
 }
 
 /** render() 뒤에 부른다. 지도 칸이 없으면 아무것도 안 한다 */
@@ -32,15 +34,18 @@ export function bindMapZoom(root: HTMLElement): void {
   const layer = canvas?.querySelector<HTMLElement>('.gx-mapzoom');
   if (!canvas || !layer) return;
   const key = canvas.dataset.map ?? '';
-  let v = views.get(key) ?? { z: 1, x: 0, y: 0 };
+  // 처음엔 가운데 (PC 임무 탭은 칸이 그림보다 낮아 위아래가 잘린다. 2026-10-21 사용자: 끌어서 본다)
+  let v = views.get(key) ?? { z: 1, x: 0, y: Number.NaN };
+  const canPan = () => layer.offsetWidth * v.z > canvas.clientWidth + 1 || layer.offsetHeight * v.z > canvas.clientHeight + 1;
 
   const apply = () => {
-    // 기준은 지도 그림 칸: PC 임무 탭은 틀이 그림보다 넓고 그림은 가운데에 있다 (2026-10-21)
-    v = clamp(v, layer.offsetWidth, layer.offsetHeight);
+    if (Number.isNaN(v.y)) v = { ...v, y: (canvas.clientHeight - layer.offsetHeight) / 2 };
+    v = clamp(v, canvas.clientWidth, canvas.clientHeight, layer.offsetWidth, layer.offsetHeight);
     views.set(key, v);
-    layer.style.transform = v.z === 1 ? '' : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
+    layer.style.transform = v.z === 1 && !v.x && !v.y ? '' : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
     layer.style.setProperty('--pz', String(Math.pow(v.z, 0.25) / v.z));
     canvas.classList.toggle('zoomed', v.z > 1);
+    canvas.classList.toggle('pan', canPan());
   };
   /** 칸 안의 한 점(px)을 붙잡은 채 배율을 바꾼다 */
   const zoomAt = (z: number, cx: number, cy: number) => {
@@ -50,7 +55,7 @@ export function bindMapZoom(root: HTMLElement): void {
   };
   const local = (px: number, py: number) => {
     const r = canvas.getBoundingClientRect();
-    return [px - r.left - canvas.clientLeft - layer.offsetLeft, py - r.top - canvas.clientTop - layer.offsetTop] as const;
+    return [px - r.left - canvas.clientLeft, py - r.top - canvas.clientTop] as const;
   };
   const img = canvas.querySelector<HTMLImageElement>('.gx-mapimg');
   if (img && !img.complete) img.addEventListener('load', apply, { once: true });
@@ -60,8 +65,8 @@ export function bindMapZoom(root: HTMLElement): void {
     const b = (e.target as HTMLElement).closest<HTMLElement>('[data-zoom]');
     if (!b) return;
     e.stopPropagation();
-    const w = layer.offsetWidth / 2, h = layer.offsetHeight / 2;
-    if (b.dataset.zoom === 'reset') (v = { z: 1, x: 0, y: 0 }), apply();
+    const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
+    if (b.dataset.zoom === 'reset') (v = { z: 1, x: 0, y: Number.NaN }), apply();
     else zoomAt(v.z * (b.dataset.zoom === 'in' ? 1.6 : 1 / 1.6), w, h);
   });
 
@@ -95,7 +100,7 @@ export function bindMapZoom(root: HTMLElement): void {
       // 두 손가락 가운데가 잡은 지점을 따라가게
       v = { z: nz, x: mx - ((start.mx - start.v.x) / start.v.z) * nz, y: my - ((start.my - start.v.y) / start.v.z) * nz };
       apply();
-    } else if (t.length === 1 && v.z > 1 && !start.d) {
+    } else if (t.length === 1 && canPan() && !start.d) {
       // 확대했을 때만 한 손가락으로 지도를 옮긴다(아니면 화면 스크롤)
       e.preventDefault();
       const dx = t[0].clientX - start.x, dy = t[0].clientY - start.y;
@@ -119,7 +124,7 @@ export function bindMapZoom(root: HTMLElement): void {
     zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
   }, { passive: false });
   canvas.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0 || v.z === 1 || (e.target as HTMLElement).closest('.gx-zoom')) return;
+    if (e.pointerType !== 'mouse' || e.button !== 0 || !canPan() || (e.target as HTMLElement).closest('.gx-zoom')) return;
     const sx = e.clientX, sy = e.clientY, sv = { ...v };
     dragged = false;
     const move = (m: PointerEvent) => {

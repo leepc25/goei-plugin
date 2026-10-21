@@ -16,7 +16,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, endedCard, evCard, peopleChips } from './evcard';
+import { elapsedText, endedCard, evCard, peopleChips, targetMark } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -251,7 +251,7 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
   // 모바일: 지역·장소 검색은 하단 바 위 서랍으로 (v0.16.24, 사용자 설계. 필터 줄은 숫자 때문에 위에 그대로)
   return `${narrow() ? '' : mapBar(x)}
-    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}" style="--mapbg:url('${esc(url)}')"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
+    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
 }
 
 /** 지도 장소 검색: 시군구·거점 이름으로 찾아 그 지도로 바로 간다 (v0.16.21) */
@@ -513,19 +513,19 @@ export function missionList(ctx: ChatContext, opening = false): string {
     const status = missionStatus(x, kind, r.name);
     const bg = art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : '';
     const cap = `<span class="gx-evart-name"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
+    // 펼친 칸: 제목 바로 오른쪽에 목표 표식 (상세 창과 같은 모양, 2026-10-21 사용자)
+    const capOpen = (mark: string) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc(r.name)}</b>${mark}</span>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
     const wikiBtn = opening ? '' : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`;
     // 위키는 접힌 띠에서도 보이게 오른쪽 끝, 펴면 접기 오른쪽 옆 (2026-10-21 사용자)
     if (!open) {
       return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
-    // 선택 단추는 임무 창 상세처럼 이름 줄 오른쪽 작은 단추 (2026-10-21 사용자)
-    const pickBtn = sel
-      ? `<button class="gx-evpick on" data-action="mission-unpick">${ICONS.pin}해제</button>`
-      : `<button class="gx-evpick" data-action="mission-pick" data-value="${val}">${ICONS.pin}선택</button>`;
+    // 선택 단추는 임무 상세 창처럼 오른쪽 위 단추 줄 맨 앞 (2026-10-21 사용자)
+    const mark = sel ? targetMark(true, 'mission-unpick', '') : targetMark(false, 'mission-pick', val);
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
       <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap"><span class="gx-mx-head">${cap}${pickBtn}</span>${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
+      <span class="gx-evart-cap">${capOpen(mark)}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {
