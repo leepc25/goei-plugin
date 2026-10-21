@@ -1,5 +1,5 @@
 // 플레이어 (쟈알디). 조작은 기본기획서 부록 A + 사용자 결정(Shift 짧게 회피·길게 달리기, 탄약 제한).
-import { PIXEL, type Hit, type HitResult, type WBox, type WorldView } from './contract';
+import { PIXEL, type Body, type Hit, type HitResult, type WBox, type WorldView } from './contract';
 import { Fighter, GRAVITY, toWorld } from './fighter';
 import type { Pad } from './input';
 import { COMBO, MOVES, type MoveDef } from './moves';
@@ -62,7 +62,7 @@ export class Player extends Fighter {
   comboClock = 0;
   maxCombo = 0;
   // 잡기
-  grabbed: Fighter | null = null;
+  grabbed: Grabbed | null = null;
   grabT = 0;
   grabHits = 0;
   // 그리기
@@ -574,14 +574,15 @@ export class Player extends Fighter {
     // 자동 잡기: 경직 중인 적에게 걸어 붙으면
     if (p.mx && !this.running && !this.crouching) {
       for (const b of world.bodies) {
-        if (!(b instanceof Fighter) || b.team !== 'enemy' || !b.alive || !b.grabbable || b.phase !== 'hurt' || b.z > 0) continue;
+        if (b.team !== 'enemy' || !b.alive || b.z > 0 || !grabCan(b as Grabbed)) continue;
         const dx = b.x - this.x;
         if (Math.sign(dx) === p.mx && Math.abs(dx) < 62 && Math.abs(b.y - this.y) < 14) {
-          this.grabbed = b;
+          const gb = b as Grabbed;
+          this.grabbed = gb;
           this.grabT = 0;
           this.grabHits = 0;
-          b.enter('held');
-          b.vx = b.vz = 0;
+          grabHold(gb);
+          gb.vx = 0;
           this.vx = this.vy = 0;
           this.dir = dx > 0 ? 1 : -1;
           world.emit({ type: 'custom', name: 'grab' });
@@ -594,14 +595,14 @@ export class Player extends Fighter {
   releaseGrab() {
     const g = this.grabbed;
     this.grabbed = null;
-    if (g && g.phase === 'held') g.enter('hurt', 8);
+    if (g && grabIsHeld(g)) grabRelease(g, 8);
   }
 
   private stepGrab(world: WorldView, p: Pad) {
     const g = this.grabbed!;
     this.grabT++;
     this.vx = this.vy = 0;
-    if (!g.alive || g.phase !== 'held') {
+    if (!g.alive || !grabIsHeld(g)) {
       this.grabbed = null;
       return;
     }
@@ -615,19 +616,42 @@ export class Player extends Fighter {
         if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
         g.x = this.x + this.dir * 50;
         this.play('grabblast', world);
-        g.enter('hurt', 30);
+        grabRelease(g, 30);
         this.grabbed = null;
         return;
       }
       this.grabHits++;
       this.play('grabknee', world);
-      g.phase = 'held';
+      grabHold(g);
     }
   }
 
   /** 무릎 치기 동안 잡힌 상태 유지 */
   keepHeld() {
     const g = this.grabbed;
-    if (g && g.phase === 'hurt') g.enter('held');
+    if (g && (g instanceof Fighter ? g.phase === 'hurt' : g.state === 'hurt' || g.state === 'stunned')) grabHold(g);
   }
+}
+
+/** 잡을 수 있는 몸: 엔진 Fighter, 또는 적 모듈 Enemy(grabbable·state·set·bindT) */
+type Grabbed = Body & { vx: number; grabbable?: boolean; phase?: string; state?: string; set?: (s: string) => void; bindT?: number };
+
+function grabCan(b: Grabbed): boolean {
+  if (!b.grabbable) return false;
+  if (b instanceof Fighter) return b.phase === 'hurt';
+  return (b.state === 'hurt' || b.state === 'stunned') && typeof b.set === 'function';
+}
+function grabHold(b: Grabbed) {
+  if (b instanceof Fighter) b.enter('held');
+  else {
+    b.set!('bound');
+    b.bindT = 9999;
+  }
+}
+function grabIsHeld(b: Grabbed): boolean {
+  return b instanceof Fighter ? b.phase === 'held' : b.state === 'bound';
+}
+function grabRelease(b: Grabbed, ticks: number) {
+  if (b instanceof Fighter) b.enter('hurt', ticks);
+  else b.bindT = ticks;
 }

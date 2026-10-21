@@ -21,9 +21,11 @@ try {
   await page.waitForFunction(() => window.__goeiEngine);
   await page.waitForTimeout(400);
   await S(page, 'pc-title');
-  // 제목 → 이어하기(허수아비 연습)에서 조작 확인
-  await page.getByText('이어하기').click();
-  await page.waitForFunction(() => window.__goeiEngine.world);
+  // 저장이 없으면 이어하기가 없다
+  assert.equal(await page.getByText('이어하기').count(), 0, '저장 없이 이어하기');
+  // 시작 꼬리표로 허수아비 연습에서 조작 확인
+  await page.goto(url + '?start=stage=dummy');
+  await page.waitForFunction(() => window.__goeiEngine && window.__goeiEngine.world);
   await page.waitForTimeout(400);
   await S(page, 'pc-start');
   const s0 = await st(page);
@@ -79,10 +81,15 @@ try {
   await page.getByText('예', { exact: true }).click();
   await page.waitForFunction(() => !window.__goeiEngine.world);
   await page.getByText('새로 시작').click();
-  await page.waitForSelector('.hq-places button');
+  // 본부 = 엔진 벨트 장면: 잼트리 자리 문 앞으로 가서 E
+  await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
+  await page.waitForTimeout(300);
   await S(page, 'pc-hq');
-  await page.click('[data-go=jaemtri]');
-  await page.waitForSelector('[data-mission]');
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'jaemtri'); w.player.x = d.x; });
+  await page.waitForTimeout(100);
+  await page.keyboard.press('KeyE');
+  await page.waitForSelector('[data-mission]', { state: 'visible' });
+  await S(page, 'pc-hq-panel');
   await page.click('[data-mission]');
   await page.click('[data-act=brief]');
   await page.waitForSelector('[data-act=deploy]');
@@ -117,8 +124,8 @@ try {
   await m.waitForTimeout(300);
   const box = await m.evaluate(() => { const r = document.querySelector('canvas').getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; });
   void box;
-  await m.getByText('이어하기').click();
-  await m.waitForFunction(() => window.__goeiEngine.world);
+  await m.goto(url + '?touch=1&start=stage=dummy');
+  await m.waitForFunction(() => window.__goeiEngine && window.__goeiEngine.world);
   await m.waitForTimeout(500);
   await S(m, 'm-start');
   const sw = await m.evaluate(() => document.documentElement.scrollWidth);

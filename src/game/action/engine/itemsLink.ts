@@ -153,6 +153,12 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
 
   return {
     run: ir,
+    /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
+    showcase() {
+      const ym = (w.lane[0] + w.lane[1]) / 2;
+      Object.keys(PROPS).forEach((id, i) => placeProp(field, id, 520 + i * 150, ym + ((i % 2) * 2 - 1) * 50));
+      Object.keys(WEAPONS).forEach((id, i) => spawnPickup(field, 'weapon', 600 + i * 140, ym));
+    },
     tick() {
       lastReserve = ir.reserve = p.reserve;
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));

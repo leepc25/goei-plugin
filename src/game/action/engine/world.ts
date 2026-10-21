@@ -54,7 +54,7 @@ export class World implements WorldView {
   player: Player;
   bodies: Body[] = [];
   floor!: FloorPlan;
-  lane: [number, number] = [500, 680];
+  lane: [number, number] = [440, 690];
   bounds: [number, number] = [0, SCREEN_W];
   noise = 0;
   light = 1;
@@ -86,6 +86,8 @@ export class World implements WorldView {
   hooks: (() => void)[] = [];
   /** E: 아이템 줍기·들기·내려놓기 (처리했으면 true) */
   pickHook: (() => boolean) | null = null;
+  /** 맞을 때 불꽃·고리·흔들림을 엔진이 그릴지 (화면 껍데기가 있으면 껍데기 fx가 맡아 끈다) */
+  hitFx = true;
   /** 든 물건 그리기: (sx, sy)=손잡이가 올 화면 자리, deg=각도(오른쪽 보기 기준), dir=보는 방향 */
   drawHeld: ((c: CanvasRenderingContext2D, carry: NonNullable<Player['carry']>, sx: number, sy: number, deg: number, dir: 1 | -1) => void) | null = null;
   /** 싸움 구간을 막는 몸인가 (적 모듈: 평화로운 주민 등은 아님) */
@@ -204,7 +206,7 @@ export class World implements WorldView {
 
   enterFloor(f: FloorPlan) {
     this.floor = f;
-    this.lane = f.lane ?? [500, 680];
+    this.lane = f.lane ?? [440, 690];
     this.bounds = [0, f.length];
     this.props = (f.props ?? []).map((p) => ({ ...p }));
     this.bodies = [];
@@ -392,15 +394,17 @@ export class World implements WorldView {
     if (r.kind === 'guard') {
       a.stop = Math.max(a.stop, 3);
       t.stop = Math.max(t.stop, 3);
-      this.fx('spark', at.x, at.y, at.z);
+      if (this.hitFx) this.fx('spark', at.x, at.y, at.z);
       return;
     }
     a.stop = Math.max(a.stop, stop);
     t.stop = Math.max(t.stop, stop);
     const strength = h.strength ?? (h.react === 'down' || h.react === 'launch' ? 3 : h.react === 'stagger' ? 2 : 1);
-    this.fx(strength >= 3 ? 'spark-big' : 'spark', at.x, at.y, at.z);
-    if (strength >= 2) this.fx('ring', at.x, at.y, at.z, String(strength));
-    if (strength >= 3) this.shake(6, 3);
+    if (this.hitFx) {
+      this.fx(strength >= 3 ? 'spark-big' : 'spark', at.x, at.y, at.z);
+      if (strength >= 2) this.fx('ring', at.x, at.y, at.z, String(strength));
+      if (strength >= 3) this.shake(6, 3);
+    }
     if (h.noise) this.emit({ type: 'custom', name: 'noise', data: h.noise });
     const p = this.player;
     if (a === p || a.kind === 'bullet') {

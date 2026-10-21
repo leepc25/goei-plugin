@@ -5,14 +5,19 @@
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
 import { createGameAudio } from '../audio';
-import { createHq, idbSaves, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+import { createHq, idbSaves, setItemIconDrawer, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
-import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore } from './contract';
+import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
-import { mountStory, type StoryApi } from '../story';
+import { CUTSCENES, mountStory, type StoryApi } from '../story';
 import { linkItems } from './itemsLink';
+import { makeHub, type HubPlace } from './hub';
+import { PLACES } from '../hq/data';
+import { openPlaces } from '../hq/logic';
+import { drawTitleBg } from '../ui/demo-world';
+import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
 
@@ -35,25 +40,58 @@ const local = (key: string) => ({
 
 type Launch = RunConfigCore & { launch?: MissionLaunch };
 
+const SAVED_KEY = 'goei-game-saved';
+const markSaved = () => local(SAVED_KEY).save('1');
+const hasSaved = () => local(SAVED_KEY).load() === '1';
+
 /** 본부 모듈을 엔진 모양으로 감싼다 */
 function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>): HqModuleLike {
   const hq = createHq();
+  const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
+  const slot = b?.slot ?? 0;
+  // 본부 걷기는 엔진 벨트 장면. 본부 모듈에 places·openPlace·isOpen이 생기기 전까지는 기존 DOM을 띄우고 장소 단추를 누른다
+  type HqPanel = { places?: () => HubPlace[]; openPlace?: (id: string) => void; isOpen?: () => boolean };
+  const api = hq as unknown as HqPanel;
+  let root: HTMLElement | null = null;
+  let fbOpen = false;
+  const places = (): HubPlace[] =>
+    api.places?.() ??
+    (() => {
+      const open = new Set(openPlaces(hq.state).map((p) => p.id));
+      return PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: open.has(p.id), opens: p.opens }));
+    })();
+  const openPlace = (id: string) => {
+    if (api.openPlace) return api.openPlace(id);
+    fbOpen = true;
+    if (root) root.hidden = false;
+    (root?.querySelector(`[data-go="${id}"]`) as HTMLElement | null)?.click();
+  };
   return {
-    mount(root, host) {
-      hq.mount(root, {
+    hub: () => makeHub(places, openPlace),
+    isOpen: () => (api.isOpen ? api.isOpen() : fbOpen),
+    mount(r, host) {
+      root = r;
+      if (!api.openPlace) {
+        const close = document.createElement('button');
+        close.textContent = '✕ 닫기';
+        close.className = 'goei-engine-hq-close';
+        close.addEventListener('click', () => (fbOpen = false));
+        r.appendChild(close);
+      }
+      hq.mount(r, {
         deploy: (l) => host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
-        load: () => saves.read(0),
-        save: (d) => saves.write(0, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' }),
+        load: () => saves.read(slot as never),
+        save: (d) => (markSaved(), saves.write(slot as never, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' })),
         saves,
         link: bridge?.card
           ? {
               card: async () => {
                 const c = await bridge.card!();
-                return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: '' })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
+                return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: (b?.photo && a.photo ? b.photo(a.photo) : '') ?? '' })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
               },
               report: async (p: unknown) => {
                 bridge.report?.(p as never);
-                return '정산 결과를 넘겼습니다. 「본편에 기록」을 누르면 카드에 씁니다.';
+                return '정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.';
               },
             } as never
           : undefined,
@@ -88,7 +126,9 @@ function toHqResult(r: RunResultCore, w: World): RunResult {
     rescued: n.rescued ?? [],
     bigHit: !!n.bigHit,
     seconds: r.timeSec,
-  };
+    id: String(n.runId ?? ''),
+    notes: r.notes,
+  } as RunResult;
 }
 
 function hudState(w: World, shell: Shell): HudState {
@@ -124,6 +164,8 @@ export interface Wiring {
 }
 
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
+  setSupplyCatalog(SUPPLY_CATALOG as never);
+  setItemIconDrawer(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   let game: Game | null = null;
   const shell = mountGameShell(box, {
@@ -131,8 +173,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     title: '차원 승강기',
     sub: 'ANOMALY SIMULATION · 관리국 액션',
     onNew: () => game?.start_new(),
-    onContinue: () => game?.start_new('dummy'),
-    hasSave: () => true,
+    onContinue: () => game?.start_new(),
+    hasSave: hasSaved,
     onRetreat: () => game?.endRun('withdraw'),
     onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
@@ -155,6 +197,44 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   };
   const elevator = createElevatorStage(stageStore);
+  // 시연용 방: 적 고르기(?start=arena[&enemy=종류]), 아이템 진열(?start=items)
+  const kinds = Object.keys(DEF_BY_KIND);
+  let arenaIdx = 0;
+  const arenaStage: StageModule = {
+    id: 'arena',
+    label: '적 시험장',
+    firstFloor: () => ({
+      id: 'arena',
+      title: '적 시험장',
+      length: 2400,
+      startX: 300,
+      exitX: Infinity,
+      banner: '적 시험장 · 표지판 앞에서 E: 다음 적',
+      props: [{ id: 'next', kind: 'sign', x: 160, y: 445, w: 120, h: 60, label: 'E · 다음 적' }],
+      encounters: [],
+    }),
+    nextFloor: () => null,
+    onInteract(api, _f, prop) {
+      if (prop.id !== 'next' || !kinds.length) return;
+      let want: string | null = null;
+      try {
+        want = new URLSearchParams(location.search).get('enemy');
+      } catch {
+        /* 없음 */
+      }
+      const kind = want && arenaIdx === 0 ? want : kinds[arenaIdx % kinds.length];
+      arenaIdx++;
+      const p = api.world.player;
+      api.spawn({ kind, x: p.x + 420, y: p.y, boss: !!(DEF_BY_KIND[kind] as { boss?: boolean })?.boss });
+      api.world.say(`다음 적: ${kind}`, 1.5);
+    },
+  };
+  const itemStage: StageModule = {
+    id: 'itemroom',
+    label: '아이템 진열실',
+    firstFloor: () => ({ id: 'itemroom', title: '아이템 진열실', length: 3200, startX: 300, exitX: Infinity, banner: '아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기', encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: 'dummy', x: 1600, y: 560 }, { kind: 'dummy', x: 2400, y: 620 }]] }] }),
+    nextFloor: () => null,
+  };
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
     if (DEF_BY_KIND[spec.kind]) {
@@ -208,6 +288,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.event({ type: 'step', x: p.x, vol: p.running ? 0.9 : 0.6 });
     }
   };
+  (globalThis as { __goeiStory?: (id: string) => void }).__goeiStory = (id) => (CUTSCENES[id] ? story.cutscene(id) : story.say(id));
   const story: StoryApi = mountStory(
     storyRoot,
     {
@@ -216,10 +297,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shake: (ms, amp) => shell.fx.onGameEvent({ type: 'shake', ms, amp } as never),
       anchor: (id) => {
         if (id !== 'agent' || !world) return null;
-        const c = shell.canvas.getBoundingClientRect();
-        const r = storyRoot.getBoundingClientRect();
+        // 화면을 돌려도 맞도록 변환 전 배치 좌표(offset*)로 계산
+        const cv = shell.canvas;
+        let ox = 0,
+          oy = 0;
+        for (let n: HTMLElement | null = cv; n && n !== storyRoot.offsetParent; n = n.offsetParent as HTMLElement | null) (ox += n.offsetLeft), (oy += n.offsetTop);
+        const k = cv.offsetWidth / 1280;
         const p = world.player;
-        return { x: c.left - r.left + ((p.x - world.camX) / 1280) * c.width, y: c.top - r.top + ((p.y - p.z - 190) / 720) * c.height };
+        return { x: ox - storyRoot.offsetLeft + (p.x - world.camX) * k, y: oy - storyRoot.offsetTop + (p.y - p.z - 190) * k };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
     },
@@ -246,13 +331,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
+      if (game?.inHub && (e.type === 'enter:floor' || e.type === 'custom')) return; // 본부: 승강기 안내·층 제목 없음
       shell.fx.onGameEvent(e as never);
       story.event(e.type, e as never);
       if (e.type === 'run:end') saveFlags();
     },
   ];
   const mods: EngineModules = {
-    stages: [elevator, trainingStage, dummyStage],
+    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
     enemyFactory,
     hq,
     hud: false,
@@ -278,7 +364,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
-      shell.hud.draw(ctx, hs, dt);
+      if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -286,20 +372,29 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onScene: (name) => {
       if (name === 'title' || name === 'hq') audio.floor(name as never);
-      if (name === 'hq') {
-        shell.play(); // 타이틀 메뉴 닫기
-        shell.mode = 'title';
-      }
+      if (name === 'hq') shell.play(); // 본부도 걷는 장면: 타이틀 메뉴 닫고 조작·터치 켜기
     },
     onPause: (p) => (p ? audio.pause() : audio.resume()),
     onWorld: (w, run) => {
       world = w;
+      w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
+      if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
+      w.notes.runId = `${run.seed}`;
       w.on((e) => {
         // 승강기를 타고 새 층에 내릴 때 안내 방송 (첫 층은 건너뛴다)
         if (e.type === 'enter:floor' && w.floors > 1 && e.floor.depth) story.say('board', { depth: e.floor.depth, ftype: (e.floor as { type?: string }).type ?? '' });
       });
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
+      });
+      // 진압 임무: 쓰러뜨린 수호자 종류를 남긴다
+      const bossesDown = new Set<number>();
+      w.hooks.push(() => {
+        for (const bd of w.bodies) {
+          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || (bd.alive && bd.hp > 0)) continue;
+          bossesDown.add(bd.id);
+          ((w.notes.bosses ??= []) as string[]).push(bd.kind);
+        }
       });
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
       w.interactHooks.push((prop) => {
@@ -319,10 +414,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
       });
       const items = linkItems(w, run);
+      if (run.stageId === 'itemroom') items.showcase();
       w.hooks.push(() => items.tick());
       w.underlays.push((c, camX) => items.draw(c, camX));
     },
     toHqResult,
+    drawIdle: (name, ctx, t) => {
+      if (name === 'title') drawTitleBg(ctx, t);
+    },
+    boot: (g) => bootFromUrl(g),
     dispose: () => {
       window.removeEventListener('keydown', storyKeys, true);
       saveFlags();
@@ -338,4 +438,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       game = g;
     },
   };
+}
+
+/** 시작 꼬리표 (게임_통합_규격 1장): ?start=hq | stage=elevator|training|dummy | arena | items | story=<장면> */
+function bootFromUrl(g: Game): boolean {
+  let q: URLSearchParams;
+  try {
+    q = new URLSearchParams(location.search);
+  } catch {
+    return false;
+  }
+  const start = q.get('start');
+  if (!start) return false;
+  const [k, v] = start.split('=');
+  if (k === 'hq') g.start_new();
+  else if (k === 'stage') g.start_new(v || undefined);
+  else if (k === 'arena') g.start_new('arena');
+  else if (k === 'items') g.start_new('itemroom');
+  else if (k === 'story') {
+    g.start_new('dummy');
+    if (v) (globalThis as { __goeiStory?: (id: string) => void }).__goeiStory?.(v);
+  } else return false;
+  return true;
 }
