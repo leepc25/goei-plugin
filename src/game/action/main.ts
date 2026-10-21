@@ -44,6 +44,9 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     dead = true;
     offTouch?.();
     game?.destroy();
+    const g = globalThis as { __goeiEngine?: Game };
+    if (g.__goeiEngine === game) delete g.__goeiEngine;
+    game = null;
     root.remove();
     st.remove();
   };
