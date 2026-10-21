@@ -1,7 +1,12 @@
 // 화면 효과: 땅 그림자, 어두운 층 조명·림라이트, 피격 섬광(하얀 실루엣), 흔들림, 스파크·충격파, 피해 숫자,
 // 층 제목, 전환(암전·승강기 문·조리개·지직). 엔진은 onEvent 로 사건만 알려 주면 된다.
 import { FONT, label } from './hud';
-import { H, W } from './stage';
+import { H as H0, W as W0 } from './stage';
+
+// 캔버스 크기 (채우기면 가로가 넓다). 그리는 함수가 정한다
+let W = W0,
+  H = H0;
+const size = (c: CanvasRenderingContext2D) => ((W = c.canvas.width), (H = c.canvas.height));
 
 export type FxEvent =
   | { type: 'hit'; x: number; y: number; strength: 1 | 2 | 3; dmg?: number; target?: 'enemy' | 'player' }
@@ -79,7 +84,7 @@ export class Fx {
   private time = 0;
   private m1 = off(256, 256);
   private m2 = off(256, 256);
-  private dark = off(W, H);
+  private dark = off(1800, 720);
   /** 진동 같은 바깥 반응 (게임패드·폰) */
   rumble: ((strength: number, ms: number) => void) | null = null;
 
@@ -265,6 +270,7 @@ export class Fx {
 
   /** 화면 덮개: 필살 암전·섬광·체력 위험 테두리·층 제목. HUD 보다 먼저 */
   drawScreen(c: CanvasRenderingContext2D, hpRatio = 1) {
+    size(c);
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
     if (this.dim > 0) (c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`), c.fillRect(0, 0, W, H);
@@ -324,6 +330,7 @@ export class Fx {
   }
   /** 맨 마지막(HUD·메뉴 위)에 그린다 */
   drawTransition(c: CanvasRenderingContext2D) {
+    size(c);
     const tr = this.tr;
     if (!tr) return;
     const half = tr.dur / 2;
@@ -399,6 +406,7 @@ export class Fx {
 
   /** 어두운 층: 빛 자리만 뚫린 어둠. 빛은 월드 좌표, camX 를 빼서 그린다 */
   darkness(c: CanvasRenderingContext2D, lights: { x: number; y: number; r: number; color?: string; flicker?: boolean }[], alpha: number, camX: number, camY = 0) {
+    size(c);
     const d = this.dark;
     fit(d, W, H);
     d.fillStyle = `rgba(2,3,6,${alpha})`;
