@@ -10,6 +10,9 @@ const BASE: Record<Fx, number> = { tear: 0.09, lost: 0.018, shade: 0.012, text: 
 const LAST: Record<Fx, number> = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
 /** 괴이만 쓰는 효과 */
 const AN_ONLY: Fx[] = ['shade', 'text', 'breath'];
+/** 같은 효과가 다시 나기까지 최소 간격(ms): 확률이 겹쳐도 연달아 나오지 않게 */
+const GAP: Record<Fx, number> = { tear: 4000, lost: 30000, shade: 60000, text: 15000, breath: 25000 };
+const lastAt = new Map<Fx, number>();
 const GRADE: Record<string, number> = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
 const BLOCKS = '█▓▒░#?¿§';
 const JAMO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ';
@@ -56,7 +59,9 @@ function tick(root: HTMLElement): void {
     const scale = an ? GRADE[view.dataset.grade ?? ''] ?? 1 : 0.4;
     for (const fx of Object.keys(BASE) as Fx[]) {
       if (!an && AN_ONLY.includes(fx)) continue;
-      if (Math.random() < BASE[fx] * scale) fireFx(view, fx);
+      if (Date.now() - (lastAt.get(fx) ?? 0) < GAP[fx] || Math.random() >= BASE[fx] * scale) continue;
+      lastAt.set(fx, Date.now());
+      fireFx(view, fx);
     }
   }
 }
