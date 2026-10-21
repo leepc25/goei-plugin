@@ -32,9 +32,21 @@ def build(partial=False):
         for i in range(8):
             x, y = i % 2, i // 2
             # Exclude generated grid seams; nearest-neighbor only, no filtering.
-            box = (round(x*w/2)+3, round(y*h/4)+3,
-                   round((x+1)*w/2)-3, round((y+1)*h/4)-3)
+            box = (round(x*w/2)+6, round(y*h/4)+6,
+                   round((x+1)*w/2)-6, round((y+1)*h/4)-6)
             frames.append(im.crop(box).resize((320,180), Image.Resampling.NEAREST))
+        if key in {'first_entry/c2','first_call/c1'}:
+            # A lighting shot must not invent gestures or change the anatomy.
+            base=frames[0]
+            frames=[]
+            for light in [1,.35,1,.55,.35,1,.55,1]:
+                f=base.copy()
+                if key=='first_call/c1':
+                    f=f.point(lambda v:round(v*light))
+                else:
+                    pixels=list(f.getdata())
+                    f.putdata([tuple(round(v*light) for v in p) if p[0]>p[1]*1.6 and p[0]>p[2]*1.6 else p for p in pixels])
+                frames.append(f)
         atlas = Image.new('RGB', (640,720))
         for i,f in enumerate(frames): atlas.paste(f,((i%2)*320,(i//2)*180))
         palette = atlas.quantize(colors=64, method=Image.Quantize.MEDIANCUT,
