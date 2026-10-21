@@ -48,11 +48,11 @@ export const MOVES: Record<string, MoveDef> = {
   // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
   jab: {
     clip: 'jab', ticks: T(1, 1, 4, 2, 2), adv: 6, cancel: 2, whiffCancel: 3,
-    hits: [{ at: [2], dmg: 8, react: 'flinch', push: 3, stop: 3, strength: 1, noise: 0.15 }],
+    hits: [{ at: [2], dmg: 8, react: 'flinch', push: 5, stop: 3, strength: 1, noise: 0.15 }],
   },
   cross: {
     clip: 'cross', ticks: T(1, 1, 2, 5, 3, 2), origin: 6, adv: 10, cancel: 3, whiffCancel: 4, lunge: [3, 0.7],
-    hits: [{ at: [3], dmg: 10, react: 'flinch', push: 3, stop: 4, strength: 2, noise: 0.2 }],
+    hits: [{ at: [3], dmg: 10, react: 'flinch', push: 6, stop: 4, strength: 2, noise: 0.2 }],
   },
   power: {
     clip: 'power', ticks: T(2, 2, 3, 7, 6), origin: 16, adv: 20, lunge: [11, 0.78], armor: [2, 3, 1],

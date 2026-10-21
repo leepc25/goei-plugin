@@ -31,7 +31,7 @@ async function loadArt(urlOf) {
 var TICK_HZ = 30;
 var SCREEN_W = 1280;
 var SCREEN_H = 720;
-var PIXEL = 2;
+var PIXEL = 2.75;
 
 // src/game/action/engine/input.ts
 var KEYMAP = {
@@ -562,6 +562,9 @@ function makeRenderer(ctx, art, opt) {
       ctx.fillText("출구", ex + 22, wallTop + 110);
     }
   }
+  function near2(w, p) {
+    return Math.abs(w.player.x - p.x) < 60;
+  }
   function drawProps(w, camX) {
     for (const p of w.props) {
       const sx = p.x - camX;
@@ -579,24 +582,20 @@ function makeRenderer(ctx, art, opt) {
           ctx.fillStyle = "#59636a";
           ctx.fillRect(sx - 20, p.y - 200, 40, 200);
         }
-        if (p.label) {
-          ctx.fillStyle = "#e8eef0";
-          ctx.font = "18px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(p.label, sx, p.y - 268);
-          ctx.textAlign = "left";
-        }
         continue;
       }
       ctx.fillStyle = p.kind === "door" || p.kind === "elevator" ? "#4d5b63" : p.kind === "pickup" ? "#c9a640" : "#59636a";
       ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
       ctx.strokeStyle = "rgba(0,0,0,0.5)";
       ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-      if (p.label) {
-        ctx.fillStyle = "#e8eef0";
-        ctx.font = "18px sans-serif";
+      if (p.label && near2(w, p)) {
+        ctx.font = "bold 15px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(p.label, sx, p.y - p.h - 8);
+        const tw = ctx.measureText(`E ${p.label}`).width + 16;
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(sx - tw / 2, p.y - p.h - 30, tw, 22);
+        ctx.fillStyle = "#f0d890";
+        ctx.fillText(`E ${p.label}`, sx, p.y - p.h - 14);
         ctx.textAlign = "left";
       }
     }
@@ -640,10 +639,17 @@ function makeRenderer(ctx, art, opt) {
       switch (f.kind) {
         case "spark":
         case "spark-big": {
-          const n = f.kind === "spark" ? 6 : 12;
-          const r = (f.kind === "spark" ? 34 : 70) * (0.4 + k);
+          const big = f.kind === "spark-big";
+          const n = big ? 12 : 8;
+          const r = (big ? 120 : 64) * (0.45 + k);
+          if (k < 0.45) {
+            ctx.fillStyle = `rgba(255,255,255,${0.9 - k * 2})`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, (big ? 46 : 26) * (1 - k), 0, Math.PI * 2);
+            ctx.fill();
+          }
           ctx.strokeStyle = k < 0.3 ? "#ffffff" : "#ffd36a";
-          ctx.lineWidth = f.kind === "spark" ? 4 : 6;
+          ctx.lineWidth = big ? 9 : 6;
           for (let i = 0; i < n; i++) {
             const an = i / n * Math.PI * 2 + f.seed % 10;
             ctx.beginPath();
@@ -796,7 +802,7 @@ function makeRenderer(ctx, art, opt) {
     }
   }
   function overlayText(w) {
-    if (w.goT > 0 && w.tick % 20 < 13) {
+    if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
       ctx.save();
       ctx.font = "bold 64px sans-serif";
       ctx.fillStyle = "#ffd36a";
@@ -934,7 +940,7 @@ var MOVES = {
     adv: 6,
     cancel: 2,
     whiffCancel: 3,
-    hits: [{ at: [2], dmg: 8, react: "flinch", push: 3, stop: 3, strength: 1, noise: 0.15 }]
+    hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
   },
   cross: {
     clip: "cross",
@@ -944,7 +950,7 @@ var MOVES = {
     cancel: 3,
     whiffCancel: 4,
     lunge: [3, 0.7],
-    hits: [{ at: [3], dmg: 10, react: "flinch", push: 3, stop: 4, strength: 2, noise: 0.2 }]
+    hits: [{ at: [3], dmg: 10, react: "flinch", push: 6, stop: 4, strength: 2, noise: 0.2 }]
   },
   power: {
     clip: "power",
@@ -1026,11 +1032,11 @@ var MOVES = {
 var COMBO = ["jab", "cross", "power"];
 
 // src/game/action/engine/player.ts
-var WALK_X = 7;
+var WALK_X = 9;
 var WALK_Y = 4.2;
-var RUN_X = 14;
-var CROUCH_X = 2.6;
-var JUMP_V = 27;
+var RUN_X = 18;
+var CROUCH_X = 3.4;
+var JUMP_V = 31;
 var BUFFER = 8;
 var MAG = 8;
 var HOLSTER_AFTER = 45;
@@ -1471,7 +1477,7 @@ var Player = class extends Fighter {
   stepFree(world, p) {
     if (this.airborne) {
       this.vx += p.mx * 0.4;
-      this.vx = Math.max(-12, Math.min(12, this.vx));
+      this.vx = Math.max(-16, Math.min(16, this.vx));
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       if (this.carry?.kind === "prop" && this.itemAct && this.take("attack")) {
         const anim = this.itemAct("attack");
@@ -1508,7 +1514,7 @@ var Player = class extends Fighter {
     if (this.take("jump") && !this.crouching) {
       this.vz = JUMP_V;
       this.z = 1;
-      this.vx = p.mx * (this.running ? 12 : WALK_X);
+      this.vx = p.mx * (this.running ? 16 : WALK_X);
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       this.running = false;
       world.emit({ type: "jump", x: this.x });
@@ -1701,6 +1707,8 @@ var World = class {
   encWave = 0;
   encBodies = [];
   goT = 0;
+  /** 메뉴로 멈춤: 겹쳐 그릴 안내(GO 등)를 숨긴다 */
+  paused = false;
   /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
   cutin = 0;
   showBoxes = false;
@@ -1958,14 +1966,14 @@ var World = class {
     if (r.kind === "guard") {
       a.stop = Math.max(a.stop, 3);
       t.stop = Math.max(t.stop, 3);
-      if (this.hitFx) this.fx("spark", at2.x, at2.y, at2.z);
+      this.fx("spark", at2.x, at2.y, at2.z);
       return;
     }
     a.stop = Math.max(a.stop, stop);
     t.stop = Math.max(t.stop, stop);
     const strength = h.strength ?? (h.react === "down" || h.react === "launch" ? 3 : h.react === "stagger" ? 2 : 1);
+    this.fx(strength >= 3 ? "spark-big" : "spark", at2.x, at2.y, at2.z);
     if (this.hitFx) {
-      this.fx(strength >= 3 ? "spark-big" : "spark", at2.x, at2.y, at2.z);
       if (strength >= 2) this.fx("ring", at2.x, at2.y, at2.z, String(strength));
       if (strength >= 3) this.shake(6, 3);
     }
@@ -6460,10 +6468,10 @@ var Fx = class {
     switch (e.type) {
       case "hit": {
         const s2 = e.strength;
-        this.shake(2 + s2 * 3, 0.08 + s2 * 0.05);
-        this.burst(e.x, e.y, 6 + s2 * 5, e.target === "player" ? "#ff6050" : "#ffe0a0", 2 + s2);
-        this.ring(e.x, e.y, 10, 40 + s2 * 30, s2 === 3 ? "#fff" : "#ffd890", 2 + s2 * 2, 0.18 + s2 * 0.04);
-        if (e.dmg != null && this.opt.numbers) this.pop(e.x, e.y - 30, String(Math.round(e.dmg)), e.target === "player" ? "#ff7060" : s2 === 3 ? "#ffe070" : "#fff", s2 === 3);
+        this.shake(3 + s2 * 4, 0.1 + s2 * 0.06);
+        this.burst(e.x, e.y, 10 + s2 * 7, e.target === "player" ? "#ff6050" : "#ffe0a0", 3 + s2 * 1.5);
+        this.ring(e.x, e.y, 16, 60 + s2 * 45, s2 === 3 ? "#fff" : "#ffd890", 4 + s2 * 3, 0.2 + s2 * 0.05);
+        if (e.dmg != null && this.opt.numbers) this.pop(e.x, e.y - 70, String(Math.round(e.dmg)), e.target === "player" ? "#ff7060" : s2 === 3 ? "#ffe070" : "#fff", s2 >= 2);
         if (s2 === 3) this.flash("#fff", 0.08, 0.35);
         this.rumble?.(0.2 + s2 * 0.2, 60 + s2 * 30);
         break;
@@ -6624,7 +6632,7 @@ var Fx = class {
       const a = p.t > 0.6 ? 1 - (p.t - 0.6) / 0.3 : 1;
       const sc = p.t < 0.1 ? 1 + (0.1 - p.t) * 6 : 1;
       c.globalAlpha = a;
-      label(c, p.text, p.x, p.y, (p.big ? 30 : 22) * sc, p.color, "center", 900);
+      label(c, p.text, p.x, p.y, (p.big ? 46 : 34) * sc, p.color, "center", 900);
     }
     c.restore();
   }
@@ -8779,7 +8787,7 @@ var Enemy = class {
   }
   knockDown(hit2) {
     this.set("air");
-    this.vz = Math.max(this.vz, 6);
+    this.vz = Math.max(this.vz, hit2.lift ?? 8);
     this.vx = hit2.dir * (hit2.push ?? 6);
     this.z = Math.max(this.z, (this.def.hover ?? 0) + 1);
   }
@@ -12680,10 +12688,24 @@ function drawTerrain(ctx, t, pal, y0, y1) {
       label2(ctx, "낮은 천장 (앉아서)", t.x0 + 4, y0 - 236, "#ffd27a");
       break;
     case "narrow": {
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
       const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
-      if (a > y0) ctx.fillRect(t.x0, y0, w, a - y0);
-      if (b < y1) ctx.fillRect(t.x0, b, w, y1 - b + 30);
+      if (a > y0) {
+        ctx.fillStyle = pal.wall;
+        ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.fillRect(t.x0, a - 10, w, 10);
+        ctx.fillStyle = pal.trim;
+        ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
+        ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
+      }
+      if (b < y1) {
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.fillRect(t.x0, b, w, 8);
+        ctx.fillStyle = pal.trim;
+        ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fillRect(t.x0, b + 4, w, 6);
+      }
       break;
     }
     case "redfloor": {
@@ -12705,10 +12727,7 @@ function drawTerrain(ctx, t, pal, y0, y1) {
   }
 }
 var laneYIn = (lane, y0, y1) => y0 + lane / 160 * (y1 - y0);
-function label2(ctx, s2, x, y, c) {
-  ctx.fillStyle = c;
-  ctx.font = "13px monospace";
-  ctx.fillText(s2, x, y);
+function label2(_ctx, _s, _x, _y, _c) {
 }
 function drawFront(ctx, camX, world, plan) {
   const fx = plan.stage.fx;
@@ -18648,7 +18667,7 @@ function engineModules(box2, bridge) {
             if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
           }
         }
-        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 270) * k, maxX };
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } })
     },
@@ -18730,13 +18749,23 @@ function engineModules(box2, bridge) {
       if (name === "title" || name === "hq") audio.floor(name);
       if (name === "hq") shell.play();
     },
-    onPause: (p) => p ? audio.pause() : audio.resume(),
+    onPause: (p) => {
+      if (p) audio.pause();
+      else audio.resume();
+      storyRoot.style.visibility = p ? "hidden" : "";
+      if (world) world.paused = p;
+    },
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent;
       if (run.stageId !== "hq" && run.launch && local("goei-first-entry").load() !== "1") {
         local("goei-first-entry").save("1");
-        queueMicrotask(() => story.cutscene("first_entry"));
+        const lines2 = [
+          ["elevator", "띵. 1층입니다. 문이 열립니다.", 300],
+          ["radio", "(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.", 2e3],
+          ["agent", "로비 같은데, 로비가 아니다.", 5200]
+        ];
+        for (const [who, text, at2] of lines2) setTimeout(() => world === w && story.bark(who, text, 2800), at2);
       }
       w.hitFx = false;
       if (run.stageId === "hq") return;

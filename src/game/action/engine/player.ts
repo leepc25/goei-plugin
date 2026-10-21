@@ -5,11 +5,11 @@ import type { Pad } from './input';
 import { COMBO, MOVES, type MoveDef } from './moves';
 import type { FrameInfo } from './art';
 
-const WALK_X = 7;
+const WALK_X = 9; // 캐릭터를 2.75배로 키우면서(검수 8번) 속도도 같은 비율 가까이
 const WALK_Y = 4.2;
-const RUN_X = 14;
-const CROUCH_X = 2.6;
-const JUMP_V = 27;
+const RUN_X = 18;
+const CROUCH_X = 3.4;
+const JUMP_V = 31;
 const BUFFER = 8;
 const MAG = 8;
 const HOLSTER_AFTER = 45;
@@ -497,7 +497,7 @@ export class Player extends Fighter {
     // 공중
     if (this.airborne) {
       this.vx += p.mx * 0.4;
-      this.vx = Math.max(-12, Math.min(12, this.vx));
+      this.vx = Math.max(-16, Math.min(16, this.vx));
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       if (this.carry?.kind === 'prop' && this.itemAct && this.take('attack')) {
         const anim = this.itemAct('attack');
@@ -537,7 +537,7 @@ export class Player extends Fighter {
     if (this.take('jump') && !this.crouching) {
       this.vz = JUMP_V;
       this.z = 1;
-      this.vx = p.mx * (this.running ? 12 : WALK_X);
+      this.vx = p.mx * (this.running ? 16 : WALK_X);
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       this.running = false;
       world.emit({ type: 'jump', x: this.x });

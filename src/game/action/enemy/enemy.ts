@@ -507,7 +507,7 @@ export class Enemy implements Body {
   }
   private knockDown(hit: Hit) {
     this.set('air');
-    this.vz = Math.max(this.vz, 6);
+    this.vz = Math.max(this.vz, hit.lift ?? 8);
     this.vx = hit.dir * (hit.push ?? 6);
     this.z = Math.max(this.z, (this.def.hover ?? 0) + 1);
   }

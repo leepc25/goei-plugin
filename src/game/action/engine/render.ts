@@ -79,6 +79,11 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     }
   }
 
+  /** world.interact와 같은 거리(가로 60) */
+  function near(w: World, p: { x: number }) {
+    return Math.abs(w.player.x - p.x) < 60;
+  }
+
   function drawProps(w: World, camX: number) {
     for (const p of w.props) {
       const sx = p.x - camX;
@@ -97,24 +102,21 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
           ctx.fillStyle = '#59636a';
           ctx.fillRect(sx - 20, p.y - 200, 40, 200);
         }
-        if (p.label) {
-          ctx.fillStyle = '#e8eef0';
-          ctx.font = '18px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(p.label, sx, p.y - 268);
-          ctx.textAlign = 'left';
-        }
         continue;
       }
       ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
       ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
       ctx.strokeStyle = 'rgba(0,0,0,0.5)';
       ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
-      if (p.label) {
-        ctx.fillStyle = '#e8eef0';
-        ctx.font = '18px sans-serif';
+      // 이름은 E가 닿는 거리에서만 작게 (상시 떠 있는 글씨 금지)
+      if (p.label && near(w, p)) {
+        ctx.font = 'bold 15px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(p.label, sx, p.y - p.h - 8);
+        const tw = ctx.measureText(`E ${p.label}`).width + 16;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(sx - tw / 2, p.y - p.h - 30, tw, 22);
+        ctx.fillStyle = '#f0d890';
+        ctx.fillText(`E ${p.label}`, sx, p.y - p.h - 14);
         ctx.textAlign = 'left';
       }
     }
@@ -164,10 +166,18 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       switch (f.kind) {
         case 'spark':
         case 'spark-big': {
-          const n = f.kind === 'spark' ? 6 : 12;
-          const r = (f.kind === 'spark' ? 34 : 70) * (0.4 + k);
+          const big = f.kind === 'spark-big';
+          const n = big ? 12 : 8;
+          const r = (big ? 120 : 64) * (0.45 + k);
+          // 가운데 흰 섬광
+          if (k < 0.45) {
+            ctx.fillStyle = `rgba(255,255,255,${0.9 - k * 2})`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, (big ? 46 : 26) * (1 - k), 0, Math.PI * 2);
+            ctx.fill();
+          }
           ctx.strokeStyle = k < 0.3 ? '#ffffff' : '#ffd36a';
-          ctx.lineWidth = f.kind === 'spark' ? 4 : 6;
+          ctx.lineWidth = big ? 9 : 6;
           for (let i = 0; i < n; i++) {
             const an = (i / n) * Math.PI * 2 + (f.seed % 10);
             ctx.beginPath();
@@ -329,7 +339,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   }
 
   function overlayText(w: World) {
-    if (w.goT > 0 && w.tick % 20 < 13) {
+    if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
       ctx.save();
       ctx.font = 'bold 64px sans-serif';
       ctx.fillStyle = '#ffd36a';

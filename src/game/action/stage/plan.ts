@@ -268,11 +268,26 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       label(ctx, '낮은 천장 (앉아서)', t.x0 + 4, y0 - 236, '#ffd27a');
       break;
     case 'narrow': {
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      // 좁은 길: 검은 사각형 대신 뒤는 튀어나온 벽, 앞은 낮은 칸막이로 막는다 (검수 6번)
       const a = laneYIn(t.lane0, y0, y1),
         b = laneYIn(t.lane1, y0, y1);
-      if (a > y0) ctx.fillRect(t.x0, y0, w, a - y0);
-      if (b < y1) ctx.fillRect(t.x0, b, w, y1 - b + 30);
+      if (a > y0) {
+        ctx.fillStyle = pal.wall;
+        ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(t.x0, a - 10, w, 10);
+        ctx.fillStyle = pal.trim;
+        ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
+        ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
+      }
+      if (b < y1) {
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(t.x0, b, w, 8);
+        ctx.fillStyle = pal.trim;
+        ctx.fillRect(t.x0, b + 4, w, y1 - b + 30);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(t.x0, b + 4, w, 6);
+      }
       break;
     }
     case 'redfloor': {
@@ -294,11 +309,8 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
   }
 }
 const laneYIn = (lane: number, y0: number, y1: number) => y0 + (lane / 160) * (y1 - y0);
-function label(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, c: string) {
-  ctx.fillStyle = c;
-  ctx.font = '13px monospace';
-  ctx.fillText(s, x, y);
-}
+/** 지형 설명 글씨는 화면에 띄우지 않는다(검수 5번: 떠 있는 설명 글씨 금지). 판정 보기(H)용으로만 남김 */
+function label(_ctx: CanvasRenderingContext2D, _s: string, _x: number, _y: number, _c: string) {}
 
 function drawFront(ctx: CanvasRenderingContext2D, camX: number, world: WorldView, plan: StagePlan) {
   const fx = plan.stage.fx;

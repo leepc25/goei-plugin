@@ -92,10 +92,11 @@ export class Fx {
     switch (e.type) {
       case 'hit': {
         const s = e.strength;
-        this.shake(2 + s * 3, 0.08 + s * 0.05);
-        this.burst(e.x, e.y, 6 + s * 5, e.target === 'player' ? '#ff6050' : '#ffe0a0', 2 + s);
-        this.ring(e.x, e.y, 10, 40 + s * 30, s === 3 ? '#fff' : '#ffd890', 2 + s * 2, 0.18 + s * 0.04);
-        if (e.dmg != null && this.opt.numbers) this.pop(e.x, e.y - 30, String(Math.round(e.dmg)), e.target === 'player' ? '#ff7060' : s === 3 ? '#ffe070' : '#fff', s === 3);
+        // 오락실 타격감(검수 9번): 더 크게, 숫자는 머리 위로 크게
+        this.shake(3 + s * 4, 0.1 + s * 0.06);
+        this.burst(e.x, e.y, 10 + s * 7, e.target === 'player' ? '#ff6050' : '#ffe0a0', 3 + s * 1.5);
+        this.ring(e.x, e.y, 16, 60 + s * 45, s === 3 ? '#fff' : '#ffd890', 4 + s * 3, 0.2 + s * 0.05);
+        if (e.dmg != null && this.opt.numbers) this.pop(e.x, e.y - 70, String(Math.round(e.dmg)), e.target === 'player' ? '#ff7060' : s === 3 ? '#ffe070' : '#fff', s >= 2);
         if (s === 3) this.flash('#fff', 0.08, 0.35);
         this.rumble?.(0.2 + s * 0.2, 60 + s * 30);
         break;
@@ -263,7 +264,7 @@ export class Fx {
       const a = p.t > 0.6 ? 1 - (p.t - 0.6) / 0.3 : 1;
       const sc = p.t < 0.1 ? 1 + (0.1 - p.t) * 6 : 1;
       c.globalAlpha = a;
-      label(c, p.text, p.x, p.y, (p.big ? 30 : 22) * sc, p.color, 'center', 900);
+      label(c, p.text, p.x, p.y, (p.big ? 46 : 34) * sc, p.color, 'center', 900);
     }
     c.restore();
   }
