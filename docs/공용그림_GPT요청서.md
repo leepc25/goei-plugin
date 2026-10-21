@@ -5,7 +5,7 @@
 ## 쓰는 법
 
 - 종류마다 GPT 대화를 따로 열고, 아래 요청문 하나를 통째로 붙여 넣으세요. 참고 그림 1장을 같이 첨부합니다 (`assets/wiki/Situations/` 의 그 종류 그림).
-- GPT가 한 장씩 만들게 하고, 파일 이름은 목록의 영어 이름 그대로 png로 받으세요. 이름이 그대로 에셋 이름이 됩니다.
+- GPT가 목록을 쉬지 않고 이어서 만듭니다. 중간에 멈추면 「계속」이라고만 하세요. 파일 이름은 목록의 영어 이름 그대로 png로 받으세요. 이름이 그대로 에셋 이름이 됩니다.
 - 받은 뒤 Claude가 720×480 AVIF로 바꾸고 꼬리표를 붙여 카드에 넣습니다.
 
 ## 괴이 (30장) · 참고 그림: Situation Anomaly
@@ -13,7 +13,7 @@
 괴이는 상황 중에 가장 많이 나오고 아파트·학교처럼 겹치는 장소가 많아서 장소 15곳마다 2장씩 만듭니다 (같은 장소의 다른 자리·다른 구도). 같은 장소의 괴이는 이름으로 둘 중 하나를 고정해서 씁니다. 30장이 한 대화에 길면 1~15, 16~30으로 나눠 두 번 붙여 넣으세요.
 
 ```
-Make 30 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png). Images ending in "1" and "2" of the same place must look clearly different (different spot, angle and composition), not the same scene redrawn.
+Make 30 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png). Images ending in "1" and "2" of the same place must look clearly different (different spot, angle and composition), not the same scene redrawn.
 
 STYLE (same for every image)
 Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
@@ -57,7 +57,7 @@ IMAGES
 ## 사건 (12장) · 참고 그림: Situation Incident
 
 ```
-Make 12 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 12 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
@@ -85,7 +85,7 @@ IMAGES
 특수는 아무 데나 나타나는 가게·공간이라 장소가 아니라 **무엇인지**(가게, 책방, 공방, 장터, 자판기, 방, 물건, 문)로 고릅니다.
 
 ```
-Make 8 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 8 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
@@ -109,7 +109,7 @@ IMAGES
 사진이 없는 조직의 대표 사진. 정사각 832×832로 씁니다. 사람은 넣지 않거나 아주 작게.
 
 ```
-Make 8 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 8 illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Korean webtoon (manhwa) illustration style matching the attached reference image exactly: clean ink line art, cel shading, muted desaturated colors, dramatic lighting. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. Square 1:1 (1024x1024). Keep the main subject in the center (the app also crops it to a thin wide strip and to a small square).
@@ -132,7 +132,7 @@ IMAGES
 거점 사진은 영문명 사진 → 연결 조직 사진 순서라, 이 그림은 **조직이 없는 거점**이나 사진 없는 조직의 거점에만 나옵니다. 거점 이름 낱말로 고릅니다(본부·본사·사무소 → Office, 상점·가게·샵 → Shop, 성당·교회·성원·절 → Religious, 지하·상가·역 → Underground, 의원·병원·약국 → Clinic, 그 밖 → Hideout). 정사각 832×832, 거점 띠로 잘려도 보이게 건물을 가운데 둡니다.
 
 ```
-Make 6 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 6 illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Korean webtoon (manhwa) illustration style matching the attached reference image exactly: clean ink line art, cel shading, muted desaturated colors, dramatic lighting. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. Square 1:1 (1024x1024). Keep the main subject in the center (the app also crops it to a thin wide strip and to a small square).
@@ -153,7 +153,7 @@ IMAGES
 세력 사진은 내부라서, 거점은 거리에서 본 **외부**로 만듭니다. 파일 이름은 「Base 영문명」입니다 (거점 영문명이 세력 영문명과 같아 겹치지 않게). 가짜 관리국으로 시작한 이야기에서는 관리국 본부 자리에 Base Fake Management Bureau가 나옵니다.
 
 ```
-Make 7 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 7 illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Korean webtoon (manhwa) illustration style matching the attached reference image exactly: clean ink line art, cel shading, muted desaturated colors, dramatic lighting. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. Square 1:1 (1024x1024). Keep the main subject in the center (the app also crops it to a thin wide strip and to a small square).
