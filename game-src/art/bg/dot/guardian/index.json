@@ -1,0 +1,26 @@
+{
+ "guardian_405_wall": {
+  "w": 320,
+  "h": 220
+ },
+ "guardian_405_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "guardian_guard_wall": {
+  "w": 320,
+  "h": 220
+ },
+ "guardian_guard_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "guardian_legs_wall": {
+  "w": 320,
+  "h": 220
+ },
+ "guardian_legs_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}

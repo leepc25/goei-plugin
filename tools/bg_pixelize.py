@@ -106,9 +106,29 @@ def cut_objects(sheet: Image.Image) -> list[Image.Image]:
                                 seen[ny][nx] = True
                                 q.append((nx, ny))
                 found.append((n, (x0 * f, y0 * f, (x1 + 1) * f, (y1 + 1) * f)))
-    found.sort(reverse=True)
-    boxes = sorted((bx for _, bx in found[:9]), key=lambda r: ((r[1] + r[3]) * 3 // (2 * sheet.height), r[0]))
+    # 덩어리를 3×3 칸(가운데 기준)으로 묶는다: 한 칸에 두 덩어리(의자 둘, 밧줄 둘)도 한 물건.
+    cells: dict[int, list[int]] = {}
+    for n, (x0, y0, x1, y1) in found:
+        if n < 30:  # 부스러기
+            continue
+        c = min(2, (y0 + y1) * 3 // (2 * sheet.height)) * 3 + min(2, (x0 + x1) * 3 // (2 * sheet.width))
+        if c in cells:
+            b = cells[c]
+            cells[c] = [min(b[0], x0), min(b[1], y0), max(b[2], x1), max(b[3], y1)]
+        else:
+            cells[c] = [x0, y0, x1, y1]
+    boxes = [tuple(cells[c]) for c in sorted(cells)]
     return [sheet.crop(bx) for bx in boxes]
+
+
+def trim_bottom(im: Image.Image) -> Image.Image:
+    """벽 아래의 평평한 띠(흰 여백·바닥 줄)를 잘라 낸다. 최대 8%."""
+    a = np.asarray(im.convert('L')).astype(float)
+    h = a.shape[0]
+    cut = h
+    while cut > h * 0.92 and a[cut - 1].std() < 12:
+        cut -= 1
+    return im.crop((0, 0, im.width, cut)) if cut < h else im
 
 
 def aspect_crop(im: Image.Image, size: tuple[int, int]) -> Image.Image:
@@ -157,6 +177,8 @@ def run_place(place: Path) -> dict:
         src = Image.open(f).convert('RGBA')
         size = {'wall': WALL, 'floor': (FLOOR, FLOOR), 'far': FAR, 'far_tall': FAR_TALL}.get(k)
         if size:
+            if k == 'wall':
+                src = trim_bottom(src)
             jobs.append((f.stem, aspect_crop(tone(src), size), size, k))
         elif k == 'objects':
             hs = HEIGHTS.get(f.stem, [])

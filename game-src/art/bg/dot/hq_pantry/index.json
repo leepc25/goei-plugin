@@ -1,0 +1,94 @@
+{
+ "hq_pantry_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/hq_pantry_objects_1": {
+  "w": 62,
+  "h": 108,
+  "foot": [
+   31,
+   108
+  ]
+ },
+ "objects/hq_pantry_objects_2": {
+  "w": 75,
+  "h": 72,
+  "foot": [
+   37,
+   72
+  ]
+ },
+ "objects/hq_pantry_objects_3": {
+  "w": 64,
+  "h": 45,
+  "foot": [
+   32,
+   45
+  ]
+ },
+ "objects/hq_pantry_objects_4": {
+  "w": 80,
+  "h": 51,
+  "foot": [
+   40,
+   51
+  ]
+ },
+ "objects/hq_pantry_objects_5": {
+  "w": 36,
+  "h": 72,
+  "foot": [
+   18,
+   72
+  ]
+ },
+ "objects/hq_pantry_objects_6": {
+  "w": 82,
+  "h": 48,
+  "foot": [
+   41,
+   48
+  ]
+ },
+ "objects/hq_pantry_objects_7": {
+  "w": 75,
+  "h": 108,
+  "foot": [
+   37,
+   108
+  ]
+ },
+ "objects/hq_pantry_objects_8": {
+  "w": 94,
+  "h": 90,
+  "foot": [
+   47,
+   90
+  ]
+ },
+ "objects/hq_pantry_objects_9": {
+  "w": 67,
+  "h": 120,
+  "foot": [
+   33,
+   120
+  ]
+ },
+ "hq_pantry_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_pantry_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_pantry_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_pantry_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

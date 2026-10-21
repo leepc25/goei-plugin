@@ -49,6 +49,19 @@ CORRECTION (applies to every image from now on, walls, floors, far backgrounds a
 4. Everything else in the original request stays the same.
 ```
 
+## 검수 결과 (2026-10-22, 원본 75장 · 커밋 5b2575b)
+
+- 75장 모두 받음. 벽 50·바닥 10·원경 5·물건 10. 구성·구도는 요청서와 맞다. 벽은 기둥 가운데에서 이어지고 정면 입면이다.
+- **다시 그릴 것 1장: `hq_jaemtri/hq_jaemtri_objects.png`.** 정정 전 기준이라 책상·상자·냉장고·프린터 수레가 비스듬한 3/4 시점이다. 다른 본부 물건 3장(사무실·정비실·탕비실)은 거의 정면이라 그대로 쓴다.
+- 코드로 고친 것: 벽 아래 흰 띠(chase_wall_1·2·4, apt_wall_3, guardian_405_wall_2, guardian_legs_wall_2)와 바닥 줄은 자동으로 잘라 낸다. 바닥 이음새는 반 칸 밀어 섞기로 맞춘다. 물건 크기는 `game-src/art/bg/heights.json`.
+- 아직 안 쓰는 것: 원경 5장(벽 그림의 창이 불투명이라 지금은 비침 없음), 물건 그림(엔진 소품이 아직 회색 상자. 엔진 스레드와 연결 예정).
+
+GPT에 붙일 재요청문:
+
+```
+Redo only hq_jaemtri/hq_jaemtri_objects.png with the same nine objects (1 L-shaped desk with two monitors and a keyboard, 2 gaming chair, 3 printer on a stand, 4 stack of cardboard boxes, 5 mini fridge with stickers (no text), 6 desk lamp, 7 trash bin full of paper, 8 floor fan, 9 tall bookshelf with binders). 1536x1024, transparent background, 3x3 grid. Every object faces the viewer squarely, front side parallel to the image, NOT rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Few large shapes, bold dark outlines, flat colors. Each object fills most of its cell. Save over the old file and commit.
+```
+
 ## 장소 목록
 
 각 장소는 GPT 대화 하나: 공통 스타일 + 해당 규칙 + 아래 목록을 붙인다. 같은 장소의 칸 4개는 같은 기둥·같은 벽 마감·같은 조명으로 그리되 내용은 확실히 다르게.

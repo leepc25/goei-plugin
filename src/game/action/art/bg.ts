@@ -120,3 +120,28 @@ export function placeFor(where: string, floorType: string | undefined, ref: stri
   if (ref === 'room:trial_goal') return 'test';
   return ({ lobby: 'lobby', chase: 'chase', trial: 'test', replica: 'apt', puzzle: 'test', silent: 'chase', dark: 'chase', deep: 'service' } as Record<string, string>)[floorType ?? ''] ?? 'lobby';
 }
+
+/** 폭이 정해진 칸(본부 장소처럼 640보다 좁거나 넓은 칸)에 벽 그림을 늘리지 않고 가운데를 잘라 채운다. */
+export function drawWallCrop(ctx: CanvasRenderingContext2D, place: string, key: string, x: number, w: number, wallBottom: number): boolean {
+  const names = walls(place);
+  if (!names.length) return false;
+  const im = image(place.split(':')[0], names[hash(key) % names.length]);
+  if (!im) return false;
+  const k = wallBottom / im.height; // 화면 px / 도트
+  const bayW = im.width * k;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  for (let dx = 0; dx < w; dx += bayW) {
+    const cw = Math.min(bayW, w - dx);
+    const sx = w <= bayW ? (im.width - cw / k) / 2 : 0;
+    ctx.drawImage(im, sx, 0, cw / k, im.height, x + dx, 0, cw, wallBottom);
+  }
+  ctx.restore();
+  return true;
+}
+
+/** 본부 장소 id → 그림 장소 (그림이 없는 장소는 비슷한 방을 빌린다). */
+export const HQ_PLACE: Record<string, string> = {
+  office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_office', supply: 'hq_workshop', pantry: 'hq_pantry', clinic: 'test', interview: 'hq_office',
+  training: 'hq_workshop', appraisal: 'hq_jaemtri', lab: 'test', tooth: 'service', gallery: 'chase',
+};

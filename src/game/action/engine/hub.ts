@@ -2,6 +2,7 @@
 // 장소마다 벽 색·간판·문, 동료는 플레이어 클립을 색만 바꾼 대역. 문 앞에서 E → 본부 모듈이 그 장소 메뉴 창을 연다.
 import type { FloorPlan, PropSpec, StageModule, WorldView } from './contract';
 import { SCREEN_H } from './contract';
+import { HQ_PLACE, drawFloor, drawWallCrop } from '../art/bg';
 
 export interface HubPlace {
   id: string;
@@ -45,8 +46,16 @@ export function makeHub(places: () => HubPlace[], openPlace: (id: string) => voi
         // 장소마다 벽 (어둡게 = 잠김)
         for (const p of cur) {
           if (p.x + p.w < camX - 40 || p.x > camX + 1320) continue;
-          c.fillStyle = p.color ?? '#2b343a';
-          c.fillRect(p.x, WALL_TOP, p.w, top - WALL_TOP);
+          // 배경 그림(art/bg)이 있으면 그 장소 벽, 없으면 단색
+          const art = HQ_PLACE[p.id] ? drawWallCrop(c, HQ_PLACE[p.id], p.id, p.x, p.w, top) : false;
+          if (!art) {
+            c.fillStyle = p.color ?? '#2b343a';
+            c.fillRect(p.x, WALL_TOP, p.w, top - WALL_TOP);
+          }
+          if (!p.open) {
+            c.fillStyle = 'rgba(0,0,0,0.55)';
+            c.fillRect(p.x, 0, p.w, top);
+          }
           c.fillStyle = 'rgba(0,0,0,0.25)';
           c.fillRect(p.x + p.w - 6, WALL_TOP, 26, top - WALL_TOP);
           // 간판
@@ -63,10 +72,10 @@ export function makeHub(places: () => HubPlace[], openPlace: (id: string) => voi
           const dw = Math.min(140, p.w * 0.5);
           const dx = p.x + p.w / 2 - dw / 2;
           c.fillStyle = p.open ? 'rgba(20,26,30,0.85)' : 'rgba(10,12,14,0.9)';
-          c.fillRect(dx, top - 220, dw, 220);
+          if (!art) c.fillRect(dx, top - 220, dw, 220);
           c.strokeStyle = 'rgba(236,230,212,0.25)';
           c.lineWidth = 3;
-          c.strokeRect(dx, top - 220, dw, 220);
+          if (!art) c.strokeRect(dx, top - 220, dw, 220);
           if (!p.open) {
             c.fillStyle = '#8e9aa1';
             c.font = '15px sans-serif';
@@ -83,7 +92,7 @@ export function makeHub(places: () => HubPlace[], openPlace: (id: string) => voi
         g.addColorStop(0, '#3c4549');
         g.addColorStop(1, '#1a1f22');
         c.fillStyle = g;
-        c.fillRect(x0, top, x1 - x0, SCREEN_H - top);
+        if (!drawFloor(c, 'hq_office', x0, x1, top, SCREEN_H)) c.fillRect(x0, top, x1 - x0, SCREEN_H - top);
         c.strokeStyle = 'rgba(255,255,255,0.06)';
         c.lineWidth = 2;
         for (const y of [top + 40, top + 100, top + 175, top + 250]) {

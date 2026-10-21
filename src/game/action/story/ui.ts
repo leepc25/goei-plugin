@@ -39,23 +39,23 @@ export class StoryUI {
     private photo: (key: string) => string | undefined,
   ) {
     const el = document.createElement('div');
-    el.className = 'gsd';
-    el.innerHTML = `<div class="gsd-fade"></div><div class="gsd-bubbles"></div><div class="gsd-caption" hidden></div>
-<button class="gsd-skip" hidden>건너뛰기 ▶▶</button>
-<div class="gsd-dock"><div class="gsd-choices" hidden></div>
-<div class="gsd-box" hidden role="dialog" aria-live="polite"><div class="gsd-photo"></div><div class="gsd-body"><b class="gsd-name"></b><p class="gsd-text"></p></div><i class="gsd-next">▼</i></div></div>`;
+    el.className = 'gsy';
+    el.innerHTML = `<div class="gsy-fade"></div><div class="gsy-bubbles"></div><div class="gsy-caption" hidden></div>
+<button class="gsy-skip" hidden>건너뛰기 ▶▶</button>
+<div class="gsy-dock"><div class="gsy-choices" hidden></div>
+<div class="gsy-box" hidden role="dialog" aria-live="polite"><div class="gsy-photo"></div><div class="gsy-body"><b class="gsy-name"></b><p class="gsy-text"></p></div><i class="gsy-next">▼</i></div></div>`;
     root.append(el);
     this.el = el;
     const q = <T extends HTMLElement>(s: string) => el.querySelector<T>(s)!;
-    this.box = q('.gsd-box');
-    this.nameEl = q('.gsd-name');
-    this.textEl = q('.gsd-text');
-    this.photoEl = q('.gsd-photo');
-    this.choicesEl = q('.gsd-choices');
-    this.bubbleLayer = q('.gsd-bubbles');
-    this.captionEl = q('.gsd-caption');
-    this.fadeEl = q('.gsd-fade');
-    this.skipEl = q<HTMLButtonElement>('.gsd-skip');
+    this.box = q('.gsy-box');
+    this.nameEl = q('.gsy-name');
+    this.textEl = q('.gsy-text');
+    this.photoEl = q('.gsy-photo');
+    this.choicesEl = q('.gsy-choices');
+    this.bubbleLayer = q('.gsy-bubbles');
+    this.captionEl = q('.gsy-caption');
+    this.fadeEl = q('.gsy-fade');
+    this.skipEl = q<HTMLButtonElement>('.gsy-skip');
     this.box.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -127,7 +127,7 @@ export class StoryUI {
   /** key: 말하는 자리. 같은 자리의 앞 말풍선은 바로 지운다 */
   bubble(text: string, anchor: Anchor, ms: number, color: string, name = '', key = name) {
     const el = document.createElement('div');
-    el.className = 'gsd-bubble';
+    el.className = 'gsy-bubble';
     el.style.setProperty('--who', color);
     el.innerHTML = `${name ? `<b>${esc(name)}</b>` : ''}${esc(text)}`;
     this.bubbleLayer.append(el);
@@ -205,12 +205,12 @@ export class TalkPanel {
   onClose: () => void = () => {};
   constructor(root: HTMLElement) {
     const el = document.createElement('div');
-    el.className = 'gsd-talk';
+    el.className = 'gsy-talk';
     el.hidden = true;
-    el.innerHTML = `<div class="gsd-talk-head"><span class="gsd-photo"></span><b></b><button data-x aria-label="닫기">✕</button></div><div class="gsd-talk-log"></div><form><input maxlength="200" placeholder="하고 싶은 말" enterkeyhint="send"><button>보내기</button></form>`;
+    el.innerHTML = `<div class="gsy-talk-head"><span class="gsy-photo"></span><b></b><button data-x aria-label="닫기">✕</button></div><div class="gsy-talk-log"></div><form><input maxlength="200" placeholder="하고 싶은 말" enterkeyhint="send"><button>보내기</button></form>`;
     root.append(el);
     this.el = el;
-    this.log = el.querySelector('.gsd-talk-log')!;
+    this.log = el.querySelector('.gsy-talk-log')!;
     this.input = el.querySelector('input')!;
     this.send = el.querySelector('form button')!;
     el.querySelector('form')!.addEventListener('submit', (e) => {
@@ -226,8 +226,8 @@ export class TalkPanel {
   open(cast: CastInfo, photo: string | undefined, greeting: string) {
     this.el.hidden = false;
     this.el.style.setProperty('--who', cast.color);
-    this.el.querySelector('.gsd-talk-head b')!.textContent = cast.name;
-    this.el.querySelector('.gsd-talk-head .gsd-photo')!.innerHTML = photo ? `<img alt="" src="${esc(photo)}">` : `<span>${esc(cast.name.slice(0, 1))}</span>`;
+    this.el.querySelector('.gsy-talk-head b')!.textContent = cast.name;
+    this.el.querySelector('.gsy-talk-head .gsy-photo')!.innerHTML = photo ? `<img alt="" src="${esc(photo)}">` : `<span>${esc(cast.name.slice(0, 1))}</span>`;
     this.log.innerHTML = '';
     this.add('npc', greeting);
     this.input.focus({ preventScroll: true });

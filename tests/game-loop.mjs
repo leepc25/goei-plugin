@@ -43,7 +43,7 @@ try {
       const w = g.world;
       if (!w) return { scene: g.sceneName ?? null };
       const p = w.player;
-      const story = document.querySelector('.gsd-box:not([hidden]), .gsd-choices:not([hidden])');
+      const story = document.querySelector('.gsy-box:not([hidden]), .gsy-choices:not([hidden])');
       return {
         floor: w.floor.id, title: w.floor.title, depth: w.floor.depth, floors: w.floors, x: p.x, len: w.floor.length,
         enemies: w.bodies.filter((b) => b.team === 'enemy' && b.alive && b.hp > 0).map((b) => ({ id: b.id, kind: b.kind, x: b.x, y: b.y, boss: !!b.boss })),

@@ -84,7 +84,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   const style = document.createElement('style');
   style.textContent = css;
   root.append(style);
-  if (opts.dock !== 'bottom') root.classList.add('gsd-top');
+  if (opts.dock !== 'bottom') root.classList.add('gsy-top');
   const rng = Math.random;
   const flags: Flags = { favor: 0, rules: 0, ...(saved ?? {}) };
   const lib = buildLibrary();
