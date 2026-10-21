@@ -2381,8 +2381,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-tgt .dot { fill: #ff3b30; opacity: 0; }
 .gx-tgt:hover { color: rgba(255, 255, 255, .9); }
 .gx-tgt.on { color: #fff; }
-.gx-tgt.on .dot { opacity: 1; animation: gx-tgt-rec 1.6s steps(1) infinite; }
-@keyframes gx-tgt-rec { 50% { opacity: .35; } }
+.gx-tgt.on .dot { opacity: 1; }
 .gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: 30px; height: 30px; margin: 0; border-radius: 9px; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
 .gx-evbtn.gx-tgt:hover { background: rgba(8, 12, 14, .82); }
 .gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
