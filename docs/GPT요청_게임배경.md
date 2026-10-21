@@ -34,7 +34,15 @@ FAR RULES
 Distant background that is seen through windows or open space, 1536x1024, very low contrast and darker than the walls, slightly hazy. The left and right edges must continue into each other (horizontally tileable). Horizon at 55% height.
 
 OBJECT SHEET RULES
-A sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Same front view as the walls (seen from the front at eye level, slightly from above so a little of the top surface shows). Same scale for all objects in the sheet: a door is 2.1 m = 60% of one cell height. No cast shadows on the ground. Doors closed. Drawers and lids closed.
+A sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.
+```
+
+## 정정 (2026-10-21 16:10, 첫 그림 확인 후)
+
+벽 칸(정비실 1번)은 그대로 좋다. 물건 모음은 배경 투명은 좋으나 책상·냉장고·상자가 비스듬히 돌아가 있고 시점이 제각각이라 위 OBJECT SHEET RULES의 Camera 문장을 고쳤다. 크기 비율은 Claude가 물건마다 실제 높이로 맞추므로 GPT는 신경 쓰지 않는다. 이미 만든 hq_jaemtri_objects는 다시 그리지 않아도 된다(쓸 수 있음). 다음 물건 모음부터 아래 정정문을 붙인다.
+
+```
+CORRECTION for every object sheet from now on: draw each object facing the viewer squarely, front side parallel to the image, not rotated to the left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background. Walls: keep doing them exactly as before.
 ```
 
 ## 장소 목록
