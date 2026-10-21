@@ -21,6 +21,8 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {
+    # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
+    'reload': [4, 5], 'deskslam': [2], 'handshead': [1], 'collapse': [2],
     'super': [-1],                             # 다시 생성분 끝 장 뭉개짐
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4],
     'nausea': [-1], 'push': [-1], 'gearcheck': [-1], 'locker': [4, 5], 'down': [1, 2], 'giftbox': [0], 'button': [5],
@@ -29,7 +31,9 @@ DROP = {
 ERASE = {
     'handover': [(0, 100, 0, 192, 144), (1, 100, 0, 192, 144), (2, 116, 0, 192, 144), (3, 116, 0, 192, 144), (4, 116, 0, 192, 144)],
     'hug': [(0, 90, 0, 192, 144), (1, 90, 0, 192, 144)],
-    'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],   # 생성기가 손 앞에 컵을 하나 더 띄워 그림
+    'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],
+    'down': [(i, 0, 137, 192, 144) for i in range(8)],   # 독립 검수: 누운 장 아래팔이 바닥선 아래로 뚫음
+    'collapse': [(i, 0, 137, 192, 144) for i in range(8)],   # 생성기가 손 앞에 컵을 하나 더 띄워 그림
 }
 
 OUTLINE = (24, 26, 30, 255)
@@ -39,6 +43,9 @@ DETACHED = {'fire', 'shotgun', 'grabblast', 'super', 'support', 'smoke', 'hug', 
             'idle_light', 'walk_light', 'run_light'}
 # 본체에 붙은 효과: 뼈대 몸 영역 밖의 밝은 회색·캐릭터 색표와 먼 색을 지움(총구 불꽃·광탄·잔상·연기·상자 조각)
 OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
+# 독립 검수(2026-10-21 16시) 회색 조각: 떼어 낸 물건·효과의 찌꺼기
+DEBRIS = set('floorrest hurtidle point nausea door carry1_walk pat gearcheck idle_light sneak seatmouth toss push'.split())
+OUTSIDE_FX |= DEBRIS; DETACHED |= DEBRIS
 
 
 def wrists(clip, i):
@@ -153,8 +160,10 @@ def lookback_frames(idle):
                 sx = 2 * cx - x
                 if 0 <= sx < FW_: m[:, x] = top[:, sx]
             dark = (top[:, :, 3] > 0) & (top[:, :, :3].sum(2) < 150)
-            for y in range(y1 - 16, y1):                 # 뒤통수 아래 머리카락: 아래로 갈수록 몸 쪽으로 깎음
-                m[y, int(cx + 8 - (y - (y1 - 16)) * 0.5):] = 0
+            hy = round(p['RIGHT EAR'][1] + rig.DY) - 1   # 머리 중심(귀 높이)
+            yy, xx = np.mgrid[0:y1, 0:FW_]               # 뒤통수(오른쪽)는 둥근 머리 윤곽 밖을 깎음(검수: 세로로 잘린 쐐기)
+            out_round = (xx > cx + 1) & ((xx - cx - 1) ** 2 + ((yy - hy) * 0.9) ** 2 > 11.5 ** 2)
+            m[out_round] = 0
             keep = dark & (m[:, :, 3] == 0); keep[:y1 - 14] = False; keep[:, cx - 1:] = False
             m[keep] = top[keep]; a = a.copy(); a[:y1] = m
         out.append(Image.fromarray(a))
@@ -196,6 +205,12 @@ def apply(key, fr, pr=None, src=None, idx=None):
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
     if key == 'pipe':                          # 재생성본(28e8170)엔 파이프가 다 그려져 있음 → 옛 덧그림은 겹쳐 두 자루가 돼서 뺌. 떨어진 1px 선만 지움
         fr = [keep_main(f) for f in fr]
+        for i, raw in enumerate(idx):          # 내려친 장 손 위 회색 갈고리: 손목보다 위의 밝은 회색
+            if raw != 4: continue
+            w, _, _, _ = wrists('pipe2', raw); a = np.array(fr[i]); c = a[:, :, :3].astype(int)
+            yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]]
+            g = (a[:, :, 3] > 0) & (c.max(2) > 95) & (c.max(2) - c.min(2) < 30) & (yy < w[1] - 3) & (abs(xx - w[0]) < 10)
+            a[g] = 0; fr[i] = Image.fromarray(a)
         for i, f in enumerate(fr):             # 내려친 장 손 위로 솟은 1px 세로선
             a = np.array(f); col = a[55:92, 100:116]
             for x in range(1, col.shape[1] - 1):
@@ -236,6 +251,17 @@ def apply(key, fr, pr=None, src=None, idx=None):
             m = (rgb[:, :, 0] > 110) & (rgb[:, :, 0] - rgb[:, :, 2] > 50) & (rgb[:, :, 1] < 150); m[:70] = False
             a[m & (a[:, :, 3] > 0)] = 0; return Image.fromarray(a)
         fr = [nobox(f) for f in fr]
+    if key in DEBRIS:                          # 몸에 붙은 회색 조각: 무채색 회색(옷은 푸른 회색, 소맷단은 흰색)만 지움
+        def nogray(f):
+            a = np.array(f); c = a[:, :, :3].astype(int)
+            g = (a[:, :, 3] > 0) & (((c.max(2) - c.min(2) < 10) & (c.max(2) >= 115) & (c.max(2) <= 215))
+                                    | (np.abs(c - (98, 111, 112)).sum(2) == 0))   # 찌꺼기 색(몸 외곽선 1px에도 조금 쓰여 같이 지워짐)
+            a[g] = 0
+            al = a[:, :, 3] > 0                    # 지운 뒤 홀로 남은 1~2px 가시 정리
+            nb = sum(np.roll(np.roll(al, dy, 0), dx, 1).astype(int) for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+            a[al & (nb <= 1)] = 0
+            return Image.fromarray(a)
+        fr = [nogray(f) for f in fr]
     if key in DETACHED:
         fr = [keep_main(f) for f in fr]
     if key in DROP:

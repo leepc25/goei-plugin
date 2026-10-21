@@ -1919,8 +1919,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
-   "frames": 6,
-   "bytes": 17009,
+   "frames": 4,
+   "bytes": 11874,
    "prop": false,
    "anchors": [
     {
@@ -1978,36 +1978,6 @@
       80
      ],
      "angle": -20,
-     "hip": [
-      59,
-      86
-     ]
-    },
-    {
-     "hand": [
-      76,
-      72
-     ],
-     "hand2": [
-      72,
-      72
-     ],
-     "angle": -38,
-     "hip": [
-      59,
-      86
-     ]
-    },
-    {
-     "hand": [
-      91,
-      64
-     ],
-     "hand2": [
-      71,
-      72
-     ],
-     "angle": -1,
      "hip": [
       59,
       86
@@ -2965,7 +2935,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 22307,
+   "bytes": 21905,
    "prop": false,
    "anchors": [
     {
@@ -3460,7 +3430,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 5,
-   "bytes": 17674,
+   "bytes": 17425,
    "prop": false,
    "anchors": [
     {
@@ -3854,7 +3824,7 @@
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 5,
-   "bytes": 13853,
+   "bytes": 13824,
    "prop": false,
    "anchors": [
     {
@@ -5297,8 +5267,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "기본 클립 (몸만, 물건·장면은 엔진)",
-   "frames": 7,
-   "bytes": 9815,
+   "frames": 6,
+   "bytes": 9000,
    "prop": false,
    "anchors": [
     {
@@ -5311,21 +5281,6 @@
       90
      ],
      "angle": 64,
-     "hip": [
-      57,
-      83
-     ]
-    },
-    {
-     "hand": [
-      61,
-      65
-     ],
-     "hand2": [
-      57,
-      66
-     ],
-     "angle": -46,
      "hip": [
       57,
       83
@@ -5418,7 +5373,7 @@
    "hold": 0.0,
    "group": "기본 클립 (몸만, 물건·장면은 엔진)",
    "frames": 4,
-   "bytes": 8867,
+   "bytes": 8462,
    "prop": false,
    "anchors": [
     {
@@ -6318,7 +6273,7 @@
    "hold": 0.0,
    "group": "기본 클립 (몸만, 물건·장면은 엔진)",
    "frames": 8,
-   "bytes": 24951,
+   "bytes": 23661,
    "prop": false,
    "anchors": [
     {
@@ -7203,7 +7158,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 8,
-   "bytes": 24635,
+   "bytes": 23321,
    "prop": false,
    "anchors": [
     {
@@ -7338,7 +7293,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 4,
-   "bytes": 10598,
+   "bytes": 10294,
    "prop": false,
    "anchors": [
     {
@@ -7683,7 +7638,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 8,
-   "bytes": 11914,
+   "bytes": 12235,
    "prop": false,
    "anchors": [
     {
@@ -7908,7 +7863,7 @@
    "hold": 0.0,
    "group": "탐사",
    "frames": 7,
-   "bytes": 26246,
+   "bytes": 25605,
    "prop": false,
    "anchors": [
     {
@@ -8238,8 +8193,8 @@
    "hold": 0.0,
    "group": "탐사",
    "frames": 6,
-   "bytes": 18552,
-   "prop": true,
+   "bytes": 18144,
+   "prop": false,
    "anchors": [
     {
      "hand": [
@@ -8838,7 +8793,7 @@
    "hold": 0.0,
    "group": "탐사",
    "frames": 4,
-   "bytes": 6427,
+   "bytes": 6123,
    "prop": false,
    "anchors": [
     {
@@ -8913,7 +8868,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 4,
-   "bytes": 12920,
+   "bytes": 12358,
    "prop": false,
    "anchors": [
     {
@@ -9183,7 +9138,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 5,
-   "bytes": 19539,
+   "bytes": 18966,
    "prop": false,
    "anchors": [
     {
@@ -9272,8 +9227,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "상태·결과",
-   "frames": 8,
-   "bytes": 33643,
+   "frames": 7,
+   "bytes": 28646,
    "prop": false,
    "anchors": [
     {
@@ -9304,21 +9259,6 @@
      "hip": [
       54,
       89
-     ]
-    },
-    {
-     "hand": [
-      68,
-      85
-     ],
-     "hand2": [
-      59,
-      86
-     ],
-     "angle": -40,
-     "hip": [
-      56,
-      98
      ]
     },
     {
@@ -9768,7 +9708,7 @@
    "hold": 0.0,
    "group": "본부 업무",
    "frames": 5,
-   "bytes": 11981,
+   "bytes": 11669,
    "prop": false,
    "anchors": [
     {
@@ -11193,7 +11133,7 @@
    "hold": 0.0,
    "group": "사교",
    "frames": 6,
-   "bytes": 13759,
+   "bytes": 13489,
    "prop": false,
    "anchors": [
     {
@@ -11298,7 +11238,7 @@
    "hold": 0.0,
    "group": "사교",
    "frames": 4,
-   "bytes": 14646,
+   "bytes": 13924,
    "prop": false,
    "anchors": [
     {
@@ -12152,8 +12092,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "감정",
-   "frames": 5,
-   "bytes": 17946,
+   "frames": 4,
+   "bytes": 14878,
    "prop": false,
    "anchors": [
     {
@@ -12184,21 +12124,6 @@
      "hip": [
       59,
       84
-     ]
-    },
-    {
-     "hand": [
-      81,
-      90
-     ],
-     "hand2": [
-      62,
-      93
-     ],
-     "angle": 28,
-     "hip": [
-      59,
-      86
      ]
     },
     {

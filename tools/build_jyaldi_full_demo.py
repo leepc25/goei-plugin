@@ -174,6 +174,8 @@ def main():
         if d['key'] == 'getup' and fr:  # 생성된 0·1장에 회색 얼룩 → 다운 마지막 누운 장으로 대체
             fr = frames_of('down')[6:7] + fr[2:]
         idx = list(range(len(fr)))
+        if d['key'] == 'push':
+            pr = None   # 상자는 엔진 오브젝트(떼어 낸 가구 층은 손 자리 구멍·점 찌꺼기가 있어 안 씀)
         if d['key'] == 'lookback':
             fr, pr = jyaldi_fixes.lookback_frames(frames_of('idle')), None
             idx = list(range(len(fr))); d = dict(d, src='idle')   # 장 번호는 아래에서 기본 대기 장 번호로 바꿔 손 좌표를 뽑음
