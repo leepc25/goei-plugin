@@ -18,9 +18,9 @@
 - 패킹은 최근접 픽셀 샘플링만 쓰며 컷마다 공통 64색 팔레트, 디더링 없음, 투명하지 않은 PNG를 출력한다. 원본 시트의 해상도는 생성 도구가 정하므로 패킹에서 규격을 맞춘다.
 - 기본 동작 간격은 125ms이며 준비·완료 자세를 더 오래 유지한다. 지속 동작에는 1부터 세는 `loop` 구간을 쓴다. 컷 전체 길이는 콘티를 따른다.
 - `opening/c3`와 `first_entry/c3`는 버튼 누르기가 아니라 점검표의 빈 서명란을 가리키는 장면이다. 접촉 자세를 고정하고 오프닝의 흰 번쩍임은 125ms만 쓴다.
-- `opening/c8`의 한 명씩 생겨나는 최초 후보는 사용자 반려다. 여덟 명이 처음부터 함께 존재하고 걸어 나와야 한다. `ensemble/`은 교체 제작 중간 자료이며 현재 완료 자산이 아니다.
+- `opening/c8`의 한 명씩 생겨나는 최초 후보는 사용자 반려다. 최종 사용한 것은 병행 작업자가 main에 올린 24프레임 버전이며, 첫 프레임부터 8명이 함께 존재한다. 오프닝 c1~c8은 최신 main의 완료 컷 검증 후 보존했다. 이 작업의 미사용 오프닝 후보와 단체 컷 재제작 중간 자료는 `output/unused-opening-candidates/`에 보존했으며 납품 프레임에 섞지 않았다.
 - 기술 검사를 통과했다는 사실은 사용자 시각 품질 승인을 뜻하지 않는다. 오디오는 선택 사항이며 아직 제작하지 않았다.
 
 ## 시연
 
-`production/player.html`은 단일 HTML 시연판 템플릿이다. 정수 배율 픽셀 표시를 위해 원본 캔버스는 640×360이며 보간을 끈다. 시연판은 `release/demo/goei-cutscenes-gpt.html`에 만든다.
+`production/player.html`은 단일 HTML 시연판 템플릿이다. 원본 캔버스는 640×360이며 보간을 끈다. `tools/preview_cutscene_frames.py`는 등록된 PNG를 읽기만 하여 `release/demo/goei-cutscenes-preview.html`을 만든다. `goei-cutscenes-gpt.html`도 최종 확인 뒤 같은 내용으로 맞춘다. `tools/audit_cutscene_frames.py`는 원격 SHA를 고정하고 파일·시간표·크기·번호·팔레트·로컬/원격 일치를 검사하여 `validation.json`을 남긴다.
