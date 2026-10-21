@@ -1,6 +1,7 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
 import { drawPropArt } from '../art/bg';
 import { drawHintIcon } from './hint';
+import { drawGoSign } from '../ui/title';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
 import type { Art } from './art';
 import { Bullet } from './bodies';
@@ -356,14 +357,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
 
   function overlayText(w: World) {
     if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
-      ctx.save();
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillStyle = '#ffd36a';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 6;
-      ctx.strokeText('GO →', SCREEN_W - 260, 300);
-      ctx.fillText('GO →', SCREEN_W - 260, 300);
-      ctx.restore();
+      drawGoSign(ctx, SCREEN_W - 330, 240, w.tick / 30);
     }
     if (w.banner && opt.hud) {
       const a = Math.min(1, w.banner.t / 15);

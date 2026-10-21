@@ -2,6 +2,7 @@
 // 메뉴(새로 시작·설정·조작법)는 menu.ts 의 title 모양이 열린 문 안에 오락실 글자로 띄운다.
 // 그림 묶음(window.__GOEI_BG_ART__)이 없으면 도형으로 그린 문으로 대신한다.
 import { FONT } from './hud';
+import { PIXEL_FONT } from './kit';
 
 const K = 3; // 도트 1칸 = 화면 3px (벽 220 도트 = 660px)
 const DOOR = { x: 160 + 112 * K, y: 50 * K, w: 100 * K, h: 170 * K }; // el_hall_wall_1 의 문 자리
@@ -21,12 +22,14 @@ function art(name: string): HTMLImageElement | null {
 
 /** 도트 글자: 작은 글씨를 알파 0/1 로 끊고 1칸 검은 테를 둘러 캔버스로 만든다 (확대해서 그린다) */
 const textCache = new Map<string, HTMLCanvasElement>();
-function pixelText(text: string, size: number, top: string, bottom: string, weight = 900): HTMLCanvasElement {
-  const key = `${text}|${size}|${top}|${bottom}|${weight}`;
+function pixelText(text: string, size: number, top: string, bottom: string, weight = 900, pixel = false): HTMLCanvasElement {
+  // 도트 글꼴은 읽히기 전이면 다음에 다시 만든다 (대역 글꼴로 굳지 않게)
+  const ready = pixel && typeof document !== 'undefined' && document.fonts?.check(`11px "${PIXEL_FONT}"`);
+  const key = `${text}|${size}|${top}|${bottom}|${weight}|${pixel}|${ready}`;
   const hit = textCache.get(key);
   if (hit) return hit;
   const m = document.createElement('canvas').getContext('2d')!;
-  m.font = `${weight} ${size}px ${FONT}`;
+  m.font = pixel ? `${size}px "${PIXEL_FONT}", ${FONT}` : `${weight} ${size}px ${FONT}`;
   const w = Math.ceil(m.measureText(text).width) + 6,
     h = Math.ceil(size * 1.3) + 6;
   const mask = document.createElement('canvas');
@@ -34,9 +37,9 @@ function pixelText(text: string, size: number, top: string, bottom: string, weig
   mask.height = h;
   const g = mask.getContext('2d')!;
   g.font = m.font;
-  g.textBaseline = 'middle';
+  g.textBaseline = pixel ? 'top' : 'middle';
   g.fillStyle = '#fff';
-  g.fillText(text, 3, h / 2 + 1);
+  g.fillText(text, 3, pixel ? 3 : h / 2 + 1);
   const d = g.getImageData(0, 0, w, h);
   for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 110 ? 255 : 0;
   g.putImageData(d, 0, 0);
@@ -188,4 +191,28 @@ function drawFallback(c: CanvasRenderingContext2D, t: number) {
   c.fillStyle = '#6a5a3a';
   c.fillRect(LAMP.x - 6, LAMP.y - 6, LAMP.w + 12, LAMP.h + 12);
   void t;
+}
+
+/** 「전진 ▶」 표시 (적을 다 쓰러뜨려 화면 잠금이 풀렸을 때): 도트 글자 + 도트 화살표. x,y 는 왼쪽 위 */
+export function drawGoSign(c: CanvasRenderingContext2D, x: number, y: number, t: number) {
+  c.save();
+  c.imageSmoothingEnabled = false;
+  const im = pixelText('전진', 33, '#ffe9a8', '#ffb43a', 700, true);
+  const k = 2;
+  c.drawImage(im, Math.round(x), Math.round(y), im.width * k, im.height * k);
+  // 도트 화살표: 4px 칸으로 그린 삼각형, 앞뒤로 살짝 움직인다
+  const ax = Math.round(x + im.width * k + 12 + (Math.floor(t * 6) % 2) * 8),
+    ay = Math.round(y + (im.height * k) / 2);
+  const P = 4;
+  for (let i = 0; i < 9; i++) {
+    const h = 9 - i;
+    c.fillStyle = '#000';
+    c.fillRect(ax + i * P - P, ay - h * P - P, P * 2, (h * 2 + 1) * P + P * 2);
+  }
+  for (let i = 0; i < 9; i++) {
+    const h = 9 - i;
+    c.fillStyle = i < 5 ? '#ffe9a8' : '#ffb43a';
+    c.fillRect(ax + i * P, ay - h * P, P, (h * 2 - 1) * P + P);
+  }
+  c.restore();
 }

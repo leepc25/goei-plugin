@@ -16,7 +16,7 @@ export type { HudState, HudItem, MapState } from './hud';
 export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
-export { drawTitleBg } from './title';
+export { drawTitleBg, drawGoSign } from './title';
 export { ensureKit, kitCss, PIXEL_FONT, agentFaces, nine, kitPiece, kitSlice } from './kit';
 export * from './keys';
 
