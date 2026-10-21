@@ -265,3 +265,4 @@
 - `dark/dark_wall_4.png`
 - `dark/dark_floor.png`
 - `dark/dark_objects.png`
+- `puzzle/puzzle_wall_1.png`
