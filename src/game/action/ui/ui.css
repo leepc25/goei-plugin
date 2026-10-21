@@ -111,3 +111,15 @@
 .mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }
 .mn-dialog .mn-box { width: 920px; max-height: 470px; }
 .mn-dialog h2 { font-size: 24px; color: #ffd890; }
+
+/* 가로 화면 띠 단추: 도트 금속 칸 + 도트 글꼴, 키 이름 없음 (검수 12) */
+.tp-side .tp-b { border-radius: 0; background: none; border-style: solid; border-width: 7px; border-image-width: 7px; text-shadow: 2px 2px 0 #000; color: #e8dcb8; }
+.tp-side .tp-b i { display: none; }
+.tp-side .tp-b b, .tp-side .tp-b.small b, .tp-side .tp-b.top b, .tp-side .tp-b.big b { font-size: 22px; font-weight: 700; letter-spacing: 0; }
+.tp-side .tp-b.big b { color: #ffb4a0; }
+.tp-side .tp-b.on { background: none; filter: brightness(1.7); }
+.tp-side .tp-b.hint { box-shadow: 0 0 0 2px #f2c94c, 0 0 12px rgba(242,201,76,0.7); }
+.tp-side .tp-b.full { box-shadow: 0 0 0 2px #f2b632, 0 0 14px rgba(242,182,50,0.9); }
+.tp-side .tp-ring { inset: auto 0 -5px 0; height: 4px; border-radius: 0; -webkit-mask: none; mask: none; background: linear-gradient(90deg, #f2b632 calc(var(--g, 0) * 100%), rgba(255,255,255,0.12) 0); }
+.tp-side .tp-b.item canvas { width: 34px; height: 34px; }
+.tp-side .tp-b.item u { font-size: 22px; font-weight: 700; right: 0; bottom: -4px; text-shadow: 2px 2px 0 #000; }
