@@ -139,6 +139,10 @@ export function bindAgentTips(root: HTMLElement): void {
     for (const box of root.querySelectorAll<HTMLElement>('.gx-flow')) {
       const inner = box.firstElementChild as HTMLElement | null;
       if (!inner) continue;
+      // 이미 잰 칸(같은 폭·같은 글)은 건드리지 않는다. 말풍선이 붙을 때마다 다시 재면서 흐르던 글이 처음으로 돌아갔다 (2026-10-21 사용자)
+      const key = `${box.clientWidth}|${inner.dataset.t ?? ''}`;
+      if (box.dataset.fk === key) continue;
+      box.dataset.fk = key;
       // 목록의 상황 글은 두 줄까지 그대로 보이고, 그래도 넘칠 때만 한 줄 전광판 (2026-10-21 사용자)
       if (box.classList.contains('gx-agrow-msg')) {
         box.classList.remove('on');
