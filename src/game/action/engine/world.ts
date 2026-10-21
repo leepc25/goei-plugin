@@ -191,8 +191,11 @@ export class World implements WorldView {
     this.shakeP = Math.max(this.shakeT > 0 ? this.shakeP : 0, power);
   }
 
+  /** 자막이 뜬 틱 */
+  subtitleAt = 0;
   say(text: string, seconds = 2) {
     this.subtitle = { text, t: Math.round(seconds * 30) };
+    this.subtitleAt = this.tick;
   }
 
   spawn(s: SpawnSpec): Body {
@@ -253,8 +256,10 @@ export class World implements WorldView {
 
     const p = this.player;
     // 플레이어
-    if (p.stop > 0) p.stop--;
-    else {
+    if (p.stop > 0) {
+      p.stop--;
+      p.listen(pad); // 히트스톱 동안 누른 키도 다음 동작으로 받아 둔다
+    } else {
       p.tick(this, pad);
       if (p.wantSuper) {
         p.wantSuper = false;

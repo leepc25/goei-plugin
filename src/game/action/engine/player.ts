@@ -280,6 +280,12 @@ export class Player extends Fighter {
     void world;
   }
 
+  /** 멈춰 있는 동안(히트스톱) 입력만 받아 두기 */
+  listen(p: Pad) {
+    this.bufPress(p);
+    if (this.buf) this.buf.ttl = Math.max(this.buf.ttl, BUFFER);
+  }
+
   private bufPress(p: Pad) {
     const order: [string, Buf][] = [['super', 'super'], ['skill', 'skill'], ['attack', 'attack'], ['jump', 'jump'], ['shoot', 'shoot']];
     for (const [k, b] of order) if (p.pressed.has(k as never)) this.buf = { b, ttl: BUFFER };

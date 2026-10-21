@@ -52,10 +52,10 @@ export const MOVES: Record<string, MoveDef> = {
   },
   cross: {
     clip: 'cross', ticks: T(1, 1, 2, 5, 3, 2), origin: 6, adv: 10, cancel: 3, whiffCancel: 4, lunge: [3, 0.7],
-    hits: [{ at: [3], dmg: 10, react: 'flinch', push: 5, stop: 4, strength: 2, noise: 0.2 }],
+    hits: [{ at: [3], dmg: 10, react: 'flinch', push: 3, stop: 4, strength: 2, noise: 0.2 }],
   },
   power: {
-    clip: 'power', ticks: T(2, 2, 3, 7, 6), origin: 16, adv: 20, lunge: [6, 0.75], armor: [2, 3, 1],
+    clip: 'power', ticks: T(2, 2, 3, 7, 6), origin: 16, adv: 20, lunge: [11, 0.78], armor: [2, 3, 1],
     hits: [{ at: [3], dmg: 18, react: 'down', push: 11, lift: 13, stop: 7, strength: 3, shake: 6, noise: 0.35 }],
   },
   // 달리며 A: 어깨 돌진

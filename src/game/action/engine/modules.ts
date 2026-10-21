@@ -152,8 +152,10 @@ function hudState(w: World, shell: Shell): HudState {
     favor: 0,
     money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
     boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
-    message: w.subtitle?.text,
-    meters: [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }],
+    // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
+    message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,
+    // 가드 게이지는 가드 중이거나 닳았을 때만
+    meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
     compact: shell.touchShown,
   };
 }
@@ -284,7 +286,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         for (let n: HTMLElement | null = cv; n && n !== storyRoot.offsetParent; n = n.offsetParent as HTMLElement | null) (ox += n.offsetLeft), (oy += n.offsetTop);
         const k = cv.offsetWidth / 1280;
         const p = world.player;
-        return { x: ox - storyRoot.offsetLeft + (p.x - world.camX) * k, y: oy - storyRoot.offsetTop + (p.y - p.z - 190) * k };
+        // 말풍선은 머리 위, 화면 가장자리(터치 버튼 띠) 안쪽으로
+        const gx = Math.max(200, Math.min(1000, p.x - world.camX));
+        return { x: ox - storyRoot.offsetLeft + gx * k, y: oy - storyRoot.offsetTop + Math.max(120, p.y - p.z - 270) * k };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
     },
