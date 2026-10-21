@@ -2457,3 +2457,10 @@ button.mk-go:hover { color: var(--signal); }
 @media (prefers-reduced-motion: reduce) {
   .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg { animation: none; }
 }
+
+/* 편성 요원 카드 (임무·커스텀): 상황이 몇 줄이든 상황 2줄 높이로 고정하고, 사진을 그 높이만큼 키운다 (2026-10-21 사용자) */
+.gx-acard.pick.wide { box-sizing: border-box; height: var(--acard-h, 108px); align-items: stretch; overflow: hidden; }
+.gx-acard.pick.wide .gx-acard-side { align-self: stretch; display: flex; }
+.gx-acard.pick.wide .gx-acard-side > .gx-ava { width: auto; height: 100%; aspect-ratio: 1; }
+.gx-acard.pick.wide .gx-acard-txt { justify-content: center; }
+@media (max-width: 760px) { .gx-acard.pick.wide { --acard-h: 100px; } .gx-acard.pick.wide small { white-space: nowrap; } }
