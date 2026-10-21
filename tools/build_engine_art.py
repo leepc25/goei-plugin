@@ -30,6 +30,7 @@ CLIPS = {
     'block': 'block', 'evade': 'evade', 'grab': 'grab', 'grabknee': 'grabknee', 'grabblast': 'grabblast',
     'super': 'super', 'hit': 'hit', 'down': 'down', 'getup': 'getup', 'collapse': 'collapse', 'tired': 'tired',
     'drink': 'drink', 'eat': 'eat', 'bandage': 'bandage', 'pickup': 'pickup', 'toss': 'toss',
+    'pipe': 'pipe', 'walk_shotgun': 'walk_shotgun',
 }
 FW, FH = 192, 144
 

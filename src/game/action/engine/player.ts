@@ -405,8 +405,12 @@ export class Player extends Fighter {
       if (h) {
         if (h.shake) world.shake(2, 1);
         if (key === 'blast' || key === 'grabblast' || key === 'groundblast' || key === 'super') {
-          const fx = key === 'super' ? 130 : key === 'groundblast' ? 0 : 56;
-          world.fx('boom', this.x + this.dir * fx * PIXEL / 2, this.y, key === 'groundblast' ? 10 : 70);
+          // 폭발은 손 고정점(있으면)에서. 필살은 앞쪽 멀리, 바닥 폭파는 발밑
+          const { info, origin } = this.frameInfo();
+          const hd = info?.hand;
+          const dx = key === 'super' ? 130 * PIXEL / 2 : key === 'groundblast' ? 0 : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
+          const dz = key === 'groundblast' ? 10 : hd && key !== 'super' ? hd[1] * PIXEL : 70 * PIXEL / 2;
+          world.fx('boom', this.x + this.dir * dx, this.y, dz);
           world.shake(h.shake ?? 6, key === 'super' ? 3 : 2);
         }
       }
