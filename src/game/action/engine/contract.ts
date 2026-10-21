@@ -141,7 +141,7 @@ export interface FloorPlan {
   /** 걸을 수 있는 깊이 [위, 아래]. 기본 [500, 680] */
   lane?: [number, number];
   startX: number;
-  /** 넘으면 구간 끝. 기본 length − 80 */
+  /** 넘으면 구간 끝. 기본 length − 80. 층 모듈이 finish로만 끝내려면 Infinity */
   exitX?: number;
   encounters: Encounter[];
   props?: PropSpec[];
@@ -149,6 +149,8 @@ export interface FloorPlan {
   banner?: string;
   /** 배경을 직접 그림 (선택). ctx는 카메라만큼 옮겨진 월드 좌표 */
   drawBackground?(ctx: CanvasRenderingContext2D, camX: number): void;
+  /** 몸들 위에 그림 (어둠·안개 등, 선택). 없으면 엔진이 world.light < 1일 때 어둡게 덮는다 */
+  drawForeground?(ctx: CanvasRenderingContext2D, camX: number, world: WorldView): void;
 }
 
 export interface StageApi {
@@ -159,6 +161,8 @@ export interface StageApi {
   heal(n: number): void;
   note(key: string, value: unknown): void;
   finish(how: 'next' | 'withdraw'): void;
+  /** 플레이어를 옮김 (구덩이 복귀·낮은 천장·단·추격 밀기). 속도는 0으로 */
+  movePlayer(x: number, y?: number): void;
 }
 
 export interface StageModule {
@@ -168,6 +172,7 @@ export interface StageModule {
   /** null = 출동 끝(귀환) */
   nextFloor(run: RunConfigCore, prev: FloorPlan, how: 'next' | 'withdraw'): FloorPlan | null;
   tick?(api: StageApi, floor: FloorPlan): void;
+  /** E를 누르면 플레이어와 x 거리 60px 안(깊이 무관)의 가장 가까운 소품 하나로 부른다 */
   onInteract?(api: StageApi, floor: FloorPlan, prop: PropSpec): void;
   onEvent?(api: StageApi, floor: FloorPlan, e: GameEvent): void;
 }
