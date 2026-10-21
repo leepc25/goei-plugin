@@ -343,8 +343,28 @@ export class World implements WorldView {
     it.n--;
   }
 
+  /** 적 모듈 몸(Fighter가 아님)이 요원 몸 안으로 파고들지 않게 최소 간격만큼 적을 밀어낸다 (검수 5-4).
+   *  잡기형(선호 거리가 아주 가까운 종)·잡는 중·쓰러짐·공중은 빼고, 적은 자기가 있던 쪽으로 밀린다. */
+  private separateFromPlayer() {
+    const p = this.player;
+    if (!p.alive || p.z > 0) return;
+    for (const b of this.bodies) {
+      const e = b as Body & { def?: { w: number; keep?: [number, number] }; state?: string; face?: number };
+      if (!e.alive || b.team === 'player' || b instanceof Fighter || !e.def || e.z > 0) continue;
+      if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
+      if (e.def.keep && e.def.keep[1] < 30) continue;
+      if (Math.abs(e.y - p.y) > 30) continue;
+      const min = 56 + e.def.w * 0.25;
+      const dx = e.x - p.x;
+      if (Math.abs(dx) >= min) continue;
+      const s = dx === 0 ? -p.dir : Math.sign(dx);
+      e.x += s * Math.min(12, min - Math.abs(dx));
+    }
+  }
+
   /** 겹친 몸을 옆으로 밀어낸다 (벨트스크롤에서 서로 뚫고 지나가지 않게) */
   private separate() {
+    this.separateFromPlayer();
     const list = [this.player as Body, ...this.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.z <= 0) as Fighter[];
     for (let i = 0; i < list.length; i++)
       for (let j = i + 1; j < list.length; j++) {

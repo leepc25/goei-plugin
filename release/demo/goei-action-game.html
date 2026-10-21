@@ -529,7 +529,7 @@ function settle(s2, l, raw, rand2) {
   const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
   let added2 = 0;
   for (const id2 of kept) if (!s2.rulebook.includes(id2)) s2.rulebook.push(id2), added2++;
-  lines2.push(`규칙서 +${added2}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ""}`);
+  if (added2 || evac && unsent.length) lines2.push(`규칙서 +${added2}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ""}`);
   const cashToBudget = Math.floor(r.cash * CASH_RATE[r.how]);
   let budget = cashToBudget + (evac ? Math.floor(r.budget / 2) : r.budget);
   let teeth = evac ? Math.floor(r.teeth / 2) : r.teeth;
@@ -555,7 +555,12 @@ function settle(s2, l, raw, rand2) {
   s2.currencies.budget = Math.max(0, s2.currencies.budget + budget);
   s2.currencies.teeth += teeth;
   s2.currencies.research += research;
-  lines2.push(`현금 ${r.cash}${evac ? " 전부 잃음" : ` → 예산 ${cashToBudget}`} · 예산 ${budget >= 0 ? "+" : ""}${budget} · 이빨 +${teeth}${research ? ` · 연구 자료 +${research}` : ""}${mult > 1 ? ` (깊이 배율 ×${mult.toFixed(1)})` : ""}`);
+  const got = [];
+  if (budget) got.push(`예산 ${budget > 0 ? "+" : ""}${budget}${cashToBudget > 0 ? ` (현금 ${r.cash}의 절반 포함${mult > 1 ? `, 깊이 배율 ×${mult.toFixed(1)}` : ""})` : mult > 1 && budget > 0 ? ` (깊이 배율 ×${mult.toFixed(1)})` : ""}`);
+  if (teeth) got.push(`이빨 +${teeth}`);
+  if (research) got.push(`연구 자료 +${research}`);
+  if (evac && r.cash > 0) got.push(`현금 ${r.cash} 잃음`);
+  lines2.push(got.length ? got.join(" · ") : "얻은 재화 없음");
   const bag = r.bag.filter((b) => !!b);
   const keptBag = evac ? bag.filter((_, i) => i % 2 === 0) : bag;
   if (keptBag.length) {
@@ -3184,8 +3189,27 @@ var World = class {
     }
     it.n--;
   }
+  /** 적 모듈 몸(Fighter가 아님)이 요원 몸 안으로 파고들지 않게 최소 간격만큼 적을 밀어낸다 (검수 5-4).
+   *  잡기형(선호 거리가 아주 가까운 종)·잡는 중·쓰러짐·공중은 빼고, 적은 자기가 있던 쪽으로 밀린다. */
+  separateFromPlayer() {
+    const p = this.player;
+    if (!p.alive || p.z > 0) return;
+    for (const b of this.bodies) {
+      const e = b;
+      if (!e.alive || b.team === "player" || b instanceof Fighter || !e.def || e.z > 0) continue;
+      if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
+      if (e.def.keep && e.def.keep[1] < 30) continue;
+      if (Math.abs(e.y - p.y) > 30) continue;
+      const min = 56 + e.def.w * 0.25;
+      const dx = e.x - p.x;
+      if (Math.abs(dx) >= min) continue;
+      const s2 = dx === 0 ? -p.dir : Math.sign(dx);
+      e.x += s2 * Math.min(12, min - Math.abs(dx));
+    }
+  }
   /** 겹친 몸을 옆으로 밀어낸다 (벨트스크롤에서 서로 뚫고 지나가지 않게) */
   separate() {
+    this.separateFromPlayer();
     const list = [this.player, ...this.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.z <= 0);
     for (let i = 0; i < list.length; i++)
       for (let j = i + 1; j < list.length; j++) {
@@ -5952,7 +5976,7 @@ function createGameAudio(opts = {}) {
 }
 
 // src/game/action/hq/style.css
-var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 18px; width: min(1100px, 100%); background: rgba(14, 19, 23, 0.95); border: 2px solid #5a4a28; border-radius: 12px; padding: 16px 20px; }\n.hq-face { flex: none; width: 128px; height: 128px; border-radius: 12px; overflow: hidden; background: #27685b; border: 2px solid #5a4a28; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: var(--accent); font-size: 20px; }\n.hq-line { margin: 4px 0 10px; font-size: 22px; line-height: 1.45; }\n.hq-kit { margin: 0 0 8px; color: var(--dim); font-size: 14px; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { font-size: 18px; padding: 10px 14px; }\n.hq-talk .hq-x { position: absolute; top: 8px; right: 10px; padding: 4px 10px; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 12px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 20px; font-size: 18px; line-height: 1.5; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n";
+var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n.hq-kit { margin: 0 0 8px; color: var(--dim); font-size: 14px; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 12px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n";
 
 // src/game/action/hq/lines.ts
 var provider = null;
@@ -6038,663 +6062,6 @@ function iconCanvas(id, size2 = 40) {
 
 // src/game/action/story/demo-photos.json
 var demo_photos_default = { Jyaldi: "data:image/webp;base64,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", Aileen: "data:image/webp;base64,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", Spangdal: "data:image/webp;base64,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", Geshugan: "data:image/webp;base64,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", Gorgodio: "data:image/webp;base64,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", Kyuras: "data:image/webp;base64,UklGRhQJAABXRUJQVlA4IAgJAACwKgCdASqQAJAAPpVEm0klpCKhKlbLyLASiWcA0xzxkF66fO9EGyR2nbQC4+XZppNAD9AekPoievvYV3WZA/yOL99LvVPem/4F7XLRF0qK7qHW2Atvp9Y3j1XW5EBiRzLA4LZ2H/mCpVtvcp3nXr3Etm9Yd6d/28f8iQpeFIC6qbiqnqAffu8+ab5ARvh6X62JnrCi83DjXep0fw1mR/9mv68e7EnNQgPvsZ5Rx8hJ/sGA+PViUH6IwElSncd7bfgLmryg3ZHa1Vx1uj/skYmTI7rO8+rcVys+DUu9FDBH3Sfg8CZ1l+eQaPHW5ztoWcEvXURHSWLI/0LUMonyEcv1EGGg9ucezTCuYjVwNzzey89JuMWEjG/Z/OZzPMBQs6FcQR41vK+7kbjS4ubrafzfsVm+3c1V2PgUa302q5Ml393dzS0cgvDSRj1FIe4iLJJQv9fJDNrQ8L2NHYkOoAD++F84n/1mJKBKU2fxLb5SpMuc4BUOzgTDrpNhp/+/QJP6SLc40o4OWzckXmHMa6/NQ1noJ4jQYDyFlIWBYqtKO3v4z1K+sx1egNYaZ0037WTwBXKwtAgXj5rHBf1+930O0o0H7/sZTSR+g09H1IbWqchgM7t5GtCl2Nxg2XeWMlDhoMQYIHoMIDwp0ZReUUp8OAvHAe+2txEpnPz90n46CytEYuoP+F8BDM4JfD3nAcz5ou2zGVnat7AQsDGUIZO/qvuxsYbpbkfq4kyNxC95dD1mkZv4Z0IVIWXdMVtKPxraTwKZt073Mk3C7/fE/7tXqJ+s/yEJNVMbAaV7oOmu3WEtBDfPxpP7EnPKJiNbcvTT4Yp+e5z+K6uFjIfL4RqyhtRLvtqknPvcSjg6N07J+v4LzW889xYOWF9g/C5XRJTzIL/I5lcYVQSRK4jDmZYwHYiwIU5N58R1ueQyBkcYWNReiNNw4C/+hFaE0tyu7+rpWFgA2QGtBUAvkOEgJDUpRHOMEqSUpwNJXpeIaME4RzKkkaik5csbHZIEW5Y0pdx93UeqWscKGTnZ/8axwz8E4aCbqrLYz1wSJcBSyF3pB2eQwMaG0tKSx6xf0pFfrHKzLPIZfWQ6pUq+YZhOts3g6gIwr6A11Qa6YGVP1d+P7CdFXgnVwHOXOWfYc8ziIv611A3pPspB5VcWE1nWT75fV1t0pxhK09GeBn0+wbq0P8VkswC/2qfn4joyPhrb0DB24Q/0rYHCnTxSBIDmoR2Zlezlk7X2v3jTYEX3+nxhro70hS4ZcxbcTuKF6vv8hD3UAsSoQAQGmyqiKZjxKaQAzlKXuVY7+cxPN7J2rJfb7qY1WR4tCaDK86qLtNpkPtr2e9dgI7mno+z93tLJWAZu5X2Mcwvybugvhbx7EYKmtpJGFTmlIp9LPsUL4VmMs1btlFJnXYW3meGyxixD19XUks9getksjFkDZUSPWQHPbIg7NcbNOxZcx5p5KebIS/NTZ5oxdxqodkv7T4RP3LM1iBtZMjNBLF87rcjG3GxbjlMly+VjOum/9dQzMpMFKU+UAQzLRPRrOFv2Lspn/oOUMvC4wp624Ro5fXDT6pxtYv/RQXc+NDDG8cLt8/OsY9Gfpjb/sfBv4hPNs/9WXM9PRZqlQK3Vk8e5pgclB0KctAIXz1NFpO8E1uW0cOqOSL4NeRQGXI4Ni6WUNjpodSax7i8Sh9h5+sIXM0/PPQUr8mB3iXh9StI5NiivZaOxPR6UgCsO0GeeBXtGSwekPAFyzGzRAYclZgQVGATYxe3f4lzH60AdbL/wpYTnVG1Jxvnm8Fe9qMCS3qOIYGTHRdDCvRYm2dElmy588faQ7HQT3Yz7amuTgxVDS6YfoDxD79bDTfzF3WYkj123YrShbKY1JbBQIlJjPDNquGZlsJWk6OhhFEnYZUFHAO2hr4ov9+WcE9yCAGmQ99Krd4WIzNWS9HPWZlb9B68BMwBzpgTYiw+21SlylYShhrxIPZzP8ktwjGniUEcc6c5+sM1NaWCof0Pv9DoqiyJGEtQ6875aFYkP7BR6EHA10lpHWpFEC/1xxNbQ2uUYFRtXNFaHzBq/Y+5t4a83ZfdmVl5gxZZ0O9hOAY7ht6R/7ynVvY15BSqVgGDF40pGfsH50YOyTWgBIQ5mYGbMCZWHrede77/7Ys10JtPGf1ImgXYRdiqWMWgJdqcDFupfBUkhLsxi9h31ALHCQndze3HejevAZ0uoYIiIqwsd7vgFkkqVSKr4Fy3bQPYGOcz5lkre6ZlOdYGPfV5p0mNzMvLBev5nWZbhxFZN/SEB7hostECouLwkPDCi6gTLgKUDKP/AyvJWt9O+OHVD48UHgGCDSwIDcuL80yI3+S1vV5r0dm2N/bFcObrncsgVyqgCO/vF4OdRvobEvfUyMKa2ImP7UhXL2/zRfjPGxHu3qtfUT3hgA/Cig540JpvetIgAy4GTnFiUvnRT67AE1y2diZCnvkW+/gYmAx6auwb61G1VStIvgRtNEA2LN1AmWQyiTaBWvQFQmmjgESPBt0fPf5zZMtR8xTpuH4AOlkA15tbFIY5Ci945aRTFBZE/J2u/D1ixPuLoP4KCRQlLBrnvkWjw/m9ILZoEgYfh/pUw/yDj6y73dlSsQRag4A9Z2VWHHZlH6p9uSICvm/g7oaa72yW79He7EU3XfQXYxp8jQz8c3wA3eAdI/KUO+cW1Fikvh9uqMItAMPzdminIcDqplSzPgHAeC+CHHmvYc1lt0ua5WnbMNoKBJsIFVvrXIgwvPTE20NKDBEkDVbzYGzC2GQuqrswHeo+vB6kmSsZkDM0H/fXA9AW+9s76xi28KCLHE18T7Et1MGnJZKffub73DFgtv3lz7y/8bPrTXdIAF615WGnOzdXhkW7rG0V2eI/b0LUvZuOB1ST/UcBvftTHbV/u3C126d/lByW+R/3pKL54X853rW6dNOtidzSFTKnH9tdxFcW1V2To2rQQHHexTtW4RDTZKGGhWH673jNY4WTmcXEozS/Zd2N8+ekrlC2EOi4rfiw3O6Qdu+X8o4Qh+S1MygWKC6HTtXmPp6g/GOXiCTwOmOMBWC2Jj7YtbkVAAA==", Deadpole: "data:image/webp;base64,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", Rojemon: "data:image/webp;base64,UklGRqgLAABXRUJQVlA4IJwLAADwMACdASqQAJAAPpU+mkglo6KhLjh7uLASiWcA0ne1Hx5xXtXDjft1np7RcRk/7cEWj2qmsTeo+wH+lPSN0SfYXsL9LhHS1hpDsktHMwBotq8XEaPHzAHej5BCpATrvETfuHOmFLAymw/VgBxV8bf5AxMu1568sXViIu2RMTDfph9Y8i9YawvDZioZlh7CmtwF3Qa3KQso06Wx6l43hnlHAt1ooUkmr8B79fOnGr6Yw3aLA0rS6Bjs4QIxr4vsz6M+zFoQ1l867NBN/3VdyxEu/Jgrb5aK2p2I3cNgYmunKKEdeehYN75zh9GxYledBM4f7tDbvQJN8POEOuGKt6tvDDzG8dvAu9A9b5UoF7VUsnWoBI8AlxLjPdP3BEfPqn6/SlixpVg2MvrjJWqTMRKFwVR5hHtr3kH4bCGgOfgTpeKqNzTQKTcUjpp4oafk55QmSXJMa3GWr9Ijm8GHW03ib++OAOwqFpxCnYkuj9pi34TnHYSGc4niZHhe011xK1PZiMo9aGSA1zR7LAqgIBQAAP74z9EIQ1EPQb/PlA8tnIYvqgMhumBxiO57tBYHSVa7cGOrBbmmFVOsSiv7bi0PNDW9d2XsFHkgjmyicZCyZy2FWKarzhlZ4pCFjIC54TNMlIKgIia4gvK/1jk6hfkHh/fkhLbclKMTBSdmOapMcJ5guVudXXUyNQbl+CH9H8Jz1MwzuiofL7duDz6325fp24j+Al7ZiteP4cpx82lj11PAP97x2WAT2ap7Wi1n8fxFPjG1CC4SVr6dT/Gh7nomXNsYQBisZLAzFBSmnQHwZBA5uTafWZf7uLZLf/lzlRQqdlP8Gx2Fukoi3kz58NYQOgGNnjcK0oJmZoHFOt2djhXTW2rgbEeGs7eITXsKClGMFsViRB+zl3uBshvcDMPZ+IHBCmuV45DFEmY3ol+hrDXYBKhUZwj/IK83i5riJJY4MUBhrDNj2SHPvtBnfn++yuAX+Xz1RNeIna47BMKoCJJmAH0CKWDfBpTZWeHvUJkm1ewkFJibai6TH+KnX4RH844y8Ilevc1aia65jDG9F4iz1Txrj68BBYAYK+Mxx7zEcD+eHcT1vfl4jZbsO9MgesnRqxyADb7BGOQp3+huAVlqYTV8o5I21mDJA99PoJspRWcm+rSHU3qWjcq87ek34zxRazIeVeu0bMN6xKa57shpC2E9o342gzMVGrnM3aNJoDy3rAV0hRxDbXlBvz4LI4N8NTMXpTjDg3cOeyCR5c7hgXRnZj/RFj9pg/FZop6jvcSDsq0RU5liL/zkMnfTS4seXgqAPe43zYWh+7cYLXvwmc7O6wnuMIzPgjJTB1i6tcC8rYLUkUQyHkLsi827Oo/r11G1bQd9qAS2GlbHkO6cFaWZcAQKI4DbXJDufqqJpe7rS7mLbFFvN/YoJbHPnaYLVSF9a4B8wZ80Wn7R0ddrcsBXo36SIgnA+54DBzfat07y502DYrDMvqvzQph9FMMIvvDw3nAz5MFmIAVRbEMNhrk32GLCj6e1jASYUvbfwNPRSBt5dAgt91xA0QpVY6QqLyqV4s3Xi/PJT+3Torju18+h45YBraawtxb6v5B0GhVmB1L4uF4Ml5dzbsvSicOqiNGxpeynMqY3BtQfui4wDhq1hCyLmqYF7lCjwqVHk/Df5CxjStR5JEhgx0l1IAejJ+0S6yHS24P//A9LO+XR+90lI0S3jlPRVkDIwrONdzh1CX2KHxR18piH2iBmIEIK1sSGApf97ZVcO1rzranjy+TZmHE4pFg87W4UvU/9t0joN073qYyYGNyLffs29wn28zpNxVrFL5qa20GSd93yMKT8YEnpW53XLvO14R5eSjDDWnBpjCSwg82t81vBt34IbsSdAvJUMRJHmlmcMEks3hxU9Y4+fYLRJmWyyirxi/WA016ZBg23bo+pXerJ89+z7Q/YDX+LNYPkT0i7C8MH0UXnKqpUFK9Mr8inkqa6vm3VSNrZ05lyWaIdtZORlsG5lR6vH20Sy4iQifDKeQ64SlIMr7JfT9lzlrihndzF/DbFo40mz7nqvCSmUrfyY2F/ktJ+CHkE2vlnZaHz07gvul7gEU/8A77POJcOLD7tMnyhQ5LSVHYVTffbIBPjJ3ftK5BAmstej1N84TdKG8QTQw2vxq0QJODWSQLd6IyGayjruhgdFeidbErcBikkynZotZQhw3WXopcn2QQAelNMS1l2vgSIRZDe+a6YGYhKkA/LwYuCyO9J5jNwULrHXX9T6THwSx7kILRptlsObL3C9v/1wUVL5vcb8Xf70PGjYXTUgws1uRLAhVWaviFTCdnu0eFWhiuB4RaK7p/3tfagMNp/Hy6X4dzK902swnyGwv1wI9RE4ZHqRH9HK9NKJbu/E9t58VKTgchP4XiLuA32qLDm/zWJSnt0SAkQWKfl1kP1osgAcdddD4HLFcYA7c3G4b0hPP4OUOzxbr4la/EEpaKq+KNwPZ7pCs+ixA668z2Mujt0MmBq5ezwS0+GFER5kl8SWDOCfW42RGfxAJoceFTu0DneLZU389GTd6QrKNEFx6C2ZoBzBrBfSF4HrZr30R2hUka70xvIyX75NtHK8oFdE6fbofKTz0AE22OWsCwxI4H8MnURO7o10O/Ll1nI/iUKxdrYAPpw6qVlwewsok2GnIQS+nNzoPzmuGpbCSQlovr3I3zYI7EACPF6P++JLurani2cx6CBm0V8KYQtnmc5IWwoNoPwxEKjYwVv2pFR5wK2DXEWRM+zBz8icCUkcc/q/dcMmOzfKfoRuHxVAM4Y2s+hBH3iOt/PzW4lzyniiaHx9aP299Qn2am+W5keACZ9XJoirYWM/y5VJwQUIESZiW6yEC8OujBF6N9nFiLSXXtLYY6n9/wwFPBQrsY+/e+zBKpY7XqqrNonDy6abFylnyPp5+wZwRCnOmcSuHjiMGYJnWUrqbYTB68mw8NnFi36th1/118kDnEZD+BdLzhMi0Mk/pvy0mQAHm1d6pUSxmMjepsJvjNAVWTSQt0LEJlyub7XRudmsr6Bdp5b9qnhBHVMuCNakYXbYk4Mq9ceJhN+HNC6Z7r0ag2kLZ+YvEWgcYB75etmKHLSp88M9zriTPkVXHHU4lfFjiR6NCJDwuZBFaEYwrHROzA/YVMc81OI1Kon7tHiGBlWZ3o1spr0JaUG0sZWKlUXSCSgIJTkMKNRps8WJnZmOqwIssp592aOF5dneByFols6/E+SyeXAlet7qUF/Sunz2Ed0klLQF3IwAX9RWGUXxDxpM+om/O1XL4BHQ8BxKhPsZRMOhyOSo5Z1w4KtMgSKv3ZRDR5+hP7ZGmWHJKnC3zBQiEt7egiT4yMyHXyM95f76aCEZh6nep6eRXPfqICvr/ltiUO8Twd/GTb22nramxZetFM+s38HQSYVWePuyYlKsNUJgGqo+CY4MQo8eEkGErGVYoZPnybu4ZW01xq+SX11qhfeNt/RxRM7jkQ6z15ULPtUqPR0iKKEkW7Vr+MIP5UvwPAHTMVPMXZQ0P0X9xjEjjR+h8mk482lkxCjAETCUSFSJh4cRpgwHvGWF6KVn9qQ/T4gYSKaWMnnPCSUUHzj0Kkrj2fgZL/dLLNPEzHTVyWn3i0DJPuKoj9x7+qfr9tf0tBxNBTi2IO3U7kE8V+3nzz4vCI9R1iW5csPo+TJ7zuW4tMtzNq2u+GcMJ1I3mBKIejZjaq0qXG18nHnnGJdtBm7UuemvJIpDJa35OQSR750FbijdJHSTKh5BG1I7jeO6MP21AmWgt5zZLROtncZCM3AJ2MwQstMYeTpEusVa+6JSp10N32RZ6snAjBOWS/zITQZ2SnA0gSpmOgaTYLsjKDHn89bjwIe+eVhvs6auSX6/z8zN+Nb3rXwm0Y5KPp5zw4jAfilii6a1B0kTl42ppwrqVbIMgWfuzV55Hktt4soZze3YgO+3xbIAA==", Jaemtri: "data:image/webp;base64,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", Gognija: "data:image/webp;base64,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", Dejure: "data:image/webp;base64,UklGRqYMAABXRUJQVlA4IJoMAACQNQCdASqQAJAAPpU+mUiloyIhLdV9MLASiWMA0Ii9Smz5+nfb+3bBKmdNtf8Ey7w89vafwAni/zDMOgcZSr/S8YD795mvSH0gPX3sF9M1QHjuYLbTSqpN4bDqW88z+pw8vtkMLkxOW2yF/oNempjI8fxPdtOhF5GBtYkO0b7te97bme71231NeTlRh2OyTWJq9TglYXvbJOIFUPVCuwXqrZRB+2jzBZ/aGpffhw/JDe8xV6JD/B0aSMrz0OZWWpgXefheXw69GbV3dZtPCt958C9ClhL9RIyBCFzy4SMxcxkFmz05H4c5ckapejO9nf1G+eHNsXO4kQBgNgM+vMCxScqn8PT5VJp/e6nrFaRyICLB9KjDVGIn810lBCL/EVVzTgWpkvRJjDY50v6ZwHXQ4fyhRftgPE4ZsfqevUIRPS+FDNXlab3sYlQ95RZ8qgaFxajr+f1k76NV9a3ic09Zl9/3cRvs4jm09qfe98QyGFZfFOJsLQyrsyVLwofUQTJnxzmXLVl9OmtxwAXA97brI0uVJaue1GGZ5sYwYSdntThpnT4kFQ1FgekkzhRcM8K9W8Z4AAD++U89TNtObgLlDNHHZgzAxA4go2QaMWbNKCz0kTLSPKt38qXvCqbzK9zUUVMudk2XncDygMa03nb2XB8VF6s8/e3iOJN+QmvaH2ouGBoDiKdzr1RGjNgA4Icr0t5prgz3CnF/4A2g/YDY46izsKGTpYV3uFV8ZhUXpQOJucJJ/iyW1xbj11Fiyg67PjnVGtFXq/3pbM1O4H4hJ3mEBJ2eLmBD5RBHJsEJtrjMT+jB6khh1gw8MgW6wuc/R2J7st61OgEo047BXwmmQSHYfraaLluPropppj8ChEr2hP3a6v+cVy8h1MEssSEkS9z18Kxn5WRkpSKJeWh47CgxN31uwBUG4+pveFrLuVB+55jwFW9wgg83EDT6hsKiJB1MOwfydG1Z/L5Fbxf9DdmKeibBfisNr5oZsdNDt6mfbB/lxhlBEgbuq99GP8vI9TUd7vXiqOFasV6a63rJZjtpwedBLaEb24rv84YjdEZr4MdvRHGWfQ+26o0fMizqlPib2y3Pw5Q+irR5pMRx+hjGBQa8KkwQCJ2u53LjITnxfi1DWz8sfhbymXyhaZqfM9CUT4YBASVEUvO/1fl1aaWC4yNLrEXWlXO2NshWZEpYEbtebhPqWI6AYsh34kWkrYsfvWDFpUl5lcFgXMDEg20B96tdWO8DyVKIP3DpuTya/MrGzJYOmJmhMONIhIhxT61xPmur7UGTJ/KkWhUx5gcmVe0muh0tZzUkHDJ8OOMLiavVZc2m2zeu6AzqwdYV96tf13wbyBTUpaR4z3e6KEhA79Bw484pGaa2dMKCyrnX8p8RTNDMw902gKqpGZNg6gweg0LqFEjIJ3pMX4DuCwa57THwbfpy9+MZRoWM7zX8FBQjKzbP1MQA7U559wwiw/s2ZyBApL0ec6D8xnmNkceEMGzSN+Um/JnhMycIaUpWlrmLzkYEy8Xs0x6nFVjKgx0BCXm2ThFPXdFRO8mLROh84cSWQhFhX8JVL0yhHjrqFYgwMFM5EKfi64Sf3ixdnatXM4ssc4PzhSz210m19dqJ7wZ6lZ/m2Hy5PM3zjAutRX7nk9yPrCpjb+26ibbYti1AM1Pnb3lgX3kVVh2t4G+v8yg6NOU+S2X+J6AvZP8aLSmdyYJ5V8DXj/DvRSGLNn2U3GPKNpD1dZFJAfcCTivfHxGGjsCNtSrGfeiaeBmf6TJKaMpb4FgFShmBSbCcM0ERCrPr4UkMvIrj/829/bLLNxDZ28evsiHHIlQ0umKOMqgZiPTYgrY2EkM0mtW+kvZG2iX0lnxditO17t1p22LRVdz4Lp5TYhMmFO7DBdXzPV4UWYEF+1SvtWNLIR6oJsWvejb5XJZJKpWK5wadjCpgBTTaA/MIz8hw7jKxdkRLAPlWCSPK6d9YhQ8Yy/r8yLari7oMuQ283/bq4xaRhB5Kmf4iaokJfitX2S2XCAaaKD3VHiefMZ1RSrh4WN7Ly5lpGZB9FvODOz1Rb5xzz2wB4paPmls+Jzw+LIpEY7NH7kWYKG1NUQyBCOebBJc3uanszI0rQ5vtzRFKyel6XhKxF9xQE3AHgxFlCdmEgElYBZ3NiuzSkftOj7FwAznv7ZN/fKvwH9Q/kbWyTuN5iQ1xGfz47tVkD3+kKQ+ldBIdmjh/aIPiRAMTHJjhmn73g8H/Nv8PDey10JkqDp644w4pYBLvRhssJyE7/+xy81LKTAjYvex7ScyhVV0hbZRWku3MD6JD6gxAknlin5MvyQavE17D91RGe62YkqZKE1llq3hZoK2gLUO7dEyI4YaDwXE2PGPvE5NgyhR+kyeXgv5ss5qr8z5HJ+z+pxMQLFbJkxKisByzEpv6whYTF53YMAOli8d7oq5Ef8QhI0hf8gb3UlAXkoCe7iCc4VpmU+809v7rkn9opMZyoFWLN8nW2qT3VPHMj/i00GscvcAYjy/qir/2Z2jHl2AK3DT9xt6LJ3yX11e/Tu/URse74dcmcqwVSzsW2nfTrEUuytsVm+RoWh4kI0dYSYmSkPycu/oZiY94V3dh8EwXuCGvdDS+mWDZVDAEdyAcmGnURU44hwPuy41Ob+bM3MjGR28+JqD0je9RtILbvU0rUaeLAs3w8V1VqlPabjfgjuoASpYZ/l5TUnhnVGExVfd97QrPuc/5e+4L6tFKZ8pva0IiCy/4HLTEn8ykN1rauKAxvXn40eB7of6o6C/Z2k9f4vRgVbg+TDVgbDnKI9EIkOQDwhhlcxyfd6A7xtugkDUyXe3Un+o+JckHXjE7r73u8JNB58EGCKrIXIjVxf2zJ5xGCK69hWmWUbHjKKut6OEZSQVuYaSzADzxx2Go3CFr+nq+9aJaQ4kMUdJ/wGtbn+M2xNera9BD/MH2+z3YbX5hdl9wOMxXB6eHci2u7EheGYIGn/kKI24MaagVMb6+qG+H7RD6YvqyCNEDmNE1tkqtBO0p0SE0UiAyWk82+RtinPHtcNGGGChgtfNmuteS6/67flulQP7xcy8aUYmVbQJEBpjVq/4CKl227YXTt4X7mA1DYjmSLOnXqb/H6UV3nCusFfzcHHhDeynlxJuFHzJH2xYzPFjxmfYbJlf72RwOsctF8wH2Mky6DZ8OmpP4Q0RWVz98FkTxC3etJqCAvJ/njzkllFxdRLwiDoL1duTbgJFZ+D/WG6QNw806r2B/kY920am7487wAAe176tjn930naX8zZiU/49Y3MCv8HXtC5mYfws2xlcJ9NQJ8Y3RUAHZnCQVb8nB6F3MZ5P6tVQX7QRsj09qQ2UjVxXBp2oeC7j7yLOvffQFGdbJ6nPNTrOmh7fmz0qgZJDI5YDnJsH/Amq1YF7Ke/rGuanK2jEXAhy3tbL91ZnWmAhT60ZNRsqbEzC0sAHnlzrLNM49omcgSw1kRM8bWKwk+RNo9Z1kjuPFdDSdn7kGgbDOfbEVR5F12Y0pXtKto4N0XmkAPhCV3FS/KtdyYnWqxUM6WstULNIW9hibIWq6IFhunH94cZqxYR61cNc2VQQC0SrL1xSSv35wv1iP5kY2/3vCrRXDT9/vMrTlPiE3vo8c/I2q/+AEiS2xdg/s3sMtleimjZBVpnyaZQRRw23htfgHkzStqYYgJOdyehz+G8rQCEdhir7tyRS263P/t+/N4CcYqOl+s6d730fxfxsgS2A8ZVKq6CpYc8BMiVrVucGqoPtnShhr3hX2AWdBbO15euZEGzCb4bu9oa+ip+OFjAG64gZeVwGMkO0J1MZcrHas5DEAl09GSsyPC0G/C4jGKYm190ASoN8zzNTATH0hB1MB6disgC1CehSKkoBliayGLy6SQaqbA3qhmMi+kwxWPVWCHJut8mgULs5WIhzXL2R9mtG3bIGjSNE2yEnbU+DXiwJ145ZIDv0/uc6NdBjdzRs6zGcLB+SSHKs5vl5JxJ5LWL06BbgbP75xSZ/5yZuDSvXfi5TSLxnyrP2vB9mHelH9ykOXfMKz/gmpgQQslvG0d3jr5o4BAJs0RUvJXe8AYm4LLoF33WryMeS+gFv1tIAFfmSeVIKaJ3W/oRfkZWp9YvbzYX37674b5uMWcsB9oMhYWgTiAz2fLeEz07EqqYPTh9m1qwFb/EISpnLEE7fe90a2GUwT9kFg0mJy5XfXzrY+Bvq5pB+uN4RY6OT0kt3pKhuonOc0+//sT35IbuQ+byUDzBn2TetqTEPdhwQJ9PmWwEl7La56GOZKafpyIAAA", Konjyuce: "data:image/webp;base64,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", "Ma Deok-hee": "data:image/webp;base64,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" };
-
-// src/game/action/hq/state.ts
-var HQ_SCHEMA = "goei-hq/1";
-var agentRecord = () => ({ xp: 0, fatigue: 0, injured: 0, runs: 0, deepest: 0, seenLevel: 1 });
-function newSave() {
-  return {
-    schema: HQ_SCHEMA,
-    day: 1,
-    runs: 0,
-    x: 200,
-    currencies: { budget: 200, research: 0, teeth: 0 },
-    agents: { jyaldi: agentRecord(), eileen: agentRecord() },
-    selected: "jyaldi",
-    support: null,
-    stash: { medkit: 1, salt: 1 },
-    loadout: [{ id: "medkit", n: 2 }, { id: "bandage", n: 1 }, { id: "flash", n: 1 }, null],
-    relicsOwned: [],
-    relics: [null, null],
-    coffee: null,
-    researchDone: [],
-    appraisal: [],
-    rulebook: [],
-    deepest: 0,
-    missionsDone: [],
-    mission: null,
-    deadlines: {},
-    failedRescues: [],
-    danger: 0,
-    maxDanger: 0,
-    flags: { firstRun: false, firstRecovery: false, firstAppraisal: false, firstSuppress: false, firstRescue: false },
-    album: [],
-    storyFlags: {},
-    decor: [],
-    rescued: [],
-    interviewed: [],
-    lostRelics: [],
-    last: null,
-    active: null,
-    records: { bestFloors: 0, bestKills: 0, fastestReturn: 0 }
-  };
-}
-function parseSave(text) {
-  if (!text) return null;
-  let d2;
-  try {
-    d2 = JSON.parse(text);
-  } catch {
-    return null;
-  }
-  if (!d2 || typeof d2 !== "object" || d2.schema !== HQ_SCHEMA) return null;
-  const base = newSave();
-  const out = { ...base, ...d2 };
-  out.currencies = { ...base.currencies, ...d2.currencies };
-  out.flags = { ...base.flags, ...d2.flags };
-  out.records = { ...base.records, ...d2.records };
-  out.agents = { ...base.agents };
-  for (const id of Object.keys(base.agents)) out.agents[id] = { ...agentRecord(), ...d2.agents?.[id] };
-  if (!Array.isArray(out.loadout) || out.loadout.length !== 4) out.loadout = base.loadout;
-  if (!Array.isArray(out.relics) || out.relics.length !== 2) out.relics = [null, null];
-  const fix = (id) => OLD_ITEM_IDS[id] ?? id;
-  out.loadout = out.loadout.map((x) => x ? { id: fix(x.id), n: x.n } : null);
-  const stash = {};
-  for (const [id, n] of Object.entries(out.stash ?? {})) stash[fix(id)] = (stash[fix(id)] ?? 0) + n;
-  out.stash = stash;
-  return out;
-}
-var saveText = (s2) => JSON.stringify(s2);
-
-// src/game/action/hq/view.ts
-var PHOTO_KEY = { 잼트리: "Jaemtri", 부장: "Jyaldi", 쟈알디: "Jyaldi", 에일린: "Aileen", 콘쥬스: "Konjyuce", 데쥬레: "Dejure", 고그니쟈: "Gognija" };
-var photoOf = (who) => demo_photos_default[PHOTO_KEY[who] ?? ""] ?? "";
-var esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-var VW = 1280;
-var VH = 400;
-var FLOOR_Y = 330;
-var depthText = (d2) => d2 ? d2 <= 3 ? `L${d2}` : `B-${d2 - 3}` : "—";
-function createHq() {
-  let s2 = newSave();
-  let host = null;
-  let root = null;
-  let wrap = null;
-  let canvas = null;
-  let raf = 0;
-  let last = 0;
-  let card = null;
-  let panel = null;
-  let overlay = null;
-  let notice = "";
-  let bark = null;
-  let barkPlace = null;
-  let moving = 0;
-  let pending = null;
-  let cards = [];
-  let selMission = null;
-  let slotList = [];
-  let pickSlot = 0;
-  let walk = true;
-  const rand2 = () => (host?.rand ?? Math.random)();
-  const keys = /* @__PURE__ */ new Set();
-  const idlers = {};
-  const ctx = () => ({ agent: s2.selected, agentName: AGENT_BY_ID[s2.selected].name, fatigue: s2.agents[s2.selected].fatigue, day: s2.day, rand: rand2 });
-  const save2 = () => host?.save(saveText(s2)).catch(() => {
-  });
-  const placeAt = (x) => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
-  const draw = (dt) => {
-    if (!canvas) return;
-    const c = canvas.getContext("2d");
-    const cam = Math.max(0, Math.min(HQ_WIDTH - VW, s2.x - VW / 2));
-    c.fillStyle = "#0b0f13";
-    c.fillRect(0, 0, VW, VH);
-    c.save();
-    c.translate(-cam, 0);
-    for (const p of PLACES) {
-      const open = placeOpen(s2, p.id);
-      c.fillStyle = open ? p.color : "#15191d";
-      c.fillRect(p.x, 40, p.w, FLOOR_Y - 40);
-      c.strokeStyle = open ? "#6b7d86" : "#2a3036";
-      c.lineWidth = 2;
-      c.strokeRect(p.x + 1, 41, p.w - 2, FLOOR_Y - 42);
-      c.fillStyle = open ? "#e8e2c8" : "#59626a";
-      c.font = "20px sans-serif";
-      c.textAlign = "center";
-      c.fillText(p.name, p.x + p.w / 2, 72);
-      c.font = "14px sans-serif";
-      c.fillStyle = open ? "#9fb2ba" : "#59626a";
-      c.fillText(open ? p.floor : `잠김 · ${p.opens}`, p.x + p.w / 2, 94);
-      if (open && p.npc && p.id !== "office") {
-        c.fillStyle = "#c8b27a";
-        c.fillRect(p.x + p.w * 0.75 - 22, FLOOR_Y - 120, 44, 120);
-        c.fillStyle = "#1a1a1a";
-        c.font = "13px sans-serif";
-        c.fillStyle = "#c8b27a";
-        c.fillText(p.npc, p.x + p.w * 0.75, FLOOR_Y - 128);
-      }
-      if (p.id === "office" && s2.decor.length) {
-        c.fillStyle = "#8a7a5a";
-        s2.decor.slice(0, 6).forEach((_, i) => c.fillRect(p.x + 30 + i * 60, FLOOR_Y - 150, 26, 18));
-      }
-      if (p.id === "gallery" && open) {
-        c.fillStyle = "#4a6a7a";
-        s2.missionsDone.forEach((_, i) => c.fillRect(p.x + 20 + i % 6 * 46, FLOOR_Y - 160 + Math.floor(i / 6) * 50, 34, 34));
-      }
-    }
-    c.fillStyle = "#20262b";
-    c.fillRect(0, FLOOR_Y, HQ_WIDTH, VH - FLOOR_Y);
-    c.fillStyle = "#556";
-    c.fillRect(PLACE_BY_ID.training.x - 40, FLOOR_Y - 200, 20, 200);
-    c.fillStyle = "#9ab";
-    c.font = "12px sans-serif";
-    c.fillText("계단 ↓ 지하", PLACE_BY_ID.training.x - 30, FLOOR_Y - 208);
-    for (const a of AGENTS) {
-      if (a.id === s2.selected) continue;
-      const it = idlers[a.id] ??= { x: PLACE_BY_ID.office.x + 260, to: PLACE_BY_ID.office.x + 260, wait: 2 };
-      it.wait -= dt;
-      if (it.wait <= 0 && Math.abs(it.x - it.to) < 2) {
-        const spots = [PLACE_BY_ID.office.x + 80, PLACE_BY_ID.office.x + 300, PLACE_BY_ID.pantry.x + 120];
-        it.to = spots[Math.floor(rand2() * spots.length)];
-        it.wait = 4 + rand2() * 6;
-      }
-      it.x += Math.sign(it.to - it.x) * Math.min(Math.abs(it.to - it.x), 60 * dt);
-      const rec = s2.agents[a.id];
-      c.fillStyle = a.color + (rec.injured ? "66" : "aa");
-      c.fillRect(it.x - 20, FLOOR_Y - 104, 40, 104);
-      c.fillStyle = "#ddd";
-      c.font = "13px sans-serif";
-      c.fillText(`${a.name}${rec.injured ? " (부상)" : rec.fatigue >= 2 ? " (피곤)" : ""}`, it.x, FLOOR_Y - 112);
-    }
-    const me = AGENT_BY_ID[s2.selected];
-    c.fillStyle = me.color;
-    c.fillRect(s2.x - 22, FLOOR_Y - 112, 44, 112);
-    c.fillStyle = "#fff";
-    c.font = "bold 14px sans-serif";
-    c.fillText(me.name, s2.x, FLOOR_Y - 120);
-    const here = placeAt(s2.x);
-    if (here && placeOpen(s2, here.id)) {
-      c.fillStyle = "#ffd080";
-      c.font = "bold 16px sans-serif";
-      c.fillText("E 들어가기", s2.x, FLOOR_Y + 34);
-    }
-    if (bark && bark.t > 0) {
-      bark.t -= dt;
-      c.font = "15px sans-serif";
-      const text = `${bark.who}: ${bark.text}`;
-      const w = Math.min(560, c.measureText(text).width + 24);
-      const bx = Math.max(cam + 8, Math.min(cam + VW - w - 8, bark.x - w / 2));
-      c.fillStyle = "#f2ecd8";
-      c.fillRect(bx, 110, w, 34);
-      c.fillStyle = "#1a1a1a";
-      c.textAlign = "left";
-      c.fillText(text.length > 44 ? text.slice(0, 43) + "…" : text, bx + 12, 133);
-    }
-    c.restore();
-  };
-  const tick = (now) => {
-    raf = requestAnimationFrame(tick);
-    const dt = Math.min(0.1, (now - last) / 1e3 || 0);
-    last = now;
-    if (!wrap || wrap.hidden) return;
-    const dir = (keys.has("ArrowRight") ? 1 : 0) - (keys.has("ArrowLeft") ? 1 : 0) || moving;
-    if (dir && !overlay) {
-      s2.x = Math.max(20, Math.min(HQ_WIDTH - 20, s2.x + dir * 320 * dt));
-      const p = placeAt(s2.x);
-      if (p && p.id !== barkPlace && placeOpen(s2, p.id)) {
-        barkPlace = p.id;
-        const l = lines(`npc:${p.id}`, ctx())[0];
-        if (l) bark = { ...l, t: 4, x: p.x + p.w / 2 };
-      }
-    }
-    draw(dt);
-  };
-  const top = () => `<div class="hq-top"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><span>최저 ${depthText(s2.deepest)}</span><button data-act="menu">Esc 메뉴</button></div>
-<nav class="hq-places">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}" class="${panel === p.id ? "sel" : ""}">${esc(p.name)}</button>`).join("")}</nav>`;
-  const agentCard = (id, mode) => {
-    const a = AGENT_BY_ID[id];
-    const rec = s2.agents[id];
-    const lv = masteryLevel(rec.xp);
-    const nx = masteryNext(rec.xp);
-    const can = canDeploy(s2, id);
-    const ros = rosterFor(card, id);
-    const photo = ros?.photo && /^(data:|https?:|blob:)/.test(ros.photo) ? `<img src="${esc(ros.photo)}" alt="">` : `<i style="background:${a.color}"></i>`;
-    const sel = mode === "pick" ? s2.selected === id : s2.support === id;
-    return `<button class="hq-agent${sel ? " sel" : ""}" data-${mode}="${id}" ${mode === "support" && id === s2.selected ? "disabled" : ""}>${photo}<span><b>${esc(ros?.name ?? a.name)}</b> · ${esc(a.weapon)}<br>숙련 ${lv}${nx ? ` (${rec.xp}/${nx})` : " (최고)"} · 출동 ${rec.runs}회 · 최저 ${depthText(rec.deepest)}<br>${rec.injured ? `<em>부상 ${rec.injured}일</em>` : rec.fatigue ? `피로 ${rec.fatigue}` : "컨디션 좋음"}</span></button>`;
-  };
-  const slotHtml = (i) => {
-    const x = s2.loadout[i];
-    return `<div class="hq-slotrow"><b>${i + 1}</b><span data-icon="${x?.id ?? ""}"></span><span>${x ? `${esc(itemName(x.id))} ×${x.n}` : "빈 칸"}</span>${x ? `<button data-unequip="${i}">빼기</button>` : ""}</div>`;
-  };
-  const stashHtml = () => {
-    const ids = Object.entries(s2.stash).filter(([, n]) => n > 0);
-    return ids.length ? ids.map(([id, n]) => `<div class="hq-stash"><span data-icon="${id}"></span>${esc(itemName(id))} ×${n} ${[0, 1, 2, 3].map((i) => `<button data-equip="${id}" data-slot="${i}">${i + 1}번 칸</button>`).join("")}</div>`).join("") : "<p>보관함이 비었어요.</p>";
-  };
-  const placeHtml = (id) => {
-    const npc = lines(`npc:${id}`, ctx()).map((l) => `<p class="hq-say"><b>${esc(l.who)}</b> ${esc(l.text)}</p>`).join("");
-    const P = PLACE_BY_ID[id];
-    const head = `<h2>${esc(P.name)}</h2>${npc}`;
-    switch (id) {
-      case "office":
-        return `${head}<h3>출동 요원</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "pick")).join("")}</div><h3>지원 요원 (C, 필살 게이지 절반)</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "support")).join("")}<button data-support="none" class="${s2.support ? "" : "sel"}">지원 없음</button></div>
-<h3>숙련 단계</h3><p>${unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).length ? unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).join(" · ") : "숙련 2부터 열려요"} — 새 동작은 숙련 3·6에서만.</p>`;
-      case "jaemtri": {
-        cards = missionBoard(s2, boardNames(card));
-        noteDeadlines(s2, cards);
-        if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
-        return `${head}<h3>임무 게시판</h3><div class="hq-cards">${cards.map((c) => `<button class="hq-mission${selMission === c.def.id ? " sel" : ""}" data-mission="${c.def.id}"><b>${esc(c.def.kind)}</b> ${esc(c.def.title)}<br><small>차원 승강기 · ${esc(c.def.depthLabel)} · 보상 예산 ${c.def.reward.budget}${c.def.reward.teeth ? ` · 이빨 ${c.def.reward.teeth}` : ""}${c.def.reward.research ? ` · 연구 ${c.def.reward.research}` : ""}${c.left !== void 0 ? ` · <em>구조 마감 출동 ${c.left}회</em>` : ""}${c.done ? " · 다시 하기" : ""}${c.linked ? ` · <em>본편 연계: ${esc(c.linked)}</em>` : ""}</small></button>`).join("")}</div><div class="hq-row"><button class="primary" data-act="brief" ${selMission ? "" : "disabled"}>브리핑 받기</button></div>
-<h3>규칙서 ${s2.rulebook.length}줄</h3><p class="hq-dim">${s2.rulebook.length ? s2.rulebook.map(esc).join(" · ") : "아직 없음. 표지를 읽고 송신하면 채워져요."}</p>`;
-      }
-      case "chief":
-        return `${head}<p>위험 단계: 지금 ${s2.danger} / 결재된 최대 ${s2.maxDanger}. 단계마다 적이 강해지고 보상이 오른다.</p><div class="hq-row">${Array.from({ length: s2.maxDanger + 1 }, (_, i) => `<button data-danger="${i}" class="${s2.danger === i ? "sel" : ""}">단계 ${i}</button>`).join("")}</div><div class="hq-row"><button data-act="approve">위험 단계 ${s2.maxDanger + 1} 결재 (예산 ${DANGER_COST(s2.maxDanger + 1)})</button></div>`;
-      case "supply":
-        return `${head}<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}
-<h3>보급품 (예산)</h3><div class="hq-buy">${supplyCatalog().map((d2) => `<button data-buy="${d2.id}" ${supplyOpen(s2, d2) ? "" : "disabled"}><span data-icon="${d2.id}"></span>${esc(d2.name)} · ${d2.price}<br><small>${supplyOpen(s2, d2) ? esc(d2.desc) : "연구 「진압 장비 보급 승인」 필요"}</small></button>`).join("")}</div>
-<h3>유물 2칸</h3>${[0, 1].map((i) => `<div class="hq-slotrow"><b>유물 ${i + 1}</b> <span>${s2.relics[i] ? esc(RELICS[s2.relics[i]].name) : "비어 있음"}</span> ${s2.relicsOwned.map((r) => `<button data-relic="${r}" data-slot="${i}">${esc(RELICS[r].name)}</button>`).join("")}${s2.relics[i] ? `<button data-relic="" data-slot="${i}">빼기</button>` : ""}</div>`).join("")}${s2.relicsOwned.length ? "" : '<p class="hq-dim">유물은 격리 연구실에서 연구로 얻어요.</p>'}`;
-      case "pantry":
-        return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s2.coffee === c.id ? "sel" : ""}">${esc(c.name)}<br><small>${esc(c.effect)}${c.who ? ` · ${esc(c.who)}` : ""}</small></button>`).join("")}</div>`;
-      case "clinic":
-        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc(a.name)}</b> <span>${s2.agents[a.id].injured ? `부상 · ${s2.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s2.agents[a.id].fatigue}`}</span>${s2.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ""}</div>`).join("")}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p>`;
-      case "interview":
-        return `${head}${s2.rescued.length ? s2.rescued.map((w) => `<div class="hq-slotrow"><b>${esc(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s2.interviewed.includes(w) ? "다시 듣기" : "면담"}</button></div>`).join("") : "<p>아직 구조한 사람이 없어요.</p>"}`;
-      case "training":
-        return `${head}<p>최다 층 ${s2.records.bestFloors} · 최다 처치 ${s2.records.bestKills} · 최단 귀환 ${s2.records.fastestReturn ? `${s2.records.fastestReturn}초` : "—"} · 최저 ${depthText(s2.deepest)}</p>${AGENTS.map((a) => `<p>${esc(a.name)}: 출동 ${s2.agents[a.id].runs}회 · 최저 ${depthText(s2.agents[a.id].deepest)}</p>`).join("")}<p class="hq-dim">허수아비 연습은 전투 모듈이 들어오면 여기서 시작한다.</p>`;
-      case "appraisal":
-        return `${head}<p>감정 대기: ${s2.appraisal.length ? s2.appraisal.map((b) => esc(b?.name)).join(", ") : "없음"}</p><div class="hq-row"><button data-act="appraise" ${s2.appraisal.length ? "" : "disabled"}>감정하기</button></div>`;
-      case "lab":
-        return `${head}<div class="hq-cards">${researchOpen(s2).map((r) => `<button data-research="${r.id}"><b>${esc(r.name)}</b><br><small>연구 자료 ${r.research} · 예산 ${r.budget}</small></button>`).join("") || "<p>지금 할 수 있는 연구를 다 했어요.</p>"}</div><p class="hq-dim">완료: ${s2.researchDone.map((id2) => esc(RESEARCH.find((r) => r.id === id2)?.name)).join(" · ") || "없음"}</p>`;
-      case "tooth":
-        return `${head}<div class="hq-row"><button data-act="tooth">이빨 ${TOOTH_COST}개 먹이고 상자 받기</button></div><p class="hq-dim">빼앗긴 유물: ${s2.lostRelics.length ? s2.lostRelics.map((r) => esc(RELICS[r].name)).join(", ") : "없음"}</p>`;
-      case "gallery":
-        return `${head}<p>완료한 임무 ${s2.missionsDone.length}: ${s2.missionsDone.map((m) => esc(MISSION_BY_ID[m]?.title)).join(" · ")}</p><p>장식: ${s2.decor.map(esc).join(", ") || "없음"}</p>`;
-      default:
-        return head;
-    }
-  };
-  const briefHtml = () => {
-    const m = MISSION_BY_ID[selMission];
-    const v = variantFor(pendingSeed);
-    const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
-    const say2 = (ls) => ls.map((l) => `<p class="hq-say"><b>${esc(l.who)}</b> ${esc(l.text)}</p>`).join("");
-    const st = statsFor(s2, s2.selected);
-    const can = canDeploy(s2, s2.selected);
-    return `<h2>브리핑 · ${esc(m.kind)}: ${esc(m.title)}</h2>${say2(lines("brief:jaemtri", c))}${say2(lines("brief:chief", c))}${say2(lines("brief:reply", c))}
-<div class="hq-brief"><p><b>출동</b> ${esc(AGENT_BY_ID[s2.selected].name)} (체력 ${st.hp}${s2.agents[s2.selected].fatigue ? `, 피로 ${s2.agents[s2.selected].fatigue}` : ""}) · 지원 ${s2.support && s2.support !== s2.selected ? esc(AGENT_BY_ID[s2.support].name) : "없음"} · 위험 단계 ${s2.danger} · 커피 ${esc(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "없음")}</p>
-<p><b>아이템</b> ${s2.loadout.map((x, i) => `${i + 1}:${x ? `${esc(itemName(x.id))}×${x.n}` : "—"}`).join(" ")} · <b>유물</b> ${s2.relics.filter(Boolean).map((r) => esc(RELICS[r].name)).join(", ") || "없음"}</p>
-${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
-<div class="hq-row"><button class="primary" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button data-go="supply">정비실 들르기</button><button data-go="pantry">탕비실 들르기</button><button data-act="close">돌아가기</button></div>`;
-  };
-  let pendingSeed = 0;
-  let evacJust = false;
-  const settleHtml = () => {
-    const l = s2.last;
-    const back = lines(`return:${l.how}`, ctx());
-    return `<h2>정산 · ${l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환"}</h2>${back.map((x) => `<p class="hq-say"><b>${esc(x.who)}</b> ${esc(x.text)}</p>`).join("")}<ul>${l.lines.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-<div class="hq-row"><button class="primary" data-act="close">본부로</button>${host?.link ? '<button data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`;
-  };
-  const menuHtml = () => `<h2>메뉴</h2><div class="hq-cols"><div><h3>재화</h3><p>예산 ${s2.currencies.budget} · 연구 자료 ${s2.currencies.research} · 이빨 ${s2.currencies.teeth}<br><small>현금은 출동 안에서만 쓰고, 귀환·철수하면 절반이 예산이 된다.</small></p>
-<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}<h3>유물</h3><p>${s2.relicsOwned.map((r) => `${esc(RELICS[r].name)} <small>${esc(RELICS[r].effect)}</small>`).join("<br>") || "없음"}</p></div>
-<div><h3>요원</h3>${AGENTS.map((a) => `<p><b>${esc(a.name)}</b> 숙련 ${masteryLevel(s2.agents[a.id].xp)} · 피로 ${s2.agents[a.id].fatigue}${s2.agents[a.id].injured ? " · 부상" : ""}</p>`).join("")}
-<h3>저장</h3><p class="hq-dim">자동 저장: 장소 이동·구매·정산 때마다. 아래는 수동 슬롯.</p>${host?.saves ? [1, 2, 3].map((n) => {
-    const m = slotList.find((x) => x.slot === n);
-    return `<div class="hq-slotrow"><b>슬롯 ${n}</b><span>${m ? `${esc(m.title)} · ${esc(m.summary)}` : "비어 있음"}</span><button data-saveslot="${n}">여기 저장</button>${m ? `<button data-loadslot="${n}">불러오기</button>` : ""}</div>`;
-  }).join("") : ""}
-<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? "" : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}">${esc(p.name)}</button>`).join("")}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
-  const bar2 = () => `<div class="hq-bar"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
-  const talkBox = (who, text, choices, extra = "") => {
-    const ph = photoOf(who);
-    return `<div class="hq-talk" role="dialog" aria-label="${esc(who)}"><div class="hq-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who">${esc(who)}</b><p class="hq-line">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
-  };
-  const missionTalk = () => {
-    cards = missionBoard(s2, boardNames(card));
-    noteDeadlines(s2, cards);
-    if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
-    const say2 = lines("npc:jaemtri", ctx())[0];
-    const sel = cards.find((c) => c.def.id === selMission);
-    const text = sel ? `${sel.def.kind} 건이에요. ${sel.def.title}. ${sel.def.depthLabel}까지, 끝나면 예산 ${sel.def.reward.budget}${sel.left !== void 0 ? `. 출동 ${sel.left}번 안에 가야 해요` : ""}.` : say2?.text ?? "오늘은 들어온 건이 없어요.";
-    const opts = cards.slice(0, 3).map((c) => `<button class="hq-choice${selMission === c.def.id ? " sel" : ""}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.title)}</button>`).join("");
-    return talkBox("잼트리", text, `${opts}<div class="hq-choice-row"><button class="hq-choice primary" data-act="brief" ${selMission ? "" : "disabled"}>이걸로 할게요</button><button class="hq-choice" data-act="close">나중에</button></div>`);
-  };
-  const briefTalk = () => {
-    const m = MISSION_BY_ID[selMission];
-    const v = variantFor(pendingSeed);
-    const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
-    const ls = [...lines("brief:jaemtri", c), ...lines("brief:chief", c)];
-    const can = canDeploy(s2, s2.selected);
-    const st = statsFor(s2, s2.selected);
-    const kit = `<p class="hq-kit">${esc(AGENT_BY_ID[s2.selected].name)} 체력 ${st.hp}${s2.agents[s2.selected].fatigue ? ` · 피로 ${s2.agents[s2.selected].fatigue}` : ""} · ${s2.loadout.map((x) => x ? `${esc(itemName(x.id))}×${x.n}` : "").filter(Boolean).join(" ") || "아이템 없음"}${s2.coffee ? ` · ${esc(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "")}` : ""}</p>${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}`;
-    const j = ls.find((l) => l.who === "잼트리") ?? ls[0];
-    return talkBox(j?.who ?? "잼트리", ls.filter((l) => l.who === (j?.who ?? "잼트리")).map((l) => l.text).join(" ") || m.title, `<button class="hq-choice primary" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button class="hq-choice" data-go="supply">정비실 먼저</button><button class="hq-choice" data-act="close">다시 고를게</button>`, kit);
-  };
-  const settleTalk = () => {
-    const l = s2.last;
-    const back = lines(`return:${l.how}`, ctx());
-    const first = back.find((x) => photoOf(x.who)) ?? back[0];
-    const who = first?.who || "잼트리";
-    const title2 = l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환";
-    const res = `<ul class="hq-result">${l.lines.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
-    return talkBox(who, `${title2}. ${first?.text ?? ""}`, `<div class="hq-choice-row"><button class="hq-choice primary" data-act="close">확인</button>${host?.link ? '<button class="hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`, res);
-  };
-  const renderFloat = () => {
-    const ov = wrap.querySelector(".hq-over");
-    const open = !!(overlay || panel);
-    ov.hidden = !open;
-    if (!open) return void (ov.innerHTML = "");
-    const talk = overlay === "brief" || overlay === "settle" || !overlay && panel === "jaemtri";
-    ov.classList.toggle("talk", talk);
-    if (talk) {
-      ov.innerHTML = (overlay === "brief" ? briefTalk() : overlay === "settle" ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : "");
-      return;
-    }
-    const body = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
-    ov.innerHTML = `<div class="hq-sheet">${bar2()}${body}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc(notice)}</p>` : ""}</div>`;
-    wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
-  };
-  const closeOne = () => {
-    if (overlay) overlay = null;
-    else panel = null;
-    notice = "";
-    render();
-    if (!overlay && !panel) host?.closed?.();
-  };
-  const render = () => {
-    if (!wrap) return;
-    if (!walk) return renderFloat();
-    wrap.querySelector(".hq-head").innerHTML = top();
-    const pane = wrap.querySelector(".hq-pane");
-    pane.innerHTML = panel ? `${placeHtml(panel)}${notice ? `<p class="hq-notice">${esc(notice)}</p>` : ""}` : `<p class="hq-dim">←→로 걸어 다니다 E로 들어가거나, 위 장소 단추를 누르세요. ${notice ? `<span class="hq-notice">${esc(notice)}</span>` : ""}</p>`;
-    const ov = wrap.querySelector(".hq-over");
-    ov.hidden = !overlay;
-    if (overlay) ov.innerHTML = `<div class="hq-sheet">${overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : menuHtml()}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc(notice)}</p>` : ""}</div>`;
-    wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
-  };
-  const say = (t) => {
-    notice = t;
-    void save2();
-    render();
-  };
-  const go = (id) => {
-    if (!placeOpen(s2, id)) return;
-    const p = PLACE_BY_ID[id];
-    s2.x = p.x + p.w / 2;
-    panel = id;
-    notice = "";
-    if (overlay === "brief" || overlay === "menu") overlay = null;
-    if (!walk) host?.goto?.(id);
-    barkPlace = id;
-    const l = lines(`npc:${id}`, ctx())[0];
-    if (l) bark = { ...l, t: 4, x: s2.x };
-    void save2();
-    render();
-  };
-  const refreshSlots = async () => {
-    if (!host?.saves) return;
-    slotList = await host.saves.list().catch(() => []);
-    if (overlay === "menu") render();
-  };
-  const onClick = (ev) => {
-    const t = ev.target.closest("button");
-    if (!t || t.disabled || !host) return;
-    const d2 = t.dataset;
-    if (d2.go) return go(d2.go);
-    if (d2.pick) return s2.selected = d2.pick, s2.support === s2.selected && (s2.support = null), say(`출동 요원: ${AGENT_BY_ID[s2.selected].name}`);
-    if (d2.support) return s2.support = d2.support === "none" ? null : d2.support, say(s2.support ? `지원 요원: ${AGENT_BY_ID[s2.support].name}` : "지원 요원 없음");
-    if (d2.mission) return selMission = d2.mission, s2.mission = d2.mission, render();
-    if (d2.buy) return say(buy(s2, d2.buy));
-    if (d2.equip) return say(equip(s2, Number(d2.slot), d2.equip));
-    if (d2.unequip) return unequip(s2, Number(d2.unequip)), say(`${Number(d2.unequip) + 1}번 칸 비움`);
-    if (d2.relic !== void 0) return say(equipRelic(s2, Number(d2.slot), d2.relic || null));
-    if (d2.coffee) return say(pickCoffee(s2, s2.coffee === d2.coffee ? null : d2.coffee));
-    if (d2.treat) return say(treat(s2, d2.treat));
-    if (d2.interview) return say(interview(s2, d2.interview));
-    if (d2.research) return say(doResearch(s2, d2.research));
-    if (d2.danger) return setDanger(s2, Number(d2.danger)), say(`위험 단계 ${s2.danger}`);
-    if (d2.saveslot) {
-      pickSlot = Number(d2.saveslot);
-      void host.saves?.write(pickSlot, saveText(s2), { ...saveTitle(s2), schema: HQ_SCHEMA }).then(() => (notice = `슬롯 ${pickSlot}에 저장했어요.`, refreshSlots()));
-      return;
-    }
-    if (d2.loadslot) {
-      void host.saves?.read(Number(d2.loadslot)).then((txt) => {
-        const got = parseSave(txt);
-        if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
-        s2 = got;
-        overlay = null;
-        panel = null;
-        say(`슬롯 ${d2.loadslot}을(를) 불러왔어요.`);
-      });
-      return;
-    }
-    switch (d2.act) {
-      case "menu":
-        overlay = "menu";
-        notice = "";
-        void refreshSlots();
-        return render();
-      case "close":
-        if (!walk) return closeOne();
-        overlay = null;
-        notice = "";
-        return render();
-      case "brief":
-        pendingSeed = Math.floor(rand2() * 1e9);
-        overlay = "brief";
-        notice = "";
-        return render();
-      case "deploy": {
-        const l = launch(s2, selMission, pendingSeed);
-        if (typeof l === "string") return say(l);
-        pending = l;
-        overlay = null;
-        panel = null;
-        void save2();
-        render();
-        if (walk) wrap.hidden = true;
-        evacJust = false;
-        host.deploy(l);
-        return;
-      }
-      case "approve":
-        return say(approveDanger(s2));
-      case "appraise":
-        return say(appraise(s2).join(" / "));
-      case "tooth":
-        return say(openToothBox(s2, rand2));
-      case "report": {
-        const p = reportPayload(s2);
-        if (p && host.link) void host.link.report(p).then((m) => say(m), () => say("보고서를 붙이지 못했어요."));
-        return;
-      }
-      case "reset":
-        if (!confirm("본부 기록(재화·규칙서·숙련)을 지우고 처음부터 할까요?")) return;
-        s2 = newSave();
-        overlay = null;
-        panel = null;
-        return say("처음부터 시작해요.");
-    }
-  };
-  const onKey = (ev) => {
-    if (!wrap || wrap.hidden) return;
-    const tg = ev.target;
-    if (tg && (tg.tagName === "INPUT" || tg.tagName === "TEXTAREA" || tg.isContentEditable)) return;
-    if (ev.type === "keyup") return void keys.delete(ev.code);
-    if (ev.code === "ArrowLeft" || ev.code === "ArrowRight") keys.add(ev.code), ev.preventDefault();
-    if (ev.repeat) return;
-    if (ev.code === "Escape") {
-      overlay = overlay ? null : "menu";
-      if (overlay) void refreshSlots();
-      notice = "";
-      render();
-    } else if (ev.code === "KeyE" && !overlay) {
-      const p = placeAt(s2.x);
-      if (p) go(p.id);
-    }
-  };
-  const onPointer = (ev) => {
-    const t = ev.target.closest("[data-move]");
-    if (ev.type === "pointerdown" && t) {
-      moving = Number(t.dataset.move);
-      if (!moving) {
-        const p = placeAt(s2.x);
-        if (p) go(p.id);
-      }
-    } else if (ev.type !== "pointerdown") moving = 0;
-  };
-  const blur = () => (keys.clear(), moving = 0);
-  const mod = {
-    get state() {
-      return s2;
-    },
-    mount(r, h, opt) {
-      root = r;
-      host = h;
-      walk = opt?.walk !== false;
-      wrap = document.createElement("section");
-      wrap.className = walk ? "hq" : "hq hq-float";
-      wrap.tabIndex = 0;
-      wrap.innerHTML = walk ? `<style>${style_default}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>` : `<style>${style_default}</style><div class="hq-over" hidden></div>`;
-      root.append(wrap);
-      canvas = wrap.querySelector("canvas");
-      wrap.addEventListener("click", onClick);
-      if (walk) {
-        wrap.addEventListener("pointerdown", onPointer);
-        window.addEventListener("pointerup", onPointer);
-        window.addEventListener("pointercancel", onPointer);
-        window.addEventListener("keydown", onKey);
-        window.addEventListener("keyup", onKey);
-        window.addEventListener("blur", blur);
-      }
-      render();
-      void (async () => {
-        const got = parseSave(await h.load().catch(() => null));
-        if (got) s2 = got;
-        if (s2.active) {
-          s2.active = null;
-          notice = "지난 출동이 끝나지 않은 채 닫혔어요. 요원은 후송된 것으로 처리했어요.";
-        }
-        card = await h.link?.card().catch(() => null) ?? null;
-        render();
-        wrap?.focus({ preventScroll: true });
-      })();
-      last = performance.now();
-      if (walk) raf = requestAnimationFrame(tick);
-    },
-    map: () => hqMap(s2, evacJust),
-    bark(place3) {
-      if (!placeOpen(s2, place3)) return null;
-      return lines(`npc:${place3}`, ctx())[0] ?? null;
-    },
-    places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s2, p.id), opens: p.opens })),
-    openPlace(id) {
-      if (!placeOpen(s2, id)) return;
-      overlay = null;
-      panel = id;
-      notice = "";
-      s2.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
-      void save2();
-      render();
-    },
-    openMenu() {
-      overlay = "menu";
-      notice = "";
-      void refreshSlots();
-      render();
-    },
-    isOpen: () => walk ? !!overlay : !!(overlay || panel),
-    close: () => walk ? (overlay = null, render()) : closeOne(),
-    onReturn(result, l) {
-      const ls = settle(s2, l, result, rand2);
-      evacJust = result.how === "evac";
-      pending = null;
-      overlay = "settle";
-      if (walk) {
-        if (result.how === "evac") go("clinic");
-        else go("jaemtri");
-      } else panel = null;
-      overlay = "settle";
-      if (wrap) wrap.hidden = false, wrap.focus({ preventScroll: true });
-      void save2();
-      render();
-      void ls;
-    },
-    unmount() {
-      cancelAnimationFrame(raf);
-      void save2();
-      window.removeEventListener("pointerup", onPointer);
-      window.removeEventListener("pointercancel", onPointer);
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("keyup", onKey);
-      window.removeEventListener("blur", blur);
-      wrap?.remove();
-      wrap = canvas = root = null;
-      host = null;
-    }
-  };
-  void pending;
-  return mod;
-}
-
-// src/game/action/hq/store.ts
-function memorySaves() {
-  const data = /* @__PURE__ */ new Map();
-  const metas = /* @__PURE__ */ new Map();
-  return {
-    read: async (slot) => data.get(slot) ?? null,
-    write: async (slot, d2, m) => {
-      data.set(slot, d2);
-      metas.set(slot, { slot, savedAt: Date.now(), ...m });
-    },
-    list: async () => [...metas.values()].sort((a, b) => a.slot - b.slot)
-  };
-}
-function idbSaves(dbName = "goei-hq-demo") {
-  let dbp = null;
-  const fallback = memorySaves();
-  const open = () => dbp ??= new Promise((res, rej) => {
-    const req = indexedDB.open(dbName, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("kv");
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-  const get = async (key) => {
-    const db = await open();
-    return new Promise((res, rej) => {
-      const r = db.transaction("kv").objectStore("kv").get(key);
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-  };
-  const put = async (key, v) => {
-    const db = await open();
-    await new Promise((res, rej) => {
-      const tx = db.transaction("kv", "readwrite");
-      tx.objectStore("kv").put(v, key);
-      tx.oncomplete = () => res();
-      tx.onerror = () => rej(tx.error);
-    });
-  };
-  let broken = false;
-  const safe = async (f, alt) => {
-    if (broken) return alt();
-    try {
-      return await f();
-    } catch {
-      broken = true;
-      return alt();
-    }
-  };
-  return {
-    read: (slot) => safe(async () => await get(`goei:game:slot:${slot}`) ?? null, () => fallback.read(slot)),
-    write: (slot, d2, m) => safe(
-      async () => {
-        await put(`goei:game:slot:${slot}`, d2);
-        const list = await get("goei:game:slots") ?? [];
-        await put("goei:game:slots", [...list.filter((x) => x.slot !== slot), { slot, savedAt: Date.now(), ...m }].sort((a, b) => a.slot - b.slot));
-      },
-      () => fallback.write(slot, d2, m)
-    ),
-    list: () => safe(async () => await get("goei:game:slots") ?? [], () => fallback.list())
-  };
-}
 
 // src/game/action/ui/kit.gen.ts
 var KIT_META = { "panel": { "w": 192, "h": 184, "slice": [17, 17, 17, 17] }, "row": { "w": 167, "h": 23, "slice": [6, 4, 6, 19] }, "portrait": { "w": 69, "h": 67, "slice": [9, 9, 9, 9] }, "bar": { "w": 169, "h": 27, "slice": [5, 14, 5, 14] }, "slot": { "w": 50, "h": 50, "slice": [7, 7, 7, 7] } };
@@ -8191,7 +7558,7 @@ var InputHub = class {
 };
 
 // src/game/action/ui/menu.ts
-var esc2 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+var esc = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 var focusable = (it) => it.type !== "head" && it.type !== "html" && !(it.type === "button" && it.disabled);
 var Menu = class {
   constructor(layer) {
@@ -8372,27 +7739,27 @@ var Menu = class {
       const f = i === this.focus ? " f" : "";
       switch (it.type) {
         case "head":
-          return `<div class="mn-head">${esc2(it.label)}</div>`;
+          return `<div class="mn-head">${esc(it.label)}</div>`;
         case "html":
           return `<div class="mn-html">${it.html}</div>`;
         case "button": {
           bn++;
           const num = s2.numbered ? `<em>${bn}</em>` : "";
-          return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? " danger" : ""}" data-i="${i}" ${it.disabled ? "disabled" : ""}>${num}<span>${esc2(it.label)}</span>${it.sub ? `<small>${esc2(it.sub)}</small>` : ""}</button>`;
+          return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? " danger" : ""}" data-i="${i}" ${it.disabled ? "disabled" : ""}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`;
         }
         case "toggle":
-          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc2(it.label)}</span><b class="mn-tog ${it.get() ? "on" : ""}"><i></i></b></div>`;
+          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? "on" : ""}"><i></i></b></div>`;
         case "slider": {
           const v = it.get();
           const k = (v - it.min) / (it.max - it.min);
-          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc2(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc2(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
+          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
         }
         case "choice":
-          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc2(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc2(v)}" class="${v === it.get() ? "on" : ""}">${esc2(l)}</b>`).join("")}</span></div>`;
+          return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? "on" : ""}">${esc(l)}</b>`).join("")}</span></div>`;
       }
     }).join("");
     const back = s2.noBack || s2.look === "title" ? "" : `<button type="button" class="mn-x" data-back aria-label="뒤로">✕</button>`;
-    const title2 = s2.look === "title" ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc2(s2.title ?? "")}</b><span>${esc2(s2.sub ?? "")}</span></div>` : s2.title ? `<h2>${esc2(s2.title)}</h2>${s2.sub ? `<p class="mn-sub">${esc2(s2.sub)}</p>` : ""}` : "";
+    const title2 = s2.look === "title" ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc(s2.title ?? "")}</b><span>${esc(s2.sub ?? "")}</span></div>` : s2.title ? `<h2>${esc(s2.title)}</h2>${s2.sub ? `<p class="mn-sub">${esc(s2.sub)}</p>` : ""}` : "";
     this.el.innerHTML = `<div class="mn-box${s2.look === "title" ? "" : " gk-panel"}">${back}${title2}<div class="mn-list">${rows}</div></div>`;
     this.el.querySelector(".f")?.scrollIntoView({ block: "nearest" });
   }
@@ -8409,7 +7776,7 @@ function choiceScreen(menu, o, pick6) {
     noBack: o.cancel === false,
     back: () => pick6(-1),
     items: [
-      ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc2(l)}</p>`).join("") }] : [],
+      ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc(l)}</p>`).join("") }] : [],
       ...o.options.map((label3, i) => ({ type: "button", label: label3, act: () => pick6(i) }))
     ]
   };
@@ -9080,10 +8447,10 @@ function mountGameShell(box3, o = {}) {
   stage.onResize(() => touch2.layout());
   const controlsHtml = () => {
     const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
-      const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc2(KEY_NAME[a])}</kbd>`;
+      const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
       const pd = PAD_NAME[CODE[a]] ?? "";
       const tc = a === "left" ? "왼쪽 스틱" : a === "menu" ? "☰" : a === "auto" || a === "hitbox" ? "메뉴" : a.startsWith("item") ? "아래 칸" : a === "evade" ? "회피 (스틱 끝 = 달리기)" : "버튼";
-      return `<tr><td>${esc2(a === "left" ? "이동 (좌우 + 안쪽·앞쪽)" : LABEL[a])}</td><td>${kb}</td><td>${esc2(pd)}</td><td>${esc2(tc)}</td></tr>`;
+      return `<tr><td>${esc(a === "left" ? "이동 (좌우 + 안쪽·앞쪽)" : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
     }).join("");
     return `<table><tr><th>행동</th><th>키보드</th><th>게임패드</th><th>터치</th></tr>${rows}</table><p style="margin-top:10px">Shift 를 0.15초 안에 떼면 회피, 누르고 있으면 달리기. 같은 방향 두 번도 달리기. ↓ 두 번 앉기.</p>`;
   };
@@ -9110,7 +8477,7 @@ function mountGameShell(box3, o = {}) {
       { type: "toggle", label: "스틱 끝까지 밀면 달리기", get: () => s2.stickRun, set: (v) => s2.stickRun = v },
       { type: "toggle", label: "왼손 배치", get: () => s2.lefty, set: (v) => s2.lefty = v },
       { type: "toggle", label: "진동", get: () => s2.vibrate, set: (v) => s2.vibrate = v },
-      { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc2(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
+      { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
       { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS2 }, apply(), saveSettings(), menu.replace(settingsScreen())) }
     ];
   };
@@ -9210,7 +8577,7 @@ function mountGameShell(box3, o = {}) {
           title: "확인",
           back: () => (menu.pop(), res(false)),
           items: [
-            { type: "html", html: `<p>${esc2(text)}</p>` },
+            { type: "html", html: `<p>${esc(text)}</p>` },
             { type: "button", label: yes, act: () => (menu.pop(), res(true)) },
             { type: "button", label: no, act: () => (menu.pop(), res(false)) }
           ]
@@ -9224,7 +8591,7 @@ function mountGameShell(box3, o = {}) {
           title: title2,
           look: "wide",
           back: () => (menu.pop(), res()),
-          items: [{ type: "html", html: lines2.map((l) => `<p>${esc2(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
+          items: [{ type: "html", html: lines2.map((l) => `<p>${esc(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
         });
       });
     },
@@ -9243,6 +8610,664 @@ function mountGameShell(box3, o = {}) {
   })();
   apply();
   return shell;
+}
+
+// src/game/action/hq/state.ts
+var HQ_SCHEMA = "goei-hq/1";
+var agentRecord = () => ({ xp: 0, fatigue: 0, injured: 0, runs: 0, deepest: 0, seenLevel: 1 });
+function newSave() {
+  return {
+    schema: HQ_SCHEMA,
+    day: 1,
+    runs: 0,
+    x: 200,
+    currencies: { budget: 200, research: 0, teeth: 0 },
+    agents: { jyaldi: agentRecord(), eileen: agentRecord() },
+    selected: "jyaldi",
+    support: null,
+    stash: { medkit: 1, salt: 1 },
+    loadout: [{ id: "medkit", n: 2 }, { id: "bandage", n: 1 }, { id: "flash", n: 1 }, null],
+    relicsOwned: [],
+    relics: [null, null],
+    coffee: null,
+    researchDone: [],
+    appraisal: [],
+    rulebook: [],
+    deepest: 0,
+    missionsDone: [],
+    mission: null,
+    deadlines: {},
+    failedRescues: [],
+    danger: 0,
+    maxDanger: 0,
+    flags: { firstRun: false, firstRecovery: false, firstAppraisal: false, firstSuppress: false, firstRescue: false },
+    album: [],
+    storyFlags: {},
+    decor: [],
+    rescued: [],
+    interviewed: [],
+    lostRelics: [],
+    last: null,
+    active: null,
+    records: { bestFloors: 0, bestKills: 0, fastestReturn: 0 }
+  };
+}
+function parseSave(text) {
+  if (!text) return null;
+  let d2;
+  try {
+    d2 = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (!d2 || typeof d2 !== "object" || d2.schema !== HQ_SCHEMA) return null;
+  const base = newSave();
+  const out = { ...base, ...d2 };
+  out.currencies = { ...base.currencies, ...d2.currencies };
+  out.flags = { ...base.flags, ...d2.flags };
+  out.records = { ...base.records, ...d2.records };
+  out.agents = { ...base.agents };
+  for (const id of Object.keys(base.agents)) out.agents[id] = { ...agentRecord(), ...d2.agents?.[id] };
+  if (!Array.isArray(out.loadout) || out.loadout.length !== 4) out.loadout = base.loadout;
+  if (!Array.isArray(out.relics) || out.relics.length !== 2) out.relics = [null, null];
+  const fix = (id) => OLD_ITEM_IDS[id] ?? id;
+  out.loadout = out.loadout.map((x) => x ? { id: fix(x.id), n: x.n } : null);
+  const stash = {};
+  for (const [id, n] of Object.entries(out.stash ?? {})) stash[fix(id)] = (stash[fix(id)] ?? 0) + n;
+  out.stash = stash;
+  return out;
+}
+var saveText = (s2) => JSON.stringify(s2);
+
+// src/game/action/hq/view.ts
+var PHOTO_KEY = { 잼트리: "Jaemtri", 부장: "Jyaldi", 쟈알디: "Jyaldi", 에일린: "Aileen", 콘쥬스: "Konjyuce", 데쥬레: "Dejure", 고그니쟈: "Gognija" };
+var photoOf = (who) => demo_photos_default[PHOTO_KEY[who] ?? ""] ?? "";
+var esc2 = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+var VW = 1280;
+var VH = 400;
+var FLOOR_Y = 330;
+var depthText = (d2) => d2 ? d2 <= 3 ? `L${d2}` : `B-${d2 - 3}` : "—";
+function createHq() {
+  let s2 = newSave();
+  let host = null;
+  let root = null;
+  let wrap = null;
+  let canvas = null;
+  let raf = 0;
+  let last = 0;
+  let card = null;
+  let panel = null;
+  let overlay = null;
+  let notice = "";
+  let bark = null;
+  let barkPlace = null;
+  let moving = 0;
+  let pending = null;
+  let cards = [];
+  let selMission = null;
+  let slotList = [];
+  let pickSlot = 0;
+  let walk = true;
+  const rand2 = () => (host?.rand ?? Math.random)();
+  const keys = /* @__PURE__ */ new Set();
+  const idlers = {};
+  const ctx = () => ({ agent: s2.selected, agentName: AGENT_BY_ID[s2.selected].name, fatigue: s2.agents[s2.selected].fatigue, day: s2.day, rand: rand2 });
+  const save2 = () => host?.save(saveText(s2)).catch(() => {
+  });
+  const placeAt = (x) => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
+  const draw = (dt) => {
+    if (!canvas) return;
+    const c = canvas.getContext("2d");
+    const cam = Math.max(0, Math.min(HQ_WIDTH - VW, s2.x - VW / 2));
+    c.fillStyle = "#0b0f13";
+    c.fillRect(0, 0, VW, VH);
+    c.save();
+    c.translate(-cam, 0);
+    for (const p of PLACES) {
+      const open = placeOpen(s2, p.id);
+      c.fillStyle = open ? p.color : "#15191d";
+      c.fillRect(p.x, 40, p.w, FLOOR_Y - 40);
+      c.strokeStyle = open ? "#6b7d86" : "#2a3036";
+      c.lineWidth = 2;
+      c.strokeRect(p.x + 1, 41, p.w - 2, FLOOR_Y - 42);
+      c.fillStyle = open ? "#e8e2c8" : "#59626a";
+      c.font = "20px sans-serif";
+      c.textAlign = "center";
+      c.fillText(p.name, p.x + p.w / 2, 72);
+      c.font = "14px sans-serif";
+      c.fillStyle = open ? "#9fb2ba" : "#59626a";
+      c.fillText(open ? p.floor : `잠김 · ${p.opens}`, p.x + p.w / 2, 94);
+      if (open && p.npc && p.id !== "office") {
+        c.fillStyle = "#c8b27a";
+        c.fillRect(p.x + p.w * 0.75 - 22, FLOOR_Y - 120, 44, 120);
+        c.fillStyle = "#1a1a1a";
+        c.font = "13px sans-serif";
+        c.fillStyle = "#c8b27a";
+        c.fillText(p.npc, p.x + p.w * 0.75, FLOOR_Y - 128);
+      }
+      if (p.id === "office" && s2.decor.length) {
+        c.fillStyle = "#8a7a5a";
+        s2.decor.slice(0, 6).forEach((_, i) => c.fillRect(p.x + 30 + i * 60, FLOOR_Y - 150, 26, 18));
+      }
+      if (p.id === "gallery" && open) {
+        c.fillStyle = "#4a6a7a";
+        s2.missionsDone.forEach((_, i) => c.fillRect(p.x + 20 + i % 6 * 46, FLOOR_Y - 160 + Math.floor(i / 6) * 50, 34, 34));
+      }
+    }
+    c.fillStyle = "#20262b";
+    c.fillRect(0, FLOOR_Y, HQ_WIDTH, VH - FLOOR_Y);
+    c.fillStyle = "#556";
+    c.fillRect(PLACE_BY_ID.training.x - 40, FLOOR_Y - 200, 20, 200);
+    c.fillStyle = "#9ab";
+    c.font = "12px sans-serif";
+    c.fillText("계단 ↓ 지하", PLACE_BY_ID.training.x - 30, FLOOR_Y - 208);
+    for (const a of AGENTS) {
+      if (a.id === s2.selected) continue;
+      const it = idlers[a.id] ??= { x: PLACE_BY_ID.office.x + 260, to: PLACE_BY_ID.office.x + 260, wait: 2 };
+      it.wait -= dt;
+      if (it.wait <= 0 && Math.abs(it.x - it.to) < 2) {
+        const spots = [PLACE_BY_ID.office.x + 80, PLACE_BY_ID.office.x + 300, PLACE_BY_ID.pantry.x + 120];
+        it.to = spots[Math.floor(rand2() * spots.length)];
+        it.wait = 4 + rand2() * 6;
+      }
+      it.x += Math.sign(it.to - it.x) * Math.min(Math.abs(it.to - it.x), 60 * dt);
+      const rec = s2.agents[a.id];
+      c.fillStyle = a.color + (rec.injured ? "66" : "aa");
+      c.fillRect(it.x - 20, FLOOR_Y - 104, 40, 104);
+      c.fillStyle = "#ddd";
+      c.font = "13px sans-serif";
+      c.fillText(`${a.name}${rec.injured ? " (부상)" : rec.fatigue >= 2 ? " (피곤)" : ""}`, it.x, FLOOR_Y - 112);
+    }
+    const me = AGENT_BY_ID[s2.selected];
+    c.fillStyle = me.color;
+    c.fillRect(s2.x - 22, FLOOR_Y - 112, 44, 112);
+    c.fillStyle = "#fff";
+    c.font = "bold 14px sans-serif";
+    c.fillText(me.name, s2.x, FLOOR_Y - 120);
+    const here = placeAt(s2.x);
+    if (here && placeOpen(s2, here.id)) {
+      c.fillStyle = "#ffd080";
+      c.font = "bold 16px sans-serif";
+      c.fillText("E 들어가기", s2.x, FLOOR_Y + 34);
+    }
+    if (bark && bark.t > 0) {
+      bark.t -= dt;
+      c.font = "15px sans-serif";
+      const text = `${bark.who}: ${bark.text}`;
+      const w = Math.min(560, c.measureText(text).width + 24);
+      const bx = Math.max(cam + 8, Math.min(cam + VW - w - 8, bark.x - w / 2));
+      c.fillStyle = "#f2ecd8";
+      c.fillRect(bx, 110, w, 34);
+      c.fillStyle = "#1a1a1a";
+      c.textAlign = "left";
+      c.fillText(text.length > 44 ? text.slice(0, 43) + "…" : text, bx + 12, 133);
+    }
+    c.restore();
+  };
+  const tick = (now) => {
+    raf = requestAnimationFrame(tick);
+    const dt = Math.min(0.1, (now - last) / 1e3 || 0);
+    last = now;
+    if (!wrap || wrap.hidden) return;
+    const dir = (keys.has("ArrowRight") ? 1 : 0) - (keys.has("ArrowLeft") ? 1 : 0) || moving;
+    if (dir && !overlay) {
+      s2.x = Math.max(20, Math.min(HQ_WIDTH - 20, s2.x + dir * 320 * dt));
+      const p = placeAt(s2.x);
+      if (p && p.id !== barkPlace && placeOpen(s2, p.id)) {
+        barkPlace = p.id;
+        const l = lines(`npc:${p.id}`, ctx())[0];
+        if (l) bark = { ...l, t: 4, x: p.x + p.w / 2 };
+      }
+    }
+    draw(dt);
+  };
+  const top = () => `<div class="hq-top"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><span>최저 ${depthText(s2.deepest)}</span><button data-act="menu">Esc 메뉴</button></div>
+<nav class="hq-places">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}" class="${panel === p.id ? "sel" : ""}">${esc2(p.name)}</button>`).join("")}</nav>`;
+  const agentCard = (id, mode) => {
+    const a = AGENT_BY_ID[id];
+    const rec = s2.agents[id];
+    const lv = masteryLevel(rec.xp);
+    const nx = masteryNext(rec.xp);
+    const can = canDeploy(s2, id);
+    const ros = rosterFor(card, id);
+    const photo = ros?.photo && /^(data:|https?:|blob:)/.test(ros.photo) ? `<img src="${esc2(ros.photo)}" alt="">` : `<i style="background:${a.color}"></i>`;
+    const sel = mode === "pick" ? s2.selected === id : s2.support === id;
+    return `<button class="hq-agent${sel ? " sel" : ""}" data-${mode}="${id}" ${mode === "support" && id === s2.selected ? "disabled" : ""}>${photo}<span><b>${esc2(ros?.name ?? a.name)}</b> · ${esc2(a.weapon)}<br>숙련 ${lv}${nx ? ` (${rec.xp}/${nx})` : " (최고)"} · 출동 ${rec.runs}회 · 최저 ${depthText(rec.deepest)}<br>${rec.injured ? `<em>부상 ${rec.injured}일</em>` : rec.fatigue ? `피로 ${rec.fatigue}` : "컨디션 좋음"}</span></button>`;
+  };
+  const slotHtml = (i) => {
+    const x = s2.loadout[i];
+    return `<div class="hq-slotrow"><b>${i + 1}</b><span data-icon="${x?.id ?? ""}"></span><span>${x ? `${esc2(itemName(x.id))} ×${x.n}` : "빈 칸"}</span>${x ? `<button data-unequip="${i}">빼기</button>` : ""}</div>`;
+  };
+  const stashHtml = () => {
+    const ids = Object.entries(s2.stash).filter(([, n]) => n > 0);
+    return ids.length ? ids.map(([id, n]) => `<div class="hq-stash"><span data-icon="${id}"></span>${esc2(itemName(id))} ×${n} ${[0, 1, 2, 3].map((i) => `<button data-equip="${id}" data-slot="${i}">${i + 1}번 칸</button>`).join("")}</div>`).join("") : "<p>보관함이 비었어요.</p>";
+  };
+  const placeHtml = (id) => {
+    const npc = lines(`npc:${id}`, ctx()).map((l) => `<p class="hq-say"><b>${esc2(l.who)}</b> ${esc2(l.text)}</p>`).join("");
+    const P = PLACE_BY_ID[id];
+    const head = `<h2>${esc2(P.name)}</h2>${npc}`;
+    switch (id) {
+      case "office":
+        return `${head}<h3>출동 요원</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "pick")).join("")}</div><h3>지원 요원 (C, 필살 게이지 절반)</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "support")).join("")}<button data-support="none" class="${s2.support ? "" : "sel"}">지원 없음</button></div>
+<h3>숙련 단계</h3><p>${unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).length ? unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).join(" · ") : "숙련 2부터 열려요"} — 새 동작은 숙련 3·6에서만.</p>`;
+      case "jaemtri": {
+        cards = missionBoard(s2, boardNames(card));
+        noteDeadlines(s2, cards);
+        if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
+        return `${head}<h3>임무 게시판</h3><div class="hq-cards">${cards.map((c) => `<button class="hq-mission${selMission === c.def.id ? " on" : ""}" data-mission="${c.def.id}"><b>${esc2(c.def.kind)}</b> ${esc2(c.def.title)}<br><small>차원 승강기 · ${esc2(c.def.depthLabel)} · 보상 예산 ${c.def.reward.budget}${c.def.reward.teeth ? ` · 이빨 ${c.def.reward.teeth}` : ""}${c.def.reward.research ? ` · 연구 ${c.def.reward.research}` : ""}${c.left !== void 0 ? ` · <em>구조 마감 출동 ${c.left}회</em>` : ""}${c.done ? " · 다시 하기" : ""}${c.linked ? ` · <em>본편 연계: ${esc2(c.linked)}</em>` : ""}</small></button>`).join("")}</div><div class="hq-row"><button class="primary" data-act="brief" ${selMission ? "" : "disabled"}>브리핑 받기</button></div>
+<h3>규칙서 ${s2.rulebook.length}줄</h3><p class="hq-dim">${s2.rulebook.length ? s2.rulebook.map(esc2).join(" · ") : "아직 없음. 표지를 읽고 송신하면 채워져요."}</p>`;
+      }
+      case "chief":
+        return `${head}<p>위험 단계: 지금 ${s2.danger} / 결재된 최대 ${s2.maxDanger}. 단계마다 적이 강해지고 보상이 오른다.</p><div class="hq-row">${Array.from({ length: s2.maxDanger + 1 }, (_, i) => `<button data-danger="${i}" class="${s2.danger === i ? "sel" : ""}">단계 ${i}</button>`).join("")}</div><div class="hq-row"><button data-act="approve">위험 단계 ${s2.maxDanger + 1} 결재 (예산 ${DANGER_COST(s2.maxDanger + 1)})</button></div>`;
+      case "supply":
+        return `${head}<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}
+<h3>보급품 (예산)</h3><div class="hq-buy">${supplyCatalog().map((d2) => `<button data-buy="${d2.id}" ${supplyOpen(s2, d2) ? "" : "disabled"}><span data-icon="${d2.id}"></span>${esc2(d2.name)} · ${d2.price}<br><small>${supplyOpen(s2, d2) ? esc2(d2.desc) : "연구 「진압 장비 보급 승인」 필요"}</small></button>`).join("")}</div>
+<h3>유물 2칸</h3>${[0, 1].map((i) => `<div class="hq-slotrow"><b>유물 ${i + 1}</b> <span>${s2.relics[i] ? esc2(RELICS[s2.relics[i]].name) : "비어 있음"}</span> ${s2.relicsOwned.map((r) => `<button data-relic="${r}" data-slot="${i}">${esc2(RELICS[r].name)}</button>`).join("")}${s2.relics[i] ? `<button data-relic="" data-slot="${i}">빼기</button>` : ""}</div>`).join("")}${s2.relicsOwned.length ? "" : '<p class="hq-dim">유물은 격리 연구실에서 연구로 얻어요.</p>'}`;
+      case "pantry":
+        return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s2.coffee === c.id ? "sel" : ""}">${esc2(c.name)}<br><small>${esc2(c.effect)}${c.who ? ` · ${esc2(c.who)}` : ""}</small></button>`).join("")}</div>`;
+      case "clinic":
+        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc2(a.name)}</b> <span>${s2.agents[a.id].injured ? `부상 · ${s2.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s2.agents[a.id].fatigue}`}</span>${s2.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ""}</div>`).join("")}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p>`;
+      case "interview":
+        return `${head}${s2.rescued.length ? s2.rescued.map((w) => `<div class="hq-slotrow"><b>${esc2(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s2.interviewed.includes(w) ? "다시 듣기" : "면담"}</button></div>`).join("") : "<p>아직 구조한 사람이 없어요.</p>"}`;
+      case "training":
+        return `${head}<p>최다 층 ${s2.records.bestFloors} · 최다 처치 ${s2.records.bestKills} · 최단 귀환 ${s2.records.fastestReturn ? `${s2.records.fastestReturn}초` : "—"} · 최저 ${depthText(s2.deepest)}</p>${AGENTS.map((a) => `<p>${esc2(a.name)}: 출동 ${s2.agents[a.id].runs}회 · 최저 ${depthText(s2.agents[a.id].deepest)}</p>`).join("")}<p class="hq-dim">허수아비 연습은 전투 모듈이 들어오면 여기서 시작한다.</p>`;
+      case "appraisal":
+        return `${head}<p>감정 대기: ${s2.appraisal.length ? s2.appraisal.map((b) => esc2(b?.name)).join(", ") : "없음"}</p><div class="hq-row"><button data-act="appraise" ${s2.appraisal.length ? "" : "disabled"}>감정하기</button></div>`;
+      case "lab":
+        return `${head}<div class="hq-cards">${researchOpen(s2).map((r) => `<button data-research="${r.id}"><b>${esc2(r.name)}</b><br><small>연구 자료 ${r.research} · 예산 ${r.budget}</small></button>`).join("") || "<p>지금 할 수 있는 연구를 다 했어요.</p>"}</div><p class="hq-dim">완료: ${s2.researchDone.map((id2) => esc2(RESEARCH.find((r) => r.id === id2)?.name)).join(" · ") || "없음"}</p>`;
+      case "tooth":
+        return `${head}<div class="hq-row"><button data-act="tooth">이빨 ${TOOTH_COST}개 먹이고 상자 받기</button></div><p class="hq-dim">빼앗긴 유물: ${s2.lostRelics.length ? s2.lostRelics.map((r) => esc2(RELICS[r].name)).join(", ") : "없음"}</p>`;
+      case "gallery":
+        return `${head}<p>완료한 임무 ${s2.missionsDone.length}: ${s2.missionsDone.map((m) => esc2(MISSION_BY_ID[m]?.title)).join(" · ")}</p><p>장식: ${s2.decor.map(esc2).join(", ") || "없음"}</p>`;
+      default:
+        return head;
+    }
+  };
+  const briefHtml = () => {
+    const m = MISSION_BY_ID[selMission];
+    const v = variantFor(pendingSeed);
+    const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
+    const say2 = (ls) => ls.map((l) => `<p class="hq-say"><b>${esc2(l.who)}</b> ${esc2(l.text)}</p>`).join("");
+    const st = statsFor(s2, s2.selected);
+    const can = canDeploy(s2, s2.selected);
+    return `<h2>브리핑 · ${esc2(m.kind)}: ${esc2(m.title)}</h2>${say2(lines("brief:jaemtri", c))}${say2(lines("brief:chief", c))}${say2(lines("brief:reply", c))}
+<div class="hq-brief"><p><b>출동</b> ${esc2(AGENT_BY_ID[s2.selected].name)} (체력 ${st.hp}${s2.agents[s2.selected].fatigue ? `, 피로 ${s2.agents[s2.selected].fatigue}` : ""}) · 지원 ${s2.support && s2.support !== s2.selected ? esc2(AGENT_BY_ID[s2.support].name) : "없음"} · 위험 단계 ${s2.danger} · 커피 ${esc2(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "없음")}</p>
+<p><b>아이템</b> ${s2.loadout.map((x, i) => `${i + 1}:${x ? `${esc2(itemName(x.id))}×${x.n}` : "—"}`).join(" ")} · <b>유물</b> ${s2.relics.filter(Boolean).map((r) => esc2(RELICS[r].name)).join(", ") || "없음"}</p>
+${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
+<div class="hq-row"><button class="primary" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button data-go="supply">정비실 들르기</button><button data-go="pantry">탕비실 들르기</button><button data-act="close">돌아가기</button></div>`;
+  };
+  let pendingSeed = 0;
+  let evacJust = false;
+  const settleHtml = () => {
+    const l = s2.last;
+    const back = lines(`return:${l.how}`, ctx());
+    return `<h2>정산 · ${l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환"}</h2>${back.map((x) => `<p class="hq-say"><b>${esc2(x.who)}</b> ${esc2(x.text)}</p>`).join("")}<ul>${l.lines.map((x) => `<li>${esc2(x)}</li>`).join("")}</ul>
+<div class="hq-row"><button class="primary" data-act="close">본부로</button>${host?.link ? '<button data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`;
+  };
+  const menuHtml = () => `<h2>메뉴</h2><div class="hq-cols"><div><h3>재화</h3><p>예산 ${s2.currencies.budget} · 연구 자료 ${s2.currencies.research} · 이빨 ${s2.currencies.teeth}<br><small>현금은 출동 안에서만 쓰고, 귀환·철수하면 절반이 예산이 된다.</small></p>
+<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}<h3>유물</h3><p>${s2.relicsOwned.map((r) => `${esc2(RELICS[r].name)} <small>${esc2(RELICS[r].effect)}</small>`).join("<br>") || "없음"}</p></div>
+<div><h3>요원</h3>${AGENTS.map((a) => `<p><b>${esc2(a.name)}</b> 숙련 ${masteryLevel(s2.agents[a.id].xp)} · 피로 ${s2.agents[a.id].fatigue}${s2.agents[a.id].injured ? " · 부상" : ""}</p>`).join("")}
+<h3>저장</h3><p class="hq-dim">자동 저장: 장소 이동·구매·정산 때마다. 아래는 수동 슬롯.</p>${host?.saves ? [1, 2, 3].map((n) => {
+    const m = slotList.find((x) => x.slot === n);
+    return `<div class="hq-slotrow"><b>슬롯 ${n}</b><span>${m ? `${esc2(m.title)} · ${esc2(m.summary)}` : "비어 있음"}</span><button data-saveslot="${n}">여기 저장</button>${m ? `<button data-loadslot="${n}">불러오기</button>` : ""}</div>`;
+  }).join("") : ""}
+<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? "" : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}">${esc2(p.name)}</button>`).join("")}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
+  const bar2 = () => `<div class="hq-bar"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
+  const talkBox = (who, text, choices, extra = "") => {
+    const ph = photoOf(who);
+    return `<div class="hq-talk gk-panel" role="dialog" aria-label="${esc2(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc2(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc2(who)}</b><p class="hq-line gk-font">${esc2(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+  };
+  const missionTalk = () => {
+    cards = missionBoard(s2, boardNames(card));
+    noteDeadlines(s2, cards);
+    if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
+    const say2 = lines("npc:jaemtri", ctx())[0];
+    const sel = cards.find((c) => c.def.id === selMission);
+    const text = sel ? `${sel.def.kind} 건이에요. ${sel.def.title}. ${sel.def.depthLabel}까지, 끝나면 예산 ${sel.def.reward.budget}${sel.left !== void 0 ? `. 출동 ${sel.left}번 안에 가야 해요` : ""}.` : say2?.text ?? "오늘은 들어온 건이 없어요.";
+    const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? " on" : ""}" data-mission="${c.def.id}">${esc2(c.def.kind)} · ${esc2(c.def.title)}</button>`).join("");
+    return talkBox("잼트리", text, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? "" : "disabled"}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
+  };
+  const briefTalk = () => {
+    const m = MISSION_BY_ID[selMission];
+    const v = variantFor(pendingSeed);
+    const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
+    const ls = [...lines("brief:jaemtri", c), ...lines("brief:chief", c)];
+    const can = canDeploy(s2, s2.selected);
+    const st = statsFor(s2, s2.selected);
+    const kit = `<p class="hq-kit gk-font">${esc2(AGENT_BY_ID[s2.selected].name)} 체력 ${st.hp}${s2.agents[s2.selected].fatigue ? ` · 피로 ${s2.agents[s2.selected].fatigue}` : ""} · ${s2.loadout.map((x) => x ? `${esc2(itemName(x.id))}×${x.n}` : "").filter(Boolean).join(" ") || "아이템 없음"}${s2.coffee ? ` · ${esc2(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "")}` : ""}</p>${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}`;
+    const j = ls.find((l) => l.who === "잼트리") ?? ls[0];
+    return talkBox(j?.who ?? "잼트리", ls.filter((l) => l.who === (j?.who ?? "잼트리")).map((l) => l.text).join(" ") || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
+  };
+  const settleTalk = () => {
+    const l = s2.last;
+    const back = lines(`return:${l.how}`, ctx());
+    const first = back.find((x) => photoOf(x.who)) ?? back[0];
+    const who = first?.who || "잼트리";
+    const title2 = l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환";
+    const res = `<ul class="hq-result gk-font">${l.lines.map((x) => `<li>${esc2(x)}</li>`).join("")}</ul>`;
+    return talkBox(who, `${title2}. ${first?.text ?? ""}`, `<div class="hq-choice-row"><button class="gk-btn hq-choice primary on" data-act="close">확인</button>${host?.link ? '<button class="gk-btn hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`, res);
+  };
+  const renderFloat = () => {
+    const ov = wrap.querySelector(".hq-over");
+    const open = !!(overlay || panel);
+    ov.hidden = !open;
+    if (!open) return void (ov.innerHTML = "");
+    const talk = overlay === "brief" || overlay === "settle" || !overlay && panel === "jaemtri";
+    ov.classList.toggle("talk", talk);
+    if (talk) {
+      ensureKit();
+      ov.innerHTML = (overlay === "brief" ? briefTalk() : overlay === "settle" ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc2(notice)}</p>` : "");
+      return;
+    }
+    const body = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
+    ov.innerHTML = `<div class="hq-sheet">${bar2()}${body}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
+    wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+  };
+  const closeOne = () => {
+    if (overlay) overlay = null;
+    else panel = null;
+    notice = "";
+    render();
+    if (!overlay && !panel) host?.closed?.();
+  };
+  const render = () => {
+    if (!wrap) return;
+    if (!walk) return renderFloat();
+    wrap.querySelector(".hq-head").innerHTML = top();
+    const pane = wrap.querySelector(".hq-pane");
+    pane.innerHTML = panel ? `${placeHtml(panel)}${notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}` : `<p class="hq-dim">←→로 걸어 다니다 E로 들어가거나, 위 장소 단추를 누르세요. ${notice ? `<span class="hq-notice">${esc2(notice)}</span>` : ""}</p>`;
+    const ov = wrap.querySelector(".hq-over");
+    ov.hidden = !overlay;
+    if (overlay) ov.innerHTML = `<div class="hq-sheet">${overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : menuHtml()}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
+    wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+  };
+  const say = (t) => {
+    notice = t;
+    void save2();
+    render();
+  };
+  const go = (id) => {
+    if (!placeOpen(s2, id)) return;
+    const p = PLACE_BY_ID[id];
+    s2.x = p.x + p.w / 2;
+    panel = id;
+    notice = "";
+    if (overlay === "brief" || overlay === "menu") overlay = null;
+    if (!walk) host?.goto?.(id);
+    barkPlace = id;
+    const l = lines(`npc:${id}`, ctx())[0];
+    if (l) bark = { ...l, t: 4, x: s2.x };
+    void save2();
+    render();
+  };
+  const refreshSlots = async () => {
+    if (!host?.saves) return;
+    slotList = await host.saves.list().catch(() => []);
+    if (overlay === "menu") render();
+  };
+  const onClick = (ev) => {
+    const t = ev.target.closest("button");
+    if (!t || t.disabled || !host) return;
+    const d2 = t.dataset;
+    if (d2.go) return go(d2.go);
+    if (d2.pick) return s2.selected = d2.pick, s2.support === s2.selected && (s2.support = null), say(`출동 요원: ${AGENT_BY_ID[s2.selected].name}`);
+    if (d2.support) return s2.support = d2.support === "none" ? null : d2.support, say(s2.support ? `지원 요원: ${AGENT_BY_ID[s2.support].name}` : "지원 요원 없음");
+    if (d2.mission) return selMission = d2.mission, s2.mission = d2.mission, render();
+    if (d2.buy) return say(buy(s2, d2.buy));
+    if (d2.equip) return say(equip(s2, Number(d2.slot), d2.equip));
+    if (d2.unequip) return unequip(s2, Number(d2.unequip)), say(`${Number(d2.unequip) + 1}번 칸 비움`);
+    if (d2.relic !== void 0) return say(equipRelic(s2, Number(d2.slot), d2.relic || null));
+    if (d2.coffee) return say(pickCoffee(s2, s2.coffee === d2.coffee ? null : d2.coffee));
+    if (d2.treat) return say(treat(s2, d2.treat));
+    if (d2.interview) return say(interview(s2, d2.interview));
+    if (d2.research) return say(doResearch(s2, d2.research));
+    if (d2.danger) return setDanger(s2, Number(d2.danger)), say(`위험 단계 ${s2.danger}`);
+    if (d2.saveslot) {
+      pickSlot = Number(d2.saveslot);
+      void host.saves?.write(pickSlot, saveText(s2), { ...saveTitle(s2), schema: HQ_SCHEMA }).then(() => (notice = `슬롯 ${pickSlot}에 저장했어요.`, refreshSlots()));
+      return;
+    }
+    if (d2.loadslot) {
+      void host.saves?.read(Number(d2.loadslot)).then((txt) => {
+        const got = parseSave(txt);
+        if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
+        s2 = got;
+        overlay = null;
+        panel = null;
+        say(`슬롯 ${d2.loadslot}을(를) 불러왔어요.`);
+      });
+      return;
+    }
+    switch (d2.act) {
+      case "menu":
+        overlay = "menu";
+        notice = "";
+        void refreshSlots();
+        return render();
+      case "close":
+        if (!walk) return closeOne();
+        overlay = null;
+        notice = "";
+        return render();
+      case "brief":
+        pendingSeed = Math.floor(rand2() * 1e9);
+        overlay = "brief";
+        notice = "";
+        return render();
+      case "deploy": {
+        const l = launch(s2, selMission, pendingSeed);
+        if (typeof l === "string") return say(l);
+        pending = l;
+        overlay = null;
+        panel = null;
+        void save2();
+        render();
+        if (walk) wrap.hidden = true;
+        evacJust = false;
+        host.deploy(l);
+        return;
+      }
+      case "approve":
+        return say(approveDanger(s2));
+      case "appraise":
+        return say(appraise(s2).join(" / "));
+      case "tooth":
+        return say(openToothBox(s2, rand2));
+      case "report": {
+        const p = reportPayload(s2);
+        if (p && host.link) void host.link.report(p).then((m) => say(m), () => say("보고서를 붙이지 못했어요."));
+        return;
+      }
+      case "reset":
+        if (!confirm("본부 기록(재화·규칙서·숙련)을 지우고 처음부터 할까요?")) return;
+        s2 = newSave();
+        overlay = null;
+        panel = null;
+        return say("처음부터 시작해요.");
+    }
+  };
+  const onKey = (ev) => {
+    if (!wrap || wrap.hidden) return;
+    const tg = ev.target;
+    if (tg && (tg.tagName === "INPUT" || tg.tagName === "TEXTAREA" || tg.isContentEditable)) return;
+    if (ev.type === "keyup") return void keys.delete(ev.code);
+    if (ev.code === "ArrowLeft" || ev.code === "ArrowRight") keys.add(ev.code), ev.preventDefault();
+    if (ev.repeat) return;
+    if (ev.code === "Escape") {
+      overlay = overlay ? null : "menu";
+      if (overlay) void refreshSlots();
+      notice = "";
+      render();
+    } else if (ev.code === "KeyE" && !overlay) {
+      const p = placeAt(s2.x);
+      if (p) go(p.id);
+    }
+  };
+  const onPointer = (ev) => {
+    const t = ev.target.closest("[data-move]");
+    if (ev.type === "pointerdown" && t) {
+      moving = Number(t.dataset.move);
+      if (!moving) {
+        const p = placeAt(s2.x);
+        if (p) go(p.id);
+      }
+    } else if (ev.type !== "pointerdown") moving = 0;
+  };
+  const blur = () => (keys.clear(), moving = 0);
+  const mod = {
+    get state() {
+      return s2;
+    },
+    mount(r, h, opt) {
+      root = r;
+      host = h;
+      walk = opt?.walk !== false;
+      wrap = document.createElement("section");
+      wrap.className = walk ? "hq" : "hq hq-float";
+      wrap.tabIndex = 0;
+      wrap.innerHTML = walk ? `<style>${style_default}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>` : `<style>${style_default}</style><div class="hq-over" hidden></div>`;
+      root.append(wrap);
+      canvas = wrap.querySelector("canvas");
+      wrap.addEventListener("click", onClick);
+      if (walk) {
+        wrap.addEventListener("pointerdown", onPointer);
+        window.addEventListener("pointerup", onPointer);
+        window.addEventListener("pointercancel", onPointer);
+        window.addEventListener("keydown", onKey);
+        window.addEventListener("keyup", onKey);
+        window.addEventListener("blur", blur);
+      }
+      render();
+      void (async () => {
+        const got = parseSave(await h.load().catch(() => null));
+        if (got) s2 = got;
+        if (s2.active) {
+          s2.active = null;
+          notice = "지난 출동이 끝나지 않은 채 닫혔어요. 요원은 후송된 것으로 처리했어요.";
+        }
+        card = await h.link?.card().catch(() => null) ?? null;
+        render();
+        wrap?.focus({ preventScroll: true });
+      })();
+      last = performance.now();
+      if (walk) raf = requestAnimationFrame(tick);
+    },
+    map: () => hqMap(s2, evacJust),
+    bark(place3) {
+      if (!placeOpen(s2, place3)) return null;
+      return lines(`npc:${place3}`, ctx())[0] ?? null;
+    },
+    places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s2, p.id), opens: p.opens })),
+    openPlace(id) {
+      if (!placeOpen(s2, id)) return;
+      overlay = null;
+      panel = id;
+      notice = "";
+      s2.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
+      void save2();
+      render();
+    },
+    openMenu() {
+      overlay = "menu";
+      notice = "";
+      void refreshSlots();
+      render();
+    },
+    isOpen: () => walk ? !!overlay : !!(overlay || panel),
+    close: () => walk ? (overlay = null, render()) : closeOne(),
+    onReturn(result, l) {
+      const ls = settle(s2, l, result, rand2);
+      evacJust = result.how === "evac";
+      pending = null;
+      overlay = "settle";
+      if (walk) {
+        if (result.how === "evac") go("clinic");
+        else go("jaemtri");
+      } else panel = null;
+      overlay = "settle";
+      if (wrap) wrap.hidden = false, wrap.focus({ preventScroll: true });
+      void save2();
+      render();
+      void ls;
+    },
+    unmount() {
+      cancelAnimationFrame(raf);
+      void save2();
+      window.removeEventListener("pointerup", onPointer);
+      window.removeEventListener("pointercancel", onPointer);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keyup", onKey);
+      window.removeEventListener("blur", blur);
+      wrap?.remove();
+      wrap = canvas = root = null;
+      host = null;
+    }
+  };
+  void pending;
+  return mod;
+}
+
+// src/game/action/hq/store.ts
+function memorySaves() {
+  const data = /* @__PURE__ */ new Map();
+  const metas = /* @__PURE__ */ new Map();
+  return {
+    read: async (slot) => data.get(slot) ?? null,
+    write: async (slot, d2, m) => {
+      data.set(slot, d2);
+      metas.set(slot, { slot, savedAt: Date.now(), ...m });
+    },
+    list: async () => [...metas.values()].sort((a, b) => a.slot - b.slot)
+  };
+}
+function idbSaves(dbName = "goei-hq-demo") {
+  let dbp = null;
+  const fallback = memorySaves();
+  const open = () => dbp ??= new Promise((res, rej) => {
+    const req = indexedDB.open(dbName, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("kv");
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+  const get = async (key) => {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const r = db.transaction("kv").objectStore("kv").get(key);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  };
+  const put = async (key, v) => {
+    const db = await open();
+    await new Promise((res, rej) => {
+      const tx = db.transaction("kv", "readwrite");
+      tx.objectStore("kv").put(v, key);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  };
+  let broken = false;
+  const safe = async (f, alt) => {
+    if (broken) return alt();
+    try {
+      return await f();
+    } catch {
+      broken = true;
+      return alt();
+    }
+  };
+  return {
+    read: (slot) => safe(async () => await get(`goei:game:slot:${slot}`) ?? null, () => fallback.read(slot)),
+    write: (slot, d2, m) => safe(
+      async () => {
+        await put(`goei:game:slot:${slot}`, d2);
+        const list = await get("goei:game:slots") ?? [];
+        await put("goei:game:slots", [...list.filter((x) => x.slot !== slot), { slot, savedAt: Date.now(), ...m }].sort((a, b) => a.slot - b.slot));
+      },
+      () => fallback.write(slot, d2, m)
+    ),
+    list: () => safe(async () => await get("goei:game:slots") ?? [], () => fallback.list())
+  };
 }
 
 // src/game/action/enemy/debuff.ts
