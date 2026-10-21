@@ -3,7 +3,7 @@
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
-import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -57,7 +57,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
       sendChat: async (m) => { (window.__calls.send = window.__calls.send || []).push({ m, last: window.__chat.message?.at(-1)?.data }); if (window.__sendFail) throw new Error('Sending chat with plugin-based model is currently blocked'); return true; },
       unwarpSafeArray: async (a) => a,
       safeLocalStorage: { getItem: async (k) => window.__store[k] ?? null, setItem: async (k, v) => { window.__store[k] = v; } },
-      pluginStorage: { getItem: async (k) => window.__store['p:' + k] ?? null, setItem: async (k, v) => { window.__store['p:' + k] = v; }, keys: async () => [], removeItem: async () => {} },
+      pluginStorage: { getItem: async (k) => window.__store['p:' + k] ?? null, setItem: async (k, v) => { window.__store['p:' + k] = v; }, keys: async () => [], removeItem: async (k) => { delete window.__store['p:' + k]; } },
       addRisuReplacer: async (type, fn) => { window.__calls.replacers.push(fn); },
       removeRisuReplacer: async () => {},
       addRisuChatListener: async (mode, fn) => { window.__calls.listeners.push(fn); },
@@ -2157,25 +2157,79 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
-// 관찰형 게임: 그림 팩이 없으면 받기 화면, 받은 뒤에는 바로 게임
+// 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
+// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다. 이전 시험판(순찰)도 그대로 열린다.
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
   await page.click('[x-goei-fab] button');
   await page.click('[data-action="game-open"] >> nth=0');
-  // 게임 창 기본은 1인 전투 검증판 (main 액션 작업). 이 시험은 기존 순찰
-  await page.click('[data-game-mode="patrol"]');
-  await page.waitForSelector('.gx-gp');
+  await page.waitForSelector('.gx-gl [data-g="get"]');
+  assert.equal(await page.locator('.gx-gl [data-g="play"]:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
+  await page.click('[data-g="get"]');
+  await page.waitForSelector('.gx-gl-msg');
+  assert.match(await page.textContent('.gx-gl-msg'), /받지 못했어요/);
+  const gdir = new URL('../dist/game/', import.meta.url);
+  const gameFiles = Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
+  await page.evaluate((files) => {
+    const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
+    window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
+  }, gameFiles);
+  await page.click('[data-g="get"]');
+  await page.waitForSelector('.gx-gl [data-g="play"][data-slot="1"]:not([disabled])');
+  assert.match(await page.evaluate(() => window.__store['p:goei:game:code'].slice(0, 30)), /^\/\/ goei-game /);
   if (shots) {
-    await page.screenshot({ path: `${shots}/game-pack.png` });
+    await page.screenshot({ path: `${shots}/game-home.png` });
     await page.setViewportSize({ width: 390, height: 800 });
     await page.waitForTimeout(200);
-    await page.screenshot({ path: `${shots}/game-pack-m.png` });
+    await page.screenshot({ path: `${shots}/game-home-m.png` });
     await page.setViewportSize({ width: 1100, height: 900 });
   }
-  await page.click('[data-gp="get"]');
-  await page.waitForFunction(() => !document.querySelector('.gx-gp-msg')?.hidden && !document.querySelector('[data-gp="get"]').disabled);
-  assert.match(await page.textContent('.gx-gp-msg'), /받지 못했어요/);
+  assert.match(await page.textContent('.gx-gl'), /요원 \d+명/, '본편 명부를 읽음');
+  await page.click('[data-g="play"][data-slot="1"]');
+  await page.waitForSelector('.gx-game-box .gb canvas');
+  await page.evaluate(() => window.__gb.save());
+  await page.waitForFunction(() => !!window.__store['p:goei:game:slot:1']);
+  assert.equal(await page.evaluate(() => JSON.parse(window.__store['p:goei:game:slots']).last), 1);
+  // 정산 화면 → 결과가 쌓인다 (쓰지는 않음)
+  const before = await page.evaluate(() => window.__calls.setChat.length);
+  await page.evaluate(() => { const g = window.__gb; g.run.ended = 'return'; g.run.phase = 'settle'; });
+  await page.waitForFunction(() => { try { return JSON.parse(window.__store['p:goei:game:reports'] ?? '[]').length === 1; } catch { return false; } });
+  assert.equal(await page.evaluate(() => window.__calls.setChat.length), before, '결과만으로는 채팅을 바꾸지 않음');
+  await page.click('[data-g="home"]');
+  await page.waitForSelector('[data-g="post"]');
+  if (shots) await page.screenshot({ path: `${shots}/game-report.png` });
+  await page.click('[data-g="post"]');
+  await page.waitForSelector('[data-g="post"][disabled]');
+  const last = await page.evaluate(() => window.__chat.message.at(-1));
+  assert.equal(last.role, 'user');
+  assert.match(last.data, /^\[관리국 출동 보고서\]/);
+  assert.match(last.data, /%%GOEI_UNSENT%%/, '전송 대기로 놓음');
+  await page.click('[data-g="record"]');
+  await page.waitForSelector('[data-g="unrecord"]');
+  assert.equal(await page.evaluate(() => window.__chat.localLore.filter((e) => e.comment === '관리국 훈련 기록').length), 1);
+  // 닫았다 다시 열면 저장 칸이 남아 있고, 코드는 다시 받지 않는다
+  await page.evaluate(() => (window.__calls.fetch = []));
+  await page.click('[data-action="game-close"]');
+  assert.equal(await page.locator('.gx-game').count(), 0);
+  await page.click('[data-action="game-open"] >> nth=0');
+  await page.waitForSelector('.gx-gl-cont');
+  await page.click('.gx-gl-cont');
+  await page.waitForSelector('.gx-game-box .gb canvas');
+  assert.equal(await page.evaluate(() => (window.__calls.fetch ?? []).filter((u) => /goei-game\.\d/.test(u)).length), 0, '코드는 저장해 둔 것');
+  // 모바일: 전체화면 → 세로면 돌려 보기
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.click('[data-g="full"]');
+  await page.waitForSelector('.gx-game.gx-full.gx-rot');
+  if (shots) await page.screenshot({ path: `${shots}/game-rotated-m.png` });
+  await page.click('[data-g="full"]');
+  await page.waitForSelector('.gx-game:not(.gx-full)');
+  await page.setViewportSize({ width: 1100, height: 900 });
+  // 이전 시험판: 순찰은 예전처럼 그림 팩 받기
+  await page.click('[data-g="home"]');
+  await page.click('details[data-keep="game-legacy"] > summary');
+  await page.click('[data-g="legacy"][data-mode="patrol"]');
+  await page.waitForSelector('.gx-gp');
   const pack = readFileSync(new URL('../dist/goei-game-patrol.pack', import.meta.url)).toString('base64');
   await page.evaluate((b64) => {
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
@@ -2183,24 +2237,122 @@ if (fixture.globalLore.some(packed)) {
   }, pack);
   await page.click('[data-gp="get"]');
   await page.waitForSelector('.goei-game canvas');
-  await page.waitForFunction(() => !document.querySelector('.gg-load'));
   assert.equal(await page.evaluate(() => Object.keys(JSON.parse(window.__store['p:goei:game-pack:patrol']).files).length), 19, '그림 19장 저장');
-  await page.waitForTimeout(1500);
-  if (shots) {
-    await page.screenshot({ path: `${shots}/game-pc.png` });
-    await page.setViewportSize({ width: 390, height: 800 });
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: `${shots}/game-m.png` });
-    await page.setViewportSize({ width: 1100, height: 900 });
+  await page.click('[data-action="game-close"]');
+  assert.deepEqual(errors, []);
+  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기 → 칸 1 시작·저장 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기 → 이전 순찰');
+  await page.close();
+}
+
+// 게임 창 측정: 처음 받기·저장해 둔 코드로 열기·열고 닫기 반복 힙·큰 자산 팩 넣기 (CPU 4배 느리게 = 중급 폰 흉내)
+{
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Performance.enable');
+  const heapMB = async () => {
+    await cdp.send('HeapProfiler.collectGarbage');
+    const m = (await cdp.send('Performance.getMetrics')).metrics.find((x) => x.name === 'JSHeapUsedSize');
+    return +(m.value / 1048576).toFixed(1);
+  };
+  await startedWithReply(page);
+  await page.click('[x-goei-fab] button');
+  const gdir = new URL('../dist/game/', import.meta.url);
+  const gameFiles = Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
+  await page.evaluate((files) => {
+    const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
+    // 받기마다 40ms (느린 망 흉내는 아님, 요청 수만큼 지연)
+    window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
+  }, gameFiles);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  const base = await heapMB();
+  const t0 = Date.now();
+  await page.click('[data-action="game-open"] >> nth=0');
+  await page.waitForSelector('[data-g="get"]');
+  const homeMs = Date.now() - t0;
+  const t1 = Date.now();
+  await page.click('[data-g="get"]');
+  await page.waitForSelector('[data-g="play"][data-slot="1"]:not([disabled])');
+  const getMs = Date.now() - t1;
+  const t2 = Date.now();
+  await page.click('[data-g="play"][data-slot="1"]');
+  await page.waitForSelector('.gx-game-box .gb canvas');
+  const playMs = Date.now() - t2;
+  await page.evaluate(() => window.__gb.unpause());
+  await page.waitForTimeout(3000);
+  const playing = await heapMB();
+  const cycles = [];
+  for (let i = 0; i < 5; i++) {
+    await page.click('[data-action="game-close"]');
+    await page.waitForTimeout(100);
+    cycles.push(await heapMB());
+    await page.click('[data-action="game-open"] >> nth=0');
+    await page.waitForSelector('.gx-gl-cont');
+    await page.click('.gx-gl-cont');
+    await page.waitForSelector('.gx-game-box .gb canvas');
+    await page.waitForTimeout(500);
   }
   await page.click('[data-action="game-close"]');
-  assert.equal(await page.locator('.gx-game').count(), 0);
-  await page.click('[data-action="game-open"] >> nth=0');
-  await page.waitForSelector('.goei-game canvas');
-  assert.equal(await page.locator('.gx-gp').count(), 0, '받은 뒤에는 바로 게임');
+  const closed = await heapMB();
+  const st = await page.evaluate(() => ({ code: { ...window.__goeiGameStats.code }, fetch: { ...window.__goeiGameStats.fetch }, urls: window.__goeiGameStats.urls() }));
+  // 저장해 둔 코드를 새 페이지에서 꺼내 실행하는 시간 (본체의 메모리 캐시 없이)
+  const stored = await page.evaluate(() => window.__store['p:goei:game:code']);
+  const page2 = (await boot(fixture, { message: [], scriptstate: {} })).page;
+  await page2.evaluate((code) => (window.__store['p:goei:game:code'] = code), stored);
+  const cdp2 = await page2.context().newCDPSession(page2);
+  await cdp2.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await startedWithReply(page2);
+  await page2.click('[x-goei-fab] button');
+  await page2.click('[data-action="game-open"] >> nth=0');
+  await page2.waitForSelector('[data-g="play"][data-slot="1"]:not([disabled])');
+  const t3 = Date.now();
+  await page2.click('[data-g="play"][data-slot="1"]');
+  await page2.waitForSelector('.gx-game-box .gb canvas');
+  const warmMs = Date.now() - t3;
+  const warm = await page2.evaluate(() => ({ ...window.__goeiGameStats.code, ...window.__goeiGameStats.game }));
+  // 큰 자산 팩 (그림 200장 × 40KB = 8MB) 넣기·꺼내기
+  const big = await page2.evaluate(async () => {
+    const n = 200, size = 40 * 1024;
+    const files = [];
+    let at = 0;
+    for (let i = 0; i < n; i++) (files.push([`f${i}.png`, at, size]), (at += size));
+    const head = new TextEncoder().encode(JSON.stringify({ id: 'bigtest', version: 1, hash: 'h1', atlas: { n }, files }));
+    const out = new Uint8Array(12 + head.length + at);
+    out.set(new TextEncoder().encode('GOEIPACK'));
+    new DataView(out.buffer).setUint32(8, head.length, true);
+    out.set(head, 12);
+    for (let i = 12 + head.length; i < out.length; i += 1) out[i] = (i * 2654435761) >>> 24;
+    window.__bigPack = out;
+    return out.length;
+  });
+  await page2.click('[data-g="home"]');
+  await page2.waitForSelector('.gx-gl [data-g-file]', { state: 'attached' });
+  const tb = Date.now();
+  await page2.evaluate(async () => {
+    const dt = new DataTransfer();
+    dt.items.add(new File([window.__bigPack], 'bigtest.pack'));
+    const input = document.querySelector('[data-g-file]');
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page2.waitForFunction(() => /넣었어요: 팩 bigtest/.test(document.querySelector('.gx-gl-msg')?.textContent ?? ''), null, { timeout: 120000 });
+  const installMs = Date.now() - tb;
+  const storedLen = await page2.evaluate(() => window.__store['p:goei:game:pack:bigtest'].length);
   assert.deepEqual(errors, []);
-  console.log('PASS 관찰형 게임: 그림 팩 받기 실패 안내 → 받기 → 저장 → 다시 열면 바로 게임');
+  const report = {
+    bodyKB: Math.round(readFileSync(new URL('../dist/goei-body.js', import.meta.url)).length / 1024),
+    gameCodeKB: Math.round(st.code.bytes / 1024),
+    cpu: '4x 느리게',
+    homeMs, getMs, getRequests: st.fetch.requests, getKB: Math.round(st.fetch.bytes / 1024), playMs,
+    warm: { clickToCanvasMs: warmMs, readMs: warm.readMs, runMs: warm.runMs, mountMs: warm.mountMs },
+    heapMB: { base, playing, afterClose: cycles, final: closed }, liveUrlsAfterClose: st.urls,
+    bigPack: { MB: +(big / 1048576).toFixed(1), installMs, storedMB: +(storedLen / 1048576).toFixed(1) },
+  };
+  console.log('MEASURE 게임 창', JSON.stringify(report));
+  writeFileSync(new URL('../dist-test/game-measure.json', import.meta.url), JSON.stringify(report, null, 1));
+  assert.ok(closed - base < 8, `닫은 뒤 힙이 많이 남음 ${base} → ${closed}`);
+  console.log('PASS 게임 창 측정');
   await page.close();
+  await page2.close();
 }
 
 // 17b) 설정 위 「설정·명부」 줄은 스크롤해도 위에 고정, 명부 탭에서는 그 아래 분류 줄도 함께 고정. 거점 탭은 조직 제목 없이 한 목록

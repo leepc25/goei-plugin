@@ -1,7 +1,8 @@
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { buildPack } from './game-pack.mjs';
+import { buildGamePack, buildPack } from './game-pack.mjs';
+import { existsSync, rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 // 업데이트 주소: package.json의 goei.updateBase (저장소 release 폴더 raw 주소). 있으면 Risu 플러그인 탭이 이 주소로 플러그인을 갱신한다
@@ -64,6 +65,59 @@ writeFileSync(
   'dist/goei-body.json',
   JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length }) + '\n',
 );
+
+// 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
+// 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
+const split = (str, max) => {
+  const out = [];
+  let buf = '';
+  let bytes = 0;
+  for (const ch of str) {
+    const n = Buffer.byteLength(ch);
+    if (bytes + n > max) (out.push(buf), (buf = ''), (bytes = 0));
+    buf += ch;
+    bytes += n;
+  }
+  if (buf) out.push(buf);
+  return out;
+};
+rmSync('dist/game', { recursive: true, force: true });
+mkdirSync('dist/game', { recursive: true });
+const gameOut = await build({ ...common, entryPoints: ['src/game/entry.ts'], format: 'iife' });
+const gameCode = `// goei-game ${pkg.version}\n` + gameOut.outputFiles[0].text;
+writeFileSync('dist/game/goei-game.js', gameCode);
+const gameParts = split(gameCode, 200_000).map((p, i) => {
+  const name = `goei-game.${i + 1}.txt`;
+  writeFileSync(`dist/game/${name}`, p);
+  return name;
+});
+const gamePacks = [];
+for (const d of existsSync('game-pack') ? readdirSync('game-pack') : []) {
+  if (!existsSync(`game-pack/${d}/pack.json`)) continue;
+  const p = buildGamePack(`game-pack/${d}`);
+  writeFileSync(`dist/game/${p.id}.pack`, p.bytes);
+  const parts = [];
+  for (let at = 0, i = 1; at < p.bytes.length; at += 512 * 1024, i++) {
+    const name = `${p.id}.${i}.bin`;
+    writeFileSync(`dist/game/${name}`, p.bytes.subarray(at, at + 512 * 1024));
+    parts.push(name);
+  }
+  gamePacks.push({ id: p.id, hash: p.hash, bytes: p.bytes.length, parts, required: p.required });
+}
+writeFileSync(
+  'dist/game/index.json',
+  JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
+);
+
+// 플러그인 창 게임 시연판 (Risu 없이 폰에서): 가짜 risuai + 실제 게임 창 + 게임 코드 팩을 한 HTML에
+{
+  const demo = await build({ ...common, entryPoints: ['src/game/host-demo.ts'], format: 'iife' });
+  const esc = (t) => t.replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>괴이 ː 이면세계 · 게임 창 시연</title><body><script>window.__GOEI_GAME_CODE__=${esc(JSON.stringify(gameCode))}</script><script>${esc(demo.outputFiles[0].text)}</script></body></html>`;
+  writeFileSync('dist/goei-plugin-game.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-plugin-game.html', html);
+}
 
 // 테스트용: 순수 로직만 묶은 모듈
 await build({
@@ -204,6 +258,9 @@ const info = {
   bytes: Buffer.byteLength(code),
   bodyBytes: Buffer.byteLength(bodyCode),
   bodyParts: partNames.length,
+  gameBytes: Buffer.byteLength(gameCode),
+  gameParts: gameParts.length,
+  gamePacks: gamePacks.map((p) => `${p.id} ${p.bytes}`),
   sha256: createHash('sha256').update(code).digest('hex'),
 };
 writeFileSync('dist/build-info.json', JSON.stringify(info, null, 2) + '\n');

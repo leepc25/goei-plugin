@@ -70,8 +70,10 @@ export interface CardAgent {
   situation: string;
   /** 편성할 수 없는 상태인가 (작전투입·실종·사망·미정) */
   locked: boolean;
-  /** 카드 사진 에셋 이름 (주소는 photo()로) */
+  /** 대표 사진(카우보이 샷) 에셋 이름. 주소는 bridge.photo()로 */
   photo: string;
+  /** 얼굴 사진 「에셋 이름#가로,세로,크기」(%, 크기는 그림 너비 대비 한 변). # 뒤가 없으면 그림 전체가 얼굴 */
+  face: string;
 }
 
 export interface CardPlace {
@@ -91,6 +93,8 @@ export interface CardEvent {
 
 /** 정산 결과. 게임이 넘기면 쌓아 두고, 사용자가 「본편에 기록」을 눌렀을 때만 카드에 쓴다 */
 export interface GameReport {
+  /** 같은 출동을 두 번 넘겨도 한 번만 받도록 (예: 출동 시드) */
+  id?: string;
   mission: string;
   outcome: 'return' | 'evac' | 'withdraw';
   /** 예: B-12 */
@@ -117,6 +121,8 @@ export interface GameViewport {
 
 export interface GameBridge {
   readonly api: 1;
+  /** 시작 화면에서 사용자가 고른 저장 칸. 여기서 불러오고 여기에 저장한다 */
+  readonly slot: SlotId;
   saves: GameSaves;
   assets: GameAssets;
   /** 본편 스냅숏. 괴이 카드 채팅이 아니면 null */
@@ -140,5 +146,5 @@ export interface GameModule {
   version: string;
   mount(box: HTMLElement, bridge: GameBridge): () => void;
   /** 이전 시험판 (관리국 순찰·1인 전투 검증판) */
-  legacy?: Record<string, (box: HTMLElement) => () => void>;
+  legacy?: Record<string, (box: HTMLElement, bridge: GameBridge) => () => void>;
 }
