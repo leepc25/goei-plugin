@@ -1768,6 +1768,18 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }
 .mn-dialog .mn-box { width: 920px; max-height: 470px; }
 .mn-dialog h2 { font-size: 24px; color: #ffd890; }
+
+/* 가로 화면 띠 단추: 도트 금속 칸 + 도트 글꼴, 키 이름 없음 (검수 12) */
+.tp-side .tp-b { border-radius: 0; background: none; border-style: solid; border-width: 7px; border-image-width: 7px; text-shadow: 2px 2px 0 #000; color: #e8dcb8; }
+.tp-side .tp-b i { display: none; }
+.tp-side .tp-b b, .tp-side .tp-b.small b, .tp-side .tp-b.top b, .tp-side .tp-b.big b { font-size: 22px; font-weight: 700; letter-spacing: 0; }
+.tp-side .tp-b.big b { color: #ffb4a0; }
+.tp-side .tp-b.on { background: none; filter: brightness(1.7); }
+.tp-side .tp-b.hint { box-shadow: 0 0 0 2px #f2c94c, 0 0 12px rgba(242,201,76,0.7); }
+.tp-side .tp-b.full { box-shadow: 0 0 0 2px #f2b632, 0 0 14px rgba(242,182,50,0.9); }
+.tp-side .tp-ring { inset: auto 0 -5px 0; height: 4px; border-radius: 0; -webkit-mask: none; mask: none; background: linear-gradient(90deg, #f2b632 calc(var(--g, 0) * 100%), rgba(255,255,255,0.12) 0); }
+.tp-side .tp-b.item canvas { width: 34px; height: 34px; }
+.tp-side .tp-b.item u { font-size: 22px; font-weight: 700; right: 0; bottom: -4px; text-shadow: 2px 2px 0 #000; }
 `;
 
 // src/game/action/ui/stage.ts
@@ -3779,20 +3791,21 @@ var TouchPad = class {
     __publicField(this, "toLocal", null);
     __publicField(this, "visible", false);
     __publicField(this, "seenTouch", false);
+    __publicField(this, "iconRedraw", 2400);
     __publicField(this, "onAnyTouch", () => {
       if (!this.seenTouch) this.seenTouch = true, this.refresh();
     });
     __publicField(this, "baseX", 0);
     __publicField(this, "baseY", 0);
     this.root = document.createElement("div");
-    this.root.className = "tp";
+    this.root.className = "tp gk-font";
     this.root.innerHTML = `<div class="tp-zone"><div class="tp-base"><div class="tp-knob"></div></div></div>`;
     this.zone = this.root.querySelector(".tp-zone");
     this.base = this.root.querySelector(".tp-base");
     this.knob = this.root.querySelector(".tp-knob");
     const mk = (b, cls) => {
       const el = document.createElement("div");
-      el.className = `tp-b ${cls}`;
+      el.className = `tp-b gk-slot ${cls}`;
       el.dataset.id = b.id;
       el.innerHTML = `<b>${b.label}</b><i>${b.key}</i>`;
       this.root.append(el);
@@ -3802,7 +3815,7 @@ var TouchPad = class {
     for (const b of CLUSTER) mk({ ...b, group: "cluster" }, b.id === "attack" ? "big" : b.d < 0.8 ? "small" : "");
     for (let i = 0; i < 4; i++) mk({ id: `item${i + 1}`, code: `Digit${i + 1}`, label: "", key: String(i + 1), dx: 0, dy: 0, d: 0.78, group: "items" }, "item");
     mk({ id: "map", code: "KeyZ", label: "지도", key: "Z", dx: 0, dy: 0, d: 0.62, group: "top" }, "top");
-    mk({ id: "menu", code: "Escape", label: "☰", key: "메뉴", dx: 0, dy: 0, d: 0.62, group: "top" }, "top");
+    mk({ id: "menu", code: "Escape", label: "메뉴", key: "Esc", dx: 0, dy: 0, d: 0.62, group: "top" }, "top");
     const ring = document.createElement("div");
     ring.className = "tp-ring";
     this.btns.find((b) => b.id === "ult").el.append(ring);
@@ -3830,7 +3843,8 @@ var TouchPad = class {
     const flip = s.lefty ? -1 : 1;
     this.root.style.setProperty("--tp-u", `${u}px`);
     this.root.style.setProperty("--tp-a", String(s.touchAlpha));
-    this.root.classList.remove("tp-float");
+    this.root.classList.remove("tp-float", "tp-side");
+    for (const b of this.btns) b.hw = void 0, b.hh = void 0;
     this.sr = u;
     this.restX = u * 1.55;
     this.restY = u;
@@ -3894,14 +3908,16 @@ var TouchPad = class {
     const colR = side >= unit * 1.25 ? bw - side / 2 : bw - edge - unit * 1.25 / 2;
     const colL = side >= unit ? side / 2 : edge + unit / 2;
     const mir = (x) => s.lefty ? bw - x : x;
+    const bwid = Math.max(unit, Math.min(side - 8, unit * 1.7));
     const place = (id, cx, cy, dpx) => {
       const b = this.btns.find((x) => x.id === id);
-      const r = dpx / 2;
+      const hh = dpx / 2, hw = bwid / 2;
       cx = mir(cx);
-      Object.assign(b, { cx, cy, r });
+      Object.assign(b, { cx, cy, r: Math.max(hw, hh), hw, hh });
       const el = b.el;
-      el.style.width = el.style.height = `${r * 2}px`;
-      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+      el.style.width = `${hw * 2}px`;
+      el.style.height = `${hh * 2}px`;
+      el.style.transform = `translate(${cx - hw}px, ${cy - hh}px)`;
     };
     const column = (ids, x, w) => {
       const total = w.reduce((a, v) => a + v * unit, 0) + (ids.length - 1) * g;
@@ -3921,7 +3937,7 @@ var TouchPad = class {
     this.root.style.setProperty("--tp-r", `${this.sr}px`);
     this.restX = side + this.sr + 30;
     this.restY = edge + this.sr + 20;
-    this.root.classList.add("tp-float");
+    this.root.classList.add("tp-float", "tp-side");
     this.restBase();
   }
   restBase() {
@@ -3960,11 +3976,19 @@ var TouchPad = class {
       const b = this.btns.find((x) => x.id === `item${i + 1}`);
       if (!b?.el) return;
       const key = `${it.id ?? ""}|${it.label}`;
-      if (b.el.dataset.icon !== key) {
+      const fresh = b.el.dataset.icon !== key;
+      if (fresh) {
         b.el.dataset.icon = key;
         b.el.innerHTML = `<canvas width="64" height="64"></canvas><i>${i + 1}</i><u></u>`;
-        const g = b.el.querySelector("canvas").getContext("2d");
-        if (g && (it.label || it.id)) drawHudItemIcon(g, it, 4, 4, 56);
+      }
+      if (fresh || this.iconRedraw-- > 0) {
+        const cv = b.el.querySelector("canvas");
+        const g = cv.getContext("2d");
+        if (g) {
+          g.clearRect(0, 0, 64, 64);
+          g.imageSmoothingEnabled = false;
+          if (it.label || it.id) drawHudItemIcon(g, it, 0, 0, 64);
+        }
       }
       const u = b.el.querySelector("u");
       const n = it.label || it.id ? String(it.count) : "";
@@ -3985,6 +4009,11 @@ var TouchPad = class {
   hit(x, y) {
     let best = null, bd = Infinity;
     for (const b of this.btns) {
+      if (b.hw) {
+        const d2 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
+        if (d2 < 1 && d2 < bd) best = b, bd = d2;
+        continue;
+      }
       const d = Math.hypot(x - b.cx, y - b.cy);
       const lim = b.r * (b.group === "cluster" ? 1.18 : 1.05);
       if (d < lim && d / b.r < bd) best = b, bd = d / b.r;
