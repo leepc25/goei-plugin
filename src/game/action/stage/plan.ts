@@ -255,20 +255,42 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       label(ctx, '구덩이 (점프)', t.x0 + 4, y0 + 20, '#ff8080');
       break;
     }
-    case 'block':
-      // 바닥 띠 전체를 가로지르는 단: 윗면(밝게) + 앞면
-      if (drawLedge(ctx, place, t.x0, t.x1, y0 - t.h, y1, t.h)) {
-        label(ctx, `단 ${t.h} (점프)`, t.x0 + 4, y0 - t.h - 6, '#ddd');
-        break;
+    case 'block': {
+      // 바닥 띠 전체를 가로지르는 낮은 단(점프로 넘기): 윗면은 바닥색 타일, 앞면은 어둡게, 모서리에 노랑·검정 경고 띠
+      const top = y0 - t.h;
+      ctx.fillStyle = pal.floor;
+      ctx.fillRect(t.x0, top, w, y1 - y0);
+      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = 2;
+      for (let x = t.x0 + 40; x < t.x1; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, top);
+        ctx.lineTo(x, top + y1 - y0);
+        ctx.stroke();
       }
-      ctx.fillStyle = pal.trim;
-      ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0 + t.h);
-      ctx.fillStyle = 'rgba(255,255,255,0.12)';
-      ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
       ctx.fillRect(t.x0, y1 - t.h, w, t.h);
-      label(ctx, `단 ${t.h} (점프)`, t.x0 + 4, y0 - t.h - 6, '#ddd');
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(t.x0, y1 - t.h, w, 8);
+      ctx.clip();
+      ctx.fillStyle = '#e0b320';
+      ctx.fillRect(t.x0, y1 - t.h, w, 8);
+      ctx.fillStyle = '#1a1a1a';
+      for (let x = t.x0 - 16; x < t.x1; x += 24) {
+        ctx.beginPath();
+        ctx.moveTo(x, y1 - t.h + 8);
+        ctx.lineTo(x + 8, y1 - t.h);
+        ctx.lineTo(x + 20, y1 - t.h);
+        ctx.lineTo(x + 12, y1 - t.h + 8);
+        ctx.fill();
+      }
+      ctx.restore();
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(t.x0 - 4, top, 4, y1 - y0 + t.h);
+      ctx.fillRect(t.x1, top, 4, y1 - y0 + t.h);
       break;
+    }
     case 'low':
       // 머리 높이로 내려온 배관 (바닥 띠 전체 위)
       ctx.fillStyle = 'rgba(90,90,90,0.85)';

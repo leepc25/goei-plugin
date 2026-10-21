@@ -108,7 +108,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         continue;
       }
       // 배경 물건 그림(art/bg)이 있으면 그것, 없으면 회색 상자 대역
-      if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type)) {
+      // 그림이 아직 없는 소품은 회색 상자 대역을 그리지 않는다 (재검수 3-1). 판정 보기(H)일 때만 상자
+      if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type) && w.showBoxes) {
         ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
         ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
         ctx.strokeStyle = 'rgba(0,0,0,0.5)';
@@ -174,16 +175,16 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         case 'spark-big': {
           const big = f.kind === 'spark-big';
           const n = big ? 12 : 8;
-          const r = (big ? 120 : 64) * (0.45 + k);
+          const r = (big ? 150 : 90) * (0.45 + k);
           // 가운데 흰 섬광
-          if (k < 0.45) {
-            ctx.fillStyle = `rgba(255,255,255,${0.9 - k * 2})`;
+          if (k < 0.6) {
+            ctx.fillStyle = `rgba(255,255,255,${0.95 - k * 1.5})`;
             ctx.beginPath();
-            ctx.arc(sx, sy, (big ? 46 : 26) * (1 - k), 0, Math.PI * 2);
+            ctx.arc(sx, sy, (big ? 64 : 40) * (1 - k * 0.8), 0, Math.PI * 2);
             ctx.fill();
           }
           ctx.strokeStyle = k < 0.3 ? '#ffffff' : '#ffd36a';
-          ctx.lineWidth = big ? 9 : 6;
+          ctx.lineWidth = big ? 11 : 8;
           for (let i = 0; i < n; i++) {
             const an = (i / n) * Math.PI * 2 + (f.seed % 10);
             ctx.beginPath();

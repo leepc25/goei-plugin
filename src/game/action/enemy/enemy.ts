@@ -577,13 +577,34 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
   ctx.fill();
   // 예고: 바닥 위험 표시 (빨간 띠)
   if (f?.tele && e.move?.danger) {
-    const blink = 0.18 + 0.22 * ((e.st >> 2) & 1);
-    ctx.globalAlpha = blink;
-    ctx.fillStyle = '#ff2a2a';
+    // 납작한 직사각형 대신 바닥에 번지는 붉은 타원 + 공격 방향 화살표 (재검수 3-2)
+    const blink = 0.35 + 0.3 * ((e.st >> 2) & 1);
     for (const d of e.move.danger) {
       const a = e.x + d.fx0 * e.dir,
         b = e.x + d.fx1 * e.dir;
-      ctx.fillRect(Math.min(a, b), e.y - d.dy, Math.abs(b - a), d.dy * 2);
+      const cx = (a + b) / 2,
+        rx = Math.max(24, Math.abs(b - a) / 2),
+        ry = Math.max(8, Math.min(d.dy, 26));
+      const g = ctx.createRadialGradient(cx, e.y, 2, cx, e.y, rx);
+      g.addColorStop(0, 'rgba(255,40,30,0.45)');
+      g.addColorStop(1, 'rgba(255,40,30,0)');
+      ctx.globalAlpha = blink * e.alpha;
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(cx, e.y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ff5a40';
+      for (let i = 0, n = Math.max(1, Math.min(4, Math.floor(rx / 40))); i < n; i++) {
+        const x = Math.min(a, b) + ((i + 0.5) / n) * Math.abs(b - a);
+        const s = 9;
+        ctx.beginPath();
+        ctx.moveTo(x + e.dir * s, e.y);
+        ctx.lineTo(x - e.dir * s * 0.6, e.y - s * 0.7);
+        ctx.lineTo(x - e.dir * s * 0.2, e.y);
+        ctx.lineTo(x - e.dir * s * 0.6, e.y + s * 0.7);
+        ctx.closePath();
+        ctx.fill();
+      }
     }
   }
   e.brain.drawUnder?.(e, ctx);

@@ -183,7 +183,7 @@ export class World implements WorldView {
   }
 
   fx(kind: Fx['kind'], x: number, y: number, z: number, text?: string) {
-    const life = { spark: 7, 'spark-big': 10, dust: 12, flash: 3, boom: 16, ring: 9, text: 30 }[kind];
+    const life = { spark: 10, 'spark-big': 14, dust: 12, flash: 3, boom: 16, ring: 9, text: 30 }[kind];
     this.fxs.push({ kind, x, y, z, t: 0, life, text, seed: Math.floor(this.rand() * 1e6) });
     if (this.fxs.length > 80) this.fxs.shift();
   }
