@@ -1,0 +1,25 @@
+{
+  "name": "dark_floor",
+  "detail": "dark grey vinyl tiles with a few large dark puddles and stains (simple shapes).",
+  "place": "PLACE: an abandoned basement office floor with every light dead; only cold emergency light. Draw it readable, mid-dark, NOT pitch black (the game darkens it further in code). PALETTE: cold navy and slate grey with one sick green emergency light.",
+  "folder": "dark",
+  "path": "game-src/art/bg/raw/dark/dark_floor.png",
+  "index": 11,
+  "total": 28,
+  "exists": false,
+  "base": "9ab51a82272b5f6522a538bb71202a2624af8067",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nFLOOR RULES\nSeamless tileable floor texture seen straight from above (top-down orthographic), 1024x1024. The left edge must continue into the right edge and the top into the bottom with no visible seam. Even lighting, no shadows of objects, no objects, no stains larger than a hand.\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nNO people, monsters, blood or gore. Ordinary Korean places inside an uncanny dimension-elevator building.\nPLACE: an abandoned basement office floor with every light dead; only cold emergency light. Draw it readable, mid-dark, NOT pitch black (the game darkens it further in code). PALETTE: cold navy and slate grey with one sick green emergency light.\nExactly 1024x1024 square. Entire canvas is one top-down material swatch, no border, no perspective, no room, no objects. Repeating large simple motifs that continue across opposite edges. No lighting vignette. Specific patches or puddles requested below override generic stain size restrictions.\nCreate ONLY dark_floor: dark grey vinyl tiles with a few large dark puddles and stains (simple shapes).",
+  "type": "floor",
+  "generator": "built-in image_gen",
+  "size": [
+    1024,
+    1024
+  ],
+  "sourceSize": [
+    1254,
+    1254
+  ],
+  "mode": "RGBA",
+  "sha256": "bc845a68f96d8eed18f472dfe461cb9ea7500f23d07cac106d6d645d2f797a7e",
+  "integration": "Raw production source; pixel conversion and game integration are separate."
+}
