@@ -519,13 +519,13 @@ export function missionList(ctx: ChatContext, opening = false): string {
       return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
-    // 선택 단추는 임무 창 상세처럼 오른쪽 아래 작은 단추 (2026-10-21 사용자)
+    // 선택 단추는 임무 창 상세처럼 이름 줄 오른쪽 작은 단추 (2026-10-21 사용자)
     const pickBtn = sel
       ? `<button class="gx-evpick on" data-action="mission-unpick">${ICONS.pin}해제</button>`
       : `<button class="gx-evpick" data-action="mission-pick" data-value="${val}">${ICONS.pin}선택</button>`;
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
       <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${cap}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}${pickBtn}</span></div></li>`;
+      <span class="gx-evart-cap"><span class="gx-mx-head">${cap}${pickBtn}</span>${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {
@@ -784,7 +784,7 @@ export async function handleField(action: string, value: string | undefined, ctx
       if (typeof x === 'string') return true;
       const ev = activeEvents(x.world).find((e) => e.key === v);
       if (!ev) return true;
-      if (isPC() && sameTarget(field.target, ev.key)) {
+      if (sameTarget(field.target, ev.key)) {
         field.target = null;
         field.confirmEnd = null;
         env.render();

@@ -139,13 +139,13 @@ export function evPopup(): string {
   const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
-  // 임무 탭: 목표로 고르기는 오른쪽 아래 글자 단추로 (2026-10-21 사용자: 위 아이콘 사이에 숨어 뭔지 몰랐다)
+  // 임무 탭: 목표 선택/해제는 이름 줄 오른쪽 글자 단추 (2026-10-21 사용자: 위 아이콘 사이에선 안 보였고, 글 아래에 두니 내용이 위로 떴다)
   const pickBtn = pick && c.key ? `<button class="gx-evpick${c.selected ? ' on' : ''}" data-action="pick-event" data-value="${key}">${ICONS.pin}${c.selected ? '해제' : '선택'}</button>` : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
     <div class="gx-evc art open ev-pop${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}${pickBtn}</span>
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${pickBtn}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
       </div></div>`;
 }
 
@@ -199,7 +199,7 @@ function opsRow(c: OpsCard, on: boolean): string {
   const thumb = c.art?.pic ? `<img src="${esc(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
   return `<li class="gx-oprow k-${c.kind}${on ? ' sel' : ''}${c.ended ? ' ended' : ''}" data-action="ops-sel" data-value="${esc(c.id)}" aria-current="${on}">
     <span class="gx-oprow-pic">${thumb}</span>
-    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span></b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
 }
 
 const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89) + 10).padStart(2, '0');
@@ -234,6 +234,12 @@ function evBtns(c: OpsCard): string {
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
 }
 
+/** 큰 보기 오른쪽 아래 목표 선택/해제 (2026-10-21 사용자: 임무 상세 창과 같은 단추) */
+function opsPick(c: OpsCard | undefined): string {
+  if (!c?.key || c.ended) return '';
+  return `<button class="gx-evpick gx-oppick${c.selected ? ' on' : ''}" data-action="pick-event" data-value="${esc(c.key)}">${ICONS.pin}${c.selected ? '해제' : '선택'}</button>`;
+}
+
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
     return `<div class="gx-opview feed nosig"><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
@@ -245,7 +251,7 @@ function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, `CAM-${camNo(c.locCode)} · ${esc(region)}`, clock)}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}${opsPick(c)}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
 
@@ -272,7 +278,7 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
   const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
   return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>
-    <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock)}${s ? `<span class="gx-evart-act">${evBtns(s)}</span>` : ''}</div></div>`;
+    <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock)}${s ? `<span class="gx-evart-act">${evBtns(s)}</span>` : ''}</div>${opsPick(s)}</div>`;
 }
 
 /** 관제실 상황판 본문. counts: 일지 제목줄 숫자 (html) */

@@ -2350,7 +2350,7 @@ button.mk-go:hover { color: var(--signal); }
 /* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
 .gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
 .gx-evart-l1 .gx-goaltag { flex: none; }
-.gx-evpick { align-self: flex-end; margin-top: 6px; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
+.gx-evpick { flex: none; margin-left: auto; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
 .gx-evpick svg { width: 17px; height: 17px; }
 .gx-evpick.on { background: rgba(8, 12, 14, .72); color: #f2f6f5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
 /* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
@@ -2358,7 +2358,6 @@ button.mk-go:hover { color: var(--signal); }
 .gx-mlist li.gx-mx { position: relative; }
 .gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
 .gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
-.gx-mx.open .gx-evpick { margin-top: 10px; }
 /* 모바일 좌우 쓸기 (2026-10-21 사용자: 단추 위에서 시작하면 안 넘어간다): 가로 끌기는 브라우저가 가져가지 않게 세로 스크롤만 맡긴다.
    가로로 넘기는 줄·지도는 자기 touch-action이 따로 있다 */
 @media (max-width: 760px) {
@@ -2380,4 +2379,20 @@ button.mk-go:hover { color: var(--signal); }
   .gx-map > .gx-mapcol > .gx-canvas:not(.ph)::before { content: ''; position: absolute; inset: -24px; background: var(--mapbg) center / cover no-repeat; filter: blur(16px) brightness(.4) saturate(.7); }
   .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { z-index: 1; }
   .gx-map .gx-canvas:not(.ph) > .gx-zoom { z-index: 2; }
+}
+/* 상황판 큰 보기의 목표 선택/해제: CCTV는 글 아래 오른쪽, 위성은 오른쪽 아래 구석 */
+.gx-opview.map > .gx-oppick { position: absolute; z-index: 3; right: 14px; bottom: 14px; margin: 0; }
+.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 10.5px; }
+/* 목표 선택/해제는 이름 줄 오른쪽 (2026-10-21 사용자: 아래에 두니 내용이 위로 붕 떴다) */
+.gx-evart-l1 > .gx-evpick { height: 32px; padding: 0 12px 0 10px; font-size: 13px; text-shadow: none; }
+.gx-mx-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.gx-mx-head > .gx-evart-name { min-width: 0; flex: 1; }
+.gx-mx-head > .gx-evpick { height: 34px; }
+/* PC 임무 탭: 지도 그림이 칸 폭을 채우고(그림 비율대로), 카드 띠를 낮춰 아래 세 줄이 들어가게 */
+@media (min-width: 761px) {
+  .gx-map > .gx-mapcol { gap: 8px; }
+  .gx-map > .gx-mapcol > .gx-sits { padding-top: 0; }
+  .gx-map .gx-sits .gx-evart { height: 76px; }
+  .gx-map .gx-mapimg { max-height: calc(min(100vh - 28px, 950px) - 98px - 338px); }
+  .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { max-width: 100%; }
 }
