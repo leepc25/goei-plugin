@@ -1,4 +1,366 @@
- !post.mine) return false;
+w Map(st.posts.map((p) => [p.id, p]));
+    const posts = [];
+    const seen2 = /* @__PURE__ */ new Set();
+    let skippedPosts = 0;
+    let skippedComments = 0;
+    let commentTotal = 0;
+    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
+    const floor = Math.max(1e5, current3.seq);
+    for (const raw of rows2) {
+      if (!isObj(raw)) continue;
+      let pid = int2(raw.id);
+      const prev = pid !== null ? old.get(pid) : void 0;
+      const author = str(raw.author).trim();
+      if (!prev && (raw.mine === true || author === o.nick)) {
+        skippedPosts++;
+        continue;
+      }
+      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
+      if (pid === null || seen2.has(pid)) continue;
+      seen2.add(pid);
+      st.seq = Math.max(st.seq, pid);
+      const comments = Array.isArray(raw.comments) ? raw.comments : [];
+      commentTotal += comments.length;
+      let date = validDate(raw.date);
+      if (!date) date = day && str(raw.time).trim() ? `${day} ${str(raw.time).trim()}` : o.date;
+      const q = {
+        id: pid,
+        nick: cut(author || "ㅇㅇ", 80),
+        title: str(raw.title),
+        body: stripForged(str(raw.content)),
+        date,
+        views: Math.max(0, int2(raw.views) ?? 0),
+        votes: Math.max(0, int2(raw.upvotes) ?? 0),
+        mine: prev?.mine ?? false,
+        comments: []
+      };
+      const sigs = /* @__PURE__ */ new Map();
+      const remap = /* @__PURE__ */ new Map([[0, 0]]);
+      if (prev) {
+        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+        for (const c of prev.comments) {
+          q.comments.push(c);
+          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
+        }
+      }
+      const raws = [];
+      comments.forEach((c, i) => {
+        const n = i + 1;
+        if (!isObj(c)) return void remap.set(n, false);
+        const cAuthor = str(c.author).trim();
+        const content = stripForged(str(c.content));
+        let parent = int2(c.parent) ?? 0;
+        if (parent < 0 || parent >= n) parent = 0;
+        const sig = `${cAuthor}\0${content}`;
+        if (sigs.has(sig)) return void remap.set(n, sigs.get(sig));
+        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
+          skippedComments++;
+          return void remap.set(n, false);
+        }
+        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
+        raws.push(str(c.time).trim());
+        sigs.set(sig, q.comments.length);
+        remap.set(n, q.comments.length);
+      });
+      stampComments(q, q.comments.length - raws.length, raws, o.date);
+      if (!q.title.trim() && !q.body.trim()) continue;
+      posts.push(q);
+    }
+    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
+    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
+    st.posts = posts;
+    trimBoard(st, o.settings);
+    const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
+    return { st, notice: notice2, emptyComments: commentTotal === 0 };
+  }
+  function acceptComments(rows2, existing, t, nick, base = t.total) {
+    const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
+    let dropped = Array.isArray(rows2) ? Math.max(0, rows2.length - LIMITS.replies) : 0;
+    const out = [];
+    const map = /* @__PURE__ */ new Map();
+    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
+    list4.forEach((c, i) => {
+      const own = t.total + i + 1;
+      const bad = () => {
+        dropped++;
+        map.set(own, false);
+      };
+      if (!isObj(c)) return bad();
+      const author = str(c.author).trim();
+      const content = stripForged(str(c.content)).trim();
+      let n = int2(c.parent);
+      if (n === null || n === 0) n = t.replyTo;
+      if (!author || [...author].length > 80 || author === nick || !content) return bad();
+      if (n > t.total) {
+        const m = map.get(n);
+        if (m === void 0 || m === false) return bad();
+        n = m;
+      } else if (n < 0 || n > 0 && !t.supplied.has(n) && n !== t.replyTo) return bad();
+      if (t.replyTo > 0 && n !== t.replyTo && n <= t.total) return bad();
+      const sig = `${author}\0${content}`;
+      if (seen2.has(sig)) return bad();
+      seen2.add(sig);
+      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
+      map.set(own, base + out.length);
+    });
+    return { comments: out, dropped };
+  }
+  function stampMinutes(stamp) {
+    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
+    if (!m) return null;
+    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
+  }
+  function minutesStamp(min) {
+    const d = new Date(min * 6e4);
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  }
+  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
+  function clockMinutes(raw) {
+    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
+    if (!m) return null;
+    const h = +m[1];
+    const mi = +m[2];
+    return h < 24 && mi < 60 ? h * 60 + mi : null;
+  }
+  function stampComments(p, from, raws, now) {
+    const nowMin = stampMinutes(now);
+    const postMin = stampMinutes(p.date);
+    const floorOf = (i) => {
+      const c = p.comments[i];
+      const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
+      const known = cands.filter((x) => x !== null);
+      return known.length ? Math.max(...known) : null;
+    };
+    const pending = [];
+    const settle = (upto) => {
+      if (!pending.length) return;
+      const lo = floorOf(pending[0]);
+      const hi = upto ?? nowMin ?? lo;
+      if (lo === null || hi === null) return void (pending.length = 0);
+      const span = Math.max(0, hi - lo);
+      pending.forEach((idx, k) => {
+        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending.length + 1)));
+        p.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
+      });
+      pending.length = 0;
+    };
+    for (let i = from; i < p.comments.length; i++) {
+      const c = p.comments[i];
+      const raw = String(raws[i - from] ?? "").trim();
+      const lo = floorOf(i);
+      const clock2 = raw ? clockMinutes(raw) : null;
+      if (clock2 === null || lo === null && nowMin === null) {
+        pending.push(i);
+        continue;
+      }
+      const hi = nowMin ?? Number.POSITIVE_INFINITY;
+      const base = lo ?? nowMin - 24 * 60;
+      let pick3 = null;
+      for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
+        const t = day * 1440 + clock2;
+        if (t >= base && t <= hi) {
+          pick3 = t;
+          break;
+        }
+      }
+      if (pick3 === null) {
+        const ahead = 1 + i % 3;
+        const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock2 > nowMin;
+        if (future && (lo === null || lo <= nowMin)) pick3 = nowMin;
+        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick3 = lo + ahead;
+        else pick3 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
+      }
+      settle(pick3);
+      c.time = minutesStamp(pick3);
+    }
+    settle(null);
+  }
+  function commentWhen(p, c) {
+    if (!c.time) return "";
+    return c.time.slice(0, 10) === String(p.date).slice(0, 10) ? hhmm(c.time) : c.time;
+  }
+  var whenField = (p, c) => {
+    const t = commentWhen(p, c);
+    return t ? { time: t } : {};
+  };
+  function pushComments(p, rows2, now) {
+    const from = p.comments.length;
+    for (const c of rows2) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
+    stampComments(p, from, rows2.map((c) => c.time ?? ""), now);
+  }
+  function parsePostDraft(value) {
+    if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
+    const title2 = str(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
+    const content = str(value.post.content).trim();
+    if (!title2 || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
+    return { title: trimTokens(title2, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
+  }
+  function attachPostDraft(draft2, input2) {
+    if (!hasAttachment(input2)) return draft2;
+    const literal = /* @__PURE__ */ new Set();
+    for (const p of bodyParts(input2)) if (p.kind === "text") for (const line2 of p.text.split("\n")) literal.add(line2.trim());
+    const plain = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
+    const kept = plain.split("\n").filter((line2) => {
+      const t = line2.trim();
+      const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
+      const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
+      const dup = !!label && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label);
+      return literal.has(t) || !dup;
+    });
+    const records = attachmentRecords(input2).map((r) => r.text);
+    const content = [kept.join("\n").trim(), ...records].filter(Boolean).join("\n");
+    return { title: draft2.title, content };
+  }
+  function activityContext(st, targetId) {
+    const posts = [];
+    const snapshots = /* @__PURE__ */ new Map();
+    for (const p of st.posts.slice(0, HISTORY.refresh)) {
+      const selected = /* @__PURE__ */ new Set();
+      for (let n = Math.max(1, p.comments.length - HISTORY.comment + 1); n <= p.comments.length; n++) {
+        let k = n;
+        const visited = /* @__PURE__ */ new Set();
+        while (p.comments[k - 1] && !visited.has(k)) {
+          visited.add(k);
+          selected.add(k);
+          k = p.comments[k - 1].parent;
+        }
+      }
+      const allowed = p.id !== targetId;
+      posts.push({
+        id: p.id,
+        author: p.nick,
+        title: p.title,
+        content: p.body,
+        date: p.date,
+        views: p.views,
+        upvotes: p.votes,
+        comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body })).filter((c) => selected.has(c.index)),
+        commentCount: p.comments.length,
+        commentsAllowed: allowed
+      });
+      snapshots.set(p.id, { head: postHead(p), rows: p.comments.map(commentKey), count: p.comments.length, selected, commentsAllowed: allowed });
+    }
+    return { posts, snapshots };
+  }
+  function applyActivity(st, rows2, snapshots, nick, now = "") {
+    if (rows2 === void 0 || rows2 === null) return [false, 0];
+    if (!Array.isArray(rows2)) return [false, 1];
+    let changed = false;
+    let skipped2 = 0;
+    const done2 = /* @__PURE__ */ new Set();
+    for (const u of rows2) {
+      const id = isObj(u) ? int2(u.id) : null;
+      const ref = id !== null ? snapshots.get(id) : void 0;
+      const p = id !== null ? findPost(st, id) : void 0;
+      if (!isObj(u) || id === null || done2.has(id) || !ref || !p || postHead(p) !== ref.head || ref.rows.some((k, i) => !p.comments[i] || commentKey(p.comments[i]) !== k)) {
+        skipped2++;
+        continue;
+      }
+      done2.add(id);
+      const delta = (v) => {
+        const n = int2(v);
+        return n !== null && n >= 0 ? Math.min(n, 1e7) : 0;
+      };
+      const comments = Array.isArray(u.comments) ? u.comments : [];
+      if (!ref.commentsAllowed && comments.length) {
+        skipped2++;
+        continue;
+      }
+      const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
+      p.views += delta(u.viewsDelta);
+      p.votes += delta(u.upvotesDelta);
+      pushComments(p, got.comments, now);
+      if (got.dropped) skipped2++;
+      changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
+    }
+    return [changed, skipped2];
+  }
+  function incomingPlan(chat, st, s4, nick, rand2, origin, saved) {
+    const plan = { allowed: false, userHandle: nick, history: [] };
+    for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
+    if (!s4.incoming) return plan;
+    const last2 = Number(chat.scriptstate?.[GN_COOLDOWN]);
+    const now = storyTurns(chat);
+    if (Number.isFinite(last2) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last2 && now - last2 < HISTORY.cooldown) return plan;
+    let post = origin?.post;
+    let ci = origin?.commentIndex;
+    if (!post && saved) {
+      post = findPost(st, saved.post);
+      ci = saved.comment;
+    }
+    if (!post) {
+      for (const p of st.posts) {
+        if (p.mine) {
+          post = p;
+          break;
+        }
+        for (let i = p.comments.length; i >= 1; i--) {
+          if (p.comments[i - 1].mine) {
+            post = p;
+            ci = i;
+            break;
+          }
+        }
+        if (post) break;
+      }
+    }
+    const comment = post && ci ? post.comments[ci - 1] : void 0;
+    if (!post || ci && (!comment || !comment.mine) || !comment && !post.mine) return plan;
+    if (s4.incomingChance <= 0 || s4.incomingChance < 100 && Math.floor(rand2() * 100) + 1 > s4.incomingChance) return plan;
+    return { ...plan, allowed: true, post, comment, commentIndex: ci };
+  }
+  function incomingTask(plan, activityPosts) {
+    const body5 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
+    if (plan.allowed && plan.post) {
+      body5.incomingOrigin = {
+        title: plan.post.title,
+        author: plan.post.nick,
+        content: plan.post.body,
+        ...plan.comment ? { comment: { author: plan.comment.nick, content: plan.comment.body } } : {}
+      };
+      body5.previousIncoming = plan.history;
+    }
+    if (activityPosts) body5.activityPosts = activityPosts;
+    return `
+COMBINED OUTPUT OPTIONS:
+${JSON.stringify(body5)}`;
+  }
+  function commitIncoming(st, rows2, plan, date, postOverride) {
+    if (!plan.allowed || !plan.post) return false;
+    if (rows2 === void 0 || rows2 === null) return false;
+    if (typeof rows2 === "string") {
+      if (rows2.trim() === "D|__NONE__|__NONE__" || !rows2.trim()) return false;
+      throw new GnetError("선쪽지 형식이 올바르지 않아요.");
+    }
+    const list4 = Array.isArray(rows2) ? rows2 : isObj(rows2) ? [rows2] : null;
+    if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
+    let pick3 = null;
+    const reasons = [];
+    let quiet = 0;
+    list4.forEach((c, i) => {
+      if (pick3) return;
+      if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
+      const nick = str(c.nick).trim();
+      const body5 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
+      if (nick === "__NONE__") return void quiet++;
+      if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
+      if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
+      if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
+      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
+      pick3 = { nick, body: body5 };
+    });
+    if (!pick3) {
+      if (!reasons.length) return false;
+      throw new GnetError(`선쪽지 형식을 확인해 주세요 (${reasons.join("; ")}).`);
+    }
+    const chosen = pick3;
+    const post = postOverride ? findPost(st, postOverride.id) : findPost(st, plan.post.id);
+    if (!post) return false;
+    const comment = plan.commentIndex ? post.comments[plan.commentIndex - 1] : void 0;
+    if (plan.commentIndex && (!comment || !comment.mine || comment.body !== plan.comment?.body)) return false;
+    if (!plan.commentIndex && !post.mine) return false;
     st.sources[chosen.nick] = sourceFor(post, plan.commentIndex ?? 0);
     st.dms.push({ nick: chosen.nick, side: "npc", body: chosen.body, unread: true, date });
     return true;
@@ -215,12 +577,12 @@ ${JSON.stringify({ feature: "gnet", records })}
     const set2 = phoneSettings(chat.scriptstate);
     const cat = tabCatalog(books);
     const tabs2 = [];
-    const visible = /* @__PURE__ */ new Set();
+    const visible2 = /* @__PURE__ */ new Set();
     const add = (t) => {
-      if (!t || visible.has(t.id)) return;
+      if (!t || visible2.has(t.id)) return;
       const allowed = t.id.startsWith("T") ? set2.allContacts || t.visibleFor.has(faction) : set2.anomalyContacts && t.visibleFor.has(faction);
       if (!allowed) return;
-      visible.add(t.id);
+      visible2.add(t.id);
       tabs2.push({ id: t.id, name: t.names[faction] ?? t.name });
     };
     for (const code of cat.orders[faction] ?? []) add(cat.entries.find((e) => e.id === code));
@@ -231,6 +593,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     for (const row6 of roster.characters ?? []) {
       const agentId = s3(row6?.id);
       if (!/^P\d{3,}$/.test(agentId) || !s3(row6.name)) continue;
+      if (agentId === String(chat.scriptstate?.["$st_player"] ?? "")) continue;
       const english = s3(row6.english);
       const c = {
         id: contactId(agentId),
@@ -246,7 +609,7 @@ ${JSON.stringify({ feature: "gnet", records })}
         visible: false,
         saved: false
       };
-      c.visible = c.tabs.some((t) => visible.has(t));
+      c.visible = c.tabs.some((t) => visible2.has(t));
       map.set(c.id, c);
       if (c.visible) contacts.push(c);
       for (const name of [english, ...list3(row6.legacy_english)]) if (name) map.set(`c_${hex2(name.toLowerCase())}`, c);
@@ -255,12 +618,12 @@ ${JSON.stringify({ feature: "gnet", records })}
       let c = map.get(entry.id);
       if (c) {
         if (!c.tabs.includes("T05")) c.tabs = [...c.tabs, "T05"];
-        if (!c.visible && visible.has("T05")) {
+        if (!c.visible && visible2.has("T05")) {
           c.visible = true;
           contacts.push(c);
         }
       } else {
-        c = { id: entry.id, name: entry.name, english: "", lore: "", group: "미분류", rank: "", department: "", note: entry.note ?? "", custom: true, tabs: ["T05"], terms: [entry.name, entry.note ?? ""], visible: visible.has("T05"), saved: true };
+        c = { id: entry.id, name: entry.name, english: "", lore: "", group: "미분류", rank: "", department: "", note: entry.note ?? "", custom: true, tabs: ["T05"], terms: [entry.name, entry.note ?? ""], visible: visible2.has("T05"), saved: true };
         map.set(c.id, c);
         if (c.visible) contacts.push(c);
       }
@@ -1819,6 +2182,7 @@ ${req.docRequest.trim()}`;
       return `➡️${t}➡️`;
     });
   }
+  var SPOILER_HEADING = /탈출|출구|금기|공략|해법|해결|클리어|생환|대처|수칙|정답|파훼|봉인|퇴치|살아남|빠져나|규칙|격리 ?(?:방법|절차)|약점/;
   var esc2 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var escText = (s4) => esc2(s4.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
   function attrs(open3) {
@@ -1887,8 +2251,18 @@ ${line2}`;
       if (list4.length) out.push(`<ul class="nw-list">${list4.map((x) => `<li>${x}</li>`).join("")}</ul>`);
       list4 = [];
     };
+    let spoil = null;
+    const hidden = /* @__PURE__ */ new Set();
+    const closeSpoil = () => {
+      if (!spoil) return;
+      const inner = out.splice(spoil.at).join("");
+      if (inner) out.push(`<details class="nw-spoil"><summary>스포일러 · 눌러서 보기</summary><div class="nw-spoil-in">${inner}</div></details>`);
+      spoil = null;
+    };
     for (const b of blocks) {
       if (b.tag !== "List") flushList();
+      if (b.tag === "Heading" && spoil && (headings[hi]?.level ?? 1) <= spoil.level) closeSpoil();
+      const n0 = notes.length;
       switch (b.tag) {
         case "Infobox": {
           const fields3 = splitFields(b.text).map(field);
@@ -1903,6 +2277,7 @@ ${line2}`;
         case "Heading": {
           const h = headings[hi++];
           if (h) out.push(`<h${h.level + 2} class="nw-h" id="nw-h-${h.id}" style="--nw:${color}"><span>${h.id}.</span> ${inline(h.title)}</h${h.level + 2}>`);
+          if (h && o.fold && !spoil && SPOILER_HEADING.test(h.title)) spoil = { level: h.level, at: out.length };
           break;
         }
         case "List":
@@ -1929,9 +2304,11 @@ ${line2}`;
         default:
           if (b.text.trim()) out.push(`<p class="nw-p">${inline(b.text.trim()).replace(/\n/g, "<br>")}</p>`);
       }
+      if (spoil) for (let i = n0; i < notes.length; i++) hidden.add(i);
     }
     flushList();
-    if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${n}</li>`).join("")}</ol>`);
+    closeSpoil();
+    if (notes.length) out.push(`<ol class="nw-notes">${notes.map((n, i) => `<li data-fn="${i + 1}">${hidden.has(i) ? `<details class="nw-spoil fn"><summary>스포일러</summary><span class="nw-fn-t">${n}</span></details>` : n}</li>`).join("")}</ol>`);
     const links = (keys) => keys.map((k) => a[k]).filter((t) => !!t && validTitle(t)).map((t) => o.canon(t));
     return { html: out.join(""), title: a.doc_title || "", related: links(["related1", "related2", "related3"]), recent: links(["recent1", "recent2", "recent3"]), headings: headings.map((h) => h.title) };
   }
@@ -2079,7 +2456,8 @@ ${SEED_CLOSE}` : "", missing };
     const faction = isFaction(s4["$st_faction"]) ? s4["$st_faction"] : void 0;
     const lang = isLang(s4["$st_lang"]) ? s4["$st_lang"] : void 0;
     const fm = Number(s4["$st_fm"]);
-    return { faction, lang, fm: Number.isInteger(fm) && fm > 0 ? fm : void 0 };
+    const player = String(s4["$st_player"] ?? "");
+    return { faction, lang, fm: Number.isInteger(fm) && fm > 0 ? fm : void 0, ...player ? { player } : {} };
   }
   var StartError = class extends Error {
   };
@@ -2090,6 +2468,7 @@ ${SEED_CLOSE}` : "", missing };
     if (!isLang(choice.lang)) throw new StartError("언어를 골라 주세요.");
     const scenario = findScenario(choice.faction, choice.fm, factions);
     if (!scenario) throw new StartError("상황을 골라 주세요.");
+    if (choice.player && scenario.kind === "opening") throw new StartError("캐릭터로 시작할 때는 직접 입력이나 커스텀 임무를 골라 주세요.");
     const direct = faction.scenarios.find((s4) => s4.kind === "direct");
     const keys = [greetingKey(choice.faction, choice.lang, choice.fm)];
     if (scenario.kind === "preset" && direct) keys.push(greetingKey(choice.faction, choice.lang, direct.fm));
@@ -2107,6 +2486,7 @@ ${SEED_CLOSE}` : "", missing };
       seedMissing: seed.missing,
       scriptstate: {
         $st_faction: choice.faction,
+        $st_player: choice.player ?? "",
         $st_lang: choice.lang,
         $st_fm: String(choice.fm),
         $st_pick: choice.faction,
@@ -2628,6 +3008,470 @@ ${next.content.trim()}`;
     return { messages: out, changed: true };
   }
 
+  // src/core/lore.ts
+  var LORE_KINDS = ["org", "site", "anomaly", "agent"];
+  var SLOTS = {
+    org: { comment: "📚Lore slot · Faction", name: "goei_lore_org", order: 200, label: "세력" },
+    site: { comment: "📚Lore slot · Mystic", name: "goei_lore_site", order: 400, label: "특수" },
+    anomaly: { comment: "📚Lore slot · Anomaly", name: "goei_lore_anomaly", order: 500, label: "괴이" },
+    agent: { comment: "📚Lore slot · Agent", name: "goei_lore_agent", order: 600, label: "요원" }
+  };
+  var slotVar = (k) => `$${SLOTS[k].name}`;
+  var DONT_ACTIVATE = "@@dont_activate";
+  var FOLDER_KIND = { 세력: "org", 조직: "org", 파밍: "site", 괴이: "anomaly", 요원: "agent" };
+  var folderWord2 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
+  var str2 = (v) => typeof v === "string" ? v : "";
+  var CONFIRM_KEYS = /* @__PURE__ */ new Set([
+    "어두운 정원",
+    "거대한 세상",
+    "욕망의 방",
+    "학교의 악몽",
+    "성자의 도시",
+    "눈먼 자들의 저택",
+    "검은 그늘 속에서",
+    "한여름 밤의 꿈",
+    "금지된 비디오",
+    "금지된 영상",
+    "생체 공장",
+    "생체공장",
+    "해피엔딩",
+    "붉은 숙녀",
+    "타락한 성당",
+    "미스테리 월드",
+    "어드벤쳐 파크",
+    "교회",
+    "강변",
+    "지하실",
+    "미술관",
+    "병원",
+    "극단",
+    "세계정치",
+    "세계 정치",
+    "기독교 상점",
+    "헐값 매입",
+    "대박 알선",
+    "사장",
+    "국장",
+    // 흔한 영어 이름·낱말과 같은 키 (2026-10-21: Jay는 흔한 이름, 브라우니는 과자)
+    "Jay",
+    "Brownie",
+    "브라우니",
+    "Yu-ri",
+    "Route 16",
+    "Red Lady"
+  ]);
+  var JOSA = [
+    "에게서",
+    "에게",
+    "한테",
+    "께서",
+    "께",
+    "이랑",
+    "하고",
+    "까지",
+    "부터",
+    "마저",
+    "조차",
+    "처럼",
+    "보다",
+    "밖에",
+    "으로",
+    "로서",
+    "로",
+    "이나",
+    "이든",
+    "이라도",
+    "라도",
+    "에서",
+    "에는",
+    "에도",
+    "에",
+    "엔",
+    "은",
+    "는",
+    "이",
+    "가",
+    "을",
+    "를",
+    "의",
+    "와",
+    "과",
+    "랑",
+    "도",
+    "만",
+    "나",
+    "든",
+    "였",
+    "여",
+    "야",
+    "예요",
+    "라",
+    "란",
+    "아"
+  ];
+  var HONOR2 = ["님", "씨", "쌤", "선배", "언니", "오빠", "누나", "형", "양", "군", "팀장", "대리", "반장", "국장", "이사", "원장", "수녀", "신부", "요원"];
+  var SUFFIXES2 = [.../* @__PURE__ */ new Set([...HONOR2, ...JOSA])].sort((a, b) => b.length - a.length);
+  var MARKERS2 = ["괴담", "괴이", "괴현상", "측", "소속", "직원", "쪽 사람"];
+  var OPEN = `「『"'“‘<《〈[(【`;
+  var CLOSE = `」』"'”’>》〉])】`;
+  var EN_TITLE = /(?:^|[^a-z])(?:chief|ban-?jang|team-?jang|leader|agent|director|manager|officer|mr\.?|ms\.?|mrs\.?|sir|madam)\s+$/;
+  var EN_STOP = /* @__PURE__ */ new Set(["the", "of", "and", "with", "a", "an", "in", "on", "to", "for"]);
+  var isLetter = (c) => !!c && /[\p{L}\p{N}]/u.test(c);
+  var hangul = (s4) => /[가-힣]/.test(s4);
+  var syllables = (s4) => [...s4.replace(/\s+/g, "")].length;
+  var escRe = (s4) => s4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  function keyRegex(key2, en2, person = false) {
+    if (en2) {
+      const words = key2.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
+      if (!words.length || words.every((w) => EN_STOP.has(w))) return null;
+      const body6 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
+      return new RegExp(`(?<![a-z0-9])${body6}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
+    }
+    const parts = key2.split(/\s+/).filter(Boolean);
+    if (!parts.length) return null;
+    const gap = !person && syllables(key2) >= 3 ? "\\s*" : "";
+    const word = (p) => [...p].map(escRe).join(gap);
+    const body5 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
+    return new RegExp(`(?<![\\p{L}\\p{N}])${body5}`, "giu");
+  }
+  function keysOf2(e) {
+    const all = str2(e.key).split(",");
+    if (e.selective) all.push(...str2(e.secondkey).split(","));
+    return [...new Set(all.map((k) => k.trim()).filter(Boolean))];
+  }
+  var hasDontActivate = (content) => content.split("\n").some((l) => l.trim() === DONT_ACTIVATE) && /^\s*@@/.test(content);
+  function stripDecorators(content) {
+    const lines = content.split("\n");
+    let i = 0;
+    while (i < lines.length && /^\s*@@/.test(lines[i])) i++;
+    return lines.slice(i).join("\n");
+  }
+  var cache4 = /* @__PURE__ */ new WeakMap();
+  function hasSlots(lore) {
+    const names4 = new Set((lore ?? []).map((e) => str2(e.comment)));
+    return LORE_KINDS.every((k) => names4.has(SLOTS[k].comment));
+  }
+  function folderKeys(books) {
+    const kinds = /* @__PURE__ */ new Map();
+    for (const e of books) {
+      const k = e.mode === "folder" ? FOLDER_KIND[folderWord2(str2(e.comment))] : void 0;
+      if (k && typeof e.key === "string") kinds.set(e.key, k);
+    }
+    return kinds;
+  }
+  var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
+  function syncDecorators(lore, mode3) {
+    const books = lore ?? [];
+    if (!hasSlots(books)) return null;
+    const kinds = folderKeys(books);
+    let n = 0;
+    const next = books.map((e) => {
+      if (!managedHere(e, kinds)) return e;
+      const content = str2(e.content);
+      const on2 = hasDontActivate(content);
+      if (mode3 === "plugin" && !on2) {
+        n++;
+        return { ...e, content: `${DONT_ACTIVATE}
+${content}` };
+      }
+      if (mode3 === "risu" && on2) {
+        n++;
+        return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
+      }
+      return e;
+    });
+    return n ? next : null;
+  }
+  function managedEntries(lore) {
+    const books = lore ?? [];
+    const hit2 = cache4.get(books);
+    if (hit2) return hit2;
+    if (!hasSlots(books)) {
+      cache4.set(books, []);
+      return [];
+    }
+    const kinds = folderKeys(books);
+    const groups = /* @__PURE__ */ new Map();
+    for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
+    const out = [];
+    books.forEach((e, index) => {
+      const kind = kinds.get(str2(e.folder));
+      const content = str2(e.content);
+      if (!kind || !managedHere(e, kinds)) return;
+      const raw = keysOf2(e);
+      const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
+      const keys = [];
+      for (const text of raw) {
+        const en2 = !hangul(text);
+        const re = keyRegex(text, en2, kind === "agent");
+        if (!re) continue;
+        const alias = kind === "agent" && !en2 && syllables(text) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text));
+        keys.push({ text, en: en2, rule: CONFIRM_KEYS.has(text) ? "confirm" : alias ? "alias" : "plain", re });
+      }
+      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
+    });
+    cache4.set(books, out);
+    return out;
+  }
+  function around(text, start4, end) {
+    let a = start4;
+    for (let n = 0; a > 0 && n < 2; ) if (/\s/.test(text[--a])) n++;
+    let b = end;
+    for (let n = 0; b < text.length && n < 2; b++) if (/\s/.test(text[b])) n++;
+    return text.slice(a, b).replace(/\s+/g, " ").trim();
+  }
+  function rightOk(text, end) {
+    const tail = text.slice(end);
+    if (!isLetter(tail[0])) {
+      const next = tail.replace(/^\s+/, "");
+      const honorAt = (h) => next.startsWith(h) && (!isLetter(next[h.length]) || JOSA.some((j) => next.startsWith(j, h.length)));
+      return { ok: true, honor: tail.length !== next.length && HONOR2.some(honorAt) };
+    }
+    const sfx = SUFFIXES2.find((s4) => tail.startsWith(s4));
+    if (!sfx) return { ok: false, honor: false };
+    return { ok: true, honor: HONOR2.includes(sfx) || sfx === "아" || sfx === "야" };
+  }
+  function findHits(text, entries2) {
+    if (!text) return [];
+    const lower = text.toLowerCase();
+    const hits = [];
+    entries2.forEach((e, ei) => {
+      for (const key2 of e.keys) {
+        key2.re.lastIndex = 0;
+        for (const m of lower.matchAll(key2.re)) {
+          const start4 = m.index ?? 0;
+          const end = start4 + m[0].length;
+          const r = key2.en ? { ok: true, honor: EN_TITLE.test(lower.slice(Math.max(0, start4 - 16), start4)) } : rightOk(lower, end);
+          if (!r.ok) continue;
+          const tail = lower.slice(end).replace(/^\s+/, "");
+          const quoted = OPEN.includes(lower[start4 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
+          const before = lower.slice(Math.max(0, start4 - 20), start4).trimEnd();
+          const marked = quoted || MARKERS2.some((w) => tail.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
+          hits.push({ entry: ei, key: key2, start: start4, end, marked, honor: r.honor, snippet: around(text, start4, end) });
+        }
+      }
+    });
+    return hits.filter((h) => !hits.some((o) => o !== h && o.entry !== h.entry && o.start <= h.start && o.end >= h.end && o.end - o.start > h.end - h.start));
+  }
+  var DEFAULT_DEPTH = 10;
+  function loreState(chat) {
+    const msgs = chat.message ?? [];
+    let target = "";
+    for (let i = msgs.length - 1; i >= 0 && !target; i--) {
+      if (msgs[i].role === "user") continue;
+      const tags = findStatusTags(str2(msgs[i].data));
+      if (tags.length) target = tags[tags.length - 1].target;
+      if (tags.length) break;
+    }
+    const w = parseWorld(chat.scriptstate?.[WORLD_KEY]);
+    const board2 = [...w.an.filter((a) => a.state === "활성").map((a) => a.name), ...w.ms.filter((m) => m.state === "출현").map((m) => m.name)];
+    const deployed = Object.entries(w.agents).filter(([, r]) => r.st === "작전투입" || r.st === "외근").map(([n]) => n);
+    return { target, board: board2, deployed };
+  }
+  var sameName = (a, b) => a.replace(/\s+/g, "").toLowerCase() === b.replace(/\s+/g, "").toLowerCase();
+  function names(e, name) {
+    return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)));
+  }
+  function pickLore(entries2, messages, state, o, inputLast = false) {
+    const window2 = messages.slice(-Math.max(1, o.depth));
+    const picks = /* @__PURE__ */ new Map();
+    const add = (i, why, key2, snippet, score) => {
+      const p = picks.get(i) ?? { entry: entries2[i], score: 0, reasons: [] };
+      p.score += score;
+      if (!p.reasons.some((r) => r.why === why && r.key === key2)) p.reasons.push({ why, key: key2, snippet });
+      picks.set(i, p);
+    };
+    entries2.forEach((e, i) => {
+      if (state.target && names(e, state.target)) add(i, "status", state.target, state.target, 100);
+    });
+    const pending = [];
+    window2.forEach((m, wi) => {
+      const age2 = window2.length - 1 - wi;
+      const isInput = inputLast && wi === window2.length - 1;
+      const why = isInput ? "input" : m.role === "user" ? "user" : "char";
+      const score = (isInput ? 30 : 0) + (m.role === "user" ? 3 : 1) * 0.8 ** age2;
+      for (const hit2 of findHits(m.data, entries2)) pending.push({ hit: hit2, why, score });
+    });
+    for (const { hit: hit2, why, score } of pending) if (hit2.key.rule === "plain") add(hit2.entry, why, hit2.key.text, hit2.snippet, score);
+    for (const { hit: hit2, why, score } of pending) {
+      if (hit2.key.rule === "plain") continue;
+      const e = entries2[hit2.entry];
+      const present = state.deployed.some((n) => names(e, n)) || state.board.some((n) => names(e, n));
+      const ok = hit2.marked || present || picks.has(hit2.entry) || hit2.honor;
+      if (ok) add(hit2.entry, picks.has(hit2.entry) || !hit2.marked ? why : "confirmed", hit2.key.text, hit2.snippet, score);
+    }
+    let list4 = [...picks.values()];
+    if (o.budget > 0) {
+      const keep = [];
+      let used = 0;
+      for (const p of list4.slice().sort((a, b) => b.score - a.score)) {
+        const n = tokens(p.entry.content);
+        if (used + n > o.budget) continue;
+        used += n;
+        keep.push(p);
+      }
+      list4 = keep;
+    }
+    return list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+  }
+  function pickLoreRisu(entries2, messages, depth) {
+    const squash3 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
+    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash3(m.data) }));
+    const out = [];
+    for (const entry of entries2) {
+      const reasons = [];
+      for (const k of entry.rawKeys) {
+        const key2 = squash3(k);
+        const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
+        if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
+      }
+      if (reasons.length) out.push({ entry, score: 0, reasons });
+    }
+    return out.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
+  }
+  function slotTexts(picks, env2) {
+    const out = { org: [], site: [], anomaly: [], agent: [] };
+    for (const p of picks) {
+      const text = stripDecorators(evaluate(p.entry.content, env2)).trim();
+      if (text) out[p.entry.kind].push(text);
+    }
+    return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
+  }
+  function loreMessages(chat, input2, raw = false) {
+    const msgs = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str2(m.data) : messageText(str2(m.data)) }));
+    if (input2 !== void 0) msgs.push({ role: "user", data: raw ? input2 : messageText(input2) });
+    return msgs.filter((m) => m.data);
+  }
+  function computeLore(lore, chat, o) {
+    const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes(e.name));
+    if (!entries2.length) return null;
+    const msgs = loreMessages(chat, o.input, o.mode === "risu");
+    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs, o.depth) : pickLore(entries2, msgs, loreState(chat), o, msgs.at(-1)?.role === "user");
+    const texts = o.mode === "risu" ? null : slotTexts(picks, o.env);
+    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
+  }
+  var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
+  function loreOptions(char, chat, mode3, user = "") {
+    const ls = char.loreSettings ?? {};
+    const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
+    const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
+    const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
+    const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n, e) => n + tokens(str2(e.content)), 0);
+    return {
+      mode: mode3,
+      depth,
+      budget: total ? Math.max(1, Math.floor((total - always) * 0.9)) : 0,
+      env: { vars: chat.scriptstate ?? {}, char: char.name, ...user ? { user } : {} }
+    };
+  }
+  function patchSlots(messages, old, next) {
+    let changed = 0;
+    let out = messages;
+    const vars = LORE_KINDS.map(slotVar);
+    const cur = vars.map((k) => String(old?.[k] ?? ""));
+    const find = (text) => text ? out.findIndex((m) => typeof m?.content === "string" && m.content.includes(text)) : -1;
+    const swap = (at, from, to) => {
+      out = out.map((m, i) => i === at ? { ...m, content: m.content.replace(from, () => to) } : m);
+    };
+    vars.forEach((k, i) => {
+      if (!(k in next)) return;
+      const v = next[k];
+      const prev = cur[i];
+      if (prev === v) return;
+      if (prev) {
+        const at = find(prev);
+        if (at < 0) return;
+        swap(at, prev, v);
+      } else {
+        const before = [...cur.slice(0, i)].reverse().find((t) => t && find(t) >= 0);
+        const after = cur.slice(i + 1).find((t) => t && find(t) >= 0);
+        if (before) swap(find(before), before, `${before}
+
+${v}`);
+        else if (after) swap(find(after), after, `${v}
+
+${after}`);
+        else return;
+      }
+      cur[i] = v;
+      changed++;
+    });
+    return { messages: out, changed };
+  }
+  function trimRoster(messages) {
+    const names4 = /* @__PURE__ */ new Set();
+    for (const m of messages) {
+      if (typeof m?.content !== "string") continue;
+      for (const x of m.content.matchAll(/^###\s*Character\s*-\s*(.+?)\s*$/gm)) names4.add(x[1].toLowerCase());
+    }
+    if (!names4.size) return messages;
+    return messages.map((m) => {
+      const c = m?.content;
+      if (typeof c !== "string" || !c.includes("## Roster")) return m;
+      const next = c.replace(/^## Roster\n[\s\S]*?(?=^## |(?![\s\S]))/m, (sec) => sec.replace(/^- ([^(\n]+?) \([^\n]*\n?/gm, (line2, name) => names4.has(name.trim().toLowerCase()) ? "" : line2));
+      return next === c ? m : { ...m, content: next };
+    });
+  }
+
+  // src/core/player.ts
+  var PLAYER_KEY = "$st_player";
+  var playerId = (state) => {
+    const v = String(state?.[PLAYER_KEY] ?? "").trim();
+    return /^P\d{3,}$/.test(v) ? v : "";
+  };
+  function playerAgent(lore, state) {
+    const id = playerId(state);
+    return id ? readDirectory(lore).agents.find((a) => a.id === id) : void 0;
+  }
+  function playableAgents(lore, faction) {
+    return readDirectory(lore).agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(faction));
+  }
+  var PLAYER_HEAD = "## Player Character";
+  function playerBlock(lore, agent, env2) {
+    const entry = (lore ?? []).find((e) => e.mode !== "folder" && String(e.comment ?? "") === agent.lore);
+    const body5 = entry ? stripDecorators(evaluate(String(entry.content ?? ""), env2)).trim() : "";
+    const who = agent.english ? `${agent.name} (${agent.english})` : agent.name;
+    return [
+      PLAYER_HEAD,
+      `The user plays ${who}${agent.rank ? `, ${agent.rank}` : ""}. This character is the protagonist (the user-controlled character).`,
+      "- Never write this character's dialogue, actions, thoughts or decisions. Narrate only the world and other characters' reactions.",
+      "- This character already knows their own background, abilities, relationships and secrets, including anything the lore marks as hidden. Colleagues, superiors and acquaintances already know them and treat them according to the lore below.",
+      "- Other characters address and refer to this character by this name.",
+      body5
+    ].filter(Boolean).join("\n");
+  }
+  function playerSource(src) {
+    const agent = playerAgent(src.char.globalLore, src.chat.scriptstate);
+    if (!agent) return src;
+    return { ...src, persona: playerBlock(src.char.globalLore, agent, { vars: src.chat.scriptstate ?? {}, char: src.char.name, user: "주인공" }) };
+  }
+  function applyPlayer(messages, block2, persona2, userName, agentName) {
+    if (!block2) return messages;
+    let out = messages;
+    const p = persona2.trim();
+    let placed = false;
+    if (p.length >= 8) {
+      out = out.map((m) => {
+        if (typeof m?.content !== "string" || !m.content.includes(p)) return m;
+        const content = placed ? m.content.split(p).join("") : m.content.replace(p, () => block2);
+        placed = true;
+        return { ...m, content };
+      });
+    }
+    if (!placed && !out.some((m) => typeof m?.content === "string" && m.content.includes(PLAYER_HEAD))) {
+      const at = out.findIndex((m) => m?.role === "system");
+      const add = { role: "system", content: block2 };
+      out = at < 0 ? [add, ...out] : [...out.slice(0, at + 1), add, ...out.slice(at + 1)];
+    }
+    const n = userName.trim();
+    if (n && agentName && n !== agentName && n.length >= 2 && !/^(?:user|나|유저)$/i.test(n)) {
+      const esc19 = n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc19}\\b` : esc19, "g");
+      out = out.map((m) => typeof m?.content === "string" && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m);
+    }
+    return out;
+  }
+
   // src/core/phonePrompt.ts
   var LANGUAGE2 = "Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.";
   function sections(src) {
@@ -2737,6 +3581,10 @@ ${next.content.trim()}`;
       narratorOnlyAgentStatus: status && c.agentId ? agentStatus(src.chat, c.agentId) : void 0
     };
   }
+  function ownerCharacter(src) {
+    const a = playerAgent(src.char.globalLore, src.chat.scriptstate);
+    return a ? { character: a.name, ...a.rank ? { rank: a.rank } : {} } : {};
+  }
   function narrator(src, names4, related2, text) {
     applyAdvanced(src.chat.scriptstate);
     const n = trimTurns(HISTORY2.turns);
@@ -2768,7 +3616,7 @@ ${recentStory.map((m) => m.text).join("\n")}`,
       else universe.activeLoreBooks.push({ source: r.sources.join(" / "), content: r.content, kind: r.kind });
     }
     return {
-      owner: { name: "주인공", faction, factionDisplayName: names4[faction] ?? faction },
+      owner: { name: "주인공", faction, factionDisplayName: names4[faction] ?? faction, ...ownerCharacter(src) },
       recentStory,
       currentSceneEntries: last2 ? (last2.user ? 1 : 0) + last2.char.length : 0,
       currentSceneTime: phoneTime(src.chat),
@@ -3168,7 +4016,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
 
   // src/host/assets.ts
   var MIME2 = { avif: "image/avif", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", gif: "image/gif" };
-  var cache4 = /* @__PURE__ */ new Map();
+  var cache5 = /* @__PURE__ */ new Map();
   function toBytes3(data) {
     if (data instanceof Uint8Array) return data;
     if (data instanceof ArrayBuffer) return new Uint8Array(data);
@@ -3290,12 +4138,12 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const row6 = findRow(char, name);
     if (!row6) return Promise.resolve(null);
     const key2 = `${String(char.chaId ?? char.name ?? "")}|${row6[1]}`;
-    let hit2 = cache4.get(key2);
+    let hit2 = cache5.get(key2);
     if (!hit2) {
       hit2 = load(row6[1], String(row6[2] ?? row6[1].split(".").pop() ?? ""));
-      cache4.set(key2, hit2);
+      cache5.set(key2, hit2);
       void hit2.then((url) => {
-        if (!url) cache4.delete(key2);
+        if (!url) cache5.delete(key2);
       });
     }
     return hit2;
@@ -3624,885 +4472,4 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text = await readStream(r.result);
       else if (typeof r.result === "string") text = r.result;
     }
-    text = stripThoughts(text).trim();
-    if (!text) throw new LlmError("모델이 빈 응답을 보냈어요.");
-    return text;
-  }
-  var retryable = (error) => !(error instanceof LlmError);
-  var defaultFix = (messages) => (raw, reason) => [
-    ...messages,
-    ...raw ? [{ role: "assistant", content: raw }] : [],
-    { role: "user", content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}` }
-  ];
-  function withRawText(error, raw) {
-    if (raw && error && typeof error === "object" && !error.raw) {
-      try {
-        Object.defineProperty(error, "raw", { value: raw, configurable: true });
-      } catch {
-      }
-    }
-    return error;
-  }
-  async function generate(messages, model2, parse3, o) {
-    const fix = o.fix ?? defaultFix(messages);
-    let ask = messages;
-    let use = model2;
-    let earlier = null;
-    for (let attempt = 0; ; attempt++) {
-      let raw = "";
-      try {
-        raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
-        if (o.state) applyAdvanced(o.state);
-        return { raw, value: parse3(raw) };
-      } catch (error) {
-        if (earlier && !retryable(error)) throw earlier;
-        if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
-        earlier = withRawText(error, raw);
-        ask = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
-        use = o.retryModel === "same" ? model2 : o.retryModel;
-      }
-    }
-  }
-
-  // src/core/lore.ts
-  var LORE_KINDS = ["org", "site", "anomaly", "agent"];
-  var SLOTS = {
-    org: { comment: "📚Lore slot · Faction", name: "goei_lore_org", order: 200, label: "세력" },
-    site: { comment: "📚Lore slot · Mystic", name: "goei_lore_site", order: 400, label: "특수" },
-    anomaly: { comment: "📚Lore slot · Anomaly", name: "goei_lore_anomaly", order: 500, label: "괴이" },
-    agent: { comment: "📚Lore slot · Agent", name: "goei_lore_agent", order: 600, label: "요원" }
-  };
-  var slotVar = (k) => `$${SLOTS[k].name}`;
-  var DONT_ACTIVATE = "@@dont_activate";
-  var FOLDER_KIND = { 세력: "org", 조직: "org", 파밍: "site", 괴이: "anomaly", 요원: "agent" };
-  var folderWord2 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
-  var str2 = (v) => typeof v === "string" ? v : "";
-  var CONFIRM_KEYS = /* @__PURE__ */ new Set([
-    "어두운 정원",
-    "거대한 세상",
-    "욕망의 방",
-    "학교의 악몽",
-    "성자의 도시",
-    "눈먼 자들의 저택",
-    "검은 그늘 속에서",
-    "한여름 밤의 꿈",
-    "금지된 비디오",
-    "금지된 영상",
-    "생체 공장",
-    "생체공장",
-    "해피엔딩",
-    "붉은 숙녀",
-    "타락한 성당",
-    "미스테리 월드",
-    "어드벤쳐 파크",
-    "교회",
-    "강변",
-    "지하실",
-    "미술관",
-    "병원",
-    "극단",
-    "세계정치",
-    "세계 정치",
-    "기독교 상점",
-    "헐값 매입",
-    "대박 알선",
-    "사장",
-    "국장"
-  ]);
-  var JOSA = [
-    "에게서",
-    "에게",
-    "한테",
-    "께서",
-    "께",
-    "이랑",
-    "하고",
-    "까지",
-    "부터",
-    "마저",
-    "조차",
-    "처럼",
-    "보다",
-    "밖에",
-    "으로",
-    "로서",
-    "로",
-    "이나",
-    "이든",
-    "이라도",
-    "라도",
-    "에서",
-    "에는",
-    "에도",
-    "에",
-    "엔",
-    "은",
-    "는",
-    "이",
-    "가",
-    "을",
-    "를",
-    "의",
-    "와",
-    "과",
-    "랑",
-    "도",
-    "만",
-    "나",
-    "든",
-    "였",
-    "여",
-    "야",
-    "예요",
-    "라",
-    "란",
-    "아"
-  ];
-  var HONOR = ["님", "씨", "쌤", "선배", "언니", "오빠", "누나", "형", "양", "군", "팀장", "대리", "반장", "국장", "이사", "원장", "수녀", "신부", "요원"];
-  var SUFFIXES2 = [.../* @__PURE__ */ new Set([...HONOR, ...JOSA])].sort((a, b) => b.length - a.length);
-  var MARKERS2 = ["괴담", "괴이", "괴현상", "측", "소속", "직원", "쪽 사람"];
-  var OPEN = `「『"'“‘<《〈[(【`;
-  var CLOSE = `」』"'”’>》〉])】`;
-  var EN_STOP = /* @__PURE__ */ new Set(["the", "of", "and", "with", "a", "an", "in", "on", "to", "for"]);
-  var isLetter = (c) => !!c && /[\p{L}\p{N}]/u.test(c);
-  var hangul = (s4) => /[가-힣]/.test(s4);
-  var syllables = (s4) => [...s4.replace(/\s+/g, "")].length;
-  var escRe = (s4) => s4.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  function keyRegex(key2, en2, person = false) {
-    if (en2) {
-      const words = key2.toLowerCase().split(/[\s\-‐_]+/).filter(Boolean);
-      if (!words.length || words.every((w) => EN_STOP.has(w))) return null;
-      const body6 = words.map((w, i) => EN_STOP.has(w) && i > 0 && i < words.length - 1 ? `(?:${escRe(w)}[\\s\\-]+)?` : `${escRe(w)}${i < words.length - 1 ? "[\\s\\-]*" : ""}`).join("");
-      return new RegExp(`(?<![a-z0-9])${body6}(?:'s|’s|s'|es|s)?(?![a-z0-9])`, "giu");
-    }
-    const parts = key2.split(/\s+/).filter(Boolean);
-    if (!parts.length) return null;
-    const gap = !person && syllables(key2) >= 3 ? "\\s*" : "";
-    const word = (p) => [...p].map(escRe).join(gap);
-    const body5 = parts.map((p, i) => i < parts.length - 1 && p.endsWith("의") && [...p].length >= 3 ? `${word(p.slice(0, -1))}(?:의)?` : word(p)).join("\\s*");
-    return new RegExp(`(?<![\\p{L}\\p{N}])${body5}`, "giu");
-  }
-  function keysOf2(e) {
-    const all = str2(e.key).split(",");
-    if (e.selective) all.push(...str2(e.secondkey).split(","));
-    return [...new Set(all.map((k) => k.trim()).filter(Boolean))];
-  }
-  var hasDontActivate = (content) => content.split("\n").some((l) => l.trim() === DONT_ACTIVATE) && /^\s*@@/.test(content);
-  function stripDecorators(content) {
-    const lines = content.split("\n");
-    let i = 0;
-    while (i < lines.length && /^\s*@@/.test(lines[i])) i++;
-    return lines.slice(i).join("\n");
-  }
-  var cache5 = /* @__PURE__ */ new WeakMap();
-  function hasSlots(lore) {
-    const names4 = new Set((lore ?? []).map((e) => str2(e.comment)));
-    return LORE_KINDS.every((k) => names4.has(SLOTS[k].comment));
-  }
-  function folderKeys(books) {
-    const kinds = /* @__PURE__ */ new Map();
-    for (const e of books) {
-      const k = e.mode === "folder" ? FOLDER_KIND[folderWord2(str2(e.comment))] : void 0;
-      if (k && typeof e.key === "string") kinds.set(e.key, k);
-    }
-    return kinds;
-  }
-  var managedHere = (e, kinds) => e.mode !== "folder" && kinds.has(str2(e.folder)) && !!str2(e.key).trim() && !e.alwaysActive;
-  function syncDecorators(lore, mode3) {
-    const books = lore ?? [];
-    if (!hasSlots(books)) return null;
-    const kinds = folderKeys(books);
-    let n = 0;
-    const next = books.map((e) => {
-      if (!managedHere(e, kinds)) return e;
-      const content = str2(e.content);
-      const on2 = hasDontActivate(content);
-      if (mode3 === "plugin" && !on2) {
-        n++;
-        return { ...e, content: `${DONT_ACTIVATE}
-${content}` };
-      }
-      if (mode3 === "risu" && on2) {
-        n++;
-        return { ...e, content: content.replace(/^\s*@@dont_activate[ \t]*\r?\n?/m, "") };
-      }
-      return e;
-    });
-    return n ? next : null;
-  }
-  function managedEntries(lore) {
-    const books = lore ?? [];
-    const hit2 = cache5.get(books);
-    if (hit2) return hit2;
-    if (!hasSlots(books)) {
-      cache5.set(books, []);
-      return [];
-    }
-    const kinds = folderKeys(books);
-    const groups = /* @__PURE__ */ new Map();
-    for (const a of readDirectory(books).agents) groups.set(a.lore, [a.group, /^[A-Z]\d\d$/.test(a.affiliation) ? "" : a.affiliation].filter(Boolean));
-    const out = [];
-    books.forEach((e, index) => {
-      const kind = kinds.get(str2(e.folder));
-      const content = str2(e.content);
-      if (!kind || !managedHere(e, kinds)) return;
-      const raw = keysOf2(e);
-      const longKo = raw.filter((k) => hangul(k) && syllables(k) >= 3);
-      const keys = [];
-      for (const text of raw) {
-        const en2 = !hangul(text);
-        const re = keyRegex(text, en2, kind === "agent");
-        if (!re) continue;
-        const alias = kind === "agent" && !en2 && syllables(text) === 2 && longKo.some((l) => l.replace(/\s+/g, "").includes(text));
-        keys.push({ text, en: en2, rule: CONFIRM_KEYS.has(text) ? "confirm" : alias ? "alias" : "plain", re });
-      }
-      out.push({ kind, name: str2(e.comment), order: Number(e.insertorder ?? 0), index, content, keys, rawKeys: raw, groups: groups.get(str2(e.comment)) ?? [] });
-    });
-    cache5.set(books, out);
-    return out;
-  }
-  function around(text, start4, end) {
-    let a = start4;
-    for (let n = 0; a > 0 && n < 2; ) if (/\s/.test(text[--a])) n++;
-    let b = end;
-    for (let n = 0; b < text.length && n < 2; b++) if (/\s/.test(text[b])) n++;
-    return text.slice(a, b).replace(/\s+/g, " ").trim();
-  }
-  function rightOk(text, end) {
-    const tail = text.slice(end);
-    if (!isLetter(tail[0])) {
-      const next = tail.replace(/^\s+/, "");
-      return { ok: true, honor: tail.length !== next.length && HONOR.some((h) => next.startsWith(h) && !isLetter(next[h.length])) };
-    }
-    const sfx = SUFFIXES2.find((s4) => tail.startsWith(s4));
-    if (!sfx) return { ok: false, honor: false };
-    return { ok: true, honor: HONOR.includes(sfx) || sfx === "아" || sfx === "야" };
-  }
-  function findHits(text, entries2) {
-    if (!text) return [];
-    const lower = text.toLowerCase();
-    const hits = [];
-    entries2.forEach((e, ei) => {
-      for (const key2 of e.keys) {
-        key2.re.lastIndex = 0;
-        for (const m of lower.matchAll(key2.re)) {
-          const start4 = m.index ?? 0;
-          const end = start4 + m[0].length;
-          const r = key2.en ? { ok: true, honor: false } : rightOk(lower, end);
-          if (!r.ok) continue;
-          const tail = lower.slice(end).replace(/^\s+/, "");
-          const quoted = OPEN.includes(lower[start4 - 1] ?? "") && CLOSE.includes(lower[end] ?? "");
-          const before = lower.slice(Math.max(0, start4 - 20), start4).trimEnd();
-          const marked = quoted || MARKERS2.some((w) => tail.startsWith(w)) || e.groups.some((g) => g && before.endsWith(g.toLowerCase()));
-          hits.push({ entry: ei, key: key2, start: start4, end, marked, honor: r.honor, snippet: around(text, start4, end) });
-        }
-      }
-    });
-    return hits.filter((h) => !hits.some((o) => o !== h && o.entry !== h.entry && o.start <= h.start && o.end >= h.end && o.end - o.start > h.end - h.start));
-  }
-  var DEFAULT_DEPTH = 10;
-  function loreState(chat) {
-    const msgs = chat.message ?? [];
-    let target = "";
-    for (let i = msgs.length - 1; i >= 0 && !target; i--) {
-      if (msgs[i].role === "user") continue;
-      const tags = findStatusTags(str2(msgs[i].data));
-      if (tags.length) target = tags[tags.length - 1].target;
-      if (tags.length) break;
-    }
-    const w = parseWorld(chat.scriptstate?.[WORLD_KEY]);
-    const board2 = [...w.an.filter((a) => a.state === "활성").map((a) => a.name), ...w.ms.filter((m) => m.state === "출현").map((m) => m.name)];
-    const deployed = Object.entries(w.agents).filter(([, r]) => r.st === "작전투입" || r.st === "외근").map(([n]) => n);
-    return { target, board: board2, deployed };
-  }
-  var sameName = (a, b) => a.replace(/\s+/g, "").toLowerCase() === b.replace(/\s+/g, "").toLowerCase();
-  function names(e, name) {
-    return !!name.trim() && (sameName(e.name, name) || e.rawKeys.some((k) => sameName(k, name)));
-  }
-  function pickLore(entries2, messages, state, o, inputLast = false) {
-    const window2 = messages.slice(-Math.max(1, o.depth));
-    const picks = /* @__PURE__ */ new Map();
-    const add = (i, why, key2, snippet, score) => {
-      const p = picks.get(i) ?? { entry: entries2[i], score: 0, reasons: [] };
-      p.score += score;
-      if (!p.reasons.some((r) => r.why === why && r.key === key2)) p.reasons.push({ why, key: key2, snippet });
-      picks.set(i, p);
-    };
-    entries2.forEach((e, i) => {
-      if (state.target && names(e, state.target)) add(i, "status", state.target, state.target, 100);
-    });
-    const pending = [];
-    window2.forEach((m, wi) => {
-      const age2 = window2.length - 1 - wi;
-      const isInput = inputLast && wi === window2.length - 1;
-      const why = isInput ? "input" : m.role === "user" ? "user" : "char";
-      const score = (isInput ? 30 : 0) + (m.role === "user" ? 3 : 1) * 0.8 ** age2;
-      for (const hit2 of findHits(m.data, entries2)) pending.push({ hit: hit2, why, score });
-    });
-    for (const { hit: hit2, why, score } of pending) if (hit2.key.rule === "plain") add(hit2.entry, why, hit2.key.text, hit2.snippet, score);
-    for (const { hit: hit2, why, score } of pending) {
-      if (hit2.key.rule === "plain") continue;
-      const e = entries2[hit2.entry];
-      const present = state.deployed.some((n) => names(e, n)) || state.board.some((n) => names(e, n));
-      const ok = hit2.marked || present || picks.has(hit2.entry) || hit2.key.rule === "alias" && hit2.honor;
-      if (ok) add(hit2.entry, picks.has(hit2.entry) || !hit2.marked ? why : "confirmed", hit2.key.text, hit2.snippet, score);
-    }
-    let list4 = [...picks.values()];
-    if (o.budget > 0) {
-      const keep = [];
-      let used = 0;
-      for (const p of list4.slice().sort((a, b) => b.score - a.score)) {
-        const n = tokens(p.entry.content);
-        if (used + n > o.budget) continue;
-        used += n;
-        keep.push(p);
-      }
-      list4 = keep;
-    }
-    return list4.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
-  }
-  function pickLoreRisu(entries2, messages, depth) {
-    const squash3 = (s4) => s4.toLowerCase().replace(/\s+/g, "");
-    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash3(m.data) }));
-    const out = [];
-    for (const entry of entries2) {
-      const reasons = [];
-      for (const k of entry.rawKeys) {
-        const key2 = squash3(k);
-        const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
-        if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
-      }
-      if (reasons.length) out.push({ entry, score: 0, reasons });
-    }
-    return out.sort((a, b) => a.entry.order - b.entry.order || a.entry.index - b.entry.index);
-  }
-  function slotTexts(picks, env2) {
-    const out = { org: [], site: [], anomaly: [], agent: [] };
-    for (const p of picks) {
-      const text = stripDecorators(evaluate(p.entry.content, env2)).trim();
-      if (text) out[p.entry.kind].push(text);
-    }
-    return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
-  }
-  function loreMessages(chat, input2, raw = false) {
-    const msgs = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str2(m.data) : messageText(str2(m.data)) }));
-    if (input2 !== void 0) msgs.push({ role: "user", data: raw ? input2 : messageText(input2) });
-    return msgs.filter((m) => m.data);
-  }
-  function computeLore(lore, chat, o) {
-    const entries2 = managedEntries(lore);
-    if (!entries2.length) return null;
-    const msgs = loreMessages(chat, o.input, o.mode === "risu");
-    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs, o.depth) : pickLore(entries2, msgs, loreState(chat), o, msgs.at(-1)?.role === "user");
-    const texts = o.mode === "risu" ? null : slotTexts(picks, o.env);
-    return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ""])) };
-  }
-  var sameVars = (ss, vars) => Object.entries(vars).every(([k, v]) => String(ss?.[k] ?? "") === v);
-  function loreOptions(char, chat, mode3, user = "") {
-    const ls = char.loreSettings ?? {};
-    const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
-    const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
-    const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
-    const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== "folder" && !slots.has(str2(e.comment))).reduce((n, e) => n + tokens(str2(e.content)), 0);
-    return {
-      mode: mode3,
-      depth,
-      budget: total ? Math.max(1, Math.floor((total - always) * 0.9)) : 0,
-      env: { vars: chat.scriptstate ?? {}, char: char.name, ...user ? { user } : {} }
-    };
-  }
-  function patchSlots(messages, old, next) {
-    let changed = 0;
-    let out = messages;
-    const vars = LORE_KINDS.map(slotVar);
-    const cur = vars.map((k) => String(old?.[k] ?? ""));
-    const find = (text) => text ? out.findIndex((m) => typeof m?.content === "string" && m.content.includes(text)) : -1;
-    const swap = (at, from, to) => {
-      out = out.map((m, i) => i === at ? { ...m, content: m.content.replace(from, () => to) } : m);
-    };
-    vars.forEach((k, i) => {
-      if (!(k in next)) return;
-      const v = next[k];
-      const prev = cur[i];
-      if (prev === v) return;
-      if (prev) {
-        const at = find(prev);
-        if (at < 0) return;
-        swap(at, prev, v);
-      } else {
-        const before = [...cur.slice(0, i)].reverse().find((t) => t && find(t) >= 0);
-        const after = cur.slice(i + 1).find((t) => t && find(t) >= 0);
-        if (before) swap(find(before), before, `${before}
-
-${v}`);
-        else if (after) swap(find(after), after, `${v}
-
-${after}`);
-        else return;
-      }
-      cur[i] = v;
-      changed++;
-    });
-    return { messages: out, changed };
-  }
-
-  // src/ui/panels.ts
-  var open2 = /* @__PURE__ */ new Set();
-  var keepOpen = (key2, fallback = false) => open2.has(key2) || fallback && !open2.has(`!${key2}`) ? " open" : "";
-  function rememberPanel(el) {
-    const key2 = el.dataset.keep;
-    if (!key2) return;
-    open2.delete(key2);
-    open2.delete(`!${key2}`);
-    open2.add(el.open ? key2 : `!${key2}`);
-  }
-
-  // src/ui/advanced.ts
-  var esc5 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var advUi = { confirm: "" };
-  function control(f, item3, cur) {
-    const id = `${f}:${item3.key}`;
-    if (item3.type === "pick") {
-      return `<div class="gx-segs gx-segs-sm">${(item3.opts ?? []).map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc5(label)}</button>`).join("")}</div>`;
-    }
-    const zero = cur === "0" && item3.zero;
-    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item3.min ?? 0}" max="${item3.max ?? ""}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? "" : esc5(cur)}"${item3.zero ? ` placeholder="${esc5(item3.zero)}"` : ""} aria-label="${esc5(item3.label)}"><span>${esc5(item3.unit ?? "")}</span></span>`;
-  }
-  function row(f, item3, state) {
-    const cur = advValue(state, f, item3.key);
-    const changed = cur !== String(item3.def);
-    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item3.key}" aria-label="${esc5(item3.label)} 기본값으로" title="기본값 ${esc5(item3.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
-    return `<div class="ps-row adv-row${item3.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc5(item3.label)}</b>${item3.hint ? `<small>${esc5(item3.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item3, cur)}${reset}</div></div>`;
-  }
-  function chips(f, items, state) {
-    return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
-      const on2 = advValue(state, f, i.key) === "1";
-      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc5(i.label)}</button>`;
-    }).join("")}</div></div>`;
-  }
-  function advSections(f, state, extra = {}) {
-    return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
-  }
-  function advancedBox(f, state) {
-    const n = advChanged(state, f).length;
-    const groups = ADV[f].map((g, gi) => {
-      const body5 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
-      if (g.fold) {
-        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc5(g.title)}</summary><div class="ps-rows">${body5}</div></details>`;
-      }
-      return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body5}</div></section>`;
-    }).join("");
-    const foot = n ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
-    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
-  }
-  var blank2 = (item3) => item3.v ? String(item3.def) : "";
-  function parse2(value) {
-    const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
-    if (!m) return null;
-    const f = m[1];
-    const item3 = advItem(f, m[2]);
-    if (!item3) return null;
-    let v = m[3].trim();
-    if (item3.type === "num") {
-      const n = Number(v);
-      if (v === "" || !Number.isFinite(n)) return [f, item3, blank2(item3)];
-      v = String(Math.min(item3.max ?? Infinity, Math.max(item3.min ?? 0, Math.round(n))));
-    } else if (item3.type === "bool" ? v !== "0" && v !== "1" : !item3.opts?.some(([o]) => o === v)) return null;
-    return [f, item3, v === String(item3.def) ? blank2(item3) : v];
-  }
-  async function handleAdvanced(action, value, ctx2, env2, scope = "chat") {
-    const v = value ?? "";
-    if (action === "adv-reset-all" || action === "adv-reset-no") {
-      advUi.confirm = action === "adv-reset-all" && v in ADV ? v : "";
-      env2.render();
-      return true;
-    }
-    let vars = null;
-    if (action === "adv-set") {
-      const hit2 = parse2(v);
-      if (hit2) vars = { [advVar(hit2[0], hit2[1])]: hit2[2] };
-    } else if (action === "adv-reset") {
-      const [f, key2] = v.split(":");
-      const item3 = f in ADV ? advItem(f, key2) : void 0;
-      if (item3) vars = { [advVar(f, item3)]: blank2(item3) };
-    } else if (action === "adv-reset-yes") {
-      advUi.confirm = "";
-      if (v in ADV) vars = advResetVars(v);
-    } else return false;
-    if (!vars) {
-      env2.render();
-      return true;
-    }
-    const patch = vars;
-    if (scope === "defaults") {
-      await savePrefs((p) => {
-        const next = { ...p.vars ?? {} };
-        for (const [k, x] of Object.entries(patch)) {
-          if (x) next[k] = x;
-          else delete next[k];
-        }
-        return { ...p, vars: next };
-      });
-      env2.render();
-      return true;
-    }
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
-    const mode3 = advValue(saved?.scriptstate, "gen", "lore_mode");
-    if (syncDecorators(ctx2.char.globalLore, mode3)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode3)).catch(() => false);
-    await env2.refresh();
-    return true;
-  }
-
-  // src/ui/phone.ts
-  var phone = {
-    sub: "contacts",
-    tab: "",
-    query: "",
-    view: "list",
-    room: null,
-    invite: null,
-    picked: [],
-    topic: "",
-    gname: "",
-    draft: "",
-    page: 1,
-    call: "",
-    callText: "",
-    addName: "",
-    addNote: "",
-    openNotice: null,
-    noticePage: 1,
-    attach: [],
-    confirm: null,
-    notice: "",
-    failure: null,
-    attachMenu: false,
-    pickQuery: "",
-    chatFilter: "all",
-    noticeFilter: "all",
-    noticeFaction: "",
-    pickTab: ""
-  };
-  function resetPhone() {
-    Object.assign(phone, {
-      sub: "contacts",
-      tab: "",
-      query: "",
-      view: "list",
-      room: null,
-      invite: null,
-      picked: [],
-      topic: "",
-      gname: "",
-      draft: "",
-      page: 1,
-      call: "",
-      callText: "",
-      addName: "",
-      addNote: "",
-      openNotice: null,
-      noticePage: 1,
-      attach: [],
-      confirm: null,
-      notice: "",
-      failure: null,
-      attachMenu: false,
-      pickQuery: "",
-      chatFilter: "all",
-      noticeFilter: "all",
-      noticeFaction: "",
-      pickTab: ""
-    });
-  }
-  var quietEnv = { render: () => {
-  }, refresh: async () => {
-  }, visible: () => false, close: async () => {
-  } };
-  var liveEnv = null;
-  var envOr = (env2) => env2 ?? liveEnv ?? quietEnv;
-  var PAGE = 40;
-  var jobs = /* @__PURE__ */ new Map();
-  var chatKey = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var phoneBusy = (ctx2) => jobs.has(chatKey(ctx2));
-  var esc6 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var source = (ctx2, chat = ctx2.chat) => ({ char: ctx2.char, chat, persona: personaText() });
-  function names2(ctx2) {
-    try {
-      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
-    } catch {
-      return {};
-    }
-  }
-  function dir(ctx2, chat = ctx2.chat) {
-    return directory(ctx2.char.globalLore, chat);
-  }
-  var token = () => `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
-  async function run(ctx2, env2, label, work) {
-    const key2 = chatKey(ctx2);
-    if (jobs.has(key2)) {
-      phone.notice = `${jobs.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
-      env2.render();
-      return false;
-    }
-    jobs.set(key2, label);
-    phone.notice = "";
-    phone.failure = null;
-    env2.render();
-    try {
-      phone.notice = await work();
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      phone.notice = msg;
-      const raw = error.raw;
-      if (raw) phone.failure = { label, reason: msg, raw };
-    } finally {
-      jobs.delete(key2);
-      await env2.refresh();
-    }
-    return true;
-  }
-  function viewingRoom(env2) {
-    return env2.visible() && phone.view === "room" ? phone.room : null;
-  }
-  function generate2(ctx2, env2, rid, label) {
-    return run(ctx2, env2, label, async () => {
-      const req = token();
-      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        const st2 = readPhone(chat);
-        const r2 = st2.rooms[rid];
-        if (!r2?.pending) return null;
-        r2.pending.status = "working";
-        r2.pending.request = req;
-        return writePhone(chat, st2);
-      });
-      if (!saved) throw new PhoneError("대기 중인 대화 요청이 없어요.");
-      const st = readPhone(saved);
-      const r = st.rooms[rid];
-      const d = dir(ctx2, saved);
-      let raw = "";
-      let result;
-      try {
-        const prompt = fitPrompt(budgetFor(saved.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved), st, r, d, names2(ctx2)));
-        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), state: saved.scriptstate }));
-      } catch (error) {
-        await markFailed(ctx2, rid, req);
-        const msg = error instanceof Error ? error.message : String(error);
-        throw new PhoneError(`대화 갱신에 실패했어요. 기존 기록은 그대로예요. ${msg}`, error.raw ?? raw);
-      }
-      let note = "";
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        const cur = readPhone(chat);
-        const room = cur.rooms[rid];
-        if (!room?.pending || room.pending.request !== req) {
-          note = "대화 상태가 바뀌어서 답장을 저장하지 않았어요.";
-          return null;
-        }
-        const events = keepValid(result.events, room);
-        const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
-        const added = applyEvents(cur, room, events, phoneTime(chat));
-        room.pending = void 0;
-        if (viewingRoom(env2) === rid) readRoom(room);
-        if (!added) note = room.kind === "group" ? "아무도 말하지 않았어요." : "답장이 없어요.";
-        return writePhone(chat, cur, unsolicitedRefresh && added ? cooldownMark(chat, "incoming") : {});
-      });
-      return note;
-    });
-  }
-  async function markFailed(ctx2, rid, req) {
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      const r = st.rooms[rid];
-      if (!r?.pending || r.pending.request !== req) return null;
-      r.pending.status = "error";
-      return writePhone(chat, st);
-    }).catch(() => null);
-  }
-  async function send(ctx2, env2, rid, text) {
-    if (phoneBusy(ctx2)) {
-      phone.notice = `${jobs.get(chatKey(ctx2))} 끝난 뒤 다시 눌러 주세요.`;
-      return env2.render();
-    }
-    if (tokens(describe(text)) > LIMITS2.input_tokens) {
-      phone.notice = `메시지와 첨부 내용은 합쳐서 ${LIMITS2.input_tokens}토큰 이내로 적어 주세요.`;
-      return env2.render();
-    }
-    let giftBlocked = false;
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      const r2 = st.rooms[rid];
-      if (!r2 || r2.pending) return null;
-      if (r2.kind !== "dm" && /\[\[ATTACH:gift\]\]/i.test(text)) return void (giftBlocked = true), null;
-      if (!st.order.includes(rid)) st.order.push(rid);
-      const time2 = phoneTime(chat);
-      const pieces = splitRecords(text);
-      let m = push(st, r2, "me", pieces[0] ?? text, time2);
-      for (const piece of pieces.slice(1)) m = push(st, r2, "me", piece, time2);
-      r2.draft = "";
-      r2.silent = false;
-      readRoom(r2);
-      r2.pending = { message: m.id, status: "error", action: { type: "send" } };
-      return writePhone(chat, st);
-    });
-    if (!saved) {
-      phone.notice = giftBlocked ? "단톡방에서는 선물을 보낼 수 없어요." : "이전 답장을 다시 시도하거나 건너뛴 뒤 보내 주세요.";
-      return env2.refresh();
-    }
-    phone.draft = "";
-    phone.attach = [];
-    phone.attachMenu = false;
-    phone.page = 1;
-    const r = readPhone(saved).rooms[rid];
-    await generate2({ ...ctx2, chat: saved }, env2, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
-  }
-  async function roomRefresh(ctx2, env2, rid) {
-    const st = readPhone(ctx2.chat);
-    const r = st.rooms[rid];
-    if (!r || !r.members.length) return;
-    if (r.pending) return void generate2(ctx2, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
-    const set2 = phoneSettings(ctx2.chat.scriptstate);
-    let [ok, why] = refreshAllowed(ctx2.chat, r, set2);
-    if (ok && unsolicited(r)) [ok, why] = refreshAllowed(ctx2.chat, r, set2, chancePassed(set2.incomingChance, Math.random));
-    if (!ok) {
-      phone.notice = `${why} 내가 보낸 메시지의 답장에는 이 제한이 없어요.`;
-      return env2.render();
-    }
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const cur = readPhone(chat);
-      const room = cur.rooms[rid];
-      if (!room || room.pending) return null;
-      room.pending = { status: "error", action: { type: "refresh" } };
-      return writePhone(chat, cur);
-    });
-    if (saved) await generate2({ ...ctx2, chat: saved }, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
-  }
-  async function createGroup(ctx2, env2) {
-    const d = dir(ctx2);
-    const members = phone.picked.filter((cid) => d.map.get(cid)?.visible);
-    const inviteRoom = phone.invite;
-    if (!members.length) {
-      phone.notice = "초대할 사람을 골라 주세요.";
-      return env2.render();
-    }
-    if (!inviteRoom && members.length === 1) {
-      phone.picked = [];
-      return openDm(ctx2, env2, members[0]);
-    }
-    const topic = phone.topic.trim();
-    const gname = inviteRoom ? "" : phone.gname.trim();
-    if ([...gname].length > LIMITS2.room_name) {
-      phone.notice = `단톡방 이름은 ${LIMITS2.room_name}자 이내로 적어 주세요.`;
-      return env2.render();
-    }
-    if (tokens(topic) > LIMITS2.topic_tokens) {
-      phone.notice = `단톡 주제는 ${LIMITS2.topic_tokens}토큰 이내로 적어 주세요.`;
-      return env2.render();
-    }
-    let rid = "";
-    let error = "";
-    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const st = readPhone(chat);
-      const time2 = phoneTime(chat);
-      if (inviteRoom) {
-        let r = st.rooms[inviteRoom];
-        if (!r || r.pending) return void (error = "대화방 상태가 바뀌었어요."), null;
-        const fresh = members.filter((cid) => !r.members.includes(cid));
-        if (!fresh.length || r.members.length + fresh.length > LIMITS2.members) return void (error = `초대할 사람을 고르세요. 상대는 최대 ${LIMITS2.members}명이에요.`), null;
-        if (r.kind === "dm") {
-          const old = r.id;
-          do
-            st.seq += 1;
-          while (st.rooms[`g_${st.seq}`]);
-          r = { ...r, id: `g_${st.seq}`, kind: "group", name: void 0 };
-          delete st.rooms[old];
-          st.rooms[r.id] = r;
-          const at = st.order.indexOf(old);
-          if (at >= 0) st.order[at] = r.id;
-          else st.order.push(r.id);
-        }
-        for (const cid of fresh) {
-          r.people[cid] = personOf(d.map.get(cid));
-          r.members.push(cid);
-        }
-        for (const cid of fresh) membership(st, r, "invite", cid, time2);
-        r.pending = { status: "error", action: { type: "invite_more", invited: fresh } };
-        rid = r.id;
-      } else {
-        if (members.length > LIMITS2.members) return void (error = `상대는 최대 ${LIMITS2.members}명이에요.`), null;
-        st.seq += 1;
-        rid = `g_${st.seq}`;
-        const people = Object.fromEntries(members.map((c) => [c, personOf(d.map.get(c))]));
-        const r = { id: rid, kind: "group", name: gname || void 0, topic, members: [...members], people, messages: [], draft: "", unread: 0 };
-        st.rooms[rid] = r;
-        st.order.push(rid);
-        for (const cid of members) membership(st, r, "invite", cid, time2);
-        r.pending = { status: "error", action: { type: "invite_initial", invited: members } };
-      }
-      return writePhone(chat, st);
-    });
-    if (!saved) {
-      phone.notice = error || "저장하지 못했어요.";
-      return env2.render();
-    }
-    Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
-    await generate2({ ...ctx2, chat: saved }, env2, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
-  }
-  function refreshInbox(ctx2, env2, automatic = false, joint) {
-    const e = envOr(env2);
-    return run(ctx2, e, automatic ? "새 메시지를 자동으로 확인하는 중이에요." : "새 메시지를 확인하는 중이에요.", async () => {
-      const startLength = ctx2.chat.message?.length ?? 0;
-      const st = readPhone(ctx2.chat);
-      const d = dir(ctx2);
-      const rolls = [];
-      let k = 0;
-      const roll = () => k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]);
-      const plan = fitPrompt(budgetFor(ctx2.chat.scriptstate, "ph"), () => {
-        k = 0;
-        const p = refreshPrompt2(source(ctx2), st, d, names2(ctx2), roll);
-        return { ...p, messages: p.prompt?.messages ?? [] };
-      });
-      if (!plan.prompt) return automatic ? "" : plan.reason;
-      const prompt = plan.prompt;
-      const model2 = phoneSettings(ctx2.chat.scriptstate).model;
-      const { value: result } = await generate(prompt.messages, model2, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
-        ...genSettings(ctx2.chat.scriptstate),
-        state: ctx2.chat.scriptstate,
-        fix: (_raw, reason) => refreshRetry(prompt, reason),
-        first: joint && ((m) => joint.ask("phone", m))
-      });
-      let note = "";
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-        if (automatic && (chat.message?.length ?? 0) !== startLength) {
-          note = "채팅이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.";
-          return null;
-        }
-        const cur = readPhone(chat);
-        const set2 = phoneSettings(chat.scriptstate);
-        const time2 = phoneTime(chat);
-        let received = 0;
-        let unsolicitedGot = false;
-        for (const u of result.updates) {
-          const r = cur.rooms[u.room] ?? plan.selected.get(u.room);
-          if (r.pending) throw new PhoneError("확인하는 동안 대화 상태가 바뀌었어요. 다시 확인해 주세요.");
-          if (u.events.length && !refreshAllowed(chat, r, set2)[0]) throw new PhoneError("선톡 받기 설정이 바뀌었어요.");
-          u.events = keepValid(u.events, r);
-        }
-        const visible = viewingRoom(e);
-        for (const u of result.updates) {
-          if (!u.events.length) continue;
-          let r = cur.rooms[u.room];
-          const talk = u.events.some((x) => x.type === "message");
-          if (!r && !talk) continue;
-          if (!r) {
-            r = plan.selected.get(u.room);
-            cur.rooms[r.id] = r;
-            cur.order.push(r.id);
-          }
-          if (talk && unsolicited(r)) unsolicitedGot = true;
-          received += applyEvents(cur, r, u.events, time2);
-          if (visible === r.id) readRoom(r);
-        }
-        received += commitInvitations(cur, result.invitations, time2);
-        const b = readBulletins(chat);
-        const notices = commitAnnouncements(b, cur, result.announcements, plan.announce, time2);
-        const marks2 = {
-          ...unsol
+    text = stripTho

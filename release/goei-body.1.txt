@@ -1,4 +1,4 @@
-// goei-body 0.16.36
+// goei-body 0.16.37
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -1395,7 +1395,24 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function migrateLore(lore, dir2 = readDirectory(lore)) {
     if (!dir2.folders) return lore;
-    return withDirectory(lore, directoryData(dir2)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? "")));
+    const own = { ...dir2, anomalies: dir2.anomalies.filter((r) => r.inFolder), sites: dir2.sites.filter((r) => r.inFolder) };
+    return withDirectory(lore, directoryData(own)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? "")));
+  }
+  var OLD_OUTSIDE_PLACES = ["탐미주의", "세크리엠", "발푸르기스 협회", "아벤샤", "무명찬란교", "흡혈귀", "병원", "극단", "가짜 관리국", "세계정치 게시판"];
+  function dropOldOutsidePlaces(lore) {
+    const data = readDirectoryData(lore);
+    if (!data) return lore;
+    const members = folderMembers(lore);
+    const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s2(e.comment)));
+    let hit2 = false;
+    const strip = (group4) => {
+      if (!group4) return group4;
+      const next2 = { ...group4 };
+      for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit2 = true;
+      return next2;
+    };
+    const next = { ...data, 괴이: strip(data.괴이), "미스틱 사이트": strip(data["미스틱 사이트"]) };
+    return hit2 ? withDirectory(lore, next) : lore;
   }
   var agentGroup = (a) => a.affiliation || "";
   function moveAgent(d, lore, how, target = "") {
@@ -1662,7 +1679,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function normAgState(v) {
     const s4 = (v ?? "").trim();
     if (AG_STATES.includes(s4)) return s4;
-    return AG_ALIAS[s4] ?? AG_ALIAS[s4.toLowerCase().replace(/\s+/g, " ")] ?? null;
+    const hit2 = AG_ALIAS[s4] ?? AG_ALIAS[s4.toLowerCase().replace(/\s+/g, " ")];
+    if (hit2) return hit2;
+    const bare = s4.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
+    if (AG_STATES.includes(bare)) return bare;
+    return AG_ALIAS[bare] ?? null;
   }
   function fields(text, kind) {
     const out = [];
@@ -1681,15 +1702,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function scanSites(text, kind, states) {
     return fields(text, kind).flatMap((f) => {
-      const i = f.findIndex((v, k) => k >= 2 && states.includes(stripLabel(v)));
+      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
+      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
       if (i < 0) return [];
       let region = f[0] ?? "";
       if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? "";
-      return [{ region, name: stripLabel(f[i - 1]), state: stripLabel(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
+      return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
     });
   }
+  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
   function scanIncidents(text) {
-    return scanSites(text, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : { ...t, deploy: "", situation: rest.join(" ") });
+    return scanSites(text, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
   }
   function scanMysticSites(text) {
     return scanSites(text, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
@@ -1931,7 +1954,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
   }
   function rosterFor(w, c, faction, limit) {
-    return c.people.filter((p) => p.rosterFor.includes(faction) && !w.retired.includes(p.id)).slice(0, limit);
+    return c.people.filter((p) => p.rosterFor.includes(faction) && !w.retired.includes(p.id) && p.id !== w.player).slice(0, limit);
   }
   function agentRecord(w, code) {
     w.agents[code] ??= { st: "미정", situation: "", since: null, dead: 0 };
@@ -1946,8 +1969,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function applyAgents(w, c, s4, faction, text) {
     const roster = rosterFor(w, c, faction, s4.agent_limit);
     for (const t of scanAgents(text)) {
-      const key2 = t.who.replace(/-/g, "").toUpperCase();
-      const p = roster.find((r) => r.id === key2 || r.english === t.who);
+      const key2 = (/[A-Z]-?\d{3}/i.exec(t.who)?.[0] ?? t.who).replace(/-/g, "").toUpperCase();
+      const who = t.who.trim().toLowerCase();
+      const p = roster.find((r) => r.id === key2) ?? roster.find((r) => r.name === t.who.trim() || !!r.english && r.english.toLowerCase() === who);
       if (!p) continue;
       const rec = agentRecord(w, p.id);
       if (rec.st !== t.state || rec.since === null) rec.since = w.minute;
@@ -2065,6 +2089,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
       }
       if (!e) continue;
       if (t.state !== "활성") {
+        if (t.state === "클리어") {
+          const names4 = [e.presetName, e.name, t.name].filter((n) => validName(n));
+          w.cleared = [.../* @__PURE__ */ new Set([...w.cleared ?? [], ...names4])].slice(-200);
+        }
         endAn(w, e);
         continue;
       }
@@ -2167,8 +2195,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     refillAgents(w, c, s4, now);
     return { world: w, faction: newFaction };
   }
-  function bootstrap(c, s4, rng) {
+  function bootstrap(c, s4, rng, player = "") {
     const w = emptyWorld();
+    if (player) w.player = player;
     tick(w, c, s4, rng);
     return w;
   }
@@ -2302,8 +2331,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       $ag_report: r.ag
     };
   }
-  function startWorldVars(c, s4, faction, rng) {
-    return worldVars(bootstrap(c, s4, rng), c, s4, faction);
+  function startWorldVars(c, s4, faction, rng, player = "") {
+    return worldVars(bootstrap(c, s4, rng, player), c, s4, faction);
   }
   function fingerprint(index, text) {
     let h = 2166136261;
@@ -2371,7 +2400,496 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return { [PREV_KEY]: JSON.stringify({ ...prev, world: JSON.stringify(w) }) };
   }
 
+  // src/core/world/alias-drop.json
+  var alias_drop_default = {
+    괴이: {
+      "소라 랜드": [
+        "Amusement Park"
+      ],
+      "예술가의 지하실": [
+        "지하실"
+      ],
+      "인스피레이션 호텔": [
+        "호텔"
+      ],
+      "유쾌 테마파크": [
+        "Flower Golden Resort"
+      ],
+      "플라워 골든 리조트": [
+        "Yukoae Theme Park"
+      ],
+      화요퀴즈쇼: [
+        "Brownie",
+        "브라우니"
+      ],
+      "해피엔딩 홀": [
+        "Mumyeong Chanran-gyo",
+        "무명찬란교"
+      ],
+      세광특별시: [
+        "Forest of the Dying",
+        "임종의 숲",
+        "Body Casino",
+        "신체 카지노",
+        "Hanbit Library",
+        "한빛도서관",
+        "Conscience Stall",
+        "양심판매대",
+        "Blood Broadcasting Station",
+        "Delusion Home Shopping",
+        "혈액 방송국",
+        "망상 홈쇼핑",
+        "Nap Shelter",
+        "낮잠용 쉼터",
+        "Scale Tribunal",
+        "저울 재판소",
+        "세광역",
+        "Segwang Station",
+        "자정역",
+        "Midnight Station",
+        "한밤역",
+        "Deep Night Station",
+        "황혼역",
+        "Dusk Station",
+        "오후역",
+        "Afternoon Station",
+        "한낮역",
+        "Midday Station",
+        "아침역",
+        "Morning Station"
+      ],
+      세광역: [
+        "Forest of the Dying",
+        "임종의 숲",
+        "Segwang Special City",
+        "세광특별시",
+        "Segwang City",
+        "세광시"
+      ],
+      자정역: [
+        "Body Casino",
+        "신체 카지노"
+      ],
+      한밤역: [
+        "Hanbit Library",
+        "한빛도서관"
+      ],
+      황혼역: [
+        "Conscience Stall",
+        "양심판매대"
+      ],
+      오후역: [
+        "Blood Broadcasting Station",
+        "Delusion Home Shopping",
+        "혈액 방송국",
+        "망상 홈쇼핑"
+      ],
+      한낮역: [
+        "Nap Shelter",
+        "낮잠용 쉼터"
+      ],
+      아침역: [
+        "Scale Tribunal",
+        "저울 재판소"
+      ],
+      세크리엠: [
+        "Vampires",
+        "흡혈귀"
+      ],
+      "발푸르기스 협회": [
+        "Sorcerer",
+        "Sorceress",
+        "마도사",
+        "마녀",
+        "Witch",
+        "Avensha",
+        "아벤샤"
+      ],
+      아벤샤: [
+        "Sorcerer",
+        "Sorceress",
+        "마도사",
+        "Witch",
+        "발푸르기스"
+      ],
+      흡혈귀: [
+        "진조",
+        "세크리엠",
+        "Secriem"
+      ]
+    },
+    "미스틱 사이트": {
+      "달빛 타투샵": [
+        "Tattoo",
+        "문신"
+      ],
+      "착한 친구 키링": [
+        "좋은 친구"
+      ]
+    },
+    요원: {
+      쟈알디: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      스팡달: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      잼트리: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      에일린: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      고르고디오: [
+        "관리국",
+        "진압팀",
+        "Management Bureau",
+        "Suppression Team"
+      ],
+      큐라스: [
+        "관리국",
+        "진압팀",
+        "Management Bureau",
+        "Suppression Team"
+      ],
+      데드폴: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      게슈간: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      로제몬: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      콘쥬스: [
+        "관리국",
+        "종합대응팀",
+        "Management Bureau",
+        "Comprehensive Response Team"
+      ],
+      고그니쟈: [
+        "관리국",
+        "격리팀",
+        "Management Bureau",
+        "Containment Team"
+      ],
+      데쥬레: [
+        "관리국",
+        "격리팀",
+        "Management Bureau",
+        "Containment Team"
+      ],
+      이도형: [
+        "관리국",
+        "검사부대",
+        "Management Bureau",
+        "Swordsman Corps"
+      ],
+      고영훈: [
+        "관리국",
+        "검사부대",
+        "Management Bureau",
+        "Swordsman Corps"
+      ],
+      노기균: [
+        "관리국",
+        "검사부대",
+        "Management Bureau",
+        "Swordsman Corps"
+      ],
+      송주익: [
+        "관리국",
+        "검사부대",
+        "Management Bureau",
+        "Swordsman Corps"
+      ],
+      곽성주: [
+        "관리국",
+        "진압부대",
+        "Management Bureau",
+        "Suppression Corps"
+      ],
+      조성춘: [
+        "관리국",
+        "진압부대",
+        "Management Bureau",
+        "Suppression Corps"
+      ],
+      윤병수: [
+        "관리국",
+        "진압부대",
+        "Management Bureau",
+        "Suppression Corps"
+      ],
+      김성진: [
+        "관리국",
+        "진압부대",
+        "Management Bureau",
+        "Suppression Corps"
+      ],
+      송진섭: [
+        "관리국",
+        "진압부대",
+        "Management Bureau",
+        "Suppression Corps"
+      ],
+      이길환: [
+        "관리국",
+        "Management Bureau",
+        "Recruit Education"
+      ],
+      이기석: [
+        "관리국",
+        "Management Bureau",
+        "Recruit Education"
+      ],
+      김조학: [
+        "관리국",
+        "Management Bureau"
+      ],
+      도필헌: [
+        "관리국",
+        "국장",
+        "Management Bureau",
+        "Guk-jang"
+      ],
+      사장: [
+        "관리국",
+        "Management Bureau"
+      ],
+      백석주: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      진나솔: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      이성해: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      이자헌: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      은하제: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      박민성: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      백사헌: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      고영은: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      강이학: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      장허운: [
+        "백일몽",
+        "현장탐사팀",
+        "Baekilmong",
+        "Field Exploration Team"
+      ],
+      곽제강: [
+        "백일몽",
+        "연구팀",
+        "Baekilmong",
+        "Research Team"
+      ],
+      이연화: [
+        "백일몽",
+        "연구팀",
+        "Baekilmong",
+        "Research Team"
+      ],
+      이병진: [
+        "백일몽",
+        "Baekilmong"
+      ],
+      제이: [
+        "Ban-jang",
+        "Banjang",
+        "Baekilmong",
+        "백일몽",
+        "경비팀"
+      ],
+      호유원: [
+        "Fox Counseling",
+        "여우상담실",
+        "백일몽",
+        "Baekilmong"
+      ],
+      청달래: [
+        "백일몽",
+        "Baekilmong"
+      ],
+      차여진: [
+        "협회",
+        "Special Disaster Response",
+        "Association",
+        "SDRA"
+      ],
+      서윤지: [
+        "협회",
+        "Special Disaster Response",
+        "Association",
+        "SDRA"
+      ],
+      고연지: [
+        "중림",
+        "Jungnim",
+        "손길 의원",
+        "Unlicensed surgeon",
+        "clinic proprietor",
+        "Backalley Doctor",
+        "Ji-a",
+        "윤지아",
+        "Son-gil",
+        "Ui-won"
+      ],
+      윤지아: [
+        "중림",
+        "Jungnim",
+        "Unlicensed surgeon",
+        "손길 의원",
+        "clinic proprietor",
+        "Backalley Doctor",
+        "연지",
+        "Yeon-ji",
+        "Son-gil",
+        "Ui-won"
+      ],
+      마덕희: [
+        "중림",
+        "Jungnim",
+        "헐값 매입"
+      ],
+      문혜란: [
+        "중림",
+        "Jungnim",
+        "대박 알선"
+      ],
+      신유리: [
+        "중림",
+        "Jungnim",
+        "영창 컨설팅"
+      ],
+      블라렛: [
+        "Vatican",
+        "교황청",
+        "기독교 상점"
+      ],
+      살라딘: [
+        "Islam",
+        "이슬람"
+      ],
+      아벤샤: [
+        "Sorcerer",
+        "Sorceress",
+        "Witch",
+        "발푸르기스",
+        "마도사"
+      ],
+      세크리엠: [
+        "Vampires",
+        "흡혈귀"
+      ],
+      브라우니: [
+        "Tuesday Quiz Show",
+        "good friend"
+      ]
+    }
+  };
+
   // src/core/world/registry.ts
+  var COMMON_ALIAS = /^(?:amusement park|hotel|호텔|지하실|basement|tattoo|문신|좋은 친구|(?:ban|team|gwa|bu|guk|sa|won|sil|cha)-?jang)$/i;
+  var ALIAS_OWNER = { 세광시: "세광특별시", "Segwang City": "세광특별시" };
+  function aliasRules(books, dir2) {
+    const low = (t) => t.trim().toLowerCase();
+    const flat = (t) => low(t).replace(/[\s\-·]/g, "");
+    const who = (key2, lore) => lore ? `lore:${low(lore)}` : key2;
+    const ownPart = (t, names4) => flat(t).length >= 2 && names4.some((n) => n && flat(n).includes(flat(t)));
+    const rows2 = [
+      ...dir2.anomalies.map((p, i) => ({ key: who(`an${i}`, p.lore), names: [p.label, p.lore, p.english], aliases: p.aliases })),
+      ...dir2.sites.map((p, i) => ({ key: who(`ms${i}`, p.lore), names: [p.label, p.lore, p.english], aliases: p.aliases })),
+      ...dir2.agents.map((a) => ({ key: who(`ag${a.id}`, a.lore), names: [a.name, a.lore, a.english], aliases: a.aliases }))
+    ];
+    const shared = /* @__PURE__ */ new Set();
+    for (const o of dir2.orgs) for (const t of [o.name, o.spec.english ?? "", orgLoreName(books, o.name)]) if (t) shared.add(low(t));
+    for (const a of dir2.agents) for (const t of [a.department, a.rank, a.group]) if (t) shared.add(low(t));
+    const users = /* @__PURE__ */ new Map();
+    for (const r of rows2) for (const t of r.aliases) if (!ownPart(t, r.names)) users.set(low(t), (users.get(low(t)) ?? /* @__PURE__ */ new Set()).add(r.key));
+    for (const [t, set2] of users) if (set2.size > 1) shared.add(t);
+    const own = /* @__PURE__ */ new Map();
+    const claim = (t, key2) => t && !own.has(low(t)) && own.set(low(t), key2);
+    dir2.anomalies.forEach((p, i) => [p.label, p.lore, p.english].forEach((t) => claim(t, who(`an${i}`, p.lore))));
+    dir2.sites.forEach((p, i) => [p.label, p.lore, p.english].forEach((t) => claim(t, who(`ms${i}`, p.lore))));
+    dir2.bases.forEach((b, i) => claim(b.name, `lm${i}`));
+    dir2.agents.forEach((a) => [a.name, a.lore, a.english].forEach((t) => claim(t, who(`ag${a.id}`, a.lore))));
+    for (const r of rows2) for (const t of r.aliases) if (ownPart(t, r.names)) claim(t, r.key);
+    for (const [t, lore] of Object.entries(ALIAS_OWNER)) claim(t, who("", lore));
+    const keyOf2 = /* @__PURE__ */ new Map();
+    for (const r of rows2) if (!keyOf2.has(r.key)) keyOf2.set(r.key, r);
+    const aliasesOf = (list4, key2, lore = "") => {
+      const k = who(key2, lore);
+      const names4 = keyOf2.get(k)?.names ?? [];
+      return list4.filter((t) => {
+        if (COMMON_ALIAS.test(t.trim())) return false;
+        const owner = own.get(low(t));
+        if (owner) return owner === k;
+        return ownPart(t, names4) || !shared.has(low(t));
+      });
+    };
+    return { aliasesOf, own, low };
+  }
   function buildRegistry(lore) {
     const books = lore ?? [];
     const entries2 = [];
@@ -2380,12 +2898,20 @@ ${body5.slice(at).replace(/^\s+/, "")}
       entries2.push({ key: key2, name, lore: loreName2, terms: uniq });
     };
     const dir2 = readDirectory(books);
+    const { aliasesOf, own, low } = aliasRules(books, dir2);
     const places = { 괴이: dir2.anomalies, "미스틱 사이트": dir2.sites };
+    const tag = { 괴이: "an", "미스틱 사이트": "ms" };
     for (const [group4, rows2] of Object.entries(places)) {
-      rows2.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
+      rows2.forEach((p, i) => add(`World catalog/${group4}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group4]}${i}`, p.lore)]));
     }
-    dir2.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ""), [b.english, b.label, ...b.aliases]));
-    for (const a of dir2.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...a.aliases, ...a.legacyEnglish]);
+    dir2.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ""), [b.english, b.label, ...b.aliases.filter((t) => (own.get(low(t)) ?? `lm${i}`) === `lm${i}`)]));
+    for (const a of dir2.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...aliasesOf(a.aliases, `ag${a.id}`, a.lore), ...a.legacyEnglish]);
+    for (const e of entries2) {
+      if (!e.key.startsWith("Agent roster/")) continue;
+      const full = [e.name, e.lore].filter((t) => /[가-힣]/.test(t) && t.replace(/\s+/g, "").length >= 3);
+      const weak = e.terms.filter((t) => /^[가-힣]{2}$/.test(t) && full.some((f) => f.replace(/\s+/g, "").includes(t)));
+      if (weak.length) e.weak = weak;
+    }
     const byTerm = /* @__PURE__ */ new Map();
     const byLore = /* @__PURE__ */ new Map();
     for (const e of entries2) {
@@ -2418,13 +2944,37 @@ ${body5.slice(at).replace(/^\s+/, "")}
       from = a + 1;
     }
   }
+  var HONOR = ["님", "씨", "쌤", "선배", "언니", "오빠", "누나", "형", "아", "야", "팀장", "대리", "과장", "주임", "사원", "반장", "이사", "전무", "원장", "요원"];
+  function calledByName(content, term) {
+    const hay = content.toLowerCase();
+    for (let a = hay.indexOf(term); a >= 0; a = hay.indexOf(term, a + 1)) {
+      if (a > 0 && isWord(hay[a - 1])) continue;
+      const tail = hay.slice(a + term.length).replace(/^\s/, "");
+      if (HONOR.some((h) => tail.startsWith(h))) return true;
+    }
+    return false;
+  }
   function referenceEntries(r, content) {
     const found = /* @__PURE__ */ new Map();
     for (const [term, list4] of r.byTerm) {
       if (!termPresent(content, term)) continue;
-      for (const e of list4) found.set(e.key, e);
+      for (const e of list4) if (!e.weak?.includes(term) || calledByName(content, term)) found.set(e.key, e);
     }
     return [...found.values()].sort((a, b) => a.key < b.key ? -1 : 1);
+  }
+  function dropDefaultAliases(lore, drop = alias_drop_default) {
+    const dir2 = readDirectory(lore);
+    if (!dir2.folders) return lore;
+    let n = 0;
+    const strip = (rows2, list4) => rows2.map((r) => {
+      const bad = new Set((list4[r.lore] ?? []).map((t) => t.toLowerCase()));
+      if (!bad.size) return r;
+      const aliases = r.aliases.filter((t) => !bad.has(t.toLowerCase()));
+      n += r.aliases.length - aliases.length;
+      return aliases.length === r.aliases.length ? r : { ...r, aliases };
+    });
+    const next = { ...dir2, anomalies: strip(dir2.anomalies, drop.괴이), sites: strip(dir2.sites, drop["미스틱 사이트"]), agents: strip(dir2.agents, drop.요원) };
+    return n ? withDirectory(lore, directoryData(next)) : lore;
   }
 
   // src/core/world/calendar.ts
@@ -2951,7 +3501,7 @@ ${themeVars("[x-goei-fab]")}
       await host2.setStyle("bottom", `${pos.bottom}px`);
     };
     await applyPos();
-    let visible = false;
+    let visible2 = false;
     let shown2 = null;
     let introTimer;
     const endIntro = () => {
@@ -2965,7 +3515,7 @@ ${themeVars("[x-goei-fab]")}
     let moved = false;
     let pending = null;
     let loop = null;
-    const rect = async () => visible ? await button.getBoundingClientRect() : null;
+    const rect = async () => visible2 ? await button.getBoundingClientRect() : null;
     const viewport = async () => {
       const r = await root2.body.getBoundingClientRect();
       return { vw: r.width, vh: r.height };
@@ -3008,7 +3558,7 @@ ${themeVars("[x-goei-fab]")}
       drag = null;
       pending = null;
       moved = false;
-      if (!visible || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
+      if (!visible2 || typeof ev.clientX !== "number" || typeof ev.clientY !== "number") return;
       if ((ev.buttons ?? 1) !== 1 && (ev.button ?? 0) !== 0) return;
       const x = ev.clientX;
       const y = ev.clientY;
@@ -3043,7 +3593,7 @@ ${themeVars("[x-goei-fab]")}
       });
     };
     const onClick = async (ev) => {
-      if (!visible) return;
+      if (!visible2) return;
       if (!inside(await rect(), ev.clientX, ev.clientY)) return;
       await loop;
       if (moved) return;
@@ -3076,7 +3626,7 @@ ${themeVars("[x-goei-fab]")}
         shown2 = next;
         if (reappear) await bind().catch(() => {
         });
-        visible = next;
+        visible2 = next;
         if (!next) {
           drag = null;
           pending = null;
@@ -3103,7 +3653,7 @@ ${themeVars("[x-goei-fab]")}
         return !!await doc.querySelector(".default-chat-screen");
       },
       async remove() {
-        visible = false;
+        visible2 = false;
         drag = null;
         pending = null;
         await host2.remove();
@@ -3730,6 +4280,7 @@ ${themeVars("[x-goei-fab]")}
       if (tag) {
         const end = text.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
         if (end >= 0) text = text.slice(end + tag[1].length + 3).trim();
+        else if (/\n\s*\{/.test(text)) text = text.slice(text.search(/\n\s*\{/)).trim();
       } else {
         const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text);
         if (fence) text = fence[1].trim();
@@ -3753,9 +4304,15 @@ ${themeVars("[x-goei-fab]")}
       const a = text.indexOf("{");
       const b = text.lastIndexOf("}");
       if (a >= 0 && b > a) {
+        const body5 = text.slice(a, b + 1);
         try {
-          return JSON.parse(text.slice(a, b + 1));
+          return JSON.parse(body5);
         } catch {
+          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
+          try {
+            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
+          } catch {
+          }
         }
       }
       throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
@@ -3773,366 +4330,4 @@ ${themeVars("[x-goei-fab]")}
     const rows2 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
     if (!Array.isArray(rows2) || !rows2.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
     const st = structuredClone(current3);
-    const old = new Map(st.posts.map((p) => [p.id, p]));
-    const posts = [];
-    const seen2 = /* @__PURE__ */ new Set();
-    let skippedPosts = 0;
-    let skippedComments = 0;
-    let commentTotal = 0;
-    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
-    const floor = Math.max(1e5, current3.seq);
-    for (const raw of rows2) {
-      if (!isObj(raw)) continue;
-      let pid = int2(raw.id);
-      const prev = pid !== null ? old.get(pid) : void 0;
-      const author = str(raw.author).trim();
-      if (!prev && (raw.mine === true || author === o.nick)) {
-        skippedPosts++;
-        continue;
-      }
-      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
-      if (pid === null || seen2.has(pid)) continue;
-      seen2.add(pid);
-      st.seq = Math.max(st.seq, pid);
-      const comments = Array.isArray(raw.comments) ? raw.comments : [];
-      commentTotal += comments.length;
-      let date = validDate(raw.date);
-      if (!date) date = day && str(raw.time).trim() ? `${day} ${str(raw.time).trim()}` : o.date;
-      const q = {
-        id: pid,
-        nick: cut(author || "ㅇㅇ", 80),
-        title: str(raw.title),
-        body: stripForged(str(raw.content)),
-        date,
-        views: Math.max(0, int2(raw.views) ?? 0),
-        votes: Math.max(0, int2(raw.upvotes) ?? 0),
-        mine: prev?.mine ?? false,
-        comments: []
-      };
-      const sigs = /* @__PURE__ */ new Map();
-      const remap = /* @__PURE__ */ new Map([[0, 0]]);
-      if (prev) {
-        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
-        for (const c of prev.comments) {
-          q.comments.push(c);
-          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
-        }
-      }
-      const raws = [];
-      comments.forEach((c, i) => {
-        const n = i + 1;
-        if (!isObj(c)) return void remap.set(n, false);
-        const cAuthor = str(c.author).trim();
-        const content = stripForged(str(c.content));
-        let parent = int2(c.parent) ?? 0;
-        if (parent < 0 || parent >= n) parent = 0;
-        const sig = `${cAuthor}\0${content}`;
-        if (sigs.has(sig)) return void remap.set(n, sigs.get(sig));
-        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
-          skippedComments++;
-          return void remap.set(n, false);
-        }
-        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
-        raws.push(str(c.time).trim());
-        sigs.set(sig, q.comments.length);
-        remap.set(n, q.comments.length);
-      });
-      stampComments(q, q.comments.length - raws.length, raws, o.date);
-      if (!q.title.trim() && !q.body.trim()) continue;
-      posts.push(q);
-    }
-    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
-    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
-    st.posts = posts;
-    trimBoard(st, o.settings);
-    const notice2 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
-    return { st, notice: notice2, emptyComments: commentTotal === 0 };
-  }
-  function acceptComments(rows2, existing, t, nick, base = t.total) {
-    const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
-    let dropped = Array.isArray(rows2) ? Math.max(0, rows2.length - LIMITS.replies) : 0;
-    const out = [];
-    const map = /* @__PURE__ */ new Map();
-    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
-    list4.forEach((c, i) => {
-      const own = t.total + i + 1;
-      const bad = () => {
-        dropped++;
-        map.set(own, false);
-      };
-      if (!isObj(c)) return bad();
-      const author = str(c.author).trim();
-      const content = stripForged(str(c.content)).trim();
-      let n = int2(c.parent);
-      if (n === null || n === 0) n = t.replyTo;
-      if (!author || [...author].length > 80 || author === nick || !content) return bad();
-      if (n > t.total) {
-        const m = map.get(n);
-        if (m === void 0 || m === false) return bad();
-        n = m;
-      } else if (n < 0 || n > 0 && !t.supplied.has(n) && n !== t.replyTo) return bad();
-      if (t.replyTo > 0 && n !== t.replyTo && n <= t.total) return bad();
-      const sig = `${author}\0${content}`;
-      if (seen2.has(sig)) return bad();
-      seen2.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n, time: str(c.time).trim() });
-      map.set(own, base + out.length);
-    });
-    return { comments: out, dropped };
-  }
-  function stampMinutes(stamp) {
-    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
-    if (!m) return null;
-    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
-    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
-  }
-  function minutesStamp(min) {
-    const d = new Date(min * 6e4);
-    const p = (n) => String(n).padStart(2, "0");
-    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-  }
-  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
-  function clockMinutes(raw) {
-    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
-    if (!m) return null;
-    const h = +m[1];
-    const mi = +m[2];
-    return h < 24 && mi < 60 ? h * 60 + mi : null;
-  }
-  function stampComments(p, from, raws, now) {
-    const nowMin = stampMinutes(now);
-    const postMin = stampMinutes(p.date);
-    const floorOf = (i) => {
-      const c = p.comments[i];
-      const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
-      const known = cands.filter((x) => x !== null);
-      return known.length ? Math.max(...known) : null;
-    };
-    const pending = [];
-    const settle = (upto) => {
-      if (!pending.length) return;
-      const lo = floorOf(pending[0]);
-      const hi = upto ?? nowMin ?? lo;
-      if (lo === null || hi === null) return void (pending.length = 0);
-      const span = Math.max(0, hi - lo);
-      pending.forEach((idx, k) => {
-        const min = Math.max(floorOf(idx) ?? lo, lo + Math.round(span * (k + 1) / (pending.length + 1)));
-        p.comments[idx].time = minutesStamp(nowMin !== null ? Math.min(min, Math.max(nowMin, lo)) : min);
-      });
-      pending.length = 0;
-    };
-    for (let i = from; i < p.comments.length; i++) {
-      const c = p.comments[i];
-      const raw = String(raws[i - from] ?? "").trim();
-      const lo = floorOf(i);
-      const clock2 = raw ? clockMinutes(raw) : null;
-      if (clock2 === null || lo === null && nowMin === null) {
-        pending.push(i);
-        continue;
-      }
-      const hi = nowMin ?? Number.POSITIVE_INFINITY;
-      const base = lo ?? nowMin - 24 * 60;
-      let pick3 = null;
-      for (let day = Math.floor(base / 1440); day * 1440 <= Math.min(hi, base + 40 * 1440); day++) {
-        const t = day * 1440 + clock2;
-        if (t >= base && t <= hi) {
-          pick3 = t;
-          break;
-        }
-      }
-      if (pick3 === null) {
-        const ahead = 1 + i % 3;
-        const future = nowMin !== null && Math.floor(nowMin / 1440) * 1440 + clock2 > nowMin;
-        if (future && (lo === null || lo <= nowMin)) pick3 = nowMin;
-        else if (lo !== null && (nowMin === null || lo + ahead <= nowMin)) pick3 = lo + ahead;
-        else pick3 = lo !== null && nowMin !== null && lo > nowMin ? lo : nowMin ?? base;
-      }
-      settle(pick3);
-      c.time = minutesStamp(pick3);
-    }
-    settle(null);
-  }
-  function commentWhen(p, c) {
-    if (!c.time) return "";
-    return c.time.slice(0, 10) === String(p.date).slice(0, 10) ? hhmm(c.time) : c.time;
-  }
-  var whenField = (p, c) => {
-    const t = commentWhen(p, c);
-    return t ? { time: t } : {};
-  };
-  function pushComments(p, rows2, now) {
-    const from = p.comments.length;
-    for (const c of rows2) p.comments.push({ nick: c.author, body: c.content, parent: c.parent, mine: false, unread: false });
-    stampComments(p, from, rows2.map((c) => c.time ?? ""), now);
-  }
-  function parsePostDraft(value) {
-    if (!isObj(value) || !isObj(value.post)) throw new GnetError("응답에 post.title과 post.content가 없어요.");
-    const title2 = str(value.post.title).split(/\r?\n/).map((l) => l.trim()).find(Boolean) ?? "";
-    const content = str(value.post.content).trim();
-    if (!title2 || !content) throw new GnetError("게시글 제목이나 본문이 비어 있어요.");
-    return { title: trimTokens(title2, LIMITS.title_tokens), content: trimTokens(content, LIMITS.post_tokens) };
-  }
-  function attachPostDraft(draft2, input2) {
-    if (!hasAttachment(input2)) return draft2;
-    const literal = /* @__PURE__ */ new Set();
-    for (const p of bodyParts(input2)) if (p.kind === "text") for (const line2 of p.text.split("\n")) literal.add(line2.trim());
-    const plain = bodyParts(draft2.content).filter((p) => p.kind === "text").map((p) => p.text).join("").replace(/\[ATTACHMENT A\d+\]/g, "");
-    const kept = plain.split("\n").filter((line2) => {
-      const t = line2.trim();
-      const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
-      const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
-      const dup = !!label && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label);
-      return literal.has(t) || !dup;
-    });
-    const records = attachmentRecords(input2).map((r) => r.text);
-    const content = [kept.join("\n").trim(), ...records].filter(Boolean).join("\n");
-    return { title: draft2.title, content };
-  }
-  function activityContext(st, targetId) {
-    const posts = [];
-    const snapshots = /* @__PURE__ */ new Map();
-    for (const p of st.posts.slice(0, HISTORY.refresh)) {
-      const selected = /* @__PURE__ */ new Set();
-      for (let n = Math.max(1, p.comments.length - HISTORY.comment + 1); n <= p.comments.length; n++) {
-        let k = n;
-        const visited = /* @__PURE__ */ new Set();
-        while (p.comments[k - 1] && !visited.has(k)) {
-          visited.add(k);
-          selected.add(k);
-          k = p.comments[k - 1].parent;
-        }
-      }
-      const allowed = p.id !== targetId;
-      posts.push({
-        id: p.id,
-        author: p.nick,
-        title: p.title,
-        content: p.body,
-        date: p.date,
-        views: p.views,
-        upvotes: p.votes,
-        comments: p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body })).filter((c) => selected.has(c.index)),
-        commentCount: p.comments.length,
-        commentsAllowed: allowed
-      });
-      snapshots.set(p.id, { head: postHead(p), rows: p.comments.map(commentKey), count: p.comments.length, selected, commentsAllowed: allowed });
-    }
-    return { posts, snapshots };
-  }
-  function applyActivity(st, rows2, snapshots, nick, now = "") {
-    if (rows2 === void 0 || rows2 === null) return [false, 0];
-    if (!Array.isArray(rows2)) return [false, 1];
-    let changed = false;
-    let skipped2 = 0;
-    const done2 = /* @__PURE__ */ new Set();
-    for (const u of rows2) {
-      const id = isObj(u) ? int2(u.id) : null;
-      const ref = id !== null ? snapshots.get(id) : void 0;
-      const p = id !== null ? findPost(st, id) : void 0;
-      if (!isObj(u) || id === null || done2.has(id) || !ref || !p || postHead(p) !== ref.head || ref.rows.some((k, i) => !p.comments[i] || commentKey(p.comments[i]) !== k)) {
-        skipped2++;
-        continue;
-      }
-      done2.add(id);
-      const delta = (v) => {
-        const n = int2(v);
-        return n !== null && n >= 0 ? Math.min(n, 1e7) : 0;
-      };
-      const comments = Array.isArray(u.comments) ? u.comments : [];
-      if (!ref.commentsAllowed && comments.length) {
-        skipped2++;
-        continue;
-      }
-      const got = acceptComments(comments, p.comments, { postId: id, replyTo: 0, total: ref.count, supplied: ref.selected }, nick, p.comments.length);
-      p.views += delta(u.viewsDelta);
-      p.votes += delta(u.upvotesDelta);
-      pushComments(p, got.comments, now);
-      if (got.dropped) skipped2++;
-      changed = changed || delta(u.viewsDelta) > 0 || delta(u.upvotesDelta) > 0 || got.comments.length > 0;
-    }
-    return [changed, skipped2];
-  }
-  function incomingPlan(chat, st, s4, nick, rand2, origin, saved) {
-    const plan = { allowed: false, userHandle: nick, history: [] };
-    for (const m of st.dms) if (m.side === "npc") plan.history.push({ nick: m.nick, body: m.body, ...m.date ? { date: m.date } : {} });
-    if (!s4.incoming) return plan;
-    const last2 = Number(chat.scriptstate?.[GN_COOLDOWN]);
-    const now = storyTurns(chat);
-    if (Number.isFinite(last2) && String(chat.scriptstate?.[GN_COOLDOWN] ?? "") !== "" && now >= last2 && now - last2 < HISTORY.cooldown) return plan;
-    let post = origin?.post;
-    let ci = origin?.commentIndex;
-    if (!post && saved) {
-      post = findPost(st, saved.post);
-      ci = saved.comment;
-    }
-    if (!post) {
-      for (const p of st.posts) {
-        if (p.mine) {
-          post = p;
-          break;
-        }
-        for (let i = p.comments.length; i >= 1; i--) {
-          if (p.comments[i - 1].mine) {
-            post = p;
-            ci = i;
-            break;
-          }
-        }
-        if (post) break;
-      }
-    }
-    const comment = post && ci ? post.comments[ci - 1] : void 0;
-    if (!post || ci && (!comment || !comment.mine) || !comment && !post.mine) return plan;
-    if (s4.incomingChance <= 0 || s4.incomingChance < 100 && Math.floor(rand2() * 100) + 1 > s4.incomingChance) return plan;
-    return { ...plan, allowed: true, post, comment, commentIndex: ci };
-  }
-  function incomingTask(plan, activityPosts) {
-    const body5 = { userHandle: plan.userHandle, incomingAllowed: plan.allowed };
-    if (plan.allowed && plan.post) {
-      body5.incomingOrigin = {
-        title: plan.post.title,
-        author: plan.post.nick,
-        content: plan.post.body,
-        ...plan.comment ? { comment: { author: plan.comment.nick, content: plan.comment.body } } : {}
-      };
-      body5.previousIncoming = plan.history;
-    }
-    if (activityPosts) body5.activityPosts = activityPosts;
-    return `
-COMBINED OUTPUT OPTIONS:
-${JSON.stringify(body5)}`;
-  }
-  function commitIncoming(st, rows2, plan, date, postOverride) {
-    if (!plan.allowed || !plan.post) return false;
-    if (rows2 === void 0 || rows2 === null) return false;
-    if (typeof rows2 === "string") {
-      if (rows2.trim() === "D|__NONE__|__NONE__" || !rows2.trim()) return false;
-      throw new GnetError("선쪽지 형식이 올바르지 않아요.");
-    }
-    const list4 = Array.isArray(rows2) ? rows2 : isObj(rows2) ? [rows2] : null;
-    if (!list4) throw new GnetError("선쪽지 형식이 올바르지 않아요.");
-    let pick3 = null;
-    const reasons = [];
-    let quiet = 0;
-    list4.forEach((c, i) => {
-      if (pick3) return;
-      if (!isObj(c)) return void reasons.push(`${i + 1}번: 객체가 아님`);
-      const nick = str(c.nick).trim();
-      const body5 = trimTokens(stripForged(str(c.body)).trim(), LIMITS.dm_tokens);
-      if (nick === "__NONE__") return void quiet++;
-      if (!nick || [...nick].length > 80) return void reasons.push(`${i + 1}번: 발신자 없음`);
-      if (nick === plan.userHandle) return void reasons.push(`${i + 1}번: 발신자가 사용자`);
-      if (!body5 || body5 === "__NONE__") return void reasons.push(`${i + 1}번: 본문 없음`);
-      if (st.dms.some((m) => m.side === "npc" && m.nick === nick && m.body === body5)) return void quiet++;
-      pick3 = { nick, body: body5 };
-    });
-    if (!pick3) {
-      if (!reasons.length) return false;
-      throw new GnetError(`선쪽지 형식을 확인해 주세요 (${reasons.join("; ")}).`);
-    }
-    const chosen = pick3;
-    const post = postOverride ? findPost(st, postOverride.id) : findPost(st, plan.post.id);
-    if (!post) return false;
-    const comment = plan.commentIndex ? post.comments[plan.commentIndex - 1] : void 0;
-    if (plan.commentIndex && (!comment || !comment.mine || comment.body !== plan.comment?.body)) return false;
-    if (!plan.commentIndex &&
+    const old = ne

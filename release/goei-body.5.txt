@@ -1,4 +1,750 @@
-st d = cx.getImageData(0, 0, bg.width, 3).data;
+: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }\n.goei-game .gg-squad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px; margin: 0; box-sizing: border-box; }\n.goei-game .gg-ag { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 8px; row-gap: 3px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 6px 8px; margin: 0; min-width: 0; }\n.goei-game .gg-ag.ready { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-ag.down { opacity: .55; }\n.goei-game .gg-face { grid-row: 1 / 4; width: 40px; height: 40px; border-radius: 8px; background-repeat: no-repeat; background-size: 320px 40px; }\n.goei-game .gg-nm { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-bar { height: 5px; border-radius: 3px; background: var(--gg-line); overflow: hidden; }\n.goei-game .gg-bar b { display: block; height: 100%; width: 100%; transform-origin: left; background: #5dc98a; }\n.goei-game .gg-bar.sk b { background: var(--gg-signal); }\n.goei-game .gg-ag.low .gg-bar.hp b { background: var(--gg-danger); }\n.goei-game .gg-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--gg-bg); z-index: 2; }\n.goei-game .gg-sheet[hidden] { display: none; }\n.goei-game .gg-sh-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 0; border-bottom: 1px solid var(--gg-line); }\n.goei-game .gg-sh-head b { flex: 1; font-size: 15px; }\n.goei-game .gg-sh-body { flex: 1; overflow-y: auto; padding: 12px; margin: 0; }\n.goei-game .gg-sh-foot { display: flex; gap: 8px; padding: 10px 12px; margin: 0; border-top: 1px solid var(--gg-line); }\n.goei-game .gg-sh-foot .gg-tb { flex: 1; padding: 10px; font-weight: 700; }\n.goei-game .gg-tb.primary { background: var(--gg-accent); border-color: var(--gg-signal); }\n.goei-game .gg-tb[disabled] { opacity: .45; cursor: default; }\n.goei-game .gg-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }\n.goei-game .gg-pk { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 10px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 8px; margin: 0; }\n.goei-game .gg-pk.on { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-pk .gg-face { grid-row: 1 / 3; width: 48px; height: 48px; background-size: 384px 48px; }\n.goei-game .gg-pk small { color: var(--gg-dim); font-size: 12px; }\n.goei-game .gg-rec { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; max-width: 420px; margin: 0 auto; padding: 4px; }\n.goei-game .gg-rec dt { color: var(--gg-dim); }\n.goei-game .gg-rec dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }\n.goei-game .gg-rec .gg-sec { grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gg-line); font-weight: 700; }\n.goei-game .gg-load { color: var(--gg-dim); padding: 16px; margin: 0; }\n@media (max-width: 520px) {\n  .goei-game .gg-squad { gap: 4px; padding: 6px; }\n  .goei-game .gg-ag { grid-template-columns: minmax(0, 1fr); padding: 6px; justify-items: stretch; }\n  .goei-game .gg-ag .gg-face { grid-row: auto; justify-self: center; }\n  .goei-game .gg-nm { text-align: center; font-size: 12px; }\n  .goei-game .gg-pick { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }\n}\n";
+
+  // src/game/assets.ts
+  var PACK_VERSION = 1;
+  var PACK_ID = "patrol";
+  var SHEET_FILES = {
+    jyaldi: "a-jyaldi",
+    gorgo: "a-gorgo",
+    geshu: "a-geshu",
+    deadfall: "a-deadfall",
+    spandal: "a-spandal",
+    eileen: "a-eileen",
+    curas: "a-curas",
+    rose: "a-rose",
+    corner: "e-corner",
+    watchman: "e-watchman",
+    statue: "e-statue",
+    master: "e-master"
+  };
+  var BACK_FILES = {
+    "belt-school": "bg-belt-school",
+    "room-classroom": "bg-room-classroom",
+    "room-lab": "bg-room-lab",
+    "room-broadcast": "bg-room-broadcast",
+    "room-courtyard": "bg-room-courtyard",
+    "belt-camp": "bg-belt-camp"
+  };
+  var FACE_FILE = "faces";
+  var PACK_FILES = [...Object.values(SHEET_FILES), ...Object.values(BACK_FILES), FACE_FILE];
+  var PACK_NAME = `goei-game-${PACK_ID}.pack`;
+  function parsePack(b, required = PACK_FILES) {
+    try {
+      if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
+      const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
+      const head = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
+      if (typeof head.id !== "string" || typeof head.version !== "number" || !head.atlas || !Array.isArray(head.files))
+        return null;
+      const base = 12 + len;
+      const files = /* @__PURE__ */ new Map();
+      for (const row6 of head.files) {
+        if (!Array.isArray(row6)) return null;
+        const [name, at, n] = row6;
+        if (typeof name !== "string" || typeof at !== "number" || typeof n !== "number" || base + at + n > b.length)
+          return null;
+        files.set(name, b.slice(base + at, base + at + n));
+      }
+      if (!required.every((f) => files.has(f))) return null;
+      return { id: head.id, version: head.version, atlas: head.atlas, files };
+    } catch {
+      return null;
+    }
+  }
+
+  // src/game/data.ts
+  var AGENTS = [
+    { id: "jyaldi", name: "쟈알디", role: "공격", hp: 130, atk: 18, range: 150, rate: 1.4, charge: 9, skill: "blast", skillName: "폭발", power: 3.2, face: 0 },
+    { id: "gorgo", name: "고르고디오", role: "방어", hp: 220, atk: 14, range: 46, rate: 1.6, charge: 10, skill: "guard", skillName: "중장갑", power: 5, face: 1 },
+    { id: "geshu", name: "게슈간", role: "제어", hp: 116, atk: 13, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "염동력", power: 3, face: 2 },
+    { id: "deadfall", name: "데드폴", role: "회복", hp: 124, atk: 10, range: 130, rate: 1.5, charge: 11, skill: "heal", skillName: "시간 역행", power: 0.45, face: 3 },
+    { id: "spandal", name: "스팡달", role: "공격", hp: 112, atk: 21, range: 52, rate: 1.2, charge: 9, skill: "bind", skillName: "그림자 가시", power: 2, face: 4 },
+    { id: "eileen", name: "에일린", role: "지원", hp: 120, atk: 14, range: 180, rate: 1, charge: 11, skill: "rally", skillName: "조준 지시", power: 6, face: 5 },
+    { id: "curas", name: "큐라스", role: "공격", hp: 126, atk: 18, range: 150, rate: 1.4, charge: 10, skill: "blast", skillName: "발화", power: 2.6, face: 6 },
+    { id: "rose", name: "로제몬", role: "지원", hp: 118, atk: 11, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "정신 간섭", power: 3.5, face: 7 }
+  ];
+  var ENEMIES = {
+    corner: { id: "corner", name: "모퉁이 귀신", hp: 70, atk: 9, range: 34, rate: 1.5, speed: 48, scale: 1, boss: false },
+    watchman: { id: "watchman", name: "야간 경비", hp: 95, atk: 11, range: 40, rate: 1.8, speed: 38, scale: 1, boss: false },
+    statue: { id: "statue", name: "움직이는 동상", hp: 900, atk: 22, range: 70, rate: 2.4, speed: 16, scale: 2, boss: true },
+    master: { id: "master", name: "악몽의 주인", hp: 1300, atk: 26, range: 80, rate: 2.2, speed: 20, scale: 2, boss: true }
+  };
+  var ROOMS = [
+    { back: "belt-school", name: "본관 복도" },
+    { back: "room-classroom", name: "교실" },
+    { back: "room-lab", name: "과학실" },
+    { back: "room-broadcast", name: "방송실" },
+    { back: "room-courtyard", name: "중앙 정원" }
+  ];
+  var CAMP = { back: "belt-camp", name: "은신처" };
+  var AF = {
+    walk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    idle: 12,
+    attack: [14, 15, 16, 17],
+    attackHit: 1,
+    skill: [18, 19, 20, 21, 22, 23],
+    skillHit: 3,
+    hurt: 24,
+    down: [25, 26, 27],
+    rise: [28, 29],
+    /** 앉아서 쉬기·먹기·마시기·정비 */
+    rest: [30, 31, 32, 33]
+  };
+  var EF = {
+    move: [0, 1, 2, 3, 4, 5],
+    attack: [7, 8, 9, 10, 11],
+    attackHit: 2,
+    skill: [12, 13, 14, 15, 16, 17],
+    skillHit: 3,
+    hurt: 19,
+    die: [20, 21, 22, 23]
+  };
+  var TUNE = {
+    /** 논리 화면 높이. 배경(320×180)을 2배로 그린 높이 */
+    sceneH: 360,
+    /** 요원 걷는 속도 (논리 픽셀/초) */
+    walkSpeed: 44,
+    /** 걷기 그림 한 칸당 이동 거리 */
+    strideStep: 6,
+    /** 방 하나의 길이 */
+    roomLen: 1500,
+    /** 순찰이 깊어질 때마다 적 체력·공격력 배율 증가 */
+    depthScale: 0.12,
+    /** 은신처 휴식 시간 (초) */
+    campTime: 7,
+    /** 응답을 기다리는 동안 진행 속도 */
+    waitingSpeed: 1.25,
+    /** 저장 최소 간격 (밀리초) */
+    saveGap: 5e3
+  };
+
+  // src/game/sim.ts
+  var SAVE_VERSION = 1;
+  var DEFAULT_SQUAD = ["gorgo", "jyaldi", "eileen", "deadfall"];
+  function newMeta() {
+    return { version: SAVE_VERSION, squad: [...DEFAULT_SQUAD], patrols: 0, best: 0, wipes: 0, kills: {}, depth: 1 };
+  }
+  function readMeta(raw) {
+    const m = newMeta();
+    if (!raw) return m;
+    try {
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return m;
+      const ids = new Set(AGENTS.map((a) => a.id));
+      if (Array.isArray(o.squad)) {
+        const s4 = [...new Set(o.squad.filter((id) => ids.has(id)))];
+        if (s4.length === 4) m.squad = s4;
+      }
+      const n = (v, d) => typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : d;
+      m.patrols = n(o.patrols, 0);
+      m.best = n(o.best, 0);
+      m.wipes = n(o.wipes, 0);
+      m.depth = Math.max(1, n(o.depth, 1));
+      if (o.kills && typeof o.kills === "object") {
+        for (const k of Object.keys(ENEMIES)) m.kills[k] = n(o.kills[k], 0);
+      }
+    } catch {
+    }
+    return m;
+  }
+  var agentDef = (id) => AGENTS.find((a) => a.id === id);
+  var isAgent = (u) => u.side === "a";
+  var alive = (u) => u.act !== "down" && u.act !== "dead" && u.act !== "rise";
+  function rand(run3) {
+    let t = run3.seed = run3.seed + 1831565813 | 0;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  var SLOT_BACK = [0, 38, 76, 114];
+  var SLOT_LANE = [1, 0, 1, 0];
+  function makeAgent(run3, id, slot, x) {
+    const d = agentDef(id);
+    return {
+      uid: ++run3.seq,
+      side: "a",
+      kind: id,
+      x: x - SLOT_BACK[slot],
+      lane: SLOT_LANE[slot],
+      hp: d.hp,
+      max: d.hp,
+      act: "walk",
+      t: 0,
+      cd: 0.4 * slot,
+      gauge: 0.35 + 0.15 * slot,
+      stride: slot * 17,
+      bound: 0,
+      slot,
+      ready: 0,
+      hit: false,
+      flash: 0,
+      gone: 0
+    };
+  }
+  function scaled(run3, base) {
+    return Math.round(base * (1 + (run3.depth - 1) * TUNE.depthScale));
+  }
+  function makeEnemy(run3, id, x, lane) {
+    const d = ENEMIES[id];
+    const hp = scaled(run3, d.hp);
+    return {
+      uid: ++run3.seq,
+      side: "e",
+      kind: id,
+      x,
+      lane,
+      hp,
+      max: hp,
+      act: "walk",
+      t: 0,
+      cd: 0.6 + rand(run3),
+      gauge: 6,
+      stride: rand(run3) * 30,
+      bound: 0,
+      slot: 0,
+      ready: 0,
+      hit: false,
+      flash: 0,
+      gone: 0
+    };
+  }
+  function pickRooms(run3) {
+    const order = ROOMS.map((_, i) => i).sort(() => rand(run3) - 0.5);
+    return [0, ...order.filter((i) => i !== 0).slice(0, 2)];
+  }
+  function wavesFor(run3) {
+    const n = run3.room === 2 ? 3 : 2 + (rand(run3) < 0.5 ? 1 : 0);
+    const len = TUNE.roomLen;
+    return Array.from({ length: n }, (_, i) => Math.round((i + 1) / (n + 1) * len * 0.9 + rand(run3) * 60));
+  }
+  function newRun(meta, seed = Date.now() | 0) {
+    const run3 = {
+      phase: "patrol",
+      pt: 0,
+      depth: meta.depth,
+      rooms: [],
+      room: 0,
+      x: 180,
+      waves: [],
+      units: [],
+      fx: [],
+      seq: 0,
+      seed,
+      guard: 0,
+      rally: 0,
+      cam: 0
+    };
+    run3.rooms = pickRooms(run3);
+    run3.waves = wavesFor(run3);
+    formSquad(run3, meta.squad, "walk");
+    return run3;
+  }
+  function formSquad(run3, squad, act2) {
+    const order = [...squad].sort((a, b) => agentDef(a).range - agentDef(b).range);
+    const keep = new Map(run3.units.filter(isAgent).map((u) => [u.kind, u]));
+    run3.units = run3.units.filter((u) => !isAgent(u));
+    order.forEach((id, slot) => {
+      const u = makeAgent(run3, id, slot, run3.x);
+      const old = keep.get(id);
+      if (old) u.hp = Math.max(1, old.hp), u.gauge = old.gauge;
+      u.act = act2;
+      run3.units.push(u);
+    });
+  }
+  function campLayout(run3) {
+    for (const a of agents(run3)) a.x = 70 + a.slot * 74;
+  }
+  function applySquad(run3, meta, squad) {
+    meta.squad = [...squad];
+    run3.phase = "camp";
+    run3.pt = 0;
+    run3.units = [];
+    run3.fx = [];
+    run3.x = 220;
+    formSquad(run3, meta.squad, "rest");
+    campLayout(run3);
+  }
+  function agents(run3) {
+    return run3.units.filter(isAgent);
+  }
+  function enemies(run3) {
+    return run3.units.filter((u) => u.side === "e");
+  }
+  function spawnWave(run3, viewW) {
+    const edge = Math.max(run3.x + 160, run3.cam + viewW + 30);
+    const last2 = run3.room === 2 && run3.waves.length === 0;
+    const regular = ["corner", "watchman"];
+    if (last2) {
+      const boss = run3.depth % 2 === 1 ? "statue" : "master";
+      run3.units.push(makeEnemy(run3, boss, edge + 60, 1));
+      run3.units.push(makeEnemy(run3, regular[Math.floor(rand(run3) * 2)], edge + 10, 0));
+      return;
+    }
+    const n = Math.min(5, 2 + Math.floor(rand(run3) * 2) + Math.floor((run3.depth - 1) / 2));
+    for (let i = 0; i < n; i++) {
+      run3.units.push(makeEnemy(run3, regular[Math.floor(rand(run3) * 2)], edge + i * 46 + rand(run3) * 20, i % 2));
+    }
+  }
+  function addNum(run3, u, amount, heal = false, big = false) {
+    const h = u.side === "e" && ENEMIES[u.kind].scale === 2 ? 170 : 96;
+    let y = footY(u) - h;
+    while (run3.fx.some((f) => (f.kind === "num" || f.kind === "heal") && f.t < 0.35 && Math.abs(f.x - u.x) < 20 && Math.abs(f.y - y) < 12)) y -= 13;
+    run3.fx.push({ kind: heal ? "heal" : "num", x: u.x + (rand(run3) * 10 - 5), y, t: 0, life: 0.8, text: String(Math.round(amount)), big });
+  }
+  function footY(u) {
+    return u.lane === 1 ? 336 : 318;
+  }
+  function damage(run3, from, to, amount, big = false) {
+    if (!alive(to)) return;
+    let v = amount * (0.9 + rand(run3) * 0.2);
+    if (to.side === "a" && run3.guard > 0) v *= 0.5;
+    if (from.side === "a" && run3.rally > 0) v *= 1.4;
+    to.hp = Math.max(0, to.hp - v);
+    to.flash = 0.12;
+    addNum(run3, to, v, false, big);
+    if (to.hp <= 0) {
+      to.act = to.side === "a" ? "down" : "dead";
+      to.t = 0;
+    } else if (to.act === "idle" || to.act === "walk") {
+      to.act = "hurt";
+      to.t = 0;
+    }
+  }
+  function nearest(from, pool) {
+    let best;
+    for (const u of pool) if (alive(u) && (!best || Math.abs(u.x - from.x) < Math.abs(best.x - from.x))) best = u;
+    return best;
+  }
+  var ATTACK_TIME = 0.5;
+  var SKILL_TIME = 0.9;
+  var HURT_TIME = 0.22;
+  var DOWN_TIME = 0.6;
+  var DIE_TIME = 0.8;
+  function frameOf(u) {
+    if (u.side === "a") {
+      switch (u.act) {
+        case "walk":
+          return AF.walk[Math.floor(u.stride / TUNE.strideStep) % AF.walk.length];
+        case "attack":
+          return AF.attack[Math.min(AF.attack.length - 1, Math.floor(u.t / ATTACK_TIME * AF.attack.length))];
+        case "skill":
+          return AF.skill[Math.min(AF.skill.length - 1, Math.floor(u.t / SKILL_TIME * AF.skill.length))];
+        case "hurt":
+          return AF.hurt;
+        case "down":
+          return AF.down[Math.min(AF.down.length - 1, Math.floor(u.t / DOWN_TIME * AF.down.length))];
+        case "rise":
+          return AF.rise[Math.min(AF.rise.length - 1, Math.floor(u.t / 0.4 * AF.rise.length))];
+        case "rest":
+          return AF.rest[(Math.floor(u.t / 2.2) + u.slot) % AF.rest.length];
+        default:
+          return AF.idle;
+      }
+    }
+    switch (u.act) {
+      case "walk":
+        return EF.move[Math.floor(u.stride / 7) % EF.move.length];
+      case "attack":
+        return EF.attack[Math.min(EF.attack.length - 1, Math.floor(u.t / enemyAttackTime(u) * EF.attack.length))];
+      case "skill":
+        return EF.skill[Math.min(EF.skill.length - 1, Math.floor(u.t / SKILL_TIME * EF.skill.length))];
+      case "hurt":
+        return EF.hurt;
+      case "dead":
+        return EF.die[Math.min(EF.die.length - 1, Math.floor(u.t / DIE_TIME * EF.die.length))];
+      default:
+        return EF.move[Math.floor(u.t * 4) % 2];
+    }
+  }
+  var enemyAttackTime = (u) => ENEMIES[u.kind].boss ? 0.8 : 0.6;
+  function trigger(run3, uid) {
+    const u = run3.units.find((x) => x.uid === uid);
+    if (!u || !alive(u) || u.gauge < 1 || run3.phase !== "patrol") return false;
+    if (!enemies(run3).some(alive)) return false;
+    startSkill(u);
+    return true;
+  }
+  function startSkill(u) {
+    u.act = "skill";
+    u.t = 0;
+    u.hit = false;
+    u.gauge = 0;
+    u.ready = 0;
+  }
+  function applySkill(run3, u, foes, team) {
+    const d = agentDef(u.kind);
+    const target = nearest(u, foes);
+    switch (d.skill) {
+      case "blast": {
+        if (!target) return;
+        run3.fx.push({ kind: "boom", x: target.x, y: footY(target) - 40, t: 0, life: 0.5 });
+        for (const f of foes) if (alive(f) && Math.abs(f.x - target.x) < 110) damage(run3, u, f, d.atk * d.power, true);
+        return;
+      }
+      case "heal":
+        for (const a of team) {
+          if (!alive(a)) continue;
+          const v = Math.min(a.max - a.hp, a.max * d.power);
+          a.hp += v;
+          if (v > 0) addNum(run3, a, v, true);
+        }
+        run3.fx.push({ kind: "ring", x: u.x, y: footY(u) - 40, t: 0, life: 0.7 });
+        return;
+      case "guard":
+        run3.guard = d.power;
+        run3.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
+        return;
+      case "rally":
+        run3.rally = d.power;
+        run3.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
+        return;
+      case "bind":
+        if (!target) return;
+        for (const f of foes) {
+          if (!alive(f) || Math.abs(f.x - target.x) > 70) continue;
+          f.bound = ENEMIES[f.kind].boss ? d.power / 2 : d.power;
+          damage(run3, u, f, d.atk * 1.5);
+          run3.fx.push({ kind: "bind", x: f.x, y: footY(f) - 30, t: 0, life: f.bound });
+        }
+        return;
+    }
+  }
+  function stepAgent(run3, u, dt, foes, team) {
+    const d = agentDef(u.kind);
+    u.t += dt;
+    u.flash = Math.max(0, u.flash - dt);
+    if (u.act === "down" || u.act === "rest") return;
+    if (u.act === "rise") {
+      if (u.t > 0.4) u.act = "idle", u.t = 0;
+      return;
+    }
+    u.cd -= dt;
+    if (foes.some(alive)) u.gauge = Math.min(1, u.gauge + dt / d.charge);
+    if (u.act === "hurt") {
+      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "attack") {
+      const target2 = nearest(u, foes);
+      if (!u.hit && u.t >= ATTACK_TIME * AF.attackHit / AF.attack.length) {
+        u.hit = true;
+        if (target2 && Math.abs(target2.x - u.x) <= d.range + 12) damage(run3, u, target2, d.atk);
+      }
+      if (u.t >= ATTACK_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "skill") {
+      if (!u.hit && u.t >= SKILL_TIME * AF.skillHit / AF.skill.length) {
+        u.hit = true;
+        applySkill(run3, u, foes, team);
+      }
+      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    const target = nearest(u, foes);
+    if (u.gauge >= 1) {
+      u.ready += dt;
+      if (target && u.ready > 1.8 && target.x - u.x < d.range + 40) return startSkill(u);
+    }
+    const home = run3.x - SLOT_BACK[u.slot];
+    let goal = home;
+    if (target && target.x - u.x < d.range + 140) {
+      goal = Math.min(Math.max(home, target.x - d.range + 8), target.x - 18);
+    }
+    const dx = goal - u.x;
+    if (Math.abs(dx) > 0.5) {
+      const step3 = Math.sign(dx) * Math.min(Math.abs(dx), TUNE.walkSpeed * 1.25 * dt);
+      u.x += step3;
+      u.stride += Math.abs(step3);
+      if (u.act !== "walk") u.act = "walk", u.t = 0;
+      return;
+    }
+    if (target && Math.abs(target.x - u.x) <= d.range + 4 && u.cd <= 0) {
+      u.act = "attack";
+      u.t = 0;
+      u.hit = false;
+      u.cd = d.rate;
+      return;
+    }
+    if (u.act !== "idle") u.act = "idle", u.t = 0;
+  }
+  function stepEnemy(run3, u, dt, team) {
+    const d = ENEMIES[u.kind];
+    u.t += dt;
+    u.flash = Math.max(0, u.flash - dt);
+    if (u.act === "dead") {
+      u.gone += dt;
+      return;
+    }
+    if (u.bound > 0) {
+      u.bound = Math.max(0, u.bound - dt);
+      if (u.act === "walk" || u.act === "attack") u.act = "idle", u.t = 0;
+      return;
+    }
+    u.cd -= dt;
+    if (u.act === "hurt") {
+      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    const guardian = run3.guard > 0 ? team.find((a) => a.kind === "gorgo" && alive(a)) : void 0;
+    const target = guardian ?? nearest(u, team);
+    if (u.act === "attack") {
+      const at = enemyAttackTime(u);
+      if (!u.hit && u.t >= at * EF.attackHit / EF.attack.length) {
+        u.hit = true;
+        if (target && Math.abs(target.x - u.x) <= d.range + 14) damage(run3, u, target, scaled(run3, d.atk));
+      }
+      if (u.t >= at) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "skill") {
+      if (!u.hit && u.t >= SKILL_TIME * EF.skillHit / EF.skill.length) {
+        u.hit = true;
+        run3.fx.push({ kind: "boom", x: u.x - 70, y: footY(u) - 30, t: 0, life: 0.5 });
+        for (const a of team) if (alive(a) && u.x - a.x < 170) damage(run3, u, a, scaled(run3, d.atk) * 1.3, true);
+      }
+      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (!target) {
+      if (u.act !== "idle") u.act = "idle", u.t = 0;
+      return;
+    }
+    if (d.boss) {
+      u.gauge -= dt;
+      if (u.gauge <= 0 && u.x - target.x < 190) {
+        u.gauge = 7 + rand(run3) * 3;
+        u.act = "skill";
+        u.t = 0;
+        u.hit = false;
+        return;
+      }
+    }
+    const gap = u.x - target.x;
+    if (gap > d.range) {
+      const step3 = Math.min(gap - d.range, d.speed * dt);
+      u.x -= step3;
+      u.stride += step3;
+      if (u.act !== "walk") u.act = "walk", u.t = 0;
+      return;
+    }
+    if (u.cd <= 0) {
+      u.act = "attack";
+      u.t = 0;
+      u.hit = false;
+      u.cd = d.rate;
+      return;
+    }
+    if (u.act !== "idle") u.act = "idle", u.t = 0;
+  }
+  function step(run3, meta, dt, viewW) {
+    const res = { changed: false };
+    run3.pt += dt;
+    run3.guard = Math.max(0, run3.guard - dt);
+    run3.rally = Math.max(0, run3.rally - dt);
+    for (const f of run3.fx) f.t += dt;
+    run3.fx = run3.fx.filter((f) => f.t < f.life);
+    const team = agents(run3);
+    const foes = enemies(run3);
+    if (run3.phase === "camp") {
+      for (const a of team) {
+        a.t += dt;
+        a.hp = Math.min(a.max, a.hp + a.max * 0.25 * dt);
+        if (a.act !== "rest") a.act = "rest", a.t = 0;
+      }
+      if (run3.pt >= TUNE.campTime) {
+        run3.phase = "fade";
+        run3.pt = 0;
+        run3.depth = meta.depth;
+        run3.rooms = pickRooms(run3);
+        run3.room = 0;
+        run3.x = 180;
+        run3.units = [];
+        formSquad(run3, meta.squad, "walk");
+        run3.waves = wavesFor(run3);
+        run3.fx = [];
+      }
+      return res;
+    }
+    if (run3.phase === "fade" || run3.phase === "retreat") {
+      if (run3.phase === "retreat" && run3.pt >= 1.2) {
+        run3.phase = "camp";
+        run3.pt = 0;
+        run3.units = [];
+        run3.x = 220;
+        formSquad(run3, meta.squad, "rest");
+        campLayout(run3);
+        for (const a of agents(run3)) a.hp = Math.max(1, a.max * 0.3);
+      }
+      if (run3.phase === "fade" && run3.pt >= 0.6) run3.phase = "patrol", run3.pt = 0;
+      return res;
+    }
+    for (const u of team) stepAgent(run3, u, dt, foes, team);
+    for (const u of foes) stepEnemy(run3, u, dt, team);
+    for (const f of foes) {
+      if (f.act === "dead" && f.gone > 1.6) {
+        meta.kills[f.kind] = (meta.kills[f.kind] ?? 0) + 1;
+        res.changed = true;
+      }
+    }
+    run3.units = run3.units.filter((u) => !(u.side === "e" && u.act === "dead" && u.gone > 1.6));
+    const livingFoes = enemies(run3).some(alive);
+    if (!team.some(alive)) {
+      meta.wipes += 1;
+      res.changed = true;
+      run3.phase = "retreat";
+      run3.pt = 0;
+      return res;
+    }
+    const engaged = livingFoes && enemies(run3).some((e) => alive(e) && e.x - run3.x < 130);
+    if (!engaged) {
+      const lagging = team.some((a) => alive(a) && run3.x - SLOT_BACK[a.slot] - a.x > 30);
+      if (!lagging) run3.x += TUNE.walkSpeed * dt;
+    }
+    if (run3.waves.length && run3.x >= run3.waves[0] - 140) {
+      run3.waves.shift();
+      spawnWave(run3, viewW);
+    }
+    if (!livingFoes && !run3.waves.length && run3.x >= TUNE.roomLen && !enemies(run3).length) {
+      if (run3.room < 2) {
+        run3.room += 1;
+        run3.phase = "fade";
+        run3.pt = 0;
+        run3.x = 180;
+        for (const a of team) {
+          if (!alive(a)) a.act = "rise", a.t = 0, a.hp = a.max * 0.25;
+          a.x = run3.x - SLOT_BACK[a.slot];
+        }
+        run3.waves = wavesFor(run3);
+      } else {
+        meta.patrols += 1;
+        meta.best = Math.max(meta.best, run3.depth);
+        meta.depth = run3.depth + 1;
+        res.changed = true;
+        run3.phase = "camp";
+        run3.pt = 0;
+        run3.units = [];
+        run3.x = 220;
+        formSquad(run3, meta.squad, "rest");
+        campLayout(run3);
+        for (const a of agents(run3)) a.hp = Math.max(1, a.max * 0.5);
+      }
+    }
+    return res;
+  }
+
+  // src/game/render.ts
+  var H = TUNE.sceneH;
+  function loadImage(src) {
+    return new Promise((ok, fail3) => {
+      const img = new Image();
+      img.onload = () => ok(img);
+      img.onerror = () => fail3(new Error("그림을 불러오지 못했습니다"));
+      img.src = src;
+    });
+  }
+  var Renderer = class {
+    canvas;
+    ctx;
+    sheets = /* @__PURE__ */ new Map();
+    backs = /* @__PURE__ */ new Map();
+    /** 기기 픽셀 기준 배율 (논리 1픽셀 = 기기 k픽셀) */
+    k = 1;
+    /** 논리 화면 폭 */
+    w = 480;
+    /** 위에서 잘라 낸 높이 (논리 픽셀) */
+    top = 0;
+    cam = 0;
+    ready = false;
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+    }
+    atlas = {};
+    async load(art2) {
+      this.atlas = art2.atlas;
+      await Promise.all([
+        ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art2.url(v)))),
+        ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art2.url(v))))
+      ]);
+      this.ready = true;
+    }
+    /** 들어갈 칸의 CSS 크기에 맞춰 배율과 논리 폭을 정한다 */
+    layout(cssW, cssH, dpr) {
+      const devW = Math.max(1, Math.floor(cssW * dpr));
+      const devH = Math.max(1, Math.floor(cssH * dpr));
+      this.k = Math.max(1, Math.min(Math.floor(devH / (H * 0.8)), Math.floor(devW / 360)));
+      this.w = Math.min(960, Math.floor(devW / this.k));
+      this.top = H - Math.floor(devH / this.k);
+      const cw = this.w * this.k;
+      const ch = (H - this.top) * this.k;
+      if (this.canvas.width !== cw || this.canvas.height !== ch) {
+        this.canvas.width = cw;
+        this.canvas.height = ch;
+      }
+      this.canvas.style.width = `${cw / dpr}px`;
+      this.canvas.style.height = `${ch / dpr}px`;
+    }
+    back(run3) {
+      return run3.phase === "camp" || run3.phase === "retreat" && run3.pt > 0.6 ? CAMP.back : ROOMS[run3.rooms[run3.room]].back;
+    }
+    camera(run3, snap) {
+      const team = run3.units.filter((u) => u.side === "a");
+      const foes = run3.units.filter((u) => u.side === "e" && alive(u));
+      let goal;
+      if (run3.phase === "camp" || !team.length) goal = 0;
+      else {
+        const front = Math.max(...team.map((u) => u.x));
+        const back = Math.min(...team.map((u) => u.x));
+        const near = foes.length ? Math.min(...foes.map((u) => u.x)) : Infinity;
+        if (near - front < this.w * 0.75) goal = (back + Math.min(near + 60, back + this.w - 40)) / 2 - this.w / 2;
+        else goal = front - this.w * 0.45;
+      }
+      goal = Math.max(0, goal);
+      this.cam = snap ? goal : this.cam + (goal - this.cam) * 0.08;
+      return Math.round(this.cam);
+    }
+    draw(run3, snapCam = false) {
+      if (!this.ready) return;
+      const c = this.ctx;
+      c.setTransform(this.k, 0, 0, this.k, 0, -this.top * this.k);
+      c.imageSmoothingEnabled = false;
+      const cam = run3.phase === "fade" && run3.pt < 0.05 ? this.camera(run3, true) : this.camera(run3, snapCam);
+      run3.cam = cam;
+      const bg = this.backs.get(this.back(run3));
+      if (bg) {
+        const tw = bg.width * 2;
+        for (let x = -(cam % tw); x < this.w; x += tw) {
+          c.drawImage(bg, x, 0, tw, H);
+        }
+        if (this.top < 0) {
+          const g = c.createLinearGradient(0, this.top, 0, 0);
+          g.addColorStop(0, "#05070a");
+          g.addColorStop(1, this.topColor(bg));
+          c.fillStyle = g;
+          c.fillRect(0, this.top, this.w, -this.top);
+        }
+      }
+      const units = [...run3.units].sort((a, b) => a.lane - b.lane || (a.side === "e" ? 1 : 0) - (b.side === "e" ? 1 : 0));
+      for (const u of units) this.shadow(u, cam);
+      for (const u of units) this.unit(u, cam);
+      this.effects(run3, cam);
+      this.bossBar(run3);
+      if (run3.phase === "fade" || run3.phase === "retreat") {
+        const a = run3.phase === "fade" ? 1 - run3.pt / 0.6 : Math.min(1, run3.pt / 0.6) - Math.max(0, (run3.pt - 0.6) / 0.6);
+        c.fillStyle = `rgba(0,0,0,${Math.max(0, Math.min(1, a))})`;
+        c.fillRect(0, this.top, this.w, H - this.top);
+      }
+    }
+    tops = /* @__PURE__ */ new Map();
+    topColor(bg) {
+      let v = this.tops.get(bg);
+      if (!v) {
+        const cv = document.createElement("canvas");
+        cv.width = bg.width;
+        cv.height = 3;
+        const cx = cv.getContext("2d");
+        cx.drawImage(bg, 0, 0);
+        const d = cx.getImageData(0, 0, bg.width, 3).data;
         let r = 0, gr = 0, b = 0;
         for (let i = 0; i < d.length; i += 4) r += d[i], gr += d[i + 1], b += d[i + 2];
         const n = d.length / 4;
@@ -1633,6 +2379,8 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     const lore = mergeByName(current3, payload.data.globalLore, loreName, (e) => PROTECTED_LORE.includes(e.comment ?? ""));
     keepUserKeys(current3, lore.list, shippedKeys(payload.data.globalLore));
     if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? "")))) lore.list = migrateLore(lore.list);
+    if (compareVersions(cardVersion(char.globalLore), "0.16.37") < 0) lore.list = dropOldOutsidePlaces(lore.list);
+    lore.list = dropDefaultAliases(lore.list);
     const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ""));
     const currentScripts = (char.customscript ?? []).filter((r) => !RETIRED_SCRIPTS.includes(r.comment ?? "") || incomingNames.has(r.comment ?? ""));
     const scripts = mergeByName(currentScripts, payload.data.customscript, (r) => r.comment ?? "");
@@ -1646,7 +2394,7 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.36" : "0";
+  var PLUGIN_VERSION = true ? "0.16.37" : "0";
 
   // src/host/gamepack.ts
   var KEY2 = `goei:game-pack:${PACK_ID}`;
@@ -2315,7 +3063,7 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
     return regCache.reg;
   }
-  var source3 = (ctx2) => ({ char: ctx2.char, chat: ctx2.chat, persona: personaText() });
+  var source3 = (ctx2) => playerSource({ char: ctx2.char, chat: ctx2.chat, persona: personaText() });
   function canon(ctx2) {
     const r = registry(ctx2);
     const src = source3(ctx2);
@@ -2697,6 +3445,11 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     </section></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc13(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
   }
+  function spoilerFold(ctx2, title2, e) {
+    if (e?.cat !== "an") return false;
+    const cleared = new Set(readWorld(ctx2.chat).cleared ?? []);
+    return ![title2, e.name, e.title].some((n) => cleared.has(n));
+  }
   function docView(ctx2) {
     const doc = findDoc(ctx2.chat, wiki.title, ctx2.char.globalLore);
     if (!doc) {
@@ -2707,7 +3460,7 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     const saved = new Set(listDocs(ctx2.chat, ctx2.char.globalLore).map((d) => d.title));
     const e = entryFor(ctx2, doc.title);
     const photo = e?.photo ? imageUrl(ctx2.char, e.photo) : null;
-    const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo });
+    const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx2, doc.title, e) });
     const job = jobs3.get(chatKey3(ctx2));
     const links = (label, list4) => list4.length ? `<div class="nw-more"><b>${label}</b><div class="nw-chips">${list4.map((t) => {
       const le = entryFor(ctx2, t);
@@ -2783,7 +3536,7 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
       const li = doc.querySelector(`.nw-notes li[data-fn="${sup.dataset.fn}"]`);
       if (!li) return;
       cur = sup;
-      pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${li.innerHTML}`;
+      pop.innerHTML = `<b>[${sup.dataset.fn}]</b> ${(li.querySelector(".nw-fn-t") ?? li).innerHTML}`;
       pop.hidden = false;
       const box = doc.getBoundingClientRect();
       const r = sup.getBoundingClientRect();
@@ -2997,7 +3750,10 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
         await env2.refresh();
         return true;
       case "wiki-jump": {
-        document.getElementById(v)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const el = document.getElementById(v);
+        const fold = el?.closest("details");
+        if (fold) fold.open = true;
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
         return true;
       }
       case "wiki-request":
@@ -3025,6 +3781,79 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
     if (name === "wiki-new") return void (wiki.newTitle = value), true;
     if (name === "wiki-docreq") return void (wiki.docReq = value), true;
     return false;
+  }
+
+  // src/ui/cctvfx.ts
+  var BASE = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
+  var LAST2 = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
+  var AN_ONLY = ["shade", "text", "breath"];
+  var GAP = { tear: 4e3, lost: 2e4, shade: 2e4, text: 1e4, breath: 15e3 };
+  var FIRST = ["shade", "shade", "text", "text", "tear", "lost"];
+  var visible = /* @__PURE__ */ new Set();
+  var lastAt = /* @__PURE__ */ new Map();
+  var GRADE = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
+  var BLOCKS = "█▓▒░#?¿§";
+  var JAMO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
+  var timer2 = null;
+  var any = (set2) => set2[Math.floor(Math.random() * set2.length)];
+  function garble(ch) {
+    if (/\s/.test(ch) || Math.random() > 0.45) return ch;
+    if (/[가-힣]/.test(ch)) return Math.random() < 0.5 ? any(JAMO) : String.fromCharCode(44032 + Math.floor(Math.random() * 11172));
+    return any(BLOCKS);
+  }
+  function textGlitch(view2) {
+    const nodes = [];
+    for (const box of view2.querySelectorAll(".gx-oposd, .gx-opcap")) {
+      const walk = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+      for (let n = walk.nextNode(); n; n = walk.nextNode()) if (n.nodeValue?.trim()) nodes.push(n);
+    }
+    const real = nodes.map((n) => n.nodeValue ?? "");
+    const shake = () => nodes.forEach((n, i) => n.nodeValue = Array.from(real[i]).map(garble).join(""));
+    shake();
+    const steps = [130, 280, 470].map((ms) => setTimeout(shake, ms));
+    setTimeout(() => {
+      steps.forEach(clearTimeout);
+      nodes.forEach((n, i) => n.nodeValue = real[i]);
+    }, LAST2.text - 10);
+  }
+  function fireFx(view2, fx2) {
+    const cls = `fx-${fx2}`;
+    if (view2.classList.contains(cls)) return;
+    if (fx2 === "text") textGlitch(view2);
+    view2.classList.add(cls);
+    setTimeout(() => view2.classList.remove(cls), LAST2[fx2]);
+  }
+  function tick2(root2) {
+    const now = /* @__PURE__ */ new Set();
+    for (const view2 of root2.querySelectorAll(".gx-opview.feed:not(.ended):not(.nosig)")) {
+      const an = view2.classList.contains("k-an");
+      const key2 = view2.dataset.fxkey ?? "";
+      now.add(key2);
+      if (key2 && !visible.has(key2)) {
+        const fx2 = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : "tear";
+        lastAt.set(fx2, Date.now());
+        setTimeout(() => view2.isConnected && fireFx(view2, fx2), Math.random() * 1500);
+        continue;
+      }
+      const scale = an ? GRADE[view2.dataset.grade ?? ""] ?? 1 : 0.4;
+      for (const fx2 of Object.keys(BASE)) {
+        if (!an && AN_ONLY.includes(fx2)) continue;
+        if (Date.now() - (lastAt.get(fx2) ?? 0) < GAP[fx2] || Math.random() >= BASE[fx2] * scale) continue;
+        lastAt.set(fx2, Date.now());
+        fireFx(view2, fx2);
+      }
+    }
+    visible = now;
+  }
+  function startCctvFx(root2) {
+    if (timer2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    timer2 = setInterval(() => tick2(root2), 1e3);
+    tick2(root2);
+  }
+  function stopCctvFx() {
+    if (timer2) clearInterval(timer2);
+    timer2 = null;
+    visible = /* @__PURE__ */ new Set();
   }
 
   // src/host/send.ts
@@ -3380,725 +4209,4 @@ st d = cx.getImageData(0, 0, bg.width, 3).data;
       <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc14(b.name)}">${gus}</select></label>
     </div>
     ${map}
-    ${input(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
-    ${input(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
-    ${input(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
-    ${input(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
-    <div class="dir-rename"><label class="dir-in"><span>거점 이름</span><input name="dir-base-name" value="${esc14(b.name)}" autocomplete="off" data-enter="dir-base-rename"></label>
-      <button class="gx-mini" data-action="dir-base-rename" data-take="dir-base-name">이름 바꾸기</button>
-      <button class="gx-mini danger" data-action="dir-base-del" data-value="${esc14(b.name)}">지우기</button></div>
-  </div>`;
-  }
-  function baseRow(b, ctx2, d) {
-    const open3 = dirUi.open === b.name;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc14(b.name)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc14(b.name)}</b><small>${esc14([b.org || "조직 없음", baseWhere(b)].join(" · "))}</small></span>
-      ${b.show ? "" : '<span class="gx-badge">숨김</span>'}
-    </button>${open3 ? basePanel(b, ctx2, d) : ""}</div>`;
-  }
-  function baseList(ctx2, d, q) {
-    const rows2 = d.bases.filter((b) => !q || [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q)));
-    const order = [...d.orgs.map((o) => o.name), ""];
-    const rank2 = (b) => b.org ? order.indexOf(b.org) : order.length;
-    const sorted = [...rows2].sort((x, y) => rank2(x) - rank2(y));
-    return `    ${sorted.length ? sorted.map((b) => baseRow(b, ctx2, d)).join("") : '<p class="gx-muted dir-empty">맞는 거점이 없어요.</p>'}`;
-  }
-  function freeBaseName(d, want) {
-    let name = want;
-    for (let i = 2; d.bases.some((b) => b.name === name); i++) name = `${want} ${i}`;
-    return name;
-  }
-  function placeRow(p, ctx2, src = "") {
-    const open3 = dirUi.open === p.lore;
-    return `<div class="dir-row${open3 ? " open" : ""}">
-    <button class="dir-head" data-action="dir-open" data-value="${esc14(p.lore)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc14(p.label)}</b><small>${esc14(p.english || "영문명 없음")}</small></span>
-      ${p.inFolder ? "" : `<span class="gx-badge wait">${esc14(src || "폴더 밖")}</span>`}
-      <span class="gx-badge${p.preset ? " live" : ""}">${p.preset ? "발생 후보" : "숨김"}</span>
-    </button>${open3 ? placePanel(p, ctx2) : ""}</div>`;
-  }
-  function agentRow(a, ctx2, d, names4, order) {
-    const open3 = dirUi.open === a.lore;
-    const sub = [a.affiliation ? orgName(d, names4, a.affiliation) : "", a.rank, a.department].filter(Boolean).join(" · ");
-    const move2 = order ? `<span class="dir-move"><span class="dir-grip" data-drag-agent="${esc14(a.lore)}" title="끌어서 순서 바꾸기" aria-hidden="true">${ICONS.grip}</span><button class="dir-step" data-action="dir-move" data-value="up|${esc14(a.lore)}" aria-label="${esc14(a.name)} 위로" ${order.first ? "disabled" : ""}>${ICONS.up}</button><button class="dir-step" data-action="dir-move" data-value="down|${esc14(a.lore)}" aria-label="${esc14(a.name)} 아래로" ${order.last ? "disabled" : ""}>${ICONS.down}</button></span>` : "";
-    return `<div class="dir-row${open3 ? " open" : ""}"${order ? ` data-agent-row="${esc14(a.lore)}" data-agent-group="${esc14(agentGroup(a))}"` : ""}><div class="dir-headrow">
-    <button class="dir-head" data-action="dir-open" data-value="${esc14(a.lore)}" aria-expanded="${open3}">
-      ${picAvatar(ctx2.char, facePic(ctx2.char, a, true), a.name)}
-      <span class="dir-name"><b>${esc14(a.name)}</b><small>${esc14(sub || "소속 미정")}</small></span>
-      ${!a.affiliation ? '<span class="gx-badge hot">소속 미정</span>' : a.rosterFor.length ? "" : '<span class="gx-badge">목록 숨김</span>'}
-    </button>${move2}</div>${open3 ? agentPanel2(a, ctx2, d) : ""}</div>`;
-  }
-  function searchAll(ctx2, d, q, names4) {
-    const jump = (kind, html) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key2) => `data-action="dir-jump" data-value="${kind}|${key2}"`);
-    const groups = [
-      ["anomaly", "괴이", d.anomalies.filter((r) => matches3(r, q)).map((r) => jump("anomaly", placeRow(r, ctx2)))],
-      ["site", "특수", d.sites.filter((r) => matches3(r, q)).map((r) => jump("site", placeRow(r, ctx2)))],
-      ["agent", "요원", d.agents.filter((r) => matches3(r, q)).map((r) => jump("agent", agentRow(r, ctx2, d, names4)))],
-      ["org", "조직", d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump("org", orgRow(o, ctx2, d, names4)))],
-      ["base", "거점", d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump("base", baseRow(b, ctx2, d)))]
-    ];
-    const hit2 = groups.filter(([, , rows2]) => rows2.length);
-    if (!hit2.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
-    return hit2.map(([, label, rows2]) => `<h3 class="dir-group">${label}<small>${rows2.length}</small></h3>${rows2.join("")}`).join("");
-  }
-  function directoryList(ctx2) {
-    const d = draftOf(ctx2);
-    const q = dirUi.q.trim().toLowerCase();
-    const names4 = namesOf(d, ctx2.char.globalLore);
-    if (q) return searchAll(ctx2, d, q, names4);
-    if (dirUi.kind === "base") return baseList(ctx2, d, q);
-    if (dirUi.kind === "org") {
-      const rows3 = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
-      return `${rows3.map((o) => orgRow(o, ctx2, d, names4)).join("") || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
-    }
-    if (dirUi.kind !== "agent") {
-      const rows3 = (dirUi.kind === "anomaly" ? d.anomalies : d.sites).filter((r) => matches3(r, q));
-      const src = loreSources(ctx2.char.globalLore);
-      const inside2 = rows3.filter((r) => r.inFolder);
-      const outside = rows3.filter((r) => !r.inFolder);
-      const folder = dirUi.kind === "anomaly" ? "🚧괴이" : "🎁파밍";
-      return `${inside2.length ? `<h3 class="dir-group">${folder} 폴더<small>${inside2.length}</small></h3>${inside2.map((r) => placeRow(r, ctx2)).join("")}` : ""}
-      ${outside.length ? `<h3 class="dir-group">다른 폴더에서 온 후보<small>${outside.length}</small></h3><p class="gx-muted dir-group-help">조직·개체처럼 괴이 폴더 밖의 로어북이에요. 「발생 후보」로 두면 괴이처럼 발생해요.</p>${outside.map((r) => placeRow(r, ctx2, src.get(r.lore))).join("")}` : ""}
-      ${!rows3.length ? '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>' : ""}`;
-    }
-    const rows2 = d.agents.filter((r) => matches3(r, q));
-    if (!rows2.length) return '<p class="gx-muted dir-empty">맞는 사람이 없어요.</p>';
-    const key2 = (a) => a.affiliation ? orgName(d, names4, a.affiliation) : "";
-    const order = ["", ...d.orgs.map((o) => o.name)];
-    const groups = [...new Set(rows2.map(key2))].sort((x, y) => order.indexOf(x) - order.indexOf(y));
-    return groups.map((g) => {
-      const list4 = rows2.filter((r) => key2(r) === g);
-      const body5 = list4.map((r, i) => agentRow(r, ctx2, d, names4, q ? void 0 : { first: i === 0, last: i === list4.length - 1 })).join("");
-      return `<h3 class="dir-group${g ? "" : " warn"}">${esc14(g || "소속 미정")}<small>${list4.length}</small></h3>${body5}`;
-    }).join("");
-  }
-  var directoryDone = () => dirUi.done;
-  var directoryDoneClear = (text) => {
-    if (dirUi.done === text) dirUi.done = "";
-  };
-  var directorySearch = () => `<input class="dir-search" type="search" data-input="dir-q" value="${esc14(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점)" aria-label="명부 전체 검색" autocomplete="off">`;
-  var barButtons = (off) => `<button class="st-act save" data-action="set-bar" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="set-bar" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button>`;
-  function directoryBar() {
-    return barButtons(!dirty() || dirUi.busy);
-  }
-  function directoryView(ctx2) {
-    const d = draftOf(ctx2);
-    const kinds = [
-      ["anomaly", "괴이", d.anomalies.length],
-      ["site", "특수", d.sites.length],
-      ["agent", "요원", d.agents.length],
-      ["org", "조직", d.orgs.length],
-      ["base", "거점", d.bases.length]
-    ];
-    return `<div class="dir">
-    <div class="gx-segs dir-kinds">${kinds.map(([k, label, n]) => `<button class="gx-seg${dirUi.kind === k ? " on" : ""}" data-action="dir-kind" data-value="${k}" aria-pressed="${dirUi.kind === k}">${label} <small>${n}</small></button>`).join("")}</div>
-    <div class="dir-tools">
-      <div class="dir-qbox">${directorySearch()}</div>
-      ${ADD_LABEL[dirUi.kind] ? `<button class="dir-tool${dirUi.adding ? " on" : ""}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}">${ICONS.plus}<span>${ADD_LABEL[dirUi.kind]}</span></button>` : ""}
-      <button class="dir-tool icon" data-action="dir-reload" aria-label="로어북 다시 읽기" title="로어북 다시 읽기">${ICONS.refresh}</button>
-      <button class="dir-tool icon${dirUi.help ? " on" : ""}" data-action="dir-help" aria-expanded="${dirUi.help}" aria-label="명부 사용법" title="명부 사용법">?</button>
-    </div>
-    ${dirUi.adding ? addPanel(ctx2) : ""}
-    ${dirUi.help ? `<div class="dir-help">
-      <ul>
-        <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
-        <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
-        <li>거점은 지도에 찍히는 장소예요. 「거점」 탭에서 추가하고 지도를 눌러 위치를 정해요.</li>
-        <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
-      </ul>
-      ${d.folders ? "" : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
-    </div>` : ""}
-    ${dirUi.notice ? `<div class="gx-err" role="alert">${esc14(dirUi.notice)}</div>` : ""}
-    ${unassigned(d) ? `<button class="dir-alert" data-action="dir-kind" data-value="agent">소속을 정하지 않은 요원이 ${unassigned(d)}명 있어요</button>` : ""}
-    <div class="dir-list">${directoryList(ctx2)}</div>
-  </div>`;
-  }
-  var ADD_LABEL = { anomaly: "후보 추가", site: "후보 추가", agent: "", org: "조직 추가", base: "거점 추가" };
-  function addPanel(ctx2) {
-    if (dirUi.kind === "org" || dirUi.kind === "base") {
-      const [name, act2, hint] = dirUi.kind === "org" ? ["dir-org-new", "dir-org-add", "새 조직 이름"] : ["dir-base-new", "dir-base-new", "새 거점 이름"];
-      return `<div class="dir-ext"><div class="dir-add"><input name="${name}" placeholder="${hint}" aria-label="${hint}" autocomplete="off" data-enter="${act2}">
-      <button class="gx-mini" data-action="${act2}" data-take="${name}">추가</button></div></div>`;
-    }
-    return `<div class="dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc14(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off">
-    <div class="dir-ext-list">${directoryExtList(ctx2)}</div></div>`;
-  }
-  var unassigned = (d) => d.agents.filter((a) => !a.affiliation).length;
-  var splitList = (v) => v.split(",").map((t) => t.trim()).filter(Boolean);
-  function directoryInput(key2, value, bar) {
-    const d = dirUi.draft;
-    if (!d) return;
-    if (key2.startsWith("base:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(5, at2);
-      const b = d.bases.find((x) => x.name === key2.slice(at2 + 1));
-      if (!b) return;
-      if (field5 === "aliases") b.aliases = splitList(value);
-      else if (field5 === "label" || field5 === "lore" || field5 === "english") b[field5] = value.trim();
-      else return;
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    if (key2.startsWith("disp:") || key2.startsWith("ptab:") || key2.startsWith("seed:")) {
-      const [kind, rest] = [key2.slice(0, 4), key2.slice(5)];
-      if (kind === "disp") {
-        const [viewer, code] = rest.split("|");
-        const m = d.display[viewer] ??= {};
-        if (value.trim()) m[code] = value.trim();
-        else delete m[code];
-      } else if (kind === "ptab") {
-        const t = d.phoneTabs.tabs.find((x) => x.id === rest);
-        if (t) t.name = value.trim() || t.id;
-      } else {
-        const names4 = splitList(value);
-        if (names4.length) d.seeds[rest] = names4;
-        else delete d.seeds[rest];
-      }
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    if (key2.startsWith("org:")) {
-      const at2 = key2.indexOf("|");
-      const field5 = key2.slice(4, at2);
-      const o = d.orgs.find((x) => x.name === key2.slice(at2 + 1));
-      if (!o) return;
-      if (field5 === "seed") o.spec.seed = splitList(value);
-      else if (field5 === "title" || field5 === "blurb" || field5 === "photo" || field5 === "english" || field5 === "gm_name" || field5 === "gm_desc" || field5 === "tab") o.spec[field5] = value.trim();
-      else return;
-      dirUi.done = "";
-      if (bar) bar.innerHTML = directoryBar();
-      return;
-    }
-    const at = key2.indexOf("|");
-    const field4 = key2.slice(0, at);
-    const row6 = findRow2(d, key2.slice(at + 1));
-    if (!row6) return;
-    if (field4 === "aliases") row6.aliases = splitList(value);
-    else if (field4 === "label") row6.label = value.trim() || row6.lore;
-    else if (field4 === "english" || field4 === "rank" || field4 === "department" || field4 === "affiliation") row6[field4] = value.trim();
-    else return;
-    dirUi.done = "";
-    if (bar) bar.innerHTML = directoryBar();
-  }
-  function setPlayable(d, o, on2) {
-    if (on2 === !!o.spec.playable) return;
-    if (on2 && !o.spec.code) {
-      const code2 = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? "")]);
-      if (!code2) {
-        dirUi.notice = "더 줄 수 있는 세력 코드가 없어요 (F00~Z00).";
-        return;
-      }
-      o.spec.code = code2;
-      d.usedCodes = [...d.usedCodes, code2];
-    }
-    const code = o.spec.code;
-    const tab2 = extraTabId(code);
-    o.spec.playable = on2;
-    const edit = (xs, x) => on2 ? xs.includes(x) ? xs : [...xs, x] : xs.filter((y) => y !== x);
-    o.rosterFor = edit(o.rosterFor, code);
-    o.phoneTabs = edit(o.phoneTabs, tab2);
-    for (const a of d.agents) {
-      if (a.affiliation !== orgAffiliation(o)) continue;
-      a.rosterFor = edit(a.rosterFor, code);
-      a.phoneTabs = edit(a.phoneTabs, tab2);
-    }
-    dirUi.notice = "";
-  }
-  async function handleDirectory(action, value, ctx2, env2) {
-    if (!action.startsWith("dir-")) return false;
-    const v = value ?? "";
-    const d = draftOf(ctx2);
-    mapEnv = env2;
-    const baseOf = (name) => d.bases.find((b) => b.name === name);
-    switch (action) {
-      case "dir-kind":
-        if (v === "anomaly" || v === "site" || v === "agent" || v === "org" || v === "base") {
-          dirUi.kind = v;
-          dirUi.open = "";
-          dirUi.q = "";
-          dirUi.adding = false;
-        }
-        break;
-      case "dir-open":
-        dirUi.open = dirUi.open === v ? "" : v;
-        break;
-      case "dir-move": {
-        const [how, lore, target] = v.split("|");
-        if ((how === "up" || how === "down" || how === "before" || how === "after") && moveAgent(d, lore ?? "", how, target ?? "")) dirUi.done = "";
-        break;
-      }
-      case "dir-jump": {
-        const cut2 = v.indexOf("|");
-        const kind = v.slice(0, cut2);
-        if (kind === "anomaly" || kind === "site" || kind === "agent" || kind === "org" || kind === "base") {
-          Object.assign(dirUi, { kind, open: v.slice(cut2 + 1), q: "", adding: false });
-          dirUi.scrollTo = v.slice(cut2 + 1);
-        }
-        break;
-      }
-      case "dir-set":
-      case "dir-toggle": {
-        const [field4, arg] = v.split("|", 2);
-        const row6 = findRow2(d, v.slice(field4.length + arg.length + 2));
-        if (!row6) break;
-        if (field4 === "preset") row6.preset = arg === "1";
-        else if (field4 === "affiliation") row6.affiliation = arg;
-        else if (field4 === "rosterFor" || field4 === "phoneTabs") {
-          const cur = row6[field4];
-          row6[field4] = cur.includes(arg) ? cur.filter((x) => x !== arg) : [...cur, arg];
-        }
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-pick": {
-        const at = v.indexOf("|");
-        const row6 = d.agents.find((a) => a.lore === v.slice(at + 1));
-        if (!row6) break;
-        assignOrg(row6, d.orgs.find((o) => o.name === v.slice(0, at)));
-        dirUi.done = "";
-        break;
-      }
-      case "dir-gender": {
-        const at = v.indexOf("|");
-        const row6 = d.agents.find((a) => a.lore === v.slice(at + 1));
-        const g = v.slice(0, at);
-        if (!row6 || g !== "F" && g !== "M" && g !== "X") break;
-        if (g === loreGender(ctx2.char.globalLore ?? [], row6.lore) || g === "X" && !loreGender(ctx2.char.globalLore ?? [], row6.lore)) delete row6.gender;
-        else row6.gender = g;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-toggle": {
-        const [field4, arg] = v.split("|", 2);
-        const o = d.orgs.find((x) => x.name === v.slice(field4.length + arg.length + 2));
-        if (!o || field4 !== "rosterFor" && field4 !== "phoneTabs") break;
-        o[field4] = o[field4].includes(arg) ? o[field4].filter((x) => x !== arg) : [...o[field4], arg];
-        for (const a of d.agents) if (a.affiliation === orgAffiliation(o)) a[field4] = [...o[field4]];
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-add": {
-        const name = v.trim();
-        dirUi.kind = "org";
-        if (!name) break;
-        if (d.orgs.some((o) => o.name === name || o.faction === name)) {
-          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
-          break;
-        }
-        d.orgs.push({ name, faction: "", rosterFor: ["D00", "E00"], phoneTabs: [], spec: {} });
-        dirUi.open = name;
-        dirUi.adding = false;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-rename": {
-        const o = d.orgs.find((x) => x.name === dirUi.open && !x.faction);
-        const name = v.trim();
-        if (!o || !name || name === o.name) break;
-        if (d.orgs.some((x) => x.name === name || x.faction === name)) {
-          dirUi.notice = `「${name}」 조직이 이미 있어요.`;
-          break;
-        }
-        for (const a of d.agents) if (a.affiliation === o.name) a.affiliation = name;
-        for (const b of d.bases) if (b.org === o.name) b.org = name;
-        o.name = name;
-        dirUi.open = name;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-org-del": {
-        const o = d.orgs.find((x) => x.name === v && !x.faction);
-        if (!o || d.agents.some((a) => a.affiliation === o.name)) break;
-        d.orgs = d.orgs.filter((x) => x !== o);
-        for (const b of d.bases) if (b.org === o.name) b.org = "";
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-goto":
-        if (!baseOf(v)) break;
-        dirUi.kind = "base";
-        dirUi.open = v;
-        dirUi.q = "";
-        break;
-      case "dir-base-new": {
-        const org = dirUi.kind === "org" ? d.orgs.find((o) => o.name === v) : void 0;
-        const want = org ? `${org.name} 거점` : v.trim();
-        if (!want) break;
-        if (!org && baseOf(want)) {
-          dirUi.notice = `「${want}」 거점이 이미 있어요.`;
-          break;
-        }
-        const name = freeBaseName(d, want);
-        const near = d.bases.find((b) => b.org && b.org === org?.name) ?? d.bases[0];
-        const sido = near?.sido && REGIONS.includes(near.sido) ? near.sido : "02";
-        d.bases.push({ name, label: "", lore: org ? org.name : "", english: "", aliases: [], org: org?.name ?? "", sido, gu: "", x: 50, y: 50, show: true });
-        dirUi.kind = "base";
-        dirUi.open = name;
-        dirUi.q = "";
-        dirUi.adding = false;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-show":
-      case "dir-base-org": {
-        const at = v.indexOf("|");
-        const b = baseOf(v.slice(at + 1));
-        if (!b) break;
-        if (action === "dir-base-show") b.show = v.slice(0, at) === "1";
-        else b.org = d.orgs.some((o) => o.name === v.slice(0, at)) ? v.slice(0, at) : "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-sido":
-      case "dir-base-gu": {
-        const at = v.lastIndexOf("=");
-        const b = baseOf(v.slice(0, at));
-        const val = v.slice(at + 1);
-        if (!b) break;
-        if (action === "dir-base-sido" && REGIONS.includes(val) && val !== b.sido) {
-          b.sido = val;
-          b.gu = "";
-          b.x = 50;
-          b.y = 50;
-        } else if (action === "dir-base-gu" && (!val || SIGUN[b.sido]?.includes(val))) b.gu = val;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-xy": {
-        const [x, y, ...rest] = v.split("|");
-        const b = baseOf(rest.join("|"));
-        if (!b) break;
-        b.x = Math.round(Math.min(100, Math.max(0, Number(x))) * 10) / 10;
-        b.y = Math.round(Math.min(100, Math.max(0, Number(y))) * 10) / 10;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-rename": {
-        const b = baseOf(dirUi.open);
-        const name = v.trim();
-        if (!b || !name || name === b.name) break;
-        if (baseOf(name)) {
-          dirUi.notice = `「${name}」 거점이 이미 있어요.`;
-          break;
-        }
-        b.name = name;
-        dirUi.open = name;
-        dirUi.notice = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-base-del":
-        d.bases = d.bases.filter((b) => b.name !== v);
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      case "dir-fac-play":
-      case "dir-fac-hide":
-      case "dir-fac-type": {
-        const at = v.indexOf("|");
-        const arg = v.slice(0, at);
-        const o = d.orgs.find((x) => x.name === v.slice(at + 1));
-        if (!o) break;
-        if (action === "dir-fac-hide") o.spec.hidden = arg === "0";
-        else if (action === "dir-fac-type") o.spec.type = arg;
-        else if (!o.faction) setPlayable(d, o, arg === "1");
-        dirUi.done = "";
-        break;
-      }
-      case "dir-fac-patch": {
-        dirUi.busy = true;
-        env2.render();
-        try {
-          let missing = [];
-          await updateCharacterLore(ctx2.charIndex, (lore) => {
-            const r = withFactionPlaceholders(lore);
-            missing = r.missing;
-            return r.changed ? r.lore : null;
-          });
-          dirUi.notice = missing.length ? `로어북에서 자리를 못 찾은 부분이 있어요: ${missing.join(", ")}` : "";
-          dirUi.done = missing.length ? "" : "🏷️Tag·📜Faction 로어북에 새 세력 자리를 넣었어요";
-        } catch (error) {
-          dirUi.notice = `로어북을 고치지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        dirUi.busy = false;
-        await env2.refresh();
-        return true;
-      }
-      case "dir-ext-open":
-        dirUi.adding = true;
-        dirUi.addQ = "";
-        break;
-      case "dir-add-toggle":
-        dirUi.adding = !dirUi.adding;
-        dirUi.addQ = "";
-        break;
-      case "dir-help":
-        dirUi.help = !dirUi.help;
-        break;
-      case "dir-photo-pick":
-        dirUi.pick = dirUi.pick === v ? "" : v;
-        dirUi.pickQ = "";
-        break;
-      case "dir-photo-set": {
-        const at = v.indexOf("|");
-        const { slot, key: key2 } = pickOf(v.slice(at + 1));
-        const p = picOf(d, key2);
-        if (!p) break;
-        p.set(slot, at > 0 ? v.slice(0, at) : "");
-        dirUi.pick = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-crop":
-        dirUi.crop = dirUi.crop === v ? "" : v;
-        dirUi.pick = "";
-        break;
-      case "dir-crop-reset":
-        picOf(d, v)?.set("crop", "");
-        dirUi.done = "";
-        break;
-      case "dir-ext-close":
-        dirUi.adding = false;
-        break;
-      case "dir-ext-add": {
-        const rows2 = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
-        if (!rows2 || !v || rows2.some((r) => r.lore === v) || !loreSources(ctx2.char.globalLore).has(v)) break;
-        rows2.push({ lore: v, label: v, english: "", aliases: [], preset: true, inFolder: false });
-        dirUi.open = v;
-        dirUi.adding = false;
-        dirUi.done = "";
-        break;
-      }
-      case "dir-ext-del": {
-        const rows2 = dirUi.kind === "anomaly" ? d.anomalies : dirUi.kind === "site" ? d.sites : null;
-        const i = rows2 ? rows2.findIndex((r) => r.lore === v && !r.inFolder) : -1;
-        if (!rows2 || i < 0) break;
-        rows2.splice(i, 1);
-        dirUi.open = "";
-        dirUi.done = "";
-        break;
-      }
-      case "dir-reset":
-        dirUi.draft = null;
-        dirUi.notice = "";
-        break;
-      case "dir-reload":
-        await env2.refresh();
-        dirUi.done = "로어북을 다시 읽었어요.";
-        env2.render();
-        return true;
-      case "dir-save": {
-        if (!dirty() || dirUi.busy) return true;
-        dirUi.busy = true;
-        dirUi.notice = "";
-        env2.render();
-        try {
-          const data = directoryData(d);
-          let saved = void 0;
-          await updateCharacterLore(ctx2.charIndex, (lore) => saved = withDirectory(lore, data).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
-          dirUi.draft = null;
-          dirUi.done = "카드 로어북에 저장했어요";
-          if (saved && (ctx2.chat.message ?? []).length) {
-            const lore = saved;
-            await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-              const vars = staleFactionVars(lore, chat.scriptstate);
-              return vars ? { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } } : null;
-            }).catch(() => null);
-          }
-        } catch (error) {
-          dirUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        dirUi.busy = false;
-        await env2.refresh();
-        return true;
-      }
-      default:
-        return false;
-    }
-    env2.render();
-    return true;
-  }
-
-  // src/ui/field.ts
-  var field2 = {
-    region: "01",
-    filter: "all",
-    place: null,
-    target: null,
-    team: [],
-    support: 0,
-    mkind: "an",
-    mname: null,
-    mpick: "an",
-    mopen: "",
-    note: "",
-    step: "goal",
-    query: "",
-    mapq: "",
-    confirmEnd: null
-  };
-  var mapUrls = {};
-  var esc15 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND_LABEL2 = { an: "괴이", in: "사건", ms: "특수" };
-  var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
-  function resetField(all = false) {
-    field2.target = null;
-    field2.team = [];
-    field2.support = 0;
-    field2.mname = null;
-    field2.note = "";
-    field2.step = "goal";
-    field2.confirmEnd = null;
-    field2.place = null;
-    if (all) {
-      field2.region = "01";
-      field2.filter = "all";
-      field2.query = "";
-      field2.mkind = "an";
-    }
-  }
-  function ctxOf(ctx2, chat) {
-    const lore = ctx2.char.globalLore;
-    const catalog = parseCatalog(lore);
-    const bases = draftBases();
-    return {
-      catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
-      world: readWorld(chat),
-      faction: String(chat.scriptstate?.["$st_faction"] ?? ""),
-      on: worldOn(chat),
-      settings: worldSettings(lore, chat.scriptstate),
-      supportOn: basicSettings(lore, chat.scriptstate).supportOn,
-      char: ctx2.char
-    };
-  }
-  function readCtx(ctx2) {
-    try {
-      return ctxOf(ctx2, ctx2.chat);
-    } catch (error) {
-      return error instanceof Error ? error.message : String(error);
-    }
-  }
-  function sidoOf(loc) {
-    return loc.split("-")[0];
-  }
-  function placeKey(ev, c) {
-    if (ev.kind === "in") {
-      const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
-      if (lm) return `fac:${lm.name}`;
-    }
-    return ev.loc;
-  }
-  function placeTarget(key2) {
-    return key2.startsWith("fac:") ? { type: "facility", name: key2.slice(4) } : { type: "place", loc: key2 };
-  }
-  function targetName(t) {
-    if (t.type === "event") return t.name;
-    if (t.type === "facility") return t.name;
-    return locName(t.loc);
-  }
-  var isPC = () => !matchMedia("(max-width: 760px)").matches;
-  function sameTarget(a, key2) {
-    if (!a) return false;
-    if (a.type === "event") return a.key === key2;
-    return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key2;
-  }
-  function mapImage(ctx2, code, env2) {
-    const hit2 = mapUrls[code];
-    if (hit2 === void 0) {
-      mapUrls[code] = "loading";
-      void assetUrl(ctx2.char, `map${code}`).then((url) => {
-        mapUrls[code] = url;
-        env2.render();
-      });
-      return null;
-    }
-    return hit2 === "loading" ? null : hit2;
-  }
-  var boardMapUrl = (ctx2, env2) => mapImage(ctx2, "01", env2);
-  function pin(action, value, label, x, y, cls, count = 0) {
-    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc15(value)}" aria-label="${esc15(label)}">
-    <span class="gx-dot"></span><span class="gx-pname">${esc15(label)}${count ? `<b>${count}</b>` : ""}</span></button>`;
-  }
-  function hotClass(list4) {
-    if (!list4.length) return "";
-    const kinds = new Set(list4.map((e) => e.kind));
-    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
-  }
-  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
-  function mapBar(x) {
-    const code = field2.region;
-    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code ? " selected" : ""}>${c === "01" ? "전국" : esc15(regionName(c))}</option>`).join("");
-    const bar = `<div class="gx-mapbar">
-      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
-      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc15(field2.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
-        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
-    </div>`;
-    return bar;
-  }
-  function mapCanvas(ctx2, x, events, env2) {
-    const code = field2.region;
-    const url = mapImage(ctx2, code, env2);
-    const byPlace = /* @__PURE__ */ new Map();
-    for (const e of events) {
-      const k = placeKey(e, x.catalog);
-      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
-    }
-    let pins = "";
-    if (code === "01") {
-      for (const [nn, label, px, py] of NATION_PINS) {
-        const here = events.filter((e) => sidoOf(e.loc) === nn);
-        pins += pin("map-region", nn, label, px, py, `nation${hotClass(here)}`, here.length);
-      }
-    } else {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        const xy = REGION_PINS[code]?.[i];
-        const loc = `${code}-${i}`;
-        if (!xy) return;
-        const here = byPlace.get(loc) ?? [];
-        const sel = field2.place === loc || sameTarget(field2.target, loc) ? " sel" : "";
-        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
-      });
-      for (const lm of x.catalog.landmarks) {
-        if (lm.sido !== code) continue;
-        const key2 = `fac:${lm.name}`;
-        const here = byPlace.get(key2) ?? [];
-        const sel = field2.place === key2 || sameTarget(field2.target, key2) ? " sel" : "";
-        pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
-      }
-    }
-    const img = url ? `<img class="gx-mapimg" src="${esc15(url)}" alt="${esc15(code === "01" ? "전국" : regionName(code))} 지도">` : `<div class="gx-mapph">${mapUrls[code] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
-    return `${narrow2() ? "" : mapBar(x)}
-    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== "01") : ""}</div>`;
-  }
-  function mapSuggest(c) {
-    const q = field2.mapq.trim().toLowerCase();
-    if (!q) return "";
-    const hits = [];
-    for (const code of MAP_CODES) {
-      (SIGUN[code] ?? []).forEach((gu, i) => {
-        if (`${regionName(code)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code}|${code}-${i}`, name: gu, sub: regionName(code) });
-      });
-    }
-    for (const lm of c.landmarks) {
-      if (!MAP_CODES.includes(lm.sido)) continue;
-      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
-    }
-    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
-    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc15(h.value)}"><b>${esc15(h.name)}</b><small>${esc15(h.sub)}</small></button>`).join("");
-  }
-  function mapSuggestFor(ctx2, q) {
-    field2.mapq = q;
-    const x = readCtx(ctx2);
-    return typeof x === "string" ? "" : mapSuggest(x.catalog);
-  }
-  var artCtx = null;
-  function eventRow(e, x, agents2) {
-    const w = x.world;
-    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc
+    ${input(k("label"), b.label, 
