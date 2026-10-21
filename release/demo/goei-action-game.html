@@ -13963,15 +13963,10 @@ function drawBack(ctx, camX, segs, pal, plan) {
     g2.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = g2;
     ctx.fillRect(s2.x, y0, s2.w, 40);
-    ctx.fillStyle = room ? pal.accent : "rgba(255,255,255,0.3)";
-    ctx.font = "14px monospace";
-    ctx.fillText(room ? roomName(s2.ref) : `${s2.ref.slice(6)}${s2.flip ? " ⇄" : ""}`, s2.x + 10, Math.max(CEIL + 24, 128));
+    void room;
   }
   for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === "floor" ? "" : s2.ref, plan.stage.floor?.sub));
   void CHUNK_W;
-}
-function roomName(ref) {
-  return { "room:elevator_hall": "엘리베이터 홀", "room:guardian_room": "수호자 방", "room:trial_goal": "시험 목표 방", "room:attic": "다락방", "room:exit_hall": "출구 홀", "room:car": "승강기 안" }[ref] ?? ref;
 }
 function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
   const w = t.x1 - t.x0;
@@ -13987,38 +13982,40 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
       break;
     }
     case "block": {
-      const top = y0 - t.h;
-      ctx.fillStyle = pal.floor;
-      ctx.fillRect(t.x0, top, w, y1 - y0);
-      ctx.strokeStyle = "rgba(0,0,0,0.18)";
-      ctx.lineWidth = 2;
-      for (let x = t.x0 + 40; x < t.x1; x += 40) {
+      const tf = ctx.getTransform();
+      const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+      const k = 0.45 / (720 - y0);
+      const px = (x, y) => x + (x - mid) * k * (y - y0);
+      const h = Math.min(t.h, 28);
+      const bk = y0 - h, fr = y1 - h;
+      const quad = (pts, fill) => {
+        ctx.fillStyle = fill;
         ctx.beginPath();
-        ctx.moveTo(x, top);
-        ctx.lineTo(x, top + y1 - y0);
-        ctx.stroke();
-      }
-      ctx.fillStyle = "rgba(0,0,0,0.45)";
-      ctx.fillRect(t.x0, y1 - t.h, w, t.h);
+        pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+        ctx.closePath();
+        ctx.fill();
+      };
+      const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
+      if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], "rgba(0,0,0,0.35)");
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], pal.floor);
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], "rgba(255,255,255,0.1)");
+      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], "rgba(0,0,0,0.5)");
       ctx.save();
       ctx.beginPath();
-      ctx.rect(t.x0, y1 - t.h, w, 8);
+      ctx.rect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
       ctx.clip();
       ctx.fillStyle = "#e0b320";
-      ctx.fillRect(t.x0, y1 - t.h, w, 8);
+      ctx.fillRect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
       ctx.fillStyle = "#1a1a1a";
-      for (let x = t.x0 - 16; x < t.x1; x += 24) {
+      for (let x = px(t.x0, y1) - 16; x < px(t.x1, y1); x += 20) {
         ctx.beginPath();
-        ctx.moveTo(x, y1 - t.h + 8);
-        ctx.lineTo(x + 8, y1 - t.h);
-        ctx.lineTo(x + 20, y1 - t.h);
-        ctx.lineTo(x + 12, y1 - t.h + 8);
+        ctx.moveTo(x, fr + 6);
+        ctx.lineTo(x + 6, fr);
+        ctx.lineTo(x + 16, fr);
+        ctx.lineTo(x + 10, fr + 6);
         ctx.fill();
       }
       ctx.restore();
-      ctx.fillStyle = "rgba(0,0,0,0.3)";
-      ctx.fillRect(t.x0 - 4, top, 4, y1 - y0 + t.h);
-      ctx.fillRect(t.x1, top, 4, y1 - y0 + t.h);
       break;
     }
     case "low":

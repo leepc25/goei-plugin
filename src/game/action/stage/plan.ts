@@ -229,9 +229,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.fillRect(s.x, y0, s.w, 40);
-    ctx.fillStyle = room ? pal.accent : 'rgba(255,255,255,0.3)';
-    ctx.font = '14px monospace';
-    ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, Math.max(CEIL + 24, 128));
+    void room; // 조각·방 이름 글씨는 화면에 쓰지 않는다 (떠 있는 글씨 금지)
   }
   // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
   for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub));
@@ -256,39 +254,44 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       break;
     }
     case 'block': {
-      // 바닥 띠 전체를 가로지르는 낮은 단(점프로 넘기): 윗면은 바닥색 타일, 앞면은 어둡게, 모서리에 노랑·검정 경고 띠
-      const top = y0 - t.h;
-      ctx.fillStyle = pal.floor;
-      ctx.fillRect(t.x0, top, w, y1 - y0);
-      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-      ctx.lineWidth = 2;
-      for (let x = t.x0 + 40; x < t.x1; x += 40) {
+      // 바닥 띠 전체를 가로지르는 낮은 단(점프로 넘기). 바닥 원근에 맞춘 상자: 윗면(넓게)·앞면(낮게)·안쪽 옆면, 앞 모서리에 경고 띠
+      const tf = ctx.getTransform();
+      const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+      const k = 0.45 / (720 - y0);
+      const px = (x: number, y: number) => x + (x - mid) * k * (y - y0);
+      const h = Math.min(t.h, 28);
+      const bk = y0 - h,
+        fr = y1 - h;
+      const quad = (pts: [number, number][], fill: string) => {
+        ctx.fillStyle = fill;
         ctx.beginPath();
-        ctx.moveTo(x, top);
-        ctx.lineTo(x, top + y1 - y0);
-        ctx.stroke();
-      }
-      ctx.fillStyle = 'rgba(0,0,0,0.45)';
-      ctx.fillRect(t.x0, y1 - t.h, w, t.h);
+        pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        ctx.closePath();
+        ctx.fill();
+      };
+      // 안쪽 옆면 (화면 가운데 쪽 면이 보인다)
+      const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
+      if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], 'rgba(0,0,0,0.35)');
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], pal.floor);
+      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]], 'rgba(255,255,255,0.1)');
+      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], 'rgba(0,0,0,0.5)');
+      // 앞 모서리 경고 띠
       ctx.save();
       ctx.beginPath();
-      ctx.rect(t.x0, y1 - t.h, w, 8);
+      ctx.rect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
       ctx.clip();
       ctx.fillStyle = '#e0b320';
-      ctx.fillRect(t.x0, y1 - t.h, w, 8);
+      ctx.fillRect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
       ctx.fillStyle = '#1a1a1a';
-      for (let x = t.x0 - 16; x < t.x1; x += 24) {
+      for (let x = px(t.x0, y1) - 16; x < px(t.x1, y1); x += 20) {
         ctx.beginPath();
-        ctx.moveTo(x, y1 - t.h + 8);
-        ctx.lineTo(x + 8, y1 - t.h);
-        ctx.lineTo(x + 20, y1 - t.h);
-        ctx.lineTo(x + 12, y1 - t.h + 8);
+        ctx.moveTo(x, fr + 6);
+        ctx.lineTo(x + 6, fr);
+        ctx.lineTo(x + 16, fr);
+        ctx.lineTo(x + 10, fr + 6);
         ctx.fill();
       }
       ctx.restore();
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(t.x0 - 4, top, 4, y1 - y0 + t.h);
-      ctx.fillRect(t.x1, top, 4, y1 - y0 + t.h);
       break;
     }
     case 'low':
