@@ -262,3 +262,4 @@
 - `dark/dark_wall_1.png`
 - `dark/dark_wall_2.png`
 - `dark/dark_wall_3.png`
+- `dark/dark_wall_4.png`
