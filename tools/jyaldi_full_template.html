@@ -20,6 +20,7 @@
   #state { color: #9fd0ff; }
   .keys { color: #b8b4a4; font-size: 13px; margin: 8px 0; }
   .keys b { color: #e8e6e0; }
+  .grp { grid-column: 1 / -1; margin: 18px 0 2px; font-size: 15px; }
   .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 14px; }
   .clip { background: #1b2228; border-radius: 8px; padding: 8px; cursor: pointer; }
   .clip canvas { width: 100%; aspect-ratio: 4/3; background: #3a444c; image-rendering: pixelated; border-radius: 4px; }
@@ -36,7 +37,7 @@
   .miss { color: #ff9a8a; }
 </style>
 <div class="wrap">
-  <h1>쟈알디 전 동작 시연판 · 기준표 A(재킷 고침) · 계획안 41행</h1>
+  <h1>쟈알디 전 동작 시연판 · 기준표 A(재킷 고침) · 계획안 41행 + 생활·감정·지형 116개</h1>
   <div class="bar">
     <label><input type="checkbox" id="rim" checked> 외곽광</label>
     <label><input type="checkbox" id="crt"> CRT</label>
@@ -53,7 +54,7 @@
     <div class="grp dpad">
       <span></span><button data-k="ArrowUp">↑</button><span></span>
       <button data-k="ArrowLeft">←</button><button data-k="ArrowDown">↓</button><button data-k="ArrowRight">→</button>
-      <button data-k="ShiftLeft">Shift</button><button data-k="Space">점프</button><button data-k="KeyE">E 줍기</button>
+      <button data-k="ShiftLeft">Shift</button><button data-k="Space">점프</button><button data-k="KeyE">E 잡기·줍기</button>
     </div>
     <div class="grp acts">
       <button data-k="KeyA">A 근접</button><button data-k="KeyS">S 권총</button><button data-k="KeyD">D 폭파</button><button data-k="KeyQ">Q 가드</button><button data-k="KeyW">W 필살</button>
@@ -63,10 +64,10 @@
     </div>
   </div>
   <div class="keys">
-    <b>이동</b> ←→ 좌우, ↑↓ 앞뒤 · <b>Shift</b> 누른 채 = 달리기, 짧게(+방향) = 회피 대시(잔상·무적) · <b>Space</b> 점프 · <b>↓↓</b> 앉기(앉아서 ←→ 이동, A 하단 공격, ↑ 일어서기)<br>
-    <b>A</b> 잽 → 스트레이트 → 강한 스트레이트(연타, 선입력) · 달리며 A = 어깨 돌진 · 공중 A = 점프 킥 · 적에게 걸어 붙으면 <b>자동 잡기</b>(A 무릎, 방향+A 잡기 폭파, Space 놓기)<br>
+    <b>이동</b> ←→ 좌우, ↑↓ 앞뒤 · <b>Shift</b> 누른 채 = 달리기, 짧게(+방향) = 회피 대시(잔상·무적) · <b>Space</b> 점프 · <b>↓↓</b> 앉기(앉아서 ←→ 쪼그려 걷기, A 하단 킥, D 지면 폭파, ↑ 일어서기)<br>
+    <b>A</b> 잽 → 스트레이트 → 강한 스트레이트(연타, 선입력) · 달리며 A = 어깨 돌진 · 공중 A = 점프 킥 · 적 앞에서 <b>E 잡기</b>(A 무릎, 방향+A 잡기 폭파, Space 놓기)<br>
     <b>S</b> 권총 뽑기 → 발사(8발 + 예비 탄창 2, 3발마다 잠깐 멈춤, 빈 탄창은 찰칵) · <b>R</b> 재장전 · 가만히 두면 집어넣기 · <b>D</b> 짧게 = 폭파, 길게 = 충전 후 놓으면 광역 폭파(벽 파괴) · <b>Q</b> 유지 = 가드 · <b>W</b> 필살기(컷인)<br>
-    <b>F</b> 숙련 3 연쇄 폭파 · <b>G</b> 숙련 6 벽 통째로 · <b>C</b> 지원 요원 등장 · <b>E</b> 줍기(쇠파이프 → A로 휘두르기, 산탄총 → S로 쏘기, 상자 → A로 던지기) · <b>1·2·3</b> 커피·간식·붕대<br>
+    <b>F</b> 숙련 3 연쇄 폭파 · <b>G</b> 숙련 6 벽 통째로 · <b>C</b> 지원 요원 등장 · <b>E</b> 줍기(쇠파이프 → A로 휘두르기, 산탄총 → S로 견착 사격, 벽돌 → A로 던지기. 든 채로 다니고, 다른 동작을 하면 내려놓음) · <b>1·2·3</b> 커피·간식·붕대<br>
     <b>T</b> 말하기 · <b>H</b> 약 피격(가드 중이면 가드 피격) · <b>K</b> 강 피격 → 다운(K 또는 잠시 뒤 기상) · <b>V</b> 피로 상태 · <b>B</b> 본부(P 서류, O 담배, L 장갑 고쳐 끼기)
   </div>
   <h2>동작 목록 (누르면 화면에서 재생)</h2>
@@ -113,7 +114,7 @@ const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], booms: [], text
 const ENEMIES = [mkE(820, 0.5), mkE(1040, 0.7)];
 function mkE(x, z) { return { x, z, y: 0, vx: 0, vy: 0, hp: 12, state: 'idle', t: 0, flash: 0, face: -1, home: x }; }
 const WALL = { x: 1230, hp: 1, broken: false, t: 0 };
-const PICK = [{ kind: 'pipe', x: 560, z: 0.8, label: '쇠파이프' }, { kind: 'shotgun', x: 700, z: 0.3, label: '산탄총' }, { kind: 'crate', x: 220, z: 0.8, label: '상자' }];
+const PICK = [{ kind: 'pipe', x: 560, z: 0.8, label: '쇠파이프' }, { kind: 'shotgun', x: 700, z: 0.3, label: '산탄총' }, { kind: 'brick', x: 220, z: 0.8, label: '벽돌' }];
 const PROJ = [];
 const ALLY = { on: false };
 const LINES = ['정리한다.', '서 있지 마.', '…냄새가 나는군.', '기록해 둬.', '끝. 보고는 내가 한다.', '충분히 쉬었나? 이동한다.', '하아. 잼트리. 이것 좀 어떻게 해 봐.', '부장이랑 같이 하는 작전이야. 날 믿어.'];
@@ -124,9 +125,11 @@ function play(k, o = {}) {
   G.clip = k; G.f = o.rev ? M.clips[k].frames - 1 : 0; G.t = 0; G.rev = !!o.rev; G.lock = !!o.lock; G.next = o.next || null; G.hold = 0; G.hitsDone = new Set(); return true;
 }
 const C = () => M.clips[G.clip];
+const heldTag = () => G.carry || G.weapon;   // 'brick' | 'pipe' | 'shotgun' | null
 function idleClip() {
   if (G.crouch) return 'crouch';
   if (G.guard) return 'block';
+  if (heldTag() && has('idle_' + heldTag())) return 'idle_' + heldTag();
   if (G.tired) return 'tired';
   if (G.fight) return 'guard';
   return 'idle';
@@ -158,25 +161,25 @@ function onKey(code, down) {
   if (G.grab) { grabInput(code); return; }
   if (G.crouch) { crouchInput(code); return; }
   switch (code) {
-    case 'Space': if (onGround()) { G.fight = true; G.aim = false; G.phase = 'pre'; play('jump', { lock: true }); } break;
+    case 'Space': if (onGround()) { dropHeld(); G.fight = true; G.aim = false; G.phase = 'pre'; play('jump', { lock: true }); } break;
     case 'KeyA': attackA(); break;
     case 'KeyS': shoot(); break;
     case 'KeyR': reload(); break;
-    case 'KeyD': if (onGround()) { G.fight = true; G.aim = false; G.charging = true; G.dT = performance.now(); G.bigRelease = false; play('blast', { lock: false }); G.chargeWait = true; } break;
-    case 'KeyQ': if (onGround()) { G.fight = true; G.aim = false; G.guard = true; play('block', { lock: false }); } break;
-    case 'KeyW': if (onGround()) superMove(); break;
+    case 'KeyD': if (onGround()) { dropHeld(); G.fight = true; G.aim = false; G.charging = true; G.dT = performance.now(); G.bigRelease = false; play('blast', { lock: false }); G.chargeWait = true; } break;
+    case 'KeyQ': if (onGround()) { dropHeld(); G.fight = true; G.aim = false; G.guard = true; play('block', { lock: false }); } break;
+    case 'KeyW': if (onGround()) { dropHeld(); superMove(); } break;
     case 'KeyF': if (onGround()) { G.fight = true; G.aim = false; play('chain', { lock: true }); } break;
     case 'KeyG': if (onGround()) { G.fight = true; G.aim = false; play('wall', { lock: true }); } break;
     case 'KeyC': callAlly(); break;
-    case 'KeyE': pickup(); break;
+    case 'KeyE': if (!tryGrab()) pickup(); break;
     case 'Digit1': useItem('coffee', 'drink'); break;
     case 'Digit2': useItem('snack', 'eat'); break;
     case 'Digit3': useItem('bandage', 'bandage'); break;
-    case 'KeyH': if (G.guard) { play('blockhit', { lock: true }); G.vx = -3; } else { play('hit', { lock: true }); G.vx = -5; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break;
+    case 'KeyH': if (G.guard) { G.vx = -4; sparks(G.x + G.dir * 50 * S, groundY(G.z) - 120 * S / 2, 6); FX.stop = Math.max(FX.stop, 0.06); FX.shake = Math.max(FX.shake, 0.08); } else { play('hit', { lock: true }); G.vx = -5; G.hp = Math.max(1, G.hp - 5); } G.fight = true; G.aim = false; break;
     case 'KeyK': knockdown(); break;
     case 'KeyT': G.talkT = 2.2; G.talkLine = LINES[lineI++ % LINES.length]; play('talk'); break;
     case 'KeyV': G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 330, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); break;
-    case 'KeyB': G.hq = !G.hq; G.fight = false; G.aim = false; hitText(640, 120, G.hq ? '본부' : '현장'); play(idleClip()); break;
+    case 'KeyB': { const wasF = G.fight && G.clip === 'guard'; G.hq = !G.hq; G.fight = false; G.aim = false; hitText(640, 120, G.hq ? '본부' : '현장'); if (wasF && has('engage')) play('engage', { lock: true, rev: true }); else play(idleClip()); break; }
     case 'KeyP': play('papers', { lock: false }); G.busy = 3; break;
     case 'KeyO': play('smoke', { lock: true }); break;
     case 'KeyL': play('glove', { lock: true }); break;
@@ -189,21 +192,29 @@ function onKey(code, down) {
 }
 function crouchInput(code) {
   if (code === 'KeyA') play('lowstrike', { lock: true });
+  else if (code === 'KeyD') play(has('groundblast') ? 'groundblast' : 'lowstrike', { lock: true });
   else if (code === 'ArrowUp' || code === 'Space' || (code === 'ArrowDown' && performance.now() - G.downTap < 260)) { G.crouch = false; play('crouch', { lock: true, rev: true }); }
   if (code === 'ArrowDown') G.downTap = performance.now();
+}
+function dropHeld() {
+  const k = heldTag(); if (!k) return;
+  PICK.push({ kind: k, x: G.x + G.dir * 40, z: G.z, label: { pipe: '쇠파이프', shotgun: '산탄총', brick: '벽돌' }[k] });
+  G.carry = null; G.weapon = null; hitText(G.x, groundY(G.z) - 330, '내려놓음');
 }
 function attackA() {
   G.fight = true; G.aim = false;
   if (G.air) { if (!G.kicked) { G.kicked = true; play('airkick', { lock: true }); G.vx = 7; G.vy = Math.max(G.vy, 4); } return; }
   if (G.carry) { play('toss', { lock: true }); return; }
   if (G.weapon === 'pipe') { play('pipe', { lock: true }); return; }
+  dropHeld();
   if (G.runHeld && dirX()) { play('dash', { lock: true }); G.vx = 9; return; }
   G.combo = G.comboT > 0 ? G.combo % 3 + 1 : 1; G.comboT = 0.7;
   play(['jab', 'cross', 'power'][G.combo - 1], { lock: true });
 }
 function shoot() {
   G.fight = true;
-  if (G.weapon === 'shotgun') { if (G.wUses <= 0) { hitText(G.x, groundY(G.z) - 320, '산탄 없음'); G.weapon = null; return; } G.wUses--; play('shotgun', { lock: true }); G.hitsDone.add(0); tryHit(); return; }
+  if (G.weapon === 'shotgun') { if (G.wUses <= 0) { hitText(G.x, groundY(G.z) - 320, '산탄 없음'); G.weapon = null; return; } G.wUses--; play('shotgun', { lock: true }); return; }
+  dropHeld();
   if (!G.aim) { G.aim = true; G.aimT = 1.6; G.burst = 0; play('draw', { lock: true }); return; }
   G.aimT = 1.6;
   if (G.burst >= 3 && G.burstT > 0) return;   // 3발 뒤 잠깐 멈춤(연타 억제)
@@ -217,7 +228,7 @@ function reload() {
   G.mags--; G.ammo = MAG; G.fight = true; G.aim = true; G.aimT = 1.6; play('reload', { lock: true });
 }
 function evade(mx) {
-  G.fight = true; G.aim = false; G.inv = 0.32; G.trail = [];
+  dropHeld(); G.fight = true; G.aim = false; G.inv = 0.32; G.trail = [];
   G.evDir = mx || -G.dir; G.vx = 0; G.evV = 15; play('evade', { lock: true });
   for (let i = 0; i < 5; i++) FX.dust.push({ x: G.x, y: groundY(G.z), vx: -G.evDir * (2 + i), vy: -1 - Math.random(), t: 0.35 });
 }
@@ -226,11 +237,17 @@ function superMove() {
   if (G.gauge < 100) { hitText(G.x, groundY(G.z) - 330, '필살 게이지 부족'); return; }
   G.gauge = 0; FX.cut = 1.1; play('super', { lock: true });
 }
-function knockdown() { G.fight = true; G.aim = false; G.guard = false; G.crouch = false; G.down = true; G.lying = false; G.vxK = -12; G.vy = -13; G.air = true; G.y = -1; play('down', { lock: true }); G.hp = Math.max(1, G.hp - 15); }
+function knockdown() { G.fight = true; G.aim = false; G.guard = false; G.crouch = false; G.down = true; G.lying = false; G.vxK = -12 * G.dir; G.vy = -13; G.air = true; G.y = -1; play('down', { lock: true }); G.hp = Math.max(1, G.hp - 15); }
 function standUp() { G.lying = false; play('getup', { lock: true }); }
 function useItem(kind, clip) {
   if (!onGround() || G.items[kind] <= 0) { hitText(G.x, groundY(G.z) - 330, '없음'); return; }
   G.items[kind]--; G.aim = false; play(clip, { lock: true }); G.itemHeal = kind === 'coffee' ? 10 : kind === 'snack' ? 20 : 35;
+}
+function tryGrab() {
+  if (!onGround() || heldTag()) return false;
+  const e = ENEMIES.find(e => (e.state === 'idle' || e.state === 'hit') && Math.abs(e.z - G.z) < 0.1 && (e.x - G.x) * G.dir > 0 && Math.abs(e.x - G.x) < 80 * S);
+  if (!e) return false;
+  G.grab = e; e.state = 'grabbed'; G.grabN = 0; G.fight = true; G.aim = false; play('grab', { lock: true }); return true;
 }
 function pickup() {
   if (!onGround()) return;
@@ -280,7 +297,7 @@ $('scale').onchange = e => S = +e.target.value;
 const HIT = {
   jab: { dmg: 1, kb: 5, ring: 1, reach: 0 }, cross: { dmg: 2, kb: 8, ring: 2 }, power: { dmg: 3, kb: 14, ring: 3, stun: 0.5 },
   dash: { dmg: 3, kb: 16, launch: true, ring: 2 }, airkick: { dmg: 2, kb: 10, launch: true, ring: 2 },
-  lowstrike: { dmg: 2, kb: 4, launch: true, boom: { at: 70, r: 50, low: true } },
+  lowstrike: { dmg: 2, kb: 6, launch: true, ring: 1 }, groundblast: { dmg: 2, kb: 4, launch: true, boom: { at: 70, r: 50, low: true } },
   blast: { dmg: 4, kb: 18, launch: true, boom: { at: 110, r: 70 } }, chain: { dmg: 2, kb: 10, launch: true, boom: { at: 70, r: 55, step: 50 } },
   wall: { dmg: 6, kb: 26, launch: true, boom: { at: 150, r: 130, wall: true } }, super: { dmg: 10, kb: 30, launch: true, all: true },
   fire: { dmg: 1, kb: 3, gun: 640 }, shotgun: { dmg: 3, kb: 14, gun: 420, spread: true, launch: true },
@@ -363,13 +380,13 @@ function frameDone() {
   if (k === 'down') { G.lock = false; G.lying = true; G.lyingT = 1.6; G.f = c.frames - 1; G.hold = 9; return; }
   if (k === 'getup') { G.down = false; }
   if (k === 'crouch' && !G.rev) { G.lock = false; G.f = c.frames - 1; G.hold = 99; return; }
-  if (k === 'lowstrike' || k === 'crouchwalk') { play('crouch', { lock: false }); G.f = M.clips.crouch.frames - 1; G.hold = 99; return; }
+  if (k === 'lowstrike' || k === 'groundblast' || k === 'crouchwalk') { play('crouch', { lock: false }); G.f = M.clips.crouch.frames - 1; G.hold = 99; return; }
   if (k === 'block') { G.lock = false; G.f = c.frames - 1; G.hold = 99; if (!G.guard) play('guard'); return; }
   if (k === 'blockhit') { play('block'); G.f = M.clips.block.frames - 1; G.hold = 99; G.lock = false; return; }
   if (k === 'blast' && G.chargeWait) return;
   if (k === 'grab') { G.lock = false; G.f = c.frames - 1; G.hold = 99; return; }
   if (k === 'grabknee' && G.grab) { play('grab'); G.f = M.clips.grab.frames - 1; G.hold = 99; G.lock = false; return; }
-  if (k === 'pickup' && G.pickWhat) { const it = G.pickWhat; G.pickWhat = null; if (it.kind === 'crate') G.carry = 'crate'; else { G.weapon = it.kind; G.wUses = it.kind === 'pipe' ? 5 : 4; } hitText(G.x, groundY(G.z) - 330, it.label + ' 획득'); }
+  if (k === 'pickup' && G.pickWhat) { const it = G.pickWhat; G.pickWhat = null; if (it.kind === 'brick') G.carry = 'brick'; else { G.weapon = it.kind; G.wUses = it.kind === 'pipe' ? 5 : 4; } hitText(G.x, groundY(G.z) - 330, it.label + ' 획득'); }
   if (k === 'pipe') { G.wUses--; if (G.wUses <= 0) { G.weapon = null; hitText(G.x, groundY(G.z) - 330, '쇠파이프가 부러졌다'); } }
   if (['drink', 'eat', 'bandage'].includes(k)) { G.hp = Math.min(100, G.hp + (G.itemHeal || 0)); hitText(G.x, groundY(G.z) - 330, '+' + (G.itemHeal || 0)); }
   if (k === 'draw' || k === 'fire' || k === 'reload') { if (G.aim) { play('fire', { lock: false }); G.f = M.clips.fire.frames - 1; G.hold = 99; return; } }
@@ -398,16 +415,17 @@ function update(now) {
     else {
       if (mx) G.dir = mx;
       const run = G.runHeld && mx;
-      const want = run ? 'run' : 'walk';
+      let want = (run ? 'run' : 'walk') + (heldTag() && has('walk_' + heldTag()) ? '_' + heldTag() : ''); if (!has(want)) want = 'walk_' + heldTag();
       if (G.clip !== want) play(want);
       const sp = run ? 7.5 : 3.2;
       G.x += mx * sp * dt * 60 * S / 2; G.z = Math.max(0, Math.min(1, G.z + mz * 0.006 * dt * 60));
-      // 자동 잡기: 걸어서 적에게 붙음
-      for (const e of ENEMIES) if (e.state === 'idle' && Math.abs(e.z - G.z) < 0.08 && (e.x - G.x) * G.dir > 0 && Math.abs(e.x - G.x) < 46 * S) { G.grab = e; e.state = 'grabbed'; G.grabN = 0; G.fight = true; play('grab', { lock: true }); break; }
     }
-  } else if (free && !G.crouch && ['walk', 'run'].includes(G.clip)) play(idleClip());
-  else if (free && !G.crouch && G.clip === 'idle' && G.fight) play('guard');
-  if (G.crouch && !G.lock && mx) { G.dir = mx; play('crouchwalk', { lock: true }); }
+  } else if (free && !G.crouch && /^(walk|run)/.test(G.clip)) play(idleClip());
+  else if (free && !G.crouch && G.clip === 'idle' && G.fight) play(has('engage') ? 'engage' : 'guard', { lock: true });
+  if (G.crouch && !G.lock && !G.down) {
+    if (mx) { G.dir = mx; if (G.clip !== 'crouchwalk') play('crouchwalk'); G.x += mx * 2.6 * dt * 60 * S / 2; }
+    else if (G.clip === 'crouchwalk') { play('crouch'); G.f = M.clips.crouch.frames - 1; G.hold = 99; }
+  }
   if (G.aim && !G.lock) { G.aimT -= dt; if (G.aimT <= 0) { G.aim = false; play('holster', { lock: true }); } }
   if (G.burstT > 0) { G.burstT -= dt; if (G.burstT <= 0) G.burst = 0; }
   if (G.comboT > 0) { G.comboT -= dt; if (G.comboT <= 0) G.combo = 0; }
@@ -453,7 +471,7 @@ function update(now) {
   // 적
   for (const e of ENEMIES) {
     e.flash -= dt;
-    if (e.state === 'grabbed') { e.x = G.x + G.dir * 44 * S; e.z = G.z; e.face = -G.dir; }
+    if (e.state === 'grabbed') { e.x = G.x + G.dir * 30 * S; e.z = G.z; e.face = -G.dir; }
     else if (e.state === 'hit') { e.x += e.vx * dt * 60; e.vx *= Math.pow(0.8, dt * 60); e.t -= dt; if (e.t <= 0) e.state = 'idle'; }
     else if (e.state === 'fly') { e.x += e.vx * dt * 60; e.vy += 0.8 * dt * 60; e.y += e.vy * dt * 60; if (e.y >= 0) { e.y = 0; if (e.vy > 6) { e.vy = -e.vy * 0.35; FX.shake = Math.max(FX.shake, 0.1); } else { e.vy = 0; e.state = 'down'; e.t = 1.3; } for (let i = 0; i < 5; i++) FX.dust.push({ x: e.x, y: groundY(e.z), vx: (i - 2) * 2.5, vy: -2, t: 0.35 }); } }
     else if (e.state === 'down') { e.t -= dt; if (e.t <= 0) { e.state = 'idle'; if (e.hp <= 0) e.hp = 12; } }
@@ -481,13 +499,14 @@ function updateAlly(dt) {
   if (!ALLY.on) return;
   const a = ALLY, c = M.clips[a.clip]; if (!c) { a.on = false; return; }
   a.t += dt;
-  if (a.phase === 'in') { a.x += 3.2 * dt * 60 * S / 2; if (a.x >= a.target) { a.phase = 'blast'; a.clip = 'blast'; a.f = 0; a.t = 0; } }
+  if (a.phase === 'in') { a.x += 3.2 * dt * 60 * S / 2; if (a.x >= a.target) { a.phase = 'blast'; a.clip = has('support') ? 'support' : 'blast'; a.f = a.clip === 'support' ? 3 : 0; a.t = 0; } }
   else if (a.phase === 'out') { a.x -= 3.2 * dt * 60 * S / 2; if (a.x < -200) a.on = false; }
   const fd = 1 / c.fps;
   while (a.t >= fd) {
     a.t -= fd;
-    if (a.f < c.frames - 1) { a.f++; if (a.clip === 'blast' && a.f === 3) { const bx = a.x + 3 * 110; FX.booms.push({ x: bx, y: groundY(a.z) - 110, r: 0, R: 90, t: 0, d: 0 }); FX.shake = Math.max(FX.shake, 0.2); for (const e of ENEMIES) if (Math.abs(e.x - bx) < 170 && e.state !== 'down') launch(e, 14, 3); if (Math.abs(WALL.x - bx) < 260) breakWall(); } }
+    if (a.f < c.frames - 1) { a.f++; if ((a.clip === 'blast' && a.f === 3) || (a.clip === 'support' && a.f === 5)) { const bx = a.x + 3 * 110; FX.booms.push({ x: bx, y: groundY(a.z) - 110, r: 0, R: 90, t: 0, d: 0 }); FX.shake = Math.max(FX.shake, 0.2); for (const e of ENEMIES) if (Math.abs(e.x - bx) < 170 && e.state !== 'down') launch(e, 14, 3); if (Math.abs(WALL.x - bx) < 260) breakWall(); } }
     else if (c.loop) a.f = 0;
+    else if (a.clip === 'support') { a.clip = 'walk'; a.phase = 'out'; a.dir = -1; a.f = 0; }
     else if (a.clip === 'blast') { a.clip = 'glove'; a.f = 0; }
     else if (a.clip === 'glove') { a.clip = 'walk'; a.phase = 'out'; a.dir = -1; a.f = 0; }
   }
@@ -495,6 +514,20 @@ function updateAlly(dt) {
 
 // ── 그리기 ──
 const cv = $('c'), ctx = cv.getContext('2d');
+// 생활 동작용 가구·지형(시연판 전용 회색 상자). 좌표 = 그림 칸(192×144) 안 px, 바닥 136
+const WOOD = '#5a4a3c', MET = '#59626b';
+const CHAIR = [[36, 72, 4, 40, WOOD], [36, 108, 28, 4, WOOD], [38, 112, 3, 24, WOOD], [59, 112, 3, 24, WOOD]];
+const DESK = [[68, 90, 46, 4, WOOD], [70, 94, 3, 42, WOOD], [109, 94, 3, 42, WOOD]];
+const PROPS = {   // 생성기가 가구를 직접 그린 동작(책상·침대·사다리·문·상자 등)은 빼고, 안 그린 것만
+  seatphone: CHAIR, seatread: CHAIR, seatdrink: CHAIR, seatgame: CHAIR, toast: [...CHAIR, ...DESK], seatnoodle: [...CHAIR, ...DESK],
+  deskslam: [[78, 92, 46, 4, WOOD], [80, 96, 3, 40, WOOD], [119, 96, 3, 40, WOOD]], mantle: [[73, 88, 70, 48, MET]], vault: [[77, 88, 14, 48, MET]],
+};
+function drawProps(k, x, y, dir) {
+  const r = PROPS[k]; if (!r) return;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
+  for (const [px, py, w, h, col] of r) { ctx.fillStyle = col; ctx.fillRect(px - ANC, py - FOOT, w, h); }
+  ctx.restore();
+}
 function sprite(k, f, x, y, dir, alpha = 1, rim = false, origin = 0) {
   const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
@@ -597,6 +630,7 @@ function drawPlayer() {
   if (!['down', 'getup'].includes(G.clip)) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(G.x, gy + 4, Math.max(10, 24 * S + G.y / 8), 5 * S, 0, 0, Math.PI * 2); ctx.fill(); }
   for (const tr of G.trail) sprite(tr.clip, tr.f, tr.x, gy + G.y, G.dir, tr.t * 2.2, false, M.clips[tr.clip].origin);
   if (G.clip === 'charge') { const p = (performance.now() % 500) / 500; ctx.strokeStyle = `rgba(230,60,80,${1 - p})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(frontX(), gy - 100 * S / 2, 8 + p * 40, 0, Math.PI * 2); ctx.stroke(); }
+  drawProps(G.clip, G.x, gy + G.y, G.dir);
   sprite(G.clip, G.f, G.x, gy + G.y, G.dir, G.inv > 0 && Math.floor(performance.now() / 50) % 2 ? 0.6 : 1, $('rim').checked && $('bg').value !== 'grey', c ? c.origin : 0);
   if (G.talkT > 0) { ctx.font = 'bold 20px system-ui'; const w = ctx.measureText(G.talkLine).width + 28, bx = G.x - w / 2, by = gy - 112 * S; ctx.fillStyle = 'rgba(245,242,232,.95)'; ctx.fillRect(bx, by - 30, w, 40); ctx.fillStyle = '#1a1a1e'; ctx.textAlign = 'center'; ctx.fillText(G.talkLine, G.x, by - 3); }
   if ($('box').checked && c) {
@@ -630,7 +664,7 @@ function hud() {
   ctx.fillStyle = '#2a2a14'; ctx.fillRect(320, 22, 200, 14); ctx.fillStyle = G.gauge >= 100 ? '#ffd860' : '#a89040'; ctx.fillRect(320, 22, 2 * G.gauge, 14);
   ctx.font = '16px system-ui'; ctx.fillStyle = '#e8e6e0';
   ctx.fillText(`탄 ${'▮'.repeat(G.ammo)}${'▯'.repeat(MAG - G.ammo)} 예비 ${G.mags}  ·  커피 ${G.items.coffee} 간식 ${G.items.snack} 붕대 ${G.items.bandage}`, 24, 62);
-  ctx.fillText(`${G.weapon ? (G.weapon === 'pipe' ? '쇠파이프 ' : '산탄총 ') + G.wUses : '맨손'}${G.carry ? ' · 상자 듦' : ''}${G.tired ? ' · 피로' : ''}${G.hq ? ' · 본부' : ''}`, 24, 86);
+  ctx.fillText(`${G.weapon ? (G.weapon === 'pipe' ? '쇠파이프 ' : '산탄총 ') + G.wUses : '맨손'}${G.carry ? ' · 벽돌 듦' : ''}${G.tired ? ' · 피로' : ''}${G.hq ? ' · 본부' : ''}`, 24, 86);
   const c = C();
   $('state').textContent = c ? `${c.label} ${G.f + 1}/${c.frames} · 그림 ${loaded}/${total}` : '';
 }
@@ -638,7 +672,9 @@ requestAnimationFrame(update);
 
 // ── 목록 ──
 const list = $('list');
+let lastGroup = '';
 for (const [k, c] of Object.entries(M.clips)) {
+  if (c.group && c.group !== lastGroup) { lastGroup = c.group; const h = document.createElement('h3'); h.className = 'grp'; h.textContent = c.group; list.appendChild(h); }
   const d = document.createElement('div'); d.className = 'clip';
   d.innerHTML = `<b>${c.label}</b><canvas width="${FW}" height="${FH}"></canvas><small>${c.frames}장 · ${c.fps}fps · ${c.loop ? '반복' : '단발'}</small>`;
   d.onclick = () => { G.lock = false; G.down = false; G.lying = false; G.grab = null; G.crouch = false; G.air = false; G.y = 0; play(k, { lock: !c.loop }); scrollTo({ top: 0, behavior: 'smooth' }); };

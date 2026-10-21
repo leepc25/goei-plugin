@@ -1,0 +1,34 @@
+before generations_remaining: 9490
+sub idle_pipe
+sub walk_pipe
+sub run_pipe
+sub idle_shotgun
+sub walk_shotgun
+sub run_shotgun
+sub idle_brick
+sub walk_brick
+sub run_brick
+sub shotgun2
+sub pipe2
+sub lowkick
+sub blockfront
+sub duckwalk
+sub grab2
+sub grabknee2
+done idle_pipe
+done idle_brick
+done pipe2
+done blockfront
+done duckwalk
+done grab2
+done grabknee2
+done walk_pipe
+done idle_shotgun
+done walk_shotgun
+done walk_brick
+done run_brick
+done shotgun2
+done lowkick
+done run_shotgun
+done run_pipe
+after generations_remaining: 9438

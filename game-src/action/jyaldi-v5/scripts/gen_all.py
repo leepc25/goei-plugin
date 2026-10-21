@@ -21,13 +21,25 @@ def submit(n,seed=11):
 def fetch(n,j):
     nf=len(rig.CLIPS[n][2]); os.makedirs(f'{OUT}/{n}',exist_ok=True)
     for i in range(nf):
-        r=mcp.tool('get_image',{'job_id':j,'index':i}); im=[x for x in r['result']['content'] if x.get('type')=='image']
+        for k in range(5):
+            try: r=mcp.tool('get_image',{'job_id':j,'index':i}); break
+            except Exception: time.sleep(5)
+        im=[x for x in r['result']['content'] if x.get('type')=='image']
         if im: open(f'{OUT}/{n}/{i:02d}.png','wb').write(base64.b64decode(im[0]['data']))
 if __name__=='__main__':
-    names=sys.argv[1:] or list(rig.CLIPS)
+    names=[a for a in sys.argv[1:] if not a.startswith('--')] or list(rig.CLIPS)
     print('before',bal(),flush=True)
     pend={}
-    queue=list(names)
+    # 이전 실행에서 넣고 못 받은 일감 이어받기(spend.log의 job id)
+    import re as _re
+    last={}
+    for ln in open('../spend.log'):
+        m=_re.search(r'gen_all (\S+) \d+f -> id: ([0-9a-f-]{36})',ln)
+        if m: last[m.group(1)]=m.group(2)
+    queue=[]
+    for n in names:
+        if n in last and '--fresh' not in sys.argv: pend[n]=last[n]; print('resume',n,flush=True)
+        else: queue.append(n)
     while queue or pend:
         while queue and len(pend)<16:
             n=queue.pop(0); j,t=submit(n)
