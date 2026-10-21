@@ -2399,7 +2399,7 @@ var Fx = class {
         this.shake(3 + s * 4, 0.1 + s * 0.06);
         this.burst(e.x, e.y, 10 + s * 7, e.target === "player" ? "#ff6050" : "#ffe0a0", 3 + s * 1.5);
         this.ring(e.x, e.y, 16, 60 + s * 45, s === 3 ? "#fff" : "#ffd890", 4 + s * 3, 0.2 + s * 0.05);
-        if (e.dmg != null && this.opt.numbers) this.pop(e.x, e.y - 70, String(Math.round(e.dmg)), e.target === "player" ? "#ff7060" : s === 3 ? "#ffe070" : "#fff", s >= 2);
+        if (e.dmg != null && Math.round(e.dmg) > 0 && this.opt.numbers) this.pop(e.x, e.y - 70, String(Math.round(e.dmg)), e.target === "player" ? "#ff7060" : s === 3 ? "#ffe070" : "#fff", s >= 2);
         if (s === 3) this.flash("#fff", 0.08, 0.35);
         this.rumble?.(0.2 + s * 0.2, 60 + s * 30);
         break;
