@@ -23,9 +23,16 @@ DROP = {
 ERASE = {
     'handover': [(0, 100, 0, 192, 144), (1, 100, 0, 192, 144), (2, 116, 0, 192, 144), (3, 116, 0, 192, 144), (4, 116, 0, 192, 144)],
     'hug': [(0, 90, 0, 192, 144), (1, 90, 0, 192, 144)],
+    'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],   # 생성기가 손 앞에 컵을 하나 더 띄워 그림
 }
 
 OUTLINE = (24, 26, 30, 255)
+
+# 그림에 박힌 효과·찌꺼기(전수검사 C·E, 2026-10-21): 캐릭터 본체에서 떨어진 조각은 모두 지운다. 효과는 게임이 그린다
+DETACHED = {'fire', 'shotgun', 'grabblast', 'super', 'support', 'smoke', 'hug', 'deskslam', 'inspect', 'tie', 'push',
+            'idle_light', 'walk_light', 'run_light'}
+# 본체에 붙은 효과: 뼈대 몸 영역 밖의 밝은 회색·캐릭터 색표와 먼 색을 지움(총구 불꽃·광탄·잔상·연기·상자 조각)
+OUTSIDE_FX = {'fire', 'shotgun', 'super', 'support', 'smoke', 'hug', 'deskslam', 'push'}
 
 
 def wrists(clip, i):
@@ -84,7 +91,62 @@ def recolor_hair(f, ymax=75):
     return Image.fromarray(a)
 
 
-def apply(key, fr, pr=None):
+def keep_main(f, gap=2):
+    """본체(가장 큰 덩어리)와 gap px 안으로 붙은 것만 남긴다."""
+    from scipy import ndimage as nd
+    a = np.array(f); al = a[:, :, 3] > 0
+    lab, n = nd.label(nd.binary_dilation(al, iterations=gap), structure=np.ones((3, 3)))
+    if n <= 1: return f
+    sz = nd.sum(al, lab, range(1, n + 1))
+    a[(lab != 1 + int(np.argmax(sz))) & al] = 0
+    return Image.fromarray(a)
+
+
+def strip_beam(f):
+    """손전등 빛(전수검사 C): 채도 낮은 밝은 회색 덩어리 중 가로 20px 넘는 것 = 빛."""
+    from scipy import ndimage as nd
+    a = np.array(f); rgb = a[:, :, :3].astype(int)
+    g = (a[:, :, 3] > 0) & (rgb.max(2) - rgb.min(2) < 30) & (rgb.max(2) > 100)
+    lab, n = nd.label(g, structure=np.ones((3, 3)))
+    for i, sl in enumerate(nd.find_objects(lab), 1):
+        if sl[1].stop - sl[1].start > 20: a[lab == i] = 0
+    return Image.fromarray(a)
+
+
+def strip_flash(f):
+    """총구 불꽃(노랑·주황)."""
+    a = np.array(f); rgb = a[:, :, :3].astype(int)
+    m = (a[:, :, 3] > 0) & (rgb[:, :, 0] > 200) & (rgb[:, :, 1] > 120) & (rgb[:, :, 2] < 140)
+    a[m] = 0
+    return Image.fromarray(a)
+
+
+def strip_outside(f, pose):
+    from jyaldi_split_props import body_mask, pal_dist
+    a = np.array(f); rgb = a[:, :, :3].astype(int)
+    light = (rgb.max(2) > 120) & (rgb.max(2) - rgb.min(2) < 40)
+    red = ((rgb[:, :, 0] > 150) & (rgb[:, :, 1] < 120) & (rgb[:, :, 2] < 120)) | ((rgb[:, :, 0] > 170) & (rgb[:, :, 0] - rgb[:, :, 2] > 60))
+    m = (a[:, :, 3] > 0) & ~body_mask(pose) & (light | red | (pal_dist(a) > 22))
+    a[m] = 0
+    return Image.fromarray(a)
+
+
+def anchors(src, idx):
+    """장마다 손 좌표(전수검사 원칙 2). hand=앞손 손목, hand2=뒷손 손목, angle=앞손 팔꿈치→손목 방향(도, 0=앞, 아래가 +)."""
+    if src not in rig.CLIPS: return None
+    out = []
+    for raw in idx:
+        w, e, w2, _ = wrists(src, raw)
+        ang = float(np.degrees(np.arctan2(w[1] - e[1], w[0] - e[0])))
+        out.append({'hand': [round(w[0]), round(w[1])], 'hand2': [round(w2[0]), round(w2[1])], 'angle': round(ang)})
+    return out
+
+
+def apply(key, fr, pr=None, src=None, idx=None):
+    """idx(원본 장 번호)를 주면 (fr, pr, idx)를 돌려준다 — 장 빼기를 거친 뒤에도 손 좌표가 맞도록."""
+    ret_idx = idx is not None
+    idx = list(idx) if idx is not None else list(range(len(fr)))
+    src = src or key
     """fr: 캐릭터 장, pr: 같은 길이의 가구 장(없으면 None). 둘 다 보정·장 빼기를 같이 거쳐 돌려준다."""
     fr = list(fr); pr = list(pr) if pr else None
     if key in ERASE:
@@ -129,9 +191,31 @@ def apply(key, fr, pr=None):
                                         d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(30, 60, 90, 255), width=3),
                                         d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(70, 150, 210, 255), width=1))
             fr[i] = over(fr[i], f)
+    if key.endswith('_light'):
+        fr = [strip_beam(f) for f in fr]
+    if key == 'fire':
+        fr = [strip_flash(f) for f in fr]
+    if key in OUTSIDE_FX and src in rig.CLIPS:
+        ps = rig.CLIPS[src][2]
+        fr = [strip_outside(f, ps[min(r, len(ps) - 1)]) for f, r in zip(fr, idx)]
+    if key == 'super':                         # 손에 붙은 광탄 고리(주황·빨강, 얼굴 아래만)
+        def noorb(f):
+            a = np.array(f); rgb = a[:, :, :3].astype(int)
+            m = (rgb[:, :, 0] > 150) & (rgb[:, :, 0] - rgb[:, :, 2] > 60); m[:50] = False
+            a[m & (a[:, :, 3] > 0)] = 0; return Image.fromarray(a)
+        fr = [noorb(f) for f in fr]
+    if key == 'push':                          # 손 앞 상자 조각(갈색, 얼굴 아래만)
+        def nobox(f):
+            a = np.array(f); rgb = a[:, :, :3].astype(int)
+            m = (rgb[:, :, 0] > 110) & (rgb[:, :, 0] - rgb[:, :, 2] > 50) & (rgb[:, :, 1] < 150); m[:70] = False
+            a[m & (a[:, :, 3] > 0)] = 0; return Image.fromarray(a)
+        fr = [nobox(f) for f in fr]
+    if key in DETACHED:
+        fr = [keep_main(f) for f in fr]
     if key in DROP:
         n = len(fr)
-        idx = {i % n for i in DROP[key]}
-        fr = [f for i, f in enumerate(fr) if i not in idx]
-        if pr: pr = [f for i, f in enumerate(pr) if i not in idx]
-    return fr, pr
+        drop = {i % n for i in DROP[key]}
+        fr = [f for i, f in enumerate(fr) if i not in drop]
+        if pr: pr = [f for i, f in enumerate(pr) if i not in drop]
+        idx = [r for i, r in enumerate(idx) if i not in drop]
+    return (fr, pr, idx) if ret_idx else (fr, pr)

@@ -177,18 +177,23 @@ def main():
             idx = idx[::-1]
         fr = [fr[i] for i in idx]; pr = [pr[i] for i in idx] if pr else None
         if fr:
-            fr, pr = jyaldi_fixes.apply(d['key'], fr, pr)
+            fr, pr, idx = jyaldi_fixes.apply(d['key'], fr, pr, src=d['src'], idx=idx)
         if not fr:
             missing.append(d['key']); print('없음', d['key'], file=sys.stderr); continue
         data = strip(fr)
         strips[d['key']] = base64.b64encode(data).decode()
         open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
         manifest['clips'][d['key']] = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'adv', 'origin', 'hold', 'group')} | {'frames': len(fr), 'bytes': len(data), 'prop': bool(pr)}
+        anc = jyaldi_fixes.anchors(d['src'], idx) if d['key'] != 'getup' else None
+        if anc: manifest['clips'][d['key']]['anchors'] = anc
         if pr:
             pdata = strip(pr)
             strips['prop:' + d['key']] = base64.b64encode(pdata).decode()
             open(os.path.join(final, d['key'] + '.prop.png'), 'wb').write(pdata)
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
+    # 엔진 손 고정점(docs/게임_모듈_연결.md 2-1): {클립: [[x, y, 각도], ...]}, 각도 0 = 위로 세움, 시계 방향 +
+    hands = {k: [[a['hand'][0], a['hand'][1], (a['angle'] + 90) % 360] for a in v['anchors']] for k, v in manifest['clips'].items() if v.get('anchors')}
+    json.dump(hands, open(os.path.join(final, 'hands.json'), 'w'), separators=(',', ':'))
     manifest['missing'] = missing
     tpl = open(os.path.join(ROOT, 'tools', 'jyaldi_full_template.html'), encoding='utf-8').read()
     html = (tpl.replace('__MANIFEST__', json.dumps(manifest, ensure_ascii=False)).replace('__STRIPS__', json.dumps(strips))
