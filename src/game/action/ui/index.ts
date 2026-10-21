@@ -33,6 +33,8 @@ export interface ShellOptions {
   /** 일시정지 메뉴의 「본부로 귀환」 */
   onRetreat?: () => void;
   onTitle?: () => void;
+  /** 채우기: 가로로 긴 화면에서 캔버스를 옆으로 넓힌다. 엔진이 shell.stage.vw 폭으로 그릴 수 있을 때만 켠다 */
+  fill?: boolean;
   /** 화면 좌표 → 요소 기준 좌표 (리스 플러그인 창이 게임을 돌릴 때 bridge.viewport.toLocal) */
   toLocal?: (clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number };
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
@@ -91,18 +93,9 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     if (code === 'Escape') shell.openPause();
     else tap(code);
   });
-  if (o.toLocal) {
-    touch.toLocal = o.toLocal;
-    const tl = o.toLocal;
-    stage.toGame = (cx, cy) => {
-      const p = tl(cx, cy, stage.root);
-      const sc = stage.scale;
-      const r = stage.stage.style.transform.match(/translate\(([-\d.]+)px, ([-\d.]+)px\)/);
-      const ox = r ? Number(r[1]) : 0,
-        oy = r ? Number(r[2]) : 0;
-      return { x: (p.x - ox) / sc, y: (p.y - oy) / sc };
-    };
-  }
+  touch.vw = () => stage.vw;
+  touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
+  if (o.fill) stage.setFit('fill');
   const apply = () => {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);

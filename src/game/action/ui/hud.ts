@@ -1,7 +1,11 @@
 // 게임 HUD: 1280×720 캔버스 위에 그린다. 엔진은 HudState 만 채운다.
 // 왼쪽 위 요원(체력·능력·필살), 가운데 위 층·규칙 변형, 오른쪽 위 재화·총애·규칙서, 아래 탄약·아이템·대사.
 // 터치 버튼이 보이면 compact: 아이템 줄은 터치 버튼이 대신 보여 주고 탄약은 요원 칸 아래로 올라간다.
-import { H, W } from './stage';
+import { H as H0, W as W0 } from './stage';
+
+// 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
+let W = W0,
+  H = H0;
 
 export const FONT = '"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
 
@@ -38,6 +42,8 @@ export interface HudState {
   message?: string;
   device?: 'kb' | 'touch' | 'pad';
   compact?: boolean;
+  /** HUD 배율. 기본: 터치(compact)면 1.2, 아니면 1. 폰에서 글자가 작지 않게 */
+  scale?: number;
 }
 
 interface Toast {
@@ -124,7 +130,11 @@ export class Hud {
     this.t += dt;
     this.track(s, dt);
     c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
+    const k = s.scale ?? (s.compact ? 1.2 : 1);
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    if (s.prompt) s = { ...s, prompt: { ...s.prompt, x: s.prompt.x / k, y: s.prompt.y / k } };
     this.agent(c, s);
     this.floor(c, s);
     this.right(c, s);
@@ -247,11 +257,13 @@ export class Hud {
     c.font = font(17);
     const nw = c.measureText(f.name).width;
     const w = Math.max(dw + nw + 40, 200);
-    const x = W / 2 - w / 2;
-    plate(c, x, 12, w, f.variant ? 64 : 44, 10);
-    label(c, f.depth, x + 16, 44, 26, '#fff', 'left', 800);
-    label(c, f.name, x + 28 + dw, 42, 17, '#d8d0bc');
-    if (f.variant) label(c, `변형 · ${f.variant}`, W / 2, 66, 13, C.amber, 'center');
+    // 터치(compact): 가운데 위는 비워 두고 오른쪽 재화 아래에 붙인다
+    const x = s.compact ? W - 16 - w : W / 2 - w / 2,
+      y = s.compact ? 58 : 12;
+    plate(c, x, y, w, f.variant ? 64 : 44, 10);
+    label(c, f.depth, x + 16, y + 32, 26, '#fff', 'left', 800);
+    label(c, f.name, x + 28 + dw, y + 30, 17, '#d8d0bc');
+    if (f.variant) label(c, `변형 · ${f.variant}`, x + w / 2, y + 54, 13, C.amber, 'center');
   }
 
   private right(c: CanvasRenderingContext2D, s: HudState) {
@@ -262,17 +274,21 @@ export class Hud {
       ['research', m.research, iconResearch],
       ['teeth', m.teeth, iconTooth],
     ];
-    const x0 = W - 16 - 420;
-    plate(c, x0, 12, 420, 40, 10);
+    const R = W;
+    const step = s.compact ? 86 : 102,
+      mw = step * 4 + 12;
+    const x0 = R - 16 - mw;
+    plate(c, x0, 12, mw, 40, 10);
     items.forEach(([k, v, ic], i) => {
-      const x = x0 + 12 + i * 102;
+      const x = x0 + 12 + i * step;
       ic(c, x + 10, 32);
       const p = this.moneyPulse[k] ?? 0;
       label(c, String(v), x + 26, 39, 17 + p * 4, p > 0 ? '#fff4c0' : C.text);
     });
     // 총애: -3 ~ +3 일곱 칸
-    const fy = 60,
-      fx = W - 16 - 260;
+    const down = s.compact ? (s.floor.variant ? 70 : 50) : 0;
+    const fy = 60 + down,
+      fx = R - 16 - 260;
     plate(c, fx, fy, 260, 34, 10);
     label(c, '총애', fx + 12, fy + 23, 14, C.dim);
     for (let i = -3; i <= 3; i++) {
@@ -292,8 +308,8 @@ export class Hud {
     const rules = s.rules ?? [];
     if (rules.length || s.ruleCount) {
       const rh = 30 + rules.length * 22;
-      const rx = W - 16 - 360,
-        ry = 102;
+      const rx = R - 16 - 360,
+        ry = 102 + down;
       plate(c, rx, ry, 360, rh, 10);
       label(c, '규칙서', rx + 12, ry + 21, 14, C.rule);
       if (s.ruleCount) label(c, `찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}`, rx + 348, ry + 21, 12, C.dim, 'right');
@@ -523,6 +539,8 @@ export interface MapState {
   at: number;
 }
 export function drawMap(c: CanvasRenderingContext2D, m: MapState) {
+  W = c.canvas.width;
+  H = c.canvas.height;
   c.save();
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.fillStyle = 'rgba(3,6,9,0.82)';
