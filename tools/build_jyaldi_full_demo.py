@@ -78,6 +78,15 @@ DEFS = [
     D('run_brick', 'run_brick', '26 벽돌 든 채 달리기', 14, loop=True),
 ]
 for d in DEFS: d['group'] = '전투·기본 (계획안 1~41)'
+# 기본 클립(docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 5장): 몸만. 장면은 이것 + 오브젝트 + 효과로 엔진이 조립
+BASE = [('stepup', '계단·턱 오르기', 10, False), ('stepover', '넘어 들어가기(욕조 등)', 8, False), ('liesit', '눕기 → 일어나 앉기', 8, False),
+        ('handswork', '서서 손 작업(씻기·설거지·기계)', 6, True), ('handshead', '머리에 두 손(샤워·수건)', 6, True), ('seatmouth', '앉아 입으로(식사·건배)', 6, True),
+        ('seathold', '앉아 들고 보기(휴대폰·책)', 4, True), ('holdlook', '서서 들고 보기(수첩·서류·폰)', 4, True), ('handear', '귀에 대기(전화·이어폰)', 4, True),
+        ('sweep', '쓸기(밀대)', 8, True), ('liehold', '누워 들고 보기', 4, True),
+        ('carry2_idle', '두 손 들고 서기', 5, True), ('carry2_walk', '두 손 들고 걷기', 10, True), ('carry2_run', '두 손 들고 달리기', 14, True),
+        ('carry1_idle', '한 손 들고 서기', 5, True), ('carry1_walk', '한 손 들고 걷기', 10, True), ('carry1_run', '한 손 들고 달리기', 14, True)]
+for k, name, fps, loop in BASE:
+    DEFS.append(dict(D(k, k, name, fps, loop=loop), group='기본 클립 (몸만, 물건·장면은 엔진)'))
 for k, grp, name, fps, loop in LIFE:
     DEFS.append(dict(D(k, k, name, fps, loop=loop), group=grp))
 FW, FH, FOOT, ANCHOR = 192, 144, 136, 57
