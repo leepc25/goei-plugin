@@ -16,6 +16,19 @@ test('situations pick by place, mystic sites by what they are', () => {
   assert.deepEqual(situationShared('an', '모르는 곳'), situationShared('an', '모르는 곳'));
 });
 
+test('one-letter place words match only whole word ends, new places fall back until drawn', () => {
+  // 광역시의 '역'이 지하철로 가면 안 됨 (2026-10-21 사용자 스샷: 영화관이 지하철 그림)
+  const cinema = situationShared('an', '충장로 구시가지 영화관', '광주광역시 동구 낡은 상영관에서 사람이 사라진다');
+  assert.match(cinema[0], /^Situation Anomaly Theater [12]$/);
+  assert.match(cinema[2], /^Situation Anomaly Ruin [12]$/);
+  assert.ok(!/Subway|Forest/.test(situationShared('an', '이상한 횟집', '부산광역시 해운대구 지역 주민의 얼굴')[0]));
+  assert.match(situationShared('an', '북한산 둘레길')[0], /^Situation Anomaly Forest/);
+  assert.match(situationShared('an', '폐공장')[0], /^Situation Anomaly Ruin/);
+  assert.match(situationShared('an', '새벽 편의점', '서울특별시 강남구')[0], /^Situation Anomaly Store/);
+  // 이름이 상황 글보다 먼저
+  assert.match(situationShared('an', '은하 목욕탕', '지하철 타고 온 손님')[0], /^Situation Anomaly Bathhouse/);
+});
+
 test('bases and orgs pick by name words', () => {
   assert.equal(baseShared('관리국 본부')[0], 'Shared Base Office');
   assert.equal(baseShared('서울중앙성원')[0], 'Shared Base Religious');
