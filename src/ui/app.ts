@@ -36,6 +36,7 @@ import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
+import { startCctvFx, stopCctvFx } from './cctvfx';
 import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
@@ -449,6 +450,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   notice = '';
   render();
   shown = true;
+  if (root) startCctvFx(root);
   await risuai.showContainer('fullscreen');
   await refresh();
   // 에셋 모듈의 표정 세트(위키 인물 사진). 목록이 바뀌었으면 한 번 다시 그린다
@@ -515,6 +517,7 @@ async function refresh(): Promise<void> {
 
 async function close(): Promise<void> {
   shown = false;
+  stopCctvFx();
   closeGame();
   await risuai.hideContainer();
 }

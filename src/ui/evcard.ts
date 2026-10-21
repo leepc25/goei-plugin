@@ -237,6 +237,10 @@ const STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class=
 /** 위성: 먼 구름, 그림자, 가까운 구름이 왼쪽에서 오른쪽으로 흐른다 */
 const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
 
+/** 괴이 효과 자리 (ui/cctvfx.ts가 클래스를 붙였다 뗄 때만 보임): 신호 끊김 화면, 렌즈 앞을 스치는 형체 */
+const SHADE = '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><path d="M50 2c17 0 27 14 27 33 0 14-5 25-12 31 20 6 35 22 35 50v24H0v-24c0-28 15-44 35-50-7-6-12-17-12-31C23 16 33 2 50 2z"/></svg>';
+const FX = `<i class="gx-oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
+
 function opsPick(c: OpsCard | undefined): string {
   return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
 }
@@ -257,7 +261,10 @@ function feedView(c: EvCard, clock: string, cls = ''): string {
   const loc = c.locCode ?? '';
   const region = locName(loc).split(' ').slice(0, 2).join(' ');
   const cam = loc ? `CAM-${camNo(loc)} · ${esc(region)}` : 'CAM-00';
-  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}">${pic}${STATIC}
+  const grade = c.kind === 'an' && c.grade && /^[A-Za-z]+$/.test(c.grade) ? ` data-grade="${c.grade.toLowerCase()}"` : '';
+  // 찢김 띠는 같은 그림을 배경으로 깔아 잘라 쓴다
+  const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc(c.art.pic)}')"><i></i><i></i></i>` : '';
+  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
