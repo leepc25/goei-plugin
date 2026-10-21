@@ -1,0 +1,94 @@
+{
+ "deep_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/deep_objects_1": {
+  "w": 127,
+  "h": 164,
+  "foot": [
+   63,
+   164
+  ]
+ },
+ "objects/deep_objects_2": {
+  "w": 126,
+  "h": 148,
+  "foot": [
+   63,
+   148
+  ]
+ },
+ "objects/deep_objects_3": {
+  "w": 66,
+  "h": 32,
+  "foot": [
+   33,
+   32
+  ]
+ },
+ "objects/deep_objects_4": {
+  "w": 61,
+  "h": 141,
+  "foot": [
+   30,
+   141
+  ]
+ },
+ "objects/deep_objects_5": {
+  "w": 41,
+  "h": 48,
+  "foot": [
+   20,
+   48
+  ]
+ },
+ "objects/deep_objects_6": {
+  "w": 77,
+  "h": 117,
+  "foot": [
+   38,
+   117
+  ]
+ },
+ "objects/deep_objects_7": {
+  "w": 97,
+  "h": 71,
+  "foot": [
+   48,
+   71
+  ]
+ },
+ "objects/deep_objects_8": {
+  "w": 40,
+  "h": 24,
+  "foot": [
+   20,
+   24
+  ]
+ },
+ "objects/deep_objects_9": {
+  "w": 50,
+  "h": 71,
+  "foot": [
+   25,
+   71
+  ]
+ },
+ "deep_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "deep_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "deep_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "deep_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

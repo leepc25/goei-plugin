@@ -176,14 +176,14 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
-    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref);
+    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref, plan.stage.floor?.sub);
     // 바닥은 한 층 안에서 한 가지 (홀·방도 그 층 바닥), 벽 장소가 바뀌는 곳은 기둥으로 잇는다 (통합 검수 2-3)
     const floorPlace = plan.stage.where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '') : place;
     if (drawWallCell(ctx, place, s.ref, s.x, s.w, s.flip, y0)) {
       const i = segs.indexOf(s);
-      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref) : place;
+      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub) : place;
       if (prev !== place) seamPillar(ctx, s.x, y0);
-      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref) : place;
+      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub) : place;
       if (next !== place) seamPillar(ctx, s.x + s.w, y0);
       if (!drawFloor(ctx, floorPlace, s.x, s.x + s.w, y0, 720) && !drawFloor(ctx, place, s.x, s.x + s.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
@@ -234,7 +234,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, Math.max(CEIL + 24, 128));
   }
   // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref));
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub));
   void CHUNK_W;
 }
 

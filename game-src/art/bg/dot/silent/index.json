@@ -1,0 +1,94 @@
+{
+ "silent_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/silent_objects_1": {
+  "w": 76,
+  "h": 156,
+  "foot": [
+   38,
+   156
+  ]
+ },
+ "objects/silent_objects_2": {
+  "w": 130,
+  "h": 63,
+  "foot": [
+   65,
+   63
+  ]
+ },
+ "objects/silent_objects_3": {
+  "w": 48,
+  "h": 71,
+  "foot": [
+   24,
+   71
+  ]
+ },
+ "objects/silent_objects_4": {
+  "w": 83,
+  "h": 32,
+  "foot": [
+   41,
+   32
+  ]
+ },
+ "objects/silent_objects_5": {
+  "w": 104,
+  "h": 94,
+  "foot": [
+   52,
+   94
+  ]
+ },
+ "objects/silent_objects_6": {
+  "w": 109,
+  "h": 79,
+  "foot": [
+   54,
+   79
+  ]
+ },
+ "objects/silent_objects_7": {
+  "w": 190,
+  "h": 156,
+  "foot": [
+   95,
+   156
+  ]
+ },
+ "objects/silent_objects_8": {
+  "w": 46,
+  "h": 86,
+  "foot": [
+   23,
+   86
+  ]
+ },
+ "objects/silent_objects_9": {
+  "w": 80,
+  "h": 40,
+  "foot": [
+   40,
+   40
+  ]
+ },
+ "silent_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "silent_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "silent_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "silent_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

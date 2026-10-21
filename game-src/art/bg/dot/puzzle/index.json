@@ -1,0 +1,94 @@
+{
+ "puzzle_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/puzzle_objects_1": {
+  "w": 83,
+  "h": 63,
+  "foot": [
+   41,
+   63
+  ]
+ },
+ "objects/puzzle_objects_2": {
+  "w": 84,
+  "h": 63,
+  "foot": [
+   42,
+   63
+  ]
+ },
+ "objects/puzzle_objects_3": {
+  "w": 76,
+  "h": 79,
+  "foot": [
+   38,
+   79
+  ]
+ },
+ "objects/puzzle_objects_4": {
+  "w": 125,
+  "h": 110,
+  "foot": [
+   62,
+   110
+  ]
+ },
+ "objects/puzzle_objects_5": {
+  "w": 48,
+  "h": 48,
+  "foot": [
+   24,
+   48
+  ]
+ },
+ "objects/puzzle_objects_6": {
+  "w": 53,
+  "h": 86,
+  "foot": [
+   26,
+   86
+  ]
+ },
+ "objects/puzzle_objects_7": {
+  "w": 65,
+  "h": 40,
+  "foot": [
+   32,
+   40
+  ]
+ },
+ "objects/puzzle_objects_8": {
+  "w": 62,
+  "h": 63,
+  "foot": [
+   31,
+   63
+  ]
+ },
+ "objects/puzzle_objects_9": {
+  "w": 44,
+  "h": 71,
+  "foot": [
+   22,
+   71
+  ]
+ },
+ "puzzle_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "puzzle_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "puzzle_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "puzzle_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

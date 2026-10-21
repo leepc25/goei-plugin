@@ -156,7 +156,9 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
 }
 
 /** 층 유형·고정 방 → 그림 장소 (docs/GPT요청_게임배경.md의 장소 이름). */
-export function placeFor(where: string, floorType: string | undefined, ref: string): string {
+export function placeFor(where: string, floorType: string | undefined, ref: string, sub?: string | null): string {
+  // 재현의 층 하위 변형(붉은 벽·빈집)은 자기 벽 그림 (바닥은 아파트 바닥, FLOOR_ALT)
+  if (where === 'floor' && floorType === 'replica' && sub && !ref.startsWith('room:') && walls(`apt_${sub}`).length) return `apt_${sub}`;
   if (where === 'car') return 'el_car';
   if (where === 'service' || ref === 'room:attic') return 'service';
   if (ref === 'room:elevator_hall' || ref === 'room:exit_hall') return 'el_hall';
@@ -204,7 +206,7 @@ const HQ_WALLS: Record<string, string[]> = {
 /** 바닥 그림이 없는 장소가 빌리는 바닥. */
 const FLOOR_ALT: Record<string, string> = {
   hq_chief: 'hq_office', hq_interview: 'hq_office', hq_jaemtri: 'hq_office', hq_lobby: 'lobby', hq_supply: 'hq_workshop',
-  hq_appraisal: 'hq_containment', hq_lab: 'hq_clinic', hq_tooth: 'hq_containment',
+  hq_appraisal: 'hq_containment', hq_lab: 'hq_clinic', hq_tooth: 'hq_containment', apt_red: 'apt', apt_vacant: 'apt',
 };
 /** 문이 그려진 벽 칸: 문 구멍 x 범위(도트)와 종류. 엔진 문 자리에 그 칸을 맞춰 그리면 문이 따로 그려지지 않는다. */
 const DOOR_WALLS: Record<string, [number, number, 'door' | 'stairs' | 'elevator' | 'main']> = {
@@ -318,6 +320,12 @@ export function seamPillar(ctx: CanvasRenderingContext2D, x: number, wallBottom:
 // ── 소품 그림 (물건 모음 → objects/<장소>_objects_N). 회색 상자 대신. 도트 1px = 화면 2px, 발(아래 가운데)을 바닥 y에.
 type ObjRef = [string, number] | [string, number, string, number] | null; // [장소, 번호] 또는 둘을 나란히, null = 그리지 않음(벽 그림에 이미 있음)
 
+const FLOOR_LABEL: Record<string, [RegExp, [string, number]][]> = {
+  silent: [[/괘종시계|시계/, ['silent', 1]], [/책장/, ['silent', 7]], [/그릇|선반/, ['silent', 5]], [/카펫/, ['silent', 4]], [/의자/, ['silent', 3]]],
+  dark: [[/형광등/, ['dark', 2]], [/의자/, ['dark', 1]], [/배관/, ['dark', 3]], [/책상/, ['dark', 4]], [/상자/, ['dark', 5]]],
+  puzzle: [[/거꾸로/, ['puzzle', 2]], [/액자/, ['puzzle', 1]], [/화분/, ['puzzle', 3]], [/표지/, ['puzzle', 4]]],
+};
+
 const BY_LABEL: [RegExp, ObjRef][] = [
   [/자판기/, ['lobby', 3]], [/소파/, ['lobby', 2]], [/정수기/, ['lobby', 5]], [/화분/, ['lobby', 4]], [/우산/, ['el_hall', 3]],
   [/게시판|표지|안내|액자|점수판|번호표|점검표|목표|시계|사진/, ['lobby', 6]],
@@ -372,8 +380,13 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
     ref = [p, DOOR[p] ?? 0] as ObjRef;
     if (!DOOR[p]) ref = ['chase', 1];
   } else if (kind in BY_KIND) ref = BY_KIND[kind];
-  else if (label) ref = BY_LABEL.find(([re]) => re.test(label))?.[1];
-  if (ref === undefined && kind === 'prop') ref = ['chase', 5];
+  else if (label) {
+    // 층마다 자기 물건 그림이 있으면 먼저 (침묵·어둠·퍼즐·심층)
+    const own = FLOOR_LABEL[floorType ?? '']?.find(([re]) => re.test(label))?.[1];
+    if (own && objImage(own[0], own[1])) ref = own;
+    else ref = BY_LABEL.find(([re]) => re.test(label))?.[1];
+  }
+  if (ref === undefined && kind === 'prop') ref = floorType === 'deep' && objImage('deep', 1) ? ['deep', 1 + (Math.abs(Math.round(sx / 97)) % 9)] : ['chase', 5];
   if (ref === undefined) return false;
   if (ref === null) return true;
   ctx.save();

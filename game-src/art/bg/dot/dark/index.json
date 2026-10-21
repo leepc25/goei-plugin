@@ -1,0 +1,94 @@
+{
+ "dark_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/dark_objects_1": {
+  "w": 119,
+  "h": 63,
+  "foot": [
+   59,
+   63
+  ]
+ },
+ "objects/dark_objects_2": {
+  "w": 60,
+  "h": 20,
+  "foot": [
+   30,
+   20
+  ]
+ },
+ "objects/dark_objects_3": {
+  "w": 87,
+  "h": 40,
+  "foot": [
+   43,
+   40
+  ]
+ },
+ "objects/dark_objects_4": {
+  "w": 140,
+  "h": 94,
+  "foot": [
+   70,
+   94
+  ]
+ },
+ "objects/dark_objects_5": {
+  "w": 108,
+  "h": 48,
+  "foot": [
+   54,
+   48
+  ]
+ },
+ "objects/dark_objects_6": {
+  "w": 42,
+  "h": 13,
+  "foot": [
+   21,
+   13
+  ]
+ },
+ "objects/dark_objects_7": {
+  "w": 67,
+  "h": 32,
+  "foot": [
+   33,
+   32
+  ]
+ },
+ "objects/dark_objects_8": {
+  "w": 25,
+  "h": 28,
+  "foot": [
+   12,
+   28
+  ]
+ },
+ "objects/dark_objects_9": {
+  "w": 73,
+  "h": 125,
+  "foot": [
+   36,
+   125
+  ]
+ },
+ "dark_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "dark_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "dark_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "dark_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}
