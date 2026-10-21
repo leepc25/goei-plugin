@@ -38,6 +38,25 @@ test('registry: aliases resolve to lore names and terms allow Korean particles',
   assert.deepEqual(referenceEntries(r, '부장과 소라 랜드에 갔다').map((e) => e.lore).sort(), ['소라 랜드', '쟈알디']);
 });
 
+test('registry: aliases that name a group or another entry are not used; given names need a form of address', () => {
+  const lore = [
+    { comment: 'World catalog', content: JSON.stringify({ 괴이: [[true, '유쾌 테마파크', '유쾌 테마파크', 'Yukoae', ['플라워 골든 리조트']], [true, '플라워 골든 리조트', '플라워 골든 리조트', 'Flower Golden', []]], '미스틱 사이트': [], 랜드마크: [] }) },
+    { comment: 'Agent roster', content: JSON.stringify({ version: 2, characters: [
+      { id: 'P001', name: '쟈알디', english: 'Jyaldi', lore: '쟈알디', aliases: ['관리국', '종합대응팀', 'Response Team'], affiliation: 'A00', department: '종합대응팀' },
+      { id: 'P002', name: '스팡달', english: 'Spangdal', lore: '스팡달', aliases: ['관리국', 'Response Team'], affiliation: 'A00', department: '종합대응팀' },
+      { id: 'P049', name: '신유리', english: 'Shin Yuri', lore: '신유리', aliases: ['유리'], affiliation: '중림 지하상가' },
+    ] }) },
+  ];
+  const r = buildRegistry(lore);
+  const names = (t) => referenceEntries(r, t).map((e) => e.name).sort();
+  assert.deepEqual(names('관리국 사무실에 갔다'), [], '소속 이름은 요원 별칭이 아님');
+  assert.deepEqual(names('Response Team arrived'), [], '여럿이 같이 쓰는 별칭');
+  assert.deepEqual(names('플라워 골든 리조트로'), ['플라워 골든 리조트'], '다른 항목 이름은 별칭이 아님');
+  assert.deepEqual(names('창문 유리가 깨졌다'), []);
+  assert.deepEqual(names('유리 씨가 웃었다'), ['신유리']);
+  assert.deepEqual(names('신유리가 웃었다'), ['신유리']);
+});
+
 test('refs: collects base, primary, active, direct and secondary rows with CBS evaluated', () => {
   const lore = [
     { comment: 'World catalog', content: JSON.stringify({ 괴이: [[true, '소라 랜드', '소라 랜드', 'Sora Land', []]], '미스틱 사이트': [], 랜드마크: [] }) },

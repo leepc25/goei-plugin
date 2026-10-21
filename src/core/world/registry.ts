@@ -9,6 +9,8 @@ export interface RegistryEntry {
   /** 정식 로어북 이름 (없으면 '') */
   lore: string;
   terms: string[];
+  /** 성을 뗀 두 글자 이름처럼 흔한 낱말과 겹치는 이름 (유리·도형·성주). 글에서 찾을 때는 호칭이 붙어야 친다 */
+  weak?: string[];
 }
 
 export interface Registry {
@@ -38,13 +40,39 @@ export function buildRegistry(lore: LoreEntry[] | undefined): Registry {
     entries.push({ key, name, lore: loreName, terms: uniq });
   };
   const dir = readDirectory(books);
+  // 별칭 거르기 (2026-10-21 점검): 원본 명부의 별칭에는 소속·부서·다른 항목 이름이 섞여 있어서
+  // 「관리국」 한 마디에 요원 26명 로어북이, 「백일몽」에 16명이 괴담넷·괴담톡·위키 요청에 딸려 들어갔다.
+  // 조직·부서·직급 이름과 다른 항목의 정식 이름은 그 항목만 가리키는 이름이 아니라서 별칭으로 쓰지 않는다.
+  const low = (t: string) => t.trim().toLowerCase();
+  const shared = new Set<string>();
+  for (const o of dir.orgs) for (const t of [o.name, o.spec.english ?? '', orgLoreName(books, o.name)]) if (t) shared.add(low(t));
+  for (const a of dir.agents) for (const t of [a.department, a.rank, a.group]) if (t) shared.add(low(t));
+  // 둘 이상의 항목이 같이 쓰는 별칭(현장탐사팀, Field Exploration Team, Vampire)도 그 무리 이름이지 한 항목의 이름이 아니다
+  const seen = new Map<string, number>();
+  for (const list of [...dir.anomalies, ...dir.sites, ...dir.agents].map((r) => r.aliases)) for (const t of new Set(list.map(low))) seen.set(t, (seen.get(t) ?? 0) + 1);
+  for (const [t, n] of seen) if (n > 1) shared.add(t);
+  const own = new Map<string, string>();
+  const claim = (t: string, key: string) => t && !own.has(low(t)) && own.set(low(t), key);
+  dir.anomalies.forEach((p, i) => [p.label, p.lore].forEach((t) => claim(t, `an${i}`)));
+  dir.sites.forEach((p, i) => [p.label, p.lore].forEach((t) => claim(t, `ms${i}`)));
+  dir.bases.forEach((b, i) => claim(b.name, `lm${i}`));
+  dir.agents.forEach((a) => [a.name, a.lore].forEach((t) => claim(t, `ag${a.id}`)));
+  const aliasesOf = (list: string[], key: string) => list.filter((t) => !shared.has(low(t)) && (own.get(low(t)) ?? key) === key);
   const places = { 괴이: dir.anomalies, '미스틱 사이트': dir.sites };
+  const tag = { 괴이: 'an', '미스틱 사이트': 'ms' } as const;
   for (const [group, rows] of Object.entries(places)) {
-    rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...p.aliases]));
+    rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group as keyof typeof tag]}${i}`)]));
   }
-  // 거점 로어북이 비면 연결 조직의 로어북 (거점에서 걸든 조직에서 걸든 같은 칸 b.org)
-  dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ''), [b.english, b.label, ...b.aliases]));
-  for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...a.aliases, ...a.legacyEnglish]);
+  // 거점 로어북이 비면 연결 조직의 로어북 (거점에서 걸든 조직에서 걸든 같은 칸 b.org). 거점 별칭은 조직 이름이어도 둔다 (거점이 곧 그 조직 자리)
+  dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ''), [b.english, b.label, ...b.aliases.filter((t) => (own.get(low(t)) ?? `lm${i}`) === `lm${i}`)]));
+  for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...aliasesOf(a.aliases, `ag${a.id}`), ...a.legacyEnglish]);
+  // 성을 뗀 이름 (고연지 → 연지): 본편 로어북 고르기(core/lore.ts)와 같은 「보조 키」 규칙
+  for (const e of entries) {
+    if (!e.key.startsWith('Agent roster/')) continue;
+    const full = [e.name, e.lore].filter((t) => /[가-힣]/.test(t) && t.replace(/\s+/g, '').length >= 3);
+    const weak = e.terms.filter((t) => /^[가-힣]{2}$/.test(t) && full.some((f) => f.replace(/\s+/g, '').includes(t)));
+    if (weak.length) e.weak = weak;
+  }
   const byTerm = new Map<string, RegistryEntry[]>();
   const byLore = new Map<string, RegistryEntry[]>();
   for (const e of entries) {
@@ -89,12 +117,25 @@ export function termPresent(content: string, term: string): boolean {
   }
 }
 
+const HONOR = ['님', '씨', '쌤', '선배', '언니', '오빠', '누나', '형', '아', '야', '팀장', '대리', '과장', '주임', '사원', '반장', '이사', '전무', '원장', '요원'];
+
+/** 성을 뗀 두 글자 이름이 사람을 부르는 꼴로 쓰였는지 (연지 씨, 연지야, 도형 대리) */
+function calledByName(content: string, term: string): boolean {
+  const hay = content.toLowerCase();
+  for (let a = hay.indexOf(term); a >= 0; a = hay.indexOf(term, a + 1)) {
+    if (a > 0 && isWord(hay[a - 1])) continue;
+    const tail = hay.slice(a + term.length).replace(/^\s/, '');
+    if (HONOR.some((h) => tail.startsWith(h))) return true;
+  }
+  return false;
+}
+
 /** 글에 이름이 나온 모든 항목 (키 순) */
 export function referenceEntries(r: Registry, content: string): RegistryEntry[] {
   const found = new Map<string, RegistryEntry>();
   for (const [term, list] of r.byTerm) {
     if (!termPresent(content, term)) continue;
-    for (const e of list) found.set(e.key, e);
+    for (const e of list) if (!e.weak?.includes(term) || calledByName(content, term)) found.set(e.key, e);
   }
   return [...found.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
 }
