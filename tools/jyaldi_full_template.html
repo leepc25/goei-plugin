@@ -384,6 +384,8 @@ function breakWall() { WALL.broken = true; WALL.t = 1; FX.shake = Math.max(FX.sh
 let last = performance.now();
 function frameDone() {
   const c = C(), k = G.clip;
+  if (k === 'undress' && has('showerturn')) { G.lock = false; play('showerturn', { lock: false }); return; }
+  if (k === 'showerturn' && has('shower')) { G.lock = false; play('shower', { lock: false }); return; }
   if (k === 'showerout' && has('towel')) { G.lock = false; play('towel', { lock: false }); return; }
   if (c.adv) G.x += G.dir * c.adv * S;
   if (G.next) { const n = G.next; G.next = null; play(n, { lock: true }); return; }

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>관리국 · 도트 컷씬 시연</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#0c1119;color:#e0e6ef}body{max-width:1280px;margin:auto;padding:20px}h1{font-size:22px}button,select{font:inherit;color:inherit;background:#1c293a;border:1px solid #43516a;border-radius:6px;padding:9px 12px}nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}canvas{display:block;width:100%;aspect-ratio:16/9;background:#000;image-rendering:pixelated}input{width:100%}p{color:#adb9ca}output{font-variant-numeric:tabular-nums}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #e7b459}#caption{min-height:2em;color:#eee;text-align:center}
+</style>
+<h1>관리국 · 도트 컷씬</h1><nav><select id="scene" aria-label="컷씬 선택"></select><button id="play">재생</button><button id="restart">처음부터</button><button id="previous">이전 프레임</button><button id="next">다음 프레임</button><button id="full">전체 화면</button></nav>
+<canvas id="screen" width="640" height="360" aria-label="컷씬 화면"></canvas>
+<input id="seek" aria-label="재생 위치" type="range" min="0" step="1"><output id="status"></output>
+<p id="caption"></p><p>원본 640×360 · 픽셀 확대 · PNG 프레임 재생. 그림과 시간표가 이 파일에 포함되어 있습니다. 소리는 없습니다.</p>
+<script>
+'use strict';
+const DATA=__CUTSCENE_DATA__;
+const titles={opening:'오프닝',first_day:'첫 출근',first_entry:'첫 투입',first_call:'첫 호명',attic:'다락방',three_years:'삼 년째 승객',return:'귀환',evac:'후송',exit:'출구',dinner:'회식'};
+const select=document.querySelector('#scene'),canvas=document.querySelector('#screen'),ctx=canvas.getContext('2d'),seek=document.querySelector('#seek'),status=document.querySelector('#status'),play=document.querySelector('#play');
+ctx.imageSmoothingEnabled=false;
+for(const id of Object.keys(DATA)){const o=document.createElement('option');o.value=id;o.textContent=titles[id]||id;select.append(o)}
+let pos=0,playing=false,last=0,total=0,timeline=[],images=new Map(),generation=0;
+function frameAt(c,t){const ms=c.timing.ms;let local=t;
+ if(c.timing.loop){const [a,b]=c.timing.loop;const before=ms.slice(0,a-1).reduce((x,y)=>x+y,0),span=ms.slice(a-1,b).reduce((x,y)=>x+y,0);if(local>=before)local=before+(local-before)%span;}
+ for(let i=0;i<ms.length;i++){if(local<ms[i])return i;local-=ms[i]}return ms.length-1;}
+function draw(){let c=timeline.find(x=>pos<x.end)||timeline.at(-1);if(!c)return;const f=frameAt(c,Math.max(0,pos-c.begin));const im=images.get(c.frames[f]);if(im)ctx.drawImage(im,0,0,640,360);seek.value=Math.min(pos,total);status.textContent=`${titles[select.value]} · ${c.cut} · ${f+1}/${c.frames.length} · ${(pos/1000).toFixed(2)} / ${(total/1000).toFixed(2)}초`;}
+async function load(){const ticket=++generation;playing=false;play.textContent='불러오는 중';play.disabled=true;pos=0;total=0;timeline=[];images=new Map();const needed=[];
+ for(const c of DATA[select.value]){timeline.push({...c,begin:total,end:total+c.duration});total+=c.duration;for(const src of c.frames){needed.push(new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve([src,im]);im.onerror=()=>reject(Error('프레임을 읽지 못했습니다'));im.src=src;}));}}
+ try{const loaded=await Promise.all(needed);if(ticket!==generation)return;images=new Map(loaded);seek.max=total;play.disabled=false;play.textContent='재생';draw();}catch(e){status.textContent=e.message;}}
+function toggle(){if(play.disabled)return;if(pos>=total)pos=0;playing=!playing;last=performance.now();play.textContent=playing?'일시정지':'재생';draw();}
+play.onclick=toggle;select.onchange=load;seek.oninput=()=>{pos=+seek.value;draw()};
+document.querySelector('#restart').onclick=()=>{pos=0;draw()};
+function step(direction){playing=false;play.textContent='재생';pos=Math.max(0,Math.min(total-1,pos+direction*125));draw()}
+document.querySelector('#previous').onclick=()=>step(-1);document.querySelector('#next').onclick=()=>step(1);
+document.querySelector('#full').onclick=()=>canvas.requestFullscreen?.();
+window.addEventListener('keydown',e=>{if(e.target.matches('select,input,button'))return;if(e.code==='Space'){e.preventDefault();toggle()}if(e.code==='ArrowRight')step(1);if(e.code==='ArrowLeft')step(-1)});
+function tick(now){if(playing){pos=Math.min(total,pos+now-last);if(pos>=total){playing=false;play.textContent='다시 재생'}draw()}last=now;requestAnimationFrame(tick)}
+window.cutscenePreview={frameAt,get timeline(){return timeline},get data(){return DATA},get position(){return pos},setPosition(v){pos=Math.max(0,Math.min(total,v));draw()}};
+load();requestAnimationFrame(tick);
+</script></html>

@@ -14,15 +14,18 @@ import rig  # noqa: E402
 # 버림(결함 35·36): 생성기가 자세를 못 그림
 DROP_CLIPS = {'pushup', 'sleepside'}
 # 기본 클립 재설계(docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 4장): 장면·물건이 박혀 폐기. 같은 이름으로 다시 뽑는 9개(tie 등)는 새 그림이 덮어씀
-DROP_CLIPS |= set('''bath bathin bathout shower showerin showerout toilet toiletin toiletout handwash wash dishes coffee microwave board brief
+DROP_CLIPS |= set('''toilet bathin bathout showerin showerout toiletin toiletout handwash wash dishes coffee microwave board brief
 window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
 toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
 run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry'''.split())
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
+# 샤워·목욕·용변·탈의는 GPT 납품(2026-10-22 4b904ee, 수건으로 가림, 샤워는 뒷모습 머리 감기). 옛 보정(머리색 바꾸기·가구 분리)은 옛 그림용이라 뺌
+# undress/showerturn were redrawn at final scale on 2026-10-22; no legacy resizing/recoloring.
+GPT_CLIPS = {'shower', 'bath', 'toilet'}
 DROP = {
     # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
-    'reload': [4, 5], 'deskslam': [2], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
+    'reload': [4, 5], 'deskslam': [2], 'shotgun': [3], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
     'super': [-1],                             # 다시 생성분 끝 장 뭉개짐
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4],
     'nausea': [-1], 'push': [-1], 'gearcheck': [-1], 'locker': [4, 5], 'giftbox': [0], 'button': [5],
@@ -34,6 +37,7 @@ ERASE = {
     'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],
     'down': [(i, 0, 137, 192, 144) for i in range(8)],   # 독립 검수: 누운 장 아래팔이 바닥선 아래로 뚫음
     'collapse': [(i, 0, 137, 192, 144) for i in range(8)],
+    'shotgun': [(5, 60, 36, 72, 42)],   # 사격 5장 머리 위 회색 선(3장 불꽃 장은 DROP)
     # 재검수(16:24) 남은 조각: 10배 격자로 자리 확인
     'toss': [(5, 70, 82, 80, 92)],
     'carry1_walk': [(0, 69, 74, 76, 79)] + [(i, 28, 59, 34, 68) for i in range(8)],
@@ -50,6 +54,7 @@ OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
 LIGHT_ERASE = {
     'toss': [(5, 64, 78, 80, 94)],
     'getup': [(1, 74, 103, 81, 110)],
+
     'carry1_walk': [(0, 68, 76, 82, 92)],
     'hurtidle': [(i, 64, 80, 78, 96) for i in range(4)],
     'push': [(1, 76, 108, 88, 137), (1, 28, 52, 44, 82), (2, 28, 52, 44, 82)],
@@ -212,8 +217,20 @@ def apply(key, fr, pr=None, src=None, idx=None):
         for i, f in enumerate(fr):
             a = np.array(f); b = np.array(pr[i]); b[:, 95:] = a[:, 95:]; a[:, 95:] = 0
             fr[i] = Image.fromarray(a); pr[i] = Image.fromarray(b)
-    if key == 'shower':
-        fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
+    if key in GPT_CLIPS:                       # GPT 납품(4b904ee): 키가 PixelLab 그림보다 약 10% 커서 발 기준(57,136)으로 0.9배
+        def sc(f, k=0.9):
+            w, h = f.size; s = f.resize((round(w * k), round(h * k)), Image.NEAREST)
+            o = Image.new('RGBA', (w, h)); o.alpha_composite(s, (round(57 - 57 * k), round(136 - 136 * k) - 2)); return o   # -2: 발바닥 y137 → 135(PixelLab과 같게)
+        def suit(f):                           # 검정 정장 → 쟈알디 청회색 정장 명암(PixelLab 대기 장에서 뽑은 색). 외곽선(아주 어두운 색)·피부·수건은 그대로
+            a = np.array(f); c = a[:, :, :3].astype(float); l = c.mean(2)
+            m = (a[:, :, 3] > 0) & (c.max(2) - c.min(2) < 15) & (c[:, :, 2] >= c[:, :, 0]) & (l >= 16) & (l < 75)
+            stops = [(16, (26, 30, 33)), (30, (38, 42, 46)), (31, (46, 53, 60)), (48, (65, 78, 86)), (75, (80, 95, 108))]
+            out = np.zeros_like(c)
+            for (l0, c0), (l1, c1) in zip(stops, stops[1:]):
+                seg = m & (l >= l0) & (l < l1); t = ((l - l0) / max(1, l1 - l0))[seg][:, None]
+                out[seg] = np.array(c0) + (np.array(c1) - np.array(c0)) * t
+            a[:, :, :3][m] = out[m].round().astype(np.uint8); return Image.fromarray(a)
+        fr = [suit(sc(f)) for f in fr]
     if key == 'pipe':                          # 16:40 재생성본: 떨어진 조각만 지움(옛 덧그림·갈고리 보정은 옛 그림용이라 뺌)
         fr = [keep_main(f) for f in fr]
         for i, raw in enumerate(idx):          # 내려친 장(pipe3 2번) 손 위 회색 갈고리: 손목보다 위의 밝은 회색

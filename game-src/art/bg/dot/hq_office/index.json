@@ -79,6 +79,78 @@
    127
   ]
  },
+ "objects/hq_office_objects_10": {
+  "w": 98,
+  "h": 76,
+  "foot": [
+   49,
+   76
+  ]
+ },
+ "objects/hq_office_objects_11": {
+  "w": 107,
+  "h": 79,
+  "foot": [
+   53,
+   79
+  ]
+ },
+ "objects/hq_office_objects_12": {
+  "w": 49,
+  "h": 61,
+  "foot": [
+   24,
+   61
+  ]
+ },
+ "objects/hq_office_objects_13": {
+  "w": 159,
+  "h": 109,
+  "foot": [
+   79,
+   109
+  ]
+ },
+ "objects/hq_office_objects_14": {
+  "w": 97,
+  "h": 79,
+  "foot": [
+   48,
+   79
+  ]
+ },
+ "objects/hq_office_objects_15": {
+  "w": 105,
+  "h": 46,
+  "foot": [
+   52,
+   46
+  ]
+ },
+ "objects/hq_office_objects_16": {
+  "w": 9,
+  "h": 13,
+  "foot": [
+   4,
+   13
+  ]
+ },
+ "objects/hq_office_objects_17": {
+  "w": 15,
+  "h": 13,
+  "foot": [
+   7,
+   13
+  ]
+ },
+ "objects/hq_office_objects_18": {
+  "w": 28,
+  "h": 19,
+  "foot": [
+   14,
+   19
+  ]
+ },
  "hq_office_wall_1": {
   "w": 320,
   "h": 220
@@ -92,6 +164,14 @@
   "h": 220
  },
  "hq_office_wall_4": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_office_wall_5": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_office_wall_6": {
   "w": 320,
   "h": 220
  }

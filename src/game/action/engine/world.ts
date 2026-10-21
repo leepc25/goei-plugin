@@ -70,6 +70,8 @@ export class World implements WorldView {
   encWave = 0;
   encBodies: Body[] = [];
   goT = 0;
+  /** 메뉴로 멈춤: 겹쳐 그릴 안내(GO 등)를 숨긴다 */
+  paused = false;
   /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
   cutin = 0;
   showBoxes = false;
@@ -399,14 +401,15 @@ export class World implements WorldView {
     if (r.kind === 'guard') {
       a.stop = Math.max(a.stop, 3);
       t.stop = Math.max(t.stop, 3);
-      if (this.hitFx) this.fx('spark', at.x, at.y, at.z);
+      this.fx('spark', at.x, at.y, at.z);
       return;
     }
     a.stop = Math.max(a.stop, stop);
     t.stop = Math.max(t.stop, stop);
     const strength = h.strength ?? (h.react === 'down' || h.react === 'launch' ? 3 : h.react === 'stagger' ? 2 : 1);
+    // 맞은 자리 번쩍임(빛살)은 늘 엔진이 그린다. 고리·흔들림은 껍데기 fx가 있으면 껍데기가
+    this.fx(strength >= 3 ? 'spark-big' : 'spark', at.x, at.y, at.z);
     if (this.hitFx) {
-      this.fx(strength >= 3 ? 'spark-big' : 'spark', at.x, at.y, at.z);
       if (strength >= 2) this.fx('ring', at.x, at.y, at.z, String(strength));
       if (strength >= 3) this.shake(6, 3);
     }

@@ -179,8 +179,8 @@ def main():
         if d['key'] == 'lookback':
             fr, pr = jyaldi_fixes.lookback_frames(frames_of('idle')), None
             idx = list(range(len(fr))); d = dict(d, src='idle')   # 장 번호는 아래에서 기본 대기 장 번호로 바꿔 손 좌표를 뽑음
-        # Bathroom clips are reviewed explicitly; preserve the commissioned 4/6 frames.
-        bathroom = {'showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout', 'toiletin', 'toilet', 'toiletout', 'handwash'}
+        # Bathroom clips are reviewed explicitly; preserve every commissioned frame.
+        bathroom = {'undress', 'showerturn', 'showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout', 'toiletin', 'toilet', 'toiletout', 'handwash'}
         if d.get('group', '').startswith('전투') is False and fr and d['key'] not in bathroom | {'lookback'}:
             idx = idx[:len(auto_trim(fr))]
         if d['order'] and idx:

@@ -52,3 +52,14 @@
 .gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}
 /* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */
 @media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}
+/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */
+.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}
+.gsy-video[hidden]{display:none}
+.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.gsy-vsub{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);max-width:min(86%,900px);margin:0;padding:8px 14px;background:rgba(0,0,0,.72);border-radius:8px;font-size:clamp(13px,2.4vh,20px);line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0}
+.gsy-vsub[hidden]{display:none}
+.gsy-vsub b{color:#e8c66a;font-weight:700;margin-right:4px}
+.gsy-vskip,.gsy-vsound{position:absolute;top:12px;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer}
+.gsy-vskip{right:12px}
+.gsy-vsound{left:12px}
+.gsy-vsound[hidden]{display:none}

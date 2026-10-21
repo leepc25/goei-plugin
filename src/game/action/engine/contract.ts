@@ -10,7 +10,8 @@
 export const TICK_HZ = 30;
 export const SCREEN_W = 1280;
 export const SCREEN_H = 720;
-export const PIXEL = 2;
+/** 도트 1px = 논리 2.75px: 쟈알디 몸(약 93px 도트)이 화면에서 약 256px (규격 2장, 검수 8번) */
+export const PIXEL = 2.75;
 
 /** 월드 AABB. x0<x1, z0<z1(높이). 깊이는 y ± dy (기본 dy 18) 안에 있어야 겹친다 */
 export interface WBox { x0: number; x1: number; z0: number; z1: number; y: number; dy?: number }

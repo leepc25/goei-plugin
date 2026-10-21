@@ -12,11 +12,12 @@ import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
 import { CUTSCENES, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
+import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubPlace } from './hub';
 import { PLACES } from '../hq/data';
 import { openPlaces } from '../hq/logic';
-import { drawTitleBg } from '../ui';
+import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
@@ -147,7 +148,7 @@ function hudState(w: World, shell: Shell): HudState {
     gauge: p.gauge,
     armor: p.armor,
     weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
-    items: w.items.map((it) => ({ label: it?.label ?? '', count: it?.n ?? 0 })),
+    items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
     money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
@@ -175,6 +176,7 @@ export interface Wiring {
 
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
   setSupplyCatalog(SUPPLY_CATALOG as never);
+  setHudItemIcon(drawItemIcon as never);
   setItemIconDrawer(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   let game: Game | null = null;
@@ -300,9 +302,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
             if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
           }
         }
-        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 270) * k, maxX };
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
+      paused: () => shell.paused,
     },
     { saved: savedFlags },
   );
@@ -384,14 +387,25 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (name === 'title' || name === 'hq') audio.floor(name as never);
       if (name === 'hq') shell.play(); // 본부도 걷는 장면: 타이틀 메뉴 닫고 조작·터치 켜기
     },
-    onPause: (p) => (p ? audio.pause() : audio.resume()),
+    onPause: (p) => {
+      if (p) audio.pause();
+      else audio.resume();
+      // 메뉴가 열리면 말풍선·GO 표시를 숨긴다
+      storyRoot.style.visibility = p ? 'hidden' : '';
+      if (world) world.paused = p;
+    },
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent as AgentId;
-      // 첫 출동이면 첫 투입 컷신 (본부·시연방 제외)
+      // 첫 출동: 화면을 가리는 컷신 대신 바로 조작하면서 말풍선 세 줄 (검은 화면 10초 금지, 검수 2번)
       if (run.stageId !== 'hq' && (run as Launch).launch && local('goei-first-entry').load() !== '1') {
         local('goei-first-entry').save('1');
-        queueMicrotask(() => story.cutscene('first_entry'));
+        const lines: [SpeakerId, string, number][] = [
+          ['elevator', '띵. 1층입니다. 문이 열립니다.', 300],
+          ['radio', '(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.', 2000],
+          ['agent', '로비 같은데, 로비가 아니다.', 5200],
+        ];
+        for (const [who, text, at] of lines) setTimeout(() => world === w && story.bark(who, text, 2800), at);
       }
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
