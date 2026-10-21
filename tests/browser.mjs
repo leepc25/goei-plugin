@@ -2305,6 +2305,15 @@ if (fixture.globalLore.some(packed)) {
   }
   await page.click('[data-action="game-close"]');
   const closed = await heapMB();
+  // 닫은 뒤 남은 것 세기 (엔진 정리 확인용)
+  const alive = {};
+  for (const name of ['HTMLCanvasElement', 'CanvasRenderingContext2D', 'AudioContext', 'HTMLImageElement', 'ImageBitmap', 'Map', 'Set']) {
+    const proto = await cdp.send('Runtime.evaluate', { expression: `typeof ${name} === 'function' ? ${name}.prototype : null` });
+    if (!proto.result.objectId) continue;
+    const q = await cdp.send('Runtime.queryObjects', { prototypeObjectId: proto.result.objectId });
+    const n = await cdp.send('Runtime.callFunctionOn', { objectId: q.objects.objectId, functionDeclaration: 'function () { return this.length; }', returnByValue: true });
+    alive[name] = n.result.value;
+  }
   const st = await page.evaluate(() => ({ code: { ...window.__goeiGameStats.code }, fetch: { ...window.__goeiGameStats.fetch }, urls: window.__goeiGameStats.urls() }));
   // 저장해 둔 코드를 새 페이지에서 꺼내 실행하는 시간 (본체의 메모리 캐시 없이)
   const stored = await page.evaluate(() => window.__store['p:goei:game:code']);
@@ -2356,7 +2365,7 @@ if (fixture.globalLore.some(packed)) {
     cpu: '4x 느리게',
     homeMs, getMs, getRequests: st.fetch.requests, getKB: Math.round(st.fetch.bytes / 1024), playMs,
     warm: { clickToCanvasMs: warmMs, readMs: warm.readMs, runMs: warm.runMs, mountMs: warm.mountMs },
-    heapMB: { base, playing, afterClose: cycles, final: closed }, liveUrlsAfterClose: st.urls,
+    heapMB: { base, playing, afterClose: cycles, final: closed }, aliveAfterClose: alive, liveUrlsAfterClose: st.urls,
     bigPack: { MB: +(big / 1048576).toFixed(1), installMs, storedMB: +(storedLen / 1048576).toFixed(1) },
   };
   console.log('MEASURE 게임 창', JSON.stringify(report));
