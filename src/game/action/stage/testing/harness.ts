@@ -1,5 +1,5 @@
-// 시연판용 대역 엔진. 「게임 전투와 조작」의 진짜 엔진이 오기 전에, 같은 계약(engine/contract.ts)으로 층 모듈을 돌려 본다.
-// 플레이어·적은 회색 상자, 전투는 최소(근접 한 가지). 층 생성·규칙·정비 구역·승강기를 걸어서 확인하는 것이 목적이다.
+// 시험용 대역 엔진 (그리기 없음). 같은 계약(engine/contract.ts)으로 층 모듈을 머리 없이 돌려
+// tests/stage.test.mjs가 자동 조작으로 로비 → 지하 → 정비 구역 → 로프 귀환을 완주하는지 본다. 게임 화면은 엔진 몫.
 import type { Body, FloorPlan, GameEvent, Hit, HitResult, PlayerState, PropSpec, SpawnSpec, StageApi, StageModule, WBox, WorldView } from '../../engine/contract';
 import type { StagePlan } from '../plan';
 
@@ -31,38 +31,12 @@ interface Enemy {
   enc: number;
 }
 
-const ENEMY_LABEL: Record<string, string> = {
-  lurker: '해롭지 않아 보이는 것',
-  shooter: '창구 직원',
-  hum: '발소리',
-  shade: '얼룩',
-  crawler: '다리 많은 새끼',
-  charger: '돌진하는 것',
-  resident: '사는 척하는 주민',
-  warmth: '체온을 재는 것',
-  toucher: '만지는 것',
-  predator: '포식자',
-  thief: '보급품 도둑',
-  nothuman: '더는 사람이 아닌 것',
-  guard: '낡은 제복의 경비원',
-  conductor: '낡은 제복의 차장',
-  noise: '소리와 냄새',
-  shadow: '그림자',
-  legs: '다리 많은 것',
-  shape: '불가능한 입체 도형',
-  elder: '405호 노부부',
-  family208: '208호 가족',
-  risenhouse: '일어난 집',
-};
-
 export class DemoEngine {
   plan!: StagePlan;
   props: PropSpec[] = [];
   enemies: Enemy[] = [];
   p = { x: 200, y: 590, z: 0, vz: 0, dir: 1 as 1 | -1, hp: 160, hpMax: 160, running: false, crouching: false, airborne: false, atk: 0, hurtT: 0, inv: 0 };
   tick = 0;
-  /** 화면 논리 폭 (세로 폰은 좁게) */
-  viewW = 1280;
   noise = 0;
   light = 1;
   bounds: [number, number] = [0, 99999];
@@ -105,7 +79,7 @@ export class DemoEngine {
     this.encDone.clear();
     this.encActive = -1;
     this.bounds = [0, plan.length];
-    const lane = plan.lane ?? [500, 680];
+    const lane = plan.lane ?? [440, 690];
     this.p.x = plan.startX;
     this.p.y = Math.max(lane[0], Math.min(lane[1], (lane[0] + lane[1]) / 2));
     this.p.z = 0;
@@ -135,7 +109,7 @@ export class DemoEngine {
         return self.plan as FloorPlan;
       },
       get lane() {
-        return (self.plan.lane ?? [500, 680]) as [number, number];
+        return (self.plan.lane ?? [440, 690]) as [number, number];
       },
       get bounds() {
         return self.bounds;
@@ -265,7 +239,7 @@ export class DemoEngine {
     if (this.ended) return;
     this.tick++;
     const p = this.p;
-    const lane = this.plan.lane ?? [500, 680];
+    const lane = this.plan.lane ?? [440, 690];
     p.inv -= DT;
     p.hurtT -= DT;
     for (const s of this.says) s.t -= DT;
@@ -398,154 +372,4 @@ export class DemoEngine {
       }
     }
   }
-
-  // ── 그리기
-  draw(ctx: CanvasRenderingContext2D) {
-    const p = this.p;
-    const vw = this.viewW;
-    const camX = Math.max(this.bounds[0], Math.min(Math.max(this.bounds[0], this.bounds[1] - vw), p.x - vw * 0.42));
-    ctx.save();
-    ctx.fillStyle = '#05070a';
-    ctx.fillRect(0, 0, vw, 720);
-    const sx = this.shakeT ? (this.rand() - 0.5) * this.shakeP * 2 : 0;
-    ctx.translate(-camX + sx, 0);
-    this.plan.drawBackground?.(ctx, camX);
-    // 소품
-    const things: { y: number; draw: () => void }[] = [];
-    const near = this.nearestProp();
-    for (const pr of this.props)
-      things.push({
-        y: pr.y - 1,
-        draw: () => {
-          const top = pr.y - pr.h - (pr.kind === 'hatch' ? 260 : 0);
-          ctx.fillStyle = propColor(pr.kind);
-          ctx.globalAlpha = pr.kind === 'shutter' && !pr.solid ? 0.25 : 1;
-          ctx.fillRect(pr.x - pr.w / 2, top, pr.w, pr.h);
-          ctx.globalAlpha = 1;
-          ctx.strokeStyle = pr === near ? '#fff' : 'rgba(0,0,0,0.6)';
-          ctx.lineWidth = pr === near ? 3 : 1;
-          ctx.strokeRect(pr.x - pr.w / 2, top, pr.w, pr.h);
-          if (pr.label) {
-            ctx.font = pr === near ? 'bold 15px sans-serif' : '13px sans-serif';
-            ctx.fillStyle = pr === near ? '#fff' : 'rgba(255,255,255,0.75)';
-            ctx.textAlign = 'center';
-            ctx.fillText(pr.label, pr.x, top - 6);
-            ctx.textAlign = 'left';
-          }
-        },
-      });
-    for (const e of this.enemies)
-      things.push({
-        y: e.y,
-        draw: () => {
-          if (!e.alive) return;
-          const hidden = this.light < 0.35 && Math.abs(e.x - p.x) > 140;
-          const invisible = e.kind === 'hum' || e.kind === 'noise';
-          const w = e.boss ? 110 : e.kind === 'crawler' || e.kind === 'shade' ? 90 : 56,
-            h = e.boss ? 190 : e.kind === 'crawler' ? 60 : e.kind === 'shade' ? 30 : 130;
-          if (hidden || (invisible && this.tick % 40 > 6)) {
-            // 발소리·냄새 파문으로만
-            ctx.strokeStyle = 'rgba(200,220,255,0.35)';
-            ctx.beginPath();
-            ctx.ellipse(e.x, e.y, 30 + (this.tick % 30) * 2, 8 + (this.tick % 30) * 0.5, 0, 0, Math.PI * 2);
-            ctx.stroke();
-            return;
-          }
-          ctx.fillStyle = e.flash > 0 ? '#fff' : e.boss ? '#a3263a' : e.elite ? '#c46a2a' : e.kind === 'toucher' || e.kind === 'warmth' ? '#6a6a7a' : '#8a3b3b';
-          ctx.fillRect(e.x - w / 2, e.y - h - e.z, w, h);
-          if (e.wind > 0) {
-            ctx.strokeStyle = '#ffeb3b';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(e.x - w / 2 - 4, e.y - h - 4, w + 8, h + 8);
-          }
-          ctx.font = '13px sans-serif';
-          ctx.fillStyle = '#ffd0d0';
-          ctx.textAlign = 'center';
-          ctx.fillText(`${ENEMY_LABEL[e.kind] ?? e.kind}${e.boss ? ' (수호자 자리)' : ''}`, e.x, e.y - h - 10);
-          if (e.max < 9000) {
-            ctx.fillStyle = '#300';
-            ctx.fillRect(e.x - 30, e.y - h - 30, 60, 5);
-            ctx.fillStyle = '#e44';
-            ctx.fillRect(e.x - 30, e.y - h - 30, (60 * Math.max(0, e.hp)) / e.max, 5);
-          }
-          ctx.textAlign = 'left';
-        },
-      });
-    things.push({
-      y: p.y,
-      draw: () => {
-        const h = p.crouching ? 70 : 130;
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.beginPath();
-        ctx.ellipse(p.x, p.y, 30, 8, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = p.inv > 0 && this.tick % 4 < 2 ? '#fff' : this.run.agent === 'eileen' ? '#3c8ad9' : '#d94b3c';
-        ctx.fillRect(p.x - 22, p.y - h - p.z, 44, h);
-        ctx.fillStyle = '#ffe';
-        ctx.fillRect(p.dir === 1 ? p.x + 8 : p.x - 20, p.y - h - p.z + 14, 12, 8);
-        if (p.atk > 0.15) {
-          ctx.fillStyle = 'rgba(255,255,255,0.5)';
-          ctx.fillRect(p.dir === 1 ? p.x + 22 : p.x - 110, p.y - 100 - p.z, 88, 30);
-        }
-      },
-    });
-    things.sort((a, b) => a.y - b.y).forEach((t) => t.draw());
-    this.plan.drawForeground?.(ctx, camX, this.world);
-    // 잠긴 구간 표시
-    if (this.encActive >= 0) {
-      ctx.fillStyle = 'rgba(255,60,60,0.5)';
-      ctx.fillRect(this.bounds[0], 100, 6, 620);
-      ctx.fillRect(this.bounds[1] - 6, 100, 6, 620);
-    }
-    ctx.restore();
-    return camX;
-  }
-}
-
-function propColor(kind: string): string {
-  return (
-    {
-      elevator: '#8d8f86',
-      panel: '#e0b84a',
-      mirror: '#9fc7d8',
-      checklist: '#e8e2c8',
-      door: '#6b4a2b',
-      shutter: '#555c66',
-      switch: '#c9a8ff',
-      hatch: '#c7883a',
-      servicedoor: '#c7883a',
-      sign: '#f1d24a',
-      goalwall: '#7ad0ff',
-      mark: '#7affc4',
-      table: '#a2603a',
-      item: '#5fd06b',
-      pack: '#5fd06b',
-      belonging: '#e0a0ff',
-      symbol: '#cccccc',
-      chasedoor: '#7a2f2f',
-      passenger: '#bfb59a',
-      npc: '#a8a08a',
-      choice: '#2e6b8f',
-      b12: '#ff3030',
-      up: '#c7883a',
-      down: '#c7883a',
-      ladder_up: '#9a7a4a',
-      ladder_down: '#9a7a4a',
-      left: '#6a5a3a',
-      right: '#6a5a3a',
-      rope: '#f0d090',
-      bed: '#6a7a5a',
-      intercom: '#e0b84a',
-      memo: '#e8e2c8',
-      map: '#e8e2c8',
-      gear: '#8ab',
-      merchant: '#b090e0',
-      fall: '#000000',
-      greet: '#e0b84a',
-      close: '#e05a4a',
-      button: '#ffd27a',
-      getoff: '#8d8f86',
-      van: '#3a4a6a',
-    } as Record<string, string>
-  )[kind] ?? '#777';
 }

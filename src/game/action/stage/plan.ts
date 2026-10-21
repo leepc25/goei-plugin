@@ -88,7 +88,7 @@ export function cellPlan(z: ServiceZone, cell: ServiceCell, id: string, startX: 
     type: 'service',
     depth: z.depth,
     length: cell.width,
-    lane: [560, 660],
+    lane: [Y_TOP, Y_BOTTOM],
     startX,
     exitX: Infinity,
     encounters: [],
@@ -104,13 +104,13 @@ export function cellPlan(z: ServiceZone, cell: ServiceCell, id: string, startX: 
 
 export function carPlan(id: string, buttons: ElevatorButton[], depth: number): StagePlan {
   const props: PropSpec[] = [
-    { id: 'getoff', kind: 'getoff', x: 90, y: 500, w: 60, h: 160, label: '내렸다 다시 타기' },
-    { id: 'greet', kind: 'greet', x: 260, y: 500, w: 60, h: 110, label: '인사하기 (E)' },
-    { id: 'mirror', kind: 'mirror', x: 420, y: 500, w: 70, h: 150, label: '거울' },
-    { id: 'close', kind: 'close', x: 600, y: 500, w: 40, h: 60, label: '닫힘 버튼' },
+    { id: 'getoff', kind: 'getoff', x: 90, y: Y_TOP, w: 60, h: 160, label: '내렸다 다시 타기' },
+    { id: 'greet', kind: 'greet', x: 260, y: Y_TOP, w: 60, h: 110, label: '인사하기 (E)' },
+    { id: 'mirror', kind: 'mirror', x: 420, y: Y_TOP, w: 70, h: 150, label: '거울' },
+    { id: 'close', kind: 'close', x: 600, y: Y_TOP, w: 40, h: 60, label: '닫힘 버튼' },
   ];
   buttons.forEach((b, i) =>
-    props.push({ id: `btn${i}`, kind: 'button', x: 760 + i * 120, y: 500, w: 60, h: 60, label: b.exit ? 'EXIT' : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : ' · ?'}` }),
+    props.push({ id: `btn${i}`, kind: 'button', x: 760 + i * 120, y: Y_TOP, w: 60, h: 60, label: b.exit ? 'EXIT' : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : ' · ?'}` }),
   );
   const pal: Palette = { wall: '#5d5146', floor: '#3a332c', trim: '#221d18', accent: '#ffcf70', fog: 'rgba(0,0,0,0)' };
   const segs: FloorSegment[] = [{ ref: 'room:car', x: 0, w: ROOM_W, flip: false, terrain: [] }];
@@ -120,7 +120,7 @@ export function carPlan(id: string, buttons: ElevatorButton[], depth: number): S
     type: 'car',
     depth,
     length: ROOM_W,
-    lane: [540, 660],
+    lane: [Y_TOP, Y_BOTTOM],
     startX: 160,
     exitX: Infinity,
     encounters: [],
@@ -146,7 +146,7 @@ export function endingPlan(id: string): StagePlan {
     startX: 200,
     exitX: Infinity,
     encounters: [],
-    props: [{ id: 'van', kind: 'van', x: 1000, y: 500, w: 220, h: 140, label: '관리국 차량 (귀환)' }],
+    props: [{ id: 'van', kind: 'van', x: 1000, y: Y_TOP, w: 220, h: 140, label: '관리국 차량 (귀환)' }],
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: '문을 열고 나왔다. 로비였다. 진짜.',
     stage: { where: 'ending', terrain: [], fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } },
@@ -163,40 +163,61 @@ export function segAt(segs: FloorSegment[], x: number): FloorSegment {
   return segs.find((s) => x >= s.x && x < s.x + s.w) ?? segs[segs.length - 1];
 }
 
-// ── 그리기 (회색 상자). 화면 y = 깊이 y − z. 벽은 Y_TOP 위.
-const WALL_TOP = 150;
+// ── 그리기 (회색 상자). 시점은 벨트스크롤(docs/게임_통합_규격.md 2장): 벽 0~Y_TOP, 바닥 띠 Y_TOP~Y_BOTTOM에 원근.
+// 화면 y = 깊이 y − z. 바닥 앞뒤 줄은 앞으로 올수록 넓어지고, 세로 이음매는 화면 가운데 위 소실점으로 모인다.
+const CEIL = 40;
 function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegment[], pal: Palette, plan: StagePlan) {
   const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
   const vx0 = camX - 40,
     vx1 = camX + 1320;
+  const cx = camX + 640;
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
+    // 벽
     ctx.fillStyle = pal.wall;
-    ctx.fillRect(s.x, WALL_TOP, s.w, y0 - WALL_TOP);
-    // 조각 경계 표시 (반 화면 단위가 보이게)
+    ctx.fillRect(s.x, CEIL, s.w, y0 - CEIL);
     ctx.fillStyle = pal.trim;
-    ctx.fillRect(s.x, WALL_TOP, 3, y0 - WALL_TOP);
-    ctx.fillRect(s.x, y0 - 14, s.w, 14);
-    // 천장
-    ctx.fillRect(s.x, WALL_TOP - 20, s.w, 20);
+    ctx.fillRect(s.x, 0, s.w, CEIL);
+    ctx.fillRect(s.x, y0 - 18, s.w, 18);
+    ctx.fillRect(s.x, CEIL, 3, y0 - CEIL);
+    // 벽 위쪽 띠 (몰딩)
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(s.x, CEIL + 40, s.w, 8);
+    // 바닥 (원근)
     ctx.fillStyle = pal.floor;
-    ctx.fillRect(s.x, y0, s.w, y1 - y0 + 30);
-    // 바닥 깊이 줄
-    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    ctx.lineWidth = 1;
-    for (let k = 1; k < 3; k++) {
-      const yy = y0 + ((y1 - y0) * k) / 3;
+    ctx.fillRect(s.x, y0, s.w, 720 - y0);
+    ctx.strokeStyle = 'rgba(0,0,0,0.28)';
+    ctx.lineWidth = 2;
+    // 앞뒤 줄: 3줄 이상, 앞으로 올수록 간격이 넓다
+    for (const f of [0.12, 0.28, 0.48, 0.72]) {
+      const yy = y0 + (y1 - y0) * f;
       ctx.beginPath();
       ctx.moveTo(s.x, yy);
       ctx.lineTo(s.x + s.w, yy);
       ctx.stroke();
     }
-    ctx.fillStyle = room ? pal.accent : 'rgba(255,255,255,0.35)';
+    // 세로 이음매: 위는 소실점 쪽으로 좁아진다
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    for (let x = Math.ceil(s.x / 120) * 120; x < s.x + s.w; x += 120) {
+      ctx.beginPath();
+      ctx.moveTo(cx + (x - cx) * 0.78, y0);
+      ctx.lineTo(cx + (x - cx) * 1.12, 720);
+      ctx.stroke();
+    }
+    // 앞쪽 그늘
+    const g = ctx.createLinearGradient(0, y0, 0, y0 + 40);
+    g.addColorStop(0, 'rgba(0,0,0,0.35)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(s.x, y0, s.w, 40);
+    ctx.fillStyle = room ? pal.accent : 'rgba(255,255,255,0.3)';
     ctx.font = '14px monospace';
-    ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, WALL_TOP + 18);
-    for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1);
+    ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, CEIL + 24);
   }
+  // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1);
   void CHUNK_W;
 }
 
@@ -209,27 +230,33 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
   switch (t.kind) {
     case 'pit': {
       ctx.fillStyle = '#000';
-      ctx.fillRect(t.x0, y0 - 2, w, y1 - y0 + 34);
+      ctx.fillRect(t.x0, y0 - 2, w, 720 - y0 + 2);
       ctx.strokeStyle = '#ff5050';
       ctx.setLineDash([6, 6]);
-      ctx.strokeRect(t.x0, y0, w, y1 - y0 + 30);
+      ctx.strokeRect(t.x0, y0, w, 720 - y0);
       ctx.setLineDash([]);
-      label(ctx, '구덩이 (점프)', t.x0 + 4, y1 + 20, '#ff8080');
+      label(ctx, '구덩이 (점프)', t.x0 + 4, y0 + 20, '#ff8080');
       break;
     }
     case 'block':
+      // 바닥 띠 전체를 가로지르는 단: 윗면(밝게) + 앞면
       ctx.fillStyle = pal.trim;
       ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0 + t.h);
       ctx.fillStyle = 'rgba(255,255,255,0.12)';
-      ctx.fillRect(t.x0, y0 - t.h, w, 6);
+      ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(t.x0, y1 - t.h, w, t.h);
       label(ctx, `단 ${t.h} (점프)`, t.x0 + 4, y0 - t.h - 6, '#ddd');
       break;
     case 'low':
-      ctx.fillStyle = '#5b5b5b';
-      ctx.fillRect(t.x0, y0 - 160, w, 40);
+      // 머리 높이로 내려온 배관 (바닥 띠 전체 위)
+      ctx.fillStyle = 'rgba(90,90,90,0.85)';
+      ctx.fillRect(t.x0, y0 - 230, w, 46);
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 160, 4, 40);
-      label(ctx, '낮은 천장 (↓ 앉아서)', t.x0 + 4, y0 - 166, '#ffd27a');
+      for (let x = t.x0; x < t.x1; x += 24) ctx.fillRect(x, y0 - 230, 4, 46);
+      ctx.fillStyle = 'rgba(255,210,120,0.08)';
+      ctx.fillRect(t.x0, y0, w, y1 - y0);
+      label(ctx, '낮은 천장 (앉아서)', t.x0 + 4, y0 - 236, '#ffd27a');
       break;
     case 'narrow': {
       ctx.fillStyle = 'rgba(0,0,0,0.55)';
@@ -253,7 +280,7 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
         ctx.lineTo(x + 12, y0 + ((x * 13) % (y1 - y0)));
         ctx.stroke();
       }
-      label(ctx, '깨진 유리 (소리)', t.x0 + 4, y1 + 20, '#bfe8ff');
+      label(ctx, '깨진 유리 (소리)', t.x0 + 4, y0 + 20, '#bfe8ff');
       break;
   }
 }

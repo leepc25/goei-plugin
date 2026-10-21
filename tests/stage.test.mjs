@@ -1,4 +1,4 @@
-// 차원 승강기 층 생성 시험. 스스로 묶어서 돌린다 (scripts/build-stage.mjs와 같은 입력).
+// 차원 승강기 층 생성 시험. 스스로 묶어서 돌린다.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
@@ -6,7 +6,7 @@ import { mkdirSync } from 'node:fs';
 
 mkdirSync('dist-test', { recursive: true });
 await build({ entryPoints: ['src/game/action/stage/index.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/stage.mjs', loader: { '.css': 'text' }, logLevel: 'error' });
-await build({ entryPoints: ['src/game/action/stage/demo/engine.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/stage-engine.mjs', logLevel: 'error' });
+await build({ entryPoints: ['src/game/action/stage/testing/harness.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/stage-engine.mjs', logLevel: 'error' });
 const S = await import('../dist-test/stage.mjs');
 const { DemoEngine } = await import('../dist-test/stage-engine.mjs');
 
@@ -174,10 +174,10 @@ function bot(eng) {
     if ((t.kind === 'pit' || t.kind === 'block') && !p.airborne) k.jump = true;
     if (t.kind === 'low') k.crouch = true;
     if (t.kind === 'narrow') (lo = Math.max(lo, t.lane0)), (hi = Math.min(hi, t.lane1));
-    if (t.kind === 'redfloor') k.y = p.y > 590 ? -1 : 1;
+    if (t.kind === 'redfloor') k.y = p.y > 565 ? -1 : 1;
   }
   if (lo > 0 || hi < 160) {
-    const ty = 500 + ((lo + hi) / 2 / 160) * 180;
+    const ty = 440 + ((lo + hi) / 2 / 160) * 250;
     if (Math.abs(ty - p.y) > 4) k.y = Math.sign(ty - p.y);
   }
   if (k.crouch) k.jump = false;
