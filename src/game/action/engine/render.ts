@@ -89,7 +89,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     for (const p of w.props) {
       const sx = p.x - camX;
       if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
-      if (p.kind === 'hubdoor') continue; // 본부 문은 층 배경이 그린다
+      if (p.kind === 'hubdoor' || p.kind === 'hubspot') continue; // 본부 문·자리는 본부 장면(hub.ts)이 그린다
       if (p.actor) {
         // 사람 대역: 플레이어 클립을 색만 바꿔서
         const a = p.actor;

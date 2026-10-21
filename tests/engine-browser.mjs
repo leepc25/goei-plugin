@@ -85,7 +85,7 @@ try {
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await page.waitForTimeout(300);
   await S(page, 'pc-hq');
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'jaemtri'); w.player.x = d.x; });
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'spot:jaemtri'); w.player.x = d.x; });
   await page.waitForTimeout(100);
   await page.keyboard.press('KeyE');
   await page.waitForSelector('[data-mission]', { state: 'visible' });

@@ -1,136 +1,355 @@
-// 본부 걷는 화면: 엔진 벨트 장면 (게임_통합_규격 2·4장). 장소 자료와 메뉴 창은 본부 모듈(hq/)이 주고, 엔진은 걷기·그리기만 한다.
-// 장소마다 벽 색·간판·문, 동료는 플레이어 클립을 색만 바꾼 대역. 문 앞에서 E → 본부 모듈이 그 장소 메뉴 창을 연다.
-import type { FloorPlan, PropSpec, StageModule, WorldView } from './contract';
-import { SCREEN_H } from './contract';
-import { HQ_PLACE, drawFloor, drawWallCrop } from '../art/bg';
+// 본부 걷는 화면: 엔진 벨트 장면 (게임_통합_규격 2·4장, docs/본부_평면도.md).
+// 건물 지도(장면·문·엘리베이터·자리·가구)는 본부 모듈 map()이 주고, 엔진은 걷기·그리기·장면 옮기기만 한다.
+// 장면 하나 = 방 하나 또는 복도 하나. 문 앞 E → 잠깐 암전 뒤 그 문이 이어진 장면, 엘리베이터 → 층 단추, 자리 앞 E → 본부 메뉴 창.
+// 화면에 벽 이름·층·잠김 이유 같은 글씨를 쓰지 않는다. 방 이름은 들어갈 때 위에 1초쯤 작게만. 사람 그림은 없으니 자리 주인은 목소리 말풍선으로.
+import type { FloorPlan, PropSpec, StageApi, StageModule, WorldView } from './contract';
+import { SCREEN_H, SCREEN_W } from './contract';
+import { HQ_PLACE, drawFloor, drawPropArt, drawWallCrop } from '../art/bg';
+import type { HqDoor, HqMapView, HqScene, HqSpot } from '../hq/map';
 
-export interface HubPlace {
-  id: string;
-  name: string;
-  floor?: string;
-  x: number;
-  w: number;
-  npc?: string | null;
-  color?: string;
-  open: boolean;
-  /** 잠겨 있을 때 보일 조건 */
-  opens?: string;
+type Door = HqDoor & { open: boolean };
+type Scene = Omit<HqScene, 'doors' | 'spots'> & { doors: Door[]; spots: (HqSpot & { open: boolean })[] };
+
+export interface HubHost {
+  map(): HqMapView;
+  openPlace(id: string): void;
+  bark(place: string): { who: string; text: string } | null;
+  /** 엘리베이터 층 단추. pick(i) 또는 취소(null) */
+  chooseFloor(opts: { label: string; open: boolean; here: boolean }[], pick: (i: number | null) => void): void;
+  sfx(name: string): void;
 }
 
 const LANE: [number, number] = [440, 690];
-const WALL_TOP = 70;
+const TOP = LANE[0];
+const DOOR_H = 250;
+const FADE = 8;
 
-export function makeHub(places: () => HubPlace[], openPlace: (id: string) => void): StageModule {
-  let cur: HubPlace[] = [];
-  const floor = (): FloorPlan => {
-    cur = places();
-    const length = Math.max(1280, ...cur.map((p) => p.x + p.w + 40));
-    const props: PropSpec[] = [];
-    cur.forEach((p, i) => {
-      if (!p.open) return;
-      props.push({ id: p.id, kind: 'hubdoor', x: p.x + p.w / 2, y: LANE[0], w: Math.min(140, p.w * 0.5), h: 220, label: p.name });
-      if (p.npc && p.npc !== '전원') props.push({ id: `npc-${p.id}`, kind: 'npc', x: p.x + p.w * 0.78, y: LANE[0] + 50, w: 50, h: 200, label: p.npc, actor: { hue: (i * 47) % 360, face: -1 } });
-    });
+const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 110, glass: 150, steel: 120, security: 120, elevator: 150, stairs_up: 120, stairs_down: 120, shop: 130 };
+
+export type Hub = StageModule & { goto(place: string): void };
+
+export function makeHub(host: HubHost, whereIs: (place: string) => { scene: string; x: number }): Hub {
+  let view: HqMapView | null = null;
+  let scene: Scene | null = null;
+  let pending: { scene: string; x: number } | null = null;
+  let enterTick = -1;
+  let fadeOut = 0;
+  let bubble: { who: string; text: string; x: number; t: number } | null = null;
+  let barked: string | null = null;
+
+  const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
+
+  const build = (id: string, x: number): FloorPlan => {
+    view = host.map();
+    const sc = sceneOf(id);
+    scene = sc;
+    barked = null;
+    bubble = null;
+    enterTick = -1;
+    const props: PropSpec[] = [
+      ...sc.doors.map((d) => ({ id: `door:${d.id}`, kind: 'hubdoor', x: d.x, y: TOP, w: DOOR_W[d.kind], h: DOOR_H })),
+      ...sc.spots.map((s) => ({ id: `spot:${s.id}`, kind: 'hubspot', x: s.x, y: TOP, w: 120, h: 10 })),
+    ];
+    const place = HQ_PLACE[sc.look] ?? HQ_PLACE[sc.id] ?? 'hq_office';
     return {
-      id: 'hq',
-      title: '관리국 본부',
+      id: `hq:${sc.id}`,
+      title: sc.name,
       type: 'hq',
-      length,
+      length: Math.max(SCREEN_W, sc.length),
       lane: LANE,
-      startX: (cur.find((p) => p.id === 'office') ?? cur[0])?.x + 120 || 200,
+      startX: Math.max(60, Math.min(sc.length - 60, x)),
       exitX: Infinity,
       props,
       encounters: [],
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
-        const top = LANE[0];
-        // 장소마다 벽 (어둡게 = 잠김)
-        for (const p of cur) {
-          if (p.x + p.w < camX - 40 || p.x > camX + 1320) continue;
-          // 배경 그림(art/bg)이 있으면 그 장소 벽, 없으면 단색
-          const art = HQ_PLACE[p.id] ? drawWallCrop(c, HQ_PLACE[p.id], p.id, p.x, p.w, top) : false;
-          if (!art) {
-            c.fillStyle = p.color ?? '#2b343a';
-            c.fillRect(p.x, WALL_TOP, p.w, top - WALL_TOP);
-          }
-          if (!p.open) {
-            c.fillStyle = 'rgba(0,0,0,0.55)';
-            c.fillRect(p.x, 0, p.w, top);
-          }
-          c.fillStyle = 'rgba(0,0,0,0.25)';
-          c.fillRect(p.x + p.w - 6, WALL_TOP, 26, top - WALL_TOP);
-          // 간판
-          c.fillStyle = 'rgba(0,0,0,0.45)';
-          c.fillRect(p.x + 16, WALL_TOP + 16, p.w - 32, 44);
-          c.fillStyle = p.open ? '#ece6d4' : '#6d767b';
-          c.font = 'bold 22px sans-serif';
+        // 벽: 장면 전체를 이어진 한 벽으로 (칸막이·이름 띠 없음)
+        if (!drawWallCrop(c, place, sc.id, 0, Math.max(SCREEN_W, sc.length), TOP)) {
+          const g = c.createLinearGradient(0, 0, 0, TOP);
+          g.addColorStop(0, '#2a3236');
+          g.addColorStop(1, '#3a4448');
+          c.fillStyle = g;
+          c.fillRect(camX - 40, 0, SCREEN_W + 80, TOP);
+        }
+        c.fillStyle = 'rgba(0,0,0,0.35)';
+        c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
+        if (!drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+          const g = c.createLinearGradient(0, TOP, 0, SCREEN_H);
+          g.addColorStop(0, '#41494c');
+          g.addColorStop(1, '#1d2225');
+          c.fillStyle = g;
+          c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+        }
+        for (const t of sc.things) if (t.wall) thing(c, t, camX);
+        for (const d of sc.doors) door(c, d, camX);
+        for (const t of sc.things) if (!t.wall) thing(c, t, camX);
+      },
+      drawForeground(c: CanvasRenderingContext2D, camX: number, w: WorldView) {
+        if (enterTick < 0) enterTick = w.tick;
+        const age = w.tick - enterTick;
+        const px = w.player.x;
+        // 가까운 문·자리: 작은 E (자리는 짧은 동사)
+        const nd = sc.doors.find((d) => Math.abs(d.x - px) < 60);
+        const ns = !nd ? sc.spots.find((s) => s.open && Math.abs(s.x - px) < 60) : null;
+        if (nd || ns) {
+          const x = (nd?.x ?? ns!.x) - camX;
+          const txt = ns ? `E ${ns.verb}` : 'E';
+          c.font = 'bold 18px sans-serif';
           c.textAlign = 'center';
-          c.fillText(p.name, p.x + p.w / 2, WALL_TOP + 46);
-          c.font = '15px sans-serif';
-          c.fillStyle = '#9aa6ad';
-          if (p.floor) c.fillText(p.floor, p.x + p.w / 2, WALL_TOP + 80);
-          // 문
-          const dw = Math.min(140, p.w * 0.5);
-          const dx = p.x + p.w / 2 - dw / 2;
-          c.fillStyle = p.open ? 'rgba(20,26,30,0.85)' : 'rgba(10,12,14,0.9)';
-          if (!art) c.fillRect(dx, top - 220, dw, 220);
-          c.strokeStyle = 'rgba(236,230,212,0.25)';
-          c.lineWidth = 3;
-          if (!art) c.strokeRect(dx, top - 220, dw, 220);
-          if (!p.open) {
-            c.fillStyle = '#8e9aa1';
-            c.font = '15px sans-serif';
-            c.fillText(`잠김 · ${p.opens ?? ''}`, p.x + p.w / 2, top - 100);
-          }
+          const tw = c.measureText(txt).width + 18;
+          const y = nd ? TOP - DOOR_H - 34 : TOP - 150;
+          c.fillStyle = 'rgba(0,0,0,0.6)';
+          c.fillRect(x - tw / 2, y, tw, 26);
+          c.fillStyle = '#f0d890';
+          c.fillText(txt, x, y + 19);
           c.textAlign = 'left';
         }
-        // 걸레받이와 바닥 (앞뒤 줄 원근)
-        const x0 = camX - 40,
-          x1 = camX + 1320;
-        c.fillStyle = 'rgba(0,0,0,0.4)';
-        c.fillRect(x0, top - 12, x1 - x0, 12);
-        const g = c.createLinearGradient(0, top, 0, SCREEN_H);
-        g.addColorStop(0, '#3c4549');
-        g.addColorStop(1, '#1a1f22');
-        c.fillStyle = g;
-        if (!drawFloor(c, 'hq_office', x0, x1, top, SCREEN_H)) c.fillRect(x0, top, x1 - x0, SCREEN_H - top);
-        c.strokeStyle = 'rgba(255,255,255,0.06)';
-        c.lineWidth = 2;
-        for (const y of [top + 40, top + 100, top + 175, top + 250]) {
-          c.beginPath();
-          c.moveTo(x0, y);
-          c.lineTo(x1, y);
-          c.stroke();
+        // 자리 주인 목소리
+        if (bubble && bubble.t > 0) {
+          bubble.t--;
+          drawBubble(c, `${bubble.who}: ${bubble.text}`, bubble.x - camX, TOP - 190, Math.min(1, bubble.t / 10));
         }
-        const mid = camX + 640;
-        for (let x = Math.floor(x0 / 160) * 160; x < x1 + 400; x += 160) {
-          c.beginPath();
-          c.moveTo(x, top);
-          c.lineTo(x + (x - mid) * 0.45, SCREEN_H);
-          c.stroke();
+        // 방 이름: 들어갈 때 1초쯤 작게
+        if (age < 45) {
+          const a = age < 8 ? age / 8 : age > 35 ? (45 - age) / 10 : 1;
+          c.save();
+          c.globalAlpha = a;
+          c.font = 'bold 22px sans-serif';
+          c.textAlign = 'center';
+          c.fillStyle = 'rgba(0,0,0,0.55)';
+          const tw = c.measureText(sc.name).width + 40;
+          c.fillRect(SCREEN_W / 2 - tw / 2, 96, tw, 36);
+          c.fillStyle = '#ece6d4';
+          c.fillText(sc.name, SCREEN_W / 2, 121);
+          c.restore();
         }
-      },
-      drawForeground(c: CanvasRenderingContext2D, _camX: number, w: WorldView) {
-        // 문 앞 안내
-        const px = w.player.x;
-        const near = cur.find((p) => p.open && Math.abs(p.x + p.w / 2 - px) < 60);
-        if (!near) return;
-        c.font = 'bold 22px sans-serif';
-        c.textAlign = 'center';
-        c.fillStyle = 'rgba(0,0,0,0.6)';
-        c.fillRect(px - 110, w.player.y - 300, 220, 36);
-        c.fillStyle = '#f0d890';
-        c.fillText(`E · ${near.name}`, px, w.player.y - 274);
-        c.textAlign = 'left';
+        // 암전: 들어올 때 밝아지고, 나갈 때 어두워진다
+        const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
+        if (dark > 0) {
+          c.fillStyle = `rgba(0,0,0,${dark})`;
+          c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+        }
       },
     };
   };
+
+  const go = (sceneId: string, x: number) => {
+    pending = { scene: sceneId, x };
+    fadeOut = FADE;
+  };
+  const doorX = (sceneId: string, doorId?: string) => sceneOf(sceneId).doors.find((d) => d.id === doorId)?.x ?? 200;
+
   return {
     id: 'hq',
     label: '본부',
-    firstFloor: () => floor(),
-    nextFloor: () => null,
-    onInteract(_api, _floor, prop) {
-      if (prop.kind === 'hubdoor') openPlace(prop.id);
+    firstFloor: () => {
+      const v = host.map();
+      view = v;
+      const s = pending ?? v.start;
+      pending = null;
+      fadeOut = 0;
+      return build(s.scene, s.x);
+    },
+    nextFloor: () => {
+      const s = pending ?? { scene: scene?.id ?? 'office', x: 400 };
+      pending = null;
+      return build(s.scene, s.x);
+    },
+    tick(a: StageApi) {
+      if (fadeOut > 0 && --fadeOut === 0 && pending) {
+        if (pending.scene === scene?.id) {
+          a.movePlayer(pending.x);
+          pending = null;
+          enterTick = -1;
+        } else a.finish('next');
+      }
+      // 자리에 가까이 가면 주인 목소리 한 줄
+      const px = a.world.player.x;
+      const sp = scene?.spots.find((s) => s.open && Math.abs(s.x - px) < 170);
+      if (sp && sp.place !== barked) {
+        barked = sp.place;
+        const l = host.bark(sp.place);
+        if (l) bubble = { who: l.who, text: l.text, x: sp.x, t: 110 };
+      } else if (!sp) barked = null;
+    },
+    onInteract(_a, _floor, prop) {
+      if (!scene || fadeOut > 0) return;
+      if (prop.kind === 'hubspot') {
+        const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
+        if (s?.open) host.openPlace(s.place);
+        return;
+      }
+      if (prop.kind !== 'hubdoor') return;
+      const d = scene.doors.find((q) => `door:${q.id}` === prop.id);
+      if (!d) return;
+      if (!d.open) return host.sfx('knock');
+      if (d.kind === 'elevator') {
+        const here = scene.id;
+        const opts = view!.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
+        host.chooseFloor(opts, (i) => {
+          if (i == null) return;
+          const e = view!.elevator[i];
+          if (!e?.open || e.scene === here) return;
+          host.sfx('ding');
+          go(e.scene, doorX(e.scene, e.door));
+        });
+        return;
+      }
+      if (!d.to) return;
+      host.sfx(d.kind === 'steel' || d.kind === 'security' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
+      go(d.to, doorX(d.to, d.toDoor));
+    },
+    goto(place: string) {
+      if (!view) return;
+      const t = whereIs(place);
+      go(t.scene, t.x);
     },
   };
+}
+
+/* ───────── 그리기 ───────── */
+
+function thing(c: CanvasRenderingContext2D, t: Scene['things'][number], camX: number) {
+  const sx = t.x - camX;
+  if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+  // 바닥 물건은 벽 밑동(뒷줄) 조금 앞에, 벽 물건은 벽 가운데 높이에
+  const base = t.wall ? TOP - 70 : TOP + 26;
+  if (drawPropArt(c, t.kind, undefined, t.x, base)) return;
+  const x = t.x - t.w / 2;
+  if (!t.wall) {
+    c.fillStyle = 'rgba(0,0,0,0.3)';
+    c.beginPath();
+    c.ellipse(t.x, base, t.w / 2 + 6, 8, 0, 0, Math.PI * 2);
+    c.fill();
+  }
+  const top = Math.min(10, t.h / 4);
+  c.fillStyle = tint(t.kind);
+  c.fillRect(x, base - t.h, t.w, t.h);
+  c.fillStyle = 'rgba(255,255,255,0.12)';
+  c.fillRect(x, base - t.h, t.w, top);
+  c.fillStyle = 'rgba(0,0,0,0.28)';
+  c.fillRect(x, base - top, t.w, top);
+  c.strokeStyle = 'rgba(0,0,0,0.45)';
+  c.lineWidth = 2;
+  c.strokeRect(x, base - t.h, t.w, t.h);
+}
+
+function door(c: CanvasRenderingContext2D, d: Door, camX: number) {
+  const w = DOOR_W[d.kind];
+  const sx = d.x - camX;
+  if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+  if (drawPropArt(c, `hq_${d.kind}`, undefined, d.x, TOP)) return;
+  const x = d.x - w / 2,
+    y = TOP - DOOR_H;
+  // 문틀
+  c.fillStyle = '#1b2023';
+  c.fillRect(x - 8, y - 8, w + 16, DOOR_H + 8);
+  switch (d.kind) {
+    case 'stairs_up':
+    case 'stairs_down': {
+      c.fillStyle = '#0d1012';
+      c.fillRect(x, y, w, DOOR_H);
+      c.fillStyle = '#3a4246';
+      const up = d.kind === 'stairs_up';
+      for (let i = 0; i < 7; i++) {
+        const sy = up ? TOP - 20 - i * 30 : y + 40 + i * 30;
+        const inset = up ? i * 10 : 0;
+        c.fillRect(x + 8 + inset, sy, w - 16 - inset, 8);
+      }
+      c.fillStyle = '#5f6a6f';
+      c.fillRect(x + 4, y + 30, 4, DOOR_H - 30);
+      break;
+    }
+    case 'elevator': {
+      c.fillStyle = '#8a949a';
+      c.fillRect(x, y, w / 2 - 1, DOOR_H);
+      c.fillRect(x + w / 2 + 1, y, w / 2 - 1, DOOR_H);
+      c.fillStyle = 'rgba(255,255,255,0.18)';
+      c.fillRect(x + 6, y, 6, DOOR_H);
+      c.fillRect(x + w / 2 + 7, y, 6, DOOR_H);
+      c.fillStyle = '#ffb34a';
+      c.fillRect(d.x - 14, y - 30, 28, 12);
+      c.fillStyle = '#2c3236';
+      c.fillRect(x + w + 14, y + 110, 16, 34);
+      c.fillStyle = '#d9d2b8';
+      c.fillRect(x + w + 18, y + 116, 8, 8);
+      c.fillRect(x + w + 18, y + 130, 8, 8);
+      break;
+    }
+    case 'glass':
+    case 'main': {
+      c.fillStyle = 'rgba(150,190,205,0.35)';
+      c.fillRect(x, y, w, DOOR_H);
+      c.fillStyle = '#2b3236';
+      c.fillRect(x, y, w, 10);
+      if (d.kind === 'main') c.fillRect(d.x - 3, y, 6, DOOR_H);
+      c.fillStyle = 'rgba(255,255,255,0.25)';
+      c.fillRect(x + 12, y + 20, 8, DOOR_H - 40);
+      c.fillStyle = '#c8c2ad';
+      c.fillRect(d.kind === 'main' ? d.x - 16 : x + w - 22, y + 120, 6, 40);
+      break;
+    }
+    case 'steel':
+    case 'security': {
+      c.fillStyle = d.kind === 'security' ? '#4d585e' : '#5a5f62';
+      c.fillRect(x, y, w, DOOR_H);
+      c.fillStyle = 'rgba(0,0,0,0.25)';
+      for (let i = 1; i < 4; i++) c.fillRect(x, y + i * (DOOR_H / 4), w, 3);
+      c.fillStyle = '#2a2f32';
+      c.fillRect(x + w + 12, y + 110, 20, 32);
+      c.fillStyle = d.open ? '#57d27a' : '#e0443a';
+      c.fillRect(x + w + 17, y + 116, 10, 6);
+      break;
+    }
+    case 'shop': {
+      c.fillStyle = '#6b4a2e';
+      c.fillRect(x, y, w, DOOR_H);
+      c.fillStyle = 'rgba(255,214,140,0.35)';
+      c.fillRect(x + 16, y + 26, w - 32, 90);
+      c.fillStyle = '#8e2f26';
+      c.fillRect(x - 30, y - 34, w + 60, 26);
+      break;
+    }
+    default: {
+      c.fillStyle = '#6a5440';
+      c.fillRect(x, y, w, DOOR_H);
+      c.fillStyle = 'rgba(0,0,0,0.18)';
+      c.fillRect(x + 12, y + 16, w - 24, 90);
+      c.fillRect(x + 12, y + 126, w - 24, 100);
+      c.fillStyle = '#c8c2ad';
+      c.fillRect(x + w - 22, y + 130, 10, 6);
+    }
+  }
+  if (!d.open) {
+    c.fillStyle = 'rgba(0,0,0,0.35)';
+    c.fillRect(x, y, w, DOOR_H);
+  }
+}
+
+function drawBubble(c: CanvasRenderingContext2D, text: string, x: number, y: number, a: number) {
+  c.save();
+  c.globalAlpha = a;
+  c.font = '17px sans-serif';
+  const tw = Math.min(520, c.measureText(text).width + 24);
+  const bx = Math.max(12, Math.min(SCREEN_W - tw - 12, x - tw / 2));
+  c.fillStyle = '#f4f1e8';
+  c.strokeStyle = '#4b8f8c';
+  c.lineWidth = 2;
+  c.fillRect(bx, y - 34, tw, 34);
+  c.strokeRect(bx, y - 34, tw, 34);
+  c.beginPath();
+  c.moveTo(x - 7, y);
+  c.lineTo(x + 7, y);
+  c.lineTo(x, y + 10);
+  c.fill();
+  c.fillStyle = '#1b1f22';
+  c.textBaseline = 'middle';
+  c.fillText(text, bx + 12, y - 17, tw - 24);
+  c.restore();
+}
+
+function tint(kind: string): string {
+  let h = 0;
+  for (let i = 0; i < kind.length; i++) h = (h * 31 + kind.charCodeAt(i)) >>> 0;
+  const hue = [28, 35, 200, 210, 18, 160][h % 6];
+  return `hsl(${hue} ${14 + (h % 10)}% ${30 + (h % 12)}%)`;
 }

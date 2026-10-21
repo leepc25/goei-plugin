@@ -12,6 +12,11 @@ const CSS = `
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:rgba(20,24,27,.92);border:2px solid #6d767b;pointer-events:auto;z-index:20}
+.goei-engine-elev[hidden]{display:none}
+.goei-engine-elev button{width:64px;height:52px;border-radius:50%;border:2px solid #9aa6ad;background:#2c3236;color:#ece6d4;font:bold 20px sans-serif;cursor:pointer}
+.goei-engine-elev button.here{border-color:#ffb34a;color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.35;cursor:default}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
 

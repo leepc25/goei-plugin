@@ -28,7 +28,7 @@ try {
   // 본부(벨트 장면) → 잼트리 자리 문 앞에서 E
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await S('hq');
-  await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'jaemtri').x; });
+  await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'spot:jaemtri').x; });
   await page.waitForTimeout(100);
   await page.keyboard.press('KeyE');
   await page.waitForSelector('[data-mission]', { state: 'visible' });

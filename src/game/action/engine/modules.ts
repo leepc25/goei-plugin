@@ -14,9 +14,8 @@ import { createElevatorStage } from '../stage';
 import { CUTSCENES, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
-import { makeHub, type HubPlace } from './hub';
-import { PLACES } from '../hq/data';
-import { openPlaces } from '../hq/logic';
+import { makeHub, type HubHost } from './hub';
+import { whereIs } from '../hq/map';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
@@ -46,40 +45,29 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>, gotoPlace?: (id: string) => void): HqModuleLike & { close(): void } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void }): HqModuleLike & { close(): void; goto(place: string): void } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
-  // 본부 걷기는 엔진 벨트 장면. 본부 모듈에 places·openPlace·isOpen이 생기기 전까지는 기존 DOM을 띄우고 장소 단추를 누른다
-  type HqPanel = { places?: () => HubPlace[]; openPlace?: (id: string) => void; isOpen?: () => boolean; close?: () => void };
-  const api = hq as unknown as HqPanel;
+  // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 본부 모듈 map(), 엔진은 장면 옮기기·그리기. 메뉴 창(DOM)만 본부 모듈이 띄운다
   let root: HTMLElement | null = null;
-  let fbOpen = false;
-  const places = (): HubPlace[] =>
-    api.places?.() ??
-    (() => {
-      const open = new Set(openPlaces(hq.state).map((p) => p.id));
-      return PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: open.has(p.id), opens: p.opens }));
-    })();
-  const openPlace = (id: string) => {
-    if (api.openPlace) return api.openPlace(id);
-    fbOpen = true;
-    if (root) root.hidden = false;
-    (root?.querySelector(`[data-go="${id}"]`) as HTMLElement | null)?.click();
-  };
+  const hub = makeHub(
+    {
+      map: () => hq.map(),
+      openPlace: (id) => hq.openPlace(id as never),
+      bark: (place) => hq.bark(place as never),
+      chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
+      sfx: (n) => ui.sfx(n),
+    },
+    (place) => whereIs(place as never),
+  );
   return {
-    hub: () => makeHub(places, openPlace),
-    isOpen: () => (api.isOpen ? api.isOpen() : fbOpen),
-    close: () => (api.close ? api.close() : (fbOpen = false)),
+    hub: () => hub,
+    goto: (place: string) => hub.goto(place),
+    isOpen: () => hq.isOpen(),
+    close: () => hq.close(),
     mount(r, host) {
       root = r;
-      if (!api.openPlace) {
-        const close = document.createElement('button');
-        close.textContent = '✕ 닫기';
-        close.className = 'goei-engine-hq-close';
-        close.addEventListener('click', () => (fbOpen = false));
-        r.appendChild(close);
-      }
       hq.mount(r, {
         deploy: (l) => host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
         load: () => saves.read(slot as never),
@@ -97,8 +85,8 @@ function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>, gotoPlace?: (
               },
             } as never
           : undefined,
-        closed: () => (fbOpen = false),
-        goto: (id: string) => gotoPlace?.(id),
+        closed: () => {},
+        goto: (id: string) => hub.goto(id),
       }, { walk: false });
     },
     onReturn(r, run) {
@@ -328,11 +316,43 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   window.addEventListener('keydown', storyKeys, true);
   const saves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
-  const hq = hqAdapter(saves, bridge, (id) => {
-    const w = game?.inHub ? game.world : null;
-    const door = w?.props.find((q) => q.id === id);
-    if (w && door) (w.player.x = door.x), (w.player.px = door.x);
+  // 엘리베이터 층 단추 (본부). 1~5 숫자키·Esc, 누르면 닫힌다
+  let floorPick: ((i: number | null) => void) | null = null;
+  const floorBox = document.createElement('div');
+  floorBox.className = 'goei-engine-elev';
+  floorBox.hidden = true;
+  storyRoot.appendChild(floorBox);
+  const closeFloors = (i: number | null) => {
+    floorBox.hidden = true;
+    const f = floorPick;
+    floorPick = null;
+    f?.(i);
+  };
+  const chooseFloor: HubHost['chooseFloor'] = (opts, pick) => {
+    floorPick = pick;
+    floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? '' : ' disabled'}${o.here ? ' class="here"' : ''}>${o.label}</button>`).join('');
+    floorBox.hidden = false;
+    audio.play('panelButton' as never);
+  };
+  floorBox.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest('button');
+    if (b && !b.disabled) closeFloors(Number(b.dataset.i));
   });
+  const floorKeys = (e: KeyboardEvent) => {
+    if (floorBox.hidden) return;
+    if (e.code === 'Escape') closeFloors(null);
+    else if (/^Digit[1-9]$/.test(e.code)) {
+      // 숫자키 = 층 숫자(1·2·3), 지하는 4=B1, 5=B2
+      const n = e.code.slice(5);
+      const want = n === '4' ? 'B1' : n === '5' ? 'B2' : n;
+      const b = [...floorBox.querySelectorAll('button')].find((q) => q.textContent === want) as HTMLButtonElement | undefined;
+      if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+    } else return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener('keydown', floorKeys, true);
+  const hq = hqAdapter(saves, bridge, { chooseFloor, sfx: (n) => audio.play(n as never) });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   const hqKeys = (e: KeyboardEvent) => {
     if (e.code !== 'Escape' || !game?.inHub || !hq.isOpen?.()) return;
@@ -355,7 +375,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking(),
+    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden,
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -465,6 +485,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
       window.removeEventListener('keydown', hqKeys, true);
+      window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
       story.dispose();
       setLineProvider(null);
