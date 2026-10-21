@@ -216,6 +216,12 @@ def apply(key, fr, pr=None, src=None, idx=None):
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
     if key == 'pipe':                          # 16:40 재생성본: 떨어진 조각만 지움(옛 덧그림·갈고리 보정은 옛 그림용이라 뺌)
         fr = [keep_main(f) for f in fr]
+        for i, raw in enumerate(idx):          # 내려친 장(pipe3 2번) 손 위 회색 갈고리: 손목보다 위의 밝은 회색
+            if raw != 2: continue
+            w, _, _, _ = wrists('pipe3', raw); a = np.array(fr[i]); c = a[:, :, :3].astype(int)
+            yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]]
+            g = (a[:, :, 3] > 0) & (c.max(2) > 95) & (c.max(2) - c.min(2) < 30) & (yy < w[1] - 3) & (abs(xx - w[0]) < 10)
+            a[g] = 0; fr[i] = Image.fromarray(a)
         for i, f in enumerate(fr):             # 28e8170 내려친 장 손 위로 솟은 1px 세로선
             a = np.array(f); col = a[55:92, 100:116]
             for x in range(1, col.shape[1] - 1):

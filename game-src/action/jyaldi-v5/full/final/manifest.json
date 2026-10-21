@@ -3862,14 +3862,14 @@
    "fps": 12,
    "loop": false,
    "hits": [
-    2
+    3
    ],
    "adv": 0,
    "origin": 0,
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 19457,
+   "bytes": 19341,
    "prop": false,
    "anchors": [
     {
