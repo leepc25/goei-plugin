@@ -115,7 +115,9 @@ function artCard(c: EvCard): string {
   // 이름 미확인도 창을 띄운다: 종료·지도 버튼이 창에만 있어서 (2026-10-20 사용자: 띠에 남은 ×가 어색했다)
   if (c.pop) seen.set(c.pop, c);
   const act = c.pop ? ` data-action="ev-pop" data-value="${esc(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key}"` : '';
-  const line3 = c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : '');
+  // 한 줄 상황 글은 넘치면 전광판처럼 흐른다 (2026-10-21 사용자, 요원 칸과 같은 .gx-flow)
+  const line3 = (c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc(c.art.desc)}</span>` : ''))
+    .replace(/^<span class="gx-evc-sit"([^>]*)>([^<]*)<\/span>$/, (_m, attr: string, t: string) => `<span class="gx-evc-sit gx-flow"${attr}><span data-t="${t}">${t}</span></span>`);
   return `<li class="gx-evc art${act ? ' go' : ''}${c.selected ? ' sel' : ''}${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}"${act}>
     <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
       <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc(c.name)}</b>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
@@ -135,7 +137,6 @@ export function evPopup(): string {
   const name = esc(c.name);
   // 버튼 셋은 같은 크기 아이콘 (2026-10-20 사용자). 종료는 휴지통, 한 번 누르면 빨개지고 한 번 더 누르면 종료
   const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open && !pick ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="지도" aria-label="${name} 지도에서 보기">${ICONS.map}</button>` : ''}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   // 임무 탭: 목표로 고르기는 오른쪽 아래 글자 단추로 (2026-10-21 사용자: 위 아이콘 사이에 숨어 뭔지 몰랐다)
@@ -225,12 +226,11 @@ function osd(sig: string, cam: string, clock: string): string {
   return `<div class="gx-oposd"><span class="l1">${sig}<span class="cam">${cam}</span></span>${clock ? `<span class="ts">${esc(clock)}</span>` : ''}</div>`;
 }
 
-/** 큰 보기 오른쪽 위 버튼: 위키 · 임무 지도 · 종료 (CCTV·위성 공통) */
+/** 큰 보기 오른쪽 위 버튼: 위키 · 종료 (CCTV·위성 공통). 임무 지도로 가는 단추는 위성 지도가 생겨 뺐다 (2026-10-21 사용자) */
 function evBtns(c: OpsCard): string {
   const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
   return `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key && c.open ? `<button class="gx-evbtn" data-action="${c.open}" data-value="${key}" title="임무 지도" aria-label="${name} 임무 지도에서 보기">${ICONS.map}</button>` : ''}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
 }
 

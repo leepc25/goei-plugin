@@ -590,8 +590,8 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
   await page.setViewportSize({ width: 390, height: 844 });
   // 상황판 행 → 임무(지도) 탭의 그 자리
   await page.setViewportSize({ width: 1280, height: 860 });
-  // 그림 카드: 눌러 펼친 뒤 지도 버튼
-  await cardAction(page, preset.name, 'board-map', '.gx-board');
+  // 상황판 → 임무 지도의 그 자리 (단추는 2026-10-21에 뺐지만 이동 동작은 남아 있다)
+  await page.evaluate((name) => { const li = [...document.querySelectorAll('.gx-board li.gx-oprow')].find((e) => e.textContent.includes(name)); const b = document.createElement('button'); b.dataset.action = 'board-map'; b.dataset.value = li.dataset.value; document.querySelector('.gx-panel').appendChild(b); b.click(); }, preset.name);
   await page.waitForSelector('.gx-map .gx-placecard');
   assert.ok((await page.textContent('.gx-map .gx-sits')).includes(preset.name));
   if (shots) {

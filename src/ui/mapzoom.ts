@@ -35,7 +35,8 @@ export function bindMapZoom(root: HTMLElement): void {
   let v = views.get(key) ?? { z: 1, x: 0, y: 0 };
 
   const apply = () => {
-    v = clamp(v, canvas.clientWidth, canvas.clientHeight);
+    // 기준은 지도 그림 칸: PC 임무 탭은 틀이 그림보다 넓고 그림은 가운데에 있다 (2026-10-21)
+    v = clamp(v, layer.offsetWidth, layer.offsetHeight);
     views.set(key, v);
     layer.style.transform = v.z === 1 ? '' : `translate(${v.x}px, ${v.y}px) scale(${v.z})`;
     layer.style.setProperty('--pz', String(Math.pow(v.z, 0.25) / v.z));
@@ -49,7 +50,7 @@ export function bindMapZoom(root: HTMLElement): void {
   };
   const local = (px: number, py: number) => {
     const r = canvas.getBoundingClientRect();
-    return [px - r.left, py - r.top] as const;
+    return [px - r.left - canvas.clientLeft - layer.offsetLeft, py - r.top - canvas.clientTop - layer.offsetTop] as const;
   };
   const img = canvas.querySelector<HTMLImageElement>('.gx-mapimg');
   if (img && !img.complete) img.addEventListener('load', apply, { once: true });
@@ -59,7 +60,7 @@ export function bindMapZoom(root: HTMLElement): void {
     const b = (e.target as HTMLElement).closest<HTMLElement>('[data-zoom]');
     if (!b) return;
     e.stopPropagation();
-    const w = canvas.clientWidth / 2, h = canvas.clientHeight / 2;
+    const w = layer.offsetWidth / 2, h = layer.offsetHeight / 2;
     if (b.dataset.zoom === 'reset') (v = { z: 1, x: 0, y: 0 }), apply();
     else zoomAt(v.z * (b.dataset.zoom === 'in' ? 1.6 : 1 / 1.6), w, h);
   });

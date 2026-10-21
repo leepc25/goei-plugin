@@ -2367,3 +2367,17 @@ button.mk-go:hover { color: var(--signal); }
 /* 상세 창·CCTV: 상황 글이 먼저 또렷하게, 위키 요약은 그 아래 한 단계 흐리게 (2026-10-21 사용자) */
 :where(.ev-pop, .gx-opcap) .gx-evc-sit { font-weight: 600; color: #fff; }
 :where(.ev-pop, .gx-opcap) .gx-evc-sit + .gx-evc-desc { color: rgba(255, 255, 255, .68); }
+/* PC 임무 탭 지도 (2026-10-21 사용자): 틀은 위 지역·검색 줄과 같은 폭, 그림은 가운데. 아래 상황 카드 세 줄이 다 보이도록
+   그림 높이 = 본문 높이 − (지역 줄 36 + 칸 사이 10×2 + 필터·카드 세 줄 342 + 틀 2) */
+@media (min-width: 761px) {
+  .gx-map .gx-mapbar .gx-select, .gx-map .gx-mapbar .gx-search { min-height: 36px; }
+  .gx-map > .gx-mapcol > .gx-canvas:not(.ph) { width: 100%; margin: 0; background: #0c1315; }
+  .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { width: fit-content; margin: 0 auto; }
+  .gx-map .gx-mapimg { max-height: calc(min(100vh - 28px, 950px) - 98px - 400px); }
+}
+/* 지도 양옆 빈 자리는 같은 지도를 흐리게 깔아 채운다 */
+@media (min-width: 761px) {
+  .gx-map > .gx-mapcol > .gx-canvas:not(.ph)::before { content: ''; position: absolute; inset: -24px; background: var(--mapbg) center / cover no-repeat; filter: blur(16px) brightness(.4) saturate(.7); }
+  .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { z-index: 1; }
+  .gx-map .gx-canvas:not(.ph) > .gx-zoom { z-index: 2; }
+}

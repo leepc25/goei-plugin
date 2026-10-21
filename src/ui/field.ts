@@ -251,7 +251,7 @@ function mapCanvas(ctx: ChatContext, x: Ctx, events: WorldEvent[], env: FieldEnv
     : `<div class="gx-mapph">${mapUrls[code] === null ? '지도 이미지를 찾지 못했어요' : '지도 불러오는 중…'}</div>`;
   // 모바일: 지역·장소 검색은 하단 바 위 서랍으로 (v0.16.24, 사용자 설계. 필터 줄은 숫자 때문에 위에 그대로)
   return `${narrow() ? '' : mapBar(x)}
-    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
+    <div class="gx-canvas${url ? '' : ' ph'}"${url ? ` data-map="${code}" style="--mapbg:url('${esc(url)}')"` : ''}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code !== '01') : ''}</div>`;
 }
 
 /** 지도 장소 검색: 시군구·거점 이름으로 찾아 그 지도로 바로 간다 (v0.16.21) */
