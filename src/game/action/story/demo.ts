@@ -718,8 +718,8 @@ root.addEventListener('keydown', (e) => {
 const layout = () => {
   const r = root.getBoundingClientRect();
   const portrait = r.height > r.width * 1.25;
-  root.classList.toggle('gst-top', portrait);
-  root.style.setProperty('--gst-dock-top', `${Math.round(stageBox.getBoundingClientRect().bottom - r.top + 8)}px`);
+  root.classList.toggle('gsy-top', portrait);
+  root.style.setProperty('--gsy-dock-top', `${Math.round(stageBox.getBoundingClientRect().bottom - r.top + 8)}px`);
 };
 addEventListener('resize', layout);
 layout();
