@@ -130,6 +130,19 @@ await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, for
   writeFileSync('release/demo/goei-graybox.html', html);
 }
 
+// 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
+{
+  const out = await build({ ...common, entryPoints: ['src/game/action/audio/demo.ts'], format: 'esm', minify: true });
+  const code = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실 · 차원 승강기</title><body><script type="module">${code}</script></body></html>`;
+  writeFileSync('dist/goei-sound.html', html);
+  mkdirSync('release/demo', { recursive: true });
+  writeFileSync('release/demo/goei-sound.html', html);
+  const lib = await build({ ...common, entryPoints: ['src/game/action/audio/index.ts'], format: 'esm', minify: true });
+  console.log(`소리 모듈 ${(lib.outputFiles[0].contents.length / 1024).toFixed(1)}KB (압축 전 최소화)`);
+}
+await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
+
 await build({
   ...common,
   entryPoints: ['src/game/action/motion-demo.ts'],
