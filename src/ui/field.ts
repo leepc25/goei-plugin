@@ -513,15 +513,19 @@ export function missionList(ctx: ChatContext, opening = false): string {
     const status = missionStatus(x, kind, r.name);
     const bg = art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : '';
     const cap = `<span class="gx-evart-name"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
+    const wikiBtn = opening ? '' : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`;
+    // 위키는 접힌 띠에서도 보이게 오른쪽 끝, 펴면 접기 오른쪽 옆 (2026-10-21 사용자)
     if (!open) {
-      return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
-        ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button></li>`;
+      return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+        ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
+    // 선택 단추는 임무 창 상세처럼 오른쪽 아래 작은 단추 (2026-10-21 사용자)
+    const pickBtn = sel
+      ? `<button class="gx-evpick on" data-action="mission-unpick">${ICONS.pin}해제</button>`
+      : `<button class="gx-evpick" data-action="mission-pick" data-value="${val}">${ICONS.pin}선택</button>`;
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button></span></span>
-      <span class="gx-evart-cap">${cap}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}
-        <span class="gx-mx-btns"><button class="gx-start gx-mx-pick" data-action="mission-pick" data-value="${val}">${sel ? '선택됨' : `이 ${kind === 'an' ? '괴이' : '특수'}로 선택`}</button>
-          ${opening ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`}</span></span></div></li>`;
+      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${cap}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}${pickBtn}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {

@@ -139,13 +139,12 @@ export function evPopup(): string {
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   // 임무 탭: 목표로 고르기는 오른쪽 아래 글자 단추로 (2026-10-21 사용자: 위 아이콘 사이에 숨어 뭔지 몰랐다)
-  const pickBtn = pick && c.key ? `<button class="gx-evpick${c.selected ? ' on' : ''}" data-action="pick-event" data-value="${key}">${ICONS.pin}${c.selected ? '목표 해제' : '목표로 선택'}</button>` : '';
+  const pickBtn = pick && c.key ? `<button class="gx-evpick${c.selected ? ' on' : ''}" data-action="pick-event" data-value="${key}">${ICONS.pin}${c.selected ? '해제' : '선택'}</button>` : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
     <div class="gx-evc art open ev-pop${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
       <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
         <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
-        ${pickBtn}
+        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}${pickBtn}</span>
       </div></div>`;
 }
 

@@ -31,7 +31,7 @@
    창 바깥이 늘 깜깜했다 (창 바깥 불투명도가 듣지 않던 원인). 창(.gx) 안에만 */
 .gx { color-scheme: dark; }
 .gx[data-theme="light"] {
-  --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #D5DDDA; --line2: #C3CECA;
+  --void: #E3E9E7; --sunk: #D8E0DD; --panel: #FFFFFF; --panel2: #EDF1F0; --line: #BCC9C5; --line2: #A3B3AE;
   --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
   --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
   --blue: #2F6FB5; --violet: #7A4FC4; --shadow: 0 30px 60px -30px rgba(20, 40, 36, .45); --scrim: rgba(20, 30, 28, .58); color-scheme: light;
@@ -1966,9 +1966,6 @@ button.mk-go:hover { color: var(--signal); }
 .gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .95) 0%, rgba(6, 10, 12, .8) 40%, rgba(6, 10, 12, 0) 72%), linear-gradient(to bottom, rgba(6, 10, 12, .5), rgba(6, 10, 12, 0) 26%); }
 .gx-mx .gx-evart-top { justify-content: flex-start; }
 .gx-mx .gx-evart-cap { max-height: calc(100% - 50px); }
-.gx-mx-btns { display: flex; gap: 6px; align-items: center; }
-.gx-mx-btns .gx-mx-pick { flex: 1; margin: 0; min-height: 40px; font-size: 14.5px; }
-.gx-mx-btns .gx-evbtn { width: 40px; height: 40px; }
 .gx-mx-art .gx-evc-desc { display: block; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, .86); text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
 .gx-mx.open .gx-evart-name b { font-size: 19px; white-space: normal; }
 /* 커스텀 목록: 그림 띠는 한 줄에 하나 (2026-10-20 사용자: 한 칸부터 보고 크면 두 칸으로). 넓은 칸이라 띠는 더 납작하게, 펴면 4:3 */
@@ -2245,7 +2242,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 
 /* 모니터 벽: 감시 화면 한 칸에 한 명. 편성 가능은 밝게(살짝 눌러서), 작전 중은 가장자리·모서리만 붉게, 편성 불가는 어둡게 */
-.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: 150px; gap: 8px; align-content: start; padding: 8px; }
+.gx-agwall { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); grid-auto-rows: max(150px, calc((100% - 24px) / 2)); gap: 8px; align-content: start; padding: 8px; }
 .gx-agmon { --c: #5fe6c6; position: relative; display: flex; min-width: 0; min-height: 0; padding: 5px 5px 14px; border-radius: 7px; background: linear-gradient(180deg, #2a3236, #1d2427); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 2px 4px rgba(0, 0, 0, .4); cursor: pointer; }
 .gx-agmon::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: var(--c); box-shadow: 0 0 5px var(--c); }
 .gx-agmon.op { --c: #ff6b5b; } .gx-agmon.lock { --c: #6d7a77; } .gx-agmon.lock::after { box-shadow: none; }
@@ -2354,8 +2351,12 @@ button.mk-go:hover { color: var(--signal); }
 /* 임무 목록에서 목표로 고른 그림 카드: 가는 녹색 줄이 오류처럼 보여서(2026-10-21 사용자) 또렷한 2px 테두리 + 이름 옆 「목표」 */
 .gx-evc.art.sel { border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), 0 0 14px color-mix(in srgb, var(--signal) 35%, transparent); }
 .gx-evart-l1 .gx-goaltag { flex: none; }
-.gx-evpick { position: absolute; z-index: 3; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
+.gx-evpick { align-self: flex-end; margin-top: 6px; display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 10px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); cursor: pointer; }
 .gx-evpick svg { width: 17px; height: 17px; }
 .gx-evpick.on { background: rgba(8, 12, 14, .72); color: #f2f6f5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
 /* 단추가 글줄을 가리지 않게 글 칸 오른쪽을 비운다 */
-.ev-pop:has(.gx-evpick) .gx-evart-cap { padding-right: 150px; }
+/* 커스텀 띠의 위키 (2026-10-21 사용자): 접힌 띠에선 오른쪽 끝, 상태 표시는 그 왼쪽 */
+.gx-mlist li.gx-mx { position: relative; }
+.gx-mx:not(.open) > .gx-mx-wiki { position: absolute; z-index: 2; top: 50%; right: 12px; transform: translateY(-50%); }
+.gx-mx.has-wiki:not(.open) .gx-evart-top { right: 52px; }
+.gx-mx.open .gx-evpick { margin-top: 10px; }
