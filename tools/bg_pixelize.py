@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import sys
+from collections import deque
 from pathlib import Path
 
 from PIL import Image, ImageEnhance
@@ -26,11 +27,12 @@ WALL = (320, 220)        # 화면 640×440 (벽 0~440)
 FLOOR = 128              # 화면 256 정사각 무늬
 FAR = (384, 256)         # 화면 768×512, 느리게 흐름
 FAR_TALL = (256, 384)
-COLORS = 32
+COLORS = 48
 DIM = 0.82               # 명도
 DESAT = 0.78             # 채도
-# 물건 모음: 원본 셀 높이 341px에서 문 2.1m = 60% → 205px. 벽은 2.9m = 220도트 → 76도트/m.
-OBJ_SCALE = (220 / 2.9) / (1024 / 3 * 0.6 / 2.1)
+# 물건 크기: GPT 그림 안 비율은 믿지 않고 heights.json의 실제 높이(m)로 맞춘다. 쟈알디 대기 키 99도트 = 1.65m.
+DPM = 99 / 1.65
+HEIGHTS = json.loads((ROOT / 'game-src/art/bg/heights.json').read_text()) if (ROOT / 'game-src/art/bg/heights.json').exists() else {}
 KEY = (255, 0, 255)
 
 
@@ -78,6 +80,7 @@ def seamless(im: Image.Image) -> Image.Image:
 
 
 def cut_objects(sheet: Image.Image) -> list[Image.Image]:
+    """투명(또는 마젠타) 바탕의 물건 모음 → 덩어리 9개. 줄 순서(위→아래, 왼→오른)."""
     sheet = sheet.convert('RGBA')
     if sheet.getchannel('A').getextrema()[0] == 255:  # 투명 아님 → 마젠타 빼기
         px = sheet.load()
@@ -86,17 +89,39 @@ def cut_objects(sheet: Image.Image) -> list[Image.Image]:
                 r, g, b, _ = px[x, y]
                 if r > 200 and b > 200 and g < 90:
                     px[x, y] = (0, 0, 0, 0)
-    cw, ch = sheet.width // 3, sheet.height // 3
-    out = []
-    for i in range(9):
-        cell = sheet.crop(((i % 3) * cw, (i // 3) * ch, (i % 3 + 1) * cw, (i // 3 + 1) * ch))
-        box = cell.getchannel('A').point(lambda a: 255 if a > 40 else 0).getbbox()
-        if not box:
-            continue
-        cell = cell.crop(box)
-        nw, nh = max(1, round(cell.width * OBJ_SCALE)), max(1, round(cell.height * OBJ_SCALE))
-        out.append(cell.resize((nw, nh), Image.Resampling.BOX))
-    return out
+    f = 4
+    small = sheet.getchannel('A').resize((sheet.width // f, sheet.height // f), Image.Resampling.BOX)
+    w, h = small.size
+    a = small.load()
+    seen = [[False] * w for _ in range(h)]
+    found = []
+    for y in range(h):
+        for x in range(w):
+            if a[x, y] > 128 and not seen[y][x]:
+                seen[y][x] = True
+                q = deque([(x, y)])
+                x0 = x1 = x
+                y0 = y1 = y
+                n = 0
+                while q:
+                    cx, cy = q.popleft()
+                    n += 1
+                    x0, x1, y0, y1 = min(x0, cx), max(x1, cx), min(y0, cy), max(y1, cy)
+                    for dy in (-2, -1, 0, 1, 2):
+                        for dx in (-2, -1, 0, 1, 2):
+                            nx, ny = cx + dx, cy + dy
+                            if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and a[nx, ny] > 128:
+                                seen[ny][nx] = True
+                                q.append((nx, ny))
+                found.append((n, (x0 * f, y0 * f, (x1 + 1) * f, (y1 + 1) * f)))
+    found.sort(reverse=True)
+    boxes = sorted((bx for _, bx in found[:9]), key=lambda r: (r[1] * 3 // sheet.height, r[0]))
+    return [sheet.crop(bx) for bx in boxes]
+
+
+def fit_height(im: Image.Image, metres: float) -> Image.Image:
+    nh = max(1, round(metres * DPM))
+    return im.resize((max(1, round(im.width * nh / im.height)), nh), Image.Resampling.BOX)
 
 
 def quantize_place(images: list[Image.Image]) -> list[Image.Image]:
@@ -133,8 +158,9 @@ def run_place(place: Path) -> dict:
         elif k == 'far_tall':
             jobs.append((f.stem, cover(im, FAR_TALL)))
         elif k == 'objects':
+            hs = HEIGHTS.get(f.stem, [])
             for i, o in enumerate(cut_objects(src), 1):
-                jobs.append((f'objects/{f.stem}_{i}', tone(o)))
+                jobs.append((f'objects/{f.stem}_{i}', fit_height(tone(o), hs[i - 1] if i <= len(hs) else 1.0)))
     if not jobs:
         return {}
     out_dir = OUT / place.name
