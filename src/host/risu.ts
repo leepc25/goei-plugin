@@ -28,8 +28,22 @@ export async function loadContext(): Promise<ChatContext | null> {
   return { charIndex, chatIndex, char, chat };
 }
 
+// 같은 채팅 저장은 차례로 (읽고 쓰는 사이에 다른 저장이 끼면 그 변경이 사라진다. 괴담넷·괴담톡 자동 확인이 동시에 저장할 수 있다)
+const queues = new Map<string, Promise<unknown>>();
+
 /** 저장 직전에 최신 채팅을 다시 읽고 변경을 적용한다. 다른 곳의 변경을 덮어쓰지 않기 위해서다. */
-export async function updateChat(charIndex: number, chatIndex: number, mutate: (chat: Chat) => Chat | null): Promise<Chat | null> {
+export function updateChat(charIndex: number, chatIndex: number, mutate: (chat: Chat) => Chat | null): Promise<Chat | null> {
+  const key = `${charIndex}:${chatIndex}`;
+  const run = (queues.get(key) ?? Promise.resolve()).then(() => saveChat(charIndex, chatIndex, mutate));
+  const tail = run.catch(() => {});
+  queues.set(key, tail);
+  void tail.then(() => {
+    if (queues.get(key) === tail) queues.delete(key);
+  });
+  return run;
+}
+
+async function saveChat(charIndex: number, chatIndex: number, mutate: (chat: Chat) => Chat | null): Promise<Chat | null> {
   const latest = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   if (!latest) throw new Error('채팅을 찾을 수 없어요. 채팅을 다시 열어 주세요.');
   latest.message ??= [];

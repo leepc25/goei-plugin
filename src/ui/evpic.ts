@@ -13,7 +13,8 @@ function rows(ctx: ChatContext): Map<string, Row> {
   if (cache && cache.lore === ctx.char.globalLore && cache.stamp === moduleAssetStamp()) return cache.map;
   const map = new Map<string, Row>();
   const dir = readDirectory(ctx.char.globalLore);
-  for (const p of [...dir.anomalies, ...dir.sites]) {
+  // 거점도 영문명 사진을 찾는다 (2026-10-21: 커스텀 거점 목록도 그림 띠)
+  for (const p of [...dir.anomalies, ...dir.sites, ...dir.bases]) {
     const row = { pic: mainPic(ctx.char, p), title: p.lore || p.label };
     for (const n of [p.label, p.lore, ...p.aliases]) if (n && !map.has(n)) map.set(n, row);
   }

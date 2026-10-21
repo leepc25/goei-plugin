@@ -296,7 +296,7 @@ function eventRow(e: WorldEvent, x: Ctx, agents: Map<string, { english?: string 
   const badge = e.kind === 'an'
     ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>'
     : e.kind === 'in' ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
-  const names = e.kind === 'in' ? [] : codesToNames(e.people || '없음', x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
+  const names = codesToNames(e.people || '없음', x.catalog, x.faction).split(/\s*,\s*/).map((n) => n.trim());
   return evCard({
     kind: e.kind, name: e.name, grade: e.grade,
     loc: `${esc(locName(e.loc))}${since ? ` · ${since}` : ''}`, badge, chips: peopleChips(x.char, names, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ''),
@@ -498,18 +498,13 @@ export function missionList(ctx: ChatContext, opening = false): string {
   const x = readCtx(ctx);
   if (typeof x === 'string') return '';
   const q = field.query.trim().toLowerCase();
-  const wiki = (name: string) => `<div class="gx-evact"><button class="gx-icon" data-action="wiki-goto" data-value="${esc(name)}" title="위키" aria-label="${esc(name)} 위키">${ICONS.wiki}</button></div>`;
-  const row = (kind: MissionKind, r: { name: string; sub: string }) => {
+    const row = (kind: MissionKind, r: { name: string; sub: string }) => {
     const sel = field.mname === r.name && field.mpick === kind;
     const val = `${kind}:${esc(r.name)}`;
-    // 거점은 그림이 없어 누르면 바로 고른다. 괴이·특수는 누르면 그 줄이 펼쳐져 그림·설명·선택 버튼 (2026-10-20 시안)
-    if (kind === 'lm') {
-      return `<li class="gx-ev${sel ? ' sel' : ''}"><button class="gx-evmain" data-action="mission-pick" data-value="${val}">
-      <span class="gx-row"><b>${esc(r.name)}</b>${missionStatus(x, kind, r.name)}</span>${r.sub ? `<span class="gx-loc">${esc(r.sub)}</span>` : ''}</button>${opening ? '' : wiki(r.name)}</li>`;
-    }
-    // 괴이·특수: 한 칸짜리 그림 띠. 누르면 같은 칸에서 정사각으로 펴지고 설명·선택·위키가 그림 안에 (2026-10-20 사용자)
+    // 괴이·특수·거점: 한 칸짜리 그림 띠. 누르면 같은 칸에서 정사각으로 펴지고 설명·선택·위키가 그림 안에 (2026-10-20 사용자)
+    // 거점도 같은 띠 (2026-10-21 사용자: 거점 사진도 넣을 거라 한 줄로). 그림이 없으면 사건 공용 그림
     const open = field.mopen === `${kind}:${r.name}`;
-    const art = evArt(ctx, r.name, kind);
+    const art = evArt(ctx, r.name, kind === 'lm' ? 'in' : kind);
     const status = missionStatus(x, kind, r.name);
     const bg = art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : '';
     const cap = `<span class="gx-evart-name"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;

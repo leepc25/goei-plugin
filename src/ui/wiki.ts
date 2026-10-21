@@ -644,7 +644,7 @@ export function wikiTab(ctx: ChatContext): string {
         ${fail}
       </div></aside>
     <button class="nw-scrim" type="button" data-action="wiki-list" data-value="close" aria-label="목록 접기" tabindex="-1"></button>
-    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}</button>
+    <button class="nw-edge" type="button" data-action="wiki-list" data-value="open" aria-label="목록 펼치기">${ICONS.list}<span>목록</span></button>
     <section class="ph-pane nw-main"><div class="nw-status">${status}</div>${paneHtml(ctx)}</section>
     ${drawerHtml([
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
@@ -778,7 +778,19 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
     const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
     t0 = null;
-    if (dx < -36 && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
+    // PC는 왼쪽에서, 모바일은 오른쪽에서 열리므로 접는 방향도 반대
+    const out = wide() ? dx < -36 : dx > 36;
+    if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
+  }, { passive: true });
+  // 모바일 책갈피를 왼쪽으로 끌어도 열린다
+  const edge = root.querySelector<HTMLElement>('.nw-edge');
+  let e0: number | null = null;
+  edge?.addEventListener('touchstart', (e) => (e0 = e.touches[0]?.clientX ?? null), { passive: true });
+  edge?.addEventListener('touchend', (e) => {
+    if (e0 === null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
+    e0 = null;
+    if (dx < -24 && !wiki.listOpen) act('open');
   }, { passive: true });
 }
 

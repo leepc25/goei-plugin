@@ -16,6 +16,8 @@ export interface InTag {
   region: string;
   name: string;
   state: '진행' | '종료';
+  /** 투입 인원 (v0.16.36부터 상태 뒤 칸. 옛 태그엔 없다) */
+  deploy: string;
   situation: string;
 }
 export interface MsTag {
@@ -106,8 +108,10 @@ function scanSites<S extends string>(text: string, kind: string, states: readonl
   });
 }
 
+/** 상태 뒤로 배치|상황 (2026-10-21 배치 칸 추가). 칸이 하나뿐이면 옛 태그라 상황으로 읽는다 */
 export function scanIncidents(text: string): InTag[] {
-  return scanSites(text, 'IN', ['진행', '종료'] as const).map(({ rest, ...t }) => ({ ...t, situation: rest.join(' ') }));
+  return scanSites(text, 'IN', ['진행', '종료'] as const).map(({ rest, ...t }) =>
+    rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(' ') } : { ...t, deploy: '', situation: rest.join(' ') });
 }
 
 export function scanMysticSites(text: string): MsTag[] {

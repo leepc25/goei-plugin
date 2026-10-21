@@ -128,9 +128,24 @@ export function bindAgentTips(root: HTMLElement): void {
   let queued = 0;
   const measure = () => {
     queued = 0;
+    // PC 요원 칸은 상자 높이를 꼭 채운다 (2026-10-21 사용자: 아래가 남았다). 모니터 두 줄 · 목록 여섯 줄, 넘치면 그 크기로 스크롤
+    // CSS 퍼센트 줄 높이는 브라우저에 따라 안 먹어서 실제 높이를 재서 넣는다
+    const pc = matchMedia('(min-width: 761px)').matches;
+    for (const ul of root.querySelectorAll<HTMLElement>('.gx-agwall, .gx-agrows')) {
+      if (!pc) ul.style.removeProperty('--agrow');
+      else if (ul.classList.contains('gx-agwall')) ul.style.setProperty('--agrow', `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);
+      else ul.style.setProperty('--agrow', `${Math.max(48, Math.floor(ul.clientHeight / 6))}px`);
+    }
     for (const box of root.querySelectorAll<HTMLElement>('.gx-flow')) {
       const inner = box.firstElementChild as HTMLElement | null;
       if (!inner) continue;
+      // 목록의 상황 글은 두 줄까지 그대로 보이고, 그래도 넘칠 때만 한 줄 전광판 (2026-10-21 사용자)
+      if (box.classList.contains('gx-agrow-msg')) {
+        box.classList.remove('on');
+        box.classList.add('two');
+        if (box.scrollHeight <= box.clientHeight + 1) continue;
+        box.classList.remove('two');
+      }
       // 켜져 있으면 뒤에 붙은 글(간격 3em 포함)까지 재므로 반으로 되돌려 잰다
       const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
       const on = box.classList.contains('on');
@@ -140,8 +155,11 @@ export function bindAgentTips(root: HTMLElement): void {
       if (over) {
         const d = w + gap;
         box.style.setProperty('--fd', `${-d}px`);
-        // 초당 16px로 한 바퀴, 맨 앞에서 잠깐 멈춤(전체의 15%)
-        box.style.setProperty('--ft', `${(d / 16 / 0.85).toFixed(1)}s`);
+        // 초당 18px로 쉬지 않고 돈다. 시작 자리는 공용 시계로 맞춰서, 창을 다시 그려도(무엇을 눌러도) 처음으로 돌아가지 않고 이어 흐른다
+        // (2026-10-21 사용자: 처음에 한참 멈춰 있고, 누를 때마다 맨 앞으로 돌아가 멈춰 보였다)
+        const ft = d / 18;
+        box.style.setProperty('--ft', `${ft.toFixed(2)}s`);
+        box.style.setProperty('--fdl', `${(-((performance.now() / 1000) % ft)).toFixed(2)}s`);
       }
     }
   };
@@ -150,5 +168,6 @@ export function bindAgentTips(root: HTMLElement): void {
   };
   new MutationObserver(schedule).observe(root, { childList: true, subtree: true });
   window.addEventListener('resize', schedule);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(schedule).observe(root);
   root.addEventListener('scroll', hide, true);
 }

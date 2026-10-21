@@ -390,6 +390,11 @@ LORE_PATCHES = [
     ('🏷️Tag', '- 방문자: current individuals or groups visiting or using the site. | 없음\n',
      '- 방문자: current individuals or groups visiting or using the site. | 없음\n'
      '- 상황: What is happening at the site right now: its current state, notable visitors\' activity, or unusual occurrences. One short sentence.\n'),
+    # 사건에도 투입 인원 칸 (2026-10-21 사용자: 사건 카드에도 누가 나갔는지 보여야). 플러그인 v0.16.36부터 읽는다
+    ('🏷️Tag', '   - 종료: MUST transition immediately once the urgent incident ends.\n',
+     '   - 종료: MUST transition immediately once the urgent incident ends.\n'
+     '- 배치 : Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n'),
+    ('🏷️Tag', '[IN|지역|발생지점|상태|상황]', '[IN|지역|발생지점|상태|배치|상황]'),
     ('🏷️Tag', '[AN|지역|발생지점|상태|등급|배치]', '[AN|지역|발생지점|상태|등급|배치|상황]'),
     ('🏷️Tag', '[MS|지역|명칭|상태|방문자]', '[MS|지역|명칭|상태|방문자|상황]'),
     ('Phone',

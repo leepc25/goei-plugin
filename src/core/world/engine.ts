@@ -40,6 +40,8 @@ export interface InEntry {
   name: string;
   state: '발생대기' | '진행';
   situation: string;
+  /** 투입 인원 (2026-10-21 추가. 옛 상태엔 없다) */
+  deploy?: string;
   kind: 'landmark' | 'random';
   origin: Origin;
   since: number | null;
@@ -498,6 +500,7 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
       continue;
     }
     e.situation = t.situation ? codesToNames(t.situation, c, faction) : '';
+    if (t.deploy) e.deploy = t.deploy;
     if (e.state !== '진행' || e.since === null) e.since = w.minute;
     e.state = '진행';
   }
@@ -600,8 +603,8 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   });
   const inc = w.inc.map((e) => {
     const ln = locName(e.loc);
-    if (e.state === '발생대기') return `NEW [IN|${ln}|${e.name || '<발생지점>'}|진행|<상황>]`;
-    return `[IN|${ln}|${e.name}|${e.state}|${e.situation}]${age(w, e.since)}`;
+    if (e.state === '발생대기') return `NEW [IN|${ln}|${e.name || '<발생지점>'}|진행|<배치>|<상황>]`;
+    return `[IN|${ln}|${e.name}|${e.state}|${e.deploy || '없음'}|${e.situation}]${age(w, e.since)}`;
   });
   const ms = w.ms.map((e) => {
     const ln = locName(e.loc);
@@ -614,7 +617,7 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   if (w.pending.in && !w.inc.some((e) => e.name === w.pending.in)) {
     const lm = c.landmarks.find((l) => l.name === w.pending.in);
     const loc = lm && landmarkLoc(lm.sido, lm.gu);
-    inc.push(`NEW [IN|${loc ? locName(loc) : '<발생 지역: 시도와 시군구>'}|${w.pending.in}|진행|<상황>]`);
+    inc.push(`NEW [IN|${loc ? locName(loc) : '<발생 지역: 시도와 시군구>'}|${w.pending.in}|진행|<배치>|<상황>]`);
   }
   if (w.pending.ms && !w.ms.some((e) => e.name === w.pending.ms)) {
     ms.push(`NEW [MS|<발생 지역: 시도와 시군구>|${w.pending.ms}|출현|<방문자>|<상황>]`);
@@ -657,7 +660,7 @@ export function activeEvents(w: WorldState): WorldEvent[] {
     if (e.state === '활성') out.push({ kind: 'an', index, loc: e.loc, name: e.name || '이름 미확인', key: key('an', e), grade: e.grade, people: e.deploy, report: e.situation ?? '' });
   });
   w.inc.forEach((e, index) => {
-    if (e.state === '진행') out.push({ kind: 'in', index, loc: e.loc, name: e.name || '이름 미확인', key: key('in', e), grade: '', people: '', report: e.situation });
+    if (e.state === '진행') out.push({ kind: 'in', index, loc: e.loc, name: e.name || '이름 미확인', key: key('in', e), grade: '', people: e.deploy ?? '', report: e.situation });
   });
   w.ms.forEach((e, index) => {
     if (e.state === '출현') out.push({ kind: 'ms', index, loc: e.loc, name: e.name, key: key('ms', e), grade: '', people: e.visitors, report: e.situation ?? '' });

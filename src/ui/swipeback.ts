@@ -2,7 +2,7 @@
 // 갈 곳은 app.ts가 정한다(step: -1 뒤로, 1 앞으로). 같은 방향 쓸기를 이미 쓰는 곳(지도, 위키 세로바·목록, 하단 바, 도구 서랍,
 // 가로로 넘기는 줄, 입력칸)에서 시작한 쓸기는 건드리지 않는다.
 
-const SKIP = 'input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .ph-drawer';
+const SKIP = 'input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer';
 const FIRE = 72;
 const bound = new WeakSet<HTMLElement>();
 

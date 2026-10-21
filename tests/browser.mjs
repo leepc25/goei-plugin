@@ -1157,7 +1157,7 @@ if (fixture.globalLore.some(packed)) {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-list-mobile.png` });
-  await page.click('.nw-scrim', { position: { x: 370, y: 400 } });
+  await page.click('.nw-scrim', { position: { x: 20, y: 400 } }); // 목록은 오른쪽에서 열린다
   await page.waitForSelector('.nw-app:not(.list-open)');
   await page.waitForTimeout(300);
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-mobile.png` });
@@ -1174,12 +1174,12 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.nw-nohit');
   if (shots) await page.screenshot({ path: `${shots}/13-wiki-nohit-mobile.png` });
   await page.fill('.nw .ph-search', '');
-  // 모바일: 펼친 목록을 왼쪽으로 밀면 접힘
+  // 모바일: 오른쪽에서 열린 목록을 오른쪽으로 밀면 접힘
   await page.evaluate(() => {
     const el = document.querySelector('.nw-list');
     const t = (x) => [new Touch({ identifier: 1, target: el, clientX: x, clientY: 300 })];
     el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: t(200), changedTouches: t(200) }));
-    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(60) }));
+    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: t(340) }));
   });
   await page.waitForSelector('.nw-app:not(.list-open)');
   // 모바일 앞뒤로 쓸기 (브라우저 ←·→ 처럼): 오른쪽 = 뒤로, 왼쪽 = 앞으로. 탭을 오가도 그대로 돌아간다
