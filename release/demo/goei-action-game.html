@@ -21080,6 +21080,7 @@ function engineModules(box3, bridge) {
   };
   let world = null;
   let runAgent = "jyaldi";
+  let openingOn = false;
   const storyRoot = document.createElement("div");
   storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
   shell.stage.root.appendChild(storyRoot);
@@ -21118,7 +21119,7 @@ function engineModules(box3, bridge) {
       audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
     }
   };
-  globalThis.__goeiStoryStart = (id) => CUTSCENES[id] ? story.cutscene(id) : story.say(id);
+  globalThis.__goeiStoryStart = (id) => CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id);
   const story = mountStory(
     storyRoot,
     {
@@ -21147,7 +21148,7 @@ function engineModules(box3, bridge) {
         return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
-      paused: () => shell.paused
+      paused: () => shell.paused && !openingOn
     },
     { saved: savedFlags }
   );
@@ -21205,7 +21206,7 @@ function engineModules(box3, bridge) {
   window.addEventListener("keydown", floorKeys, true);
   const canFilm = () => location.protocol !== "file:";
   const cutOnce = (id, done2) => {
-    if (!CUTSCENES[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+    if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
     story.flags[`cut_${id}`] = 1;
     saveFlags();
     story.cutscene(id, done2);
@@ -21230,15 +21231,30 @@ function engineModules(box3, bridge) {
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
-    if (!CUTSCENES.opening || !canFilm()) return;
+    if (!VIDEOS.opening || !canFilm()) return;
     openingT = setTimeout(() => {
       openingT = null;
       if (shell.mode !== "title" || story.isBlocking()) return armOpening();
-      story.cutscene("opening", () => shell.mode === "title" && armOpening());
+      const menuEl = shell.stage.root.querySelector(".gs-ui");
+      if (menuEl) menuEl.style.visibility = "hidden";
+      storyRoot.style.visibility = "";
+      storyRoot.style.zIndex = "60";
+      openingOn = true;
+      story.cutscene("opening", () => {
+        openingOn = false;
+        if (menuEl) menuEl.style.visibility = "";
+        storyRoot.style.zIndex = "15";
+        if (shell.paused) storyRoot.style.visibility = "hidden";
+        if (shell.mode === "title") armOpening();
+      });
     }, 2e4);
   };
-  const titleInput = () => {
-    if (openingT && shell.mode === "title") armOpening();
+  const titleInput = (e) => {
+    if (openingOn) {
+      story.skip();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    } else if (openingT && shell.mode === "title") armOpening();
   };
   window.addEventListener("keydown", titleInput, true);
   window.addEventListener("pointerdown", titleInput, true);

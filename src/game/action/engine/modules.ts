@@ -11,7 +11,7 @@ import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
-import { CUTSCENES, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
+import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubHost } from './hub';
@@ -225,6 +225,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
   let runAgent: AgentId = 'jyaldi';
+  let openingOn = false; // 제목 화면 오프닝 영상이 도는 중 (메뉴가 열려 있어도 영상은 멈추지 않는다)
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
@@ -265,7 +266,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.event({ type: 'step', x: p.x, vol: p.running ? 0.9 : 0.6 });
     }
   };
-  (globalThis as { __goeiStoryStart?: (id: string) => void }).__goeiStoryStart = (id) => (CUTSCENES[id] ? story.cutscene(id) : story.say(id));
+  (globalThis as { __goeiStoryStart?: (id: string) => void }).__goeiStoryStart = (id) => (CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id));
   const story: StoryApi = mountStory(
     storyRoot,
     {
@@ -298,7 +299,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
-      paused: () => shell.paused,
+      paused: () => shell.paused && !openingOn,
     },
     { saved: savedFlags },
   );
@@ -362,7 +363,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
      attic = 첫 로프 귀환 · exit = 출구 층 · dinner = 첫 임무 성공 정산 뒤 · evac = 첫 후송 */
   const canFilm = () => location.protocol !== 'file:'; // file:// 시연판은 프레임 목록을 못 읽는다
   const cutOnce = (id: string, done?: () => void): boolean => {
-    if (!CUTSCENES[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+    if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
     story.flags[`cut_${id}`] = 1;
     saveFlags();
     story.cutscene(id, done);
@@ -389,15 +390,32 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
-    if (!CUTSCENES.opening || !canFilm()) return;
+    if (!VIDEOS.opening || !canFilm()) return;
     openingT = setTimeout(() => {
       openingT = null;
       if (shell.mode !== 'title' || story.isBlocking()) return armOpening();
-      story.cutscene('opening', () => shell.mode === 'title' && armOpening());
+      // 제목 메뉴(DOM)가 영상 위를 덮지 않게 도는 동안 숨긴다
+      const menuEl = shell.stage.root.querySelector<HTMLElement>('.gs-ui');
+      if (menuEl) menuEl.style.visibility = 'hidden';
+      storyRoot.style.visibility = ''; // 제목 메뉴가 열려 있는 동안은 '멈춤'이라 영상 층이 숨어 있다
+      storyRoot.style.zIndex = '60'; // 제목 그림·메뉴 층 위로
+      openingOn = true;
+      story.cutscene('opening', () => {
+        openingOn = false;
+        if (menuEl) menuEl.style.visibility = '';
+        storyRoot.style.zIndex = '15';
+        if (shell.paused) storyRoot.style.visibility = 'hidden';
+        if (shell.mode === 'title') armOpening();
+      });
     }, 20000);
   };
-  const titleInput = () => {
-    if (openingT && shell.mode === 'title') armOpening();
+  // 오프닝 중엔 아무 입력이나 건너뛰기, 대기 중엔 대기 시간을 처음부터
+  const titleInput = (e: Event) => {
+    if (openingOn) {
+      story.skip();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    } else if (openingT && shell.mode === 'title') armOpening();
   };
   window.addEventListener('keydown', titleInput, true);
   window.addEventListener('pointerdown', titleInput, true);
