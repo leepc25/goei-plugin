@@ -88,6 +88,8 @@ export interface RunResult {
   /** 체력 30% 아래로 떨어진 적이 있나 (후송 영구 부상 판정에 씀) */
   bigHit: boolean;
   seconds: number;
+  /** 엔진 World.notes 그대로 (층 모듈 stage.found·stage.rescued·stage.depth·stage.visited·stage.trial, bosses 등). 있으면 본부가 정리·판정한다 */
+  notes?: Record<string, unknown>;
 }
 
 export const emptyResult = (how: EndHow): RunResult => ({ how, missionDone: false, depth: 1, floors: 0, kills: 0, cash: 0, shards: 0, debt: 0, budget: 0, teeth: 0, bag: [], itemsLeft: [null, null, null, null], found: [], sent: [], rescued: [], bigHit: false, seconds: 0 });

@@ -76,3 +76,19 @@
 .hq-run-view { flex-direction: column; }
 .hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }
 @media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }
+/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */
+@media (max-height: 520px) {
+  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }
+  .hq-top { font-size: 12px; gap: 2px 10px; }
+  .hq-places { padding-top: 4px; }
+  .hq-places button { padding: 4px 8px; font-size: 12px; }
+  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }
+  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }
+  .hq-move button { padding: 8px; }
+  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }
+  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }
+  .hq-sheet { padding: 10px 14px; }
+  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }
+}
+@media (pointer: coarse) { .hq-move { display: flex; } }

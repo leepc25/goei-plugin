@@ -21,7 +21,7 @@ test('게시판 → 출동 정보: 칸·커피는 출동으로 넘어가고, 숙
   L.pickCoffee(s, 'mix');
   const l = L.launch(s, 'm1', 7);
   assert.equal(typeof l, 'object');
-  assert.equal(l.items[0].id, 'heal');
+  assert.equal(l.items[0].id, 'medkit');
   assert.deepEqual(s.loadout, [null, null, null, null]);
   assert.equal(s.coffee, null);
   assert.equal(l.stats.hp, Math.round(220 * 1.1));
@@ -32,7 +32,7 @@ test('게시판 → 출동 정보: 칸·커피는 출동으로 넘어가고, 숙
 test('귀환 성공: 보상·현금 절반 환산·남은 아이템 돌려받기·회수물 감정 대기·피로', () => {
   const s = S.newSave();
   const l = L.launch(s, 'm1', 1);
-  const lines = L.settle(s, l, result('return', { missionDone: true, depth: 2, floors: 2, cash: 100, teeth: 1, found: ['greet', 'lobby'], bag: [{ id: 'odd', name: '이상 물품', research: 2 }], itemsLeft: [{ id: 'heal', n: 1 }, null, null, null] }), fixed(0.9));
+  const lines = L.settle(s, l, result('return', { missionDone: true, depth: 2, floors: 2, cash: 100, teeth: 1, found: ['greet', 'lobby'], bag: [{ id: 'odd', name: '이상 물품', research: 2 }], itemsLeft: [{ id: 'medkit', n: 1 }, null, null, null] }), fixed(0.9));
   assert.ok(lines[0].startsWith('귀환'));
   assert.equal(s.currencies.budget, 200 + 50 + 100);
   assert.equal(s.currencies.teeth, 1 + 2);
@@ -53,7 +53,7 @@ test('귀환 성공: 보상·현금 절반 환산·남은 아이템 돌려받기
 test('후송: 현금 0, 회수물·미송신 규칙 절반, 아이템 잃음, 영구 부상 판정, 송신한 규칙은 보존', () => {
   const s = S.newSave();
   const l = L.launch(s, 'm1', 1);
-  L.settle(s, l, result('evac', { depth: 3, cash: 300, found: ['a', 'b', 'c', 'd'], sent: ['a'], bag: [{ id: 'x', name: 'x' }, { id: 'y', name: 'y' }], itemsLeft: [{ id: 'heal', n: 2 }, null, null, null] }), fixed(0.01));
+  L.settle(s, l, result('evac', { depth: 3, cash: 300, found: ['a', 'b', 'c', 'd'], sent: ['a'], bag: [{ id: 'x', name: 'x' }, { id: 'y', name: 'y' }], itemsLeft: [{ id: 'medkit', n: 2 }, null, null, null] }), fixed(0.01));
   assert.equal(s.currencies.budget, 200);
   assert.deepEqual(s.rulebook, ['a', 'b', 'd']);
   assert.equal(s.appraisal.length, 1);
@@ -92,16 +92,16 @@ test('숙련: 1~10단계, 새 동작은 3·6에서만', () => {
 test('보급·장착·연구·이빨 상자·위험 단계', () => {
   const s = S.newSave();
   s.currencies.budget = 2000;
-  assert.match(L.buy(s, 'salt'), /살 수 없는/);
-  L.buy(s, 'heal');
-  assert.equal(s.stash.heal, 2);
-  L.equip(s, 2, 'heal');
-  assert.deepEqual(s.loadout[2], { id: 'heal', n: 1 });
+  assert.match(L.buy(s, 'charm'), /살 수 없는/);
+  L.buy(s, 'medkit');
+  assert.equal(s.stash.medkit, 2);
+  L.equip(s, 2, 'medkit');
+  assert.deepEqual(s.loadout[2], { id: 'medkit', n: 1 });
   L.unequip(s, 2);
-  assert.equal(s.stash.heal, 2);
+  assert.equal(s.stash.medkit, 2);
   s.currencies.research = 30;
   L.doResearch(s, 'rs_supply');
-  assert.match(L.buy(s, 'salt'), /구입/);
+  assert.match(L.buy(s, 'charm'), /구입/);
   L.doResearch(s, 'rs_relic1');
   assert.ok(s.relicsOwned.includes('first_guard'));
   L.equipRelic(s, 0, 'first_guard');
@@ -134,4 +134,28 @@ test('보고서는 버튼용 글만 만든다', () => {
   const s = S.newSave();
   L.settle(s, L.launch(s, 'm1', 1), result('return', { missionDone: true, depth: 2, floors: 2, found: ['greet'] }), fixed(0.9));
   assert.match(L.reportText(s), /^\[관리국 출동 보고\] 쟈알디 · 차원 승강기 · 임무 「로비에서 규칙 2개 확인 후 로프로 귀환」 · 귀환/);
+});
+
+test('엔진 기록(stage.*)으로 결과를 채우고 임무 달성은 본부가 판정한다', () => {
+  const s = S.newSave();
+  const l = L.launch(s, 'm1', 1);
+  // 귀환했지만 규칙 1줄뿐 → 미달성
+  L.settle(s, l, result('return', { missionDone: true, notes: { 'stage.found': ['greet'], 'stage.depth': 2 } }), fixed(0.9));
+  assert.deepEqual(s.missionsDone, []);
+  assert.deepEqual(s.rulebook, ['greet']);
+  assert.equal(s.deepest, 2);
+  const l2 = L.launch(s, 'm1', 2);
+  L.settle(s, l2, result('return', { notes: { 'stage.found': ['greet', 'lobby'], 'stage.rescued': ['missing:5'] } }), fixed(0.9));
+  assert.deepEqual(s.missionsDone, ['m1']);
+  assert.deepEqual(s.rescued, ['worker']);
+  assert.ok(L.placeOpen(s, 'interview'));
+  // 진압은 수호자 처치 기록이 있어야
+  const g = { id: 'm2', kind: '진압', title: '', depth: 3 };
+  assert.equal(L.judgeMission(g, result('return', { depth: 3, notes: {} })), false);
+  assert.equal(L.judgeMission(g, result('return', { depth: 3, notes: { bosses: ['guard'] } })), true);
+  // 예전 저장의 임시 아이템 id는 옮겨진다
+  const old = { ...S.newSave(), loadout: [{ id: 'heal', n: 2 }, null, null, null], stash: { torch: 1 } };
+  const back = S.parseSave(JSON.stringify(old));
+  assert.deepEqual(back.loadout[0], { id: 'medkit', n: 2 });
+  assert.deepEqual(back.stash, { flash: 1 });
 });
