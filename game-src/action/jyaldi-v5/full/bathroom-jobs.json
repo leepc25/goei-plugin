@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-21",
+  "before": 9079,
+  "jobs": {
+    "showerin": "b98d6fff-bd6b-4f81-8869-3dae137ab378",
+    "shower": "382d1d71-9045-41fb-af6a-49f5b84ebd14",
+    "showerout": "fddfe692-8042-45b7-b100-4c6e21cc3a15",
+    "bathin": "ac44e189-f127-418e-92b9-47805383eb7b",
+    "bath": "b46b52a0-26ed-48bd-9363-1fbd2a534001",
+    "bathout": "3de34182-1bb3-4980-8c7f-a17dd23b77f5",
+    "toiletin": "f0e43b9e-bd19-409f-82b5-31f83575e7b3",
+    "toilet": "476e51c6-e4de-45ae-a540-3515b5d3a5c7",
+    "toiletout": "e121e21f-1499-4648-9556-47bab43465e4",
+    "handwash": "8844d197-9a36-43ae-92d3-998a56e43b6b"
+  }
+}

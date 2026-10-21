@@ -1,0 +1,4 @@
+2026-10-21 GPT correction showerin -> id: 012e28ba-6e68-4b75-9df8-e428309bf980; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction bathin -> id: 397fc61c-3ad7-4f34-92ef-3ad3cff221fd; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction toilet -> id: a499d24b-a56d-456e-972f-5139e2701832; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
+2026-10-21 GPT correction toiletout -> id: 39ed76e0-8e52-4927-a01f-d09feec4cde6; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation

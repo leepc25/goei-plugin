@@ -1,0 +1,190 @@
+before generations_remaining: 9425
+sub floorsit
+sub floorrest
+sub transmit
+sub hurtidle
+sub limp
+sub collapse
+sub bedlie
+sub bedwake
+sub victory
+sub rope
+sub ladder
+sub mantle
+sub crawl
+sub bow
+sub button
+sub chairsit
+done bedlie
+done bedwake
+sub seatrest
+sub deskwork
+done ladder
+sub seatthink
+done floorrest
+sub walllean
+done floorsit
+done transmit
+done hurtidle
+done collapse
+done victory
+done rope
+done mantle
+done crawl
+done bow
+done button
+done chairsit
+done seatrest
+done deskwork
+done seatthink
+done walllean
+sub armscross
+sub coffee
+sub phone
+sub gesture
+sub turn
+sub fall
+sub land
+sub stairs
+sub vault
+sub sneak
+sub idle_light
+sub walk_light
+sub run_light
+sub idle_box
+sub walk_box
+done limp
+sub run_box
+done idle_light
+sub idle_folder
+done armscross
+done coffee
+done vault
+done walk_light
+done run_light
+done idle_box
+done walk_box
+done run_box
+done idle_folder
+sub walk_folder
+sub run_folder
+sub idle_cup
+sub walk_cup
+sub run_cup
+sub lookback
+sub hide
+sub door
+sub doorclose
+done phone
+done gesture
+done turn
+done fall
+done land
+done stairs
+done sneak
+sub knock
+sub push
+sub lever
+sub inspect
+sub readwall
+sub notebook
+sub leadhand
+done door
+sub elevwait
+done idle_cup
+sub backpack
+done push
+done readwall
+sub fear
+sub nausea
+done walk_folder
+done run_folder
+done walk_cup
+done run_cup
+done lookback
+done hide
+done doorclose
+done knock
+done lever
+done inspect
+done notebook
+done leadhand
+done elevwait
+done backpack
+sub feast
+sub toast
+sub giftbox
+sub tie
+sub gearcheck
+sub typing
+sub handover
+sub board
+sub brief
+sub doze
+sub sofa
+sub phonelook
+sub seatphone
+sub seatread
+done fear
+done feast
+done board
+sub yawn
+sub stretch
+sub wash
+done brief
+done sofa
+sub hairflip
+sub seatdrink
+done nausea
+sub window
+done toast
+done giftbox
+done tie
+done typing
+done doze
+done phonelook
+done seatphone
+done seatread
+done yawn
+done stretch
+sub nod
+sub headshake
+sub wave
+sub handshake
+sub pat
+sub point
+sub shrug
+sub sigh
+sub smile
+sub laugh
+done seatdrink
+done window
+sub cry
+sub angry
+Traceback (most recent call last):
+  File "/home/user/goei-plugin/game-src/action/jyaldi-v5/scripts/gen_all.py", line 42, in <module>
+    fetch(n,j); del pend[n]; print('done',n,flush=True); log(f'{n} done')
+    ~~~~~^^^^^
+  File "/home/user/goei-plugin/game-src/action/jyaldi-v5/scripts/gen_all.py", line 24, in fetch
+    r=mcp.tool('get_image',{'job_id':j,'index':i}); im=[x for x in r['result']['content'] if x.get('type')=='image']
+  File "/home/user/goei-plugin/game-src/action/jyaldi-v5/scripts/mcp.py", line 15, in tool
+    r=call('tools/call',{"name":name,"arguments":args})
+  File "/home/user/goei-plugin/game-src/action/jyaldi-v5/scripts/mcp.py", line 7, in call
+    with urllib.request.urlopen(req,context=ctx,timeout=300) as r:
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/urllib/request.py", line 189, in urlopen
+    return opener.open(url, data, timeout)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/urllib/request.py", line 495, in open
+    response = meth(req, response)
+  File "/usr/lib/python3.13/urllib/request.py", line 604, in http_response
+    response = self.parent.error(
+        'http', request, response, code, msg, hdrs)
+  File "/usr/lib/python3.13/urllib/request.py", line 533, in error
+    return self._call_chain(*args)
+           ~~~~~~~~~~~~~~~~^^^^^^^
+  File "/usr/lib/python3.13/urllib/request.py", line 466, in _call_chain
+    result = func(*args)
+  File "/usr/lib/python3.13/urllib/request.py", line 613, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 502: Bad Gateway
