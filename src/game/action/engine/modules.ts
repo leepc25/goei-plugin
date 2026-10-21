@@ -17,7 +17,7 @@ import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubPlace } from './hub';
 import { PLACES } from '../hq/data';
 import { openPlaces } from '../hq/logic';
-import { drawTitleBg } from '../ui';
+import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
@@ -148,7 +148,7 @@ function hudState(w: World, shell: Shell): HudState {
     gauge: p.gauge,
     armor: p.armor,
     weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
-    items: w.items.map((it) => ({ label: it?.label ?? '', count: it?.n ?? 0 })),
+    items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
     money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
@@ -176,6 +176,7 @@ export interface Wiring {
 
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
   setSupplyCatalog(SUPPLY_CATALOG as never);
+  setHudItemIcon(drawItemIcon as never);
   setItemIconDrawer(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   let game: Game | null = null;

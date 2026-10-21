@@ -6703,6 +6703,9 @@ function bullet(c, x, y, color) {
   c.fillRect(x - 3, y + 4, 6, 2);
 }
 var iconDrawer2 = null;
+function setHudItemIcon(fn) {
+  iconDrawer2 = fn;
+}
 function drawHudItemIcon(c, it, x, y, size2) {
   if (it.id && iconDrawer2) return iconDrawer2(c, it.id, x, y, size2);
   c.save();
@@ -19332,7 +19335,7 @@ function hudState(w, shell) {
     gauge: p.gauge,
     armor: p.armor,
     weapon: heldWeapon(w) ?? { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 6 : null },
-    items: w.items.map((it) => ({ label: it?.label ?? "", count: it?.n ?? 0 })),
+    items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? "", count: it?.n ?? 0 })),
     floor: { depth: d2 ? d2 <= 3 ? `L${d2}` : `B-${d2 - 3}` : "", name: f.title },
     favor: 0,
     money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
@@ -19350,6 +19353,7 @@ function heldWeapon(w) {
 }
 function engineModules(box2, bridge) {
   setSupplyCatalog(SUPPLY_CATALOG);
+  setHudItemIcon(drawItemIcon);
   setItemIconDrawer(drawItemIcon);
   const audio = createGameAudio(local("goei-game-audio"));
   let game = null;
@@ -19707,13 +19711,13 @@ function mountTouch(root, input) {
       el.classList.add("on");
       input.press(b);
     };
-    const off2 = () => {
+    const off3 = () => {
       el.classList.remove("on");
       input.release(b);
     };
     el.addEventListener("pointerdown", on);
-    el.addEventListener("pointerup", off2);
-    el.addEventListener("pointercancel", off2);
+    el.addEventListener("pointerup", off3);
+    el.addEventListener("pointercancel", off3);
   });
   const stick = wrap.querySelector(".gt-stick");
   const ring = wrap.querySelector(".gt-ring");
@@ -19820,5 +19824,9 @@ function mountGame(box2, bridge) {
 
 // src/game/action/engine/demo.ts
 var box = document.getElementById("box");
-mountGame(box);
+var off2 = mountGame(box);
+globalThis.__goeiDemo = {
+  close: () => (off2?.(), off2 = null),
+  open: () => (off2?.(), off2 = mountGame(box))
+};
 </script></html>

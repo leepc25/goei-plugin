@@ -2,4 +2,9 @@
 import { mountGame } from '../main';
 
 const box = document.getElementById('box')!;
-mountGame(box);
+let off: (() => void) | null = mountGame(box);
+// 시험용: 닫기·다시 열기 (플러그인 창처럼). 객체가 남는지 잴 때 쓴다
+(globalThis as { __goeiDemo?: unknown }).__goeiDemo = {
+  close: () => (off?.(), (off = null)),
+  open: () => (off?.(), (off = mountGame(box))),
+};
