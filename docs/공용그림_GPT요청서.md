@@ -60,24 +60,28 @@ IMAGES
 12. Situation Incident Residential — Narrow residential alley with villas and parked scooters, police car lights at the end, tape across the alley.
 ```
 
-## 특수 (6장) · 참고 그림: Situation Mystic
+## 특수 (8장) · 참고 그림: Situation Mystic
+
+특수는 아무 데나 나타나는 가게·공간이라 장소가 아니라 **무엇인지**(가게, 책방, 공방, 장터, 자판기, 방, 물건, 문)로 고릅니다.
 
 ```
-Make 6 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 8 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
 
 KIND: MYSTIC
-Exactly ONE cold cyan/blue light (lantern, moonlight, glow). Quiet, otherworldly, slightly dreamlike calm.
+Exactly ONE cold cyan/blue light. Quiet, otherworldly, slightly dreamlike calm. The place itself is the subject.
 
 IMAGES
-1. Situation Mystic Hanok — Hanok village lane under the moon, closed shutters, a small stall with a cyan lantern (closest to the reference).
-2. Situation Mystic Temple — Mountain Buddhist temple courtyard at night, stone pagoda, paper lanterns, one cyan glow.
-3. Situation Mystic Shrine — Small old shrine in a forest clearing, rope with paper strips, moonlight, cyan will-o'-the-wisp.
-4. Situation Mystic Sea — Rocky seashore at night, calm water, a cyan light floating above the waves, distant lighthouse dark.
-5. Situation Mystic Underground — Old underground passage with tiled walls, an unexpected doorway glowing cyan, dust in the air.
-6. Situation Mystic Rooftop — City rooftop at night with water tanks, the skyline below, a strange cyan glow hanging in the air.
+1. Situation Mystic Shop — A tiny mysterious shop squeezed between ordinary buildings on a night street, warm-dark window display of odd objects, one cyan lamp over the door.
+2. Situation Mystic Bookshop — Inside a cramped old bookshop at night, towering shelves, a reading desk, a cyan glow from one open book.
+3. Situation Mystic Workshop — A craftsman workshop full of tools, half-finished strange objects and a small furnace glowing cyan instead of orange.
+4. Situation Mystic Market — A night market of covered stalls under a bridge or in a back lane, lanterns glowing cyan, wares wrapped in cloth, no shoppers.
+5. Situation Mystic Vending — A lone vending machine at the end of a dark alley, its panel glowing cyan, products behind the glass blurred and unidentifiable.
+6. Situation Mystic Room — A cozy consultation room with two armchairs and a low table with tea, a paper screen, one cyan floor lamp, feels like a dream.
+7. Situation Mystic Object — A single small mysterious object (a gift box, a keyring, a seed packet) resting on a wet street bench at night, softly glowing cyan.
+8. Situation Mystic Door — A plain door standing where no door should be, in an alley wall or a stairwell, cyan light leaking around its edges.
 ```
 
 ## 공용 조직 (8장) · 참고 그림: assets/wiki/Factions 의 그림 아무거나 (예: Freelancer)
@@ -103,12 +107,12 @@ IMAGES
 8. Shared Org Underground — A hidden meeting place in a rundown building: mismatched sofas, old TV, maps taped to the wall, a crowded but cozy hideout.
 ```
 
-## 공용 거점 (8장) · 참고 그림: assets/wiki/Factions/Management Bureau
+## 공용 거점 (6장) · 참고 그림: assets/wiki/Factions/Management Bureau
 
-사진도 연결 조직 사진도 없는 거점의 그림. 정사각 832×832, 거점 띠로 잘려도 보이게 건물을 가운데 둡니다.
+거점 사진은 영문명 사진 → 연결 조직 사진 순서라, 이 그림은 **조직이 없는 거점**이나 사진 없는 조직의 거점에만 나옵니다. 거점 이름 낱말로 고릅니다(본부·본사·사무소 → Office, 상점·가게·샵 → Shop, 성당·교회·성원·절 → Religious, 지하·상가·역 → Underground, 의원·병원·약국 → Clinic, 그 밖 → Hideout). 정사각 832×832, 거점 띠로 잘려도 보이게 건물을 가운데 둡니다.
 
 ```
-Make 8 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 6 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
 
 STYLE (same for every image)
 Korean webtoon (manhwa) illustration style matching the attached reference image exactly: clean ink line art, cel shading, muted desaturated colors, dramatic lighting. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. Square 1:1 (1024x1024). Keep the main subject in the center (the app also crops it to a thin wide strip and to a small square).
@@ -120,10 +124,8 @@ IMAGES
 2. Shared Base Shop — A small storefront on a quiet Seoul side street at night, shutters half down, warm light inside.
 3. Shared Base Religious — A small church or mosque-like religious building on a Seoul hillside at night, generic architecture without symbols of a specific faith, soft lights in the windows.
 4. Shared Base Underground — A stairway descending into an old underground shopping arcade at night, flickering fluorescent lights below.
-5. Shared Base Warehouse — A riverside warehouse compound at night, rolling shutters, a single lamp over a side door.
-6. Shared Base Clinic — A shabby private clinic entrance in an alley, frosted glass door, a cross-shaped light without text.
-7. Shared Base Hideout — A worn-out villa apartment building at night, one window lit on the top floor, laundry on a balcony.
-8. Shared Base Hall — A large old public hall or school auditorium building at night, wide steps, tall dark windows.
+5. Shared Base Clinic — A shabby private clinic entrance in an alley, frosted glass door, a cross-shaped light without text.
+6. Shared Base Hideout — A worn-out villa apartment building at night, one window lit on the top floor, laundry on a balcony.
 ```
 
 ## 공용 요원 (10장) · 참고 그림: assets/agents 의 「영문명_default」 아무거나 (예: Aileen_default)
@@ -153,10 +155,11 @@ IMAGES
 
 ## 플러그인 매칭 (Claude 담당)
 
-- 그림마다 꼬리표 낱말을 둡니다. 예: Subway = 지하철, 역, 승강장, 전철, 선로 / School = 학교, 교실, 기숙학교, 학원.
-- 상황의 이름·발생 지점·상황 글에서 꼬리표 낱말을 찾아 점수가 가장 높은 그림을 고릅니다. 모델 호출 없음.
-- 점수가 같거나 하나도 안 맞으면 이름으로 정해 같은 상황은 늘 같은 그림이 나옵니다.
-- 그림이 하나도 없으면 지금의 Situation Anomaly/Incident/Mystic을 씁니다.
-- 조직: 사진이 없으면 유형(조직형·민간형·프리랜서형)과 이름·로어북 낱말(회사·교회·성원·교단·연구·사채 등)로 Shared Org를 고릅니다.
-- 거점: 영문명 → 연결 조직 사진 → 이름 낱말(본부·본사 → Office, 상점·가게 → Shop, 성원·성당·교회 → Religious, 지하·상가 → Underground 등)로 Shared Base.
-- 요원: 사진이 없으면 소속 조직(관리국 → Suit, 백일몽 → Masked, 프리랜서·협회 → Freelancer, 민간인 → Civilian, 교황청·이슬람 → Religious, 발푸르기스 → Occult)과 로어북의 성별 낱말(여성·Female/남성·Male)로 고르고, 성별을 모르면 이름으로 정합니다.
+모델 호출 없이 낱말로 고르고, 점수가 같거나 하나도 안 맞으면 이름으로 정해서 같은 대상은 늘 같은 그림이 나옵니다. 그림이 없으면 지금의 Situation Anomaly/Incident/Mystic을 씁니다.
+
+- **괴이·사건:** 상황의 이름 + 발생 지점 + 상황 글에서 장소 낱말을 찾습니다. 예: Subway = 지하철, 역, 승강장, 전철, 선로 / School = 학교, 교실, 기숙학교, 학원 / Hospital = 병원, 의원, 병동, 응급실.
+- **특수:** 장소가 아니라 특수 이름에서 종류 낱말을 찾습니다. 예: 「달빛 타투샵」·「우주 쇼핑몰」 → Shop, 「이정 책방」 → Bookshop, 「도깨비 공방」 → Workshop, 「얼굴 없는 장터」 → Market, 「무엇이든 자판기」 → Vending, 「여우 상담실」 → Room, 「친절한 씨앗 키트」·「착한 친구 키링」 → Object, 안 맞으면 Door.
+- **조직:** 사진이 없으면 유형(조직형·민간형·프리랜서형)과 이름 낱말(회사·주식회사 → Corporate, 교회·성원·교단 → Religious, 교 → Cult, 연구 → Research, 사채·조직 → Criminal 등)로 Shared Org.
+- **거점:** 영문명 → 연결 조직 사진 → 이름 낱말로 Shared Base.
+- **요원:** 소속 조직(관리국·가짜 관리국 → Suit, 백일몽 → Masked, 프리랜서·협회·중림 → Freelancer, 민간인 → Civilian, 교황청·이슬람 → Religious, 발푸르기스 → Occult)으로 옷을 고르고, 성별로 남녀를 고릅니다.
+  - 성별: 명부 요원에 「성별」 칸(여·남·미정)을 새로 둡니다. 비어 있으면 요원 로어북의 `Gender: Female/Male` 줄을 읽습니다 (지금 카드 요원 55명 모두 이 줄이 있음). 그래도 모르면 성별이 드러나지 않는 Religious·Occult(후드) 그림을 씁니다.
