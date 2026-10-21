@@ -129,4 +129,5 @@
 .hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }
 @media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }
 /* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */
-.hq-talk:has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }
+.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }
+.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }

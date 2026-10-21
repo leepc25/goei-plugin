@@ -55,6 +55,8 @@ export const AGENT_BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as R
 
 // ── 임무 (기획서 9.5). id는 회색 상자 시험판 MISSIONS와 같다. ──
 export interface MissionDef extends MissionGoal {
+  /** 선택지에 쓰는 짧은 이름 */
+  short: string;
   depthLabel: string;
   reward: { budget: number; teeth: number; research: number };
   requires?: string;
@@ -64,15 +66,15 @@ export interface MissionDef extends MissionGoal {
   deadline?: number;
 }
 export const MISSIONS: MissionDef[] = [
-  { id: 'm1', kind: '조사', title: '로비에서 규칙 2개 확인 후 로프로 귀환', depth: 2, depthLabel: 'L1~L2', rules: 2, reward: { budget: 100, teeth: 2, research: 0 }, repeat: true },
-  { id: 'm2', kind: '진압', title: '로비 L3 경비원', depth: 3, depthLabel: 'L3', reward: { budget: 200, teeth: 3, research: 0 }, requires: 'm1' },
-  { id: 'm3', kind: '조사', title: '추격의 층 통과', depth: 5, depthLabel: 'B-1', reward: { budget: 200, teeth: 2, research: 1 }, requires: 'm2' },
-  { id: 'm4', kind: '구조', title: '야근하다 들어온 회사원을 다락방까지', depth: 5, depthLabel: 'B-1~B-2', rescue: 'worker', reward: { budget: 300, teeth: 5, research: 0 }, requires: 'm3', deadline: 2 },
-  { id: 'm5', kind: '조사', title: '재현의 층 「아파트」 규칙 3개', depth: 5, depthLabel: 'B-2', rules: 3, reward: { budget: 150, teeth: 2, research: 2 }, requires: 'm3' },
-  { id: 'm6', kind: '진압', title: '405호 노부부 (재현)', depth: 5, depthLabel: 'B-2', reward: { budget: 400, teeth: 4, research: 1 }, requires: 'm5' },
-  { id: 'm7', kind: '회수', title: '서명란이 빈 점검표', depth: 3, depthLabel: '정비 구역', recover: 'checklist', reward: { budget: 100, teeth: 1, research: 3 }, requires: 'm2' },
-  { id: 'm8', kind: '조사', title: '시험 층 목표 달성', depth: 6, depthLabel: 'B-3', reward: { budget: 500, teeth: 3, research: 1 }, requires: 'm6' },
-  { id: 'm9', kind: '기록', title: 'B-5 도달', depth: 8, depthLabel: 'B-5', reward: { budget: 600, teeth: 5, research: 2 }, requires: 'm8' },
+  { id: 'm1', short: '로비 규칙 확인', kind: '조사', title: '로비에서 규칙 2개 확인 후 로프로 귀환', depth: 2, depthLabel: 'L1~L2', rules: 2, reward: { budget: 100, teeth: 2, research: 0 }, repeat: true },
+  { id: 'm2', short: 'L3 경비원 진압', kind: '진압', title: '로비 L3 경비원', depth: 3, depthLabel: 'L3', reward: { budget: 200, teeth: 3, research: 0 }, requires: 'm1' },
+  { id: 'm3', short: '추격의 층 통과', kind: '조사', title: '추격의 층 통과', depth: 5, depthLabel: 'B-1', reward: { budget: 200, teeth: 2, research: 1 }, requires: 'm2' },
+  { id: 'm4', short: '야근 회사원 구조', kind: '구조', title: '야근하다 들어온 회사원을 다락방까지', depth: 5, depthLabel: 'B-1~B-2', rescue: 'worker', reward: { budget: 300, teeth: 5, research: 0 }, requires: 'm3', deadline: 2 },
+  { id: 'm5', short: '아파트 규칙 조사', kind: '조사', title: '재현의 층 「아파트」 규칙 3개', depth: 5, depthLabel: 'B-2', rules: 3, reward: { budget: 150, teeth: 2, research: 2 }, requires: 'm3' },
+  { id: 'm6', short: '405호 노부부', kind: '진압', title: '405호 노부부 (재현)', depth: 5, depthLabel: 'B-2', reward: { budget: 400, teeth: 4, research: 1 }, requires: 'm5' },
+  { id: 'm7', short: '빈 점검표 회수', kind: '회수', title: '서명란이 빈 점검표', depth: 3, depthLabel: '정비 구역', recover: 'checklist', reward: { budget: 100, teeth: 1, research: 3 }, requires: 'm2' },
+  { id: 'm8', short: '시험 층 돌파', kind: '조사', title: '시험 층 목표 달성', depth: 6, depthLabel: 'B-3', reward: { budget: 500, teeth: 3, research: 1 }, requires: 'm6' },
+  { id: 'm9', short: 'B-5 도달', kind: '기록', title: 'B-5 도달', depth: 8, depthLabel: 'B-5', reward: { budget: 600, teeth: 5, research: 2 }, requires: 'm8' },
 ];
 export const MISSION_BY_ID = Object.fromEntries(MISSIONS.map((m) => [m.id, m]));
 

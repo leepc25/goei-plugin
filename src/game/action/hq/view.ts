@@ -318,7 +318,23 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   // 잼트리 임무·브리핑: 게임 화면 위 대화창 (얼굴 + 큰 글씨 + 선택지). 폰에서도 게임이 보이게 아래쪽만 덮는다
   const talkBox = (who: string, text: string, choices: string, extra = '') => {
     const ph = photoOf(who);
-    return `<div class="hq-talk gk-panel" role="dialog" aria-label="${esc(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc(who)}</b><p class="hq-line gk-font">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+    return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc(who)}</b><p class="hq-line gk-font">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+  };
+  // 잼트리 말투 (선택지에는 임무 이름만, 대사에서는 되풀이하지 않는다)
+  const pitch = (c: MissionCard) => {
+    const d = c.def;
+    switch (d.kind) {
+      case '조사':
+        return d.rules ? `${d.depthLabel} 쪽이에요. 규칙 ${d.rules}개만 확인하고 바로 올라오시면 돼요.` : `${d.depthLabel}까지 내려가서 보고 오시면 돼요. 무리는 마시고요.`;
+      case '진압':
+        return `${d.depthLabel}에서 진압 요청 들어왔어요. 이번엔 정리하고 오셔야 해요.`;
+      case '구조':
+        return `구조 요청이에요. 사람이 기다리고 있어요${c.left !== undefined ? `. 출동 ${c.left}번 안에 가셔야 해요` : ''}.`;
+      case '회수':
+        return `${d.depthLabel}에 두고 온 물건이 있대요. 들고만 오시면 돼요.`;
+      default:
+        return `${d.depthLabel}까지 내려가 보는 건이에요. 기록 남기는 거죠.`;
+    }
   };
   const missionTalk = () => {
     cards = missionBoard(s, boardNames(card));
@@ -326,8 +342,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
     const say = lines('npc:jaemtri', ctx())[0];
     const sel = cards.find((c) => c.def.id === selMission);
-    const text = sel ? `${sel.def.kind} 건이에요. ${sel.def.title}. ${sel.def.depthLabel}까지, 끝나면 예산 ${sel.def.reward.budget}${sel.left !== undefined ? `. 출동 ${sel.left}번 안에 가야 해요` : ''}.` : (say?.text ?? '오늘은 들어온 건이 없어요.');
-    const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? ' on' : ''}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.title)}</button>`).join('');
+    const text = sel ? `${pitch(sel)} 끝나면 예산 ${sel.def.reward.budget} 나와요.` : (say?.text ?? '오늘은 들어온 건이 없어요.');
+    const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? ' on' : ''}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.short)}</button>`).join('');
     return talkBox('잼트리', text, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? '' : 'disabled'}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
   };
   const briefTalk = () => {
@@ -537,6 +553,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       root.append(wrap);
       canvas = wrap.querySelector('canvas');
       wrap.addEventListener('click', onClick);
+      // 창이 바뀐 직전 마우스 자리로 강조가 옮겨 가지 않게: 마우스를 움직여야 올림 강조가 켜진다
+      wrap.addEventListener('pointermove', () => wrap?.querySelector('.hq-talk.fresh')?.classList.remove('fresh'));
       if (walk) {
         wrap.addEventListener('pointerdown', onPointer);
         window.addEventListener('pointerup', onPointer);
