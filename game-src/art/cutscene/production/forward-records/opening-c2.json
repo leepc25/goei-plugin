@@ -1,0 +1,47 @@
+{
+  "cut": "opening/c2",
+  "generator": "built-in image_gen",
+  "sources": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c2-1.png"
+  ],
+  "prompts": [
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C2. Empty Jongno Seoul street at night. An old SIX-storey grey masonry office building with flat roof and regular windows. Eight consecutive frames form a vertical downward camera pan: first rooftop and upper floors, then lower floors, and last frame the warm lit glass ground-floor lobby. Same building's facade consistent across frames, no jump cuts. In the final two frames through the glass doorway clearly show closed brass elevator doors and a single small RED indicator lamp above, NO numbers. No people or cars. Navy night, dim amber lobby, dark outlined clear geometric pixel clusters. Each panel must be a complete 16:9 camera view, not a slice of a tall image."
+  ],
+  "layout": "vertical-pan",
+  "timing": {
+    "ms": [
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125
+    ]
+  },
+  "size": [
+    640,
+    360
+  ],
+  "colors": 64,
+  "sampling": "nearest-neighbor only; no dithering",
+  "paletteSha256": "bd61903f69d729463970f5f5ad44e37917ac3226405901a4fecd5fce1d57a367",
+  "uniqueFrames": 24
+}
