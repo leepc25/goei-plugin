@@ -251,11 +251,69 @@ def run_place(place: Path) -> dict:
     return meta
 
 
+# 본부 벽에 그려진 빈 문틀(검은 구멍)을 닫힌 문으로 채운다 (통합 재검수 3-4). 벽 이름 → (문 구멍 x 범위, 문짝 그림)
+DOOR_FILL = {
+    'hq_corridor_wall_3': ((128, 205), 'hq_office/objects/hq_office_objects_9'),
+    'hq_corridor_wall_4': ((124, 196), 'hq_office/objects/hq_office_objects_9'),
+    'hq_clinic_wall_4': ((77, 163), 'hq_office/objects/hq_office_objects_9'),
+    'hq_office_wall_3': ((126, 194), 'hq_office/objects/hq_office_objects_9'),
+    'hq_pantry_wall_2': ((62, 139), 'hq_pantry/objects/hq_pantry_objects_9'),
+    'hq_pantry_wall_4': ((122, 198), 'hq_pantry/objects/hq_pantry_objects_9'),
+    'hq_workshop_wall_1': ((29, 101), 'hq_workshop/objects/hq_workshop_objects_9'),
+    'hq_workshop_wall_3': ((115, 206), 'hq_workshop/objects/hq_workshop_objects_9'),
+    'hq_supply_wall_2': ((123, 215), 'hq_workshop/objects/hq_workshop_objects_9'),
+    'hq_containment_wall_1': ((139, 216), 'hq_workshop/objects/hq_workshop_objects_9'),
+    'hq_containment_wall_3': ((116, 204), 'hq_workshop/objects/hq_workshop_objects_9'),
+    'hq_containment_wall_4': ((111, 211), 'hq_workshop/objects/hq_workshop_objects_9'),
+}
+
+
+def fill_doors() -> None:
+    for name, ((x0, x1), leaf) in DOOR_FILL.items():
+        f = OUT / name.rsplit('_wall', 1)[0] / f'{name}.png'
+        lf = OUT / f'{leaf}.png'
+        if not f.exists() or not lf.exists():
+            continue
+        im = Image.open(f).convert('RGBA')
+        a = np.asarray(im.convert('RGB')).astype(int)
+        lum = a @ np.array([299, 587, 114]) // 1000
+        dark = lum < 40
+        # 문 구멍 = 아래 가운데에서 이어진 어두운 칸 (x 범위 안)
+        h, w = dark.shape
+        best = np.zeros_like(dark)
+        for cx in ((x0 + x1) // 2, (x0 * 2 + x1) // 3, (x0 + x1 * 2) // 3):
+            for sy in (h - 3, h - 8, h - 16, h - 30):
+                if not dark[sy, cx]:
+                    continue
+                seen = np.zeros_like(dark)
+                stack = [(sy, cx)]
+                while stack:
+                    y, x = stack.pop()
+                    if not (0 <= y < h and x0 - 4 <= x <= x1 + 4) or seen[y, x] or not dark[y, x]:
+                        continue
+                    seen[y, x] = True
+                    stack += [(y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)]
+                if seen.sum() > best.sum():
+                    best = seen
+        seen = best
+        ys, xs = np.nonzero(seen)
+        if len(xs) < 200:
+            print(f'{name}: 문 구멍 못 찾음')
+            continue
+        bx0, bx1, by0, by1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
+        door = Image.open(lf).convert('RGBA')
+        door = door.crop(door.getbbox()).resize((bx1 - bx0, by1 - by0), Image.Resampling.NEAREST)
+        im.alpha_composite(door, (int(bx0), int(by0)))
+        im.save(f, optimize=True)
+        print(f'{name}: 문 닫음 ({bx0},{by0})-({bx1},{by1})')
+
+
 def main(argv: list[str]) -> None:
     places = [RAW / p for p in argv] if argv else sorted(p for p in RAW.glob('*') if p.is_dir())
     for p in places:
         meta = run_place(p)
         print(f'{p.name}: {len(meta)}개')
+    fill_doors()
 
 
 if __name__ == '__main__':
