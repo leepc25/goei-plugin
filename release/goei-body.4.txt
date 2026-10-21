@@ -1,4 +1,38 @@
-}
+ border-bottom: 1px solid var(--line); font-size: 20px; color: var(--text); }
+.nw-h span { color: var(--nw, var(--signal)); }
+h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
+.nw-infobox { float: right; width: min(100%, 300px); margin: 0 0 12px 16px; border-collapse: collapse; font-size: 14px; border: 1px solid var(--nw); }
+.nw-infobox th { padding: 8px; background: var(--nw); color: #fff; font-size: 16px; }
+.nw-infobox td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+.nw-infobox td:first-child { width: 36%; color: var(--dim); background: var(--void); }
+.nw-toc { display: inline-flex; flex-direction: column; gap: 2px; margin: 0 0 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 14px; }
+.nw-toc b { color: var(--mint); margin-bottom: 4px; }
+.nw-toc a { color: var(--text); cursor: pointer; text-decoration: none; }
+.nw-toc a.l2 { padding-left: 14px; color: var(--dim); }
+.nw-toc a:hover { color: var(--signal); }
+.nw-list { margin: 0 0 12px; padding-left: 22px; }
+.nw-quote { margin: 0 0 12px; padding: 10px 14px; border-left: 4px solid var(--line); background: var(--void); border-radius: 0 10px 10px 0; }
+/* 정보표(오른쪽 띄움) 옆에서 제목 줄·인용 상자가 표 밑으로 들어가지 않게 */
+.nw-h, .nw-quote { display: flow-root; }
+.nw-spoil { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
+.nw-spoil > summary { cursor: pointer; padding: 10px 14px; color: var(--dim); font-size: 14px; list-style: none; }
+.nw-spoil > summary::-webkit-details-marker { display: none; }
+.nw-spoil > summary::before { content: '▸ '; }
+.nw-spoil[open] > summary::before { content: '▾ '; }
+.nw-spoil[open] > summary { border-bottom: 1px solid var(--line); }
+.nw-spoil-in { padding: 12px 14px 0; }
+.nw-spoil.fn { display: inline-block; margin: 0; border: 0; background: none; }
+.nw-spoil.fn > summary { display: inline; padding: 0; }
+.nw-spoil.fn[open] > summary { border: 0; }
+.nw-quote cite { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--dim); }
+.nw-table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 15px; }
+.nw-table caption { padding: 6px; font-weight: 600; color: var(--mint); }
+.nw-table th { background: var(--nw); color: #fff; padding: 6px 8px; }
+.nw-table td { padding: 6px 8px; border: 1px solid var(--line); }
+.nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
+.nw-link.on { color: #7fb8ff; text-decoration: none; }
+.nw-link:hover { text-decoration: underline; }
+.nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; }
 .nw-fn:hover, .nw-fn:focus-visible { background: var(--accent-bg); outline: none; }
 .nw-doc { position: relative; }
 .nw-fnpop { position: absolute; z-index: 5; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0, 0, 0, .35); font-size: 14px; line-height: 1.6; color: var(--text); pointer-events: none; }
@@ -1942,23 +1976,29 @@ button.mk-go:hover { color: var(--signal); }
 @keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
 /* 2026-10-21 사용자: 어둡게는 접힌 띠에만. 펼친 커스텀은 글자 자리(아래)만 살짝 어둡게 */
 .gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
-/* 「선택」 표식이 눈에 띄게: 조준선이 숨 쉬듯 붉게 빛나고 글자도 따라 밝아진다. 고르면 붉은 빛 고정 */
-.gx-tgt:not(.gx-evbtn) { color: rgba(255, 255, 255, .92); }
-.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.8s ease-in-out infinite; }
-.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.8s ease-in-out infinite; }
-.gx-tgt.on:not(.gx-evbtn) { color: #ff6a5e; text-shadow: 0 0 6px rgba(255, 59, 48, .75), 0 1px 2px rgba(0, 0, 0, .8); }
-.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 3px rgba(255, 59, 48, .9)); }
-.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 8px rgba(255, 90, 80, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+/* 「선택」 표식이 눈에 띄게 (2026-10-21 사용자: 효과가 약하다): 상자 없이 글자·조준선만. 고르기 전에는 붉게 깜빡이며
+   조준선에서 붉은 고리가 퍼지고, 고르면 붉은 빛으로 고정되고 한 번 「잠김」 번쩍임 */
+.gx-tgt:not(.gx-evbtn) { position: relative; color: #fff; font-size: 12px; letter-spacing: .06em; }
+.gx-tgt:not(.gx-evbtn) svg { position: relative; z-index: 1; }
+.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on)::before { content: ''; position: absolute; left: 2px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border: 2px solid #ff3b30; border-radius: 50%; box-sizing: border-box; pointer-events: none; animation: gx-tgt-ring 1.2s ease-out infinite; }
+.gx-tgt.on:not(.gx-evbtn) { color: #ff5a4e; text-shadow: 0 0 8px rgba(255, 59, 48, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); animation: gx-tgt-lock .5s ease-out 1; }
+.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
+.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 10px rgba(255, 70, 60, 1), 0 1px 2px rgba(0, 0, 0, .8); }
 @keyframes gx-tgt-pulse {
-  0%, 100% { text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
-  50% { color: #fff; text-shadow: 0 0 8px rgba(255, 70, 60, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+  0%, 100% { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+  50% { color: #ff6a5e; text-shadow: 0 0 10px rgba(255, 59, 48, 1), 0 0 3px rgba(255, 120, 110, 1), 0 1px 2px rgba(0, 0, 0, .8); }
 }
 @keyframes gx-tgt-spin {
   0%, 100% { transform: scale(1) rotate(0deg); filter: none; }
-  50% { transform: scale(1.18) rotate(45deg); filter: drop-shadow(0 0 3px rgba(255, 59, 48, .95)); }
+  50% { transform: scale(1.3) rotate(90deg); filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
 }
+@keyframes gx-tgt-ring { 0% { transform: scale(.8); opacity: .95; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes gx-tgt-lock { 0% { transform: scale(1.35); filter: brightness(2); } 100% { transform: none; filter: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg { animation: none; }
+  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg, .gx-tgt.on:not(.gx-evbtn) { animation: none; }
+  .gx-tgt:not(.gx-evbtn):not(.on)::before { content: none; }
 }
 
 /* 편성 요원 카드 (임무·커스텀): 상황이 몇 줄이든 상황 2줄 높이로 고정하고, 사진을 그 높이만큼 키운다 (2026-10-21 사용자) */
@@ -2260,51 +2300,4 @@ button.mk-go:hover { color: var(--signal); }
       if (e.target.closest(".gx-zoom")) return start4 = null;
       if (t.length === 2) {
         const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        start4 = { d: dist(t), mx, my, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-      } else if (t.length === 1) start4 = { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY };
-    }, { passive: true });
-    canvas.addEventListener("touchmove", (e) => {
-      const t = e.touches;
-      if (!start4) return;
-      if (t.length === 2 && start4.d) {
-        e.preventDefault();
-        dragged = true;
-        const [mx, my] = local((t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2);
-        const nz = Math.min(MAX, Math.max(1, start4.v.z * dist(t) / start4.d));
-        v = { z: nz, x: mx - (start4.mx - start4.v.x) / start4.v.z * nz, y: my - (start4.my - start4.v.y) / start4.v.z * nz };
-        apply();
-      } else if (t.length === 1 && canPan() && !start4.d) {
-        e.preventDefault();
-        const dx = t[0].clientX - start4.x, dy = t[0].clientY - start4.y;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        v = { ...start4.v, x: start4.v.x + dx, y: start4.v.y + dy };
-        apply();
-      }
-    }, { passive: false });
-    canvas.addEventListener("touchend", (e) => {
-      const t = e.touches;
-      start4 = t.length === 1 ? { d: 0, mx: 0, my: 0, v: { ...v }, x: t[0].clientX, y: t[0].clientY } : null;
-    }, { passive: true });
-    canvas.addEventListener("wheel", (e) => {
-      if (!e.ctrlKey) return;
-      e.preventDefault();
-      const [cx, cy] = local(e.clientX, e.clientY);
-      zoomAt(v.z * Math.exp(-e.deltaY / 200), cx, cy);
-    }, { passive: false });
-    canvas.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse" || e.button !== 0 || !canPan() || e.target.closest(".gx-zoom")) return;
-      const sx = e.clientX, sy = e.clientY, sv = { ...v };
-      dragged = false;
-      const move2 = (m) => {
-        const dx = m.clientX - sx, dy = m.clientY - sy;
-        if (Math.hypot(dx, dy) > MOVE) dragged = true;
-        if (dragged) v = { ...sv, x: sv.x + dx, y: sv.y + dy }, apply();
-      };
-      const up = () => (window.removeEventListener("pointermove", move2), window.removeEventListener("pointerup", up));
-      window.addEventListener("pointermove", move2);
-      window.addEventListener("pointerup", up);
-    });
-  }
-
-  // src/game/style.css
-  var style_default2 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border
+        start4 = { d: dist(t), mx, my, v: { ...v }, x: t[0].client

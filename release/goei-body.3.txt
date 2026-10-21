@@ -1,4 +1,63 @@
-ughts(text).trim();
+w = "") {
+      super(message);
+      this.raw = raw;
+    }
+  };
+  function stripThoughts(s4) {
+    return s4.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<(?:thoughts|think)\b[^>]*>[\s\S]*$/gi, "");
+  }
+  async function readStream(stream) {
+    const reader = stream.getReader();
+    let last2 = "";
+    try {
+      for (; ; ) {
+        const { done: done2, value } = await reader.read();
+        if (done2) break;
+        if (typeof value === "string") last2 = value;
+        else if (value && typeof value === "object") last2 = String(Object.values(value)[0] ?? last2);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+    return last2;
+  }
+  async function withPhotos(messages) {
+    return Promise.all(
+      messages.map(async (m) => {
+        if (!m.images?.length) return m;
+        const { images, ...rest } = m;
+        const data = await Promise.all(images.map(photoData));
+        const missing = data.map((d, i) => d ? 0 : i + 1).filter(Boolean);
+        return {
+          ...rest,
+          content: missing.length ? `${rest.content}
+Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
+          multimodals: data.filter((d) => !!d).map((base643) => ({ type: "image", base64: base643 }))
+        };
+      })
+    );
+  }
+  async function runModel(messages, model2) {
+    let res;
+    try {
+      res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model2 === "aux" ? "submodel" : "model", allowPlugins: true });
+    } catch (error) {
+      throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    let text = "";
+    if (typeof res === "string") text = res;
+    else if (res && typeof res === "object") {
+      const r = res;
+      if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
+        throw new LlmError("Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.", String(r.result));
+      }
+      if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
+${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
+      if (r.type === "multiline" && Array.isArray(r.result)) text = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
+      else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text = await readStream(r.result);
+      else if (typeof r.result === "string") text = r.result;
+    }
+    text = stripThoughts(text).trim();
     if (!text) throw new LlmError("모델이 빈 응답을 보냈어요.");
     return text;
   }
@@ -111,8 +170,8 @@ ughts(text).trim();
     }
     let vars = null;
     if (action === "adv-set") {
-      const hit2 = parse2(v);
-      if (hit2) vars = { [advVar(hit2[0], hit2[1])]: hit2[2] };
+      const hit3 = parse2(v);
+      if (hit3) vars = { [advVar(hit3[0], hit3[1])]: hit3[2] };
     } else if (action === "adv-reset") {
       const [f, key2] = v.split(":");
       const item3 = f in ADV ? advItem(f, key2) : void 0;
@@ -3453,38 +3512,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .nw-body { font-size: 16px; line-height: 1.75; color: var(--text); }
 .nw-body::after { content: ""; display: block; clear: both; }
 .nw-p { margin: 0 0 12px; }
-.nw-h { margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 20px; color: var(--text); }
-.nw-h span { color: var(--nw, var(--signal)); }
-h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
-.nw-infobox { float: right; width: min(100%, 300px); margin: 0 0 12px 16px; border-collapse: collapse; font-size: 14px; border: 1px solid var(--nw); }
-.nw-infobox th { padding: 8px; background: var(--nw); color: #fff; font-size: 16px; }
-.nw-infobox td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; }
-.nw-infobox td:first-child { width: 36%; color: var(--dim); background: var(--void); }
-.nw-toc { display: inline-flex; flex-direction: column; gap: 2px; margin: 0 0 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 14px; }
-.nw-toc b { color: var(--mint); margin-bottom: 4px; }
-.nw-toc a { color: var(--text); cursor: pointer; text-decoration: none; }
-.nw-toc a.l2 { padding-left: 14px; color: var(--dim); }
-.nw-toc a:hover { color: var(--signal); }
-.nw-list { margin: 0 0 12px; padding-left: 22px; }
-.nw-quote { margin: 0 0 12px; padding: 10px 14px; border-left: 4px solid var(--line); background: var(--void); border-radius: 0 10px 10px 0; }
-/* 정보표(오른쪽 띄움) 옆에서 제목 줄·인용 상자가 표 밑으로 들어가지 않게 */
-.nw-h, .nw-quote { display: flow-root; }
-.nw-spoil { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel2); }
-.nw-spoil > summary { cursor: pointer; padding: 10px 14px; color: var(--dim); font-size: 14px; list-style: none; }
-.nw-spoil > summary::-webkit-details-marker { display: none; }
-.nw-spoil > summary::before { content: '▸ '; }
-.nw-spoil[open] > summary::before { content: '▾ '; }
-.nw-spoil[open] > summary { border-bottom: 1px solid var(--line); }
-.nw-spoil-in { padding: 12px 14px 0; }
-.nw-spoil.fn { display: inline-block; margin: 0; border: 0; background: none; }
-.nw-spoil.fn > summary { display: inline; padding: 0; }
-.nw-spoil.fn[open] > summary { border: 0; }
-.nw-quote cite { display: block; margin-top: 4px; font-style: normal; font-size: 14px; color: var(--dim); }
-.nw-table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 15px; }
-.nw-table caption { padding: 6px; font-weight: 600; color: var(--mint); }
-.nw-table th { background: var(--nw); color: #fff; padding: 6px 8px; }
-.nw-table td { padding: 6px 8px; border: 1px solid var(--line); }
-.nw-link { display: inline; padding: 0; border: 0; background: none; color: #f08a8a; text-decoration: underline dotted; text-underline-offset: 3px; font: inherit; }
-.nw-link.on { color: #7fb8ff; text-decoration: none; }
-.nw-link:hover { text-decoration: underline; }
-.nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; 
+.nw-h { margin: 22px 0 10px; padding-bottom: 6px;

@@ -1,4 +1,52 @@
-"지도 표시명", "비우면 거점 이름")}
+소속 요원이 있으면 지울 수 없어요"' : ""}>지우기</button></div>`}
+    ${members.length ? `<p class="gx-muted">소속: ${members.map((m) => esc14(m.name)).join(", ")}</p>` : ""}
+    <div class="dir-line"><span>거점</span><div class="dir-chips">${d.bases.filter((b) => b.org === o.name).map((b) => chip2("dir-base-goto", b.name, b.name, false)).join("")}<button class="gx-chip" data-action="dir-base-new" data-value="${esc14(o.name)}">＋ 거점 추가</button></div></div>
+  </div>`;
+  }
+  function orgRow(o, ctx2, d, names4) {
+    const open3 = dirUi.open === o.name;
+    const n = d.agents.filter((a) => a.affiliation === orgAffiliation(o)).length;
+    const sub = o.rosterFor.length ? `${o.rosterFor.map((f) => names4[f] ?? f).join("·")} 플레이 때 보임` : "요원 목록에 안 보임";
+    const play = o.faction || o.spec.playable && o.spec.code;
+    return `<div class="dir-row${open3 ? " open" : ""}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc14(o.name)}" aria-expanded="${open3}">
+      <span class="dir-name"><b>${esc14(o.name)}</b><small>${esc14(sub)}</small></span>
+      ${play ? `<span class="gx-badge live">플레이 ${esc14(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n}명</span>
+    </button>${open3 ? orgPanel(o, ctx2, d) : ""}</div>`;
+  }
+  var REGIONS = MAP_CODES.filter((c) => c !== "01");
+  var baseMaps = {};
+  function baseMap(ctx2, code, env2) {
+    const hit3 = baseMaps[code];
+    if (hit3 === void 0 && env2) {
+      baseMaps[code] = "loading";
+      void assetUrl(ctx2.char, `map${code}`).then((url) => {
+        baseMaps[code] = url;
+        env2.render();
+      });
+      return null;
+    }
+    return hit3 === "loading" || hit3 === void 0 ? null : hit3;
+  }
+  var mapEnv = null;
+  var baseWhere = (b) => placeWhere(b.sido, b.gu) || "위치 미정";
+  function basePanel(b, ctx2, d) {
+    const k = (f) => `base:${f}|${b.name}`;
+    const url = baseMap(ctx2, b.sido, mapEnv);
+    const sido = REGIONS.map((c) => `<option value="${c}"${c === b.sido ? " selected" : ""}>${esc14(regionName(c))}</option>`).join("");
+    const gus = `<option value=""${b.gu ? "" : " selected"}>시군구 선택 안 함</option>` + (SIGUN[b.sido] ?? []).map((g) => `<option value="${esc14(g)}"${g === b.gu ? " selected" : ""}>${esc14(g)}</option>`).join("");
+    const map = url ? `<div class="dir-map" data-base-pick="${esc14(b.name)}"><img src="${esc14(url)}" alt="${esc14(regionName(b.sido))} 지도" draggable="false"><span class="dir-mappin" style="left:${b.x}%;top:${b.y}%"></span></div>` : `<div class="dir-map ph">지도 불러오는 중…</div>`;
+    return `<div class="dir-panel">
+    <div class="dir-line"><span>지도에 보이기</span><div class="gx-segs gx-segs-sm">
+      <button class="gx-seg${b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc14(`1|${b.name}`)}">보임</button>
+      <button class="gx-seg${!b.show ? " on" : ""}" data-action="dir-base-show" data-value="${esc14(`0|${b.name}`)}">숨김</button></div></div>
+    <div class="dir-line"><span>조직</span><div class="dir-chips">${d.orgs.map((o) => chip2("dir-base-org", `${o.name}|${b.name}`, o.name, b.org === o.name)).join("")}${chip2("dir-base-org", `|${b.name}`, "조직 없음", !b.org)}</div></div>
+    <div class="dir-grid">
+      <label class="dir-in"><span>지역</span><select class="gx-select" data-change="dir-base-sido" data-key="${esc14(b.name)}">${sido}</select></label>
+      <label class="dir-in"><span>시군구</span><select class="gx-select" data-change="dir-base-gu" data-key="${esc14(b.name)}">${gus}</select></label>
+    </div>
+    ${map}
+    ${input(k("label"), b.label, "지도 표시명", "비우면 거점 이름")}
     ${input(k("lore"), b.lore, "위키 로어북", "이 거점을 설명하는 로어북 이름")}
     ${input(k("english"), b.english, "영문명", "영어 응답에서도 이 이름을 알아봐요")}
     ${input(k("aliases"), b.aliases.join(", "), "별칭", "쉼표로 나눠 적어요")}
@@ -56,9 +104,9 @@
       ["org", "조직", d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump("org", orgRow(o, ctx2, d, names4)))],
       ["base", "거점", d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump("base", baseRow(b, ctx2, d)))]
     ];
-    const hit2 = groups.filter(([, , rows2]) => rows2.length);
-    if (!hit2.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
-    return hit2.map(([, label, rows2]) => `<h3 class="dir-group">${label}<small>${rows2.length}</small></h3>${rows2.join("")}`).join("");
+    const hit3 = groups.filter(([, , rows2]) => rows2.length);
+    if (!hit3.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
+    return hit3.map(([, label, rows2]) => `<h3 class="dir-group">${label}<small>${rows2.length}</small></h3>${rows2.join("")}`).join("");
   }
   function directoryList(ctx2) {
     const d = draftOf(ctx2);
@@ -628,8 +676,8 @@
     return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key2;
   }
   function mapImage(ctx2, code, env2) {
-    const hit2 = mapUrls[code];
-    if (hit2 === void 0) {
+    const hit3 = mapUrls[code];
+    if (hit3 === void 0) {
       mapUrls[code] = "loading";
       void assetUrl(ctx2.char, `map${code}`).then((url) => {
         mapUrls[code] = url;
@@ -637,7 +685,7 @@
       });
       return null;
     }
-    return hit2 === "loading" ? null : hit2;
+    return hit3 === "loading" ? null : hit3;
   }
   var boardMapUrl = (ctx2, env2) => mapImage(ctx2, "01", env2);
   function pin(action, value, label, x, y, cls, count = 0) {
@@ -905,14 +953,14 @@
       <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen(mark)}${art2.desc ? `<span class="gx-evc-desc">${esc15(art2.desc)}</span>` : ""}</span></div></li>`;
     };
-    const hit2 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
+    const hit3 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
     if (!q) {
       const rows2 = missionCatalog(x.catalog, field2.mkind);
       if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
       return `<ul class="gx-list gx-mlist">${rows2.map((r) => row6(field2.mkind, r)).join("")}</ul>`;
     }
     const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) => k !== field2.mkind)];
-    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit2) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
+    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
     return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
   }
   function missionTab(ctx2, opening, notice2, busy4) {
@@ -1500,8 +1548,8 @@ ${note.trim()}` : card2;
           return true;
         }
         case "set-world": {
-          const hit2 = nextWorld(d.world, v);
-          if (hit2) await saveDefaults(env2, (p) => ({ ...p, world: { ...p.world, [hit2[0]]: hit2[1] } }));
+          const hit3 = nextWorld(d.world, v);
+          if (hit3) await saveDefaults(env2, (p) => ({ ...p, world: { ...p.world, [hit3[0]]: hit3[1] } }));
           return true;
         }
       }
@@ -1510,8 +1558,8 @@ ${note.trim()}` : card2;
     switch (action) {
       case "set-world":
         await save(ctx2, env2, (chat) => {
-          const hit2 = nextWorld(worldSettings(lore, chat.scriptstate), v);
-          return hit2 ? { [wgKey(hit2[0])]: String(hit2[1]) } : null;
+          const hit3 = nextWorld(worldSettings(lore, chat.scriptstate), v);
+          return hit3 ? { [wgKey(hit3[0])]: String(hit3[1]) } : null;
         });
         return true;
       case "set-anomaly":
@@ -2048,6 +2096,17 @@ ${note.trim()}` : card2;
       return;
     }
     if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
+    if (action === "pick-event" && view.kind === "started" && tab !== "map") {
+      await handleField(action, value, view.ctx, env, false);
+      if (field2.target?.type === "event" && field2.target.key === value && showOnMap(view.ctx, value ?? "")) {
+        tab = "map";
+        evUi.pop = "";
+        field2.step = "goal";
+        notice = "";
+        render();
+      }
+      return;
+    }
     if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env, view.kind === "opening")) return;
     switch (action) {
       case "close":
