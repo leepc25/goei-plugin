@@ -1,5 +1,5 @@
 // 스테이지 자료 → 엔진 FloorPlan (docs/게임_모듈_연결.md). 배경·전경 그리기도 여기서 한다(회색 상자, 그림 없음).
-import { drawPropArt } from '../art/bg';
+import { drawPropArt, isStandBoard, wallDecoSpans } from '../art/bg';
 import type { Encounter, FloorPlan, PropSpec, SpawnSpec, WorldView } from '../engine/contract';
 import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
@@ -162,6 +162,7 @@ export function endingPlan(id: string): StagePlan {
    기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
 const FIXED_PROPS = new Set(['elevator', 'mirror', 'hatch', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const BOARD_GAP = 1400;
 const artW = (p: PropSpec) => Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
 
 function spreadProps(f: Floor, props: PropSpec[], startX: number) {
@@ -175,15 +176,15 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number) {
   // 규칙 표지는 지우지 않지만(읽어야 한다) 겹치면 옮긴다
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
   const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
-  // 입간판·게시판류(뜻 없는 꾸밈)는 층마다 2개까지, 서로 한 화면(1400px) 넘게 떨어뜨린다 (검수 13-2: 화면마다 2~3개 반복)
-  const boardLike = (p: PropSpec) => p.kind === 'sign' || p.kind === 'checklist' || (p.kind === 'prop' && /게시판|표지|안내|점검|액자|시간표/.test(p.label ?? ''));
-  const boardy = (p: PropSpec) => !meaning.has(p.id) && !ruled.has(p.id) && boardLike(p);
-  // 뜻 있는 표지(규칙·갈림길)도 수와 간격에 센다
-  const kept: number[] = props.filter((p) => boardLike(p) && (meaning.has(p.id) || ruled.has(p.id))).map((p) => p.x);
-  for (const p of [...props].filter(boardy).sort((a, b) => a.x - b.x)) {
-    if (kept.length < 3 && kept.every((x) => Math.abs(x - p.x) > 1400)) kept.push(p.x);
-    else props.splice(props.indexOf(p), 1);
-  }
+  // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
+  // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
+  const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type);
+  const must = (p: PropSpec) => meaning.has(p.id) || ruled.has(p.id);
+  // 판 자리: 고정된 판(갈림길·순서) → 규칙 표지 → 꾸밈 판 순으로 잡는다. 꾸밈 판은 자리가 없거나, 넷째거나, 바로 앞 판과 같은 그림이면 뺀다.
+  const kept: PropSpec[] = props.filter((p) => boardLike(p) && fixed(p));
+  const decor = new Set(props.filter((p) => boardLike(p) && !must(p) && !fixed(p)));
+  // 벽 그림의 게시판·액자·창 앞에도 벽 쪽 소품을 세우지 않는다 (검수 14-1)
+  for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
   for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p) / 2;
@@ -191,11 +192,30 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number) {
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
     if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false; // 구덩이·단은 앞쪽이 원근으로 넓어진다
+    if (spaced && boardLike(p) && kept.some((q) => q !== p && Math.abs(q.x - x) <= BOARD_GAP)) return false;
     return true;
   };
-  for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => a.x - b.x)) {
-    let x = p.x;
-    for (let d = 0; d <= 480; d += 24) {
+  let spaced = true;
+  // 한 화면 간격 자리가 없으면(짧은 층에 규칙 표지 셋) 다른 판과 가장 먼 빈자리
+  const farthest = (p: PropSpec, reach: number): number | null => {
+    spaced = false;
+    let best: number | null = null, bd = -1;
+    for (let d = -reach; d <= reach; d += 24) {
+      const x = p.x + d;
+      if (!free(p, x)) continue;
+      const md = Math.min(...kept.filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
+      if (md > bd) (bd = md), (best = x);
+    }
+    spaced = true;
+    return best;
+  };
+  const placed: PropSpec[] = props.filter(fixed);
+  const order = (p: PropSpec) => (boardLike(p) ? (decor.has(p) ? 1 : 0) : 2);
+  for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
+    let x: number | null = null;
+    // 판은 다른 판과 한 화면 떨어진 자리를 더 멀리까지 찾는다
+    const reach = boardLike(p) ? 1800 : 480;
+    for (let d = 0; d <= reach; d += 24) {
       if (free(p, p.x + d)) {
         x = p.x + d;
         break;
@@ -205,8 +225,23 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number) {
         break;
       }
     }
-    p.x = x;
-    taken.push({ a: x - artW(p) / 2, b: x + artW(p) / 2, y: p.y });
+    if (x === null && boardLike(p) && !decor.has(p)) x = farthest(p, f.width);
+    if (decor.has(p)) {
+      const near = x === null ? null : kept.reduce<PropSpec | null>((n, q) => (!n || Math.abs(q.x - x!) < Math.abs(n.x - x!) ? q : n), null);
+      if (x === null || kept.length >= 3 || (near && near.kind === p.kind && near.label === p.label)) {
+        props.splice(props.indexOf(p), 1);
+        continue;
+      }
+    }
+    // 같은 꾸밈 소품(정수기 둘 등)이 나란히 서지 않게 (검수 14-1 「같은 종류 연속 금지」)
+    if (!must(p) && p.kind === 'prop' && placed.some((q) => q.kind === p.kind && q.label === p.label && Math.abs(q.x - (x ?? p.x)) < 640)) {
+      props.splice(props.indexOf(p), 1);
+      continue;
+    }
+    p.x = x ?? p.x;
+    placed.push(p);
+    if (boardLike(p)) kept.push(p);
+    taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   }
 }
 
@@ -551,8 +586,15 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       if (b < y1) {
         // 실제 공사 차단대 크기: 기둥 ≈ 쟈알디 엉덩이 높이(130px), 가로대 두 줄 (검수 7)
         const fy = Math.min(y1 + 10, b + 150);
-        for (let x = t.x0 + 10; x < t.x1 - 10; x += 170) {
-          const x2 = Math.min(t.x1 - 10, x + 160);
+        // 길 폭을 같은 너비 차단대 n개로 나눈다: 끝에 기둥 하나짜리 조각이 남지 않게 (검수 14-2)
+        // 기둥 사이 좁은 칸(폭 80)도 기둥 둘 + 가로대 한 벌(폭 140)로, 칸 가운데에
+        const bw = Math.max(w, 160),
+          bx0 = t.x0 + (w - bw) / 2;
+        const n = Math.max(1, Math.round((bw - 20) / 170)),
+          sw = (bw - 20) / n;
+        for (let i = 0; i < n; i++) {
+          const x = Math.round(bx0 + 10 + i * sw),
+            x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
           ctx.fillStyle = 'rgba(0,0,0,0.3)';
           ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
           for (const px of [x, x2 - 16]) {

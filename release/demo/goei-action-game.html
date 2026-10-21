@@ -968,7 +968,27 @@ var WALL_SOLID = {
   silent_wall_4: [[25, 275]],
   test_wall_3: [[70, 250]]
 };
-function wallSolidSpans(place3, x, w, flip) {
+var WALL_DECO = {
+  lobby_wall_4: [[122, 212], [222, 290]],
+  apt_wall_1: [[146, 182], [188, 272]],
+  apt_wall_2: [[85, 170]],
+  apt_wall_3: [[32, 136]],
+  chase_wall_2: [[35, 285]],
+  chase_wall_3: [[65, 255]],
+  chase_wall_4: [[140, 282]],
+  dark_wall_3: [[95, 285]],
+  dark_wall_4: [[40, 135]],
+  deep_wall_4: [[30, 285]],
+  puzzle_wall_1: [[118, 200]],
+  puzzle_wall_2: [[30, 280]],
+  puzzle_wall_3: [[28, 180]],
+  puzzle_wall_4: [[170, 255]],
+  silent_wall_3: [[15, 100], [230, 315]],
+  silent_wall_4: [[25, 285]],
+  test_wall_1: [[50, 268]],
+  test_wall_2: [[45, 275]]
+};
+function wallSolidSpans(place3, x, w, flip, table = WALL_SOLID) {
   const names = walls(place3);
   if (!names.length) return [];
   const bays = Math.max(1, Math.round(w / 640));
@@ -978,9 +998,12 @@ function wallSolidSpans(place3, x, w, flip) {
     const k = Math.round((x + i * bw) / 640);
     const name = names[(k + hash(place3) % names.length) % names.length];
     const bx = x + i * bw, sc = bw / 320;
-    for (const [a, b] of WALL_SOLID[name] ?? []) out.push(flip ? [bx + bw - b * sc, bx + bw - a * sc] : [bx + a * sc, bx + b * sc]);
+    for (const [a, b] of table[name] ?? []) out.push(flip ? [bx + bw - b * sc, bx + bw - a * sc] : [bx + a * sc, bx + b * sc]);
   }
   return out;
+}
+function wallDecoSpans(place3, x, w, flip) {
+  return wallSolidSpans(place3, x, w, flip, WALL_DECO);
 }
 function wallLight(ctx, x, w, bottom) {
   const top = ctx.createLinearGradient(0, 0, 0, bottom * 0.32);
@@ -1408,8 +1431,7 @@ function drawObj(ctx, place3, n, x, y) {
   ctx.drawImage(im, Math.round(x - im.width), Math.round(y - im.height * 2), im.width * 2, im.height * 2);
   return im.width * 2;
 }
-function drawPropArt(ctx, kind, label3, sx, y, floorType) {
-  if (kind.startsWith("item_") && typeof window !== "undefined" && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
+function propArtRef(kind, label3, sx, floorType) {
   let ref;
   if (kind === "door") {
     const p = placeFor("floor", floorType, "");
@@ -1422,6 +1444,15 @@ function drawPropArt(ctx, kind, label3, sx, y, floorType) {
     else ref = BY_LABEL.find(([re]) => re.test(label3))?.[1];
   }
   if (ref === void 0 && kind === "prop") ref = floorType === "deep" && objImage("deep", 1) ? ["deep", 1 + Math.abs(Math.round(sx / 97)) % 9] : ["chase", 5];
+  return ref;
+}
+function isStandBoard(kind, label3, floorType) {
+  const r = propArtRef(kind, label3, 0, floorType);
+  return !!r && r.length === 2 && r[0] === "lobby" && r[1] === 6;
+}
+function drawPropArt(ctx, kind, label3, sx, y, floorType) {
+  if (kind.startsWith("item_") && typeof window !== "undefined" && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
+  const ref = propArtRef(kind, label3, sx, floorType);
   if (ref === void 0) return false;
   if (ref === null) return true;
   ctx.save();
@@ -1442,7 +1473,7 @@ function drawPropArt(ctx, kind, label3, sx, y, floorType) {
   return ok;
 }
 function boardFace(ctx, x, y, w, h, kind, label3) {
-  const head = /시험|점수/.test(label3) ? "시험" : /순서/.test(label3) ? "순서" : /표지/.test(label3) ? "표지" : kind === "checklist" || /점검/.test(label3) ? "점검" : kind === "goalwall" || /목표/.test(label3) ? "목표" : /긁힌/.test(label3) ? "" : "안내";
+  const head = /시험|점수/.test(label3) ? "시험" : /순서/.test(label3) ? "순서" : /규칙/.test(label3) ? "규칙" : /표지/.test(label3) ? "표지" : kind === "checklist" || /점검/.test(label3) ? "점검" : kind === "goalwall" || /목표/.test(label3) ? "목표" : /긁힌/.test(label3) ? "" : "안내";
   x = Math.round(x);
   y = Math.round(y);
   const v = hash(`${kind}:${label3}:${x}`) % 3;
@@ -1524,6 +1555,16 @@ function boardFace(ctx, x, y, w, h, kind, label3) {
       P(W5 - 7 - k, 21 - k, 1, 1 + k * 2, K4);
     }
     lines2(30, 3);
+  } else if (head === "규칙") {
+    const cx = Math.floor(W5 / 2), cy = 13;
+    for (let yy = -9; yy <= 9; yy++)
+      for (let xx = -9; xx <= 9; xx++) {
+        const r = xx * xx + yy * yy;
+        if (r <= 81 && r >= 46) P(cx + xx, cy + yy, 1, 1, R);
+        else if (r < 46 && Math.abs(xx - yy) <= 1) P(cx + xx, cy + yy, 1, 1, R);
+      }
+    P(cx - 2, cy - 4, 4, 8, K4);
+    lines2(27, 4);
   } else if (head === "순서") {
     for (let i = 0; i < 3; i++) {
       P(5 + i * 11, 8, 8, 8, K4);
@@ -14576,6 +14617,7 @@ function endingPlan(id) {
   return plan;
 }
 var FIXED_PROPS = /* @__PURE__ */ new Set(["elevator", "mirror", "hatch", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
+var BOARD_GAP = 1400;
 var artW = (p) => Math.max(p.w, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
 function spreadProps(f, props2, startX) {
   const wallY = Y_TOP + 40;
@@ -14586,13 +14628,11 @@ function spreadProps(f, props2, startX) {
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
   const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
-  const boardLike = (p) => p.kind === "sign" || p.kind === "checklist" || p.kind === "prop" && /게시판|표지|안내|점검|액자|시간표/.test(p.label ?? "");
-  const boardy = (p) => !meaning.has(p.id) && !ruled.has(p.id) && boardLike(p);
-  const kept = props2.filter((p) => boardLike(p) && (meaning.has(p.id) || ruled.has(p.id))).map((p) => p.x);
-  for (const p of [...props2].filter(boardy).sort((a, b) => a.x - b.x)) {
-    if (kept.length < 3 && kept.every((x) => Math.abs(x - p.x) > 1400)) kept.push(p.x);
-    else props2.splice(props2.indexOf(p), 1);
-  }
+  const boardLike = (p) => isStandBoard(p.kind, p.label, f.type);
+  const must = (p) => meaning.has(p.id) || ruled.has(p.id);
+  const kept = props2.filter((p) => boardLike(p) && fixed2(p));
+  const decor = new Set(props2.filter((p) => boardLike(p) && !must(p) && !fixed2(p)));
+  for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
   for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   const free = (p, x) => {
     const h = artW(p) / 2;
@@ -14600,11 +14640,28 @@ function spreadProps(f, props2, startX) {
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
     if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false;
+    if (spaced && boardLike(p) && kept.some((q) => q !== p && Math.abs(q.x - x) <= BOARD_GAP)) return false;
     return true;
   };
-  for (const p of [...props2].filter((q) => !fixed2(q)).sort((a, b) => a.x - b.x)) {
-    let x = p.x;
-    for (let d2 = 0; d2 <= 480; d2 += 24) {
+  let spaced = true;
+  const farthest = (p, reach) => {
+    spaced = false;
+    let best = null, bd = -1;
+    for (let d2 = -reach; d2 <= reach; d2 += 24) {
+      const x = p.x + d2;
+      if (!free(p, x)) continue;
+      const md = Math.min(...kept.filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
+      if (md > bd) bd = md, best = x;
+    }
+    spaced = true;
+    return best;
+  };
+  const placed = props2.filter(fixed2);
+  const order = (p) => boardLike(p) ? decor.has(p) ? 1 : 0 : 2;
+  for (const p of [...props2].filter((q) => !fixed2(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
+    let x = null;
+    const reach = boardLike(p) ? 1800 : 480;
+    for (let d2 = 0; d2 <= reach; d2 += 24) {
       if (free(p, p.x + d2)) {
         x = p.x + d2;
         break;
@@ -14614,8 +14671,22 @@ function spreadProps(f, props2, startX) {
         break;
       }
     }
-    p.x = x;
-    taken.push({ a: x - artW(p) / 2, b: x + artW(p) / 2, y: p.y });
+    if (x === null && boardLike(p) && !decor.has(p)) x = farthest(p, f.width);
+    if (decor.has(p)) {
+      const near2 = x === null ? null : kept.reduce((n, q) => !n || Math.abs(q.x - x) < Math.abs(n.x - x) ? q : n, null);
+      if (x === null || kept.length >= 3 || near2 && near2.kind === p.kind && near2.label === p.label) {
+        props2.splice(props2.indexOf(p), 1);
+        continue;
+      }
+    }
+    if (!must(p) && p.kind === "prop" && placed.some((q) => q.kind === p.kind && q.label === p.label && Math.abs(q.x - (x ?? p.x)) < 640)) {
+      props2.splice(props2.indexOf(p), 1);
+      continue;
+    }
+    p.x = x ?? p.x;
+    placed.push(p);
+    if (boardLike(p)) kept.push(p);
+    taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   }
 }
 function clearOfProps(props2, x, y) {
@@ -14908,8 +14979,10 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers) {
       }
       if (b < y1) {
         const fy = Math.min(y1 + 10, b + 150);
-        for (let x = t.x0 + 10; x < t.x1 - 10; x += 170) {
-          const x2 = Math.min(t.x1 - 10, x + 160);
+        const bw = Math.max(w, 160), bx0 = t.x0 + (w - bw) / 2;
+        const n = Math.max(1, Math.round((bw - 20) / 170)), sw = (bw - 20) / n;
+        for (let i = 0; i < n; i++) {
+          const x = Math.round(bx0 + 10 + i * sw), x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
           ctx.fillStyle = "rgba(0,0,0,0.3)";
           ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
           for (const px of [x, x2 - 16]) {

@@ -121,8 +121,18 @@ const WALL_SOLID: Record<string, [number, number][]> = {
   silent_wall_2: [[228, 282]], silent_wall_3: [[112, 195]], silent_wall_4: [[25, 275]], test_wall_3: [[70, 250]],
 };
 
+/** 벽에 걸린 게시판·액자·창·표지(도트 x 구간). 입간판·소품이 그 앞을 가리지 않게 (검수 14-1). */
+const WALL_DECO: Record<string, [number, number][]> = {
+  lobby_wall_4: [[122, 212], [222, 290]],
+  apt_wall_1: [[146, 182], [188, 272]], apt_wall_2: [[85, 170]], apt_wall_3: [[32, 136]],
+  chase_wall_2: [[35, 285]], chase_wall_3: [[65, 255]], chase_wall_4: [[140, 282]],
+  dark_wall_3: [[95, 285]], dark_wall_4: [[40, 135]], deep_wall_4: [[30, 285]],
+  puzzle_wall_1: [[118, 200]], puzzle_wall_2: [[30, 280]], puzzle_wall_3: [[28, 180]], puzzle_wall_4: [[170, 255]],
+  silent_wall_3: [[15, 100], [230, 315]], silent_wall_4: [[25, 285]], test_wall_1: [[50, 268]], test_wall_2: [[45, 275]],
+};
+
 /** drawWallCell과 같은 칸 고르기로, 조각(x, w) 벽 그림 속 문·가구가 차지한 월드 x 구간들 */
-export function wallSolidSpans(place: string, x: number, w: number, flip: boolean): [number, number][] {
+export function wallSolidSpans(place: string, x: number, w: number, flip: boolean, table: Record<string, [number, number][]> = WALL_SOLID): [number, number][] {
   const names = walls(place);
   if (!names.length) return [];
   const bays = Math.max(1, Math.round(w / 640));
@@ -133,9 +143,14 @@ export function wallSolidSpans(place: string, x: number, w: number, flip: boolea
     const name = names[(k + (hash(place) % names.length)) % names.length];
     const bx = x + i * bw,
       sc = bw / 320;
-    for (const [a, b] of WALL_SOLID[name] ?? []) out.push(flip ? [bx + bw - b * sc, bx + bw - a * sc] : [bx + a * sc, bx + b * sc]);
+    for (const [a, b] of table[name] ?? []) out.push(flip ? [bx + bw - b * sc, bx + bw - a * sc] : [bx + a * sc, bx + b * sc]);
   }
   return out;
+}
+
+/** 벽 그림 속 게시판·액자·창이 차지한 월드 x 구간들 */
+export function wallDecoSpans(place: string, x: number, w: number, flip: boolean): [number, number][] {
+  return wallSolidSpans(place, x, w, flip, WALL_DECO);
 }
 
 /** 벽 명암 단계: 천장 쪽 두 단, 걸레받이 쪽 한 단을 어둡게 (부드러운 그라데이션 대신 도트처럼 끊어진 띠). */
@@ -510,10 +525,8 @@ function drawObj(ctx: CanvasRenderingContext2D, place: string, n: number, x: num
   return im.width * 2;
 }
 
-/** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
-export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
-  // 부수는·던지는 물건(item_*)은 아이템 그림이 따로 있다: 배경 물건 대신 그것을 쓰게 (청록 상자처럼 보이던 아파트 TV 대역)
-  if (kind.startsWith('item_') && typeof window !== 'undefined' && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
+/** 소품이 쓸 물건 그림 [장소, 번호]. undefined = 그림 없음(부른 쪽 대역), null = 그리지 않음. */
+export function propArtRef(kind: string, label: string | undefined, sx: number, floorType?: string): ObjRef | undefined {
   let ref: ObjRef | undefined;
   if (kind === 'door') {
     const p = placeFor('floor', floorType, '');
@@ -527,6 +540,20 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
     else ref = BY_LABEL.find(([re]) => re.test(label))?.[1];
   }
   if (ref === undefined && kind === 'prop') ref = floorType === 'deep' && objImage('deep', 1) ? ['deep', 1 + (Math.abs(Math.round(sx / 97)) % 9)] : ['chase', 5];
+  return ref;
+}
+
+/** 이 소품이 서 있는 판(로비 6번 입간판 그림)으로 그려지는가 */
+export function isStandBoard(kind: string, label: string | undefined, floorType?: string): boolean {
+  const r = propArtRef(kind, label, 0, floorType);
+  return !!r && r.length === 2 && r[0] === 'lobby' && r[1] === 6;
+}
+
+/** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
+export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
+  // 부수는·던지는 물건(item_*)은 아이템 그림이 따로 있다: 배경 물건 대신 그것을 쓰게 (청록 상자처럼 보이던 아파트 TV 대역)
+  if (kind.startsWith('item_') && typeof window !== 'undefined' && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
+  const ref = propArtRef(kind, label, sx, floorType);
   if (ref === undefined) return false;
   if (ref === null) return true;
   ctx.save();
@@ -554,7 +581,7 @@ function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   // 글씨 머리띠(「안내」「점검」)와 점선 글줄은 층마다 반복되는 이름표처럼 보였다(검수 12-3): 내용을 도트 포스터 그림으로.
   // 2px 한 칸. 같은 종류라도 자리(x)에 따라 그림을 바꿔 줄지어 같은 판이 서지 않게.
   const head =
-    /시험|점수/.test(label) ? '시험' : /순서/.test(label) ? '순서' : /표지/.test(label) ? '표지' : kind === 'checklist' || /점검/.test(label) ? '점검' : kind === 'goalwall' || /목표/.test(label) ? '목표' : /긁힌/.test(label) ? '' : '안내';
+    /시험|점수/.test(label) ? '시험' : /순서/.test(label) ? '순서' : /규칙/.test(label) ? '규칙' : /표지/.test(label) ? '표지' : kind === 'checklist' || /점검/.test(label) ? '점검' : kind === 'goalwall' || /목표/.test(label) ? '목표' : /긁힌/.test(label) ? '' : '안내';
   x = Math.round(x);
   y = Math.round(y);
   const v = hash(`${kind}:${label}:${x}`) % 3;
@@ -616,6 +643,17 @@ function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
     P(6, 20, W - 12, 3, K);
     for (let k = 0; k < 6; k++) { P(6 + k, 21 - k, 1, 1 + k * 2, K); P(W - 7 - k, 21 - k, 1, 1 + k * 2, K); }
     lines(30, 3);
+  } else if (head === '규칙') {
+    // 규칙 표지: 빨간 금지 동그라미 + 글줄 (「표지」의 양쪽 화살표와 다른 그림, 검수 14-1)
+    const cx = Math.floor(W / 2), cy = 13;
+    for (let yy = -9; yy <= 9; yy++)
+      for (let xx = -9; xx <= 9; xx++) {
+        const r = xx * xx + yy * yy;
+        if (r <= 81 && r >= 46) P(cx + xx, cy + yy, 1, 1, R);
+        else if (r < 46 && Math.abs(xx - yy) <= 1) P(cx + xx, cy + yy, 1, 1, R);
+      }
+    P(cx - 2, cy - 4, 4, 8, K);
+    lines(27, 4);
   } else if (head === '순서') {
     for (let i = 0; i < 3; i++) {
       P(5 + i * 11, 8, 8, 8, K); P(6 + i * 11, 9, 6, 6, '#e8e4d8');
