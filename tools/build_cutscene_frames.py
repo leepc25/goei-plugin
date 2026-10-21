@@ -16,12 +16,13 @@ LOOPS = {'opening/c1','opening/c5','opening/c7','first_entry/c1','first_entry/c2
          'return/c2','return/c4','evac/c1','evac/c4','exit/c3','dinner/c1',
          'dinner/c2','dinner/c3','first_day/c2','first_day/c3'}
 
-def build(partial=False):
+def build(partial=False,only=None):
     manifest = json.loads(MANIFEST.read_text(encoding='utf-8-sig'))
     groups, report = {}, []
     for cut in manifest['cuts']:
         scene, number = cut['scene'], cut['cut']
         key = f'{scene}/{number}'
+        if only and key != only: continue
         sheet = ART / 'production/sheets' / f'{scene}-{number}.png'
         if not sheet.exists():
             if partial: continue
@@ -97,6 +98,10 @@ def build(partial=False):
         report.append({'id':key,'frames':len(frames),'size':[640,360],'colors':64,
                        'durationMs':duration,'paletteSha256':hashlib.sha256(bytes(frames[0].getpalette())).hexdigest(),
                        'uniqueFrames':len(set(hashes)),'source':str(sheet.relative_to(ROOT))})
+    if only:
+        assert len(report)==1, 'Cut was not built: '+only
+        print(json.dumps(report[0]))
+        return
     target=ROOT/'release/demo/goei-cutscenes-gpt.html'
     target.parent.mkdir(parents=True,exist_ok=True)
     template=(ART/'production/player.html').read_text(encoding='utf-8')
@@ -134,6 +139,7 @@ if __name__ == '__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--partial',action='store_true')
     parser.add_argument('--register')
+    parser.add_argument('--only')
     args=parser.parse_args()
-    build(args.partial)
+    build(args.partial,args.only)
     if args.register:register(args.register)
