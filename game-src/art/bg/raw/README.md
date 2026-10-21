@@ -261,3 +261,4 @@
 - `silent/silent_objects.png`
 - `dark/dark_wall_1.png`
 - `dark/dark_wall_2.png`
+- `dark/dark_wall_3.png`
