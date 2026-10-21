@@ -8,6 +8,10 @@ type Fx = 'tear' | 'lost' | 'shade' | 'text' | 'breath';
 const BASE: Record<Fx, number> = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
 /** 효과가 붙어 있는 시간(ms) */
 const LAST: Record<Fx, number> = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
+/** 신호 끊김 뒤 돌아오는 연출 시간(ms) */
+const BACK_MS = 1300;
+/** 돌아올 때 형체 연출: 붉은 장면에 렌즈 앞에 서 있음 · 켜지자 옆으로 휙 도망 · 멀리 서 있다가 깜빡일 때마다 다가옴 · 화면 끝에 숨어 있다 빠져나감 · 렌즈에 바짝 붙어 있다 떨어짐 */
+const BACKS = ['stand', 'flee', 'near', 'peek', 'lens'];
 /** 괴이만 쓰는 효과 */
 const AN_ONLY: Fx[] = ['shade', 'text', 'breath'];
 /** 같은 효과가 다시 나기까지 최소 간격(ms): 확률이 겹쳐도 연달아 나오지 않게 */
@@ -53,7 +57,16 @@ export function fireFx(view: HTMLElement, fx: Fx): void {
   if (view.classList.contains(cls)) return;
   if (fx === 'text') textGlitch(view);
   view.classList.add(cls);
-  setTimeout(() => view.classList.remove(cls), LAST[fx]);
+  setTimeout(() => {
+    view.classList.remove(cls);
+    // 신호가 돌아올 때 (2026-10-21 사용자: 그냥 쓱 켜지지 말고 오싹하게, 숨어 있다 도망가거나 다양하게):
+    // 브라운관처럼 한 줄에서 펴지고 반전·세로 흘림 뒤, 매번 다른 형체 연출 하나 (CSS fx-back[data-back])
+    if (fx === 'lost' && view.isConnected) {
+      view.dataset.back = BACKS[Math.floor(Math.random() * BACKS.length)];
+      view.classList.add('fx-back');
+      setTimeout(() => view.classList.remove('fx-back'), BACK_MS);
+    }
+  }, LAST[fx]);
 }
 
 function tick(root: HTMLElement): void {

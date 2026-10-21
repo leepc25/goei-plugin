@@ -1,4 +1,179 @@
-_mode");
+ndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      });
+      env2.setBusy(false);
+      await env2.refresh();
+    } catch (error) {
+      env2.setBusy(false);
+      env2.setNotice(error instanceof Error ? error.message : String(error));
+      env2.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field2.region = sidoOf(ev.loc);
+    field2.place = placeKey(ev, x.catalog);
+    field2.filter = "all";
+    field2.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env2, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field2.place = null;
+        field2.confirmEnd = null;
+        env2.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code) || !key2) return true;
+          field2.region = code;
+          field2.mapq = "";
+          v2 = key2;
+        }
+        field2.confirmEnd = null;
+        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
+          field2.place = null;
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field2.target = placeTarget(v2);
+        env2.render();
+        return true;
+      }
+      case "map-unplace":
+        field2.place = null;
+        field2.target = null;
+        field2.confirmEnd = null;
+        toStep("goal", env2);
+        return true;
+      case "map-filter":
+        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env2.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field2.target, v)) {
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.target = placeTarget(v);
+        toStep("team", env2);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env2);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field2.target, ev.key)) {
+          field2.target = null;
+          field2.confirmEnd = null;
+          env2.render();
+          return true;
+        }
+        field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field2.region = sidoOf(ev.loc);
+        field2.confirmEnd = null;
+        toStep("team", env2);
+        return true;
+      }
+      case "end-event":
+        if (field2.confirmEnd !== v) {
+          field2.confirmEnd = v;
+          env2.render();
+          return true;
+        }
+        field2.confirmEnd = null;
+        if (field2.target?.type === "event" && field2.target.key === v) field2.target = null;
+        await saveWorld(ctx2, env2, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field2.team.indexOf(v);
+        if (i >= 0) field2.team.splice(i, 1);
+        else if (field2.team.length + field2.support < TEAM_MAX) field2.team.push(v);
+        env2.render();
+        return true;
+      }
+      case "support": {
+        const next = field2.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field2.team.length, next)) field2.support = next;
+        env2.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env2);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field2.mkind = v;
+          field2.query = "";
+        }
+        env2.render();
+        return true;
+      case "mission-open":
+        field2.mopen = field2.mopen === v ? "" : v;
+        env2.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field2.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field2.mname === name && field2.mpick === kind && field2.mopen !== `${kind}:${name}`) {
+          field2.mname = null;
+          env2.render();
+          return true;
+        }
+        field2.mname = name;
+        field2.mpick = kind;
+        toStep("team", env2);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env2, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        field2.mname = null;
+        toStep("goal", env2);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env2, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/lorecheck.ts
+  var esc16 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증" };
+  function item(p, risu = false) {
+    const r = p.reasons[0];
+    const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
+  }
+  function loreCheckBox(ctx2) {
+    const mode2 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
     const opts = (m) => loreOptions(ctx2.char, ctx2.chat, m);
     const now = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode2));
     if (!now) return "";
