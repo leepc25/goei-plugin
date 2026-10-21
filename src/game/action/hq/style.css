@@ -1,9 +1,9 @@
 .hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }
 .hq * { box-sizing: border-box; }
-.hq button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }
+.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }
 .hq button:disabled { opacity: 0.45; cursor: default; }
-.hq button.sel { border-color: var(--accent); background: #3a2e14; }
-.hq button.primary { background: #6a4a14; border-color: var(--accent); font-weight: bold; }
+.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }
+.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }
 .hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }
 .hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
 .hq-top button { margin-left: auto; padding: 4px 10px; }
@@ -102,27 +102,29 @@
 @media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
 /* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */
 .hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }
-.hq-talk { position: relative; display: flex; gap: 18px; width: min(1100px, 100%); background: rgba(14, 19, 23, 0.95); border: 2px solid #5a4a28; border-radius: 12px; padding: 16px 20px; }
-.hq-face { flex: none; width: 128px; height: 128px; border-radius: 12px; overflow: hidden; background: #27685b; border: 2px solid #5a4a28; }
+.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }
+.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }
 .hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }
 .hq-talk-body { flex: 1; min-width: 0; }
-.hq-who { color: var(--accent); font-size: 20px; }
-.hq-line { margin: 4px 0 10px; font-size: 22px; line-height: 1.45; }
+.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }
+.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }
 .hq-kit { margin: 0 0 8px; color: var(--dim); font-size: 14px; }
 .hq-choices { display: flex; flex-direction: column; gap: 6px; }
 .hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.hq .hq-choice { font-size: 18px; padding: 10px 14px; }
-.hq-talk .hq-x { position: absolute; top: 8px; right: 10px; padding: 4px 10px; }
+.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }
+.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }
+.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }
 .hq-talk-notice { width: min(1100px, 100%); }
 @media (max-height: 520px) {
   .hq-talk { gap: 10px; padding: 8px 12px; }
   .hq-face { width: 64px; height: 64px; }
+  .hq .hq-choice { font-size: 15px; }
   .hq-who { font-size: 15px; }
   .hq-line { font-size: 15px; margin: 2px 0 6px; }
   .hq .hq-choice { font-size: 14px; padding: 6px 10px; }
   .hq-choices { flex-direction: row; flex-wrap: wrap; }
   .hq-kit { font-size: 12px; margin-bottom: 4px; }
 }
-.hq-result { margin: 0 0 10px; padding-left: 20px; font-size: 18px; line-height: 1.5; }
+.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }
 @media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }
