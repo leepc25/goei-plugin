@@ -257,3 +257,4 @@
 - `silent/silent_wall_2.png`
 - `silent/silent_wall_3.png`
 - `silent/silent_wall_4.png`
+- `silent/silent_floor.png`
