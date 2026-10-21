@@ -23,6 +23,7 @@ FIXES = [
     ('first_entry/c4', 'shirt', [(285, 58, 360, 130)]),
     ('first_call/c3', 'grey_eyes', [(222, 100, 258, 126), (292, 100, 330, 126)]),
     ('return/c3', 'sky_light', [(0, 0, 640, 360)]),
+    ('opening/c6', 'shirt', [(230, 175, 430, 360)]),
 ]
 
 
