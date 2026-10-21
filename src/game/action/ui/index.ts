@@ -2,7 +2,7 @@
 // 엔진 쪽 사용법은 docs/게임_모듈_연결.md 와 이 폴더 README.md.
 import { Fx } from './fx';
 import { PadReader } from './gamepad';
-import { Hud } from './hud';
+import { Hud, statusHtml } from './hud';
 import { InputHub } from './input';
 import { ACTS, CODE, KEY_NAME, LABEL, PAD_NAME } from './keys';
 import { Menu, choiceScreen, esc, type MenuItem, type Screen } from './menu';
@@ -13,7 +13,7 @@ import { TouchPad } from './touch';
 export { Fx, Hud, InputHub, Menu, PadReader, TouchPad, choiceScreen };
 export type { FxEvent, TransitionKind } from './fx';
 export type { HudState, HudItem, MapState } from './hud';
-export { drawHud, drawMap, label, plate, font, FONT } from './hud';
+export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
 export { drawTitleBg } from './title';
@@ -233,6 +233,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         title: '일시정지',
         sub: o.pauseInfo?.() ?? '',
         items: [
+          ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
           { type: 'button', label: '계속', sub: 'Esc', act: () => menu.closeAll() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
