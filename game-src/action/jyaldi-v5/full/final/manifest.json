@@ -574,14 +574,14 @@
    "fps": 12,
    "loop": false,
    "hits": [
-    3
+    2
    ],
    "adv": 0,
    "origin": 0,
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
-   "frames": 6,
-   "bytes": 32390,
+   "frames": 4,
+   "bytes": 22309,
    "prop": false
   },
   "shotgun": {

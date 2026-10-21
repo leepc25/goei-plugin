@@ -99,9 +99,9 @@ def apply(key, fr, pr=None):
     if key == 'shower':
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
     if key == 'pipe':                          # 결함 1: 파이프 빠진 장에 뼈대 손목 따라 덧그림
-        for i in (1, 2, 5):
+        for i, raw in ((0, 1), (2, 2)):   # (최종 장, 원본 장): 빌더 order=[1, 0, 2, 3]
             if i < len(fr):
-                w, e, _, _ = wrists('pipe2', i); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
+                w, e, _, _ = wrists('pipe2', raw); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
     if key == 'idle_pipe':                     # 결함 2: 대기도 걷기처럼 어깨에 걸침 → 걷기 중 두 발 모인 장
         from build_jyaldi_full_demo import frames_of
         wp = frames_of('walk_pipe')[:7]
