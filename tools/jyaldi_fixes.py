@@ -34,6 +34,7 @@ ERASE = {
     'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],
     'down': [(i, 0, 137, 192, 144) for i in range(8)],   # 독립 검수: 누운 장 아래팔이 바닥선 아래로 뚫음
     'collapse': [(i, 0, 137, 192, 144) for i in range(8)],
+    'shotgun': [(3, 150, 20, 192, 90)],   # 17:15 재생성 사격: 펌프 장 총구 불꽃(다른 장 총구 x≈149~152)
     # 재검수(16:24) 남은 조각: 10배 격자로 자리 확인
     'toss': [(5, 70, 82, 80, 92)],
     'carry1_walk': [(0, 69, 74, 76, 79)] + [(i, 28, 59, 34, 68) for i in range(8)],
@@ -50,6 +51,7 @@ OUTSIDE_FX = {'fire', 'shotgun', 'support', 'smoke', 'hug', 'deskslam', 'push'}
 LIGHT_ERASE = {
     'toss': [(5, 64, 78, 80, 94)],
     'getup': [(1, 74, 103, 81, 110)],
+
     'carry1_walk': [(0, 68, 76, 82, 92)],
     'hurtidle': [(i, 64, 80, 78, 96) for i in range(4)],
     'push': [(1, 76, 108, 88, 137), (1, 28, 52, 44, 82), (2, 28, 52, 44, 82)],
