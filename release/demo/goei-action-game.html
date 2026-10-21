@@ -1866,16 +1866,15 @@ function makeRenderer(ctx, art3, opt) {
     if (Math.abs(w.player.x - w.floor.startX) < 4) return false;
     return Math.abs(w.player.x - p.x) < 60;
   }
-  function drawProps(w, camX) {
-    if (w.props.some((p) => p.label && near2(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
-    for (const p of w.props) {
+  function drawProps(w, camX, list = w.props) {
+    for (const p of list) {
       const sx = p.x - camX;
       if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
       if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
       if (p.actor) {
         const a = p.actor;
-        const list = art3.clips[a.clip ?? "idle"];
-        const fr = list ? Math.floor(w.tick / 5) % list.length : 0;
+        const list2 = art3.clips[a.clip ?? "idle"];
+        const fr = list2 ? Math.floor(w.tick / 5) % list2.length : 0;
         ctx.save();
         if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
         const ok = sprite(a.clip ?? "idle", fr, 0, sx, p.y, a.face ?? -1);
@@ -2175,7 +2174,14 @@ function makeRenderer(ctx, art3, opt) {
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
       background(w, camX);
-      drawProps(w, camX);
+      const props2 = [...w.props].sort((a, b) => a.y - b.y);
+      let pi = 0;
+      const propsUpTo = (y) => {
+        const from = pi;
+        while (pi < props2.length && props2[pi].y <= y) pi++;
+        if (pi > from) drawProps(w, camX, props2.slice(from, pi));
+      };
+      propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
       const all = [w.player, ...w.bodies].filter((b) => b.alive);
       const pos = (b) => {
@@ -2207,6 +2213,7 @@ function makeRenderer(ctx, art3, opt) {
       all.sort((a, b) => a.y - b.y);
       for (const b of all) {
         const q = pos(b);
+        propsUpTo(q.y);
         const jitter = b.stop > 0 && b !== w.player ? w.tick % 2 ? 3 : -3 : 0;
         if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
         else if (b.draw && worldSpace(b)) {
@@ -2221,6 +2228,8 @@ function makeRenderer(ctx, art3, opt) {
           ctx.restore();
         } else grayBody(b, camX - jitter, 0);
       }
+      propsUpTo(Infinity);
+      if (w.props.some((p) => p.label && near2(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
@@ -14551,28 +14560,30 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
       if (b < y1) {
-        const fy = Math.min(y1 + 10, b + 70);
-        for (let x = t.x0 + 10; x < t.x1 - 10; x += 120) {
-          const x2 = Math.min(t.x1 - 10, x + 110);
+        const fy = Math.min(y1 + 10, b + 150);
+        for (let x = t.x0 + 10; x < t.x1 - 10; x += 170) {
+          const x2 = Math.min(t.x1 - 10, x + 160);
           ctx.fillStyle = "rgba(0,0,0,0.3)";
-          ctx.fillRect(x - 6, fy - 4, x2 - x + 12, 8);
-          for (const px of [x, x2 - 10]) {
+          ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
+          for (const px of [x, x2 - 16]) {
             ctx.fillStyle = "#2b2d30";
-            ctx.fillRect(px - 8, fy - 6, 26, 8);
+            ctx.fillRect(px - 14, fy - 10, 44, 12);
             ctx.fillStyle = "#5d6166";
-            ctx.fillRect(px, fy - 64, 10, 60);
+            ctx.fillRect(px, fy - 132, 16, 124);
             ctx.fillStyle = "#878c91";
-            ctx.fillRect(px, fy - 64, 3, 60);
+            ctx.fillRect(px, fy - 132, 5, 124);
+            ctx.fillStyle = "#3c3f43";
+            ctx.fillRect(px + 12, fy - 132, 4, 124);
           }
-          for (const ry of [fy - 58, fy - 34]) {
-            for (let sx = x; sx < x2; sx += 16) {
-              ctx.fillStyle = (sx - x) / 16 % 2 ? "#1d1d1f" : "#e2b23a";
-              ctx.fillRect(sx, ry, Math.min(16, x2 - sx), 12);
+          for (const ry of [fy - 122, fy - 72]) {
+            for (let sx = x; sx < x2; sx += 24) {
+              ctx.fillStyle = (sx - x) / 24 % 2 ? "#1d1d1f" : "#e2b23a";
+              ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
             }
-            ctx.fillStyle = "rgba(255,255,255,0.18)";
-            ctx.fillRect(x, ry, x2 - x, 2);
+            ctx.fillStyle = "rgba(255,255,255,0.2)";
+            ctx.fillRect(x, ry, x2 - x, 3);
             ctx.fillStyle = "rgba(0,0,0,0.35)";
-            ctx.fillRect(x, ry + 10, x2 - x, 2);
+            ctx.fillRect(x, ry + 20, x2 - x, 4);
           }
         }
       }
@@ -14616,15 +14627,20 @@ function label2(_ctx, _s, _x, _y, _c) {
 function drawFront(ctx, camX, world, plan) {
   const fx = plan.stage.fx;
   const vw = ctx.canvas.width;
+  const [ly0, ly1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
+  const alive = [world.player, ...world.bodies].filter((b) => b.alive);
+  for (const t of plan.stage.terrain) {
+    if (t.kind !== "narrow") continue;
+    const a = laneYIn(t.lane0, ly0, ly1);
+    if (a <= ly0 || !alive.some((b) => b.y < a - 2 && b.x > t.x0 - 80 && b.x < t.x1 + 80)) continue;
+    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(ctx, "clutter", "사물함", x, a)) break;
+  }
   if (fx.chaseX > -9e3) {
     const g2 = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);
     g2.addColorStop(0, "rgba(60,0,0,0.95)");
     g2.addColorStop(1, "rgba(160,20,20,0.85)");
     ctx.fillStyle = g2;
     ctx.fillRect(fx.chaseX - 1600, 100, 1640, 640);
-    ctx.fillStyle = "#ffb0b0";
-    ctx.font = "bold 18px monospace";
-    ctx.fillText("뒤에서 오는 것 ▶", fx.chaseX - 200, 340);
   }
   if (fx.light < 0.99) {
     const p = world.player;

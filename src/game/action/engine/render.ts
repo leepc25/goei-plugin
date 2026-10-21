@@ -88,10 +88,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     return Math.abs(w.player.x - p.x) < 60;
   }
 
-  function drawProps(w: World, camX: number) {
-    // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
-    if (w.props.some((p) => p.label && near(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
-    for (const p of w.props) {
+  function drawProps(w: World, camX: number, list: readonly World['props'][number][] = w.props) {
+    for (const p of list) {
       const sx = p.x - camX;
       if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
       if (p.kind === 'hubdoor' || p.kind === 'hubspot') continue; // 본부 문·자리는 본부 장면(hub.ts)이 그린다
@@ -420,7 +418,15 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
-      drawProps(w, camX);
+      // 바닥 물건은 몸과 함께 깊이(y) 순서로 그린다: 물건 앞(아래)에 선 몸은 물건 위에, 뒤에 선 몸은 물건에 가려진다 (검수 7)
+      const props = [...w.props].sort((a, b) => a.y - b.y);
+      let pi = 0;
+      const propsUpTo = (y: number) => {
+        const from = pi;
+        while (pi < props.length && props[pi].y <= y) pi++;
+        if (pi > from) drawProps(w, camX, props.slice(from, pi));
+      };
+      propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
       const all = [w.player as Body, ...w.bodies].filter((b) => b.alive);
       const pos = (b: Body) => {
@@ -455,6 +461,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       all.sort((a, b) => a.y - b.y);
       for (const b of all) {
         const q = pos(b);
+        propsUpTo(q.y);
         const jitter = b.stop > 0 && b !== w.player ? (w.tick % 2 ? 3 : -3) : 0;
         if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
         else if (b.draw && worldSpace(b)) {
@@ -469,6 +476,9 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
           ctx.restore();
         } else grayBody(b, camX - jitter, 0);
       }
+      propsUpTo(Infinity);
+      // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
+      if (w.props.some((p) => p.label && near(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();

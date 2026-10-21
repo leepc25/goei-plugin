@@ -452,28 +452,31 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       }
       // 앞줄(화면 아래)은 키 큰 사물함이 싸움을 가리므로 낮은 공사 차단대 줄로 막는다 (기둥·노랑검정 가로대·받침)
       if (b < y1) {
-        const fy = Math.min(y1 + 10, b + 70);
-        for (let x = t.x0 + 10; x < t.x1 - 10; x += 120) {
-          const x2 = Math.min(t.x1 - 10, x + 110);
+        // 실제 공사 차단대 크기: 기둥 ≈ 쟈알디 엉덩이 높이(130px), 가로대 두 줄 (검수 7)
+        const fy = Math.min(y1 + 10, b + 150);
+        for (let x = t.x0 + 10; x < t.x1 - 10; x += 170) {
+          const x2 = Math.min(t.x1 - 10, x + 160);
           ctx.fillStyle = 'rgba(0,0,0,0.3)';
-          ctx.fillRect(x - 6, fy - 4, x2 - x + 12, 8);
-          for (const px of [x, x2 - 10]) {
+          ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
+          for (const px of [x, x2 - 16]) {
             ctx.fillStyle = '#2b2d30';
-            ctx.fillRect(px - 8, fy - 6, 26, 8);
+            ctx.fillRect(px - 14, fy - 10, 44, 12);
             ctx.fillStyle = '#5d6166';
-            ctx.fillRect(px, fy - 64, 10, 60);
+            ctx.fillRect(px, fy - 132, 16, 124);
             ctx.fillStyle = '#878c91';
-            ctx.fillRect(px, fy - 64, 3, 60);
+            ctx.fillRect(px, fy - 132, 5, 124);
+            ctx.fillStyle = '#3c3f43';
+            ctx.fillRect(px + 12, fy - 132, 4, 124);
           }
-          for (const ry of [fy - 58, fy - 34]) {
-            for (let sx = x; sx < x2; sx += 16) {
-              ctx.fillStyle = ((sx - x) / 16) % 2 ? '#1d1d1f' : '#e2b23a';
-              ctx.fillRect(sx, ry, Math.min(16, x2 - sx), 12);
+          for (const ry of [fy - 122, fy - 72]) {
+            for (let sx = x; sx < x2; sx += 24) {
+              ctx.fillStyle = ((sx - x) / 24) % 2 ? '#1d1d1f' : '#e2b23a';
+              ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
             }
-            ctx.fillStyle = 'rgba(255,255,255,0.18)';
-            ctx.fillRect(x, ry, x2 - x, 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(x, ry, x2 - x, 3);
             ctx.fillStyle = 'rgba(0,0,0,0.35)';
-            ctx.fillRect(x, ry + 10, x2 - x, 2);
+            ctx.fillRect(x, ry + 20, x2 - x, 4);
           }
         }
       }
@@ -521,6 +524,15 @@ function label(_ctx: CanvasRenderingContext2D, _s: string, _x: number, _y: numbe
 function drawFront(ctx: CanvasRenderingContext2D, camX: number, world: WorldView, plan: StagePlan) {
   const fx = plan.stage.fx;
   const vw = ctx.canvas.width;
+  // 좁은 길 뒷줄 사물함보다 안쪽(깊은 쪽)에 선 몸은 사물함에 가려져야 한다: 그 몸이 있을 때만 사물함 줄을 몸 위에 다시 그린다 (앞뒤 정렬, 검수 7)
+  const [ly0, ly1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
+  const alive = [world.player, ...world.bodies].filter((b) => b.alive);
+  for (const t of plan.stage.terrain) {
+    if (t.kind !== 'narrow') continue;
+    const a = laneYIn(t.lane0, ly0, ly1);
+    if (a <= ly0 || !alive.some((b) => b.y < a - 2 && b.x > t.x0 - 80 && b.x < t.x1 + 80)) continue;
+    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(ctx, 'clutter', '사물함', x, a)) break;
+  }
   // 추격의 벽
   if (fx.chaseX > -9000) {
     const g = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);
@@ -528,9 +540,6 @@ function drawFront(ctx: CanvasRenderingContext2D, camX: number, world: WorldView
     g.addColorStop(1, 'rgba(160,20,20,0.85)');
     ctx.fillStyle = g;
     ctx.fillRect(fx.chaseX - 1600, 100, 1640, 640);
-    ctx.fillStyle = '#ffb0b0';
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('뒤에서 오는 것 ▶', fx.chaseX - 200, 340);
   }
   // 어둠: 플레이어 둘레만 보인다 (화면 좌표로)
   if (fx.light < 0.99) {
