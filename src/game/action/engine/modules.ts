@@ -5,13 +5,13 @@
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
 import { createGameAudio } from '../audio';
-import { createHq, idbSaves, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+import { createHq, idbSaves, setLineProvider, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
-import { mountStory, type StoryApi } from '../story';
+import { hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import { linkItems } from './itemsLink';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
@@ -154,7 +154,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
   };
-  const elevator = createElevatorStage(stageStore);
+  const elevator = createElevatorStage(stageStore, stageHooks());
+  setLineProvider(hqLines);
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
     if (DEF_BY_KIND[spec.kind]) {
@@ -169,6 +170,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
+  let runAgent: AgentId = 'jyaldi';
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
@@ -211,7 +213,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const story: StoryApi = mountStory(
     storyRoot,
     {
-      getAgent: () => 'jyaldi',
+      getAgent: () => runAgent,
       sfx: (n) => audio.event({ type: 'custom', name: n } as never),
       shake: (ms, amp) => shell.fx.onGameEvent({ type: 'shake', ms, amp } as never),
       anchor: (id) => {
@@ -225,6 +227,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     { saved: savedFlags },
   );
+  (globalThis as { __goeiStory?: StoryApi }).__goeiStory = story; // 시험용
   const saveFlags = () => {
     try {
       localStorage.setItem('goei-game-story', JSON.stringify(story.flags));
@@ -294,10 +297,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onPause: (p) => (p ? audio.pause() : audio.resume()),
     onWorld: (w, run) => {
       world = w;
-      w.on((e) => {
-        // 승강기를 타고 새 층에 내릴 때 안내 방송 (첫 층은 건너뛴다)
-        if (e.type === 'enter:floor' && w.floors > 1 && e.floor.depth) story.say('board', { depth: e.floor.depth, ftype: (e.floor as { type?: string }).type ?? '' });
-      });
+      runAgent = run.agent as AgentId;
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
       });
@@ -327,6 +327,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('keydown', storyKeys, true);
       saveFlags();
       story.dispose();
+      setLineProvider(null);
       audio.dispose();
       shell.dispose();
     },

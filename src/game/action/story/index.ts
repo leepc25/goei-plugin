@@ -18,6 +18,7 @@ export type { AgentId, Flags, StoryEvent } from './types';
 export type { TalkModel, TalkNpcId } from './ai';
 export { CUTSCENES } from './scripts/cutscenes';
 export { AGENTS, AGENT_LINES, agentLine } from './lines/agents';
+export { hqLines, stageHooks } from './hooks';
 
 /** 엔진이 채우는 쪽. 없는 기능은 건너뛴다. */
 export interface StoryHost {
@@ -66,13 +67,24 @@ export interface StoryOptions {
   saved?: Flags;
   /** 시연·시험용: 말풍선 간격·확률 제한을 거의 없앤다 */
   eager?: boolean;
+  /** 대화창 자리. 기본 top: 게임 화면 위쪽(HUD 아래)에 띄워 아래쪽 아이템 칸·터치 버튼과 겹치지 않게 한다 */
+  dock?: 'top' | 'bottom';
+  /** 층에 내릴 때 승강기 안내를 말풍선으로 띄운다. 통합판은 층 모듈이 안내하므로 끈다 (시연판만 true) */
+  announce?: boolean;
 }
+
+/** 다른 모듈이 world.emit({type:'custom', name})으로 내는 사건 → 이 모듈 사건 이름 */
+const CUSTOM: Record<string, string> = {
+  ruleBroken: 'rule:break',
+  guardianCleared: 'win',
+};
 
 export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOptions = {}): StoryApi {
   const saved = opts.saved;
   const style = document.createElement('style');
   style.textContent = css;
   root.append(style);
+  if (opts.dock !== 'bottom') root.classList.add('gst-top');
   const rng = Math.random;
   const flags: Flags = { favor: 0, rules: 0, ...(saved ?? {}) };
   const lib = buildLibrary();
@@ -189,15 +201,21 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     say(tmp);
   };
 
+  // 무대를 바꿔 줄 host.bg가 없으면(통합판) 장면이 바뀐 뒤의 「밝아짐」은 어둡게 가린 채로 둔다.
+  // 멈춘 전투 화면 위에 「로비였다」 같은 자막이 뜨면 거짓말이 되기 때문.
+  let sceneVeiled = false;
   const io: CutsceneIO = {
-    bg: (s) => host.bg?.(s),
-    fade: (to, ms) => ui.fade(to, ms),
+    bg: (s) => {
+      if (host.bg) host.bg(s);
+      else sceneVeiled = true;
+    },
+    fade: (to, ms) => ui.fade(to === 'clear' && sceneVeiled ? 'dim' : to, ms),
     caption: (t, ms) => ui.caption(t, ms),
     sfx: (n) => host.sfx?.(n),
     shake: (ms, amp) => host.shake?.(ms, amp),
     actor: (id, to, ms) => host.actor?.(id, to, ms),
     camera: (to, ms) => host.camera?.(to.x, to.y, to.zoom, ms),
-    panel: (t, ms) => host.panel?.(t, ms),
+    panel: (t, ms) => (host.panel ? host.panel(t, ms) : ms > 0 && ui.caption(t, ms)),
     bark: (who, t, ms) => bark(who, t, ms),
     emit: (e, a) => host.emit?.(e, a),
     dialogue: (id) => say(id),
@@ -216,8 +234,13 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
 
   const cutscene = (id: string, onDone?: () => void) => {
     const def = CUTSCENES[id];
-    if (!def) throw new Error(`없는 컷신: ${id}`);
+    if (!def) {
+      console.warn('[goei] 없는 컷신:', id);
+      onDone?.();
+      return;
+    }
     syncAgent();
+    sceneVeiled = false;
     scene = new Cutscene(def, io);
     sceneDone = onDone;
     flags[`seen.cs.${id}`] = 1;
@@ -265,8 +288,19 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     refresh();
   };
 
+  let bossUp = false;
   const event = (name: string, data: Record<string, unknown> = {}) => {
     syncAgent();
+    // 엔진 GameEvent 모양 맞추기: custom은 이름으로, 적이 쓰러진 down은 무시
+    if (name === 'custom') {
+      name = CUSTOM[String(data.name)] ?? '';
+      data = (data.data as Record<string, unknown>) ?? {};
+      if (!name) return;
+    }
+    if (name === 'down' && data.who === 'enemy') return;
+    if (name === 'combat:boss') bossUp = true;
+    if (name === 'combat:clear' && bossUp) (bossUp = false), (name = 'win');
+    if (name === 'enter:floor') bossUp = false;
     // 상태 값
     if (name === 'enter:floor' || name === 'floor:enter') {
       const f = (data.floor as Record<string, unknown> | undefined) ?? data;
@@ -274,7 +308,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
       if (f.type !== undefined) flags.ftype = String(f.type);
       if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
       // 승강기 대본(board)이 이미 안내한 층이면 다시 말하지 않는다
-      if (Number(flags.announced) !== Number(flags.depth)) {
+      if (opts.announce && Number(flags.announced) !== Number(flags.depth)) {
         const t = lookupLine(agent(), 'el:announce', flags, rng);
         if (t) bark('elevator', t, 2400);
       }
@@ -287,7 +321,8 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     }
     if (name === 'rule:break') flags.broke_rule = 1;
     if (name === 'run:end') {
-      flags.result = String(data.result ?? 'return');
+      const how = String(data.result ?? data.how ?? 'return');
+      flags.result = how === 'withdraw' ? 'retreat' : how;
       flags.called_run = 0;
     }
     if (name === 'combat:clear' && data.final) name = 'win';
