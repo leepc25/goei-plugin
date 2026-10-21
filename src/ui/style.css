@@ -2434,23 +2434,29 @@ button.mk-go:hover { color: var(--signal); }
 @keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
 /* 2026-10-21 사용자: 어둡게는 접힌 띠에만. 펼친 커스텀은 글자 자리(아래)만 살짝 어둡게 */
 .gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
-/* 「선택」 표식이 눈에 띄게: 조준선이 숨 쉬듯 붉게 빛나고 글자도 따라 밝아진다. 고르면 붉은 빛 고정 */
-.gx-tgt:not(.gx-evbtn) { color: rgba(255, 255, 255, .92); }
-.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.8s ease-in-out infinite; }
-.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.8s ease-in-out infinite; }
-.gx-tgt.on:not(.gx-evbtn) { color: #ff6a5e; text-shadow: 0 0 6px rgba(255, 59, 48, .75), 0 1px 2px rgba(0, 0, 0, .8); }
-.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 3px rgba(255, 59, 48, .9)); }
-.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 8px rgba(255, 90, 80, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+/* 「선택」 표식이 눈에 띄게 (2026-10-21 사용자: 효과가 약하다): 상자 없이 글자·조준선만. 고르기 전에는 붉게 깜빡이며
+   조준선에서 붉은 고리가 퍼지고, 고르면 붉은 빛으로 고정되고 한 번 「잠김」 번쩍임 */
+.gx-tgt:not(.gx-evbtn) { position: relative; color: #fff; font-size: 12px; letter-spacing: .06em; }
+.gx-tgt:not(.gx-evbtn) svg { position: relative; z-index: 1; }
+.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.2s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on)::before { content: ''; position: absolute; left: 2px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border: 2px solid #ff3b30; border-radius: 50%; box-sizing: border-box; pointer-events: none; animation: gx-tgt-ring 1.2s ease-out infinite; }
+.gx-tgt.on:not(.gx-evbtn) { color: #ff5a4e; text-shadow: 0 0 8px rgba(255, 59, 48, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); animation: gx-tgt-lock .5s ease-out 1; }
+.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
+.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 10px rgba(255, 70, 60, 1), 0 1px 2px rgba(0, 0, 0, .8); }
 @keyframes gx-tgt-pulse {
-  0%, 100% { text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
-  50% { color: #fff; text-shadow: 0 0 8px rgba(255, 70, 60, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+  0%, 100% { color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+  50% { color: #ff6a5e; text-shadow: 0 0 10px rgba(255, 59, 48, 1), 0 0 3px rgba(255, 120, 110, 1), 0 1px 2px rgba(0, 0, 0, .8); }
 }
 @keyframes gx-tgt-spin {
   0%, 100% { transform: scale(1) rotate(0deg); filter: none; }
-  50% { transform: scale(1.18) rotate(45deg); filter: drop-shadow(0 0 3px rgba(255, 59, 48, .95)); }
+  50% { transform: scale(1.3) rotate(90deg); filter: drop-shadow(0 0 4px rgba(255, 59, 48, 1)); }
 }
+@keyframes gx-tgt-ring { 0% { transform: scale(.8); opacity: .95; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes gx-tgt-lock { 0% { transform: scale(1.35); filter: brightness(2); } 100% { transform: none; filter: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg { animation: none; }
+  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg, .gx-tgt.on:not(.gx-evbtn) { animation: none; }
+  .gx-tgt:not(.gx-evbtn):not(.on)::before { content: none; }
 }
 
 /* 편성 요원 카드 (임무·커스텀): 상황이 몇 줄이든 상황 2줄 높이로 고정하고, 사진을 그 높이만큼 키운다 (2026-10-21 사용자) */

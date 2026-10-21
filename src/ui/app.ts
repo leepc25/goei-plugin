@@ -582,6 +582,19 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action.startsWith('upd-') && (view.kind === 'started' || view.kind === 'picker') && (await handleUpdate(action, view.ctx, settingsEnv))) return;
+  // 상황판(CCTV·일지·상세 창)에서 「선택」: 목표로 고르고 바로 임무 지도로, 그 자리를 고른 채로 (2026-10-21 사용자)
+  if (action === 'pick-event' && view.kind === 'started' && tab !== 'map') {
+    await handleField(action, value, view.ctx, env, false);
+    if (field.target?.type === 'event' && field.target.key === value && showOnMap(view.ctx, value ?? '')) {
+      tab = 'map';
+      evUi.pop = '';
+      // 모바일은 지도(목표) 단계를 먼저 보여 준다. 편성은 위 「편성」으로
+      field.step = 'goal';
+      notice = '';
+      render();
+    }
+    return;
+  }
   if ((view.kind === 'started' || view.kind === 'opening') && (await handleField(action, value, view.ctx, env, view.kind === 'opening'))) return;
   switch (action) {
     case 'close':
