@@ -535,6 +535,11 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
     await page.waitForSelector('.gx-board');
   }
+  // PC 왼쪽 메뉴: 보고 있는 탭을 한 번 더 누르면 상황판으로
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
+  await page.waitForSelector('.gx-map');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
+  await page.waitForSelector('.gx-board');
   await page.setViewportSize({ width: 390, height: 844 });
   if (shots) { await page.screenshot({ path: `${shots}/9-board-mobile.png` }); await page.evaluate(() => { const b = document.querySelector(".gx-body"); b.scrollTop = b.scrollHeight; }); await page.screenshot({ path: `${shots}/9-board-mobile-agents.png` }); }
   await page.setViewportSize({ width: 1280, height: 860 });
@@ -930,7 +935,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   assert.equal(JSON.parse(after.scriptstate.$goei_world).pending.ms, site);
   // 요청 취소
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  // 이미 커스텀 탭이면 다시 누르지 않는다 (한 번 더 누르면 상황판으로 간다)
+  if (!(await page.$('.gx-nav .gx-nb:not(.mob).on[data-value="mission"]'))) await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
   await page.click('[data-action="mission-cancel"][data-value="ms"]');
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로
@@ -989,7 +995,7 @@ if (fixture.globalLore.some(packed)) {
     const scrollTop = () => page.evaluate(() => document.querySelector('.nw-doc').scrollTop);
     await startedWithReply(page);
     await open(page);
-    await page.locator('[data-action="tab"][data-value="wiki"]:visible').first().click();
+    await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="wiki"]:visible').first().click();
     await page.waitForSelector('.nw-home');
     // 창이 늦게 한 번 더 그려지면(사용자 사진 읽기 등) 입력이 사라질 수 있어 문서가 뜰 때까지 다시 친다
     for (let i = 0; i < 3 && !(await page.locator('.nw-dochead').count()); i++) {
@@ -2064,7 +2070,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="upd-skip"]');
   assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
   assert.equal(await page.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');
-  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"] >> nth=0');
   await page.click('[data-action="upd-prepare"]');
   await page.waitForSelector('.upd-plan');
   if (shots) await page.locator('.upd-plan').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-settings.png` });
@@ -2201,7 +2207,7 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, vp);
   await startedWithReply(page);
   await open(page);
-  await page.locator('[data-action="tab"][data-value="settings"]:visible').first().click();
+  await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]:visible').first().click();
   await page.waitForSelector('.gx-settings > .st-scopebar');
   const stuck = (sel) => page.evaluate((sel) => {
     const body = document.querySelector('.gx-settings');
@@ -2233,10 +2239,10 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     assert.ok(await page.evaluate(() => document.querySelector('.gx-settings .ps-group h3')?.textContent === '기능별 설정'), '기능별 설정이 맨 위');
     await page.click('[data-action="feature-set"][data-value="wiki"]');
     await page.waitForSelector('.nw-setpane');
-    await page.click('[data-action="tab"][data-value="settings"]');
+    await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]');
     await page.click('[data-action="feature-set"][data-value="gnet"]');
     await page.waitForFunction(() => document.querySelector('[data-action="gn-settings"]')?.getAttribute('aria-pressed') === 'true');
-    await page.click('[data-action="tab"][data-value="settings"]');
+    await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]');
     await page.waitForSelector('.gx-settings .st-feats');
     if (shots) {
       await page.evaluate(() => document.querySelector('.st-world').scrollIntoView({ block: 'start' }));
@@ -2286,7 +2292,7 @@ if (fixture.globalLore.some(packed)) {
   // 요원 기본 그림은 이제 카드에 있다 (v0.16.33). 모듈에서 찾기는 카드에 없는 「관리국」 대표 그림으로 본다
   assert.ok(await page.evaluate(() => window.__calls.read.includes('mod/org.png')), '모듈의 _default 사진');
   // 거점 추가 → 덮어쓰기 없이 임무 지도
-  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"] >> nth=0');
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.click('[data-action="dir-kind"][data-value="base"]');
   await page.click('[data-action="dir-add-toggle"]');
@@ -2297,7 +2303,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.inputValue('select[data-change="dir-base-gu"]'), '', '새 거점은 시군구를 안 고른 채로');
   assert.match(await page.textContent('.dir-row.open .dir-name small'), /· 서울특별시$/, '시군구 없으면 시도만');
   const sido = await page.inputValue('.dir select[data-change^="dir-base-sido"], .dir select[name*="sido"]').catch(() => '02');
-  await page.click('[data-action="tab"][data-value="map"] >> nth=0');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="map"] >> nth=0');
   await page.waitForSelector('.gx-field');
   await page.selectOption('select[data-change="map-region"]', sido.split('=').pop() || '02');
   await page.waitForTimeout(300);
@@ -2305,7 +2311,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(seen, '새 거점이 임무 지도에 보임');
   if (shots) await page.screenshot({ path: `${shots}/17c-map-newbase.png` });
   // 괴이 사진 고르기 → 저장하면 명부에 남음
-  await page.click('[data-action="tab"][data-value="settings"] >> nth=0');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"] >> nth=0');
   await page.click('[data-action="set-scope"][data-value="card"]');
   // 고친 값이 있는 채로 로어북에 새 세력·괴이를 넣고 「다시 읽기」 → 새 줄만 들어오고 새 거점은 그대로
   await page.evaluate(() => {
@@ -2344,7 +2350,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(book.괴이[first].photo, 'Lee Do-hyeong', '괴이 사진 저장');
   assert.ok(book.거점['시험 거점'], '거점도 저장');
   assert.equal(book.조직.관리국.english, 'Management Bureau');
-  await page.click('[data-action="tab"][data-value="wiki"] >> nth=0');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="wiki"] >> nth=0');
   await page.waitForSelector('.nw-rail');
   await page.click('.nw-grab');
   await page.fill('.nw .ph-search', '관리국');
@@ -2377,7 +2383,7 @@ if (fixture.globalLore.some(packed)) {
       window.__modules = [{ id: 'm1', name: '괴이 에셋', assets: [['Lee Do-hyeong_default', 'face-test.avif', 'avif']] }];
     }, real);
     await open(page);
-    await page.locator('[data-action="tab"][data-value="settings"]:visible').first().click();
+    await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]:visible').first().click();
     await page.click('[data-action="set-scope"][data-value="card"]');
     await page.click('[data-action="dir-kind"][data-value="agent"]');
     const row = page.locator('.dir-row', { has: page.locator('.dir-name b', { hasText: '이도형' }) });
@@ -2406,7 +2412,7 @@ if (fixture.globalLore.some(packed)) {
       const [x, y] = saved.crop.split(',').map(Number);
       assert.ok(x > 55 && y > 25, `틀 위치 저장 (${saved.crop})`);
       // 상황판 요원 카드도 얼굴 사진
-      await page.click('[data-action="tab"][data-value="board"] >> nth=0');
+      await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"] >> nth=0');
       await page.waitForTimeout(500);
       if (shots) await page.screenshot({ path: `${shots}/17d-board-pc.png` });
     }
@@ -2445,14 +2451,14 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.mk-head [data-action="mk-pop"]');
   // 모바일: 서랍에 즐겨찾기 칸, 비었으면 안내, 펼친 서랍을 좌우로 밀면 ★ 창
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.click('[data-action="tab"][data-value="board"]:visible');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
   await page.click('.gx-bdrawer .ph-grip');
   assert.equal(await page.locator('.gx-bdrawer .mk-slot:not(.empty)').count(), 1);
   assert.equal(await page.locator('.gx-bdrawer [data-action="game-open"], .gx-bdrawer [data-value="settings"]').count(), 0, '순찰·설정 버튼은 뺌');
   await page.click('.gx-bdrawer .mk-slot:not(.empty)');
   assert.equal(await tabNow(), 'wiki', '칸을 누르면 그 화면');
   assert.equal(await page.locator('.ph-drawer.open').count(), 0, '서랍에서 가면 서랍은 접힘');
-  await page.click('[data-action="tab"][data-value="board"]:visible');
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
   await page.click('.gx-bdrawer .ph-grip');
   await page.click('.gx-bdrawer .mk-slot.empty >> nth=0');
   await page.waitForSelector('.mk-pop');

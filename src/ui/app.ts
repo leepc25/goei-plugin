@@ -602,6 +602,10 @@ async function handle(action: string, value?: string): Promise<void> {
       return renderPicker();
     case 'start':
       return start();
+    case 'nav-tab':
+      // PC 왼쪽 메뉴: 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일은 그대로)
+      if (value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
+    // falls through
     case 'tab':
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
@@ -1133,7 +1137,7 @@ function tabs(): string {
   const unreadPhone = view.kind === 'started' && phoneUnread(view.ctx);
   const cur: Tab = tab === 'mission' ? 'map' : tab;
   const item = (id: Tab, label: string, icon: string, cls = '', badge = '') =>
-    `<button class="gx-nb${cls ? ` ${cls}` : ''}${(cls === 'mob' ? cur === id : tab === id) ? ' on' : ''}" data-action="tab" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
+    `<button class="gx-nb${cls ? ` ${cls}` : ''}${(cls === 'mob' ? cur === id : tab === id) ? ' on' : ''}" data-action="${cls === 'mob' ? 'tab' : 'nav-tab'}" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
   const ctx = view.kind === 'started' ? view.ctx : null;
   return `<nav class="gx-nav" aria-label="주요 화면">
     ${ctx ? brand(ctx) : ''}
