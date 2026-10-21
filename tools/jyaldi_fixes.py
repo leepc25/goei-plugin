@@ -17,8 +17,7 @@ DROP_CLIPS = {'pushup', 'sleepside'}
 DROP_CLIPS |= set('''bath bathin bathout shower showerin showerout toilet toiletin toiletout handwash wash dishes coffee microwave board brief
 window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
 toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
-run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry
-lookback'''.split())
+run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry'''.split())
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {
@@ -136,6 +135,31 @@ def strip_outside(f, pose):
     m = (a[:, :, 3] > 0) & ~body_mask(pose) & (light | red | (pal_dist(a) > 22))
     a[m] = 0
     return Image.fromarray(a)
+
+
+# 뒤돌아보기: 생성기가 화면 반대쪽으로 도는 자세를 못 그려(2회 실패, rig lookback_try·try2) 기본 대기 장의 목 위만 좌우로 뒤집는다.
+# 뒤집힌 머리 중 뒤통수 쪽으로 늘어진 머리카락(귀 높이 아래)은 비스듬히 잘라 내고, 원래 등 뒤 머리카락은 남겨 이어 붙인다.
+LOOKBACK_ORDER = [0, 1, 2, 3, 0, 1, 2, 3]   # 기본 대기 장 번호
+LOOKBACK_TURNED = {2, 3, 4, 5}              # 이 순번만 고개를 돌림
+def lookback_frames(idle):
+    out = []
+    for n, raw in enumerate(LOOKBACK_ORDER):
+        a = np.array(idle[raw % len(idle)])
+        if n in LOOKBACK_TURNED:
+            p = rig.CLIPS['idle'][2][min(raw, len(rig.CLIPS['idle'][2]) - 1)]
+            cx, y1 = round(p['NECK'][0] + rig.DX) - 1, round(p['NECK'][1] + rig.DY) + 1
+            top = a[:y1].copy(); m = np.zeros_like(top)
+            for x in range(FW_):
+                sx = 2 * cx - x
+                if 0 <= sx < FW_: m[:, x] = top[:, sx]
+            dark = (top[:, :, 3] > 0) & (top[:, :, :3].sum(2) < 150)
+            for y in range(y1 - 16, y1):                 # 뒤통수 아래 머리카락: 아래로 갈수록 몸 쪽으로 깎음
+                m[y, int(cx + 8 - (y - (y1 - 16)) * 0.5):] = 0
+            keep = dark & (m[:, :, 3] == 0); keep[:y1 - 14] = False; keep[:, cx - 1:] = False
+            m[keep] = top[keep]; a = a.copy(); a[:y1] = m
+        out.append(Image.fromarray(a))
+    return out
+FW_ = 192
 
 
 def anchors(src, idx):
