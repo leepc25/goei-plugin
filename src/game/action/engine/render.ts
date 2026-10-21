@@ -1,6 +1,7 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
 import type { Art } from './art';
+import { Bullet } from './bodies';
 import { Fighter } from './fighter';
 import type { Player } from './player';
 import type { World } from './world';
@@ -376,7 +377,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       };
       // 그림자
       for (const b of all) {
-        if (b.kind === 'bullet') continue;
+        if (b.kind === 'bullet' || !(b instanceof Fighter)) continue;
         const q = pos(b);
         ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.beginPath();
@@ -389,12 +390,27 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         g.t--;
       }
       for (let i = ghosts.length - 1; i >= 0; i--) if (ghosts[i].t <= 0) ghosts.splice(i, 1);
+      // 적 모듈 몸은 월드 좌표로 그린다 (엔진 기본 몸은 발 기준 지역 좌표)
+      const worldSpace = (b: Body) => !(b instanceof Fighter) && !(b instanceof Bullet);
+      for (const b of all) {
+        const back = (b as { drawBack?: (c: CanvasRenderingContext2D) => void }).drawBack;
+        if (!back) continue;
+        ctx.save();
+        ctx.translate(-camX, 0);
+        back.call(b, ctx);
+        ctx.restore();
+      }
       all.sort((a, b) => a.y - b.y);
       for (const b of all) {
         const q = pos(b);
         const jitter = b.stop > 0 && b !== w.player ? (w.tick % 2 ? 3 : -3) : 0;
         if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
-        else if (b.draw) {
+        else if (b.draw && worldSpace(b)) {
+          ctx.save();
+          ctx.translate(-camX + jitter, 0);
+          b.draw(ctx, w);
+          ctx.restore();
+        } else if (b.draw) {
           ctx.save();
           ctx.translate(Math.round(q.x - camX + jitter), Math.round(q.y - q.z));
           b.draw(ctx, w);

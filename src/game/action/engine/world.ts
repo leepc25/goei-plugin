@@ -43,6 +43,9 @@ export function mulberry32(seed: number) {
   };
 }
 
+/** 엔진 기본 적: 허수아비 + 임시 적 (적 모듈에 없는 종류도 이걸로) */
+export const fallbackEnemy: EnemyFactory = (s, w) => (s.kind.startsWith('dummy') ? new Dummy(s.x, s.y, s.kind === 'dummy') : new Thug(s, w));
+
 const STOP_DEFAULT = { none: 1, flinch: 3, stagger: 4, launch: 6, down: 6, bind: 4 } as const;
 
 export class World implements WorldView {
@@ -81,6 +84,10 @@ export class World implements WorldView {
   enemyFactory: EnemyFactory;
   /** 모듈이 매 틱 덧붙이는 일 (아이템 등) */
   hooks: (() => void)[] = [];
+  /** 싸움 구간을 막는 몸인가 (적 모듈: 평화로운 주민 등은 아님) */
+  threat: (b: Body) => boolean = () => true;
+  /** E를 눌렀을 때 (적 모듈 규칙 신호 등). 가장 가까운 소품을 같이 준다 */
+  interactHooks: ((prop: PropSpec | null) => void)[] = [];
   /** 몸 아래에 덧그리기 (바닥 물건 등). ctx는 화면 좌표 */
   underlays: ((ctx: CanvasRenderingContext2D, camX: number) => void)[] = [];
   itemUse: ItemUse | null = null;
@@ -100,8 +107,7 @@ export class World implements WorldView {
     this.rand = mulberry32(run.seed || 1);
     this.player = new Player(clips);
     if (run.hpMax) this.player.hp = this.player.hpMax = run.hpMax;
-    this.enemyFactory =
-      enemyFactory ?? ((s, w) => (s.kind.startsWith('dummy') ? new Dummy(s.x, s.y, s.kind === 'dummy') : new Thug(s, w)));
+    this.enemyFactory = enemyFactory ?? fallbackEnemy;
     const self = this;
     this.stageApi = {
       get world() {
@@ -287,6 +293,7 @@ export class World implements WorldView {
       const d = Math.abs(pr.x - p.x);
       if (d < 60 && (!best || d < Math.abs(best.x - p.x))) best = pr;
     }
+    for (const h of this.interactHooks) h(best);
     if (best && this.stage?.onInteract) {
       p.play('pickup', this);
       this.stage.onInteract(this.stageApi, this.floor, best);
@@ -369,6 +376,9 @@ export class World implements WorldView {
   }
 
   private applyHit(a: Body, t: Body, h: Hit) {
+    // 밀리는 쪽은 때린 쪽 반대 (때린 몸의 방향이 아니라 서로의 위치로 정한다)
+    const side = Math.sign(t.x - a.x);
+    if (side && side !== h.dir) h = { ...h, dir: side as 1 | -1 };
     const r = t.applyHit(h, this);
     const at = { x: (Math.max(h.x0, t.x - 30) + Math.min(h.x1, t.x + 30)) / 2, y: t.y, z: (h.z0 + h.z1) / 2 };
     if (r.kind === 'immune') return;
@@ -413,7 +423,7 @@ export class World implements WorldView {
       return;
     }
     const e = encs[this.encActive];
-    this.encBodies = this.encBodies.filter((b) => b.alive && !(b instanceof Fighter && (b.phase === 'dead' || (b.hp <= 0 && b.phase === 'down'))));
+    this.encBodies = this.encBodies.filter((b) => b.alive && b.hp > 0 && this.threat(b) && !(b instanceof Fighter && (b.phase === 'dead' || b.phase === 'down' && b.hp <= 0)));
     if (this.encBodies.length) return;
     this.encWave++;
     if (this.encWave < e.waves.length) {

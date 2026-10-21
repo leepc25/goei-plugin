@@ -9,9 +9,12 @@ import { createHq, idbSaves, type MissionLaunch, type RunResult, type SaveSlots 
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore } from './contract';
 import type { EngineModules, Game } from './game';
+import { DEF_BY_KIND, createEnemy, isThreat, signalEnemies } from '../enemy';
+import { createElevatorStage } from '../stage';
+import { mountStory, type StoryApi } from '../story';
 import { linkItems } from './itemsLink';
 import { dummyStage, trainingStage } from './training';
-import type { World } from './world';
+import { fallbackEnemy, type EnemyFactory, type World } from './world';
 
 const local = (key: string) => ({
   load: () => {
@@ -134,6 +137,81 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
   });
+  const stageStore = {
+    load: () => {
+      try {
+        const t = localStorage.getItem('goei-game-stage');
+        return t ? JSON.parse(t) : null;
+      } catch {
+        return null;
+      }
+    },
+    save: (m: unknown) => {
+      try {
+        localStorage.setItem('goei-game-stage', JSON.stringify(m));
+      } catch {
+        /* 저장 못 해도 진행 */
+      }
+    },
+  };
+  const elevator = createElevatorStage(stageStore);
+  const unknownKinds = new Set<string>();
+  const enemyFactory: EnemyFactory = (spec, w) => {
+    if (DEF_BY_KIND[spec.kind]) {
+      const sp = spec as typeof spec & { affixes?: never };
+      return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes }) as never;
+    }
+    if (!spec.kind.startsWith('dummy') && !unknownKinds.has(spec.kind)) {
+      unknownKinds.add(spec.kind);
+      console.warn('[goei] 적 모듈에 없는 종류 → 임시 적:', spec.kind);
+    }
+    return fallbackEnemy(spec, w);
+  };
+  // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
+  let world: World | null = null;
+  const storyRoot = document.createElement('div');
+  storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
+  shell.stage.root.appendChild(storyRoot);
+  const savedFlags = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('goei-game-story') ?? 'null') ?? undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+  const story: StoryApi = mountStory(
+    storyRoot,
+    {
+      getAgent: () => 'jyaldi',
+      sfx: (n) => audio.event({ type: 'custom', name: n } as never),
+      shake: (ms, amp) => shell.fx.onGameEvent({ type: 'shake', ms, amp } as never),
+      anchor: (id) => {
+        if (id !== 'agent' || !world) return null;
+        const c = shell.canvas.getBoundingClientRect();
+        const r = storyRoot.getBoundingClientRect();
+        const p = world.player;
+        return { x: c.left - r.left + ((p.x - world.camX) / 1280) * c.width, y: c.top - r.top + ((p.y - p.z - 190) / 720) * c.height };
+      },
+      emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
+    },
+    { saved: savedFlags },
+  );
+  const saveFlags = () => {
+    try {
+      localStorage.setItem('goei-game-story', JSON.stringify(story.flags));
+    } catch {
+      /* 저장 못 해도 진행 */
+    }
+  };
+  const storyKeys = (e: KeyboardEvent) => {
+    if (!story.isBlocking()) return;
+    if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+    else if (['Space', 'Enter', 'KeyE', 'KeyZ', 'KeyA'].includes(e.code)) story.advance();
+    else return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener('keydown', storyKeys, true);
   const saves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
   const hq = hqAdapter(saves, bridge);
   const listeners: ((e: GameEvent) => void)[] = [
@@ -141,18 +219,23 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.event(e as never);
       if (e.type === 'super') audio.duck(1.4);
       shell.fx.onGameEvent(e as never);
+      story.event(e.type, e as never);
+      if (e.type === 'run:end') saveFlags();
     },
   ];
   const mods: EngineModules = {
-    stages: [trainingStage, dummyStage],
+    stages: [elevator, trainingStage, dummyStage],
+    enemyFactory,
     hq,
     hud: false,
+    blocking: () => story.isBlocking(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
     openTitle: () => shell.openTitle(),
     onPlay: () => shell.play(),
     frame: (dt) => {
+      story.update(dt);
       shell.frame(dt);
       shell.input.endFrame();
     },
@@ -173,12 +256,37 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onScene: (name) => {
       if (name === 'title' || name === 'hq') audio.floor(name as never);
-      if (name === 'hq') shell.mode = 'title';
+      if (name === 'hq') {
+        shell.play(); // 타이틀 메뉴 닫기
+        shell.mode = 'title';
+      }
     },
     onPause: (p) => (p ? audio.pause() : audio.resume()),
     onWorld: (w, run) => {
+      world = w;
+      w.on((e) => {
+        // 승강기를 타고 새 층에 내릴 때 안내 방송 (첫 층은 건너뛴다)
+        if (e.type === 'enter:floor' && w.floors > 1 && e.floor.depth) story.say('board', { depth: e.floor.depth, ftype: (e.floor as { type?: string }).type ?? '' });
+      });
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
+      });
+      w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
+      w.interactHooks.push((prop) => {
+        const p = w.player;
+        const at = { x: p.x, y: p.y };
+        signalEnemies(w as never, { kind: 'greet', ...at } as never);
+        signalEnemies(w as never, { kind: 'door', ...at } as never);
+        if (prop?.kind === 'crevice') signalEnemies(w as never, { kind: 'plug', x: prop.x } as never);
+        if (prop?.kind === 'bowl') signalEnemies(w as never, { kind: 'bowl', x: prop.x, y: prop.y } as never);
+        if (prop?.kind === 'table' || prop?.kind === 'meal') signalEnemies(w as never, { kind: 'mealThanks', ...at } as never);
+      });
+      w.on((e) => {
+        if (e.type !== 'custom') return;
+        const d = (e.data ?? {}) as { dmg?: number; text?: string };
+        if (e.name === 'evac' && !w.ended) w.ended = 'evac';
+        else if (e.name === 'hurtPlayer') w.api.hurtPlayer(d.dmg ?? 10);
+        else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
       });
       const items = linkItems(w, run);
       w.hooks.push(() => items.tick());
@@ -186,6 +294,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     toHqResult,
     dispose: () => {
+      window.removeEventListener('keydown', storyKeys, true);
+      saveFlags();
+      story.dispose();
       audio.dispose();
       shell.dispose();
     },

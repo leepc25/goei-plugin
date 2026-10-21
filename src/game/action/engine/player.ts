@@ -322,8 +322,11 @@ export class Player extends Fighter {
         this.vx = 0;
       }
     } else if (this.move) {
+      const k = this.move.lunge?.[1] ?? 0.6;
       this.x += this.vx;
-      this.vx *= this.move.lunge?.[1] ?? 0.6;
+      this.y += this.vy;
+      this.vx *= k;
+      this.vy *= k;
     } else {
       this.x += this.vx;
       this.y += this.vy;
@@ -469,7 +472,7 @@ export class Player extends Fighter {
     // 공중
     if (this.airborne) {
       this.vx += p.mx * 0.4;
-      this.vx = Math.max(-9, Math.min(9, this.vx));
+      this.vx = Math.max(-12, Math.min(12, this.vx));
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       if (!this.airAttackUsed && this.take('attack')) {
         this.airAttackUsed = true;
@@ -504,7 +507,7 @@ export class Player extends Fighter {
     if (this.take('jump') && !this.crouching) {
       this.vz = JUMP_V;
       this.z = 1;
-      this.vx = p.mx * (this.running ? 9 : 5);
+      this.vx = p.mx * (this.running ? 12 : WALK_X);
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       this.running = false;
       world.emit({ type: 'jump', x: this.x });
