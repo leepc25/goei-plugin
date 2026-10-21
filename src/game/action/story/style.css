@@ -6,6 +6,7 @@
 .gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}
 .gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}
 .gsy-bubble.free::after{display:none}
+@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}
 .gsy-bubble.out{opacity:0}
 .gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}
 .gsy-caption.out{opacity:0}

@@ -18,6 +18,9 @@ interface Btn {
   cx?: number;
   cy?: number;
   r?: number;
+  /** 네모 단추(가로 화면 띠): 반폭·반높이. 있으면 판정도 네모 */
+  hw?: number;
+  hh?: number;
   group?: 'cluster' | 'items' | 'top';
 }
 
@@ -62,6 +65,7 @@ export class TouchPad {
   toLocal: ((clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number }) | null = null;
   visible = false;
   private seenTouch = false;
+  private iconRedraw = 2400;
   constructor(
     private layer: HTMLElement,
     private hub: InputHub,
@@ -69,14 +73,14 @@ export class TouchPad {
     private onMenu: (code: string) => void,
   ) {
     this.root = document.createElement('div');
-    this.root.className = 'tp';
+    this.root.className = 'tp gk-font';
     this.root.innerHTML = `<div class="tp-zone"><div class="tp-base"><div class="tp-knob"></div></div></div>`;
     this.zone = this.root.querySelector('.tp-zone')!;
     this.base = this.root.querySelector('.tp-base')!;
     this.knob = this.root.querySelector('.tp-knob')!;
     const mk = (b: Btn, cls: string) => {
       const el = document.createElement('div');
-      el.className = `tp-b ${cls}`;
+      el.className = `tp-b gk-slot ${cls}`;
       el.dataset.id = b.id;
       el.innerHTML = `<b>${b.label}</b><i>${b.key}</i>`;
       this.root.append(el);
@@ -86,7 +90,7 @@ export class TouchPad {
     for (const b of CLUSTER) mk({ ...b, group: 'cluster' }, b.id === 'attack' ? 'big' : b.d < 0.8 ? 'small' : '');
     for (let i = 0; i < 4; i++) mk({ id: `item${i + 1}`, code: `Digit${i + 1}`, label: '', key: String(i + 1), dx: 0, dy: 0, d: 0.78, group: 'items' }, 'item');
     mk({ id: 'map', code: 'KeyZ', label: '지도', key: 'Z', dx: 0, dy: 0, d: 0.62, group: 'top' }, 'top');
-    mk({ id: 'menu', code: 'Escape', label: '☰', key: '메뉴', dx: 0, dy: 0, d: 0.62, group: 'top' }, 'top');
+    mk({ id: 'menu', code: 'Escape', label: '메뉴', key: 'Esc', dx: 0, dy: 0, d: 0.62, group: 'top' }, 'top');
     const ring = document.createElement('div');
     ring.className = 'tp-ring';
     this.btns.find((b) => b.id === 'ult')!.el!.append(ring);
@@ -119,7 +123,8 @@ export class TouchPad {
     const flip = s.lefty ? -1 : 1;
     this.root.style.setProperty('--tp-u', `${u}px`);
     this.root.style.setProperty('--tp-a', String(s.touchAlpha));
-    this.root.classList.remove('tp-float');
+    this.root.classList.remove('tp-float', 'tp-side');
+    for (const b of this.btns) (b.hw = undefined), (b.hh = undefined);
     this.sr = u;
     this.restX = u * 1.55;
     this.restY = u;
@@ -191,14 +196,18 @@ export class TouchPad {
     const colR = side >= unit * 1.25 ? bw - side / 2 : bw - edge - (unit * 1.25) / 2;
     const colL = side >= unit ? side / 2 : edge + unit / 2;
     const mir = (x: number) => (s.lefty ? bw - x : x);
+    // 네모 단추: 높이 = 칸, 폭 = 띠 폭에 맞춤 (도트 금속 틀)
+    const bwid = Math.max(unit, Math.min(side - 8, unit * 1.7));
     const place = (id: string, cx: number, cy: number, dpx: number) => {
       const b = this.btns.find((x) => x.id === id)!;
-      const r = dpx / 2;
+      const hh = dpx / 2,
+        hw = bwid / 2;
       cx = mir(cx);
-      Object.assign(b, { cx, cy, r });
+      Object.assign(b, { cx, cy, r: Math.max(hw, hh), hw, hh });
       const el = b.el!;
-      el.style.width = el.style.height = `${r * 2}px`;
-      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+      el.style.width = `${hw * 2}px`;
+      el.style.height = `${hh * 2}px`;
+      el.style.transform = `translate(${cx - hw}px, ${cy - hh}px)`;
     };
     // 두 띠 모두 세로 가운데 정렬 (위아래 빈 곳이 같게)
     const column = (ids: string[], x: number, w: number[]) => {
@@ -220,7 +229,7 @@ export class TouchPad {
     this.root.style.setProperty('--tp-r', `${this.sr}px`);
     this.restX = side + this.sr + 30;
     this.restY = edge + this.sr + 20;
-    this.root.classList.add('tp-float');
+    this.root.classList.add('tp-float', 'tp-side');
     this.restBase();
   }
   private restBase() {
@@ -261,11 +270,20 @@ export class TouchPad {
       const b = this.btns.find((x) => x.id === `item${i + 1}`);
       if (!b?.el) return;
       const key = `${it.id ?? ''}|${it.label}`;
-      if (b.el.dataset.icon !== key) {
+      const fresh = b.el.dataset.icon !== key;
+      if (fresh) {
         b.el.dataset.icon = key;
         b.el.innerHTML = `<canvas width="64" height="64"></canvas><i>${i + 1}</i><u></u>`;
-        const g = b.el.querySelector('canvas')!.getContext('2d');
-        if (g && (it.label || it.id)) drawHudItemIcon(g, it, 4, 4, 56);
+      }
+      // 아이템 그림은 늦게 읽힐 수 있어 처음 몇 초는 가끔 다시 그린다 (안 그러면 대역 아이콘이 남는다)
+      if (fresh || this.iconRedraw-- > 0) {
+        const cv = b.el.querySelector('canvas')!;
+        const g = cv.getContext('2d');
+        if (g) {
+          g.clearRect(0, 0, 64, 64);
+          g.imageSmoothingEnabled = false;
+          if (it.label || it.id) drawHudItemIcon(g, it, 0, 0, 64);
+        }
       }
       const u = b.el.querySelector('u')!;
       const n = it.label || it.id ? String(it.count) : '';
@@ -287,6 +305,12 @@ export class TouchPad {
     let best: Btn | null = null,
       bd = Infinity;
     for (const b of this.btns) {
+      if (b.hw) {
+        // 네모 단추: 띠 안에서 붙어 있으므로 여유 없이 칸 그대로 (사이 틈은 가까운 쪽)
+        const d = Math.max(Math.abs(x - b.cx!) / (b.hw + 3), Math.abs(y - b.cy!) / (b.hh! + 3));
+        if (d < 1 && d < bd) (best = b), (bd = d);
+        continue;
+      }
       const d = Math.hypot(x - b.cx!, y - b.cy!);
       const lim = b.r! * (b.group === 'cluster' ? 1.18 : 1.05);
       if (d < lim && d / b.r! < bd) (best = b), (bd = d / b.r!);
