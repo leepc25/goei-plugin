@@ -3316,22 +3316,24 @@ function makeRenderer(ctx, art3, opt) {
       background(w, camX);
       const layers = w.floor.depthLayers ?? [];
       const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
+      const all = [w.player, ...w.bodies].filter((b) => b.alive);
       let pi = 0;
       const propsUpTo = (y) => {
         while (pi < props2.length && props2[pi].y <= y) {
           const d2 = props2[pi++];
           if (d2.prop) drawProps(w, camX, [d2.prop]);
           else if (d2.layer) {
+            const l = d2.layer;
             ctx.save();
             ctx.translate(-camX, 0);
-            d2.layer.draw(ctx);
+            if (all.some((b) => b.kind !== "bullet" && b.kind !== "item" && b.y < l.y - 2 && l.y - b.y < 300 && b.x > l.x0 - 60 && b.x < l.x1 + 60)) ctx.globalAlpha = 0.45;
+            l.draw(ctx);
             ctx.restore();
           }
         }
       };
       propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
-      const all = [w.player, ...w.bodies].filter((b) => b.alive);
       const pos = (b) => {
         const f = b;
         return { x: lerp(f.px ?? b.x, b.x, alpha), y: lerp(f.py ?? b.y, b.y, alpha), z: lerp(f.pz ?? b.z, b.z, alpha) };
@@ -14967,7 +14969,9 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers) {
         return ok;
       };
       if (a > y0 && layers) {
-        layers.push({ y: a, x0: t.x0 - 10, x1: t.x1 + 10, draw: (c) => {
+        let lastX = t.x0 + 50;
+        while (lastX + 100 < t.x1 - 20) lastX += 100;
+        layers.push({ y: a, x0: t.x0 - 76, x1: lastX + 126, draw: (c) => {
           for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
         } });
       } else if (a > y0 && !row("사물함", a)) {
@@ -20734,6 +20738,24 @@ function createShopPanel(root) {
   };
 }
 
+// src/game/action/engine/propBlock.ts
+var PROP_DEPTH = 34;
+var STEP = 9;
+function blockByProps(bodies, props2, lane) {
+  for (const b of bodies) {
+    if (b.z > 4) continue;
+    for (const p of props2) {
+      const dy = b.y - p.y;
+      if (Math.abs(b.x - p.x) >= p.w / 2 + 18 || Math.abs(dy) >= PROP_DEPTH) continue;
+      let s2 = dy === 0 ? p.y < (lane[0] + lane[1]) / 2 ? 1 : -1 : Math.sign(dy);
+      if (s2 < 0 && p.y - PROP_DEPTH < lane[0] || s2 > 0 && p.y + PROP_DEPTH > lane[1]) s2 = -s2;
+      const want = p.y + s2 * PROP_DEPTH;
+      b.y += Math.max(-STEP, Math.min(STEP, want - b.y));
+      b.y = Math.max(lane[0], Math.min(lane[1], b.y));
+    }
+  }
+}
+
 // src/game/action/engine/itemsLink.ts
 var PROP_ART = /* @__PURE__ */ new Set(["chair", "pot", "tv", "table", "crate"]);
 var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
@@ -20919,6 +20941,8 @@ function linkItems(w, run) {
       const hits = p.frame().hit;
       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+      const solids = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w }));
+      if (solids.length) blockByProps([p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral"), solids, w.lane);
       syncCarry();
       w.notes.cash = ir.cash;
       w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;

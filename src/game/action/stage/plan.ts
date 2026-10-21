@@ -572,7 +572,10 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       };
       // 뒷줄 사물함은 배경이 아니라 깊이 줄로(엔진이 몸과 y 순서로 섞어 그린다): 그 뒤에 선 몸은 가려지고 앞에 선 몸은 위에 (검수 9)
       if (a > y0 && layers) {
-        layers.push({ y: a, x0: t.x0 - 10, x1: t.x1 + 10, draw: (c) => {
+        // 줄의 그림 폭(사물함 한 칸 = 화면 252px, 가운데 기준): 엔진이 뒤에 선 몸을 이 폭으로 찾는다
+        let lastX = t.x0 + 50;
+        while (lastX + 100 < t.x1 - 20) lastX += 100;
+        layers.push({ y: a, x0: t.x0 - 76, x1: lastX + 126, draw: (c) => {
           for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
         } });
       } else if (a > y0 && !row('사물함', a)) {

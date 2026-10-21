@@ -33,6 +33,7 @@ import { drawPropArt } from '../art/bg';
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
+import { blockByProps } from './propBlock';
 import type { World } from './world';
 
 // 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
@@ -249,6 +250,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       const hits = p.frame().hit;
       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+      // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
+      const solids = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w }));
+      if (solids.length) blockByProps([p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral'), solids, w.lane);
       syncCarry();
       w.notes.cash = ir.cash;
       w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;

@@ -419,22 +419,25 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       type Deep = { y: number; prop?: World['props'][number]; layer?: NonNullable<typeof w.floor.depthLayers>[number] };
       const layers = w.floor.depthLayers ?? [];
       const props: Deep[] = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
+      const all = [w.player as Body, ...w.bodies].filter((b) => b.alive);
       let pi = 0;
       const propsUpTo = (y: number) => {
         while (pi < props.length && props[pi].y <= y) {
           const d = props[pi++];
           if (d.prop) drawProps(w, camX, [d.prop]);
           else if (d.layer) {
+            const l = d.layer;
             ctx.save();
             ctx.translate(-camX, 0);
-            d.layer.draw(ctx);
+            // 뒤에 몸(요원·적)이 서 있으면 키 큰 깊이 줄(사물함 줄)을 반투명으로: 뒤에서 싸우는 몸이 다 가려지지 않게 (검수 15-1)
+            if (all.some((b) => b.kind !== 'bullet' && b.kind !== 'item' && b.y < l.y - 2 && l.y - b.y < 300 && b.x > l.x0 - 60 && b.x < l.x1 + 60)) ctx.globalAlpha = 0.45;
+            l.draw(ctx);
             ctx.restore();
           }
         }
       };
       propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
-      const all = [w.player as Body, ...w.bodies].filter((b) => b.alive);
       const pos = (b: Body) => {
         const f = b as Partial<Fighter>;
         return { x: lerp(f.px ?? b.x, b.x, alpha), y: lerp(f.py ?? b.y, b.y, alpha), z: lerp(f.pz ?? b.z, b.z, alpha) };
