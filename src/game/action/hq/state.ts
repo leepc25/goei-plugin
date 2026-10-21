@@ -1,7 +1,7 @@
 // 본부 저장 데이터 모양 (본부 스레드 소유). 저장소(pluginStorage 슬롯)는 리스 탑재 스레드의 bridge.saves가 들고,
 // 본문은 이 모양의 JSON 문자열이다. 모양이 바뀌면 HQ_SCHEMA 숫자를 올리고 migrate()에 옮기는 줄을 더한다.
 import type { AgentId, BagSlot, RunResult, Slot } from './contract';
-import type { PlaceId } from './data';
+import { OLD_ITEM_IDS, type PlaceId } from './data';
 
 export const HQ_SCHEMA = 'goei-hq/1';
 
@@ -75,8 +75,8 @@ export function newSave(): HqSave {
     agents: { jyaldi: agentRecord(), eileen: agentRecord() },
     selected: 'jyaldi',
     support: null,
-    stash: { heal: 1, torch: 1 },
-    loadout: [{ id: 'heal', n: 2 }, { id: 'guard', n: 1 }, null, null],
+    stash: { medkit: 1, salt: 1 },
+    loadout: [{ id: 'medkit', n: 2 }, { id: 'bandage', n: 1 }, { id: 'flash', n: 1 }, null],
     relicsOwned: [],
     relics: [null, null],
     coffee: null,
@@ -122,6 +122,12 @@ export function parseSave(text: string | null | undefined): HqSave | null {
   for (const id of Object.keys(base.agents) as AgentId[]) out.agents[id] = { ...agentRecord(), ...d.agents?.[id] };
   if (!Array.isArray(out.loadout) || out.loadout.length !== 4) out.loadout = base.loadout;
   if (!Array.isArray(out.relics) || out.relics.length !== 2) out.relics = [null, null];
+  // 예전 임시 아이템 id → 아이템 모듈 id
+  const fix = (id: string) => OLD_ITEM_IDS[id] ?? id;
+  out.loadout = out.loadout.map((x) => (x ? { id: fix(x.id), n: x.n } : null));
+  const stash: Record<string, number> = {};
+  for (const [id, n] of Object.entries(out.stash ?? {})) stash[fix(id)] = (stash[fix(id)] ?? 0) + n;
+  out.stash = stash;
   return out;
 }
 

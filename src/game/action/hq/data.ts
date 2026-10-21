@@ -128,7 +128,7 @@ export const RESEARCH: ResearchDef[] = [
   { id: 'rs_relic3', name: '멈춘 시간 측정', research: 8, budget: 250, gives: 'relic:gauge', requires: 'rs_relic2' },
 ];
 
-/** 아이템 스레드의 SUPPLY_CATALOG가 들어오기 전 임시 표. 같은 모양. */
+/** 아이템 모듈(items/data.ts SUPPLY_CATALOG)과 같은 id·값. 엔진이 setSupplyCatalog로 그쪽 표를 넣으면 그것을 쓴다. */
 export interface SupplyDef {
   id: string;
   name: string;
@@ -139,14 +139,20 @@ export interface SupplyDef {
   /** 연구로 열림 */
   locked?: boolean;
 }
+/** 연구 「진압 장비 보급 승인」 뒤에 살 수 있는 것 */
+export const LOCKED_SUPPLY = new Set(['antidote', 'smoke', 'charm']);
 export const SUPPLY_FALLBACK: SupplyDef[] = [
-  { id: 'heal', name: '회복약', price: 60, kind: 'heal', max: 3, desc: '체력 +60' },
-  { id: 'guard', name: '방어 강화', price: 40, kind: 'special', max: 2, desc: '10초 동안 받는 피해 감소' },
-  { id: 'energy', name: '능력 회복', price: 50, kind: 'special', max: 2, desc: '고유기 재사용 초기화, 필살 +30' },
-  { id: 'torch', name: '손전등', price: 30, kind: 'special', max: 3, desc: '3초 밝힘 (어둠의 층·그림자)' },
-  { id: 'salt', name: '소금', price: 40, kind: 'cure', max: 2, desc: '오염 해제, 체력 +30', locked: true },
-  { id: 'flash', name: '섬광탄', price: 60, kind: 'throw', max: 2, desc: '주변 적 2초 경직', locked: true },
+  { id: 'medkit', name: '회복약', price: 30, kind: 'heal', max: 3, desc: '체력 35% 회복' },
+  { id: 'bandage', name: '압박 붕대', price: 18, kind: 'cure', max: 3, desc: '출혈을 멈추고 체력 10% 회복' },
+  { id: 'antidote', name: '정화제', price: 40, kind: 'cure', max: 2, desc: '오염 한 단계 제거' },
+  { id: 'salt', name: '소금', price: 25, kind: 'special', max: 3, desc: '발밑에 소금 원. 괴이가 6초 동안 들어오지 못한다' },
+  { id: 'flash', name: '섬광탄', price: 35, kind: 'throw', max: 3, desc: '주변 적 2초 기절' },
+  { id: 'smoke', name: '연막탄', price: 28, kind: 'throw', max: 2, desc: '연기 속 적 40% 둔화, 5초' },
+  { id: 'charm', name: '관리국 부적', price: 60, kind: 'special', max: 1, desc: '다음 피격 1회 무효' },
+  { id: 'energy', name: '에너지 음료', price: 22, kind: 'special', max: 2, desc: '능력 자원 40 회복' },
 ];
+/** 예전 본부 저장의 임시 id → 아이템 모듈 id */
+export const OLD_ITEM_IDS: Record<string, string> = { heal: 'medkit', guard: 'bandage', torch: 'flash' };
 
 /** 이빨 요정 상자 잡동사니 (본부 장식) */
 export const DECOR = ['녹슨 사원증', '이 빠진 머그컵', '「여기 오래 있지 마」 쪽지', '402호 리모컨', '엘리베이터 점검 스티커', '누군가의 어금니', '접힌 우산', '반쯤 탄 향초'];
