@@ -13219,12 +13219,12 @@ ${RULE[id].variant.text}` : ""}`, 4);
     const fork = !!h.data.fork;
     if (!r.talked.has(prop.id)) {
       const info = { kind, honest: !!h.data.honest, long: !!h.data.long, fork, knowsRule: currentKnown(meta).includes("passenger"), agent: o.agent, depth: o.depth };
-      if (hooks.passenger?.(info, defer((api2, res) => applyPassenger(api2, prop, h, res.choice)))) {
+      if (hooks.meetPassenger?.(info, defer((api2, res) => applyPassenger(api2, prop, h, res.choice)))) {
         r.talked.add(prop.id);
         return;
       }
     }
-    const lines2 = hooks.passengerLines?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
+    const lines2 = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
     api.world.say(`${PASSENGER_LABEL[kind]}: ${lines2.join(" ")}`, 5);
     if (r.talked.has(prop.id)) return;
     r.talked.add(prop.id);
