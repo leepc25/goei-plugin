@@ -49,7 +49,7 @@ DEFS = [
     D('grab', 'grab2', '21 잡기', 14),
     D('grabknee', 'grabknee2', '22 잡기 타격(무릎)', 14, hits=[2], hold=0.05),
     D('grabblast', 'grabblast', '23 잡기 폭파(던지기 대신)', 12, hits=[4], hold=0.1),
-    D('super', 'super', '24 필살기', 10, hits=[6], hold=0.2),
+    D('super', 'super', '24 필살기', 14, hits=[6], hold=0.2),
     D('pickup', 'pickup', '25 상호작용·줍기', 10),
     D('toss', 'toss', '26 물건 던지기', 12, hits=[3]),
     D('drink', 'drink', '27 마시기', 6),
