@@ -96,3 +96,11 @@
 - `hq_lobby/hq_lobby_wall_1.png`
 - `hq_lobby/hq_lobby_wall_2.png`
 - `hq_lobby/hq_lobby_objects.png`
+
+## 본부 배경 추가 · 2026-10-22 · 3층 사무실
+
+요청서 추가분 3장, 기존 사무실 원본과 함께 사용. 원본 제공이며 도트화·게임 반영은 후속 통합 작업.
+
+- `hq_office/hq_office_wall_5.png`
+- `hq_office/hq_office_wall_6.png`
+- `hq_office/hq_office_objects_2.png`
