@@ -17,6 +17,7 @@ export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItem
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
 export { drawTitleBg } from './title';
+export { ensureKit, kitCss, PIXEL_FONT, agentFaces, nine, kitPiece, kitSlice } from './kit';
 export * from './keys';
 
 export interface ShellOptions {
