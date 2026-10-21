@@ -23,6 +23,7 @@ import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
+import { playerSource } from '../core/player';
 import { saveVarDefaults } from '../host/prefs';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -74,7 +75,7 @@ const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 const retry = (chat: Chat): RetryOptions => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
-const source = (ctx: ChatContext, chat = ctx.chat): RefSource => ({ char: ctx.char as RefSource['char'], chat, persona: personaText() });
+const source = (ctx: ChatContext, chat = ctx.chat): RefSource => playerSource({ char: ctx.char as RefSource['char'], chat, persona: personaText() } as RefSource);
 
 function names(ctx: ChatContext): Record<string, string> {
   try {

@@ -9,7 +9,8 @@ import {
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
-import { loadModuleAssets, mainPic } from '../host/assets';
+import { facePic, loadModuleAssets, mainPic } from '../host/assets';
+import { playableAgents, playerAgent } from '../core/player';
 import { savePrefs } from '../host/prefs';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
@@ -18,7 +19,7 @@ import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
 import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
-import { agentInner, avatar, factionPic, imageUrl, setImageRedraw, showIdCard, stLabel } from './images';
+import { agentInner, avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
 import { closeGame, gameOpen, openGame, reattachGame } from './game';
 import { BRAND, CARD_FILE } from './brand';
@@ -52,6 +53,8 @@ interface Draft {
   fm?: number;
   /** 직접 입력 첫 장면: 출발과 함께 보낼 상황 */
   situation?: string;
+  /** 캐릭터로 플레이: 유저가 연기할 요원 코드 ('' = 내 페르소나) */
+  player?: string;
 }
 
 type View =
@@ -499,7 +502,7 @@ async function refresh(): Promise<void> {
       else if (presetStaged && !repick) view = { kind: 'opening', ctx };
       else {
         view = { kind: 'picker', ctx, manifest, staged: phase === 'staged' };
-        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm };
+        draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '' };
         if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
         if (draft.faction && !findScenario(draft.faction, draft.fm ?? 0, facs)) draft.fm = defaultScenario(draft.faction, facs);
       }
@@ -588,7 +591,10 @@ async function handle(action: string, value?: string): Promise<void> {
       const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
       const f = findFaction(value ?? '', facs);
       if (!f) return;
-      if (draft.faction !== f.code) draft.fm = defaultScenario(f.code, facs);
+      if (draft.faction !== f.code) {
+        draft.fm = defaultScenario(f.code, facs);
+        draft.player = '';
+      }
       draft.faction = f.code;
       notice = '';
       return renderPicker();
@@ -600,6 +606,16 @@ async function handle(action: string, value?: string): Promise<void> {
       draft.fm = Number(value);
       notice = '';
       return renderPicker();
+    case 'player': {
+      draft.player = value ?? '';
+      // 준비된 첫 장면은 신입 시점이라 캐릭터로 시작하면 직접 입력·커스텀 임무만 고를 수 있다
+      if (draft.player && draft.faction && view.kind === 'picker') {
+        const f = findFaction(draft.faction, factionList(view.ctx.char.globalLore));
+        if (f && findScenario(f.code, draft.fm ?? 0, factionList(view.ctx.char.globalLore))?.kind === 'opening') draft.fm = f.scenarios.find((x) => x.kind !== 'opening')?.fm;
+      }
+      notice = '';
+      return renderPicker();
+    }
     case 'start':
       return start();
     case 'nav-tab':
@@ -725,12 +741,12 @@ async function start(): Promise<void> {
   notice = '';
   render();
   try {
-    const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm };
+    const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm, ...(draft.player ? { player: draft.player } : {}) };
     const lore = ctx.char.globalLore ?? [];
     let world = null;
     try {
       // 기본값에서 상황판을 꺼 두었으면 상황판 없이 시작 (나중에 설정 탭에서 켤 수 있음)
-      if (basicDefaults(lore).anomalyOn) world = startWorldVars(parseCatalog(lore), worldDefaults(lore), choice.faction, Math.random);
+      if (basicDefaults(lore).anomalyOn) world = startWorldVars(parseCatalog(lore), worldDefaults(lore), choice.faction, Math.random, draft.player ?? '');
     } catch (error) {
       // 목록 로어북이 없으면 상황판 없이 시작한다 (대화는 그대로 가능)
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -785,7 +801,7 @@ async function turnWorldOn(): Promise<void> {
     await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (worldOn(chat)) return null;
       const faction = String(chat.scriptstate?.['$st_faction'] ?? '');
-      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...startWorldVars(catalog, worldSettings(ctx.char.globalLore, chat.scriptstate), faction, Math.random) } };
+      return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...startWorldVars(catalog, worldSettings(ctx.char.globalLore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.['$st_player'] ?? '')) } };
     });
     busy = false;
     await refresh();
@@ -1104,8 +1120,10 @@ function picker(): string {
         `<button class="gx-seg${l.code === draft.lang ? ' on' : ''}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc(l.label)}</button>`,
     )
     .join('');
+  const playing = !!draft.player;
   const scenarios = f
     ? f.scenarios
+        .filter((s) => !playing || s.kind !== 'opening')
         .map((s) => {
           return `<button class="gx-sc${s.fm === draft.fm ? ' on' : ''}" data-action="fm" data-value="${s.fm}" aria-pressed="${s.fm === draft.fm}">
             <b>${String(s.fm).padStart(2, '0')}</b><span>${esc(s.label)}</span></button>`;
@@ -1120,14 +1138,26 @@ function picker(): string {
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   // 직접 입력은 상황을 적어야 출발
-  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim());
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(playing && sc.kind === 'opening');
+  // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
+  const ctxP = view.kind === 'picker' ? view.ctx : null;
+  const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
+  const me = userInfo();
+  const who = f
+    ? `<div class="gx-who">${[
+        `<button class="gx-whoc${!playing ? ' on' : ''}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`,
+        ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? ' on' : ''}" data-action="player" data-value="${esc(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ''}<span class="gx-whot"><b>${esc(a.name)}</b>${a.rank ? `<small>${esc(a.rank)}</small>` : ''}</span></button>`),
+      ].join('')}</div>${playing ? '<div class="gx-hint">고른 요원이 주인공이 돼요. 첫 장면은 직접 입력이나 커스텀 임무로 시작해요.</div>' : ''}`
+    : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
+  const shown = f ? f.scenarios.filter((s) => !playing || s.kind !== 'opening').length : 0;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
-    <section><h2><i>2</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${f.scenarios.length}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
-    <section><h2><i>3</i>언어</h2><div class="gx-segs">${langs}</div></section>
+    <section><h2><i>2</i>주인공</h2>${who}</section>
+    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc(f.name)} · ${shown}개</small>` : ''}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
-    ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)} · ${String(sc.fm).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
+    ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(sc.fm).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
     ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
     <button class="gx-start" data-action="start" ${ready && !busy ? '' : 'disabled'}>${busy ? '시작하는 중…' : '출 발'}</button>
   </footer>`;
@@ -1185,13 +1215,17 @@ function idCard(ctx: ChatContext): string {
   // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
   const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
   const u = userInfo();
-  const name = u.name || '나';
-  const photo = u.photo
-    ? `<span class="gx-id-photo"><img src="${esc(u.photo)}" alt=""></span>`
+  // 캐릭터로 플레이: 신분증도 그 요원 사진·이름·직급
+  const pa = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  const paPic = pa ? imageUrl(ctx.char, facePic(ctx.char, pa, true)) : null;
+  const name = pa?.name || u.name || '나';
+  const photoUrl = pa ? paPic : u.photo;
+  const photo = photoUrl
+    ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
   return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</small></span>
+      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
       ${status ? `<span class="gx-op-st">${status}</span>` : ''}
     </div>`;
 }

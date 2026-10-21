@@ -9,6 +9,7 @@ import {
 } from './phone';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
+import { playerAgent } from './player';
 import { bookText, PERSONA_SOURCE, collectRefs, factionCodesToNames, policySections, recentTurns, type RefSource } from './refs';
 
 export interface PhonePrompt {
@@ -167,12 +168,18 @@ function participant(src: RefSource, c: PPerson, related: boolean, status: boole
 }
 
 interface Narrator {
-  owner: { name: string; faction: string; factionDisplayName: string };
+  owner: { name: string; faction: string; factionDisplayName: string; character?: string; rank?: string };
   recentStory: { role: string; text: string; turn: number }[];
   currentSceneEntries: number;
   currentSceneTime: string;
   factionLabels: Record<string, string>;
   universe: { characterDescription: string; authorsNote: string; userPersona?: string; activeLoreBooks: { source: string; content: string; kind: string }[] };
+}
+
+/** 캐릭터로 플레이: 폰 주인이 어느 요원인지 (이름·직급). 다른 요원은 로어북의 관계대로 대한다 */
+function ownerCharacter(src: RefSource): { character?: string; rank?: string } {
+  const a = playerAgent(src.char.globalLore, src.chat.scriptstate);
+  return a ? { character: a.name, ...(a.rank ? { rank: a.rank } : {}) } : {};
 }
 
 function narrator(src: RefSource, names: Record<string, string>, related: boolean, text: string): Narrator {
@@ -199,7 +206,7 @@ function narrator(src: RefSource, names: Record<string, string>, related: boolea
     else universe.activeLoreBooks.push({ source: r.sources.join(' / '), content: r.content, kind: r.kind });
   }
   return {
-    owner: { name: '주인공', faction, factionDisplayName: names[faction] ?? faction },
+    owner: { name: '주인공', faction, factionDisplayName: names[faction] ?? faction, ...ownerCharacter(src) },
     recentStory, currentSceneEntries: last ? (last.user ? 1 : 0) + last.char.length : 0, currentSceneTime: phoneTime(src.chat), factionLabels: names, universe,
   };
 }

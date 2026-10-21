@@ -41,6 +41,7 @@ import { setWaiting } from './host/waiting';
 import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRoster, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
+import { applyPlayer, playerAgent, playerBlock } from './core/player';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -61,6 +62,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (liteNow) {
     messages = stripHistoryTags(messages);
     messages = await fixLore(messages).catch(() => messages);
+    messages = await withPlayer(messages).catch(() => messages);
     messages = trimRoster(messages);
     const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
     if (ctx.length) {
@@ -92,7 +94,8 @@ type LoreChar = { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknow
 
 function loreFor(char: LoreChar, chat: Chat, input?: string) {
   const mode = advValue(chat.scriptstate, 'gen', 'lore_mode') as LoreMode;
-  return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userInfo().name), input });
+  const player = playerAgent(char.globalLore, chat.scriptstate);
+  return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userInfo().name), input, ...(player ? { exclude: [player.lore] } : {}) });
 }
 
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
@@ -134,6 +137,17 @@ async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const got = loreFor(char, chat);
   if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
   return patchSlots(messages, chat.scriptstate, got.vars).messages;
+}
+
+/** 캐릭터로 플레이: 페르소나 자리에 그 요원 로어북과 틀 지침, 페르소나 이름은 요원 이름으로 */
+async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> {
+  const charIndex = await risuai.getCurrentCharacterIndex();
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
+  const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
+  if (!char || !chat || !agent) return messages;
+  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
+  return applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;

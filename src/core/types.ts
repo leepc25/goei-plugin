@@ -66,6 +66,8 @@ export interface StartChoice {
   faction: FactionCode;
   lang: LangCode;
   fm: number;
+  /** 캐릭터로 플레이: 유저가 연기할 요원 코드 (없으면 페르소나) */
+  player?: string;
 }
 
 export type ScriptState = Record<string, string | number | boolean>;

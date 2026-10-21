@@ -374,7 +374,7 @@ export async function handleSettings(action: string, value: string | undefined, 
         await save(ctx, env, (chat) => {
           if (worldOn(chat)) return null;
           const faction = String(chat.scriptstate?.['$st_faction'] ?? '');
-          return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random);
+          return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.['$st_player'] ?? ''));
         });
       }
       return true;
