@@ -84,6 +84,10 @@ export class World implements WorldView {
   enemyFactory: EnemyFactory;
   /** 모듈이 매 틱 덧붙이는 일 (아이템 등) */
   hooks: (() => void)[] = [];
+  /** E: 아이템 줍기·들기·내려놓기 (처리했으면 true) */
+  pickHook: (() => boolean) | null = null;
+  /** 든 물건 그리기: (sx, sy)=손잡이가 올 화면 자리, deg=각도(오른쪽 보기 기준), dir=보는 방향 */
+  drawHeld: ((c: CanvasRenderingContext2D, carry: NonNullable<Player['carry']>, sx: number, sy: number, deg: number, dir: 1 | -1) => void) | null = null;
   /** 싸움 구간을 막는 몸인가 (적 모듈: 평화로운 주민 등은 아님) */
   threat: (b: Body) => boolean = () => true;
   /** E를 눌렀을 때 (적 모듈 규칙 신호 등). 가장 가까운 소품을 같이 준다 */
@@ -293,6 +297,8 @@ export class World implements WorldView {
       const d = Math.abs(pr.x - p.x);
       if (d < 60 && (!best || d < Math.abs(best.x - p.x))) best = pr;
     }
+    // 든 게 있거나 가까운 층 물건이 없으면 E는 아이템 줍기·내려놓기 먼저
+    if ((p.carry || !best) && this.pickHook?.()) return;
     for (const h of this.interactHooks) h(best);
     if (best && this.stage?.onInteract) {
       p.play('pickup', this);

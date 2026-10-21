@@ -8,6 +8,9 @@ export interface FrameInfo {
   /** 앵커 기준 도트 상자 [x0, x1, y0, y1], y는 위가 + */
   hurt: [number, number, number, number] | null;
   reach: [number, number, number, number] | null;
+  /** 손 고정점 [x, y, 각도°] 앵커 기준 도트, y는 위가 +, 각도는 오른쪽 보기에서 시계 방향.
+   *  든 물건(무기·환경 물건)은 캐릭터 그림에 넣지 않고, 엔진이 그 물건 그림의 손잡이를 이 점에 맞춰 따로 그린다. */
+  hand?: [number, number, number] | null;
 }
 
 export interface Art {

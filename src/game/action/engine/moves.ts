@@ -107,6 +107,9 @@ export const MOVES: Record<string, MoveDef> = {
   eat: { clip: 'eat', ticks: T(3, 3, 3, 3, 3, 3) },
   bandage: { clip: 'bandage', ticks: T(3, 3, 3, 3, 3, 3) },
   toss: { clip: 'toss', ticks: T(2, 2, 2, 3, 3, 2) },
+  // 임시 무기: 판정은 아이템 모듈이 낸다 (내구도·물건 부수기와 같이). 엔진은 동작만
+  wswing: { clip: 'power', ticks: T(2, 2, 3, 5, 5), origin: 16, adv: 20, lunge: [5, 0.75] },
+  wfire: { clip: 'fire', ticks: T(2, 2, 2, 1) },
 };
 
 export const COMBO = ['jab', 'cross', 'power'] as const;

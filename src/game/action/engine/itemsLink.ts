@@ -1,7 +1,11 @@
 // 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(현금·파편·회복·탄·아이템·회수물), 섬광·연막 투척, 탄약 맞추기.
-// 임시 무기(쇠파이프·산탄총)는 아직 엔진 동작에 안 붙였다 (줍기 E를 넘기지 않음).
+// 환경 물건 들기(E)·던지기(A), 임시 무기 줍기(E)·휘두르기(A)·쏘기(S). 든 것은 캐릭터 그림과 따로 손 고정점에 그린다.
 import {
   ITEMS,
+  PROPS,
+  WEAPONS,
+  placeProp,
+  spawnPickup,
   createField,
   createItemRun,
   drawItemIcon,
@@ -67,6 +71,59 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     syncSlots();
   };
 
+  const actor = () => ({ x: p.x, y: p.y, z: p.z, dir: p.dir });
+  const syncCarry = () => {
+    p.carry = ir.carry
+      ? { kind: 'prop', id: ir.carry.prop, hold: 'over' }
+      : ir.held
+        ? { kind: 'weapon', id: ir.held.id, hold: 'hand', cls: WEAPONS[ir.held.id]?.cls }
+        : null;
+  };
+  const melee = { damage: 12, reach: 110 };
+  p.itemAct = (k) => {
+    if (ir.carry) {
+      apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
+      syncCarry();
+      return 'toss';
+    }
+    const cls = ir.held ? WEAPONS[ir.held.id]?.cls : undefined;
+    if (k === 'attack' && cls === 'melee') {
+      apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
+      syncCarry();
+      return 'wswing';
+    }
+    if (k === 'shoot' && cls === 'gun') {
+      apply(stepField(field, ir, actor(), { shoot: true }, targets(), 0, ctx()));
+      syncCarry();
+      return 'wfire';
+    }
+    return null;
+  };
+  w.pickHook = () => {
+    const before = `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
+    const evs = stepField(field, ir, actor(), { interact: true }, targets(), 0, ctx());
+    apply(evs);
+    syncCarry();
+    const changed = evs.length > 0 || before !== `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
+    if (changed && p.phase === 'free' && !p.move && p.z <= 0) p.play('pickup', w);
+    return changed;
+  };
+  w.drawHeld = (c, carry, sx, sy, deg, dir) => {
+    c.save();
+    c.translate(sx, sy);
+    if (dir < 0) c.scale(-1, 1);
+    if (carry.kind === 'prop') {
+      const d = PROPS[carry.id];
+      const s = Math.max(d?.w ?? 60, d?.h ?? 60);
+      drawItemIcon(c, carry.id, -s / 2, -s, s);
+    } else {
+      // 무기 그림의 손잡이 = 그림 아래쪽 1/4 지점. 각도 0 = 위로 세움, 시계 방향
+      c.rotate(((deg + 45) * Math.PI) / 180);
+      drawItemIcon(c, carry.id, -12, -36, 48);
+    }
+    c.restore();
+  };
+
   w.itemUse = (slot) => {
     const evs = stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, { use: slot - 1 }, targets(), 0, ctx());
     const used = evs.find((e) => e.t === 'use') as Extract<ItemEvent, { t: 'use' }> | undefined;
@@ -82,6 +139,14 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   w.on((e) => {
     if (e.type === 'enter:floor') {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
+      // 층마다 들 수 있는 물건 둘, 임시 무기 하나 (층 모듈이 자리를 정하기 전까지 임시 배치)
+      const sx = e.floor.startX ?? 200;
+      const ym = (w.lane[0] + w.lane[1]) / 2;
+      const pick = <T,>(a: T[]) => a[Math.floor(w.rand() * a.length)];
+      placeProp(field, pick(['chair', 'bin', 'pot']), Math.min(e.floor.length - 100, sx + 380), ym + 30);
+      placeProp(field, pick(['tv', 'extinguisher', 'chair']), Math.min(e.floor.length - 100, sx + 900), ym - 20);
+      spawnPickup(field, 'weapon', Math.min(e.floor.length - 100, sx + 600), ym, pick(['pipe', 'chairleg', 'kitchenknife', 'servicepistol']));
+      syncCarry();
     }
     if (e.type === 'enemyDie') apply(dropFromKill(field, ir, DROP_TABLE[e.kind] ?? 'anomaly', e.x, w.player.y));
   });
@@ -91,6 +156,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     tick() {
       lastReserve = ir.reserve = p.reserve;
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+      syncCarry();
       w.notes.cash = ir.cash;
       w.notes.shards = ir.shards;
       w.notes.debt = ir.debt;
@@ -99,6 +165,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     },
     draw(c: CanvasRenderingContext2D, camX: number) {
       for (const e of field.ents) {
+        if (e.type === 'prop') {
+          const d = PROPS[e.prop];
+          const s = Math.max(d?.w ?? 60, d?.h ?? 60);
+          c.fillStyle = 'rgba(0,0,0,0.3)';
+          c.beginPath();
+          c.ellipse(e.x - camX, e.y, s * 0.4, 6, 0, 0, Math.PI * 2);
+          c.fill();
+          if (e.flash > 0) c.globalAlpha = 0.6;
+          drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
+          c.globalAlpha = 1;
+          continue;
+        }
         if (e.type !== 'pickup') continue;
         const x = e.x - camX;
         const y = e.y - e.z;
@@ -112,7 +190,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       }
       for (const pj of field.projs) {
         c.fillStyle = '#d8e0e4';
-        c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
+        if (pj.kind === 'prop' && pj.ref) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
+        else c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
       }
       for (const z of field.zones) {
         c.strokeStyle = z.kind === 'salt' ? 'rgba(240,240,240,0.6)' : 'rgba(160,170,180,0.5)';

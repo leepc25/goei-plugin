@@ -71,6 +71,10 @@ export class Player extends Fighter {
   /** 부적: 피격 무효 남은 횟수 */
   ward = 0;
   /** 이 틱에 요청한 일 (world가 처리) */
+  /** 든 것: 환경 물건은 머리 위('over'), 임시 무기는 손('hand'). 그림은 엔진이 따로 그린다 */
+  carry: { kind: 'prop' | 'weapon'; id: string; hold: 'over' | 'hand'; cls?: 'melee' | 'gun' } | null = null;
+  /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
+  itemAct: ((k: 'attack' | 'shoot') => string | null) | null = null;
   wantInteract = false;
   wantItem = 0;
   wantSuper = false;
@@ -99,6 +103,21 @@ export class Player extends Fighter {
     const a = this.anim();
     const list = this.clips[a.clip];
     return { info: list ? list[Math.min(a.frame, list.length - 1)] : null, origin: a.origin };
+  }
+
+  /** 든 물건을 그릴 자리: 발 기준 앞쪽 px(dx), 높이 px(dz), 각도° (오른쪽 보기 기준) */
+  heldAt(): { dx: number; dz: number; deg: number } | null {
+    if (!this.carry) return null;
+    const { info, origin } = this.frameInfo();
+    const P = PIXEL;
+    if (this.carry.hold === 'over') {
+      const top = info?.hurt ? info.hurt[3] : 96;
+      return { dx: ((info?.hurt ? (info.hurt[0] + info.hurt[1]) / 2 : 0) - origin) * P, dz: (top - 6) * P, deg: 0 };
+    }
+    const h = info?.hand;
+    if (h) return { dx: (h[0] - origin) * P, dz: h[1] * P, deg: h[2] };
+    const r = info?.reach;
+    return r ? { dx: ((r[0] + r[1]) / 2 - origin) * P, dz: ((r[2] + r[3]) / 2) * P, deg: -30 } : { dx: 18 * P, dz: 50 * P, deg: -30 };
   }
 
   frame(): { hit: Hit[]; hurt: WBox[] } {
@@ -474,6 +493,11 @@ export class Player extends Fighter {
       this.vx += p.mx * 0.4;
       this.vx = Math.max(-12, Math.min(12, this.vx));
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      if (this.carry?.kind === 'prop' && this.itemAct && this.take('attack')) {
+        const anim = this.itemAct('attack');
+        if (anim) this.play(anim, world);
+        return;
+      }
       if (!this.airAttackUsed && this.take('attack')) {
         this.airAttackUsed = true;
         this.play('airkick', world);
@@ -512,6 +536,17 @@ export class Player extends Fighter {
       this.running = false;
       world.emit({ type: 'jump', x: this.x });
       return;
+    }
+    // 든 것이 있으면 A·S는 던지기·휘두르기·임시 총
+    if (this.carry && this.itemAct && (this.buf?.b === 'attack' || this.buf?.b === 'shoot')) {
+      const k = this.buf.b as 'attack' | 'shoot';
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      const anim = this.itemAct(k);
+      if (anim !== null) {
+        this.take(k);
+        if (anim) this.play(anim, world);
+        return;
+      }
     }
     if (this.take('attack')) {
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;

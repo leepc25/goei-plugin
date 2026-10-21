@@ -5,6 +5,9 @@ game-src/action/jyaldi-v5/full/final/ 의 게임용 최종 스트립을 한 픽�
 장마다 판정 상자를 그림에서 재서 함께 적는다 (엔진 판정 보기 H로 확인, 손으로 고칠 때는 OVERRIDE에).
   hurt = 몸통 상자 (불투명 픽셀 x의 10~90% 범위, 머리끝~발)
   reach = 그림의 가장 앞쪽 점 근처 상자 (때리는 장의 공격 판정 후보)
+  hand  = 손 고정점 [x, y, 각도°]. 든 물건(무기·환경 물건)은 캐릭터 그림에 넣지 않고 엔진이 이 점에 물건 그림을 따로 그린다.
+          final/hands.json {클립: [[x, y, 각도] 또는 null, ...]} (원본 192×144 장 좌표, 아래가 +y)이 있으면 그 값,
+          없으면 팔 높이(그림 위에서 35~65%)의 가장 앞쪽 점으로 어림한다 (각도 -30).
 좌표: 원본 장(192×144) 기준 → 앵커(x=57, 발 y=136) 기준으로 바꿔 적는다. 오른쪽 보기, y는 위가 +.
 
 출력: game-pack/jyaldi/atlas.png, game-pack/jyaldi/frames.json, game-pack/jyaldi/pack.json, game-pack/jyaldi/cutin.png
@@ -34,6 +37,23 @@ FW, FH = 192, 144
 def frames_of(name):
     strip = Image.open(os.path.join(SRC, 'final', name + '.png')).convert('RGBA')
     return [strip.crop((i * FW, 0, (i + 1) * FW, FH)) for i in range(strip.width // FW)]
+
+
+HANDS_FILE = os.path.join(SRC, 'final', 'hands.json')
+HANDS = json.load(open(HANDS_FILE)) if os.path.exists(HANDS_FILE) else {}
+
+
+def guess_hand(im, bb):
+    a = im.getchannel('A').load()
+    h = bb[3] - bb[1]
+    best = None
+    for y in range(bb[1] + int(h * 0.35), bb[1] + int(h * 0.65)):
+        for x in range(bb[2] - 1, bb[0] - 1, -1):
+            if a[x, y] > 0:
+                if not best or x > best[0]:
+                    best = (x, y)
+                break
+    return best
 
 
 def measure(im):
@@ -71,7 +91,15 @@ def main():
                 bb = (0, 0, 1, 1)
             crop = im.crop(bb)
             cells.append(crop)
-            info.append({'cell': len(cells) - 1, 'ox': bb[0] - ANCHOR, 'oy': bb[1] - FOOT, 'hurt': hurt, 'reach': reach})
+            i = len(info)
+            given = HANDS.get(key) or HANDS.get(src)
+            if given and i < len(given) and given[i]:
+                hx, hy, hd = given[i]
+            else:
+                g = guess_hand(im, bb) if hurt else None
+                hx, hy, hd = (g[0] - 3, g[1], -30) if g else (ANCHOR + 18, FOOT - 50, -30)
+            hand = [hx - ANCHOR, FOOT - hy, hd]
+            info.append({'cell': len(cells) - 1, 'ox': bb[0] - ANCHOR, 'oy': bb[1] - FOOT, 'hurt': hurt, 'reach': reach, 'hand': hand})
         meta[key] = info
     # 줄 채우기 아틀라스 (폭 2048)
     W, x, y, rowh, pos = 2048, 0, 0, 0, []

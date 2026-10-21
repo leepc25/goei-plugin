@@ -123,6 +123,9 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillStyle = '#c0453a';
       ctx.fillRect(x - 20, y - z - 190, 40, 190);
     }
+    // 든 물건: 캐릭터 그림과 따로, 손 고정점(또는 머리 위)에 물건 그림의 손잡이를 맞춰 그린다
+    const held = p.heldAt();
+    if (held && p.carry && w.drawHeld) w.drawHeld(ctx, p.carry, x + p.dir * held.dx, y - z - held.dz, held.deg, p.dir);
     // 잔상: 회피·돌진·달리기
     if (p.moveKey === 'evade' || p.moveKey === 'dash' || (p.running && w.tick % 3 === 0)) {
       if (w.tick % 2 === 0) ghosts.push({ x: p.x, y: p.y - p.z, clip: a.clip, frame: a.frame, origin: a.origin, dir: p.dir, t: 8 });
