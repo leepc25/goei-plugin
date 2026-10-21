@@ -431,3 +431,6 @@ action: Hard combat sprint, one full stride that loops: upper body leaning far f
 04:30:48 keypose jump animate_image 8f 160x112 -> id: 5800b23f-d86a-4a92-8a3d-94f426c79d08
 job_id: 5800b23f-d86a-4a92-8a3d-94f426c79d08
 action: Powerful jump: deep crouch with arms swinging back, explosive push-off with legs fully extended and arms t
+04:32:55 keypose draw animate_image 8f 160x112 -> id: acc8e402-3488-44f5-978d-f95321f589ba
+job_id: acc8e402-3488-44f5-978d-f95321f589ba
+action: Draws the pistol from the holster on her right hip with her RIGHT hand in one fast motion and raises it to
