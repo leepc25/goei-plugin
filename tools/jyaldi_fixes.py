@@ -99,9 +99,9 @@ def apply(key, fr, pr=None):
     if key == 'shower':
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
     if key == 'pipe':                          # 결함 1: 파이프 빠진 장에 뼈대 손목 따라 덧그림
-        for i in (1, 2, 5):
+        for i, raw in ((0, 1), (2, 2)):   # (최종 장, 원본 장): 빌더 order=[1, 0, 2, 3]
             if i < len(fr):
-                w, e, _, _ = wrists('pipe2', i); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
+                w, e, _, _ = wrists('pipe2', raw); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
     if key == 'idle_pipe':                     # 결함 2: 대기도 걷기처럼 어깨에 걸침 → 걷기 중 두 발 모인 장
         from build_jyaldi_full_demo import frames_of
         wp = frames_of('walk_pipe')[:7]
@@ -124,7 +124,10 @@ def apply(key, fr, pr=None):
             elif key == 'bandage':
                 f = lambda d, im, w=w: box(d, w[0] - 3, w[1] - 3, w[0] + 3, w[1] + 3, (236, 232, 222, 255), hi=(255, 255, 255, 255))
             else:
-                f = lambda d, im, w=w: (d.line([(w[0], w[1]), (w[0] + 2, w[1] - 7)], fill=(60, 140, 200, 255), width=2), d.point([(w[0] + 2, w[1] - 8), (w[0] + 3, w[1] - 8)], fill=(250, 250, 250, 255)))
+                # 칫솔: 주먹이 입 바로 앞이라, 솔은 입 안(주먹 뒤쪽)에 물고 손잡이가 주먹 앞으로 거의 수평으로 나옴
+                f = lambda d, im, w=w: (d.point([(w[0] - 2, w[1]), (w[0] - 2, w[1] + 1)], fill=(250, 250, 250, 255)),
+                                        d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(30, 60, 90, 255), width=3),
+                                        d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(70, 150, 210, 255), width=1))
             fr[i] = over(fr[i], f)
     if key in DROP:
         n = len(fr)

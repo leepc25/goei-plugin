@@ -49,7 +49,7 @@ DEFS = [
     D('grab', 'grab2', '21 잡기', 14),
     D('grabknee', 'grabknee2', '22 잡기 타격(무릎)', 14, hits=[2], hold=0.05),
     D('grabblast', 'grabblast', '23 잡기 폭파(던지기 대신)', 12, hits=[4], hold=0.1),
-    D('super', 'super', '24 필살기', 10, hits=[6], hold=0.2),
+    D('super', 'super', '24 필살기', 14, hits=[6], hold=0.2),
     D('pickup', 'pickup', '25 상호작용·줍기', 10),
     D('toss', 'toss', '26 물건 던지기', 12, hits=[3]),
     D('drink', 'drink', '27 마시기', 6),
@@ -63,7 +63,7 @@ DEFS = [
     D('smoke', 'smoke', '34 본부: 담배', 4),
     D('chain', 'chain', '36 숙련 3: 연쇄 폭파', 10, hits=[1, 3, 5], hold=0.05),
     D('wall', 'wall', '37 숙련 6: 벽 통째로', 10, hits=[4], hold=0.15),
-    D('pipe', 'pipe2', '38 임시 둔기 휘두르기', 12, hits=[3], hold=0.06),
+    D('pipe', 'pipe2', '38 임시 둔기 휘두르기', 12, hits=[2], hold=0.06, order=[1, 0, 2, 3]),   # 뒤로 치켜듦 → 머리 위 → 수평 → 아래로(내려치기 호). 찌르기처럼 보이던 4·5장은 뺌
     D('shotgun', 'shotgun2', '39 임시 총 사격(견착)', 12, order=[2, 0, 1, 3, 4, 5], hits=[1]),
     D('tired', 'tired', '41 피로·부상 대기', 4, loop=True),
     D('engage', 'engage', '2 전투 대기 진입(해제 = 역재생)', 12),

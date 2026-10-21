@@ -379,7 +379,7 @@
   },
   "super": {
    "label": "24 필살기",
-   "fps": 10,
+   "fps": 14,
    "loop": false,
    "hits": [
     6
@@ -574,14 +574,14 @@
    "fps": 12,
    "loop": false,
    "hits": [
-    3
+    2
    ],
    "adv": 0,
    "origin": 0,
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
-   "frames": 6,
-   "bytes": 32390,
+   "frames": 4,
+   "bytes": 22309,
    "prop": false
   },
   "shotgun": {
@@ -1794,7 +1794,7 @@
    "hold": 0.0,
    "group": "씻기·집안일·운동",
    "frames": 4,
-   "bytes": 10791,
+   "bytes": 10714,
    "prop": false
   },
   "towel": {
