@@ -124,7 +124,10 @@ def apply(key, fr, pr=None):
             elif key == 'bandage':
                 f = lambda d, im, w=w: box(d, w[0] - 3, w[1] - 3, w[0] + 3, w[1] + 3, (236, 232, 222, 255), hi=(255, 255, 255, 255))
             else:
-                f = lambda d, im, w=w: (d.line([(w[0], w[1]), (w[0] + 2, w[1] - 7)], fill=(60, 140, 200, 255), width=2), d.point([(w[0] + 2, w[1] - 8), (w[0] + 3, w[1] - 8)], fill=(250, 250, 250, 255)))
+                # 칫솔: 주먹이 입 바로 앞이라, 솔은 입 안(주먹 뒤쪽)에 물고 손잡이가 주먹 앞으로 거의 수평으로 나옴
+                f = lambda d, im, w=w: (d.point([(w[0] - 2, w[1]), (w[0] - 2, w[1] + 1)], fill=(250, 250, 250, 255)),
+                                        d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(30, 60, 90, 255), width=3),
+                                        d.line([(w[0] + 2, w[1] + 1), (w[0] + 9, w[1] + 2)], fill=(70, 150, 210, 255), width=1))
             fr[i] = over(fr[i], f)
     if key in DROP:
         n = len(fr)
