@@ -194,8 +194,16 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       }
     }
   }
+  // 아이템·무기 그림 (tools/items_pixelize.py → game-src/art/items/dot + items.json)
+  const items = {};
+  if (existsSync('game-src/art/items/items.json')) {
+    for (const [id, e] of Object.entries(JSON.parse(readFileSync('game-src/art/items/items.json', 'utf8')))) {
+      const f = `game-src/art/items/${e.file}`;
+      if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
+    }
+  }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

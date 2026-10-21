@@ -12,75 +12,75 @@
   "h": 128
  },
  "objects/service_objects_1": {
-  "w": 66,
-  "h": 121,
+  "w": 85,
+  "h": 156,
   "foot": [
-   33,
-   121
+   42,
+   156
   ]
  },
  "objects/service_objects_2": {
-  "w": 32,
-  "h": 37,
+  "w": 41,
+  "h": 48,
   "foot": [
-   16,
-   37
+   20,
+   48
   ]
  },
  "objects/service_objects_3": {
-  "w": 44,
-  "h": 22,
+  "w": 55,
+  "h": 28,
   "foot": [
-   22,
-   22
+   27,
+   28
   ]
  },
  "objects/service_objects_4": {
-  "w": 44,
-  "h": 13,
+  "w": 58,
+  "h": 17,
   "foot": [
-   22,
-   13
+   29,
+   17
   ]
  },
  "objects/service_objects_5": {
-  "w": 16,
-  "h": 22,
+  "w": 20,
+  "h": 28,
   "foot": [
-   8,
-   22
+   10,
+   28
   ]
  },
  "objects/service_objects_6": {
-  "w": 39,
-  "h": 34,
+  "w": 51,
+  "h": 44,
   "foot": [
-   19,
-   34
+   25,
+   44
   ]
  },
  "objects/service_objects_7": {
-  "w": 94,
-  "h": 61,
+  "w": 122,
+  "h": 79,
   "foot": [
-   47,
-   61
+   61,
+   79
   ]
  },
  "objects/service_objects_8": {
-  "w": 92,
-  "h": 49,
+  "w": 118,
+  "h": 63,
   "foot": [
-   46,
-   49
+   59,
+   63
   ]
  },
  "objects/service_objects_9": {
-  "w": 14,
-  "h": 10,
+  "w": 19,
+  "h": 13,
   "foot": [
-   7,
-   10
+   9,
+   13
   ]
  },
  "service_wall_1": {

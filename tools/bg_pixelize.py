@@ -33,8 +33,8 @@ FAR_TALL = (256, 384)
 COLORS = 32
 DIM = 0.85               # 명도
 DESAT = 1.1              # 채도
-# 물건 크기: GPT 그림 안 비율은 믿지 않고 heights.json의 실제 높이(m)로 맞춘다. 쟈알디 대기 키 99도트 = 1.65m.
-DPM = 99 / 1.65
+# 물건 크기: GPT 그림 안 비율은 믿지 않고 heights.json의 실제 높이(m)로 맞춘다. 쟈알디 키 128도트(화면 256px) = 1.65m (2026-10-21 새 쟈알디).
+DPM = 128 / 1.65
 HEIGHTS = json.loads((ROOT / 'game-src/art/bg/heights.json').read_text()) if (ROOT / 'game-src/art/bg/heights.json').exists() else {}
 KEY = (255, 0, 255)
 

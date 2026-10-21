@@ -1,0 +1,94 @@
+{
+ "hq_training_floor": {
+  "w": 128,
+  "h": 128
+ },
+ "objects/hq_training_objects_1": {
+  "w": 65,
+  "h": 141,
+  "foot": [
+   32,
+   141
+  ]
+ },
+ "objects/hq_training_objects_2": {
+  "w": 115,
+  "h": 125,
+  "foot": [
+   57,
+   125
+  ]
+ },
+ "objects/hq_training_objects_3": {
+  "w": 97,
+  "h": 102,
+  "foot": [
+   48,
+   102
+  ]
+ },
+ "objects/hq_training_objects_4": {
+  "w": 107,
+  "h": 125,
+  "foot": [
+   53,
+   125
+  ]
+ },
+ "objects/hq_training_objects_5": {
+  "w": 193,
+  "h": 94,
+  "foot": [
+   96,
+   94
+  ]
+ },
+ "objects/hq_training_objects_6": {
+  "w": 83,
+  "h": 36,
+  "foot": [
+   41,
+   36
+  ]
+ },
+ "objects/hq_training_objects_7": {
+  "w": 77,
+  "h": 40,
+  "foot": [
+   38,
+   40
+  ]
+ },
+ "objects/hq_training_objects_8": {
+  "w": 125,
+  "h": 94,
+  "foot": [
+   62,
+   94
+  ]
+ },
+ "objects/hq_training_objects_9": {
+  "w": 61,
+  "h": 32,
+  "foot": [
+   30,
+   32
+  ]
+ },
+ "hq_training_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_training_wall_2": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_training_wall_3": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_training_wall_4": {
+  "w": 320,
+  "h": 220
+ }
+}

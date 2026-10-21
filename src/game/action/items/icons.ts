@@ -1,3 +1,4 @@
+import { drawItemArt } from '../art/items';
 /**
  * 그레이박스 아이콘. 코드로만 그린다(그림 파일 없음). 칸 배경은 그리지 않고 물건만.
  * 종류별 색: 회복 초록, 해제 청록, 투척 주황, 특수 보라, 무기 회색, 회수물 금색, 현금 노랑.
@@ -278,6 +279,8 @@ const ICONS: Record<string, Draw> = {
 export const hasIcon = (id: string) => id in ICONS;
 /** (x, y) 왼쪽 위, size 크기 정사각에 물건 하나. 모르는 id는 물음표 상자. */
 export function drawItemIcon(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, size: number): void {
+  // GPT 그림을 도트화한 것이 있으면 그것 (art/items). 없으면 아래 코드 아이콘.
+  if (drawItemArt(ctx, id, x, y, size)) return;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(size / 32, size / 32);

@@ -1,0 +1,82 @@
+{
+ "objects/hq_tooth_objects_1": {
+  "w": 96,
+  "h": 110,
+  "foot": [
+   48,
+   110
+  ]
+ },
+ "objects/hq_tooth_objects_2": {
+  "w": 41,
+  "h": 32,
+  "foot": [
+   20,
+   32
+  ]
+ },
+ "objects/hq_tooth_objects_3": {
+  "w": 56,
+  "h": 48,
+  "foot": [
+   28,
+   48
+  ]
+ },
+ "objects/hq_tooth_objects_4": {
+  "w": 100,
+  "h": 94,
+  "foot": [
+   50,
+   94
+  ]
+ },
+ "objects/hq_tooth_objects_5": {
+  "w": 66,
+  "h": 63,
+  "foot": [
+   33,
+   63
+  ]
+ },
+ "objects/hq_tooth_objects_6": {
+  "w": 19,
+  "h": 24,
+  "foot": [
+   9,
+   24
+  ]
+ },
+ "objects/hq_tooth_objects_7": {
+  "w": 38,
+  "h": 20,
+  "foot": [
+   19,
+   20
+  ]
+ },
+ "objects/hq_tooth_objects_8": {
+  "w": 43,
+  "h": 40,
+  "foot": [
+   21,
+   40
+  ]
+ },
+ "objects/hq_tooth_objects_9": {
+  "w": 38,
+  "h": 20,
+  "foot": [
+   19,
+   20
+  ]
+ },
+ "hq_tooth_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_tooth_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}

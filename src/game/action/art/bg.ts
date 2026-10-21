@@ -95,6 +95,7 @@ function wallLight(ctx: CanvasRenderingContext2D, x: number, w: number, bottom: 
 /** 바닥 띠(y0~y1)를 무늬로 깐다. 뒤쪽 줄일수록 좁고 납작하게(원근), 무늬는 월드 x에 붙는다. */
 export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, y0: number, y1: number): boolean {
   place = place.split(':')[0];
+  if (!Object.keys(pack()[place] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[place]) place = FLOOR_ALT[place];
   const name = Object.keys(pack()[place] ?? {}).find((n) => n.endsWith('_floor'));
   const im = name ? image(place, name) : null;
   if (!im) return false;
@@ -186,13 +187,133 @@ export function drawWallCrop(ctx: CanvasRenderingContext2D, place: string, key: 
   return true;
 }
 
-/** 본부 장소 id → 그림 장소 (그림이 없는 장소는 비슷한 방을 빌린다). */
+/** 본부 장면 id·look → 그림 장소 (hq/map.ts). 옛 본부 장소 id도 받는다. */
 export const HQ_PLACE: Record<string, string> = {
-  office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_office', supply: 'hq_workshop', pantry: 'hq_pantry', clinic: 'hq_clinic', interview: 'hq_interview',
-  training: 'hq_workshop', appraisal: 'hq_jaemtri', lab: 'test', tooth: 'service', gallery: 'chase',
-  // 본부 평면도(hq/map.ts)의 장면 id·look. 그림이 아직 없는 곳은 비슷한 방을 빌린다(본부 배경 의뢰가 들어오면 바꾼다).
-  street: 'hq_street', lobby: 'hq_lobby', f2: 'hq_corridor', corridor: 'hq_corridor', b2: 'chase', containment: 'chase', pasta: 'apt',
+  street: 'hq_street', lobby: 'hq_lobby', f2: 'hq_corridor', corridor: 'hq_corridor', clinic: 'hq_clinic', interview: 'hq_interview',
+  office: 'hq_office', jaemtri: 'hq_jaemtri', chief: 'hq_chief', pantry: 'hq_pantry', supply: 'hq_supply', training: 'hq_training',
+  b2: 'hq_containment', containment: 'hq_containment', appraisal: 'hq_appraisal', lab: 'hq_lab', tooth: 'hq_tooth', pasta: 'hq_pasta', gallery: 'chase',
 };
+
+/** 본부 장면에서 벽 칸을 함께 쓰는 장소 (같은 방 마감). */
+const HQ_WALLS: Record<string, string[]> = {
+  hq_office: ['hq_office', 'hq_jaemtri'],
+  hq_supply: ['hq_supply', 'hq_workshop'],
+  hq_lab: ['hq_lab', 'hq_jaemtri:hq_jaemtri_wall_4'],
+  hq_lobby: ['hq_lobby', 'lobby:lobby_wall_1'],
+};
+/** 바닥 그림이 없는 장소가 빌리는 바닥. */
+const FLOOR_ALT: Record<string, string> = {
+  hq_chief: 'hq_office', hq_interview: 'hq_office', hq_jaemtri: 'hq_office', hq_lobby: 'lobby', hq_supply: 'hq_workshop',
+  hq_appraisal: 'hq_containment', hq_lab: 'hq_clinic', hq_tooth: 'hq_containment',
+};
+/** 문이 그려진 벽 칸: 문 구멍 x 범위(도트)와 종류. 엔진 문 자리에 그 칸을 맞춰 그리면 문이 따로 그려지지 않는다. */
+const DOOR_WALLS: Record<string, [number, number, 'door' | 'stairs' | 'elevator' | 'main']> = {
+  lobby_wall_1: [140, 180, 'main'],
+  hq_street_wall_1: [130, 190, 'door'], hq_street_wall_3: [204, 267, 'door'], hq_lobby_wall_2: [130, 238, 'stairs'],
+  hq_corridor_wall_1: [114, 206, 'elevator'], hq_corridor_wall_3: [128, 205, 'door'], hq_corridor_wall_4: [124, 196, 'door'],
+  hq_clinic_wall_4: [77, 163, 'door'], hq_office_wall_3: [126, 194, 'door'], hq_pantry_wall_2: [62, 139, 'door'], hq_pantry_wall_4: [122, 198, 'door'],
+  hq_workshop_wall_1: [29, 101, 'door'], hq_workshop_wall_3: [115, 206, 'door'], hq_supply_wall_2: [123, 215, 'door'],
+  hq_containment_wall_1: [139, 216, 'door'], hq_containment_wall_3: [116, 204, 'door'], hq_containment_wall_4: [111, 211, 'door'],
+};
+/** 본부에서 쓰지 않는 벽 칸 (문이 둘이라 엔진 문과 맞출 수 없음, 막다른 골목 입구). */
+const HQ_SKIP = new Set(['hq_office_wall_5', 'hq_street_wall_4']);
+/** 특정 문에 쓸 벽 칸: 장면:문 → 그림 이름. */
+const DOOR_FOR: Record<string, string> = { 'street:main': 'hq_street_wall_1', 'street:pasta': 'hq_street_wall_3', 'lobby:main': 'lobby_wall_1' };
+
+function doorType(kind: string): 'door' | 'stairs' | 'elevator' {
+  return kind.startsWith('stairs') ? 'stairs' : kind === 'elevator' ? 'elevator' : 'door';
+}
+
+/**
+ * 본부 장면 벽: 엔진 문 자리에 문이 그려진 벽 칸을 문 구멍이 맞게 놓고, 사이는 문 없는 칸으로 채운다.
+ * 칸끼리 겹치면 가운데서 자르고 기둥을 세운다. 돌려주는 집합 = 벽 그림이 문을 대신한 문 id (엔진은 그 문을 그리지 않는다).
+ */
+export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId: string, length: number, wallBottom: number, doors: { id: string; x: number; kind: string }[]): Set<string> | null {
+  const cands: [string, string][] = [];
+  for (const src of HQ_WALLS[place] ?? [place]) {
+    const [p, only] = src.split(':');
+    for (const n of walls(p)) if ((!only || n === only) && !HQ_SKIP.has(n)) cands.push([p, n]);
+  }
+  if (!cands.length) return null;
+  const plain = cands.filter(([, n]) => !DOOR_WALLS[n]);
+  const fill = plain.length ? plain : cands;
+  const k = wallBottom / 220; // 화면 px / 도트
+  const bayW = 320 * k;
+  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string };
+  const pieces: Piece[] = [];
+  for (const d of [...doors].sort((a, b) => a.x - b.x)) {
+    const want = DOOR_FOR[`${sceneId}:${d.id}`];
+    // 정문은 정문 칸, 없으면 보통 문 칸. 보통 문은 정문 칸을 쓰지 않는다.
+    const t = d.kind === 'main' && cands.some(([, n]) => DOOR_WALLS[n]?.[2] === 'main') ? 'main' : doorType(d.kind);
+    const ok = cands.filter(([, n]) => DOOR_WALLS[n]?.[2] === t);
+    const pick = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d.id}`) % Math.max(1, ok.length)];
+    if (!pick) continue;
+    const [x0, x1] = DOOR_WALLS[pick[1]];
+    const bx = d.x - ((x0 + x1) / 2) * k;
+    pieces.push({ p: pick[0], n: pick[1], x: bx, a: bx, b: bx + bayW, door: d.id });
+  }
+  // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다)
+  for (let i = 1; i < pieces.length; i++) {
+    const L = pieces[i - 1], R = pieces[i];
+    if (L.b > R.a) {
+      const m = (L.b + R.a) / 2;
+      L.b = m;
+      R.a = m;
+    }
+  }
+  // 빈 곳은 문 없는 칸으로
+  const fills: Piece[] = [];
+  let cur = 0, idx = hash(sceneId);
+  const gaps: [number, number][] = [];
+  for (const pc of pieces) {
+    if (pc.a > cur) gaps.push([cur, pc.a]);
+    cur = Math.max(cur, pc.b);
+  }
+  if (cur < length) gaps.push([cur, length]);
+  for (const [g0, g1] of gaps) {
+    for (let x = g0; x < g1; x += bayW) {
+      const [p, n] = fill[idx++ % fill.length];
+      fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1) });
+    }
+  }
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  const covered = new Set<string>();
+  for (const pc of [...fills, ...pieces]) {
+    const im = image(pc.p, pc.n);
+    if (!im) continue;
+    const a = Math.max(pc.a, pc.x), b = Math.min(pc.b, pc.x + bayW);
+    if (b <= a) continue;
+    ctx.drawImage(im, (a - pc.x) / k, 0, (b - a) / k, im.height, a, 0, b - a, wallBottom);
+    if (pc.door) covered.add(pc.door);
+  }
+  // 이 장소 벽 그림에 엘리베이터가 없으면 2층 복도 엘리베이터(문틀째)를 잘라 붙인다
+  const el = image('hq_corridor', 'hq_corridor_wall_1');
+  for (const d of doors) {
+    if (d.kind !== 'elevator' || covered.has(d.id) || !el) continue;
+    const [cx0, cy0, cx1, cy1] = [108, 23, 213, 218];
+    const w = (cx1 - cx0) * k, h = (cy1 - cy0) * k;
+    ctx.drawImage(el, cx0, cy0, cx1 - cx0, cy1 - cy0, Math.round(d.x - w / 2), Math.round(wallBottom - h - 2 * k), w, h);
+    covered.add(d.id);
+  }
+  // 잘린 이음매에 기둥
+  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && e - pc.x > 2 && pc.x + bayW - e > 2) seamPillar(ctx, e, wallBottom, 14);
+  wallLight(ctx, 0, length, wallBottom);
+  ctx.restore();
+  return covered;
+}
+
+/** 장소가 바뀌는 이음매·잘린 칸 이음매의 기둥 (도트 마감: 어두운 몸통 + 밝은 모서리). */
+export function seamPillar(ctx: CanvasRenderingContext2D, x: number, wallBottom: number, w = 36) {
+  const x0 = Math.round(x - w / 2);
+  ctx.fillStyle = '#22262a';
+  ctx.fillRect(x0, 0, w, wallBottom);
+  ctx.fillStyle = '#3a4045';
+  ctx.fillRect(x0 + 2, 0, Math.max(2, Math.round(w / 4)), wallBottom);
+  ctx.fillStyle = '#121416';
+  ctx.fillRect(x0 + w - 2, 0, 2, wallBottom);
+  ctx.fillRect(x0, 0, 2, wallBottom);
+}
 
 // ── 소품 그림 (물건 모음 → objects/<장소>_objects_N). 회색 상자 대신. 도트 1px = 화면 2px, 발(아래 가운데)을 바닥 y에.
 type ObjRef = [string, number] | [string, number, string, number] | null; // [장소, 번호] 또는 둘을 나란히, null = 그리지 않음(벽 그림에 이미 있음)
@@ -208,7 +329,12 @@ const DOOR: Record<string, number> = { apt: 1, chase: 1, lobby: 9, test: 9, hq_o
 const BY_KIND: Record<string, ObjRef> = {
   elevator: ['el_hall', 1, 'el_hall', 2], chasedoor: ['chase', 1], servicedoor: ['hq_workshop', 9], hatch: ['service', 9], shutter: ['chase', 6],
   table: ['apt', 3], switch: ['test', 3], checklist: ['lobby', 6], sign: ['lobby', 6], symbol: null, goalwall: ['lobby', 6], belonging: ['service', 6],
+  item: ['service', 7], up: ['service', 9], down: ['service', 9], fall: ['service', 9], ladder_up: ['service', 1], ladder_down: ['service', 1],
+  rope: ['service', 2], pack: ['service', 6], gear: ['service', 3], memo: ['lobby', 6], map: ['lobby', 6], intercom: ['test', 3],
+  left: ['chase', 1], right: ['chase', 1], merchant: ['service', 7],
   // 승강기 안: 거울·버튼판은 벽 그림에 있다. 상호작용 자리는 그림 없이 (가까이 가면 엔진이 안내)
+  // 본부 문(엔진 hub.ts가 hq_<문 종류>로 부른다): 벽 그림에 문이 없을 때 엘리베이터·계단 그림
+  hq_stairs_up: ['hq_lobby', 6], hq_stairs_down: ['hq_lobby', 9],
   mirror: null, panel: null, button: null, getoff: null, greet: null, close: null, mark: null, b12: null,
   // 본부 평면도(hq/map.ts) 물건. 창문·블라인드처럼 벽에 붙은 것은 벽 그림에 있다.
   window: null, blinds: null, glass_door: null, hydrant_box: null, kitchen_window: null, mailboxes: null, coat_chair: null,
@@ -216,8 +342,13 @@ const BY_KIND: Record<string, ObjRef> = {
   guard_desk: ['hq_lobby', 1], plant: ['hq_lobby', 5],
   desk_monitors: ['hq_jaemtri', 1], cardigan_chair: ['hq_office', 12], condensed_milk_coffee: ['hq_office', 16], mix_coffee_box: ['hq_office', 17],
   whiteboard: ['hq_office', 13], desk_row: ['hq_office', 10, 'hq_office', 11], copier: ['hq_office', 14], sofa: ['hq_office', 4],
-  meeting_table: ['hq_office', 15], paper_pile: ['hq_office', 18], chief_desk: ['hq_office', 1], bookshelf: ['hq_jaemtri', 9], chair: ['hq_office', 2],
+  meeting_table: ['hq_office', 15], paper_pile: ['hq_office', 18], chief_desk: ['hq_chief', 1], bookshelf: null, chair: ['hq_interview', 3],
   bed: ['hq_clinic', 1], iv_stand: ['hq_clinic', 2], curtain: ['hq_clinic', 3], med_cabinet: null, recorder: ['hq_interview', 4],
+  dummy: ['hq_training', 1], mat: null, record_board: null, shooting_lane: null,
+  showcase: ['hq_containment', 1], security_gate: null, warning_light: null,
+  appraisal_bench: ['hq_appraisal', 1], gloves: ['hq_appraisal', 3], hologram: ['hq_appraisal', 2], drawers: ['hq_appraisal', 9],
+  lab_bench: ['hq_lab', 1], glass_cell: null, server_rack: ['hq_lab', 9],
+  tooth_tree: ['hq_tooth', 1], cage: null, feed_slot: null, long_table: ['hq_pasta', 1],
   coffee_machine: ['hq_pantry', 2], fridge: ['hq_pantry', 1], table_small: ['hq_pantry', 3], sink_counter: ['hq_pantry', 8],
   locker_row: ['hq_supply', 4], workbench: ['hq_workshop', 1], cargo_cart: ['hq_supply', 3], shelf: ['hq_supply', 1],
 };
@@ -256,6 +387,88 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
       ctx.drawImage(b, Math.round(sx), Math.round(y - b.height * 2), b.width * 2, b.height * 2);
     } else ok = false;
   } else ok = drawObj(ctx, ref[0], ref[1], sx, y) > 0;
+  // 빈 흰 판(로비 6번)에 글씨·무늬 (통합 검수 2-4: 빈 판처럼 보인다). 판 면 = 도트 (10,2)~(50,48)
+  if (ok && ref.length === 2 && ref[0] === 'lobby' && ref[1] === 6) {
+    const im = objImage('lobby', 6)!;
+    boardFace(ctx, sx - im.width + 22, y - im.height * 2 + 6, 78, 88, kind, label ?? '');
+  }
   ctx.restore();
   return ok;
+}
+
+/** 표지판 면: 머리 글씨 두 자 + 글줄 무늬. 종류마다 머리 글씨·무늬가 다르다. */
+function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, kind: string, label: string) {
+  const head =
+    /시험|점수/.test(label) ? '시험' : /순서/.test(label) ? '순서' : /표지/.test(label) ? '표지' : kind === 'checklist' || /점검/.test(label) ? '점검' : kind === 'goalwall' || /목표/.test(label) ? '목표' : /긁힌/.test(label) ? '' : '안내';
+  x = Math.round(x);
+  y = Math.round(y);
+  ctx.save();
+  ctx.fillStyle = head === '시험' || head === '목표' ? '#7a2a26' : '#2c3c52';
+  ctx.fillRect(x, y, w, 22);
+  if (head) {
+    ctx.fillStyle = '#e8e2d2';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(head, x + w / 2, y + 12);
+  }
+  ctx.fillStyle = '#3a3a3e';
+  if (head === '순서') {
+    for (let i = 0; i < 3; i++) ctx.fillRect(x + 10 + i * 22, y + 36, 14, 14);
+    ctx.fillRect(x + 8, y + 62, w - 16, 4);
+  } else if (head === '표지') {
+    // 화살표 머리만 (어느 쪽인지는 읽어야 안다)
+    ctx.fillRect(x + 18, y + 44, w - 36, 6);
+    ctx.fillRect(x + 10, y + 34, 6, 26);
+    ctx.fillRect(x + w - 16, y + 34, 6, 26);
+  } else if (!head) {
+    // 긁힌 글씨: 비뚤어진 긁힘
+    ctx.fillStyle = '#5a2a2a';
+    for (let i = 0; i < 6; i++) ctx.fillRect(x + 6 + ((i * 13) % (w - 20)), y + 8 + i * 12, 14 + ((i * 7) % 20), 3);
+  } else {
+    // 글줄: 길이가 다른 짧은 줄 (작은 글씨처럼)
+    for (let i = 0; i < 5; i++) {
+      const lw = w - 16 - ((i * 17) % 28);
+      for (let gx = 0; gx < lw; gx += 8) ctx.fillRect(x + 8 + gx, y + 30 + i * 11, 6, 4);
+    }
+  }
+  ctx.restore();
+}
+
+/**
+ * 지형 덩어리(좁은 길의 튀어나온 바닥·앞 칸막이, 단)를 그 층 바닥 무늬로 칠한다. 회색 상자 대신.
+ * 윗면은 바닥 무늬를 밝게, face(px)만큼 아래쪽은 어두운 앞면. 바닥 그림이 없으면 false.
+ */
+export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, yTop: number, yBot: number, face = 0): boolean {
+  let p = place.split(':')[0];
+  if (!Object.keys(pack()[p] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[p]) p = FLOOR_ALT[p];
+  const name = Object.keys(pack()[p] ?? {}).find((n) => n.endsWith('_floor'));
+  const im = name ? image(p, name) : null;
+  if (!im || yBot <= yTop) return false;
+  const key = `${p}/${name}`;
+  let pat = patterns.get(key);
+  if (pat === undefined) {
+    pat = ctx.createPattern(im, 'repeat');
+    patterns.set(key, pat);
+  }
+  if (!pat) return false;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  pat.setTransform(new DOMMatrix([2, 0, 0, 2, 0, 0]));
+  ctx.fillStyle = pat;
+  ctx.fillRect(x0, yTop, x1 - x0, yBot - yTop);
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.fillRect(x0, yTop, x1 - x0, yBot - yTop - face);
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.fillRect(x0, yTop, x1 - x0, 4);
+  if (face > 0) {
+    ctx.fillStyle = 'rgba(10,10,16,0.55)';
+    ctx.fillRect(x0, yBot - face, x1 - x0, face);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(x0, yBot - 3, x1 - x0, 3);
+  ctx.fillRect(x0, yTop, 3, yBot - yTop);
+  ctx.fillRect(x1 - 3, yTop, 3, yBot - yTop);
+  ctx.restore();
+  return true;
 }

@@ -4,7 +4,7 @@
 // 화면에 벽 이름·층·잠김 이유 같은 글씨를 쓰지 않는다. 방 이름은 들어갈 때 위에 1초쯤 작게만. 사람 그림은 없으니 자리 주인은 목소리 말풍선으로.
 import type { FloorPlan, PropSpec, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
-import { HQ_PLACE, drawFloor, drawPropArt, drawWallCrop } from '../art/bg';
+import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt } from '../art/bg';
 import type { HqDoor, HqMapView, HqScene, HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -31,6 +31,7 @@ export type Hub = StageModule & { goto(place: string): void };
 export function makeHub(host: HubHost, whereIs: (place: string) => { scene: string; x: number }): Hub {
   let view: HqMapView | null = null;
   let scene: Scene | null = null;
+  let artDoors = new Set<string>();
   let pending: { scene: string; x: number } | null = null;
   let enterTick = -1;
   let fadeOut = 0;
@@ -63,7 +64,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       encounters: [],
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         // 벽: 장면 전체를 이어진 한 벽으로 (칸막이·이름 띠 없음)
-        if (!drawWallCrop(c, place, sc.id, 0, Math.max(SCREEN_W, sc.length), TOP)) {
+        // 문이 그려진 벽 칸을 엔진 문 자리에 맞춘다: 그 문은 벽 그림이 대신한다
+        const cov = drawHqWall(c, place, sc.id, Math.max(SCREEN_W, sc.length), TOP, sc.doors);
+        artDoors = cov ?? new Set();
+        if (!cov) {
           const g = c.createLinearGradient(0, 0, 0, TOP);
           g.addColorStop(0, '#2a3236');
           g.addColorStop(1, '#3a4448');
@@ -80,7 +84,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
         }
         for (const t of sc.things) if (t.wall) thing(c, t, camX);
-        for (const d of sc.doors) door(c, d, camX);
+        for (const d of sc.doors) if (!artDoors.has(d.id)) door(c, d, camX);
         for (const t of sc.things) if (!t.wall) thing(c, t, camX);
       },
       drawForeground(c: CanvasRenderingContext2D, camX: number, w: WorldView) {

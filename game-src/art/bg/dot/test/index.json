@@ -4,75 +4,75 @@
   "h": 128
  },
  "objects/test_objects_1": {
-  "w": 47,
-  "h": 61,
+  "w": 60,
+  "h": 79,
   "foot": [
-   23,
-   61
+   30,
+   79
   ]
  },
  "objects/test_objects_2": {
-  "w": 67,
-  "h": 55,
+  "w": 86,
+  "h": 71,
   "foot": [
-   33,
-   55
+   43,
+   71
   ]
  },
  "objects/test_objects_3": {
-  "w": 30,
-  "h": 67,
+  "w": 38,
+  "h": 86,
   "foot": [
-   15,
-   67
+   19,
+   86
   ]
  },
  "objects/test_objects_4": {
-  "w": 18,
-  "h": 7,
+  "w": 24,
+  "h": 9,
   "foot": [
-   9,
-   7
+   12,
+   9
   ]
  },
  "objects/test_objects_5": {
-  "w": 37,
-  "h": 25,
+  "w": 48,
+  "h": 32,
   "foot": [
-   18,
-   25
+   24,
+   32
   ]
  },
  "objects/test_objects_6": {
-  "w": 78,
-  "h": 55,
+  "w": 101,
+  "h": 71,
   "foot": [
-   39,
-   55
+   50,
+   71
   ]
  },
  "objects/test_objects_7": {
-  "w": 27,
-  "h": 37,
+  "w": 35,
+  "h": 48,
   "foot": [
-   13,
-   37
+   17,
+   48
   ]
  },
  "objects/test_objects_8": {
-  "w": 28,
-  "h": 28,
+  "w": 36,
+  "h": 36,
   "foot": [
-   14,
-   28
+   18,
+   36
   ]
  },
  "objects/test_objects_9": {
-  "w": 106,
-  "h": 127,
+  "w": 136,
+  "h": 164,
   "foot": [
-   53,
-   127
+   68,
+   164
   ]
  },
  "test_wall_1": {

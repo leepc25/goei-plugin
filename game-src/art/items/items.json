@@ -1,0 +1,934 @@
+{
+ "pipe": {
+  "file": "dot/pipe.png",
+  "sheet": "items_weapons_temp",
+  "w": 38,
+  "h": 9,
+  "foot": [
+   19,
+   8
+  ],
+  "grip": [
+   3,
+   6
+  ]
+ },
+ "chairleg": {
+  "file": "dot/chairleg.png",
+  "sheet": "items_weapons_temp",
+  "w": 26,
+  "h": 9,
+  "foot": [
+   13,
+   8
+  ],
+  "grip": [
+   2,
+   3
+  ]
+ },
+ "kitchenknife": {
+  "file": "dot/kitchenknife.png",
+  "sheet": "items_weapons_temp",
+  "w": 20,
+  "h": 5,
+  "foot": [
+   10,
+   4
+  ],
+  "grip": [
+   2,
+   2
+  ]
+ },
+ "katana": {
+  "file": "dot/katana.png",
+  "sheet": "items_weapons_temp",
+  "w": 40,
+  "h": 8,
+  "foot": [
+   20,
+   7
+  ],
+  "grip": [
+   4,
+   3
+  ]
+ },
+ "smg": {
+  "file": "dot/smg.png",
+  "sheet": "items_weapons_temp",
+  "w": 30,
+  "h": 16,
+  "foot": [
+   15,
+   15
+  ],
+  "grip": [
+   10,
+   9
+  ]
+ },
+ "servicepistol": {
+  "file": "dot/servicepistol.png",
+  "sheet": "items_weapons_temp",
+  "w": 18,
+  "h": 12,
+  "foot": [
+   9,
+   11
+  ],
+  "grip": [
+   2,
+   7
+  ]
+ },
+ "shotgun": {
+  "file": "dot/shotgun.png",
+  "sheet": "items_weapons_temp",
+  "w": 40,
+  "h": 11,
+  "foot": [
+   20,
+   10
+  ],
+  "grip": [
+   10,
+   6
+  ]
+ },
+ "ammo_box": {
+  "file": "dot/ammo_box.png",
+  "sheet": "items_weapons_temp",
+  "w": 14,
+  "h": 14,
+  "foot": [
+   7,
+   13
+  ],
+  "grip": [
+   7,
+   9
+  ]
+ },
+ "rifle_mag": {
+  "file": "dot/rifle_mag.png",
+  "sheet": "items_weapons_temp",
+  "w": 8,
+  "h": 16,
+  "foot": [
+   4,
+   15
+  ],
+  "grip": [
+   4,
+   11
+  ]
+ },
+ "sig_jyaldi_pistol": {
+  "file": "dot/sig_jyaldi_pistol.png",
+  "sheet": "items_weapons_signature",
+  "w": 17,
+  "h": 13,
+  "foot": [
+   8,
+   12
+  ],
+  "grip": [
+   4,
+   8
+  ]
+ },
+ "sig_aileen_carbine": {
+  "file": "dot/sig_aileen_carbine.png",
+  "sheet": "items_weapons_signature",
+  "w": 32,
+  "h": 18,
+  "foot": [
+   16,
+   17
+  ],
+  "grip": [
+   11,
+   11
+  ]
+ },
+ "sig_aileen_pistol": {
+  "file": "dot/sig_aileen_pistol.png",
+  "sheet": "items_weapons_signature",
+  "w": 19,
+  "h": 13,
+  "foot": [
+   9,
+   12
+  ],
+  "grip": [
+   4,
+   8
+  ]
+ },
+ "sig_deadpole_pistol": {
+  "file": "dot/sig_deadpole_pistol.png",
+  "sheet": "items_weapons_signature",
+  "w": 20,
+  "h": 17,
+  "foot": [
+   10,
+   16
+  ],
+  "grip": [
+   3,
+   11
+  ]
+ },
+ "sig_gorgodio_knife": {
+  "file": "dot/sig_gorgodio_knife.png",
+  "sheet": "items_weapons_signature",
+  "w": 24,
+  "h": 9,
+  "foot": [
+   12,
+   8
+  ],
+  "grip": [
+   2,
+   3
+  ]
+ },
+ "sig_gorgodio_knife_stuck": {
+  "file": "dot/sig_gorgodio_knife_stuck.png",
+  "sheet": "items_weapons_signature",
+  "w": 17,
+  "h": 22,
+  "foot": [
+   8,
+   21
+  ]
+ },
+ "sig_geshugan_cube": {
+  "file": "dot/sig_geshugan_cube.png",
+  "sheet": "items_weapons_signature",
+  "w": 13,
+  "h": 14,
+  "foot": [
+   6,
+   13
+  ],
+  "grip": [
+   6,
+   9
+  ]
+ },
+ "sig_rojemon_doll": {
+  "file": "dot/sig_rojemon_doll.png",
+  "sheet": "items_weapons_signature",
+  "w": 15,
+  "h": 22,
+  "foot": [
+   7,
+   21
+  ],
+  "grip": [
+   7,
+   15
+  ]
+ },
+ "pistol_mag": {
+  "file": "dot/pistol_mag.png",
+  "sheet": "items_weapons_signature",
+  "w": 8,
+  "h": 14,
+  "foot": [
+   4,
+   13
+  ],
+  "grip": [
+   4,
+   9
+  ]
+ },
+ "medkit": {
+  "file": "dot/medkit.png",
+  "sheet": "items_consumables",
+  "w": 23,
+  "h": 18,
+  "foot": [
+   11,
+   17
+  ],
+  "grip": [
+   11,
+   12
+  ]
+ },
+ "bandage": {
+  "file": "dot/bandage.png",
+  "sheet": "items_consumables",
+  "w": 19,
+  "h": 16,
+  "foot": [
+   9,
+   15
+  ],
+  "grip": [
+   9,
+   11
+  ]
+ },
+ "antidote": {
+  "file": "dot/antidote.png",
+  "sheet": "items_consumables",
+  "w": 11,
+  "h": 18,
+  "foot": [
+   5,
+   17
+  ],
+  "grip": [
+   5,
+   12
+  ]
+ },
+ "salt": {
+  "file": "dot/salt.png",
+  "sheet": "items_consumables",
+  "w": 21,
+  "h": 17,
+  "foot": [
+   10,
+   16
+  ],
+  "grip": [
+   10,
+   11
+  ]
+ },
+ "flash": {
+  "file": "dot/flash.png",
+  "sheet": "items_consumables",
+  "w": 10,
+  "h": 17,
+  "foot": [
+   5,
+   16
+  ],
+  "grip": [
+   5,
+   11
+  ]
+ },
+ "smoke": {
+  "file": "dot/smoke.png",
+  "sheet": "items_consumables",
+  "w": 11,
+  "h": 19,
+  "foot": [
+   5,
+   18
+  ],
+  "grip": [
+   5,
+   13
+  ]
+ },
+ "charm": {
+  "file": "dot/charm.png",
+  "sheet": "items_consumables",
+  "w": 11,
+  "h": 20,
+  "foot": [
+   5,
+   19
+  ],
+  "grip": [
+   5,
+   13
+  ]
+ },
+ "energy": {
+  "file": "dot/energy.png",
+  "sheet": "items_consumables",
+  "w": 9,
+  "h": 18,
+  "foot": [
+   4,
+   17
+  ],
+  "grip": [
+   4,
+   12
+  ]
+ },
+ "adrenaline": {
+  "file": "dot/adrenaline.png",
+  "sheet": "items_consumables",
+  "w": 20,
+  "h": 6,
+  "foot": [
+   10,
+   5
+  ],
+  "grip": [
+   10,
+   4
+  ]
+ },
+ "cash": {
+  "file": "dot/cash.png",
+  "sheet": "items_pickups",
+  "w": 23,
+  "h": 14,
+  "foot": [
+   11,
+   13
+  ],
+  "grip": [
+   11,
+   9
+  ]
+ },
+ "coins": {
+  "file": "dot/coins.png",
+  "sheet": "items_pickups",
+  "w": 26,
+  "h": 14,
+  "foot": [
+   13,
+   13
+  ],
+  "grip": [
+   13,
+   9
+  ]
+ },
+ "shard": {
+  "file": "dot/shard.png",
+  "sheet": "items_pickups",
+  "w": 11,
+  "h": 18,
+  "foot": [
+   5,
+   17
+  ],
+  "grip": [
+   5,
+   12
+  ]
+ },
+ "heal_orb": {
+  "file": "dot/heal_orb.png",
+  "sheet": "items_pickups",
+  "w": 16,
+  "h": 16,
+  "foot": [
+   8,
+   15
+  ],
+  "grip": [
+   8,
+   11
+  ]
+ },
+ "rounds": {
+  "file": "dot/rounds.png",
+  "sheet": "items_pickups",
+  "w": 20,
+  "h": 14,
+  "foot": [
+   10,
+   13
+  ],
+  "grip": [
+   10,
+   9
+  ]
+ },
+ "scrap": {
+  "file": "dot/scrap.png",
+  "sheet": "items_pickups",
+  "w": 23,
+  "h": 16,
+  "foot": [
+   11,
+   15
+  ],
+  "grip": [
+   11,
+   11
+  ]
+ },
+ "oddcoin": {
+  "file": "dot/oddcoin.png",
+  "sheet": "items_pickups",
+  "w": 11,
+  "h": 18,
+  "foot": [
+   5,
+   17
+  ],
+  "grip": [
+   5,
+   12
+  ]
+ },
+ "rustkey": {
+  "file": "dot/rustkey.png",
+  "sheet": "items_pickups",
+  "w": 10,
+  "h": 18,
+  "foot": [
+   5,
+   17
+  ],
+  "grip": [
+   5,
+   12
+  ]
+ },
+ "tooth": {
+  "file": "dot/tooth.png",
+  "sheet": "items_pickups",
+  "w": 10,
+  "h": 14,
+  "foot": [
+   5,
+   13
+  ],
+  "grip": [
+   5,
+   9
+  ]
+ },
+ "photo": {
+  "file": "dot/photo.png",
+  "sheet": "items_relics",
+  "w": 18,
+  "h": 20,
+  "foot": [
+   9,
+   19
+  ],
+  "grip": [
+   9,
+   13
+  ]
+ },
+ "dreamcatcher": {
+  "file": "dot/dreamcatcher.png",
+  "sheet": "items_relics",
+  "w": 15,
+  "h": 20,
+  "foot": [
+   7,
+   19
+  ],
+  "grip": [
+   7,
+   13
+  ]
+ },
+ "blackbox": {
+  "file": "dot/blackbox.png",
+  "sheet": "items_relics",
+  "w": 28,
+  "h": 20,
+  "foot": [
+   14,
+   19
+  ],
+  "grip": [
+   14,
+   13
+  ]
+ },
+ "unknown_device": {
+  "file": "dot/unknown_device.png",
+  "sheet": "items_relics",
+  "w": 23,
+  "h": 20,
+  "foot": [
+   11,
+   19
+  ],
+  "grip": [
+   11,
+   13
+  ]
+ },
+ "backpack": {
+  "file": "dot/backpack.png",
+  "sheet": "items_relics",
+  "w": 24,
+  "h": 22,
+  "foot": [
+   12,
+   21
+  ],
+  "grip": [
+   12,
+   15
+  ]
+ },
+ "wallet": {
+  "file": "dot/wallet.png",
+  "sheet": "items_relics",
+  "w": 16,
+  "h": 14,
+  "foot": [
+   8,
+   13
+  ],
+  "grip": [
+   8,
+   9
+  ]
+ },
+ "hand_mirror": {
+  "file": "dot/hand_mirror.png",
+  "sheet": "items_relics",
+  "w": 14,
+  "h": 20,
+  "foot": [
+   7,
+   19
+  ],
+  "grip": [
+   7,
+   13
+  ]
+ },
+ "music_box": {
+  "file": "dot/music_box.png",
+  "sheet": "items_relics",
+  "w": 22,
+  "h": 16,
+  "foot": [
+   11,
+   15
+  ],
+  "grip": [
+   11,
+   11
+  ]
+ },
+ "cassettes": {
+  "file": "dot/cassettes.png",
+  "sheet": "items_relics",
+  "w": 20,
+  "h": 16,
+  "foot": [
+   10,
+   15
+  ],
+  "grip": [
+   10,
+   11
+  ]
+ },
+ "vendor_stall": {
+  "file": "dot/vendor_stall.png",
+  "sheet": "items_vendor",
+  "w": 179,
+  "h": 128,
+  "foot": [
+   89,
+   127
+  ]
+ },
+ "doctor_bag": {
+  "file": "dot/doctor_bag.png",
+  "sheet": "items_vendor",
+  "w": 45,
+  "h": 29,
+  "foot": [
+   22,
+   28
+  ]
+ },
+ "loan_envelope": {
+  "file": "dot/loan_envelope.png",
+  "sheet": "items_vendor",
+  "w": 25,
+  "h": 16,
+  "foot": [
+   12,
+   15
+  ],
+  "grip": [
+   12,
+   11
+  ]
+ },
+ "vending": {
+  "file": "dot/vending.png",
+  "sheet": "items_vendor",
+  "w": 86,
+  "h": 110,
+  "foot": [
+   43,
+   109
+  ]
+ },
+ "merchant_crate": {
+  "file": "dot/merchant_crate.png",
+  "sheet": "items_vendor",
+  "w": 65,
+  "h": 38,
+  "foot": [
+   32,
+   37
+  ]
+ },
+ "cash_box": {
+  "file": "dot/cash_box.png",
+  "sheet": "items_vendor",
+  "w": 28,
+  "h": 16,
+  "foot": [
+   14,
+   15
+  ],
+  "grip": [
+   14,
+   11
+  ]
+ },
+ "clinic_tray": {
+  "file": "dot/clinic_tray.png",
+  "sheet": "items_vendor",
+  "w": 83,
+  "h": 53,
+  "foot": [
+   41,
+   52
+  ]
+ },
+ "stall_lamp": {
+  "file": "dot/stall_lamp.png",
+  "sheet": "items_vendor",
+  "w": 11,
+  "h": 22,
+  "foot": [
+   5,
+   21
+  ]
+ },
+ "price_tag": {
+  "file": "dot/price_tag.png",
+  "sheet": "items_vendor",
+  "w": 13,
+  "h": 14,
+  "foot": [
+   6,
+   13
+  ],
+  "grip": [
+   6,
+   9
+  ]
+ },
+ "chair": {
+  "file": "dot/chair.png",
+  "sheet": "props_throw_break",
+  "w": 40,
+  "h": 56,
+  "foot": [
+   20,
+   55
+  ],
+  "grip": [
+   20,
+   0
+  ]
+ },
+ "pot": {
+  "file": "dot/pot.png",
+  "sheet": "props_throw_break",
+  "w": 41,
+  "h": 44,
+  "foot": [
+   20,
+   43
+  ],
+  "grip": [
+   20,
+   0
+  ]
+ },
+ "extinguisher": {
+  "file": "dot/extinguisher.png",
+  "sheet": "props_throw_break",
+  "w": 21,
+  "h": 38,
+  "foot": [
+   10,
+   37
+  ],
+  "grip": [
+   10,
+   0
+  ]
+ },
+ "tv": {
+  "file": "dot/tv.png",
+  "sheet": "props_throw_break",
+  "w": 38,
+  "h": 38,
+  "foot": [
+   19,
+   37
+  ],
+  "grip": [
+   19,
+   0
+  ]
+ },
+ "table": {
+  "file": "dot/table.png",
+  "sheet": "props_throw_break",
+  "w": 42,
+  "h": 23,
+  "foot": [
+   21,
+   22
+  ],
+  "grip": [
+   21,
+   0
+  ]
+ },
+ "bin": {
+  "file": "dot/bin.png",
+  "sheet": "props_throw_break",
+  "w": 39,
+  "h": 44,
+  "foot": [
+   19,
+   43
+  ],
+  "grip": [
+   19,
+   0
+  ]
+ },
+ "crate": {
+  "file": "dot/crate.png",
+  "sheet": "props_throw_break",
+  "w": 45,
+  "h": 44,
+  "foot": [
+   22,
+   43
+  ]
+ },
+ "drawer": {
+  "file": "dot/drawer.png",
+  "sheet": "props_throw_break",
+  "w": 57,
+  "h": 50,
+  "foot": [
+   28,
+   49
+  ]
+ },
+ "mailbox": {
+  "file": "dot/mailbox.png",
+  "sheet": "props_throw_break",
+  "w": 115,
+  "h": 38,
+  "foot": [
+   57,
+   37
+  ]
+ },
+ "barrel": {
+  "file": "dot/barrel.png",
+  "sheet": "props_break_more",
+  "w": 39,
+  "h": 56,
+  "foot": [
+   19,
+   55
+  ]
+ },
+ "locker": {
+  "file": "dot/locker.png",
+  "sheet": "props_break_more",
+  "w": 75,
+  "h": 116,
+  "foot": [
+   37,
+   115
+  ]
+ },
+ "crackedwall": {
+  "file": "dot/crackedwall.png",
+  "sheet": "props_break_more",
+  "w": 78,
+  "h": 62,
+  "foot": [
+   39,
+   61
+  ]
+ },
+ "crate_broken": {
+  "file": "dot/crate_broken.png",
+  "sheet": "props_break_more",
+  "w": 35,
+  "h": 20,
+  "foot": [
+   17,
+   19
+  ]
+ },
+ "drawer_broken": {
+  "file": "dot/drawer_broken.png",
+  "sheet": "props_break_more",
+  "w": 37,
+  "h": 23,
+  "foot": [
+   18,
+   22
+  ]
+ },
+ "mailbox_broken": {
+  "file": "dot/mailbox_broken.png",
+  "sheet": "props_break_more",
+  "w": 34,
+  "h": 20,
+  "foot": [
+   17,
+   19
+  ]
+ },
+ "barrel_broken": {
+  "file": "dot/barrel_broken.png",
+  "sheet": "props_break_more",
+  "w": 49,
+  "h": 38,
+  "foot": [
+   24,
+   37
+  ]
+ },
+ "pot_broken": {
+  "file": "dot/pot_broken.png",
+  "sheet": "props_break_more",
+  "w": 39,
+  "h": 23,
+  "foot": [
+   19,
+   22
+  ]
+ },
+ "tv_broken": {
+  "file": "dot/tv_broken.png",
+  "sheet": "props_break_more",
+  "w": 32,
+  "h": 29,
+  "foot": [
+   16,
+   28
+  ]
+ }
+}

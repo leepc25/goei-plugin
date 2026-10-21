@@ -1,0 +1,82 @@
+{
+ "objects/hq_chief_objects_1": {
+  "w": 202,
+  "h": 94,
+  "foot": [
+   101,
+   94
+  ]
+ },
+ "objects/hq_chief_objects_2": {
+  "w": 75,
+  "h": 102,
+  "foot": [
+   37,
+   102
+  ]
+ },
+ "objects/hq_chief_objects_3": {
+  "w": 134,
+  "h": 67,
+  "foot": [
+   67,
+   67
+  ]
+ },
+ "objects/hq_chief_objects_4": {
+  "w": 113,
+  "h": 36,
+  "foot": [
+   56,
+   36
+  ]
+ },
+ "objects/hq_chief_objects_5": {
+  "w": 76,
+  "h": 79,
+  "foot": [
+   38,
+   79
+  ]
+ },
+ "objects/hq_chief_objects_6": {
+  "w": 42,
+  "h": 48,
+  "foot": [
+   21,
+   48
+  ]
+ },
+ "objects/hq_chief_objects_7": {
+  "w": 177,
+  "h": 102,
+  "foot": [
+   88,
+   102
+  ]
+ },
+ "objects/hq_chief_objects_8": {
+  "w": 63,
+  "h": 141,
+  "foot": [
+   31,
+   141
+  ]
+ },
+ "objects/hq_chief_objects_9": {
+  "w": 54,
+  "h": 86,
+  "foot": [
+   27,
+   86
+  ]
+ },
+ "hq_chief_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_chief_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}

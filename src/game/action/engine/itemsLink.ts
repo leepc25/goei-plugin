@@ -1,5 +1,6 @@
 // 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(현금·파편·회복·탄·아이템·회수물), 섬광·연막 투척, 탄약 맞추기.
 // 환경 물건 들기(E)·던지기(A), 임시 무기 줍기(E)·휘두르기(A)·쏘기(S). 든 것은 캐릭터 그림과 따로 손 고정점에 그린다.
+import { drawItemHeld } from '../art/items';
 import {
   ITEMS,
   PROPS,
@@ -136,7 +137,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       const d = PROPS[carry.id];
       const s = Math.max(d?.w ?? 60, d?.h ?? 60);
       drawItemIcon(c, carry.id, -s / 2, -s, s);
-    } else {
+    } else if (!drawItemHeld(c, carry.id, deg)) {
       // 무기 그림의 손잡이 = 그림 아래쪽 1/4 지점. 각도 0 = 위로 세움, 시계 방향
       c.rotate(((deg + 45) * Math.PI) / 180);
       drawItemIcon(c, carry.id, -12, -36, 48);

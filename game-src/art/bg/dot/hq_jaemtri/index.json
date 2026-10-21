@@ -1,74 +1,74 @@
 {
  "objects/hq_jaemtri_objects_1": {
-  "w": 71,
-  "h": 46,
+  "w": 91,
+  "h": 59,
   "foot": [
-   35,
-   46
+   45,
+   59
   ]
  },
  "objects/hq_jaemtri_objects_2": {
-  "w": 59,
-  "h": 76,
+  "w": 75,
+  "h": 98,
   "foot": [
-   29,
-   76
+   37,
+   98
   ]
  },
  "objects/hq_jaemtri_objects_3": {
-  "w": 68,
-  "h": 61,
+  "w": 88,
+  "h": 79,
   "foot": [
-   34,
-   61
+   44,
+   79
   ]
  },
  "objects/hq_jaemtri_objects_4": {
-  "w": 56,
-  "h": 55,
+  "w": 72,
+  "h": 71,
   "foot": [
-   28,
-   55
+   36,
+   71
   ]
  },
  "objects/hq_jaemtri_objects_5": {
-  "w": 45,
-  "h": 52,
-  "foot": [
-   22,
-   52
-  ]
- },
- "objects/hq_jaemtri_objects_6": {
-  "w": 25,
-  "h": 31,
-  "foot": [
-   12,
-   31
-  ]
- },
- "objects/hq_jaemtri_objects_7": {
-  "w": 35,
-  "h": 43,
-  "foot": [
-   17,
-   43
-  ]
- },
- "objects/hq_jaemtri_objects_8": {
-  "w": 49,
+  "w": 57,
   "h": 67,
   "foot": [
-   24,
+   28,
    67
   ]
  },
- "objects/hq_jaemtri_objects_9": {
-  "w": 85,
-  "h": 109,
+ "objects/hq_jaemtri_objects_6": {
+  "w": 32,
+  "h": 40,
   "foot": [
-   42,
-   109
+   16,
+   40
+  ]
+ },
+ "objects/hq_jaemtri_objects_7": {
+  "w": 45,
+  "h": 55,
+  "foot": [
+   22,
+   55
+  ]
+ },
+ "objects/hq_jaemtri_objects_8": {
+  "w": 62,
+  "h": 86,
+  "foot": [
+   31,
+   86
+  ]
+ },
+ "objects/hq_jaemtri_objects_9": {
+  "w": 109,
+  "h": 141,
+  "foot": [
+   54,
+   141
   ]
  },
  "hq_jaemtri_wall_1": {

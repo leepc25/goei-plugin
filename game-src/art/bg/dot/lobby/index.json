@@ -8,75 +8,75 @@
   "h": 128
  },
  "objects/lobby_objects_1": {
-  "w": 150,
-  "h": 67,
+  "w": 193,
+  "h": 86,
   "foot": [
-   75,
-   67
+   96,
+   86
   ]
  },
  "objects/lobby_objects_2": {
-  "w": 127,
-  "h": 52,
+  "w": 164,
+  "h": 67,
   "foot": [
-   63,
-   52
+   82,
+   67
   ]
  },
  "objects/lobby_objects_3": {
-  "w": 80,
-  "h": 109,
+  "w": 103,
+  "h": 141,
   "foot": [
-   40,
-   109
+   51,
+   141
   ]
  },
  "objects/lobby_objects_4": {
-  "w": 63,
-  "h": 97,
+  "w": 80,
+  "h": 125,
   "foot": [
-   31,
-   97
+   40,
+   125
   ]
  },
  "objects/lobby_objects_5": {
-  "w": 28,
-  "h": 73,
+  "w": 36,
+  "h": 94,
   "foot": [
-   14,
-   73
+   18,
+   94
   ]
  },
  "objects/lobby_objects_6": {
-  "w": 60,
-  "h": 85,
+  "w": 78,
+  "h": 110,
   "foot": [
-   30,
-   85
+   39,
+   110
   ]
  },
  "objects/lobby_objects_7": {
-  "w": 102,
-  "h": 52,
+  "w": 132,
+  "h": 67,
   "foot": [
-   51,
-   52
+   66,
+   67
   ]
  },
  "objects/lobby_objects_8": {
-  "w": 75,
-  "h": 61,
+  "w": 97,
+  "h": 79,
   "foot": [
-   37,
-   61
+   48,
+   79
   ]
  },
  "objects/lobby_objects_9": {
-  "w": 71,
-  "h": 127,
+  "w": 92,
+  "h": 164,
   "foot": [
-   35,
-   127
+   46,
+   164
   ]
  },
  "lobby_wall_1": {

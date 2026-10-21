@@ -1,0 +1,82 @@
+{
+ "objects/hq_appraisal_objects_1": {
+  "w": 177,
+  "h": 110,
+  "foot": [
+   88,
+   110
+  ]
+ },
+ "objects/hq_appraisal_objects_2": {
+  "w": 96,
+  "h": 117,
+  "foot": [
+   48,
+   117
+  ]
+ },
+ "objects/hq_appraisal_objects_3": {
+  "w": 27,
+  "h": 13,
+  "foot": [
+   13,
+   13
+  ]
+ },
+ "objects/hq_appraisal_objects_4": {
+  "w": 46,
+  "h": 32,
+  "foot": [
+   23,
+   32
+  ]
+ },
+ "objects/hq_appraisal_objects_5": {
+  "w": 47,
+  "h": 59,
+  "foot": [
+   23,
+   59
+  ]
+ },
+ "objects/hq_appraisal_objects_6": {
+  "w": 54,
+  "h": 48,
+  "foot": [
+   27,
+   48
+  ]
+ },
+ "objects/hq_appraisal_objects_7": {
+  "w": 115,
+  "h": 79,
+  "foot": [
+   57,
+   79
+  ]
+ },
+ "objects/hq_appraisal_objects_8": {
+  "w": 45,
+  "h": 28,
+  "foot": [
+   22,
+   28
+  ]
+ },
+ "objects/hq_appraisal_objects_9": {
+  "w": 90,
+  "h": 71,
+  "foot": [
+   45,
+   71
+  ]
+ },
+ "hq_appraisal_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_appraisal_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}

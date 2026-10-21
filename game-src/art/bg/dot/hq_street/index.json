@@ -8,75 +8,75 @@
   "h": 128
  },
  "objects/hq_street_objects_1": {
-  "w": 140,
-  "h": 205,
+  "w": 180,
+  "h": 265,
   "foot": [
-   70,
-   205
+   90,
+   265
   ]
  },
  "objects/hq_street_objects_2": {
-  "w": 32,
-  "h": 43,
+  "w": 41,
+  "h": 55,
   "foot": [
-   16,
-   43
+   20,
+   55
   ]
  },
  "objects/hq_street_objects_3": {
-  "w": 90,
-  "h": 49,
+  "w": 116,
+  "h": 63,
   "foot": [
-   45,
-   49
+   58,
+   63
   ]
  },
  "objects/hq_street_objects_4": {
-  "w": 92,
-  "h": 67,
+  "w": 117,
+  "h": 86,
   "foot": [
-   46,
-   67
+   58,
+   86
   ]
  },
  "objects/hq_street_objects_5": {
-  "w": 95,
-  "h": 109,
+  "w": 122,
+  "h": 141,
   "foot": [
-   47,
-   109
+   61,
+   141
   ]
  },
  "objects/hq_street_objects_6": {
-  "w": 71,
-  "h": 97,
+  "w": 91,
+  "h": 125,
   "foot": [
-   35,
-   97
+   45,
+   125
   ]
  },
  "objects/hq_street_objects_7": {
-  "w": 115,
-  "h": 61,
+  "w": 149,
+  "h": 79,
   "foot": [
-   57,
-   61
+   74,
+   79
   ]
  },
  "objects/hq_street_objects_8": {
-  "w": 34,
-  "h": 43,
+  "w": 42,
+  "h": 55,
   "foot": [
-   17,
-   43
+   21,
+   55
   ]
  },
  "objects/hq_street_objects_9": {
-  "w": 87,
-  "h": 55,
+  "w": 112,
+  "h": 71,
   "foot": [
-   43,
-   55
+   56,
+   71
   ]
  },
  "hq_street_wall_1": {

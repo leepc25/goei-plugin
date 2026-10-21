@@ -4,7 +4,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawWallCell, placeFor } from '../art/bg';
+import { drawFloor, drawLedge, drawWallCell, placeFor, seamPillar } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -176,8 +176,15 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
     const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref);
+    // 바닥은 한 층 안에서 한 가지 (홀·방도 그 층 바닥), 벽 장소가 바뀌는 곳은 기둥으로 잇는다 (통합 검수 2-3)
+    const floorPlace = plan.stage.where === 'floor' ? placeFor('floor', plan.stage.floor?.type, '') : place;
     if (drawWallCell(ctx, place, s.ref, s.x, s.w, s.flip, y0)) {
-      if (!drawFloor(ctx, place, s.x, s.x + s.w, y0, 720)) {
+      const i = segs.indexOf(s);
+      const prev = i > 0 ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i - 1].ref) : place;
+      if (prev !== place) seamPillar(ctx, s.x, y0);
+      const next = i + 1 < segs.length ? placeFor(plan.stage.where, plan.stage.floor?.type, segs[i + 1].ref) : place;
+      if (next !== place) seamPillar(ctx, s.x + s.w, y0);
+      if (!drawFloor(ctx, floorPlace, s.x, s.x + s.w, y0, 720) && !drawFloor(ctx, place, s.x, s.x + s.w, y0, 720)) {
         ctx.fillStyle = pal.floor;
         ctx.fillRect(s.x, y0, s.w, 720 - y0);
       }
@@ -226,7 +233,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, Math.max(CEIL + 24, 128));
   }
   // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1);
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref));
   void CHUNK_W;
 }
 
@@ -234,7 +241,7 @@ function roomName(ref: string): string {
   return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
-function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number) {
+function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '') {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case 'pit': {
@@ -249,6 +256,10 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
     }
     case 'block':
       // 바닥 띠 전체를 가로지르는 단: 윗면(밝게) + 앞면
+      if (drawLedge(ctx, place, t.x0, t.x1, y0 - t.h, y1, t.h)) {
+        label(ctx, `단 ${t.h} (점프)`, t.x0 + 4, y0 - t.h - 6, '#ddd');
+        break;
+      }
       ctx.fillStyle = pal.trim;
       ctx.fillRect(t.x0, y0 - t.h, w, y1 - y0 + t.h);
       ctx.fillStyle = 'rgba(255,255,255,0.12)';
@@ -271,7 +282,9 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       // 좁은 길: 검은 사각형 대신 뒤는 튀어나온 벽, 앞은 낮은 칸막이로 막는다 (검수 6번)
       const a = laneYIn(t.lane0, y0, y1),
         b = laneYIn(t.lane1, y0, y1);
-      if (a > y0) {
+      if (a > y0 && drawLedge(ctx, place, t.x0, t.x1, y0 - 40, a, 28)) {
+        // 그림으로 칠함
+      } else if (a > y0) {
         ctx.fillStyle = pal.wall;
         ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
@@ -280,7 +293,9 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
         ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
         ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
       }
-      if (b < y1) {
+      if (b < y1 && drawLedge(ctx, place, t.x0, t.x1, b + 4, y1 + 30, 0)) {
+        // 그림으로 칠함
+      } else if (b < y1) {
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(t.x0, b, w, 8);
         ctx.fillStyle = pal.trim;
