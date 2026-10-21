@@ -5,13 +5,13 @@
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
 import { createGameAudio } from '../audio';
-import { createHq, idbSaves, setItemIconDrawer, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
-import { CUTSCENES, mountStory, type StoryApi } from '../story';
+import { CUTSCENES, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubPlace } from './hub';
 import { PLACES } from '../hq/data';
@@ -204,7 +204,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
   };
-  const elevator = createElevatorStage(stageStore);
+  const elevator = createElevatorStage(stageStore, stageHooks());
+  setLineProvider(hqLines);
   // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
     id: 'itemroom',
@@ -226,6 +227,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
+  let runAgent: AgentId = 'jyaldi';
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
@@ -266,11 +268,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       audio.event({ type: 'step', x: p.x, vol: p.running ? 0.9 : 0.6 });
     }
   };
-  (globalThis as { __goeiStory?: (id: string) => void }).__goeiStory = (id) => (CUTSCENES[id] ? story.cutscene(id) : story.say(id));
+  (globalThis as { __goeiStoryStart?: (id: string) => void }).__goeiStoryStart = (id) => (CUTSCENES[id] ? story.cutscene(id) : story.say(id));
   const story: StoryApi = mountStory(
     storyRoot,
     {
-      getAgent: () => 'jyaldi',
+      getAgent: () => runAgent,
       sfx: (n) => audio.event({ type: 'custom', name: n } as never),
       shake: (ms, amp) => shell.fx.onGameEvent({ type: 'shake', ms, amp } as never),
       anchor: (id) => {
@@ -288,6 +290,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     { saved: savedFlags },
   );
+  (globalThis as { __goeiStory?: StoryApi }).__goeiStory = story; // 시험용
   const saveFlags = () => {
     try {
       localStorage.setItem('goei-game-story', JSON.stringify(story.flags));
@@ -367,6 +370,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onPause: (p) => (p ? audio.pause() : audio.resume()),
     onWorld: (w, run) => {
       world = w;
+      runAgent = run.agent as AgentId;
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
@@ -416,6 +420,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('keydown', hqKeys, true);
       saveFlags();
       story.dispose();
+      setLineProvider(null);
       audio.dispose();
       shell.dispose();
     },
@@ -446,7 +451,7 @@ function bootFromUrl(g: Game): boolean {
   else if (k === 'items') g.start_new('itemroom');
   else if (k === 'story') {
     g.start_new('dummy');
-    if (v) (globalThis as { __goeiStory?: (id: string) => void }).__goeiStory?.(v);
+    if (v) (globalThis as { __goeiStoryStart?: (id: string) => void }).__goeiStoryStart?.(v);
   } else return false;
   return true;
 }

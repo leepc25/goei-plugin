@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { buildPack } from './game-pack.mjs';
 
@@ -138,8 +138,16 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     cutin: `data:image/png;base64,${readFileSync('game-pack/jyaldi/cutin.png').toString('base64')}`,
     frames: JSON.parse(readFileSync('game-pack/jyaldi/frames.json', 'utf8')),
   };
+  // 배경 그림 (tools/bg_pixelize.py → game-src/art/bg/dot/<장소>/*.png). 없으면 단색 대역.
+  const bg = {};
+  const bgDir = 'game-src/art/bg/dot';
+  for (const place of existsSync(bgDir) ? readdirSync(bgDir) : []) {
+    for (const f of readdirSync(`${bgDir}/${place}`).filter((f) => f.endsWith('.png'))) {
+      (bg[place] ??= {})[f.slice(0, -4)] = `data:image/png;base64,${readFileSync(`${bgDir}/${place}/${f}`).toString('base64')}`;
+    }
+  }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

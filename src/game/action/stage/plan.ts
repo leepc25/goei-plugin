@@ -4,6 +4,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
+import { drawFloor, drawWallCell, placeFor } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -172,6 +173,16 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
+    const place = placeFor(plan.stage.where, plan.stage.floor?.type, s.ref);
+    const art = drawWallCell(ctx, place, s.ref, s.x, s.w, s.flip, y0);
+    if (art) {
+      if (!drawFloor(ctx, place, s.x, s.x + s.w, y0, y1 + 30)) {
+        ctx.fillStyle = pal.floor;
+        ctx.fillRect(s.x, y0, s.w, y1 - y0 + 30);
+      }
+      for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1);
+      continue;
+    }
     ctx.fillStyle = pal.wall;
     ctx.fillRect(s.x, WALL_TOP, s.w, y0 - WALL_TOP);
     // 조각 경계 표시 (반 화면 단위가 보이게)
