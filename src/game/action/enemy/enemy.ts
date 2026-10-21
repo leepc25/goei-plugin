@@ -7,6 +7,7 @@ import type { Armor, Body, Debuff, FrameBoxes, Hit, HitResult, LocalBox, Move, P
 import { rollDrops, fireDropHook } from './drops';
 import { armDebuff, checkDebuffs } from './debuff';
 import { drawFigure, drawSwing } from './look';
+import { PIXEL_FONT, kitPiece, kitSlice, nine } from '../ui/kit';
 
 export type St = 'spawn' | 'idle' | 'walk' | 'attack' | 'hurt' | 'air' | 'down' | 'getup' | 'bound' | 'grabbing' | 'dormant' | 'hidden' | 'flee' | 'dead' | 'stunned';
 export type Affix = 'bleed' | 'armor' | 'fast' | 'regen';
@@ -619,16 +620,41 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
       ctx.fillRect(e.x - w / 2, top + 7, (w * Math.min(1, e.groggy / e.groggyMax)) / 1, 3);
     }
   }
-  if (e.bubble) {
-    ctx.font = '600 20px sans-serif';
-    ctx.textAlign = 'center';
-    const tw = ctx.measureText(e.bubble).width + 20;
-    const top = e.y - e.z - e.def.h - 64;
-    ctx.fillStyle = 'rgba(16,18,22,.85)';
-    ctx.fillRect(e.x - tw / 2, top, tw, 32);
-    ctx.fillStyle = '#f4efe2';
-    ctx.fillText(e.bubble, e.x, top + 23);
+  if (e.bubble) drawBubble(ctx, e.bubble, e.x, e.y - e.z - e.def.h - 30);
+  ctx.restore();
+}
+
+/** 적 말풍선: 화면 표시 도트 틀(slot) + 도트 글꼴, 아래로 도트 꼬리. bottom = 꼬리 끝 높이 */
+function drawBubble(ctx: CanvasRenderingContext2D, text: string, x: number, bottom: number) {
+  const P = 3;
+  ctx.save();
+  ctx.font = `700 22px '${PIXEL_FONT}', 'Galmuri11', monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const tw = Math.ceil(ctx.measureText(text).width / P) * P;
+  const w = tw + 15 * P;
+  const h = 14 * P;
+  const x0 = Math.round((x - w / 2) / P) * P;
+  const y0 = Math.round((bottom - h - 4 * P) / P) * P;
+  const frame = kitPiece('slot');
+  ctx.fillStyle = '#16130f';
+  ctx.fillRect(x0 + P, y0 + P, w - 2 * P, h - 2 * P);
+  if (frame?.complete && frame.naturalWidth) nine(ctx, frame, kitSlice('slot'), x0, y0, w, h, 1);
+  else {
+    ctx.strokeStyle = '#8a7a58';
+    ctx.lineWidth = P;
+    ctx.strokeRect(x0 + P / 2, y0 + P / 2, w - P, h - P);
   }
+  // 꼬리 (계단 도트)
+  const tx = Math.round(x / P) * P;
+  ctx.fillStyle = '#8a7a58';
+  for (let i = 0; i < 4; i++) ctx.fillRect(tx - (3 - i) * P, y0 + h + i * P - P, (3 - i) * 2 * P + P, P);
+  ctx.fillStyle = '#16130f';
+  for (let i = 0; i < 3; i++) ctx.fillRect(tx - (2 - i) * P, y0 + h + i * P - P, (2 - i) * 2 * P + P, P);
+  ctx.fillStyle = '#000';
+  ctx.fillText(text, x + 2, y0 + h / 2 + 2);
+  ctx.fillStyle = '#ece6d4';
+  ctx.fillText(text, x, y0 + h / 2);
   ctx.restore();
 }
 
