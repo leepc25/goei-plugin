@@ -14,7 +14,7 @@
   - **프레임 PNG** `0001.png`, `0002.png`, … : 장마다 640×360 원래 크기 한 장, 번호 순서대로 재생.
   - **`timing.json`**: `{"ms":[0001 장을 보여 줄 ms, 0002 장 ms, …],"loop":[처음 장 번호, 끝 장 번호]}`. `ms`의 개수 = 장 수. `loop`는 반복할 구간이 있을 때만(예: 깜빡이는 등, 흔들리는 머리카락, 1부터 셈). 반복 구간이 있으면 컷 길이는 콘티의 초를 따른다.
 - 소리(선택): 영상마다 `sound.ogg` 하나(음악·효과음, 사람 목소리 없음). 콘티 시각에 맞춘다.
-- 저장: **`game-src/art/cutscene/frames/<컷신 이름>/<컷 번호>/0001.png …` + 같은 폴더의 `timing.json`** (+ 컷신 폴더에 `sound.ogg`). 예: `game-src/art/cutscene/frames/first_entry/c1/0001.png`, `game-src/art/cutscene/frames/first_entry/c1/timing.json`, `game-src/art/cutscene/frames/first_entry/sound.ogg`. 올린 뒤 main에 커밋하고 `docs/GPT_요청_목록.md`의 이 줄을 「받음」으로 바꾼다.
+- 저장: **`game-src/art/cutscene/frames/<컷신 이름>/<컷 번호>/0001.png …` + 같은 폴더의 `timing.json`** (+ 컷신 폴더에 `sound.ogg`). 예: `game-src/art/cutscene/frames/first_entry/c1/0001.png`, `game-src/art/cutscene/frames/first_entry/c1/timing.json`, `game-src/art/cutscene/frames/first_entry/sound.ogg`. 컷신 하나를 다 올리면 `game-src/art/cutscene/frames/index.json`(이름 목록, 예: `["first_entry"]`)에 그 이름을 더한다(목록에 없는 컷신은 게임이 불러 보지 않는다). 올린 뒤 main에 커밋하고 `docs/GPT_요청_목록.md`의 이 줄을 「받음」으로 바꾼다.
 - 장면마다 시간과 빛이 다르다(각 영상에 적음).
 - **그림 안에 글자·자막·숫자를 넣지 않는다**(오프닝 마지막 로고만 예외). 대사는 게임이 아래 시각에 자막으로 띄운다. 컷 길이를 콘티의 초에 맞춰 주면 자막이 맞는다.
 - 사람이 아무도 없는 거리, 낡은 건물, 이상한 엘리베이터: 무섭기보다 **조용히 이상한** 분위기.

@@ -168,7 +168,7 @@ const story: StoryApi = mountStory(
     emit: (e, a) => setTimeout(() => onEmit(e, a), 0),
     photo: (k) => P[k],
   },
-  { saved: save.flags, eager: true, announce: true, dock: 'bottom' },
+  { saved: save.flags, eager: true, announce: true, dock: 'bottom', cutscenes: 'script' },
 );
 
 // ── 흐름 ──
