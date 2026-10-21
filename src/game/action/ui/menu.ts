@@ -197,7 +197,7 @@ export class Menu {
       this.el.className = 'mn';
       return;
     }
-    this.el.className = `mn on mn-${s.look ?? 'panel'}`;
+    this.el.className = `mn on gk-font mn-${s.look ?? 'panel'}`;
     let bn = 0;
     const rows = s.items
       .map((it, i) => {
@@ -210,23 +210,23 @@ export class Menu {
           case 'button': {
             bn++;
             const num = s.numbered ? `<em>${bn}</em>` : '';
-            return `<button type="button" class="mn-row mn-btn${f}${it.danger ? ' danger' : ''}" data-i="${i}" ${it.disabled ? 'disabled' : ''}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}</button>`;
+            return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? ' danger' : ''}" data-i="${i}" ${it.disabled ? 'disabled' : ''}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}</button>`;
           }
           case 'toggle':
-            return `<div class="mn-row${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? 'on' : ''}"><i></i></b></div>`;
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? 'on' : ''}"><i></i></b></div>`;
           case 'slider': {
             const v = it.get();
             const k = (v - it.min) / (it.max - it.min);
-            return `<div class="mn-row${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
           }
           case 'choice':
-            return `<div class="mn-row${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? 'on' : ''}">${esc(l)}</b>`).join('')}</span></div>`;
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? 'on' : ''}">${esc(l)}</b>`).join('')}</span></div>`;
         }
       })
       .join('');
     const back = s.noBack || s.look === 'title' ? '' : `<button type="button" class="mn-x" data-back aria-label="뒤로">✕</button>`;
     const title = s.look === 'title' ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc(s.title ?? '')}</b><span>${esc(s.sub ?? '')}</span></div>` : s.title ? `<h2>${esc(s.title)}</h2>${s.sub ? `<p class="mn-sub">${esc(s.sub)}</p>` : ''}` : '';
-    this.el.innerHTML = `<div class="mn-box">${back}${title}<div class="mn-list">${rows}</div></div>`;
+    this.el.innerHTML = `<div class="mn-box${s.look === 'title' ? '' : ' gk-panel'}">${back}${title}<div class="mn-list">${rows}</div></div>`;
     this.el.querySelector('.f')?.scrollIntoView({ block: 'nearest' });
   }
   dispose() {

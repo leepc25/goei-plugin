@@ -1,6 +1,7 @@
 // 화면 틀: 1280×720 내부 해상도를 상자 크기에 맞춘다. 채우기(기본)는 가로로 긴 화면에서 캔버스를 옆으로 넓혀 검은 띠를 없앤다.
 // 층: 게임 캔버스 → CRT 덮개 → 메뉴(1280×720 좌표) / 터치 버튼(상자 전체) / 세로 화면 안내
 import css from './ui.css';
+import { ensureKit } from './kit';
 
 export const W = 1280,
   H = 720;
@@ -45,6 +46,7 @@ export function mountStage(box: HTMLElement): Stage {
     document.head.append(st);
     cssAdded = true;
   }
+  ensureKit();
   const root = document.createElement('div');
   root.className = 'gs';
   root.tabIndex = 0;
