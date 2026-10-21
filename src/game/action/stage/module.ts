@@ -64,16 +64,16 @@ export interface StageHooks {
   /** 승강기 안에 들어설 때. true를 돌려주면 대사 모듈이 인사·호명·방송을 맡고 끝나면 done을 부른다. false·없음이면 층 모듈 기본(소품 E) */
   board?(v: BoardInfo, done: (r: BoardResult) => void): boolean;
   /** 승객과 말할 때(E). true면 대사 모듈이 대화·선택지를 맡는다 */
-  passenger?(v: PassengerInfo, done: (r: PassengerResult) => void): boolean;
+  meetPassenger?(v: PassengerInfo, done: (r: PassengerResult) => void): boolean;
   /** 정비 구역 인터폰 거래. deal null = 안 함 */
   deal?(v: DealInfo, done: (r: { deal: 'reveal' | 'skip' | 'supply' | null }) => void): boolean;
   /** 거울(E). off = 내려서 다시 탄다(승강기 안일 때) */
   mirror?(v: { tired: boolean; inCar: boolean; agent: string }, done: (r: { off: boolean }) => void): boolean;
   /** 층 도착 방송. true면 대사 모듈이 말한 것 */
   announce?(v: { depth: number; type: string; label: string; hint: string; first: boolean; agent: string }): boolean;
-  /** (옛 모양) 대사만 바꿔 끼우기 */
+  /** 대사만 바꿔 끼우기 (효과는 층 모듈이 정한다). story/hooks.ts stageHooks()가 쓰는 모양 */
   elevator?: ElevatorLines;
-  passengerLines?: PassengerLines;
+  passenger?: PassengerLines;
   /** 출동 기록 한 줄 (시험 로그용) */
   log?(line: string): void;
 }
@@ -1023,12 +1023,12 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const fork = !!h.data.fork;
     if (!r.talked.has(prop.id)) {
       const info: PassengerInfo = { kind, honest: !!h.data.honest, long: !!h.data.long, fork, knowsRule: currentKnown(meta).includes('passenger'), agent: o.agent, depth: o.depth };
-      if (hooks.passenger?.(info, defer<PassengerResult>((api, res) => applyPassenger(api, prop, h, res.choice)))) {
+      if (hooks.meetPassenger?.(info, defer<PassengerResult>((api, res) => applyPassenger(api, prop, h, res.choice)))) {
         r.talked.add(prop.id);
         return;
       }
     }
-    const lines = hooks.passengerLines?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
+    const lines = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
     api.world.say(`${PASSENGER_LABEL[kind]}: ${lines.join(' ')}`, 5);
     if (r.talked.has(prop.id)) return;
     r.talked.add(prop.id);
