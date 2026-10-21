@@ -56,3 +56,7 @@
 - `full/clips/<이름>/` 10개 폴더, `rig.py`·`jyaldi_life_defs.py` 변경, `spend.log` 기록.
 - 다시 빌드한 `release/demo/jyaldi-full.html`.
 - 사용자에게 보낼 휴대폰 링크(raw.githack, main 기준).
+
+## 6. 수정 요청 (2026-10-21)
+
+없음. 검수에서 나온 화장실·샤워 결함은 Claude가 처리한다(사용자 지시). 체형 차이는 실측 결과 결함이 아니어서 철회했다(`쟈알디_결함목록_2026-10-21.md` 44번).
