@@ -1,6 +1,6 @@
 // 「지도」·「커스텀 임무」 탭: 목표를 고르고, 요원·지원 인원을 편성해 채팅에 이동 지시문 카드를 놓는다.
 // 원본 Lua의 지도 작업 공간(WG.map)과 커스텀 임무 창(preparePreset/commitPreset)을 옮겼다.
-import { evArt } from './evpic';
+import { baseLink, evArt } from './evpic';
 import {
   destination, DirectiveError, hasSceneCard, parseDirective, sceneDirective, sceneRecord, TEAM_MAX, validTeam,
 } from '../core/dispatch';
@@ -504,13 +504,16 @@ export function missionList(ctx: ChatContext, opening = false): string {
     // 괴이·특수·거점: 한 칸짜리 그림 띠. 누르면 같은 칸에서 정사각으로 펴지고 설명·선택·위키가 그림 안에 (2026-10-20 사용자)
     // 거점도 같은 띠 (2026-10-21 사용자: 거점 사진도 넣을 거라 한 줄로). 그림이 없으면 사건 공용 그림
     const open = field.mopen === `${kind}:${r.name}`;
-    const art = evArt(ctx, r.name, kind === 'lm' ? 'in' : kind);
+    const art = evArt(ctx, r.name, kind);
+    // 거점: 연결 조직은 시점 세력 기준 이름, 위키는 거점 문서 → 연결 조직 문서
+    const link = kind === 'lm' ? baseLink(ctx, r.name) : null;
+    if (link) r = { ...r, sub: [link.org, r.sub].filter(Boolean).join(' · ') };
     const status = missionStatus(x, kind, r.name);
     const bg = art.pic ? ` style="background-image:url('${esc(art.pic)}')"` : '';
     const cap = `<span class="gx-evart-name"><b>${esc(r.name)}</b>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
     // 펼친 칸: 제목 바로 오른쪽에 목표 표식 (상세 창과 같은 모양, 2026-10-21 사용자)
     const capOpen = (mark: string) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc(r.name)}</b>${mark}</span>${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</span>`;
-    const wikiBtn = opening ? '' : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc(r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`;
+    const wikiBtn = opening ? '' : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc(link?.doc ?? r.name)}" title="위키" aria-label="${esc(r.name)} 위키">${ICONS.wiki}</button>`;
     // 위키는 접힌 띠에서도 보이게 오른쪽 끝, 펴면 접기 오른쪽 옆 (2026-10-21 사용자)
     if (!open) {
       return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>

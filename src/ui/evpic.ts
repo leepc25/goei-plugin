@@ -1,16 +1,21 @@
 // 상황 카드·커스텀 목록의 그림과 짧은 설명 (2026-10-20 사용자: 상황판을 그림 위주로).
 // 괴이·특수는 명부 사진(대표 → 영문명_default → 영문명), 설명은 위키 문서 첫 문단. 그림이 없으면 null (종류별 공용 그림 자리)
 import type { ChatContext } from '../host/risu';
-import { readDirectory } from '../core/world/directory';
+import { orgLoreName, readDirectory } from '../core/world/directory';
+import { factionNames, parseCatalog } from '../core/world/catalog';
 import { hasAsset, mainPic, moduleAssetStamp } from '../host/assets';
 import { docSummary, findDoc } from '../core/wiki';
 import { imageUrl } from './images';
 
-interface Row { pic: string; title: string }
-let cache: { lore: unknown; stamp: number; map: Map<string, Row> } | null = null;
+interface Row { pic: string; title: string; org?: string }
+let cache: { lore: unknown; stamp: number; viewer: string; map: Map<string, Row> } | null = null;
+
+/** 이야기의 시점 세력 (시작 화면에서 고른 세력 코드) */
+const viewerOf = (ctx: ChatContext) => String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
 
 function rows(ctx: ChatContext): Map<string, Row> {
-  if (cache && cache.lore === ctx.char.globalLore && cache.stamp === moduleAssetStamp()) return cache.map;
+  const viewer = viewerOf(ctx);
+  if (cache && cache.lore === ctx.char.globalLore && cache.stamp === moduleAssetStamp() && cache.viewer === viewer) return cache.map;
   const map = new Map<string, Row>();
   const dir = readDirectory(ctx.char.globalLore);
   // 거점도 영문명 사진을 찾는다 (2026-10-21: 커스텀 거점 목록도 그림 띠)
@@ -18,25 +23,47 @@ function rows(ctx: ChatContext): Map<string, Row> {
     const row = { pic: mainPic(ctx.char, p), title: p.lore || p.label };
     for (const n of [p.label, p.lore, ...p.aliases]) if (n && !map.has(n)) map.set(n, row);
   }
-  // 거점은 이름(관리국 본부)으로 찾는다. 사진은 영문명 = 세력 사진, 설명은 거점 문서가 있으면 그것(백일몽 본사), 없으면 세력 문서
-  for (const b of dir.bases) {
-    // 영문명이 세력 사진 이름과 다르면 (Baekilmong corporation ↔ Baekilmong) 연결 조직의 사진
-    const org = dir.orgs.find((o) => o.name === b.org);
-    const row = { pic: mainPic(ctx.char, b) || (org ? mainPic(ctx.char, org.spec) : ''), title: findDoc(ctx.chat, b.name, ctx.char.globalLore) ? b.name : b.lore || b.name };
-    map.set(b.name, row);
+  // 거점은 이름(관리국 본부)으로 찾는다. 사진은 영문명 → 연결 조직 사진 → 공용 거점 그림, 설명은 거점 문서가 있으면 그것(백일몽 본사), 없으면 세력 문서
+  let names: Record<string, string> = {};
+  try {
+    names = factionNames(parseCatalog(ctx.char.globalLore), viewer);
+  } catch {
+    /* 목록 로어북이 없으면 조직 이름 그대로 */
   }
-  cache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), map };
+  const fake = dir.orgs.find((o) => o.faction === 'B00');
+  for (const b of dir.bases) {
+    let org = dir.orgs.find((o) => o.name === b.org);
+    // 가짜 관리국 시점에서는 관리국 본부가 자기 본부: 사진·문서·조직이 가짜 관리국 것 (2026-10-21 사용자: 둘 중 하나만 보이게)
+    const swap = viewer === 'B00' && org?.faction === 'A00' && !!fake;
+    if (swap) org = fake;
+    const own = !swap && findDoc(ctx.chat, b.name, ctx.char.globalLore);
+    const lore = ctx.char.globalLore ?? [];
+    // 영문명이 세력 사진 이름과 다르면 (Baekilmong corporation ↔ Baekilmong) 연결 조직의 사진
+    const pic = (!swap && mainPic(ctx.char, b)) || (org ? mainPic(ctx.char, org.spec) : '');
+    const title = own ? b.name : swap ? orgLoreName(lore, org!.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
+    map.set(b.name, { pic, title, org: org ? (org.faction && names[org.faction]) || org.name : '' });
+  }
+  cache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
   return map;
 }
 
 const descs = new Map<string, string>();
 
 /** 그림이 없는 상황의 종류별 공용 그림 (카드 에셋, assets/wiki/Situations) */
-const SHARED: Record<string, string> = { an: 'Situation Anomaly', in: 'Situation Incident', ms: 'Situation Mystic' };
+const SHARED: Record<string, string[]> = { an: ['Situation Anomaly'], in: ['Situation Incident'], ms: ['Situation Mystic'], lm: ['Situation Base', 'Situation Incident'] };
+
+/** 거점 사진 이름: 영문명 → 연결 조직 사진 → '' (공용 그림은 evArt가) */
+export const basePic = (ctx: ChatContext, name: string): string => rows(ctx).get(name)?.pic ?? '';
+
+/** 거점이 이어지는 위키 문서와, 시점 세력 기준으로 부르는 연결 조직 이름 */
+export function baseLink(ctx: ChatContext, name: string): { doc: string; org: string } {
+  const r = rows(ctx).get(name);
+  return { doc: r?.title ?? name, org: r?.org ?? '' };
+}
 
 export function evArt(ctx: ChatContext, name: string, kind?: string): { pic: string | null; desc: string } {
   const r = rows(ctx).get(name);
-  const shared = kind && hasAsset(ctx.char, SHARED[kind] ?? '') ? SHARED[kind] : '';
+  const shared = (kind && SHARED[kind]?.find((n) => hasAsset(ctx.char, n))) || '';
   const pic = imageUrl(ctx.char, r?.pic || shared);
   const title = r?.title ?? name;
   let desc = descs.get(title);

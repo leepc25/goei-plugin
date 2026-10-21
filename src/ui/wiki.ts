@@ -18,6 +18,7 @@ import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
 import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
+import { baseLink, basePic as baseArt } from './evpic';
 import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
 import { facePic, mainPic, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
@@ -234,9 +235,10 @@ interface Entry {
 const CAT_LABEL: Record<Cat, string> = { an: '괴이', ms: '특수', lm: '거점', ag: '인물', org: '조직' };
 const CAT_ICON: Record<Cat, string> = { an: ICONS.info, ms: ICONS.spook, lm: ICONS.pin, ag: ICONS.idcard, org: ICONS.group };
 
-let entryCache: { lore: unknown; stamp: number; list: Entry[] } | null = null;
+let entryCache: { lore: unknown; stamp: number; viewer: string; list: Entry[] } | null = null;
 function entries(ctx: ChatContext): Entry[] {
-  if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp()) return entryCache.list;
+  const viewer = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
+  if (entryCache && entryCache.lore === ctx.char.globalLore && entryCache.stamp === moduleAssetStamp() && entryCache.viewer === viewer) return entryCache.list;
   const c = canon(ctx);
   const list: Entry[] = [];
   const dir = readDirectory(ctx.char.globalLore);
@@ -247,7 +249,8 @@ function entries(ctx: ChatContext): Entry[] {
   }
   try {
     for (const l of parseCatalog(ctx.char.globalLore).landmarks) {
-      list.push({ cat: 'lm', name: l.name, title: c(l.name), sub: placeWhere(l.sido, l.gu), photo: '', face: '', terms: [l.name, l.english, ...l.aliases] });
+      const link = baseLink(ctx, l.name);
+      list.push({ cat: 'lm', name: l.name, title: c(link.doc), sub: [link.org, placeWhere(l.sido, l.gu)].filter(Boolean).join(' · '), photo: baseArt(ctx, l.name), face: baseArt(ctx, l.name), terms: [l.name, l.english, ...l.aliases] });
     }
   } catch {
     /* 목록 로어북이 없으면 거점만 뺀다 */
@@ -270,7 +273,7 @@ function entries(ctx: ChatContext): Entry[] {
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();
   const out = list.filter((e) => (seen.has(`${e.cat}|${e.title}`) ? false : (seen.add(`${e.cat}|${e.title}`), true)));
-  entryCache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), list: out };
+  entryCache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), viewer, list: out };
   return out;
 }
 
