@@ -503,6 +503,31 @@ def fill_doors(places: set[str]) -> None:
                     # 계단실: 판처럼 밝게 칠하지 않고 원래 어두운 계단 결을 살려 은은하게 (밝은 반투명 판처럼 보였다, 검수 5)
                     rgb = a[ys, xs] * 2.4 + np.stack([58 - 24 * t, 44 - 20 * t, 26 - 12 * t], 1)
                 px[ys, xs, :3] = np.clip(rgb, 0, 255).astype(np.uint8)
+                if leaf == 'LIT' and name == 'hq_lobby_wall_2':
+                    # 계단참 뒷벽이 납작한 갈색 판으로 보였다(검수 6): 천장 등, 층계참 창문, 벽 그늘, 참 바닥 모서리
+                    flat = np.zeros(px.shape[:2], bool)
+                    flat[ys, xs] = lum[ys, xs] < 14
+                    reg = np.zeros_like(flat)
+                    reg[by0:by0 + 78, bx0:bx0 + 82] = True
+                    flat &= reg
+                    fy, fx = np.nonzero(flat)
+                    lx, ly = bx0 + 40, by0 + 4
+                    dist = np.hypot((fx - lx) / 1.4, fy - ly)
+                    glow = np.clip(1 - dist / 70, 0, 1)[:, None]
+                    wall = np.array([70, 60, 48]) * (0.65 + 0.7 * glow) + np.array([40, 30, 14]) * glow
+                    px[fy, fx, :3] = np.clip(wall, 0, 255).astype(np.uint8)
+                    px[ly:ly + 2, lx - 6:lx + 7, :3] = (250, 238, 200)
+                    px[ly + 2, lx - 5:lx + 6, :3] = (120, 108, 86)
+                    wx0, wy0, wx1, wy1 = bx0 + 24, by0 + 22, bx0 + 54, by0 + 52
+                    px[wy0:wy1, wx0:wx1, :3] = (44, 38, 32)
+                    px[wy0 + 2:wy1 - 2, wx0 + 2:wx1 - 2, :3] = (30, 42, 62)
+                    px[wy0 + 2:wy1 - 2, (wx0 + wx1) // 2, :3] = (44, 38, 32)
+                    px[(wy0 + wy1) // 2, wx0 + 2:wx1 - 2, :3] = (44, 38, 32)
+                    for k in range(6):
+                        px[wy0 + 4 + k, wx0 + 4 + k, :3] = (64, 80, 104)
+                    px[wy1, wx0 - 1:wx1 + 1, :3] = (104, 92, 74)
+                    sy = by0 + 74
+                    px[sy:sy + 2, bx0 + 2:bx0 + 80, :3] = (52, 44, 36)
                 if leaf == 'GLASS':
                     # 불 켜진 로비가 보이는 유리 여닫이문 두 짝: 안쪽 바닥 띠, 천장 등, 가운데·양옆 문틀, 손잡이
                     fy = by0 + (by1 - by0) * 3 // 4

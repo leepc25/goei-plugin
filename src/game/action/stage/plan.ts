@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, floorPattern, drawWallCell, placeFor, seamPillar } from '../art/bg';
+import { drawFloor, drawLedge, floorHasGrid, floorPattern, drawWallCell, placeFor, seamPillar } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -240,7 +240,7 @@ function roomName(ref: string): string {
   return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
-function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '') {
+export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '') {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case 'pit': {
@@ -315,14 +315,16 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
       break;
     }
     case 'block': {
-      // 바닥 띠 전체를 가로지르는 낮은 단(점프로 넘기). 바닥 원근에 맞춘 상자: 윗면(넓게)·앞면(낮게)·안쪽 옆면, 앞 모서리에 경고 띠
+      // 바닥 띠 전체를 가로지르는 낮은 단(점프로 넘기). 바닥과 같은 원근(뒤 0.62배 → 앞 1배, 화면 가운데로 모임)으로
+      // 바닥 타일 무늬·이음줄을 한 단 높이 그대로 깔고, 앞면은 콘크리트 옆면, 둘레에 그늘 (평평한 판처럼 보이지 않게, 검수 6)
       const tf = ctx.getTransform();
       const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
-      const k = 0.45 / (720 - y0);
-      const px = (x: number, y: number) => x + (x - mid) * k * (y - y0);
       const h = Math.min(t.h, 28);
-      const bk = y0 - h,
-        fr = y1 - h;
+      const depth = (y: number) => 0.62 + (0.38 * (y - y0)) / Math.max(1, y1 - y0);
+      // 사람은 깊이와 상관없이 월드 x에 서므로, 가운데 줄 깊이에서 단 모서리가 t.x0~t.x1이 되게 맞춘다 (판정과 그림 차이를 앞뒤로 반씩)
+      const f0 = mid + (t.x0 - mid) / 0.81,
+        f1 = mid + (t.x1 - mid) / 0.81;
+      const at = (xf: number, y: number) => mid + (xf - mid) * depth(y);
       const quad = (pts: [number, number][], fill: string | CanvasGradient | CanvasPattern) => {
         ctx.fillStyle = fill;
         ctx.beginPath();
@@ -330,62 +332,83 @@ function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0
         ctx.closePath();
         ctx.fill();
       };
-      // 안쪽 옆면 (화면 가운데 쪽 면이 보인다)
-      const sx = t.x1 < mid ? t.x1 : t.x0 > mid ? t.x0 : null;
-      if (sx !== null) quad([[px(sx, y0), bk], [px(sx, y1), fr], [px(sx, y1), y1], [px(sx, y0), y0]], 'rgba(0,0,0,0.35)');
-      // 윗면: 이 층 바닥과 같은 무늬를 한 단 높이 깔고 살짝 어둡게 (따로 칠한 베이지 판은 바닥 조각처럼 떠 보였다, 검수 5)
-      const topPts: [number, number][] = [[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y1), fr], [px(t.x0, y1), fr]];
+      const topPts: [number, number][] = [[at(f0, y0), y0 - h], [at(f1, y0), y0 - h], [at(f1, y1), y1 - h], [at(f0, y1), y1 - h]];
+      // 바닥에 지는 그늘 (앞·옆으로 번짐)
+      ctx.save();
+      ctx.filter = 'blur(6px)';
+      quad([[at(f0, y0) - 6, y0], [at(f1, y0) + 6, y0], [at(f1, y1) + 14, y1 + 4], [at(f0, y1) - 14, y1 + 4]], 'rgba(0,0,0,0.35)');
+      ctx.restore();
+      // 옆면 (화면 가운데 쪽 면이 보인다): 콘크리트, 뒤로 갈수록 어둡게
+      const side = (xf: number) => {
+        const g = ctx.createLinearGradient(0, y0, 0, y1);
+        g.addColorStop(0, '#3b3d3f');
+        g.addColorStop(1, '#55585a');
+        quad([[at(xf, y0), y0 - h], [at(xf, y1), y1 - h], [at(xf, y1), y1], [at(xf, y0), y0]], g);
+      };
+      if (t.x1 < mid) side(f1);
+      else if (t.x0 > mid) side(f0);
+      // 윗면: 바닥 무늬 그대로 + 바닥과 같은 이음줄
       const fp = floorPattern(ctx, place);
-      if (fp) {
-        ctx.save();
-        ctx.imageSmoothingEnabled = false;
-        fp.setTransform(new DOMMatrix([2, 0, 0, 1, 0, bk]));
-        quad(topPts, fp);
-        ctx.restore();
-      }
-      const top = ctx.createLinearGradient(0, bk, 0, fr);
-      top.addColorStop(0, fp ? 'rgba(10,10,16,0.08)' : '#8a8478');
-      top.addColorStop(1, fp ? 'rgba(10,10,16,0.3)' : '#5c574f');
-      quad(topPts, top);
-      ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-      ctx.lineWidth = 2;
-      for (let x = t.x0 + 48; x < t.x1 - 10; x += 48) {
-        ctx.beginPath();
-        ctx.moveTo(px(x, y0), bk);
-        ctx.lineTo(px(x, y1), fr);
-        ctx.stroke();
-      }
-      for (let y = y0 + 60; y < y1 - 10; y += 60) {
-        ctx.beginPath();
-        ctx.moveTo(px(t.x0, y), y - h);
-        ctx.lineTo(px(t.x1, y), y - h);
-        ctx.stroke();
-      }
-      ctx.fillStyle = 'rgba(40,30,20,0.25)';
-      for (let i = 0; i < 6; i++) {
-        const yy = y0 + ((y1 - y0) * (i + 0.5)) / 6;
-        const xx = t.x0 + ((Math.sin(t.x0 + i * 3.1) + 1) / 2) * (w - 40) + 10;
-        ctx.fillRect(px(xx, yy), yy - h, 22, 3);
-      }
-      quad([[px(t.x0, y0), bk], [px(t.x1, y0), bk], [px(t.x1, y0), bk + 3], [px(t.x0, y0), bk + 3]], 'rgba(255,255,255,0.35)');
-      quad([[px(t.x0, y1), fr], [px(t.x1, y1), fr], [px(t.x1, y1), y1], [px(t.x0, y1), y1]], '#3e3a35');
-      // 앞 모서리 경고 띠
       ctx.save();
       ctx.beginPath();
-      ctx.rect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
+      topPts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.closePath();
       ctx.clip();
-      ctx.fillStyle = '#e0b320';
-      ctx.fillRect(px(t.x0, y1), fr, px(t.x1, y1) - px(t.x0, y1), 6);
-      ctx.fillStyle = '#1a1a1a';
-      for (let x = px(t.x0, y1) - 16; x < px(t.x1, y1); x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, fr + 6);
-        ctx.lineTo(x + 6, fr);
-        ctx.lineTo(x + 16, fr);
-        ctx.lineTo(x + 10, fr + 6);
-        ctx.fill();
+      if (fp) {
+        ctx.imageSmoothingEnabled = false;
+        fp.setTransform(new DOMMatrix([2, 0, 0, 1, 0, y0 - h]));
+        ctx.fillStyle = fp;
+      } else ctx.fillStyle = pal.floor;
+      const tx0 = Math.min(at(f0, y0), at(f0, y1)) - 4,
+        tx1 = Math.max(at(f1, y0), at(f1, y1)) + 4;
+      ctx.fillRect(tx0, y0 - h, tx1 - tx0, y1 - y0);
+      ctx.strokeStyle = 'rgba(10,10,16,0.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const ownGrid = floorHasGrid(place);
+      for (let d = 0, k = 0; !ownGrid && y0 + d < y1; k++) {
+        ctx.moveTo(at(f0, y0 + d) - 4, Math.round(y0 + d) - h);
+        ctx.lineTo(at(f1, y0 + d) + 4, Math.round(y0 + d) - h);
+        d += 22 + k * 9;
       }
+      for (let wx = Math.ceil(f0 / 128) * 128; !ownGrid && wx < f1; wx += 128) {
+        ctx.moveTo(at(wx, y0), y0 - h);
+        ctx.lineTo(wx, y1 - h);
+      }
+      ctx.stroke();
+      // 바닥과 같은 뒤쪽 그늘 (조금 약하게: 높은 면이 빛을 더 받는다)
+      const sh = ctx.createLinearGradient(0, y0 - h, 0, 720 - h);
+      sh.addColorStop(0, 'rgba(0,0,0,0.28)');
+      sh.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = sh;
+      ctx.fillRect(tx0, y0 - h, tx1 - tx0, y1 - y0);
       ctx.restore();
+      // 윗면 테두리: 밝은 모서리 선
+      ctx.strokeStyle = 'rgba(230,230,224,0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(at(f0, y1), y1 - h);
+      ctx.lineTo(at(f0, y0), y0 - h);
+      ctx.lineTo(at(f1, y0), y0 - h);
+      ctx.lineTo(at(f1, y1), y1 - h);
+      ctx.stroke();
+      // 앞면: 콘크리트 옆면 (위 모서리 밝게, 아래로 어둡게, 거푸집 자국·이 빠진 모서리)
+      const fx0 = at(f0, y1),
+        fx1 = at(f1, y1);
+      const fg = ctx.createLinearGradient(0, y1 - h, 0, y1);
+      fg.addColorStop(0, '#6d6f70');
+      fg.addColorStop(1, '#3f4143');
+      quad([[fx0, y1 - h], [fx1, y1 - h], [fx1, y1], [fx0, y1]], fg);
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      for (let x = fx0 + 40; x < fx1 - 8; x += 64) ctx.fillRect(Math.round(x), y1 - h + 3, 2, h - 5);
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillRect(fx0, y1 - h, fx1 - fx0, 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(fx0, y1 - 2, fx1 - fx0, 2);
+      for (let i = 0; i < 3; i++) {
+        const cx = fx0 + ((Math.sin(t.x0 * 0.7 + i * 2.3) + 1) / 2) * (fx1 - fx0 - 20) + 6;
+        quad([[cx, y1 - h], [cx + 10, y1 - h], [cx + 4, y1 - h + 6]], '#2e3032');
+      }
       break;
     }
     case 'low': {
