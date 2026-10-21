@@ -1276,3 +1276,66 @@ description: tall slim adult woman agent, long straight black hair to the
 2026-10-21 GPT correction toilet -> id: a499d24b-a56d-456e-972f-5139e2701832; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
 2026-10-21 GPT correction toiletout -> id: 39ed76e0-8e52-4927-a01f-d09feec4cde6; cost=3; changed method: furniture-bearing first frame and spatial skeleton path, toiletout pinned end-frame interpolation
 2026-10-21 GPT correction bath -> id: de11b83d-7648-47a7-b953-1d15dd216749; animate_image 4 generated frames (input excluded); charged=2. Total 44 generations; balance 9079 -> 9035.
+14:32:11 gen_fix2 before generations_remaining: 9035
+14:33:15 gen_fix2 evade 6f -> id: fe368e65-dcb3-402a-b170-90c3c028e562
+job_id: fe368e65-dcb3-402a-b170-90c3c028e562
+description: tall slim adult woman agent, long straight black hair to the 
+14:38:51 gen_fix2 evade done
+14:38:52 gen_fix2 after generations_remaining: 9032
+2026-10-21 gen_fix2 evade 6f: 3 generations, 9035 -> 9032 (기준 그림 guard/00 옆모습)
+14:39:20 gen_fix2 before generations_remaining: 9029
+14:39:22 gen_fix2 grab2 4f -> id: 77388c57-2c1c-4e87-b5d1-cac5c4a3b890
+job_id: 77388c57-2c1c-4e87-b5d1-cac5c4a3b890
+description: tall slim adult woman agent, long straight black hair to the 
+14:39:27 gen_fix2 step 6f -> id: 6e835636-1cf1-4f67-9147-ab0a197b5806
+job_id: 6e835636-1cf1-4f67-9147-ab0a197b5806
+description: tall slim adult woman agent, long straight black hair to the 
+14:39:31 gen_fix2 dash 6f -> id: ceeb98dc-bbac-4550-84f6-2c93d6380ccd
+job_id: ceeb98dc-bbac-4550-84f6-2c93d6380ccd
+description: tall slim adult woman agent, long straight black hair to the 
+14:39:32 gen_fix2 airkick 6f -> id: 0a2a8ca2-b6f3-45e9-b3ff-ad090fc0f8e7
+job_id: 0a2a8ca2-b6f3-45e9-b3ff-ad090fc0f8e7
+description: tall slim adult woman agent, long straight black hair to the 
+14:39:33 gen_fix2 blockfront 4f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+14:39:34 gen_fix2 grabblast 8f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+14:39:34 gen_fix2 chain 8f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+14:39:35 gen_fix2 super 10f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+14:39:36 gen_fix2 fall 3f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+14:41:59 gen_fix2 grab2 done
+14:42:51 gen_fix2 step done
+14:42:58 gen_fix2 airkick done
+14:44:28 gen_fix2 dash done
+14:44:29 gen_fix2 after generations_remaining: 8969
+14:44:47 gen_fix2 before generations_remaining: 8969
+14:44:51 gen_fix2 blockfront 4f -> id: b8356e3f-6036-4bec-b13a-c5d44d61239e
+job_id: b8356e3f-6036-4bec-b13a-c5d44d61239e
+description: tall slim adult woman agent, long straight black hair to the 
+14:44:51 gen_fix2 grabblast 8f -> id: 55030acc-38d2-4bc4-b64e-00a0c7ec7ec4
+job_id: 55030acc-38d2-4bc4-b64e-00a0c7ec7ec4
+description: tall slim adult woman agent, long straight black hair to the 
+14:44:55 gen_fix2 chain 8f -> id: 021d7aff-6e43-4289-a624-f89d70350462
+job_id: 021d7aff-6e43-4289-a624-f89d70350462
+description: tall slim adult woman agent, long straight black hair to the 
+14:44:57 gen_fix2 super 10f -> id: 6d4df5f3-0295-46bf-91dc-0620c8c15155
+job_id: 6d4df5f3-0295-46bf-91dc-0620c8c15155
+description: tall slim adult woman agent, long straight black hair to the 
+14:45:03 gen_fix2 fall 3f -> id: e29c97f7-a6ff-4c21-bd4e-bceb87040ec0
+job_id: e29c97f7-a6ff-4c21-bd4e-bceb87040ec0
+description: tall slim adult woman agent, long straight black hair to the 
+14:49:00 gen_fix2 fall done
+14:49:27 gen_fix2 blockfront done
+14:49:49 gen_fix2 grabblast done
+14:50:04 gen_fix2 chain done
+14:52:05 gen_fix2 super done
+14:52:08 gen_fix2 after generations_remaining: 8952
+2026-10-21 gen_fix2 total: evade 3 + grab2 step dash airkick blockfront grabblast chain super fall 30 = 33 generations (balance shared with life thread; 8952 after)

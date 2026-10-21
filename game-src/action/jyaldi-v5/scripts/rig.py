@@ -591,6 +591,32 @@ clip('bathin',CLIPS['bathin'][0],[ENTRY,REACH,BATH_STEP,lerp(BATH_STEP,BATH_SEAT
 clip('bathout',CLIPS['bathout'][0],list(reversed(CLIPS['bathin'][2])),BATH_PROP)
 clip('bath',CLIPS['bath'][0],[BATH_SEATED,jit(BATH_SEATED,0,.4,['NECK','SHOULDER','NOSE','EYE','EAR']),BATH_SEATED,jit(BATH_SEATED,0,.2,['NECK','SHOULDER','NOSE','EYE','EAR'])],BATH_PROP)
 
+# ── 수정 2차 (2026-10-21 결함 목록 3·13~16·18) ──
+# 정면 돌아감의 실제 원인: 뼈대 폭이 아니라 기준 그림. A2는 셔츠·넥타이가 보이는 3/4 각도라, 생성기가 A2를 따라가면 3/4,
+# 뼈대를 따라가면 옆모습이 나옴(같은 G0 뼈대인 guard·step은 옆모습, evade·grab2는 처음부터 끝까지 3/4).
+# 그래서 다시 생성분은 옆모습으로 나온 guard/00.png(뼈대 = G0)를 기준 그림으로 씀(gen_fix2.py). 아래는 약했던 동작의 뼈대.
+# 20 회피: 몸을 낮게 숙이며 뒷발로 크게 물러났다(그림 안 -18px) 다시 스탠스로
+EVA=P((X-8,68),14,-0.9,-0.5,(X+4,G-7),(X-24,G),(16,6),'chin',tilt=10)
+EVB=P((X-18,72),16,-0.9,-0.5,(X-6,G),(X-32,G-2),(16,8),'chin',tilt=12)
+clip('evade','quick low evasive back-step: ducks low and hops back, then returns to the boxing guard',[G0,EVA,EVB,EVB,lerp(EVB,G0,.5),G0])
+# 21 잡기: 앞손을 끝까지 뻗어 멱살을 잡고(팔 다 펴짐) 당겨 붙임 → 끝 자세 GR2(잡기 타격·폭파와 이어짐)
+GRF=P((X+8,60),12,-1.3,-0.7,(X+24,G),(X-10,G-2),(44,2),'chin')
+clip('grab2','lunging reach with the lead arm fully extended, grabs an enemy by the collar and pulls them close',[G0,staged(G0,GRF,.5),GRF,lerp(GRF,GR2,.6)])
+clip('grab','lunging reach with the lead arm fully extended, grabs an enemy by the collar',[G0,staged(G0,GRF,.5),GRF,lerp(GRF,GR,.6)])
+# 3b 전투 걸음: 앞발을 높이 들어 크게(20px) 내딛고 뒷발이 끌려옴. 끝에서 코드가 20px 이동(빌더 adv=20)
+clip('step','boxing footwork: lead foot lifts and steps far forward, rear foot slides after, guard up',
+     [shuffle(8,0,8,0),shuffle(16,0,7,0),shuffle(20,0,0,0),shuffle(20,7,0,7),shuffle(20,15,0,5),shuffle(20,20,0,0)])
+# 12 돌진: 상체를 크게(35~45도) 숙이고 앞어깨를 내밀어 들이받음, 머리는 어깨 뒤
+DSL=P((X+12,68),36,-1.8,-1.0,(X+30,G),(X-12,G-4),(10,16),(2,12),head=(6,-4),tilt=8)
+DSH=P((X+26,70),46,-2.0,-1.1,(X+44,G),(X-8,G-8),(12,18),(4,14),head=(6,-4),tilt=8)
+clip('dash','running shoulder charge: torso bent low and forward, lead shoulder driving into the enemy, rear leg pushing hard',[DASH0,DSL,DSH,sh(DSH,3),lerp(DSH,GUARD(20),.5),GUARD(22)])
+# 13 점프 킥: 앞다리를 거의 수평으로 끝까지 폄, 뒷무릎은 가슴까지 접음, 상체는 뒤로
+KK=lambda e: P((X-4*e,54),-6-6*e,-0.6,-0.4,(X+14+32*e,G-20-14*e),(X-2,G-36),(13,0),'chin',rk=KNEE_UP)
+clip('airkick','mid-air flying side kick: lead leg fully extended straight forward, rear knee tucked to the chest',[air(12),KK(.45),KK(1),KK(1),KK(.5),air(10)])
+# 18 전면 가드: 팔꿈치를 앞으로 모아 두 팔뚝을 세워 얼굴을 덮음, 고개 숙이고 몸을 웅크림
+BF2=P((X-2,63),10,-0.7,-0.4,(X+13,G),(X-13,G-2),(15,-15),(12,-11),tilt=16,le=ELB_OUT,re=ELB_OUT)
+clip('blockfront','covering up: both forearms raised vertically in front of the face, elbows together, chin tucked',[G0,lerp(G0,BF2,.5),BF2,BF2])
+
 A_KP=skel.A
 def kp(p):
     out=[]
