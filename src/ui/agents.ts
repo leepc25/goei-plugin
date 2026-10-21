@@ -1,6 +1,7 @@
 // 상황판 요원 칸 (2026-10-20 사용자 시안): 모니터 벽 또는 근무 현황 목록. 누르면 요원 사원증 창, 마우스를 올리면 머리 위 말풍선
 
 import { ICONS } from './icons';
+import { headSeg } from './evcard';
 
 export type AgentView = 'wall' | 'list';
 /** 편성 기준: 작전 중(op) · 편성 가능(ok) · 작전 중은 아니지만 편성 불가(lock: 실종·사망 등) */
@@ -57,11 +58,8 @@ export function agentPanel(items: AgentItem[], view: AgentView, o: { total: numb
   lastOrg = o.org;
   const list = [...items].sort((a, b) => ORDER[a.side] - ORDER[b.side]);
   const op = items.filter((a) => a.side === 'op').length;
-  // 모양 바꾸기: 제목 옆 작은 아이콘 두 개 (설정 → 화면 「요원 칸」과 같은 값)
-  const seg = `<span class="gx-agseg" role="tablist" aria-label="요원 칸 모양">${(['wall', 'list'] as const)
-    .map((v) => `<button role="tab" class="${view === v ? 'on' : ''}" data-action="agents-view" data-value="${v}" aria-selected="${view === v}" title="${v === 'wall' ? '모니터' : '목록'}" aria-label="${v === 'wall' ? '모니터' : '목록'}">${v === 'wall' ? ICONS.grid : ICONS.list}</button>`)
-    .join('')}</span>`;
-  const head = `<h2><b>요원</b>${seg}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
+  // 제목 글자 대신 모양 전환 아이콘 (설정 → 화면 「요원 칸」과 같은 값)
+  const head = `<h2>${headSeg('agents-view', view, [['wall', '요원 모니터', ICONS.grid], ['list', '요원 목록', ICONS.list]])}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
   const body = !list.length
     ? `<p class="gx-none">${esc(o.empty)}</p>`
     : view === 'list'

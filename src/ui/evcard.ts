@@ -201,9 +201,10 @@ function opsRow(c: OpsCard, on: boolean): string {
 
 const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89) + 10).padStart(2, '0');
 
-function modeSeg(): string {
-  return `<span class="gx-opseg" role="tablist">${(['feed', 'map'] as const)
-    .map((m) => `<button role="tab" class="${opsUi.mode === m ? 'on' : ''}" data-action="ops-mode" data-value="${m}" aria-selected="${opsUi.mode === m}">${m === 'feed' ? '상황' : '지도'}</button>`)
+/** 칸 제목 자리의 아이콘 전환 (일지: CCTV ↔ 위성 지도, 요원: 모니터 ↔ 목록). 2026-10-21 사용자: 제목 글자 대신 */
+export function headSeg(action: string, cur: string, items: [string, string, string][]): string {
+  return `<span class="gx-hseg" role="tablist">${items
+    .map(([v, label, icon]) => `<button role="tab" class="${cur === v ? 'on' : ''}" data-action="${action}" data-value="${v}" aria-selected="${cur === v}" title="${label}" aria-label="${label}">${icon}</button>`)
     .join('')}</span>`;
 }
 
@@ -219,7 +220,7 @@ function whoLine(chips = ''): string {
 
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
-    return `<div class="gx-opview feed nosig"><div class="gx-opbar">${modeSeg()}</div><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
+    return `<div class="gx-opview feed nosig"><div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
   }
   const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
@@ -230,7 +231,7 @@ function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
   const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}
-    <div class="gx-opbar">${modeSeg()}<span class="gx-evart-act">${btns}</span></div>
+    <div class="gx-opbar"><span class="gx-evart-act">${btns}</span></div>
     <div class="gx-oposd"><span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span><span class="cam">CAM-${camNo(c.locCode)} · ${esc(region)}</span><span class="ts">${esc(clock)}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b></span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
@@ -256,7 +257,7 @@ function opsMap(cards: OpsCard[], sel: string, url: string | null, clock: string
   // 고른 상황을 가운데로 (지도가 보기보다 넓거나 길어 잘릴 때만 움직인다)
   const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : '--px:55;--py:50';
   return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc(url)}" alt="전국 지도">${cross}${pins}</div>` : ''}</div>
-    <div class="gx-opbar">${modeSeg()}<span class="gx-oplive"><i></i>위성 관측</span></div><span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div>`;
+    <div class="gx-opbar"><span class="gx-oplive"><i></i>위성 관측</span></div><span class="gx-opcoord">SAT-2 · ${esc(clock)}</span></div>`;
 }
 
 /** 관제실 상황판 본문. counts: 일지 제목줄 숫자 (html) */
@@ -265,5 +266,5 @@ export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: st
   const sel = cards.find((c) => c.id === opsUi.sel);
   const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
   const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
-  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2><b>상황 일지</b><span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
+  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.satellite]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
 }

@@ -34,6 +34,8 @@ export const ICONS = {
   star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
   game: stroke('<path d="M7 8h10a4 4 0 0 1 4 4.5l-.6 3.6a2.4 2.4 0 0 1-4.2 1.1L14.5 15h-5l-1.7 2.2a2.4 2.4 0 0 1-4.2-1.1L3 12.5A4 4 0 0 1 7 8Z"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01"/>'),
   search: stroke('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
+  cctv: stroke('<path d="M3 8.5 15 5l1.8 6L4.8 14.5Z"/><path d="m16.6 9.6 3.9-1.1.8 2.9-3.9 1.1"/><path d="M8.5 13.3V19H4"/>'),
+  satellite: stroke('<rect x="2.5" y="9" width="5.5" height="6" rx=".8"/><rect x="16" y="9" width="5.5" height="6" rx=".8"/><rect x="9.5" y="8" width="5" height="8" rx="1"/><path d="M8 12h1.5M14.5 12H16M12 8V5.5"/><circle cx="12" cy="4.3" r="1.2"/><path d="M9.5 19.5a3.5 3.5 0 0 0 5 0"/>'),
   grid: stroke('<rect x="3.5" y="4" width="7" height="7" rx="1.5"/><rect x="13.5" y="4" width="7" height="7" rx="1.5"/><rect x="3.5" y="14" width="7" height="7" rx="1.5"/><rect x="13.5" y="14" width="7" height="7" rx="1.5"/>'),
   list: stroke('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>'),
   pin: stroke('<path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.8" r="2.3"/>'),
