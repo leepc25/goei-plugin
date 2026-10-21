@@ -1,0 +1,77 @@
+{
+  "source": "docs/GPT요청_컷신.md",
+  "style": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim lighting. No text, letters, numbers, logos or signs with writing anywhere (sign plates, buttons and papers stay blank). Square 1:1, 1024x1024.\n",
+  "character": "CHARACTER: JYALDI\nA tall Korean woman in her late 20s, the chief of a secret anomaly-response team. Long straight jet-black hair down to her waist, worn loose. Red eyes (the only strong color on her, clearly red even when small). Expressionless, calm face; upright, straight posture. Black pantsuit (jacket and trousers, never a skirt), white dress shirt, black necktie, black leather gloves. Curvy full-chested figure that the shirt buttons strain against, drawn plainly, not exaggerated. Carries a black handgun in a holster under the jacket (not drawn in hand unless stated). Palette: hair #15141a, suit #1c1d24/#2d2f3a, shirt #e8e6e0, skin #f0d6c4, eyes #d12b3a, gloves #111115.\n",
+  "tasks": [
+    {
+      "name": "cs_bg_street",
+      "detail": "Jongno, central Seoul, at 8:40 on a weekday morning, completely empty: no people, no cars, no birds. A wide six-lane road and sidewalk seen from the side, old office buildings and shuttered shops behind, traffic lights on, soft grey morning light, an eerie stillness. The sidewalk (where a person would stand) is flat across the 62-76% height band.",
+      "type": "background"
+    },
+    {
+      "name": "cs_bg_shaft",
+      "detail": "inside a deep vertical elevator shaft, seen from the side: rusty brown riveted steel walls, guide rails, thick steel cables, one rope hanging straight down in the center from a faint warm light far above, darkness below. Orange caged work lamps at two heights. (A character will be shown climbing the rope.)",
+      "type": "background"
+    },
+    {
+      "name": "cs_bg_lobby_real",
+      "detail": "the real ground-floor lobby of an ordinary old Korean office building at early morning: light grey wall panels, grey stone columns, glass entrance doors on the right with pale morning sunlight streaming in, a closed elevator with brass trim on the left. Calm and safe-feeling, warmer than the night scenes. Flat floor in the 62-76% band.",
+      "type": "background"
+    },
+    {
+      "name": "cs_bg_medbay",
+      "detail": "a small infirmary room in the team headquarters: one hospital bed with white sheets (empty), a bedside table with a paper coffee cup, a folding screen, a drip stand, fluorescent ceiling light, pale green walls. Quiet. Flat floor in the 62-76% band.",
+      "type": "background"
+    },
+    {
+      "name": "cs_bg_exit_car",
+      "detail": "outside the old office building entrance at dawn: the building's glass doors behind, and at the curb a plain black government sedan with its engine running (exhaust vapor, headlights on, back door open, no driver visible). Empty street. Flat sidewalk in the 62-76% band.",
+      "type": "background"
+    },
+    {
+      "name": "cs_bg_pasta",
+      "detail": "inside a small cozy neighborhood pasta restaurant near Jongno in the evening: warm yellow pendant lights, wooden tables, one long table pushed together with many plates of pasta, glasses and a bottle, chairs empty and slightly pulled out as if people just sat down. Brick wall and a chalkboard menu with no writing.",
+      "type": "background"
+    },
+    {
+      "name": "cs_key_first_day",
+      "detail": "JYALDI (see CHARACTER) standing alone in the middle of the completely empty Jongno road at morning, seen from slightly behind and to the side, her long black hair moving a little in the wind, buildings towering on both sides, no people or cars anywhere. Lonely, eerie, cinematic.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_checklist",
+      "detail": "close-up of an old elevator inspection checklist in a clear plastic sleeve fixed to a beige marble wall next to brass-framed elevator call buttons: rows of empty boxes and lines with NO writing, and the signature box at the bottom clearly empty. A black-gloved hand (JYALDI's) touches the empty signature box. Dim light, one red indicator lamp glowing above.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_panel",
+      "detail": "close-up of the inside elevator button panel (brushed steel, faux-wood below): far too many round buttons in a long column going down off the bottom of the image, all faces blank (no numbers), a few glowing faintly, the lowest ones dark and scratched. A small speaker grille at the top. Unsettling.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_intercom",
+      "detail": "extreme close-up of the small round speaker grille of an old elevator intercom on brushed steel, a faint warm light glowing behind the holes as if someone is about to speak. Nothing else.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_attic",
+      "detail": "the \"attic\" hidden between elevator shafts where former agents rested: a cramped space of rusty brown steel plates and ducts, one hanging orange work lamp, an abandoned backpack and a sleeping mat, old chalk tally marks and a hand-scratched map of floors on the steel wall made only of lines and boxes (no letters), a coiled rope. Nobody there. Warm lamp in cold darkness.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_passenger",
+      "detail": "in a dim elevator lobby with beige marble and brass trim, a thin middle-aged Korean man in a worn, outdated grey suit and loosened tie stands facing the viewer with a kind, tired smile, one hand pointing to the side toward a door out of frame. Half of his face in shadow. He looks friendly, and that is what feels wrong.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_rope",
+      "detail": "JYALDI (see CHARACTER) climbing a single rope hand over hand up a dark vertical elevator shaft, seen from below and to the side, her long black hair hanging, jacket dusty, a faint warm light far above her. Rusty steel walls and cables around.",
+      "type": "key"
+    },
+    {
+      "name": "cs_key_medbay",
+      "detail": "JYALDI (see CHARACTER) lying in a hospital bed in a small infirmary, jacket off (white shirt and black tie loosened), one bandage on her forehead, eyes just opened (red), looking at the ceiling, expressionless. A paper cup of black coffee on the bedside table. Fluorescent light, pale green wall.",
+      "type": "key"
+    }
+  ]
+}
