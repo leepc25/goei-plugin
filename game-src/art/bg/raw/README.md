@@ -241,3 +241,10 @@
 - `hq_pasta/hq_pasta_floor.png`
 - `hq_pasta/hq_pasta_objects.png`
 
+
+## 본부 배경 역순 작업 기록 · 2026-10-22
+
+- 요청서에 실제 열거된 59개 파일 모두 존재하며 크기와 물건 시트 alpha를 확인함(요약의 53장과 차이).
+- 매 생성 전 main을 새로 받아 `hq_pasta_objects`, `hq_pasta_floor`, `hq_pasta_wall_2` 순으로 각 한 장씩 별도 커밋. 나머지 56개는 main의 기존·동시 추가 파일을 유지함.
+- `hq_pasta_wall_1`은 생성 중 다른 작업이 먼저 추가하여 해당 main 파일을 유지함.
+- 내장 image_gen 사용. 전체 생성 요청문·커밋·파일 검사 기록: [hq-reverse-20261022-production.json](hq-reverse-20261022-production.json).
