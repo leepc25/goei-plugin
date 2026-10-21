@@ -1966,16 +1966,32 @@ function makeRenderer(ctx, art3, opt) {
           break;
         }
         case "boom": {
-          const r = 40 + 130 * Math.min(1, k * 2);
-          ctx.globalAlpha = 1 - k;
-          ctx.fillStyle = k < 0.2 ? "#ffffff" : "#ff9a3c";
-          ctx.beginPath();
-          ctx.arc(sx, sy, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = "#ffe28a";
-          ctx.beginPath();
-          ctx.arc(sx, sy, r * 0.55, 0, Math.PI * 2);
-          ctx.fill();
+          const D3 = 8;
+          const r = 30 + 110 * Math.min(1, k * 2.2);
+          const fade = 1 - k;
+          const cols = k < 0.15 ? ["#ffffff", "#fff3b0", "#ffd24a"] : k < 0.5 ? ["#fff0a0", "#ffb43c", "#e0601e"] : ["#ff9a3c", "#b8401a", "#4a2a22"];
+          const rnd3 = (i) => {
+            const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
+            return v - Math.floor(v);
+          };
+          ctx.globalAlpha = Math.min(1, fade * 1.6);
+          for (let gy = -r; gy <= r; gy += D3)
+            for (let gx = -r; gx <= r; gx += D3) {
+              const an = Math.atan2(gy, gx);
+              const edge2 = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
+              const d2 = Math.hypot(gx, gy * 1.25);
+              if (d2 > edge2) continue;
+              const t = d2 / edge2;
+              ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
+              ctx.fillRect(Math.round((sx + gx) / D3) * D3, Math.round((sy + gy) / D3) * D3, D3, D3);
+            }
+          ctx.fillStyle = k < 0.4 ? "#ffd24a" : "#6a3a28";
+          for (let i = 0; i < 14; i++) {
+            const an = rnd3(i) * Math.PI * 2;
+            const dist = r * (0.9 + rnd3(i + 40) * 0.9) * Math.min(1, k * 1.6 + 0.2);
+            const sz = D3 * (rnd3(i + 80) < 0.5 ? 1 : 0.5);
+            ctx.fillRect(Math.round(sx + Math.cos(an) * dist), Math.round(sy + Math.sin(an) * dist * 0.7 + 60 * k * k), sz, sz);
+          }
           break;
         }
         case "dust":

@@ -202,16 +202,33 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
           break;
         }
         case 'boom': {
-          const r = 40 + 130 * Math.min(1, k * 2);
-          ctx.globalAlpha = 1 - k;
-          ctx.fillStyle = k < 0.2 ? '#ffffff' : '#ff9a3c';
-          ctx.beginPath();
-          ctx.arc(sx, sy, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#ffe28a';
-          ctx.beginPath();
-          ctx.arc(sx, sy, r * 0.55, 0, Math.PI * 2);
-          ctx.fill();
+          // 도트 불꽃: 8px 칸으로 쌓은 울퉁불퉁한 덩어리(흰·노랑·주황·검붉은 3~4단) + 바깥으로 튀는 파편 (원판 금지, 검수 5-2)
+          const D = 8;
+          const r = 30 + 110 * Math.min(1, k * 2.2);
+          const fade = 1 - k;
+          const cols = k < 0.15 ? ['#ffffff', '#fff3b0', '#ffd24a'] : k < 0.5 ? ['#fff0a0', '#ffb43c', '#e0601e'] : ['#ff9a3c', '#b8401a', '#4a2a22'];
+          const rnd = (i: number) => {
+            const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
+            return v - Math.floor(v);
+          };
+          ctx.globalAlpha = Math.min(1, fade * 1.6);
+          for (let gy = -r; gy <= r; gy += D)
+            for (let gx = -r; gx <= r; gx += D) {
+              const an = Math.atan2(gy, gx);
+              const edge = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
+              const d = Math.hypot(gx, gy * 1.25);
+              if (d > edge) continue;
+              const t = d / edge;
+              ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
+              ctx.fillRect(Math.round((sx + gx) / D) * D, Math.round((sy + gy) / D) * D, D, D);
+            }
+          ctx.fillStyle = k < 0.4 ? '#ffd24a' : '#6a3a28';
+          for (let i = 0; i < 14; i++) {
+            const an = rnd(i) * Math.PI * 2;
+            const dist = r * (0.9 + rnd(i + 40) * 0.9) * Math.min(1, k * 1.6 + 0.2);
+            const sz = D * (rnd(i + 80) < 0.5 ? 1 : 0.5);
+            ctx.fillRect(Math.round(sx + Math.cos(an) * dist), Math.round(sy + Math.sin(an) * dist * 0.7 + 60 * k * k), sz, sz);
+          }
           break;
         }
         case 'dust':
