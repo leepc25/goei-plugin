@@ -158,20 +158,31 @@ try {
     await page.screenshot({ path: `${shots}/m-dark.png` });
     await ctx.close();
   }
-  // ── 폰 세로
+  // ── 폰 세로: 처음부터 게임 전체가 90도 돌아 꽉 차고, 터치 좌표도 돌려서 읽는다
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
     const page = await ctx.newPage();
-    page.on('pageerror', (e) => errors.push(`portrait: ${e}`));
+    page.on('pageerror', (e) => errors.push(`turned: ${e}`));
     await page.goto(url);
-    await page.waitForSelector('.gs-rotate.on');
-    await page.screenshot({ path: `${shots}/p-rotate.png` });
-    await page.tap('[data-rot=keep]');
-    await fitCheck(page, '폰 세로');
+    await page.waitForSelector(".gs.turned");
+    assert.ok(await page.evaluate(() => document.querySelector('.gs').classList.contains('turned')), '돌려 보기 켜짐');
+    const big = await page.evaluate(() => document.querySelector('.gs-stage').getBoundingClientRect().height);
+    assert.ok(big > 600, `돌리면 게임이 커진다 (${big})`);
     await page.tap('.mn-btn >> text=새로 시작');
     await page.tap('.mn-dialog .mn-btn >> nth=0');
     await wait(2200);
-    await page.screenshot({ path: `${shots}/p-play.png` });
+    const cdp = await ctx.newCDPSession(page);
+    const x0 = await page.evaluate(() => window.__ui.run.player.x);
+    // 돌린 화면의 (150, 300) = 실제 화면 (390 - 300, 150)
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 90, y: 150, id: 1 }] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 90, y: 210, id: 1 }] });
+    await wait(600);
+    const right = await page.evaluate(() => window.__ui.shell.input.held('ArrowRight'));
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    const x1 = await page.evaluate(() => window.__ui.run.player.x);
+    assert.ok(right && x1 > x0 + 20, `돌린 화면에서 스틱 오른쪽 = 오른쪽 이동 ${x0}→${x1}`);
+    await page.screenshot({ path: `${shots}/p-turned.png` });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1), true, '세로 스크롤 없음');
     await ctx.close();
   }
   assert.deepEqual(errors, []);

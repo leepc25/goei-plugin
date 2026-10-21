@@ -179,6 +179,35 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       return undefined;
     }
   })();
+  // 메뉴 소리와 설정 화면의 음량 밀대를 소리 모듈에 잇는다 (환경음·메뉴 버스는 효과음 밀대를 따른다)
+  shell.menu.onSound = (k) => audio.play(k === 'move' ? 'uiMove' : k === 'ok' ? 'uiOk' : 'uiBack');
+  let vol = '';
+  const syncVolume = () => {
+    const s = shell.settings;
+    const key = `${s.master}/${s.music}/${s.sfx}`;
+    if (key === vol) return;
+    vol = key;
+    audio.setVolume('master', s.master);
+    audio.setVolume('music', s.music);
+    audio.setVolume('sfx', s.sfx);
+    audio.setVolume('amb', s.sfx * 0.8);
+    audio.setVolume('ui', s.sfx * 0.7);
+  };
+  // 발소리: 엔진이 step 사건을 따로 내지 않으므로 땅 위에서 움직인 거리로 낸다 (보폭 걸음 55 / 달리기 75)
+  let foot = { x: 0, y: 0, d: 0, w: null as unknown };
+  const footsteps = (w: { player: { x: number; y: number; airborne: boolean; running: boolean } }) => {
+    const p = w.player;
+    if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
+    const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
+    foot.x = p.x;
+    foot.y = p.y;
+    if (p.airborne || moved > 60) return void (foot.d = 0);
+    foot.d += moved;
+    if (foot.d >= (p.running ? 75 : 55)) {
+      foot.d = 0;
+      audio.event({ type: 'step', x: p.x, vol: p.running ? 0.9 : 0.6 });
+    }
+  };
   const story: StoryApi = mountStory(
     storyRoot,
     {
@@ -217,7 +246,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
-      if (e.type === 'super') audio.duck(1.4);
       shell.fx.onGameEvent(e as never);
       story.event(e.type, e as never);
       if (e.type === 'run:end') saveFlags();
@@ -235,6 +263,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     openTitle: () => shell.openTitle(),
     onPlay: () => shell.play(),
     frame: (dt) => {
+      syncVolume();
       story.update(dt);
       shell.frame(dt);
       shell.input.endFrame();
@@ -242,6 +271,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     overlay: (ctx, w, dt) => {
       if (!w) return;
       audio.setListener(w.camX + 640, 640);
+      footsteps(w);
       ctx.save();
       ctx.translate(-Math.round(w.camX), 0);
       shell.fx.drawWorld(ctx);

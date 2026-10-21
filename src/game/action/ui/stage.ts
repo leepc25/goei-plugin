@@ -1,4 +1,4 @@
-// 화면 틀: 1280×720 내부 해상도를 상자 크기에 16:9 로 맞춘다(남는 곳은 검은 띠).
+// 화면 틀: 1280×720 내부 해상도를 상자 크기에 맞춘다. 채우기(기본)는 가로로 긴 화면에서 캔버스를 옆으로 넓혀 검은 띠를 없앤다.
 // 층: 게임 캔버스 → CRT 덮개 → 메뉴(1280×720 좌표) / 터치 버튼(상자 전체) / 세로 화면 안내
 import css from './ui.css';
 
@@ -15,6 +15,13 @@ export interface Stage {
   /** 터치 버튼 층 (상자 전체, 배율 없음) */
   touch: HTMLElement;
   scale: number;
+  /** 캔버스 가로 (논리 px). 맞춤이면 1280, 채우기면 화면 비율만큼 넓어진다 (최대 1800). 세로는 늘 720 */
+  vw: number;
+  setFit(mode: 'fill' | 'fit'): void;
+  /** 세로로 든 폰에서 게임 전체를 90도 돌려 크게 보여 주는 중 */
+  turned: boolean;
+  /** 화면 좌표 → 요소 기준 좌표 (돌려 보기 중에도 맞음) */
+  toLocal(clientX: number, clientY: number, el: HTMLElement): { x: number; y: number };
   /** 화면 좌표 → 게임 좌표 */
   toGame(clientX: number, clientY: number): { x: number; y: number };
   portrait: boolean;
@@ -41,7 +48,7 @@ export function mountStage(box: HTMLElement): Stage {
   const root = document.createElement('div');
   root.className = 'gs';
   root.tabIndex = 0;
-  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>가로로 돌려 주세요</b><span>세로에서도 할 수 있지만 화면이 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="fs">전체 화면 · 가로</button><button type="button" data-rot="keep">세로로 계속</button></div></div>`;
+  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
   box.append(root);
   const stageEl = root.querySelector<HTMLElement>('.gs-stage')!;
   const canvas = root.querySelector<HTMLCanvasElement>('canvas')!;
@@ -51,7 +58,11 @@ export function mountStage(box: HTMLElement): Stage {
   const rotate = root.querySelector<HTMLElement>('.gs-rotate')!;
   const fns: (() => void)[] = [];
   let keepPortrait = false;
+  // 채우기는 엔진이 넓은 캔버스를 그릴 수 있을 때만 켠다 (setFit('fill'))
+  let fill = false;
   const coarse = () => typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+  // 세로로 든 폰은 처음부터 90도 돌려 꽉 채운다 (통합 규격 3장: 세로에 작게 넣지 않는다)
+  let turn = coarse();
   const s: Stage = {
     root,
     stage: stageEl,
@@ -60,10 +71,29 @@ export function mountStage(box: HTMLElement): Stage {
     ui,
     touch,
     scale: 1,
+    vw: W,
+    setFit(mode) {
+      fill = mode === 'fill';
+      layout();
+    },
     portrait: false,
+    turned: false,
+    toLocal(cx, cy, el) {
+      if (!s.turned) {
+        const r = el.getBoundingClientRect();
+        return { x: cx - r.left, y: cy - r.top };
+      }
+      // 시계 방향 90도: 화면 (x, y) → 돌린 상자 안 (y, 상자폭 − x)
+      const b = box.getBoundingClientRect();
+      let x = cy - b.top,
+        y = b.width - (cx - b.left);
+      for (let n: HTMLElement | null = el; n && n !== root; n = n.offsetParent as HTMLElement | null) (x -= n.offsetLeft), (y -= n.offsetTop);
+      return { x, y };
+    },
     toGame(cx, cy) {
-      const r = stageEl.getBoundingClientRect();
-      return { x: ((cx - r.left) / r.width) * W, y: ((cy - r.top) / r.height) * H };
+      const p = s.toLocal(cx, cy, root);
+      const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(stageEl.style.transform);
+      return { x: (p.x - (m ? +m[1] : 0)) / s.scale, y: (p.y - (m ? +m[2] : 0)) / s.scale };
     },
     onResize(fn) {
       fns.push(fn);
@@ -92,15 +122,31 @@ export function mountStage(box: HTMLElement): Stage {
     },
   };
   const layout = () => {
+    // 돌려 보기: 상자가 세로인 동안만. 폰을 실제로 가로로 돌리면 저절로 풀린다
+    const ow = box.clientWidth,
+      oh = box.clientHeight;
+    const turnNow = turn && oh > ow * 1.05;
+    if (turnNow !== s.turned || turnNow) {
+      s.turned = turnNow;
+      root.classList.toggle('turned', turnNow);
+      Object.assign(root.style, turnNow ? { position: 'absolute', left: '0', top: '0', width: `${oh}px`, height: `${ow}px`, transformOrigin: '0 0', transform: `translate(${ow}px, 0) rotate(90deg)` } : { position: '', left: '', top: '', width: '', height: '', transformOrigin: '', transform: '' });
+    }
     const bw = root.clientWidth,
       bh = root.clientHeight;
     if (!bw || !bh) return;
     const portrait = bh > bw * 1.05;
     s.portrait = portrait;
     root.classList.toggle('portrait', portrait);
-    const scale = Math.min(bw / W, bh / H);
+    // 채우기: 가로로 긴 폰은 검은 띠 대신 게임 화면을 옆으로 넓힌다 (위아래는 꽉 참)
+    const vw = fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : W;
+    if (vw !== s.vw || canvas.width !== vw) {
+      s.vw = vw;
+      canvas.width = vw;
+      canvas.style.width = stageEl.style.width = `${vw}px`;
+    }
+    const scale = Math.min(bw / vw, bh / H);
     s.scale = scale;
-    const w = W * scale,
+    const w = vw * scale,
       h = H * scale;
     // 세로 화면: 게임을 위에 붙이고 아래 빈 곳은 터치 버튼 자리
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
@@ -115,11 +161,12 @@ export function mountStage(box: HTMLElement): Stage {
     const b = (e.target as HTMLElement).closest<HTMLElement>('[data-rot]');
     if (!b) return;
     keepPortrait = true;
-    if (b.dataset.rot === 'fs') void s.fullscreen();
+    if (b.dataset.rot === 'turn') turn = true;
     layout();
   });
   const ro = new ResizeObserver(layout);
   ro.observe(root);
+  ro.observe(box);
   layout();
   return s;
 }

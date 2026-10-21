@@ -52,6 +52,8 @@ export class TouchPad {
   /** 스틱 자리 (층 기준 px) */
   private zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
+  /** 캔버스 논리 폭 (채우기면 1280 보다 넓다) */
+  vw: () => number = () => 1280;
   toLocal: ((clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number }) | null = null;
   visible = false;
   private seenTouch = false;
@@ -102,9 +104,11 @@ export class TouchPad {
     const bw = this.layer.clientWidth || 800,
       bh = this.layer.clientHeight || 400;
     const portrait = bh > bw * 1.05;
-    const scale = Math.min(bw / 1280, bh / 720);
-    const stageW = 1280 * scale,
+    const vw = this.vw();
+    const scale = Math.min(bw / vw, bh / 720);
+    const stageW = vw * scale,
       stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s.touchSize;
     const u = this.u;
     const flip = s.lefty ? -1 : 1;
@@ -131,11 +135,13 @@ export class TouchPad {
       else {
         const i = b.id === 'menu' ? 0 : 1;
         if (topInSide) {
+          // 옆 검은 띠 안에 세로로
           cx = s.lefty ? side / 2 : bw - side / 2;
           cy = 12 + u * 0.35 + i * u * 0.8;
         } else {
-          cx = s.lefty ? safeS + u * 0.35 + i * u * 0.75 : bw - safeS - u * 0.35 - i * u * 0.75;
-          cy = 10 + u * 0.35;
+          // 띠가 없으면 가운데 위 (터치 HUD 는 가운데 위를 비워 둔다)
+          cx = bw / 2 + (i === 0 ? 0.4 : -0.4) * u;
+          cy = (portrait ? 10 : 8) + u * 0.32;
         }
       }
       const d = ri >= 0 ? 0.8 : b.d;
@@ -153,12 +159,53 @@ export class TouchPad {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.restBase();
   }
+  /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+   *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  private layoutSide(bw: number, bh: number, side: number) {
+    const s = this.st();
+    const g = 4;
+    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g) / 5.55)) * s.touchSize;
+    const u = this.u;
+    this.root.style.setProperty('--tp-u', `${u}px`);
+    this.root.style.setProperty('--tp-a', String(s.touchAlpha));
+    const edge = 6;
+    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge - u * 0.6;
+    const colL = side >= u * 0.7 ? side / 2 : edge + u * 0.36;
+    const mir = (x: number) => (s.lefty ? bw - x : x);
+    const place = (id: string, cx: number, cy: number, d: number) => {
+      const b = this.btns.find((x) => x.id === id)!;
+      const r = (d * u) / 2;
+      cx = mir(cx);
+      Object.assign(b, { cx, cy, r });
+      const el = b.el!;
+      el.style.width = el.style.height = `${r * 2}px`;
+      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+    };
+    const stack = (ids: string[], x: number, d: number[], fromBottom: boolean) => {
+      let y = fromBottom ? bh - edge : edge;
+      ids.forEach((id, i) => {
+        const r = (d[i] * u) / 2;
+        y += fromBottom ? -r : r;
+        place(id, x, y, d[i]);
+        y += fromBottom ? -r - g : r + g;
+      });
+    };
+    stack(['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
+    const inner = colR - Math.max(side, u * 1.15) / 2 - g - u * 0.4;
+    stack(['guard', 'interact', 'reload', 'support'], inner, [0.8, 0.8, 0.8, 0.8], true);
+    stack(['menu', 'map', 'item1', 'item2', 'item3', 'item4'], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    const zw = bw * 0.42,
+      zt = bh * 0.3;
+    this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+    Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.restBase();
+  }
   private restBase() {
     const s = this.st();
     const zr = this.zr;
     const u = this.u;
-    const x = s.lefty ? zr.w - u * 1.25 : u * 1.25;
-    const y = zr.h - u * 1.25;
+    const x = s.lefty ? zr.w - u * 1.55 : u * 1.55;
+    const y = zr.h - u * 1.0;
     this.placeBase(x, y);
     this.knob.style.transform = '';
     this.base.classList.remove('on');

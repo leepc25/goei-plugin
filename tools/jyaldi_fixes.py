@@ -13,6 +13,12 @@ import rig  # noqa: E402
 
 # 버림(결함 35·36): 생성기가 자세를 못 그림
 DROP_CLIPS = {'pushup', 'sleepside'}
+# 기본 클립 재설계(docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 4장): 장면·물건이 박혀 폐기. 같은 이름으로 다시 뽑는 9개(tie 등)는 새 그림이 덮어씀
+DROP_CLIPS |= set('''bath bathin bathout shower showerin showerout toilet toiletin toiletout handwash wash dishes coffee microwave board brief
+window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
+toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
+run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry
+lookback'''.split())
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {
