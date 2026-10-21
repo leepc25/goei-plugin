@@ -1,0 +1,82 @@
+{
+ "objects/hq_supply_objects_1": {
+  "w": 137,
+  "h": 121,
+  "foot": [
+   68,
+   121
+  ]
+ },
+ "objects/hq_supply_objects_2": {
+  "w": 141,
+  "h": 121,
+  "foot": [
+   70,
+   121
+  ]
+ },
+ "objects/hq_supply_objects_3": {
+  "w": 77,
+  "h": 55,
+  "foot": [
+   38,
+   55
+  ]
+ },
+ "objects/hq_supply_objects_4": {
+  "w": 146,
+  "h": 115,
+  "foot": [
+   73,
+   115
+  ]
+ },
+ "objects/hq_supply_objects_5": {
+  "w": 39,
+  "h": 22,
+  "foot": [
+   19,
+   22
+  ]
+ },
+ "objects/hq_supply_objects_6": {
+  "w": 26,
+  "h": 19,
+  "foot": [
+   13,
+   19
+  ]
+ },
+ "objects/hq_supply_objects_7": {
+  "w": 52,
+  "h": 49,
+  "foot": [
+   26,
+   49
+  ]
+ },
+ "objects/hq_supply_objects_8": {
+  "w": 46,
+  "h": 91,
+  "foot": [
+   23,
+   91
+  ]
+ },
+ "objects/hq_supply_objects_9": {
+  "w": 51,
+  "h": 73,
+  "foot": [
+   25,
+   73
+  ]
+ },
+ "hq_supply_wall_1": {
+  "w": 320,
+  "h": 220
+ },
+ "hq_supply_wall_2": {
+  "w": 320,
+  "h": 220
+ }
+}

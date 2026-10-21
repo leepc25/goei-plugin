@@ -219,7 +219,7 @@ const BY_KIND: Record<string, ObjRef> = {
   meeting_table: ['hq_office', 15], paper_pile: ['hq_office', 18], chief_desk: ['hq_office', 1], bookshelf: ['hq_jaemtri', 9], chair: ['hq_office', 2],
   bed: ['hq_clinic', 1], iv_stand: ['hq_clinic', 2], curtain: ['hq_clinic', 3], med_cabinet: null, recorder: ['hq_interview', 4],
   coffee_machine: ['hq_pantry', 2], fridge: ['hq_pantry', 1], table_small: ['hq_pantry', 3], sink_counter: ['hq_pantry', 8],
-  locker_row: ['hq_workshop', 3], workbench: ['hq_workshop', 1], cargo_cart: ['hq_workshop', 2], shelf: ['hq_pantry', 8],
+  locker_row: ['hq_supply', 4], workbench: ['hq_workshop', 1], cargo_cart: ['hq_supply', 3], shelf: ['hq_supply', 1],
 };
 
 function objImage(place: string, n: number): HTMLImageElement | null {
