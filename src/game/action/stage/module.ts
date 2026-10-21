@@ -301,7 +301,9 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           break;
         case 'narrow': {
           // 사물함·차단대 그림 폭(몸 절반 포함)만큼 넓게 막는다: 사물함 줄 끝 바로 옆, 그 뒤 깊이에 서서 사물함에 박혀 보이지 않게 (검수 9)
-          const M = 120;
+          // 이웃 좁은 길과 사이가 좁으면(지그재그) 줄을 바꿀 틈이 남도록 덜 넓힌다
+          let M = 120;
+          for (const o of terr) if (o !== t && o.kind === 'narrow') M = Math.min(M, Math.max(0, (o.x0 >= t.x1 ? o.x0 - t.x1 : t.x0 - o.x1) / 2 - 40));
           const inN = p.x > t.x0 - M && p.x < t.x1 + M,
             wasN = r.prevX > t.x0 - M && r.prevX < t.x1 + M;
           if (inN && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {

@@ -418,10 +418,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent as AgentId;
-      // 첫 출동: 말풍선 없이 아래 자막 한 줄씩 (검수 4-7: 글자 여러 겹 금지). 층 안내 자막은 층 모듈이 먼저 낸다
+      // 첫 출동: GPT 도트 영상 컷신 first_entry (프레임 팩이 생겨 검은 화면이 아니다). 끝나면 로프 안내 자막 한 줄
       if (run.stageId !== 'hq' && (run as Launch).launch && local('goei-first-entry').load() !== '1') {
         local('goei-first-entry').save('1');
-        setTimeout(() => world === w && w.say('(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.', 3), 4600);
+        const rope = () => world === w && w.say('(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.', 3);
+        // file:// 로 연 시연판은 프레임 목록(index.json)을 못 읽으므로 자막만
+        if (CUTSCENES.first_entry && location.protocol !== 'file:') story.cutscene('first_entry', () => setTimeout(rope, 1200));
+        else setTimeout(rope, 4600);
       }
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음

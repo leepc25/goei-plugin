@@ -169,7 +169,13 @@ function bot(eng) {
   let lo = 0,
     hi = 160;
   for (const t of st.terrain) {
-    const hit = Math.min(p.x, ahead) < t.x1 && Math.max(p.x, ahead) > t.x0;
+    // 좁은 길은 사물함·차단대 그림 폭만큼(±120) 앞에서부터 막힌다
+    let m = 0;
+    if (t.kind === 'narrow') {
+      m = 130;
+      for (const o of st.terrain) if (o !== t && o.kind === 'narrow') m = Math.min(m, Math.max(0, (o.x0 >= t.x1 ? o.x0 - t.x1 : t.x0 - o.x1) / 2 - 30));
+    }
+    const hit = Math.min(p.x, ahead) < t.x1 + m && Math.max(p.x, ahead) > t.x0 - m;
     if (!hit) continue;
     if ((t.kind === 'pit' || t.kind === 'block') && !p.airborne) k.jump = true;
     if (t.kind === 'low') k.crouch = true;
