@@ -32,3 +32,9 @@
 ## 제7장 탈의·돌아서기 재제작 (2026-10-22 GPT)
 
 undress 00~06(7장), showerturn 00~02(3장)을 내장 image_gen으로 새로 제작했다. 완성 PNG는 192×144, 발바닥 y=135, 서 있는 머리끝 y=37~39다. 수건 옆모습 끝/시작 장은 동일 파일 내용으로 연결했다. 이전 undress 07은 gpt-redraw-20261022/superseded-undress-07.png에 보관했다. 시연판에서 탈의 → 돌아서기 → 기존 샤워로 이어진다. 신규 두 클립에는 이전 축소·색 보정·장 삭제를 적용하지 않는다. 제작 프롬프트와 실측: gpt-redraw-20261022/production.json, 비교판: contact.png. 사용자 최종 시각 승인을 뜻하지 않는다.
+
+## 제8장 샤워·목욕 그림체 맞추기 (2026-10-22 GPT)
+
+채택된 showerturn/02와 undress/06을 기준으로 shower 6장·bath 4장을 내장 image_gen으로 새로 그렸다. 캐릭터만 있는 192×144 투명 PNG, 발바닥 y=135다. shower는 뒷모습 머리 감기, bath는 오른쪽 옆모습으로 무릎을 감싸 앉아 쉰다. bath 머리 높이는 68→67→66→67px로 반복 경계 포함 1px씩 변한다. 새 두 클립은 옛 0.9배 축소·머리색 보정을 제외하고 전달 좌표를 갱신했다. full/final 스트립과 release/demo/jyaldi-full.html에 반영, 빌드 missing=[]·브라우저 반복 재생·showerturn→shower 연결을 확인했다. 사용자 최종 시각 승인과는 구분한다.
+
+제작 요청문·실측: gpt-style-match-20261022/production.json. 비교판: gpt-style-match-20261022/contact.png. image_gen 12회(목욕 마지막 장 수정 2회 포함), PixelLab 0회.
