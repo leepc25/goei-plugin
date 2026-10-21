@@ -21,6 +21,7 @@ export type AiKind =
   | 'duelist'
   | 'rival'
   | 'float'
+  | 'touch'
   | 'boss';
 export type Faction = 'elevator' | 'replica' | 'bureau' | 'daydream' | 'guardian';
 export type DropTable = 'common' | 'bureau' | 'daydream' | 'mid' | 'guardian' | 'none';
@@ -747,7 +748,96 @@ const mummy: EnemyDef = {
   attacks: [{ move: strike('grope', '더듬기', 60, 176, { tele: 18, active: 5, recover: 18, reach: [15, 90], z: [80, 160], spec: S(8, 'flinch', 4, { debuff: { kind: 'taint', ticks: 600 } }) }), range: [0, 100], dy: 22, cd: 60, weight: 1 }],
 };
 
-export const ROSTER: EnemyDef[] = [lurker, hollow, crawler, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
+
+// ─── 층 모듈이 부르는 이름 (스테이지 floortypes·승객 조우) ─────────────────
+
+const clerkBody = humanoid(62, 186);
+const shooter: EnemyDef = {
+  kind: 'shooter',
+  label: '사격하는 것',
+  role: 'shoot',
+  faction: 'elevator',
+  price: 15,
+  hp: 70,
+  speed: 1.2,
+  w: 62,
+  h: 186,
+  body: clerkBody,
+  armor: 0,
+  types: ['lobby', 'trial', 'puzzle'],
+  ai: 'kite',
+  keep: [240, 400],
+  drop: 'common',
+  grabbable: true,
+  cap: 3,
+  note: '창구 직원처럼 앉아 있다가 서류철에서 날붙이를 던진다. 거리를 둔다.',
+  weak: '던진 뒤 잠깐 선다. 깊이를 바꿔 피하고 붙어라',
+  color: '#6e7a70',
+  attacks: [
+    { move: shoot('toss', '날붙이 던지기', 62, 186, { tele: 16, shots: 2, gap: 8, recover: 20, fire: 'spoon', body: clerkBody }), range: [150, 560], dy: 18, cd: 60, weight: 3 },
+    { move: strike('jab', '찌르기', 62, 186, { tele: 10, active: 4, recover: 14, reach: [15, 85], z: [100, 160], spec: S(8, 'stagger', 10) }), range: [0, 90], dy: 22, cd: 40, weight: 4, when: 'close' },
+  ],
+};
+
+const thief: EnemyDef = {
+  kind: 'thief',
+  label: '보급 승객',
+  role: 'rush',
+  faction: 'elevator',
+  price: 0,
+  hp: 110,
+  speed: 2,
+  w: 62,
+  h: 184,
+  body: humanoid(62, 184),
+  armor: 0,
+  types: [],
+  ai: 'rival',
+  keep: [60, 120],
+  drop: 'daydream',
+  grabbable: true,
+  note: '배낭을 멘 승객. 보급품을 노리고 덤빈다. 몰리면 도망간다.',
+  weak: '체력 30% 아래면 도망친다',
+  color: '#7a6a4a',
+  attacks: [
+    { move: strike('shove', '밀치기', 62, 184, { tele: 12, active: 4, recover: 14, reach: [15, 90], z: [90, 170], spec: S(8, 'stagger', 12) }), range: [0, 100], dy: 22, cd: 30, weight: 3 },
+    { move: strike('pipe', '쇠파이프', 62, 184, { tele: 18, active: 5, recover: 20, reach: [20, 120], z: [80, 190], lunge: 4, spec: S(14, 'down', 8, { strength: 3 }) }), range: [0, 140], dy: 24, cd: 80, weight: 2 },
+  ],
+};
+
+const touchBody = [B(-24, 24, 60, 170, 14, 'arm')];
+const toucher: EnemyDef = {
+  kind: 'toucher',
+  label: '만지는 손',
+  role: 'hinder',
+  faction: 'elevator',
+  price: 0,
+  hp: 1,
+  speed: 1.1,
+  w: 48,
+  h: 170,
+  body: touchBody,
+  armor: 3,
+  types: [],
+  ai: 'touch',
+  keep: [0, 30],
+  drop: 'none',
+  grabbable: false,
+  note: '완전한 어둠에서 어깨를 만지는 손. 때려도 닿지 않는다. 멈추거나 소리 내면 다가온다.',
+  weak: '움직이고, 조용히. 20초 뒤 사라진다',
+  color: '#d8d0c0',
+  attacks: [
+    {
+      move: bake('touch', '만지기', touchBody, [{ n: 20, tele: true }, { n: 4, hit: [B(-30, 50, 60, 170, 18, 'arm')] }, { n: 24 }], [{ dmg: 0, react: 'none', unblockable: true, debuff: { kind: 'fear', ticks: 60 }, stop: 0 }], { danger: [{ fx0: -30, fx1: 50, dy: 18 }] }),
+      range: [0, 60],
+      dy: 20,
+      cd: 90,
+      weight: 1,
+    },
+  ],
+};
+
+export const ROSTER: EnemyDef[] = [shooter, thief, toucher, lurker, hollow, crawler, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
 export const ROSTER_BY_KIND: Record<string, EnemyDef> = Object.fromEntries(ROSTER.map((d) => [d.kind, d]));
 /** 난입 세력 (층 유형과 무관하게 섞인다) */
 export const INTRUDERS = { bureau: ['fb_smg', 'fb_shield', 'fb_chief'], bureauMid: ['fb_sword'], daydream: ['dd_member'] };

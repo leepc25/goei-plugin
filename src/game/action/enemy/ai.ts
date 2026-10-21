@@ -1,5 +1,6 @@
 // 일반 적 두뇌. 역할(10.1)별 공통 행동 + 적마다 다른 규칙 (규칙형·천장·얼룩·보이지 않음 등).
 // 벨트스크롤 관례: 한 번에 공격하는 적은 2체까지(공격권). 나머지는 둘러싸고 기다린다.
+import { emitDebuff } from './debuff';
 import { Enemy, stillTicks, type Brain } from './enemy';
 import type { Attack } from './roster';
 import type { WorldView } from './types';
@@ -345,7 +346,7 @@ const summoner: Brain = {
     const p = w.player;
     const watching = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 640;
     e.mem.frozen = !watching;
-    if (watching && e.age % 45 === 0 && e.state !== 'dead') w.emit({ type: 'custom', name: 'debuff', data: { kind: 'headache', ticks: 30, from: e.id } });
+    if (watching && e.age % 45 === 0 && e.state !== 'dead') emitDebuff(w, { kind: 'headache', ticks: 30 }, e.id);
     for (const [mark, n] of [[0.66, 1], [0.33, 2]] as const)
       if (e.hp < e.hpMax * mark && (e.mem.summoned ?? 0) < n) {
         e.mem.summoned = n;
@@ -434,4 +435,31 @@ const float: Brain = {
   think: (e, w) => engage(e, w, 0.09),
 };
 
-export const AI_BRAINS: Record<string, Brain> = { rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
+/** 만지는 손 (B-12·깊은 곳): 때릴 수 없다. 멈추거나 소리 내면 다가와 만진다(공포). 20초 뒤 사라진다 */
+const touch: Brain = {
+  tick(e, w) {
+    if (e.age === 1) e.hostile = false;
+    e.alpha = e.state === 'attack' ? 0.9 : 0.35;
+    if (e.age > 600 && e.state !== 'dead') {
+      e.alpha = Math.max(0, 1 - (e.age - 600) / 20);
+      if (e.age > 620) e.set('dead');
+      return true;
+    }
+  },
+  think(e, w) {
+    const p = w.player;
+    const drawn = stillTicks(w) > 15 || w.noise > 0.3 || p.running;
+    const dx = p.x - e.x,
+      dy = p.y - e.y;
+    const sp = e.speed() * (drawn ? 1.8 : 0.5);
+    e.face(p.x);
+    e.x += Math.sign(dx) * Math.min(Math.abs(dx), sp);
+    e.y += Math.sign(dy) * Math.min(Math.abs(dy), sp * 0.6);
+    e.set('walk');
+    const a = e.def.attacks[0];
+    if (Math.abs(dx) < 50 && Math.abs(dy) < 18 && e.cd(a.move.id) <= 0) e.start(a.move, w, a.cd);
+  },
+  hit: () => ({ immune: true, text: '닿지 않는다' }),
+};
+
+export const AI_BRAINS: Record<string, Brain> = { touch, rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
