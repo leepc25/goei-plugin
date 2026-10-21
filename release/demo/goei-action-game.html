@@ -8157,7 +8157,7 @@ var TouchPad = class {
 
 // src/game/action/ui/title.ts
 var K = 3;
-var DOOR = { x: 160 + 112 * K, y: 50 * K, w: 100 * K, h: 170 * K };
+var DOOR2 = { x: 160 + 112 * K, y: 50 * K, w: 100 * K, h: 170 * K };
 var LAMP = { x: 160 + 132 * K, y: 17 * K, w: 48 * K, h: 10 * K };
 var imgs = /* @__PURE__ */ new Map();
 function art(name) {
@@ -8249,7 +8249,7 @@ function drawTitleBg(c, t, title2 = "차원 승강기", sub = "ANOMALY SIMULATIO
   const buzz = Math.sin(t * 23) > 0.96 || Math.sin(t * 1.3) > 0.985 && Math.sin(t * 40) > 0;
   c.fillStyle = `rgba(4,6,10,${buzz ? 0.72 : 0.5})`;
   c.fillRect(0, 0, 1280, 720);
-  const d2 = DOOR;
+  const d2 = DOOR2;
   c.save();
   c.beginPath();
   c.rect(d2.x, d2.y, d2.w, d2.h);
@@ -8310,7 +8310,7 @@ function drawFallback(c, t) {
   c.fillRect(0, 0, 1280, 720);
   c.fillStyle = "#3a342a";
   c.fillRect(0, 660, 1280, 60);
-  const d2 = DOOR;
+  const d2 = DOOR2;
   c.fillStyle = "#6a5a3a";
   c.fillRect(d2.x - 18, d2.y - 18, d2.w + 36, d2.h + 18);
   c.fillStyle = "#000";
