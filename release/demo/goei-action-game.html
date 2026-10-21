@@ -4332,7 +4332,11 @@ function createGameAudio(opts = {}) {
       graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
     }
   }
+  let wantSong = null;
   function ensure() {
+    return disposed ? null : out;
+  }
+  function create() {
     if (disposed) return null;
     if (out) return out;
     const AC = window.AudioContext ?? window.webkitAudioContext;
@@ -4349,8 +4353,16 @@ function createGameAudio(opts = {}) {
     return out;
   }
   async function unlock() {
-    const o = ensure();
+    const fresh = !out;
+    const o = create();
     if (!o || !ctx) return false;
+    if (fresh) {
+      if (scene) {
+        amb = startAmbience(o, scene);
+        music(SCENE_SONG[scene], 1.2);
+      } else if (wantSong) music(wantSong);
+      wantSong = null;
+    }
     try {
       const nav = navigator;
       if (nav.audioSession && nav.audioSession.type !== "playback") nav.audioSession.type = "playback";
@@ -4445,7 +4457,10 @@ function createGameAudio(opts = {}) {
   }
   function music(id, fade = 1) {
     const o = ensure();
-    if (!o || !ctx) return;
+    if (!o || !ctx) {
+      wantSong = id;
+      return;
+    }
     clearTimeout(jingleTimer);
     resumeSong = null;
     if (song?.id === id && !song.player.ended) return;
@@ -4480,10 +4495,10 @@ function createGameAudio(opts = {}) {
     g2.setTargetAtTime(1, t + sec, 0.3);
   }
   function floor(s2) {
-    const o = ensure();
-    if (!o) return;
     if (s2 === scene) return;
     scene = s2;
+    const o = ensure();
+    if (!o) return;
     amb?.stop();
     amb = s2 ? startAmbience(o, s2) : null;
     music(s2 ? SCENE_SONG[s2] : null, 1.2);
@@ -6277,7 +6292,7 @@ var Fx = class {
   /** 엔진 GameEvent(engine/contract.ts)를 그대로 받는다. y 는 화면 y(발 위치 − 높이), 없으면 opt.y */
   onGameEvent(e, opt = {}) {
     const n = (k, d2 = 0) => typeof e[k] === "number" ? e[k] : d2;
-    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") - 80 : opt.y ?? 520;
+    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") : opt.y ?? 520;
     switch (e.type) {
       case "hit":
         return this.onEvent({ type: "hit", x, y, strength: Math.max(1, Math.min(3, n("strength", 1))), dmg: n("dmg"), target: e.target === "player" ? "player" : "enemy" });
