@@ -468,3 +468,24 @@ export function patchSlots<M extends { content?: unknown }>(messages: M[], old: 
   });
   return { messages: out, changed };
 }
+
+/**
+ * 🙂Roster의 한 줄 소개 중, 같은 요청에 전체 로어북(「### Character - 이름」)이 들어간 인물 줄을 뺀다.
+ * 같은 인물을 두 번 읽히지 않게 (토큰 절약). 어느 방식으로 들어갔든 요청 속 제목으로 판단한다
+ */
+export function trimRoster<M extends { content?: unknown }>(messages: M[]): M[] {
+  const names = new Set<string>();
+  for (const m of messages) {
+    if (typeof m?.content !== 'string') continue;
+    for (const x of m.content.matchAll(/^###\s*Character\s*-\s*(.+?)\s*$/gm)) names.add(x[1].toLowerCase());
+  }
+  if (!names.size) return messages;
+  return messages.map((m) => {
+    const c = m?.content;
+    if (typeof c !== 'string' || !c.includes('## Roster')) return m;
+    // 「## Roster」부터 다음 「## 」 제목 전까지만 (같은 메시지에 다른 로어북이 붙어 있어도 건드리지 않게)
+    const next = c.replace(/^## Roster\n[\s\S]*?(?=^## |(?![\s\S]))/m, (sec) =>
+      sec.replace(/^- ([^(\n]+?) \([^\n]*\n?/gm, (line, name: string) => (names.has(name.trim().toLowerCase()) ? '' : line)));
+    return next === c ? m : { ...m, content: next };
+  });
+}

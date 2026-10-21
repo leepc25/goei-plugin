@@ -146,3 +146,12 @@ test('보내는 방식에 맞게 @@dont_activate 줄을 붙이고 뗀다', () =>
   assert.deepEqual(r.picks.map((p) => p.entry.name), ['제이'], 'Risu가 켤 것 추정');
   assert.equal(r.vars.$goei_lore_agent, '', 'Risu가 직접 켤 때는 자리를 비움');
 });
+
+test('trimRoster: 전체 로어북이 들어간 인물은 Roster 한 줄 소개에서 뺀다', () => {
+  const { trimRoster } = lore;
+  const roster = '## Roster\n- Purpose: GM reference.\n\n#### Team\n- Jyaldi (early 30s/F): boss.\n- Aileen (early 20s/F): cynic.\n\n## Other\n- Jyaldi (x): keep\n';
+  const out = trimRoster([{ role: 'system', content: roster }, { role: 'system', content: '### Character - Jyaldi\n- Age: 30s' }]);
+  assert.equal(out[0].content, '## Roster\n- Purpose: GM reference.\n\n#### Team\n- Aileen (early 20s/F): cynic.\n\n## Other\n- Jyaldi (x): keep\n');
+  const same = [{ role: 'system', content: roster }];
+  assert.equal(trimRoster(same), same);
+});

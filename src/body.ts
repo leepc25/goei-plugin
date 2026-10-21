@@ -38,7 +38,7 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { setWaiting } from './host/waiting';
-import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, type LoreMode } from './core/lore';
+import { syncDecorators, computeLore, loreOptions, patchSlots, sameVars, trimRoster, type LoreMode } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 
@@ -61,6 +61,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (liteNow) {
     messages = stripHistoryTags(messages);
     messages = await fixLore(messages).catch(() => messages);
+    messages = trimRoster(messages);
     const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
     if (ctx.length) {
       // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
