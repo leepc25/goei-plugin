@@ -1,0 +1,21 @@
+{
+  "name": "silent_floor",
+  "detail": "dark green carpet with a worn wine-red runner pattern made of large simple shapes.",
+  "place": "PLACE: a hushed old reading hall of a 1980s Korean public library merged with a quiet traditional house; thick carpets, heavy curtains, everything muffled. PALETTE: deep green and dark wood brown with dull brass, cream paper.",
+  "folder": "silent",
+  "path": "game-src/art/bg/raw/silent/silent_floor.png",
+  "index": 5,
+  "total": 28,
+  "exists": false,
+  "base": "e28310ade087413525941e3cae667f6a54149977",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nFLOOR RULES\nSeamless tileable floor texture seen straight from above (top-down orthographic), 1024x1024. The left edge must continue into the right edge and the top into the bottom with no visible seam. Even lighting, no shadows of objects, no objects, no stains larger than a hand.\n\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nNO people, monsters, blood or gore. Ordinary Korean places inside an uncanny dimension-elevator building.\nPLACE: a hushed old reading hall of a 1980s Korean public library merged with a quiet traditional house; thick carpets, heavy curtains, everything muffled. PALETTE: deep green and dark wood brown with dull brass, cream paper.\nExactly 1024x1024 square. Entire canvas is one top-down material swatch, no border, no perspective, no room, no objects. Repeating large simple motifs that continue across opposite edges. No lighting vignette. Specific patches or puddles requested below override generic stain size restrictions.\nCreate ONLY silent_floor: dark green carpet with a worn wine-red runner pattern made of large simple shapes.",
+  "type": "floor",
+  "generator": "built-in image_gen",
+  "size": [
+    1024,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "26690a5a5ba73053c883f8da1e0e750eb108dbc983060df2d04b6772a47f4cb1",
+  "integration": "Raw production source; pixel conversion and game integration are separate."
+}
