@@ -2376,14 +2376,18 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
    안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
-.gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 22px; margin-left: 2px; padding: 0 7px 0 6px; border: 1px dashed rgba(255, 255, 255, .38); border-radius: 3px; background: rgba(8, 11, 13, .45); color: rgba(255, 255, 255, .72); font: 700 11px/1 var(--mono); letter-spacing: .02em; text-shadow: none; cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
-.gx-tgt svg { flex: none; }
-.gx-tgt .dot { opacity: 0; }
-.gx-tgt:hover { color: #fff; border-color: rgba(255, 255, 255, .7); }
-.gx-tgt.on { border-style: solid; border-color: #5fe6c6; background: rgba(95, 230, 198, .16); color: #5fe6c6; }
-.gx-tgt.on .dot { opacity: 1; }
-.gx-tgt.on:hover { background: rgba(95, 230, 198, .26); }
-.gx-evart-act > .gx-tgt { height: 30px; margin: 0 2px 0 0; }
+.gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
+.gx-tgt svg { display: block; }
+.gx-tgt .dot { fill: #ff3b30; opacity: 0; }
+.gx-tgt:hover { color: rgba(255, 255, 255, .9); }
+.gx-tgt.on { color: #fff; }
+.gx-tgt.on .dot { opacity: 1; animation: gx-tgt-rec 1.6s steps(1) infinite; }
+@keyframes gx-tgt-rec { 50% { opacity: .35; } }
+.gx-evbtn.gx-tgt { display: grid; place-items: center; padding: 0; width: 30px; height: 30px; margin: 0; border-radius: 9px; background: rgba(8, 12, 14, .58); color: #f2f6f5; }
+.gx-evbtn.gx-tgt:hover { background: rgba(8, 12, 14, .82); }
+.gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
 .gx-mx.open .gx-evart-name .gx-evart-l1 > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-opcap .gx-evart-l1 > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 10.5px; }
+.gx-evart-l1 > b:has(+ .gx-tgt), .gx-evart-l1 > .gx-tgt { align-self: baseline; }
+.gx-evart-l1 > .gx-tgt { height: auto; font-size: 12px; }

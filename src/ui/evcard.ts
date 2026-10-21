@@ -124,11 +124,11 @@ function artCard(c: EvCard): string {
     </div></li>`;
 }
 
-const TGT = '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle class="dot" cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>';
+const TGT = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle class="dot" cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>';
 /** 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 단추처럼 튀지 않게). 상태 딱지와 같은 기록지 도장 모양.
  *  안 고른 때는 흐린 점선 「목표 지정」, 고르면 민트색 「목표」. 다시 누르면 해제 */
-export function targetMark(on: boolean, action: string, value: string): string {
-  return `<button class="gx-tgt${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${on ? '목표 해제' : '목표로 지정'}">${TGT}<span>${on ? '목표' : '목표 지정'}</span></button>`;
+export function targetMark(on: boolean, action: string, value: string, btn = false): string {
+  return `<button class="${btn ? 'gx-evbtn ' : ''}gx-tgt${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${on ? '목표 해제' : '목표로 지정'}" aria-label="${on ? '목표 해제' : '목표로 지정'}">${TGT}${btn ? '' : `<span>${on ? '해제' : '선택'}</span>`}</button>`;
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 정사각 그림 안에 버튼·요원·상황 글·문서 요약 전부.
@@ -243,7 +243,7 @@ function evBtns(c: OpsCard): string {
 
 /** 위성 보기: 제목이 없어 오른쪽 위 단추 줄 맨 앞에 같은 표식 */
 function opsPick(c: OpsCard | undefined): string {
-  return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : '';
+  return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
 }
 
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
