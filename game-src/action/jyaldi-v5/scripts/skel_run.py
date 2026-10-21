@@ -37,6 +37,11 @@ def run(name,seed=7):
         r=mcp.tool('get_image',{'job_id':j,'index':i}); im=[x for x in r['result']['content'] if x.get('type')=='image']
         if im: open(f'../skel/{name}-{keys[i]}.png','wb').write(base64.b64decode(im[0]['data']))
     print('done',txt[:200].replace('\n',' | '),flush=True)
+import skel3
+skel2.KEY.update({n:p for n,p in skel3.COMBO+skel3.WALK})
+JOBS['combo2']=('three-punch boxing combo stepping forward: jab, cross, lead power straight',[n for n,_ in skel3.COMBO])
+JOBS['walk']=('boxing footwork step forward in guard: lead foot steps, rear foot follows',[n for n,_ in skel3.WALK])
+
 if __name__=='__main__':
     print('before',mcp.text(mcp.tool('get_balance',{})).split('\n')[1])
     for n in sys.argv[1:]: run(n)
