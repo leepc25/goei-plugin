@@ -194,10 +194,14 @@ def apply(key, fr, pr=None, src=None, idx=None):
             fr[i] = Image.fromarray(a); pr[i] = Image.fromarray(b)
     if key == 'shower':
         fr = [recolor_hair(f) if i < 3 else f for i, f in enumerate(fr)]
-    if key == 'pipe':                          # 결함 1: 파이프 빠진 장에 뼈대 손목 따라 덧그림
-        for i, raw in ((0, 1), (2, 2)):   # (최종 장, 원본 장): 빌더 order=[1, 0, 2, 3]
-            if i < len(fr):
-                w, e, _, _ = wrists('pipe2', raw); fr[i] = over(fr[i], lambda d, im: pipe_line(d, w, e))
+    if key == 'pipe':                          # 재생성본(28e8170)엔 파이프가 다 그려져 있음 → 옛 덧그림은 겹쳐 두 자루가 돼서 뺌. 떨어진 1px 선만 지움
+        fr = [keep_main(f) for f in fr]
+        for i, f in enumerate(fr):             # 내려친 장 손 위로 솟은 1px 세로선
+            a = np.array(f); col = a[55:92, 100:116]
+            for x in range(1, col.shape[1] - 1):
+                thin = (col[:, x, 3] > 0) & (col[:, x - 1, 3] == 0) & (col[:, x + 1, 3] == 0)
+                if thin.sum() >= 6: col[thin, x] = 0
+            fr[i] = Image.fromarray(a)
     if 'brick' in key:                         # 결함 23
         fr = [replace_red(f) for f in fr]
     if key == 'reload':                        # 결함 21: 뒷손에 탄창
