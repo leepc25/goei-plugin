@@ -19,6 +19,7 @@ import { StoryUI, TalkPanel, type Anchor } from './ui';
 export type { AgentId, Flags, StoryEvent } from './types';
 export type { TalkModel, TalkNpcId } from './ai';
 export { CUTSCENES } from './scripts/cutscenes';
+export { VIDEOS } from './scripts/videos';
 export { AGENTS, AGENT_LINES, agentLine } from './lines/agents';
 export { hqLines, stageHooks } from './hooks';
 
