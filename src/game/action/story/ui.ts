@@ -42,7 +42,7 @@ export class StoryUI {
     const el = document.createElement('div');
     el.className = 'gsy';
     el.innerHTML = `<div class="gsy-fade"></div><div class="gsy-bubbles"></div><div class="gsy-caption" hidden></div>
-<button class="gsy-skip" hidden>건너뛰기 ▶▶</button>
+<button class="gsy-skip gk-btn" hidden>건너뛰기 ▶▶</button>
 <div class="gsy-dock"><div class="gsy-choices" hidden></div>
 <div class="gsy-box" hidden role="dialog" aria-live="polite"><div class="gsy-photo"></div><div class="gsy-body"><b class="gsy-name"></b><p class="gsy-text"></p></div><i class="gsy-next">▼</i></div></div>`;
     root.append(el);

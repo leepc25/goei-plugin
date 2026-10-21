@@ -2,6 +2,7 @@
 // 컷 = 폴더 <컷>/ 안의 0001.png, 0002.png …(장마다 640×360) + timing.json {ms: [장별 ms], loop?: [처음, 끝](1부터)}.
 // 첫 컷을 못 불러오면 바로 끝낸다.
 import type { VideoSub } from './scripts/videos';
+import { ensureKit } from '../ui/kit';
 
 const W = 640;
 const H = 360;
@@ -40,9 +41,10 @@ export class VideoPlayer {
     const el = document.createElement('div');
     el.className = 'gsy-video';
     el.hidden = true;
-    el.innerHTML = `<canvas width="${W}" height="${H}"></canvas><p class="gsy-vsub" hidden></p>
-<button class="gsy-vsound" hidden>🔊 소리 켜기</button><button class="gsy-vskip">건너뛰기 ▶▶</button>`;
+    el.innerHTML = `<canvas width="${W}" height="${H}"></canvas><p class="gsy-vsub gk-panel gk-font" hidden></p>
+<button class="gsy-vsound gk-btn" hidden>소리 켜기</button><button class="gsy-vskip gk-btn">건너뛰기 ▶▶</button>`;
     root.append(el);
+    ensureKit();
     this.el = el;
     this.canvas = el.querySelector('canvas')!;
     this.ctx = this.canvas.getContext('2d')!;
