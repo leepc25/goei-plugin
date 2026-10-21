@@ -14548,24 +14548,39 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers) {
       break;
     }
     case "low": {
-      const py = y0 - 230, ph = 46;
-      ctx.fillStyle = "#2a2b2c";
-      for (let x = t.x0 + 60; x < t.x1 - 30; x += 160) ctx.fillRect(x, 0, 6, py + 4);
-      const g2 = ctx.createLinearGradient(0, py, 0, py + ph);
-      g2.addColorStop(0, "#5d6264");
-      g2.addColorStop(0.3, "#a3a8a6");
-      g2.addColorStop(0.55, "#6f7573");
-      g2.addColorStop(1, "#2c3031");
-      ctx.fillStyle = g2;
-      ctx.fillRect(t.x0, py, w, ph);
-      for (let x = t.x0 + 20; x < t.x1 - 10; x += 120) {
-        ctx.fillStyle = "#3a3d3e";
-        ctx.fillRect(x, py - 5, 14, ph + 10);
-        ctx.fillStyle = "#8c918f";
-        ctx.fillRect(x + 2, py - 3, 3, ph + 6);
+      const py = Math.round((y0 - 232) / 4) * 4;
+      const bands = [[4, "#2a2d2e"], [8, "#5f6567"], [4, "#9aa09e"], [4, "#c3c7c4"], [8, "#7c8280"], [8, "#5a6062"], [6, "#3c4143"], [4, "#222527"]];
+      const x0 = Math.round(t.x0 / 4) * 4, x1 = Math.round(t.x1 / 4) * 4;
+      for (let x = x0 + 64; x < x1 - 40; x += 160) {
+        ctx.fillStyle = "#1e2021";
+        ctx.fillRect(x, 0, 8, py);
+        ctx.fillStyle = "#4a4f51";
+        ctx.fillRect(x + 2, 0, 2, py);
+        ctx.fillStyle = "#1e2021";
+        ctx.fillRect(x - 8, py - 8, 24, 8);
       }
-      ctx.fillStyle = "rgba(120,70,40,0.35)";
-      for (let x = t.x0 + 70; x < t.x1; x += 210) ctx.fillRect(x, py + ph - 10, 26, 8);
+      let y = py;
+      for (const [h, c] of bands) {
+        ctx.fillStyle = c;
+        ctx.fillRect(x0, y, x1 - x0, h);
+        y += h;
+      }
+      const ph = y - py;
+      for (let x = x0 + 24; x < x1 - 16; x += 128) {
+        ctx.fillStyle = "#2f3335";
+        ctx.fillRect(x, py - 4, 16, ph + 8);
+        ctx.fillStyle = "#8d9290";
+        ctx.fillRect(x + 4, py - 4, 4, ph + 8);
+        ctx.fillStyle = "#c9ccc9";
+        for (let ry = py + 4; ry < py + ph - 4; ry += 12) ctx.fillRect(x + 10, ry, 4, 4);
+      }
+      for (let x = x0 + 72; x < x1 - 20; x += 196) {
+        ctx.fillStyle = "#7a4a2a";
+        ctx.fillRect(x, py + ph - 16, 12, 8);
+        ctx.fillRect(x + 4, py + ph - 8, 4, 8);
+        ctx.fillStyle = "#5a3420";
+        ctx.fillRect(x + 12, py + ph - 12, 8, 4);
+      }
       break;
     }
     case "narrow": {
@@ -20919,8 +20934,7 @@ function hqAdapter(saves, bridge, ui) {
             return "정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.";
           }
         } : void 0,
-        closed: () => {
-        },
+        closed: () => ui.closed?.(),
         goto: (id) => hub.goto(id)
       }, { walk: false });
     },
@@ -20994,7 +21008,11 @@ function engineModules(box3, bridge) {
     synth: true,
     title: "차원 승강기",
     sub: "ANOMALY SIMULATION · 관리국 액션",
-    onNew: () => game?.start_new(),
+    onNew: () => {
+      for (const k of Object.keys(story.flags)) if (k.startsWith("cut_") || k === "told_rope") delete story.flags[k];
+      saveFlags();
+      game?.start_new();
+    },
     onContinue: () => game?.start_new(),
     hasSave: hasSaved,
     onRetreat: () => game?.endRun("withdraw"),
@@ -21162,7 +21180,22 @@ function engineModules(box3, bridge) {
     e.stopImmediatePropagation();
   };
   window.addEventListener("keydown", floorKeys, true);
-  const hq2 = hqAdapter(saves, bridge, { chooseFloor, sfx: (n) => audio.play(n) });
+  const canFilm = () => location.protocol !== "file:";
+  const cutOnce = (id, done2) => {
+    if (!CUTSCENES[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+    story.flags[`cut_${id}`] = 1;
+    saveFlags();
+    story.cutscene(id, done2);
+    return true;
+  };
+  let dinnerDue = false;
+  const hq2 = hqAdapter(saves, bridge, {
+    chooseFloor,
+    sfx: (n) => audio.play(n),
+    closed: () => {
+      if (dinnerDue) dinnerDue = false, cutOnce("dinner");
+    }
+  });
   const hqKeys = (e) => {
     if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
     hq2.close();
@@ -21170,6 +21203,22 @@ function engineModules(box3, bridge) {
     e.stopImmediatePropagation();
   };
   window.addEventListener("keydown", hqKeys, true);
+  let openingT = null;
+  const armOpening = () => {
+    if (openingT) clearTimeout(openingT);
+    openingT = null;
+    if (!CUTSCENES.opening || !canFilm()) return;
+    openingT = setTimeout(() => {
+      openingT = null;
+      if (shell.mode !== "title" || story.isBlocking()) return armOpening();
+      story.cutscene("opening", () => shell.mode === "title" && armOpening());
+    }, 2e4);
+  };
+  const titleInput = () => {
+    if (openingT && shell.mode === "title") armOpening();
+  };
+  window.addEventListener("keydown", titleInput, true);
+  window.addEventListener("pointerdown", titleInput, true);
   const listeners = [
     (e) => {
       audio.event(e);
@@ -21177,6 +21226,11 @@ function engineModules(box3, bridge) {
       shell.fx.onGameEvent(e);
       story.event(e.type, e);
       if (e.type === "run:end") saveFlags();
+      if (e.type === "enter:floor" && world) {
+        const f = world.floor;
+        if (f.id.startsWith("ending")) cutOnce("exit");
+        else if ((f.depth ?? 0) >= 2) cutOnce("first_call");
+      }
     }
   ];
   const mods = {
@@ -21188,7 +21242,10 @@ function engineModules(box3, bridge) {
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
-    openTitle: () => shell.openTitle(),
+    openTitle: () => {
+      shell.openTitle();
+      armOpening();
+    },
     onPlay: () => shell.play(),
     frame: (dt) => {
       syncVolume();
@@ -21226,12 +21283,12 @@ function engineModules(box3, bridge) {
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent;
-      if (run.stageId !== "hq" && run.launch && local("goei-first-entry").load() !== "1") {
-        local("goei-first-entry").save("1");
+      if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
+        story.flags.told_rope = 1;
         const rope = () => world === w && w.say("(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.", 3);
-        if (CUTSCENES.first_entry && location.protocol !== "file:") story.cutscene("first_entry", () => setTimeout(rope, 1200));
-        else setTimeout(rope, 4600);
+        if (!cutOnce("first_entry", () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
       }
+      if (run.stageId === "hq") setTimeout(() => world === w && cutOnce("first_day"), 600);
       w.hitFx = false;
       if (run.stageId === "hq") return;
       w.notes.runId = `${run.seed}`;
@@ -21272,8 +21329,8 @@ function engineModules(box3, bridge) {
     afterRun: (how, done2) => {
       let fired = false;
       const once = () => fired ? void 0 : (fired = true, done2());
-      story.cutscene(how === "evac" ? "evac" : "return", once);
-      setTimeout(() => !story.isBlocking() && once(), 400);
+      if (how === "return" && world?.notes.missionDone !== false) dinnerDue = !story.flags.cut_dinner;
+      if (!cutOnce(how === "evac" ? "evac" : "attic", once)) once();
     },
     drawIdle: (name, ctx, t) => {
       if (name === "title") drawTitleBg(ctx, t);
@@ -21287,6 +21344,9 @@ function engineModules(box3, bridge) {
       world = null;
       game = null;
       window.removeEventListener("keydown", storyKeys, true);
+      window.removeEventListener("keydown", titleInput, true);
+      window.removeEventListener("pointerdown", titleInput, true);
+      if (openingT) clearTimeout(openingT);
       window.removeEventListener("keydown", hqKeys, true);
       window.removeEventListener("keydown", floorKeys, true);
       saveFlags();

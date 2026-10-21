@@ -415,26 +415,44 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       break;
     }
     case 'low': {
-      // 머리 높이로 내려온 굵은 배관: 둥근 음영, 이음 고리, 천장에 매단 걸쇠 (바닥 띠·글씨 없음, 검수 4-3)
-      const py = y0 - 230,
-        ph = 46;
-      ctx.fillStyle = '#2a2b2c';
-      for (let x = t.x0 + 60; x < t.x1 - 30; x += 160) ctx.fillRect(x, 0, 6, py + 4);
-      const g = ctx.createLinearGradient(0, py, 0, py + ph);
-      g.addColorStop(0, '#5d6264');
-      g.addColorStop(0.3, '#a3a8a6');
-      g.addColorStop(0.55, '#6f7573');
-      g.addColorStop(1, '#2c3031');
-      ctx.fillStyle = g;
-      ctx.fillRect(t.x0, py, w, ph);
-      for (let x = t.x0 + 20; x < t.x1 - 10; x += 120) {
-        ctx.fillStyle = '#3a3d3e';
-        ctx.fillRect(x, py - 5, 14, ph + 10);
-        ctx.fillStyle = '#8c918f';
-        ctx.fillRect(x + 2, py - 3, 3, ph + 6);
+      // 머리 높이로 내려온 굵은 배관 (도트: 4px 단위 색 띠, 이음 고리, 리벳, 녹 얼룩, 천장 걸쇠). 매끈한 그라데이션 금지 (검수 10)
+      const py = Math.round((y0 - 232) / 4) * 4;
+      const bands: [number, string][] = [[4, '#2a2d2e'], [8, '#5f6567'], [4, '#9aa09e'], [4, '#c3c7c4'], [8, '#7c8280'], [8, '#5a6062'], [6, '#3c4143'], [4, '#222527']];
+      const x0 = Math.round(t.x0 / 4) * 4,
+        x1 = Math.round(t.x1 / 4) * 4;
+      // 걸쇠: 천장에서 내려오는 각진 막대 + 배관을 감싼 띠쇠
+      for (let x = x0 + 64; x < x1 - 40; x += 160) {
+        ctx.fillStyle = '#1e2021';
+        ctx.fillRect(x, 0, 8, py);
+        ctx.fillStyle = '#4a4f51';
+        ctx.fillRect(x + 2, 0, 2, py);
+        ctx.fillStyle = '#1e2021';
+        ctx.fillRect(x - 8, py - 8, 24, 8);
       }
-      ctx.fillStyle = 'rgba(120,70,40,0.35)';
-      for (let x = t.x0 + 70; x < t.x1; x += 210) ctx.fillRect(x, py + ph - 10, 26, 8);
+      let y = py;
+      for (const [h, c] of bands) {
+        ctx.fillStyle = c;
+        ctx.fillRect(x0, y, x1 - x0, h);
+        y += h;
+      }
+      const ph = y - py;
+      // 이음 고리(플랜지)와 리벳
+      for (let x = x0 + 24; x < x1 - 16; x += 128) {
+        ctx.fillStyle = '#2f3335';
+        ctx.fillRect(x, py - 4, 16, ph + 8);
+        ctx.fillStyle = '#8d9290';
+        ctx.fillRect(x + 4, py - 4, 4, ph + 8);
+        ctx.fillStyle = '#c9ccc9';
+        for (let ry = py + 4; ry < py + ph - 4; ry += 12) ctx.fillRect(x + 10, ry, 4, 4);
+      }
+      // 녹 얼룩·물방울 자국 (도트 덩어리)
+      for (let x = x0 + 72; x < x1 - 20; x += 196) {
+        ctx.fillStyle = '#7a4a2a';
+        ctx.fillRect(x, py + ph - 16, 12, 8);
+        ctx.fillRect(x + 4, py + ph - 8, 4, 8);
+        ctx.fillStyle = '#5a3420';
+        ctx.fillRect(x + 12, py + ph - 12, 8, 4);
+      }
       break;
     }
     case 'narrow': {

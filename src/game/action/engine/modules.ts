@@ -45,7 +45,7 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void }): HqModuleLike & { close(): void; goto(place: string): void } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -85,7 +85,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
               },
             } as never
           : undefined,
-        closed: () => {},
+        closed: () => ui.closed?.(),
         goto: (id: string) => hub.goto(id),
       }, { walk: false });
     },
@@ -172,7 +172,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     synth: true,
     title: '차원 승강기',
     sub: 'ANOMALY SIMULATION · 관리국 액션',
-    onNew: () => game?.start_new(),
+    onNew: () => {
+      // 새 저장: 영상 깃발을 지운다 (저장마다 한 번)
+      for (const k of Object.keys(story.flags)) if (k.startsWith('cut_') || k === 'told_rope') delete story.flags[k];
+      saveFlags();
+      game?.start_new();
+    },
     onContinue: () => game?.start_new(),
     hasSave: hasSaved,
     onRetreat: () => game?.endRun('withdraw'),
@@ -352,7 +357,25 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', floorKeys, true);
-  const hq = hqAdapter(saves, bridge, { chooseFloor, sfx: (n) => audio.play(n as never) });
+  /* 도트 영상 컷신 자리 (지휘자 결정, 검수10): 한 전환에 하나, 저장마다 한 번(이야기 깃발 cut_<id>), 늘 건너뛰기.
+     opening = 제목 화면 대기 오프닝(반복) · first_day = 새 저장 첫 본부 · first_entry = 첫 출동 · first_call = 처음 L2 이상
+     attic = 첫 로프 귀환 · exit = 출구 층 · dinner = 첫 임무 성공 정산 뒤 · evac = 첫 후송 */
+  const canFilm = () => location.protocol !== 'file:'; // file:// 시연판은 프레임 목록을 못 읽는다
+  const cutOnce = (id: string, done?: () => void): boolean => {
+    if (!CUTSCENES[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
+    story.flags[`cut_${id}`] = 1;
+    saveFlags();
+    story.cutscene(id, done);
+    return true;
+  };
+  let dinnerDue = false;
+  const hq = hqAdapter(saves, bridge, {
+    chooseFloor,
+    sfx: (n) => audio.play(n as never),
+    closed: () => {
+      if (dinnerDue) (dinnerDue = false), cutOnce('dinner');
+    },
+  });
   // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
   const hqKeys = (e: KeyboardEvent) => {
     if (e.code !== 'Escape' || !game?.inHub || !hq.isOpen?.()) return;
@@ -361,6 +384,23 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', hqKeys, true);
+  // 오락실 오프닝: 제목 화면에서 20초 가만히 있으면 opening 영상, 끝나면 다시 기다린다. 아무 입력이나 대기 시간을 처음부터
+  let openingT: ReturnType<typeof setTimeout> | null = null;
+  const armOpening = () => {
+    if (openingT) clearTimeout(openingT);
+    openingT = null;
+    if (!CUTSCENES.opening || !canFilm()) return;
+    openingT = setTimeout(() => {
+      openingT = null;
+      if (shell.mode !== 'title' || story.isBlocking()) return armOpening();
+      story.cutscene('opening', () => shell.mode === 'title' && armOpening());
+    }, 20000);
+  };
+  const titleInput = () => {
+    if (openingT && shell.mode === 'title') armOpening();
+  };
+  window.addEventListener('keydown', titleInput, true);
+  window.addEventListener('pointerdown', titleInput, true);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -368,6 +408,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.onGameEvent(e as never);
       story.event(e.type, e as never);
       if (e.type === 'run:end') saveFlags();
+      if (e.type === 'enter:floor' && world) {
+        const f = world.floor;
+        if (f.id.startsWith('ending')) cutOnce('exit');
+        else if ((f.depth ?? 0) >= 2) cutOnce('first_call');
+      }
     },
   ];
   const mods: EngineModules = {
@@ -379,7 +424,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
-    openTitle: () => shell.openTitle(),
+    openTitle: () => {
+      shell.openTitle();
+      armOpening();
+    },
     onPlay: () => shell.play(),
     frame: (dt) => {
       syncVolume();
@@ -418,14 +466,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent as AgentId;
-      // 첫 출동: GPT 도트 영상 컷신 first_entry (프레임 팩이 생겨 검은 화면이 아니다). 끝나면 로프 안내 자막 한 줄
-      if (run.stageId !== 'hq' && (run as Launch).launch && local('goei-first-entry').load() !== '1') {
-        local('goei-first-entry').save('1');
+      // 첫 출동: 도트 영상 first_entry, 끝나면 로프 안내 자막 한 줄 (영상을 못 틀면 자막만)
+      if (run.stageId !== 'hq' && (run as Launch).launch && !story.flags.told_rope) {
+        story.flags.told_rope = 1;
         const rope = () => world === w && w.say('(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.', 3);
-        // file:// 로 연 시연판은 프레임 목록(index.json)을 못 읽으므로 자막만
-        if (CUTSCENES.first_entry && location.protocol !== 'file:') story.cutscene('first_entry', () => setTimeout(rope, 1200));
-        else setTimeout(rope, 4600);
+        if (!cutOnce('first_entry', () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
       }
+      // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
+      if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
@@ -468,8 +516,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     afterRun: (how, done) => {
       let fired = false;
       const once = () => (fired ? undefined : ((fired = true), done()));
-      story.cutscene(how === 'evac' ? 'evac' : 'return', once);
-      setTimeout(() => !story.isBlocking() && once(), 400); // 컷신이 없거나 바로 끝나면
+      // 첫 후송 = evac, 첫 로프 귀환(귀환·철수) = attic. 그 밖엔 영상 없이 바로 정산. 첫 임무 성공이면 정산 창을 닫은 뒤 dinner
+      if (how === 'return' && world?.notes.missionDone !== false) dinnerDue = !story.flags.cut_dinner;
+      if (!cutOnce(how === 'evac' ? 'evac' : 'attic', once)) once();
     },
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
@@ -483,6 +532,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       world = null;
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
+      window.removeEventListener('keydown', titleInput, true);
+      window.removeEventListener('pointerdown', titleInput, true);
+      if (openingT) clearTimeout(openingT);
       window.removeEventListener('keydown', hqKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
