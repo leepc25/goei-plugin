@@ -2156,6 +2156,7 @@ var Game = class {
       this.hqRoot.hidden = !hq2.isOpen?.();
       this.hqRoot.classList.add("goei-engine-hq-panel");
       this.canvas.style.visibility = "";
+      this.inHub = true;
       const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
       for (const l of this.mods.listeners ?? []) w.on(l);
       this.mods.onWorld?.(w, run);
@@ -4411,7 +4412,11 @@ function createGameAudio(opts = {}) {
       graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
     }
   }
+  let wantSong = null;
   function ensure() {
+    return disposed ? null : out;
+  }
+  function create() {
     if (disposed) return null;
     if (out) return out;
     const AC = window.AudioContext ?? window.webkitAudioContext;
@@ -4428,8 +4433,16 @@ function createGameAudio(opts = {}) {
     return out;
   }
   async function unlock() {
-    const o = ensure();
+    const fresh = !out;
+    const o = create();
     if (!o || !ctx) return false;
+    if (fresh) {
+      if (scene) {
+        amb = startAmbience(o, scene);
+        music(SCENE_SONG[scene], 1.2);
+      } else if (wantSong) music(wantSong);
+      wantSong = null;
+    }
     try {
       const nav = navigator;
       if (nav.audioSession && nav.audioSession.type !== "playback") nav.audioSession.type = "playback";
@@ -4524,7 +4537,10 @@ function createGameAudio(opts = {}) {
   }
   function music(id, fade = 1) {
     const o = ensure();
-    if (!o || !ctx) return;
+    if (!o || !ctx) {
+      wantSong = id;
+      return;
+    }
     clearTimeout(jingleTimer);
     resumeSong = null;
     if (song?.id === id && !song.player.ended) return;
@@ -4559,10 +4575,10 @@ function createGameAudio(opts = {}) {
     g2.setTargetAtTime(1, t + sec, 0.3);
   }
   function floor(s2) {
-    const o = ensure();
-    if (!o) return;
     if (s2 === scene) return;
     scene = s2;
+    const o = ensure();
+    if (!o) return;
     amb?.stop();
     amb = s2 ? startAmbience(o, s2) : null;
     music(s2 ? SCENE_SONG[s2] : null, 1.2);
@@ -5764,7 +5780,7 @@ function idbSaves(dbName = "goei-hq-demo") {
 }
 
 // src/game/action/ui/ui.css
-var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.62); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.item u { position: absolute; right: 6px; bottom: 4px; text-decoration: none; font-size: calc(var(--tp-u) * 0.18); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 7px; top: 4px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
+var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.17); }\n.tp-b.item u { position: absolute; right: 5px; bottom: 2px; text-decoration: none; font-size: calc(var(--tp-u) * 0.16); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 6px; top: 2px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
 
 // src/game/action/ui/stage.ts
 var W = 1280;
@@ -5793,8 +5809,8 @@ function mountStage(box2) {
   const fns = [];
   let keepPortrait = false;
   let fill = false;
-  let turn = false;
   const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+  let turn = coarse();
   const s2 = {
     root,
     stage: stageEl,
@@ -7317,7 +7333,7 @@ var DEFAULT_SETTINGS2 = {
   sfx: 0.9,
   touch: "auto",
   touchSize: 1,
-  touchAlpha: 0.75,
+  touchAlpha: 0.55,
   stickRun: true,
   lefty: false,
   vibrate: true,
@@ -7438,6 +7454,7 @@ var TouchPad = class {
     const vw = this.vw();
     const scale = Math.min(bw / vw, bh / 720);
     const stageW = vw * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s2.touchSize;
     const u = this.u;
     const flip = s2.lefty ? -1 : 1;
@@ -7482,12 +7499,52 @@ var TouchPad = class {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.restBase();
   }
+  /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+   *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  layoutSide(bw, bh, side) {
+    const s2 = this.st();
+    const g2 = 4;
+    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g2) / 5.55)) * s2.touchSize;
+    const u = this.u;
+    this.root.style.setProperty("--tp-u", `${u}px`);
+    this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+    const edge2 = 6;
+    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge2 - u * 0.6;
+    const colL = side >= u * 0.7 ? side / 2 : edge2 + u * 0.36;
+    const mir = (x) => s2.lefty ? bw - x : x;
+    const place2 = (id, cx, cy, d2) => {
+      const b = this.btns.find((x) => x.id === id);
+      const r = d2 * u / 2;
+      cx = mir(cx);
+      Object.assign(b, { cx, cy, r });
+      const el = b.el;
+      el.style.width = el.style.height = `${r * 2}px`;
+      el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+    };
+    const stack = (ids, x, d2, fromBottom) => {
+      let y = fromBottom ? bh - edge2 : edge2;
+      ids.forEach((id, i) => {
+        const r = d2[i] * u / 2;
+        y += fromBottom ? -r : r;
+        place2(id, x, y, d2[i]);
+        y += fromBottom ? -r - g2 : r + g2;
+      });
+    };
+    stack(["attack", "jump", "evade", "shoot", "unique", "ult"], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
+    const inner = colR - Math.max(side, u * 1.15) / 2 - g2 - u * 0.4;
+    stack(["guard", "interact", "reload", "support"], inner, [0.8, 0.8, 0.8, 0.8], true);
+    stack(["menu", "map", "item1", "item2", "item3", "item4"], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    const zw = bw * 0.42, zt = bh * 0.3;
+    this.zr = { x: s2.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+    Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.restBase();
+  }
   restBase() {
     const s2 = this.st();
     const zr = this.zr;
     const u = this.u;
-    const x = s2.lefty ? zr.w - u * 1.25 : u * 1.25;
-    const y = zr.h - u * 1.25;
+    const x = s2.lefty ? zr.w - u * 1.55 : u * 1.55;
+    const y = zr.h - u * 1;
     this.placeBase(x, y);
     this.knob.style.transform = "";
     this.base.classList.remove("on");
@@ -7678,6 +7735,54 @@ var TouchPad = class {
   }
 };
 
+// src/game/action/ui/title.ts
+function drawTitleBg(c, t) {
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  const W4 = c.canvas.width, H5 = c.canvas.height;
+  const g2 = c.createLinearGradient(0, 0, 0, H5);
+  g2.addColorStop(0, "#0b1014");
+  g2.addColorStop(1, "#1a1410");
+  c.fillStyle = g2;
+  c.fillRect(0, 0, W4, H5);
+  const dx = 820, dw = 340, dy = 170, dh = 470;
+  c.fillStyle = "#2a2f33";
+  c.fillRect(dx - 30, dy - 30, dw + 60, dh + 30);
+  const open = Math.max(0, Math.sin(t * 0.35)) ** 6 * 30;
+  for (const side of [0, 1]) {
+    const x = side ? dx + dw / 2 + open : dx - open;
+    const dg = c.createLinearGradient(x, 0, x + dw / 2, 0);
+    dg.addColorStop(0, "#4c5458");
+    dg.addColorStop(1, "#3a4044");
+    c.fillStyle = dg;
+    c.fillRect(x, dy, dw / 2, dh);
+  }
+  c.fillStyle = "#000";
+  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
+  c.fillStyle = "rgba(255,60,30,0.25)";
+  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
+  c.fillStyle = "#100604";
+  c.fillRect(dx + dw / 2 - 70, dy - 110, 140, 60);
+  const flick = Math.sin(t * 13) > 0.92 || Math.sin(t * 2.1) > 0.97;
+  const floors = ["1", "B1", "B3", "B7", "B12", "??"];
+  label(c, flick ? floors[Math.floor(t * 7) % floors.length] : floors[Math.floor(t / 3) % floors.length], dx + dw / 2, dy - 66, 36, flick ? "#ff3020" : "#ff8a40", "center", 900);
+  c.fillStyle = "#d8d0bc";
+  c.fillRect(dx - 110, dy + 120, 60, 84);
+  c.fillStyle = "rgba(0,0,0,0.5)";
+  for (let i = 0; i < 6; i++) c.fillRect(dx - 104, dy + 132 + i * 11, 48, 2);
+  c.fillStyle = "rgba(236,230,212,0.25)";
+  for (let i = 0; i < 40; i++) {
+    const x = (i * 197 + t * 12 * (1 + i % 3)) % W4, y = (i * 131 + t * 8 * (1 + i % 2)) % H5;
+    c.fillRect(x, y, 2, 2);
+  }
+  const v = c.createRadialGradient(W4 / 2, H5 / 2, H5 * 0.3, W4 / 2, H5 / 2, H5);
+  v.addColorStop(0, "rgba(0,0,0,0)");
+  v.addColorStop(1, "rgba(0,0,0,0.75)");
+  c.fillStyle = v;
+  c.fillRect(0, 0, W4, H5);
+  c.restore();
+}
+
 // src/game/action/ui/index.ts
 function mountGameShell(box2, o = {}) {
   const stage = mountStage(box2);
@@ -7816,7 +7921,7 @@ function mountGameShell(box2, o = {}) {
         id: "title",
         look: "title",
         title: o.title ?? "차원 승강기",
-        sub: o.sub ?? "띵. 1층입니다. 문이 열립니다.",
+        sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
         noBack: true,
         items: [
           ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
@@ -10749,13 +10854,13 @@ var ROSTER_BY_KIND = Object.fromEntries(ROSTER.map((d2) => [d2.kind, d2]));
 // src/game/action/enemy/index.ts
 var ALL_DEFS = [...ROSTER, ...GUARDIANS];
 var DEF_BY_KIND = Object.fromEntries(ALL_DEFS.map((d2) => [d2.kind, d2]));
-function createEnemy(kind, x, y, rng3, opts = {}) {
+function createEnemy(kind, x, y, rng2, opts = {}) {
   const def = DEF_BY_KIND[kind];
   if (!def) throw new Error(`unknown enemy kind: ${kind}`);
   const brain = GUARDIAN_BRAINS[kind] ?? AI_BRAINS[def.ai] ?? AI_BRAINS.rush;
   const AFF = ["bleed", "armor", "fast", "regen"];
-  const affixes = opts.elite ? opts.affixes ?? [AFF[Math.floor(rng3() * AFF.length)]] : [];
-  const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng3 });
+  const affixes = opts.elite ? opts.affixes ?? [AFF[Math.floor(rng2() * AFF.length)]] : [];
+  const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng2 });
   return e;
 }
 setSpawner((w, kind, x, y, opts) => {
@@ -13167,14 +13272,14 @@ var StoryRunner = class {
     return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
   }
   run() {
-    const { flags, rng: rng3 } = this.ctx;
+    const { flags, rng: rng2 } = this.ctx;
     for (let guard3 = 0; guard3 < 2e3; guard3++) {
       const top = this.stack[this.stack.length - 1];
       if (!top) {
         delete flags.d100;
         return { kind: "end" };
       }
-      flags.d100 = Math.floor(rng3() * 100);
+      flags.d100 = Math.floor(rng2() * 100);
       const n = top.script.nodes[top.pc];
       if (!n) {
         this.stack.pop();
@@ -13185,9 +13290,9 @@ var StoryRunner = class {
         case "say":
           return this.say(n);
         case "pick":
-          return this.say(n.lines[Math.floor(rng3() * n.lines.length) % n.lines.length]);
+          return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
         case "agentline": {
-          const text = this.ctx.agentLine(this.ctx.agent, n.tag, rng3);
+          const text = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
           if (!text) break;
           const who = n.who === "agent" ? this.ctx.agent : n.who;
           return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text), mood: "base" };
@@ -14506,11 +14611,11 @@ var FALLBACK3 = {
   down: "hp_low",
   pick: "offer"
 };
-function agentLine(agent, tag, rng3 = Math.random) {
+function agentLine(agent, tag, rng2 = Math.random) {
   let t = tag;
   for (let i = 0; i < 3; i++) {
     const list = AGENT_LINES[agent]?.[t];
-    if (list?.length) return list[Math.floor(rng3() * list.length) % list.length];
+    if (list?.length) return list[Math.floor(rng2() * list.length) % list.length];
     const f = FALLBACK3[t];
     if (!f) break;
     t = f;
@@ -14675,10 +14780,10 @@ var ELEVATOR = {
 function floorLabel(depth) {
   return depth <= 3 ? `${Math.max(1, depth)}층` : `B-${depth - 3}`;
 }
-function announce2(depth, rng3 = Math.random) {
+function announce2(depth, rng2 = Math.random) {
   const label3 = floorLabel(depth);
   const base = depth <= 3 ? [`띵. ${label3}입니다. 문이 열립니다.`] : [`띵. ${label3}입니다. 문이 열립니다.`, `띵. ${label3}. 내리실 분은… 내리세요.`, `${label3}입니다. 잘 다녀와요.`];
-  return base[Math.floor(rng3() * base.length) % base.length];
+  return base[Math.floor(rng2() * base.length) % base.length];
 }
 var TYPE_HINTS = {
   lobby: ["평범한 층이에요. 평범한 게 제일 위험하대요.", "시계를 보세요. 아, 보지 마세요."],
@@ -14692,14 +14797,14 @@ var TYPE_HINTS = {
 };
 
 // src/game/action/story/lines/index.ts
-var pick3 = (list, rng3) => list?.length ? list[Math.floor(rng3() * list.length) % list.length] : void 0;
-function lookupLine(agent, tag, flags, rng3) {
-  if (!tag.startsWith("el:")) return agentLine(agent, tag, rng3);
+var pick3 = (list, rng2) => list?.length ? list[Math.floor(rng2() * list.length) % list.length] : void 0;
+function lookupLine(agent, tag, flags, rng2) {
+  if (!tag.startsWith("el:")) return agentLine(agent, tag, rng2);
   const key = tag.slice(3);
   const favor = Math.max(-3, Math.min(3, Number(flags.favor) || 0));
   switch (key) {
     case "board":
-      return pick3(BOARD_BY_FAVOR[String(favor)], rng3);
+      return pick3(BOARD_BY_FAVOR[String(favor)], rng2);
     case "call": {
       const k = `calls.${agent}`;
       const n = Number(flags[k]) || 0;
@@ -14707,17 +14812,17 @@ function lookupLine(agent, tag, flags, rng3) {
       return CALLS[agent][n % CALLS[agent].length];
     }
     case "favor_high":
-      return pick3(FAVOR_LINES[agent].high, rng3);
+      return pick3(FAVOR_LINES[agent].high, rng2);
     case "favor_low":
-      return pick3(FAVOR_LINES[agent].low, rng3);
+      return pick3(FAVOR_LINES[agent].low, rng2);
     case "announce":
-      return announce2(Number(flags.depth) || 1, rng3);
+      return announce2(Number(flags.depth) || 1, rng2);
     case "hint": {
       const list = TYPE_HINTS[flags.ftype || "lobby"];
-      return favor >= 2 ? list?.[0] : pick3(list, rng3);
+      return favor >= 2 ? list?.[0] : pick3(list, rng2);
     }
     default:
-      return pick3(ELEVATOR[key], rng3);
+      return pick3(ELEVATOR[key], rng2);
   }
 }
 
@@ -14761,8 +14866,8 @@ var ALIAS3 = {
 };
 for (const [k, v] of Object.entries(ALIAS3)) EVENT_RULES[k] = EVENT_RULES[v];
 var BarkPicker = class {
-  constructor(rng3 = Math.random) {
-    this.rng = rng3;
+  constructor(rng2 = Math.random) {
+    this.rng = rng2;
   }
   last = -1e9;
   lastTag = /* @__PURE__ */ new Map();
@@ -15087,12 +15192,12 @@ var OFFLINE = {
     default: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요."]
   }
 };
-function offlineReply(npc, text, agent, rng3 = Math.random) {
-  const pick5 = (l) => l[Math.floor(rng3() * l.length) % l.length];
+function offlineReply(npc, text, agent, rng2 = Math.random) {
+  const pick5 = (l) => l[Math.floor(rng2() * l.length) % l.length];
   const table = OFFLINE[npc];
   if (!table) {
     const tag = /괜찮|다쳤|아파/.test(text) ? "hp_low" : /출동|가자|임무/.test(text) ? "offer" : pick5(["settle", "find", "win", "offer"]);
-    return agentLine(npc, tag, rng3) ?? "…";
+    return agentLine(npc, tag, rng2) ?? "…";
   }
   for (const [re, lines2] of table.rules) if (re.test(text)) return pick5(lines2);
   return pick5(table.default);
@@ -15288,8 +15393,8 @@ var StoryUI = class {
       return;
     }
     b.el.classList.remove("free");
-    const w = b.el.offsetWidth, W5 = this.el.clientWidth;
-    const x = Math.max(w / 2 + 6, Math.min(W5 - w / 2 - 6, p.x));
+    const w = b.el.offsetWidth, W4 = this.el.clientWidth;
+    const x = Math.max(w / 2 + 6, Math.min(W4 - w / 2 - 6, p.x));
     b.el.style.setProperty("--tail", `${Math.round(p.x - x)}px`);
     b.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(Math.max(p.y, 0))}px) translate(-50%, -100%)`;
   }
@@ -15382,13 +15487,13 @@ function mountStory(root, host, opts = {}) {
   const style = document.createElement("style");
   style.textContent = style_default2;
   root.append(style);
-  const rng3 = Math.random;
+  const rng2 = Math.random;
   const flags = { favor: 0, rules: 0, ...saved ?? {} };
   const lib = buildLibrary();
   const ui = new StoryUI(root, (k) => host.photo?.(k));
   const panel = new TalkPanel(root);
   const talker = new FreeTalk({ model: host.talkModel });
-  const picker = new BarkPicker(rng3);
+  const picker = new BarkPicker(rng2);
   if (opts.eager) {
     picker.gap = 0.4;
     picker.tagCool = 0;
@@ -15412,7 +15517,7 @@ function mountStory(root, host, opts = {}) {
     get agent() {
       return agent();
     },
-    rng: rng3,
+    rng: rng2,
     speakerName: (who) => castOf(who, agent()).name,
     agentLine: (a, tag, r) => lookupLine(a, tag, flags, r),
     emit: (event2, arg) => {
@@ -15442,7 +15547,7 @@ function mountStory(root, host, opts = {}) {
   const evacWrap = (id) => {
     const pairs = EVAC_PAIRS[agent()] ?? [];
     if (!pairs.length) return id;
-    const p = pairs[Math.floor(rng3() * pairs.length) % pairs.length];
+    const p = pairs[Math.floor(rng2() * pairs.length) % pairs.length];
     host.emit?.("buddy", p.by);
     host.actor?.("buddy", { anim: p.by, show: true }, 0);
     const tmp = `__evac_${id}`;
@@ -15505,7 +15610,7 @@ ${who}: ${text.replace(/\n/g, " ")}
     dialogue: (id) => say(id),
     line: (who, text) => singleLine(who, text),
     agentLine: (tag) => {
-      const t = lookupLine(agent(), tag, flags, rng3);
+      const t = lookupLine(agent(), tag, flags, rng2);
       if (t) singleLine("agent", t);
     },
     talking: () => ui.boxOpen,
@@ -15561,7 +15666,7 @@ ${who}: ${text.replace(/\n/g, " ")}
     talkNpc = npc;
     talkDone = onDone;
     const c = castOf(npc, agent());
-    panel.open(c, c.photo ? host.photo?.(c.photo) : void 0, greet[npc] ?? (AGENTS2[npc] ? lookupLine(npc, "offer", flags, rng3) ?? "…" : "…"));
+    panel.open(c, c.photo ? host.photo?.(c.photo) : void 0, greet[npc] ?? (AGENTS2[npc] ? lookupLine(npc, "offer", flags, rng2) ?? "…" : "…"));
     refresh();
   };
   const event = (name, data = {}) => {
@@ -15572,7 +15677,7 @@ ${who}: ${text.replace(/\n/g, " ")}
       if (f.type !== void 0) flags.ftype = String(f.type);
       if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
       if (Number(flags.announced) !== Number(flags.depth)) {
-        const t = lookupLine(agent(), "el:announce", flags, rng3);
+        const t = lookupLine(agent(), "el:announce", flags, rng2);
         if (t) bark("elevator", t, 2400);
       }
       flags.announced = Number(flags.depth);
@@ -16829,7 +16934,6 @@ function makeHub(places, openPlace) {
       id: "hq",
       title: "관리국 본부",
       type: "hq",
-      depth: 0,
       length,
       lane: LANE,
       startX: (cur.find((p) => p.id === "office") ?? cur[0])?.x + 120 || 200,
@@ -16914,80 +17018,6 @@ function makeHub(places, openPlace) {
       if (prop.kind === "hubdoor") openPlace(prop.id);
     }
   };
-}
-
-// src/game/action/graybox/data.ts
-var RULES2 = [
-  { id: "entry", text: "점검표 서명란이 빈 엘리베이터가 입구다.", type: "common" },
-  { id: "noreturn", text: "타고 온 승강기로는 못 돌아간다. 귀환은 다락방의 로프.", type: "common" },
-  { id: "greet", text: "승강기를 탈 때 인사해라 (E). 대우가 달라진다.", type: "common" },
-  { id: "close", text: "닫힘 버튼을 연타하지 마라.", type: "common" },
-  { id: "mirror", text: "거울 속 얼굴이 피곤해 보이면 내려라.", type: "common" },
-  { id: "lobby", text: "평범해 보이는 것을 믿지 마라.", type: "lobby" },
-  { id: "attic", text: "다락방에 오래 있지 마라.", type: "service" },
-  { id: "passenger", text: "친절한 승객이 둘이면 사연이 긴 쪽이 거짓이다.", type: "common" },
-  { id: "trial", text: "벽의 목표를 먼저 읽어라.", type: "trial" },
-  { id: "dark", text: "어둠에서는 멈추지 마라.", type: "dark" },
-  { id: "silent", text: "소리를 내지 마라. 달리기·총·큰 기술이 소리다.", type: "silent" },
-  { id: "exit", text: "EXIT는 규칙 10줄 · 총애 3 · B-12 도달 뒤에만 눌러라.", type: "common" },
-  { id: "r_greet", text: "아파트: 주민에게 먼저 인사해라 (E).", type: "replica" },
-  { id: "r_quiet", text: "아파트: 복도에서 뛰지 마라.", type: "replica" },
-  { id: "r_meal", text: "아파트: 권하는 밥은 「잘 먹었습니다」(E)로 거절해라.", type: "replica" },
-  { id: "p_sign", text: "퍼즐: 표지가 가리키는 문이 정답이다. 표지는 읽어야 보인다.", type: "puzzle" },
-  { id: "c_door", text: "추격: 문은 닫고 가라 (E). 뒤의 것이 느려진다.", type: "chase" }
-];
-var RULE_BY_ID = Object.fromEntries(RULES2.map((r) => [r.id, r]));
-
-// src/game/action/graybox/sim.ts
-var W4 = 1280;
-var H5 = 720;
-var DT2 = 1 / 30;
-
-// src/game/action/ui/demo-world.ts
-function drawTitleBg(c, t) {
-  c.save();
-  c.setTransform(1, 0, 0, 1, 0, 0);
-  const g2 = c.createLinearGradient(0, 0, 0, H5);
-  g2.addColorStop(0, "#0b1014");
-  g2.addColorStop(1, "#1a1410");
-  c.fillStyle = g2;
-  c.fillRect(0, 0, W4, H5);
-  const dx = 820, dw = 340, dy = 170, dh = 470;
-  c.fillStyle = "#2a2f33";
-  c.fillRect(dx - 30, dy - 30, dw + 60, dh + 30);
-  const open = Math.max(0, Math.sin(t * 0.35)) ** 6 * 30;
-  for (const side of [0, 1]) {
-    const x = side ? dx + dw / 2 + open : dx - open;
-    const dg = c.createLinearGradient(x, 0, x + dw / 2, 0);
-    dg.addColorStop(0, "#4c5458");
-    dg.addColorStop(1, "#3a4044");
-    c.fillStyle = dg;
-    c.fillRect(x, dy, dw / 2, dh);
-  }
-  c.fillStyle = "#000";
-  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
-  c.fillStyle = "rgba(255,60,30,0.25)";
-  c.fillRect(dx + dw / 2 - open, dy, open * 2, dh);
-  c.fillStyle = "#100604";
-  c.fillRect(dx + dw / 2 - 70, dy - 110, 140, 60);
-  const flick = Math.sin(t * 13) > 0.92 || Math.sin(t * 2.1) > 0.97;
-  const floors = ["1", "B1", "B3", "B7", "B12", "??"];
-  label(c, flick ? floors[Math.floor(t * 7) % floors.length] : floors[Math.floor(t / 3) % floors.length], dx + dw / 2, dy - 66, 36, flick ? "#ff3020" : "#ff8a40", "center", 900);
-  c.fillStyle = "#d8d0bc";
-  c.fillRect(dx - 110, dy + 120, 60, 84);
-  c.fillStyle = "rgba(0,0,0,0.5)";
-  for (let i = 0; i < 6; i++) c.fillRect(dx - 104, dy + 132 + i * 11, 48, 2);
-  c.fillStyle = "rgba(236,230,212,0.25)";
-  for (let i = 0; i < 40; i++) {
-    const x = (i * 197 + t * 12 * (1 + i % 3)) % W4, y = (i * 131 + t * 8 * (1 + i % 2)) % H5;
-    c.fillRect(x, y, 2, 2);
-  }
-  const v = c.createRadialGradient(W4 / 2, H5 / 2, H5 * 0.3, W4 / 2, H5 / 2, H5);
-  v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,0.75)");
-  c.fillStyle = v;
-  c.fillRect(0, 0, W4, H5);
-  c.restore();
 }
 
 // src/game/action/engine/training.ts
@@ -17314,6 +17344,7 @@ function engineModules(box2, bridge) {
   const listeners = [
     (e) => {
       audio.event(e);
+      if (game?.inHub && (e.type === "enter:floor" || e.type === "custom")) return;
       shell.fx.onGameEvent(e);
       story.event(e.type, e);
       if (e.type === "run:end") saveFlags();
@@ -17346,7 +17377,7 @@ function engineModules(box2, bridge) {
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
-      shell.hud.draw(ctx, hs, dt);
+      if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);

@@ -16,7 +16,7 @@ import { linkItems } from './itemsLink';
 import { makeHub, type HubPlace } from './hub';
 import { PLACES } from '../hq/data';
 import { openPlaces } from '../hq/logic';
-import { drawTitleBg } from '../ui/demo-world';
+import { drawTitleBg } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';

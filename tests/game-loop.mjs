@@ -25,14 +25,18 @@ try {
   await page.goto(url);
   await page.waitForFunction(() => window.__goeiEngine);
   await page.getByText('새로 시작').click();
-  await page.waitForSelector('.hq-places button');
-  await page.click('[data-go=jaemtri]');
-  await page.waitForSelector('[data-mission]');
+  // 본부(벨트 장면) → 잼트리 자리 문 앞에서 E
+  await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
+  await S('hq');
+  await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'jaemtri').x; });
+  await page.waitForTimeout(100);
+  await page.keyboard.press('KeyE');
+  await page.waitForSelector('[data-mission]', { state: 'visible' });
   await page.click('[data-mission]');
   await page.click('[data-act=brief]');
   await page.waitForSelector('[data-act=deploy]');
   await page.click('[data-act=deploy]');
-  await page.waitForFunction(() => window.__goeiEngine.world);
+  await page.waitForFunction(() => window.__goeiEngine.world && !window.__goeiEngine.inHub);
   const state = () =>
     page.evaluate(() => {
       const g = window.__goeiEngine;
@@ -89,10 +93,9 @@ try {
   // 철수 → 본부 정산
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
-  await page.getByText('철수', { exact: false }).first().click();
-  const yes = page.getByText('예', { exact: true });
-  if (await yes.count()) await yes.first().click();
-  await page.waitForFunction(() => !window.__goeiEngine.world, null, { timeout: 15000 });
+  await page.getByText('본부로 귀환').first().click();
+  await page.getByText('귀환', { exact: true }).first().click();
+  await page.waitForFunction(() => window.__goeiEngine.inHub, null, { timeout: 15000 });
   await page.waitForTimeout(1200);
   await S('settle');
   const hqText = await page.evaluate(() => document.querySelector('.goei-engine-hq, .hq')?.innerText.slice(0, 400) ?? '');

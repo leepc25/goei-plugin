@@ -235,3 +235,12 @@ const info = {
 };
 writeFileSync('dist/build-info.json', JSON.stringify(info, null, 2) + '\n');
 console.log(info);
+
+// 게임 모듈 시험용 묶음 (dist-test/*): 시험이 쓰는 파일을 한 번에 만든다. 단독 시연판은 개발용(게임_통합_규격 7장)
+await import('./build-ui.mjs');
+await import('./build-enemy.mjs');
+await import('./build-stage.mjs');
+{
+  const story = await import('./build-story.mjs');
+  await story.buildStoryPure();
+}
