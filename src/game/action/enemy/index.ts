@@ -20,19 +20,37 @@ export { GUARDIANS, GUARDIAN_FOR } from './guardians';
 export { budgetFor, planEncounter, spawnWave, guardianSpawn, rollIntrusion, poolFor, SCREEN_CAP } from './spawn';
 export { setDropHook, rollDrops, DROP_LABEL } from './drops';
 export { moveJson, moveTiming } from './frames';
+export { arenaStage } from './arenaStage';
 export type { EnemyDef } from './roster';
 export type { GuardianDef } from './guardians';
 
 export const ALL_DEFS: EnemyDef[] = [...ROSTER, ...GUARDIANS];
 export const DEF_BY_KIND: Record<string, EnemyDef> = Object.fromEntries(ALL_DEFS.map((d) => [d.kind, d]));
 
+/** 층 모듈(stage/)이 쓰는 이름 → 이 모듈의 종류. solo = 짝을 스스로 부른다 (노부부·208호 가족) */
+export const KIND_ALIAS: Record<string, { kind: string; solo?: boolean }> = {
+  nothuman: { kind: 'hollow' },
+  warmth: { kind: 'shade' },
+  conductor: { kind: 'proctor' },
+  elder: { kind: 'elder_f', solo: true },
+  family208: { kind: 'family_f', solo: true },
+};
+// 엔진은 DEF_BY_KIND[spec.kind]로 우리 적인지 본다. 별칭도 여기서 찾히게 한다
+for (const [k, a] of Object.entries(KIND_ALIAS)) if (!DEF_BY_KIND[k] && DEF_BY_KIND[a.kind]) DEF_BY_KIND[k] = DEF_BY_KIND[a.kind];
+export function hasKind(kind: string): boolean {
+  return !!(DEF_BY_KIND[kind] || KIND_ALIAS[kind]);
+}
+
 export function createEnemy(kind: string, x: number, y: number, rng: () => number, opts: { elite?: boolean; affixes?: Affix[] } = {}): Enemy {
+  const alias = KIND_ALIAS[kind];
+  if (alias) kind = alias.kind;
   const def = DEF_BY_KIND[kind];
   if (!def) throw new Error(`unknown enemy kind: ${kind}`);
   const brain = GUARDIAN_BRAINS[kind] ?? AI_BRAINS[def.ai] ?? AI_BRAINS.rush;
   const AFF: Affix[] = ['bleed', 'armor', 'fast', 'regen'];
   const affixes = opts.elite ? (opts.affixes ?? [AFF[Math.floor(rng() * AFF.length)]]) : [];
   const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng });
+  if (alias?.solo) e.mem.solo = true;
   return e;
 }
 
