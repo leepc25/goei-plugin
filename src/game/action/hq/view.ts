@@ -12,6 +12,7 @@ import {
 import { iconCanvas } from './runmenu';
 import { hqMap, type HqMapView } from './map';
 import photos from '../story/demo-photos.json';
+import { ensureKit } from '../ui';
 import { HQ_SCHEMA, newSave, parseSave, saveText, type HqSave } from './state';
 import type { SaveSlots } from './store';
 
@@ -254,7 +255,7 @@ export function createHq(): HqModule {
         noteDeadlines(s, cards);
         if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
         return `${head}<h3>임무 게시판</h3><div class="hq-cards">${cards
-          .map((c) => `<button class="hq-mission${selMission === c.def.id ? ' sel' : ''}" data-mission="${c.def.id}"><b>${esc(c.def.kind)}</b> ${esc(c.def.title)}<br><small>차원 승강기 · ${esc(c.def.depthLabel)} · 보상 예산 ${c.def.reward.budget}${c.def.reward.teeth ? ` · 이빨 ${c.def.reward.teeth}` : ''}${c.def.reward.research ? ` · 연구 ${c.def.reward.research}` : ''}${c.left !== undefined ? ` · <em>구조 마감 출동 ${c.left}회</em>` : ''}${c.done ? ' · 다시 하기' : ''}${c.linked ? ` · <em>본편 연계: ${esc(c.linked)}</em>` : ''}</small></button>`)
+          .map((c) => `<button class="hq-mission${selMission === c.def.id ? ' on' : ''}" data-mission="${c.def.id}"><b>${esc(c.def.kind)}</b> ${esc(c.def.title)}<br><small>차원 승강기 · ${esc(c.def.depthLabel)} · 보상 예산 ${c.def.reward.budget}${c.def.reward.teeth ? ` · 이빨 ${c.def.reward.teeth}` : ''}${c.def.reward.research ? ` · 연구 ${c.def.reward.research}` : ''}${c.left !== undefined ? ` · <em>구조 마감 출동 ${c.left}회</em>` : ''}${c.done ? ' · 다시 하기' : ''}${c.linked ? ` · <em>본편 연계: ${esc(c.linked)}</em>` : ''}</small></button>`)
           .join('')}</div><div class="hq-row"><button class="primary" data-act="brief" ${selMission ? '' : 'disabled'}>브리핑 받기</button></div>
 <h3>규칙서 ${s.rulebook.length}줄</h3><p class="hq-dim">${s.rulebook.length ? s.rulebook.map(esc).join(' · ') : '아직 없음. 표지를 읽고 송신하면 채워져요.'}</p>`;
       }
@@ -317,7 +318,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   // 잼트리 임무·브리핑: 게임 화면 위 대화창 (얼굴 + 큰 글씨 + 선택지). 폰에서도 게임이 보이게 아래쪽만 덮는다
   const talkBox = (who: string, text: string, choices: string, extra = '') => {
     const ph = photoOf(who);
-    return `<div class="hq-talk" role="dialog" aria-label="${esc(who)}"><div class="hq-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who">${esc(who)}</b><p class="hq-line">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+    return `<div class="hq-talk gk-panel" role="dialog" aria-label="${esc(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc(who)}</b><p class="hq-line gk-font">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
   };
   const missionTalk = () => {
     cards = missionBoard(s, boardNames(card));
@@ -326,8 +327,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const say = lines('npc:jaemtri', ctx())[0];
     const sel = cards.find((c) => c.def.id === selMission);
     const text = sel ? `${sel.def.kind} 건이에요. ${sel.def.title}. ${sel.def.depthLabel}까지, 끝나면 예산 ${sel.def.reward.budget}${sel.left !== undefined ? `. 출동 ${sel.left}번 안에 가야 해요` : ''}.` : (say?.text ?? '오늘은 들어온 건이 없어요.');
-    const opts = cards.slice(0, 3).map((c) => `<button class="hq-choice${selMission === c.def.id ? ' sel' : ''}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.title)}</button>`).join('');
-    return talkBox('잼트리', text, `${opts}<div class="hq-choice-row"><button class="hq-choice primary" data-act="brief" ${selMission ? '' : 'disabled'}>이걸로 할게요</button><button class="hq-choice" data-act="close">나중에</button></div>`);
+    const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? ' on' : ''}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.title)}</button>`).join('');
+    return talkBox('잼트리', text, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? '' : 'disabled'}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
   };
   const briefTalk = () => {
     const m = MISSION_BY_ID[selMission!];
@@ -336,9 +337,9 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const ls = [...lines('brief:jaemtri', c), ...lines('brief:chief', c)];
     const can = canDeploy(s, s.selected);
     const st = statsFor(s, s.selected);
-    const kit = `<p class="hq-kit">${esc(AGENT_BY_ID[s.selected].name)} 체력 ${st.hp}${s.agents[s.selected].fatigue ? ` · 피로 ${s.agents[s.selected].fatigue}` : ''} · ${s.loadout.map((x) => (x ? `${esc(itemName(x.id))}×${x.n}` : '')).filter(Boolean).join(' ') || '아이템 없음'}${s.coffee ? ` · ${esc(COFFEES.find((x) => x.id === s.coffee)?.name ?? '')}` : ''}</p>${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}`;
+    const kit = `<p class="hq-kit gk-font">${esc(AGENT_BY_ID[s.selected].name)} 체력 ${st.hp}${s.agents[s.selected].fatigue ? ` · 피로 ${s.agents[s.selected].fatigue}` : ''} · ${s.loadout.map((x) => (x ? `${esc(itemName(x.id))}×${x.n}` : '')).filter(Boolean).join(' ') || '아이템 없음'}${s.coffee ? ` · ${esc(COFFEES.find((x) => x.id === s.coffee)?.name ?? '')}` : ''}</p>${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}`;
     const j = ls.find((l) => l.who === '잼트리') ?? ls[0];
-    return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="hq-choice primary" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button class="hq-choice" data-go="supply">정비실 먼저</button><button class="hq-choice" data-act="close">다시 고를게</button>`, kit);
+    return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
   };
   // 정산: 본부 장면 위 대화창 (말한 사람 얼굴 + 큰 글씨 결과 몇 줄 + 확인)
   const settleTalk = () => {
@@ -347,8 +348,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const first = back.find((x) => photoOf(x.who)) ?? back[0];
     const who = first?.who || '잼트리';
     const title = l.how === 'evac' ? '후송' : l.how === 'withdraw' ? '철수' : '귀환';
-    const res = `<ul class="hq-result">${l.lines.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
-    return talkBox(who, `${title}. ${first?.text ?? ''}`, `<div class="hq-choice-row"><button class="hq-choice primary" data-act="close">확인</button>${host?.link ? '<button class="hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ''}</div>`, res);
+    const res = `<ul class="hq-result gk-font">${l.lines.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    return talkBox(who, `${title}. ${first?.text ?? ''}`, `<div class="hq-choice-row"><button class="gk-btn hq-choice primary on" data-act="close">확인</button>${host?.link ? '<button class="gk-btn hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ''}</div>`, res);
   };
   const renderFloat = () => {
     const ov = wrap!.querySelector<HTMLElement>('.hq-over')!;
@@ -358,6 +359,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const talk = overlay === 'brief' || overlay === 'settle' || (!overlay && panel === 'jaemtri');
     ov.classList.toggle('talk', talk);
     if (talk) {
+      ensureKit();
       ov.innerHTML = (overlay === 'brief' ? briefTalk() : overlay === 'settle' ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : '');
       return;
     }
