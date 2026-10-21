@@ -267,3 +267,4 @@
 - `dark/dark_objects.png`
 - `puzzle/puzzle_wall_1.png`
 - `puzzle/puzzle_wall_2.png`
+- `puzzle/puzzle_wall_3.png`

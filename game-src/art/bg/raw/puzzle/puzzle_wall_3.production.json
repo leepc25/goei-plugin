@@ -1,0 +1,25 @@
+{
+  "name": "puzzle_wall_3",
+  "detail": "a big blank sign board on the wall with a blank arrow, a potted plant under it.",
+  "place": "PLACE: a too-clean, repeating corridor of identical doors, like a hotel or government building copied many times; slightly wrong symmetry. PALETTE: pale mint and off-white with mustard yellow doors, black trims.",
+  "folder": "puzzle",
+  "path": "game-src/art/bg/raw/puzzle/puzzle_wall_3.png",
+  "index": 15,
+  "total": 28,
+  "exists": false,
+  "base": "dccd0de38b74e1b3b4ccec052267714eb59629b4",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).\n\nWALL BAY RULES\nStraight-on front elevation of ONE section of an interior wall, camera facing the wall exactly (no vanishing point, no visible side walls, no ceiling plane, no floor plane). 1536x1024 landscape. The wall fills the whole image from top to bottom; the bottom 4% is the baseboard line where the floor will start (draw nothing below it). The left and right edges of the image are each the center of a structural pillar/column of the same design in every bay of this place, so the bays can be placed side by side. Scale: the wall is 2.9 m high (full image height), a door is 2.1 m (72% of the image height), a desk top is 0.75 m (26%). Doors and openings are drawn as an empty dark doorway hole of exactly the door size; the door leaf itself is NOT drawn (it is a separate object). Furniture that stands on the floor is NOT drawn (separate objects); only built-in things attached to the wall (windows, boards, shelves fixed to the wall, pipes, vents, switches, lamps on the wall).\n\nCORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):\n1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.\n2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.\n3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.\n4. Everything else in the original request stays the same.\n\nNO people, monsters, blood or gore. Ordinary Korean places inside an uncanny dimension-elevator building.\nPLACE: a too-clean, repeating corridor of identical doors, like a hotel or government building copied many times; slightly wrong symmetry. PALETTE: pale mint and off-white with mustard yellow doors, black trims.\nMatch all bays of this place: straight frontal elevation, identical simple half-pillars at x=0 and x=1536 (48px visible each), baseboard at y=984..1023. Wall fills entire canvas. No floor or ceiling plane, no depth corridor. Specific subject details (closed doors, fixed props) below override generic omissions when explicitly requested. Use broad simple shapes; no tiny clutter.\nCreate ONLY puzzle_wall_3: a big blank sign board on the wall with a blank arrow, a potted plant under it.",
+  "type": "wall",
+  "generator": "built-in image_gen",
+  "size": [
+    1536,
+    1024
+  ],
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "mode": "RGB",
+  "sha256": "ba077484e25128e08d3d96b4d3c999e144d1c8ac058812f17e7fdfcec5b87430",
+  "integration": "Raw production source; pixel conversion and game integration are separate."
+}
