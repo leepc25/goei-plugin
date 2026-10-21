@@ -14,7 +14,7 @@ GPT가 그리고, Claude가 도트화(쟈알디와 같은 2배 격자, 장소별
 
 ```
 STYLE (same for every image)
-2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).
+2D side-scrolling beat-'em-up game background art, like a 1990s arcade brawler (Capcom's Dungeons & Dragons: Shadow over Mystara) but set in present-day South Korea. Clean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines, few large simple shapes (it will be shrunk to a small pixel-art screen), no painterly brush texture, no noise, no film grain, no blur, no depth of field. NOT pixel art (it will be pixelated later), but keep shapes simple and readable at small size. Muted, slightly desaturated colors, dim indoor night lighting; the playable characters must stand out in front of it, so avoid pure white and strong saturated colors except the noted accent. NO people, no silhouettes, no text, letters, numbers, logos or signs with writing anywhere (sign plates stay blank).
 ```
 
 ## 벽 칸 (WALL) 공통 규칙
@@ -37,12 +37,16 @@ OBJECT SHEET RULES
 A sheet of separate game objects, 1536x1024, transparent background (if transparency is not possible, a perfectly flat #FF00FF magenta background with no shadows on it). Arrange them in a 3x3 grid, one object per cell, each fully inside its cell with a margin, not touching others. Camera: every object faces the viewer squarely (front side parallel to the image, NOT turned left or right, no 3/4 rotation), seen from a little above so only a thin strip of the top surface shows, the same camera for all 9. Size inside the sheet does not matter (it is resized per object later); make each object fill most of its cell. No cast shadows on the ground. Doors closed. Drawers and lids closed.
 ```
 
-## 정정 (2026-10-21 16:10, 첫 그림 확인 후)
+## 정정 (2026-10-21 16:15, 첫 그림 도트화 시험 후 · 최종본)
 
-벽 칸(정비실 1번)은 그대로 좋다. 물건 모음은 배경 투명은 좋으나 책상·냉장고·상자가 비스듬히 돌아가 있고 시점이 제각각이라 위 OBJECT SHEET RULES의 Camera 문장을 고쳤다. 크기 비율은 Claude가 물건마다 실제 높이로 맞추므로 GPT는 신경 쓰지 않는다. 이미 만든 hq_jaemtri_objects는 다시 그리지 않아도 된다(쓸 수 있음). 다음 물건 모음부터 아래 정정문을 붙인다.
+정비실 벽 1번과 잼트리 물건 모음을 도트화해 봤다(`/mnt/project-files/game/bg_test_1021/`). 벽 320도트 안에 공구 수십 개 같은 잔 디테일은 들어가지 않아 뭉개지고, 물건은 비스듬한 3/4 시점이 섞였다. 그래서 아래 정정을 모든 다음 그림(벽·바닥·원경·물건)에 붙인다. 크기 비율은 Claude가 물건마다 실제 높이로 맞추므로 GPT는 신경 쓰지 않는다. 이미 만든 그림은 다시 그리지 않아도 된다.
 
 ```
-CORRECTION for every object sheet from now on: draw each object facing the viewer squarely, front side parallel to the image, not rotated to the left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background. Walls: keep doing them exactly as before.
+CORRECTION (applies to every image from now on, walls, floors, far backgrounds and object sheets):
+1. These images will be shrunk to a small pixel-art game (a whole wall becomes only 320x220 pixels). Draw for that: FEW, LARGE, simple shapes. At most 5-8 distinct items per wall, each item big; no rows of dozens of small things (no 30 tools, no rows of tiny bottles, no small text-like marks). Large flat color areas, 2-3 tone steps, no fine texture, no noise, no scratches smaller than a hand.
+2. Bold, dark outlines (about 6-8 px thick at this size) around every object and every major shape, like 1990s arcade sprites.
+3. Object sheets: every object faces the viewer squarely, front side parallel to the image, not rotated left or right (no 3/4 angle), seen from slightly above so only a thin strip of the top shows; the same camera for all nine. Do not worry about relative size between objects; make each one fill most of its cell. Keep the transparent background.
+4. Everything else in the original request stays the same.
 ```
 
 ## 장소 목록
@@ -218,7 +222,7 @@ PLACE: three different boss rooms. Each bay is its own room; still use pillars a
 
 ## Claude가 하는 일 (받은 뒤)
 
-1. `tools/bg_pixelize.py`: 1536×1024 → 도트 격자(벽 칸 320×220 도트 = 화면 640×440), 장소별 32색, 캐릭터보다 명도·채도 낮춤, 마젠타 배경 제거, 물건 3×3 자르기.
+1. `tools/bg_pixelize.py`: 1536×1024 → 도트 격자(벽 칸 320×220 도트 = 화면 640×440), 장소별 32색, 칸마다 다수결 색(번짐 없음), 명도 조금 낮춤, 마젠타 배경 제거, 물건 덩어리 자르기·실제 높이 맞춤.
 2. 바닥: 무늬를 코드에서 원근(앞줄 넓게, 뒷줄 좁게)으로 바닥 띠 440~690에 깔고 타일 줄·그림자.
 3. 벽 칸 이어 붙이기: 기둥 가운데에서 이음, 칸 순서는 층 생성(`stage/`)의 조각 표에 맞춤. 깊이별 손상은 팔레트·얼룩 덧칠(코드).
 4. 물건: 바닥 접점·문손잡이·앉는 높이 기준점 표(`art/bg/objects.json`).

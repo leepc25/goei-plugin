@@ -6,7 +6,8 @@
 
 종류는 파일 이름 꼬리로 정한다: _wall_N / _wall / _floor / _far / _far_tall / _objects.
 장소 하나의 모든 그림은 한 팔레트(기본 32색)로 줄여 칸끼리 색이 같게 한다.
-캐릭터가 묻히지 않게 명도·채도를 낮춘다(DIM, DESAT).
+캐릭터가 묻히지 않게 명도를 조금 낮춘다(DIM, DESAT).
+줄일 때 색을 평균 내지 않고 칸마다 가장 많은 색 하나를 고른다(번짐 없는 도트 경계, 2026-10-21 사용자 비교 B안).
 
 사용: python3 tools/bg_pixelize.py [장소 ...]   (없으면 전부)
 """
@@ -17,6 +18,7 @@ import sys
 from collections import deque
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageEnhance
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,9 +29,9 @@ WALL = (320, 220)        # 화면 640×440 (벽 0~440)
 FLOOR = 128              # 화면 256 정사각 무늬
 FAR = (384, 256)         # 화면 768×512, 느리게 흐름
 FAR_TALL = (256, 384)
-COLORS = 48
-DIM = 0.82               # 명도
-DESAT = 0.78             # 채도
+COLORS = 32
+DIM = 0.9                # 명도
+DESAT = 1.0              # 채도
 # 물건 크기: GPT 그림 안 비율은 믿지 않고 heights.json의 실제 높이(m)로 맞춘다. 쟈알디 대기 키 99도트 = 1.65m.
 DPM = 99 / 1.65
 HEIGHTS = json.loads((ROOT / 'game-src/art/bg/heights.json').read_text()) if (ROOT / 'game-src/art/bg/heights.json').exists() else {}
@@ -50,16 +52,6 @@ def tone(im: Image.Image) -> Image.Image:
     if im.mode == 'RGBA':
         rgb.putalpha(im.getchannel('A'))
     return rgb
-
-
-def cover(im: Image.Image, size: tuple[int, int]) -> Image.Image:
-    """비율 유지로 꽉 채운 뒤 가운데 자르기. 줄일 때 BOX(평균)로 계단 없이."""
-    w, h = size
-    s = max(w / im.width, h / im.height)
-    nw, nh = max(w, round(im.width * s)), max(h, round(im.height * s))
-    im = im.resize((nw, nh), Image.Resampling.BOX)
-    x, y = (nw - w) // 2, (nh - h) // 2
-    return im.crop((x, y, x + w, y + h))
 
 
 def seamless(im: Image.Image) -> Image.Image:
@@ -115,58 +107,72 @@ def cut_objects(sheet: Image.Image) -> list[Image.Image]:
                                 q.append((nx, ny))
                 found.append((n, (x0 * f, y0 * f, (x1 + 1) * f, (y1 + 1) * f)))
     found.sort(reverse=True)
-    boxes = sorted((bx for _, bx in found[:9]), key=lambda r: (r[1] * 3 // sheet.height, r[0]))
+    boxes = sorted((bx for _, bx in found[:9]), key=lambda r: ((r[1] + r[3]) * 3 // (2 * sheet.height), r[0]))
     return [sheet.crop(bx) for bx in boxes]
 
 
-def fit_height(im: Image.Image, metres: float) -> Image.Image:
-    nh = max(1, round(metres * DPM))
-    return im.resize((max(1, round(im.width * nh / im.height)), nh), Image.Resampling.BOX)
+def aspect_crop(im: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """목표 비율로 가운데 자르기(원본 해상도 유지)."""
+    w, h = size
+    s = max(w / im.width, h / im.height)
+    cw, ch = min(im.width, round(w / s)), min(im.height, round(h / s))
+    x, y = (im.width - cw) // 2, (im.height - ch) // 2
+    return im.crop((x, y, x + cw, y + ch))
 
 
-def quantize_place(images: list[Image.Image]) -> list[Image.Image]:
-    """장소 전체를 한 팔레트로. 반투명은 0/255로 끊는다."""
-    strip_w = sum(im.width for im in images)
-    strip = Image.new('RGB', (strip_w, max(im.height for im in images)), (0, 0, 0))
+def place_palette(images: list[Image.Image]) -> Image.Image:
+    small = [im.convert('RGB').resize((max(1, im.width // 3), max(1, im.height // 3)), Image.Resampling.BOX) for im in images]
+    strip = Image.new('RGB', (sum(i.width for i in small), max(i.height for i in small)))
     x = 0
-    for im in images:
-        strip.paste(im.convert('RGB'), (x, 0))
-        x += im.width
-    pal = strip.quantize(COLORS, method=Image.Quantize.MEDIANCUT)
-    res = []
-    for im in images:
-        q = im.convert('RGB').quantize(palette=pal, dither=Image.Dither.NONE).convert('RGBA')
-        if im.mode == 'RGBA':
-            q.putalpha(im.getchannel('A').point(lambda a: 255 if a > 127 else 0))
-        res.append(q)
-    return res
+    for i in small:
+        strip.paste(i, (x, 0))
+        x += i.width
+    return strip.quantize(COLORS, method=Image.Quantize.MEDIANCUT)
+
+
+def mode_down(im: Image.Image, size: tuple[int, int], pal: Image.Image) -> Image.Image:
+    """장소 팔레트로 원본 해상도에서 색을 고른 뒤, 칸마다 다수결 색으로 줄인다."""
+    W, H = size
+    idx = np.asarray(im.convert('RGB').quantize(palette=pal, dither=Image.Dither.NONE))
+    ys = np.linspace(0, idx.shape[0], H + 1).astype(int)
+    xs = np.linspace(0, idx.shape[1], W + 1).astype(int)
+    out = np.zeros((H, W), np.uint8)
+    for j in range(H):
+        row = idx[ys[j]:ys[j + 1]]
+        for i in range(W):
+            out[j, i] = np.bincount(row[:, xs[i]:xs[i + 1]].ravel()).argmax()
+    o = Image.fromarray(out, 'P')
+    o.putpalette(pal.getpalette())
+    o = o.convert('RGBA')
+    if im.mode == 'RGBA':
+        a = np.asarray(im.getchannel('A').resize(size, Image.Resampling.BOX))
+        o.putalpha(Image.fromarray(np.where(a > 127, 255, 0).astype(np.uint8)))
+    return o
 
 
 def run_place(place: Path) -> dict:
-    files = sorted(place.glob('*.png'))
-    jobs: list[tuple[str, Image.Image]] = []
-    for f in files:
+    jobs: list[tuple[str, Image.Image, tuple[int, int], str]] = []
+    for f in sorted(place.glob('*.png')):
         k = kind_of(f.stem)
         src = Image.open(f).convert('RGBA')
-        im = tone(src)
-        if k == 'wall':
-            jobs.append((f.stem, cover(im, WALL)))
-        elif k == 'floor':
-            jobs.append((f.stem, seamless(cover(im, (FLOOR, FLOOR)))))
-        elif k == 'far':
-            jobs.append((f.stem, cover(im, FAR)))
-        elif k == 'far_tall':
-            jobs.append((f.stem, cover(im, FAR_TALL)))
+        size = {'wall': WALL, 'floor': (FLOOR, FLOOR), 'far': FAR, 'far_tall': FAR_TALL}.get(k)
+        if size:
+            jobs.append((f.stem, aspect_crop(tone(src), size), size, k))
         elif k == 'objects':
             hs = HEIGHTS.get(f.stem, [])
             for i, o in enumerate(cut_objects(src), 1):
-                jobs.append((f'objects/{f.stem}_{i}', fit_height(tone(o), hs[i - 1] if i <= len(hs) else 1.0)))
+                nh = max(1, round((hs[i - 1] if i <= len(hs) else 1.0) * DPM))
+                jobs.append((f'objects/{f.stem}_{i}', tone(o), (max(1, round(o.width * nh / o.height)), nh), k))
     if not jobs:
         return {}
+    pal = place_palette([j[1] for j in jobs])
     out_dir = OUT / place.name
     (out_dir / 'objects').mkdir(parents=True, exist_ok=True)
     meta: dict = {}
-    for (name, _), q in zip(jobs, quantize_place([im for _, im in jobs])):
+    for name, im, size, k in jobs:
+        q = mode_down(im, size, pal)
+        if k == 'floor':
+            q = seamless(q)
         q.save(out_dir / f'{name}.png', optimize=True)
         entry = {'w': q.width, 'h': q.height}
         if name.startswith('objects/'):
