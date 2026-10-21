@@ -807,7 +807,29 @@ export function sameData(a: DirectoryData, b: DirectoryData): boolean {
  */
 export function migrateLore(lore: LoreEntry[], dir: Directory = readDirectory(lore)): LoreEntry[] {
   if (!dir.folders) return lore;
-  return withDirectory(lore, directoryData(dir)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? '')));
+  // 옛 목록에서 온 폴더 밖 괴이·특수 후보(세력·요원 로어북)는 옮기지 않는다 (2026-10-21 사용자)
+  const own = { ...dir, anomalies: dir.anomalies.filter((r) => r.inFolder), sites: dir.sites.filter((r) => r.inFolder) };
+  return withDirectory(lore, directoryData(own)).filter((e) => !LEGACY_DATA.includes(String(e.comment ?? '')));
+}
+
+/** 0.16.37 전 카드 명부에 기본으로 들어 있던 폴더 밖 괴이·특수 후보 (세력·요원 로어북). 카드 업데이트 때 한 번 뺀다 */
+export const OLD_OUTSIDE_PLACES = ['탐미주의', '세크리엠', '발푸르기스 협회', '아벤샤', '무명찬란교', '흡혈귀', '병원', '극단', '가짜 관리국', '세계정치 게시판'];
+
+/** 명부의 괴이·특수에서 OLD_OUTSIDE_PLACES를 뺀 새 목록. 사용자가 그 로어북을 괴이·파밍 폴더로 옮겼으면 둔다 */
+export function dropOldOutsidePlaces(lore: LoreEntry[]): LoreEntry[] {
+  const data = readDirectoryData(lore);
+  if (!data) return lore;
+  const members = folderMembers(lore);
+  const inside = new Set([...(members?.anomaly ?? []), ...(members?.site ?? [])].map((e) => s(e.comment)));
+  let hit = false;
+  const strip = (group: Record<string, unknown> | undefined) => {
+    if (!group) return group;
+    const next = { ...group };
+    for (const name of OLD_OUTSIDE_PLACES) if (name in next && !inside.has(name)) (delete next[name], (hit = true));
+    return next;
+  };
+  const next = { ...data, 괴이: strip(data.괴이), '미스틱 사이트': strip(data['미스틱 사이트']) } as DirectoryData;
+  return hit ? withDirectory(lore, next) : lore;
 }
 
 // ── 요원 순서 ──

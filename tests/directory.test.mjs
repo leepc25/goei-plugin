@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import {
+  OLD_OUTSIDE_PLACES,
   readDirectory, migrateLore, parseCatalog, buildRegistry, directoryData, withDirectory, DIRECTORY_COMMENT, stableAgentId, assignOrg, orgOf,
 } from '../dist-test/core.mjs';
 
@@ -122,11 +123,16 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   assert.equal(bases.length, 6);
   assert.deepEqual(bases.map((b) => b.org), ['관리국', '백일몽', '특수재난대응협회', '교황청', '이슬람', '중림 지하상가']);
   assert.deepEqual(bases, d.bases);
+  // 폴더 밖 괴이·특수 후보(세력·요원 로어북)는 옮기지 않음 (2026-10-21 사용자). 나머지는 같음
+  const dropped = new Set(['탐미주의', '진조 세크리엠', '발푸르기스 협회', '십마녀 아벤샤', '무명찬란교']);
   const after = parseCatalog(moved);
-  assert.equal(j(after), j(before));
-  const ra = buildRegistry(realLore).entries.map(j);
-  const rb = buildRegistry(moved).entries.map(j);
-  assert.deepEqual(rb, ra);
+  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)) }));
+  const outside = new Set(OLD_OUTSIDE_PLACES);
+  const places = (l) => buildRegistry(l).entries.filter((e) => !e.key.startsWith('Agent roster/'));
+  assert.deepEqual(places(moved).map(j), places(realLore).filter((e) => !outside.has(e.lore)).map(j));
+  // 요원은 그대로 (자리를 비운 별칭은 요원 이름 찾기로 넘어감)
+  const agentKeys = (l) => buildRegistry(l).entries.filter((e) => e.key.startsWith('Agent roster/')).map((e) => e.key);
+  assert.deepEqual(agentKeys(moved), agentKeys(realLore));
   assert.deepEqual(readDirectory(moved).agents, d.agents);
   assert.deepEqual(readDirectory(moved).orgs, d.orgs);
   const orgNames = d.orgs.map((o) => o.name);
@@ -158,4 +164,24 @@ test('요원 순서: 같은 소속 안에서만 옮기고, 저장하면 노출 �
     assert.equal(readDirectory(saved).agents[0].lore, ids[1], '저장한 순서를 다시 읽어도 그대로');
     assert.ok(people.length > 0);
   }
+});
+
+test('폴더 밖 괴이·특수 후보: 옮길 때 빼고, 옛 카드 명부에서도 기본 후보를 뺌 (2026-10-21)', { skip: !realLore }, async () => {
+  const { dropOldOutsidePlaces } = await import('../dist-test/core.mjs');
+  const moved = migrateLore(realLore);
+  const d = readDirectory(moved);
+  assert.ok(d.anomalies.length > 50 && d.anomalies.every((r) => r.inFolder));
+  assert.ok(d.sites.length > 5 && d.sites.every((r) => r.inFolder));
+  // 옛 카드 명부: 기본 후보가 들어 있던 것처럼 만들고 빼기
+  const entry = moved.find((e) => e.comment === 'Directory');
+  const data = JSON.parse(entry.content);
+  data.괴이.탐미주의 = { preset: true, label: '탐미주의', english: 'Aestheticism', aliases: [] };
+  data['미스틱 사이트']['세계정치 게시판'] = { preset: false, label: '세계정치 게시판', english: '', aliases: [] };
+  const old = moved.map((e) => (e === entry ? { ...e, content: JSON.stringify(data) } : e));
+  assert.ok(readDirectory(old).anomalies.some((r) => r.lore === '탐미주의'));
+  const clean = dropOldOutsidePlaces(old);
+  assert.ok(!readDirectory(clean).anomalies.some((r) => r.lore === '탐미주의'));
+  assert.ok(!readDirectory(clean).sites.some((r) => r.lore === '세계정치 게시판'));
+  assert.equal(readDirectory(clean).anomalies.length, d.anomalies.length);
+  assert.equal(dropOldOutsidePlaces(moved), moved, '뺄 게 없으면 그대로');
 });
