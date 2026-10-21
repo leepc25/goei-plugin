@@ -5,6 +5,7 @@ import { PROJ, Proj } from './proj';
 import type { AiKind, EnemyDef } from './roster';
 import type { Armor, Body, Debuff, FrameBoxes, Hit, HitResult, LocalBox, Move, Part, PartBox, RuleSignal, WBox, WorldView } from './types';
 import { rollDrops, fireDropHook } from './drops';
+import { armDebuff, checkDebuffs } from './debuff';
 
 export type St = 'spawn' | 'idle' | 'walk' | 'attack' | 'hurt' | 'air' | 'down' | 'getup' | 'bound' | 'grabbing' | 'dormant' | 'hidden' | 'flee' | 'dead' | 'stunned';
 export type Affix = 'bleed' | 'armor' | 'fast' | 'regen';
@@ -231,7 +232,10 @@ export class Enemy implements Body {
           noise: spec.noise,
         };
         const debuff = spec.debuff ?? (this.has('bleed') && spec.dmg > 0 ? { kind: 'bleed' as const, ticks: 120 } : undefined);
-        if (debuff) h.debuff = debuff;
+        if (debuff) {
+          h.debuff = debuff;
+          armDebuff(h, debuff, this.id);
+        }
         hit.push(h);
       }
     }
@@ -248,6 +252,7 @@ export class Enemy implements Body {
   step(w: WorldView): void {
     if (!this.alive || this.lastTick === w.tick) return;
     this.lastTick = w.tick;
+    checkDebuffs(w);
     this.age++;
     this.st++;
     for (const k in this.cds) if (this.cds[k] > 0) this.cds[k]--;
@@ -515,7 +520,8 @@ export class Enemy implements Body {
     this.set('dead');
     this.vx = (hit?.dir ?? -this.dir) * 4;
     this.brain.death?.(this, w);
-    w.emit({ type: 'enemyDie', x: this.x, kind: this.kind });
+    // 맞아서 죽으면 엔진 world.ts가 enemyDie를 낸다. 출혈·자폭 같은 다른 죽음만 여기서 낸다
+    if (!hit) w.emit({ type: 'enemyDie', x: this.x, kind: this.kind });
     const drops = rollDrops(this.def.drop, () => w.rand(), this.elite);
     if (drops.length) {
       w.emit({ type: 'custom', name: 'enemyDrop', data: { id: this.id, kind: this.kind, x: this.x, y: this.y, drops } });

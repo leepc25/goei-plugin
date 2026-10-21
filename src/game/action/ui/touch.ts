@@ -49,6 +49,10 @@ export class TouchPad {
   private runSince = 0;
   private runTimer = 0;
   private u = 64;
+  /** 스틱 받침 반지름과 쉴 때 자리(바깥 가장자리에서) */
+  private sr = 64;
+  private restX = 64 * 1.55;
+  private restY = 64;
   /** 스틱 자리 (층 기준 px) */
   private zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
@@ -114,6 +118,10 @@ export class TouchPad {
     const flip = s.lefty ? -1 : 1;
     this.root.style.setProperty('--tp-u', `${u}px`);
     this.root.style.setProperty('--tp-a', String(s.touchAlpha));
+    this.sr = u;
+    this.restX = u * 1.55;
+    this.restY = u;
+    this.root.style.setProperty('--tp-r', `${u}px`);
     const safeB = 10,
       safeS = 14;
     const ax = s.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
@@ -191,27 +199,41 @@ export class TouchPad {
       });
     };
     stack(['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
-    const inner = colR - Math.max(side, u * 1.15) / 2 - g - u * 0.4;
-    stack(['guard', 'interact', 'reload', 'support'], inner, [0.8, 0.8, 0.8, 0.8], true);
+    // 안쪽 열은 작게(0.64u), 같은 높이의 오른쪽 띠 버튼 바로 옆에 붙여 캔버스를 덜 가린다
+    const right = ['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'].map((id) => this.btns.find((x) => x.id === id)!);
+    const di = 0.64,
+      ri = (di * u) / 2;
+    let y = bh - edge;
+    for (const id of ['guard', 'interact', 'reload', 'support']) {
+      y -= ri;
+      let left = colR;
+      for (const b of right) if (Math.abs((b.cy ?? 0) - y) < (b.r ?? 0) + ri) left = Math.min(left, mir(b.cx ?? 0) - (b.r ?? 0));
+      place(id, left - g - ri, y, di);
+      y -= ri + g;
+    }
     stack(['menu', 'map', 'item1', 'item2', 'item3', 'item4'], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
     const zw = bw * 0.42,
       zt = bh * 0.3;
     this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    // 스틱 받침: 조금 작게, 쉴 때는 왼쪽 띠에 걸쳐 캔버스 안으로 60px 넘게 들어가지 않게
+    this.sr = u * 0.82;
+    this.root.style.setProperty('--tp-r', `${this.sr}px`);
+    this.restX = Math.max(edge + this.sr, side + 60 - this.sr);
+    this.restY = edge + this.sr;
     this.restBase();
   }
   private restBase() {
     const s = this.st();
     const zr = this.zr;
-    const u = this.u;
-    const x = s.lefty ? zr.w - u * 1.55 : u * 1.55;
-    const y = zr.h - u * 1.0;
+    const x = s.lefty ? zr.w - this.restX : this.restX;
+    const y = zr.h - this.restY;
     this.placeBase(x, y);
     this.knob.style.transform = '';
     this.base.classList.remove('on');
   }
   private placeBase(x: number, y: number) {
-    this.base.style.transform = `translate(${x - this.u}px, ${y - this.u}px)`;
+    this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
     this.baseX = x;
     this.baseY = y;
   }
@@ -333,7 +355,7 @@ export class TouchPad {
     }
   }
   private stickTo(x: number, y: number) {
-    const R = this.u * 0.95;
+    const R = this.sr * 0.95;
     let dx = x - this.baseX,
       dy = y - this.baseY;
     const m = Math.hypot(dx, dy);
