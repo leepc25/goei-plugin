@@ -273,3 +273,41 @@ test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·�
   assert.ok(metaStore.m.deepest >= 9);
   assert.ok(Object.keys(metaStore.m.known).length >= 5, `송신된 규칙 ${Object.keys(metaStore.m.known)}`);
 });
+
+test('대사 모듈 연결: board 훅이 맡으면 인사·닫힘 소품을 치우고, 돌려준 결과로 총애를 바꾼다', () => {
+  const metaStore = { m: null, load() { return this.m; }, save(m) { this.m = JSON.parse(JSON.stringify(m)); } };
+  const calls = [];
+  let finish = null;
+  const stage = S.createElevatorStage(metaStore, {
+    board(v, done) {
+      calls.push(v);
+      finish = done;
+      return true;
+    },
+    announce(v) {
+      calls.push({ announce: v.depth });
+      return true;
+    },
+  });
+  const eng = new DemoEngine(stage, { seed: 5, agent: 'rojemon' });
+  eng.start();
+  const k = { x: 0, y: 0, run: false, jump: false, attack: false, interact: false, crouch: false };
+  eng.step(k);
+  assert.deepEqual(calls[0], { announce: 1 });
+  const panel = eng.props.find((p) => p.kind === 'panel');
+  eng.p.x = panel.x;
+  eng.step({ ...k, interact: true });
+  for (let i = 0; i < 5 && eng.plan.stage.where !== 'car'; i++) eng.step(k);
+  assert.equal(eng.plan.stage.where, 'car');
+  eng.step(k);
+  const board = calls.find((c) => c.ride);
+  assert.ok(board, 'board 훅이 불리지 않음');
+  assert.equal(board.agent, 'rojemon');
+  assert.ok(!eng.props.some((p) => p.id === 'greet' || p.id === 'close'), '인사·닫힘 소품이 남음');
+  const before = stage.meta().favor;
+  finish({ act: 'greet', favor: before + 1 });
+  eng.step(k);
+  const flip = stage.outing().flags.includes('greet_flip');
+  assert.equal(stage.meta().favor, before + (flip ? -1 : 1));
+  assert.ok(stage.outing().found.includes('greet'), '인사 규칙을 찾은 것으로 남아야 함');
+});

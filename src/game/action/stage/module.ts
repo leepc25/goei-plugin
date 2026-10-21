@@ -10,7 +10,7 @@ import { cellAt, makeService } from './gen/service';
 import { CHOICE_LABEL, PASSENGER_LABEL, defaultTalk, type PassengerChoice, type PassengerKind, type PassengerLines } from './passengers';
 import { carPlan, cellPlan, endingPlan, floorPlan, segAt, type StagePlan } from './plan';
 import { mix, rng } from './rng';
-import { addFavor, exitOpen, newMeta, newOuting, reshuffle, ruleVersion, sendFound, type Outing, type StageMeta, type Target } from './state';
+import { addFavor, currentKnown, exitOpen, newMeta, newOuting, reshuffle, ruleVersion, sendFound, type Outing, type StageMeta, type Target } from './state';
 import { LANE_DEPTH, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Placed, type SpawnHook, type Terrain } from './types';
 
 const DT = 1 / 30;
@@ -19,12 +19,65 @@ export interface StageStore {
   load(): StageMeta | null;
   save(meta: StageMeta): void;
 }
+/** 승강기에 탈 때 대사 모듈에 넘기는 값 */
+export interface BoardInfo {
+  /** 지금 깊이(1~) */
+  depth: number;
+  /** 방금 내린 층 유형 (첫 탑승이면 '') */
+  ftype: string;
+  favor: number;
+  agent: string;
+  /** 이번 출동 몇 번째 탑승인지 (1부터) */
+  ride: number;
+  /** 총애가 낮아 문이 안 닫히는 초 (0이면 아님) */
+  stuck: number;
+  /** 이번 출동 변형: 인사하면 깎임 / 닫힘 한 번만 눌러도 깎임 */
+  greetFlip: boolean;
+  closeAny: boolean;
+}
+/** greet = 인사, spam = 닫힘 연타, quiet = 가만히. favor를 주면 그 값을 쓰고(이전 값 ±1로 자름), 안 주면 층 모듈이 굴린다 */
+export interface BoardResult {
+  act: 'greet' | 'spam' | 'quiet';
+  favor?: number;
+}
+export interface PassengerInfo {
+  kind: PassengerKind;
+  honest: boolean;
+  /** 사연이 긴 쪽 (규칙 8의 단서) */
+  long: boolean;
+  /** 이 층에 갈림길 문이 있음 (승객이 문을 가리킬 수 있음) */
+  fork: boolean;
+  /** 규칙서에 승객 규칙이 있음 */
+  knowsRule: boolean;
+  agent: string;
+  depth: number;
+}
+/** follow = 승객이 가리킨 문 표시, help = 돕기(구조·보급), ignore = 지나침, rob = 뺏기 */
+export interface PassengerResult {
+  choice: PassengerChoice | 'follow';
+}
+export interface DealInfo {
+  favor: number;
+  items: string[];
+}
 export interface StageHooks {
+  /** 승강기 안에 들어설 때. true를 돌려주면 대사 모듈이 인사·호명·방송을 맡고 끝나면 done을 부른다. false·없음이면 층 모듈 기본(소품 E) */
+  board?(v: BoardInfo, done: (r: BoardResult) => void): boolean;
+  /** 승객과 말할 때(E). true면 대사 모듈이 대화·선택지를 맡는다 */
+  passenger?(v: PassengerInfo, done: (r: PassengerResult) => void): boolean;
+  /** 정비 구역 인터폰 거래. deal null = 안 함 */
+  deal?(v: DealInfo, done: (r: { deal: 'reveal' | 'skip' | 'supply' | null }) => void): boolean;
+  /** 거울(E). off = 내려서 다시 탄다(승강기 안일 때) */
+  mirror?(v: { tired: boolean; inCar: boolean; agent: string }, done: (r: { off: boolean }) => void): boolean;
+  /** 층 도착 방송. true면 대사 모듈이 말한 것 */
+  announce?(v: { depth: number; type: string; label: string; hint: string; first: boolean; agent: string }): boolean;
+  /** (옛 모양) 대사만 바꿔 끼우기 */
   elevator?: ElevatorLines;
-  passenger?: PassengerLines;
-  /** 출동 기록 한 줄 (시연판 로그용) */
+  passengerLines?: PassengerLines;
+  /** 출동 기록 한 줄 (시험 로그용) */
   log?(line: string): void;
 }
+
 
 /** 층 하나가 열려 있는 동안의 규칙 상태 */
 interface Runtime {
@@ -121,6 +174,15 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     hurtCd: 0,
     red: false,
   });
+
+  // 대사 모듈이 대화를 마치고 돌려준 결과는 다음 tick에, 아직 같은 층일 때만 적용한다
+  let later: { plan: string; run: (api: StageApi) => void }[] = [];
+  const defer =
+    <R>(run: (api: StageApi, r: R) => void) =>
+    (res: R) => {
+      const plan = rt?.plan.id;
+      if (plan) later.push({ plan, run: (api) => run(api, res) });
+    };
 
   const placedOf = (prop: PropSpec): Placed | undefined => (prop.id.startsWith('p') ? rt?.plan.stage.floor?.placed.find((p) => `p${p.id}` === prop.id) : undefined);
   const hookOf = (id: string): SpawnHook | undefined => (id.startsWith('h') ? rt?.plan.stage.floor?.spawns.find((s) => `h${s.id}` === id) : undefined);
@@ -541,6 +603,11 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       const r = rt;
       const p = api.world.player;
       if (r.t === 0) onEnter(api);
+      if (later.length) {
+        const now = later.filter((l) => l.plan === r.plan.id);
+        later = [];
+        for (const l of now) l.run(api);
+      }
       r.t += DT;
       r.hurtCd -= DT;
       const where = r.plan.stage.where;
@@ -623,7 +690,10 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         case 'mirror': {
           const tired = rng(mix(o.seed, o.ride, o.depth, 55))() < 0.35;
           foundRule(api, 'mirror', p.x);
-          if (r.plan.stage.where === 'car') {
+          const inCar = r.plan.stage.where === 'car';
+          if (inCar) o.tired = tired;
+          if (hooks.mirror?.({ tired, inCar, agent: o.agent }, defer<{ off: boolean }>((api, res) => res.off && inCar && finishWith(api, { to: 'car' })))) break;
+          if (inCar) {
             if (tired) (o.tired = true), api.world.say('거울 속 얼굴이 피곤해 보인다. (내려서 다시 타면 바뀐다. 그대로 가면 다음 층 위협 +30%)', 4);
             else (o.tired = false), api.world.say('거울 속 얼굴은 괜찮아 보인다.', 2);
           } else api.world.say(tired ? '거울 속 얼굴이 피곤해 보인다.' : '거울 속 얼굴. 나다. 아마도.', 2.5);
@@ -835,37 +905,16 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           api.world.say('용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)', 2.5);
           break;
         case 'merchant':
-          api.world.say('중림 상인: 「현금 있어? 물건은 많아.」 (상점은 아이템 작업에서)', 3);
-          break;
+          break; // 상점 창은 아이템 모듈이 엔진 interactHooks에서 연다
         // ── 승강기 안
-        case 'greet': {
-          if (o.greeted) {
-            api.world.say(greetLine(meta.favor, false, false), 2);
-            break;
-          }
-          o.greeted = true;
-          foundRule(api, 'greet', p.x);
-          if (o.flags.includes('greet_flip')) {
-            addFavor(meta, o, -1, '말 걸지 말라는 날 인사함');
-            api.world.say(greetLine(meta.favor, false, true), 2.5);
-          } else {
-            const gain = rng(mix(o.seed, o.ride, 31))() < 0.5 ? 1 : 0;
-            if (gain) addFavor(meta, o, 1, '인사');
-            api.world.say(greetLine(meta.favor, !!gain, false), 2.5);
-            if (meta.favor >= 3 && !meta.lonelyHeard) (meta.lonelyHeard = true), api.world.say(LONELY_LINE, 5);
-          }
-          save();
+        case 'greet':
+          if (o.greeted) api.world.say(greetLine(meta.favor, false, false), 2);
+          else doGreet(api, true);
           break;
-        }
         case 'close':
           o.closeCount++;
-          if (o.closeCount >= 3 || (o.flags.includes('close_any') && o.closeCount === 1)) {
-            addFavor(meta, o, -1, '닫힘 연타');
-            foundRule(api, 'close', p.x);
-            api.world.say(CLOSE_SPAM_LINE, 2.5);
-            o.closeCount = -99;
-            save();
-          } else api.world.say('딸깍.', 0.8);
+          if (o.closeCount >= 3 || (o.flags.includes('close_any') && o.closeCount === 1)) doSpam(api, true);
+          else api.world.say('딸깍.', 0.8);
           break;
         case 'getoff':
           finishWith(api, { to: 'car' });
@@ -898,6 +947,31 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     },
   };
 
+  /** 인사 (소품 E 또는 대사 모듈 선택). given = 대사 모듈이 굴린 총애 */
+  const doGreet = (api: StageApi, talk: boolean, given?: number) => {
+    const o = out!;
+    o.greeted = true;
+    foundRule(api, 'greet', api.world.player.x);
+    if (o.flags.includes('greet_flip')) {
+      addFavor(meta, o, -1, '말 걸지 말라는 날 인사함');
+      if (talk) api.world.say(greetLine(meta.favor, false, true), 2.5);
+    } else {
+      const gain = given !== undefined ? Math.max(0, Math.min(1, given - meta.favor)) : rng(mix(o.seed, o.ride, 31))() < 0.5 ? 1 : 0;
+      if (gain) addFavor(meta, o, 1, '인사');
+      if (talk) api.world.say(greetLine(meta.favor, !!gain, false), 2.5);
+      if (talk && meta.favor >= 3 && !meta.lonelyHeard) ((meta.lonelyHeard = true), api.world.say(LONELY_LINE, 5));
+    }
+    save();
+  };
+  const doSpam = (api: StageApi, talk: boolean) => {
+    const o = out!;
+    addFavor(meta, o, -1, '닫힘 연타');
+    foundRule(api, 'close', api.world.player.x);
+    if (talk) api.world.say(CLOSE_SPAM_LINE, 2.5);
+    o.closeCount = -99;
+    save();
+  };
+
   const onEnter = (api: StageApi) => {
     const r = rt!;
     const o = out!;
@@ -909,9 +983,26 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     if (plan.stage.where === 'floor') {
       const f = plan.stage.floor!;
       api.world.emit({ type: 'ding', x: plan.startX });
-      api.world.say(o.depth === 1 && o.visited.length === 1 ? '띵. 1층입니다. 문이 열립니다. …로비 같은데, 로비가 아니다.' : announce(f.depth, f.type), 4);
+      const first = o.depth === 1 && o.visited.length === 1;
+      const told = hooks.announce?.({ depth: f.depth, type: f.type, label: FLOOR_TYPES[f.type].label, hint: FLOOR_TYPES[f.type].hint, first, agent: o.agent });
+      if (!told) api.world.say(first ? '띵. 1층입니다. 문이 열립니다. …로비 같은데, 로비가 아니다.' : announce(f.depth, f.type), 4);
       if (f.goal && !o.flags.includes('trial_mid')) api.world.say(`벽에 큰 글씨: 「${f.goal.text}」 (E로 읽기)`, 4);
     } else if (plan.stage.where === 'car') {
+      const info: BoardInfo = { depth: o.depth, ftype: o.lastTypes.at(-1) ?? '', favor: meta.favor, agent: o.agent, ride: o.ride, stuck: Math.max(0, o.stuck), greetFlip: o.flags.includes('greet_flip'), closeAny: o.flags.includes('close_any') };
+      const byStory = hooks.board?.(
+        info,
+        defer<BoardResult>((api, res) => {
+          if (res.act === 'greet' && !out!.greeted) doGreet(api, false, res.favor);
+          else if (res.act === 'spam' && out!.closeCount >= 0) doSpam(api, false);
+        }),
+      );
+      if (byStory) {
+        // 인사·닫힘은 대사 모듈 선택지로 했으니 소품은 치운다
+        api.setProp('greet', null);
+        api.setProp('close', null);
+        if (o.stuck > 0) log('총애가 낮아 문이 안 닫힌다 (10초)');
+        return;
+      }
       const lines = hooks.elevator;
       const n = o.ride;
       const call = rng(mix(o.seed, n, 7))() < 0.4 ? lines?.callout?.(o.agent, meta.favor, n) ?? defaultCallout(o.agent, meta.favor) : MUTTER[n % MUTTER.length];
@@ -930,7 +1021,14 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     if (!h) return;
     const kind = h.kind as PassengerKind;
     const fork = !!h.data.fork;
-    const lines = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
+    if (!r.talked.has(prop.id)) {
+      const info: PassengerInfo = { kind, honest: !!h.data.honest, long: !!h.data.long, fork, knowsRule: currentKnown(meta).includes('passenger'), agent: o.agent, depth: o.depth };
+      if (hooks.passenger?.(info, defer<PassengerResult>((api, res) => applyPassenger(api, prop, h, res.choice)))) {
+        r.talked.add(prop.id);
+        return;
+      }
+    }
+    const lines = hooks.passengerLines?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
     api.world.say(`${PASSENGER_LABEL[kind]}: ${lines.join(' ')}`, 5);
     if (r.talked.has(prop.id)) return;
     r.talked.add(prop.id);
@@ -955,33 +1053,42 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const p = api.world.player;
     if (ch.choice === 'deal') {
       clearChoices(api, 'deal:');
-      const cost = o.items.find((i) => i === 'gear' || i === 'checklist') ?? o.items[0];
-      if (!cost) return api.world.say('인터폰: 「줄 게 없으면 거래도 없어요.」', 2.5);
-      o.items.splice(o.items.indexOf(cost), 1);
-      o.deals++;
-      const truth = dealTruth(meta.favor, rng(mix(o.seed, o.deals, meta.favor, 11))());
-      log(`승강기와 거래: ${ch.deal} (${itemName(cost)} 줌) · ${truth ? '참' : '거짓'}`);
-      if (ch.deal === 'reveal') {
-        o.reveal = true;
-        const ty = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, truth ? 3 : 4);
-        api.world.say(`인터폰: 「다음은 ${FLOOR_TYPES[ty].label}예요.」${truth ? '' : ' (…정말일까)'}`, 3.5);
-      } else if (ch.deal === 'skip') {
-        const d = o.serviceDepth + (truth ? 3 : 1);
-        api.world.say(`인터폰: 「아래로 모셔다 드릴게요.」`, 2.5);
-        finishWith(api, { to: 'floor', depth: d, type: pickType(d, o.lastTypes, o.seed, meta.epoch, 77), sub: null });
-      } else {
-        api.world.say(truth ? '인터폰: 「매트 밑을 봐요.」 (회복약 2개)' : '인터폰: 「매트 밑을 봐요.」 …아무것도 없다.', 3);
-        if (truth) o.items.push('heal', 'heal'), api.heal(30);
-      }
-      save();
-      return;
+      return applyDeal(api, ch.deal!);
     }
-    const h = ch.hook;
+    clearChoices(api, `h${ch.hook.id}:`);
+    applyPassenger(api, prop, ch.hook, ch.choice);
+  };
+
+  const applyDeal = (api: StageApi, deal: 'reveal' | 'skip' | 'supply') => {
+    const o = out!;
+    const cost = o.items.find((i) => i === 'gear' || i === 'checklist') ?? o.items[0];
+    if (!cost) return api.world.say('인터폰: 「줄 게 없으면 거래도 없어요.」', 2.5);
+    o.items.splice(o.items.indexOf(cost), 1);
+    o.deals++;
+    const truth = dealTruth(meta.favor, rng(mix(o.seed, o.deals, meta.favor, 11))());
+    log(`승강기와 거래: ${deal} (${itemName(cost)} 줌) · ${truth ? '참' : '거짓'}`);
+    if (deal === 'reveal') {
+      o.reveal = true;
+      const ty = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, truth ? 3 : 4);
+      api.world.say(`인터폰: 「다음은 ${FLOOR_TYPES[ty].label}예요.」${truth ? '' : ' (…정말일까)'}`, 3.5);
+    } else if (deal === 'skip') {
+      const d = o.serviceDepth + (truth ? 3 : 1);
+      api.world.say(`인터폰: 「아래로 모셔다 드릴게요.」`, 2.5);
+      finishWith(api, { to: 'floor', depth: d, type: pickType(d, o.lastTypes, o.seed, meta.epoch, 77), sub: null });
+    } else {
+      api.world.say(truth ? '인터폰: 「매트 밑을 봐요.」 (회복약 2개)' : '인터폰: 「매트 밑을 봐요.」 …아무것도 없다.', 3);
+      if (truth) o.items.push('heal', 'heal'), api.heal(30);
+    }
+    save();
+  };
+
+  const applyPassenger = (api: StageApi, prop: PropSpec, h: SpawnHook, c: PassengerChoice | 'follow') => {
+    const o = out!;
+    const p = api.world.player;
     const kind = h.kind as PassengerKind;
-    clearChoices(api, `h${h.id}:`);
     const honest = !!h.data.honest;
-    const c = ch.choice;
-    log(`승객 조우: ${PASSENGER_LABEL[kind]} · ${c === 'help' ? '돕기' : c === 'ignore' ? '무시' : '뺏기'} · ${honest ? '진실' : '거짓'}`);
+    log(`승객 조우: ${PASSENGER_LABEL[kind]} · ${({ help: '돕기', ignore: '무시', rob: '뺏기', follow: '따라가기' } as const)[c]} · ${honest ? '진실' : '거짓'}`);
+    if (c === 'follow' && kind !== 'three_years') c = 'ignore';
     if (c === 'ignore') return void api.world.say('지나쳤다.', 1.5);
     if (c === 'rob') {
       api.setProp(`h${h.id}`, null);
@@ -995,6 +1102,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const f = rt!.plan.stage.floor;
     switch (kind) {
       case 'three_years': {
+        // follow·help 둘 다 승객이 가리킨 문을 표시한다
         foundRule(api, 'passenger', p.x);
         const doors = f?.placed.filter((x) => x.kind === 'door' && x.data.fork !== undefined) ?? [];
         if (doors.length) {
@@ -1031,6 +1139,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
   const offerDeal = (api: StageApi, prop: PropSpec) => {
     const r = rt!;
     const hookStub: SpawnHook = { id: 0, role: 'passenger', kind: 'deal', x: 0, lane: 0, wave: 0, elite: false, data: {} };
+    if (hooks.deal?.({ favor: meta.favor, items: [...out!.items] }, defer<{ deal: 'reveal' | 'skip' | 'supply' | null }>((api, res) => res.deal && applyDeal(api, res.deal)))) return;
     api.world.say(`인터폰: 「거래할래요? 회수물 하나면 돼요.」 (가진 것: ${out!.items.map(itemName).join(', ') || '없음'})`, 4);
     (
       [
