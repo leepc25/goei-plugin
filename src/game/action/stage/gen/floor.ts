@@ -169,7 +169,8 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   placed.push(place('elevator', hall + 200, 0, 160, '타고 온 엘리베이터', { noreturn: true }));
   placed.push(place('mirror', hall + 470, 0, 60, '거울'));
   if (depth === 1) placed.push(place('checklist', hall + 640, 0, 50, '정기 점검표', { rule: 'entry' }));
-  if (depth === 1) placed.push(place('sign', hall + 860, 0, 50, '안내문', { rule: 'noreturn' }));
+  // 안내문은 점검표 옆에 나란히 두지 않고 한 화면 뒤에 (검수 13-2: 입간판 두 개 나란히)
+  if (depth === 1) placed.push(place('sign', hall + 2040, 0, 50, '안내문', { rule: 'noreturn' }));
   if (depth === 2) placed.push(place('sign', hall + 860, 0, 50, '안내판 (글자가 섞임)', { rule: 'lobby' }));
   if (type === 'deep') placed.push(place('sign', hall + 860, 0, 50, '긁힌 글씨', { rule: 'b12' }));
 

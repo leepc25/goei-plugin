@@ -171,8 +171,19 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number) {
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === 'block' || t.kind === 'pit' || t.kind === 'narrow' || t.kind === 'low');
   const taken: { a: number; b: number; y: number }[] = [];
   // 갈림길·규칙 표지는 순서가 뜻이라 그대로
-  const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.rule || q.data.group !== undefined).map((q) => `p${q.id}`));
+  const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.group !== undefined).map((q) => `p${q.id}`));
+  // 규칙 표지는 지우지 않지만(읽어야 한다) 겹치면 옮긴다
+  const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
   const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  // 입간판·게시판류(뜻 없는 꾸밈)는 층마다 2개까지, 서로 한 화면(1400px) 넘게 떨어뜨린다 (검수 13-2: 화면마다 2~3개 반복)
+  const boardLike = (p: PropSpec) => p.kind === 'sign' || p.kind === 'checklist' || (p.kind === 'prop' && /게시판|표지|안내|점검|액자|시간표/.test(p.label ?? ''));
+  const boardy = (p: PropSpec) => !meaning.has(p.id) && !ruled.has(p.id) && boardLike(p);
+  // 뜻 있는 표지(규칙·갈림길)도 수와 간격에 센다
+  const kept: number[] = props.filter((p) => boardLike(p) && (meaning.has(p.id) || ruled.has(p.id))).map((p) => p.x);
+  for (const p of [...props].filter(boardy).sort((a, b) => a.x - b.x)) {
+    if (kept.length < 3 && kept.every((x) => Math.abs(x - p.x) > 1400)) kept.push(p.x);
+    else props.splice(props.indexOf(p), 1);
+  }
   for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p) / 2;

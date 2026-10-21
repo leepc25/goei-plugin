@@ -13969,7 +13969,7 @@ function buildFloor(ctx, seed, fallback) {
   placed.push(place2("elevator", hall + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
   placed.push(place2("mirror", hall + 470, 0, 60, "거울"));
   if (depth === 1) placed.push(place2("checklist", hall + 640, 0, 50, "정기 점검표", { rule: "entry" }));
-  if (depth === 1) placed.push(place2("sign", hall + 860, 0, 50, "안내문", { rule: "noreturn" }));
+  if (depth === 1) placed.push(place2("sign", hall + 2040, 0, 50, "안내문", { rule: "noreturn" }));
   if (depth === 2) placed.push(place2("sign", hall + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
   if (type === "deep") placed.push(place2("sign", hall + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
   const goalBox = { g: null };
@@ -14565,8 +14565,16 @@ function spreadProps(f, props2, startX) {
   for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor("floor", f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === "block" || t.kind === "pit" || t.kind === "narrow" || t.kind === "low");
   const taken = [];
-  const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.rule || q.data.group !== void 0).map((q) => `p${q.id}`));
+  const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
+  const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
   const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  const boardLike = (p) => p.kind === "sign" || p.kind === "checklist" || p.kind === "prop" && /게시판|표지|안내|점검|액자|시간표/.test(p.label ?? "");
+  const boardy = (p) => !meaning.has(p.id) && !ruled.has(p.id) && boardLike(p);
+  const kept = props2.filter((p) => boardLike(p) && (meaning.has(p.id) || ruled.has(p.id))).map((p) => p.x);
+  for (const p of [...props2].filter(boardy).sort((a, b) => a.x - b.x)) {
+    if (kept.length < 3 && kept.every((x) => Math.abs(x - p.x) > 1400)) kept.push(p.x);
+    else props2.splice(props2.indexOf(p), 1);
+  }
   for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
   const free = (p, x) => {
     const h = artW(p) / 2;
