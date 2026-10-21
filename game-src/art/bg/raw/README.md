@@ -173,3 +173,16 @@
 - `hq_supply/hq_supply_wall_2.png`
 - `hq_supply/hq_supply_objects.png`
 
+
+
+## 본부 배경 추가 · 2026-10-22 · hq_training
+
+요청서 신규 원본 6장. 벽·원경·물건 1536×1024, 바닥 1024×1024. 도트화·게임 반영은 후속 통합 작업.
+
+- `hq_training/hq_training_wall_1.png`
+- `hq_training/hq_training_wall_2.png`
+- `hq_training/hq_training_wall_3.png`
+- `hq_training/hq_training_wall_4.png`
+- `hq_training/hq_training_floor.png`
+- `hq_training/hq_training_objects.png`
+
