@@ -254,3 +254,4 @@
 내장 image_gen으로 순서대로 제작. 각 이미지 옆 `.production.json`에 요청문·규격·해시를 기록. 도트화·게임 반영은 별도.
 
 - `silent/silent_wall_1.png`
+- `silent/silent_wall_2.png`
