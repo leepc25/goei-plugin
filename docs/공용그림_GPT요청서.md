@@ -6,7 +6,7 @@
 
 - 종류마다 GPT 대화를 따로 열고, 아래 요청문 하나를 통째로 붙여 넣으세요. 참고 그림 1장을 같이 첨부합니다 (`assets/wiki/Situations/` 의 그 종류 그림).
 - GPT가 목록을 쉬지 않고 이어서 만듭니다. 중간에 멈추면 「계속」이라고만 하세요. 파일 이름은 목록의 영어 이름 그대로 png로 받으세요. 이름이 그대로 에셋 이름이 됩니다.
-- 받은 뒤 Claude가 720×480 AVIF로 바꾸고 꼬리표를 붙여 카드에 넣습니다.
+- 받은 뒤 Claude가 720×720 AVIF로 바꾸고 꼬리표를 붙여 카드에 넣습니다.
 
 ## 괴이 (30장) · 참고 그림: Situation Anomaly
 
@@ -16,7 +16,7 @@
 Make 30 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png). Images ending in "1" and "2" of the same place must look clearly different (different spot, angle and composition), not the same scene redrawn.
 
 STYLE (same for every image)
-Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
+Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level shot, square 1:1 (1024x1024). Keep the main subject in the center (the app shows it as a square when opened and crops it to a thin wide strip when closed). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
 
 KIND: ANOMALY
 Exactly ONE red light accent (signal lamp, exit sign, red glow). Uncanny emptiness; something is subtly wrong but no monster is shown.
@@ -60,7 +60,7 @@ IMAGES
 Make 12 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
-Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
+Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level shot, square 1:1 (1024x1024). Keep the main subject in the center (the app shows it as a square when opened and crops it to a thin wide strip when closed). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
 
 KIND: INCIDENT
 Blue and amber emergency lights, police tape or barricades. A realistic public emergency; nothing supernatural visible.
@@ -88,7 +88,7 @@ IMAGES
 Make 8 background illustrations for a Korean urban-horror roleplay app in this order. Generate them one after another in the same reply without stopping to ask me anything; if you hit a limit, stop and continue from the next number when I say "계속". Name each file exactly as given (.png).
 
 STYLE (same for every image)
-Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
+Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level shot, square 1:1 (1024x1024). Keep the main subject in the center (the app shows it as a square when opened and crops it to a thin wide strip when closed). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
 
 KIND: MYSTIC
 Exactly ONE cold cyan/blue light. Quiet, otherworldly, slightly dreamlike calm. The place itself is the subject.
