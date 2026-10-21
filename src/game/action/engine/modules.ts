@@ -45,12 +45,12 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>): HqModuleLike {
+function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>, gotoPlace?: (id: string) => void): HqModuleLike & { close(): void } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
   // 본부 걷기는 엔진 벨트 장면. 본부 모듈에 places·openPlace·isOpen이 생기기 전까지는 기존 DOM을 띄우고 장소 단추를 누른다
-  type HqPanel = { places?: () => HubPlace[]; openPlace?: (id: string) => void; isOpen?: () => boolean };
+  type HqPanel = { places?: () => HubPlace[]; openPlace?: (id: string) => void; isOpen?: () => boolean; close?: () => void };
   const api = hq as unknown as HqPanel;
   let root: HTMLElement | null = null;
   let fbOpen = false;
@@ -69,6 +69,7 @@ function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>): HqModuleLike
   return {
     hub: () => makeHub(places, openPlace),
     isOpen: () => (api.isOpen ? api.isOpen() : fbOpen),
+    close: () => (api.close ? api.close() : (fbOpen = false)),
     mount(r, host) {
       root = r;
       if (!api.openPlace) {
@@ -95,11 +96,13 @@ function hqAdapter(saves: SaveSlots, bridge?: Partial<GameBridge>): HqModuleLike
               },
             } as never
           : undefined,
-      });
+        closed: () => (fbOpen = false),
+        goto: (id: string) => gotoPlace?.(id),
+      }, { walk: false });
     },
     onReturn(r, run) {
       const l = (run as Launch).launch;
-      if (l) hq.onReturn(r as unknown as RunResult, l);
+      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (l as { runId?: string }).runId } as RunResult, l);
     },
     unmount: () => hq.unmount(),
   };
@@ -126,7 +129,6 @@ function toHqResult(r: RunResultCore, w: World): RunResult {
     rescued: n.rescued ?? [],
     bigHit: !!n.bigHit,
     seconds: r.timeSec,
-    id: String(n.runId ?? ''),
     notes: r.notes,
   } as RunResult;
 }
@@ -327,7 +329,19 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   window.addEventListener('keydown', storyKeys, true);
   const saves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
-  const hq = hqAdapter(saves, bridge);
+  const hq = hqAdapter(saves, bridge, (id) => {
+    const w = game?.inHub ? game.world : null;
+    const door = w?.props.find((q) => q.id === id);
+    if (w && door) (w.player.x = door.x), (w.player.px = door.x);
+  });
+  // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
+  const hqKeys = (e: KeyboardEvent) => {
+    if (e.code !== 'Escape' || !game?.inHub || !hq.isOpen?.()) return;
+    hq.close();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener('keydown', hqKeys, true);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -425,6 +439,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     boot: (g) => bootFromUrl(g),
     dispose: () => {
       window.removeEventListener('keydown', storyKeys, true);
+      window.removeEventListener('keydown', hqKeys, true);
       saveFlags();
       story.dispose();
       audio.dispose();
