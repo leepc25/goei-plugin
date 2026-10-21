@@ -1,0 +1,144 @@
+// 게임 ↔ 플러그인 다리 (타입만). 게임 코드는 플러그인 본체에 들지 않고 코드 팩(goei-game.js)으로 따로 받는다.
+// 코드 팩은 실행되면 globalThis.__goeiGame = { version, mount }를 남기고, 플러그인 창이 mount(box, bridge)로 붙인다.
+// 플러그인 쪽 구현은 src/host/game/, 단독 시험 페이지용 가짜 다리는 src/game/bridge-local.ts.
+
+/** 저장 칸: 0 = 자동 저장, 1~3 = 수동 */
+export type SlotId = 0 | 1 | 2 | 3;
+export const SLOT_IDS: SlotId[] = [0, 1, 2, 3];
+
+export interface SlotInfo {
+  slot: SlotId;
+  /** 저장 시각 (ms) */
+  savedAt: number;
+  /** 예: 「3일차 · 쟈알디」 */
+  title: string;
+  /** 예: 「예산 420 · 규칙서 6줄 · 최저 B-2」 */
+  summary: string;
+  /** 저장 본문 모양 (예: goei-hq/1). 본부 쪽이 정한다 */
+  schema: string;
+  /** 본문 글자 수 */
+  size: number;
+}
+
+export interface GameSaves {
+  list(): Promise<SlotInfo[]>;
+  read(slot: SlotId): Promise<string | null>;
+  write(slot: SlotId, data: string, info: { title: string; summary: string; schema: string }): Promise<void>;
+  remove(slot: SlotId): Promise<void>;
+  /** 마지막으로 쓴 칸 (이어하기). 없으면 null */
+  last(): Promise<SlotId | null>;
+}
+
+export interface GameAssets {
+  /** 받아 둔 팩인가 */
+  ready(pack: string): Promise<boolean>;
+  /** 팩의 파일 주소 (blob:). 팩이 없거나 파일이 없으면 '' . 게임을 닫으면 주소를 거둔다 */
+  url(pack: string, file: string): Promise<string>;
+  /** 파일 바이트 (소리를 AudioContext.decodeAudioData로 풀 때 등). 없으면 null */
+  bytes(pack: string, file: string): Promise<Uint8Array | null>;
+  /** 팩의 atlas.json 내용 (없으면 null) */
+  atlas(pack: string): Promise<unknown>;
+  /** 팩 목록과 상태 */
+  list(): Promise<{ id: string; bytes: number; ready: boolean; old: boolean }[]>;
+}
+
+/** 본편(카드·이 채팅) 읽기 전용 스냅숏. 게임을 열 때 한 번 만든다 */
+export interface CardSnapshot {
+  /** 카드 이름 */
+  card: string;
+  /** 유저 소속 코드 (A00 등) */
+  faction: string;
+  /** 캐릭터로 플레이 중인 요원 id (없으면 '') */
+  player: string;
+  agents: CardAgent[];
+  anomalies: CardPlace[];
+  sites: CardPlace[];
+  /** 지금 상황판에 떠 있는 괴이·사건·미스틱 사이트 */
+  events: CardEvent[];
+  /** 상황판 시각 (분). 없으면 null */
+  minute: number | null;
+}
+
+export interface CardAgent {
+  id: string;
+  name: string;
+  english: string;
+  affiliation: string;
+  rank: string;
+  /** 상황판 상태 (휴게·부상·작전투입…). 모르면 '미정' */
+  state: string;
+  situation: string;
+  /** 편성할 수 없는 상태인가 (작전투입·실종·사망·미정) */
+  locked: boolean;
+  /** 카드 사진 에셋 이름 (주소는 photo()로) */
+  photo: string;
+}
+
+export interface CardPlace {
+  lore: string;
+  label: string;
+  english: string;
+}
+
+export interface CardEvent {
+  kind: 'an' | 'in' | 'ms';
+  name: string;
+  loc: string;
+  grade: string;
+  state: string;
+  situation: string;
+}
+
+/** 정산 결과. 게임이 넘기면 쌓아 두고, 사용자가 「본편에 기록」을 눌렀을 때만 카드에 쓴다 */
+export interface GameReport {
+  mission: string;
+  outcome: 'return' | 'evac' | 'withdraw';
+  /** 예: B-12 */
+  depth: string;
+  agents: { id: string; name: string; hp?: number; injured?: boolean }[];
+  rules: string[];
+  loot: string[];
+  /** 한두 문장 요약 */
+  summary: string;
+}
+
+export interface GameViewport {
+  /** 전체화면을 시도한다. 브라우저 전체화면이 막히면 창 안 전체화면으로 대신한다 */
+  enter(): Promise<void>;
+  exit(): Promise<void>;
+  readonly full: boolean;
+  /** 세로 화면에서 게임을 90도 돌려 가로로 보여 주는 중인가 */
+  readonly rotated: boolean;
+  /** 화면 좌표(clientX/Y)를 게임 상자 기준 좌표로. 돌려 보일 때도 맞게 바꾼다 */
+  toLocal(clientX: number, clientY: number, el: Element): { x: number; y: number };
+  /** 크기·방향이 바뀔 때 */
+  onChange(cb: () => void): () => void;
+}
+
+export interface GameBridge {
+  readonly api: 1;
+  saves: GameSaves;
+  assets: GameAssets;
+  /** 본편 스냅숏. 괴이 카드 채팅이 아니면 null */
+  card(): Promise<CardSnapshot | null>;
+  /** 요원 사진 주소 (없으면 '') */
+  photo(asset: string): Promise<string>;
+  /** 정산 결과를 넘긴다 (쓰지는 않는다) */
+  report(result: GameReport): void;
+  viewport: GameViewport;
+  /** 지금 AI 응답을 기다리는 중인가 */
+  waiting(): boolean;
+  onWaiting(cb: (waiting: boolean) => void): () => void;
+  /** 모바일 폭인가 */
+  narrow(): boolean;
+  /** 게임 창을 닫는다 */
+  close(): void;
+}
+
+/** 코드 팩이 남기는 것 */
+export interface GameModule {
+  version: string;
+  mount(box: HTMLElement, bridge: GameBridge): () => void;
+  /** 이전 시험판 (관리국 순찰·1인 전투 검증판) */
+  legacy?: Record<string, (box: HTMLElement) => () => void>;
+}
