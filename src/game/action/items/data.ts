@@ -130,19 +130,20 @@ export interface PropDef {
   /** 숨은 방 입구 등 층 생성 쪽이 쓰는 표시 */
   tag?: 'hiddenRoom';
 }
+/** w·h = 화면 px 실제 크기(쟈알디 키 약 260px 기준: 의자 허리 130, 사물함 230). 그림도 이 높이로 그린다. */
 export const PROPS: Record<string, PropDef> = {
-  chair: { id: 'chair', name: '의자', use: 'both', hp: 20, damage: 26, knockdown: true, w: 60, h: 80, loot: 'junk' },
-  pot: { id: 'pot', name: '화분', use: 'throw', hp: 8, damage: 18, knockdown: false, w: 44, h: 56 },
-  extinguisher: { id: 'extinguisher', name: '소화기', use: 'throw', hp: 10, damage: 20, knockdown: false, w: 30, h: 64, burst: { type: 'smoke', radius: 180, slow: 0.4, time: 4 } },
-  tv: { id: 'tv', name: '텔레비전', use: 'throw', hp: 12, damage: 34, knockdown: true, w: 76, h: 60, burst: { type: 'shock', radius: 120, damage: 10 } },
-  table: { id: 'table', name: '밥상', use: 'throw', hp: 16, damage: 30, knockdown: true, w: 110, h: 40 },
-  bin: { id: 'bin', name: '쓰레기통', use: 'both', hp: 14, damage: 16, knockdown: false, w: 48, h: 64, loot: 'junk' },
-  crate: { id: 'crate', name: '나무 상자', use: 'break', hp: 24, damage: 0, knockdown: false, w: 80, h: 80, loot: 'crate' },
-  drawer: { id: 'drawer', name: '서랍장', use: 'break', hp: 36, damage: 0, knockdown: false, w: 90, h: 110, loot: 'drawer' },
-  mailbox: { id: 'mailbox', name: '우편함', use: 'break', hp: 16, damage: 0, knockdown: false, w: 70, h: 90, loot: 'mailbox' },
-  barrel: { id: 'barrel', name: '드럼통', use: 'break', hp: 18, damage: 0, knockdown: true, w: 60, h: 84, burst: { type: 'blast', radius: 170, damage: 40 } },
-  locker: { id: 'locker', name: '관리국 보급함', use: 'break', hp: 30, damage: 0, knockdown: false, w: 70, h: 120, loot: 'locker' },
-  crackedwall: { id: 'crackedwall', name: '금 간 벽', use: 'break', hp: 60, damage: 0, knockdown: false, w: 120, h: 200, tag: 'hiddenRoom', loot: 'hidden' },
+  chair: { id: 'chair', name: '의자', use: 'both', hp: 20, damage: 26, knockdown: true, w: 93, h: 130, loot: 'junk' },
+  pot: { id: 'pot', name: '화분', use: 'throw', hp: 8, damage: 18, knockdown: false, w: 75, h: 80 },
+  extinguisher: { id: 'extinguisher', name: '소화기', use: 'throw', hp: 10, damage: 20, knockdown: false, w: 44, h: 80, burst: { type: 'smoke', radius: 180, slow: 0.4, time: 4 } },
+  tv: { id: 'tv', name: '텔레비전', use: 'throw', hp: 12, damage: 34, knockdown: true, w: 76, h: 76, burst: { type: 'shock', radius: 120, damage: 10 } },
+  table: { id: 'table', name: '밥상', use: 'throw', hp: 16, damage: 30, knockdown: true, w: 146, h: 80 },
+  bin: { id: 'bin', name: '쓰레기통', use: 'both', hp: 14, damage: 16, knockdown: false, w: 84, h: 95, loot: 'junk' },
+  crate: { id: 'crate', name: '나무 상자', use: 'break', hp: 24, damage: 0, knockdown: false, w: 102, h: 100, loot: 'crate' },
+  drawer: { id: 'drawer', name: '서랍장', use: 'break', hp: 36, damage: 0, knockdown: false, w: 125, h: 110, loot: 'drawer' },
+  mailbox: { id: 'mailbox', name: '우편함', use: 'break', hp: 16, damage: 0, knockdown: false, w: 242, h: 80, loot: 'mailbox' },
+  barrel: { id: 'barrel', name: '드럼통', use: 'break', hp: 18, damage: 0, knockdown: true, w: 91, h: 130, burst: { type: 'blast', radius: 170, damage: 40 } },
+  locker: { id: 'locker', name: '관리국 보급함', use: 'break', hp: 30, damage: 0, knockdown: false, w: 149, h: 230, loot: 'locker' },
+  crackedwall: { id: 'crackedwall', name: '금 간 벽', use: 'break', hp: 60, damage: 0, knockdown: false, w: 252, h: 200, tag: 'hiddenRoom', loot: 'hidden' },
 };
 
 // ---------- 줍는 것 (바닥 드랍) ----------

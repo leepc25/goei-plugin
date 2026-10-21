@@ -57,6 +57,24 @@ function drawFloorArt(c: CanvasRenderingContext2D, id: string, x: number, y: num
   return true;
 }
 
+/** 환경 물건(가구)은 손에 드는 배율이 아니라 실제 크기: 그림 높이를 PROPS[id].h(화면 px)에 맞춘다. 아래 가운데 = (x, y) */
+function drawPropSized(c: CanvasRenderingContext2D, id: string, x: number, y: number): boolean {
+  const d = PROPS[id];
+  const all = (typeof window !== 'undefined' && (window as { __GOEI_ITEM_ART__?: Record<string, { src: string; w: number; h: number }> }).__GOEI_ITEM_ART__) || {};
+  const a = all[id];
+  if (!a || !d) return false;
+  let im = floorImgs.get(a.src);
+  if (!im) floorImgs.set(a.src, (im = Object.assign(new Image(), { src: a.src })));
+  if (!im.complete || !im.naturalWidth) return false;
+  const h = d.h,
+    w = (a.w * h) / a.h;
+  const prev = c.imageSmoothingEnabled;
+  c.imageSmoothingEnabled = false;
+  c.drawImage(im, Math.round(x - w / 2), Math.round(y - h), Math.round(w), h);
+  c.imageSmoothingEnabled = prev;
+  return true;
+}
+
 // 중림 상인 거래 창 (무대 위에 겹침). 열려 있으면 전투를 멈춘다: modules.ts의 blocking에서 itemsBlocking()
 let shopPanel: ShopPanel | null = null;
 export const itemsBlocking = () => !!shopPanel?.isOpen();
@@ -159,8 +177,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     if (carry.kind === 'prop') {
       const d = PROPS[carry.id];
       const s = Math.max(d?.w ?? 60, d?.h ?? 60);
-      // 머리 위로 들어 올린 높이 (머리에 겹치지 않게 조금 띄움)
-      drawItemIcon(c, carry.id, -s / 2, -s - 18, s);
+      // 머리 위로 들어 올린 높이 (머리에 겹치지 않게 조금 띄움), 바닥과 같은 실제 크기
+      if (!drawPropSized(c, carry.id, 0, -18)) drawItemIcon(c, carry.id, -s / 2, -s - 18, s);
     } else if (!drawItemHeld(c, carry.id, deg)) {
       // 무기 그림의 손잡이 = 그림 아래쪽 1/4 지점. 각도 0 = 위로 세움, 시계 방향
       c.rotate(((deg + 45) * Math.PI) / 180);
@@ -248,7 +266,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
           c.fill();
           if (e.flash > 0) c.globalAlpha = 0.6;
           // 배경 물건 그림이 있으면 그것, 없으면 아이콘
-          if (!drawPropArt(c, `item_${e.prop}`, d?.name, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
+          if (!drawPropArt(c, `item_${e.prop}`, d?.name, e.x - camX, e.y) && !drawPropSized(c, e.prop, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
           c.globalAlpha = 1;
           continue;
         }
@@ -266,7 +284,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       }
       for (const pj of field.projs) {
         c.fillStyle = '#d8e0e4';
-        if (pj.kind === 'prop' && pj.ref) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
+        if (pj.kind === 'prop' && pj.ref) {
+          if (!drawPropSized(c, pj.ref, pj.x - camX, pj.y - pj.z + (PROPS[pj.ref]?.h ?? 56) / 2)) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
+        }
         else c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
       }
       for (const z of field.zones) {
