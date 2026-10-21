@@ -5079,7 +5079,7 @@ function settle(s2, l, raw, rand2) {
   const evac = r.how === "evac";
   const success = r.how === "return" && r.missionDone;
   const agent = AGENT_BY_ID[l.agent];
-  lines2.push(evac ? `후송: ${agent.name}이(가) 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === "return" ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${agent.name}이(가) 다락방 로프로 철수했다. 성공 보상은 없다.`);
+  lines2.push(evac ? `후송: ${josa(agent.name, "이", "가")} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === "return" ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, "이", "가")} 다락방 로프로 철수했다. 성공 보상은 없다.`);
   const unsent = r.found.filter((f) => !r.sent.includes(f));
   const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
   let added = 0;
@@ -5104,7 +5104,7 @@ function settle(s2, l, raw, rand2) {
     if (pay < r.debt && s2.relicsOwned.length) {
       const taken = s2.relicsOwned.pop();
       s2.relics = s2.relics.map((x) => x === taken ? null : x);
-      lines2.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」을(를) 압류당했다.`);
+      lines2.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 압류당했다.`);
     } else lines2.push(`사채 ${r.debt} 상환`);
   }
   s2.currencies.budget = Math.max(0, s2.currencies.budget + budget);
@@ -5157,7 +5157,7 @@ function settle(s2, l, raw, rand2) {
     s2.relicsOwned = s2.relicsOwned.filter((x) => x !== taken);
     s2.relics = s2.relics.map((x) => x === taken ? null : x);
     s2.lostRelics.push(taken);
-    lines2.push(`유물 「${RELICS[taken].name}」을(를) 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
+    lines2.push(`유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
   }
   s2.runs++;
   for (const [id2, until] of Object.entries(s2.deadlines)) {
@@ -5192,6 +5192,11 @@ function reportText(s2) {
 }
 function saveTitle(s2) {
   return { title: `${s2.day}일차 · ${AGENT_BY_ID[s2.selected].name}`, summary: `예산 ${s2.currencies.budget} · 규칙서 ${s2.rulebook.length}줄 · 최저 ${s2.deepest ? s2.deepest <= 3 ? `L${s2.deepest}` : `B-${s2.deepest - 3}` : "—"}` };
+}
+function josa(word, withBatchim, without) {
+  const c = word.charCodeAt(word.length - 1);
+  const has = c >= 44032 && c <= 55203 && (c - 44032) % 28 !== 0;
+  return word + (has ? withBatchim : without);
 }
 
 // src/game/action/hq/link.ts
@@ -12599,7 +12604,7 @@ function drawBack(ctx, camX, segs, pal, plan) {
     ctx.fillRect(s2.x, y0, s2.w, 40);
     ctx.fillStyle = room ? pal.accent : "rgba(255,255,255,0.3)";
     ctx.font = "14px monospace";
-    ctx.fillText(room ? roomName(s2.ref) : `${s2.ref.slice(6)}${s2.flip ? " ⇄" : ""}`, s2.x + 10, CEIL + 24);
+    ctx.fillText(room ? roomName(s2.ref) : `${s2.ref.slice(6)}${s2.flip ? " ⇄" : ""}`, s2.x + 10, Math.max(CEIL + 24, 128));
   }
   for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1);
   void CHUNK_W;

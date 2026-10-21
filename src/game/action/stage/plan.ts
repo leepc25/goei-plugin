@@ -223,7 +223,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     ctx.fillRect(s.x, y0, s.w, 40);
     ctx.fillStyle = room ? pal.accent : 'rgba(255,255,255,0.3)';
     ctx.font = '14px monospace';
-    ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, CEIL + 24);
+    ctx.fillText(room ? roomName(s.ref) : `${s.ref.slice(6)}${s.flip ? ' ⇄' : ''}`, s.x + 10, Math.max(CEIL + 24, 128));
   }
   // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
   for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1);

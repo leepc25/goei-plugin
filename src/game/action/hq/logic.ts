@@ -337,7 +337,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   const evac = r.how === 'evac';
   const success = r.how === 'return' && r.missionDone;
   const agent = AGENT_BY_ID[l.agent];
-  lines.push(evac ? `후송: ${agent.name}이(가) 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${agent.name}이(가) 다락방 로프로 철수했다. 성공 보상은 없다.`);
+  lines.push(evac ? `후송: ${josa(agent.name, '이', '가')} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, '이', '가')} 다락방 로프로 철수했다. 성공 보상은 없다.`);
 
   // 규칙서: 송신한 정보는 전부, 안 보낸 정보는 후송이면 절반
   const unsent = r.found.filter((f) => !r.sent.includes(f));
@@ -368,7 +368,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
     if (pay < r.debt && s.relicsOwned.length) {
       const taken = s.relicsOwned.pop()!;
       s.relics = s.relics.map((x) => (x === taken ? null : x));
-      lines.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」을(를) 압류당했다.`);
+      lines.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, '을', '를').slice(RELICS[taken].name.length)} 압류당했다.`);
     } else lines.push(`사채 ${r.debt} 상환`);
   }
   s.currencies.budget = Math.max(0, s.currencies.budget + budget);
@@ -431,7 +431,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
     s.relicsOwned = s.relicsOwned.filter((x) => x !== taken);
     s.relics = s.relics.map((x) => (x === taken ? null : x));
     s.lostRelics.push(taken);
-    lines.push(`유물 「${RELICS[taken].name}」을(를) 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
+    lines.push(`유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, '을', '를').slice(RELICS[taken].name.length)} 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
   }
   // 구조 요청 마감
   s.runs++;
@@ -475,3 +475,10 @@ export function saveTitle(s: HqSave) {
 }
 
 export type { Slot };
+
+/** 받침에 따라 조사 고르기: josa('쟈알디', '이', '가') → '쟈알디가' */
+function josa(word: string, withBatchim: string, without: string): string {
+  const c = word.charCodeAt(word.length - 1);
+  const has = c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 !== 0;
+  return word + (has ? withBatchim : without);
+}
