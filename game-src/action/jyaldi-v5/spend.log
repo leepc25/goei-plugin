@@ -452,3 +452,52 @@ description: tall slim adult woman agent, long straight black hair to the waist,
 09:41:55 skel walk 8f -> id: 0e459152-3d3d-4552-90c5-66329d0923e2
 job_id: 0e459152-3d3d-4552-90c5-66329d0923e2
 description: tall slim adult woman agent, long straight black hair to the waist, pale skin, red eyes, black pant s
+10:05:57 char1 south seed711 -> id: 185c26b6-7cba-4202-99e0-1de2e1a569d8
+job_id: 185c26b6-7cba-4202-99e0-1de2e1a569d8
+model: pixen
+description: Front view pixel art sprite for a 1990
+10:05:58 char1 south seed721 -> id: 56fbebe8-a0ac-4124-8c62-1b3c7c7af6a9
+job_id: 56fbebe8-a0ac-4124-8c62-1b3c7c7af6a9
+model: pixen
+description: Front view pixel art sprite for a 1990
+10:07:13 char1 edit south-721 -> id: 8c778f9c-07e9-4cb8-8733-4202b86cc82f
+job_id: 8c778f9c-07e9-4cb8-8733-4202b86cc82f
+model: pixen
+edit: Make her clearly a young woman with a feminin
+10:08:26 char2 create -> id: c0968765-bb79-4596-a1a7-433e60b4f9f1
+name: Jyaldi
+mode: v3 reference (2 generations, 4 directions)
+body: humanoid
+size: 96x96px
+view: side
+style: from reference image (outline/detail hints ignored)
+status: processing (~3-5 min)
+
+hint: get_character(character_id="c0968765-bb79-4596-a1a7-433e60b4f
+10:12:33 char2 anim running-8-frames -> character: c0968765-bb79-4596-a1a7-433e60b4f9f1
+animation: running-8-frames
+mode: skeleton-v3
+directions: east (1 jobs)
+job_ids: east=644ca2a8-b6ba-4d5c-9693-e0b4fcee7f4b
+group: 86dddc53-1f66-4197-b34c-55592cab2e11
+cost: 3 generations (3/dir x 1)
+eta: ~3-5 min/direction
+add more directions to this g
+10:12:33 char2 anim lead-jab -> character: c0968765-bb79-4596-a1a7-433e60b4f9f1
+animation: lead-jab
+mode: skeleton-v3
+directions: east (1 jobs)
+job_ids: east=bcd74e71-7cb8-4b16-8d26-51183f91dd0a
+group: d2af3af0-4a2b-4e30-b7f9-25ce8dce834a
+cost: 2 generations (2/dir x 1)
+eta: ~3-5 min/direction
+add more directions to this group: an
+10:12:34 char2 anim taking-punch -> character: c0968765-bb79-4596-a1a7-433e60b4f9f1
+animation: taking-punch
+mode: skeleton-v3
+directions: east (1 jobs)
+job_ids: east=d2834ecd-994c-456b-8521-cad8e120eda9
+group: 04900a25-3525-4667-bb89-2353aa9c8ac0
+cost: 3 generations (3/dir x 1)
+eta: ~3-5 min/direction
+add more directions to this group

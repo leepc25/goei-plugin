@@ -1,0 +1,44 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>쟈알디 기본 견본 시험</title>
+<style>
+body{margin:0;background:#1A2226;color:#dde;font:14px sans-serif;display:flex;flex-direction:column;align-items:center;touch-action:none;user-select:none}
+canvas{background:#2C383E;image-rendering:pixelated;width:min(100vw,960px);margin-top:8px}
+.k{margin:8px;opacity:.8}
+.pad{display:flex;gap:10px;margin:10px}
+.pad button{font-size:18px;padding:16px 20px;border-radius:12px;border:0;background:#3a4a52;color:#fff}
+</style></head><body>
+<canvas id="c" width="480" height="200"></canvas>
+<div class="k">← → 달리기 · J 잽 · K 맞기 · [ ] 속도 <span id="sp"></span></div>
+<div class="pad"><button data-k="ArrowLeft">←</button><button data-k="ArrowRight">→</button><button data-k="j">잽</button><button data-k="k">맞기</button></div>
+<script>
+const D=/*DATA*/null, IM={};
+for(const k in D) IM[k]=D[k].map(s=>{const i=new Image();i.src=s;return i});
+const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
+const keys={};let x=150,face=1,act=null,af=0,at=0,runF=0,runT=0,shake=0,speed=1;
+const FPS={run:12,jab:[4,3,8],punch:[3,3,6,6,5,5]}; // jab: 준비·뻗음·유지 (60fps 기준 장 길이)
+function start(a){if(act)return;act=a;af=0;at=0;if(a==='punch')shake=6}
+addEventListener('keydown',e=>{keys[e.key]=1;if(e.key==='j'||e.key==='J')start('jab');if(e.key==='k'||e.key==='K')start('punch');
+ if(e.key==='[')speed=Math.max(.25,speed/2);if(e.key===']')speed=Math.min(1,speed*2);document.getElementById('sp').textContent=speed<1?'×'+speed:''});
+addEventListener('keyup',e=>keys[e.key]=0);
+document.querySelectorAll('.pad button').forEach(b=>{const k=b.dataset.k;
+ b.onpointerdown=e=>{e.preventDefault();if(k==='j')start('jab');else if(k==='k')start('punch');else keys[k]=1};
+ b.onpointerup=b.onpointerleave=()=>{keys[k]=0}});
+let last=performance.now(),acc=0;
+function tick(){
+ const dir=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);
+ if(act){at++;const L=FPS[act][af];if(at>=L){at=0;af++;if(af>=IM[act].length){act=null}}}
+ else if(dir){face=dir;x+=dir*2.4;if(x<-40)x=520;if(x>520)x=-40;runT++;if(runT>=60/FPS.run){runT=0;runF=(runF+1)%8}}
+ else runF=0;
+ if(shake>0)shake--;
+}
+function draw(){
+ g.fillStyle='#2C383E';g.fillRect(0,0,480,200);g.fillStyle='#151C1F';g.fillRect(0,170,480,30);
+ const dir=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);
+ let im=act?IM[act][af]:dir?IM.run[runF]:IM.jab[0];
+ const sx=shake?(shake%2?2:-2):0;
+ g.save();g.translate(Math.round(x+sx),50);if(face<0){g.scale(-1,1)}
+ g.drawImage(im,-72,0);g.restore();
+}
+function loop(t){acc+=(t-last)*speed;last=t;while(acc>=1000/60){tick();acc-=1000/60}draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>
