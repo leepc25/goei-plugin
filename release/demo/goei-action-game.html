@@ -19901,6 +19901,22 @@ function createShopPanel(root) {
 // src/game/action/engine/itemsLink.ts
 var PROP_ART = /* @__PURE__ */ new Set(["chair", "pot", "tv", "table", "crate"]);
 var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
+var FLOOR_ALIAS = { heal: "heal_orb", ammo: "rounds", coin: "coins" };
+var floorImgs = /* @__PURE__ */ new Map();
+function drawFloorArt(c, id, x, y) {
+  const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
+  const a = all[id] ?? all[FLOOR_ALIAS[id] ?? ""];
+  if (!a) return false;
+  let im = floorImgs.get(a.src);
+  if (!im) floorImgs.set(a.src, im = Object.assign(new Image(), { src: a.src }));
+  if (!im.complete || !im.naturalWidth) return false;
+  const w = a.w * 2, h = a.h * 2;
+  const prev = c.imageSmoothingEnabled;
+  c.imageSmoothingEnabled = false;
+  c.drawImage(im, Math.round(x - w / 2), Math.round(y - h), w, h);
+  c.imageSmoothingEnabled = prev;
+  return true;
+}
 var shopPanel = null;
 var itemsBlocking = () => !!shopPanel?.isOpen();
 function mountItemsOverlay(root) {
@@ -20082,8 +20098,7 @@ function linkItems(w, run) {
         c.fill();
         const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
         const id = e.ref ?? e.kind;
-        const sz = e.kind === "weapon" ? 80 : e.kind === "item" || e.kind === "relic" ? 40 : 28;
-        drawItemIcon(c, id, x - sz / 2, y - sz - 6 + bob, sz);
+        if (!drawFloorArt(c, id, x, y - 4 + bob)) drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
       }
       for (const pj of field.projs) {
         c.fillStyle = "#d8e0e4";
