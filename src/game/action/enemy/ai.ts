@@ -59,12 +59,24 @@ export function approach(e: Enemy, w: WorldView, keep = e.def.keep, wait = false
   const adx = Math.abs(dx);
   const sp = e.speed();
   e.face(p.x);
-  const far = wait ? keep[1] + 140 : keep[1];
+  // 같은 쪽에서 플레이어에 더 가까운 같은 편 수만큼 한 줄 뒤에 선다 (한 덩어리로 겹치지 않게, 검수 4-10)
+  let rank = 0;
+  for (const b of w.bodies)
+    if (b !== e && b instanceof Enemy && b.alive && b.state !== 'dead' && Math.sign(p.x - b.x) === Math.sign(dx) && Math.abs(p.x - b.x) < adx) rank++;
+  const back = Math.min(rank, 3) * 110;
+  const far = (wait ? keep[1] + 140 : keep[1]) + back;
+  const near = keep[0] + back;
   let mx = 0;
   if (adx > far) mx = Math.sign(dx);
-  else if (adx < keep[0]) mx = -Math.sign(dx);
-  // 같은 편끼리 겹치지 않게 살짝 밀기
-  for (const b of w.bodies) if (b !== e && b instanceof Enemy && b.alive && Math.abs(b.x - e.x) < 40 && Math.abs(b.y - e.y) < 20) e.y += b.y > e.y ? -0.8 : 0.8;
+  else if (adx < near) mx = -Math.sign(dx);
+  // 같은 편끼리 가까우면 앞뒤(깊이)와 옆으로 벌린다
+  let ny = 0;
+  for (const b of w.bodies)
+    if (b !== e && b instanceof Enemy && b.alive && Math.abs(b.x - e.x) < 90 && Math.abs(b.y - e.y) < 50) {
+      ny += b.y > e.y || (b.y === e.y && b.id > e.id) ? -1 : 1;
+      if (!mx) e.x += (b.x > e.x || (b.x === e.x && b.id > e.id) ? -1 : 1) * Math.min(1.5, sp * 0.4);
+    }
+  if (ny) e.y += Math.sign(ny) * Math.min(2, sp * 0.5);
   const ty = p.y + (wait ? e.laneOff : 0);
   const my = Math.abs(ty - e.y) > 4 ? Math.sign(ty - e.y) : 0;
   e.x += mx * sp;

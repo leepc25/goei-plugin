@@ -124,3 +124,5 @@
   .hq-choices { flex-direction: row; flex-wrap: wrap; }
   .hq-kit { font-size: 12px; margin-bottom: 4px; }
 }
+.hq-result { margin: 0 0 10px; padding-left: 20px; font-size: 18px; line-height: 1.5; }
+@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }

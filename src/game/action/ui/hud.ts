@@ -2,6 +2,7 @@
 // 오락실식: 왼쪽 위 한 묶음(얼굴·체력·필살·탄), 오른쪽 위 구석 층 글자, 왼쪽 아래 아이템 아이콘, 아래 대사.
 // 재화·총애·규칙서 목록은 화면에 늘 띄우지 않는다: 바뀔 때 잠깐 알림, 전체는 일시정지 메뉴(statusHtml).
 // 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
+import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './kit';
 import { H as H0, W as W0 } from './stage';
 
 // 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
@@ -76,20 +77,30 @@ const C = {
 };
 
 export function font(size: number, weight = 700) {
-  return `${weight} ${size}px ${FONT}`;
+  return pixelOn ? pfont(size).f : `${weight} ${size}px ${FONT}`;
+}
+/** HUD 글자: 도트 글꼴은 11px 배수에서만 또렷하다 (12 이하 = 11, 그 위는 22·33·44) */
+export function pfont(size: number) {
+  const n = size <= 12 ? 11 : Math.max(22, Math.round(size / 11) * 11);
+  return { n, f: `700 ${n}px "${PIXEL_FONT}", ${FONT}` };
 }
 /** 외곽선 글자 */
 export function label(c: CanvasRenderingContext2D, s: string, x: number, y: number, size = 16, color = C.text, align: CanvasTextAlign = 'left', weight = 700) {
-  c.font = font(size, weight);
+  const p = pixelOn ? pfont(size) : null;
+  if (p) size = p.n;
+  c.font = p ? p.f : font(size, weight);
   c.textAlign = align;
   c.textBaseline = 'alphabetic';
-  c.lineJoin = 'round';
-  c.lineWidth = Math.max(3, size / 4.5);
+  c.lineJoin = p ? 'miter' : 'round';
+  c.lineWidth = p ? Math.max(3, size / 5.5) : Math.max(3, size / 4.5);
   c.strokeStyle = 'rgba(0,0,0,0.85)';
   c.strokeText(s, x, y);
   c.fillStyle = color;
   c.fillText(s, x, y);
 }
+/** HUD 글자를 도트 글꼴로 (draw 하는 동안만 켠다: 다른 모듈이 label 을 빌려 쓸 때는 원래 글꼴) */
+let pixelOn = false;
+
 export function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 8) {
   c.beginPath();
   c.roundRect(x, y, w, h, r);
@@ -145,6 +156,7 @@ export class Hud {
     c.setTransform(k, 0, 0, k, 0, 0);
     if (s.prompt) s = { ...s, prompt: { ...s.prompt, x: s.prompt.x / k, y: s.prompt.y / k } };
     this.last = s;
+    pixelOn = true;
     this.agent(c, s);
     this.floor(c, s);
     this.rules(c, s);
@@ -154,6 +166,7 @@ export class Hud {
     if (s.message) this.message(c, s.message, s.compact);
     if (s.prompt) this.prompt(c, s.prompt, s.device);
     this.drawToasts(c, dt);
+    pixelOn = false;
     c.restore();
   }
 
@@ -190,38 +203,49 @@ export class Hud {
 
   /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
   private agent(c: CanvasRenderingContext2D, s: HudState) {
-    const x = 18,
-      y = 14,
-      fs = 76;
+    const x = 22,
+      y = 18,
+      fs = 80;
     // 뒤를 살짝 어둡게 (밝은 배경에서도 읽히게)
-    const g = c.createLinearGradient(0, 0, 440, 0);
+    const g = c.createLinearGradient(0, 0, 460, 0);
     g.addColorStop(0, 'rgba(0,0,0,0.5)');
     g.addColorStop(0.75, 'rgba(0,0,0,0.25)');
     g.addColorStop(1, 'rgba(0,0,0,0)');
     c.fillStyle = g;
-    c.fillRect(0, 0, 440, y + fs + 26);
-    // 얼굴: 검은 테 + 밝은 테
-    c.fillStyle = '#000';
-    c.fillRect(x - 4, y - 4, fs + 8, fs + 8);
-    c.fillStyle = C.frame;
-    c.fillRect(x - 2, y - 2, fs + 4, fs + 4);
+    c.fillRect(0, 0, 460, y + fs + 30);
+    // 얼굴: 맞으면·위급하면·필살이 차면 표정이 바뀐다
+    const r0 = Math.max(0, s.hp) / s.maxHp;
+    const faces = s.agent.portrait ? null : agentFaces(s.agent.name);
+    const face = faces ? kitImage(faces[this.hurtT > 0 ? 1 : r0 < 0.25 ? 2 : s.gauge >= 100 ? 3 : 0]) : null;
     c.fillStyle = s.agent.color ?? '#5a6a74';
+    if (face || s.agent.portrait) c.fillStyle = '#141b20';
     c.fillRect(x, y, fs, fs);
+    c.save();
+    c.imageSmoothingEnabled = false;
     if (s.agent.portrait) c.drawImage(s.agent.portrait, x, y, fs, fs);
+    else if (face) c.drawImage(face, x, y, fs, fs);
     else label(c, s.agent.name.slice(0, 1), x + fs / 2, y + fs * 0.72, 44, '#fff', 'center', 900);
-    if (this.hurtT > 0) (c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.6})`), c.fillRect(x, y, fs, fs);
+    c.restore();
+    if (this.hurtT > 0) (c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.2})`), c.fillRect(x, y, fs, fs);
+    const pf = kitPiece('portrait');
+    if (pf) nine(c, pf, kitSlice('portrait'), x - 12, y - 12, fs + 24, fs + 24, 2);
+    else {
+      c.strokeStyle = C.frame;
+      c.lineWidth = 3;
+      c.strokeRect(x - 1.5, y - 1.5, fs + 3, fs + 3);
+    }
     // 능력(고유기) 재사용: 얼굴 아래 얇은 띠
-    if (s.maxEnergy) bar(c, x - 2, y + fs + 4, fs + 4, 5, (s.energy ?? 0) / s.maxEnergy, '#e8e2d0', '#000');
-    const bx = x + fs + 14,
+    if (s.maxEnergy) bar(c, x - 2, y + fs + 12, fs + 4, 5, (s.energy ?? 0) / s.maxEnergy, '#e8e2d0', '#000');
+    const bx = x + fs + 30,
       bw = 300;
     label(c, s.agent.name, bx, y + 20, 22, C.name, 'left', 900);
     c.font = font(22, 900);
     let ax = bx + c.measureText(s.agent.name).width + 10;
     if (s.armor) label(c, '◆'.repeat(s.armor), ax, y + 19, 15, C.amber), (ax += 50);
     // 체력: 굵은 한 줄. 깎인 만큼 붉은 띠가 늦게 따라온다
-    const by = y + 28,
+    const by = y + 30,
       bh = 24;
-    const r = Math.max(0, s.hp) / s.maxHp;
+    const r = r0;
     const low = r < 0.25;
     c.fillStyle = '#000';
     c.fillRect(bx - 3, by - 3, bw + 6, bh + 6);
@@ -236,6 +260,8 @@ export class Hud {
     c.fillRect(bx, by + 3, bw * r, 4);
     c.fillStyle = 'rgba(0,0,0,0.25)';
     c.fillRect(bx, by + bh - 5, bw * r, 5);
+    const bf = kitPiece('bar');
+    if (bf) nine(c, bf, kitSlice('bar'), bx - 22, by - 10, bw + 44, bh + 20, 2);
     // 필살 게이지: 체력 아래, 가득 차면 빛남
     const gy = by + bh + 9,
       gw = 220,
@@ -329,15 +355,19 @@ export class Hud {
       const it = items[i] ?? { label: '', count: 0 };
       const x = x0 + i * (s + g);
       const dim = it.count <= 0;
-      c.fillStyle = '#000';
-      c.fillRect(x - 2, y - 2, s + 4, s + 4);
-      c.fillStyle = dim ? 'rgba(30,34,38,0.8)' : 'rgba(44,50,56,0.92)';
-      c.fillRect(x, y, s, s);
+      const sf = kitPiece('slot');
+      if (sf) nine(c, sf, kitSlice('slot'), x - 4, y - 4, s + 8, s + 8, 1);
+      else {
+        c.fillStyle = '#000';
+        c.fillRect(x - 2, y - 2, s + 4, s + 4);
+        c.fillStyle = dim ? 'rgba(30,34,38,0.8)' : 'rgba(44,50,56,0.92)';
+        c.fillRect(x, y, s, s);
+      }
       if (this.itemFlash[i] > 0) (c.fillStyle = `rgba(255,240,180,${this.itemFlash[i]})`), c.fillRect(x, y, s, s);
       if (it.label || it.id) {
         c.save();
         c.globalAlpha = dim ? 0.3 : 1;
-        drawHudItemIcon(c, it, x + 6, y + 6, s - 12);
+        drawHudItemIcon(c, it, x + 2, y + 2, s - 4);
         c.restore();
       }
       label(c, device === 'pad' ? padKeys[i] : String(i + 1), x + 4, y + 14, 12, C.dim, 'left', 800);
@@ -375,6 +405,11 @@ export class Hud {
     if (!s.timer) return;
     const t = Math.max(0, s.timer.sec);
     label(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, W / 2, 40, 26, t < 10 ? C.hpLow : '#bfe0f0', 'center', 900);
+  }
+
+  /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
+  drawMessage(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
+    this.message(c, text, compact);
   }
 
   private message(c: CanvasRenderingContext2D, text: string, compact?: boolean) {

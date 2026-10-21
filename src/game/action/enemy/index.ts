@@ -11,6 +11,7 @@ import { AI_BRAINS } from './ai';
 import { Enemy, type Affix } from './enemy';
 import { GUARDIANS, GUARDIAN_BRAINS } from './guardians';
 import { setSpawner } from './registry';
+import { scaleAll } from './scale';
 import { ROSTER, ROSTER_BY_KIND, type EnemyDef } from './roster';
 import type { Body, Hit, HitResult, RuleSignal, WorldView } from './types';
 
@@ -25,6 +26,7 @@ export type { EnemyDef } from './roster';
 export type { GuardianDef } from './guardians';
 
 export const ALL_DEFS: EnemyDef[] = [...ROSTER, ...GUARDIANS];
+scaleAll(ALL_DEFS);
 export const DEF_BY_KIND: Record<string, EnemyDef> = Object.fromEntries(ALL_DEFS.map((d) => [d.kind, d]));
 
 /** 층 모듈(stage/)이 쓰는 이름 → 이 모듈의 종류. solo = 짝을 스스로 부른다 (노부부·208호 가족) */

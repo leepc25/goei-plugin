@@ -38,6 +38,25 @@ import type { World } from './world';
 // 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
 const DROP_TABLE: Record<string, string> = { thug: 'anomaly', dummy: 'anomaly' };
 
+/** 바닥에 떨어진 물건 그림을 캐릭터와 같은 배율(도트 1 = 화면 2)로, 아래 가운데를 (x, y)에 */
+const FLOOR_ALIAS: Record<string, string> = { heal: 'heal_orb', ammo: 'rounds', coin: 'coins' };
+const floorImgs = new Map<string, HTMLImageElement>();
+function drawFloorArt(c: CanvasRenderingContext2D, id: string, x: number, y: number): boolean {
+  const all = (typeof window !== 'undefined' && (window as { __GOEI_ITEM_ART__?: Record<string, { src: string; w: number; h: number }> }).__GOEI_ITEM_ART__) || {};
+  const a = all[id] ?? all[FLOOR_ALIAS[id] ?? ''];
+  if (!a) return false;
+  let im = floorImgs.get(a.src);
+  if (!im) floorImgs.set(a.src, (im = Object.assign(new Image(), { src: a.src })));
+  if (!im.complete || !im.naturalWidth) return false;
+  const w = a.w * 2,
+    h = a.h * 2;
+  const prev = c.imageSmoothingEnabled;
+  c.imageSmoothingEnabled = false;
+  c.drawImage(im, Math.round(x - w / 2), Math.round(y - h), w, h);
+  c.imageSmoothingEnabled = prev;
+  return true;
+}
+
 // 중림 상인 거래 창 (무대 위에 겹침). 열려 있으면 전투를 멈춘다: modules.ts의 blocking에서 itemsBlocking()
 let shopPanel: ShopPanel | null = null;
 export const itemsBlocking = () => !!shopPanel?.isOpen();
@@ -242,9 +261,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         c.fill();
         const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
         const id = e.ref ?? e.kind;
-        // 바닥 크기: 무기는 도트 2배 실제 길이에 가깝게, 아이템·회수물은 조금 크게
-        const sz = e.kind === 'weapon' ? 80 : e.kind === 'item' || e.kind === 'relic' ? 40 : 28;
-        drawItemIcon(c, id, x - sz / 2, y - sz - 6 + bob, sz);
+        // 바닥 크기 = 손에 든 것과 같은 배율(도트 1 = 화면 2). 그림이 없으면 코드 아이콘 28px
+        if (!drawFloorArt(c, id, x, y - 4 + bob)) drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
       }
       for (const pj of field.projs) {
         c.fillStyle = '#d8e0e4';

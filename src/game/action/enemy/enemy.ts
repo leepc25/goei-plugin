@@ -575,17 +575,7 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
   ctx.beginPath();
   ctx.ellipse(e.x, e.y, e.def.w * 0.55, 9, 0, 0, Math.PI * 2);
   ctx.fill();
-  // 예고: 바닥 위험 표시 (빨간 띠)
-  if (f?.tele && e.move?.danger) {
-    const blink = 0.18 + 0.22 * ((e.st >> 2) & 1);
-    ctx.globalAlpha = blink;
-    ctx.fillStyle = '#ff2a2a';
-    for (const d of e.move.danger) {
-      const a = e.x + d.fx0 * e.dir,
-        b = e.x + d.fx1 * e.dir;
-      ctx.fillRect(Math.min(a, b), e.y - d.dy, Math.abs(b - a), d.dy * 2);
-    }
-  }
+  // 예고는 몸 테두리 깜빡임과 「!」로만 (바닥의 붉은 판은 놀이판 대역처럼 보여 뺐다, 검수 4-3)
   e.brain.drawUnder?.(e, ctx);
   ctx.restore();
   ctx.save();
@@ -645,11 +635,18 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
 /** 모양이 없는 종 (도형·집·얼룩·벽 얼굴 등): 판정 상자를 칠한다 */
 function drawBoxes(e: Enemy, ctx: CanvasRenderingContext2D, f: ReturnType<Enemy['frameNow']>, alpha: number, outline: string, armorNow: number) {
   const body = e.state === 'down' || e.state === 'getup' || e.state === 'dead' ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+  // 테두리는 사각 틀 대신 몸을 따라 번지는 빛 (검수 4-3)
+  ctx.save();
+  if (outline) {
+    ctx.shadowColor = outline;
+    ctx.shadowBlur = armorNow >= 2 ? 18 : 12;
+  }
   for (const b of body) {
     const wb = toWorld(b, e.x, e.y, e.z, e.dir);
     ctx.fillStyle = e.flash > 0 ? '#ffffff' : tint(e.def.color, PART_SHADE[b.part ?? 'torso'] ?? 0);
     ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
   }
+  ctx.restore();
   // 바라보는 쪽 눈
   if (body.length && e.state !== 'dead' && e.state !== 'down') {
     const top = Math.max(...body.map((b) => b.z1));
@@ -666,16 +663,6 @@ function drawBoxes(e: Enemy, ctx: CanvasRenderingContext2D, f: ReturnType<Enemy[
     }
   }
   ctx.globalAlpha = alpha;
-  if (outline && body.length) {
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = armorNow >= 2 ? 4 : 3;
-    const xs = body.map((b) => toWorld(b, e.x, e.y, e.z, e.dir));
-    const x0 = Math.min(...xs.map((b) => b.x0)),
-      x1 = Math.max(...xs.map((b) => b.x1)),
-      z1 = Math.max(...xs.map((b) => b.z1)),
-      z0 = Math.min(...xs.map((b) => b.z0));
-    ctx.strokeRect(x0 - 3, e.y - z1 - 3, x1 - x0 + 6, z1 - z0 + 6);
-  }
 }
 
 function flat(e: Enemy): LocalBox[] {

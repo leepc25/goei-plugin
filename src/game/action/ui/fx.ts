@@ -295,23 +295,17 @@ export class Fx {
   }
 
   private drawTitle(c: CanvasRenderingContext2D, t: { depth: string; name: string; variant?: string; t: number }) {
+    // 짧은 층 제목 한 줄만 (검수 4-7: 위아래 검은 띠·가운데 반투명 띠·큰 L1 글자 없음)
     const inK = Math.min(1, t.t / 0.35),
       outK = t.t > 2.3 ? (t.t - 2.3) / 0.5 : 0;
-    const a = inK * (1 - outK);
-    const bar = 64 * easeOut(inK) * (1 - outK);
-    c.fillStyle = 'rgba(0,0,0,0.85)';
-    c.fillRect(0, 0, W, bar);
-    c.fillRect(0, H - bar, W, bar);
-    c.globalAlpha = a;
-    const y = H * 0.42;
-    c.fillStyle = 'rgba(0,0,0,0.45)';
-    c.fillRect(0, y - 70, W, 130);
-    label(c, t.depth, W / 2, y, 64, '#fff', 'center', 900);
+    c.globalAlpha = inK * (1 - outK);
+    const text = !t.depth || t.name.startsWith(t.depth) ? t.name || t.depth : `${t.depth} · ${t.name}`;
+    const y = H * 0.24;
+    label(c, text, W / 2, y, 30, '#ece2c8', 'center', 800);
     c.fillStyle = 'rgba(240,180,90,0.9)';
-    const lw = 300 * easeOut(Math.min(1, t.t / 0.6));
-    c.fillRect(W / 2 - lw / 2, y + 14, lw, 2);
-    label(c, t.name, W / 2, y + 46, 24, '#e8dcc0', 'center', 700);
-    if (t.variant) label(c, `변형 · ${t.variant}`, W / 2, y + 78, 16, '#f0b45a', 'center');
+    const lw = 180 * easeOut(Math.min(1, t.t / 0.6));
+    c.fillRect(W / 2 - lw / 2, y + 12, lw, 2);
+    if (t.variant) label(c, `변형 · ${t.variant}`, W / 2, y + 40, 16, '#f0b45a', 'center');
     c.globalAlpha = 1;
   }
 

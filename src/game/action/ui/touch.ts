@@ -119,6 +119,7 @@ export class TouchPad {
     const flip = s.lefty ? -1 : 1;
     this.root.style.setProperty('--tp-u', `${u}px`);
     this.root.style.setProperty('--tp-a', String(s.touchAlpha));
+    this.root.classList.remove('tp-float');
     this.sr = u;
     this.restX = u * 1.55;
     this.restY = u;
@@ -170,58 +171,56 @@ export class TouchPad {
   }
   /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
    *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+  /** 가로 화면: 버튼을 전부 좌우 검은 띠 안에 둔다(놀이판을 덮지 않게).
+   *  오른쪽 띠(위→아래) = 필살·고유·사격·가드·회피·조사·점프·공격(크게), 왼쪽 띠 = 메뉴·지도·아이템 1~4·장전·지원.
+   *  스틱은 왼쪽 아래 어디를 눌러도 그 자리에 나타나고, 쉬는 동안은 그리지 않는다 */
   private layoutSide(bw: number, bh: number, side: number) {
     const s = this.st();
-    const g = 4;
-    this.u = Math.max(40, Math.min(86, (bh - 16 - 6 * g) / 5.55)) * s.touchSize;
+    const g = 4,
+      edge = 6;
+    const right = ['ult', 'unique', 'shoot', 'guard', 'evade', 'interact', 'jump', 'attack'];
+    const left = ['menu', 'map', 'item1', 'item2', 'item3', 'item4', 'reload', 'support'];
+    const wR = [1, 1, 1, 1, 1, 1, 1, 1.25];
+    const sum = wR.reduce((a, v) => a + v, 0);
+    // 버튼 한 칸 지름: 높이에 8개가 들어가고 띠 폭을 넘지 않게 (띠가 좁으면 그만큼 캔버스에 걸친다)
+    const unit = Math.max(36, Math.min((bh - 2 * edge - (right.length - 1) * g) / sum, side > 40 ? side - 8 : 999, 70)) * s.touchSize;
+    this.u = unit / 0.88;
     const u = this.u;
     this.root.style.setProperty('--tp-u', `${u}px`);
     this.root.style.setProperty('--tp-a', String(s.touchAlpha));
-    const edge = 6;
-    const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge - u * 0.6;
-    const colL = side >= u * 0.7 ? side / 2 : edge + u * 0.36;
+    const colR = side >= unit * 1.25 ? bw - side / 2 : bw - edge - (unit * 1.25) / 2;
+    const colL = side >= unit ? side / 2 : edge + unit / 2;
     const mir = (x: number) => (s.lefty ? bw - x : x);
-    const place = (id: string, cx: number, cy: number, d: number) => {
+    const place = (id: string, cx: number, cy: number, dpx: number) => {
       const b = this.btns.find((x) => x.id === id)!;
-      const r = (d * u) / 2;
+      const r = dpx / 2;
       cx = mir(cx);
       Object.assign(b, { cx, cy, r });
       const el = b.el!;
       el.style.width = el.style.height = `${r * 2}px`;
       el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
     };
-    const stack = (ids: string[], x: number, d: number[], fromBottom: boolean) => {
-      let y = fromBottom ? bh - edge : edge;
+    // 두 띠 모두 세로 가운데 정렬 (위아래 빈 곳이 같게)
+    const column = (ids: string[], x: number, w: number[]) => {
+      const total = w.reduce((a, v) => a + v * unit, 0) + (ids.length - 1) * g;
+      let y = Math.max(edge, (bh - total) / 2);
       ids.forEach((id, i) => {
-        const r = (d[i] * u) / 2;
-        y += fromBottom ? -r : r;
-        place(id, x, y, d[i]);
-        y += fromBottom ? -r - g : r + g;
+        const d = w[i] * unit;
+        place(id, x, y + d / 2, d);
+        y += d + g;
       });
     };
-    stack(['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
-    // 안쪽 열은 작게(0.64u), 같은 높이의 오른쪽 띠 버튼 바로 옆에 붙여 캔버스를 덜 가린다
-    const right = ['attack', 'jump', 'evade', 'shoot', 'unique', 'ult'].map((id) => this.btns.find((x) => x.id === id)!);
-    const di = 0.64,
-      ri = (di * u) / 2;
-    let y = bh - edge;
-    for (const id of ['guard', 'interact', 'reload', 'support']) {
-      y -= ri;
-      let left = colR;
-      for (const b of right) if (Math.abs((b.cy ?? 0) - y) < (b.r ?? 0) + ri) left = Math.min(left, mir(b.cx ?? 0) - (b.r ?? 0));
-      place(id, left - g - ri, y, di);
-      y -= ri + g;
-    }
-    stack(['menu', 'map', 'item1', 'item2', 'item3', 'item4'], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
+    column(right, colR, wR);
+    column(left, colL, left.map(() => 1));
     const zw = bw * 0.42,
       zt = bh * 0.3;
     this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
-    // 스틱 받침: 조금 작게, 쉴 때는 왼쪽 띠에 걸쳐 캔버스 안으로 60px 넘게 들어가지 않게
     this.sr = u * 0.82;
     this.root.style.setProperty('--tp-r', `${this.sr}px`);
-    this.restX = Math.max(edge + this.sr, side + 60 - this.sr);
-    this.restY = edge + this.sr;
+    this.restX = side + this.sr + 30;
+    this.restY = edge + this.sr + 20;
+    this.root.classList.add('tp-float');
     this.restBase();
   }
   private restBase() {
