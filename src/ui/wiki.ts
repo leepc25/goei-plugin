@@ -257,7 +257,9 @@ function entries(ctx: ChatContext): Entry[] {
     const doc = orgLoreName(lore, o.name);
     if (!f && !hasLore.has(doc)) continue; // 요원 소속에만 있는 이름(미분류 등)
     const name = f?.name ?? o.name;
-    list.push({ cat: 'org', name, title: c(doc), sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, o.spec), face: facePic(ctx.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ''] });
+    // 문서 제목: 로어북 이름(이슬람 서울중앙성원)과 기본 문서 제목(이슬람)이 다를 수 있어 문서가 있는 쪽 (2026-10-21)
+    const title = [c(doc), c(o.name), c(name)].find((t) => findDoc(ctx.chat, t, lore)) ?? c(doc);
+    list.push({ cat: 'org', name, title, sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, o.spec), face: facePic(ctx.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();
@@ -267,10 +269,13 @@ function entries(ctx: ChatContext): Entry[] {
 }
 
 // 같은 문서로 이어지는 항목이 여럿이면 (예: 거점 「관리국 본부」와 조직 「관리국」) 이름이 제목과 같은 쪽
+// 거점은 조직 문서를 같이 가리킬 뿐이라 (서울중앙성원 → 이슬람) 다른 항목이 있으면 그쪽 이름으로 보인다
 const entryFor = (ctx: ChatContext, title: string) => {
   const all = entries(ctx).filter((e) => e.title === title);
-  return all.find((e) => e.name === title) ?? all[0];
+  return all.find((e) => e.name === title) ?? all.find((e) => e.cat !== 'lm') ?? all[0];
 };
+/** 목록에 보이는 이름 (가나다 묶음·정렬도 이 이름으로: 문서 「협회」는 「특수재난대응협회」로 ㅌ에) */
+const shownName = (ctx: ChatContext, title: string) => entryFor(ctx, title)?.name ?? title;
 
 function matches(ctx: ChatContext, q: string): Entry[] {
   const lower = q.toLowerCase();
@@ -357,8 +362,9 @@ export function keyOf(title: string): string {
 
 function sortedDocs(ctx: ChatContext) {
   return listDocs(ctx.chat, ctx.char.globalLore)
-    .map((d) => ({ d, k: KEYS.indexOf(keyOf(d.title)) }))
-    .sort((x, y) => x.k - y.k || x.d.title.localeCompare(y.d.title, 'ko'))
+    .map((d) => ({ d, n: shownName(ctx, d.title) }))
+    .map((x) => ({ ...x, k: KEYS.indexOf(keyOf(x.n)) }))
+    .sort((x, y) => x.k - y.k || x.n.localeCompare(y.n, 'ko'))
     .map((x) => x.d);
 }
 
@@ -416,9 +422,10 @@ export function wikiList(ctx: ChatContext, query = wiki.query): string {
   const chips = `<div class="ph-tabs nw-tabs" role="tablist">${tabs
     .map(([t, label]) => `<button class="ph-tab${t === tab ? ' on' : ''}" data-action="wiki-tab" data-value="${t}" aria-selected="${t === tab}">${label}<small>${count(t)}</small></button>`)
     .join('')}</div>`;
-  const keys = KEYS.filter((k) => shown.some((d) => keyOf(d.title) === k));
+  const keyOfDoc = (d: (typeof docs)[number]) => keyOf(shownName(ctx, d.title));
+  const keys = KEYS.filter((k) => shown.some((d) => keyOfDoc(d) === k));
   const groups = keys.map((k) => {
-    const rows = shown.filter((d) => keyOf(d.title) === k);
+    const rows = shown.filter((d) => keyOfDoc(d) === k);
     const head = keys.length > 1 ? `<button type="button" class="nw-kbtn" data-kpick aria-label="${k}, 다른 자음으로 이동">${k}<b>${rows.length}</b></button>` : `${k}<b>${rows.length}</b>`;
     return `<h4 class="ph-sec nw-ksec" data-ksec="${k}">${head}</h4><ul class="ph-list">${rows.map((d) => dated(d, tab !== 'story')).join('')}</ul>`;
   }).join('');
