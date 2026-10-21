@@ -10,6 +10,8 @@ import {
   pickCoffee, placeOpen, researchOpen, saveTitle, setDanger, settle, statsFor, supplyCatalog, supplyOpen, treat, unequip, unlocksAt, variantFor, itemName, DANGER_COST, TOOTH_COST, TREAT_COST, type MissionCard,
 } from './logic';
 import { iconCanvas } from './runmenu';
+import { hqMap, type HqMapView } from './map';
+import photos from '../story/demo-photos.json';
 import { HQ_SCHEMA, newSave, parseSave, saveText, type HqSave } from './state';
 import type { SaveSlots } from './store';
 
@@ -55,9 +57,16 @@ export interface HqModule {
   close(): void;
   onReturn(result: RunResult, launch: MissionLaunch): void;
   unmount(): void;
+  /** 본부 건물 지도 (docs/본부_평면도.md): 장면·문·엘리베이터·자리. 엔진이 장면을 그리고 자리 앞 E → openPlace(spot.place) */
+  map(): HqMapView;
+  /** 자리 주인 목소리 한 줄 (가까이 가면 말풍선). 사람 그림은 아직 없으니 목소리로만 */
+  bark(place: PlaceId): Line | null;
   /** 시험용 */
   readonly state: HqSave;
 }
+
+const PHOTO_KEY: Record<string, string> = { 잼트리: 'Jaemtri', 부장: 'Jyaldi', 쟈알디: 'Jyaldi', 에일린: 'Aileen', 콘쥬스: 'Konjyuce', 데쥬레: 'Dejure', 고그니쟈: 'Gognija' };
+const photoOf = (who: string) => (photos as Record<string, string>)[PHOTO_KEY[who] ?? ''] ?? '';
 
 const esc = (t: unknown) => String(t ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const VW = 1280,
@@ -291,6 +300,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
 <div class="hq-row"><button class="primary" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button data-go="supply">정비실 들르기</button><button data-go="pantry">탕비실 들르기</button><button data-act="close">돌아가기</button></div>`;
   };
   let pendingSeed = 0;
+  let evacJust = false;
   const settleHtml = () => {
     const l = s.last!;
     const back = lines(`return:${l.how}`, ctx());
@@ -304,11 +314,43 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
 <div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? '' : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s, p.id)).map((p) => `<button data-go="${p.id}">${esc(p.name)}</button>`).join('')}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
 
   const bar = () => `<div class="hq-bar"><b>본부 · ${s.day}일차</b><span>예산 ${s.currencies.budget}</span><span>연구 자료 ${s.currencies.research}</span><span>이빨 ${s.currencies.teeth}</span><span>규칙서 ${s.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
+  // 잼트리 임무·브리핑: 게임 화면 위 대화창 (얼굴 + 큰 글씨 + 선택지). 폰에서도 게임이 보이게 아래쪽만 덮는다
+  const talkBox = (who: string, text: string, choices: string, extra = '') => {
+    const ph = photoOf(who);
+    return `<div class="hq-talk" role="dialog" aria-label="${esc(who)}"><div class="hq-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who">${esc(who)}</b><p class="hq-line">${esc(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+  };
+  const missionTalk = () => {
+    cards = missionBoard(s, boardNames(card));
+    noteDeadlines(s, cards);
+    if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
+    const say = lines('npc:jaemtri', ctx())[0];
+    const sel = cards.find((c) => c.def.id === selMission);
+    const text = sel ? `${sel.def.kind} 건이에요. ${sel.def.title}. ${sel.def.depthLabel}까지, 끝나면 예산 ${sel.def.reward.budget}${sel.left !== undefined ? `. 출동 ${sel.left}번 안에 가야 해요` : ''}.` : (say?.text ?? '오늘은 들어온 건이 없어요.');
+    const opts = cards.slice(0, 3).map((c) => `<button class="hq-choice${selMission === c.def.id ? ' sel' : ''}" data-mission="${c.def.id}">${esc(c.def.kind)} · ${esc(c.def.title)}</button>`).join('');
+    return talkBox('잼트리', text, `${opts}<div class="hq-choice-row"><button class="hq-choice primary" data-act="brief" ${selMission ? '' : 'disabled'}>이걸로 할게요</button><button class="hq-choice" data-act="close">나중에</button></div>`);
+  };
+  const briefTalk = () => {
+    const m = MISSION_BY_ID[selMission!];
+    const v = variantFor(pendingSeed);
+    const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s.rulebook.slice(0, 3) };
+    const ls = [...lines('brief:jaemtri', c), ...lines('brief:chief', c)];
+    const can = canDeploy(s, s.selected);
+    const st = statsFor(s, s.selected);
+    const kit = `<p class="hq-kit">${esc(AGENT_BY_ID[s.selected].name)} 체력 ${st.hp}${s.agents[s.selected].fatigue ? ` · 피로 ${s.agents[s.selected].fatigue}` : ''} · ${s.loadout.map((x) => (x ? `${esc(itemName(x.id))}×${x.n}` : '')).filter(Boolean).join(' ') || '아이템 없음'}${s.coffee ? ` · ${esc(COFFEES.find((x) => x.id === s.coffee)?.name ?? '')}` : ''}</p>${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}`;
+    const j = ls.find((l) => l.who === '잼트리') ?? ls[0];
+    return talkBox(j?.who ?? '잼트리', ls.filter((l) => l.who === (j?.who ?? '잼트리')).map((l) => l.text).join(' ') || m.title, `<button class="hq-choice primary" data-act="deploy" ${can.ok ? '' : 'disabled'}>출동</button><button class="hq-choice" data-go="supply">정비실 먼저</button><button class="hq-choice" data-act="close">다시 고를게</button>`, kit);
+  };
   const renderFloat = () => {
     const ov = wrap!.querySelector<HTMLElement>('.hq-over')!;
     const open = !!(overlay || panel);
     ov.hidden = !open;
     if (!open) return void (ov.innerHTML = '');
+    const talk = overlay === 'brief' || (!overlay && panel === 'jaemtri');
+    ov.classList.toggle('talk', talk);
+    if (talk) {
+      ov.innerHTML = (overlay === 'brief' ? briefTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc(notice)}</p>` : '');
+      return;
+    }
     const body = overlay === 'brief' ? briefHtml() : overlay === 'settle' ? settleHtml() : overlay === 'menu' ? menuHtml() : placeHtml(panel!);
     ov.innerHTML = `<div class="hq-sheet">${bar()}${body}${overlay !== 'settle' && notice ? `<p class="hq-notice">${esc(notice)}</p>` : ''}</div>`;
     wrap!.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
@@ -414,6 +456,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         void save();
         render();
         if (walk) wrap!.hidden = true;
+        evacJust = false;
         host.deploy(l);
         return;
       }
@@ -506,6 +549,11 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       last = performance.now();
       if (walk) raf = requestAnimationFrame(tick);
     },
+    map: () => hqMap(s, evacJust),
+    bark(place) {
+      if (!placeOpen(s, place)) return null;
+      return lines(`npc:${place}`, ctx())[0] ?? null;
+    },
     places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s, p.id), opens: p.opens })),
     openPlace(id) {
       if (!placeOpen(s, id)) return;
@@ -526,6 +574,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     close: () => (walk ? ((overlay = null), render()) : closeOne()),
     onReturn(result, l) {
       const ls = settle(s, l, result, rand);
+      evacJust = result.how === 'evac';
       pending = null;
       overlay = 'settle';
       if (walk) {
