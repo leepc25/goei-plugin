@@ -11,7 +11,7 @@ const url = pathToFileURL(resolve('dist/goei-action-game.html')).href;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', headless: true, args: ['--no-sandbox', '--allow-file-access-from-files'] });
 const errors = [];
 const S = (page, name) => (shots ? page.screenshot({ path: `${shots}/${name}.png` }) : null);
-const bubbles = (page) => page.evaluate(() => [...document.querySelectorAll('.gst-bubble')].map((b) => b.textContent));
+const bubbles = (page) => page.evaluate(() => [...document.querySelectorAll('.gsd-bubble')].map((b) => b.textContent));
 
 try {
   for (const [label, viewport, q] of [
@@ -44,7 +44,7 @@ try {
     await page.waitForFunction(() => window.__goeiEngine.world);
     await page.waitForTimeout(500);
     // 첫 층: 대화창이 막지 않는다
-    assert.equal(await page.evaluate(() => document.querySelector('.gst-box')?.hidden ?? true), true, '층 들어가자마자 대화창이 열림');
+    assert.equal(await page.evaluate(() => document.querySelector('.gsd-box')?.hidden ?? true), true, '층 들어가자마자 대화창이 열림');
     // 전투 사건 → 요원 말풍선 (요원 위에)
     await page.evaluate(() => window.__goeiEngine.world.emit({ type: 'combat:start', index: 0 }));
     await page.waitForTimeout(200);
@@ -80,10 +80,10 @@ try {
     assert.equal(await page.evaluate(() => window.__goeiEngine.world.tick), tick0, '대화 중 전투가 멈추지 않음');
     await S(page, `${label}-4-dialogue`);
     const overlap = await page.evaluate(() => {
-      const box = document.querySelector('.gst-box').getBoundingClientRect();
+      const box = document.querySelector('.gsd-box').getBoundingClientRect();
       const hits = [];
       for (const el of document.querySelectorAll('button, [class*=touch] *, [class*=pad] *')) {
-        if (el.closest('.gst')) continue;
+        if (el.closest('.gsd')) continue;
         const r = el.getBoundingClientRect();
         if (r.width * r.height > innerWidth * innerHeight * 0.2) continue; // 터치 층 전체 판
         if (!r.width || !r.height || getComputedStyle(el).visibility === 'hidden' || getComputedStyle(el).display === 'none') continue;
@@ -93,11 +93,11 @@ try {
     });
     assert.deepEqual(overlap, [], `대화창이 버튼과 겹침 ${overlap}`);
     for (let i = 0; i < 40 && (await page.evaluate(() => window.__goeiStory.isBlocking())); i++) {
-      const ch = await page.locator('.gst-choices:not([hidden]) button').count();
+      const ch = await page.locator('.gsd-choices:not([hidden]) button').count();
       if (ch) {
         if (i < 8) await S(page, `${label}-5-choices`);
-        await page.locator('.gst-choices button').first().click();
-      } else await page.locator('.gst-box').click();
+        await page.locator('.gsd-choices button').first().click();
+      } else await page.locator('.gsd-box').click();
       await page.waitForTimeout(80);
     }
     assert.equal(await page.evaluate(() => window.__goeiStory.isBlocking()), false, '대화가 안 끝남');
@@ -106,18 +106,18 @@ try {
       await page.evaluate((id) => window.__goeiStory.cutscene(id), id);
       await page.waitForTimeout(3600);
       await S(page, `${label}-6-cs-${id}`);
-      await page.locator('.gst-skip').click({ timeout: 800 }).catch(() => {});
+      await page.locator('.gsd-skip').click({ timeout: 800 }).catch(() => {});
       for (let i = 0; i < 30 && (await page.evaluate(() => window.__goeiStory.isBlocking())); i++) {
         const c = { timeout: 800 };
-        if (await page.locator('.gst-choices:not([hidden]) button').count()) await page.locator('.gst-choices button').first().click(c).catch(() => {});
-        else if (await page.locator('.gst-box:not([hidden])').count()) await page.locator('.gst-box').click(c).catch(() => {});
-        else if (await page.locator('.gst-skip:not([hidden])').count()) await page.locator('.gst-skip').click(c).catch(() => {});
+        if (await page.locator('.gsd-choices:not([hidden]) button').count()) await page.locator('.gsd-choices button').first().click(c).catch(() => {});
+        else if (await page.locator('.gsd-box:not([hidden])').count()) await page.locator('.gsd-box').click(c).catch(() => {});
+        else if (await page.locator('.gsd-skip:not([hidden])').count()) await page.locator('.gsd-skip').click(c).catch(() => {});
         await page.waitForTimeout(150);
       }
       assert.equal(await page.evaluate(() => window.__goeiStory.isBlocking()), false, `컷신 ${id} 안 끝남`);
     }
     await page.waitForTimeout(400);
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gst-fade')).opacity), '0', '컷신 뒤 화면이 어두운 채');
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gsd-fade')).opacity), '0', '컷신 뒤 화면이 어두운 채');
     console.log(label, { desk: desk.slice(0, 2), brief: brief.slice(0, 160), b1, b2, b3 });
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert.ok(over <= 0, `가로 넘침 ${over}`);

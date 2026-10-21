@@ -13774,7 +13774,7 @@ function itemName2(id) {
 }
 
 // src/game/action/story/style.css
-var style_default2 = ".gst{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gst-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gst-bubbles{position:absolute;inset:0}\n.gst-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gst-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gst-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gst-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gst-bubble.free::after{display:none}\n.gst-bubble.out{opacity:0}\n.gst-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gst-caption.out{opacity:0}\n.gst-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gst-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gst-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gst-box[hidden],.gst-choices[hidden],.gst-caption[hidden],.gst-skip[hidden],.gst-talk[hidden]{display:none}\n.gst-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gst-photo[hidden]{display:none}\n.gst-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gst-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gst-body{flex:1;min-width:0}\n.gst-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gst-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gst-box.narr{border-top-color:#555}\n.gst-box.narr .gst-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gst-box[data-mood=serious] .gst-photo{filter:saturate(.7) brightness(.9)}\n.gst-box[data-mood=hurt] .gst-photo{filter:saturate(.6)}\n.gst-box[data-mood=surprise] .gst-photo{animation:gst-hop .25s}\n@keyframes gst-hop{50%{transform:translateY(-4px)}}\n.gst-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gst-box.done:not(.asking) .gst-next{opacity:.9;animation:gst-blink 1s infinite}\n@keyframes gst-blink{50%{opacity:.2}}\n.gst-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gst-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gst-choices button:hover,.gst-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gst-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gst-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gst-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gst-talk-head .gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gst-talk-head .gst-photo span{font-size:18px}\n.gst-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gst-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gst-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gst-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gst-talk-log .npc{align-self:flex-start;background:#26323a}\n.gst-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gst-talk-log .wait{opacity:.6;animation:gst-blink 1s infinite}\n.gst-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gst-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gst-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gst-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gst-photo{flex-basis:56px;width:56px;height:56px}.gst-text{font-size:15px}.gst-box{min-height:96px;padding:10px 12px 12px}}\n.gst-top .gst-dock{top:var(--gst-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gst-box,.gst-choices{width:min(52%,560px)}.gst-dock{align-items:flex-start;padding-left:17%}.gst-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gst-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gst-photo span{font-size:18px}.gst-name{font-size:12px;margin-bottom:2px}.gst-text{font-size:13px;line-height:1.45;min-height:2.9em}.gst-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gst-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gst-dock{gap:5px}.gst-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}\n";
+var style_default2 = ".gsd{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gsd-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsd-bubbles{position:absolute;inset:0}\n.gsd-bubble{position:absolute;left:0;top:0;max-width:min(260px,60vw);padding:7px 11px;border-radius:10px;background:#f4f1e8;color:#1b1f22;font-size:14px;line-height:1.4;box-shadow:0 2px 0 rgba(0,0,0,.35);border:2px solid var(--who,#888);transition:opacity .25s;word-break:keep-all}\n.gsd-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--who,#888);border-bottom:0}\n.gsd-bubble b{display:block;font-size:11px;color:var(--who);margin-bottom:1px}\n.gsd-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsd-bubble.free::after{display:none}\n.gsd-bubble.out{opacity:0}\n.gsd-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsd-caption.out{opacity:0}\n.gsd-skip{position:absolute;right:12px;top:12px;pointer-events:auto;background:rgba(0,0,0,.55);color:#e8ece9;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:13px}\n.gsd-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsd-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsd-box[hidden],.gsd-choices[hidden],.gsd-caption[hidden],.gsd-skip[hidden],.gsd-talk[hidden]{display:none}\n.gsd-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsd-photo[hidden]{display:none}\n.gsd-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsd-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsd-body{flex:1;min-width:0}\n.gsd-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsd-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsd-box.narr{border-top-color:#555}\n.gsd-box.narr .gsd-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsd-box[data-mood=serious] .gsd-photo{filter:saturate(.7) brightness(.9)}\n.gsd-box[data-mood=hurt] .gsd-photo{filter:saturate(.6)}\n.gsd-box[data-mood=surprise] .gsd-photo{animation:gsd-hop .25s}\n@keyframes gsd-hop{50%{transform:translateY(-4px)}}\n.gsd-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsd-box.done:not(.asking) .gsd-next{opacity:.9;animation:gsd-blink 1s infinite}\n@keyframes gsd-blink{50%{opacity:.2}}\n.gsd-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsd-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsd-choices button:hover,.gsd-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsd-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsd-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsd-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsd-talk-head .gsd-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsd-talk-head .gsd-photo span{font-size:18px}\n.gsd-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsd-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsd-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsd-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsd-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsd-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsd-talk-log .wait{opacity:.6;animation:gsd-blink 1s infinite}\n.gsd-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsd-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsd-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsd-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsd-photo{flex-basis:56px;width:56px;height:56px}.gsd-text{font-size:15px}.gsd-box{min-height:96px;padding:10px 12px 12px}}\n.gsd-top .gsd-dock{top:var(--gsd-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsd-box,.gsd-choices{width:min(52%,560px)}.gsd-dock{align-items:flex-start;padding-left:17%}.gsd-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsd-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsd-photo span{font-size:18px}.gsd-name{font-size:12px;margin-bottom:2px}.gsd-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsd-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsd-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsd-dock{gap:5px}.gsd-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:5px 10px;font-size:12px}}\n";
 
 // src/game/action/story/script.ts
 var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
@@ -16035,23 +16035,23 @@ var StoryUI = class {
   constructor(root, photo) {
     this.photo = photo;
     const el = document.createElement("div");
-    el.className = "gst";
-    el.innerHTML = `<div class="gst-fade"></div><div class="gst-bubbles"></div><div class="gst-caption" hidden></div>
-<button class="gst-skip" hidden>건너뛰기 ▶▶</button>
-<div class="gst-dock"><div class="gst-choices" hidden></div>
-<div class="gst-box" hidden role="dialog" aria-live="polite"><div class="gst-photo"></div><div class="gst-body"><b class="gst-name"></b><p class="gst-text"></p></div><i class="gst-next">▼</i></div></div>`;
+    el.className = "gsd";
+    el.innerHTML = `<div class="gsd-fade"></div><div class="gsd-bubbles"></div><div class="gsd-caption" hidden></div>
+<button class="gsd-skip" hidden>건너뛰기 ▶▶</button>
+<div class="gsd-dock"><div class="gsd-choices" hidden></div>
+<div class="gsd-box" hidden role="dialog" aria-live="polite"><div class="gsd-photo"></div><div class="gsd-body"><b class="gsd-name"></b><p class="gsd-text"></p></div><i class="gsd-next">▼</i></div></div>`;
     root.append(el);
     this.el = el;
     const q = (s2) => el.querySelector(s2);
-    this.box = q(".gst-box");
-    this.nameEl = q(".gst-name");
-    this.textEl = q(".gst-text");
-    this.photoEl = q(".gst-photo");
-    this.choicesEl = q(".gst-choices");
-    this.bubbleLayer = q(".gst-bubbles");
-    this.captionEl = q(".gst-caption");
-    this.fadeEl = q(".gst-fade");
-    this.skipEl = q(".gst-skip");
+    this.box = q(".gsd-box");
+    this.nameEl = q(".gsd-name");
+    this.textEl = q(".gsd-text");
+    this.photoEl = q(".gsd-photo");
+    this.choicesEl = q(".gsd-choices");
+    this.bubbleLayer = q(".gsd-bubbles");
+    this.captionEl = q(".gsd-caption");
+    this.fadeEl = q(".gsd-fade");
+    this.skipEl = q(".gsd-skip");
     this.box.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -16138,7 +16138,7 @@ var StoryUI = class {
   /** key: 말하는 자리. 같은 자리의 앞 말풍선은 바로 지운다 */
   bubble(text, anchor, ms, color, name = "", key = name) {
     const el = document.createElement("div");
-    el.className = "gst-bubble";
+    el.className = "gsd-bubble";
     el.style.setProperty("--who", color);
     el.innerHTML = `${name ? `<b>${esc3(name)}</b>` : ""}${esc3(text)}`;
     this.bubbleLayer.append(el);
@@ -16209,12 +16209,12 @@ var TalkPanel = class {
   };
   constructor(root) {
     const el = document.createElement("div");
-    el.className = "gst-talk";
+    el.className = "gsd-talk";
     el.hidden = true;
-    el.innerHTML = `<div class="gst-talk-head"><span class="gst-photo"></span><b></b><button data-x aria-label="닫기">✕</button></div><div class="gst-talk-log"></div><form><input maxlength="200" placeholder="하고 싶은 말" enterkeyhint="send"><button>보내기</button></form>`;
+    el.innerHTML = `<div class="gsd-talk-head"><span class="gsd-photo"></span><b></b><button data-x aria-label="닫기">✕</button></div><div class="gsd-talk-log"></div><form><input maxlength="200" placeholder="하고 싶은 말" enterkeyhint="send"><button>보내기</button></form>`;
     root.append(el);
     this.el = el;
-    this.log = el.querySelector(".gst-talk-log");
+    this.log = el.querySelector(".gsd-talk-log");
     this.input = el.querySelector("input");
     this.send = el.querySelector("form button");
     el.querySelector("form").addEventListener("submit", (e) => {
@@ -16230,8 +16230,8 @@ var TalkPanel = class {
   open(cast, photo, greeting) {
     this.el.hidden = false;
     this.el.style.setProperty("--who", cast.color);
-    this.el.querySelector(".gst-talk-head b").textContent = cast.name;
-    this.el.querySelector(".gst-talk-head .gst-photo").innerHTML = photo ? `<img alt="" src="${esc3(photo)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
+    this.el.querySelector(".gsd-talk-head b").textContent = cast.name;
+    this.el.querySelector(".gsd-talk-head .gsd-photo").innerHTML = photo ? `<img alt="" src="${esc3(photo)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
     this.log.innerHTML = "";
     this.add("npc", greeting);
     this.input.focus({ preventScroll: true });
@@ -16380,7 +16380,7 @@ function mountStory(root, host, opts = {}) {
   const style = document.createElement("style");
   style.textContent = style_default2;
   root.append(style);
-  if (opts.dock !== "bottom") root.classList.add("gst-top");
+  if (opts.dock !== "bottom") root.classList.add("gsd-top");
   const rng2 = Math.random;
   const flags = { favor: 0, rules: 0, ...saved ?? {} };
   const lib = buildLibrary();
