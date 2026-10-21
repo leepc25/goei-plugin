@@ -22,7 +22,8 @@ if (process.argv[2] === '--compare') {
   console.log(JSON.stringify(out));
 } else {
   const lore = read(process.argv[2]);
-  const r = core.withFactionPlaceholders(core.migrateLore(lore));
+  // 원본 명부의 별칭 중 소속·부서·다른 항목 이름 같은 것은 지운다 (src/core/world/alias-drop.json)
+  const r = core.withFactionPlaceholders(core.dropDefaultAliases(core.migrateLore(lore)));
   if (r.missing.length) throw new Error(`새 세력 자리표시자를 넣을 곳을 못 찾음: ${r.missing.join(', ')}`);
   writeFileSync(process.argv[3], JSON.stringify(r.lore));
 }

@@ -1,7 +1,8 @@
 // 이름 → 정식 로어북 찾기. 원본 WG.registry / resolve / termPresent / referenceEntries와 같은 규칙.
 // 카드 명부(숨긴 항목 포함)와 World catalog 랜드마크의 표시명·영문명·로어북명·별칭을 모두 쓴다.
 import type { LoreEntry } from '../types';
-import { orgLoreName, readDirectory } from './directory';
+import { directoryData, orgLoreName, readDirectory, withDirectory, type Directory } from './directory';
+import ALIAS_DROP from './alias-drop.json';
 
 export interface RegistryEntry {
   key: string;
@@ -32,6 +33,81 @@ function json(lore: LoreEntry[], comment: string): Record<string, unknown> | nul
   }
 }
 
+/** 너무 넓은 보통 낱말·직급 로마자: 한 항목만 가리키는 이름이 아니다 */
+const COMMON_ALIAS = /^(?:amusement park|hotel|호텔|지하실|basement|tattoo|문신|좋은 친구|(?:ban|team|gwa|bu|guk|sa|won|sil|cha)-?jang)$/i;
+
+/** 이름만으로는 알 수 없는 주인 (줄인 이름) */
+const ALIAS_OWNER: Record<string, string> = { 세광시: '세광특별시', 'Segwang City': '세광특별시' };
+
+/**
+ * 명부 별칭 거르기 규칙 (2026-10-21 점검). 별칭 = 그 항목만 가리키는 다른 이름.
+ * 조직·부서·직급 이름, 둘 이상이 같이 쓰는 무리 이름, 다른 항목의 정식 이름, 너무 넓은 낱말은 쓰지 않는다
+ */
+function aliasRules(books: LoreEntry[], dir: Directory) {
+  // 별칭 거르기 (2026-10-21 점검): 원본 명부의 별칭에는 소속·부서·다른 항목 이름이 섞여 있어서
+  // 「관리국」 한 마디에 요원 26명 로어북이, 「백일몽」에 16명이 괴담넷·괴담톡·위키 요청에 딸려 들어갔다.
+  // 조직·부서·직급 이름과 다른 항목의 정식 이름은 그 항목만 가리키는 이름이 아니라서 별칭으로 쓰지 않는다.
+  const low = (t: string) => t.trim().toLowerCase();
+  const flat = (t: string) => low(t).replace(/[\s\-·]/g, '');
+  // 같은 로어북을 가리키는 줄(괴이이면서 요원인 탐미주의·세크리엠·아벤샤)은 한 항목으로 본다
+  const who = (key: string, lore: string) => (lore ? `lore:${low(lore)}` : key);
+  // 자기 이름의 일부(고연지 → 연지, Go Yeon-ji → Yeon-ji)는 남이 같이 써도 자기 별칭이다
+  const ownPart = (t: string, names: string[]) => flat(t).length >= 2 && names.some((n) => n && flat(n).includes(flat(t)));
+  type Row = { key: string; names: string[]; aliases: string[] };
+  const rows: Row[] = [
+    ...dir.anomalies.map((p, i) => ({ key: who(`an${i}`, p.lore), names: [p.label, p.lore, p.english], aliases: p.aliases })),
+    ...dir.sites.map((p, i) => ({ key: who(`ms${i}`, p.lore), names: [p.label, p.lore, p.english], aliases: p.aliases })),
+    ...dir.agents.map((a) => ({ key: who(`ag${a.id}`, a.lore), names: [a.name, a.lore, a.english], aliases: a.aliases })),
+  ];
+  const shared = new Set<string>();
+  for (const o of dir.orgs) for (const t of [o.name, o.spec.english ?? '', orgLoreName(books, o.name)]) if (t) shared.add(low(t));
+  for (const a of dir.agents) for (const t of [a.department, a.rank, a.group]) if (t) shared.add(low(t));
+  // 둘 이상의 항목이 같이 쓰는 별칭(현장탐사팀, Field Exploration Team, Vampire)도 그 무리 이름이지 한 항목의 이름이 아니다
+  const users = new Map<string, Set<string>>();
+  for (const r of rows) for (const t of r.aliases) if (!ownPart(t, r.names)) users.set(low(t), (users.get(low(t)) ?? new Set()).add(r.key));
+  for (const [t, set] of users) if (set.size > 1) shared.add(t);
+  const own = new Map<string, string>();
+  const claim = (t: string, key: string) => t && !own.has(low(t)) && own.set(low(t), key);
+  dir.anomalies.forEach((p, i) => [p.label, p.lore, p.english].forEach((t) => claim(t, who(`an${i}`, p.lore))));
+  dir.sites.forEach((p, i) => [p.label, p.lore, p.english].forEach((t) => claim(t, who(`ms${i}`, p.lore))));
+  dir.bases.forEach((b, i) => claim(b.name, `lm${i}`));
+  dir.agents.forEach((a) => [a.name, a.lore, a.english].forEach((t) => claim(t, who(`ag${a.id}`, a.lore))));
+  // 자기 이름의 일부는 그 사람 것 (윤지아의 별칭에 든 「연지」는 고연지 것)
+  for (const r of rows) for (const t of r.aliases) if (ownPart(t, r.names)) claim(t, r.key);
+  for (const [t, lore] of Object.entries(ALIAS_OWNER)) claim(t, who('', lore));
+  const keyOf = new Map<string, Row>();
+  for (const r of rows) if (!keyOf.has(r.key)) keyOf.set(r.key, r);
+  /** key: 'an0'·'ms3'·'agP001' 같은 줄 열쇠, lore: 그 줄의 로어북 이름 */
+  const aliasesOf = (list: string[], key: string, lore = '') => {
+    const k = who(key, lore);
+    const names = keyOf.get(k)?.names ?? [];
+    return list.filter((t) => {
+      if (COMMON_ALIAS.test(t.trim())) return false;
+      const owner = own.get(low(t));
+      if (owner) return owner === k;
+      return ownPart(t, names) || !shared.has(low(t));
+    });
+  };
+  return { aliasesOf, own, low };
+}
+
+/** 규칙에 걸리는 별칭 {괴이|미스틱 사이트|요원: {로어북 이름: [별칭…]}} (카드 기본 명부 정리용) */
+export function junkAliases(lore: LoreEntry[] | undefined): Record<'괴이' | '미스틱 사이트' | '요원', Record<string, string[]>> {
+  const books = lore ?? [];
+  const dir = readDirectory(books);
+  const { aliasesOf } = aliasRules(books, dir);
+  const out: Record<'괴이' | '미스틱 사이트' | '요원', Record<string, string[]>> = { 괴이: {}, '미스틱 사이트': {}, 요원: {} };
+  const put = (group: keyof typeof out, lore: string, list: string[], key: string) => {
+    const keep = new Set(aliasesOf(list, key, lore));
+    const junk = list.filter((t) => !keep.has(t));
+    if (junk.length) out[group][lore] = junk;
+  };
+  dir.anomalies.forEach((p, i) => put('괴이', p.lore, p.aliases, `an${i}`));
+  dir.sites.forEach((p, i) => put('미스틱 사이트', p.lore, p.aliases, `ms${i}`));
+  dir.agents.forEach((a) => put('요원', a.lore, a.aliases, `ag${a.id}`));
+  return out;
+}
+
 export function buildRegistry(lore: LoreEntry[] | undefined): Registry {
   const books = lore ?? [];
   const entries: RegistryEntry[] = [];
@@ -40,32 +116,15 @@ export function buildRegistry(lore: LoreEntry[] | undefined): Registry {
     entries.push({ key, name, lore: loreName, terms: uniq });
   };
   const dir = readDirectory(books);
-  // 별칭 거르기 (2026-10-21 점검): 원본 명부의 별칭에는 소속·부서·다른 항목 이름이 섞여 있어서
-  // 「관리국」 한 마디에 요원 26명 로어북이, 「백일몽」에 16명이 괴담넷·괴담톡·위키 요청에 딸려 들어갔다.
-  // 조직·부서·직급 이름과 다른 항목의 정식 이름은 그 항목만 가리키는 이름이 아니라서 별칭으로 쓰지 않는다.
-  const low = (t: string) => t.trim().toLowerCase();
-  const shared = new Set<string>();
-  for (const o of dir.orgs) for (const t of [o.name, o.spec.english ?? '', orgLoreName(books, o.name)]) if (t) shared.add(low(t));
-  for (const a of dir.agents) for (const t of [a.department, a.rank, a.group]) if (t) shared.add(low(t));
-  // 둘 이상의 항목이 같이 쓰는 별칭(현장탐사팀, Field Exploration Team, Vampire)도 그 무리 이름이지 한 항목의 이름이 아니다
-  const seen = new Map<string, number>();
-  for (const list of [...dir.anomalies, ...dir.sites, ...dir.agents].map((r) => r.aliases)) for (const t of new Set(list.map(low))) seen.set(t, (seen.get(t) ?? 0) + 1);
-  for (const [t, n] of seen) if (n > 1) shared.add(t);
-  const own = new Map<string, string>();
-  const claim = (t: string, key: string) => t && !own.has(low(t)) && own.set(low(t), key);
-  dir.anomalies.forEach((p, i) => [p.label, p.lore].forEach((t) => claim(t, `an${i}`)));
-  dir.sites.forEach((p, i) => [p.label, p.lore].forEach((t) => claim(t, `ms${i}`)));
-  dir.bases.forEach((b, i) => claim(b.name, `lm${i}`));
-  dir.agents.forEach((a) => [a.name, a.lore].forEach((t) => claim(t, `ag${a.id}`)));
-  const aliasesOf = (list: string[], key: string) => list.filter((t) => !shared.has(low(t)) && (own.get(low(t)) ?? key) === key);
+  const { aliasesOf, own, low } = aliasRules(books, dir);
   const places = { 괴이: dir.anomalies, '미스틱 사이트': dir.sites };
   const tag = { 괴이: 'an', '미스틱 사이트': 'ms' } as const;
   for (const [group, rows] of Object.entries(places)) {
-    rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group as keyof typeof tag]}${i}`)]));
+    rows.forEach((p, i) => add(`World catalog/${group}/${i + 1}`, p.label, p.lore, [p.english, ...aliasesOf(p.aliases, `${tag[group as keyof typeof tag]}${i}`, p.lore)]));
   }
   // 거점 로어북이 비면 연결 조직의 로어북 (거점에서 걸든 조직에서 걸든 같은 칸 b.org). 거점 별칭은 조직 이름이어도 둔다 (거점이 곧 그 조직 자리)
   dir.bases.forEach((b, i) => add(`거점/${i + 1}`, b.name, b.lore || (b.org ? orgLoreName(books, b.org) : ''), [b.english, b.label, ...b.aliases.filter((t) => (own.get(low(t)) ?? `lm${i}`) === `lm${i}`)]));
-  for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...aliasesOf(a.aliases, `ag${a.id}`), ...a.legacyEnglish]);
+  for (const a of dir.agents) add(`Agent roster/${a.id}`, a.name, a.lore, [a.english, ...aliasesOf(a.aliases, `ag${a.id}`, a.lore), ...a.legacyEnglish]);
   // 성을 뗀 이름 (고연지 → 연지): 본편 로어북 고르기(core/lore.ts)와 같은 「보조 키」 규칙
   for (const e of entries) {
     if (!e.key.startsWith('Agent roster/')) continue;
@@ -138,4 +197,26 @@ export function referenceEntries(r: Registry, content: string): RegistryEntry[] 
     for (const e of list) if (!e.weak?.includes(term) || calledByName(content, term)) found.set(e.key, e);
   }
   return [...found.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
+}
+
+export type AliasDrop = Record<'괴이' | '미스틱 사이트' | '요원', Record<string, string[]>>;
+
+/**
+ * 카드가 처음 낸 명부 별칭 중 규칙에 걸리는 것을 지운다 (scripts/alias-drop.mjs가 원본 카드에서 뽑은 목록).
+ * 목록에 있는 별칭만 지우므로 사용자가 더한 별칭은 남는다. 지울 게 없으면 원래 목록을 그대로 돌려준다
+ */
+export function dropDefaultAliases(lore: LoreEntry[], drop: AliasDrop = ALIAS_DROP as AliasDrop): LoreEntry[] {
+  const dir = readDirectory(lore);
+  if (!dir.folders) return lore;
+  let n = 0;
+  const strip = <T extends { lore: string; aliases: string[] }>(rows: T[], list: Record<string, string[]>): T[] =>
+    rows.map((r) => {
+      const bad = new Set((list[r.lore] ?? []).map((t) => t.toLowerCase()));
+      if (!bad.size) return r;
+      const aliases = r.aliases.filter((t) => !bad.has(t.toLowerCase()));
+      n += r.aliases.length - aliases.length;
+      return aliases.length === r.aliases.length ? r : { ...r, aliases };
+    });
+  const next: Directory = { ...dir, anomalies: strip(dir.anomalies, drop.괴이), sites: strip(dir.sites, drop['미스틱 사이트']), agents: strip(dir.agents, drop.요원) };
+  return n ? withDirectory(lore, directoryData(next)) : lore;
 }

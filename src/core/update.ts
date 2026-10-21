@@ -3,6 +3,7 @@
 // 플러그인 자체는 Risu 설정의 플러그인 탭이 //@update-url로 갱신한다.
 import { DIRECTORY_COMMENT, isDirectory, LEGACY_DATA, manifestEntry, OLD_DIRECTORY, RETIRED } from './lorebooks';
 import { migrateLore } from './world/directory';
+import { dropDefaultAliases } from './world/registry';
 import type { LoreEntry } from './types';
 
 export const UPDATE_SCHEMA = 1;
@@ -168,6 +169,8 @@ export function planUpdate(char: Record<string, unknown>, payload: CardPayload):
   keepUserKeys(current, lore.list, shippedKeys(payload.data.globalLore));
   // 옛 데이터 로어북(Faction display 등)은 새 카드에 없어 「사용자가 넣은 것」으로 남는다. 명부로 옮기고 지운다
   if (lore.list.some((e) => LEGACY_DATA.includes(String(e.comment ?? '')))) lore.list = migrateLore(lore.list);
+  // 사용자 명부(보호됨)에 남은 원본 기본 별칭 중 규칙에 걸리는 것만 지운다. 사용자가 더한 별칭은 남는다 (2026-10-21)
+  lore.list = dropDefaultAliases(lore.list);
   // Risu 캐릭터의 정규식 칸 이름은 customscript (s 없음)
   // 상태창 정규식은 플러그인이 그리게 되어(v0.16.31) 옛 카드에서 뺀다 (새 카드에 같은 이름이 있으면 그대로)
   const incomingNames = new Set(payload.data.customscript.map((r) => r.comment ?? ''));

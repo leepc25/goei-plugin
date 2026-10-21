@@ -1,0 +1,447 @@
+{
+ "괴이": {
+  "소라 랜드": [
+   "Amusement Park"
+  ],
+  "예술가의 지하실": [
+   "지하실"
+  ],
+  "인스피레이션 호텔": [
+   "호텔"
+  ],
+  "유쾌 테마파크": [
+   "Flower Golden Resort"
+  ],
+  "플라워 골든 리조트": [
+   "Yukoae Theme Park"
+  ],
+  "화요퀴즈쇼": [
+   "Brownie",
+   "브라우니"
+  ],
+  "해피엔딩 홀": [
+   "Mumyeong Chanran-gyo",
+   "무명찬란교"
+  ],
+  "세광특별시": [
+   "Forest of the Dying",
+   "임종의 숲",
+   "Body Casino",
+   "신체 카지노",
+   "Hanbit Library",
+   "한빛도서관",
+   "Conscience Stall",
+   "양심판매대",
+   "Blood Broadcasting Station",
+   "Delusion Home Shopping",
+   "혈액 방송국",
+   "망상 홈쇼핑",
+   "Nap Shelter",
+   "낮잠용 쉼터",
+   "Scale Tribunal",
+   "저울 재판소",
+   "세광역",
+   "Segwang Station",
+   "자정역",
+   "Midnight Station",
+   "한밤역",
+   "Deep Night Station",
+   "황혼역",
+   "Dusk Station",
+   "오후역",
+   "Afternoon Station",
+   "한낮역",
+   "Midday Station",
+   "아침역",
+   "Morning Station"
+  ],
+  "세광역": [
+   "Forest of the Dying",
+   "임종의 숲",
+   "Segwang Special City",
+   "세광특별시",
+   "Segwang City",
+   "세광시"
+  ],
+  "자정역": [
+   "Body Casino",
+   "신체 카지노"
+  ],
+  "한밤역": [
+   "Hanbit Library",
+   "한빛도서관"
+  ],
+  "황혼역": [
+   "Conscience Stall",
+   "양심판매대"
+  ],
+  "오후역": [
+   "Blood Broadcasting Station",
+   "Delusion Home Shopping",
+   "혈액 방송국",
+   "망상 홈쇼핑"
+  ],
+  "한낮역": [
+   "Nap Shelter",
+   "낮잠용 쉼터"
+  ],
+  "아침역": [
+   "Scale Tribunal",
+   "저울 재판소"
+  ],
+  "세크리엠": [
+   "Vampires",
+   "흡혈귀"
+  ],
+  "발푸르기스 협회": [
+   "Sorcerer",
+   "Sorceress",
+   "마도사",
+   "마녀",
+   "Witch",
+   "Avensha",
+   "아벤샤"
+  ],
+  "아벤샤": [
+   "Sorcerer",
+   "Sorceress",
+   "마도사",
+   "Witch",
+   "발푸르기스"
+  ],
+  "흡혈귀": [
+   "진조",
+   "세크리엠",
+   "Secriem"
+  ]
+ },
+ "미스틱 사이트": {
+  "달빛 타투샵": [
+   "Tattoo",
+   "문신"
+  ],
+  "착한 친구 키링": [
+   "좋은 친구"
+  ]
+ },
+ "요원": {
+  "쟈알디": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "스팡달": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "잼트리": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "에일린": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "고르고디오": [
+   "관리국",
+   "진압팀",
+   "Management Bureau",
+   "Suppression Team"
+  ],
+  "큐라스": [
+   "관리국",
+   "진압팀",
+   "Management Bureau",
+   "Suppression Team"
+  ],
+  "데드폴": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "게슈간": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "로제몬": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "콘쥬스": [
+   "관리국",
+   "종합대응팀",
+   "Management Bureau",
+   "Comprehensive Response Team"
+  ],
+  "고그니쟈": [
+   "관리국",
+   "격리팀",
+   "Management Bureau",
+   "Containment Team"
+  ],
+  "데쥬레": [
+   "관리국",
+   "격리팀",
+   "Management Bureau",
+   "Containment Team"
+  ],
+  "이도형": [
+   "관리국",
+   "검사부대",
+   "Management Bureau",
+   "Swordsman Corps"
+  ],
+  "고영훈": [
+   "관리국",
+   "검사부대",
+   "Management Bureau",
+   "Swordsman Corps"
+  ],
+  "노기균": [
+   "관리국",
+   "검사부대",
+   "Management Bureau",
+   "Swordsman Corps"
+  ],
+  "송주익": [
+   "관리국",
+   "검사부대",
+   "Management Bureau",
+   "Swordsman Corps"
+  ],
+  "곽성주": [
+   "관리국",
+   "진압부대",
+   "Management Bureau",
+   "Suppression Corps"
+  ],
+  "조성춘": [
+   "관리국",
+   "진압부대",
+   "Management Bureau",
+   "Suppression Corps"
+  ],
+  "윤병수": [
+   "관리국",
+   "진압부대",
+   "Management Bureau",
+   "Suppression Corps"
+  ],
+  "김성진": [
+   "관리국",
+   "진압부대",
+   "Management Bureau",
+   "Suppression Corps"
+  ],
+  "송진섭": [
+   "관리국",
+   "진압부대",
+   "Management Bureau",
+   "Suppression Corps"
+  ],
+  "이길환": [
+   "관리국",
+   "Management Bureau",
+   "Recruit Education"
+  ],
+  "이기석": [
+   "관리국",
+   "Management Bureau",
+   "Recruit Education"
+  ],
+  "김조학": [
+   "관리국",
+   "Management Bureau"
+  ],
+  "도필헌": [
+   "관리국",
+   "국장",
+   "Management Bureau",
+   "Guk-jang"
+  ],
+  "사장": [
+   "관리국",
+   "Management Bureau"
+  ],
+  "백석주": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "진나솔": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "이성해": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "이자헌": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "은하제": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "박민성": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "백사헌": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "고영은": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "강이학": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "장허운": [
+   "백일몽",
+   "현장탐사팀",
+   "Baekilmong",
+   "Field Exploration Team"
+  ],
+  "곽제강": [
+   "백일몽",
+   "연구팀",
+   "Baekilmong",
+   "Research Team"
+  ],
+  "이연화": [
+   "백일몽",
+   "연구팀",
+   "Baekilmong",
+   "Research Team"
+  ],
+  "이병진": [
+   "백일몽",
+   "Baekilmong"
+  ],
+  "제이": [
+   "Ban-jang",
+   "Banjang",
+   "Baekilmong",
+   "백일몽",
+   "경비팀"
+  ],
+  "호유원": [
+   "Fox Counseling",
+   "여우상담실",
+   "백일몽",
+   "Baekilmong"
+  ],
+  "청달래": [
+   "백일몽",
+   "Baekilmong"
+  ],
+  "차여진": [
+   "협회",
+   "Special Disaster Response",
+   "Association",
+   "SDRA"
+  ],
+  "서윤지": [
+   "협회",
+   "Special Disaster Response",
+   "Association",
+   "SDRA"
+  ],
+  "고연지": [
+   "중림",
+   "Jungnim",
+   "손길 의원",
+   "Unlicensed surgeon",
+   "clinic proprietor",
+   "Backalley Doctor",
+   "Ji-a",
+   "윤지아",
+   "Son-gil",
+   "Ui-won"
+  ],
+  "윤지아": [
+   "중림",
+   "Jungnim",
+   "Unlicensed surgeon",
+   "손길 의원",
+   "clinic proprietor",
+   "Backalley Doctor",
+   "연지",
+   "Yeon-ji",
+   "Son-gil",
+   "Ui-won"
+  ],
+  "마덕희": [
+   "중림",
+   "Jungnim",
+   "헐값 매입"
+  ],
+  "문혜란": [
+   "중림",
+   "Jungnim",
+   "대박 알선"
+  ],
+  "신유리": [
+   "중림",
+   "Jungnim",
+   "영창 컨설팅"
+  ],
+  "블라렛": [
+   "Vatican",
+   "교황청",
+   "기독교 상점"
+  ],
+  "살라딘": [
+   "Islam",
+   "이슬람"
+  ],
+  "아벤샤": [
+   "Sorcerer",
+   "Sorceress",
+   "Witch",
+   "발푸르기스",
+   "마도사"
+  ],
+  "세크리엠": [
+   "Vampires",
+   "흡혈귀"
+  ],
+  "브라우니": [
+   "Tuesday Quiz Show",
+   "good friend"
+  ]
+ }
+}
