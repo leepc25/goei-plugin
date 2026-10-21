@@ -2432,3 +2432,28 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opfx.sky > .c2 { opacity: .35; background-size: 820px 820px; background-position: 300px 140px; animation: gx-opsky2 120s linear infinite; }
 @keyframes gx-opsky { from { transform: translateX(-512px); } to { transform: translateX(0); } }
 @keyframes gx-opsky2 { from { transform: translateX(-820px); } to { transform: translateX(0); } }
+/* 2026-10-21 사용자: 어둡게는 접힌 띠에만. 펼친 커스텀·상세 창은 글자 자리(아래)만 살짝 어둡게 */
+.gx-mx.open .gx-mx-art::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
+.gx-evc.art.ev-pop .gx-evart, .gx-evc.art.wait.ev-pop .gx-evart, .gx-evc.art.go.ev-pop:hover .gx-evart { filter: none; }
+.gx-evc.art.ev-pop .gx-evart::after { background: linear-gradient(to top, rgba(6, 10, 12, .88) 0%, rgba(6, 10, 12, .5) 24%, rgba(6, 10, 12, 0) 46%), linear-gradient(to bottom, rgba(6, 10, 12, .35), rgba(6, 10, 12, 0) 18%); }
+/* 상세 창은 그림 크기(600px)대로 */
+.gx-evc.art.ev-pop { width: min(600px, calc(100% - 32px)); }
+.gx-evc.art.ev-pop .gx-evart { max-height: calc(100% - 0px); }
+/* 「선택」 표식이 눈에 띄게: 조준선이 숨 쉬듯 붉게 빛나고 글자도 따라 밝아진다. 고르면 붉은 빛 고정 */
+.gx-tgt:not(.gx-evbtn) { color: rgba(255, 255, 255, .92); }
+.gx-tgt:not(.gx-evbtn):not(.on) { animation: gx-tgt-pulse 1.8s ease-in-out infinite; }
+.gx-tgt:not(.gx-evbtn):not(.on) svg { animation: gx-tgt-spin 1.8s ease-in-out infinite; }
+.gx-tgt.on:not(.gx-evbtn) { color: #ff6a5e; text-shadow: 0 0 6px rgba(255, 59, 48, .75), 0 1px 2px rgba(0, 0, 0, .8); }
+.gx-tgt.on:not(.gx-evbtn) svg { filter: drop-shadow(0 0 3px rgba(255, 59, 48, .9)); }
+.gx-tgt:not(.gx-evbtn):hover { animation: none; color: #fff; text-shadow: 0 0 8px rgba(255, 90, 80, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+@keyframes gx-tgt-pulse {
+  0%, 100% { text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+  50% { color: #fff; text-shadow: 0 0 8px rgba(255, 70, 60, .95), 0 0 2px rgba(255, 120, 110, .9), 0 1px 2px rgba(0, 0, 0, .8); }
+}
+@keyframes gx-tgt-spin {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: none; }
+  50% { transform: scale(1.18) rotate(45deg); filter: drop-shadow(0 0 3px rgba(255, 59, 48, .95)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx-tgt:not(.gx-evbtn):not(.on), .gx-tgt:not(.gx-evbtn):not(.on) svg { animation: none; }
+}
