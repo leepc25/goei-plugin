@@ -434,3 +434,9 @@ action: Powerful jump: deep crouch with arms swinging back, explosive push-off w
 04:32:55 keypose draw animate_image 8f 160x112 -> id: acc8e402-3488-44f5-978d-f95321f589ba
 job_id: acc8e402-3488-44f5-978d-f95321f589ba
 action: Draws the pistol from the holster on her right hip with her RIGHT hand in one fast motion and raises it to
+07:33:49 keypose heavy2 animate_image 8f 160x112 -> id: f84a3dfd-976f-4d47-912f-ab842a887b4d
+job_id: f84a3dfd-976f-4d47-912f-ab842a887b4d
+action: Heavy finishing punch, much bigger than a normal straight: she drops her weight low, then lunges a full lo
+07:36:30 keypose run2 animate_image 8f 160x112 -> id: c2baa0bd-ecf7-450a-9087-af4bab9ab9fd
+job_id: c2baa0bd-ecf7-450a-9087-af4bab9ab9fd
+action: Fast combat sprint toward the right, one full stride that loops: torso leaning strongly forward about 30 d

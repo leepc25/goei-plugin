@@ -11,6 +11,8 @@ M={
  'run':(8,'Hard combat sprint, one full stride that loops: upper body leaning far forward, long powerful strides with knees lifting high, arms bent and pumping strongly opposite to the legs, hair streaming behind, feet on the same ground line.'),
  'jump':(8,'Powerful jump: deep crouch with arms swinging back, explosive push-off with legs fully extended and arms thrown up, then knees tucked high at the top, hair whipping. Big, athletic motion.'),
  'draw':(8,'Draws the pistol from the holster on her right hip with her RIGHT hand in one fast motion and raises it to a one-handed level aim pointing right, body turning side-on, left fist stays up near the chest, ends holding the aim.'),
+ 'heavy2':(8,'Heavy finishing punch, much bigger than a normal straight: she drops her weight low, then lunges a full long stride forward, the front foot landing far ahead with the front knee deeply bent, the back leg stretched fully straight behind her, hips and shoulders rotated fully forward, the rear fist driving straight out at chest height with the torso leaning far forward over the front knee, the whole body travelling forward with the punch. Holds the deep lunge. Feet stay on the same ground line.'),
+ 'run2':(8,'Fast combat sprint toward the right, one full stride that loops: torso leaning strongly forward about 30 degrees, head forward, very long strides with the front thigh lifted high and the back leg fully extended pushing off, bent arms pumping hard front and back opposite to the legs, hair and jacket tail streaming behind. Aggressive charging run, not a jog. Feet on the same ground line.'),
 }
 def log(s): open('../spend.log','a').write(time.strftime('%H:%M:%S')+' keypose '+s+'\n')
 def run(n,seed=21):
