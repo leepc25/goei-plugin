@@ -32,3 +32,11 @@
 - [공식 Animation to animation](https://www.pixellab.ai/docs/tools/animation-to-animation): 처음엔 2장처럼 적게 뽑아 좋은 장을 고르고, 그 장을 기준 그림으로 다시 뽑는다. 수작업 정리를 각오.
 - [공식 Animation with Text](https://www.pixellab.ai/docs/tools/animation): 큰 공격은 캐릭터를 캔버스 한쪽으로 옮겨 공간을 준다.
 - 타격 원칙 참고 [Slynyrd 근접 공격](https://www.slynyrd.com/blog/2018/9/8/pixelblog-9-melee-attacks): 자세(스탠스)부터. 예비동작이 길면 입력 지연, 회수가 길면 끈적함. 타격 순간 잠깐 멈춤, 번짐(smear)은 1장. 최대로 뻗은 장에서 팔을 살짝 늘이면 손맛·사거리 증가.
+
+## PixelLab 기본 길: 캐릭터 등록 + 동작 견본 (2026-10-21 확인, 아직 미시험)
+
+대부분의 사용자가 쓰는 길. 우리는 이 길을 쓰지 않고 낱장 그림에서 매번 동작을 그려서 비용·반복이 커졌다.
+- `create_character`: standard 1회(크기 128까지), v3 2~9회(256까지, 최고 품질). v3 + `reference_image`는 **정면(south) 그림**을 8방향으로 돌림. 이미 그린 다른 방향은 `direction_images`로 넣음(예: east = 기준표 A). `view`에 side 있음.
+- `animate_character`: 견본(`template_animation_id`) 1회/방향, 뼈대판 `skeleton-v3` 2~4회/방향(정체성 더 안정). 견본 예: lead-jab, cross-punch, surprise-uppercut, high-kick, flying-kick, roundhouse-kick, leg-sweep, fight-stance-idle-8-frames, taking-punch, falling-back-death, getting-up, running-4/6/8-frames, running-jump, running-slide, throw-object, backflip. 목록은 `get_character`.
+- 직접 설명 동작(v3)은 시작·끝 장 지정 가능(`custom_start_frame`, `end_frame`, 한 방향).
+- 오른쪽(east)만 뽑고 왼쪽은 반전하면 방향 비용이 1배.
