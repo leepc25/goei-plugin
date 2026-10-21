@@ -952,6 +952,11 @@ def rung(t):
     c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
     return P((X+8,58+2.5*abs(sn)),12,0,0,(X+6+19*c,G-12*max(0,-sn)-1),(X+6-19*c,G-12*max(0,sn)-1),(24,16),(4,12),le=('e',8,14),re=('e',0,14))
 clip('run_shotgun','side view in profile: running while carrying a long pump shotgun level in both hands',[rung(i/8) for i in range(8)],SGP)
+# 사격: 대기·걷기·달리기와 같은 긴 펌프식(나무 개머리판)으로, 어깨 회전 0(옆모습)
+SAb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(24,6),(8,6)); SRb=P((X-3,60),0,0,0,(X+13,G),(X-12,G-1),(21,2),(5,3),head=(4,-7))
+SPb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(16,8),(8,6))
+clip('shotgun2','side view in profile: firing a pump shotgun from the shoulder with both hands, strong recoil, then racks the pump',[SAb,SRb,lerp(SRb,SAb,.5),SPb,SAb,SAb],
+     'holding a long black pump shotgun with a wooden stock and wooden pump in both hands, stock against the shoulder, as long as her arm')
 REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A
