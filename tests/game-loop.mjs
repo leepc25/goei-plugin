@@ -102,6 +102,11 @@ try {
   await S('pause');
   await page.getByText('본부로 귀환').first().click();
   await page.getByText('귀환', { exact: true }).first().click();
+  // 귀환 컷신을 넘기며 본부까지
+  for (let i = 0; i < 80 && !(await page.evaluate(() => window.__goeiEngine.inHub)); i++) {
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(150);
+  }
   await page.waitForFunction(() => window.__goeiEngine.inHub, null, { timeout: 15000 });
   await page.waitForTimeout(1200);
   await S('settle');

@@ -2219,8 +2219,15 @@ var Game = class {
     this.world = null;
     this.paused = false;
     if (this.mods.hq && this.run) {
-      this.showHq();
-      this.mods.hq.onReturn(this.mods.toHqResult?.(result, w) ?? result, this.run);
+      const run = this.run;
+      const back = () => {
+        this.showHq();
+        this.mods.hq.onReturn(this.mods.toHqResult?.(result, w) ?? result, run);
+      };
+      if (this.mods.afterRun) {
+        this.scene = this.idleScene("cutscene");
+        this.mods.afterRun(how, back);
+      } else back();
       return;
     }
     this.scene = this.resultScene(result);
@@ -18584,7 +18591,8 @@ function engineModules(box2, bridge) {
   };
   const storyKeys = (e) => {
     if (!story.isBlocking()) return;
-    if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+    if (e.code === "Escape") story.skip();
+    else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
     else if (["Space", "Enter", "KeyE", "KeyZ", "KeyA"].includes(e.code)) story.advance();
     else return;
     e.preventDefault();
@@ -18654,6 +18662,10 @@ function engineModules(box2, bridge) {
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent;
+      if (run.stageId !== "hq" && run.launch && local("goei-first-entry").load() !== "1") {
+        local("goei-first-entry").save("1");
+        queueMicrotask(() => story.cutscene("first_entry"));
+      }
       w.hitFx = false;
       if (run.stageId === "hq") return;
       w.notes.runId = `${run.seed}`;
@@ -18691,6 +18703,12 @@ function engineModules(box2, bridge) {
       w.underlays.push((c, camX) => items.draw(c, camX));
     },
     toHqResult,
+    afterRun: (how, done) => {
+      let fired = false;
+      const once = () => fired ? void 0 : (fired = true, done());
+      story.cutscene(how === "evac" ? "evac" : "return", once);
+      setTimeout(() => !story.isBlocking() && once(), 400);
+    },
     drawIdle: (name, ctx, t) => {
       if (name === "title") drawTitleBg(ctx, t);
     },

@@ -39,6 +39,8 @@ export interface EngineModules {
   onWorld?: (w: World, run: RunConfigCore) => void;
   /** 제목 등 빈 장면의 배경 그리기 */
   drawIdle?: (name: string, ctx: CanvasRenderingContext2D, t: number) => void;
+  /** 출동이 끝난 뒤 본부로 가기 전 (귀환·후송 컷신). done을 부르면 본부 정산으로 */
+  afterRun?: (how: RunResultCore['how'], done: () => void) => void;
   /** 시작 꼬리표(?start=) 처리. true면 제목 화면을 건너뛴다 */
   boot?: (game: Game) => boolean;
   dispose?: () => void;
@@ -264,8 +266,15 @@ export class Game {
     this.world = null;
     this.paused = false;
     if (this.mods.hq && this.run) {
-      this.showHq();
-      this.mods.hq.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, this.run);
+      const run = this.run;
+      const back = () => {
+        this.showHq();
+        this.mods.hq!.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, run);
+      };
+      if (this.mods.afterRun) {
+        this.scene = this.idleScene('cutscene');
+        this.mods.afterRun(how, back);
+      } else back();
       return;
     }
     this.scene = this.resultScene(result);

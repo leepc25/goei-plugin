@@ -300,7 +300,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   const storyKeys = (e: KeyboardEvent) => {
     if (!story.isBlocking()) return;
-    if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+    if (e.code === 'Escape') story.skip();
+    else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
     else if (['Space', 'Enter', 'KeyE', 'KeyZ', 'KeyA'].includes(e.code)) story.advance();
     else return;
     e.preventDefault();
@@ -371,6 +372,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onWorld: (w, run) => {
       world = w;
       runAgent = run.agent as AgentId;
+      // 첫 출동이면 첫 투입 컷신 (본부·시연방 제외)
+      if (run.stageId !== 'hq' && (run as Launch).launch && local('goei-first-entry').load() !== '1') {
+        local('goei-first-entry').save('1');
+        queueMicrotask(() => story.cutscene('first_entry'));
+      }
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
@@ -410,6 +416,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       w.underlays.push((c, camX) => items.draw(c, camX));
     },
     toHqResult,
+    afterRun: (how, done) => {
+      let fired = false;
+      const once = () => (fired ? undefined : ((fired = true), done()));
+      story.cutscene(how === 'evac' ? 'evac' : 'return', once);
+      setTimeout(() => !story.isBlocking() && once(), 400); // 컷신이 없거나 바로 끝나면
+    },
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
     },
