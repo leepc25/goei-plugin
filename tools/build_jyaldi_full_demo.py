@@ -174,9 +174,12 @@ def main():
         if d['key'] == 'getup' and fr:  # 생성된 0·1장에 회색 얼룩 → 다운 마지막 누운 장으로 대체
             fr = frames_of('down')[6:7] + fr[2:]
         idx = list(range(len(fr)))
+        if d['key'] == 'lookback':
+            fr, pr = jyaldi_fixes.lookback_frames(frames_of('idle')), None
+            idx = list(range(len(fr))); d = dict(d, src='idle')   # 장 번호는 아래에서 기본 대기 장 번호로 바꿔 손 좌표를 뽑음
         # Bathroom clips are reviewed explicitly; preserve the commissioned 4/6 frames.
         bathroom = {'showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout', 'toiletin', 'toilet', 'toiletout', 'handwash'}
-        if d.get('group', '').startswith('전투') is False and fr and d['key'] not in bathroom:
+        if d.get('group', '').startswith('전투') is False and fr and d['key'] not in bathroom | {'lookback'}:
             idx = idx[:len(auto_trim(fr))]
         if d['order'] and idx:
             idx = [idx[i] for i in d['order'] if i < len(idx)]
@@ -185,6 +188,8 @@ def main():
         if d['rev']:
             idx = idx[::-1]
         fr = [fr[i] for i in idx]; pr = [pr[i] for i in idx] if pr else None
+        if d['key'] == 'lookback':
+            idx = list(jyaldi_fixes.LOOKBACK_ORDER)
         if fr:
             fr, pr, idx = jyaldi_fixes.apply(d['key'], fr, pr, src=d['src'], idx=idx)
         if not fr:

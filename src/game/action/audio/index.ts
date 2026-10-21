@@ -169,7 +169,13 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   }
 
   // ── 컨텍스트 ──
+  // 첫 사용자 동작(unlock) 전에는 AudioContext를 만들지 않는다 (브라우저 자동 재생 경고 방지).
+  // 그 전에 들어온 층·곡은 기억해 두었다가 잠금 해제 때 튼다.
+  let wantSong: SongId | null = null;
   function ensure(): Out | null {
+    return disposed ? null : out;
+  }
+  function create(): Out | null {
     if (disposed) return null;
     if (out) return out;
     const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -190,8 +196,16 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   // iOS·안드로이드는 사용자가 화면을 만진 그 순간에 resume해야 소리가 난다.
   // iOS 17+은 audioSession을 'playback'으로 두면 무음 스위치를 켜도 들린다.
   async function unlock() {
-    const o = ensure();
+    const fresh = !out;
+    const o = create();
     if (!o || !ctx) return false;
+    if (fresh) {
+      if (scene) {
+        amb = startAmbience(o, scene);
+        music(SCENE_SONG[scene], 1.2);
+      } else if (wantSong) music(wantSong);
+      wantSong = null;
+    }
     try {
       const nav = navigator as unknown as { audioSession?: { type: string } };
       if (nav.audioSession && nav.audioSession.type !== 'playback') nav.audioSession.type = 'playback';
@@ -301,7 +315,10 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
 
   function music(id: SongId | null, fade = 1) {
     const o = ensure();
-    if (!o || !ctx) return;
+    if (!o || !ctx) {
+      wantSong = id;
+      return;
+    }
     clearTimeout(jingleTimer);
     resumeSong = null;
     if (song?.id === id && !song.player.ended) return;
@@ -342,10 +359,10 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
 
   // ── 층 ──
   function floor(s: Scene | null) {
-    const o = ensure();
-    if (!o) return;
     if (s === scene) return;
     scene = s;
+    const o = ensure();
+    if (!o) return;
     amb?.stop();
     amb = s ? startAmbience(o, s) : null;
     music(s ? SCENE_SONG[s] : null, 1.2);

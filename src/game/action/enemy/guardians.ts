@@ -1,6 +1,7 @@
 // 수호자 (층 유형별 구역 보스). 근거: 스테이지설계서_차원승강기 10장, 명일아파트 6.1(405호), 기본 기획서 10.4·부록 E.2.
 // 공통: 평상시 경 아머, 공격 유효 구간 중 아머, 그로기 게이지가 차면 2초간 아머 없음. 체력 50%(일부 66/33%)에서 패턴이 바뀐다.
 // 규칙 약점: 그 층 규칙을 아는 사람이 쉽게 이긴다 (경로 밖 기습, 틈새 막기, 빛, 그릇, 등 돌리기, 잘 먹었습니다).
+import { emitDebuff } from './debuff';
 import { attackersNow, engage, pickAttack } from './ai';
 import { B, bake, humanoid } from './frames';
 import { Enemy, newAttackId, stillTicks, type Brain } from './enemy';
@@ -120,7 +121,7 @@ export const guard: GuardianDef = g({
 });
 export const proctor: GuardianDef = g({
   kind: 'proctor',
-  label: '낡은 제복의 시험 감독',
+  label: '낡은 제복의 차장',
   floor: 'trial',
   hp: 550,
   speed: 1.2,
@@ -506,7 +507,7 @@ const shadowBrain: Brain = {
   ev(e, name, w) {
     if (name !== 'engulf') return;
     w.emit({ type: 'custom', name: 'screen', data: { effect: 'dark', ticks: 150 } });
-    w.emit({ type: 'custom', name: 'debuff', data: { kind: 'fear', ticks: 60, from: e.id } });
+    emitDebuff(w, { kind: 'fear', ticks: 60 }, e.id);
     spawnInto(w, 'shade', e.x - 200, e.y);
     spawnInto(w, 'shade', e.x + 200, e.y);
   },
@@ -671,7 +672,7 @@ const shapeBrain: Brain = {
     // 보고 있으면 멀미 (조작 반전): 엔진에 두통 디버프로 알린다
     const looking = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 760 && !e.mem.folded;
     e.mem.looking = looking;
-    if (looking && e.age % 30 === 0) w.emit({ type: 'custom', name: 'debuff', data: { kind: 'headache', ticks: 32, from: e.id } });
+    if (looking && e.age % 30 === 0) emitDebuff(w, { kind: 'headache', ticks: 32 }, e.id);
     if (e.mem.folded) {
       if (--e.mem.folded <= 0) {
         e.mem.folded = 0;
@@ -832,6 +833,7 @@ function startFight(e: Enemy, w: WorldView, why: string) {
 
 const elderBrain: Brain = {
   tick(e, w) {
+    if (e.age === 1 && e.mem.solo && e.kind === 'elder_f') spawnInto(w, 'elder_m', e.x + 120, e.y + 10);
     if (e.age === 1) {
       e.mem.mode = 'table';
       e.hostile = false;
@@ -970,7 +972,7 @@ const touchBrain: Brain = {
       h.t++;
       if (h.t === TOUCH_TELE + 1) {
         h.hit = Math.abs(p.x - h.x) < 40 && Math.abs(p.y - h.y) < 22 && !p.airborne;
-        if (h.hit) w.emit({ type: 'custom', name: 'debuff', data: { kind: 'fear', ticks: 60, from: e.id } });
+        if (h.hit) emitDebuff(w, { kind: 'fear', ticks: 60 }, e.id);
       }
       if (h.hit && h.t < TOUCH_TELE + 60) touching++;
     }
@@ -1016,7 +1018,178 @@ const touchBrain: Brain = {
   },
 };
 
-export const GUARDIANS: GuardianDef[] = [guard, legs, shadow, noise, shape, elderF, elderM, proctor, touchers];
+// ─── 7. 208호 가족 (재현의 층 · 붉은 벽) ─────────────────────────
+
+/** 총알처럼 약한 원거리 (엔진 총알: noise가 있고 강도 1) */
+const ranged = (h: Hit) => (h.noise ?? 0) > 0 && (h.strength ?? 1) === 1;
+const auntBody = humanoid(66, 178);
+const uncleBody = humanoid(86, 200);
+export const familyF: GuardianDef = g({
+  kind: 'family_f',
+  label: '208호 아주머니',
+  floor: 'replica',
+  hp: 900,
+  speed: 2.2,
+  w: 66,
+  h: 178,
+  body: auntBody,
+  armor: 1,
+  attacks: [
+    { move: strike('bite', '턱 찢고 물기', 66, 178, { tele: 14, active: 5, recover: 18, reach: [20, 120], z: [120, 190], lunge: 9, armor: 2, body: auntBody, spec: S(16, 'stagger', 10, { debuff: { kind: 'bleed', ticks: 150 }, strength: 2 }) }), range: [40, 200], dy: 24, cd: 50, weight: 3 },
+    { move: charge('dash', '달려들기', 66, 178, { tele: 18, dash: 16, speed: 14, recover: 22, armor: 2, spec: S(14, 'down', 10, { strength: 3 }), body: auntBody }), range: [200, 560], dy: 20, cd: 110, weight: 2 },
+  ],
+  keep: [60, 140],
+  groggyMax: 110,
+  intro: '우리 애 못 봤어요?',
+  rule: '방 안 아이 방 문(E)을 열면 둘이 그쪽을 보고 멈춘다 (규칙 11을 지켜 열쇠를 얻었을 때)',
+  note: '보라색 머리 아주머니. 아이를 찾는다며 묻다가 세 번째 대화에서 턱이 찢어진다. 빠르게 달려들어 문다.',
+  color: '#7a4a8a',
+});
+export const familyM: GuardianDef = g({
+  kind: 'family_m',
+  label: '208호 아저씨',
+  floor: 'replica',
+  hp: 900,
+  speed: 0.8,
+  w: 86,
+  h: 200,
+  body: uncleBody,
+  armor: 1,
+  attacks: [
+    { move: strike('smash', '내려치기', 86, 200, { tele: 22, active: 5, recover: 26, reach: [20, 130], z: [0, 200], extend: false, armor: 2, body: uncleBody, spec: S(20, 'down', 8, { strength: 3 }) }), range: [0, 150], dy: 26, cd: 70, weight: 3 },
+    { move: grab('hold', '움켜잡기', 86, 200, { tele: 18, active: 5, recover: 24, reach: 120, ticks: 45, dmgPerTick: 2, armor: 2, body: uncleBody }), range: [0, 130], dy: 24, cd: 120, weight: 2 },
+  ],
+  keep: [20, 80],
+  groggyMax: 140,
+  intro: '…',
+  rule: '총이 안 듣는다 (비틀거리기만). 근접·잡기·환경 무기',
+  note: '표정이 굳은 아저씨. 총을 맞고도 비틀거리기만 한다. 느리게 다가와 내려친다.',
+  color: '#5a5a62',
+});
+const FAMILY_ASK = ['우리 애 못 봤어요?', '키가 이만해요. 머리핀을 했어요.', '…정말 못 봤어요?'];
+function familyOther(e: Enemy, w: WorldView): Enemy | null {
+  for (const b of w.bodies) if (b instanceof Enemy && b !== e && b.alive && (b.kind === 'family_f' || b.kind === 'family_m') && b.state !== 'dead') return b;
+  return null;
+}
+function familyFight(e: Enemy, w: WorldView) {
+  for (const x of [e, familyOther(e, w)]) if (x && x.mem.mode !== 'fight') ((x.mem.mode = 'fight'), (x.hostile = true));
+  e.say('(턱이 찢어진다)', 60);
+  w.emit({ type: 'bossRoar', x: e.x, kind: 'family208' });
+  w.emit({ type: 'combat:boss', index: 0 });
+}
+const familyBrain: Brain = {
+  tick(e, w) {
+    if (e.age === 1) {
+      e.groggyMax = (e.def as GuardianDef).groggyMax;
+      e.mem.mode = 'ask';
+      e.hostile = false;
+      if (e.mem.solo && e.kind === 'family_f') spawnInto(w, 'family_m', e.x + 140, e.y + 10);
+    }
+    if (e.mem.mode === 'ask') {
+      e.face(w.player.x);
+      if (e.lastHurt > 0) familyFight(e, w);
+      else if (e.kind === 'family_f' && Math.abs(w.player.x - e.x) < 360) {
+        e.mem.askT = (e.mem.askT ?? 0) + 1;
+        const i = Math.floor(e.mem.askT / 75);
+        if (e.mem.askT % 75 === 1 && i < FAMILY_ASK.length) e.say(FAMILY_ASK[i], 70);
+        if (i >= FAMILY_ASK.length) familyFight(e, w);
+      }
+      return true;
+    }
+    if (e.mem.froze > 0) {
+      e.mem.froze--;
+      e.weakOpen = 2;
+      return true;
+    }
+    if (!familyOther(e, w) && !e.mem.alone) ((e.mem.alone = true), (e.rally = 99999));
+  },
+  think: (e, w) => engage(e, w, e.kind === 'family_f' ? 0.14 : 0.08),
+  hit(e, h) {
+    if (e.kind === 'family_m' && ranged(h)) return { mult: 0, noReact: true, text: '비틀거릴 뿐' };
+  },
+  signal(e, s, w) {
+    if ((s.kind === 'childDoor' || s.kind === 'door') && e.mem.mode === 'fight' && !e.mem.doorDone) {
+      for (const x of [e, familyOther(e, w)]) if (x) ((x.mem.doorDone = true), (x.mem.froze = 150), (x.move = null), x.set('stunned'), (x.stunT = 150), x.say('…거기 있니?', 80));
+      w.emit({ type: 'custom', name: 'ruleKept', data: { rule: 'r_child', id: e.id } });
+    }
+  },
+};
+
+// ─── 8. 일어난 집 (재현의 층 · 빈집) ───────────────────────────────
+
+const houseBody: LocalBox[] = [B(-180, 180, 0, 260, 20, 'torso'), B(-30, 30, 170, 230, 22, 'core')];
+export const risenhouse: GuardianDef = g({
+  kind: 'risenhouse',
+  label: '일어난 집',
+  floor: 'replica',
+  hp: 800,
+  speed: 0,
+  w: 360,
+  h: 260,
+  body: houseBody,
+  armor: 3,
+  attacks: [
+    { move: bake('furniture', '가구 날리기', houseBody, [{ n: 22, tele: true }, { n: 4, ev: 'furniture' }, { n: 20 }], [S(0, 'none')]), range: [0, 2000], dy: 2000, cd: 70, weight: 3 },
+    { move: bake('tilt', '바닥 기울기', houseBody, [{ n: 26, tele: true }, { n: 4, fire: 'ring' }, { n: 14 }, { n: 4, fire: 'ring' }, { n: 20 }], [S(0, 'none')], { danger: [{ fx0: -400, fx1: 400, dy: 60 }] }), range: [0, 2000], dy: 2000, cd: 150, weight: 2 },
+    { move: bake('rally', '집이 부른다', houseBody, [{ n: 30, tele: true }, { n: 4, ev: 'wake' }, { n: 20 }], [S(0, 'none')]), range: [0, 2000], dy: 2000, cd: 400, weight: 1, when: 'phase2' },
+  ],
+  keep: [0, 0],
+  groggyMax: 9999,
+  intro: '(집이 삐걱거리며 일어선다)',
+  rule: '멈춘 시계(가운데 동그라미)를 부수면 다시 「떠난 집」이 된다. 시계 말고는 거의 안 들어간다',
+  note: '물건을 너무 집으면 집 자체가 일어난다. 방 전체가 보스. 가구가 날아오고, 바닥이 기울고, 먼지 쌓인 물건들이 깨어난다.',
+  color: '#4a3e30',
+});
+const houseBrain: Brain = {
+  tick(e, w) {
+    intro(e, w);
+    e.y = w.lane[0] + 4;
+    phaseCheck(e, w, [0.5]);
+  },
+  think(e, w) {
+    e.face(w.player.x);
+    const a = pickAttack(e, w);
+    if (a && w.rand() < 0.04) e.start(a.move, w, a.cd);
+  },
+  ev(e, name, w) {
+    const p = w.player;
+    if (name === 'furniture') {
+      const [b0, b1] = w.bounds;
+      const fromLeft = w.rand() < 0.5;
+      e.fire('chair', w, { x: fromLeft ? b0 - 30 : b1 + 30, y: p.y, dir: fromLeft ? 1 : -1 });
+      if (e.phase >= 2) e.fire('chair', w, { x: fromLeft ? b1 + 30 : b0 - 30, y: Math.max(w.lane[0], Math.min(w.lane[1], p.y + 40)), dir: fromLeft ? -1 : 1 });
+    } else if (name === 'wake') for (const k of [-1, 1]) spawnInto(w, 'dusty', p.x + k * 300, p.y);
+  },
+  hit(e, h, part) {
+    if (part === 'core') return { mult: 2, weak: true, text: '시계' };
+    return { mult: 0.2, noReact: true };
+  },
+  signal(e, s, w) {
+    if (s.kind === 'clock' && e.state !== 'dead') {
+      e.say('(시계가 멈췄다. 집이 다시 떠났다)', 80);
+      w.emit({ type: 'custom', name: 'ruleKept', data: { rule: 'r_clock', id: e.id } });
+      w.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'risenhouse', how: 'rule' } });
+      e.set('dead');
+    }
+  },
+  drawOver(e, ctx) {
+    if (e.state === 'dead') return;
+    ctx.fillStyle = '#d8c8a0';
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - e.z - 200, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#2a2018';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x, e.y - e.z - 218);
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x + 12, e.y - e.z - 196);
+    ctx.stroke();
+  },
+};
+
+export const GUARDIANS: GuardianDef[] = [guard, legs, shadow, noise, shape, elderF, elderM, proctor, touchers, familyF, familyM, risenhouse];
 export const GUARDIAN_BRAINS: Record<string, Brain> = {
   guard: guardBrain,
   proctor: guardBrain,
@@ -1027,6 +1200,9 @@ export const GUARDIAN_BRAINS: Record<string, Brain> = {
   elder_f: elderBrain,
   elder_m: elderBrain,
   touchers: touchBrain,
+  family_f: familyBrain,
+  family_m: familyBrain,
+  risenhouse: houseBrain,
 };
 /** 층 유형 → 수호자 (재현은 노부부 둘을 같이 부른다) */
 export const GUARDIAN_FOR: Record<FloorType, string[]> = {

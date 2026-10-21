@@ -88,6 +88,7 @@ export type RuleSignal =
   | { kind: 'bowl'; x: number; y: number }
   | { kind: 'door'; x: number; y: number }
   | { kind: 'childDoor' }
+  | { kind: 'clock' }
   | { kind: 'look'; on: boolean };
 
 export type { Hit as EngineHit };
