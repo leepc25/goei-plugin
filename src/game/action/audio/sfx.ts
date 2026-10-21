@@ -883,6 +883,42 @@ const scare: Recipe = (o, t, p) => {
   return dur + 1;
 };
 
+/** 구두 굽 또각 (컷신) */
+const heels: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+  for (let i = 0; i < 4; i++) {
+    const tt = t + i * 0.32;
+    burst(o, tt, v, 'bandpass', 3600, 4, 0.02, 0.6);
+    tone(o, tt, v, 'triangle', 1250, 0.03, 0.15);
+  }
+  return 1.6;
+};
+/** 덕트 안을 기는 소리: 철판이 우그러지는 쿵·깡 */
+const duct: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.5);
+  for (let i = 0; i < 3; i++) {
+    const tt = t + i * rnd(0.35, 0.5);
+    thump(o, tt, v, 90, 50, 0.2, 0.6);
+    tone(o, tt, v, 'triangle', rnd(300, 420), 0.4, 0.15);
+    tone(o, tt, v, 'sine', rnd(900, 1300), 0.25, 0.06);
+  }
+  return 1.8;
+};
+/** 천장 해치·점검문: 걸쇠 철컥 + 경첩 */
+const hatch: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.4);
+  burst(o, t, v, 'bandpass', 2600, 5, 0.03, 0.7);
+  tone(o, t, v, 'square', 820, 0.04, 0.1);
+  const g = gainNode(o, 0, v);
+  g.gain.setValueAtTime(0.0001, t + 0.1);
+  g.gain.linearRampToValueAtTime(0.5, t + 0.2);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+  const s = osc(o, 'sawtooth', 30, t + 0.1, 0.6, filt(o, 'bandpass', 1500, 12, g));
+  s.frequency.linearRampToValueAtTime(18, t + 0.7);
+  thump(o, t + 0.7, v, 110, 45, 0.15, 0.7);
+  return 1;
+};
+
 // ── 목록 ─────────────────────────────────────────────────────────────
 
 export interface SfxDef {
@@ -968,6 +1004,9 @@ export const SFX = {
   timerWarn: d('시간 경고', 'world', timerWarn),
   noiseUp: d('소리 게이지 상승', 'world', noiseUp),
   safeRoom: d('다락방 도착', 'world', safeRoom),
+  heels: d('구두 소리', 'world', heels),
+  duct: d('덕트 기어가기', 'world', duct),
+  hatch: d('해치 열기', 'world', hatch),
   uiMove: d('커서 이동', 'ui', uiMove, 'ui'),
   uiOk: d('결정', 'ui', uiOk, 'ui'),
   uiBack: d('취소', 'ui', uiBack, 'ui'),
