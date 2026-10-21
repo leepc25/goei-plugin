@@ -36,6 +36,8 @@ export interface EvCard {
   art?: { pic: string | null; desc: string };
   /** 그림 카드를 눌렀을 때 뜨는 상세 창의 id (상황판·임무 탭이 같은 id라 어느 쪽에서 열어도 같은 창) */
   pop?: string;
+  /** 지역 코드 (상세 창 CCTV의 카메라 번호·지역) */
+  locCode?: string;
   /** 막 끝난 상황 (다음 응답까지 흐리게) */
   ended?: boolean;
 }
@@ -132,35 +134,22 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
   return `<button class="${btn ? 'gx-evbtn ' : ''}gx-tgt${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${on ? '목표 해제' : '목표로 지정'}" aria-label="${on ? '목표 해제' : '목표로 지정'}">${TGT}${btn ? '' : `<span>${on ? '해제' : '선택'}</span>`}</button>`;
 }
 
-/** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 정사각 그림 안에 버튼·요원·상황 글·문서 요약 전부.
- *  종료는 오른쪽 위 한 곳에만 (2026-10-20 사용자: 위·아래 두 곳이 헷갈림). 닫기는 바깥 누르기·Esc·뒤로 */
-export function evPopup(): string {
+/** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
+ *  종료는 오른쪽 위 한 곳에만. 닫기는 바깥 누르기·Esc·뒤로 */
+export function evPopup(clock = ''): string {
   const c = evUi.pop ? seen.get(evUi.pop) : undefined;
   if (!c) {
     evUi.pop = '';
     return '';
   }
-  const key = c.key ? esc(c.key) : '';
-  const pick = c.open === 'pick-event';
-  const name = esc(c.name);
-  // 버튼 셋은 같은 크기 아이콘 (2026-10-20 사용자). 종료는 휴지통, 한 번 누르면 빨개지고 한 번 더 누르면 종료
-  const btns = `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
-    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
-  const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
-  // 목표 선택/해제는 오른쪽 위 단추 줄 맨 앞의 글자 단추 (2026-10-21 사용자: 상세 창·CCTV·위성·커스텀 모두 같은 자리. 글 아래·이름 옆은 글 배치를 흔들었다)
-  const pickBtn = pick && c.key ? targetMark(!!c.selected, 'pick-event', c.key) : '';
   return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
-    <div class="gx-evc art open ev-pop${c.ended ? ' wait ended' : c.key ? ' live' : ' wait'}" role="dialog" aria-label="${esc(c.name)}">
-      <div class="gx-evart k-${c.kind}${c.art?.pic ? '' : ' none'}"${artBg(c)}>${artIco(c)}
-        <span class="gx-evart-top"><span class="gx-evart-act">${btns}</span></span>
-        <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${pickBtn}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}${c.key && !c.chips && c.kind !== 'in' ? `<em class="gx-evc-note">${c.kind === 'ms' ? '미방문' : '미투입'}</em>` : ''}</span>${c.chips ? `<span class="gx-evc-who">${c.chips}</span>` : ''}${c.extra ?? ''}${desc}</span>
-      </div></div>`;
+    ${feedView(c, clock, ' ev-pop" role="dialog" aria-label="' + esc(c.name))}`;
 }
 
 /** 막 끝난 상황 카드 (상황판·임무 탭 공통). 버튼은 위키만 */
 export function endedCard(e: EndedEntry, art: (name: string, kind: EvKind) => { pic: string | null; desc: string } | undefined): string {
   const name = e.name || '이름 미확인';
-  return artCard({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art(name, e.kind) ?? { pic: null, desc: '' }, pop: `end:${e.kind}:${e.name}:${e.loc}` });
+  return artCard({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art(name, e.kind) ?? { pic: null, desc: '' }, pop: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc });
 }
 
 export function evCard(c: EvCard): string {
@@ -235,7 +224,7 @@ function osd(sig: string, cam: string, clock: string): string {
 }
 
 /** 큰 보기 오른쪽 위 버튼: 위키 · 종료 (CCTV·위성 공통). 임무 지도로 가는 단추는 위성 지도가 생겨 뺐다 (2026-10-21 사용자) */
-function evBtns(c: OpsCard): string {
+function evBtns(c: EvCard): string {
   const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
   return `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
@@ -256,13 +245,20 @@ function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
   if (!c) {
     return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc(empty)}</small></div></div>`;
   }
+  return feedView(c, clock);
+}
+
+/** CCTV 큰 보기 한 장 (상황판 왼쪽, 상세 창 공통). cls: 바깥 div에 덧붙일 클래스(와 속성) */
+function feedView(c: EvCard, clock: string, cls = ''): string {
   const name = esc(c.name);
   const btns = evBtns(c);
   const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
   const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc(c.art.desc)}</span>` : '';
-  const region = locName(c.locCode).split(' ').slice(0, 2).join(' ');
-  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}">${pic}${STATIC}
-    <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, `CAM-${camNo(c.locCode)} · ${esc(region)}`, clock)}<span class="gx-evart-act">${btns}</span></div>
+  const loc = c.locCode ?? '';
+  const region = locName(loc).split(' ').slice(0, 2).join(' ');
+  const cam = loc ? `CAM-${camNo(loc)} · ${esc(region)}` : 'CAM-00';
+  return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}">${pic}${STATIC}
+    <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
     <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }

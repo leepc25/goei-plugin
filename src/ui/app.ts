@@ -1090,7 +1090,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup()}${tab === 'board' ? agentPopup() : ''}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup() : ''}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1312,10 +1312,15 @@ function board(ctx: ChatContext): string {
   const cnt = (cls: string, label: string, n: number) => `<em class="${cls}">${label}<i>${n}</i></em>`;
   const limit = worldSettings(ctx.char.globalLore, ctx.chat.scriptstate).agent_limit;
   const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms));
-  const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
-  const clock = [st?.date, st?.time].filter(Boolean).join(' ');
+  const clock = boardClock(ctx);
   return `<main class="gx-body gx-board">
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
     ${agentPanel(agents, getPrefs().agents ?? 'wall', { total: roster.length, org: findFaction(faction, factionList(ctx.char.globalLore))?.affiliation ?? '', extra: promo, empty: limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.' })}
   </main>${boardDrawer()}`;
+}
+
+/** 상황판 CCTV·상세 창 시각: 최근 상태 줄의 날짜·시각 */
+function boardClock(ctx: ChatContext): string {
+  const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
+  return [st?.date, st?.time].filter(Boolean).join(' ');
 }

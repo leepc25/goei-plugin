@@ -1674,7 +1674,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*70/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
+  assert.ok(/괴이\s*62/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
@@ -1688,17 +1688,18 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.inputValue('[data-input="dir-q"]'), '');
   await page.click('[data-action="dir-set"][data-value="preset|0|명일 아파트"]');
   await page.waitForFunction(() => !document.querySelector('.dir-bar [data-value="save"]')?.disabled);
-  // 다른 폴더에서 온 후보: 원본 World catalog의 조직·개체는 따로 묶고 출처 폴더를 보여 준다. 새 후보 추가
+  // 다른 폴더에서 온 후보: 기본으로는 없고(2026-10-21 사용자), 직접 넣으면 따로 묶고 출처 폴더를 보여 준다
   await page.fill('[data-input="dir-q"]', '');
   await page.click('[data-action="dir-kind"][data-value="anomaly"]');
-  const listText = await page.textContent('.dir-list');
-  assert.ok(listText.includes('다른 폴더에서 온 후보') && listText.includes('🙂요원 · 개체') && listText.includes('🌆세력'), '출처 폴더 표시');
+  assert.ok(!(await page.textContent('.dir-list')).includes('다른 폴더에서 온 후보'), '기본 명부엔 폴더 밖 후보 없음');
   await page.click('[data-action="dir-add-toggle"]');
   await page.fill('[data-input="dir-ext-q"]', '세력');
   const extName = await page.getAttribute('.dir-ext-item', 'data-value');
   assert.ok(extName);
   await page.click('.dir-ext-item');
   await page.waitForSelector(`.dir-head[data-value="${extName}"][aria-expanded="true"]`);
+  const listText = await page.textContent('.dir-list');
+  assert.ok(listText.includes('다른 폴더에서 온 후보') && listText.includes('🌆세력'), '출처 폴더 표시');
   // 조직 추가 → 요원에게 고르기
   await page.click('[data-action="dir-kind"][data-value="org"]');
   await page.click('[data-action="dir-add-toggle"]');
