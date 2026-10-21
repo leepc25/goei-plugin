@@ -1,12 +1,15 @@
-# GPT 요청서 · 오프닝과 클로즈업 레이어 (2026-10-21 최종 정정판)
+> **폐기 (2026-10-21 17:00).** 사용자가 컷신을 「도트 영상」으로 정했다. 이 요청서는 GPT에 넘기지 않는다. 새 의뢰서: `docs/GPT요청_컷신영상.md`.
+
+# GPT 요청서 · 오프닝과 시네마틱 컷신 레이어 (2026-10-21 최종판)
 
 주인: 「대사와 컷신」 스레드(Claude). 이전 판(한 장 그림 14장, 장소 배경 4곳)은 **모두 취소**한다. 이미 만든 그림은 쓰지 않는다.
 
 ## 정한 것 (사용자 2026-10-21)
 
-- 컷신 9개는 **이벤트씬**이다. 게임 화면 안에서 게임 배경(`docs/GPT요청_게임배경.md`)과 쟈알디 등 기존 도트 클립이 대본대로 걷고, 마주 보고, 놀라고, 문을 연다. GPT 그림이 필요 없다.
-- GPT 그림은 **오락실식 도트 오프닝**(CPS2·네오지오 시절: 여러 층 스크롤 배경, 화면을 크게 채우는 인물이 실제로 움직임, 얼굴·눈 클로즈업, 빠른 컷 전환과 번쩍임, 마지막 로고)과 **꼭 필요한 클로즈업 3컷**에만 쓴다.
-- 그림은 컷마다 **레이어를 나눠 투명 배경**으로 받는다. Claude가 「게임 타일과 배경」의 B판 도구로 도트화하고, 엔진에서 레이어 시차·카메라·흔들림·번쩍임과 인물 레이어 움직임(숨쉬기, 머리카락, 옷자락, 고개, 팔)으로 움직인다.
+- **컷신 = 시네마틱 컷신.** 오프닝(코인 넣고 스타트 전 영상)과 컷신 9개(첫 투입, 이벤트 중간) 모두 오락실 시절 도트 연출로 만든다: 연출된 컷 구성(설정 컷 → 인물 → 클로즈업 → 반응), 여러 층 시차 스크롤, 화면을 크게 채우는 인물 레이어의 움직임(숨쉬기, 머리카락, 옷자락, 고개, 팔), 카메라 이동·줌, 레터박스, 빠른 컷 전환과 번쩍임.
+- 게임 화면 안에서 작은 스프라이트만으로 하는 장면은 따로 「이벤트씬」이라 부르고, 컷신을 대신하지 않는다.
+- 그림은 컷마다 **레이어를 나눠 투명 배경**으로 받는다. Claude가 「게임 타일과 배경」의 B판 도구로 도트화하고, 엔진의 컷신 재생기가 움직인다.
+- 컷신 안 대사는 기존 대본(`src/game/action/story/scripts/cutscenes.ts`)이 화면 위 대화창으로 띄운다. 그림에 글자를 넣지 않는다.
 
 ## GPT에게 (작업 방법)
 
@@ -112,24 +115,195 @@ op8_lineup — the team stepping out of a wide-open old elevator into a dark lob
   op8_lineup/a8_rojemon_b.png — the same, arms crossed, glaring, eyes glowing faintly purple.
 ```
 
-## 클로즈업 3컷 (이벤트씬 안에 잠깐 끼우는 것)
+## 컷신 9개
+
+인물 외형 (해당 인물이 나오는 레이어에 붙인다):
 
 ```
-cu_intercom — elevator intercom speaker grille on brushed steel, extreme close-up (첫 호명).
-  cu_intercom/bg.png   — brushed steel panel with the round grille (full).
-  cu_intercom/glow.png — warm light behind the grille holes only.
-
-cu_attic_wall — the scratched wall of the agents' "attic" between elevator shafts: rusty brown steel plate, old chalk tally marks and a hand-scratched map of floors made only of lines and boxes (no letters), an orange caged work lamp (다락방).
-  cu_attic_wall/bg.png   — the wall (full).
-  cu_attic_wall/lamp.png — only the lamp and its warm light pool (transparent elsewhere), for flickering.
-
-cu_rope_hands — JYALDI's two black-gloved hands gripping a single rope, seen from above, the dark elevator shaft dropping away below with tiny orange lamps (귀환).
-  cu_rope_hands/far.png   — the shaft depth with small lamps far below (full).
-  cu_rope_hands/rope.png  — the rope (transparent elsewhere).
-  cu_rope_hands/hands.png — the two gloved hands and wrists on the rope (transparent elsewhere).
+CHARACTER: JAEMTRI — Korean woman in her late 20s, the team's mission desk officer. Long brown wavy hair falling below the shoulders, soft green eyes that crinkle when she smiles, a warm "friendly older sister" smile. Curvy figure. Black office skirt suit, black high heels, always holding a tablet.
+CHARACTER: PASSENGER — a thin middle-aged Korean man in a worn, outdated grey suit with a loosened tie, tired kind eyes, three years of stubble, friendly smile that feels wrong.
 ```
 
-합계: 오프닝 47장(op1~op7 29장 + op8 18장) + 클로즈업 7장 = 54장.
+각 컷신은 이 순서로 재생한다. 「다시 씀」은 오프닝 레이어를 그대로 쓴다는 뜻(새로 그리지 않음).
+
+### 1. 첫 출근 (first_day) · 약 16초 · 아침
+콘티: 사람 하나 없는 아침 종로를 옆으로 훑고 → 쟈알디가 텅 빈 길을 걸어가는 뒷모습 → 사무실 문이 열리며 잼트리가 화면(신입 시점)을 보고 웃는 얼굴 → 쟈알디 무표정 옆얼굴, 눈 깜빡.
+```
+cs1_street — empty Jongno at 8:40 on a weekday morning, no people, no cars, no birds, overcast cool grey light, traffic lights on.
+  cs1_street/far.png  — grey morning sky and distant high-rises (full).
+  cs1_street/mid.png  — old 4-6 storey office buildings and shuttered shops along the street (transparent sky).
+  cs1_street/near.png — the empty six-lane road and sidewalk across the bottom third.
+  cs1_street/fg.png   — a traffic light pole and a street lamp at the right edge (transparent elsewhere).
+cs1_walk — JYALDI seen from behind at mid distance, walking away down the middle of the empty road, buildings on both sides.
+  cs1_walk/bg.png   — the empty road in one-point perspective toward the vanishing point (full).
+  cs1_walk/body.png — JYALDI from behind, full figure, mid-stride, without hair.
+  cs1_walk/hair.png — her long black hair as a separate shape, overlapping the head.
+cs1_jaemtri — inside a small run-down government office, morning light through blinds; JAEMTRI at the doorway looks straight at the viewer (the new agent) with a welcoming smile, tablet in hand, waist-up.
+  cs1_jaemtri/bg.png       — office interior with blinds, desks, grey-green walls (full).
+  cs1_jaemtri/body.png     — JAEMTRI waist-up without head.
+  cs1_jaemtri/head.png     — her head with the warm smile.
+  cs1_jaemtri/head_talk.png — the same head, mouth open mid-word, same position.
+cs1_react — JYALDI's face in side profile, close-up, expressionless, red eye.
+  cs1_react/bg.png   — soft blurred-looking office background as flat color shapes (full).
+  cs1_react/face.png — her profile from the chin to the top of the head with hair.
+  cs1_react/shut.png — the same with the eye closed (blink), same position.
+```
+
+### 2. 첫 투입 (first_entry) · 약 18초 · 밤
+콘티: 밤의 낡은 건물 외경에서 로비로 내려옴 → 엘리베이터 앞 쟈알디 뒷모습, 고개 돌림 → 빈 서명란을 짚는 장갑 손 → 승강기 안 쟈알디 정면, 문이 양쪽에서 닫힘 → 버튼 패널이 끝없이 이어짐 → 붉은 눈.
+```
+cs2_building — 다시 씀: op2_building (모든 레이어).
+cs2_back      — 다시 씀: op4_jyaldi_back (모든 레이어).
+cs2_checklist — 다시 씀: op3_checklist (모든 레이어).
+cs2_car — inside an old elevator car (brushed steel, faux-wood lower panels, dim warm ceiling light), JYALDI standing in the center facing the viewer, full figure, the doors closing toward her from both sides in the foreground.
+  cs2_car/bg.png      — the car interior back wall with the mirror and handrail (full).
+  cs2_car/body.png    — JYALDI front view, full figure, arms down, without hair.
+  cs2_car/hair.png    — her long black hair, separate.
+  cs2_car/door_l.png  — the left steel door panel only, drawn at its fully open position at the left edge (transparent elsewhere).
+  cs2_car/door_r.png  — the right steel door panel only, fully open at the right edge.
+cs2_panel — 다시 씀: op7_panel (모든 레이어).
+cs2_eye   — 다시 씀: op5_eye (모든 레이어).
+```
+
+### 3. 첫 호명 (first_call) · 약 10초 · 승강기 안
+콘티: 승강기 안 쟈알디 옆모습, 천장등 깜빡 → 인터폰 스피커 클로즈업, 구멍 뒤로 빛 → 쟈알디 눈만 스피커 쪽으로.
+```
+cs3_side — JYALDI in side view, waist-up, standing in the elevator car, the ceiling light above flickering.
+  cs3_side/bg.png    — car interior side wall with the button panel (full).
+  cs3_side/body.png  — JYALDI waist-up side view facing right.
+  cs3_side/light.png — only the ceiling lamp and its light cone (transparent elsewhere), for flickering.
+cs3_intercom — extreme close-up of the round intercom speaker grille on brushed steel.
+  cs3_intercom/bg.png   — the steel panel with the grille (full).
+  cs3_intercom/glow.png — warm light behind the grille holes only.
+cs3_eye — 다시 씀: op5_eye.
+```
+
+### 4. 다락방 (attic) · 약 14초 · 정비 구역
+콘티: 덕트 사이 비좁은 공간 설정 컷, 작업등이 흔들림 → 버려진 배낭과 침낭 클로즈업 → 벽에 긁어 쓴 지도와 표시 클로즈업(「여기 오래 있지 마」는 자막) → 쪼그려 앉아 벽을 보는 쟈알디.
+```
+cs4_attic — the hidden "attic" between elevator shafts: cramped space of rusty brown riveted steel plates and ducts, very dark, one orange caged work lamp hanging from a wire.
+  cs4_attic/far.png  — deep darkness of the shaft beyond, a few tiny orange lamps far away (full).
+  cs4_attic/bg.png   — the cramped room walls and ducts (transparent where it opens to the shaft).
+  cs4_attic/lamp.png — only the hanging lamp and its warm light pool (transparent elsewhere), for swinging.
+  cs4_attic/fg.png   — a pipe and a duct edge crossing the foreground (transparent elsewhere).
+cs4_pack — close-up on the floor: an abandoned old backpack and a rolled sleeping mat, dust, a coiled rope.
+  cs4_pack/bg.png    — steel grating floor (full).
+  cs4_pack/items.png — the backpack, mat and rope.
+cs4_wall — close-up of the scratched steel wall: chalk tally marks and a hand-scratched map of floors made only of lines and boxes (no letters).
+  cs4_wall/bg.png    — the wall (full).
+  cs4_wall/light.png — the swinging lamp light falling across it (transparent elsewhere).
+cs4_crouch — JYALDI crouching low, three-quarter back view, looking at the wall, lamp light on her side.
+  cs4_crouch/bg.png   — the attic corner (full).
+  cs4_crouch/body.png — JYALDI crouching, without hair.
+  cs4_crouch/hair.png — her hair falling over her shoulder, separate.
+```
+
+### 5. 삼 년째 승객 (three_years) · 약 12초 · 엘리베이터 홀
+콘티: 엘리베이터 홀 설정 컷, 벽에 기댄 승객 → 승객 얼굴 클로즈업, 반쪽 그림자에 친절한 미소 → 한 문을 가리키는 손가락 → 쟈알디의 가늘어진 붉은 눈.
+```
+cs5_hall — an old elevator lobby at night (pale beige marble, brass trim, one red indicator lamp), the PASSENGER leaning against the wall far right, small in frame.
+  cs5_hall/bg.png        — the lobby (full).
+  cs5_hall/passenger.png — the PASSENGER leaning, full figure.
+  cs5_hall/lamp.png      — only the red lamp glow (transparent elsewhere).
+cs5_face — close-up of the PASSENGER's face, half in shadow, kind smile.
+  cs5_face/bg.png   — dark marble background (full).
+  cs5_face/face.png — his face and shoulders.
+  cs5_face/talk.png — the same face, mouth open mid-word, same position.
+cs5_point — close-up of the PASSENGER's hand pointing toward one of two closed doors.
+  cs5_point/bg.png   — two doors side by side in the dim hall (full).
+  cs5_point/hand.png — his hand and sleeve entering from the left (transparent elsewhere).
+cs5_eye — 다시 씀: op5_eye.
+```
+
+### 6. 귀환 (return) · 약 14초 · 승강로 → 아침 로비
+콘티: 승강로를 아래에서 올려다보면 작은 쟈알디가 로프를 오름 → 로프를 잡은 장갑 손 클로즈업 → 해치가 열리며 빛이 쏟아짐 → 아침 햇살 속 진짜 로비, 쟈알디 뒷모습.
+```
+cs6_shaft — looking straight up a deep vertical elevator shaft from below: rusty steel walls, cables, guide rails, warm light far above, JYALDI small in the middle climbing a single rope.
+  cs6_shaft/far.png   — the light far above and the shaft walls fading (full).
+  cs6_shaft/near.png  — cables and rails close to the viewer at both edges (transparent in the middle).
+  cs6_shaft/rope.png  — the single rope from top to bottom (transparent elsewhere).
+  cs6_shaft/body.png  — JYALDI small, climbing, seen from below (transparent elsewhere).
+cs6_hands — JYALDI's two black-gloved hands gripping the rope, seen from above, the dark shaft dropping away below.
+  cs6_hands/far.png   — the shaft depth with tiny orange lamps far below (full).
+  cs6_hands/rope.png  — the rope.
+  cs6_hands/hands.png — the two gloved hands and wrists.
+cs6_hatch — a steel maintenance hatch overhead being pushed open, white morning light pouring in.
+  cs6_hatch/bg.png   — the dark steel ceiling around the hatch frame (full).
+  cs6_hatch/lid.png  — the hatch lid only, closed position (transparent elsewhere), to be rotated open.
+  cs6_hatch/rays.png — light rays pouring through the opening (transparent elsewhere).
+cs6_lobby — the real ground-floor lobby of an ordinary old office building at early morning, warm sunlight streaming through glass entrance doors; JYALDI from behind, full figure, standing in the light, jacket dusty.
+  cs6_lobby/far.png  — the morning street outside the glass doors (full).
+  cs6_lobby/bg.png   — the lobby walls and glass doors (transparent through the glass).
+  cs6_lobby/body.png — JYALDI from behind, without hair.
+  cs6_lobby/hair.png — her hair, separate.
+  cs6_lobby/sun.png  — only the sunbeams and dust in the air (transparent elsewhere).
+```
+
+### 7. 후송 (evac) · 약 12초 · 어둠 → 의무실
+콘티: 암흑 속 팽팽하게 당겨지는 로프, 크게 흔들림 → 누운 시점으로 천장 형광등이 깜빡이며 켜짐 → 의무실 침대의 쟈알디가 눈을 뜸 → 옆 탁자 블랙커피에서 김.
+```
+cs7_rope — total darkness, a single rope pulled taut diagonally across the frame, a faint light at the top.
+  cs7_rope/bg.png   — darkness with faint shaft edges (full).
+  cs7_rope/rope.png — the taut rope.
+cs7_ceiling — point of view lying on a bed: a white infirmary ceiling with one fluorescent tube light.
+  cs7_ceiling/bg.png    — the ceiling (full).
+  cs7_ceiling/tube.png  — only the lit tube and its glow (transparent elsewhere), for flickering on.
+cs7_bed — JYALDI lying in a hospital bed, jacket off, white shirt, tie loosened, one bandage on her forehead, seen from the side at bed height, pale green wall, fluorescent light.
+  cs7_bed/bg.png   — the bed and wall (full).
+  cs7_bed/body.png — JYALDI lying, eyes closed.
+  cs7_bed/open.png — only her face with the eyes open (red), same position.
+cs7_coffee — close-up of a bedside table with a paper cup of black coffee.
+  cs7_coffee/bg.png    — the table top and pale wall (full).
+  cs7_coffee/cup.png   — the paper cup.
+  cs7_coffee/steam.png — a few soft steam curls above the cup (transparent elsewhere).
+```
+
+### 8. 출구 (exit) · 약 14초 · 새벽
+콘티: 버튼 패널 맨 아래에 EXIT 불이 켜짐 → 문이 열리고 새벽빛 역광 속 쟈알디 실루엣 → 건물 앞에 시동 걸린 관리국 차량 → 승강기 문이 닫히며 표시등이 꺼짐(「또 와요」는 대화창).
+```
+cs8_panel — 다시 씀: op7_panel, 추가 레이어 하나:
+  cs8_panel/exit.png — only one button at the very bottom glowing green-white (transparent elsewhere).
+cs8_door — elevator doors opened onto a lobby flooded with pale dawn light, JYALDI as a dark silhouette in the doorway, full figure, seen from inside the car.
+  cs8_door/bg.png   — the lit lobby beyond the doors (full).
+  cs8_door/frame.png — the dark elevator door frame and car edges around the opening (transparent in the opening).
+  cs8_door/body.png — JYALDI's silhouette (dark, rim-lit edges).
+cs8_car — the front of the old office building at dawn, a plain black government sedan at the curb with its engine running, headlights on, exhaust vapor.
+  cs8_car/far.png     — dawn sky over low rooftops (full).
+  cs8_car/bg.png      — the building facade and sidewalk (transparent sky).
+  cs8_car/car.png     — the sedan from the side.
+  cs8_car/exhaust.png — exhaust vapor puffs (transparent elsewhere).
+cs8_close — the elevator doors from outside closing, the floor indicator above with one red lamp.
+  cs8_close/bg.png     — marble wall and brass frame around the opening (full).
+  cs8_close/door_l.png — left door panel, open position.
+  cs8_close/door_r.png — right door panel, open position.
+  cs8_close/lamp.png   — the red lamp glow only.
+```
+
+### 9. 공략 완료 회식 (dinner) · 약 14초 · 저녁
+콘티: 창에 불 켜진 파스타집 외경 → 긴 식탁에 둘러앉은 팀(잼트리, 쟈알디 앞쪽) → 메뉴판을 든 잼트리의 신난 얼굴 → 블랙커피 잔을 드는 쟈알디 손.
+```
+cs9_outside — a small cozy pasta restaurant near Jongno in the evening, warm yellow light from the front window, dark blue sky.
+  cs9_outside/far.png — evening sky and rooftops (full).
+  cs9_outside/bg.png  — the restaurant front (transparent sky).
+  cs9_outside/glow.png — only the warm window light (transparent elsewhere).
+cs9_table — inside: a long table full of pasta plates and glasses, warm pendant lights, exposed brick; JAEMTRI at the near left holding a menu, JYALDI at the near right holding a coffee cup, both waist-up, other seats in the back left as dark warm shapes.
+  cs9_table/bg.png      — the restaurant interior and back seats (full).
+  cs9_table/table.png   — the table with food in the foreground.
+  cs9_table/jaemtri.png — JAEMTRI waist-up with the menu.
+  cs9_table/jyaldi.png  — JYALDI waist-up with the cup.
+cs9_jaemtri — close-up of JAEMTRI's excited smiling face behind the open menu.
+  cs9_jaemtri/bg.png   — warm blurred-looking restaurant as flat shapes (full).
+  cs9_jaemtri/face.png — her face, hair and the menu.
+  cs9_jaemtri/talk.png — the same, mouth open mid-word.
+cs9_cup — close-up of JYALDI's black-gloved hand lifting a small cup of black coffee.
+  cs9_cup/bg.png    — the table top (full).
+  cs9_cup/hand.png  — the gloved hand with the cup.
+  cs9_cup/steam.png — steam curls (transparent elsewhere).
+```
+
+## 합계
+
+오프닝 47장 + 컷신 9개 새 레이어 110장 = **157장** (첫 투입·첫 호명·승객 컷신 일부는 오프닝 레이어를 다시 씀).
 
 ## Claude가 받은 뒤 하는 일
 
