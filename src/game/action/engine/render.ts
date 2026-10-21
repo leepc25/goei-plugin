@@ -119,12 +119,14 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     }
   }
 
+  /** 가려진 요원 윤곽을 다시 그릴 때 모든 그림 투명도에 곱한다 */
+  let ghostK = 1;
   function sprite(clip: string, frame: number, origin: number, x: number, y: number, dir: 1 | -1, alpha = 1) {
     const list = art.clips[clip];
     const fi = list?.[Math.min(frame, list.length - 1)];
     if (!fi || !art.atlas) return false;
     ctx.save();
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = alpha * ghostK;
     ctx.translate(Math.round(x), Math.round(y));
     if (dir < 0) ctx.scale(-1, 1);
     ctx.drawImage(art.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * PIXEL, fi.oy * PIXEL, fi.w * PIXEL, fi.h * PIXEL);
@@ -419,12 +421,22 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
       // 바닥 물건은 몸과 함께 깊이(y) 순서로 그린다: 물건 앞(아래)에 선 몸은 물건 위에, 뒤에 선 몸은 물건에 가려진다 (검수 7)
-      const props = [...w.props].sort((a, b) => a.y - b.y);
+      // 층이 넘긴 깊이 줄(뒷줄 사물함 등)도 같은 순서에 섞는다
+      type Deep = { y: number; prop?: World['props'][number]; layer?: NonNullable<typeof w.floor.depthLayers>[number] };
+      const layers = w.floor.depthLayers ?? [];
+      const props: Deep[] = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
       let pi = 0;
       const propsUpTo = (y: number) => {
-        const from = pi;
-        while (pi < props.length && props[pi].y <= y) pi++;
-        if (pi > from) drawProps(w, camX, props.slice(from, pi));
+        while (pi < props.length && props[pi].y <= y) {
+          const d = props[pi++];
+          if (d.prop) drawProps(w, camX, [d.prop]);
+          else if (d.layer) {
+            ctx.save();
+            ctx.translate(-camX, 0);
+            d.layer.draw(ctx);
+            ctx.restore();
+          }
+        }
       };
       propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
@@ -480,11 +492,13 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 요원이 앞쪽 물건에 가려지면 윤곽을 비쳐 보인다 (완전히 사라지지 않게, 검수 8)
       {
         const pl = w.player;
-        if (pl.alive && w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind))) {
+        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind)) || layers.some((l) => l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
           const q = pos(pl);
           ctx.save();
-          ctx.globalAlpha = 0.45;
+          ctx.globalAlpha = 0.4;
+          ghostK = 0.4;
           drawPlayer(pl, q.x - camX, q.y, q.z, w);
+          ghostK = 1;
           ctx.restore();
         }
       }

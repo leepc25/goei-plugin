@@ -299,12 +299,17 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
             if (!r.warned.has('low')) r.warned.add('low'), api.world.say('천장이 낮다. ↓ 앉아서 지나간다.', 2);
           }
           break;
-        case 'narrow':
-          if (inX && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {
-            if (!wasIn) blocked = true;
+        case 'narrow': {
+          // 사물함·차단대 그림 폭(몸 절반 포함)만큼 넓게 막는다: 사물함 줄 끝 바로 옆, 그 뒤 깊이에 서서 사물함에 박혀 보이지 않게 (검수 9)
+          const M = 120;
+          const inN = p.x > t.x0 - M && p.x < t.x1 + M,
+            wasN = r.prevX > t.x0 - M && r.prevX < t.x1 + M;
+          if (inN && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {
+            if (!wasN) blocked = true;
             else api.movePlayer(p.x, laneY(Math.max(t.lane0, Math.min(t.lane1, lane))));
           }
           break;
+        }
         case 'redfloor':
           if (inX && lane >= t.lane0 && lane <= t.lane1 && p.z <= 0.5 && r.hurtCd <= 0) {
             r.hurtCd = 1.2;

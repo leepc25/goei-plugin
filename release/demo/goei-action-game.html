@@ -1893,12 +1893,13 @@ function makeRenderer(ctx, art3, opt) {
       }
     }
   }
+  let ghostK = 1;
   function sprite(clip, frame, origin, x, y, dir, alpha = 1) {
     const list = art3.clips[clip];
     const fi = list?.[Math.min(frame, list.length - 1)];
     if (!fi || !art3.atlas) return false;
     ctx.save();
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = alpha * ghostK;
     ctx.translate(Math.round(x), Math.round(y));
     if (dir < 0) ctx.scale(-1, 1);
     ctx.drawImage(art3.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * PIXEL, fi.oy * PIXEL, fi.w * PIXEL, fi.h * PIXEL);
@@ -2174,12 +2175,20 @@ function makeRenderer(ctx, art3, opt) {
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
       background(w, camX);
-      const props2 = [...w.props].sort((a, b) => a.y - b.y);
+      const layers = w.floor.depthLayers ?? [];
+      const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
       let pi = 0;
       const propsUpTo = (y) => {
-        const from = pi;
-        while (pi < props2.length && props2[pi].y <= y) pi++;
-        if (pi > from) drawProps(w, camX, props2.slice(from, pi));
+        while (pi < props2.length && props2[pi].y <= y) {
+          const d2 = props2[pi++];
+          if (d2.prop) drawProps(w, camX, [d2.prop]);
+          else if (d2.layer) {
+            ctx.save();
+            ctx.translate(-camX, 0);
+            d2.layer.draw(ctx);
+            ctx.restore();
+          }
+        }
       };
       propsUpTo(w.lane[0]);
       for (const u of w.underlays) u(ctx, camX);
@@ -2231,11 +2240,13 @@ function makeRenderer(ctx, art3, opt) {
       propsUpTo(Infinity);
       {
         const pl = w.player;
-        if (pl.alive && w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind))) {
+        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind)) || layers.some((l) => l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
           const q = pos(pl);
           ctx.save();
-          ctx.globalAlpha = 0.45;
+          ctx.globalAlpha = 0.4;
+          ghostK = 0.4;
           drawPlayer(pl, q.x - camX, q.y, q.z, w);
+          ghostK = 1;
           ctx.restore();
         }
       }
@@ -14379,10 +14390,12 @@ function drawBack(ctx, camX, segs, pal, plan) {
     ctx.fillRect(s2.x, y0, s2.w, 40);
     void room;
   }
-  for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === "floor" ? "" : s2.ref, plan.stage.floor?.sub));
+  const layers = [];
+  plan.depthLayers = layers;
+  for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === "floor" ? "" : s2.ref, plan.stage.floor?.sub), layers);
   void CHUNK_W;
 }
-function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
+function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers) {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case "pit": {
@@ -14562,7 +14575,11 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "") {
         for (let x = t.x0 + 50; x < t.x1 - 20 && ok; x += 100) ok = drawPropArt(ctx, "clutter", label3, x, y);
         return ok;
       };
-      if (a > y0 && !row("사물함", a)) {
+      if (a > y0 && layers) {
+        layers.push({ y: a, x0: t.x0 - 10, x1: t.x1 + 10, draw: (c) => {
+          for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
+        } });
+      } else if (a > y0 && !row("사물함", a)) {
         ctx.fillStyle = pal.wall;
         ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
         ctx.fillStyle = pal.trim;
@@ -14905,12 +14922,15 @@ ${RULE[id].variant.text}` : ""}`, 4);
             if (!r.warned.has("low")) r.warned.add("low"), api.world.say("천장이 낮다. ↓ 앉아서 지나간다.", 2);
           }
           break;
-        case "narrow":
-          if (inX && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {
-            if (!wasIn) blocked = true;
+        case "narrow": {
+          const M2 = 120;
+          const inN = p.x > t.x0 - M2 && p.x < t.x1 + M2, wasN = r.prevX > t.x0 - M2 && r.prevX < t.x1 + M2;
+          if (inN && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {
+            if (!wasN) blocked = true;
             else api.movePlayer(p.x, laneY(Math.max(t.lane0, Math.min(t.lane1, lane))));
           }
           break;
+        }
         case "redfloor":
           if (inX && lane >= t.lane0 && lane <= t.lane1 && p.z <= 0.5 && r.hurtCd <= 0) {
             r.hurtCd = 1.2;

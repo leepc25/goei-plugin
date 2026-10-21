@@ -232,7 +232,10 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
     void room; // 조각·방 이름 글씨는 화면에 쓰지 않는다 (떠 있는 글씨 금지)
   }
   // 지형은 조각을 다 깐 뒤에 (이웃 조각 바닥에 덮이지 않게)
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub));
+  // 깊이 줄(뒷줄 사물함 등)은 매 장면 새로 모아 엔진에 넘긴다
+  const layers: NonNullable<StagePlan['depthLayers']> = [];
+  plan.depthLayers = layers;
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub), layers);
   void CHUNK_W;
 }
 
@@ -240,7 +243,7 @@ function roomName(ref: string): string {
   return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
-export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '') {
+export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '', layers?: NonNullable<StagePlan['depthLayers']>) {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case 'pit': {
@@ -443,7 +446,12 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
         for (let x = t.x0 + 50; x < t.x1 - 20 && ok; x += 100) ok = drawPropArt(ctx, 'clutter', label, x, y);
         return ok;
       };
-      if (a > y0 && !row('사물함', a)) {
+      // 뒷줄 사물함은 배경이 아니라 깊이 줄로(엔진이 몸과 y 순서로 섞어 그린다): 그 뒤에 선 몸은 가려지고 앞에 선 몸은 위에 (검수 9)
+      if (a > y0 && layers) {
+        layers.push({ y: a, x0: t.x0 - 10, x1: t.x1 + 10, draw: (c) => {
+          for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
+        } });
+      } else if (a > y0 && !row('사물함', a)) {
         ctx.fillStyle = pal.wall;
         ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
         ctx.fillStyle = pal.trim;
