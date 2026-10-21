@@ -151,50 +151,9 @@ IMAGES
 7. Base Jungrim Underground Shopping Center — The street-level stair entrance down to a decaying underground shopping arcade in Jungnim-dong, Seoul at night: half-dead fluorescent lights below, closed shops visible at the bottom of the stairs, wet pavement.
 ```
 
-## 공용 요원 (30장) · 직접 제작 (GPT 아님: 기존 요원 그림 톤을 맞춰야 함)
+## 공용 요원 (30장)
 
-사진이 없는 요원의 대표 사진. 기존 요원 그림과 같은 도구·톤으로 직접 만듭니다. 아래 목록은 장면 설명이고, 쓰는 도구 형식(태그 등)으로 바꿔 쓰면 됩니다. 세로 832×1216, 검은 배경. 여러 인물 대신 쓰는 그림이라 얼굴이 드러나면 안 됩니다. 옷차림(소속)과 성별마다 3장씩 두고, 플러그인이 요원 이름으로 그중 하나를 골라 같은 요원은 늘 같은 그림이 나옵니다. 성별을 모르면 후드 차림(Religious·Occult)을 씁니다.
-
-```
-Make 30 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png). Variants of the same outfit must look like DIFFERENT people (different hair, build, pose, accessory).
-
-STYLE (same for every image)
-Korean webtoon (manhwa) character illustration matching the attached reference image exactly: fine ink line art, soft cel shading, muted colors. Portrait 2:3 (1024x1536). One person, standing, framed from head to mid-thigh, facing slightly to the side, centered, plain pure black background. The face must be ANONYMOUS: hidden by deep shadow, a cap brim, a hood, hair or a mask, so the image can stand in for many different characters. Head near the top quarter of the frame (the app crops a square face icon from there). NO readable text, logos or insignia.
-
-KIND: AGENT
-
-IMAGES
-1. Shared Agent Suit Female 1 — Woman in black suit and black tie, white shirt; long dark hair falling over the eyes, gloved hands.
-2. Shared Agent Suit Female 2 — Woman in black suit and black tie, white shirt; short bob haircut, face in shadow, holding a pistol pointed down.
-3. Shared Agent Suit Female 3 — Woman in black suit and black tie, white shirt; hair tied back, sunglasses, arms crossed.
-4. Shared Agent Suit Male 1 — Man in black suit and black tie, white shirt; face in deep shadow, hands in pockets.
-5. Shared Agent Suit Male 2 — Man in black suit and black tie, white shirt; sunglasses and short hair, adjusting a cuff.
-6. Shared Agent Suit Male 3 — Man in black suit and black tie, white shirt; holding a black umbrella, face hidden under it.
-7. Shared Agent Masked Female 1 — Woman in neat office suit with an employee ID lanyard (no readable text); fox mask, long hair.
-8. Shared Agent Masked Female 2 — Woman in neat office suit with an employee ID lanyard (no readable text); cat mask, short hair, holding a clipboard.
-9. Shared Agent Masked Female 3 — Woman in neat office suit with an employee ID lanyard (no readable text); rabbit mask, ponytail, collector cylinder at the hip.
-10. Shared Agent Masked Male 1 — Man in neat office suit with an employee ID lanyard (no readable text); wolf mask, standing straight.
-11. Shared Agent Masked Male 2 — Man in neat office suit with an employee ID lanyard (no readable text); owl mask, sleeves rolled up.
-12. Shared Agent Masked Male 3 — Man in neat office suit with an employee ID lanyard (no readable text); bear mask, heavy build, carrying a metal case.
-13. Shared Agent Freelancer Female 1 — Woman in practical streetwear with a tactical touch; hooded jacket and tactical vest, short baton, hood shadowing the face.
-14. Shared Agent Freelancer Female 2 — Woman in practical streetwear with a tactical touch; leather jacket, cap pulled low, knife sheath on the thigh.
-15. Shared Agent Freelancer Female 3 — Woman in practical streetwear with a tactical touch; long coat and scarf over the mouth, gloves.
-16. Shared Agent Freelancer Male 1 — Man in practical streetwear with a tactical touch; worn bomber jacket, cap pulled low, duffel bag.
-17. Shared Agent Freelancer Male 2 — Man in practical streetwear with a tactical touch; hoodie under a utility vest, face mask, bandaged knuckles.
-18. Shared Agent Freelancer Male 3 — Man in practical streetwear with a tactical touch; trench coat, turned-up collar hiding the face, crowbar in hand.
-19. Shared Agent Civilian Female 1 — Woman in ordinary casual clothes; hoodie and long coat, backpack strap, face turned away under her hair.
-20. Shared Agent Civilian Female 2 — Woman in ordinary casual clothes; school-style cardigan and skirt, face hidden by a surgical mask and bangs.
-21. Shared Agent Civilian Female 3 — Woman in ordinary casual clothes; office worker blouse and slacks, holding a phone up so it hides her face.
-22. Shared Agent Civilian Male 1 — Man in ordinary casual clothes; casual shirt and jacket, cap hiding the face.
-23. Shared Agent Civilian Male 2 — Man in ordinary casual clothes; delivery rider jacket with helmet on, visor down.
-24. Shared Agent Civilian Male 3 — Man in ordinary casual clothes; college hoodie, hood up, earphones, looking down at a phone.
-25. Shared Agent Religious 1 — Person of unclear gender in a dark cassock-like robe with a hood; rosary-like string of beads at the wrist; face hidden by the hood.
-26. Shared Agent Religious 2 — Person of unclear gender in a dark cassock-like robe with a hood; veil and long robe, hands folded; face hidden by the hood.
-27. Shared Agent Religious 3 — Person of unclear gender in a dark cassock-like robe with a hood; wide-sleeved robe, holding a small lantern; face hidden by the hood.
-28. Shared Agent Occult 1 — Person of unclear gender in a long dark cloak; sand-colored trim, faint glowing sigils around the hands; face hidden by the hood.
-29. Shared Agent Occult 2 — Person of unclear gender in a long dark cloak; tattered cloak, a staff with charms; face hidden by the hood.
-30. Shared Agent Occult 3 — Person of unclear gender in a long dark cloak; layered cloak with talisman papers, face hidden by a hood; face hidden by the hood.
-```
+기존 요원 그림과 톤을 맞춰야 해서 GPT가 아니라 NAI로 직접 만듭니다. 프롬프트는 `docs/공용요원_NAI프롬프트.md`.
 
 ## 플러그인 매칭 (Claude 담당)
 
