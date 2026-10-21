@@ -524,15 +524,6 @@ function label(_ctx: CanvasRenderingContext2D, _s: string, _x: number, _y: numbe
 function drawFront(ctx: CanvasRenderingContext2D, camX: number, world: WorldView, plan: StagePlan) {
   const fx = plan.stage.fx;
   const vw = ctx.canvas.width;
-  // 좁은 길 뒷줄 사물함보다 안쪽(깊은 쪽)에 선 몸은 사물함에 가려져야 한다: 그 몸이 있을 때만 사물함 줄을 몸 위에 다시 그린다 (앞뒤 정렬, 검수 7)
-  const [ly0, ly1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
-  const alive = [world.player, ...world.bodies].filter((b) => b.alive);
-  for (const t of plan.stage.terrain) {
-    if (t.kind !== 'narrow') continue;
-    const a = laneYIn(t.lane0, ly0, ly1);
-    if (a <= ly0 || !alive.some((b) => b.y < a - 2 && b.x > t.x0 - 80 && b.x < t.x1 + 80)) continue;
-    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(ctx, 'clutter', '사물함', x, a)) break;
-  }
   // 추격의 벽
   if (fx.chaseX > -9000) {
     const g = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);

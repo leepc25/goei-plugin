@@ -2229,6 +2229,16 @@ function makeRenderer(ctx, art3, opt) {
         } else grayBody(b, camX - jitter, 0);
       }
       propsUpTo(Infinity);
+      {
+        const pl = w.player;
+        if (pl.alive && w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind))) {
+          const q = pos(pl);
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          drawPlayer(pl, q.x - camX, q.y, q.z, w);
+          ctx.restore();
+        }
+      }
       if (w.props.some((p) => p.label && near2(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
@@ -14627,14 +14637,6 @@ function label2(_ctx, _s, _x, _y, _c) {
 function drawFront(ctx, camX, world, plan) {
   const fx = plan.stage.fx;
   const vw = ctx.canvas.width;
-  const [ly0, ly1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
-  const alive = [world.player, ...world.bodies].filter((b) => b.alive);
-  for (const t of plan.stage.terrain) {
-    if (t.kind !== "narrow") continue;
-    const a = laneYIn(t.lane0, ly0, ly1);
-    if (a <= ly0 || !alive.some((b) => b.y < a - 2 && b.x > t.x0 - 80 && b.x < t.x1 + 80)) continue;
-    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(ctx, "clutter", "사물함", x, a)) break;
-  }
   if (fx.chaseX > -9e3) {
     const g2 = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);
     g2.addColorStop(0, "rgba(60,0,0,0.95)");

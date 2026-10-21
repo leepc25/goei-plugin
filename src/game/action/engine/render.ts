@@ -477,6 +477,17 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         } else grayBody(b, camX - jitter, 0);
       }
       propsUpTo(Infinity);
+      // 요원이 앞쪽 물건에 가려지면 윤곽을 비쳐 보인다 (완전히 사라지지 않게, 검수 8)
+      {
+        const pl = w.player;
+        if (pl.alive && w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind))) {
+          const q = pos(pl);
+          ctx.save();
+          ctx.globalAlpha = 0.45;
+          drawPlayer(pl, q.x - camX, q.y, q.z, w);
+          ctx.restore();
+        }
+      }
       // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
       if (w.props.some((p) => p.label && near(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
