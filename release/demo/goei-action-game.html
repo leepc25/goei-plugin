@@ -4647,7 +4647,7 @@ function createGameAudio(opts = {}) {
 }
 
 // src/game/action/hq/style.css
-var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n";
+var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n";
 
 // src/game/action/hq/data.ts
 var PLACES = [
@@ -4984,7 +4984,9 @@ function launch(s2, missionId, seed) {
   if (s2.active) return "이미 출동 중이에요.";
   const rec = s2.agents[s2.selected];
   const level = masteryLevel(rec.xp);
+  const runId = `${s2.day}-${s2.runs + 1}-${seed.toString(36)}`;
   const l = {
+    runId,
     seed,
     agent: s2.selected,
     support: s2.support && s2.support !== s2.selected && s2.agents[s2.support].injured === 0 ? s2.support : null,
@@ -5003,7 +5005,7 @@ function launch(s2, missionId, seed) {
   s2.loadout = [null, null, null, null];
   s2.coffee = null;
   s2.mission = m.id;
-  s2.active = { mission: m.id, agent: s2.selected, seed };
+  s2.active = { runId, mission: m.id, agent: s2.selected, seed };
   return l;
 }
 var survivorId = (id) => SURVIVORS[id] ? id : id.startsWith("missing") ? "worker" : id;
@@ -5047,6 +5049,9 @@ function judgeMission(g2, r) {
 var CASH_RATE = { return: 0.5, withdraw: 0.5, evac: 0 };
 var MASTERY_GAIN = (r) => 20 + r.floors * 10 + (r.missionDone ? 30 : 0) + Math.min(30, r.kills);
 function settle(s2, l, raw, rand2) {
+  const id = raw.runId ?? l.runId;
+  if (s2.last?.runId === id && id) return s2.last.lines;
+  if (s2.active && l.runId && s2.active.runId !== l.runId) return ["다른 출동의 결과라 정산하지 않았어요."];
   const lines2 = [];
   const r0 = normalizeResult(raw);
   const r = { ...r0, missionDone: judgeMission(l.goal, r0) };
@@ -5058,7 +5063,7 @@ function settle(s2, l, raw, rand2) {
   const unsent = r.found.filter((f) => !r.sent.includes(f));
   const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
   let added = 0;
-  for (const id of kept) if (!s2.rulebook.includes(id)) s2.rulebook.push(id), added++;
+  for (const id2 of kept) if (!s2.rulebook.includes(id2)) s2.rulebook.push(id2), added++;
   lines2.push(`규칙서 +${added}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ""}`);
   const cashToBudget = Math.floor(r.cash * CASH_RATE[r.how]);
   let budget = cashToBudget + (evac ? Math.floor(r.budget / 2) : r.budget);
@@ -5135,11 +5140,11 @@ function settle(s2, l, raw, rand2) {
     lines2.push(`유물 「${RELICS[taken].name}」을(를) 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
   }
   s2.runs++;
-  for (const [id, until] of Object.entries(s2.deadlines)) {
-    if (s2.missionsDone.includes(id) || s2.failedRescues.includes(id)) continue;
-    if (s2.runs >= until && !(success && id === m.id)) {
-      s2.failedRescues.push(id);
-      lines2.push(`구조 요청 「${MISSION_BY_ID[id].title}」 마감을 넘겼다. 다음에 만나면 더는 사람이 아닐 것이다.`);
+  for (const [id2, until] of Object.entries(s2.deadlines)) {
+    if (s2.missionsDone.includes(id2) || s2.failedRescues.includes(id2)) continue;
+    if (s2.runs >= until && !(success && id2 === m.id)) {
+      s2.failedRescues.push(id2);
+      lines2.push(`구조 요청 「${MISSION_BY_ID[id2].title}」 마감을 넘겼다. 다음에 만나면 더는 사람이 아닐 것이다.`);
     }
   }
   s2.deepest = Math.max(s2.deepest, r.depth);
@@ -5152,7 +5157,7 @@ function settle(s2, l, raw, rand2) {
   s2.mission = null;
   const { notes: _notes, ...lastResult } = r;
   void _notes;
-  s2.last = { mission: m.id, agent: l.agent, how: r.how, lines: lines2, result: lastResult, day: s2.day - 1 };
+  s2.last = { runId: id ?? "", mission: m.id, agent: l.agent, how: r.how, lines: lines2, result: { ...lastResult, runId: id }, day: s2.day - 1 };
   return lines2;
 }
 function reportText(s2) {
@@ -5309,6 +5314,7 @@ function createHq() {
   let selMission = null;
   let slotList = [];
   let pickSlot = 0;
+  let walk = true;
   const rand2 = () => (host?.rand ?? Math.random)();
   const keys = /* @__PURE__ */ new Set();
   const idlers = {};
@@ -5511,9 +5517,27 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     const m = slotList.find((x) => x.slot === n);
     return `<div class="hq-slotrow"><b>슬롯 ${n}</b><span>${m ? `${esc(m.title)} · ${esc(m.summary)}` : "비어 있음"}</span><button data-saveslot="${n}">여기 저장</button>${m ? `<button data-loadslot="${n}">불러오기</button>` : ""}</div>`;
   }).join("") : ""}
-<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div><div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
+<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? "" : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}">${esc(p.name)}</button>`).join("")}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
+  const bar2 = () => `<div class="hq-bar"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
+  const renderFloat = () => {
+    const ov = wrap.querySelector(".hq-over");
+    const open = !!(overlay || panel);
+    ov.hidden = !open;
+    if (!open) return void (ov.innerHTML = "");
+    const body = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
+    ov.innerHTML = `<div class="hq-sheet">${bar2()}${body}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc(notice)}</p>` : ""}</div>`;
+    wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+  };
+  const closeOne = () => {
+    if (overlay) overlay = null;
+    else panel = null;
+    notice = "";
+    render();
+    if (!overlay && !panel) host?.closed?.();
+  };
   const render = () => {
     if (!wrap) return;
+    if (!walk) return renderFloat();
     wrap.querySelector(".hq-head").innerHTML = top();
     const pane = wrap.querySelector(".hq-pane");
     pane.innerHTML = panel ? `${placeHtml(panel)}${notice ? `<p class="hq-notice">${esc(notice)}</p>` : ""}` : `<p class="hq-dim">←→로 걸어 다니다 E로 들어가거나, 위 장소 단추를 누르세요. ${notice ? `<span class="hq-notice">${esc(notice)}</span>` : ""}</p>`;
@@ -5533,7 +5557,8 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     s2.x = p.x + p.w / 2;
     panel = id;
     notice = "";
-    if (overlay === "brief") overlay = null;
+    if (overlay === "brief" || overlay === "menu") overlay = null;
+    if (!walk) host?.goto?.(id);
     barkPlace = id;
     const l = lines(`npc:${id}`, ctx())[0];
     if (l) bark = { ...l, t: 4, x: s2.x };
@@ -5585,6 +5610,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         void refreshSlots();
         return render();
       case "close":
+        if (!walk) return closeOne();
         overlay = null;
         notice = "";
         return render();
@@ -5601,7 +5627,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         panel = null;
         void save2();
         render();
-        wrap.hidden = true;
+        if (walk) wrap.hidden = true;
         host.deploy(l);
         return;
       }
@@ -5656,22 +5682,25 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     get state() {
       return s2;
     },
-    mount(r, h) {
+    mount(r, h, opt) {
       root = r;
       host = h;
+      walk = opt?.walk !== false;
       wrap = document.createElement("section");
-      wrap.className = "hq";
+      wrap.className = walk ? "hq" : "hq hq-float";
       wrap.tabIndex = 0;
-      wrap.innerHTML = `<style>${style_default}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>`;
+      wrap.innerHTML = walk ? `<style>${style_default}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>` : `<style>${style_default}</style><div class="hq-over" hidden></div>`;
       root.append(wrap);
       canvas = wrap.querySelector("canvas");
       wrap.addEventListener("click", onClick);
-      wrap.addEventListener("pointerdown", onPointer);
-      window.addEventListener("pointerup", onPointer);
-      window.addEventListener("pointercancel", onPointer);
-      window.addEventListener("keydown", onKey);
-      window.addEventListener("keyup", onKey);
-      window.addEventListener("blur", blur);
+      if (walk) {
+        wrap.addEventListener("pointerdown", onPointer);
+        window.addEventListener("pointerup", onPointer);
+        window.addEventListener("pointercancel", onPointer);
+        window.addEventListener("keydown", onKey);
+        window.addEventListener("keyup", onKey);
+        window.addEventListener("blur", blur);
+      }
       render();
       void (async () => {
         const got = parseSave(await h.load().catch(() => null));
@@ -5685,14 +5714,34 @@ ${can.ok ? "" : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         wrap?.focus({ preventScroll: true });
       })();
       last = performance.now();
-      raf = requestAnimationFrame(tick);
+      if (walk) raf = requestAnimationFrame(tick);
     },
+    places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s2, p.id), opens: p.opens })),
+    openPlace(id) {
+      if (!placeOpen(s2, id)) return;
+      overlay = null;
+      panel = id;
+      notice = "";
+      s2.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
+      void save2();
+      render();
+    },
+    openMenu() {
+      overlay = "menu";
+      notice = "";
+      void refreshSlots();
+      render();
+    },
+    isOpen: () => walk ? !!overlay : !!(overlay || panel),
+    close: () => walk ? (overlay = null, render()) : closeOne(),
     onReturn(result, l) {
       const ls = settle(s2, l, result, rand2);
       pending = null;
       overlay = "settle";
-      if (result.how === "evac") go("clinic");
-      else go("jaemtri");
+      if (walk) {
+        if (result.how === "evac") go("clinic");
+        else go("jaemtri");
+      } else panel = null;
       overlay = "settle";
       if (wrap) wrap.hidden = false, wrap.focus({ preventScroll: true });
       void save2();
@@ -5780,7 +5829,7 @@ function idbSaves(dbName = "goei-hq-demo") {
 }
 
 // src/game/action/ui/ui.css
-var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.17); }\n.tp-b.item u { position: absolute; right: 5px; bottom: 2px; text-decoration: none; font-size: calc(var(--tp-u) * 0.16); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 6px; top: 2px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
+var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-r, var(--tp-u)) * 2); height: calc(var(--tp-r, var(--tp-u)) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-r, var(--tp-u)) * 0.95); height: calc(var(--tp-r, var(--tp-u)) * 0.95); margin: calc(var(--tp-r, var(--tp-u)) * -0.475) 0 0 calc(var(--tp-r, var(--tp-u)) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.17); }\n.tp-b.item u { position: absolute; right: 5px; bottom: 2px; text-decoration: none; font-size: calc(var(--tp-u) * 0.16); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 6px; top: 2px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
 
 // src/game/action/ui/stage.ts
 var W = 1280;
@@ -5804,7 +5853,7 @@ function mountStage(box2) {
   const canvas = root.querySelector("canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
   const ui = root.querySelector(".gs-ui");
-  const touch = root.querySelector(".gs-touch");
+  const touch2 = root.querySelector(".gs-touch");
   const rotate = root.querySelector(".gs-rotate");
   const fns = [];
   let keepPortrait = false;
@@ -5817,7 +5866,7 @@ function mountStage(box2) {
     canvas,
     ctx,
     ui,
-    touch,
+    touch: touch2,
     scale: 1,
     vw: W,
     setFit(mode) {
@@ -7435,6 +7484,10 @@ var TouchPad = class {
   runSince = 0;
   runTimer = 0;
   u = 64;
+  /** 스틱 받침 반지름과 쉴 때 자리(바깥 가장자리에서) */
+  sr = 64;
+  restX = 64 * 1.55;
+  restY = 64;
   /** 스틱 자리 (층 기준 px) */
   zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
@@ -7460,6 +7513,10 @@ var TouchPad = class {
     const flip = s2.lefty ? -1 : 1;
     this.root.style.setProperty("--tp-u", `${u}px`);
     this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+    this.sr = u;
+    this.restX = u * 1.55;
+    this.restY = u;
+    this.root.style.setProperty("--tp-r", `${u}px`);
     const safeB = 10, safeS = 14;
     const ax = s2.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
     const ay = bh - safeB - u * 0.85;
@@ -7512,7 +7569,7 @@ var TouchPad = class {
     const colR = side >= u * 0.9 ? bw - side / 2 : bw - edge2 - u * 0.6;
     const colL = side >= u * 0.7 ? side / 2 : edge2 + u * 0.36;
     const mir = (x) => s2.lefty ? bw - x : x;
-    const place2 = (id, cx, cy, d2) => {
+    const place3 = (id, cx, cy, d2) => {
       const b = this.btns.find((x) => x.id === id);
       const r = d2 * u / 2;
       cx = mir(cx);
@@ -7522,35 +7579,46 @@ var TouchPad = class {
       el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
     };
     const stack = (ids, x, d2, fromBottom) => {
-      let y = fromBottom ? bh - edge2 : edge2;
+      let y2 = fromBottom ? bh - edge2 : edge2;
       ids.forEach((id, i) => {
         const r = d2[i] * u / 2;
-        y += fromBottom ? -r : r;
-        place2(id, x, y, d2[i]);
-        y += fromBottom ? -r - g2 : r + g2;
+        y2 += fromBottom ? -r : r;
+        place3(id, x, y2, d2[i]);
+        y2 += fromBottom ? -r - g2 : r + g2;
       });
     };
     stack(["attack", "jump", "evade", "shoot", "unique", "ult"], colR, [1.15, 0.88, 0.88, 0.88, 0.88, 0.88], true);
-    const inner = colR - Math.max(side, u * 1.15) / 2 - g2 - u * 0.4;
-    stack(["guard", "interact", "reload", "support"], inner, [0.8, 0.8, 0.8, 0.8], true);
+    const right = ["attack", "jump", "evade", "shoot", "unique", "ult"].map((id) => this.btns.find((x) => x.id === id));
+    const di = 0.64, ri = di * u / 2;
+    let y = bh - edge2;
+    for (const id of ["guard", "interact", "reload", "support"]) {
+      y -= ri;
+      let left = colR;
+      for (const b of right) if (Math.abs((b.cy ?? 0) - y) < (b.r ?? 0) + ri) left = Math.min(left, mir(b.cx ?? 0) - (b.r ?? 0));
+      place3(id, left - g2 - ri, y, di);
+      y -= ri + g2;
+    }
     stack(["menu", "map", "item1", "item2", "item3", "item4"], colL, [0.66, 0.66, 0.66, 0.66, 0.66, 0.66], false);
     const zw = bw * 0.42, zt = bh * 0.3;
     this.zr = { x: s2.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+    this.sr = u * 0.82;
+    this.root.style.setProperty("--tp-r", `${this.sr}px`);
+    this.restX = Math.max(edge2 + this.sr, side + 60 - this.sr);
+    this.restY = edge2 + this.sr;
     this.restBase();
   }
   restBase() {
     const s2 = this.st();
     const zr = this.zr;
-    const u = this.u;
-    const x = s2.lefty ? zr.w - u * 1.55 : u * 1.55;
-    const y = zr.h - u * 1;
+    const x = s2.lefty ? zr.w - this.restX : this.restX;
+    const y = zr.h - this.restY;
     this.placeBase(x, y);
     this.knob.style.transform = "";
     this.base.classList.remove("on");
   }
   placeBase(x, y) {
-    this.base.style.transform = `translate(${x - this.u}px, ${y - this.u}px)`;
+    this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
     this.baseX = x;
     this.baseY = y;
   }
@@ -7669,7 +7737,7 @@ var TouchPad = class {
     }
   }
   stickTo(x, y) {
-    const R = this.u * 0.95;
+    const R = this.sr * 0.95;
     let dx = x - this.baseX, dy = y - this.baseY;
     const m = Math.hypot(dx, dy);
     if (m > R * 1.5) {
@@ -7800,12 +7868,12 @@ function mountGameShell(box2, o = {}) {
     input.press(code, "touch");
     setTimeout(() => input.release(code, "touch"), 90);
   };
-  const touch = new TouchPad(stage.touch, input, () => settings, (code) => {
+  const touch2 = new TouchPad(stage.touch, input, () => settings, (code) => {
     if (code === "Escape") shell.openPause();
     else tap(code);
   });
-  touch.vw = () => stage.vw;
-  touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
+  touch2.vw = () => stage.vw;
+  touch2.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
   if (o.fill) stage.setFit("fill");
   const apply = () => {
     stage.setCrt(settings.crt);
@@ -7813,7 +7881,7 @@ function mountGameShell(box2, o = {}) {
     stage.setPixel(settings.pixel);
     fx.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
     pad.setRumble(settings.vibrate);
-    touch.refresh();
+    touch2.refresh();
   };
   const saveSettings = () => void store.save(JSON.stringify(settings));
   menu.onChange = () => {
@@ -7822,7 +7890,7 @@ function mountGameShell(box2, o = {}) {
   };
   menu.onOpen = (open) => {
     if (open) input.releaseSource("kb"), input.releaseSource("pad");
-    touch.setVisible(!open && shell.mode === "play");
+    touch2.setVisible(!open && shell.mode === "play");
   };
   input.capture = (code, down2) => {
     if (!menu.isOpen) {
@@ -7839,7 +7907,7 @@ function mountGameShell(box2, o = {}) {
   input.attachKeyboard(o.keyTarget ?? window, {
     prevent: (code) => code.startsWith("Arrow") || code === "Space" || code === "Tab" || code === "Escape" || /^Key|^Digit|^Shift/.test(code)
   });
-  stage.onResize(() => touch.layout());
+  stage.onResize(() => touch2.layout());
   const controlsHtml = () => {
     const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
       const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc2(KEY_NAME[a])}</kbd>`;
@@ -7884,7 +7952,7 @@ function mountGameShell(box2, o = {}) {
     ctx: stage.ctx,
     input,
     pad,
-    touch,
+    touch: touch2,
     hud,
     fx,
     menu,
@@ -7896,13 +7964,13 @@ function mountGameShell(box2, o = {}) {
     },
     set mode(m) {
       mode = m;
-      touch.setVisible(m === "play" && !menu.isOpen);
+      touch2.setVisible(m === "play" && !menu.isOpen);
     },
     get paused() {
       return menu.isOpen || mode !== "play";
     },
     get touchShown() {
-      return touch.shown;
+      return touch2.shown;
     },
     frame(dt) {
       pad.poll();
@@ -7993,7 +8061,7 @@ function mountGameShell(box2, o = {}) {
     saveSettings,
     dispose() {
       input.dispose();
-      touch.dispose();
+      touch2.dispose();
       menu.dispose();
       stage.dispose();
     }
@@ -8004,6 +8072,50 @@ function mountGameShell(box2, o = {}) {
   })();
   apply();
   return shell;
+}
+
+// src/game/action/enemy/debuff.ts
+var DEBUFF_TEXT = {
+  bleed: "출혈 · 피가 멎지 않는다",
+  taint: "오염 · 숨이 탁해진다",
+  headache: "두통 · 머리가 울린다",
+  confuse: "혼란 · 방향이 뒤집힌다",
+  fear: "공포 · 몸이 굳는다",
+  slow: "느려졌다",
+  silence: "목소리가 안 나온다"
+};
+var seen = /* @__PURE__ */ new WeakMap();
+var armed = [];
+function state(w) {
+  let s2 = seen.get(w);
+  if (!s2) seen.set(w, s2 = { tick: -1, hp: w.player.hp, said: {} });
+  return s2;
+}
+function emitDebuff(w, debuff, from) {
+  const s2 = state(w);
+  const quiet = w.tick - (s2.said[debuff.kind] ?? -999) < 90;
+  if (!quiet) s2.said[debuff.kind] = w.tick;
+  w.emit({ type: "custom", name: "debuff", data: { ...debuff, from, text: quiet ? void 0 : DEBUFF_TEXT[debuff.kind] } });
+}
+function armDebuff(hit2, debuff, from) {
+  armed.push({ hit: hit2, debuff, from });
+}
+function checkDebuffs(w) {
+  const s2 = state(w);
+  if (s2.tick === w.tick) return;
+  s2.tick = w.tick;
+  const p = w.player;
+  if (p.hp < s2.hp) {
+    for (const a of armed) {
+      const h = a.hit;
+      if (p.x >= h.x0 - 30 && p.x <= h.x1 + 30 && Math.abs(p.y - h.y) <= (h.dy ?? 20) + 20) {
+        emitDebuff(w, a.debuff, a.from);
+        break;
+      }
+    }
+  }
+  s2.hp = p.hp;
+  armed = [];
 }
 
 // src/game/action/enemy/geom.ts
@@ -8021,6 +8133,7 @@ var PROJ = {
   shard: { label: "조각", w: 24, h: 24, z: 110, speed: 9, life: 80, dmg: 8, react: "flinch", push: 4, homeY: 1.2, color: "#a99cf0" },
   static: { label: "지지직", w: 40, h: 170, z: 0, speed: 6.5, life: 110, dmg: 7, react: "stagger", push: 8, unblockable: true, debuff: { kind: "headache", ticks: 60 }, color: "#9fd3e6" },
   table: { label: "밥상", w: 90, h: 40, z: 150, speed: 8, vz: 9, gravity: 0.55, life: 70, dmg: 18, react: "down", push: 8, color: "#8a6a44" },
+  chair: { label: "날아오는 가구", w: 70, h: 60, z: 90, speed: 11, life: 140, dmg: 14, react: "stagger", push: 10, color: "#7a5a36" },
   spoon: { label: "숟가락", w: 22, h: 6, z: 120, speed: 15, life: 50, dmg: 4, react: "flinch", color: "#d8d8d8" },
   web: { label: "거미줄", w: 36, h: 36, z: 90, speed: 7, life: 90, dmg: 2, react: "none", debuff: { kind: "slow", ticks: 120 }, color: "#e8e2d0" },
   ring: { label: "충격파", w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: "stagger", push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: "#e86b4f" },
@@ -8083,11 +8196,15 @@ var Proj = class {
       armorBreak: d2.unblockable,
       strength: d2.react === "down" ? 3 : d2.react === "stagger" ? 2 : 1
     };
-    if (d2.debuff) hit2.debuff = d2.debuff;
+    if (d2.debuff) {
+      hit2.debuff = d2.debuff;
+      armDebuff(hit2, d2.debuff, this.id);
+    }
     return { hit: [hit2], hurt: [] };
   }
   step(world) {
     const d2 = this.def;
+    checkDebuffs(world);
     if (this.done) return void (this.alive = false);
     this.t++;
     if (d2.every && this.t % d2.every === 0) this.attackId = nextProjId++ * 7;
@@ -8369,7 +8486,10 @@ var Enemy = class {
           noise: spec.noise
         };
         const debuff = spec.debuff ?? (this.has("bleed") && spec.dmg > 0 ? { kind: "bleed", ticks: 120 } : void 0);
-        if (debuff) h.debuff = debuff;
+        if (debuff) {
+          h.debuff = debuff;
+          armDebuff(h, debuff, this.id);
+        }
         hit2.push(h);
       }
     }
@@ -8385,6 +8505,7 @@ var Enemy = class {
   step(w) {
     if (!this.alive || this.lastTick === w.tick) return;
     this.lastTick = w.tick;
+    checkDebuffs(w);
     this.age++;
     this.st++;
     for (const k in this.cds) if (this.cds[k] > 0) this.cds[k]--;
@@ -8640,7 +8761,7 @@ var Enemy = class {
     this.set("dead");
     this.vx = (hit2?.dir ?? -this.dir) * 4;
     this.brain.death?.(this, w);
-    w.emit({ type: "enemyDie", x: this.x, kind: this.kind });
+    if (!hit2) w.emit({ type: "enemyDie", x: this.x, kind: this.kind });
     const drops = rollDrops(this.def.drop, () => w.rand(), this.elite);
     if (drops.length) {
       w.emit({ type: "custom", name: "enemyDrop", data: { id: this.id, kind: this.kind, x: this.x, y: this.y, drops } });
@@ -8846,8 +8967,8 @@ function approach(e, w, keep = e.def.keep, wait = false) {
 function engage(e, w, aggression = 0.12) {
   const p = w.player;
   if (!p.alive) return approach(e, w, [300, 400], true);
-  const shooter = e.def.role === "shoot";
-  const can = shooter || attackersNow(w) < MAX_ATTACKERS + (w.floor.depth && w.floor.depth > 8 ? 1 : 0);
+  const shooter2 = e.def.role === "shoot";
+  const can = shooter2 || attackersNow(w) < MAX_ATTACKERS + (w.floor.depth && w.floor.depth > 8 ? 1 : 0);
   const a = can ? pickAttack(e, w) : null;
   if (a && w.rand() < aggression * (e.rally > 0 ? 1.6 : 1)) {
     e.face(p.x);
@@ -9087,7 +9208,7 @@ var summoner = {
     const p = w.player;
     const watching = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 640;
     e.mem.frozen = !watching;
-    if (watching && e.age % 45 === 0 && e.state !== "dead") w.emit({ type: "custom", name: "debuff", data: { kind: "headache", ticks: 30, from: e.id } });
+    if (watching && e.age % 45 === 0 && e.state !== "dead") emitDebuff(w, { kind: "headache", ticks: 30 }, e.id);
     for (const [mark, n] of [[0.66, 1], [0.33, 2]])
       if (e.hp < e.hpMax * mark && (e.mem.summoned ?? 0) < n) {
         e.mem.summoned = n;
@@ -9167,7 +9288,31 @@ var float = {
   },
   think: (e, w) => engage(e, w, 0.09)
 };
-var AI_BRAINS = { rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
+var touch = {
+  tick(e, w) {
+    if (e.age === 1) e.hostile = false;
+    e.alpha = e.state === "attack" ? 0.9 : 0.35;
+    if (e.age > 600 && e.state !== "dead") {
+      e.alpha = Math.max(0, 1 - (e.age - 600) / 20);
+      if (e.age > 620) e.set("dead");
+      return true;
+    }
+  },
+  think(e, w) {
+    const p = w.player;
+    const drawn = stillTicks(w) > 15 || w.noise > 0.3 || p.running;
+    const dx = p.x - e.x, dy = p.y - e.y;
+    const sp = e.speed() * (drawn ? 1.8 : 0.5);
+    e.face(p.x);
+    e.x += Math.sign(dx) * Math.min(Math.abs(dx), sp);
+    e.y += Math.sign(dy) * Math.min(Math.abs(dy), sp * 0.6);
+    e.set("walk");
+    const a = e.def.attacks[0];
+    if (Math.abs(dx) < 50 && Math.abs(dy) < 18 && e.cd(a.move.id) <= 0) e.start(a.move, w, a.cd);
+  },
+  hit: () => ({ immune: true, text: "닿지 않는다" })
+};
+var AI_BRAINS = { touch, rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
 
 // src/game/action/enemy/frames.ts
 var B = (fx0, fx1, z0, z1, dy = 18, part) => ({ fx0, fx1, z0, z1, dy, part });
@@ -9363,7 +9508,7 @@ var guard2 = g({
 });
 var proctor = g({
   kind: "proctor",
-  label: "낡은 제복의 시험 감독",
+  label: "낡은 제복의 차장",
   floor: "trial",
   hp: 550,
   speed: 1.2,
@@ -9720,7 +9865,7 @@ var shadowBrain = {
   ev(e, name, w) {
     if (name !== "engulf") return;
     w.emit({ type: "custom", name: "screen", data: { effect: "dark", ticks: 150 } });
-    w.emit({ type: "custom", name: "debuff", data: { kind: "fear", ticks: 60, from: e.id } });
+    emitDebuff(w, { kind: "fear", ticks: 60 }, e.id);
     spawnInto(w, "shade", e.x - 200, e.y);
     spawnInto(w, "shade", e.x + 200, e.y);
   },
@@ -9874,7 +10019,7 @@ var shapeBrain = {
     const p = w.player;
     const looking = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 760 && !e.mem.folded;
     e.mem.looking = looking;
-    if (looking && e.age % 30 === 0) w.emit({ type: "custom", name: "debuff", data: { kind: "headache", ticks: 32, from: e.id } });
+    if (looking && e.age % 30 === 0) emitDebuff(w, { kind: "headache", ticks: 32 }, e.id);
     if (e.mem.folded) {
       if (--e.mem.folded <= 0) {
         e.mem.folded = 0;
@@ -10024,6 +10169,7 @@ function startFight(e, w, why) {
 }
 var elderBrain = {
   tick(e, w) {
+    if (e.age === 1 && e.mem.solo && e.kind === "elder_f") spawnInto(w, "elder_m", e.x + 120, e.y + 10);
     if (e.age === 1) {
       e.mem.mode = "table";
       e.hostile = false;
@@ -10145,7 +10291,7 @@ var touchBrain = {
       h.t++;
       if (h.t === TOUCH_TELE + 1) {
         h.hit = Math.abs(p.x - h.x) < 40 && Math.abs(p.y - h.y) < 22 && !p.airborne;
-        if (h.hit) w.emit({ type: "custom", name: "debuff", data: { kind: "fear", ticks: 60, from: e.id } });
+        if (h.hit) emitDebuff(w, { kind: "fear", ticks: 60 }, e.id);
       }
       if (h.hit && h.t < TOUCH_TELE + 60) touching++;
     }
@@ -10190,7 +10336,171 @@ var touchBrain = {
     ctx.fillText(`버티기 ${Math.max(0, Math.ceil((e.mem.left ?? 0) / 30))}초 · 닿음 ${e.mem.touching ?? 0}/3`, e.x, e.y - 260);
   }
 };
-var GUARDIANS = [guard2, legs, shadow, noise2, shape, elderF, elderM, proctor, touchers];
+var ranged = (h) => (h.noise ?? 0) > 0 && (h.strength ?? 1) === 1;
+var auntBody = humanoid(66, 178);
+var uncleBody = humanoid(86, 200);
+var familyF = g({
+  kind: "family_f",
+  label: "208호 아주머니",
+  floor: "replica",
+  hp: 900,
+  speed: 2.2,
+  w: 66,
+  h: 178,
+  body: auntBody,
+  armor: 1,
+  attacks: [
+    { move: strike("bite", "턱 찢고 물기", 66, 178, { tele: 14, active: 5, recover: 18, reach: [20, 120], z: [120, 190], lunge: 9, armor: 2, body: auntBody, spec: S(16, "stagger", 10, { debuff: { kind: "bleed", ticks: 150 }, strength: 2 }) }), range: [40, 200], dy: 24, cd: 50, weight: 3 },
+    { move: charge("dash", "달려들기", 66, 178, { tele: 18, dash: 16, speed: 14, recover: 22, armor: 2, spec: S(14, "down", 10, { strength: 3 }), body: auntBody }), range: [200, 560], dy: 20, cd: 110, weight: 2 }
+  ],
+  keep: [60, 140],
+  groggyMax: 110,
+  intro: "우리 애 못 봤어요?",
+  rule: "방 안 아이 방 문(E)을 열면 둘이 그쪽을 보고 멈춘다 (규칙 11을 지켜 열쇠를 얻었을 때)",
+  note: "보라색 머리 아주머니. 아이를 찾는다며 묻다가 세 번째 대화에서 턱이 찢어진다. 빠르게 달려들어 문다.",
+  color: "#7a4a8a"
+});
+var familyM = g({
+  kind: "family_m",
+  label: "208호 아저씨",
+  floor: "replica",
+  hp: 900,
+  speed: 0.8,
+  w: 86,
+  h: 200,
+  body: uncleBody,
+  armor: 1,
+  attacks: [
+    { move: strike("smash", "내려치기", 86, 200, { tele: 22, active: 5, recover: 26, reach: [20, 130], z: [0, 200], extend: false, armor: 2, body: uncleBody, spec: S(20, "down", 8, { strength: 3 }) }), range: [0, 150], dy: 26, cd: 70, weight: 3 },
+    { move: grab("hold", "움켜잡기", 86, 200, { tele: 18, active: 5, recover: 24, reach: 120, ticks: 45, dmgPerTick: 2, armor: 2, body: uncleBody }), range: [0, 130], dy: 24, cd: 120, weight: 2 }
+  ],
+  keep: [20, 80],
+  groggyMax: 140,
+  intro: "…",
+  rule: "총이 안 듣는다 (비틀거리기만). 근접·잡기·환경 무기",
+  note: "표정이 굳은 아저씨. 총을 맞고도 비틀거리기만 한다. 느리게 다가와 내려친다.",
+  color: "#5a5a62"
+});
+var FAMILY_ASK = ["우리 애 못 봤어요?", "키가 이만해요. 머리핀을 했어요.", "…정말 못 봤어요?"];
+function familyOther(e, w) {
+  for (const b of w.bodies) if (b instanceof Enemy && b !== e && b.alive && (b.kind === "family_f" || b.kind === "family_m") && b.state !== "dead") return b;
+  return null;
+}
+function familyFight(e, w) {
+  for (const x of [e, familyOther(e, w)]) if (x && x.mem.mode !== "fight") x.mem.mode = "fight", x.hostile = true;
+  e.say("(턱이 찢어진다)", 60);
+  w.emit({ type: "bossRoar", x: e.x, kind: "family208" });
+  w.emit({ type: "combat:boss", index: 0 });
+}
+var familyBrain = {
+  tick(e, w) {
+    if (e.age === 1) {
+      e.groggyMax = e.def.groggyMax;
+      e.mem.mode = "ask";
+      e.hostile = false;
+      if (e.mem.solo && e.kind === "family_f") spawnInto(w, "family_m", e.x + 140, e.y + 10);
+    }
+    if (e.mem.mode === "ask") {
+      e.face(w.player.x);
+      if (e.lastHurt > 0) familyFight(e, w);
+      else if (e.kind === "family_f" && Math.abs(w.player.x - e.x) < 360) {
+        e.mem.askT = (e.mem.askT ?? 0) + 1;
+        const i = Math.floor(e.mem.askT / 75);
+        if (e.mem.askT % 75 === 1 && i < FAMILY_ASK.length) e.say(FAMILY_ASK[i], 70);
+        if (i >= FAMILY_ASK.length) familyFight(e, w);
+      }
+      return true;
+    }
+    if (e.mem.froze > 0) {
+      e.mem.froze--;
+      e.weakOpen = 2;
+      return true;
+    }
+    if (!familyOther(e, w) && !e.mem.alone) e.mem.alone = true, e.rally = 99999;
+  },
+  think: (e, w) => engage(e, w, e.kind === "family_f" ? 0.14 : 0.08),
+  hit(e, h) {
+    if (e.kind === "family_m" && ranged(h)) return { mult: 0, noReact: true, text: "비틀거릴 뿐" };
+  },
+  signal(e, s2, w) {
+    if ((s2.kind === "childDoor" || s2.kind === "door") && e.mem.mode === "fight" && !e.mem.doorDone) {
+      for (const x of [e, familyOther(e, w)]) if (x) x.mem.doorDone = true, x.mem.froze = 150, x.move = null, x.set("stunned"), x.stunT = 150, x.say("…거기 있니?", 80);
+      w.emit({ type: "custom", name: "ruleKept", data: { rule: "r_child", id: e.id } });
+    }
+  }
+};
+var houseBody = [B(-180, 180, 0, 260, 20, "torso"), B(-30, 30, 170, 230, 22, "core")];
+var risenhouse = g({
+  kind: "risenhouse",
+  label: "일어난 집",
+  floor: "replica",
+  hp: 800,
+  speed: 0,
+  w: 360,
+  h: 260,
+  body: houseBody,
+  armor: 3,
+  attacks: [
+    { move: bake("furniture", "가구 날리기", houseBody, [{ n: 22, tele: true }, { n: 4, ev: "furniture" }, { n: 20 }], [S(0, "none")]), range: [0, 2e3], dy: 2e3, cd: 70, weight: 3 },
+    { move: bake("tilt", "바닥 기울기", houseBody, [{ n: 26, tele: true }, { n: 4, fire: "ring" }, { n: 14 }, { n: 4, fire: "ring" }, { n: 20 }], [S(0, "none")], { danger: [{ fx0: -400, fx1: 400, dy: 60 }] }), range: [0, 2e3], dy: 2e3, cd: 150, weight: 2 },
+    { move: bake("rally", "집이 부른다", houseBody, [{ n: 30, tele: true }, { n: 4, ev: "wake" }, { n: 20 }], [S(0, "none")]), range: [0, 2e3], dy: 2e3, cd: 400, weight: 1, when: "phase2" }
+  ],
+  keep: [0, 0],
+  groggyMax: 9999,
+  intro: "(집이 삐걱거리며 일어선다)",
+  rule: "멈춘 시계(가운데 동그라미)를 부수면 다시 「떠난 집」이 된다. 시계 말고는 거의 안 들어간다",
+  note: "물건을 너무 집으면 집 자체가 일어난다. 방 전체가 보스. 가구가 날아오고, 바닥이 기울고, 먼지 쌓인 물건들이 깨어난다.",
+  color: "#4a3e30"
+});
+var houseBrain = {
+  tick(e, w) {
+    intro(e, w);
+    e.y = w.lane[0] + 4;
+    phaseCheck(e, w, [0.5]);
+  },
+  think(e, w) {
+    e.face(w.player.x);
+    const a = pickAttack(e, w);
+    if (a && w.rand() < 0.04) e.start(a.move, w, a.cd);
+  },
+  ev(e, name, w) {
+    const p = w.player;
+    if (name === "furniture") {
+      const [b0, b1] = w.bounds;
+      const fromLeft = w.rand() < 0.5;
+      e.fire("chair", w, { x: fromLeft ? b0 - 30 : b1 + 30, y: p.y, dir: fromLeft ? 1 : -1 });
+      if (e.phase >= 2) e.fire("chair", w, { x: fromLeft ? b1 + 30 : b0 - 30, y: Math.max(w.lane[0], Math.min(w.lane[1], p.y + 40)), dir: fromLeft ? -1 : 1 });
+    } else if (name === "wake") for (const k of [-1, 1]) spawnInto(w, "dusty", p.x + k * 300, p.y);
+  },
+  hit(e, h, part) {
+    if (part === "core") return { mult: 2, weak: true, text: "시계" };
+    return { mult: 0.2, noReact: true };
+  },
+  signal(e, s2, w) {
+    if (s2.kind === "clock" && e.state !== "dead") {
+      e.say("(시계가 멈췄다. 집이 다시 떠났다)", 80);
+      w.emit({ type: "custom", name: "ruleKept", data: { rule: "r_clock", id: e.id } });
+      w.emit({ type: "custom", name: "guardianCleared", data: { kind: "risenhouse", how: "rule" } });
+      e.set("dead");
+    }
+  },
+  drawOver(e, ctx) {
+    if (e.state === "dead") return;
+    ctx.fillStyle = "#d8c8a0";
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - e.z - 200, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#2a2018";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x, e.y - e.z - 218);
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x + 12, e.y - e.z - 196);
+    ctx.stroke();
+  }
+};
+var GUARDIANS = [guard2, legs, shadow, noise2, shape, elderF, elderM, proctor, touchers, familyF, familyM, risenhouse];
 var GUARDIAN_BRAINS = {
   guard: guardBrain,
   proctor: guardBrain,
@@ -10200,7 +10510,10 @@ var GUARDIAN_BRAINS = {
   shape: shapeBrain,
   elder_f: elderBrain,
   elder_m: elderBrain,
-  touchers: touchBrain
+  touchers: touchBrain,
+  family_f: familyBrain,
+  family_m: familyBrain,
+  risenhouse: houseBrain
 };
 
 // src/game/action/enemy/roster.ts
@@ -10848,19 +11161,279 @@ var mummy = {
   color: "#a89a7c",
   attacks: [{ move: strike("grope", "더듬기", 60, 176, { tele: 18, active: 5, recover: 18, reach: [15, 90], z: [80, 160], spec: S(8, "flinch", 4, { debuff: { kind: "taint", ticks: 600 } }) }), range: [0, 100], dy: 22, cd: 60, weight: 1 }]
 };
-var ROSTER = [lurker, hollow, crawler2, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
+var clerkBody = humanoid(62, 186);
+var shooter = {
+  kind: "shooter",
+  label: "사격하는 것",
+  role: "shoot",
+  faction: "elevator",
+  price: 15,
+  hp: 70,
+  speed: 1.2,
+  w: 62,
+  h: 186,
+  body: clerkBody,
+  armor: 0,
+  types: ["lobby", "trial", "puzzle"],
+  ai: "kite",
+  keep: [240, 400],
+  drop: "common",
+  grabbable: true,
+  cap: 3,
+  note: "창구 직원처럼 앉아 있다가 서류철에서 날붙이를 던진다. 거리를 둔다.",
+  weak: "던진 뒤 잠깐 선다. 깊이를 바꿔 피하고 붙어라",
+  color: "#6e7a70",
+  attacks: [
+    { move: shoot("toss", "날붙이 던지기", 62, 186, { tele: 16, shots: 2, gap: 8, recover: 20, fire: "spoon", body: clerkBody }), range: [150, 560], dy: 18, cd: 60, weight: 3 },
+    { move: strike("jab", "찌르기", 62, 186, { tele: 10, active: 4, recover: 14, reach: [15, 85], z: [100, 160], spec: S(8, "stagger", 10) }), range: [0, 90], dy: 22, cd: 40, weight: 4, when: "close" }
+  ]
+};
+var thief = {
+  kind: "thief",
+  label: "보급 승객",
+  role: "rush",
+  faction: "elevator",
+  price: 0,
+  hp: 110,
+  speed: 2,
+  w: 62,
+  h: 184,
+  body: humanoid(62, 184),
+  armor: 0,
+  types: [],
+  ai: "rival",
+  keep: [60, 120],
+  drop: "daydream",
+  grabbable: true,
+  note: "배낭을 멘 승객. 보급품을 노리고 덤빈다. 몰리면 도망간다.",
+  weak: "체력 30% 아래면 도망친다",
+  color: "#7a6a4a",
+  attacks: [
+    { move: strike("shove", "밀치기", 62, 184, { tele: 12, active: 4, recover: 14, reach: [15, 90], z: [90, 170], spec: S(8, "stagger", 12) }), range: [0, 100], dy: 22, cd: 30, weight: 3 },
+    { move: strike("pipe", "쇠파이프", 62, 184, { tele: 18, active: 5, recover: 20, reach: [20, 120], z: [80, 190], lunge: 4, spec: S(14, "down", 8, { strength: 3 }) }), range: [0, 140], dy: 24, cd: 80, weight: 2 }
+  ]
+};
+var touchBody = [B(-24, 24, 60, 170, 14, "arm")];
+var toucher = {
+  kind: "toucher",
+  label: "만지는 손",
+  role: "hinder",
+  faction: "elevator",
+  price: 0,
+  hp: 1,
+  speed: 1.1,
+  w: 48,
+  h: 170,
+  body: touchBody,
+  armor: 3,
+  types: [],
+  ai: "touch",
+  keep: [0, 30],
+  drop: "none",
+  grabbable: false,
+  note: "완전한 어둠에서 어깨를 만지는 손. 때려도 닿지 않는다. 멈추거나 소리 내면 다가온다.",
+  weak: "움직이고, 조용히. 20초 뒤 사라진다",
+  color: "#d8d0c0",
+  attacks: [
+    {
+      move: bake("touch", "만지기", touchBody, [{ n: 20, tele: true }, { n: 4, hit: [B(-30, 50, 60, 170, 18, "arm")] }, { n: 24 }], [{ dmg: 0, react: "none", unblockable: true, debuff: { kind: "fear", ticks: 60 }, stop: 0 }], { danger: [{ fx0: -30, fx1: 50, dy: 18 }] }),
+      range: [0, 60],
+      dy: 20,
+      cd: 90,
+      weight: 1
+    }
+  ]
+};
+var ROSTER = [shooter, thief, toucher, lurker, hollow, crawler2, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
 var ROSTER_BY_KIND = Object.fromEntries(ROSTER.map((d2) => [d2.kind, d2]));
+var INTRUDERS = { bureau: ["fb_smg", "fb_shield", "fb_chief"], bureauMid: ["fb_sword"], daydream: ["dd_member"] };
+
+// src/game/action/enemy/spawn.ts
+var SCREEN_CAP = 8;
+var ELITE_COST = 14;
+var AFFIXES = ["bleed", "armor", "fast", "regen"];
+var DEFAULT_AREA = { x0: 0, x1: 1280, y0: 500, y1: 680 };
+function poolFor(floor, intrusion = null, allowMid = false) {
+  if (floor === "b12") return [];
+  let kinds;
+  if (intrusion === "bureau") kinds = [...INTRUDERS.bureau, ...allowMid ? INTRUDERS.bureauMid : []];
+  else if (intrusion === "daydream") kinds = INTRUDERS.daydream;
+  else kinds = ROSTER.filter((d2) => d2.types.includes(floor) && d2.price > 0 && (allowMid || !d2.mid)).map((d2) => d2.kind);
+  return kinds.map((k) => ROSTER_BY_KIND[k]).filter(Boolean);
+}
+function place(d2, i, area, r) {
+  const inner = ["fixed", "floorgrab", "ambush", "ceiling", "rule", "stain"].includes(d2.ai);
+  const y = d2.kind === "wallface" ? area.y0 : area.y0 + 10 + r() * (area.y1 - area.y0 - 20);
+  if (inner) return { x: area.x0 + 160 + r() * (area.x1 - area.x0 - 320), y };
+  const left = i % 2 === 0 ? r() < 0.7 : r() < 0.3;
+  return { x: left ? area.x0 - 40 - r() * 60 : area.x1 + 40 + r() * 60, y };
+}
+function planEncounter(o) {
+  let plan = buy2(o);
+  for (let i = 0; i < 3 && o.recent?.slice(-3).includes(plan.signature); i++) plan = buy2(o);
+  return plan;
+}
+function buy2(o) {
+  const r = o.rand;
+  const area = o.area ?? DEFAULT_AREA;
+  const intrusion = o.intrusion ?? null;
+  const pool = poolFor(o.floor, intrusion, o.allowMid);
+  const plan = { budget: o.budget, spent: 0, waves: [], elites: 0, intrusion, signature: "" };
+  if (!pool.length || o.budget <= 0) return plan;
+  const cheapest = Math.min(...pool.map((d2) => d2.price));
+  const nWaves = o.budget < 30 ? 1 : o.budget < 75 ? 2 : 3;
+  const reserve = o.depth >= 8 ? Math.round(o.budget * 0.15) : 0;
+  let left = o.budget - reserve;
+  const mids = pool.filter((d2) => d2.mid && d2.price <= left * 0.6);
+  let mid = null;
+  if (o.allowMid && mids.length && r() < 0.5) {
+    mid = mids[Math.floor(r() * mids.length)];
+    left -= mid.price;
+  }
+  const normal = pool.filter((d2) => !d2.mid);
+  const softCap = Math.min(SCREEN_CAP, 3 + Math.floor(o.depth / 2));
+  for (let wv = 0; wv < nWaves; wv++) {
+    const share = wv === nWaves - 1 ? left : Math.round(left / (nWaves - wv));
+    let wl = share;
+    const wave = [];
+    if (mid && wv === nWaves - 1) wave.push({ kind: mid.kind, ...place(mid, 0, area, r), wave: wv });
+    let guard3 = 0;
+    while (wl >= cheapest && wave.length < softCap && guard3++ < 40) {
+      const ok = normal.filter((d3) => d3.price <= wl && wave.filter((s2) => s2.kind === d3.kind).length < (d3.cap ?? SCREEN_CAP));
+      if (!ok.length) break;
+      const weights = ok.map((d3) => 1 / (1 + wave.filter((s2) => s2.kind === d3.kind).length * 1.5));
+      let pick5 = r() * weights.reduce((a, b) => a + b, 0);
+      let d2 = ok[ok.length - 1];
+      for (let i = 0; i < ok.length; i++) if ((pick5 -= weights[i]) <= 0) d2 = ok[i], i = ok.length;
+      wave.push({ kind: d2.kind, ...place(d2, wave.length, area, r), wave: wv });
+      wl -= d2.price;
+    }
+    left -= share - wl;
+    plan.waves.push(wave);
+  }
+  left += reserve;
+  const all = plan.waves.flat().filter((s2) => !ROSTER_BY_KIND[s2.kind]?.mid);
+  for (const s2 of shuffled(all, r)) {
+    if (left < ELITE_COST) break;
+    s2.elite = true;
+    s2.affixes = [AFFIXES[Math.floor(r() * AFFIXES.length)]];
+    if (left >= ELITE_COST * 3 && r() < 0.4) {
+      const second = AFFIXES.filter((a) => a !== s2.affixes[0]);
+      s2.affixes.push(second[Math.floor(r() * second.length)]);
+      left -= ELITE_COST;
+    }
+    left -= ELITE_COST;
+    plan.elites++;
+  }
+  plan.waves = plan.waves.filter((w) => w.length);
+  plan.spent = o.budget - left;
+  plan.signature = plan.waves.map((w) => w.map((s2) => s2.kind + (s2.elite ? "*" : "")).sort().join(",")).join("|");
+  return plan;
+}
+function shuffled(a, r) {
+  const b = a.slice();
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(r() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+function spawnWave(budget, floorType, depth, rng2, area = DEFAULT_AREA, opts = {}) {
+  return planEncounter({ budget, floor: floorType ?? "lobby", depth, rand: rng2, area, ...opts }).waves;
+}
+
+// src/game/action/enemy/arenaStage.ts
+var MIXED = [
+  ["lobby", "로비"],
+  ["chase", "추격"],
+  ["trial", "시험"],
+  ["dark", "어둠"],
+  ["silent", "침묵"],
+  ["puzzle", "퍼즐"],
+  ["service", "정비"],
+  ["replica", "재현"]
+];
+var BOSSES = [
+  ["guard", "경비원"],
+  ["conductor", "차장"],
+  ["legs", "다리 많은 것"],
+  ["shadow", "그림자"],
+  ["noise", "소리와 냄새"],
+  ["shape", "입체 도형"],
+  ["elder", "405호 노부부"],
+  ["family208", "208호 가족"],
+  ["risenhouse", "일어난 집"],
+  ["touchers", "만지는 것들"],
+  ["predator", "포식자"]
+];
+var GAP = 150;
+var X0 = 420;
+function props() {
+  const out = [{ id: "clear", kind: "sign", x: 260, y: 505, w: 110, h: 60, label: "치우기 (E)" }];
+  MIXED.forEach(([t, name], i) => out.push({ id: `mix:${t}`, kind: "sign", x: X0 + i * GAP, y: 505, w: 120, h: 60, label: `${name} 무리` }));
+  BOSSES.forEach(([k, name], i) => out.push({ id: `boss:${k}`, kind: "sign", x: X0 + (MIXED.length + i) * GAP + 80, y: 505, w: 120, h: 60, label: name }));
+  return out;
+}
+var arenaStage = {
+  id: "arena",
+  label: "적 시험장",
+  firstFloor: () => {
+    const length = X0 + (MIXED.length + BOSSES.length) * GAP + 600;
+    return {
+      id: "enemy-arena",
+      title: "적 시험장",
+      type: "lobby",
+      depth: 4,
+      length,
+      lane: [500, 680],
+      startX: 200,
+      exitX: Infinity,
+      banner: "적 시험장 · 표지 앞에서 E · H 판정 보기",
+      palette: { wall: "#2b343a", floor: "#3c4549", accent: "#6c7b83" },
+      props: props(),
+      encounters: []
+    };
+  },
+  nextFloor: () => null,
+  onInteract(api, floor, prop) {
+    const w = api.world;
+    const p = w.player;
+    if (prop.id === "clear") {
+      for (const b of w.bodies) if (b.team === "enemy") b.alive = false;
+      return;
+    }
+    const [kind, what] = prop.id.split(":");
+    const x0 = Math.min(p.x + 160, floor.length - 700);
+    const area = { x0, x1: x0 + 560, y0: 520, y1: 670 };
+    if (kind === "boss") {
+      api.spawn({ kind: what, x: x0 + 300, y: 590, boss: true });
+      return;
+    }
+    if (kind === "mix") for (const s2 of spawnWave(24, what, 4, () => w.rand(), area).flat()) api.spawn(s2);
+  }
+};
 
 // src/game/action/enemy/index.ts
 var ALL_DEFS = [...ROSTER, ...GUARDIANS];
 var DEF_BY_KIND = Object.fromEntries(ALL_DEFS.map((d2) => [d2.kind, d2]));
+var KIND_ALIAS = {
+  nothuman: { kind: "hollow" },
+  warmth: { kind: "shade" },
+  conductor: { kind: "proctor" },
+  elder: { kind: "elder_f", solo: true },
+  family208: { kind: "family_f", solo: true }
+};
+for (const [k, a] of Object.entries(KIND_ALIAS)) if (!DEF_BY_KIND[k] && DEF_BY_KIND[a.kind]) DEF_BY_KIND[k] = DEF_BY_KIND[a.kind];
 function createEnemy(kind, x, y, rng2, opts = {}) {
+  const alias = KIND_ALIAS[kind];
+  if (alias) kind = alias.kind;
   const def = DEF_BY_KIND[kind];
   if (!def) throw new Error(`unknown enemy kind: ${kind}`);
   const brain = GUARDIAN_BRAINS[kind] ?? AI_BRAINS[def.ai] ?? AI_BRAINS.rush;
   const AFF = ["bleed", "armor", "fast", "regen"];
   const affixes = opts.elite ? opts.affixes ?? [AFF[Math.floor(rng2() * AFF.length)]] : [];
   const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng2 });
+  if (alias?.solo) e.mem.solo = true;
   return e;
 }
 setSpawner((w, kind, x, y, opts) => {
@@ -11160,7 +11733,7 @@ function shuffle2(r, list) {
 var MAX_PIT = 130;
 var MID = LANE_DEPTH / 2;
 var nextId2 = 1;
-var place = (kind, x, lane, w, label3, data = {}) => ({ id: nextId2++, kind, x: Math.round(x), lane: Math.round(lane), w, label: label3, data });
+var place2 = (kind, x, lane, w, label3, data = {}) => ({ id: nextId2++, kind, x: Math.round(x), lane: Math.round(lane), w, label: label3, data });
 function pickType(depth, last, seed, epoch, salt = 0) {
   if (depth <= 3) return "lobby";
   if (depth === B12) return "deep";
@@ -11263,19 +11836,19 @@ function buildFloor(ctx, seed, fallback) {
     return x0;
   };
   const hall = addRoom("elevator_hall");
-  placed.push(place("elevator", hall + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
-  placed.push(place("mirror", hall + 470, 0, 60, "거울"));
-  if (depth === 1) placed.push(place("checklist", hall + 640, 0, 50, "정기 점검표", { rule: "entry" }));
-  if (depth === 1) placed.push(place("sign", hall + 860, 0, 50, "안내문", { rule: "noreturn" }));
-  if (depth === 2) placed.push(place("sign", hall + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
-  if (type === "deep") placed.push(place("sign", hall + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
+  placed.push(place2("elevator", hall + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
+  placed.push(place2("mirror", hall + 470, 0, 60, "거울"));
+  if (depth === 1) placed.push(place2("checklist", hall + 640, 0, 50, "정기 점검표", { rule: "entry" }));
+  if (depth === 1) placed.push(place2("sign", hall + 860, 0, 50, "안내문", { rule: "noreturn" }));
+  if (depth === 2) placed.push(place2("sign", hall + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
+  if (type === "deep") placed.push(place2("sign", hall + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
   const goalBox = { g: null };
   const goalMid = ctx.flags.includes("trial_mid");
   const goalRoom = () => {
     const gx = addRoom("trial_goal", CHUNK_W);
     const goal = goalBox.g = makeGoal(r, depth);
-    placed.push(place("goalwall", gx + 320, 0, 240, "목표", { text: goal.text }));
-    placed.push(place("sign", gx + 80, 0, 50, "시험 안내", { rule: "trial" }));
+    placed.push(place2("goalwall", gx + 320, 0, 240, "목표", { text: goal.text }));
+    placed.push(place2("sign", gx + 80, 0, 50, "시험 안내", { rule: "trial" }));
   };
   if (type === "trial" && !goalMid) goalRoom();
   let ruleSigns = [...type === "replica" && sub ? REPLICA_SUB_RULES[sub] : def.rules];
@@ -11299,52 +11872,52 @@ function buildFloor(ctx, seed, fallback) {
       const correct = r() < 0.5 ? 0 : 1;
       const shown = ctx.flags.includes("puzzle_mirror") ? 1 - correct : correct;
       const signSlot = t.slots.find((s2) => s2.kind === "sign");
-      placed.push(place("sign", sx(signSlot.x), 0, 50, "표지 (읽어야 보임)", { rule: "p_sign", arrow: shown === 0 ? "왼쪽 문" : "오른쪽 문", fork: forkN }));
-      doors.forEach((d2, k) => placed.push(place("door", sx(d2.x), 0, 90, k === 0 ? "왼쪽 문" : "오른쪽 문", { correct: k === correct, fork: forkN })));
-      placed.push(place("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { fork: forkN, open: false }));
+      placed.push(place2("sign", sx(signSlot.x), 0, 50, "표지 (읽어야 보임)", { rule: "p_sign", arrow: shown === 0 ? "왼쪽 문" : "오른쪽 문", fork: forkN }));
+      doors.forEach((d2, k) => placed.push(place2("door", sx(d2.x), 0, 90, k === 0 ? "왼쪽 문" : "오른쪽 문", { correct: k === correct, fork: forkN })));
+      placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { fork: forkN, open: false }));
       continue;
     }
     if (t.device === "switches") {
       const sw = t.slots.filter((s2) => s2.kind === "switch");
       const order = shuffle2(r, sw.map((_, k) => k + 1));
       const signSlot = t.slots.find((s2) => s2.kind === "sign");
-      placed.push(place("sign", sx(signSlot.x), 0, 50, "순서 표지", { rule: "p_order", order: order.join("-") }));
-      sw.forEach((s2, k) => placed.push(place("switch", sx(s2.x), s2.lane ?? 20, 40, `스위치 ${"①②③④"[k]}`, { n: k + 1, group: cb.index })));
-      placed.push(place("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { group: cb.index, order: order.join("-"), open: false }));
+      placed.push(place2("sign", sx(signSlot.x), 0, 50, "순서 표지", { rule: "p_order", order: order.join("-") }));
+      sw.forEach((s2, k) => placed.push(place2("switch", sx(s2.x), s2.lane ?? 20, 40, `스위치 ${"①②③④"[k]}`, { n: k + 1, group: cb.index })));
+      placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { group: cb.index, order: order.join("-"), open: false }));
       continue;
     }
-    if (t.device === "meal" && sub === "pretending") placed.push(place("table", cb.x + 320, 40, 140, "차려진 밥상", { rule: "r_meal" }));
+    if (t.device === "meal" && sub === "pretending") placed.push(place2("table", cb.x + 320, 40, 140, "차려진 밥상", { rule: "r_meal" }));
     for (const s2 of t.slots) {
       const px = sx(s2.x), lane = s2.lane ?? MID;
       switch (s2.kind) {
         case "servicedoor":
           serviceCount++;
-          placed.push(place("servicedoor", px, 0, 70, "점검문"));
+          placed.push(place2("servicedoor", px, 0, 70, "점검문"));
           break;
         case "hatch":
-          if (serviceCount < 2 || r() < 0.4) serviceCount++, placed.push(place("hatch", px, lane, 80, "천장 해치"));
+          if (serviceCount < 2 || r() < 0.4) serviceCount++, placed.push(place2("hatch", px, lane, 80, "천장 해치"));
           break;
         case "door":
-          if (type === "chase") placed.push(place("chasedoor", px, 0, 60, "방화문", { closed: false }));
-          else if (r() < 0.5) placed.push(place("prop", px, 0, 70, "잠긴 문"));
+          if (type === "chase") placed.push(place2("chasedoor", px, 0, 60, "방화문", { closed: false }));
+          else if (r() < 0.5) placed.push(place2("prop", px, 0, 70, "잠긴 문"));
           break;
         case "sign":
           if (ruleSigns.length) {
             const id = ruleSigns.shift();
-            placed.push(place("sign", px, 0, 50, "규칙 표지", { rule: id }));
-          } else if (r() < 0.25) placed.push(place("symbol", px, 0, 40, "벽 기호", { danger: r() < 0.5 ? 1 : 0 }));
-          else if (type === "lobby" && r() < 0.5) placed.push(place("prop", px, 0, 50, "거꾸로 가는 시계"));
+            placed.push(place2("sign", px, 0, 50, "규칙 표지", { rule: id }));
+          } else if (r() < 0.25) placed.push(place2("symbol", px, 0, 40, "벽 기호", { danger: r() < 0.5 ? 1 : 0 }));
+          else if (type === "lobby" && r() < 0.5) placed.push(place2("prop", px, 0, 50, "거꾸로 가는 시계"));
           break;
         case "prop":
-          placed.push(place("prop", px, lane, 60, propLabel(type, sub, r)));
+          placed.push(place2("prop", px, lane, 60, propLabel(type, sub, r)));
           break;
         case "item":
-          if (type === "trial") markXs.push(px), placed.push(place("mark", px, lane, 30, "표식", { found: false }));
-          else if (type === "replica" && sub === "vacant") placed.push(place("belonging", px, lane, 30, pick2(r, ["남의 지갑", "아이 신발", "가족 사진", "열쇠 꾸러미"]), { rule: "r_things" }));
-          else if (r() < 0.5) placed.push(place("item", px, lane, 28, "보급품", { item: pick2(r, ["heal", "heal", "light", "guard", "ammo"]) }));
+          if (type === "trial") markXs.push(px), placed.push(place2("mark", px, lane, 30, "표식", { found: false }));
+          else if (type === "replica" && sub === "vacant") placed.push(place2("belonging", px, lane, 30, pick2(r, ["남의 지갑", "아이 신발", "가족 사진", "열쇠 꾸러미"]), { rule: "r_things" }));
+          else if (r() < 0.5) placed.push(place2("item", px, lane, 28, "보급품", { item: pick2(r, ["heal", "heal", "light", "guard", "ammo"]) }));
           break;
         case "switch":
-          if (type === "trial") bellXs.push(px), placed.push(place("switch", px, lane, 40, "종", { bell: true, n: bellXs.length }));
+          if (type === "trial") bellXs.push(px), placed.push(place2("switch", px, lane, 40, "종", { bell: true, n: bellXs.length }));
           break;
         case "npc":
           if (type === "replica" && sub !== "vacant") spawns.push(hook2("resident", "resident", px, lane, 0, false, { greeted: false, asleep: true }));
@@ -11391,7 +11964,7 @@ function buildFloor(ctx, seed, fallback) {
   if (type === "dark") spawns.push(hook2("stalker", "warmth", 0, MID, 0, false, { follows: true }));
   if (type === "deep") for (let k = 0; k < 6; k++) spawns.push(hook2("stalker", "toucher", chunkBase[1 + k % (chunkBase.length - 1)].x + 320, r() * LANE_DEPTH, 0, false, {}));
   const b12mark = depth > 4 && type !== "deep" && r() < 0.15;
-  if (b12mark) placed.push(place("b12", chunkBase[0].x + 300, 0, 80, "B-12", { rule: "b12" }));
+  if (b12mark) placed.push(place2("b12", chunkBase[0].x + 300, 0, 80, "B-12", { rule: "b12" }));
   let guardian = null;
   const guardianP = type === "deep" ? 1 : depth === 3 ? 1 : depth < 3 ? 0 : Math.min(1, (0.35 + (depth - 4) * 0.05) * (b12mark ? 2 : 1));
   if (r() < guardianP || type === "trial") {
@@ -11403,14 +11976,14 @@ function buildFloor(ctx, seed, fallback) {
       spawns.push(hook2("guardian", g2.kind, gx + 640, MID, 0, false, { label: g2.label, weakness: g2.weakness, survive: true }));
     } else {
       spawns.push(hook2("guardian", g2.kind, gx + 900, MID, 0, depth >= 9, { label: g2.label, weakness: g2.weakness, onFail: type === "trial" }));
-      if (g2.kind === "elder") placed.push(place("table", gx + 520, 40, 160, "405호 밥상", { rule: "r_meal", guardian: true }));
-      if (g2.kind === "legs") for (let k = 0; k < 3; k++) placed.push(place("prop", gx + 200 + k * 300, 120, 60, "틈새 (밀어 막기)", { gap: k }));
-      if (g2.kind === "guard" || g2.kind === "conductor") placed.push(place("prop", gx + 120, 0, 40, "순찰 경로 표시"));
+      if (g2.kind === "elder") placed.push(place2("table", gx + 520, 40, 160, "405호 밥상", { rule: "r_meal", guardian: true }));
+      if (g2.kind === "legs") for (let k = 0; k < 3; k++) placed.push(place2("prop", gx + 200 + k * 300, 120, 60, "틈새 (밀어 막기)", { gap: k }));
+      if (g2.kind === "guard" || g2.kind === "conductor") placed.push(place2("prop", gx + 120, 0, 40, "순찰 경로 표시"));
     }
   }
   const end = addRoom(ctx.exitOpen ? "exit_hall" : "elevator_hall");
-  placed.push(place("panel", end + 900, 0, 80, ctx.exitOpen ? "승강기 패널 (EXIT 불이 켜짐)" : "승강기 패널", { exit: !!ctx.exitOpen }));
-  placed.push(place("elevator", end + 1080, 0, 160, "열린 엘리베이터"));
+  placed.push(place2("panel", end + 900, 0, 80, ctx.exitOpen ? "승강기 패널 (EXIT 불이 켜짐)" : "승강기 패널", { exit: !!ctx.exitOpen }));
+  placed.push(place2("elevator", end + 1080, 0, 160, "열린 엘리베이터"));
   if (depth >= 2 && type !== "deep" && r() < 0.5) {
     const kinds = ["three_years", "markers", "supply", "nothuman", "missing"];
     const kind = pick2(r, depth < 5 ? kinds.slice(0, 3) : kinds);
@@ -11595,7 +12168,7 @@ function makeService(ctx) {
   for (let rw = 0; rw < rows; rw++)
     for (let c = 0; c < cols; c++)
       cells.push({ col: c, row: rw, kind: "plain", open: { u: false, r: false, d: false, l: false }, duct: { r: false, l: false }, width: ROOM_W, segments: [], things: [], label: "" });
-  const seen = /* @__PURE__ */ new Set([idx(...entryCell)]);
+  const seen2 = /* @__PURE__ */ new Set([idx(...entryCell)]);
   const stack = [entryCell];
   const link = (a, b, duct2 = false) => {
     const A = cells[idx(...a)], B2 = cells[idx(...b)];
@@ -11611,13 +12184,13 @@ function makeService(ctx) {
       [c - 1, rw],
       [c, rw + 1],
       [c, rw - 1]
-    ]).filter(([x, y]) => x >= 0 && y >= 0 && x < cols && y < rows && !seen.has(idx(x, y)));
+    ]).filter(([x, y]) => x >= 0 && y >= 0 && x < cols && y < rows && !seen2.has(idx(x, y)));
     if (!nb.length) {
       stack.pop();
       continue;
     }
     const n = nb[0];
-    seen.add(idx(...n));
+    seen2.add(idx(...n));
     link([c, rw], n, n[1] === rw && r() < 0.4);
     stack.push(n);
   }
@@ -11726,7 +12299,7 @@ var CHOICE_LABEL = { help: "돕는다 (E)", ignore: "무시한다 (E)", rob: "�
 // src/game/action/stage/plan.ts
 var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
 function floorPlan(f, id, startX = 240) {
-  const props = f.placed.map((p) => ({
+  const props2 = f.placed.map((p) => ({
     id: `p${p.id}`,
     kind: p.kind,
     x: p.x,
@@ -11737,9 +12310,9 @@ function floorPlan(f, id, startX = 240) {
     solid: p.kind === "shutter" ? !p.data.open : void 0
   }));
   for (const s2 of f.spawns) {
-    if (s2.role === "passenger") props.push({ id: `h${s2.id}`, kind: "passenger", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "떠도는 승객" });
-    if (s2.role === "resident") props.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
-    if (s2.role === "enemy" && s2.data.harmless) props.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
+    if (s2.role === "passenger") props2.push({ id: `h${s2.id}`, kind: "passenger", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "떠도는 승객" });
+    if (s2.role === "resident") props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
+    if (s2.role === "enemy" && s2.data.harmless) props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
   }
   const encounters = [];
   if (!NOLOCK_TYPES.has(f.type)) {
@@ -11771,7 +12344,7 @@ function floorPlan(f, id, startX = 240) {
     startX,
     exitX: Infinity,
     encounters,
-    props,
+    props: props2,
     palette: { wall: f.palette.wall, floor: f.palette.floor, accent: f.palette.accent },
     banner: f.label,
     stage: { where: "floor", terrain: f.segments.flatMap((s2) => s2.terrain), floor: f, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
@@ -11781,7 +12354,7 @@ function floorPlan(f, id, startX = 240) {
   return plan;
 }
 function cellPlan(z, cell, id, startX) {
-  const props = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === "rope" ? 260 : t.kind.startsWith("ladder") ? 220 : 110, label: t.label }));
+  const props2 = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === "rope" ? 260 : t.kind.startsWith("ladder") ? 220 : 110, label: t.label }));
   const pal = { wall: "#4a3a24", floor: "#33291c", trim: "#1e170e", accent: "#f0b860", fog: "rgba(0,0,0,0)" };
   const plan = {
     id,
@@ -11793,7 +12366,7 @@ function cellPlan(z, cell, id, startX) {
     startX,
     exitX: Infinity,
     encounters: [],
-    props,
+    props: props2,
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: cell.kind === "attic" ? "선배들의 다락방" : `정비 구역 · ${cell.label}`,
     stage: { where: "service", terrain: cell.segments.flatMap((s2) => s2.terrain), cell, zone: z, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
@@ -11803,14 +12376,14 @@ function cellPlan(z, cell, id, startX) {
   return plan;
 }
 function carPlan(id, buttons, depth) {
-  const props = [
+  const props2 = [
     { id: "getoff", kind: "getoff", x: 90, y: 500, w: 60, h: 160, label: "내렸다 다시 타기" },
     { id: "greet", kind: "greet", x: 260, y: 500, w: 60, h: 110, label: "인사하기 (E)" },
     { id: "mirror", kind: "mirror", x: 420, y: 500, w: 70, h: 150, label: "거울" },
     { id: "close", kind: "close", x: 600, y: 500, w: 40, h: 60, label: "닫힘 버튼" }
   ];
   buttons.forEach(
-    (b, i) => props.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: 500, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
+    (b, i) => props2.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: 500, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
   );
   const pal = { wall: "#5d5146", floor: "#3a332c", trim: "#221d18", accent: "#ffcf70", fog: "rgba(0,0,0,0)" };
   const segs = [{ ref: "room:car", x: 0, w: ROOM_W, flip: false, terrain: [] }];
@@ -11824,7 +12397,7 @@ function carPlan(id, buttons, depth) {
     startX: 160,
     exitX: Infinity,
     encounters: [],
-    props,
+    props: props2,
     palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
     banner: "승강기",
     stage: { where: "car", terrain: [], buttons, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
@@ -15102,7 +15675,7 @@ var PERSONAS = {
 function buildMessages(npc, agent, flags, history, text) {
   const p = PERSONAS[npc];
   const me = AGENTS2[agent];
-  const state = [
+  const state2 = [
     `말을 거는 사람: ${me.name} (${me.title}). 말투: ${me.voice}`,
     flags.mission ? `지금 받은 임무: ${String(flags.mission)}` : "",
     Number(flags.rules) ? `규칙서에 찾은 규칙 수: ${String(flags.rules)}` : "",
@@ -15115,7 +15688,7 @@ function buildMessages(npc, agent, flags, history, text) {
 - ${p.facts.join("\n- ")}` : "",
     `하지 않는 것: ${p.never.join(" / ")}.`,
     `상황:
-- ${state.join("\n- ")}`,
+- ${state2.join("\n- ")}`,
     "규칙: 한국어로 1~3문장, 120자 이내. 대사만 쓴다(이름표·따옴표·괄호 지문·별표 금지). 상대의 행동이나 대사를 대신 쓰지 않는다. 실제 사람의 본명을 만들지 않는다. 게임 밖 이야기(현실 시스템, AI임)는 하지 않는다."
   ].filter(Boolean).join("\n\n");
   return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text }];
@@ -15891,6 +16464,51 @@ var DROP_TABLES = {
     { p: 0.6, kind: "relic", pool: ["rustkey", "oddcoin", "photo"] }
   ]
 };
+var VENDORS = {
+  madeokhee: {
+    id: "madeokhee",
+    name: "마덕희",
+    title: "중림 상인",
+    appear: 0.35,
+    greet: ["현금만 받아요. 관리국 결재는 여기서 안 통하고.", "주운 거 있으면 보여 줘요. 값은 내가 매겨."],
+    bye: "또 살아서 오면 단골 해 줄게."
+  },
+  backalley: {
+    id: "backalley",
+    name: "고연지·윤지아",
+    title: "중림 뒷골목 의사",
+    appear: 0.12,
+    greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."],
+    bye: "다음엔 덜 다쳐서 와."
+  },
+  shinyuri: {
+    id: "shinyuri",
+    name: "신유리",
+    title: "중림 사채",
+    appear: 0.1,
+    greet: ["급하지? 돈은 있어. 이자도 있고.", "관리국 예산으로 갚으면 돼. 못 갚으면 물건으로 받고."],
+    bye: "날짜 잊지 마."
+  },
+  vending: {
+    id: "vending",
+    name: "무엇이든 자판기",
+    title: "특수 장소",
+    appear: 0.08,
+    greet: ["[동전을 넣으십시오. 또는 다른 것을.]"],
+    bye: "[이용해 주셔서 감사합니다.]"
+  }
+};
+var CLINIC = [
+  { id: "patch", name: "응급 봉합", price: 40, desc: "체력 50% 회복, 출혈 제거", heal: 0.5, cure: ["bleed"] },
+  { id: "full", name: "전신 처치", price: 110, desc: "체력 전부 회복, 부상 제거", heal: 1, cure: ["bleed", "injury"] },
+  { id: "purge", name: "오염 세척", price: 90, desc: "오염 전부 제거", heal: 0, cure: ["taint"] }
+];
+var LOANS = [
+  { cash: 60, debt: 90 },
+  { cash: 120, debt: 190 },
+  { cash: 200, debt: 330 }
+];
+var priceAt = (base, depth) => Math.round(base * (1 + Math.min(depth, 20) * 0.04));
 
 // src/game/action/items/inventory.ts
 var SLOT_COUNT = 4;
@@ -16411,6 +17029,103 @@ function stepField(field, run, actor, input, targets, dt, ctx, melee) {
   return ev;
 }
 
+// src/game/action/items/shop.ts
+function openShop(vendor, run, depth, seed) {
+  const st = { seed: seed | 0 || 7 };
+  const v = VENDORS[vendor];
+  const offers = [];
+  const greet = v.greet[Math.floor(rand(st) * v.greet.length)];
+  if (vendor === "madeokhee") {
+    const pool = ["medkit", "bandage", "antidote", "salt", "flash", "smoke", "charm", "energy", "adrenaline"];
+    const picks = ["medkit"];
+    while (picks.length < 4) {
+      const id = pool[Math.floor(rand(st) * pool.length)];
+      if (!picks.includes(id)) picks.push(id);
+    }
+    for (const id of picks) {
+      const d2 = ITEMS[id];
+      offers.push({ key: "i:" + id, kind: "item", ref: id, name: d2.name, desc: d2.desc, price: priceAt(d2.price, depth), stock: id === "medkit" ? 3 : 2 });
+    }
+    const sig = SIGNATURES[run.agent];
+    if (sig && sig.ammo !== "none") {
+      const a = AMMO_PICKUP[sig.ammo];
+      offers.push({ key: "ammo", kind: "ammo", ref: sig.ammo, name: a.name, desc: `${sig.ranged} 예비 +${a.amount}`, price: priceAt(sig.ammo === "rifle" ? 30 : 15, depth), stock: 4 });
+    }
+    if (rand(st) < 0.6) {
+      const ws = ["pipe", "kitchenknife", "servicepistol", "shotgun", "smg"];
+      const id = ws[Math.floor(rand(st) * ws.length)];
+      const w = WEAPONS[id];
+      offers.push({ key: "w:" + id, kind: "weapon", ref: id, name: w.name, desc: `${w.cls === "gun" ? "총" : "한 손 근접"} · ${w.cls === "gun" ? "탄" : "내구"} ${w.uses} · ${w.desc}`, price: priceAt(w.cls === "gun" ? 55 : 30, depth), stock: 1 });
+    }
+  } else if (vendor === "backalley") {
+    for (const c of CLINIC) offers.push({ key: "c:" + c.id, kind: "clinic", ref: c.id, name: c.name, desc: c.desc, price: priceAt(c.price, depth), stock: 1 });
+  } else if (vendor === "shinyuri") {
+    LOANS.forEach(
+      (l, i) => offers.push({ key: "l:" + i, kind: "loan", ref: String(i), name: `현금 ${l.cash}`, desc: `귀환 후 예산 ${l.debt} 상환. 못 갚으면 유물 압류`, price: 0, stock: 1, debt: l.debt })
+    );
+  } else {
+    offers.push({ key: "g:cash", kind: "gamble", ref: "cash", name: "동전 넣기", desc: "무작위 아이템 하나", price: priceAt(25, depth), stock: 3 });
+    offers.push({ key: "g:hp", kind: "gamble", ref: "hp", name: "다른 것을 넣기", desc: "체력 20%를 내고 무작위 아이템 하나", price: 0, stock: 2, hpCost: 0.2 });
+  }
+  return { vendor, depth, seed: st.seed, offers, buys: vendor === "madeokhee", greet };
+}
+function buy3(shop, run, key) {
+  const o = shop.offers.find((x) => x.key === key);
+  if (!o || o.stock <= 0) return { ok: false, why: "stock" };
+  if (run.cash < o.price) return { ok: false, why: "cash" };
+  let res;
+  switch (o.kind) {
+    case "item":
+      if (!canAddItem(run, o.ref)) return { ok: false, why: "full" };
+      addItem2(run, o.ref);
+      res = { ok: true, got: o.name };
+      break;
+    case "ammo":
+      if (!addAmmo(run)) return { ok: false, why: "ammoFull" };
+      res = { ok: true, got: o.name };
+      break;
+    case "weapon":
+      equip2(run, o.ref);
+      res = { ok: true, got: o.name };
+      break;
+    case "clinic": {
+      const c = CLINIC.find((x) => x.id === o.ref);
+      res = { ok: true, got: o.name, heal: c.heal, cure: c.cure };
+      break;
+    }
+    case "loan": {
+      if (run.debt > 0) return { ok: false, why: "loan" };
+      const l = LOANS[+o.ref];
+      run.cash += l.cash;
+      run.debt += l.debt;
+      for (const x of shop.offers) if (x.kind === "loan") x.stock = 0;
+      return { ok: true, got: o.name };
+    }
+    case "gamble": {
+      const st = { seed: shop.seed };
+      const ids = Object.keys(ITEMS).filter((id2) => canAddItem(run, id2));
+      if (!ids.length) return { ok: false, why: "full" };
+      const id = ids[Math.floor(rand(st) * ids.length)];
+      shop.seed = st.seed;
+      addItem2(run, id);
+      res = { ok: true, got: ITEMS[id].name, hpCost: o.hpCost };
+      break;
+    }
+  }
+  run.cash -= o.price;
+  o.stock--;
+  return res;
+}
+function sell(shop, run, bagIndex) {
+  const b = run.bag[bagIndex];
+  if (!shop.buys || !b) return 0;
+  const price = Math.round((RELICS2[b.id]?.value ?? b.value) * (1 + shop.depth * 0.03));
+  run.bag[bagIndex] = null;
+  run.cash += price;
+  return price;
+}
+var sellPrice = (shop, value) => Math.round(value * (1 + shop.depth * 0.03));
+
 // src/game/action/items/icons.ts
 var C2 = {
   heal: "#5fbf6a",
@@ -16740,8 +17455,232 @@ function toGameEvents(events, x, ammo = 0) {
   return out;
 }
 
+// src/game/action/items/link.ts
+var ENEMY_WEAPONS = {
+  fb_smg: { p: 0.3, pool: ["smg"] },
+  fb_sword: { p: 0.5, pool: ["katana"] },
+  fb_chief: { p: 0.35, pool: ["servicepistol", "shotgun"] },
+  fb_shield: { p: 0.2, pool: ["pipe"] },
+  dd_member: { p: 0.1, pool: ["kitchenknife"] }
+};
+var COMMON_RELICS = ["scrap", "oddcoin", "tooth", "photo"];
+function spawnEnemyDrops(field, run, drops, x, y, kind = "") {
+  const ev = [];
+  const put = (k, ref, amount = 1) => {
+    spawnPickup(field, k, x, y, ref, amount);
+    ev.push({ t: "drop", kind: k, ref, x, y });
+  };
+  for (const d2 of drops) {
+    switch (d2.item) {
+      case "cash": {
+        const parts = Math.min(4, Math.max(1, Math.ceil(d2.n / 10)));
+        let left = d2.n;
+        for (let i = 0; i < parts; i++) {
+          const k = i === parts - 1 ? left : Math.ceil(d2.n / parts);
+          left -= k;
+          if (k > 0) put("cash", void 0, k);
+        }
+        break;
+      }
+      case "shard":
+        for (let i = 0; i < d2.n; i++) put("shard");
+        break;
+      case "heal":
+        for (let i = 0; i < d2.n; i++) put("heal");
+        break;
+      case "ammo":
+        if (usesAmmo(run)) for (let i = 0; i < d2.n; i++) put("ammo");
+        else put("cash", void 0, 4 * d2.n);
+        break;
+      case "relic":
+        for (let i = 0; i < d2.n; i++) put("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
+        break;
+      case "dream":
+        put("relic", "dreamcatcher");
+        break;
+      case "key":
+        put("relic", "rustkey");
+        break;
+    }
+  }
+  if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put("ammo");
+  const w = ENEMY_WEAPONS[kind];
+  if (w && rand(field) < w.p) put("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
+  return ev;
+}
+function strikeProps(field, run, hits, seen2, targets = []) {
+  const ev = [];
+  if (!hits.length) return ev;
+  for (const e of field.ents.slice()) {
+    if (e.type !== "prop" || !field.ents.includes(e)) continue;
+    const d2 = PROPS[e.prop];
+    if (d2.use === "throw") continue;
+    for (const h of hits) {
+      const key = h.attackId + ":" + e.id;
+      if (seen2.has(key)) continue;
+      if (h.x1 < e.x - d2.w / 2 || h.x0 > e.x + d2.w / 2 || h.z0 > d2.h + 110 || h.z1 < 0 || Math.abs(h.y - e.y) > (h.dy ?? 18) + 24) continue;
+      seen2.add(key);
+      ev.push(...damageProp(field, run, e, Math.max(6, h.dmg), targets));
+      break;
+    }
+  }
+  if (seen2.size > 400) seen2.clear();
+  return ev;
+}
+function furnishFloor(field, floor, lane, r = () => rand(field)) {
+  const pick5 = (a) => a[Math.floor(r() * a.length)];
+  const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
+  const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
+  const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
+  const spot = () => {
+    for (let i = 0; i < 12; i++) {
+      const x = x0 + r() * (x1 - x0);
+      if (!taken.some(([a, b]) => x > a && x < b)) {
+        taken.push([x - 90, x + 90]);
+        return x;
+      }
+    }
+    return null;
+  };
+  const front = lane[1] - 20, back = lane[0] + 10;
+  const put = (id, y) => {
+    const x = spot();
+    if (x !== null) placeProp(field, id, x, y);
+  };
+  put(pick5(["chair", "bin", "pot"]), front - r() * 40);
+  put(pick5(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
+  put(pick5(["crate", "crate", "drawer", "mailbox"]), back);
+  put(pick5(["barrel", "locker", "crate"]), back + r() * 20);
+  const wx = spot();
+  if (wx !== null) {
+    const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick5(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
+    Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
+  }
+}
+
+// src/game/action/items/shopPanel.ts
+var CSS = `
+.gi-shop{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:12px;box-sizing:border-box;pointer-events:auto;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ecee}
+.gi-shop[hidden]{display:none}
+.gi-shop .panel{background:#1b2226;border:1px solid #3a464d;border-radius:14px;width:min(560px,100%);max-height:100%;overflow:auto;padding:14px 16px;box-sizing:border-box}
+.gi-shop header{display:flex;align-items:center;gap:10px}
+.gi-shop header div{display:flex;flex-direction:column}
+.gi-shop header small{color:#8a969c}
+.gi-shop .cash{margin-left:auto;color:#e6d36a;font-weight:700}
+.gi-shop .say{color:#cfd6da;margin:10px 0}
+.gi-shop h4{margin:14px 0 6px;color:#8a969c;font-size:13px}
+.gi-shop .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#232d32;border:1px solid #33404a;border-radius:10px;color:inherit;font:inherit;padding:8px 10px;margin:0 0 6px;cursor:pointer}
+.gi-shop .row:disabled{opacity:.45;cursor:default}
+.gi-shop .row.sel{border-color:#e6d36a}
+.gi-shop .t{display:flex;flex-direction:column;flex:1;min-width:0}
+.gi-shop .t small{color:#8a969c;font-size:12px}
+.gi-shop .p{display:flex;flex-direction:column;align-items:flex-end;color:#e6d36a;font-weight:700;white-space:nowrap}
+.gi-shop .p small{color:#8a969c;font-weight:400;font-size:11px}
+.gi-shop .msg{min-height:20px;color:#9fd9a6;margin:8px 0}
+.gi-shop footer{display:flex;justify-content:flex-end}
+.gi-shop footer button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #4a565d;background:#2c383e;color:#e8ecee;cursor:pointer}
+`;
+var WHY = { cash: "현금이 모자라", stock: "품절", full: "1~4칸이 가득", ammoFull: "탄이 가득", loan: "빚부터 갚아" };
+function createShopPanel(root) {
+  if (!document.getElementById("gi-shop-css")) {
+    const s2 = document.createElement("style");
+    s2.id = "gi-shop-css";
+    s2.textContent = CSS;
+    document.head.appendChild(s2);
+  }
+  const box2 = document.createElement("div");
+  box2.className = "gi-shop";
+  box2.hidden = true;
+  root.appendChild(box2);
+  let cur = null;
+  let sel = 0;
+  let msg = "";
+  const render = () => {
+    if (!cur) return;
+    const { shop, run } = cur;
+    const v = VENDORS[shop.vendor];
+    const icon = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
+    const rows = shop.offers.map(
+      (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon(o)}"></canvas>
+        <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
+        <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
+    ).join("");
+    const bag = shop.buys ? `<h4>회수물 팔기</h4>${run.bag.map((b, i) => b ? `<button class="row" data-sell="${i}"><canvas width="40" height="40" data-icon="${b.id}"></canvas><span class="t"><b>${b.name}</b></span><span class="p">${sellPrice(shop, b.value)}원</span></button>` : "").join("") || '<p class="say">가방이 비었다</p>'}` : "";
+    box2.innerHTML = `<div class="panel"><header><canvas width="44" height="44" data-icon="${shop.vendor}"></canvas><div><b>${v.name}</b><small>${v.title}</small></div><span class="cash">현금 ${run.cash}${run.debt ? ` · 빚 ${run.debt}` : ""}</span></header>
+      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
+    box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
+    const list = [...box2.querySelectorAll(".row")];
+    sel = Math.max(0, Math.min(sel, list.length - 1));
+    list[sel]?.classList.add("sel");
+  };
+  const press = (b) => {
+    if (!cur) return;
+    if (b.dataset.close !== void 0) return close();
+    if (b.dataset.sell !== void 0) {
+      msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
+      return render();
+    }
+    const k = b.dataset.k;
+    if (!k) return;
+    const r = buy3(cur.shop, cur.run, k);
+    if (r.ok) {
+      cur.onBuy(r);
+      msg = `받음: ${r.got}`;
+    } else msg = WHY[r.why];
+    render();
+  };
+  box2.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b) press(b);
+  });
+  const onKey = (e) => {
+    if (!cur) return;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    if (e.repeat) return;
+    const list = [...box2.querySelectorAll(".row")];
+    if (e.code === "Escape" || e.code === "KeyQ") close();
+    else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
+      sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
+      render();
+      list[sel]?.scrollIntoView({ block: "nearest" });
+    } else if (["KeyA", "KeyE", "Enter", "Space"].includes(e.code) && list[sel] && !list[sel].disabled) press(list[sel]);
+  };
+  window.addEventListener("keydown", onKey, true);
+  function close() {
+    if (!cur) return;
+    const c = cur.onClose;
+    cur = null;
+    box2.hidden = true;
+    box2.innerHTML = "";
+    c?.();
+  }
+  return {
+    open(shop, run, onBuy, onClose) {
+      cur = { shop, run, onBuy, onClose };
+      sel = 0;
+      msg = "";
+      box2.hidden = false;
+      render();
+    },
+    close,
+    isOpen: () => !!cur,
+    dispose() {
+      window.removeEventListener("keydown", onKey, true);
+      box2.remove();
+    }
+  };
+}
+
 // src/game/action/engine/itemsLink.ts
 var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
+var shopPanel = null;
+var itemsBlocking = () => !!shopPanel?.isOpen();
+function mountItemsOverlay(root) {
+  shopPanel?.dispose();
+  shopPanel = createShopPanel(root);
+  return () => (shopPanel?.dispose(), shopPanel = null);
+}
 function linkItems(w, run) {
   const loadout = run.launch?.items ?? [{ id: "medkit", n: 2 }, { id: "flash", n: 2 }, { id: "adrenaline", n: 1 }, null];
   const ir = createItemRun("jyaldi", loadout.map((s2) => s2 ? { id: s2.id, n: s2.n } : null));
@@ -16751,6 +17690,7 @@ function linkItems(w, run) {
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   w.itemRun = ir;
+  w.itemField = () => field;
   const syncSlots = () => {
     w.items = ir.loadout.map((s2) => s2 ? { id: s2.id, label: ITEMS[s2.id]?.name ?? s2.id, n: s2.n } : null);
   };
@@ -16845,16 +17785,31 @@ function linkItems(w, run) {
   w.on((e) => {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-      const sx = e.floor.startX ?? 200;
-      const ym = (w.lane[0] + w.lane[1]) / 2;
-      const pick5 = (a) => a[Math.floor(w.rand() * a.length)];
-      placeProp(field, pick5(["chair", "bin", "pot"]), Math.min(e.floor.length - 100, sx + 380), ym + 30);
-      placeProp(field, pick5(["tv", "extinguisher", "chair"]), Math.min(e.floor.length - 100, sx + 900), ym - 20);
-      spawnPickup(field, "weapon", Math.min(e.floor.length - 100, sx + 600), ym, pick5(["pipe", "chairleg", "kitchenknife", "servicepistol"]));
+      furnishFloor(field, e.floor, w.lane, () => w.rand());
       syncCarry();
     }
-    if (e.type === "enemyDie") apply(dropFromKill(field, ir, DROP_TABLE[e.kind] ?? "anomaly", e.x, w.player.y));
+    if (e.type === "enemyDie" && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
+    if (e.type === "custom" && e.name === "enemyDrop") {
+      const d2 = e.data;
+      apply(spawnEnemyDrops(field, ir, d2.drops, d2.x, d2.y, d2.kind));
+    }
   });
+  let shopSeed = run.seed ^ 20817;
+  w.interactHooks.push((prop) => {
+    if (prop?.kind !== "merchant" || !shopPanel || shopPanel.isOpen()) return;
+    const ids = Object.keys(VENDORS);
+    const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? "madeokhee";
+    const shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
+    lastReserve = ir.reserve = p.reserve;
+    shopPanel.open(shop, ir, (r) => {
+      if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
+      if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
+      apply([]);
+      syncCarry();
+      w.emit({ type: "pickup", x: p.x, id: "shop" });
+    }, () => w.say(VENDORS[vendor].bye, 2));
+  });
+  const hitSeen = /* @__PURE__ */ new Set();
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
@@ -16865,9 +17820,12 @@ function linkItems(w, run) {
     },
     tick() {
       lastReserve = ir.reserve = p.reserve;
+      const hits = p.frame().hit;
+      if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       syncCarry();
       w.notes.cash = ir.cash;
+      w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
       w.notes.shards = ir.shards;
       w.notes.debt = ir.debt;
       w.notes.bag = ir.bag.map((b) => b ? { id: b.id, name: b.name } : null);
@@ -16924,11 +17882,11 @@ function makeHub(places, openPlace) {
   const floor = () => {
     cur = places();
     const length = Math.max(1280, ...cur.map((p) => p.x + p.w + 40));
-    const props = [];
+    const props2 = [];
     cur.forEach((p, i) => {
       if (!p.open) return;
-      props.push({ id: p.id, kind: "hubdoor", x: p.x + p.w / 2, y: LANE[0], w: Math.min(140, p.w * 0.5), h: 220, label: p.name });
-      if (p.npc && p.npc !== "전원") props.push({ id: `npc-${p.id}`, kind: "npc", x: p.x + p.w * 0.78, y: LANE[0] + 50, w: 50, h: 200, label: p.npc, actor: { hue: i * 47 % 360, face: -1 } });
+      props2.push({ id: p.id, kind: "hubdoor", x: p.x + p.w / 2, y: LANE[0], w: Math.min(140, p.w * 0.5), h: 220, label: p.name });
+      if (p.npc && p.npc !== "전원") props2.push({ id: `npc-${p.id}`, kind: "npc", x: p.x + p.w * 0.78, y: LANE[0] + 50, w: 50, h: 200, label: p.npc, actor: { hue: i * 47 % 360, face: -1 } });
     });
     return {
       id: "hq",
@@ -16938,7 +17896,7 @@ function makeHub(places, openPlace) {
       lane: LANE,
       startX: (cur.find((p) => p.id === "office") ?? cur[0])?.x + 120 || 200,
       exitX: Infinity,
-      props,
+      props: props2,
       encounters: [],
       drawBackground(c, camX) {
         const top = LANE[0];
@@ -17084,7 +18042,7 @@ var local = (key) => ({
 var SAVED_KEY = "goei-game-saved";
 var markSaved = () => local(SAVED_KEY).save("1");
 var hasSaved = () => local(SAVED_KEY).load() === "1";
-function hqAdapter(saves, bridge) {
+function hqAdapter(saves, bridge, gotoPlace) {
   const hq2 = createHq();
   const b = bridge;
   const slot = b?.slot ?? 0;
@@ -17104,6 +18062,7 @@ function hqAdapter(saves, bridge) {
   return {
     hub: () => makeHub(places, openPlace),
     isOpen: () => api.isOpen ? api.isOpen() : fbOpen,
+    close: () => api.close ? api.close() : fbOpen = false,
     mount(r, host) {
       root = r;
       if (!api.openPlace) {
@@ -17127,12 +18086,14 @@ function hqAdapter(saves, bridge) {
             bridge.report?.(p);
             return "정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.";
           }
-        } : void 0
-      });
+        } : void 0,
+        closed: () => fbOpen = false,
+        goto: (id) => gotoPlace?.(id)
+      }, { walk: false });
     },
     onReturn(r, run) {
       const l = run.launch;
-      if (l) hq2.onReturn(r, l);
+      if (l) hq2.onReturn({ ...r, runId: l.runId }, l);
     },
     unmount: () => hq2.unmount()
   };
@@ -17157,7 +18118,6 @@ function toHqResult(r, w) {
     rescued: n.rescued ?? [],
     bigHit: !!n.bigHit,
     seconds: r.timeSec,
-    id: String(n.runId ?? ""),
     notes: r.notes
   };
 }
@@ -17174,16 +18134,20 @@ function hudState(w, shell) {
     maxEnergy: 75,
     gauge: p.gauge,
     armor: p.armor,
-    weapon: { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 6 : null },
+    weapon: heldWeapon(w) ?? { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 6 : null },
     items: w.items.map((it) => ({ label: it?.label ?? "", count: it?.n ?? 0 })),
     floor: { depth: d2 ? d2 <= 3 ? `L${d2}` : `B-${d2 - 3}` : "", name: f.title },
     favor: 0,
-    money: { cash: 0, budget: 0, research: 0, teeth: 0 },
+    money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
     boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
     message: w.subtitle?.text,
     meters: [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }],
     compact: shell.touchShown
   };
+}
+function heldWeapon(w) {
+  const h = w.notes.held;
+  return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
 }
 function engineModules(box2, bridge) {
   setSupplyCatalog(SUPPLY_CATALOG);
@@ -17218,36 +18182,6 @@ function engineModules(box2, bridge) {
     }
   };
   const elevator = createElevatorStage(stageStore);
-  const kinds = Object.keys(DEF_BY_KIND);
-  let arenaIdx = 0;
-  const arenaStage = {
-    id: "arena",
-    label: "적 시험장",
-    firstFloor: () => ({
-      id: "arena",
-      title: "적 시험장",
-      length: 2400,
-      startX: 300,
-      exitX: Infinity,
-      banner: "적 시험장 · 표지판 앞에서 E: 다음 적",
-      props: [{ id: "next", kind: "sign", x: 160, y: 445, w: 120, h: 60, label: "E · 다음 적" }],
-      encounters: []
-    }),
-    nextFloor: () => null,
-    onInteract(api, _f, prop) {
-      if (prop.id !== "next" || !kinds.length) return;
-      let want = null;
-      try {
-        want = new URLSearchParams(location.search).get("enemy");
-      } catch {
-      }
-      const kind = want && arenaIdx === 0 ? want : kinds[arenaIdx % kinds.length];
-      arenaIdx++;
-      const p = api.world.player;
-      api.spawn({ kind, x: p.x + 420, y: p.y, boss: !!DEF_BY_KIND[kind]?.boss });
-      api.world.say(`다음 적: ${kind}`, 1.5);
-    }
-  };
   const itemStage = {
     id: "itemroom",
     label: "아이템 진열실",
@@ -17270,6 +18204,7 @@ function engineModules(box2, bridge) {
   const storyRoot = document.createElement("div");
   storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
   shell.stage.root.appendChild(storyRoot);
+  const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
       return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
@@ -17340,7 +18275,18 @@ function engineModules(box2, bridge) {
   };
   window.addEventListener("keydown", storyKeys, true);
   const saves = bridge?.saves ?? idbSaves("goei-game");
-  const hq2 = hqAdapter(saves, bridge);
+  const hq2 = hqAdapter(saves, bridge, (id) => {
+    const w = game?.inHub ? game.world : null;
+    const door = w?.props.find((q) => q.id === id);
+    if (w && door) w.player.x = door.x, w.player.px = door.x;
+  });
+  const hqKeys = (e) => {
+    if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
+    hq2.close();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  };
+  window.addEventListener("keydown", hqKeys, true);
   const listeners = [
     (e) => {
       audio.event(e);
@@ -17355,7 +18301,7 @@ function engineModules(box2, bridge) {
     enemyFactory,
     hq: hq2,
     hud: false,
-    blocking: () => story.isBlocking(),
+    blocking: () => story.isBlocking() || itemsBlocking(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -17393,9 +18339,6 @@ function engineModules(box2, bridge) {
       w.hitFx = false;
       if (run.stageId === "hq") return;
       w.notes.runId = `${run.seed}`;
-      w.on((e) => {
-        if (e.type === "enter:floor" && w.floors > 1 && e.floor.depth) story.say("board", { depth: e.floor.depth, ftype: e.floor.type ?? "" });
-      });
       w.on((e) => {
         if (e.type === "hp:low") w.notes.bigHit = true;
       });
@@ -17435,7 +18378,9 @@ function engineModules(box2, bridge) {
     },
     boot: (g2) => bootFromUrl(g2),
     dispose: () => {
+      unmountItems();
       window.removeEventListener("keydown", storyKeys, true);
+      window.removeEventListener("keydown", hqKeys, true);
       saveFlags();
       story.dispose();
       audio.dispose();
@@ -17472,7 +18417,7 @@ function bootFromUrl(g2) {
 }
 
 // src/game/action/engine/touch.ts
-var CSS = `
+var CSS2 = `
 .gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
 .gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
 .gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
@@ -17499,7 +18444,7 @@ var BTNS = [
 ];
 function mountTouch(root, input) {
   const st = document.createElement("style");
-  st.textContent = CSS;
+  st.textContent = CSS2;
   const wrap = document.createElement("div");
   wrap.className = "gt-wrap";
   wrap.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
@@ -17585,7 +18530,7 @@ function mountTouch(root, input) {
 }
 
 // src/game/action/main.ts
-var CSS2 = `
+var CSS3 = `
 .goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
 .goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
@@ -17596,7 +18541,7 @@ var CSS2 = `
 `;
 function mountGame(box2, bridge) {
   const st = document.createElement("style");
-  st.textContent = CSS2;
+  st.textContent = CSS3;
   const root = document.createElement("div");
   root.className = "goei-engine";
   const stage = document.createElement("div");

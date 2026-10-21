@@ -67,6 +67,7 @@ try {
     }
     if (s.blocking) {
       seen.dialogs++;
+      await page.keyboard.press('Digit1'); // 선택지면 첫째
       await page.keyboard.press('Space');
       await page.waitForTimeout(150);
       continue;
@@ -90,9 +91,15 @@ try {
   const before = await state();
   log.push(['마지막', before.title, before.floors]);
   await S('last');
-  // 철수 → 본부 정산
+  // 철수 → 본부 정산 (열린 대화부터 닫기)
+  for (let i = 0; i < 20 && (await state()).blocking; i++) {
+    await page.keyboard.press('Digit1');
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(150);
+  }
   await page.keyboard.press('Escape');
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
+  await S('pause');
   await page.getByText('본부로 귀환').first().click();
   await page.getByText('귀환', { exact: true }).first().click();
   await page.waitForFunction(() => window.__goeiEngine.inHub, null, { timeout: 15000 });

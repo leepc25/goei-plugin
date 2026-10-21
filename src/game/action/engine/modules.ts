@@ -9,7 +9,7 @@ import { createHq, idbSaves, setItemIconDrawer, setSupplyCatalog, type MissionLa
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
-import { DEF_BY_KIND, createEnemy, isThreat, signalEnemies } from '../enemy';
+import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
 import { createElevatorStage } from '../stage';
 import { CUTSCENES, mountStory, type StoryApi } from '../story';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
@@ -205,38 +205,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   };
   const elevator = createElevatorStage(stageStore);
-  // 시연용 방: 적 고르기(?start=arena[&enemy=종류]), 아이템 진열(?start=items)
-  const kinds = Object.keys(DEF_BY_KIND);
-  let arenaIdx = 0;
-  const arenaStage: StageModule = {
-    id: 'arena',
-    label: '적 시험장',
-    firstFloor: () => ({
-      id: 'arena',
-      title: '적 시험장',
-      length: 2400,
-      startX: 300,
-      exitX: Infinity,
-      banner: '적 시험장 · 표지판 앞에서 E: 다음 적',
-      props: [{ id: 'next', kind: 'sign', x: 160, y: 445, w: 120, h: 60, label: 'E · 다음 적' }],
-      encounters: [],
-    }),
-    nextFloor: () => null,
-    onInteract(api, _f, prop) {
-      if (prop.id !== 'next' || !kinds.length) return;
-      let want: string | null = null;
-      try {
-        want = new URLSearchParams(location.search).get('enemy');
-      } catch {
-        /* 없음 */
-      }
-      const kind = want && arenaIdx === 0 ? want : kinds[arenaIdx % kinds.length];
-      arenaIdx++;
-      const p = api.world.player;
-      api.spawn({ kind, x: p.x + 420, y: p.y, boss: !!(DEF_BY_KIND[kind] as { boss?: boolean })?.boss });
-      api.world.say(`다음 적: ${kind}`, 1.5);
-    },
-  };
+  // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
     id: 'itemroom',
     label: '아이템 진열실',
@@ -401,10 +370,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
-      w.on((e) => {
-        // 승강기를 타고 새 층에 내릴 때 안내 방송 (첫 층은 건너뛴다)
-        if (e.type === 'enter:floor' && w.floors > 1 && e.floor.depth) story.say('board', { depth: e.floor.depth, ftype: (e.floor as { type?: string }).type ?? '' });
-      });
+      // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
       });
