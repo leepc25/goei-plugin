@@ -1,0 +1,266 @@
+{
+  "canvas": [
+    192,
+    144
+  ],
+  "foot": 136,
+  "anchor": 57,
+  "generator": "built-in image_gen",
+  "pixellabCalls": 0,
+  "integration": "focused demo; separate props and water belong to Claude",
+  "clips": {
+    "shower": {
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "label": "샤워 · 뒷모습 · 머리 거품",
+      "anchors": [
+        {
+          "frame": 0,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 1,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 2,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 3,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 4,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 5,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        }
+      ]
+    },
+    "bath": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "label": "목욕 · 옆모습 · 바닥에 앉기",
+      "anchors": [
+        {
+          "frame": 0,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 1,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 2,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 3,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        }
+      ]
+    },
+    "toilet": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true,
+      "label": "용변 · 옆모습 · 수건 가림",
+      "anchors": [
+        {
+          "frame": 0,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 1,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 2,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 3,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        }
+      ]
+    },
+    "undress": {
+      "frames": 8,
+      "fps": 5,
+      "loop": false,
+      "label": "탈의 · 정장 → 목욕 수건",
+      "anchors": [
+        {
+          "frame": 0,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 1,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 2,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 3,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 4,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 5,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 6,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        },
+        {
+          "frame": 7,
+          "foot": [
+            57,
+            136
+          ],
+          "seat": null,
+          "rim": null,
+          "handle": null
+        }
+      ]
+    }
+  },
+  "anchorNote": "foot is a common placement reference; seat requires calibration against the engine toilet prop"
+}
