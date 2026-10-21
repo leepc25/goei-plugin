@@ -43,6 +43,8 @@ export interface MissionGoal {
 }
 
 export interface MissionLaunch {
+  /** 출동 id (본부가 매김, 정산 결과에 그대로 돌려준다. 같은 출동을 두 번 정산하지 않게) */
+  runId: string;
   seed: number;
   agent: AgentId;
   support: AgentId | null;
@@ -66,6 +68,8 @@ export interface MissionLaunch {
 }
 
 export interface RunResult {
+  /** 이 결과가 어느 출동 것인지 (MissionLaunch.runId). 비어 있으면 본부가 지금 출동 것으로 본다 */
+  runId?: string;
   how: EndHow;
   missionDone: boolean;
   depth: number;

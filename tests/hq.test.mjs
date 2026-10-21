@@ -159,3 +159,17 @@ test('엔진 기록(stage.*)으로 결과를 채우고 임무 달성은 본부�
   assert.deepEqual(back.loadout[0], { id: 'medkit', n: 2 });
   assert.deepEqual(back.stash, { flash: 1 });
 });
+
+test('출동 id: 결과에 남고, 같은 출동은 두 번 정산하지 않는다', () => {
+  const s = S.newSave();
+  const l = L.launch(s, 'm1', 42);
+  assert.ok(l.runId);
+  const r = result('return', { runId: l.runId, cash: 100 });
+  L.settle(s, l, r, fixed(0.9));
+  const budget = s.currencies.budget;
+  assert.equal(s.last.runId, l.runId);
+  assert.equal(s.last.result.runId, l.runId);
+  L.settle(s, l, r, fixed(0.9));
+  assert.equal(s.currencies.budget, budget);
+  assert.equal(s.day, 2);
+});
