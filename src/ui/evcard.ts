@@ -244,8 +244,8 @@ function evBtns(c: OpsCard): string {
 /** 위성 보기: 제목이 없어 오른쪽 위 단추 줄 맨 앞에 같은 표식 */
 /** CCTV·위성 잡음: 무늬는 한 번만 그리고 위치만 옮긴다 (transform만 움직여 다시 그리기 없음) */
 const STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
-/** 위성: 구름 두 겹이 천천히 흐른다 */
-const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c1"></i><i class="c2"></i></i>';
+/** 위성: 먼 구름, 그림자, 가까운 구름이 왼쪽에서 오른쪽으로 흐른다 */
+const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
 
 function opsPick(c: OpsCard | undefined): string {
   return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
