@@ -1,0 +1,371 @@
+{
+  "date": "2026-10-22",
+  "tool": "built-in image_gen",
+  "calls": 12,
+  "pixellabCredits": 0,
+  "frames": [
+    {
+      "key": "bath/00",
+      "file": "exec-df1a10e0-6d80-48d0-9865-8851065d3bc3.png",
+      "prompt": "ONE low-resolution pixel-art game animation frame. The reference is the APPROVED character identity, narrow body proportions, towel width, fine 1-logical-pixel dark outlines and softly shaded pixel clusters. Match these exactly, do not thicken outlines, widen towel, enlarge head/body, add messy hair or switch to smooth illustration, photography, 3D or chibi. Adult woman aged in her 30s, long straight BLACK hair to waist, pale warm skin, opaque BEIGE towel securely covering chest through knees, bare feet. Nonsexual ordinary daily activity, character only.\nTRANSPARENT background with true alpha, no backdrop, no floor, shadow, furniture, water, droplets, steam, text, numbers, borders or guides. Preserve the reference's 4:3 transparent landscape composition: logical canvas192x144, hip axis x57 with large blank space to right. Draw on the same pixel grid as reference, use whole pixel clusters. If high resolution is required, use 6x nearest-neighbor blocks on 1152x864. Single frame, never sheet.\nEdit the approved right-side standing reference into bath/00: sit directly on the invisible ground, STRICT RIGHT-FACING 90-degree SIDE PROFILE, nose pointing right, only one eye and one shoulder visible. Bend BOTH knees up toward chest and wrap BOTH forearms around the raised knees in a calm resting pose. Torso nearly upright, head relaxed, eyes gently closed. Buttock contact logical (57,128); soles rest flat on y135 about x82-95. Preserve head size and all limb lengths, do not shrink body anatomically. Sitting makes visible height shorter, scalp approximately y69. Black waist-length hair hangs neatly down back toward hip. Beige towel stays wrapped securely, covers chest, waist, pelvis and thighs over bent knees; no naked torso, no revealing view. Match the approved narrow towel volume, no inflated blanket. Arms naturally hug knees, small hands near shins. Keep ground contact fixed. This is neutral breathing rest frame, no bath tub, water or foam."
+    },
+    {
+      "key": "bath/01",
+      "file": "exec-4d62bcbc-fe3d-46a0-9c29-1eb843682a82.png",
+      "prompt": "Edit reference into ONE next frame bath/01. Match exact reference pixel-art style, pixel size, adult character dimensions, composition and transparent4:3 canvas. Same adult woman in her30s, beige opaque towel securely covering chest and lap, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Breathing inhale frame: raise ONLY the head and shoulders by exactly ONE logical pixel and expand upper chest imperceptibly, while arms continue hugging raised knees. Keep exact same strict right profile, closed eyes, long hair, narrow towel, knees, hips and feet. Buttock and feet must not move. Not a global image translation. No items, environment, floor, water, tub, foam, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Transparent background."
+    },
+    {
+      "key": "bath/02",
+      "file": "exec-2ba7bd61-2983-4950-bb0d-bea272c71e3f.png",
+      "prompt": "Edit reference into ONE next frame bath/03. Match exact reference pixel-art style, pixel size, adult character dimensions, composition and transparent4:3 canvas. Same adult woman in her30s, beige opaque towel securely covering chest and lap, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Breathing exhale frame: lower ONLY the head and shoulders by exactly ONE logical pixel, very subtly relax neck, while arms keep embracing knees. Keep exact same head size, closed eyes, profile facing right, hair, towel shape, hips, knees and feet fixed. Not a global image translation. No items, environment, floor, water, tub, foam, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Transparent background."
+    },
+    {
+      "key": "bath/03",
+      "file": "exec-a8e6614e-9ce9-4510-bdef-7de68600fa5e.png",
+      "prompt": "Edit reference into ONE next frame bath/02. Match exact reference pixel-art style, pixel size, adult character dimensions, composition and transparent4:3 canvas. Same adult woman in her30s, beige opaque towel securely covering chest and lap, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Breathing midpoint frame: return head/shoulders to neutral reference height, gently relax near hand fingers around shin by one logical pixel. Strict right-side profile, eyes closed, neutral face. Hair tip may settle one pixel. Same head size, hips, knees, towel and feet fixed; no body turn. No items, environment, floor, water, tub, foam, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Transparent background."
+    },
+    {
+      "key": "shower/00",
+      "file": "exec-17585f35-9f34-4921-bec4-529fe8922117.png",
+      "prompt": "ONE low-resolution pixel-art game animation frame. The reference is the APPROVED character identity, narrow body proportions, towel width, fine 1-logical-pixel dark outlines and softly shaded pixel clusters. Match these exactly, do not thicken outlines, widen towel, enlarge head/body, add messy hair or switch to smooth illustration, photography, 3D or chibi. Adult woman aged in her 30s, long straight BLACK hair to waist, pale warm skin, opaque BEIGE towel securely covering chest through knees, bare feet. Nonsexual ordinary daily activity, character only.\nTRANSPARENT background with true alpha, no backdrop, no floor, shadow, furniture, water, droplets, steam, text, numbers, borders or guides. Preserve the reference's 4:3 transparent landscape composition: logical canvas192x144, hip axis x57 with large blank space to right. Draw on the same pixel grid as reference, use whole pixel clusters. If high resolution is required, use 6x nearest-neighbor blocks on 1152x864. Single frame, never sheet.\nEdit the approved rear-view standing reference into shower/00: remain EXACT FULL BACK VIEW, both feet planted at the identical positions, scalp top logical y39 and soles y135. Keep the exact same narrow torso, towel hem, legs, feet and waist-length smooth black hair. ONLY raise both bare arms naturally to wash crown of head. Upper arms spread out to the sides, elbows bend comfortably with forearms going UP and IN toward crown, both hands touch crown slightly left and right of center. All joints natural, no inverted elbows, no extra limbs. A SMALL patch of white soap suds ONLY atop crown, about 3-4 logical pixels wide, never giant foam cap. Hands rub gently, no face visible. Fingers visible as small clean pixel clusters. Shoulders approximately y62, elbows near x37/77 y53, hands x53/61 y37. Keep hair itself y39 and lower body/feet absolutely unchanged from reference."
+    },
+    {
+      "key": "shower/01",
+      "file": "exec-3bc62bca-a409-4ef6-801c-3e4d51f354a4.png",
+      "prompt": "Edit reference into ONE next frame shower/01. Match the exact reference pixel-art style, pixel size, character dimensions, composition and transparent 4:3 canvas. Keep the same adult woman in her 30s, beige opaque chest-to-knees towel, waist-length straight black hair. Keep all parts except the specified tiny action unchanged. Washing motion phase 1: left fingers make a small inward circular scrub at crown, right fingers press near right crown. Left elbow moves 1 logical pixel outward, right elbow 1 pixel inward. Natural shoulders and bent elbows. Keep scalp/head level and long hair smooth; do not lower head or change feet, towel or body. No new items, environment, floor, water, shower booth, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Only tiny soap suds atop head. Transparent background."
+    },
+    {
+      "key": "shower/02",
+      "file": "exec-cc9e81b0-9b4c-4897-87ce-5df9b2adbf06.png",
+      "prompt": "Edit reference into ONE next frame shower/02. Match the exact reference pixel-art style, pixel size, character dimensions, composition and transparent 4:3 canvas. Keep the same adult woman in her 30s, beige opaque chest-to-knees towel, waist-length straight black hair. Keep all parts except the specified tiny action unchanged. Washing motion phase 2: both fingertips gently scrub the center of crown, overlapping only slightly, elbows draw inward 1 logical pixel on each side and lift 1 pixel. Keep separate natural arms. Tiny suds patch shifts 1 pixel right. Keep scalp/head level, lower body exactly fixed. No new items, environment, floor, water, shower booth, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Only tiny soap suds atop head. Transparent background."
+    },
+    {
+      "key": "shower/03",
+      "file": "exec-910e3aa0-0dbd-472f-a758-8c3776469322.png",
+      "prompt": "Edit reference into ONE next frame shower/03. Match exact reference pixel-art style, pixel size, character dimensions, composition and transparent 4:3 canvas. Same adult woman in her30s, beige opaque chest-to-knees towel, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Washing motion phase 3: fingers slide 1 logical pixel apart over the crown, right elbow moves 2 pixels outward and 1 pixel down, left elbow stays naturally raised at the side. Tiny foam patch remains on crown. Keep scalp/head level and both hands touching head. Lower body exactly fixed. No items, environment, floor, water, booth, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Only tiny soap suds atop head. Transparent background."
+    },
+    {
+      "key": "shower/04",
+      "file": "exec-b513378b-c2d5-4b65-811a-83d2d4d51eb4.png",
+      "prompt": "Edit reference into ONE next frame shower/04. Match exact reference pixel-art style, pixel size, character dimensions, composition and transparent 4:3 canvas. Same adult woman in her30s, beige opaque chest-to-knees towel, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Washing motion phase 4: fingertips curl inward to scrub again; left wrist rotates slightly, left elbow moves 1 logical pixel inward, right elbow 1 pixel outward. Keep palms and fingers attached and anatomy natural, head still upright. Small soap patch slightly shifts left. Lower body exactly fixed. No items, environment, floor, water, booth, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Only tiny soap suds atop head. Transparent background."
+    },
+    {
+      "key": "shower/05",
+      "file": "exec-8532d687-0d95-4b12-b557-ba8f3618a1a2.png",
+      "prompt": "Edit reference into ONE next frame shower/05. Match exact reference pixel-art style, pixel size, character dimensions, composition and transparent 4:3 canvas. Same adult woman in her30s, beige opaque chest-to-knees towel, waist-length straight black hair. Keep all parts except specified tiny action unchanged. Washing motion phase 5, smoothly returning near frame00: both fingers spread a tiny amount at crown, elbows settle into nearly symmetric bent pose, right wrist 1 logical pixel lower than frame00. Tiny crown suds remain. Head and narrow torso stay upright, towel/legs/feet exactly fixed. No items, environment, floor, water, booth, steam, text or shadows. Fine soft-shaded pixel clusters, no thick outline. Only tiny soap suds atop head. Transparent background."
+    }
+  ],
+  "corrections": [
+    {
+      "key": "bath/03",
+      "reason": "Reduce excessive head nod",
+      "previous": "exec-1ecfdd21-2831-443a-afb0-91794e369247.png",
+      "prompt": "Correct this single PIXEL-ART animation frame. Keep absolutely everything fixed including body scale, exact transparent canvas, hip, towel, knees, arms, feet, outline and palette. Only correct excessive head nod: lift the head and upper shoulders UP by 2 logical pixels (about 15 pixels at this displayed resolution), keeping neck natural. The adult woman's chin should be level and head upright like a calm breathing-rest pose. She remains strict RIGHT-FACING side profile with eyes closed, wearing opaque beige chest-and-lap towel, hugging knees. Do not change hair shape or length except that its top follows the tiny upward head motion. Do NOT move the whole character. This is a tiny breathing animation correction, not a new pose. Keep all ground contacts exactly fixed. True transparent background, no background or props."
+    },
+    {
+      "key": "bath/03",
+      "reason": "Use stable inhale pose as edit reference; change fingers only to keep breathing within one logical pixel",
+      "prompt": "Make a near-identical next breathing animation frame from THIS approved seated pose. Keep head position, hair silhouette, shoulder position, knee position, hip position and feet exactly the same as this image. Do not nod, do not lean, do not translate or rescale the figure. Change only the small finger pixel cluster where the near hand wraps around her shin, relaxing the fingertips by one logical pixel. Preserve the same adult woman, strict right-side profile, closed eye, long black hair and opaque beige towel. This frame will be the held inhale portion of a subtle 4-frame breathing loop. Exactly same image composition, pixel size and true transparent background. No other elements."
+    }
+  ],
+  "breathingOrder": "Reordered final independent drawings so scalp y follows 68,67,66,67; one pixel each step including wraparound",
+  "export": {
+    "canvas": [
+      192,
+      144
+    ],
+    "resampling": "nearest neighbor",
+    "alpha": "generated coverage threshold 128; source preserved",
+    "measurements": [
+      {
+        "key": "bath/00",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          6
+        ],
+        "bounds": [
+          36,
+          68,
+          92,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "bath/01",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          6
+        ],
+        "bounds": [
+          36,
+          67,
+          92,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "bath/02",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          6
+        ],
+        "bounds": [
+          36,
+          66,
+          92,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "bath/03",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          6
+        ],
+        "bounds": [
+          36,
+          67,
+          92,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/00",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          1,
+          0
+        ],
+        "bounds": [
+          39,
+          39,
+          76,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/01",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          1,
+          0
+        ],
+        "bounds": [
+          39,
+          39,
+          75,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/02",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          0
+        ],
+        "bounds": [
+          44,
+          39,
+          72,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/03",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          0,
+          0
+        ],
+        "bounds": [
+          39,
+          39,
+          76,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/04",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          1,
+          0
+        ],
+        "bounds": [
+          40,
+          38,
+          74,
+          136
+        ],
+        "footY": 135
+      },
+      {
+        "key": "shower/05",
+        "rawSize": [
+          1448,
+          1086
+        ],
+        "translation": [
+          1,
+          0
+        ],
+        "bounds": [
+          39,
+          39,
+          76,
+          136
+        ],
+        "footY": 135
+      }
+    ]
+  },
+  "request": "docs/캐릭터제작서/의뢰서_쟈알디_샤워·목욕·용변_GPT.md section 8",
+  "references": [
+    "game-src/action/jyaldi-v5/full/clips/showerturn/02.png",
+    "game-src/action/jyaldi-v5/full/clips/undress/06.png"
+  ],
+  "userVisualApproval": "Not claimed; delivery for user review",
+  "builtinCost": "Usage price is not exposed by image_gen",
+  "validation": [
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\00.png",
+      "bounds": [
+        39,
+        39,
+        76,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\01.png",
+      "bounds": [
+        39,
+        39,
+        75,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\02.png",
+      "bounds": [
+        44,
+        39,
+        72,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\03.png",
+      "bounds": [
+        39,
+        39,
+        76,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\04.png",
+      "bounds": [
+        40,
+        38,
+        74,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\shower\\05.png",
+      "bounds": [
+        39,
+        39,
+        76,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\bath\\00.png",
+      "bounds": [
+        36,
+        68,
+        92,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\bath\\01.png",
+      "bounds": [
+        36,
+        67,
+        92,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\bath\\02.png",
+      "bounds": [
+        36,
+        66,
+        92,
+        136
+      ],
+      "footY": 135
+    },
+    {
+      "file": "game-src\\action\\jyaldi-v5\\full\\clips\\bath\\03.png",
+      "bounds": [
+        36,
+        67,
+        92,
+        136
+      ],
+      "footY": 135
+    }
+  ]
+}
