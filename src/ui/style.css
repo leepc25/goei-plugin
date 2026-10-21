@@ -2469,13 +2469,13 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opview.fx-lost > .gx-oplost { display: grid; animation: gx-lost 1.5s steps(1) both; }
 @keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } 92% { opacity: 1; } 95% { opacity: .2; } }
 /* 렌즈 앞을 스치는 것 (2026-10-21 사용자: 뒤에서 움직이는 사람 말고, 카메라 바로 앞을 섬뜩한 게 지나가는 느낌).
-   화면보다 큰 검은 형체가 초점이 안 맞은 채 0.4초 만에 가로지르고, 지나간 뒤 카메라 노출이 잠깐 튄다 */
+   화면보다 큰 검은 형체가 초점이 안 맞은 채 0.2초 만에 가로지르고, 지나간 뒤 카메라 노출이 잠깐 튄다 */
 .gx-opshade { z-index: 2; inset: -20% auto -30% 0; width: 85%; }
 .gx-opshade svg { width: 100%; height: 100%; fill: #030204; filter: blur(16px); }
-.gx-opview.fx-shade > .gx-opshade { display: block; animation: gx-shade .42s cubic-bezier(.3, 0, .7, 1) both; }
+.gx-opview.fx-shade > .gx-opshade { display: block; animation: gx-shade .22s cubic-bezier(.4, 0, .6, 1) both; }
 @keyframes gx-shade { 0% { transform: translateX(125%) rotate(4deg); opacity: .96; } 100% { transform: translateX(-130%) rotate(-3deg); opacity: .96; } }
 .gx-opview.fx-shade > .gx-opfeed { animation: gx-shadeimg 1.4s ease-out both; }
-@keyframes gx-shadeimg { 0%, 28% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 34% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
+@keyframes gx-shadeimg { 0%, 14% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } 19% { filter: saturate(.2) contrast(1.4) brightness(1.55) sepia(.1); } 60% { filter: saturate(.35) contrast(1.25) brightness(1.1) sepia(.15); } 100% { filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); } }
 /* 글자 깨짐: 화면 위 글자 전부가 붉게 번지며 떨린다 (글자는 ui/cctvfx.ts가 바꿈) */
 .gx-opview.fx-text :is(.gx-oposd, .gx-opcap) { animation: gx-textjit .75s steps(1) both; }
 @keyframes gx-textjit {
