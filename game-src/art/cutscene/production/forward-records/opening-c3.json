@@ -1,0 +1,31 @@
+{
+  "cut": "opening/c3",
+  "generator": "built-in image_gen",
+  "sources": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c3-1.png"
+  ],
+  "prompts": [
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C3. Eight clearly SEPARATE repeated cinematic views of the SAME wall-mounted elevator maintenance sheet on a clipboard, close-up straight on. All ruled rectangular checkboxes and a wide lower signature rectangle are EMPTY. No writing anywhere. A single BLACK LEATHER GLOVED INDEX FINGER enters from the right and points at the EMPTY signature box, never presses a button. Frames1-2 clipboard alone and fingertip entering; frames3-4 finger extends toward blank lower signature rectangle; frames5-7 identical held pointing contact pose; frame8 an all-white flash with barely visible clipboard silhouette. The chart and camera never move, only one hand. Dim brass elevator edge at left, muted gray plaster wall. Make the eight panels obvious repeated compositions, not one large drawing. Crisp pixel clusters, no antialiasing."
+  ],
+  "layout": "2x4-sheet",
+  "timing": {
+    "ms": [
+      500,
+      125,
+      125,
+      125,
+      125,
+      125,
+      750,
+      125
+    ]
+  },
+  "size": [
+    640,
+    360
+  ],
+  "colors": 64,
+  "sampling": "nearest-neighbor only; no dithering",
+  "paletteSha256": "1f9265b6e40a07599f609ca126928fba64545cf0ea5222c8846bd1f74cb9c8b9",
+  "uniqueFrames": 8
+}
