@@ -19827,7 +19827,7 @@ function linkItems(w, run) {
     if (carry.kind === "prop") {
       const d2 = PROPS[carry.id];
       const s2 = Math.max(d2?.w ?? 60, d2?.h ?? 60);
-      drawItemIcon(c, carry.id, -s2 / 2, -s2, s2);
+      drawItemIcon(c, carry.id, -s2 / 2, -s2 - 18, s2);
     } else if (!drawItemHeld(c, carry.id, deg)) {
       c.rotate((deg + 45) * Math.PI / 180);
       drawItemIcon(c, carry.id, -12, -36, 48);
@@ -19918,7 +19918,8 @@ function linkItems(w, run) {
         c.fill();
         const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
         const id = e.ref ?? e.kind;
-        drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
+        const sz = e.kind === "weapon" ? 80 : e.kind === "item" || e.kind === "relic" ? 40 : 28;
+        drawItemIcon(c, id, x - sz / 2, y - sz - 6 + bob, sz);
       }
       for (const pj of field.projs) {
         c.fillStyle = "#d8e0e4";

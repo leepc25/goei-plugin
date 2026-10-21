@@ -18,6 +18,7 @@
     "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. OPENING C8 PART C: LAST FOUR PERSONAL GESTURES. Use the reference as exact character identity, eight-person order, size, ground positions, backdrop and camera. ALL EIGHT ADULTS remain present fully head-to-toe in EVERY panel in the exact row. The first FOUR agents from the left already have warm floor spotlights and remain calmly still and lit. Panels1-2: spotlight turns on under FIFTH person, enormous BALD bearded man Gorgodio; he brings hands together and flexes/cracks his knuckles. Panels3-4: SIXTH person slim lime-haired man Kyras lights up, twirls motorcycle keys by one finger. Panels5-6: SEVENTH person petite long black-haired woman Deadfall lights up, eyes narrow slightly and right hand rests on her HOLSTERED pistol grip, gun remains holstered. Panels7-8: EIGHTH/rightmost woman Rosemon long PURPLE hair and cardigan lights up, crosses arms and gives a stern look, small PURPLE eye glint. All previously revealed people stay lit. Until their turn the last agents are visible dark silhouettes, not absent. Final panel shows the complete eight-person lit group, exactly the reference order. No firing, no targets, no text, no isolated-character panels."
   ],
   "layout": "2x4-sheet",
+  "preserveCharacterAccentHues": true,
   "whiteTransitionFrame": false,
   "timing": {
     "ms": [
@@ -53,6 +54,6 @@
   ],
   "colors": 64,
   "sampling": "nearest-neighbor only; no dithering",
-  "paletteSha256": "29870d741fd5543836d5ba1c6142a98093c1ac31d78af3ebd67985a7c1841784",
+  "paletteSha256": "6ce559c046ac1b77c2e6a55d52490d25d347c91ecf5f650ce42e66eaf8fac31f",
   "uniqueFrames": 24
 }

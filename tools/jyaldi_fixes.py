@@ -21,8 +21,26 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 # 샤워·목욕·용변·탈의는 GPT 납품(2026-10-22 4b904ee, 수건으로 가림, 샤워는 뒷모습 머리 감기). 옛 보정(머리색 바꾸기·가구 분리)은 옛 그림용이라 뺌
-# undress/showerturn were redrawn at final scale on 2026-10-22; no legacy resizing/recoloring.
-GPT_CLIPS = {'shower', 'bath', 'toilet'}
+# undress/showerturn and section-8 shower/bath were redrawn at final scale;
+# preserve their approved size, hair palette, and y=135 sole baseline.
+GPT_CLIPS = {'toilet'}
+# Section 8: anchors measured on the final 192x144 drawings, not the retired rig.
+GPT_STYLE_ANCHORS = {
+    'shower': [
+        ((61, 40), (54, 40), -137, (57, 91)),
+        ((61, 41), (54, 40), -133, (57, 91)),
+        ((61, 40), (55, 40), -120, (57, 91)),
+        ((62, 41), (54, 40), -137, (57, 91)),
+        ((61, 40), (54, 39), -132, (57, 91)),
+        ((61, 41), (54, 40), -137, (57, 91)),
+    ],
+    'bath': [
+        ((79, 109), (80, 108), -13, (57, 128)),
+        ((79, 108), (80, 107), -13, (57, 128)),
+        ((79, 108), (80, 107), -13, (57, 128)),
+        ((79, 109), (80, 108), -13, (57, 128)),
+    ],
+}
 DROP = {
     # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
     'reload': [4, 5], 'deskslam': [2], 'shotgun': [3], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
@@ -189,6 +207,9 @@ FW_ = 192
 
 def anchors(src, idx):
     """장마다 손 좌표(전수검사 원칙 2). hand=앞손 손목, hand2=뒷손 손목, angle=앞손 팔꿈치→손목 방향(도, 0=앞, 아래가 +)."""
+    if src in GPT_STYLE_ANCHORS:
+        return [{'hand': list(h), 'hand2': list(h2), 'angle': a, 'hip': list(hip)}
+                for h, h2, a, hip in (GPT_STYLE_ANCHORS[src][i] for i in idx)]
     if src not in rig.CLIPS: return None
     out = []
     for raw in idx:
