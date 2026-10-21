@@ -2534,7 +2534,66 @@ button.mk-go:hover { color: var(--signal); }
 .gx-oplost { z-index: 4; place-items: center; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .04) 0 1px, transparent 1px 3px), #050807; }
 .gx-oplost > b { font: 700 15px/1 var(--mono); letter-spacing: .3em; color: rgba(235, 255, 240, .8); text-shadow: 0 0 6px rgba(235, 255, 240, .5); animation: gx-blink 1s steps(2, jump-none) infinite; }
 .gx-opview.fx-lost > .gx-oplost { display: grid; animation: gx-lost 1.5s steps(1) both; }
-@keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } 92% { opacity: 1; } 95% { opacity: .2; } }
+@keyframes gx-lost { 0% { opacity: 1; } 8% { opacity: .3; } 12% { opacity: 1; } }
+/* 신호가 돌아올 때 (2026-10-21 사용자: 너무 쓱 켜진다, 오싹하게, 숨어 있다 도망가거나 다양하게). 1.3초:
+   검은 화면 가운데 밝은 한 줄 → 세로로 펴지며 음화(반전) → 위아래로 흘러내림 → 한 번 꺼졌다 켜짐. 형체 연출은 data-back마다 다르다 (ui/cctvfx.ts) */
+.gx-opview.fx-back > .gx-opfeed { transform-origin: 50% 50%; animation: gx-backon 1.3s linear both; }
+@keyframes gx-backon {
+  0% { transform: scaleY(.008) scaleX(.7); filter: brightness(6) saturate(0); }
+  7% { transform: scaleY(.008) scaleX(1); filter: brightness(6) saturate(0); }
+  13% { transform: scaleY(1); filter: invert(1) saturate(0) contrast(1.8) brightness(1.2); }
+  20% { transform: translateY(-38%); filter: invert(1) saturate(0) contrast(1.8); }
+  21% { transform: translateY(42%); filter: invert(1) saturate(0) contrast(1.6); }
+  27% { transform: translateY(6%); filter: saturate(0) contrast(1.4) brightness(.6); }
+  31%, 51% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.7) sepia(.2); }
+  52%, 57% { transform: none; filter: brightness(0); }
+  58% { transform: translateX(-4px); filter: saturate(.2) contrast(1.6) brightness(1.5); }
+  66% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.45); }
+  74% { transform: none; filter: saturate(.5) contrast(1.15) brightness(1.1) sepia(.15); }
+  100% { transform: none; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+}
+/* 붉은 장면: 서 있는 형체와 함께 화면이 핏빛으로 한 번 */
+.gx-opview.fx-back[data-back="stand"] > .gx-opfeed { animation-name: gx-backred; }
+@keyframes gx-backred {
+  0% { transform: scaleY(.008) scaleX(.7); filter: brightness(6) saturate(0); }
+  7% { transform: scaleY(.008) scaleX(1); filter: brightness(6) saturate(0); }
+  13% { transform: scaleY(1); filter: invert(1) saturate(0) contrast(1.8) brightness(1.2); }
+  20% { transform: translateY(-38%); filter: invert(1) saturate(0) contrast(1.8); }
+  21% { transform: translateY(42%); filter: invert(1) saturate(0) contrast(1.6); }
+  27% { transform: translateY(6%); filter: saturate(0) contrast(1.4) brightness(.6); }
+  31%, 51% { transform: none; filter: sepia(1) hue-rotate(-45deg) saturate(5) contrast(1.5) brightness(.55); }
+  52%, 57% { transform: none; filter: brightness(0); }
+  58% { transform: translateX(-4px); filter: saturate(.2) contrast(1.6) brightness(1.5); }
+  66% { transform: none; filter: saturate(.3) contrast(1.3) brightness(.45); }
+  74% { transform: none; filter: saturate(.5) contrast(1.15) brightness(1.1) sepia(.15); }
+  100% { transform: none; filter: saturate(.5) contrast(1.15) brightness(.85) sepia(.15); }
+}
+.gx-opview.fx-back > .gx-oplost { display: grid; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .09) 0 1px, transparent 1px 3px); animation: gx-backnoise 1.3s steps(1) both; }
+.gx-opview.fx-back > .gx-oplost > b { display: none; }
+@keyframes gx-backnoise { 0% { opacity: 1; background-position: 0 0; } 15% { background-position: 0 7px; } 30% { background-position: 0 2px; } 45% { opacity: .8; background-position: 0 5px; } 66% { opacity: .35; } 80%, 100% { opacity: 0; } }
+.gx-opview.fx-back > .gx-opshade { display: block; width: auto; opacity: 0; animation: 1.3s both; }
+/* stand: 렌즈 바로 앞 가운데에 서 있다가, 꺼졌다 켜지면 없다 */
+.gx-opview.fx-back[data-back="stand"] > .gx-opshade { inset: -8% 18% -25%; animation-name: gx-bk-stand; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="stand"] > .gx-opshade svg { filter: blur(9px); }
+@keyframes gx-bk-stand { 0% { opacity: 0; } 31% { opacity: .92; transform: scale(1.04); } 42% { opacity: .92; transform: scale(1.12); } 52%, 100% { opacity: 0; } }
+/* flee: 켜지자 화면 가운데 있던 형체가 옆으로 휙 빠져나간다 */
+.gx-opview.fx-back[data-back="flee"] > .gx-opshade { inset: 22% 38% -6%; animation-name: gx-bk-flee; animation-timing-function: linear; }
+.gx-opview.fx-back[data-back="flee"] > .gx-opshade svg { filter: blur(3px); }
+@keyframes gx-bk-flee { 0%, 26% { opacity: 0; transform: none; } 27%, 38% { opacity: .95; transform: none; } 40% { opacity: .95; transform: translateX(-30%) skewX(12deg) scaleX(1.3); } 46% { opacity: .9; transform: translateX(-260%) skewX(20deg) scaleX(1.8); } 47%, 100% { opacity: 0; transform: translateX(-260%); } }
+.gx-opview.fx-back[data-back="flee"] > .gx-opfeed { animation-name: gx-backon, gx-bk-jolt; animation-duration: 1.3s, 1.3s; }
+@keyframes gx-bk-jolt { 0%, 39% { translate: 0; } 41% { translate: 6px 0; } 43% { translate: -5px 1px; } 46%, 100% { translate: 0; } }
+/* near: 멀리 작게 서 있다가, 꺼졌다 켜지면 훨씬 가까이, 그다음엔 없다 */
+.gx-opview.fx-back[data-back="near"] > .gx-opshade { inset: 30% 45% 28%; animation-name: gx-bk-near; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="near"] > .gx-opshade svg { filter: blur(1.5px); }
+@keyframes gx-bk-near { 0% { opacity: 0; } 27% { opacity: .95; transform: none; } 52% { opacity: 0; } 58% { opacity: .95; transform: translateY(32%) scale(3.4); } 66%, 100% { opacity: 0; } }
+/* peek: 화면 오른쪽 끝에 몸을 반쯤 숨기고 있다가 천천히 빠져나간다 */
+.gx-opview.fx-back[data-back="peek"] > .gx-opshade { inset: 6% -22% -20% 72%; animation-name: gx-bk-peek; animation-timing-function: ease-in; }
+.gx-opview.fx-back[data-back="peek"] > .gx-opshade svg { filter: blur(4px); }
+@keyframes gx-bk-peek { 0%, 26% { opacity: 0; transform: none; } 27%, 40% { opacity: .95; transform: none; } 70% { opacity: .95; transform: translateX(70%); } 71%, 100% { opacity: 0; transform: translateX(70%); } }
+/* lens: 켜지는 순간 렌즈에 바짝 붙은 머리가 화면을 가리고 있다가, 꺼졌다 켜지면 없다 */
+.gx-opview.fx-back[data-back="lens"] > .gx-opshade { inset: -30% -25% -90%; animation-name: gx-bk-lens; animation-timing-function: steps(1); }
+.gx-opview.fx-back[data-back="lens"] > .gx-opshade svg { filter: blur(20px); }
+@keyframes gx-bk-lens { 0%, 12% { opacity: 0; } 13% { opacity: .97; transform: none; } 40% { opacity: .97; transform: scale(1.08); } 52%, 100% { opacity: 0; } }
 /* 렌즈 앞을 스치는 것 (2026-10-21 사용자: 뒤에서 움직이는 사람 말고, 카메라 바로 앞을 섬뜩한 게 지나가는 느낌).
    화면보다 큰 검은 형체가 초점이 안 맞은 채 0.2초 만에 가로지르고, 지나간 뒤 카메라 노출이 잠깐 튄다 */
 .gx-opshade { z-index: 2; inset: -20% auto -30% 0; width: 85%; }
