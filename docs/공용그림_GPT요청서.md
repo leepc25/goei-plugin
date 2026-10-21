@@ -128,12 +128,35 @@ IMAGES
 6. Shared Base Hideout — A worn-out villa apartment building at night, one window lit on the top floor, laundry on a balcony.
 ```
 
-## 공용 요원 (10장) · 참고 그림: assets/agents 의 「영문명_default」 아무거나 (예: Aileen_default)
+## 기본 거점 외부 (7장) · 참고 그림: assets/wiki/Factions/Management Bureau
 
-사진이 없는 요원의 대표 사진. 세로 832×1216, 검은 배경. 여러 인물 대신 쓰는 그림이라 얼굴이 드러나면 안 됩니다.
+세력 사진은 내부라서, 거점은 거리에서 본 **외부**로 만듭니다. 파일 이름은 「Base 영문명」입니다 (거점 영문명이 세력 영문명과 같아 겹치지 않게). 가짜 관리국으로 시작한 이야기에서는 관리국 본부 자리에 Base Fake Management Bureau가 나옵니다.
 
 ```
-Make 10 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 7 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+
+STYLE (same for every image)
+Korean webtoon (manhwa) illustration style matching the attached reference image exactly: clean ink line art, cel shading, muted desaturated colors, dramatic lighting. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. Square 1:1 (1024x1024). Keep the main subject in the center (the app also crops it to a thin wide strip and to a small square).
+
+KIND: BASE EXTERIOR
+The building seen from the street outside, the whole facade readable at a glance, no people.
+
+IMAGES
+1. Base Management Bureau — A large, completely ordinary office building in central Jongno, Seoul at dawn. The wide street in front is eerily EMPTY of people and cars while traffic lights still change. Plain glass entrance, one soft teal light by the door. It should feel forgettable and quietly guarded.
+2. Base Fake Management Bureau — A big imposing company building in Jongno, Seoul at night. A row of identical black sedans parked in front, harsh white lights, many dark windows, an auditorium-like wing. Disciplined, cold and military.
+3. Base Baekilmong corporation — A sleek glass-curtain high-rise pharmaceutical headquarters on a wide Gangnam boulevard at night, a lower annex building attached at the side, bright lobby, an air of polished menace.
+4. Base Special Disaster Response Association — A plain 10-storey mid-rise office building in Yeongdeungpo, Seoul at night, posing as a disaster-consulting company: fire-safety posters visible through the lobby glass (no readable text), a few lit floors.
+5. Base Vatican — A small Christian goods shop in a narrow alley of Seodaemun, Seoul at night: shop window full of crosses, rosaries and religious icons, warm candle-like light, a little bell over the door.
+6. Base Islam — A mosque on a hillside in Itaewon, Seoul at night: white dome, two slender minarets, steps leading up, quiet residential street below, soft light from the arched windows.
+7. Base Jungrim Underground Shopping Center — The street-level stair entrance down to a decaying underground shopping arcade in Jungnim-dong, Seoul at night: half-dead fluorescent lights below, closed shops visible at the bottom of the stairs, wet pavement.
+```
+
+## 공용 요원 (30장) · 직접 제작 (GPT 아님: 기존 요원 그림 톤을 맞춰야 함)
+
+사진이 없는 요원의 대표 사진. 기존 요원 그림과 같은 도구·톤으로 직접 만듭니다. 아래 목록은 장면 설명이고, 쓰는 도구 형식(태그 등)으로 바꿔 쓰면 됩니다. 세로 832×1216, 검은 배경. 여러 인물 대신 쓰는 그림이라 얼굴이 드러나면 안 됩니다. 옷차림(소속)과 성별마다 3장씩 두고, 플러그인이 요원 이름으로 그중 하나를 골라 같은 요원은 늘 같은 그림이 나옵니다. 성별을 모르면 후드 차림(Religious·Occult)을 씁니다.
+
+```
+Make 30 illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png). Variants of the same outfit must look like DIFFERENT people (different hair, build, pose, accessory).
 
 STYLE (same for every image)
 Korean webtoon (manhwa) character illustration matching the attached reference image exactly: fine ink line art, soft cel shading, muted colors. Portrait 2:3 (1024x1536). One person, standing, framed from head to mid-thigh, facing slightly to the side, centered, plain pure black background. The face must be ANONYMOUS: hidden by deep shadow, a cap brim, a hood, hair or a mask, so the image can stand in for many different characters. Head near the top quarter of the frame (the app crops a square face icon from there). NO readable text, logos or insignia.
@@ -141,16 +164,36 @@ Korean webtoon (manhwa) character illustration matching the attached reference i
 KIND: AGENT
 
 IMAGES
-1. Shared Agent Suit Female — Woman in a black suit and black tie, white shirt, long dark hair covering her eyes in shadow, gloved hands.
-2. Shared Agent Suit Male — Man in a black suit and black tie, white shirt, face in deep shadow, hands in pockets.
-3. Shared Agent Masked Female — Woman in a neat office suit with an employee ID lanyard, wearing an animal mask (fox).
-4. Shared Agent Masked Male — Man in a neat office suit with an employee ID lanyard, wearing an animal mask (wolf).
-5. Shared Agent Freelancer Female — Woman in a hooded jacket and tactical vest, cargo pants, holding a short baton, hood shadowing her face.
-6. Shared Agent Freelancer Male — Man in a worn bomber jacket and cap pulled low, a duffel bag on his shoulder.
-7. Shared Agent Civilian Female — Woman in a casual hoodie and long coat, a backpack strap, face turned away under her hair.
-8. Shared Agent Civilian Male — Man in a casual shirt and jacket, holding a phone, face hidden by a cap.
-9. Shared Agent Religious — Person in a dark cassock-like robe with a hood, a rosary-like string of beads at the wrist, face hidden by the hood.
-10. Shared Agent Occult — Person in a long dark cloak with sand-colored trim, faint glowing sigils around the hands, face hidden by the hood.
+1. Shared Agent Suit Female 1 — Woman in black suit and black tie, white shirt; long dark hair falling over the eyes, gloved hands.
+2. Shared Agent Suit Female 2 — Woman in black suit and black tie, white shirt; short bob haircut, face in shadow, holding a pistol pointed down.
+3. Shared Agent Suit Female 3 — Woman in black suit and black tie, white shirt; hair tied back, sunglasses, arms crossed.
+4. Shared Agent Suit Male 1 — Man in black suit and black tie, white shirt; face in deep shadow, hands in pockets.
+5. Shared Agent Suit Male 2 — Man in black suit and black tie, white shirt; sunglasses and short hair, adjusting a cuff.
+6. Shared Agent Suit Male 3 — Man in black suit and black tie, white shirt; holding a black umbrella, face hidden under it.
+7. Shared Agent Masked Female 1 — Woman in neat office suit with an employee ID lanyard (no readable text); fox mask, long hair.
+8. Shared Agent Masked Female 2 — Woman in neat office suit with an employee ID lanyard (no readable text); cat mask, short hair, holding a clipboard.
+9. Shared Agent Masked Female 3 — Woman in neat office suit with an employee ID lanyard (no readable text); rabbit mask, ponytail, collector cylinder at the hip.
+10. Shared Agent Masked Male 1 — Man in neat office suit with an employee ID lanyard (no readable text); wolf mask, standing straight.
+11. Shared Agent Masked Male 2 — Man in neat office suit with an employee ID lanyard (no readable text); owl mask, sleeves rolled up.
+12. Shared Agent Masked Male 3 — Man in neat office suit with an employee ID lanyard (no readable text); bear mask, heavy build, carrying a metal case.
+13. Shared Agent Freelancer Female 1 — Woman in practical streetwear with a tactical touch; hooded jacket and tactical vest, short baton, hood shadowing the face.
+14. Shared Agent Freelancer Female 2 — Woman in practical streetwear with a tactical touch; leather jacket, cap pulled low, knife sheath on the thigh.
+15. Shared Agent Freelancer Female 3 — Woman in practical streetwear with a tactical touch; long coat and scarf over the mouth, gloves.
+16. Shared Agent Freelancer Male 1 — Man in practical streetwear with a tactical touch; worn bomber jacket, cap pulled low, duffel bag.
+17. Shared Agent Freelancer Male 2 — Man in practical streetwear with a tactical touch; hoodie under a utility vest, face mask, bandaged knuckles.
+18. Shared Agent Freelancer Male 3 — Man in practical streetwear with a tactical touch; trench coat, turned-up collar hiding the face, crowbar in hand.
+19. Shared Agent Civilian Female 1 — Woman in ordinary casual clothes; hoodie and long coat, backpack strap, face turned away under her hair.
+20. Shared Agent Civilian Female 2 — Woman in ordinary casual clothes; school-style cardigan and skirt, face hidden by a surgical mask and bangs.
+21. Shared Agent Civilian Female 3 — Woman in ordinary casual clothes; office worker blouse and slacks, holding a phone up so it hides her face.
+22. Shared Agent Civilian Male 1 — Man in ordinary casual clothes; casual shirt and jacket, cap hiding the face.
+23. Shared Agent Civilian Male 2 — Man in ordinary casual clothes; delivery rider jacket with helmet on, visor down.
+24. Shared Agent Civilian Male 3 — Man in ordinary casual clothes; college hoodie, hood up, earphones, looking down at a phone.
+25. Shared Agent Religious 1 — Person of unclear gender in a dark cassock-like robe with a hood; rosary-like string of beads at the wrist; face hidden by the hood.
+26. Shared Agent Religious 2 — Person of unclear gender in a dark cassock-like robe with a hood; veil and long robe, hands folded; face hidden by the hood.
+27. Shared Agent Religious 3 — Person of unclear gender in a dark cassock-like robe with a hood; wide-sleeved robe, holding a small lantern; face hidden by the hood.
+28. Shared Agent Occult 1 — Person of unclear gender in a long dark cloak; sand-colored trim, faint glowing sigils around the hands; face hidden by the hood.
+29. Shared Agent Occult 2 — Person of unclear gender in a long dark cloak; tattered cloak, a staff with charms; face hidden by the hood.
+30. Shared Agent Occult 3 — Person of unclear gender in a long dark cloak; layered cloak with talisman papers, face hidden by a hood; face hidden by the hood.
 ```
 
 ## 플러그인 매칭 (Claude 담당)
@@ -160,6 +203,6 @@ IMAGES
 - **괴이·사건:** 상황의 이름 + 발생 지점 + 상황 글에서 장소 낱말을 찾습니다. 예: Subway = 지하철, 역, 승강장, 전철, 선로 / School = 학교, 교실, 기숙학교, 학원 / Hospital = 병원, 의원, 병동, 응급실.
 - **특수:** 장소가 아니라 특수 이름에서 종류 낱말을 찾습니다. 예: 「달빛 타투샵」·「우주 쇼핑몰」 → Shop, 「이정 책방」 → Bookshop, 「도깨비 공방」 → Workshop, 「얼굴 없는 장터」 → Market, 「무엇이든 자판기」 → Vending, 「여우 상담실」 → Room, 「친절한 씨앗 키트」·「착한 친구 키링」 → Object, 안 맞으면 Door.
 - **조직:** 사진이 없으면 유형(조직형·민간형·프리랜서형)과 이름 낱말(회사·주식회사 → Corporate, 교회·성원·교단 → Religious, 교 → Cult, 연구 → Research, 사채·조직 → Criminal 등)로 Shared Org.
-- **거점:** 영문명 → 연결 조직 사진 → 이름 낱말로 Shared Base.
-- **요원:** 소속 조직(관리국·가짜 관리국 → Suit, 백일몽 → Masked, 프리랜서·협회·중림 → Freelancer, 민간인 → Civilian, 교황청·이슬람 → Religious, 발푸르기스 → Occult)으로 옷을 고르고, 성별로 남녀를 고릅니다.
-  - 성별: 명부 요원에 「성별」 칸(여·남·미정)을 새로 둡니다. 비어 있으면 요원 로어북의 `Gender: Female/Male` 줄을 읽습니다 (지금 카드 요원 55명 모두 이 줄이 있음). 그래도 모르면 성별이 드러나지 않는 Religious·Occult(후드) 그림을 씁니다.
+- **거점:** 「Base 영문명」(외부) → 거점에 고른 사진 → 연결 조직 사진 → 이름 낱말로 Shared Base (외부).
+- **요원:** 소속 조직(관리국·가짜 관리국 → Suit, 백일몽 → Masked, 프리랜서·협회·중림 → Freelancer, 민간인 → Civilian, 교황청·이슬람 → Religious, 발푸르기스 → Occult)으로 옷, 성별로 남녀를 고르고, 같은 묶음 3장 중 하나를 요원 이름으로 정합니다 (같은 요원은 늘 같은 그림).
+  - 성별: 명부 요원의 「성별」 칸(여·남·미정, 2026-10-21 추가). 비어 있으면 요원 로어북의 `Gender: Female/Male` 줄을 읽습니다 (지금 카드 요원 55명 모두 이 줄이 있음). 그래도 모르면 성별이 드러나지 않는 Religious·Occult(후드) 그림을 씁니다.
