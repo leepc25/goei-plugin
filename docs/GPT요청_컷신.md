@@ -31,7 +31,7 @@ CHARACTER: JYALDI
 A tall Korean woman in her late 20s, chief of a secret anomaly-response team. Long straight jet-black hair down to her waist, worn loose. Red eyes (the only strong color on her). Expressionless, calm face; upright posture. Black pantsuit (jacket and trousers, never a skirt), white dress shirt, black necktie, black leather gloves. Full-chested figure, drawn plainly, not exaggerated. A black handgun in a shoulder holster under the jacket. Palette: hair #15141a, suit #1c1d24/#2d2f3a, shirt #e8e6e0, skin #f0d6c4, eyes #d12b3a, gloves #111115.
 ```
 
-## 오프닝 (컷 7개)
+## 오프닝 (컷 8개)
 
 | 컷 | 길이 | 움직임 (엔진) |
 | --- | --- | --- |
@@ -42,8 +42,9 @@ A tall Korean woman in her late 20s, chief of a secret anomaly-response team. Lo
 | op5_eye | 1.5초 | 눈 반짝 빛 레이어가 지나감, 미세 흔들림 |
 | op6_draw | 2.5초 | 팔 레이어가 총집에서 앞으로 돌며 뽑힘(두 장 바꿔 끼움), 흰 번쩍 |
 | op7_panel | 4초 | 버튼 빛 레이어가 위에서 아래로 빠르게 켜짐, 컷 번쩍 두 번 |
+| op8_lineup | 6초 | 엘리베이터 문이 열리고 역광 속에서 8명이 실루엣(인물 레이어를 검게)으로 걸어 나와 일렬로 섬. 한 명씩 발밑 조명이 켜지며 전신이 드러나고, 짧은 고유 동작(레이어 흔들기·자세 두 장 바꿔 끼우기)과 이름표가 쾅 붙음. 한 명 0.6초 |
 
-그 뒤 요원 얼굴 8장(기존 명부 사진)과 로고는 엔진이 만든다. GPT 그림 없음.
+로고는 그 뒤 엔진이 만든다(GPT 그림 없음). 쟈알디 외 요원은 아직 게임 도트가 없어서 지금은 이 GPT 전신 레이어로 쓰고, 도트가 생기면 바꾼다.
 
 ```
 op1_city — Seoul skyline at night from a high place, moonless cloudy sky glowing faintly orange from the city.
@@ -89,6 +90,26 @@ op7_panel — close-up of the inside elevator button panel (brushed steel, faux-
   op7_panel/bg.png     — the panel (full).
   op7_panel/lights.png — only the button faces glowing warm (transparent elsewhere), for lighting one by one.
   op7_panel/grille.png — the small speaker grille at the top with a faint glow behind the holes (transparent elsewhere).
+
+op8_lineup — the team stepping out of a wide-open old elevator into a dark lobby, backlit by cold white light from inside the elevator car. Eight agents in one row, all full-body, front view, the same scale (feet on the same floor line at 88% of the image height, heads at about 25-30%), evenly spaced left to right in this order. Draw each agent on its OWN layer at its own place in the row, so the layers together make the whole lineup.
+  op8_lineup/bg.png        — the open elevator car glowing white in the center back, dark marble lobby, terrazzo floor (full).
+  op8_lineup/light.png     — only the light beam from the elevator spilling forward on the floor (transparent elsewhere).
+  op8_lineup/a1_jyaldi.png   — JYALDI (see CHARACTER), arms down, calm, gloves.
+  op8_lineup/a1_jyaldi_b.png — the same, right hand adjusting the glove at the wrist (signature gesture), same place.
+  op8_lineup/a2_eileen.png   — EILEEN: small, solid trained build; faded platinum-blonde high ponytail; dull pale eyes; black suit with a dark olive bulletproof vest over it, handgun holster on the right hip, a rifle slung on the left shoulder.
+  op8_lineup/a2_eileen_b.png — the same, both hands checking the rifle on its sling.
+  op8_lineup/a3_spangdal.png   — SPANGDAL: slim light build, full chest; wavy purple chin-length bob; pale skin; dull gold unblinking eyes; half-smile; black skirt suit, black stockings, low heels.
+  op8_lineup/a3_spangdal_b.png — the same, head tilted slightly, one hand raised in a small wave.
+  op8_lineup/a4_geshugan.png   — GESHUGAN: athletic build; short snow-white hair; cold blue eyes; flat expression; loose white shirt with rolled sleeves, black slacks, a small belt bag; a puzzle cube in one hand.
+  op8_lineup/a4_geshugan_b.png — the same, cube held up turning it.
+  op8_lineup/a5_gorgodio.png   — GORGODIO: huge wrestler build, bald, neat beard, confident face; black jacket over the agent suit, boots; a thick cleaver-like blade inside the jacket.
+  op8_lineup/a5_gorgodio_b.png — the same, cracking his knuckles, chest out.
+  op8_lineup/a6_kyuras.png   — KYURAS: thin, hollow cheeks, light-green hair slicked back, a constant grin; motorcycle jacket with shoulder and elbow pads over the agent suit, no gloves.
+  op8_lineup/a6_kyuras_b.png — the same, spinning a motorcycle key on one finger.
+  op8_lineup/a7_deadpole.png   — DEADPOLE: small; long straight black hair to the back with bangs; soft round eyes; neat black suit, white shirt, black stab-proof gloves; holster on the left hip.
+  op8_lineup/a7_deadpole_b.png — the same, right hand on the gun grip across the body, eyes narrowed sharp.
+  op8_lineup/a8_rojemon.png   — ROJEMON: small with a narrow waist; long wavy purple hair; slightly upturned purple eyes; cute face trying to glare; office blouse, skirt and cardigan; a snack pouch.
+  op8_lineup/a8_rojemon_b.png — the same, arms crossed, glaring, eyes glowing faintly purple.
 ```
 
 ## 클로즈업 3컷 (이벤트씬 안에 잠깐 끼우는 것)
@@ -108,7 +129,7 @@ cu_rope_hands — JYALDI's two black-gloved hands gripping a single rope, seen f
   cu_rope_hands/hands.png — the two gloved hands and wrists on the rope (transparent elsewhere).
 ```
 
-합계: 오프닝 29장 + 클로즈업 7장 = 36장.
+합계: 오프닝 47장(op1~op7 29장 + op8 18장) + 클로즈업 7장 = 54장.
 
 ## Claude가 받은 뒤 하는 일
 
