@@ -17,7 +17,7 @@ DROP_CLIPS = {'pushup', 'sleepside'}
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4], 'mop': [5],
-    'nausea': [-1], 'push': [-1], 'locker': [4, 5], 'down': [1, 2], 'bedwake': [0], 'giftbox': [0], 'run': [0], 'button': [5],
+    'nausea': [-1], 'push': [-1], 'locker': [4, 5], 'down': [1, 2], 'giftbox': [0], 'run': [0], 'button': [5],
 }
 # 지울 영역(결함 5·37·46): (장, x0, y0, x1, y1) — 유령 상대·회색 찌꺼기·떨어진 조각
 ERASE = {
