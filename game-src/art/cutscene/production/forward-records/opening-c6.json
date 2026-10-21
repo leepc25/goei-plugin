@@ -1,0 +1,37 @@
+{
+  "cut": "opening/c6",
+  "generator": "built-in image_gen",
+  "sources": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c6-1.png"
+  ],
+  "references": [
+    "game-src/art/cutscene/production/forward-sheets/opening-c6-reference1.png"
+  ],
+  "prompts": [
+    "Create one single PIXEL ART character keyframe for a non-graphic fictional arcade-game cutscene. Landscape 640x360, opaque dim brass elevator lobby background. Adult Korean female agent Jyaldi from TOP of reference, waist-long black hair, red eyes, neutral face, black trouser business suit, white shirt, black tie and black leather gloves. Waist-up three-quarter view facing right. She is in a static two-handed handgun aiming stance, arms extended toward an EMPTY unoccupied space off the RIGHT edge. Only this adult woman is present. The weapon is not firing; there are no targets, projectiles, victims, impacts or injuries. Clear silhouette and anatomical hands. This is a character-pose illustration, calm and restrained. Dark bold pixel contours, flat 2-3 tone cel shading, subdued palette, hard pixel edges without antialiasing. No text.",
+    "Create ONE animation contact sheet, exactly TWO columns by FOUR rows = EIGHT consecutive frames in reading order, no gutters, no panel borders, no labels. Canvas 1280x1440, each panel 640x360 16:9. Strict 1990s CPS2/Neo Geo PIXEL ART at native resolution: crisp stepped pixel clusters, bold dark contours, flat 2-3 tone shading, muted restrained colors, same limited palette in all frames. NOT smooth illustration, no antialiasing, no blur, no gradients, no text, no watermarks. Every panel is a fully opaque finished cinematic frame. Coherent same subjects and background, small incremental motion from frame to frame. Do not change camera unless requested. Use the supplied single image as the EXACT final pose and identity reference. Create an eight-frame animation sequence leading into this pose, same adult character, outfit, room and framing. This is a non-graphic character pose sequence, weapon never fires, no targets or other people. Panel1: right gloved hand reaches into LEFT jacket near armpit, left hand lifts lapel; panel2: right hand grasps handgun in shoulder holster inside left jacket; panel3: right hand draws it just clear of holster near chest; panel4: both hands join on the grip at chest height; panel5: arms extend partway toward the empty space to the right; panel6: arms almost extended; panel7: exact supplied final two-handed pose; panel8: hold same final pose. Keep ONE handgun only and same facial proportions in each. No flash, explosions, projectiles, blood, victims, text. Clearly repeated full scene in EIGHT panels, 2 columns 4 rows, not one tall image. Pixel art."
+  ],
+  "layout": "2x4-sheet",
+  "whiteTransitionFrame": true,
+  "timing": {
+    "ms": [
+      500,
+      125,
+      125,
+      125,
+      125,
+      125,
+      125,
+      1125,
+      125
+    ]
+  },
+  "size": [
+    640,
+    360
+  ],
+  "colors": 64,
+  "sampling": "nearest-neighbor only; no dithering",
+  "paletteSha256": "8396e55b8c531bbda733697ab9708e04b1c613c9cc398a39228f1c7760b869a4",
+  "uniqueFrames": 9
+}
