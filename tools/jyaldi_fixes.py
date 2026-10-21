@@ -14,7 +14,7 @@ import rig  # noqa: E402
 # 버림(결함 35·36): 생성기가 자세를 못 그림
 DROP_CLIPS = {'pushup', 'sleepside'}
 # 기본 클립 재설계(docs/캐릭터제작서/쟈알디_기본클립_재설계_2026-10-21.md 4장): 장면·물건이 박혀 폐기. 같은 이름으로 다시 뽑는 9개(tie 등)는 새 그림이 덮어씀
-DROP_CLIPS |= set('''bathin bathout showerin showerout toiletin toiletout handwash wash dishes coffee microwave board brief
+DROP_CLIPS |= set('''undress toilet bathin bathout showerin showerout toiletin toiletout handwash wash dishes coffee microwave board brief
 window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
 toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
 run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry'''.split())
@@ -24,7 +24,7 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 GPT_CLIPS = {'shower', 'bath', 'toilet', 'undress'}
 DROP = {
     # 독립 검수(16시): reload 4장 총 조각남·5장 색 빠짐, deskslam 2장 손이 가루, handshead 1장 두 팔 없음, collapse 2장 두 발 뜸(깡충)
-    'reload': [4, 5], 'deskslam': [2], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
+    'reload': [4, 5], 'deskslam': [2], 'shotgun': [3], 'undress': [6], 'handshead': [1], 'down': [-1],   # pipe 끝 장 파이프 사라짐(16:40 재생성)
     'super': [-1],                             # 다시 생성분 끝 장 뭉개짐
     'glove': [-1], 'power': [-1], 'support': [-1], 'land': [0, -1], 'board': [4], 'microwave': [4],
     'nausea': [-1], 'push': [-1], 'gearcheck': [-1], 'locker': [4, 5], 'giftbox': [0], 'button': [5],
@@ -36,7 +36,7 @@ ERASE = {
     'seatnoodle': [(i, 88, 0, 192, 144) for i in range(4)],
     'down': [(i, 0, 137, 192, 144) for i in range(8)],   # 독립 검수: 누운 장 아래팔이 바닥선 아래로 뚫음
     'collapse': [(i, 0, 137, 192, 144) for i in range(8)],
-    'shotgun': [(3, 150, 20, 192, 90)],   # 17:15 재생성 사격: 펌프 장 총구 불꽃(다른 장 총구 x≈149~152)
+    'shotgun': [(5, 60, 36, 72, 42)],   # 사격 5장 머리 위 회색 선(3장 불꽃 장은 DROP)
     # 재검수(16:24) 남은 조각: 10배 격자로 자리 확인
     'toss': [(5, 70, 82, 80, 92)],
     'carry1_walk': [(0, 69, 74, 76, 79)] + [(i, 28, 59, 34, 68) for i in range(8)],
@@ -219,8 +219,17 @@ def apply(key, fr, pr=None, src=None, idx=None):
     if key in GPT_CLIPS:                       # GPT 납품(4b904ee): 키가 PixelLab 그림보다 약 10% 커서 발 기준(57,136)으로 0.9배
         def sc(f, k=0.9):
             w, h = f.size; s = f.resize((round(w * k), round(h * k)), Image.NEAREST)
-            o = Image.new('RGBA', (w, h)); o.alpha_composite(s, (round(57 - 57 * k), round(136 - 136 * k))); return o
-        fr = [sc(f) for f in fr]
+            o = Image.new('RGBA', (w, h)); o.alpha_composite(s, (round(57 - 57 * k), round(136 - 136 * k) - 2)); return o   # -2: 발바닥 y137 → 135(PixelLab과 같게)
+        def suit(f):                           # 검정 정장 → 쟈알디 청회색 정장 명암(PixelLab 대기 장에서 뽑은 색). 외곽선(아주 어두운 색)·피부·수건은 그대로
+            a = np.array(f); c = a[:, :, :3].astype(float); l = c.mean(2)
+            m = (a[:, :, 3] > 0) & (c.max(2) - c.min(2) < 15) & (c[:, :, 2] >= c[:, :, 0]) & (l >= 16) & (l < 75)
+            stops = [(16, (26, 30, 33)), (30, (38, 42, 46)), (31, (46, 53, 60)), (48, (65, 78, 86)), (75, (80, 95, 108))]
+            out = np.zeros_like(c)
+            for (l0, c0), (l1, c1) in zip(stops, stops[1:]):
+                seg = m & (l >= l0) & (l < l1); t = ((l - l0) / max(1, l1 - l0))[seg][:, None]
+                out[seg] = np.array(c0) + (np.array(c1) - np.array(c0)) * t
+            a[:, :, :3][m] = out[m].round().astype(np.uint8); return Image.fromarray(a)
+        fr = [suit(sc(f)) for f in fr]
     if key == 'pipe':                          # 16:40 재생성본: 떨어진 조각만 지움(옛 덧그림·갈고리 보정은 옛 그림용이라 뺌)
         fr = [keep_main(f) for f in fr]
         for i, raw in enumerate(idx):          # 내려친 장(pipe3 2번) 손 위 회색 갈고리: 손목보다 위의 밝은 회색

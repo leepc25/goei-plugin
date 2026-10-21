@@ -3975,8 +3975,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
-   "frames": 6,
-   "bytes": 22684,
+   "frames": 5,
+   "bytes": 19513,
    "prop": false,
    "anchors": [
     {
@@ -4021,21 +4021,6 @@
      "angle": -62,
      "hip": [
       54,
-      88
-     ]
-    },
-    {
-     "hand": [
-      76,
-      70
-     ],
-     "hand2": [
-      68,
-      68
-     ],
-     "angle": -55,
-     "hip": [
-      57,
       88
      ]
     },
@@ -12848,19 +12833,6 @@
     }
    ]
   },
-  "undress": {
-   "label": "탈의: 정장 → 목욕 수건",
-   "fps": 5,
-   "loop": false,
-   "hits": [],
-   "adv": 0,
-   "origin": 0,
-   "hold": 0.0,
-   "group": "씻기·집안일·운동",
-   "frames": 8,
-   "bytes": 63253,
-   "prop": false
-  },
   "shower": {
    "label": "샤워: 뒷모습 머리 감기",
    "fps": 6,
@@ -12871,7 +12843,7 @@
    "hold": 0.0,
    "group": "씻기·집안일·운동",
    "frames": 6,
-   "bytes": 47801,
+   "bytes": 48193,
    "prop": false,
    "anchors": [
     {
@@ -12976,7 +12948,7 @@
    "hold": 0.0,
    "group": "씻기·집안일·운동",
    "frames": 4,
-   "bytes": 37491,
+   "bytes": 38092,
    "prop": false,
    "anchors": [
     {
@@ -13037,81 +13009,6 @@
      "hip": [
       96,
       91
-     ]
-    }
-   ]
-  },
-  "toilet": {
-   "label": "용변: 앉기(변기는 엔진)",
-   "fps": 4,
-   "loop": true,
-   "hits": [],
-   "adv": 0,
-   "origin": 0,
-   "hold": 0.0,
-   "group": "씻기·집안일·운동",
-   "frames": 4,
-   "bytes": 36355,
-   "prop": false,
-   "anchors": [
-    {
-     "hand": [
-      69,
-      89
-     ],
-     "hand2": [
-      67,
-      91
-     ],
-     "angle": -30,
-     "hip": [
-      51,
-      105
-     ]
-    },
-    {
-     "hand": [
-      69,
-      90
-     ],
-     "hand2": [
-      67,
-      91
-     ],
-     "angle": -30,
-     "hip": [
-      51,
-      106
-     ]
-    },
-    {
-     "hand": [
-      69,
-      90
-     ],
-     "hand2": [
-      67,
-      92
-     ],
-     "angle": -30,
-     "hip": [
-      51,
-      106
-     ]
-    },
-    {
-     "hand": [
-      69,
-      90
-     ],
-     "hand2": [
-      67,
-      91
-     ],
-     "angle": -30,
-     "hip": [
-      51,
-      106
      ]
     }
    ]
