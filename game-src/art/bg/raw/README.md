@@ -104,3 +104,17 @@
 - `hq_office/hq_office_wall_5.png`
 - `hq_office/hq_office_wall_6.png`
 - `hq_office/hq_office_objects_2.png`
+
+
+## 본부 배경 추가 · 2026-10-22 · hq_street
+
+요청서 신규 원본 7장. 벽·원경·물건 1536×1024, 바닥 1024×1024. 도트화·게임 반영은 후속 통합 작업.
+
+- `hq_street/hq_street_wall_1.png`
+- `hq_street/hq_street_wall_2.png`
+- `hq_street/hq_street_wall_3.png`
+- `hq_street/hq_street_wall_4.png`
+- `hq_street/hq_street_floor.png`
+- `hq_street/hq_street_far.png`
+- `hq_street/hq_street_objects.png`
+
