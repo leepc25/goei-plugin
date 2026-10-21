@@ -16688,7 +16688,7 @@ var StoryUI = class {
     }
     b.el.classList.remove("free");
     const w = b.el.offsetWidth, W4 = this.el.clientWidth;
-    const x = Math.max(w / 2 + 6, Math.min(W4 - w / 2 - 6, p.x));
+    const x = Math.max(w / 2 + 6, Math.min(Math.min(W4, p.maxX ?? W4) - w / 2 - 6, p.x));
     b.el.style.setProperty("--tail", `${Math.round(p.x - x)}px`);
     b.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(Math.max(p.y, 0))}px) translate(-50%, -100%)`;
   }
@@ -19118,13 +19118,24 @@ function engineModules(box2, bridge) {
       shake: (ms, amp) => shell.fx.onGameEvent({ type: "shake", ms, amp }),
       anchor: (id) => {
         if (id !== "agent" || !world) return null;
-        const cv = shell.canvas;
-        let ox = 0, oy = 0;
-        for (let n = cv; n && n !== storyRoot.offsetParent; n = n.offsetParent) ox += n.offsetLeft, oy += n.offsetTop;
-        const k = cv.offsetWidth / 1280;
+        const st = shell.canvas.parentElement;
+        const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
+        const k = shell.stage.scale || 1;
+        const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft, oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
         const p = world.player;
         const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
-        return { x: ox - storyRoot.offsetLeft + gx * k, y: oy - storyRoot.offsetTop + Math.max(120, p.y - p.z - 270) * k };
+        let maxX;
+        const tp = storyRoot.ownerDocument.querySelector(".tp");
+        if (tp && tp.offsetParent) {
+          let tx = 0;
+          for (let n = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent) tx += n.offsetLeft;
+          for (const b of tp.querySelectorAll(".tp-b:not(.item):not(.top)")) {
+            if (!b.offsetWidth || getComputedStyle(b).display === "none") continue;
+            const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
+            if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
+          }
+        }
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 270) * k, maxX };
       },
       emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } })
     },
