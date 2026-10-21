@@ -61,12 +61,12 @@
    "fps": 14,
    "loop": false,
    "hits": [],
-   "adv": 14,
+   "adv": 20,
    "origin": 0,
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 23275,
+   "bytes": 22293,
    "prop": false
   },
   "run": {
@@ -208,7 +208,7 @@
    "hold": 0.06,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 30500,
+   "bytes": 26302,
    "prop": false
   },
   "airkick": {
@@ -223,7 +223,7 @@
    "hold": 0.05,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 5,
-   "bytes": 20522,
+   "bytes": 17956,
    "prop": false
   },
   "draw": {
@@ -318,7 +318,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 4,
-   "bytes": 14238,
+   "bytes": 14060,
    "prop": false
   },
   "evade": {
@@ -331,7 +331,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 6,
-   "bytes": 31519,
+   "bytes": 24125,
    "prop": false
   },
   "grab": {
@@ -344,7 +344,7 @@
    "hold": 0.0,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 4,
-   "bytes": 18097,
+   "bytes": 16642,
    "prop": false
   },
   "grabknee": {
@@ -374,7 +374,7 @@
    "hold": 0.1,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 8,
-   "bytes": 46555,
+   "bytes": 29177,
    "prop": false
   },
   "super": {
@@ -389,7 +389,7 @@
    "hold": 0.2,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 10,
-   "bytes": 52517,
+   "bytes": 36313,
    "prop": false
   },
   "pickup": {
@@ -551,7 +551,7 @@
    "hold": 0.05,
    "group": "전투·기본 (계획안 1~41)",
    "frames": 8,
-   "bytes": 34068,
+   "bytes": 23043,
    "prop": false
   },
   "wall": {
@@ -767,7 +767,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 3,
-   "bytes": 16603,
+   "bytes": 12430,
    "prop": false
   },
   "land": {
@@ -805,8 +805,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "지형·이동",
-   "frames": 7,
-   "bytes": 39446,
+   "frames": 8,
+   "bytes": 30686,
    "prop": false
   },
   "rope": {
@@ -936,7 +936,7 @@
    "hold": 0.0,
    "group": "지형·이동",
    "frames": 5,
-   "bytes": 24749,
+   "bytes": 23261,
    "prop": false
   },
   "door": {
@@ -948,8 +948,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "탐사",
-   "frames": 6,
-   "bytes": 27589,
+   "frames": 7,
+   "bytes": 26246,
    "prop": false
   },
   "doorclose": {
@@ -961,8 +961,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "탐사",
-   "frames": 4,
-   "bytes": 13653,
+   "frames": 6,
+   "bytes": 23163,
    "prop": false
   },
   "knock": {
@@ -1091,8 +1091,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "탐사",
-   "frames": 8,
-   "bytes": 30617,
+   "frames": 7,
+   "bytes": 25662,
    "prop": false
   },
   "backpack": {
@@ -1157,7 +1157,7 @@
    "hold": 0.0,
    "group": "탐사",
    "frames": 4,
-   "bytes": 14030,
+   "bytes": 7740,
    "prop": false
   },
   "floorsit": {
@@ -1196,7 +1196,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 4,
-   "bytes": 14336,
+   "bytes": 12920,
    "prop": false
   },
   "limp": {
@@ -1208,8 +1208,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "상태·결과",
-   "frames": 7,
-   "bytes": 22794,
+   "frames": 8,
+   "bytes": 32844,
    "prop": false
   },
   "fear": {
@@ -1274,7 +1274,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 5,
-   "bytes": 27920,
+   "bytes": 20407,
    "prop": false
   },
   "victory": {
@@ -1287,7 +1287,7 @@
    "hold": 0.0,
    "group": "상태·결과",
    "frames": 7,
-   "bytes": 21165,
+   "bytes": 24232,
    "prop": false
   },
   "chairsit": {
@@ -1299,8 +1299,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "본부 업무",
-   "frames": 4,
-   "bytes": 16656,
+   "frames": 5,
+   "bytes": 17875,
    "prop": false
   },
   "deskwork": {
@@ -1313,7 +1313,7 @@
    "hold": 0.0,
    "group": "본부 업무",
    "frames": 6,
-   "bytes": 14538,
+   "bytes": 12373,
    "prop": false
   },
   "typing": {
@@ -1326,7 +1326,7 @@
    "hold": 0.0,
    "group": "본부 업무",
    "frames": 4,
-   "bytes": 10275,
+   "bytes": 8507,
    "prop": false
   },
   "phone": {
@@ -1339,7 +1339,7 @@
    "hold": 0.0,
    "group": "본부 업무",
    "frames": 4,
-   "bytes": 6742,
+   "bytes": 7032,
    "prop": false
   },
   "handover": {
@@ -1404,7 +1404,7 @@
    "hold": 0.0,
    "group": "본부 업무",
    "frames": 7,
-   "bytes": 21323,
+   "bytes": 20916,
    "prop": false
   },
   "run_folder": {
@@ -1469,7 +1469,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 8355,
+   "bytes": 6006,
    "prop": false
   },
   "seatthink": {
@@ -1482,7 +1482,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 9631,
+   "bytes": 6137,
    "prop": false
   },
   "doze": {
@@ -1495,7 +1495,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 9258,
+   "bytes": 7997,
    "prop": false
   },
   "walllean": {
@@ -1508,7 +1508,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 9875,
+   "bytes": 6783,
    "prop": false
   },
   "window": {
@@ -1534,7 +1534,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 13448,
+   "bytes": 8014,
    "prop": false
   },
   "coffee": {
@@ -1638,7 +1638,7 @@
    "hold": 0.0,
    "group": "생활·여가",
    "frames": 4,
-   "bytes": 11128,
+   "bytes": 9158,
    "prop": false
   },
   "toast": {
@@ -1859,7 +1859,7 @@
    "hold": 0.0,
    "group": "씻기·집안일·운동",
    "frames": 4,
-   "bytes": 15840,
+   "bytes": 17497,
    "prop": false
   },
   "gesture": {
@@ -1885,7 +1885,7 @@
    "hold": 0.0,
    "group": "사교",
    "frames": 4,
-   "bytes": 9322,
+   "bytes": 8051,
    "prop": false
   },
   "nod": {
@@ -1923,8 +1923,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "사교",
-   "frames": 6,
-   "bytes": 12428,
+   "frames": 8,
+   "bytes": 15895,
    "prop": false
   },
   "handshake": {
@@ -2067,7 +2067,7 @@
    "hold": 0.0,
    "group": "감정",
    "frames": 4,
-   "bytes": 8470,
+   "bytes": 10438,
    "prop": false
   },
   "kneelcry": {
@@ -2223,7 +2223,7 @@
    "hold": 0.0,
    "group": "감정",
    "frames": 4,
-   "bytes": 11049,
+   "bytes": 10118,
    "prop": false
   },
   "showerin": {
@@ -2313,8 +2313,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "씻기·집안일·운동",
-   "frames": 6,
-   "bytes": 40812,
+   "frames": 7,
+   "bytes": 22703,
    "prop": false
   },
   "toilet": {
@@ -2327,7 +2327,7 @@
    "hold": 0.0,
    "group": "씻기·집안일·운동",
    "frames": 4,
-   "bytes": 11971,
+   "bytes": 10438,
    "prop": false
   },
   "toiletout": {
@@ -2339,8 +2339,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "씻기·집안일·운동",
-   "frames": 6,
-   "bytes": 26218,
+   "frames": 7,
+   "bytes": 24940,
    "prop": false
   },
   "handwash": {
