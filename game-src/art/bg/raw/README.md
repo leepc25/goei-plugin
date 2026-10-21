@@ -255,3 +255,4 @@
 
 - `silent/silent_wall_1.png`
 - `silent/silent_wall_2.png`
+- `silent/silent_wall_3.png`
