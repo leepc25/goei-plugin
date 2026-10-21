@@ -60,7 +60,7 @@
       <button data-k="KeyA">A 근접</button><button data-k="KeyS">S 권총</button><button data-k="KeyD">D 폭파</button><button data-k="KeyQ">Q 가드</button><button data-k="KeyW">W 필살</button>
       <button data-k="KeyR">R 장전</button><button data-k="KeyF">F 숙련3</button><button data-k="KeyG">G 숙련6</button><button data-k="KeyC">C 지원</button><button data-k="KeyT">T 말</button>
       <button data-k="Digit1">1 커피</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button>
-      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 서류</button><button data-k="KeyO">O 담배</button><button data-k="KeyL">L 장갑</button>
+      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyP">P 들고 보기</button><button data-k="KeyO">O 전화</button><button data-k="KeyL">L 장갑</button>
     </div>
   </div>
   <div class="keys">
@@ -129,10 +129,12 @@ function play(k, o = {}) {
 const C = () => M.clips[G.clip];
 const NUDE = new Set(['showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout']);
 const heldTag = () => G.carry || G.weapon;   // 'brick' | 'pipe' | 'shotgun' | null
+// 집는 물건(벽돌 등)은 그림에 없고 두 손 들기 기본 클립(carry2_*) + 손 좌표에 엔진이 붙임. 무기는 무기별 클립(idle_pipe 등)
+const heldClip = (base) => G.carry ? 'carry2_' + base : base + '_' + G.weapon;
 function idleClip() {
   if (G.crouch) return 'crouch';
   if (G.guard) return 'block';
-  if (heldTag() && has('idle_' + heldTag())) return 'idle_' + heldTag();
+  if (heldTag() && has(heldClip('idle'))) return heldClip('idle');
   if (G.tired) return 'tired';
   if (G.fight) return 'guard';
   return 'idle';
@@ -184,8 +186,8 @@ function onKey(code, down) {
     case 'KeyT': G.talkT = 2.2; G.talkLine = LINES[lineI++ % LINES.length]; play('talk'); break;
     case 'KeyV': G.tired = !G.tired; G.fight = false; hitText(G.x, groundY(G.z) - 330, G.tired ? '피로 상태' : '피로 회복'); play(idleClip()); break;
     case 'KeyB': { const wasF = G.fight && G.clip === 'guard'; G.hq = !G.hq; G.fight = false; G.aim = false; hitText(640, 120, G.hq ? '본부' : '현장'); if (wasF && has('engage')) play('engage', { lock: true, rev: true }); else play(idleClip()); break; }
-    case 'KeyP': play('papers', { lock: false }); G.busy = 3; break;
-    case 'KeyO': play('smoke', { lock: true }); break;
+    case 'KeyP': play('holdlook', { lock: false }); G.busy = 3; break;
+    case 'KeyO': play('handear', { lock: true }); break;
     case 'KeyL': play('glove', { lock: true }); break;
     case 'ArrowDown': {
       const now = performance.now();
@@ -427,7 +429,7 @@ function update(now) {
     else {
       if (mx) G.dir = mx;
       const run = G.runHeld && mx;
-      let want = (run ? 'run' : 'walk') + (heldTag() && has('walk_' + heldTag()) ? '_' + heldTag() : ''); if (!has(want)) want = 'walk_' + heldTag();
+      let want = heldTag() ? heldClip(run ? 'run' : 'walk') : (run ? 'run' : 'walk'); if (!has(want)) want = heldTag() ? heldClip('walk') : 'walk';
       if (G.clip !== want) play(want);
       const sp = run ? 7.5 : 3.2;
       G.x += mx * sp * dt * 60 * S / 2; G.z = Math.max(0, Math.min(1, G.z + mz * 0.006 * dt * 60));

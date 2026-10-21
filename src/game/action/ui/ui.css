@@ -2,6 +2,7 @@
 .gs *, .gs *::before, .gs *::after { box-sizing: border-box; }
 .gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }
 .gs-canvas { display: block; width: 1280px; height: 720px; }
+.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }
 .gs.pixel .gs-canvas { image-rendering: pixelated; }
 
 /* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */

@@ -62,6 +62,9 @@ export interface AudioEvent {
 
 const SCENES = new Set<string>(['title', 'hq', 'lobby', 'chase', 'replica', 'trial', 'dark', 'silent', 'puzzle', 'service', 'boss']);
 
+/** 다른 모듈이 쓰는 소리 이름 (대사·컷신 스크립트) */
+const ALIAS: Record<string, SfxId> = { doors: 'doorOpen', rope: 'ropeCreak', stamp: 'ruleStamp', knockknock: 'knock', static: 'intercom' };
+
 /** 엔진 사건 → 효과음. 없는 사건은 null (조용히 무시) */
 export function pickSfx(e: AudioEvent, scene: Scene | null): SfxId | null {
   switch (e.type) {
@@ -95,6 +98,7 @@ export function pickSfx(e: AudioEvent, scene: Scene | null): SfxId | null {
     case 'hp:low':
       return 'heartbeat';
     case 'custom':
+      if (e.name && e.name in ALIAS) return ALIAS[e.name];
       return e.name && e.name in SFX ? (e.name as SfxId) : null;
     default:
       return e.type in SFX ? (e.type as SfxId) : null;
