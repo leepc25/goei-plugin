@@ -501,3 +501,187 @@ group: 04900a25-3525-4667-bb89-2353aa9c8ac0
 cost: 3 generations (3/dir x 1)
 eta: ~3-5 min/direction
 add more directions to this group
+10:38:06 jacket_pixen seed31 -> id: 1ae9f147-e701-4f8d-a197-ed05ffa9cb22
+job_id: 1ae9f147-e701-4f8d-a197-ed05ffa9cb22
+model: pixen
+edit: Make the black suit jacket longer: the jacket hem now h
+10:38:06 jacket_pixen seed32 -> id: 88bcfbe5-1eb6-41fd-b217-5db577bc83c0
+job_id: 88bcfbe5-1eb6-41fd-b217-5db577bc83c0
+model: pixen
+edit: Make the black suit jacket longer: the jacket hem now h
+10:38:07 jacket_pixen seed33 -> id: 4438182f-5291-4617-8ea5-8715b7961283
+job_id: 4438182f-5291-4617-8ea5-8715b7961283
+model: pixen
+edit: Make the black suit jacket longer: the jacket hem now h
+10:39:41 jacket_pixen2 src31 seed41 -> id: 833e5ee0-73f9-430f-93c3-0072f1382921
+job_id: 833e5ee0-73f9-430f-93c3-0072f1382921
+model: pixen
+edit: Shorten the lon
+10:39:41 jacket_pixen2 src31 seed42 -> id: cc4a54e7-b88b-484d-81da-505b08d7a1f9
+job_id: cc4a54e7-b88b-484d-81da-505b08d7a1f9
+model: pixen
+edit: Shorten the lon
+10:39:41 jacket_pixen2 src33 seed43 -> id: 36debf67-d2a7-49e5-855f-913cb4169cd0
+job_id: 36debf67-d2a7-49e5-855f-913cb4169cd0
+model: pixen
+edit: Shorten the lon
+10:47:42 gen_all idle 4f -> id: 2106de22-b556-4020-bed7-1fa652315180
+job_id: 2106de22-b556-4020-bed7-1fa652315180
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:03 gen_all idle done
+10:49:19 gen_all glove 6f -> id: e2192d4d-5b66-458a-aa2f-4577d42f7821
+job_id: e2192d4d-5b66-458a-aa2f-4577d42f7821
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:19 gen_all guard 4f -> id: 6f02ec3e-5a84-4ce9-8a94-c8e5841a690d
+job_id: 6f02ec3e-5a84-4ce9-8a94-c8e5841a690d
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:20 gen_all walk 8f -> id: e9be8233-15cb-4435-958a-f1456cd5c425
+job_id: e9be8233-15cb-4435-958a-f1456cd5c425
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:20 gen_all step 6f -> id: 3e1a4817-eb96-43ea-8bee-5bffab78a0ee
+job_id: 3e1a4817-eb96-43ea-8bee-5bffab78a0ee
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:21 gen_all run 8f -> id: 7ce1fc1b-75ff-49d7-9b52-be3317b0f142
+job_id: 7ce1fc1b-75ff-49d7-9b52-be3317b0f142
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:21 gen_all jump 8f -> id: dab0e86e-b3d6-4987-be0b-f7713ebf8d54
+job_id: dab0e86e-b3d6-4987-be0b-f7713ebf8d54
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:22 gen_all crouch 4f -> id: ea38725a-b7ac-4751-8068-7f283520b748
+job_id: ea38725a-b7ac-4751-8068-7f283520b748
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:22 gen_all crouchwalk 6f -> id: e121f770-6360-428d-89e9-6bc4842570ce
+job_id: e121f770-6360-428d-89e9-6bc4842570ce
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:23 gen_all lowstrike 6f -> id: c61f0f5b-acc8-4472-bf0b-d3831b5d499d
+job_id: c61f0f5b-acc8-4472-bf0b-d3831b5d499d
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:24 gen_all combo 15f -> id: 6ba8273d-e310-489e-a845-a53d0e61702d
+job_id: 6ba8273d-e310-489e-a845-a53d0e61702d
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:24 gen_all dash 6f -> id: 86f9b90e-fbb0-466f-bb00-ba22a6ddb11c
+job_id: 86f9b90e-fbb0-466f-bb00-ba22a6ddb11c
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:24 gen_all airkick 6f -> id: 59930ee8-8bc2-4212-a2f9-36e8d6c35834
+job_id: 59930ee8-8bc2-4212-a2f9-36e8d6c35834
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:25 gen_all draw 5f -> id: 08b8875e-d91e-46c2-ab57-3c1598a00635
+job_id: 08b8875e-d91e-46c2-ab57-3c1598a00635
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:25 gen_all fire 4f -> id: 1636671a-f15d-4413-9872-dedc03bfde5b
+job_id: 1636671a-f15d-4413-9872-dedc03bfde5b
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:26 gen_all reload 6f -> id: 397e4e91-7901-49f2-85f7-01131c8adc92
+job_id: 397e4e91-7901-49f2-85f7-01131c8adc92
+description: tall slim adult woman agent, long straight black hair to the 
+10:49:26 gen_all blast 8f -> id: bc33a423-d0b8-4f00-991f-d048d43191e5
+job_id: bc33a423-d0b8-4f00-991f-d048d43191e5
+description: tall slim adult woman agent, long straight black hair to the 
+10:50:45 gen_all guard done
+10:50:52 gen_all fire done
+10:50:53 gen_all charge 4f -> id: 85f49912-27a2-459d-b14d-6fcd3406e1c5
+job_id: 85f49912-27a2-459d-b14d-6fcd3406e1c5
+description: tall slim adult woman agent, long straight black hair to the 
+10:50:54 gen_all block 4f -> id: 395601bf-6803-498b-a451-45799b3f0adf
+job_id: 395601bf-6803-498b-a451-45799b3f0adf
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:11 gen_all glove done
+10:51:14 gen_all step done
+10:51:17 gen_all crouchwalk done
+10:51:20 gen_all dash done
+10:51:22 gen_all airkick done
+10:51:24 gen_all draw done
+10:51:28 gen_all blast done
+10:51:29 gen_all blockhit 4f -> id: 9a1fe994-2616-46cd-bdb9-ec9cf7cefae3
+job_id: 9a1fe994-2616-46cd-bdb9-ec9cf7cefae3
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:29 gen_all evade 6f -> id: 9132ce1f-8cc8-4079-899b-3a0cacebbfa6
+job_id: 9132ce1f-8cc8-4079-899b-3a0cacebbfa6
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:30 gen_all grab 4f -> id: de25e1a1-d9b4-4e9f-bb27-f4e4534f99cd
+job_id: de25e1a1-d9b4-4e9f-bb27-f4e4534f99cd
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:30 gen_all grabknee 4f -> id: fcea76fd-ac9e-44ae-9111-563370f6082c
+job_id: fcea76fd-ac9e-44ae-9111-563370f6082c
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:31 gen_all grabblast 8f -> id: 3242ae14-464b-4b41-9cfb-5a13f48252e0
+job_id: 3242ae14-464b-4b41-9cfb-5a13f48252e0
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:31 gen_all super 10f -> id: 42aca558-cfc6-4aba-92f0-e1af047c1c32
+job_id: 42aca558-cfc6-4aba-92f0-e1af047c1c32
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:32 gen_all pickup 6f -> id: dc18fe05-298f-4a89-8284-a696eeb7871a
+job_id: dc18fe05-298f-4a89-8284-a696eeb7871a
+description: tall slim adult woman agent, long straight black hair to the 
+10:51:50 gen_all walk done
+10:51:53 gen_all run done
+10:51:56 gen_all jump done
+10:51:58 gen_all lowstrike done
+10:52:00 gen_all reload done
+10:52:04 gen_all toss 6f -> id: 0890e982-f61b-4897-a320-8a19f805b81c
+job_id: 0890e982-f61b-4897-a320-8a19f805b81c
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:05 gen_all drink 6f -> id: a0990c21-7ed6-4acd-b426-2c82877ef0a4
+job_id: a0990c21-7ed6-4acd-b426-2c82877ef0a4
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:06 gen_all eat 6f -> id: 8ff2d211-1293-4d76-b5c0-705fb3d6108b
+job_id: 8ff2d211-1293-4d76-b5c0-705fb3d6108b
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:07 gen_all bandage 6f -> id: 9726562b-46a2-4dc8-a537-abc9409240dc
+job_id: 9726562b-46a2-4dc8-a537-abc9409240dc
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:08 gen_all hit 4f -> id: 4ce1fbf6-7dc9-448c-9535-dc34d971a86f
+job_id: 4ce1fbf6-7dc9-448c-9535-dc34d971a86f
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:26 gen_all block done
+10:52:30 gen_all down 8f -> id: a56cd14a-a8e4-47e3-8f96-42d9706b7bd6
+job_id: a56cd14a-a8e4-47e3-8f96-42d9706b7bd6
+description: tall slim adult woman agent, long straight black hair to the 
+10:52:48 gen_all crouch done
+10:52:58 gen_all combo done
+10:53:00 gen_all blockhit done
+10:53:02 gen_all grab done
+10:53:04 gen_all grabknee done
+10:53:08 gen_all getup 6f -> id: 35f8d1fe-1f2b-4b41-9c9f-74d4a28f9b15
+job_id: 35f8d1fe-1f2b-4b41-9c9f-74d4a28f9b15
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:09 gen_all papers 6f -> id: 3fc08cda-3733-4fd8-bfe1-6ac616da8ba2
+job_id: 3fc08cda-3733-4fd8-bfe1-6ac616da8ba2
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:12 gen_all smoke 6f -> id: 176fa896-73c2-424c-adec-4a5e3e0398a4
+job_id: 176fa896-73c2-424c-adec-4a5e3e0398a4
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:13 gen_all chain 8f -> id: 3407257d-2f32-49e5-a82d-8fc3a9f4d2aa
+job_id: 3407257d-2f32-49e5-a82d-8fc3a9f4d2aa
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:13 gen_all wall 8f -> id: d18e79cc-f117-457f-a20a-dd745bed3ded
+job_id: d18e79cc-f117-457f-a20a-dd745bed3ded
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:30 gen_all charge done
+10:53:34 gen_all evade done
+10:53:37 gen_all hit done
+10:53:39 gen_all pipe 6f -> id: 57a6c8fe-5f7a-4144-99b5-55bd745ca42c
+job_id: 57a6c8fe-5f7a-4144-99b5-55bd745ca42c
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:41 gen_all shotgun 4f -> id: a6753233-8e40-4dfc-a722-3ae38045d478
+job_id: a6753233-8e40-4dfc-a722-3ae38045d478
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:41 gen_all tired 4f -> id: 9627b5a1-9bb1-4b19-8473-5e75dafca922
+job_id: 9627b5a1-9bb1-4b19-8473-5e75dafca922
+description: tall slim adult woman agent, long straight black hair to the 
+10:53:59 gen_all grabblast done
+10:54:03 gen_all super done
+10:54:11 gen_all eat done
+10:54:13 gen_all bandage done
+10:54:41 gen_all drink done
+10:55:02 gen_all down done
+10:55:05 gen_all papers done
+10:55:07 gen_all smoke done
+10:55:10 gen_all chain done
+10:55:12 gen_all shotgun done
+10:55:13 gen_all tired done
+10:55:33 gen_all toss done
+10:55:39 gen_all wall done
+10:56:19 gen_all pickup done
+10:56:37 gen_all pipe done
+10:57:27 gen_all getup done
