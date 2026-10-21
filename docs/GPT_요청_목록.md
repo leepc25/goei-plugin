@@ -10,3 +10,4 @@ GPT가 이 저장소에 그림을 올리는 일감 목록. 한 줄에 한 요청
 | docs/캐릭터제작서/의뢰서_쟈알디_샤워·목욕·용변_GPT.md (7장) | 쟈알디 탈의 다시 7장(옆모습, 벗은 옷 안 그림, 청회색 정장) + 샤워 앞 돌아서기 3장. 샤워·목욕 4b904ee 채택, 용변 취소 | game-src/action/jyaldi-v5/full/clips/undress/NN.png · showerturn/NN.png | 대기 (다시 그리기) |
 | docs/GPT요청_컷신영상.md | 도트 애니메이션 10편(동영상 파일 아님): 오프닝(약 32초, 9컷) + 컷신 9개(첫 출근·첫 투입·첫 호명·다락방·삼 년째 승객·귀환·후송·출구·회식, 각 10~20초, 3~6컷). mp4 금지, 컷마다 640×360 PNG 프레임 0001.png… + timing.json(장별 ms), 팔레트 고정, 8~12fps, 글자 없음, 소리 sound.ogg(선택) | game-src/art/cutscene/frames/<컷신>/<컷>/0001.png…·timing.json | 제작 중: first_day, first_entry 받음 (2/10편) |
 | docs/GPT요청_컷신.md | (폐기 2026-10-21: 레이어 그림 방식 취소. 넘기지 않음) | — | 폐기 |
+| docs/GPT요청_화면표시.md | HUD·메뉴: 쟈알디 HUD 얼굴 4표정 1장(2×2: 평소·맞음·위급·필살 준비) + 메뉴·HUD 테두리 모음 1장(메뉴 창 9칸 틀·고른 줄 판·얼굴 칸·체력 막대·아이템 칸) = 2장 | game-src/art/ui/raw/<목록 이름>.png | 대기 |
