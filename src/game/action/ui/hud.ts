@@ -1,6 +1,7 @@
 // 게임 HUD: 1280×720 캔버스 위에 그린다. 엔진은 HudState 만 채운다.
-// 왼쪽 위 요원(체력·능력·필살), 가운데 위 층·규칙 변형, 오른쪽 위 재화·총애·규칙서, 아래 탄약·아이템·대사.
-// 터치 버튼이 보이면 compact: 아이템 줄은 터치 버튼이 대신 보여 주고 탄약은 요원 칸 아래로 올라간다.
+// 오락실식: 왼쪽 위 한 묶음(얼굴·체력·필살·탄), 오른쪽 위 구석 층 글자, 왼쪽 아래 아이템 아이콘, 아래 대사.
+// 재화·총애·규칙서 목록은 화면에 늘 띄우지 않는다: 바뀔 때 잠깐 알림, 전체는 일시정지 메뉴(statusHtml).
+// 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
 import { H as H0, W as W0 } from './stage';
 
 // 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
@@ -10,6 +11,8 @@ let W = W0,
 export const FONT = '"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
 
 export interface HudItem {
+  /** 아이템 id (있으면 아이콘 그리개가 이것으로 그린다) */
+  id?: string;
   label: string;
   count: number;
   /** 재사용 대기 0~1 (1 = 막 씀) */
@@ -57,11 +60,15 @@ const C = {
   edge: 'rgba(200,220,230,0.16)',
   text: '#ece6d4',
   dim: '#9aa6ab',
-  hp: '#d8443c',
-  hpLow: '#ff2a2a',
-  trail: '#f3e2c0',
+  hp: '#f6d23a',
+  hpLow: '#ff3a2a',
+  trail: '#e8402c',
+  hpMid: '#f2a62c',
+  frame: '#e8dcb8',
+  name: '#ffe9a8',
   energy: '#4aa8e8',
   gauge: '#f2b632',
+  gaugeFill: '#3ec8f0',
   favorUp: '#f2c94c',
   favorDown: '#d8443c',
   rule: '#a9e0a0',
@@ -112,6 +119,8 @@ export class Hud {
   private lastMoney: Record<string, number> = {};
   private moneyPulse: Record<string, number> = {};
   private itemFlash = [0, 0, 0, 0];
+  /** 마지막으로 그린 상태 (일시정지 메뉴가 재화·총애·규칙을 보여 줄 때 쓴다) */
+  last: HudState | null = null;
   private lastItems: number[] = [];
 
   toast(text: string, color = C.text) {
@@ -135,17 +144,13 @@ export class Hud {
     H = c.canvas.height / k;
     c.setTransform(k, 0, 0, k, 0, 0);
     if (s.prompt) s = { ...s, prompt: { ...s.prompt, x: s.prompt.x / k, y: s.prompt.y / k } };
+    this.last = s;
     this.agent(c, s);
     this.floor(c, s);
-    this.right(c, s);
-    if (s.compact) {
-      if (s.weapon) this.ammoCompact(c, s.weapon);
-    } else {
-      if (s.weapon) this.ammo(c, s.weapon);
-      this.items(c, s.items, s.device);
-    }
+    this.rules(c, s);
+    if (!s.compact) this.items(c, s.items, s.device);
     if (s.boss) this.boss(c, s.boss, s.compact);
-    this.meters(c, s);
+    this.timer(c, s);
     if (s.message) this.message(c, s.message, s.compact);
     if (s.prompt) this.prompt(c, s.prompt, s.device);
     this.drawToasts(c, dt);
@@ -183,212 +188,160 @@ export class Hud {
     if (fk !== this.lastFloor) this.lastFloor = fk;
   }
 
+  /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
   private agent(c: CanvasRenderingContext2D, s: HudState) {
-    const x = 16,
-      y = 14;
-    plate(c, x, y, 404, 96, 10);
-    // 얼굴 칸: 둥근 네모
-    c.save();
-    c.beginPath();
-    c.roundRect(x + 10, y + 10, 72, 72, 12);
-    c.clip();
+    const x = 18,
+      y = 14,
+      fs = 76;
+    // 뒤를 살짝 어둡게 (밝은 배경에서도 읽히게)
+    const g = c.createLinearGradient(0, 0, 440, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0.5)');
+    g.addColorStop(0.75, 'rgba(0,0,0,0.25)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, 440, y + fs + 26);
+    // 얼굴: 검은 테 + 밝은 테
+    c.fillStyle = '#000';
+    c.fillRect(x - 4, y - 4, fs + 8, fs + 8);
+    c.fillStyle = C.frame;
+    c.fillRect(x - 2, y - 2, fs + 4, fs + 4);
     c.fillStyle = s.agent.color ?? '#5a6a74';
-    c.fillRect(x + 10, y + 10, 72, 72);
-    if (s.agent.portrait) c.drawImage(s.agent.portrait, x + 10, y + 10, 72, 72);
-    else label(c, s.agent.name.slice(0, 1), x + 46, y + 60, 36, '#fff', 'center', 800);
-    if (this.hurtT > 0) (c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.6})`), c.fillRect(x + 10, y + 10, 72, 72);
-    c.restore();
-    const bx = x + 94;
-    label(c, s.agent.name, bx, y + 26, 18);
-    if (s.armor) label(c, '◆'.repeat(s.armor), bx + c.measureText(s.agent.name).width + 10, y + 25, 13, C.amber);
-    // 체력: 10 단위 눈금, 깎인 만큼 밝은 띠가 늦게 따라온다
-    const bw = 296,
-      bh = 18,
-      by = y + 34;
-    const low = s.hp / s.maxHp < 0.25;
-    c.fillStyle = 'rgba(0,0,0,0.65)';
+    c.fillRect(x, y, fs, fs);
+    if (s.agent.portrait) c.drawImage(s.agent.portrait, x, y, fs, fs);
+    else label(c, s.agent.name.slice(0, 1), x + fs / 2, y + fs * 0.72, 44, '#fff', 'center', 900);
+    if (this.hurtT > 0) (c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.6})`), c.fillRect(x, y, fs, fs);
+    // 능력(고유기) 재사용: 얼굴 아래 얇은 띠
+    if (s.maxEnergy) bar(c, x - 2, y + fs + 4, fs + 4, 5, (s.energy ?? 0) / s.maxEnergy, '#e8e2d0', '#000');
+    const bx = x + fs + 14,
+      bw = 300;
+    label(c, s.agent.name, bx, y + 20, 22, C.name, 'left', 900);
+    c.font = font(22, 900);
+    let ax = bx + c.measureText(s.agent.name).width + 10;
+    if (s.armor) label(c, '◆'.repeat(s.armor), ax, y + 19, 15, C.amber), (ax += 50);
+    // 체력: 굵은 한 줄. 깎인 만큼 붉은 띠가 늦게 따라온다
+    const by = y + 28,
+      bh = 24;
+    const r = Math.max(0, s.hp) / s.maxHp;
+    const low = r < 0.25;
+    c.fillStyle = '#000';
+    c.fillRect(bx - 3, by - 3, bw + 6, bh + 6);
+    c.fillStyle = '#3a1410';
     c.fillRect(bx, by, bw, bh);
     c.fillStyle = C.trail;
     c.fillRect(bx, by, (bw * this.trail) / s.maxHp, bh);
-    c.fillStyle = low ? (Math.sin(this.t * 10) > 0 ? C.hpLow : C.hp) : C.hp;
-    c.fillRect(bx, by, (bw * Math.max(0, s.hp)) / s.maxHp, bh);
-    c.fillStyle = 'rgba(255,255,255,0.18)';
-    c.fillRect(bx, by, (bw * Math.max(0, s.hp)) / s.maxHp, 5);
-    c.fillStyle = 'rgba(0,0,0,0.45)';
-    for (let v = 10; v < s.maxHp; v += 10) c.fillRect(bx + Math.round((bw * v) / s.maxHp), by, 1, bh);
-    c.strokeStyle = 'rgba(255,255,255,0.25)';
-    c.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
-    label(c, `${Math.ceil(Math.max(0, s.hp))} / ${s.maxHp}`, bx + bw - 6, by + 14, 13, '#fff', 'right');
-    // 능력
-    if (s.maxEnergy) bar(c, bx, by + 26, 200, 6, (s.energy ?? 0) / s.maxEnergy, C.energy);
-    // 필살 게이지
+    const hc = low ? (Math.sin(this.t * 10) > 0 ? C.hpLow : C.hp) : r < 0.5 ? C.hpMid : C.hp;
+    c.fillStyle = hc;
+    c.fillRect(bx, by, bw * r, bh);
+    c.fillStyle = 'rgba(255,255,255,0.35)';
+    c.fillRect(bx, by + 3, bw * r, 4);
+    c.fillStyle = 'rgba(0,0,0,0.25)';
+    c.fillRect(bx, by + bh - 5, bw * r, 5);
+    // 필살 게이지: 체력 아래, 가득 차면 빛남
+    const gy = by + bh + 9,
+      gw = 220,
+      gh = 12;
     const full = s.gauge >= 100;
-    const gy = by + 39;
-    bar(c, bx, gy, 200, 9, s.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gauge);
+    c.fillStyle = '#000';
+    c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
+    bar(c, bx, gy, gw, gh, s.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gaugeFill, '#10181c');
     if (full) {
       c.save();
       c.shadowColor = C.gauge;
       c.shadowBlur = 12 + Math.sin(this.t * 8) * 6;
       c.strokeStyle = C.gauge;
-      c.strokeRect(bx - 1, gy - 1, 202, 11);
+      c.lineWidth = 2;
+      c.strokeRect(bx - 2, gy - 2, gw + 4, gh + 4);
       c.restore();
+      label(c, s.device === 'pad' ? 'RT' : s.device === 'touch' ? '필살' : 'W', bx + gw + 10, gy + 12, 15, C.gauge, 'left', 900);
     }
-    label(c, full ? `필살 ${s.device === 'pad' ? 'RT' : 'W'}` : '필살', bx + 208, gy + 10, 12, full ? C.gauge : C.dim);
-    if (s.maxEnergy) label(c, '능력', bx + 208, by + 33, 12, C.dim);
+    // 탄: 총알 그림 + 큰 숫자
+    if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
+    // 가드 같은 상황 막대는 묶음 아래
+    let my = y + fs + 22;
+    for (const m of s.meters ?? []) {
+      label(c, m.label, x, my + 10, 13, m.color, 'left', 800);
+      bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, '#000');
+      my += 18;
+    }
     // 상태
     let sx = x;
-    const sy = y + (s.compact && s.weapon ? 142 : 102);
     for (const st of s.status ?? []) {
-      c.font = font(12);
+      c.font = font(13, 800);
       const w = c.measureText(st.label).width + 14;
       c.beginPath();
-      c.roundRect(sx, sy, w, 20, 10);
-      c.fillStyle = st.good ? 'rgba(60,140,90,0.85)' : 'rgba(150,50,50,0.85)';
+      c.roundRect(sx, my + 4, w, 22, 11);
+      c.fillStyle = st.good ? 'rgba(60,140,90,0.9)' : 'rgba(150,50,50,0.9)';
       c.fill();
-      label(c, st.label, sx + 7, sy + 15, 12, '#fff');
+      label(c, st.label, sx + 7, my + 20, 13, '#fff', 'left', 800);
       sx += w + 6;
     }
   }
 
+  private ammo(c: CanvasRenderingContext2D, w: NonNullable<HudState['weapon']>, x: number, y: number) {
+    const empty = w.mag <= 0;
+    bullet(c, x + 6, y - 9, empty ? '#7a3a30' : '#f0d890');
+    label(c, String(w.mag), x + 20, y, 26, empty ? C.hpLow : '#fff', 'left', 900);
+    c.font = font(26, 900);
+    const mw = c.measureText(String(w.mag)).width;
+    label(c, `/ ${w.reserve}`, x + 26 + mw, y, 16, C.dim, 'left', 800);
+    c.font = font(16, 800);
+    const ex = x + 34 + mw + c.measureText(`/ ${w.reserve}`).width + 8;
+    if (w.temp) label(c, `${w.temp.name} ${w.temp.uses}회`, ex, y, 15, C.amber, 'left', 800);
+    else if (w.reload != null) {
+      bar(c, ex, y - 12, 90, 8, w.reload, '#e8e0b0', '#000');
+      label(c, '재장전', ex + 98, y, 14, '#e8e0b0', 'left', 800);
+    } else if (w.mag <= Math.ceil(w.magMax * 0.25)) label(c, w.reserve > 0 ? '재장전!' : '탄 없음', ex, y, 15, Math.sin(this.t * 8) > 0 ? C.hpLow : '#fff', 'left', 900);
+  }
+
+  /** 층: 오른쪽 위 구석에 글자만 (판 없음). 바뀔 때는 Fx 층 제목이 크게 알린다 */
   private floor(c: CanvasRenderingContext2D, s: HudState) {
     const f = s.floor;
-    c.font = font(26, 800);
-    const dw = c.measureText(f.depth).width;
-    c.font = font(17);
-    const nw = c.measureText(f.name).width;
-    const w = Math.max(dw + nw + 40, 200);
-    // 터치(compact): 가운데 위는 비워 두고 오른쪽 재화 아래에 붙인다
-    const x = s.compact ? W - 16 - w : W / 2 - w / 2,
-      y = s.compact ? 58 : 12;
-    plate(c, x, y, w, f.variant ? 64 : 44, 10);
-    label(c, f.depth, x + 16, y + 32, 26, '#fff', 'left', 800);
-    label(c, f.name, x + 28 + dw, y + 30, 17, '#d8d0bc');
-    if (f.variant) label(c, `변형 · ${f.variant}`, x + w / 2, y + 54, 13, C.amber, 'center');
+    if (!f.depth) return;
+    label(c, f.depth, W - 20, 44, 32, '#fff', 'right', 900);
+    if (f.variant) label(c, f.variant, W - 20, 68, 15, C.amber, 'right', 800);
   }
 
-  private right(c: CanvasRenderingContext2D, s: HudState) {
-    const m = s.money;
-    const items: [string, number, (c: CanvasRenderingContext2D, x: number, y: number) => void][] = [
-      ['cash', m.cash, iconCash],
-      ['budget', m.budget, iconBudget],
-      ['research', m.research, iconResearch],
-      ['teeth', m.teeth, iconTooth],
-    ];
-    const R = W;
-    const step = s.compact ? 86 : 102,
-      mw = step * 4 + 12;
-    const x0 = R - 16 - mw;
-    plate(c, x0, 12, mw, 40, 10);
-    items.forEach(([k, v, ic], i) => {
-      const x = x0 + 12 + i * step;
-      ic(c, x + 10, 32);
-      const p = this.moneyPulse[k] ?? 0;
-      label(c, String(v), x + 26, 39, 17 + p * 4, p > 0 ? '#fff4c0' : C.text);
-    });
-    // 총애: -3 ~ +3 일곱 칸
-    const down = s.compact ? (s.floor.variant ? 70 : 50) : 0;
-    const fy = 60 + down,
-      fx = R - 16 - 260;
-    plate(c, fx, fy, 260, 34, 10);
-    label(c, '총애', fx + 12, fy + 23, 14, C.dim);
-    for (let i = -3; i <= 3; i++) {
-      const cx = fx + 92 + (i + 3) * 24,
-        cy = fy + 17;
-      const on = (s.favor > 0 && i > 0 && i <= s.favor) || (s.favor < 0 && i < 0 && i >= s.favor);
-      c.beginPath();
-      if (i === 0) c.rect(cx - 2, cy - 7, 4, 14);
-      else c.arc(cx, cy, 7, 0, Math.PI * 2);
-      c.fillStyle = i === 0 ? '#889' : on ? (i > 0 ? C.favorUp : C.favorDown) : 'rgba(255,255,255,0.12)';
-      if (on && this.favorPulse > 0) (c.shadowColor = c.fillStyle as string), (c.shadowBlur = 14 * this.favorPulse);
-      c.fill();
-      c.shadowBlur = 0;
-    }
-    label(c, (s.favor > 0 ? '+' : '') + s.favor, fx + 248, fy + 23, 14, s.favor > 0 ? C.favorUp : s.favor < 0 ? C.favorDown : C.dim, 'right');
-    // 규칙서
-    const rules = s.rules ?? [];
-    if (rules.length || s.ruleCount) {
-      const rh = 30 + rules.length * 22;
-      const rx = R - 16 - 360,
-        ry = 102 + down;
-      plate(c, rx, ry, 360, rh, 10);
-      label(c, '규칙서', rx + 12, ry + 21, 14, C.rule);
-      if (s.ruleCount) label(c, `찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}`, rx + 348, ry + 21, 12, C.dim, 'right');
-      rules.forEach((r, i) => {
-        const col = r.fresh ? (Math.sin(this.t * 9) > 0 ? '#fff6a0' : C.rule) : '#cfd8cf';
-        let t = r.text;
-        c.font = font(13, 600);
-        while (c.measureText(t).width > 330 && t.length > 4) t = t.slice(0, -2);
-        if (t !== r.text) t += '…';
-        label(c, t, rx + 12, ry + 44 + i * 22, 13, col, 'left', 600);
-      });
+  /** 규칙서: 새로 찾은 규칙이 있을 때만 오른쪽 위에 잠깐. 전체 목록은 일시정지 메뉴 */
+  private rules(c: CanvasRenderingContext2D, s: HudState) {
+    const fresh = (s.rules ?? []).filter((r) => r.fresh);
+    if (!fresh.length) return;
+    let y = s.floor.variant ? 96 : 76;
+    if (s.boss && s.compact) y += 34;
+    for (const r of fresh.slice(-3)) {
+      let t = r.text;
+      c.font = font(15, 800);
+      while (c.measureText(t).width > 380 && t.length > 4) t = t.slice(0, -2);
+      if (t !== r.text) t += '…';
+      label(c, `규칙 · ${t}`, W - 20, y + 16, 15, Math.sin(this.t * 9) > 0 ? '#fff6a0' : C.rule, 'right', 800);
+      y += 24;
     }
   }
 
-  private ammo(c: CanvasRenderingContext2D, w: NonNullable<HudState['weapon']>) {
-    const x = 16,
-      y = H - 16 - 74;
-    plate(c, x, y, 280, 74, 10);
-    label(c, w.temp ? `${w.temp.name} · ${w.temp.uses}회` : w.name, x + 12, y + 22, 13, w.temp ? C.amber : C.dim);
-    const empty = w.mag <= 0;
-    label(c, String(w.mag), x + 12, y + 60, 32, empty ? C.hpLow : '#fff', 'left', 800);
-    c.font = font(32, 800);
-    const mw = c.measureText(String(w.mag)).width;
-    label(c, `/ ${w.reserve}`, x + 18 + mw, y + 60, 16, C.dim);
-    // 탄창 눈금 또는 재장전
-    const px = x + 120,
-      py = y + 36;
-    if (w.reload != null) {
-      bar(c, px, py + 6, 148, 10, w.reload, '#e8e0b0');
-      label(c, '재장전', px, py + 34, 13, '#e8e0b0');
-    } else {
-      const n = Math.min(w.magMax, 24);
-      const step = 148 / n;
-      for (let i = 0; i < n; i++) {
-        const filled = i < Math.ceil((w.mag / w.magMax) * n);
-        c.fillStyle = filled ? '#f0d890' : 'rgba(255,255,255,0.12)';
-        c.fillRect(px + i * step, py, Math.max(2, step - 2), 22);
-      }
-      if (w.mag <= Math.ceil(w.magMax * 0.25)) label(c, w.reserve > 0 ? 'R 재장전' : '탄 없음', px, py + 40, 12, C.hpLow);
-    }
-  }
-  private ammoCompact(c: CanvasRenderingContext2D, w: NonNullable<HudState['weapon']>) {
-    const x = 16,
-      y = 116;
-    plate(c, x, y, 220, 34, 9);
-    label(c, `${w.mag}`, x + 12, y + 25, 20, w.mag <= 0 ? C.hpLow : '#fff', 'left', 800);
-    label(c, `/ ${w.reserve}`, x + 46, y + 24, 13, C.dim);
-    if (w.reload != null) bar(c, x + 96, y + 13, 110, 8, w.reload, '#e8e0b0');
-    else {
-      const n = Math.min(w.magMax, 16),
-        step = 110 / n;
-      for (let i = 0; i < n; i++) {
-        c.fillStyle = i < Math.ceil((w.mag / w.magMax) * n) ? '#f0d890' : 'rgba(255,255,255,0.12)';
-        c.fillRect(x + 96 + i * step, y + 9, Math.max(2, step - 2), 16);
-      }
-    }
-  }
-
+  /** 아이템: 아이콘만 (글자 없음), 왼쪽 아래. 터치 화면에서는 터치 버튼이 대신 보여 준다 */
   private items(c: CanvasRenderingContext2D, items: HudItem[], device?: string) {
     const n = 4,
-      s = 62,
+      s = 56,
       g = 8;
-    const x0 = W / 2 - (n * s + (n - 1) * g) / 2,
+    const x0 = 18,
       y = H - 16 - s;
     const padKeys = ['↑', '→', '↓', '←'];
     for (let i = 0; i < n; i++) {
       const it = items[i] ?? { label: '', count: 0 };
       const x = x0 + i * (s + g);
-      plate(c, x, y, s, s, 9);
-      if (this.itemFlash[i] > 0) {
-        c.fillStyle = `rgba(255,240,180,${this.itemFlash[i]})`;
-        c.beginPath();
-        c.roundRect(x, y, s, s, 9);
-        c.fill();
-      }
       const dim = it.count <= 0;
-      label(c, it.label, x + s / 2, y + 38, 15, dim ? '#5a6266' : C.text, 'center');
-      label(c, device === 'pad' ? padKeys[i] : String(i + 1), x + 7, y + 17, 12, C.dim);
-      label(c, `${it.count}`, x + s - 7, y + s - 7, 14, dim ? '#5a6266' : '#fff', 'right');
+      c.fillStyle = '#000';
+      c.fillRect(x - 2, y - 2, s + 4, s + 4);
+      c.fillStyle = dim ? 'rgba(30,34,38,0.8)' : 'rgba(44,50,56,0.92)';
+      c.fillRect(x, y, s, s);
+      if (this.itemFlash[i] > 0) (c.fillStyle = `rgba(255,240,180,${this.itemFlash[i]})`), c.fillRect(x, y, s, s);
+      if (it.label || it.id) {
+        c.save();
+        c.globalAlpha = dim ? 0.3 : 1;
+        drawHudItemIcon(c, it, x + 6, y + 6, s - 12);
+        c.restore();
+      }
+      label(c, device === 'pad' ? padKeys[i] : String(i + 1), x + 4, y + 14, 12, C.dim, 'left', 800);
+      if (it.label || it.id) label(c, `${it.count}`, x + s - 4, y + s - 4, 17, dim ? '#6a7276' : '#fff', 'right', 900);
       if (it.cd && it.cd > 0) {
         c.save();
         c.beginPath();
@@ -418,19 +371,10 @@ export class Hud {
     c.strokeRect(x + 0.5, y + 0.5, w - 1, 13);
   }
 
-  private meters(c: CanvasRenderingContext2D, s: HudState) {
-    let y = s.floor.variant ? 96 : 76;
-    if (s.boss && s.compact) y += 34;
-    if (s.timer) {
-      const t = Math.max(0, s.timer.sec);
-      label(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, W / 2, y + 18, 20, t < 10 ? C.hpLow : '#bfe0f0', 'center', 800);
-      y += 30;
-    }
-    for (const m of s.meters ?? []) {
-      label(c, m.label, W / 2 - 110, y + 11, 12, m.color, 'right');
-      bar(c, W / 2 - 100, y + 2, 200, 9, m.v / m.max, m.color);
-      y += 18;
-    }
+  private timer(c: CanvasRenderingContext2D, s: HudState) {
+    if (!s.timer) return;
+    const t = Math.max(0, s.timer.sec);
+    label(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, W / 2, 40, 26, t < 10 ? C.hpLow : '#bfe0f0', 'center', 900);
   }
 
   private message(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
@@ -466,7 +410,7 @@ export class Hud {
   }
 
   private drawToasts(c: CanvasRenderingContext2D, dt: number) {
-    let y = 160;
+    let y = 196;
     for (const t of this.toasts) {
       t.t += dt;
       const a = t.t < 0.15 ? t.t / 0.15 : t.t > 2.2 ? Math.max(0, 1 - (t.t - 2.2) / 0.5) : 1;
@@ -485,50 +429,70 @@ export function drawHud(c: CanvasRenderingContext2D, s: HudState, dt = 1 / 60) {
   shared.draw(c, s, dt);
 }
 
-// 재화 아이콘 (그림 대신 도형)
-function iconCash(c: CanvasRenderingContext2D, x: number, y: number) {
-  c.fillStyle = '#5fae6a';
-  c.fillRect(x - 10, y - 6, 20, 12);
-  c.strokeStyle = '#d8f0d0';
-  c.lineWidth = 1;
-  c.strokeRect(x - 9.5, y - 5.5, 19, 11);
+/** 총알 하나 (탄 숫자 옆) */
+function bullet(c: CanvasRenderingContext2D, x: number, y: number, color: string) {
+  c.fillStyle = '#000';
+  c.fillRect(x - 5, y - 12, 10, 26);
+  c.fillStyle = color;
   c.beginPath();
-  c.arc(x, y, 3, 0, Math.PI * 2);
-  c.stroke();
-}
-function iconBudget(c: CanvasRenderingContext2D, x: number, y: number) {
-  c.fillStyle = '#d8b040';
-  c.beginPath();
-  c.arc(x, y, 8, 0, Math.PI * 2);
-  c.fill();
-  c.fillStyle = '#7a5a10';
-  c.font = font(10, 800);
-  c.textAlign = 'center';
-  c.fillText('결', x, y + 4);
-}
-function iconResearch(c: CanvasRenderingContext2D, x: number, y: number) {
-  c.fillStyle = '#5aa8e0';
-  c.beginPath();
-  c.moveTo(x - 3, y - 8);
-  c.lineTo(x + 3, y - 8);
-  c.lineTo(x + 3, y - 2);
-  c.lineTo(x + 8, y + 7);
-  c.lineTo(x - 8, y + 7);
-  c.lineTo(x - 3, y - 2);
+  c.moveTo(x - 3, y + 12);
+  c.lineTo(x - 3, y - 4);
+  c.quadraticCurveTo(x, y - 12, x + 3, y - 4);
+  c.lineTo(x + 3, y + 12);
   c.closePath();
   c.fill();
+  c.fillStyle = 'rgba(0,0,0,0.35)';
+  c.fillRect(x - 3, y + 4, 6, 2);
 }
-function iconTooth(c: CanvasRenderingContext2D, x: number, y: number) {
-  c.fillStyle = '#f2efe6';
-  c.beginPath();
-  c.moveTo(x - 7, y - 6);
-  c.quadraticCurveTo(x, y - 10, x + 7, y - 6);
-  c.lineTo(x + 5, y + 8);
-  c.lineTo(x + 1, y + 2);
-  c.lineTo(x - 1, y + 2);
-  c.lineTo(x - 5, y + 8);
-  c.closePath();
-  c.fill();
+
+/** 아이템 아이콘 그리개. 아이템 모듈의 drawItemIcon(ctx, id, x, y, size) 을 엔진이 setHudItemIcon 으로 넘긴다.
+ *  id 가 없거나 그리개가 없으면 이름으로 고른 간단한 도형을 그린다 (글자는 쓰지 않는다) */
+type IconDrawer = (c: CanvasRenderingContext2D, id: string, x: number, y: number, size: number) => void;
+let iconDrawer: IconDrawer | null = null;
+export function setHudItemIcon(fn: IconDrawer | null) {
+  iconDrawer = fn;
+}
+export function drawHudItemIcon(c: CanvasRenderingContext2D, it: { id?: string; label: string }, x: number, y: number, size: number) {
+  if (it.id && iconDrawer) return iconDrawer(c, it.id, x, y, size);
+  c.save();
+  c.translate(x, y);
+  c.scale(size / 32, size / 32);
+  const l = it.label;
+  const f = (col: string, ...r: number[]) => {
+    c.fillStyle = col;
+    for (let i = 0; i < r.length; i += 4) c.fillRect(r[i], r[i + 1], r[i + 2], r[i + 3]);
+  };
+  if (/붕대|봉대|밴드/.test(l)) f('#e8e2d0', 4, 11, 24, 10), f('#c9c0a8', 4, 11, 24, 2, 4, 19, 24, 2), f('#d65a5a', 14, 13, 4, 6, 13, 14, 6, 4);
+  else if (/섬광|수류|폭탄|탄$/.test(l)) {
+    f('#e08a3c', 9, 10, 14, 18), f('#9aa4ab', 12, 5, 8, 6), f('#4a5258', 19, 3, 6, 3), f('#fff3b0', 12, 14, 3, 8);
+  } else if (/주사|각성|제$/.test(l)) {
+    f('#9aa4ab', 6, 24, 4, 4), f('#e8ecee', 9, 9, 8, 16), f('#9a7fd1', 10, 14, 6, 10), f('#4a5258', 11, 5, 4, 5, 8, 3, 10, 3), f('#d8d8d8', 12, 25, 2, 6);
+  } else if (/약|물약|회복|포션/.test(l)) {
+    f('#4a5258', 13, 3, 6, 4), f('#c8d0d4', 12, 7, 8, 4), f('#5fbf6a', 7, 11, 18, 18), f('#9be0a3', 9, 13, 4, 8), f('#e8ecee', 13, 17, 6, 2, 15, 15, 2, 6);
+  } else if (/부적|봉인|종이/.test(l)) f('#e6d36a', 8, 4, 16, 24), f('#d65a5a', 11, 8, 10, 2, 15, 8, 2, 16, 11, 16, 10, 2);
+  else if (/열쇠|키$/.test(l)) f('#d6b64a', 4, 10, 10, 10, 14, 14, 16, 3, 24, 17, 3, 5, 19, 17, 3, 4), f('#2c383e', 7, 13, 4, 4);
+  else if (/손전등|등$/.test(l)) f('#4a5258', 4, 12, 16, 8), f('#9aa4ab', 20, 9, 6, 14), f('#fff3b0', 26, 10, 3, 12);
+  else {
+    // 모르는 물건: 상자
+    f('#a07850', 6, 9, 20, 18), f('#7a5838', 6, 9, 20, 4), f('#d6b64a', 14, 9, 4, 18);
+  }
+  c.restore();
+}
+
+/** 일시정지 메뉴에 넣을 지금 상태 (재화·총애·층·규칙서). 화면에 늘 띄우지 않는 것들 */
+export function statusHtml(s: HudState | null): string {
+  if (!s) return '';
+  const esc = (t: string) => t.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
+  const m = s.money;
+  const fav = s.favor > 0 ? `+${s.favor}` : String(s.favor);
+  const rows = [
+    s.floor.depth || s.floor.name ? `<tr><th>층</th><td>${esc([s.floor.depth, s.floor.name].filter(Boolean).join(' · '))}${s.floor.variant ? ` · ${esc(s.floor.variant)}` : ''}</td></tr>` : '',
+    `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget} · 연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
+    `<tr><th>승강기 총애</th><td>${fav}</td></tr>`,
+    s.ruleCount ? `<tr><th>규칙서</th><td>찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}</td></tr>` : '',
+    ...(s.rules ?? []).map((r) => `<tr><th></th><td>${esc(r.text)}</td></tr>`),
+  ];
+  return `<table>${rows.join('')}</table>`;
 }
 
 /** 지도 (Z): 가 본 층 목록 + 지금 층 띠 */
