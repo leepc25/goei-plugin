@@ -20,6 +20,7 @@ export { GUARDIANS, GUARDIAN_FOR } from './guardians';
 export { budgetFor, planEncounter, spawnWave, guardianSpawn, rollIntrusion, poolFor, SCREEN_CAP } from './spawn';
 export { setDropHook, rollDrops, DROP_LABEL } from './drops';
 export { moveJson, moveTiming } from './frames';
+export { arenaStage } from './arenaStage';
 export type { EnemyDef } from './roster';
 export type { GuardianDef } from './guardians';
 

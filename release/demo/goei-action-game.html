@@ -5050,20 +5050,20 @@ function reportPayload(s2) {
 // src/game/action/hq/runmenu.ts
 var iconDrawer = null;
 var ICON_COLOR = { heal: "#d05050", guard: "#5080d0", energy: "#d0b040", torch: "#e0e0a0", salt: "#e8e8e8", flash: "#f0f070" };
-function drawIcon(ctx, id, x, y, size) {
-  if (iconDrawer) return iconDrawer(ctx, id, x, y, size);
+function drawIcon(ctx, id, x, y, size2) {
+  if (iconDrawer) return iconDrawer(ctx, id, x, y, size2);
   ctx.fillStyle = ICON_COLOR[id] ?? "#8a8a8a";
-  ctx.fillRect(x + 4, y + 4, size - 8, size - 8);
+  ctx.fillRect(x + 4, y + 4, size2 - 8, size2 - 8);
   ctx.fillStyle = "#111";
-  ctx.font = `${Math.round(size * 0.45)}px sans-serif`;
+  ctx.font = `${Math.round(size2 * 0.45)}px sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(itemName(id).slice(0, 1), x + size / 2, y + size / 2 + 1);
+  ctx.fillText(itemName(id).slice(0, 1), x + size2 / 2, y + size2 / 2 + 1);
 }
-function iconCanvas(id, size = 40) {
+function iconCanvas(id, size2 = 40) {
   const c = document.createElement("canvas");
-  c.width = c.height = size;
-  drawIcon(c.getContext("2d"), id, 0, 0, size);
+  c.width = c.height = size2;
+  drawIcon(c.getContext("2d"), id, 0, 0, size2);
   c.className = "hq-icon";
   return c;
 }
@@ -5627,7 +5627,7 @@ function idbSaves(dbName = "goei-hq-demo") {
 }
 
 // src/game/action/ui/ui.css
-var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.62); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.item u { position: absolute; right: 6px; bottom: 4px; text-decoration: none; font-size: calc(var(--tp-u) * 0.18); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 7px; top: 4px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
+var ui_default = '.gs { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000; outline: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #ece6d4; color-scheme: dark; }\n.gs *, .gs *::before, .gs *::after { box-sizing: border-box; }\n.gs-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; background: #05080c; }\n.gs-canvas { display: block; width: 1280px; height: 720px; }\n.gs-stage .gs-ui, .gs-stage .gs-crt { right: 0; width: auto; }\n.gs.pixel .gs-canvas { image-rendering: pixelated; }\n\n/* CRT: 주사선 + 모서리 어둡게 + 둥근 화면 + 약한 깜빡임 */\n.gs-crt { position: absolute; inset: 0; pointer-events: none; display: none; }\n.gs.crt .gs-crt { display: block; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0) 4px), radial-gradient(ellipse at center, rgba(0,0,0,0) 58%, rgba(0,0,0,0.55) 100%); box-shadow: inset 0 0 90px rgba(0,0,0,0.75), inset 0 0 14px rgba(120,200,255,0.12); border-radius: 26px / 34px; animation: gs-flick 0.12s steps(2) infinite; }\n.gs.crt .gs-canvas { border-radius: 26px / 34px; filter: saturate(1.12) contrast(1.06); }\n.gs.crt .gs-crt::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to right, rgba(255,0,0,0.035) 0, rgba(0,255,0,0.025) 1px, rgba(0,0,255,0.035) 2px); mix-blend-mode: screen; }\n@keyframes gs-flick { 0% { opacity: 0.94; } 100% { opacity: 1; } }\n\n.gs-ui { position: absolute; inset: 0; pointer-events: none; }\n.gs-ui.menu-on { pointer-events: auto; }\n.gs-touch { position: absolute; inset: 0; pointer-events: none; }\n\n/* 세로 화면 안내 */\n.gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }\n.gs-rotate.on { display: flex; }\n.gs-rotate b { font-size: 20px; }\n.gs-rotate span { font-size: 14px; color: #9aa6ab; }\n.gs-rot-ico { width: 56px; height: 90px; border: 3px solid #ece6d4; border-radius: 10px; animation: gs-rot 2.2s ease-in-out infinite; margin-bottom: 8px; }\n@keyframes gs-rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }\n.gs-rot-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }\n.gs-rot-row button { font: inherit; font-size: 15px; font-weight: 700; color: #ece6d4; background: #1d2a31; border: 1px solid #4a5a62; border-radius: 10px; padding: 12px 18px; }\n.gs-rot-row button:first-child { background: #6a4a1c; border-color: #c08a3a; }\n\n/* 터치 버튼 */\n.tp { position: absolute; inset: 0; pointer-events: auto; touch-action: none; --tp-u: 64px; --tp-a: 0.75; }\n.tp.hide { display: none; }\n.tp-zone { position: absolute; }\n.tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-u) * 2); height: calc(var(--tp-u) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }\n.tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }\n.tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-u) * 0.95); height: calc(var(--tp-u) * 0.95); margin: calc(var(--tp-u) * -0.475) 0 0 calc(var(--tp-u) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }\n.tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.62); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }\n.tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }\n.tp-b i { font-style: normal; font-size: calc(var(--tp-u) * 0.15); color: #9aa6ab; margin-top: 2px; }\n.tp-b.big { background: rgba(110,40,30,0.62); border-color: rgba(255,170,140,0.55); }\n.tp-b.big b { font-size: calc(var(--tp-u) * 0.32); }\n.tp-b.small b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.top { border-radius: 12px; }\n.tp-b.top b { font-size: calc(var(--tp-u) * 0.22); }\n.tp-b.item { border-radius: 14px; }\n.tp-b.item b { font-size: calc(var(--tp-u) * 0.2); }\n.tp-b.item u { position: absolute; right: 6px; bottom: 4px; text-decoration: none; font-size: calc(var(--tp-u) * 0.18); font-weight: 800; }\n.tp-b.item i { position: absolute; left: 7px; top: 4px; margin: 0; }\n.tp-b.item.empty { opacity: calc(var(--tp-a) * 0.45); }\n.tp-b.on { background: rgba(236,230,212,0.5); border-color: #fff; transform-origin: center; filter: brightness(1.3); }\n.tp-b.hint { border-color: #f2c94c; box-shadow: 0 0 14px rgba(242,201,76,0.7); }\n.tp-b[data-id="ult"] { overflow: visible; }\n.tp-ring { position: absolute; inset: -5px; border-radius: 50%; background: conic-gradient(#f2b632 calc(var(--g, 0) * 360deg), rgba(255,255,255,0.08) 0); -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%); mask: radial-gradient(circle, transparent 62%, #000 64%); }\n.tp-b.full { border-color: #f2b632; box-shadow: 0 0 18px rgba(242,182,50,0.9); animation: tp-pulse 0.6s ease-in-out infinite alternate; }\n@keyframes tp-pulse { from { filter: brightness(1); } to { filter: brightness(1.5); } }\n\n/* 메뉴 */\n.mn { position: absolute; inset: 0; display: none; }\n.mn.on { display: flex; align-items: center; justify-content: center; background: rgba(2,4,7,0.62); backdrop-filter: blur(2px); }\n.mn-box { position: relative; width: 560px; max-height: 640px; display: flex; flex-direction: column; background: linear-gradient(180deg, rgba(20,28,34,0.97), rgba(11,16,20,0.97)); border: 1px solid #3a4a52; border-radius: 16px; padding: 26px 28px 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }\n.mn-wide .mn-box { width: 900px; }\n.mn h2 { margin: 0 0 4px; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }\n.mn-sub { margin: 0 0 12px; color: #9aa6ab; font-size: 16px; }\n.mn-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; margin-top: 8px; scrollbar-width: thin; }\n.mn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 52px; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid transparent; font: inherit; font-size: 19px; font-weight: 700; color: #ece6d4; text-align: left; cursor: pointer; }\n.mn-row.f { background: rgba(240,180,90,0.16); border-color: rgba(240,180,90,0.75); }\n.mn-btn { width: 100%; justify-content: flex-start; }\n.mn-btn small { margin-left: auto; color: #9aa6ab; font-size: 14px; font-weight: 600; }\n.mn-btn em { font-style: normal; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: #ece6d4; color: #111; font-size: 15px; font-weight: 800; flex: none; }\n.mn-btn.danger span { color: #ff9a8a; }\n.mn-btn:disabled { opacity: 0.4; }\n.mn-head { margin: 12px 4px 0; font-size: 14px; font-weight: 800; color: #f0b45a; letter-spacing: 1px; }\n.mn-html { font-size: 17px; line-height: 1.55; color: #d8d0bc; padding: 0 4px; }\n.mn-html p { margin: 0 0 6px; }\n.mn-html table { width: 100%; border-collapse: collapse; font-size: 15px; }\n.mn-html th, .mn-html td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }\n.mn-html th { color: #9aa6ab; font-weight: 700; }\n.mn-html kbd { display: inline-block; min-width: 24px; padding: 1px 7px; border-radius: 5px; background: #ece6d4; color: #111; font: 800 13px/20px inherit; text-align: center; margin: 1px; }\n.mn-tog { width: 52px; height: 28px; border-radius: 14px; background: #2c383e; position: relative; flex: none; }\n.mn-tog i { position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #9aa6ab; transition: left 0.12s; }\n.mn-tog.on { background: #8a5a1c; }\n.mn-tog.on i { left: 27px; background: #ffd890; }\n.mn-sl { display: flex; align-items: center; gap: 8px; }\n.mn-sl b { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; background: #2c383e; font-size: 20px; }\n.mn-bar { width: 160px; height: 10px; background: #2c383e; border-radius: 5px; overflow: hidden; padding: 0; }\n.mn-bar i { display: block; height: 100%; background: #f0b45a; }\n.mn-sl em { font-style: normal; width: 52px; text-align: right; color: #d8d0bc; font-size: 16px; }\n.mn-ch { display: flex; gap: 4px; }\n.mn-ch b { padding: 6px 12px; border-radius: 8px; background: #2c383e; font-size: 15px; }\n.mn-ch b.on { background: #8a5a1c; color: #ffe6b8; }\n.mn-x { position: absolute; right: 14px; top: 14px; width: 44px; height: 44px; border-radius: 10px; border: 0; background: rgba(255,255,255,0.06); color: #ece6d4; font-size: 20px; cursor: pointer; }\n\n/* 타이틀 */\n.mn-title.on { background: radial-gradient(ellipse at 50% 30%, rgba(0,0,0,0) 0, rgba(0,0,0,0.55) 80%); backdrop-filter: none; justify-content: flex-start; padding-left: 110px; }\n.mn-title .mn-box { background: none; border: 0; box-shadow: none; width: 520px; padding: 0; }\n.mn-logo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 30px; }\n.mn-logo small { font-size: 18px; letter-spacing: 6px; color: #f0b45a; font-weight: 700; }\n.mn-logo b { font-size: 68px; font-weight: 900; letter-spacing: -2px; line-height: 1; text-shadow: 0 0 24px rgba(255,120,60,0.35), 0 3px 0 #000; }\n.mn-logo span { font-size: 18px; color: #9aa6ab; }\n.mn-title .mn-row { background: rgba(10,14,18,0.6); font-size: 22px; }\n\n/* 선택지 (대화·승강기) */\n.mn-dialog.on { align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 60%); backdrop-filter: none; padding-bottom: 28px; }\n.mn-dialog .mn-box { width: 920px; max-height: 470px; }\n.mn-dialog h2 { font-size: 24px; color: #ffd890; }\n';
 
 // src/game/action/ui/stage.ts
 var W = 1280;
@@ -5645,16 +5645,18 @@ function mountStage(box2) {
   const root = document.createElement("div");
   root.className = "gs";
   root.tabIndex = 0;
-  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>가로로 돌려 주세요</b><span>세로에서도 할 수 있지만 화면이 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="fs">전체 화면 · 가로</button><button type="button" data-rot="keep">세로로 계속</button></div></div>`;
+  root.innerHTML = `<div class="gs-stage"><canvas class="gs-canvas" width="${W}" height="${H}" aria-label="게임 화면"></canvas><div class="gs-crt"></div><div class="gs-ui"></div></div><div class="gs-touch"></div><div class="gs-rotate"><div class="gs-rot-ico"></div><b>폰을 가로로 돌려 주세요</b><span>세로 그대로면 화면이 아주 작습니다</span><div class="gs-rot-row"><button type="button" data-rot="turn">화면 돌려서 크게</button><button type="button" data-rot="keep">세로로 작게</button></div></div>`;
   box2.append(root);
   const stageEl = root.querySelector(".gs-stage");
   const canvas = root.querySelector("canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
   const ui = root.querySelector(".gs-ui");
-  const touch = root.querySelector(".gs-touch");
+  const touch2 = root.querySelector(".gs-touch");
   const rotate = root.querySelector(".gs-rotate");
   const fns = [];
   let keepPortrait = false;
+  let fill = false;
+  let turn = false;
   const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
   const s2 = {
     root,
@@ -5662,12 +5664,29 @@ function mountStage(box2) {
     canvas,
     ctx,
     ui,
-    touch,
+    touch: touch2,
     scale: 1,
+    vw: W,
+    setFit(mode) {
+      fill = mode === "fill";
+      layout();
+    },
     portrait: false,
+    turned: false,
+    toLocal(cx, cy, el) {
+      if (!s2.turned) {
+        const r = el.getBoundingClientRect();
+        return { x: cx - r.left, y: cy - r.top };
+      }
+      const b = box2.getBoundingClientRect();
+      let x = cy - b.top, y = b.width - (cx - b.left);
+      for (let n = el; n && n !== root; n = n.offsetParent) x -= n.offsetLeft, y -= n.offsetTop;
+      return { x, y };
+    },
     toGame(cx, cy) {
-      const r = stageEl.getBoundingClientRect();
-      return { x: (cx - r.left) / r.width * W, y: (cy - r.top) / r.height * H };
+      const p = s2.toLocal(cx, cy, root);
+      const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(stageEl.style.transform);
+      return { x: (p.x - (m ? +m[1] : 0)) / s2.scale, y: (p.y - (m ? +m[2] : 0)) / s2.scale };
     },
     onResize(fn) {
       fns.push(fn);
@@ -5695,14 +5714,27 @@ function mountStage(box2) {
     }
   };
   const layout = () => {
+    const ow = box2.clientWidth, oh = box2.clientHeight;
+    const turnNow = turn && oh > ow * 1.05;
+    if (turnNow !== s2.turned || turnNow) {
+      s2.turned = turnNow;
+      root.classList.toggle("turned", turnNow);
+      Object.assign(root.style, turnNow ? { position: "absolute", left: "0", top: "0", width: `${oh}px`, height: `${ow}px`, transformOrigin: "0 0", transform: `translate(${ow}px, 0) rotate(90deg)` } : { position: "", left: "", top: "", width: "", height: "", transformOrigin: "", transform: "" });
+    }
     const bw = root.clientWidth, bh = root.clientHeight;
     if (!bw || !bh) return;
     const portrait = bh > bw * 1.05;
     s2.portrait = portrait;
     root.classList.toggle("portrait", portrait);
-    const scale = Math.min(bw / W, bh / H);
+    const vw = fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round(H * bw / bh)) : W;
+    if (vw !== s2.vw || canvas.width !== vw) {
+      s2.vw = vw;
+      canvas.width = vw;
+      canvas.style.width = stageEl.style.width = `${vw}px`;
+    }
+    const scale = Math.min(bw / vw, bh / H);
     s2.scale = scale;
-    const w = W * scale, h = H * scale;
+    const w = vw * scale, h = H * scale;
     const top = portrait ? portraitTop(bh, h) : (bh - h) / 2;
     stageEl.style.transform = `translate(${Math.round((bw - w) / 2)}px, ${Math.round(top)}px) scale(${scale})`;
     root.style.setProperty("--gs-scale", String(scale));
@@ -5715,16 +5747,19 @@ function mountStage(box2) {
     const b = e.target.closest("[data-rot]");
     if (!b) return;
     keepPortrait = true;
-    if (b.dataset.rot === "fs") void s2.fullscreen();
+    if (b.dataset.rot === "turn") turn = true;
     layout();
   });
   const ro = new ResizeObserver(layout);
   ro.observe(root);
+  ro.observe(box2);
   layout();
   return s2;
 }
 
 // src/game/action/ui/hud.ts
+var W2 = W;
+var H2 = H;
 var FONT = '"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
 var C = {
   plate: "rgba(7,11,15,0.84)",
@@ -5741,15 +5776,15 @@ var C = {
   rule: "#a9e0a0",
   amber: "#f0b45a"
 };
-function font(size, weight = 700) {
-  return `${weight} ${size}px ${FONT}`;
+function font(size2, weight = 700) {
+  return `${weight} ${size2}px ${FONT}`;
 }
-function label(c, s2, x, y, size = 16, color = C.text, align = "left", weight = 700) {
-  c.font = font(size, weight);
+function label(c, s2, x, y, size2 = 16, color = C.text, align = "left", weight = 700) {
+  c.font = font(size2, weight);
   c.textAlign = align;
   c.textBaseline = "alphabetic";
   c.lineJoin = "round";
-  c.lineWidth = Math.max(3, size / 4.5);
+  c.lineWidth = Math.max(3, size2 / 4.5);
   c.strokeStyle = "rgba(0,0,0,0.85)";
   c.strokeText(s2, x, y);
   c.fillStyle = color;
@@ -5799,7 +5834,11 @@ var Hud = class {
     this.t += dt;
     this.track(s2, dt);
     c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
+    const k = s2.scale ?? (s2.compact ? 1.2 : 1);
+    W2 = c.canvas.width / k;
+    H2 = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    if (s2.prompt) s2 = { ...s2, prompt: { ...s2.prompt, x: s2.prompt.x / k, y: s2.prompt.y / k } };
     this.agent(c, s2);
     this.floor(c, s2);
     this.right(c, s2);
@@ -5911,11 +5950,11 @@ var Hud = class {
     c.font = font(17);
     const nw = c.measureText(f.name).width;
     const w = Math.max(dw + nw + 40, 200);
-    const x = W / 2 - w / 2;
-    plate(c, x, 12, w, f.variant ? 64 : 44, 10);
-    label(c, f.depth, x + 16, 44, 26, "#fff", "left", 800);
-    label(c, f.name, x + 28 + dw, 42, 17, "#d8d0bc");
-    if (f.variant) label(c, `변형 · ${f.variant}`, W / 2, 66, 13, C.amber, "center");
+    const x = s2.compact ? W2 - 16 - w : W2 / 2 - w / 2, y = s2.compact ? 58 : 12;
+    plate(c, x, y, w, f.variant ? 64 : 44, 10);
+    label(c, f.depth, x + 16, y + 32, 26, "#fff", "left", 800);
+    label(c, f.name, x + 28 + dw, y + 30, 17, "#d8d0bc");
+    if (f.variant) label(c, `변형 · ${f.variant}`, x + w / 2, y + 54, 13, C.amber, "center");
   }
   right(c, s2) {
     const m = s2.money;
@@ -5925,15 +5964,18 @@ var Hud = class {
       ["research", m.research, iconResearch],
       ["teeth", m.teeth, iconTooth]
     ];
-    const x0 = W - 16 - 420;
-    plate(c, x0, 12, 420, 40, 10);
+    const R = W2;
+    const step2 = s2.compact ? 86 : 102, mw = step2 * 4 + 12;
+    const x0 = R - 16 - mw;
+    plate(c, x0, 12, mw, 40, 10);
     items.forEach(([k, v, ic], i) => {
-      const x = x0 + 12 + i * 102;
+      const x = x0 + 12 + i * step2;
       ic(c, x + 10, 32);
       const p = this.moneyPulse[k] ?? 0;
       label(c, String(v), x + 26, 39, 17 + p * 4, p > 0 ? "#fff4c0" : C.text);
     });
-    const fy = 60, fx = W - 16 - 260;
+    const down2 = s2.compact ? s2.floor.variant ? 70 : 50 : 0;
+    const fy = 60 + down2, fx = R - 16 - 260;
     plate(c, fx, fy, 260, 34, 10);
     label(c, "총애", fx + 12, fy + 23, 14, C.dim);
     for (let i = -3; i <= 3; i++) {
@@ -5951,7 +5993,7 @@ var Hud = class {
     const rules = s2.rules ?? [];
     if (rules.length || s2.ruleCount) {
       const rh = 30 + rules.length * 22;
-      const rx = W - 16 - 360, ry = 102;
+      const rx = R - 16 - 360, ry = 102 + down2;
       plate(c, rx, ry, 360, rh, 10);
       label(c, "규칙서", rx + 12, ry + 21, 14, C.rule);
       if (s2.ruleCount) label(c, `찾음 ${s2.ruleCount.found} · 송신 ${s2.ruleCount.sent}`, rx + 348, ry + 21, 12, C.dim, "right");
@@ -5966,7 +6008,7 @@ var Hud = class {
     }
   }
   ammo(c, w) {
-    const x = 16, y = H - 16 - 74;
+    const x = 16, y = H2 - 16 - 74;
     plate(c, x, y, 280, 74, 10);
     label(c, w.temp ? `${w.temp.name} · ${w.temp.uses}회` : w.name, x + 12, y + 22, 13, w.temp ? C.amber : C.dim);
     const empty = w.mag <= 0;
@@ -6005,7 +6047,7 @@ var Hud = class {
   }
   items(c, items, device) {
     const n = 4, s2 = 62, g2 = 8;
-    const x0 = W / 2 - (n * s2 + (n - 1) * g2) / 2, y = H - 16 - s2;
+    const x0 = W2 / 2 - (n * s2 + (n - 1) * g2) / 2, y = H2 - 16 - s2;
     const padKeys = ["↑", "→", "↓", "←"];
     for (let i = 0; i < n; i++) {
       const it = items[i] ?? { label: "", count: 0 };
@@ -6035,7 +6077,7 @@ var Hud = class {
     }
   }
   boss(c, b, compact) {
-    const w = 640, x = W / 2 - w / 2, y = compact ? 84 : H - 128;
+    const w = 640, x = W2 / 2 - w / 2, y = compact ? 84 : H2 - 128;
     label(c, b.name, x, y - 6, 16, "#f0c0b0");
     c.fillStyle = "rgba(0,0,0,0.7)";
     c.fillRect(x, y, w, 14);
@@ -6051,12 +6093,12 @@ var Hud = class {
     if (s2.boss && s2.compact) y += 34;
     if (s2.timer) {
       const t = Math.max(0, s2.timer.sec);
-      label(c, `${s2.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`, W / 2, y + 18, 20, t < 10 ? C.hpLow : "#bfe0f0", "center", 800);
+      label(c, `${s2.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`, W2 / 2, y + 18, 20, t < 10 ? C.hpLow : "#bfe0f0", "center", 800);
       y += 30;
     }
     for (const m of s2.meters ?? []) {
-      label(c, m.label, W / 2 - 110, y + 11, 12, m.color, "right");
-      bar(c, W / 2 - 100, y + 2, 200, 9, m.v / m.max, m.color);
+      label(c, m.label, W2 / 2 - 110, y + 11, 12, m.color, "right");
+      bar(c, W2 / 2 - 100, y + 2, 200, 9, m.v / m.max, m.color);
       y += 18;
     }
   }
@@ -6066,9 +6108,9 @@ var Hud = class {
     while (c.measureText(t).width > 900 && t.length > 4) t = t.slice(0, -2);
     if (t !== text) t += "…";
     const w = c.measureText(t).width + 40;
-    const y = compact ? H - 210 : H - 128;
-    plate(c, W / 2 - w / 2, y, w, 36, 18);
-    label(c, t, W / 2, y + 25, 17, "#fff8e6", "center", 600);
+    const y = compact ? H2 - 210 : H2 - 128;
+    plate(c, W2 / 2 - w / 2, y, w, 36, 18);
+    label(c, t, W2 / 2, y + 25, 17, "#fff8e6", "center", 600);
   }
   prompt(c, p, device) {
     const bob = Math.sin(this.t * 5) * 3;
@@ -6077,7 +6119,7 @@ var Hud = class {
     const kw = Math.max(28, c.measureText(key).width + 14);
     const tw = c.measureText(p.text).width;
     const w = kw + tw + 22;
-    const x = Math.max(8, Math.min(W - w - 8, p.x - w / 2)), y = Math.max(8, p.y - 40 + bob);
+    const x = Math.max(8, Math.min(W2 - w - 8, p.x - w / 2)), y = Math.max(8, p.y - 40 + bob);
     plate(c, x, y, w, 32, 8);
     c.beginPath();
     c.roundRect(x + 5, y + 5, kw, 22, 5);
@@ -6149,6 +6191,9 @@ function iconTooth(c, x, y) {
 }
 
 // src/game/action/ui/fx.ts
+var W3 = W;
+var H3 = H;
+var size = (c) => (W3 = c.canvas.width, H3 = c.canvas.height);
 function off(w, h) {
   const cv = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h });
   return cv.getContext("2d");
@@ -6176,7 +6221,7 @@ var Fx = class {
   time = 0;
   m1 = off(256, 256);
   m2 = off(256, 256);
-  dark = off(W, H);
+  dark = off(1800, 720);
   /** 진동 같은 바깥 반응 (게임패드·폰) */
   rumble = null;
   onEvent(e) {
@@ -6232,7 +6277,7 @@ var Fx = class {
   /** 엔진 GameEvent(engine/contract.ts)를 그대로 받는다. y 는 화면 y(발 위치 − 높이), 없으면 opt.y */
   onGameEvent(e, opt = {}) {
     const n = (k, d2 = 0) => typeof e[k] === "number" ? e[k] : d2;
-    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") - 80 : opt.y ?? 520;
+    const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") : opt.y ?? 520;
     switch (e.type) {
       case "hit":
         return this.onEvent({ type: "hit", x, y, strength: Math.max(1, Math.min(3, n("strength", 1))), dmg: n("dmg"), target: e.target === "player" ? "player" : "enemy" });
@@ -6353,22 +6398,23 @@ var Fx = class {
   }
   /** 화면 덮개: 필살 암전·섬광·체력 위험 테두리·층 제목. HUD 보다 먼저 */
   drawScreen(c, hpRatio = 1) {
+    size(c);
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
-    if (this.dim > 0) c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`, c.fillRect(0, 0, W, H);
+    if (this.dim > 0) c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`, c.fillRect(0, 0, W3, H3);
     if (hpRatio < 0.3) {
       const k = (0.3 - hpRatio) / 0.3;
       const pulse = 0.55 + Math.sin(this.time * (4 + k * 4)) * 0.25;
-      const g2 = c.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, H * 0.95);
+      const g2 = c.createRadialGradient(W3 / 2, H3 / 2, H3 * 0.35, W3 / 2, H3 / 2, H3 * 0.95);
       g2.addColorStop(0, "rgba(120,0,0,0)");
       g2.addColorStop(1, `rgba(150,0,0,${0.55 * k * pulse + 0.1})`);
       c.fillStyle = g2;
-      c.fillRect(0, 0, W, H);
+      c.fillRect(0, 0, W3, H3);
     }
     for (const f of this.flashes) {
       c.globalAlpha = f.a * (1 - f.t / f.dur);
       c.fillStyle = f.color;
-      c.fillRect(0, 0, W, H);
+      c.fillRect(0, 0, W3, H3);
     }
     c.globalAlpha = 1;
     if (this.title) this.drawTitle(c, this.title);
@@ -6379,18 +6425,18 @@ var Fx = class {
     const a = inK * (1 - outK);
     const bar2 = 64 * easeOut(inK) * (1 - outK);
     c.fillStyle = "rgba(0,0,0,0.85)";
-    c.fillRect(0, 0, W, bar2);
-    c.fillRect(0, H - bar2, W, bar2);
+    c.fillRect(0, 0, W3, bar2);
+    c.fillRect(0, H3 - bar2, W3, bar2);
     c.globalAlpha = a;
-    const y = H * 0.42;
+    const y = H3 * 0.42;
     c.fillStyle = "rgba(0,0,0,0.45)";
-    c.fillRect(0, y - 70, W, 130);
-    label(c, t.depth, W / 2, y, 64, "#fff", "center", 900);
+    c.fillRect(0, y - 70, W3, 130);
+    label(c, t.depth, W3 / 2, y, 64, "#fff", "center", 900);
     c.fillStyle = "rgba(240,180,90,0.9)";
     const lw = 300 * easeOut(Math.min(1, t.t / 0.6));
-    c.fillRect(W / 2 - lw / 2, y + 14, lw, 2);
-    label(c, t.name, W / 2, y + 46, 24, "#e8dcc0", "center", 700);
-    if (t.variant) label(c, `변형 · ${t.variant}`, W / 2, y + 78, 16, "#f0b45a", "center");
+    c.fillRect(W3 / 2 - lw / 2, y + 14, lw, 2);
+    label(c, t.name, W3 / 2, y + 46, 24, "#e8dcc0", "center", 700);
+    if (t.variant) label(c, `변형 · ${t.variant}`, W3 / 2, y + 78, 16, "#f0b45a", "center");
     c.globalAlpha = 1;
   }
   /** 전환: 가운데에서 mid 를 부르고 끝나면 풀린다 */
@@ -6403,11 +6449,12 @@ var Fx = class {
         old.done();
       }
       const dur = opts.dur ?? (kind === "doors" ? 1.6 : kind === "glitch" ? 0.7 : 0.8);
-      this.tr = { kind, t: opts.open ? dur / 2 : 0, dur, mid: opts.mid, midDone: !!opts.open, x: opts.x ?? W / 2, y: opts.y ?? H / 2, done, text: opts.text ?? "" };
+      this.tr = { kind, t: opts.open ? dur / 2 : 0, dur, mid: opts.mid, midDone: !!opts.open, x: opts.x ?? W3 / 2, y: opts.y ?? H3 / 2, done, text: opts.text ?? "" };
     });
   }
   /** 맨 마지막(HUD·메뉴 위)에 그린다 */
   drawTransition(c) {
+    size(c);
     const tr = this.tr;
     if (!tr) return;
     const half = tr.dur / 2;
@@ -6416,35 +6463,35 @@ var Fx = class {
     c.setTransform(1, 0, 0, 1, 0, 0);
     if (tr.kind === "fade") {
       c.fillStyle = `rgba(0,0,0,${k})`;
-      c.fillRect(0, 0, W, H);
+      c.fillRect(0, 0, W3, H3);
     } else if (tr.kind === "doors") {
       const hold = Math.min(1, k * 1.15);
-      const dw = W / 2 * hold;
+      const dw = W3 / 2 * hold;
       const g2 = c.createLinearGradient(0, 0, dw, 0);
       g2.addColorStop(0, "#3c4448");
       g2.addColorStop(1, "#5f696e");
       c.fillStyle = g2;
-      c.fillRect(0, 0, dw, H);
-      const g22 = c.createLinearGradient(W, 0, W - dw, 0);
+      c.fillRect(0, 0, dw, H3);
+      const g22 = c.createLinearGradient(W3, 0, W3 - dw, 0);
       g22.addColorStop(0, "#3c4448");
       g22.addColorStop(1, "#5f696e");
       c.fillStyle = g22;
-      c.fillRect(W - dw, 0, dw, H);
+      c.fillRect(W3 - dw, 0, dw, H3);
       c.fillStyle = "rgba(0,0,0,0.5)";
-      for (let i = 1; i < 4; i++) c.fillRect(dw * i / 4, 0, 1, H), c.fillRect(W - dw * i / 4, 0, 1, H);
+      for (let i = 1; i < 4; i++) c.fillRect(dw * i / 4, 0, 1, H3), c.fillRect(W3 - dw * i / 4, 0, 1, H3);
       c.fillStyle = "#111";
-      c.fillRect(dw - 2, 0, 2, H);
-      c.fillRect(W - dw, 0, 2, H);
+      c.fillRect(dw - 2, 0, 2, H3);
+      c.fillRect(W3 - dw, 0, 2, H3);
       if (hold >= 1 && tr.text) {
         c.fillStyle = "#120604";
-        c.fillRect(W / 2 - 90, 70, 180, 70);
-        label(c, tr.text, W / 2, 124, 44, "#ff8a40", "center", 900);
+        c.fillRect(W3 / 2 - 90, 70, 180, 70);
+        label(c, tr.text, W3 / 2, 124, 44, "#ff8a40", "center", 900);
       }
     } else if (tr.kind === "iris") {
-      const r = Math.hypot(W, H) * (1 - k);
+      const r = Math.hypot(W3, H3) * (1 - k);
       c.fillStyle = "#000";
       c.beginPath();
-      c.rect(0, 0, W, H);
+      c.rect(0, 0, W3, H3);
       c.arc(tr.x, tr.y, Math.max(0, r), 0, Math.PI * 2, true);
       c.fill();
     } else {
@@ -6452,14 +6499,14 @@ var Fx = class {
       const n = 14;
       for (let i = 0; i < n; i++) {
         if (Math.random() > 0.35 + k * 0.5) continue;
-        const y = Math.floor(Math.random() * H), h = 4 + Math.random() * 40;
+        const y = Math.floor(Math.random() * H3), h = 4 + Math.random() * 40;
         const dx = (Math.random() - 0.5) * 160 * k;
-        c.drawImage(src, 0, y, W, h, dx, y, W, h);
+        c.drawImage(src, 0, y, W3, h, dx, y, W3, h);
       }
       c.fillStyle = `rgba(0,0,0,${k * 0.85})`;
-      c.fillRect(0, 0, W, H);
+      c.fillRect(0, 0, W3, H3);
       c.fillStyle = `rgba(180,20,20,${k * 0.25})`;
-      for (let i = 0; i < 40; i++) c.fillRect(Math.random() * W, Math.random() * H, 2 + Math.random() * 80, 2);
+      for (let i = 0; i < 40; i++) c.fillRect(Math.random() * W3, Math.random() * H3, 2 + Math.random() * 80, 2);
     }
     c.restore();
   }
@@ -6476,10 +6523,11 @@ var Fx = class {
   }
   /** 어두운 층: 빛 자리만 뚫린 어둠. 빛은 월드 좌표, camX 를 빼서 그린다 */
   darkness(c, lights, alpha, camX, camY = 0) {
+    size(c);
     const d2 = this.dark;
-    fit(d2, W, H);
+    fit(d2, W3, H3);
     d2.fillStyle = `rgba(2,3,6,${alpha})`;
-    d2.fillRect(0, 0, W, H);
+    d2.fillRect(0, 0, W3, H3);
     d2.globalCompositeOperation = "destination-out";
     for (const l of lights) {
       const r = l.r * (l.flicker ? 0.94 + Math.sin(this.time * 23) * 0.03 + Math.random() * 0.03 : 1);
@@ -6494,7 +6542,7 @@ var Fx = class {
     d2.globalCompositeOperation = "source-over";
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
-    c.drawImage(d2.canvas, 0, 0, W, H, 0, 0, W, H);
+    c.drawImage(d2.canvas, 0, 0, W3, H3, 0, 0, W3, H3);
     c.globalCompositeOperation = "lighter";
     for (const l of lights) {
       if (!l.color) continue;
@@ -7237,6 +7285,8 @@ var TouchPad = class {
   /** 스틱 자리 (층 기준 px) */
   zr = { x: 0, y: 0, w: 0, h: 0 };
   /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
+  /** 캔버스 논리 폭 (채우기면 1280 보다 넓다) */
+  vw = () => 1280;
   toLocal = null;
   visible = false;
   seenTouch = false;
@@ -7248,8 +7298,9 @@ var TouchPad = class {
     const s2 = this.st();
     const bw = this.layer.clientWidth || 800, bh = this.layer.clientHeight || 400;
     const portrait = bh > bw * 1.05;
-    const scale = Math.min(bw / 1280, bh / 720);
-    const stageW = 1280 * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+    const vw = this.vw();
+    const scale = Math.min(bw / vw, bh / 720);
+    const stageW = vw * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
     this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s2.touchSize;
     const u = this.u;
     const flip = s2.lefty ? -1 : 1;
@@ -7276,8 +7327,8 @@ var TouchPad = class {
           cx = s2.lefty ? side / 2 : bw - side / 2;
           cy = 12 + u * 0.35 + i * u * 0.8;
         } else {
-          cx = s2.lefty ? safeS + u * 0.35 + i * u * 0.75 : bw - safeS - u * 0.35 - i * u * 0.75;
-          cy = 10 + u * 0.35;
+          cx = bw / 2 + (i === 0 ? 0.4 : -0.4) * u;
+          cy = (portrait ? 10 : 8) + u * 0.32;
         }
       }
       const d2 = ri >= 0 ? 0.8 : b.d;
@@ -7507,28 +7558,20 @@ function mountGameShell(box2, o = {}) {
     input.press(code, "touch");
     setTimeout(() => input.release(code, "touch"), 90);
   };
-  const touch = new TouchPad(stage.touch, input, () => settings, (code) => {
+  const touch2 = new TouchPad(stage.touch, input, () => settings, (code) => {
     if (code === "Escape") shell.openPause();
     else tap(code);
   });
-  if (o.toLocal) {
-    touch.toLocal = o.toLocal;
-    const tl = o.toLocal;
-    stage.toGame = (cx, cy) => {
-      const p = tl(cx, cy, stage.root);
-      const sc = stage.scale;
-      const r = stage.stage.style.transform.match(/translate\(([-\d.]+)px, ([-\d.]+)px\)/);
-      const ox = r ? Number(r[1]) : 0, oy = r ? Number(r[2]) : 0;
-      return { x: (p.x - ox) / sc, y: (p.y - oy) / sc };
-    };
-  }
+  touch2.vw = () => stage.vw;
+  touch2.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
+  if (o.fill) stage.setFit("fill");
   const apply = () => {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);
     stage.setPixel(settings.pixel);
     fx.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
     pad.setRumble(settings.vibrate);
-    touch.refresh();
+    touch2.refresh();
   };
   const saveSettings = () => void store.save(JSON.stringify(settings));
   menu.onChange = () => {
@@ -7537,7 +7580,7 @@ function mountGameShell(box2, o = {}) {
   };
   menu.onOpen = (open) => {
     if (open) input.releaseSource("kb"), input.releaseSource("pad");
-    touch.setVisible(!open && shell.mode === "play");
+    touch2.setVisible(!open && shell.mode === "play");
   };
   input.capture = (code, down2) => {
     if (!menu.isOpen) {
@@ -7554,7 +7597,7 @@ function mountGameShell(box2, o = {}) {
   input.attachKeyboard(o.keyTarget ?? window, {
     prevent: (code) => code.startsWith("Arrow") || code === "Space" || code === "Tab" || code === "Escape" || /^Key|^Digit|^Shift/.test(code)
   });
-  stage.onResize(() => touch.layout());
+  stage.onResize(() => touch2.layout());
   const controlsHtml = () => {
     const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
       const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc2(KEY_NAME[a])}</kbd>`;
@@ -7599,7 +7642,7 @@ function mountGameShell(box2, o = {}) {
     ctx: stage.ctx,
     input,
     pad,
-    touch,
+    touch: touch2,
     hud,
     fx,
     menu,
@@ -7611,13 +7654,13 @@ function mountGameShell(box2, o = {}) {
     },
     set mode(m) {
       mode = m;
-      touch.setVisible(m === "play" && !menu.isOpen);
+      touch2.setVisible(m === "play" && !menu.isOpen);
     },
     get paused() {
       return menu.isOpen || mode !== "play";
     },
     get touchShown() {
-      return touch.shown;
+      return touch2.shown;
     },
     frame(dt) {
       pad.poll();
@@ -7708,7 +7751,7 @@ function mountGameShell(box2, o = {}) {
     saveSettings,
     dispose() {
       input.dispose();
-      touch.dispose();
+      touch2.dispose();
       menu.dispose();
       stage.dispose();
     }
@@ -7719,6 +7762,50 @@ function mountGameShell(box2, o = {}) {
   })();
   apply();
   return shell;
+}
+
+// src/game/action/enemy/debuff.ts
+var DEBUFF_TEXT = {
+  bleed: "출혈 · 피가 멎지 않는다",
+  taint: "오염 · 숨이 탁해진다",
+  headache: "두통 · 머리가 울린다",
+  confuse: "혼란 · 방향이 뒤집힌다",
+  fear: "공포 · 몸이 굳는다",
+  slow: "느려졌다",
+  silence: "목소리가 안 나온다"
+};
+var seen = /* @__PURE__ */ new WeakMap();
+var armed = [];
+function state(w) {
+  let s2 = seen.get(w);
+  if (!s2) seen.set(w, s2 = { tick: -1, hp: w.player.hp, said: {} });
+  return s2;
+}
+function emitDebuff(w, debuff, from) {
+  const s2 = state(w);
+  const quiet = w.tick - (s2.said[debuff.kind] ?? -999) < 90;
+  if (!quiet) s2.said[debuff.kind] = w.tick;
+  w.emit({ type: "custom", name: "debuff", data: { ...debuff, from, text: quiet ? void 0 : DEBUFF_TEXT[debuff.kind] } });
+}
+function armDebuff(hit2, debuff, from) {
+  armed.push({ hit: hit2, debuff, from });
+}
+function checkDebuffs(w) {
+  const s2 = state(w);
+  if (s2.tick === w.tick) return;
+  s2.tick = w.tick;
+  const p = w.player;
+  if (p.hp < s2.hp) {
+    for (const a of armed) {
+      const h = a.hit;
+      if (p.x >= h.x0 - 30 && p.x <= h.x1 + 30 && Math.abs(p.y - h.y) <= (h.dy ?? 20) + 20) {
+        emitDebuff(w, a.debuff, a.from);
+        break;
+      }
+    }
+  }
+  s2.hp = p.hp;
+  armed = [];
 }
 
 // src/game/action/enemy/geom.ts
@@ -7736,6 +7823,7 @@ var PROJ = {
   shard: { label: "조각", w: 24, h: 24, z: 110, speed: 9, life: 80, dmg: 8, react: "flinch", push: 4, homeY: 1.2, color: "#a99cf0" },
   static: { label: "지지직", w: 40, h: 170, z: 0, speed: 6.5, life: 110, dmg: 7, react: "stagger", push: 8, unblockable: true, debuff: { kind: "headache", ticks: 60 }, color: "#9fd3e6" },
   table: { label: "밥상", w: 90, h: 40, z: 150, speed: 8, vz: 9, gravity: 0.55, life: 70, dmg: 18, react: "down", push: 8, color: "#8a6a44" },
+  chair: { label: "날아오는 가구", w: 70, h: 60, z: 90, speed: 11, life: 140, dmg: 14, react: "stagger", push: 10, color: "#7a5a36" },
   spoon: { label: "숟가락", w: 22, h: 6, z: 120, speed: 15, life: 50, dmg: 4, react: "flinch", color: "#d8d8d8" },
   web: { label: "거미줄", w: 36, h: 36, z: 90, speed: 7, life: 90, dmg: 2, react: "none", debuff: { kind: "slow", ticks: 120 }, color: "#e8e2d0" },
   ring: { label: "충격파", w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: "stagger", push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: "#e86b4f" },
@@ -7798,11 +7886,15 @@ var Proj = class {
       armorBreak: d2.unblockable,
       strength: d2.react === "down" ? 3 : d2.react === "stagger" ? 2 : 1
     };
-    if (d2.debuff) hit2.debuff = d2.debuff;
+    if (d2.debuff) {
+      hit2.debuff = d2.debuff;
+      armDebuff(hit2, d2.debuff, this.id);
+    }
     return { hit: [hit2], hurt: [] };
   }
   step(world) {
     const d2 = this.def;
+    checkDebuffs(world);
     if (this.done) return void (this.alive = false);
     this.t++;
     if (d2.every && this.t % d2.every === 0) this.attackId = nextProjId++ * 7;
@@ -8084,7 +8176,10 @@ var Enemy = class {
           noise: spec.noise
         };
         const debuff = spec.debuff ?? (this.has("bleed") && spec.dmg > 0 ? { kind: "bleed", ticks: 120 } : void 0);
-        if (debuff) h.debuff = debuff;
+        if (debuff) {
+          h.debuff = debuff;
+          armDebuff(h, debuff, this.id);
+        }
         hit2.push(h);
       }
     }
@@ -8100,6 +8195,7 @@ var Enemy = class {
   step(w) {
     if (!this.alive || this.lastTick === w.tick) return;
     this.lastTick = w.tick;
+    checkDebuffs(w);
     this.age++;
     this.st++;
     for (const k in this.cds) if (this.cds[k] > 0) this.cds[k]--;
@@ -8355,7 +8451,7 @@ var Enemy = class {
     this.set("dead");
     this.vx = (hit2?.dir ?? -this.dir) * 4;
     this.brain.death?.(this, w);
-    w.emit({ type: "enemyDie", x: this.x, kind: this.kind });
+    if (!hit2) w.emit({ type: "enemyDie", x: this.x, kind: this.kind });
     const drops = rollDrops(this.def.drop, () => w.rand(), this.elite);
     if (drops.length) {
       w.emit({ type: "custom", name: "enemyDrop", data: { id: this.id, kind: this.kind, x: this.x, y: this.y, drops } });
@@ -8561,8 +8657,8 @@ function approach(e, w, keep = e.def.keep, wait = false) {
 function engage(e, w, aggression = 0.12) {
   const p = w.player;
   if (!p.alive) return approach(e, w, [300, 400], true);
-  const shooter = e.def.role === "shoot";
-  const can = shooter || attackersNow(w) < MAX_ATTACKERS + (w.floor.depth && w.floor.depth > 8 ? 1 : 0);
+  const shooter2 = e.def.role === "shoot";
+  const can = shooter2 || attackersNow(w) < MAX_ATTACKERS + (w.floor.depth && w.floor.depth > 8 ? 1 : 0);
   const a = can ? pickAttack(e, w) : null;
   if (a && w.rand() < aggression * (e.rally > 0 ? 1.6 : 1)) {
     e.face(p.x);
@@ -8802,7 +8898,7 @@ var summoner = {
     const p = w.player;
     const watching = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 640;
     e.mem.frozen = !watching;
-    if (watching && e.age % 45 === 0 && e.state !== "dead") w.emit({ type: "custom", name: "debuff", data: { kind: "headache", ticks: 30, from: e.id } });
+    if (watching && e.age % 45 === 0 && e.state !== "dead") emitDebuff(w, { kind: "headache", ticks: 30 }, e.id);
     for (const [mark, n] of [[0.66, 1], [0.33, 2]])
       if (e.hp < e.hpMax * mark && (e.mem.summoned ?? 0) < n) {
         e.mem.summoned = n;
@@ -8882,7 +8978,31 @@ var float = {
   },
   think: (e, w) => engage(e, w, 0.09)
 };
-var AI_BRAINS = { rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
+var touch = {
+  tick(e, w) {
+    if (e.age === 1) e.hostile = false;
+    e.alpha = e.state === "attack" ? 0.9 : 0.35;
+    if (e.age > 600 && e.state !== "dead") {
+      e.alpha = Math.max(0, 1 - (e.age - 600) / 20);
+      if (e.age > 620) e.set("dead");
+      return true;
+    }
+  },
+  think(e, w) {
+    const p = w.player;
+    const drawn = stillTicks(w) > 15 || w.noise > 0.3 || p.running;
+    const dx = p.x - e.x, dy = p.y - e.y;
+    const sp = e.speed() * (drawn ? 1.8 : 0.5);
+    e.face(p.x);
+    e.x += Math.sign(dx) * Math.min(Math.abs(dx), sp);
+    e.y += Math.sign(dy) * Math.min(Math.abs(dy), sp * 0.6);
+    e.set("walk");
+    const a = e.def.attacks[0];
+    if (Math.abs(dx) < 50 && Math.abs(dy) < 18 && e.cd(a.move.id) <= 0) e.start(a.move, w, a.cd);
+  },
+  hit: () => ({ immune: true, text: "닿지 않는다" })
+};
+var AI_BRAINS = { touch, rush, kite, shield, ambush, ceiling, stain, invisible, heavy, rule, fixed, floorgrab, summoner, chief, duelist, rival, float };
 
 // src/game/action/enemy/frames.ts
 var B = (fx0, fx1, z0, z1, dy = 18, part) => ({ fx0, fx1, z0, z1, dy, part });
@@ -9078,7 +9198,7 @@ var guard2 = g({
 });
 var proctor = g({
   kind: "proctor",
-  label: "낡은 제복의 시험 감독",
+  label: "낡은 제복의 차장",
   floor: "trial",
   hp: 550,
   speed: 1.2,
@@ -9435,7 +9555,7 @@ var shadowBrain = {
   ev(e, name, w) {
     if (name !== "engulf") return;
     w.emit({ type: "custom", name: "screen", data: { effect: "dark", ticks: 150 } });
-    w.emit({ type: "custom", name: "debuff", data: { kind: "fear", ticks: 60, from: e.id } });
+    emitDebuff(w, { kind: "fear", ticks: 60 }, e.id);
     spawnInto(w, "shade", e.x - 200, e.y);
     spawnInto(w, "shade", e.x + 200, e.y);
   },
@@ -9589,7 +9709,7 @@ var shapeBrain = {
     const p = w.player;
     const looking = Math.sign(e.x - p.x) === p.dir && Math.abs(e.x - p.x) < 760 && !e.mem.folded;
     e.mem.looking = looking;
-    if (looking && e.age % 30 === 0) w.emit({ type: "custom", name: "debuff", data: { kind: "headache", ticks: 32, from: e.id } });
+    if (looking && e.age % 30 === 0) emitDebuff(w, { kind: "headache", ticks: 32 }, e.id);
     if (e.mem.folded) {
       if (--e.mem.folded <= 0) {
         e.mem.folded = 0;
@@ -9739,6 +9859,7 @@ function startFight(e, w, why) {
 }
 var elderBrain = {
   tick(e, w) {
+    if (e.age === 1 && e.mem.solo && e.kind === "elder_f") spawnInto(w, "elder_m", e.x + 120, e.y + 10);
     if (e.age === 1) {
       e.mem.mode = "table";
       e.hostile = false;
@@ -9860,7 +9981,7 @@ var touchBrain = {
       h.t++;
       if (h.t === TOUCH_TELE + 1) {
         h.hit = Math.abs(p.x - h.x) < 40 && Math.abs(p.y - h.y) < 22 && !p.airborne;
-        if (h.hit) w.emit({ type: "custom", name: "debuff", data: { kind: "fear", ticks: 60, from: e.id } });
+        if (h.hit) emitDebuff(w, { kind: "fear", ticks: 60 }, e.id);
       }
       if (h.hit && h.t < TOUCH_TELE + 60) touching++;
     }
@@ -9905,7 +10026,171 @@ var touchBrain = {
     ctx.fillText(`버티기 ${Math.max(0, Math.ceil((e.mem.left ?? 0) / 30))}초 · 닿음 ${e.mem.touching ?? 0}/3`, e.x, e.y - 260);
   }
 };
-var GUARDIANS = [guard2, legs, shadow, noise2, shape, elderF, elderM, proctor, touchers];
+var ranged = (h) => (h.noise ?? 0) > 0 && (h.strength ?? 1) === 1;
+var auntBody = humanoid(66, 178);
+var uncleBody = humanoid(86, 200);
+var familyF = g({
+  kind: "family_f",
+  label: "208호 아주머니",
+  floor: "replica",
+  hp: 900,
+  speed: 2.2,
+  w: 66,
+  h: 178,
+  body: auntBody,
+  armor: 1,
+  attacks: [
+    { move: strike("bite", "턱 찢고 물기", 66, 178, { tele: 14, active: 5, recover: 18, reach: [20, 120], z: [120, 190], lunge: 9, armor: 2, body: auntBody, spec: S(16, "stagger", 10, { debuff: { kind: "bleed", ticks: 150 }, strength: 2 }) }), range: [40, 200], dy: 24, cd: 50, weight: 3 },
+    { move: charge("dash", "달려들기", 66, 178, { tele: 18, dash: 16, speed: 14, recover: 22, armor: 2, spec: S(14, "down", 10, { strength: 3 }), body: auntBody }), range: [200, 560], dy: 20, cd: 110, weight: 2 }
+  ],
+  keep: [60, 140],
+  groggyMax: 110,
+  intro: "우리 애 못 봤어요?",
+  rule: "방 안 아이 방 문(E)을 열면 둘이 그쪽을 보고 멈춘다 (규칙 11을 지켜 열쇠를 얻었을 때)",
+  note: "보라색 머리 아주머니. 아이를 찾는다며 묻다가 세 번째 대화에서 턱이 찢어진다. 빠르게 달려들어 문다.",
+  color: "#7a4a8a"
+});
+var familyM = g({
+  kind: "family_m",
+  label: "208호 아저씨",
+  floor: "replica",
+  hp: 900,
+  speed: 0.8,
+  w: 86,
+  h: 200,
+  body: uncleBody,
+  armor: 1,
+  attacks: [
+    { move: strike("smash", "내려치기", 86, 200, { tele: 22, active: 5, recover: 26, reach: [20, 130], z: [0, 200], extend: false, armor: 2, body: uncleBody, spec: S(20, "down", 8, { strength: 3 }) }), range: [0, 150], dy: 26, cd: 70, weight: 3 },
+    { move: grab("hold", "움켜잡기", 86, 200, { tele: 18, active: 5, recover: 24, reach: 120, ticks: 45, dmgPerTick: 2, armor: 2, body: uncleBody }), range: [0, 130], dy: 24, cd: 120, weight: 2 }
+  ],
+  keep: [20, 80],
+  groggyMax: 140,
+  intro: "…",
+  rule: "총이 안 듣는다 (비틀거리기만). 근접·잡기·환경 무기",
+  note: "표정이 굳은 아저씨. 총을 맞고도 비틀거리기만 한다. 느리게 다가와 내려친다.",
+  color: "#5a5a62"
+});
+var FAMILY_ASK = ["우리 애 못 봤어요?", "키가 이만해요. 머리핀을 했어요.", "…정말 못 봤어요?"];
+function familyOther(e, w) {
+  for (const b of w.bodies) if (b instanceof Enemy && b !== e && b.alive && (b.kind === "family_f" || b.kind === "family_m") && b.state !== "dead") return b;
+  return null;
+}
+function familyFight(e, w) {
+  for (const x of [e, familyOther(e, w)]) if (x && x.mem.mode !== "fight") x.mem.mode = "fight", x.hostile = true;
+  e.say("(턱이 찢어진다)", 60);
+  w.emit({ type: "bossRoar", x: e.x, kind: "family208" });
+  w.emit({ type: "combat:boss", index: 0 });
+}
+var familyBrain = {
+  tick(e, w) {
+    if (e.age === 1) {
+      e.groggyMax = e.def.groggyMax;
+      e.mem.mode = "ask";
+      e.hostile = false;
+      if (e.mem.solo && e.kind === "family_f") spawnInto(w, "family_m", e.x + 140, e.y + 10);
+    }
+    if (e.mem.mode === "ask") {
+      e.face(w.player.x);
+      if (e.lastHurt > 0) familyFight(e, w);
+      else if (e.kind === "family_f" && Math.abs(w.player.x - e.x) < 360) {
+        e.mem.askT = (e.mem.askT ?? 0) + 1;
+        const i = Math.floor(e.mem.askT / 75);
+        if (e.mem.askT % 75 === 1 && i < FAMILY_ASK.length) e.say(FAMILY_ASK[i], 70);
+        if (i >= FAMILY_ASK.length) familyFight(e, w);
+      }
+      return true;
+    }
+    if (e.mem.froze > 0) {
+      e.mem.froze--;
+      e.weakOpen = 2;
+      return true;
+    }
+    if (!familyOther(e, w) && !e.mem.alone) e.mem.alone = true, e.rally = 99999;
+  },
+  think: (e, w) => engage(e, w, e.kind === "family_f" ? 0.14 : 0.08),
+  hit(e, h) {
+    if (e.kind === "family_m" && ranged(h)) return { mult: 0, noReact: true, text: "비틀거릴 뿐" };
+  },
+  signal(e, s2, w) {
+    if ((s2.kind === "childDoor" || s2.kind === "door") && e.mem.mode === "fight" && !e.mem.doorDone) {
+      for (const x of [e, familyOther(e, w)]) if (x) x.mem.doorDone = true, x.mem.froze = 150, x.move = null, x.set("stunned"), x.stunT = 150, x.say("…거기 있니?", 80);
+      w.emit({ type: "custom", name: "ruleKept", data: { rule: "r_child", id: e.id } });
+    }
+  }
+};
+var houseBody = [B(-180, 180, 0, 260, 20, "torso"), B(-30, 30, 170, 230, 22, "core")];
+var risenhouse = g({
+  kind: "risenhouse",
+  label: "일어난 집",
+  floor: "replica",
+  hp: 800,
+  speed: 0,
+  w: 360,
+  h: 260,
+  body: houseBody,
+  armor: 3,
+  attacks: [
+    { move: bake("furniture", "가구 날리기", houseBody, [{ n: 22, tele: true }, { n: 4, ev: "furniture" }, { n: 20 }], [S(0, "none")]), range: [0, 2e3], dy: 2e3, cd: 70, weight: 3 },
+    { move: bake("tilt", "바닥 기울기", houseBody, [{ n: 26, tele: true }, { n: 4, fire: "ring" }, { n: 14 }, { n: 4, fire: "ring" }, { n: 20 }], [S(0, "none")], { danger: [{ fx0: -400, fx1: 400, dy: 60 }] }), range: [0, 2e3], dy: 2e3, cd: 150, weight: 2 },
+    { move: bake("rally", "집이 부른다", houseBody, [{ n: 30, tele: true }, { n: 4, ev: "wake" }, { n: 20 }], [S(0, "none")]), range: [0, 2e3], dy: 2e3, cd: 400, weight: 1, when: "phase2" }
+  ],
+  keep: [0, 0],
+  groggyMax: 9999,
+  intro: "(집이 삐걱거리며 일어선다)",
+  rule: "멈춘 시계(가운데 동그라미)를 부수면 다시 「떠난 집」이 된다. 시계 말고는 거의 안 들어간다",
+  note: "물건을 너무 집으면 집 자체가 일어난다. 방 전체가 보스. 가구가 날아오고, 바닥이 기울고, 먼지 쌓인 물건들이 깨어난다.",
+  color: "#4a3e30"
+});
+var houseBrain = {
+  tick(e, w) {
+    intro(e, w);
+    e.y = w.lane[0] + 4;
+    phaseCheck(e, w, [0.5]);
+  },
+  think(e, w) {
+    e.face(w.player.x);
+    const a = pickAttack(e, w);
+    if (a && w.rand() < 0.04) e.start(a.move, w, a.cd);
+  },
+  ev(e, name, w) {
+    const p = w.player;
+    if (name === "furniture") {
+      const [b0, b1] = w.bounds;
+      const fromLeft = w.rand() < 0.5;
+      e.fire("chair", w, { x: fromLeft ? b0 - 30 : b1 + 30, y: p.y, dir: fromLeft ? 1 : -1 });
+      if (e.phase >= 2) e.fire("chair", w, { x: fromLeft ? b1 + 30 : b0 - 30, y: Math.max(w.lane[0], Math.min(w.lane[1], p.y + 40)), dir: fromLeft ? -1 : 1 });
+    } else if (name === "wake") for (const k of [-1, 1]) spawnInto(w, "dusty", p.x + k * 300, p.y);
+  },
+  hit(e, h, part) {
+    if (part === "core") return { mult: 2, weak: true, text: "시계" };
+    return { mult: 0.2, noReact: true };
+  },
+  signal(e, s2, w) {
+    if (s2.kind === "clock" && e.state !== "dead") {
+      e.say("(시계가 멈췄다. 집이 다시 떠났다)", 80);
+      w.emit({ type: "custom", name: "ruleKept", data: { rule: "r_clock", id: e.id } });
+      w.emit({ type: "custom", name: "guardianCleared", data: { kind: "risenhouse", how: "rule" } });
+      e.set("dead");
+    }
+  },
+  drawOver(e, ctx) {
+    if (e.state === "dead") return;
+    ctx.fillStyle = "#d8c8a0";
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - e.z - 200, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#2a2018";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x, e.y - e.z - 218);
+    ctx.moveTo(e.x, e.y - e.z - 200);
+    ctx.lineTo(e.x + 12, e.y - e.z - 196);
+    ctx.stroke();
+  }
+};
+var GUARDIANS = [guard2, legs, shadow, noise2, shape, elderF, elderM, proctor, touchers, familyF, familyM, risenhouse];
 var GUARDIAN_BRAINS = {
   guard: guardBrain,
   proctor: guardBrain,
@@ -9915,12 +10200,15 @@ var GUARDIAN_BRAINS = {
   shape: shapeBrain,
   elder_f: elderBrain,
   elder_m: elderBrain,
-  touchers: touchBrain
+  touchers: touchBrain,
+  family_f: familyBrain,
+  family_m: familyBrain,
+  risenhouse: houseBrain
 };
 
 // src/game/action/enemy/roster.ts
-var H2 = 190;
-var lurkerBody = humanoid(64, H2);
+var H4 = 190;
+var lurkerBody = humanoid(64, H4);
 var lurker = {
   kind: "lurker",
   label: "해롭지 않아 보이는 것",
@@ -9930,7 +10218,7 @@ var lurker = {
   hp: 45,
   speed: 1.6,
   w: 64,
-  h: H2,
+  h: H4,
   body: lurkerBody,
   armor: 0,
   types: ["lobby"],
@@ -9943,8 +10231,8 @@ var lurker = {
   weak: "정면으로 보고 지나가면 깨어나지 않는다 (규칙 6)",
   color: "#8b8f86",
   attacks: [
-    { move: grab("snap", "물어뜯기", 64, H2, { tele: 10, active: 5, recover: 18, reach: 110, lunge: 9, ticks: 36, dmgPerTick: 2 }), range: [0, 150], dy: 30, cd: 90, weight: 2, when: "targetBack" },
-    { move: strike("claw", "할퀴기", 64, H2, { tele: 12, active: 4, recover: 14, reach: [20, 95], z: [90, 170], spec: S(8, "flinch", 4) }), range: [0, 100], dy: 24, cd: 30, weight: 3 }
+    { move: grab("snap", "물어뜯기", 64, H4, { tele: 10, active: 5, recover: 18, reach: 110, lunge: 9, ticks: 36, dmgPerTick: 2 }), range: [0, 150], dy: 30, cd: 90, weight: 2, when: "targetBack" },
+    { move: strike("claw", "할퀴기", 64, H4, { tele: 12, active: 4, recover: 14, reach: [20, 95], z: [90, 170], spec: S(8, "flinch", 4) }), range: [0, 100], dy: 24, cd: 30, weight: 3 }
   ]
 };
 var hollow = {
@@ -9956,8 +10244,8 @@ var hollow = {
   hp: 75,
   speed: 1.1,
   w: 66,
-  h: H2,
-  body: humanoid(66, H2, 16, 8),
+  h: H4,
+  body: humanoid(66, H4, 16, 8),
   armor: 0,
   types: ["chase", "replica", "trial", "puzzle", "dark", "silent"],
   ai: "rush",
@@ -9967,9 +10255,9 @@ var hollow = {
   note: "승객 옷을 입은 것. 얼굴은 보지 않는 편이 낫다. 느리게 걷다가 갑자기 덤빈다.",
   color: "#7d7466",
   attacks: [
-    { move: strike("lunge", "덤벼들기", 66, H2, { tele: 16, active: 6, recover: 20, reach: [20, 90], z: [80, 180], lunge: 7, spec: S(12, "stagger", 8) }), range: [60, 170], dy: 26, cd: 70, weight: 2 },
-    { move: grab("hug", "끌어안기", 66, H2, { tele: 14, active: 4, recover: 22, reach: 80, ticks: 45, dmgPerTick: 1.5 }), range: [0, 120], dy: 24, cd: 120, weight: 2 },
-    { move: strike("swipe", "팔 휘두르기", 66, H2, { tele: 12, active: 4, recover: 12, reach: [10, 85], z: [90, 170], spec: S(7, "flinch", 3) }), range: [0, 90], dy: 22, cd: 24, weight: 3 }
+    { move: strike("lunge", "덤벼들기", 66, H4, { tele: 16, active: 6, recover: 20, reach: [20, 90], z: [80, 180], lunge: 7, spec: S(12, "stagger", 8) }), range: [60, 170], dy: 26, cd: 70, weight: 2 },
+    { move: grab("hug", "끌어안기", 66, H4, { tele: 14, active: 4, recover: 22, reach: 80, ticks: 45, dmgPerTick: 1.5 }), range: [0, 120], dy: 24, cd: 120, weight: 2 },
+    { move: strike("swipe", "팔 휘두르기", 66, H4, { tele: 12, active: 4, recover: 12, reach: [10, 85], z: [90, 170], spec: S(7, "flinch", 3) }), range: [0, 90], dy: 22, cd: 24, weight: 3 }
   ]
 };
 var crawlerBody = lowBody(110, 54);
@@ -10175,7 +10463,7 @@ var edge = {
     { move: charge("cut", "베고 지나가기", 60, 60, { tele: 20, dash: 14, speed: 16, recover: 30, spec: S(10, "stagger", 8, { debuff: { kind: "bleed", ticks: 120 } }), armor: 0, body: edgeBody }), range: [60, 300], dy: 18, cd: 120, weight: 1 }
   ]
 };
-var residentBody = humanoid(66, H2);
+var residentBody = humanoid(66, H4);
 var resident = {
   kind: "resident",
   label: "사는 척하는 주민",
@@ -10185,7 +10473,7 @@ var resident = {
   hp: 150,
   speed: 1.2,
   w: 66,
-  h: H2,
+  h: H4,
   body: residentBody,
   armor: 0,
   types: ["replica"],
@@ -10197,8 +10485,8 @@ var resident = {
   weak: "규칙을 지키면 싸우지 않는다 (인사 E). 등 뒤 1.5배",
   color: "#9c8f7a",
   attacks: [
-    { move: strike("nail", "손톱", 66, H2, { tele: 12, active: 4, recover: 10, reach: [15, 90], z: [100, 170], spec: S(9, "flinch", 4) }), range: [0, 100], dy: 22, cd: 22, weight: 3 },
-    { move: strike("jaw", "턱 벌려 물기", 66, H2, { tele: 20, active: 5, recover: 22, reach: [20, 110], z: [140, 200], lunge: 6, spec: S(16, "stagger", 8, { debuff: { kind: "bleed", ticks: 150 }, strength: 2 }) }), range: [40, 150], dy: 24, cd: 90, weight: 2 }
+    { move: strike("nail", "손톱", 66, H4, { tele: 12, active: 4, recover: 10, reach: [15, 90], z: [100, 170], spec: S(9, "flinch", 4) }), range: [0, 100], dy: 22, cd: 22, weight: 3 },
+    { move: strike("jaw", "턱 벌려 물기", 66, H4, { tele: 20, active: 5, recover: 22, reach: [20, 110], z: [140, 200], lunge: 6, spec: S(16, "stagger", 8, { debuff: { kind: "bleed", ticks: 150 }, strength: 2 }) }), range: [40, 150], dy: 24, cd: 90, weight: 2 }
   ]
 };
 var dustyBody = lowBody(90, 60);
@@ -10563,19 +10851,113 @@ var mummy = {
   color: "#a89a7c",
   attacks: [{ move: strike("grope", "더듬기", 60, 176, { tele: 18, active: 5, recover: 18, reach: [15, 90], z: [80, 160], spec: S(8, "flinch", 4, { debuff: { kind: "taint", ticks: 600 } }) }), range: [0, 100], dy: 22, cd: 60, weight: 1 }]
 };
-var ROSTER = [lurker, hollow, crawler2, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
+var clerkBody = humanoid(62, 186);
+var shooter = {
+  kind: "shooter",
+  label: "사격하는 것",
+  role: "shoot",
+  faction: "elevator",
+  price: 15,
+  hp: 70,
+  speed: 1.2,
+  w: 62,
+  h: 186,
+  body: clerkBody,
+  armor: 0,
+  types: ["lobby", "trial", "puzzle"],
+  ai: "kite",
+  keep: [240, 400],
+  drop: "common",
+  grabbable: true,
+  cap: 3,
+  note: "창구 직원처럼 앉아 있다가 서류철에서 날붙이를 던진다. 거리를 둔다.",
+  weak: "던진 뒤 잠깐 선다. 깊이를 바꿔 피하고 붙어라",
+  color: "#6e7a70",
+  attacks: [
+    { move: shoot("toss", "날붙이 던지기", 62, 186, { tele: 16, shots: 2, gap: 8, recover: 20, fire: "spoon", body: clerkBody }), range: [150, 560], dy: 18, cd: 60, weight: 3 },
+    { move: strike("jab", "찌르기", 62, 186, { tele: 10, active: 4, recover: 14, reach: [15, 85], z: [100, 160], spec: S(8, "stagger", 10) }), range: [0, 90], dy: 22, cd: 40, weight: 4, when: "close" }
+  ]
+};
+var thief = {
+  kind: "thief",
+  label: "보급 승객",
+  role: "rush",
+  faction: "elevator",
+  price: 0,
+  hp: 110,
+  speed: 2,
+  w: 62,
+  h: 184,
+  body: humanoid(62, 184),
+  armor: 0,
+  types: [],
+  ai: "rival",
+  keep: [60, 120],
+  drop: "daydream",
+  grabbable: true,
+  note: "배낭을 멘 승객. 보급품을 노리고 덤빈다. 몰리면 도망간다.",
+  weak: "체력 30% 아래면 도망친다",
+  color: "#7a6a4a",
+  attacks: [
+    { move: strike("shove", "밀치기", 62, 184, { tele: 12, active: 4, recover: 14, reach: [15, 90], z: [90, 170], spec: S(8, "stagger", 12) }), range: [0, 100], dy: 22, cd: 30, weight: 3 },
+    { move: strike("pipe", "쇠파이프", 62, 184, { tele: 18, active: 5, recover: 20, reach: [20, 120], z: [80, 190], lunge: 4, spec: S(14, "down", 8, { strength: 3 }) }), range: [0, 140], dy: 24, cd: 80, weight: 2 }
+  ]
+};
+var touchBody = [B(-24, 24, 60, 170, 14, "arm")];
+var toucher = {
+  kind: "toucher",
+  label: "만지는 손",
+  role: "hinder",
+  faction: "elevator",
+  price: 0,
+  hp: 1,
+  speed: 1.1,
+  w: 48,
+  h: 170,
+  body: touchBody,
+  armor: 3,
+  types: [],
+  ai: "touch",
+  keep: [0, 30],
+  drop: "none",
+  grabbable: false,
+  note: "완전한 어둠에서 어깨를 만지는 손. 때려도 닿지 않는다. 멈추거나 소리 내면 다가온다.",
+  weak: "움직이고, 조용히. 20초 뒤 사라진다",
+  color: "#d8d0c0",
+  attacks: [
+    {
+      move: bake("touch", "만지기", touchBody, [{ n: 20, tele: true }, { n: 4, hit: [B(-30, 50, 60, 170, 18, "arm")] }, { n: 24 }], [{ dmg: 0, react: "none", unblockable: true, debuff: { kind: "fear", ticks: 60 }, stop: 0 }], { danger: [{ fx0: -30, fx1: 50, dy: 18 }] }),
+      range: [0, 60],
+      dy: 20,
+      cd: 90,
+      weight: 1
+    }
+  ]
+};
+var ROSTER = [shooter, thief, toucher, lurker, hollow, crawler2, shade, hum, predator, charger, edge, resident, dusty, doorhand, wallface, floorhand, doorframe, tv402, fbSmg, fbShield, fbChief, fbSword, ddMember, mummy];
 var ROSTER_BY_KIND = Object.fromEntries(ROSTER.map((d2) => [d2.kind, d2]));
 
 // src/game/action/enemy/index.ts
 var ALL_DEFS = [...ROSTER, ...GUARDIANS];
 var DEF_BY_KIND = Object.fromEntries(ALL_DEFS.map((d2) => [d2.kind, d2]));
+var KIND_ALIAS = {
+  nothuman: { kind: "hollow" },
+  warmth: { kind: "shade" },
+  conductor: { kind: "proctor" },
+  elder: { kind: "elder_f", solo: true },
+  family208: { kind: "family_f", solo: true }
+};
+for (const [k, a] of Object.entries(KIND_ALIAS)) if (!DEF_BY_KIND[k] && DEF_BY_KIND[a.kind]) DEF_BY_KIND[k] = DEF_BY_KIND[a.kind];
 function createEnemy(kind, x, y, rng2, opts = {}) {
+  const alias = KIND_ALIAS[kind];
+  if (alias) kind = alias.kind;
   const def = DEF_BY_KIND[kind];
   if (!def) throw new Error(`unknown enemy kind: ${kind}`);
   const brain = GUARDIAN_BRAINS[kind] ?? AI_BRAINS[def.ai] ?? AI_BRAINS.rush;
   const AFF = ["bleed", "armor", "fast", "regen"];
   const affixes = opts.elite ? opts.affixes ?? [AFF[Math.floor(rng2() * AFF.length)]] : [];
   const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng2 });
+  if (alias?.solo) e.mem.solo = true;
   return e;
 }
 setSpawner((w, kind, x, y, opts) => {
@@ -11310,7 +11692,7 @@ function makeService(ctx) {
   for (let rw = 0; rw < rows; rw++)
     for (let c = 0; c < cols; c++)
       cells.push({ col: c, row: rw, kind: "plain", open: { u: false, r: false, d: false, l: false }, duct: { r: false, l: false }, width: ROOM_W, segments: [], things: [], label: "" });
-  const seen = /* @__PURE__ */ new Set([idx(...entryCell)]);
+  const seen2 = /* @__PURE__ */ new Set([idx(...entryCell)]);
   const stack = [entryCell];
   const link = (a, b, duct2 = false) => {
     const A = cells[idx(...a)], B2 = cells[idx(...b)];
@@ -11326,13 +11708,13 @@ function makeService(ctx) {
       [c - 1, rw],
       [c, rw + 1],
       [c, rw - 1]
-    ]).filter(([x, y]) => x >= 0 && y >= 0 && x < cols && y < rows && !seen.has(idx(x, y)));
+    ]).filter(([x, y]) => x >= 0 && y >= 0 && x < cols && y < rows && !seen2.has(idx(x, y)));
     if (!nb.length) {
       stack.pop();
       continue;
     }
     const n = nb[0];
-    seen.add(idx(...n));
+    seen2.add(idx(...n));
     link([c, rw], n, n[1] === rw && r() < 0.4);
     stack.push(n);
   }
@@ -14817,7 +15199,7 @@ var PERSONAS = {
 function buildMessages(npc, agent, flags, history, text) {
   const p = PERSONAS[npc];
   const me = AGENTS2[agent];
-  const state = [
+  const state2 = [
     `말을 거는 사람: ${me.name} (${me.title}). 말투: ${me.voice}`,
     flags.mission ? `지금 받은 임무: ${String(flags.mission)}` : "",
     Number(flags.rules) ? `규칙서에 찾은 규칙 수: ${String(flags.rules)}` : "",
@@ -14830,7 +15212,7 @@ function buildMessages(npc, agent, flags, history, text) {
 - ${p.facts.join("\n- ")}` : "",
     `하지 않는 것: ${p.never.join(" / ")}.`,
     `상황:
-- ${state.join("\n- ")}`,
+- ${state2.join("\n- ")}`,
     "규칙: 한국어로 1~3문장, 120자 이내. 대사만 쓴다(이름표·따옴표·괄호 지문·별표 금지). 상대의 행동이나 대사를 대신 쓰지 않는다. 실제 사람의 본명을 만들지 않는다. 게임 밖 이야기(현실 시스템, AI임)는 하지 않는다."
   ].filter(Boolean).join("\n\n");
   return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text }];
@@ -15108,8 +15490,8 @@ var StoryUI = class {
       return;
     }
     b.el.classList.remove("free");
-    const w = b.el.offsetWidth, W2 = this.el.clientWidth;
-    const x = Math.max(w / 2 + 6, Math.min(W2 - w / 2 - 6, p.x));
+    const w = b.el.offsetWidth, W4 = this.el.clientWidth;
+    const x = Math.max(w / 2 + 6, Math.min(W4 - w / 2 - 6, p.x));
     b.el.style.setProperty("--tail", `${Math.round(p.x - x)}px`);
     b.el.style.transform = `translate(${Math.round(x)}px, ${Math.round(Math.max(p.y, 0))}px) translate(-50%, -100%)`;
   }
@@ -16398,10 +16780,10 @@ var ICONS = {
     rect(g2, C2.dark, 10, 23, 12, 3);
   }
 };
-function drawItemIcon(ctx, id, x, y, size) {
+function drawItemIcon(ctx, id, x, y, size2) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.scale(size / 32, size / 32);
+  ctx.scale(size2 / 32, size2 / 32);
   const d2 = ICONS[id];
   if (d2) d2(ctx);
   else {
