@@ -8,10 +8,12 @@
 - GPT가 한 장씩 만들게 하고, 파일 이름은 목록의 영어 이름 그대로 png로 받으세요. 이름이 그대로 에셋 이름이 됩니다.
 - 받은 뒤 Claude가 720×480 AVIF로 바꾸고 꼬리표를 붙여 카드에 넣습니다.
 
-## 괴이 (12장) · 참고 그림: Situation Anomaly
+## 괴이 (30장) · 참고 그림: Situation Anomaly
+
+괴이는 상황 중에 가장 많이 나오고 아파트·학교처럼 겹치는 장소가 많아서 장소 15곳마다 2장씩 만듭니다 (같은 장소의 다른 자리·다른 구도). 같은 장소의 괴이는 이름으로 둘 중 하나를 고정해서 씁니다. 30장이 한 대화에 길면 1~15, 16~30으로 나눠 두 번 붙여 넣으세요.
 
 ```
-Make 12 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png).
+Make 30 background illustrations for a Korean urban-horror roleplay app, ONE image per reply, in this order. Name each file exactly as given (.png). Images ending in "1" and "2" of the same place must look clearly different (different spot, angle and composition), not the same scene redrawn.
 
 STYLE (same for every image)
 Semi-realistic anime background art, cinematic, highly detailed, soft volumetric light. Present-day South Korea. NO readable text, letters, numbers, logos or brand names anywhere. NO people, no faces, no foreground silhouettes. Night or heavy overcast, muted desaturated blue-grey palette, wet surfaces, light fog. Eye-level wide shot, landscape 3:2 (1536x1024). Keep the main subject inside the middle horizontal band (the app crops to a thin wide strip). Keep the lower-left area calm and darker for white caption text. Match the style of the attached reference image exactly.
@@ -20,18 +22,36 @@ KIND: ANOMALY
 Exactly ONE red light accent (signal lamp, exit sign, red glow). Uncanny emptiness; something is subtly wrong but no monster is shown.
 
 IMAGES
-1. Situation Anomaly Apartment — Long outdoor corridor of an old Korean apartment block at night, identical doors, one flickering red light at the far end.
-2. Situation Anomaly School — Empty school hallway at night, rows of classroom doors, a red emergency light glowing at the end, faint fog on the floor.
-3. Situation Anomaly Hospital — Dim hospital ward corridor, empty beds behind curtains, a red exit-light glow, one wheelchair left in the middle.
-4. Situation Anomaly Subway — Deserted subway platform after midnight, screen doors closed, tunnel darkness, a single red signal light deep in the tunnel.
-5. Situation Anomaly Road — Empty two-lane mountain road at night in fog, guard rail, a red warning lamp blinking beside the road.
-6. Situation Anomaly Tunnel — Inside a long road tunnel, orange ceiling lamps mostly dead, one red light ahead, wet asphalt.
-7. Situation Anomaly Forest — Dark forest path in a Korean hillside, wooden stairs going up into fog, a red ribbon tied to a branch catching faint red light.
-8. Situation Anomaly Amusement — Closed amusement park at night, a carousel standing still, one red bulb still lit, mist between the rides.
-9. Situation Anomaly Lodging — Narrow motel hallway, patterned carpet, numbered doors without readable numbers, red light leaking under one door.
-10. Situation Anomaly Ruin — Abandoned concrete building interior, peeling walls, broken windows, a red glow from a stairwell below.
-11. Situation Anomaly Elevator — Old apartment elevator with doors half open into darkness, the floor indicator glowing red with no readable digits.
-12. Situation Anomaly Village — Rural Korean village alley at night, low stone walls, persimmon tree, one red light in a window.
+1. Situation Anomaly Apartment 1 — Old Korean apartment complex seen from the parking lot at night, rows of identical balconies, every window dark except one glowing red.
+2. Situation Anomaly Apartment 2 — Long outdoor corridor of an old apartment block, identical doors, one flickering red light at the far end.
+3. Situation Anomaly School 1 — School building and empty sports field at night, goal posts in fog, one red light in a third-floor window.
+4. Situation Anomaly School 2 — Empty classroom at night, desks in rows, chairs pushed in, a red glow on the blackboard with nothing written.
+5. Situation Anomaly Hospital 1 — Small hospital entrance at night, closed glass doors, empty ambulance bay, a red emergency sign glowing.
+6. Situation Anomaly Hospital 2 — Dim ward corridor, empty beds behind curtains, one wheelchair in the middle, a red exit-light glow.
+7. Situation Anomaly Subway 1 — Deserted subway platform after midnight, screen doors closed, a single red signal light deep in the tunnel.
+8. Situation Anomaly Subway 2 — Empty subway car interior, seats in two long rows, hand straps swaying, red light through the connecting door window.
+9. Situation Anomaly Road 1 — Empty two-lane mountain road in fog, guard rail, a red warning lamp blinking beside the road.
+10. Situation Anomaly Road 2 — Empty city crosswalk at night, traffic light stuck on red, wet asphalt reflecting it, no cars.
+11. Situation Anomaly Tunnel 1 — Inside a long road tunnel, orange ceiling lamps mostly dead, one red light ahead.
+12. Situation Anomaly Tunnel 2 — Narrow pedestrian underpass, tiled walls, puddles, a red light at the far exit.
+13. Situation Anomaly Forest 1 — Dark hillside forest path, wooden stairs going up into fog, a red ribbon on a branch catching faint red light.
+14. Situation Anomaly Forest 2 — Small empty city park at night, swings and a bench under trees, a red lamp among the trees.
+15. Situation Anomaly Amusement 1 — Closed amusement park, carousel standing still, one red bulb lit, mist between rides.
+16. Situation Anomaly Amusement 2 — Empty circus tent interior, rows of seats around a dark ring, one red spotlight on the center.
+17. Situation Anomaly Lodging 1 — Small motel building at night by the road, neon sign unlit, one red-lit window.
+18. Situation Anomaly Lodging 2 — Narrow motel hallway, patterned carpet, doors without readable numbers, red light leaking under one door.
+19. Situation Anomaly Ruin 1 — Abandoned factory exterior, broken windows, rusty gate half open, a red glow inside.
+20. Situation Anomaly Ruin 2 — Abandoned concrete interior, peeling walls, debris, a red glow rising from a stairwell below.
+21. Situation Anomaly Elevator 1 — Old apartment elevator, doors half open into darkness, floor indicator glowing red with no readable digits.
+22. Situation Anomaly Elevator 2 — Elevator lobby on an empty floor, two closed elevator doors, call button glowing red.
+23. Situation Anomaly Village 1 — Rural village alley at night, low stone walls, persimmon tree, one red light in a window.
+24. Situation Anomaly Village 2 — Village crossroad with an old bus stop shelter and a big zelkova tree, a red lantern hanging from a branch.
+25. Situation Anomaly Office 1 — Office tower at night seen from the street, all floors dark except one red-lit floor.
+26. Situation Anomaly Office 2 — Open-plan office after hours, empty desks and monitors off, one monitor glowing red.
+27. Situation Anomaly Sea 1 — Empty beach at night, calm black sea, a small lighthouse with a red light.
+28. Situation Anomaly Sea 2 — Old fishing harbor pier at night, moored small boats, rope and nets, a red buoy light.
+29. Situation Anomaly Shrine 1 — Hillside graveyard of round Korean burial mounds at night in fog, a red light between the mounds.
+30. Situation Anomaly Shrine 2 — Small shaman shrine room, folded paper decorations and candles, low altar, a red candle glow.
 ```
 
 ## 사건 (12장) · 참고 그림: Situation Incident

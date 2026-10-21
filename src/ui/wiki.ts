@@ -268,7 +268,7 @@ function entries(ctx: ChatContext): Entry[] {
     const name = f?.name ?? o.name;
     // 문서 제목: 로어북 이름(이슬람 서울중앙성원)과 기본 문서 제목(이슬람)이 다를 수 있어 문서가 있는 쪽 (2026-10-21)
     const title = [c(doc), c(o.name), c(name)].find((t) => findDoc(ctx.chat, t, lore)) ?? c(doc);
-    list.push({ cat: 'org', name, title, sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, o.spec), face: facePic(ctx.char, o.spec), terms: [name, o.name, doc, o.spec.english ?? ''] });
+    list.push({ cat: 'org', name, title, sub: o.name !== name ? o.name : '', photo: mainPic(ctx.char, { ...o.spec, shared: o.shared }), face: facePic(ctx.char, { ...o.spec, shared: o.shared }), terms: [name, o.name, doc, o.spec.english ?? ''] });
   }
   // 같은 문서로 이어지는 항목은 하나만
   const seen = new Set<string>();

@@ -6,6 +6,7 @@ import { factionNames, parseCatalog } from '../core/world/catalog';
 import { hasAsset, mainPic, moduleAssetStamp } from '../host/assets';
 import { docSummary, findDoc } from '../core/wiki';
 import { imageUrl } from './images';
+import { baseShared, situationShared } from '../core/sharedpics';
 
 interface Row { pic: string; title: string; org?: string }
 let cache: { lore: unknown; stamp: number; viewer: string; map: Map<string, Row> } | null = null;
@@ -39,9 +40,13 @@ function rows(ctx: ChatContext): Map<string, Row> {
     const own = !swap && findDoc(ctx.chat, b.name, ctx.char.globalLore);
     const lore = ctx.char.globalLore ?? [];
     // 영문명이 세력 사진 이름과 다르면 (Baekilmong corporation ↔ Baekilmong) 연결 조직의 사진
-    const pic = (!swap && mainPic(ctx.char, b)) || (org ? mainPic(ctx.char, org.spec) : '');
+    // 거점은 바깥 모습 「Base 영문명」이 먼저 (세력 사진은 대개 안쪽, 2026-10-21 사용자)
+    const outside = (en: string | undefined) => (en && hasAsset(ctx.char, `Base ${en}`) ? `Base ${en}` : '');
+    const pic = (swap ? outside(org!.spec.english) : outside(b.english) || mainPic(ctx.char, b)) || (org ? mainPic(ctx.char, org.spec) : '');
     const title = own ? b.name : swap ? orgLoreName(lore, org!.name) : b.lore || (org ? orgLoreName(lore, org.name) : b.name);
-    map.set(b.name, { pic, title, org: org ? (org.faction && names[org.faction]) || org.name : '' });
+    // 그것도 없으면 이름 낱말로 고른 공용 거점 그림 (바깥 모습)
+    const shared = pic ? '' : baseShared(b.name, b.label).find((n) => hasAsset(ctx.char, n)) ?? '';
+    map.set(b.name, { pic: pic || shared, title, org: org ? (org.faction && names[org.faction]) || org.name : '' });
   }
   cache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), viewer, map };
   return map;
@@ -50,7 +55,8 @@ function rows(ctx: ChatContext): Map<string, Row> {
 const descs = new Map<string, string>();
 
 /** 그림이 없는 상황의 종류별 공용 그림 (카드 에셋, assets/wiki/Situations) */
-const SHARED: Record<string, string[]> = { an: ['Situation Anomaly'], in: ['Situation Incident'], ms: ['Situation Mystic'], lm: ['Situation Base', 'Situation Incident'] };
+// 괴이·사건은 장소, 특수는 종류로 고른 여러 장 중 카드에 있는 첫 그림 (core/sharedpics). 거점은 공용 거점 그림이 없으면 사건 그림
+const sharedFor = (kind: string, name: string, text: string) => (kind === 'lm' ? ['Situation Incident'] : situationShared(kind, name, text));
 
 /** 거점 사진 이름: 영문명 → 연결 조직 사진 → '' (공용 그림은 evArt가) */
 export const basePic = (ctx: ChatContext, name: string): string => rows(ctx).get(name)?.pic ?? '';
@@ -61,9 +67,10 @@ export function baseLink(ctx: ChatContext, name: string): { doc: string; org: st
   return { doc: r?.title ?? name, org: r?.org ?? '' };
 }
 
-export function evArt(ctx: ChatContext, name: string, kind?: string): { pic: string | null; desc: string } {
+/** text: 발생 지점·상황 글 (공용 그림을 장소에 맞게 고를 때) */
+export function evArt(ctx: ChatContext, name: string, kind?: string, text = ''): { pic: string | null; desc: string } {
   const r = rows(ctx).get(name);
-  const shared = (kind && SHARED[kind]?.find((n) => hasAsset(ctx.char, n))) || '';
+  const shared = (!r?.pic && kind && sharedFor(kind, name, text).find((n) => hasAsset(ctx.char, n))) || '';
   const pic = imageUrl(ctx.char, r?.pic || shared);
   const title = r?.title ?? name;
   let desc = descs.get(title);

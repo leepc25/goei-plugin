@@ -1240,7 +1240,7 @@ function board(ctx: ChatContext): string {
   const add = (kind: EvKind, i: number, locCode: string, c: Omit<EvCard, 'kind' | 'key'>) => {
     const key = keys.get(`${kind}${i}`);
     if (!key) return;
-    cards.push({ ...c, kind, key, id: key, locCode, open: 'board-map', confirmEnd: field.confirmEnd === key, selected: field.target?.type === 'event' && field.target.key === key, art: evArt(ctx, c.name, kind) });
+    cards.push({ ...c, kind, key, id: key, locCode, open: 'board-map', confirmEnd: field.confirmEnd === key, selected: field.target?.type === 'event' && field.target.key === key, art: evArt(ctx, c.name, kind, `${locName(locCode)} ${String(c.extra ?? '').replace(/<[^>]*>/g, ' ')}`) });
   };
   const since = (m: number | null) => elapsedText(w.minute, m);
   // 상황 글: 바깥 띠엔 상황 글(없으면 위키 요약), 상세 창·CCTV엔 상황 글과 위키 요약을 함께 (2026-10-21 사용자)

@@ -96,6 +96,8 @@ export interface PicSource {
   english?: string;
   /** 대표 사진에서 얼굴로 자를 틀 「가로,세로,크기」 (%) */
   crop?: string;
+  /** 사진이 하나도 없을 때 쓸 공용 그림 후보 (좋은 순서, core/sharedpics) */
+  shared?: string[];
 }
 
 /** 얼굴 틀을 따로 맞추지 않은 요원: 카우보이샷의 위쪽 가운데 */
@@ -147,7 +149,7 @@ export function mainPic(char: CharacterSnapshot, p: PicSource): string {
   if (p.photo) return p.photo;
   if (en && hasAsset(char, `${en}_default`)) return `${en}_default`;
   if (en && hasAsset(char, en)) return en;
-  return '';
+  return p.shared?.find((n) => hasAsset(char, n)) ?? '';
 }
 
 /**

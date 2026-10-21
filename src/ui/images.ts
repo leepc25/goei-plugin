@@ -96,7 +96,7 @@ export function agentFace(char: CharacterSnapshot, english: string | undefined):
 /** 세력·조직 사진 이름 (명부 조직 칸의 고른 사진·영문명). slot: 대표(main) 또는 얼굴(face) */
 export function factionPic(char: CharacterSnapshot, f: Pick<Faction, 'code' | 'affiliation'> & { photo?: string; english?: string }, slot: 'main' | 'face' = 'main'): string {
   const o = readDirectory((char.globalLore ?? []) as LoreEntry[]).orgs.find((x) => (x.faction ? x.faction === f.code : x.name === f.affiliation));
-  const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english };
+  const src = { photo: o?.spec.photo ?? f.photo, face: o?.spec.face, crop: o?.spec.crop, english: o?.spec.english || f.english, shared: o?.shared };
   return slot === 'face' ? facePic(char, src) : mainPic(char, src);
 }
 
