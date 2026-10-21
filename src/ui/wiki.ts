@@ -97,7 +97,12 @@ const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['
 function canon(ctx: ChatContext) {
   const r = registry(ctx);
   const src = source(ctx);
-  return (t: string) => canonicalTitle(r, src, t).title;
+  return (t: string) => ownDoc(ctx, t) ?? canonicalTitle(r, src, t).title;
+}
+/** 그 제목 그대로 된 문서가 있으면 별칭보다 먼저 (거점 「백일몽 본사」는 조직 「백일몽」과 다른 문서, 2026-10-21 사용자) */
+function ownDoc(ctx: ChatContext, t: string): string | null {
+  const title = t.trim();
+  return title && findDoc(ctx.chat, title, ctx.char.globalLore) ? title : null;
 }
 
 function go(view: WikiView, title = '', query = wiki.query) {
@@ -140,7 +145,8 @@ function search(ctx: ChatContext, q: string) {
   const query = q.trim();
   wiki.query = query;
   if (!query) return;
-  const c = canonicalTitle(registry(ctx), source(ctx), query);
+  const own = ownDoc(ctx, query);
+  const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx), source(ctx), query);
   if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
   if (c.known) return openTitle(ctx, c.title, 'direct');
   // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)

@@ -14,9 +14,16 @@ function rows(ctx: ChatContext): Map<string, Row> {
   const map = new Map<string, Row>();
   const dir = readDirectory(ctx.char.globalLore);
   // 거점도 영문명 사진을 찾는다 (2026-10-21: 커스텀 거점 목록도 그림 띠)
-  for (const p of [...dir.anomalies, ...dir.sites, ...dir.bases]) {
+  for (const p of [...dir.anomalies, ...dir.sites]) {
     const row = { pic: mainPic(ctx.char, p), title: p.lore || p.label };
     for (const n of [p.label, p.lore, ...p.aliases]) if (n && !map.has(n)) map.set(n, row);
+  }
+  // 거점은 이름(관리국 본부)으로 찾는다. 사진은 영문명 = 세력 사진, 설명은 거점 문서가 있으면 그것(백일몽 본사), 없으면 세력 문서
+  for (const b of dir.bases) {
+    // 영문명이 세력 사진 이름과 다르면 (Baekilmong corporation ↔ Baekilmong) 연결 조직의 사진
+    const org = dir.orgs.find((o) => o.name === b.org);
+    const row = { pic: mainPic(ctx.char, b) || (org ? mainPic(ctx.char, org.spec) : ''), title: findDoc(ctx.chat, b.name, ctx.char.globalLore) ? b.name : b.lore || b.name };
+    map.set(b.name, row);
   }
   cache = { lore: ctx.char.globalLore, stamp: moduleAssetStamp(), map };
   return map;
