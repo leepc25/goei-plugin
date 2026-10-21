@@ -49,6 +49,14 @@ def build(partial=False,only=None):
                     pixels=list(f.getdata())
                     f.putdata([tuple(round(v*light) for v in p) if p[0]>p[1]*1.6 and p[0]>p[2]*1.6 else p for p in pixels])
                 frames.append(f)
+        if key=='opening/c9':
+            # Keep the settled logo lettering fixed while its red indicator blinks.
+            base=frames[3]
+            frames=frames[:4]
+            for light in [.2,1,.2,1]:
+                f=base.copy()
+                f.putdata([tuple(round(v*light) for v in p) if p[0]>p[1]*1.6 and p[0]>p[2]*1.6 else p for p in list(f.getdata())])
+                frames.append(f)
         atlas = Image.new('RGB', (640,720))
         for i,f in enumerate(frames): atlas.paste(f,((i%2)*320,(i//2)*180))
         palette = atlas.quantize(colors=64, method=Image.Quantize.MEDIANCUT,
