@@ -60,8 +60,9 @@ export function mountStage(box: HTMLElement): Stage {
   let keepPortrait = false;
   // 채우기는 엔진이 넓은 캔버스를 그릴 수 있을 때만 켠다 (setFit('fill'))
   let fill = false;
-  let turn = false;
   const coarse = () => typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+  // 세로로 든 폰은 처음부터 90도 돌려 꽉 채운다 (통합 규격 3장: 세로에 작게 넣지 않는다)
+  let turn = coarse();
   const s: Stage = {
     root,
     stage: stageEl,

@@ -17,7 +17,8 @@ DROP_CLIPS = {'pushup', 'sleepside'}
 DROP_CLIPS |= set('''bath bathin bathout shower showerin showerout toilet toiletin toiletout handwash wash dishes coffee microwave board brief
 window readwall button lever locker rope stairs water mop backpack giftbox transmit deskwork seatphone seatread seatgame seatdrink seatnoodle
 toast feast sofa bedwake situp idle_box walk_box run_box idle_brick walk_brick run_brick idle_cup walk_cup run_cup idle_folder walk_folder
-run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry'''.split())
+run_folder notebook papers phonelook phone towel handover smoke music walllean sigh smile angry
+lookback'''.split())
 
 # 장 빼기(결함 6~10): 끝 장 깨짐·대기 자세로 튐·얼굴 뭉개짐·달리기 0장
 DROP = {

@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: UiSettings = {
   sfx: 0.9,
   touch: 'auto',
   touchSize: 1,
-  touchAlpha: 0.75,
+  touchAlpha: 0.55,
   stickRun: true,
   lefty: false,
   vibrate: true,
