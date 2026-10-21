@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """쟈알디 전 동작 시연판 빌더 (2026-10-21, 계획안 41행 전부).
 
-game-src/action/jyaldi-v5/full/clips/<클립>/NN.png (animate_with_skeleton_v3 원본, 192×144, 한 픽셀도 바꾸지 않음)를
+game-src/action/jyaldi-v5/full/clips/<클립>/NN.png (animate_with_skeleton_v3 원본, 192×144)를
 클립별 가로 스트립으로 묶어 단일 HTML(release/demo/jyaldi-full.html)에 내장한다.
+결함 목록의 코드 보정(tools/jyaldi_fixes.py)과 가구 분리(full/split/)를 거친 최종 스트립은 게임용으로 full/final/<클립>.png·<클립>.prop.png·manifest.json에도 쓴다.
 모든 장은 같은 캔버스·같은 바닥선(발바닥 y=136)·같은 기준 x(57)라서 코드는 장마다 발을 재지 않는다.
 말하기(33)는 기본 대기 장 + edit_image_pixen으로 입을 연 장의 입 부분(8×7px)만 옮긴 장, 컷인은 A2 얼굴을 pixen으로 다시 그린 것이다.
 """
 import base64, io, json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from jyaldi_life_defs import LIFE
+import jyaldi_fixes
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,24 +90,14 @@ def frames_of(src):
     return [Image.open(os.path.join(d, f)).convert('RGBA') for f in sorted(os.listdir(d)) if f.endswith('.png')]
 
 
-def pipe_fix(frames):
-    """생성 결과에서 쇠파이프가 빠진 장(0·2·4·5)에 뼈대 손목 좌표로 파이프를 덧그린다(2px 회색 선)."""
-    sys.path.insert(0, os.path.join(ROOT, 'game-src', 'action', 'jyaldi-v5', 'scripts'))
-    import rig
-    from PIL import ImageDraw
-    ps = rig.CLIPS['pipe'][2]
-    out = []
-    for i, f in enumerate(frames):
-        if i in (0, 2, 4, 5) and i < len(ps):
-            p = ps[i]; w = p['RIGHT ARM']; e = p['RIGHT ELBOW']
-            dx, dy = w[0] - e[0], w[1] - e[1]; L = max(1e-3, (dx * dx + dy * dy) ** .5)
-            x0, y0 = w[0] + rig.DX, w[1] + rig.DY
-            x1, y1 = x0 + dx / L * 44, y0 + dy / L * 44
-            f = f.copy(); d = ImageDraw.Draw(f)
-            d.line([(x0, y0), (x1, y1)], fill=(40, 44, 48, 255), width=4)
-            d.line([(x0, y0), (x1, y1)], fill=(139, 147, 154, 255), width=2)
-        out.append(f)
-    return out
+def layers_of(src):
+    """가구를 떼어 낸 클립(full/split/)이면 (캐릭터 장, 가구 장), 아니면 (원본 장, None)."""
+    d = os.path.join(SRC, 'split', src)
+    if not os.path.isdir(d):
+        return frames_of(src), None
+    fs = sorted(f for f in os.listdir(d) if f.endswith('.png') and not f.startswith('prop_'))
+    return ([Image.open(os.path.join(d, f)).convert('RGBA') for f in fs],
+            [Image.open(os.path.join(d, 'prop_' + f)).convert('RGBA') for f in fs])
 
 
 def auto_trim(frames):
@@ -165,25 +157,38 @@ def strip(frames):
 def main():
     manifest = {'frameW': FW, 'frameH': FH, 'foot': FOOT, 'anchor': ANCHOR, 'clips': {}}
     strips, missing = {}, []
+    final = os.path.join(SRC, 'final'); os.makedirs(final, exist_ok=True)
     for d in DEFS:
-        fr = talk_frames() if d['src'] == '@talk' else frames_of(d['src'])
+        if d['key'] in jyaldi_fixes.DROP_CLIPS:
+            continue
+        fr, pr = (talk_frames(), None) if d['src'] == '@talk' else layers_of(d['src'])
         if d['key'] == 'getup' and fr:  # 생성된 0·1장에 회색 얼룩 → 다운 마지막 누운 장으로 대체
             fr = frames_of('down')[6:7] + fr[2:]
+        idx = list(range(len(fr)))
         # Bathroom clips are reviewed explicitly; preserve the commissioned 4/6 frames.
         bathroom = {'showerin', 'shower', 'showerout', 'bathin', 'bath', 'bathout', 'toiletin', 'toilet', 'toiletout', 'handwash'}
         if d.get('group', '').startswith('전투') is False and fr and d['key'] not in bathroom:
-            fr = auto_trim(fr)
-        if d['order'] and fr:
-            fr = [fr[i] for i in d['order'] if i < len(fr)]
-        if d['rng'] and fr:
-            fr = fr[d['rng'][0]:d['rng'][1]]
+            idx = idx[:len(auto_trim(fr))]
+        if d['order'] and idx:
+            idx = [idx[i] for i in d['order'] if i < len(idx)]
+        if d['rng'] and idx:
+            idx = idx[d['rng'][0]:d['rng'][1]]
         if d['rev']:
-            fr = fr[::-1]
+            idx = idx[::-1]
+        fr = [fr[i] for i in idx]; pr = [pr[i] for i in idx] if pr else None
+        if fr:
+            fr, pr = jyaldi_fixes.apply(d['key'], fr, pr)
         if not fr:
             missing.append(d['key']); print('없음', d['key'], file=sys.stderr); continue
         data = strip(fr)
         strips[d['key']] = base64.b64encode(data).decode()
-        manifest['clips'][d['key']] = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'adv', 'origin', 'hold', 'group')} | {'frames': len(fr), 'bytes': len(data)}
+        open(os.path.join(final, d['key'] + '.png'), 'wb').write(data)
+        manifest['clips'][d['key']] = {k: d[k] for k in ('label', 'fps', 'loop', 'hits', 'adv', 'origin', 'hold', 'group')} | {'frames': len(fr), 'bytes': len(data), 'prop': bool(pr)}
+        if pr:
+            pdata = strip(pr)
+            strips['prop:' + d['key']] = base64.b64encode(pdata).decode()
+            open(os.path.join(final, d['key'] + '.prop.png'), 'wb').write(pdata)
+    json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     manifest['missing'] = missing
     tpl = open(os.path.join(ROOT, 'tools', 'jyaldi_full_template.html'), encoding='utf-8').read()
     html = (tpl.replace('__MANIFEST__', json.dumps(manifest, ensure_ascii=False)).replace('__STRIPS__', json.dumps(strips))
