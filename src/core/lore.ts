@@ -286,6 +286,8 @@ export interface LoreOptions {
   /** 넣을 로어북 글 상한 (추정 토큰). 0이면 없음 */
   budget: number;
   env: CbsEnv;
+  /** 고르지 않을 로어북 이름 (캐릭터로 플레이: 유저가 연기하는 요원은 주인공 자리에 따로 넣는다) */
+  exclude?: string[];
 }
 
 export const DEFAULT_DEPTH = 10;
@@ -404,7 +406,7 @@ export interface LoreResult {
 
 /** 이번 요청에 넣을 로어북과 채팅 변수 */
 export function computeLore(lore: LoreEntry[] | undefined, chat: Chat, o: LoreOptions & { mode: LoreMode; input?: string }): LoreResult | null {
-  const entries = managedEntries(lore);
+  const entries = managedEntries(lore).filter((e) => !o.exclude?.includes(e.name));
   if (!entries.length) return null;
   const msgs = loreMessages(chat, o.input, o.mode === 'risu');
   const picks = o.mode === 'risu' ? pickLoreRisu(entries, msgs, o.depth) : pickLore(entries, msgs, loreState(chat), o, msgs.at(-1)?.role === 'user');

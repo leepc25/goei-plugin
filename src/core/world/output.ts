@@ -51,8 +51,8 @@ export function worldVars(w: WorldState, c: Catalog, s: WorldSettings, faction: 
 }
 
 /** START 때 넣을 상황판 변수 (첫 발생 추첨 포함) */
-export function startWorldVars(c: Catalog, s: WorldSettings, faction: string, rng: Rng): ScriptState {
-  return worldVars(bootstrap(c, s, rng), c, s, faction);
+export function startWorldVars(c: Catalog, s: WorldSettings, faction: string, rng: Rng, player = ''): ScriptState {
+  return worldVars(bootstrap(c, s, rng, player), c, s, faction);
 }
 
 /** 짧은 지문: 같은 응답을 두 번 처리하지 않기 위해 */

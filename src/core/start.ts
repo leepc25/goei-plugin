@@ -40,7 +40,8 @@ export function currentChoice(chat: Chat): Partial<StartChoice> {
   const faction = isFaction(s['$st_faction']) ? s['$st_faction'] : undefined;
   const lang = isLang(s['$st_lang']) ? s['$st_lang'] : undefined;
   const fm = Number(s['$st_fm']);
-  return { faction, lang, fm: Number.isInteger(fm) && fm > 0 ? fm : undefined };
+  const player = String(s['$st_player'] ?? '');
+  return { faction, lang, fm: Number.isInteger(fm) && fm > 0 ? fm : undefined, ...(player ? { player } : {}) };
 }
 
 export class StartError extends Error {}
@@ -71,6 +72,8 @@ export function planStart(
   if (!isLang(choice.lang)) throw new StartError('언어를 골라 주세요.');
   const scenario = findScenario(choice.faction, choice.fm, factions);
   if (!scenario) throw new StartError('상황을 골라 주세요.');
+  // 준비된 첫 장면은 신입(페르소나) 시점이라 캐릭터 플레이에는 직접 입력·커스텀 임무만
+  if (choice.player && scenario.kind === 'opening') throw new StartError('캐릭터로 시작할 때는 직접 입력이나 커스텀 임무를 골라 주세요.');
   // 커스텀 임무 시작은 직접 입력과 같은 빈 첫 장면을 쓴다 (원본도 같은 인사말)
   const direct = faction.scenarios.find((s) => s.kind === 'direct');
   const keys = [greetingKey(choice.faction, choice.lang, choice.fm)];
@@ -90,6 +93,7 @@ export function planStart(
     seedMissing: seed.missing,
     scriptstate: {
       $st_faction: choice.faction,
+      $st_player: choice.player ?? '',
       $st_lang: choice.lang,
       $st_fm: String(choice.fm),
       $st_pick: choice.faction,

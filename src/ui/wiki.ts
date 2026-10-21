@@ -12,6 +12,7 @@ import { budgetFor, genSettings } from '../core/advanced';
 import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
+import { playerSource } from '../core/player';
 import { saveVarDefaults } from '../host/prefs';
 import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
@@ -94,7 +95,7 @@ function registry(ctx: ChatContext): Registry {
   if (!regCache || regCache.lore !== ctx.char.globalLore) regCache = { lore: ctx.char.globalLore, reg: buildRegistry(ctx.char.globalLore) };
   return regCache.reg;
 }
-const source = (ctx: ChatContext): RefSource => ({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() });
+const source = (ctx: ChatContext): RefSource => playerSource({ char: ctx.char as RefSource['char'], chat: ctx.chat, persona: personaText() } as RefSource);
 function canon(ctx: ChatContext) {
   const r = registry(ctx);
   const src = source(ctx);

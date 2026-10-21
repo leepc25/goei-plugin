@@ -5,7 +5,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const core = await import(new URL('../dist-test/core.mjs', import.meta.url));
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
 if (process.argv[2] === '--compare') {
-  const a = read(process.argv[3]);
+  // 원본 쪽에도 기본 별칭 정리를 적용해서 비교 (경량 카드는 정리된 명부를 싣는다)
+  const a0 = read(process.argv[3]);
+  const a = core.dropDefaultAliases(core.migrateLore(a0));
   const b = read(process.argv[4]);
   const sort = (x) => (Array.isArray(x) ? x.map(sort) : x && typeof x === 'object' ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, sort(x[k])])) : x);
   const j = (x) => JSON.stringify(sort(x));
@@ -22,7 +24,8 @@ if (process.argv[2] === '--compare') {
   console.log(JSON.stringify(out));
 } else {
   const lore = read(process.argv[2]);
-  const r = core.withFactionPlaceholders(core.migrateLore(lore));
+  // 원본 명부의 별칭 중 소속·부서·다른 항목 이름 같은 것은 지운다 (src/core/world/alias-drop.json)
+  const r = core.withFactionPlaceholders(core.dropDefaultAliases(core.migrateLore(lore)));
   if (r.missing.length) throw new Error(`새 세력 자리표시자를 넣을 곳을 못 찾음: ${r.missing.join(', ')}`);
   writeFileSync(process.argv[3], JSON.stringify(r.lore));
 }

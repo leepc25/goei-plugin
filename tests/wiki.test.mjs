@@ -208,3 +208,16 @@ test('renderArticle: fold면 정답 문단(탈출·금기 등)만 접고 각주�
   assert.ok(html.includes('겉 이야기') && html.indexOf('겉 이야기') < html.indexOf('<details'));
   assert.ok(html.includes('<details class="nw-spoil fn">'));
 });
+
+test('dropDefaultAliases: 목록에 든 기본 별칭만 지우고 사용자 별칭은 남긴다', async () => {
+  const core = await import('../dist-test/core.mjs');
+  const books = realLore ? core.migrateLore(realLore) : null;
+  if (!books) return;
+  const dir = core.readDirectory(books);
+  const a = dir.agents.find((x) => x.aliases.length);
+  const drop = { 괴이: {}, '미스틱 사이트': {}, 요원: { [a.lore]: [a.aliases[0]] } };
+  const out = core.dropDefaultAliases(books, drop);
+  const b = core.readDirectory(out).agents.find((x) => x.lore === a.lore);
+  assert.deepEqual(b.aliases, a.aliases.slice(1));
+  assert.equal(core.dropDefaultAliases(out, drop), out, '두 번째는 바꿀 게 없다');
+});

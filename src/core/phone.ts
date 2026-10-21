@@ -238,6 +238,8 @@ export function directory(lore: LoreEntry[] | undefined, chat: Chat): Directory 
   for (const row of roster.characters ?? []) {
     const agentId = s(row?.id);
     if (!/^P\d{3,}$/.test(agentId) || !s(row.name)) continue;
+    // 캐릭터로 플레이: 주인공 자신은 연락처에 없다
+    if (agentId === String(chat.scriptstate?.['$st_player'] ?? '')) continue;
     const english = s(row.english);
     const c: Contact = {
       id: contactId(agentId), agentId, name: s(row.name), english, lore: s(row.lore), group: s(row.affiliation), rank: s(row.rank),

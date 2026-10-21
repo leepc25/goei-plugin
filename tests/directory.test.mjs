@@ -129,7 +129,9 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)) }));
   const outside = new Set(OLD_OUTSIDE_PLACES);
   const places = (l) => buildRegistry(l).entries.filter((e) => !e.key.startsWith('Agent roster/'));
-  assert.deepEqual(places(moved).map(j), places(realLore).filter((e) => !outside.has(e.lore)).map(j));
+  // 별칭은 빠진 항목이 쓰던 것을 다른 항목이 넘겨받을 수 있어(Mumyeong Chanran-gyo → 해피엔딩 홀) 이름만 견줌
+  const ids = (e) => `${e.key}|${e.name}|${e.lore}`;
+  assert.deepEqual(places(moved).map(ids), places(realLore).filter((e) => !outside.has(e.lore)).map(ids));
   // 요원은 그대로 (자리를 비운 별칭은 요원 이름 찾기로 넘어감)
   const agentKeys = (l) => buildRegistry(l).entries.filter((e) => e.key.startsWith('Agent roster/')).map((e) => e.key);
   assert.deepEqual(agentKeys(moved), agentKeys(realLore));

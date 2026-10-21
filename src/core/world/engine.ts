@@ -93,6 +93,8 @@ export interface WorldState {
   ended: EndedEntry[];
   /** 이 채팅에서 클리어한 괴이 이름 (위키 정답 문단을 처음부터 펼친다) */
   cleared?: string[];
+  /** 캐릭터로 플레이: 유저가 연기하는 요원 코드. 요원 명단(AG 태그·요원 칸·편성)에서 뺀다 */
+  player?: string;
 }
 
 export interface EndedEntry {
@@ -324,7 +326,7 @@ export function tick(w: WorldState, c: Catalog, s: WorldSettings, rng: Rng) {
 
 /** 이 소속에서 보이는 요원 (결번 제외, 상한까지) */
 export function rosterFor(w: WorldState, c: Catalog, faction: string, limit: number) {
-  return c.people.filter((p) => p.rosterFor.includes(faction as FactionCode) && !w.retired.includes(p.id)).slice(0, limit);
+  return c.people.filter((p) => p.rosterFor.includes(faction as FactionCode) && !w.retired.includes(p.id) && p.id !== w.player).slice(0, limit);
 }
 
 function agentRecord(w: WorldState, code: string): AgentRecord {
@@ -582,8 +584,9 @@ export function applyOutput(prev: WorldState, c: Catalog, s: WorldSettings, fact
 }
 
 /** START 직후 첫 추첨 (원본: 첫 입력 때 한 번) */
-export function bootstrap(c: Catalog, s: WorldSettings, rng: Rng): WorldState {
+export function bootstrap(c: Catalog, s: WorldSettings, rng: Rng, player = ''): WorldState {
   const w = emptyWorld();
+  if (player) w.player = player;
   tick(w, c, s, rng);
   return w;
 }
