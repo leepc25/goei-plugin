@@ -21,6 +21,23 @@ export interface StagePlan extends FloorPlan {
   };
 }
 
+/** 좁은 길 뒷줄 사물함 그림이 차지하는 월드 x 구간 (사물함 한 칸 = 화면 252px, 100px 간격, 가운데 기준).
+ * 층 tick은 이 구간 전체에서 사물함 뒤 깊이로 못 들어가게 막는다 (검수 16-1). 뒷줄이 없으면 null. */
+export function narrowBackSpan(t: Terrain, terr: readonly Terrain[] = []): [number, number] | null {
+  if (t.kind !== 'narrow' || t.lane0 <= 0) return null;
+  let lastX = t.x0 + 50;
+  while (lastX + 100 < t.x1 - 20) lastX += 100;
+  let a = t.x0 - 76,
+    b = lastX + 126;
+  // 이웃 좁은 길(지그재그 미로)과는 사이 가운데까지만: 줄을 바꿀 틈을 남긴다
+  for (const o of terr) {
+    if (o === t || o.kind !== 'narrow') continue;
+    if (o.x1 <= t.x0) a = Math.max(a, (o.x1 + t.x0) / 2);
+    else if (o.x0 >= t.x1) b = Math.min(b, (t.x1 + o.x0) / 2);
+  }
+  return [a, b];
+}
+
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
 export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
@@ -334,7 +351,8 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   // 깊이 줄(뒷줄 사물함 등)은 매 장면 새로 모아 엔진에 넘긴다
   const layers: NonNullable<StagePlan['depthLayers']> = [];
   plan.depthLayers = layers;
-  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub), layers);
+  const allTerr = segs.flatMap((s) => s.terrain);
+  for (const s of segs) if (!(s.x + s.w < vx0 || s.x > vx1)) for (const t of s.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(plan.stage.where, plan.stage.floor?.type, plan.stage.where === 'floor' ? '' : s.ref, plan.stage.floor?.sub), layers, allTerr);
   void CHUNK_W;
 }
 
@@ -342,7 +360,7 @@ function roomName(ref: string): string {
   return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
-export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '', layers?: NonNullable<StagePlan['depthLayers']>) {
+export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Palette, y0: number, y1: number, place = '', layers?: NonNullable<StagePlan['depthLayers']>, segTerrain: readonly Terrain[] = []) {
   const w = t.x1 - t.x0;
   switch (t.kind) {
     case 'pit': {
@@ -572,10 +590,8 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       };
       // 뒷줄 사물함은 배경이 아니라 깊이 줄로(엔진이 몸과 y 순서로 섞어 그린다): 그 뒤에 선 몸은 가려지고 앞에 선 몸은 위에 (검수 9)
       if (a > y0 && layers) {
-        // 줄의 그림 폭(사물함 한 칸 = 화면 252px, 가운데 기준): 엔진이 뒤에 선 몸을 이 폭으로 찾는다
-        let lastX = t.x0 + 50;
-        while (lastX + 100 < t.x1 - 20) lastX += 100;
-        layers.push({ y: a, x0: t.x0 - 76, x1: lastX + 126, draw: (c) => {
+        const [sx0, sx1] = narrowBackSpan(t, segTerrain)!;
+        layers.push({ y: a, x0: sx0, x1: sx1, draw: (c) => {
           for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) if (!drawPropArt(c, 'clutter', '사물함', x, a)) break;
         } });
       } else if (a > y0 && !row('사물함', a)) {

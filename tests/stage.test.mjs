@@ -168,6 +168,7 @@ function bot(eng) {
   const ahead = p.x + k.x * 70;
   let lo = 0,
     hi = 160;
+  const cs = [];
   for (const t of st.terrain) {
     // 좁은 길은 사물함·차단대 그림 폭만큼(±120) 앞에서부터 막힌다
     let m = 0;
@@ -176,11 +177,19 @@ function bot(eng) {
       for (const o of st.terrain) if (o !== t && o.kind === 'narrow') m = Math.min(m, Math.max(0, (o.x0 >= t.x1 ? o.x0 - t.x1 : t.x0 - o.x1) / 2 - 30));
     }
     const hit = Math.min(p.x, ahead) < t.x1 + m && Math.max(p.x, ahead) > t.x0 - m;
+    // 뒷줄 사물함은 그림 폭 전체가 막힌다
+    const bs = t.kind === 'narrow' ? S.narrowBackSpan(t, st.terrain) : null;
+    if (bs && Math.min(p.x, ahead) < bs[1] + 44 && Math.max(p.x, ahead) > bs[0] - 44) (lo = Math.max(lo, t.lane0)), cs.push(t);
     if (!hit) continue;
     if ((t.kind === 'pit' || t.kind === 'block') && !p.airborne) k.jump = true;
     if (t.kind === 'low') k.crouch = true;
-    if (t.kind === 'narrow') (lo = Math.max(lo, t.lane0)), (hi = Math.min(hi, t.lane1));
+    if (t.kind === 'narrow') (lo = Math.max(lo, t.lane0)), (hi = Math.min(hi, t.lane1)), cs.push(t);
     if (t.kind === 'redfloor') k.y = p.y > 565 ? -1 : 1;
+  }
+  // 지그재그 미로에서 두 좁은 길이 겹쳐 보이면 앞으로 갈 길의 줄에 먼저 맞춘다
+  if (lo > hi && cs.length) {
+    const next = cs.reduce((a, b) => ((b.x0 - a.x0) * (k.x || 1) > 0 ? b : a));
+    (lo = next.lane0), (hi = next.lane1);
   }
   if (lo > 0 || hi < 160) {
     const ty = 440 + ((lo + hi) / 2 / 160) * 250;

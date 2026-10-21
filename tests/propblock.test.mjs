@@ -35,3 +35,13 @@ test('길 끝에 붙은 물건은 반대쪽으로 비켜 선다', () => {
   for (let i = 0; i < 10; i++) blockByProps([b], [t2], lane);
   assert.ok(b.y >= 450 + PROP_DEPTH && b.y <= lane[1]);
 });
+
+test('제자리에 묶인 적과 겹친 물건은 물건 쪽이 옆으로 비킨다', async () => {
+  const { nudgeProp } = await import('../dist-test/propblock.mjs');
+  const t = { x: 1000, y: 560, w: 146 };
+  const still = { x: 990, y: 562, z: 0 };
+  const stuck = blockByProps([{ ...still }], [t], lane);
+  nudgeProp(t, [still], [t], 40, 4000);
+  assert.ok(Math.abs(t.x - still.x) >= t.w / 2 + 60, `x=${t.x}`);
+  assert.ok(stuck instanceof Set);
+});

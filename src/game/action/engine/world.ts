@@ -362,9 +362,30 @@ export class World implements WorldView {
     }
   }
 
+  /** 적 모듈 몸끼리: 한 몸처럼 포개지지 않게 옆(x)으로 벌린다 (검수 16-3) */
+  private separateEnemies() {
+    type E = Body & { def?: { w: number; keep?: [number, number] }; state?: string };
+    const skip = (e: E) => !e.alive || e.team === 'player' || e.kind.startsWith('proj') || e instanceof Fighter || !e.def || e.z > 0 || (!!e.state && /^(dead|down|getup|grabbing|air|bound|hidden|spawn)$/.test(e.state));
+    const list = (this.bodies as E[]).filter((e) => !skip(e));
+    for (let i = 0; i < list.length; i++)
+      for (let j = i + 1; j < list.length; j++) {
+        const a = list[i],
+          b = list[j];
+        if (Math.abs(a.y - b.y) > 40) continue;
+        const min = 50 + (a.def!.w + b.def!.w) * 0.45;
+        const dx = b.x - a.x;
+        if (Math.abs(dx) >= min) continue;
+        const s = dx === 0 ? (a.id < b.id ? 1 : -1) : Math.sign(dx);
+        const push = Math.min(6, (min - Math.abs(dx)) / 2);
+        a.x -= s * push;
+        b.x += s * push;
+      }
+  }
+
   /** 겹친 몸을 옆으로 밀어낸다 (벨트스크롤에서 서로 뚫고 지나가지 않게) */
   private separate() {
     this.separateFromPlayer();
+    this.separateEnemies();
     const list = [this.player as Body, ...this.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.z <= 0) as Fighter[];
     for (let i = 0; i < list.length; i++)
       for (let j = i + 1; j < list.length; j++) {

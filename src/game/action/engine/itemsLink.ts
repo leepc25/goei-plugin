@@ -33,7 +33,7 @@ import { drawPropArt } from '../art/bg';
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
-import { blockByProps } from './propBlock';
+import { blockByProps, nudgeProp } from './propBlock';
 import type { World } from './world';
 
 // 적 모듈에 없는 임시 적만 아이템 표로 굴린다. 적 모듈 적은 그쪽 드랍(custom 'enemyDrop')을 바닥에 놓는다.
@@ -205,7 +205,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       // 지형(단·구덩이·좁은 길·낮은 천장) 위에도 놓지 않는다 (검수 12-2: TV가 단 모서리에 걸침)
-      const terr = ((e.floor as { stage?: { terrain?: { x0: number; x1: number }[] } }).stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 220 }));
+      const terr = ((e.floor as { stage?: { terrain?: { x0: number; x1: number }[] } }).stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
       furnishFloor(field, { ...e.floor, props: [...(e.floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr] }, w.lane, () => w.rand());
       // 그림이 없는 물건(회색 기둥처럼 보이는 아이콘 대역)은 층에 두지 않는다 (재검수 2-1)
       field.ents = field.ents.filter((q) => q.type !== 'prop' || PROP_ART.has(q.prop));
@@ -236,6 +236,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   });
 
   const hitSeen = new Set<string>();
+  const overlapT = new WeakMap<object, number>();
+  // 검사 스크립트용: 바닥 물건 목록 (화면 검수에서 물건·몸 겹침을 숫자로 잰다)
+  Object.defineProperty(w, 'itemField', { get: () => field, configurable: true });
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
@@ -251,8 +254,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
-      const solids = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w }));
-      if (solids.length) blockByProps([p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral'), solids, w.lane);
+      const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
+      const solids = ents.map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w }));
+      if (solids.length) {
+        const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== 'bullet' && b.kind !== 'item' && b.team !== 'neutral');
+        const stuck = blockByProps(bodies, solids, w.lane);
+        // 0.5초 넘게 겹쳐 있으면(제자리에 묶인 적) 물건을 옆으로 옮긴다
+        ents.forEach((e, i) => {
+          const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
+          overlapT.set(e, n);
+          if (n > TICK_HZ / 2) nudgeProp(solids[i], bodies, solids, 40, (w.floor?.length ?? 99999) - 40), (e.x = solids[i].x), overlapT.set(e, 0);
+        });
+      }
       syncCarry();
       w.notes.cash = ir.cash;
       w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;

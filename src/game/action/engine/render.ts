@@ -429,8 +429,6 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
             const l = d.layer;
             ctx.save();
             ctx.translate(-camX, 0);
-            // 뒤에 몸(요원·적)이 서 있으면 키 큰 깊이 줄(사물함 줄)을 반투명으로: 뒤에서 싸우는 몸이 다 가려지지 않게 (검수 15-1)
-            if (all.some((b) => b.kind !== 'bullet' && b.kind !== 'item' && b.y < l.y - 2 && l.y - b.y < 300 && b.x > l.x0 - 60 && b.x < l.x1 + 60)) ctx.globalAlpha = 0.45;
             l.draw(ctx);
             ctx.restore();
           }

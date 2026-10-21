@@ -2,7 +2,7 @@
 export { createElevatorStage, itemName, type ElevatorStage, type StageHooks, type StageStore } from './module';
 export { makeFloor, validateFloor, pickType, pickSub, MAX_PIT, type GenContext } from './gen/floor';
 export { makeService, validateService, cellAt } from './gen/service';
-export { floorPlan, cellPlan, carPlan, endingPlan, type StagePlan } from './plan';
+export { narrowBackSpan, floorPlan, cellPlan, carPlan, endingPlan, type StagePlan } from './plan';
 export { elevatorButtons, buttonCount, announce, type ElevatorButton, type ElevatorLines } from './elevator';
 export { newMeta, newOuting, reshuffle, rulebook, exitOpen, exitProgress, currentKnown, sendFound, type StageMeta, type Outing } from './state';
 export { RULES, RULE, ruleText } from './data/rules';

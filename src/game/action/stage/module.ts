@@ -8,7 +8,7 @@ import { CLOSE_SPAM_LINE, LONELY_LINE, MUTTER, STUCK_LINE, announce, defaultCall
 import { makeFloor, pickSub, pickType } from './gen/floor';
 import { cellAt, makeService } from './gen/service';
 import { CHOICE_LABEL, PASSENGER_LABEL, defaultTalk, type PassengerChoice, type PassengerKind, type PassengerLines } from './passengers';
-import { carPlan, cellPlan, endingPlan, floorPlan, segAt, type StagePlan } from './plan';
+import { carPlan, cellPlan, endingPlan, floorPlan, narrowBackSpan, segAt, type StagePlan } from './plan';
 import { mix, rng } from './rng';
 import { addFavor, currentKnown, exitOpen, newMeta, newOuting, reshuffle, ruleVersion, sendFound, type Outing, type StageMeta, type Target } from './state';
 import { LANE_DEPTH, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Placed, type SpawnHook, type Terrain } from './types';
@@ -300,16 +300,23 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           }
           break;
         case 'narrow': {
-          // 사물함·차단대 그림 폭(몸 절반 포함)만큼 넓게 막는다: 사물함 줄 끝 바로 옆, 그 뒤 깊이에 서서 사물함에 박혀 보이지 않게 (검수 9)
-          // 이웃 좁은 길과 사이가 좁으면(지그재그) 줄을 바꿀 틈이 남도록 덜 넓힌다
+          // 앞줄 차단대: 그림 폭(몸 절반 포함)만큼 넓게 막는다 (검수 9). 이웃 좁은 길과 사이가 좁으면(지그재그) 줄을 바꿀 틈이 남도록 덜 넓힌다
           let M = 120;
           for (const o of terr) if (o !== t && o.kind === 'narrow') M = Math.min(M, Math.max(0, (o.x0 >= t.x1 ? o.x0 - t.x1 : t.x0 - o.x1) / 2 - 40));
-          const inN = p.x > t.x0 - M && p.x < t.x1 + M,
-            wasN = r.prevX > t.x0 - M && r.prevX < t.x1 + M;
-          if (inN && (lane < t.lane0 - 2 || lane > t.lane1 + 2)) {
-            if (!wasN) blocked = true;
-            else api.movePlayer(p.x, laneY(Math.max(t.lane0, Math.min(t.lane1, lane))));
-          }
+          // 뒷줄 사물함: 그림 폭 전체에서 사물함 뒤 깊이로 못 들어간다 (검수 16-1: 사물함 뒤에서 싸우면 다 가려짐)
+          const back = narrowBackSpan(t, terr) ?? [t.x0 - M, t.x1 + M];
+          const inB = (x: number) => x > back[0] - 44 && x < back[1] + 44,
+            inF = (x: number) => x > t.x0 - M && x < t.x1 + M;
+          const out = (lane < t.lane0 - 2 && inB(p.x) ? (inB(r.prevX) ? 'clamp' : 'block') : null) ?? (lane > t.lane1 + 2 && inF(p.x) ? (inF(r.prevX) ? 'clamp' : 'block') : null);
+          if (out === 'block') blocked = true;
+          else if (out === 'clamp') api.movePlayer(p.x, laneY(Math.max(t.lane0, Math.min(t.lane1, lane))));
+          // 적도 사물함 뒤로 들어가지 않는다
+          if (back && t.lane0 > 0)
+            for (const b of api.world.bodies) {
+              if (!b.alive || b.team === 'player' || b.kind === 'bullet' || b.kind === 'item') continue;
+              const bl = ((b.y - Y_TOP) / (Y_BOTTOM - Y_TOP)) * LANE_DEPTH;
+              if (bl < t.lane0 && inB(b.x)) b.y = laneY(t.lane0);
+            }
           break;
         }
         case 'redfloor':
