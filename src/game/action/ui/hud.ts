@@ -5,6 +5,7 @@
 import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './kit';
 import { ITEM_IMG } from './kit.gen';
 import { H as H0, W as W0 } from './stage';
+import { setExplorationMap } from './mapLayout';
 
 // 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
 let W = W0,
@@ -152,6 +153,7 @@ export class Hud {
   }
 
   draw(c: CanvasRenderingContext2D, s: HudState, dt: number) {
+    setExplorationMap(c.canvas, false);
     this.t += dt;
     this.track(s, dt);
     c.save();
@@ -395,7 +397,8 @@ export class Hud {
   private boss(c: CanvasRenderingContext2D, b: NonNullable<HudState['boss']>, compact?: boolean) {
     const w = 640,
       x = W / 2 - w / 2,
-      y = compact ? 84 : H - 128;
+      // The exploration minimap occupies the upper centre on landscape phones.
+      y = H - 128;
     label(c, b.name, x, y - 6, 16, '#f0c0b0');
     c.fillStyle = 'rgba(0,0,0,0.7)';
     c.fillRect(x, y, w, 14);
