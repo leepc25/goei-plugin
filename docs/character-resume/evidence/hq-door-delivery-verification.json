@@ -1,0 +1,47 @@
+{
+  "verified_at": "2026-10-22T19:50:46.562117+09:00",
+  "delivery_commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+  "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+  "receipt_path": "game-src/art/hq-door-round2/evidence/get-image-result.json",
+  "receipt_sha256": "cf8ab86cf545520a17e57920ae1595f42abe7a3d529b7a756e889ceff9dad210",
+  "charged_generations": 1,
+  "verification_scope": "Git commit内 영수증·원본/상태 PNG 규격 확인; 서비스 재조회·시각 승인·실기기 검수 아님",
+  "files": [
+    {
+      "path": "game-src/art/hq-door-round2/raw/pixellab-d0105c20.png",
+      "sha256": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03",
+      "size": [
+        96,
+        144
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "game-src/art/hq-door-round2/states/closed.png",
+      "sha256": "b29fdc0157085f53034a2a67311b356ba355779b311e31ad2f143c1adf829154",
+      "size": [
+        96,
+        144
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "game-src/art/hq-door-round2/states/half.png",
+      "sha256": "b6466006b95796d019b381d4eb14577ebb4d91cc051f266887d9b436b038a97c",
+      "size": [
+        96,
+        144
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "game-src/art/hq-door-round2/states/open.png",
+      "sha256": "17d3794d33cd2205d0f81af1d9ebcc77f8117bfa87760e19bc731880ca03d2d5",
+      "size": [
+        96,
+        144
+      ],
+      "mode": "RGBA"
+    }
+  ]
+}

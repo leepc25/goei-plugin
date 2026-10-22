@@ -104,10 +104,10 @@
       "reserved_generation_calls": 1,
       "quoted_charge": 1,
       "quote_status": "담당자가 get_image completed / charged 1 generation 전달",
-      "state": "original_recovered_local_assembly_pending",
+      "state": "delivered_cost_reconciled",
       "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
       "actual_charge": 1,
-      "delivery_sha": null,
+      "delivery_sha": "17ec31076d41863bae52e32f0491b8014af7119e",
       "do_not_generate_in_character_queue": true,
       "opening_plan": "동일 문틀·문짝 로컬 분리; 추가 유료 생성 예약 없음",
       "received_at": "2026-10-22T19:36:28.507035+09:00",
@@ -124,12 +124,15 @@
       "charge_unit": "generations",
       "submitted_generation_calls": 1,
       "remaining_reserved_generation_calls": 0,
-      "updated_at": "2026-10-22T19:39:30.694327+09:00",
+      "updated_at": "2026-10-22T19:50:46.562117+09:00",
       "cost_evidence": {
-        "source": "owner_report_of_completed_job_receipt",
+        "source": "committed_completed_job_receipt_verified",
         "independently_fetched_here": false,
         "reported_cost": 1,
-        "unit": "generation"
+        "unit": "generation",
+        "repository_receipt_verified": true,
+        "delivery_commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+        "path": "game-src/art/hq-door-round2/evidence/get-image-result.json"
       },
       "recovery": {
         "reported_complete": true,
@@ -138,8 +141,9 @@
           144
         ],
         "mode": "RGBA",
-        "delivery_sha": null,
-        "assembly_status": "분리된 문짝 형태; 로컬 개구부/문틀 고정 조립과 상태 분리 중"
+        "delivery_sha": "17ec31076d41863bae52e32f0491b8014af7119e",
+        "assembly_status": "로컬 조립·상태 분리 완료; 담당 납품",
+        "original_sha256": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03"
       },
       "reported_balance_change": {
         "before": "14160.30",
@@ -147,7 +151,52 @@
         "source": "문 담당 세션 전달",
         "note": "공유 계정 전체의 현재 잔액으로 간주하지 않음; 개별 과금은 작업 영수증 기준"
       },
-      "repeat_generation": false
+      "repeat_generation": false,
+      "cost_ledger_status": "complete",
+      "delivery": {
+        "root": "game-src/art/hq-door-round2/",
+        "review_url": "https://rawcdn.githack.com/leepc25/goei-plugin/17ec31076d41863bae52e32f0491b8014af7119e/game-src/art/hq-door-round2/review/index.html",
+        "handoff_url": "https://github.com/leepc25/goei-plugin/blob/17ec31076d41863bae52e32f0491b8014af7119e/game-src/art/hq-door-round2/DELIVERY.md",
+        "anchor": [
+          48,
+          136
+        ],
+        "aperture": [
+          8,
+          11,
+          80,
+          125
+        ],
+        "display_scale": 2,
+        "world_threshold": [
+          1364,
+          440
+        ],
+        "png_origin": [
+          1268,
+          168
+        ],
+        "marker_center": [
+          1364,
+          464
+        ],
+        "verification_evidence": "docs/character-resume/evidence/hq-door-delivery-verification.json"
+      },
+      "reported_validation": {
+        "frame_static_across_9_steps": true,
+        "integration_capture_commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+        "pc_and_mobile_emulation": true,
+        "proposed_renderer_three_states_pixel_match": true,
+        "note": "담당 전달/납품서 기록; 이 세션에서 브라우저 재검사하지 않음"
+      },
+      "pending_completion_scopes": [
+        "사용자 시각 승인",
+        "실기기 검사",
+        "메인 통합",
+        "이동 회귀검사"
+      ],
+      "user_visual_approval": false,
+      "main_integrated": false
     },
     {
       "reservation_id": "hq-first-day-corridor-round2-01a1632e",
@@ -256,10 +305,10 @@
     }
   ],
   "external_cost_summary": {
-    "as_of_received_at": "2026-10-22T19:39:30.694327+09:00",
+    "as_of_received_at": "2026-10-22T19:50:46.562117+09:00",
     "reported_receipt_charge_generations": 2,
     "pending_quoted_generations": 10,
     "pending_quote_reservation": "spangdal-first-hit-hand-01a1632e82b9",
-    "note": "담당자 전달 영수증 기준 2회. 스팡달 10회는 미실행 견적. 이 세션 신규 생성 0회; 현재 잔액은 독립 조회하지 않음."
+    "note": "작업별 누적 차감 2회(문1회는 납품 커밋 영수증 확인, 복도1회는 담당 전달). 완료 갱신은 추가 차감 아님. 스팡달10회는 실행 보고 전 견적. 현재 잔액 독립 조회 없음."
   }
 }
