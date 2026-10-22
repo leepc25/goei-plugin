@@ -1,0 +1,16 @@
+before generations_remaining: 15728.70
+resume pending ['handear', 'handshead', 'handswork', 'holdlook', 'liesit', 'seathold', 'seatmouth', 'sweep'] new 81
+done liesit
+done handswork
+done handshead
+done seatmouth
+done seathold
+done holdlook
+done handear
+done sweep
+sub liehold
+sub carry2_idle
+done carry2_idle
+sub carry2_walk
+done liehold
+sub carry2_run
