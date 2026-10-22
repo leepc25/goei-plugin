@@ -1,0 +1,139 @@
+01:38:03 base pixen-801 create_image_pixen -> id: a87ff636-cea4-487b-a420-d649f4c657a5
+job_id: a87ff636-cea4-487b-a420-d649f4c657a5
+model: pixen
+description: Side-vie
+01:38:04 base pixen-802 create_image_pixen -> id: efb33aed-c2cc-4237-8beb-62db9bd8ae75
+job_id: efb33aed-c2cc-4237-8beb-62db9bd8ae75
+model: pixen
+description: Side-vie
+01:38:04 base pixen-803 create_image_pixen -> id: a2f6d74a-3fc9-4152-b200-df214a6ccedb
+job_id: a2f6d74a-3fc9-4152-b200-df214a6ccedb
+model: pixen
+description: Side-vie
+01:38:04 base pixen-804 create_image_pixen -> id: 7fe363fc-7709-4c36-b11c-2de57215b41f
+job_id: 7fe363fc-7709-4c36-b11c-2de57215b41f
+model: pixen
+description: Side-vie
+01:38:05 base flux-811 create_image_pixflux -> id: 3ba3639d-5073-41c7-92c8-d03a59e844f7
+job_id: 3ba3639d-5073-41c7-92c8-d03a59e844f7
+description: Side-view pixel art s
+01:38:05 base flux-812 create_image_pixflux -> id: 838b3d7d-cd54-4f8b-99f8-c15075188e3b
+job_id: 838b3d7d-cd54-4f8b-99f8-c15075188e3b
+description: Side-view pixel art s
+01:38:05 base flux-813 create_image_pixflux -> id: d820e781-dede-4a12-8dbb-98e69e862bb2
+job_id: d820e781-dede-4a12-8dbb-98e69e862bb2
+description: Side-view pixel art s
+01:38:05 base flux-814 create_image_pixflux -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+01:39:21 base p2-821 create_image_pixen -> id: 8d5d6266-c13c-421a-932a-bf703797e23d
+job_id: 8d5d6266-c13c-421a-932a-bf703797e23d
+model: pixen
+description: Side-vie
+01:39:21 base p2-822 create_image_pixen -> id: ca10c1e8-d7b0-49da-90c7-0af38e13b06a
+job_id: ca10c1e8-d7b0-49da-90c7-0af38e13b06a
+model: pixen
+description: Side-vie
+01:39:22 base p2-823 create_image_pixen -> id: bea14b3c-f409-4125-9d24-aa507818ad89
+job_id: bea14b3c-f409-4125-9d24-aa507818ad89
+model: pixen
+description: Side-vie
+01:39:38 base p2-824 create_image_pixen -> id: e0d16b11-0f32-484b-8ae7-e8028ce0969b
+job_id: e0d16b11-0f32-484b-8ae7-e8028ce0969b
+model: pixen
+description: Side-vie
+01:39:54 base f2-831 create_image_pixflux -> id: 289ba88e-77f9-4f45-b76e-d5a0aced51a9
+job_id: 289ba88e-77f9-4f45-b76e-d5a0aced51a9
+description: Side-view pixel art s
+01:39:54 base f2-832 create_image_pixflux -> id: da9f2ad8-a260-428c-b087-35d17cd7078d
+job_id: da9f2ad8-a260-428c-b087-35d17cd7078d
+description: Side-view pixel art s
+01:41:59 base: 1차 7회(pixen 4·pixflux 3) + 2차 6회(pixen 4·pixflux 2) = 13회. 채택 cand-p2-823 → 피부 채도 0.72배 → full/base.png (224x176, 발 y168)
+01:47:25 gen pbase 3f seed11 -> id: b89025d3-23fc-41bd-8ee9-2161ddbadc09
+job_id: b89025d3-23fc-41bd-8ee9-2161ddbadc09
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:49:17 gen pbase done
+01:50:00 refedit seed41 -> id: a4aadda1-194f-4478-9780-dc571b4e25a4
+job_id: a4aadda1-194f-4478-9780-dc571b4e25a4
+model: pixen
+edit: Keep the pose, body, face and size exactly the same. Th
+01:50:00 refedit seed42 -> id: 7939e36a-f181-46f6-a2f3-9456602894d5
+job_id: 7939e36a-f181-46f6-a2f3-9456602894d5
+model: pixen
+edit: Keep the pose, body, face and size exactly the same. Th
+01:50:01 refedit seed43 -> id: d47ea2df-9de9-4ea1-acb7-04d9e09d0033
+job_id: d47ea2df-9de9-4ea1-acb7-04d9e09d0033
+model: pixen
+edit: Keep the pose, body, face and size exactly the same. Th
+01:51:30 base armor-851 -> id: 8b7bf83f-a627-4f27-88e7-b13f6b081c49
+job_id: 8b7bf83f-a627-4f27-88e7-b13f6b081c49
+model: pixen
+description: Side-vie
+01:51:30 base armor-852 -> id: 3c27dc37-1aab-441c-8d27-717ae23326da
+job_id: 3c27dc37-1aab-441c-8d27-717ae23326da
+model: pixen
+description: Side-vie
+01:52:12 base armor-853 -> id: d49b0bf5-8d87-4088-8f03-84e0d5881f4f
+job_id: d49b0bf5-8d87-4088-8f03-84e0d5881f4f
+model: pixen
+description: Side-vie
+01:52:12 base armor-854 -> id: fa4ed485-0f4a-4b51-9686-559b51159073
+job_id: fa4ed485-0f4a-4b51-9686-559b51159073
+model: pixen
+description: Side-vie
+01:52:13 base armor-855 -> id: 5ffa1ecc-5817-4280-b170-5041d248604a
+job_id: 5ffa1ecc-5817-4280-b170-5041d248604a
+model: pixen
+description: Side-vie
+01:52:13 base armor-856 -> id: 2c72cc35-279c-449a-9849-33471b53cf2d
+job_id: 2c72cc35-279c-449a-9849-33471b53cf2d
+model: pixen
+description: Side-vie
+01:52:17 gen idle 4f seed11 -> id: 6a1506d3-ff51-4b2e-81d0-26bdfdebf81e
+job_id: 6a1506d3-ff51-4b2e-81d0-26bdfdebf81e
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:52:17 gen guard 4f seed11 -> id: 353b86b0-8141-4d4a-b0f6-b13376deee1b
+job_id: 353b86b0-8141-4d4a-b0f6-b13376deee1b
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:52:17 gen walk 8f seed11 -> id: 7f3c9ddf-330c-43e0-ac1f-9f5fa9d624f8
+job_id: 7f3c9ddf-330c-43e0-ac1f-9f5fa9d624f8
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:52:18 gen chop1 5f seed11 -> id: a359b483-f554-4677-b47a-67bd613235ec
+job_id: a359b483-f554-4677-b47a-67bd613235ec
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:52:39 gen cleave 7f seed11 -> id: cfdd20fe-1430-49cb-82a5-78d974862f34
+job_id: cfdd20fe-1430-49cb-82a5-78d974862f34
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:52:39 gen bigboot 6f seed11 -> id: 448f9f43-4e54-4497-bd63-7112f2f2f1ab
+job_id: 448f9f43-4e54-4497-bd63-7112f2f2f1ab
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:54:10 base armor_edit seed61 -> id: 95000f86-152a-4e8b-984f-70d50c9e14d5
+job_id: 95000f86-152a-4e8b-984f-70d50c9e14d5
+model: pixen
+edit: Keep the pose, 
+01:54:11 base armor_edit seed62 -> id: 98b67b23-3157-4d36-848b-03435db609d2
+job_id: 98b67b23-3157-4d36-848b-03435db609d2
+model: pixen
+edit: Keep the pose, 
+01:54:20 gen guard done
+01:54:21 gen chop1 done
+01:54:38 gen idle done
+01:54:41 gen walk done
+01:54:43 gen cleave done
+01:54:52 base armor_edit seed63 -> id: 6a90bdaf-ec7a-424b-97d2-e978f9000835
+job_id: 6a90bdaf-ec7a-424b-97d2-e978f9000835
+model: pixen
+edit: Keep the pose, 
+01:55:01 gen bigboot done
+01:57:21 gen pbase 3f seed11 -> id: 360e44b2-1b36-4672-a647-cae6342e8226
+job_id: 360e44b2-1b36-4672-a647-cae6342e8226
+description: huge figure fully encased in near-future powered plate armor,
+01:57:23 gen idle 4f seed11 -> id: c135940a-fac4-48ef-b8f5-159327a6eae2
+job_id: c135940a-fac4-48ef-b8f5-159327a6eae2
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:58:04 gen beard 5f seed11 -> id: 1dde6604-31a7-4682-a367-a160be3f806d
+job_id: 1dde6604-31a7-4682-a367-a160be3f806d
+description: huge bald man, two meters tall, muscular wrestler build with 
+01:58:45 gen engage 5f seed11 -> id: 8765f45f-7e8a-4c53-8e99-eea3f852ed75
+job_id: 8765f45f-7e8a-4c53-8e99-eea3f852ed75
+description: huge bald man, two meters tall, muscular wrestler build with 

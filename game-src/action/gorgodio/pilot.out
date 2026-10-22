@@ -1,0 +1,14 @@
+before generations_remaining: 8482
+sub idle
+sub guard
+sub walk
+sub chop1
+sub cleave
+sub bigboot
+done guard
+done chop1
+done idle
+done walk
+done cleave
+done bigboot
+after generations_remaining: 8384
