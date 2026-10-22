@@ -87,5 +87,39 @@
     "eileen showerturn/shower/bath",
     "gorgodio undress/showerturn/shower/bath",
     "deadpole 20 bathing frames"
+  ],
+  "external_reservations": [
+    {
+      "reservation_id": "hq-glass-door-round2-01a1632c",
+      "owner_thread_id": "01a1632c-ef37-7b13-b0b2-099b78b84713",
+      "owner_chat": "제작 및 검수할 본부 출입구",
+      "owner_branch": "codex/pixellab-doors-round2",
+      "asset": "본부 유리문 닫힘 원본",
+      "canvas": [
+        96,
+        144
+      ],
+      "variants": 1,
+      "tool": "create_image_pixen",
+      "reserved_generation_calls": 1,
+      "quoted_charge": null,
+      "quote_status": "담당자가 공식 비용 재확인 중",
+      "state": "reserved_by_other_session_pending_gallery_recovery_check",
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "opening_plan": "동일 문틀·문짝 로컬 분리; 추가 유료 생성 예약 없음",
+      "received_at": "2026-10-22T19:36:28.507035+09:00",
+      "reported_account_snapshot": {
+        "source": "문 담당 세션 전달; 이 캐릭터 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "MCP 정상이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "active_jobs": 0,
+        "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      },
+      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중"
+    }
   ]
 }
