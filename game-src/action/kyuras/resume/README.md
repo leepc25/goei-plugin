@@ -18,7 +18,7 @@
 
 준비 브랜치 `087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4`의 `tools/recover_character_jobs.py`와 회수 검사를 선택 반입해 큐라스 전용으로 만들었다. 전체 브랜치를 병합하지 않았다. `tools/recover_kyuras_jobs.py`는 두 고정 ID의 `get_image`와 작업별 REST 조회만 허용한다. 계정 전체 조회·생성·취소는 호출할 수 없다. 같은 머신의 다른 worktree도 공통 잠금을 쓴다. 별도 머신 담당은 총괄 배정으로 단일 소유권을 유지해야 한다.
 
-환경 비밀 변수로 인증이 연결되고 총괄이 계정 상태를 확인한 뒤:
+환경 비밀 변수 `PIXELLAB_API_TOKEN` 또는 `PIXELLAB_API_KEY`를 지원한다. 둘 다 있으면 비어 있지 않은 `PIXELLAB_API_TOKEN`을 우선한다. 값은 프록시 대체값일 수도 있으므로 변수의 존재를 인증 성공으로 간주하지 않는다. 기존 프록시·CA 설정은 그대로 보존한다. 인증이 연결되고 총괄이 실제 API 응답으로 계정 상태를 확인한 뒤:
 
 ```sh
 python3 tools/recover_kyuras_jobs.py inspect --clip idle_shotgun

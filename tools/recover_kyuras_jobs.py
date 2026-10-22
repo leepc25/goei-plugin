@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only Kyuras PixelLab recovery. No generation, cancellation, or automatic promotion.
 
-PIXELLAB_API_TOKEN is supplied by the environment, never a CLI argument.
+PIXELLAB_API_TOKEN or PIXELLAB_API_KEY is supplied by the environment, never a CLI argument.
 Use: python3 tools/recover_kyuras_jobs.py inspect|recover
 """
 import argparse
@@ -55,10 +55,16 @@ def parse_rpc(raw):
     raise ValueError("MCP JSON-RPC response missing")
 
 
+def credential_from_environment():
+    # A configured value may be a proxy placeholder; only an API response verifies authentication.
+    # Retain inherited proxy and CA configuration. TOKEN takes precedence when both are set.
+    return os.environ.get("PIXELLAB_API_TOKEN") or os.environ.get("PIXELLAB_API_KEY", "")
+
+
 class Client:
     def __init__(self, token):
         if not token:
-            raise ValueError("PIXELLAB_API_TOKEN 미설정: 큐라스 작업 조회·회수 불가")
+            raise ValueError("PIXELLAB_API_TOKEN / PIXELLAB_API_KEY 미설정: 큐라스 작업 조회·회수 불가")
         self.token = token
 
     def request(self, url, data=None):
@@ -177,7 +183,7 @@ def main():
     parser.add_argument("--clip", choices=sorted(JOBS))
     parser.add_argument("--output", type=Path, default=ROOT / "game-src/action/kyuras/recovered")
     args = parser.parse_args()
-    client = Client(os.environ.get("PIXELLAB_API_TOKEN", ""))
+    client = Client(credential_from_environment())
     lock_path = Path("/tmp/goei-pixellab-kyuras-recovery.lock")
     with lock_path.open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

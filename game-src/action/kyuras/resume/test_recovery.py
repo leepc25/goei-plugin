@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from PIL import Image
 
 spec = importlib.util.spec_from_file_location("recovery", Path(__file__).resolve().parents[4] / "tools/recover_kyuras_jobs.py")
@@ -35,6 +36,15 @@ class FakeClient:
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_environment_credential_aliases_and_precedence(self):
+        for environment, expected in [({}, ""),
+                ({"PIXELLAB_API_TOKEN": "token-value"}, "token-value"),
+                ({"PIXELLAB_API_KEY": "key-value"}, "key-value"),
+                ({"PIXELLAB_API_TOKEN": "", "PIXELLAB_API_KEY": "key-value"}, "key-value"),
+                ({"PIXELLAB_API_TOKEN": "token-value", "PIXELLAB_API_KEY": "key-value"}, "token-value")]:
+            with self.subTest(variable_names=sorted(environment)), patch.dict(M.os.environ, environment, clear=True):
+                self.assertEqual(M.credential_from_environment(), expected)
+
     def test_forbids_submission_and_cancellation_before_network(self):
         c = M.Client("fake-token")
         for name in ["animate_with_skeleton_v3", "cancel_job", "edit_image", "get_balance", "list_jobs"]:
