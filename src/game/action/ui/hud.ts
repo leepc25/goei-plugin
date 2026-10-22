@@ -6,6 +6,8 @@ import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './ki
 import { ITEM_IMG } from './kit.gen';
 import { H as H0, W as W0 } from './stage';
 import { setExplorationMap } from './mapLayout';
+import type { NavigationFeedback } from '../engine/navigationFeedback';
+import { drawHintIcon } from '../engine/hint';
 
 // 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
 let W = W0,
@@ -41,8 +43,10 @@ export interface HudState {
   favor: number;
   money: { cash: number; budget: number; research: number; teeth: number };
   boss?: { name: string; hp: number; max: number } | null;
-  /** 조사·줍기 안내 (게임 화면 좌표) */
+  /** 구형 조사 안내. 좌표는 호환을 위해 받고 고정 안내 영역에 표시한다. */
   prompt?: { text: string; key: string; x: number; y: number } | null;
+  /** 읽기 전용 출입·목표 안내. 엔진 연결은 navigation-feedback-round2.patch 참조. */
+  navigation?: NavigationFeedback;
   meters?: { label: string; v: number; max: number; color: string }[];
   timer?: { label: string; sec: number } | null;
   message?: string;
@@ -102,6 +106,28 @@ export function label(c: CanvasRenderingContext2D, s: string, x: number, y: numb
 }
 /** HUD 글자를 도트 글꼴로 (draw 하는 동안만 켠다: 다른 모듈이 label 을 빌려 쓸 때는 원래 글꼴) */
 let pixelOn = false;
+/** 말줄임표까지 폭에 포함한다. UTF-16 중간을 잘라 아이콘을 깨뜨리지 않는다. */
+function fitText(c: CanvasRenderingContext2D, text: string, width: number): string {
+  if (c.measureText(text).width <= width) return text;
+  const chars = Array.from(text);
+  while (chars.length && c.measureText(chars.join('') + '…').width > width) chars.pop();
+  return chars.join('') + '…';
+}
+function wrapText(c: CanvasRenderingContext2D, text: string, width: number, maxRows: number): string[] {
+  const rows: string[] = [];
+  let line = '';
+  const chars = Array.from(text.replace(/\s+/g, ' '));
+  for (let i = 0; i < chars.length; i++) {
+    if (line && c.measureText(line + chars[i]).width > width) {
+      rows.push(line);
+      if (rows.length === maxRows - 1) return [...rows, fitText(c, chars.slice(i).join(''), width)];
+      line = '';
+    }
+    line += chars[i];
+  }
+  if (line) rows.push(line);
+  return rows;
+}
 /** HUD 밖(효과 층)에서도 도트 글꼴로 쓰게 켠다/끈다 */
 export function setPixelText(on: boolean) {
   pixelOn = on;
@@ -171,7 +197,7 @@ export class Hud {
     if (s.boss) this.boss(c, s.boss, s.compact);
     this.timer(c, s);
     if (s.message) this.message(c, s.message, s.compact);
-    if (s.prompt) this.prompt(c, s.prompt, s.device);
+    this.navigation(c, s);
     this.drawToasts(c, dt);
     pixelOn = false;
     c.restore();
@@ -210,7 +236,7 @@ export class Hud {
 
   /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
   private agent(c: CanvasRenderingContext2D, s: HudState) {
-    const x = 22,
+    const x = s.compact ? 100 : 22,
       y = 18,
       fs = 80;
     // 뒤를 살짝 어둡게 (밝은 배경에서도 읽히게)
@@ -244,7 +270,7 @@ export class Hud {
     // 능력(고유기) 재사용: 얼굴 아래 얇은 띠
     if (s.maxEnergy) bar(c, x - 2, y + fs + 12, fs + 4, 5, (s.energy ?? 0) / s.maxEnergy, '#e8e2d0', '#000');
     const bx = x + fs + 30,
-      bw = 300;
+      bw = s.compact ? 250 : 300;
     label(c, s.agent.name, bx, y + 20, 22, C.name, 'left', 900);
     c.font = font(22, 900);
     let ax = bx + c.measureText(s.agent.name).width + 10;
@@ -271,7 +297,7 @@ export class Hud {
     if (bf) nine(c, bf, kitSlice('bar'), bx - 22, by - 10, bw + 44, bh + 20, 2);
     // 필살 게이지: 체력 아래, 가득 차면 빛남
     const gy = by + bh + 9,
-      gw = 220,
+      gw = s.compact ? 180 : 220,
       gh = 12;
     const full = s.gauge >= 100;
     c.fillStyle = '#000';
@@ -290,7 +316,7 @@ export class Hud {
     // 탄: 총알 그림 + 큰 숫자
     if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
     // 가드 같은 상황 막대는 묶음 아래
-    let my = y + fs + 22;
+    let my = y + fs + 52; // 탄약 줄(126) 아래에서 시작
     for (const m of s.meters ?? []) {
       label(c, m.label, x, my + 10, 13, m.color, 'left', 800);
       bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, '#000');
@@ -330,8 +356,9 @@ export class Hud {
   private floor(c: CanvasRenderingContext2D, s: HudState) {
     const f = s.floor;
     if (!f.depth) return;
-    label(c, f.depth, W - 20, 44, 32, '#fff', 'right', 900);
-    if (f.variant) label(c, f.variant, W - 20, 68, 15, C.amber, 'right', 800);
+    const right = W - (s.compact ? 100 : 20);
+    label(c, f.depth, right, 44, 32, '#fff', 'right', 900);
+    if (f.variant) label(c, f.variant, right, 68, 15, C.amber, 'right', 800);
   }
 
   /** 규칙서: 새로 찾은 규칙이 있을 때만 오른쪽 위에 잠깐. 전체 목록은 일시정지 메뉴 */
@@ -413,19 +440,42 @@ export class Hud {
   private timer(c: CanvasRenderingContext2D, s: HudState) {
     if (!s.timer) return;
     const t = Math.max(0, s.timer.sec);
-    label(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, W / 2, 40, 26, t < 10 ? C.hpLow : '#bfe0f0', 'center', 900);
+    // 아이템(482..714, 22..74) 아래, 미니맵 왼쪽. 터치 미니맵은 x=560부터다.
+    const x = s.compact ? 340 : 482, y = s.compact ? 174 : 116;
+    c.font = font(15);
+    const text = fitText(c, `${s.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, s.compact ? 120 : 230);
+    label(c, text, x, y, 15, t < 10 ? C.hpLow : '#bfe0f0');
   }
 
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
   drawMessage(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
+    // 본부는 draw()를 거치지 않는다. 직전 출동의 W/H/배율을 재사용하지 않는다.
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
     this.message(c, text, compact);
+    c.restore();
+  }
+
+  /** 본부의 전투 HUD 없는 화면에서도 동일한 안내 영역을 쓴다. */
+  drawNavigation(c: CanvasRenderingContext2D, navigation: NavigationFeedback, compact = false, device?: HudState['device']) {
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    this.navigation(c, { navigation, compact, device });
+    pixelOn = false;
+    c.restore();
   }
 
   private message(c: CanvasRenderingContext2D, text: string, compact?: boolean) {
     c.font = font(17, 600);
     let t = text;
-    while (c.measureText(t).width > 900 && t.length > 4) t = t.slice(0, -2);
-    if (t !== text) t += '…';
+    t = fitText(c, t, Math.min(900, W - (compact ? 240 : 64)));
     const w = c.measureText(t).width + 40;
     // 화면 맨 아래 띠: 몸통을 가로지르지 않게 (독립 검수: 자막이 캐릭터 허리를 관통)
     const y = H - 44;
@@ -433,34 +483,46 @@ export class Hud {
     label(c, t, W / 2, y + 25, 17, '#fff8e6', 'center', 600);
   }
 
-  private prompt(c: CanvasRenderingContext2D, p: NonNullable<HudState['prompt']>, device?: string) {
-    const bob = Math.sin(this.t * 5) * 3;
-    const key = device === 'pad' ? 'B' : device === 'touch' ? '조사' : p.key;
+  private navigation(c: CanvasRenderingContext2D, s: Pick<HudState, 'navigation' | 'prompt' | 'compact' | 'device'>) {
+    const nav = s.navigation;
+    if (!nav && !s.prompt) return;
+    // 상단 상태·미니맵, 하단 보스·자막·터치 버튼과 분리한 고정 안내 띠.
+    const y = s.compact ? 220 : 204;
+    const x = s.compact ? 100 : 20, width = W - x * 2;
+    const lines: { text: string; color: string }[] = [];
+    if (nav?.objective) lines.push({ text: `현재 목표 · ${nav.objective}`, color: C.rule });
+    const target = nav?.target;
+    if (target) {
+      const key = target.kind === 'locked' ? '잠김' : target.kind === 'decoration' ? '장식' : s.device === 'pad' ? 'B' : s.device === 'touch' || s.compact ? '조사' : 'E';
+      lines.push({ text: `[${key}] ${target.text}${target.reason ? ` · ${target.reason}` : ''}`, color: target.kind === 'locked' ? C.amber : C.text });
+    } else if (s.prompt) {
+      const key = s.device === 'pad' ? 'B' : s.device === 'touch' || s.compact ? '조사' : s.prompt.key;
+      lines.push({ text: `[${key}] ${s.prompt.text}`, color: C.text });
+    }
+    if (!lines.length) return;
     c.font = font(15);
-    const kw = Math.max(28, c.measureText(key).width + 14);
-    const tw = c.measureText(p.text).width;
-    const w = kw + tw + 22;
-    const x = Math.max(8, Math.min(W - w - 8, p.x - w / 2)),
-      y = Math.max(8, p.y - 40 + bob);
-    plate(c, x, y, w, 32, 8);
-    c.beginPath();
-    c.roundRect(x + 5, y + 5, kw, 22, 5);
-    c.fillStyle = '#ece6d4';
-    c.fill();
-    c.font = font(14, 800);
-    c.fillStyle = '#111';
-    c.textAlign = 'center';
-    c.fillText(key, x + 5 + kw / 2, y + 21);
-    label(c, p.text, x + kw + 13, y + 22, 15, '#fff');
+    // 도트 글꼴에 없는 원문자도 잠금 번호를 읽을 수 있게 숫자로 표시한다.
+    const rows = lines.flatMap(line => wrapText(c, line.text.replace(/[①②③④]/g, ch => `${'①②③④'.indexOf(ch) + 1}번`), width - 64, 2).map(text => ({ ...line, text })));
+    plate(c, x, y, width, rows.length * 28 + 14);
+    rows.forEach((row, i) => label(c, row.text, x + 12, y + 27 + i * 28, 15, row.color));
+    if (target) {
+      c.save();
+      c.translate(x + width - 24, y + rows.length * 28 - 2);
+      c.scale(0.4, 0.4);
+      drawHintIcon(c, 0, 0, 0, target.kind === 'locked' ? 'locked' : target.kind === 'decoration' ? 'decoration' : 'available');
+      c.restore();
+    }
   }
 
   private drawToasts(c: CanvasRenderingContext2D, dt: number) {
-    let y = 196;
+    let y = this.last?.navigation || this.last?.prompt ? (this.last.compact ? 220 : 204) + 154 : 196;
     for (const t of this.toasts) {
       t.t += dt;
       const a = t.t < 0.15 ? t.t / 0.15 : t.t > 2.2 ? Math.max(0, 1 - (t.t - 2.2) / 0.5) : 1;
       c.globalAlpha = a;
-      label(c, t.text, 22 + (1 - Math.min(1, t.t / 0.15)) * -20, y, 15, t.color);
+      const x = this.last?.compact ? 100 : 22;
+      c.font = font(15);
+      label(c, fitText(c, t.text, W - x * 2), x + (1 - Math.min(1, t.t / 0.15)) * -20, y, 15, t.color);
       c.globalAlpha = 1;
       y += 22;
     }
