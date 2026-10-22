@@ -1,6 +1,7 @@
 // 주 루프와 장면 관리. 30Hz 고정 틱 + 화면 주사율 그리기(보간).
 // 장면: 제목 → 본부(hq 모듈, 없으면 바로 출동) → 출동(층 → 층 …) → 본부 정산 / 엔진 정산 화면 → 제목·본부.
 // 화면 틀·메뉴·HUD는 ui 모듈(껍데기)이 있으면 그쪽을, 없으면 엔진 기본을 쓴다.
+import { pfont } from './pxfont';
 import { SCREEN_H, SCREEN_W, TICK_HZ, type GameEvent, type HqModuleLike, type RunConfigCore, type RunResultCore, type StageModule } from './contract';
 import type { Art } from './art';
 import { Input, type Pad } from './input';
@@ -341,11 +342,11 @@ export class Game {
       c.fillRect(0, 0, SCREEN_W, SCREEN_H);
       c.fillStyle = '#e8eef0';
       c.textAlign = 'center';
-      c.font = 'bold 44px sans-serif';
+      c.font = pfont(44).f;
       c.fillText(title, SCREEN_W / 2, 210);
     }
     c.textAlign = 'center';
-    c.font = '30px sans-serif';
+    c.font = pfont(30).f;
     items.forEach((t, i) => {
       const y = 300 + i * 64;
       c.fillStyle = i === this.menuIndex ? '#ffd36a' : 'rgba(255,255,255,0.1)';
@@ -397,12 +398,12 @@ export class Game {
         c.font = 'bold 30px monospace';
         c.fillStyle = '#8e9aa1';
         c.fillText('ANOMALY SIMULATION', SCREEN_W / 2, 120);
-        c.font = 'bold 58px sans-serif';
+        c.font = pfont(58).f;
         c.fillStyle = '#e8eef0';
         c.fillText('관리국 · 차원 승강기', SCREEN_W / 2, 190);
         this.drawMenu('', this.titleItems, false);
         c.fillStyle = '#8e9aa1';
-        c.font = '20px sans-serif';
+        c.font = pfont(20).f;
         c.textAlign = 'center';
         const help = [
           '방향키 이동 · A 3연타 · 달리며 A 돌진 · ↓↓ 앉기, 앉아 A 하단 · Space 점프, 공중 A 점프 킥',
@@ -436,14 +437,14 @@ export class Game {
         c.fillRect(0, 0, SCREEN_W, SCREEN_H);
         c.textAlign = 'center';
         c.fillStyle = r.how === 'evac' ? '#ff6a5a' : '#7fe0a0';
-        c.font = 'bold 64px sans-serif';
+        c.font = pfont(64).f;
         c.fillText(how, SCREEN_W / 2, 200);
         c.fillStyle = '#e8eef0';
-        c.font = '30px sans-serif';
+        c.font = pfont(30).f;
         const lines = [`처치 ${r.kills}`, `최대 콤보 ${r.maxCombo}`, `층 ${r.floors}`, `시간 ${r.timeSec}초`, `남은 체력 ${r.hpLeft}`];
         lines.forEach((l, i) => c.fillText(l, SCREEN_W / 2, 290 + i * 48));
         c.fillStyle = '#8e9aa1';
-        c.font = '22px sans-serif';
+        c.font = pfont(22).f;
         c.fillText('A 또는 화면을 누르면 처음으로', SCREEN_W / 2, 600);
         c.textAlign = 'left';
       },

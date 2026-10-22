@@ -1,4 +1,5 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
+import { pfont } from './pxfont';
 import { drawPropArt } from '../art/bg';
 import { drawHintIcon } from './hint';
 import { drawGoSign } from '../ui/title';
@@ -78,7 +79,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillStyle = 'rgba(80,200,120,0.18)';
       ctx.fillRect(ex, wallTop + 120, 90, top - wallTop - 140);
       ctx.fillStyle = '#7fe0a0';
-      ctx.font = 'bold 22px sans-serif';
+      ctx.font = pfont(22).f;
       ctx.fillText('출구', ex + 22, wallTop + 110);
     }
   }
@@ -251,7 +252,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         case 'text':
           ctx.globalAlpha = 1 - k;
           ctx.fillStyle = '#fff';
-          ctx.font = 'bold 26px sans-serif';
+          ctx.font = pfont(26).f;
           ctx.textAlign = 'center';
           ctx.fillText(f.text ?? '', sx, sy - 30 * k);
           break;
@@ -290,7 +291,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.fillRect(20, 20, 420, 92);
     ctx.fillStyle = '#e8eef0';
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = pfont(20).f;
     ctx.fillText('쟈알디', 34, 46);
     ctx.fillStyle = '#3a2224';
     ctx.fillRect(120, 30, 300, 18);
@@ -306,7 +307,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillStyle = '#9ad08a';
     ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
     // 탄
-    ctx.font = '16px sans-serif';
+    ctx.font = pfont(16).f;
     ctx.fillStyle = '#c9d3d8';
     ctx.fillText('탄', 34, 98);
     for (let i = 0; i < p.mag; i++) {
@@ -322,7 +323,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillStyle = 'rgba(0,0,0,0.55)';
       ctx.fillRect(x, 20, 58, 58);
       ctx.fillStyle = '#8e9aa1';
-      ctx.font = '14px sans-serif';
+      ctx.font = pfont(14).f;
       ctx.fillText(String(i + 1), x + 4, 36);
       if (it) {
         ctx.fillStyle = it.n > 0 ? '#e8eef0' : '#5a646a';
@@ -333,7 +334,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     // 콤보
     if (p.combo >= 2) {
       ctx.save();
-      ctx.font = 'bold 54px sans-serif';
+      ctx.font = pfont(54).f;
       ctx.textAlign = 'right';
       ctx.fillStyle = '#ffd36a';
       ctx.strokeStyle = '#000';
@@ -348,7 +349,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillStyle = 'rgba(0,0,0,0.6)';
       ctx.fillRect(240, SCREEN_H - 62, 800, 40);
       ctx.fillStyle = '#e8eef0';
-      ctx.font = 'bold 18px sans-serif';
+      ctx.font = pfont(18).f;
       ctx.fillText(boss.label, 252, SCREEN_H - 36);
       ctx.fillStyle = '#5a1e1e';
       ctx.fillRect(470, SCREEN_H - 50, 556, 16);
@@ -366,13 +367,13 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
       ctx.fillRect(0, 170, SCREEN_W, 70);
       ctx.fillStyle = `rgba(232,238,240,${a})`;
-      ctx.font = 'bold 34px sans-serif';
+      ctx.font = pfont(34).f;
       ctx.textAlign = 'center';
       ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
       ctx.textAlign = 'left';
     }
     if (w.subtitle && opt.hud) {
-      ctx.font = '24px sans-serif';
+      ctx.font = pfont(24).f;
       ctx.textAlign = 'center';
       const tw = ctx.measureText(w.subtitle.text).width;
       ctx.fillStyle = 'rgba(0,0,0,0.65)';
@@ -403,7 +404,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(art.cutin, x - 200, bandY - 40, 340, 340);
     }
-    ctx.font = 'bold 72px sans-serif';
+    ctx.font = pfont(72).f;
     ctx.fillStyle = '#fff';
     ctx.fillText('전부 폭파', x + 220, bandY + 160);
   }

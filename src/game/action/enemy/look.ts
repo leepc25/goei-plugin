@@ -529,9 +529,37 @@ function mix(hex: string, to: string, k: number): string {
 const cache = new WeakMap<Enemy, Board & { key: string }>();
 
 /** 그림 모양이 있는 종은 true를 돌려 주고, 없으면 상자 그리기에 맡긴다 */
+// 같은 종이 여럿 나와도 복제처럼 보이지 않게: 한 마리마다 옷 색·머리색·체격·키를 조금씩 (독립 검수: 회색 클론 반복)
+const OUTFITS: [string, string, string][] = [
+  ['#6a4a3a', '#2e2a26', '#2a1e16'],
+  ['#3e5a4a', '#262e2a', '#141414'],
+  ['#5a5070', '#2a2834', '#3a2a1e'],
+  ['#7a6a4a', '#3a3428', '#5a4a3a'],
+  ['#44546e', '#22262e', '#101012'],
+  ['#704848', '#2c2224', '#1c1a1a'],
+];
+function varied(e: Enemy, L: Look): { L: Look; scale: number } {
+  if (L.shape !== 'human' || e.boss || e.kind.startsWith('fb_')) return { L, scale: 1 };
+  const v = (e.id * 2654435761) >>> 0;
+  if (v % 5 === 0) return { L, scale: 1 };
+  const o = OUTFITS[v % OUTFITS.length];
+  const k = 0.35 + ((v >> 4) % 3) * 0.12;
+  return {
+    L: {
+      ...L,
+      top: mix(L.top ?? '#5a5a5a', o[0], k),
+      bottom: mix(L.bottom ?? '#2a2a2a', o[1], k),
+      hair: (v >> 7) % 2 ? o[2] : L.hair,
+      bulk: (L.bulk ?? 0.16) * (0.88 + ((v >> 9) % 4) * 0.06),
+    },
+    scale: 0.93 + ((v >> 12) % 4) * 0.035,
+  };
+}
+
 export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
-  const L = lookFor(e.kind);
-  if (!L || typeof document === 'undefined') return false;
+  const L0 = lookFor(e.kind);
+  if (!L0 || typeof document === 'undefined') return false;
+  const { L, scale } = varied(e, L0);
   const p = poseOf(e);
   const base = e.def.color;
   const col: Record<Part, string> = {
@@ -546,7 +574,7 @@ export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
   const flash = e.flash > 0 && p.lie === 0 && e.state !== 'dead' && e.state !== 'down';
   const transform = (x: Board['x']) => {
     x.setTransform(1 / PIXEL, 0, 0, 1 / PIXEL, OX, OY + (e.mem.cling && L.shape === 'spider' ? -40 : 40));
-    x.scale(e.dir, 1);
+    x.scale(e.dir * scale, scale);
     const upright = L.shape === 'human' || L.shape === 'hand';
     if (e.mem.cling && L.shape === 'spider') x.scale(1, -1);
     if (p.lie > 0 && !upright) {
