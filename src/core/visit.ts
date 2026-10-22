@@ -7,6 +7,7 @@ export interface VisitTurn { id: string; at: number; agentId: string; name: stri
 export interface VisitRecord { turns: VisitTurn[] }
 export type VisitRoom = 'office' | 'lounge' | 'infirmary' | 'quarters';
 export function visitRoom(a: CardAgent): VisitRoom | null {
+  if (a.locked) return null;
   if (/외근|비번|격리|작전투입|실종|사망|미정/.test(a.state)) return null;
   if (/부상|치료/.test(a.state)) return 'infirmary';
   if (/수면|취침/.test(a.state)) return 'quarters';

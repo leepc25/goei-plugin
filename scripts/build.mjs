@@ -5,8 +5,9 @@ import { buildGamePack, buildPack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION;
 // 업데이트 주소: package.json의 goei.updateBase (저장소 release 폴더 raw 주소). 있으면 Risu 플러그인 탭이 이 주소로 플러그인을 갱신한다
-const updateBase = String(pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
+const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
   '//@display-name 괴이: 이면세계',

@@ -1,0 +1,4558 @@
+ength: 3, low: true, box: [-70, 90, 0, 40], dy: 40, shake: 8, noise: 0.8 }]
+    },
+    // D 길게: 충전(charge 반복) 뒤 놓으면 큰 폭파 (쟈알디 단독 시연판과 같게)
+    bigblast: {
+      clip: "blast",
+      ticks: T(0, 0, 2, 7, 5, 3, 3, 3),
+      armor: [0, 4, 3],
+      hits: [{ at: [3], dmg: 40, react: "down", push: 20, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [10, 120, 0, 100], dy: 50, shake: 12, noise: 1 }]
+    },
+    // F: 숙련 3 연쇄 폭파 (앞으로 세 번), G: 숙련 6 벽 통째로
+    chain: {
+      clip: "chain",
+      ticks: T(2, 3, 3, 3, 3, 3, 3, 3),
+      armor: [1, 5, 2],
+      hits: [
+        { at: [1], dmg: 12, react: "stagger", push: 6, stop: 4, strength: 2, box: [20, 70, 10, 90], dy: 34, shake: 4, noise: 0.5 },
+        { at: [3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2, box: [50, 110, 10, 90], dy: 34, shake: 5, noise: 0.5 },
+        { at: [5], dmg: 18, react: "down", push: 14, lift: 14, stop: 7, strength: 3, armorBreak: true, box: [80, 150, 10, 100], dy: 40, shake: 8, noise: 0.8 }
+      ]
+    },
+    wall: {
+      clip: "wall",
+      ticks: T(2, 3, 3, 3, 8, 4, 3, 3),
+      armor: [0, 5, 3],
+      hits: [{ at: [4], dmg: 34, react: "down", push: 24, lift: 10, stop: 10, strength: 3, armorBreak: true, box: [20, 140, 0, 120], dy: 70, shake: 12, noise: 1 }]
+    },
+    fire: { clip: "fire", ticks: T(2, 2, 2, 1) },
+    draw: { clip: "draw", ticks: T(2, 2, 2, 2, 2) },
+    holster: { clip: "holster", ticks: T(2, 2, 2, 2, 2) },
+    reload: { clip: "reload", ticks: T(4, 4, 4, 4) },
+    evade: { clip: "evade", ticks: T(1, 2, 2, 2, 2, 2), invuln: [0, 4], lunge: [15, 0.84] },
+    land: { clip: "land", ticks: T(1, 2, 2), free: true },
+    // 잡기 타격: 무릎. 세 번째는 잡기 폭파로 넘어감
+    grabknee: {
+      clip: "grabknee",
+      ticks: T(2, 2, 4, 3),
+      hits: [{ at: [2], dmg: 7, react: "none", push: 0, stop: 4, strength: 2, box: [14, 46, 20, 60] }]
+    },
+    grabblast: {
+      clip: "grabblast",
+      ticks: T(2, 2, 2, 2, 6, 3, 3, 3),
+      armor: [0, 7, 2],
+      hits: [{ at: [4], dmg: 22, react: "down", push: 16, lift: 15, stop: 8, strength: 3, armorBreak: true, box: [10, 70, 20, 90], dy: 26, shake: 8, noise: 0.8 }]
+    },
+    // W: 필살기. 컷인 뒤 큰 폭발 (장 7)
+    super: {
+      clip: "super",
+      ticks: T(2, 2, 2, 2, 2, 2, 4, 9, 5, 5),
+      invuln: [0, 9],
+      hits: [{ at: [7], dmg: 60, react: "down", push: 18, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [20, 170, 0, 110], dy: 60, shake: 14, noise: 1 }]
+    },
+    pickup: { clip: "pickup", ticks: T(2, 2, 2, 2, 2, 2) },
+    drink: { clip: "drink", ticks: T(3, 3, 3, 3, 3, 3) },
+    eat: { clip: "eat", ticks: T(3, 3, 3, 3, 3, 3) },
+    bandage: { clip: "bandage", ticks: T(3, 3, 3, 3, 3, 3) },
+    toss: { clip: "toss", ticks: T(2, 2, 2, 3, 3, 2) },
+    // 임시 무기: 판정은 아이템 모듈이 낸다 (내구도·물건 부수기와 같이). 엔진은 동작만
+    wswing: { clip: "pipe", ticks: T(2, 2, 2, 3, 4, 5), lunge: [5, 0.75] },
+    wfire: { clip: "fire", ticks: T(2, 2, 2, 1) },
+    // 산탄총·기관단총은 어깨에 견착해서 쏜다
+    wshot: { clip: "shotgun", ticks: T(1, 3, 3, 2, 2) }
+  };
+  var COMBO = ["jab", "cross", "power"];
+
+  // src/game/action/engine/progression.ts
+  var NEUTRAL = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
+  var positive = (value, fallback) => typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+  function progressionFor(run) {
+    const s2 = run?.launch?.stats;
+    return {
+      agent: run?.agent ?? "jyaldi",
+      fromHq: !!run?.launch,
+      stats: {
+        hp: positive(s2?.hp, run?.hpMax ?? NEUTRAL.hp),
+        power: positive(s2?.power, NEUTRAL.power),
+        aim: positive(s2?.aim, NEUTRAL.aim),
+        defense: typeof s2?.defense === "number" && Number.isFinite(s2.defense) ? Math.max(0, Math.min(0.5, s2.defense)) : 0,
+        speed: positive(s2?.speed, NEUTRAL.speed),
+        poise: typeof s2?.poise === "number" && Number.isFinite(s2.poise) ? Math.max(0, Math.min(3, s2.poise)) : 0,
+        charge: positive(s2?.charge, NEUTRAL.charge)
+      },
+      relics: [...run?.launch?.relics ?? []],
+      moves: [...run?.launch?.moves ?? []]
+    };
+  }
+  function initializeProgression(player, run) {
+    player.progression = progressionFor(run);
+    player.hp = player.hpMax = player.progression.stats.hp;
+    if (player.progression.relics.includes("first_guard")) player.ward++;
+  }
+  var BLAST_MOVES = /* @__PURE__ */ new Set(["blast", "bigblast", "groundblast", "grabblast", "chain", "wall", "super"]);
+  var isBlastMove = (move3) => BLAST_MOVES.has(move3);
+  function progressionHit(hit2, p, kind) {
+    const damage3 = hit2.dmg * (kind === "melee" ? p.stats.power : kind === "ranged" ? p.stats.aim : 1);
+    if (kind !== "ability" || p.agent !== "jyaldi" || !p.relics.includes("own_jyaldi")) return damage3 === hit2.dmg ? hit2 : { ...hit2, dmg: damage3 };
+    const x = (hit2.x0 + hit2.x1) / 2, z = (hit2.z0 + hit2.z1) / 2;
+    const halfX = (hit2.x1 - hit2.x0) * 0.6, halfZ = (hit2.z1 - hit2.z0) * 0.6;
+    return { ...hit2, dmg: damage3, x0: x - halfX, x1: x + halfX, z0: z - halfZ, z1: z + halfZ, dy: (hit2.dy ?? 18) * 1.2 };
+  }
+  function defendedHit(hit2, p) {
+    return p.stats.defense ? { ...hit2, dmg: hit2.dmg * (1 - p.stats.defense) } : hit2;
+  }
+  function canUseMasteryMove(p, key2) {
+    if (!p.fromHq) return true;
+    return key2 === "chain" ? p.moves.includes("unique_a") : key2 === "wall" ? p.moves.includes("unique_b") : true;
+  }
+  function masteryMove(p, key2, move3) {
+    if (key2 !== "super" || !p.moves.includes("ult2")) return move3;
+    return { ...move3, hits: move3.hits?.map((h) => ({ ...h, at: [...h.at, 8] })) };
+  }
+  var masteryHitId = (p, key2, frame2, id) => id + (key2 === "super" && p.moves.includes("ult2") && frame2 >= 8 ? 1 : 0);
+
+  // src/game/action/engine/player.ts
+  var WALK_X = 9;
+  var WALK_Y = 4.2;
+  var RUN_X = 18;
+  var CROUCH_X = 3.4;
+  var JUMP_V = 31;
+  var BUFFER = 8;
+  var MAG = 8;
+  var HOLSTER_AFTER = 48;
+  var CHARGE_AFTER = 9;
+  var FIGHT_STANCE = 150;
+  var SKILL_CD = 75;
+  var GRAB_TIME = 66;
+  var Player = class extends Fighter {
+    constructor(clips) {
+      super();
+      this.clips = clips;
+      this.friction = 0.72;
+    }
+    team = "player";
+    kind = "player";
+    label = "쟈알디";
+    hp = 220;
+    hpMax = 220;
+    width = 30;
+    // 동작
+    move = null;
+    moveKey = "";
+    mf = 0;
+    mft = 0;
+    attackId = 0;
+    connected = false;
+    comboStep = 0;
+    comboTimer = 0;
+    buf = null;
+    // 자세
+    crouching = false;
+    guarding = false;
+    running = false;
+    wasGuarding = 0;
+    airAttackUsed = false;
+    // 총
+    ammo = MAG;
+    mag = MAG;
+    reserve = 40;
+    gunOut = 0;
+    queuedShot = false;
+    burst = 0;
+    burstT = 0;
+    dry = false;
+    // D 길게: 충전
+    chargeT = -1;
+    charging = false;
+    /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
+    fightT = 0;
+    /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
+    ally = null;
+    /** 강화 선택 등이 곱하는 공격력 배수 */
+    dmgMul = 1;
+    progression = progressionFor();
+    // 게이지
+    gauge = 0;
+    guardMeter = 100;
+    skillCd = 0;
+    combo = 0;
+    comboClock = 0;
+    maxCombo = 0;
+    // 잡기
+    grabbed = null;
+    grabT = 0;
+    grabHits = 0;
+    // 그리기
+    animClock = 0;
+    gaitFrame = 0;
+    gaitMoving = false;
+    gaitDir = 1;
+    lowWarned = false;
+    /** 부적: 피격 무효 남은 횟수 */
+    ward = 0;
+    /** 이 틱에 요청한 일 (world가 처리) */
+    /** 든 것: 환경 물건은 머리 위('over'), 임시 무기는 손('hand'). 그림은 엔진이 따로 그린다 */
+    carry = null;
+    /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
+    itemAct = null;
+    seat = null;
+    sit(clip, x, y, face, exit) {
+      if (!this.clips[clip]?.length || this.z > 0 || this.phase !== "free" || this.move && this.moveKey !== "pickup") return false;
+      this.cancelMove();
+      this.buf = null;
+      this.running = this.guarding = this.crouching = this.charging = false;
+      this.chargeT = -1;
+      this.wantItem = 0;
+      this.wantSuper = false;
+      this.vx = this.vy = this.vz = 0;
+      this.x = this.px = x;
+      this.y = this.py = y;
+      this.dir = face;
+      this.resetLocomotion();
+      this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
+      return true;
+    }
+    wantInteract = false;
+    wantItem = 0;
+    wantSuper = false;
+    get state() {
+      if (this.phase !== "free") return this.phase;
+      if (this.move) return this.moveKey;
+      if (this.grabbed) return "grab";
+      if (this.airborne) return "jump";
+      if (this.guarding) return "guard";
+      if (this.crouching) return "crouch";
+      return this.running ? "run" : "idle";
+    }
+    get guardMeterView() {
+      return this.guardMeter;
+    }
+    /* ───────── 판정 ───────── */
+    frameInfo() {
+      const a = this.anim();
+      const list = this.clips[a.clip];
+      return { info: list ? list[Math.min(a.frame, list.length - 1)] : null, origin: a.origin };
+    }
+    /** 든 물건을 그릴 자리: 발 기준 앞쪽 px(dx), 높이 px(dz), 각도° (오른쪽 보기 기준) */
+    heldAt() {
+      if (!this.carry) return null;
+      const { info, origin } = this.frameInfo();
+      const P = PIXEL;
+      if (this.carry.hold === "over" && info?.hand && /^carry2_|^toss/.test(this.anim().clip)) return { dx: (info.hand[0] - origin) * P, dz: info.hand[1] * P, deg: 0 };
+      if (this.carry.hold === "over") {
+        const top = info?.hurt ? info.hurt[3] : 96;
+        return { dx: ((info?.hurt ? (info.hurt[0] + info.hurt[1]) / 2 : 0) - origin) * P, dz: (top - 6) * P, deg: 0 };
+      }
+      const h = info?.hand;
+      if (h) return { dx: (h[0] - origin) * P, dz: h[1] * P, deg: h[2] };
+      const r = info?.reach;
+      return r ? { dx: ((r[0] + r[1]) / 2 - origin) * P, dz: (r[2] + r[3]) / 2 * P, deg: -30 } : { dx: 18 * P, dz: 50 * P, deg: -30 };
+    }
+    frame() {
+      const { info, origin } = this.frameInfo();
+      const P = PIXEL;
+      const hurt2 = [];
+      if (this.alive && this.phase !== "dead") {
+        const h = info?.hurt;
+        if (h) hurt2.push(toWorld(this, (h[0] - origin) * P, (h[1] - origin) * P, h[2] * P, h[3] * P, 16));
+        else hurt2.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
+      }
+      const hit2 = [];
+      const al = this.ally;
+      if (al?.hitOn) {
+        const a = al.dir === 1 ? al.x + 260 : al.x - 640, b = al.dir === 1 ? al.x + 640 : al.x - 260;
+        hit2.push({ x0: a, x1: b, z0: 0, z1: 320, y: al.y, dy: 70, attackId: al.id, dmg: 30 * this.dmgMul, react: "down", dir: al.dir, push: 16, lift: 16, stop: 8, strength: 3, armorBreak: true, noise: 1 });
+      }
+      if (this.move?.hits && this.phase === "free") {
+        for (const mh of this.move.hits) {
+          if (!mh.at.includes(this.mf)) continue;
+          const r = mh.box ?? info?.reach;
+          if (!r) continue;
+          const o = mh.box ? 0 : origin;
+          const w = toWorld(this, (r[0] - o) * P, (r[1] - o) * P, r[2] * P, r[3] * P, mh.dy ?? 20);
+          hit2.push({
+            ...w,
+            attackId: masteryHitId(this.progression, this.moveKey, this.mf, this.attackId),
+            dmg: mh.dmg * this.dmgMul,
+            react: mh.react,
+            dir: this.dir,
+            push: mh.push,
+            lift: mh.lift,
+            stop: mh.stop,
+            low: mh.low,
+            armorBreak: mh.armorBreak,
+            strength: mh.strength,
+            noise: mh.noise
+          });
+        }
+      }
+      return { hit: hit2.map((h) => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? "ability" : "melee")), hurt: hurt2 };
+    }
+    /** 지금 보여 줄 클립·장 */
+    anim() {
+      if (this.seat) return { clip: this.seat.clip, frame: this.seat.frame, origin: 0 };
+      const c = this.animClock;
+      const loop = (clip, every) => {
+        const n = this.clips[clip]?.length || 1;
+        return { clip, frame: Math.floor(c / every) % n, origin: 0 };
+      };
+      const gait = (clip) => ({ clip, frame: Math.floor(this.gaitFrame + 1e-9) % (this.clips[clip]?.length || 1), origin: 0 });
+      switch (this.phase) {
+        case "hurt":
+          return { clip: "hit", frame: Math.min(3, Math.floor(this.t / Math.max(1, this.until) * 4)), origin: 0 };
+        case "air-hurt":
+          return { clip: "down", frame: this.vz > 0 ? 0 : 1, origin: 0 };
+        case "down":
+          return { clip: "down", frame: Math.min(4, 2 + Math.floor(this.t / 3)), origin: 0 };
+        case "getup":
+          return { clip: "getup", frame: Math.min(4, Math.floor(this.t / this.until * 5)), origin: 0 };
+        case "dead":
+          return { clip: "down", frame: 4, origin: 0 };
+        default:
+      }
+      if (this.move) return { clip: this.move.clip, frame: this.mf, origin: this.move.origin ?? 0 };
+      if (this.grabbed) return { clip: "grab", frame: Math.min(3, Math.floor(this.grabT / 2)), origin: 0 };
+      if (this.airborne) {
+        const f = this.vz > 14 ? 2 : this.vz > 3 ? 3 : this.vz > -6 ? 4 : this.vz > -16 ? 5 : 6;
+        return { clip: "jump", frame: f, origin: 0 };
+      }
+      if (this.charging) return loop("charge", 3);
+      if (this.guarding) return { clip: "block", frame: Math.min(3, this.wasGuarding), origin: 0 };
+      if (this.crouching) return this.gaitMoving ? gait("crouchwalk") : { clip: "crouch", frame: 3, origin: 0 };
+      const held = this.heldSet();
+      const moving = this.gaitMoving;
+      const running = moving && this.running;
+      if (held) {
+        const want = `${held === "carry2" ? "carry2_" : ""}${running ? "run" : moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
+        const alt = `${held === "carry2" ? "carry2_" : ""}${moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
+        if (this.clips[want]) return moving ? gait(want) : loop(want, 6);
+        if (this.clips[alt]) return moving ? gait(alt) : loop(alt, 6);
+      }
+      if (running) return gait("run");
+      if (moving) return gait("walk");
+      if (this.gunOut > 0) return { clip: "fire", frame: Math.max(0, (this.clips.fire?.length ?? 4) - 1), origin: 0 };
+      return this.fightT > 0 ? loop("guard", 6) : loop("idle", 7);
+    }
+    /** 월드가 가구·지형·카메라 경계까지 처리한 뒤 한 번 호출한다.
+     * 입력 속도만 보면 벽에 막힌 채 계속 달리므로, 최종 이동량만 발걸음에 반영한다. */
+    finishLocomotion() {
+      const canWalk = this.phase === "free" && !this.move && !this.airborne && !this.grabbed && !this.guarding && !this.charging && this.stop <= 0;
+      const dx = Math.abs(this.x - this.px), dy = Math.abs(this.y - this.py);
+      const moving = canWalk && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) && (dx > 0.05 || dy > 0.05);
+      if (!moving) return this.resetLocomotion();
+      const speedX = this.crouching ? CROUCH_X : this.running ? RUN_X : WALK_X;
+      const speedY = this.running ? WALK_Y * 1.2 : WALK_Y;
+      const progress = Math.min(this.progression.stats.speed, Math.max(dx / speedX, dy / speedY));
+      if (!this.gaitMoving || this.gaitDir !== this.dir) this.gaitFrame = 0;
+      else this.gaitFrame += progress / (this.running && !this.crouching ? 2 : 3);
+      this.gaitMoving = true;
+      this.gaitDir = this.dir;
+    }
+    /** 방 이동·저장 복원은 보행 도중의 자세를 다음 방에 끌고 가지 않는다. */
+    resetLocomotion() {
+      this.gaitFrame = 0;
+      this.gaitMoving = false;
+      this.gaitDir = this.dir;
+    }
+    /** 든 물건 종류별 자세 클립 이름 조각 */
+    heldSet() {
+      const c = this.carry;
+      if (!c) return null;
+      if (c.kind === "prop") return "carry2";
+      if (c.cls === "melee") return "pipe";
+      if (c.cls === "gun" && c.id !== "servicepistol") return "shotgun";
+      return null;
+    }
+    /* ───────── 맞음 ───────── */
+    applyHit(hit2, world) {
+      if (this.invuln > 0 || this.move?.invuln && this.mf >= this.move.invuln[0] && this.mf <= this.move.invuln[1]) return { kind: "immune" };
+      const front = hit2.dir === -this.dir;
+      const blockable = !hit2.grab && (!hit2.low || this.crouching);
+      if (this.guarding && front && blockable && this.phase === "free") {
+        this.guardMeter -= (hit2.dmg ?? 0) * 2.4;
+        this.x += hit2.dir * Math.max(3, (hit2.push ?? 4) * 1.6);
+        world.emit({ type: "guard", x: this.x });
+        world.fx("ring", this.x + this.dir * 36, this.y, 90);
+        if (this.guardMeter <= 0) {
+          this.guardMeter = 0;
+          this.guarding = false;
+          world.emit({ type: "guardBreak", x: this.x });
+          world.say("가드가 깨졌다!", 1.2);
+          this.enter("hurt", 30);
+        }
+        return { kind: "guard" };
+      }
+      if (this.ward > 0 && hit2.dmg > 0) {
+        this.ward--;
+        this.invuln = 20;
+        world.fx("ring", this.x, this.y, 100, "3");
+        world.say("부적이 대신 맞았다", 1);
+        return { kind: "immune" };
+      }
+      hit2 = defendedHit(hit2, this.progression);
+      const armorFrame = this.move?.armor && this.mf >= this.move.armor[0] && this.mf <= this.move.armor[1] ? this.move.armor[2] : 0;
+      this.armor = armorFrame;
+      this.cancelMove();
+      if (this.grabbed) this.releaseGrab();
+      const r = super.applyHit(hit2, world);
+      if (r.kind === "hit" || r.kind === "armor") {
+        this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
+        world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
+        if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
+          this.lowWarned = true;
+          world.emit({ type: "hp:low" });
+        }
+      }
+      if (r.kind === "armor") this.armor = 0;
+      return r;
+    }
+    onKilled() {
+      this.crouching = this.guarding = this.running = false;
+    }
+    /* ───────── 한 틱 ───────── */
+    cancelMove() {
+      this.move = null;
+      this.moveKey = "";
+      this.queuedShot = false;
+    }
+    play(key2, world) {
+      if (!canUseMasteryMove(this.progression, key2)) {
+        world.say(key2 === "chain" ? "연쇄 폭파: 숙련 3에서 열린다." : "벽 통째로: 숙련 6에서 열린다.", 2);
+        return;
+      }
+      const m = masteryMove(this.progression, key2, MOVES[key2]);
+      this.move = m;
+      this.moveKey = key2;
+      this.mf = 0;
+      this.mft = 0;
+      this.attackId = newAttackId(2);
+      this.connected = false;
+      this.running = false;
+      this.guarding = false;
+      if (m.hits) this.fightT = FIGHT_STANCE;
+      if (m.lunge) this.vx = this.dir * m.lunge[0];
+      else if (!this.airborne) this.vx = 0;
+      this.vy = 0;
+      this.skipZeroFrames();
+      const ability2 = key2 === "blast" || key2 === "bigblast" || key2 === "groundblast" || key2 === "grabblast" || key2 === "chain" || key2 === "wall";
+      world.emit(ability2 ? { type: "ability", x: this.x, move: key2 } : key2 === "super" ? { type: "super", x: this.x, move: key2 } : key2 === "evade" ? { type: "evade", x: this.x } : { type: "custom", name: "move", data: key2 });
+    }
+    skipZeroFrames() {
+      const m = this.move;
+      if (!m) return;
+      while (this.mf < m.ticks.length - 1 && m.ticks[this.mf] === 0) this.mf++;
+    }
+    /** 엔진이 명중을 알려 줌 */
+    onConnect(world, killed) {
+      this.connected = true;
+      this.gauge = Math.min(100, this.gauge + 2.5 * this.progression.stats.charge);
+      this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
+      this.comboClock = 40;
+      this.maxCombo = Math.max(this.maxCombo, this.combo);
+      if (killed) this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
+      void world;
+    }
+    /** 멈춰 있는 동안(히트스톱) 입력만 받아 두기 */
+    listen(p) {
+      this.bufPress(p);
+      if (this.buf) this.buf.ttl = Math.max(this.buf.ttl, BUFFER);
+    }
+    bufPress(p) {
+      const order = [["super", "super"], ["skill", "skill"], ["attack", "attack"], ["jump", "jump"], ["shoot", "shoot"]];
+      for (const [k, b] of order) if (p.pressed.has(k)) this.buf = { b, ttl: BUFFER };
+      if (p.evade) this.buf = { b: "evade", ttl: BUFFER };
+    }
+    take(b) {
+      if (this.buf?.b === b) {
+        this.buf = null;
+        return true;
+      }
+      return false;
+    }
+    step(world) {
+      void world;
+    }
+    tick(world, p) {
+      if (this.seat) {
+        const s2 = this.seat;
+        this.wantInteract = false;
+        this.wantItem = 0;
+        this.wantSuper = false;
+        this.buf = null;
+        if (p.pressed.has("interact") && !s2.rising) {
+          s2.rising = true;
+          s2.tick = 0;
+        }
+        if (++s2.tick >= 4) {
+          s2.tick = 0;
+          if (s2.rising) {
+            if (s2.frame > 0) s2.frame--;
+            else {
+              this.x = this.px = s2.exit.x;
+              this.y = this.py = s2.exit.y;
+              this.seat = null;
+              this.resetLocomotion();
+            }
+          } else s2.frame = Math.min(s2.frame + 1, this.clips[s2.clip].length - 1);
+        }
+        return;
+      }
+      this.animClock++;
+      if (this.comboTimer > 0) this.comboTimer--;
+      if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
+      if (this.skillCd > 0) this.skillCd--;
+      if (!this.guarding) this.guardMeter = Math.min(100, this.guardMeter + 0.5);
+      this.bufPress(p);
+      if (this.buf && --this.buf.ttl < 0) this.buf = null;
+      this.wantInteract = p.pressed.has("interact");
+      this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
+      if (this.fightT > 0) this.fightT--;
+      if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
+      this.stepAlly(world);
+      if (this.stepReact(world)) {
+        this.running = this.guarding = this.crouching = this.charging = false;
+        this.chargeT = -1;
+        this.fightT = FIGHT_STANCE;
+        this.wantInteract = false;
+        this.wantItem = 0;
+        return;
+      }
+      this.armor = 0;
+      if (this.move?.free && (this.buf || p.mx || p.my)) this.cancelMove();
+      if (this.move) this.stepMove(world, p);
+      else if (this.charging) this.stepCharge(world, p);
+      else if (this.grabbed) this.stepGrab(world, p);
+      else this.stepFree(world, p);
+      this.stepPhysics(world);
+    }
+    stepPhysics(world) {
+      if (this.z > 0 || this.vz > 0) {
+        this.z += this.vz;
+        this.vz -= GRAVITY;
+        this.x += this.vx;
+        if (this.z <= 0) {
+          this.z = 0;
+          this.vz = 0;
+          this.airAttackUsed = false;
+          world.emit({ type: "land", x: this.x });
+          world.fx("dust", this.x, this.y, 0);
+          if (this.moveKey === "airkick" || !this.move) this.play("land", world);
+          this.vx = 0;
+        }
+      } else if (this.move) {
+        const k = this.move.lunge?.[1] ?? 0.6;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= k;
+        this.vy *= k;
+      } else {
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+      const [lo, hi] = world.lane;
+      this.y = Math.max(lo, Math.min(hi, this.y));
+      const [b0, b1] = world.bounds;
+      this.x = Math.max(b0 + 30, Math.min(b1 - 30, this.x));
+    }
+    stepMove(world, p) {
+      const m = this.move;
+      const key2 = this.moveKey;
+      const canCancel = this.connected ? m.cancel !== void 0 && this.mf >= m.cancel : m.whiffCancel !== void 0 && this.mf >= m.whiffCancel;
+      if (canCancel) {
+        const ci = COMBO.indexOf(key2);
+        if (this.connected && this.take("skill") && this.skillCd <= 0) return this.startSkill(world, p);
+        if (this.connected && this.take("super") && this.gauge >= 100) return this.startSuper(world);
+        if (this.take("attack")) {
+          const next = this.connected && ci >= 0 && ci < 2 ? COMBO[ci + 1] : "jab";
+          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+          this.comboStep = COMBO.indexOf(next);
+          this.endMoveAdvance();
+          return this.play(next, world);
+        }
+        if (this.connected && this.take("evade")) {
+          this.endMoveAdvance();
+          return this.startEvade(world, p);
+        }
+      }
+      if (key2 === "evade" && this.mf <= 2 && this.take("attack")) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        return this.play("dash", world);
+      }
+      if (key2 === "blast" && this.chargeT >= 0) {
+        if (p.held.has("skill")) {
+          this.chargeT++;
+          if (this.mf >= 2) {
+            this.mf = 2;
+            this.mft = 0;
+          }
+          if (this.chargeT >= CHARGE_AFTER) {
+            this.cancelMove();
+            this.charging = true;
+            this.chargeT = 0;
+            return;
+          }
+          return;
+        }
+        this.chargeT = -1;
+      }
+      if (key2 === "reload" && this.mf === 3 && this.mft === 0) {
+        const n = Math.min(this.mag - this.ammo, this.reserve);
+        this.ammo += n;
+        this.reserve -= n;
+        world.emit({ type: "reload", x: this.x });
+      }
+      if (key2 === "fire" && this.mf === 0 && this.mft === 0 && !this.dry) this.fireBullet(world);
+      if (++this.mft >= Math.max(1, m.ticks[this.mf])) {
+        this.mft = 0;
+        this.mf++;
+        this.skipZeroFrames();
+        const h = m.hits?.find((x) => x.at[0] === this.mf || key2 === "super" && x.at.includes(this.mf));
+        if (h) {
+          if (h.shake) world.shake(2, 1);
+          if (key2 === "blast" || key2 === "bigblast" || key2 === "grabblast" || key2 === "groundblast" || key2 === "super" || key2 === "chain" || key2 === "wall") {
+            const { info, origin } = this.frameInfo();
+            const hd = info?.hand;
+            const reachX = h.box ? (h.box[0] + h.box[1]) / 2 * PIXEL : 0;
+            const dx = key2 === "super" ? 130 * PIXEL / 2 : key2 === "groundblast" ? 0 : key2 === "chain" || key2 === "wall" || key2 === "bigblast" ? reachX : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
+            const dz = key2 === "groundblast" ? 10 : hd && key2 !== "super" ? hd[1] * PIXEL : 70 * PIXEL / 2;
+            world.fx("boom", this.x + this.dir * dx, this.y, dz);
+            world.shake(h.shake ?? 6, key2 === "super" ? 3 : 2);
+          }
+        }
+        if (this.mf >= m.ticks.length) return this.finishMove(world);
+      }
+    }
+    endMoveAdvance() {
+      const m = this.move;
+      if (m?.adv) this.x += this.dir * ((m.adv - (m.origin ?? 0)) * PIXEL);
+    }
+    finishMove(world) {
+      const key2 = this.moveKey;
+      if (this.move?.hits && !this.connected) world.emit({ type: "whiff", x: this.x });
+      const queued = this.queuedShot;
+      this.endMoveAdvance();
+      this.cancelMove();
+      if (key2 === "jab" || key2 === "cross") this.comboTimer = 8;
+      else this.comboStep = 0;
+      void queued;
+      if (key2 === "draw" || key2 === "fire" || key2 === "reload") this.gunOut = HOLSTER_AFTER;
+      if (key2 === "holster") this.gunOut = 0;
+      if (key2 === "grabblast" || key2 === "grabknee") {
+      }
+    }
+    startSkill(world, p) {
+      this.skillCd = SKILL_CD;
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      else this.faceNearest(world);
+      this.gunOut = 0;
+      this.play(this.crouching ? "groundblast" : "blast", world);
+      if (!this.crouching && p.held.has("skill")) this.chargeT = 0;
+    }
+    /** 충전 중: 놓으면 큰 폭파 */
+    stepCharge(world, p) {
+      this.vx = this.vy = 0;
+      this.chargeT++;
+      if (this.chargeT % 8 === 0) {
+        const hd = this.clips.charge?.[0]?.hand;
+        world.fx("spark", this.x + this.dir * ((hd ? hd[0] : 37) + 14) * PIXEL, this.y, (hd ? hd[1] : 70) * PIXEL);
+      }
+      if (!p.held.has("skill")) {
+        this.charging = false;
+        this.chargeT = -1;
+        this.play("bigblast", world);
+      }
+    }
+    startSuper(world) {
+      this.gauge = 0;
+      this.wantSuper = true;
+      this.play("super", world);
+    }
+    startEvade(world, p) {
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      this.play("evade", world);
+      const mx = p.mx || (p.my ? 0 : this.dir);
+      const sp = MOVES.evade.lunge[0];
+      this.vx = mx * sp;
+      this.vy = p.my * sp * 0.55;
+      this.invuln = 9;
+      world.fx("dust", this.x, this.y, 0);
+    }
+    /** S: 집어넣은 상태면 뽑기만, 뽑은 상태면 한 발. 3발 뒤 잠깐 멈춤, 빈 탄창은 「찰칵」 (R로 장전) */
+    tryShoot(world) {
+      this.fightT = FIGHT_STANCE;
+      if (this.gunOut <= 0) return this.play("draw", world);
+      if (this.burst >= 3 && this.burstT > 0) return;
+      this.dry = this.ammo <= 0;
+      if (this.dry) {
+        world.emit({ type: "empty", x: this.x });
+        world.say(this.reserve > 0 ? "찰칵 — R로 장전" : "찰칵 — 탄약이 없다", 1);
+      }
+      this.play("fire", world);
+      if (this.dry) {
+        this.mf = this.move.ticks.length - 1;
+        return;
+      }
+      if (++this.burst >= 3) this.burstT = 14;
+    }
+    fireBullet(world) {
+      this.ammo--;
+      this.gunOut = HOLSTER_AFTER;
+      world.emit({ type: "shot", x: this.x, ammo: this.ammo });
+      const { info, origin } = this.frameInfo();
+      const hd = info?.hand;
+      const mx = hd ? (hd[0] - origin + 14) * PIXEL : 48 * PIXEL;
+      const mz = hd ? (hd[1] + 3) * PIXEL : 74 * PIXEL;
+      world.addBullet({
+        x: this.x + this.dir * mx,
+        y: this.y,
+        z: mz,
+        dir: this.dir
+      });
+      world.fx("spark", this.x + this.dir * mx, this.y, mz);
+      this.x -= this.dir * 2;
+    }
+    callAlly(world) {
+      if (this.ally) return;
+      if (this.gauge < 50) return world.say("지원 호출: 필살 게이지 절반 필요", 1);
+      this.gauge -= 50;
+      const d3 = this.dir;
+      this.ally = { x: this.x - d3 * 580, y: Math.min(world.lane[1], this.y + 30), dir: d3, phase: "in", clip: "walk", f: 0, ft: 0, hitOn: false, id: newAttackId() };
+      world.say("「길 비켜.」", 1.4);
+    }
+    stepAlly(world) {
+      const a = this.ally;
+      if (!a) return;
+      a.hitOn = false;
+      a.ft++;
+      if (a.phase === "in") {
+        a.x += a.dir * 12;
+        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+        if ((this.x - a.x) * a.dir <= 150) Object.assign(a, { phase: "act", clip: "support", f: 3, ft: 0 });
+      } else if (a.phase === "act") {
+        if (a.ft >= 3) {
+          a.ft = 0;
+          a.f++;
+          if (a.f === 5) {
+            a.hitOn = true;
+            world.fx("boom", a.x + a.dir * 450, a.y, 150);
+            world.shake(10, 3);
+            world.emit({ type: "ability", x: a.x, move: "support" });
+          }
+          if (a.f >= (this.clips.support?.length || 10)) Object.assign(a, { phase: "out", clip: "walk", f: 0, ft: 0, dir: -a.dir });
+        }
+      } else {
+        a.x += a.dir * 12;
+        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+        if (Math.abs(a.x - this.x) > 900) this.ally = null;
+      }
+    }
+    /** 방향키 없이 칠 때: 등 뒤에만 적이 붙어 있으면 그쪽으로 돈다 (독립 검수: 허공을 침) */
+    faceNearest(world) {
+      let front = Infinity, back = Infinity;
+      for (const b of world.bodies) {
+        if (b.team !== "enemy" || !b.alive || Math.abs(b.y - this.y) > 60) continue;
+        const d3 = (b.x - this.x) * this.dir;
+        if (d3 >= 0) front = Math.min(front, d3);
+        else back = Math.min(back, -d3);
+      }
+      if (back < 220 && front > 260) this.dir = -this.dir;
+    }
+    /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
+    tryGrabFront(world) {
+      for (const b of world.bodies) {
+        if (b.team !== "enemy" || !b.alive || b.z > 0) continue;
+        const g2 = b;
+        if (!g2.grabbable || !(g2 instanceof Fighter || typeof g2.set === "function")) continue;
+        const dx = b.x - this.x;
+        if (Math.sign(dx) !== this.dir || Math.abs(dx) > 90 || Math.abs(b.y - this.y) > 20) continue;
+        this.grabbed = g2;
+        this.grabT = 0;
+        this.grabHits = 0;
+        grabHold(g2);
+        g2.vx = 0;
+        this.vx = this.vy = 0;
+        this.gunOut = 0;
+        this.fightT = FIGHT_STANCE;
+        world.emit({ type: "custom", name: "grab" });
+        return true;
+      }
+      return false;
+    }
+    stepFree(world, p) {
+      if (this.airborne) {
+        this.vx += p.mx * 0.4;
+        this.vx = Math.max(-16, Math.min(16, this.vx));
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        if (this.carry?.kind === "prop" && this.itemAct && this.take("attack")) {
+          const anim = this.itemAct("attack");
+          if (anim) this.play(anim, world);
+          return;
+        }
+        if (!this.airAttackUsed && this.take("attack")) {
+          this.airAttackUsed = true;
+          this.play("airkick", world);
+        }
+        return;
+      }
+      if (this.take("super")) {
+        if (this.gauge >= 100) return this.startSuper(world);
+        world.say("필살 게이지가 모자라다", 1);
+      }
+      if (this.crouching && (p.pressed.has("up") || p.pressed.has("jump") || p.downDouble)) {
+        this.crouching = false;
+        if (this.buf?.b === "jump") this.buf = null;
+        p.pressed.delete("up");
+      } else if (p.downDouble && !this.carry) {
+        this.crouching = true;
+        this.gunOut = 0;
+      }
+      if (p.pressed.has("interact") && !this.carry && !this.crouching && this.tryGrabFront(world)) {
+        this.wantInteract = false;
+        return;
+      }
+      if (p.pressed.has("ally")) this.callAlly(world);
+      if (!this.crouching && !this.carry && p.pressed.has("chain")) {
+        this.play("chain", world);
+        if (this.move) return;
+      }
+      if (!this.crouching && !this.carry && p.pressed.has("wall")) {
+        this.play("wall", world);
+        if (this.move) return;
+      }
+      const g2 = p.held.has("guard") && this.guardMeter > 0;
+      this.wasGuarding = g2 ? this.wasGuarding + 1 : 0;
+      this.guarding = g2;
+      if (g2) {
+        this.vx = this.vy = 0;
+        this.running = false;
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        if (this.take("evade")) return this.startEvade(world, p);
+        return;
+      }
+      if (this.take("evade")) return this.startEvade(world, p);
+      if (this.take("skill")) {
+        if (this.skillCd <= 0) return this.startSkill(world, p);
+        world.say("폭파 충전 중", 0.6);
+      }
+      if (this.take("jump") && !this.crouching) {
+        this.vz = JUMP_V;
+        this.z = 1;
+        this.vx = p.mx * (this.running ? 16 : WALK_X);
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        this.running = false;
+        world.emit({ type: "jump", x: this.x });
+        return;
+      }
+      if (this.carry && this.itemAct && (this.buf?.b === "attack" || this.buf?.b === "shoot")) {
+        const k = this.buf.b;
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        const anim = this.itemAct(k);
+        if (anim !== null) {
+          this.take(k);
+          if (anim) this.play(anim === "wfire" && this.heldSet() === "shotgun" ? "wshot" : anim, world);
+          return;
+        }
+      }
+      if (this.take("attack")) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        else this.faceNearest(world);
+        if (this.crouching) return this.play("lowkick", world);
+        if (this.running) return this.play("dash", world);
+        const next = this.comboTimer > 0 && this.comboStep > 0 ? COMBO[this.comboStep] : "jab";
+        this.comboStep = COMBO.indexOf(next);
+        return this.play(next, world);
+      }
+      if (p.pressed.has("reload") && this.ammo < this.mag) {
+        if (this.reserve > 0) return this.play("reload", world);
+        world.say("예비 탄약이 없다", 1);
+      }
+      if (this.take("shoot") && !this.crouching) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        return this.tryShoot(world);
+      }
+      if (this.gunOut > 0 && (p.mx || p.my || --this.gunOut === 0)) {
+        this.gunOut = 0;
+        return this.play("holster", world);
+      }
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      this.running = p.run && p.mx !== 0 && !this.crouching;
+      if (this.crouching) {
+        this.vx = p.mx * CROUCH_X * this.progression.stats.speed;
+        this.vy = 0;
+      } else {
+        this.vx = p.mx * (this.running ? RUN_X : WALK_X) * this.progression.stats.speed;
+        this.vy = p.my * (this.running ? WALK_Y * 1.2 : WALK_Y) * this.progression.stats.speed;
+      }
+      if (p.mx && !this.running && !this.crouching) {
+        for (const b of world.bodies) {
+          if (b.team !== "enemy" || !b.alive || b.z > 0 || !grabCan(b)) continue;
+          const dx = b.x - this.x;
+          if (Math.sign(dx) === p.mx && Math.abs(dx) < 62 && Math.abs(b.y - this.y) < 14) {
+            const gb = b;
+            this.grabbed = gb;
+            this.grabT = 0;
+            this.grabHits = 0;
+            grabHold(gb);
+            gb.vx = 0;
+            this.vx = this.vy = 0;
+            this.dir = dx > 0 ? 1 : -1;
+            world.emit({ type: "custom", name: "grab" });
+            break;
+          }
+        }
+      }
+    }
+    releaseGrab() {
+      const g2 = this.grabbed;
+      this.grabbed = null;
+      if (g2 && grabIsHeld(g2)) grabRelease(g2, 8);
+    }
+    stepGrab(world, p) {
+      const g2 = this.grabbed;
+      this.grabT++;
+      this.vx = this.vy = 0;
+      if (!g2.alive || !grabIsHeld(g2)) {
+        this.grabbed = null;
+        return;
+      }
+      g2.x = this.x + this.dir * 50;
+      g2.y = this.y;
+      g2.z = 0;
+      g2.dir = -this.dir;
+      if (this.take("jump") || this.grabT > GRAB_TIME) return this.releaseGrab();
+      if (this.take("attack")) {
+        if (p.mx || this.grabHits >= 2) {
+          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+          g2.x = this.x + this.dir * 50;
+          this.play("grabblast", world);
+          grabRelease(g2, 30);
+          this.grabbed = null;
+          return;
+        }
+        this.grabHits++;
+        this.play("grabknee", world);
+        grabHold(g2);
+      }
+    }
+    /** 무릎 치기 동안 잡힌 상태 유지 */
+    keepHeld() {
+      const g2 = this.grabbed;
+      if (g2 && (g2 instanceof Fighter ? g2.phase === "hurt" : g2.state === "hurt" || g2.state === "stunned")) grabHold(g2);
+    }
+  };
+  function grabCan(b) {
+    if (!b.grabbable) return false;
+    if (b instanceof Fighter) return b.phase === "hurt";
+    return (b.state === "hurt" || b.state === "stunned") && typeof b.set === "function";
+  }
+  function grabHold(b) {
+    if (b instanceof Fighter) b.enter("held");
+    else {
+      b.set("bound");
+      b.bindT = 9999;
+    }
+  }
+  function grabIsHeld(b) {
+    return b instanceof Fighter ? b.phase === "held" : b.state === "bound";
+  }
+  function grabRelease(b, ticks) {
+    if (b instanceof Fighter) b.enter("hurt", ticks);
+    else b.bindT = ticks;
+  }
+
+  // src/game/action/engine/checkpoint.ts
+  var encodeState = (v) => JSON.stringify(v, (_k, x) => x instanceof Set ? { $set: [...x] } : x instanceof Map ? { $map: [...x] } : x === Infinity ? { $infinity: true } : x);
+  var decodeState = (s2) => JSON.parse(s2, (_k, x) => x && typeof x === "object" ? "$set" in x ? new Set(x.$set) : "$map" in x ? new Map(x.$map) : x.$infinity ? Infinity : x : x);
+
+  // src/game/action/engine/world.ts
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    const next = () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+    return Object.assign(next, { state: () => a, restore: (v) => {
+      a = v >>> 0;
+    } });
+  }
+  var fallbackEnemy = (s2, w) => s2.kind.startsWith("dummy") ? new Dummy(s2.x, s2.y, s2.kind === "dummy") : new Thug(s2, w);
+  var STOP_DEFAULT = { none: 1, flinch: 3, stagger: 4, launch: 6, down: 6, bind: 4 };
+  var World = class {
+    constructor(run, clips, stage, enemyFactory) {
+      this.run = run;
+      this.stage = stage;
+      this.rand = mulberry32(run.seed || 1);
+      this.player = new Player(clips);
+      initializeProgression(this.player, run);
+      this.enemyFactory = enemyFactory ?? fallbackEnemy;
+      const self = this;
+      this.stageApi = {
+        get world() {
+          return self;
+        },
+        spawn: (s2) => this.spawn(s2),
+        setProp: (id, patch) => {
+          const i = this.props.findIndex((p) => p.id === id);
+          if (i < 0) {
+            if (patch) this.props.push({ id, kind: "decor", x: 0, y: this.lane[0], w: 40, h: 40, ...patch });
+            return;
+          }
+          if (patch === null) this.props.splice(i, 1);
+          else this.props[i] = { ...this.props[i], ...patch };
+        },
+        hurtPlayer: (dmg, stagger = true) => {
+          const p = this.player;
+          if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: "flinch", dir: -p.dir, push: 2 }, this);
+          else p.hp = Math.max(0, p.hp - dmg);
+        },
+        heal: (n) => {
+          this.player.hp = Math.min(this.player.hpMax, this.player.hp + n);
+          this.emit({ type: "heal", x: this.player.x });
+        },
+        note: (k, v) => this.notes[k] = v,
+        finish: (how) => {
+          if (!this.ended) this.ended = how;
+        },
+        movePlayer: (x, y) => {
+          const p = this.player;
+          p.x = p.px = x;
+          if (y !== void 0) p.y = p.py = y;
+          p.vx = p.vy = 0;
+        }
+      };
+    }
+    tick = 0;
+    rand;
+    player;
+    bodies = [];
+    floor;
+    lane = [440, 690];
+    bounds = [0, SCREEN_W];
+    noise = 0;
+    light = 1;
+    fxs = [];
+    camX = 0;
+    prevCamX = 0;
+    shakeT = 0;
+    shakeP = 0;
+    subtitle = null;
+    banner = null;
+    props = [];
+    encIndex = 0;
+    encActive = -1;
+    encWave = 0;
+    encBodies = [];
+    goT = 0;
+    /** 메뉴로 멈춤: 겹쳐 그릴 안내(GO 등)를 숨긴다 */
+    paused = false;
+    /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
+    cutin = 0;
+    showBoxes = false;
+    /** 이번 프레임에 머리 위 상호작용 아이콘이 떴나 (말풍선을 그 위로 올린다) */
+    hintShown = false;
+    kills = 0;
+    floors = 0;
+    notes = {};
+    ended = null;
+    itemState;
+    recovery;
+    /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
+    canCheckpoint() {
+      return !this.ended && this.player.hp > 0 && this.player.phase === "free" && !this.player.move && !this.player.airborne && !this.player.grabbed && this.encActive < 0 && !this.bodies.some((b) => b.alive && b.hp > 0 && b.team !== "player");
+    }
+    snapshot() {
+      const keys2 = ["x", "y", "dir", "hp", "hpMax", "ammo", "mag", "reserve", "gauge", "guardMeter", "skillCd", "maxCombo", "ward", "dmgMul"];
+      return encodeState({
+        tick: this.tick,
+        kills: this.kills,
+        floors: this.floors,
+        notes: this.notes,
+        rng: this.rand.state(),
+        player: Object.fromEntries(keys2.map((k) => [k, this.player[k]])),
+        items: this.itemState?.snapshot()
+      });
+    }
+    restore(state2) {
+      const s2 = decodeState(state2);
+      if (!s2.player || !(Number(s2.player.hp) > 0)) throw new Error("손상된 출동 상태");
+      this.tick = s2.tick;
+      this.kills = s2.kills;
+      this.floors = s2.floors;
+      this.notes = s2.notes;
+      Object.assign(this.player, s2.player);
+      this.player.px = this.player.x;
+      this.player.py = this.player.y;
+      this.player.resetLocomotion();
+      this.itemState?.restore(s2.items);
+      this.rand.restore(s2.rng);
+      this.camera();
+      this.prevCamX = this.camX;
+    }
+    deadT = 0;
+    hitMemo = /* @__PURE__ */ new Map();
+    listeners = [];
+    stageApi;
+    enemyFactory;
+    /** 모듈이 매 틱 덧붙이는 일 (아이템 등) */
+    hooks = [];
+    /** E: 아이템 줍기·들기·내려놓기 (처리했으면 true) */
+    pickHook = null;
+    /** 맞을 때 불꽃·고리·흔들림을 엔진이 그릴지 (화면 껍데기가 있으면 껍데기 fx가 맡아 끈다) */
+    hitFx = true;
+    /** 든 물건 그리기: (sx, sy)=손잡이가 올 화면 자리, deg=각도(오른쪽 보기 기준), dir=보는 방향 */
+    drawHeld = null;
+    /** 싸움 구간을 막는 몸인가 (적 모듈: 평화로운 주민 등은 아님) */
+    threat = () => true;
+    /** E를 눌렀을 때 (적 모듈 규칙 신호 등). 가장 가까운 소품을 같이 준다 */
+    interactHooks = [];
+    /** E를 눌렀을 때 대화를 열었으면 true (그러면 원래 E 처리를 하지 않는다) */
+    talkHook = null;
+    /** 몸 아래에 덧그리기 (바닥 물건 등). ctx는 화면 좌표 */
+    underlays = [];
+    itemUse = null;
+    items = [
+      { id: "bandage", label: "붕대", n: 2 },
+      { id: "ammo", label: "탄약 상자", n: 1 },
+      null,
+      null
+    ];
+    get api() {
+      return this.stageApi;
+    }
+    on(f) {
+      this.listeners.push(f);
+      return () => this.listeners = this.listeners.filter((g2) => g2 !== f);
+    }
+    emit(e) {
+      for (const f of this.listeners) {
+        try {
+          f(e);
+        } catch (err) {
+          console.warn("[goei] 이벤트 처리 오류", err);
+        }
+      }
+      if (this.stage?.onEvent) this.stage.onEvent(this.stageApi, this.floor, e);
+    }
+    add(b) {
+      this.bodies.push(b);
+    }
+    addBullet(o) {
+      this.add(new Bullet(o.x, o.y, o.z, o.dir));
+      this.fx("flash", o.x, o.y, o.z);
+    }
+    fx(kind, x, y, z, text2) {
+      const life = { spark: 10, "spark-big": 14, dust: 12, flash: 3, boom: 16, ring: 9, text: 30 }[kind];
+      this.fxs.push({ kind, x, y, z, t: 0, life, text: text2, seed: Math.floor(this.rand() * 1e6) });
+      if (this.fxs.length > 80) this.fxs.shift();
+    }
+    shake(ticks, power = 2) {
+      this.shakeT = Math.max(this.shakeT, ticks);
+      this.shakeP = Math.max(this.shakeT > 0 ? this.shakeP : 0, power);
+    }
+    /** 자막이 뜬 틱 */
+    subtitleAt = 0;
+    say(text2, seconds = 2) {
+      this.subtitle = { text: text2, t: Math.round(seconds * 30) };
+      this.subtitleAt = this.tick;
+    }
+    /** 생성 자리 고치기 (바닥 물건 위에 생겨나지 않게, itemsLink가 단다) */
+    spawnAdjust = null;
+    spawn(s2) {
+      if (this.spawnAdjust) s2 = this.spawnAdjust(s2);
+      const b = this.enemyFactory(s2, this);
+      this.add(b);
+      this.emit({ type: "enemySpawn", x: b.x, kind: s2.kind });
+      return b;
+    }
+    /* ───────── 층 ───────── */
+    enterFloor(f) {
+      this.floor = f;
+      this.lane = f.lane ?? [440, 690];
+      this.bounds = [0, f.length];
+      this.props = (f.props ?? []).map((p2) => ({ ...p2 }));
+      this.bodies = [];
+      this.encIndex = 0;
+      this.encActive = -1;
+      this.encBodies = [];
+      this.ended = null;
+      this.noise = 0;
+      this.light = 1;
+      const p = this.player;
+      p.x = p.px = f.startX;
+      p.y = p.py = (this.lane[0] + this.lane[1]) / 2;
+      p.z = p.pz = 0;
+      p.vx = p.vy = p.vz = 0;
+      p.seat = null;
+      p.move = null;
+      p.moveKey = "";
+      p.grabbed = null;
+      p.enter("free");
+      p.stop = 0;
+      p.resetLocomotion();
+      p.dir = 1;
+      this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+      this.prevCamX = this.camX;
+      this.banner = { text: f.banner ?? f.title, t: 70 };
+      this.subtitle = null;
+      this.floors++;
+      this.emit({ type: "enter:floor", floor: f });
+    }
+    /* ───────── 한 틱 ───────── */
+    step(pad) {
+      this.prevCamX = this.camX;
+      this.tick++;
+      if (pad.pressed.has("hitbox")) this.showBoxes = !this.showBoxes;
+      for (const f of this.fxs) f.t++;
+      this.fxs = this.fxs.filter((f) => f.t < f.life);
+      if (this.subtitle && --this.subtitle.t <= 0) this.subtitle = null;
+      if (this.banner && --this.banner.t <= 0) this.banner = null;
+      if (this.shakeT > 0) this.shakeT--;
+      if (this.goT > 0) this.goT--;
+      for (const b of [this.player, ...this.bodies]) {
+        const f = b;
+        f.px = b.x;
+        f.py = b.y;
+        f.pz = b.z;
+      }
+      if (this.cutin > 0) {
+        this.cutin--;
+        return;
+      }
+      const p = this.player;
+      if (p.stop > 0) {
+        p.stop--;
+        p.listen(pad);
+      } else {
+        p.tick(this, pad);
+        if (p.wantSuper) {
+          p.wantSuper = false;
+          this.cutin = 22;
+          this.emit({ type: "super", x: p.x, move: "super" });
+        }
+        if (p.wantInteract) this.interact();
+        if (p.wantItem) this.useItem(p.wantItem);
+      }
+      for (const b of this.bodies) {
+        if (!b.alive) continue;
+        if (b.stop > 0) {
+          b.stop--;
+          continue;
+        }
+        b.step(this);
+      }
+      this.separate();
+      this.resolveHits();
+      this.bodies = this.bodies.filter((b) => {
+        if (b instanceof Fighter && b.phase === "dead" && b.t > 30) b.alive = false;
+        return b.alive;
+      });
+      for (const h of this.hooks) h();
+      this.stepEncounters();
+      if (this.stage?.tick) this.stage.tick(this.stageApi, this.floor);
+      const exitX = this.floor.exitX ?? this.floor.length - 80;
+      if (this.encActive < 0 && p.x >= exitX && !this.ended) this.ended = "next";
+      if (p.phase === "dead" || p.hp <= 0 && p.phase === "down") {
+        if (++this.deadT > 75 && !this.ended) this.ended = "evac";
+      }
+      this.camera();
+      p.finishLocomotion();
+    }
+    interact() {
+      const p = this.player;
+      let best = null;
+      for (const pr of this.props) {
+        const d3 = Math.abs(pr.x - p.x);
+        if (d3 < 60 && (!best || d3 < Math.abs(best.x - p.x))) best = pr;
+      }
+      if (!p.carry && this.talkHook?.(best)) return;
+      if ((p.carry || !best) && this.pickHook?.()) return;
+      this.interactWith(best);
+    }
+    /** 원래 E가 하던 일 (대화창의 「거래」「인사」 같은 버튼이 부른다) */
+    interactWith(best) {
+      const p = this.player;
+      for (const h of this.interactHooks) h(best);
+      if (best && this.stage?.onInteract) {
+        p.play("pickup", this);
+        this.stage.onInteract(this.stageApi, this.floor, best);
+      }
+    }
+    useItem(slot) {
+      const p = this.player;
+      if (p.move || p.airborne) return;
+      if (this.itemUse) {
+        const r = this.itemUse(slot, this.stageApi);
+        if (r) {
+          p.play(r.anim, this);
+          this.emit({ type: "item", x: p.x });
+        }
+        return;
+      }
+      const it = this.items[slot - 1];
+      if (!it || it.n <= 0) return;
+      if (it.id === "bandage") {
+        if (p.hp >= p.hpMax) return this.say("다친 곳이 없다", 1);
+        p.hp = Math.min(p.hpMax, p.hp + 60);
+        p.play("bandage", this);
+        this.emit({ type: "heal", x: p.x, id: it.id });
+      } else if (it.id === "ammo") {
+        p.reserve += 24;
+        p.play("pickup", this);
+        this.emit({ type: "item", x: p.x, id: it.id });
+        this.say("탄약 +24", 1);
+      }
+      it.n--;
+    }
+    /** 적 모듈 몸(Fighter가 아님)이 요원 몸 안으로 파고들지 않게 최소 간격만큼 적을 밀어낸다 (검수 5-4).
+     *  잡기형(선호 거리가 아주 가까운 종)·잡는 중·쓰러짐·공중은 빼고, 적은 자기가 있던 쪽으로 밀린다. */
+    separateFromPlayer() {
+      const p = this.player;
+      if (!p.alive || p.z > 0) return;
+      for (const b of this.bodies) {
+        const e = b;
+        if (!e.alive || b.team === "player" || b instanceof Fighter || !e.def || e.z > 0) continue;
+        if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
+        if (e.kind === "toucher" || e.def.keep && e.def.keep[1] < 30) continue;
+        const dy = Math.abs(e.y - p.y);
+        if (dy > 85) continue;
+        const min = (84 + e.def.w * 0.35) * (dy > 45 ? 0.8 : 1);
+        const dx = e.x - p.x;
+        if (Math.abs(dx) >= min) continue;
+        const s2 = dx === 0 ? -p.dir : Math.sign(dx);
+        e.x += s2 * Math.min(16, min - Math.abs(dx));
+      }
+    }
+    /** 적 모듈 몸끼리: 한 몸처럼 포개지지 않게 옆(x)으로 벌린다 (검수 16-3) */
+    separateEnemies() {
+      const skip = (e) => !e.alive || e.team === "player" || e.kind.startsWith("proj") || e instanceof Fighter || !e.def || e.z > 0 || !!e.state && /^(dead|down|getup|grabbing|air|bound|hidden|spawn)$/.test(e.state);
+      const list = this.bodies.filter((e) => !skip(e));
+      for (let i = 0; i < list.length; i++)
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i], b = list[j];
+          const dy = Math.abs(a.y - b.y);
+          if (dy > 95) continue;
+          const min = (70 + (a.def.w + b.def.w) * 0.5) * (dy > 50 ? 0.8 : 1);
+          const dx = b.x - a.x;
+          if (Math.abs(dx) >= min) continue;
+          const s2 = dx === 0 ? a.id < b.id ? 1 : -1 : Math.sign(dx);
+          const push = Math.min(10, (min - Math.abs(dx)) / 2);
+          a.x -= s2 * push;
+          b.x += s2 * push;
+        }
+    }
+    /** 겹친 몸을 옆으로 밀어낸다 (벨트스크롤에서 서로 뚫고 지나가지 않게) */
+    separate() {
+      this.separateFromPlayer();
+      this.separateEnemies();
+      const list = [this.player, ...this.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.z <= 0);
+      for (let i = 0; i < list.length; i++)
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i];
+          const b = list[j];
+          if (!(a instanceof Fighter) || !(b instanceof Fighter)) continue;
+          if (a.phase === "held" || b.phase === "held" || a.phase === "down" || b.phase === "down" || a.phase === "dead" || b.phase === "dead") continue;
+          if (a.invuln > 0 || b.invuln > 0) continue;
+          if (Math.abs(a.y - b.y) > 30) continue;
+          const min = (a.width + b.width) * 0.8;
+          const dx = b.x - a.x;
+          if (Math.abs(dx) < min) {
+            const push = (min - Math.abs(dx)) / 2;
+            const s2 = dx === 0 ? 1 : Math.sign(dx);
+            if (a.team === "player" && a instanceof Player && a.move) b.x += s2 * push * 2;
+            else {
+              a.x -= s2 * push;
+              b.x += s2 * push;
+            }
+          }
+        }
+    }
+    resolveHits() {
+      const all = [this.player, ...this.bodies].filter((b) => b.alive);
+      const frames = new Map(all.map((b) => [b, b.frame()]));
+      for (const a of all) {
+        const fa = frames.get(a);
+        if (!fa.hit.length) continue;
+        for (const h of fa.hit)
+          for (const t of all) {
+            if (t === a || t.team === a.team || t.team === "neutral" || !t.alive) continue;
+            const ft = frames.get(t);
+            if (!ft.hurt.some((hb) => overlap(h, hb))) continue;
+            const key2 = `${a.id}:${h.attackId}:${t.id}`;
+            if (this.hitMemo.has(key2)) continue;
+            this.hitMemo.set(key2, this.tick);
+            this.applyHit(a, t, h);
+            if (a.kind === "bullet") a.alive = false;
+            if (!a.alive) break;
+          }
+      }
+      if (this.hitMemo.size > 400) {
+        for (const [k, v] of this.hitMemo) if (this.tick - v > 120) this.hitMemo.delete(k);
+      }
+    }
+    applyHit(a, t, h) {
+      if (a.kind === "bullet") h = progressionHit(h, this.player.progression, "ranged");
+      const side = Math.sign(t.x - a.x);
+      if (side && side !== h.dir) h = { ...h, dir: side };
+      const r = t.applyHit(h, this);
+      const at2 = { x: (Math.max(h.x0, t.x - 30) + Math.min(h.x1, t.x + 30)) / 2, y: t.y, z: (h.z0 + h.z1) / 2 };
+      if (r.kind === "immune") return;
+      const stop = h.stop ?? STOP_DEFAULT[h.react];
+      if (r.kind === "guard") {
+        a.stop = Math.max(a.stop, 3);
+        t.stop = Math.max(t.stop, 3);
+        this.fx("spark", at2.x, at2.y, at2.z);
+        return;
+      }
+      a.stop = Math.max(a.stop, stop);
+      t.stop = Math.max(t.stop, stop);
+      const strength = h.strength ?? (h.react === "down" || h.react === "launch" ? 3 : h.react === "stagger" ? 2 : 1);
+      this.fx(strength >= 3 ? "spark-big" : "spark", at2.x, at2.y, at2.z);
+      if (this.hitFx) {
+        if (strength >= 2) this.fx("ring", at2.x, at2.y, at2.z, String(strength));
+        if (strength >= 3) this.shake(6, 3);
+      }
+      if (h.noise) this.emit({ type: "custom", name: "noise", data: h.noise });
+      const p = this.player;
+      if (a === p || a.kind === "bullet") {
+        p.onConnect(this, !!r.killed);
+        if (r.killed) this.kills++;
+      }
+      const mk = a.kind === "bullet" ? "bullet" : a !== p ? "enemy" : { airkick: "kick", lowkick: "low", dash: "dash", blast: "blast", groundblast: "blast", grabblast: "blast", super: "super", grabknee: "kick" }[p.moveKey] ?? "punch";
+      this.emit({ type: "hit", strength, x: at2.x, y: at2.y, z: at2.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0, kind: mk });
+      if (r.killed && t.team === "enemy" && !(t instanceof Fighter)) this.emit({ type: "enemyDie", x: t.x, kind: t.kind });
+      if (a === p && p.moveKey === "grabknee") p.keepHeld();
+    }
+    stepEncounters() {
+      const encs = this.floor.encounters;
+      const p = this.player;
+      if (this.encActive < 0) {
+        const e2 = encs[this.encIndex];
+        if (e2 && p.x >= e2.triggerX) {
+          this.encActive = this.encIndex;
+          this.goT = 0;
+          this.encWave = 0;
+          this.bounds = [e2.lockFrom, e2.lockTo];
+          this.spawnWave();
+          this.emit({ type: "combat:start", index: this.encActive });
+          if (e2.waves.some((w) => w.some((s2) => s2.boss))) this.emit({ type: "combat:boss", index: this.encActive });
+        }
+        return;
+      }
+      const e = encs[this.encActive];
+      this.encBodies = this.encBodies.filter((b) => b.alive && b.hp > 0 && this.threat(b) && !(b instanceof Fighter && (b.phase === "dead" || b.phase === "down" && b.hp <= 0)));
+      if (this.encBodies.length) return;
+      this.encWave++;
+      if (this.encWave < e.waves.length) {
+        this.spawnWave();
+        return;
+      }
+      this.emit({ type: "combat:clear", index: this.encActive });
+      this.encActive = -1;
+      this.encIndex++;
+      this.bounds = [0, this.floor.length];
+      this.goT = 90;
+    }
+    spawnWave() {
+      const e = this.floor.encounters[this.encActive];
+      this.encBodies = e.waves[this.encWave].map((s2) => this.spawn(s2));
+    }
+    camera() {
+      const p = this.player;
+      const [b0, b1] = this.bounds;
+      const target = p.x - SCREEN_W / 2 + p.dir * 90;
+      let cx = this.camX + (target - this.camX) * 0.14;
+      cx = Math.max(b0, Math.min(b1 - SCREEN_W, cx));
+      cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
+      this.camX = cx;
+      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x));
+    }
+    /** 보스 체력 막대용 */
+    boss() {
+      const b = this.bodies.find((x) => x.alive && x.boss);
+      return b ? { label: b.label ?? b.kind, hp: b.hp, hpMax: b.hpMax } : null;
+    }
+  };
+
+  // src/game/action/engine/game.ts
+  var Game = class {
+    constructor(box2, art5, mods) {
+      this.box = box2;
+      this.art = art5;
+      this.mods = mods;
+      if (mods.surface) {
+        this.canvas = mods.surface.canvas;
+        this.ctx = mods.surface.ctx;
+        this.ownCanvas = false;
+      } else {
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = SCREEN_W;
+        this.canvas.height = SCREEN_H;
+        this.canvas.className = "goei-engine-canvas";
+        box2.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext("2d");
+        this.ownCanvas = true;
+      }
+      this.renderer = makeRenderer(this.ctx, art5, { hud: mods.hud !== false });
+      this.input.attach();
+      this.canvas.addEventListener("pointerdown", (e) => this.onPointer(e));
+      this.scene = this.idleScene("title");
+      this.toTitle();
+    }
+    canvas;
+    ctx;
+    input = new Input();
+    world = null;
+    scene;
+    paused = false;
+    ownCanvas;
+    renderer;
+    raf = 0;
+    acc = 0;
+    last = 0;
+    menuIndex = 0;
+    run = null;
+    runStage = null;
+    lastResult = null;
+    hqRoot = null;
+    wasPaused = false;
+    menuItems = [];
+    titleItems = [];
+    /** 꼬리표 시작은 주 루프가 돈 뒤에 (start()에서) */
+    booted = false;
+    start() {
+      if (!this.booted) {
+        this.booted = true;
+        queueMicrotask(() => this.mods.boot?.(this));
+      }
+      const frame2 = (now) => {
+        if (this.dead) return;
+        this.raf = requestAnimationFrame(frame2);
+        if (!this.last) this.last = now;
+        let dt = (now - this.last) / 1e3;
+        this.last = now;
+        if (dt > 0.25) dt = 0.25;
+        this.mods.frame?.(dt);
+        this.acc += dt;
+        const T3 = 1 / TICK_HZ;
+        while (this.acc >= T3) {
+          this.acc -= T3;
+          this.tickOnce();
+        }
+        const paused = this.paused || !!this.mods.paused?.();
+        if (paused !== this.wasPaused) {
+          this.wasPaused = paused;
+          this.mods.onPause?.(paused);
+        }
+        if (!this.mods.covered?.()) {
+          this.scene.draw(paused ? 1 : this.acc / T3);
+          this.mods.overlay?.(this.ctx, this.world, dt);
+        }
+      };
+      this.raf = requestAnimationFrame(frame2);
+    }
+    /** 시험용: 틱을 n번 바로 돌린다 */
+    advance(n) {
+      for (let i = 0; i < n; i++) this.tickOnce();
+      this.scene.draw(1);
+    }
+    tickOnce() {
+      const p = this.input.sample();
+      if (typeof document !== "undefined" && document.hidden) return;
+      if (this.mods.paused?.() && this.scene.name === "battle") return;
+      this.scene.tick(p);
+    }
+    destroy() {
+      this.checkpoint();
+      this.dead = true;
+      cancelAnimationFrame(this.raf);
+      this.world = null;
+      this.run = null;
+      this.input.detach();
+      if (this.ownCanvas) this.canvas.remove();
+      if (this.hqRoot) {
+        this.mods.hq?.unmount();
+        this.hqRoot.remove();
+      }
+      this.mods.dispose?.();
+    }
+    /* ───────── 제목·본부 ───────── */
+    toTitle() {
+      this.checkpoint();
+      this.world = null;
+      this.inHub = false;
+      this.paused = false;
+      if (this.hqRoot) this.hqRoot.hidden = true;
+      if (this.mods.openTitle) {
+        this.scene = this.idleScene("title");
+        this.mods.openTitle();
+      } else this.scene = this.titleScene();
+      this.mods.onScene?.("title");
+    }
+    /** 새로 시작: 본부가 있으면 본부로, 없으면 첫 층 모듈로 바로 출동 */
+    start_new(stageId) {
+      if (this.mods.hq && !stageId) return this.showHq();
+      const stage = this.mods.stages.find((s2) => s2.id === stageId) ?? this.mods.stages[0];
+      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id });
+    }
+    dead = false;
+    /** 본부를 걷는 중인가 (엔진 벨트 장면) */
+    inHub = false;
+    showHq() {
+      const hq2 = this.mods.hq;
+      this.world = null;
+      this.scene = this.idleScene("hq");
+      if (!hq2.hub) this.canvas.style.visibility = "hidden";
+      if (!this.hqRoot) {
+        this.hqRoot = document.createElement("div");
+        this.hqRoot.className = "goei-engine-hq";
+        this.box.appendChild(this.hqRoot);
+        hq2.mount(this.hqRoot, {
+          deploy: (run) => this.deploy(run),
+          stages: () => this.mods.stages.map((s2) => ({ id: s2.id, label: s2.label }))
+        });
+      }
+      this.hqRoot.hidden = false;
+      if (hq2.hub) {
+        const stage = hq2.hub();
+        const run = { seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id };
+        this.hqRoot.hidden = !hq2.isOpen?.();
+        this.hqRoot.classList.add("goei-engine-hq-panel");
+        this.canvas.style.visibility = "";
+        this.inHub = true;
+        const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
+        for (const l of this.mods.listeners ?? []) w.on(l);
+        this.mods.onWorld?.(w, run);
+        w.enterFloor(stage.firstFloor(run));
+        this.world = w;
+        this.runStage = stage;
+        this.inHub = true;
+        this.paused = false;
+        this.scene = this.battleScene(w);
+        this.mods.onPlay?.();
+      }
+      this.mods.onScene?.("hq");
+    }
+    idleScene(name) {
+      return {
+        name,
+        tick: () => {
+        },
+        draw: () => {
+          this.ctx.fillStyle = "#05080a";
+          this.ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+          this.mods.drawIdle?.(name, this.ctx, performance.now() / 1e3);
+        }
+      };
+    }
+    /* ───────── 출동 ───────── */
+    deploy(run, saved) {
+      const stage = this.mods.stages.find((s2) => s2.id === run.stageId) ?? this.mods.stages[0];
+      run = { ...run, stageId: stage.id };
+      this.inHub = false;
+      this.run = run;
+      this.runStage = stage;
+      if (this.hqRoot) this.hqRoot.hidden = true;
+      this.canvas.style.visibility = "";
+      const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
+      if (this.mods.itemUse) w.itemUse = this.mods.itemUse;
+      for (const l of this.mods.listeners ?? []) w.on(l);
+      this.mods.onWorld?.(w, run);
+      w.enterFloor(saved && stage.restore ? stage.restore(saved.stage) : stage.firstFloor(run));
+      if (saved) w.restore(saved.world);
+      this.world = w;
+      this.paused = false;
+      this.scene = this.battleScene(w);
+      this.mods.onPlay?.();
+      this.mods.onScene?.("battle");
+      this.checkpoint(true);
+    }
+    /** 전투 도중에는 직전 안전 지점을 유지한다. HP·탄·드랍도 함께 되돌린다. */
+    checkpoint(force = false) {
+      const w = this.world;
+      if (!w || this.inHub || !this.run || !w.canCheckpoint() || !force && this.mods.blocking?.()) return;
+      const stage = this.runStage?.snapshot?.();
+      if (!stage) return;
+      this.mods.saveCheckpoint?.({ version: 1, run: this.run, stage, world: w.snapshot(), savedAt: Date.now() });
+    }
+    async resume(saved) {
+      const stageId = saved.run.stageId ?? this.mods.stages[0]?.id;
+      if (saved.version !== 1 || !this.mods.stages.some((s2) => s2.id === stageId && s2.restore)) throw new Error("지원하지 않는 출동 저장");
+      if (this.mods.hq) {
+        this.showHq();
+        await this.mods.hq.ready?.();
+      }
+      this.deploy({ ...saved.run, stageId }, saved);
+      this.world?.say("출동 복원 완료. 전투 중 중단한 경우 마지막 안전 지점부터 이어집니다.", 4);
+    }
+    /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
+    endRun(how) {
+      const w = this.world;
+      if (!w || this.inHub) return;
+      const result = {
+        how,
+        floors: Number(w.notes["stage.visitedCount"] ?? w.floors),
+        kills: w.kills,
+        maxCombo: w.player.maxCombo,
+        timeSec: Math.round(w.tick / TICK_HZ),
+        hpLeft: Math.max(0, Math.round(w.player.hp)),
+        notes: w.notes
+      };
+      w.emit({ type: "run:end", how });
+      this.lastResult = result;
+      this.world = null;
+      this.paused = false;
+      if (this.mods.hq && this.run) {
+        const run = this.run;
+        this.mods.hq.onReturn(this.mods.toHqResult?.(result, w) ?? result, run);
+        this.mods.saveCheckpoint?.(null);
+        const back = () => this.showHq();
+        if (this.mods.afterRun) {
+          this.scene = this.idleScene("cutscene");
+          this.mods.afterRun(how, back);
+        } else back();
+        return;
+      }
+      this.mods.saveCheckpoint?.(null);
+      this.scene = this.resultScene(result);
+      this.mods.onScene?.("result");
+    }
+    battleScene(w) {
+      const ownMenu = !this.mods.paused;
+      return {
+        name: "battle",
+        tick: (p) => {
+          if (ownMenu && p.pressed.has("pause")) {
+            this.paused = !this.paused;
+            this.menuIndex = 0;
+          }
+          if (this.paused) return this.pauseMenu(p, w);
+          if (this.inHub && this.hqRoot) {
+            const open = !!this.mods.hq?.isOpen?.();
+            this.hqRoot.hidden = !open;
+            if (open) return;
+          }
+          if (this.mods.blocking?.()) return;
+          w.step(p);
+          if (w.ended) {
+            const how = w.ended;
+            if (how === "next") {
+              const next = this.runStage.nextFloor(this.run, w.floor, "next");
+              if (next) {
+                w.enterFloor(next);
+                this.checkpoint(true);
+              } else this.endRun("return");
+            } else this.endRun(how);
+          } else if (w.tick % 60 === 0) this.checkpoint();
+        },
+        draw: (a) => {
+          this.renderer.draw(w, this.paused || this.mods.blocking?.() || this.mods.hq?.isOpen?.() ? 1 : a);
+          if (this.paused) this.drawMenu("일시정지", ["계속", w.showBoxes ? "판정 보기 끄기" : "판정 보기 켜기", "철수 (출동 끝내기)", "처음으로"]);
+        }
+      };
+    }
+    pauseMenu(p, w) {
+      const n = 4;
+      if (p.pressed.has("up")) this.menuIndex = (this.menuIndex + n - 1) % n;
+      if (p.pressed.has("down")) this.menuIndex = (this.menuIndex + 1) % n;
+      if (p.pressed.has("attack") || p.pressed.has("jump") || p.pressed.has("interact")) this.pick(this.menuIndex, w);
+    }
+    pick(i, w) {
+      this.paused = false;
+      if (i === 1) w.showBoxes = !w.showBoxes;
+      else if (i === 2) this.endRun("withdraw");
+      else if (i === 3) this.toTitle();
+    }
+    drawMenu(title2, items, bg = true) {
+      const c = this.ctx;
+      if (bg) {
+        c.fillStyle = "rgba(0,0,0,0.6)";
+        c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+        c.fillStyle = "#e8eef0";
+        c.textAlign = "center";
+        c.font = pfont(44).f;
+        c.fillText(title2, SCREEN_W / 2, 210);
+      }
+      c.textAlign = "center";
+      c.font = pfont(30).f;
+      items.forEach((t, i) => {
+        const y = 300 + i * 64;
+        c.fillStyle = i === this.menuIndex ? "#ffd36a" : "rgba(255,255,255,0.1)";
+        c.fillRect(SCREEN_W / 2 - 230, y - 40, 460, 54);
+        c.fillStyle = i === this.menuIndex ? "#1a1f22" : "#e8eef0";
+        c.fillText(t, SCREEN_W / 2, y - 3);
+      });
+      c.textAlign = "left";
+      this.menuItems = items.map((_, i) => ({ y0: 300 + i * 64 - 40, y1: 300 + i * 64 + 14 }));
+    }
+    onPointer(e) {
+      const r = this.canvas.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * SCREEN_W;
+      const y = (e.clientY - r.top) / r.height * SCREEN_H;
+      if (this.scene.name === "result") return this.leaveResult();
+      if (Math.abs(x - SCREEN_W / 2) > 230) return;
+      const i = this.menuItems.findIndex((m) => y >= m.y0 && y <= m.y1);
+      if (i < 0) return;
+      if (this.world && this.paused) this.pick(i, this.world);
+      else if (this.scene.name === "title") this.titlePick(i);
+    }
+    /* ───────── 엔진 기본 제목·정산 ───────── */
+    titlePick(i) {
+      if (i === 0) this.start_new();
+      else this.start_new(i === 1 && this.mods.hq ? this.mods.stages[0].id : "dummy");
+    }
+    titleScene() {
+      this.menuIndex = 0;
+      this.menuItems = [];
+      const first = this.mods.stages[0];
+      this.titleItems = this.mods.hq ? ["본부로 출근", `바로 출동 · ${first?.label ?? ""}`, "허수아비 연습"] : [`출동 · ${first?.label ?? ""}`, "허수아비 연습"];
+      return {
+        name: "title",
+        tick: (p) => {
+          const n = this.titleItems.length;
+          if (p.pressed.has("up")) this.menuIndex = (this.menuIndex + n - 1) % n;
+          if (p.pressed.has("down")) this.menuIndex = (this.menuIndex + 1) % n;
+          if (p.pressed.has("attack") || p.pressed.has("jump") || p.pressed.has("interact")) this.titlePick(this.menuIndex);
+        },
+        draw: () => {
+          const c = this.ctx;
+          c.fillStyle = "#0d1114";
+          c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+          c.textAlign = "center";
+          c.font = "bold 30px monospace";
+          c.fillStyle = "#8e9aa1";
+          c.fillText("ANOMALY SIMULATION", SCREEN_W / 2, 120);
+          c.font = pfont(58).f;
+          c.fillStyle = "#e8eef0";
+          c.fillText("관리국 · 차원 승강기", SCREEN_W / 2, 190);
+          this.drawMenu("", this.titleItems, false);
+          c.fillStyle = "#8e9aa1";
+          c.font = pfont(20).f;
+          c.textAlign = "center";
+          const help = [
+            "방향키 이동 · A 3연타 · 달리며 A 돌진 · ↓↓ 앉기, 앉아 A 하단 · Space 점프, 공중 A 점프 킥",
+            "S 권총(탄창 8, R 재장전) · D 폭파 · Q 가드 · W 필살기 · Shift 짧게 회피 / 길게 달리기",
+            "경직된 적에게 걸어 붙으면 잡기 → A 무릎, 방향+A 잡기 폭파, Space 놓기 · 1~4 아이템 · H 판정 보기 · Esc 메뉴"
+          ];
+          help.forEach((h, i) => c.fillText(h, SCREEN_W / 2, 560 + i * 34));
+          c.textAlign = "left";
+        }
+      };
+    }
+    leaveResult() {
+      if (this.mods.hq) this.showHq();
+      else this.toTitle();
+    }
+    resultScene(r) {
+      this.menuIndex = 0;
+      this.menuItems = [];
+      const how = { return: "귀환", withdraw: "철수", evac: "후송" }[r.how];
+      let t = 0;
+      return {
+        name: "result",
+        tick: (p) => {
+          if (++t > 20 && (p.pressed.has("attack") || p.pressed.has("jump") || p.pressed.has("interact") || p.pressed.has("pause"))) this.leaveResult();
+        },
+        draw: () => {
+          const c = this.ctx;
+          c.fillStyle = "#0d1114";
+          c.fillRect(0, 0, SCREEN_W, SCREEN_H);
+          c.textAlign = "center";
+          c.fillStyle = r.how === "evac" ? "#ff6a5a" : "#7fe0a0";
+          c.font = pfont(64).f;
+          c.fillText(how, SCREEN_W / 2, 200);
+          c.fillStyle = "#e8eef0";
+          c.font = pfont(30).f;
+          const lines3 = [`처치 ${r.kills}`, `최대 콤보 ${r.maxCombo}`, `층 ${r.floors}`, `시간 ${r.timeSec}초`, `남은 체력 ${r.hpLeft}`];
+          lines3.forEach((l, i) => c.fillText(l, SCREEN_W / 2, 290 + i * 48));
+          c.fillStyle = "#8e9aa1";
+          c.font = pfont(22).f;
+          c.fillText("A 또는 화면을 누르면 처음으로", SCREEN_W / 2, 600);
+          c.textAlign = "left";
+        }
+      };
+    }
+  };
+
+  // src/game/visit.ts
+  var rooms = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
+  function mountVisit(root, api) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:45;font:16px sans-serif;color:#eee";
+    const button = document.createElement("button");
+    button.textContent = "본부 인물 · 대화";
+    button.style.cssText = "position:absolute;right:16px;top:76px;pointer-events:auto;padding:12px;background:#1b292b;color:#eee;border:1px solid #a99c78;border-radius:6px";
+    const panel = document.createElement("section");
+    panel.setAttribute("aria-label", "본부 방문 대화");
+    panel.style.cssText = "position:absolute;inset:12% 5% 5%;background:#111c20f5;padding:20px;pointer-events:auto;display:none;overflow:auto;border:1px solid #a99c78;border-radius:8px";
+    panel.innerHTML = '<header style="display:flex;justify-content:space-between"><b>본부 인물</b><button data-close>닫기</button></header><p>대화는 이 채팅에 저장되어 본편에서도 이어집니다.</p><div data-people></div><p role="status"></p><div data-log style="white-space:pre-wrap;max-height:42vh;overflow:auto"></div><form style="display:flex;gap:8px"><select aria-label="대화 모델"><option value="main">메인 모델</option><option value="aux">보조 모델</option></select><input aria-label="요원에게 할 말" maxlength="2000" style="flex:1;min-width:0" autocomplete="off"><button type="submit">보내기</button></form>';
+    wrap.append(button, panel);
+    root.append(wrap);
+    let state2 = { agents: [], turns: [] };
+    let selected = "";
+    let busy = false;
+    let dead = false;
+    const status = panel.querySelector("[role=status]");
+    const input = panel.querySelector("input");
+    const form = panel.querySelector("form");
+    const people = panel.querySelector("[data-people]");
+    const log = panel.querySelector("[data-log]");
+    const submit = form.querySelector("button");
+    const render = () => {
+      people.replaceChildren();
+      for (const a of state2.agents) {
+        const b = document.createElement("button");
+        b.textContent = `${a.name} · ${a.room ? rooms[a.room] || a.room : "부재/위치 미확인"} (${a.state})`;
+        b.disabled = busy || !a.room;
+        b.setAttribute("aria-pressed", String(a.id === selected));
+        b.style.cssText = `margin:3px;padding:8px;background:${a.id === selected ? "#3c5551" : "#263237"};color:#eee;border:1px solid #75817b`;
+        b.onclick = () => {
+          selected = a.id;
+          render();
+          input.focus();
+        };
+        people.append(b);
+      }
+      log.textContent = state2.turns.filter((t) => t.agentId === selected).map((t) => `나: ${t.user}
+${t.name}: ${t.reply}`).join("\n\n");
+      log.scrollTop = log.scrollHeight;
+      submit.disabled = busy || !state2.agents.some((a) => a.id === selected && a.room);
+      input.disabled = busy;
+    };
+    async function open(name) {
+      panel.style.display = "block";
+      status.textContent = "본편 상태를 읽는 중…";
+      try {
+        state2 = await api.state();
+        if (dead) return;
+        selected = state2.agents.find((a) => a.room && (a.name === name || a.id === name))?.id || selected || state2.agents.find((a) => a.room)?.id || "";
+        status.textContent = state2.agents.some((a) => a.room) ? "" : "본부에 있는 것으로 확인된 요원이 없어요. 본편 상태 태그를 확인해 주세요.";
+        render();
+      } catch (e) {
+        if (!dead) status.textContent = String(e instanceof Error ? e.message : e);
+      }
+    }
+    button.onclick = () => void open();
+    panel.querySelector("[data-close]").onclick = () => {
+      panel.style.display = "none";
+    };
+    for (const type of ["keydown", "keyup", "pointerdown", "pointerup"]) panel.addEventListener(type, (e) => e.stopPropagation());
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (busy || !selected || !input.value.trim()) return;
+      const text2 = input.value;
+      busy = true;
+      render();
+      status.textContent = "답변을 기다리는 중…";
+      try {
+        state2 = await api.send(selected, text2, panel.querySelector("select").value === "aux" ? "aux" : "main");
+        if (dead) return;
+        input.value = "";
+        status.textContent = "대화를 본편에 기록했어요.";
+      } catch (e2) {
+        if (!dead) status.textContent = e2 instanceof Error ? e2.message : String(e2);
+      } finally {
+        busy = false;
+        if (!dead) {
+          render();
+          input.focus();
+        }
+      }
+    };
+    return { open, isOpen: () => panel.style.display !== "none", dispose: () => {
+      dead = true;
+      wrap.remove();
+    } };
+  }
+
+  // src/game/action/audio/engine.ts
+  var BUSES = ["master", "music", "sfx", "amb", "ui"];
+  var DEFAULT_SETTINGS = { master: 0.8, music: 0.55, sfx: 0.9, amb: 0.7, ui: 0.6, muted: false };
+  function cleanSettings(x) {
+    const o = x && typeof x === "object" ? x : {};
+    const out = { ...DEFAULT_SETTINGS };
+    for (const b of BUSES) {
+      const v = Number(o[b]);
+      if (Number.isFinite(v)) out[b] = Math.min(1, Math.max(0, v));
+    }
+    out.muted = o.muted === true;
+    return out;
+  }
+  var sliderGain = (v) => v * v;
+  var AudioScope = class {
+    constructor(parent) {
+      this.parent = parent;
+      this.out = { ...parent, scope: this };
+      parent.scope?.children.add(this);
+    }
+    out;
+    nodes = /* @__PURE__ */ new Set();
+    sources = /* @__PURE__ */ new Set();
+    children = /* @__PURE__ */ new Set();
+    sealed = false;
+    disposed = false;
+    node(node) {
+      this.nodes.add(node);
+      return node;
+    }
+    source(node) {
+      this.node(node);
+      this.sources.add(node);
+      node.addEventListener("ended", () => {
+        node.disconnect();
+        this.sources.delete(node);
+        this.nodes.delete(node);
+        if (this.sealed && !this.sources.size) this.dispose();
+      }, { once: true });
+      return node;
+    }
+    seal() {
+      this.sealed = true;
+      if (!this.sources.size) this.dispose();
+    }
+    stopAt(at2) {
+      const timer = this.source(this.out.ctx.createBufferSource());
+      timer.buffer = this.out.ctx.createBuffer(1, 1, this.out.ctx.sampleRate);
+      timer.addEventListener("ended", () => this.dispose(), { once: true });
+      timer.start(Math.max(this.out.ctx.currentTime, at2));
+    }
+    dispose() {
+      if (this.disposed) return;
+      this.disposed = true;
+      for (const child of this.children) child.dispose();
+      for (const source of this.sources) try {
+        source.stop();
+      } catch {
+      }
+      for (const node of this.nodes) node.disconnect();
+      this.nodes.clear();
+      this.sources.clear();
+      this.children.clear();
+      this.parent.scope?.children.delete(this);
+    }
+  };
+  var ownNode = (o, node) => o.scope?.node(node) ?? node;
+  var ownSource = (o, node) => o.scope?.source(node) ?? node;
+  function busOut(o, bus) {
+    return { ...o, ...o.effects?.[bus] ?? {} };
+  }
+  function oneShot(o, render) {
+    const scope = new AudioScope(o);
+    try {
+      return render(scope.out);
+    } finally {
+      scope.seal();
+    }
+  }
+  function makeNoise(ctx, sec, brown = false) {
+    const len = Math.floor(ctx.sampleRate * sec);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d3 = buf.getChannelData(0);
+    let seed = brown ? 7 : 3;
+    const rnd3 = () => (seed = seed * 1103515245 + 12345 >>> 0) / 4294967296 * 2 - 1;
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = rnd3();
+      if (brown) {
+        last = (last + 0.02 * w) / 1.02;
+        d3[i] = last * 3.5;
+      } else d3[i] = w;
+    }
+    const fade = Math.min(2e3, len >> 3);
+    for (let i = 0; i < fade; i++) {
+      const a = i / fade;
+      d3[len - fade + i] = d3[len - fade + i] * (1 - a) + d3[i] * a;
+    }
+    return buf;
+  }
+  function makeImpulse(ctx, sec, decay, dark2 = 0.5) {
+    const len = Math.floor(ctx.sampleRate * sec);
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d3 = buf.getChannelData(c);
+      let lp = 0;
+      let seed = 17 + c * 31;
+      for (let i = 0; i < len; i++) {
+        seed = seed * 1664525 + 1013904223 >>> 0;
+        const w = seed / 2147483648 - 1;
+        lp = lp + (w - lp) * (1 - dark2 * (i / len));
+        d3[i] = lp * Math.pow(1 - i / len, decay);
+      }
+    }
+    return buf;
+  }
+  var curves = /* @__PURE__ */ new Map();
+  function driveCurve(k) {
+    let c = curves.get(k);
+    if (c) return c;
+    c = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++) {
+      const x = i / 1023 * 2 - 1;
+      c[i] = (1 + k) * x / (1 + k * Math.abs(x));
+    }
+    curves.set(k, c);
+    return c;
+  }
+  var mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  function voice(o, dest, t, vol = 1, pan = 0, verb = 0, room2 = 0) {
+    const ctx = o.ctx;
+    const g2 = ownNode(o, ctx.createGain());
+    g2.gain.value = vol;
+    let tail = g2;
+    if (pan) {
+      const p = ownNode(o, ctx.createStereoPanner());
+      p.pan.value = Math.max(-1, Math.min(1, pan));
+      g2.connect(p);
+      tail = p;
+    }
+    tail.connect(dest);
+    if (verb > 0) {
+      const s2 = ownNode(o, ctx.createGain());
+      s2.gain.value = verb;
+      tail.connect(s2).connect(o.verb);
+    }
+    if (room2 > 0) {
+      const s2 = ownNode(o, ctx.createGain());
+      s2.gain.value = room2;
+      tail.connect(s2).connect(o.room);
+    }
+    void t;
+    return g2;
+  }
+  function perc(p, t, a, peak, d3) {
+    p.cancelScheduledValues(t);
+    p.setValueAtTime(1e-4, t);
+    p.linearRampToValueAtTime(peak, t + Math.max(1e-3, a));
+    p.exponentialRampToValueAtTime(1e-4, t + a + Math.max(5e-3, d3));
+  }
+  function adsr(p, t, a, d3, s2, hold, r, peak = 1) {
+    p.cancelScheduledValues(t);
+    p.setValueAtTime(1e-4, t);
+    p.linearRampToValueAtTime(peak, t + Math.max(2e-3, a));
+    p.setTargetAtTime(peak * s2, t + a, Math.max(3e-3, d3 / 3));
+    const end = t + Math.max(a + 5e-3, hold);
+    p.setTargetAtTime(1e-4, end, Math.max(5e-3, r / 4));
+    return end + r;
+  }
+  function osc(o, type, f, t, dur, dest) {
+    const n = ownSource(o, o.ctx.createOscillator());
+    n.type = type;
+    n.frequency.setValueAtTime(f, t);
+    n.connect(dest);
+    n.start(t);
+    n.stop(t + dur + 0.05);
+    return n;
+  }
+  function noise2(o, t, dur, dest, brown = false, rate = 1) {
+    const n = ownSource(o, o.ctx.createBufferSource());
+    n.buffer = brown ? o.brown : o.noise;
+    n.loop = true;
+    n.playbackRate.value = rate;
+    n.connect(dest);
+    n.start(t, Math.random() * 1.5);
+    n.stop(t + dur + 0.05);
+    return n;
+  }
+  function filt(o, type, f, q = 0.7, dest) {
+    const n = ownNode(o, o.ctx.createBiquadFilter());
+    n.type = type;
+    n.frequency.value = f;
+    n.Q.value = q;
+    if (dest) n.connect(dest);
+    return n;
+  }
+  function gainNode(o, v, dest) {
+    const g2 = ownNode(o, o.ctx.createGain());
+    g2.gain.value = v;
+    if (dest) g2.connect(dest);
+    return g2;
+  }
+  function shaper(o, k, dest) {
+    const n = ownNode(o, o.ctx.createWaveShaper());
+    n.curve = driveCurve(k);
+    n.oversample = "2x";
+    if (dest) n.connect(dest);
+    return n;
+  }
+  function buildGraph(ctx, dest) {
+    const comp2 = ctx.createDynamicsCompressor();
+    comp2.threshold.value = -10;
+    comp2.knee.value = 8;
+    comp2.ratio.value = 6;
+    comp2.attack.value = 3e-3;
+    comp2.release.value = 0.18;
+    const master = ctx.createGain();
+    master.connect(comp2).connect(dest);
+    const bus = (v) => {
+      const g2 = ctx.createGain();
+      g2.gain.value = v;
+      g2.connect(master);
+      return g2;
+    };
+    const music = bus(1);
+    const sfx = bus(1);
+    const amb = bus(1);
+    const ui = bus(1);
+    const duck = ctx.createGain();
+    duck.connect(music);
+    const longImpulse = makeImpulse(ctx, 2.6, 2.4, 0.7);
+    const shortImpulse = makeImpulse(ctx, 0.45, 3, 0.3);
+    const effects = {};
+    for (const [name, target] of Object.entries({ music: duck, sfx, amb, ui })) {
+      const verb = ctx.createConvolver();
+      verb.buffer = longImpulse;
+      const verbOut = ctx.createGain();
+      verbOut.gain.value = 0.55;
+      verb.connect(verbOut).connect(target);
+      const room2 = ctx.createConvolver();
+      room2.buffer = shortImpulse;
+      const roomOut = ctx.createGain();
+      roomOut.gain.value = 0.5;
+      room2.connect(roomOut).connect(target);
+      effects[name] = { verb, room: room2 };
+    }
+    const out = {
+      ctx,
+      sfx,
+      ui,
+      music: duck,
+      amb,
+      ...effects.sfx,
+      effects,
+      noise: makeNoise(ctx, 2),
+      brown: makeNoise(ctx, 4, true)
+    };
+    return { out, gains: { master, music, sfx, amb, ui }, duck, comp: comp2 };
+  }
+
+  // src/game/action/audio/sfx.ts
+  var rnd = (a, b) => a + Math.random() * (b - a);
+  function thump(o, t, dest, f0, f1, dur, vol) {
+    const g2 = gainNode(o, 0, dest);
+    perc(g2.gain, t, 2e-3, vol, dur);
+    const n = osc(o, "sine", f0, t, dur, g2);
+    n.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur * 0.8);
+  }
+  function burst2(o, t, dest, type, f, q, dur, vol, a = 1e-3) {
+    const g2 = gainNode(o, 0, dest);
+    perc(g2.gain, t, a, vol, dur);
+    const fl = filt(o, type, f, q, g2);
+    noise2(o, t, dur + a, fl);
+    return fl;
+  }
+  function tone2(o, t, dest, type, f, dur, vol, a = 3e-3) {
+    const g2 = gainNode(o, 0, dest);
+    perc(g2.gain, t, a, vol, dur);
+    return osc(o, type, f, t, dur + a, g2);
+  }
+  function bell(o, t, dest, f, dur, vol, ratio = 3.5, index = 3) {
+    const g2 = gainNode(o, 0, dest);
+    perc(g2.gain, t, 2e-3, vol, dur);
+    const car = osc(o, "sine", f, t, dur, g2);
+    const mg = gainNode(o, 0);
+    mg.gain.setValueAtTime(f * index, t);
+    mg.gain.exponentialRampToValueAtTime(f * 0.05, t + dur);
+    mg.connect(car.frequency);
+    osc(o, "sine", f * ratio, t, dur, mg);
+  }
+  function swoosh(o, t, dest, f0, f1, dur, vol) {
+    const g2 = gainNode(o, 0, dest);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(vol, t + dur * 0.35);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const fl = filt(o, "bandpass", f0, 1.4, g2);
+    fl.frequency.setValueAtTime(f0, t);
+    fl.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.4);
+    fl.frequency.exponentialRampToValueAtTime(f0 * 0.7, t + dur);
+    noise2(o, t, dur, fl);
+  }
+  function hit(level) {
+    return (o, t, p) => {
+      const v = voice(o, p.dest, t, p.vol, p.pan, 0.08 * level, 0.25);
+      const k = p.pitch * rnd(0.95, 1.05);
+      const len = [0.1, 0.16, 0.28][level - 1];
+      thump(o, t, v, [150, 130, 110][level - 1] * k, 40, len, [0.8, 0.95, 1.1][level - 1]);
+      burst2(o, t, v, "bandpass", [2600, 2e3, 1500][level - 1] * k, 1.2, [0.03, 0.045, 0.07][level - 1], [0.7, 0.8, 0.9][level - 1]);
+      const body2 = gainNode(o, 0, v);
+      perc(body2.gain, t, 1e-3, 0.35 + level * 0.1, len * 0.7);
+      const sh = shaper(o, 4 + level * 6, body2);
+      const b = osc(o, "triangle", 320 * k, t, len, sh);
+      b.frequency.exponentialRampToValueAtTime(90 * k, t + len * 0.6);
+      if (level === 3) {
+        thump(o, t + 0.012, v, 70, 30, 0.35, 0.8);
+        burst2(o, t, v, "lowpass", 900, 0.7, 0.22, 0.5);
+      }
+      return len + 0.4;
+    };
+  }
+  var whiff = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    swoosh(o, t, v, 600 * p.pitch, 2400 * p.pitch, 0.16, 0.45);
+    return 0.2;
+  };
+  var swingHeavy = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    swoosh(o, t, v, 300 * p.pitch, 1400 * p.pitch, 0.28, 0.6);
+    return 0.3;
+  };
+  var kick = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.2);
+    swoosh(o, t, v, 500, 1800, 0.12, 0.35);
+    thump(o, t + 0.08, v, 140 * p.pitch, 45, 0.14, 0.9);
+    burst2(o, t + 0.08, v, "bandpass", 1800, 1, 0.05, 0.7);
+    return 0.4;
+  };
+  var lowKick = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+    swoosh(o, t, v, 250, 900, 0.1, 0.4);
+    thump(o, t + 0.05, v, 110, 40, 0.12, 0.9);
+    burst2(o, t + 0.05, v, "lowpass", 1500, 0.8, 0.08, 0.6);
+    return 0.3;
+  };
+  var dashHit = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.2);
+    swoosh(o, t, v, 400, 3e3, 0.2, 0.5);
+    thump(o, t + 0.12, v, 120, 35, 0.3, 1.1);
+    burst2(o, t + 0.12, v, "bandpass", 1300, 0.9, 0.09, 0.8);
+    return 0.6;
+  };
+  var gun = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+    const k = p.pitch * rnd(0.96, 1.04);
+    burst2(o, t, v, "highpass", 1200 * k, 0.6, 0.06, 0.9);
+    burst2(o, t, v, "bandpass", 500 * k, 0.8, 0.12, 0.8);
+    thump(o, t, v, 180 * k, 50, 0.1, 1);
+    tone2(o, t + 0.07, v, "square", 2900 * k, 0.03, 0.06);
+    return 0.6;
+  };
+  var gunSilenced = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.15);
+    burst2(o, t, v, "lowpass", 1400 * p.pitch, 0.9, 0.05, 0.6);
+    thump(o, t, v, 220, 80, 0.05, 0.4);
+    tone2(o, t + 0.05, v, "square", 2600, 0.025, 0.05);
+    return 0.2;
+  };
+  var reload = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+    burst2(o, t, v, "bandpass", 3e3, 3, 0.03, 0.5);
+    tone2(o, t, v, "square", 1800, 0.02, 0.08);
+    burst2(o, t + 0.22, v, "bandpass", 2200, 4, 0.04, 0.6);
+    tone2(o, t + 0.22, v, "triangle", 900, 0.05, 0.2);
+    return 0.4;
+  };
+  var emptyClick = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    burst2(o, t, v, "highpass", 4e3, 1, 0.015, 0.5);
+    tone2(o, t, v, "square", 1400, 0.015, 0.1);
+    return 0.1;
+  };
+  var bulletHit = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+    burst2(o, t, v, "bandpass", 1800 * p.pitch, 1.5, 0.04, 0.7);
+    thump(o, t, v, 130, 50, 0.07, 0.6);
+    return 0.15;
+  };
+  var ricochet = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol * 0.6, p.pan, 0.2);
+    const n = tone2(o, t, v, "sine", 3800 * p.pitch, 0.35, 0.3);
+    n.frequency.exponentialRampToValueAtTime(1500, t + 0.35);
+    burst2(o, t, v, "highpass", 3e3, 1, 0.02, 0.4);
+    return 0.5;
+  };
+  var guard2 = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.12, 0.3);
+    burst2(o, t, v, "bandpass", 1100, 2, 0.05, 0.7);
+    tone2(o, t, v, "square", 520 * p.pitch, 0.12, 0.12);
+    tone2(o, t, v, "triangle", 1370 * p.pitch, 0.18, 0.18);
+    thump(o, t, v, 100, 60, 0.06, 0.5);
+    return 0.3;
+  };
+  var guardBreak = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.3);
+    const sh = shaper(o, 20, v);
+    burst2(o, t, sh, "bandpass", 900, 1, 0.25, 0.6);
+    const n = tone2(o, t, v, "sawtooth", 600, 0.4, 0.25);
+    n.frequency.exponentialRampToValueAtTime(90, t + 0.4);
+    thump(o, t, v, 90, 30, 0.3, 1);
+    for (let i = 0; i < 3; i++) tone2(o, t + 0.25 + i * 0.12, v, "square", 1500 - i * 200, 0.06, 0.06);
+    return 0.7;
+  };
+  var parry = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.35);
+    bell(o, t, v, 1320 * p.pitch, 0.6, 0.4, 2.01, 2);
+    burst2(o, t, v, "highpass", 5e3, 1, 0.04, 0.5);
+    return 0.8;
+  };
+  var evade = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    swoosh(o, t, v, 800, 3500, 0.22, 0.4);
+    burst2(o, t + 0.15, v, "lowpass", 600, 0.7, 0.08, 0.25);
+    return 0.3;
+  };
+  var jump = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    burst2(o, t, v, "lowpass", 700, 0.7, 0.06, 0.4);
+    swoosh(o, t, v, 500, 1500, 0.14, 0.2);
+    return 0.2;
+  };
+  var land = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.25);
+    thump(o, t, v, 90, 40, 0.1, 0.7);
+    burst2(o, t, v, "lowpass", 900, 0.7, 0.08, 0.45);
+    return 0.2;
+  };
+  var hurt = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.05, 0.2);
+    thump(o, t, v, 120, 45, 0.15, 1);
+    burst2(o, t, v, "bandpass", 1e3, 0.9, 0.08, 0.7);
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t + 0.02, 0.01, 0.25, 0.12);
+    const f1 = filt(o, "bandpass", 700, 6, g2);
+    const f2 = filt(o, "bandpass", 1200, 6, g2);
+    const n = noise2(o, t + 0.02, 0.15, f1);
+    n.connect(f2);
+    return 0.3;
+  };
+  var down = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+    thump(o, t, v, 80, 30, 0.25, 1);
+    burst2(o, t, v, "lowpass", 600, 0.7, 0.2, 0.6);
+    thump(o, t + 0.18, v, 70, 30, 0.12, 0.5);
+    burst2(o, t + 0.18, v, "lowpass", 500, 0.7, 0.1, 0.3);
+    return 0.5;
+  };
+  var wakeup = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    swoosh(o, t, v, 400, 1200, 0.2, 0.3);
+    return 0.25;
+  };
+  var armor = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.2);
+    tone2(o, t, v, "square", 220, 0.12, 0.2);
+    tone2(o, t, v, "square", 331, 0.12, 0.15);
+    burst2(o, t, v, "bandpass", 2400, 3, 0.05, 0.4);
+    return 0.3;
+  };
+  var ability = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.4, 0.3);
+    thump(o, t, v, 160, 28, 0.6, 1.2);
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t, 0.01, 0.8, 0.7);
+    const fl = filt(o, "lowpass", 3e3, 0.8, g2);
+    fl.frequency.setValueAtTime(3e3, t);
+    fl.frequency.exponentialRampToValueAtTime(200, t + 0.7);
+    const sh = shaper(o, 8, fl);
+    noise2(o, t, 0.75, sh, true, 2);
+    swoosh(o, t, v, 300, 1800, 0.5, 0.35);
+    return 1.2;
+  };
+  var superStart = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.6);
+    const n = tone2(o, t, v, "sawtooth", 110, 0.9, 0.25, 0.01);
+    n.frequency.exponentialRampToValueAtTime(880, t + 0.6);
+    const n2 = tone2(o, t, v, "sawtooth", 112, 0.9, 0.2, 0.01);
+    n2.frequency.exponentialRampToValueAtTime(887, t + 0.6);
+    burst2(o, t, v, "highpass", 6e3, 0.7, 0.5, 0.25, 0.3);
+    bell(o, t + 0.55, v, 1760, 1.2, 0.35, 3.5, 4);
+    burst2(o, t + 0.55, v, "bandpass", 3e3, 0.7, 0.15, 0.6);
+    return 1.8;
+  };
+  var superHit = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5, 0.3);
+    hit(3)(o, t, { ...p, dest: v, vol: 1, pan: 0 });
+    thump(o, t + 0.02, v, 60, 25, 0.9, 1.1);
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t, 5e-3, 0.9, 1.1);
+    const fl = filt(o, "lowpass", 2500, 0.7, g2);
+    fl.frequency.exponentialRampToValueAtTime(120, t + 1.1);
+    noise2(o, t, 1.2, shaper(o, 12, fl), true, 3);
+    return 1.6;
+  };
+  var heal = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+    [72, 76, 79, 84].forEach((m, i) => bell(o, t + i * 0.07, v, mtof(m) * p.pitch, 0.5, 0.18, 2, 1.2));
+    return 1;
+  };
+  var itemUse = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    burst2(o, t, v, "bandpass", 2500, 2, 0.06, 0.5);
+    tone2(o, t + 0.08, v, "square", 660, 0.06, 0.12);
+    tone2(o, t + 0.15, v, "square", 990, 0.1, 0.12);
+    return 0.35;
+  };
+  var pickup = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.15);
+    tone2(o, t, v, "square", 988 * p.pitch, 0.07, 0.15);
+    tone2(o, t + 0.07, v, "square", 1319 * p.pitch, 0.15, 0.15);
+    return 0.3;
+  };
+  var enemyDie = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.35);
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t, 0.02, 0.6, 0.8);
+    const fl = filt(o, "bandpass", 3e3, 2, g2);
+    fl.frequency.exponentialRampToValueAtTime(150, t + 0.8);
+    noise2(o, t, 0.85, fl);
+    const n = tone2(o, t, v, "triangle", 880 * p.pitch, 0.7, 0.2, 0.01);
+    n.frequency.exponentialRampToValueAtTime(110, t + 0.7);
+    return 1;
+  };
+  var enemyTell = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+    const n = tone2(o, t, v, "sawtooth", 700 * p.pitch, 0.25, 0.18, 0.02);
+    n.frequency.exponentialRampToValueAtTime(1400 * p.pitch, t + 0.2);
+    tone2(o, t, v, "sine", 1404 * p.pitch, 0.25, 0.12, 0.02);
+    return 0.35;
+  };
+  var ghostWail = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    const dur = 1.3;
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.35, t + 0.3);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const f = 420 * p.pitch;
+    const a = osc(o, "sine", f, t, dur, g2);
+    const b = osc(o, "triangle", f * 1.5, t, dur, gainNode(o, 0.3, g2));
+    for (const n of [a, b]) {
+      n.frequency.linearRampToValueAtTime(f * 1.25 * (n === b ? 1.5 : 1), t + 0.5);
+      n.frequency.linearRampToValueAtTime(f * 0.8 * (n === b ? 1.5 : 1), t + dur);
+    }
+    const lg = gainNode(o, f * 0.03);
+    lg.connect(a.frequency);
+    osc(o, "sine", 6.5, t, dur, lg);
+    const ng = gainNode(o, 0, v);
+    ng.gain.setValueAtTime(1e-4, t);
+    ng.gain.linearRampToValueAtTime(0.12, t + 0.3);
+    ng.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    noise2(o, t, dur, filt(o, "bandpass", f * 2, 3, ng));
+    return dur + 0.5;
+  };
+  var ghostAttack = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+    swoosh(o, t, v, 300, 2200, 0.25, 0.5);
+    const n = tone2(o, t, v, "sawtooth", 300, 0.3, 0.2, 0.02);
+    n.frequency.exponentialRampToValueAtTime(900, t + 0.25);
+    return 0.4;
+  };
+  var crawler2 = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+    const n = 14;
+    for (let i = 0; i < n; i++) {
+      const tt = t + i * rnd(0.03, 0.055);
+      burst2(o, tt, v, "bandpass", rnd(2200, 4200) * p.pitch, 6, 0.012, rnd(0.25, 0.5));
+    }
+    return 0.9;
+  };
+  var stomp = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.4);
+    thump(o, t, v, 60 * p.pitch, 25, 0.35, 1.2);
+    burst2(o, t, v, "lowpass", 400, 0.7, 0.25, 0.6);
+    return 0.5;
+  };
+  var enemyShot = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+    burst2(o, t, v, "bandpass", 900, 1.2, 0.08, 0.7);
+    thump(o, t, v, 150, 60, 0.08, 0.6);
+    return 0.3;
+  };
+  var enemySpawn = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.6);
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.exponentialRampToValueAtTime(0.5, t + 0.5);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + 0.7);
+    const fl = filt(o, "bandpass", 200, 3, g2);
+    fl.frequency.exponentialRampToValueAtTime(2500, t + 0.5);
+    noise2(o, t, 0.7, fl);
+    tone2(o, t + 0.45, v, "sine", 55, 0.4, 0.5);
+    return 1;
+  };
+  var whisper = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    const syll = 6 + Math.floor(Math.random() * 4);
+    let tt = t;
+    for (let i = 0; i < syll; i++) {
+      const d3 = rnd(0.07, 0.16);
+      const g2 = gainNode(o, 0, v);
+      perc(g2.gain, tt, d3 * 0.3, rnd(0.15, 0.3), d3);
+      const f1 = filt(o, "bandpass", rnd(500, 900), 8, g2);
+      const f2 = filt(o, "bandpass", rnd(1200, 2600), 8, g2);
+      const hs = filt(o, "highpass", 4e3, 0.7, gainNode(o, 0.4, g2));
+      const n = noise2(o, tt, d3 * 1.3, f1);
+      n.connect(f2);
+      n.connect(hs);
+      tt += d3 + rnd(0.01, 0.06);
+    }
+    return tt - t + 0.6;
+  };
+  var bossTell = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+    for (let i = 0; i < 3; i++) {
+      const tt = t + i * 0.16;
+      tone2(o, tt, v, "square", 880, 0.1, 0.12);
+      tone2(o, tt, v, "square", 932, 0.1, 0.1);
+    }
+    thump(o, t, v, 70, 35, 0.6, 0.8);
+    return 0.8;
+  };
+  var bossRoar = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    const dur = 1.6;
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.9, t + 0.15);
+    g2.gain.setTargetAtTime(1e-4, t + dur * 0.6, 0.25);
+    const sh = shaper(o, 30, g2);
+    const base2 = 70 * p.pitch;
+    const a = osc(o, "sawtooth", base2, t, dur, sh);
+    const b = osc(o, "sawtooth", base2 * 1.47, t, dur, sh);
+    a.frequency.linearRampToValueAtTime(base2 * 0.75, t + dur);
+    b.frequency.linearRampToValueAtTime(base2 * 1.1, t + dur);
+    const am = gainNode(o, 0.35);
+    am.connect(g2.gain);
+    osc(o, "sine", 23, t, dur, am);
+    const ng = gainNode(o, 0, v);
+    perc(ng.gain, t, 0.1, 0.4, dur);
+    noise2(o, t, dur, filt(o, "bandpass", 500, 1.5, ng), true, 4);
+    return dur + 1;
+  };
+  var heartbeat = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    thump(o, t, v, 55, 35, 0.12, 0.9);
+    thump(o, t + 0.22, v, 50, 30, 0.15, 0.7);
+    return 0.5;
+  };
+  var enemyStep = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+    thump(o, t, v, 75 * p.pitch, 40, 0.15, 0.7);
+    burst2(o, t, v, "bandpass", 500, 4, 0.1, 0.35);
+    return 0.3;
+  };
+  function step(s2) {
+    return (o, t, p) => {
+      const k = p.pitch * rnd(0.9, 1.1);
+      const vol = p.vol * rnd(0.8, 1);
+      switch (s2) {
+        case "marble": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.12, 0.3);
+          burst2(o, t, v, "bandpass", 3200 * k, 2, 0.025, 0.5);
+          burst2(o, t + 5e-3, v, "bandpass", 900 * k, 1.5, 0.05, 0.35);
+          return 0.15;
+        }
+        case "concrete": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.03, 0.25);
+          burst2(o, t, v, "bandpass", 1400 * k, 1, 0.04, 0.5);
+          thump(o, t, v, 110 * k, 60, 0.05, 0.4);
+          return 0.12;
+        }
+        case "carpet": {
+          const v = voice(o, p.dest, t, vol, p.pan);
+          burst2(o, t, v, "lowpass", 500 * k, 0.7, 0.07, 0.55, 8e-3);
+          return 0.12;
+        }
+        case "wood": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0, 0.3);
+          burst2(o, t, v, "bandpass", 1100 * k, 2, 0.04, 0.45);
+          tone2(o, t, v, "triangle", 190 * k, 0.07, 0.25);
+          if (Math.random() < 0.15) {
+            const n = tone2(o, t + 0.05, v, "sawtooth", 380, 0.18, 0.04, 0.05);
+            n.frequency.linearRampToValueAtTime(330, t + 0.2);
+          }
+          return 0.3;
+        }
+        case "metal": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.1, 0.4);
+          burst2(o, t, v, "bandpass", 2e3 * k, 1, 0.02, 0.4);
+          tone2(o, t, v, "triangle", 517 * k, 0.18, 0.12);
+          tone2(o, t, v, "sine", 1243 * k, 0.12, 0.08);
+          tone2(o, t, v, "sine", 2071 * k, 0.08, 0.05);
+          return 0.25;
+        }
+        case "tile": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.08, 0.35);
+          burst2(o, t, v, "highpass", 3500 * k, 1, 0.02, 0.5);
+          burst2(o, t, v, "bandpass", 1200 * k, 1.5, 0.04, 0.3);
+          return 0.12;
+        }
+        case "wet": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.05, 0.2);
+          const g2 = gainNode(o, 0, v);
+          perc(g2.gain, t, 5e-3, 1.6, 0.12);
+          const fl = filt(o, "bandpass", 600 * k, 5, g2);
+          fl.frequency.exponentialRampToValueAtTime(1800 * k, t + 0.1);
+          noise2(o, t, 0.13, fl);
+          return 0.2;
+        }
+        case "void": {
+          const v = voice(o, p.dest, t, vol, p.pan, 0.4);
+          thump(o, t, v, 60 * k, 45, 0.2, 0.5);
+          const n = tone2(o, t, v, "sine", 880 * k, 0.25, 0.05, 0.08);
+          n.frequency.exponentialRampToValueAtTime(840 * k, t + 0.25);
+          return 0.4;
+        }
+      }
+    };
+  }
+  var ding = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.3);
+    bell(o, t, v, 1318.5 * p.pitch, 2.2, 0.45, 1, 1.5);
+    bell(o, t, v, 1318.5 * 2.76 * p.pitch, 1, 0.08, 1, 0.8);
+    return 2.6;
+  };
+  var dingDong = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.3);
+    bell(o, t, v, 1318.5 * p.pitch, 1.4, 0.4, 1, 1.4);
+    bell(o, t + 0.45, v, 1046.5 * p.pitch, 2, 0.4, 1, 1.4);
+    return 2.6;
+  };
+  function doorSlide(open) {
+    return (o, t, p) => {
+      const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+      const dur = 1.1;
+      const mg = gainNode(o, 0, v);
+      mg.gain.setValueAtTime(1e-4, t);
+      mg.gain.linearRampToValueAtTime(0.18, t + 0.15);
+      mg.gain.setValueAtTime(0.18, t + dur - 0.2);
+      mg.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+      const m = osc(o, "sawtooth", 95, t, dur, filt(o, "lowpass", 300, 1, mg));
+      m.frequency.linearRampToValueAtTime(open ? 110 : 85, t + dur);
+      const rg = gainNode(o, 0, v);
+      rg.gain.setValueAtTime(1e-4, t);
+      rg.gain.linearRampToValueAtTime(0.3, t + 0.2);
+      rg.gain.setValueAtTime(0.3, t + dur - 0.25);
+      rg.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+      noise2(o, t, dur, filt(o, "bandpass", 700, 0.8, rg), true, 6);
+      thump(o, t + dur - 0.05, v, open ? 120 : 90, 40, 0.12, open ? 0.4 : 0.9);
+      burst2(o, t + dur - 0.05, v, "bandpass", 1500, 2, 0.04, open ? 0.2 : 0.5);
+      return dur + 0.3;
+    };
+  }
+  var panelButton = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
+    burst2(o, t, v, "bandpass", 3500, 3, 0.012, 0.6);
+    tone2(o, t + 0.01, v, "sine", 1975 * p.pitch, 0.09, 0.2);
+    return 0.15;
+  };
+  var intercom = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    const dur = 0.9;
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.3, t + 0.03);
+    g2.gain.setValueAtTime(0.3, t + dur - 0.15);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const bp = filt(o, "bandpass", 1800, 1.2, g2);
+    noise2(o, t, dur, shaper(o, 30, bp));
+    for (let i = 0; i < 8; i++) burst2(o, t + rnd(0, dur), v, "highpass", 2500, 1, 0.01, rnd(0.2, 0.5));
+    tone2(o, t, v, "square", 1e3, 0.05, 0.08);
+    return dur + 0.2;
+  };
+  var elevatorRide = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+    const dur = 2.8;
+    thump(o, t, v, 70, 35, 0.2, 0.8);
+    burst2(o, t, v, "lowpass", 500, 0.7, 0.15, 0.4);
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.5, t + 0.6);
+    g2.gain.setValueAtTime(0.5, t + dur - 0.6);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const h = osc(o, "sawtooth", 48, t, dur, filt(o, "lowpass", 220, 2, g2));
+    h.frequency.linearRampToValueAtTime(52, t + dur * 0.5);
+    h.frequency.linearRampToValueAtTime(46, t + dur);
+    noise2(o, t, dur, filt(o, "lowpass", 300, 0.7, gainNode(o, 0.6, g2)), true);
+    swoosh(o, t + 0.5, v, 200, 700, dur - 0.8, 0.15);
+    thump(o, t + dur - 0.1, v, 80, 35, 0.15, 0.6);
+    return dur + 0.3;
+  };
+  var ropeCreak = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+    const dur = rnd(0.5, 0.9);
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.2, t + dur * 0.3);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    const f = rnd(18, 30);
+    const s2 = osc(o, "sawtooth", f, t, dur, filt(o, "bandpass", rnd(600, 1100), 12, g2));
+    s2.frequency.linearRampToValueAtTime(f * rnd(0.6, 1.4), t + dur);
+    return dur + 0.4;
+  };
+  var uiMove = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    tone2(o, t, v, "square", 1760 * p.pitch, 0.03, 0.14);
+    return 0.06;
+  };
+  var uiOk = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.05);
+    tone2(o, t, v, "square", 1320 * p.pitch, 0.05, 0.1);
+    tone2(o, t + 0.05, v, "square", 1980 * p.pitch, 0.09, 0.1);
+    return 0.18;
+  };
+  var uiBack = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    tone2(o, t, v, "square", 1320 * p.pitch, 0.05, 0.09);
+    tone2(o, t + 0.05, v, "square", 880 * p.pitch, 0.08, 0.09);
+    return 0.16;
+  };
+  var uiError = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    tone2(o, t, v, "square", 196, 0.09, 0.15);
+    tone2(o, t + 0.11, v, "square", 185, 0.14, 0.15);
+    return 0.3;
+  };
+  var uiOpen = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    swoosh(o, t, v, 1500, 5e3, 0.12, 0.15);
+    tone2(o, t + 0.04, v, "triangle", 1046, 0.1, 0.12);
+    return 0.2;
+  };
+  var uiClose = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    swoosh(o, t, v, 4e3, 1200, 0.1, 0.12);
+    return 0.15;
+  };
+  var textBlip = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan);
+    tone2(o, t, v, "square", 600 * p.pitch * rnd(0.97, 1.03), 0.025, 0.05);
+    return 0.04;
+  };
+  var message = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    bell(o, t, v, 1568, 0.25, 0.2, 2, 1);
+    bell(o, t + 0.12, v, 2093, 0.4, 0.2, 2, 1);
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t, 0.01, 0.15, 0.25);
+    osc(o, "square", 150, t, 0.25, filt(o, "lowpass", 300, 1, g2));
+    return 0.6;
+  };
+  var ruleStamp = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+    thump(o, t, v, 140, 50, 0.12, 1.1);
+    burst2(o, t, v, "lowpass", 1800, 0.7, 0.09, 0.8);
+    burst2(o, t, v, "bandpass", 4e3, 1, 0.03, 0.4);
+    [64, 68, 71, 76].forEach((m, i) => bell(o, t + 0.18 + i * 0.05, v, mtof(m), 0.9, 0.14, 1, 1.2));
+    return 1.2;
+  };
+  var save = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
+    [67, 72, 79].forEach((m, i) => tone2(o, t + i * 0.08, v, "triangle", mtof(m), 0.25, 0.15));
+    return 0.6;
+  };
+  var coin = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    tone2(o, t, v, "square", 1975, 0.06, 0.12);
+    tone2(o, t + 0.06, v, "square", 2637, 0.25, 0.12);
+    return 0.35;
+  };
+  var levelUp = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
+    [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => tone2(o, t + i * 0.05, v, "square", mtof(m), 0.12, 0.08));
+    bell(o, t + 0.36, v, mtof(84), 1, 0.25, 2, 2);
+    return 1.4;
+  };
+  var doorWood = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.4);
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.7, t + 0.1);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + 0.6);
+    const s2 = osc(o, "sawtooth", 24, t, 0.6, filt(o, "bandpass", 1300, 14, g2));
+    s2.frequency.linearRampToValueAtTime(14, t + 0.6);
+    return 0.7;
+  };
+  var doorSlam = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.35, 0.4);
+    thump(o, t, v, 95, 40, 0.25, 1.1);
+    burst2(o, t, v, "lowpass", 1200, 0.7, 0.18, 0.7);
+    burst2(o, t, v, "bandpass", 2500, 2, 0.04, 0.4);
+    return 1;
+  };
+  var knock = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.15, 0.5);
+    for (let i = 0; i < 3; i++) {
+      const tt = t + i * 0.22 + (i === 2 ? 0.05 : 0);
+      thump(o, tt, v, 160, 90, 0.06, 0.7);
+      burst2(o, tt, v, "bandpass", 900, 3, 0.04, 0.5);
+    }
+    return 1;
+  };
+  var switchClick = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+    burst2(o, t, v, "bandpass", 2800, 4, 0.015, 0.7);
+    thump(o, t, v, 300, 150, 0.03, 0.3);
+    return 0.1;
+  };
+  var crateBreak = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
+    thump(o, t, v, 120, 50, 0.15, 0.8);
+    for (let i = 0; i < 7; i++) {
+      const tt = t + rnd(0, 0.25);
+      burst2(o, tt, v, "bandpass", rnd(700, 2500), 3, rnd(0.02, 0.06), rnd(0.2, 0.5));
+    }
+    return 0.6;
+  };
+  var glassBreak = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.3);
+    burst2(o, t, v, "highpass", 3e3, 0.7, 0.15, 0.7);
+    for (let i = 0; i < 9; i++) {
+      const tt = t + rnd(0.02, 0.5);
+      tone2(o, tt, v, "sine", rnd(3e3, 7e3), rnd(0.05, 0.2), rnd(0.05, 0.12));
+    }
+    return 0.9;
+  };
+  var flicker = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    for (let i = 0; i < 5; i++) {
+      const tt = t + rnd(0, 0.5);
+      const d3 = rnd(0.02, 0.08);
+      const g2 = gainNode(o, 0, v);
+      perc(g2.gain, tt, 2e-3, rnd(0.15, 0.3), d3);
+      osc(o, "sawtooth", 120, tt, d3, filt(o, "highpass", 800, 1, g2));
+    }
+    return 0.7;
+  };
+  var drip = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    const n = tone2(o, t, v, "sine", rnd(1400, 2200) * p.pitch, 0.08, 0.25, 1e-3);
+    n.frequency.exponentialRampToValueAtTime(n.frequency.value * 0.5 + 400, t + 0.06);
+    return 0.6;
+  };
+  var wallGrind = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.3);
+    const dur = 1.5;
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t);
+    g2.gain.linearRampToValueAtTime(0.5, t + 0.2);
+    g2.gain.setValueAtTime(0.5, t + dur - 0.3);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + dur);
+    noise2(o, t, dur, shaper(o, 10, filt(o, "lowpass", 400, 4, g2)), true, 8);
+    osc(o, "sawtooth", 41, t, dur, filt(o, "lowpass", 160, 1, gainNode(o, 0.5, g2)));
+    return dur + 0.3;
+  };
+  var clockTick = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
+    burst2(o, t, v, "bandpass", 3800 * p.pitch, 8, 0.012, 0.5);
+    return 0.05;
+  };
+  var timerWarn = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
+    tone2(o, t, v, "square", 1046, 0.08, 0.12);
+    tone2(o, t + 0.15, v, "square", 1046, 0.08, 0.12);
+    return 0.3;
+  };
+  var noiseUp = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
+    const n = tone2(o, t, v, "sine", 300, 0.4, 0.25, 0.05);
+    n.frequency.exponentialRampToValueAtTime(600, t + 0.4);
+    tone2(o, t, v, "sine", 317, 0.4, 0.15, 0.05);
+    return 0.6;
+  };
+  var safeRoom = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    [67, 71, 74, 79].forEach((m, i) => bell(o, t + i * 0.12, v, mtof(m), 1.6, 0.16, 1, 1.4));
+    return 2.2;
+  };
+  var scare = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
+    const dur = 1.2;
+    const g2 = gainNode(o, 0, v);
+    perc(g2.gain, t, 5e-3, 0.7, dur);
+    const sh = shaper(o, 25, g2);
+    [61, 62, 67, 68, 73].forEach((m) => osc(o, "sawtooth", mtof(m) * 0.5, t, dur, sh));
+    burst2(o, t, v, "highpass", 2e3, 0.7, 0.8, 0.4);
+    thump(o, t, v, 50, 25, 0.8, 1);
+    return dur + 1;
+  };
+  var heels = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.25, 0.4);
+    for (let i = 0; i < 4; i++) {
+      const tt = t + i * 0.32;
+      burst2(o, tt, v, "bandpass", 3600, 4, 0.02, 0.6);
+      tone2(o, tt, v, "triangle", 1250, 0.03, 0.15);
+    }
+    return 1.6;
+  };
+  var duct = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.5);
+    for (let i = 0; i < 3; i++) {
+      const tt = t + i * rnd(0.35, 0.5);
+      thump(o, tt, v, 90, 50, 0.2, 0.6);
+      tone2(o, tt, v, "triangle", rnd(300, 420), 0.4, 0.15);
+      tone2(o, tt, v, "sine", rnd(900, 1300), 0.25, 0.06);
+    }
+    return 1.8;
+  };
+  var hatch = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.4);
+    burst2(o, t, v, "bandpass", 2600, 5, 0.03, 0.7);
+    tone2(o, t, v, "square", 820, 0.04, 0.1);
+    const g2 = gainNode(o, 0, v);
+    g2.gain.setValueAtTime(1e-4, t + 0.1);
+    g2.gain.linearRampToValueAtTime(0.5, t + 0.2);
+    g2.gain.exponentialRampToValueAtTime(1e-4, t + 0.7);
+    const s2 = osc(o, "sawtooth", 30, t + 0.1, 0.6, filt(o, "bandpass", 1500, 12, g2));
+    s2.frequency.linearRampToValueAtTime(18, t + 0.7);
+    thump(o, t + 0.7, v, 110, 45, 0.15, 0.7);
+    return 1;
+  };
+  var d = (label3, group, fn2, bus = "sfx") => ({ label: label3, group, bus, fn: fn2 });
+  var SFX = {
+    hit1: d("1타 (약)", "combat", hit(1)),
+    hit2: d("2타 (보통)", "combat", hit(2)),
+    hit3: d("3타 (강)", "combat", hit(3)),
+    whiff: d("헛손질", "combat", whiff),
+    swingHeavy: d("큰 휘두르기", "combat", swingHeavy),
+    kick: d("점프 킥", "combat", kick),
+    lowKick: d("하단차기", "combat", lowKick),
+    dashHit: d("대시 공격", "combat", dashHit),
+    gun: d("권총", "combat", gun),
+    gunSilenced: d("소음기 권총", "combat", gunSilenced),
+    reload: d("재장전", "combat", reload),
+    emptyClick: d("탄 없음", "combat", emptyClick),
+    bulletHit: d("탄 명중", "combat", bulletHit),
+    ricochet: d("도탄", "combat", ricochet),
+    guard: d("가드", "combat", guard2),
+    guardBreak: d("가드 붕괴", "combat", guardBreak),
+    parry: d("저스트 가드", "combat", parry),
+    evade: d("회피", "combat", evade),
+    jump: d("점프", "combat", jump),
+    land: d("착지", "combat", land),
+    hurt: d("피격", "combat", hurt),
+    down: d("다운", "combat", down),
+    wakeup: d("기상", "combat", wakeup),
+    armor: d("슈퍼아머", "combat", armor),
+    ability: d("능력 충격파", "combat", ability),
+    superStart: d("필살기 컷인", "combat", superStart),
+    superHit: d("필살기 명중", "combat", superHit),
+    heal: d("회복", "combat", heal),
+    itemUse: d("소모품 사용", "combat", itemUse),
+    pickup: d("줍기", "combat", pickup),
+    enemyDie: d("괴이 소멸", "enemy", enemyDie),
+    enemyTell: d("공격 예고", "enemy", enemyTell),
+    ghostWail: d("귀신 울음", "enemy", ghostWail),
+    ghostAttack: d("귀신 덮침", "enemy", ghostAttack),
+    crawler: d("다리 많은 것", "enemy", crawler2),
+    stomp: d("무거운 발구름", "enemy", stomp),
+    enemyShot: d("경비 사격", "enemy", enemyShot),
+    enemySpawn: d("출현", "enemy", enemySpawn),
+    enemyStep: d("보이지 않는 발소리", "enemy", enemyStep),
+    whisper: d("속삭임", "enemy", whisper),
+    heartbeat: d("심장 소리", "enemy", heartbeat),
+    bossTell: d("수호자 예고", "enemy", bossTell),
+    bossRoar: d("수호자 포효", "enemy", bossRoar),
+    scare: d("공포 굉음", "enemy", scare),
+    stepMarble: d("대리석", "step", step("marble")),
+    stepConcrete: d("콘크리트", "step", step("concrete")),
+    stepCarpet: d("장판·카펫", "step", step("carpet")),
+    stepWood: d("나무 마루", "step", step("wood")),
+    stepMetal: d("철판·덕트", "step", step("metal")),
+    stepTile: d("타일", "step", step("tile")),
+    stepWet: d("젖은 바닥", "step", step("wet")),
+    stepVoid: d("알 수 없는 재질", "step", step("void")),
+    ding: d("띵", "elevator", ding),
+    dingDong: d("띵동", "elevator", dingDong),
+    doorOpen: d("문 열림", "elevator", doorSlide(true)),
+    doorClose: d("문 닫힘", "elevator", doorSlide(false)),
+    panelButton: d("패널 버튼", "elevator", panelButton),
+    intercom: d("인터폰 잡음", "elevator", intercom),
+    elevatorRide: d("승강기 이동", "elevator", elevatorRide),
+    ropeCreak: d("귀환 로프", "elevator", ropeCreak),
+    doorWood: d("문 삐걱", "world", doorWood),
+    doorSlam: d("문 쾅", "world", doorSlam),
+    knock: d("똑똑똑", "world", knock),
+    switchClick: d("스위치", "world", switchClick),
+    crateBreak: d("상자 부숨", "world", crateBreak),
+    glassBreak: d("유리 깨짐", "world", glassBreak),
+    flicker: d("형광등 지직", "world", flicker),
+    drip: d("물방울", "world", drip),
+    wallGrind: d("벽이 조여 옴", "world", wallGrind),
+    clockTick: d("시계 초침", "world", clockTick),
+    timerWarn: d("시간 경고", "world", timerWarn),
+    noiseUp: d("소리 게이지 상승", "world", noiseUp),
+    safeRoom: d("다락방 도착", "world", safeRoom),
+    heels: d("구두 소리", "world", heels),
+    duct: d("덕트 기어가기", "world", duct),
+    hatch: d("해치 열기", "world", hatch),
+    uiMove: d("커서 이동", "ui", uiMove, "ui"),
+    uiOk: d("결정", "ui", uiOk, "ui"),
+    uiBack: d("취소", "ui", uiBack, "ui"),
+    uiError: d("안 됨", "ui", uiError, "ui"),
+    uiOpen: d("창 열기", "ui", uiOpen, "ui"),
+    uiClose: d("창 닫기", "ui", uiClose, "ui"),
+    textBlip: d("대사 글자", "ui", textBlip, "ui"),
+    message: d("괴담톡 알림", "ui", message, "ui"),
+    ruleStamp: d("규칙 발견 (도장)", "ui", ruleStamp, "ui"),
+    save: d("저장", "ui", save, "ui"),
+    coin: d("보상", "ui", coin, "ui"),
+    levelUp: d("강화", "ui", levelUp, "ui")
+  };
+  var SFX_IDS = Object.keys(SFX);
+  var SURFACE_SFX = {
+    marble: "stepMarble",
+    concrete: "stepConcrete",
+    carpet: "stepCarpet",
+    wood: "stepWood",
+    metal: "stepMetal",
+    tile: "stepTile",
+    wet: "stepWet",
+    void: "stepVoid"
+  };
+
+  // src/game/action/audio/music.ts
+  var PC = { c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11 };
+  function noteToMidi(s2) {
+    const m = /^([a-gA-G])([#b]?)(-?\d)$/.exec(s2);
+    if (!m) throw new Error(`음 표기 오류: ${s2}`);
+    const acc = m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0;
+    return 12 * (Number(m[3]) + 1) + PC[m[1].toLowerCase()] + acc;
+  }
+  function parseNotes(src) {
+    const toks = [];
+    for (const raw of src.split(/\s+/)) {
+      if (!raw || raw === "|") continue;
+      const m = /^(.*)\*(\d+)$/.exec(raw);
+      if (m) {
+        const n = Number(m[2]);
+        if (m[1] === "." || m[1] === "-") for (let i = 0; i < n; i++) toks.push(m[1]);
+        else {
+          toks.push(m[1]);
+          for (let i = 1; i < n; i++) toks.push("-");
+        }
+      } else toks.push(raw);
+    }
+    const evs = [];
+    let cur = null;
+    toks.forEach((t, i) => {
+      if (t === "-") {
+        if (cur) cur.len++;
+        return;
+      }
+      cur = null;
+      if (t === ".") return;
+      let vel = 0.8;
+      let body2 = t;
+      if (body2.endsWith("!")) vel = 1, body2 = body2.slice(0, -1);
+      else if (body2.endsWith("?")) vel = 0.5, body2 = body2.slice(0, -1);
+      cur = { step: i, notes: body2.split("+").map(noteToMidi), len: 1, vel };
+      evs.push(cur);
+    });
+    return { evs, steps: toks.length };
+  }
+  function parseDrums(src) {
+    const s2 = src.replace(/[\s|]/g, "");
+    const evs = [];
+    for (let i = 0; i < s2.length; i++) if (s2[i] !== ".") evs.push({ step: i, kind: s2[i] });
+    return { evs, steps: s2.length };
+  }
+  var QUAL = {
+    "": [0, 4, 7],
+    m: [0, 3, 7],
+    "7": [0, 4, 7, 10],
+    maj7: [0, 4, 7, 11],
+    m7: [0, 3, 7, 10],
+    dim: [0, 3, 6],
+    m7b5: [0, 3, 6, 10],
+    sus4: [0, 5, 7],
+    aug: [0, 4, 8],
+    "5": [0, 7],
+    add9: [0, 4, 7, 14],
+    madd9: [0, 3, 7, 14]
+  };
+  function chord(name) {
+    const m = /^([A-G])([#b]?)(.*)$/.exec(name);
+    if (!m || !(m[3] in QUAL)) throw new Error(`화음 표기 오류: ${name}`);
+    const root = PC[m[1].toLowerCase()] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0);
+    const tones = QUAL[m[3]].map((iv) => {
+      let n = 48 + (root + iv) % 12;
+      while (n < 52) n += 12;
+      if (iv >= 12) n += 12;
+      return n;
+    });
+    tones.sort((a, b) => a - b);
+    return { root: (root + 12) % 12, tones };
+  }
+  var NAMES = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
+  var tok = (notes) => notes.map((n) => `${NAMES[n % 12]}${Math.floor(n / 12) - 1}`).join("+");
+  function comp(chords, rhythm, shift = 0) {
+    return chords.split(/\s+/).filter(Boolean).map((c) => {
+      const ns = chord(c).tones.map((n) => n + shift);
+      return [...rhythm].map((ch) => ch === "x" ? tok(ns) : ch === "X" ? tok(ns) + "!" : ch).join(" ");
+    }).join(" ");
+  }
+  function bass(chords, rhythm, oct = 2) {
+    return chords.split(/\s+/).filter(Boolean).map((c) => {
+      const { root } = chord(c);
+      const r = 12 * (oct + 1) + root;
+      const pick6 = (ch) => ch === "r" ? r : ch === "o" ? r + 12 : ch === "f" ? r + 7 : ch === "b" ? r + 10 : -1;
+      return [...rhythm].map((ch) => pick6(ch) >= 0 ? tok([pick6(ch)]) : ch).join(" ");
+    }).join(" ");
+  }
+  function arp(chords, shape2, shift = 12) {
+    return chords.split(/\s+/).filter(Boolean).map((c) => {
+      const ts = chord(c).tones;
+      return [...shape2].map((ch) => {
+        if (!/\d/.test(ch)) return ch;
+        const i = Number(ch);
+        return tok([ts[i % ts.length] + 12 * Math.floor(i / ts.length) + shift]);
+      }).join(" ");
+    }).join(" ");
+  }
+  function fm(o, dest, t, f, dur, vel, ratio, idx, idxDecay, a, d3, s2, r) {
+    const g2 = gainNode(o, 0, dest);
+    const end = adsr(g2.gain, t, a, d3, s2, dur, r, vel);
+    const car = osc(o, "sine", f, t, end - t, g2);
+    const mg = gainNode(o, 0);
+    mg.gain.setValueAtTime(f * idx, t);
+    mg.gain.setTargetAtTime(f * idx * 0.15, t, idxDecay);
+    mg.connect(car.frequency);
+    osc(o, "sine", f * ratio, t, end - t, mg);
+  }
+  var INST = {
+    // 아케이드 리드: 네모파 + 톱니파, 늦게 들어오는 떨림
+    lead(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.01, 0.12, 0.7, dur, 0.08, vel * 0.32);
+      const lp = filt(o, "lowpass", 3200, 1.2, g2);
+      const vib = gainNode(o, 0);
+      vib.gain.setValueAtTime(0, t);
+      vib.gain.linearRampToValueAtTime(f * 0.012, t + Math.min(0.4, dur));
+      const a = osc(o, "square", f, t, end - t, lp);
+      const b = osc(o, "sawtooth", f * 1.004, t, end - t, gainNode(o, 0.6, lp));
+      vib.connect(a.frequency);
+      vib.connect(b.frequency);
+      osc(o, "sine", 5.5, t, end - t, vib);
+    },
+    square(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 5e-3, 0.08, 0.5, dur, 0.05, vel * 0.25);
+      osc(o, "square", f, t, end - t, filt(o, "lowpass", 2500, 0.7, g2));
+    },
+    // 금관 찌르기: 필터가 확 열렸다 닫힌다
+    brass(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.02, 0.2, 0.6, dur, 0.1, vel * 0.22);
+      const lp = filt(o, "lowpass", 400, 2, g2);
+      lp.frequency.setValueAtTime(400, t);
+      lp.frequency.linearRampToValueAtTime(3500, t + 0.04);
+      lp.frequency.setTargetAtTime(900, t + 0.05, 0.12);
+      osc(o, "sawtooth", f, t, end - t, lp);
+      osc(o, "sawtooth", f * 1.006, t, end - t, lp);
+    },
+    epiano(o, dest, t, f, dur, vel) {
+      fm(o, dest, t, f, Math.min(dur, 1.6), vel * 0.28, 1, 1.8, 0.25, 3e-3, 0.9, 0.35, 0.3);
+      const g2 = gainNode(o, 0, dest);
+      perc(g2.gain, t, 1e-3, vel * 0.04, 0.15);
+      osc(o, "sine", f * 14, t, 0.2, g2);
+    },
+    fmbass(o, dest, t, f, dur, vel) {
+      fm(o, dest, t, f, dur, vel * 0.55, 1, 2.5, 0.06, 2e-3, 0.25, 0.55, 0.05);
+      const g2 = gainNode(o, 0, dest);
+      adsr(g2.gain, t, 2e-3, 0.2, 0.7, dur, 0.05, vel * 0.3);
+      osc(o, "sine", f, t, dur + 0.1, g2);
+    },
+    bass(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 3e-3, 0.15, 0.6, dur, 0.06, vel * 0.45);
+      const lp = filt(o, "lowpass", 1400, 3, g2);
+      lp.frequency.setTargetAtTime(350, t, 0.06);
+      osc(o, "sawtooth", f, t, end - t, lp);
+    },
+    pad(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.6, 0.5, 0.8, dur, 1.2, vel * 0.09);
+      const lp = filt(o, "lowpass", 1100, 0.7, g2);
+      for (const k of [0.995, 1, 1.006]) osc(o, "sawtooth", f * k, t, end - t, lp);
+    },
+    strings(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.12, 0.3, 0.85, dur, 0.4, vel * 0.13);
+      const lp = filt(o, "lowpass", 2600, 0.7, g2);
+      const vib = gainNode(o, f * 6e-3);
+      for (const k of [0.997, 1.003]) vib.connect(osc(o, "sawtooth", f * k, t, end - t, lp).frequency);
+      osc(o, "sine", 5, t, end - t, vib);
+    },
+    bell(o, dest, t, f, dur, vel) {
+      fm(o, dest, t, f, 0.05, vel * 0.22, 3.5, 2.5, 0.4, 2e-3, 1.6, 1e-4, 1.2);
+    },
+    // 오르골: 사인 + 높은 배음, 짧게 사그라듦. 조금씩 음이 어긋난다
+    box(o, dest, t, f, dur, vel) {
+      const ff = f * (1 + (Math.random() - 0.5) * 8e-3);
+      const g2 = gainNode(o, 0, dest);
+      perc(g2.gain, t, 2e-3, vel * 0.3, 1.4);
+      osc(o, "sine", ff, t, 1.5, g2);
+      const h = gainNode(o, 0, dest);
+      perc(h.gain, t, 1e-3, vel * 0.08, 0.4);
+      osc(o, "sine", ff * 5.02, t, 0.5, h);
+      void dur;
+    },
+    organ(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.01, 0.1, 0.9, dur, 0.06, vel * 0.13);
+      const vib = gainNode(o, f * 4e-3);
+      for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.25], [0.5, 0.4]]) {
+        const n = osc(o, "sine", f * k, t, end - t, gainNode(o, v, g2));
+        vib.connect(n.frequency);
+      }
+      osc(o, "sine", 6, t, end - t, vib);
+    },
+    pluck(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      perc(g2.gain, t, 2e-3, vel * 0.3, Math.min(0.5, dur + 0.15));
+      const lp = filt(o, "lowpass", 3e3, 1, g2);
+      lp.frequency.setTargetAtTime(500, t, 0.08);
+      osc(o, "triangle", f, t, 0.6, lp);
+      osc(o, "square", f, t, 0.6, gainNode(o, 0.2, lp));
+    },
+    // 사람 목소리 같은 '아—' (모음 대역 둘)
+    choir(o, dest, t, f, dur, vel) {
+      const g2 = gainNode(o, 0, dest);
+      const end = adsr(g2.gain, t, 0.5, 0.4, 0.85, dur, 1, vel * 0.5);
+      const f1 = filt(o, "bandpass", 700, 5, g2);
+      const f2 = filt(o, "bandpass", 1150, 6, g2);
+      for (const k of [0.996, 1.004]) {
+        const s2 = osc(o, "sawtooth", f * k, t, end - t, f1);
+        s2.connect(f2);
+      }
+    }
+  };
+  function drum(o, dest, t, kind, vel) {
+    const g2 = gainNode(o, vel, dest);
+    switch (kind) {
+      case "k": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, 0.9, 0.25);
+        const n = osc(o, "sine", 150, t, 0.3, e);
+        n.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+        const c = gainNode(o, 0, g2);
+        perc(c.gain, t, 1e-3, 0.3, 0.02);
+        noise2(o, t, 0.03, filt(o, "lowpass", 3e3, 0.7, c));
+        break;
+      }
+      case "s": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, 0.45, 0.16);
+        noise2(o, t, 0.2, filt(o, "bandpass", 2200, 0.8, e));
+        const b = gainNode(o, 0, g2);
+        perc(b.gain, t, 1e-3, 0.35, 0.08);
+        const n = osc(o, "triangle", 230, t, 0.1, b);
+        n.frequency.exponentialRampToValueAtTime(160, t + 0.08);
+        break;
+      }
+      case "x": {
+        for (let i = 0; i < 3; i++) {
+          const e = gainNode(o, 0, g2);
+          perc(e.gain, t + i * 0.011, 1e-3, 0.4, i === 2 ? 0.12 : 0.01);
+          noise2(o, t + i * 0.011, 0.14, filt(o, "bandpass", 1300, 1.5, e));
+        }
+        break;
+      }
+      case "h":
+      case "o": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, kind === "h" ? 0.18 : 0.15, kind === "h" ? 0.04 : 0.3);
+        noise2(o, t, kind === "h" ? 0.06 : 0.35, filt(o, "highpass", 7e3, 0.7, e));
+        break;
+      }
+      case "c": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, 0.22, 1.4);
+        noise2(o, t, 1.5, filt(o, "highpass", 4500, 0.5, e));
+        break;
+      }
+      case "t":
+      case "m": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, 0.6, 0.3);
+        const f0 = kind === "t" ? 110 : 170;
+        const n = osc(o, "sine", f0, t, 0.35, e);
+        n.frequency.exponentialRampToValueAtTime(f0 * 0.6, t + 0.3);
+        break;
+      }
+      case "r": {
+        const e = gainNode(o, 0, g2);
+        perc(e.gain, t, 1e-3, 0.3, 0.03);
+        osc(o, "triangle", 1700, t, 0.05, filt(o, "bandpass", 1700, 4, e));
+        noise2(o, t, 0.03, filt(o, "bandpass", 3e3, 3, e));
+        break;
+      }
+    }
+  }
+  function compileSong(def) {
+    const chans = {};
+    for (const [name, c] of Object.entries(def.chans)) chans[name] = { def: c, at: /* @__PURE__ */ new Map() };
+    let base2 = 0;
+    for (const entry of def.order) {
+      const m = /^([A-Za-z0-9_]+)([+-]\d+)?$/.exec(entry);
+      if (!m || !def.pats[m[1]]) throw new Error(`곡 순서 오류: ${entry}`);
+      const pat = def.pats[m[1]];
+      const tr = Number(m[2] ?? 0);
+      let len = 0;
+      const parsed = {};
+      for (const [name, src] of Object.entries(pat)) {
+        const c = def.chans[name];
+        if (!c) throw new Error(`없는 악기 줄: ${name}`);
+        parsed[name] = c.inst === "drums" ? parseDrums(src) : parseNotes(src);
+        len = Math.max(len, parsed[name].steps);
+      }
+      for (const [name, p] of Object.entries(parsed)) {
+        for (const e of p.evs) {
+          const ev = "notes" in e ? { ...e, notes: e.notes.map((n) => n + tr) } : e;
+          const at2 = chans[name].at;
+          const k = base2 + e.step;
+          (at2.get(k) ?? at2.set(k, []).get(k)).push(ev);
+        }
+      }
+      base2 += len;
+    }
+    return { def, steps: base2, chans };
+  }
+  var stepSec = (bpm) => 60 / bpm / 4;
+  var Player2 = class {
+    constructor(o, song, startAt) {
+      this.o = o;
+      this.song = song;
+      this.startAt = startAt;
+      this.scope = new AudioScope(busOut(o, "music"));
+      o = this.o = this.scope.out;
+      this.out = gainNode(o, 1, o.music);
+      const verb = gainNode(o, 1, o.verb), room2 = gainNode(o, 1, o.room);
+      this.sends = [this.out, verb, room2];
+      this.o = { ...o, verb, room: room2 };
+      this.nextTime = startAt;
+      for (const [name, c] of Object.entries(song.chans)) {
+        const d3 = c.def;
+        const g2 = gainNode(o, d3.vol ?? 1);
+        let tail = g2;
+        if (d3.drive) tail = tail.connect(shaper(o, d3.drive));
+        if (d3.pan) {
+          const p = ownNode(o, o.ctx.createStereoPanner());
+          p.pan.value = d3.pan;
+          tail = tail.connect(p);
+        }
+        tail.connect(this.out);
+        if (d3.verb) tail.connect(gainNode(o, d3.verb, this.o.verb));
+        this.chanNodes.set(name, g2);
+      }
+    }
+    out;
+    scope;
+    sends;
+    chanNodes = /* @__PURE__ */ new Map();
+    step = 0;
+    nextTime;
+    ended = false;
+    /** until 시각까지의 칸을 미리 예약한다 */
+    schedule(until, now = -Infinity) {
+      const s2 = this.song;
+      const sec = stepSec(s2.def.bpm);
+      while (!this.ended && this.nextTime < now - 0.05) {
+        this.step++;
+        this.nextTime += sec;
+        if (!s2.def.loop && this.step >= s2.steps) this.ended = true;
+      }
+      while (!this.ended && this.nextTime < until) {
+        const i = this.step % s2.steps;
+        const swing = i % 2 === 1 ? (s2.def.swing ?? 0) * sec : 0;
+        const t = this.nextTime + swing;
+        for (const [name, c] of Object.entries(s2.chans)) {
+          const evs = c.at.get(i);
+          if (!evs) continue;
+          const dest = this.chanNodes.get(name);
+          for (const e of evs) {
+            if ("kind" in e) oneShot(this.o, (o) => drum(o, dest, t, e.kind, 1));
+            else {
+              const inst = INST[c.def.inst];
+              for (const n of e.notes) {
+                const sour = s2.def.wrong && Math.random() < s2.def.wrong ? (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.7) : 0;
+                oneShot(this.o, (o) => inst(o, dest, t, mtof(n + sour), e.len * sec * 0.95, e.vel));
+              }
+            }
+          }
+        }
+        this.step++;
+        this.nextTime += sec;
+        if (!s2.def.loop && this.step >= s2.steps) this.ended = true;
+      }
+    }
+    /** 끝나는 데 걸리는 시간(초). 반복곡은 한 바퀴 */
+    get lengthSec() {
+      return this.song.steps * stepSec(this.song.def.bpm);
+    }
+    fadeOut(t, sec) {
+      for (const node of this.sends) {
+        const g2 = node.gain;
+        g2.cancelScheduledValues(t);
+        g2.setValueAtTime(g2.value, t);
+        g2.linearRampToValueAtTime(0, t + sec);
+      }
+      this.ended = true;
+      this.scope.stopAt(t + sec);
+    }
+  };
+
+  // src/game/action/audio/songs.ts
+  var rep = (s2, n) => Array(n).fill(s2).join(" ");
+  var hq = {
+    label: "본부 · 관리국 사무실",
+    bpm: 112,
+    swing: 0.14,
+    loop: true,
+    chans: {
+      mel: { inst: "square", vol: 0.8, pan: 0.15, verb: 0.15 },
+      keys: { inst: "epiano", vol: 0.9, pan: -0.2, verb: 0.2 },
+      bass: { inst: "fmbass", vol: 0.9 },
+      dr: { inst: "drums", vol: 0.55 },
+      hat: { inst: "drums", vol: 0.35, pan: 0.3 }
+    },
+    pats: {
+      A: {
+        mel: "a4*2 c5*2 e5*3 d5 c5*2 a4*2 g4*4 | f4*2 a4*2 c5*4 . . d5 c5 a4*4 | bb4*3 a4 g4*2 f4*2 d4*2 f4*2 g4*4 | e4*2 g4*2 bb4*2 c5*2 e5*4 .*4",
+        keys: comp("Fmaj7 Dm7 Gm7 C7", "x-.x-.x--.x-...."),
+        bass: bass("F Dm Gm C7", "r..o..r.f..o.r.b"),
+        dr: rep("k...s..kk.k.s...", 4),
+        hat: rep("h.hhh.hhh.hhh.ho", 4)
+      },
+      B: {
+        mel: "c5*2 . c5 e5*2 d5*2 c5*3 a4 g4*4 | f#4*2 a4*2 c5*2 d5*2 f#5*4 e5*2 d5*2 | d5*3 c5 bb4*2 a4*2 g4*4 f4*2 g4*2 | bb4*2 a4*2 g4*2 e4*2 c4*4 .*4",
+        keys: comp("Am7 D7 Gm7 C7", "x-.x-.x--.x-...."),
+        bass: bass("A D Gm C7", "r..o..r.f..o.r.b"),
+        dr: rep("k...s..kk.k.s...", 3) + " k...s..ks.s.s.xx",
+        hat: rep("h.hhh.hhh.hhh.ho", 4)
+      }
+    },
+    order: ["A", "B", "A", "B"]
+  };
+  var lobby = {
+    label: "로비 · 어긋난 대기 음악",
+    bpm: 96,
+    loop: true,
+    wrong: 0.06,
+    chans: {
+      mel: { inst: "organ", vol: 1, verb: 0.3 },
+      keys: { inst: "epiano", vol: 0.75, pan: -0.25, verb: 0.3 },
+      bass: { inst: "bass", vol: 0.6 },
+      rim: { inst: "drums", vol: 0.4, pan: 0.2 },
+      hat: { inst: "drums", vol: 0.2, pan: -0.3 }
+    },
+    pats: {
+      A: {
+        mel: "g4*4 bb4*2 g4*2 f4*4 eb4*4 | g4*2 f4*2 eb4*2 c4*2 d4*8 | ab4*4 c5*2 ab4*2 g4*4 f4*4 | d4*2 f4*2 ab4*2 bb4*2 g4*8",
+        keys: comp("Ebmaj7 Cm7 Fm7 Bb7", "x.x..x.x.x..x.x."),
+        bass: bass("Eb Cm Fm Bb", "r-.f-.r.f-.r.f.."),
+        rim: rep("k..r..r.k..r..r.", 4),
+        hat: rep("hhhhhhhhhhhhhhhh", 4)
+      },
+      B: {
+        mel: "bb4*4 d5*2 bb4*2 a4*4 g4*4 | e4*2 g4*2 bb4*2 c5*2 bb4*8 | ab4*2 g4*2 f4*2 eb4*2 c4*8 | d4*4 f4*4 bb3*8",
+        keys: comp("Gm7 C7 Fm7 Bb7", "x.x..x.x.x..x.x."),
+        bass: bass("G C Fm Bb", "r-.f-.r.f-.r.f.."),
+        rim: rep("k..r..r.k..r..r.", 4),
+        hat: rep("hhhhhhhhhhhhhhhh", 4)
+      }
+    },
+    order: ["A", "B", "A", "B-1"]
+    // 마지막 바퀴는 반음 낮게 미끄러진다
+  };
+  var chase = {
+    label: "추격의 층",
+    bpm: 168,
+    loop: true,
+    chans: {
+      mel: { inst: "lead", vol: 0.9, verb: 0.12 },
+      stab: { inst: "brass", vol: 0.8, pan: -0.3 },
+      bass: { inst: "fmbass", vol: 1 },
+      dr: { inst: "drums", vol: 0.7 },
+      hat: { inst: "drums", vol: 0.3, pan: 0.3 }
+    },
+    pats: {
+      A: {
+        mel: "d5*2 . d5 f5*2 d5*2 a5*4 g5*2 f5*2 | e5*2 f5*2 e5*2 d5*2 c5*4 a4*4 | bb4*2 . bb4 d5*2 f5*2 bb5*4 a5*2 g5*2 | a5*4 g5*4 e5*4 c5*4",
+        stab: comp("Dm Dm Bb C", "X..x..x........."),
+        bass: bass("Dm Dm Bb C", "r.ror.orr.ror.oo"),
+        dr: "c.h.s.hkk.h.s.hs " + rep("k.h.s.hkk.h.s.hs", 2) + " k.s.s.kks.sssmtt",
+        hat: rep("hhhhhhhhhhhhhhhh", 4)
+      },
+      B: {
+        mel: "a5*3 a5 a5*2 g5*2 f5*2 e5*2 d5*4 | f5*2 e5*2 d5*2 c5*2 d5*8 | g5*3 g5 bb5*2 a5*2 g5*2 f5*2 e5*4 | c#5*4 e5*4 a5*4 c#6*4",
+        stab: comp("Dm Dm Gm A", "X..x..x........."),
+        bass: bass("Dm Dm Gm A", "r.ror.orr.ror.oo"),
+        dr: "c.h.s.hkk.h.s.hs " + rep("k.h.s.hkk.h.s.hs", 2) + " sssssssssmmmtttc",
+        hat: rep("hhhhhhhhhhhhhhhh", 4)
+      }
+    },
+    order: ["A", "B", "A+2", "B"]
+  };
+  var replica = {
+    label: "재현의 층 · 아파트",
+    bpm: 76,
+    loop: true,
+    chans: {
+      box: { inst: "box", vol: 1, verb: 0.45, pan: 0.1 },
+      acc: { inst: "pluck", vol: 0.45, pan: -0.2, verb: 0.3 },
+      pad: { inst: "pad", vol: 0.6, verb: 0.4 },
+      tick: { inst: "drums", vol: 0.12, pan: 0.5 }
+    },
+    pats: {
+      A: {
+        box: "e5*4 a5*4 c6*4 | b5*4 a5*4 e5*4 | f5*4 a5*4 d6*4 | c6*4 b5*4 g#5*4 | a5*4 c6*2 b5*2 a5*4 | e5*4 f5*4 a5*4 | g#5*4 b5*4 e5*4 | a5*12",
+        acc: bass("Am Am Dm E Am F E Am", "r...........", 3),
+        pad: "a3+e4*24 d4+a4*12 e4+g#4*12 a3+e4*12 f3+c4*12 e3+b3*12 a3+e4*12",
+        tick: rep("r...r...r...", 8)
+      },
+      B: {
+        // 둘째 바퀴: 오르골 태엽이 풀려 한 음씩 빠진다
+        box: "e5*4 .*4 c6*4 | b5*4 .*4 e5*4 | f5*4 a5*4 .*4 | c6*4 .*4 g#5*4 | a5*4 .*8 | e5*4 .*8 | g#5*4 .*4 e5*4 | a4*12",
+        acc: bass("Am Am Dm E Am F E Am", "r...........", 3),
+        pad: "a3+e4*24 d4+a4*12 e4+g#4*12 a3+e4*12 f3+c4*12 e3+b3*12 a3+e4*12",
+        tick: rep("r...r...r...", 8)
+      }
+    },
+    order: ["A", "B"]
+  };
+  var trial = {
+    label: "시험 층",
+    bpm: 132,
+    loop: true,
+    chans: {
+      mel: { inst: "square", vol: 0.9, pan: 0.2, verb: 0.2 },
+      arp: { inst: "bell", vol: 0.7, pan: -0.3, verb: 0.3 },
+      bass: { inst: "bass", vol: 0.8 },
+      dr: { inst: "drums", vol: 0.6 },
+      tick: { inst: "drums", vol: 0.3, pan: 0.4 }
+    },
+    pats: {
+      A: {
+        mel: "e5*2 .*2 f5*2 .*2 e5*2 b4*2 .*4 | f5*2 .*2 g5*2 .*2 f5*2 c5*2 .*4 | e5 f5 g5 a5 b5*4 .*2 a5*2 g5*2 f5*2 | e5*8 .*8",
+        arp: arp("Em F Em F", "0121012101210121"),
+        bass: bass("Em F Em F", "r.r.r.r.r.r.r.r."),
+        dr: rep("k...k...k...k...", 4),
+        tick: rep("r.r.r.r.r.r.r.r.", 4)
+      },
+      B: {
+        arp: arp("Em G F Em", "0123012301230123"),
+        bass: bass("Em G F Em", "r.r.o.r.r.r.o.r."),
+        dr: rep("k..sk...k..sk.s.", 3) + " k.s.k.s.ssssmmtt",
+        tick: rep("hhhhhhhhhhhhhhhh", 4)
+      }
+    },
+    order: ["A", "A", "B", "A+1"]
+  };
+  var dark = {
+    label: "어둠의 층",
+    bpm: 60,
+    loop: true,
+    chans: {
+      drone: { inst: "pad", vol: 0.9, verb: 0.5 },
+      voice: { inst: "choir", vol: 0.35, verb: 0.6, pan: -0.3 },
+      ping: { inst: "bell", vol: 0.45, verb: 0.9, pan: 0.4 },
+      beat: { inst: "drums", vol: 0.35 }
+    },
+    pats: {
+      A: {
+        drone: "c2+g2*64",
+        voice: ".*16 eb4*24 .*8 d4*16",
+        ping: ".*20 g5? .*13 f#5? .*21 c6? .*7",
+        beat: rep("k..k............", 4)
+      },
+      B: {
+        drone: "c#2+g#2*32 c2+g2*32",
+        voice: ".*8 e4*20 .*4 eb4*32",
+        ping: ".*9 b5? .*30 c5? .*23",
+        beat: rep("k..k............", 2) + " k..k....k..k.... k..k....k..k...."
+      }
+    },
+    order: ["A", "B"]
+  };
+  var puzzle = {
+    label: "퍼즐과 선택의 층",
+    bpm: 100,
+    loop: true,
+    chans: {
+      arp: { inst: "bell", vol: 0.8, verb: 0.4, pan: 0.25 },
+      low: { inst: "pad", vol: 0.7, verb: 0.3 },
+      bass: { inst: "pluck", vol: 0.7, pan: -0.2 },
+      dr: { inst: "drums", vol: 0.5 }
+    },
+    pats: {
+      A: {
+        arp: "c5 . e5 . g#5 . d5 . f#5 . a#5 . e5 . | c6 . a#5 . f#5 . d5 . g#5 . e5 . c5 .",
+        low: "c3+f#3*28",
+        bass: "c2*6 . d2*7 | c2*6 . a#1*7",
+        dr: "k.....s...k.s. k...t.s...k.sm"
+      }
+    },
+    order: ["A", "A+1", "A-2", "A+3", "A", "A-1"]
+  };
+  var service = {
+    label: "정비 구역 · 다락방",
+    bpm: 84,
+    loop: true,
+    chans: {
+      mel: { inst: "strings", vol: 0.8, verb: 0.4, pan: 0.15 },
+      keys: { inst: "epiano", vol: 0.8, verb: 0.35, pan: -0.2 },
+      bass: { inst: "fmbass", vol: 0.55 },
+      dr: { inst: "drums", vol: 0.25 }
+    },
+    pats: {
+      A: {
+        mel: "d5*6 c5*2 bb4*8 | g4*4 bb4*4 d5*8 | f5*6 d5*2 c5*4 bb4*4 | a4*12 .*4",
+        keys: arp("Gm7 Ebmaj7 Bbmaj7 F", "0.1.2.3.2.1.0.1.", 0),
+        bass: bass("Gm Eb Bb F", "r-------f---r---"),
+        dr: rep("k.......r.......", 4)
+      },
+      B: {
+        mel: "bb4*4 a4*4 g4*8 | g4*4 bb4*4 eb5*8 | eb5*6 d5*2 c5*8 | d5*4 c5*4 a4*4 f#4*4",
+        keys: arp("Gm7 Ebmaj7 Cm7 D7", "0.1.2.3.2.1.0.1.", 0),
+        bass: bass("Gm Eb Cm D", "r-------f---r---"),
+        dr: rep("k.......r.......", 4)
+      }
+    },
+    order: ["A", "B"]
+  };
+  var boss = {
+    label: "층 수호자",
+    bpm: 152,
+    loop: true,
+    chans: {
+      mel: { inst: "lead", vol: 1, verb: 0.15 },
+      stab: { inst: "brass", vol: 0.9, pan: -0.25, verb: 0.15 },
+      voice: { inst: "choir", vol: 0.4, verb: 0.5, pan: 0.3 },
+      bass: { inst: "fmbass", vol: 1, drive: 2 },
+      kick: { inst: "drums", vol: 0.75 },
+      hat: { inst: "drums", vol: 0.3, pan: 0.3 }
+    },
+    pats: {
+      A: {
+        mel: "c5*2 eb5*2 g5*4 f5*2 eb5*2 d5*2 eb5*2 | c5*4 g4*4 c5*2 d5*2 eb5*4 | f5*2 eb5*2 c5*4 ab5*4 g5*4 | b4*4 d5*4 f5*4 g5*4",
+        stab: comp("Cm Cm Ab G", "X..x..x...x..x.."),
+        voice: comp("Cm Cm Ab G", "x---------------"),
+        bass: bass("Cm Cm Ab G", "r.rrr.rrr.rrr.ro"),
+        kick: "c..k..s.k..k..s. " + rep("k..k..s.k..k..s.", 2) + " k..k..s.k.ssssss",
+        hat: rep("h.h.h.h.h.h.h.h.", 4)
+      },
+      B: {
+        mel: "ab5*4 g5*2 f5*2 c5*4 f5*4 | eb5*4 d5*2 c5*2 g4*8 | f5*4 ab5*4 db6*4 c6*4 | b5*8 g5*4 d5*4",
+        stab: comp("Fm Cm Db G", "X..x..x...x..x.."),
+        voice: comp("Fm Cm Db G", "x---------------"),
+        bass: bass("Fm Cm Db G", "r.rrr.rrr.rrr.ro"),
+        kick: "c..k..s.k..k..s. " + rep("k..k..s.k..k..s.", 2) + " kkkksssstttmmmmc",
+        hat: rep("h.h.h.h.h.h.h.h.", 4)
+      }
+    },
+    order: ["A", "B", "A", "B+1"]
+  };
+  var title = {
+    label: "제목 화면",
+    bpm: 116,
+    loop: true,
+    chans: {
+      mel: { inst: "strings", vol: 1, verb: 0.35 },
+      arp: { inst: "pluck", vol: 0.6, pan: -0.3, verb: 0.2 },
+      bass: { inst: "fmbass", vol: 0.9 },
+      dr: { inst: "drums", vol: 0.55 },
+      hat: { inst: "drums", vol: 0.25, pan: 0.3 }
+    },
+    pats: {
+      A: {
+        mel: "e5*6 d5*2 c5*4 b4*4 | a4*8 c5*4 f5*4 | g5*6 f5*2 e5*4 d5*4 | g#4*4 b4*4 e5*8",
+        arp: arp("Am F G E", "0120".repeat(4)),
+        bass: bass("Am F G E", "r.......r...r.o."),
+        dr: "c...s...k.k.s... " + rep("k...s...k.k.s...", 3),
+        hat: rep("..h...h...h...h.", 4)
+      },
+      B: {
+        mel: "a5*6 g5*2 e5*8 | f5*4 e5*4 c5*8 | d5*4 f5*4 a5*4 g5*4 | g#5*8 b5*4 e6*4",
+        arp: arp("Am F Dm E", "0120".repeat(4)),
+        bass: bass("Am F Dm E", "r.......r...r.o."),
+        dr: rep("k...s...k.k.s...", 3) + " k.k.s.s.ssssmmtc",
+        hat: rep("h.h.h.h.h.h.h.h.", 4)
+      }
+    },
+    order: ["A", "B"]
+  };
+  var clear = {
+    label: "층 돌파 (알림곡)",
+    bpm: 150,
+    loop: false,
+    chans: {
+      mel: { inst: "lead", vol: 1, verb: 0.3 },
+      stab: { inst: "brass", vol: 0.9, verb: 0.3 },
+      bass: { inst: "fmbass", vol: 0.9 },
+      dr: { inst: "drums", vol: 0.6 }
+    },
+    pats: {
+      A: {
+        mel: "g4 c5 e5 g5*3 e5 g5*9 | ab5*2 bb5*2 c6*12",
+        stab: "c4+e4+g4*2 .*6 c4+e4+g4*8 | ab3+c4+eb4*2 bb3+d4+f4*2 c4+e4+g4*12",
+        bass: "c3*2 .*6 c2*8 | ab2*2 bb2*2 c3*12",
+        dr: "k.s.k.sssc...... k.k.c..........."
+      }
+    },
+    order: ["A"]
+  };
+  var gameover = {
+    label: "후송 (알림곡)",
+    bpm: 70,
+    loop: false,
+    chans: {
+      mel: { inst: "strings", vol: 1, verb: 0.5 },
+      pad: { inst: "pad", vol: 0.8, verb: 0.5 },
+      bell: { inst: "bell", vol: 0.5, verb: 0.8 }
+    },
+    pats: {
+      A: {
+        mel: "e5*4 d#5*4 d5*4 c#5*4 | c5*16",
+        pad: "a3+c4+e4*16 f3+ab3+c4*16",
+        bell: ".*16 a4*16"
+      }
+    },
+    order: ["A"]
+  };
+  var discover = {
+    label: "규칙 발견 (알림곡)",
+    bpm: 140,
+    loop: false,
+    chans: {
+      b: { inst: "bell", vol: 0.9, verb: 0.5 },
+      pad: { inst: "strings", vol: 0.7, verb: 0.5 }
+    },
+    pats: { A: { b: "e5 g#5 b5 e6*13", pad: "e4+g#4+b4*16" } },
+    order: ["A"]
+  };
+  var SONGS = { title, hq, lobby, chase, replica, trial, dark, puzzle, service, boss, clear, gameover, discover };
+  var SONG_IDS = Object.keys(SONGS);
+
+  // src/game/action/audio/ambience.ts
+  var AMBIENCE = {
+    title: { layers: [{ kind: "rumble", f: 120, vol: 0.12 }], events: [] },
+    hq: {
+      layers: [{ kind: "air", f: 900, vol: 0.02 }, { kind: "hum", f: 60, vol: 0.015 }],
+      events: [
+        { id: "typing", gap: [3, 9], vol: [0.15, 0.3], pan: 0.8 },
+        { id: "message", gap: [25, 50], vol: [0.08, 0.15], pan: 0.8 },
+        { id: "switchClick", gap: [12, 30], vol: [0.1, 0.2], pan: 0.8 }
+      ]
+    },
+    lobby: {
+      layers: [{ kind: "hum", f: 120, vol: 0.035 }, { kind: "air", f: 700, vol: 0.025 }],
+      events: [
+        { id: "flicker", gap: [6, 14], vol: [0.15, 0.35], pan: 0.7 },
+        { id: "intercom", gap: [20, 40], vol: [0.1, 0.2], pan: 0.5 },
+        { id: "ding", gap: [30, 60], vol: [0.05, 0.1], pitch: [0.94, 0.94], pan: 1 }
+      ]
+    },
+    chase: {
+      layers: [{ kind: "rumble", f: 160, vol: 0.22 }, { kind: "air", f: 400, vol: 0.05 }],
+      events: [
+        { id: "doorSlam", gap: [4, 9], vol: [0.2, 0.45], pan: 1 },
+        { id: "crawler", gap: [5, 11], vol: [0.25, 0.45], pan: 0.9 }
+      ]
+    },
+    replica: {
+      layers: [{ kind: "hum", f: 60, vol: 0.03 }],
+      events: [
+        { id: "clockTick", gap: [1, 1], vol: [0.12, 0.12], pan: 0 },
+        { id: "knock", gap: [15, 35], vol: [0.25, 0.4], pan: 1 },
+        { id: "whisper", gap: [18, 40], vol: [0.15, 0.3], pan: 1 },
+        { id: "doorWood", gap: [14, 30], vol: [0.15, 0.3], pan: 1 }
+      ]
+    },
+    trial: {
+      layers: [{ kind: "hum", f: 100, vol: 0.025 }, { kind: "air", f: 1200, vol: 0.015 }],
+      events: [{ id: "intercom", gap: [18, 35], vol: [0.1, 0.2], pan: 0.5 }]
+    },
+    dark: {
+      layers: [{ kind: "rumble", f: 90, vol: 0.18 }],
+      events: [
+        { id: "enemyStep", gap: [1.5, 5], vol: [0.25, 0.5], pan: 1 },
+        { id: "heartbeat", gap: [8, 15], vol: [0.25, 0.4], pan: 0 },
+        { id: "whisper", gap: [12, 25], vol: [0.12, 0.25], pan: 1 },
+        { id: "drip", gap: [4, 9], vol: [0.1, 0.25], pan: 1 }
+      ]
+    },
+    silent: {
+      // 원문: 아무 소리도 안 들림. 귀가 먹먹한 이명 하나만
+      layers: [{ kind: "ring", f: 7200, vol: 4e-3 }],
+      events: [{ id: "drip", gap: [25, 50], vol: [0.03, 0.06], pan: 1 }]
+    },
+    puzzle: {
+      layers: [{ kind: "air", f: 500, vol: 0.03 }, { kind: "hum", f: 82, vol: 0.02 }],
+      events: [
+        { id: "wallGrind", gap: [18, 35], vol: [0.15, 0.3], pan: 0.6 },
+        { id: "clockTick", gap: [2, 2], vol: [0.06, 0.06], pan: 0.3 }
+      ]
+    },
+    service: {
+      layers: [{ kind: "rumble", f: 140, vol: 0.2 }, { kind: "air", f: 300, vol: 0.04 }],
+      events: [
+        { id: "drip", gap: [2, 6], vol: [0.15, 0.3], pan: 1 },
+        { id: "ropeCreak", gap: [8, 16], vol: [0.2, 0.35], pan: 1 },
+        { id: "bossRoar", gap: [30, 60], vol: [0.05, 0.08], pitch: [0.6, 0.8], pan: 1 },
+        // 멀리서 포식자
+        { id: "stomp", gap: [20, 40], vol: [0.06, 0.12], pan: 1 }
+      ]
+    },
+    boss: { layers: [{ kind: "rumble", f: 120, vol: 0.18 }], events: [] }
+  };
+  var rnd2 = (a, b) => a + Math.random() * (b - a);
+  function startAmbience(o, scene, fadeIn = 1.5) {
+    const scope = new AudioScope(busOut(o, "amb"));
+    o = scope.out;
+    const ctx = o.ctx;
+    const spec = AMBIENCE[scene];
+    const out = gainNode(o, 0, o.amb);
+    const verb = gainNode(o, 1, o.verb), room2 = gainNode(o, 1, o.room);
+    o = { ...o, verb, room: room2 };
+    const t0 = ctx.currentTime;
+    out.gain.setValueAtTime(1e-4, t0);
+    out.gain.linearRampToValueAtTime(1, t0 + fadeIn);
+    const long = 86400;
+    for (const l of spec.layers) {
+      const g2 = gainNode(o, l.vol, out);
+      if (l.kind === "hum") {
+        for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.3], [4, 0.15]]) osc(o, "sine", l.f * k, t0, long, gainNode(o, v, g2));
+        const wob = gainNode(o, l.vol * 0.3);
+        wob.connect(g2.gain);
+        osc(o, "sine", 0.13, t0, long, wob);
+      } else if (l.kind === "rumble") {
+        noise2(o, t0, long, filt(o, "lowpass", l.f, 1.5, g2), true);
+        const wob = gainNode(o, l.vol * 0.4);
+        wob.connect(g2.gain);
+        osc(o, "sine", 0.07, t0, long, wob);
+      } else if (l.kind === "air") {
+        noise2(o, t0, long, filt(o, "bandpass", l.f, 0.6, g2));
+        const wob = gainNode(o, l.vol * 0.6);
+        wob.connect(g2.gain);
+        osc(o, "sine", 0.05, t0, long, wob);
+      } else {
+        osc(o, "sine", l.f, t0, long, g2);
+      }
+    }
+    const timers = /* @__PURE__ */ new Set();
+    const later = (f, ms) => {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        f();
+      }, ms);
+      timers.add(id);
+    };
+    let live = true;
+    const fire = (e) => {
+      if (!live) return;
+      if (ctx.state !== "running") {
+        later(() => fire(e), e.gap[0] * 1e3);
+        return;
+      }
+      const vol = rnd2(e.vol[0], e.vol[1]);
+      const pan = (Math.random() * 2 - 1) * (e.pan ?? 0);
+      const pitch = e.pitch ? rnd2(e.pitch[0], e.pitch[1]) : 1;
+      const t = ctx.currentTime + 0.05;
+      if (e.id === "typing") {
+        const n = 4 + Math.floor(Math.random() * 10);
+        for (let i = 0; i < n; i++) oneShot(o, (ao) => SFX.switchClick.fn(ao, t + i * rnd2(0.07, 0.16), { vol: vol * rnd2(0.5, 1), pan, pitch: rnd2(1.2, 1.8), dest: out }));
+      } else oneShot(o, (ao) => SFX[e.id].fn(ao, t, { vol, pan, pitch, dest: out }));
+      later(() => fire(e), rnd2(e.gap[0], e.gap[1]) * 1e3);
+    };
+    for (const e of spec.events) later(() => fire(e), rnd2(e.gap[0] * 0.3, e.gap[1] * 0.6) * 1e3);
+    return {
+      scene,
+      stop(fade = 1.2) {
+        if (!live) return;
+        live = false;
+        for (const id of timers) clearTimeout(id);
+        timers.clear();
+        const t = ctx.currentTime;
+        for (const node of [out, verb, room2]) {
+          node.gain.cancelScheduledValues(t);
+          node.gain.setValueAtTime(node.gain.value, t);
+          node.gain.linearRampToValueAtTime(0, t + fade);
+        }
+        scope.stopAt(t + fade);
+      }
+    };
+  }
+
+  // src/game/action/audio/index.ts
+  var SCENE_SONG = {
+    title: "title",
+    hq: "hq",
+    lobby: "lobby",
+    chase: "chase",
+    replica: "replica",
+    trial: "trial",
+    dark: "dark",
+    silent: null,
+    puzzle: "puzzle",
+    service: "service",
+    boss: "boss"
+  };
+  var SCENE_SURFACE = {
+    title: "marble",
+    hq: "wood",
+    lobby: "marble",
+    chase: "concrete",
+    replica: "carpet",
+    trial: "tile",
+    dark: "wet",
+    silent: "concrete",
+    puzzle: "void",
+    service: "metal",
+    boss: "concrete"
+  };
+  var SCENES = /* @__PURE__ */ new Set(["title", "hq", "lobby", "chase", "replica", "trial", "dark", "silent", "puzzle", "service", "boss"]);
+  var ALIAS2 = { doors: "doorOpen", rope: "ropeCreak", stamp: "ruleStamp", knockknock: "knock", static: "intercom" };
+  function pickSfx(e, scene) {
+    switch (e.type) {
+      case "hit":
+        if (e.kind === "kick") return "kick";
+        if (e.kind === "low") return "lowKick";
+        if (e.kind === "dash") return "dashHit";
+        if (e.kind === "bullet") return "bulletHit";
+        if (e.kind === "super") return "superHit";
+        return e.strength && e.strength >= 3 ? "hit3" : e.strength === 2 ? "hit2" : "hit1";
+      case "whiff":
+        return e.strength && e.strength >= 3 ? "swingHeavy" : "whiff";
+      case "shot":
+        return e.kind === "silenced" ? "gunSilenced" : e.kind === "enemy" ? "enemyShot" : "gun";
+      case "empty":
+        return "emptyClick";
+      case "guard":
+        return e.perfect ? "parry" : "guard";
+      case "super":
+        return "superStart";
+      case "item":
+        return "itemUse";
+      case "step":
+        return SURFACE_SFX[e.surface ?? (scene ? SCENE_SURFACE[scene] : "concrete")];
+      case "door":
+        if (e.kind === "wood") return "doorWood";
+        if (e.kind === "slam") return "doorSlam";
+        return e.open === false ? "doorClose" : "doorOpen";
+      case "ruleFound":
+        return "ruleStamp";
+      case "hp:low":
+        return "heartbeat";
+      case "custom":
+        if (e.name && e.name in ALIAS2) return ALIAS2[e.name];
+        return e.name && e.name in SFX ? e.name : null;
+      default:
+        return e.type in SFX ? e.type : null;
+    }
+  }
+  var MIN_GAP = { textBlip: 0.03, uiMove: 0.03, heartbeat: 0.3 };
+  var STEP_GAP = 0.07;
+  var MAX_VOICES = 28;
+  function createGameAudio(opts = {}) {
+    let settings = { ...DEFAULT_SETTINGS };
+    let ctx = null;
+    let graph = null;
+    let out = null;
+    let disposed = false;
+    let userPaused = false;
+    let cutscene = false;
+    const media = /* @__PURE__ */ new Set();
+    let scene = null;
+    let amb = null;
+    let song = null;
+    let resumeSong = null;
+    let jingleEnd = null;
+    let rootScope = null;
+    let pumpTimer = 0;
+    const lastAt = /* @__PURE__ */ new Map();
+    const voices = [];
+    let listener = { x: 0, half: 640 };
+    const compiled = /* @__PURE__ */ new Map();
+    const listeners = /* @__PURE__ */ new Set();
+    const ready = (async () => {
+      try {
+        const raw = await opts.load?.();
+        if (raw != null && !disposed) settings = cleanSettings(typeof raw === "string" ? JSON.parse(raw) : raw);
+      } catch {
+      }
+      applyVolumes();
+    })();
+    let saveTimer = 0;
+    const saveNow = () => {
+      saveTimer = 0;
+      try {
+        void Promise.resolve(opts.save?.(JSON.stringify(settings))).catch(() => {
+        });
+      } catch {
+      }
+    };
+    const persist = () => {
+      clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(saveNow, 400);
+    };
+    function syncMedia() {
+      for (const track of media) track.setPolicy(settings.muted ? 0 : sliderGain(settings.master) * sliderGain(settings.sfx), userPaused);
+    }
+    function applyVolumes() {
+      syncMedia();
+      if (!graph || !ctx) return;
+      const t = ctx.currentTime;
+      for (const b of BUSES) {
+        const v = b === "master" ? settings.muted || cutscene ? 0 : sliderGain(settings.master) : sliderGain(settings[b]);
+        graph.gains[b].gain.cancelScheduledValues(t);
+        if (v === 0) graph.gains[b].gain.setValueAtTime(0, t);
+        else graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
+      }
+    }
+    let wantSong = null;
+    function ensure() {
+      return disposed ? null : out;
+    }
+    function create() {
+      if (disposed) return null;
+      if (out) return out;
+      const AC = window.AudioContext ?? window.webkitAudioContext;
+      if (!AC) return null;
+      try {
+        ctx = new AC({ latencyHint: "interactive" });
+      } catch {
+        return null;
+      }
+      graph = buildGraph(ctx, ctx.destination);
+      rootScope = new AudioScope(graph.out);
+      out = rootScope.out;
+      applyVolumes();
+      ctx.addEventListener("statechange", () => {
+        if (disposed) return;
+        if (ctx?.state !== "running" && opts.autoUnlock !== false) attachUnlock();
+        listeners.forEach((f) => f());
+      });
+      return out;
+    }
+    async function unlock() {
+      const fresh = !out;
+      const o = create();
+      if (!o || !ctx) return false;
+      const current = ctx;
+      if (fresh) {
+        if (scene) amb = startAmbience(o, scene);
+        music(wantSong, 1.2);
+      }
+      if (userPaused || document.hidden) return false;
+      try {
+        const nav = navigator;
+        if (nav.audioSession && nav.audioSession.type !== "playback") nav.audioSession.type = "playback";
+      } catch {
+      }
+      if (current.state !== "running") {
+        const prime = new AudioScope(o);
+        try {
+          const b = prime.source(current.createBufferSource());
+          b.buffer = current.createBuffer(1, 1, 22050);
+          b.connect(current.destination);
+          b.start(0);
+          prime.seal();
+          await current.resume();
+        } catch {
+          prime.dispose();
+          return false;
+        }
+      }
+      if (disposed || ctx !== current) return false;
+      if (userPaused || document.hidden) {
+        void current.suspend().catch(() => {
+        });
+        return false;
+      }
+      if (current.state === "running") {
+        detachUnlock();
+        pump();
+      }
+      return current.state === "running";
+    }
+    const UNLOCK_EVENTS = ["pointerdown", "touchend", "mousedown", "keydown"];
+    const onGesture = () => void unlock();
+    function attachUnlock() {
+      for (const ev of UNLOCK_EVENTS) window.addEventListener(ev, onGesture, { capture: true, passive: true });
+    }
+    function detachUnlock() {
+      for (const ev of UNLOCK_EVENTS) window.removeEventListener(ev, onGesture, { capture: true });
+    }
+    if (opts.autoUnlock !== false) attachUnlock();
+    const onVis = () => {
+      if (!ctx) return;
+      if (document.hidden) void ctx.suspend().catch(() => {
+      });
+      else if (!userPaused) void unlock();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    function play(id, o = {}) {
+      const ao = ensure();
+      if (!ao || !ctx || ctx.state !== "running" || userPaused || document.hidden) return false;
+      const def = SFX[id];
+      if (!def || cutscene) return false;
+      const now = ctx.currentTime;
+      const gap = def.group === "step" ? STEP_GAP : MIN_GAP[id] ?? 0.015;
+      if (now - (lastAt.get(id) ?? -1) < gap) return false;
+      while (voices.length && voices[0] < now) voices.shift();
+      if (voices.length >= MAX_VOICES && (def.group === "step" || def.group === "world")) return false;
+      lastAt.set(id, now);
+      const t = Math.max(now, o.at ?? now) + 5e-3;
+      const dur = oneShot(busOut(ao, def.bus), (scoped) => def.fn(scoped, t, { vol: o.vol ?? 1, pan: o.pan ?? 0, pitch: o.pitch ?? 1, dest: ao[def.bus] }));
+      const end = t + dur;
+      const i = voices.findIndex((v) => v > end);
+      voices.splice(i < 0 ? voices.length : i, 0, end);
+      return true;
+    }
+    function panOf(e) {
+      if (e.pan != null) return e.pan;
+      if (e.x == null) return 0;
+      return Math.max(-0.8, Math.min(0.8, (e.x - listener.x) / listener.half));
+    }
+    function event(e) {
+      switch (e.type) {
+        case "enter:floor":
+          if (e.floor?.type && SCENES.has(e.floor.type)) floor(e.floor.type);
+          return true;
+        case "combat:boss":
+          music("boss", 0.6);
+          return true;
+        case "combat:clear":
+          if (song?.id === "boss") jingle("clear", scene ? SCENE_SONG[scene] : null);
+          return true;
+        case "run:end":
+          jingle(e.how === "evac" ? "gameover" : "clear", null);
+          return true;
+      }
+      const id = pickSfx(e, scene);
+      if (!id) return false;
+      const far = e.x == null ? 1 : Math.max(0.35, 1 - Math.max(0, Math.abs(e.x - listener.x) - listener.half) / (listener.half * 2));
+      const ok = play(id, { vol: (e.vol ?? 1) * far, pan: panOf(e), pitch: e.pitch });
+      if (ok && e.type === "super") duck(1.6);
+      if (ok && e.type === "ruleFound") duck(1.2, 0.4);
+      return ok;
+    }
+    function songOf(id) {
+      let c = compiled.get(id);
+      if (!c) compiled.set(id, c = compileSong(SONGS[id]));
+      return c;
+    }
+    function pump() {
+      if (!ctx || !song || ctx.state !== "running" || userPaused || document.hidden) return;
+      if (jingleEnd !== null && ctx.currentTime >= jingleEnd) {
+        music(resumeSong, 0.5);
+        return;
+      }
+      song.player.schedule(ctx.currentTime + 0.4, ctx.currentTime);
+    }
+    function startPump() {
+      if (!pumpTimer) pumpTimer = window.setInterval(pump, 50);
+    }
+    function music(id, fade = 1) {
+      wantSong = id;
+      jingleEnd = null;
+      resumeSong = null;
+      const o = ensure();
+      if (!o || !ctx) return;
+      if (song?.id === id && !song.player.ended) return;
+      const t = ctx.currentTime;
+      song?.player.fadeOut(t, fade);
+      song = null;
+      if (!id) {
+        clearInterval(pumpTimer);
+        pumpTimer = 0;
+        return;
+      }
+      const player = new Player2(o, songOf(id), t + Math.min(0.15, fade * 0.3));
+      song = { id, player };
+      startPump();
+      pump();
+    }
+    function jingle(id, then) {
+      const o = ensure();
+      if (!o || !ctx) return;
+      const back = then !== void 0 ? then : resumeSong ?? song?.id ?? null;
+      music(id, 0.25);
+      resumeSong = back;
+      jingleEnd = song.player.startAt + song.player.lengthSec + 0.8;
+    }
+    function duck(sec, to = 0.25) {
+      if (!ctx || !graph) return;
+      const g2 = graph.duck.gain;
+      const t = ctx.currentTime;
+      g2.cancelScheduledValues(t);
+      g2.setTargetAtTime(to, t, 0.04);
+      g2.setTargetAtTime(1, t + sec, 0.3);
+    }
+    function floor(s2) {
+      if (s2 === scene) return;
+      scene = s2;
+      wantSong = s2 ? SCENE_SONG[s2] : null;
+      const o = ensure();
+      if (!o) return;
+      amb?.stop();
+      amb = s2 ? startAmbience(o, s2) : null;
+      music(s2 ? SCENE_SONG[s2] : null, 1.2);
+    }
+    function setPaused(paused) {
+      if (disposed || userPaused === paused) return;
+      userPaused = paused;
+      syncMedia();
+      if (paused) void ctx?.suspend().catch(() => {
+      });
+      else if (ctx) void unlock();
+    }
+    return {
+      ready,
+      unlock,
+      /** Called once for each story media element, before its first play(). */
+      attachMedia(track) {
+        if (disposed) return track.dispose();
+        media.add(track);
+        track.onDispose(() => media.delete(track));
+        syncMedia();
+      },
+      setCutscene(active) {
+        if (cutscene === active) return;
+        cutscene = active;
+        applyVolumes();
+      },
+      setPaused(paused) {
+        setPaused(paused);
+      },
+      get unlocked() {
+        return ctx?.state === "running";
+      },
+      get scene() {
+        return scene;
+      },
+      get song() {
+        return song?.id ?? null;
+      },
+      play,
+      event,
+      music,
+      jingle,
+      duck,
+      floor,
+      /** 소리의 좌우를 정할 기준: 화면 가운데 x와 화면 반 너비 */
+      setListener(x, half = 640) {
+        listener = { x, half: Math.max(1, half) };
+      },
+      get settings() {
+        return { ...settings };
+      },
+      setVolume(bus, v) {
+        settings = cleanSettings({ ...settings, [bus]: v });
+        applyVolumes();
+        persist();
+      },
+      setMuted(m) {
+        settings = { ...settings, muted: m };
+        applyVolumes();
+        persist();
+      },
+      /** 게임 일시정지: 모든 소리를 멈춘다 */
+      pause() {
+        setPaused(true);
+      },
+      resume() {
+        setPaused(false);
+      },
+      onState(f) {
+        listeners.add(f);
+        return () => listeners.delete(f);
+      },
+      dispose() {
+        if (disposed) return;
+        disposed = true;
+        detachUnlock();
+        document.removeEventListener("visibilitychange", onVis);
+        clearInterval(pumpTimer);
+        clearTimeout(saveTimer);
+        if (saveTimer) saveNow();
+        jingleEnd = null;
+        amb?.stop(0);
+        rootScope?.dispose();
+        listeners.clear();
+        for (const track of media) track.dispose();
+        media.clear();
+        song = null;
+        amb = null;
+        scene = null;
+        void ctx?.close().catch(() => {
+        });
+        ctx = null;
+        out = null;
+        graph = null;
+      }
+    };
+  }
+
+  // src/game/action/audio/videoTrack.ts
+  var VIDEO_AUDIO_EVENT = "goei:video-audio";
+  var VideoTrack = class {
+    constructor(root, url, blockedButton) {
+      this.blockedButton = blockedButton;
+      this.element = new Audio(url);
+      document.addEventListener("visibilitychange", this.visibility);
+      root.dispatchEvent(new CustomEvent(VIDEO_AUDIO_EVENT, { bubbles: true, detail: this }));
+      this.sync();
+    }
+    element;
+    disposed = false;
+    held = false;
+    gamePaused = false;
+    pending = false;
+    resync = false;
+    needsGesture = false;
+    cleanup = /* @__PURE__ */ new Set();
+    visibility = () => this.sync();
+    get blocked() {
+      return this.gamePaused || document.hidden;
+    }
+    setPolicy(volume, paused) {
+      this.element.volume = Math.max(0, Math.min(1, volume));
+      const changed = this.gamePaused !== paused;
+      this.gamePaused = paused;
+      if (changed) this.sync();
+    }
+    onDispose(fn2) {
+      this.cleanup.add(fn2);
+    }
+    pause() {
+      this.held = true;
+      this.sync();
+    }
+    resume(at2) {
+      this.element.currentTime = at2;
+      this.held = false;
+      this.sync();
+    }
+    enable(at2) {
+      if (at2 !== void 0) this.element.currentTime = at2;
+      this.needsGesture = false;
+      this.sync();
+    }
+    sync() {
+      const a = this.element;
+      if (this.disposed || this.held || this.blocked) {
+        this.resync = false;
+        a.pause();
+        return;
+      }
+      if (this.pending) {
+        this.resync = true;
+        return;
+      }
+      if (!a.paused || this.needsGesture) return;
+      this.pending = true;
+      void a.play().then(() => {
+        if (this.disposed || this.held || this.blocked) a.pause();
+        else this.blockedButton(false);
+      }).catch((e) => {
+        if (this.disposed || this.held || this.blocked) return;
+        this.needsGesture = e instanceof DOMException && e.name === "NotAllowedError";
+        this.blockedButton(this.needsGesture);
+      }).finally(() => {
+        this.pending = false;
+        const retry = this.resync;
+        this.resync = false;
+        if (retry) this.sync();
+      });
+    }
+    dispose() {
+      if (this.disposed) return;
+      this.disposed = true;
+      document.removeEventListener("visibilitychange", this.visibility);
+      this.element.pause();
+      this.element.removeAttribute("src");
+      this.element.load();
+      for (const fn2 of this.cleanup) fn2();
+      this.cleanup.clear();
+    }
+  };
+
+  // src/game/action/hq/style.css
+  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n";
+
+  // src/game/action/hq/lines.ts
+  var provider = null;
+  function setLineProvider(p) {
+    provider = p;
+  }
+  var pick2 = (xs, r) => xs[Math.floor(r() * xs.length) % xs.length];
+  var FALLBACK = {
+    "npc:jaemtri": (c) => [{ who: "잼트리", text: pick2(["오늘 들어온 글 정리해 뒀어요. 하나 골라 주세요.", "출동 전에 규칙서 한 번만 더 봐요. 진짜로요.", "연유 커피 남았는데, 드실래요?"], c.rand) }],
+    "npc:chief": (c) => [{ who: "부장", text: pick2(["예산은 결과로 말하는 거야.", "위험 단계? 기준부터 가져와."], c.rand) }],
+    "npc:supply": (c) => [{ who: "콘쥬스", text: pick2(["아저씨, 아니 오빠! 오늘 회복약 싸게 드릴게요.", "칸은 네 개예요. 욕심내면 다 못 써요."], c.rand) }],
+    "npc:pantry": (c) => [{ who: "데쥬레", text: "미, 믹스커피가 제일이에요. 아메리카노는… 그, 쓴 물이잖아요." }, { who: "고그니쟈", text: "믹스는 진리일세!!! 아메리카노 마시는 자는 내 연구실 출입 금지일세!!!" }],
+    "npc:appraisal": () => [{ who: "데쥬레", text: "이, 이거 가져오신 거예요? 감정해 볼게요. 터지지만 않으면요." }],
+    "npc:lab": () => [{ who: "고그니쟈", text: "자료를 가져왔나!!! 좋네!!! 연구는 돈과 시간이 드는 법일세!!!" }],
+    "npc:tooth": () => [{ who: "격리팀", text: "이빨 요정은 이빨을 먹으면 상자를 줘요. 안에 뭐가 있는지는 저희도 몰라요." }],
+    "npc:office": (c) => [{ who: c.agentName, text: c.fatigue >= 2 ? "…또 나가요? 좀 쉬고 싶은데." : "갈 데 있으면 불러요." }],
+    "npc:clinic": () => [{ who: "의무실", text: "다친 사람은 쉬거나, 예산을 쓰거나." }],
+    "npc:interview": () => [{ who: "면담실", text: "구조된 분들이 기다리고 있어요." }],
+    "npc:training": () => [{ who: "훈련장", text: "허수아비가 기다린다. 기록은 벽에 붙어 있다." }],
+    "npc:street": () => [{ who: "종로", text: "사람이 하나도 없는 거리. 인식의 장막 안쪽이다." }],
+    "npc:gallery": () => [{ who: "격리 구역", text: "진열장에 회수물이 하나둘 늘어 간다." }],
+    "npc:pasta": () => [{ who: "파스타집", text: "공략 축하는 여기서. 오늘은 부장님이 산대요." }],
+    "brief:jaemtri": (c) => [{ who: "잼트리", text: c.rules?.length ? `알려진 규칙부터요. ${c.rules.slice(0, 2).join(" / ")}` : "점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요." }, ...c.variantHint ? [{ who: "잼트리", text: c.variantHint }] : []],
+    "brief:chief": (c) => [{ who: "부장", text: `목표: ${c.mission ?? "조사"}. 위험하면 다락방 로프로 철수해. 살아서 오는 게 먼저다.` }],
+    "brief:reply": (c) => [{ who: c.agentName, text: c.agent === "jyaldi" ? "알겠어. 금방 갔다 온다." : "확인. 다녀오겠습니다." }],
+    "return:return": () => [{ who: "잼트리", text: "돌아오셨네요! 보고서는 제가 정리할게요." }],
+    "return:withdraw": () => [{ who: "잼트리", text: "철수도 판단이에요. 잘하셨어요." }],
+    "return:evac": (c) => [{ who: "데쥬레", text: `${c.agentName} 씨, 깨, 깨어났어요? 의무실이에요. 다들 걱정했어요.` }],
+    "pantry:chat": (c) => FALLBACK["npc:pantry"](c)
+  };
+  function lines(tag, ctx) {
+    const got = provider?.(tag, ctx);
+    if (got && got.length) return got;
+    return FALLBACK[tag]?.(ctx) ?? [];
+  }
+
+  // src/game/action/hq/link.ts
+  function rosterFor(card, id) {
+    if (!card) return null;
+    const a = AGENT_BY_ID[id];
+    const en = id === "eileen" ? "aileen" : id;
+    return card.agents.find((x) => x.name === a.name || (x.english ?? "").toLowerCase().startsWith(en)) ?? null;
+  }
+  var boardNames = (card) => (card?.events ?? []).filter((e) => !e.state || /활성|진행|출현/.test(e.state)).map((e) => e.name);
+  function reportPayload(s2) {
+    const l = s2.last;
+    if (!l) return null;
+    const a = AGENT_BY_ID[l.agent];
+    return {
+      mission: MISSION_BY_ID[l.mission]?.title ?? l.mission,
+      outcome: l.how,
+      depth: l.result.depth,
+      agents: [{ id: a.id, name: a.name, hp: l.how === "evac" ? 0 : 1, injured: s2.agents[l.agent].injured > 0 }],
+      rules: l.result.found,
+      loot: l.result.bag.filter(Boolean).map((b) => b.name),
+      summary: reportText(s2)
+    };
+  }
+
+  // src/game/action/hq/runmenu.ts
+  var iconDrawer2 = null;
+  function setItemIconDrawer(f) {
+    iconDrawer2 = f;
+  }
+  var ICON_COLOR = { medkit: "#d05050", bandage: "#e0d0c0", antidote: "#60c080", salt: "#e8e8e8", flash: "#f0f070", smoke: "#8a8a9a", charm: "#d0a040", energy: "#d0b040" };
+  function drawIcon(ctx, id, x, y, size2) {
+    if (iconDrawer2) return iconDrawer2(ctx, id, x, y, size2);
+    ctx.fillStyle = ICON_COLOR[id] ?? "#8a8a8a";
+    ctx.fillRect(x + 4, y + 4, size2 - 8, size2 - 8);
+    ctx.fillStyle = "#111";
+    ctx.font = `${Math.round(size2 * 0.45)}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(itemName(id).slice(0, 1), x + size2 / 2, y + size2 / 2 + 1);
+  }
+  function iconCanvas(id, size2 = 40) {
+    const c = document.createElement("canvas");
+    c.width = c.height = size2;
+    drawIcon(c.getContext("2d"), id, 0, 0, size2);
+    c.className = "hq-icon";
+    return c;
+  }
+
+  // src/game/action/story/demo-photos.json
+  var demo_photos_default = { Jyaldi: "data:image/webp;base64,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", Aileen: "data:image/webp;base64,UklGRpYIAABXRUJQVlA4IIoIAAAQJwCdASqQAJAAPpVEnEolo6KhqLXbgLASiWUA0bptYPYy3/twfzt7kteRGMps9cZ2YO2OYC+985tNPNZ8pkGALwGN1jBXz7gEAHH4s+6SxCkgVl32ECdij6QGaOoWImVcEXKQcxp4i00z8SrAXFxaNapXbg65OekyAkHoQ1nfwDw9mJq5TVqgB+RFzf/T5JC7UM45SON5au03DBBQkyQr+LmcGlh8xAwHgX2LidKCI5PLDFgEXT/k5bCcrlCc1VDLO9k/edEqd6JQtgyY7qHZNIl1BlCtN4tA/hKmfogKRiUssS1LzXNwJFDJBKHZqkMbFDCXvTdWmB6wD4/5VtiQ7+2YTKVx1zNVNZ7469f9/00BmQmFXGB1px0jN6j6FOoOgmV6WcJs0T3RqC4laOk1Lauak1tgXlF27DuvjRSfz6AA/vhfIyLi/0CMsFRJgzkRm7071LXopftW9WHeCfrNuFEY+KB+caeqSKwiQOvCJZVRWAb3PSiqAOH0Ced9x57hEOT3ezN8RL6N9n5nA6LMofkyJbmEZpSErN/74uO5/WlpmIMSEN6RUDABWBAp+bUzZJT3ufm1CKjt8NGxewph20JZVU8ZCfaXeKU636Lds3zOaCEe91Zc9Z4UNGFByBFjrXhmt3SXS4QTrswoRUZpinJxO3wHIx05ydNfuar1uLQA9bE35FczFw5hxLObt47gAWSBIiTodBzW1G+iSnOsRCFBnH+i971wvkRPWtGWUOO0kDmYiMbP2nYz6b1KiXIIBGsrqPuzXe/qVPZ7Pi2uzmGiXaesJ+fzEfwoMkFcNR2jfuYk276eYANNPZ3SvUXPoWYP7VSaJejI0YCNyWH17EazRfcQCyiIAjg77l0qA2C8op3fMyvsPC7GngvARE+KwIQSBEZiML6ibzZcRMBNrZXtLLcpkVR74eMl1iKovufVH+dn0jTSz6cV2OBm2WOb+SQ9+9RyT6/Cv4O8PAoCsOswS8eKhFtek9TH5ByBd8Pl/Mbl7FXiD4ZlY+REXD7xe4Y9ATOI/Qz95QwRrHF25ptngo6WD9YPxreZIlmMe1G172kYjJ1JCi/H5/ouXFtGD9hdLPQpGTk4nTIqSi/bmELZcnCxvZIVUKdBA/95U2DIKgZ2+rkRKt/ZcCrFJlxiUM+Pr9FZabIbodI8ez6xRcqFVFcj3SDwa3byqyj8v9bVM8wxukLtqj8bIBebZj80l3ajZ6C93NAzn7cYuG/t03DA/Lk5rJcPOPIOpWNTeOu5BRAFJA8OQE3fHsuVdxuSHd5BGFNKwznETn6CbAWq8pfytHBLgsUmo8Hl71xJMU9pZecyx9GVAR733FfrVh+VQdWbCTkhYEuYDTN84t6ObS2/HAnZbQiHOtce74auxV8/gbK3q/diAiUGavWuHracTEwfcgghzh+zk9fId5BGZ+YW6OqbJloDEXFc9PSA9qhsq8BoUWbWXeI5x3agjp6aCQ3CTot2gOAmz/QAaKdCgeFYKchkG2qEFZ7l+eRqHseB58/N/UjRGvinow+Bs116rF0skPSo2CDs8K+x0tDmamEo9gh9eZBWa12aSHsYIB83wmsE8Zis8QvupvO+s5NaCJ8VuFRBxOGXopKY9ZFl93jpoHArINNFNL1tLbH0NovIvpuBeqlI98kLCJE4AHn5OxFqsBKOrRW5ygJJ4+lRU9/pc08lHZzLPXmpLsh7g8WrEKChyhGcrun4lL3c/pu9ar2mABdBDFOfxit8iD64UJ+30KCf8zojWOf/dCaKcjPCHt2Aq5ksvnLOrmZo6b0/556IcRxu3OifIPDxTvio4SHzDc8JNmp7M5Eb5GoxFIfL6mc/mptKoyKOjGcy+K6DDZhXu7tI607eGXABdSDlqCTFE5xJ9sV3prvBTFsF3hnYPkcDBhRrSngmjo+58uWHl8hzhv/LxaKqfTkT6viaW9SJFk/e4mN6SrmBaTFnY29u6FmFPvDelLkz9Kq1wAPR77WTSuS8s7frSuEVRoE7Bdi+kioSgAnmZvffKgaheUXbz8i/ge2yBbPXCv6T+NX0XAgd/Tg3cLrC0NR4Izkrs9gWLs3sxYj4gvHlPc4ZK5SYNT9ddbCaxTXNFYkZ0Y0z/l7uvA+y0DipImpw+E+gyl16Jm+IA46k6xD6N2mBHjgK6a9t7GBGV8Af4hWAHO9CWDBfPf8AZHeTbg6vbNn2+lbTcvAsjbW8QD6WEob3jTnSEAESxrhdENQYWb8/cgKr6YuiQAiaUqPmBWmCVxjjy6yJhWZKN5sJty0imd4Ku+D1s/72sYUr8s4+RS1/KF86y3skFDvlBHJRzbGIxi1kYjWvJWd6KafhFkfD+Zqfcb1QGyJ7PicE3faof3aOSBCQKDW5hHxzY6LVdCHuAxxfyxr9E65k6zTaqNlBFM70abw7zosXj/nMuE1bR5rlGlRVAzlaqt41jbGQCMsfY4KM50iqa84KmI5pKDzgpS+PKRdIqxKQgsWUk5LzHsmKAt+EFdguZBYZqji2lfFItQPkyRTyhIjfOXpu5lynCNrREGHNWHNb+bSmbcaJCsmGExQg2FylYmCpEUo2wZaORAnWMGi12zuonFP4dGQLtTQWZI2TU5rsGC9qB7doldOwQ5KVTf0jW21sxOrfja1IAf8wmchWZ0d6BFleZt2eOW9toxcy+lgypG7DzYsNhW6oSZVeCKDAT9ny0Tgw0FiISFmNszyqdzNgB3GBdhji2v/J3UQZiM1saZTpAXMrAI7ZPxST+tQ3QvKW4cbLIsxEtlWklR+4fzqwrkFZVMXwqT9gJvMYoW6do86dCExiDl5ovZIVyjlkVLh8JVtJSXVY2ZjQDnXvB2PSTV+ZjI6oUUFDGD9vonOxtZYvu8EhKsOcVVJ4H0tMRnzDjH51IS171EPb8vOF0+IQoK0AAA==", Spangdal: "data:image/webp;base64,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", Geshugan: "data:image/webp;base64,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

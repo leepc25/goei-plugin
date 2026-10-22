@@ -1,0 +1,3559 @@
+button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
+  }
+  async function defaultsAction(pane, action, value, ctx2, refresh2) {
+    const sub = action.slice(pane.length + 1);
+    if (sub === "def-ask") {
+      defaultsAsk.pane = pane;
+      defaultsAsk.what = value === "save" || value === "load" ? value : "";
+      return "";
+    }
+    if (sub === "def-no") {
+      defaultsAsk.pane = "";
+      defaultsAsk.what = "";
+      return "";
+    }
+    if (sub !== "def-yes") return null;
+    const what = defaultsAsk.pane === pane ? defaultsAsk.what : "";
+    defaultsAsk.pane = "";
+    defaultsAsk.what = "";
+    if (what === "save") {
+      await saveVarDefaults(PREFIXES[pane], ctx2.chat.scriptstate);
+      return `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장했어요.`;
+    }
+    if (what === "load") {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...loadVarDefaults(PREFIXES[pane], chat.scriptstate) } }));
+      await refresh2();
+      return `새 채팅 기본값을 지금 ${NAME[pane]}에 불러왔어요.`;
+    }
+    return "";
+  }
+
+  // src/ui/toast.ts
+  var esc4 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var timers = /* @__PURE__ */ new Map();
+  function toast(key2, text, clear) {
+    if (!text) return "";
+    const cur = timers.get(key2);
+    if (!cur || cur.text !== text) {
+      if (cur) clearTimeout(cur.id);
+      const ms = Math.min(8e3, 2500 + [...text].length * 50);
+      const id = setTimeout(() => {
+        timers.delete(key2);
+        clear(text);
+        const el = document.querySelector(`.gx-toast[data-toast="${key2}"]`);
+        if (!el) return;
+        el.classList.add("out");
+        setTimeout(() => el.remove(), 300);
+      }, ms);
+      timers.set(key2, { text, id });
+    }
+    return `<div class="gx-toast gn-notice" data-toast="${key2}" role="status">${esc4(text)}</div>`;
+  }
+
+  // src/ui/drawer.ts
+  var open = false;
+  function drawerHtml(tools, above = "", cls = "") {
+    return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    ${above}<div class="ph-tools">${tools}</div></div>`;
+  }
+  function drawerBox(content, cls = "", after = "") {
+    return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
+    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
+    <div class="ph-dbody">${content}</div>${after}</div>`;
+  }
+  function closeDrawer() {
+    open = false;
+  }
+  function set(box, on2) {
+    open = on2;
+    box.classList.toggle("open", on2);
+    const grip = box.querySelector(".ph-grip");
+    grip?.setAttribute("aria-expanded", String(on2));
+    grip?.setAttribute("aria-label", on2 ? "도구 접기" : "도구 펼치기");
+  }
+  function bindDrawer(root2, onSide) {
+    const box = root2.querySelector(".ph-drawer");
+    const grip = box?.querySelector(".ph-grip");
+    if (!box || !grip) return;
+    grip.addEventListener("click", () => set(box, !open));
+    let y0 = null;
+    let x0 = 0;
+    box.addEventListener("touchstart", (e) => {
+      y0 = e.touches[0]?.clientY ?? null;
+      x0 = e.touches[0]?.clientX ?? 0;
+    }, { passive: true });
+    box.addEventListener("touchend", (e) => {
+      if (y0 === null) return;
+      const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
+      const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+      y0 = null;
+      if (onSide && open && box.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
+      if (dy < -24 && !open) set(box, true);
+      else if (dy > 24 && open) set(box, false);
+    }, { passive: true });
+  }
+
+  // src/host/llm.ts
+  var LlmError = class extends Error {
+    constructor(message, raw = "") {
+      super(message);
+      this.raw = raw;
+    }
+  };
+  function stripThoughts(s4) {
+    return s4.replace(/<(thoughts|think)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "").replace(/<(?:thoughts|think)\b[^>]*>[\s\S]*$/gi, "");
+  }
+  async function readStream(stream) {
+    const reader = stream.getReader();
+    let last2 = "";
+    try {
+      for (; ; ) {
+        const { done: done2, value } = await reader.read();
+        if (done2) break;
+        if (typeof value === "string") last2 = value;
+        else if (value && typeof value === "object") last2 = String(Object.values(value)[0] ?? last2);
+      }
+    } finally {
+      reader.releaseLock();
+    }
+    return last2;
+  }
+  async function withPhotos(messages) {
+    return Promise.all(
+      messages.map(async (m) => {
+        if (!m.images?.length) return m;
+        const { images, ...rest } = m;
+        const data = await Promise.all(images.map(photoData));
+        const missing = data.map((d, i) => d ? 0 : i + 1).filter(Boolean);
+        return {
+          ...rest,
+          content: missing.length ? `${rest.content}
+Image ${missing.join(", ")} could not be loaded; do not describe it.` : rest.content,
+          multimodals: data.filter((d) => !!d).map((base643) => ({ type: "image", base64: base643 }))
+        };
+      })
+    );
+  }
+  async function runModel(messages, model2) {
+    let res;
+    try {
+      res = await risuai.runLLMModel({ messages: await withPhotos(prepareAttachments(messages)), mode: model2 === "aux" ? "submodel" : "model", allowPlugins: true });
+    } catch (error) {
+      throw new LlmError(`모델 요청에 실패했어요: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    let text = "";
+    if (typeof res === "string") text = res;
+    else if (res && typeof res === "object") {
+      const r = res;
+      if (r.type === "fail" && /Plugin calls are blocked/i.test(String(r.result ?? ""))) {
+        throw new LlmError("Risu가 플러그인 모델 호출을 막았어요. 이 버전의 Risu는 플러그인이 제공하는 모델을 다른 플러그인에서 쓸 수 없어요. Risu를 최신으로 업데이트하거나, 위키·괴담넷 모델을 플러그인 모델이 아닌 쪽(메인/보조)으로 바꿔 보세요.", String(r.result));
+      }
+      if (r.type === "fail") throw new LlmError(`모델 요청에 실패했어요. Risu의 모델 연결을 확인해 주세요.
+${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
+      if (r.type === "multiline" && Array.isArray(r.result)) text = r.result.filter(([role]) => role === "char").map(([, t]) => t).join("\n");
+      else if (r.type === "streaming" && r.result && typeof r.result.getReader === "function") text = await readStream(r.result);
+      else if (typeof r.result === "string") text = r.result;
+    }
+    text = stripThoughts(text).trim();
+    if (!text) throw new LlmError("모델이 빈 응답을 보냈어요.");
+    return text;
+  }
+  var retryable = (error) => !(error instanceof LlmError);
+  var defaultFix = (messages) => (raw, reason) => [
+    ...messages,
+    ...raw ? [{ role: "assistant", content: raw }] : [],
+    { role: "user", content: `The previous reply was rejected and nothing was saved. Reply again from the same data, following the required output format exactly. Validation error: ${reason.slice(0, 600)}` }
+  ];
+  function withRawText(error, raw) {
+    if (raw && error && typeof error === "object" && !error.raw) {
+      try {
+        Object.defineProperty(error, "raw", { value: raw, configurable: true });
+      } catch {
+      }
+    }
+    return error;
+  }
+  async function generate(messages, model2, parse3, o) {
+    const fix = o.fix ?? defaultFix(messages);
+    let ask = messages;
+    let use = model2;
+    let earlier = null;
+    for (let attempt = 0; ; attempt++) {
+      let raw = "";
+      try {
+        raw = attempt === 0 && o.first ? await o.first(ask) : await runModel(ask, use);
+        if (o.state) applyAdvanced(o.state);
+        return { raw, value: parse3(raw) };
+      } catch (error) {
+        if (earlier && !retryable(error)) throw earlier;
+        if (attempt >= o.retries || !retryable(error)) throw withRawText(error, raw);
+        earlier = withRawText(error, raw);
+        ask = raw ? fix(raw, error instanceof Error ? error.message : String(error)) : messages;
+        use = o.retryModel === "same" ? model2 : o.retryModel;
+      }
+    }
+  }
+
+  // src/ui/panels.ts
+  var open2 = /* @__PURE__ */ new Set();
+  var keepOpen = (key2, fallback = false) => open2.has(key2) || fallback && !open2.has(`!${key2}`) ? " open" : "";
+  function rememberPanel(el) {
+    const key2 = el.dataset.keep;
+    if (!key2) return;
+    open2.delete(key2);
+    open2.delete(`!${key2}`);
+    open2.add(el.open ? key2 : `!${key2}`);
+  }
+
+  // src/ui/advanced.ts
+  var esc5 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var advUi = { confirm: "" };
+  function control(f, item2, cur) {
+    const id = `${f}:${item2.key}`;
+    if (item2.type === "pick") {
+      return `<div class="gx-segs gx-segs-sm">${(item2.opts ?? []).map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc5(label)}</button>`).join("")}</div>`;
+    }
+    const zero = cur === "0" && item2.zero;
+    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item2.min ?? 0}" max="${item2.max ?? ""}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? "" : esc5(cur)}"${item2.zero ? ` placeholder="${esc5(item2.zero)}"` : ""} aria-label="${esc5(item2.label)}"><span>${esc5(item2.unit ?? "")}</span></span>`;
+  }
+  function row(f, item2, state) {
+    const cur = advValue(state, f, item2.key);
+    const changed = cur !== String(item2.def);
+    const reset = changed ? `<button class="ph-tool sm adv-reset" data-action="adv-reset" data-value="${f}:${item2.key}" aria-label="${esc5(item2.label)} 기본값으로" title="기본값 ${esc5(item2.def)}">${ICONS.refresh}</button>` : '<span class="adv-reset" aria-hidden="true"></span>';
+    return `<div class="ps-row adv-row${item2.type === "num" ? " adv-numrow" : ""}${changed ? " changed" : ""}"><div class="ps-label"><b>${esc5(item2.label)}</b>${item2.hint ? `<small>${esc5(item2.hint)}</small>` : ""}</div><div class="ps-ctl">${control(f, item2, cur)}${reset}</div></div>`;
+  }
+  function chips(f, items, state) {
+    return `<div class="ps-row adv-chips"><div class="gx-chips">${items.map((i) => {
+      const on2 = advValue(state, f, i.key) === "1";
+      return `<button class="gx-chip${on2 ? " on" : ""}" data-action="adv-set" data-value="${f}:${i.key}=${on2 ? "0" : "1"}" aria-pressed="${on2}">${esc5(i.label)}</button>`;
+    }).join("")}</div></div>`;
+  }
+  function advSections(f, state, extra = {}) {
+    return ADV[f].map((g, gi) => `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}</div>${extra[gi] ?? ""}</section>`).join("");
+  }
+  function advancedBox(f, state) {
+    const n = advChanged(state, f).length;
+    const groups = ADV[f].map((g, gi) => {
+      const body4 = `${g.chips?.length ? chips(f, g.chips, state) : ""}${g.items.map((i) => row(f, i, state)).join("")}`;
+      if (g.fold) {
+        return `<details class="ps-adv-sub" data-keep="adv-${f}-${gi}"${keepOpen(`adv-${f}-${gi}`)}><summary>${esc5(g.title)}</summary><div class="ps-rows">${body4}</div></details>`;
+      }
+      return `<section class="ps-group"><h3>${esc5(g.title)}</h3><div class="ps-rows">${body4}</div></section>`;
+    }).join("");
+    const foot = n ? advUi.confirm === f ? `<div class="st-confirm adv-foot"><p>고급 설정 ${n}개를 모두 기본값으로 돌릴까요?</p><div class="gx-row-btns"><button class="gx-mini danger" data-action="adv-reset-yes" data-value="${f}">되돌리기</button><button class="gx-mini" data-action="adv-reset-no">취소</button></div></div>` : `<div class="adv-foot"><button class="gx-mini" data-action="adv-reset-all" data-value="${f}">${ICONS.refresh}모두 기본값으로</button></div>` : "";
+    return `<details class="ps-adv" data-keep="adv-${f}"${keepOpen(`adv-${f}`)}><summary class="ps-adv-sum"><b>고급 설정</b>${n ? `<span class="adv-count">${n}개 바꿈</span>` : ""}</summary><div class="ps-adv-body">${groups}${foot}</div></details>`;
+  }
+  var blank2 = (item2) => item2.v ? String(item2.def) : "";
+  function parse2(value) {
+    const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
+    if (!m) return null;
+    const f = m[1];
+    const item2 = advItem(f, m[2]);
+    if (!item2) return null;
+    let v = m[3].trim();
+    if (item2.type === "num") {
+      const n = Number(v);
+      if (v === "" || !Number.isFinite(n)) return [f, item2, blank2(item2)];
+      v = String(Math.min(item2.max ?? Infinity, Math.max(item2.min ?? 0, Math.round(n))));
+    } else if (item2.type === "bool" ? v !== "0" && v !== "1" : !item2.opts?.some(([o]) => o === v)) return null;
+    return [f, item2, v === String(item2.def) ? blank2(item2) : v];
+  }
+  async function handleAdvanced(action, value, ctx2, env2, scope = "chat") {
+    const v = value ?? "";
+    if (action === "adv-reset-all" || action === "adv-reset-no") {
+      advUi.confirm = action === "adv-reset-all" && v in ADV ? v : "";
+      env2.render();
+      return true;
+    }
+    let vars = null;
+    if (action === "adv-set") {
+      const hit3 = parse2(v);
+      if (hit3) vars = { [advVar(hit3[0], hit3[1])]: hit3[2] };
+    } else if (action === "adv-reset") {
+      const [f, key2] = v.split(":");
+      const item2 = f in ADV ? advItem(f, key2) : void 0;
+      if (item2) vars = { [advVar(f, item2)]: blank2(item2) };
+    } else if (action === "adv-reset-yes") {
+      advUi.confirm = "";
+      if (v in ADV) vars = advResetVars(v);
+    } else return false;
+    if (!vars) {
+      env2.render();
+      return true;
+    }
+    const patch = vars;
+    if (scope === "defaults") {
+      await savePrefs((p) => {
+        const next = { ...p.vars ?? {} };
+        for (const [k, x] of Object.entries(patch)) {
+          if (x) next[k] = x;
+          else delete next[k];
+        }
+        return { ...p, vars: next };
+      });
+      env2.render();
+      return true;
+    }
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...patch } }));
+    const mode2 = advValue(saved?.scriptstate, "gen", "lore_mode");
+    if (syncDecorators(ctx2.char.globalLore, mode2)) await updateCharacterLore(ctx2.charIndex, (lore) => syncDecorators(lore, mode2)).catch(() => false);
+    await env2.refresh();
+    return true;
+  }
+
+  // src/ui/phone.ts
+  var phone = {
+    sub: "contacts",
+    tab: "",
+    query: "",
+    view: "list",
+    room: null,
+    invite: null,
+    picked: [],
+    topic: "",
+    gname: "",
+    draft: "",
+    page: 1,
+    call: "",
+    callText: "",
+    addName: "",
+    addNote: "",
+    openNotice: null,
+    noticePage: 1,
+    attach: [],
+    confirm: null,
+    notice: "",
+    failure: null,
+    attachMenu: false,
+    pickQuery: "",
+    chatFilter: "all",
+    noticeFilter: "all",
+    noticeFaction: "",
+    pickTab: ""
+  };
+  function resetPhone() {
+    Object.assign(phone, {
+      sub: "contacts",
+      tab: "",
+      query: "",
+      view: "list",
+      room: null,
+      invite: null,
+      picked: [],
+      topic: "",
+      gname: "",
+      draft: "",
+      page: 1,
+      call: "",
+      callText: "",
+      addName: "",
+      addNote: "",
+      openNotice: null,
+      noticePage: 1,
+      attach: [],
+      confirm: null,
+      notice: "",
+      failure: null,
+      attachMenu: false,
+      pickQuery: "",
+      chatFilter: "all",
+      noticeFilter: "all",
+      noticeFaction: "",
+      pickTab: ""
+    });
+  }
+  var quietEnv = { render: () => {
+  }, refresh: async () => {
+  }, visible: () => false, close: async () => {
+  } };
+  var liveEnv = null;
+  var envOr = (env2) => env2 ?? liveEnv ?? quietEnv;
+  var PAGE = 40;
+  var jobs = /* @__PURE__ */ new Map();
+  var chatKey = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
+  var phoneBusy = (ctx2) => jobs.has(chatKey(ctx2));
+  var esc6 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var source = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
+  function names2(ctx2) {
+    try {
+      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
+    } catch {
+      return {};
+    }
+  }
+  function dir(ctx2, chat = ctx2.chat) {
+    return directory(ctx2.char.globalLore, chat);
+  }
+  var token = () => `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+  async function run(ctx2, env2, label, work) {
+    const key2 = chatKey(ctx2);
+    if (jobs.has(key2)) {
+      phone.notice = `${jobs.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+      env2.render();
+      return false;
+    }
+    jobs.set(key2, label);
+    phone.notice = "";
+    phone.failure = null;
+    env2.render();
+    try {
+      phone.notice = await work();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      phone.notice = msg;
+      const raw = error.raw;
+      if (raw) phone.failure = { label, reason: msg, raw };
+    } finally {
+      jobs.delete(key2);
+      await env2.refresh();
+    }
+    return true;
+  }
+  function viewingRoom(env2) {
+    return env2.visible() && phone.view === "room" ? phone.room : null;
+  }
+  function generate2(ctx2, env2, rid, label) {
+    return run(ctx2, env2, label, async () => {
+      const req = token();
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const st2 = readPhone(chat);
+        const r2 = st2.rooms[rid];
+        if (!r2?.pending) return null;
+        r2.pending.status = "working";
+        r2.pending.request = req;
+        return writePhone(chat, st2);
+      });
+      if (!saved) throw new PhoneError("대기 중인 대화 요청이 없어요.");
+      const st = readPhone(saved);
+      const r = st.rooms[rid];
+      const d = dir(ctx2, saved);
+      let raw = "";
+      let result;
+      try {
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "ph"), () => replyPrompt(source(ctx2, saved), st, r, d, names2(ctx2)));
+        ({ raw, value: result } = await generate(prompt.messages, phoneSettings(saved.scriptstate).model, (x) => parseReply(x, r, prompt.contactMode), { ...genSettings(saved.scriptstate), state: saved.scriptstate }));
+      } catch (error) {
+        await markFailed(ctx2, rid, req);
+        const msg = error instanceof Error ? error.message : String(error);
+        throw new PhoneError(`대화 갱신에 실패했어요. 기존 기록은 그대로예요. ${msg}`, error.raw ?? raw);
+      }
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readPhone(chat);
+        const room = cur.rooms[rid];
+        if (!room?.pending || room.pending.request !== req) {
+          note = "대화 상태가 바뀌어서 답장을 저장하지 않았어요.";
+          return null;
+        }
+        const events = keepValid(result.events, room);
+        const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
+        const added = applyEvents(cur, room, events, phoneTime(chat));
+        room.pending = void 0;
+        if (viewingRoom(env2) === rid) readRoom(room);
+        if (!added) note = room.kind === "group" ? "아무도 말하지 않았어요." : "답장이 없어요.";
+        return writePhone(chat, cur, unsolicitedRefresh && added ? cooldownMark(chat, "incoming") : {});
+      });
+      return note;
+    });
+  }
+  async function markFailed(ctx2, rid, req) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r = st.rooms[rid];
+      if (!r?.pending || r.pending.request !== req) return null;
+      r.pending.status = "error";
+      return writePhone(chat, st);
+    }).catch(() => null);
+  }
+  async function send(ctx2, env2, rid, text) {
+    if (phoneBusy(ctx2)) {
+      phone.notice = `${jobs.get(chatKey(ctx2))} 끝난 뒤 다시 눌러 주세요.`;
+      return env2.render();
+    }
+    if (tokens(describe(text)) > LIMITS2.input_tokens) {
+      phone.notice = `메시지와 첨부 내용은 합쳐서 ${LIMITS2.input_tokens}토큰 이내로 적어 주세요.`;
+      return env2.render();
+    }
+    let giftBlocked = false;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r2 = st.rooms[rid];
+      if (!r2 || r2.pending) return null;
+      if (r2.kind !== "dm" && /\[\[ATTACH:gift\]\]/i.test(text)) return void (giftBlocked = true), null;
+      if (!st.order.includes(rid)) st.order.push(rid);
+      const time2 = phoneTime(chat);
+      const pieces = splitRecords(text);
+      let m = push(st, r2, "me", pieces[0] ?? text, time2);
+      for (const piece of pieces.slice(1)) m = push(st, r2, "me", piece, time2);
+      r2.draft = "";
+      r2.silent = false;
+      readRoom(r2);
+      r2.pending = { message: m.id, status: "error", action: { type: "send" } };
+      return writePhone(chat, st);
+    });
+    if (!saved) {
+      phone.notice = giftBlocked ? "단톡방에서는 선물을 보낼 수 없어요." : "이전 답장을 다시 시도하거나 건너뛴 뒤 보내 주세요.";
+      return env2.refresh();
+    }
+    phone.draft = "";
+    phone.attach = [];
+    phone.attachMenu = false;
+    phone.page = 1;
+    const r = readPhone(saved).rooms[rid];
+    await generate2({ ...ctx2, chat: saved }, env2, rid, `${roomLabel(r)}의 답장을 기다리는 중이에요.`);
+  }
+  async function roomRefresh(ctx2, env2, rid) {
+    const st = readPhone(ctx2.chat);
+    const r = st.rooms[rid];
+    if (!r || !r.members.length) return;
+    if (r.pending) return void generate2(ctx2, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+    const set2 = phoneSettings(ctx2.chat.scriptstate);
+    let [ok, why] = refreshAllowed(ctx2.chat, r, set2);
+    if (ok && unsolicited(r)) [ok, why] = refreshAllowed(ctx2.chat, r, set2, chancePassed(set2.incomingChance, Math.random));
+    if (!ok) {
+      phone.notice = `${why} 내가 보낸 메시지의 답장에는 이 제한이 없어요.`;
+      return env2.render();
+    }
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const cur = readPhone(chat);
+      const room = cur.rooms[rid];
+      if (!room || room.pending) return null;
+      room.pending = { status: "error", action: { type: "refresh" } };
+      return writePhone(chat, cur);
+    });
+    if (saved) await generate2({ ...ctx2, chat: saved }, env2, rid, `${josa(roomLabel(r), "을", "를")} 확인하는 중이에요.`);
+  }
+  async function createGroup(ctx2, env2) {
+    const d = dir(ctx2);
+    const members = phone.picked.filter((cid) => d.map.get(cid)?.visible);
+    const inviteRoom = phone.invite;
+    if (!members.length) {
+      phone.notice = "초대할 사람을 골라 주세요.";
+      return env2.render();
+    }
+    if (!inviteRoom && members.length === 1) {
+      phone.picked = [];
+      return openDm(ctx2, env2, members[0]);
+    }
+    const topic = phone.topic.trim();
+    const gname = inviteRoom ? "" : phone.gname.trim();
+    if ([...gname].length > LIMITS2.room_name) {
+      phone.notice = `단톡방 이름은 ${LIMITS2.room_name}자 이내로 적어 주세요.`;
+      return env2.render();
+    }
+    if (tokens(topic) > LIMITS2.topic_tokens) {
+      phone.notice = `단톡 주제는 ${LIMITS2.topic_tokens}토큰 이내로 적어 주세요.`;
+      return env2.render();
+    }
+    let rid = "";
+    let error = "";
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const time2 = phoneTime(chat);
+      if (inviteRoom) {
+        let r = st.rooms[inviteRoom];
+        if (!r || r.pending) return void (error = "대화방 상태가 바뀌었어요."), null;
+        const fresh = members.filter((cid) => !r.members.includes(cid));
+        if (!fresh.length || r.members.length + fresh.length > LIMITS2.members) return void (error = `초대할 사람을 고르세요. 상대는 최대 ${LIMITS2.members}명이에요.`), null;
+        if (r.kind === "dm") {
+          const old = r.id;
+          do
+            st.seq += 1;
+          while (st.rooms[`g_${st.seq}`]);
+          r = { ...r, id: `g_${st.seq}`, kind: "group", name: void 0 };
+          delete st.rooms[old];
+          st.rooms[r.id] = r;
+          const at = st.order.indexOf(old);
+          if (at >= 0) st.order[at] = r.id;
+          else st.order.push(r.id);
+        }
+        for (const cid of fresh) {
+          r.people[cid] = personOf(d.map.get(cid));
+          r.members.push(cid);
+        }
+        for (const cid of fresh) membership(st, r, "invite", cid, time2);
+        r.pending = { status: "error", action: { type: "invite_more", invited: fresh } };
+        rid = r.id;
+      } else {
+        if (members.length > LIMITS2.members) return void (error = `상대는 최대 ${LIMITS2.members}명이에요.`), null;
+        st.seq += 1;
+        rid = `g_${st.seq}`;
+        const people = Object.fromEntries(members.map((c) => [c, personOf(d.map.get(c))]));
+        const r = { id: rid, kind: "group", name: gname || void 0, topic, members: [...members], people, messages: [], draft: "", unread: 0 };
+        st.rooms[rid] = r;
+        st.order.push(rid);
+        for (const cid of members) membership(st, r, "invite", cid, time2);
+        r.pending = { status: "error", action: { type: "invite_initial", invited: members } };
+      }
+      return writePhone(chat, st);
+    });
+    if (!saved) {
+      phone.notice = error || "저장하지 못했어요.";
+      return env2.render();
+    }
+    Object.assign(phone, { invite: null, picked: [], topic: "", gname: "", room: rid, view: "room", sub: "chats", page: 1 });
+    await generate2({ ...ctx2, chat: saved }, env2, rid, inviteRoom ? "초대한 사람들의 반응을 기다리는 중이에요." : "단톡방을 여는 중이에요.");
+  }
+  function refreshInbox(ctx2, env2, automatic = false, joint) {
+    const e = envOr(env2);
+    return run(ctx2, e, automatic ? "새 메시지를 자동으로 확인하는 중이에요." : "새 메시지를 확인하는 중이에요.", async () => {
+      const startLength = ctx2.chat.message?.length ?? 0;
+      const st = readPhone(ctx2.chat);
+      const d = dir(ctx2);
+      const rolls = [];
+      let k = 0;
+      const roll = () => k < rolls.length ? rolls[k++] : (rolls.push(Math.random()), k++, rolls[rolls.length - 1]);
+      const plan = fitPrompt(budgetFor(ctx2.chat.scriptstate, "ph"), () => {
+        k = 0;
+        const p = refreshPrompt2(source(ctx2), st, d, names2(ctx2), roll);
+        return { ...p, messages: p.prompt?.messages ?? [] };
+      });
+      if (!plan.prompt) return automatic ? "" : plan.reason;
+      const prompt = plan.prompt;
+      const model2 = phoneSettings(ctx2.chat.scriptstate).model;
+      const { value: result } = await generate(prompt.messages, model2, (raw) => parseRefresh(raw, plan.selected, plan.receive, plan.announce, plan.invite, st, d, prompt.contactMode), {
+        ...genSettings(ctx2.chat.scriptstate),
+        state: ctx2.chat.scriptstate,
+        fix: (_raw, reason) => refreshRetry(prompt, reason),
+        first: joint && ((m) => joint.ask("phone", m))
+      });
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (automatic && (chat.message?.length ?? 0) !== startLength) {
+          note = "채팅이 이어져서 이번 자동 확인 결과는 저장하지 않았어요.";
+          return null;
+        }
+        const cur = readPhone(chat);
+        const set2 = phoneSettings(chat.scriptstate);
+        const time2 = phoneTime(chat);
+        let received = 0;
+        let unsolicitedGot = false;
+        for (const u of result.updates) {
+          const r = cur.rooms[u.room] ?? plan.selected.get(u.room);
+          if (r.pending) throw new PhoneError("확인하는 동안 대화 상태가 바뀌었어요. 다시 확인해 주세요.");
+          if (u.events.length && !refreshAllowed(chat, r, set2)[0]) throw new PhoneError("선톡 받기 설정이 바뀌었어요.");
+          u.events = keepValid(u.events, r);
+        }
+        const visible2 = viewingRoom(e);
+        for (const u of result.updates) {
+          if (!u.events.length) continue;
+          let r = cur.rooms[u.room];
+          const talk = u.events.some((x) => x.type === "message");
+          if (!r && !talk) continue;
+          if (!r) {
+            r = plan.selected.get(u.room);
+            cur.rooms[r.id] = r;
+            cur.order.push(r.id);
+          }
+          if (talk && unsolicited(r)) unsolicitedGot = true;
+          received += applyEvents(cur, r, u.events, time2);
+          if (visible2 === r.id) readRoom(r);
+        }
+        received += commitInvitations(cur, result.invitations, time2);
+        const b = readBulletins(chat);
+        const notices = commitAnnouncements(b, cur, result.announcements, plan.announce, time2);
+        const marks2 = {
+          ...unsolicitedGot ? cooldownMark(chat, "incoming") : {},
+          ...result.invitations.length ? cooldownMark(chat, "invitation") : {},
+          ...notices ? cooldownMark(chat, "announcement") : {}
+        };
+        note = received || result.invitations.length || notices ? `메시지 ${received}개 · 단톡 초대 ${result.invitations.length}개 · 공지 ${notices}개를 받았어요.` : automatic ? "" : "새 메시지가 없어요.";
+        return writePhone(chat, cur, { ...writeBulletins(b, chat.scriptstate), ...marks2 });
+      });
+      return note;
+    });
+  }
+  async function autoRefresh(ctx2, messageIndex, env2, joint) {
+    const set2 = phoneSettings(ctx2.chat.scriptstate);
+    if (!(env2 ? set2.autoOpen : set2.auto) || phoneBusy(ctx2)) return;
+    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data.trim()) return;
+    let hash = 7;
+    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash}`;
+    if (String(ctx2.chat.scriptstate?.[PH_AUTO_LAST] ?? "") === stamp) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_AUTO_LAST]: stamp } }));
+    if (!saved) return;
+    try {
+      directory(ctx2.char.globalLore, saved);
+    } catch {
+      return;
+    }
+    await refreshInbox({ ...ctx2, chat: saved }, env2, true, joint);
+  }
+  function openCheck(ctx2, env2) {
+    if (!phoneSettings(ctx2.chat.scriptstate).autoOpen) return;
+    const at = lastReply(ctx2.chat);
+    if (at < 0) return;
+    void autoRefresh(ctx2, at, env2).catch((error) => console.log(`[goei] 괴담톡 확인 실패: ${error instanceof Error ? error.message : String(error)}`));
+  }
+  async function openDm(ctx2, env2, cid) {
+    const d = dir(ctx2);
+    const c = d.map.get(cid);
+    if (!c) return;
+    const rid = `dm_${c.id}`;
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      dropEmpty(st, rid);
+      const r = st.rooms[rid];
+      if (r) {
+        readRoom(r);
+        return writePhone(chat, st);
+      }
+      st.rooms[rid] = { id: rid, kind: "dm", members: [c.id], people: { [c.id]: personOf(c) }, messages: [], draft: "", unread: 0, readThrough: 0 };
+      return writePhone(chat, st);
+    });
+    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
+    await env2.refresh();
+  }
+  function agentContact(ctx2, agentId) {
+    const c = dir(ctx2).map.get(contactId(agentId));
+    return c ? { id: c.id, wiki: c.lore || c.name } : null;
+  }
+  async function openAgentDm(ctx2, env2, agentId) {
+    const c = agentContact(ctx2, agentId);
+    if (!c) return false;
+    phone.query = "";
+    await openDm(ctx2, env2, c.id);
+    return true;
+  }
+  function dropEmpty(st, keep) {
+    const prev = phone.room;
+    if (!prev || prev === keep) return;
+    const r = st.rooms[prev];
+    if (r && !r.messages.length && !r.pending && !r.draft.trim()) {
+      delete st.rooms[prev];
+      st.order = st.order.filter((x) => x !== prev);
+    }
+  }
+  async function openRoom(ctx2, env2, rid) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      const r = st.rooms[rid];
+      if (!r) return null;
+      dropEmpty(st, rid);
+      readRoom(r);
+      return writePhone(chat, st);
+    });
+    Object.assign(phone, { room: rid, view: "room", page: 1, draft: "", attach: [], attachMenu: false, confirm: null });
+    await env2.refresh();
+  }
+  async function mutate(ctx2, env2, f, extra = () => ({})) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readPhone(chat);
+      if (f(st, chat) === false) return null;
+      return writePhone(chat, st, extra(chat));
+    });
+    await env2.refresh();
+  }
+  async function setVars(ctx2, env2, vars) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
+    await env2.refresh();
+  }
+  function newMessage(data) {
+    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return { role: "user", data, time: Date.now(), chatId: id };
+  }
+  async function placeCall(ctx2, env2, target, purpose) {
+    if (!validCallTarget(target)) {
+      phone.notice = "상대 이름을 확인해 주세요. (60자 이내, 줄바꿈·괄호 없이)";
+      return env2.render();
+    }
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const message = (chat.message ?? []).slice();
+      const last2 = message[message.length - 1];
+      const record = callRecord(target.trim(), purpose);
+      if (last2?.role === "user" && String(last2.data).includes("%%PHONE_CALL:")) message[message.length - 1] = { ...last2, data: record };
+      else message.push(newMessage(record));
+      return { ...chat, message };
+    });
+    Object.assign(phone, { view: "list", call: "", callText: "", notice: "" });
+    await env2.close();
+  }
+  var bubbleBody = (text) => attachBody(text);
+  var phKinds = (r) => r.kind === "dm" ? ["image", "photo", "video", "file", "link", "gift"] : ["image", "photo", "video", "file", "link"];
+  var initial = (name) => esc6([...name][0] ?? "톡");
+  function face(ctx2, who, label, cls = "") {
+    const url = who && !who.custom ? imageUrl(ctx2.char, agentFace(ctx2.char, who.english)) : null;
+    return `<span class="ph-avatar${cls}">${url ? `<img src="${esc6(url)}" alt="" loading="lazy">` : initial(label)}</span>`;
+  }
+  var shortTime = (t) => /(\d\d:\d\d)/.exec(t)?.[1] ?? "";
+  function matches(c, q, fnames) {
+    return `${c.name} ${c.english ?? ""} ${fnames[c.group ?? ""] ?? c.group ?? ""} ${c.rank ?? ""} ${c.department ?? ""} ${c.terms.join(" ")}`.toLowerCase().includes(q);
+  }
+  var tool = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  var badge = (n) => n > 0 ? `<span class="ph-badge">${n > 99 ? "99+" : n}</span>` : "";
+  function chips2(action, cur, items) {
+    return `<div class="ph-tabs" role="tablist">${items.map((t) => `<button class="ph-tab${t.id === cur ? " on" : ""}" data-action="${action}" data-value="${esc6(t.id)}" aria-selected="${t.id === cur}">${esc6(t.label)}${t.count !== void 0 ? `<small>${t.count}</small>` : ""}${badge(t.alert ?? 0)}</button>`).join("")}</div>`;
+  }
+  var blank3 = (text) => `<div class="ph-blank"><p>${text}</p></div>`;
+  function agentStates(ctx2) {
+    try {
+      if (!worldOn(ctx2.chat)) return {};
+      return Object.fromEntries(Object.entries(readWorld(ctx2.chat).agents).map(([k, v]) => [k, v.st]));
+    } catch {
+      return {};
+    }
+  }
+  function contactsView(ctx2, d, st) {
+    if (!d.tabs.length) return blank3("이 소속에 공개된 연락처 탭이 없어요. 설정에서 「모든 연락처 공개」를 켤 수 있어요.");
+    const tab2 = d.tabs.some((t) => t.id === phone.tab) ? phone.tab : d.tabs[0].id;
+    const head = chips2("ph-ctab", tab2, d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id)).length })));
+    const rows2 = d.contacts.filter((c) => c.tabs.includes(tab2));
+    return head + (rows2.length ? contactList(ctx2, rows2, st) : blank3("이 탭에는 아직 연락처가 없어요."));
+  }
+  var talking = (room) => room?.messages.some((m) => m.kind === "message") ? `<span class="ph-talk${room.unread ? " new" : ""}" role="img" aria-label="${room.unread ? "안 읽은 대화" : "대화 중"}">${ICONS.phone}</span>` : "";
+  function contactList(ctx2, rows2, st) {
+    const fnames = names2(ctx2);
+    const states = agentStates(ctx2);
+    return `<ul class="ph-list ph-contacts">${rows2.map((c) => {
+      const room = st.rooms[`dm_${c.id}`];
+      const confirm2 = phone.confirm === `contact:${c.id}`;
+      const on2 = phone.view === "room" && phone.room === `dm_${c.id}`;
+      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-dm" data-value="${c.id}">${face(ctx2, c, c.name)}
+            <span class="ph-who"><span class="ph-who-name"><b>${esc6(c.name)}</b>${c.agentId && states[c.agentId] ? stChip(states[c.agentId]) : ""}${talking(room)}</span><small>${esc6(contactDetails(c) || (c.custom ? c.note || "직접 추가한 연락처" : fnames[c.group ?? ""] ?? ""))}</small></span>
+            ${badge(room?.unread ?? 0)}</button>
+            <span class="ph-act"><button class="ph-tool sm" data-action="ph-call" data-value="${esc6(c.name)}" title="전화" aria-label="${esc6(c.name)}에게 전화">${ICONS.call}</button>
+            ${c.custom ? "" : `<button class="ph-tool sm" data-action="wiki-goto" data-value="${esc6(c.lore || c.name)}" title="위키" aria-label="${esc6(c.name)} 위키">${ICONS.book}</button>`}
+            ${c.saved && c.custom ? `<button class="gx-mini${confirm2 ? " danger" : ""}" data-action="ph-contact-del" data-value="${c.id}">${confirm2 ? "정말 삭제" : "삭제"}</button>` : ""}</span></li>`;
+    }).join("")}</ul>`;
+  }
+  function chatRooms(st, q) {
+    const keys = [.../* @__PURE__ */ new Set([...listedRooms(st), ...st.order.filter((k) => st.rooms[k]?.pending)])];
+    return keys.map((k) => st.rooms[k]).filter((r) => r && (!q || roomLabel(r).toLowerCase().includes(q) || r.messages.some((m) => m.text.toLowerCase().includes(q))));
+  }
+  function chatsView(ctx2, st, d) {
+    const all = chatRooms(st, "");
+    if (!all.length) return blank3("아직 대화가 없어요.<br>연락처에서 이름을 누르거나 새 메시지 확인을 눌러 보세요.");
+    const unread = all.filter((r) => r.unread);
+    const head = chips2("ph-chat-filter", phone.chatFilter, [
+      { id: "all", label: "전체", count: all.length },
+      { id: "unread", label: "안읽음", alert: unread.reduce((n, r) => n + r.unread, 0) }
+    ]);
+    const rows2 = phone.chatFilter === "unread" ? unread : all;
+    return head + (rows2.length ? chatList(ctx2, rows2, d) : blank3("안 읽은 대화가 없어요."));
+  }
+  function chatList(ctx2, rows2, d) {
+    return `<ul class="ph-list ph-chats">${rows2.map((r) => {
+      const last2 = [...r.messages].reverse().find((m) => m.kind === "message") ?? r.messages[r.messages.length - 1];
+      const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : null;
+      const preview = r.pending ? "답장을 기다리는 중…" : last2 ? last2.kind === "message" ? `${last2.sender === "me" ? "나: " : ""}${previewText(last2.text)}` : last2.text : "";
+      const on2 = phone.view === "room" && phone.room === r.id;
+      return `<li class="ph-row"><button class="ph-main${on2 ? " on" : ""}" data-action="ph-room" data-value="${esc6(r.id)}">${r.kind === "group" ? `<span class="ph-avatar group">${ICONS.group}<i>${r.members.length + 1}</i></span>` : face(ctx2, who ?? void 0, roomLabel(r))}
+        <span class="ph-who"><span class="ph-who-top"><b>${esc6(roomLabel(r))}</b>${last2 ? `<small class="ph-time">${esc6(shortTime(last2.time))}</small>` : ""}</span>
+        <span class="ph-who-bot"><small class="${r.pending ? "ph-wait" : ""}">${esc6([...preview].slice(0, 60).join(""))}</small>${badge(r.unread)}</span></span></button>${roomDel(r.id, !!r.pending, roomLabel(r))}</li>`;
+    }).join("")}</ul>`;
+  }
+  function roomDel(id, pending, label) {
+    return phone.confirm === `room:${id}` ? `<button class="gx-mini danger ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="ph-room-del" data-value="${esc6(id)}" title="삭제" aria-label="${esc6(label)} 삭제" ${pending ? "disabled" : ""}>${ICONS.trash}</button>`;
+  }
+  var dayOf = (t) => /^(\d{4})\.(\d\d)\.(\d\d)/.exec(t);
+  function roomView(ctx2, st, d, busy5) {
+    const r = phone.room ? st.rooms[phone.room] : void 0;
+    if (!r) return '<div class="ph-empty"><p class="gx-none">대화방을 찾지 못했어요.</p></div>';
+    const confirm2 = phone.confirm === `room:${r.id}`;
+    const visible2 = r.messages.filter((m) => m.kind !== "pause" || !hiddenPause(m.text));
+    const shown2 = visible2.slice(-PAGE * phone.page);
+    const more = visible2.length > shown2.length;
+    const name = (cid) => (d.map.get(cid) ?? r.people[cid])?.name ?? cid;
+    const isMsg = (m) => !!m && m.kind === "message" && m.sender !== "system";
+    let lastDay = "";
+    const bubbles = shown2.map((m, i) => {
+      const dm = dayOf(m.time);
+      const day = dm ? `${dm[1]}년 ${Number(dm[2])}월 ${Number(dm[3])}일` : "";
+      const sep = day && day !== lastDay ? `<div class="ph-day"><span>${day}</span></div>` : "";
+      if (day) lastDay = day;
+      if (!isMsg(m)) return `${sep}<div class="ph-sys${m.kind === "pause" ? " pause" : ""}">${esc6(m.text)}</div>`;
+      const prev = shown2[i - 1];
+      const next = shown2[i + 1];
+      const me = m.sender === "me";
+      const first = !!sep || !isMsg(prev) || prev.sender !== m.sender;
+      const last2 = !isMsg(next) || next.sender !== m.sender || shortTime(next.time) !== shortTime(m.time) || !!(dayOf(next.time)?.[0] !== dm?.[0]);
+      const unread = me && r.kind === "dm" && r.pending?.message === m.id && !r.messages.some((x) => x.id > m.id && x.sender !== "me" && x.kind === "message");
+      const who2 = d.map.get(m.sender) ?? r.people[m.sender];
+      const pic = !me ? first ? face(ctx2, who2, name(m.sender), " ph-face") : '<span class="ph-face-gap"></span>' : "";
+      const head = !me && first ? `<b class="ph-name">${esc6(name(m.sender))}</b>` : "";
+      const meta = last2 || unread ? `<span class="ph-meta-t">${unread ? "<i>1</i>" : ""}${last2 ? esc6(shortTime(m.time)) : ""}</span>` : "";
+      return `${sep}<div class="ph-msg ${me ? "me" : "npc"}${first ? " first" : ""}">${pic}<div class="ph-msg-col">${head}<div class="ph-line"><div class="ph-bubble">${bubbleBody(m.text)}</div>${meta}</div></div></div>`;
+    }).join("");
+    const pending = r.pending ? r.pending.status === "working" || busy5 ? '<div class="ph-msg npc first ph-typing-row"><span class="ph-face-gap"></span><div class="ph-bubble ph-typing" aria-label="입력 중"><i></i><i></i><i></i></div></div>' : `<div class="ph-retry"><span>답장을 받지 못했어요.</span><button class="gx-mini" data-action="ph-retry" data-value="${esc6(r.id)}">다시 시도</button><button class="gx-mini" data-action="ph-skip" data-value="${esc6(r.id)}">건너뛰기</button></div>` : "";
+    const who = r.kind === "dm" ? d.map.get(r.members[0]) ?? r.people[r.members[0]] : void 0;
+    const sub = r.kind === "dm" ? contactDetails(who) : `${r.members.length + 1}명${r.topic ? ` · ${r.topic}` : ""}`;
+    const off = !r.members.length;
+    const locked = !!r.pending || off;
+    return `<div class="ph-room">
+    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="목록으로">${ICONS.back}</button>
+      ${r.kind === "group" ? `<span class="ph-avatar group sm">${ICONS.group}</span>` : face(ctx2, who, roomLabel(r), " sm")}
+      <div class="ph-room-title"><b>${esc6(roomLabel(r))}</b>${sub ? `<small>${esc6(sub)}</small>` : ""}</div>
+      <span class="ph-act">
+        ${tool("ph-room-refresh", ICONS.refresh, "이 방 새로고침", `data-value="${esc6(r.id)}" ${busy5 || off ? "disabled" : ""}`)}
+        ${r.kind === "dm" ? tool("ph-call", ICONS.call, "전화", `data-value="${esc6(roomLabel(r))}"`) : ""}
+        ${tool("ph-invite", ICONS.addUser, "초대", `data-value="${esc6(r.id)}" ${busy5 || r.pending ? "disabled" : ""}`)}
+        ${confirm2 ? `<button class="gx-mini danger" data-action="ph-room-del" data-value="${esc6(r.id)}">정말 삭제</button>` : tool("ph-room-del", ICONS.trash, "방 삭제", `data-value="${esc6(r.id)}" ${r.pending ? "disabled" : ""}`)}
+      </span></header>
+    ${r.kind === "group" ? `<p class="ph-members">참여자: 나, ${esc6(r.members.map(name).join(", "))}</p>` : ""}
+    <div class="ph-log">${more ? `<button class="gx-mini ph-more" data-action="ph-more">이전 대화 더 보기</button>` : ""}${r.trimmedRecords && !more ? `<div class="ph-sys">오래된 기록 ${r.trimmedRecords}개는 보관 상한으로 정리됐어요.</div>` : ""}${bubbles || '<div class="ph-sys">아직 대화가 없어요. 첫 메시지를 보내 보세요.</div>'}${pending}</div>
+    <div class="ph-composer">
+      ${off ? "" : attachEditor("ph", phone.attach, phKinds(r), !!r.pending, r.kind === "dm" ? "" : "선물은 1:1 대화에서만 보낼 수 있어요.", phone.attachMenu)}
+      <div class="ph-compose">
+        <button class="ph-tool ph-plus${phone.attachMenu ? " on" : ""}" data-action="ph-att-menu" aria-label="첨부" aria-expanded="${phone.attachMenu}" title="사진·파일·선물 첨부 (사진은 붙여넣기도 돼요)" ${locked ? "disabled" : ""}>${ICONS.plus}</button>
+        <textarea class="ph-input" data-input="ph-draft" rows="1" placeholder="${off ? "참여자가 없어요" : phone.attach.length ? "함께 보낼 메시지 (선택)" : "메시지 입력"}" ${locked ? "disabled" : ""}>${esc6(phone.draft)}</textarea>
+        <button class="ph-send" data-action="ph-send" data-value="${esc6(r.id)}" aria-label="보내기" title="보내기" ${busy5 || locked ? "disabled" : ""}>${ICONS.send}</button>
+        <button class="ph-tool ph-back2" data-action="ph-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
+      </div>
+    </div>
+  </div>`;
+  }
+  function phonePickList(ctx2) {
+    let st;
+    let d;
+    try {
+      st = readPhone(ctx2.chat);
+      d = dir(ctx2);
+    } catch (error) {
+      return `<p class="gx-none">${esc6(error instanceof Error ? error.message : String(error))}</p>`;
+    }
+    const room = phone.invite ? st.rooms[phone.invite] : void 0;
+    const existing = new Set(room?.members ?? []);
+    const q = phone.pickQuery.trim().toLowerCase();
+    const fnames = names2(ctx2);
+    const tab2 = pickTabOf(d);
+    const rows2 = d.contacts.filter((c) => !existing.has(c.id) && (q ? matches(c, q, fnames) : !tab2 || c.tabs.includes(tab2)));
+    const picked = new Set(phone.picked);
+    if (!rows2.length) return '<p class="gx-none">고를 수 있는 연락처가 없어요.</p>';
+    return rows2.map((c) => `<li class="ph-row"><button class="ph-main${picked.has(c.id) ? " on" : ""}" data-action="ph-pick" data-value="${c.id}" aria-pressed="${picked.has(c.id)}">
+        <span class="ph-check">${picked.has(c.id) ? "✓" : ""}</span>${face(ctx2, c, c.name)}<span class="ph-who"><b>${esc6(c.name)}</b><small>${esc6(contactDetails(c))}</small></span></button></li>`).join("");
+  }
+  function pickTabOf(d) {
+    const cur = phone.pickTab;
+    return d.tabs.some((t) => t.id === cur) ? cur : d.tabs[0]?.id ?? "";
+  }
+  function paneHead(title2, sub, right = "") {
+    return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="ph-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right}</header>`;
+  }
+  function groupView(ctx2, st, d) {
+    const room = phone.invite ? st.rooms[phone.invite] : void 0;
+    const picked = phone.picked.length;
+    const existing = new Set(room?.members ?? []);
+    const tabs2 = d.tabs.length > 1 ? chips2("ph-pick-tab", pickTabOf(d), d.tabs.map((t) => ({ id: t.id, label: t.name, count: d.contacts.filter((c) => c.tabs.includes(t.id) && !existing.has(c.id)).length }))) : "";
+    return `<div class="ph-form">
+    ${paneHead(
+      room ? `「${esc6(roomLabel(room))}」에 초대` : "단톡방 만들기",
+      `${picked}명 선택 · 상대 최대 ${LIMITS2.members}명`,
+      `<input class="gx-search ph-head-q" data-input="ph-pick-q" value="${esc6(phone.pickQuery)}" placeholder="이름·소속 검색" aria-label="초대할 사람 검색">`
+    )}
+    <div class="ph-form-body ph-gbody">
+      ${room ? "" : `<input class="gx-search ph-gname" data-input="ph-gname" value="${esc6(phone.gname)}" maxlength="${LIMITS2.room_name}" placeholder="단톡방 이름 (선택, 비우면 참여자 이름)" aria-label="단톡방 이름">`}
+      ${room ? "" : `<textarea class="gx-search ph-topic${phone.topic.trim() ? " filled" : ""}" data-input="ph-topic" rows="1" placeholder="주제·상황 (선택, 비우면 지금 상황에 맞춰 시작)" aria-label="주제·상황">${esc6(phone.topic)}</textarea>`}
+      ${tabs2}
+      <ul class="ph-list ph-pick">${phonePickList(ctx2)}</ul>
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="ph-group-create" ${picked ? "" : "disabled"}>${room ? "초대하기" : picked === 1 ? "1:1 대화" : "단톡방 만들기"}</button></div>
+  </div>`;
+  }
+  function noticesView(ctx2) {
+    let b;
+    try {
+      b = readBulletins(ctx2.chat);
+    } catch (error) {
+      return `<p class="gx-none">${esc6(error.message)}</p>`;
+    }
+    const received = [...b.items].reverse();
+    if (!received.length) return blank3("아직 받은 공지가 없어요.<br>새 메시지 확인 때 소속 공지가 올 수 있어요.");
+    const label = noticeFactionLabel(names2(ctx2));
+    const factions = [...new Set(received.map((r) => r.channel))];
+    if (factions.length < 2 || !factions.includes(phone.noticeFaction)) phone.noticeFaction = "";
+    const every = phone.noticeFaction ? received.filter((r) => r.channel === phone.noticeFaction) : received;
+    const unreadN = every.filter((r) => r.read === false).length;
+    const all = phone.noticeFilter === "unread" ? every.filter((r) => r.read === false) : every;
+    const size = noticeSettings(ctx2.chat.scriptstate).page;
+    const pages = Math.max(1, Math.ceil(all.length / size));
+    const page = Math.min(Math.max(1, phone.noticePage), pages);
+    const items = all.slice((page - 1) * size, page * size);
+    const head = `<div class="ph-notice-bar">${chips2("ph-notice-filter", phone.noticeFilter, [
+      { id: "all", label: "전체", count: every.length },
+      { id: "unread", label: "안읽음", alert: unreadN }
+    ])}${unreadN ? '<button class="gx-mini" data-action="ph-notice-all">모두 읽음</button>' : ""}</div>` + (factions.length > 1 ? `<div class="ph-notice-facs">${factions.map((f) => `<button class="gx-chip${phone.noticeFaction === f ? " on" : ""}" data-action="ph-notice-faction" data-value="${esc6(f)}" aria-pressed="${phone.noticeFaction === f}">${esc6(label(f, received.find((r) => r.channel === f)?.channelName))}<small>${received.filter((r) => r.channel === f).length}</small></button>`).join("")}</div>` : "");
+    if (!all.length) return head + blank3("안 읽은 공지가 없어요.");
+    const nav = pages > 1 ? `<div class="ph-pager"><button class="gx-mini" data-action="ph-notice-page" data-value="${page - 1}" ${page <= 1 ? "disabled" : ""}>‹ 이전</button><span>${page} / ${pages}</span><button class="gx-mini" data-action="ph-notice-page" data-value="${page + 1}" ${page >= pages ? "disabled" : ""}>다음 ›</button></div>` : "";
+    return `${head}${noticeList(items, label)}${nav}`;
+  }
+  function noticeFactionLabel(names4) {
+    return (code, saved) => (code ? noticeLabel(code, names4) : "") || saved || code || "소속 없음";
+  }
+  function noticeList(items, label) {
+    return `<ul class="ph-list ph-notices">${items.map((r) => {
+      const on2 = phone.view === "notice" && phone.openNotice === r.id;
+      const confirm2 = phone.confirm === `notice:${r.id}`;
+      const del = confirm2 ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc6(r.title)} 삭제">${ICONS.trash}</button>`;
+      const open3 = phone.openNotice === r.id;
+      return `<li class="ph-notice${on2 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open3}">
+        <span class="ph-ncard-top"><span class="gx-badge">${esc6(r.category)}</span><span class="ph-nfac">${esc6(label(r.channel, r.channelName))}</span><small>${esc6(r.issuer)}${r.time ? ` · ${esc6(r.time)}` : ""}</small></span>
+        <span class="ph-ncard-title"><b>${esc6(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
+</button>${del}
+        ${open3 ? `<div class="ph-notice-body">${esc6(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  function noticeDetail(ctx2) {
+    let r;
+    try {
+      r = readBulletins(ctx2.chat).items.find((x) => x.id === phone.openNotice);
+    } catch {
+      r = void 0;
+    }
+    if (!r) return '<div class="ph-empty"><p class="gx-none">공지를 찾지 못했어요.</p></div>';
+    const confirm2 = phone.confirm === `notice:${r.id}`;
+    const del = confirm2 ? `<button class="gx-mini danger" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : tool("ph-notice-del", ICONS.trash, "공지 삭제", `data-value="${r.id}"`);
+    return `<div class="ph-form ph-ndoc">${paneHead("공지", "", `<span class="ph-act">${del}</span>`)}
+    <article class="ph-ndoc-body">
+      <header class="ph-ndoc-head"><span class="gx-badge">${esc6(r.category)}</span><h3>${esc6(r.title)}</h3>
+        <div class="ph-ndoc-meta"><b>${esc6(r.issuer)}</b>${r.time ? `<span>${esc6(r.time)}</span>` : ""}</div></header>
+      <div class="ph-ndoc-text">${esc6(r.text).replace(/\n/g, "<br>")}</div>
+    </article></div>`;
+  }
+  function searchView(ctx2, st, d) {
+    const q = phone.query.trim().toLowerCase();
+    const fnames = names2(ctx2);
+    const people = d.contacts.filter((c) => matches(c, q, fnames));
+    const rooms = chatRooms(st, q);
+    let notes = [];
+    try {
+      notes = [...readBulletins(ctx2.chat).items].reverse().filter((r) => `${r.title} ${r.text} ${r.issuer}`.toLowerCase().includes(q));
+    } catch {
+    }
+    if (!people.length && !rooms.length && !notes.length) return blank3("검색 결과가 없어요.");
+    const sec = (title2, n, html) => n ? `<h4 class="ph-sec">${title2}<b>${n}</b></h4>${html}` : "";
+    return sec("연락처", people.length, contactList(ctx2, people, st)) + sec("대화", rooms.length, chatList(ctx2, rooms, d)) + sec("공지", notes.length, noticeList(notes, noticeFactionLabel(names2(ctx2))));
+  }
+  function callView() {
+    return `<div class="ph-form">${paneHead("전화 걸기", "기록을 남기고 창을 닫아요. 채팅에서 전송을 누르면 통화 장면이 이어져요.")}
+    <div class="ph-form-body">
+      <label class="ph-label">상대</label><input class="gx-search" data-input="ph-call-to" value="${esc6(phone.call)}" placeholder="상대 이름" maxlength="60">
+      <label class="ph-label">할 말·용건 (선택)<small>채팅 입력창에 덧붙여 보내도 돼요</small></label><textarea class="gx-search" data-input="ph-call-text" rows="3" placeholder="예: 방금 본 걸 보고하려고">${esc6(phone.callText)}</textarea>
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="ph-call-place">${ICONS.call} 전화 걸기</button></div></div>`;
+  }
+  function addView() {
+    return `<div class="ph-form">${paneHead("연락처 추가", "「기타」 탭에 들어가요. 명부에 있는 이름이면 그 인물로 추가돼요.")}
+    <div class="ph-form-body">
+      <label class="ph-label">이름</label><input class="gx-search" data-input="ph-add-name" value="${esc6(phone.addName)}" maxlength="60" placeholder="이름">
+      <label class="ph-label">인물 메모 (선택)<small>어떤 사람인지, 어떻게 아는 사이인지</small></label><textarea class="gx-search" data-input="ph-add-note" rows="3">${esc6(phone.addNote)}</textarea>
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="ph-add-save">추가</button></div></div>`;
+  }
+  var AUTO_HINT = {
+    "0": "새로고침 버튼을 누를 때만 확인해요",
+    open: "채팅이 진행된 뒤 괴담톡을 열면 한 번 확인해요",
+    "1": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
+  };
+  function seg(key2, cur, items) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="ph-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
+  }
+  var row2 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var group = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
+  function settingsView(ctx2) {
+    const v = (k) => phoneValue(ctx2.chat.scriptstate, k);
+    const onoff = (k) => seg(k, v(k) === "1" ? "1" : "0", [["1", "켜기"], ["0", "끄기"]]);
+    const pct2 = (k) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc6(v(k))}" aria-label="확률"><span>%</span></span>`;
+    const num4 = (k, cur, lo, hi, unit) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
+    const notices = noticeSettings(ctx2.chat.scriptstate);
+    const rest = (k) => {
+      const n = advNum(ctx2.chat.scriptstate, "ph", k);
+      return n ? `받은 뒤 ${n}턴 쉬어요` : "";
+    };
+    const keep = (k, label) => {
+      const st = phoneStorage(ctx2.chat.scriptstate, k);
+      return row2(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${st.auto ? num4(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX2, "개") : ""}</span>`, "최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요");
+    };
+    return `<div class="ph-form">${paneHead("괴담톡 설정", "", `<span class="ph-act">${defaultsButtons("ph")}</span>`)}${defaultsConfirm("ph")}
+    <div class="ph-form-body ps">
+      ${group("답장", [
+      row2("모델", seg("model", v("model") === "main" ? "main" : "aux", [["main", "메인"], ["aux", "보조"]])),
+      row2("채팅에 반영", onoff("context"), "지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요"),
+      row2("요원 상태 참고", onoff("status"))
+    ].join(""))}
+      ${group("새 메시지", [
+      row2("새 메시지 확인", seg("auto", ["1", "open"].includes(v("auto")) ? v("auto") : "0", [["0", "수동"], ["open", "창을 열 때"], ["1", "매 턴"]]), AUTO_HINT[v("auto")] ?? AUTO_HINT["0"]),
+      row2("선톡 받기", `<span class="ph-inline">${onoff("incoming")}${pct2("incoming_chance")}</span>`, rest("cd_incoming")),
+      row2("단톡방 초대 받기", `<span class="ph-inline">${onoff("group_invites")}${pct2("group_invite_chance")}</span>`, rest("cd_invite")),
+      row2("소속 공지 받기", onoff("announcements")),
+      row2("공지 대기 턴", num4("announcement_gap", notices.gap, 1, 100, "턴")),
+      row2("공지 참고 수", num4("announcement_history", notices.history, 1, 50, "개"))
+    ].join(""))}
+      ${group("연락처", [row2("모든 연락처 공개", onoff("all_contacts"), "내 소속과 관계없이 모든 탭을 보여요"), row2("괴이 연락처 공개", onoff("anomaly_contacts"))].join(""))}
+      ${group("보관", [
+      keep("dm", "1:1 대화 정리"),
+      keep("group", "단톡방 정리"),
+      keep("notice", "공지 정리"),
+      row2("페이지당 공지", `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n) => `<button class="gx-seg${notices.page === n ? " on" : ""}" data-action="ph-cfg" data-value="announcement_page_size=${n}" aria-pressed="${notices.page === n}">${n}</button>`).join("")}</div>`)
+    ].join(""))}
+      ${advancedBox("ph", ctx2.chat.scriptstate)}
+    </div></div>`;
+  }
+  function listHtml(ctx2, st, d) {
+    if (phone.query.trim()) return searchView(ctx2, st, d);
+    return phone.sub === "contacts" ? contactsView(ctx2, d, st) : phone.sub === "chats" ? chatsView(ctx2, st, d) : noticesView(ctx2);
+  }
+  function paneHtml(ctx2, st, d, busy5) {
+    if (phone.view === "room") return roomView(ctx2, st, d, busy5);
+    if (phone.view === "group") return groupView(ctx2, st, d);
+    if (phone.view === "call") return callView();
+    if (phone.view === "add") return addView();
+    if (phone.view === "settings") return settingsView(ctx2);
+    if (phone.view === "notice") return noticeDetail(ctx2);
+    return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.phone}</span><b>괴담톡</b><p>왼쪽에서 대화나 연락처를 고르세요.</p></div>`;
+  }
+  function phoneContent(ctx2, query) {
+    phone.query = query;
+    try {
+      return listHtml(ctx2, readPhone(ctx2.chat), dir(ctx2));
+    } catch (error) {
+      return `<p class="gx-none">${esc6(error instanceof Error ? error.message : String(error))}</p>`;
+    }
+  }
+  function phoneTab(ctx2, env2) {
+    liveEnv = env2;
+    let st;
+    let d;
+    try {
+      st = readPhone(ctx2.chat);
+      d = dir(ctx2);
+    } catch (error) {
+      return `<main class="gx-body"><div class="gx-empty">${esc6(error instanceof Error ? error.message : String(error))}</div></main>`;
+    }
+    const job = jobs.get(chatKey(ctx2));
+    const busy5 = !!job;
+    let b;
+    try {
+      b = readBulletins(ctx2.chat);
+    } catch {
+      b = null;
+    }
+    const unread = unreadCount(st);
+    const subBtn = (id, label, extra = "") => `<button class="ph-sub${phone.sub === id ? " on" : ""}" data-action="ph-sub" data-value="${id}" aria-pressed="${phone.sub === id}">${label}${extra}</button>`;
+    const fail3 = phone.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc6(phone.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc6(phone.failure.raw)}</textarea></details>` : "";
+    const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc6(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const note = toast("ph", phone.notice, (t) => {
+      if (phone.notice === t) phone.notice = "";
+    });
+    const detail = phone.view !== "list";
+    const tools = [
+      tool("ph-refresh", ICONS.refresh, "새 메시지 확인", busy5 ? "disabled" : "", "새로고침"),
+      tool("ph-group", ICONS.group, "단톡 만들기", busy5 ? "disabled" : "", "단톡"),
+      tool("ph-add", ICONS.addUser, "연락처 추가", "", "추가"),
+      tool("ph-call", ICONS.call, "전화 걸기", 'data-value=""', "전화"),
+      tool("ph-settings", ICONS.settings, "괴담톡 설정", phone.view === "settings" ? 'aria-pressed="true"' : "", "설정")
+    ].join("");
+    return `<main class="gx-body ph ph-app ${detail ? "is-detail" : "is-list"}">
+    <section class="ph-side" aria-label="괴담톡 목록">
+      <div class="ph-side-head">
+        <div class="ph-subs">${subBtn("contacts", "연락처")}${subBtn("chats", "대화", badge(unread))}${subBtn("notices", "공지", badge(b ? b.items.filter((r) => r.read === false).length : 0))}</div>
+        <input class="gx-search ph-search" name="ph-q" data-input="ph-query" value="${esc6(phone.query)}" placeholder="이름·대화·공지 검색" aria-label="연락처·대화·공지 검색">
+      </div>
+      ${detail ? "" : status}
+      <div class="ph-content">${listHtml(ctx2, st, d)}</div>
+      ${fail3}
+      ${drawerHtml(tools)}
+    </section>
+    <section class="ph-pane">${detail ? status : ""}${paneHtml(ctx2, st, d, busy5)}</section>
+    ${note}
+  </main>`;
+  }
+  async function handlePhone(action, value, ctx2, env2) {
+    if (!action.startsWith("ph-")) return false;
+    liveEnv = env2;
+    const v = value ?? "";
+    if (!["ph-room-del", "ph-contact-del", "ph-notice-del"].includes(action)) phone.confirm = null;
+    if (action.startsWith("ph-def-")) {
+      try {
+        const msg = await defaultsAction("ph", action, v, ctx2, env2.refresh);
+        if (msg) phone.notice = msg;
+      } catch (error) {
+        phone.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      env2.render();
+      return true;
+    }
+    switch (action) {
+      case "ph-sub":
+        Object.assign(phone, { sub: v, query: "", ...phone.view === "room" ? {} : { view: "list", invite: null, picked: [] } });
+        break;
+      case "ph-settings":
+        Object.assign(phone, { view: phone.view === "settings" ? "list" : "settings", invite: null, picked: [] });
+        break;
+      case "ph-att-menu":
+        phone.attachMenu = !phone.attachMenu;
+        break;
+      case "ph-ctab":
+        phone.tab = v;
+        phone.query = "";
+        break;
+      case "ph-chat-filter":
+        phone.chatFilter = v === "unread" ? "unread" : "all";
+        break;
+      case "ph-notice-filter":
+        phone.noticeFilter = v === "unread" ? "unread" : "all";
+        phone.noticePage = 1;
+        break;
+      case "ph-notice-faction":
+        phone.noticeFaction = phone.noticeFaction === v ? "" : v;
+        phone.noticePage = 1;
+        break;
+      case "ph-pick-tab":
+        phone.pickTab = v;
+        phone.pickQuery = "";
+        break;
+      case "ph-dm":
+        if (phone.view === "room" && phone.room === `dm_${v}` && !matchMedia("(max-width: 760px)").matches) return handlePhone("ph-back", void 0, ctx2, env2);
+        await openDm(ctx2, env2, v);
+        return true;
+      case "ph-room":
+        if (phone.view === "room" && phone.room === v && !matchMedia("(max-width: 760px)").matches) return handlePhone("ph-back", void 0, ctx2, env2);
+        await openRoom(ctx2, env2, v);
+        return true;
+      case "ph-back":
+        if (phone.view === "group" && phone.invite) {
+          Object.assign(phone, { view: "room", room: phone.invite, invite: null, picked: [] });
+          break;
+        }
+        if (phone.view === "room" && phone.room) {
+          const rid = phone.room;
+          Object.assign(phone, { view: "list", room: null, draft: "", attach: [] });
+          await mutate(ctx2, env2, (st) => {
+            const r = st.rooms[rid];
+            if (!r || r.messages.length || r.pending) return false;
+            delete st.rooms[rid];
+            st.order = st.order.filter((x) => x !== rid);
+          });
+          return true;
+        }
+        Object.assign(phone, { view: "list", invite: null, picked: [] });
+        break;
+      case "ph-more":
+        phone.page += 1;
+        break;
+      case "ph-att-add":
+      case "ph-att-del": {
+        const r = readPhone(ctx2.chat).rooms[phone.room ?? ""];
+        if (r) attachAction(phone.attach, action === "ph-att-add" ? "add" : "del", v, phKinds(r));
+        break;
+      }
+      case "ph-send": {
+        if (!phone.draft.trim() && !phone.attach.length) {
+          phone.notice = "메시지를 입력해 주세요.";
+          break;
+        }
+        if (emptyAttachment(phone.attach)) {
+          phone.notice = "첨부 내용을 입력하거나 ✕로 빼 주세요.";
+          break;
+        }
+        void send(ctx2, env2, v, composeBody(phone.attach, phone.draft));
+        return true;
+      }
+      case "ph-retry": {
+        const r = readPhone(ctx2.chat).rooms[v];
+        if (r?.pending) void generate2(ctx2, env2, v, `${roomLabel(r)}의 답장을 다시 기다리는 중이에요.`);
+        return true;
+      }
+      case "ph-skip":
+        if (phoneBusy(ctx2)) break;
+        await mutate(ctx2, env2, (st) => {
+          const r = st.rooms[v];
+          if (!r?.pending) return false;
+          r.pending = void 0;
+        });
+        return true;
+      case "ph-room-refresh":
+        void roomRefresh(ctx2, env2, v);
+        return true;
+      case "ph-refresh":
+        void refreshInbox(ctx2, env2);
+        return true;
+      case "ph-group":
+        Object.assign(phone, { view: "group", invite: null, picked: [], topic: "", gname: "", pickQuery: "", pickTab: "" });
+        break;
+      case "ph-invite":
+        Object.assign(phone, { view: "group", invite: v, room: v, picked: [], pickQuery: "", pickTab: "" });
+        break;
+      case "ph-pick": {
+        const set2 = new Set(phone.picked);
+        if (set2.has(v)) set2.delete(v);
+        else {
+          const existing = phone.invite ? readPhone(ctx2.chat).rooms[phone.invite]?.members.length ?? 0 : 0;
+          if (set2.size + existing >= LIMITS2.members) {
+            phone.notice = `상대는 최대 ${LIMITS2.members}명까지예요.`;
+            break;
+          }
+          set2.add(v);
+        }
+        phone.picked = [...set2];
+        break;
+      }
+      case "ph-group-create":
+        await createGroup(ctx2, env2);
+        return true;
+      case "ph-room-del":
+        if (phone.confirm !== `room:${v}`) {
+          phone.confirm = `room:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        await mutate(ctx2, env2, (st) => {
+          const r = st.rooms[v];
+          if (!r || r.pending) return false;
+          delete st.rooms[v];
+          st.order = st.order.filter((x) => x !== v);
+        });
+        if (phone.room === v) Object.assign(phone, { view: phone.view === "room" ? "list" : phone.view, room: null });
+        return true;
+      case "ph-notice": {
+        const id = Number(v);
+        if (matchMedia("(max-width: 760px)").matches) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === "notice" ? "list" : phone.view });
+        else if (phone.view === "notice" && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: "list" });
+        else Object.assign(phone, { openNotice: id, view: "notice" });
+        {
+          const b = readBulletins(ctx2.chat);
+          const row6 = b.items.find((x) => x.id === id);
+          if (row6 && row6.read === false) {
+            row6.read = true;
+            await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+            return true;
+          }
+        }
+        break;
+      }
+      case "ph-notice-page":
+        phone.noticePage = Math.max(1, Number(v) || 1);
+        phone.openNotice = null;
+        break;
+      case "ph-notice-all": {
+        const b = readBulletins(ctx2.chat);
+        if (!b.items.some((x) => x.read === false)) break;
+        for (const row6 of b.items) row6.read = true;
+        await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+        return true;
+      }
+      case "ph-notice-del": {
+        if (phone.confirm !== `notice:${v}`) {
+          phone.confirm = `notice:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        const b = readBulletins(ctx2.chat);
+        b.items = b.items.filter((x) => x.id !== Number(v));
+        if (phone.openNotice === Number(v)) Object.assign(phone, { openNotice: null, view: phone.view === "notice" ? "list" : phone.view });
+        await setVars(ctx2, env2, writeBulletins(b, ctx2.chat.scriptstate));
+        return true;
+      }
+      case "ph-call":
+        Object.assign(phone, { view: "call", call: v, callText: "" });
+        break;
+      case "ph-call-place":
+        await placeCall(ctx2, env2, phone.call, phone.callText);
+        return true;
+      case "ph-add":
+        Object.assign(phone, { view: "add", addName: "", addNote: "" });
+        break;
+      case "ph-add-save":
+        await addContact(ctx2, env2);
+        return true;
+      case "ph-contact-del":
+        if (phone.confirm !== `contact:${v}`) {
+          phone.confirm = `contact:${v}`;
+          break;
+        }
+        phone.confirm = null;
+        await deleteContact(ctx2, env2, v);
+        return true;
+      case "ph-cfg": {
+        const [k, val] = v.split("=");
+        const vars = { [PH(k)]: val };
+        if (k === "all_contacts" || k === "anomaly_contacts") phone.tab = "";
+        if (k === "announcement_page_size") phone.noticePage = 1;
+        await setVars(ctx2, env2, vars);
+        return true;
+      }
+      case "ph-num": {
+        const [k, val] = v.split("=");
+        const range = {
+          incoming_chance: [0, 100],
+          group_invite_chance: [0, 100],
+          announcement_gap: [1, 100],
+          announcement_history: [1, 50],
+          storage_limit_dm: [1, STORAGE_MAX2],
+          storage_limit_group: [1, STORAGE_MAX2],
+          storage_limit_notice: [1, STORAGE_MAX2]
+        };
+        const r = range[k];
+        const n = Math.floor(Number(val));
+        if (r && Number.isFinite(n)) await setVars(ctx2, env2, { [PH(k)]: String(Math.max(r[0], Math.min(r[1], n))) });
+        else env2.render();
+        return true;
+      }
+      default:
+        return false;
+    }
+    env2.render();
+    return true;
+  }
+  async function addContact(ctx2, env2) {
+    const name = phone.addName.trim();
+    if (!validCallTarget(name)) {
+      phone.notice = "이름은 60자 이내로, 줄바꿈·괄호 없이 적어 주세요.";
+      return env2.render();
+    }
+    if (tokens(phone.addNote) > LIMITS2.memo_tokens) {
+      phone.notice = `인물 메모는 ${LIMITS2.memo_tokens}토큰 이내로 적어 주세요.`;
+      return env2.render();
+    }
+    const d = dir(ctx2);
+    const key2 = name.toLowerCase();
+    const found = [...new Set(d.map.values())].filter((c) => c.name === name || (c.english ?? "").toLowerCase() === key2 || c.terms.some((t) => t.toLowerCase() === key2));
+    if (found.length > 1) {
+      phone.notice = "같은 이름의 연락처가 여럿이에요. 정확한 이름을 적어 주세요.";
+      return env2.render();
+    }
+    const match = found[0];
+    if (match?.visible) {
+      Object.assign(phone, { view: "list", sub: "contacts", tab: match.tabs[0] ?? "", query: "", notice: "이미 등록된 연락처예요." });
+      return env2.render();
+    }
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const data = readCustom(chat);
+      if (match) data.items.push({ id: match.id, name: match.name, agentId: match.agentId });
+      else {
+        data.seq += 1;
+        data.items.push({ id: contactId(`custom:${data.seq}`), name, note: phone.addNote.trim() });
+      }
+      return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data) } };
+    });
+    Object.assign(phone, { view: "list", sub: "contacts", tab: "T05", query: "", notice: "연락처를 기타에 추가했어요." });
+    await env2.refresh();
+  }
+  async function deleteContact(ctx2, env2, cid) {
+    if (phoneBusy(ctx2)) return;
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const data = readCustom(chat);
+      data.items = data.items.filter((x) => x.id !== cid);
+      const st = readPhone(chat);
+      for (const [rid, r] of Object.entries(st.rooms)) if (r.kind === "dm" && (rid === `dm_${cid}` || r.members.includes(cid))) delete st.rooms[rid];
+      st.order = st.order.filter((x) => st.rooms[x]);
+      return writePhone({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, [PH_CONTACTS]: JSON.stringify(data) } }, st);
+    });
+    phone.notice = "연락처와 1:1 대화 기록을 지웠어요.";
+    await env2.refresh();
+  }
+  function phoneInput(name, value, key2) {
+    switch (name) {
+      case "ph-draft":
+        phone.draft = value;
+        return true;
+      case "ph-att":
+        return attachInput(phone.attach, key2, value);
+      case "ph-topic":
+        phone.topic = value;
+        return true;
+      case "ph-gname":
+        phone.gname = value;
+        return true;
+      case "ph-call-to":
+        phone.call = value;
+        return true;
+      case "ph-call-text":
+        phone.callText = value;
+        return true;
+      case "ph-add-name":
+        phone.addName = value;
+        return true;
+      case "ph-add-note":
+        phone.addNote = value;
+        return true;
+      case "ph-pick-q":
+        phone.pickQuery = value;
+        return true;
+      default:
+        return false;
+    }
+  }
+  function phoneUnread(ctx2) {
+    try {
+      return unreadCount(readPhone(ctx2.chat)) > 0 || bulletinUnread(readBulletins(ctx2.chat));
+    } catch {
+      return false;
+    }
+  }
+
+  // src/ui/gnet.ts
+  var gnet = {
+    sub: "board",
+    open: null,
+    openDm: null,
+    compose: null,
+    draft: "",
+    attach: [],
+    to: "",
+    confirm: null,
+    editNick: false,
+    nick: "",
+    notice: "",
+    failure: null,
+    settings: false,
+    attachMenu: false
+  };
+  var GN_KINDS = ["image", "photo", "video", "file", "link"];
+  function resetGnet() {
+    Object.assign(gnet, { sub: "board", open: null, openDm: null, compose: null, draft: "", attach: [], to: "", confirm: null, editNick: false, notice: "", failure: null, settings: false, attachMenu: false });
+  }
+  var jobs2 = /* @__PURE__ */ new Map();
+  var chatKey2 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
+  var esc7 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var retry = (chat) => ({ ...genSettings(chat.scriptstate), state: chat.scriptstate });
+  var source2 = (ctx2, chat = ctx2.chat) => playerSource({ char: ctx2.char, chat, persona: personaText() });
+  function names3(ctx2) {
+    try {
+      return factionNames(parseCatalog(ctx2.char.globalLore), String(ctx2.chat.scriptstate?.["$st_faction"] ?? ""));
+    } catch {
+      return {};
+    }
+  }
+  var ORIGIN_KEY = "$gn_incoming_origin";
+  function savedOrigin(chat) {
+    try {
+      const v = JSON.parse(String(chat.scriptstate?.[ORIGIN_KEY] ?? ""));
+      return v && Number.isInteger(v.post) ? v : null;
+    } catch {
+      return null;
+    }
+  }
+  function withVars(chat, vars) {
+    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } };
+  }
+  function saveIncoming(chat, st, rows2, plan, post) {
+    try {
+      if (commitIncoming(st, rows2, plan, dateNow(chat), post)) return { vars: { [GN_COOLDOWN]: String(storyTurns(chat)) }, note: "새 쪽지가 왔어요." };
+      return { vars: {}, note: "" };
+    } catch (error) {
+      return { vars: {}, note: `본 결과는 저장했어요. 선쪽지만 적용하지 않았어요: ${error instanceof Error ? error.message : String(error)}` };
+    }
+  }
+  async function run2(ctx2, env2, label, work) {
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+      env2.render();
+      return;
+    }
+    jobs2.set(key2, label);
+    gnet.notice = "";
+    gnet.failure = null;
+    env2.render();
+    try {
+      gnet.notice = await work();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      gnet.notice = msg;
+      const raw = error.raw;
+      if (raw) gnet.failure = { label, reason: msg, raw };
+    } finally {
+      jobs2.delete(key2);
+      await env2.refresh();
+    }
+  }
+  var viewing = () => ({ post: gnet.sub === "board" ? gnet.open : null, nick: gnet.sub === "dm" ? gnet.openDm : null });
+  function refreshBoard(ctx2, env2, automatic = false, joint) {
+    return run2(ctx2, env2, automatic ? "채팅 응답에 맞춰 게시판을 새로 불러오는 중이에요." : "게시판을 불러오는 중이에요.", async () => {
+      const startLength = ctx2.chat.message?.length ?? 0;
+      const before = readGnet(ctx2.chat);
+      const nick = userNick(ctx2.chat.scriptstate);
+      const s4 = gnetSettings(ctx2.chat.scriptstate);
+      const plan = incomingPlan(ctx2.chat, before, s4, nick, Math.random, void 0, savedOrigin(ctx2.chat));
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => refreshPrompt(source2(ctx2), before, plan, nick, names3(ctx2)));
+      const first = joint && ((m) => joint.ask("gnet", m));
+      const { raw, value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), { ...retry(ctx2.chat), first });
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (automatic && (chat.message?.length ?? 0) !== startLength) {
+          note = "채팅이 이어져서 이번 자동 새로고침 결과는 저장하지 않았어요.";
+          return null;
+        }
+        const res = withRaw(raw, () => applyBoard(before, readGnet(chat), value, { nick, settings: s4, date: dateNow(chat) }));
+        const inc = saveIncoming(chat, res.st, value.incoming, plan);
+        note = [res.notice, res.emptyComments ? "이번 게시판에는 댓글이 하나도 없어요." : "", inc.note].filter(Boolean).join(" ");
+        return writeGnet(withVars(chat, inc.vars), res.st, { ack: viewing() });
+      });
+      if (!automatic) gnet.open = null;
+      else if (gnet.open !== null && !findPost(readGnet(await currentChat(ctx2) ?? ctx2.chat), gnet.open)) gnet.open = null;
+      return note;
+    });
+  }
+  function withRaw(raw, f) {
+    try {
+      return f();
+    } catch (error) {
+      if (error instanceof GnetError && !error.raw) throw new GnetError(error.message, raw);
+      throw error;
+    }
+  }
+  function writePost(ctx2, env2, input2) {
+    return run2(ctx2, env2, "글을 올리는 중이에요.", async () => {
+      const st = readGnet(ctx2.chat);
+      const nick = userNick(ctx2.chat.scriptstate);
+      const s4 = gnetSettings(ctx2.chat.scriptstate);
+      const draftPost = { id: 0, date: "", nick, title: "", body: input2, views: 0, votes: 0, mine: true, comments: [] };
+      const plan = incomingPlan(ctx2.chat, st, s4, nick, Math.random, { post: draftPost });
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "gn"), () => postPrompt(source2(ctx2), st, input2, plan, names3(ctx2)));
+      const { value, draft: parsed } = (await generate(prompt.messages, s4.model, (r) => {
+        const v = withRaw(r, () => parseJsonPayload(r));
+        return { value: v, draft: withRaw(r, () => parsePostDraft(v)) };
+      }, retry(ctx2.chat))).value;
+      const draft2 = attachPostDraft(parsed, input2);
+      let note = "글을 올렸어요.";
+      let newId = 0;
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        const p = addUserPost(cur, nick, draft2.title, draft2.content, dateNow(chat));
+        newId = p.id;
+        const got = acceptComments(value.comments, [], { postId: p.id, replyTo: 0, total: 0, supplied: /* @__PURE__ */ new Set() }, nick);
+        pushComments(p, got.comments, dateNow(chat));
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+        trimBoard(cur, s4);
+        const inc = saveIncoming(chat, cur, value.incoming, plan, p);
+        if (!got.comments.length) note = "글을 올렸어요. 아직 댓글은 없어요.";
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        if (inc.note) note += ` ${inc.note}`;
+        return writeGnet(withVars(chat, { ...inc.vars, [ORIGIN_KEY]: JSON.stringify({ post: p.id }) }), cur, { ack: { post: p.id } });
+      });
+      gnet.compose = null;
+      gnet.draft = "";
+      gnet.attach = [];
+      gnet.sub = "board";
+      gnet.open = newId;
+      return note;
+    });
+  }
+  function refreshPost(ctx2, env2, postId2) {
+    return run2(ctx2, env2, "이 글을 새로 불러오는 중이에요.", async () => {
+      const chat = ctx2.chat;
+      const st = readGnet(chat);
+      const target = findPost(st, postId2);
+      if (!target) throw new GnetError("대상 글이 없어졌어요.");
+      const s4 = gnetSettings(chat.scriptstate);
+      const nick = userNick(chat.scriptstate);
+      const plan = incomingPlan(chat, st, { ...s4, incoming: false }, nick, Math.random);
+      const prompt = fitPrompt(budgetFor(chat.scriptstate, "gn"), () => commentPrompt(source2(ctx2, chat), st, postId2, 0, "", plan, nick, names3(ctx2), POST_REFRESH_ACTION));
+      const snapshot2 = postKey(target);
+      const { value } = await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(chat));
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const cur = readGnet(latest);
+        const p = findPost(cur, postId2);
+        if (!p || postKey(p) !== snapshot2) {
+          note = "불러오는 동안 글이 바뀌어서 적용하지 않았어요. 다시 눌러 주세요.";
+          return null;
+        }
+        const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: 0, total: prompt.total, supplied: prompt.supplied }, nick);
+        pushComments(p, got.comments, dateNow(latest));
+        const n = got.comments.length;
+        p.views += n * (5 + Math.floor(Math.random() * 20)) + Math.floor(Math.random() * 10);
+        p.votes += Math.floor(Math.random() * (n + 2));
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(latest));
+        note = n ? "" : "새 댓글이 없어요.";
+        if (got.dropped) note += ` 형식이 맞지 않는 댓글 ${got.dropped}개는 뺐어요.`;
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        return writeGnet(latest, cur, { ack: viewing() });
+      });
+      return note.trim();
+    });
+  }
+  async function writeComment(ctx2, env2, postId2, parent, body4) {
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+      return env2.render();
+    }
+    const nick = userNick(ctx2.chat.scriptstate);
+    let index2 = 0;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      index2 = addUserComment(st, postId2, parent, nick, body4, dateNow(chat));
+      return writeGnet(withVars(chat, { [ORIGIN_KEY]: JSON.stringify({ post: postId2, comment: index2 }) }), st);
+    });
+    gnet.compose = null;
+    gnet.draft = "";
+    gnet.attach = [];
+    if (!saved) return env2.refresh();
+    return run2({ ...ctx2, chat: saved }, env2, "댓글 반응을 기다리는 중이에요.", async () => {
+      const st = readGnet(saved);
+      const s4 = gnetSettings(saved.scriptstate);
+      const target = findPost(st, postId2);
+      const plan = incomingPlan(saved, st, s4, nick, Math.random, { post: target, commentIndex: index2 });
+      let value;
+      let prompt;
+      try {
+        prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => commentPrompt(source2(ctx2, saved), st, postId2, index2, body4, plan, nick, names3(ctx2)));
+        value = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseJsonPayload(r)), retry(saved))).value;
+      } catch (error) {
+        throw new GnetError(`댓글은 저장했어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
+      }
+      const snapshot2 = postKey(target);
+      let note = "";
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        const p = findPost(cur, postId2);
+        if (!p || postKey(p) !== snapshot2) {
+          note = "생성하는 동안 글이 바뀌어서 답글을 적용하지 않았어요. 내 댓글은 저장돼 있어요.";
+          return null;
+        }
+        const got = acceptComments(value.comments, p.comments, { postId: postId2, replyTo: index2, total: prompt.total, supplied: prompt.supplied }, nick);
+        pushComments(p, got.comments, dateNow(chat));
+        const [, skipped2] = applyActivity(cur, value.activity, prompt.activity.snapshots, nick, dateNow(chat));
+        const inc = saveIncoming(chat, cur, value.incoming, plan, p);
+        note = got.comments.length ? "" : "등록했어요. 추가 답글은 없어요.";
+        if (got.dropped) note += ` 형식이 맞지 않는 답글 ${got.dropped}개는 뺐어요.`;
+        if (skipped2) note += ` 다른 글 활동 ${skipped2}건은 형식이 맞지 않아 뺐어요.`;
+        if (inc.note) note += ` ${inc.note}`;
+        return writeGnet(withVars(chat, inc.vars), cur, { ack: viewing() });
+      });
+      return note.trim();
+    });
+  }
+  async function sendDm(ctx2, env2, nick, body4, src) {
+    const key2 = chatKey2(ctx2);
+    if (jobs2.has(key2)) {
+      gnet.notice = `${jobs2.get(key2)} 끝난 뒤 다시 눌러 주세요.`;
+      return env2.render();
+    }
+    const me = userNick(ctx2.chat.scriptstate);
+    if (nick === me) {
+      gnet.notice = "나에게는 쪽지를 보낼 수 없어요.";
+      return env2.render();
+    }
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      addOutgoingDm(st, nick, body4, dateNow(chat), src);
+      return writeGnet(chat, st);
+    });
+    const before = { draft: gnet.draft, compose: gnet.compose, attach: gnet.attach, to: gnet.to };
+    gnet.compose = null;
+    gnet.draft = "";
+    gnet.attach = [];
+    gnet.to = "";
+    gnet.sub = "dm";
+    gnet.openDm = nick;
+    if (!saved) return env2.refresh();
+    return run2({ ...ctx2, chat: saved }, env2, `${nick}의 답장을 기다리는 중이에요.`, async () => {
+      const st = readGnet(saved);
+      const s4 = gnetSettings(saved.scriptstate);
+      let reply;
+      try {
+        const prompt = fitPrompt(budgetFor(saved.scriptstate, "gn"), () => dmPrompt(source2(ctx2, saved), st, nick, body4, me, names3(ctx2)));
+        reply = (await generate(prompt.messages, s4.model, (r) => withRaw(r, () => parseDmBody(r)), { ...retry(saved), fix: (raw, reason) => retryMessages(prompt, raw, reason) })).value;
+      } catch (error) {
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const cur = readGnet(chat);
+          let i = cur.dms.length - 1;
+          while (i >= 0 && !(cur.dms[i].nick === nick && cur.dms[i].side === "me")) i--;
+          if (i < 0) return null;
+          cur.dms.splice(i, 1);
+          return writeGnet(chat, cur);
+        }).catch(() => null);
+        if (!gnet.draft && !gnet.attach.length) Object.assign(gnet, before);
+        throw new GnetError(`쪽지를 보내지 못했어요. 쓴 내용은 입력칸에 돌려놨어요. ${error instanceof Error ? error.message : String(error)}`, error.raw ?? "");
+      }
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        const cur = readGnet(chat);
+        cur.dms.push({ nick, side: "npc", body: reply, unread: true, date: dateNow(chat) });
+        return writeGnet(chat, cur, { ack: viewing() });
+      });
+      return "";
+    });
+  }
+  async function mutate2(ctx2, env2, f, vars = {}, reconcile = true) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+      const st = readGnet(chat);
+      if (f(st, chat) === false) return null;
+      return writeGnet(withVars(chat, vars), st, { reconcile });
+    });
+    await env2.refresh();
+  }
+  async function setVar(ctx2, env2, key2, value) {
+    await setVars2(ctx2, env2, { [key2]: value });
+  }
+  async function setVars2(ctx2, env2, vars) {
+    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, vars));
+    await env2.refresh();
+  }
+  var MODE_PREV = "$gn_mode_prev";
+  function seg2(key2, cur, items) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="gn-cfg" data-value="${key2}=${v}" aria-pressed="${cur === v}">${label}</button>`).join("")}</div>`;
+  }
+  var body2 = (text) => attachBody(text, true);
+  function time(date) {
+    return /(\d\d:\d\d)/.exec(date)?.[1] ?? "";
+  }
+  var tool2 = (action, icon2, label, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
+  function paneHead2(title2, sub, right = "", back = true) {
+    return `<header class="ph-room-head">${back ? `<button class="ph-tool ph-back" data-action="gn-back" aria-label="뒤로">${ICONS.back}</button>` : ""}<div class="ph-room-title"><b>${title2}</b>${sub ? `<small>${sub}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+  }
+  var narrow = () => matchMedia("(max-width: 760px)").matches;
+  function paneKind(st, mobile = narrow()) {
+    if (gnet.settings) return "settings";
+    const c = gnet.compose;
+    if (c && (c.kind === "post" || c.kind === "newdm" || c.kind === "dm" && !st.dms.some((d) => d.nick === c.nick))) return "compose";
+    if (mobile) return null;
+    if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) return "post";
+    if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) return "dm";
+    return null;
+  }
+  function inlineComposer(st, busy5) {
+    const c = gnet.compose;
+    if (c && c.kind !== "comment" && c.kind !== "dm") return "";
+    if (gnet.sub === "board" && gnet.open !== null && findPost(st, gnet.open)) {
+      if (c?.kind === "comment" && c.post === gnet.open && c.parent > 0) return "";
+      return composer(busy5, "댓글 입력");
+    }
+    if (gnet.sub === "dm" && gnet.openDm && st.dms.some((d) => d.nick === gnet.openDm)) {
+      const ph = c?.kind === "dm" && c.nick === gnet.openDm && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+      return composer(busy5, ph);
+    }
+    return "";
+  }
+  function composer(busy5, placeholder, chip3 = "") {
+    return `<div class="ph-composer gn-composer">
+    ${chip3}
+    ${attachEditor("gn", gnet.attach, GN_KINDS, busy5, "", gnet.attachMenu)}
+    <div class="ph-compose">
+      <button class="ph-tool ph-plus${gnet.attachMenu ? " on" : ""}" data-action="gn-att-menu" aria-label="첨부" aria-expanded="${gnet.attachMenu}" title="첨부">${ICONS.plus}</button>
+      <textarea class="ph-input" data-input="gn-draft" rows="1" placeholder="${esc7(placeholder)}" ${busy5 ? "disabled" : ""}>${esc7(gnet.draft)}</textarea>
+      <button class="ph-send" data-action="gn-send" aria-label="등록" title="등록" ${busy5 ? "disabled" : ""}>${ICONS.send}</button>
+      <button class="ph-tool ph-back2" data-action="gn-back" aria-label="목록으로" title="목록으로">${ICONS.back}</button>
+    </div>
+  </div>`;
+  }
+  function composeView(c, busy5) {
+    const post = c.kind === "post";
+    const to = c.kind === "newdm" ? `<input class="gx-search" data-input="gn-to" placeholder="받는 사람 닉네임" value="${esc7(gnet.to)}" aria-label="받는 사람">` : c.kind === "dm" ? `<p class="gn-to">받는 사람 <b>${esc7(c.nick)}</b></p>` : "";
+    const ph = post ? "올릴 글이나 쓰고 싶은 내용 (제목과 본문은 다듬어서 올려요)" : gnet.attach.length ? "함께 보낼 글 (선택)" : "쪽지 내용";
+    return `<div class="ph-form gn-cpane">${paneHead2(post ? "새 글" : "새 쪽지", c.kind === "dm" ? esc7(c.label) : "")}
+    <div class="ph-form-body">${to}
+      <textarea class="gx-search gn-text" data-input="gn-draft" rows="${post ? 8 : 5}" placeholder="${esc7(ph)}" aria-label="내용">${esc7(gnet.draft)}</textarea>
+      ${attachEditor("gn", gnet.attach, GN_KINDS, busy5)}
+    </div>
+    <div class="ph-form-foot"><button class="gx-start" data-action="gn-send" ${busy5 ? "disabled" : ""}>${post ? "올리기" : "보내기"}</button></div></div>`;
+  }
+  function replyBox(label, busy5, depth) {
+    const chip3 = `<div class="gn-replyto"><span>${esc7(label)}</span><button class="ph-tool sm" data-action="gn-cancel" aria-label="답글 취소" title="취소">${ICONS.close}</button></div>`;
+    return `<li class="gn-c-compose" style="--gn-depth:${Math.min(depth, 3)}">${composer(busy5, "답글 입력", chip3)}</li>`;
+  }
+  function commentTree(p, busy5) {
+    const kids = /* @__PURE__ */ new Map();
+    p.comments.forEach((c, i) => {
+      const parent = c.parent > 0 && c.parent <= p.comments.length && c.parent !== i + 1 ? c.parent : 0;
+      kids.set(parent, [...kids.get(parent) ?? [], i + 1]);
+    });
+    const out = [];
+    const seen2 = /* @__PURE__ */ new Set();
+    const target = gnet.compose?.kind === "comment" && gnet.compose.post === p.id ? gnet.compose.parent : 0;
+    const walk = (n, depth) => {
+      for (const k of kids.get(n) ?? []) {
+        if (seen2.has(k)) continue;
+        seen2.add(k);
+        const c = p.comments[k - 1];
+        const confirm2 = gnet.confirm === `c:${p.id}:${k}`;
+        const author = c.mine ? `<b class="gn-me">${esc7(c.nick)}</b>` : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:${k}" title="쪽지 보내기">${esc7(c.nick)}</button>`;
+        const del = c.mine ? confirm2 ? `<button class="gx-mini danger" data-action="gn-del-comment" data-value="${p.id}:${k}">정말 삭제</button>` : `<button class="ph-tool sm gn-cdel" data-action="gn-del-comment" data-value="${p.id}:${k}" aria-label="댓글 삭제" title="삭제">${ICONS.trash}</button>` : "";
+        out.push(`<li class="gn-c${depth ? " re" : ""}${c.unread ? " unread" : ""}${target === k ? " target" : ""}" style="--gn-depth:${Math.min(depth, 3)}">
+        <div class="gn-c-who">${depth ? '<span class="gn-re" aria-hidden="true">↳</span>' : ""}${author}${c.unread ? '<span class="gn-dot" aria-label="새 답글"></span>' : ""}</div>
+        <div class="gn-c-body">${body2(c.body)}</div>
+        <div class="gn-c-act">${commentClock(p, c)}<button class="gn-reply" data-action="gn-reply" data-value="${p.id}:${k}">답글</button>${del}</div></li>`);
+        if (target === k && gnet.compose?.kind === "comment") out.push(replyBox(gnet.compose.label, busy5, depth + 1));
+        walk(k, depth + 1);
+      }
+    };
+    walk(0, 0);
+    return out.join("");
+  }
+  function commentClock(p, c) {
+    if (!c.time) return "";
+    const same = c.time.slice(0, 10) === String(p.date).slice(0, 10);
+    return `<time class="gn-c-time">${esc7(same ? hhmm(c.time) : `${c.time.slice(5, 10)} ${hhmm(c.time)}`)}</time>`;
+  }
+  function postView(p, busy5, inline = false) {
+    const c = gnet.compose;
+    const reply = c?.kind === "comment" && c.post === p.id && c.parent > 0 ? c : null;
+    const confirm2 = gnet.confirm === `p:${p.id}`;
+    const right = p.mine ? confirm2 ? `<button class="gx-mini danger" data-action="gn-del-post" data-value="${p.id}">정말 삭제</button>` : tool2("gn-del-post", ICONS.trash, "글 삭제", `data-value="${p.id}"`) : "";
+    const again = tool2("gn-post-refresh", ICONS.refresh, "이 글 새로고침", `data-value="${p.id}" ${busy5 ? "disabled" : ""}`);
+    const who = p.mine ? "" : `<button class="gn-nick" data-action="gn-dm-from" data-value="${p.id}:0" title="쪽지 보내기">${esc7(p.nick)}</button>`;
+    const head = inline ? "" : `<header class="gn-post-head"><h2 class="gn-post-title">${esc7(p.title)}</h2>
+          <div class="gn-post-meta"><span class="gn-post-who">${p.mine ? `<b class="gn-me">${esc7(p.nick)}</b>` : who}</span>
+            <span>${esc7(p.date)}</span><span class="gn-post-stat"><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span><span>댓글 ${p.comments.length}</span></span></div></header>`;
+    const tail = inline ? `<span class="gn-chead-act">${again}${p.mine ? right : `<span class="gn-chead-dm">${ICONS.mail}${who}</span>`}</span>` : "";
+    return `<div class="${inline ? "gn-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2("게시판", `#${p.id}`, again + right)}
+    <div class="gn-doc">
+      <article class="gn-post">${head}
+        <div class="gn-post-body">${body2(p.body)}</div>
+      </article>
+      <section class="gn-csec"><div class="gn-chead"><h3 class="gn-ccount">전체 댓글 <b>${p.comments.length}</b>개</h3>${tail}</div>
+        ${p.comments.length ? `<ul class="gn-comments">${commentTree(p, busy5)}</ul>` : '<p class="gn-cnone">아직 댓글이 없어요.</p>'}</section>
+    </div>
+    ${inline || reply ? "" : composer(busy5, "댓글 입력")}
+  </div>`;
+  }
+  function dmPane(st, nick, busy5, inline = false) {
+    const t = dmThreads(st).find((x) => x.nick === nick);
+    if (!t) return "";
+    const confirm2 = gnet.confirm === `d:${nick}`;
+    const right = confirm2 ? `<button class="gx-mini danger" data-action="gn-del-thread" data-value="${esc7(nick)}">정말 삭제</button>` : tool2("gn-del-thread", ICONS.trash, "쪽지 삭제", `data-value="${esc7(nick)}"`);
+    const src = st.sources[nick];
+    const c = gnet.compose;
+    const ph = c?.kind === "dm" && c.nick === nick && c.source ? `「${c.source.title}」 보고 보내는 쪽지` : "쪽지 입력";
+    return `<div class="${inline ? "gn-inline gn-dm-inline" : "ph-room gn-pane"}">${inline ? "" : paneHead2(esc7(nick), `${t.rows.length}통`, right)}
+    <div class="ph-log">${src ? `<div class="ph-sys">처음 이어진 글 「${esc7(src.title)}」</div>` : ""}
+      ${t.rows.map((d, i) => {
+      const first = i === 0 || t.rows[i - 1].side !== d.side;
+      return `<div class="ph-msg ${d.side === "me" ? "me" : "npc"}${first ? " first" : ""}"><div class="ph-msg-col"><div class="ph-bubble">${body2(d.body)}</div>${d.date ? `<small class="gn-dm-t">${esc7(d.date)}</small>` : ""}</div></div>`;
+    }).join("")}
+    </div>
+    ${inline ? "" : composer(busy5, ph)}
+  </div>`;
+  }
+  function boardList(st, busy5, mobile) {
+    if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
+    return `<ul class="ph-list gn-list">${st.posts.map((p) => {
+      const on2 = gnet.open === p.id && !gnet.settings;
+      return `<li class="gn-row${on2 ? " on" : ""}${p.mine ? " mine" : ""}"><button class="gn-row-main" data-action="gn-open" data-value="${p.id}" aria-pressed="${on2}">
+        <span class="gn-title"><b>${esc7(p.title)}</b>${p.comments.length ? `<em>${p.comments.length}</em>` : ""}${postUnread(p) ? '<span class="gn-dot" aria-label="새 댓글"></span>' : ""}</span>
+        <span class="gn-row-meta"><span class="gn-row-nick">${esc7(p.nick)}</span><span>${esc7(time(p.date))}</span><span>조회 ${p.views.toLocaleString()}</span><span>추천 ${p.votes.toLocaleString()}</span></span>
+      </button>${mobile && on2 && !gnet.compose?.kind.match(/post|newdm/) ? postView(p, busy5, true) : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  function dmList(st, busy5, mobile) {
+    const threads = dmThreads(st);
+    if (!threads.length) return '<div class="ph-blank"><p>주고받은 쪽지가 없어요.<br>게시판에서 닉네임을 누르거나 쪽지를 눌러 보내 보세요.</p></div>';
+    return `<ul class="ph-list gn-list">${threads.map((t) => {
+      const on2 = gnet.openDm === t.nick && !gnet.settings;
+      const last2 = t.rows[t.rows.length - 1];
+      const confirm2 = gnet.confirm === `d:${t.nick}`;
+      const del = confirm2 ? `<button class="gx-mini danger ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}">정말 삭제</button>` : `<button class="ph-tool sm ph-rdel" data-action="gn-del-thread" data-value="${esc7(t.nick)}" aria-label="${esc7(t.nick)} 쪽지 삭제" title="삭제">${ICONS.trash}</button>`;
+      return `<li class="ph-row"><button class="ph-main gn-dmrow${on2 ? " on" : ""}" data-action="gn-open-dm" data-value="${esc7(t.nick)}" aria-pressed="${on2}">
+        <span class="ph-avatar gn-ava">${ICONS.mail}</span>
+        <span class="ph-who"><span class="ph-who-top"><b>${esc7(t.nick)}</b>${t.lastDate ? `<small class="ph-time">${esc7(time(t.lastDate) || t.lastDate)}</small>` : ""}</span>
+        <span class="ph-who-bot"><small>${last2.side === "me" ? "나: " : ""}${esc7([...previewText(last2.body)].slice(0, 60).join(""))}</small>${t.unread ? `<span class="ph-badge">${t.unread}</span>` : ""}</span></span></button>${del}${mobile && on2 && gnet.compose?.kind !== "newdm" ? dmPane(st, t.nick, busy5, true) : ""}</li>`;
+    }).join("")}</ul>`;
+  }
+  var row3 = (label, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  var group2 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
+  function settingsView2(ctx2, back = true) {
+    const v = (k) => String(ctx2.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
+    const text = (k, ph) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc7(v(k) === "-" ? "" : v(k))}" placeholder="${esc7(ph)}">`;
+    const keep = gnetRetention(ctx2.chat.scriptstate);
+    const on2 = v("mode") !== "0";
+    const rows2 = on2 ? `${group2("괴담넷", [
+      row3("괴담넷 사용", seg2("power", "1", [["1", "켜기"], ["0", "끄기"]])),
+      row3("모델", seg2("mode", v("mode") === "1" ? "1" : "2", [["1", "메인"], ["2", "보조"]])),
+      row3("새로고침", seg2("lazy", ["0", "open"].includes(v("lazy")) ? v("lazy") : "1", [["1", "수동"], ["open", "창을 열 때"], ["0", "매 턴"]]), LAZY_HINT[v("lazy")] ?? LAZY_HINT["1"]),
+      row3("채팅에 반영", seg2("context", v("context") === "1" ? "1" : "0", [["0", "포함"], ["1", "빼기"]]), "지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요"),
+      row3("다양성 강화", seg2("sampling", v("sampling") === "1" ? "1" : "0", [["0", "끄기"], ["1", "켜기"]]))
+    ].join(""))}
+      ${group2("게시판", [
+      row3("게시글 수", seg2("quantity", v("quantity"), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+      row3("사생활", seg2("privacy", v("privacy"), [["0", "이목집중"], ["1", "자율"], ["2", "약보호"], ["3", "강보호"], ["4", "언급금지"]])),
+      row3("주제", text("subject", "비우면 세계관에 맞는 다양한 주제")),
+      row3("분위기·말투", text("mood", "비우면 익명 커뮤니티 말투")),
+      row3("보호 대상", text("protagonist", "비우면 주인공")),
+      row3("새로고침 시 내 글", seg2("keepown", v("keepown"), [["1", "유지"], ["0", "교체"]])),
+      row3("내 댓글 있는 글", seg2("keepreplied", v("keepreplied"), [["1", "유지"], ["0", "교체"]]))
+    ].join(""))}
+      ${group2("쪽지", [
+      row3("선쪽지 받기", seg2("incoming", v("incoming") === "0" ? "0" : "1", [["1", "받기"], ["0", "안 받기"]])),
+      row3("쪽지 자동 정리", `<span class="ph-inline">${seg2("storage", keep.auto ? "1" : "0", [["1", "켜기"], ["0", "끄기"]])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ""}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`)
+    ].join(""))}
+      ${advancedBox("gn", ctx2.chat.scriptstate)}` : group2("괴담넷", row3("괴담넷 사용", seg2("power", "0", [["1", "켜기"], ["0", "끄기"]]), "꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요"));
+    return `<div class="ph-form">${paneHead2("괴담넷 설정", "", defaultsButtons("gn"), back)}${defaultsConfirm("gn")}<div class="ph-form-body ps">${rows2}</div></div>`;
+  }
+  function paneHtml2(ctx2, st, kind, busy5) {
+    if (kind === "settings") return settingsView2(ctx2);
+    if (kind === "compose" && gnet.compose) return composeView(gnet.compose, busy5);
+    if (kind === "post") return postView(findPost(st, gnet.open), busy5);
+    if (kind === "dm") return dmPane(st, gnet.openDm, busy5);
+    return `<div class="ph-empty"><span class="ph-empty-ico">${ICONS.gnet}</span><b>괴담넷</b><p>왼쪽에서 글이나 쪽지를 고르세요.</p></div>`;
+  }
+  function gnetTab(ctx2, env2) {
+    if (env2) liveEnv2 = env2;
+    if (!gnetSettings(ctx2.chat.scriptstate).enabled) {
+      const off = toast("gn", gnet.notice, (t) => {
+        if (gnet.notice === t) gnet.notice = "";
+      });
+      return `<main class="gx-body gn gn-off">${settingsView2(ctx2, false)}${off}</main>`;
+    }
+    const st = readGnet(ctx2.chat);
+    const me = userNick(ctx2.chat.scriptstate);
+    const job = jobs2.get(chatKey2(ctx2));
+    const busy5 = !!job;
+    const unreadDm = st.dms.filter((d) => d.unread).length;
+    const mobile = narrow();
+    const kind = paneKind(st, mobile);
+    const nick = gnet.editNick ? `<div class="gn-nickform"><input class="gx-search" name="gn-nick" data-enter="gn-nick-save" value="${esc7(me === "익명" && !ctx2.chat.scriptstate?.[GN_NICK] ? "" : me)}" placeholder="내 닉네임 (비우면 익명)" maxlength="36" aria-label="내 닉네임"><button class="gx-mini" data-action="gn-nick-save" data-take="gn-nick">저장</button></div>` : "";
+    const fail3 = gnet.failure ? `<details class="nw-fail"><summary>최근 실패 원문</summary><p>${esc7(gnet.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc7(gnet.failure.raw)}</textarea></details>` : "";
+    const status = job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>${esc7(job)} 창을 닫아도 계속돼요.</div>` : "";
+    const note = toast("gn", gnet.notice, (t) => {
+      if (gnet.notice === t) gnet.notice = "";
+    });
+    const tools = [
+      tool2("gn-refresh", ICONS.refresh, "게시판 새로고침", busy5 ? "disabled" : "", "새로고침"),
+      tool2("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기"),
+      tool2("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지"),
+      tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임"),
+      tool2("gn-settings", ICONS.settings, "괴담넷 설정", gnet.settings ? 'aria-pressed="true"' : "", "설정")
+    ].join("");
+    const subBtn = (id, label, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;
+    return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
+    <section class="ph-side" aria-label="괴담넷 목록">
+      <div class="ph-side-head">
+        <div class="ph-subs">${subBtn("board", "게시판", boardUnread(st) ? '<span class="gn-dot"></span>' : "")}${subBtn("dm", "쪽지함", unreadDm ? ` <b class="gn-count">${unreadDm}</b>` : dmUnread(st) ? '<span class="gn-dot"></span>' : "")}<span class="gn-mynick" title="내 닉네임"><small>내 닉네임</small><b>${esc7(me)}</b></span></div>
+      </div>
+      ${kind ? "" : status}
+      <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy5, mobile) : dmList(st, busy5, mobile)}</div>
+      ${mobile && !kind ? inlineComposer(st, busy5) : ""}
+      ${fail3}
+      ${drawerHtml(tools, nick)}
+    </section>
+    <section class="ph-pane">${kind ? status : ""}${paneHtml2(ctx2, st, kind, busy5)}</section>
+    ${note}
+  </main>`;
+  }
+  var AUTO_LAST = "$gn_auto_last";
+  var quietEnv2 = { render: () => {
+  }, refresh: async () => {
+  }, current: () => null };
+  var liveEnv2 = null;
+  async function currentChat(ctx2) {
+    try {
+      return await risuai.getChatFromIndex(ctx2.charIndex, ctx2.chatIndex);
+    } catch {
+      return null;
+    }
+  }
+  async function autoRefreshGnet(ctx2, messageIndex, open3 = false, joint) {
+    const s4 = gnetSettings(ctx2.chat.scriptstate);
+    if (!s4.enabled || !(open3 ? s4.autoOpen : s4.auto) || jobs2.has(chatKey2(ctx2))) return;
+    const data = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
+    if (!data.trim()) return;
+    let hash = 7;
+    for (let i = 0; i < data.length; i++) hash = (hash * 131 + data.charCodeAt(i)) % 2147483647;
+    const stamp = `${messageIndex}:${hash}`;
+    if (String(ctx2.chat.scriptstate?.[AUTO_LAST] ?? "") === stamp) return;
+    const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => withVars(chat, { [AUTO_LAST]: stamp }));
+    if (!saved) return;
+    const env2 = liveEnv2 ?? quietEnv2;
+    const showing = env2.current();
+    const target = showing && chatKey2(showing) === chatKey2(ctx2) ? env2 : { ...quietEnv2 };
+    const notice3 = gnet.notice;
+    await refreshBoard({ ...ctx2, chat: saved }, target, true, joint);
+    if (target !== env2) gnet.notice = notice3;
+  }
+  function gnetOpenCheck(ctx2, env2) {
+    liveEnv2 = env2;
+    if (!gnetSettings(ctx2.chat.scriptstate).autoOpen) return;
+    const at = lastReply(ctx2.chat);
+    if (at < 0) return;
+    void autoRefreshGnet(ctx2, at, true).catch((error) => console.log(`[goei] 괴담넷 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`));
+  }
+  var LAZY_HINT = {
+    "1": "새로고침 버튼을 누를 때만 불러요",
+    open: "채팅이 진행된 뒤 괴담넷을 열면 한 번 불러요",
+    "0": "채팅 응답이 끝날 때마다 모델을 한 번 더 불러요"
+  };
+  async function handleGnet(action, value, ctx2, env2) {
+    liveEnv2 = env2;
+    const v = value ?? "";
+    const [a, b] = v.split(":").map(Number);
+    const st = () => readGnet(ctx2.chat);
+    if (!action.startsWith("gn-")) return false;
+    if (action !== "gn-del-post" && action !== "gn-del-comment" && action !== "gn-del-thread") gnet.confirm = null;
+    if (action.startsWith("gn-def-")) {
+      try {
+        const msg = await defaultsAction("gn", action, v, ctx2, env2.refresh);
+        if (msg) gnet.notice = msg;
+      } catch (error) {
+        gnet.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      env2.render();
+      return true;
+    }
+    switch (action) {
+      case "gn-sub":
+        gnet.sub = v === "dm" ? "dm" : "board";
+        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+        break;
+      case "gn-back":
+        if (gnet.settings) gnet.settings = false;
+        else if (gnet.compose && (gnet.compose.kind === "post" || gnet.compose.kind === "newdm" || gnet.compose.kind === "dm" && !st().dms.some((d) => d.nick === gnet.compose.nick))) gnet.compose = null;
+        else if (gnet.sub === "board") gnet.open = null;
+        else gnet.openDm = null;
+        if (gnet.compose?.kind === "comment" || gnet.compose?.kind === "dm") gnet.compose = null;
+        gnet.attachMenu = false;
+        break;
+      case "gn-settings":
+        gnet.settings = !gnet.settings;
+        break;
+      case "gn-att-menu":
+        gnet.attachMenu = !gnet.attachMenu;
+        break;
+      case "gn-open": {
+        gnet.open = gnet.open === a && !gnet.settings && !(gnet.compose && gnet.compose.kind !== "comment") ? null : a;
+        gnet.settings = false;
+        if (gnet.compose && gnet.compose.kind !== "post") gnet.compose = null;
+        if (gnet.compose?.kind === "post") gnet.compose = null;
+        const p = gnet.open !== null ? findPost(st(), gnet.open) : void 0;
+        if (p && postUnread(p)) {
+          const id = p.id;
+          await mutate2(ctx2, env2, (s4) => acknowledge(s4, id), {}, false);
+          return true;
+        }
+        break;
+      }
+      case "gn-open-dm": {
+        gnet.openDm = gnet.openDm === v && !gnet.settings && !gnet.compose ? null : v;
+        gnet.settings = false;
+        gnet.compose = null;
+        if (gnet.openDm && st().dms.some((d) => d.nick === v && d.unread)) {
+          await mutate2(ctx2, env2, (s4) => acknowledge(s4, void 0, v), {}, false);
+          return true;
+        }
+        break;
+      }
+      case "gn-refresh":
+        void refreshBoard(ctx2, env2);
+        return true;
+      case "gn-write":
+        gnet.settings = false;
+        gnet.sub = "board";
+        gnet.compose = { kind: "post" };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-newdm":
+        gnet.settings = false;
+        gnet.sub = "dm";
+        gnet.compose = { kind: "newdm" };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-comment": {
+        gnet.compose = { kind: "comment", post: a, parent: 0, label: "댓글" };
+        gnet.attach = [];
+        env2.render();
+        const box = document.querySelector('.gn-composer [data-input="gn-draft"]');
+        box?.scrollIntoView({ block: "center", behavior: "smooth" });
+        box?.focus({ preventScroll: true });
+        return true;
+      }
+      case "gn-reply": {
+        const c = findPost(st(), a)?.comments[b - 1];
+        if (!c) break;
+        gnet.draft = "";
+        gnet.attach = [];
+        if (gnet.compose?.kind === "comment" && gnet.compose.post === a && gnet.compose.parent === b) {
+          gnet.compose = null;
+          break;
+        }
+        gnet.compose = { kind: "comment", post: a, parent: b, label: `${c.nick}에게 답글` };
+        env2.render();
+        const box = document.querySelector('.gn-c-compose [data-input="gn-draft"]');
+        box?.focus({ preventScroll: true });
+        box?.closest(".gn-c-compose")?.scrollIntoView({ block: "nearest" });
+        return true;
+      }
+      case "gn-dm-from": {
+        const p = findPost(st(), a);
+        const contact = p && (b > 0 ? p.comments[b - 1] : p);
+        if (!p || !contact || contact.mine) break;
+        gnet.sub = "dm";
+        gnet.settings = false;
+        gnet.openDm = contact.nick;
+        gnet.compose = { kind: "dm", nick: contact.nick, source: sourceFor(p, b), label: `${contact.nick}에게 쪽지 · 「${p.title}」` };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      }
+      case "gn-dm-reply":
+        gnet.compose = { kind: "dm", nick: v, label: `${v}에게 답장` };
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-cancel":
+        gnet.compose = null;
+        gnet.draft = "";
+        gnet.attach = [];
+        break;
+      case "gn-att-add":
+      case "gn-att-del":
+        attachAction(gnet.attach, action === "gn-att-add" ? "add" : "del", v, GN_KINDS);
+        break;
+      case "gn-send": {
+        const c = gnet.compose ?? (gnet.sub === "board" && gnet.open !== null ? { kind: "comment", post: gnet.open, parent: 0, label: "댓글" } : gnet.sub === "dm" && gnet.openDm ? { kind: "dm", nick: gnet.openDm, label: `${gnet.openDm}에게 답장` } : null);
+        if (!c) break;
+        if (!gnet.draft.trim() && !gnet.attach.length) {
+          gnet.notice = "내용을 입력해 주세요.";
+          break;
+        }
+        const blank5 = emptyAttachment(gnet.attach);
+        if (blank5) {
+          gnet.notice = "첨부 내용을 입력하거나 ✕로 빼 주세요.";
+          break;
+        }
+        const text = composeBody(gnet.attach, gnet.draft);
+        const cap = c.kind === "post" ? LIMITS.post_tokens : c.kind === "comment" ? LIMITS.comment_tokens : LIMITS.dm_tokens;
+        if (tokens(describe(text)) > cap) {
+          gnet.notice = `첨부 내용과 글이 작성 상한(${cap}토큰)을 넘었어요. 조금 줄여 주세요.`;
+          break;
+        }
+        if (c.kind === "post") void writePost(ctx2, env2, text);
+        else if (c.kind === "comment") void writeComment(ctx2, env2, c.post, c.parent, text);
+        else if (c.kind === "dm") void sendDm(ctx2, env2, c.nick, text, c.source);
+        else {
+          const to = gnet.to.trim().slice(0, 80);
+          if (!to) {
+            gnet.notice = "받는 사람 닉네임을 적어 주세요.";
+            break;
+          }
+          void sendDm(ctx2, env2, to, text);
+        }
+        return true;
+      }
+      case "gn-post-refresh":
+        if (findPost(st(), a)) void refreshPost(ctx2, env2, a);
+        break;
+      case "gn-del-post":
+        if (gnet.confirm !== `p:${a}`) {
+          gnet.confirm = `p:${a}`;
+          break;
+        }
+        gnet.confirm = null;
+        gnet.open = null;
+        await mutate2(ctx2, env2, (s4) => deletePost(s4, a));
+        return true;
+      case "gn-del-comment":
+        if (gnet.confirm !== `c:${a}:${b}`) {
+          gnet.confirm = `c:${a}:${b}`;
+          break;
+        }
+        gnet.confirm = null;
+        await mutate2(ctx2, env2, (s4) => deleteComment(s4, a, b));
+        return true;
+      case "gn-del-thread":
+        if (gnet.confirm !== `d:${v}`) {
+          gnet.confirm = `d:${v}`;
+          break;
+        }
+        gnet.confirm = null;
+        gnet.openDm = null;
+        await mutate2(ctx2, env2, (s4) => deleteThread(s4, v));
+        return true;
+      case "gn-nick":
+        gnet.editNick = true;
+        break;
+      case "gn-nick-save":
+        gnet.editNick = false;
+        await setVar(ctx2, env2, GN_NICK, v.trim().slice(0, 36));
+        return true;
+      case "gn-cfg": {
+        const [k, val] = v.split("=");
+        if (k === "power") {
+          const cur = String(ctx2.chat.scriptstate?.[CFG("mode")] ?? GN_DEFAULTS.mode);
+          if (val === "0" && cur !== "0") await setVars2(ctx2, env2, { [CFG("mode")]: "0", [MODE_PREV]: cur === "1" ? "1" : "2" });
+          else if (val === "1" && cur === "0") await setVar(ctx2, env2, CFG("mode"), String(ctx2.chat.scriptstate?.[MODE_PREV] ?? "") === "1" ? "1" : "2");
+          return true;
+        }
+        if (k === "storage") {
+          await setVar(ctx2, env2, GN_STORAGE_AUTO, val === "0" ? "0" : "1");
+          return true;
+        }
+        if (k in GN_DEFAULTS) await setVar(ctx2, env2, CFG(k), val);
+        return true;
+      }
+      case "gn-keep": {
+        const n = Math.floor(Number(v));
+        if (Number.isFinite(n) && n >= 1 && n <= STORAGE_MAX) await setVar(ctx2, env2, GN_STORAGE_LIMIT, String(n));
+        else env2.render();
+        return true;
+      }
+      case "gn-text": {
+        const [k, ...rest] = v.split("=");
+        if (["subject", "mood", "protagonist"].includes(k)) await setVar(ctx2, env2, CFG(k), rest.join("=").trim());
+        return true;
+      }
+      default:
+        return false;
+    }
+    env2.render();
+    return true;
+  }
+
+  // src/host/joint.ts
+  var INSTRUCTION = `Execute two independent automatic tasks in ONE response. Return exactly one JSON object {"gnet": OBJECT, "phone": OBJECT}, without fences or commentary. Each value is the complete JSON object required by that task, not an encoded JSON string. Write Korean literally in UTF-8; do not transliterate it into Unicode escape sequences. Escape only JSON quotation marks, backslashes and control characters. A task may return null if it cannot produce a valid result; do not substitute the other task. Follow each task's supplied messages and output contract only within its own result. This outer envelope overrides standalone output-only restrictions. Resolve contentParts by concatenating text or referenced sharedReferences text in order, without adding separators. Shared references are available to a task ONLY where its own message references them. Never use phone contacts, private messages, notices, invitations, relationship evidence or phone-only narrator data to create GNet public posts or private messages. Never let either task infer private facts from the other task's inputs or outputs. Preserve each task's permissions, chance decisions, cooldown eligibility, source boundaries and ownership. Finish both objects compactly: preserve GNet board quantity and topic-dependent discussion; shorten prose instead of making all threads silent. Phone activity counts and text lengths remain ceilings, not targets.`;
+  function combinedPrompts(gnet2, phone3) {
+    const chunks = (t) => t.match(/[\s\S]*?(?:\n\n|$)/g)?.filter(Boolean) ?? [t];
+    const tasks = { gnet: gnet2.map((m) => ({ role: m.role, parts: chunks(m.content) })), phone: phone3.map((m) => ({ role: m.role, parts: chunks(m.content) })) };
+    const seen2 = { gnet: /* @__PURE__ */ new Set(), phone: /* @__PURE__ */ new Set() };
+    for (const k of ["gnet", "phone"]) for (const m of tasks[k]) for (const p of m.parts) if (p.length >= 256) seen2[k].add(p);
+    const shared = [];
+    const ids = /* @__PURE__ */ new Map();
+    const out = { gnet: [], phone: [] };
+    for (const k of ["gnet", "phone"]) {
+      for (const m of tasks[k]) {
+        let referenced = false;
+        const parts = m.parts.map((p) => {
+          if (!(seen2.gnet.has(p) && seen2.phone.has(p))) return { text: p };
+          let id = ids.get(p);
+          if (!id) {
+            id = `R${shared.length + 1}`;
+            ids.set(p, id);
+            shared.push({ id, text: p });
+          }
+          referenced = true;
+          return { ref: id };
+        });
+        out[k].push(referenced ? { role: m.role, contentParts: parts } : { role: m.role, content: m.parts.join("") });
+      }
+    }
+    return [{ role: "system", content: INSTRUCTION }, { role: "user", content: JSON.stringify({ sharedReferences: shared, gnet: out.gnet, phone: out.phone }) }];
+  }
+  function splitCombined(raw) {
+    let s4 = raw.replace(/^﻿/, "").trim();
+    const fence = /^```(?:json)?\s*\n([\s\S]*?)\n?```$/i.exec(s4);
+    if (fence) s4 = fence[1].trim();
+    let i = 0;
+    const n = s4.length;
+    const fail3 = (why) => {
+      throw new Error(`통합 응답 형식이 맞지 않아요: ${why}`);
+    };
+    const space = () => {
+      while (i < n && /\s/.test(s4[i])) i++;
+    };
+    const quoted = () => {
+      if (s4[i] !== '"') fail3("문자열 경계");
+      const first = i++;
+      while (i < n) {
+        if (s4[i] === "\\") i += 2;
+        else if (s4[i++] === '"') return s4.slice(first, i);
+      }
+      return fail3("끝나지 않은 문자열");
+    };
+    if (s4[i++] !== "{") fail3("JSON 객체가 없음");
+    const parts = {};
+    for (; ; ) {
+      space();
+      const key2 = JSON.parse(quoted());
+      if (key2 !== "gnet" && key2 !== "phone" || key2 in parts) fail3(`알 수 없는 칸 ${key2}`);
+      space();
+      if (s4[i++] !== ":") fail3("구분자");
+      space();
+      const first = i;
+      if (s4.startsWith("null", i)) {
+        i += 4;
+        parts[key2] = null;
+      } else {
+        if (s4[i] !== "{") fail3("결과가 객체가 아님");
+        const stack = ["}"];
+        i++;
+        while (i < n && stack.length) {
+          const c2 = s4[i];
+          if (c2 === '"') quoted();
+          else if (c2 === "{" || c2 === "[") stack.push(c2 === "{" ? "}" : "]"), i++;
+          else if (c2 === "}" || c2 === "]") {
+            if (c2 !== stack.pop()) fail3("괄호");
+            i++;
+          } else i++;
+        }
+        if (stack.length) fail3("중간에 잘림");
+        parts[key2] = s4.slice(first, i);
+      }
+      space();
+      const c = s4[i++];
+      if (c === "}") break;
+      if (c !== ",") fail3("결과 구분자");
+    }
+    space();
+    if (i < n || !("gnet" in parts) || !("phone" in parts)) fail3("결과가 빠졌거나 뒤에 다른 글이 붙음");
+    return parts;
+  }
+  var Joint = class {
+    constructor(model2) {
+      this.model = model2;
+      this.left = /* @__PURE__ */ new Set(["gnet", "phone"]);
+    }
+    waits = /* @__PURE__ */ new Map();
+    left;
+    fired = false;
+    /** 이 작업의 첫 요청. 다른 작업도 모이면 한 번에 보낸다 */
+    ask(kind, messages) {
+      if (this.fired || !this.left.has(kind) || messages.some((m) => m.images?.length)) {
+        this.done(kind);
+        return runModel(messages, this.model);
+      }
+      return new Promise((resolve, reject) => {
+        this.waits.set(kind, { messages, resolve, reject });
+        this.flush();
+      });
+    }
+    /** 이 작업은 더 묻지 않는다 (모델을 안 부르고 끝났거나 이미 받음) */
+    done(kind) {
+      this.left.delete(kind);
+      this.flush();
+    }
+    flush() {
+      if (this.fired || [...this.left].some((k) => !this.waits.has(k))) return;
+      this.fired = true;
+      const g = this.waits.get("gnet");
+      const p = this.waits.get("phone");
+      if (g && p) void this.both(g, p);
+      else for (const w of this.waits.values()) runModel(w.messages, this.model).then(w.resolve, w.reject);
+    }
+    async both(g, p) {
+      let raw = "";
+      try {
+        raw = await runModel(combinedPrompts(g.messages, p.messages), this.model);
+      } catch (error) {
+        g.reject(error);
+        p.reject(error);
+        return;
+      }
+      let parts;
+      try {
+        parts = splitCombined(raw);
+      } catch (error) {
+        const e = new LlmError(error instanceof Error ? error.message : String(error), raw);
+        g.reject(e);
+        p.reject(e);
+        return;
+      }
+      for (const [k, w] of [["gnet", g], ["phone", p]]) {
+        const part = parts[k];
+        if (part) w.resolve(part);
+        else runModel(w.messages, this.model).then(w.resolve, w.reject);
+      }
+    }
+  };
+
+  // src/core/asset.ts
+  var AssetError = class extends Error {
+  };
+  var IMAGE_BOOK = "Image tag";
+  var ASSET_NOTE = "$goei_asset_note";
+  var fail2 = (field4, why) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field4}): ${why}`);
+  function readImageData(lore) {
+    const books = lore.filter((e) => e.comment === IMAGE_BOOK && typeof e.content === "string" && e.content.trim() && e.content.trim() !== "[]");
+    if (!books.length) throw fail2("읽기", "로어북이 없거나 비어 있습니다. 에셋 모듈이 켜져 있는지 확인하세요.");
+    let src;
+    try {
+      src = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, "").trim());
+    } catch {
+      throw fail2("JSON", "JSON 구문 또는 같은 이름의 중복 로어북을 확인하세요.");
+    }
+    if (!src || typeof src !== "object") throw fail2("JSON", "객체가 필요합니다.");
+    const d = { characters: [], keywords: [], keywordSet: /* @__PURE__ */ new Set(), aliases: /* @__PURE__ */ new Map() };
+    const allowed = /* @__PURE__ */ new Set();
+    const alias = (term, target) => {
+      const k = term.toLowerCase();
+      const cur = d.aliases.get(k);
+      d.aliases.set(k, cur !== void 0 && cur !== target ? false : target);
+    };
+    const list4 = (v, field4) => {
+      if (!Array.isArray(v)) throw fail2(field4, "배열이 필요합니다.");
+      return v;
+    };
+    const text = (v, field4) => {
+      if (typeof v !== "string" || !v.trim()) throw fail2(field4, "빈 문자열이 아닌 값이 필요합니다.");
+      return v.trim();
+    };
+    for (const raw of list4(src.characters, "characters")) {
+      const name = text(raw, "characters");
+      if (/[<>"{}_]/.test(name)) throw fail2("characters", `이미지 영문명에 사용할 수 없는 문자입니다: ${name}`);
+      if (!allowed.has(name)) {
+        allowed.add(name);
+        d.characters.push(name);
+      }
+      alias(name, name);
+    }
+    if (!d.characters.length) throw fail2("characters", "출력 대상이 필요합니다.");
+    for (const raw of list4(src.sfw_keywords, "sfw_keywords")) {
+      const k = text(raw, "sfw_keywords");
+      if (!d.keywordSet.has(k)) {
+        d.keywordSet.add(k);
+        d.keywords.push(k);
+      }
+    }
+    if (!d.keywords.length) throw fail2("sfw_keywords", "태그 목록이 필요합니다.");
+    const obj3 = (v, field4) => {
+      if (v === void 0) return {};
+      if (!v || typeof v !== "object" || Array.isArray(v)) throw fail2(field4, "객체가 필요합니다.");
+      return v;
+    };
+    for (const [term, target] of Object.entries(obj3(src.kor_to_eng, "kor_to_eng"))) {
+      if (typeof target !== "string" || !allowed.has(target)) throw fail2("kor_to_eng", `characters에 없는 대상: ${String(target)}`);
+      alias(text(term, "kor_to_eng"), target);
+    }
+    for (const [target, terms] of Object.entries(obj3(src.eng_aliases, "eng_aliases"))) {
+      if (!allowed.has(target)) throw fail2("eng_aliases", `characters에 없는 대상: ${target}`);
+      for (const t of list4(terms, "eng_aliases")) alias(text(t, "eng_aliases"), target);
+    }
+    return d;
+  }
+  function stripImageTags(content) {
+    return content.replace(/\n\s*\n\s*<img\s*=[^>]*>\s*\n\s*\n/g, "\n\n").replace(/<img\s*=[^>]*>\s*/g, "");
+  }
+  function splitNarrative(content) {
+    const cut2 = ["[▣|", "[◎|"].map((p) => content.indexOf(p)).filter((i) => i >= 0);
+    const at = cut2.length ? Math.min(...cut2) : -1;
+    const narrative = at >= 0 ? content.slice(0, at) : content;
+    const trailing = at >= 0 ? content.slice(at) : "";
+    return {
+      narrative: stripImageTags(narrative.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, "").replace(/<!--[\s\S]*?-->/g, "")).trim(),
+      trailing
+    };
+  }
+  function paragraphs(text) {
+    const out = [];
+    let cur = [];
+    for (const line2 of `${text}
+`.split("\n").slice(0, -1)) {
+      if (/^\s*$/.test(line2)) {
+        if (cur.length) out.push(cur.join("\n"));
+        cur = [];
+      } else cur.push(line2);
+    }
+    if (cur.length) out.push(cur.join("\n"));
+    return out;
+  }
+  function activeCharacters(narrative, d) {
+    return d.characters.filter((name) => [...d.aliases].some(([alias, target]) => target === name && termPresent(narrative, alias)));
+  }
+  function assetPrompt(active, paras, d, limit) {
+    const first = active[0] ?? "Lee Ha-neul";
+    const n = String(limit);
+    const aliasLines = active.map((name) => {
+      const names4 = [...d.aliases].filter(([, t]) => t === name).map(([a]) => a).sort();
+      return names4.length ? `- ${name} (${names4.join(", ")})` : "";
+    }).filter(Boolean);
+    const w = [
+      "# Insert <img> tags into a finished narrative.",
+      "",
+      "Output ONLY a JSON array. No text. No explanation. No code fence.",
+      "",
+      "## Format",
+      '[{"line":N,"tag":"<img=\\"Character_keyword\\">"}]',
+      "",
+      "- `line`: 1-based paragraph number from the numbered narrative below. The tag is inserted AFTER that paragraph (the tag represents that paragraph's character).",
+      '- `tag`: full `<img="Name_keyword">` string with Name and keyword from the allowed lists.',
+      "- If no listed character appears in the narrative, output `[]`.",
+      "",
+      "## Rules",
+      "- ONE tag per paragraph maximum. If multiple listed characters appear in the same paragraph, choose the one who is the FOCUS of that paragraph.",
+      "- EVIDENCE-BASED: a character MUST be explicitly mentioned by name (English prefix OR Korean alias) in that paragraph's text to be tagged.",
+      "- FORBIDDEN: tagging characters not present in the narrative. Absence in narrative = NO TAG.",
+      "- MUST tag every visible listed character at least ONCE when they appear and are the focus.",
+      "- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).",
+      "- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).",
+      "- DO NOT tag {{user}}, the narrator, or undefined NPCs.",
+      "- DO NOT invent character names or keywords. Use only the lists below.",
+      "",
+      "## HARD LIMIT (per-character, independent count)",
+      `- Each listed character has their OWN independent counter for tags. The limit is ${n} tag${n === "1" ? "" : "s"} PER character, NOT a total for the whole response.`,
+      `- Character A may receive up to ${n} tag(s). Character B may ALSO receive up to ${n} tag(s). They do not share a budget.`,
+      `- If 3 characters appear and each is the focus of separate paragraphs, you may output up to ${limit * 3} tags total (3 characters × ${n} each).`,
+      "- Per-character priority when over the limit: KEEP the most significant emotion moments, SKIP the rest.",
+      "- This per-character limit is absolute — exceeding it for any single character is a hard error. Under-using it (when more legitimate tags exist for that character) wastes the budget.",
+      "",
+      "## Allowed Character Names (use exactly as written)",
+      active.join(" | "),
+      "",
+      ...aliasLines.length ? ["## Aliases (for presence verification — still use the full English name in tag)", ...aliasLines, ""] : [],
+      "## Allowed Keywords (use exactly as written)",
+      `SFW: ${d.keywords.join(", ")}`,
+      "",
+      "## Examples",
+      "",
+      "### NEGATIVE (do not do this)",
+      "Narrative:",
+      "[1] The room is empty.",
+      "[2] Wind blows through the window.",
+      "",
+      "Wrong output:",
+      `[{"line":1,"tag":"<img=\\"${first}_neutral\\">"}]   <- no listed character present`,
+      "",
+      "Correct output:",
+      "[]",
+      "",
+      "### POSITIVE (do this)",
+      "Narrative:",
+      `[1] ${first} walked into the room with a quiet smile.`,
+      "[2] She glanced at the figure standing by the desk, her expression hardening into something sharper.",
+      "",
+      "Correct output:",
+      `[{"line":1,"tag":"<img=\\"${first}_default\\">"},{"line":2,"tag":"<img=\\"${first}_serious\\">"}]`,
+      "",
+      "## Narrative (numbered by paragraph)",
+      "",
+      paras.map((p, i) => `[${i + 1}] ${p}`).join("\n\n"),
+      "",
+      "# Reminder: Output ONLY the JSON array. No prose. No explanation. If no listed character appears, output []."
+    ];
+    return [{ role: "user", content: w.join("\n") }];
+  }
+  function parsePatches(raw) {
+    const text = raw.replace(/```json/g, "").replace(/```/g, "").trim();
+    const s4 = text.indexOf("[");
+    const e = text.lastIndexOf("]");
+    if (s4 < 0 || e <= s4) return [];
+    let v;
+    try {
+      v = JSON.parse(text.slice(s4, e + 1));
+    } catch {
+      try {
+        v = JSON.parse(text.slice(s4, e + 1).replace(/,\s*([\]}])/g, "$1"));
+      } catch {
+        return [];
+      }
+    }
+    if (!Array.isArray(v)) return [];
+    return v.filter((p) => !!p && typeof p === "object").map((p) => ({ line: Number(p.line), tag: typeof p.tag === "string" ? p.tag : "" }));
+  }
+  function applyPatches(paras, patches, limit, d) {
+    const sorted = [...d.characters].sort((a, b) => b.length - a.length);
+    const inserts = /* @__PURE__ */ new Map();
+    const count2 = /* @__PURE__ */ new Map();
+    for (const p of patches) {
+      const ln = p.line;
+      if (!Number.isInteger(ln) || ln < 1 || ln > paras.length || inserts.has(ln)) continue;
+      const m = /<img\s*=\s*"([^"]+)"/.exec(p.tag) ?? /<img\s*=\s*([^>]+)>/.exec(p.tag);
+      const inner = m?.[1]?.trim();
+      if (!inner) continue;
+      const name = sorted.find((c) => inner.startsWith(`${c}_`));
+      if (!name || !d.keywordSet.has(inner.slice(name.length + 1))) continue;
+      const cur = count2.get(name) ?? 0;
+      if (cur >= limit) continue;
+      inserts.set(ln, `<img=${inner}>`);
+      count2.set(name, cur + 1);
+    }
+    const out = [];
+    paras.forEach((para, i) => {
+      out.push(para);
+      const tag = inserts.get(i + 1);
+      if (tag) out.push(tag);
+    });
+    return out.join("\n\n");
+  }
+  function planAsset(content, d, limit) {
+    const { narrative, trailing } = splitNarrative(content);
+    if (!narrative) return null;
+    const active = activeCharacters(narrative, d);
+    if (!active.length) return null;
+    const paras = paragraphs(narrative);
+    if (!paras.length) return null;
+    return { original: content, paras, trailing, messages: assetPrompt(active, paras, d, limit) };
+  }
+  function finishAsset(job, response, d, limit) {
+    const patches = parsePatches(response);
+    if (!patches.length) return null;
+    const body4 = applyPatches(job.paras, patches, limit, d);
+    return job.trailing ? `${body4}
+${job.trailing}` : body4;
+  }
+
+  // src/host/asset.ts
+  var running = false;
+  async function supplementAssets(t) {
+    const s4 = basicSettings(t.lore, t.chat.scriptstate);
+    if (!s4.assetOn || s4.assetModel !== "aux" || running) return;
+    const msg = t.chat.message?.[t.messageIndex];
+    if (!msg || msg.role !== "char" || typeof msg.data !== "string" || !msg.data) return;
+    if (t.messageIndex !== (t.chat.message?.length ?? 0) - 1) return;
+    running = true;
+    const note = (text) => updateChat(t.charIndex, t.chatIndex, (c) => c.scriptstate?.[ASSET_NOTE] === text ? null : { ...c, scriptstate: { ...c.scriptstate ?? {}, [ASSET_NOTE]: text } }).catch(() => null);
+    try {
+      let entries2;
+      try {
+        entries2 = await risuai.getCurrentLorebookEntries() ?? [];
+      } catch {
+        entries2 = t.lore ?? [];
+      }
+      const data = readImageData(entries2);
+      const job = planAsset(msg.data, data, s4.assetLimit);
+      if (!job) return;
+      const raw = await runModel(job.messages, "aux");
+      const next = finishAsset(job, raw, data, s4.assetLimit);
+      if (!next) {
+        await note("이번 응답에는 붙일 이미지가 없었어요.");
+        return;
+      }
+      const saved = await updateChat(t.charIndex, t.chatIndex, (latest) => {
+        const list4 = latest.message ?? [];
+        const i = t.messageIndex;
+        if (i !== list4.length - 1 || list4[i]?.role !== "char" || list4[i].data !== job.original) return null;
+        const message = list4.slice();
+        message[i] = { ...list4[i], data: next };
+        return { ...latest, message, scriptstate: { ...latest.scriptstate ?? {}, [ASSET_NOTE]: "" } };
+      });
+      if (!saved) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
+    } catch (error) {
+      const why = error instanceof AssetError ? error.message : `보조 모델 호출 실패: ${error instanceof Error ? error.message : String(error)}`;
+      console.log(`[goei] 이미지 태그 보충 실패: ${why}`);
+      await note(why.slice(0, 300));
+    } finally {
+      running = false;
+    }
+  }
+
+  // src/core/watch.ts
+  var WatchState = class {
+    charIndex = -2;
+    active = false;
+    isLite = false;
+    /** 지금 캐릭터가 괴이봇 Lite인지 (채팅 화면 여부와 무관) */
+    get lite() {
+      return this.charIndex >= 0 && this.isLite;
+    }
+    needsCharacterCheck(s4) {
+      return s4.charIndex !== this.charIndex;
+    }
+    /**
+     * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
+     * intro: 괴이봇 Lite 채팅 화면에 새로 들어온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
+     */
+    update(s4, lite) {
+      if (s4.charIndex !== this.charIndex) this.isLite = lite ?? false;
+      this.charIndex = s4.charIndex;
+      const active = s4.charIndex >= 0 && s4.chatIndex >= 0 && s4.chatScreen && this.isLite;
+      const changed = active !== this.active;
+      const intro = active && !this.active;
+      this.active = active;
+      return { changed, fabVisible: active, intro };
+    }
+  };
+
+  // src/core/navhist.ts
+  var LIMIT = 60;
+  var NavHistory = class {
+    list = [];
+    at = -1;
+    /** 지금 화면 상태를 적는다 (방금 적은 것과 같으면 그대로) */
+    record(state) {
+      const key2 = JSON.stringify(state);
+      if (this.list[this.at] === key2) return;
+      this.list = this.list.slice(0, this.at + 1);
+      this.list.push(key2);
+      if (this.list.length > LIMIT) this.list.shift();
+      this.at = this.list.length - 1;
+    }
+    can(dir2) {
+      const i = this.at + dir2;
+      return i >= 0 && i < this.list.length;
+    }
+    /** 한 칸 옮기고 그 화면 상태를 돌려준다. 갈 곳이 없으면 null */
+    go(dir2) {
+      if (!this.can(dir2)) return null;
+      this.at += dir2;
+      return JSON.parse(this.list[this.at]);
+    }
+    /** 지나온 화면들, 최근 것부터 (같은 화면은 한 번만) */
+    recent() {
+      return [...new Set(this.list.slice(0, this.at + 1).reverse())].map((k) => JSON.parse(k));
+    }
+    clear() {
+      this.list = [];
+      this.at = -1;
+    }
+  };
+
+  // src/ui/clouds.ts
+  var N = 256;
+  function lattice(seed, g) {
+    const a = new Float32Array(g * g);
+    let s4 = seed >>> 0;
+    for (let i = 0; i < a.length; i++) {
+      s4 = s4 * 1664525 + 1013904223 >>> 0;
+      a[i] = s4 / 4294967296;
+    }
+    return a;
+  }
+  function noise(lat, g, x, y) {
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const fx = x - xi, fy = y - yi;
+    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const x0 = (xi % g + g) % g, y0 = (yi % g + g) % g, x1 = (x0 + 1) % g, y1 = (y0 + 1) % g;
+    const a = lat[y0 * g + x0] + (lat[y0 * g + x1] - lat[y0 * g + x0]) * sx;
+    const b = lat[y1 * g + x0] + (lat[y1 * g + x1] - lat[y1 * g + x0]) * sx;
+    return a + (b - a) * sy;
+  }
+  function fbm(seed, base, oct) {
+    const lats = Array.from({ length: oct }, (_, o) => lattice(seed + o * 101, base << o));
+    return (u, v) => {
+      let t = 0, amp = 0.5, sum = 0;
+      for (let o = 0; o < oct; o++) {
+        const g = base << o;
+        t += noise(lats[o], g, u * g, v * g) * amp;
+        sum += amp;
+        amp *= 0.5;
+      }
+      return t / sum;
+    };
+  }
+  function draw(seed) {
+    const c = document.createElement("canvas");
+    c.width = c.height = N;
+    const x = c.getContext("2d");
+    if (!x) return null;
+    const main = fbm(seed, 4, 6);
+    const warp = fbm(seed + 7, 3, 3);
+    const img = x.createImageData(N, N);
+    const sh = x.createImageData(N, N);
+    for (let j = 0; j < N; j++) {
+      for (let i = 0; i < N; i++) {
+        const u = i / N, v = j / N;
+        const w = warp(u, v) - 0.5;
+        const n = main(u + w * 0.35, v + w * 0.2);
+        const d = Math.min(1, Math.max(0, (n - 0.5) / 0.22));
+        const a = d * d * (3 - 2 * d);
+        const k = (j * N + i) * 4;
+        const tone = 196 + 59 * Math.min(1, a * 1.3);
+        img.data[k] = tone;
+        img.data[k + 1] = tone + 2;
+        img.data[k + 2] = Math.min(255, tone + 6);
+        img.data[k + 3] = Math.round(a * 235);
+        sh.data[k] = 0;
+        sh.data[k + 1] = 4;
+        sh.data[k + 2] = 8;
+        sh.data[k + 3] = Math.round(a * 120);
+      }
+    }
+    x.putImageData(img, 0, 0);
+    const cloud = c.toDataURL("image/png");
+    x.putImageData(sh, 0, 0);
+    return { cloud, shadow: c.toDataURL("image/png") };
+  }
+  var done = false;
+  function ensureClouds() {
+    if (done) return;
+    done = true;
+    try {
+      const a = draw(20251021);
+      if (!a) return;
+      const st = document.createElement("style");
+      st.textContent = `.gx-opfx.sky > :is(.c1, .c2) { background-image: url(${a.cloud}); } .gx-opfx.sky > .c0 { background-image: url(${a.shadow}); }`;
+      document.head.appendChild(st);
+    } catch {
+    }
+  }
+
+  // src/ui/evcard.ts
+  var esc8 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var KIND = { an: "괴이", in: "사건", ms: "특수" };
+  var MARK = { an: "?", in: ICONS.siren, ms: ICONS.spook };
+  function peopleChips(char, names4, agents, own = "") {
+    return names4.filter((n, i, all) => n && n !== "없음" && all.indexOf(n) === i).map((n) => {
+      if (agents.has(n)) return `<span class="gx-pchip">${avatar(char, agents.get(n).english, n, "xs")}${esc8(n)}</span>`;
+      return `<span class="gx-badge${own && n === own ? " own" : ""}">${esc8(n)}</span>`;
+    }).join("");
+  }
+  function elapsedText(minute, since) {
+    if (minute === null || since === null) return "";
+    const m = Math.max(0, minute - since);
+    const h = Math.floor(m / 60);
+    if (!m) return "방금 발생";
+    return `발생 ${h ? `${h}시간 ` : ""}${m % 60 || !h ? `${m % 60}분 ` : ""}경과`;
+  }
+  var evUi = { pop: "" };
+  var seen = /* @__PURE__ */ new Map();
+  var evSeenReset = () => seen.clear();
+  function gradeMark(c) {
+    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
+    return `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc8(grade)}등급` : ""}">${grade ? esc8(grade) : MARK[c.kind]}</i>`;
+  }
+  var artBg = (c) => c.art?.pic ? ` style="background-image:url('${esc8(c.art.pic)}')"` : "";
+  var artIco = (c) => c.art?.pic ? "" : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+  function statusNote(c) {
+    const text = c.badge.replace(/<[^>]+>/g, "").trim();
+    if (!c.key) return text ? `<em class="gx-evc-note wait">${esc8(text)}</em>` : "";
+    return /class="gx-badge op"/.test(c.badge) ? `<em class="gx-evc-note op">${esc8(text)}</em>` : "";
+  }
+  function chipItems(html = "") {
+    const out = [];
+    const re = /<span class="gx-(?:pchip|badge[^"]*)">/g;
+    const starts = [];
+    for (let m = re.exec(html); m; m = re.exec(html)) {
+      starts.push(m.index);
+    }
+    starts.forEach((st, i) => out.push(html.slice(st, starts[i + 1] ?? html.length)));
+    return out;
+  }
+  function depMark(c) {
+    if (!c.key || c.kind === "in") return "";
+    const items = chipItems(c.chips);
+    const strip = (h) => h.replace(/<[^>]+>/g, "").trim();
+    const ours = items.filter((h) => h.startsWith('<span class="gx-pchip"') || h.startsWith('<span class="gx-badge own"')).map(strip);
+    const others = items.filter((h) => h.startsWith('<span class="gx-badge">')).map(strip);
+    const verb = c.kind === "ms" ? "방문" : "투입";
+    const cls = ours.length ? "on" : others.length ? "other" : "";
+    const title2 = [ours.length ? `우리: ${ours.join(", ")}` : "", others.length ? `다른 세력: ${others.join(", ")}` : ""].filter(Boolean).join(" / ") || `미${verb}`;
+    return `<i class="gx-evdep${cls ? ` ${cls}` : ""}${ours.length && others.length ? " mix" : ""}" title="${esc8(title2)}" aria-label="${esc8(title2)}">${ICONS.person}</i>`;
+  }
+  function artCard(c) {
+    const key2 = c.key ? esc8(c.key) : "";
+    if (c.pop) seen.set(c.pop, c);
+    const act = c.pop ? ` data-action="ev-pop" data-value="${esc8(c.pop)}"` : c.open && c.key ? ` data-action="${c.open}" data-value="${key2}"` : "";
+    const line3 = (c.extra || (c.art?.desc ? `<span class="gx-evc-sit">${esc8(c.art.desc)}</span>` : "")).replace(/^<span class="gx-evc-sit"([^>]*)>([^<]*)<\/span>$/, (_m, attr, t) => `<span class="gx-evc-sit gx-flow"${attr}><span data-t="${t}">${t}</span></span>`);
+    return `<li class="gx-evc art${act ? " go" : ""}${c.selected ? " sel" : ""}${c.ended ? " wait ended" : c.key ? " live" : " wait"}"${act}>
+    <div class="gx-evart k-${c.kind}${c.art?.pic ? "" : " none"}"${artBg(c)}>${artIco(c)}
+      <span class="gx-evart-cap"><span class="gx-evart-l1">${gradeMark(c)}<b>${esc8(c.name)}</b>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ""}${depMark(c)}</span><span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${line3}</span>
+    </div></li>`;
+  }
+  var TGT = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/><circle class="dot" cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/></svg>';
+  function targetMark(on2, action, value, btn = false) {
+    return `<button class="${btn ? "gx-evbtn " : ""}gx-tgt${on2 ? " on" : ""}" data-action="${action}" data-value="${esc8(value)}" aria-pressed="${on2}" title="${on2 ? "목표 해제" : "목표로 지정"}" aria-label="${on2 ? "목표 해제" : "목표로 지정"}">${TGT}${btn ? "" : `<span>${on2 ? "해제" : "선택"}</span>`}</button>`;
+  }
+  function evPopup(clock2 = "") {
+    const c = evUi.pop ? seen.get(evUi.pop) : void 0;
+    if (!c) {
+      evUi.pop = "";
+      return "";
+    }
+    return `<button class="ev-scrim" data-action="ev-pop" aria-label="닫기"></button>
+    ${feedView(c, clock2, ' ev-pop" role="dialog" aria-label="' + esc8(c.name))}`;
+  }
+  function endedCard(e, art) {
+    const name = e.name || "이름 미확인";
+    return artCard({ kind: e.kind, name, grade: e.grade, loc: esc8(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, art: art(name, e.kind) ?? { pic: null, desc: "" }, pop: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc });
+  }
+  function evCard(c) {
+    if (c.art) return artCard(c);
+    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? c.grade : "";
+    const mark2 = `<i class="gx-gmark ${c.kind}${grade ? ` g-${grade.toLowerCase()}` : ""}" title="${KIND[c.kind]}${grade ? ` ${esc8(grade)}등급` : ""}">${grade ? esc8(grade) : MARK[c.kind]}</i>`;
+    const title2 = `<span class="gx-evc-name"><b>${esc8(c.name)}</b></span>`;
+    if (!c.key) {
+      return `<li class="gx-evc">${mark2}<span class="gx-evc-main"><span class="gx-evc-top">${title2}<span class="gx-evc-tags">${c.badge}</span></span><small>${c.loc}</small>${c.extra ?? ""}</span></li>`;
+    }
+    const key2 = esc8(c.key);
+    const acts = `<span class="gx-evc-act">
+      ${c.name !== "이름 미확인" ? `<button class="gx-icon" data-action="wiki-goto" data-value="${esc8(c.name)}" title="위키" aria-label="${esc8(c.name)} 위키">${ICONS.wiki}</button>` : ""}
+      ${c.confirmEnd ? `<button class="gx-mini danger" data-action="end-event" data-value="${key2}">정말 종료</button>` : `<button class="gx-icon" data-action="end-event" data-value="${key2}" title="상황 종료" aria-label="${esc8(c.name)} 상황 종료">${ICONS.close}</button>`}</span>`;
+    const open3 = c.open ? ` data-action="${c.open}" data-value="${key2}"` : "";
+    return `<li class="gx-evc go${c.selected ? " sel" : ""}"${open3}>${mark2}<span class="gx-evc-main"><span class="gx-evc-top">${title2}${acts}</span>
+    <small>${c.loc}</small><span class="gx-evc-who">${c.badge}${c.chips ?? ""}</span>${c.extra ?? ""}</span></li>`;
+  }
+  var opsUi = { sel: "", mode: "feed" };
+  var GRADE_RANK = { S: 0, A: 1, B: 2, C: 3, D: 4 };
+  function firstPick(cards) {
+    const live = cards.filter((c) => !c.ended);
+    const ours = (c) => /class="gx-(?:pchip|badge own)"/.test(c.chips ?? "");
+    const rank2 = (c) => (ours(c) ? 0 : 10) + (GRADE_RANK[(c.grade ?? "").toUpperCase()] ?? 6);
+    return [...live].sort((a, b) => rank2(a) - rank2(b))[0]?.id ?? cards[0]?.id ?? "";
+  }
+  function opsRow(c, on2) {
+    const thumb = c.art?.pic ? `<img src="${esc8(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
+    return `<li class="gx-oprow k-${c.kind}${on2 ? " sel" : ""}${c.ended ? " ended" : ""}" data-action="ops-sel" data-value="${esc8(c.id)}" aria-current="${on2}">
+    <span class="gx-oprow-pic">${thumb}</span>
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc8(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ""}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+  }
+  var camNo = (loc) => String(Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89 + 10).padStart(2, "0");
+  function headSeg(action, cur, items) {
+    return `<span class="gx-hseg" role="tablist">${items.map(([v, label, icon2]) => `<button role="tab" class="${cur === v ? "on" : ""}" data-action="${action}" data-value="${v}" aria-selected="${cur === v}" title="${label}" aria-label="${label}">${icon2}</button>`).join("")}</span>`;
+  }
+  function whoLine(chips3 = "") {
+    const items = chipItems(chips3).map((h) => {
+      const ours = /^<span class="gx-(?:pchip|badge own)"/.test(h);
+      const text = h.replace(/<[^>]*>/g, "").trim();
+      return text ? `<span class="${ours ? "on" : "other"}">${text}</span>` : "";
+    }).filter(Boolean);
+    return items.length ? `<span class="gx-opwho"><em>투입</em>${items.join("<i>·</i>")}</span>` : "";
+  }
+  function osd(sig, cam, clock2) {
+    return `<div class="gx-oposd"><span class="l1">${sig}<span class="cam">${cam}</span></span>${clock2 ? `<span class="ts">${esc8(clock2)}</span>` : ""}</div>`;
+  }
+  function evBtns(c) {
+    const key2 = c.key ? esc8(c.key) : "";
+    const name = esc8(c.name);
+    return `${c.name === "이름 미확인" ? "" : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+    ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? " danger" : ""}" data-action="end-event" data-value="${key2}" title="${c.confirmEnd ? "한 번 더 누르면 종료" : "상황 종료"}" aria-label="${name} ${c.confirmEnd ? "정말 종료" : "상황 종료"}">${ICONS.trash}</button>` : ""}`;
+  }
+  var STATIC = '<i class="gx-opfx" aria-hidden="true"><i class="n"></i><i class="r"></i></i>';
+  var SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i class="c0"></i><i class="c1"></i></i>';
+  var SHADE = '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><path d="M50 2c17 0 27 14 27 33 0 14-5 25-12 31 20 6 35 22 35 50v24H0v-24c0-28 15-44 35-50-7-6-12-17-12-31C23 16 33 2 50 2z"/></svg>';
+  var FX = `<i class="gx-oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
+  function opsPick(c) {
+    return c?.key && !c.ended ? targetMark(!!c.selected, "pick-event", c.key, true) : "";
+  }
+  function opsFeed(c, clock2, empty) {
+    if (!c) {
+      return `<div class="gx-opview feed nosig">${STATIC}<div class="gx-opnosig"><b>NO SIGNAL</b><small>${esc8(empty)}</small></div></div>`;
+    }
+    return feedView(c, clock2);
+  }
+  function feedView(c, clock2, cls = "") {
+    const name = esc8(c.name);
+    const btns = evBtns(c);
+    const pic = c.art?.pic ? `<img class="gx-opfeed" src="${esc8(c.art.pic)}" alt="">` : `<span class="gx-evart-ico">${MARK[c.kind]}</span>`;
+    const desc = c.art?.desc ? `<span class="gx-evc-desc">${esc8(c.art.desc)}</span>` : "";
+    const loc = c.locCode ?? "";
+    const region = locName(loc).split(" ").slice(0, 2).join(" ");
+    const cam = loc ? `CAM-${camNo(loc)} · ${esc8(region)}` : "CAM-00";
+    const grade = c.kind === "an" && c.grade && /^[A-Za-z]+$/.test(c.grade) ? ` data-grade="${c.grade.toLowerCase()}"` : "";
+    const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc8(c.art.pic)}')"><i></i><i></i></i>` : "";
+    const fxkey = ` data-fxkey="${esc8(`${cls ? "pop" : "board"}:${c.key ?? c.name}`)}"`;
+    return `<div class="gx-opview feed k-${c.kind}${c.ended ? " ended" : ""}${cls}"${grade}${fxkey}>${pic}${tear}${STATIC}${c.ended ? "" : FX}
+    <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? "END" : "REC"}</span>`, cam, clock2)}<span class="gx-evart-act">${btns}</span></div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, "pick-event", c.key) : ""}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ""}${desc}</div>
+  </div>`;
+  }
+  var track = (px, py) => `N${(38.7 - py * 0.058).toFixed(2)} E${(124.6 + px * 0.056).toFixed(2)}`;
+  function opsMap(cards, sel, url, clock2) {
+    if (url) ensureClouds();
+    const per = /* @__PURE__ */ new Map();
+    const pins = cards.filter((c) => !c.ended).map((c) => {
+      const sido = c.locCode.split("-")[0];
+      const at = NATION_PINS.find((p) => p[0] === sido);
+      if (!at) return "";
+      const n = per.get(sido) ?? 0;
+      per.set(sido, n + 1);
+      return `<button class="gx-oppin k-${c.kind}${c.id === sel ? " sel" : ""}" style="left:${at[2]}%;top:${at[3] + n * 4.2}%" data-action="ops-sel" data-value="${esc8(c.id)}" aria-label="${esc8(c.name)}"><i></i><em>${esc8(c.name)}</em></button>`;
+    }).join("");
+    const s4 = cards.find((c) => c.id === sel && !c.ended);
+    const sAt = s4 ? NATION_PINS.find((p) => p[0] === s4.locCode.split("-")[0]) : void 0;
+    const sN = s4 ? cards.filter((c) => !c.ended && c.locCode.split("-")[0] === s4.locCode.split("-")[0]).findIndex((c) => c.id === s4.id) : 0;
+    const cross = sAt ? `<span class="gx-opcross" style="left:${sAt[2]}%;top:${sAt[3] + sN * 4.2}%"></span>` : "";
+    const focus = sAt ? `--px:${sAt[2]};--py:${sAt[3] + sN * 4.2}` : "--px:55;--py:50";
+    return `<div class="gx-opview map"><div class="gx-opmap">${url ? `<div class="gx-opmapi" style="${focus}"><img src="${esc8(url)}" alt="전국 지도">${cross}${pins}</div>` : ""}</div>${url ? SKY : ""}
+    <div class="gx-opbar">${osd('<span class="rec sat"><i></i>LIVE</span>', `SAT-02 · TRK ${track(sAt ? sAt[2] : 55, sAt ? sAt[3] + sN * 4.2 : 50)}`, clock2)}${s4 ? `<span class="gx-evart-act">${opsPick(s4)}${evBtns(s4)}</span>` : ""}</div></div>`;
+  }
+  function opsBoard(cards, o) {
+    if (!cards.some((c) => c.id === opsUi.sel)) opsUi.sel = firstPick(cards);
+    const sel = cards.find((c) => c.id === opsUi.sel);
+    const view3 = opsUi.mode === "map" ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
+    const rows2 = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join("");
+    return `<div class="gx-ops">${view3}<section class="gx-oplog"><h2>${headSeg("ops-mode", opsUi.mode, [["feed", "CCTV", ICONS.cctv], ["map", "위성 지도", ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows2 ? `<ul>${rows2}</ul>` : `<p class="gx-none">${esc8(o.empty)}</p>`}</section></div>`;
+  }
+
+  // src/ui/agents.ts
+  var agUi = { pop: "" };
+  var last = [];
+  var lastOrg = "";
+  var esc9 = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var ORDER = { op: 0, ok: 1, lock: 2 };
+  var line = (a) => a.situation || (a.side === "op" ? a.deployed : "") || "대기 중";
+  var tip = (a) => `data-agtip="${esc9(`${a.name} · ${a.st}`)}" data-agtip-text="${esc9(line(a))}"`;
+  var flow = (tag, text, cls = "") => `<${tag} class="${cls ? `${cls} ` : ""}gx-flow"><span data-t="${esc9(text)}">${esc9(text)}</span></${tag}>`;
+  function tile(a, i) {
+    return `<li class="gx-agmon ${a.side}" data-action="agent-info" data-value="${esc9(a.id)}" ${tip(a)}><span class="gx-agmon-scr">${a.face}
+    <span class="gx-agmon-osd"><span>CH-${String(i + 1).padStart(2, "0")}</span><span class="st">${esc9(a.st)}</span></span>
+    <span class="gx-agmon-cap"><b>${esc9(a.name)}</b>${flow("small", a.side === "op" && a.deployed ? a.deployed : line(a))}</span></span></li>`;
+  }
+  function row4(a) {
+    const tools = a.wiki !== null ? `<span class="gx-agrow-tools"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc9(a.id)}" title="괴담톡" aria-label="${esc9(a.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc9(a.wiki)}" title="위키" aria-label="${esc9(a.name)} 위키">${ICONS.wiki}</button></span>` : "";
+    return `<li class="gx-agrow ${a.side}" data-action="agent-info" data-value="${esc9(a.id)}" ${tip(a)}>${a.face}<b>${esc9(a.name)}</b><span class="gx-agrow-st"><i></i>${esc9(a.st)}</span>${flow("span", line(a), "gx-agrow-msg")}${tools}</li>`;
+  }
+  function agentPanel(items, view3, o) {
+    last = items;
+    lastOrg = o.org;
+    const list4 = [...items].sort((a, b) => ORDER[a.side] - ORDER[b.side]);
+    const op = items.filter((a) => a.side === "op").length;
+    const head = `<h2>${headSeg("agents-view", view3, [["wall", "요원 모니터", ICONS.grid], ["list", "요원 목록", ICONS.list]])}<span class="gx-opcnt"><em class="op">작전<i>${op}</i><u>/${o.total}</u></em></span></h2>`;
+    const body4 = !list4.length ? `<p class="gx-none">${esc9(o.empty)}</p>` : view3 === "list" ? `<ul class="gx-agrows">${list4.map(row4).join("")}</ul>` : `<ul class="gx-agwall">${list4.map(tile).join("")}</ul>`;
+    return `<section class="gx-sec gx-agbox ${view3}" id="gx-sec-ag">${head}${o.extra}${body4}</section>`;
+  }
+  function agentPopup() {
+    const org = lastOrg;
+    const a = last.find((x) => x.id === agUi.pop);
+    if (!a) {
+      agUi.pop = "";
+      return "";
+    }
+    const btns = a.wiki !== null ? `<button data-action="agent-talk" data-value="${esc9(a.id)}">${ICONS.phone}괴담톡</button><button data-action="wiki-goto" data-value="${esc9(a.wiki)}">${ICONS.wiki}위키</button>` : "";
+    const rows2 = [["소속", a.dept], ["직급", a.rank], ["투입", a.deployed], ["상황", a.situation || "대기 중"]].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd${k === "투입" ? ' class="dep"' : ""}>${esc9(v)}</dd>`).join("");
+    return `<button class="ev-scrim" data-action="agent-info" data-value="${esc9(a.id)}" aria-label="닫기"></button>
+    <div class="gx-agcard ${a.side}" role="dialog" aria-label="${esc9(a.name)}">
+      <div class="gx-agcard-band">AGENT ID<b>${esc9(org)}</b><button class="gx-agcard-x" data-action="agent-info" data-value="${esc9(a.id)}" aria-label="닫기">✕</button></div>
+      <div class="gx-agcard-main"><span class="gx-agcard-ph">${a.photo ? `<img src="${esc9(a.photo)}" alt="">` : a.face}</span>
+        <span class="gx-agcard-t"><span class="nm">${esc9(a.name)}</span>${a.english ? `<span class="en">${esc9(a.english)}</span>` : ""}<dl>${rows2}</dl></span></div>
+      <div class="gx-agcard-foot"><span class="code">NO. ${esc9(a.id.replace(/^([A-Z]+)(\d)/, "$1-$2"))}<u></u></span>${btns}</div>
+    </div>`;
+  }
+  function bindAgentTips(root2) {
+    let bub = null;
+    const hide = () => {
+      bub?.remove();
+      bub = null;
+    };
+    root2.addEventListener("mouseover", (ev) => {
+      if (!matchMedia("(hover: hover)").matches) return;
+      const el = ev.target.closest("[data-agtip]");
+      if (!el || el.contains(ev.relatedTarget)) return;
+      hide();
+      bub = document.createElement("div");
+      bub.className = "gx-agtip";
+      bub.innerHTML = `<b>${esc9(el.dataset.agtip ?? "")}</b>${esc9(el.dataset.agtipText ?? "")}`;
+      root2.appendChild(bub);
+      const r = el.getBoundingClientRect();
+      const w = bub.offsetWidth;
+      const x = Math.min(window.innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2));
+      bub.style.left = `${x}px`;
+      bub.style.top = `${r.top - bub.offsetHeight - 10}px`;
+      bub.style.setProperty("--tail", `${r.left + r.width / 2 - x}px`);
+    });
+    root2.addEventListener("mouseout", (ev) => {
+      const el = ev.target.closest("[data-agtip]");
+      if (el && !el.contains(ev.relatedTarget)) hide();
+    });
+    root2.addEventListener("click", hide, true);
+    let queued2 = 0;
+    const measure = () => {
+      queued2 = 0;
+      const pc = matchMedia("(min-width: 761px)").matches;
+      for (const ul of root2.querySelectorAll(".gx-agwall, .gx-agrows")) {
+        if (!pc) ul.style.removeProperty("--agrow");
+        else if (ul.classList.contains("gx-agwall")) ul.style.setProperty("--agrow", `${Math.max(140, Math.floor((ul.clientHeight - 24) / 2))}px`);
+        else ul.style.setProperty("--agrow", `${Math.max(48, Math.floor(ul.clientHeight / 6))}px`);
+      }
+      for (const box of root2.querySelectorAll(".gx-flow")) {
+        const inner = box.firstElementChild;
+        if (!inner) continue;
+        const key2 = `${box.clientWidth}|${inner.dataset.t ?? ""}`;
+        if (box.dataset.fk === key2) continue;
+        box.dataset.fk = key2;
+        if (box.classList.contains("gx-agrow-msg")) {
+          box.classList.remove("on");
+          box.classList.add("two");
+          if (box.scrollHeight <= box.clientHeight + 1) continue;
+          box.classList.remove("two");
+        }
+        const gap = 3 * parseFloat(getComputedStyle(inner).fontSize);
+        const on2 = box.classList.contains("on");
+        const w = on2 ? (inner.scrollWidth - gap) / 2 : inner.scrollWidth;
+        const over = w - box.clientWidth > 2;
+        box.classList.toggle("on", over);
+        if (over) {
+          const d = w + gap;
+          box.style.setProperty("--fd", `${-d}px`);
+          const ft = d / 18;
+          box.style.setProperty("--ft", `${ft.toFixed(2)}s`);
+          box.style.setProperty("--fdl", `${(-(performance.now() / 1e3 % ft)).toFixed(2)}s`);
+        }
+      }
+    };
+    const schedule2 = () => {
+      if (!queued2) queued2 = requestAnimationFrame(measure);
+    };
+    new MutationObserver(schedule2).observe(root2, { childList: true, subtree: true });
+    window.addEventListener("resize", schedule2);
+    if (typeof ResizeObserver === "function") new ResizeObserver(schedule2).observe(root2);
+    root2.addEventListener("scroll", hide, true);
+  }
+
+  // src/ui/style.css
+  var style_default = `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+/* 디자인 시안 v1 (2026-10-16): 다크 기본, 라이트·페이퍼는 채팅 테마($st_fixed_theme)를 따른다 */
+:root {
+  /* 다크 (v0.16.31 개편): 올블랙이 아니라 차분한 짙은 청회색. 면 층마다 밝기 차이를 분명히 */
+  --void: #1A2226;      /* 창 바탕 */
+  --sunk: #151C1F;      /* 들어간 면 (대화창·문서 칸) */
+  --panel: #232D32;     /* 카드 */
+  --panel2: #2C383E;    /* 올린 면 (칩·입력칸) */
+  --line: #37464D;
+  --line2: #46565D;
+  --text: #E9F0EE;
+  --sub: #BECBC8;
+  --dim: #97A9A5;
+  --mint: #A6B8B4;      /* 소제목 */
+  --signal: #5EEAD4;    /* 강조 */
+  --on-signal: #052A25;
+  --accent-bg: #1D403A;
+  --accent-line: #3F8879;
+  --amber: #F5B544;
+  --amber-bg: #45381C;
+  --danger: #FF7A6B;
+  --danger-bg: #4A2A27;
+  --blue: #7DB8F5;
+  --violet: #C9A7FF;
+  --shadow: 0 40px 80px -30px rgba(0, 0, 0, .65);
+  --scrim: rgba(3, 7, 9, .8);
+  --font: 'IBM Plex Sans KR', 'Pretendard', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --mono: 'JetBrains Mono', 'IBM Plex Sans KR', 'Pretendard', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+/* color-scheme은 문서 뿌리(:root)에 두면 안 된다: Risu 화면과 다르면 브라우저가 이 iframe 뒤를 불투명하게 칠해
+   창 바깥이 늘 깜깜했다 (창 바깥 불투명도가 듣지 않던 원인). 창(.gx) 안에만 */
+.gx { color-scheme: dark; }
+.gx[data-theme="light"] {
+  --void: #F4F6F5; --sunk: #E9EEEC; --panel: #FFFFFF; --panel2: #EEF2F1; --line: #BCC9C5; --line2: #A3B3AE;
+  --text: #13201D; --sub: #3B4B47; --dim: #5C6E6A; --mint: #4F625E; --signal: #0F8C7A; --on-signal: #FFFFFF;
+  --accent-bg: #DDF3EE; --accent-line: #8FCFC3; --amber: #9A6400; --amber-bg: #FBEED3; --danger: #C2412F; --danger-bg: #FBE3DF;
+  --blue: #2F6FB5; --violet: #7A4FC4; --shadow: 0 30px 60px -30px rgba(20, 40, 36, .45); --scrim: rgba(20, 30, 28, .58); color-scheme: light;
+}
+.gx[data-theme="paper"] {
+  --void: #EFE6D2; --sunk: #E5D9BF; --panel: #FAF5E9; --panel2: #F3EBDA; --line: #D3C29E; --line2: #C2AE85;
+  --text: #2B2418; --sub: #4A3F2C; --dim: #6E6046; --mint: #5E5138; --signal: #8A4B12; --on-signal: #FFF8EC;
+  --accent-bg: #F1DEC2; --accent-line: #C99A63; --amber: #8A5A00; --amber-bg: #F3E2BC; --danger: #A8361F; --danger-bg: #F2D6CB;
+  --blue: #2F5F95; --violet: #6D4AA8; --shadow: 0 30px 60px -30px rgba(60, 40, 10, .45); --scrim: rgba(40, 30, 15, .58); color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: transparent; }
+body {
+  font: 16px/1.55 var(--font);
+  color: var(--text);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+/* ── 창: 크기 고정 ── */
+.gx {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px;
+  /* 뒤 화면 흐림(backdrop-filter)은 창을 다시 그릴 때마다 화면 전체를 다시 흐리게 계산해서 버벅임의 주원인이었다 (v0.10.1). 대신 막을 조금 진하게 */
+  color: var(--text);
+}
+/* 창 바깥 막: 설정 → 화면 「창 바깥 어둡기」. 색은 app.ts가 .gx에 바로 칠한다 (100%면 완전히 가림) */
+.gx-panel {
+  /* PC는 화면을 넓게 쓴다 (v0.11.0: 1040×720 → 화면 대부분) */
+  /* v0.16.15: 설정 묶음 좌우 여백만큼 좁혔다 (1560 → 1280) */
+  width: min(100%, 1280px);
+  /* 커스텀 임무 오른쪽(요원 12명·작전 메모·임무 요청)이 스크롤 없이 딱 들어오는 높이 (v0.16.16) */
+  height: min(100%, 950px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "head" "body";
+  background: var(--void);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+/* 시작 전 화면: 설정 묶음(980px) + 좌우 여백 폭 */
+.gx-panel.pre { width: min(100%, 1024px); }
+/* 스크롤바도 창 배색으로 (브라우저 기본 회색이 테마와 안 맞았다) */
+/* 스크롤바 (v0.16.21, 사용자 요청: 너무 눈에 띈다): 평소엔 아주 흐리게, 그 칸에 마우스를 올렸을 때만 보이게 */
+.gx, .gx * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--sub) 12%, transparent) transparent; }
+.gx *:hover { scrollbar-color: color-mix(in srgb, var(--sub) 30%, transparent) transparent; }
+.gx ::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+.gx ::-webkit-scrollbar-track { background: transparent; }
+.gx ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 12%, transparent); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+.gx :hover::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--sub) 30%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--signal) 45%, transparent); border: 2px solid transparent; background-clip: padding-box; }
+.gx ::-webkit-scrollbar-corner { background: transparent; }
+.gx-panel.has-nav { grid-template-columns: 236px minmax(0, 1fr); grid-template-areas: "head head" "nav body"; }
+/* 메뉴를 오른쪽에 (설정 → 화면 「메뉴 위치」, PC만). 상단바는 창 전체 폭 */
+@media (min-width: 761px) {
+  .gx[data-nav="right"] .gx-panel.has-nav { grid-template-columns: minmax(0, 1fr) 236px; grid-template-areas: "head head" "body nav"; }
+  .gx[data-nav="right"] .gx-nav { border-right: 0; border-left: 1px solid var(--panel2); }
+}
+/* 상단바: 「괴이 ː 이면세계 › 지금 화면」 한 줄. 꺾쇠는 메뉴 위치와 상관없이 제목 바로 뒤 */
+.gx-hmark { display: flex; align-items: center; gap: 10px; flex: none; min-width: 0; }
+.gx-hmark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
+.gx-hmark .gx-logo svg { width: 24px; height: 24px; }
+.gx-hsep { flex: none; color: var(--dim); font-size: 20px; line-height: 1; margin: 0 2px; }
+.gx-tabhead .gx-tabicon { display: none; }
+@media (max-width: 760px) {
+  .gx-hmark, .gx-hsep { display: none; }
+  .gx-tabhead .gx-tabicon { display: grid; }
+}
+.gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
+.gx-content > .gx-body, .gx-content > main { flex: 1; min-height: 0; }
+.gx-head {
+  grid-area: head;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--panel2);
+}
+.gx-brand { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.gx-brand b { display: block; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: .01em; }
+.gx-brand > div { min-width: 0; }
+.gx-brand small { display: block; font-size: 14px; color: var(--dim); font-family: var(--mono); letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-brand small .y { opacity: .8; }
+.gx-logo { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); flex: none; }
+.gx-logo svg { width: 26px; height: 26px; }
+.gx-head-act { display: flex; align-items: center; gap: 8px; flex: none; }
+.gx-x { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--sub); font-size: 18px; flex: none; }
+.gx-x:hover { color: var(--text); border-color: var(--line2); }
+.gx-x.on { color: var(--signal); border-color: var(--accent-line); background: var(--accent-bg); }
+
+/* ── 메뉴: PC는 왼쪽, 모바일은 하단 바 ── */
+.gx-nav { grid-area: nav; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; border-right: 1px solid var(--panel2); background: var(--void); min-height: 0; overflow-y: auto; }
+.gx-nav-brand { display: flex; flex-direction: column; gap: 14px; padding: 2px 2px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--panel2); }
+.gx-mark { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
+.gx-mark .gx-logo { width: 36px; height: 36px; border-radius: 11px; }
+.gx-mark .gx-logo svg { width: 24px; height: 24px; }
+.gx-mark-txt b { display: block; font-size: 18px; font-weight: 800; letter-spacing: .02em; line-height: 1.15; }
+.gx-mark-txt small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--signal); opacity: .8; }
+/* 상단바 표지: 영문은 글씨 크기 그대로, 글자 사이를 벌려 한글 제목과 같은 길이 */
+.gx-hmark .gx-mark-txt { display: inline-grid; }
+.gx-hmark .gx-mark-txt small { display: flex; justify-content: space-between; letter-spacing: 0; }
+.gx-hmark .gx-mark-txt small i { font-style: normal; }
+/* 띄어쓰기만 3px 좁히고 그만큼 오른쪽 끝을 당긴다 (다른 글자 간격은 그대로) */
+.gx-hmark .gx-mark-txt small { padding-right: 3px; }
+.gx-hmark .gx-mark-txt small i.sp { width: calc(1ch - 3px); overflow: hidden; }
+/* 이번 작전 카드: 소속 사진 위에 소속 이름과 첫 장면 */
+.gx-logo.mob { display: none; }
+/* PC: 본문 첫 줄을 왼쪽 사원증 윗선 높이에 맞춘다 (v0.16.16, 2026-10-20 사원증 위치 18px에 다시 맞춤) */
+@media (min-width: 761px) {
+  .gx-panel.has-nav .gx-head { padding-top: 8px; padding-bottom: 8px; }
+  .gx-panel.has-nav .gx-content > .gx-body, .gx-panel.has-nav .gx-content > .gx-board, .gx-panel.has-nav .gx-content > .gx-field { padding-top: 18px; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:not(:where(.gx-hint, .gx-err, .gx-alert)) { margin-top: 0; padding-top: 0; }
+  .gx-panel.has-nav .gx-content > .gx-body > :first-child:where(.gx-hint, .gx-err, .gx-alert) { margin-top: 0; }
+  .gx-panel.has-nav .gx-field > .gx-mapcol { top: 0; }
+}
+/* 탭 제목: 아이콘 타일 + 제목, 머리 아래 선에 탭 색 한 줄 (v0.16.16: 글자만 달랑 있어 밋밋했다) */
+.gx-head { position: relative; }
+.gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--signal) 14%, color-mix(in srgb, var(--signal) 70%, transparent) 80%, transparent); }
+.gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
+.gx-tabicon svg { width: 20px; height: 20px; }
+.gx-tabhead b { letter-spacing: .02em; }
+.gx-nav-gap { flex: 1; }
+.gx-nb {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 48px; padding: 0 14px;
+  border: 0; border-radius: 12px; background: transparent; color: var(--dim);
+  font-size: 16px; font-weight: 600; text-align: left;
+}
+.gx-nb svg { width: 22px; height: 22px; flex: none; }
+.gx-nb:hover { color: var(--text); background: var(--panel); }
+.gx-nb.on { color: var(--signal); background: var(--accent-bg); }
+.gx-nb .gx-nbadge { margin-left: auto; }
+.gx-nbadge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--danger); color: #2A0B07; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; }
+.gx-nbadge.dot { min-width: 10px; width: 10px; height: 10px; padding: 0; }
+.gx-nb.mob { display: none; }
+.gx-mbar { display: none; }
+.gx-h2-sub { margin-left: auto; font-size: 14px; font-weight: 500; color: var(--dim); }
+
+/* 스크롤 막대 자리를 늘 비워 둔다: 내용이 길어져 막대가 생기고 없어질 때마다 칸 너비가 바뀌어 화면이 움찔거렸다 (v0.16.18). 막대 10px만큼 오른쪽 여백을 줄여 좌우를 맞춤 */
+.gx-body { padding: 4px 10px 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.gx-body section { padding: 14px 0 6px; }
+.gx-body h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--text); }
+.gx-body h2 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-bg); font-style: normal; font-size: 13px; color: var(--signal); font-family: var(--mono); }
+
+/* ── 시작 화면 ── */
+.gx-facs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.gx-fac {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; text-align: left;
+  min-height: 96px; padding: 0; overflow: hidden;
+  border: 2px solid var(--line); border-radius: 20px; background: var(--panel);
+  /* 테두리·그림자·크기를 서서히 바꾸면 큰 세력 사진까지 매 프레임 다시 칠해서 고를 때 끊겼다 (v0.10.2). 바로 바꾼다 */
+}
+.gx-fac.has-img { min-height: 176px; border-color: transparent; }
+.gx-fac-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.gx-fac.has-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 18, 21, 0) 30%, rgba(11, 18, 21, .94) 100%); }
+.gx-fac-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; }
+.gx-fac b { font-size: 22px; font-weight: 700; color: var(--text); }
+.gx-fac-txt span { font-size: 14px; color: var(--sub); line-height: 1.45; }
+.gx-fac.has-img b { color: #F2F7F6; }
+.gx-fac.has-img .gx-fac-txt span { color: #C9D6D3; }
+/* 사진 확대 대신 아래 그늘만 옅게: 큰 사진을 키우는 효과는 매 프레임 다시 그려서 끊겼다 (v0.10.2) */
+.gx-fac.has-img::after { transition: opacity .15s; }
+.gx-fac.has-img:hover::after { opacity: .82; }
+/* 평소엔 어두운 흑백, 마우스를 올리거나 고르면 컬러로 (v0.16.8: 밝아지는 효과가 너무 약했다).
+   사진 위 filter 전환 애니메이션은 매 프레임 사진을 다시 그려 끊겨서(v0.10.2) 바로 바꾼다 */
+/* 마우스가 없는 휴대폰에서는 늘 컬러 */
+@media (hover: hover) {
+  .gx-fac-img { filter: grayscale(1) brightness(.5); }
+  .gx-fac.on .gx-fac-img, .gx-fac.has-img:hover .gx-fac-img { filter: none; }
+}
+.gx-fac.on { border-color: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 22%, transparent); }
+
+.gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gx-seg { min-width: 96px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: transparent; color: var(--dim); font-weight: 600; }
+.gx-seg:hover { color: var(--text); }
+.gx-seg.on { background: var(--line); color: var(--text); }
+
+.gx-scs { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.gx-sc {
+  position: relative; display: flex; align-items: center; gap: 10px; text-align: left;
+  min-height: 56px; padding: 8px 14px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--panel);
+  font-weight: 600;
+}
+.gx-sc b { font-family: var(--mono); color: var(--dim); font-size: 13px; font-weight: 500; }
+.gx-sc span { flex: 1; min-width: 0; }
+.gx-sc em { font-style: normal; font-size: 13px; color: var(--dim); font-weight: 400; }
+.gx-sc:hover:not(:disabled) { border-color: var(--line2); }
+.gx-sc.on { border-color: var(--signal); background: var(--accent-bg); }
+.gx-sc.on b { color: var(--signal); }
+.gx-sc.off { opacity: .45; }
+
+.gx-who { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 240px; overflow: auto; padding: 2px; }
+.gx-whoc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; font-size: 15px; text-align: left; cursor: pointer; }
+.gx-whoc .gx-ava { flex: none; width: 34px; height: 34px; border-radius: 9px; }
+.gx-whot { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.gx-whot b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.gx-whot small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
+.gx-whoc:hover { border-color: var(--line2); }
+.gx-whoc.on { border-color: var(--signal); background: var(--accent-bg); }
+.gx-hint { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--sub); font-size: 15px; }
+
+.gx-foot { padding: 12px 20px 18px; border-top: 1px solid var(--panel2); background: var(--void); display: flex; flex-direction: column; gap: 8px; }
+.gx-foot-sum { font-size: 15px; color: var(--dim); }
+.gx-err.info { border-color: var(--accent-line); background: var(--accent-bg); color: var(--text); }
+.gx-err { margin-bottom: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); background: var(--danger-bg); color: var(--danger); font-size: 15px; }
+.gx-start {
+  width: 100%; min-height: 56px; border: 0; border-radius: 16px;
+  background: var(--signal); color: var(--on-signal); font-size: 18px; font-weight: 700; letter-spacing: .3em;
+}
+.gx-start:hover:not(:disabled) { filter: brightness(1.06); }
+.gx-start:disabled { background: var(--line); color: var(--dim); }
+
+.gx-empty { padding: 28px 20px; color: var(--text); overflow-y: auto; }
+.gx-empty p { margin: 0 0 10px; }
+.gx-muted { color: var(--dim); font-size: 15px; }
+.gx-sum { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0 0 16px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
+.gx-sum dt { color: var(--dim); }
+.gx-sum dd { margin: 0; color: var(--text); font-weight: 600; }
+
+/* ── 상황판 ── */
+.gx-board { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+.gx-board > section { padding: 0; }
+/* 칸이 많아 넘칠 때 줄어들어 서로 겹치지 않게 (응답 전 안내 줄이 눌려 글씨가 위로 쏠렸다) */
+.gx-board > * { flex-shrink: 0; }
+.gx-board > .gx-hint { margin: 0; }
+.gx-board > .gx-alert { padding: 14px 16px; }
+.gx-alert { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--danger-bg); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-alert.calm { background: var(--accent-bg); border-color: var(--accent-line); }
+.gx-alert-top { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--danger); }
+.gx-alert.calm .gx-alert-top { color: var(--signal); }
+.gx-alert-top small { margin-left: auto; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; opacity: .8; font-weight: 500; }
+.gx-meter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.gx-meter i { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text) 12%, transparent); }
+.gx-meter i.l1 { background: var(--amber); } .gx-meter i.l2 { background: color-mix(in srgb, var(--amber) 50%, var(--danger)); } .gx-meter i.l3, .gx-meter i.l4, .gx-meter i.l5 { background: var(--danger); }
+.gx-alert p { margin: 0; font-size: 15px; color: var(--sub); }
+/* 깜빡이는 점: box-shadow를 움직이면 매 프레임 다시 칠해서(예전엔 뒤 흐림까지 다시 계산) 창 전체가 버벅였다. 겉 고리를 transform·opacity로만 움직인다 (v0.10.1) */
+.gx-live { position: relative; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.gx-live::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; background: currentColor; opacity: .22; animation: gxpulse 1.6s ease-in-out infinite; will-change: transform, opacity; }
+@keyframes gxpulse { 50% { transform: scale(1.5); opacity: 0; } }
+.gx-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.gx-tile { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; min-height: 76px; padding: 10px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); text-align: left; }
+.gx-tile span { font-size: 14px; color: var(--dim); }
+.gx-tile b { font-family: var(--mono); font-size: 26px; line-height: 1.1; }
+.gx-tile.an b { color: var(--danger); } .gx-tile.in b { color: var(--amber); } .gx-tile.ms b { color: var(--signal); }
+.gx-clock { margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dim); font-family: var(--mono); }
+.gx-sec h2 { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 18px; color: var(--text); }
+.gx-sec h2 small { color: var(--dim); font-weight: 500; font-size: 14px; }
+.gx-none { margin: 0; color: var(--dim); font-size: 15px; }
+.gx-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gx-list li { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+.gx-list p { margin: 6px 0 0; font-size: 15px; color: var(--sub); }
+.gx-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gx-row b { margin-right: auto; font-size: 17px; }
+.gx-loc { font-size: 14px; color: var(--dim); }
+.gx-ev-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.gx-ev-card .gx-ev-sub { grid-column: 2 / -1; }
+.gx-gmark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; font-size: 16px; grid-row: span 2; align-self: start; }
+.gx-gmark.an { background: var(--danger-bg); color: var(--danger); }
+.gx-gmark.in { background: var(--amber-bg); color: var(--amber); }
+.gx-gmark.ms { background: var(--accent-bg); color: var(--signal); }
+.gx-gmark.wait { background: var(--panel2); color: var(--dim); }
+.gx-ev-name { font-size: 17px; font-weight: 700; min-width: 0; }
+.gx-faces { display: inline-flex; padding-left: 8px; vertical-align: middle; margin-right: 6px; }
+.gx-faces .gx-ava { width: 28px; height: 28px; margin-left: -8px; border: 2px solid var(--panel); font-size: 12px; }
+.gx-ava { position: relative; flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: var(--panel2); color: var(--signal); font-weight: 700; }
+.gx-ava.sq { border-radius: 14px; }
+.gx-ava img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gx-badge, .gx-grade { font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px; color: var(--sub); background: var(--panel2); box-shadow: inset 0 0 0 1px var(--line2); font-weight: 600; white-space: nowrap; }
+.gx-badge.wait { background: transparent; box-shadow: none; border: 1px dashed var(--line2); }
+.gx-badge.live { color: var(--signal); background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.gx-badge.new { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-badge.hot, .gx-badge.hurt { color: var(--amber); background: var(--amber-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 35%, transparent); }
+.gx-badge.op, .gx-badge.out { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--blue) 35%, transparent); }
+.gx-badge.bad, .gx-badge.dead { color: var(--danger); background: var(--danger-bg); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 35%, transparent); }
+.gx-badge.dead { text-decoration: line-through; }
+.gx-grade { font-weight: 700; color: var(--text); }
+.gx-grade.gS, .gx-grade.gA { color: var(--danger); }
+.gx-grade.gB { color: var(--amber); }
+
+/* 지도 · 커스텀 임무 */
+.gx-tabs { overflow-x: auto; scrollbar-width: none; }
+.gx-tab { white-space: nowrap; flex: none; }
+.gx-tab-end { margin-left: auto; font-size: 14px; }
+.gx-field { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); gap: 20px; padding-top: 12px; padding-bottom: 16px; align-items: start; align-content: start; }
+/* PC: 지도는 옆 목록을 내려도 따라오고, 창 높이에 맞춰 최대한 크게 (v0.11.0) */
+.gx-field > .gx-mapcol { position: sticky; top: 12px; }
+.gx-mapcol, .gx-sidecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.gx-sidecol .gx-sec { padding: 0; }
+.gx-mapbar { display: flex; gap: 8px; align-items: center; }
+/* 임무 탭 (v0.16.21): 지역 고르기 옆에 장소 검색. 결과는 아래로 펼쳐지는 작은 목록 */
+.gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
+.gx-mapfind { position: relative; flex: 1; min-width: 0; }
+.gx-mapfind .gx-search { width: 100%; font-size: 13px; }
+.gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.gx-mapsug:empty { display: none; }
+.gx-sugi { display: flex; align-items: baseline; gap: 8px; min-height: 40px; padding: 8px 12px; border: 0; border-bottom: 1px solid var(--panel2); background: none; color: var(--text); text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
+.gx-sugi:last-child { border-bottom: 0; }
+.gx-sugi:hover, .gx-sugi:focus-visible { background: var(--panel2); outline: none; }
+.gx-sugi small { color: var(--dim); font-size: 12px; }
+.gx-sugnone { margin: 0; padding: 10px 12px; color: var(--dim); font-size: 13px; text-align: center; }
+@media (max-width: 760px) { .gx-mapbar > .gx-select { flex-basis: 38%; } }
+.gx-select, .gx-search {
+  min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--void); color: var(--text); font: inherit;
+}
+.gx-select { flex: 1; }
+.gx-search { width: 100%; }
+.gx-search:focus, .gx-select:focus { outline: 2px solid var(--signal); outline-offset: 1px; }
+.gx-canvas { position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--void); }
+.gx-canvas.ph { aspect-ratio: 4 / 5; }
+.gx-mapcol .gx-canvas:not(.ph) { width: fit-content; max-width: 100%; margin: 0 auto; }
+.gx-mapimg { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(min(100vh - 28px, 950px) - 210px); user-select: none; }
+.gx-mapph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--dim); font-size: 14px; }
+.gx-pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 28px; min-height: 28px; padding: 2px; border: 0; background: none;
+}
+.gx-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 2px var(--void); }
+.gx-pname {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 6px; border-radius: 6px; background: color-mix(in srgb, var(--void) 86%, transparent);
+  font-size: 12px; line-height: 1.4; color: var(--text); white-space: nowrap;
+}
+.gx-pname b { color: #04201c; background: var(--amber); border-radius: 999px; padding: 0 5px; font-size: 12px; }
+.gx-pin.nation .gx-dot { width: 12px; height: 12px; }
+.gx-pin.nation .gx-pname { font-size: 13px; }
+.gx-pin.fac .gx-dot { border-radius: 3px; background: #9cc4ff; }
+.gx-pin.sealed .gx-dot { background: var(--danger); }
+.gx-pin.hot .gx-dot { background: var(--amber); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(224, 163, 60, .35); }
+.gx-pin.hot-an .gx-dot { background: var(--danger); box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(255, 143, 143, .3); }
+.gx-pin.hot-ms .gx-dot { background: #c9a7ff; box-shadow: 0 0 0 2px var(--void), 0 0 0 6px rgba(201, 167, 255, .3); }
+.gx-pin.sel .gx-pname { background: var(--signal); color: var(--on-signal); }
+.gx-pin:hover .gx-pname { outline: 1px solid var(--signal); }
+.gx-mini {
+  min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--void); color: var(--text); font-size: 13px; white-space: nowrap;
+}
+.gx-mini:hover { border-color: var(--mint); }
+.gx-mini.danger { border-color: var(--danger); color: var(--danger); }
+.gx-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.gx-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--dim); font-size: 13px; }
+.gx-chip b { color: var(--text); font-weight: 600; }
+.gx-chip.on { border-color: var(--signal); color: var(--signal); }
+.gx-ctxbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; background: var(--void); border: 1px solid var(--line); font-size: 14px; }
+.gx-wide { width: 100%; min-height: 38px; margin-bottom: 8px; border: 1px dashed var(--line); border-radius: 10px; background: transparent; color: var(--mint); font-size: 14px; }
+.gx-wide.on { border-style: solid; border-color: var(--signal); color: var(--signal); }
+.gx-evs li, .gx-mlist li { padding: 0; overflow: hidden; }
+.gx-ev { display: flex; align-items: stretch; }
+.gx-evmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 9px 12px; border: 0; background: none; text-align: left; }
+.gx-evact { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 6px 8px 6px 0; }
+.gx-evs li.sel, .gx-mlist li.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-report { font-size: 13px; color: var(--text); }
+.gx-kind { background: var(--void); color: var(--dim); }
+.gx-kind.k-an { color: var(--danger); }
+.gx-kind.k-in { color: var(--amber); }
+.gx-kind.k-ms { color: var(--blue); }
+.gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.gx-team .gx-muted { margin: 0; font-size: 13px; }
+.gx-goal { display: flex; align-items: baseline; gap: 8px; }
+.gx-goal span { color: var(--dim); font-size: 13px; }
+.gx-goal b { flex: 1; min-width: 0; color: var(--signal); }
+.gx-goal b.none { color: var(--dim); font-weight: 600; }
+.gx-goal em { font-style: normal; font-size: 13px; color: var(--dim
