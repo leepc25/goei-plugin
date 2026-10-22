@@ -23,7 +23,10 @@ S_=lambda t: math.sin(2*math.pi*t)
 # ── 손 위치 약속 ──
 PF=('a',X+4,63); PR=('a',X-2,63)            # 주머니(앞손·뒷손): 엉덩이 옆
 PKE=dict(le=('e',-3,15),re=('e',-6,14))     # 주머니 팔꿈치: 몸 옆 살짝 뒤
-LOAD=(15,1); FIRE=(19,2)                    # 앞손 스냅 장전(엄지·중지 붙임, 손목 젖힘) / 해제(손목 튕김)
+# v2(2026-10-22 독립 검수: 가슴 앞 손이 주먹 가드로 그려짐) → 앞손을 어깨 높이로 더 내밀어 펼친 손가락이 실루엣에 보이게, 뒷손은 바지 주머니
+LOAD=(20,-3); FIRE=(24,0)                   # 앞손 스냅 장전(검지 세움·엄지와 중지 붙임) / 해제(손목 튕김)
+RPK=lambda d=0,b=0: ('a',X+d-3,64+b)       # 뒷손 바지 주머니(전투 자세)
+RPE=('e',-6,14)
 def ST(b=0,lh=PF,rh=PR,head=(5,-7),tilt=0,dx=0,lean=2,lf=6,rf=-4,**k):
     """서기. 기본은 두 손 주머니"""
     kk={**PKE} if (lh==PF and rh==PR) else {}
@@ -31,12 +34,13 @@ def ST(b=0,lh=PF,rh=PR,head=(5,-7),tilt=0,dx=0,lean=2,lf=6,rf=-4,**k):
     if rh==PR and 're' not in k: k.setdefault('re',PKE['re'])
     kk.update(k)
     return P((X+dx,55+b),lean,0,0,(X+dx+lf,G),(X+dx+rf,G),lh,rh,head=head,tilt=tilt,**kk)
-def KG(d=0,b=0,fh=LOAD,rh='hip',lean=3,tilt=0,lfl=0,rfl=0,s=0.1,head=(5,-7),**k):
+def KG(d=0,b=0,fh=LOAD,rh=None,lean=3,tilt=0,lfl=0,rfl=0,s=0.1,head=(5,-7),**k):
     """전투 대기: 펜싱 앙가르드(앞발 앞, 뒷발 뒤 90도, 무릎 굽힘, 상체 곧게) + 앞손 가슴~눈 높이 스냅 장전, 뒷손 허리"""
+    if rh is None: rh=RPK(d,b); k.setdefault('re',RPE)
     return P((X+d,61+b),lean,s,0.1,(X+14+d,G-lfl),(X-12+d,G-1-rfl),fh,rh,head=head,tilt=tilt,**k)
 def KGF(df,dr,lfl=0,rfl=0,fh=LOAD):
     """펜싱 걸음: 앞발 df·뒷발 dr만큼 옮김, 골반은 가운데"""
-    return P((X+(df+dr)/2,61),3,0.1,0.1,(X+14+df,G-lfl),(X-12+dr,G-1-rfl),fh,'hip')
+    return P((X+(df+dr)/2,61),3,0.1,0.1,(X+14+df,G-lfl),(X-12+dr,G-1-rfl),fh,RPK((df+dr)/2),re=RPE)
 
 # ════════ 전투·기본 ════════
 # 1 기본 대기: 두 손 주머니, 무게를 발 사이로 옮기며 고개로 주변을 훑음(위키 "늘 주변을 훑으며")
@@ -48,7 +52,7 @@ FW=lambda r: ST(0,lh=('r',20+2*r,8),rh=('r',19+2*r,9),le=('e',10+r,10),re=('e',9
 clip('fingerwarm','interlaces his fingers and stretches both arms straight forward, then raises one hand and snaps his fingers once',
      [ST(0),FW(0),FW(1),ST(0,lh=LOAD,le=ELB_DOWN),ST(0,lh=FIRE,le=ELB_DOWN,tilt=-3)])
 # 2 전투 대기: 발끝 바운스(위키 "몸놀림은 가볍고 빠르다")
-clip('guard','light fencing-like side stance, bouncing on the balls of his feet, lead hand raised ready to snap, rear hand at the hip',
+clip('guard','light fencing-like side stance, bouncing on the balls of his feet, lead hand raised ready to snap, rear hand tucked in his trouser pocket',
      [KG(0,0),KG(0,1.5,rfl=1),KG(0,2.5,rfl=2,lfl=1),KG(0,1.5,rfl=1)])
 # 2+ 전투 진입: 주머니에서 손 빼며 어깨 한 번 털고 앞손 올림
 clip('engage','pulls his hands out of his pockets, rolls his shoulders once and raises the lead hand ready to snap',
@@ -75,17 +79,17 @@ def runk(t,lh=None,rh=None):
     return P((X+8,57+3*abs(s)),9,0,0,(X+6+21*c,G-13*max(0,-s)-1),(X+6-21*c,G-13*max(0,s)-1),lh,rh,le=('e',9,9))
 clip('run','light fast run with long bounding strides, torso only slightly forward, lead hand held half forward, rear arm pumping',[runk(i/8) for i in range(8)])
 # 5 점프: 높고 가벼움. 무릎을 가슴까지 접음, 뒷팔은 위로 균형
-AIR=lambda tuck,b=0,fh=(14,-2): P((X,56+b),4,0,0,(X+10,G-2-tuck),(X-4,G-4-tuck*1.2),fh,(-8,-6),lk=KNEE_FWD,rk=KNEE_FWD,re=ELB_UP)
-clip('jump','high light jump: quick dip, springs up, tucks both knees to the chest, rear arm up for balance, lands softly on the toes',
-     [KG(0,4),P((X+1,52),2,0,0,(X+9,G-3),(X-7,G-6),(14,-6),(-8,-10),re=ELB_UP),AIR(14),AIR(22),AIR(16),AIR(5,-1),KG(0,5,rfl=2),KG(0,1)])
+AIR=lambda tuck,b=0,fh=(16,2): P((X,56+b),4,0,0,(X+10,G-2-tuck),(X-4,G-4-tuck*1.2),fh,('r',-11,18),lk=KNEE_FWD,rk=KNEE_FWD,re=('e',-7,10))   # v2: 뒷팔 아래·뒤(위로 들면 머리 뒤 혹으로 그려짐)
+clip('jump','high light jump: quick dip, springs up, tucks both knees to the chest, rear arm swung down and back for balance, lands softly on the toes',
+     [KG(0,4),P((X+1,52),2,0,0,(X+9,G-3),(X-7,G-6),(16,-4),('r',-11,16),re=('e',-7,9)),AIR(14),AIR(22),AIR(16),AIR(5,-1),KG(0,5,rfl=2),KG(0,1)])
 # 6 앉기: 발끝으로 깊이 쪼그려 앉기, 앞손 앞으로
-CK=lambda d=0,b=0,fh=(18,8),rh=('r',8,22),lean=14,**k: P((X+d,80+b),lean,0,0,(X+12+d,G),(X-6+d,G-2),fh,rh,lk=KNEE_FWD,rk=KNEE_FWD,re=('e',3,15),**k)
-clip('crouch','drops into a deep squat on the balls of his feet, lead hand forward ready',[KG(),lerp(KG(),CK(),.4),lerp(KG(),CK(),.8),CK()])
+CK=lambda d=0,b=0,fh=(18,6),rh=None,lean=16,**k: P((X+d,88+b),lean,0,0,(X+9+d,G-1),(X+1+d,G-4),fh,rh if rh is not None else ('r',-4,26),lk=KNEE_FWD,rk=KNEE_FWD,re=('e',-3,14),**k)   # v2: 두 무릎 모두 위로, 뒤꿈치 듦
+clip('crouch','drops into a deep full squat balanced on the balls of both feet, both heels lifted, both knees up high, no knee touches the floor, lead hand forward ready',[KG(),lerp(KG(),CK(),.4),lerp(KG(),CK(),.8),CK()])
 # 7 앉아 이동: 낮게 빠른 종종걸음, 뒷손이 바닥 가까이
 def ckw(t):
     c,s=C(t),S_(t)
-    return P((X+2,80+abs(c)),18,0,0,(X+12+6*c,G-3*max(0,-s)),(X-6-6*c,G-2-3*max(0,s)),(18,8),('r',10,26),lk=KNEE_FWD,rk=KNEE_FWD,re=('e',4,15))
-clip('crouchwalk','scuttling forward low in a squat with quick short steps, rear hand low near the floor',[ckw(i/8) for i in range(8)])
+    return P((X+2,88+abs(c)),16,0,0,(X+9+6*c,G-1-4*max(0,-s)),(X+1-6*c,G-4-4*max(0,s)),(18,6),('r',-4,26),lk=KNEE_FWD,rk=KNEE_FWD,re=('e',-3,14))
+clip('crouchwalk','duck-walking forward in a deep full squat on the balls of both feet, heels lifted, knees up, quick short steps, no knee on the floor',[ckw(i/8) for i in range(8)])
 # 8 하단: 앉은 채 손끝으로 바닥을 앞으로 쓸고 끝에서 튕김(불길은 코드)
 LF=lambda t: P((X+5*t,84),36+6*t,0,0,(X+12,G),(X-6,G-2),('a',X+14+24*t,94-2*t),('r',6,20),lk=KNEE_FWD,rk=KNEE_FWD,re=('e',3,15),tilt=-20)
 clip('lowflame','from a squat, sweeps the lead fingertips low along the floor forward and flicks them at the end',
@@ -98,41 +102,41 @@ FWd=P((X+2,57),-2,0,0,(X+12,G),(X-8,G-1),('r',17,-16),('r',14,-14),le=('e',12,-2
 clip('firewall','from a squat, raises both hands from the floor upward like lifting a curtain while standing up, both hands snap high at the end',
      [CK(),FWa,FWb,FWc,FWd,KG()])
 # 9 1타 앞손 스냅: 손목만 튕김, 뒷발부터 반걸음 후퇴(6), 머리 갸웃
-clip('snap1','lead-hand wrist snap of the fingers toward a point ahead while stepping half a step back, head tilts, hair flicks',
-     [KG(0,0,(14,0)),KGF(0,-4,0,2),P((X-3,61),0,0.1,0.1,(X+14,G),(X-18,G-1),FIRE,'hip',tilt=-4),
-      P((X-5,61),0,0.1,0.1,(X+10,G-2),(X-18,G-1),FIRE,'hip',tilt=-4),KG(-6)])
+clip('snap1','cocks the open lead hand back beside his face, then flicks it forward snapping thumb and middle finger at a point ahead while stepping half a step back, hair flicks',
+     [KG(),KGF(0,-4,0,2,fh=(15,-10)),P((X-3,61),0,0.1,0.1,(X+14,G),(X-18,G-1),(27,2),RPK(-3),re=RPE,le=('e',14,-1),tilt=-6),
+      P((X-5,61),0,0.1,0.1,(X+10,G-2),(X-18,G-1),(25,4),RPK(-5),re=RPE,le=('e',13,0),tilt=-4),KG(-6)])
 # 10 2타 뒷손 스냅: 뒷손이 귀 옆에서 앞으로 휙, 몸이 따라 돌며 한 걸음 후퇴(12)
 S2a=P((X-2,61),2,0.2,0.2,(X+14,G),(X-18,G-1),(8,10),('r',-1,-6),le=('e',8,16),re=('e',-6,2))
-S2b=P((X-6,62),6,0.25,0.25,(X+12,G),(X-24,G-1),(6,12),('r',20,-1),le=('e',4,16),re=('e',10,2),tilt=-3)
-S2c=P((X-9,62),4,0.2,0.2,(X+4,G-2),(X-24,G-1),(8,10),('r',22,1),le=('e',4,16),re=('e',11,3),tilt=-4)
-clip('snap2','rear hand whips forward from beside the ear and snaps, body turns with it while stepping a full step back',
+S2b=P((X-6,62),6,0.25,0.25,(X+12,G),(X-24,G-1),(6,12),('r',16,-8),le=('e',4,16),re=('e',9,-2),tilt=-3)
+S2c=P((X-9,62),4,0.2,0.2,(X+4,G-2),(X-24,G-1),(8,10),('r',18,-4),le=('e',4,16),re=('e',10,0),tilt=-4)
+clip('snap2','rear hand whips forward from beside the ear and flicks open with a finger snap at head height, elbow still bent, fingers spread, not a punch, body turns with it while stepping a full step back',
      [KG(),S2a,staged(S2a,S2b,.5),S2b,S2c,KG(-12)])
 # 11 3타 교차 스냅: 두 팔 가슴 앞 X자 → 양옆으로 펼치며 양손 동시 스냅, 뒷발 미끄러지며 크게 후퇴(20), 상체 뒤로
 S3a=P((X-4,63),4,0,0,(X+14,G),(X-22,G-1),('r',11,8),('r',12,6),le=('e',4,13),re=('e',5,12),tilt=6)
-S3b=P((X-10,62),-6,0,0,(X+10,G-1),(X-30,G-1),('r',24,-6),('r',-13,6),le=('e',13,1),re=('e',-7,10),tilt=-8)
-S3c=P((X-14,62),-9,0,0,(X+2,G),(X-32,G-1),('r',24,-4),('r',-14,8),le=('e',13,2),re=('e',-7,11),tilt=-10)
-clip('snap3','crosses both arms in an X before the chest, then flings them apart snapping both hands at once, rear foot slides far back, upper body leans back',
+S3b=P((X-10,62),-6,0,0,(X+10,G-1),(X-30,G-1),('r',24,2),('r',-13,16),le=('e',13,3),re=('e',-7,9),tilt=-8)
+S3c=P((X-14,62),-9,0,0,(X+2,G),(X-32,G-1),('r',24,4),('r',-14,17),le=('e',13,4),re=('e',-7,10),tilt=-10)
+clip('snap3','crosses both forearms in an X before the chest, then flings them apart, lead hand forward and rear hand down behind, snapping both open hands at once, rear foot slides far back, upper body leans back',
      [KG(),S3a,staged(S3a,S3b,.5),S3b,S3c,lerp(S3c,KG(-20),.5),KG(-20)])
 # 12 달리며 A: 미끄러져 서며 앞손을 바닥 앞쪽으로 휙 쓸어 튕김(몸은 안 들어감)
-SKa=P((X+10,66),-8,0,0,(X+32,G),(X-4,G-1),(-2,16),(-10,8),lk=KNEE_FWD,le=('e',2,16))
-SKb=P((X+16,70),-10,0,0,(X+38,G),(X+2,G-1),(16,18),(-12,6),le=('e',8,15))
-SKc=P((X+18,70),-6,0,0,(X+38,G),(X+4,G-1),(24,10),(-12,6),le=('e',12,12),tilt=-4)
+SKa=P((X+10,66),-8,0,0,(X+32,G),(X-4,G-1),(-2,16),('r',-12,16),lk=KNEE_FWD,le=('e',2,16),re=('e',-7,9))
+SKb=P((X+16,74),-4,0,0,(X+38,G),(X+2,G-1),('a',X+40,G+2),('r',-12,16),le=('e',10,16),re=('e',-7,9))   # v2: 앞손 끝이 바닥 앞을 쓸어야 함
+SKc=P((X+18,72),-6,0,0,(X+38,G),(X+4,G-1),('a',X+50,G-6),('r',-12,16),le=('e',13,14),re=('e',-7,9),tilt=-4)
 clip('skid','sliding to a stop out of a run, leaning back, sweeps the lead hand low forward and snaps',[runk(.25),SKa,SKb,SKc,sh(SKc,0,-1),KG(20)])
 # 13 공중: 앞 아래로 내리꽂아 스냅 → 반동으로 몸이 뒤로 젖혀짐
-ASa=AIR(14,0,(8,-14)); ASb=P((X+2,56),10,0,0,(X+12,G-14),(X-2,G-18),(20,24),(-8,-6),re=ELB_UP,le=('e',12,12))
-ASc=P((X-2,54),-14,0,0,(X+12,G-12),(X+2,G-16),(18,26),(-10,-4),re=ELB_UP,le=('e',10,14),tilt=-8)
-clip('airsnap','in mid-air, thrusts the lead hand down at a point below ahead and snaps, recoil throws his body back',[AIR(14),ASa,ASb,ASc,sh(ASc,-2,-1),AIR(8)])
+ASa=AIR(14,0,(18,-8)); ASb=P((X+2,56),10,0,0,(X+12,G-14),(X-2,G-18),(20,24),('r',-12,16),re=('e',-7,9),le=('e',12,12))
+ASc=P((X-2,54),-14,0,0,(X+12,G-12),(X+2,G-16),(18,26),('r',-12,14),re=('e',-7,8),le=('e',10,14),tilt=-8)
+clip('airsnap','in mid-air, thrusts the lead hand down at a point below ahead and snaps, recoil throws his body back',[AIR(14),ASa,ASb,ASc,sh(ASc,-2,-1),lerp(ASc,AIR(8),.5)])
 # 14 조준(수납 = 역재생): 앞팔을 곧게 뻗어 검지로 겨눔, 뒷손이 앞 손목을 받침, 고개 숙여 팔 따라 봄
 AIM=P((X,61),4,0.1,0.1,(X+14,G),(X-12,G-1),(28,-2),('r',14,3),re=('e',6,10),tilt=6)
 clip('aim','extends the lead arm straight forward and points along the index finger, rear hand supports the wrist, sighting along the arm',
      [KG(),lerp(KG(),AIM,.4),lerp(KG(),AIM,.8),AIM,jit(AIM,0,.5,['NECK','SHOULDER'])])
 # 15 원거리 스냅: 뻗은 팔 끝 손목만 튕김, 앞머리 튐
 AIMF=jit(AIM,1,-2,['RIGHT ARM'])
-clip('fire','from the pointing pose, snaps the fingers at the end of the outstretched arm, only the wrist flicks, hair bounces',
+clip('fire','from the pointing pose with the index finger extended, only the wrist flicks as thumb and middle finger snap, arm stays level, hair bounces',
      [AIM,AIMF,jit(AIMF,0,0,['NOSE']),AIM])
 # 40 손가락 식히기(과열): 손끝을 입에 대고 후 → 손을 아래로 세게 턴다
-COb=P((X,58),6,0,0,(X+8,G),(X-6,G),('r',7,-1),'hip',le=('e',11,8),tilt=-4)
-COs=lambda a: P((X,59),10,0,0,(X+8,G),(X-6,G),('r',14+3*a,20-4*a),'hip',le=('e',8,12),tilt=8)
+COb=P((X,58),6,0,0,(X+8,G),(X-6,G),('r',7,-1),('a',X-3,61),re=RPE,le=('e',11,8),tilt=-4)
+COs=lambda a: P((X,59),10,0,0,(X+8,G),(X-6,G),('r',14+3*a,20-4*a),('a',X-3,62),re=RPE,le=('e',8,12),tilt=8)
 clip('cool','overheated fingers: blows on his fingertips, then shakes the hand hard downward to cool it, wincing grin',
      [KG(),COb,jit(COb,0,0,['NOSE']),COs(0),COs(1),COs(0)])
 # 16 요격: 고개를 위로 홱, 앞손 위로 튕김 → 곧바로 앞으로 한 번 더(두 번 스냅)
@@ -140,35 +144,36 @@ INa=KG(-2,0,(12,-12),tilt=-12,le=('e',10,0)); INb=KG(-3,0,(15,-22),tilt=-16,le=(
 INd=KG(-3,0,(22,2),lean=6)
 clip('intercept','jerks his head up toward a threat and snaps the lead hand upward, then immediately snaps it forward again',[KG(),INa,INb,INc,INd,KG()])
 # 17 지속 포격 충전(반복): 두 손 가슴 앞 모음, 손가락 떨림, 발끝 들썩
-CHG=lambda j,b: P((X,61+b),4,0,0,(X+14,G),(X-12,G-1-b),('r',11+j,6),('r',12-j,7),le=('e',4,13),re=('e',5,12),tilt=4)
-clip('charge','both hands held together before his chest, fingers trembling with built-up heat, bouncing slightly on his toes',[CHG(0,0),CHG(1,1),CHG(0,1.5),CHG(-1,1)])
+CHG=lambda j,b: P((X,61+b),4,0,0,(X+14,G),(X-12,G-1-b),('r',16+j,2),('r',9-j,11),le=('e',8,10),re=('e',4,14),tilt=4)   # v3: 두 손을 떼어 펼침
+clip('charge','both open hands held apart before his chest, fingers spread and trembling with built-up heat, bouncing slightly on his toes',[CHG(0,0),CHG(1,1),CHG(0,1.5),CHG(-1,1)])
 # 17+ 지속 포격 방출: 두 손 번갈아 앞으로 빠르게 스냅
 BRa=P((X,61),6,0,0,(X+14,G),(X-12,G-1),(20,0),('r',12,6),re=('e',5,12)); BRb=P((X,62),6,0,0,(X+14,G),(X-12,G-1),(12,6),('r',20,0),re=('e',9,6))
 clip('barrage','rapid alternating finger snaps with both hands thrusting forward in turn, sustained barrage',[BRa,BRb,jit(BRa,0,-1,['NECK','SHOULDER','NOSE']),BRb,BRa,BRb])
 # 18 요격 자세(가드): 앞손 손바닥 앞, 뒷손 귀 옆 장전, 무게 뒤
-BLK=lambda b: P((X-2,61+b),-3,0,0,(X+14,G),(X-12,G-1),(18,-3),('r',1,-4),re=('e',-5,4),tilt=-2)
-clip('block','interception stance: lead palm open forward at face height, rear hand cocked beside the ear, weight back',[BLK(0),BLK(1),BLK(1.5),BLK(1)])
+BLK=lambda b: P((X-2,61+b),-5,0,0,(X+14,G),(X-12,G-1),(24,-6),RPK(-2,b),re=RPE,le=('e',13,-2),tilt=-2)
+clip('block','interception stance: lead arm stretched forward with the open palm facing ahead at face height like stopping traffic, rear hand in the trouser pocket, weight back',[BLK(0),BLK(1),BLK(1.5),BLK(1)])
 # 20 회피: 두 발 모아 뒤로 홉, 앞손은 발 앞 바닥을 향해 튕김(연막은 코드)
-EVa=P((X,66),8,0,0,(X+12,G),(X-10,G-1),(14,10),'hip')
-EVb=P((X-12,56),2,0,0,(X-2,G-8),(X-14,G-10),(16,20),(-10,4),lk=KNEE_FWD,le=('e',8,14))
-EVc=P((X-22,64),6,0,0,(X-8,G),(X-32,G-1),(18,18),'hip',le=('e',8,14))
+EVa=P((X,66),8,0,0,(X+12,G),(X-10,G-1),(14,10),('a',X-3,69),re=RPE)
+EVb=P((X-12,56),6,0,0,(X-2,G-8),(X-14,G-10),('a',X+8,G-2),('r',-11,16),lk=KNEE_FWD,le=('e',8,16),re=('e',-7,9))   # v2: 앞손이 발 앞 바닥을 향해 튕김
+EVc=P((X-22,64),6,0,0,(X-8,G),(X-32,G-1),(18,18),RPK(-22),re=RPE,le=('e',8,14))
 clip('evade','hops backward with both feet together while flicking a snap down at the floor where he stood, lands lightly',[KG(),EVa,EVb,lerp(EVb,EVc,.5),EVc,KG(-24)])
 # 21 밀쳐 떼기: 팔꿈치 편 손바닥으로 가슴 밀기, 뒷발 버팀(경찰 거리두기 밀어내기)
-SHV=P((X+2,61),8,0,0,(X+14,G),(X-14,G-1),(26,6),'hip',le=('e',13,6))
-clip('shove','stiff-arm shove: straight arm pushes the palm into an enemy chest, rear leg braced, keeping distance',[KG(),lerp(KG(),SHV,.5),SHV,jit(SHV,1,0,['RIGHT ARM','RIGHT ELBOW'])])
+SHV=P((X+2,61),8,0,0,(X+14,G),(X-14,G-1),(26,6),RPK(2),re=RPE,le=('e',13,6))
+clip('shove','stiff-arm shove: straight arm pushes the open palm, fingers spread, into an enemy chest, rear leg braced, keeping distance',[KG(),lerp(KG(),SHV,.5),SHV,jit(SHV,1,0,['RIGHT ARM','RIGHT ELBOW'])])
 # 22 딱밤 스냅: 밀친 손을 거둬 얼굴 높이에서 짧게 튕김
-FLa=P((X,61),4,0,0,(X+14,G),(X-12,G-1),(13,-2),'hip',tilt=-2); FLb=P((X,61),4,0,0,(X+14,G),(X-12,G-1),(20,-6),'hip',tilt=-4)
+FLa=P((X,61),4,0,0,(X+14,G),(X-12,G-1),(13,-2),RPK(),re=RPE,tilt=-2); FLb=P((X,61),4,0,0,(X+14,G),(X-12,G-1),(20,-6),RPK(),re=RPE,tilt=-4)
 clip('flick','pulls the shoving hand back and flicks a snap right in front of the enemy face',[SHV,FLa,FLb,FLa])
 # 23 발밑 폭발로 날림: 백스텝하며 앞손을 아래로 내리꽂아 스냅
-LAa=P((X-4,61),2,0,0,(X+12,G),(X-20,G-1),(12,-10),'hip',le=('e',10,-2)); LAb=P((X-10,63),10,0,0,(X+8,G),(X-24,G-1),(22,20),'hip',le=('e',11,12))
-clip('launch','steps back, raises the lead hand and drives it down to snap at the ground under the enemy',
+# v3: 앞손을 머리 위 앞쪽으로 높이 들었다가(머리에 얹은 듯 보이지 않게) 적 발밑(무릎 높이)까지 내리꽂음
+LAa=P((X-4,61),2,0,0,(X+12,G),(X-20,G-1),(16,-18),RPK(-4),re=RPE,le=('e',13,-7)); LAb=P((X-10,64),14,0,0,(X+8,G),(X-24,G-1),('a',X+22,88),RPK(-10,2),re=RPE,le=('e',12,12))
+clip('launch','steps back, raises the open lead hand high and drives it down to snap at the ground under the enemy',
      [SHV,lerp(SHV,LAa,.5),LAa,staged(LAa,LAb,.5),LAb,sh(LAb,-1,0),lerp(LAb,KG(-14),.5),KG(-14)])
 # 24 필살기 지휘: 4/4 지휘 경로 아래(1)→안(2)→밖(3)→위(4), 익투스마다 스냅 → 두 손 올렸다 양손 스냅(근거: 지휘 교본)
 CD=lambda fh,rh=('r',6,16),tilt=0,lean=2,re=('e',2,14),le=None: P((X,57),lean,0,0,(X+8,G),(X-8,G),fh,rh,tilt=tilt,re=re,**({'le':le} if le else {}))
-clip('super','conducts an orchestra with the lead hand: down, in, out, up, snapping on each beat, then raises both hands and snaps both together, grin widening',
-     [CD(('r',14,-16),le=('e',10,-4),tilt=-6),CD(('r',16,12),le=('e',10,6)),CD(('r',8,4),le=('e',8,10)),CD(('r',24,2),le=('e',13,4)),
-      CD(('r',14,-18),le=('e',11,-4),tilt=-8),CD(('r',14,-20),('r',10,-18),-10,-4,('e',8,-4),('e',11,-4)),
-      CD(('r',22,6),('r',18,8),2,8,('e',8,8),('e',12,6)),CD(('r',23,8),('r',19,10),4,8,('e',8,9),('e',12,7)),KG()])
+clip('super','conducts an orchestra with big sweeping strokes of the lead arm: down, in, out, up, snapping on each beat, then raises both open hands high above his head and flings them apart snapping both, grin widening',
+     [KG(),CD(('r',14,-16),le=('e',10,-4),tilt=-6),CD(('r',18,14),le=('e',11,7)),CD(('r',6,6),le=('e',8,11)),CD(('r',26,0),le=('e',14,3)),
+      CD(('r',16,-20),le=('e',11,-6),tilt=-8),CD(('r',10,-28),('r',4,-26),-14,-6,('e',6,-12),('e',9,-12)),
+      CD(('r',26,6),('r',-14,16),4,8,('e',-7,9),('e',13,4)),jit(CD(('r',26,6),('r',-14,16),4,8,('e',-7,9),('e',13,4)),0,-1,['NOSE','NECK']),KG()])
 # 36 숙련 3: 검지로 높이 다른 세 곳 톡톡 → 모은 손을 펴며 스냅
 MK=lambda fh,le: KG(0,0,fh,le=le)
 clip('mark3','taps three points in the air at different heights with the index finger, then gathers the hand and snaps',
@@ -178,8 +183,8 @@ DR=lambda a,b: P((X,61+b),4,0,0,(X+14,G),(X-12,G-1-b),(18,-2) if a else (12,6),(
 clip('drum','drum-solo finger snapping: both hands alternate faster and faster, bouncing on his toes to the beat, head bobbing',
      [DR(1,0),DR(0,2),DR(1,0),DR(0,2),DR(1,1),DR(0,2.5),DR(1,1),DR(0,2.5)])
 # 25 줍기: 허리만 빠르게 숙여 한 손으로 낚아챔, 고개는 앞
-PKa=P((X-4,66),50,0,0,(X+8,G),(X-6,G),('a',X+20,90),PR,tilt=-30,re=PKE['re'])
-PKb=P((X-4,70),60,0,0,(X+8,G),(X-6,G),('a',X+24,96),PR,tilt=-36,re=PKE['re'])
+PKa=P((X-2,72),32,0,0,(X+10,G),(X-8,G),('a',X+20,96),PR,tilt=-20,re=PKE['re'])
+PKb=P((X-2,78),38,0,0,(X+10,G),(X-8,G),('a',X+24,100),PR,tilt=-24,re=PKE['re'])
 clip('pickup','bends quickly at the waist and snatches something off the floor with one hand, eyes still forward, straightens up',
      [ST(0),PKa,PKb,PKb,PKa,ST(0,lh=(10,14),le=('e',5,14))])
 # 26 물건 던지기: 언더핸드로 높이 띄움 → 같은 손으로 스냅
@@ -200,23 +205,24 @@ BDb=ST(0,lh=('r',15,11),rh=('r',13,8),le=('e',8,13),re=('e',6,11),tilt=-6,lean=-
 clip('bandage','holds the injured forearm forward, touches the wound with a fingertip and snaps to cauterize it, flinches, then grins again',
      [ST(0),BDa,jit(BDa,0,-1,['LEFT ARM']),BDb,BDa,ST(0)])
 # 30 약 피격: 가볍게 튕겨 밀리며 한 발 뒤, 미소 유지
-HT=P((X-5,60),-8,0,0,(X+12,G),(X-16,G-1),(12,2),(-2,14),tilt=-6)
-clip('hit','light hit: bounced back a step, head knocked back, still smiling',[KG(),HT,lerp(HT,KG(-6),.5),KG(-6)])
+HT=P((X-5,60),-8,0,0,(X+12,G),(X-16,G-1),(12,2),('a',X-8,63),re=RPE,tilt=-6)
+clip('hit','light hit: bounced back a step, head knocked back, lead hand flung open, still smiling',[KG(),HT,lerp(HT,KG(-6),.5),KG(-6)])
+DOWN_DX=16   # v3: 누우면 뒤통수가 x<0으로 나감 → 클립 전체를 오른쪽으로. 빌더 SHIFT_SKEL이 origin으로 되돌림
 # 31 강 피격·다운: 가벼운 몸이 날아가 등으로 떨어지며 두 팔로 바닥 침(뒤낙법), 한 번 튐
 DNa=P((X-8,56),-24,0,0,(X+8,G-6),(X-4,G-10),(14,-4),(6,-8),tilt=-12,le=ELB_UP,re=ELB_UP)
 DNb=P((X-16,66),-58,0,0,(X+10,G-24),(X+2,G-30),(12,-20),(4,-18),tilt=16,lk=KNEE_UP,rk=KNEE_UP)
-DNc=P((X-16,92),-86,0,0,(X+16,G-14),(X+10,G-10),('a',X-26,G+2),('a',X-34,G+2),tilt=30,lk=KNEE_UP,rk=KNEE_UP)
-DNd=P((X-16,88),-82,0,0,(X+18,G-10),(X+12,G-8),('a',X-24,G-2),('a',X-32,G-2),tilt=28,lk=KNEE_UP,rk=KNEE_UP)
-DNe=P((X-16,94),-88,0,0,(X+20,G),(X+14,G),('a',X-24,G+2),('a',X-32,G+2),tilt=32,lk=KNEE_UP,rk=KNEE_UP)
+DNc=P((X-16,89),-86,0,0,(X+16,G-14),(X+10,G-10),('a',X-26,G-1),('a',X-34,G-1),tilt=30,lk=KNEE_UP,rk=KNEE_UP)
+DNd=P((X-16,86),-82,0,0,(X+18,G-10),(X+12,G-8),('a',X-24,G-4),('a',X-32,G-4),tilt=28,lk=KNEE_UP,rk=KNEE_UP)
+DNe=P((X-16,90),-88,0,0,(X+20,G),(X+14,G),('a',X-24,G-2),('a',X-32,G-2),tilt=32,lk=KNEE_UP,rk=KNEE_UP)
 clip('down','heavy hit: his light body is thrown back through the air, lands on his back slapping the floor with both arms, bounces once',
-     [KG(),DNa,DNb,DNc,DNd,DNe,DNe])
+     [sh(p,DOWN_DX,0) for p in (KG(),DNa,DNb,DNc,DNd,DNe,DNe)])
 # 32 기상: 무릎을 가슴으로 당겨 뒤로 구르듯 → 한쪽 무릎 → 일어서며 손가락 튕겨 먼지 털기
 GUa=P((X-18,94),-70,0,0,(X-30,G-36),(X-34,G-30),('a',X-30,G),('a',X-36,G),tilt=34,lk=KNEE_UP,rk=KNEE_UP)
 GUb=P((X-30,86),-10,0,0,(X-18,G),(X-40,G-1),(14,12),('a',X-44,G-1),lk=KNEE_FWD,rk=KNEE_UP)
-GUc=P((X-34,74),8,0,0,(X-22,G),(X-46,G-2),(14,8),'hip')
+GUc=P((X-34,74),8,0,0,(X-22,G),(X-46,G-2),(14,8),('r',-6,18),re=('e',-5,12))
 GUd=P((X-34,58),2,0,0,(X-26,G),(X-42,G),('r',9,16),('r',6,20),le=('e',3,14),re=('e',2,15),tilt=10)
 clip('getup','rolls backward over his shoulder to put distance, comes up on one knee, stands and snaps the dust off his jacket',
-     [DNe,GUa,GUb,GUc,GUd,jit(GUd,1,-2,['RIGHT ARM']),sh(KG(),-34,0)])
+     [sh(p,DOWN_DX,0) for p in (DNe,GUa,GUb,GUc,lerp(GUc,GUd,.5),GUd,jit(GUd,1,-2,['RIGHT ARM']),lerp(GUd,sh(KG(),-34,0),.5),sh(KG(),-34,0))])
 # 33 말하기: 손짓 많음, 입 계속(입은 생성 설명)
 TK=lambda fh,le,tilt: ST(0,lh=fh,le=le,tilt=tilt)
 clip('talk','talking cheerfully nonstop, lead hand gesturing a lot, rear hand in the pocket, mouth moving',
@@ -225,26 +231,27 @@ clip('talk','talking cheerfully nonstop, lead hand gesturing a lot, rear hand in
 TI=lambda b: P((X-2,62+b),40,0,0,(X+10,G),(X-8,G),('a',X+12,80),('a',X+8,82),tilt=-26,le=('e',8,12),re=('e',6,13))
 clip('tired','out of breath with both hands on his knees, panting, but lifts his head and grins',[TI(0),TI(1.5),TI(2.5),TI(1.5)])
 # 35 지원 등장: 옆에서 내려서듯 착지 → 뒤·앞·위 세 번 스냅 → 두 손가락 경례
-SUa=P((X-20,52),4,0,0,(X-12,G-14),(X-26,G-10),(12,-6),(-8,-4),lk=KNEE_FWD,re=ELB_UP)
+SUa=P((X-20,52),4,0,0,(X-12,G-14),(X-26,G-10),(14,10),('r',-10,14),lk=KNEE_FWD,le=('e',8,10),re=('e',-6,9))   # v3: 손이 얼굴을 가리지 않게 균형 잡듯 아래로
 SUb=P((X-10,70),12,0,0,(X+2,G),(X-22,G-1),(14,6),('r',-4,20))
-SAL=lambda a: ST(0,lh=('r',6+8*a,-11-a),le=('e',13,0),rh=PR)
-clip('support','hops down as if off a motorbike, snaps behind, ahead and above in quick turns, then gives a two-finger salute',
-     [SUa,SUb,KG(-6),KG(-6,0,LOAD,('r',-18,2),re=('e',-9,8)),KG(-6,0,(22,0)),KG(-6,0,(14,-18),le=('e',12,-4),tilt=-10),ST(0),SAL(0),SAL(1),ST(0)])
+SAL=lambda a: ST(0,lh=('r',9+10*a,-10-2*a),le=('e',14,-1),rh=PR)
+clip('support','hops down as if off a motorbike, snaps behind, ahead and above in quick turns, then touches two fingers to his brow and flicks them forward in a casual salute',
+     [SUa,SUb,KG(-6),KG(-6,0,LOAD,('r',-18,2),re=('e',-9,8)),KG(-6,0,(22,0)),KG(-6,0,(14,-18),le=('e',12,-4),tilt=-10),lerp(KG(-6,0,(14,-18),le=('e',12,-4)),ST(0),.5),ST(0),SAL(0),SAL(1),ST(0)])
 # 38 둔기: 어깨 위 둔기를 손목으로 휙 던짐 → 바로 스냅(던진 둔기는 엔진이 손 좌표에서 날림, 그림은 빈 손)
 PPa=ST(0,lh=('r',3,-1),le=('e',9,10)); PPb=P((X-2,56),-4,0,0,(X+6,G),(X-6,G),('r',-2,-5),PR,le=('e',8,4),re=PKE['re'])
 PPc=P((X+3,56),8,0,0,(X+12,G),(X-6,G),(20,-10),PR,le=('e',12,-2),re=PKE['re']); PPd=P((X+3,56),4,0,0,(X+12,G),(X-6,G),(18,-14),PR,le=('e',12,-4),re=PKE['re'],tilt=-10)
 clip('pipe','flicks something resting on his shoulder forward with one hand like a throw, then snaps at it, empty hand',[PPa,PPb,PPc,PPd,jit(PPd,1,-1,['RIGHT ARM']),ST(0)])
-PIPE='a long steel pipe resting on his shoulder held by one hand'
-clip('idle_pipe','standing relaxed with a steel pipe resting on his shoulder in one hand, other hand in the pocket',[ST(b,lh=('r',3,-1),le=('e',9,10)) for b in (0,.5,1,.5)],PIPE)
-clip('walk_pipe','walking lightly with a steel pipe resting on his shoulder, other hand in the pocket',[walkk(i/8,lh=('r',3,-1),le=('e',9,10)) for i in range(8)],PIPE)
+# v3(2026-10-22 독립 검수: 생성기가 그린 파이프·총이 입을 가로지르고 손 사이를 순간이동, 총 디자인 3종) → 무기는 그리지 않고 엔진이 손 좌표에 그림
+PIPE=''
+clip('idle_pipe','standing relaxed, lead hand raised to rest on his own shoulder, fingers curled as if gripping a handle, other hand in the pocket',[ST(b,lh=('r',3,-1),le=('e',9,10)) for b in (0,.5,1,.5)],PIPE)
+clip('walk_pipe','walking lightly, lead hand resting on his own shoulder with fingers curled as if gripping a handle, other hand in the pocket',[walkk(i/8,lh=('r',3,-1),le=('e',9,10)) for i in range(8)],PIPE)
 # 39 서툰 산탄총: 허리 높이 한 손 사격, 반동에 팔이 튀고 얼굴 찡그림, 반 발 휘청
 SGa=ST(0,lh=('r',14,24),le=('e',4,16),lf=10,rf=-8); SGb=P((X-3,55),-8,0,0,(X+10,G),(X-10,G),('r',16,10),PR,le=('e',8,12),re=PKE['re'],tilt=-8)
-clip('shotgun','fires a shotgun awkwardly one-handed from the hip, recoil jerks the arm up, winces and stumbles half a step',
-     [SGa,SGb,lerp(SGb,SGa,.5),SGa,SGa],'an awkwardly held black pump shotgun in one hand at hip height')
-SGH='a black pump shotgun dangling awkwardly in one hand at his side, held away from his body'
-clip('idle_shotgun','standing with a shotgun dangling awkwardly in one hand away from his body, other hand in the pocket',[ST(b,lh=(6,28)) for b in (0,.5,1,.5)],SGH)
-clip('walk_shotgun','walking holding a shotgun dangling awkwardly at his side in one hand',[walkk(i/8,lh=(6,28)) for i in range(8)],SGH)
-clip('run_shotgun','running holding a shotgun at his side in one hand',[runk(i/8,lh=(8,24)) for i in range(8)],SGH)
+clip('shotgun','lead hand at hip height jerks up as if kicked by a heavy recoil, he winces and stumbles half a step back',
+     [SGa,SGb,lerp(SGb,SGa,.5),SGa,SGa])
+SGH=''
+clip('idle_shotgun','standing, lead arm hanging slightly away from his body with fingers curled as if gripping a handle, other hand in the pocket',[ST(b,lh=(6,28)) for b in (0,.5,1,.5)],SGH)
+clip('walk_shotgun','walking, lead arm hanging stiffly away from his side with fingers curled as if gripping a handle',[walkk(i/8,lh=(6,28)) for i in range(8)],SGH)
+clip('run_shotgun','running, lead arm held stiffly at his side with fingers curled as if gripping a handle, rear arm pumping',[runk(i/8,lh=(10,18)) for i in range(8)],SGH)
 # 34a 영입 멘트: 상대를 가리킴 → 팔 활짝 → 엄지로 자기 가슴
 RCa=ST(0,lh=(24,-2),le=('e',12,2),tilt=-2); RCb=ST(0,lh=(22,-6),rh=('r',-14,-2),le=('e',12,0),re=('e',-8,6),lean=-4,tilt=-6)
 RCc=ST(0,lh=('r',5,10),le=('e',8,14),tilt=4)

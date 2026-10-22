@@ -229,7 +229,7 @@ function onKey(code, down) {
   if (code === 'KeyQ') tryParry();
   if (G.lock) {
     if (code === 'KeyA' && G.air) { attackA(); return; }
-    if (code === 'KeyA' && ['snap1', 'snap2'].includes(G.clip)) G.queued = 'A';
+    if (code === 'KeyA' && ['snap1', 'snap2', 'shove'].includes(G.clip)) G.queued = 'A';
     if (code === 'KeyS' && G.clip === 'fire') { G.sHeld = true; }
     if (code === 'KeyD' && G.clip === 'intercept') G.dHeld = true;
     return;
@@ -498,7 +498,8 @@ function frameDone() {
   if (c.adv) G.x += G.dir * c.adv * S;
   if (G.next) { const n = G.next; G.next = null; play(n, { lock: true }); return; }
   if (k === 'jump') return;
-  if (k === 'airsnap' && G.air) { G.lock = true; G.phase = 'air'; play('jump', { lock: true }); return; }
+  if (k === 'airsnap' && G.air) { G.lock = true; G.phase = 'air'; play('jump', { lock: true }); G.f = G.vy < 0 ? 3 : 4; return; }
+  if (G.queued === 'A' && k === 'shove' && G.shoved && canSnap() && !G.overheat) { G.queued = null; play(dirX() ? 'launch' : 'flick', { lock: true }); return; }
   if (G.queued === 'A' && (k === 'snap1' || k === 'snap2') && canSnap() && !G.overheat) { G.queued = null; G.combo++; G.comboT = 0.8; play(G.combo === 2 ? 'snap2' : 'snap3', { lock: true }); return; }
   G.queued = null;
   if (G.overheat && k !== 'cool') { startCool(); return; }
@@ -537,7 +538,7 @@ function update(now) {
   if (G.overheat && !G.lock && !G.air && !G.down) startCool();
   // 지속 포격·드럼 끝
   if (G.barrageT > 0) { G.barrageT -= dt; if (G.barrageT <= 0 && G.clip === 'barrage') { G.lock = false; if (G.overheat) startCool(); else play(idleClip()); } }
-  if (G.drumT > 0) { G.drumT -= dt; if (G.drumT <= 0 && G.clip === 'drum') { G.lock = false; if (G.overheat) startCool(); else play(idleClip()); } }
+  if (G.drumT > 0) { G.drumT -= dt; if (G.drumT <= 0 && G.clip === 'drum' && G.f < M.clips.drum.frames - 1) G.drumT = 0.001; else if (G.drumT <= 0 && G.clip === 'drum') { G.lock = false; if (G.overheat) startCool(); else play(idleClip()); } }
   for (const s of SCHED) { s.t -= dt; if (s.t <= 0 && !s.done) { s.done = true; s.fn(); } }
   for (let i = SCHED.length - 1; i >= 0; i--) if (SCHED[i].done) SCHED.splice(i, 1);
   const free = !G.lock && !G.down && !G.guard && !G.charging && !G.air;
@@ -816,24 +817,35 @@ function drawPickups() {
     const gy = groundY(p.z);
     ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(p.x, gy + 2, 30, 6, 0, 0, Math.PI * 2); ctx.fill();
     if (p.kind === 'pipe') { ctx.fillStyle = '#8b939a'; ctx.fillRect(p.x - 50, gy - 8, 100, 8); ctx.fillStyle = '#5a6168'; ctx.fillRect(p.x - 50, gy - 3, 100, 3); }
-    else if (p.kind === 'shotgun') { ctx.fillStyle = '#26282c'; ctx.fillRect(p.x - 50, gy - 10, 100, 7); ctx.fillStyle = '#6b4a32'; ctx.fillRect(p.x + 20, gy - 12, 30, 12); }
+    else if (p.kind === 'shotgun') { ctx.save(); ctx.translate(p.x, gy - 4); ctx.scale(S, S); px([[-17, -2, 13, 4, '#1d1f23'], [-4, -2, 12, 4, '#2c3036'], [8, -2, 22, 2, '#3a3f46'], [8, 0, 15, 2, '#24272c'], [12, 0, 8, 3, '#4a4f57']]); ctx.restore(); }
     else { ctx.fillStyle = '#9a4a36'; ctx.fillRect(p.x - 22, gy - 18, 44, 18); ctx.strokeStyle = '#4a2218'; ctx.lineWidth = 3; ctx.strokeRect(p.x - 22, gy - 18, 44, 18); }
     if (Math.abs(p.x - G.x) < 110 && Math.abs(p.z - G.z) < 0.15) { ctx.fillStyle = '#ffe9a0'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('E ' + p.label, p.x, gy - 60); }
   }
 }
-// 든 물건(그림에 없음): 손 좌표에 붙임
-// 서툰 허리 사격 클립은 생성기가 총을 거의 안 그림 → 앞손 손목 좌표·팔 각도에 산탄총을 붙임(대기·걷기·달리기 클립은 그림에 총이 있음)
-function drawGun() {
-  const c = C(), a = c && c.anchors && c.anchors[Math.min(G.f, c.anchors.length - 1)]; if (!a) return;
-  const h = handPos(), ang = a.angle * Math.PI / 180;
-  ctx.save(); ctx.translate(Math.round(h.x), Math.round(h.y)); ctx.scale(G.dir * S, S); ctx.rotate(Math.max(-0.6, Math.min(0.4, ang)));
-  const r = (x, y, w, hh, col) => { ctx.fillStyle = '#000'; ctx.fillRect(x - 1, y - 1, w + 2, hh + 2); ctx.fillStyle = col; ctx.fillRect(x, y, w, hh); };
-  r(-14, -1, 12, 4, '#6b4a32'); r(-3, -2, 34, 3, '#2c3036'); r(4, 1, 12, 2, '#4a3a2c');
+// 든 물건(그림에 없음): 손 좌표에 붙임. 무기 클립은 몸만 그려져 있고(2026-10-22 검수: 생성기 무기가 손 사이를 순간이동, 총 디자인 3종) 무기는 전부 여기서 한 모양으로 그림
+// 그림 px 단위(검정 1px 외곽선 + 2~3단 색), S배로 키움
+function px(rects) { for (const [x, y, w, hh, col] of rects) { ctx.fillStyle = '#000'; ctx.fillRect(x - 1, y - 1, w + 2, hh + 2); } for (const [x, y, w, hh, col] of rects) { ctx.fillStyle = col; ctx.fillRect(x, y, w, hh); } }
+// 검은 펌프식 산탄총(손 = 권총 손잡이, +x = 총구)
+function drawGun(ang) {
+  const h = handPos();
+  ctx.save(); ctx.translate(Math.round(h.x), Math.round(h.y)); ctx.scale(G.dir * S, S); ctx.rotate(ang);
+  px([[-17, -2, 13, 4, '#1d1f23'], [-4, -2, 12, 4, '#2c3036'], [8, -2, 22, 2, '#3a3f46'], [8, 0, 15, 2, '#24272c'], [12, 0, 8, 3, '#4a4f57'], [-1, 2, 3, 3, '#1d1f23']]);
+  ctx.fillStyle = '#5a6068'; ctx.fillRect(-16, -2, 11, 1); ctx.fillRect(9, -2, 20, 1);
+  ctx.restore();
+}
+// 쇠파이프: 손에서 어깨 뒤로 비스듬히 걸침
+function drawPipe(ang = -0.32) {
+  const h = handPos();
+  ctx.save(); ctx.translate(Math.round(h.x), Math.round(h.y)); ctx.scale(G.dir * S, S); ctx.rotate(Math.PI + ang);
+  px([[-8, -2, 48, 3, '#8b939a']]); ctx.fillStyle = '#5a6168'; ctx.fillRect(-8, 0, 48, 1); ctx.fillStyle = '#c4cbd0'; ctx.fillRect(-8, -2, 48, 1);
   ctx.restore();
 }
 function drawHeld() {
-  if (G.clip === 'shotgun') drawGun();
-  const k = heldTag(); if (!k || G.weapon === 'shotgun' || G.weapon === 'pipe') return;   // 쇠파이프·산탄총은 무기별 클립에 그려져 있음
+  const c = C(), a = c && c.anchors && c.anchors[Math.min(G.f, c.anchors.length - 1)];
+  if (G.clip === 'shotgun') { if (a) drawGun(Math.max(-0.6, Math.min(0.4, a.angle * Math.PI / 180))); return; }
+  if (G.weapon === 'shotgun') { drawGun(G.clip === 'run_shotgun' ? 0.35 : 0.6); return; }   // 늘어뜨린 총: 총구가 앞 아래
+  if (G.weapon === 'pipe' || (G.clip === 'pipe' && G.f < (c.hits[0] ?? 2))) { drawPipe(); return; }   // 던지기 클립은 손을 떠나는 장(타격 장) 전까지 파이프를 쥠
+  const k = heldTag(); if (!k) return;
   const h = handPos(), h2 = handPos('hand2'), x = (h.x + h2.x) / 2, y = (h.y + h2.y) / 2;
   ctx.fillStyle = '#9a4a36'; ctx.fillRect(x - 11 * S, y - 8 * S, 22 * S, 9 * S); ctx.strokeStyle = '#4a2218'; ctx.lineWidth = 2; ctx.strokeRect(x - 11 * S, y - 8 * S, 22 * S, 9 * S);
 }

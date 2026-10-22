@@ -1,0 +1,59 @@
+before 14700
+done snap3 7
+sub airsnap
+done jump 8
+sub super
+done airsnap 6
+sub block
+done block 4
+sub advance
+done super 10
+sub retreat
+done advance 6
+sub engage
+done retreat 6
+sub aim
+done engage 4
+sub fire
+done aim 5
+sub intercept
+done fire 4
+sub charge
+done intercept 6
+sub skid
+done skid 6
+sub evade
+done charge 4
+sub crouch
+done evade 6
+sub crouchwalk
+done crouch 4
+sub lowflame
+done crouchwalk 8
+sub firewall
+done lowflame 6
+sub shove
+done firewall 6
+sub flick
+done shove 4
+sub launch
+done flick 4
+sub hit
+done launch 8
+done hit 4
+sub down
+sub getup
+done down 7
+sub support
+done support 11
+sub cool
+done getup 9
+done cool 6
+sub mark3
+sub pickup
+done mark3 8
+done pickup 6
+sub idle_shotgun
+sub walk_shotgun
+done walk_shotgun 8
+sub run_shotgun

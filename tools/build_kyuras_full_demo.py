@@ -54,7 +54,7 @@ DEFS = [
     D('shove', 'E 밀쳐 떼기', 14, hits=[2], hold=0.04),
     D('flick', '밀친 뒤 A: 딱밤 스냅', 14, hits=[2], hold=0.05),
     D('launch', '밀친 뒤 방향+A: 발밑 폭발', 13, hits=[4], adv=-14, hold=0.08),
-    D('super', 'W 필살기: 지휘', 6, hits=[1, 2, 3, 4, 6], hold=0.05),
+    D('super', 'W 필살기: 지휘', 7, hits=[2, 3, 4, 5, 7], hold=0.05),
     D('mark3', '숙련 3: 3점 지정', 10, hits=[5], hold=0.1),
     D('drum', '숙련 6: 드럼 솔로', 10, loop=True),
     D('pickup', 'E 줍기', 10),
@@ -171,7 +171,7 @@ def main():
             slide = round(d['adv'] - drawn, 1)
         manifest['clips'][d['key']] = {k: d[k] for k in ('label', 'fps', 'loop', 'adv', 'origin', 'hold', 'group')} | {'hits': hits, 'slide': slide, 'frames': len(fr), 'bytes': len(data), 'prop': False}
         sh = kyuras_fixes.SHIFT.get(d['key'], 0)
-        if sh: manifest['clips'][d['key']]['origin'] = sh
+        if sh or d['key'] in kyuras_fixes.ORIGIN: manifest['clips'][d['key']]['origin'] = sh + kyuras_fixes.ORIGIN.get(d['key'], 0)
         anc = None if d['key'] in GPT else kyuras_fixes.anchors(d['key'], idx)
         if anc and sh:
             for q in anc:
