@@ -374,7 +374,8 @@ function onDisplay(text: string): string {
     // 캐릭터 이미지 태그는 플러그인이 그림 칸으로. Lite 판정 전(다른 채팅에서 돌아온 직후)에는 태그가 모두 에셋 모듈에 있는 이름일 때만
     if (hasImgTag(out)) {
       const pick = modulePicker();
-      if (liteNow || imgTagsKnown(out, pick)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def);
+      const self = userInfo().name;
+      if (liteNow || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
     }
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();

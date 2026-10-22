@@ -94,6 +94,10 @@ test('주인공 이미지: 기본 끔, 켜면 Asset 로어북의 {{user}} 금지
   assert.doesNotMatch(on, /\{\{|tags for Jyaldi|solely on Jyaldi|If only Jyaldi/);
   assert.match(on, /Do NOT generate tags for undefined characters\./);
   assert.match(on, /If only undefined NPCs, or pure narration/);
+  assert.match(on, /Aestheticism, Brownie, Jyaldi\n/);
+  assert.match(off, /Aestheticism, Brownie\n/);
+  assert.match(run({ $st_asset_player: '1', $st_player: '' }), /Brownie, Jyaldi\n/);
+  assert.match(run({ $st_asset_player: '1', $st_player: 'P001' }), /Aestheticism, Brownie\n/);
   const msgs = [{ role: 'system', content: off }, { role: 'user', content: 'Jyaldi, hi' }];
   const hid = hidePlayerTag(msgs, ['Jyaldi']);
   assert.match(hid[0].content, /- Characters \{name\}: Aileen, Deadpole, Spangdal, Dejure, Geshugan, Gognija, Gorgodio, Jaemtri, Konjyuce,/);
@@ -105,4 +109,17 @@ test('보조모델: 주인공 이미지를 끄면 주인공은 태그 후보에�
   const text = '쟈알디가 문을 열었다.\n\n에일린이 웃었다.';
   assert.deepEqual(A.planAsset(text, data, 2).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Jyaldi | Aileen');
   assert.deepEqual(A.planAsset(text, data, 2, ['Jyaldi']).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Aileen');
+});
+
+test('페르소나 이름 태그는 표정과 상관없이 유저 사진 칸', async () => {
+  const { imgtag } = await import('../dist-test/core.mjs');
+  const pick = (n) => (n === 'Aileen_default' ? 'Aileen_default' : null);
+  const out = imgtag.renderImgTags('a\n<img=영지_smile>\nb\n<img=Aileen_smile>', pick, 0, '영지');
+  assert.match(out, /url\('\{\{source::user\}\}'\)/);
+  assert.match(out, /url\('\{\{raw::Aileen_default\}\}'\)/);
+  assert.doesNotMatch(imgtag.renderImgTags('<img=영지_smile>', pick, 0), /gim/);
+  assert.equal(imgtag.imgTagsKnown('<img=영지_smile>', pick, '영지'), true);
+  // 페르소나 에셋을 넣으면 그것이 먼저
+  const pick2 = (n) => (n === '영지_smile' ? '영지_smile' : null);
+  assert.match(imgtag.renderImgTags('<img=영지_smile>', pick2, 0, '영지'), /raw::영지_smile/);
 });
