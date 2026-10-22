@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T21:06:03+09:00",
+  "observed_at": "2026-10-22T21:07:05+09:00",
   "files": [
     {
       "path": "game-src/action/eileen/resume/live-20261022/account-end.json",
@@ -63,7 +63,7 @@
     },
     {
       "path": "game-src/action/eileen/resume/live-20261022/ledger.json",
-      "sha256": "3bac52e7916c85e3f7d884775ea0d52aa2f78c004b8f3a6620acb2a51e7b61d3",
+      "sha256": "b92e863de0de78d43abca69cead4b21e1fe96243dacb76184e579e071d9dda84",
       "bytes": 15381
     },
     {
@@ -268,8 +268,8 @@
     },
     {
       "path": "game-src/action/eileen/resume/live-20261022/transition-exact/comparison.png",
-      "sha256": "6f95c9fcabf741ee03ab5f5fdf2401ba125476c2cac7739e528f42edf993c73f",
-      "bytes": 15730
+      "sha256": "de805956a6cdc123ee7484d7d988e019b2441fa91daf07894dddf59d2be379d1",
+      "bytes": 33625
     },
     {
       "path": "game-src/action/eileen/resume/live-20261022/transition-exact/request-v1.json",
@@ -308,8 +308,8 @@
     },
     {
       "path": "game-src/action/eileen/resume/live-20261022/transition-exact/sequence.png",
-      "sha256": "8e67257da2ddda42b7d3157d613496bab94ac500a0cc83f80edd9706cfd2e1c8",
-      "bytes": 44058
+      "sha256": "4af0f8eeeb81a7caf03df93416abaca6316081e549429a3c70a61ee58bef7247",
+      "bytes": 31854
     },
     {
       "path": "game-src/action/eileen/resume/live-20261022/transition-exact/suffix-detail.png",

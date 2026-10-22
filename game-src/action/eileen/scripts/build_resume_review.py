@@ -32,6 +32,8 @@ def main():
  transition_before=frames(old('transition'));transition_after=frames(Image.open(ART/'final/transition.png').convert('RGBA'))
  sections.append(dict(key='transition',title='무장 전환 11장 · 소총 경로 직접 보정 / 시각 승인 대기',status='changed',rows=[dict(label='이전: 6장',frames=[png(f) for f in transition_before]),dict(label='현재: 11장',frames=[png(f) for f in transition_after])]))
  sheet([('old transition',transition_before),('new transition',transition_after)],OUT/'transition-delivery-review.png',1)
+ sheet([('current transition v2',transition_after)],OUT/'transition-exact/sequence.png',1)
+ sheet([('original rifle02-05',[Image.open(OUT/f'transition-rig/{i:02d}.png').convert('RGBA') for i in range(2,6)]),('exact rifle v2',[Image.open(OUT/f'transition-exact/{i:02d}.png').convert('RGBA') for i in range(2,6)])],OUT/'transition-exact/comparison.png',2)
  for i,im in enumerate(transition_after):
   records.append(dict(clip='transition',frame=i,face='rig source unchanged; strict profile still needs review' if i<6 else 'existing pistol source unchanged',body='rig source unchanged' if i<6 else 'existing suffix unchanged',clothing='unchanged except rifle overlay',hands='original skin pixels protected',grounding='support foot bbox reviewed',loop_boundary='one shot; reverse sequence supported; suffix unchanged',rgba_sha256=hashlib.sha256(im.tobytes()).hexdigest(),visual_approval='pending'))
  rejected=Image.open(OUT/'precise-edit/result.png').convert('RGBA')
