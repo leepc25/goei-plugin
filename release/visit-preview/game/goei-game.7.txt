@@ -1,4 +1,37 @@
-, passenger: false, need: [], chunks: 2, name: "" });
+, 4 + Math.floor((depth - 4) / 2)), Math.min(5, 3 + Math.floor((depth - 4) / 3))];
+  }
+  function lockCount(depth, type) {
+    if (depth <= 1 || type === "chase") return 0;
+    if (depth <= 3) return 1;
+    return Math.min(3, 1 + Math.floor((depth - 4) / 4));
+  }
+  var ROOM_NAMES = {
+    lobby: ["안내 데스크", "휴게실", "사무실", "복도", "탕비실", "회의실", "문서 창고", "숙직실", "흡연실", "우편실"],
+    silent: ["열람실", "서고", "낭독실", "복도", "자료실", "정숙 구역", "빈 강의실"],
+    dark: ["어두운 복도", "배전실", "불 꺼진 사무실", "창고", "기계실", "빈 홀"],
+    puzzle: ["같은 방", "거꾸로 된 방", "시험실", "두 갈래 방", "반복되는 방", "비틀린 방"],
+    trial: ["대기실", "시험장", "심판석", "채점실", "복도"],
+    chase: ["비상 통로", "계단참", "복도", "방화문 앞", "하역장"],
+    deep: ["어둠", "끝없는 어둠", "만져지는 곳", "바닥 없는 곳"],
+    "replica:pretending": ["거실", "부엌", "안방", "베란다", "계단실", "복도", "작은방", "현관"],
+    "replica:vacant": ["빈 거실", "빈 부엌", "창고", "계단실", "복도", "빈 안방"],
+    "replica:red": ["붉은 복도", "붉은 거실", "계단실", "베란다", "붉은 방"]
+  };
+  var key = (c, r) => `${c},${r}`;
+  function makeWorld(ctx) {
+    for (let tries = 0; tries < 8; tries++) {
+      const w = buildWorld(ctx, rng(mix2(ctx.seed, ctx.depth, ctx.epoch, 9001, tries)));
+      if (!validateWorld(w).length) return w;
+    }
+    return buildWorld({ ...ctx }, rng(mix2(ctx.seed, ctx.depth, 4444)), true);
+  }
+  function buildWorld(ctx, r, noLocks = false) {
+    const { depth, type } = ctx;
+    const [cols, rows] = worldSize(depth, type);
+    const rooms3 = [];
+    for (let row2 = 0; row2 < rows; row2++)
+      for (let col = 0; col < cols; col++)
+        rooms3.push({ col, row: row2, open: { l: false, r: false, u: false, d: false }, wrap: {}, lock: {}, hidden: {}, role: "branch", dist: 0, region: 0, onPath: false, key: null, panel: false, guardian: false, passenger: false, need: [], chunks: 2, name: "" });
     const at2 = (c2, rw) => rooms3[rw * cols + c2];
     const link = (a, d3) => {
       const [dx, dy] = STEP2[d3];
@@ -3872,54 +3905,4 @@ ${SET_BONUS[u.set]}`;
           case "choice": {
             const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
             if (!visible.length) break;
-            this.pending = n.options;
-            return { kind: "choice", options: visible.map(({ o, index }) => ({ text: this.fill(o.text), index })) };
-          }
-          case "set":
-            applySet(n.key, n.op, n.expr, flags);
-            break;
-          case "goto":
-            if (test(n.if, flags)) this.jump(n.to);
-            break;
-          case "emit":
-            this.ctx.emit?.(n.event, this.fill(n.arg));
-            break;
-          case "call":
-            this.stack.push({ script: this.lib.get(n.script), pc: 0 });
-            break;
-          case "end":
-            this.stack = [];
-            delete flags.d100;
-            return { kind: "end" };
-        }
-      }
-      throw new ScriptError("대본이 끝없이 돌아요");
-    }
-  };
-
-  // src/game/action/story/scripts/hq.ts
-  var hq_default = String.raw`
-=== jaemtri_desk
-> goto again if met_jaemtri
-jaemtri(smile): 어머, 후배, 왔어?
-jaemtri(smile): 잼트리 요원이라고 불러. 그거면 돼. …아니다, 언니라고 불러도 돼. 다들 결국 그렇게 되거든.
-jaemtri: 여기가 임무 창구야. 온라인 순찰로 찾은 괴담 글, 실종 신고, 생존자 진술. 전부 이 태블릿으로 들어와.
-jaemtri(serious): 그리고 하나만. 현장에서 들은 이름은 여기 와서 말하지 마. 코드네임 제도는 철저하거든.
-jaemtri(smile): 자, 그럼 일 얘기 할까?
-> set met_jaemtri = 1
-> goto menu
--- again
-~ jaemtri(smile): 왔어? 커피 먼저 할래, 일 먼저 할래?
-~ jaemtri(smile): 어머, 후배. 얼굴 좋아졌네. 앉아.
-~ jaemtri: 태블릿에 새 글 올라왔어. 볼래?
-~ jaemtri(smile): 우리 후배 고생했지~ 자, 서류부터.
--- menu
-* 임무 게시판 -> board
-* 규칙서 열람 -> rulebook
-* 커피 한 잔 -> coffee [if !coffee]
-* 그냥 이야기하기 -> free
-* 나중에 올게요 -> bye
--- board
-jaemtri: 지금 들어온 건 차원 승강기 건이야. 낡은 건물 엘리베이터, 점검표 서명란이 빈 거.
-* [조사] 로비에서 규칙 2개 확인, 로프로 귀환 -> m1 [if !done_m1]
-* [진압] 로비 L3 경비원 -> m2 [if do
+            this

@@ -1,4 +1,5 @@
-button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
+t text = save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
+    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
   }
   async function defaultsAction(pane, action, value, ctx2, refresh2) {
     const sub = action.slice(pane.length + 1);
@@ -2447,7 +2448,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   var fail2 = (field4, why) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field4}): ${why}`);
   function readImageData(lore) {
     const books = lore.filter((e) => e.comment === IMAGE_BOOK && typeof e.content === "string" && e.content.trim() && e.content.trim() !== "[]");
-    if (!books.length) throw fail2("읽기", "로어북이 없거나 비어 있습니다. 에셋 모듈이 켜져 있는지 확인하세요.");
+    if (!books.length) throw fail2("읽기", "로어북이 없거나 비어 있습니다. 봇 카드를 업데이트했는지 확인하세요.");
     let src;
     try {
       src = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, "").trim());
@@ -3552,8 +3553,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-kind.k-ms { color: var(--blue); }
 .gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
 .gx-team .gx-muted { margin: 0; font-size: 13px; }
-.gx-goal { display: flex; align-items: baseline; gap: 8px; }
-.gx-goal span { color: var(--dim); font-size: 13px; }
-.gx-goal b { flex: 1; min-width: 0; color: var(--signal); }
-.gx-goal b.none { color: var(--dim); font-weight: 600; }
-.gx-goal em { font-style: normal; font-size: 13px; color: var(--dim
+.gx-goal { display:

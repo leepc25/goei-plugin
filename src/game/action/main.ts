@@ -3,6 +3,7 @@ import type { GameBridge } from '../bridge';
 import { prepareStartRoom } from './art/startRoom';
 import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
+import { prepareVisitAgents } from './art/visitAgents';
 import { loadArt } from './engine/art';
 import { Game } from './engine/game';
 import { engineModules } from './engine/modules';
@@ -40,7 +41,8 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
   const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
   const startRoom = prepareStartRoom(bridge?.assets ? f => bridge.assets!.url('start-room', f) : undefined);
-  void Promise.all([loadArt(urlOf), startRoom.ready]).then(([art]) => {
+  const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? f => bridge.assets!.url('visit-agents', f) : undefined, bridge.assets ? f => bridge.assets!.bytes('visit-agents', f) : undefined) : null;
+  void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), startRoom.ready, visitArt?.ready]).then(([art]) => {
     if (dead) return;
     stage.remove();
     root.style.display = 'block';
@@ -50,12 +52,19 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
     game.start();
     (globalThis as { __goeiEngine?: Game }).__goeiEngine = game;
-  }).catch(() => { if (!dead) stage.textContent = '시작방 그림을 불러오지 못했습니다. 새로고침해 주세요.'; });
+  }).catch((e) => {
+    console.error('[goei] 게임 시작 실패', e);
+    if (dead) return;
+    // 그림을 받은 뒤 엔진 조립에서 실패하면 stage가 이미 빠져 있다: 안내를 다시 붙인다
+    stage.textContent = `게임을 시작하지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
+    if (!stage.isConnected) { root.style.display = ''; root.appendChild(stage); }
+  });
   return () => {
     dead = true;
     releaseDoorArt();
     releaseHqArt();
     startRoom.dispose();
+    visitArt?.dispose();
     offTouch?.();
     game?.destroy();
     const g = globalThis as { __goeiEngine?: Game };

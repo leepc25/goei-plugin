@@ -11,6 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
+import { drawVisitAgent } from '../art/visitAgents';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
@@ -29,6 +30,8 @@ export interface HubHost {
   busy?(): boolean;
   /** 자리 동작(앉기·눕기…) 클립 순서. 플레이어 동작 재생이 붙으면 여기로 */
   act?(seq: string[], face: 1 | -1 | undefined): void;
+  /** 본부 방문: 이 장면에 서 있는 요원 (상태 태그로 정한 방). 발 위치와 보는 쪽 */
+  visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
 }
 
 const TOP = 440;
@@ -62,13 +65,19 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
 
   const build = (id: string, x: number, y?: number): FloorPlan => {
     view = host.map();
-    const sc = sceneOf(id);
+    const base = sceneOf(id);
+    // 방문 요원은 그 방의 자리(대화 상대)로 붙인다: E → 대화창 (npcLink hubTalk → visit)
+    const people = (host.visitors?.(base.id) ?? []).map((p) => {
+      const at = clearSpot(p.x, p.y, base.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base.lane ?? LANE);
+      return { ...p, x: at.x, y: at.y };
+    });
+    const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
     scene = sc;
     barked = null;
     enterTick = -1;
     opening = null;
     near = null;
-    solids = sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
+    solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 56, back: 18, front: 6 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -86,7 +95,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
         drawBox(c, b, sc.look);
-      } })),
+      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } }))),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
         if (sc.legacy) {

@@ -1,12 +1,12 @@
 //@name goei-plugin
 //@display-name 괴이: 이면세계
 //@api 3.0
-//@version 0.16.40-visit.1
-//@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview/goei-plugin.js
+//@version 0.16.41-visit.2
+//@update-url https://raw.githubusercontent.com/leepc25/goei-plugin/claude/project-thread-qilshh/release/visit-preview/goei-plugin.js
 //@description 괴이: 이면세계 전용 플러그인 (괴이봇 2탄 기반): 시작 화면, 상황판, 지도·요원 이동, 커스텀 임무, 괴담넷, 괴담톡, 위키, 설정·캐릭터 이미지
 // src/loader/body.ts
 var BODY_KEY = "goei:body";
-var BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview" : "";
+var BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/claude/project-thread-qilshh/release/visit-preview" : "";
 var BodyError = class extends Error {
 };
 function bodyVersion(code) {
@@ -143,7 +143,7 @@ function showPanel(version, install2) {
 }
 
 // src/main.ts
-var VERSION = true ? "0.16.40-visit.1" : "";
+var VERSION = true ? "0.16.41-visit.2" : "";
 var WATCH_MS = 1e3;
 var MARKS = ["%%SEED%%", "%%SCENE_CARD:", "%%PHONE_CALL:", "%%GOEI_UNSENT%%", "%%GOEI_START%%", 'data-goei="landing"', "ANOMALY SIMULATION", "[▣"];
 var ours = (t) => typeof t === "string" && MARKS.some((m) => t.includes(m));

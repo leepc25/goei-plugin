@@ -1,4 +1,59 @@
+(d3.grow) {
+        ctx.fillRect(b.x0, this.y - b.z1, 10, b.z1 - b.z0);
+        ctx.fillRect(b.x1 - 10, this.y - b.z1, 10, b.z1 - b.z0);
+      } else ctx.fillRect(b.x0, this.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.ellipse(this.x, this.y, Math.min(60, this.half), 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  };
 
+  // src/game/action/enemy/drops.ts
+  var hook = null;
+  function fireDropHook(c) {
+    hook?.(c);
+  }
+  var int = (r, a, b) => a + Math.floor(r() * (b - a + 1));
+  function rollDrops2(table, r, elite = false) {
+    const out = [];
+    const add = (item2, n) => n > 0 && out.push({ item: item2, n });
+    const k = elite ? 1.5 : 1;
+    const heal2 = (p) => r() < p + (elite ? 0.1 : 0) && add("heal", 1);
+    switch (table) {
+      case "none":
+        return out;
+      case "common":
+        add("cash", Math.round(int(r, 1, 3) * k));
+        heal2(0.15);
+        add("shard", Math.round(int(r, 1, 2) * k));
+        if (r() < 0.02) add("relic", 1);
+        break;
+      case "bureau":
+        add("cash", Math.round(int(r, 3, 6) * k));
+        heal2(0.1);
+        add("shard", Math.round(1 * k));
+        if (r() < 0.05) add(r() < 0.5 ? "ammo" : "relic", 1);
+        break;
+      case "daydream":
+        add("cash", Math.round(int(r, 6, 10) * k));
+        heal2(0.1);
+        add("shard", Math.round(1 * k));
+        if (r() < 0.03) add("dream", 1);
+        break;
+      case "mid":
+        add("cash", int(r, 12, 20));
+        add("heal", 1);
+        add("shard", 5);
+        add("relic", 1);
+        break;
+      case "guardian":
+        add("cash", int(r, 40, 60));
+        add("heal", 2);
+        add("shard", 10);
+        add("relic", 1);
         add("upgrade", 1);
         break;
     }
@@ -4883,55 +4938,4 @@
       hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
     },
     cross: {
-      clip: "cross",
-      ticks: T(1, 1, 2, 5, 3, 2),
-      origin: 6,
-      adv: 10,
-      cancel: 3,
-      whiffCancel: 4,
-      lunge: [3, 0.7],
-      hits: [{ at: [3], dmg: 10, react: "flinch", push: 6, stop: 4, strength: 2, noise: 0.2 }]
-    },
-    power: {
-      clip: "power",
-      ticks: T(2, 2, 3, 7, 6),
-      origin: 16,
-      adv: 20,
-      lunge: [11, 0.78],
-      armor: [2, 3, 1],
-      hits: [{ at: [3], dmg: 18, react: "down", push: 11, lift: 13, stop: 7, strength: 3, shake: 6, noise: 0.35 }]
-    },
-    // 달리며 A: 어깨 돌진
-    dash: {
-      clip: "dash",
-      ticks: T(2, 2, 4, 4, 3, 3),
-      adv: 22,
-      lunge: [12, 0.86],
-      hits: [{ at: [2, 3], dmg: 14, react: "down", push: 12, lift: 9, stop: 6, strength: 3, shake: 5, noise: 0.3 }]
-    },
-    // 앉아 A: 하단 킥 → 띄움
-    lowkick: {
-      clip: "lowkick",
-      ticks: T(1, 2, 5, 3, 2, 2),
-      cancel: 3,
-      hits: [{ at: [2, 3], dmg: 9, react: "launch", push: 3, lift: 17, stop: 4, strength: 2, low: true }]
-    },
-    // 공중 A: 점프 킥
-    airkick: {
-      clip: "airkick",
-      ticks: T(1, 2, 6, 6, 4),
-      hits: [{ at: [2, 3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2 }]
-    },
-    // D: 폭파 (고유기). 앞쪽 넓게, 아머 중
-    blast: {
-      clip: "blast",
-      ticks: T(2, 2, 3, 6, 4, 3, 3, 3),
-      armor: [0, 3, 2],
-      hits: [{ at: [3], dmg: 24, react: "down", push: 14, lift: 14, stop: 8, strength: 3, armorBreak: true, box: [20, 82, 10, 90], dy: 34, shake: 9, noise: 0.8 }]
-    },
-    // 앉아 D: 지면 폭파 (양옆 낮게 → 띄움)
-    groundblast: {
-      clip: "groundblast",
-      ticks: T(2, 2, 3, 6, 4, 4),
-      armor: [0, 3, 2],
-      hits: [{ at: [3], dmg: 18, react: "launch", push: 5, lift: 20, stop: 7, str
+      clip:

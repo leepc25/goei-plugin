@@ -1,4 +1,10 @@
-> {
+data)) message[message.length - 1] = { ...last2, data: record };
+    else message.push(newMessage2(record));
+    return { ...chat, message };
+  }
+  function partyNames(x, team) {
+    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
+    return team.map((id) => {
       const p = roster.find((r) => r.id === id);
       if (!p || lockedState(x, id)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
       return p.name || p.english;
@@ -394,7 +400,7 @@
       field3("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy5), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.")
     ].join(""))}
     ${group3("캐릭터 이미지", [
-      field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
+      field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 봇 카드에 들어 있어요."),
       s4.assetOn ? field3("이미지 크기", pctSlider("set-img-size", getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, "이미지 크기", busy5), "채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.") : "",
       s4.assetOn ? field3("접힌 높이", pctSlider("set-img-fold", getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, "접힌 높이", busy5), "이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.") : "",
       s4.assetOn ? field3("이미지 표시 범위", recentControl("img-show", getPrefs().imgShow, "이미지 표시 메시지 수", busy5), "이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.") : "",
@@ -1361,6 +1367,7 @@
   </header>`;
   }
   var gameShown = () => {
+    if (true) return true;
     if (globalThis.__goeiGame === true) return true;
     try {
       return localStorage.getItem("goei:game") === "1";
@@ -1372,7 +1379,7 @@
     return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>` : ""}
+      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="본부 방문" title="본부 방문">${ICONS.game}</button>` : ""}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc18(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
@@ -2139,5 +2146,5 @@
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.40-visit.1", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.41-visit.2", start: start2 };
 })();

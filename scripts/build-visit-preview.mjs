@@ -1,8 +1,8 @@
 // Isolated installable build; production release and update URL stay unchanged.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, copyFileSync, readdirSync, rmSync } from 'node:fs';
-const base = 'https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview';
-execFileSync(process.execPath, ['scripts/build.mjs'], { stdio: 'inherit', env: { ...process.env, GOEI_UPDATE_BASE: base, GOEI_BUILD_VERSION: '0.16.40-visit.1' } });
+const base = 'https://raw.githubusercontent.com/leepc25/goei-plugin/claude/project-thread-qilshh/release/visit-preview';
+execFileSync(process.execPath, ['scripts/build.mjs'], { stdio: 'inherit', env: { ...process.env, GOEI_UPDATE_BASE: base, GOEI_BUILD_VERSION: '0.16.41-visit.2', GOEI_GAME_BUTTON: '1' } });
 const dest = 'release/visit-preview';
 rmSync(dest, { recursive: true, force: true });
 mkdirSync(`${dest}/game`, { recursive: true });

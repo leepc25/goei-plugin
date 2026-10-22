@@ -1,4 +1,5 @@
-class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
+기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
     const cand = markCandidates(recent, current3);
     const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
         <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
@@ -301,7 +302,7 @@ class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<sp
 
   // src/core/update.ts
   var UPDATE_SCHEMA = 1;
-  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview" : "";
+  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/claude/project-thread-qilshh/release/visit-preview" : "";
   var CARD_FIELDS = [
     "characterVersion",
     "firstMessage",
@@ -432,7 +433,7 @@ class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<sp
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.40-visit.1" : "0";
+  var PLUGIN_VERSION = true ? "0.16.41-visit.2" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -497,7 +498,7 @@ class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<sp
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.40-visit.1" : "";
+  var VERSION = true ? "0.16.41-visit.2" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -3809,10 +3810,4 @@ ${memory}` },
 ${note.trim()}` : card2;
     const message = (chat.message ?? []).slice();
     const last2 = message[message.length - 1];
-    if (last2?.role === "user" && hasSceneCard(last2.data)) message[message.length - 1] = { ...last2, data: record };
-    else message.push(newMessage2(record));
-    return { ...chat, message };
-  }
-  function partyNames(x, team) {
-    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
-    return team.map((id) =
+    if (last2?.role === "user" && hasSceneCard(last2.

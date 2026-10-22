@@ -6,6 +6,27 @@ import { mountLegacy } from './legacy';
 
 declare const __PLUGIN_VERSION__: string;
 
+// Risu 플러그인 iframe은 allow-same-origin이 없어 localStorage를 읽기만 해도 SecurityError가 난다.
+// 게임 모듈 곳곳이 localStorage를 바로 쓰므로, 막혀 있으면 창이 열려 있는 동안만 쓰는 메모리 저장소로 대신한다.
+function memoryStorage(): Storage {
+  const m = new Map<string, string>();
+  return {
+    get length() { return m.size; },
+    key: (i) => [...m.keys()][i] ?? null,
+    getItem: (k) => m.get(String(k)) ?? null,
+    setItem: (k, v) => void m.set(String(k), String(v)),
+    removeItem: (k) => void m.delete(String(k)),
+    clear: () => m.clear(),
+  };
+}
+try {
+  void globalThis.localStorage?.length;
+} catch {
+  for (const name of ['localStorage', 'sessionStorage']) {
+    try { Object.defineProperty(globalThis, name, { value: memoryStorage(), configurable: true }); } catch { /* 못 바꾸면 그대로 */ }
+  }
+}
+
 const mod: GameModule = {
   version: __PLUGIN_VERSION__,
   mount: (box, bridge) => mountPlay(box, bridge),

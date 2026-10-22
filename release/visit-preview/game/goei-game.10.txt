@@ -1,4 +1,103 @@
-.name === "evac" && !w.ended) w.ended = "evac";
+cutOnce("first_call");
+        }
+      }
+    ];
+    const mods = {
+      saveCheckpoint: (v) => {
+        markSaved();
+        session.setCheckpoint(v);
+      },
+      stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
+      enemyFactory,
+      hq: hq2,
+      hud: false,
+      blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+      covered: () => story.isVideoPlaying(),
+      listeners,
+      surface: { canvas: shell.canvas, ctx: shell.ctx },
+      paused: () => shell.paused,
+      openTitle: () => {
+        cancelStoryForScene();
+        world = null;
+        mapOpen = false;
+        shell.openTitle();
+        armOpening();
+      },
+      onPlay: () => shell.play(),
+      frame: (dt) => {
+        syncVolume();
+        audio.setPaused(shell.paused && !openingOn);
+        audio.setCutscene(story.isVideoPlaying());
+        story.update(dt);
+        shell.frame(dt);
+        shell.input.endFrame();
+      },
+      overlay: (ctx, w, dt) => {
+        if (!w) return;
+        audio.setListener(w.camX + 640, 640);
+        footsteps(w);
+        ctx.save();
+        ctx.translate(-Math.round(w.camX), 0);
+        shell.fx.drawWorld(ctx);
+        ctx.restore();
+        shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+        const hs = hudState(w, shell);
+        if (npc.isOpen()) hs.message = void 0;
+        if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
+        if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
+        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
+        if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+        if (shell.paused) mapOpen = false;
+        if (!game?.inHub && w.stage === elevator) {
+          const m = elevator.mapView();
+          const t = performance.now() / 1e3;
+          const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+          if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
+          else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
+        } else mapOpen = false;
+        syncNavigationButton(shell.canvas, hs.navigation);
+        shell.touch.setItems(hs.items);
+        shell.touch.setGauge(w.player.gauge / 100);
+        shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
+        shell.fx.drawTransition(ctx);
+      },
+      onScene: (name) => {
+        if (name === "title" || name === "hq") audio.floor(name);
+        if (name === "hq") shell.play();
+      },
+      onPause: (p) => {
+        storyRoot.style.visibility = p ? "hidden" : "";
+        if (world) world.paused = p;
+      },
+      onWorld: (w, run) => {
+        cancelStoryForScene();
+        world = w;
+        runAgent = run.agent;
+        if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
+          story.flags.told_rope = 1;
+          const rope = () => world === w && w.say("(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.", 3);
+          if (!cutOnce("first_entry", () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
+        }
+        w.hitFx = false;
+        if (run.stageId === "hq") return void npc.attach(w, { hub: hq2.hub?.() ?? null, hq: true });
+        w.notes.runId = run.launch?.runId;
+        w.on((e) => {
+          if (e.type === "hp:low") w.notes.bigHit = true;
+        });
+        const bossesDown = /* @__PURE__ */ new Set();
+        w.hooks.push(() => {
+          for (const bd of w.bodies) {
+            if (!bd.boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
+            bossesDown.add(bd.id);
+            (w.notes.bosses ??= []).push(bd.kind);
+          }
+        });
+        w.threat = (b) => DEF_BY_KIND[b.kind] ? isThreat(b) : true;
+        bindEnemyInteractions(w);
+        w.on((e) => {
+          if (e.type !== "custom") return;
+          const d3 = e.data ?? {};
+          if (e.name === "evac" && !w.ended) w.ended = "evac";
           else if (e.name === "hurtPlayer") w.api.hurtPlayer(d3.dmg ?? 10);
           else if (e.name === "debuff" && d3.text) w.say(d3.text, 1.5);
         });
@@ -19,7 +118,7 @@
         if (name === "title") drawTitleBg(ctx, t);
       },
       boot: (g2) => {
-        void session.ready.then(() => {
+        void Promise.all([session.ready, hq2.visitReady]).then(() => {
           elevator.reloadMeta();
           if (bridge?.visit) g2.start_new();
           else if (!bootFromUrl(g2)) g2.toTitle();
@@ -251,7 +350,8 @@
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
     const startRoom = prepareStartRoom(bridge?.assets ? (f) => bridge.assets.url("start-room", f) : void 0);
-    void Promise.all([loadArt(urlOf), startRoom.ready]).then(([art5]) => {
+    const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
+    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), startRoom.ready, visitArt?.ready]).then(([art5]) => {
       if (dead) return;
       stage.remove();
       root.style.display = "block";
@@ -261,14 +361,21 @@
       if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
       game.start();
       globalThis.__goeiEngine = game;
-    }).catch(() => {
-      if (!dead) stage.textContent = "시작방 그림을 불러오지 못했습니다. 새로고침해 주세요.";
+    }).catch((e) => {
+      console.error("[goei] 게임 시작 실패", e);
+      if (dead) return;
+      stage.textContent = `게임을 시작하지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
+      if (!stage.isConnected) {
+        root.style.display = "";
+        root.appendChild(stage);
+      }
     });
     return () => {
       dead = true;
       releaseDoorArt();
       releaseHqArt();
       startRoom.dispose();
+      visitArt?.dispose();
       offTouch?.();
       game?.destroy();
       const g2 = globalThis;
@@ -1183,7 +1290,7 @@
     const canvas = $("canvas");
     const stage = $(".gg-stage");
     const squadEl = $(".gg-squad");
-    const sheet = $(".gg-sheet");
+    const sheet2 = $(".gg-sheet");
     const renderer = new Renderer(canvas);
     let meta = readMeta(null);
     let run = null;
@@ -1244,19 +1351,19 @@
     };
     const openSquad = () => {
       picking = [...meta.squad];
-      sheet.hidden = false;
+      sheet2.hidden = false;
       drawSquadSheet();
     };
     const drawSquadSheet = () => {
-      sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
+      sheet2.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><div class="gg-pick">${AGENTS3.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
         <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc6(a.name)}</b><small>${esc6(a.role)} · ${esc6(a.skillName)}</small></button>`).join("")}</div></div>
       <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
     };
     const openRecord = () => {
-      sheet.hidden = false;
+      sheet2.hidden = false;
       const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc6(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
-      sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
+      sheet2.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
       <div class="gg-sh-body"><dl class="gg-rec">
         <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
         <dt class="gg-sec">처치</dt>${kills}</dl></div>`;
@@ -1267,12 +1374,12 @@
       const act2 = t.dataset.act;
       if (act2 === "squad") return openSquad();
       if (act2 === "rec") return openRecord();
-      if (act2 === "close") return void (sheet.hidden = true);
+      if (act2 === "close") return void (sheet2.hidden = true);
       if (act2 === "apply" && picking.length === 4) {
         applySquad(run, meta, picking);
         dirty = true;
         cardKey = topKey = "";
-        sheet.hidden = true;
+        sheet2.hidden = true;
         return;
       }
       if (t.dataset.pick) {
@@ -2547,7 +2654,7 @@
   }
 
   // src/core/update.ts
-  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview" : "";
+  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/claude/project-thread-qilshh/release/visit-preview" : "";
 
   // src/host/assets.ts
   function toBytes(data) {
@@ -2793,8 +2900,31 @@
   }
 
   // src/game/entry.ts
+  function memoryStorage() {
+    const m = /* @__PURE__ */ new Map();
+    return {
+      get length() {
+        return m.size;
+      },
+      key: (i) => [...m.keys()][i] ?? null,
+      getItem: (k) => m.get(String(k)) ?? null,
+      setItem: (k, v) => void m.set(String(k), String(v)),
+      removeItem: (k) => void m.delete(String(k)),
+      clear: () => m.clear()
+    };
+  }
+  try {
+    void globalThis.localStorage?.length;
+  } catch {
+    for (const name of ["localStorage", "sessionStorage"]) {
+      try {
+        Object.defineProperty(globalThis, name, { value: memoryStorage(), configurable: true });
+      } catch {
+      }
+    }
+  }
   var mod = {
-    version: "0.16.40-visit.1",
+    version: "0.16.41-visit.2",
     mount: (box2, bridge) => mountPlay(box2, bridge),
     // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
     legacy: {

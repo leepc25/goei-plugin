@@ -37,7 +37,8 @@ function img(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
-export async function loadArt(urlOf?: (file: string) => Promise<string>): Promise<Art> {
+// Risu 플러그인 iframe은 CSP connect-src 'none'이라 blob 주소를 fetch로 읽지 못한다: JSON은 bytesOf로 받는다
+export async function loadArt(urlOf?: (file: string) => Promise<string>, bytesOf?: (file: string) => Promise<Uint8Array | null>): Promise<Art> {
   const inline = typeof window !== 'undefined' ? window.__GOEI_ENGINE_ART__ : undefined;
   if (inline) {
     const [atlas, cutin] = await Promise.all([img(inline.atlas), img(inline.cutin)]);
@@ -45,8 +46,15 @@ export async function loadArt(urlOf?: (file: string) => Promise<string>): Promis
   }
   if (urlOf) {
     try {
-      const [a, c, f] = await Promise.all([urlOf('atlas.png'), urlOf('cutin.png'), urlOf('frames.json')]);
-      const frames = f ? await (await fetch(f)).json() : null;
+      const [a, c] = await Promise.all([urlOf('atlas.png'), urlOf('cutin.png')]);
+      let frames = null;
+      if (bytesOf) {
+        const b = await bytesOf('frames.json');
+        frames = b ? JSON.parse(new TextDecoder().decode(b)) : null;
+      } else {
+        const f = await urlOf('frames.json');
+        frames = f ? await (await fetch(f)).json() : null;
+      }
       const [atlas, cutin] = await Promise.all([img(a), img(c)]);
       if (frames) return { atlas, cutin, clips: frames.clips };
     } catch {

@@ -1,4 +1,45 @@
-m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
+st.filter((e) => e !== "gift");
+    if (!t.canJoin) list = list.filter((e) => e !== "join");
+    return list;
+  }
+  function buildPrompt(p) {
+    const { def, target: t, rel } = p;
+    const name = t.name ?? def.name;
+    const effects = allowedEffects(def, t);
+    const situation = [
+      `장소: ${t.place}`,
+      `말을 거는 사람: ${p.agent.name} (관리국 ${p.agent.title}). 말투: ${p.agent.voice}`,
+      `이 사람에 대한 네 마음: ${FAVOR_WORD(rel.favor)} (호감 ${rel.favor > 0 ? "+" : ""}${rel.favor}, -3~+3)`,
+      rel.met ? `이전에 ${rel.met}번 이야기했다.` : "처음 만났다.",
+      ...rel.memo.map((m) => `지난 일: ${m}`),
+      ...t.facts ?? [],
+      ...p.meta?.self ? [`본편 현재 네 상태: ${p.meta.self.state}${p.meta.self.situation ? ` — ${p.meta.self.situation}` : ""}`] : [],
+      ...p.meta?.events?.length ? [`요즘 관리국 상황판 소식: ${p.meta.events.slice(0, 3).join(" / ")}`] : []
+    ];
+    const parts = [
+      `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː 이면세계」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
+      p.sheet ? `[인물 시트: 본편 설정. 영어로 적혀 있지만 대답은 한국어로]
+${p.sheet}` : "",
+      t.persona ? `[이 사람]
+${t.persona}` : "",
+      `[게임 속 역할] ${def.role}`,
+      `[말투] ${def.speech}`,
+      `[지금 상황]
+- ${situation.join("\n- ")}`,
+      p.meta?.recent?.length ? `[본편 최근 장면: 참고만 하고 이어서 말하지 않는다]
+${p.meta.recent.join("\n")}` : "",
+      t.secret ? `[비밀: 입 밖에 내지 말고 말과 행동에만 반영한다]
+${t.secret}` : "",
+      effects.length ? `[행동 태그] 대사 다음 줄에 해당하는 것만 0~2개 쓴다. 해당 없으면 쓰지 않는다.
+- ${effects.map((e) => TAG_HELP[e]).join("\n- ")}` + (effects.includes("hint") ? `
+단서: ${t.hints.map((h, i) => `${i + 1}) ${h.text}`).join(" ")}` : "") + (effects.includes("gift") ? `
+줄 수 있는 물건: ${(t.gifts ?? def.gifts).join(", ")}` : "") : "",
+      `[하지 않는 것] ${[...def.never ?? [], "상대의 대사나 행동을 대신 쓰지 않는다", "모르는 설정을 지어내지 않고 모르면 모른다고 넘긴다", "게임 밖 이야기(현실, AI)를 하지 않는다"].join(" / ")}.`,
+      def.minor ? "[주의] 이 인물은 미성년자다. 성적인 이야기, 노출, 씻기·옷 갈아입기 이야기는 어떤 경우에도 하지 않고 화제를 돌린다." : "",
+      "[형식] 한국어 대사만 1~3문장, 140자 이내. 이름표·따옴표·괄호 지문·별표를 쓰지 않는다. 태그는 대사 뒤 새 줄에만."
+    ];
+    const system = parts.filter(Boolean).join("\n\n");
+    return [{ role: "system", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
   }
   var WORD_TAG = Object.fromEntries([
     ...Object.entries(TAG_WORD).map(([k, v]) => [v, k]),
@@ -1978,8 +2019,8 @@ m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
         const timer = setTimeout(() => ctrl.abort(), host.timeoutMs ?? 25e3);
         try {
           const a = AGENTS2[host.agent()] ?? AGENTS2.jyaldi;
-          const [sheet, meta] = await Promise.all([sheetText(d3), host.meta?.(d3).catch(() => null)]);
-          const messages = buildPrompt({ def: d3, target: t, sheet, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text: text2 });
+          const [sheet2, meta] = await Promise.all([sheetText(d3), host.meta?.(d3).catch(() => null)]);
+          const messages = buildPrompt({ def: d3, target: t, sheet: sheet2, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text: text2 });
           const raw = await Promise.race([
             model(messages, { signal: ctrl.signal }),
             new Promise((_, rej) => ctrl.signal.addEventListener("abort", () => rej(new Error("응답이 25초 넘게 없어요"))))
@@ -2722,6 +2763,20 @@ m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
     const b = bridge;
     const slot = b?.slot ?? 0;
     let root = null;
+    let present = [];
+    const visitReady = b?.visit ? b.visit.state().then((v) => {
+      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
+    }).catch(() => {
+    }) : Promise.resolve();
+    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const visitors = (sceneId) => {
+      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+      const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
+      if (!sc || !here.length) return [];
+      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+      const slots = sceneId === "office" ? [[630, 0.4], [1e3, 0.5], [1130, 0.85], [620, 0.9], [900, 0.15], [1180, 0.3]] : [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > (sceneId === "office" ? 820 : sc.length / 2) ? -1 : 1 }));
+    };
     const hub = makeHub(
       {
         map: () => hq2.map(),
@@ -2729,6 +2784,7 @@ m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
         bark: (place3) => hq2.bark(place3),
         chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
         sfx: (n) => ui.sfx(n),
+        visitors,
         // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
         busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
       },
@@ -2736,6 +2792,7 @@ m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
     );
     return {
       ready: () => hq2.ready(),
+      visitReady,
       hub: () => hub,
       state: () => hq2.state,
       goto: (place3) => hub.goto(place3),
@@ -3157,103 +3214,4 @@ m", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
         if (e.type === "enter:floor" && world) {
           const f = world.floor;
           if (f.id.startsWith("ending")) cutOnce("exit");
-          else if ((f.depth ?? 0) >= 2) cutOnce("first_call");
-        }
-      }
-    ];
-    const mods = {
-      saveCheckpoint: (v) => {
-        markSaved();
-        session.setCheckpoint(v);
-      },
-      stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
-      enemyFactory,
-      hq: hq2,
-      hud: false,
-      blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
-      covered: () => story.isVideoPlaying(),
-      listeners,
-      surface: { canvas: shell.canvas, ctx: shell.ctx },
-      paused: () => shell.paused,
-      openTitle: () => {
-        cancelStoryForScene();
-        world = null;
-        mapOpen = false;
-        shell.openTitle();
-        armOpening();
-      },
-      onPlay: () => shell.play(),
-      frame: (dt) => {
-        syncVolume();
-        audio.setPaused(shell.paused && !openingOn);
-        audio.setCutscene(story.isVideoPlaying());
-        story.update(dt);
-        shell.frame(dt);
-        shell.input.endFrame();
-      },
-      overlay: (ctx, w, dt) => {
-        if (!w) return;
-        audio.setListener(w.camX + 640, 640);
-        footsteps(w);
-        ctx.save();
-        ctx.translate(-Math.round(w.camX), 0);
-        shell.fx.drawWorld(ctx);
-        ctx.restore();
-        shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
-        const hs = hudState(w, shell);
-        if (npc.isOpen()) hs.message = void 0;
-        if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
-        if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
-        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
-        if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
-        if (shell.paused) mapOpen = false;
-        if (!game?.inHub && w.stage === elevator) {
-          const m = elevator.mapView();
-          const t = performance.now() / 1e3;
-          const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
-          if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
-          else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
-        } else mapOpen = false;
-        syncNavigationButton(shell.canvas, hs.navigation);
-        shell.touch.setItems(hs.items);
-        shell.touch.setGauge(w.player.gauge / 100);
-        shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
-        shell.fx.drawTransition(ctx);
-      },
-      onScene: (name) => {
-        if (name === "title" || name === "hq") audio.floor(name);
-        if (name === "hq") shell.play();
-      },
-      onPause: (p) => {
-        storyRoot.style.visibility = p ? "hidden" : "";
-        if (world) world.paused = p;
-      },
-      onWorld: (w, run) => {
-        cancelStoryForScene();
-        world = w;
-        runAgent = run.agent;
-        if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
-          story.flags.told_rope = 1;
-          const rope = () => world === w && w.say("(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.", 3);
-          if (!cutOnce("first_entry", () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
-        }
-        w.hitFx = false;
-        if (run.stageId === "hq") return void npc.attach(w, { hub: hq2.hub?.() ?? null, hq: true });
-        w.notes.runId = run.launch?.runId;
-        w.on((e) => {
-          if (e.type === "hp:low") w.notes.bigHit = true;
-        });
-        const bossesDown = /* @__PURE__ */ new Set();
-        w.hooks.push(() => {
-          for (const bd of w.bodies) {
-            if (!bd.boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
-            bossesDown.add(bd.id);
-            (w.notes.bosses ??= []).push(bd.kind);
-          }
-        });
-        w.threat = (b) => DEF_BY_KIND[b.kind] ? isThreat(b) : true;
-        bindEnemyInteractions(w);
-        w.on((e) => {
-          if (e.type !== "custom") return;
-          const d3 = e.data ?? {};
-          if (e
+          else if ((f.depth ?? 0) >= 2) 

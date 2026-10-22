@@ -11,7 +11,7 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
   const panel = document.createElement('section');
   panel.setAttribute('aria-label', '본부 방문 대화');
   panel.style.cssText = 'position:absolute;inset:12% 5% 5%;background:#111c20f5;padding:20px;pointer-events:auto;display:none;overflow:auto;border:1px solid #a99c78;border-radius:8px';
-  panel.innerHTML = '<header style="display:flex;justify-content:space-between"><b>본부 인물</b><button data-close>닫기</button></header><p>대화는 이 채팅에 저장되어 본편에서도 이어집니다.</p><div data-people></div><p role="status"></p><div data-log style="white-space:pre-wrap;max-height:42vh;overflow:auto"></div><form style="display:flex;gap:8px"><select aria-label="대화 모델"><option value="main">메인 모델</option><option value="aux">보조 모델</option></select><input aria-label="요원에게 할 말" maxlength="2000" style="flex:1;min-width:0" autocomplete="off"><button type="submit">보내기</button></form>';
+  panel.innerHTML = '<header style="display:flex;justify-content:space-between"><b>본부 인물</b><button data-close>닫기</button></header><p>대화는 이 채팅에 저장되어 본편에서도 이어집니다.</p><div data-people></div><p role="status"></p><div data-log style="white-space:pre-wrap;max-height:42vh;overflow:auto"></div><div data-compose style="display:flex;gap:8px"><select aria-label="대화 모델"><option value="main">메인 모델</option><option value="aux">보조 모델</option></select><input aria-label="요원에게 할 말" maxlength="2000" style="flex:1;min-width:0" autocomplete="off"><button type="button" data-send>보내기</button></div>';
   wrap.append(button, panel); root.append(wrap);
   let state: VisitState = { agents: [], turns: [] };
   let selected = '';
@@ -19,13 +19,13 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
   let dead = false;
   const status = panel.querySelector<HTMLElement>('[role=status]')!;
   const input = panel.querySelector('input')!;
-  const form = panel.querySelector('form')!;
   const people = panel.querySelector<HTMLElement>('[data-people]')!;
   const log = panel.querySelector<HTMLElement>('[data-log]')!;
-  const submit = form.querySelector('button')!;
+  const submit = panel.querySelector<HTMLButtonElement>('[data-send]')!;
   const render = () => {
     people.replaceChildren();
-    for (const a of state.agents) {
+    // 본부에 있는 요원만 고를 수 있게 보여 준다. 나머지는 수만 알린다
+    for (const a of state.agents.filter(a => a.room)) {
       const b = document.createElement('button');
       b.textContent = `${a.name} · ${a.room ? rooms[a.room] || a.room : '부재/위치 미확인'} (${a.state})`;
       b.disabled = busy || !a.room;
@@ -46,7 +46,8 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
       state = await api.state();
       if (dead) return;
       selected = state.agents.find(a => a.room && (a.name === name || a.id === name))?.id || selected || state.agents.find(a => a.room)?.id || '';
-      status.textContent = state.agents.some(a => a.room) ? '' : '본부에 있는 것으로 확인된 요원이 없어요. 본편 상태 태그를 확인해 주세요.';
+      const away = state.agents.filter(a => !a.room).length;
+      status.textContent = state.agents.some(a => a.room) ? (away ? `지금 본부에 없는 ${away}명은 대화할 수 없어요.` : '') : '본부에 있는 것으로 확인된 요원이 없어요. 본편 상태 태그를 확인해 주세요.';
       render();
     } catch (e) { if (!dead) status.textContent = String(e instanceof Error ? e.message : e); }
   }
@@ -54,8 +55,8 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
   panel.querySelector<HTMLButtonElement>('[data-close]')!.onclick = () => { panel.style.display = 'none'; };
   // Typing must not trigger engine movement, attacks or E interactions.
   for (const type of ['keydown', 'keyup', 'pointerdown', 'pointerup']) panel.addEventListener(type, e => e.stopPropagation());
-  form.onsubmit = async e => {
-    e.preventDefault();
+  // Risu plugin iframes lack allow-forms, so submit never fires: send from the button and Enter instead.
+  const send = async () => {
     if (busy || !selected || !input.value.trim()) return;
     const text = input.value;
     busy = true; render(); status.textContent = '답변을 기다리는 중…';
@@ -66,5 +67,7 @@ export function mountVisit(root: HTMLElement, api: GameVisit) {
     } catch (e) { if (!dead) status.textContent = e instanceof Error ? e.message : String(e); }
     finally { busy = false; if (!dead) { render(); input.focus(); } }
   };
+  submit.onclick = () => void send();
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); void send(); } });
   return { open, isOpen: () => panel.style.display !== 'none', dispose: () => { dead = true; wrap.remove(); } };
 }

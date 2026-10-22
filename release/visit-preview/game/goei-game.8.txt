@@ -1,4 +1,54 @@
-ne_m1 && !done_m2]
+.pending = n.options;
+            return { kind: "choice", options: visible.map(({ o, index }) => ({ text: this.fill(o.text), index })) };
+          }
+          case "set":
+            applySet(n.key, n.op, n.expr, flags);
+            break;
+          case "goto":
+            if (test(n.if, flags)) this.jump(n.to);
+            break;
+          case "emit":
+            this.ctx.emit?.(n.event, this.fill(n.arg));
+            break;
+          case "call":
+            this.stack.push({ script: this.lib.get(n.script), pc: 0 });
+            break;
+          case "end":
+            this.stack = [];
+            delete flags.d100;
+            return { kind: "end" };
+        }
+      }
+      throw new ScriptError("대본이 끝없이 돌아요");
+    }
+  };
+
+  // src/game/action/story/scripts/hq.ts
+  var hq_default = String.raw`
+=== jaemtri_desk
+> goto again if met_jaemtri
+jaemtri(smile): 어머, 후배, 왔어?
+jaemtri(smile): 잼트리 요원이라고 불러. 그거면 돼. …아니다, 언니라고 불러도 돼. 다들 결국 그렇게 되거든.
+jaemtri: 여기가 임무 창구야. 온라인 순찰로 찾은 괴담 글, 실종 신고, 생존자 진술. 전부 이 태블릿으로 들어와.
+jaemtri(serious): 그리고 하나만. 현장에서 들은 이름은 여기 와서 말하지 마. 코드네임 제도는 철저하거든.
+jaemtri(smile): 자, 그럼 일 얘기 할까?
+> set met_jaemtri = 1
+> goto menu
+-- again
+~ jaemtri(smile): 왔어? 커피 먼저 할래, 일 먼저 할래?
+~ jaemtri(smile): 어머, 후배. 얼굴 좋아졌네. 앉아.
+~ jaemtri: 태블릿에 새 글 올라왔어. 볼래?
+~ jaemtri(smile): 우리 후배 고생했지~ 자, 서류부터.
+-- menu
+* 임무 게시판 -> board
+* 규칙서 열람 -> rulebook
+* 커피 한 잔 -> coffee [if !coffee]
+* 그냥 이야기하기 -> free
+* 나중에 올게요 -> bye
+-- board
+jaemtri: 지금 들어온 건 차원 승강기 건이야. 낡은 건물 엘리베이터, 점검표 서명란이 빈 거.
+* [조사] 로비에서 규칙 2개 확인, 로프로 귀환 -> m1 [if !done_m1]
+* [진압] 로비 L3 경비원 -> m2 [if done_m1 && !done_m2]
 * [조사] 추격의 층 통과 -> m3 [if done_m2 && !done_m3]
 * [구조] 야근하다 들어온 회사원 -> m4 [if done_m3 && !done_m4]
 * [조사] 재현의 층 「아파트」 규칙 3개 -> m5 [if done_m3 && !done_m5]
@@ -2941,13 +2991,18 @@ ${who}: ${text2.replace(/\n/g, " ")}
     const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0;
     const build = (id, x, y) => {
       view = host.map();
-      const sc = sceneOf(id);
+      const base2 = sceneOf(id);
+      const people = (host.visitors?.(base2.id) ?? []).map((p) => {
+        const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
+        return { ...p, x: at2.x, y: at2.y };
+      });
+      const sc = { ...base2, spots: [...base2.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
       scene = sc;
       barked = null;
       enterTick = -1;
       opening = null;
       near2 = null;
-      solids = sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
+      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 56, back: 18, front: 6 }))];
       const len = Math.max(SCREEN_W, sc.length);
       const sx = Math.max(60, Math.min(len - 60, x));
       arrive = { x: sx, y };
@@ -2968,7 +3023,9 @@ ${who}: ${text2.replace(/\n/g, " ")}
             return;
           }
           drawBox(c, b, sc.look);
-        } })),
+        } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
+          drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now());
+        } }))),
         drawBackground(c, camX) {
           if (sc.id === "office" && drawStartRoom(c, openOf("out"))) return;
           if (sc.legacy) {
@@ -3950,45 +4007,4 @@ ${lines3.join("\n")}`);
     let list = def.effects.filter((e) => !t.allow || t.allow.includes(e));
     if (!t.actions?.some((a) => a.id === "trade")) list = list.filter((e) => e !== "trade");
     if (!t.hints?.length) list = list.filter((e) => e !== "hint");
-    if (!(t.gifts ?? def.gifts)?.length) list = list.filter((e) => e !== "gift");
-    if (!t.canJoin) list = list.filter((e) => e !== "join");
-    return list;
-  }
-  function buildPrompt(p) {
-    const { def, target: t, rel } = p;
-    const name = t.name ?? def.name;
-    const effects = allowedEffects(def, t);
-    const situation = [
-      `장소: ${t.place}`,
-      `말을 거는 사람: ${p.agent.name} (관리국 ${p.agent.title}). 말투: ${p.agent.voice}`,
-      `이 사람에 대한 네 마음: ${FAVOR_WORD(rel.favor)} (호감 ${rel.favor > 0 ? "+" : ""}${rel.favor}, -3~+3)`,
-      rel.met ? `이전에 ${rel.met}번 이야기했다.` : "처음 만났다.",
-      ...rel.memo.map((m) => `지난 일: ${m}`),
-      ...t.facts ?? [],
-      ...p.meta?.self ? [`본편 현재 네 상태: ${p.meta.self.state}${p.meta.self.situation ? ` — ${p.meta.self.situation}` : ""}`] : [],
-      ...p.meta?.events?.length ? [`요즘 관리국 상황판 소식: ${p.meta.events.slice(0, 3).join(" / ")}`] : []
-    ];
-    const parts = [
-      `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː 이면세계」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
-      p.sheet ? `[인물 시트: 본편 설정. 영어로 적혀 있지만 대답은 한국어로]
-${p.sheet}` : "",
-      t.persona ? `[이 사람]
-${t.persona}` : "",
-      `[게임 속 역할] ${def.role}`,
-      `[말투] ${def.speech}`,
-      `[지금 상황]
-- ${situation.join("\n- ")}`,
-      p.meta?.recent?.length ? `[본편 최근 장면: 참고만 하고 이어서 말하지 않는다]
-${p.meta.recent.join("\n")}` : "",
-      t.secret ? `[비밀: 입 밖에 내지 말고 말과 행동에만 반영한다]
-${t.secret}` : "",
-      effects.length ? `[행동 태그] 대사 다음 줄에 해당하는 것만 0~2개 쓴다. 해당 없으면 쓰지 않는다.
-- ${effects.map((e) => TAG_HELP[e]).join("\n- ")}` + (effects.includes("hint") ? `
-단서: ${t.hints.map((h, i) => `${i + 1}) ${h.text}`).join(" ")}` : "") + (effects.includes("gift") ? `
-줄 수 있는 물건: ${(t.gifts ?? def.gifts).join(", ")}` : "") : "",
-      `[하지 않는 것] ${[...def.never ?? [], "상대의 대사나 행동을 대신 쓰지 않는다", "모르는 설정을 지어내지 않고 모르면 모른다고 넘긴다", "게임 밖 이야기(현실, AI)를 하지 않는다"].join(" / ")}.`,
-      def.minor ? "[주의] 이 인물은 미성년자다. 성적인 이야기, 노출, 씻기·옷 갈아입기 이야기는 어떤 경우에도 하지 않고 화제를 돌린다." : "",
-      "[형식] 한국어 대사만 1~3문장, 140자 이내. 이름표·따옴표·괄호 지문·별표를 쓰지 않는다. 태그는 대사 뒤 새 줄에만."
-    ];
-    const system = parts.filter(Boolean).join("\n\n");
-    return [{ role: "syste
+    if (!(t.gifts ?? def.gifts)?.length) list = li

@@ -23,7 +23,8 @@ import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubHost } from './hub';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
-import { whereIs } from '../hq/map';
+import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
+import { hasVisitAgent } from '../art/visitAgents';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
@@ -54,12 +55,29 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void> } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
   // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 본부 모듈 map(), 엔진은 장면 옮기기·그리기. 메뉴 창(DOM)만 본부 모듈이 띄운다
   let root: HTMLElement | null = null;
+  // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
+  let present: { name: string; room: string }[] = [];
+  const visitReady = b?.visit
+    ? b.visit.state().then((v) => { present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
+    : Promise.resolve();
+  const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
+  const visitors = (sceneId: string) => {
+    const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+    const sc = hq.map().scenes.find((s) => s.id === sceneId);
+    if (!sc || !here.length) return [];
+    const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+    // 사무실(시작 방)은 왼쪽 책상을 피해 오른쪽 바닥에, 다른 방은 가운데 쪽에 고르게
+    const slots = sceneId === 'office'
+      ? [[630, 0.4], [1000, 0.5], [1130, 0.85], [620, 0.9], [900, 0.15], [1180, 0.3]]
+      : [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx, fy]) => [sc.length * fx, fy]);
+    return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: (slots[i][0] > (sceneId === 'office' ? 820 : sc.length / 2) ? -1 : 1) as 1 | -1 }));
+  };
   const hub = makeHub(
     {
       map: () => hq.map(),
@@ -67,6 +85,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       bark: (place) => hq.bark(place as never),
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
+      visitors,
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
     },
@@ -74,6 +93,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   );
   return {
     ready: () => hq.ready(),
+    visitReady,
     hub: () => hub,
     state: () => hq.state,
     goto: (place: string) => hub.goto(place),
@@ -649,7 +669,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
     },
-    boot: (g) => { void session.ready.then(() => { elevator.reloadMeta(); if (bridge?.visit) g.start_new(); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
+    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit) g.start_new(); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       window.removeEventListener('pagehide', saveOnHide);
       document.removeEventListener('visibilitychange', saveOnHide);

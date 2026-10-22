@@ -1,4 +1,8 @@
-); font-variant-numeric: tabular-nums; }
+ flex; align-items: baseline; gap: 8px; }
+.gx-goal span { color: var(--dim); font-size: 13px; }
+.gx-goal b { flex: 1; min-width: 0; color: var(--signal); }
+.gx-goal b.none { color: var(--dim); font-weight: 600; }
+.gx-goal em { font-style: normal; font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
 .gx-support { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .gx-support span { margin-right: auto; color: var(--dim); }
 .gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
@@ -2239,5 +2243,4 @@ button.mk-go:hover { color: var(--signal); }
     const list4 = marks();
     const full = list4.length >= MARK_MAX;
     const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
-        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current3 && !isMarked(current3) ? `<button 
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼

@@ -1,5 +1,5 @@
 {
- "version": "0.16.40-visit.1",
+ "version": "0.16.41-visit.2",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -13,8 +13,8 @@
    "goei-game.9.txt",
    "goei-game.10.txt"
   ],
-  "length": 1827997,
-  "bytes": 1916978
+  "length": 1833119,
+  "bytes": 1922124
  },
  "packs": [
   {
@@ -56,6 +56,15 @@
     "start-room.3.bin",
     "start-room.4.bin",
     "start-room.5.bin"
+   ],
+   "required": true
+  },
+  {
+   "id": "visit-agents",
+   "hash": "055f4d0f5ff02f3a",
+   "bytes": 78691,
+   "parts": [
+    "visit-agents.1.bin"
    ],
    "required": true
   }

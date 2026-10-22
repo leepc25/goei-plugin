@@ -22,6 +22,7 @@ mkdirSync('dist', { recursive: true });
 const define = {
   __UPDATE_BASE__: JSON.stringify(updateBase),
   __PLUGIN_VERSION__: JSON.stringify(pkg.version),
+  __GAME_BUTTON__: JSON.stringify(process.env.GOEI_GAME_BUTTON === '1'),
 };
 const common = {
   define,
