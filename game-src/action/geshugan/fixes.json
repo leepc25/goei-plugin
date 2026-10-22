@@ -1,4 +1,95 @@
 {
- "_설명": "검수 코드 보정. compose = 다른 클립 장을 빌려 엮음 [[클립, 장]], drop = 뺄 장, order = 장 순서. 근거는 qa_notes.md",
- "jump": {"compose": [["jump", 0], ["jump", 1], ["airstomp", 0], ["airstomp", 1], ["airstomp", 0], ["jump", 6], ["jump", 7]]}
+ "_설명": "검수 코드 보정. align = {원본 장: 바닥 y}, compose = 다른 클립 장을 빌려 엮음 [[클립, 장]], drop = 뺄 장(정리 후 번호), order = 장 순서. 근거 docs/캐릭터제작서/게슈간_결함목록_2026-10-22.md",
+ "jump": {
+  "compose": [
+   [
+    "jump",
+    0
+   ],
+   [
+    "fall",
+    0
+   ],
+   [
+    "fall",
+    1
+   ],
+   [
+    "fall",
+    1
+   ],
+   [
+    "fall",
+    0
+   ],
+   [
+    "jump",
+    6
+   ],
+   [
+    "jump",
+    7
+   ]
+  ]
+ },
+ "down": {
+  "align": {
+   "3": 136,
+   "4": 136,
+   "5": 136,
+   "6": 136,
+   "7": 136
+  }
+ },
+ "getup": {
+  "align": {
+   "0": 136,
+   "1": 136
+  }
+ },
+ "liesit": {
+  "align": {
+   "0": 110
+  }
+ },
+ "land": {
+  "drop": [
+   2,
+   3
+  ]
+ },
+ "fall": {
+  "drop": [
+   2
+  ]
+ },
+ "tackle": {
+  "drop": [
+   4
+  ]
+ },
+ "support": {
+  "drop": [
+   2,
+   3
+  ]
+ },
+ "undress": {
+  "outline": true
+ },
+ "showerturn": {
+  "outline": true
+ },
+ "shower": {
+  "outline": true
+ },
+ "bath": {
+  "outline": true
+ },
+ "bandage": {
+  "drop": [
+   0,
+   1
+  ]
+ }
 }

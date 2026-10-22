@@ -450,6 +450,14 @@ function updEnemy(e, dt) {
 
 // ── 그리기 ──
 const cv = $('c'), ctx = cv.getContext('2d');
+// 시연용 가구(게임에선 무대 오브젝트): 누웠다 앉기 등 침대 높이에서 그린 동작 밑에 침대
+const PROPS = { liesit: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']], liehold: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']], bedlie: [[14, 110, 164, 6, '#c9c4b8'], [14, 116, 164, 20, '#6b5440']] };
+function drawProps(k, x, y, dir) {
+  const r = PROPS[k]; if (!r) return;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
+  for (const [px, py, w, h, col] of r) { ctx.fillStyle = col; ctx.fillRect(px - ANC, py - FOOT, w, h); }
+  ctx.restore();
+}
 function sprite(k, f, x, y, dir, alpha = 1, rim = false, filter = '') {
   const im = imgs[k]; if (!im || !im.complete || !M.clips[k]) return;
   ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x), Math.round(y)); ctx.scale(dir * S, S);
@@ -543,6 +551,7 @@ function drawPlayer() {
   if (!['down', 'getup', 'liesit', 'liehold', 'bedlie'].includes(G.clip)) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(G.x, gy + 4, Math.max(10, 24 * S + G.y / 8), 5 * S, 0, 0, Math.PI * 2); ctx.fill(); }
   if (G.inv > 0 && G.clip === 'tkleap') { ctx.fillStyle = 'rgba(160,215,255,.35)'; ctx.fillRect(G.x - G.dir * 120, gy - 6, 120 * G.dir, 4); }
   const filt = G.hurtT > 0.08 ? 'brightness(0) invert(1)' : G.hurtT > 0 ? 'brightness(1.8)' : '';
+  drawProps(G.clip, G.x, gy + G.y, G.dir);
   sprite(G.clip, G.f, G.x, gy + G.y, G.dir, 1, $('rim').checked && $('bg').value !== 'grey', filt);
   const hp = handPos();
   // 집은 물건: 손에 안 들고 띄움(둔기·큰 물건), 총은 손 앞에 떠 있음
@@ -599,6 +608,7 @@ for (const [k, c] of Object.entries(M.clips)) {
     acc += (now - lt) / 1000 * +$('speed').value; lt = now;
     while (acc >= 1 / c.fps) { acc -= 1 / c.fps; f = (f + 1) % c.frames; }
     cc.fillStyle = '#3a444c'; cc.fillRect(0, 0, FW, FH);
+    for (const [px, py, w, h, col] of PROPS[k] || []) { cc.fillStyle = col; cc.fillRect(px, py, w, h); }
     if (imgs[k].complete) cc.drawImage(imgs[k], f * FW, 0, FW, FH, 0, 0, FW, FH);
     requestAnimationFrame(tick);
   })(performance.now());
