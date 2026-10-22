@@ -1,0 +1,62 @@
+{
+  "male": {
+    "file": "persona-male-original.png",
+    "canvas": [
+      128,
+      256
+    ],
+    "alpha_bbox_exclusive": [
+      26,
+      10,
+      99,
+      251
+    ],
+    "figure_width_px": 73,
+    "figure_height_px": 241,
+    "vertical_occupancy_percent": 94.14,
+    "tight_canvas": [
+      81,
+      249
+    ],
+    "tight_padding_px": 4,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "opaque_rgb_colors": 48,
+    "sha256": "dc481a36bbf937c7580044f2d0d6a7f920ec3d8739ca0be81be75a853ccd7fad",
+    "comparison_figure_height_px": 241,
+    "comparison_scale": 1,
+    "comparison_figure_width_px": 73
+  },
+  "female": {
+    "file": "persona-female-original.png",
+    "canvas": [
+      128,
+      256
+    ],
+    "alpha_bbox_exclusive": [
+      31,
+      20,
+      90,
+      249
+    ],
+    "figure_width_px": 59,
+    "figure_height_px": 229,
+    "vertical_occupancy_percent": 89.45,
+    "tight_canvas": [
+      67,
+      237
+    ],
+    "tight_padding_px": 4,
+    "alpha_values": [
+      0,
+      255
+    ],
+    "opaque_rgb_colors": 48,
+    "sha256": "05c3e94c81ac43f7fca5aac2b230b00247e68f1acb969459458e67dd9c00dd5c",
+    "comparison_figure_height_px": 229,
+    "comparison_scale": 1,
+    "comparison_figure_width_px": 59
+  }
+}
