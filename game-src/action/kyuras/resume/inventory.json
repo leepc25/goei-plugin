@@ -1,0 +1,83 @@
+{
+  "observed_at": "2026-10-22T10:16:29.918565+00:00",
+  "system_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "preparation_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "character_source_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47",
+  "source_diff_paths": [],
+  "jobs": [
+    {
+      "clip": "idle_shotgun",
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "expected_frames": 4,
+      "raw_frames": [],
+      "manifest_entry": null,
+      "hands_entry": null,
+      "legacy_final": {
+        "path": "game-src/action/kyuras/final/idle_shotgun.png",
+        "sha256": "52a7edf91b03e0805f9832e5c1516334ddc18933d0c3881204f32b20cda4b6c5",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      },
+      "server_status": null,
+      "recovery_status": "blocked_authentication",
+      "original_cost": null,
+      "user_visual_approval": false,
+      "regenerate": false
+    },
+    {
+      "clip": "run_shotgun",
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "expected_frames": 8,
+      "raw_frames": [],
+      "manifest_entry": null,
+      "hands_entry": null,
+      "legacy_final": {
+        "path": "game-src/action/kyuras/final/run_shotgun.png",
+        "sha256": "0f42c2ef1af63bcdefed4d7d284e646743f831871e76bc000beb6240cf59c088",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      },
+      "server_status": null,
+      "recovery_status": "blocked_authentication",
+      "original_cost": null,
+      "user_visual_approval": false,
+      "regenerate": false
+    }
+  ],
+  "source_files": [
+    {
+      "path": "game-src/action/kyuras/base/A.png",
+      "sha256": "d137c412ec4d41c87dd65841648fae386953e8ff0c7941b204e1860398595b98",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/scripts/gen.py",
+      "sha256": "f770666f78aa5b7b53589ba188415a9d1a2f49b212d46c9103429126e40d123a",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/scripts/krig.py",
+      "sha256": "19ab9520657c84a03cdb254aa258cf33d06666ca1dc4cac83d05de992b269be0",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/scripts/krig_v4_snaps_unrun.py",
+      "sha256": "1beecb76f7d0375026991de77146a1b8cc7d83a9fca048b2ba320fee1cf10f42",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/final/manifest.json",
+      "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/final/hands.json",
+      "sha256": "898a9d474f1250b07b25cb6d75cf39e64cf8f64eccc1307a252e642a073c5337",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    },
+    {
+      "path": "game-src/action/kyuras/spend.log",
+      "sha256": "b4834200c7fa05dc096245671eba7fd965c964f47cb646cc3c2aa08eb3c84532",
+      "note": "조회 시점 파일 해시. 과거 제출 입력 해시로 단정하지 않는다."
+    }
+  ],
+  "cost_note": "과거 인계에서 과금됨이라고 기록했으나 개별 실제 비용 증거 없음. 공유 잔액 차이를 비용으로 쓰지 않는다."
+}

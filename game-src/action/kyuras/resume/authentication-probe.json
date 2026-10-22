@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-10-22T10:15:26.515586+00:00",
+  "method": "get_image",
+  "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+  "request_sha256": "14e8d2a554bdee837a4038de0ef024bb39d39c9c864a0fd330a11e0b4dba6ead",
+  "new_generation_calls": 0,
+  "new_generation_charge": 0,
+  "token_configured": false,
+  "http_status": 200,
+  "response_size": 232,
+  "service_error_code": 401,
+  "service_error": "Missing Authorization header",
+  "authenticated": false
+}

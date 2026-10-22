@@ -378,3 +378,5 @@ description: thin adult man in his early thirties, gaunt face with hollow
 2026-10-22 04:55:00 gen run_shotgun 8f seed11 -> id: 9fe0e770-b992-4299-a4c1-90d6e591828a
 job_id: 9fe0e770-b992-4299-a4c1-90d6e591828a
 description: thin adult man in his early thirties, gaunt face with hollow 
+
+2026-10-22T10:15:26Z recovery_owner get_image idle_shotgun job_id=11826541-47d1-40de-9664-f05f1838bb23 http=200 mcp_error=401 authenticated=false new_generation_calls=0 new_generation_charge=0 original_job_cost=unknown; run_shotgun query deferred after shared authentication failure. Evidence: resume/authentication-probe.json
