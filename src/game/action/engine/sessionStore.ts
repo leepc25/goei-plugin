@@ -1,5 +1,6 @@
 import type { SaveSlots } from '../hq/store';
 import type { RunCheckpoint } from './checkpoint';
+import { parseSave } from '../hq/state';
 
 interface Session {
   schema: 'goei-session/1';
@@ -12,7 +13,11 @@ const empty = (): Session => ({ schema: 'goei-session/1', revision: 0, hq: null,
 const parse = (raw: string | null): Session => {
   if (!raw) return empty();
   const value = JSON.parse(raw);
-  if (value.schema === 'goei-session/1') return value;
+  if (value?.schema === 'goei-session/1') {
+    if (!Number.isFinite(value.revision) || value.revision < 0 || (value.hq !== null && typeof value.hq !== 'string')) throw new Error('손상된 저장 봉투');
+    return { ...empty(), ...value };
+  }
+  if (!parseSave(raw)) throw new Error('지원하지 않는 저장');
   return { ...empty(), hq: raw }; // 기존 본부 저장을 보존한다.
 };
 
@@ -37,14 +42,38 @@ export class SessionStore {
       list: () => saves.list(),
       read: async n => { await this.ready; return n === slot ? this.value.hq : parse(await saves.read(n)).hq; },
       write: async (n, hq, info) => {
-        if (n !== slot) return saves.write(n, JSON.stringify({ ...this.value, hq }), { ...info, schema: 'goei-session/1' });
+        await this.ready;
+        if (n !== slot) {
+          let oldRevision = 0;
+          try { oldRevision = parse(await saves.read(n)).revision; } catch { /* 명시한 슬롯 덮어쓰기는 손상된 이전 기록에도 가능 */ }
+          try { oldRevision = Math.max(oldRevision, parse(this.journal?.getItem(this.keyFor(n)) ?? null).revision); } catch { /* 손상된 저널은 대체 */ }
+          const snapshot = { ...this.value, hq, revision: Math.max(Date.now(), this.value.revision + 1, oldRevision + 1) };
+          const text = JSON.stringify(snapshot);
+          try { this.journal?.setItem(this.keyFor(n), text); } catch { /* 브리지 저장은 계속 */ }
+          return saves.write(n, text, { ...info, schema: 'goei-session/1' });
+        }
         this.value.hq = hq;
         this.persist();
         await this.flush();
       },
+      restore: async n => {
+        await this.ready;
+        await this.flush();
+        // 읽기와 복원을 분리한다. 단순 슬롯 조회는 현재 출동을 바꾸지 않는다.
+        let remote: Session | null = null, cached: Session | null = null;
+        try { remote = parse(await saves.read(n)); } catch { /* 저널에서 복구 */ }
+        try { cached = parse(this.journal?.getItem(this.keyFor(n)) ?? null); } catch { /* 브리지에서 복구 */ }
+        const next = cached && (!remote || cached.revision > remote.revision) ? cached : remote;
+        if (!next?.hq || !parseSave(next.hq)) return null;
+        this.value = { ...next, revision: Math.max(next.revision, this.value.revision) };
+        this.persist();
+        await this.flush();
+        return this.value.hq;
+      },
     };
   }
-  private get key() { return `goei-session-journal:${this.slot}`; }
+  private keyFor(slot: number) { return `goei-session-journal:${slot}`; }
+  private get key() { return this.keyFor(this.slot); }
   get checkpoint() { return this.value.checkpoint; }
   get meta() { return this.value.meta; }
   get hasSave() { return !!(this.value.hq || this.value.checkpoint); }

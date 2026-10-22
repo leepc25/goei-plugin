@@ -11,6 +11,8 @@ export interface SaveSlots {
   read(slot: number): Promise<string | null>;
   write(slot: number, data: string, meta: { title: string; summary: string; schema: string }): Promise<void>;
   list(): Promise<SaveMeta[]>;
+  /** 수동 저장 전체를 현재 자동 저장으로 복원. 반환 문자열은 본부 데이터. */
+  restore?(slot: number): Promise<string | null>;
 }
 
 export function memorySaves(): SaveSlots {

@@ -7,7 +7,7 @@ import { lines, type Line, type LineCtx } from './lines';
 import { boardNames, reportPayload, rosterFor, type CardView, type MainLink } from './link';
 import {
   appraise, approveDanger, buy, canDeploy, doResearch, equip, equipRelic, interview, launch, masteryLevel, masteryNext, missionBoard, noteDeadlines, openToothBox,
-  pickCoffee, placeOpen, researchOpen, saveTitle, setDanger, settle, statsFor, supplyCatalog, supplyOpen, treat, unequip, unlocksAt, variantFor, itemName, DANGER_COST, TOOTH_COST, TREAT_COST, type MissionCard,
+  pickCoffee, placeOpen, researchOpen, restDay, saveTitle, setDanger, settle, statsFor, supplyCatalog, supplyOpen, treat, unequip, unlocksAt, variantFor, itemName, DANGER_COST, TOOTH_COST, TREAT_COST, type MissionCard,
 } from './logic';
 import { iconCanvas } from './runmenu';
 import { hqMap, type HqMapView } from './map';
@@ -81,6 +81,7 @@ export function createHq(): HqModule {
   let ready = Promise.resolve();
   let loaded = false;
   let mountId = 0;
+  let slotBusy = false;
   let s: HqSave = newSave();
   let host: HqHost | null = null;
   let root: HTMLElement | null = null;
@@ -275,7 +276,7 @@ export function createHq(): HqModule {
       case 'pantry':
         return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s.coffee === c.id ? 'sel' : ''}">${esc(c.name)}<br><small>${esc(c.effect)}${c.who ? ` · ${esc(c.who)}` : ''}</small></button>`).join('')}</div>`;
       case 'clinic':
-        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc(a.name)}</b> <span>${s.agents[a.id].injured ? `부상 · ${s.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s.agents[a.id].fatigue}`}</span>${s.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ''}</div>`).join('')}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p>`;
+        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc(a.name)}</b> <span>${s.agents[a.id].injured ? `부상 · ${s.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s.agents[a.id].fatigue}`}</span>${s.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ''}</div>`).join('')}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p><button data-rest="day"${s.active ? ' disabled' : ''}>하루 휴식 (치료비 없음)</button>`;
       case 'interview':
         return `${head}${s.rescued.length ? s.rescued.map((w) => `<div class="hq-slotrow"><b>${esc(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s.interviewed.includes(w) ? '다시 듣기' : '면담'}</button></div>`).join('') : '<p>아직 구조한 사람이 없어요.</p>'}`;
       case 'training':
@@ -432,7 +433,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   };
 
   const onClick = (ev: Event) => {
-    if (!loaded) return;
+    if (!loaded || slotBusy) return;
     const t = (ev.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!t || t.disabled || !host) return;
     const d = t.dataset;
@@ -446,23 +447,36 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     if (d.relic !== undefined) return say(equipRelic(s, Number(d.slot), d.relic || null));
     if (d.coffee) return say(pickCoffee(s, s.coffee === d.coffee ? null : d.coffee));
     if (d.treat) return say(treat(s, d.treat as AgentId));
+    if (d.rest) return say(restDay(s));
     if (d.interview) return say(interview(s, d.interview));
     if (d.research) return say(doResearch(s, d.research));
     if (d.danger) return (setDanger(s, Number(d.danger)), say(`위험 단계 ${s.danger}`));
     if (d.saveslot) {
+      slotBusy = true;
       pickSlot = Number(d.saveslot);
-      void host.saves?.write(pickSlot, saveText(s), { ...saveTitle(s), schema: HQ_SCHEMA }).then(() => ((notice = `슬롯 ${pickSlot}에 저장했어요.`), refreshSlots()));
+      const savingSlot = pickSlot, mounting = mountId;
+      void host.saves?.write(savingSlot, saveText(s), { ...saveTitle(s), schema: HQ_SCHEMA }).then(() => {
+        if (mounting !== mountId) return;
+        notice = `슬롯 ${savingSlot}에 저장했어요.`;
+        void refreshSlots();
+      }).catch(() => mounting === mountId && say('저장하지 못했어요. 저장 장치를 확인한 뒤 다시 시도해 주세요.')).finally(() => { if (mounting === mountId) slotBusy = false; });
       return;
     }
     if (d.loadslot) {
-      void host.saves?.read(Number(d.loadslot)).then((txt) => {
+      slotBusy = true;
+      const mounting = mountId;
+      const loading = host.saves?.restore ? host.saves.restore(Number(d.loadslot)) : host.saves?.read(Number(d.loadslot));
+      void loading?.then((txt) => {
+        if (mounting !== mountId) return;
         const got = parseSave(txt);
         if (!got) return say('불러오지 못했어요 (모양이 다른 저장).');
         s = got;
-        overlay = null;
+        overlay = got.active ? 'menu' : null;
         panel = null;
-        say(`슬롯 ${d.loadslot}을(를) 불러왔어요.`);
-      });
+        selMission = null;
+        pending = null;
+        say(`슬롯 ${d.loadslot}을(를) 불러왔어요.${got.active ? ' 진행 중인 출동은 시작 화면의 이어하기로 복원하세요.' : ''}`);
+      }).catch(() => mounting === mountId && say('불러오지 못했어요. 현재 본부 기록은 유지합니다.')).finally(() => { if (mounting === mountId) slotBusy = false; });
       return;
     }
     switch (d.act) {
@@ -550,6 +564,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     mount(r, h, opt) {
       const mounting = ++mountId;
       loaded = false;
+      slotBusy = false;
       root = r;
       host = h;
       walk = opt?.walk !== false;

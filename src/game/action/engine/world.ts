@@ -17,6 +17,7 @@ import { Bullet, Dummy, Thug } from './bodies';
 import { Fighter, overlap } from './fighter';
 import type { Pad } from './input';
 import { Player } from './player';
+import { initializeProgression, progressionHit } from './progression';
 import { encodeState, decodeState } from './checkpoint';
 
 export type EnemyFactory = (spec: SpawnSpec, world: WorldView) => Body;
@@ -89,7 +90,8 @@ export class World implements WorldView {
   /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
   canCheckpoint() {
     return !this.ended && this.player.hp > 0 && this.player.phase === 'free' && !this.player.move && !this.player.airborne && !this.player.grabbed
-      && this.encActive < 0 && !this.bodies.some(b => b.alive && b.hp > 0 && b.team !== 'player' && this.threat(b));
+      // 몸은 체크포인트에 저장하지 않는다. 비적대 수호자·환경 위협도 남겨 두고 저장하면 사라진다.
+      && this.encActive < 0 && !this.bodies.some(b => b.alive && b.hp > 0 && b.team !== 'player');
   }
   snapshot(): string {
     const keys = ['x', 'y', 'dir', 'hp', 'hpMax', 'ammo', 'mag', 'reserve', 'gauge', 'guardMeter', 'skillCd', 'maxCombo', 'ward', 'dmgMul'] as const;
@@ -102,6 +104,7 @@ export class World implements WorldView {
     this.tick = s.tick; this.kills = s.kills; this.floors = s.floors; this.notes = s.notes;
     Object.assign(this.player, s.player);
     this.player.px = this.player.x; this.player.py = this.player.y;
+    this.player.resetLocomotion();
     this.itemState?.restore(s.items);
     this.rand.restore(s.rng);
     this.camera();
@@ -144,7 +147,7 @@ export class World implements WorldView {
   ) {
     this.rand = mulberry32(run.seed || 1);
     this.player = new Player(clips);
-    if (run.hpMax) this.player.hp = this.player.hpMax = run.hpMax;
+    initializeProgression(this.player, run);
     this.enemyFactory = enemyFactory ?? fallbackEnemy;
     const self = this;
     this.stageApi = {
@@ -262,6 +265,7 @@ export class World implements WorldView {
     p.vx = p.vy = p.vz = 0;
     p.move = null; p.moveKey = ''; p.grabbed = null;
     p.enter('free'); p.stop = 0;
+    p.resetLocomotion();
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
     this.prevCamX = this.camX;
@@ -336,6 +340,7 @@ export class World implements WorldView {
       if (++this.deadT > 75 && !this.ended) this.ended = 'evac';
     }
     this.camera();
+    p.finishLocomotion();
   }
 
   private interact() {
@@ -483,6 +488,7 @@ export class World implements WorldView {
   }
 
   private applyHit(a: Body, t: Body, h: Hit) {
+    if (a.kind === 'bullet') h = progressionHit(h, this.player.progression, 'ranged');
     // 밀리는 쪽은 때린 쪽 반대 (때린 몸의 방향이 아니라 서로의 위치로 정한다)
     const side = Math.sign(t.x - a.x);
     if (side && side !== h.dir) h = { ...h, dir: side as 1 | -1 };

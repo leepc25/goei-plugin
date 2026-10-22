@@ -382,7 +382,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', storyKeys, true);
-  const saves = session.hqSaves;
+  const saves: SaveSlots = {
+    ...session.hqSaves,
+    restore: async n => {
+      const hq = await session.hqSaves.restore!(n);
+      if (hq) elevator.reloadMeta();
+      return hq;
+    },
+  };
   // 엘리베이터 층 단추 (본부). 1~5 숫자키·Esc, 누르면 닫힌다
   let floorPick: ((i: number | null) => void) | null = null;
   const floorBox = document.createElement('div');

@@ -582,13 +582,16 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         api.movePlayer(r.chaseX + 260);
         api.world.shake(10, 6);
       }
-      // 추격 층 적은 화면을 잠그지 않고 다가가면 나온다
+      plan.stage.fx.chaseX = r.chaseX;
+    }
+    // 화면을 잠그지 않는 방도 계획된 적은 양쪽 진입에서 실제로 나타난다.
+    // 추격 벽을 끈 뒤의 역방향 진입과 B-12의 stalker는 전투 encounter가 대신 생성하지 않는다.
+    if (f.type === 'chase' || f.type === 'deep') {
       for (const s of f.spawns)
-        if (s.role === 'enemy' && !r.spawned.has(s.id) && s.x - p.x < 700) {
+        if ((s.role === 'enemy' || f.type === 'deep' && s.role === 'stalker') && !s.data.harmless && !r.spawned.has(s.id) && Math.abs(s.x - p.x) < 700) {
           r.spawned.add(s.id);
           api.spawn({ kind: s.kind, x: s.x, y: laneY(s.lane), elite: s.elite || undefined });
         }
-      plan.stage.fx.chaseX = r.chaseX;
     }
     // 퍼즐: 시간이 다 되면 벽이 조여 온다. 셔터는 정답 문·스위치로만 열린다.
     if (f.type === 'puzzle') {
@@ -763,6 +766,20 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       nodes.clear(); worlds.clear(); node = null; later = []; ruleSaid.clear();
       for (const [k, n] of s.nodes) {
         n.rt = revive(n.rt); n.plan = n.rt.plan;
+        const guardian = n.plan.stage.floor?.spawns.find(g => g.role === 'guardian');
+        if (guardian && !n.rt.guardianSkip && !n.rt.guardianDefeated) {
+          // 구형 저장은 비적대 상태의 노부부/가족을 안전하다고 보고 몸 없이 저장했다.
+          // 소환 완료 비트만 남아 영영 사라진 수호자를 다시 불러, 해결하지 않은 방을 우회하지 않는다.
+          if (guardian.kind === 'elder') n.rt.guardianSpawned = false;
+          if (guardian.kind === 'family208') {
+            n.all = n.all.map(enc => {
+              const guards = enc.waves.flat().filter(sp => sp.kind === 'family208');
+              if (!guards.length || !n.cleared.has(enc.triggerX)) return enc;
+              n.cleared.delete(enc.triggerX);
+              return { ...enc, waves: [guards] };
+            });
+          }
+        }
         n.plan.encounters = n.all.filter(e => !n.cleared.has(e.triggerX));
         nodes.set(k, n);
         if (n.plan.id === s.current.plan.id) node = n;
@@ -923,21 +940,23 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         case 'enemyDie':
           rt.kills++;
           if (e.kind === rt.plan.stage.floor?.spawns.find(s => s.role === 'guardian')?.kind) rt.guardianDefeated = true;
-          if (f?.spawns.some(s => s.role === 'guardian' && s.kind === 'elder') && ['elder_f', 'elder_m'].includes(e.kind)) {
+          if (f?.spawns.some(s => s.role === 'guardian' && ['elder', 'family208'].includes(s.kind)) && ['elder_f', 'elder_m', 'family_f', 'family_m'].includes(e.kind)) {
             rt.guardianKills = [...new Set([...(rt.guardianKills ?? []), e.kind])];
-            if (rt.guardianKills.includes('elder_f') && rt.guardianKills.includes('elder_m')) {
+            const kind = f.spawns.find(s => s.role === 'guardian')!.kind;
+            const pair = kind === 'elder' ? ['elder_f', 'elder_m'] : ['family_f', 'family_m'];
+            if (pair.every(k => rt!.guardianKills!.includes(k))) {
               rt.guardianDefeated = true;
-              api.world.emit({ type: 'custom', name: 'guardianCleared', data: { kind: 'elder', how: 'kill' } });
+              api.world.emit({ type: 'custom', name: 'guardianCleared', data: { kind, how: 'kill' } });
             }
           }
           if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
           break;
         case 'custom': {
           const d = e.data as { kind?: string; how?: string } | undefined;
-          if (e.name === 'guardianCleared' && d?.kind === 'elder' && f?.spawns.some(s => s.role === 'guardian' && s.kind === 'elder')) {
-            if (d.how === 'rule') rt.guardianSkip = true;
+          if (e.name === 'guardianCleared' && d?.kind && f?.spawns.some(s => s.role === 'guardian' && s.kind === d.kind)) {
+            if (d.how === 'rule' || d.how === 'endure') rt.guardianSkip = true;
             // 진압과 규칙 준수는 서로 다른 결과다.
-            if (d.how === 'kill') api.note('stage.elderDefeated', true);
+            if (d.kind === 'elder' && d.how === 'kill') api.note('stage.elderDefeated', true);
           }
           break;
         }
@@ -1601,7 +1620,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const r = n.rt, f = n.plan.stage.floor;
     if (r.trial && !r.trial.done) return false;
     const g = f?.spawns.find(s => s.role === 'guardian');
-    if (g?.kind === 'elder' && !r.guardianSkip && !r.guardianDefeated) return false;
+    if (g && !g.data.onFail && !g.data.survive && f?.type !== 'chase' && !r.guardianSkip && !r.guardianDefeated) return false;
     if ((f?.type === 'chase' || f?.type === 'deep' || g?.data.survive) && !r.traversed) return false;
     return true;
   };

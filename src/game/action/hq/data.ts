@@ -48,7 +48,7 @@ export interface AgentInfo {
 }
 // 체력·속도는 회색 상자 시험판(graybox/data.ts AGENTS)과 같은 값.
 export const AGENTS: AgentInfo[] = [
-  { id: 'jyaldi', name: '쟈알디', color: '#d94b3c', base: { hp: 220, power: 1.2, aim: 1, defense: 0.1, speed: 1, poise: 1, charge: 1 }, weapon: '폭파 + 권총', moveA: '폭파 변형 A: 지면 폭파', moveB: '폭파 변형 B: 연쇄 폭파' },
+  { id: 'jyaldi', name: '쟈알디', color: '#d94b3c', base: { hp: 220, power: 1.2, aim: 1, defense: 0.1, speed: 1, poise: 1, charge: 1 }, weapon: '폭파 + 권총', moveA: '폭파 변형 A: 연쇄 폭파', moveB: '폭파 변형 B: 벽 통째로' },
   { id: 'eileen', name: '에일린', color: '#3c8ad9', base: { hp: 170, power: 1, aim: 1.3, defense: 0.05, speed: 1.1, poise: 0, charge: 1.1 }, weapon: '소총', moveA: '읽기 변형 A: 약점 표시', moveB: '읽기 변형 B: 관통 저격' },
 ];
 export const AGENT_BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as Record<AgentId, AgentInfo>;

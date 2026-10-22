@@ -176,7 +176,7 @@ var PLACES = [
 var HQ_WIDTH = 4400;
 var PLACE_BY_ID = Object.fromEntries(PLACES.map((p) => [p.id, p]));
 var AGENTS = [
-  { id: "jyaldi", name: "쟈알디", color: "#d94b3c", base: { hp: 220, power: 1.2, aim: 1, defense: 0.1, speed: 1, poise: 1, charge: 1 }, weapon: "폭파 + 권총", moveA: "폭파 변형 A: 지면 폭파", moveB: "폭파 변형 B: 연쇄 폭파" },
+  { id: "jyaldi", name: "쟈알디", color: "#d94b3c", base: { hp: 220, power: 1.2, aim: 1, defense: 0.1, speed: 1, poise: 1, charge: 1 }, weapon: "폭파 + 권총", moveA: "폭파 변형 A: 연쇄 폭파", moveB: "폭파 변형 B: 벽 통째로" },
   { id: "eileen", name: "에일린", color: "#3c8ad9", base: { hp: 170, power: 1, aim: 1.3, defense: 0.05, speed: 1.1, poise: 0, charge: 1.1 }, weapon: "소총", moveA: "읽기 변형 A: 약점 표시", moveB: "읽기 변형 B: 관통 저격" }
 ];
 var AGENT_BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a]));
@@ -369,6 +369,16 @@ function treat(s2, agent) {
   rec.injured = 0;
   return `${AGENT_BY_ID[agent].name} 치료 완료 (예산 -${TREAT_COST})`;
 }
+function restDay(s2) {
+  if (s2.active) return "출동 중에는 본부에서 휴식할 수 없어요.";
+  if (!AGENTS.some((a) => s2.agents[a.id].injured > 0 || s2.agents[a.id].fatigue > 0)) return "모두 충분히 쉬었어요.";
+  for (const a of AGENTS) {
+    s2.agents[a.id].fatigue = 0;
+    s2.agents[a.id].injured = Math.max(0, s2.agents[a.id].injured - 1);
+  }
+  s2.day++;
+  return "하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)";
+}
 function appraise(s2) {
   if (!s2.appraisal.length) return ["감정할 회수물이 없어요."];
   const lines3 = [];
@@ -453,6 +463,9 @@ function variantFor(seed) {
 function launch(s2, missionId, seed) {
   const m = MISSION_BY_ID[missionId];
   if (!m) return "임무를 고르세요.";
+  if (m.requires && !s2.missionsDone.includes(m.requires)) return "앞 임무를 먼저 완료해야 해요.";
+  if (s2.failedRescues.includes(m.id)) return "마감이 지난 구조 요청이에요.";
+  if (!m.repeat && s2.missionsDone.includes(m.id)) return "이미 완료한 임무예요. 게시판에서 다음 임무를 골라 주세요.";
   const can = canDeploy(s2, s2.selected);
   if (!can.ok) return can.why;
   if (s2.active) return "이미 출동 중이에요.";
@@ -5805,6 +5818,54 @@ var MOVES = {
 };
 var COMBO = ["jab", "cross", "power"];
 
+// src/game/action/engine/progression.ts
+var NEUTRAL = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
+var positive = (value, fallback) => typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+function progressionFor(run) {
+  const s2 = run?.launch?.stats;
+  return {
+    agent: run?.agent ?? "jyaldi",
+    fromHq: !!run?.launch,
+    stats: {
+      hp: positive(s2?.hp, run?.hpMax ?? NEUTRAL.hp),
+      power: positive(s2?.power, NEUTRAL.power),
+      aim: positive(s2?.aim, NEUTRAL.aim),
+      defense: typeof s2?.defense === "number" && Number.isFinite(s2.defense) ? Math.max(0, Math.min(0.5, s2.defense)) : 0,
+      speed: positive(s2?.speed, NEUTRAL.speed),
+      poise: typeof s2?.poise === "number" && Number.isFinite(s2.poise) ? Math.max(0, Math.min(3, s2.poise)) : 0,
+      charge: positive(s2?.charge, NEUTRAL.charge)
+    },
+    relics: [...run?.launch?.relics ?? []],
+    moves: [...run?.launch?.moves ?? []]
+  };
+}
+function initializeProgression(player, run) {
+  player.progression = progressionFor(run);
+  player.hp = player.hpMax = player.progression.stats.hp;
+  if (player.progression.relics.includes("first_guard")) player.ward++;
+}
+var BLAST_MOVES = /* @__PURE__ */ new Set(["blast", "bigblast", "groundblast", "grabblast", "chain", "wall", "super"]);
+var isBlastMove = (move2) => BLAST_MOVES.has(move2);
+function progressionHit(hit2, p, kind) {
+  const damage = hit2.dmg * (kind === "melee" ? p.stats.power : kind === "ranged" ? p.stats.aim : 1);
+  if (kind !== "ability" || p.agent !== "jyaldi" || !p.relics.includes("own_jyaldi")) return damage === hit2.dmg ? hit2 : { ...hit2, dmg: damage };
+  const x = (hit2.x0 + hit2.x1) / 2, z = (hit2.z0 + hit2.z1) / 2;
+  const halfX = (hit2.x1 - hit2.x0) * 0.6, halfZ = (hit2.z1 - hit2.z0) * 0.6;
+  return { ...hit2, dmg: damage, x0: x - halfX, x1: x + halfX, z0: z - halfZ, z1: z + halfZ, dy: (hit2.dy ?? 18) * 1.2 };
+}
+function defendedHit(hit2, p) {
+  return p.stats.defense ? { ...hit2, dmg: hit2.dmg * (1 - p.stats.defense) } : hit2;
+}
+function canUseMasteryMove(p, key2) {
+  if (!p.fromHq) return true;
+  return key2 === "chain" ? p.moves.includes("unique_a") : key2 === "wall" ? p.moves.includes("unique_b") : true;
+}
+function masteryMove(p, key2, move2) {
+  if (key2 !== "super" || !p.moves.includes("ult2")) return move2;
+  return { ...move2, hits: move2.hits?.map((h) => ({ ...h, at: [...h.at, 8] })) };
+}
+var masteryHitId = (p, key2, frame2, id) => id * 2 + (key2 === "super" && p.moves.includes("ult2") && frame2 >= 8 ? 1 : 0);
+
 // src/game/action/engine/player.ts
 var WALK_X = 9;
 var WALK_Y = 4.2;
@@ -5865,6 +5926,7 @@ var Player = class extends Fighter {
   allyN = 0;
   /** 강화 선택 등이 곱하는 공격력 배수 */
   dmgMul = 1;
+  progression = progressionFor();
   // 게이지
   gauge = 0;
   guardMeter = 100;
@@ -5878,6 +5940,9 @@ var Player = class extends Fighter {
   grabHits = 0;
   // 그리기
   animClock = 0;
+  gaitFrame = 0;
+  gaitMoving = false;
+  gaitDir = 1;
   lowWarned = false;
   /** 부적: 피격 무효 남은 횟수 */
   ward = 0;
@@ -5946,7 +6011,7 @@ var Player = class extends Fighter {
         const w = toWorld(this, (r[0] - o) * P, (r[1] - o) * P, r[2] * P, r[3] * P, mh.dy ?? 20);
         hit2.push({
           ...w,
-          attackId: this.attackId,
+          attackId: masteryHitId(this.progression, this.moveKey, this.mf, this.attackId),
           dmg: mh.dmg * this.dmgMul,
           react: mh.react,
           dir: this.dir,
@@ -5960,7 +6025,7 @@ var Player = class extends Fighter {
         });
       }
     }
-    return { hit: hit2, hurt: hurt2 };
+    return { hit: hit2.map((h) => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? "ability" : "melee")), hurt: hurt2 };
   }
   /** 지금 보여 줄 클립·장 */
   anim() {
@@ -5969,6 +6034,7 @@ var Player = class extends Fighter {
       const n = this.clips[clip]?.length || 1;
       return { clip, frame: Math.floor(c / every) % n, origin: 0 };
     };
+    const gait = (clip) => ({ clip, frame: Math.floor(this.gaitFrame + 1e-9) % (this.clips[clip]?.length || 1), origin: 0 });
     switch (this.phase) {
       case "hurt":
         return { clip: "hit", frame: Math.min(3, Math.floor(this.t / Math.max(1, this.until) * 4)), origin: 0 };
@@ -5990,19 +6056,41 @@ var Player = class extends Fighter {
     }
     if (this.charging) return loop("charge", 3);
     if (this.guarding) return { clip: "block", frame: Math.min(3, this.wasGuarding), origin: 0 };
-    if (this.crouching) return Math.abs(this.vx) > 0.5 ? loop("crouchwalk", 3) : { clip: "crouch", frame: 3, origin: 0 };
+    if (this.crouching) return this.gaitMoving ? gait("crouchwalk") : { clip: "crouch", frame: 3, origin: 0 };
     const held = this.heldSet();
-    const moving = Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5;
+    const moving = this.gaitMoving;
+    const running = moving && this.running;
     if (held) {
-      const want = `${held === "carry2" ? "carry2_" : ""}${this.running ? "run" : moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
+      const want = `${held === "carry2" ? "carry2_" : ""}${running ? "run" : moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
       const alt = `${held === "carry2" ? "carry2_" : ""}${moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
-      if (this.clips[want]) return loop(want, this.running ? 2 : moving ? 3 : 6);
-      if (this.clips[alt]) return loop(alt, moving ? 3 : 6);
+      if (this.clips[want]) return moving ? gait(want) : loop(want, 6);
+      if (this.clips[alt]) return moving ? gait(alt) : loop(alt, 6);
     }
-    if (this.running) return loop("run", 2);
-    if (moving) return loop("walk", 3);
+    if (running) return gait("run");
+    if (moving) return gait("walk");
     if (this.gunOut > 0) return { clip: "fire", frame: Math.max(0, (this.clips.fire?.length ?? 4) - 1), origin: 0 };
     return this.fightT > 0 ? loop("guard", 6) : loop("idle", 7);
+  }
+  /** 월드가 가구·지형·카메라 경계까지 처리한 뒤 한 번 호출한다.
+   * 입력 속도만 보면 벽에 막힌 채 계속 달리므로, 최종 이동량만 발걸음에 반영한다. */
+  finishLocomotion() {
+    const canWalk = this.phase === "free" && !this.move && !this.airborne && !this.grabbed && !this.guarding && !this.charging && this.stop <= 0;
+    const dx = Math.abs(this.x - this.px), dy = Math.abs(this.y - this.py);
+    const moving = canWalk && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) && (dx > 0.05 || dy > 0.05);
+    if (!moving) return this.resetLocomotion();
+    const speedX = this.crouching ? CROUCH_X : this.running ? RUN_X : WALK_X;
+    const speedY = this.running ? WALK_Y * 1.2 : WALK_Y;
+    const progress = Math.min(this.progression.stats.speed, Math.max(dx / speedX, dy / speedY));
+    if (!this.gaitMoving || this.gaitDir !== this.dir) this.gaitFrame = 0;
+    else this.gaitFrame += progress / (this.running && !this.crouching ? 2 : 3);
+    this.gaitMoving = true;
+    this.gaitDir = this.dir;
+  }
+  /** 방 이동·저장 복원은 보행 도중의 자세를 다음 방에 끌고 가지 않는다. */
+  resetLocomotion() {
+    this.gaitFrame = 0;
+    this.gaitMoving = false;
+    this.gaitDir = this.dir;
   }
   /** 든 물건 종류별 자세 클립 이름 조각 */
   heldSet() {
@@ -6039,13 +6127,14 @@ var Player = class extends Fighter {
       world.say("부적이 대신 맞았다", 1);
       return { kind: "immune" };
     }
+    hit2 = defendedHit(hit2, this.progression);
     const armorFrame = this.move?.armor && this.mf >= this.move.armor[0] && this.mf <= this.move.armor[1] ? this.move.armor[2] : 0;
     this.armor = armorFrame;
     this.cancelMove();
     if (this.grabbed) this.releaseGrab();
     const r = super.applyHit(hit2, world);
     if (r.kind === "hit" || r.kind === "armor") {
-      this.gauge = Math.min(100, this.gauge + 4);
+      this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
       world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
       if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
         this.lowWarned = true;
@@ -6065,7 +6154,11 @@ var Player = class extends Fighter {
     this.queuedShot = false;
   }
   play(key2, world) {
-    const m = MOVES[key2];
+    if (!canUseMasteryMove(this.progression, key2)) {
+      world.say(key2 === "chain" ? "연쇄 폭파: 숙련 3에서 열린다." : "벽 통째로: 숙련 6에서 열린다.", 2);
+      return;
+    }
+    const m = masteryMove(this.progression, key2, MOVES[key2]);
     this.move = m;
     this.moveKey = key2;
     this.mf = 0;
@@ -6090,11 +6183,11 @@ var Player = class extends Fighter {
   /** 엔진이 명중을 알려 줌 */
   onConnect(world, killed) {
     this.connected = true;
-    this.gauge = Math.min(100, this.gauge + 2.5);
+    this.gauge = Math.min(100, this.gauge + 2.5 * this.progression.stats.charge);
     this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
     this.comboClock = 40;
     this.maxCombo = Math.max(this.maxCombo, this.combo);
-    if (killed) this.gauge = Math.min(100, this.gauge + 4);
+    if (killed) this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
     void world;
   }
   /** 멈춰 있는 동안(히트스톱) 입력만 받아 두기 */
@@ -6227,7 +6320,7 @@ var Player = class extends Fighter {
       this.mft = 0;
       this.mf++;
       this.skipZeroFrames();
-      const h = m.hits?.find((x) => x.at[0] === this.mf);
+      const h = m.hits?.find((x) => x.at[0] === this.mf || key2 === "super" && x.at.includes(this.mf));
       if (h) {
         if (h.shake) world.shake(2, 1);
         if (key2 === "blast" || key2 === "bigblast" || key2 === "grabblast" || key2 === "groundblast" || key2 === "super" || key2 === "chain" || key2 === "wall") {
@@ -6432,8 +6525,14 @@ var Player = class extends Fighter {
       return;
     }
     if (p.pressed.has("ally")) this.callAlly(world);
-    if (!this.crouching && !this.carry && p.pressed.has("chain")) return this.play("chain", world);
-    if (!this.crouching && !this.carry && p.pressed.has("wall")) return this.play("wall", world);
+    if (!this.crouching && !this.carry && p.pressed.has("chain")) {
+      this.play("chain", world);
+      if (this.move) return;
+    }
+    if (!this.crouching && !this.carry && p.pressed.has("wall")) {
+      this.play("wall", world);
+      if (this.move) return;
+    }
     const g2 = p.held.has("guard") && this.guardMeter > 0;
     this.wasGuarding = g2 ? this.wasGuarding + 1 : 0;
     this.guarding = g2;
@@ -6492,11 +6591,11 @@ var Player = class extends Fighter {
     if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
     this.running = p.run && p.mx !== 0 && !this.crouching;
     if (this.crouching) {
-      this.vx = p.mx * CROUCH_X;
+      this.vx = p.mx * CROUCH_X * this.progression.stats.speed;
       this.vy = 0;
     } else {
-      this.vx = p.mx * (this.running ? RUN_X : WALK_X);
-      this.vy = p.my * (this.running ? WALK_Y * 1.2 : WALK_Y);
+      this.vx = p.mx * (this.running ? RUN_X : WALK_X) * this.progression.stats.speed;
+      this.vy = p.my * (this.running ? WALK_Y * 1.2 : WALK_Y) * this.progression.stats.speed;
     }
     if (p.mx && !this.running && !this.crouching) {
       for (const b of world.bodies) {
@@ -6601,7 +6700,7 @@ var World = class {
     this.stage = stage;
     this.rand = mulberry32(run.seed || 1);
     this.player = new Player(clips);
-    if (run.hpMax) this.player.hp = this.player.hpMax = run.hpMax;
+    initializeProgression(this.player, run);
     this.enemyFactory = enemyFactory ?? fallbackEnemy;
     const self = this;
     this.stageApi = {
@@ -6676,7 +6775,7 @@ var World = class {
   recovery;
   /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
   canCheckpoint() {
-    return !this.ended && this.player.hp > 0 && this.player.phase === "free" && !this.player.move && !this.player.airborne && !this.player.grabbed && this.encActive < 0 && !this.bodies.some((b) => b.alive && b.hp > 0 && b.team !== "player" && this.threat(b));
+    return !this.ended && this.player.hp > 0 && this.player.phase === "free" && !this.player.move && !this.player.airborne && !this.player.grabbed && this.encActive < 0 && !this.bodies.some((b) => b.alive && b.hp > 0 && b.team !== "player");
   }
   snapshot() {
     const keys = ["x", "y", "dir", "hp", "hpMax", "ammo", "mag", "reserve", "gauge", "guardMeter", "skillCd", "maxCombo", "ward", "dmgMul"];
@@ -6700,6 +6799,7 @@ var World = class {
     Object.assign(this.player, s2.player);
     this.player.px = this.player.x;
     this.player.py = this.player.y;
+    this.player.resetLocomotion();
     this.itemState?.restore(s2.items);
     this.rand.restore(s2.rng);
     this.camera();
@@ -6804,6 +6904,7 @@ var World = class {
     p.grabbed = null;
     p.enter("free");
     p.stop = 0;
+    p.resetLocomotion();
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
     this.prevCamX = this.camX;
@@ -6870,6 +6971,7 @@ var World = class {
       if (++this.deadT > 75 && !this.ended) this.ended = "evac";
     }
     this.camera();
+    p.finishLocomotion();
   }
   interact() {
     const p = this.player;
@@ -7004,6 +7106,7 @@ var World = class {
     }
   }
   applyHit(a, t, h) {
+    if (a.kind === "bullet") h = progressionHit(h, this.player.progression, "ranged");
     const side = Math.sign(t.x - a.x);
     if (side && side !== h.dir) h = { ...h, dir: side };
     const r = t.applyHit(h, this);
@@ -11600,6 +11703,7 @@ function createHq() {
   let ready = Promise.resolve();
   let loaded = false;
   let mountId = 0;
+  let slotBusy = false;
   let s2 = newSave();
   let host = null;
   let root = null;
@@ -11778,7 +11882,7 @@ function createHq() {
       case "pantry":
         return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s2.coffee === c.id ? "sel" : ""}">${esc2(c.name)}<br><small>${esc2(c.effect)}${c.who ? ` · ${esc2(c.who)}` : ""}</small></button>`).join("")}</div>`;
       case "clinic":
-        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc2(a.name)}</b> <span>${s2.agents[a.id].injured ? `부상 · ${s2.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s2.agents[a.id].fatigue}`}</span>${s2.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ""}</div>`).join("")}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p>`;
+        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc2(a.name)}</b> <span>${s2.agents[a.id].injured ? `부상 · ${s2.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s2.agents[a.id].fatigue}`}</span>${s2.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ""}</div>`).join("")}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p><button data-rest="day"${s2.active ? " disabled" : ""}>하루 휴식 (치료비 없음)</button>`;
       case "interview":
         return `${head}${s2.rescued.length ? s2.rescued.map((w) => `<div class="hq-slotrow"><b>${esc2(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s2.interviewed.includes(w) ? "다시 듣기" : "면담"}</button></div>`).join("") : "<p>아직 구조한 사람이 없어요.</p>"}`;
       case "training":
@@ -11933,7 +12037,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     if (overlay === "menu") render();
   };
   const onClick = (ev) => {
-    if (!loaded) return;
+    if (!loaded || slotBusy) return;
     const t = ev.target.closest("button");
     if (!t || t.disabled || !host) return;
     const d3 = t.dataset;
@@ -11947,22 +12051,39 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     if (d3.relic !== void 0) return say(equipRelic(s2, Number(d3.slot), d3.relic || null));
     if (d3.coffee) return say(pickCoffee(s2, s2.coffee === d3.coffee ? null : d3.coffee));
     if (d3.treat) return say(treat(s2, d3.treat));
+    if (d3.rest) return say(restDay(s2));
     if (d3.interview) return say(interview(s2, d3.interview));
     if (d3.research) return say(doResearch(s2, d3.research));
     if (d3.danger) return setDanger(s2, Number(d3.danger)), say(`위험 단계 ${s2.danger}`);
     if (d3.saveslot) {
+      slotBusy = true;
       pickSlot = Number(d3.saveslot);
-      void host.saves?.write(pickSlot, saveText(s2), { ...saveTitle(s2), schema: HQ_SCHEMA }).then(() => (notice = `슬롯 ${pickSlot}에 저장했어요.`, refreshSlots()));
+      const savingSlot = pickSlot, mounting = mountId;
+      void host.saves?.write(savingSlot, saveText(s2), { ...saveTitle(s2), schema: HQ_SCHEMA }).then(() => {
+        if (mounting !== mountId) return;
+        notice = `슬롯 ${savingSlot}에 저장했어요.`;
+        void refreshSlots();
+      }).catch(() => mounting === mountId && say("저장하지 못했어요. 저장 장치를 확인한 뒤 다시 시도해 주세요.")).finally(() => {
+        if (mounting === mountId) slotBusy = false;
+      });
       return;
     }
     if (d3.loadslot) {
-      void host.saves?.read(Number(d3.loadslot)).then((txt) => {
+      slotBusy = true;
+      const mounting = mountId;
+      const loading = host.saves?.restore ? host.saves.restore(Number(d3.loadslot)) : host.saves?.read(Number(d3.loadslot));
+      void loading?.then((txt) => {
+        if (mounting !== mountId) return;
         const got = parseSave(txt);
         if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
         s2 = got;
-        overlay = null;
+        overlay = got.active ? "menu" : null;
         panel = null;
-        say(`슬롯 ${d3.loadslot}을(를) 불러왔어요.`);
+        selMission = null;
+        pending = null;
+        say(`슬롯 ${d3.loadslot}을(를) 불러왔어요.${got.active ? " 진행 중인 출동은 시작 화면의 이어하기로 복원하세요." : ""}`);
+      }).catch(() => mounting === mountId && say("불러오지 못했어요. 현재 본부 기록은 유지합니다.")).finally(() => {
+        if (mounting === mountId) slotBusy = false;
       });
       return;
     }
@@ -12050,6 +12171,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     mount(r, h, opt) {
       const mounting = ++mountId;
       loaded = false;
+      slotBusy = false;
       root = r;
       host = h;
       walk = opt?.walk !== false;
@@ -19052,12 +19174,14 @@ ${RULE[id].variant.text}` : ""}`, 4);
         api.movePlayer(r.chaseX + 260);
         api.world.shake(10, 6);
       }
+      plan.stage.fx.chaseX = r.chaseX;
+    }
+    if (f.type === "chase" || f.type === "deep") {
       for (const s2 of f.spawns)
-        if (s2.role === "enemy" && !r.spawned.has(s2.id) && s2.x - p.x < 700) {
+        if ((s2.role === "enemy" || f.type === "deep" && s2.role === "stalker") && !s2.data.harmless && !r.spawned.has(s2.id) && Math.abs(s2.x - p.x) < 700) {
           r.spawned.add(s2.id);
           api.spawn({ kind: s2.kind, x: s2.x, y: laneY(s2.lane), elite: s2.elite || void 0 });
         }
-      plan.stage.fx.chaseX = r.chaseX;
     }
     if (f.type === "puzzle") {
       r.squeeze -= DT;
@@ -19224,6 +19348,18 @@ ${RULE[id].variant.text}` : ""}`, 4);
       for (const [k, n] of s2.nodes) {
         n.rt = revive(n.rt);
         n.plan = n.rt.plan;
+        const guardian = n.plan.stage.floor?.spawns.find((g2) => g2.role === "guardian");
+        if (guardian && !n.rt.guardianSkip && !n.rt.guardianDefeated) {
+          if (guardian.kind === "elder") n.rt.guardianSpawned = false;
+          if (guardian.kind === "family208") {
+            n.all = n.all.map((enc) => {
+              const guards = enc.waves.flat().filter((sp) => sp.kind === "family208");
+              if (!guards.length || !n.cleared.has(enc.triggerX)) return enc;
+              n.cleared.delete(enc.triggerX);
+              return { ...enc, waves: [guards] };
+            });
+          }
+        }
         n.plan.encounters = n.all.filter((e) => !n.cleared.has(e.triggerX));
         nodes.set(k, n);
         if (n.plan.id === s2.current.plan.id) node = n;
@@ -19385,20 +19521,22 @@ ${RULE[id].variant.text}` : ""}`, 4);
         case "enemyDie":
           rt.kills++;
           if (e.kind === rt.plan.stage.floor?.spawns.find((s2) => s2.role === "guardian")?.kind) rt.guardianDefeated = true;
-          if (f?.spawns.some((s2) => s2.role === "guardian" && s2.kind === "elder") && ["elder_f", "elder_m"].includes(e.kind)) {
+          if (f?.spawns.some((s2) => s2.role === "guardian" && ["elder", "family208"].includes(s2.kind)) && ["elder_f", "elder_m", "family_f", "family_m"].includes(e.kind)) {
             rt.guardianKills = [.../* @__PURE__ */ new Set([...rt.guardianKills ?? [], e.kind])];
-            if (rt.guardianKills.includes("elder_f") && rt.guardianKills.includes("elder_m")) {
+            const kind = f.spawns.find((s2) => s2.role === "guardian").kind;
+            const pair = kind === "elder" ? ["elder_f", "elder_m"] : ["family_f", "family_m"];
+            if (pair.every((k) => rt.guardianKills.includes(k))) {
               rt.guardianDefeated = true;
-              api.world.emit({ type: "custom", name: "guardianCleared", data: { kind: "elder", how: "kill" } });
+              api.world.emit({ type: "custom", name: "guardianCleared", data: { kind, how: "kill" } });
             }
           }
           if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
           break;
         case "custom": {
           const d3 = e.data;
-          if (e.name === "guardianCleared" && d3?.kind === "elder" && f?.spawns.some((s2) => s2.role === "guardian" && s2.kind === "elder")) {
-            if (d3.how === "rule") rt.guardianSkip = true;
-            if (d3.how === "kill") api.note("stage.elderDefeated", true);
+          if (e.name === "guardianCleared" && d3?.kind && f?.spawns.some((s2) => s2.role === "guardian" && s2.kind === d3.kind)) {
+            if (d3.how === "rule" || d3.how === "endure") rt.guardianSkip = true;
+            if (d3.kind === "elder" && d3.how === "kill") api.note("stage.elderDefeated", true);
           }
           break;
         }
@@ -20029,7 +20167,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
     const r = n.rt, f = n.plan.stage.floor;
     if (r.trial && !r.trial.done) return false;
     const g2 = f?.spawns.find((s2) => s2.role === "guardian");
-    if (g2?.kind === "elder" && !r.guardianSkip && !r.guardianDefeated) return false;
+    if (g2 && !g2.data.onFail && !g2.data.survive && f?.type !== "chase" && !r.guardianSkip && !r.guardianDefeated) return false;
     if ((f?.type === "chase" || f?.type === "deep" || g2?.data.survive) && !r.traversed) return false;
     return true;
   };
@@ -27465,7 +27603,11 @@ var empty = () => ({ schema: "goei-session/1", revision: 0, hq: null, meta: null
 var parse = (raw) => {
   if (!raw) return empty();
   const value = JSON.parse(raw);
-  if (value.schema === "goei-session/1") return value;
+  if (value?.schema === "goei-session/1") {
+    if (!Number.isFinite(value.revision) || value.revision < 0 || value.hq !== null && typeof value.hq !== "string") throw new Error("손상된 저장 봉투");
+    return { ...empty(), ...value };
+  }
+  if (!parseSave(raw)) throw new Error("지원하지 않는 저장");
   return { ...empty(), hq: raw };
 };
 var SessionStore = class {
@@ -27494,10 +27636,47 @@ var SessionStore = class {
         return n === slot ? this.value.hq : parse(await saves.read(n)).hq;
       },
       write: async (n, hq2, info) => {
-        if (n !== slot) return saves.write(n, JSON.stringify({ ...this.value, hq: hq2 }), { ...info, schema: "goei-session/1" });
+        await this.ready;
+        if (n !== slot) {
+          let oldRevision = 0;
+          try {
+            oldRevision = parse(await saves.read(n)).revision;
+          } catch {
+          }
+          try {
+            oldRevision = Math.max(oldRevision, parse(this.journal?.getItem(this.keyFor(n)) ?? null).revision);
+          } catch {
+          }
+          const snapshot = { ...this.value, hq: hq2, revision: Math.max(Date.now(), this.value.revision + 1, oldRevision + 1) };
+          const text2 = JSON.stringify(snapshot);
+          try {
+            this.journal?.setItem(this.keyFor(n), text2);
+          } catch {
+          }
+          return saves.write(n, text2, { ...info, schema: "goei-session/1" });
+        }
         this.value.hq = hq2;
         this.persist();
         await this.flush();
+      },
+      restore: async (n) => {
+        await this.ready;
+        await this.flush();
+        let remote = null, cached2 = null;
+        try {
+          remote = parse(await saves.read(n));
+        } catch {
+        }
+        try {
+          cached2 = parse(this.journal?.getItem(this.keyFor(n)) ?? null);
+        } catch {
+        }
+        const next = cached2 && (!remote || cached2.revision > remote.revision) ? cached2 : remote;
+        if (!next?.hq || !parseSave(next.hq)) return null;
+        this.value = { ...next, revision: Math.max(next.revision, this.value.revision) };
+        this.persist();
+        await this.flush();
+        return this.value.hq;
       }
     };
   }
@@ -27506,8 +27685,11 @@ var SessionStore = class {
   ready;
   error = null;
   hqSaves;
+  keyFor(slot) {
+    return `goei-session-journal:${slot}`;
+  }
   get key() {
-    return `goei-session-journal:${this.slot}`;
+    return this.keyFor(this.slot);
   }
   get checkpoint() {
     return this.value.checkpoint;
@@ -27869,7 +28051,14 @@ function engineModules(box3, bridge) {
     e.stopImmediatePropagation();
   };
   window.addEventListener("keydown", storyKeys, true);
-  const saves = session.hqSaves;
+  const saves = {
+    ...session.hqSaves,
+    restore: async (n) => {
+      const hq3 = await session.hqSaves.restore(n);
+      if (hq3) elevator.reloadMeta();
+      return hq3;
+    }
+  };
   let floorPick = null;
   const floorBox = document.createElement("div");
   floorBox.className = "goei-engine-elev";

@@ -156,6 +156,17 @@ export function treat(s: HqSave, agent: AgentId): string {
   rec.injured = 0;
   return `${AGENT_BY_ID[agent].name} 치료 완료 (예산 -${TREAT_COST})`;
 }
+/** 출동할 건강한 요원이나 치료비가 없어도 기존 하루 휴식 규칙으로 회복할 수 있다. */
+export function restDay(s: HqSave): string {
+  if (s.active) return '출동 중에는 본부에서 휴식할 수 없어요.';
+  if (!AGENTS.some(a => s.agents[a.id].injured > 0 || s.agents[a.id].fatigue > 0)) return '모두 충분히 쉬었어요.';
+  for (const a of AGENTS) {
+    s.agents[a.id].fatigue = 0;
+    s.agents[a.id].injured = Math.max(0, s.agents[a.id].injured - 1);
+  }
+  s.day++;
+  return '하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)';
+}
 export function appraise(s: HqSave): string[] {
   if (!s.appraisal.length) return ['감정할 회수물이 없어요.'];
   const lines: string[] = [];
@@ -243,6 +254,9 @@ export function variantFor(seed: number) {
 export function launch(s: HqSave, missionId: string, seed: number): MissionLaunch | string {
   const m = MISSION_BY_ID[missionId];
   if (!m) return '임무를 고르세요.';
+  if (m.requires && !s.missionsDone.includes(m.requires)) return '앞 임무를 먼저 완료해야 해요.';
+  if (s.failedRescues.includes(m.id)) return '마감이 지난 구조 요청이에요.';
+  if (!m.repeat && s.missionsDone.includes(m.id)) return '이미 완료한 임무예요. 게시판에서 다음 임무를 골라 주세요.';
   const can = canDeploy(s, s.selected);
   if (!can.ok) return can.why;
   if (s.active) return '이미 출동 중이에요.';
