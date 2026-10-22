@@ -1308,3 +1308,6 @@ description: petite young woman agent, long wavy pale
 2026-10-22 04:01:31 gen man_throw done
 2026-10-22 04:01:32 gen walllean done
 2026-10-22T10:26:32.266461+00:00 resume auth blocked: get_balance/list_jobs/search_help MCP 401; new_paid_calls=0 new_actual_cost=0; down/man_throw estimates=3+3, NOT SUBMITTED; per-job historical actual cost unknown; evidence resume/evidence/*-retry.json
+2026-10-22 local-resume down job_id=d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3 actual_cost=3 generations receipt=resume\live\down\result.json input_sha256=b342a19edae71f3d0aaac6165b69c21a87affc71b1e438dff4ee3c60e4abf51e qa=provisional_repair user_visual_approval=false
+2026-10-22 local-resume man_throw job_id=2fce7c21-c96f-492c-a404-e5cdeb9a6450 actual_cost=3 generations receipt=resume\live\man_throw\result.json input_sha256=68c095225bd923a2b68312d57f55575c52c14d543c9abc059e61777cbf2fadc0 qa=provisional_repair user_visual_approval=false
+2026-10-22 local-resume man_throw_edit job_id=d5d8b068-9501-40be-9538-7c2fe192cdc8 actual_cost=1 generations receipt=resume\live\man_throw_edit\result.json input_sha256=baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85 qa=rejected user_visual_approval=false

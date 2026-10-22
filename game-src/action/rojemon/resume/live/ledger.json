@@ -1,0 +1,73 @@
+{
+  "owner": "codex/art-rojemon-resume",
+  "max_pending": 1,
+  "active_jobs": 0,
+  "paid_calls": 3,
+  "actual_generations": 7,
+  "jobs": [
+    {
+      "clip": "down",
+      "job_id": "d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3",
+      "tool": "animate_with_skeleton_v3",
+      "actual_cost": 3,
+      "cost_unit": "generations",
+      "cost_evidence": "resume\\live\\down\\result.json",
+      "request_sha256": "6b61e2c3606d44d799484b8a52ff8f5698c73807016caef19817e236c6de27c7",
+      "input_sha256": "b342a19edae71f3d0aaac6165b69c21a87affc71b1e438dff4ee3c60e4abf51e",
+      "output_hashes": [
+        "87f62de760164c4bc5e4ec4aec9ef6f175356b8bb1ce86ed2a5f8ec1f66cd912",
+        "68187de919bc5e2f220ffc52c2bc34a94fbc13501b0838ca4d8bbf64c09ed5a8",
+        "18e697618ec65289a2a53f45cc69629e2e513cdcc65850dec7e71c6cadef3cfc",
+        "f4532f1d9f2946f7bea3b612fe9b4bf71a0fd0c6fe5fb085d704e7669bf6c7a4",
+        "3e267c22739e891e51bde93072eb4db6ff000728ce5a47f3dbaf65285ce37d89",
+        "7beb02b5e6bdf5fd8ba516ebd53f644e166532c81a512e99ff0efec81549ba73",
+        "422a7a35d9ae2e72231a2f71a53704af20112b5669f5f1868d9483ad2122dd21",
+        "ae0cc9eec33e55f3d8d00cbb935615f4ff9f18a71f1517dff02df9d21768147f"
+      ],
+      "status": "recovered",
+      "qa": "provisional_repair",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "man_throw",
+      "job_id": "2fce7c21-c96f-492c-a404-e5cdeb9a6450",
+      "tool": "animate_with_skeleton_v3",
+      "actual_cost": 3,
+      "cost_unit": "generations",
+      "cost_evidence": "resume\\live\\man_throw\\result.json",
+      "request_sha256": "1a4ae1184a8a843967cb4e6a17fa6718810c47df2b4b198fa88495f0893a5058",
+      "input_sha256": "68c095225bd923a2b68312d57f55575c52c14d543c9abc059e61777cbf2fadc0",
+      "output_hashes": [
+        "d8725f04970e647bf95ac8f692cb0705e71294ed8cb6a762a24ffc806e8ae54e",
+        "44efefc64db08cdbc97d86a3a0e8a2e5cd4ad1312118bfdb956da5f5d59476d5",
+        "560aa3d65fc28cc8dd9d8395f86d3d0b33e1bbf23f8e49be9f50276cf248ecaf",
+        "598c95b067c0f425fe4231e497d4201b804011f56aee4683378d45524fbdd7f5",
+        "6cad90f8e92e78158c0a2e9f85f2bad9acb984561f60bd809257c642603404a7",
+        "baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85",
+        "df8c87e24f83f1bb84d09e23441944b1170a5d6404d8b8f792775d88e72dc798",
+        "96418b18706dbbd1fbfcb5e2b05bedfefdae2798c2fa38c71e59c5a5e81f83a5"
+      ],
+      "status": "recovered",
+      "qa": "provisional_repair",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "man_throw_edit",
+      "job_id": "d5d8b068-9501-40be-9538-7c2fe192cdc8",
+      "tool": "edit_image_pixen",
+      "actual_cost": 1,
+      "cost_unit": "generations",
+      "cost_evidence": "resume\\live\\man_throw_edit\\result.json",
+      "request_sha256": "71d3aee8b5243cfbc53e24e377d0e74fd90ef538b2ac53b73cef5dffb278c5c8",
+      "input_sha256": "baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85",
+      "output_hashes": [
+        "eb265ea5075e632abe3f778e75ff321dc6118b8230ef79bb9550c2d03301e8f3"
+      ],
+      "status": "recovered",
+      "qa": "rejected",
+      "user_visual_approval": false
+    }
+  ],
+  "historical_actual_total": null,
+  "historical_note": "Earlier approx330 is not independently itemized actual usage; do not infer this owner cost from shared balance delta."
+}

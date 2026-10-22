@@ -1,0 +1,15 @@
+{
+  "refs": {
+    "HEAD": "98e45e3d187001d35e30f19cf2c6ce71e070d982",
+    "origin/codex/metroidvania-run-system": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "origin/codex/character-production-resume": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb"
+  },
+  "base_branch": "codex/art-rojemon-resume",
+  "merged_branches": [],
+  "original_assets_unchanged": true,
+  "tool_reference": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4:tools/build_character_resume_demo.py",
+  "adaptation": "Same embedding/hash audit pattern; Rojemon-only standalone source, no other agent image reuse",
+  "account_controller": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+  "cost_total": 7,
+  "user_visual_approval": false
+}

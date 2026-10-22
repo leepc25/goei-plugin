@@ -1,0 +1,122 @@
+[
+  {
+    "frame": 0,
+    "sha256": "d8725f04970e647bf95ac8f692cb0705e71294ed8cb6a762a24ffc806e8ae54e",
+    "bbox": [
+      102,
+      50,
+      140,
+      142
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 1,
+    "sha256": "44efefc64db08cdbc97d86a3a0e8a2e5cd4ad1312118bfdb956da5f5d59476d5",
+    "bbox": [
+      100,
+      49,
+      128,
+      143
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 2,
+    "sha256": "560aa3d65fc28cc8dd9d8395f86d3d0b33e1bbf23f8e49be9f50276cf248ecaf",
+    "bbox": [
+      80,
+      51,
+      125,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 3,
+    "sha256": "598c95b067c0f425fe4231e497d4201b804011f56aee4683378d45524fbdd7f5",
+    "bbox": [
+      56,
+      58,
+      120,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 4,
+    "sha256": "6cad90f8e92e78158c0a2e9f85f2bad9acb984561f60bd809257c642603404a7",
+    "bbox": [
+      48,
+      75,
+      117,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 5,
+    "sha256": "baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85",
+    "bbox": [
+      64,
+      61,
+      119,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 6,
+    "sha256": "df8c87e24f83f1bb84d09e23441944b1170a5d6404d8b8f792775d88e72dc798",
+    "bbox": [
+      83,
+      43,
+      119,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 7,
+    "sha256": "96418b18706dbbd1fbfcb5e2b05bedfefdae2798c2fa38c71e59c5a5e81f83a5",
+    "bbox": [
+      90,
+      49,
+      117,
+      143
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  }
+]

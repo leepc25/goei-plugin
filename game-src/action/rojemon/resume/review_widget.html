@@ -1,0 +1,33 @@
+<section id="resumeReview" style="padding:12px;background:#24202f;border:1px solid #8873b4;border-radius:8px">
+<b>새 그림 검수 · 사용자 시각 승인 대기</b>
+<p style="margin:5px 0">아래 수정 클립만 새 PixelLab 그림입니다. 나머지 동작은 기존 비교용이며 생활·씻기는 이번 제작에 포함하지 않았습니다. 원본 크기와 투명 여백을 유지합니다.</p>
+<div class="bar"><label>수정 동작 <select id="reviewClip"></select></label><button id="reviewPlay">일시정지</button><button id="reviewPrev">이전 장</button><button id="reviewNext">다음 장</button><label><input type="checkbox" id="reviewOld"> 이전 원본 비교</label><span id="reviewFrame"></span></div>
+<canvas id="reviewCanvas" width="512" height="320" style="max-width:100%;image-rendering:pixelated;background:#363640"></canvas>
+<p id="reviewNote" style="margin:4px 0"></p>
+<p style="margin:4px 0">아래 플레이 화면: K 다운 · 이동키로 걷기 · Shift+이동키로 달리기. 클립 목록에서도 각 동작을 실행할 수 있습니다.</p>
+</section>
+<script>
+window.ROJEMON_REVIEW=__REVIEW__;
+(()=>{
+ const data=window.ROJEMON_REVIEW, sel=document.querySelector('#reviewClip'), cv=document.querySelector('#reviewCanvas'), ctx=cv.getContext('2d');
+ let frame=0,playing=true,elapsed=0,last=performance.now();
+ const imgs={};
+ for(const [key,v] of Object.entries(data)){
+   const option=document.createElement('option');option.value=key;option.textContent=v.label;sel.append(option);
+   imgs[key]={};for(const kind of ['frames','old'])imgs[key][kind]=v[kind].map(url=>{const im=new Image();im.src=url;return im;});
+ }
+ const old=document.querySelector('#reviewOld');
+ function draw(){
+   const v=data[sel.value], list=imgs[sel.value][old.checked?'old':'frames'];frame=(frame+list.length)%list.length;
+   ctx.clearRect(0,0,512,320);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#88909c';ctx.fillRect(0,288,512,1);
+   const im=list[frame];if(im.complete&&im.naturalWidth)ctx.drawImage(im,old.checked?96:0,old.checked?16:0,im.width*2,im.height*2);
+   document.querySelector('#reviewFrame').textContent=`${old.checked?'이전':'수정'} ${frame+1}/${list.length}`;
+   document.querySelector('#reviewNote').textContent=v.qa.summary;
+ }
+ sel.onchange=()=>{frame=0;draw()};old.onchange=draw;
+ const play=document.querySelector('#reviewPlay');function pause(){playing=false;play.textContent='재생'}
+ play.onclick=()=>{playing=!playing;play.textContent=playing?'일시정지':'재생'};
+ document.querySelector('#reviewPrev').onclick=()=>{pause();frame--;draw()};document.querySelector('#reviewNext').onclick=()=>{pause();frame++;draw()};
+ function tick(now){elapsed+=(now-last);last=now;if(playing&&elapsed>125){frame++;elapsed=0}draw();requestAnimationFrame(tick)}requestAnimationFrame(tick);
+})();
+</script>

@@ -1,0 +1,122 @@
+[
+  {
+    "frame": 0,
+    "sha256": "87f62de760164c4bc5e4ec4aec9ef6f175356b8bb1ce86ed2a5f8ec1f66cd912",
+    "bbox": [
+      62,
+      58,
+      116,
+      146
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 1,
+    "sha256": "68187de919bc5e2f220ffc52c2bc34a94fbc13501b0838ca4d8bbf64c09ed5a8",
+    "bbox": [
+      56,
+      67,
+      117,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 2,
+    "sha256": "18e697618ec65289a2a53f45cc69629e2e513cdcc65850dec7e71c6cadef3cfc",
+    "bbox": [
+      48,
+      80,
+      120,
+      141
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 3,
+    "sha256": "f4532f1d9f2946f7bea3b612fe9b4bf71a0fd0c6fe5fb085d704e7669bf6c7a4",
+    "bbox": [
+      38,
+      100,
+      127,
+      140
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 4,
+    "sha256": "3e267c22739e891e51bde93072eb4db6ff000728ce5a47f3dbaf65285ce37d89",
+    "bbox": [
+      50,
+      110,
+      145,
+      140
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 5,
+    "sha256": "7beb02b5e6bdf5fd8ba516ebd53f644e166532c81a512e99ff0efec81549ba73",
+    "bbox": [
+      55,
+      110,
+      163,
+      139
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 6,
+    "sha256": "422a7a35d9ae2e72231a2f71a53704af20112b5669f5f1868d9483ad2122dd21",
+    "bbox": [
+      55,
+      110,
+      162,
+      139
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  },
+  {
+    "frame": 7,
+    "sha256": "ae0cc9eec33e55f3d8d00cbb935615f4ff9f18a71f1517dff02df9d21768147f",
+    "bbox": [
+      61,
+      96,
+      156,
+      142
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  }
+]

@@ -39,6 +39,8 @@ def joints(pose):
 
 
 def prepare():
+    if any((HERE/'live').glob('*/submit-response.json')):
+        raise SystemExit('실제 제출 기록이 있습니다. prepare는 현재 원장을 덮어쓸 수 없습니다. live/ledger.json과 보존된 요청을 사용하세요.')
     tools = json.loads((HERE / 'evidence/tools-live.json').read_text())['result']['tools']
     schema = next(t['inputSchema'] for t in tools if t['name'] == 'animate_with_skeleton_v3')
     records = []

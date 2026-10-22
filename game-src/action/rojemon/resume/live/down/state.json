@@ -1,0 +1,28 @@
+{
+  "status": "recovered",
+  "clip": "down",
+  "job_id": "d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3",
+  "estimate_generations": 3,
+  "actual_cost": 3,
+  "cost_unit": "generations",
+  "cost_evidence": "resume\\live\\down\\result.json",
+  "owner": "codex/art-rojemon-resume",
+  "request": "../../requests/down.json",
+  "user_visual_approval": false,
+  "frame_count": 8,
+  "geometry": "geometry.json",
+  "tool": "animate_with_skeleton_v3",
+  "request_sha256": "6b61e2c3606d44d799484b8a52ff8f5698c73807016caef19817e236c6de27c7",
+  "input_sha256": "b342a19edae71f3d0aaac6165b69c21a87affc71b1e438dff4ee3c60e4abf51e",
+  "output_hashes": [
+    "87f62de760164c4bc5e4ec4aec9ef6f175356b8bb1ce86ed2a5f8ec1f66cd912",
+    "68187de919bc5e2f220ffc52c2bc34a94fbc13501b0838ca4d8bbf64c09ed5a8",
+    "18e697618ec65289a2a53f45cc69629e2e513cdcc65850dec7e71c6cadef3cfc",
+    "f4532f1d9f2946f7bea3b612fe9b4bf71a0fd0c6fe5fb085d704e7669bf6c7a4",
+    "3e267c22739e891e51bde93072eb4db6ff000728ce5a47f3dbaf65285ce37d89",
+    "7beb02b5e6bdf5fd8ba516ebd53f644e166532c81a512e99ff0efec81549ba73",
+    "422a7a35d9ae2e72231a2f71a53704af20112b5669f5f1868d9483ad2122dd21",
+    "ae0cc9eec33e55f3d8d00cbb935615f4ff9f18a71f1517dff02df9d21768147f"
+  ],
+  "qa": "provisional_repair"
+}

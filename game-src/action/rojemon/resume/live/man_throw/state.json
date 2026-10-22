@@ -1,0 +1,27 @@
+{
+  "status": "recovered",
+  "clip": "man_throw",
+  "job_id": "2fce7c21-c96f-492c-a404-e5cdeb9a6450",
+  "estimate_generations": 3,
+  "actual_cost": 3,
+  "cost_unit": "generations",
+  "cost_evidence": "resume\\live\\man_throw\\result.json",
+  "owner": "codex/art-rojemon-resume",
+  "user_visual_approval": false,
+  "frame_count": 8,
+  "geometry": "geometry.json",
+  "tool": "animate_with_skeleton_v3",
+  "request_sha256": "1a4ae1184a8a843967cb4e6a17fa6718810c47df2b4b198fa88495f0893a5058",
+  "input_sha256": "68c095225bd923a2b68312d57f55575c52c14d543c9abc059e61777cbf2fadc0",
+  "output_hashes": [
+    "d8725f04970e647bf95ac8f692cb0705e71294ed8cb6a762a24ffc806e8ae54e",
+    "44efefc64db08cdbc97d86a3a0e8a2e5cd4ad1312118bfdb956da5f5d59476d5",
+    "560aa3d65fc28cc8dd9d8395f86d3d0b33e1bbf23f8e49be9f50276cf248ecaf",
+    "598c95b067c0f425fe4231e497d4201b804011f56aee4683378d45524fbdd7f5",
+    "6cad90f8e92e78158c0a2e9f85f2bad9acb984561f60bd809257c642603404a7",
+    "baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85",
+    "df8c87e24f83f1bb84d09e23441944b1170a5d6404d8b8f792775d88e72dc798",
+    "96418b18706dbbd1fbfcb5e2b05bedfefdae2798c2fa38c71e59c5a5e81f83a5"
+  ],
+  "qa": "provisional_repair"
+}

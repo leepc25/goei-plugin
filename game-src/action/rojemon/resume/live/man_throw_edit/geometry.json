@@ -1,0 +1,17 @@
+[
+  {
+    "frame": 0,
+    "sha256": "eb265ea5075e632abe3f778e75ff321dc6118b8230ef79bb9550c2d03301e8f3",
+    "bbox": [
+      70,
+      70,
+      119,
+      144
+    ],
+    "edge_contact": false,
+    "alpha_values": [
+      0,
+      255
+    ]
+  }
+]

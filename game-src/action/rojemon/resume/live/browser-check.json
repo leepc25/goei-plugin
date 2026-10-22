@@ -1,0 +1,63 @@
+{
+  "results": [
+    {
+      "name": "desktop",
+      "embedded": {
+        "down": {
+          "fw": 256,
+          "fh": 160,
+          "frames": 7,
+          "stripWidth": 1792
+        },
+        "man_throw": {
+          "fw": 256,
+          "fh": 160,
+          "frames": 7,
+          "stripWidth": 1792
+        }
+      },
+      "down": {
+        "clip": "down",
+        "frame": 6,
+        "lying": true,
+        "frames": 7
+      },
+      "transition": {
+        "identical": true,
+        "sameAnchor": true
+      },
+      "reviewStepPaused": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "mobile",
+      "embedded": {
+        "down": {
+          "fw": 256,
+          "fh": 160,
+          "frames": 7,
+          "stripWidth": 1792
+        },
+        "man_throw": {
+          "fw": 256,
+          "fh": 160,
+          "frames": 7,
+          "stripWidth": 1792
+        }
+      },
+      "down": {
+        "clip": "down",
+        "frame": 6,
+        "lying": true,
+        "frames": 7
+      },
+      "transition": {
+        "identical": true,
+        "sameAnchor": true
+      },
+      "reviewStepPaused": true,
+      "horizontalOverflow": false
+    }
+  ],
+  "errors": []
+}

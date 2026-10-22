@@ -1,0 +1,18 @@
+{
+  "status": "recovered",
+  "job_id": "d5d8b068-9501-40be-9538-7c2fe192cdc8",
+  "actual_cost": 1,
+  "cost_unit": "generations",
+  "user_visual_approval": false,
+  "frame_count": 1,
+  "geometry": "geometry.json",
+  "clip": "man_throw_edit",
+  "tool": "edit_image_pixen",
+  "cost_evidence": "resume\\live\\man_throw_edit\\result.json",
+  "request_sha256": "71d3aee8b5243cfbc53e24e377d0e74fd90ef538b2ac53b73cef5dffb278c5c8",
+  "input_sha256": "baff04b81a744211e755db6ca960d88e4411255a704e901cabfb9b09ea997d85",
+  "output_hashes": [
+    "eb265ea5075e632abe3f778e75ff321dc6118b8230ef79bb9550c2d03301e8f3"
+  ],
+  "qa": "rejected"
+}
