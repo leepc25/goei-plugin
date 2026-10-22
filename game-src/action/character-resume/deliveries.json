@@ -84,6 +84,19 @@
       "visual_status": "owner delivered contact-v2; independent full playback review outstanding",
       "remaining": "run not submitted; do not swap atlas without cycle adjustment",
       "user_visual_approval": false
+    },
+    {
+      "character": "eileen",
+      "commit": "3578aa2f4a07e368a2bafeb96eee487eabef7e9a",
+      "branch": "codex/art-eileen-resume",
+      "html": "release/demo/eileen-full.html",
+      "charged_generations": 28,
+      "transition_frames": 11,
+      "fps": 20,
+      "free_edit_pixels": 541,
+      "visual_status": "owner delivered; coordinator inspected latest sequence sheet",
+      "remaining": "frame03 occlusion;05 to06 face and equipment silhouette discontinuity; strict side view",
+      "user_visual_approval": false
     }
   ]
 }
