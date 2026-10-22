@@ -27,6 +27,12 @@ async function loadArt(urlOf) {
   return EMPTY_ART;
 }
 
+// src/game/action/engine/pxfont.ts
+function pfont(size2) {
+  const n = size2 <= 12 ? 11 : Math.max(22, Math.round(size2 / 11) * 11);
+  return { n, f: `700 ${n}px "GoeiPixel", "Galmuri11", monospace` };
+}
+
 // src/game/action/engine/contract.ts
 var TICK_HZ = 30;
 var SCREEN_W = 1280;
@@ -965,6 +971,42 @@ var PLATE_NAMES = {
   apt_vacant: ["501", "502", "503", "504"],
   silent: ["열람실", "서고", "별관", "고문서실"]
 };
+var tone = 0;
+var TONES = [
+  [1, 1, 1, 0],
+  [1.06, 0.98, 0.84, 6],
+  // 누런 낡은 층
+  [0.86, 1, 0.94, 0],
+  // 푸른빛 도는 녹색 층
+  [0.92, 0.9, 1.08, -4]
+  // 차가운 보랏빛 층
+];
+var toned = /* @__PURE__ */ new Map();
+function setFloorTone(depth) {
+  tone = depth > 0 ? (depth - 1) % TONES.length : 0;
+}
+function tonedImage(key, im) {
+  if (!tone || typeof document === "undefined") return im;
+  const k = `${key}#${tone}`;
+  let c = toned.get(k);
+  if (!c) {
+    c = document.createElement("canvas");
+    c.width = im.naturalWidth;
+    c.height = im.naturalHeight;
+    const g2 = c.getContext("2d");
+    g2.drawImage(im, 0, 0);
+    const d2 = g2.getImageData(0, 0, c.width, c.height);
+    const [r, gg, b, add] = TONES[tone];
+    for (let i = 0; i < d2.data.length; i += 4) {
+      d2.data[i] = Math.min(255, d2.data[i] * r + add);
+      d2.data[i + 1] = Math.min(255, d2.data[i + 1] * gg + add);
+      d2.data[i + 2] = Math.min(255, d2.data[i + 2] * b + add);
+    }
+    g2.putImageData(d2, 0, 0);
+    toned.set(k, c);
+  }
+  return c;
+}
 function drawWallCell(ctx, place3, ref, x, w, flip, wallBottom) {
   const names = walls(place3);
   if (!names.length) return false;
@@ -974,11 +1016,12 @@ function drawWallCell(ctx, place3, ref, x, w, flip, wallBottom) {
   ctx.imageSmoothingEnabled = false;
   for (let i = 0; i < bays; i++) {
     const k = Math.round((x + i * bw) / 640);
-    const im = image(place3.split(":")[0], names[(k + hash(place3) % names.length) % names.length]);
-    if (!im) {
+    const im0 = image(place3.split(":")[0], names[(k + hash(place3) % names.length) % names.length]);
+    if (!im0) {
       ctx.restore();
       return false;
     }
+    const im = tonedImage(`${place3}/${names[(k + hash(place3) % names.length) % names.length]}`, im0);
     const bx = x + i * bw;
     if (flip) {
       ctx.save();
@@ -1092,10 +1135,10 @@ function drawFloor(ctx, place3, x0, x1, y0, y1) {
   const name = Object.keys(pack()[place3] ?? {}).find((n) => n.endsWith("_floor"));
   const im = name ? image(place3, name) : null;
   if (!im) return false;
-  const key = `${place3}/${name}`;
+  const key = `${place3}/${name}#${tone}`;
   let pat = patterns.get(key);
   if (pat === void 0) {
-    pat = ctx.createPattern(im, "repeat");
+    pat = ctx.createPattern(tonedImage(`${place3}/${name}`, im), "repeat");
     patterns.set(key, pat);
   }
   if (!pat) return false;
@@ -1683,6 +1726,31 @@ function drawPipeBundle(ctx, x0, x1, bottom) {
   ctx.restore();
   return true;
 }
+function drawLowRow(ctx, x0, x1, fy, seed) {
+  const ORDER = [1, 6, 4, 1, 5, 2, 6, 1, 4];
+  const ims = ORDER.map((n) => objImage("props", n));
+  if (ims.some((im) => !im)) return false;
+  const pick6 = [];
+  let tot = 0;
+  for (let i = Math.abs(Math.round(seed / 97)) % ORDER.length; ; i = (i + 1) % ORDER.length) {
+    const im = ims[i];
+    if (pick6.length && tot + im.width * 2 > x1 - x0 + 30) break;
+    pick6.push(im);
+    tot += im.width * 2;
+    if (pick6.length > 30) break;
+  }
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  let x = Math.round(x0 + (x1 - x0 - tot) / 2);
+  for (const im of pick6) {
+    ctx.fillStyle = "rgba(0,0,0,0.3)";
+    ctx.fillRect(x + 4, fy - 6, im.width * 2 - 8, 10);
+    ctx.drawImage(im, x, fy - im.height * 2, im.width * 2, im.height * 2);
+    x += im.width * 2;
+  }
+  ctx.restore();
+  return true;
+}
 function drawPropArt(ctx, kind, label3, sx, y, floorType) {
   if (kind === "hatch") {
     drawCeilingHatch(ctx, sx);
@@ -2165,14 +2233,14 @@ var C = {
   amber: "#f0b45a"
 };
 function font(size2, weight = 700) {
-  return pixelOn ? pfont(size2).f : `${weight} ${size2}px ${FONT}`;
+  return pixelOn ? pfont2(size2).f : `${weight} ${size2}px ${FONT}`;
 }
-function pfont(size2) {
+function pfont2(size2) {
   const n = size2 <= 12 ? 11 : Math.max(22, Math.round(size2 / 11) * 11);
   return { n, f: `700 ${n}px "${PIXEL_FONT}", ${FONT}` };
 }
 function label(c, s2, x, y, size2 = 16, color = C.text, align = "left", weight = 700) {
-  const p = pixelOn ? pfont(size2) : null;
+  const p = pixelOn ? pfont2(size2) : null;
   if (p) size2 = p.n;
   c.font = p ? p.f : font(size2, weight);
   c.textAlign = align;
@@ -2185,6 +2253,9 @@ function label(c, s2, x, y, size2 = 16, color = C.text, align = "left", weight =
   c.fillText(s2, x, y);
 }
 var pixelOn = false;
+function setPixelText(on) {
+  pixelOn = on;
+}
 function plate(c, x, y, w, h, r = 8) {
   c.beginPath();
   c.roundRect(x, y, w, h, r);
@@ -2404,10 +2475,11 @@ var Hud = class {
       y += 24;
     }
   }
-  /** 아이템: 아이콘만 (글자 없음), 왼쪽 아래. 터치 화면에서는 터치 버튼이 대신 보여 준다 */
+  /** 아이템: 아이콘만 (글자 없음), 체력 막대 오른쪽 위 천장 띠. 바닥(물건·자막)과 겹치지 않게 (독립 검수: UI 안전영역).
+   * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
   items(c, items, device) {
-    const n = 4, s2 = 56, g2 = 8;
-    const x0 = 18, y = H2 - 16 - s2;
+    const n = 4, s2 = 52, g2 = 8;
+    const x0 = 482, y = 22;
     const padKeys = ["↑", "→", "↓", "←"];
     for (let i = 0; i < n; i++) {
       const it = items[i] ?? { label: "", count: 0 };
@@ -2746,6 +2818,16 @@ function drawGoSign(c, x, y, t) {
   c.imageSmoothingEnabled = false;
   const im = pixelText("전진", 33, "#ffe9a8", "#ffb43a", 700, true);
   const k = 2;
+  {
+    const pw = im.width * k + 12 + 9 * 4 + 8 + 28, ph = Math.max(im.height * k, 19 * 4) + 20;
+    const px = Math.round(x - 14) & ~3, py = Math.round(y + im.height * k / 2 - ph / 2) & ~3;
+    c.fillStyle = "#0c0f12";
+    c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
+    c.fillStyle = "#b8873a";
+    c.fillRect(px, py, pw, ph);
+    c.fillStyle = "rgba(16,20,24,0.92)";
+    c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
+  }
   c.drawImage(im, Math.round(x), Math.round(y), im.width * k, im.height * k);
   const ax = Math.round(x + im.width * k + 12 + Math.floor(t * 6) % 2 * 8), ay = Math.round(y + im.height * k / 2);
   const P = 4;
@@ -4959,7 +5041,7 @@ function makeRenderer(ctx, art3, opt) {
       ctx.fillStyle = "rgba(80,200,120,0.18)";
       ctx.fillRect(ex, wallTop + 120, 90, top - wallTop - 140);
       ctx.fillStyle = "#7fe0a0";
-      ctx.font = "bold 22px sans-serif";
+      ctx.font = pfont(22).f;
       ctx.fillText("출구", ex + 22, wallTop + 110);
     }
   }
@@ -5116,7 +5198,7 @@ function makeRenderer(ctx, art3, opt) {
         case "text":
           ctx.globalAlpha = 1 - k;
           ctx.fillStyle = "#fff";
-          ctx.font = "bold 26px sans-serif";
+          ctx.font = pfont(26).f;
           ctx.textAlign = "center";
           ctx.fillText(f.text ?? "", sx, sy - 30 * k);
           break;
@@ -5152,7 +5234,7 @@ function makeRenderer(ctx, art3, opt) {
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.fillRect(20, 20, 420, 92);
     ctx.fillStyle = "#e8eef0";
-    ctx.font = "bold 20px sans-serif";
+    ctx.font = pfont(20).f;
     ctx.fillText("쟈알디", 34, 46);
     ctx.fillStyle = "#3a2224";
     ctx.fillRect(120, 30, 300, 18);
@@ -5166,7 +5248,7 @@ function makeRenderer(ctx, art3, opt) {
     ctx.fillRect(120, 66, 300, 5);
     ctx.fillStyle = "#9ad08a";
     ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
-    ctx.font = "16px sans-serif";
+    ctx.font = pfont(16).f;
     ctx.fillStyle = "#c9d3d8";
     ctx.fillText("탄", 34, 98);
     for (let i = 0; i < p.mag; i++) {
@@ -5181,7 +5263,7 @@ function makeRenderer(ctx, art3, opt) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(x, 20, 58, 58);
       ctx.fillStyle = "#8e9aa1";
-      ctx.font = "14px sans-serif";
+      ctx.font = pfont(14).f;
       ctx.fillText(String(i + 1), x + 4, 36);
       if (it) {
         ctx.fillStyle = it.n > 0 ? "#e8eef0" : "#5a646a";
@@ -5191,7 +5273,7 @@ function makeRenderer(ctx, art3, opt) {
     });
     if (p.combo >= 2) {
       ctx.save();
-      ctx.font = "bold 54px sans-serif";
+      ctx.font = pfont(54).f;
       ctx.textAlign = "right";
       ctx.fillStyle = "#ffd36a";
       ctx.strokeStyle = "#000";
@@ -5205,7 +5287,7 @@ function makeRenderer(ctx, art3, opt) {
       ctx.fillStyle = "rgba(0,0,0,0.6)";
       ctx.fillRect(240, SCREEN_H - 62, 800, 40);
       ctx.fillStyle = "#e8eef0";
-      ctx.font = "bold 18px sans-serif";
+      ctx.font = pfont(18).f;
       ctx.fillText(boss2.label, 252, SCREEN_H - 36);
       ctx.fillStyle = "#5a1e1e";
       ctx.fillRect(470, SCREEN_H - 50, 556, 16);
@@ -5222,13 +5304,13 @@ function makeRenderer(ctx, art3, opt) {
       ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
       ctx.fillRect(0, 170, SCREEN_W, 70);
       ctx.fillStyle = `rgba(232,238,240,${a})`;
-      ctx.font = "bold 34px sans-serif";
+      ctx.font = pfont(34).f;
       ctx.textAlign = "center";
       ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
       ctx.textAlign = "left";
     }
     if (w.subtitle && opt.hud) {
-      ctx.font = "24px sans-serif";
+      ctx.font = pfont(24).f;
       ctx.textAlign = "center";
       const tw = ctx.measureText(w.subtitle.text).width;
       ctx.fillStyle = "rgba(0,0,0,0.65)";
@@ -5258,7 +5340,7 @@ function makeRenderer(ctx, art3, opt) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(art3.cutin, x - 200, bandY - 40, 340, 340);
     }
-    ctx.font = "bold 72px sans-serif";
+    ctx.font = pfont(72).f;
     ctx.fillStyle = "#fff";
     ctx.fillText("전부 폭파", x + 220, bandY + 160);
   }
@@ -6380,8 +6462,9 @@ var World = class {
     for (let i = 0; i < list.length; i++)
       for (let j = i + 1; j < list.length; j++) {
         const a = list[i], b = list[j];
-        if (Math.abs(a.y - b.y) > 40) continue;
-        const min = 50 + (a.def.w + b.def.w) * 0.45;
+        const dy = Math.abs(a.y - b.y);
+        if (dy > 75) continue;
+        const min = (50 + (a.def.w + b.def.w) * 0.45) * (dy > 40 ? 0.75 : 1);
         const dx = b.x - a.x;
         if (Math.abs(dx) >= min) continue;
         const s2 = dx === 0 ? a.id < b.id ? 1 : -1 : Math.sign(dx);
@@ -6791,11 +6874,11 @@ var Game = class {
       c.fillRect(0, 0, SCREEN_W, SCREEN_H);
       c.fillStyle = "#e8eef0";
       c.textAlign = "center";
-      c.font = "bold 44px sans-serif";
+      c.font = pfont(44).f;
       c.fillText(title2, SCREEN_W / 2, 210);
     }
     c.textAlign = "center";
-    c.font = "30px sans-serif";
+    c.font = pfont(30).f;
     items.forEach((t, i) => {
       const y = 300 + i * 64;
       c.fillStyle = i === this.menuIndex ? "#ffd36a" : "rgba(255,255,255,0.1)";
@@ -6843,12 +6926,12 @@ var Game = class {
         c.font = "bold 30px monospace";
         c.fillStyle = "#8e9aa1";
         c.fillText("ANOMALY SIMULATION", SCREEN_W / 2, 120);
-        c.font = "bold 58px sans-serif";
+        c.font = pfont(58).f;
         c.fillStyle = "#e8eef0";
         c.fillText("관리국 · 차원 승강기", SCREEN_W / 2, 190);
         this.drawMenu("", this.titleItems, false);
         c.fillStyle = "#8e9aa1";
-        c.font = "20px sans-serif";
+        c.font = pfont(20).f;
         c.textAlign = "center";
         const help = [
           "방향키 이동 · A 3연타 · 달리며 A 돌진 · ↓↓ 앉기, 앉아 A 하단 · Space 점프, 공중 A 점프 킥",
@@ -6880,14 +6963,14 @@ var Game = class {
         c.fillRect(0, 0, SCREEN_W, SCREEN_H);
         c.textAlign = "center";
         c.fillStyle = r.how === "evac" ? "#ff6a5a" : "#7fe0a0";
-        c.font = "bold 64px sans-serif";
+        c.font = pfont(64).f;
         c.fillText(how, SCREEN_W / 2, 200);
         c.fillStyle = "#e8eef0";
-        c.font = "30px sans-serif";
+        c.font = pfont(30).f;
         const lines2 = [`처치 ${r.kills}`, `최대 콤보 ${r.maxCombo}`, `층 ${r.floors}`, `시간 ${r.timeSec}초`, `남은 체력 ${r.hpLeft}`];
         lines2.forEach((l, i) => c.fillText(l, SCREEN_W / 2, 290 + i * 48));
         c.fillStyle = "#8e9aa1";
-        c.font = "22px sans-serif";
+        c.font = pfont(22).f;
         c.fillText("A 또는 화면을 누르면 처음으로", SCREEN_W / 2, 600);
         c.textAlign = "left";
       }
@@ -7099,7 +7182,7 @@ function burst2(o, t, dest, type, f, q, dur, vol, a = 1e-3) {
   noise(o, t, dur + a, fl);
   return fl;
 }
-function tone(o, t, dest, type, f, dur, vol, a = 3e-3) {
+function tone2(o, t, dest, type, f, dur, vol, a = 3e-3) {
   const g2 = gainNode(o, 0, dest);
   perc(g2.gain, t, a, vol, dur);
   return osc(o, type, f, t, dur + a, g2);
@@ -7181,28 +7264,28 @@ var gun = (o, t, p) => {
   burst2(o, t, v, "highpass", 1200 * k, 0.6, 0.06, 0.9);
   burst2(o, t, v, "bandpass", 500 * k, 0.8, 0.12, 0.8);
   thump(o, t, v, 180 * k, 50, 0.1, 1);
-  tone(o, t + 0.07, v, "square", 2900 * k, 0.03, 0.06);
+  tone2(o, t + 0.07, v, "square", 2900 * k, 0.03, 0.06);
   return 0.6;
 };
 var gunSilenced = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.15);
   burst2(o, t, v, "lowpass", 1400 * p.pitch, 0.9, 0.05, 0.6);
   thump(o, t, v, 220, 80, 0.05, 0.4);
-  tone(o, t + 0.05, v, "square", 2600, 0.025, 0.05);
+  tone2(o, t + 0.05, v, "square", 2600, 0.025, 0.05);
   return 0.2;
 };
 var reload = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.3);
   burst2(o, t, v, "bandpass", 3e3, 3, 0.03, 0.5);
-  tone(o, t, v, "square", 1800, 0.02, 0.08);
+  tone2(o, t, v, "square", 1800, 0.02, 0.08);
   burst2(o, t + 0.22, v, "bandpass", 2200, 4, 0.04, 0.6);
-  tone(o, t + 0.22, v, "triangle", 900, 0.05, 0.2);
+  tone2(o, t + 0.22, v, "triangle", 900, 0.05, 0.2);
   return 0.4;
 };
 var emptyClick = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan);
   burst2(o, t, v, "highpass", 4e3, 1, 0.015, 0.5);
-  tone(o, t, v, "square", 1400, 0.015, 0.1);
+  tone2(o, t, v, "square", 1400, 0.015, 0.1);
   return 0.1;
 };
 var bulletHit = (o, t, p) => {
@@ -7213,7 +7296,7 @@ var bulletHit = (o, t, p) => {
 };
 var ricochet = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol * 0.6, p.pan, 0.2);
-  const n = tone(o, t, v, "sine", 3800 * p.pitch, 0.35, 0.3);
+  const n = tone2(o, t, v, "sine", 3800 * p.pitch, 0.35, 0.3);
   n.frequency.exponentialRampToValueAtTime(1500, t + 0.35);
   burst2(o, t, v, "highpass", 3e3, 1, 0.02, 0.4);
   return 0.5;
@@ -7221,8 +7304,8 @@ var ricochet = (o, t, p) => {
 var guard = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.12, 0.3);
   burst2(o, t, v, "bandpass", 1100, 2, 0.05, 0.7);
-  tone(o, t, v, "square", 520 * p.pitch, 0.12, 0.12);
-  tone(o, t, v, "triangle", 1370 * p.pitch, 0.18, 0.18);
+  tone2(o, t, v, "square", 520 * p.pitch, 0.12, 0.12);
+  tone2(o, t, v, "triangle", 1370 * p.pitch, 0.18, 0.18);
   thump(o, t, v, 100, 60, 0.06, 0.5);
   return 0.3;
 };
@@ -7230,10 +7313,10 @@ var guardBreak = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.3, 0.3);
   const sh = shaper(o, 20, v);
   burst2(o, t, sh, "bandpass", 900, 1, 0.25, 0.6);
-  const n = tone(o, t, v, "sawtooth", 600, 0.4, 0.25);
+  const n = tone2(o, t, v, "sawtooth", 600, 0.4, 0.25);
   n.frequency.exponentialRampToValueAtTime(90, t + 0.4);
   thump(o, t, v, 90, 30, 0.3, 1);
-  for (let i = 0; i < 3; i++) tone(o, t + 0.25 + i * 0.12, v, "square", 1500 - i * 200, 0.06, 0.06);
+  for (let i = 0; i < 3; i++) tone2(o, t + 0.25 + i * 0.12, v, "square", 1500 - i * 200, 0.06, 0.06);
   return 0.7;
 };
 var parry = (o, t, p) => {
@@ -7287,8 +7370,8 @@ var wakeup = (o, t, p) => {
 };
 var armor = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.2);
-  tone(o, t, v, "square", 220, 0.12, 0.2);
-  tone(o, t, v, "square", 331, 0.12, 0.15);
+  tone2(o, t, v, "square", 220, 0.12, 0.2);
+  tone2(o, t, v, "square", 331, 0.12, 0.15);
   burst2(o, t, v, "bandpass", 2400, 3, 0.05, 0.4);
   return 0.3;
 };
@@ -7307,9 +7390,9 @@ var ability = (o, t, p) => {
 };
 var superStart = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.6);
-  const n = tone(o, t, v, "sawtooth", 110, 0.9, 0.25, 0.01);
+  const n = tone2(o, t, v, "sawtooth", 110, 0.9, 0.25, 0.01);
   n.frequency.exponentialRampToValueAtTime(880, t + 0.6);
-  const n2 = tone(o, t, v, "sawtooth", 112, 0.9, 0.2, 0.01);
+  const n2 = tone2(o, t, v, "sawtooth", 112, 0.9, 0.2, 0.01);
   n2.frequency.exponentialRampToValueAtTime(887, t + 0.6);
   burst2(o, t, v, "highpass", 6e3, 0.7, 0.5, 0.25, 0.3);
   bell(o, t + 0.55, v, 1760, 1.2, 0.35, 3.5, 4);
@@ -7335,14 +7418,14 @@ var heal = (o, t, p) => {
 var itemUse = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
   burst2(o, t, v, "bandpass", 2500, 2, 0.06, 0.5);
-  tone(o, t + 0.08, v, "square", 660, 0.06, 0.12);
-  tone(o, t + 0.15, v, "square", 990, 0.1, 0.12);
+  tone2(o, t + 0.08, v, "square", 660, 0.06, 0.12);
+  tone2(o, t + 0.15, v, "square", 990, 0.1, 0.12);
   return 0.35;
 };
 var pickup = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.15);
-  tone(o, t, v, "square", 988 * p.pitch, 0.07, 0.15);
-  tone(o, t + 0.07, v, "square", 1319 * p.pitch, 0.15, 0.15);
+  tone2(o, t, v, "square", 988 * p.pitch, 0.07, 0.15);
+  tone2(o, t + 0.07, v, "square", 1319 * p.pitch, 0.15, 0.15);
   return 0.3;
 };
 var enemyDie = (o, t, p) => {
@@ -7352,15 +7435,15 @@ var enemyDie = (o, t, p) => {
   const fl = filt(o, "bandpass", 3e3, 2, g2);
   fl.frequency.exponentialRampToValueAtTime(150, t + 0.8);
   noise(o, t, 0.85, fl);
-  const n = tone(o, t, v, "triangle", 880 * p.pitch, 0.7, 0.2, 0.01);
+  const n = tone2(o, t, v, "triangle", 880 * p.pitch, 0.7, 0.2, 0.01);
   n.frequency.exponentialRampToValueAtTime(110, t + 0.7);
   return 1;
 };
 var enemyTell = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
-  const n = tone(o, t, v, "sawtooth", 700 * p.pitch, 0.25, 0.18, 0.02);
+  const n = tone2(o, t, v, "sawtooth", 700 * p.pitch, 0.25, 0.18, 0.02);
   n.frequency.exponentialRampToValueAtTime(1400 * p.pitch, t + 0.2);
-  tone(o, t, v, "sine", 1404 * p.pitch, 0.25, 0.12, 0.02);
+  tone2(o, t, v, "sine", 1404 * p.pitch, 0.25, 0.12, 0.02);
   return 0.35;
 };
 var ghostWail = (o, t, p) => {
@@ -7390,7 +7473,7 @@ var ghostWail = (o, t, p) => {
 var ghostAttack = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
   swoosh(o, t, v, 300, 2200, 0.25, 0.5);
-  const n = tone(o, t, v, "sawtooth", 300, 0.3, 0.2, 0.02);
+  const n = tone2(o, t, v, "sawtooth", 300, 0.3, 0.2, 0.02);
   n.frequency.exponentialRampToValueAtTime(900, t + 0.25);
   return 0.4;
 };
@@ -7424,7 +7507,7 @@ var enemySpawn = (o, t, p) => {
   const fl = filt(o, "bandpass", 200, 3, g2);
   fl.frequency.exponentialRampToValueAtTime(2500, t + 0.5);
   noise(o, t, 0.7, fl);
-  tone(o, t + 0.45, v, "sine", 55, 0.4, 0.5);
+  tone2(o, t + 0.45, v, "sine", 55, 0.4, 0.5);
   return 1;
 };
 var whisper = (o, t, p) => {
@@ -7449,8 +7532,8 @@ var bossTell = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
   for (let i = 0; i < 3; i++) {
     const tt = t + i * 0.16;
-    tone(o, tt, v, "square", 880, 0.1, 0.12);
-    tone(o, tt, v, "square", 932, 0.1, 0.1);
+    tone2(o, tt, v, "square", 880, 0.1, 0.12);
+    tone2(o, tt, v, "square", 932, 0.1, 0.1);
   }
   thump(o, t, v, 70, 35, 0.6, 0.8);
   return 0.8;
@@ -7513,9 +7596,9 @@ function step(s2) {
       case "wood": {
         const v = voice(o, p.dest, t, vol, p.pan, 0, 0.3);
         burst2(o, t, v, "bandpass", 1100 * k, 2, 0.04, 0.45);
-        tone(o, t, v, "triangle", 190 * k, 0.07, 0.25);
+        tone2(o, t, v, "triangle", 190 * k, 0.07, 0.25);
         if (Math.random() < 0.15) {
-          const n = tone(o, t + 0.05, v, "sawtooth", 380, 0.18, 0.04, 0.05);
+          const n = tone2(o, t + 0.05, v, "sawtooth", 380, 0.18, 0.04, 0.05);
           n.frequency.linearRampToValueAtTime(330, t + 0.2);
         }
         return 0.3;
@@ -7523,9 +7606,9 @@ function step(s2) {
       case "metal": {
         const v = voice(o, p.dest, t, vol, p.pan, 0.1, 0.4);
         burst2(o, t, v, "bandpass", 2e3 * k, 1, 0.02, 0.4);
-        tone(o, t, v, "triangle", 517 * k, 0.18, 0.12);
-        tone(o, t, v, "sine", 1243 * k, 0.12, 0.08);
-        tone(o, t, v, "sine", 2071 * k, 0.08, 0.05);
+        tone2(o, t, v, "triangle", 517 * k, 0.18, 0.12);
+        tone2(o, t, v, "sine", 1243 * k, 0.12, 0.08);
+        tone2(o, t, v, "sine", 2071 * k, 0.08, 0.05);
         return 0.25;
       }
       case "tile": {
@@ -7546,7 +7629,7 @@ function step(s2) {
       case "void": {
         const v = voice(o, p.dest, t, vol, p.pan, 0.4);
         thump(o, t, v, 60 * k, 45, 0.2, 0.5);
-        const n = tone(o, t, v, "sine", 880 * k, 0.25, 0.05, 0.08);
+        const n = tone2(o, t, v, "sine", 880 * k, 0.25, 0.05, 0.08);
         n.frequency.exponentialRampToValueAtTime(840 * k, t + 0.25);
         return 0.4;
       }
@@ -7590,7 +7673,7 @@ function doorSlide(open) {
 var panelButton = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0, 0.2);
   burst2(o, t, v, "bandpass", 3500, 3, 0.012, 0.6);
-  tone(o, t + 0.01, v, "sine", 1975 * p.pitch, 0.09, 0.2);
+  tone2(o, t + 0.01, v, "sine", 1975 * p.pitch, 0.09, 0.2);
   return 0.15;
 };
 var intercom = (o, t, p) => {
@@ -7604,7 +7687,7 @@ var intercom = (o, t, p) => {
   const bp = filt(o, "bandpass", 1800, 1.2, g2);
   noise(o, t, dur, shaper(o, 30, bp));
   for (let i = 0; i < 8; i++) burst2(o, t + rnd(0, dur), v, "highpass", 2500, 1, 0.01, rnd(0.2, 0.5));
-  tone(o, t, v, "square", 1e3, 0.05, 0.08);
+  tone2(o, t, v, "square", 1e3, 0.05, 0.08);
   return dur + 0.2;
 };
 var elevatorRide = (o, t, p) => {
@@ -7639,31 +7722,31 @@ var ropeCreak = (o, t, p) => {
 };
 var uiMove = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan);
-  tone(o, t, v, "square", 1760 * p.pitch, 0.03, 0.14);
+  tone2(o, t, v, "square", 1760 * p.pitch, 0.03, 0.14);
   return 0.06;
 };
 var uiOk = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.05);
-  tone(o, t, v, "square", 1320 * p.pitch, 0.05, 0.1);
-  tone(o, t + 0.05, v, "square", 1980 * p.pitch, 0.09, 0.1);
+  tone2(o, t, v, "square", 1320 * p.pitch, 0.05, 0.1);
+  tone2(o, t + 0.05, v, "square", 1980 * p.pitch, 0.09, 0.1);
   return 0.18;
 };
 var uiBack = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan);
-  tone(o, t, v, "square", 1320 * p.pitch, 0.05, 0.09);
-  tone(o, t + 0.05, v, "square", 880 * p.pitch, 0.08, 0.09);
+  tone2(o, t, v, "square", 1320 * p.pitch, 0.05, 0.09);
+  tone2(o, t + 0.05, v, "square", 880 * p.pitch, 0.08, 0.09);
   return 0.16;
 };
 var uiError = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan);
-  tone(o, t, v, "square", 196, 0.09, 0.15);
-  tone(o, t + 0.11, v, "square", 185, 0.14, 0.15);
+  tone2(o, t, v, "square", 196, 0.09, 0.15);
+  tone2(o, t + 0.11, v, "square", 185, 0.14, 0.15);
   return 0.3;
 };
 var uiOpen = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
   swoosh(o, t, v, 1500, 5e3, 0.12, 0.15);
-  tone(o, t + 0.04, v, "triangle", 1046, 0.1, 0.12);
+  tone2(o, t + 0.04, v, "triangle", 1046, 0.1, 0.12);
   return 0.2;
 };
 var uiClose = (o, t, p) => {
@@ -7673,7 +7756,7 @@ var uiClose = (o, t, p) => {
 };
 var textBlip = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan);
-  tone(o, t, v, "square", 600 * p.pitch * rnd(0.97, 1.03), 0.025, 0.05);
+  tone2(o, t, v, "square", 600 * p.pitch * rnd(0.97, 1.03), 0.025, 0.05);
   return 0.04;
 };
 var message = (o, t, p) => {
@@ -7695,18 +7778,18 @@ var ruleStamp = (o, t, p) => {
 };
 var save = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.2);
-  [67, 72, 79].forEach((m, i) => tone(o, t + i * 0.08, v, "triangle", mtof(m), 0.25, 0.15));
+  [67, 72, 79].forEach((m, i) => tone2(o, t + i * 0.08, v, "triangle", mtof(m), 0.25, 0.15));
   return 0.6;
 };
 var coin = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
-  tone(o, t, v, "square", 1975, 0.06, 0.12);
-  tone(o, t + 0.06, v, "square", 2637, 0.25, 0.12);
+  tone2(o, t, v, "square", 1975, 0.06, 0.12);
+  tone2(o, t + 0.06, v, "square", 2637, 0.25, 0.12);
   return 0.35;
 };
 var levelUp = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
-  [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => tone(o, t + i * 0.05, v, "square", mtof(m), 0.12, 0.08));
+  [60, 64, 67, 72, 76, 79, 84].forEach((m, i) => tone2(o, t + i * 0.05, v, "square", mtof(m), 0.12, 0.08));
   bell(o, t + 0.36, v, mtof(84), 1, 0.25, 2, 2);
   return 1.4;
 };
@@ -7756,7 +7839,7 @@ var glassBreak = (o, t, p) => {
   burst2(o, t, v, "highpass", 3e3, 0.7, 0.15, 0.7);
   for (let i = 0; i < 9; i++) {
     const tt = t + rnd(0.02, 0.5);
-    tone(o, tt, v, "sine", rnd(3e3, 7e3), rnd(0.05, 0.2), rnd(0.05, 0.12));
+    tone2(o, tt, v, "sine", rnd(3e3, 7e3), rnd(0.05, 0.2), rnd(0.05, 0.12));
   }
   return 0.9;
 };
@@ -7773,7 +7856,7 @@ var flicker = (o, t, p) => {
 };
 var drip = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.5);
-  const n = tone(o, t, v, "sine", rnd(1400, 2200) * p.pitch, 0.08, 0.25, 1e-3);
+  const n = tone2(o, t, v, "sine", rnd(1400, 2200) * p.pitch, 0.08, 0.25, 1e-3);
   n.frequency.exponentialRampToValueAtTime(n.frequency.value * 0.5 + 400, t + 0.06);
   return 0.6;
 };
@@ -7796,15 +7879,15 @@ var clockTick = (o, t, p) => {
 };
 var timerWarn = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.1);
-  tone(o, t, v, "square", 1046, 0.08, 0.12);
-  tone(o, t + 0.15, v, "square", 1046, 0.08, 0.12);
+  tone2(o, t, v, "square", 1046, 0.08, 0.12);
+  tone2(o, t + 0.15, v, "square", 1046, 0.08, 0.12);
   return 0.3;
 };
 var noiseUp = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.4);
-  const n = tone(o, t, v, "sine", 300, 0.4, 0.25, 0.05);
+  const n = tone2(o, t, v, "sine", 300, 0.4, 0.25, 0.05);
   n.frequency.exponentialRampToValueAtTime(600, t + 0.4);
-  tone(o, t, v, "sine", 317, 0.4, 0.15, 0.05);
+  tone2(o, t, v, "sine", 317, 0.4, 0.15, 0.05);
   return 0.6;
 };
 var safeRoom = (o, t, p) => {
@@ -7828,7 +7911,7 @@ var heels = (o, t, p) => {
   for (let i = 0; i < 4; i++) {
     const tt = t + i * 0.32;
     burst2(o, tt, v, "bandpass", 3600, 4, 0.02, 0.6);
-    tone(o, tt, v, "triangle", 1250, 0.03, 0.15);
+    tone2(o, tt, v, "triangle", 1250, 0.03, 0.15);
   }
   return 1.6;
 };
@@ -7837,15 +7920,15 @@ var duct = (o, t, p) => {
   for (let i = 0; i < 3; i++) {
     const tt = t + i * rnd(0.35, 0.5);
     thump(o, tt, v, 90, 50, 0.2, 0.6);
-    tone(o, tt, v, "triangle", rnd(300, 420), 0.4, 0.15);
-    tone(o, tt, v, "sine", rnd(900, 1300), 0.25, 0.06);
+    tone2(o, tt, v, "triangle", rnd(300, 420), 0.4, 0.15);
+    tone2(o, tt, v, "sine", rnd(900, 1300), 0.25, 0.06);
   }
   return 1.8;
 };
 var hatch = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.2, 0.4);
   burst2(o, t, v, "bandpass", 2600, 5, 0.03, 0.7);
-  tone(o, t, v, "square", 820, 0.04, 0.1);
+  tone2(o, t, v, "square", 820, 0.04, 0.1);
   const g2 = gainNode(o, 0, v);
   g2.gain.setValueAtTime(1e-4, t + 0.1);
   g2.gain.linearRampToValueAtTime(0.5, t + 0.2);
@@ -9161,7 +9244,7 @@ function createGameAudio(opts = {}) {
 }
 
 // src/game/action/hq/style.css
-var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n.hq-kit { margin: 0 0 8px; color: var(--dim); font-size: 14px; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 12px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n";
+var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #c9cfc6; font-size: 18px; line-height: 1.45; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 14px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n";
 
 // src/game/action/hq/lines.ts
 var provider = null;
@@ -9305,7 +9388,7 @@ var Fx = class {
         break;
       case "hurt":
         this.shake(5 + (e.strength ?? 1) * 3, 0.18);
-        this.flash("#ff2020", 0.25, 0.28);
+        this.flash("#ff2020", 0.1, 0.2);
         this.rumble?.(0.6, 140);
         break;
       case "blast":
@@ -9412,7 +9495,7 @@ var Fx = class {
     this.pops = this.pops.filter((p) => p.t < 0.9);
     if (this.title) {
       this.title.t += dt;
-      if (this.title.t > 2.8) this.title = null;
+      if (this.title.t > 1.9) this.title = null;
     }
     this.dim = Math.max(0, this.dim - dt * 1.2);
     if (this.tr) {
@@ -9453,7 +9536,9 @@ var Fx = class {
       const a = p.t > 0.6 ? 1 - (p.t - 0.6) / 0.3 : 1;
       const sc = p.t < 0.1 ? 1 + (0.1 - p.t) * 6 : 1;
       c.globalAlpha = a;
+      setPixelText(true);
       label(c, p.text, p.x, p.y, (p.big ? 46 : 34) * sc, p.color, "center", 900);
+      setPixelText(false);
     }
     c.restore();
   }
@@ -9482,15 +9567,23 @@ var Fx = class {
     c.restore();
   }
   drawTitle(c, t) {
-    const inK = Math.min(1, t.t / 0.35), outK = t.t > 2.3 ? (t.t - 2.3) / 0.5 : 0;
-    c.globalAlpha = inK * (1 - outK);
+    const inK = Math.min(1, t.t / 0.3), outK = t.t > 1.5 ? (t.t - 1.5) / 0.4 : 0;
+    c.globalAlpha = Math.max(0, inK * (1 - outK));
     const text = !t.depth || t.name.startsWith(t.depth) ? t.name || t.depth : `${t.depth} · ${t.name}`;
-    const y = H3 * 0.24;
-    label(c, text, W3 / 2, y, 30, "#ece2c8", "center", 800);
-    c.fillStyle = "rgba(240,180,90,0.9)";
-    const lw = 180 * easeOut(Math.min(1, t.t / 0.6));
-    c.fillRect(W3 / 2 - lw / 2, y + 12, lw, 2);
-    if (t.variant) label(c, `변형 · ${t.variant}`, W3 / 2, y + 40, 16, "#f0b45a", "center");
+    const y = 112;
+    c.font = pfont2(22).f;
+    const pw = Math.round(c.measureText(text).width + 64) & ~3, ph = t.variant ? 64 : 44, px = Math.round(W3 / 2 - pw / 2) & ~3, py = y - 32;
+    c.fillStyle = "#0c0f12";
+    c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
+    c.fillStyle = "#b8873a";
+    c.fillRect(px, py, pw, ph);
+    c.fillStyle = "rgba(16,20,24,0.94)";
+    c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
+    c.textAlign = "center";
+    c.fillStyle = "#ece2c8";
+    c.fillText(text, W3 / 2, y - (t.variant ? 4 : 0));
+    if (t.variant) c.font = pfont2(11).f, c.fillStyle = "#f0b45a", c.fillText(`변형 · ${t.variant}`, W3 / 2, y + 20);
+    c.textAlign = "left";
     c.globalAlpha = 1;
   }
   /** 전환: 가운데에서 mid 를 부르고 끝나면 풀린다 */
@@ -9539,7 +9632,9 @@ var Fx = class {
       if (hold >= 1 && tr.text) {
         c.fillStyle = "#120604";
         c.fillRect(W3 / 2 - 90, 70, 180, 70);
+        setPixelText(true);
         label(c, tr.text, W3 / 2, 124, 44, "#ff8a40", "center", 900);
+        setPixelText(false);
       }
     } else if (tr.kind === "iris") {
       const r = Math.hypot(W3, H3) * (1 - k);
@@ -12252,9 +12347,35 @@ function mix(hex, to, k) {
   return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
 }
 var cache4 = /* @__PURE__ */ new WeakMap();
+var OUTFITS = [
+  ["#6a4a3a", "#2e2a26", "#2a1e16"],
+  ["#3e5a4a", "#262e2a", "#141414"],
+  ["#5a5070", "#2a2834", "#3a2a1e"],
+  ["#7a6a4a", "#3a3428", "#5a4a3a"],
+  ["#44546e", "#22262e", "#101012"],
+  ["#704848", "#2c2224", "#1c1a1a"]
+];
+function varied(e, L) {
+  if (L.shape !== "human" || e.boss || e.kind.startsWith("fb_")) return { L, scale: 1 };
+  const v = e.id * 2654435761 >>> 0;
+  if (v % 5 === 0) return { L, scale: 1 };
+  const o = OUTFITS[v % OUTFITS.length];
+  const k = 0.35 + (v >> 4) % 3 * 0.12;
+  return {
+    L: {
+      ...L,
+      top: mix(L.top ?? "#5a5a5a", o[0], k),
+      bottom: mix(L.bottom ?? "#2a2a2a", o[1], k),
+      hair: (v >> 7) % 2 ? o[2] : L.hair,
+      bulk: (L.bulk ?? 0.16) * (0.88 + (v >> 9) % 4 * 0.06)
+    },
+    scale: 0.93 + (v >> 12) % 4 * 0.035
+  };
+}
 function drawFigure(e, ctx, outline) {
-  const L = lookFor(e.kind);
-  if (!L || typeof document === "undefined") return false;
+  const L0 = lookFor(e.kind);
+  if (!L0 || typeof document === "undefined") return false;
+  const { L, scale } = varied(e, L0);
   const p = poseOf(e);
   const base = e.def.color;
   const col = {
@@ -12268,7 +12389,7 @@ function drawFigure(e, ctx, outline) {
   const flash = e.flash > 0 && p.lie === 0 && e.state !== "dead" && e.state !== "down";
   const transform = (x) => {
     x.setTransform(1 / PIXEL, 0, 0, 1 / PIXEL, OX, OY + (e.mem.cling && L.shape === "spider" ? -40 : 40));
-    x.scale(e.dir, 1);
+    x.scale(e.dir * scale, scale);
     const upright = L.shape === "human" || L.shape === "hand";
     if (e.mem.cling && L.shape === "spider") x.scale(1, -1);
     if (p.lie > 0 && !upright) {
@@ -13346,7 +13467,7 @@ var summoner = {
   drawOver(e, ctx) {
     if (!e.mem.frozen) return;
     ctx.fillStyle = "#9fd3e6";
-    ctx.font = "600 18px sans-serif";
+    ctx.font = pfont(18).f;
     ctx.textAlign = "center";
     ctx.fillText("멈춤", e.x, e.y - e.def.h - 40);
   }
@@ -16765,6 +16886,7 @@ function drawBack(ctx, camX, segs, pal, plan) {
   const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
   const vx0 = camX - 40, vx1 = camX + 1320;
   const cx = camX + 640;
+  setFloorTone(plan.stage.where === "floor" ? plan.depth ?? 1 : 0);
   for (const s2 of segs) {
     if (s2.x + s2.w < vx0 || s2.x > vx1) continue;
     const room = s2.ref.startsWith("room:");
@@ -17076,7 +17198,7 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) 
       }
       if (b < y1) {
         const fy = Math.min(y1 + 10, b + 150);
-        drawBarricade(ctx, t.x0, t.x1, fy);
+        if (!drawLowRow(ctx, t.x0, t.x1, Math.min(y1 + 6, b + 70), t.x0)) drawBarricade(ctx, t.x0, t.x1, fy);
       }
       break;
     }
@@ -17097,7 +17219,6 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) 
         ctx.fill();
       }
       ctx.restore();
-      label2(ctx, "붉은 바닥", t.x0 + 4, laneYIn(t.lane0, y0, y1) + 14, "#ffb0b0");
       break;
     }
     case "glass":
@@ -17284,12 +17405,17 @@ function createElevatorStage(store, hooks = {}) {
   };
   const placedOf = (prop) => prop.id.startsWith("p") ? rt?.plan.stage.floor?.placed.find((p) => `p${p.id}` === prop.id) : void 0;
   const hookOf = (id) => id.startsWith("h") ? rt?.plan.stage.floor?.spawns.find((s2) => `h${s2.id}` === id) : void 0;
+  const ruleSaid = /* @__PURE__ */ new Map();
   const foundRule = (api, id, x) => {
     if (!out || !RULE[id]) return;
     const text = ruleText(id, ruleVersion(meta, id));
     const already = meta.known[id] === ruleVersion(meta, id) || out.found.includes(id);
-    api.world.say(`규칙: ${text}${out.variants.includes(id) ? `
+    const now = api.world.tick;
+    if (!already || now - (ruleSaid.get(id) ?? -9999) > 600) {
+      ruleSaid.set(id, now);
+      api.world.say(`규칙: ${text}${out.variants.includes(id) ? `
 ${RULE[id].variant.text}` : ""}`, 4);
+    }
     if (!already) {
       out.found.push(id);
       api.world.emit({ type: "ruleFound", x, id });
@@ -18217,7 +18343,7 @@ function itemName2(id) {
 }
 
 // src/game/action/story/style.css
-var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
+var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
 
 // src/game/action/story/script.ts
 var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
@@ -21463,8 +21589,9 @@ function makeHub(host, whereIs2) {
         const px = w.player.x;
         const nd = sc.doors.find((d2) => Math.abs(d2.x - px) < 60);
         const ns = !nd ? sc.spots.find((s2) => s2.open && Math.abs(s2.x - px) < 60) : null;
-        if ((nd || ns) && fadeOut <= 0) w.hintShown = true;
-        if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
+        const show = (nd || ns) && fadeOut <= 0 && !host.busy?.();
+        if (show) w.hintShown = true;
+        if (show) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark2 > 0) {
           c.fillStyle = `rgba(0,0,0,${dark2})`;
@@ -21744,7 +21871,9 @@ function hqAdapter(saves, bridge, ui) {
       openPlace: (id) => hq2.openPlace(id),
       bark: (place3) => hq2.bark(place3),
       chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
-      sfx: (n) => ui.sfx(n)
+      sfx: (n) => ui.sfx(n),
+      // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+      busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
     },
     (place3) => whereIs(place3)
   );

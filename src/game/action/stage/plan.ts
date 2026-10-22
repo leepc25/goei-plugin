@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
+import { drawFloor, drawLedge, drawLowRow, setFloorTone, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -365,6 +365,7 @@ function drawBack(ctx: CanvasRenderingContext2D, camX: number, segs: FloorSegmen
   const vx0 = camX - 40,
     vx1 = camX + 1320;
   const cx = camX + 640;
+  setFloorTone(plan.stage.where === 'floor' ? (plan.depth ?? 1) : 0);
   for (const s of segs) {
     if (s.x + s.w < vx0 || s.x > vx1) continue;
     const room = s.ref.startsWith('room:');
@@ -728,7 +729,7 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
       if (b < y1) {
         // 실제 공사 차단대 크기: 기둥 ≈ 쟈알디 엉덩이 높이(130px), 가로대 두 줄 (검수 7)
         const fy = Math.min(y1 + 10, b + 150);
-        drawBarricade(ctx, t.x0, t.x1, fy);
+        if (!drawLowRow(ctx, t.x0, t.x1, Math.min(y1 + 6, b + 70), t.x0)) drawBarricade(ctx, t.x0, t.x1, fy);
       }
       break;
     }
@@ -752,7 +753,6 @@ export function drawTerrain(ctx: CanvasRenderingContext2D, t: Terrain, pal: Pale
         ctx.fill();
       }
       ctx.restore();
-      label(ctx, '붉은 바닥', t.x0 + 4, laneYIn(t.lane0, y0, y1) + 14, '#ffb0b0');
       break;
     }
     case 'glass':

@@ -18,6 +18,8 @@ export interface HubHost {
   /** 엘리베이터 층 단추. pick(i) 또는 취소(null) */
   chooseFloor(opts: { label: string; open: boolean; here: boolean }[], pick: (i: number | null) => void): void;
   sfx(name: string): void;
+  /** 메뉴·대화창이 떠 있나 */
+  busy?(): boolean;
 }
 
 // 벽 밑선(TOP)은 440, 걷는 띠는 그보다 조금 앞에서: 바닥 가구(밑동 TOP+26)는 배경에 그려지므로 그 뒤에 몸이 서면 가구 위에 겹쳐 보인다
@@ -96,8 +98,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         // 가까운 문·자리: 요원 머리 위에 작은 도트 아이콘만 (글씨·말풍선 없음, 검수 4-2)
         const nd = sc.doors.find((d) => Math.abs(d.x - px) < 60);
         const ns = !nd ? sc.spots.find((s) => s.open && Math.abs(s.x - px) < 60) : null;
-        if ((nd || ns) && fadeOut <= 0) (w as { hintShown?: boolean }).hintShown = true;
-        if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
+        const show = (nd || ns) && fadeOut <= 0 && !host.busy?.();
+        if (show) (w as { hintShown?: boolean }).hintShown = true;
+        if (show) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         // 암전: 들어올 때 밝아지고, 나갈 때 어두워진다
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {

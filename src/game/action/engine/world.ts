@@ -377,8 +377,10 @@ export class World implements WorldView {
       for (let j = i + 1; j < list.length; j++) {
         const a = list[i],
           b = list[j];
-        if (Math.abs(a.y - b.y) > 40) continue;
-        const min = 50 + (a.def!.w + b.def!.w) * 0.45;
+        // 앞뒤로 조금 떨어져 있어도 그림은 포개진다: 깊이 75 안쪽이면 옆으로 벌린다 (독립 검수: 적이 세로로 쌓임)
+        const dy = Math.abs(a.y - b.y);
+        if (dy > 75) continue;
+        const min = (50 + (a.def!.w + b.def!.w) * 0.45) * (dy > 40 ? 0.75 : 1);
         const dx = b.x - a.x;
         if (Math.abs(dx) >= min) continue;
         const s = dx === 0 ? (a.id < b.id ? 1 : -1) : Math.sign(dx);
