@@ -1,0 +1,74 @@
+{
+ "objects/boards_objects_1": {
+  "w": 99,
+  "h": 71,
+  "foot": [
+   49,
+   71
+  ]
+ },
+ "objects/boards_objects_2": {
+  "w": 57,
+  "h": 67,
+  "foot": [
+   28,
+   67
+  ]
+ },
+ "objects/boards_objects_3": {
+  "w": 65,
+  "h": 48,
+  "foot": [
+   32,
+   48
+  ]
+ },
+ "objects/boards_objects_4": {
+  "w": 71,
+  "h": 48,
+  "foot": [
+   35,
+   48
+  ]
+ },
+ "objects/boards_objects_5": {
+  "w": 49,
+  "h": 36,
+  "foot": [
+   24,
+   36
+  ]
+ },
+ "objects/boards_objects_6": {
+  "w": 110,
+  "h": 71,
+  "foot": [
+   55,
+   71
+  ]
+ },
+ "objects/boards_objects_7": {
+  "w": 57,
+  "h": 40,
+  "foot": [
+   28,
+   40
+  ]
+ },
+ "objects/boards_objects_8": {
+  "w": 29,
+  "h": 28,
+  "foot": [
+   14,
+   28
+  ]
+ },
+ "objects/boards_objects_9": {
+  "w": 74,
+  "h": 55,
+  "foot": [
+   37,
+   55
+  ]
+ }
+}

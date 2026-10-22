@@ -28,7 +28,7 @@ import {
   type Target,
 } from '../items';
 import { TICK_HZ, type Body, type RunConfigCore } from './contract';
-import { drawPropArt, propArtSize } from '../art/bg';
+import { drawPropArt, isHighSign, propArtSize } from '../art/bg';
 
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
@@ -301,6 +301,20 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   // 검사 스크립트용: 바닥 물건 목록 (화면 검수에서 물건·몸 겹침을 숫자로 잰다)
   Object.defineProperty(w, 'itemField', { get: () => field, configurable: true });
   Object.defineProperty(w, 'solidsNow', { get: () => allSolids(), configurable: true });
+  // 그려지는 층 소품·바닥 물건의 화면 상자 (x 가운데, y 발, 폭·키): 겹침 시험이 벽 장식·서로와 맞대 본다
+  Object.defineProperty(w, 'propRects', {
+    get: () => [
+      ...w.props
+        .filter((q) => !['hubdoor', 'hubspot', 'hatch'].includes(q.kind) && !isHighSign(q.kind, q.label))
+        .map((q) => {
+          const a = propArtSize(q.kind, q.label, w.floor?.type);
+          return a ? { x: q.x, y: q.y, w: a.w, h: a.h, what: `${q.kind}:${q.label ?? ''}` } : null;
+        })
+        .filter(Boolean),
+      ...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w, h: PROPS[(e as { prop: string }).prop].h, what: `물건:${(e as { prop: string }).prop}` })),
+    ],
+    configurable: true,
+  });
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */

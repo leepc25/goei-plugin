@@ -20,14 +20,15 @@ export interface HubHost {
   sfx(name: string): void;
 }
 
-const LANE: [number, number] = [440, 690];
-const TOP = LANE[0];
+// 벽 밑선(TOP)은 440, 걷는 띠는 그보다 조금 앞에서: 바닥 가구(밑동 TOP+26)는 배경에 그려지므로 그 뒤에 몸이 서면 가구 위에 겹쳐 보인다
+const TOP = 440;
+const LANE: [number, number] = [TOP + 30, 690];
 const DOOR_H = 250;
 const FADE = 8;
 
 const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 110, glass: 150, steel: 120, security: 120, elevator: 150, stairs_up: 120, stairs_down: 120, shop: 130 };
 
-export type Hub = StageModule & { goto(place: string): void };
+export type Hub = StageModule & { goto(place: string): void; jump(sceneId: string, x?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
 export function makeHub(host: HubHost, whereIs: (place: string) => { scene: string; x: number }): Hub {
   let view: HqMapView | null = null;
@@ -173,6 +174,12 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       host.sfx(d.kind === 'steel' || d.kind === 'security' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
       go(d.to, doorX(d.to, d.toDoor));
     },
+    /** 검사·스크린샷용: 장면으로 바로 */
+    jump(sceneId: string, x = 400) {
+      if (view) go(sceneId, x);
+    },
+    sceneIds: () => (view ?? host.map()).scenes.map((s) => s.id),
+    current: () => scene,
     goto(place: string) {
       if (!view) return;
       const t = whereIs(place);

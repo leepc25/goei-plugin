@@ -3,6 +3,7 @@
 // 재화·총애·규칙서 목록은 화면에 늘 띄우지 않는다: 바뀔 때 잠깐 알림, 전체는 일시정지 메뉴(statusHtml).
 // 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
 import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './kit';
+import { ITEM_IMG } from './kit.gen';
 import { H as H0, W as W0 } from './stage';
 
 // 지금 그리는 HUD 의 논리 크기 (캔버스 크기 ÷ HUD 배율). draw 가 정한다
@@ -488,6 +489,18 @@ export function setHudItemIcon(fn: IconDrawer | null) {
   iconDrawer = fn;
 }
 export function drawHudItemIcon(c: CanvasRenderingContext2D, it: { id?: string; label: string }, x: number, y: number, size: number) {
+  // GPT 퀵슬롯 아이콘(도트 32×32)이 먼저. 모르는 id는 「모르는 물건」 봉투
+  const src = it.id ? ITEM_IMG[it.id] ?? (/탄약|탄창/.test(it.label) ? ITEM_IMG.ammo : ITEM_IMG.unknown) : null;
+  const im = src ? kitImage(src) : null;
+  if (im) {
+    const k = Math.max(1, Math.floor(size / 32));
+    const d = 32 * k;
+    c.save();
+    c.imageSmoothingEnabled = false;
+    c.drawImage(im, Math.round(x + (size - d) / 2), Math.round(y + (size - d) / 2), d, d);
+    c.restore();
+    return;
+  }
   if (it.id && iconDrawer) return iconDrawer(c, it.id, x, y, size);
   c.save();
   c.translate(x, y);

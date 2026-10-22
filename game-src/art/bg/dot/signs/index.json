@@ -1,0 +1,74 @@
+{
+ "objects/signs_objects_1": {
+  "w": 122,
+  "h": 106,
+  "foot": [
+   61,
+   106
+  ]
+ },
+ "objects/signs_objects_2": {
+  "w": 59,
+  "h": 32,
+  "foot": [
+   29,
+   32
+  ]
+ },
+ "objects/signs_objects_3": {
+  "w": 45,
+  "h": 55,
+  "foot": [
+   22,
+   55
+  ]
+ },
+ "objects/signs_objects_4": {
+  "w": 107,
+  "h": 106,
+  "foot": [
+   53,
+   106
+  ]
+ },
+ "objects/signs_objects_5": {
+  "w": 120,
+  "h": 106,
+  "foot": [
+   60,
+   106
+  ]
+ },
+ "objects/signs_objects_6": {
+  "w": 54,
+  "h": 94,
+  "foot": [
+   27,
+   94
+  ]
+ },
+ "objects/signs_objects_7": {
+  "w": 135,
+  "h": 113,
+  "foot": [
+   67,
+   113
+  ]
+ },
+ "objects/signs_objects_8": {
+  "w": 100,
+  "h": 117,
+  "foot": [
+   50,
+   117
+  ]
+ },
+ "objects/signs_objects_9": {
+  "w": 46,
+  "h": 75,
+  "foot": [
+   23,
+   75
+  ]
+ }
+}

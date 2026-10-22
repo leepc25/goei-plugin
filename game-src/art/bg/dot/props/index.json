@@ -1,0 +1,146 @@
+{
+ "objects/props_objects_1": {
+  "w": 131,
+  "h": 24,
+  "foot": [
+   65,
+   24
+  ]
+ },
+ "objects/props_objects_2": {
+  "w": 77,
+  "h": 24,
+  "foot": [
+   38,
+   24
+  ]
+ },
+ "objects/props_objects_3": {
+  "w": 67,
+  "h": 13,
+  "foot": [
+   33,
+   13
+  ]
+ },
+ "objects/props_objects_4": {
+  "w": 100,
+  "h": 36,
+  "foot": [
+   50,
+   36
+  ]
+ },
+ "objects/props_objects_5": {
+  "w": 91,
+  "h": 32,
+  "foot": [
+   45,
+   32
+  ]
+ },
+ "objects/props_objects_6": {
+  "w": 113,
+  "h": 28,
+  "foot": [
+   56,
+   28
+  ]
+ },
+ "objects/props_objects_7": {
+  "w": 134,
+  "h": 36,
+  "foot": [
+   67,
+   36
+  ]
+ },
+ "objects/props_objects_8": {
+  "w": 130,
+  "h": 32,
+  "foot": [
+   65,
+   32
+  ]
+ },
+ "objects/props_objects_9": {
+  "w": 73,
+  "h": 24,
+  "foot": [
+   36,
+   24
+  ]
+ },
+ "objects/props_objects_10": {
+  "w": 46,
+  "h": 102,
+  "foot": [
+   23,
+   102
+  ]
+ },
+ "objects/props_objects_11": {
+  "w": 72,
+  "h": 137,
+  "foot": [
+   36,
+   137
+  ]
+ },
+ "objects/props_objects_12": {
+  "w": 38,
+  "h": 63,
+  "foot": [
+   19,
+   63
+  ]
+ },
+ "objects/props_objects_13": {
+  "w": 43,
+  "h": 63,
+  "foot": [
+   21,
+   63
+  ]
+ },
+ "objects/props_objects_14": {
+  "w": 74,
+  "h": 75,
+  "foot": [
+   37,
+   75
+  ]
+ },
+ "objects/props_objects_15": {
+  "w": 73,
+  "h": 86,
+  "foot": [
+   36,
+   86
+  ]
+ },
+ "objects/props_objects_16": {
+  "w": 53,
+  "h": 79,
+  "foot": [
+   26,
+   79
+  ]
+ },
+ "objects/props_objects_17": {
+  "w": 79,
+  "h": 79,
+  "foot": [
+   39,
+   79
+  ]
+ },
+ "objects/props_objects_18": {
+  "w": 78,
+  "h": 113,
+  "foot": [
+   39,
+   113
+  ]
+ }
+}
