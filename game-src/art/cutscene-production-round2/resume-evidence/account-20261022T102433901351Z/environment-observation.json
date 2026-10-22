@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-22T10:25:23.640571+00:00",
+  "observedRevision": "4",
+  "observationsCurrent": true,
+  "networkPolicyState": "enforced",
+  "secrets": [],
+  "runtimeVariables": [],
+  "outboundIdentities": [],
+  "pixellabTokenPresent": false,
+  "credentialValuesRead": false,
+  "status": "auth-not-delivered-to-this-runtime"
+}

@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-22T10:24:35.196764+00:00",
+  "tool": "search_help",
+  "arguments": {
+    "question": "For a new empty HQ corridor environment cut: create_image_pixen opaque 320x180, then animate_image opaque 96x144 crop, frame_count=16. Please confirm exact subscription generation charge (expected 1+4), exact USD credit charge, whether output is 17 frames including unchanged input index 0, how to retrieve all frames, failure/refund policy, concurrent job limits, and whether doorframe preservation is guaranteed. No characters, no image prompt enhancement. Account access and recovery must precede generation."
+  },
+  "paidGeneration": false,
+  "httpStatus": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "status": "service-error"
+}
