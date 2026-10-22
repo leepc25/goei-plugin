@@ -4,7 +4,7 @@ import sys,time,base64,re,os
 sys.path.insert(0,'../../jyaldi-v5/scripts'); sys.path.insert(0,'.'); import mcp,rig
 DESC=('slim adult woman agent, short wavy nearly black dark purple bob to the jaw, side bangs hiding the far eye, pale skin, one dull gold eye, '
       'faint closed-mouth half smile, black suit with a hip-length jacket and blue-grey highlights, white shirt, black necktie, '
-      'knee-length black pencil skirt, black stockings, low black heels, empty hands, '
+      'knee-length black pencil skirt, black stockings, low black heels, open empty hands with straight fingers, never clenched fists, '
       'seen strictly from the side in profile facing right, character only, no background, no furniture, no weapon in hand, '
       'no visual effects, no explosions, no sparks, no light or glow')
 OUT='../full/clips'
