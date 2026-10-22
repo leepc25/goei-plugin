@@ -99,7 +99,7 @@ def READY(d=0,b=0,lean=8): return P((X+d,HY+3+b),lean,SIDE,-0.1,(X+9+d,G),(X-6+d
 # 이소슬리스 정조준: 두 팔 쭉, 어깨 수평, 상체 살짝 앞
 def AIM(d=0,b=0,y=3): return P((X+2+d,HY+2+b),7,SIDE,-0.1,(X+11+d,G),(X-6+d,G),('r',30,y),('r',29,y+1),tilt=-3)
 # 리텐션: 총을 가슴 옆에 붙이고 팔꿈치 뒤로, 장갑 낀 앞손은 얼굴 앞을 막음(손 바뀜 주의: 총 = 앞손 RIGHT)
-def RET(d=0,lean=10): return P((X+2+d,HY+3),lean,SIDE,-0.1,(X+11+d,G),(X-7+d,G),('r',11,10),('r',13,-3),le=('e',-3,12),re=('e',9,6),tilt=-2)
+def RET(d=0,lean=10): return P((X+2+d,HY+3),lean,SIDE,-0.1,(X+11+d,G),(X-7+d,G),('r',10,2),('r',13,9),le=('e',4,9),re=('e',2,11),tilt=-2)
 # 빠른 무릎 쏴: 뒷무릎 바닥, 상체 세움, 두 손 조준
 def KNEEL(b=0,y=4,lean=4): return P((X-1,HY+21+b),lean,SIDE,-0.1,(X+13,G),(X-15,G-1),('r',29,y),('r',28,y+1),tilt=-2)
 def KNEELREADY(b=0): return P((X-1,HY+21+b),6,SIDE,-0.1,(X+13,G),(X-15,G-1),tilt=0,**TWO(15,14))
@@ -150,16 +150,16 @@ A2=AIM(9,1,2); A2r=jit(A2,-2,-2,['ARM'])
 C3=P((X+14,HY+3),12,SIDE,-0.1,(X+24,G),(X+2,G),('r',16,6),('r',13,-2),le=('e',4,11),re=('e',9,5),tilt=10)
 C3b=jit(C3,-1,-2,['RIGHT ARM']); C3c=P((X+14,HY+3),12,SIDE,-0.1,(X+24,G),(X+2,G),('r',16,6),('r',13,-2),le=('e',4,11),re=('e',9,5),tilt=18)
 PSH=P((X+6,HY+2),2,SIDE,-0.1,(X+18,G),(X-8,G),('r',8,10),('r',26,4),le=('e',-3,12),tilt=0)
-clip('cq','close-quarters pistol combo: fires from the chest with elbow tucked, steps in with a two-handed double tap, then apologetically fires three point-blank shots and shoves with the open palm, stepping back',
+clip('cq','pistol combo: chest shot, muzzle level forward, two-hand double tap, three close shots, palm shove',
      [READY(),R0,R1,lerp(R1,R0,.5),staged(R0,A2,.5),A2,A2r,A2,staged(A2,C3,.5),C3,C3b,C3c,C3b,PSH,lerp(PSH,READY(-2),.5)],GUN2)
 SL0=runf(.25)
 SL1=P((X+10,HY+18),-20,SIDE,0,(X+44,G-2),(X+2,G-4),('r',24,-6),('r',22,-5),lk=KNEE_FWD,rk=KNEE_UP,tilt=-8)
-SL2=P((X+20,HY+28),-38,0,0,(X+60,G),(X+16,G-2),('r',26,-10),('r',25,-9),lk=KNEE_FWD,rk=KNEE_UP,tilt=-14)
+SL2=P((X+20,HY+28),-38,0,0,(X+60,G),(X+16,G-2),('r',27,8),('r',26,9),lk=KNEE_FWD,rk=KNEE_UP,tilt=-14)
 SL3=jit(SL2,-2,-3,['ARM'])
-clip('slide','running baseball slide feet-first: front leg straight, rear leg tucked, leans back on the hip and fires upward ahead with both hands, then pops up to one knee',
+clip('slide','feet-first slide on the floor, leaning back on the hip, fires straight ahead, rises to one knee',
      tail([SL0,SL1,SL2,SL3,sh(SL2,4),lerp(sh(SL2,6),KNEEL(),.5),sh(KNEEL(),10)],False),GUN2)
-AS=lambda r: P((X,HY-6),4,SIDE,0,(X+8,G-16),(X-4,G-18),('r',26,14-r),('r',25,15-r),tilt=8)
-clip('airshot','in mid-air with knees tucked, points the pistol down and forward at 45 degrees and fires twice, recoil lifts her slightly',
+AS=lambda r: P((X,HY-6),4,SIDE,0,(X+8,G-16),(X-4,G-18),('r',19,21-r),('r',18,22-r),le=('e',8,13),re=('e',7,14),tilt=14)
+clip('airshot','mid-air, knees tucked, arms angled down, pistol aimed diagonally down at the floor ahead, fires',
      [JT(14),AS(0),sh(AS(3),-1,-2),AS(0),sh(AS(3),-1,-3),JT(12)],GUN2)
 FR1=jit(AIM(),-2,-3,['ARM']); FR1=jit(FR1,-1,-1,['ELBOW'])
 clip('fire','firing a pistol two-handed in an isosceles stance, arms straight, small recoil of the wrists',[AIM(),FR1,lerp(FR1,AIM(),.5),AIM()],GUN2)
@@ -174,13 +174,13 @@ clip('rewind','places her near hand on her chest and closes her eyes, hair and j
      tail([STAND(0),RW(0),RW(.6),RW(1.3),RW(1),RW(.4),STAND(0)],False))
 SF=lambda u: P((X,HY),1,0,0,(X+5,G),(X-3,G),tilt=-10-2*u,lh=('r',9,14),rh=('r',8,16),le=('e',1,12),re=('e',0,13))
 clip('sniff','standing with eyes closed and chin raised, sniffing the air in short breaths, shoulders lifting slightly',[SF(0),jit(SF(1),0,-0.8,['SHOULDER','NECK','NOSE','EYE','EAR']),SF(0),jit(SF(1),0,-0.8,['SHOULDER','NECK','NOSE','EYE','EAR'])])
-CV=lambda b: P((X+1,HY+3+b),2,0,0,(X+11,G),(X-8,G),('r',14,2),('r',-12,2),le=('e',8,0),re=('e',-6,0),tilt=-6)
-clip('cover','shielding stance: both arms spread wide to the sides, feet braced, chin tucked, eyes open, standing her ground',[CV(0),CV(.6),CV(1),CV(.6)])
+CV=lambda b: P((X+1,HY+3+b),2,0,0,(X+11,G),(X-8,G),('r',23,1),('r',-19,1),le=('e',11,0),re=('e',-9,0),tilt=-6)
+clip('cover','blocking the way: both arms straight out at shoulder height, one forward one back, palms open',[CV(0),CV(.6),CV(1),CV(.6)])
 CT1=P((X+4,HY+2),6,SIDE,-0.1,(X+14,G),(X-8,G),('r',18,10),('r',28,-2),le=('e',5,10),re=('e',12,2),tilt=-2)
 CT2=P((X-2,HY+3),4,SIDE,-0.1,(X+12,G),(X-12,G),('r',16,10),('r',26,2),le=('e',4,10),re=('e',12,4),tilt=-2)
 CT3=P((X-2,HY+3),6,SIDE,-0.1,(X+12,G),(X-12,G),('r',22,14),('r',24,2),le=('e',8,10),re=('e',11,4),tilt=0)
-clip('catch','catches an attacking blade: the gloved lead hand snaps forward and grips, body slips half a step aside off the line, then points the pistol at the attacker point-blank',
-     tail([READY(),CT1,CT2,CT2,CT3,CT3],False),'gripping a small black pistol in the rear hand, the front gloved hand open and gripping')
+clip('catch','empty gloved front hand snaps forward, open fingers close into a fist, sidesteps, other hand low',
+     tail([READY(),CT1,CT2,CT2,CT3,CT3],False),'only one small black pistol, held low at the hip in the far hand; the near front hand is an empty black glove with no weapon')
 def rollp(a):
     # 앞구르기 낙법(뒤집힌 장 없이): 0 숙여 손 짚음 → 1 머리 숙여 어깨로 말림(공처럼) → 2 등으로 굴러 무릎 당김 → 3 무릎 쏴로 일어남
     if a==0: return P((X+6,HY+12),56,0,0,(X+16,G),(X-6,G),('a',X+30,G),('a',X+26,G),head=(5,-4),tilt=24)
@@ -192,9 +192,9 @@ KNEE_POSE=KNEELREADY
 clip('roll','forward combat roll: dives forward onto the outside of the near shoulder, rolls across the back, comes up onto one knee with the pistol ready',
      tail([READY(),rollp(0),rollp(1),rollp(2),rollp(3),rollp(4),sh(KNEEL(),44)],False),GUN2)
 CL=lambda d=0: P((X+8+d,HY+2),6,SIDE,-0.1,(X+18+d,G),(X-2+d,G),('r',12,12),('r',20,-4),le=('e',4,12),re=('e',10,2),tilt=-10)
-clip('collar','lunges in close and grips forward at chest height with the gloved lead hand clenched, pulling, looking up',[READY(),staged(READY(),CL(),.5),CL(),CL(.5)],GUN)
+clip('collar','lunges in, empty front hand grabs forward at chest height into a fist and pulls, other hand low',[READY(),staged(READY(),CL(),.5),CL(),CL(.5)],'both hands empty black gloves, no weapon')
 CN=lambda r: P((X+8,HY+2),6,SIDE,-0.1,(X+18,G),(X-2,G),('r',18,14-r),('r',20,-4),le=('e',6,12),re=('e',10,2),tilt=-10+4*r)
-clip('contact','holding the collar, presses the pistol muzzle against the enemy and fires point-blank, the elbow folds from the recoil',tail([CL(),CN(0),CN(2),CN(0),CL()],False),GUN)
+clip('contact','front empty fist at chest height; low hand pushes a pistol forward at belly height and fires',tail([CL(),CN(0),CN(2),CN(0),CL()],False),'one small black pistol only in the low hand at belly height, the high hand is an empty fist')
 TM1=P((X+4,HY+10),30,SIDE,0,(X+16,G),(X-4,G),('r',24,4),('r',22,6),tilt=-6)
 TM2=P((X-4,HY+28),-30,0,0,(X+12,G),(X-10,G),('r',22,-6),('r',20,-4),lk=KNEE_UP,rk=KNEE_UP,tilt=-10)
 TM3=P((X-8,HY+36),-80,0,0,(X+18,G-30),(X+6,G-2),('r',10,-20),('r',8,-18),lk=KNEE_UP,rk=KNEE_UP,tilt=-20)
@@ -204,8 +204,8 @@ TM6=P((X-8,HY+38),-92,0,0,(X+26,G-6),(X+20,G-4),('r',4,14),('r',2,16),lk=KNEE_UP
 clip('tomoe','judo sacrifice throw: grips the collar, pulls forward while dropping onto her back, plants a foot up high and kicks it up over her head with both hands following through, ends lying on her back',
      [CL(),TM1,TM2,TM3,TM4,TM5,TM6,TM6,TM6,TM6])
 SW=lambda t: walkf(t,stride=8,tilt=10)
-SOPEN=lambda u: P((X+10,HY),1,0,0,(X+15,G),(X+6,G),('r',6+8*u,20-14*u),('r',-4-6*u,20-14*u),le=('e',2+6*u,14-8*u),re=('e',-3-3*u,14-8*u),tilt=14-12*u)
-clip('super','lowers both hands, walks three steps forward, then slowly spreads both arms wide open, one arm reaching forward and the other back, chest exposed, head bowed in apology, stands still',
+SOPEN=lambda u: P((X+10,HY),1,0,0,(X+15,G),(X+6,G),('r',6+17*u,20-20*u),('r',-4-15*u,20-20*u),le=('e',2+9*u,14-14*u),re=('e',-3-6*u,14-14*u),tilt=14)
+clip('super','walks forward, opens both empty arms straight out at shoulder height, one forward one back',
      tail([READY(),sh(SW(0),2),sh(SW(.25),4),sh(SW(.5),7),SOPEN(0),SOPEN(.5),SOPEN(1)],False))
 # 필살 되감기 부활: 누운 자세(die 끝)에서 거꾸로 일으켜 세워짐
 LIEDEAD=P((X-6,HY+37),-90,0,0,(X+30,G),(X+28,G),('r',6,22),('r',4,24),le=('e',1,12),re=('e',0,12),tilt=20)
@@ -214,7 +214,7 @@ clip('superrise','rewinding back to life: rises from lying flat as if pulled upr
      tail([LIEDEAD,RISE(.2),RISE(.4),RISE(.6),RISE(.8),RISE(1),READY()],False))
 PKA=P((X,HY+18),18,0,0,(X+10,G),(X+2,G),('r',22,18),('r',20,20),le=('e',8,12),re=('e',6,13),lk=KNEE_UP,rk=KNEE_UP,tilt=18)
 PKB=P((X,HY+18),12,0,0,(X+10,G),(X+2,G),('r',10,12),('r',9,13),le=('e',2,12),re=('e',1,13),lk=KNEE_UP,rk=KNEE_UP,tilt=10)
-clip('pickup','squats down with knees together, picks something up with both hands, hugs it to her chest and stands',
+clip('pickup','squats with knees together, both empty hands reach to the floor, brings them up to her chest, stands',
      tail([STAND(0),lerp(STAND(0),PKA,.5),PKA,PKB,lerp(PKB,STAND(0,lh=('r',10,12),rh=('r',9,13),le=('e',2,12),re=('e',1,13)),.5),STAND(0,lh=('r',10,12),rh=('r',9,13),le=('e',2,12),re=('e',1,13))],False))
 TS0=P((X,HY+3),8,0,0,(X+7,G),(X-4,G),('r',4,24),('r',3,25),le=('e',-2,14),re=('e',-3,14),tilt=8)
 TS1=P((X+2,HY+1),-2,0,0,(X+8,G),(X-4,G),('r',20,0),('r',19,1),le=('e',10,6),re=('e',9,7),tilt=-4)
@@ -274,10 +274,10 @@ clip('shotgun','hugging a heavy pump shotgun at waist height with both hands, fi
      tail([SG,SGR,lerp(SGR,sh(SG,-4),.5),sh(SG,-4),sh(SGR,-4),sh(SG,-8)],False),'holding a long black pump shotgun with a wooden stock at waist height in both hands')
 TR=lambda b: P((X,HY+2+b),6,0,0,(X+5,G),(X-3,G),('r',6,25),('r',5,26),le=('e',-1,15),re=('e',-2,15),tilt=14)
 clip('tired','tired but smiling: clasped hands droop low, shoulders sag, shallow breathing',[TR(0),TR(.8),TR(1.4),TR(.8)])
-SUPA=P((X+6,HY+3),2,0,0,(X+16,G),(X-6,G),('r',14,2),('r',-12,2),le=('e',8,0),re=('e',-6,0),tilt=-6)
+SUPA=P((X+6,HY+3),2,0,0,(X+16,G),(X-6,G),('r',23,1),('r',-19,1),le=('e',11,0),re=('e',-9,0),tilt=-6)
 SUPH=sh(jit(SUPA,-2,1,['NOSE','EYE','EAR','NECK','SHOULDER']),-3)
 SUPL=P((X+3,HY),1,0,0,(X+8,G),(X-2,G),tilt=-4,head=(-2,-6.5),**CLASP)
-clip('support','runs in, stops and plants her feet with both arms spread wide, flinches twice, then glances back over her shoulder with a reassuring smile',
+clip('support','runs in, stops with both arms straight out at shoulder height, flinches twice, looks back',
      [runf(0),runf(.25),runf(.5),SUPA,SUPH,SUPA,SUPH,SUPA,SUPL,SUPL])
 PIPE='a plain round grey steel pipe, a straight metal tube with no blade and no hand guard, held in front of her with both hands, pointing forward and up'
 PPH=dict(lh=('r',17,12),rh=('r',14,14),le=('e',7,12),re=('e',5,13))

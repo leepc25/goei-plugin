@@ -364,7 +364,7 @@ const HIT = {
   cq1: { dmg: 9, gun: 150 }, cq2: { dmg: 7, gun: 230 }, cq3: { dmg: 6, gun: 150, push: 5 },
   fire: { dmg: 14, still: 18, gun: 1280 }, draw: { dmg: 14, gun: 1280 }, kneelshot: { dmg: 10, gun: 700, otg: true },
   slide: { dmg: 8, gun: 600 }, airshot: { dmg: 7, gun: 500 }, shotgun: { dmg: 20, gun: 420, spread: true, launch: true, noAmmo: true },
-  contact: { dmg: 22, grab: true }, catch: { dmg: 18, caught: true }, tomoe: { dmg: 26, throw: true },
+  contact: { dmg: 22, grab: true }, counter: { dmg: 18, caught: true }, tomoe: { dmg: 26, throw: true },
   pipe: { dmg: 15, melee: true }, toss: { toss: true },
 };
 function frontX() {
@@ -475,7 +475,9 @@ function frameDone() {
   if (k === 'sniffground') { G.trackT = 5; say('발자취 5초'); play('kneel'); G.f = M.clips.kneel.frames - 1; G.hold = 99; return; }
   if (k === 'collar') { G.lock = false; G.f = c.frames - 1; G.hold = 99; return; }
   if (k === 'contact' && G.grab) { play('collar'); G.f = M.clips.collar.frames - 1; G.hold = 99; G.lock = false; return; }
-  if (k === 'catch') { G.caught = null; if (keys.has('KeyQ')) { G.cover = true; play('cover'); return; } }
+  // 칼날 잡기는 빈손으로 잡기만 함 → 잡았으면 뒷손 권총으로 배에 대고 맞쏘기(접사 장면 재사용)
+  if (k === 'catch' && G.caught) { play('counter', { lock: true }); return; }
+  if (k === 'catch' || k === 'counter') { if (G.caught) { G.caught.state = 'idle'; G.caught = null; } if (keys.has('KeyQ')) { G.cover = true; play('cover'); return; } }
   if (k === 'pickup' && G.pickWhat) { const it = G.pickWhat; G.pickWhat = null; if (it.kind === 'brick') G.carry = 'brick'; else { G.weapon = it.kind; G.wUses = it.kind === 'pipe' ? 5 : 4; } say(it.label + ' 획득'); }
   if (['drink', 'eat', 'bandage'].includes(k)) { G.hp = Math.min(HPMAX, G.hp + (G.itemHeal || 0)); say('+' + (G.itemHeal || 0)); }
   if (k === 'reload') { const n = Math.min(MAG - G.ammo, G.reserve); G.ammo += n; G.reserve -= n; G.emerg = false; }

@@ -49,14 +49,14 @@ LOOP = {'idle', 'ready', 'walk', 'step', 'run', 'kneelwalk', 'sniff', 'cover', '
         'shower', 'bath', 'wallcry', 'kneelcry', 'sad', 'think', 'laugh', 'cry', 'glad', 'nod', 'wave'}
 FPS = {'idle': 5, 'ready': 6, 'walk': 10, 'step': 12, 'run': 14, 'jump': 12, 'kneel': 16, 'kneelwalk': 12, 'kneelshot': 16, 'cq1': 18, 'cq2': 18,
        'cq3': 16, 'slide': 14, 'airshot': 16, 'fire': 20, 'draw': 18, 'holster': 10, 'reload': 9, 'rewind': 10, 'sniff': 5, 'cover': 5,
-       'catch': 18, 'roll': 16, 'collar': 14, 'contact': 14, 'tomoe': 12, 'super': 8, 'superrise': 10, 'die': 8, 'revive': 7, 'hit': 14,
+       'catch': 18, 'counter': 14, 'roll': 16, 'collar': 14, 'contact': 14, 'tomoe': 12, 'super': 8, 'superrise': 10, 'die': 8, 'revive': 7, 'hit': 14,
        'down': 12, 'getup': 10, 'tired': 4, 'sniffground': 6, 'purge': 8, 'rewindother': 8, 'pipe': 12, 'shotgun': 10, 'support': 10,
        'talk': 6, 'undress': 3, 'showerturn': 4, 'shower': 4, 'bath': 2}
 # 타격 장(잘라 낸 뒤 장 번호), 그림 안 전진, 시작 오프셋, 멈춤
 META = {
     'cq1': dict(hits=[2], hold=0.03), 'cq2': dict(hits=[2, 3], hold=0.03, adv=9), 'cq3': dict(hits=[2, 3, 4, 5], hold=0.04, origin=9, adv=-4),
     'kneelshot': dict(hits=[2]), 'slide': dict(hits=[3, 4], adv=10), 'airshot': dict(hits=[2, 4]), 'fire': dict(hits=[1]),
-    'draw': dict(hits=[2]), 'contact': dict(hits=[2], hold=0.06), 'catch': dict(hits=[4]), 'tomoe': dict(hits=[4], hold=0.1),
+    'draw': dict(hits=[2]), 'contact': dict(hits=[2], hold=0.06), 'counter': dict(hits=[2], hold=0.08), 'tomoe': dict(hits=[4], hold=0.1),
     'pipe': dict(hits=[3], hold=0.05), 'shotgun': dict(hits=[1, 4]), 'toss': dict(hits=[3]), 'roll': dict(adv=44), 'super': dict(adv=7),
 }
 CQ = {'cq1': (0, 4), 'cq2': (4, 8), 'cq3': (8, 15)}
@@ -111,6 +111,8 @@ def defs():
         out.append(dict(key=name, src=name, rng=None, label=lab.get(name, name), group=grp))
         if name == 'idle':
             out.append(dict(key='talk', src='@talk', rng=None, label='말하기', group=grp))
+        if name == 'contact':   # 칼날 잡은 뒤 맞쏘기 = 접사 그림
+            out.append(dict(key='counter', src='contact', rng=None, label='칼날 잡고 맞쏘기', group=grp))
     for k, nm in GPT:
         out.append(dict(key=k, src=k, rng=None, label=nm, group='씻기 (GPT 납품)'))
     for d in out:

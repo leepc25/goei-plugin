@@ -52,7 +52,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 3,
-   "bytes": 7709
+   "bytes": 7705
   },
   "holster": {
    "label": "집어넣기",
@@ -112,7 +112,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 8,
-   "bytes": 21952
+   "bytes": 21953
   },
   "jump": {
    "label": "점프",
@@ -124,7 +124,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 8,
-   "bytes": 21730
+   "bytes": 21740
   },
   "kneel": {
    "label": "앉기",
@@ -136,7 +136,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 12464
+   "bytes": 12526
   },
   "kneelwalk": {
    "label": "앉아 이동",
@@ -147,8 +147,8 @@
    "origin": 0,
    "hold": 0,
    "group": "전투·기본",
-   "frames": 8,
-   "bytes": 14166
+   "frames": 7,
+   "bytes": 12180
   },
   "kneelshot": {
    "label": "하단 공격",
@@ -174,7 +174,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 12690
+   "bytes": 12256
   },
   "cq1": {
    "label": "근접 사격 1타 리텐션",
@@ -188,7 +188,7 @@
    "hold": 0.03,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 7405
+   "bytes": 8648
   },
   "cq2": {
    "label": "근접 사격 2타 더블탭",
@@ -203,7 +203,7 @@
    "hold": 0.03,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 8235
+   "bytes": 9078
   },
   "cq3": {
    "label": "근접 사격 3타 「죄송합니다」",
@@ -220,7 +220,7 @@
    "hold": 0.04,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 14570
+   "bytes": 17332
   },
   "slide": {
    "label": "돌진공격",
@@ -235,7 +235,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 25062
+   "bytes": 21312
   },
   "airshot": {
    "label": "공중 공격",
@@ -250,7 +250,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 14004
+   "bytes": 15002
   },
   "fire": {
    "label": "권총 발사",
@@ -264,7 +264,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 7446
+   "bytes": 7507
   },
   "reload": {
    "label": "재장전",
@@ -276,7 +276,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 10892
+   "bytes": 10889
   },
   "rewind": {
    "label": "고유기 짧게",
@@ -312,21 +312,19 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 6028
+   "bytes": 7728
   },
   "catch": {
    "label": "(새) 가드 짧게",
    "fps": 18,
    "loop": false,
-   "hits": [
-    4
-   ],
+   "hits": [],
    "adv": 0,
    "origin": 0,
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 12007
+   "bytes": 12761
   },
   "roll": {
    "label": "회피",
@@ -338,7 +336,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 18629
+   "bytes": 18048
   },
   "collar": {
    "label": "잡기",
@@ -350,7 +348,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 8265
+   "bytes": 8912
   },
   "contact": {
    "label": "잡기 타격",
@@ -364,7 +362,21 @@
    "hold": 0.06,
    "group": "전투·기본",
    "frames": 5,
-   "bytes": 8101
+   "bytes": 8406
+  },
+  "counter": {
+   "label": "칼날 잡고 맞쏘기",
+   "fps": 14,
+   "loop": false,
+   "hits": [
+    2
+   ],
+   "adv": 0,
+   "origin": 0,
+   "hold": 0.08,
+   "group": "전투·기본",
+   "frames": 5,
+   "bytes": 8411
   },
   "tomoe": {
    "label": "던지기",
@@ -378,7 +390,7 @@
    "hold": 0.1,
    "group": "전투·기본",
    "frames": 9,
-   "bytes": 25026
+   "bytes": 23550
   },
   "super": {
    "label": "필살기",
@@ -390,7 +402,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 14120
+   "bytes": 15255
   },
   "superrise": {
    "label": "(새) 필살 되감기 부활",
@@ -402,7 +414,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 19788
+   "bytes": 19067
   },
   "pickup": {
    "label": "줍기",
@@ -414,7 +426,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 15640
+   "bytes": 15413
   },
   "toss": {
    "label": "물건 던지기",
@@ -476,7 +488,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 10916
+   "bytes": 10958
   },
   "down": {
    "label": "강 피격·다운",
@@ -488,7 +500,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 15236
+   "bytes": 14436
   },
   "die": {
    "label": "(새) 사망",
@@ -500,7 +512,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 17361
+   "bytes": 16974
   },
   "getup": {
    "label": "기상",
@@ -512,7 +524,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 15768
+   "bytes": 15424
   },
   "revive": {
    "label": "(새) 부활",
@@ -523,8 +535,8 @@
    "origin": 0,
    "hold": 0,
    "group": "전투·기본",
-   "frames": 12,
-   "bytes": 27849
+   "frames": 11,
+   "bytes": 25596
   },
   "purge": {
    "label": "숙련 3",
@@ -536,7 +548,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 17148
+   "bytes": 16288
   },
   "rewindother": {
    "label": "숙련 6",
@@ -562,7 +574,7 @@
    "hold": 0.05,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 20074
+   "bytes": 20083
   },
   "shotgun": {
    "label": "임시 총",
@@ -577,7 +589,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 12843
+   "bytes": 12820
   },
   "tired": {
    "label": "피로 대기",
@@ -601,7 +613,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 9,
-   "bytes": 20799
+   "bytes": 24526
   },
   "idle_pipe": {
    "label": "idle_pipe",
@@ -637,7 +649,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 8768
+   "bytes": 8845
   },
   "walk_shotgun": {
    "label": "walk_shotgun",
@@ -661,7 +673,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 8,
-   "bytes": 20952
+   "bytes": 20955
   },
   "carry2_idle": {
    "label": "carry2_idle",
@@ -781,7 +793,7 @@
    "hold": 0,
    "group": "지형·이동",
    "frames": 7,
-   "bytes": 12364
+   "bytes": 12220
   },
   "sneak": {
    "label": "살금 걷기",
@@ -805,7 +817,7 @@
    "hold": 0,
    "group": "지형·이동",
    "frames": 4,
-   "bytes": 8210
+   "bytes": 8324
   },
   "walk_light": {
    "label": "walk_light",
