@@ -1329,8 +1329,6 @@ var BY_KIND = {
   elevator: ["el_hall", 12],
   chasedoor: ["chase", 1],
   servicedoor: ["hq_workshop", 9],
-  hatch: ["service", 1],
-  // 천장 해치 = 벽에 세운 사다리 (바닥의 작은 회색 상자처럼 보였다, 검수 20)
   shutter: ["chase", 6],
   table: ["apt", 3],
   switch: ["test", 3],
@@ -1462,7 +1460,35 @@ function isStandBoard(kind, label3, floorType) {
   const r = propArtRef(kind, label3, 0, floorType);
   return !!r && r.length === 2 && r[0] === "lobby" && r[1] === 6;
 }
+function drawCeilingHatch(ctx, sx) {
+  const x = Math.round(sx - 56);
+  const R = (rx, ry, rw, rh, c) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x + rx, ry, rw, rh);
+  };
+  ctx.save();
+  R(-4, 0, 120, 26, "#1b1d20");
+  R(0, 0, 112, 20, "#5a5f63");
+  R(4, 0, 104, 16, "#0c0d0f");
+  R(10, 4, 92, 3, "#2c3034");
+  R(0, 20, 112, 2, "#8a9094");
+  for (let i = 0; i < 18; i++) R(-2 - i, 22 + i * 3, 14, 3, i % 6 === 0 ? "#3d4246" : "#6b7175");
+  R(40, 20, 6, 64, "#3a3e42");
+  R(70, 20, 6, 64, "#3a3e42");
+  R(41, 20, 2, 64, "#9aa0a4");
+  R(71, 20, 2, 64, "#9aa0a4");
+  for (let ry = 30; ry < 84; ry += 12) {
+    R(46, ry, 24, 4, "#7d8387");
+    R(46, ry + 3, 24, 1, "#2a2d30");
+  }
+  R(40, 82, 36, 2, "#1b1d20");
+  ctx.restore();
+}
 function drawPropArt(ctx, kind, label3, sx, y, floorType) {
+  if (kind === "hatch") {
+    drawCeilingHatch(ctx, sx);
+    return true;
+  }
   if (kind.startsWith("item_") && typeof window !== "undefined" && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
   const ref = propArtRef(kind, label3, sx, floorType);
   if (ref === void 0) return false;

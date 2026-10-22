@@ -488,8 +488,7 @@ const BY_LABEL: [RegExp, ObjRef][] = [
 ];
 const DOOR: Record<string, number> = { apt: 1, chase: 1, lobby: 9, test: 9, hq_office: 9, hq_workshop: 9, hq_pantry: 9 };
 const BY_KIND: Record<string, ObjRef> = {
-  elevator: ['el_hall', 12], chasedoor: ['chase', 1], servicedoor: ['hq_workshop', 9], hatch: ['service', 1], // 천장 해치 = 벽에 세운 사다리 (바닥의 작은 회색 상자처럼 보였다, 검수 20)
-  shutter: ['chase', 6],
+  elevator: ['el_hall', 12], chasedoor: ['chase', 1], servicedoor: ['hq_workshop', 9],  shutter: ['chase', 6],
   table: ['apt', 3], switch: ['test', 3], checklist: ['lobby', 6], sign: ['lobby', 6], symbol: null, goalwall: ['lobby', 6], belonging: ['service', 6],
   item: ['service', 7], up: ['service', 9], down: ['service', 9], fall: ['service', 9], ladder_up: ['service', 1], ladder_down: ['service', 1],
   rope: ['service', 2], pack: ['service', 6], gear: ['service', 3], memo: ['lobby', 6], map: ['lobby', 6], intercom: ['test', 3],
@@ -563,8 +562,42 @@ export function isStandBoard(kind: string, label: string | undefined, floorType?
   return !!r && r.length === 2 && r[0] === 'lobby' && r[1] === 6;
 }
 
+function drawCeilingHatch(ctx: CanvasRenderingContext2D, sx: number) {
+  const x = Math.round(sx - 56);
+  const R = (rx: number, ry: number, rw: number, rh: number, c: string) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x + rx, ry, rw, rh);
+  };
+  ctx.save();
+  // 천장 구멍: 테두리 + 안쪽 어둠 + 안쪽 배관 한 줄
+  R(-4, 0, 120, 26, '#1b1d20');
+  R(0, 0, 112, 20, '#5a5f63');
+  R(4, 0, 104, 16, '#0c0d0f');
+  R(10, 4, 92, 3, '#2c3034');
+  R(0, 20, 112, 2, '#8a9094');
+  // 늘어진 뚜껑 (왼쪽 경첩에서 비스듬히)
+  for (let i = 0; i < 18; i++) R(-2 - i, 22 + i * 3, 14, 3, i % 6 === 0 ? '#3d4246' : '#6b7175');
+  // 접이식 사다리: 두 기둥 + 가로대, 아래 끝 그늘
+  R(40, 20, 6, 64, '#3a3e42');
+  R(70, 20, 6, 64, '#3a3e42');
+  R(41, 20, 2, 64, '#9aa0a4');
+  R(71, 20, 2, 64, '#9aa0a4');
+  for (let ry = 30; ry < 84; ry += 12) {
+    R(46, ry, 24, 4, '#7d8387');
+    R(46, ry + 3, 24, 1, '#2a2d30');
+  }
+  R(40, 82, 36, 2, '#1b1d20');
+  ctx.restore();
+}
+
 /** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
 export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
+  if (kind === 'hatch') {
+    // 천장 해치: 바닥 y와 상관없이 천장(화면 맨 위)에 열린 구멍 + 늘어진 뚜껑 + 짧은 접이식 사다리.
+    // 바닥 상자(검수 20)·복도 한가운데 사다리(검수 21)는 벽 그림을 가렸다. 사다리 끝은 y 84까지만 (문·게시판 위)
+    drawCeilingHatch(ctx, sx);
+    return true;
+  }
   // 부수는·던지는 물건(item_*)은 아이템 그림이 따로 있다: 배경 물건 대신 그것을 쓰게 (청록 상자처럼 보이던 아파트 TV 대역)
   if (kind.startsWith('item_') && typeof window !== 'undefined' && window.__GOEI_ITEM_ART__?.[kind.slice(5)]) return false;
   const ref = propArtRef(kind, label, sx, floorType);
