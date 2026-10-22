@@ -175,9 +175,22 @@ def no_muzzle(im):
     return im
 
 
-GROUND = ('down', 'crawl', 'purge', 'tomoe', 'getup', 'revive', 'die', 'superrise', 'sniffground', 'slide')
-HAZE = ('airshot', 'getup', 'revive', 'purge', 'down', 'tomoe', 'slide', 'sniffground', 'crawl', 'superrise', 'die', 'roll')
-GUN = ('airshot', 'slide', 'collar', 'ready', 'fire', 'step', 'draw', 'cq1', 'cq2', 'cq3', 'kneel', 'kneelwalk', 'kneelshot', 'catch', 'contact', 'reload')
+def under_muzzle(im):
+    """공중 사격: 아래로 겨눈 총구 밑에 남은 줄·탄피·불꽃 점 (총구 = 가장 앞 어두운 점, 그 아래 앞쪽 6줄을 비움)"""
+    im = im.copy(); px = im.load(); bb = im.getbbox()
+    if not bb:
+        return im
+    dark = [(x, y) for y in range(im.height) for x in range(im.width) if px[x, y][3] and sum(px[x, y][:3]) < 120]
+    mx = max(x for x, _ in dark); my = max(y for x, y in dark if x == mx)
+    for y in range(my + 2, im.height):
+        for x in range(mx - 6, bb[2]):
+            px[x, y] = (0, 0, 0, 0)
+    return im
+
+
+GROUND = ('hit', 'collar', 'contact', 'counter', 'catch', 'cover', 'super', 'support', 'down', 'crawl', 'purge', 'tomoe', 'getup', 'revive', 'die', 'superrise', 'sniffground', 'slide')
+HAZE = ('rewind', 'airshot', 'getup', 'revive', 'purge', 'down', 'tomoe', 'slide', 'sniffground', 'crawl', 'superrise', 'die', 'roll')
+GUN = ('airshot', 'slide', 'collar', 'contact', 'counter', 'ready', 'fire', 'step', 'draw', 'cq1', 'cq2', 'cq3', 'kneel', 'kneelwalk', 'kneelshot', 'catch', 'contact', 'reload')
 
 
 # 클립: 함수(장 목록) → 장 목록 (검수 결함 보정)
@@ -195,6 +208,8 @@ def apply(key, src, frames):
     frames = [clean(f) for f in frames]
     if key in GUN:
         frames = [grey_gun(f) for f in frames]
+    if key == 'airshot':
+        frames = [under_muzzle(f) for f in frames]
     if key in HAZE:
         frames = [unhaze(f) for f in frames]
     if key in GROUND:
