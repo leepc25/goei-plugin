@@ -6,3 +6,7 @@
 2026-10-22 Asia/Seoul | round2 | full-frame animation preflight: 640x360 exceeds 256x256 per-side maximum; no POST
 2026-10-22 Asia/Seoul | round2 | paid generation calls=0; actual generation deductions=0; new images=0; failed generation jobs=0
 2026-10-22 Asia/Seoul | round2 | unexecuted alternative only: 3 calls, estimated 1+1+8=10 generations; no spend authorization implied for a different workflow
+2026-10-22T10:18:27.487814+00:00 | resume | actual MCP tools/list succeeded, 103 tools; get_balance and list_jobs each MCP isError=true, 401 Missing Authorization header
+2026-10-22T10:18:27.487814+00:00 | resume | known environment job IDs=0; recovery=blocked; account balance/current jobs unknown; paid calls=0; generated images=0; charged generations=0
+2026-10-22T10:18:27.487814+00:00 | resume | revised estimated reservation ONLY: background 320x180=1; 96x144 animation 16 new frames + returned input=4; total 2 paid calls/5 generations; unsubmitted; coordinator acknowledgement absent
+2026-10-22T10:22:48.822128+00:00 | resume preflight | get_balance/list_jobs(include_recent=true)/search_help returned service-error 401; individual call receipts in resume-evidence/account-20261022T101924501313Z; no new paid calls or job IDs; recovery not performed

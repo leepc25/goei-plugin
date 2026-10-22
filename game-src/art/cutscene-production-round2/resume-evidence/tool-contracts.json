@@ -1,0 +1,332 @@
+{
+  "retrievedAt": "2026-10-22T10:18:27.487814+00:00",
+  "source": "https://api.pixellab.ai/mcp",
+  "tools": [
+    {
+      "name": "search_help",
+      "description": "Ask for help using PixelLab MCP tools, workflows, or features.\nA knowledge agent searches our docs and returns a concise answer.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "description": "What you need help with (tools, workflows, billing, features, deployment). Include the context you are working in. Max 2000 characters.",
+            "maxLength": 2000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "create_image_pixen",
+      "description": "Generate a freeform pixel-art image with the Pixen model.\n\nPixen is the newer of the two fast generators and holds up better on small\nsprites. Pick between the three text-to-image tools like this:\n- create_image_pixflux — when you need an init image (img2img), a palette\n  given as an image, isometric, or shading control.\n- create_image_pixen — this one; cleaner small sprites, bigger canvas.\n- create_image_pro — best quality, returns a set of candidates, costs more;\n  takes a palette as hex colours (1-bit, Game Boy, PICO-8, NES, Lospec).\n\nCanvas: 16-768 per side and each side must be a multiple of 4; total area\n16x16 to 512x512. Below 32 the canvas must be SQUARE, so the small sizes\nare 16x16, 20x20, 24x24 and 28x28.\n\nCost: 1 generation. Generation time: ~10-40 seconds (async).\nPoll with get_image(job_id).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "description": "What to draw (e.g. 'ornate iron key', 'mossy stone wall').",
+            "type": "string"
+          },
+          "width": {
+            "default": 128,
+            "description": "Canvas width in pixels. Must be a multiple of 4; width must equal height when either side is below 32. width x height may not exceed 512x512 = 262,144, so the widest canvases are e.g. 768x340 or 680x384, not 768x384.",
+            "maximum": 768,
+            "minimum": 16,
+            "type": "integer"
+          },
+          "height": {
+            "default": 128,
+            "description": "Canvas height in pixels. Must be a multiple of 4; height must equal width when either side is below 32.",
+            "maximum": 768,
+            "minimum": 16,
+            "type": "integer"
+          },
+          "no_background": {
+            "default": false,
+            "description": "Return the subject on a transparent background. True for sprites and items, False for scenes. Up to 256x256 of area (65,536 px, e.g. 256x256 or 512x128); larger canvases are refused with it on.",
+            "type": "boolean"
+          },
+          "view": {
+            "default": null,
+            "description": "Camera angle (weakly guiding).",
+            "enum": [
+              "side",
+              "low top-down",
+              "high top-down"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "direction": {
+            "default": null,
+            "description": "Which way the subject faces (weakly guiding).",
+            "enum": [
+              "north",
+              "north-east",
+              "east",
+              "south-east",
+              "south",
+              "south-west",
+              "west",
+              "north-west"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "outline": {
+            "default": null,
+            "description": "Outline style (weakly guiding).",
+            "enum": [
+              "single color black outline",
+              "single color outline",
+              "selective outline",
+              "lineless"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detail": {
+            "default": null,
+            "description": "Detail level (weakly guiding).",
+            "enum": [
+              "low detail",
+              "medium detail",
+              "highly detailed"
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "seed": {
+            "default": null,
+            "description": "Seed for reproducible generation.",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "project_id": {
+            "default": null,
+            "description": "Internal Game Builder project context; the finished image is linked after generation.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "get_image",
+      "description": "Get a raw-image result by job id, or a gallery image by `gallery:<id>`.\n\nReturns the image(s) inline plus no-auth download URLs when completed, or\nprogress/error otherwise. A completed job also reports its gallery save:\nthe Creator ``asset_id`` once saved, or a failure note (the image is still\ndelivered) while the save is being retried.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "job_id": {
+            "description": "The job id returned by any raw-image tool (create_image_pixflux, create_image_pixen, create_image_pro, edit_image, edit_image_pixen, transfer_outfit, inpaint_image, animate_image, image_to_pixelart, unzoom_image, correct_pixelart, reduce_colors, create_normal_map), or a gallery:<id> from list_images — images made on the website have no job id.",
+            "type": "string"
+          },
+          "index": {
+            "default": null,
+            "description": "Return only this frame, inline. Use it to reach frames past the first few of a long animation without fetching a URL.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "animate_image",
+      "description": "Animate any image from a text description of the motion.\n\nWorks on a loose sprite — unlike animate_character / animate_object, which\nneed an id of something PixelLab generated.\n\nget_image returns frame_count + 1 images: index 0 is your input frame\nunchanged, then the generated ones. Play them in order.\n\nExamples:\n- animate_image(first_frame_base64=<png>, action=\"walking forward\", frame_count=8)\n- pin the ending: animate_image(first_frame_base64=<open>, last_frame_base64=<closed>,\n                                action=\"chest lid closing\", frame_count=6)\n\nLimits: frame max 256x256, and width x height x frame_count <= 524288 — so a\n256x256 frame allows 8 frames, a 64x64 frame allows all 16.\n\nCost scales with total pixels (a 64x64 8-frame animation is 1 generation, a\n128x128 16-frame one is 4). Generation time: ~30-180 seconds (async).\nPoll with get_image(job_id).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "description": "The motion (e.g. 'walking forward', 'flame flickering', 'chest opening'). Describe movement, not appearance.",
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "frame_count": {
+            "default": 8,
+            "description": "Frames to generate — must be EVEN. 4 for idle loops, 8 for walk/run, 16 for complex actions. Large frames allow fewer frames.",
+            "maximum": 16,
+            "minimum": 4,
+            "type": "integer"
+          },
+          "first_frame_base64": {
+            "default": null,
+            "description": "Base64 PNG to animate — the first frame. Max 256x256. PREFER first_frame_url; MCP clients routinely truncate large inline base64.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_frame_url": {
+            "default": null,
+            "description": "Alternative to first_frame_base64: an https (or data:) URL to the first frame PNG. PREFER THIS. Give one, not both.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_frame_base64": {
+            "default": null,
+            "description": "Optional final frame, same size as the first, to pin where the motion ends (interpolation instead of open-ended animation).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_frame_url": {
+            "default": null,
+            "description": "Alternative to last_frame_base64: an https (or data:) URL to the final frame PNG. Give one, not both.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "no_background": {
+            "default": null,
+            "description": "Background handling. Default (unset) follows the first frame: a transparent sprite animates on transparency, an opaque image stays opaque.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "seed": {
+            "default": null,
+            "description": "Seed for reproducible generation.",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "project_id": {
+            "default": null,
+            "description": "Internal Game Builder project context; the finished image is linked after generation.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "get_balance",
+      "description": "Check your account balance: remaining credits (USD) and subscription generations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "list_jobs",
+      "description": "List your active background jobs (pending + processing).\n\nUse this to find stuck jobs you can cancel with cancel_job.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_recent": {
+            "default": false,
+            "description": "Include recently completed/failed jobs (last 30 min). Default: only active jobs.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    }
+  ]
+}

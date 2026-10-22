@@ -1,0 +1,11 @@
+{
+  "description": "One closed double sliding frosted-glass office doorway, straight-on front elevation, no visible top surface or perspective convergence. Modern Seoul secret government HQ. Charcoal frame, brushed steel edges, muted blue-grey glass, horizontal frosted band. Crisp arcade pixel art, large clean shapes, dark outline. Opening 80x125 pixels centered in a 96x144 canvas, threshold at y=136. Both leaves closed, central seam. No people, text, logo, room, floor, shadow or second object. Transparent outside the frame.",
+  "width": 96,
+  "height": 144,
+  "no_background": true,
+  "view": "side",
+  "direction": "south",
+  "outline": "single color outline",
+  "detail": "medium detail",
+  "seed": 102209
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "first-day-empty-hall-door-round2",
+  "status": "blocked-authentication",
+  "canvas": {
+    "width": 640,
+    "height": 360,
+    "sourceWidth": 320,
+    "sourceHeight": 180,
+    "integerScale": 2,
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "displayScale": 1,
+    "resample": "nearest-neighbor",
+    "mobile": {
+      "portraitSourceScale": 1,
+      "landscapeSourceScale": 2,
+      "center": true,
+      "fillRemainder": "#111720"
+    }
+  },
+  "frames": [],
+  "playback": {
+    "order": [],
+    "ms": [],
+    "durationMs": 0
+  },
+  "plannedPlayback": {
+    "order": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "ms": [
+      400,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      500
+    ],
+    "durationMs": 2400
+  },
+  "sourceJobs": [],
+  "actualGeneratedImages": 0,
+  "actualPaidCalls": 0,
+  "actualChargedGenerations": 0,
+  "accountBalance": null,
+  "review": {
+    "firstFrame": "not-generated",
+    "desktop": "not-run-on-new-art",
+    "mobile": "not-run-on-new-art",
+    "visualApproval": false
+  },
+  "integration": {
+    "target": "first_day/c3 opening environment segment",
+    "originalDurationMs": 6000,
+    "environmentDurationMs": 2400,
+    "remainingCharacterSegmentMs": 3600,
+    "characterSegmentOwner": "character-production lead",
+    "status": "proposal; timing and subtitles must be reconciled by main integrator",
+    "sharedFilesModified": false
+  }
+}

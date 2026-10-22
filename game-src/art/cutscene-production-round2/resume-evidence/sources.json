@@ -1,0 +1,15 @@
+{
+  "retrievedAt": "2026-10-22T10:18:27.487814+00:00",
+  "branches": {
+    "pixellab-doors-round2": "09e955d21aa3de669ced4bced5200dc0ae9e34c5",
+    "character-production-resume": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4"
+  },
+  "publicDocuments": {
+    "openapi.json": "0de478ae3db31fc963cf1234af1d5999c605e24500d07322311d37039b00c990",
+    "mcp-docs.txt": "d85f01d958ed9d8538bb593baa0b3e5e38f5bea9b03f194ba222f1a97b7129d8"
+  },
+  "liveCoordination": {
+    "available": false,
+    "reason": "No send_message_to_thread or handoff_thread tool exposed. Read latest peer thread and remote handoff; no peer acknowledgement."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-22T10:22:48.822128+00:00",
+  "passed": [
+    "background request against live MCP JSON schema",
+    "17 planned frame durations sum to 2400ms",
+    "320x180 integer 2x equals 640x360",
+    "96x144x16 within animation total-pixel limit; cost formula = 4",
+    "actual manifest contains no ungenerated frames or invented jobs",
+    "Python AST and node --check",
+    "blocked-state design page builder",
+    "git diff --check"
+  ],
+  "notRun": [
+    "new first frame visual review",
+    "new animation consistency review",
+    "new playable cut desktop/mobile review"
+  ],
+  "actualPaidCalls": 0,
+  "actualGeneratedImages": 0,
+  "actualChargedGenerations": 0
+}

@@ -1,0 +1,11 @@
+{
+  "description": "Empty ground-floor headquarters corridor in a modern Seoul administrative office, overcast weekday morning. Locked side-on belt-scroll camera, front elevation of the north wall, shallow visible floor, no perspective convergence. Native 320x180 crisp pixel art, chunky readable shapes, selective dark outlines, two or three tones per material. Navy walls #1f2733 and #2a3544, restrained walnut trim #4d3a2c, cool light #cfe4ff, grey floor #7f8994 and #76808b. Quiet empty space on the left. On the right, one closed double sliding frosted-glass office doorway: charcoal frame, brushed steel edges, blue-grey glass, horizontal frosted band and central vertical seam. Target opening x200..279, y31..155, threshold y156, opening 80x125 pixels. Frame and header contained in x192..287, y20..163. Both leaves slide apart horizontally into wall pockets, no hinges or swinging door. No people, characters, faces, hands, human reflections, silhouettes, portraits, text, numbers, logos, pets, blur, gradients or antialiasing.",
+  "width": 320,
+  "height": 180,
+  "no_background": false,
+  "view": "side",
+  "direction": "south",
+  "outline": "selective outline",
+  "detail": "medium detail",
+  "seed": 102222
+}

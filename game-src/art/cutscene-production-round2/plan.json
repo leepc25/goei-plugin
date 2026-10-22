@@ -2,43 +2,156 @@
   "id": "first-day-empty-hall-door-round2",
   "status": "blocked-before-generation",
   "baseCommit": "0d43a4496bff1cdc7c0122e273a43475c9134356",
-  "canvas": { "width": 640, "height": 360, "displayScale": 2 },
+  "canvas": {
+    "width": 640,
+    "height": 360,
+    "sourceWidth": 320,
+    "sourceHeight": 180,
+    "integerScale": 2,
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "displayScale": 1,
+    "resample": "nearest-neighbor",
+    "mobile": {
+      "portraitSourceScale": 1,
+      "landscapeSourceScale": 2,
+      "center": true,
+      "fillRemainder": "#111720"
+    }
+  },
   "generatedFrames": [],
   "generationCalls": 0,
   "chargedGenerations": 0,
   "blockers": [
-    "PixelLab MCP is not exposed; plugin search returned no matches.",
-    "Managed environment has no configured PixelLab secret or identity.",
-    "animate_image / animate-with-text-v3 is limited to 256 pixels per side."
+    "Actual get_balance and list_jobs rejected: 401 Missing Authorization header.",
+    "Account balance, current jobs, billing and live generation coordination unverified."
   ],
   "paletteSource": "src/game/action/engine/hub.ts LOOKS.hall (text values only)",
-  "palette": ["#1f2733", "#2a3544", "#4d3a2c", "#cfe4ff", "#7f8994", "#76808b"],
+  "palette": [
+    "#1f2733",
+    "#2a3544",
+    "#4d3a2c",
+    "#cfe4ff",
+    "#7f8994",
+    "#76808b"
+  ],
+  "doorStandard": {
+    "branch": "codex/pixellab-doors-round2",
+    "commit": "09e955d21aa3de669ced4bced5200dc0ae9e34c5",
+    "type": "double-sliding-frosted-glass",
+    "frame": "charcoal with brushed steel edges",
+    "glass": "blue-grey, horizontal frosted band",
+    "view": "front elevation on north wall",
+    "openingSourcePx": [
+      80,
+      125
+    ],
+    "thresholdSourceY": 156,
+    "openingSourceRect": [
+      200,
+      31,
+      80,
+      125
+    ],
+    "status": "latest peer design, no approved generated door asset"
+  },
   "design": {
     "durationMs": 2400,
-    "frameCount": 16,
-    "ms": [400, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 600],
-    "keyframes": [
-      { "frame": 1, "doorDegrees": 0, "role": "closed; quiet establishing hold" },
-      { "frame": 5, "doorDegrees": 12, "role": "first narrow light gap" },
-      { "frame": 9, "doorDegrees": 45, "role": "opening accelerates; hinge fixed" },
-      { "frame": 13, "doorDegrees": 75, "role": "deceleration; floor light widens" },
-      { "frame": 16, "doorDegrees": 85, "role": "open; empty room; deliberate end hold" }
+    "frameCount": 17,
+    "generatedAnimationFrames": 16,
+    "inputFramesReturnedByAPI": 1,
+    "ms": [
+      400,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      500
     ],
-    "intermediateFrames": [2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15],
-    "camera": "locked belt-scroll side view, shallow visible floor depth; no zoom/pan",
+    "keyframes": [
+      {
+        "frame": 1,
+        "openFraction": 0,
+        "role": "closed; establishing hold"
+      },
+      {
+        "frame": 5,
+        "openFraction": 0.15,
+        "role": "two leaves separate"
+      },
+      {
+        "frame": 9,
+        "openFraction": 0.5,
+        "role": "middle opening"
+      },
+      {
+        "frame": 13,
+        "openFraction": 0.85,
+        "role": "decelerate"
+      },
+      {
+        "frame": 17,
+        "openFraction": 1,
+        "role": "fully open; empty office"
+      }
+    ],
+    "camera": "locked side-on belt-scroll; shallow floor; front-facing doorway",
     "characters": false,
     "loop": false,
-    "note": "Planning only. Interior keyframes are review targets, not per-frame constraints supported by animate_image."
+    "note": "Intermediate opening fractions are QA targets, not model guarantees. Returned input is counted once; no duplicate-frame smoothing."
   },
-  "unexecutedSupportedAlternative": {
-    "status": "proposal-only; do not auto-submit",
-    "background": { "width": 640, "height": 360, "tool": "create_image_pixen", "generations": 1 },
-    "doorRegion": { "x": 384, "y": 64, "width": 128, "height": 256 },
-    "endKeyframe": { "tool": "edit_image_pixen", "generations": 1 },
-    "animation": { "tool": "animate_image", "frameCount": 16, "estimatedGenerations": 8 },
-    "estimatedGenerationCalls": 3,
-    "estimatedTotalGenerations": 10,
+  "production": {
+    "status": "waiting-for-authentication",
+    "background": {
+      "tool": "create_image_pixen",
+      "width": 320,
+      "height": 180,
+      "generations": 1
+    },
+    "doorRegion": {
+      "x": 192,
+      "y": 20,
+      "width": 96,
+      "height": 144
+    },
+    "animation": {
+      "tool": "animate_image",
+      "frame_count": 16,
+      "expectedReturnedFrames": 17,
+      "estimatedGenerations": 4
+    },
+    "estimatedGenerationCalls": 2,
+    "estimatedTotalGenerations": 5,
+    "estimateFormula": "1 + ceil(96*144*16/65536)",
+    "accountQuoteConfirmed": false,
+    "actualUSD": null,
     "enhancePrompt": false,
-    "note": "Native-resolution crop from a newly generated background only; no rescale, no old reference. Exact account quote/usage must be checked after connection. Crop must include the entire door swing, light and shadow; reject if it does not."
+    "firstFrameGate": "Inspect exact 320x180 output, palette, empty corridor and measured opening before any animation submission. Recompute crop/estimate if geometry differs; no blind retry.",
+    "composite": "Keep the source background immutable. Paste animation only through reviewed aperture mask; restore frame/wall/floor from original. No crossfade or repeated image synthesis. Preserve unmasked raw returned frames for drift inspection.",
+    "fallback": "If moving glass edges or interiors fail visual QA, investigate before changing technique; no automatic paid retry."
+  },
+  "integration": {
+    "target": "first_day/c3 opening environment segment",
+    "originalDurationMs": 6000,
+    "environmentDurationMs": 2400,
+    "remainingCharacterSegmentMs": 3600,
+    "characterSegmentOwner": "character-production lead",
+    "status": "proposal; timing and subtitles must be reconciled by main integrator",
+    "sharedFilesModified": false
   }
 }
