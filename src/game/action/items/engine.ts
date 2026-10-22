@@ -13,6 +13,15 @@ const TICK = 30;
 let attackSeq = 900000;
 const react = (knockdown: boolean, kb: number): React => (knockdown ? 'down' : kb >= 140 ? 'stagger' : 'flinch');
 
+/** 적 모듈은 attackId로 중복 피격을 막는다. 서로 다른 아이템 타격에 상수 ID를 재사용하지 않는다. */
+export function itemHit(e: Extract<ItemEvent, { t: 'hit' }>, sourceX: number): Hit {
+  return {
+    attackId: attackSeq++, x0: e.x, x1: e.x, z0: 0, z1: 0, y: e.y,
+    dmg: e.damage, react: react(e.knockdown, e.knockback),
+    dir: e.x < sourceX ? -1 : 1, push: e.knockback / TICK, armorBreak: e.armorBreak,
+  };
+}
+
 /** 날아가는 투척물·탄을 엔진 Hit 상자로. projId로 hitProp을 부른다. */
 export function projectileHits(field: Field): (Hit & { projId: number })[] {
   const out: (Hit & { projId: number })[] = [];
