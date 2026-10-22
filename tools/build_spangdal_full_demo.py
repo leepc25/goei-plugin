@@ -77,6 +77,61 @@ def frames_of(k):
     return fs
 
 
+AIR = {'jump', 'airrain', 'fall'}   # 공중 장은 발이 떠 있는 게 맞음
+FIX_ERASE = {   # 클립: {장: [(x0, y0, x1, y1), ...]}  생성기가 그린 소품·효과를 지울 사각형(검수 결과)
+    'execute': {4: [(102, 48, 112, 56)], 5: [(102, 48, 112, 56)]},   # 손끝 은색 바늘(가시는 코드가 그림)
+    'shotgun': {0: [(152, 50, 192, 76)]},                            # 총구 불꽃(효과는 코드)
+    'engage': {0: [(80, 80, 95, 90)], 1: [(84, 81, 101, 91)]},       # 손 앞 번진 잔상
+    'door': {i: [(96, 0, 192, 144)] for i in range(7)},              # 생성기가 그린 문짝·손잡이(문은 배경 소품)
+}
+FIX_REPLACE = {'getup': {0: ('down', -1)},   # 머리 위 회색 먼지 → 다운 마지막 누운 장
+               'land': {0: ('fall', -1)},    # 검게 뭉개진 첫 장 → 낙하 마지막 장
+               'door': {6: ('door', 5)}}     # 문짝이 몸을 덮은 장 → 손잡이 잡은 장
+
+
+def detach(im):
+    """가장 큰 덩어리(8방향 연결)에서 2px 넘게 떨어진 조각을 지움: 날아간 물건·효과선."""
+    import numpy as np
+    from collections import deque
+    a = np.array(im); al = a[:, :, 3] > 0
+    lab = np.zeros(al.shape, int); sizes = [0]; n = 0
+    for y0, x0 in zip(*np.where(al)):
+        if lab[y0, x0]: continue
+        n += 1; sizes.append(0); q = deque([(y0, x0)]); lab[y0, x0] = n
+        while q:
+            y, x = q.popleft(); sizes[n] += 1
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    yy, xx = y + dy, x + dx
+                    if 0 <= yy < FH and 0 <= xx < FW and al[yy, xx] and not lab[yy, xx]: lab[yy, xx] = n; q.append((yy, xx))
+    if n <= 1: return im
+    main = int(np.argmax(sizes))
+    m = lab == main
+    near = m.copy()
+    for _ in range(2):
+        near = near | np.roll(near, 1, 0) | np.roll(near, -1, 0) | np.roll(near, 1, 1) | np.roll(near, -1, 1)
+    for i in range(1, n + 1):
+        if i != main and not (near & (lab == i)).any(): a[lab == i] = 0
+    return Image.fromarray(a)
+
+
+def clean(k, fr):
+    for i, (src, j) in FIX_REPLACE.get(k, {}).items():
+        alt = frames_of(src)
+        if alt and i < len(fr): fr = fr[:i] + [alt[j]] + fr[i + 1:]
+    out = []
+    for i, f in enumerate(fr):
+        for r in FIX_ERASE.get(k, {}).get(i, []):
+            f.paste((0, 0, 0, 0), r)
+        f = detach(f)
+        if k not in AIR:   # 발이 바닥선(불투명 맨 아래 y=135) 아래로 내려간 장은 위로 당김
+            bb = f.split()[-1].getbbox()
+            if bb and bb[3] - 1 > 135:
+                g = Image.new('RGBA', f.size, (0, 0, 0, 0)); g.paste(f, (0, 135 - (bb[3] - 1))); f = g
+        out.append(f)
+    return out
+
+
 def hands_of(k, n):
     """뼈대 손목·팔꿈치 → [[앞손 x, y, 각도], [뒷손 x, y, 각도]] (각도: 팔꿈치→손목, 오른쪽 0°, 시계 방향 +)."""
     import math
@@ -116,6 +171,8 @@ def main():
     hands_all = {}
     for k, grp, label in defs:
         fr = frames_of(k)
+        if k == 'talk': continue   # 말하기 = 대기 장 + 말풍선(코드)
+        if fr and k not in NUDE: fr = clean(k, fr)
         if not fr:
             missing.append(k); continue
         cv = COMBAT.get(k)

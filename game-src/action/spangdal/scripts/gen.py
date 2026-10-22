@@ -39,7 +39,7 @@ def fetch(n,j):
         im=[x for x in (r or {}).get('result',{}).get('content',[]) if x.get('type')=='image']
         if im: open(f'{d}/{i:02d}.png','wb').write(base64.b64decode(im[0]['data']))
 if __name__=='__main__':
-    skip={'--ref','--refkp'}
+    skip={'--ref','--refkp','--max'}
     names=[]; it=iter(sys.argv[1:])
     for a in it:
         if a in skip: next(it); continue
@@ -53,7 +53,7 @@ if __name__=='__main__':
             if m: resume[m.group(1)]=m.group(2)
     pend={}; queue=list(names)
     while queue or pend:
-        while queue and len(pend)<12:
+        while queue and len(pend)<int(arg('--max','2')):
             n=queue.pop(0)
             if n in resume: pend[n]=resume[n]; continue
             j,t=submit(n)

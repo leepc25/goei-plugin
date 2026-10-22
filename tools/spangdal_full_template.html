@@ -169,6 +169,7 @@ function onKey(code, down) {
   }
   if (FX.cut > 0 || G.superQ) return;
   if (G.down) { if (code === 'KeyK' && G.lying) standUp(); return; }
+  if (G.lock && (G.clip === 'engage' || G.clip === 'groom')) { G.lock = false; play(G.fight ? 'stance' : 'idle'); }   // 전투 진입·손질은 아무 입력으로 끊김
   if (G.lurk && !G.lock) { lurkInput(code); return; }
   if (G.lock) {
     if (code === 'KeyA' && G.air && !G.down) { attackA(); return; }
@@ -405,11 +406,11 @@ function drawThorns(k, f, x, y, dir) {
     needle(h.x + h.ax * 3 * S, h.y + h.ay * 3 * S, h.ax, h.ay, len);
   }
   if (k === 'spikeguard' && f >= 1) {   // 두 팔뚝에서 앞으로 돋는 짧은 가시
-    for (const i of [0, 1]) { const h = handAt(k, f, i, x, y, dir); if (!h) continue; for (let j = 0; j < 4; j++) needle(h.x - h.ax * j * 4 * S, h.y - h.ay * j * 4 * S - S, dir, -0.25, 6 + (j % 2) * 3); }
+    for (const i of [0, 1]) { const h = handAt(k, f, i, x, y, dir); if (!h) continue; for (let j = 0; j < 4; j++) needle(h.x - h.ax * j * 4 * S, h.y - h.ay * j * 4 * S - S, dir * 0.97, -0.25, 10 + (j % 2) * 4); }
   }
   if (k === 'latticecharge' || (k === 'latticerelease' && f < 2)) {   // 펼친 손가락 사이 실 같은 선
     const a = handAt(k, f, 0, x, y, dir), b = handAt(k, f, 1, x, y, dir);
-    if (a && b) { ctx.strokeStyle = 'rgba(20,16,30,.9)'; ctx.lineWidth = 1; for (let j = 0; j < 4; j++) { ctx.beginPath(); ctx.moveTo(a.x, a.y - j * 3); ctx.lineTo(a.x + dir * (90 + j * 14) * S, a.y - 20 * S + j * 12 * S); ctx.stroke(); } }
+    if (a && b) { ctx.strokeStyle = 'rgba(160,130,220,.75)'; ctx.lineWidth = 2; for (let j = 0; j < 4; j++) { ctx.beginPath(); ctx.moveTo(a.x, a.y - j * 3); ctx.lineTo(a.x + dir * (90 + j * 14) * S, a.y - 20 * S + j * 12 * S); ctx.stroke(); } }
   }
 }
 
@@ -648,7 +649,7 @@ function updateEnemies(dt) {
     if (!e.aware) {
       if (G.hidden || G.lurk) continue;
       const ahead = Math.sign(G.x - e.x) === e.face;
-      let r = ahead ? 420 : 170; if (walkingQuiet || G.crouch) r *= 0.5; if (G.runHeld) r *= 1.6;
+      let r = ahead ? 420 : 120; if (walkingQuiet || G.crouch) r *= 0.5; if (G.runHeld) r *= 1.6;
       if (Math.abs(G.x - e.x) < r && Math.abs(G.z - e.z) < 0.35) { e.aware = true; e.turnT = 0.45; say(e.x, groundY(e.z) - 250, '!', 0.6); }
       continue;
     }
@@ -696,11 +697,11 @@ const CHAIR = [[48, 72, 4, 40, WOOD], [48, 108, 28, 4, WOOD], [50, 112, 3, 24, W
 const DESK = [[80, 90, 46, 4, WOOD], [82, 94, 3, 42, WOOD], [121, 94, 3, 42, WOOD]];
 const PROPS = {   // 시연판 전용 회색 상자(게임에선 무대 오브젝트). 좌표 = 그림 칸 px
   chairsit: CHAIR, typing: [...CHAIR, ...DESK], seatrest: CHAIR, seatthink: CHAIR, doze: CHAIR, seatmouth: [...CHAIR, ...DESK], seathold: CHAIR,
-  deskslam: [[90, 92, 46, 4, WOOD], [92, 96, 3, 40, WOOD], [131, 96, 3, 40, WOOD]], mantle: [[85, 88, 70, 48, MET]], vault: [[89, 96, 14, 40, MET]],
+  deskslam: [[90, 92, 46, 4, WOOD], [92, 96, 3, 40, WOOD], [131, 96, 3, 40, WOOD]], mantle: [[85, 99, 70, 37, MET]], vault: [[89, 96, 14, 40, MET]],
   liesit: [[20, 107, 160, 6, '#c9c4b8'], [20, 113, 160, 23, WOOD]], liehold: [[20, 109, 160, 6, '#c9c4b8'], [20, 115, 160, 21, WOOD]], bedlie: [[20, 109, 160, 6, '#c9c4b8'], [20, 115, 160, 21, WOOD]],
   stepup: [[80, 120, 64, 16, MET]], stepover: [[90, 104, 80, 32, '#d8dde2']], handswork: [[86, 92, 50, 44, '#d8dde2']],
   ladder: [[96, 0, 4, 136, MET], [118, 0, 4, 136, MET], [96, 20, 26, 3, MET], [96, 44, 26, 3, MET], [96, 68, 26, 3, MET], [96, 92, 26, 3, MET], [96, 116, 26, 3, MET]],
-  wallcry: [[96, 20, 10, 116, PLATE]], door: [[92, 30, 6, 106, WOOD]], doorclose: [[44, 30, 6, 106, WOOD]], knock: [[96, 30, 6, 106, WOOD]], push: [[96, 70, 40, 66, WOOD]],
+  wallcry: [[96, 20, 10, 116, PLATE]], door: [[97, 30, 6, 106, WOOD], [93, 84, 4, 3, MET]], doorclose: [[44, 30, 6, 106, WOOD]], knock: [[96, 30, 6, 106, WOOD]], push: [[96, 70, 40, 66, WOOD]],
 };
 function drawProps(k, x, y, dir) {
   const r = PROPS[k]; if (!r) return;
