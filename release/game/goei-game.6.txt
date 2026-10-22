@@ -1,0 +1,3372 @@
+nTB19K+5DdYRwdHppy6yoUZ/fbrEkGNBD8RoI8vILtXvux7CeT8zK1MCO0cBznyic341ErgUaEQ+vHsvleV+3KKq+ffiaSOoLmYy+anbQQW2GmP/EH0AhUUllM9DtX5nUetZPw9vekOW64EfBXMLkClvFYFU48PHinU9RD6nXphKPQ1mH3+Cig2tHFe/Uj3BMj5YVFqpcMb2CmFs9CcaAVy/Y98VMqvrZMGBrxZWheZ5/KZrRmn22plTwLyHFTRdBM3uSat8nmdCvwr77TQDPTN9aaNJrHMrQ0sCoikocmF8f5jMeiN4q0rB7nEuFW/uXK4L+l5JSWvZKnEIbhGZx/UAxK78t7Rq03MWYsy6wQZeQNaDZZ8XCEfnV9W7zaUGmlNUoEp+MZfRMFMoU0PHfuU3ULmaTCJB3zYzVNumjL5UxZGhHOGsZDHZTt3IY0b7RABEhxrQi/NZviaYzUCcpqlgY6VQvGcEPxPIXIDzBfYPxB1W+t2QNfGh8PjgIt0BGhmLucg//Dqk3FCcioLWAex8Afn6SXK2xntk2tt2ATT3mM6etPEyyMKN5YaLxO8nLR7hUg4E2KQybuywB+V9yXI098Y4XRyOSvtBwszNDWUfvwOemrIc37REBmMS0/pqWobg11V41j3w2fbryldlhWdAfW0sY9ErcopWY3Z64xjSMqHWaYtVZzOK1MWBegKZRWJSYCD5QUt9dyKHYPwhUe+/49V6EmrPrejI1HuoNk9QuX979xITWvDA4dmelwOR9DMA0lgbjNdTjjLfVxz+6Vqx8XGU5zhIVmWrcXoGtONXhhW1Tj/E/8pRRx5RBnuHsOiZyh5MFfNjCrQ6O92zd6INMwwtmK5onItgx09Xtr2lhRDEakRj2nduqTjKLz3+zyAhIUfJihS2c1HXQBNjwmDIjpaWOaiyePA08IIvus6p0JBM9/FiaoZdZ+sFSakq+qhelfRzIShP/B6LLVy3Np5N47rC05h90+nMWMiGBsJSbQc31r+wiUNkmAtlzxCwJ7/mTi/z3l2xEZP63oaw3KYNk0ZCYpveRMIscx0R8JFf41JeWVc/LJVjN1/qt2JqjbVSXzUPAz6r4YbU0ftm5U+mKDYwh2f8+FywVKkZIzcWUFbnSeLPktu/iZJIpbj9cdKRQyyowF6NfbQzRAXFo3hyuN5yq07PHOUQEUy4tVDIIYQEg9e3rTSBvR8MuEvK2i5Hba1KuS9gzqw7CFJiYiKayRlsOa3orG8RhrPPbWkYIz/hs5YgmEFOBKLFv7IJk4HTwTmxqQ3PQrV8HK3iAiiPrWMnaW6NKBei8L8EsM5xwr1PB+2GbcyJFXn3NQfOF1JdsiVtolMz/Ga2bsHBna7++QuGP+zFJNLy9fAiRse6UZbwpEQwCKwtC6oebLij+0zw+DBVUPZeukeaas/oi80j6NxUkrr4Zb341mfvvz1Zpy9eaaW7I7kKirwpKyBVGTetDW/pLipshmtN8/0fPsn4cKUvqC9eRojKQo9huTNMYQvgKNZxg3lBN9QCetlKZ+SKP/Icc1GJllMmcDbkw//lOst4E6ItpO4GJ/TgJiJ0dDldJMx8nvCcwaJPk6v/O+hkQ+Hre2P6DrDo5jHKWvR8Dc/cqbP+X/KSa7XMsN0u89E7KLLk+TqqraWxOVyiizAB4wxijweOxcV8gH3NM21Hcj2axzBsuWemTI6u8czqeYbzIDBrumZiPrwwV8QM1VZOp+AV/3gZWg3RTqPpvN1CXlJoEMkgeNQPFPDc1aOI/73s9jiaPgGniEC4UIRI1LvgdT5FvkJjUCd1j9LahnnWm38UBa4fqg4eF/LnMnACoaGLFqLSPUa/kb5eIeg8+ICLxcRmSTWfzh0AoR8PLz6Htg7XNoj3M04PcuE/4a/Enq3SkKQnBdnKH5V43JKgBkbFIDe2vf2tf2JNKXXZLYau7f0Sb0W54rqi0cV6ifTztvcpwcg5osUoLqvxTNUCHVgS+kFsT8hSbNId93gQZnmYgTpnrW1J/wfsSZDOOoPvS7AFjOfgK84XDY8haPsuHd1p72fBoYMGfUj/mQNCBxZNKlcVFHSc89VtWTcEeiOab6xE5YwLakKhSsvoOlyxLnezABncumuhquZdutyHV+k4qzc05P7uTeF+eWNCt+lrCWrEfST7P6ar/PyDyK5BH/LOMbdxphvQQQQtF0DCSOlF40TZU/E49GHk5MAt7GMCzIQE14/VxmjNuvLFVS4Q7sjjy4O8eRb9TCsPiJEiiNlHjImZri7r48QkeZKT/XieH2Xr4dpW4ZIJ9b6OFLXgxhA95i3rtXYN6nnxBlTyZ6uyDz5wQp8426q3nLv5v80IoE/cdB9lgPqpMUKVK32uBCQgLbhdcfWZYdjzigA1eYqTJx3GSwThS5WvDQkxIQ+w4Ubm+uvqWp3YwjS74+USwLNSfu7T5TyqbZ9Srzv+txWyx+6ThOzNcYptO4plcSLEHtwtLORa0mouLFU0j6wxbI7GYxKZp7hiQbcqrzm/27aatu/nOHQHWM2bBKLGZrFqXod5NpeSuQrZDigx0YDr8FuTLmBzbkA4nIUgu9g7ZMxv3etM4F8sko499yHcBEtu5D4t2Ra4FrtAQCnFzvsPe0sqXhEd1ciymsnP10CjNvnNIhVOyXb60vdTu9gVs3MfMw3iL7mWjuprKke1be1wPWiuhXy13zsnhndvx9yp/yfDrxh3FjwajMA6JmIBrMI8rAIC29z1QqdeZeuP3VmgR8kb0QYB5ISeYp5t/UN+uvxAjDPBFKd1A6kUJmF7vOa9TqpA9PofgPqU3MjHn8yeiXvpG+Apid8DkHgk69YmF0Fa2snWk63zZUyoToyHE31ZySnN2+ajRqQbe1MtAuRWZ2B54Orz5zQJsVyKU6XyhHn1aaBYt5l8Bxv8rVVYxldhJOd9GNvnW3nhvWnB/XlAl3Td5KxT6JZRR2OHWYRfwdgOcNzvFZ76k9wPqtEzh7LhmKusy5UPiDQKoG5cdoQi3hbXCjKU2iriU4C/grs7f6WBjMjpncdjacRU9UmvWBfAd/Re3CgtOs3frnlaqD+4qX4mJbaB1Du9IHP28Gk3nW8c66NqA5uMNiDrbQhGXOWgeVAWpqA8z44RWEdQsaRA6UAAA", Gorgodio: "data:image/webp;base64,UklGRtoKAABXRUJQVlA4IM4KAAAwMACdASqQAJAAPpVEm0olo6IhqFScQLASiWUA0bpbX99m/Ucuv06bgtm5emPhv5bvkkt24z6+PyOKHgF+yd+dAF+g/2/wCdX3wpr0dAX+d/5L0V9Aj1X7BXTAPDp4/T3C4Rf5OxrzGMuq5ZB4wEHwKwc++YbYe2QIN2c4OOB0VD6XV4FD4jhv6wcbQBNLmj2dpj0wVL03k7fucbK4b2fUuwHLV7la6Egsq5MN6P29NEXD1TeosuIcxj+k79ZLJaEiq8gbg8rHC5rg95JJX4IvJmeag5E8VbgRllDnTYrGaNjpwtnk8BonH/j2USjac1dO6Y1yWPuMDCwVf/8Zbl2cc1X8Svams0m7gBF9K3NOMglKruFkvohg8ae7ryGp2+66+Hc5ua7js+xfe6JeUJrt22N0uWH4Pp39Ny8I1f9S32eEuyGE5jtMPCQg3TVa+4Lia3abHnjr3UeZcQzrmVVBk8LrV7lY9vJ3rLN/lG3Azk62GlNIiXzfMin2iVgxE0kKuN5FJdlPY//gAP74Xyek9GeBaojjOh67kNdEvLhmvb2RW9bx/I3yHQW7a3ru8RQmKz06bWp5bbUnIsdwKzh0goW2QKQIOqn5c5QTUNYc3F9uRDXTSNNuHRRR4Yl1t9tFUJOPUIPXghz1NH2jrsD6JWDUh2s0d2sMTFtRzf3o6MScEGkDblBYORV35/Eo9Dj5iARxPvOLNnQdJkEdo8LXtNWJQf9EXvHlRwwmWcrLkYMANbGu1sq2auX6AqmktK0Gi42RWFxM8XkaxT1LICa7SigVx/CT/BzeQUwe5mfjan9ZzfEUFGeHHKVQDnJVjuuRG8sp07jsio2cp/1iMI6ojcH85bMwpIjhzKAhboLa1w6GE92aRBGAZwM/zKxHdadnl0T3mzJor29DJVoFiKyDAb7aHBXoRXbyTxaKYgjASx1EPU1TR0RvBDJyfTKeqgxynjzHoD6bbcDwoezIJoK+/208zLYC1oP9uxG16wwPh0ohC7HumyQl82qzm6d1P6i8YX7vbua8qq16YkF2pODRY+kS2GadsnKNR84wHz2jXnlRMJKdkJwv9kGNdT7U90z+7npqEKhd1arBC+hVB680b1cuH2qzhsaZ+4MnoxkBE4ahUDuyb3b2m8sRizMGFx3Kk3/cT/duAZESCzoiIJ4f3LU78Uj2LX/t/k7Ly2SjT+DzM0BU3AJPFA6IYYzKVm4v+gz99kzPTu0ewwfkrGk+jA5I/sHxNaS3F+IOrzxAI0mKJt4bLZBd1kkLAtH/Fp59kR98+S7J5TtUFcAgbcT/nka6ImRGSjSCX5HByAjUu4WCszW3DZ1ulPR/jhaW+k6Hl9ZUeFBV3ZMNXFd//bL5avIYWRM6A+2Fe3TEp0Z2fL7zyoMAyaLNfN8ZQsu3xx9QUdpcETEFkx0w+WIjRC/Lz8dfUwDuib691kylh3Vnp7l7wQ11S4Yt3XQXAj5eCms+NEfxknjlEUTHQcl195J6/82Nmwxif3K59XxMHbt14hZiS+G2DZh2xL/Cy0svIrj+HRQizkwp46s2XfqylfWAoKlCW04B2lLz3x3wwhH1RecyGC+iDIKmZw+1zL7HzyQn9GNgJ0zTcOebM8+nRWaTm+/gU890cnK6B9UBqwOtj1G+Kl+CuhBlKNTBlsUO4cqjSpDP0wjzDRjqecCP505oWL0mMQMfzp9Xp6+tDNze3r7hQ3UOBihHIsLsxCKH8j1viEI+2nnJ1vCu467/+rHCXT/LoQfl3ms/KaqRF2MLxdCgrhnqHQtIN346dzXOKAzCNyPR9mxABS6ffd/jELetou7S4qapEJULjrNAlTQWJ0QQZyVvgdn66ahVIKp/PkxEhqvoigAde5v0IUXxrPlTjwkuZX3x+stLi5v5cLyTnnc6+ef4i9k48/CmoxVyoXuXAERxbOlX++jHVVvSOAQCe7aE9fXmHZ0f0FHVAhH7paezktZkmNtlpTa5ZuqVLzrYILh+HYgjEh0Yq+Wm0R5n/bscNqmzjQG+gQnMyEjz8xiKxdyGVzMTAsJ0G9ErYrmvbtXNv9P3y2XOt3iTHPQLIWpDW+qE+7uQ5qOc01jKVgfQcw5cVxagpgVifk3AoN8zDTG/C5uyt/2ttlbQRXto/2zR5ivyATXkwalzcKHeSH4jTsF4M6dyNp16Btoap2QuBngxgvMe55x16YH9Tz84iXp8swuX2zLUjRCfD7j5rpKh/B72E+/4DKAs4z0oE58+G3g/aLXUzQN6f0R1RWtKITy9ww/83fpEsOvZRlm/oG6Gbl9pqCpQALFaWbJzAVL9ukL/0aLf3vHBSRQHI9d/sx3udde4jCDP9QGAO0WhEz/9GK22Qs/vdEeABXOdtviojQt9r4ztVtH1mkbCIPEOpgMhpSngOKeMJjIcK9OsGJgQ9r/4MdzjrUyaIaMUn2etT8eDxXnLeuexUpZ75LUAlTwYSiuSImEq7lfbNYHd0D9ZAIMUlq8+c58eu/Sumj6uPU1lT8hEaSfn7xJxqmLv2niK3nhyb2lV6kzqmwvMjNjfa4++2CR47E7re82zseFrzJYh3+jinHQu6JqCjHw0bIKw2hWjqgBGAd3leznoS2yw7xFw45FLHMvgHuK6wg3kRecqySW0Uu/YiMSezh7H/WTRmLQAb/FmYD9cHQlInZkxVCL5Xms0b7vY+DIp+d7cMj3YdaV8s8teRzCQUyD70p9rV0ZHametEASqrnORlmH2e3EKPnnQQoCrVatcq9IVAsKAxrHTY4+r1fxSM4WdnhCkzENZoTaI6yjdleLfP+St7b/wd9lZm1peJ8C8yQIXw+HWpLGLaWzCLO4/9mDTYVyg//5xZP7FgELMfPIxM/46/kvagUEAFDJS9daOM48x5ZVfRaN8BHXZ//1YY7Mhvgy84qO+Dq64RwAkeqCzEgtm6nBYbsTDI2dLR5JnvGd1raXXFg0wJTbJxhFZuHEmXAkz7RA9i39bHnwTYNgPp9BsPUJ1T08AadDTLU75WG7GTAgmHMe91npl3hB/RJEjU1Kh5+xsupZ1w97jxFFM/c9o/6JWj7L0Bk6eui3tXQCkvh3yH0A8U5a9qP2HP1mp7NcyOvjt5JE1UsZFh+es9XDNK+M+jl/r3PHv9t6e9J6yR8lwAsBRWXNsHJP1tq3MFrUbmi/r7Fer70cLUdzhvcoWTn25tKJp8blhhM51LzhZ7CTeIO0tL17m2I6A7JHOTLK1YfTp4pc975IqwsxF5kjhS0Nj9i9II+N7akkoN/h06rvGlXdCgWQrsHHyQs3+Dy81zHBbwKVtlcS+NfVCmdIGDRMOY7Pk937qYO7ZPuLINpioANmsjpIYkN/MtvmOVf7yRnNp/G3YfMkuLKnwp51fVBgWB9ckGtH0Hbx6r5euTEnhepC3uJDY3u945T/zl600dwWos0rfSYNFtO9jfUb+S7Mgjw65m2hIPZSuyJoXUD/wrWYKRDXV3+V6ApLoLRUc2di4yGgOTuauBQ7UWWGRmBdVxX/8Sc8o1rz6r36erbXoyZC+IbPBlLCQzx1dwcqzScT6PRqwU/9xflD86tAl8jy+QqHvNQp6X0srLNcq+RukqeMIKg0jTBK7VouzO2jiFBczkk1gLWFtlGxbnjpJiyfsNB7XVpGH1ldpX+U9ge5HcGZgsTUBVDGJaXXZS/osV7elc30ACdVAAAA=", Kyuras: "data:image/webp;base64,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", Deadpole: "data:image/webp;base64,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", Rojemon: "data:image/webp;base64,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", Jaemtri: "data:image/webp;base64,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", Gognija: "data:image/webp;base64,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", Dejure: "data:image/webp;base64,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", Konjyuce: "data:image/webp;base64,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", "Ma Deok-hee": "data:image/webp;base64,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" };
+
+  // src/game/action/ui/fx.ts
+  var W3 = W;
+  var H4 = H;
+  var size = (c) => (W3 = c.canvas.width, H4 = c.canvas.height);
+  function off(w, h) {
+    const cv = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h });
+    return cv.getContext("2d");
+  }
+  function fit(c, w, h) {
+    const cv = c.canvas;
+    if (cv.width < w || cv.height < h) cv.width = Math.max(cv.width, Math.ceil(w)), cv.height = Math.max(cv.height, Math.ceil(h));
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalCompositeOperation = "source-over";
+    c.globalAlpha = 1;
+    c.clearRect(0, 0, w, h);
+  }
+  var Fx = class {
+    opt = { shake: 1, flash: true, numbers: true };
+    shakeT = 0;
+    shakeDur = 0;
+    shakePow = 0;
+    flashes = [];
+    sparks = [];
+    rings = [];
+    pops = [];
+    title = null;
+    dim = 0;
+    tr = null;
+    time = 0;
+    m1 = off(256, 256);
+    m2 = off(256, 256);
+    dark = off(1800, 720);
+    /** 진동 같은 바깥 반응 (게임패드·폰) */
+    rumble = null;
+    onEvent(e) {
+      switch (e.type) {
+        case "hit": {
+          const s2 = e.strength;
+          this.shake(3 + s2 * 4, 0.1 + s2 * 0.06);
+          this.burst(e.x, e.y, 10 + s2 * 7, e.target === "player" ? "#ff6050" : "#ffe0a0", 3 + s2 * 1.5);
+          this.ring(e.x, e.y, 16, 60 + s2 * 45, s2 === 3 ? "#fff" : "#ffd890", 4 + s2 * 3, 0.2 + s2 * 0.05);
+          if (e.dmg != null && Math.round(e.dmg) > 0 && this.opt.numbers) this.pop(e.x, e.y - 30, String(Math.round(e.dmg)), e.target === "player" ? "#ff7060" : s2 === 3 ? "#ffe070" : "#fff", s2 >= 2);
+          if (s2 === 3) this.flash("#fff", 0.08, 0.35);
+          this.rumble?.(0.2 + s2 * 0.2, 60 + s2 * 30);
+          break;
+        }
+        case "guard":
+          this.burst(e.x, e.y, 8, "#9fd8ff", 3);
+          this.ring(e.x, e.y, 20, 60, "#9fd8ff", 4, 0.2);
+          this.shake(2, 0.06);
+          break;
+        case "down":
+          this.shake(6, 0.15);
+          this.burst(e.x, e.y, 10, "#b0a490", 3, -1);
+          break;
+        case "hurt":
+          this.shake(5 + (e.strength ?? 1) * 3, 0.18);
+          this.flash("#ff2020", 0.1, 0.2);
+          this.rumble?.(0.6, 140);
+          break;
+        case "blast":
+          this.shake(10, 0.3);
+          this.ring(e.x, e.y, 20, e.r ?? 220, "#ffb070", 8, 0.35);
+          this.burst(e.x, e.y, 26, "#ffb070", 5);
+          this.flash("#ffd8a0", 0.12, 0.3);
+          this.rumble?.(1, 250);
+          break;
+        case "ult":
+          this.dim = 0.7;
+          this.flash("#fff", 0.15, 0.5);
+          this.rumble?.(0.8, 200);
+          break;
+        case "heal":
+          this.burst(e.x, e.y, 12, "#80f0a0", 2, -1.5);
+          if (e.amount && this.opt.numbers) this.pop(e.x, e.y - 40, `+${e.amount}`, "#80f0a0", false);
+          break;
+        case "pop":
+          this.pop(e.x, e.y, e.text, e.color ?? "#fff", false);
+          break;
+        case "floor":
+          this.title = { depth: e.depth, name: e.name, variant: e.variant, t: 0 };
+          break;
+      }
+    }
+    /** 엔진 GameEvent(engine/contract.ts)를 그대로 받는다. y 는 화면 y(발 위치 − 높이), 없으면 opt.y */
+    onGameEvent(e, opt = {}) {
+      const n = (k, d3 = 0) => typeof e[k] === "number" ? e[k] : d3;
+      const x = n("x"), y = typeof e.y === "number" ? n("y") - n("z") : opt.y ?? 520;
+      switch (e.type) {
+        case "hit":
+          return this.onEvent({ type: "hit", x, y, strength: Math.max(1, Math.min(3, n("strength", 1))), dmg: n("dmg"), target: e.target === "player" ? "player" : "enemy" });
+        case "guard":
+          return this.onEvent({ type: "guard", x, y });
+        case "guardBreak":
+          this.shake(8, 0.2);
+          this.ring(x, y, 20, 120, "#9fd8ff", 6, 0.3);
+          return this.flash("#9fd8ff", 0.12, 0.3);
+        case "hurt":
+          return this.onEvent({ type: "hurt", strength: n("dmg") > 20 ? 2 : 1 });
+        case "down":
+          return this.onEvent({ type: "down", x, y: opt.y ?? 600 });
+        case "super":
+          return this.onEvent({ type: "ult" });
+        case "ability":
+          return this.shake(4, 0.1);
+        case "heal":
+          return this.onEvent({ type: "heal", x, y });
+        case "bossRoar":
+          return this.shake(10, 0.6);
+        case "ruleFound":
+          return this.flash("#f0d890", 0.25, 0.18);
+        case "enter:floor": {
+          const f = e.floor ?? {};
+          return this.onEvent({ type: "floor", depth: f.depth == null ? "" : f.depth <= 3 ? `L${f.depth}` : `B-${f.depth - 3}`, name: f.title ?? "" });
+        }
+      }
+    }
+    shake(pow, dur) {
+      if (pow * this.opt.shake < this.shakePow * (this.shakeT / (this.shakeDur || 1))) return;
+      this.shakePow = pow * this.opt.shake;
+      this.shakeT = this.shakeDur = dur;
+    }
+    flash(color, dur, a = 0.4) {
+      if (!this.opt.flash) return;
+      this.flashes.push({ color, t: 0, dur, a });
+    }
+    burst(x, y, n, color, speed, lift = 0) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = (0.4 + Math.random()) * speed * 60;
+        this.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 + lift * 60, t: 0, life: 0.18 + Math.random() * 0.22, color, size: 2 + Math.random() * 3 });
+      }
+    }
+    ring(x, y, r0, r1, color, width, life) {
+      this.rings.push({ x, y, r0, r1, color, width, life, t: 0 });
+    }
+    pop(x, y, text2, color, big) {
+      let n = 0;
+      for (const p of this.pops) if (p.t < 0.6 && Math.abs(p.x - x) < 70 && Math.abs(p.y - y) < 90) n++;
+      const side = n % 2 ? 1 : -1;
+      this.pops.push({ x: x + (n ? side * (28 + 14 * n) : (Math.random() - 0.5) * 16), y: y - n * 34, text: text2, color, t: 0, big });
+    }
+    /** 흔들림 오프셋: 카메라에 더한다 */
+    camera() {
+      if (this.shakeT <= 0) return { x: 0, y: 0 };
+      const k = this.shakeT / this.shakeDur;
+      const p = this.shakePow * k;
+      return { x: Math.round((Math.random() * 2 - 1) * p), y: Math.round((Math.random() * 2 - 1) * p * 0.6) };
+    }
+    get busy() {
+      return !!this.tr;
+    }
+    update(dt) {
+      this.time += dt;
+      this.shakeT = Math.max(0, this.shakeT - dt);
+      for (const f of this.flashes) f.t += dt;
+      this.flashes = this.flashes.filter((f) => f.t < f.dur);
+      for (const s2 of this.sparks) s2.t += dt, s2.x += s2.vx * dt, s2.y += s2.vy * dt, s2.vy += 900 * dt, s2.vx *= 0.9;
+      this.sparks = this.sparks.filter((s2) => s2.t < s2.life);
+      for (const r of this.rings) r.t += dt;
+      this.rings = this.rings.filter((r) => r.t < r.life);
+      for (const p of this.pops) p.t += dt, p.y -= dt * (p.t < 0.2 ? 160 : 30);
+      this.pops = this.pops.filter((p) => p.t < 0.9);
+      if (this.title) {
+        this.title.t += dt;
+        if (this.title.t > 1.9) this.title = null;
+      }
+      this.dim = Math.max(0, this.dim - dt * 1.2);
+      if (this.tr) {
+        const tr = this.tr;
+        tr.t += dt;
+        if (!tr.midDone && tr.t >= tr.dur / 2) {
+          tr.midDone = true;
+          tr.mid?.();
+        }
+        if (tr.t >= tr.dur) {
+          this.tr = null;
+          tr.done();
+        }
+      }
+    }
+    /** 월드 좌표 효과 (카메라 변환을 걸고 부른다) */
+    drawWorld(c) {
+      c.save();
+      for (const r of this.rings) {
+        const k = r.t / r.life;
+        c.globalAlpha = 1 - k;
+        c.strokeStyle = r.color;
+        c.lineWidth = r.width * (1 - k * 0.6);
+        c.beginPath();
+        c.ellipse(r.x, r.y, r.r0 + (r.r1 - r.r0) * easeOut(k), (r.r0 + (r.r1 - r.r0) * easeOut(k)) * 0.75, 0, 0, Math.PI * 2);
+        c.stroke();
+      }
+      c.globalAlpha = 1;
+      c.globalCompositeOperation = "lighter";
+      for (const s2 of this.sparks) {
+        c.globalAlpha = 1 - s2.t / s2.life;
+        c.fillStyle = s2.color;
+        c.fillRect(s2.x - s2.size / 2, s2.y - s2.size / 2, s2.size, s2.size);
+        c.fillRect(s2.x - s2.vx * 0.02, s2.y - s2.vy * 0.02, s2.size * 0.6, s2.size * 0.6);
+      }
+      c.globalCompositeOperation = "source-over";
+      for (const p of this.pops) {
+        const a = p.t > 0.6 ? 1 - (p.t - 0.6) / 0.3 : 1;
+        const sc = p.t < 0.1 ? 1 + (0.1 - p.t) * 6 : 1;
+        c.globalAlpha = a;
+        setPixelText(true);
+        label(c, p.text, p.x, p.y, (p.big ? 46 : 34) * sc, p.color, "center", 900);
+        setPixelText(false);
+      }
+      c.restore();
+    }
+    /** 화면 덮개: 필살 암전·섬광·체력 위험 테두리·층 제목. HUD 보다 먼저 */
+    drawScreen(c, hpRatio = 1) {
+      size(c);
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      if (this.dim > 0) c.fillStyle = `rgba(0,0,0,${Math.min(0.6, this.dim)})`, c.fillRect(0, 0, W3, H4);
+      if (hpRatio < 0.3) {
+        const k = (0.3 - hpRatio) / 0.3;
+        const pulse = 0.55 + Math.sin(this.time * (4 + k * 4)) * 0.25;
+        const g2 = c.createRadialGradient(W3 / 2, H4 / 2, H4 * 0.35, W3 / 2, H4 / 2, H4 * 0.95);
+        g2.addColorStop(0, "rgba(120,0,0,0)");
+        g2.addColorStop(1, `rgba(150,0,0,${0.55 * k * pulse + 0.1})`);
+        c.fillStyle = g2;
+        c.fillRect(0, 0, W3, H4);
+      }
+      for (const f of this.flashes) {
+        c.globalAlpha = f.a * (1 - f.t / f.dur);
+        c.fillStyle = f.color;
+        c.fillRect(0, 0, W3, H4);
+      }
+      c.globalAlpha = 1;
+      if (this.title) this.drawTitle(c, this.title);
+      c.restore();
+    }
+    drawTitle(c, t) {
+      const inK = Math.min(1, t.t / 0.3), outK = t.t > 1.5 ? (t.t - 1.5) / 0.4 : 0;
+      c.globalAlpha = Math.max(0, inK * (1 - outK));
+      const text2 = t.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, "") || t.depth;
+      c.font = pfont2(22).f;
+      const pw = Math.round(c.measureText(text2).width + 40) + 3 & ~3, ph = t.variant ? 64 : 44, px = Math.round(W3 - 16 - pw) >> 2 << 2, py = 62;
+      c.fillStyle = "#0c0f12";
+      c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
+      c.fillStyle = "#b8873a";
+      c.fillRect(px, py, pw, ph);
+      c.fillStyle = "rgba(16,20,24,0.94)";
+      c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.fillStyle = "#ece2c8";
+      c.fillText(text2, px + pw / 2, py + 22);
+      if (t.variant) c.font = pfont2(11).f, c.fillStyle = "#f0b45a", c.fillText(`변형 · ${t.variant}`, px + pw / 2, py + 48);
+      c.textBaseline = "alphabetic";
+      c.textAlign = "left";
+      c.globalAlpha = 1;
+    }
+    /** 전환: 가운데에서 mid 를 부르고 끝나면 풀린다 */
+    /** open: 이미 덮인 상태에서 시작해 열리기만 한다 (상태가 먼저 바뀐 뒤 부를 때) */
+    transition(kind, opts = {}) {
+      return new Promise((done2) => {
+        if (this.tr) {
+          const old = this.tr;
+          if (!old.midDone) old.mid?.();
+          old.done();
+        }
+        const dur = opts.dur ?? (kind === "doors" ? 1.6 : kind === "glitch" ? 0.7 : 0.8);
+        this.tr = { kind, t: opts.open ? dur / 2 : 0, dur, mid: opts.mid, midDone: !!opts.open, x: opts.x ?? W3 / 2, y: opts.y ?? H4 / 2, done: done2, text: opts.text ?? "" };
+      });
+    }
+    /** 맨 마지막(HUD·메뉴 위)에 그린다 */
+    drawTransition(c) {
+      size(c);
+      const tr = this.tr;
+      if (!tr) return;
+      const half = tr.dur / 2;
+      const k = tr.t < half ? easeInOut(tr.t / half) : 1 - easeInOut((tr.t - half) / half);
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      if (tr.kind === "fade") {
+        c.fillStyle = `rgba(0,0,0,${k})`;
+        c.fillRect(0, 0, W3, H4);
+      } else if (tr.kind === "doors") {
+        const hold = Math.min(1, k * 1.15);
+        const dw = W3 / 2 * hold;
+        const g2 = c.createLinearGradient(0, 0, dw, 0);
+        g2.addColorStop(0, "#3c4448");
+        g2.addColorStop(1, "#5f696e");
+        c.fillStyle = g2;
+        c.fillRect(0, 0, dw, H4);
+        const g22 = c.createLinearGradient(W3, 0, W3 - dw, 0);
+        g22.addColorStop(0, "#3c4448");
+        g22.addColorStop(1, "#5f696e");
+        c.fillStyle = g22;
+        c.fillRect(W3 - dw, 0, dw, H4);
+        c.fillStyle = "rgba(0,0,0,0.5)";
+        for (let i = 1; i < 4; i++) c.fillRect(dw * i / 4, 0, 1, H4), c.fillRect(W3 - dw * i / 4, 0, 1, H4);
+        c.fillStyle = "#111";
+        c.fillRect(dw - 2, 0, 2, H4);
+        c.fillRect(W3 - dw, 0, 2, H4);
+        if (hold >= 1 && tr.text) {
+          c.fillStyle = "#120604";
+          c.fillRect(W3 / 2 - 90, 70, 180, 70);
+          setPixelText(true);
+          label(c, tr.text, W3 / 2, 124, 44, "#ff8a40", "center", 900);
+          setPixelText(false);
+        }
+      } else if (tr.kind === "iris") {
+        const r = Math.hypot(W3, H4) * (1 - k);
+        c.fillStyle = "#000";
+        c.beginPath();
+        c.rect(0, 0, W3, H4);
+        c.arc(tr.x, tr.y, Math.max(0, r), 0, Math.PI * 2, true);
+        c.fill();
+      } else {
+        const src = c.canvas;
+        const n = 14;
+        for (let i = 0; i < n; i++) {
+          if (Math.random() > 0.35 + k * 0.5) continue;
+          const y = Math.floor(Math.random() * H4), h = 4 + Math.random() * 40;
+          const dx = (Math.random() - 0.5) * 160 * k;
+          c.drawImage(src, 0, y, W3, h, dx, y, W3, h);
+        }
+        c.fillStyle = `rgba(0,0,0,${k * 0.85})`;
+        c.fillRect(0, 0, W3, H4);
+        c.fillStyle = `rgba(180,20,20,${k * 0.25})`;
+        for (let i = 0; i < 40; i++) c.fillRect(Math.random() * W3, Math.random() * H4, 2 + Math.random() * 80, 2);
+      }
+      c.restore();
+    }
+    // ── 그리기 도구 (엔진·렌더러가 쓴다) ──
+    /** 땅 그림자: 공중에 뜰수록 작고 옅게 */
+    static shadow(c, x, y, w, z = 0) {
+      const k = Math.max(0.35, 1 - z / 320);
+      c.save();
+      c.fillStyle = `rgba(0,0,0,${0.45 * k})`;
+      c.beginPath();
+      c.ellipse(x, y, w / 2 * k, w / 7 * k, 0, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+    /** 어두운 층: 빛 자리만 뚫린 어둠. 빛은 월드 좌표, camX 를 빼서 그린다 */
+    darkness(c, lights, alpha, camX, camY = 0) {
+      size(c);
+      const d3 = this.dark;
+      fit(d3, W3, H4);
+      d3.fillStyle = `rgba(2,3,6,${alpha})`;
+      d3.fillRect(0, 0, W3, H4);
+      d3.globalCompositeOperation = "destination-out";
+      for (const l of lights) {
+        const r = l.r * (l.flicker ? 0.94 + Math.sin(this.time * 23) * 0.03 + Math.random() * 0.03 : 1);
+        const x = l.x - camX, y = l.y - camY;
+        const g2 = d3.createRadialGradient(x, y, r * 0.15, x, y, r);
+        g2.addColorStop(0, "rgba(0,0,0,1)");
+        g2.addColorStop(0.55, "rgba(0,0,0,0.75)");
+        g2.addColorStop(1, "rgba(0,0,0,0)");
+        d3.fillStyle = g2;
+        d3.fillRect(x - r, y - r, r * 2, r * 2);
+      }
+      d3.globalCompositeOperation = "source-over";
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.drawImage(d3.canvas, 0, 0, W3, H4, 0, 0, W3, H4);
+      c.globalCompositeOperation = "lighter";
+      for (const l of lights) {
+        if (!l.color) continue;
+        const x = l.x - camX, y = l.y - camY;
+        const g2 = c.createRadialGradient(x, y, 0, x, y, l.r);
+        g2.addColorStop(0, l.color);
+        g2.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = g2;
+        c.fillRect(x - l.r, y - l.r, l.r * 2, l.r * 2);
+      }
+      c.restore();
+    }
+    /** 실루엣을 한 색으로 (피격 하얀 번쩍). draw 는 (0,0)~(w,h) 안에 그림을 그린다 */
+    tint(c, x, y, w, h, draw, color, a = 1) {
+      const m = this.m1;
+      fit(m, w, h);
+      draw(m);
+      m.globalCompositeOperation = "source-in";
+      m.fillStyle = color;
+      m.fillRect(0, 0, w, h);
+      c.save();
+      c.globalAlpha *= a;
+      c.drawImage(m.canvas, 0, 0, w, h, x, y, w, h);
+      c.restore();
+    }
+    /** 림라이트: 빛을 향한 가장자리만 밝게. 어두운 층에서 캐릭터가 배경과 갈라져 보이게 한다 */
+    rim(c, x, y, w, h, draw, lx, ly, color = "#ffd9a0", a = 0.9, thick = 3) {
+      const pad = thick + 1;
+      const ww = w + pad * 2, hh = h + pad * 2;
+      const s2 = this.m2, r = this.m1;
+      fit(s2, ww, hh);
+      s2.translate(pad, pad);
+      draw(s2);
+      s2.setTransform(1, 0, 0, 1, 0, 0);
+      fit(r, ww, hh);
+      r.drawImage(s2.canvas, 0, 0, ww, hh, 0, 0, ww, hh);
+      r.globalCompositeOperation = "source-in";
+      r.fillStyle = color;
+      r.fillRect(0, 0, ww, hh);
+      const cx = x + w / 2, cy = y + h / 2;
+      const d3 = Math.hypot(lx - cx, ly - cy) || 1;
+      const dx = (lx - cx) / d3 * thick, dy = (ly - cy) / d3 * thick;
+      r.globalCompositeOperation = "destination-out";
+      r.drawImage(s2.canvas, 0, 0, ww, hh, -dx, -dy, ww, hh);
+      c.save();
+      c.globalAlpha *= a;
+      c.globalCompositeOperation = "lighter";
+      c.drawImage(r.canvas, 0, 0, ww, hh, x - pad, y - pad, ww, hh);
+      c.restore();
+    }
+  };
+  var easeOut = (k) => 1 - (1 - k) * (1 - k);
+  var easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+
+  // src/game/action/ui/keys.ts
+  var CODE = {
+    left: "ArrowLeft",
+    right: "ArrowRight",
+    up: "ArrowUp",
+    down: "ArrowDown",
+    attack: "KeyA",
+    shoot: "KeyS",
+    unique: "KeyD",
+    guard: "KeyQ",
+    ult: "KeyW",
+    interact: "KeyE",
+    jump: "Space",
+    evade: "ShiftLeft",
+    item1: "Digit1",
+    item2: "Digit2",
+    item3: "Digit3",
+    item4: "Digit4",
+    support: "KeyC",
+    map: "KeyZ",
+    auto: "KeyX",
+    menu: "Escape",
+    reload: "KeyR",
+    hitbox: "KeyH"
+  };
+  var ALIAS3 = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
+  var KEY_OF = {
+    ArrowLeft: "ArrowLeft",
+    ArrowRight: "ArrowRight",
+    ArrowUp: "ArrowUp",
+    ArrowDown: "ArrowDown",
+    KeyA: "a",
+    KeyS: "s",
+    KeyD: "d",
+    KeyQ: "q",
+    KeyW: "w",
+    KeyE: "e",
+    KeyC: "c",
+    KeyZ: "z",
+    KeyX: "x",
+    KeyR: "r",
+    KeyH: "h",
+    Space: " ",
+    ShiftLeft: "Shift",
+    Digit1: "1",
+    Digit2: "2",
+    Digit3: "3",
+    Digit4: "4",
+    Escape: "Escape",
+    Tab: "Tab",
+    Enter: "Enter"
+  };
+  var LABEL = {
+    left: "왼쪽",
+    right: "오른쪽",
+    up: "위(안쪽)",
+    down: "아래(앞쪽)·두 번 앉기",
+    attack: "근접 (연타 3타)",
+    shoot: "원거리",
+    unique: "고유기 (짧게·길게)",
+    guard: "가드 (누른 채)",
+    ult: "필살기 (게이지 가득)",
+    interact: "상호작용·줍기",
+    jump: "점프",
+    evade: "짧게 회피 · 누른 채 달리기",
+    item1: "아이템 1",
+    item2: "아이템 2",
+    item3: "아이템 3",
+    item4: "아이템 4",
+    support: "지원 요원 호출",
+    map: "지도",
+    auto: "자동 전환",
+    menu: "메뉴",
+    reload: "재장전",
+    hitbox: "판정 보기"
+  };
+  var KEY_NAME = {
+    left: "←",
+    right: "→",
+    up: "↑",
+    down: "↓",
+    attack: "A",
+    shoot: "S",
+    unique: "D",
+    guard: "Q",
+    ult: "W",
+    interact: "E",
+    jump: "Space",
+    evade: "Shift",
+    item1: "1",
+    item2: "2",
+    item3: "3",
+    item4: "4",
+    support: "C",
+    map: "Z",
+    auto: "X",
+    menu: "Esc",
+    reload: "R",
+    hitbox: "H"
+  };
+  var PAD_BUTTON = {
+    0: "Space",
+    // A 점프
+    1: "KeyE",
+    // B 상호작용
+    2: "KeyA",
+    // X 근접
+    3: "KeyS",
+    // Y 원거리
+    4: "KeyQ",
+    // LB 가드
+    5: "ShiftLeft",
+    // RB 회피·달리기
+    6: "KeyD",
+    // LT 고유기
+    7: "KeyW",
+    // RT 필살기
+    8: "KeyZ",
+    // Back 지도
+    9: "Escape",
+    // Start 메뉴
+    10: "KeyC",
+    // L3 지원
+    11: "KeyR",
+    // R3 재장전 (자동 전환·판정 보기는 메뉴에)
+    12: "Digit1",
+    // 십자 위 아이템 1
+    15: "Digit2",
+    // 십자 오른쪽 아이템 2
+    13: "Digit3",
+    // 십자 아래 아이템 3
+    14: "Digit4"
+    // 십자 왼쪽 아이템 4
+  };
+  var PAD_NAME = {
+    Space: "A",
+    KeyE: "B",
+    KeyA: "X",
+    KeyS: "Y",
+    KeyQ: "LB",
+    ShiftLeft: "RB",
+    KeyD: "LT",
+    KeyW: "RT",
+    KeyZ: "Back",
+    Escape: "Start",
+    KeyC: "L3",
+    KeyR: "R3",
+    KeyX: "메뉴",
+    KeyH: "메뉴",
+    Digit1: "십자↑",
+    Digit2: "십자→",
+    Digit3: "십자↓",
+    Digit4: "십자←",
+    ArrowLeft: "왼쪽 스틱",
+    ArrowRight: "왼쪽 스틱",
+    ArrowUp: "왼쪽 스틱",
+    ArrowDown: "왼쪽 스틱"
+  };
+  var ACTS = Object.keys(CODE);
+  var ACT_OF_CODE = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
+
+  // src/game/action/ui/gamepad.ts
+  var DEAD = 0.3;
+  var PadReader = class {
+    constructor(hub) {
+      this.hub = hub;
+    }
+    connected = "";
+    prev = /* @__PURE__ */ new Map();
+    rumbleOn = true;
+    index = null;
+    setRumble(on) {
+      this.rumbleOn = on;
+    }
+    pad() {
+      if (typeof navigator === "undefined" || !navigator.getGamepads) return null;
+      for (const p of navigator.getGamepads()) if (p && p.connected) return p;
+      return null;
+    }
+    poll() {
+      const p = this.pad();
+      if (!p) {
+        this.connected = "";
+        this.index = null;
+        this.hub.releaseSource("pad");
+        this.prev.clear();
+        return;
+      }
+      if (this.index !== p.index || this.connected !== p.id) {
+        this.hub.releaseSource("pad");
+        this.prev.clear();
+      }
+      this.index = p.index;
+      this.connected = p.id;
+      const want = /* @__PURE__ */ new Map();
+      const set = (code, on) => want.set(code, (want.get(code) ?? false) || on);
+      p.buttons.forEach((b, i) => {
+        const code = PAD_BUTTON[i];
+        if (code) set(code, b.pressed || b.value > 0.5);
+      });
+      let x = p.axes[0] ?? 0, y = p.axes[1] ?? 0;
+      if (Math.hypot(x, y) < DEAD) x = y = 0;
+      this.hub.setAnalog("pad", x, y);
+      set("ArrowLeft", x < -0.45);
+      set("ArrowRight", x > 0.45);
+      set("ArrowUp", y < -0.45);
+      set("ArrowDown", y > 0.45);
+      for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
+      for (const [code, on] of want) {
+        if (on && !this.prev.get(code)) this.hub.press(code, "pad");
+        else if (!on && this.prev.get(code)) this.hub.release(code, "pad");
+        this.prev.set(code, on);
+      }
+    }
+    /** 진동 0~1, ms */
+    rumble(strength, ms) {
+      if (!this.rumbleOn) return;
+      const p = this.pad();
+      p?.vibrationActuator?.playEffect?.("dual-rumble", { duration: ms, strongMagnitude: strength, weakMagnitude: Math.min(1, strength * 1.4) })?.catch?.(() => {
+      });
+    }
+  };
+
+  // src/game/action/ui/input.ts
+  var MARK = "__goeiSynth";
+  var InputHub = class {
+    bySrc = /* @__PURE__ */ new Map([
+      ["kb", /* @__PURE__ */ new Set()],
+      ["touch", /* @__PURE__ */ new Set()],
+      ["pad", /* @__PURE__ */ new Set()]
+    ]);
+    down = /* @__PURE__ */ new Set();
+    edgeDown = /* @__PURE__ */ new Set();
+    edgeUp = /* @__PURE__ */ new Set();
+    since = /* @__PURE__ */ new Map();
+    analog = /* @__PURE__ */ new Map();
+    /** 마지막으로 쓴 입력 장치 (안내 글자 고르기용) */
+    last = "kb";
+    /** 켜면 장치별 입력을 합친 KeyboardEvent만 target에 보낸다 (키보드 원본은 차단). */
+    synth = false;
+    target = null;
+    /** 메뉴가 열려 있으면 게임 입력을 막고 메뉴가 받는다 */
+    capture = null;
+    listeners = [];
+    detach = null;
+    now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+    on(fn2) {
+      this.listeners.push(fn2);
+      return () => this.listeners = this.listeners.filter((f) => f !== fn2);
+    }
+    press(code, src) {
+      code = ALIAS3[code] ?? code;
+      this.last = src;
+      if (this.capture?.(code, true, src)) return;
+      const set = this.bySrc.get(src);
+      if (set.has(code)) return;
+      set.add(code);
+      if (!this.down.has(code)) {
+        this.down.add(code);
+        this.edgeDown.add(code);
+        this.since.set(code, this.now());
+        this.emit(code, true);
+        for (const f of this.listeners) f(code, true, src);
+      }
+    }
+    release(code, src) {
+      code = ALIAS3[code] ?? code;
+      const set = this.bySrc.get(src);
+      if (!set.delete(code)) {
+        this.capture?.(code, false, src);
+        return;
+      }
+      for (const s2 of this.bySrc.values()) if (s2.has(code)) return;
+      this.down.delete(code);
+      this.edgeUp.add(code);
+      this.emit(code, false);
+      for (const f of this.listeners) f(code, false, src);
+    }
+    releaseSource(src) {
+      for (const c of [...this.bySrc.get(src)]) this.release(c, src);
+      this.analog.delete(src);
+    }
+    releaseAll() {
+      for (const s2 of ["kb", "touch", "pad"]) this.releaseSource(s2);
+    }
+    held(code) {
+      return this.down.has(code);
+    }
+    /** 누르고 있던 시간(초). 안 누르면 0 */
+    heldFor(code) {
+      return this.down.has(code) ? (this.now() - (this.since.get(code) ?? this.now())) / 1e3 : 0;
+    }
+    pressed(code) {
+      return this.edgeDown.has(code);
+    }
+    released(code) {
+      return this.edgeUp.has(code);
+    }
+    /** 매 프레임(엔진 틱) 끝에 부른다 */
+    endFrame() {
+      this.edgeDown.clear();
+      this.edgeUp.clear();
+    }
+    setAnalog(src, x, y) {
+      if (x === 0 && y === 0) this.analog.delete(src);
+      else this.analog.set(src, { x, y });
+    }
+    /** 이동 방향 -1~1. 아날로그(스틱)가 있으면 그 값, 없으면 방향키 */
+    axis() {
+      let x = 0, y = 0;
+      for (const a of this.analog.values()) x += a.x, y += a.y;
+      if (x === 0 && y === 0) {
+        x = (this.held("ArrowRight") ? 1 : 0) - (this.held("ArrowLeft") ? 1 : 0);
+        y = (this.held("ArrowDown") ? 1 : 0) - (this.held("ArrowUp") ? 1 : 0);
+      }
+      return { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
+    }
+    emit(code, down2) {
+      if (!this.synth || !this.target || typeof KeyboardEvent === "undefined") return;
+      const ev = new KeyboardEvent(down2 ? "keydown" : "keyup", { code, key: KEY_OF[code] ?? code, bubbles: true, cancelable: true });
+      ev[MARK] = true;
+      this.target.dispatchEvent(ev);
+    }
+    /** 키보드 받기. 글 입력칸에 초점이 있으면 무시한다 */
+    attachKeyboard(el, opts = {}) {
+      this.detach?.();
+      const physical = /* @__PURE__ */ new Set();
+      const onKey = (e) => {
+        const ev = e;
+        if (ev[MARK]) return;
+        const t = ev.target;
+        const editing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
+        if (editing && ev.type === "keydown") return;
+        if (this.synth) ev.stopImmediatePropagation();
+        if (ev.type === "keydown") {
+          if (opts.prevent?.(ev.code) ?? true) ev.preventDefault();
+          if (ev.repeat) return;
+          physical.add(ev.code);
+          this.press(ev.code, "kb");
+        } else {
+          physical.delete(ev.code);
+          const code = ALIAS3[ev.code] ?? ev.code;
+          if (![...physical].some((c) => (ALIAS3[c] ?? c) === code)) this.release(code, "kb");
+        }
+      };
+      const blur = () => {
+        physical.clear();
+        this.releaseAll();
+      };
+      const vis = () => document.hidden && blur();
+      el.addEventListener("keydown", onKey);
+      el.addEventListener("keyup", onKey);
+      window.addEventListener("blur", blur);
+      document.addEventListener("visibilitychange", vis);
+      this.detach = () => {
+        el.removeEventListener("keydown", onKey);
+        el.removeEventListener("keyup", onKey);
+        window.removeEventListener("blur", blur);
+        document.removeEventListener("visibilitychange", vis);
+      };
+    }
+    dispose() {
+      this.detach?.();
+      this.releaseAll();
+    }
+  };
+
+  // src/game/action/ui/menu.ts
+  var esc = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  var focusable = (it) => it.type !== "head" && it.type !== "html" && !(it.type === "button" && it.disabled);
+  var Menu = class {
+    constructor(layer) {
+      this.layer = layer;
+      this.el = document.createElement("div");
+      this.el.className = "mn";
+      layer.append(this.el);
+      this.el.addEventListener("click", (e) => this.click(e));
+      this.el.addEventListener("pointermove", (e) => {
+        const row = e.target.closest("[data-i]");
+        if (row && e.pointerType === "mouse") this.setFocus(Number(row.dataset.i), false);
+      });
+    }
+    stack = [];
+    focus = 0;
+    el;
+    onChange = null;
+    /** 메뉴가 열리고 닫힐 때 (터치 버튼 숨기기 등) */
+    onOpen = null;
+    /** 소리 스레드가 메뉴 이동·결정 소리를 붙일 자리 */
+    onSound = null;
+    get isOpen() {
+      return this.stack.length > 0;
+    }
+    get top() {
+      return this.stack[this.stack.length - 1] ?? null;
+    }
+    open(s2) {
+      this.stack.push(s2);
+      this.focus = this.first();
+      this.render();
+    }
+    replace(s2) {
+      this.stack.pop();
+      this.open(s2);
+    }
+    back() {
+      const s2 = this.top;
+      if (!s2 || s2.noBack) return;
+      this.onSound?.("back");
+      if (s2.back) s2.back();
+      else this.pop();
+    }
+    pop() {
+      this.stack.pop();
+      this.focus = this.first();
+      this.render();
+    }
+    closeAll() {
+      this.stack = [];
+      this.render();
+    }
+    /** 화면 내용이 바뀌면 다시 그린다 (초점 유지) */
+    refresh() {
+      this.render();
+    }
+    first() {
+      const s2 = this.top;
+      if (!s2) return 0;
+      const i = s2.items.findIndex(focusable);
+      return Math.max(0, i);
+    }
+    setFocus(i, sound = true) {
+      if (i === this.focus) return;
+      this.focus = i;
+      if (sound) this.onSound?.("move");
+      this.el.querySelectorAll("[data-i]").forEach((r) => r.classList.toggle("f", Number(r.dataset.i) === i));
+      this.el.querySelector(`[data-i="${i}"]`)?.scrollIntoView({ block: "nearest" });
+    }
+    moveFocus(d3) {
+      const s2 = this.top;
+      if (!s2) return;
+      const n = s2.items.length;
+      let i = this.focus;
+      for (let k = 0; k < n; k++) {
+        i = (i + d3 + n) % n;
+        if (focusable(s2.items[i])) return this.setFocus(i);
+      }
+    }
+    /** 키 하나를 메뉴가 먹으면 true */
+    key(code) {
+      const s2 = this.top;
+      if (!s2) return false;
+      const it = s2.items[this.focus];
+      switch (code) {
+        case "ArrowUp":
+          this.moveFocus(-1);
+          return true;
+        case "ArrowDown":
+          this.moveFocus(1);
+          return true;
+        case "ArrowLeft":
+        case "ArrowRight":
+          if (it) this.adjust(it, code === "ArrowLeft" ? -1 : 1);
+          return true;
+        case "Enter":
+        case "Space":
+        case "NumpadEnter":
+          if (it) this.activate(it);
+          return true;
+        case "Escape":
+        case "Backspace":
+          this.back();
+          return true;
+      }
+      if (s2.numbered && /^Digit[1-9]$/.test(code)) {
+        const n = Number(code.slice(5)) - 1;
+        const btns = s2.items.map((x, i) => [x, i]).filter(([x]) => x.type === "button");
+        const pick6 = btns[n];
+        if (pick6) this.focus = pick6[1], this.activate(pick6[0]);
+        return true;
+      }
+      return true;
+    }
+    adjust(it, d3) {
+      if (it.type === "slider") {
+        const v = Math.max(it.min, Math.min(it.max, Math.round((it.get() + d3 * it.step) / it.step) * it.step));
+        it.set(Number(v.toFixed(3)));
+      } else if (it.type === "toggle") it.set(!it.get());
+      else if (it.type === "choice") {
+        const i = it.options.findIndex(([v]) => v === it.get());
+        it.set(it.options[(i + d3 + it.options.length) % it.options.length][0]);
+      } else return;
+      this.onSound?.("move");
+      this.render();
+      this.onChange?.();
+    }
+    activate(it) {
+      if (it.type === "button") {
+        if (it.disabled) return;
+        this.onSound?.("ok");
+        it.act();
+      } else this.adjust(it, 1);
+    }
+    click(e) {
+      const t = e.target;
+      const row = t.closest("[data-i]");
+      if (t.closest("[data-back]")) return this.back();
+      if (!row) return;
+      const i = Number(row.dataset.i);
+      const it = this.top?.items[i];
+      if (!it) return;
+      this.setFocus(i, false);
+      const step4 = t.closest("[data-step]");
+      if (step4) return this.adjust(it, Number(step4.dataset.step));
+      if (it.type === "slider") {
+        const bar2 = row.querySelector(".mn-bar");
+        if (bar2 && t.closest(".mn-bar")) {
+          const r = bar2.getBoundingClientRect();
+          const k = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+          it.set(Number((it.min + Math.round(k * (it.max - it.min) / it.step) * it.step).toFixed(3)));
+          this.render();
+          this.onChange?.();
+        }
+        return;
+      }
+      const opt = t.closest("[data-opt]");
+      if (opt && it.type === "choice") {
+        it.set(opt.dataset.opt);
+        this.render();
+        this.onChange?.();
+        return;
+      }
+      this.activate(it);
+    }
+    render() {
+      const s2 = this.top;
+      this.layer.classList.toggle("menu-on", !!s2);
+      this.onOpen?.(!!s2);
+      if (!s2) {
+        this.el.innerHTML = "";
+        this.el.className = "mn";
+        return;
+      }
+      this.el.className = `mn on gk-font mn-${s2.look ?? "panel"}`;
+      let bn = 0;
+      const rows = s2.items.map((it, i) => {
+        const f = i === this.focus ? " f" : "";
+        switch (it.type) {
+          case "head":
+            return `<div class="mn-head">${esc(it.label)}</div>`;
+          case "html":
+            return `<div class="mn-html">${it.html}</div>`;
+          case "button": {
+            bn++;
+            const num = s2.numbered ? `<em>${bn}</em>` : "";
+            return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? " danger" : ""}" data-i="${i}" ${it.disabled ? "disabled" : ""}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`;
+          }
+          case "toggle":
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? "on" : ""}"><i></i></b></div>`;
+          case "slider": {
+            const v = it.get();
+            const k = (v - it.min) / (it.max - it.min);
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
+          }
+          case "choice":
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? "on" : ""}">${esc(l)}</b>`).join("")}</span></div>`;
+        }
+      }).join("");
+      const back = s2.noBack || s2.look === "title" ? "" : `<button type="button" class="mn-x" data-back aria-label="뒤로">✕</button>`;
+      const title2 = s2.look === "title" ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc(s2.title ?? "")}</b><span>${esc(s2.sub ?? "")}</span></div>` : s2.title ? `<h2>${esc(s2.title)}</h2>${s2.sub ? `<p class="mn-sub">${esc(s2.sub)}</p>` : ""}` : "";
+      this.el.innerHTML = `<div class="mn-box${s2.look === "title" ? "" : " gk-panel"}">${back}${title2}<div class="mn-list">${rows}</div></div>`;
+      this.el.querySelector(".f")?.scrollIntoView({ block: "nearest" });
+    }
+    dispose() {
+      this.el.remove();
+    }
+  };
+  function choiceScreen(menu, o, pick6) {
+    return {
+      id: "choice",
+      look: "dialog",
+      numbered: true,
+      title: o.title,
+      noBack: o.cancel === false,
+      back: () => pick6(-1),
+      items: [
+        ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc(l)}</p>`).join("") }] : [],
+        ...o.options.map((label3, i) => ({ type: "button", label: label3, act: () => pick6(i) }))
+      ]
+    };
+  }
+
+  // src/game/action/ui/settings.ts
+  var DEFAULT_SETTINGS2 = {
+    crt: false,
+    shake: 1,
+    flash: true,
+    bright: 1,
+    pixel: true,
+    master: 0.8,
+    music: 0.7,
+    sfx: 0.9,
+    touch: "auto",
+    touchSize: 1,
+    touchAlpha: 0.55,
+    stickRun: true,
+    lefty: false,
+    vibrate: true,
+    numbers: true,
+    talkModel: "main",
+    talkRecent: false
+  };
+  var KEY = "goei-game-ui:v1";
+  var localStore = {
+    load() {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    },
+    save(text2) {
+      try {
+        localStorage.setItem(KEY, text2);
+      } catch {
+      }
+    }
+  };
+  function parseSettings(text2) {
+    const s2 = { ...DEFAULT_SETTINGS2 };
+    if (!text2) return s2;
+    try {
+      const o = JSON.parse(text2);
+      for (const k of Object.keys(s2)) {
+        const v = o[k];
+        if (v !== void 0 && typeof v === typeof s2[k]) s2[k] = v;
+      }
+    } catch {
+    }
+    return s2;
+  }
+
+  // src/game/action/ui/touch.ts
+  var CLUSTER = [
+    { id: "attack", code: "KeyA", label: "공격", key: "A", dx: 0, dy: 0, d: 1.45 },
+    { id: "jump", code: "Space", label: "점프", key: "Spc", dx: -1.6, dy: 0.15, d: 1.05 },
+    { id: "shoot", code: "KeyS", label: "사격", key: "S", dx: -1.15, dy: -1.15, d: 1.05 },
+    { id: "unique", code: "KeyD", label: "고유", key: "D", dx: 0.05, dy: -1.6, d: 1.05 },
+    { id: "evade", code: "ShiftLeft", label: "회피", key: "Shift", dx: -2.85, dy: 0.3, d: 1 },
+    { id: "guard", code: "KeyQ", label: "가드", key: "Q", dx: -2.55, dy: -1.35, d: 0.95 },
+    { id: "interact", code: "KeyE", label: "조사", key: "E", dx: -1.55, dy: -2.5, d: 0.95 },
+    { id: "ult", code: "KeyW", label: "필살", key: "W", dx: 0.2, dy: -2.85, d: 1 },
+    { id: "reload", code: "KeyR", label: "장전", key: "R", dx: -3.75, dy: -0.6, d: 0.7 },
+    { id: "support", code: "KeyC", label: "지원", key: "C", dx: -2.75, dy: -2.65, d: 0.7 }
+  ];
+  var TouchPad = class {
+    constructor(layer, hub, st, onMenu) {
+      this.layer = layer;
+      this.hub = hub;
+      this.st = st;
+      this.onMenu = onMenu;
+      this.root = document.createElement("div");
+      this.root.className = "tp gk-font";
+      this.root.innerHTML = `<div class="tp-zone"><div class="tp-base"><div class="tp-knob"></div></div></div>`;
+      this.zone = this.root.querySelector(".tp-zone");
+      this.base = this.root.querySelector(".tp-base");
+      this.knob = this.root.querySelector(".tp-knob");
+      const mk = (b, cls) => {
+        const el = document.createElement("div");
+        const plate2 = TOUCH_IMG[cls === "item" ? "slot" : b.id];
+        el.className = `tp-b ${plate2 ? "pl" : "gk-slot"} ${cls}`;
+        el.dataset.id = b.id;
+        el.innerHTML = `<b>${b.label}</b><i>${b.key}</i>`;
+        if (plate2) el.style.backgroundImage = `url("${plate2}")`;
+        this.root.append(el);
+        b.el = el;
+        this.btns.push(b);
+      };
+      for (const b of CLUSTER) mk({ ...b, group: "cluster" }, b.id === "attack" ? "big" : b.d < 0.8 ? "small" : "");
+      for (let i = 0; i < 4; i++) mk({ id: `item${i + 1}`, code: `Digit${i + 1}`, label: "", key: String(i + 1), dx: 0, dy: 0, d: 0.78, group: "items" }, "item");
+      mk({ id: "map", code: "KeyZ", label: "지도", key: "Z", dx: 0, dy: 0, d: 0.62, group: "top" }, "top");
+      mk({ id: "menu", code: "Escape", label: "메뉴", key: "Esc", dx: 0, dy: 0, d: 0.62, group: "top" }, "top");
+      const ring = document.createElement("div");
+      ring.className = "tp-ring";
+      this.btns.find((b) => b.id === "ult").el.append(ring);
+      layer.append(this.root);
+      const opt = { passive: false };
+      this.root.addEventListener("pointerdown", (e) => this.down(e), opt);
+      this.root.addEventListener("pointermove", (e) => this.move(e), opt);
+      this.root.addEventListener("pointerup", (e) => this.up(e), opt);
+      this.root.addEventListener("pointercancel", (e) => this.up(e), opt);
+      this.root.addEventListener("lostpointercapture", (e) => this.up(e), opt);
+      window.addEventListener("pointerup", this.onPointerEnd);
+      window.addEventListener("pointercancel", this.onPointerEnd);
+      window.addEventListener("blur", this.onBlur);
+      document.addEventListener("visibilitychange", this.onVisibility);
+      this.root.addEventListener("contextmenu", (e) => e.preventDefault());
+      window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
+      this.layout();
+    }
+    root;
+    btns = [];
+    zone;
+    base;
+    knob;
+    ptr = /* @__PURE__ */ new Map();
+    count = /* @__PURE__ */ new Map();
+    stickPid = null;
+    sx = 0;
+    sy = 0;
+    dirOn = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false };
+    runOn = false;
+    runSince = 0;
+    runTimer = 0;
+    u = 64;
+    /** 스틱 받침 반지름과 쉴 때 자리(바깥 가장자리에서) */
+    sr = 64;
+    restX = 64 * 1.55;
+    restY = 64;
+    /** 스틱 자리 (층 기준 px) */
+    zr = { x: 0, y: 0, w: 0, h: 0 };
+    /** 화면 좌표 → 층 좌표. 리스 플러그인 창이 게임을 90도 돌릴 때 bridge.viewport.toLocal 을 넣는다 */
+    /** 캔버스 논리 폭 (채우기면 1280 보다 넓다) */
+    vw = () => 1280;
+    toLocal = null;
+    visible = false;
+    seenTouch = false;
+    iconRedraw = 2400;
+    onPointerEnd = (e) => this.up(e);
+    onBlur = () => this.releaseAll();
+    onVisibility = () => {
+      if (document.hidden) this.releaseAll();
+    };
+    onAnyTouch = () => {
+      if (!this.seenTouch) {
+        this.seenTouch = true;
+        if (!this.shown) this.refresh();
+      }
+    };
+    /** 설정·화면 크기가 바뀌면 다시 배치 */
+    layout() {
+      this.releaseAll();
+      const s2 = this.st();
+      const bw = this.layer.clientWidth || 800, bh = this.layer.clientHeight || 400;
+      const portrait = bh > bw * 1.05;
+      const vw = this.vw();
+      const scale = Math.min(bw / vw, bh / 720);
+      const stageW = vw * scale, stageBottom = portrait ? portraitTop(bh, 720 * scale) + 720 * scale : (bh + 720 * scale) / 2;
+      if (!portrait) return this.layoutSide(bw, bh, (bw - stageW) / 2);
+      this.u = (portrait ? Math.max(42, Math.min(70, bw * 0.135)) : Math.max(44, Math.min(86, Math.min(bw, bh) * 0.155))) * s2.touchSize;
+      const u = this.u;
+      const flip = s2.lefty ? -1 : 1;
+      this.root.style.setProperty("--tp-u", `${u}px`);
+      this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+      this.root.classList.remove("tp-float", "tp-side");
+      for (const b of this.btns) b.hw = void 0, b.hh = void 0;
+      this.sr = u;
+      this.restX = u * 1.55;
+      this.restY = u;
+      this.root.style.setProperty("--tp-r", `${u}px`);
+      const safeB = 10, safeS = 14;
+      const ax = s2.lefty ? safeS + u * 0.8 : bw - safeS - u * 0.8;
+      const ay = bh - safeB - u * 0.85;
+      const squeeze = portrait ? 0.8 : 1;
+      const rowBtns = portrait ? ["item1", "item2", "item3", "item4", "reload", "support"] : ["item1", "item2", "item3", "item4"];
+      const side = (bw - stageW) / 2;
+      const topInSide = !portrait && side >= u * 0.75;
+      for (const b of this.btns) {
+        let cx = 0, cy = 0;
+        const ri = rowBtns.indexOf(b.id);
+        if (ri >= 0) {
+          const gap = u * (portrait ? 0.95 : 0.92);
+          cx = bw / 2 + (ri - (rowBtns.length - 1) / 2) * gap;
+          cy = portrait ? Math.max(stageBottom + 10 + u * 0.4, ay - 3.3 * u) : bh - safeB - u * 0.45;
+        } else if (b.group === "cluster") cx = ax + b.dx * u * flip * squeeze, cy = ay + b.dy * u * squeeze;
+        else {
+          const i = b.id === "menu" ? 0 : 1;
+          if (topInSide) {
+            cx = s2.lefty ? side / 2 : bw - side / 2;
+            cy = 12 + u * 0.35 + i * u * 0.8;
+          } else {
+            cx = bw / 2 + (i === 0 ? 0.4 : -0.4) * u;
+            cy = (portrait ? 10 : 8) + u * 0.32;
+          }
+        }
+        const d3 = ri >= 0 ? 0.8 : b.d;
+        const r = d3 * u / 2;
+        Object.assign(b, { cx, cy, r });
+        const el = b.el;
+        el.style.width = el.style.height = `${r * 2}px`;
+        el.style.transform = `translate(${cx - r}px, ${cy - r}px)`;
+      }
+      const clusterW = u * (portrait ? 3.6 : 4.4);
+      const zw = portrait ? Math.max(u * 2.4, bw - clusterW - safeS * 2) : bw * 0.45;
+      const zt = portrait ? stageBottom + 10 : bh * 0.22;
+      this.zr = { x: s2.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+      Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+      this.restBase();
+    }
+    /** 가로 화면: 좌우 검은 띠를 먼저 쓴다. 오른쪽 띠 = 공격·점프·회피·사격·고유·필살, 그 안쪽 아래 = 가드·조사·장전·지원,
+     *  왼쪽 띠 = 메뉴·지도·아이템 1~4, 왼쪽 아래 = 스틱. 플레이어가 서는 바닥 가운데는 비운다 */
+    /** 가로 화면: 버튼을 전부 좌우 검은 띠 안에 둔다(놀이판을 덮지 않게).
+     *  오른쪽 띠(위→아래) = 필살·고유·사격·가드·회피·조사·점프·공격(크게), 왼쪽 띠 = 메뉴·지도·아이템 1~4·장전·지원.
+     *  스틱은 왼쪽 아래 어디를 눌러도 그 자리에 나타나고, 쉬는 동안은 그리지 않는다 */
+    layoutSide(bw, bh, side) {
+      const s2 = this.st();
+      const g2 = 4, edge2 = 6;
+      const right = ["ult", "unique", "shoot", "guard", "evade", "interact", "jump", "attack"];
+      const left = ["menu", "map", "item1", "item2", "item3", "item4", "reload", "support"];
+      const wR = [1, 1, 1, 1, 1, 1, 1, 1.25];
+      const sum = wR.reduce((a, v) => a + v, 0);
+      const unit = Math.max(36, Math.min((bh - 2 * edge2 - (right.length - 1) * g2) / sum, side > 40 ? side - 8 : 999, 70)) * s2.touchSize;
+      this.u = unit / 0.88;
+      const u = this.u;
+      this.root.style.setProperty("--tp-u", `${u}px`);
+      this.root.style.setProperty("--tp-a", String(s2.touchAlpha));
+      const colR = side >= unit * 1.25 ? bw - side / 2 : bw - edge2 - unit * 1.25 / 2;
+      const colL = side >= unit ? side / 2 : edge2 + unit / 2;
+      const mir = (x) => s2.lefty ? bw - x : x;
+      const bwid = Math.max(unit, Math.min(side - 8, unit * 1.7));
+      const place3 = (id, cx, cy, dpx) => {
+        const b = this.btns.find((x) => x.id === id);
+        const hh = dpx / 2, hw = bwid / 2;
+        cx = mir(cx);
+        Object.assign(b, { cx, cy, r: Math.max(hw, hh), hw, hh });
+        const el = b.el;
+        el.style.width = `${hw * 2}px`;
+        el.style.height = `${hh * 2}px`;
+        el.style.transform = `translate(${cx - hw}px, ${cy - hh}px)`;
+      };
+      const column = (ids, x, w) => {
+        const total = w.reduce((a, v) => a + v * unit, 0) + (ids.length - 1) * g2;
+        let y = Math.max(edge2, (bh - total) / 2);
+        ids.forEach((id, i) => {
+          const d3 = w[i] * unit;
+          place3(id, x, y + d3 / 2, d3);
+          y += d3 + g2;
+        });
+      };
+      column(right, colR, wR);
+      column(left, colL, left.map(() => 1));
+      const zw = bw * 0.42, zt = bh * 0.3;
+      this.zr = { x: s2.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+      Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+      this.sr = u * 0.82;
+      this.root.style.setProperty("--tp-r", `${this.sr}px`);
+      this.restX = side + this.sr + 30;
+      this.restY = edge2 + this.sr + 20;
+      this.root.classList.add("tp-float", "tp-side");
+      this.restBase();
+    }
+    restBase() {
+      const s2 = this.st();
+      const zr = this.zr;
+      const x = s2.lefty ? zr.w - this.restX : this.restX;
+      const y = zr.h - this.restY;
+      this.placeBase(x, y);
+      this.knob.style.transform = "";
+      this.base.classList.remove("on");
+    }
+    placeBase(x, y) {
+      this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
+      this.baseX = x;
+      this.baseY = y;
+    }
+    baseX = 0;
+    baseY = 0;
+    refresh() {
+      const s2 = this.st();
+      const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+      const show = s2.touch === "on" || s2.touch === "auto" && (coarse || this.seenTouch);
+      this.root.classList.toggle("hide", !show || !this.visible);
+      this.layout();
+    }
+    setVisible(on) {
+      if (this.visible === on) return;
+      this.visible = on;
+      if (!on) this.releaseAll();
+      this.refresh();
+    }
+    get shown() {
+      return !this.root.classList.contains("hide");
+    }
+    /** 아이템 칸: 글자 대신 아이콘 + 개수 */
+    setItems(items) {
+      items.forEach((it, i) => {
+        const b = this.btns.find((x) => x.id === `item${i + 1}`);
+        if (!b?.el) return;
+        const key2 = `${it.id ?? ""}|${it.label}`;
+        const fresh = b.el.dataset.icon !== key2;
+        if (fresh) {
+          b.el.dataset.icon = key2;
+          b.el.innerHTML = `<canvas width="64" height="64"></canvas><i>${i + 1}</i><u></u>`;
+        }
+        if (fresh || this.iconRedraw-- > 0) {
+          const cv = b.el.querySelector("canvas");
+          const g2 = cv.getContext("2d");
+          if (g2) {
+            g2.clearRect(0, 0, 64, 64);
+            g2.imageSmoothingEnabled = false;
+            if (it.label || it.id) drawHudItemIcon(g2, it, 0, 0, 64);
+          }
+        }
+        const u = b.el.querySelector("u");
+        const n = it.label || it.id ? String(it.count) : "";
+        if (u.textContent !== n) u.textContent = n;
+        b.el.classList.toggle("empty", it.count <= 0);
+      });
+    }
+    /** 필살 게이지 0~1 */
+    setGauge(v) {
+      const b = this.btns.find((x) => x.id === "ult").el;
+      b.style.setProperty("--g", String(Math.max(0, Math.min(1, v))));
+      b.classList.toggle("full", v >= 1);
+      if (TOUCH_IMG.ult_ready) b.style.backgroundImage = `url("${TOUCH_IMG[v >= 1 ? "ult_ready" : "ult"]}")`;
+    }
+    /** 버튼 강조 (조사할 것이 있을 때 E, 탄이 적을 때 R 등) */
+    hint(id, on) {
+      this.btns.find((x) => x.id === id)?.el?.classList.toggle("hint", on);
+    }
+    hit(x, y) {
+      let best = null, bd = Infinity;
+      for (const b of this.btns) {
+        if (this.root.closest(".exploration-map") && b.id !== "map" && b.id !== "menu") continue;
+        if (b.hw) {
+          const d4 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
+          if (d4 < 1 && d4 < bd) best = b, bd = d4;
+          continue;
+        }
+        const d3 = Math.hypot(x - b.cx, y - b.cy);
+        const lim = b.r * (b.group === "cluster" ? 1.18 : 1.05);
+        if (d3 < lim && d3 / b.r < bd) best = b, bd = d3 / b.r;
+      }
+      return best;
+    }
+    local(e) {
+      if (this.toLocal) return this.toLocal(e.clientX, e.clientY, this.layer);
+      const r = this.layer.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    hold(b, on) {
+      const n = (this.count.get(b.code) ?? 0) + (on ? 1 : -1);
+      this.count.set(b.code, Math.max(0, n));
+      b.el.classList.toggle("on", n > 0);
+      if (b.code === "Escape" || b.code === "KeyZ") {
+        if (on && n === 1) {
+          this.releaseAll();
+          this.onMenu(b.code);
+        }
+        return;
+      }
+      if (on && n === 1) {
+        this.hub.press(b.code, "touch");
+        if (this.st().vibrate) navigator.vibrate?.(8);
+      } else if (!on && n <= 0) this.hub.release(b.code, "touch");
+    }
+    down(e) {
+      if (!this.shown || e.pointerType === "mouse" && e.button !== 0) return;
+      e.preventDefault();
+      const p = this.local(e);
+      const b = this.hit(p.x, p.y);
+      try {
+        this.root.setPointerCapture(e.pointerId);
+      } catch {
+      }
+      if (b) {
+        this.ptr.set(e.pointerId, { kind: "btn", b });
+        this.hold(b, true);
+        return;
+      }
+      if (this.root.closest(".exploration-map")) return;
+      const zr = this.zr;
+      const zx = p.x - zr.x, zy = p.y - zr.y;
+      if (this.stickPid === null && zx >= 0 && zy >= 0 && zx <= zr.w && zy <= zr.h) {
+        this.stickPid = e.pointerId;
+        this.ptr.set(e.pointerId, { kind: "stick" });
+        this.placeBase(zx, zy);
+        this.base.classList.add("on");
+        this.stickTo(zx, zy);
+      }
+    }
+    move(e) {
+      const st = this.ptr.get(e.pointerId);
+      if (!st) return;
+      e.preventDefault();
+      const p = this.local(e);
+      if (p.x < 0 || p.y < 0 || p.x >= this.layer.clientWidth || p.y >= this.layer.clientHeight) {
+        this.up(e);
+        return;
+      }
+      if (st.kind === "stick") {
+        this.stickTo(p.x - this.zr.x, p.y - this.zr.y);
+        return;
+      }
+      const b = this.hit(p.x, p.y);
+      if (b !== st.b) {
+        if (st.b) this.hold(st.b, false);
+        st.b = b;
+        if (b) this.hold(b, true);
+      }
+    }
+    up(e) {
+      const st = this.ptr.get(e.pointerId);
+      if (!st) return;
+      this.ptr.delete(e.pointerId);
+      if (this.root.hasPointerCapture(e.pointerId)) this.root.releasePointerCapture(e.pointerId);
+      if (st.kind === "btn") {
+        if (st.b) this.hold(st.b, false);
+      } else {
+        this.stickPid = null;
+        this.setStick(0, 0);
+        this.restBase();
+      }
+    }
+    stickTo(x, y) {
+      const R = this.sr * 0.95;
+      let dx = x - this.baseX, dy = y - this.baseY;
+      const m = Math.hypot(dx, dy);
+      if (m > R * 1.5) {
+        const k = (m - R * 1.5) / m;
+        this.placeBase(this.baseX + dx * k, this.baseY + dy * k);
+        dx = x - this.baseX;
+        dy = y - this.baseY;
+      }
+      const mm = Math.hypot(dx, dy);
+      const cl = mm > R ? R / mm : 1;
+      this.knob.style.transform = `translate(${dx * cl}px, ${dy * cl}px)`;
+      let nx = dx * cl / R, ny = dy * cl / R;
+      if (Math.hypot(nx, ny) < 0.18) nx = ny = 0;
+      this.setStick(nx, ny);
+    }
+    setStick(x, y) {
+      this.sx = x;
+      this.sy = y;
+      this.hub.setAnalog("touch", x, y);
+      const dir = (code, v) => {
+        if (this.dirOn[code] === v) return;
+        this.dirOn[code] = v;
+        if (v) this.hub.press(code, "touch");
+        else this.hub.release(code, "touch");
+      };
+      const th = (on) => on ? 0.3 : 0.42;
+      dir("ArrowLeft", x < -th(this.dirOn.ArrowLeft));
+      dir("ArrowRight", x > th(this.dirOn.ArrowRight));
+      dir("ArrowUp", y < -th(this.dirOn.ArrowUp) * 1.15);
+      dir("ArrowDown", y > th(this.dirOn.ArrowDown) * 1.15);
+      const wantRun = this.st().stickRun && Math.abs(x) > 0.9;
+      const shiftBtn = this.btns.find((b) => b.code === "ShiftLeft");
+      if (wantRun && !this.runOn) {
+        this.runOn = true;
+        this.runSince = performance.now();
+        const pending = this.runTimer !== 0;
+        clearTimeout(this.runTimer);
+        this.runTimer = 0;
+        if (!pending) this.hold(shiftBtn, true);
+      } else if (!wantRun && this.runOn) {
+        this.runOn = false;
+        const left = 250 - (performance.now() - this.runSince);
+        clearTimeout(this.runTimer);
+        this.runTimer = 0;
+        if (left > 0) this.runTimer = window.setTimeout(() => {
+          this.runTimer = 0;
+          this.hold(shiftBtn, false);
+        }, left);
+        else this.hold(shiftBtn, false);
+      }
+    }
+    releaseAll() {
+      const ids = [...this.ptr.keys()];
+      this.ptr.clear();
+      for (const id of ids) if (this.root.hasPointerCapture(id)) this.root.releasePointerCapture(id);
+      clearTimeout(this.runTimer);
+      this.runTimer = 0;
+      this.runOn = false;
+      this.stickPid = null;
+      this.setStick(0, 0);
+      this.count.clear();
+      for (const b of this.btns) b.el.classList.remove("on");
+      this.hub.releaseSource("touch");
+      this.restBase();
+    }
+    dispose() {
+      window.removeEventListener("pointerup", this.onPointerEnd);
+      window.removeEventListener("pointercancel", this.onPointerEnd);
+      window.removeEventListener("blur", this.onBlur);
+      document.removeEventListener("visibilitychange", this.onVisibility);
+      window.removeEventListener("touchstart", this.onAnyTouch, { capture: true });
+      this.releaseAll();
+      this.root.remove();
+    }
+  };
+
+  // src/game/action/ui/index.ts
+  function mountGameShell(box2, o = {}) {
+    const stage = mountStage(box2);
+    const input = new InputHub();
+    input.synth = !!o.synth;
+    input.target = o.keyTarget ?? window;
+    const pad = new PadReader(input);
+    const hud = new Hud();
+    const fx2 = new Fx();
+    fx2.rumble = (s2, ms) => pad.rumble(s2, ms);
+    const menu = new Menu(stage.ui);
+    const store2 = o.store ?? localStore;
+    let settings = { ...DEFAULT_SETTINGS2 };
+    const tap = (code) => {
+      input.press(code, "touch");
+      setTimeout(() => input.release(code, "touch"), 90);
+    };
+    const touch2 = new TouchPad(stage.touch, input, () => settings, (code) => {
+      if (code === "Escape") shell.openPause();
+      else tap(code);
+    });
+    touch2.vw = () => stage.vw;
+    touch2.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
+    if (o.fill) stage.setFit("fill");
+    const apply = () => {
+      stage.setCrt(settings.crt);
+      stage.setBright(settings.bright);
+      stage.setPixel(settings.pixel);
+      fx2.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
+      pad.setRumble(settings.vibrate);
+      touch2.refresh();
+    };
+    const saveSettings = () => void store2.save(JSON.stringify(settings));
+    menu.onChange = () => {
+      apply();
+      saveSettings();
+    };
+    menu.onOpen = (open) => {
+      if (open) input.releaseSource("kb"), input.releaseSource("pad");
+      touch2.setVisible(!open && shell.mode === "play");
+    };
+    input.capture = (code, down2) => {
+      if (!menu.isOpen) {
+        if (code === "Escape" && shell.mode === "play") {
+          if (down2) shell.openPause();
+          return true;
+        }
+        return false;
+      }
+      if (!down2) return true;
+      menu.key(code === "KeyE" && input.last === "pad" ? "Escape" : code === "KeyA" && input.last === "pad" ? "Enter" : code);
+      return true;
+    };
+    input.attachKeyboard(o.keyTarget ?? window, {
+      prevent: (code) => code.startsWith("Arrow") || code === "Space" || code === "Tab" || code === "Escape" || /^Key|^Digit|^Shift/.test(code)
+    });
+    stage.onResize(() => touch2.layout());
+    const controlsHtml = () => {
+      const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
+        const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
+        const pd = PAD_NAME[CODE[a]] ?? "";
+        const tc = a === "left" ? "왼쪽 스틱" : a === "menu" ? "☰" : a === "auto" || a === "hitbox" ? "메뉴" : a.startsWith("item") ? "아래 칸" : a === "evade" ? "회피 (스틱 끝 = 달리기)" : "버튼";
+        return `<tr><td>${esc(a === "left" ? "이동 (좌우 + 안쪽·앞쪽)" : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
+      }).join("");
+      return `<table><tr><th>행동</th><th>키보드</th><th>게임패드</th><th>터치</th></tr>${rows}</table><p style="margin-top:10px">Shift 를 0.15초 안에 떼면 회피, 누르고 있으면 달리기. 같은 방향 두 번도 달리기. ↓ 두 번 앉기.</p>`;
+    };
+    const settingsItems = () => {
+      const s2 = settings;
+      const pct = (v) => `${Math.round(v * 100)}%`;
+      return [
+        { type: "head", label: "화면" },
+        { type: "toggle", label: "CRT 필터 (주사선·모서리)", get: () => s2.crt, set: (v) => s2.crt = v },
+        { type: "slider", label: "화면 흔들림", get: () => s2.shake, set: (v) => s2.shake = v, min: 0, max: 1, step: 0.25, fmt: pct },
+        { type: "toggle", label: "피격 섬광", get: () => s2.flash, set: (v) => s2.flash = v },
+        { type: "toggle", label: "피해 숫자", get: () => s2.numbers, set: (v) => s2.numbers = v },
+        { type: "slider", label: "밝기", get: () => s2.bright, set: (v) => s2.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
+        { type: "toggle", label: "도트 선명하게", get: () => s2.pixel, set: (v) => s2.pixel = v },
+        { type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() },
+        { type: "head", label: "소리" },
+        { type: "slider", label: "전체", get: () => s2.master, set: (v) => s2.master = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "slider", label: "음악", get: () => s2.music, set: (v) => s2.music = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "slider", label: "효과음", get: () => s2.sfx, set: (v) => s2.sfx = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "head", label: "조작" },
+        { type: "choice", label: "터치 버튼", options: [["auto", "자동"], ["on", "항상"], ["off", "끄기"]], get: () => s2.touch, set: (v) => s2.touch = v },
+        { type: "slider", label: "버튼 크기", get: () => s2.touchSize, set: (v) => s2.touchSize = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
+        { type: "slider", label: "버튼 진하기", get: () => s2.touchAlpha, set: (v) => s2.touchAlpha = v, min: 0.3, max: 1, step: 0.05, fmt: pct },
+        { type: "toggle", label: "스틱 끝까지 밀면 달리기", get: () => s2.stickRun, set: (v) => s2.stickRun = v },
+        { type: "toggle", label: "왼손 배치", get: () => s2.lefty, set: (v) => s2.lefty = v },
+        { type: "toggle", label: "진동", get: () => s2.vibrate, set: (v) => s2.vibrate = v },
+        { type: "head", label: "대화" },
+        { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s2.talkModel, set: (v) => s2.talkModel = v },
+        { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s2.talkRecent, set: (v) => s2.talkRecent = v },
+        { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
+        { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS2 }, apply(), saveSettings(), menu.replace(settingsScreen())) }
+      ];
+    };
+    const settingsScreen = () => ({ id: "settings", title: "설정", items: settingsItems() });
+    let mode = "title";
+    const shell = {
+      stage,
+      canvas: stage.canvas,
+      ctx: stage.ctx,
+      input,
+      pad,
+      touch: touch2,
+      hud,
+      fx: fx2,
+      menu,
+      get settings() {
+        return settings;
+      },
+      get mode() {
+        return mode;
+      },
+      set mode(m) {
+        mode = m;
+        touch2.setVisible(m === "play" && !menu.isOpen);
+      },
+      get paused() {
+        return menu.isOpen || mode !== "play";
+      },
+      get touchShown() {
+        return touch2.shown;
+      },
+      frame(dt) {
+        pad.poll();
+        fx2.update(dt);
+      },
+      play() {
+        menu.closeAll();
+        shell.mode = "play";
+        stage.root.focus({ preventScroll: true });
+      },
+      openTitle() {
+        shell.mode = "title";
+        menu.closeAll();
+        const has = o.hasSave?.() ?? false;
+        menu.open({
+          id: "title",
+          look: "title",
+          title: o.title ?? "차원 승강기",
+          sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
+          noBack: true,
+          items: [
+            ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
+            { type: "button", label: "새로 시작", act: () => o.onNew?.() },
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() }
+          ]
+        });
+      },
+      openPause() {
+        if (menu.isOpen) return;
+        const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+        const kb = !coarse && (!hud.last?.device || hud.last.device === "kb");
+        const key2 = (k) => kb ? k : void 0;
+        menu.open({
+          id: "pause",
+          title: "일시정지",
+          sub: o.pauseInfo?.() ?? "",
+          items: [
+            ...hud.last ? [{ type: "html", html: statusHtml(hud.last) }] : [],
+            { type: "button", label: "계속", sub: key2("Esc"), act: () => menu.closeAll() },
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() },
+            { type: "button", label: "자동 전환", sub: key2("X"), act: () => (menu.closeAll(), tap("KeyX")) },
+            { type: "button", label: "판정 보기", sub: key2("H"), act: () => (menu.closeAll(), tap("KeyH")) },
+            ...o.onRetreat ? [{ type: "button", label: "출동 포기 · 긴급 철수", sub: "안전 귀환은 다락방 로프", danger: true, act: () => void shell.confirm("출동을 포기하고 철수할까요? 안전 귀환보다 회수 보상이 줄어듭니다.", "철수", "계속 싸운다").then((y) => y && (menu.closeAll(), o.onRetreat())) }] : [],
+            { type: "button", label: "타이틀로", act: () => void shell.confirm("타이틀로 나갈까요? 이어하기는 마지막 안전 지점부터입니다. 전투 중 얻거나 사용한 물품·체력도 그 시점으로 돌아갑니다.").then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) }
+          ]
+        });
+      },
+      openSettings() {
+        menu.open(settingsScreen());
+      },
+      openControls() {
+        menu.open({ id: "controls", title: "조작법", look: "wide", items: [{ type: "html", html: controlsHtml() }, { type: "button", label: "닫기", act: () => menu.pop() }] });
+      },
+      choose(c) {
+        return new Promise((res) => {
+          menu.open(
+            choiceScreen(menu, c, (i) => {
+              menu.pop();
+              res(i);
+            })
+          );
+        });
+      },
+      confirm(text2, yes = "예", no = "아니오") {
+        return new Promise((res) => {
+          menu.open({
+            id: "confirm",
+            title: "확인",
+            back: () => (menu.pop(), res(false)),
+            items: [
+              { type: "html", html: `<p>${esc(text2)}</p>` },
+              { type: "button", label: yes, act: () => (menu.pop(), res(true)) },
+              { type: "button", label: no, act: () => (menu.pop(), res(false)) }
+            ]
+          });
+        });
+      },
+      info(title2, lines3, button = "확인") {
+        return new Promise((res) => {
+          menu.open({
+            id: "info",
+            title: title2,
+            look: "wide",
+            back: () => (menu.pop(), res()),
+            items: [{ type: "html", html: lines3.map((l) => `<p>${esc(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
+          });
+        });
+      },
+      tap,
+      saveSettings,
+      dispose() {
+        input.dispose();
+        touch2.dispose();
+        menu.dispose();
+        stage.dispose();
+      }
+    };
+    void (async () => {
+      settings = parseSettings(await store2.load());
+      apply();
+    })();
+    apply();
+    return shell;
+  }
+
+  // src/game/action/hq/state.ts
+  var HQ_SCHEMA = "goei-hq/1";
+  var agentRecord = () => ({ xp: 0, fatigue: 0, injured: 0, runs: 0, deepest: 0, seenLevel: 1 });
+  function newSave() {
+    return {
+      schema: HQ_SCHEMA,
+      day: 1,
+      runs: 0,
+      x: 200,
+      currencies: { budget: 200, research: 0, teeth: 0 },
+      agents: { jyaldi: agentRecord(), eileen: agentRecord() },
+      selected: "jyaldi",
+      support: null,
+      stash: { medkit: 1, salt: 1 },
+      loadout: [{ id: "medkit", n: 2 }, { id: "bandage", n: 1 }, { id: "flash", n: 1 }, null],
+      relicsOwned: [],
+      relics: [null, null],
+      coffee: null,
+      researchDone: [],
+      appraisal: [],
+      rulebook: [],
+      deepest: 0,
+      missionsDone: [],
+      mission: null,
+      deadlines: {},
+      failedRescues: [],
+      danger: 0,
+      maxDanger: 0,
+      flags: { firstRun: false, firstRecovery: false, firstAppraisal: false, firstSuppress: false, firstRescue: false },
+      album: [],
+      storyFlags: {},
+      decor: [],
+      rescued: [],
+      interviewed: [],
+      lostRelics: [],
+      last: null,
+      active: null,
+      records: { bestFloors: 0, bestKills: 0, fastestReturn: 0 }
+    };
+  }
+  function parseSave(text2) {
+    if (!text2) return null;
+    let d3;
+    try {
+      d3 = JSON.parse(text2);
+    } catch {
+      return null;
+    }
+    if (!d3 || typeof d3 !== "object" || d3.schema !== HQ_SCHEMA) return null;
+    const base2 = newSave();
+    const out = { ...base2, ...d3 };
+    out.currencies = { ...base2.currencies, ...d3.currencies };
+    out.flags = { ...base2.flags, ...d3.flags };
+    out.records = { ...base2.records, ...d3.records };
+    out.agents = { ...base2.agents };
+    for (const id of Object.keys(base2.agents)) out.agents[id] = { ...agentRecord(), ...d3.agents?.[id] };
+    if (!Array.isArray(out.loadout) || out.loadout.length !== 4) out.loadout = base2.loadout;
+    if (!Array.isArray(out.relics) || out.relics.length !== 2) out.relics = [null, null];
+    const fix = (id) => OLD_ITEM_IDS[id] ?? id;
+    out.loadout = out.loadout.map((x) => x ? { id: fix(x.id), n: x.n } : null);
+    const stash = {};
+    for (const [id, n] of Object.entries(out.stash ?? {})) stash[fix(id)] = (stash[fix(id)] ?? 0) + n;
+    out.stash = stash;
+    return out;
+  }
+  var saveText = (s2) => JSON.stringify(s2);
+
+  // src/game/action/hq/view.ts
+  var PHOTO_KEY = { 잼트리: "Jaemtri", 부장: "Jyaldi", 쟈알디: "Jyaldi", 에일린: "Aileen", 콘쥬스: "Konjyuce", 데쥬레: "Dejure", 고그니쟈: "Gognija" };
+  var photoOf = (who) => demo_photos_default[PHOTO_KEY[who] ?? ""] ?? "";
+  var esc2 = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  var VW = 1280;
+  var VH = 400;
+  var FLOOR_Y = 330;
+  var depthText = (d3) => d3 ? d3 <= 3 ? `L${d3}` : `B-${d3 - 3}` : "—";
+  function createHq() {
+    let ready = Promise.resolve();
+    let loaded2 = false;
+    let mountId = 0;
+    let slotBusy = false;
+    let s2 = newSave();
+    let host = null;
+    let root = null;
+    let wrap = null;
+    let canvas = null;
+    let raf = 0;
+    let last = 0;
+    let card = null;
+    let panel = null;
+    let overlay = null;
+    let notice = "";
+    let bark = null;
+    let barkPlace = null;
+    let moving = 0;
+    let pending = null;
+    let cards = [];
+    let selMission = null;
+    let slotList = [];
+    let pickSlot = 0;
+    let walk = true;
+    const rand3 = () => (host?.rand ?? Math.random)();
+    const keys2 = /* @__PURE__ */ new Set();
+    const idlers = {};
+    const ctx = () => ({ agent: s2.selected, agentName: AGENT_BY_ID[s2.selected].name, fatigue: s2.agents[s2.selected].fatigue, day: s2.day, rand: rand3 });
+    const save2 = () => loaded2 ? host?.save(saveText(s2)).catch(() => {
+    }) : void 0;
+    const placeAt = (x) => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
+    const draw = (dt) => {
+      if (!canvas) return;
+      const c = canvas.getContext("2d");
+      const cam = Math.max(0, Math.min(HQ_WIDTH - VW, s2.x - VW / 2));
+      c.fillStyle = "#0b0f13";
+      c.fillRect(0, 0, VW, VH);
+      c.save();
+      c.translate(-cam, 0);
+      for (const p of PLACES) {
+        const open = placeOpen(s2, p.id);
+        c.fillStyle = open ? p.color : "#15191d";
+        c.fillRect(p.x, 40, p.w, FLOOR_Y - 40);
+        c.strokeStyle = open ? "#6b7d86" : "#2a3036";
+        c.lineWidth = 2;
+        c.strokeRect(p.x + 1, 41, p.w - 2, FLOOR_Y - 42);
+        c.fillStyle = open ? "#e8e2c8" : "#59626a";
+        c.font = "20px sans-serif";
+        c.textAlign = "center";
+        c.fillText(p.name, p.x + p.w / 2, 72);
+        c.font = "14px sans-serif";
+        c.fillStyle = open ? "#9fb2ba" : "#59626a";
+        c.fillText(open ? p.floor : `잠김 · ${p.opens}`, p.x + p.w / 2, 94);
+        if (open && p.npc && p.id !== "office") {
+          c.fillStyle = "#c8b27a";
+          c.fillRect(p.x + p.w * 0.75 - 22, FLOOR_Y - 120, 44, 120);
+          c.fillStyle = "#1a1a1a";
+          c.font = "13px sans-serif";
+          c.fillStyle = "#c8b27a";
+          c.fillText(p.npc, p.x + p.w * 0.75, FLOOR_Y - 128);
+        }
+        if (p.id === "office" && s2.decor.length) {
+          c.fillStyle = "#8a7a5a";
+          s2.decor.slice(0, 6).forEach((_, i) => c.fillRect(p.x + 30 + i * 60, FLOOR_Y - 150, 26, 18));
+        }
+        if (p.id === "gallery" && open) {
+          c.fillStyle = "#4a6a7a";
+          s2.missionsDone.forEach((_, i) => c.fillRect(p.x + 20 + i % 6 * 46, FLOOR_Y - 160 + Math.floor(i / 6) * 50, 34, 34));
+        }
+      }
+      c.fillStyle = "#20262b";
+      c.fillRect(0, FLOOR_Y, HQ_WIDTH, VH - FLOOR_Y);
+      c.fillStyle = "#556";
+      c.fillRect(PLACE_BY_ID.training.x - 40, FLOOR_Y - 200, 20, 200);
+      c.fillStyle = "#9ab";
+      c.font = "12px sans-serif";
+      c.fillText("계단 ↓ 지하", PLACE_BY_ID.training.x - 30, FLOOR_Y - 208);
+      for (const a of AGENTS) {
+        if (a.id === s2.selected) continue;
+        const it = idlers[a.id] ??= { x: PLACE_BY_ID.office.x + 260, to: PLACE_BY_ID.office.x + 260, wait: 2 };
+        it.wait -= dt;
+        if (it.wait <= 0 && Math.abs(it.x - it.to) < 2) {
+          const spots = [PLACE_BY_ID.office.x + 80, PLACE_BY_ID.office.x + 300, PLACE_BY_ID.pantry.x + 120];
+          it.to = spots[Math.floor(rand3() * spots.length)];
+          it.wait = 4 + rand3() * 6;
+        }
+        it.x += Math.sign(it.to - it.x) * Math.min(Math.abs(it.to - it.x), 60 * dt);
+        const rec = s2.agents[a.id];
+        c.fillStyle = a.color + (rec.injured ? "66" : "aa");
+        c.fillRect(it.x - 20, FLOOR_Y - 104, 40, 104);
+        c.fillStyle = "#ddd";
+        c.font = "13px sans-serif";
+        c.fillText(`${a.name}${rec.injured ? " (부상)" : rec.fatigue >= 2 ? " (피곤)" : ""}`, it.x, FLOOR_Y - 112);
+      }
+      const me = AGENT_BY_ID[s2.selected];
+      c.fillStyle = me.color;
+      c.fillRect(s2.x - 22, FLOOR_Y - 112, 44, 112);
+      c.fillStyle = "#fff";
+      c.font = "bold 14px sans-serif";
+      c.fillText(me.name, s2.x, FLOOR_Y - 120);
+      const here = placeAt(s2.x);
+      if (here && placeOpen(s2, here.id)) {
+        c.fillStyle = "#ffd080";
+        c.font = "bold 16px sans-serif";
+        c.fillText("E 들어가기", s2.x, FLOOR_Y + 34);
+      }
+      if (bark && bark.t > 0) {
+        bark.t -= dt;
+        c.font = "15px sans-serif";
+        const text2 = `${bark.who}: ${bark.text}`;
+        const w = Math.min(560, c.measureText(text2).width + 24);
+        const bx = Math.max(cam + 8, Math.min(cam + VW - w - 8, bark.x - w / 2));
+        c.fillStyle = "#f2ecd8";
+        c.fillRect(bx, 110, w, 34);
+        c.fillStyle = "#1a1a1a";
+        c.textAlign = "left";
+        c.fillText(text2.length > 44 ? text2.slice(0, 43) + "…" : text2, bx + 12, 133);
+      }
+      c.restore();
+    };
+    const tick = (now) => {
+      raf = requestAnimationFrame(tick);
+      const dt = Math.min(0.1, (now - last) / 1e3 || 0);
+      last = now;
+      if (!wrap || wrap.hidden) return;
+      const dir = (keys2.has("ArrowRight") ? 1 : 0) - (keys2.has("ArrowLeft") ? 1 : 0) || moving;
+      if (dir && !overlay) {
+        s2.x = Math.max(20, Math.min(HQ_WIDTH - 20, s2.x + dir * 320 * dt));
+        const p = placeAt(s2.x);
+        if (p && p.id !== barkPlace && placeOpen(s2, p.id)) {
+          barkPlace = p.id;
+          const l = lines(`npc:${p.id}`, ctx())[0];
+          if (l) bark = { ...l, t: 4, x: p.x + p.w / 2 };
+        }
+      }
+      draw(dt);
+    };
+    const top = () => `<div class="hq-top"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><span>최저 ${depthText(s2.deepest)}</span><button data-act="menu">Esc 메뉴</button></div>
+<nav class="hq-places">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}" class="${panel === p.id ? "sel" : ""}">${esc2(p.name)}</button>`).join("")}</nav>`;
+    const agentCard = (id, mode) => {
+      const a = AGENT_BY_ID[id];
+      const rec = s2.agents[id];
+      const lv = masteryLevel(rec.xp);
+      const nx = masteryNext(rec.xp);
+      const can = canDeploy(s2, id);
+      const ros = rosterFor(card, id);
+      const photo = ros?.photo && /^(data:|https?:|blob:)/.test(ros.photo) ? `<img src="${esc2(ros.photo)}" alt="">` : `<i style="background:${a.color}"></i>`;
+      const sel = mode === "pick" ? s2.selected === id : s2.support === id;
+      return `<button class="hq-agent${sel ? " sel" : ""}" data-${mode}="${id}" ${mode === "support" && id === s2.selected ? "disabled" : ""}>${photo}<span><b>${esc2(ros?.name ?? a.name)}</b> · ${esc2(a.weapon)}<br>숙련 ${lv}${nx ? ` (${rec.xp}/${nx})` : " (최고)"} · 출동 ${rec.runs}회 · 최저 ${depthText(rec.deepest)}<br>${rec.injured ? `<em>부상 ${rec.injured}일</em>` : rec.fatigue ? `피로 ${rec.fatigue}` : "컨디션 좋음"}</span></button>`;
+    };
+    const slotHtml = (i) => {
+      const x = s2.loadout[i];
+      return `<div class="hq-slotrow"><b>${i + 1}</b><span data-icon="${x?.id ?? ""}"></span><span>${x ? `${esc2(itemName(x.id))} ×${x.n}` : "빈 칸"}</span>${x ? `<button data-unequip="${i}">빼기</button>` : ""}</div>`;
+    };
+    const stashHtml = () => {
+      const ids = Object.entries(s2.stash).filter(([, n]) => n > 0);
+      return ids.length ? ids.map(([id, n]) => `<div class="hq-stash"><span data-icon="${id}"></span>${esc2(itemName(id))} ×${n} ${[0, 1, 2, 3].map((i) => `<button data-equip="${id}" data-slot="${i}">${i + 1}번 칸</button>`).join("")}</div>`).join("") : "<p>보관함이 비었어요.</p>";
+    };
+    const placeHtml = (id) => {
+      const npc = lines(`npc:${id}`, ctx()).map((l) => `<p class="hq-say"><b>${esc2(l.who)}</b> ${esc2(l.text)}</p>`).join("");
+      const P = PLACE_BY_ID[id];
+      const head = `<h2>${esc2(P.name)}</h2>${npc}`;
+      switch (id) {
+        case "office":
+          return `${head}<h3>출동 요원</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "pick")).join("")}</div><h3>지원 요원 (C, 필살 게이지 절반)</h3><div class="hq-agents">${AGENTS.map((a) => agentCard(a.id, "support")).join("")}<button data-support="none" class="${s2.support ? "" : "sel"}">지원 없음</button></div>
+<h3>숙련 단계</h3><p>${unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).length ? unlocksAt(masteryLevel(s2.agents[s2.selected].xp)).join(" · ") : "숙련 2부터 열려요"} — 새 동작은 숙련 3·6에서만.</p>`;
+        case "jaemtri": {
+          cards = missionBoard(s2, boardNames(card));
+          noteDeadlines(s2, cards);
+          if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
+          return `${head}<h3>임무 게시판</h3><div class="hq-cards">${cards.map((c) => `<button class="hq-mission${selMission === c.def.id ? " on" : ""}" data-mission="${c.def.id}"><b>${esc2(c.def.kind)}</b> ${esc2(c.def.title)}<br><small>차원 승강기 · ${esc2(c.def.depthLabel)} · 보상 예산 ${c.def.reward.budget}${c.def.reward.teeth ? ` · 이빨 ${c.def.reward.teeth}` : ""}${c.def.reward.research ? ` · 연구 ${c.def.reward.research}` : ""}${c.left !== void 0 ? ` · <em>구조 마감 출동 ${c.left}회</em>` : ""}${c.done ? " · 다시 하기" : ""}${c.linked ? ` · <em>본편 연계: ${esc2(c.linked)}</em>` : ""}</small></button>`).join("")}</div><div class="hq-row"><button class="primary" data-act="brief" ${selMission ? "" : "disabled"}>브리핑 받기</button></div>
+<h3>규칙서 ${s2.rulebook.length}줄</h3><p class="hq-dim">${s2.rulebook.length ? s2.rulebook.map(esc2).join(" · ") : "아직 없음. 표지를 읽고 송신하면 채워져요."}</p>`;
+        }
+        case "chief":
+          return `${head}<p>위험 단계: 지금 ${s2.danger} / 결재된 최대 ${s2.maxDanger}. 단계마다 적이 강해지고 보상이 오른다.</p><div class="hq-row">${Array.from({ length: s2.maxDanger + 1 }, (_, i) => `<button data-danger="${i}" class="${s2.danger === i ? "sel" : ""}">단계 ${i}</button>`).join("")}</div><div class="hq-row"><button data-act="approve">위험 단계 ${s2.maxDanger + 1} 결재 (예산 ${DANGER_COST(s2.maxDanger + 1)})</button></div>`;
+        case "supply":
+          return `${head}<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}
+<h3>보급품 (예산)</h3><div class="hq-buy">${supplyCatalog().map((d3) => `<button data-buy="${d3.id}" ${supplyOpen(s2, d3) ? "" : "disabled"}><span data-icon="${d3.id}"></span>${esc2(d3.name)} · ${d3.price}<br><small>${supplyOpen(s2, d3) ? esc2(d3.desc) : "연구 「진압 장비 보급 승인」 필요"}</small></button>`).join("")}</div>
+<h3>유물 2칸</h3>${[0, 1].map((i) => `<div class="hq-slotrow"><b>유물 ${i + 1}</b> <span>${s2.relics[i] ? esc2(RELICS[s2.relics[i]].name) : "비어 있음"}</span> ${s2.relicsOwned.map((r) => `<button data-relic="${r}" data-slot="${i}">${esc2(RELICS[r].name)}</button>`).join("")}${s2.relics[i] ? `<button data-relic="" data-slot="${i}">빼기</button>` : ""}</div>`).join("")}${s2.relicsOwned.length ? "" : '<p class="hq-dim">유물은 격리 연구실에서 연구로 얻어요.</p>'}`;
+        case "pantry":
+          return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s2.coffee === c.id ? "sel" : ""}">${esc2(c.name)}<br><small>${esc2(c.effect)}${c.who ? ` · ${esc2(c.who)}` : ""}</small></button>`).join("")}</div>`;
+        case "clinic":
+          return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc2(a.name)}</b> <span>${s2.agents[a.id].injured ? `부상 · ${s2.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s2.agents[a.id].fatigue}`}</span>${s2.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ""}</div>`).join("")}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p><button data-rest="day"${s2.active ? " disabled" : ""}>하루 휴식 (치료비 없음)</button>`;
+        case "interview":
+          return `${head}${s2.rescued.length ? s2.rescued.map((w) => `<div class="hq-slotrow"><b>${esc2(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s2.interviewed.includes(w) ? "다시 듣기" : "면담"}</button></div>`).join("") : "<p>아직 구조한 사람이 없어요.</p>"}`;
+        case "training":
+          return `${head}<p>최다 층 ${s2.records.bestFloors} · 최다 처치 ${s2.records.bestKills} · 최단 귀환 ${s2.records.fastestReturn ? `${s2.records.fastestReturn}초` : "—"} · 최저 ${depthText(s2.deepest)}</p>${AGENTS.map((a) => `<p>${esc2(a.name)}: 출동 ${s2.agents[a.id].runs}회 · 최저 ${depthText(s2.agents[a.id].deepest)}</p>`).join("")}<p class="hq-dim">허수아비 연습은 전투 모듈이 들어오면 여기서 시작한다.</p>`;
+        case "appraisal":
+          return `${head}<p>감정 대기: ${s2.appraisal.length ? s2.appraisal.map((b) => esc2(b?.name)).join(", ") : "없음"}</p><div class="hq-row"><button data-act="appraise" ${s2.appraisal.length ? "" : "disabled"}>감정하기</button></div>`;
+        case "lab":
+          return `${head}<div class="hq-cards">${researchOpen(s2).map((r) => `<button data-research="${r.id}"><b>${esc2(r.name)}</b><br><small>연구 자료 ${r.research} · 예산 ${r.budget}</small></button>`).join("") || "<p>지금 할 수 있는 연구를 다 했어요.</p>"}</div><p class="hq-dim">완료: ${s2.researchDone.map((id2) => esc2(RESEARCH.find((r) => r.id === id2)?.name)).join(" · ") || "없음"}</p>`;
+        case "tooth":
+          return `${head}<div class="hq-row"><button data-act="tooth">이빨 ${TOOTH_COST}개 먹이고 상자 받기</button></div><p class="hq-dim">빼앗긴 유물: ${s2.lostRelics.length ? s2.lostRelics.map((r) => esc2(RELICS[r].name)).join(", ") : "없음"}</p>`;
+        case "gallery":
+          return `${head}<p>완료한 임무 ${s2.missionsDone.length}: ${s2.missionsDone.map((m) => esc2(MISSION_BY_ID[m]?.title)).join(" · ")}</p><p>장식: ${s2.decor.map(esc2).join(", ") || "없음"}</p>`;
+        default:
+          return head;
+      }
+    };
+    const briefHtml = () => {
+      const m = MISSION_BY_ID[selMission];
+      const v = variantFor(pendingSeed);
+      const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
+      const say2 = (ls) => ls.map((l) => `<p class="hq-say"><b>${esc2(l.who)}</b> ${esc2(l.text)}</p>`).join("");
+      const st = statsFor(s2, s2.selected);
+      const can = canDeploy(s2, s2.selected);
+      return `<h2>브리핑 · ${esc2(m.kind)}: ${esc2(m.title)}</h2>${say2(lines("brief:jaemtri", c))}${say2(lines("brief:chief", c))}${say2(lines("brief:reply", c))}
+<div class="hq-brief"><p><b>출동</b> ${esc2(AGENT_BY_ID[s2.selected].name)} (체력 ${st.hp}${s2.agents[s2.selected].fatigue ? `, 피로 ${s2.agents[s2.selected].fatigue}` : ""}) · 지원 ${s2.support && s2.support !== s2.selected ? esc2(AGENT_BY_ID[s2.support].name) : "없음"} · 위험 단계 ${s2.danger} · 커피 ${esc2(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "없음")}</p>
+<p><b>아이템</b> ${s2.loadout.map((x, i) => `${i + 1}:${x ? `${esc2(itemName(x.id))}×${x.n}` : "—"}`).join(" ")} · <b>유물</b> ${s2.relics.filter(Boolean).map((r) => esc2(RELICS[r].name)).join(", ") || "없음"}</p>
+${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
+<div class="hq-row"><button class="primary" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button data-go="supply">정비실 들르기</button><button data-go="pantry">탕비실 들르기</button><button data-act="close">돌아가기</button></div>`;
+    };
+    let pendingSeed = 0;
+    let evacJust = false;
+    const settleHtml = () => {
+      const l = s2.last;
+      const back = lines(`return:${l.how}`, ctx());
+      return `<h2>정산 · ${l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환"}</h2>${back.map((x) => `<p class="hq-say"><b>${esc2(x.who)}</b> ${esc2(x.text)}</p>`).join("")}<ul>${l.lines.map((x) => `<li>${esc2(x)}</li>`).join("")}</ul>
+<div class="hq-row"><button class="primary" data-act="close">본부로</button>${host?.link ? '<button data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`;
+    };
+    const menuHtml = () => `<h2>메뉴</h2><div class="hq-cols"><div><h3>재화</h3><p>예산 ${s2.currencies.budget} · 연구 자료 ${s2.currencies.research} · 이빨 ${s2.currencies.teeth}<br><small>현금은 출동 안에서만 쓰고, 귀환·철수하면 절반이 예산이 된다.</small></p>
+<h3>출동 아이템 4칸</h3>${[0, 1, 2, 3].map(slotHtml).join("")}<h3>보관함</h3>${stashHtml()}<h3>유물</h3><p>${s2.relicsOwned.map((r) => `${esc2(RELICS[r].name)} <small>${esc2(RELICS[r].effect)}</small>`).join("<br>") || "없음"}</p></div>
+<div><h3>요원</h3>${AGENTS.map((a) => `<p><b>${esc2(a.name)}</b> 숙련 ${masteryLevel(s2.agents[a.id].xp)} · 피로 ${s2.agents[a.id].fatigue}${s2.agents[a.id].injured ? " · 부상" : ""}</p>`).join("")}
+<h3>저장</h3><p class="hq-dim">자동 저장: 장소 이동·구매·정산 때마다. 아래는 수동 슬롯.</p>${host?.saves ? [1, 2, 3].map((n) => {
+      const m = slotList.find((x) => x.slot === n);
+      return `<div class="hq-slotrow"><b>슬롯 ${n}</b><span>${m ? `${esc2(m.title)} · ${esc2(m.summary)}` : "비어 있음"}</span><button data-saveslot="${n}">여기 저장</button>${m ? `<button data-loadslot="${n}">불러오기</button>` : ""}</div>`;
+    }).join("") : ""}
+<div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? "" : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}">${esc2(p.name)}</button>`).join("")}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
+    const bar2 = () => `<div class="hq-bar"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
+    const talkBox = (who, text2, choices, extra = "") => {
+      const ph = photoOf(who);
+      return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc2(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc2(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc2(who)}</b><p class="hq-line gk-font">${esc2(text2)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+    };
+    const pitch = (c) => {
+      const d3 = c.def;
+      switch (d3.kind) {
+        case "조사":
+          return d3.rules ? `${d3.depthLabel} 쪽이에요. 규칙 ${d3.rules}개만 확인하고 바로 올라오시면 돼요.` : `${d3.depthLabel}까지 내려가서 보고 오시면 돼요. 무리는 마시고요.`;
+        case "진압":
+          return `${d3.depthLabel}에서 진압 요청 들어왔어요. 이번엔 정리하고 오셔야 해요.`;
+        case "구조":
+          return `구조 요청이에요. 사람이 기다리고 있어요${c.left !== void 0 ? `. 출동 ${c.left}번 안에 가셔야 해요` : ""}.`;
+        case "회수":
+          return `${d3.depthLabel}에 두고 온 물건이 있대요. 들고만 오시면 돼요.`;
+        default:
+          return `${d3.depthLabel}까지 내려가 보는 건이에요. 기록 남기는 거죠.`;
+      }
+    };
+    const missionTalk = () => {
+      cards = missionBoard(s2, boardNames(card));
+      noteDeadlines(s2, cards);
+      if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
+      const say2 = lines("npc:jaemtri", ctx())[0];
+      const sel = cards.find((c) => c.def.id === selMission);
+      const text2 = sel ? `${pitch(sel)} 끝나면 예산 ${sel.def.reward.budget} 나와요.` : say2?.text ?? "오늘은 들어온 건이 없어요.";
+      const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? " on" : ""}" data-mission="${c.def.id}">${esc2(c.def.kind)} · ${esc2(c.def.short)}</button>`).join("");
+      return talkBox("잼트리", text2, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? "" : "disabled"}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
+    };
+    const briefTalk = () => {
+      const m = MISSION_BY_ID[selMission];
+      const v = variantFor(pendingSeed);
+      const c = { ...ctx(), mission: m.title, variantHint: v.hint, rules: s2.rulebook.slice(0, 3) };
+      const ls = [...lines("brief:jaemtri", c), ...lines("brief:chief", c)];
+      const can = canDeploy(s2, s2.selected);
+      const st = statsFor(s2, s2.selected);
+      const kit = `<p class="hq-kit gk-font">${esc2(AGENT_BY_ID[s2.selected].name)} 체력 ${st.hp}${s2.agents[s2.selected].fatigue ? ` · 피로 ${s2.agents[s2.selected].fatigue}` : ""} · ${s2.loadout.map((x) => x ? `${esc2(itemName(x.id))}×${x.n}` : "").filter(Boolean).join(" ") || "아이템 없음"}${s2.coffee ? ` · ${esc2(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "")}` : ""}</p>${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}`;
+      const j = ls.find((l) => l.who === "잼트리") ?? ls[0];
+      return talkBox(j?.who ?? "잼트리", ls.filter((l) => l.who === (j?.who ?? "잼트리")).map((l) => l.text).join(" ") || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
+    };
+    const settleTalk = () => {
+      const l = s2.last;
+      const back = lines(`return:${l.how}`, ctx());
+      const first = back.find((x) => photoOf(x.who)) ?? back[0];
+      const who = first?.who || "잼트리";
+      const title2 = l.how === "evac" ? "후송" : l.how === "withdraw" ? "철수" : "귀환";
+      const res = `<ul class="hq-result gk-font">${l.lines.map((x) => `<li>${esc2(x)}</li>`).join("")}</ul>`;
+      return talkBox(who, `${title2}. ${first?.text ?? ""}`, `<div class="hq-choice-row"><button class="gk-btn hq-choice primary on" data-act="close">확인</button>${host?.link ? '<button class="gk-btn hq-choice" data-act="report">본편에 보고서 붙이기</button>' : ""}</div>`, res);
+    };
+    const renderFloat = () => {
+      const ov = wrap.querySelector(".hq-over");
+      const open = !!(overlay || panel);
+      ov.hidden = !open;
+      if (!open) return void (ov.innerHTML = "");
+      const talk = overlay === "brief" || overlay === "settle" || !overlay && panel === "jaemtri";
+      ov.classList.toggle("talk", talk);
+      if (talk) {
+        ensureKit();
+        ov.innerHTML = (overlay === "brief" ? briefTalk() : overlay === "settle" ? settleTalk() : missionTalk()) + (notice ? `<p class="hq-notice hq-talk-notice">${esc2(notice)}</p>` : "");
+        return;
+      }
+      const body2 = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
+      ov.innerHTML = `<div class="hq-sheet">${bar2()}${body2}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
+      wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+    };
+    const closeOne = () => {
+      if (overlay) overlay = null;
+      else panel = null;
+      notice = "";
+      render();
+      if (!overlay && !panel) host?.closed?.();
+    };
+    const render = () => {
+      if (!wrap) return;
+      if (!walk) return renderFloat();
+      wrap.querySelector(".hq-head").innerHTML = top();
+      const pane = wrap.querySelector(".hq-pane");
+      pane.innerHTML = panel ? `${placeHtml(panel)}${notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}` : `<p class="hq-dim">←→로 걸어 다니다 E로 들어가거나, 위 장소 단추를 누르세요. ${notice ? `<span class="hq-notice">${esc2(notice)}</span>` : ""}</p>`;
+      const ov = wrap.querySelector(".hq-over");
+      ov.hidden = !overlay;
+      if (overlay) ov.innerHTML = `<div class="hq-sheet">${overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : menuHtml()}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
+      wrap.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
+    };
+    const say = (t) => {
+      notice = t;
+      void save2();
+      render();
+    };
+    const go = (id) => {
+      if (!placeOpen(s2, id)) return;
+      const p = PLACE_BY_ID[id];
+      s2.x = p.x + p.w / 2;
+      panel = id;
+      notice = "";
+      if (overlay === "brief" || overlay === "menu") overlay = null;
+      if (!walk) host?.goto?.(id);
+      barkPlace = id;
+      const l = lines(`npc:${id}`, ctx())[0];
+      if (l) bark = { ...l, t: 4, x: s2.x };
+      void save2();
+      render();
+    };
+    const refreshSlots = async () => {
+      if (!host?.saves) return;
+      slotList = await host.saves.list().catch(() => []);
+      if (overlay === "menu") render();
+    };
+    const onClick = (ev) => {
+      if (!loaded2 || slotBusy) return;
+      const t = ev.target.closest("button");
+      if (!t || t.disabled || !host) return;
+      const d3 = t.dataset;
+      if (d3.go) return go(d3.go);
+      if (d3.pick) return s2.selected = d3.pick, s2.support === s2.selected && (s2.support = null), say(`출동 요원: ${AGENT_BY_ID[s2.selected].name}`);
+      if (d3.support) return s2.support = d3.support === "none" ? null : d3.support, say(s2.support ? `지원 요원: ${AGENT_BY_ID[s2.support].name}` : "지원 요원 없음");
+      if (d3.mission) return selMission = d3.mission, s2.mission = d3.mission, render();
+      if (d3.buy) return say(buy(s2, d3.buy));
+      if (d3.equip) return say(equip(s2, Number(d3.slot), d3.equip));
+      if (d3.unequip) return unequip(s2, Number(d3.unequip)), say(`${Number(d3.unequip) + 1}번 칸 비움`);
+      if (d3.relic !== void 0) return say(equipRelic(s2, Number(d3.slot), d3.relic || null));
+      if (d3.coffee) return say(pickCoffee(s2, s2.coffee === d3.coffee ? null : d3.coffee));
+      if (d3.treat) return say(treat(s2, d3.treat));
+      if (d3.rest) return say(restDay(s2));
+      if (d3.interview) return say(interview(s2, d3.interview));
+      if (d3.research) return say(doResearch(s2, d3.research));
+      if (d3.danger) return setDanger(s2, Number(d3.danger)), say(`위험 단계 ${s2.danger}`);
+      if (d3.saveslot) {
+        slotBusy = true;
+        pickSlot = Number(d3.saveslot);
+        const savingSlot = pickSlot, mounting = mountId;
+        void host.saves?.write(savingSlot, saveText(s2), { ...saveTitle(s2), schema: HQ_SCHEMA }).then(() => {
+          if (mounting !== mountId) return;
+          notice = `슬롯 ${savingSlot}에 저장했어요.`;
+          void refreshSlots();
+        }).catch(() => mounting === mountId && say("저장하지 못했어요. 저장 장치를 확인한 뒤 다시 시도해 주세요.")).finally(() => {
+          if (mounting === mountId) slotBusy = false;
+        });
+        return;
+      }
+      if (d3.loadslot) {
+        slotBusy = true;
+        const mounting = mountId;
+        const loading = host.saves?.restore ? host.saves.restore(Number(d3.loadslot)) : host.saves?.read(Number(d3.loadslot));
+        void loading?.then((txt) => {
+          if (mounting !== mountId) return;
+          const got = parseSave(txt);
+          if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
+          s2 = got;
+          overlay = got.active ? "menu" : null;
+          panel = null;
+          selMission = null;
+          pending = null;
+          say(`슬롯 ${d3.loadslot}을(를) 불러왔어요.${got.active ? " 진행 중인 출동은 시작 화면의 이어하기로 복원하세요." : ""}`);
+        }).catch(() => mounting === mountId && say("불러오지 못했어요. 현재 본부 기록은 유지합니다.")).finally(() => {
+          if (mounting === mountId) slotBusy = false;
+        });
+        return;
+      }
+      switch (d3.act) {
+        case "menu":
+          overlay = "menu";
+          notice = "";
+          void refreshSlots();
+          return render();
+        case "close":
+          if (!walk) return closeOne();
+          overlay = null;
+          notice = "";
+          return render();
+        case "brief":
+          pendingSeed = Math.floor(rand3() * 1e9);
+          overlay = "brief";
+          notice = "";
+          return render();
+        case "deploy": {
+          const l = launch(s2, selMission, pendingSeed);
+          if (typeof l === "string") return say(l);
+          pending = l;
+          overlay = null;
+          panel = null;
+          void save2();
+          render();
+          if (walk) wrap.hidden = true;
+          evacJust = false;
+          host.deploy(l);
+          return;
+        }
+        case "approve":
+          return say(approveDanger(s2));
+        case "appraise":
+          return say(appraise(s2).join(" / "));
+        case "tooth":
+          return say(openToothBox(s2, rand3));
+        case "report": {
+          const p = reportPayload(s2);
+          if (p && host.link) void host.link.report(p).then((m) => say(m), () => say("보고서를 붙이지 못했어요."));
+          return;
+        }
+        case "reset":
+          if (!confirm("본부 기록(재화·규칙서·숙련)을 지우고 처음부터 할까요?")) return;
+          s2 = newSave();
+          overlay = null;
+          panel = null;
+          return say("처음부터 시작해요.");
+      }
+    };
+    const onKey = (ev) => {
+      if (!wrap || wrap.hidden) return;
+      const tg = ev.target;
+      if (tg && (tg.tagName === "INPUT" || tg.tagName === "TEXTAREA" || tg.isContentEditable)) return;
+      if (ev.type === "keyup") return void keys2.delete(ev.code);
+      if (ev.code === "ArrowLeft" || ev.code === "ArrowRight") keys2.add(ev.code), ev.preventDefault();
+      if (ev.repeat) return;
+      if (ev.code === "Escape") {
+        overlay = overlay ? null : "menu";
+        if (overlay) void refreshSlots();
+        notice = "";
+        render();
+      } else if (ev.code === "KeyE" && !overlay) {
+        const p = placeAt(s2.x);
+        if (p) go(p.id);
+      }
+    };
+    const onPointer = (ev) => {
+      const t = ev.target.closest("[data-move]");
+      if (ev.type === "pointerdown" && t) {
+        moving = Number(t.dataset.move);
+        if (!moving) {
+          const p = placeAt(s2.x);
+          if (p) go(p.id);
+        }
+      } else if (ev.type !== "pointerdown") moving = 0;
+    };
+    const blur = () => (keys2.clear(), moving = 0);
+    const mod2 = {
+      get state() {
+        return s2;
+      },
+      ready: () => ready,
+      mount(r, h, opt) {
+        const mounting = ++mountId;
+        loaded2 = false;
+        slotBusy = false;
+        root = r;
+        host = h;
+        walk = opt?.walk !== false;
+        wrap = document.createElement("section");
+        wrap.className = walk ? "hq" : "hq hq-float";
+        wrap.tabIndex = 0;
+        wrap.innerHTML = walk ? `<style>${style_default}</style><div class="hq-head"></div><div class="hq-view"><canvas width="${VW}" height="${VH}" aria-label="본부"></canvas></div><div class="hq-move"><button data-move="-1">◀</button><button data-move="0">E 들어가기</button><button data-move="1">▶</button></div><div class="hq-pane"></div><div class="hq-over" hidden></div>` : `<style>${style_default}</style><div class="hq-over" hidden></div>`;
+        root.append(wrap);
+        canvas = wrap.querySelector("canvas");
+        wrap.addEventListener("click", onClick);
+        wrap.addEventListener("pointermove", () => wrap?.querySelector(".hq-talk.fresh")?.classList.remove("fresh"));
+        if (walk) {
+          wrap.addEventListener("pointerdown", onPointer);
+          window.addEventListener("pointerup", onPointer);
+          window.addEventListener("pointercancel", onPointer);
+          window.addEventListener("keydown", onKey);
+          window.addEventListener("keyup", onKey);
+          window.addEventListener("blur", blur);
+        }
+        render();
+        ready = (async () => {
+          const got = parseSave(await h.load().catch(() => null));
+          if (mounting !== mountId) return;
+          if (got) s2 = got;
+          loaded2 = true;
+          if (s2.active && !h.resuming?.()) {
+            notice = "진행 중인 출동이 있어요. 시작 화면에서 이어하기로 돌아가세요.";
+          }
+          const nextCard = await h.link?.card().catch(() => null) ?? null;
+          if (mounting !== mountId) return;
+          card = nextCard;
+          render();
+          wrap?.focus({ preventScroll: true });
+        })();
+        last = performance.now();
+        if (walk) raf = requestAnimationFrame(tick);
+      },
+      map: () => hqMap(s2, evacJust),
+      bark(place3) {
+        if (!placeOpen(s2, place3)) return null;
+        return lines(`npc:${place3}`, ctx())[0] ?? null;
+      },
+      places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s2, p.id), opens: p.opens })),
+      openPlace(id) {
+        if (!loaded2) return;
+        if (!placeOpen(s2, id)) return;
+        overlay = null;
+        panel = id;
+        notice = "";
+        s2.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
+        void save2();
+        render();
+      },
+      openMenu() {
+        overlay = "menu";
+        notice = "";
+        void refreshSlots();
+        render();
+      },
+      isOpen: () => walk ? !!overlay : !!(overlay || panel),
+      close: () => walk ? (overlay = null, render()) : closeOne(),
+      onReturn(result, l) {
+        const previous = s2.last;
+        settle(s2, l, result, rand3);
+        if (s2.last === previous) return;
+        evacJust = result.how === "evac";
+        pending = null;
+        overlay = "settle";
+        if (walk) {
+          if (result.how === "evac") go("clinic");
+          else go("jaemtri");
+        } else panel = null;
+        overlay = "settle";
+        if (wrap) wrap.hidden = false, wrap.focus({ preventScroll: true });
+        void save2();
+        render();
+      },
+      unmount() {
+        cancelAnimationFrame(raf);
+        void save2();
+        loaded2 = false;
+        mountId++;
+        window.removeEventListener("pointerup", onPointer);
+        window.removeEventListener("pointercancel", onPointer);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("keyup", onKey);
+        window.removeEventListener("blur", blur);
+        wrap?.remove();
+        wrap = canvas = root = null;
+        host = null;
+      }
+    };
+    void pending;
+    return mod2;
+  }
+
+  // src/game/action/hq/store.ts
+  function memorySaves() {
+    const data = /* @__PURE__ */ new Map();
+    const metas = /* @__PURE__ */ new Map();
+    return {
+      read: async (slot) => data.get(slot) ?? null,
+      write: async (slot, d3, m) => {
+        data.set(slot, d3);
+        metas.set(slot, { slot, savedAt: Date.now(), ...m });
+      },
+      list: async () => [...metas.values()].sort((a, b) => a.slot - b.slot)
+    };
+  }
+  function idbSaves(dbName = "goei-hq-demo") {
+    let dbp = null;
+    const fallback = memorySaves();
+    const open = () => dbp ??= new Promise((res, rej) => {
+      const req = indexedDB.open(dbName, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore("kv");
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+    const get = async (key2) => {
+      const db = await open();
+      return new Promise((res, rej) => {
+        const r = db.transaction("kv").objectStore("kv").get(key2);
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+    };
+    const put2 = async (key2, v) => {
+      const db = await open();
+      await new Promise((res, rej) => {
+        const tx = db.transaction("kv", "readwrite");
+        tx.objectStore("kv").put(v, key2);
+        tx.oncomplete = () => res();
+        tx.onerror = () => rej(tx.error);
+      });
+    };
+    let broken = false;
+    const safe = async (f, alt) => {
+      if (broken) return alt();
+      try {
+        return await f();
+      } catch {
+        broken = true;
+        return alt();
+      }
+    };
+    return {
+      read: (slot) => safe(async () => await get(`goei:game:slot:${slot}`) ?? null, () => fallback.read(slot)),
+      write: (slot, d3, m) => safe(
+        async () => {
+          await put2(`goei:game:slot:${slot}`, d3);
+          const list = await get("goei:game:slots") ?? [];
+          await put2("goei:game:slots", [...list.filter((x) => x.slot !== slot), { slot, savedAt: Date.now(), ...m }].sort((a, b) => a.slot - b.slot));
+        },
+        () => fallback.write(slot, d3, m)
+      ),
+      list: () => safe(async () => await get("goei:game:slots") ?? [], () => fallback.list())
+    };
+  }
+
+  // src/game/action/engine/navigationFeedback.ts
+  var MARK2 = (n) => "①②③④"[n - 1] ?? String(n);
+  var ARROW = { l: "←", r: "→", u: "↑", d: "↓" };
+  function navigationTarget(props2, x) {
+    let best = null;
+    for (const p of props2) if (Math.abs(p.x - x) < 60 && (!best || Math.abs(p.x - x) < Math.abs(best.x - x))) best = p;
+    return best;
+  }
+  function navigationFeedback(w, map) {
+    if (w.player.seat) return { objective: "본부 · 의자에서 휴식 중", target: { id: "seat:stand", text: "일어나기", kind: "interact" } };
+    const stage = w.stage;
+    const m = map === void 0 ? stage?.mapView?.() : map;
+    const plan = w.floor.stage;
+    const outing = stage?.outing?.();
+    const combat = !!m && (w.encActive >= 0 || w.encIndex < w.floor.encounters.length);
+    const guardian = plan?.where === "floor" && w.bodies.some((b) => b.alive && b.hp > 0 && b.boss);
+    const travelReason = combat ? "전투 중 잠김 · 이 방의 적을 정리하세요" : guardian ? "수호자를 해결해야 길이 열립니다" : void 0;
+    const objective = travelReason ?? m?.goal ?? (w.floor.type === "hq" ? "본부 · 표시된 출입구와 자리 앞에서 조사" : "표시된 장치를 조사하세요");
+    const result = { objective, target: null };
+    if (w.ended || w.player.hp <= 0 || w.player.carry) return result;
+    const p = navigationTarget(w.props, w.player.x);
+    if (!p) return result;
+    const set = (text2, kind2 = "interact", reason) => {
+      result.target = { id: p.id, text: text2, kind: reason ? "locked" : kind2, reason };
+      return result;
+    };
+    const scene = w.floor.type === "hq" ? stage?.current?.() : null;
+    if (scene && p.kind === "hubdoor") {
+      const d3 = scene.doors.find((d4) => `door:${d4.id}` === p.id);
+      if (!d3) return result;
+      if (!d3.open) return set("닫힌 문", "locked", d3.needs ? "본부 시설 해금 필요" : "출입할 수 없는 문");
+      if (d3.kind === "elevator") return set("승강기 · 층 선택");
+      return d3.to ? set(d3.side === "S" ? "출구 · 복도로 이동" : "출입구 · 이동", "exit") : set("배경 문 · 출입 불가", "decoration");
+    }
+    if (scene && p.kind === "hubspot") {
+      const s2 = scene.spots.find((s3) => `spot:${s3.id}` === p.id);
+      return s2?.open ? set([s2.who, s2.verb].filter(Boolean).join(" · ")) : result;
+    }
+    const pl = plan?.floor?.placed.find((pl2) => `p${pl2.id}` === p.id);
+    const kind = pl?.kind ?? p.kind;
+    const room2 = m?.worlds.find((f) => f.depth === m.depth)?.rooms.find((r) => r.col === m?.room?.[0] && r.row === m?.room?.[1]);
+    const dir = pl?.data.dir;
+    const lock = dir ? room2?.lock[dir] : void 0;
+    const master = outing?.upgrades.includes("master") && !outing.upgrades.includes("master:used");
+    const lockReason = lock && lock.state === "locked" && !master ? `열쇠 ${MARK2(lock.n)} 필요 · 열린 방을 탐색하세요` : void 0;
+    const name = p.label ?? "";
+    if (["wdoor", "wup", "wdown"].includes(kind)) {
+      return set(`${dir ? ARROW[dir] + " " : ""}출입구 · ${name}`, "exit", lockReason ?? travelReason);
+    }
+    if (kind === "locked") {
+      const needsKey = lock ? lockReason : !master && !outing?.keys.includes(outing.depth) ? "열쇠 필요 · 정비 구역을 탐색하세요" : void 0;
+      return set(needsKey ? "잠긴 셔터" : "셔터 잠금 해제", "interact", needsKey);
+    }
+    if (kind === "upper") return set("위층 점검문", "exit", !outing?.shortcuts.includes(outing.depth) ? "반대편 정비 구역에서 열어야 합니다" : travelReason);
+    if (kind === "panel") return set("승강기 패널 · 다음 층", "exit", m?.where === "floor" && !m.panelReady ? "이 층의 방과 목표를 모두 해결하세요" : travelReason);
+    if (kind === "elevator") return set("승강기 문", "locked", name === "타고 온 엘리베이터" ? "돌아갈 수 없음 · 귀환은 다락방 로프" : "승강기 패널을 조사하세요");
+    if (kind === "rope" || kind === "van") return set(`귀환 출구 · ${name}`, "exit");
+    if (kind === "down" || kind === "fall") return set(`아래층 출구 · ${name}`, "exit", !m?.panelReady ? "위 층의 방과 목표를 모두 해결하세요" : travelReason);
+    if ((kind === "left" || kind === "right") && plan?.cell?.duct[kind === "left" ? "l" : "r"] && !w.player.crouching) return set(name, "locked", "앉은 채로 조사하세요");
+    if (["hatch", "servicedoor", "sidedoor", "ladder_up", "ladder_down", "left", "right", "up", "getoff"].includes(kind) || kind === "door" && plan?.where === "side") return set(`출구 · ${name}`, "exit", travelReason);
+    if (kind === "button") return set(name, "exit", outing && outing.stuck > 0 ? "승강기 정지 중 · 잠시 기다리세요" : travelReason);
+    if (kind === "crack") return set(name || "금 간 벽", "exit", name.includes("부서진") ? travelReason : "공격해서 벽을 부수세요");
+    if (kind === "vent") return set(name || "덕트", "exit", !name.includes("열린") && !w.player.crouching ? "앉은 채로 조사하세요" : travelReason);
+    if (kind === "key") return set(`줍기 · ${name || "열쇠"}`);
+    if (kind === "decor" || !pl && kind === "door" && plan?.where !== "side") return set("배경 장식 · 출입 불가", "decoration");
+    if (!name) return result;
+    return set(name);
+  }
+
+  // src/game/action/ui/navigationButton.ts
+  function syncNavigationButton(canvas, navigation) {
+    const button = canvas.closest(".gs")?.querySelector('.tp [data-id="interact"]');
+    if (!button) return;
+    const target = navigation?.target;
+    const locked = target?.kind === "locked";
+    const active = !!target && !locked && target.kind !== "decoration";
+    const text2 = locked ? "잠김" : "조사";
+    const description = target ? `${text2} · ${target.text}${target.reason ? ` · ${target.reason}` : ""}` : "조사 · 표시된 대상에 가까이 가세요";
+    if (button.getAttribute("aria-label") === description) return;
+    button.setAttribute("aria-label", description);
+    button.title = description;
+    button.classList.toggle("hint", active);
+    const label3 = button.querySelector("b");
+    if (!label3) return;
+    label3.textContent = text2;
+    Object.assign(label3.style, {
+      display: "block",
+      position: "absolute",
+      inset: "auto 2px 2px",
+      background: "rgba(7,11,15,.9)",
+      color: locked ? "#f0b45a" : "#fff8e6",
+      font: "700 12px sans-serif",
+      lineHeight: "15px",
+      textAlign: "center",
+      pointerEvents: "none",
+      textShadow: "none"
+    });
+  }
+
+  // src/game/action/engine/enemyInteractions.ts
+  function bindEnemyInteractions(w) {
+    w.interactHooks.push((prop) => {
+      const at2 = { x: w.player.x, y: w.player.y };
+      signalEnemies(w, { kind: "greet", ...at2 });
+      signalEnemies(w, { kind: "door", ...at2 });
+      if (prop?.kind === "crevice") signalEnemies(w, { kind: "plug", x: prop.x });
+      if (prop?.kind === "bowl") signalEnemies(w, { kind: "bowl", x: prop.x, y: prop.y });
+    });
+    w.on((event) => {
+      if (event.type !== "custom" || event.name !== "guardianRule") return;
+      const kind = event.data?.kind;
+      if (kind === "mealThanks" || kind === "childDoor") signalEnemies(w, { kind });
+    });
+  }
+
+  // src/game/action/stage/data/floortypes.ts
+  var FLOOR_TYPES = {
+    lobby: {
+      type: "lobby",
+      label: "로비",
+      hint: "편하게 둘러보세요. 다 평범하니까요.",
+      rules: ["lobby", "l_clock"],
+      guardians: [{ kind: "guard", label: "낡은 제복의 경비원", weakness: "순찰 경로 밖에 서면 못 본다" }],
+      enemies: [
+        { kind: "lurker", label: "해롭지 않아 보이는 것", price: 8 },
+        { kind: "shooter", label: "창구 직원", price: 15 },
+        // 로비에 둘만 나오면 같은 모양이 반복된다 (독립 검수: 클론 적)
+        { kind: "hollow", label: "더는 사람이 아닌 것", price: 12 }
+      ],
+      palette: { wall: "#4a5459", floor: "#6d6a5f", trim: "#2f3638", accent: "#d8c27a", fog: "rgba(0,0,0,0)" }
+    },
+    silent: {
+      type: "silent",
+      label: "침묵의 층",
+      hint: "이번 층에서는 뛰지 마세요. 숨도 작게.",
+      rules: ["silent"],
+      guardians: [{ kind: "noise", label: "소리와 냄새", weakness: "조용히 유인해 그릇 아래 가두기" }],
+      enemies: [{ kind: "hum", label: "발소리", price: 20 }],
+      palette: { wall: "#3c4646", floor: "#2a3131", trim: "#1b2020", accent: "#9fc6c0", fog: "rgba(40,60,60,0.15)" }
+    },
+    dark: {
+      type: "dark",
+      label: "어둠의 층",
+      hint: "불은 아끼세요. 그리고 멈추지 마세요.",
+      rules: ["dark"],
+      guardians: [{ kind: "shadow", label: "그림자", weakness: "빛에 얇아질 때만 피해" }],
+      enemies: [
+        { kind: "shade", label: "얼룩", price: 20 },
+        { kind: "crawler", label: "다리 많은 새끼", price: 25 }
+      ],
+      palette: { wall: "#1d2124", floor: "#141618", trim: "#0b0c0d", accent: "#e8d7a0", fog: "rgba(0,0,0,0)" }
+    },
+    chase: {
+      type: "chase",
+      label: "추격의 층",
+      hint: "문이 열리면 바로 가세요. 뒤는 보지 마시고.",
+      rules: ["c_back", "c_door"],
+      guardians: [{ kind: "legs", label: "다리 많은 것", weakness: "틈새를 막으면 나올 곳이 준다" }],
+      enemies: [
+        { kind: "crawler", label: "다리 많은 새끼", price: 25 },
+        { kind: "charger", label: "돌진하는 것", price: 20 }
+      ],
+      palette: { wall: "#5a3a36", floor: "#3b2826", trim: "#241514", accent: "#ff8a6a", fog: "rgba(80,0,0,0.12)" }
+    },
+    puzzle: {
+      type: "puzzle",
+      label: "퍼즐과 선택의 층",
+      hint: "표지를 읽으세요. 문은 둘인데 길은 하나예요.",
+      rules: ["p_sign", "p_order", "p_wall"],
+      guardians: [{ kind: "shape", label: "불가능한 입체 도형", weakness: "등 돌리면 반전이 풀린다" }],
+      enemies: [
+        { kind: "shooter", label: "사격하는 것", price: 15 },
+        { kind: "charger", label: "돌진하는 것", price: 20 }
+      ],
+      palette: { wall: "#43385a", floor: "#2d2640", trim: "#1c1729", accent: "#c9a8ff", fog: "rgba(30,0,60,0.1)" }
+    },
+    replica: {
+      type: "replica",
+      label: "재현의 층 · 아파트",
+      hint: "이웃끼리는 인사하는 거예요.",
+      rules: ["r_greet", "r_quiet", "r_meal"],
+      guardians: [
+        { kind: "elder", label: "405호 노부부", weakness: "「잘 먹었습니다」로 전투 생략" },
+        { kind: "family208", label: "208호 가족", weakness: "벽 얼굴을 공격하지 말고 규칙을 알아내라. 아이 방 열쇠로 문을 열면 잠시 멈춘다" },
+        { kind: "risenhouse", label: "일어난 집", weakness: "물건을 제자리에" }
+      ],
+      enemies: [{ kind: "resident", label: "사는 척하는 주민", price: 10 }],
+      palette: { wall: "#5b5442", floor: "#7a6a4c", trim: "#3a3324", accent: "#ffd98a", fog: "rgba(60,40,0,0.08)" }
+    },
+    trial: {
+      type: "trial",
+      label: "시험 층",
+      hint: "벽부터 읽으세요. 시간은 이미 가고 있어요.",
+      rules: ["trial"],
+      guardians: [{ kind: "conductor", label: "낡은 제복의 차장", weakness: "순찰 경로 밖에 서면 못 본다" }],
+      enemies: [
+        { kind: "charger", label: "돌진하는 것", price: 20 },
+        { kind: "shooter", label: "사격하는 것", price: 15 }
+      ],
+      palette: { wall: "#34485a", floor: "#22303c", trim: "#141d25", accent: "#7ad0ff", fog: "rgba(0,20,40,0.08)" }
+    },
+    deep: {
+      type: "deep",
+      label: "B-12 · 완전한 어둠",
+      hint: "……",
+      rules: ["dark", "silent"],
+      guardians: [{ kind: "touchers", label: "만지는 것들", weakness: "멈추지 않기 + 소리 안 내기" }],
+      enemies: [],
+      palette: { wall: "#060606", floor: "#050505", trim: "#000", accent: "#777", fog: "rgba(0,0,0,0)" }
+    }
+  };
+  var REPLICA_SUB_LABEL = { vacant: "빈집", pretending: "사는 척", red: "붉은 벽" };
+  var REPLICA_SUB_RULES = {
+    vacant: ["r_things"],
+    pretending: ["r_greet", "r_quiet", "r_meal"],
+    red: ["r_red", "r_quiet", "r11"]
+  };
+  var REPLICA_SUB_GUARDIAN = { vacant: "risenhouse", pretending: "elder", red: "family208" };
+  function depthLabel(depth) {
+    return depth <= 3 ? `L${depth}` : `B-${depth - 3}`;
+  }
+  var B12 = 15;
+  function budgetFor2(depth, chunkIndex, danger, variant, growth) {
+    const base2 = depth <= 3 ? 6 + depth * 3 : 16 + (depth - 3) * 8;
+    return Math.round(base2 + chunkIndex * 2 + danger * 5 + variant + growth * 4);
+  }
+
+  // src/game/action/stage/data/rules.ts
+  var RULES = [
+    { id: "entry", scope: "common", texts: ["점검표 서명란이 빈 엘리베이터가 입구다.", "점검표 날짜가 오늘보다 뒤면 그게 입구다.", "거울이 없는 엘리베이터가 입구다."], breach: "—" },
+    { id: "noreturn", scope: "elevator", texts: ["타고 온 승강기로는 못 돌아간다. 귀환은 다락방의 로프.", "위층 버튼은 누르지 마라. 귀환은 로프뿐이다."], breach: "엉뚱한 층" },
+    { id: "close", scope: "elevator", texts: ["닫힘 버튼을 연타하지 마라.", "열림 버튼을 누르고 있지 마라."], breach: "총애 -1", variant: { flag: "close_any", text: "이번 출동: 닫힘 버튼은 한 번만 눌러도 싫어한다." } },
+    { id: "greet", scope: "elevator", texts: ["탈 때 인사해라 (E). 대우가 달라진다.", "탈 때 이름을 말해라 (E). 대우가 달라진다."], breach: "—", variant: { flag: "greet_flip", text: "이번 출동: 승강기가 말을 걸면 싫어한다. 인사하지 마라." } },
+    { id: "mirror", scope: "elevator", texts: ["거울 속 얼굴이 피곤해 보이면 내려라.", "거울 속 얼굴이 웃고 있으면 내려라."], breach: "그 층 위협 +30%" },
+    { id: "lobby", scope: "lobby", texts: ["평범해 보이는 것을 믿지 마라.", "시계가 거꾸로 가는 층에서는 등을 보이지 마라."], breach: "기습" },
+    { id: "attic", scope: "service", texts: ["다락방에 오래 있지 마라. (90초)", "정비 구역에서 같은 칸에 오래 있지 마라."], breach: "포식자", variant: { flag: "attic_short", text: "이번 출동: 정비 구역은 60초면 포식자가 온다." } },
+    { id: "passenger", scope: "common", texts: ["친절한 승객이 둘이면 사연이 긴 쪽이 거짓이다.", "승객이 이름을 먼저 물으면 대답하지 마라."], breach: "유인", variant: { flag: "passenger_flip", text: "이번 출동: 사연이 짧은 쪽이 거짓이다." } },
+    { id: "trial", scope: "trial", texts: ["벽의 목표를 먼저 읽어라.", "목표는 두 번 읽어라. 두 번째가 진짜다."], breach: "수호자", variant: { flag: "trial_mid", text: "이번 출동: 목표는 층 한가운데 벽에 적혀 있다." } },
+    { id: "dark", scope: "dark", texts: ["어둠에서는 멈추지 마라.", "어둠에서는 빛을 세 번 이상 켜지 마라."], breach: "체온을 재는 것", variant: { flag: "dark_fast", text: "이번 출동: 빛이 두 배 빨리 사그라든다." } },
+    { id: "silent", scope: "silent", texts: ["소리를 내지 마라. 달리기·점프 착지·공격이 소리다.", "소리를 내지 마라. 문 여닫는 것도 소리다."], breach: "소환", variant: { flag: "silent_fast", text: "이번 출동: 소리가 두 배로 울린다." } },
+    { id: "exit", scope: "common", texts: ["EXIT는 규칙 10줄 · 총애 3 · B-12 도달 뒤에만 눌러라."], breach: "후송 · 영구 손실" },
+    // 유형별
+    { id: "c_back", scope: "chase", texts: ["추격: 뒤돌아보지 마라."], breach: "뒤의 것이 빨라진다" },
+    { id: "c_door", scope: "chase", texts: ["추격: 문은 닫고 가라 (E)."], breach: "—", variant: { flag: "chase_fast", text: "이번 출동: 뒤의 것이 더 빠르다. 문을 꼭 닫아라." } },
+    { id: "p_sign", scope: "puzzle", texts: ["퍼즐: 표지가 가리키는 문이 정답이다. 표지는 읽어야 보인다."], breach: "함정", variant: { flag: "puzzle_mirror", text: "이번 출동: 표지는 거울에 비친 것이다. 반대 문이 정답이다." } },
+    { id: "p_order", scope: "puzzle", texts: ["퍼즐: 스위치는 표지에 적힌 순서로만 눌러라."], breach: "벽이 조여 온다 -10초" },
+    { id: "p_wall", scope: "puzzle", texts: ["퍼즐: 시간이 다 되면 벽이 조여 온다. 서둘러라."], breach: "압사" },
+    { id: "r_greet", scope: "replica", texts: ["아파트: 주민 옆을 지날 때 인사해라 (E)."], breach: "주민이 깨어남", variant: { flag: "replica_nogreet", text: "이번 출동: 주민과 눈을 마주치지 마라. 인사하지 마라." } },
+    { id: "r_quiet", scope: "replica", texts: ["아파트: 복도에서 뛰지 마라."], breach: "주민이 깨어남" },
+    { id: "r_meal", scope: "replica", texts: ["아파트: 밥상 앞에서는 「잘 먹었습니다」(E)."], breach: "주민이 깨어남" },
+    { id: "r_things", scope: "replica", texts: ["빈집: 남의 물건에 손대지 마라."], breach: "집이 일어난다" },
+    { id: "r11", scope: "replica", texts: ["붉은 벽: 벽에 묻힌 사람 모양을 공격하지 마라."], breach: "바닥의 손 군집이 깨어남" },
+    { id: "r_red", scope: "replica", texts: ["붉은 벽: 붉은 바닥을 밟지 마라."], breach: "바닥의 손" },
+    { id: "l_clock", scope: "lobby", texts: ["로비: 거꾸로 가는 시계 앞에서는 걸어라."], breach: "해롭지 않아 보이는 것" },
+    { id: "b12", scope: "common", texts: ["벽에 B-12가 적힌 층은 수호자가 두 배로 자주 나온다."], breach: "—" }
+  ];
+  var RULE = Object.fromEntries(RULES.map((r) => [r.id, r]));
+  var COMMON_RULE_IDS = RULES.filter((r) => r.scope === "common" || r.scope === "elevator" || r.scope === "service" || r.id === "lobby" || r.id === "trial" || r.id === "dark" || r.id === "silent").map((r) => r.id);
+  var RESHUFFLE_POOL = RULES.filter((r) => r.texts.length > 1).map((r) => r.id);
+  var VARIANT_POOL = RULES.filter((r) => r.variant).map((r) => r.id);
+  function ruleText(id, epochIndex) {
+    const r = RULE[id];
+    if (!r) return id;
+    return r.texts[Math.min(epochIndex, r.texts.length - 1)];
+  }
+
+  // src/game/action/stage/types.ts
+  var CHUNK_W = 640;
+  var ROOM_W = 1280;
+  var LANE_DEPTH = 160;
+  var Y_TOP = 440;
+  var Y_BOTTOM = 690;
+  var laneY = (lane) => Y_TOP + lane / LANE_DEPTH * (Y_BOTTOM - Y_TOP);
+  var DEEP_TYPES = ["chase", "replica", "trial", "dark", "silent", "puzzle"];
+
+  // src/game/action/stage/data/chunks.ts
+  var M2 = LANE_DEPTH / 2;
+  var s = (kind, x, lane = M2) => ({ kind, x, lane });
+  var pit = (x0, x1) => ({ kind: "pit", x0, x1 });
+  var block = (x0, x1, h = 44) => ({ kind: "block", x0, x1, h });
+  var low = (x0, x1) => ({ kind: "low", x0, x1 });
+  var narrow = (x0, x1, lane0, lane1) => ({ kind: "narrow", x0, x1, lane0, lane1 });
+  var glass = (x0, x1) => ({ kind: "glass", x0, x1 });
+  var T2 = (id, set, label3, terrain, slots, extra = {}) => ({ id, set, label: label3, terrain, slots, ...extra });
+  var COMMON_CHUNKS = [
+    T2("c_flat", "common", "복도", [], [s("enemy", 320), s("prop", 160, 10), s("item", 480, 120), s("sign", 120, 0)]),
+    T2("c_step", "common", "단차", [block(220, 420)], [s("enemy", 520), s("prop", 100, 10)]),
+    T2("c_pit", "common", "꺼진 바닥", [pit(260, 380)], [s("enemy", 520), s("item", 120, 140)]),
+    T2("c_twodoor", "common", "두 문", [], [s("door", 200, 0), s("door", 440, 0), s("sign", 320, 0)]),
+    T2("c_service", "common", "점검문", [], [s("servicedoor", 460, 0), s("enemy", 240), s("prop", 120, 10)]),
+    T2("c_hatch", "common", "천장 해치", [], [s("hatch", 320, 40), s("enemy", 520)]),
+    T2("c_deadend", "common", "막다른 벽", [], [s("prop", 520, 0), s("servicedoor", 360, 0)], { endOnly: true }),
+    T2("c_bend", "common", "꺾임", [narrow(0, 280, 0, 100), narrow(280, 640, 60, LANE_DEPTH)], [s("enemy", 460, 120), s("sign", 80, 0)]),
+    T2("c_wide", "common", "넓은 홀", [], [s("enemy", 200, 30), s("enemy", 420, 130), s("item", 320, 80), s("prop", 560, 10)]),
+    T2("c_narrow", "common", "좁은 통로", [narrow(80, 560, 60, 110)], [s("enemy", 400, 85)])
+  ];
+  var TYPE_CHUNKS = [
+    // 로비: 사무실 건물 로비·복도·휴게실. 어긋난 구석이 규칙 단서.
+    T2("l_desk", "lobby", "안내 데스크", [block(260, 400, 36)], [s("prop", 330, 0), s("npc", 520), s("sign", 120, 0)]),
+    T2("l_lounge", "lobby", "휴게실", [], [s("prop", 140, 20), s("prop", 300, 20), s("enemy", 480), s("item", 560, 140)]),
+    T2("l_clock", "lobby", "거꾸로 가는 시계", [], [s("sign", 320, 0), s("enemy", 520), s("prop", 120, 0)]),
+    T2("l_office", "lobby", "사무실 복도", [], [s("prop", 120, 0), s("prop", 360, 0), s("enemy", 500), s("hatch", 240, 40)]),
+    T2("l_pillars", "lobby", "기둥 홀", [narrow(160, 240, 0, 70), narrow(400, 480, 90, LANE_DEPTH)], [s("enemy", 320), s("item", 560, 40)]),
+    T2("l_rest", "lobby", "화장실 앞", [low(300, 420)], [s("prop", 140, 0), s("enemy", 520)]),
+    // 침묵: 유리 바닥 = 소리 함정
+    T2("s_library", "silent", "열람실", [], [s("prop", 120, 0), s("prop", 280, 0), s("prop", 440, 0), s("enemy", 360)]),
+    T2("s_glass", "silent", "깨진 유리 복도", [glass(180, 460)], [s("enemy", 540), s("item", 100, 130)]),
+    T2("s_carpet", "silent", "카펫 홀", [], [s("enemy", 200), s("enemy", 480), s("sign", 340, 0)]),
+    T2("s_bowls", "silent", "그릇 선반", [block(420, 520, 30)], [s("prop", 200, 0), s("item", 300, 140), s("enemy", 560)]),
+    T2("s_glass2", "silent", "유리 계단", [glass(60, 200), block(260, 380, 40), glass(420, 560)], [s("enemy", 320)]),
+    T2("s_hush", "silent", "쉿 복도", [narrow(100, 540, 40, 120)], [s("sign", 80, 0), s("enemy", 420, 80)]),
+    // 어둠
+    T2("d_pitch", "dark", "칠흑 복도", [pit(300, 400)], [s("enemy", 180), s("enemy", 520)]),
+    T2("d_pillars", "dark", "기둥 숲", [narrow(120, 200, 0, 60), narrow(320, 400, 100, LANE_DEPTH), narrow(500, 560, 0, 70)], [s("enemy", 260), s("item", 440, 140)]),
+    T2("d_stairs", "dark", "계단참", [block(200, 300, 30), block(300, 420, 60)], [s("enemy", 540)]),
+    T2("d_duct", "dark", "낮은 배관", [low(160, 480)], [s("item", 560, 80)]),
+    T2("d_well", "dark", "물 고인 바닥", [pit(140, 240), pit(400, 500)], [s("enemy", 320)]),
+    T2("d_hall", "dark", "빈 홀", [], [s("enemy", 160), s("enemy", 320), s("enemy", 480), s("sign", 80, 0)]),
+    // 추격: 멈추면 죽음. 장애물 점프·앉기·문 닫기.
+    T2("h_collapse", "chase", "무너지는 복도", [pit(160, 260), pit(420, 520)], [s("enemy", 340)]),
+    T2("h_doors", "chase", "문 복도", [], [s("door", 300, 0), s("item", 140, 120)]),
+    T2("h_crates", "chase", "상자 더미", [block(140, 220, 40), block(380, 460, 50)], [s("enemy", 560)]),
+    T2("h_pipes", "chase", "낮은 파이프", [low(200, 300), low(420, 500)], [s("enemy", 600)]),
+    T2("h_mixed", "chase", "엉킨 복도", [block(120, 200), low(300, 380), pit(470, 560)], []),
+    T2("h_door2", "chase", "방화문", [narrow(200, 640, 40, 120)], [s("door", 520, 0), s("enemy", 300, 80)]),
+    // 퍼즐과 선택
+    T2("p_fork", "puzzle", "두 갈래 문", [], [s("door", 180, 0), s("door", 460, 0), s("sign", 60, 0)], { device: "fork" }),
+    T2("p_switch", "puzzle", "스위치 방", [], [s("switch", 160, 20), s("switch", 320, 20), s("switch", 480, 20), s("sign", 60, 0)], { device: "switches" }),
+    T2("p_loop", "puzzle", "끝나지 않는 복도", [], [s("prop", 160, 0), s("prop", 480, 0), s("enemy", 320)]),
+    T2("p_tilt", "puzzle", "기울어진 방", [block(100, 260, 24), block(260, 420, 48), block(420, 540, 24)], [s("enemy", 600)]),
+    T2("p_maze", "puzzle", "칸막이", [narrow(100, 220, 0, 60), narrow(260, 380, 100, LANE_DEPTH), narrow(420, 540, 0, 60)], [s("item", 320, 140), s("enemy", 560)]),
+    T2("p_stair", "puzzle", "거꾸로 계단", [block(200, 440, 40), pit(300, 340)], [s("sign", 100, 0)]),
+    // 재현 · 아파트 (명일 아파트 틀을 조각으로: 복도·거실·안방·부엌·베란다·계단실·창고)
+    T2("r_corridor", "replica", "아파트 복도", [], [s("npc", 260), s("prop", 120, 0), s("prop", 440, 0), s("item", 540, 140)]),
+    T2("r_living", "replica", "거실", [], [s("prop", 140, 10), s("npc", 380), s("item", 520, 120)], { device: "meal" }),
+    T2("r_room", "replica", "안방", [block(380, 520, 30)], [s("prop", 200, 0), s("item", 300, 140), s("npc", 560)]),
+    T2("r_kitchen", "replica", "부엌", [], [s("prop", 120, 0), s("prop", 260, 0), s("npc", 460)], { device: "meal" }),
+    T2("r_veranda", "replica", "베란다", [narrow(80, 560, 0, 70), pit(260, 340)], [s("item", 480, 40)]),
+    T2("r_stairs", "replica", "계단실", [block(220, 420, 40)], [s("sign", 100, 0), s("npc", 520)]),
+    T2("r_storage", "replica", "창고", [low(360, 480)], [s("item", 160, 60), s("item", 280, 120), s("prop", 560, 0)]),
+    // 시험
+    T2("t_arena", "trial", "시험장", [], [s("enemy", 200, 40), s("enemy", 360, 120), s("enemy", 500, 60), s("item", 320, 80)]),
+    T2("t_marks", "trial", "표식 복도", [block(380, 460, 36)], [s("item", 140, 30), s("item", 420, 120), s("enemy", 560)]),
+    T2("t_bells", "trial", "종 매단 홀", [], [s("switch", 200, 20), s("switch", 440, 140), s("enemy", 320)]),
+    T2("t_gauntlet", "trial", "관문", [pit(140, 240), block(340, 420, 44), low(500, 580)], [s("item", 300, 140)]),
+    T2("t_lockers", "trial", "사물함", [narrow(120, 520, 50, LANE_DEPTH)], [s("item", 220, 140), s("item", 460, 70), s("enemy", 360)]),
+    T2("t_ring", "trial", "둥근 홀", [], [s("enemy", 160), s("enemy", 480), s("sign", 320, 0)])
+  ];
+  var ALL_CHUNKS = [...COMMON_CHUNKS, ...TYPE_CHUNKS];
+  var CHUNK_BY_ID = Object.fromEntries(ALL_CHUNKS.map((c) => [c.id, c]));
+  function flipTerrain(t) {
+    const f = (x) => CHUNK_W - x;
+    return { ...t, x0: f(t.x1), x1: f(t.x0) };
+  }
+  var SERVICE_CHUNKS = [
+    T2("v_duct", "service", "덕트", [low(60, 580)], [s("item", 320, 120)]),
+    T2("v_duct2", "service", "좁은 덕트", [low(0, 300), narrow(300, 640, 40, 120)], []),
+    T2("v_support", "service", "지지대", [block(140, 260, 40), block(380, 500, 60)], [s("item", 440, 40)]),
+    T2("v_slope", "service", "기울어진 바닥", [block(100, 220, 20), block(220, 340, 40), block(340, 460, 60)], [s("prop", 560, 0)]),
+    T2("v_gapline", "service", "틈새 난간", [pit(240, 340)], [s("item", 520, 140)]),
+    T2("v_plain", "service", "배관 통로", [], [s("prop", 200, 0), s("item", 420, 80)])
+  ];
+  CHUNK_BY_ID_ADD(SERVICE_CHUNKS);
+  function CHUNK_BY_ID_ADD(list) {
+    for (const c of list) CHUNK_BY_ID[c.id] = c;
+  }
+
+  // src/game/action/stage/rng.ts
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function mix2(...n) {
+    let h = 2166136261;
+    for (const v of n) {
+      h ^= v | 0;
+      h = Math.imul(h, 16777619);
+      h ^= h >>> 13;
+    }
+    return h >>> 0;
+  }
+  var pick3 = (r, list) => list[Math.floor(r() * list.length)];
+  var range = (r, a, b) => a + Math.floor(r() * (b - a + 1));
+  function shuffle2(r, list) {
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  }
+
+  // src/game/action/stage/gen/floor.ts
+  var MAX_PIT = 130;
+  var MID = LANE_DEPTH / 2;
+  var nextId = 1;
+  var place2 = (kind, x, lane, w, label3, data = {}) => ({ id: nextId++, kind, x: Math.round(x), lane: Math.round(lane), w, label: label3, data });
+  function pickType(depth, last, seed, epoch, salt = 0) {
+    if (depth <= 3) return "lobby";
+    if (depth === B12) return "deep";
+    const r = rng(mix2(seed, depth, epoch, salt, 77));
+    const recent = last.slice(-3);
+    if (!recent.includes("trial") && last.length >= 2 && r() < 0.6) return "trial";
+    const pool = DEEP_TYPES.filter((t) => !recent.includes(t));
+    const order = shuffle2(rng(mix2(epoch, 991)), [...DEEP_TYPES]);
+    const weights = pool.map((t) => 1 + (order.indexOf(t) < 3 ? 0.8 : 0));
+    let roll = r() * weights.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < pool.length; i++) if ((roll -= weights[i]) <= 0) return pool[i];
+    return pool[0] ?? "chase";
+  }
+  function pickSub(seed, depth, epoch) {
+    return pick3(rng(mix2(seed, depth, epoch, 404)), ["vacant", "pretending", "red"]);
+  }
+  function chunkPool(type, depth) {
+    const own = ALL_CHUNKS.filter((c) => c.set === type && (c.minDepth ?? 0) <= depth);
+    const common = ALL_CHUNKS.filter((c) => c.set === "common");
+    return type === "deep" ? common.filter((c) => !c.terrain.some((t) => t.kind === "pit")) : [...own, ...own, ...common];
+  }
+  function pickSequence(ctx, r, count) {
+    const pool = chunkPool(ctx.type, ctx.depth).filter((c) => !c.endOnly && !(ctx.room && c.device && !ctx.room.need.includes(c.id)));
+    const seq = [];
+    for (let i = 0; i < count; i++) {
+      let t = pick3(r, pool);
+      if (seq.length && seq[seq.length - 1].id === t.id) t = pick3(r, pool);
+      seq.push(t);
+    }
+    const need = [];
+    if (ctx.room) need.push(...ctx.room.need);
+    else if (ctx.type === "puzzle") need.push("p_fork", "p_switch");
+    if (!ctx.room) {
+      if (ctx.type === "replica" && (ctx.sub ?? "pretending") === "pretending") need.push(r() < 0.5 ? "r_living" : "r_kitchen");
+      if (ctx.type === "replica" && ctx.sub === "vacant") need.push("r_storage");
+      if (ctx.type === "chase") need.push("h_doors");
+      if (ctx.type === "trial") need.push("t_marks");
+    }
+    const reserved = /* @__PURE__ */ new Set();
+    const free = () => {
+      const cands = seq.map((_, i) => i).filter((i) => !reserved.has(i) && !need.includes(seq[i].id));
+      return cands.length ? cands[Math.floor(r() * cands.length)] : seq.length - 1;
+    };
+    for (const id of need) {
+      const at2 = seq.findIndex((c, i) => c.id === id && !reserved.has(i));
+      if (at2 >= 0) reserved.add(at2);
+      else {
+        const i = free();
+        seq[i] = CHUNK_BY_ID[id];
+        reserved.add(i);
+      }
+    }
+    const hasService = (c) => c.slots.some((s2) => s2.kind === "servicedoor" || s2.kind === "hatch");
+    if (!ctx.room && !seq.some(hasService)) seq[free()] = CHUNK_BY_ID[r() < 0.5 ? "c_service" : "c_hatch"];
+    if (!ctx.room && r() < 0.25) seq.push(CHUNK_BY_ID.c_deadend);
+    return seq.map((t) => ({ t, flip: !t.device && r() < 0.4 }));
+  }
+  function roomTerrain() {
+    return [];
+  }
+  function makeFloor(ctx) {
+    for (let tries = 0; tries < 4; tries++) {
+      const f2 = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.epoch, tries * 7919), null);
+      f2.tries = tries;
+      if (validateFloor(f2).length === 0) return f2;
+    }
+    const f = buildFloor(ctx, mix2(ctx.seed, ctx.depth, 31337), ctx.seed % 2 ? "A" : "B");
+    f.tries = 4;
+    return f;
+  }
+  function makeRoomFloor(ctx) {
+    for (let tries = 0; tries < 5; tries++) {
+      const f2 = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.room.col * 31 + ctx.room.row, ctx.epoch, tries * 7919), null);
+      f2.tries = tries;
+      if (validateFloor(f2).length === 0) return f2;
+    }
+    const f = buildFloor(ctx, mix2(ctx.seed, ctx.depth, ctx.room.col, ctx.room.row, 31337), "A");
+    f.tries = 5;
+    return f;
+  }
+  var FALLBACK2 = {
+    A: ["c_flat", "c_service", "c_step", "c_flat", "c_wide", "c_flat"],
+    B: ["c_flat", "c_pit", "c_hatch", "c_narrow", "c_flat", "c_flat"]
+  };
+  function buildFloor(ctx, seed, fallback) {
+    nextId = 1;
+    const r = rng(seed);
+    const { depth, type } = ctx;
+    const def = FLOOR_TYPES[type];
+    const sub = type === "replica" ? ctx.sub ?? "pretending" : null;
+    const room2 = ctx.room;
+    const count = room2 ? room2.chunks : type === "lobby" ? range(r, 4, 6) : type === "deep" ? 8 : Math.min(12, range(r, 6, 9) + Math.floor((depth - 4) / 4));
+    let seq = fallback && room2 ? [...room2.need.map((id) => ({ t: CHUNK_BY_ID[id], flip: false })), ...Array.from({ length: Math.max(1, count - room2.need.length) }, () => ({ t: CHUNK_BY_ID.c_flat, flip: false }))] : fallback ? FALLBACK2[fallback].map((id) => ({ t: CHUNK_BY_ID[id], flip: false })) : pickSequence(ctx, r, count);
+    if (fallback && !room2 && type === "puzzle") seq.splice(2, 0, { t: CHUNK_BY_ID.p_fork, flip: false }, { t: CHUNK_BY_ID.p_switch, flip: false });
+    if (fallback && !room2 && type === "trial") seq.splice(2, 0, { t: CHUNK_BY_ID.t_marks, flip: false });
+    if (fallback && !room2 && type === "replica") seq.splice(2, 0, { t: CHUNK_BY_ID.r_living, flip: false }, { t: CHUNK_BY_ID.r_storage, flip: false });
+    if (fallback && !room2 && type === "chase") seq.splice(1, 0, { t: CHUNK_BY_ID.h_doors, flip: false });
+    if (type === "lobby" && depth === 1) seq = seq.map((c, i) => i < 2 && c.t.terrain.some((t) => t.kind === "pit" || t.kind === "low") ? { t: CHUNK_BY_ID.c_flat, flip: false } : c);
+    if (type === "lobby" && depth === 1) seq = seq.map((c) => c.t.terrain.some((t) => t.kind === "block") ? { ...c, t: { ...c.t, terrain: c.t.terrain.filter((t) => t.kind !== "block") } } : c);
+    const segments = [];
+    const placed = [];
+    const spawns = [];
+    let x = 0;
+    const addRoom = (kind, w = ROOM_W) => {
+      segments.push({ ref: `room:${kind}`, x, w, flip: false, terrain: roomTerrain() });
+      const x0 = x;
+      x += w;
+      return x0;
+    };
+    const addChunk = (t, flip) => {
+      const terrain = t.terrain.map((tr) => flip ? flipTerrain(tr) : tr).map((tr) => ({ ...tr, x0: tr.x0 + x, x1: tr.x1 + x }));
+      segments.push({ ref: `chunk:${t.id}`, x, w: CHUNK_W, flip, terrain });
+      const x0 = x;
+      x += CHUNK_W;
+      return x0;
+    };
+    if (!room2 || room2.arrival) {
+      const hall2 = addRoom("elevator_hall");
+      placed.push(place2("elevator", hall2 + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
+      placed.push(place2("mirror", hall2 + 470, 0, 60, "거울"));
+      if (depth === 1) placed.push(place2("checklist", hall2 + 640, 0, 50, "정기 점검표", { rule: "entry" }));
+      if (depth === 1) placed.push(place2("sign", hall2 + (room2 ? 1e3 : 2040), 0, 50, "안내문", { rule: "noreturn" }));
+      if (depth === 2) placed.push(place2("sign", hall2 + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
+      if (type === "deep") placed.push(place2("sign", hall2 + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
+    }
+    const goalBox = { g: null };
+    const goalMid = ctx.flags.includes("trial_mid");
+    const goalRoom = () => {
+      const gx = addRoom("trial_goal", CHUNK_W);
+      const goal = goalBox.g = makeGoal(r, depth);
+      placed.push(place2("goalwall", gx + 320, 0, 240, "목표", { text: goal.text }));
+      placed.push(place2("sign", gx + 80, 0, 50, "시험 안내", { rule: "trial" }));
+    };
+    if (type === "trial" && (room2 ? room2.goal : !goalMid)) goalRoom();
+    let ruleSigns = [...type === "replica" && sub ? REPLICA_SUB_RULES[sub] : def.rules];
+    if (type === "lobby" && depth !== 2) ruleSigns = depth === 3 ? ["l_clock"] : ["greet"];
+    if (room2 && !room2.rules) ruleSigns = [];
+    let forkN = 0;
+    const chunkBase = [];
+    seq.forEach((c, i) => {
+      if (type === "trial" && !room2 && goalMid && i === Math.floor(seq.length / 2)) goalRoom();
+      const bx = addChunk(c.t, c.flip);
+      chunkBase.push({ x: bx, t: c.t, flip: c.flip, index: i });
+    });
+    const markXs = [];
+    const bellXs = [];
+    let serviceCount = 0;
+    for (const cb of chunkBase) {
+      const sx = (v) => cb.x + (cb.flip ? CHUNK_W - v : v);
+      const t = cb.t;
+      if (t.device === "fork") {
+        forkN++;
+        const doors = t.slots.filter((s2) => s2.kind === "door");
+        const correct = r() < 0.5 ? 0 : 1;
+        const shown = ctx.flags.includes("puzzle_mirror") ? 1 - correct : correct;
+        const signSlot = t.slots.find((s2) => s2.kind === "sign");
+        placed.push(place2("sign", sx(signSlot.x), 0, 50, "표지 (읽어야 보임)", { rule: "p_sign", arrow: shown === 0 ? "왼쪽 문" : "오른쪽 문", fork: forkN }));
+        doors.forEach((d3, k) => placed.push(place2("door", sx(d3.x), 0, 90, k === 0 ? "왼쪽 문" : "오른쪽 문", { correct: k === correct, fork: forkN })));
+        placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { fork: forkN, open: false }));
+        continue;
+      }
+      if (t.device === "switches") {
+        const sw = t.slots.filter((s2) => s2.kind === "switch");
+        const order = shuffle2(r, sw.map((_, k) => k + 1));
+        const signSlot = t.slots.find((s2) => s2.kind === "sign");
+        placed.push(place2("sign", sx(signSlot.x), 0, 50, "순서 표지", { rule: "p_order", order: order.join("-") }));
+        sw.forEach((s2, k) => placed.push(place2("switch", sx(s2.x), s2.lane ?? 20, 40, `스위치 ${"①②③④"[k]}`, { n: k + 1, group: cb.index })));
+        placed.push(place2("shutter", cb.x + CHUNK_W - 30, MID, 40, "닫힌 셔터", { group: cb.index, order: order.join("-"), open: false }));
+        continue;
+      }
+      if (t.device === "meal" && sub === "pretending") placed.push(place2("table", cb.x + 320, 40, 140, "차려진 밥상", { rule: "r_meal" }));
+      for (const s2 of t.slots) {
+        const px = sx(s2.x), lane = s2.lane ?? MID;
+        switch (s2.kind) {
+          case "servicedoor":
+            serviceCount++;
+            placed.push(place2("servicedoor", px, 0, 70, "점검문"));
+            break;
+          case "hatch":
+            if (serviceCount < 2 || r() < 0.4) serviceCount++, placed.push(place2("hatch", px, lane, 80, "천장 해치"));
+            break;
+          case "door":
+            if (type === "chase") placed.push(place2("chasedoor", px, 0, 60, "방화문", { closed: false }));
+            else if (r() < 0.5) placed.push(place2("prop", px, 0, 70, "닫힌 사무실 문"));
+            break;
+          case "sign":
+            if (ruleSigns.length) {
+              const id = ruleSigns.shift();
+              placed.push(place2("sign", px, 0, 50, "규칙 표지", { rule: id }));
+            } else if (r() < 0.25) placed.push(place2("symbol", px, 0, 40, "벽 기호", { danger: r() < 0.5 ? 1 : 0 }));
+            else if (type === "lobby" && r() < 0.5) placed.push(place2("prop", px, 0, 50, "거꾸로 가는 시계"));
+            break;
+          case "prop":
+            placed.push(place2("prop", px, lane, 60, propLabel(type, sub, r)));
+            break;
+          case "item":
+            if (type === "trial") markXs.push(px), placed.push(place2("mark", px, lane, 30, "표식", { found: false }));
+            else if (type === "replica" && sub === "vacant") placed.push(place2("belonging", px, lane, 30, pick3(r, ["남의 지갑", "아이 신발", "가족 사진", "열쇠 꾸러미"]), { rule: "r_things" }));
+            else if (r() < 0.5) placed.push(place2("item", px, lane, 28, "보급품", { item: pick3(r, ["heal", "heal", "light", "guard", "ammo"]) }));
+            break;
+          case "switch":
+            if (type === "trial") bellXs.push(px), placed.push(place2("switch", px, lane, 40, "종", { bell: true, n: bellXs.length }));
+            break;
+          case "npc":
+            if (type === "replica" && sub !== "vacant") spawns.push(hook2("resident", "resident", px, lane, 0, false, { greeted: false, asleep: true }));
+            else if (type === "lobby") spawns.push(hook2("enemy", "lurker", px, lane, 0, false, { harmless: true }));
+            break;
+          case "enemy":
+            break;
+        }
+      }
+      if (type === "replica" && sub === "red" && r() < 0.6) {
+        const a = cb.x + 120 + Math.floor(r() * 240);
+        const lane0 = r() < 0.5 ? 0 : 80;
+        segments.find((s2) => s2.x === cb.x).terrain.push({ kind: "redfloor", x0: a, x1: a + 160, lane0, lane1: lane0 + 80 });
+      }
+    }
+    const tired = ctx.tired ? 1.3 : 1;
+    const pool = def.enemies;
+    let total = 0;
+    if (pool.length && (!room2 || room2.enemies)) {
+      for (const cb of chunkBase) {
+        if (type === "lobby" && depth === 1 && cb.index < 2 && (!room2 || room2.arrival)) continue;
+        const slots = cb.t.slots.filter((s2) => s2.kind === "enemy");
+        if (!slots.length) continue;
+        let left = Math.round(budgetFor2(depth, cb.index + (room2?.index0 ?? 0), ctx.danger, ctx.flags.length * 2, ctx.growth) * tired);
+        total += left;
+        let n = 0;
+        while (left >= 8 && n < 8) {
+          const ok = pool.filter((e2) => e2.price <= left);
+          if (!ok.length) break;
+          const e = pick3(r, ok);
+          const s2 = slots[n % slots.length];
+          const px = cb.x + (cb.flip ? CHUNK_W - s2.x : s2.x) + (n >= slots.length ? (r() - 0.5) * 160 : 0);
+          spawns.push(hook2("enemy", e.kind, px, n % 2 ? s2.lane ?? MID : r() * LANE_DEPTH, n >= 4 ? 1 : 0, false, {}));
+          left -= e.price;
+          n++;
+        }
+        const mine = spawns.filter((h) => h.role === "enemy" && h.x >= cb.x && h.x < cb.x + CHUNK_W);
+        while (left >= 15 && mine.some((m) => !m.elite)) {
+          mine.find((m) => !m.elite).elite = true;
+          left -= 15;
+        }
+      }
+    }
+    if (type === "dark") spawns.push(hook2("stalker", "warmth", 0, MID, 0, false, { follows: true }));
+    if (type === "deep") for (let k = 0; k < (room2 ? 2 : 6); k++) spawns.push(hook2("stalker", "toucher", chunkBase[Math.min(chunkBase.length - 1, 1 + k % Math.max(1, chunkBase.length - 1))].x + 320, r() * LANE_DEPTH, 0, false, {}));
+    if (type === "replica" && sub === "red" && chunkBase.length) {
+      spawns.push(hook2("stalker", "wallface", chunkBase[0].x + 320, 0, 0, false, { rule: "r11" }));
+    }
+    const b12mark = depth > 4 && type !== "deep" && (!room2 || room2.arrival) && r() < 0.15;
+    if (b12mark) placed.push(place2("b12", chunkBase[0].x + 300, 0, 80, "B-12", { rule: "b12" }));
+    let guardian = null;
+    const guardianP = type === "deep" ? 1 : depth === 3 ? 1 : depth < 3 ? 0 : Math.min(1, (0.35 + (depth - 4) * 0.05) * (b12mark ? 2 : 1));
+    if (room2 ? room2.guardian || type === "trial" && room2.goal : r() < guardianP || type === "trial") {
+      const gx = addRoom("guardian_room");
+      const cands = def.guardians;
+      const g2 = type === "replica" && sub ? cands.find((c) => c.kind === REPLICA_SUB_GUARDIAN[sub]) : cands[mix2(ctx.epoch, depth) % cands.length];
+      guardian = g2.kind;
+      if (type === "deep") {
+        spawns.push(hook2("guardian", g2.kind, gx + 640, MID, 0, false, { label: g2.label, weakness: g2.weakness, survive: true }));
+      } else {
+        spawns.push(hook2("guardian", g2.kind, gx + 900, MID, 0, depth >= 9, { label: g2.label, weakness: g2.weakness, onFail: type === "trial" }));
+        if (g2.kind === "family208") {
+          placed.push(place2("sign", gx + 240, 0, 50, "생존자의 쪽지", { rule: "r11" }));
+          placed.push(place2("childkey", gx + 650, MID, 40, "아이 방 열쇠", { rule: "r11" }));
+          placed.push(place2("childdoor", gx + 1060, 0, 90, "잠긴 아이 방 문", { rule: "r11" }));
+        }
+        if (g2.kind === "elder") placed.push(place2("table", gx + 520, 40, 160, "405호 밥상", { rule: "r_meal", guardian: true }));
+        if (g2.kind === "legs") for (let k = 0; k < 3; k++) placed.push(place2("prop", gx + 200 + k * 300, 120, 60, "틈새 (밀어 막기)", { gap: k }));
+        if (g2.kind === "guard" || g2.kind === "conductor") placed.push(place2("prop", gx + 120, 0, 40, "순찰 경로 표시"));
+      }
+    }
+    if (!room2 || room2.exit) {
+      const end = addRoom(ctx.exitOpen ? "exit_hall" : "elevator_hall");
+      placed.push(place2("panel", end + 900, 0, 80, ctx.exitOpen ? "승강기 패널 (EXIT 불이 켜짐)" : "승강기 패널", { exit: !!ctx.exitOpen }));
+      placed.push(place2("elevator", end + 1080, 0, 160, "열린 엘리베이터"));
+    }
+    if (room2 ? room2.passenger : depth >= 2 && type !== "deep" && r() < 0.5) {
+      const kinds = ["three_years", "markers", "supply", "nothuman", "missing"];
+      const kind = pick3(r, depth < 5 ? kinds.slice(0, 3) : kinds);
+      const honest = rng(mix2(ctx.seed, depth, ctx.epoch, 5150))() < 0.5;
+      const cb = chunkBase[Math.min(chunkBase.length - 1, 1 + Math.floor(r() * Math.max(1, chunkBase.length - 2)))];
+      const flip = ctx.flags.includes("passenger_flip");
+      const storyLong = flip ? honest : !honest;
+      spawns.push(hook2("passenger", kind, cb.x + 420, 30, 0, false, { honest, long: storyLong, fork: forkN > 0 ? 1 : 0 }));
+    }
+    const minor = /* @__PURE__ */ new Set(["item", "symbol", "belonging", "mark", "prop"]);
+    const ways = placed.filter((p) => !minor.has(p.kind));
+    for (let i = placed.length - 1; i >= 0; i--) {
+      const p = placed[i];
+      if (minor.has(p.kind) && p.kind !== "prop" && (ways.some((w) => Math.abs(w.x - p.x) < 60) || placed.some((q, j) => j < i && minor.has(q.kind) && q.kind !== "prop" && Math.abs(q.x - p.x) < 60))) {
+        if (p.kind === "mark") markXs.splice(markXs.indexOf(p.x), 1);
+        placed.splice(i, 1);
+      }
+    }
+    const palette = def.palette;
+    const label3 = `${depthLabel(depth)} · ${def.label}${sub ? ` (${REPLICA_SUB_LABEL[sub]})` : ""}${room2 ? ` · ${room2.name}` : ""}`;
+    const tuning = {
+      chaseSpeed: (150 + depth * 6) * (ctx.flags.includes("chase_fast") ? 1.4 : 1),
+      noiseMul: ctx.flags.includes("silent_fast") ? 2 : 1,
+      lightFade: ctx.flags.includes("dark_fast") ? 2 : 1,
+      squeeze: 70 + seq.length * 12,
+      b12: b12mark ? 1 : 0
+    };
+    const floor = {
+      depth,
+      label: label3,
+      type,
+      sub,
+      seed,
+      width: x,
+      segments,
+      placed,
+      spawns,
+      budget: total,
+      guardian,
+      goal: goalBox.g ? { ...goalBox.g, need: Math.min(goalBox.g.need, goalBox.g.kind === "marks" ? Math.max(1, markXs.length) : 99) } : null,
+      rules: type === "replica" && sub ? REPLICA_SUB_RULES[sub] : def.rules,
+      tuning,
+      palette,
+      fallback: fallback ?? "",
+      tries: 0,
+      room: room2 ? { col: room2.col, row: room2.row, name: room2.name } : void 0
+    };
+    if (!room2) addMetro(floor, ctx, r);
+    return floor;
+  }
+  var GATE_FREE = /* @__PURE__ */ new Set(["chase", "deep"]);
+  var UPPER_X = 1100;
+  function addMetro(f, ctx, r) {
+    const { depth, type } = f;
+    if (type === "deep") return;
+    const hall2 = f.segments[0];
+    const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
+    const terr = f.segments.flatMap((s2) => s2.terrain);
+    const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
+    const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+    const spot = (segs, d3, ok = () => true, shuffled2 = false) => {
+      let xs = segs.flatMap((c) => Array.from({ length: 27 }, (_, k) => c.x + 60 + k * 20));
+      if (shuffled2) xs = shuffle2(r, xs);
+      for (const pass of [clearAt, clearIfMoved])
+        for (const x of xs)
+          if (pass(x, d3) && ok(x)) {
+            f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d3));
+            return x;
+          }
+      return null;
+    };
+    if (depth >= 2) f.placed.push(place2("upper", hall2.x + UPPER_X, 0, 70, "위층 점검문", {}));
+    if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
+      const gateAt = (gap) => spot(chunks.slice(Math.max(2, Math.floor(chunks.length * 0.5))), 110, (x) => !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300) && !terr.some((t) => x > t.x0 - gap && x < t.x1 + gap));
+      const gx = gateAt(260) ?? (depth === 2 ? gateAt(170) ?? gateAt(100) : null) ?? -1;
+      if (gx > 0) {
+        const before = f.placed.filter((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100);
+        if (!before.length) {
+          const sx = spot(chunks.filter((c) => c.x + 600 < gx - 200), 80);
+          if (sx !== null) f.placed.push(place2("servicedoor", sx, 0, 70, "점검문"));
+        }
+        if (f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
+          f.placed.push(place2("locked", gx, MID, 40, "잠긴 방화셔터", { key: depth }));
+          f.tuning.keyGate = 1;
+        }
+      }
+    }
+    const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
+    const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
+    for (let made = 0; made < want; made++) {
+      const x = spot(plainChunks, 120, () => true, true);
+      if (x === null) break;
+      f.placed.push(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
+    }
+    if (ctx.secret) {
+      const crack = r() < 0.55;
+      const x = spot(plainChunks, 120, () => true, true);
+      if (x !== null) f.placed.push(place2(crack ? "crack" : "vent", x, crack ? 0 : MID, crack ? 90 : 60, crack ? "금 간 벽" : "막힌 덕트", { hp: 3 }));
+    }
+  }
+  var SIDE_NAMES = {
+    lobby: ["옆 사무실", "문서 창고", "숙직실", "탕비실"],
+    silent: ["열람실 안쪽", "서고"],
+    dark: ["불 꺼진 방", "배전실"],
+    puzzle: ["같은 방", "거꾸로 된 방"],
+    replica: ["옆집", "작은방", "다용도실"],
+    trial: ["대기실", "심판석"],
+    chase: ["비상구 옆방"]
+  };
+  function hook2(role, kind, x, lane, wave, elite, data) {
+    return { id: nextId++, role, kind, x: Math.round(x), lane: Math.round(lane), wave, elite, data };
+  }
+  function makeGoal(r, depth) {
+    const n = depth - 3;
+    const opts = [
+      { kind: "marks", need: Math.min(4, 2 + Math.floor(n / 3)), time: 60, text: "" },
+      { kind: "nostop", need: 1, time: 50, text: "" },
+      { kind: "clear", need: 1, time: 75, text: "" }
+    ];
+    const g2 = pick3(r, opts);
+    g2.text = g2.kind === "marks" ? `${g2.time}초 안에 표식 ${g2.need}개를 찾아라` : g2.kind === "nostop" ? `${g2.time}초 안에 끝까지 가라. 멈추지 마라` : `${g2.time}초 안에 이 층의 것들을 쓰러뜨려라`;
+    return g2;
+  }
+  function propLabel(type, sub, r) {
+    const sets = {
+      lobby: ["화분", "소파", "정수기", "게시판", "자판기", "우산꽂이"],
+      silent: ["책장", "그릇 선반", "멈춘 괘종시계", "카펫 말이"],
+      dark: ["꺼진 형광등", "쓰러진 의자", "배관"],
+      chase: ["쓰러진 캐비닛", "찢긴 블라인드", "부서진 문짝"],
+      puzzle: ["같은 액자", "같은 화분", "거꾸로 걸린 표지"],
+      replica: sub === "red" ? ["붉은 벽지", "문틀", "붉은 손자국"] : sub === "vacant" ? ["먼지 쌓인 신발장", "덮인 가구", "멈춘 냉장고"] : ["신발장", "텔레비전", "가족 사진", "냉장고"],
+      trial: ["점수판", "사물함", "번호표"],
+      deep: ["…"]
+    };
+    return pick3(r, sets[type] ?? ["상자"]);
+  }
+  function validateFloor(f) {
+    const bad = [];
+    const room2 = !!f.room;
+    if (!room2 && !f.segments[0]?.ref.startsWith("room:elevator_hall")) bad.push("시작 홀 없음");
+    const last = f.segments[f.segments.length - 1];
+    if (!room2 && (!last || !(last.ref === "room:elevator_hall" || last.ref === "room:exit_hall"))) bad.push("끝 홀 없음");
+    const terr = f.segments.flatMap((s2) => s2.terrain);
+    for (const t of terr) if (t.kind === "pit" && t.x1 - t.x0 > MAX_PIT) bad.push(`구덩이 너무 넓음 ${t.x0}`);
+    for (const p of terr.filter((t) => t.kind === "pit")) for (const l of terr.filter((t) => t.kind === "low")) if (p.x0 < l.x1 + 60 && l.x0 < p.x1 + 60) bad.push("구덩이·낮은 천장 겹침");
+    const pits = terr.filter((t) => t.kind === "pit").sort((a, b) => a.x0 - b.x0);
+    for (let i = 1; i < pits.length; i++) if (pits[i].x0 - pits[i - 1].x1 < 80) bad.push("구덩이 사이 착지 자리 없음");
+    if (!room2 && f.type !== "deep" && !f.placed.some((p) => p.kind === "servicedoor" || p.kind === "hatch")) bad.push("정비 구역 입구 없음");
+    for (const sh of f.placed.filter((p) => p.kind === "shutter")) {
+      if (sh.data.fork !== void 0) {
+        const sign = f.placed.find((p) => p.kind === "sign" && p.data.fork === sh.data.fork);
+        const doors = f.placed.filter((p) => p.kind === "door" && p.data.fork === sh.data.fork);
+        if (!sign || doors.length !== 2 || sign.x > Math.min(...doors.map((d3) => d3.x)) || doors.some((d3) => d3.x > sh.x)) bad.push("갈림길 순서");
+        if (doors.filter((d3) => d3.data.correct).length !== 1) bad.push("정답 문 수");
+      }
+      if (sh.data.group !== void 0) {
+        const sw = f.placed.filter((p) => p.kind === "switch" && p.data.group === sh.data.group);
+        if (sw.length < 2 || sw.some((s2) => s2.x > sh.x)) bad.push("스위치 순서");
+      }
+    }
+    if (!room2 && f.type === "puzzle" && !f.placed.some((p) => p.kind === "shutter")) bad.push("퍼즐 장치 없음");
+    if (!room2 && f.type === "replica" && f.sub === "pretending" && !f.placed.some((p) => p.kind === "table")) bad.push("밥상 없음");
+    if (f.goal) {
+      if (f.goal.kind === "marks" && f.placed.filter((p) => p.kind === "mark").length < f.goal.need) bad.push("표식 모자람");
+      if (!f.placed.some((p) => p.kind === "goalwall")) bad.push("목표 벽 없음");
+    }
+    if (f.guardian && !room2) {
+      const g2 = f.spawns.find((s2) => s2.role === "guardian");
+      const panel = f.placed.find((p) => p.kind === "panel");
+      if (!g2 || !panel || g2.x > panel.x) bad.push("수호자 방 도달");
+    }
+    if (!room2 && !f.placed.some((p) => p.kind === "panel")) bad.push("패널 없음");
+    for (const g2 of f.placed.filter((p) => p.kind === "locked")) {
+      if (!f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < g2.x - 100)) bad.push("열쇠 찾으러 갈 입구가 셔터 뒤");
+      const panel = f.placed.find((p) => p.kind === "panel");
+      if (panel && panel.x < g2.x) bad.push("패널이 셔터 앞");
+    }
+    if (!room2 && f.depth >= 4 && f.type !== "deep" && !f.placed.some((p) => p.kind === "sign" && p.data.rule)) bad.push("규칙 장치 없음");
+    if (room2 && f.type === "puzzle" && f.segments.some((sg) => sg.ref === "chunk:p_fork" || sg.ref === "chunk:p_switch") && !f.placed.some((p) => p.kind === "shutter")) bad.push("퍼즐 장치 없음");
+    return bad;
+  }
+
+  // src/game/action/stage/elevator.ts
+  var FAVOR_MIN = -3;
+  var FAVOR_MAX = 3;
+  var clampFavor = (n) => Math.max(FAVOR_MIN, Math.min(FAVOR_MAX, n));
+  function buttonCount(favor) {
+    return favor <= -2 ? 1 : favor >= 2 ? 3 : 2;
+  }
+  function elevatorButtons(o) {
+    const n = buttonCount(o.favor);
+    const out = [];
+    const next = o.depth + 1;
+    if (o.exitOpen && o.depth <= 3) out.push({ depth: 0, label: "EXIT", type: "lobby", sub: null, shown: true, exit: true });
+    for (let i = 0; i < n; i++) {
+      const type = pickType(next, o.last, o.seed, o.epoch, i * 101 + 3);
+      out.push({ depth: next, label: depthLabel(next), type, sub: type === "replica" ? pickSub(o.seed + i, next, o.epoch) : null, shown: o.favor >= 2 || o.reveal });
+    }
+    if (out.length >= 2 && next > 3) {
+      const r = rng(mix2(o.seed, next, 99));
+      for (let i = 1; i < out.length; i++)
+        if (!out[i].exit && out.slice(0, i).some((b) => b.type === out[i].type)) {
+          const alt = ["chase", "replica", "trial", "dark", "silent", "puzzle"].filter((t) => !out.some((b) => b.type === t) && t !== o.last[o.last.length - 1]);
+          if (alt.length && next !== 15) out[i].type = alt[Math.floor(r() * alt.length)];
+          out[i].sub = out[i].type === "replica" ? pickSub(o.seed + i, next, o.epoch) : null;
+        }
+    }
+    if (o.depth <= 3 && o.deepest >= 5) {
+      const d3 = Math.max(4, o.deepest - 1);
+      const type = pickType(d3, [], o.seed, o.epoch, 555);
+      out.push({ depth: d3, label: `${depthLabel(d3)} (기억)`, type, sub: type === "replica" ? pickSub(o.seed, d3, o.epoch) : null, shown: o.favor >= 2 || o.reveal, remembered: true });
+    }
+    return out;
+  }
+  function announce(depth, type) {
+    return `띵. ${depth <= 3 ? `${depth}층` : depthLabel(depth)}입니다. 문이 열립니다.${type === "deep" ? "" : ` …${FLOOR_TYPES[type].hint}`}`;
+  }
+  function greetLine(favor, gained, flip) {
+    if (flip) return "…말 걸지 마요. 오늘은.";
+    if (!gained) return favor >= 2 ? "네, 네. 알아요. 반가워요." : "…";
+    return ["…인사는 받을게요.", "어머. 예의 바르네요.", "고마워요. 다들 안 하더라고요.", "오늘은 좋은 층으로 모실게요."][Math.max(0, Math.min(3, favor + 1))];
+  }
+  var CLOSE_SPAM_LINE = "…서두르지 마요. 문은 제가 닫아요.";
+  var STUCK_LINE = "문이… 안 닫히네요. 어쩌죠. 누가 오는데.";
+  var LONELY_LINE = "…여기 오래 있으면, 다들 말이 없어져요. 당신은 말을 해 줘서 좋았어요.";
+  var MUTTER = ["열두 층 아래는 아직 아무도 안 세어 봤어요.", "이 버튼, 어제는 없었는데.", "거울 보지 마요. 피곤해 보여요.", "아래층 사람들이 또 문을 두드려요.", "위로는 안 가요. 그건 제 일이 아니라서."];
+  function defaultCallout(agent, favor) {
+    const name = agent === "eileen" ? "에일린" : agent === "jyaldi" ? "쟈알디" : "요원";
+    return favor >= 1 ? `안녕, ${name} 씨. 이번 층에서는 꼭 살아남아요.` : `${name} 씨. 또 왔네요.`;
+  }
+  function dealTruth(favor, roll) {
+    return roll < 0.5 + favor * 0.15;
+  }
+
+  // src/game/action/stage/gen/world.ts
+  var DIRS = ["l", "r", "u", "d"];
+  var OPP = { l: "r", r: "l", u: "d", d: "u" };
+  var STEP2 = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] };
+  function worldSize(depth, type) {
+    if (type === "deep") return [6, 5];
+    if (depth <= 1) return [3, 2];
+    if (depth === 2) return [4, 2];
+    if (depth === 3) return [4, 3];
+    return [Math.min(7, 4 + Ma

@@ -1,4 +1,18 @@
-d) => d.unread && (nick === void 0 || d.nick === nick));
+= "me");
+  }
+  function acknowledge(st, post, nick) {
+    let changed = false;
+    if (post !== void 0) {
+      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
+    }
+    if (nick !== void 0) {
+      for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
+    }
+    return changed;
+  }
+  var postUnread = (p) => p.comments.some((c) => c.unread);
+  var boardUnread = (st) => st.posts.some(postUnread);
+  var dmUnread = (st, nick) => st.dms.some((d) => d.unread && (nick === void 0 || d.nick === nick));
   function writeGnet(chat, st, opts = {}) {
     if (opts.reconcile !== false) reconcileUnread(st, readGnet(chat));
     if (opts.ack) acknowledge(st, opts.ack.post ?? void 0, opts.ack.nick ?? void 0);
@@ -3638,6 +3652,16 @@ ${after}`);
     }
     return out;
   }
+  function hidePlayerTag(messages, tagNames) {
+    const drop = new Set(tagNames.filter(Boolean));
+    if (!drop.size) return messages;
+    const re = /^(- Characters \{name\}: )(.*)$/gm;
+    return messages.map((m) => {
+      if (typeof m?.content !== "string" || !m.content.includes("- Characters {name}: ")) return m;
+      const content = m.content.replace(re, (_, head, list4) => head + list4.split(",").map((s4) => s4.trim()).filter((s4) => s4 && !drop.has(s4)).join(", "));
+      return content === m.content ? m : { ...m, content };
+    });
+  }
 
   // src/core/phonePrompt.ts
   var LANGUAGE2 = "Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.";
@@ -4470,25 +4494,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const mine = (k) => PREF_VAR.test(k) && prefixes.some((x) => k.startsWith(x));
     const saved = getPrefs().vars ?? {};
     const out = {};
-    for (const k of [.../* @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
-    return out;
-  }
-  async function savePrefs(change) {
-    const next = setPrefs(change(structuredClone(getPrefs())));
-    await risuai.pluginStorage.setItem(KEY, JSON.stringify(next));
-    return next;
-  }
-
-  // src/ui/defaults.ts
-  var PREFIXES = {
-    ph: ["$ph_"],
-    gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
-    wiki: ["$nw_"]
-  };
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키" };
-  var defaultsAsk = { pane: "", what: "" };
-  var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
-  function defaultsConfirm(pane) {
-    if (defaultsAsk.pane !== pane || !defaultsAsk.what) return "";
-    const save2 = defaultsAsk.what === "save";
-    const text =
+    for (const k of [.../*

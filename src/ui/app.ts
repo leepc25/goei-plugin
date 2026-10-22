@@ -844,13 +844,8 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
-// 게임은 완성 전까지 숨긴다 (본부 방문 시험판 빌드만 GOEI_GAME_BUTTON=1로 늘 보인다) (2026-10-21 사용자: 완성 안 된 게임은 릴리스 금지). 개발·시험만 window.__goeiGame = true 또는 localStorage 'goei:game' = '1'
-declare const __GAME_BUTTON__: boolean | undefined;
-const gameShown = (): boolean => {
-  if (typeof __GAME_BUTTON__ !== 'undefined' && __GAME_BUTTON__) return true;
-  if ((globalThis as { __goeiGame?: boolean }).__goeiGame === true) return true;
-  try { return localStorage.getItem('goei:game') === '1'; } catch { return false; }
-};
+// 본부 방문은 상황판 머리 버튼으로 연다 (2026-10-22 사용자: 테스트하게 릴리스에 버튼을 넣어 달라)
+const gameShown = (): boolean => true;
 
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {

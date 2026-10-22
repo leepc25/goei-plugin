@@ -1,4 +1,4 @@
-// goei-body 0.16.41
+// goei-body 0.16.42
 "use strict";
 (() => {
   // src/core/dispatch.ts
@@ -3228,20 +3228,23 @@ ${body4.slice(at).replace(/^\s+/, "")}
   function hasImgTag(text) {
     return text.includes("<img=");
   }
-  var tagName = (who, expr, pick3) => {
+  var SELF = "{{source::user}}";
+  var tagName = (who, expr, pick3, self) => {
     const want = `${who.trim()}_${expr.trim()}`;
-    return pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
+    const found = pick3 ? pick3(want) ?? pick3(`${who.trim()}_default`) : want;
+    return found ?? (self && who.trim() === self.trim() ? SELF : null);
   };
-  function imgTagsKnown(text, pick3) {
+  function imgTagsKnown(text, pick3, self) {
     if (!pick3) return false;
     const all = [...text.matchAll(TAG)];
-    return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick3));
+    return all.length > 0 && all.every((m) => !!tagName(m[1], m[2], pick3, self));
   }
-  function renderImgTags(text, pick3, recent = IMG_RECENT.def) {
+  function renderImgTags(text, pick3, recent = IMG_RECENT.def, self) {
     return text.replace(TAG, (_m, who, expr) => {
-      const name = tagName(who, expr, pick3);
-      if (!name || /[{}'"<>\\]/.test(name)) return "\n\n";
-      const box = `<div class="gim" style="${BASE_STYLE};background-image:url('{{raw::${name}}}')" tabindex="0"></div>`;
+      const name = tagName(who, expr, pick3, self);
+      if (!name || name !== SELF && /[{}'"<>\\]/.test(name)) return "\n\n";
+      const url = name === SELF ? SELF : `{{raw::${name}}}`;
+      const box = `<div class="gim" style="${BASE_STYLE};background-image:url('${url}')" tabindex="0"></div>`;
       return `
 
 ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-${recent - 1}}}}}}}${box}{{/when}}` : box}
@@ -3294,12 +3297,13 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var ST = {
     assetOn: "$st_asset_on",
     assetModel: "$st_asset_model",
+    assetPlayer: "$st_asset_player",
     assetLimit: "$st_asset_limit",
     agentLimit: "$st_agent_limit",
     supportOn: "$st_support_on"
   };
   var AGENT_MAX = 20;
-  var BASIC_DEFAULTS = { anomalyOn: true, assetOn: true, assetModel: "main", assetLimit: 2, agentLimit: 12, supportOn: true };
+  var BASIC_DEFAULTS = { anomalyOn: true, assetOn: true, assetModel: "main", assetPlayer: false, assetLimit: 2, agentLimit: 12, supportOn: true };
   var WORLD_SPEC = [
     ["추가 발생 여유분", "extra_cap", null, false],
     ["미스틱 사이트 추가 여유분", "extra_ms_cap", null, false],
@@ -3344,6 +3348,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     if (typeof b.anomalyOn === "boolean") basic.anomalyOn = b.anomalyOn;
     if (typeof b.assetOn === "boolean") basic.assetOn = b.assetOn;
     if (b.assetModel === "main" || b.assetModel === "aux") basic.assetModel = b.assetModel;
+    if (typeof b.assetPlayer === "boolean") basic.assetPlayer = b.assetPlayer;
     const al = int(b.assetLimit, 1, 4);
     if (al !== null) basic.assetLimit = al;
     const ag = int(b.agentLimit, 0, AGENT_MAX);
@@ -3416,6 +3421,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       anomalyOn: flag(b["상황판"] ?? b["통합관제"]) ?? BASIC_DEFAULTS.anomalyOn,
       assetOn: flag(b["에셋 출력"]) ?? BASIC_DEFAULTS.assetOn,
       assetModel: model(b["에셋 모델"]) ?? BASIC_DEFAULTS.assetModel,
+      assetPlayer: flag(b["주인공 에셋"]) ?? BASIC_DEFAULTS.assetPlayer,
       assetLimit: int(b["캐릭터당 이미지 수"], 1, 4) ?? BASIC_DEFAULTS.assetLimit,
       agentLimit: int(b["요원 표시 인원"], 0, AGENT_MAX) ?? BASIC_DEFAULTS.agentLimit,
       supportOn: flag(b["지원 투입"]) ?? BASIC_DEFAULTS.supportOn
@@ -3429,6 +3435,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       anomalyOn: v.$st_anomaly_on === void 0 ? d.anomalyOn : v.$st_anomaly_on === "1",
       assetOn: flag(v[ST.assetOn]) ?? d.assetOn,
       assetModel: model(v[ST.assetModel]) ?? d.assetModel,
+      assetPlayer: flag(v[ST.assetPlayer]) ?? d.assetPlayer,
       assetLimit: int(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
       agentLimit: int(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
       supportOn: flag(v[ST.supportOn]) ?? d.supportOn
@@ -3438,6 +3445,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return {
       [ST.assetOn]: s4.assetOn ? "1" : "0",
       [ST.assetModel]: s4.assetModel,
+      [ST.assetPlayer]: s4.assetPlayer ? "1" : "0",
       [ST.assetLimit]: String(s4.assetLimit),
       [ST.agentLimit]: String(s4.agentLimit),
       [ST.supportOn]: s4.supportOn ? "1" : "0"
@@ -4273,18 +4281,4 @@ ${themeVars("[x-goei-fab]")}
       }
     };
     for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
-  }
-  function acknowledge(st, post, nick) {
-    let changed = false;
-    if (post !== void 0) {
-      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
-    }
-    if (nick !== void 0) {
-      for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
-    }
-    return changed;
-  }
-  var postUnread = (p) => p.comments.some((c) => c.unread);
-  var boardUnread = (st) => st.posts.some(postUnread);
-  var dmUnread = (st, nick) => st.dms.some((
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !=

@@ -1,4 +1,25 @@
- save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
+ @__PURE__ */ new Set([...Object.keys(state ?? {}), ...Object.keys(saved)])].filter(mine)) out[k] = String(saved[k] ?? "");
+    return out;
+  }
+  async function savePrefs(change) {
+    const next = setPrefs(change(structuredClone(getPrefs())));
+    await risuai.pluginStorage.setItem(KEY, JSON.stringify(next));
+    return next;
+  }
+
+  // src/ui/defaults.ts
+  var PREFIXES = {
+    ph: ["$ph_"],
+    gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
+    wiki: ["$nw_"]
+  };
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키" };
+  var defaultsAsk = { pane: "", what: "" };
+  var defaultsButtons = (pane, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}불러오기</button></span>`;
+  function defaultsConfirm(pane) {
+    if (defaultsAsk.pane !== pane || !defaultsAsk.what) return "";
+    const save2 = defaultsAsk.what === "save";
+    const text = save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
     return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save2 ? " ps-save" : " danger"}" data-action="${pane}-def-yes">${save2 ? "덮어쓰기" : "불러오기"}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
   }
   async function defaultsAction(pane, action, value, ctx2, refresh2) {
@@ -2445,6 +2466,11 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   };
   var IMAGE_BOOK = "Image tag";
   var ASSET_NOTE = "$goei_asset_note";
+  function withUser(d, self) {
+    const n = self?.trim() ?? "";
+    if (!n || n.includes("_") || d.characters.includes(n)) return { ...d, allowUser: true };
+    return { ...d, allowUser: true, characters: [...d.characters, n], aliases: new Map(d.aliases).set(n.toLowerCase(), n) };
+  }
   var fail2 = (field4, why) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field4}): ${why}`);
   function readImageData(lore) {
     const books = lore.filter((e) => e.comment === IMAGE_BOOK && typeof e.content === "string" && e.content.trim() && e.content.trim() !== "[]");
@@ -2559,7 +2585,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       "- MUST tag every visible listed character at least ONCE when they appear and are the focus.",
       "- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).",
       "- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).",
-      "- DO NOT tag {{user}}, the narrator, or undefined NPCs.",
+      d.allowUser ? "- DO NOT tag the narrator or undefined NPCs." : "- DO NOT tag {{user}}, the narrator, or undefined NPCs.",
       "- DO NOT invent character names or keywords. Use only the lists below.",
       "",
       "## HARD LIMIT (per-character, independent count)",
@@ -2648,10 +2674,10 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
     });
     return out.join("\n\n");
   }
-  function planAsset(content, d, limit) {
+  function planAsset(content, d, limit, exclude = []) {
     const { narrative, trailing } = splitNarrative(content);
     if (!narrative) return null;
-    const active = activeCharacters(narrative, d);
+    const active = activeCharacters(narrative, d).filter((name) => !exclude.includes(name));
     if (!active.length) return null;
     const paras = paragraphs(narrative);
     if (!paras.length) return null;
@@ -2682,8 +2708,11 @@ ${job.trailing}` : body4;
       } catch {
         entries2 = t.lore ?? [];
       }
-      const data = readImageData(entries2);
-      const job = planAsset(msg.data, data, s4.assetLimit);
+      const agent = playerAgent(t.lore, t.chat.scriptstate);
+      const base = readImageData(entries2);
+      const data = s4.assetPlayer ? withUser(base, agent ? void 0 : userInfo().name) : base;
+      const exclude = agent && !s4.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v) => typeof v === "string" && !!v) : [];
+      const job = planAsset(msg.data, data, s4.assetLimit, exclude);
       if (!job) return;
       const raw = await runModel(job.messages, "aux");
       const next = finishAsset(job, raw, data, s4.assetLimit);
@@ -3534,23 +3563,4 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .gx-mini:hover { border-color: var(--mint); }
 .gx-mini.danger { border-color: var(--danger); color: var(--danger); }
-.gx-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.gx-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--dim); font-size: 13px; }
-.gx-chip b { color: var(--text); font-weight: 600; }
-.gx-chip.on { border-color: var(--signal); color: var(--signal); }
-.gx-ctxbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; background: var(--void); border: 1px solid var(--line); font-size: 14px; }
-.gx-wide { width: 100%; min-height: 38px; margin-bottom: 8px; border: 1px dashed var(--line); border-radius: 10px; background: transparent; color: var(--mint); font-size: 14px; }
-.gx-wide.on { border-style: solid; border-color: var(--signal); color: var(--signal); }
-.gx-evs li, .gx-mlist li { padding: 0; overflow: hidden; }
-.gx-ev { display: flex; align-items: stretch; }
-.gx-evmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 9px 12px; border: 0; background: none; text-align: left; }
-.gx-evact { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 6px 8px 6px 0; }
-.gx-evs li.sel, .gx-mlist li.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
-.gx-report { font-size: 13px; color: var(--text); }
-.gx-kind { background: var(--void); color: var(--dim); }
-.gx-kind.k-an { color: var(--danger); }
-.gx-kind.k-in { color: var(--amber); }
-.gx-kind.k-ms { color: var(--blue); }
-.gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
-.gx-team .gx-muted { margin: 0; font-size: 13px; }
-.gx-goal { display: flex; a
+.gx-chips { display: flex; gap: 6px; fl

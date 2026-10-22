@@ -1,4 +1,23 @@
-lign-items: baseline; gap: 8px; }
+ex-wrap: wrap; margin-bottom: 8px; }
+.gx-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--void); color: var(--dim); font-size: 13px; }
+.gx-chip b { color: var(--text); font-weight: 600; }
+.gx-chip.on { border-color: var(--signal); color: var(--signal); }
+.gx-ctxbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; margin-bottom: 8px; border-radius: 10px; background: var(--void); border: 1px solid var(--line); font-size: 14px; }
+.gx-wide { width: 100%; min-height: 38px; margin-bottom: 8px; border: 1px dashed var(--line); border-radius: 10px; background: transparent; color: var(--mint); font-size: 14px; }
+.gx-wide.on { border-style: solid; border-color: var(--signal); color: var(--signal); }
+.gx-evs li, .gx-mlist li { padding: 0; overflow: hidden; }
+.gx-ev { display: flex; align-items: stretch; }
+.gx-evmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 9px 12px; border: 0; background: none; text-align: left; }
+.gx-evact { display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 6px 8px 6px 0; }
+.gx-evs li.sel, .gx-mlist li.sel { border-color: var(--signal); box-shadow: inset 0 0 0 1px var(--signal); }
+.gx-report { font-size: 13px; color: var(--text); }
+.gx-kind { background: var(--void); color: var(--dim); }
+.gx-kind.k-an { color: var(--danger); }
+.gx-kind.k-in { color: var(--amber); }
+.gx-kind.k-ms { color: var(--blue); }
+.gx-team { display: flex; flex-direction: column; gap: 10px; padding: 12px !important; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.gx-team .gx-muted { margin: 0; font-size: 13px; }
+.gx-goal { display: flex; align-items: baseline; gap: 8px; }
 .gx-goal span { color: var(--dim); font-size: 13px; }
 .gx-goal b { flex: 1; min-width: 0; color: var(--signal); }
 .gx-goal b.none { color: var(--dim); font-weight: 600; }
@@ -2203,44 +2222,4 @@ button.mk-go:hover { color: var(--signal); }
     });
     bar.addEventListener("pointermove", (e) => {
       if (e.pointerId !== id) return;
-      const dx = e.clientX - x0;
-      if (!dragging) {
-        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
-        dragging = true;
-        bar.setPointerCapture?.(e.pointerId);
-      }
-      shown2 = rubber(dx, closeW());
-      paint();
-    });
-    bar.addEventListener("pointerup", end);
-    bar.addEventListener("pointercancel", end);
-    bar.addEventListener("click", (e) => {
-      if (!dragging) return;
-      dragging = false;
-      e.stopPropagation();
-      e.preventDefault();
-    }, true);
-  }
-
-  // src/ui/marks.ts
-  var esc10 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var key = (m) => JSON.stringify(m.s);
-  var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
-  var markUi = { pop: false };
-  var marks = () => getPrefs().marks ?? [];
-  var isMarked = (m) => marks().some((x) => key(x) === key(m));
-  async function addMark(m) {
-    if (isMarked(m) || marks().length >= MARK_MAX) return false;
-    await savePrefs((p) => ({ ...p, marks: [...p.marks ?? [], m] }));
-    return true;
-  }
-  async function removeMarkAt(i) {
-    await savePrefs((p) => ({ ...p, marks: (p.marks ?? []).filter((_, j) => j !== i) }));
-  }
-  var markCandidates = (recent, current3) => recent.filter((m) => !isMarked(m) && (!current3 || key(m) !== key(current3))).slice(0, 5);
-  function markPop(current3, recent) {
-    if (!markUi.pop) return "";
-    const list4 = marks();
-    const full = list4.length >= MARK_MAX;
-    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
-        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title
+      const dx = e.clientX

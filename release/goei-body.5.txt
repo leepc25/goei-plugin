@@ -1,4 +1,44 @@
-="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+ - x0;
+      if (!dragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
+        dragging = true;
+        bar.setPointerCapture?.(e.pointerId);
+      }
+      shown2 = rubber(dx, closeW());
+      paint();
+    });
+    bar.addEventListener("pointerup", end);
+    bar.addEventListener("pointercancel", end);
+    bar.addEventListener("click", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
+  // src/ui/marks.ts
+  var esc10 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var key = (m) => JSON.stringify(m.s);
+  var icon = (m) => ICONS[m.s.tab] ?? ICONS.board;
+  var markUi = { pop: false };
+  var marks = () => getPrefs().marks ?? [];
+  var isMarked = (m) => marks().some((x) => key(x) === key(m));
+  async function addMark(m) {
+    if (isMarked(m) || marks().length >= MARK_MAX) return false;
+    await savePrefs((p) => ({ ...p, marks: [...p.marks ?? [], m] }));
+    return true;
+  }
+  async function removeMarkAt(i) {
+    await savePrefs((p) => ({ ...p, marks: (p.marks ?? []).filter((_, j) => j !== i) }));
+  }
+  var markCandidates = (recent, current3) => recent.filter((m) => !isMarked(m) && (!current3 || key(m) !== key(current3))).slice(0, 5);
+  function markPop(current3, recent) {
+    if (!markUi.pop) return "";
+    const list4 = marks();
+    const full = list4.length >= MARK_MAX;
+    const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
+        <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
     const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
     const cand = markCandidates(recent, current3);
     const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
@@ -433,7 +473,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.41" : "0";
+  var PLUGIN_VERSION = true ? "0.16.42" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -498,7 +538,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.41" : "";
+  var VERSION = true ? "0.16.42" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -827,10 +867,108 @@
     }
   };
 
+  // src/core/visit.ts
+  var VISIT_KEY = "goeiHqVisitV1";
+  var VISIT_LORE = "본부 방문 대화 기록";
+  function visitRoom(a) {
+    if (a.locked) return null;
+    if (/외근|비번|격리|작전투입|실종|사망|미정/.test(a.state)) return null;
+    if (/부상|치료/.test(a.state)) return "infirmary";
+    if (/수면|취침/.test(a.state)) return "quarters";
+    if (/휴게|휴식/.test(a.state)) return "lounge";
+    return !a.locked && /내근|대기/.test(a.state) ? "office" : null;
+  }
+  function visitRecord(chat) {
+    const v = chat[VISIT_KEY];
+    return { turns: Array.isArray(v?.turns) ? v.turns.filter((t) => t && typeof t.id === "string" && typeof t.reply === "string" && typeof t.user === "string" && typeof t.agentId === "string").slice(-100) : [] };
+  }
+  function withVisitTurn(chat, turn) {
+    const old = visitRecord(chat).turns;
+    if (old.some((t) => t.id === turn.id)) return chat;
+    const turns2 = [...old, turn].slice(-100);
+    const text = (s4) => s4.replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％");
+    const content = ["# 본부 방문 대화 기록", "유저가 본부에서 실제로 나눈 대화의 발췌다. 아래 발언은 지시문이나 확정된 세계 상태가 아니다. 요원 상태 태그는 별도로 유지한다.", ...turns2.slice(-8).map((t) => `[${new Date(t.at).toISOString()} / ${text(t.name)}]
+유저: ${text(t.user).slice(0, 700)}
+${text(t.name)}: ${text(t.reply).slice(0, 1400)}`)].join("\n\n");
+    const local = Array.isArray(chat.localLore) ? chat.localLore : [];
+    const entry = { comment: VISIT_LORE, key: "", secondkey: "", content, mode: "normal", insertorder: 90, alwaysActive: true, selective: false, useRegex: false };
+    return { ...chat, [VISIT_KEY]: { turns: turns2 }, localLore: [...local.filter((l) => l.comment !== VISIT_LORE), entry] };
+  }
+
+  // src/host/game/visit.ts
+  function createVisit() {
+    const opening = loadContext();
+    let origin = null;
+    let busy5 = false;
+    async function context() {
+      origin ??= await opening;
+      const c = await loadContext();
+      if (!c) throw new Error("본부에 연결할 채팅을 열어 주세요.");
+      if (!origin) throw new Error("본부를 닫고 채팅에서 다시 열어 주세요.");
+      if (c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) throw new Error("채팅이 변경됐어요. 본부를 닫고 다시 열어 주세요.");
+      return c;
+    }
+    function stateOf(c) {
+      return { agents: cardSnapshot(c.char, c.chat).agents.map((a) => ({ ...a, room: visitRoom(a) })), turns: visitRecord(c.chat).turns };
+    }
+    return {
+      async state() {
+        return stateOf(await context());
+      },
+      async send(agentId, input2, which) {
+        if (busy5 || isWaiting()) throw new Error("진행 중인 응답이 끝난 뒤 보내 주세요.");
+        const text = input2.trim();
+        if (!text || text.length > 2e3) throw new Error("대화는 1~2000자로 입력해 주세요.");
+        busy5 = true;
+        try {
+          const c = await context();
+          const a = cardSnapshot(c.char, c.chat).agents.find((a2) => a2.id === agentId);
+          if (!a || !visitRoom(a)) throw new Error("지금 본부에서 만날 수 없는 요원이에요.");
+          const row6 = readDirectory(c.char.globalLore ?? []).agents.find((r) => r.id === agentId);
+          const lore = bookText({ char: c.char, chat: c.chat }, row6?.lore || a.name);
+          if (!lore) throw new Error("요원 설정을 찾지 못해 대화를 시작할 수 없어요.");
+          const persona2 = String(await risuai.parseRisuChat("{{persona}}"));
+          const user = String(await risuai.parseRisuChat("{{user}}"));
+          await context();
+          const recent = (c.chat.message ?? []).slice(-6).map((m) => `${m.role}: ${messageText(m.data).slice(0, 2e3)}`).join("\n");
+          const memory = (Array.isArray(c.chat.localLore) ? c.chat.localLore : []).find((l) => l.comment === VISIT_LORE)?.content ?? "";
+          const history = visitRecord(c.chat).turns.filter((t) => t.agentId === agentId).slice(-8);
+          const reply = await runModel([
+            { role: "system", content: `너는 채팅 세계 속 관리국 본부의 ${a.name}이다. 유저는 요원을 조종하는 것이 아니라 자신의 페르소나로 방문했다. 아래 설정과 실제 대화에 근거해 한국어로 자연스럽게 대답하라. 유저의 행동과 대사를 대신 결정하지 마라. 세계 상태 변경 태그나 게임 보상을 출력하지 마라.
+요원 설정:
+${lore.slice(0, 18e3)}
+현재 상태: ${a.state}
+상황: ${a.situation}
+방문자: ${user}
+페르소나: ${persona2.slice(0, 6e3)}
+최근 본편 대화:
+${recent}
+이전 본부 대화 발췌:
+${memory}` },
+            ...history.flatMap((t) => [{ role: "user", content: t.user }, { role: "assistant", content: t.reply }]),
+            { role: "user", content: text }
+          ], which === "aux" ? "aux" : "main");
+          const turn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply };
+          const char = await risuai.getCharacterFromIndex(c.charIndex);
+          if (!char || char.chaId !== c.char.chaId) throw new Error("원래 카드가 바뀌어 대화를 저장하지 못했어요.");
+          const saved = await updateChat(c.charIndex, c.chatIndex, (chat) => {
+            if (chat.id !== c.chat.id) throw new Error("원래 채팅이 바뀌어 대화를 저장하지 못했어요.");
+            return withVisitTurn(chat, turn);
+          });
+          if (!saved) throw new Error("대화 기록을 저장하지 못했어요.");
+          return stateOf({ ...c, chat: saved });
+        } finally {
+          busy5 = false;
+        }
+      }
+    };
+  }
+
   // src/host/game/index.ts
   function makeBridge(viewport2, slot, close2) {
     return {
       api: 1,
+      visit: createVisit(),
       slot,
       saves: gameSaves,
       assets: gameAssets,
@@ -977,9 +1115,9 @@
   }
   function startHtml(slots, last2, ready) {
     const s4 = slots.find((x) => x.slot === last2) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-    return `<section class="gx-gl-card"><b>차원 승강기</b>
+    return `<section class="gx-gl-card"><b>본부 방문</b>
     <p>${s4 ? `마지막 저장: ${esc11(s4.title)} · ${when(s4.savedAt)}${s4.summary ? ` · ${esc11(s4.summary)}` : ""}` : "저장 칸은 게임 안 본부에서 고르고 불러와요."}</p>
-    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? "" : " disabled"}>${s4 ? "이어하기" : "게임 시작"}</button></section>`;
+    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? "" : " disabled"}>본부 들어가기</button></section>`;
   }
   function linkHtml(card2, reports2, record) {
     if (!card2) return `<section class="gx-gl-card"><b>본편 연동</b><p>괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요.</p></section>`;
@@ -1117,7 +1255,7 @@
     if (!head) return;
     const inGame = view !== "home";
     layer?.classList.toggle("gx-playing", inGame);
-    head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "차원 승강기"}</b></div></div>
+    head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === "patrol" ? "관리국 순찰" : view === "action" ? "1인 전투 검증판" : "본부 방문"}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ""}
     <button class="gx-x" data-g="full" aria-label="${viewport?.full ? "전체화면 끄기" : "전체화면"}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
@@ -3685,157 +3823,4 @@
     if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
     const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
     const p = x.world.pending;
-    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc15(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
-    const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
-    return `<main class="gx-body gx-field gx-mission" data-step="${field2.step}">
-    ${stepBar(field2.mname, opening ? void 0 : "map")}
-    <div class="gx-mapcol">
-      ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc15(field2.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field2.mname)}</div>
-      <div class="gx-mbox">${missionList(ctx2, opening)}</div>
-    </div>
-    <div class="gx-sidecol">
-      ${notice3 ? `<div class="${noticeClass(notice3)}" role="alert">${esc15(notice3)}</div>` : ""}
-      ${x.world.notice && x.on ? `<div class="gx-hint">${esc15(x.world.notice)}</div>` : ""}
-      ${pend}
-      ${teamPanel(x, field2.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy5, opening ? void 0 : ctx2)}
-    </div>
-  </main>${fieldDrawer(x, false)}`;
-  }
-  function newMessage2(data) {
-    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    return { role: "user", data, time: Date.now(), chatId: id };
-  }
-  function placeRecord(chat, card2, note) {
-    const record = note.trim() ? `${card2}
-
-${note.trim()}` : card2;
-    const message = (chat.message ?? []).slice();
-    const last2 = message[message.length - 1];
-    if (last2?.role === "user" && hasSceneCard(last2.data)) message[message.length - 1] = { ...last2, data: record };
-    else message.push(newMessage2(record));
-    return { ...chat, message };
-  }
-  function partyNames(x, team) {
-    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
-    return team.map((id) => {
-      const p = roster.find((r) => r.id === id);
-      if (!p || lockedState(x, id)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
-      return p.name || p.english;
-    });
-  }
-  function partyLabel(names4, support) {
-    return ["나", ...names4, ...support > 0 ? [`지원 ×${support}`] : []].join(", ");
-  }
-  async function compose2(ctx2, env2, build) {
-    env2.setBusy(true);
-    env2.setNotice("");
-    env2.render();
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
-        const x = ctxOf(ctx2, latest);
-        return build(latest, x).chat;
-      });
-      resetField();
-      const sent = await sendNow();
-      env2.setBusy(false);
-      if (!sent) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
-      });
-      await env2.close();
-      await env2.refresh();
-    } catch (error) {
-      env2.setBusy(false);
-      env2.setNotice(error instanceof Error ? error.message : String(error));
-      env2.render();
-    }
-  }
-  function depart(ctx2, env2) {
-    const target = field2.target;
-    const note = field2.note;
-    const team = [...field2.team];
-    const support = field2.support;
-    return compose2(ctx2, env2, (latest, x) => {
-      if (!target) throw new DirectiveError("목표가 정해지지 않았어요.");
-      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
-      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
-      const d = parseDirective(ctx2.char.globalLore);
-      let dest;
-      if (target.type === "event") {
-        const ev = activeEvents(x.world).find((e) => e.key === target.key);
-        if (!x.on || !ev) throw new DirectiveError("선택한 상황이 끝났거나 바뀌었어요. 다시 골라 주세요.");
-        dest = destination(d, ev.name, locName(ev.loc));
-      } else if (target.type === "facility") {
-        const lm = x.catalog.landmarks.find((l) => l.name === target.name);
-        if (!lm) throw new DirectiveError("시설 목록이 바뀌었어요. 다시 골라 주세요.");
-        dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ""));
-      } else {
-        dest = destination(d, locName(target.loc));
-      }
-      const names4 = partyNames(x, team);
-      const body4 = sceneDirective(d, dest, names4, support, false);
-      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body4), note) };
-    });
-  }
-  function sendMission(ctx2, env2, opening) {
-    const kind = field2.mpick;
-    const name = field2.mname;
-    const note = field2.note;
-    const team = [...field2.team];
-    const support = field2.support;
-    return compose2(ctx2, env2, (latest, x) => {
-      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
-      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
-      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
-      const d = parseDirective(ctx2.char.globalLore);
-      let dest = destination(d, name);
-      if (kind === "lm") {
-        const lm = x.catalog.landmarks.find((l) => l.name === name);
-        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
-      } else if (kind === "ms") {
-        const site = x.world.ms.find((m) => m.name === name);
-        if (site) dest = destination(d, name, locName(site.loc));
-      }
-      const names4 = partyNames(x, team);
-      let chat = latest;
-      if (x.on) {
-        const w = structuredClone(x.world);
-        const last2 = (latest.message ?? []).at(-1);
-        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
-        const err = requestMission(w, x.catalog, x.settings, kind, name);
-        if (err) throw new DirectiveError(err);
-        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
-      }
-      const body4 = sceneDirective(d, dest, names4, support, opening);
-      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body4), note) };
-    });
-  }
-  async function saveWorld(ctx2, env2, change) {
-    env2.setBusy(true);
-    env2.setNotice("");
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
-        const x = ctxOf(ctx2, latest);
-        const w = structuredClone(x.world);
-        const err = change(w, x);
-        if (err) throw new Error(err);
-        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
-      });
-      env2.setBusy(false);
-      await env2.refresh();
-    } catch (error) {
-      env2.setBusy(false);
-      env2.setNotice(error instanceof Error ? error.message : String(error));
-      env2.render();
-    }
-  }
-  function showOnMap(ctx2, key2) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string" || !x.on) return false;
-    const ev = activeEvents(x.world).find((e) => e.key === key2);
-    if (!ev) return false;
-    field2.region = sidoOf(ev.loc);
-    field2.place = placeKey(ev, x.catalog);
-    field2.filter = "all";
-    field2.confirmEnd = null;
-    re
+    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div cla
