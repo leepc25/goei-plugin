@@ -1,0 +1,1408 @@
+{
+  "request": "docs/캐릭터제작서/의뢰서_데드폴_탈의·샤워·목욕_GPT.md",
+  "specification": "3-1. 정확한 수치 / 기준 그림 3차",
+  "verified_main_sha": "83a5dcf24a6b62b45ca9108c538548f0eba4ecb4",
+  "tool": "built-in image_gen; no PixelLab or fallback API",
+  "status": "received; Claude visual review and game integration pending",
+  "delivered_frame_count": 20,
+  "clip_counts": {
+    "undress": 7,
+    "showerturn": 3,
+    "shower": 6,
+    "bath": 4
+  },
+  "generation_attempt_count": 20,
+  "exact_reuse_count": 2,
+  "v3_continuation_frames": 14,
+  "retained_pre_v3_frames": [
+    "game-src/action/deadpole/full/clips/undress/00.png",
+    "game-src/action/deadpole/full/clips/undress/01.png",
+    "game-src/action/deadpole/full/clips/undress/02.png",
+    "game-src/action/deadpole/full/clips/undress/03.png",
+    "game-src/action/deadpole/full/clips/undress/04.png",
+    "game-src/action/deadpole/full/clips/undress/05.png"
+  ],
+  "allowed_v3_palette": [
+    "#000000",
+    "#050509",
+    "#0a0a0d",
+    "#0e0d13",
+    "#121116",
+    "#17161a",
+    "#1d1c1f",
+    "#28272a",
+    "#383438",
+    "#3d393d",
+    "#444449",
+    "#6a707b",
+    "#6e5c42",
+    "#7e3b14",
+    "#9ea2a6",
+    "#a08a66",
+    "#ad6b42",
+    "#c9b48e",
+    "#d6d7d9",
+    "#e2d3b4",
+    "#e88159",
+    "#eb9c68",
+    "#f8f9fa",
+    "#fbc496"
+  ],
+  "technical_processing": [
+    "Nearest-neighbor reduction to native canvas, binary alpha threshold, isolated background speck removal.",
+    "Upright v3 figures calibrated uniformly to 87px; no seated/bent figure stretched to standing height.",
+    "Rigid baseline alignment to lowest painted row y135 and nominal horizontal center x57.",
+    "V3 colors mapped only to specified 20 base colors plus 4 allowed towel colors.",
+    "One-pixel pure-black outer pixel boundary; no extra dilation or blur."
+  ],
+  "notes": [
+    "사용자의 이미 올린 장 건너뛰기 지시에 따라 탈의 00~05는 변경하지 않았다. 이 6장은 v3 이전 규격이며 현재 측정값을 그대로 기록했다.",
+    "undress/05 원래 바지 내리기 동작은 생성 도구 출력 안전 검사에서 차단되어, 수건과 바지를 완전히 착용하고 무릎 바깥으로 두 손을 내리는 자세로 대체했다.",
+    "undress/06의 v3 이전 미업로드 후보는 사용자 최신 v3 지시 도착으로 폐기하고 v3 참조로 제작했다.",
+    "showerturn/00은 의뢰서의 등호대로 undress/06과 바이트 동일하다. undress/00은 초기 기본 대기의 동일 시작 자세를 그대로 연결했다.",
+    "샤워 장의 최상단 측정에는 머리에 놓인 손과 작은 거품이 포함될 수 있다.",
+    "목욕 실제 최상단은 84,85,85,86이다. 순환 시 00→01→02→03→02→01처럼 왕복하면 머리 높이 변화가 한 단계당 최대 1px이다. 제안이며 게임에는 아직 적용하지 않았다.",
+    "장별 손동작과 연결의 최종 시각 검수 및 코드 보정은 의뢰서에 따라 Claude 후속 작업이다. 기술 검사 통과를 사용자 시각 승인으로 간주하지 않는다."
+  ],
+  "contact": {
+    "path": "game-src/action/deadpole/full/gpt-bathing/contact.png",
+    "scale": 4,
+    "sampling": "nearest",
+    "layout": "5 columns by 4 rows; full frames in request order",
+    "size": [
+      3840,
+      2464
+    ]
+  },
+  "frames": [
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/00.png",
+      "commit": "1f00d86c3b62ae2d281d156555da1fb52ae32e6c",
+      "prompt": "의뢰서 undress 00: 기본 대기처럼 두 손을 배 앞에 모음. 지정 idle/00.png와 같은 시작 자세를 정확히 유지.",
+      "source": "game-src/action/deadpole/full/clips/idle/00.png",
+      "generation_count": 0,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 47,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          37,
+          47,
+          74,
+          136
+        ],
+        "body_width": 37,
+        "bbox_center_x": 55.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 28,
+        "outside_v3_palette_color_count": 27,
+        "outer_boundary_black": false
+      },
+      "sha256": "b62cd57f64bb0e31671e4405fcdb27e01fc640dc8627ac853f5f78b936b4d5c8",
+      "git_blob_sha": "57d38e702ad4e236793b6f7819d272102ee408e8",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/idle/00.png at initial pre-v3 commit"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/01.png",
+      "commit": "cf3d9291a9562e5f23337ab2c6c93bcb600de417",
+      "prompt": "Use case: identity-preserve. Edit the supplied pixel-art reference into ONE animation frame, not a sheet. Reference 1 is the exact approved Deadpole idle sprite; reference 2 is her approved base sprite. Adult woman in her early twenties, small slim adult build, narrow shoulders, long straight black hair with blunt hime bangs, brown eyes. Match this exact pixel character, body mass, face, hair, muted blue-charcoal palette and 1-native-pixel dark outline. This is low-resolution 1990s arcade pixel art, NOT a high-resolution illustration and NOT chibi. Preserve the reference composition and sprite scale.\nOutput: transparent RGBA PNG, landscape 4:3 canvas, 1536x1152, representing an exactly 8-times-nearest enlarged 192x144 game frame. Each native pixel is a hard 8x8 square. Native coordinate guide: body center x=57, top of hair y=47, soles y=135; at output these are x=456, hair top y=376, foot bottom y=1087. The small character occupies the lower-left portion (roughly x=296..600 and y=376..1088) of the otherwise empty canvas. Do NOT center or enlarge the character. Keep exact head/body/leg proportions and same stance of reference 1.\nPOSE undress/01: facing RIGHT in side profile, still fully dressed in a closed charcoal business suit jacket, white shirt, black tie, black trousers, black gloves and shoes. Raise BOTH hands from her lower abdomen to the jacket fastening at the lower chest, delicately undoing the jacket button. Small restrained elbow bend, shoulders level, legs and head and long hair remain exactly as in idle. Jacket stays on, torso covered. No props, text, floor, scenery, water, steam, garment piles, cast shadows or additional characters. Only this single pixel-art character on real transparency.",
+      "generation_count": 1,
+      "source": "exec-223f0042-1366-4c8b-b356-5866384396e9.png",
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 47,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          39,
+          47,
+          76,
+          136
+        ],
+        "body_width": 37,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 759,
+        "outside_v3_palette_color_count": 758,
+        "outer_boundary_black": false
+      },
+      "sha256": "7adebf831349b13dd2d722b70826774e19dd00f62414bc60cf4fb42f03dce5e4",
+      "git_blob_sha": "33a1300ff7b0e60fcd3f30d951e3e082f4963603",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/idle/00.png at initial pre-v3 commit",
+        "base.png pre-v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/02.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        39,
+        46,
+        76,
+        136
+      ],
+      "head_top_y": 46,
+      "sole_y": 135,
+      "body_width": 37,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        193,
+        145
+      ],
+      "translation": [
+        0,
+        -2
+      ],
+      "sha256": "a1850f060c18d198203b9d7039322e8e80305cc5ebd6bc8f3960a515befdc45b",
+      "source_sha256": "1ba8c50b81341497b950245e34675f318b5c90bb119c0af2e02dd69852521e2c",
+      "prompt": "Edit the supplied approved pixel sprite reference into ONE animation frame. Adult woman in her early twenties, petite slim adult proportions, narrow shoulders, very long straight black hair with blunt bangs, brown eyes. Exact same character and sprite scale, palette and 1-native-pixel dark outline as reference. Low-resolution 1990s arcade pixel art, NOT a high-resolution illustration, NOT chibi. Transparent RGBA PNG, 4:3 landscape canvas representing 192x144 game pixels enlarged evenly. Full sprite remains in LOWER LEFT: body center x=57/192 of canvas width, soles y=135/144, head top y=47/144 when standing. Keep the entire mostly-empty canvas composition. Do not zoom in or center the sprite. Preserve head size, body mass, limb lengths, large pixel clusters and shading. No additional characters, backgrounds, floor, bathroom, water, steam, objects, detached clothing, labels or shadow. One character only, real transparent background. All changing and bathing poses are ordinary NON-SEXUAL daily care, with an opaque beige towel firmly wrapped from chest to knees when specified. No nudity.\nPOSE undress/02: right-facing side profile, standing in the EXACT stance and body proportions of the attached idle. Her jacket has been removed: she wears a white LONG-SLEEVED button-up office shirt, straight black necktie, charcoal suit trousers, black shoes and black gloves. Both hands are held together calmly in front of the abdomen. The white shirt must replace the jacket without changing the torso silhouette, shoulders, face or leg scale. Hair remains long to below waist. No jacket anywhere. No garment pile. Preserve the small pixel sprite in the lower-left position and the mostly empty transparent canvas.",
+      "commit": "b156dc0c5a15e6eb128a13c242e03c40630822b8",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 46,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          39,
+          46,
+          76,
+          136
+        ],
+        "body_width": 37,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 744,
+        "outside_v3_palette_color_count": 743,
+        "outer_boundary_black": false
+      },
+      "git_blob_sha": "b972dda0afd85a16666cd92db1d78de4e69815ef",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/idle/00.png at initial pre-v3 commit"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/03.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        40,
+        46,
+        75,
+        136
+      ],
+      "head_top_y": 46,
+      "sole_y": 135,
+      "body_width": 35,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        193,
+        145
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "sha256": "c22bc53f7bbdbc7ea093a410ad54ccea0757a8bb1349be31c6c1ea46dd239981",
+      "source_sha256": "ba24015f47bdcb3c756ad7f88b338c157fe3f3074c9344fa5e2c081a2d709a7f",
+      "prompt": "Edit the supplied approved pixel sprite reference into ONE animation frame. Adult woman in her early twenties, petite slim adult proportions, narrow shoulders, very long straight black hair with blunt bangs, brown eyes. Exact same character and sprite scale, palette and 1-native-pixel dark outline as reference. Low-resolution 1990s arcade pixel art, NOT a high-resolution illustration, NOT chibi. Transparent RGBA PNG, 4:3 landscape canvas representing 192x144 game pixels enlarged evenly. Full sprite remains in LOWER LEFT: body center x=57/192 of canvas width, soles y=135/144, head top y=47/144 when standing. Keep the entire mostly-empty canvas composition. Do not zoom in or center the sprite. Preserve head size, body mass, limb lengths, large pixel clusters and shading. No additional characters, backgrounds, floor, bathroom, water, steam, objects, detached clothing, labels or shadow. One character only, real transparent background. All changing and bathing poses are ordinary NON-SEXUAL daily care, with an opaque beige towel firmly wrapped from chest to knees when specified. No nudity.\nPOSE undress/03: change ONLY the forearms and hands of reference 1 (the white-shirt frame). The adult character still wears the white long-sleeved shirt, black necktie, charcoal trousers and shoes. Both hands now at collarbone height: one gently holds the tie knot and the other loosens the tie just below it, elbows modestly bent. RIGHT-facing side profile. Keep exact head shape and location, same long hair, shoulders, torso mass, hips, legs and foot placement as reference 1. Shirt remains fully covering torso. Reference 2 provides her original idle pixel-art scale and identity. The tie is still on her neck, slightly loosened, not held as a detached prop. No jacket or garment pile. Small restrained motion.",
+      "commit": "36f9d76d79a1ecb4c112348b7e33a7da77ba5a6d",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 46,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          40,
+          46,
+          75,
+          136
+        ],
+        "body_width": 35,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 787,
+        "outside_v3_palette_color_count": 786,
+        "outer_boundary_black": false
+      },
+      "git_blob_sha": "2874cb70a56a44db00340f5f7b0045a54993f66d",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/undress/02.png",
+        "clips/idle/00.png pre-v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/04.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        39,
+        46,
+        76,
+        136
+      ],
+      "head_top_y": 46,
+      "sole_y": 135,
+      "body_width": 37,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        193,
+        145
+      ],
+      "translation": [
+        1,
+        -1
+      ],
+      "sha256": "6c10b8e4dbfdde2d229759ef71bac45189bfb544a6d59fbfebcb43184a142f23",
+      "source_sha256": "9c00ee7283792b6e5976178c60a56e7646e7b664049bbcc94e8963c85cb79bfd",
+      "prompt": "Edit the supplied approved pixel sprite reference into ONE animation frame. Adult woman in her early twenties, petite slim adult proportions, narrow shoulders, very long straight black hair with blunt bangs, brown eyes. Exact same character and sprite scale, palette and 1-native-pixel dark outline as reference. Low-resolution 1990s arcade pixel art, NOT a high-resolution illustration, NOT chibi. Transparent RGBA PNG, 4:3 landscape canvas representing 192x144 game pixels enlarged evenly. Full sprite remains in LOWER LEFT: body center x=57/192 of canvas width, soles y=135/144, head top y=47/144 when standing. Keep the entire mostly-empty canvas composition. Do not zoom in or center the sprite. Preserve head size, body mass, limb lengths, large pixel clusters and shading. No additional characters, backgrounds, floor, bathroom, water, steam, objects, detached clothing, labels or shadow. One character only, real transparent background. All changing and bathing poses are ordinary NON-SEXUAL daily care, with an opaque beige towel firmly wrapped from chest to knees when specified. No nudity.\nPOSE undress/04: RIGHT-facing side profile, standing with the exact head, long hair, adult body proportions, leg lengths and stance of the reference. The shirt, jacket, tie and gloves are gone, replaced by an opaque plain BEIGE BATH TOWEL firmly wrapped from the upper chest/armpits DOWN TO THE KNEES, straight modest wrap, not a short skirt. Charcoal suit TROUSERS and black shoes are STILL WORN underneath, visible below the towel. Bare shoulders and bare arms, both hands gently clasped in front of the towel at abdomen height. No visible chest anatomy or cleavage, towel opaque and secure. Her shape must stay petite and narrow, not voluptuous. This is a practical non-sexual game dressing transition. Do not show removed clothing. Long black hair hangs naturally down the back to below waist with blunt bangs. Keep sprite only around the lower-left quarter as reference, not enlarged or centered.",
+      "commit": "5e76c2bdf834b38d81c621b9c2de2d871c8f41f4",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 46,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          39,
+          46,
+          76,
+          136
+        ],
+        "body_width": 37,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 43,
+        "outside_v3_palette_color_count": 42,
+        "outer_boundary_black": false
+      },
+      "git_blob_sha": "c372cf3aa6716581f218ce5a916f2185242df819",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/idle/00.png at initial pre-v3 commit"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/05.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        39,
+        56,
+        76,
+        136
+      ],
+      "head_top_y": 56,
+      "sole_y": 135,
+      "body_width": 37,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        193,
+        145
+      ],
+      "translation": [
+        -6,
+        -1
+      ],
+      "sha256": "3c1bbab425ee8e63c4f5714f095cd381e7db2b79dfac5eb3883b46afe881434f",
+      "source_sha256": "2b794b639181e9037db269eb1cab55922bf46131282b8ac4b2e5e2924501dba5",
+      "prompt": "Edit the supplied approved pixel sprite reference into ONE animation frame. Adult woman in her early twenties, petite slim adult proportions, narrow shoulders, very long straight black hair with blunt bangs, brown eyes. Exact same character and sprite scale, palette and 1-native-pixel dark outline as reference. Low-resolution 1990s arcade pixel art, NOT a high-resolution illustration, NOT chibi. Transparent RGBA PNG, 4:3 landscape canvas representing 192x144 game pixels enlarged evenly. Full sprite remains in LOWER LEFT: body center x=57/192 of canvas width, soles y=135/144, head top y=47/144 when standing. Keep the entire mostly-empty canvas composition. Do not zoom in or center the sprite. Preserve head size, body mass, limb lengths, large pixel clusters and shading. No additional characters, backgrounds, floor, bathroom, water, steam, objects, detached clothing, labels or shadow. One character only, real transparent background. All changing and bathing poses are ordinary NON-SEXUAL daily care, with an opaque beige towel firmly wrapped from chest to knees when specified. No nudity.\nPOSE undress/05 SAFE ALTERNATIVE: fully covered adult character in a beige knee-length towel wrap OVER fully worn charcoal trousers. The trousers remain pulled all the way up and fastened, exactly as reference 1; she is NOT removing or lowering them in this image. She bends forward slightly at the waist, knees together, placing both hands on the OUTSIDE of her fully clothed knees to smooth the trouser fabric. Facing RIGHT. The opaque beige towel remains wrapped securely over torso and hips down to the knees. Both legs entirely clothed in charcoal trousers, shoes on. No garment removal. Long black hair hangs forward with gravity; her face looks down calmly. Ordinary clothing adjustment in a game animation. Preserve the SAME physical head size and bone lengths as both references. Because she bends, the top of her head is LOWER than in the standing pose. Do not scale the bent character taller. Keep feet at native y=135 and body around x=57 in the mostly empty 192x144-composition transparent canvas.",
+      "commit": "25bee6641f678545962b3c3124456286b6a86206",
+      "generation_count": 2,
+      "deviation": "원래 요청한 바지 내리기 장면은 이미지 생성 출력 안전 검사(sexual)에서 차단되어, 수건과 바지를 완전히 착용한 채 무릎 바깥에 두 손을 대는 자세로 대체.",
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 56,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          39,
+          56,
+          76,
+          136
+        ],
+        "body_width": 37,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 45,
+        "outside_v3_palette_color_count": 44,
+        "outer_boundary_black": false
+      },
+      "git_blob_sha": "3a01bee83e3491a4e849d928ec6d0f471daea539",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "pre-v3, retained unchanged per user skip instruction",
+      "reference_inputs": [
+        "clips/undress/04.png",
+        "clips/idle/00.png pre-v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/06.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        45,
+        49,
+        69,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 24,
+      "center_x": 56.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        -1,
+        0
+      ],
+      "standing_scale_calibration": 1.0235294117647058,
+      "sha256": "9a42f4be6c1f198d0d4925c8f26e53af3aff6d6865a4401cc27a35273d55943e",
+      "source_sha256": "ab4285b906783784bc30b289677ba5d50223ed93d878b1ce9ed2dc08a5d6a942",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE undress/06: standing upright calmly facing RIGHT in exact side profile. Same face, head size, straight hair and body proportions as the attached version-3 base. Wear ONLY a secure opaque knee-length beige bath-towel wrap; bare lower legs below knees and bare feet. Both empty hands are gently gathered together in front of the towel at abdomen height. Narrow shoulders relaxed, legs together, toes point right. Towel has a straight modest silhouette from upper chest to knees, no fitted waist or body emphasis. Hair hangs straight down to buttocks, NOT swept out. Keep the exact small 87-native-pixel height and lower-left sprite placement. Change clothing and hand pose, not the person.",
+      "commit": "65cae7974535211d831ffbded03abd3a297c0681",
+      "generation_count": 2,
+      "revision": "base-v3; uncommitted v2 candidate discarded after user's updated specification",
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          45,
+          49,
+          69,
+          136
+        ],
+        "body_width": 24,
+        "bbox_center_x": 56.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 21,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "4736d90077f1c8cffe01b224f7d7c29c967c5272",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/00.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        45,
+        49,
+        69,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 24,
+      "center_x": 56.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        -1,
+        0
+      ],
+      "standing_scale_calibration": 1.0235294117647058,
+      "sha256": "9a42f4be6c1f198d0d4925c8f26e53af3aff6d6865a4401cc27a35273d55943e",
+      "source_sha256": "ab4285b906783784bc30b289677ba5d50223ed93d878b1ce9ed2dc08a5d6a942",
+      "prompt": "의뢰서 showerturn 00 = undress 06. 연결 장면의 픽셀·수건·체형이 동일하도록 undress/06.png를 바이트 동일하게 복사.",
+      "commit": "82a7744b8722ecc3ff7dc2e23df98692502c7b4d",
+      "generation_count": 0,
+      "source": "game-src/action/deadpole/full/clips/undress/06.png",
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          45,
+          49,
+          69,
+          136
+        ],
+        "body_width": 24,
+        "bbox_center_x": 56.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 21,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "4736d90077f1c8cffe01b224f7d7c29c967c5272",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/undress/06.png (byte-identical reuse)"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/01.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1449,
+        1086
+      ],
+      "bbox": [
+        45,
+        49,
+        71,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 26,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        0
+      ],
+      "standing_scale_calibration": 1.0116279069767442,
+      "sha256": "ac5e161913dc88b55249c3937ed438c12d3a3fd200deebd7e77bd6fec81c0b7c",
+      "source_sha256": "2eda7df4b7bf8b8e4df6116d17858192509b766f446533a7188267c1058f31d4",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE showerturn/01: this is the MIDDLE TURN from a right-facing side profile toward a full back view. Show the adult character in THREE-QUARTER REAR VIEW (back and a small right cheek edge visible). Both hands are together at her RIGHT shoulder, gathering her very long straight black hair over that shoulder toward the FRONT. The two elbows bend softly; no hands above the head yet. Keep the same securely wrapped plain beige towel from chest to knees and bare feet. The towel covers her back, torso, pelvis and upper legs completely. Same head size, 87px crown-to-sole height, limb lengths and torso mass as reference 1. Feet stay together on y135. Reference 1 is the final approved towel standing pose; reference 2 fixes v3 palette and identity. Do not create a different person or a larger sprite.",
+      "commit": "0b357ee650574e23fdc57e23d717f1cc3b35d273",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          45,
+          49,
+          71,
+          136
+        ],
+        "body_width": 26,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 20,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "f41633c132dc00c42e503a175ec81e049aea2c03",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/undress/06.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/02.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        45,
+        49,
+        69,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 24,
+      "center_x": 56.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        -1,
+        0
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "1c97b4a2a73489260ef43a6c61a34e4c414bba9cf9981cf140a1f7c924387de5",
+      "source_sha256": "278608be1ce00f4f81090e0b04fd418f00e46209253beb1117bfacd782617f6a",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE showerturn/02: complete the turn into a FULL STRAIGHT BACK VIEW, shoulders and hips parallel to the image, face NOT visible. Both arms are now lowered naturally at her sides, elbows relaxed, empty hands beside the towel. Her long black hair was gathered to her RIGHT shoulder in the preceding frame: it passes forward over that shoulder, leaving most upper back visible; a long black strand is visible along the right side, no short haircut. Same secure beige knee-length towel wrap, same bare feet together, no exposed torso below the shoulder blades. Same head size and 87px standing height as reference 1. Crown y49, soles y135. Reference 1 is the preceding three-quarter turn, reference 2 the v3 body and palette. Upright calm adult, no pose exaggeration.",
+      "commit": "e54dba5325b63ed35c5b04fc5e8e4d528306efe5",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          45,
+          49,
+          69,
+          136
+        ],
+        "body_width": 24,
+        "bbox_center_x": 56.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 20,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "af3be2c2df7208ffb132b16c2765d0746e2764e6",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/showerturn/01.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/00.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        42,
+        49,
+        73,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 31,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "standing_scale_calibration": 1.0116279069767442,
+      "sha256": "31c5831bb4c44e80bca8f31758903b5a5ba07d0a5ef6061be5523fe34cd795db",
+      "source_sha256": "24f1c6a282639e39a1049eeb866e11f7aeb6d274f744abedcdcad02ccaafbed2",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/00 (first hair-washing frame): FULL STRAIGHT BACK VIEW matching reference 1 exactly. Both arms are now raised, elbows gently pointing outward, fingertips rest on the TOP REAR of her scalp. Left hand near the crown, right hand near the upper-right scalp. Her long black hair now hangs straight DOWN her back to the buttocks in a few compact damp strands, no flying hair. Only a TINY patch of light foam ON the crown (about 2-3 native pixels wide); no foam on body or towel, no water at all. Secure opaque beige towel from chest to knees and barefoot lower legs as reference. Ordinary adult washing hair, neutral posture. Preserve the exact torso, towel, pelvis, legs, feet and 87px crown-to-sole scale of reference 1; do not enlarge body when arms rise. Hands/elbows and tiny foam may extend ABOVE y49, but skull crown remains y49 and soles y135. Reference 2 fixes version-3 identity and 20-color palette. No shower enclosure or bathroom.",
+      "commit": "875cfd7a5da82655d23ccc0df67d72b58d1aa296",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          42,
+          49,
+          73,
+          136
+        ],
+        "body_width": 31,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 23,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "8b20f1dc1a8c83330b3ffa11d69a3f3ca54dc019",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/showerturn/02.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/01.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        43,
+        49,
+        73,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 30,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        0
+      ],
+      "standing_scale_calibration": 1.0116279069767442,
+      "sha256": "805f08783c971f5bf92d87f3f1dc082fa3589036013557f6c5f4f0a114059403",
+      "source_sha256": "c22560c81fff23891fc7127b6d0073bdea12d96a53049a12b44071e12f8b459c",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/01: the next frame of the same quiet hair-washing loop. FULL STRAIGHT BACK VIEW. Reference 1 is the EXACT shampoo master: keep its head size, straight damp hair to buttocks, secure opaque beige knee-length towel, shoulders, torso, legs, bare feet, baseline and 87px body scale unchanged. Keep both arms raised and both hands in contact with scalp. CHANGE ONLY this small gesture: Small LEFT-HAND scrubbing stroke: left fingertips shift one or two native pixels toward the upper-left scalp, left elbow lowers one native pixel. Right fingertips remain resting on the crown. One gentle hair-washing gesture. Tiny 2-3 native pixel patch of light foam stays ONLY on the crown. No new foam or water. No body or towel motion except natural one-pixel shoulder response. Reference 2 fixes version-3 identity and palette. Only ONE character in lower-left composition, real transparency.",
+      "commit": "a922374e21c22f2146dd09c213a0c3dacd0f90ef",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          43,
+          49,
+          73,
+          136
+        ],
+        "body_width": 30,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 23,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "f4524621fec308f2fdb79592bbf99da66d6a83f7",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/shower/00.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/02.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        43,
+        49,
+        73,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 30,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        0
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "22390f339d16713c322fdf9bb08de13b400b6df8e6c3f3e9da9180f25d62a80e",
+      "source_sha256": "646a2514b87496150af0c1941e23085469cc4f68b82b5c1d3f1d7f5007008de7",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/02: the next frame of the same quiet hair-washing loop. FULL STRAIGHT BACK VIEW. Reference 1 is the EXACT shampoo master: keep its head size, straight damp hair to buttocks, secure opaque beige knee-length towel, shoulders, torso, legs, bare feet, baseline and 87px body scale unchanged. Keep both arms raised and both hands in contact with scalp. CHANGE ONLY this small gesture: Small RIGHT-HAND scrubbing stroke: right fingertips shift one or two native pixels toward the upper-right scalp, right elbow opens outward one native pixel. Left hand rests on the upper-left scalp. One gentle hair-washing gesture. Tiny 2-3 native pixel patch of light foam stays ONLY on the crown. No new foam or water. No body or towel motion except natural one-pixel shoulder response. Reference 2 fixes version-3 identity and palette. Only ONE character in lower-left composition, real transparency.",
+      "commit": "7c6e7ba3e7df5574ddd660ed25f4d93ee7ed8997",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          43,
+          49,
+          73,
+          136
+        ],
+        "body_width": 30,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 22,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "8d49b1b884b6c0890cb4790813f738050bacbfee",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/shower/00.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/03.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        45,
+        49,
+        69,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 24,
+      "center_x": 56.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        -1,
+        0
+      ],
+      "standing_scale_calibration": 1.0116279069767442,
+      "sha256": "29e29ea72c9ccf4828869f5f4c81f89721f7c90579b942cfcf7876fbc9077e69",
+      "source_sha256": "bdfc1b42810d62ede5da2432f510873bf4ba0ccee71923b3c6f2f662525185c9",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/03: the next frame of the same quiet hair-washing loop. FULL STRAIGHT BACK VIEW. Reference 1 is the EXACT shampoo master: keep its head size, straight damp hair to buttocks, secure opaque beige knee-length towel, shoulders, torso, legs, bare feet, baseline and 87px body scale unchanged. Keep both arms raised and both hands in contact with scalp. CHANGE ONLY this small gesture: Both fingertips press lightly into the crown for a small circular massage, elbows draw inward about one native pixel. The gesture stays compact, hands remain in contact with the hair, never raised away. Tiny 2-3 native pixel patch of light foam stays ONLY on the crown. No new foam or water. No body or towel motion except natural one-pixel shoulder response. Reference 2 fixes version-3 identity and palette. Only ONE character in lower-left composition, real transparency.",
+      "commit": "c0eabc963f32f8be16b323a761cb58b896b2fc33",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          45,
+          49,
+          69,
+          136
+        ],
+        "body_width": 24,
+        "bbox_center_x": 56.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 22,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "b16f25df4c18843e553c936ff3513fd59bf0f536",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/shower/00.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/04.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        43,
+        49,
+        73,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 30,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        0
+      ],
+      "standing_scale_calibration": 1.0875,
+      "sha256": "8d9bdd633d072eb6a6d1b90d1ea82196de6033bd749114687c3bd2019b2d0731",
+      "source_sha256": "c95212992c2e76a434bc02b8ee970ebb78b23182523f69cf2c2c922ebbd033a6",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/04: the next frame of the same quiet hair-washing loop. FULL STRAIGHT BACK VIEW. Reference 1 is the EXACT shampoo master: keep its head size, straight damp hair to buttocks, secure opaque beige knee-length towel, shoulders, torso, legs, bare feet, baseline and 87px body scale unchanged. Keep both arms raised and both hands in contact with scalp. CHANGE ONLY this small gesture: Fingertips slide a little toward the BACK OF THE HEAD, both elbows lower by one or two native pixels. Fingers remain on scalp. One gentle down-and-back scrubbing gesture, torso does not bend. Tiny 2-3 native pixel patch of light foam stays ONLY on the crown. No new foam or water. No body or towel motion except natural one-pixel shoulder response. Reference 2 fixes version-3 identity and palette. Only ONE character in lower-left composition, real transparency.",
+      "commit": "3cf0e87caebbd38168aa42b7232406ce215ba569",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          43,
+          49,
+          73,
+          136
+        ],
+        "body_width": 30,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 22,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "53e4d1dab13d92920c20fdfce6c2b01b32825f86",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/shower/00.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/05.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        43,
+        49,
+        72,
+        136
+      ],
+      "head_top_y": 49,
+      "sole_y": 135,
+      "body_width": 29,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "standing_scale_calibration": 1.0116279069767442,
+      "sha256": "190ebe8913b17841ca433b382706c2b95d652011a8c86801d65b0f4f17edfd16",
+      "source_sha256": "f358c2c28a52af83dfbb2fa6a302c8f4e6d768f6e8b3ebfeb12d10c44887c1c9",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE shower/05: the next frame of the same quiet hair-washing loop. FULL STRAIGHT BACK VIEW. Reference 1 is the EXACT shampoo master: keep its head size, straight damp hair to buttocks, secure opaque beige knee-length towel, shoulders, torso, legs, bare feet, baseline and 87px body scale unchanged. Keep both arms raised and both hands in contact with scalp. CHANGE ONLY this small gesture: Return toward the first shampoo pose: fingertips return to crown, left elbow slightly higher than the right by one native pixel. Tiny finger opening, calm compact hair-washing motion, suitable for looping back to frame 00. Tiny 2-3 native pixel patch of light foam stays ONLY on the crown. No new foam or water. No body or towel motion except natural one-pixel shoulder response. Reference 2 fixes version-3 identity and palette. Only ONE character in lower-left composition, real transparency.",
+      "commit": "1bc00a459bbc31745fb7929426b9e6f4fef2e6f1",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 49,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          43,
+          49,
+          72,
+          136
+        ],
+        "body_width": 29,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 23,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "5e4c2f2e6e5915ada9893659e20ebcdd99806116",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/shower/00.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/00.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        34,
+        84,
+        80,
+        136
+      ],
+      "head_top_y": 84,
+      "sole_y": 135,
+      "body_width": 46,
+      "center_x": 56.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        -9,
+        1
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "49dfd3c5191059d5905b965054e17b662c0ec0ea26adcf5848b8f3779ec5ef2f",
+      "source_sha256": "543f35badea26aec6a6062b6d99383fdd3535ce27b34d97c13b00d1454ce673e",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE bath/00: RIGHT-facing SIDE PROFILE, sitting on an invisible level surface (draw NO surface), knees drawn UP together in front of the torso, both arms wrapped gently around the upper shins. Her CHIN PHYSICALLY RESTS ON THE TOPS OF HER KNEES; head lowered, calm eyes, not looking up. Same adult character as the two references. She remains securely covered by an opaque BEIGE BATH TOWEL: closed wrap covers chest, abdomen, pelvis and bent upper legs, gathered around the knees, no uncovered upper legs. Bare lower shins and feet only, toes point right. Both empty hands rest around the shins just below knees; small reserved adult posture, no body emphasis. Very long straight black hair falls behind the back down to the seated hips. No bath tub, water, foam, stool, chair, ground line or any other object.\nIMPORTANT SCALE: do NOT scale this seated pose to standing height. Same head size (roughly 16-18 native pixels high) and SAME bone lengths as the 87px standing adult in reference 1. A naturally folded seated silhouette is about 55-60 native pixels high, with crown around y78-81 and seated pelvis/lowest foot row y135, nominal body center x57 on the full 192x144 composition. Keep her SMALL in the lower-left, same mostly empty transparent canvas. Reference 1 is the towel body/clothing reference; reference 2 is the approved version-3 face, palette and proportions.",
+      "commit": "12e5a0a3e9e067ac0b53565a5e2fd82800811b81",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 84,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          34,
+          84,
+          80,
+          136
+        ],
+        "body_width": 46,
+        "bbox_center_x": 56.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 20,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "72853ae3fc7d9ed3899d41e120e1bceba0590c22",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/undress/06.png",
+        "base.png v3"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/01.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        36,
+        85,
+        80,
+        136
+      ],
+      "head_top_y": 85,
+      "sole_y": 135,
+      "body_width": 44,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        2
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "f8c75d8d0b5c52c8b7b75313613c8c1149d1739840f1640d81f91fd03a49fff2",
+      "source_sha256": "aabb406359caf7fecbf788668ebb808857c82aeafdae266e0707bb9b03510769",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE bath/01: edit ONLY the subtle breathing motion in the attached SEATED master. a small INHALE: head and shoulders lift by ONLY ONE native pixel; chin remains resting against knees with a tiny head tilt. No change to hands, legs, seated hips or feet. Keep EXACTLY the same right-facing side profile, adult head size, straight black hair, opaque beige towel covering chest, pelvis and bent upper legs, knees together, arms hugging shins, chin physically resting on knees. Do not look up. Keep the master sprite's SAME physical size and folded seated silhouette (about 52 native pixels high), crown near y84, seated hips and lowest foot row y135, nominal center x57. Preserve feet and all lower-body pixels as closely as possible. Do NOT redraw the character larger or move the body. A seated pose is NOT 87 pixels high. No chair, tub, water, steam, floor, foam, clothes or additional objects. Single compact pixel-art adult character with 1px black border and the exact 20+4 allowed colors, same empty 192x144-composition transparent canvas.",
+      "commit": "d44ffa9ecc8b3000d00b013710e67cea4ae2450b",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 85,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          36,
+          85,
+          80,
+          136
+        ],
+        "body_width": 44,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 23,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "4da7d7f1f469d6effa7189a5e1a46727d43f1a99",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/bath/00.png"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/02.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        36,
+        85,
+        80,
+        136
+      ],
+      "head_top_y": 85,
+      "sole_y": 135,
+      "body_width": 44,
+      "center_x": 57.5,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        1,
+        0
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "0309ba5ef2805aa98046e70980ee3ef1851d51136e45802a57201e193a34fcda",
+      "source_sha256": "618a46b97744e26cf2debd41f8c67459c3971adf6a30a9eb5527c3dc43ea3689",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE bath/02: edit ONLY the subtle breathing motion in the attached SEATED master. return from the inhale to the BASELINE shoulder and head position of reference 1; a one-native-pixel softening of the shoulder line. Hands continue embracing the same shins. Chin stays on knees. Keep EXACTLY the same right-facing side profile, adult head size, straight black hair, opaque beige towel covering chest, pelvis and bent upper legs, knees together, arms hugging shins, chin physically resting on knees. Do not look up. Keep the master sprite's SAME physical size and folded seated silhouette (about 52 native pixels high), crown near y84, seated hips and lowest foot row y135, nominal center x57. Preserve feet and all lower-body pixels as closely as possible. Do NOT redraw the character larger or move the body. A seated pose is NOT 87 pixels high. No chair, tub, water, steam, floor, foam, clothes or additional objects. Single compact pixel-art adult character with 1px black border and the exact 20+4 allowed colors, same empty 192x144-composition transparent canvas.",
+      "commit": "ed75fc8967c7176f580021a3c9be359dab1381c6",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 85,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          36,
+          85,
+          80,
+          136
+        ],
+        "body_width": 44,
+        "bbox_center_x": 57.5,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 20,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "cc218bb7e51e75cd74a9bc25cb2df2f71d79d361",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/bath/00.png"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/03.png",
+      "native_size": [
+        192,
+        144
+      ],
+      "source_size": [
+        1448,
+        1086
+      ],
+      "bbox": [
+        35,
+        86,
+        80,
+        136
+      ],
+      "head_top_y": 86,
+      "sole_y": 135,
+      "body_width": 45,
+      "center_x": 57,
+      "alpha_values": [
+        0,
+        255
+      ],
+      "fixed_canvas_reduction": [
+        192,
+        144
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "standing_scale_calibration": 1,
+      "sha256": "21b60e2fb7162a66c73dfcd5aaca4c49f966dd0b9ec64f651cf31407643b56ab",
+      "source_sha256": "bc73eea601af391ebdc3804df64311a533f5d67400085c00b51cc9f00b49b78c",
+      "prompt": "Edit the supplied APPROVED VERSION-3 Deadpole pixel sprite into ONE game animation frame. An adult woman in her early twenties, petite slim adult build and narrow shoulders. Very long STRAIGHT BLACK HAIR hangs straight to her buttocks, blunt hime bangs, brown eyes and a subtle blush. EXACT same adult character, physical proportions, head size and 1-native-pixel PURE BLACK #000000 outer outline as the v3 reference. NOT chibi, NOT a large illustration. Low-resolution 1990s arcade pixel art with compact pixel clusters, hard edges, no antialiasing, blur or gradients.\nTechnical layout: 192x144 native game-pixel composition, landscape 4:3 canvas, may be enlarged by an integer with nearest-neighbor. Standing crown y=49 and lowest sole row y=135 gives EXACTLY 87 pixels in height. Nominal torso center x=57, right-facing standing sprite roughly x=42..75. Thus character appears SMALL in LOWER LEFT and most canvas is empty. Do not center or zoom. Preserve body lengths during turning and bending.\nUse ONLY these base 20 colors: #000000 #1d1c1f #0e0d13 #3d393d #383438 #17161a #050509 #121116 #0a0a0d #28272a #444449 for hair/dark areas; #f8f9fa #d6d7d9 #9ea2a6 #6a707b for light areas; #fbc496 #eb9c68 #e88159 #ad6b42 #7e3b14 for skin/eyes/blush. Towel additional colors ONLY #e2d3b4 #c9b48e #a08a66 #6e5c42. Absolutely no blue-grey hair, no colorful fringe. Transparent background, alpha only 0 or 255. Sole baseline y135; seated pelvis and soles lowest y135.\nOrdinary NON-SEXUAL adult daily-care animation. A secure opaque beige bath towel covers from chest to knees in the bathing poses. No nudity. No detached clothing, props, walls, floor, bath, water, steam, text, extra characters or ground shadow. Only one sprite and genuine transparent background.\nPOSE bath/03: edit ONLY the subtle breathing motion in the attached SEATED master. a small EXHALE: shoulders and head settle ONLY ONE native pixel lower than the baseline, chin nestles against knees. Hands and forearms remain wrapped around the shins, feet and seated hips unmoved. Keep EXACTLY the same right-facing side profile, adult head size, straight black hair, opaque beige towel covering chest, pelvis and bent upper legs, knees together, arms hugging shins, chin physically resting on knees. Do not look up. Keep the master sprite's SAME physical size and folded seated silhouette (about 52 native pixels high), crown near y84, seated hips and lowest foot row y135, nominal center x57. Preserve feet and all lower-body pixels as closely as possible. Do NOT redraw the character larger or move the body. A seated pose is NOT 87 pixels high. No chair, tub, water, steam, floor, foam, clothes or additional objects. Single compact pixel-art adult character with 1px black border and the exact 20+4 allowed colors, same empty 192x144-composition transparent canvas.",
+      "commit": "6427f0137b39252fe379266c4ada12a398ac7bde",
+      "generation_count": 1,
+      "measurements": {
+        "canvas": [
+          192,
+          144
+        ],
+        "head_top_y": 86,
+        "bottom_y": 135,
+        "opaque_bbox": [
+          35,
+          86,
+          80,
+          136
+        ],
+        "body_width": 45,
+        "bbox_center_x": 57.0,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "color_count": 21,
+        "outside_v3_palette_color_count": 0,
+        "outer_boundary_black": true
+      },
+      "git_blob_sha": "cd8a4a8fe7672d320189289806cd16a019491ef1",
+      "commit_reachable_from_verified_main": true,
+      "spec_revision": "v3 section 3-1",
+      "reference_inputs": [
+        "clips/bath/00.png"
+      ],
+      "reference_rendering": "nearest-neighbor 4x enlarged review image; original body proportions retained"
+    }
+  ]
+}
