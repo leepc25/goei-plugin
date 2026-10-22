@@ -94,8 +94,8 @@ const TONES: [number, number, number, number][] = [
 const toned = new Map<string, HTMLCanvasElement>();
 /** 0이면 원래 색. 층 깊이를 넣는다 (그리기 전에 한 번) */
 export function setFloorTone(depth: number) {
-  // 벽 묶음 자체를 층마다 바꾸므로(placeFor) 색조는 4층부터 한 바퀴 돈 뒤에만
-  tone = depth > 3 ? Math.floor((depth - 1) / 3) % TONES.length : 0;
+  // 시작 홀(승강기 벽)은 층마다 같은 그림이라 색조를 층마다 돌린다 (독립 검수 fb99e85: L1~L3 시작 화면이 같음)
+  tone = depth > 0 ? (depth - 1) % TONES.length : 0;
 }
 function tonedImage(key: string, im: HTMLImageElement): CanvasImageSource {
   if (!tone || typeof document === 'undefined') return im;
@@ -227,6 +227,8 @@ const OWN_GRID = new Set(['hq_pantry', 'hq_street', 'puzzle']);
 /** 바닥 띠(y0~y1)를 무늬로 깐다. 무늬는 월드 x에 붙고, 깊이는 모이는 줄과 뒤쪽 어둡게로 읽힌다. */
 export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, y0: number, y1: number): boolean {
   place = place.split(':')[0];
+  // 탕비실 바닥 그림은 도트화하면 투명 체커처럼 보인다 (독립 검수 fb99e85): 복도 바닥을 빌린다
+  if (place === 'hq_pantry') place = 'hq_corridor';
   if (!Object.keys(pack()[place] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[place]) place = FLOOR_ALT[place];
   const name = Object.keys(pack()[place] ?? {}).find((n) => n.endsWith('_floor'));
   const im = name ? image(place, name) : null;

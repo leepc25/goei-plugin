@@ -197,6 +197,10 @@ function drawFallback(c: CanvasRenderingContext2D, t: number) {
 export function drawGoSign(c: CanvasRenderingContext2D, x: number, y: number, t: number) {
   c.save();
   c.imageSmoothingEnabled = false;
+  // 작게 줄여 화면 맨 위 HUD 띠에 붙인다: 큰 판은 문 윗부분·액자를 가렸다 (독립 검수 fb99e85)
+  c.translate(x, y);
+  c.scale(0.62, 0.62);
+  c.translate(-x, -y);
   const im = pixelText('전진', 33, '#ffe9a8', '#ffb43a', 700, true);
   const k = 2;
   // 어두운 도트 판을 받쳐 벽·문 위 글씨가 아니라 화면 표시로 읽히게 (독립 검수: 「전진」이 문과 겹침)

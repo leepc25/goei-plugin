@@ -12,7 +12,9 @@ const CROUCH_X = 3.4;
 const JUMP_V = 31;
 const BUFFER = 8;
 const MAG = 8;
-const HOLSTER_AFTER = 45;
+const HOLSTER_AFTER = 48; // 뽑은 권총을 들고 있는 시간 (시연판 1.6초)
+const CHARGE_AFTER = 9; // D를 이만큼 누르고 있으면 충전으로
+const FIGHT_STANCE = 150;
 const SKILL_CD = 75;
 const GRAB_TIME = 66;
 
@@ -54,6 +56,16 @@ export class Player extends Fighter {
   reserve = 40;
   gunOut = 0;
   private queuedShot = false;
+  private burst = 0;
+  private burstT = 0;
+  private dry = false;
+  // D 길게: 충전
+  chargeT = -1;
+  charging = false;
+  /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
+  fightT = 0;
+  /** 강화 선택 등이 곱하는 공격력 배수 */
+  dmgMul = 1;
   // 게이지
   gauge = 0;
   guardMeter = 100;
@@ -110,6 +122,7 @@ export class Player extends Fighter {
     if (!this.carry) return null;
     const { info, origin } = this.frameInfo();
     const P = PIXEL;
+    if (this.carry.hold === 'over' && info?.hand && /^carry2_|^toss/.test(this.anim().clip)) return { dx: (info.hand[0] - origin) * P, dz: info.hand[1] * P, deg: 0 };
     if (this.carry.hold === 'over') {
       const top = info?.hurt ? info.hurt[3] : 96;
       return { dx: ((info?.hurt ? (info.hurt[0] + info.hurt[1]) / 2 : 0) - origin) * P, dz: (top - 6) * P, deg: 0 };
@@ -140,7 +153,7 @@ export class Player extends Fighter {
         hit.push({
           ...w,
           attackId: this.attackId,
-          dmg: mh.dmg,
+          dmg: mh.dmg * this.dmgMul,
           react: mh.react,
           dir: this.dir,
           push: mh.push,
@@ -182,11 +195,33 @@ export class Player extends Fighter {
       const f = this.vz > 14 ? 2 : this.vz > 3 ? 3 : this.vz > -6 ? 4 : this.vz > -16 ? 5 : 6;
       return { clip: 'jump', frame: f, origin: 0 };
     }
+    if (this.charging) return loop('charge', 3);
     if (this.guarding) return { clip: 'block', frame: Math.min(3, this.wasGuarding), origin: 0 };
     if (this.crouching) return Math.abs(this.vx) > 0.5 ? loop('crouchwalk', 3) : { clip: 'crouch', frame: 3, origin: 0 };
+    // 든 것에 따라 서기·걷기·뛰기 클립이 다르다 (시연판: 산탄총·쇠파이프·두 손 들기)
+    const held = this.heldSet();
+    const moving = Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5;
+    if (held) {
+      const want = `${held === 'carry2' ? 'carry2_' : ''}${this.running ? 'run' : moving ? 'walk' : 'idle'}${held === 'carry2' ? '' : '_' + held}`;
+      const alt = `${held === 'carry2' ? 'carry2_' : ''}${moving ? 'walk' : 'idle'}${held === 'carry2' ? '' : '_' + held}`;
+      if (this.clips[want]) return loop(want, this.running ? 2 : moving ? 3 : 6);
+      if (this.clips[alt]) return loop(alt, moving ? 3 : 6);
+    }
     if (this.running) return loop('run', 2);
-    if (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) return loop('walk', 3);
-    return this.gunOut > 0 ? loop('guard', 6) : loop('idle', 7);
+    if (moving) return loop('walk', 3);
+    // 뽑은 권총: 겨눈 자세(발사 마지막 장)를 유지
+    if (this.gunOut > 0) return { clip: 'fire', frame: Math.max(0, (this.clips.fire?.length ?? 4) - 1), origin: 0 };
+    return this.fightT > 0 ? loop('guard', 6) : loop('idle', 7);
+  }
+
+  /** 든 물건 종류별 자세 클립 이름 조각 */
+  private heldSet(): 'shotgun' | 'pipe' | 'carry2' | null {
+    const c = this.carry;
+    if (!c) return null;
+    if (c.kind === 'prop') return 'carry2';
+    if (c.cls === 'melee') return 'pipe';
+    if (c.cls === 'gun' && c.id !== 'servicepistol') return 'shotgun';
+    return null;
   }
 
   /* ───────── 맞음 ───────── */
@@ -255,11 +290,12 @@ export class Player extends Fighter {
     this.connected = false;
     this.running = false;
     this.guarding = false;
+    if (m.hits) this.fightT = FIGHT_STANCE;
     if (m.lunge) this.vx = this.dir * m.lunge[0];
     else if (!this.airborne) this.vx = 0;
     this.vy = 0;
     this.skipZeroFrames();
-    const ability = key === 'blast' || key === 'groundblast' || key === 'grabblast';
+    const ability = key === 'blast' || key === 'bigblast' || key === 'groundblast' || key === 'grabblast' || key === 'chain' || key === 'wall';
     world.emit(ability ? { type: 'ability', x: this.x, move: key } : key === 'super' ? { type: 'super', x: this.x, move: key } : key === 'evade' ? { type: 'evade', x: this.x } : { type: 'custom', name: 'move', data: key });
   }
 
@@ -290,7 +326,6 @@ export class Player extends Fighter {
     const order: [string, Buf][] = [['super', 'super'], ['skill', 'skill'], ['attack', 'attack'], ['jump', 'jump'], ['shoot', 'shoot']];
     for (const [k, b] of order) if (p.pressed.has(k as never)) this.buf = { b, ttl: BUFFER };
     if (p.evade) this.buf = { b: 'evade', ttl: BUFFER };
-    if (p.held.has('shoot') && this.gunOut > 0 && !this.buf) this.buf = { b: 'shoot', ttl: 1 };
   }
 
   private take(b: Buf): boolean {
@@ -311,15 +346,18 @@ export class Player extends Fighter {
     if (this.comboTimer > 0) this.comboTimer--;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
     if (this.skillCd > 0) this.skillCd--;
-    if (this.gunOut > 0) this.gunOut--;
     if (!this.guarding) this.guardMeter = Math.min(100, this.guardMeter + 0.5);
     this.bufPress(p);
     if (this.buf && --this.buf.ttl < 0) this.buf = null;
     this.wantInteract = p.pressed.has('interact');
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
 
+    if (this.fightT > 0) this.fightT--;
+    if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
     if (this.stepReact(world)) {
-      this.running = this.guarding = this.crouching = false;
+      this.running = this.guarding = this.crouching = this.charging = false;
+      this.chargeT = -1;
+      this.fightT = FIGHT_STANCE;
       this.wantInteract = false;
       this.wantItem = 0;
       return;
@@ -327,6 +365,7 @@ export class Player extends Fighter {
     this.armor = 0;
     if (this.move?.free && (this.buf || p.mx || p.my)) this.cancelMove();
     if (this.move) this.stepMove(world, p);
+    else if (this.charging) this.stepCharge(world, p);
     else if (this.grabbed) this.stepGrab(world, p);
     else this.stepFree(world, p);
     this.stepPhysics(world);
@@ -388,13 +427,31 @@ export class Player extends Fighter {
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       return this.play('dash', world);
     }
+    // D를 누르고 있는 동안 폭파 예비 자세(장 2)에서 멈췄다가, 길어지면 충전으로
+    if (key === 'blast' && this.chargeT >= 0) {
+      if (p.held.has('skill')) {
+        this.chargeT++;
+        if (this.mf >= 2) {
+          this.mf = 2;
+          this.mft = 0;
+        }
+        if (this.chargeT >= CHARGE_AFTER) {
+          this.cancelMove();
+          this.charging = true;
+          this.chargeT = 0;
+          return;
+        }
+        return;
+      }
+      this.chargeT = -1;
+    }
     if (key === 'reload' && this.mf === 3 && this.mft === 0) {
       const n = Math.min(this.mag - this.ammo, this.reserve);
       this.ammo += n;
       this.reserve -= n;
       world.emit({ type: 'reload', x: this.x });
     }
-    if (key === 'fire' && this.mf === 0 && this.mft === 0) this.fireBullet(world);
+    if (key === 'fire' && this.mf === 0 && this.mft === 0 && !this.dry) this.fireBullet(world);
     // 장 진행
     if (++this.mft >= Math.max(1, m.ticks[this.mf])) {
       this.mft = 0;
@@ -404,11 +461,12 @@ export class Player extends Fighter {
       const h = m.hits?.find((x) => x.at[0] === this.mf);
       if (h) {
         if (h.shake) world.shake(2, 1);
-        if (key === 'blast' || key === 'grabblast' || key === 'groundblast' || key === 'super') {
+        if (key === 'blast' || key === 'bigblast' || key === 'grabblast' || key === 'groundblast' || key === 'super' || key === 'chain' || key === 'wall') {
           // 폭발은 손 고정점(있으면)에서. 필살은 앞쪽 멀리, 바닥 폭파는 발밑
           const { info, origin } = this.frameInfo();
           const hd = info?.hand;
-          const dx = key === 'super' ? 130 * PIXEL / 2 : key === 'groundblast' ? 0 : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
+          const reachX = h.box ? ((h.box[0] + h.box[1]) / 2) * PIXEL : 0;
+          const dx = key === 'super' ? 130 * PIXEL / 2 : key === 'groundblast' ? 0 : key === 'chain' || key === 'wall' || key === 'bigblast' ? reachX : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
           const dz = key === 'groundblast' ? 10 : hd && key !== 'super' ? hd[1] * PIXEL : 70 * PIXEL / 2;
           world.fx('boom', this.x + this.dir * dx, this.y, dz);
           world.shake(h.shake ?? 6, key === 'super' ? 3 : 2);
@@ -431,14 +489,10 @@ export class Player extends Fighter {
     this.cancelMove();
     if (key === 'jab' || key === 'cross') this.comboTimer = 8;
     else this.comboStep = 0;
-    if (key === 'draw') {
-      this.gunOut = HOLSTER_AFTER;
-      if (queued || this.buf?.b === 'shoot') {
-        this.buf = null;
-        this.tryShoot(world);
-      }
-    }
-    if (key === 'fire') this.gunOut = HOLSTER_AFTER;
+    void queued;
+    // 뽑기·사격·장전 뒤에는 겨눈 채 기다린다. 다음 S가 사격 (시연판과 같게)
+    if (key === 'draw' || key === 'fire' || key === 'reload') this.gunOut = HOLSTER_AFTER;
+    if (key === 'holster') this.gunOut = 0;
     if (key === 'grabblast' || key === 'grabknee') {
       /* 잡기 끝 처리는 stepGrab에서 */
     }
@@ -447,7 +501,21 @@ export class Player extends Fighter {
   private startSkill(world: WorldView, p: Pad) {
     this.skillCd = SKILL_CD;
     if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+    this.gunOut = 0;
     this.play(this.crouching ? 'groundblast' : 'blast', world);
+    if (!this.crouching && p.held.has('skill')) this.chargeT = 0;
+  }
+
+  /** 충전 중: 놓으면 큰 폭파 */
+  private stepCharge(world: WorldView, p: Pad) {
+    this.vx = this.vy = 0;
+    this.chargeT++;
+    if (this.chargeT % 6 === 0) world.fx('spark', this.x + this.dir * 34 * PIXEL, this.y, 66 * PIXEL);
+    if (!p.held.has('skill')) {
+      this.charging = false;
+      this.chargeT = -1;
+      this.play('bigblast', world);
+    }
   }
 
   private startSuper(world: WorldView) {
@@ -467,34 +535,63 @@ export class Player extends Fighter {
     world.fx('dust', this.x, this.y, 0);
   }
 
+  /** S: 집어넣은 상태면 뽑기만, 뽑은 상태면 한 발. 3발 뒤 잠깐 멈춤, 빈 탄창은 「찰칵」 (R로 장전) */
   private tryShoot(world: WorldView) {
-    if (this.ammo <= 0) {
-      if (this.reserve > 0) this.play('reload', world);
-      else {
-        world.emit({ type: 'empty', x: this.x });
-        world.say('탄약이 없다', 1);
-      }
-      return;
-    }
-    if (this.gunOut <= 0) {
-      this.play('draw', world);
-      this.queuedShot = true;
-      return;
+    this.fightT = FIGHT_STANCE;
+    if (this.gunOut <= 0) return this.play('draw', world);
+    if (this.burst >= 3 && this.burstT > 0) return;
+    this.dry = this.ammo <= 0;
+    if (this.dry) {
+      world.emit({ type: 'empty', x: this.x });
+      world.say(this.reserve > 0 ? '찰칵 — R로 장전' : '찰칵 — 탄약이 없다', 1);
     }
     this.play('fire', world);
+    if (this.dry) {
+      this.mf = this.move!.ticks.length - 1;
+      return;
+    }
+    if (++this.burst >= 3) this.burstT = 14;
   }
 
   private fireBullet(world: WorldView) {
     this.ammo--;
     this.gunOut = HOLSTER_AFTER;
     world.emit({ type: 'shot', x: this.x, ammo: this.ammo });
+    // 총구 = 발사 장의 손 고정점 + 권총 길이 (무릎 높이에서 나가던 것 고침)
+    const { info, origin } = this.frameInfo();
+    const hd = info?.hand;
+    const mx = hd ? (hd[0] - origin + 14) * PIXEL : 48 * PIXEL;
+    const mz = hd ? (hd[1] + 3) * PIXEL : 74 * PIXEL;
     (world as unknown as { addBullet(o: { x: number; y: number; z: number; dir: 1 | -1 }): void }).addBullet({
-      x: this.x + this.dir * 150,
+      x: this.x + this.dir * mx,
       y: this.y,
-      z: 66,
+      z: mz,
       dir: this.dir,
     });
+    world.fx('spark', this.x + this.dir * mx, this.y, mz);
     this.x -= this.dir * 2;
+  }
+
+  /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
+  private tryGrabFront(world: WorldView): boolean {
+    for (const b of world.bodies) {
+      if (b.team !== 'enemy' || !b.alive || b.z > 0) continue;
+      const g = b as Grabbed;
+      if (!g.grabbable || !(g instanceof Fighter || typeof g.set === 'function')) continue;
+      const dx = b.x - this.x;
+      if (Math.sign(dx) !== this.dir || Math.abs(dx) > 90 || Math.abs(b.y - this.y) > 20) continue;
+      this.grabbed = g;
+      this.grabT = 0;
+      this.grabHits = 0;
+      grabHold(g);
+      g.vx = 0;
+      this.vx = this.vy = 0;
+      this.gunOut = 0;
+      this.fightT = FIGHT_STANCE;
+      world.emit({ type: 'custom', name: 'grab' });
+      return true;
+    }
+    return false;
   }
 
   private stepFree(world: WorldView, p: Pad) {
@@ -520,8 +617,22 @@ export class Player extends Fighter {
       world.say('필살 게이지가 모자라다', 1);
     }
     // 앉기: ↓ 두 번, ↓ 누르고 있는 동안 유지
-    if (p.downDouble) this.crouching = true;
-    if (!p.held.has('down')) this.crouching = false;
+    // 앉기: ↓ 두 번으로 앉고 앉은 채 유지, ↑·Space·↓ 두 번으로 일어선다 (시연판)
+    if (this.crouching && (p.pressed.has('up') || p.pressed.has('jump') || p.downDouble)) {
+      this.crouching = false;
+      if (this.buf?.b === 'jump') this.buf = null;
+      p.pressed.delete('up');
+    } else if (p.downDouble && !this.carry) {
+      this.crouching = true;
+      this.gunOut = 0;
+    }
+    if (p.pressed.has('interact') && !this.carry && !this.crouching && this.tryGrabFront(world)) {
+      this.wantInteract = false;
+      return;
+    }
+    // F 연쇄 폭파, G 벽 통째로 (숙련 동작)
+    if (!this.crouching && !this.carry && p.pressed.has('chain')) return this.play('chain', world);
+    if (!this.crouching && !this.carry && p.pressed.has('wall')) return this.play('wall', world);
     // 가드
     const g = p.held.has('guard') && this.guardMeter > 0;
     this.wasGuarding = g ? this.wasGuarding + 1 : 0;
@@ -554,7 +665,7 @@ export class Player extends Fighter {
       const anim = this.itemAct(k);
       if (anim !== null) {
         this.take(k);
-        if (anim) this.play(anim, world);
+        if (anim) this.play(anim === 'wfire' && this.heldSet() === 'shotgun' ? 'wshot' : anim, world);
         return;
       }
     }
@@ -566,10 +677,18 @@ export class Player extends Fighter {
       this.comboStep = COMBO.indexOf(next);
       return this.play(next, world);
     }
-    if (p.pressed.has('reload') && this.ammo < this.mag && this.reserve > 0) return this.play('reload', world);
+    if (p.pressed.has('reload') && this.ammo < this.mag) {
+      if (this.reserve > 0) return this.play('reload', world);
+      world.say('예비 탄약이 없다', 1);
+    }
     if (this.take('shoot') && !this.crouching) {
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
       return this.tryShoot(world);
+    }
+    // 겨눈 채 움직이면 권총을 집어넣는다. 아무것도 안 하고 시간이 지나도 집어넣는다
+    if (this.gunOut > 0 && (p.mx || p.my || --this.gunOut === 0)) {
+      this.gunOut = 0;
+      return this.play('holster', world);
     }
     // 이동
     if (p.mx) this.dir = p.mx > 0 ? 1 : -1;

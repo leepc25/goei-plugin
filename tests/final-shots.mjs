@@ -71,6 +71,9 @@ try {
     });
     await page.waitForTimeout(200);
     await page.keyboard.press('KeyE');
+    // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
+    await page.waitForSelector('.gnp:not([hidden])');
+    await page.keyboard.press('KeyE');
     await page.waitForSelector('[data-mission]', { state: 'visible' });
     await page.waitForTimeout(300);
     await S('mission');

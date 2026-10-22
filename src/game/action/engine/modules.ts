@@ -15,6 +15,8 @@ import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type 
 import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, type HubHost } from './hub';
+import { linkNpcTalk } from './npcLink';
+import demoPhotos from '../story/demo-photos.json';
 import { whereIs } from '../hq/map';
 import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
@@ -45,7 +47,7 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -65,6 +67,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   );
   return {
     hub: () => hub,
+    state: () => hq.state,
     goto: (place: string) => hub.goto(place),
     isOpen: () => hq.isOpen(),
     close: () => hq.close(),
@@ -203,7 +206,20 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
   };
-  const elevator = createElevatorStage(stageStore, stageHooks());
+  // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
+  const npc = linkNpcTalk({
+    layer: shell.stage.ui,
+    bridge,
+    settings: () => shell.settings,
+    agent: () => runAgent,
+    day: () => hq.state().day,
+    rescued: () => hq.state().rescued,
+    photo: (k) => (bridge as { photo?: (n: string) => string | undefined } | undefined)?.photo?.(k) || (demoPhotos as Record<string, string>)[k],
+    sfx: (n) => audio.play(n as never),
+    onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
+  });
+  (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
+  const elevator = createElevatorStage(stageStore, npc.stageHooks(stageHooks()));
   setLineProvider(hqLines);
   // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
@@ -441,7 +457,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden,
+    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
@@ -496,7 +512,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
       if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
-      if (run.stageId === 'hq') return; // 본부 걷기: 아이템·대사 안내·전투 기록 없음
+      if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.notes.runId = `${run.seed}`;
       // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
       w.on((e) => {
@@ -529,6 +545,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
       });
       const items = linkItems(w, run);
+      npc.attach(w, { items, hq: false });
       if (run.stageId === 'itemroom') items.showcase();
       w.hooks.push(() => items.tick());
       w.underlays.push((c, camX) => items.draw(c, camX));
@@ -546,9 +563,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     boot: (g) => bootFromUrl(g),
     dispose: () => {
+      npc.dispose();
       unmountItems();
-      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown };
+      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
+      delete g.__goeiNpc;
       delete g.__goeiStoryStart;
       world = null;
       game = null;

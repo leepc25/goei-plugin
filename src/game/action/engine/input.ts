@@ -4,11 +4,12 @@
 export type Btn =
   | 'left' | 'right' | 'up' | 'down'
   | 'attack' | 'shoot' | 'skill' | 'guard' | 'super' | 'interact' | 'jump' | 'shift' | 'reload'
-  | 'item1' | 'item2' | 'item3' | 'item4' | 'map' | 'auto' | 'pause' | 'hitbox';
+  | 'chain' | 'wall' | 'ally' | 'item1' | 'item2' | 'item3' | 'item4' | 'map' | 'auto' | 'pause' | 'hitbox';
 
 export const KEYMAP: Record<string, Btn> = {
   ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down',
   KeyA: 'attack', KeyS: 'shoot', KeyD: 'skill', KeyQ: 'guard', KeyW: 'super', KeyE: 'interact',
+  KeyF: 'chain', KeyG: 'wall', KeyC: 'ally',
   Space: 'jump', ShiftLeft: 'shift', ShiftRight: 'shift', KeyR: 'reload',
   Digit1: 'item1', Digit2: 'item2', Digit3: 'item3', Digit4: 'item4',
   KeyZ: 'map', Tab: 'map', KeyX: 'auto', Escape: 'pause', KeyH: 'hitbox',

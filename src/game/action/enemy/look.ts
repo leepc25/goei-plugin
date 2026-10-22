@@ -551,6 +551,8 @@ function varied(e: Enemy, L: Look): { L: Look; scale: number } {
       top: mix(L.top ?? '#5a5a5a', o[0], Math.min(1, k)),
       bottom: mix(L.bottom ?? '#2a2a2a', o[1], Math.min(1, k)),
       hair: (v >> 7) % 3 ? o[2] : L.hair,
+      // 얼굴도 회색 가면처럼 보이지 않게 사람 피부색 몇 가지 (독립 검수: 회색 무표정)
+      skin: mix(L.skin ?? '#a8927e', ['#c8a080', '#b08460', '#d4b090', '#9a7458'][(v >>> 14) % 4], 0.75),
       bulk: (L.bulk ?? 0.16) * (0.86 + ((v >> 9) % 4) * 0.07),
     },
     scale: 0.92 + ((v >> 12) % 4) * 0.04,
