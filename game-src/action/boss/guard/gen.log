@@ -1,0 +1,25 @@
+before 16798.8 clips 17
+sub idle
+sub walk
+sub combo
+sub charge
+sub slam
+done idle
+done walk
+FAIL combo status: failed
+id: dbc714ee-cd55-4a76-be2f-5e151c9c5e2f
+job_id: dbc714ee-cd55-4a76-be2f-5e151c9c5e2f
+error: generation failed (invalid request: 1 validation error for animatewithskeletonv3request
+keyp
+done charge
+FAIL slam status: failed
+id: c7ec37a8-7c5f-43e0-8bb0-b77a5bcc7d99
+job_id: c7ec37a8-7c5f-43e0-8bb0-b77a5bcc7d99
+error: generation failed (invalid request: 4 validation errors for animatewithskeletonv3request
+key
+sub reach
+sub parry
+sub whistle
+sub push
+sub hit
+done reach

@@ -1,0 +1,26 @@
+before 16760.4 clips 12
+sub idle
+sub walk
+sub invite
+sub throw
+done idle
+sub spoons
+done walk
+sub smack
+done invite
+done throw
+sub splash
+sub argue
+done spoons
+done smack
+done splash
+sub hit
+sub freeze
+sub groggy
+done argue
+done hit
+done freeze
+sub lunge
+done groggy
+done lunge
+after 15751.7
