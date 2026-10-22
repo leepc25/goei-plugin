@@ -3789,7 +3789,9 @@ var DEFAULT_SETTINGS = {
   stickRun: true,
   lefty: false,
   vibrate: true,
-  numbers: true
+  numbers: true,
+  talkModel: "main",
+  talkRecent: false
 };
 var KEY = "goei-game-ui:v1";
 var localStore = {
@@ -4323,6 +4325,9 @@ function mountGameShell(box2, o = {}) {
       { type: "toggle", label: "스틱 끝까지 밀면 달리기", get: () => s.stickRun, set: (v) => s.stickRun = v },
       { type: "toggle", label: "왼손 배치", get: () => s.lefty, set: (v) => s.lefty = v },
       { type: "toggle", label: "진동", get: () => s.vibrate, set: (v) => s.vibrate = v },
+      { type: "head", label: "대화" },
+      { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s.talkModel, set: (v) => s.talkModel = v },
+      { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s.talkRecent, set: (v) => s.talkRecent = v },
       { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
       { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS }, apply(), saveSettings(), menu.replace(settingsScreen())) }
     ];

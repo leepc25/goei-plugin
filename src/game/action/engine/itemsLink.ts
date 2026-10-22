@@ -9,6 +9,7 @@ import {
   spawnPickup,
   createField,
   createItemRun,
+  addItem,
   drawItemIcon,
   dropFromKill,
   spawnEnemyDrops,
@@ -319,6 +320,12 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   });
   return {
     run: ir,
+    /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */
+    give(id: string) {
+      const n = addItem(ir, id, 1);
+      syncSlots();
+      return n > 0;
+    },
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
     showcase() {
       const ym = (w.lane[0] + w.lane[1]) / 2;
