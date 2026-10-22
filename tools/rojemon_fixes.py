@@ -17,9 +17,9 @@ def _shift(im, dx, dy):
 
 
 def _sole(im, foot):
-    """발이 바닥선 아래로 1~2px 빠진 장(생성기 버릇)을 바닥선에 올림."""
+    """발·몸이 바닥선 아래로 빠진 장(생성기 버릇, 누운 장은 8px까지)을 바닥선에 올림."""
     bb = im.split()[3].getbbox()
-    if bb and foot < bb[3] <= foot + 2:
+    if bb and bb[3] > foot:
         return _shift(im, 0, foot - bb[3])
     return im
 

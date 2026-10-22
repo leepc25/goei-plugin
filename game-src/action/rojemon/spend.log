@@ -1245,3 +1245,65 @@ description: small handmade burlap rag doll with stitc
 2026-10-22 03:37:36 gen kid_flop 5f -> id: ecc2a041-9c2f-4d58-bcf9-4f98dafb8f0c
 job_id: ecc2a041-9c2f-4d58-bcf9-4f98dafb8f0c
 description: small handmade burlap rag doll with stitc
+2026-10-22 03:39:41 gen kid_hit done
+2026-10-22 03:39:42 gen kid_rise 5f -> id: 39567a97-ef7a-4ca0-8f7e-c78506e85efa
+job_id: 39567a97-ef7a-4ca0-8f7e-c78506e85efa
+description: small handmade burlap rag doll with stitc
+2026-10-22 03:39:59 gen kid_flop done
+2026-10-22 03:39:59 gen kid_ride 4f -> id: 62f61da1-268b-4e00-97f7-c1073bba253d
+job_id: 62f61da1-268b-4e00-97f7-c1073bba253d
+description: small handmade burlap rag doll with stitc
+2026-10-22 03:42:25 gen kid_rise done
+2026-10-22 03:42:26 gen kid_ride done
+2026-10-22 03:42:26 gen man_limp 3f -> id: c1710ef0-949f-463a-95de-e7f45744f42c
+job_id: c1710ef0-949f-463a-95de-e7f45744f42c
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:42:27 gen man_rise 6f -> id: 7664d8fb-2697-48fc-942c-b7c9737e7494
+job_id: 7664d8fb-2697-48fc-942c-b7c9737e7494
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:45:40 gen man_rise done
+2026-10-22 03:45:40 gen man_idle 4f -> id: c2a869ca-be32-4d42-b464-0b2847e6a435
+job_id: c2a869ca-be32-4d42-b464-0b2847e6a435
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:45:56 gen man_limp done
+2026-10-22 03:45:57 gen man_walk 8f -> id: ef54194f-cca9-4296-9574-7af08dd293b1
+job_id: ef54194f-cca9-4296-9574-7af08dd293b1
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:47:50 gen man_walk done
+2026-10-22 03:47:51 gen man_chop 6f -> id: fb19fc88-8d36-47a2-91cf-b6fe28e52bcf
+job_id: fb19fc88-8d36-47a2-91cf-b6fe28e52bcf
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:48:07 gen man_idle done
+2026-10-22 03:48:08 gen man_sweep 6f -> id: 20d5d6fe-ddff-4d6b-8ae3-1a3d7a25a137
+job_id: 20d5d6fe-ddff-4d6b-8ae3-1a3d7a25a137
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:51:05 gen man_chop done
+2026-10-22 03:51:06 gen man_slam 6f -> id: d3cc7a40-5ca0-4b14-a386-702767993f70
+job_id: d3cc7a40-5ca0-4b14-a386-702767993f70
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:51:23 gen man_sweep done
+2026-10-22 03:51:24 gen man_block 4f -> id: 0ce9ec0f-4c0f-4e50-80cd-19f0baecfd3d
+job_id: 0ce9ec0f-4c0f-4e50-80cd-19f0baecfd3d
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:54:04 gen man_block done
+2026-10-22 03:54:05 gen man_hit 4f -> id: 4ffff7ac-9585-443f-9333-c9e8a3911912
+job_id: 4ffff7ac-9585-443f-9333-c9e8a3911912
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:54:38 gen man_slam done
+2026-10-22 03:54:39 gen man_break 6f -> id: 0c91d834-b8b0-4bd2-9dc3-f1c525a29d7e
+job_id: 0c91d834-b8b0-4bd2-9dc3-f1c525a29d7e
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:56:31 gen man_hit done
+2026-10-22 03:56:32 gen man_grab 4f -> id: a5617d1f-098c-46ee-972f-f509493ba1c8
+job_id: a5617d1f-098c-46ee-972f-f509493ba1c8
+description: faceless wooden artist mannequin with bal
+2026-10-22 03:57:21 gen man_break done
+2026-10-22 03:57:22 gen man_throw 8f -> id: 663ebadd-4149-44f1-922e-92f750b94452
+job_id: 663ebadd-4149-44f1-922e-92f750b94452
+description: faceless wooden artist mannequin with bal
+2026-10-22 04:00:08 gen man_grab done
+2026-10-22 04:00:09 gen walllean 4f -> id: bda9bc81-4fff-4442-9a87-71df262c9448
+job_id: bda9bc81-4fff-4442-9a87-71df262c9448
+description: petite young woman agent, long wavy pale 
+2026-10-22 04:01:31 gen man_throw done
+2026-10-22 04:01:32 gen walllean done

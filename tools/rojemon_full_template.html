@@ -31,6 +31,7 @@
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
+  @media (max-height: 520px) { h1 { display: none; } .bar { font-size: 12px; margin: 4px 0; } .screen { height: 62svh; width: auto; margin: 0 auto; } .pad button { min-height: 38px; } }
 </style>
 <div class="wrap">
   <h1>로제몬 전 동작 시연판 · 본체는 때리지 않는다(판정은 꼬마 인형·마네킹·실에서만)</h1>
@@ -347,7 +348,9 @@ function sendKid(act, lo = 20 * S, hi = REACH, onHit) {
   if (KID.state === 'flop') { hitText(G.x, groundY(G.z) - 230, '꼬마 실이 끊김'); return; }
   const tgt = nearestE(G.x, G.z, G.dir, lo, hi + 40, 0.25);
   KID.target = tgt; KID.act = act; KID.cb = onHit; KID.dir = G.dir;
-  KID.tx = tgt ? tgt.x - G.dir * 34 : G.x + G.dir * Math.min(hi, 120 * S); KID.tz = tgt ? tgt.z + 0.005 : G.z + 0.01;
+  // 인형 그림 안에서 몸이 앞으로 나가는 거리(때리는 장의 몸 중심 - 기준 x)만큼 덜 가서 멈춤 → 때리는 장에서 딱 적에게 닿음
+  const c = M.clips[act], hb = c && boxes[c.src] && boxes[c.src][c.hits[0] || 0], off = hb ? ((hb.x0 + hb.x1) / 2 - c.anc) * S : 0;
+  KID.tx = tgt ? tgt.x - G.dir * (30 + off) : G.x + G.dir * Math.min(hi, 120 * S); KID.tz = tgt ? tgt.z + 0.005 : G.z + 0.01;
   KID.state = 'go'; anim(KID, act === 'kid_bite' ? 'kid_hop' : 'kid_leap'); KID.f = act === 'kid_bite' ? 0 : 1;
 }
 function kidGuard() { if (KID.state === 'flop') return; KID.state = 'guard'; KID.dir = G.dir; anim(KID, 'kid_block'); }
@@ -514,7 +517,8 @@ function updateMan(dt) {
   if (V.state === 'go') {
     const e = V.goal; if (!e || e.state === 'gone') { V.state = 'idle'; return; }
     V.dir = Math.sign(e.x - V.x) || V.dir; stepAnim(V, dt);
-    if (moveTo(V, e.x - V.dir * 70, e.z, 6, dt)) { V.state = 'act'; anim(V, ['man_chop', 'man_sweep', 'man_slam'][Math.min(2, (V.beat || 1) - 1)]); }
+    const mk = ['man_chop', 'man_sweep', 'man_slam'][Math.min(2, (V.beat || 1) - 1)], mc = M.clips[mk], mb = mc && boxes[mc.src] && boxes[mc.src][mc.hits[0] || 0], moff = mb ? (mb.x1 - mc.anc) * S : 70;
+    if (moveTo(V, e.x - V.dir * Math.max(40, moff), e.z, 6, dt)) { V.state = 'act'; anim(V, mk); }
     return;
   }
   if (V.state === 'act') {
