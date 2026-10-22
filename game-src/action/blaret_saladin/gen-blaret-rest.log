@@ -1,0 +1,17 @@
+before generations_remaining: 16319.20
+blaret queue 50 resume 0
+sub walk
+sub run
+sub blink
+sub draw
+sub guns_idle
+sub fire_split
+sub jump
+sub air_fire
+done walk
+done run
+done blink
+done draw
+done guns_idle
+done fire_split
+sub reload

@@ -17,8 +17,13 @@ def comps(m):
                     if 0<=yy<h and 0<=xx<w and m[yy,xx] and not lab[yy,xx]: lab[yy,xx]=n; q.append((yy,xx))
         sizes.append(c)
     return lab,sizes
-def clean(im,flash=True,minfrac=0.2):
+def clean(im,flash=True,minfrac=0.2,erase=()):
     a=np.array(im.convert('RGBA')).astype(int); m=a[...,3]>0
+    for x0,y0,x1,y1 in erase:   # 총구 앞 칸: 총(무채색·어두운 회색)만 남기고 불꽃·연기 삭제
+        r=a[y0:y1,x0:x1]; c=r[...,:3]
+        keep=((c.max(-1)-c.min(-1))<20)&(c.mean(-1)<150)
+        r[~keep,3]=0
+    m=a[...,3]>0
     r,g,b=a[...,0],a[...,1],a[...,2]
     if flash:
         f=m&(r>200)&(g>110)&(b<130)&((r-b)>110)
@@ -33,5 +38,7 @@ def clean(im,flash=True,minfrac=0.2):
     if sizes:
         big=max(sizes)
         for i,s in enumerate(sizes,1):
-            if s<big*minfrac: a[lab==i,3]=0
+            if s==big: continue
+            px=a[lab==i][:,:3]; lum=px.mean(); sat=(px.max(1)-px.min(1)).mean()
+            if s<big*minfrac or (s<big*0.4 and lum>110 and sat<30): a[lab==i,3]=0   # 작은 조각, 또는 밝은 회색 덩어리(연기)
     return Image.fromarray(a.astype('uint8'))

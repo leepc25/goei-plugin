@@ -1,0 +1,9 @@
+before generations_remaining: 16708.40
+blaret queue 3 resume 0
+sub idle
+sub cut1
+sub fire
+done idle
+done cut1
+done fire
+after generations_remaining: 16089.70

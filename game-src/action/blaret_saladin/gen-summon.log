@@ -1,0 +1,21 @@
+before generations_remaining: 16197.80
+highmamluk queue 1 resume 0
+sub run
+done run
+after generations_remaining: 16026.70
+before generations_remaining: 16017.70
+crusader queue 3 resume 0
+before generations_remaining: 15953.70
+knight queue 3 resume 0
+sub idle
+sub march
+sub march
+before generations_remaining: 15863.70
+modernspirit queue 1 resume 0
+sub slash
+sub rise
+done march
+done rise
+done slash
+after generations_remaining: 15751.70
+sub fire

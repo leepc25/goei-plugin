@@ -1,0 +1,41 @@
+{
+ "idle": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 5,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "draw": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "armed_idle": {
+  "frames": 4,
+  "w": 256,
+  "h": 176,
+  "fps": 5,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ }
+}

@@ -30,7 +30,7 @@ FPS = {'idle': 5, 'guns_idle': 6, 'sword_idle': 6, 'armed_idle': 5, 'arms_crosse
        'cut2': 16, 'cut3': 14, 'lunge': 16, 'rise': 14, 'plunge': 14, 'slash1': 14, 'slash2': 14, 'leap_cleave': 12,
        'super_cut': 12, 'super_judge': 8, 'cathedral': 8, 'chant': 9, 'weep': 6, 'dance': 9, 'bow': 8, 'gallop': 12}
 # 피해(판정) 장: 뼈대 기준으로 정함. 엔진은 이 장에서 히트스톱을 건다.
-HITS = {'blaret': {'fire': [0, 3], 'fire_split': [2, 4], 'air_fire': [2, 4, 6], 'stake_throw': [4], 'stake_finish': [5], 'cut1': [3],
+HITS = {'blaret': {'fire': [0, 3], 'fire_split': [2, 4], 'air_fire': [3, 5, 6], 'stake_throw': [4], 'stake_finish': [5], 'cut1': [3],
                    'cut2': [3], 'cut3': [5], 'lunge': [3], 'rise': [3], 'plunge': [4], 'palm': [3], 'wave': [5], 'high_kick': [2],
                    'super_cut': [5], 'smash': [5]},
         'saladin': {'advance_fire': [1, 3, 5, 7], 'slash1': [3], 'slash2': [3], 'mixer': [1, 3, 5, 7, 9, 11], 'burst': [1, 3],
@@ -39,7 +39,11 @@ HITS = {'blaret': {'fire': [0, 3], 'fire_split': [2, 4], 'air_fire': [2, 4, 6], 
 NAMES = {'blaret': '블라렛', 'saladin': '살라딘', 'knight': '성기사(블라렛 소환)', 'crusader': '성전 병사(살라딘 군세)',
          'highmamluk': '고위 맘루크(군세·자폭)', 'modernspirit': '현대 영령(군세·로켓)', 'horse': '맘루크 중기병(군세)'}
 SPIRIT = {'crusader', 'highmamluk', 'modernspirit', 'horse'}   # 시연판에서 반투명 푸른빛으로 칠해 보는 군세
-FIX = {}
+# 검수 결과(game-src/action/blaret_saladin/qa.md): {(캐릭터, 클립): {'drop': [원본 장 번호], 'erase': [(x0,y0,x1,y1[, [장...]])], 'skip': True}}
+FIX = {('blaret', 'blink'): {'drop': [4]}, ('blaret', 'cut1'): {'drop': [0]}, ('blaret', 'extract'): {'drop': [5]},
+       ('blaret', 'sword_idle'): {'drop': [0]}, ('blaret', 'cut2'): {'drop': [3]},
+       ('blaret', 'rise'): {'drop': [4]}, ('blaret', 'super_cut'): {'drop': [0, 1]}, ('blaret', 'plunge'): {'erase': [(136, 40, 152, 155, [4, 5, 6])]},
+       ('blaret', 'air_fire'): {'erase': [(130, 108, 200, 160)], 'drop': [2, 4]}}
 DOC = os.path.join(ROOT, 'docs', '캐릭터제작서', '동작설계_블라렛_살라딘.md')
 SUMMON_KO = {'idle': '대기', 'march': '행진', 'slash': '베기', 'rise': '땅에서 솟아오름', 'run': '돌격(자폭은 코드)',
              'fire': '어깨에 로켓 겨눠 발사', 'gallop': '질주'}
@@ -56,7 +60,7 @@ def ko_labels():
             c = [x.strip() for x in ln.strip().strip('|').split('|')]
             if len(c) >= 4 and c[0].isdigit():
                 out[(cur, c[1])] = c[3]
-    return out   # {(캐릭터, 클립): {'drop': [장...]} 또는 {'skip': True}} — 검수 결과로 채움
+    return out
 
 
 def hands_for(cn, clip):
@@ -106,7 +110,8 @@ def build():
             if not os.path.isdir(cd) or fx.get('skip'):
                 continue
             files = sorted(f for f in os.listdir(cd) if f.endswith('.png'))
-            frames = [clean(Image.open(os.path.join(cd, f))) for i, f in enumerate(files) if i not in fx.get('drop', [])]
+            frames = [clean(Image.open(os.path.join(cd, f)), erase=[e[:4] for e in fx.get('erase', ()) if len(e) == 4 or i in e[4]])
+                      for i, f in enumerate(files) if i not in fx.get('drop', [])]
             if not frames:
                 continue
             loop = clip in LOOP
@@ -116,12 +121,13 @@ def build():
             st.save(os.path.join(final, f'{clip}.png'))
             act = bsrig.CHARS[cn]['clips'][clip][0] if cn in bsrig.CHARS and clip in bsrig.CHARS[cn]['clips'] else ''
             kind = '상호' if cn in ('blaret', 'saladin') and act and clip in INTERACT.get(cn, set()) else '전투'
+            keep = [i for i in range(len(files)) if i not in fx.get('drop', [])][:len(frames)]
+            hits = sorted({min(range(len(keep)), key=lambda k: (keep[k] < i, abs(keep[k] - i))) for i in HITS.get(cn, {}).get(clip, [])})   # 원본 장 번호 → 뺀 뒤 번호(뺀 장이면 다음 장)
             m = dict(frames=len(frames), w=frames[0].width, h=frames[0].height, fps=FPS.get(clip, 10), loop=loop,
-                     hits=HITS.get(cn, {}).get(clip, []), foot=[96, 168], kind=kind)
+                     hits=hits, foot=[96, 168], kind=kind)
             man[clip] = m
             hd = hands_for(cn, clip)
             if hd:
-                keep = [i for i in range(len(files)) if i not in fx.get('drop', [])][:len(frames)]
                 hands[clip] = {k: [v[i] for i in keep if i < len(v)] for k, v in hd.items()}
             ko = KO.get((cn, clip)) or SUMMON_KO.get(clip, clip)
             title, _, rest = ko.partition(':')

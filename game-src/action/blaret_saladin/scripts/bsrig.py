@@ -62,7 +62,9 @@ GI=lambda b=0,d=0: P((X+d,57+b),4,SIDE,-0.1,(X+9+d,G),(X-7+d,G),R(10,6),R(8,8),l
 DR1=P((X,60),10,SIDE,0,(X+7,G),(X-5,G),A(X+6,68),A(X,70),le=E(4,14),re=E(-2,15),tilt=10)
 DR2=P((X,58),4,SIDE,0,(X+8,G),(X-6,G),R(20,16),R(14,20))
 add(BL,'draw','pulls two pistols from the thigh holsters at once and flips them up into a crossed hold',[BS(0),DR1,lerp(DR1,DR2,.5),DR2,lerp(DR2,GI(),.5),GI()],GUNS)
-add(BL,'guns_idle','pistols crossed in front of the chest, muzzles up, light bounce',[GI(0),GI(.5),GI(1),GI(.5)],GUNS)
+# 1차(가슴 앞 교차)는 손이 기도하듯 모여 총이 사라짐 → 허리 높이로 앞을 겨눈 준비 자세로 다시 짬
+GI2=lambda b=0: P((X,57+b),4,SIDE,-0.1,(X+9,G),(X-7,G),R(24,20),R(18,22),le=E(8,14),re=E(5,15))
+add(BL,'guns_idle','ready stance, a pistol in each hand held low and pointed forward at hip height, light bounce',[GI2(0),GI2(.5),GI2(1),GI2(.5)],GUNS)
 FN=lambda r=0: P((X+1,57),6,SIDE,-0.1,(X+10,G),(X-7,G),R(31-3*r,3-3*r),R(12,8),le=E(14,6),re=E(2,15))
 FF=lambda r=0: P((X+1,57),6,SIDE,-0.1,(X+10,G),(X-7,G),R(12,7),R(30-3*r,4-3*r),le=E(3,14),re=E(13,7))
 add(BL,'fire','alternating twin pistol shots, one arm snaps forward while the other pulls back',[FN(0),FN(1),lerp(FN(),FF(),.5),FF(0),FF(1),lerp(FF(),FN(),.5)],GUNS)
@@ -83,7 +85,7 @@ add(BL,'stake_throw','draws a silver stake from under the skirt and whips it for
 SF0=P((X+6,58),10,SIDE,0,(X+16,G-4),(X-4,G-6),R(6,-26),R(4,-24),le=E(4,-10),re=E(2,-8))
 SF1=P((X+22,78),20,SIDE,0,(X+40,G),(X+4,G),R(8,-22),R(6,-20),le=E(6,-8),re=E(4,-6))
 SF2=P((X+22,80),40,SIDE,0,(X+40,G),(X+4,G),A(X+40,92),A(X+38,92),le=E(14,10),re=E(12,12),tilt=20)
-add(BL,'stake_finish','leaps onto a fallen foe, drops to one knee and drives the stake down with both hands',[BS(0),SF0,sh(SF0,10,-6),SF1,staged(SF1,SF2,.5),SF2,SF2,sh(SF2,0,-1)],STAKE)
+add(BL,'stake_finish','drops to one knee on the bare floor and drives the stake down into the floor with both hands',[BS(0),SF0,sh(SF0,10,-6),SF1,staged(SF1,SF2,.5),SF2,SF2,sh(SF2,0,-1)],STAKE)
 EX1=P((X+4,60),20,SIDE,0,(X+16,G),(X-6,G),R(26,26),R(6,26),le=E(12,12),tilt=16)
 EX2=P((X+2,56),0,SIDE,0,(X+12,G),(X-6,G),R(16,4),R(8,26),le=E(8,10))
 EX3=P((X,55),-6,SIDE,0,(X+10,G),(X-6,G),R(6,-28),R(4,-24),le=E(6,-10),re=E(2,-8),tilt=-12)
@@ -135,7 +137,8 @@ add(BL,'cathedral','kneels and lifts the chest cross in both hands in prayer, th
      lerp(KN(R(10,-6),R(8,-4),-10),CA2,.4),lerp(KN(R(10,-6),R(8,-4),-10),CA2,.75),CA2,CA2,sh(CA2,0,1)],EMPTY)
 CM=lambda: P((X+4,57),6,SIDE,0,(X+16,G),(X-6,G),R(34,-6),'hip',le=E(16,0),tilt=-4)
 add(BL,'command','points the sword forward and calls the advance',[SW(),lerp(SW(),CM(),.5),CM(),sh(CM(),1),CM(),sh(CM(),1)],SWORD1)
-SR=lambda a=0: P((X,54-a),-10,SIDE,0,(X+10,G),(X-8,G),R(4,-30-a),R(2,-29-a),le=E(4,-12),re=E(2,-11),tilt=-16)
+# 1차: 두 팔을 머리 바로 위로 겹쳐 올려 얼굴이 가려지고 뒤돌아선 듯 보임 → 팔을 앞 위로 벌리고 고개는 덜 젖힘
+SR=lambda a=0: P((X,54-a),-6,SIDE,0,(X+10,G),(X-8,G),R(14,-27-a),R(7,-29-a),le=E(9,-11),re=E(5,-12),tilt=-8)
 add(BL,'super_ready','reaches both arms straight up as if seizing something huge from the sky',[BS(0),lerp(BS(0),SR(),.4),lerp(BS(0),SR(),.75),SR(0),SR(1),SR(2),SR(1),SR(2)],EMPTY)
 SC1=P((X+16,74),38,SIDE,0,(X+36,G),(X-8,G-1),R(30,30),R(29,31),le=E(18,12),re=E(17,13),tilt=18)
 add(BL,'super_cut','brings both raised hands all the way down in one colossal overhead chop, whole body following',
@@ -189,7 +192,7 @@ add(BL,'flee','brushes off her skirt, waves with a wink, then springs back out o
 # ════════ 살라딘 ════════  (쟈알디 공간에서 짜고 발 기준점(X,G) 중심으로 SCALE배. 기준 그림 실측 뒤 base.json에서 정함)
 SA=make('saladin',
   'huge bearded man, dark brown skin, short black beard, white wrapped turban, black suit, white shirt, black tie, black shoes, '
-  'ammo pouches and explosive packs strapped across the chest, scimitar scabbard at the hip')
+  'ammo pouches and explosive packs strapped across the chest, scimitar scabbard at the hip',1.04)
 ARMS='a curved scimitar in the near hand and an assault rifle in the far hand'
 RIFLE='an assault rifle in the far hand, scimitar sheathed at the hip'
 SCIM='a curved scimitar held in both hands'
