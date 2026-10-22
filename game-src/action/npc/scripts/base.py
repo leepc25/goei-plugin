@@ -35,6 +35,10 @@ NPC={
  'collegian':(90,'University student woman, long straight dark hair, round glasses, oversized cream knit sweater, long brown pleated skirt, white sneakers, tote bag strap over one shoulder. Hands gripping the strap.'),
  'lady':(88,'Middle-aged businesswoman, neat short dark bob, pearl earrings, grey tailored skirt suit, white blouse, black low heels. Composed but pale, hands clasped at the waist.'),
  'cook':(90,'Restaurant cook man in his 30s, short black hair, white double-breasted cook jacket, black checked cook trousers, black apron at the waist, black non-slip shoes. Wiping hands nervously.'),
+ 'staff_m':(92,'Ordinary office clerk man in his 30s, short neat black hair, plain face, white long-sleeved dress shirt tucked in, no tie, dark grey slacks, black belt, black shoes. Standing relaxed, arms at the sides.'),
+ 'staff_f':(87,'Ordinary office clerk woman in her late 20s, dark brown hair tied in a low ponytail, plain face, white long-sleeved blouse tucked in, dark navy slacks, black flat shoes. Standing relaxed, arms at the sides.'),
+ 'squad_m':(95,'Fit tactical response team man in his 30s, short cropped black hair, stern face, dark navy long-sleeved tactical shirt, dark navy cargo trousers, black belt, black combat boots, black gloves. No vest, no helmet. Standing upright, arms at the sides.'),
+ 'squad_f':(89,'Fit tactical response team woman in her late 20s, black hair in a tight bun, stern face, dark navy long-sleeved tactical shirt, dark navy cargo trousers, black belt, black combat boots, black gloves. No vest, no helmet. Standing upright, arms at the sides.'),
 }
 CANVAS={'dejure':84,'yunjia':84,'konjyuce':88,'grandma':84,'child':64,'cleaner':88,'student':88,'grandpa':88,'pajama':88}   # 작은 사람은 작은 캔버스로(그림 크기 = 키)
 def desc(h,look):

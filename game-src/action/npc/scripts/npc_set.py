@@ -32,6 +32,14 @@ BASIC={  # 4.1 줍기·마시기·먹기·피로 (잼트리, 고그니쟈, 데�
 }
 SIG={'jaemtri':['poke','shush','glare'],'gognija':['bellow','pill','welcome','present','steeple','tinker'],
      'dejure':['sorry','bloom','work','scan'],'konjyuce':['lift','wink','protest','deadpan','wonder']}
+# 본부 상주 넷은 던전 이동 동작을 만들지 않음(본부 설계, 사용자 2026-10-22 03:53 「그래」)
+DUNGEON={'ladder','rope','crawl','idle_light','walk_light','run_light','sneak','hide','fall','land','mantle','vault'}
+# 본부에서 쓰는 사람별 동작(같은 결정): npc_rig에 있는 것 중 SIG 밖의 것
+EXTRA={'jaemtri':['type','stir'],'dejure':['startle','stir'],'konjyuce':['carry']}
+HQ1={'jaemtri':['type','coffee','walk_cup','poke','shush','glare'],
+     'gognija':['tinker','present','pill','drink','bellow','welcome','steeple'],
+     'dejure':['scan','coffee','stir','startle','sorry','bloom','work'],
+     'konjyuce':['idle_box','walk_box','run_box','lift','protest','wink','deadpan','wonder','run','carry','bathin_k','bathout_k']}
 def hq(id):
     j=HQ.index(id); st=npc_life.STYLE[id]; out={}
     out.update(pick(id,'idle','walk'))
@@ -39,7 +47,9 @@ def hq(id):
     for n in ('pickup','drink','eat','tired'): out[n]=(BASIC[n][j],RS(T(n),st))
     out.update(pick(id,'talk'))
     out.update(pick(id,*SIG[id]))
-    for n,(a,ps,tl) in npc_life.life_clips(id).items(): out[n]=(a,ps)
+    out.update(pick(id,*[n for n in EXTRA.get(id,[]) if n not in out]))
+    for n,(a,ps,tl) in npc_life.life_clips(id).items():
+        if n not in DUNGEON: out[n]=(a,ps)
     out['handwash']=(('washes her hands neatly, palms then backs, then dabs them dry','scrubs his hands vigorously with big motions, then shakes them hard',
                       'washes her hands very carefully, finger by finger','rubs her palms together fast and splashy, then flicks her hands dry')[j],RS(T('handwash'),st))
     if id=='konjyuce':   # 욕실 대체 2클립: 옷 입은 채(설계서 4.4)
@@ -158,6 +168,8 @@ def supported(ps):   # 절뚝 걸음 + 앞팔을 앞사람 어깨 위로 걸침(
     return out
 FOLLOW=lambda hands: (lambda t: cower_walk(t,hands))
 # 민간인: (등급 full/core, 자세 변환, 걸음 손 자리, 몸가짐 한 마디)
+# 2026-10-22 사용자: 공용 몸 6종(BODY)만 17동작 전부 생성, 옷·머리·소품은 코드로 얹어 20종 이상. 나머지는 나중에 개별 추가(지금 생성 안 함).
+BODY=['missing_worker','worker_f','student','child','grandma','grandpa']
 CIV={
  'missing_worker':('full',dict(lean=6,tilt=6,stance=0.9,arm=0.8,bounce=0),((4,24),(1,25)),'dazed and exhausted'),
  'worker_f':('full',dict(lean=4,tilt=4,stance=0.8,arm=0.9,bounce=0),((10,10),(8,8)),'frazzled and shaky'),
@@ -169,7 +181,7 @@ CIV={
  'courier':('full',dict(lean=0,tilt=0,stance=1.15,arm=1.1,bounce=0),((10,12),(6,16)),'tense and jumpy'),
  'repairman':('full',dict(lean=-2,tilt=0,stance=1.2,arm=1.0,bounce=0),((8,16),(4,20)),'gruff but shaken'),
  'pajama':('full',dict(lean=5,tilt=4,stance=0.75,arm=0.9,bounce=0),((10,4),(8,5)),'half asleep and frightened'),
- 'grandpa':('core',dict(lean=10,tilt=6,stance=0.8,arm=0.7,bounce=0,crouch=2),((-6,20),(-8,20)),'stiff and slow, elderly'),
+ 'grandpa':('full',dict(lean=10,tilt=6,stance=0.8,arm=0.7,bounce=0,crouch=2),((-6,20),(-8,20)),'stiff and slow, elderly'),
  'clerk':('core',dict(lean=4,tilt=6,stance=0.9,arm=1.0,bounce=0),((10,10),(8,8)),'nervous and twitchy'),
  'cleaner':('core',dict(lean=6,tilt=4,stance=0.9,arm=0.9,bounce=0),((12,12),(10,13)),'worried, sturdy'),
  'hiker':('core',dict(lean=0,tilt=-2,stance=1.25,arm=1.05,bounce=0),((8,14),(4,18)),'loud and stiff'),
@@ -234,6 +246,32 @@ def civilian(id):
     names=FULL if CIV[id][0]=='full' else CORE
     return {n:(civ_action(id,n),civ_poses(id,n)) for n in names}
 
+# ════════ 관리국 일반 직원 공용 몸 4종: 생활 13동작, 전투 없음 (사용자 2026-10-22 04:11 「아무튼 만들어」) ════════
+# 머리·안경·옷 색·조끼·헬멧은 코드로 얹으므로 그림엔 몸만. 쓰는 곳: 행정실, 로비 보안, 진압팀 사무실, 훈련장.
+STAFF={'staff_m':dict(lean=1,tilt=2,stance=0.9,arm=0.9,bounce=0),'staff_f':dict(lean=1,tilt=2,stance=0.8,arm=0.85,bounce=0),
+       'squad_m':dict(lean=-1,tilt=-1,stance=1.2,arm=1.0,bounce=0),'squad_f':dict(lean=-1,tilt=-1,stance=1.1,arm=1.0,bounce=0)}
+SROW={  # 클립: (쟈알디 뼈대, 사무 직원 문장, 진압팀 문장)
+ 'walk':('walk','ordinary office walk, relaxed small steps, arms swinging a little','firm upright walk, even steps, arms swinging little'),
+ 'idle':('idle','standing relaxed, breathing, weight shifting slightly','standing upright at ease, feet apart, breathing'),
+ 'sit':('chairsit','lowers into a seated pose with nothing under, hands to the lap','sits down briskly with nothing under, hands on the knees'),
+ 'typing':('typing','seated, typing in the air at desk height, steady','seated upright, typing fast in the air at desk height'),
+ 'doze':('doze','seated, arms folded, dozing, head dropping and jerking up','seated, arms folded, nodding off, catching himself'),
+ 'walk_folder':('walk_folder','walking, both arms hugging flat against the chest','brisk walk, both arms flat against the chest'),
+ 'drink':('drink','lifts the near hand to the mouth for a sip, then lowers it','one quick sip, hand to the mouth, then back down'),
+ 'phone':('phone','standing, near hand held to the ear, talking, nodding','standing, near hand at the ear, short clipped replies'),
+ 'chat':('gesture','chatting casually, small open-hand gestures, smiling','talking briefly, small firm hand gestures'),
+ 'stretch':('stretch','big stretch, fingers laced, arms straight up overhead','stretches arms overhead, rolls the shoulders'),
+ 'yawn':('yawn','yawns, covering the mouth with the hand, head tipped back','stifles a yawn behind the hand, straightens up'),
+ 'walk_box':('walk_box','walking, both forearms level at the chest, hands open','steady walk, both forearms level at the chest'),
+ 'gearcheck':('gearcheck','looks down, both hands working at waist height, checking','looks down, both hands checking at the hip, methodical'),
+}
+def staff(id):
+    st=STAFF[id]; j=1 if id.startswith('squad') else 0
+    out={n:(v[1+j],RS(T(v[0]),st)) for n,v in SROW.items()}
+    if id.endswith('_m'): out={n:(a.replace('herself','himself'),ps) for n,(a,ps) in out.items()}
+    else: out={n:(a.replace('himself','herself').replace('catching himself','catching herself'),ps) for n,(a,ps) in out.items()}
+    return out
+
 def passenger(id): return dict(npc_rig.NPCS[id]['clips'])
 
 def fit(a):   # 100자 넘으면 마지막 쉼표 앞에서 자름
@@ -251,9 +289,16 @@ def unflip(p):   # 거꾸로 꺾인 팔꿈치·무릎을 바로잡음(audit_join
         if AJ.cross(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])<-0.12: q[f'{s} KNEE']=_refl(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])
     return q
 def clips(id):
-    c=hq(id) if id in HQ else merchant(id) if id in MER else civilian(id) if id in CIV else passenger(id)
+    c=hq(id) if id in HQ else merchant(id) if id in MER else civilian(id) if id in CIV else staff(id) if id in STAFF else passenger(id)
     return {n:(fit(a),[unflip(p) for p in ps]) for n,(a,ps) in c.items()}
-ALL=HQ+MER+list(CIV)+['passenger_3y','passenger_pack']
+ALL=HQ+MER+BODY+['passenger_3y','passenger_pack']+list(STAFF)
+# 생성 순서(사용자 2026-10-22 03:17): 1단계 = 게임에 바로 필요한 것(본부 대기·걷기·달리기·말하기·고유 동작, 상인 28, 민간인 몸 6×17, 승객), 2단계 = 본부 생활 전체 목록.
+def phase1(id):
+    c=clips(id)
+    if id in HQ:
+        keep=['idle','walk','talk','turn']+HQ1[id]
+        return [n for n in keep if n in c]
+    return list(c)
 def cost(nf): return 3 if nf<=8 else 4   # 실측 2026-10-22: 4장도 3회
 if __name__=='__main__':
     tot={}

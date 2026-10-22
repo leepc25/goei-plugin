@@ -16,7 +16,7 @@ def ref(id):
     if not os.path.exists(kp): profile.estimate(p)
     a=Image.open(p).convert('RGBA').split()[3].point(lambda v:255 if v>=128 else 0).getbbox()
     return p,json.load(open(kp)),(a[3]-a[1])/93
-def desc(id): return NPC[id][1].rsplit('.',2)[0]+', side view in strict profile facing right, character only, empty transparent background'
+def desc(id): return NPC[id][1].rsplit('.',2)[0]+', side view in strict profile facing right, character only, no symbols or effect marks, empty transparent background'
 def args(id,n,a,ps,cache):
     p,kp,k=cache
     return {'description':desc(id),'action':a[:100],'direction':'east',
@@ -29,7 +29,8 @@ if __name__=='__main__':
     todo=[]
     for a in sys.argv[1:]:
         id,_,ns=a.partition(':'); c=npc_set.clips(id)
-        for n in (ns.split(',') if ns else c): todo.append((id,n,c[n]))
+        names=ns.split(',') if ns else (npc_set.phase1(id) if os.environ.get('PHASE')=='1' else list(c))
+        for n in names: todo.append((id,n,c[n]))
     caches={}; jobsf={}; pend={}
     def jobs(id):
         if id not in jobsf:
@@ -43,6 +44,7 @@ if __name__=='__main__':
         j=jobs(id).get(n)
         if j and j!='FAIL': pend[(id,n)]=(j,len(ps))
         else: queue.append((id,n,a,ps))
+    if os.environ.get('DRAIN'): queue=[]   # 새로 넣지 않고 넣어 둔 일감만 받음(요원 우선 순서, 2026-10-22)
     print('todo',len(queue),'resume',len(pend),'credits≈',sum(npc_set.cost(len(ps)) for *_,ps in queue),flush=True)
     while queue or pend:
         while queue and len(pend)<MAX:
