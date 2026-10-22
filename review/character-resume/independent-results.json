@@ -1,0 +1,161 @@
+[
+  {
+    "viewport": "pc",
+    "baseline": {
+      "agent": "jyaldi",
+      "clip": "walk",
+      "frame": 0,
+      "playing": true,
+      "worldX": 0,
+      "facing": 1,
+      "loopCount": 1,
+      "frames": 8,
+      "loaded": 89,
+      "total": 89
+    },
+    "pause": true,
+    "step": 1,
+    "moved": 11.400000000000002,
+    "ranClip": "run",
+    "layout": {
+      "overflow": false,
+      "stage": {
+        "x": 36,
+        "y": 229.890625,
+        "width": 934,
+        "height": 300,
+        "top": 229.890625,
+        "right": 970,
+        "bottom": 529.890625,
+        "left": 36
+      },
+      "touch": {
+        "x": 35,
+        "y": 579.140625,
+        "width": 936,
+        "height": 42,
+        "top": 579.140625,
+        "right": 971,
+        "bottom": 621.140625,
+        "left": 35
+      },
+      "broken": 0
+    },
+    "errors": [],
+    "afterTabArrowMoved": true,
+    "pointerMoved": true,
+    "lastToFirst": [
+      7,
+      0
+    ],
+    "realTouch": null
+  },
+  {
+    "viewport": "mobile-landscape",
+    "baseline": {
+      "agent": "jyaldi",
+      "clip": "walk",
+      "frame": 0,
+      "playing": true,
+      "worldX": 0,
+      "facing": 1,
+      "loopCount": 1,
+      "frames": 8,
+      "loaded": 89,
+      "total": 89
+    },
+    "pause": true,
+    "step": 1,
+    "moved": 11.403799999999999,
+    "ranClip": "run",
+    "layout": {
+      "overflow": false,
+      "stage": {
+        "x": 23,
+        "y": 147.9375,
+        "width": 599,
+        "height": 150,
+        "top": 147.9375,
+        "right": 622,
+        "bottom": 297.9375,
+        "left": 23
+      },
+      "touch": {
+        "x": 22,
+        "y": 343.1875,
+        "width": 601,
+        "height": 37.25,
+        "top": 343.1875,
+        "right": 623,
+        "bottom": 380.4375,
+        "left": 22
+      },
+      "broken": 0
+    },
+    "errors": [],
+    "afterTabArrowMoved": true,
+    "pointerMoved": true,
+    "lastToFirst": [
+      7,
+      0
+    ],
+    "realTouch": {
+      "movedLeft": true,
+      "released": true
+    }
+  },
+  {
+    "viewport": "mobile-portrait",
+    "baseline": {
+      "agent": "jyaldi",
+      "clip": "walk",
+      "frame": 7,
+      "playing": true,
+      "worldX": 0,
+      "facing": 1,
+      "loopCount": 0,
+      "frames": 8,
+      "loaded": 89,
+      "total": 89
+    },
+    "pause": true,
+    "step": 0,
+    "moved": 11.400000000000002,
+    "ranClip": "run",
+    "layout": {
+      "overflow": false,
+      "stage": {
+        "x": 28,
+        "y": 327.09375,
+        "width": 334,
+        "height": 240,
+        "top": 327.09375,
+        "right": 362,
+        "bottom": 567.09375,
+        "left": 28
+      },
+      "touch": {
+        "x": 27,
+        "y": 639.59375,
+        "width": 336,
+        "height": 42,
+        "top": 639.59375,
+        "right": 363,
+        "bottom": 681.59375,
+        "left": 27
+      },
+      "broken": 0
+    },
+    "errors": [],
+    "afterTabArrowMoved": true,
+    "pointerMoved": true,
+    "lastToFirst": [
+      7,
+      0
+    ],
+    "realTouch": {
+      "movedLeft": true,
+      "released": true
+    }
+  }
+]

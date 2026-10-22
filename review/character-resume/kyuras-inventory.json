@@ -1,0 +1,1196 @@
+{
+  "audited_head": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+  "latest_character_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47",
+  "paid_recovery_jobs": {
+    "idle_shotgun": "11826541-47d1-40de-9664-f05f1838bb23",
+    "run_shotgun": "9fe0e770-b992-4299-a4c1-90d6e591828a"
+  },
+  "service_status": "not_checked_by_auditor",
+  "current_balance": null,
+  "new_paid_calls": 0,
+  "clips": {
+    "snap1": {
+      "raw_frames": [
+        {
+          "path": "game-src/action/kyuras/clips/snap1/00.png",
+          "sha256": "0674195d44a666d991ee146b1bef8edad77fa0135e5bc10ef5dd9f296c981820",
+          "rgba_bbox_exclusive": [
+            39,
+            43,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap1/01.png",
+          "sha256": "003c274922d791b5dd45f588af9c543d2d176f3f114dc3c3e845f8cb87b1fbaf",
+          "rgba_bbox_exclusive": [
+            34,
+            44,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap1/02.png",
+          "sha256": "cb17746dab635f29829c5cbc69a60b8ad250e84b4958c64a0bbc7362f907c208",
+          "rgba_bbox_exclusive": [
+            32,
+            43,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap1/03.png",
+          "sha256": "8878ba9eb163c594969097def3cbb4689c7230921ebcbac099c258472f77f13e",
+          "rgba_bbox_exclusive": [
+            33,
+            43,
+            83,
+            135
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap1/04.png",
+          "sha256": "26a8754bfe21f69f7d66512f2d0561859f9a3763bd9fe232d512fbdc081cf581",
+          "rgba_bbox_exclusive": [
+            33,
+            43,
+            80,
+            136
+          ]
+        }
+      ],
+      "legacy_frames": 5,
+      "manifest_entry": {
+        "label": "A 1타 앞손 스냅(반걸음 후퇴)",
+        "fps": 18,
+        "loop": false,
+        "adv": -6,
+        "origin": 0,
+        "hold": 0.03,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          2
+        ],
+        "slide": 1.3,
+        "frames": 5,
+        "bytes": 12181,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              71,
+              53
+            ],
+            "hand2": [
+              52,
+              92
+            ],
+            "angle": -99,
+            "hip": [
+              55,
+              89
+            ]
+          },
+          {
+            "hand": [
+              81,
+              65
+            ],
+            "hand2": [
+              51,
+              92
+            ],
+            "angle": -22,
+            "hip": [
+              54,
+              89
+            ]
+          },
+          {
+            "hand": [
+              77,
+              67
+            ],
+            "hand2": [
+              49,
+              92
+            ],
+            "angle": -18,
+            "hip": [
+              52,
+              89
+            ]
+          },
+          {
+            "hand": [
+              72,
+              60
+            ],
+            "hand2": [
+              48,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              51,
+              89
+            ]
+          }
+        ]
+      },
+      "hands_entry": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          71,
+          53,
+          351
+        ],
+        [
+          81,
+          65,
+          68
+        ],
+        [
+          77,
+          67,
+          72
+        ],
+        [
+          72,
+          60,
+          17
+        ]
+      ],
+      "final_path": "game-src/action/kyuras/final/snap1.png",
+      "final_sha256": "2b98fb3c4d95216cfcc404fcce72bc9d0ce272c847d921d0bbd345c865e2ca9a",
+      "final_size": [
+        960,
+        144
+      ],
+      "delivery_state": "generated_visual_approval_not_established"
+    },
+    "snap2": {
+      "raw_frames": [
+        {
+          "path": "game-src/action/kyuras/clips/snap2/00.png",
+          "sha256": "bb58c691107888ec7cd09c87bc2c2570df0b5a144bd7930ae49853edc0a24580",
+          "rgba_bbox_exclusive": [
+            40,
+            44,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap2/01.png",
+          "sha256": "c207728f01247bec4603d45507139db10a6eb79fa0bc76bc2238ca78666d4143",
+          "rgba_bbox_exclusive": [
+            32,
+            44,
+            85,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap2/02.png",
+          "sha256": "554d43bce04f68528d3f001fff6b2b844621aa2ad63be8708791b013d9aff4de",
+          "rgba_bbox_exclusive": [
+            28,
+            44,
+            85,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap2/03.png",
+          "sha256": "12bc4621365f101c9a3049a2d95ee24f17f0c43334c50cbb982208056ccffee9",
+          "rgba_bbox_exclusive": [
+            28,
+            44,
+            84,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap2/04.png",
+          "sha256": "bcd5b733497889613c08965a4740707c7b84315734ce1b03ca8c14d39a126e34",
+          "rgba_bbox_exclusive": [
+            26,
+            44,
+            80,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap2/05.png",
+          "sha256": "a4d76c88e3d7d8e45d1ae850bd22f834c48d411941c2bde083b56ed2c60413b6",
+          "rgba_bbox_exclusive": [
+            27,
+            43,
+            74,
+            136
+          ]
+        }
+      ],
+      "legacy_frames": 6,
+      "manifest_entry": {
+        "label": "A 2타 뒷손 스냅(한 걸음 후퇴)",
+        "fps": 15,
+        "loop": false,
+        "adv": -12,
+        "origin": 0,
+        "hold": 0.05,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          3
+        ],
+        "slide": 0.7,
+        "frames": 6,
+        "bytes": 14842,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              64,
+              73
+            ],
+            "hand2": [
+              55,
+              57
+            ],
+            "angle": -85,
+            "hip": [
+              55,
+              89
+            ]
+          },
+          {
+            "hand": [
+              63,
+              74
+            ],
+            "hand2": [
+              60,
+              57
+            ],
+            "angle": -74,
+            "hip": [
+              52,
+              90
+            ]
+          },
+          {
+            "hand": [
+              60,
+              76
+            ],
+            "hand2": [
+              70,
+              58
+            ],
+            "angle": -50,
+            "hip": [
+              51,
+              90
+            ]
+          },
+          {
+            "hand": [
+              58,
+              74
+            ],
+            "hand2": [
+              68,
+              61
+            ],
+            "angle": -51,
+            "hip": [
+              48,
+              90
+            ]
+          },
+          {
+            "hand": [
+              66,
+              60
+            ],
+            "hand2": [
+              42,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              45,
+              89
+            ]
+          }
+        ]
+      },
+      "hands_entry": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          64,
+          73,
+          5
+        ],
+        [
+          63,
+          74,
+          16
+        ],
+        [
+          60,
+          76,
+          40
+        ],
+        [
+          58,
+          74,
+          39
+        ],
+        [
+          66,
+          60,
+          17
+        ]
+      ],
+      "final_path": "game-src/action/kyuras/final/snap2.png",
+      "final_sha256": "a52a1d2a79ef890bc3e4bd12d329344ac3ed645172b3e03657cbd3a859594a78",
+      "final_size": [
+        1152,
+        144
+      ],
+      "delivery_state": "generated_visual_approval_not_established"
+    },
+    "snap3": {
+      "raw_frames": [
+        {
+          "path": "game-src/action/kyuras/clips/snap3/00.png",
+          "sha256": "6773dc7b3c06177c972ccfe36ee2066d59adf2bf42024e4f544823a1fd309232",
+          "rgba_bbox_exclusive": [
+            36,
+            44,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/01.png",
+          "sha256": "a03a4de1f6af2750eeebf838f406623660c4239f00d48354c719ba84a6efa666",
+          "rgba_bbox_exclusive": [
+            28,
+            45,
+            86,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/02.png",
+          "sha256": "6ed96f776a8d8952d60b94a47edcf35ea37a54756ad08a3f7ca89222a0a850f7",
+          "rgba_bbox_exclusive": [
+            22,
+            45,
+            83,
+            135
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/03.png",
+          "sha256": "5627344025f33ce7d3731e9568be125ad76a3c29c17ff934326c974363cb19ad",
+          "rgba_bbox_exclusive": [
+            20,
+            44,
+            82,
+            135
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/04.png",
+          "sha256": "857e60dc18fa6fb4acb3a451c7807466d308cff021bb547af3a3e04025f68d0b",
+          "rgba_bbox_exclusive": [
+            18,
+            44,
+            73,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/05.png",
+          "sha256": "644409723e679df335ee7b1f77411dbab590f2ebb92aa08837c0c2b6de403dc2",
+          "rgba_bbox_exclusive": [
+            18,
+            44,
+            70,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/snap3/06.png",
+          "sha256": "f36c0553b21e25147b44defb635e5865b7c04e8a327c35dbb659ee0689f4c5e2",
+          "rgba_bbox_exclusive": [
+            18,
+            44,
+            67,
+            136
+          ]
+        }
+      ],
+      "legacy_frames": 7,
+      "manifest_entry": {
+        "label": "A 3타 교차 스냅(크게 후퇴)",
+        "fps": 13,
+        "loop": false,
+        "adv": -20,
+        "origin": 0,
+        "hold": 0.1,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          3
+        ],
+        "slide": -0.4,
+        "frames": 7,
+        "bytes": 17582,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              65,
+              74
+            ],
+            "hand2": [
+              66,
+              72
+            ],
+            "angle": -32,
+            "hip": [
+              53,
+              91
+            ]
+          },
+          {
+            "hand": [
+              66,
+              70
+            ],
+            "hand2": [
+              55,
+              75
+            ],
+            "angle": -24,
+            "hip": [
+              48,
+              90
+            ]
+          },
+          {
+            "hand": [
+              68,
+              64
+            ],
+            "hand2": [
+              33,
+              81
+            ],
+            "angle": -11,
+            "hip": [
+              47,
+              90
+            ]
+          },
+          {
+            "hand": [
+              63,
+              65
+            ],
+            "hand2": [
+              28,
+              83
+            ],
+            "angle": -9,
+            "hip": [
+              43,
+              90
+            ]
+          },
+          {
+            "hand": [
+              61,
+              62
+            ],
+            "hand2": [
+              31,
+              88
+            ],
+            "angle": -45,
+            "hip": [
+              40,
+              90
+            ]
+          },
+          {
+            "hand": [
+              58,
+              60
+            ],
+            "hand2": [
+              34,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              37,
+              89
+            ]
+          }
+        ]
+      },
+      "hands_entry": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          65,
+          74,
+          58
+        ],
+        [
+          66,
+          70,
+          66
+        ],
+        [
+          68,
+          64,
+          79
+        ],
+        [
+          63,
+          65,
+          81
+        ],
+        [
+          61,
+          62,
+          45
+        ],
+        [
+          58,
+          60,
+          17
+        ]
+      ],
+      "final_path": "game-src/action/kyuras/final/snap3.png",
+      "final_sha256": "8ed45cdaac1ade9733b0ae28c736a74eb795bfc53d19d8b56736b348fdb5b6ed",
+      "final_size": [
+        1344,
+        144
+      ],
+      "delivery_state": "generated_visual_approval_not_established"
+    },
+    "idle_pipe": {
+      "raw_frames": [],
+      "legacy_frames": 4,
+      "manifest_entry": null,
+      "hands_entry": null,
+      "final_path": "game-src/action/kyuras/final/idle_pipe.png",
+      "final_sha256": "b68e8ec7ee48a189e630aefce0b71390476d9bb5b24d06b1bb18d69135e3d378",
+      "final_size": [
+        768,
+        144
+      ],
+      "delivery_state": "legacy_orphan_do_not_package"
+    },
+    "walk_pipe": {
+      "raw_frames": [],
+      "legacy_frames": 8,
+      "manifest_entry": null,
+      "hands_entry": null,
+      "final_path": "game-src/action/kyuras/final/walk_pipe.png",
+      "final_sha256": "7bc871f82b59dac9e9e34e1101cc8a10c34e7c3d25d3b25133cc8184108f235b",
+      "final_size": [
+        1536,
+        144
+      ],
+      "delivery_state": "legacy_orphan_do_not_package"
+    },
+    "shotgun": {
+      "raw_frames": [],
+      "legacy_frames": 5,
+      "manifest_entry": null,
+      "hands_entry": null,
+      "final_path": "game-src/action/kyuras/final/shotgun.png",
+      "final_sha256": "b75aee7b55b2e0f70270b4f961fb34e6eedca6694ebe442fadd8c54b98454b3f",
+      "final_size": [
+        960,
+        144
+      ],
+      "delivery_state": "legacy_orphan_do_not_package"
+    },
+    "idle_shotgun": {
+      "raw_frames": [],
+      "legacy_frames": 4,
+      "manifest_entry": null,
+      "hands_entry": null,
+      "final_path": "game-src/action/kyuras/final/idle_shotgun.png",
+      "final_sha256": "52a7edf91b03e0805f9832e5c1516334ddc18933d0c3881204f32b20cda4b6c5",
+      "final_size": [
+        768,
+        144
+      ],
+      "delivery_state": "legacy_orphan_do_not_package"
+    },
+    "run_shotgun": {
+      "raw_frames": [],
+      "legacy_frames": 8,
+      "manifest_entry": null,
+      "hands_entry": null,
+      "final_path": "game-src/action/kyuras/final/run_shotgun.png",
+      "final_sha256": "0f42c2ef1af63bcdefed4d7d284e646743f831871e76bc000beb6240cf59c088",
+      "final_size": [
+        1536,
+        144
+      ],
+      "delivery_state": "legacy_orphan_do_not_package"
+    },
+    "walk_shotgun": {
+      "raw_frames": [
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/00.png",
+          "sha256": "268756a154241005869cdba95cf27586fadd14455b64dc34fca571b095d7a504",
+          "rgba_bbox_exclusive": [
+            40,
+            38,
+            87,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/01.png",
+          "sha256": "3f9a4b0b37b74260871d43e8ebfd969f6a0bcdd4585186f319e158f92827c101",
+          "rgba_bbox_exclusive": [
+            42,
+            38,
+            84,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/02.png",
+          "sha256": "a91111c1933503ede1d19ff3c3a8ebbb980b4fdd80334620a6b173e72b288790",
+          "rgba_bbox_exclusive": [
+            42,
+            36,
+            74,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/03.png",
+          "sha256": "65fa11e4d6a7359c3e207d56c5df095f082d759d79fd5b2323460371ea57f401",
+          "rgba_bbox_exclusive": [
+            42,
+            37,
+            79,
+            137
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/04.png",
+          "sha256": "11a5d5088466deca5fd2fb245495bdce801f14661e780d4b4c784ae9356e2818",
+          "rgba_bbox_exclusive": [
+            39,
+            38,
+            88,
+            138
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/05.png",
+          "sha256": "62476868d37b197b3f6bbd80ce77974e2deb0126d3054f21405b7521acc9d74a",
+          "rgba_bbox_exclusive": [
+            42,
+            38,
+            80,
+            135
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/06.png",
+          "sha256": "b4c06e2a448ab11971852c3a0ecbb753947605912398da8c4483d7d0b71fcf2f",
+          "rgba_bbox_exclusive": [
+            42,
+            36,
+            75,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/walk_shotgun/07.png",
+          "sha256": "58e071fe53ba0676e99bb269255841d613bb283dd9f14c32033d3a994d1d29e1",
+          "rgba_bbox_exclusive": [
+            42,
+            37,
+            80,
+            135
+          ]
+        }
+      ],
+      "legacy_frames": 8,
+      "manifest_entry": {
+        "label": "산탄총 들고 걷기",
+        "fps": 10,
+        "loop": true,
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [],
+        "slide": 0,
+        "frames": 8,
+        "bytes": 17371,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              65,
+              87
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              85
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              83
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              87
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              85
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              83
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          }
+        ]
+      },
+      "hands_entry": [
+        [
+          65,
+          87,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          85,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          87,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          85,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ]
+      ],
+      "final_path": "game-src/action/kyuras/final/walk_shotgun.png",
+      "final_sha256": "56f2722226b455e6a556dcda3d68eb83f65b4703b9fc9fc41ee72ca39327dbfd",
+      "final_size": [
+        1536,
+        144
+      ],
+      "delivery_state": "generated_visual_approval_not_established"
+    },
+    "pipe": {
+      "raw_frames": [
+        {
+          "path": "game-src/action/kyuras/clips/pipe/00.png",
+          "sha256": "cc42e2dc91e2884f50d1772eefe0dc9716de51c08f6126a69d218c370afd38b1",
+          "rgba_bbox_exclusive": [
+            42,
+            36,
+            78,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/pipe/01.png",
+          "sha256": "d891ad927dc57fb1093fb9aeb5aaaedc1d51e2008f77871fbf73609d640830ad",
+          "rgba_bbox_exclusive": [
+            40,
+            37,
+            78,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/pipe/02.png",
+          "sha256": "6e52dd313dec4d447082875de963677064d17210d74e341617905d14108e398d",
+          "rgba_bbox_exclusive": [
+            46,
+            37,
+            87,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/pipe/03.png",
+          "sha256": "624dfefa25429b09cf1b5e7dd9fff213fbeff04d69c5db7133599018c63699fb",
+          "rgba_bbox_exclusive": [
+            46,
+            38,
+            84,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/pipe/04.png",
+          "sha256": "0a785affc3a754760e1083b3ddfb97842ab9fbecae06c5365aa7482690191591",
+          "rgba_bbox_exclusive": [
+            46,
+            33,
+            89,
+            136
+          ]
+        },
+        {
+          "path": "game-src/action/kyuras/clips/pipe/05.png",
+          "sha256": "5a429c20abdbe134198c9dbfc1562b83ff2b01bb313ada9ba5c9705117a8e413",
+          "rgba_bbox_exclusive": [
+            42,
+            36,
+            78,
+            136
+          ]
+        }
+      ],
+      "legacy_frames": 0,
+      "manifest_entry": {
+        "label": "쇠파이프 던져 터뜨리기",
+        "fps": 12,
+        "loop": false,
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          2
+        ],
+        "slide": 0,
+        "frames": 6,
+        "bytes": 12625,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              61,
+              56
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": -117,
+            "hip": [
+              57,
+              83
+            ]
+          },
+          {
+            "hand": [
+              51,
+              53
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": -142,
+            "hip": [
+              55,
+              84
+            ]
+          },
+          {
+            "hand": [
+              84,
+              48
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": -51,
+            "hip": [
+              60,
+              84
+            ]
+          },
+          {
+            "hand": [
+              80,
+              44
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": -62,
+            "hip": [
+              60,
+              84
+            ]
+          },
+          {
+            "hand": [
+              81,
+              43
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": -60,
+            "hip": [
+              60,
+              84
+            ]
+          },
+          {
+            "hand": [
+              61,
+              91
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 71,
+            "hip": [
+              57,
+              83
+            ]
+          }
+        ]
+      },
+      "hands_entry": [
+        [
+          61,
+          56,
+          333
+        ],
+        [
+          51,
+          53,
+          308
+        ],
+        [
+          84,
+          48,
+          39
+        ],
+        [
+          80,
+          44,
+          28
+        ],
+        [
+          81,
+          43,
+          30
+        ],
+        [
+          61,
+          91,
+          161
+        ]
+      ],
+      "final_path": "game-src/action/kyuras/final/pipe.png",
+      "final_sha256": "6b21df07d276a79d635cd1a75db2fa7d330fc5106bdc33963045a23c0868f9ff",
+      "final_size": [
+        1152,
+        144
+      ],
+      "delivery_state": "generated_visual_approval_not_established"
+    }
+  }
+}

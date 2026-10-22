@@ -1,0 +1,50 @@
+[
+  {
+    "viewport": "pc",
+    "width": 1280,
+    "height": 720,
+    "pass": true,
+    "checks": [
+      "89 embedded source images loaded",
+      "pause/step/last-to-first/playback",
+      "keyboard/pointer movement and run",
+      "all 14 clips switchable",
+      "no external requests",
+      "no horizontal overflow",
+      "no browser errors"
+    ],
+    "artApproval": false
+  },
+  {
+    "viewport": "mobile-landscape",
+    "width": 844,
+    "height": 390,
+    "pass": true,
+    "checks": [
+      "89 embedded source images loaded",
+      "pause/step/last-to-first/playback",
+      "keyboard/pointer movement and run",
+      "all 14 clips switchable",
+      "no external requests",
+      "no horizontal overflow",
+      "no browser errors"
+    ],
+    "artApproval": false
+  },
+  {
+    "viewport": "mobile-portrait",
+    "width": 390,
+    "height": 844,
+    "pass": true,
+    "checks": [
+      "89 embedded source images loaded",
+      "pause/step/last-to-first/playback",
+      "keyboard/pointer movement and run",
+      "all 14 clips switchable",
+      "no external requests",
+      "no horizontal overflow",
+      "no browser errors"
+    ],
+    "artApproval": false
+  }
+]

@@ -1,0 +1,237 @@
+{
+  "observed_at": "2026-10-22T08:55:34.605588+00:00",
+  "source": "https://api.pixellab.ai/v2/openapi.json",
+  "paths": {
+    "/balance": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Get balance",
+        "description": "Returns the current balance for your account, including both USD credits and remaining subscription generations.\n\nUsing the Python client:\n```python\nimport pixellab\n\nclient = pixellab.Client(secret=\"YOUR_API_TOKEN\")\nbalance = client.get_balance()\nprint(f\"Credits: ${balance.credits.usd}\")\nprint(f\"Generations remaining: {balance.subscription.generations}/{balance.subscription.total}\")\n```",
+        "operationId": "get_balance_balance_get",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceResponse"
+                },
+                "example": {
+                  "credits": {
+                    "type": "usd",
+                    "usd": 10.5
+                  },
+                  "subscription": {
+                    "type": "generations",
+                    "status": "active",
+                    "plan": "Tier 2: Pixel Artisan",
+                    "generations": 450,
+                    "total": 2000
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API token"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/background-jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Get background job status",
+        "description": "Check the status and results of a background job.\n\nThis endpoint allows you to monitor the progress of background operations like\ncharacter creation and animation generation. Background jobs are used for \nexpensive operations that take time to complete.\n\n**Job Statuses:**\n- `processing` - Job is currently running\n- `completed` - Job finished successfully \n- `failed` - Job encountered an error\n\n**Usage Pattern:**\n1. Create a character or animation (returns `background_job_id`)\n2. Poll this endpoint periodically to check status\n3. When status is `completed`, access results in `last_response`\n\n**Response Data:**\n- For character creation: `character_id`, `directions_count`, character info\n- For animations: `animation_id`, `frame_count`, animation details\n- Storage information and file organization details\n\n**Authentication:**\nRequires a valid API token. You can only access jobs you created.\n\n**Error Handling:**\n- 404: Job not found or doesn't belong to you\n- Jobs are automatically cleaned up after completion\n\n**Polling Recommendations:**\n- Poll every 5-10 seconds while status is `processing`\n- Stop polling once status is `completed` or `failed`\n- While `processing`, `last_response.queue_position` and\n  `last_response.estimated_wait_seconds` show a job waiting for a GPU\n- To stop a job, `DELETE /v2/background-jobs/{job_id}`\n- Character creation typically takes 30-60 seconds\n- Animations may take longer depending on frame count and directions",
+        "operationId": "get_background_job_status_background_jobs__job_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved job status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundJobResponse"
+                },
+                "example": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "status": "completed",
+                  "created_at": "2024-01-15T10:30:00Z",
+                  "last_response": {
+                    "character_id": "456e7890-e89b-12d3-a456-426614174001",
+                    "saved_to_storage": true,
+                    "uploaded_directions": [
+                      "south",
+                      "east",
+                      "north",
+                      "west"
+                    ],
+                    "directions_count": 4
+                  },
+                  "usage": {
+                    "type": "usd",
+                    "usd": 0.0
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API token"
+          },
+          "404": {
+            "description": "Job not found or doesn't belong to user"
+          },
+          "429": {
+            "description": "Too many requests"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Jobs"
+        ],
+        "summary": "Cancel a background job",
+        "description": "Cancel a background job that is still `processing`.\n\n- Frees your concurrency slot immediately, so you can submit new work.\n- A job still waiting in the queue is removed and not charged. Billing only\n  covers work a GPU actually did, so a generation that is already running may\n  still finish and be charged.\n- A job you resubmit starts at the back of the queue. While a job is\n  `processing`, `last_response.queue_position` and\n  `last_response.estimated_wait_seconds` (from GET\n  `/v2/background-jobs/{job_id}`) show that it is waiting for a GPU. A waiting\n  job is not stuck, and cancelling it to resubmit makes the wait longer.",
+        "operationId": "cancel_background_job_background_jobs__job_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelBackgroundJobResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Job already completed or failed; nothing to cancel"
+          },
+          "409": {
+            "description": "Job completed while the cancel was being applied"
+          },
+          "401": {
+            "description": "Invalid API token"
+          },
+          "404": {
+            "description": "Job not found or doesn't belong to user"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/animate-with-skeleton-v3": {
+      "post": {
+        "tags": [
+          "Skeleton Animation"
+        ],
+        "summary": "Animate with skeleton v3",
+        "description": "Beta. Animate a sprite by posing it: one skeleton per frame, drawn from a single reference image.\n\nReturns immediately with a background job ID. Poll `GET /v2/background-jobs/{job_id}`\nto retrieve results when generation completes.\n\n**How it works:**\n1. Send the sprite, the skeleton of the pose it is already in (`first_frame_keypoints`), and one skeleton per frame you want (`keypoints`).\n2. Poll `GET /v2/background-jobs/{background_job_id}` every 5-10 seconds.\n3. When `status` is `completed`, `last_response.images` holds exactly `len(keypoints)` frames, each the size of `first_frame`. The reference frame is not returned.\n\n**Skeletons:** 18 humanoid joints, `x`/`y` as fractions 0-1 of the image. `depth` is\noptional -- leave it out and it is taken from the standing pose of `template_id` for\nyour direction, which is what an editor without 3D data should do. `GET /v2/estimate-skeleton`\nwill derive a skeleton from an image if you do not have one.\n\n**Limits:** 3-15 frames, canvas up to 256x256.\n\n**Cost:** by generation time, which depends on frame count and not on canvas size:\n3 frames = 2 generations,\n8 frames = 3,\n15 frames = 4. A longer clip\nis nearly free, so prefer one long clip to several short ones.\n\nTypical generation time: 3-5 minutes.",
+        "operationId": "animate_with_skeleton_v3_animate_with_skeleton_v3_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnimateWithSkeletonV3Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Background job accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnimateWithSkeletonV3Response"
+                },
+                "example": {
+                  "background_job_id": "123e4567-e89b-12d3-a456-426614174000",
+                  "status": "processing"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API token"
+          },
+          "402": {
+            "description": "Insufficient credits"
+          },
+          "422": {
+            "description": "Validation error"
+          },
+          "429": {
+            "description": "Too many concurrent background jobs"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  }
+}

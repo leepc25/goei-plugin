@@ -1,0 +1,1406 @@
+{
+  "schema": "goei.character-review-delivery/1",
+  "purpose": "existing_asset_review_only",
+  "baseline_commit": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+  "new_art_generated": false,
+  "user_visual_approval": false,
+  "engine_auto_apply": false,
+  "new_generation_cost": 0,
+  "blockers": [
+    "PixelLab 신규 수정 원본 없음",
+    "쟈알디 이동·큐라스 기본 공격 시각 결함 미해결",
+    "사용자 시각 승인 없음",
+    "손 좌표는 생성 뼈대 값으로 실제 손 부착 검수 필요"
+  ],
+  "clips": {
+    "jyaldi/walk": {
+      "strip": "strips/jyaldi/walk.png",
+      "sha256": "ba2de7f6070fc0a9e20f2f9f82352f29cd22461541769f98f5f661e37fb30ef4",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "3 걷기(탐사)",
+        "fps": 10,
+        "loop": true,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (계획안 1~41)",
+        "frames": 8,
+        "bytes": 29406,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              55,
+              87
+            ],
+            "hand2": [
+              66,
+              87
+            ],
+            "angle": 59,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              57,
+              87
+            ],
+            "hand2": [
+              64,
+              87
+            ],
+            "angle": 54,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              62,
+              86
+            ],
+            "hand2": [
+              59,
+              86
+            ],
+            "angle": 43,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              67,
+              87
+            ],
+            "hand2": [
+              54,
+              87
+            ],
+            "angle": 35,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              69,
+              87
+            ],
+            "hand2": [
+              52,
+              87
+            ],
+            "angle": 32,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              67,
+              87
+            ],
+            "hand2": [
+              54,
+              87
+            ],
+            "angle": 35,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              62,
+              86
+            ],
+            "hand2": [
+              59,
+              86
+            ],
+            "angle": 43,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              57,
+              87
+            ],
+            "hand2": [
+              64,
+              87
+            ],
+            "angle": 54,
+            "hip": [
+              59,
+              85
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          55,
+          87,
+          149
+        ],
+        [
+          57,
+          87,
+          144
+        ],
+        [
+          62,
+          86,
+          133
+        ],
+        [
+          67,
+          87,
+          125
+        ],
+        [
+          69,
+          87,
+          122
+        ],
+        [
+          67,
+          87,
+          125
+        ],
+        [
+          62,
+          86,
+          133
+        ],
+        [
+          57,
+          87,
+          144
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/jyaldi-v5/full/final/walk.png",
+          "sha256": "ba2de7f6070fc0a9e20f2f9f82352f29cd22461541769f98f5f661e37fb30ef4",
+          "last_commit": "feed03086e8acbd187c30fd58f7e24b5043175b8"
+        },
+        "manifest": {
+          "path": "game-src/action/jyaldi-v5/full/final/manifest.json",
+          "sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095",
+          "last_commit": "b1c2a711f839e92af3cedfe35eb75f0013d19b5b"
+        },
+        "hands": {
+          "path": "game-src/action/jyaldi-v5/full/final/hands.json",
+          "sha256": "ab0a15cc5916ec880b8c0a5326aa1792712da696d3b51dd1f324b5f882359c7c",
+          "last_commit": "1454dfe8de15c399b519a26fb1e6ab0854ed2716"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/00.png",
+            "sha256": "243d81abac7767afb632a3cd6570e052024d98a7b50ccf7aca29207ea8789f32",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/01.png",
+            "sha256": "41345c59d0801e3e51debb727a6d4f93063615308b4030af2d7d4876fa4533fb",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/02.png",
+            "sha256": "0ba274a8702649fa16a84366f53e7649d7a0295787d871e3e624b6f82d384d28",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/03.png",
+            "sha256": "497bf1ba2110af1fa9b3455c78130ec4914ae34b7f7bee39c79e0f10e3e66067",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/04.png",
+            "sha256": "6f7f753fe088fe012819237ba6766b25284d74d1ec6f715010c20e1ebd3297ec",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/05.png",
+            "sha256": "99b4770daa8ad0fbbb84369b3c8f2a1d62b4915b28307b82b6b35aee3f54b198",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/06.png",
+            "sha256": "63a3c3e94bde23c99b5f5db01a334abd67c1970cb4ddbc0dad6f0bec8ad09501",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/walk/07.png",
+            "sha256": "18b3ef7dc7d01b504a9f48040ec3131f9d4ec3d67abded093d668ae2680feb8f",
+            "last_commit": "ed8e16ec698a29dc8ca4f568328bb9338e8835af"
+          }
+        ]
+      }
+    },
+    "jyaldi/run": {
+      "strip": "strips/jyaldi/run.png",
+      "sha256": "d4f66ac791d9832937ff67aab8f7d0364de414afdca7dc09a20d33d060e957de",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "4 달리기",
+        "fps": 14,
+        "loop": true,
+        "hits": [],
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (계획안 1~41)",
+        "frames": 8,
+        "bytes": 33410,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              67,
+              81
+            ],
+            "hand2": [
+              101,
+              71
+            ],
+            "angle": 46,
+            "hip": [
+              67,
+              88
+            ]
+          },
+          {
+            "hand": [
+              73,
+              76
+            ],
+            "hand2": [
+              95,
+              69
+            ],
+            "angle": 18,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              87,
+              71
+            ],
+            "hand2": [
+              81,
+              71
+            ],
+            "angle": -40,
+            "hip": [
+              67,
+              83
+            ]
+          },
+          {
+            "hand": [
+              101,
+              69
+            ],
+            "hand2": [
+              67,
+              76
+            ],
+            "angle": -38,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              107,
+              71
+            ],
+            "hand2": [
+              61,
+              81
+            ],
+            "angle": -24,
+            "hip": [
+              67,
+              88
+            ]
+          },
+          {
+            "hand": [
+              101,
+              69
+            ],
+            "hand2": [
+              67,
+              76
+            ],
+            "angle": -38,
+            "hip": [
+              67,
+              84
+            ]
+          },
+          {
+            "hand": [
+              87,
+              71
+            ],
+            "hand2": [
+              81,
+              71
+            ],
+            "angle": -40,
+            "hip": [
+              67,
+              83
+            ]
+          },
+          {
+            "hand": [
+              73,
+              76
+            ],
+            "hand2": [
+              95,
+              69
+            ],
+            "angle": 18,
+            "hip": [
+              67,
+              84
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          67,
+          81,
+          136
+        ],
+        [
+          73,
+          76,
+          108
+        ],
+        [
+          87,
+          71,
+          50
+        ],
+        [
+          101,
+          69,
+          52
+        ],
+        [
+          107,
+          71,
+          66
+        ],
+        [
+          101,
+          69,
+          52
+        ],
+        [
+          87,
+          71,
+          50
+        ],
+        [
+          73,
+          76,
+          108
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/jyaldi-v5/full/final/run.png",
+          "sha256": "d4f66ac791d9832937ff67aab8f7d0364de414afdca7dc09a20d33d060e957de",
+          "last_commit": "ba4a44a567fff74022954f63393d3855da5ecacc"
+        },
+        "manifest": {
+          "path": "game-src/action/jyaldi-v5/full/final/manifest.json",
+          "sha256": "78bd9a68af565a6d595bdc8adf37a5337968e003e72f9525098e5b2a50d65095",
+          "last_commit": "b1c2a711f839e92af3cedfe35eb75f0013d19b5b"
+        },
+        "hands": {
+          "path": "game-src/action/jyaldi-v5/full/final/hands.json",
+          "sha256": "ab0a15cc5916ec880b8c0a5326aa1792712da696d3b51dd1f324b5f882359c7c",
+          "last_commit": "1454dfe8de15c399b519a26fb1e6ab0854ed2716"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/00.png",
+            "sha256": "df80724956f359b43d66d9f55baae8b162db26e26b48912612e7f7a2d77971e2",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/01.png",
+            "sha256": "675cf7da131fccc0ebdba5add07e85f35f16f2fb999586c33e984a6abff69ac1",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/02.png",
+            "sha256": "859837797b90915e33610ac7fe3be6f34158cbe9d4d679b37067d394aec17fdc",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/03.png",
+            "sha256": "d3ba5caeba700519c59ca455a0a38d72276c23b1e51784f4386a7ad1c4cb98cd",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/04.png",
+            "sha256": "d1f9b6a1093beef6c41f7a8774d08ae98ff83dbde0178249ac68e25fc0ffad86",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/05.png",
+            "sha256": "e7c66a21dd4d73a626f8d4441137a9dfc88f5d171fd06bc88e3cda5ecdeba561",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/06.png",
+            "sha256": "1c446961728e443b19b99428f30f93537b21e40d3f4898add3f0e5ac3ebb3475",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          },
+          {
+            "path": "game-src/action/jyaldi-v5/full/clips/run/07.png",
+            "sha256": "5a9e66d8aefa469418eb1d507eccd35eb6e6438fb186c67e603ee2f9a4121aa9",
+            "last_commit": "28e8170235934e0df395639dc75ed8d162038f84"
+          }
+        ]
+      }
+    },
+    "kyuras/snap1": {
+      "strip": "strips/kyuras/snap1.png",
+      "sha256": "2b98fb3c4d95216cfcc404fcce72bc9d0ce272c847d921d0bbd345c865e2ca9a",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "A 1타 앞손 스냅(반걸음 후퇴)",
+        "fps": 18,
+        "loop": false,
+        "adv": -6,
+        "origin": 0,
+        "hold": 0.03,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          2
+        ],
+        "slide": 1.3,
+        "frames": 5,
+        "bytes": 12181,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              71,
+              53
+            ],
+            "hand2": [
+              52,
+              92
+            ],
+            "angle": -99,
+            "hip": [
+              55,
+              89
+            ]
+          },
+          {
+            "hand": [
+              81,
+              65
+            ],
+            "hand2": [
+              51,
+              92
+            ],
+            "angle": -22,
+            "hip": [
+              54,
+              89
+            ]
+          },
+          {
+            "hand": [
+              77,
+              67
+            ],
+            "hand2": [
+              49,
+              92
+            ],
+            "angle": -18,
+            "hip": [
+              52,
+              89
+            ]
+          },
+          {
+            "hand": [
+              72,
+              60
+            ],
+            "hand2": [
+              48,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              51,
+              89
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          71,
+          53,
+          351
+        ],
+        [
+          81,
+          65,
+          68
+        ],
+        [
+          77,
+          67,
+          72
+        ],
+        [
+          72,
+          60,
+          17
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/kyuras/final/snap1.png",
+          "sha256": "2b98fb3c4d95216cfcc404fcce72bc9d0ce272c847d921d0bbd345c865e2ca9a",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "manifest": {
+          "path": "game-src/action/kyuras/final/manifest.json",
+          "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "hands": {
+          "path": "game-src/action/kyuras/final/hands.json",
+          "sha256": "898a9d474f1250b07b25cb6d75cf39e64cf8f64eccc1307a252e642a073c5337",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/kyuras/clips/snap1/00.png",
+            "sha256": "0674195d44a666d991ee146b1bef8edad77fa0135e5bc10ef5dd9f296c981820",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap1/01.png",
+            "sha256": "003c274922d791b5dd45f588af9c543d2d176f3f114dc3c3e845f8cb87b1fbaf",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap1/02.png",
+            "sha256": "cb17746dab635f29829c5cbc69a60b8ad250e84b4958c64a0bbc7362f907c208",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap1/03.png",
+            "sha256": "8878ba9eb163c594969097def3cbb4689c7230921ebcbac099c258472f77f13e",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap1/04.png",
+            "sha256": "26a8754bfe21f69f7d66512f2d0561859f9a3763bd9fe232d512fbdc081cf581",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          }
+        ]
+      }
+    },
+    "kyuras/snap2": {
+      "strip": "strips/kyuras/snap2.png",
+      "sha256": "a52a1d2a79ef890bc3e4bd12d329344ac3ed645172b3e03657cbd3a859594a78",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "A 2타 뒷손 스냅(한 걸음 후퇴)",
+        "fps": 15,
+        "loop": false,
+        "adv": -12,
+        "origin": 0,
+        "hold": 0.05,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          3
+        ],
+        "slide": 0.7,
+        "frames": 6,
+        "bytes": 14842,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              64,
+              73
+            ],
+            "hand2": [
+              55,
+              57
+            ],
+            "angle": -85,
+            "hip": [
+              55,
+              89
+            ]
+          },
+          {
+            "hand": [
+              63,
+              74
+            ],
+            "hand2": [
+              60,
+              57
+            ],
+            "angle": -74,
+            "hip": [
+              52,
+              90
+            ]
+          },
+          {
+            "hand": [
+              60,
+              76
+            ],
+            "hand2": [
+              70,
+              58
+            ],
+            "angle": -50,
+            "hip": [
+              51,
+              90
+            ]
+          },
+          {
+            "hand": [
+              58,
+              74
+            ],
+            "hand2": [
+              68,
+              61
+            ],
+            "angle": -51,
+            "hip": [
+              48,
+              90
+            ]
+          },
+          {
+            "hand": [
+              66,
+              60
+            ],
+            "hand2": [
+              42,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              45,
+              89
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          64,
+          73,
+          5
+        ],
+        [
+          63,
+          74,
+          16
+        ],
+        [
+          60,
+          76,
+          40
+        ],
+        [
+          58,
+          74,
+          39
+        ],
+        [
+          66,
+          60,
+          17
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/kyuras/final/snap2.png",
+          "sha256": "a52a1d2a79ef890bc3e4bd12d329344ac3ed645172b3e03657cbd3a859594a78",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "manifest": {
+          "path": "game-src/action/kyuras/final/manifest.json",
+          "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "hands": {
+          "path": "game-src/action/kyuras/final/hands.json",
+          "sha256": "898a9d474f1250b07b25cb6d75cf39e64cf8f64eccc1307a252e642a073c5337",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/kyuras/clips/snap2/00.png",
+            "sha256": "bb58c691107888ec7cd09c87bc2c2570df0b5a144bd7930ae49853edc0a24580",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap2/01.png",
+            "sha256": "c207728f01247bec4603d45507139db10a6eb79fa0bc76bc2238ca78666d4143",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap2/02.png",
+            "sha256": "554d43bce04f68528d3f001fff6b2b844621aa2ad63be8708791b013d9aff4de",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap2/03.png",
+            "sha256": "12bc4621365f101c9a3049a2d95ee24f17f0c43334c50cbb982208056ccffee9",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap2/04.png",
+            "sha256": "bcd5b733497889613c08965a4740707c7b84315734ce1b03ca8c14d39a126e34",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap2/05.png",
+            "sha256": "a4d76c88e3d7d8e45d1ae850bd22f834c48d411941c2bde083b56ed2c60413b6",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          }
+        ]
+      }
+    },
+    "kyuras/snap3": {
+      "strip": "strips/kyuras/snap3.png",
+      "sha256": "8ed45cdaac1ade9733b0ae28c736a74eb795bfc53d19d8b56736b348fdb5b6ed",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "A 3타 교차 스냅(크게 후퇴)",
+        "fps": 13,
+        "loop": false,
+        "adv": -20,
+        "origin": 0,
+        "hold": 0.1,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [
+          3
+        ],
+        "slide": -0.4,
+        "frames": 7,
+        "bytes": 17582,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              78,
+              60
+            ],
+            "hand2": [
+              54,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              57,
+              89
+            ]
+          },
+          {
+            "hand": [
+              65,
+              74
+            ],
+            "hand2": [
+              66,
+              72
+            ],
+            "angle": -32,
+            "hip": [
+              53,
+              91
+            ]
+          },
+          {
+            "hand": [
+              66,
+              70
+            ],
+            "hand2": [
+              55,
+              75
+            ],
+            "angle": -24,
+            "hip": [
+              48,
+              90
+            ]
+          },
+          {
+            "hand": [
+              68,
+              64
+            ],
+            "hand2": [
+              33,
+              81
+            ],
+            "angle": -11,
+            "hip": [
+              47,
+              90
+            ]
+          },
+          {
+            "hand": [
+              63,
+              65
+            ],
+            "hand2": [
+              28,
+              83
+            ],
+            "angle": -9,
+            "hip": [
+              43,
+              90
+            ]
+          },
+          {
+            "hand": [
+              61,
+              62
+            ],
+            "hand2": [
+              31,
+              88
+            ],
+            "angle": -45,
+            "hip": [
+              40,
+              90
+            ]
+          },
+          {
+            "hand": [
+              58,
+              60
+            ],
+            "hand2": [
+              34,
+              92
+            ],
+            "angle": -73,
+            "hip": [
+              37,
+              89
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          78,
+          60,
+          17
+        ],
+        [
+          65,
+          74,
+          58
+        ],
+        [
+          66,
+          70,
+          66
+        ],
+        [
+          68,
+          64,
+          79
+        ],
+        [
+          63,
+          65,
+          81
+        ],
+        [
+          61,
+          62,
+          45
+        ],
+        [
+          58,
+          60,
+          17
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/kyuras/final/snap3.png",
+          "sha256": "8ed45cdaac1ade9733b0ae28c736a74eb795bfc53d19d8b56736b348fdb5b6ed",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "manifest": {
+          "path": "game-src/action/kyuras/final/manifest.json",
+          "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "hands": {
+          "path": "game-src/action/kyuras/final/hands.json",
+          "sha256": "898a9d474f1250b07b25cb6d75cf39e64cf8f64eccc1307a252e642a073c5337",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/kyuras/clips/snap3/00.png",
+            "sha256": "6773dc7b3c06177c972ccfe36ee2066d59adf2bf42024e4f544823a1fd309232",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/01.png",
+            "sha256": "a03a4de1f6af2750eeebf838f406623660c4239f00d48354c719ba84a6efa666",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/02.png",
+            "sha256": "6ed96f776a8d8952d60b94a47edcf35ea37a54756ad08a3f7ca89222a0a850f7",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/03.png",
+            "sha256": "5627344025f33ce7d3731e9568be125ad76a3c29c17ff934326c974363cb19ad",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/04.png",
+            "sha256": "857e60dc18fa6fb4acb3a451c7807466d308cff021bb547af3a3e04025f68d0b",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/05.png",
+            "sha256": "644409723e679df335ee7b1f77411dbab590f2ebb92aa08837c0c2b6de403dc2",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/snap3/06.png",
+            "sha256": "f36c0553b21e25147b44defb635e5865b7c04e8a327c35dbb659ee0689f4c5e2",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          }
+        ]
+      }
+    },
+    "kyuras/walk_shotgun": {
+      "strip": "strips/kyuras/walk_shotgun.png",
+      "sha256": "56f2722226b455e6a556dcda3d68eb83f65b4703b9fc9fc41ee72ca39327dbfd",
+      "status": "existing_generated_visual_unapproved",
+      "geometry": {
+        "frameW": 192,
+        "frameH": 144,
+        "foot": 136,
+        "anchor": 57
+      },
+      "metadata": {
+        "label": "산탄총 들고 걷기",
+        "fps": 10,
+        "loop": true,
+        "adv": 0,
+        "origin": 0,
+        "hold": 0.0,
+        "group": "전투·기본 (쟈알디 계획안 1~41 자리 + 큐라스 고유)",
+        "hits": [],
+        "slide": 0,
+        "frames": 8,
+        "bytes": 17371,
+        "prop": false,
+        "anchors": [
+          {
+            "hand": [
+              65,
+              87
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              85
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              83
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              87
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              85
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          },
+          {
+            "hand": [
+              65,
+              85
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              83
+            ]
+          },
+          {
+            "hand": [
+              65,
+              86
+            ],
+            "hand2": [
+              55,
+              91
+            ],
+            "angle": 36,
+            "hip": [
+              59,
+              84
+            ]
+          }
+        ]
+      },
+      "hands": [
+        [
+          65,
+          87,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          85,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          87,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ],
+        [
+          65,
+          85,
+          126
+        ],
+        [
+          65,
+          86,
+          126
+        ]
+      ],
+      "provenance": {
+        "strip": {
+          "path": "game-src/action/kyuras/final/walk_shotgun.png",
+          "sha256": "56f2722226b455e6a556dcda3d68eb83f65b4703b9fc9fc41ee72ca39327dbfd",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "manifest": {
+          "path": "game-src/action/kyuras/final/manifest.json",
+          "sha256": "2e91296e24e7470a20f74a7a05e25414bbaeda10ca5eb699ab8c3785ced318c6",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "hands": {
+          "path": "game-src/action/kyuras/final/hands.json",
+          "sha256": "898a9d474f1250b07b25cb6d75cf39e64cf8f64eccc1307a252e642a073c5337",
+          "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+        },
+        "raw_frames": [
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/00.png",
+            "sha256": "268756a154241005869cdba95cf27586fadd14455b64dc34fca571b095d7a504",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/01.png",
+            "sha256": "3f9a4b0b37b74260871d43e8ebfd969f6a0bcdd4585186f319e158f92827c101",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/02.png",
+            "sha256": "a91111c1933503ede1d19ff3c3a8ebbb980b4fdd80334620a6b173e72b288790",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/03.png",
+            "sha256": "65fa11e4d6a7359c3e207d56c5df095f082d759d79fd5b2323460371ea57f401",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/04.png",
+            "sha256": "11a5d5088466deca5fd2fb245495bdce801f14661e780d4b4c784ae9356e2818",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/05.png",
+            "sha256": "62476868d37b197b3f6bbd80ce77974e2deb0126d3054f21405b7521acc9d74a",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/06.png",
+            "sha256": "b4c06e2a448ab11971852c3a0ecbb753947605912398da8c4483d7d0b71fcf2f",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          },
+          {
+            "path": "game-src/action/kyuras/clips/walk_shotgun/07.png",
+            "sha256": "58e071fe53ba0676e99bb269255841d613bb283dd9f14c32033d3a994d1d29e1",
+            "last_commit": "3bfb455499bf9868658212f1a3cb3ad43ff24e47"
+          }
+        ]
+      }
+    }
+  },
+  "excluded_legacy_files": [
+    {
+      "clip": "kyuras/idle_pipe",
+      "reason": "legacy_final_not_in_current_manifest_or_raw_delivery",
+      "source": {
+        "path": "game-src/action/kyuras/final/idle_pipe.png",
+        "sha256": "b68e8ec7ee48a189e630aefce0b71390476d9bb5b24d06b1bb18d69135e3d378",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      }
+    },
+    {
+      "clip": "kyuras/walk_pipe",
+      "reason": "legacy_final_not_in_current_manifest_or_raw_delivery",
+      "source": {
+        "path": "game-src/action/kyuras/final/walk_pipe.png",
+        "sha256": "7bc871f82b59dac9e9e34e1101cc8a10c34e7c3d25d3b25133cc8184108f235b",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      }
+    },
+    {
+      "clip": "kyuras/shotgun",
+      "reason": "legacy_final_not_in_current_manifest_or_raw_delivery",
+      "source": {
+        "path": "game-src/action/kyuras/final/shotgun.png",
+        "sha256": "b75aee7b55b2e0f70270b4f961fb34e6eedca6694ebe442fadd8c54b98454b3f",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      }
+    },
+    {
+      "clip": "kyuras/idle_shotgun",
+      "reason": "legacy_final_not_in_current_manifest_or_raw_delivery",
+      "source": {
+        "path": "game-src/action/kyuras/final/idle_shotgun.png",
+        "sha256": "52a7edf91b03e0805f9832e5c1516334ddc18933d0c3881204f32b20cda4b6c5",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      }
+    },
+    {
+      "clip": "kyuras/run_shotgun",
+      "reason": "legacy_final_not_in_current_manifest_or_raw_delivery",
+      "source": {
+        "path": "game-src/action/kyuras/final/run_shotgun.png",
+        "sha256": "0f42c2ef1af63bcdefed4d7d284e646743f831871e76bc000beb6240cf59c088",
+        "last_commit": "716205d1fa8571499ecde20948f6729a36aec727"
+      }
+    }
+  ]
+}

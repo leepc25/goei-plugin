@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-10-22T08:49:40.616006+00:00",
+  "tool": "get_image",
+  "arguments": {
+    "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a"
+  },
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

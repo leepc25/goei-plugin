@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-10-22T08:49:40.839804+00:00",
+  "tool": "search_help",
+  "arguments": {
+    "question": "For animate_with_skeleton_v3, please confirm current cost for 8 frames, maximum active jobs/concurrency and how to retrieve already-paid get_image jobs without regenerating. Does tools/list require authentication while get_balance and list_jobs require it?"
+  },
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

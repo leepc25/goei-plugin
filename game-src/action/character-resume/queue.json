@@ -1,0 +1,91 @@
+{
+  "schema": "goei-character-production-queue/1",
+  "system_base": "0a13285205b77fd6cf33b966cea246efa0d3082e",
+  "branch": "codex/character-production-resume",
+  "account": {
+    "balance": null,
+    "active_jobs": null,
+    "concurrency_limit": null,
+    "reason": "401 Missing Authorization header"
+  },
+  "new_generation_calls": 0,
+  "new_generation_charge": 0,
+  "items": [
+    {
+      "priority": 1,
+      "character": "kyuras",
+      "clip": "idle_shotgun",
+      "frames": 4,
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "state": "existing_paid_job_auth_blocked",
+      "regenerate": false,
+      "original_job_usage": null
+    },
+    {
+      "priority": 1,
+      "character": "kyuras",
+      "clip": "run_shotgun",
+      "frames": 8,
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "state": "existing_paid_job_auth_blocked",
+      "regenerate": false,
+      "original_job_usage": null
+    },
+    {
+      "priority": 2,
+      "character": "jyaldi",
+      "clip": "walk",
+      "frames": 8,
+      "state": "skeleton_design_pending_auth_and_review",
+      "tool": "animate_with_skeleton_v3",
+      "current_public_estimate_generations": 3,
+      "job_id": null,
+      "actual_charge": 0
+    },
+    {
+      "priority": 3,
+      "character": "jyaldi",
+      "clip": "run",
+      "frames": 8,
+      "state": "after_walk_frame_review",
+      "tool": "animate_with_skeleton_v3",
+      "current_public_estimate_generations": 3,
+      "job_id": null,
+      "actual_charge": 0
+    },
+    {
+      "priority": 4,
+      "character": "kyuras",
+      "clips": [
+        "snap1",
+        "snap2",
+        "snap3",
+        "idle_pipe",
+        "walk_pipe",
+        "shotgun"
+      ],
+      "state": "redesign_review_before_quote",
+      "current_estimate": null
+    },
+    {
+      "priority": 5,
+      "character": "eileen",
+      "clips": [
+        "transition",
+        "buttstroke",
+        "pushkick",
+        "step",
+        "limp"
+      ],
+      "state": "combat_pose_review_before_quote",
+      "current_estimate": null
+    }
+  ],
+  "never_duplicate_from_stale_handoff": [
+    "jyaldi grabknee/undress/showerturn/shower",
+    "kyuras walk_shotgun and bathing originals",
+    "eileen showerturn/shower/bath",
+    "gorgodio undress/showerturn/shower/bath",
+    "deadpole 20 bathing frames"
+  ]
+}
