@@ -21,4 +21,4 @@ GPT가 이 저장소에 그림을 올리는 일감 목록. 한 줄에 한 요청
 | docs/캐릭터제작서/의뢰서_데드폴_탈의·샤워·목욕_GPT.md | 데드폴 탈의 7 + 돌아서기 3 + 샤워 6 + 목욕 4 = 20장(192×144 투명, 수건 차림, 데드폴 키·그림체). **기준 그림 base.png·idle/00.png가 main에 올라온 뒤 시작** | game-src/action/deadpole/full/clips/<클립>/NN.png | 요청(기준 그림 올림 3040638) |
 | docs/캐릭터제작서/의뢰서_큐라스_샤워·목욕_GPT.md | 큐라스 탈의 7 + 샤워 앞 돌아서기 3 + 샤워 6 + 목욕 4 = 20장(192×144 투명, 기준 game-src/action/kyuras/base/A.png, 허리 수건) | game-src/action/kyuras/clips/undress·showerturn·shower·bath/NN.png | 요청 |
 | docs/캐릭터제작서/의뢰서_에일린_씻기_GPT.md | 에일린 탈의 7·돌아서기 3·샤워 6·목욕 4 = 20장(192×144 투명, 옆모습, 캐릭터만). 기준 그림 game-src/action/eileen/base/H-side.png | game-src/action/eileen/clips/undress·showerturn·shower·bath/NN.png | 요청 |
-| docs/캐릭터제작서/의뢰서_고르고디오_샤워·목욕_GPT.md | 고르고디오 탈의 7·샤워 앞 돌아서기 3·샤워 6·목욕 4 = 20장 (224×176 투명, 수건 차림, 캐릭터만) | game-src/action/gorgodio/full/clips/<undress·showerturn·shower·bath>/NN.png | 대기: 맨몸 기준 그림 game-src/action/gorgodio/full/base.png가 올라온 뒤 시작 |
+| docs/캐릭터제작서/의뢰서_고르고디오_샤워·목욕_GPT.md | 고르고디오 탈의 7·샤워 앞 돌아서기 3·샤워 6·목욕 4 = 20장 (224×176 투명, 수건 차림, 캐릭터만) | game-src/action/gorgodio/full/clips/<undress·showerturn·shower·bath>/NN.png | 시작 가능(기준 그림 full/ref.png) |
