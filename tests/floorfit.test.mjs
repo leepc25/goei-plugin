@@ -3,19 +3,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
-import { mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 
 // 벽 그림 이름만 있는 가짜 배경 꾸러미: 벽 그림 속 문 구간(keepOut)을 노드에서도 계산하게
 const pack = {};
 for (const place of readdirSync('game-src/art/bg/dot')) {
   pack[place] = {};
   for (const f of readdirSync(`game-src/art/bg/dot/${place}`)) if (f.includes('_wall') && f.endsWith('.png')) pack[place][f.slice(0, -4)] = 'x';
+  // 물건 그림은 진짜 PNG 머리를 넣어 그림 폭을 재게 한다
+  if (existsSync(`game-src/art/bg/dot/${place}/objects`))
+    for (const f of readdirSync(`game-src/art/bg/dot/${place}/objects`)) if (f.endsWith('.png')) pack[place][`objects/${f.slice(0, -4)}`] = `data:image/png;base64,${readFileSync(`game-src/art/bg/dot/${place}/objects/${f}`).subarray(0, 33).toString('base64')}`;
 }
 globalThis.window = { __GOEI_BG_ART__: pack };
+globalThis.Image ??= class { complete = false; naturalWidth = 0; src = ''; };
 
 mkdirSync('dist-test', { recursive: true });
 await build({
-  stdin: { contents: "export { makeFloor, floorPlan } from './src/game/action/stage/index.ts'; export { createField, furnishFloor, PROPS } from './src/game/action/items/index.ts'; export * from './src/game/action/engine/propBlock.ts';", resolveDir: '.', loader: 'ts' },
+  stdin: { contents: "export { makeFloor, floorPlan } from './src/game/action/stage/index.ts'; export { propArtSize } from './src/game/action/art/bg.ts'; export { createField, furnishFloor, PROPS } from './src/game/action/items/index.ts'; export * from './src/game/action/engine/propBlock.ts';", resolveDir: '.', loader: 'ts' },
   bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/floorfit.mjs', loader: { '.css': 'text', '.png': 'empty' }, logLevel: 'error',
 });
 const M = await import('../dist-test/floorfit.mjs');
@@ -26,7 +30,8 @@ let seedR = 1;
 const rnd = () => ((seedR = (seedR * 16807) % 2147483647) / 2147483647);
 
 test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 물건 밖에 생겨난다', () => {
-  let floors = 0, doorsChecked = 0, spawns = 0;
+  let floors = 0, doorsChecked = 0, spawns = 0, wallProps = 0;
+  const moved = [];
   for (let seed = 1; seed <= 40; seed++)
     for (const type of TYPES) {
       const depth = type === 'lobby' ? 1 + (seed % 3) : type === 'deep' ? 15 : 4 + (seed % 20);
@@ -38,6 +43,21 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
       seedR = seed;
       M.furnishFloor(field, { ...plan, props: M.furnishAvoid(plan) }, lane, rnd);
       const items = field.ents.filter((e) => e.type === 'prop');
+      // 벽에 붙은 큰 소품(자판기·소파·정수기…)은 그림 폭 전체가 문·명패·벽 장식 앞을 피한다 (검수 22)
+      for (const q of plan.props.filter((q) => q.y <= lane[0] + 40 && ['prop', 'clutter', 'table'].includes(q.kind))) {
+        const aw = M.propArtSize(q.kind, q.label, type)?.w;
+        if (!aw) continue;
+        wallProps++;
+        const hit = (plan.keepOut ?? []).find(([a, b]) => q.x + aw / 2 > a && q.x - aw / 2 < b);
+        if (hit) moved.push(`${type} ${depth} ${seed}: ${q.label}@${q.x} 폭 ${aw} ↔ [${Math.round(hit[0])}, ${Math.round(hit[1])}]`);
+      }
+      // 점검문(철문)도 벽 그림의 문·게시판 앞에 서지 않는다 (검수 22)
+      for (const q of plan.props.filter((q) => q.kind === 'servicedoor')) {
+        const aw = M.propArtSize(q.kind, q.label, type)?.w ?? 170;
+        // 벽 그림의 문 하나를 통째로 덮는 것(그 문이 철문이 된다)은 괜찮다
+        const hit = (plan.keepOut ?? []).find(([a, b]) => q.x + aw / 2 > a && q.x - aw / 2 < b && !(a >= q.x - aw / 2 && b <= q.x + aw / 2 && b - a >= 100));
+        if (hit) moved.push(`${type} ${depth} ${seed}: 점검문@${q.x} 폭 ${aw} ↔ [${Math.round(hit[0])}, ${Math.round(hit[1])}]`);
+      }
       // 사다리(천장 해치)는 벽선에, 문·벽 장식 앞이 아니고, 한 화면에 하나 (검수 21)
       const hatches = plan.props.filter((q) => q.kind === 'hatch').sort((a, b) => a.x - b.x);
       hatches.forEach((h, i) => {
@@ -62,5 +82,7 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
         assert.ok(!bad, `${type} ${depth} ${seed}: ${s.kind}@${q.x},${q.y} 물건 안 (${bad?.x},${bad?.y})`);
       }
     }
+  // 자리가 정말 없을 때(480px 안) 원래 자리에 남는 경우만 조금 허용
+  assert.ok(moved.length <= floors * 0.03, `벽 소품 ${wallProps}개 중 ${moved.length}개가 문·장식 앞:\n${moved.slice(0, 8).join('\n')}`);
   assert.ok(floors === 320 && doorsChecked > 300 && spawns > 500, `층 ${floors}, 문 ${doorsChecked}, 적 ${spawns}`);
 });

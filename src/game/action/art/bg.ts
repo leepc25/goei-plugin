@@ -547,13 +547,30 @@ export function propArtRef(kind: string, label: string | undefined, sx: number, 
 export function propArtSize(kind: string, label: string | undefined, floorType?: string): { w: number; h: number } | null {
   const r = propArtRef(kind, label, 0, floorType);
   if (!r) return null;
-  const a = objImage(r[0], r[1]);
+  const a = objSize(r[0], r[1]);
   if (!a) return null;
   if (r.length === 4) {
-    const b = objImage(r[2], r[3]);
-    return b ? { w: (a.width + b.width) * 2, h: Math.max(a.height, b.height) * 2 } : null;
+    const b = objSize(r[2], r[3]);
+    return b ? { w: (a.w + b.w) * 2, h: Math.max(a.h, b.h) * 2 } : null;
   }
-  return { w: a.width * 2, h: a.height * 2 };
+  return { w: a.w * 2, h: a.h * 2 };
+}
+
+/** 물건 그림 도트 크기: 그림이 읽히기 전(층 배치 때)에도 PNG 머리(IHDR)에서 바로 읽는다 */
+const sizeCache = new Map<string, { w: number; h: number } | null>();
+function objSize(place: string, n: number): { w: number; h: number } | null {
+  const key = `${place}/${n}`;
+  if (sizeCache.has(key)) return sizeCache.get(key)!;
+  const src = pack()[place]?.[`objects/${place}_objects_${n}`];
+  let out: { w: number; h: number } | null = null;
+  const m = typeof src === 'string' ? /^data:image\/png;base64,(.{32})/.exec(src) : null;
+  if (m && typeof atob === 'function') {
+    const b = atob(m[1]);
+    const u = (i: number) => ((b.charCodeAt(i) << 24) | (b.charCodeAt(i + 1) << 16) | (b.charCodeAt(i + 2) << 8) | b.charCodeAt(i + 3)) >>> 0;
+    out = { w: u(16), h: u(20) };
+  }
+  sizeCache.set(key, out);
+  return out;
 }
 
 /** 이 소품이 서 있는 판(로비 6번 입간판 그림)으로 그려지는가 */

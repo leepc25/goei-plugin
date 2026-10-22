@@ -1448,13 +1448,28 @@ function propArtRef(kind, label3, sx, floorType) {
 function propArtSize(kind, label3, floorType) {
   const r = propArtRef(kind, label3, 0, floorType);
   if (!r) return null;
-  const a = objImage(r[0], r[1]);
+  const a = objSize(r[0], r[1]);
   if (!a) return null;
   if (r.length === 4) {
-    const b = objImage(r[2], r[3]);
-    return b ? { w: (a.width + b.width) * 2, h: Math.max(a.height, b.height) * 2 } : null;
+    const b = objSize(r[2], r[3]);
+    return b ? { w: (a.w + b.w) * 2, h: Math.max(a.h, b.h) * 2 } : null;
   }
-  return { w: a.width * 2, h: a.height * 2 };
+  return { w: a.w * 2, h: a.h * 2 };
+}
+var sizeCache = /* @__PURE__ */ new Map();
+function objSize(place3, n) {
+  const key = `${place3}/${n}`;
+  if (sizeCache.has(key)) return sizeCache.get(key);
+  const src = pack()[place3]?.[`objects/${place3}_objects_${n}`];
+  let out = null;
+  const m = typeof src === "string" ? /^data:image\/png;base64,(.{32})/.exec(src) : null;
+  if (m && typeof atob === "function") {
+    const b = atob(m[1]);
+    const u = (i) => (b.charCodeAt(i) << 24 | b.charCodeAt(i + 1) << 16 | b.charCodeAt(i + 2) << 8 | b.charCodeAt(i + 3)) >>> 0;
+    out = { w: u(16), h: u(20) };
+  }
+  sizeCache.set(key, out);
+  return out;
 }
 function isStandBoard(kind, label3, floorType) {
   const r = propArtRef(kind, label3, 0, floorType);
@@ -16470,12 +16485,16 @@ function endingPlan(id) {
 }
 var FIXED_PROPS = /* @__PURE__ */ new Set(["elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
 var BOARD_GAP = 1400;
-var artW = (p) => Math.max(p.w, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
+var artW = (p, floorType) => {
+  const base = Math.max(p.w, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
+  if (p.kind === "item" || p.kind === "belonging" || p.kind === "mark" || p.kind === "passenger" || p.kind === "npc") return base;
+  return Math.max(base, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
+};
 function spreadProps(f, props2, startX) {
   const wallY = Y_TOP + 40;
   const keepOut = [];
   for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor("floor", f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
-  const doorSpans = keepOut.slice();
+  const wallDoors = keepOut.filter(([a, b]) => b - a >= 100);
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === "block" || t.kind === "pit" || t.kind === "narrow" || t.kind === "low");
   const taken = [];
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
@@ -16486,9 +16505,25 @@ function spreadProps(f, props2, startX) {
   const kept = props2.filter((p) => boardLike(p) && fixed2(p));
   const decor = new Set(props2.filter((p) => boardLike(p) && !must(p) && !fixed2(p)));
   for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
-  for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
+  for (const p of props2.filter((q) => q.kind === "servicedoor")) {
+    const h = artW(p, f.type) / 2;
+    const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+    if (ok(p.x)) continue;
+    let x = null;
+    for (let d2 = 24; d2 <= 1600 && x === null; d2 += 24) x = ok(p.x + d2) ? p.x + d2 : ok(p.x - d2) ? p.x - d2 : null;
+    if (x === null)
+      for (const [a, b] of [...wallDoors].sort((u, v) => Math.abs((u[0] + u[1]) / 2 - p.x) - Math.abs((v[0] + v[1]) / 2 - p.x))) {
+        const c = (a + b) / 2;
+        if (b - a > 2 * h || keepOut.some(([a2, b2]) => (a2 !== a || b2 !== b) && c + h > a2 && c - h < b2)) continue;
+        if (terr.some((t) => c + h > t.x0 - 20 && c - h < t.x1 + 20) || props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - c) < h + artW(q, f.type) / 2 + 16)) continue;
+        x = c;
+        break;
+      }
+    if (x !== null) p.x = x;
+  }
+  for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
   const free = (p, x) => {
-    const h = artW(p) / 2;
+    const h = artW(p, f.type) / 2;
     if (x - h < 40 || x + h > f.width - 40) return false;
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
@@ -16514,7 +16549,7 @@ function spreadProps(f, props2, startX) {
   const order = (p) => boardLike(p) ? decor.has(p) ? 1 : 0 : 2;
   for (const p of [...props2].filter((q) => !fixed2(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x = null;
-    const reach = boardLike(p) || p.kind === "hatch" ? 1800 : 480;
+    const reach = boardLike(p) || p.kind === "hatch" ? 1800 : p.y <= wallY ? 900 : 480;
     for (let d2 = 0; d2 <= reach; d2 += 24) {
       if (free(p, p.x + d2)) {
         x = p.x + d2;
@@ -16526,6 +16561,10 @@ function spreadProps(f, props2, startX) {
       }
     }
     if (x === null && (boardLike(p) && !decor.has(p) || p.kind === "hatch")) x = farthest(p, f.width);
+    if (x === null && p.kind === "prop" && p.y <= wallY && !must(p) && p.label !== "거꾸로 가는 시계") {
+      props2.splice(props2.indexOf(p), 1);
+      continue;
+    }
     if (decor.has(p)) {
       const near2 = x === null ? null : kept.reduce((n, q) => !n || Math.abs(q.x - x) < Math.abs(n.x - x) ? q : n, null);
       if (x === null || kept.length >= 3 || near2 && near2.kind === p.kind && near2.label === p.label) {
@@ -16540,9 +16579,9 @@ function spreadProps(f, props2, startX) {
     p.x = x ?? p.x;
     placed.push(p);
     if (boardLike(p)) kept.push(p);
-    taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
+    taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
   }
-  return doorSpans;
+  return keepOut;
 }
 function clearOfProps(props2, x, y) {
   const hit2 = (yy) => props2.some((p) => Math.abs(p.y - yy) < 70 && Math.abs(p.x - x) < artW(p) / 2 + 40);

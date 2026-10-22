@@ -1,5 +1,5 @@
 // 스테이지 자료 → 엔진 FloorPlan (docs/게임_모듈_연결.md). 배경·전경 그리기도 여기서 한다(회색 상자, 그림 없음).
-import { drawPropArt, isStandBoard, wallDecoSpans } from '../art/bg';
+import { drawPropArt, isStandBoard, propArtSize, wallDecoSpans } from '../art/bg';
 import type { Encounter, FloorPlan, PropSpec, SpawnSpec, WorldView } from '../engine/contract';
 import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type Terrain } from './types';
@@ -193,13 +193,18 @@ export function endingPlan(id: string): StagePlan {
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
 const FIXED_PROPS = new Set(['elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
 const BOARD_GAP = 1400;
-const artW = (p: PropSpec) => Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
+// 소품 그림 폭: 그림이 있으면 그 실제 폭(자판기·소파처럼 넓은 것이 문·명패를 가렸다, 검수 22), 없으면 종류별 기본
+const artW = (p: PropSpec, floorType?: string) => {
+  const base = Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
+  if (p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' || p.kind === 'passenger' || p.kind === 'npc') return base;
+  return Math.max(base, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
+};
 
 function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, number][] {
   const wallY = Y_TOP + 40;
   const keepOut: [number, number][] = [];
   for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
-  const doorSpans = keepOut.slice();
+  const wallDoors = keepOut.filter(([a, b]) => b - a >= 100);
   const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === 'block' || t.kind === 'pit' || t.kind === 'narrow' || t.kind === 'low');
   const taken: { a: number; b: number; y: number }[] = [];
   // 갈림길·규칙 표지는 순서가 뜻이라 그대로
@@ -216,9 +221,31 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const decor = new Set(props.filter((p) => boardLike(p) && !must(p) && !fixed(p)));
   // 벽 그림의 게시판·액자·창 앞에도 벽 쪽 소품을 세우지 않는다 (검수 14-1)
   for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor('floor', f.type, sg.ref, f.sub), sg.x, sg.w, sg.flip));
-  for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
+  // 점검문(철문)은 덩이 안 자리만 정해져 있다: 벽 그림의 문·게시판 앞이면 가까운 빈 벽으로 민다 (검수 22: 철문이 게시판을 가림)
+  for (const p of props.filter((q) => q.kind === 'servicedoor')) {
+    const h = artW(p, f.type) / 2;
+    const ok = (x: number) =>
+      x - h >= 40 && x + h <= f.width - 40 &&
+      !keepOut.some(([a, b]) => x + h + 8 > a && x - h - 8 < b) &&
+      !terr.some((t) => x + h > t.x0 - 20 && x - h < t.x1 + 20) &&
+      !props.some((q) => q !== p && fixed(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 16);
+    if (ok(p.x)) continue;
+    let x: number | null = null;
+    for (let d = 24; d <= 1600 && x === null; d += 24) x = ok(p.x + d) ? p.x + d : ok(p.x - d) ? p.x - d : null;
+    // 벽이 문으로 꽉 찬 층(퍼즐·추격): 빈 벽이 없으면 벽 그림의 문 하나를 통째로 덮어 그 문이 철문이 되게 한다
+    if (x === null)
+      for (const [a, b] of [...wallDoors].sort((u, v) => Math.abs((u[0] + u[1]) / 2 - p.x) - Math.abs((v[0] + v[1]) / 2 - p.x))) {
+        const c = (a + b) / 2;
+        if (b - a > 2 * h || keepOut.some(([a2, b2]) => (a2 !== a || b2 !== b) && c + h > a2 && c - h < b2)) continue;
+        if (terr.some((t) => c + h > t.x0 - 20 && c - h < t.x1 + 20) || props.some((q) => q !== p && fixed(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - c) < h + artW(q, f.type) / 2 + 16)) continue;
+        x = c;
+        break;
+      }
+    if (x !== null) p.x = x;
+  }
+  for (const p of props) if (fixed(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
   const free = (p: PropSpec, x: number) => {
-    const h = artW(p) / 2;
+    const h = artW(p, f.type) / 2;
     if (x - h < 40 || x + h > f.width - 40) return false;
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
@@ -247,7 +274,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x: number | null = null;
     // 판은 다른 판과 한 화면 떨어진 자리를 더 멀리까지 찾는다
-    const reach = boardLike(p) || p.kind === 'hatch' ? 1800 : 480;
+    const reach = boardLike(p) || p.kind === 'hatch' ? 1800 : p.y <= wallY ? 900 : 480;
     for (let d = 0; d <= reach; d += 24) {
       if (free(p, p.x + d)) {
         x = p.x + d;
@@ -259,6 +286,11 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
       }
     }
     if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch')) x = farthest(p, f.width);
+    // 벽에 붙는 꾸밈 소품이 문·명패·벽 장식을 피할 자리가 없으면 빼 버린다 (검수 22: 자판기가 문·게시판을 가림)
+    if (x === null && p.kind === 'prop' && p.y <= wallY && !must(p) && p.label !== '거꾸로 가는 시계') {
+      props.splice(props.indexOf(p), 1);
+      continue;
+    }
     if (decor.has(p)) {
       const near = x === null ? null : kept.reduce<PropSpec | null>((n, q) => (!n || Math.abs(q.x - x!) < Math.abs(n.x - x!) ? q : n), null);
       if (x === null || kept.length >= 3 || (near && near.kind === p.kind && near.label === p.label)) {
@@ -274,9 +306,10 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     p.x = x ?? p.x;
     placed.push(p);
     if (boardLike(p)) kept.push(p);
-    taken.push({ a: p.x - artW(p) / 2, b: p.x + artW(p) / 2, y: p.y });
+    taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
   }
-  return doorSpans;
+  // 문·벽 가구·벽 장식(게시판·액자·창) 구간: 엔진이 들·부술 물건을 놓을 때도 피한다 (검수 22)
+  return keepOut;
 }
 
 /** 적이 소품 한가운데 서지 않게: 그 자리에 소품이 있으면 깊이를 비켜 선다 */
