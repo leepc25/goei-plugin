@@ -957,6 +957,12 @@ SAb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(24,6),(8,6)); SRb=P((X-3,60),0,0,0,(X+13
 SPb=P((X,60),6,0,0,(X+13,G),(X-12,G-1),(16,8),(8,6))
 clip('shotgun2','side view in profile: firing a pump shotgun from the shoulder with both hands, strong recoil, then racks the pump',[SAb,SRb,lerp(SRb,SAb,.5),SPb,SAb,SAb],
      'holding a long black pump shotgun with a wooden stock and wooden pump in both hands, stock against the shoulder, as long as her arm')
+# 잡기 무릎 3차(2026-10-22): s만 고친 2차도 3/4 정면 → 원인 후보: 뒷손 'chin'(몸 앞을 가로지름) + 높이 든 무릎이 몸 앞을 가림.
+# 뒷손은 엉덩이 옆 아래로 내려 몸 뒤에 두고(앞을 가로지르지 않음), 앞손만 앞으로 뻗어 잡음, 무릎은 허리 높이까지만, 몸통은 살짝 뒤로.
+GRc=P((X+4,59),2,0,0,(X+18,G),(X-12,G-1),(26,4),'hip',re=('e',-4,14))
+KNc=P((X+4,59),-4,0,0,(X+18,G),(X+10,G-10),(26,6),'hip',rk=KNEE_UP,re=('e',-4,14))
+clip('grabknee','side view in profile facing right: knee strike, the back knee rises to waist height in front, the near arm reaches straight forward',
+     [GRc,lerp(GRc,KNc,.5),KNc,KNc,lerp(KNc,GRc,.5)])
 REDO8=['blast','grabknee','drink','down','getup','collapse','pipe2','walk_shotgun']
 
 A_KP=skel.A
