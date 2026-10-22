@@ -1,0 +1,17 @@
+{
+  "name": "hq3_hall_floor",
+  "group": "hq3_hall",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nFLOOR TILE RULES\nSeamless tileable floor texture seen straight from above, 1024x1024, tiles left-right and top-bottom with no seam. Large calm pattern (big tiles or long planks), even lighting, no objects, no shadows, no stains.\n\nhq3_hall_floor — FLOOR TILE RULES: dark grey polished stone, long 120x60 cm tiles.\nCRITICAL OUTPUT: a square 1024x1024 image of FLOOR ONLY. Orthographic vertical top-down material swatch filling every pixel. No wall, room, architecture, windows, furniture, horizon, borders or inset views. Use simple flat cel-shaded large shapes, no photographic textures.",
+  "transparent": false,
+  "source": "/workspace/generated_images/exec-c7b2583a-07f5-405c-ae69-2023a44db292.png",
+  "source_size": [
+    1254,
+    1254
+  ],
+  "size": [
+    1024,
+    1024
+  ],
+  "mode": "RGB",
+  "sha256": "4a18f1edbfac53ae2ad1798ac728b674c76ebc4098ec73c1aae0de9ed50c80b3"
+}
