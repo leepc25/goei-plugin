@@ -70,7 +70,7 @@ clip('death','collapses to his knees, then topples face down flat on the floor, 
 if __name__=='__main__':
     import sys,os
     from PIL import Image,ImageDraw
-    base=Image.open('../guard/base/G1.png').convert('RGBA'); os.makedirs('../guard/preview',exist_ok=True)
+    base=Image.open('../guard/base/G1e.png').convert('RGBA'); os.makedirs('../guard/preview',exist_ok=True)
     B.draw(BASE,base,2).save('../guard/preview/base.png')
     rows=[]
     for n,(a,ps) in CLIPS.items():
@@ -83,9 +83,9 @@ if __name__=='__main__':
 # ── 생성 설정 ──
 import json as _j,os as _o
 _D=_o.path.dirname(_o.path.abspath(__file__))
-REF=_o.path.join(_D,'../guard/base/G1.png')
+REF=_o.path.join(_D,'../guard/base/G1e.png')
 DESC=('monstrous towering elongated night security guard, faded grey-navy decades-old uniform with brass buttons, peaked cap brim hiding the face in shadow, '
-      'pale thin chin, very long thin neck and long arms, black police baton in the near hand, old metal flashlight in the far hand, black shoes')
+      'pale thin chin, very long thin neck and long arms, both hands empty with long bony pale fingers, black shoes')
 _sw={'LEFT':'RIGHT','RIGHT':'LEFT'}
 FIRST=[{**k,'label':(_sw[k['label'].split()[0]]+' '+' '.join(k['label'].split()[1:])) if k['label'].split()[0] in _sw else k['label'],
         'z_index':8 if k['label'].startswith('LEFT') else 2 if k['label'].startswith('RIGHT') else 5}

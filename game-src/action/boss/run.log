@@ -1,3 +1,63 @@
 guard hit True
 before 15701.7 clips 9
 sub combo
+done combo
+sub slam
+before 15567.3 clips 4
+sub hit
+done hit
+sub freeze
+done freeze
+sub groggy
+done groggy
+sub seized
+done seized
+after 15163.3
+before 15163.3 clips 9
+sub crawl
+done crawl
+sub slam
+done slam
+sub sweep
+done sweep
+sub suck
+done suck
+sub charge
+done charge
+sub hurl
+done hurl
+sub hit
+done hit
+sub groggy
+done groggy
+sub death
+done death
+after 14668.3
+before 14668.3 clips 1
+sub throw
+done throw
+after 14626.3
+before 14626.3 clips 8
+sub idle
+done idle
+sub walk
+done walk
+sub bite
+done bite
+sub pounce
+done pounce
+sub slash
+done slash
+sub hit
+done hit
+sub groggy
+done groggy
+sub breath
+done breath
+after 14359.3
+before 14359.3 clips 8
+sub idle
+done idle
+sub walk
+done walk
+sub smash

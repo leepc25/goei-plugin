@@ -239,3 +239,122 @@ description: side view facing right, a bald human-like head r
 2026-10-22 03:15:02 guard/combo 8f seed31 animate_with_skeleton_v3 -> id: c985998e-4654-4323-8810-a3aa9fa356cd
 job_id: c985998e-4654-4323-8810-a3aa9fa356cd
 description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:18:45 guard/combo done
+2026-10-22 03:18:46 guard/slam 10f seed31 animate_with_skeleton_v3 -> id: b271b28e-ab6e-49d8-b4b8-0e00bad403b9
+job_id: b271b28e-ab6e-49d8-b4b8-0e00bad403b9
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:22:46 grandpa/hit 4f seed31 animate_with_skeleton_v3 -> id: 3de5faf7-5a7a-4a3b-a79f-92510367c2ad
+job_id: 3de5faf7-5a7a-4a3b-a79f-92510367c2ad
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:28:35 grandpa/hit done
+2026-10-22 03:28:36 grandpa/freeze 6f seed31 animate_with_skeleton_v3 -> id: 78c92775-1f46-4d01-9e87-cee1525d9bae
+job_id: 78c92775-1f46-4d01-9e87-cee1525d9bae
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:32:50 grandpa/freeze done
+2026-10-22 03:32:50 grandpa/groggy 6f seed31 animate_with_skeleton_v3 -> id: 917a71cc-db5b-4469-9a56-bf020eb7e3bd
+job_id: 917a71cc-db5b-4469-9a56-bf020eb7e3bd
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:39:16 grandpa/groggy done
+2026-10-22 03:39:16 grandpa/seized 6f seed31 animate_with_skeleton_v3 -> id: 6ebfde94-7e4e-4cf4-b50a-35bdedbf400c
+job_id: 6ebfde94-7e4e-4cf4-b50a-35bdedbf400c
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:47:57 grandpa/seized done
+2026-10-22 03:47:58 guard-empty G1 edit_image_pixen -> id: 63e05649-4e68-478d-8011-67adfa32d71e
+job_id: 63e05649-4e68-478d-8011-67adfa32d71e
+model: pixen
+edit: Remove the police baton and the flashlight completely; 
+2026-10-22 03:48:49 guard-empty G1 edit_image_pixen -> id: 4c997c2b-73ef-4d7d-a193-051b5d30b19b
+job_id: 4c997c2b-73ef-4d7d-a193-051b5d30b19b
+model: pixen
+edit: Remove the police baton and the flashlight completely; 
+2026-10-22 03:49:58 guard-empty S1 edit_image_pixen -> id: ff774122-d19d-418a-a5a7-4fc3b6713a84
+job_id: ff774122-d19d-418a-a5a7-4fc3b6713a84
+model: pixen
+edit: Remove the police baton and the flashlight completely; 
+2026-10-22 03:51:02 guard-empty S1 edit_image_pixen -> id: 9d50bdfa-e35e-44ae-8f65-89a86bc44471
+job_id: 9d50bdfa-e35e-44ae-8f65-89a86bc44471
+model: pixen
+edit: Remove the police baton and the flashlight completely; 
+2026-10-22 03:52:08 giant/crawl 8f seed31 animate_with_skeleton_v3 -> id: eddc37b1-dca5-4e20-91fb-8bf734d66db2
+job_id: eddc37b1-dca5-4e20-91fb-8bf734d66db2
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 03:55:36 giant/crawl done
+2026-10-22 03:55:37 giant/slam 10f seed31 animate_with_skeleton_v3 -> id: 5697f5d7-f885-44d8-a7ec-1b25f033212f
+job_id: 5697f5d7-f885-44d8-a7ec-1b25f033212f
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:02:47 giant/slam done
+2026-10-22 04:02:47 giant/sweep 8f seed31 animate_with_skeleton_v3 -> id: 41d4e248-3f01-4c39-867f-d3b3c271c507
+job_id: 41d4e248-3f01-4c39-867f-d3b3c271c507
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:05:13 giant/sweep done
+2026-10-22 04:05:14 giant/suck 8f seed31 animate_with_skeleton_v3 -> id: af8691e7-4ad2-4779-b54a-2d701fe58dcd
+job_id: af8691e7-4ad2-4779-b54a-2d701fe58dcd
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:11:04 giant/suck done
+2026-10-22 04:11:05 giant/charge 6f seed31 animate_with_skeleton_v3 -> id: 732f3e95-608d-4aab-bc9a-19892737bb61
+job_id: 732f3e95-608d-4aab-bc9a-19892737bb61
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:13:13 giant/charge done
+2026-10-22 04:13:14 giant/hurl 9f seed31 animate_with_skeleton_v3 -> id: fafc68cf-9f65-413d-b235-4322e98a300e
+job_id: fafc68cf-9f65-413d-b235-4322e98a300e
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:16:27 giant/hurl done
+2026-10-22 04:16:28 giant/hit 4f seed31 animate_with_skeleton_v3 -> id: cdbf2b96-0d47-4027-9d3c-77ac1688121b
+job_id: cdbf2b96-0d47-4027-9d3c-77ac1688121b
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:18:05 giant/hit done
+2026-10-22 04:18:05 giant/groggy 6f seed31 animate_with_skeleton_v3 -> id: 1ff54e8e-36f1-4245-9de2-3fdd1ad1fcd2
+job_id: 1ff54e8e-36f1-4245-9de2-3fdd1ad1fcd2
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:20:31 giant/groggy done
+2026-10-22 04:20:31 giant/death 9f seed31 animate_with_skeleton_v3 -> id: fe4f8d16-bece-4bd1-bfe7-896b42691879
+job_id: fe4f8d16-bece-4bd1-bfe7-896b42691879
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 04:23:28 giant/death done
+2026-10-22 04:23:30 grandma/throw 9f seed31 animate_with_skeleton_v3 -> id: 1b4d5f1e-20a4-49f5-9387-626f760f54f4
+job_id: 1b4d5f1e-20a4-49f5-9387-626f760f54f4
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 04:25:54 grandma/throw done
+2026-10-22 04:25:56 momx/idle 4f seed31 animate_with_skeleton_v3 -> id: 57597517-12d6-41da-843d-600d90e112f1
+job_id: 57597517-12d6-41da-843d-600d90e112f1
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:27:49 momx/idle done
+2026-10-22 04:27:50 momx/walk 8f seed31 animate_with_skeleton_v3 -> id: b71075c9-64da-4223-b3e9-a083b15f2627
+job_id: b71075c9-64da-4223-b3e9-a083b15f2627
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:30:15 momx/walk done
+2026-10-22 04:30:15 momx/bite 9f seed31 animate_with_skeleton_v3 -> id: 8b592f10-1efd-45ec-a4ea-8cc7a92ebc21
+job_id: 8b592f10-1efd-45ec-a4ea-8cc7a92ebc21
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:32:58 momx/bite done
+2026-10-22 04:32:59 momx/pounce 9f seed31 animate_with_skeleton_v3 -> id: 82534fe5-1158-4e66-8523-2a86352dab89
+job_id: 82534fe5-1158-4e66-8523-2a86352dab89
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:36:44 momx/pounce done
+2026-10-22 04:36:44 momx/slash 7f seed31 animate_with_skeleton_v3 -> id: 964423da-86c3-4177-a44a-dc330901dfd2
+job_id: 964423da-86c3-4177-a44a-dc330901dfd2
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:39:25 momx/slash done
+2026-10-22 04:39:26 momx/hit 4f seed31 animate_with_skeleton_v3 -> id: cd048222-c08f-4be3-bd74-57e46e89837b
+job_id: cd048222-c08f-4be3-bd74-57e46e89837b
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:41:23 momx/hit done
+2026-10-22 04:41:23 momx/groggy 6f seed31 animate_with_skeleton_v3 -> id: dbab8433-4cb9-4a53-a870-0724a897ace5
+job_id: dbab8433-4cb9-4a53-a870-0724a897ace5
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:43:36 momx/groggy done
+2026-10-22 04:43:36 momx/breath 6f seed31 animate_with_skeleton_v3 -> id: 499d9b90-ed17-4ad5-93de-0ebbf70c5003
+job_id: 499d9b90-ed17-4ad5-93de-0ebbf70c5003
+description: horribly stretched tall thin monster mother with purple perme
+2026-10-22 04:46:48 momx/breath done
+2026-10-22 04:46:49 dadx/idle 4f seed31 animate_with_skeleton_v3 -> id: 136d6ff5-988b-4fc6-bb99-d2eb5271e17a
+job_id: 136d6ff5-988b-4fc6-bb99-d2eb5271e17a
+description: huge stretched hulking monster father with a hard square face
+2026-10-22 04:48:26 dadx/idle done
+2026-10-22 04:48:26 dadx/walk 8f seed31 animate_with_skeleton_v3 -> id: cc5454e8-1f30-4513-a768-68a1adf2a077
+job_id: cc5454e8-1f30-4513-a768-68a1adf2a077
+description: huge stretched hulking monster father with a hard square face
+2026-10-22 04:51:07 dadx/walk done
+2026-10-22 04:51:07 dadx/smash 9f seed31 animate_with_skeleton_v3 -> id: ca9cb461-562a-4380-b614-ddd5d12191d5
+job_id: ca9cb461-562a-4380-b614-ddd5d12191d5
+description: huge stretched hulking monster father with a hard square face

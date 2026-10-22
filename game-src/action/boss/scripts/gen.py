@@ -9,6 +9,7 @@ PAR=int(([a for a in sys.argv if a.startswith('--par=')] or ['--par=6'])[0][6:])
 OUT=f'../{boss}/clips'; REF=pl.url(R.REF)
 def done(n): return os.path.exists(f'{OUT}/{n}/{len(R.CLIPS[n][1])-1:02d}.png')
 def submit(n):
+    while os.path.exists('../PAUSE'): time.sleep(10)   # 동시 1개 규칙: 다른 작업이 끼어들 때 잠시 멈춤
     act,ps=R.CLIPS[n]
     a={'description':R.DESC,'action':act[:100],'direction':'east','first_frame_url':REF,'first_frame_keypoints':R.FIRST,
        'keypoints':[R.B.kp(p) for p in ps],'seed':SEED}
@@ -30,6 +31,6 @@ while queue or pend:
         try: txt=mcp.text(mcp.tool('get_image',{'job_id':j})).lower()
         except Exception: continue
         if 'complet' in txt or 'image' in txt and 'process' not in txt:
-            if pl.wait(j,f'{OUT}/{n}',len(R.CLIPS[n][1]),tries=3,step=1): del pend[n]; print('done',n,flush=True); pl.log(f'{boss}/{n} done')
+            if pl.wait(j,f'{OUT}/{n}',len(R.CLIPS[n][1]),tries=3,step=1): del pend[n]; json.dump([R.B.kp(p) for p in R.CLIPS[n][1]],open(f'{OUT}/{n}/kp.json','w')); print('done',n,flush=True); pl.log(f'{boss}/{n} done')
         elif 'fail' in txt: del pend[n]; print('FAIL',n,txt[:200],flush=True); pl.log(f'{boss}/{n} FAIL')
 print('after',pl.bal(),flush=True)
