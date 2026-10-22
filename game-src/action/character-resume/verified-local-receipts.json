@@ -1,15 +1,43 @@
 {
-  "observed_at": "2026-10-22T10:43:34.823777+00:00",
+  "observed_at": "2026-10-22T10:50:20.862102+00:00",
   "jobs": [
     {
       "job_id": "f06a14de-204f-47b2-badd-dfd49796f148",
+      "character": "blaret-saladin",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        0,
+        1
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "76884626-42e9-4626-980a-37663c8aac8f",
+      "character": "blaret-saladin",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        2,
+        3
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
       "character": "blaret-saladin",
       "charged_generations": null,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
       "server_status": "processing",
       "evidence": [
-        0
+        4
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -22,8 +50,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        1,
-        2
+        5,
+        6,
+        7
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -31,12 +60,14 @@
     {
       "job_id": "11526db3-3927-47df-a600-5f55e1473bcc",
       "character": "kyuras",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        3
+        8,
+        9,
+        10
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -49,8 +80,10 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        4,
-        8
+        11,
+        12,
+        22,
+        23
       ],
       "user_visual_approval": false,
       "billing_period": "historical_paid_recovery"
@@ -63,11 +96,26 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        5,
-        9
+        13,
+        14,
+        24,
+        25
       ],
       "user_visual_approval": false,
       "billing_period": "historical_paid_recovery"
+    },
+    {
+      "job_id": "27a5c819-12b3-4f7b-82ae-fe0a56f55a04",
+      "character": "kyuras",
+      "charged_generations": null,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "processing",
+      "evidence": [
+        15
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
     },
     {
       "job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
@@ -77,8 +125,24 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        6,
-        7
+        16,
+        17,
+        18
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "9f98ad15-77c1-4eda-8023-a90762053267",
+      "character": "kyuras",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        19,
+        20,
+        21
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -91,8 +155,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        10,
-        11
+        26,
+        27,
+        28
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -105,8 +170,24 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        12,
-        13
+        29,
+        30,
+        31
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "5ce7b76d-7f1a-43e5-a28a-76f10b039fbd",
+      "character": "eileen",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        32,
+        33,
+        34
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -119,8 +200,37 @@
       "estimated_generations": 10.0,
       "server_status": "completed",
       "evidence": [
-        14,
-        15
+        35,
+        36,
+        37
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "a3743d39-b041-4287-96ad-c62228b484b3",
+      "character": "spangdal",
+      "charged_generations": null,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "processing",
+      "evidence": [
+        38
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "3000e1b3-fee3-478b-a0ce-00b276a8f0c3",
+      "character": "spangdal",
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
+      "server_status": "completed",
+      "evidence": [
+        39,
+        40,
+        41
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -133,8 +243,9 @@
       "estimated_generations": 10.0,
       "server_status": "completed",
       "evidence": [
-        16,
-        17
+        42,
+        43,
+        44
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -147,8 +258,39 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        18,
-        19
+        45,
+        46,
+        47
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "cd0766c8-87f7-4b50-8a9c-a7d79c5c3896",
+      "character": "geshugan",
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
+      "server_status": "completed",
+      "evidence": [
+        48,
+        49,
+        50
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "ee5ef44a-a16d-4ed1-a494-6578590bb498",
+      "character": "geshugan",
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
+      "server_status": "completed",
+      "evidence": [
+        51,
+        52,
+        53
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -156,13 +298,14 @@
     {
       "job_id": "c679844b-e541-48e4-9006-4b615ddb9dcc",
       "character": "geshugan",
-      "charged_generations": null,
+      "charged_generations": 10.0,
       "submission_cost_generations": null,
       "estimated_generations": 10.0,
-      "server_status": "pending",
+      "server_status": "completed",
       "evidence": [
-        20,
-        21
+        54,
+        55,
+        56
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -170,12 +313,40 @@
     {
       "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
       "character": "deadpole",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        22
+        57,
+        58
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+      "character": "deadpole",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        59,
+        60
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
+      "character": "deadpole",
+      "charged_generations": null,
+      "submission_cost_generations": 2.0,
+      "estimated_generations": null,
+      "server_status": "pending",
+      "evidence": [
+        61
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -183,12 +354,13 @@
     {
       "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea",
       "character": "deadpole",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        23
+        62,
+        63
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -196,12 +368,13 @@
     {
       "job_id": "7282832d-aa8a-4969-b050-096a6a4832ed",
       "character": "gorgodio",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        24
+        64,
+        65
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -214,8 +387,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        25,
-        26
+        66,
+        67,
+        68
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -223,12 +397,29 @@
     {
       "job_id": "2fce7c21-c96f-492c-a404-e5cdeb9a6450",
       "character": "rojemon",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        27
+        69,
+        70,
+        71
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "d5d8b068-9501-40be-9538-7c2fe192cdc8",
+      "character": "rojemon",
+      "charged_generations": 1.0,
+      "submission_cost_generations": 1.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        72,
+        73,
+        74
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -243,6 +434,34 @@
       "source": "local owner worktree; commit verification pending"
     },
     {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/blaret-guns_idle/result.json",
+      "sha256": "73f4936b895ecb8a738d5888c0d4689677b294ab2e434f8e66acc03889b36ca6",
+      "receipt_text": "status: completed\nid: f06a14de-204f-47b2-badd-dfd49796f148\njob_id: f06a14de-204f-47b2-badd-dfd49796f148\nframes: 4\ntransparent: yes\nasset_id: ee6a94a4-791e-5460-a5f4-d97fa9e99eb6\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/f06a14de-204f-47b2-badd-dfd49796f148/download?index=0 ... ?index=3",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/blaret-stake_finish/receipt.json",
+      "sha256": "491925c0683f164905aa0dbf779399267ce518f1a9a9e790c466105eb4c8d4f4",
+      "receipt_text": "id: 76884626-42e9-4626-980a-37663c8aac8f\njob_id: 76884626-42e9-4626-980a-37663c8aac8f\ndescription: battle nun: black veil to the shoulders with a thin white forehead band, white collar, long fitted black habit with a high side slit, pale thigh with a black garter holster, ash-blonde straight hair with blunt bangs, green eyes, thick grey chain with a silver cross on the chest, wooden rosary on the wrist, black shoes, a short silver stake in the near hand, one character only, isolated, strict right side profile, no effects, no other people\naction: kneels and lowers both hands to an empty floor, one isolated character\nframes: 8\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"76884626-42e9-4626-980a-37663c8aac8f\")\nasset_id: fb6eee2d-f869-5820-97c8-5df040b8378d\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/blaret-stake_finish/result.json",
+      "sha256": "745011fdc7709f5a6f3ecb36fc9f27bd4c5e22ee75db5324b7aedac26fbe1866",
+      "receipt_text": "status: completed\nid: 76884626-42e9-4626-980a-37663c8aac8f\njob_id: 76884626-42e9-4626-980a-37663c8aac8f\nframes: 8\ntransparent: yes\nasset_id: fb6eee2d-f869-5820-97c8-5df040b8378d\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/76884626-42e9-4626-980a-37663c8aac8f/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/blaret-super_ready/receipt.json",
+      "sha256": "5af800dc54628bb480fec62815644f048e1d26b89d1fbe0f50791bd6e5138cd2",
+      "receipt_text": "id: 429ad77b-ed3b-4337-9524-075adf0a262c\njob_id: 429ad77b-ed3b-4337-9524-075adf0a262c\ndescription: battle nun: black veil to the shoulders with a thin white forehead band, white collar, long fitted black habit with a high side slit, pale thigh with a black garter holster, ash-blonde straight hair with blunt bangs, green eyes, thick grey chain with a silver cross on the chest, wooden rosary on the wrist, black shoes, empty hands, one character only, isolated, strict right side profile, no effects, no other people\naction: reaches diagonally forward and upward, head stays in right profile and face unobstructed\nframes: 8\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"429ad77b-ed3b-4337-9524-075adf0a262c\")\nasset_id: 017c1978-9eff-5617-8a4e-689b01a35886\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
       "owner": "jyaldi",
       "path": "game-src/action/jyaldi-v5/resume/evidence/walk-completed.json",
       "sha256": "90b63f88112e1525d2f42dfeb75683e03a76089d6a4d51c7c16c3c7766c83c14",
@@ -251,9 +470,30 @@
     },
     {
       "owner": "jyaldi",
+      "path": "game-src/action/jyaldi-v5/resume/evidence/walk-completed.json",
+      "sha256": "90b63f88112e1525d2f42dfeb75683e03a76089d6a4d51c7c16c3c7766c83c14",
+      "receipt_text": "Structured server receipt fields\njob_id: df3b56fb-5426-4491-888f-f94a4192e5cf\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "jyaldi",
       "path": "game-src/action/jyaldi-v5/resume/evidence/walk-submission.json",
       "sha256": "291b5a14373aff77102b206b1b1ac6905ba38d0e0540372ec59cfedfbd1e0db4",
       "receipt_text": "id: df3b56fb-5426-4491-888f-f94a4192e5cf\njob_id: df3b56fb-5426-4491-888f-f94a4192e5cf\ndescription: adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only\naction: walking forward, alternating opposite arms and legs\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"df3b56fb-5426-4491-888f-f94a4192e5cf\")\nasset_id: 16e5be89-c304-5e1b-9867-5b65768e92af\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/idle_pipe-completed.json",
+      "sha256": "752191362a65518f3c09e0101dd8a08d00762a358223f5e87dfc4eb367858d22",
+      "receipt_text": "status: completed\nid: 11526db3-3927-47df-a600-5f55e1473bcc\njob_id: 11526db3-3927-47df-a600-5f55e1473bcc\nframes: 4\ntransparent: yes\nasset_id: 3815c624-2aa7-569b-ae0b-f02c86cfbae4\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/11526db3-3927-47df-a600-5f55e1473bcc/download?index=0 ... ?index=3",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/idle_pipe-completed.json",
+      "sha256": "752191362a65518f3c09e0101dd8a08d00762a358223f5e87dfc4eb367858d22",
+      "receipt_text": "Structured server receipt fields\njob_id: 11526db3-3927-47df-a600-5f55e1473bcc\nstatus: completed\ncharged: 3 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -272,9 +512,30 @@
     },
     {
       "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/native-11826541-47d1-40de-9664-f05f1838bb23.json",
+      "sha256": "001f9b552775b3d6065b982d9244f9eacf09eb9719722c12f523d74745f47018",
+      "receipt_text": "Structured server receipt fields\njob_id: 11826541-47d1-40de-9664-f05f1838bb23\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
       "path": "game-src/action/kyuras/resume/native-9fe0e770-b992-4299-a4c1-90d6e591828a.json",
       "sha256": "bc066c05f0e2f368ddaea2decfd1ee74763f5d04faf6ba754f7bfb1b5ee3da83",
       "receipt_text": "status: completed\nid: 9fe0e770-b992-4299-a4c1-90d6e591828a\njob_id: 9fe0e770-b992-4299-a4c1-90d6e591828a\nframes: 8\ntransparent: yes\nasset_id: 6e36058e-35ad-5f71-8d04-153063d5ef42\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/9fe0e770-b992-4299-a4c1-90d6e591828a/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/native-9fe0e770-b992-4299-a4c1-90d6e591828a.json",
+      "sha256": "bc066c05f0e2f368ddaea2decfd1ee74763f5d04faf6ba754f7bfb1b5ee3da83",
+      "receipt_text": "Structured server receipt fields\njob_id: 9fe0e770-b992-4299-a4c1-90d6e591828a\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/shotgun-submission.json",
+      "sha256": "c1ae0807c2659dd113f65f103cd0e818004478dd68c20c43c639191d4ba1a99c",
+      "receipt_text": "id: 27a5c819-12b3-4f7b-82ae-fe0a56f55a04\njob_id: 27a5c819-12b3-4f7b-82ae-fe0a56f55a04\ndescription: thin adult man early thirties, gaunt face hollow cheeks, short grey-green swept back hair with one loose forehead strand, green eye, friendly smile, black hip-length suit jacket, white shirt, black necktie, black trousers, black shoes, bare slender hands, strict right-facing profile, character alone, no effects, no fire, no smoke, no weapons or props, empty hands curled to grip an invisible handle\naction: Empty gripping hand at hip recoils upward, stumble back\nframes: 5\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"27a5c819-12b3-4f7b-82ae-fe0a56f55a04\")\nasset_id: f87d0eb9-6f21-5818-9ef5-6b726f2c0abb\nasset_status: pending (saved to your gallery when generation completes)",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -286,9 +547,37 @@
     },
     {
       "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/snap1-completed.json",
+      "sha256": "8b6b684b1d74f06b2066dd4f7356bdf55329972d405f7b4da38a3b34c1eaa4ef",
+      "receipt_text": "Structured server receipt fields\njob_id: 3b131a96-b98f-4c4f-b220-146ce3706ceb\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
       "path": "game-src/action/kyuras/resume/snap1-submission.json",
       "sha256": "35b71bfd1177397bc6dd0afc603e38555999ea238b13b740a9df0960637364ba",
       "receipt_text": "id: 3b131a96-b98f-4c4f-b220-146ce3706ceb\njob_id: 3b131a96-b98f-4c4f-b220-146ce3706ceb\ndescription: thin adult man early thirties, gaunt face hollow cheeks, short grey-green swept back hair with one loose forehead strand, green eye, friendly smile, black hip-length suit jacket, white shirt, black necktie, black trousers, black shoes, bare slender hands, strict right-facing profile, character alone, no effects, no fire, no smoke, no weapons or props, open fingers with thumb and middle finger poised to snap, index raised, never a fist\naction: Bent-elbow lead finger snap beside face, hand upright, step back\nframes: 5\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"3b131a96-b98f-4c4f-b220-146ce3706ceb\")\nasset_id: 2f1789d1-4647-5b24-b612-92e92d0ba689\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/walk_pipe-completed.json",
+      "sha256": "4a97a9608f310a2b8642f3b47739275581b63119390da03d6d79fea7bd947e80",
+      "receipt_text": "status: completed\nid: 9f98ad15-77c1-4eda-8023-a90762053267\njob_id: 9f98ad15-77c1-4eda-8023-a90762053267\nframes: 8\ntransparent: yes\nasset_id: 04ed41de-ee8e-5809-9430-11c8294cc131\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/9f98ad15-77c1-4eda-8023-a90762053267/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/walk_pipe-completed.json",
+      "sha256": "4a97a9608f310a2b8642f3b47739275581b63119390da03d6d79fea7bd947e80",
+      "receipt_text": "Structured server receipt fields\njob_id: 9f98ad15-77c1-4eda-8023-a90762053267\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/resume/walk_pipe-submission.json",
+      "sha256": "bad65a6fd080ecd32b2f298f578c10eb84f2f69288098d3dbb270ea21ef13d91",
+      "receipt_text": "id: 9f98ad15-77c1-4eda-8023-a90762053267\njob_id: 9f98ad15-77c1-4eda-8023-a90762053267\ndescription: thin adult man early thirties, gaunt face hollow cheeks, short grey-green swept back hair with one loose forehead strand, green eye, friendly smile, black hip-length suit jacket, white shirt, black necktie, black trousers, black shoes, bare slender hands, strict right-facing profile, character alone, no effects, no fire, no smoke, no weapons or props, empty hands curled to grip an invisible handle\naction: Walk with empty gripping hand on shoulder\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"9f98ad15-77c1-4eda-8023-a90762053267\")\nasset_id: 04ed41de-ee8e-5809-9430-11c8294cc131\nasset_status: pending (saved to your gallery when generation completes)",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -300,9 +589,23 @@
     },
     {
       "owner": "kyuras",
+      "path": "game-src/action/kyuras/recovered/11826541-47d1-40de-9664-f05f1838bb23/status.json",
+      "sha256": "60caa7224c7ae3b00634698c6580deefe61b8a1ca73e59343fe04e6c9769ff0b",
+      "receipt_text": "Structured server receipt fields\njob_id: 11826541-47d1-40de-9664-f05f1838bb23\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
       "path": "game-src/action/kyuras/recovered/9fe0e770-b992-4299-a4c1-90d6e591828a/status.json",
       "sha256": "987f1453d04bb65cb7f0cf7a27776a444f23fad248c8f6aa1b373da5e967a68d",
       "receipt_text": "status: completed\nid: 9fe0e770-b992-4299-a4c1-90d6e591828a\njob_id: 9fe0e770-b992-4299-a4c1-90d6e591828a\nframes: 8\ntransparent: yes\nasset_id: 6e36058e-35ad-5f71-8d04-153063d5ef42\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/9fe0e770-b992-4299-a4c1-90d6e591828a/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "kyuras",
+      "path": "game-src/action/kyuras/recovered/9fe0e770-b992-4299-a4c1-90d6e591828a/status.json",
+      "sha256": "987f1453d04bb65cb7f0cf7a27776a444f23fad248c8f6aa1b373da5e967a68d",
+      "receipt_text": "Structured server receipt fields\njob_id: 9fe0e770-b992-4299-a4c1-90d6e591828a\nstatus: completed\ncharged: 3 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -310,6 +613,13 @@
       "path": "game-src/action/eileen/resume/live-20261022/precise-edit/result.json",
       "sha256": "9f31c68cfdb337b255bcc6f598fb66718a47827d795c26af2a2489578ace0e12",
       "receipt_text": "status: completed\nid: ddafed99-d4d6-4b51-bbb4-c01ce660ef68\njob_id: ddafed99-d4d6-4b51-bbb4-c01ce660ef68\nframes: 1\ntransparent: yes\nasset_id: a7c2835e-130f-55fd-bfc6-6a81c593ee16\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 1 generation\ndownload: https://api.pixellab.ai/mcp/images/ddafed99-d4d6-4b51-bbb4-c01ce660ef68/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "eileen",
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/result.json",
+      "sha256": "9f31c68cfdb337b255bcc6f598fb66718a47827d795c26af2a2489578ace0e12",
+      "receipt_text": "Structured server receipt fields\njob_id: ddafed99-d4d6-4b51-bbb4-c01ce660ef68\nstatus: completed\ncharged: 1 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -328,9 +638,37 @@
     },
     {
       "owner": "eileen",
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/result.json",
+      "sha256": "a788ffebe5d94db21b38422c0d17feb27027bce5b8fca19d5cf79467c9553a20",
+      "receipt_text": "Structured server receipt fields\njob_id: e92bce68-f025-4757-94b0-b16566cebe5d\nstatus: completed\ncharged: 4 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "eileen",
       "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/submission.json",
       "sha256": "f3f6ff8cb896a63937373125256d5cba2351a59201e68067e17896136779bd8e",
       "receipt_text": "id: e92bce68-f025-4757-94b0-b16566cebe5d\njob_id: e92bce68-f025-4757-94b0-b16566cebe5d\naction: Keeping both feet planted and the head facing right, the support hand lowers the rifle muzzle and smoothly guides the rifle on its sling around the side onto the back; the right hand releases the grip and reaches the hip holster. Short controlled motion, same body, no turning toward camera, no walking, no effects.\nframes: 8\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 108\nasset_id: 40d7ebf5-d08d-5d91-a78a-d20d9cf8a962\nasset_status: pending (saved when generation completes)\ncost: 4 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"e92bce68-f025-4757-94b0-b16566cebe5d\")",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "eileen",
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/result.json",
+      "sha256": "0d5af0cc975298761e8173c9ba8a1d913e2e5dc8b6143ccf26a8bdf78ebfb501",
+      "receipt_text": "status: completed\nid: 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\njob_id: 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\nframe: 7 of 8\nasset_id: e459fae1-dad3-5c54-8f16-83b8811b03d8\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/5ce7b76d-7f1a-43e5-a28a-76f10b039fbd/download?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "eileen",
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/result.json",
+      "sha256": "0d5af0cc975298761e8173c9ba8a1d913e2e5dc8b6143ccf26a8bdf78ebfb501",
+      "receipt_text": "Structured server receipt fields\njob_id: 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "eileen",
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/submission.json",
+      "sha256": "4a974c79b86f4eca24943be6e5ff80128973b450a5ea71d533fa9d155cd9f404",
+      "receipt_text": "id: 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\njob_id: 5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\ndescription: Compact adult woman agent with pale blonde high ponytail, black suit, olive tactical vest, black shoes, bare hands, right-facing profile. Exactly one compact black rifle on one shoulder sling; the support wrist carries this same rifle from the front toward the shoulder and back. No spare rifle, no second rifle, no pistol in hands. Same face, body mass, palette and pixel outline as reference. No effects.\naction: sling rifle behind shoulder, release near hand to holster\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"5ce7b76d-7f1a-43e5-a28a-76f10b039fbd\")\nasset_id: e459fae1-dad3-5c54-8f16-83b8811b03d8\nasset_status: pending (saved to your gallery when generation completes)",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -342,6 +680,13 @@
     },
     {
       "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/hand-inpaint-r1/result.json",
+      "sha256": "5c33d987b8ecda16551e99a0961ed7970c0a3ae707d58bd55594de578ac3a641",
+      "receipt_text": "Structured server receipt fields\njob_id: 6aa5567e-0ffc-45df-a3a3-702ca373d66c\nstatus: completed\ncharged: 10 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
       "path": "game-src/action/spangdal/resume/production/hand-inpaint-r1/submission.json",
       "sha256": "5f711bba7de876b2e3eb9392d4a4c64e7fd17b5e2ad5dfa797072f29c4d2afb5",
       "receipt_text": "id: 6aa5567e-0ffc-45df-a3a3-702ca373d66c\njob_id: 6aa5567e-0ffc-45df-a3a3-702ca373d66c\nsize: 192x144px\nmask: box 22x14 at (109,78)\nfill: Repair only the outstretched right hand into a flat spear-hand (karate nukite): FOUR straight fingers tightly pressed together as ONE broad tapered blade, thumb folded against palm, continuous straight silhouette from wrist to fingertips pointing right. No pointing index, no fist, no spread fingers, no weapon. Pale skin and crisp dark one-pixel outline matching this sprite. Preserve wrist position, arm, face, clothing and pose.\ntransparent: True\nseed: 1022402\nasset_id: 4867f055-daec-599d-8c81-2acaa8625ba2\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"6aa5567e-0ffc-45df-a3a3-702ca373d66c\")",
@@ -349,9 +694,44 @@
     },
     {
       "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/pierce3-cross-r1/submission.json",
+      "sha256": "f37d6521ffeff5a690a74b84e61d7d898015ac90224e32eeb3f967874849bd19",
+      "receipt_text": "id: a3743d39-b041-4287-96ad-c62228b484b3\njob_id: a3743d39-b041-4287-96ad-c62228b484b3\ndescription: slim adult woman agent, short wavy dark purple bob, one golden eye, pale skin, black fitted suit jacket white shirt black tie knee-length pencil skirt dark stockings low heels. EMPTY OPEN SPEAR HANDS: all four fingers straight and tightly together, thumbs tucked. No pointing index, no fists, no weapons, no effects. Same face and clothes as reference.\naction: both open spear hands thrust in an X, forearms crossing, front foot lunges, then recover\nframes: 9\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"a3743d39-b041-4287-96ad-c62228b484b3\")\nasset_id: 460e484b-1e61-5953-99ad-3645cec70652\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/stab1-recovery-r2/result.json",
+      "sha256": "2664f51eeef8fac071349046338dfa9769a4147e1b1ca73619a8afb44faa7b7f",
+      "receipt_text": "status: completed\nid: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\njob_id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\nframes: 1\ntransparent: yes\nasset_id: f1e84960-6f47-5fbc-8e1a-1a24228a8ef9\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 10 generations\ndownload: https://api.pixellab.ai/mcp/images/3000e1b3-fee3-478b-a0ce-00b276a8f0c3/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/stab1-recovery-r2/result.json",
+      "sha256": "2664f51eeef8fac071349046338dfa9769a4147e1b1ca73619a8afb44faa7b7f",
+      "receipt_text": "Structured server receipt fields\njob_id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\nstatus: completed\ncharged: 10 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/stab1-recovery-r2/submission.json",
+      "sha256": "f27d8aaa1635fc2ab943124f5b2ddb3364419b61b6530cc3a835b79220616aac",
+      "receipt_text": "id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\njob_id: 3000e1b3-fee3-478b-a0ce-00b276a8f0c3\nsize: 192x144px\nmask: box 16x12 at (96,83)\nfill: Repair only the tiny right hand at the end of the lowered forearm. Keep the wrist at (98,87), same lowered diagonal angle. Four fingers pressed together into a flat tapered spear-hand with thumb tucked, fingertips around (109,89). Do NOT lengthen or straighten the arm. Keep hand within existing small silhouette, black one-pixel outline and same pale skin. Empty hand, no weapon.\ntransparent: True\nseed: 1022444\nasset_id: f1e84960-6f47-5fbc-8e1a-1a24228a8ef9\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"3000e1b3-fee3-478b-a0ce-00b276a8f0c3\")",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
       "path": "game-src/action/spangdal/resume/production/stab1-sequence-r1/result.json",
       "sha256": "4ca7ccd9778ff981b22d20cd14a7ca96296b35faa7a632bc3662693149a9d1bd",
       "receipt_text": "status: completed\nid: 4af04357-fbfe-49e9-8ebb-b10a1765e7a2\njob_id: 4af04357-fbfe-49e9-8ebb-b10a1765e7a2\nframes: 1\ntransparent: yes\nasset_id: e412a856-a301-5d53-9e2e-9d5ee4b98c04\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 10 generations\ndownload: https://api.pixellab.ai/mcp/images/4af04357-fbfe-49e9-8ebb-b10a1765e7a2/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "spangdal",
+      "path": "game-src/action/spangdal/resume/production/stab1-sequence-r1/result.json",
+      "sha256": "4ca7ccd9778ff981b22d20cd14a7ca96296b35faa7a632bc3662693149a9d1bd",
+      "receipt_text": "Structured server receipt fields\njob_id: 4af04357-fbfe-49e9-8ebb-b10a1765e7a2\nstatus: completed\ncharged: 10 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -370,6 +750,13 @@
     },
     {
       "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/local-getup-result.json",
+      "sha256": "d56b53977a634118381010cc2760d9f3bbc37805469389df5add9595526903d1",
+      "receipt_text": "Structured server receipt fields\njob_id: c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\nstatus: completed\ncharged: 1 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
       "path": "game-src/action/geshugan/resume/local-getup-submit.json",
       "sha256": "51f89acbd1076f92a5dd2afaf60ad9fa8cac292387e95434c23aaa63bd39ecf8",
       "receipt_text": "id: c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\njob_id: c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\nmodel: pixen\nedit: Correct only the face to the right-facing side profile of this same adult woman. Preserve her white chin-length bob, pale blue eye, facial identity, head position, body pose, white shirt, black trousers, hands, feet, pixel palette, transparent background and canvas. Do not add objects or another person.\nsource: 192x144px\nsize: 192x144px\ntransparent: True\nseed: 221003\nasset_id: 1f0ef13f-5f69-515c-b4da-7cca7675419a\nasset_status: pending (saved when generation completes)\ncost: 1 generation\nstatus: processing (~10-40s)\n\nhint: get_image(job_id=\"c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a\")",
@@ -377,9 +764,58 @@
     },
     {
       "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-chain2/result.json",
+      "sha256": "7775b1f604892fc9094eead2b47f16b1a07e2e2e33ab17fad2dd8c1f69c3d935",
+      "receipt_text": "status: completed\nid: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\njob_id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\nframes: 1\ntransparent: yes\nasset_id: cb42ad61-f146-5104-91fd-5700cb9f5579\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 10 generations\ndownload: https://api.pixellab.ai/mcp/images/cd0766c8-87f7-4b50-8a9c-a7d79c5c3896/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-chain2/result.json",
+      "sha256": "7775b1f604892fc9094eead2b47f16b1a07e2e2e33ab17fad2dd8c1f69c3d935",
+      "receipt_text": "Structured server receipt fields\njob_id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\nstatus: completed\ncharged: 10 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-chain2/submit.json",
+      "sha256": "cf3a7f63bafa5a3aebbfe8d299e6b0eeaf0970e43ac574eb9fa17ea557cbd679",
+      "receipt_text": "id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\njob_id: cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\nsize: 256x128px\nmask: custom mask\nfill: This is a grid of separate pixel-art poses of the SAME adult woman. In EACH masked chin region only, remove the beard-like grey or white strands dangling below her chin. Reveal a clean feminine jawline and small natural skin-colored neck above the existing white shirt collar. Preserve the existing side bob outside the mask. Follow each face angle and the original limited palette, crisp 1px outline and transparent background. Do not connect cells or add any new objects.\ntransparent: True\nseed: 221014\nasset_id: cb42ad61-f146-5104-91fd-5700cb9f5579\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"cd0766c8-87f7-4b50-8a9c-a7d79c5c3896\")",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-edit/masked-result.json",
+      "sha256": "532c4ead9be102426cf145b5f98eb3a5802b6ada23af07278ca5b7478935c52b",
+      "receipt_text": "status: completed\nid: ee5ef44a-a16d-4ed1-a494-6578590bb498\njob_id: ee5ef44a-a16d-4ed1-a494-6578590bb498\nframes: 1\ntransparent: yes\nasset_id: 44515cea-277d-5ad3-91cf-a2e6aadb55ca\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 10 generations\ndownload: https://api.pixellab.ai/mcp/images/ee5ef44a-a16d-4ed1-a494-6578590bb498/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-edit/masked-result.json",
+      "sha256": "532c4ead9be102426cf145b5f98eb3a5802b6ada23af07278ca5b7478935c52b",
+      "receipt_text": "Structured server receipt fields\njob_id: ee5ef44a-a16d-4ed1-a494-6578590bb498\nstatus: completed\ncharged: 10 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-edit/masked-submit.json",
+      "sha256": "c8836ffbbe60d9484a07961e645ee0c60467c2ef46a5ccd258ecafc80ea2b277",
+      "receipt_text": "id: ee5ef44a-a16d-4ed1-a494-6578590bb498\njob_id: ee5ef44a-a16d-4ed1-a494-6578590bb498\nsize: 256x256px\nmask: custom mask\nfill: This is a grid of separate pixel-art poses of the SAME adult woman. In EACH masked chin region only, remove the beard-like grey or white strands dangling below her chin. Reveal a clean feminine jawline and small natural skin-colored neck above the existing white shirt collar. Preserve the existing side bob outside the mask. Follow each face angle and the original limited palette, crisp 1px outline and transparent background. Do not connect cells or add any new objects.\ntransparent: True\nseed: 221014\nasset_id: 44515cea-277d-5ad3-91cf-a2e6aadb55ca\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"ee5ef44a-a16d-4ed1-a494-6578590bb498\")",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
       "path": "game-src/action/geshugan/resume/neck-edit/result.json",
-      "sha256": "057aa689f550b5a07cf3d0522c689981bb19984ffe83b22354cca2cd4f18a79a",
-      "receipt_text": "status: processing 71%\nid: c679844b-e541-48e4-9006-4b615ddb9dcc\njob_id: c679844b-e541-48e4-9006-4b615ddb9dcc\neta: ~26s",
+      "sha256": "3ca241d9c63d848fa6d2d605970d2025d3d2cb09d7e67283f6837c08d18af9d8",
+      "receipt_text": "status: completed\nid: c679844b-e541-48e4-9006-4b615ddb9dcc\njob_id: c679844b-e541-48e4-9006-4b615ddb9dcc\nframes: 13\ntransparent: yes\nasset_id: 6bacd634-be9e-5334-8ce8-974f60f1dd66\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 10 generations\ndownload: https://api.pixellab.ai/mcp/images/c679844b-e541-48e4-9006-4b615ddb9dcc/download?index=0 ... ?index=12",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "geshugan",
+      "path": "game-src/action/geshugan/resume/neck-edit/result.json",
+      "sha256": "3ca241d9c63d848fa6d2d605970d2025d3d2cb09d7e67283f6837c08d18af9d8",
+      "receipt_text": "Structured server receipt fields\njob_id: c679844b-e541-48e4-9006-4b615ddb9dcc\nstatus: completed\ncharged: 10 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -391,6 +827,13 @@
     },
     {
       "owner": "deadpole",
+      "path": "game-src/action/deadpole/resume/attempts/catch_counter/result.json",
+      "sha256": "98716d6fdf77d41e982c661c6a589ced902e587f8d596bf63e7064298ef6aa7f",
+      "receipt_text": "Structured server receipt fields\njob_id: d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "deadpole",
       "path": "game-src/action/deadpole/resume/attempts/catch_counter/submit-response.json",
       "sha256": "fca612d4e41ff35809a15eecb6e3fffd1329b49a8c7c0754ea7a0d6613b8f3c9",
       "receipt_text": "id: d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\njob_id: d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\ndescription: petite adult woman, long straight black hair to hips, blunt bangs, pale face, warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, strict right-facing profile, empty hands, character only, transparent background, no held objects, no weapons, no effects\naction: catch a wrist, sidestep, low hand extends and recoils, high hand holds\nframes: 10\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\")\nasset_id: 39fec92e-01e5-58c3-bc99-351e26c19e02\nasset_status: pending (saved to your gallery when generation completes)",
@@ -398,9 +841,44 @@
     },
     {
       "owner": "deadpole",
+      "path": "game-src/action/deadpole/resume/attempts/close_combo/result.json",
+      "sha256": "5c686c62ce2fdaf402c987fb3ba89fc85026f38192b30e2452ac1281c5d9dafc",
+      "receipt_text": "Structured server receipt fields\njob_id: 4206757c-145c-4b9a-8211-2e585da3df75\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "deadpole",
+      "path": "game-src/action/deadpole/resume/attempts/close_combo/submit-response.json",
+      "sha256": "234fe852d61d2e0fc6024c49fb28aab57e5d8ddd6c688a1713b355cf731dfca1",
+      "receipt_text": "id: 4206757c-145c-4b9a-8211-2e585da3df75\njob_id: 4206757c-145c-4b9a-8211-2e585da3df75\ndescription: petite adult woman, long straight black hair to hips, blunt bangs, pale face, warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, strict right-facing profile, empty hands, character only, transparent background, no held objects, no weapons, no effects\naction: low chest retention recoil, two hands extend, recoil, open palm shove and recover\nframes: 14\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"4206757c-145c-4b9a-8211-2e585da3df75\")\nasset_id: 7745d95b-214e-5049-b6d6-a6dadddbbb14\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "deadpole",
+      "path": "game-src/action/deadpole/resume/attempts/combo_bridge/submit-response.json",
+      "sha256": "c20fa766f3659bd7f6b46df9605c32ef43ce23dda00770c0e89a545112791b25",
+      "receipt_text": "id: 0d951568-6645-4872-8dc8-30511d65023a\njob_id: 0d951568-6645-4872-8dc8-30511d65023a\naction: Small controlled backward step, lower the rear hand to waist height while opening the front palm, keep feet planted until weight transfers.\nframes: 4\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 1022\nasset_id: 3cb1858d-6b31-5380-9772-96463f0682bf\nasset_status: pending (saved when generation completes)\ncost: 2 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"0d951568-6645-4872-8dc8-30511d65023a\")",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "deadpole",
+      "path": "game-src/action/deadpole/resume/attempts/pipe_body/result.json",
+      "sha256": "2513f40c5d50a12876391ea038f398f770b5b4f2c4c25305f277f6ac60cdff17",
+      "receipt_text": "Structured server receipt fields\njob_id: 4ee67072-3bcb-431e-b62b-a1f2446761ea\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "deadpole",
       "path": "game-src/action/deadpole/resume/attempts/pipe_body/submit-response.json",
       "sha256": "2e4df097dd991315ef11893b0da96170631b6b5fd86f0260acf7786195132857",
       "receipt_text": "id: 4ee67072-3bcb-431e-b62b-a1f2446761ea\njob_id: 4ee67072-3bcb-431e-b62b-a1f2446761ea\ndescription: petite adult woman, long straight black hair to hips, blunt bangs, pale face, warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, strict right-facing profile, empty hands, character only, transparent background, no held objects, no weapons, no effects\naction: two handed swing, empty closed hands, then step back\nframes: 8\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"4ee67072-3bcb-431e-b62b-a1f2446761ea\")\nasset_id: bcce17db-90ba-564f-94ac-62c7d2dd1715\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "gorgodio",
+      "path": "game-src/action/gorgodio/resume/arrival-v2/completion.json",
+      "sha256": "4df6c16a13132bdbd63462c982c9a16d3147b04cbf785f8e3e08d4ab0ed1b77f",
+      "receipt_text": "status: completed\nid: 7282832d-aa8a-4969-b050-096a6a4832ed\njob_id: 7282832d-aa8a-4969-b050-096a6a4832ed\nframes: 8\ntransparent: yes\nasset_id: 0986ca23-2249-5641-8340-0675822cb945\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/7282832d-aa8a-4969-b050-096a6a4832ed/download?index=0 ... ?index=7",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -419,9 +897,30 @@
     },
     {
       "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/down/result.json",
+      "sha256": "d3eb814f90b6ed3a5b7891aa52b27a8d1e6e3cf035d3906d86f6cc9e43b76867",
+      "receipt_text": "Structured server receipt fields\njob_id: d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3\nstatus: completed\ncharged: 3 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
       "path": "game-src/action/rojemon/resume/live/down/submit-response.json",
       "sha256": "a053b20bc673e69321ba478d1a794dd8add82ba51e92dcd1ef55f372f9cb17e0",
       "receipt_text": "id: d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3\njob_id: d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3\ndescription: petite young woman agent, long wavy pale lavender hair, blunt bangs, purple eyes, fitted black suit jacket, white shirt, black necktie, black pencil skirt, bare legs, black low heel pumps\naction: fall backwards from a startled recoil to lying supine and remain down\nframes: 8\nsize: 256x160px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3\")\nasset_id: cc7ccfbc-0cbd-56d9-9375-21b0a0fc1731\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/man_throw/result.json",
+      "sha256": "55e2c3cc78980ebf72ca6e3c740f97b4245afd9d098409115d40930d69f1bd84",
+      "receipt_text": "status: completed\nid: 2fce7c21-c96f-492c-a404-e5cdeb9a6450\njob_id: 2fce7c21-c96f-492c-a404-e5cdeb9a6450\nframes: 8\ntransparent: yes\nasset_id: 0645cbf5-c81a-59b0-88b0-4aa36980d826\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/2fce7c21-c96f-492c-a404-e5cdeb9a6450/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/man_throw/result.json",
+      "sha256": "55e2c3cc78980ebf72ca6e3c740f97b4245afd9d098409115d40930d69f1bd84",
+      "receipt_text": "Structured server receipt fields\njob_id: 2fce7c21-c96f-492c-a404-e5cdeb9a6450\nstatus: completed\ncharged: 3 generations",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -430,9 +929,30 @@
       "sha256": "da319e3b83f47bcb61b68108a42ff627a2e9ca33d8605e1021ac8126f9b5f794",
       "receipt_text": "id: 2fce7c21-c96f-492c-a404-e5cdeb9a6450\njob_id: 2fce7c21-c96f-492c-a404-e5cdeb9a6450\ndescription: faceless wooden artist mannequin, smooth light wood, ball joints, adult proportions\naction: overhead throw with a backward windup then forward release and recovery\nframes: 8\nsize: 256x160px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"2fce7c21-c96f-492c-a404-e5cdeb9a6450\")\nasset_id: 0645cbf5-c81a-59b0-88b0-4aa36980d826\nasset_status: pending (saved to your gallery when generation completes)",
       "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/man_throw_edit/result.json",
+      "sha256": "05ca75787624921bc1dc919a4e8e20f795ced327cc8551069d6508b00f0e4ce5",
+      "receipt_text": "status: completed\nid: d5d8b068-9501-40be-9538-7c2fe192cdc8\njob_id: d5d8b068-9501-40be-9538-7c2fe192cdc8\nframes: 1\ntransparent: yes\nasset_id: df72d83e-56ff-56bb-9093-a0241cb17df4\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 1 generation\ndownload: https://api.pixellab.ai/mcp/images/d5d8b068-9501-40be-9538-7c2fe192cdc8/download",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/man_throw_edit/result.json",
+      "sha256": "05ca75787624921bc1dc919a4e8e20f795ced327cc8551069d6508b00f0e4ce5",
+      "receipt_text": "Structured server receipt fields\njob_id: d5d8b068-9501-40be-9538-7c2fe192cdc8\nstatus: completed\ncharged: 1 generations",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "rojemon",
+      "path": "game-src/action/rojemon/resume/live/man_throw_edit/submit-response.json",
+      "sha256": "f2cabda454f53e566722ede8f9b994b98facb142db28a80d006f81d42d1c383d",
+      "receipt_text": "id: d5d8b068-9501-40be-9538-7c2fe192cdc8\njob_id: d5d8b068-9501-40be-9538-7c2fe192cdc8\nmodel: pixen\nedit: Clean only the blurred double outlines around the two wooden forearms and hands overlapping above this mannequin's face. Make two clearly separated solid wooden arms with round elbow joints and simple compact hands, matching the existing crisp one-pixel dark outline. Preserve the exact backward-bent pose, head, torso, legs, feet, colors, scale and transparent canvas. Do not add limbs, objects, motion streaks or shadows.\nsource: 256x160px\nsize: 256x160px\ntransparent: True\nseed: 7\nasset_id: df72d83e-56ff-56bb-9093-a0241cb17df4\nasset_status: pending (saved when generation completes)\ncost: 1 generation\nstatus: processing (~10-40s)\n\nhint: get_image(job_id=\"d5d8b068-9501-40be-9538-7c2fe192cdc8\")",
+      "source": "local owner worktree; commit verification pending"
     }
   ],
-  "current_confirmed_charged_generations": 35.0,
+  "current_confirmed_charged_generations": 106.0,
   "historical_recovered_generations": 6.0,
   "note": "Only explicit server receipt fields. Missing cost remains null; submission cost and completed charged are separate. Balances are not attributed."
 }

@@ -1,5 +1,7 @@
 {
-  "observed_at": "2026-10-22 10:38:13 UTC",
+  "recorded_at": "2026-10-22 10:38:13 UTC",
+  "observed_at": null,
+  "time_note": "Initial native MCP response earlier in this turn; exact query timestamp was not captured. Subsequent snapshots have captured query times.",
   "transport": "native PixelLab MCP",
   "result": {
     "content": [

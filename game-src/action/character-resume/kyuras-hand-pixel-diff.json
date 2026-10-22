@@ -1,0 +1,68 @@
+{
+  "raw_job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
+  "free_edit_asset_id": "e09c29fd-cf1e-4ba5-8d5e-7912990b7d74",
+  "frames": [
+    {
+      "frame": 0,
+      "changed_pixels": 49,
+      "bbox": [
+        76,
+        54,
+        84,
+        64
+      ],
+      "before_sha256": "c85c01863fc9a2c7b4e3fc7790b02075b5eb73f08670c6d380fb9a6ec280baee",
+      "after_sha256": "cf12f6b10d61a512efcf8d235c747635d008c5ac4b6fd0784dc49bd8017f968b"
+    },
+    {
+      "frame": 1,
+      "changed_pixels": 46,
+      "bbox": [
+        63,
+        42,
+        71,
+        52
+      ],
+      "before_sha256": "4fa915eb822631001ab0ff6787df0076c1c3e3e6b0de7d06ae3bbebe39e7f2ac",
+      "after_sha256": "806203682318dd074d7f81fd0d4057789e7071bdd09fb8efdebc0c53f1a2edc8"
+    },
+    {
+      "frame": 2,
+      "changed_pixels": 42,
+      "bbox": [
+        74,
+        44,
+        83,
+        54
+      ],
+      "before_sha256": "489c6ff6687ab388f3fe305a46502bf86e77d20a6d2947d8c78c8e404509b0a0",
+      "after_sha256": "6373f083aabb11312f23545f4cc412c8c9ab10670f704aa77c65d9d59ff96598"
+    },
+    {
+      "frame": 3,
+      "changed_pixels": 41,
+      "bbox": [
+        73,
+        49,
+        81,
+        59
+      ],
+      "before_sha256": "8ae787c3e67b8762368cfed0d746090262208a011ac76daa31dcb3f43b16766a",
+      "after_sha256": "231b70b4c8c44de1698425170574ebcb5e3a7d3cd091205bbf80ab67fcdd9c46"
+    },
+    {
+      "frame": 4,
+      "changed_pixels": 42,
+      "bbox": [
+        69,
+        52,
+        77,
+        62
+      ],
+      "before_sha256": "752f476ad7afd7ab81c50a280f39a0ecc1c32c722c967b780ee3ec2fdf2e68be",
+      "after_sha256": "1915c9204280750739a1d990210cca1821129063bf36fc7f3ef9cb55e7274d45"
+    }
+  ],
+  "total_changed_pixels": 220,
+  "note": "Pixel-diff evidence only, not automatic visual approval."
+}

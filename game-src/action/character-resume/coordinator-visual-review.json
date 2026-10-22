@@ -1,0 +1,132 @@
+{
+  "observed_at": "2026-10-22 10:45:25 UTC",
+  "reviews": [
+    {
+      "character": "kyuras",
+      "clip": "idle_shotgun",
+      "status": "recovered_review_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "finding": "Body/face/clothing maintained. Low hand agrees with one-handed hip-fire design; runtime weapon alignment pending.",
+      "source": "recovered/11826541-47d1-40de-9664-f05f1838bb23/sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "run_shotgun",
+      "status": "visual_defect",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Front hand disappears into sleeve at frames2-6. Recovery successful; visual acceptance withheld.",
+      "source": "recovered/9fe0e770-b992-4299-a4c1-90d6e591828a/sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "snap1_generated",
+      "status": "rejected",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "finding": "Bent elbow improved but hands read as fists/thumbs-up, not thumb-middle-finger snapping. No same-method snap2/3 rerolls.",
+      "source": "generated/3b131a96-b98f-4c4f-b220-146ce3706ceb/sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "eileen",
+      "clip": "transition_bridge",
+      "status": "visual_defect",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "finding": "Rifle duplicates between front and back in frames2-3, then front rifle disappears. Continuous weapon transition not achieved.",
+      "source": "resume/live-20261022/transition-bridge/review.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "jyaldi",
+      "clip": "walk",
+      "status": "playback_review_pending",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Identity and clothing maintained; last-to-first support-foot and head-height boundary requested for playback verification.",
+      "source": "resume/walk-20261022/contact-sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "gorgodio",
+      "clip": "a_arrive_v2",
+      "status": "contact_review_pass_playback_pending",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Initial raised fist corresponds to body summon end. Feet stay on ground reference; armor body silhouette maintained.",
+      "source": "resume/arrival-v2/contact.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "rojemon",
+      "clip": "down",
+      "status": "selective_playback_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Clipping fixed. Frame7 rises again; agree preserve raw and play0-6. getup transition needs playback check.",
+      "source": "resume/live/down/contact.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    }
+  ]
+}

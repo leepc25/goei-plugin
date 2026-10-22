@@ -3,17 +3,15 @@
   "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "branch": "codex/character-production-control",
   "account": {
-    "observed_at": "2026-10-22 10:38:38 UTC",
+    "observed_at": "2026-10-22 10:46:11 UTC",
     "authentication": "native_mcp_success",
-    "balance_generations": 14158.3,
-    "active_jobs": 3,
+    "balance_generations": 14085.3,
+    "active_jobs": 5,
     "documented_tier_limit": 20,
     "account_specific_limit": null,
     "limit_note": "Tier 3 documentation: 20; no separate account cap returned",
-    "evidence": "control-evidence/local-auth-20261022/account-snapshot.json"
+    "evidence": "control-evidence/local-auth-20261022/snapshot-20261022104611.json"
   },
-  "new_generation_calls": 0,
-  "new_generation_charge": 0,
   "items": [
     {
       "priority": 1,
@@ -151,7 +149,7 @@
     "deadpole 20 bathing frames"
   ],
   "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
-  "observed_at": "2026-10-22 10:38:38 UTC",
+  "observed_at": "2026-10-22 10:46:11 UTC",
   "per_owner_in_flight_limit": 1,
   "dispatch_enabled": true,
   "dispatch_blocker": null,
@@ -329,5 +327,20 @@
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
       }
     }
-  ]
+  ],
+  "coordinator_direct_generation_calls": 0,
+  "delegated_generation_costs": "verified-local-receipts.json",
+  "queue_check": {
+    "observed_at": "2026-10-22 10:46:11 UTC",
+    "active_by_owner": {
+      "blaret-saladin": 1,
+      "eileen": 1,
+      "geshugan": 1,
+      "kyuras": 1,
+      "deadpole": 1
+    },
+    "unattributed_active_ids": [],
+    "per_owner_violations": {},
+    "account_over_documented_limit": false
+  }
 }

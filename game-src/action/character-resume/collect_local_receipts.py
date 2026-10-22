@@ -7,9 +7,11 @@ WORKSPACE=ROOT.parent
 UUID=r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 def messages(obj):
     if isinstance(obj,dict):
+        if obj.get('job_id') and isinstance(obj.get('charged_generations'),(int,float)) and ('download_url' in obj or 'asset' in obj):
+            yield 'Structured server receipt fields\njob_id: '+str(obj['job_id'])+'\nstatus: '+str(obj.get('status','unknown'))+'\ncharged: '+str(obj['charged_generations'])+' generations'
         if obj.get('type')=='text' and isinstance(obj.get('text'),str):
             yield obj['text']
-        for key in ('result','response','content'):
+        for key in ('result','response','content','structuredContent'):
             if key in obj: yield from messages(obj[key])
     elif isinstance(obj,list):
         for item in obj: yield from messages(item)
@@ -35,7 +37,10 @@ for owner in owners:
                     charged=re.search(r'charged:\s*([\d.]+) generations?',text,re.I)
                     cost=re.search(r'cost:\s*([\d.]+) generations?',text,re.I)
                     estimated=re.search(r'cost:\s*~\s*([\d.]+) generations?',text,re.I)
-                    if charged: job['charged_generations']=float(charged.group(1))
+                    if charged:
+                        amount=float(charged.group(1))
+                        assert job['charged_generations'] in (None,amount), 'conflicting server charge receipts: '+job_id
+                        job['charged_generations']=amount
                     if cost: job['submission_cost_generations']=float(cost.group(1))
                     if estimated: job['estimated_generations']=float(estimated.group(1))
                     status=re.search(r'status:\s*(\w+)',text,re.I)
@@ -51,5 +56,20 @@ value={'observed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'j
        'historical_recovered_generations':sum(j['charged_generations'] or 0 for j in jobs.values() if j['job_id'] in historical),
        'note':'Only explicit server receipt fields. Missing cost remains null; submission cost and completed charged are separate. Balances are not attributed.'}
 (HERE/'verified-local-receipts.json').write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+inventory_path=HERE/'job-inventory.json'
+inventory=json.loads(inventory_path.read_text(encoding='utf-8'))
+index={j['job_id']:j for j in inventory['jobs']}
+for receipt in value['jobs']:
+    item=index.setdefault(receipt['job_id'],{'job_id':receipt['job_id'],'character':receipt['character'],'sources':[],'actual_cost':None})
+    item['local_receipt_record']='verified-local-receipts.json#'+receipt['job_id']
+    if receipt['charged_generations'] is not None:
+        item['actual_cost']={'generations':receipt['charged_generations'],'evidence':item['local_receipt_record']}
+        item['cost_status']='completed_server_receipt_verified'
+    else:
+        item['cost_status']='submission_receipt_only_completion_charge_pending'
+inventory['jobs']=sorted(index.values(),key=lambda j:(j['character'],j['job_id']))
+inventory['job_count']=len(index)
+inventory['local_receipts_verified_at']=value['observed_at']
+inventory_path.write_text(json.dumps(inventory,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 print(json.dumps({k:v for k,v in value.items() if k not in ('jobs','evidence')}))
 print('jobs',len(jobs),'evidence',len(evidence))

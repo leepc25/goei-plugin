@@ -1,0 +1,27 @@
+{
+  "observed_at": "2026-10-22 10:51:10 UTC",
+  "deliveries": [
+    {
+      "character": "jyaldi",
+      "commit": "ae4ca04785882a9de6d466d759e95dbbe085d020",
+      "branch": "codex/art-jyaldi-resume",
+      "html": "release/demo/jyaldi-walk-resume.html",
+      "frames": 8,
+      "charged_generations": 3,
+      "visual_status": "HOLD",
+      "remaining": "walk contact4, sole height6/7, low pelvis; run not submitted",
+      "user_visual_approval": false
+    },
+    {
+      "character": "gorgodio",
+      "commit": "466ef1f6a4cb7d027c6d8e418559ebb3163aa451",
+      "branch": "codex/art-gorgodio-resume",
+      "html": "release/demo/gorgodio-resume.html",
+      "frames": 8,
+      "charged_generations": 3,
+      "visual_status": "arrival corrected; user approval pending",
+      "remaining": "chop1 back of head; cleave shirt flash; walk detailed grounding/loop",
+      "user_visual_approval": false
+    }
+  ]
+}

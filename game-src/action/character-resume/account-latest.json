@@ -1,10 +1,10 @@
 {
-  "observed_at": "2026-10-22 10:38:38 UTC",
+  "observed_at": "2026-10-22 10:46:11 UTC",
   "authentication": "native_mcp_success",
-  "balance_generations": 14158.3,
-  "active_jobs": 3,
+  "balance_generations": 14085.3,
+  "active_jobs": 5,
   "documented_tier_limit": 20,
   "account_specific_limit": null,
   "limit_note": "Tier 3 documentation: 20; no separate account cap returned",
-  "evidence": "control-evidence/local-auth-20261022/account-snapshot.json"
+  "evidence": "control-evidence/local-auth-20261022/snapshot-20261022104611.json"
 }
