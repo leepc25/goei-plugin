@@ -96,6 +96,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         // 가까운 문·자리: 요원 머리 위에 작은 도트 아이콘만 (글씨·말풍선 없음, 검수 4-2)
         const nd = sc.doors.find((d) => Math.abs(d.x - px) < 60);
         const ns = !nd ? sc.spots.find((s) => s.open && Math.abs(s.x - px) < 60) : null;
+        if ((nd || ns) && fadeOut <= 0) (w as { hintShown?: boolean }).hintShown = true;
         if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         // 암전: 들어올 때 밝아지고, 나갈 때 어두워진다
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;

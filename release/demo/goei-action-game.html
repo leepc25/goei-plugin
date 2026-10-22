@@ -4762,7 +4762,8 @@ function linkItems(w, run) {
   w.on((e) => {
     if (e.type === "enter:floor") {
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
-      furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
+      const artProps = (e.floor.props ?? []).map((q) => ({ ...q, w: Math.max(q.w, (propArtSize(q.kind, q.label, e.floor.type)?.w ?? 0) + 40) }));
+      furnishFloor(field, { ...e.floor, props: furnishAvoid({ ...e.floor, props: artProps }, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
       const st = clearSpot(p.x, p.y, allSolids(), w.lane);
       p.x = p.px = st.x;
       p.y = p.py = st.y;
@@ -5346,7 +5347,8 @@ function makeRenderer(ctx, art3, opt) {
         }
       }
       const fighting = w.bodies.some((b) => b.alive && b.team !== "player" && b.kind !== "bullet" && b.kind !== "item" && Math.abs(b.x - w.player.x) < 520);
-      if (!fighting && w.props.some((p) => p.label && near2(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
+      w.hintShown = !fighting && w.props.some((p) => p.label && near2(w, p));
+      if (w.hintShown) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
@@ -6151,6 +6153,8 @@ var World = class {
   /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
   cutin = 0;
   showBoxes = false;
+  /** 이번 프레임에 머리 위 상호작용 아이콘이 떴나 (말풍선을 그 위로 올린다) */
+  hintShown = false;
   kills = 0;
   floors = 0;
   notes = {};
@@ -6474,6 +6478,7 @@ var World = class {
       const e2 = encs[this.encIndex];
       if (e2 && p.x >= e2.triggerX) {
         this.encActive = this.encIndex;
+        this.goT = 0;
         this.encWave = 0;
         this.bounds = [e2.lockFrom, e2.lockTo];
         this.spawnWave();
@@ -6508,7 +6513,7 @@ var World = class {
     cx = Math.max(b0, Math.min(b1 - SCREEN_W, cx));
     cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
     this.camX = cx;
-    if (this.encActive >= 0) p.x = Math.max(cx + 30, Math.min(cx + SCREEN_W - 30, p.x));
+    if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x));
   }
   /** 보스 체력 막대용 */
   boss() {
@@ -21458,6 +21463,7 @@ function makeHub(host, whereIs2) {
         const px = w.player.x;
         const nd = sc.doors.find((d2) => Math.abs(d2.x - px) < 60);
         const ns = !nd ? sc.spots.find((s2) => s2.open && Math.abs(s2.x - px) < 60) : null;
+        if ((nd || ns) && fadeOut <= 0) w.hintShown = true;
         if ((nd || ns) && fadeOut <= 0) drawHintIcon(c, px, w.player.y - w.player.z - 300, w.tick);
         const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark2 > 0) {
@@ -21952,7 +21958,7 @@ function engineModules(box3, bridge) {
             if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
           }
         }
-        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, minX: ox, maxX: Math.min(maxX ?? Infinity, ox + 1280 * k) };
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: ox, maxX: Math.min(maxX ?? Infinity, ox + 1280 * k) };
       },
       emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
       paused: () => shell.paused && !openingOn

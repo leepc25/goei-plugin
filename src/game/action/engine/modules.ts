@@ -297,7 +297,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
           }
         }
         // 놀이판(게임 화면) 안쪽으로만: 폰 가로의 좌우 버튼 띠에 걸치지 않게
-        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - 290) * k, minX: ox, maxX: Math.min(maxX ?? Infinity, ox + 1280 * k) };
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: ox, maxX: Math.min(maxX ?? Infinity, ox + 1280 * k) };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
       paused: () => shell.paused && !openingOn,
