@@ -1807,3 +1807,4 @@ description: tall slim adult woman agent, long straight black hair to the
 02:02:48 gen_fix2 after generations_remaining: 8222.90
 
 2026-10-22T10:20:46.077176+00:00 codex/art-jyaldi-resume: tools/list OK; get_balance/list_jobs/search_help MCP 401 Missing Authorization. New submissions=0, new charge=0; balance/active_jobs/limit unknown. walk 8-frame public quote=3 generations; not submitted. Kyuras two paid jobs handed off in resume/HANDOFF-20261022.md, not recovered here.
+2026-10-22T10:25:46.791400+00:00 auth recheck after user connection: get_balance/list_jobs both MCP 401 Missing Authorization header. Environment revision 4 reports no secret/runtime bindings. New submissions=0; new charge=0; live balance/queue/limit unknown. Evidence resume/evidence/recheck-20261022T102500Z/.

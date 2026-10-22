@@ -1,11 +1,13 @@
 {
-  "observed_at": "2026-10-22T10:20:46.077176+00:00",
+  "observed_at": "2026-10-22T10:25:46.791400+00:00",
   "branch": "codex/art-jyaldi-resume",
   "account": {
     "balance": null,
     "active_jobs": null,
     "concurrency_limit": null,
-    "error": "401 Missing Authorization header"
+    "error": "get_balance and list_jobs both return 401 Missing Authorization header after user-reported connection",
+    "evidence": "evidence/recheck-20261022T102500Z/",
+    "environment_spec_revision": "4"
   },
   "per_owner_inflight_limit": 1,
   "global_lock_acquired": false,
