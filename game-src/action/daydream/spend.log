@@ -91,7 +91,7 @@ d
 2026-10-22 02:32:40 gen minseong idle 5f -> id: 2714c35f-a6ea-4cd9-a534-ea9ec9bffe0c
 job_id: 2714c35f-a6ea-4cd9-a534-ea9ec9bffe0c
 description: big broad muscular man, short messy brown hair, anxious frien
-2026-10-22 02:32:41 gen nasol idle 5f -> id: 0777b524-e478-46cb-a851-83f55fae75cb
+2026-10-22 02:32:41 gen nasol idle 5f (old-ref, dropped) -> id: 0777b524-e478-46cb-a851-83f55fae75cb
 job_id: 0777b524-e478-46cb-a851-83f55fae75cb
 description: tall slender woman, black high ponytail with blunt bangs, sha
 2026-10-22 02:33:29 base seonghae s913 -> id: c62cade3-2a9d-4ada-a2c9-e66a1bdccc2a
@@ -108,7 +108,7 @@ d
 2026-10-22 02:34:47 gen haje idle 5f -> id: 2a806f80-84bd-4a75-b135-0ba55847242a
 job_id: 2a806f80-84bd-4a75-b135-0ba55847242a
 description: lean woman, chin-length dark navy blue bob, tired cold face, 
-2026-10-22 02:35:14 gen nasol temple 7f -> id: 18435551-9982-4dd3-8120-fae4a8f873a5
+2026-10-22 02:35:14 gen nasol temple 7f (old-ref, dropped) -> id: 18435551-9982-4dd3-8120-fae4a8f873a5
 job_id: 18435551-9982-4dd3-8120-fae4a8f873a5
 description: tall slender woman, black high ponytail with blunt bangs, sha
 2026-10-22 02:35:56 base grunt_m s911 -> id: 8c4c8572-0ce1-4f89-980f-a7d76a34f80f
@@ -128,7 +128,7 @@ model: pixen
 d
 2026-10-22 02:38:41 base after generations_remaining: 16658.40
 2026-10-22 02:39:20 gen jaheon before generations_remaining: 16639.40
-2026-10-22 02:40:20 gen nasol stance 5f -> id: bc0ac4fa-1883-43f9-bccb-98b76b92e87d
+2026-10-22 02:40:20 gen nasol stance 5f (old-ref, dropped) -> id: bc0ac4fa-1883-43f9-bccb-98b76b92e87d
 job_id: bc0ac4fa-1883-43f9-bccb-98b76b92e87d
 description: tall slender woman, black high ponytail with blunt bangs, sha
 2026-10-22 02:40:42 base grunt_m s913 -> id: 7d50e7ec-654f-4d8c-bce6-851539f9f323
@@ -175,3 +175,109 @@ description: tall heavy man, swept-back short white hair, expressionless h
 2026-10-22 02:48:56 gen grunt_m before generations_remaining: 16366.50
 2026-10-22 02:48:57 gen seonghae before generations_remaining: 16366.50
 2026-10-22 02:48:57 gen grunt_f before generations_remaining: 16366.50
+2026-10-22 02:49:29 gen jaheon stance 5f -> id: b184c1e9-6deb-4633-8fcb-30ceb1630606
+job_id: b184c1e9-6deb-4633-8fcb-30ceb1630606
+description: tall heavy man, swept-back short white hair, expressionless h
+2026-10-22 02:49:29 gen minseong engage 5f -> id: a3c0c181-fdd1-4325-853e-b90a79d09fd9
+job_id: a3c0c181-fdd1-4325-853e-b90a79d09fd9
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 02:49:30 gen minseong walk 9f -> id: 035bdfb4-1a01-434d-97de-7eea27206484
+job_id: 035bdfb4-1a01-434d-97de-7eea27206484
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 02:49:57 gen grunt_m idle 5f -> id: 16002920-c3a6-4938-b0f5-73c8f0492a69
+job_id: 16002920-c3a6-4938-b0f5-73c8f0492a69
+description: average man, very short dark hair, plain face, navy suit, whi
+2026-10-22 02:54:04 gen grunt_f idle 5f -> id: 28070570-85e7-47e8-8018-a5a748739788
+job_id: 28070570-85e7-47e8-8018-a5a748739788
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 02:55:01 gen nasol temple 7f -> id: 728af459-fbcf-4f66-a5b1-06e39c34f62f
+job_id: 728af459-fbcf-4f66-a5b1-06e39c34f62f
+description: tall slender woman, black high ponytail with blunt bangs, sha
+2026-10-22 02:55:04 gen seonghae idle 5f -> id: 00a9e972-71de-4d5d-aaed-2f154511b1ad
+job_id: 00a9e972-71de-4d5d-aaed-2f154511b1ad
+description: small slight woman, long wavy white hair tied low over one sh
+2026-10-22 02:55:04 gen seonghae snack 7f -> id: f220a16c-eca2-4494-b990-abf82073eb96
+job_id: f220a16c-eca2-4494-b990-abf82073eb96
+description: small slight woman, long wavy white hair tied low over one sh
+2026-10-22 02:55:04 gen minseong step 7f -> id: c7f12fbe-f231-4176-bd18-c4c1751fba23
+job_id: c7f12fbe-f231-4176-bd18-c4c1751fba23
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 02:55:21 gen minseong idle done
+2026-10-22 02:55:23 gen minseong headscratch done
+2026-10-22 02:55:24 gen minseong stance done
+2026-10-22 02:55:28 gen minseong engage done
+2026-10-22 02:55:30 gen minseong walk done
+2026-10-22 02:56:43 gen grunt_f stance 5f -> id: c853f67f-1843-47a8-a108-b9ed12ef4f0f
+job_id: c853f67f-1843-47a8-a108-b9ed12ef4f0f
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 02:57:09 gen jaheon engage 5f -> id: 6eefe924-cc64-4d5d-836f-2a373cb96498
+job_id: 6eefe924-cc64-4d5d-836f-2a373cb96498
+description: tall heavy man, swept-back short white hair, expressionless h
+2026-10-22 02:57:09 gen seonghae stance 5f -> id: d50bf47e-ea37-431d-9293-2014af6d48c2
+job_id: d50bf47e-ea37-431d-9293-2014af6d48c2
+description: small slight woman, long wavy white hair tied low over one sh
+2026-10-22 02:58:45 gen grunt_f walk 9f -> id: dec3fba1-3e79-4841-8ec1-1ab505673847
+job_id: dec3fba1-3e79-4841-8ec1-1ab505673847
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 02:59:19 gen grunt_f run 9f -> id: 0e658ba2-9a57-46f6-8a06-d958847eb0c5
+job_id: 0e658ba2-9a57-46f6-8a06-d958847eb0c5
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 02:59:37 gen grunt_m stance 5f -> id: 7e851f02-71d9-4155-bce5-14743e45845e
+job_id: 7e851f02-71d9-4155-bce5-14743e45845e
+description: average man, very short dark hair, plain face, navy suit, whi
+2026-10-22 03:00:51 gen grunt_f jump 9f -> id: 936af78e-0709-46a9-948b-1d3380cbd628
+job_id: 936af78e-0709-46a9-948b-1d3380cbd628
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 03:01:40 gen haje engage 5f -> id: 48505a3a-8b0a-4c97-8355-7078ca1d6b78
+job_id: 48505a3a-8b0a-4c97-8355-7078ca1d6b78
+description: lean woman, chin-length dark navy blue bob, tired cold face, 
+2026-10-22 03:02:10 gen minseong run 9f -> id: ccd4ec05-88e9-42d3-8def-14b6337e5688
+job_id: ccd4ec05-88e9-42d3-8def-14b6337e5688
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 03:02:13 gen seonghae engage 5f -> id: 413c5024-83cc-431d-bf65-b660817e26bc
+job_id: 413c5024-83cc-431d-bf65-b660817e26bc
+description: small slight woman, long wavy white hair tied low over one sh
+2026-10-22 03:02:23 gen grunt_f jab 5f -> id: f342f3f5-4a01-4d9b-b878-4435d953edec
+job_id: f342f3f5-4a01-4d9b-b878-4435d953edec
+description: average woman, short dark hair, plain face, navy pantsuit, wh
+2026-10-22 03:02:40 gen grunt_f idle done
+2026-10-22 03:02:41 gen grunt_f stance done
+2026-10-22 03:02:44 gen grunt_f walk done
+2026-10-22 03:02:47 gen grunt_f run done
+2026-10-22 03:02:49 gen grunt_f jump done
+2026-10-22 03:03:17 gen seonghae walk 9f -> id: 2abdf158-9a70-4478-81b7-662c3743625c
+job_id: 2abdf158-9a70-4478-81b7-662c3743625c
+description: small slight woman, long wavy white hair tied low over one sh
+2026-10-22 03:03:43 gen minseong jump 9f -> id: dd0d8558-8d3b-4432-a993-56c3be2f5b0f
+job_id: dd0d8558-8d3b-4432-a993-56c3be2f5b0f
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 03:06:48 gen minseong crouch 5f -> id: 22348387-26e8-4e75-8884-cc4d04189189
+job_id: 22348387-26e8-4e75-8884-cc4d04189189
+description: big broad muscular man, short messy brown hair, anxious frien
+2026-10-22 03:06:48 gen jaheon walk 9f -> id: 78a9f837-9271-4a31-aee8-5de372fe8d90
+job_id: 78a9f837-9271-4a31-aee8-5de372fe8d90
+description: tall heavy man, swept-back short white hair, expressionless h
+2026-10-22 03:11:25 gen jaheon step 7f -> id: 19592163-1862-4d62-94f0-99550fc99885
+job_id: 19592163-1862-4d62-94f0-99550fc99885
+description: tall heavy man, swept-back short white hair, expressionless h
+2026-10-22 03:11:42 gen jaheon idle done
+2026-10-22 03:11:44 gen jaheon gloves done
+2026-10-22 03:11:46 gen jaheon stance done
+2026-10-22 03:11:47 gen jaheon engage done
+2026-10-22 03:11:50 gen jaheon walk done
+2026-10-22 03:12:26 gen haje walk 9f -> id: c31db6a5-6482-498e-8645-194a876a5b95
+job_id: c31db6a5-6482-498e-8645-194a876a5b95
+description: lean woman, chin-length dark navy blue bob, tired cold face, 
+2026-10-22 03:12:52 gen jaheon run 9f -> id: fc882ffb-b4b0-4208-81ef-108a164cc766
+job_id: fc882ffb-b4b0-4208-81ef-108a164cc766
+description: tall heavy man, swept-back short white hair, expressionless h
+2026-10-22 03:13:49 gen haje before generations_remaining: 15728.70
+2026-10-22 03:14:10 gen haje idle done
+2026-10-22 03:14:28 gen haje cigarette done
+2026-10-22 03:14:48 gen haje stance done
+2026-10-22 03:15:07 gen haje engage done
+2026-10-22 03:15:25 gen haje walk done
+2026-10-22 03:16:27 gen haje step 7f -> id: 2e7a02d0-5350-403b-ae1a-5633f11e054e
+job_id: 2e7a02d0-5350-403b-ae1a-5633f11e054e
+description: lean woman, chin-length dark navy blue bob, tired cold face, 
+2026-10-22 03:18:16 gen haje before generations_remaining: 15648.30

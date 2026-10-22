@@ -269,3 +269,8 @@ LIFE_NAMES=['stepup','stepover','liesit','handswork','handshead','seatmouth','se
  'gesture','armscross','nod','headshake','wave','handshake','pat','point','shrug','hug',
  'laugh','glad','cry','wallcry','kneelcry','sad','shout','deskslam','surprise','startlefall','plopdown','embarrassed','annoyed','think','bored',
  'pickup','toss','drink','eat','bandage','hit','down','getup','tired','idle_pipe','walk_pipe','idle_shotgun','walk_shotgun','run_shotgun','pipe','shotgun']
+# 2026-10-22 사용자 확정: 전투·이동·적/중립 조우 먼저(1차), 생활·사교·감정은 나중(2차). gen.py는 PHASE=2일 때만 아래 목록을 만든다.
+LATER={'liesit','handswork','handshead','seatmouth','seathold','holdlook','handear','sweep','liehold',
+ 'floorsit','floorrest','bedlie','chairsit','typing','gearcheck','tie',
+ 'seatrest','seatthink','doze','yawn','stretch','hairflip','brushteeth',
+ 'handshake','pat','hug','laugh','glad','cry','wallcry','kneelcry','sad','shout','deskslam','plopdown','embarrassed','annoyed','think','bored','eat'}

@@ -48,7 +48,9 @@ def fetch(n,j):
         im=[x for x in (r or {}).get('result',{}).get('content',[]) if x.get('type')=='image']
         if im: open(f'{d}/{i:02d}.png','wb').write(base64.b64decode(im[0]['data']))
 if __name__=='__main__':
-    names=[a for a in sys.argv[2:] if not a.startswith('--') and not a.isdigit()] or list(c.CLIPS)
+    import life
+    PH=os.environ.get('PHASE','1')
+    names=[a for a in sys.argv[2:] if not a.startswith('--') and not a.isdigit()] or [n for n in c.CLIPS if (n in life.LATER)==(PH=='2')]
     b0=bal(); print('before',b0,flush=True); log('before '+b0)
     resume={}
     if '--resume' in sys.argv:
