@@ -41,6 +41,26 @@ export interface GenContext {
   tired?: boolean;
   /** 이번 출동의 숨은 길이 이 층에 있다 (출동당 0~1, 기본기획서 8.2) */
   secret?: boolean;
+  /** 방 격자 세상의 방 하나를 짠다 (gen/world.ts). 없으면 예전 한 줄 층 */
+  room?: RoomOpts;
+}
+
+/** 방 하나 짜기: 조각 수·꼭 넣을 장치·홀(도착·출구)·수호자·승객·규칙 표지·적 */
+export interface RoomOpts {
+  col: number;
+  row: number;
+  name: string;
+  chunks: number;
+  need: string[];
+  arrival: boolean;
+  exit: boolean;
+  guardian: boolean;
+  passenger: boolean;
+  rules: boolean;
+  goal: boolean;
+  enemies: boolean;
+  /** 적 예산 조각 번호에 더할 값 (도착 방에서 멀수록 세다) */
+  index0: number;
 }
 
 export const MAX_PIT = 130;
@@ -76,7 +96,8 @@ function chunkPool(type: FloorType, depth: number): ChunkTemplate[] {
 
 /** 조각 순서를 고른다. 유형이 요구하는 장치는 반드시 한 번 이상. */
 function pickSequence(ctx: GenContext, r: Rng, count: number): { t: ChunkTemplate; flip: boolean }[] {
-  const pool = chunkPool(ctx.type, ctx.depth).filter((c) => !c.endOnly);
+  // 방: 정비 구역 입구 조각은 세상 쪽에서 정한다 (방마다 억지로 넣지 않는다)
+  const pool = chunkPool(ctx.type, ctx.depth).filter((c) => !c.endOnly && !(ctx.room && c.device && !ctx.room.need.includes(c.id)));
   const seq: ChunkTemplate[] = [];
   for (let i = 0; i < count; i++) {
     let t = pick(r, pool);
@@ -85,11 +106,14 @@ function pickSequence(ctx: GenContext, r: Rng, count: number): { t: ChunkTemplat
     seq.push(t);
   }
   const need: string[] = [];
-  if (ctx.type === 'puzzle') need.push('p_fork', 'p_switch');
-  if (ctx.type === 'replica' && (ctx.sub ?? 'pretending') === 'pretending') need.push(r() < 0.5 ? 'r_living' : 'r_kitchen');
-  if (ctx.type === 'replica' && ctx.sub === 'vacant') need.push('r_storage');
-  if (ctx.type === 'chase') need.push('h_doors');
-  if (ctx.type === 'trial') need.push('t_marks');
+  if (ctx.room) need.push(...ctx.room.need);
+  else if (ctx.type === 'puzzle') need.push('p_fork', 'p_switch');
+  if (!ctx.room) {
+    if (ctx.type === 'replica' && (ctx.sub ?? 'pretending') === 'pretending') need.push(r() < 0.5 ? 'r_living' : 'r_kitchen');
+    if (ctx.type === 'replica' && ctx.sub === 'vacant') need.push('r_storage');
+    if (ctx.type === 'chase') need.push('h_doors');
+    if (ctx.type === 'trial') need.push('t_marks');
+  }
   const reserved = new Set<number>();
   const free = () => {
     const cands = seq.map((_, i) => i).filter((i) => !reserved.has(i) && !need.includes(seq[i].id));
@@ -106,8 +130,8 @@ function pickSequence(ctx: GenContext, r: Rng, count: number): { t: ChunkTemplat
   }
   // 정비 구역 입구 하나 이상
   const hasService = (c: ChunkTemplate) => c.slots.some((s) => s.kind === 'servicedoor' || s.kind === 'hatch');
-  if (!seq.some(hasService)) seq[free()] = CHUNK_BY_ID[r() < 0.5 ? 'c_service' : 'c_hatch'];
-  if (r() < 0.25) seq.push(CHUNK_BY_ID.c_deadend);
+  if (!ctx.room && !seq.some(hasService)) seq[free()] = CHUNK_BY_ID[r() < 0.5 ? 'c_service' : 'c_hatch'];
+  if (!ctx.room && r() < 0.25) seq.push(CHUNK_BY_ID.c_deadend);
   return seq.map((t) => ({ t, flip: !t.device && r() < 0.4 }));
 }
 
@@ -126,6 +150,18 @@ export function makeFloor(ctx: GenContext): Floor {
   return f;
 }
 
+/** 방 격자 세상의 방 하나 (gen/world.ts). 검증 실패면 다시, 끝내 안 되면 평지 조각 */
+export function makeRoomFloor(ctx: GenContext & { room: RoomOpts }): Floor {
+  for (let tries = 0; tries < 5; tries++) {
+    const f = buildFloor(ctx, mix(ctx.seed, ctx.depth, ctx.room.col * 31 + ctx.room.row, ctx.epoch, tries * 7919), null);
+    f.tries = tries;
+    if (validateFloor(f).length === 0) return f;
+  }
+  const f = buildFloor(ctx, mix(ctx.seed, ctx.depth, ctx.room.col, ctx.room.row, 31337), 'A');
+  f.tries = 5;
+  return f;
+}
+
 const FALLBACK: Record<'A' | 'B', string[]> = {
   A: ['c_flat', 'c_service', 'c_step', 'c_flat', 'c_wide', 'c_flat'],
   B: ['c_flat', 'c_pit', 'c_hatch', 'c_narrow', 'c_flat', 'c_flat'],
@@ -137,12 +173,13 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   const { depth, type } = ctx;
   const def = FLOOR_TYPES[type];
   const sub: ReplicaSub | null = type === 'replica' ? ctx.sub ?? 'pretending' : null;
-  const count = type === 'lobby' ? range(r, 4, 6) : type === 'deep' ? 8 : Math.min(12, range(r, 6, 9) + Math.floor((depth - 4) / 4));
-  let seq = fallback ? FALLBACK[fallback].map((id) => ({ t: CHUNK_BY_ID[id], flip: false })) : pickSequence(ctx, r, count);
-  if (fallback && type === 'puzzle') seq.splice(2, 0, { t: CHUNK_BY_ID.p_fork, flip: false }, { t: CHUNK_BY_ID.p_switch, flip: false });
-  if (fallback && type === 'trial') seq.splice(2, 0, { t: CHUNK_BY_ID.t_marks, flip: false });
-  if (fallback && type === 'replica') seq.splice(2, 0, { t: CHUNK_BY_ID.r_living, flip: false }, { t: CHUNK_BY_ID.r_storage, flip: false });
-  if (fallback && type === 'chase') seq.splice(1, 0, { t: CHUNK_BY_ID.h_doors, flip: false });
+  const room = ctx.room;
+  const count = room ? room.chunks : type === 'lobby' ? range(r, 4, 6) : type === 'deep' ? 8 : Math.min(12, range(r, 6, 9) + Math.floor((depth - 4) / 4));
+  let seq = fallback && room ? [...room.need.map((id) => ({ t: CHUNK_BY_ID[id], flip: false })), ...Array.from({ length: Math.max(1, count - room.need.length) }, () => ({ t: CHUNK_BY_ID.c_flat, flip: false }))] : fallback ? FALLBACK[fallback].map((id) => ({ t: CHUNK_BY_ID[id], flip: false })) : pickSequence(ctx, r, count);
+  if (fallback && !room && type === 'puzzle') seq.splice(2, 0, { t: CHUNK_BY_ID.p_fork, flip: false }, { t: CHUNK_BY_ID.p_switch, flip: false });
+  if (fallback && !room && type === 'trial') seq.splice(2, 0, { t: CHUNK_BY_ID.t_marks, flip: false });
+  if (fallback && !room && type === 'replica') seq.splice(2, 0, { t: CHUNK_BY_ID.r_living, flip: false }, { t: CHUNK_BY_ID.r_storage, flip: false });
+  if (fallback && !room && type === 'chase') seq.splice(1, 0, { t: CHUNK_BY_ID.h_doors, flip: false });
   // 로비 L1 튜토리얼: 구덩이·낮은 천장 없는 쉬운 조각만 앞에
   if (type === 'lobby' && depth === 1) seq = seq.map((c, i) => (i < 2 && c.t.terrain.some((t) => t.kind === 'pit' || t.kind === 'low') ? { t: CHUNK_BY_ID.c_flat, flip: false } : c));
   // 로비 L1에는 낮은 단(바닥을 가로지르는 판)을 두지 않는다: 매끈한 통로 판처럼 보인다 (검수 12-1). 조각의 소품은 그대로
@@ -167,14 +204,16 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   };
 
   // ── 시작 홀 (고정 방): 타고 온 엘리베이터 + 거울 + 점검표
-  const hall = addRoom('elevator_hall');
-  placed.push(place('elevator', hall + 200, 0, 160, '타고 온 엘리베이터', { noreturn: true }));
-  placed.push(place('mirror', hall + 470, 0, 60, '거울'));
-  if (depth === 1) placed.push(place('checklist', hall + 640, 0, 50, '정기 점검표', { rule: 'entry' }));
-  // 안내문은 점검표 옆에 나란히 두지 않고 한 화면 뒤에 (검수 13-2: 입간판 두 개 나란히)
-  if (depth === 1) placed.push(place('sign', hall + 2040, 0, 50, '안내문', { rule: 'noreturn' }));
-  if (depth === 2) placed.push(place('sign', hall + 860, 0, 50, '안내판 (글자가 섞임)', { rule: 'lobby' }));
-  if (type === 'deep') placed.push(place('sign', hall + 860, 0, 50, '긁힌 글씨', { rule: 'b12' }));
+  if (!room || room.arrival) {
+    const hall = addRoom('elevator_hall');
+    placed.push(place('elevator', hall + 200, 0, 160, '타고 온 엘리베이터', { noreturn: true }));
+    placed.push(place('mirror', hall + 470, 0, 60, '거울'));
+    if (depth === 1) placed.push(place('checklist', hall + 640, 0, 50, '정기 점검표', { rule: 'entry' }));
+    // 안내문은 점검표 옆에 나란히 두지 않고 한 화면 뒤에 (검수 13-2: 입간판 두 개 나란히)
+    if (depth === 1) placed.push(place('sign', hall + (room ? 1000 : 2040), 0, 50, '안내문', { rule: 'noreturn' }));
+    if (depth === 2) placed.push(place('sign', hall + 860, 0, 50, '안내판 (글자가 섞임)', { rule: 'lobby' }));
+    if (type === 'deep') placed.push(place('sign', hall + 860, 0, 50, '긁힌 글씨', { rule: 'b12' }));
+  }
 
   // 시험 층 목표 방: 들어가자마자 (변형 trial_mid면 한가운데)
   const goalBox: { g: TrialGoal | null } = { g: null };
@@ -185,15 +224,16 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
     placed.push(place('goalwall', gx + 320, 0, 240, '목표', { text: goal.text }));
     placed.push(place('sign', gx + 80, 0, 50, '시험 안내', { rule: 'trial' }));
   };
-  if (type === 'trial' && !goalMid) goalRoom();
+  if (type === 'trial' && (room ? room.goal : !goalMid)) goalRoom();
 
   // ── 조각들
   let ruleSigns = [...(type === 'replica' && sub ? REPLICA_SUB_RULES[sub] : def.rules)];
   if (type === 'lobby' && depth !== 2) ruleSigns = depth === 3 ? ['l_clock'] : ['greet'];
+  if (room && !room.rules) ruleSigns = [];
   let forkN = 0;
   const chunkBase: { x: number; t: ChunkTemplate; flip: boolean; index: number }[] = [];
   seq.forEach((c, i) => {
-    if (type === 'trial' && goalMid && i === Math.floor(seq.length / 2)) goalRoom();
+    if (type === 'trial' && !room && goalMid && i === Math.floor(seq.length / 2)) goalRoom();
     const bx = addChunk(c.t, c.flip);
     chunkBase.push({ x: bx, t: c.t, flip: c.flip, index: i });
   });
@@ -280,12 +320,12 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   const tired = ctx.tired ? 1.3 : 1;
   const pool = def.enemies;
   let total = 0;
-  if (pool.length) {
+  if (pool.length && (!room || room.enemies)) {
     for (const cb of chunkBase) {
-      if (type === 'lobby' && depth === 1 && cb.index < 2) continue;
+      if (type === 'lobby' && depth === 1 && cb.index < 2 && (!room || room.arrival)) continue;
       const slots = cb.t.slots.filter((s) => s.kind === 'enemy');
       if (!slots.length) continue;
-      let left = Math.round(budgetFor(depth, cb.index, ctx.danger, ctx.flags.length * 2, ctx.growth) * tired);
+      let left = Math.round(budgetFor(depth, cb.index + (room?.index0 ?? 0), ctx.danger, ctx.flags.length * 2, ctx.growth) * tired);
       total += left;
       let n = 0;
       while (left >= 8 && n < 8) {
@@ -308,16 +348,16 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   }
   // 어둠: 멈추면 다가오는 '체온을 재는 것' 자리 / B-12: 만지는 것들
   if (type === 'dark') spawns.push(hook('stalker', 'warmth', 0, MID, 0, false, { follows: true }));
-  if (type === 'deep') for (let k = 0; k < 6; k++) spawns.push(hook('stalker', 'toucher', chunkBase[1 + (k % (chunkBase.length - 1))].x + 320, r() * LANE_DEPTH, 0, false, {}));
+  if (type === 'deep') for (let k = 0; k < (room ? 2 : 6); k++) spawns.push(hook('stalker', 'toucher', chunkBase[Math.min(chunkBase.length - 1, 1 + (k % Math.max(1, chunkBase.length - 1)))].x + 320, r() * LANE_DEPTH, 0, false, {}));
 
   // ── B-12 낙서 (원문 여담 반전: 수호자 확률 2배)
-  const b12mark = depth > 4 && type !== 'deep' && r() < 0.15;
+  const b12mark = depth > 4 && type !== 'deep' && (!room || room.arrival) && r() < 0.15;
   if (b12mark) placed.push(place('b12', chunkBase[0].x + 300, 0, 80, 'B-12', { rule: 'b12' }));
 
   // ── 수호자 방: L3는 반드시, 지하는 깊이에 따른 확률(B-12 낙서면 2배). 시험 층은 실패하면 나온다.
   let guardian: string | null = null;
   const guardianP = type === 'deep' ? 1 : depth === 3 ? 1 : depth < 3 ? 0 : Math.min(1, (0.35 + (depth - 4) * 0.05) * (b12mark ? 2 : 1));
-  if (r() < guardianP || type === 'trial') {
+  if (room ? room.guardian || (type === 'trial' && room.goal) : r() < guardianP || type === 'trial') {
     const gx = addRoom('guardian_room');
     const cands = def.guardians;
     const g = type === 'replica' && sub ? cands.find((c) => c.kind === REPLICA_SUB_GUARDIAN[sub])! : cands[mix(ctx.epoch, depth) % cands.length];
@@ -334,12 +374,14 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   }
 
   // ── 끝 홀: 승강기 패널 (L1에 EXIT 조건 충족이면 출구 홀)
-  const end = addRoom(ctx.exitOpen ? 'exit_hall' : 'elevator_hall');
-  placed.push(place('panel', end + 900, 0, 80, ctx.exitOpen ? '승강기 패널 (EXIT 불이 켜짐)' : '승강기 패널', { exit: !!ctx.exitOpen }));
-  placed.push(place('elevator', end + 1080, 0, 160, '열린 엘리베이터'));
+  if (!room || room.exit) {
+    const end = addRoom(ctx.exitOpen ? 'exit_hall' : 'elevator_hall');
+    placed.push(place('panel', end + 900, 0, 80, ctx.exitOpen ? '승강기 패널 (EXIT 불이 켜짐)' : '승강기 패널', { exit: !!ctx.exitOpen }));
+    placed.push(place('elevator', end + 1080, 0, 160, '열린 엘리베이터'));
+  }
 
   // ── 떠도는 승객 (로비 L2부터, 층마다 p=0.5). 정직/거짓 50:50, epoch마다 다시 섞임. 사연 길이가 단서(규칙 8).
-  if (depth >= 2 && type !== 'deep' && r() < 0.5) {
+  if (room ? room.passenger : depth >= 2 && type !== 'deep' && r() < 0.5) {
     const kinds = ['three_years', 'markers', 'supply', 'nothuman', 'missing'] as const;
     const kind = pick(r, depth < 5 ? kinds.slice(0, 3) : kinds);
     const honest = rng(mix(ctx.seed, depth, ctx.epoch, 5150))() < 0.5;
@@ -360,7 +402,7 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
     }
   }
   const palette = def.palette;
-  const label = `${depthLabel(depth)} · ${def.label}${sub ? ` (${REPLICA_SUB_LABEL[sub]})` : ''}`;
+  const label = `${depthLabel(depth)} · ${def.label}${sub ? ` (${REPLICA_SUB_LABEL[sub]})` : ''}${room ? ` · ${room.name}` : ''}`;
   const tuning: Record<string, number> = {
     chaseSpeed: (150 + depth * 6) * (ctx.flags.includes('chase_fast') ? 1.4 : 1),
     noiseMul: ctx.flags.includes('silent_fast') ? 2 : 1,
@@ -386,8 +428,9 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
     palette,
     fallback: fallback ?? '',
     tries: 0,
+    room: room ? { col: room.col, row: room.row, name: room.name } : undefined,
   };
-  addMetro(floor, ctx, r);
+  if (!room) addMetro(floor, ctx, r);
   return floor;
 }
 
@@ -498,9 +541,10 @@ function propLabel(type: FloorType, sub: ReplicaSub | null, r: Rng): string {
 /** 검증. 문제 목록을 돌려준다(빈 배열 = 통과). */
 export function validateFloor(f: Floor): string[] {
   const bad: string[] = [];
-  if (!f.segments[0]?.ref.startsWith('room:elevator_hall')) bad.push('시작 홀 없음');
+  const room = !!f.room;
+  if (!room && !f.segments[0]?.ref.startsWith('room:elevator_hall')) bad.push('시작 홀 없음');
   const last = f.segments[f.segments.length - 1];
-  if (!last || !(last.ref === 'room:elevator_hall' || last.ref === 'room:exit_hall')) bad.push('끝 홀 없음');
+  if (!room && (!last || !(last.ref === 'room:elevator_hall' || last.ref === 'room:exit_hall'))) bad.push('끝 홀 없음');
   const terr = f.segments.flatMap((s) => s.terrain);
   for (const t of terr) if (t.kind === 'pit' && t.x1 - t.x0 > MAX_PIT) bad.push(`구덩이 너무 넓음 ${t.x0}`);
   // 구덩이와 낮은 천장이 겹치면(앉은 채 점프 불가) 길이 없다
@@ -508,7 +552,7 @@ export function validateFloor(f: Floor): string[] {
   // 구덩이 끼리 붙어 있으면 착지 자리 없음
   const pits = terr.filter((t) => t.kind === 'pit').sort((a, b) => a.x0 - b.x0);
   for (let i = 1; i < pits.length; i++) if (pits[i].x0 - pits[i - 1].x1 < 80) bad.push('구덩이 사이 착지 자리 없음');
-  if (f.type !== 'deep' && !f.placed.some((p) => p.kind === 'servicedoor' || p.kind === 'hatch')) bad.push('정비 구역 입구 없음');
+  if (!room && f.type !== 'deep' && !f.placed.some((p) => p.kind === 'servicedoor' || p.kind === 'hatch')) bad.push('정비 구역 입구 없음');
   // 열쇠가 문보다 앞: 갈림길 표지 → 문 → 셔터 순서
   for (const sh of f.placed.filter((p) => p.kind === 'shutter')) {
     if (sh.data.fork !== undefined) {
@@ -522,23 +566,25 @@ export function validateFloor(f: Floor): string[] {
       if (sw.length < 2 || sw.some((s) => s.x > sh.x)) bad.push('스위치 순서');
     }
   }
-  if (f.type === 'puzzle' && !f.placed.some((p) => p.kind === 'shutter')) bad.push('퍼즐 장치 없음');
-  if (f.type === 'replica' && f.sub === 'pretending' && !f.placed.some((p) => p.kind === 'table')) bad.push('밥상 없음');
+  if (!room && f.type === 'puzzle' && !f.placed.some((p) => p.kind === 'shutter')) bad.push('퍼즐 장치 없음');
+  if (!room && f.type === 'replica' && f.sub === 'pretending' && !f.placed.some((p) => p.kind === 'table')) bad.push('밥상 없음');
   if (f.goal) {
     if (f.goal.kind === 'marks' && f.placed.filter((p) => p.kind === 'mark').length < f.goal.need) bad.push('표식 모자람');
     if (!f.placed.some((p) => p.kind === 'goalwall')) bad.push('목표 벽 없음');
   }
-  if (f.guardian) {
+  if (f.guardian && !room) {
     const g = f.spawns.find((s) => s.role === 'guardian');
     const panel = f.placed.find((p) => p.kind === 'panel');
     if (!g || !panel || g.x > panel.x) bad.push('수호자 방 도달');
   }
-  if (!f.placed.some((p) => p.kind === 'panel')) bad.push('패널 없음');
+  if (!room && !f.placed.some((p) => p.kind === 'panel')) bad.push('패널 없음');
   for (const g of f.placed.filter((p) => p.kind === 'locked')) {
     if (!f.placed.some((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < g.x - 100)) bad.push('열쇠 찾으러 갈 입구가 셔터 뒤');
     const panel = f.placed.find((p) => p.kind === 'panel');
     if (panel && panel.x < g.x) bad.push('패널이 셔터 앞');
   }
-  if (f.depth >= 4 && f.type !== 'deep' && !f.placed.some((p) => p.kind === 'sign' && p.data.rule)) bad.push('규칙 장치 없음');
+  if (!room && f.depth >= 4 && f.type !== 'deep' && !f.placed.some((p) => p.kind === 'sign' && p.data.rule)) bad.push('규칙 장치 없음');
+  // 방: 꼭 넣을 장치가 들어갔는가
+  if (room && f.type === 'puzzle' && f.segments.some((sg) => sg.ref === 'chunk:p_fork' || sg.ref === 'chunk:p_switch') && !f.placed.some((p) => p.kind === 'shutter')) bad.push('퍼즐 장치 없음');
   return bad;
 }

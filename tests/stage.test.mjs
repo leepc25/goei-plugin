@@ -32,6 +32,37 @@ test('층 생성: 300 씨앗 × 유형 전부 검증 통과, 고정 배치는 �
   assert.ok(fallback / n < 0.03, `고정 배치 ${fallback}/${n}`);
 });
 
+test('세상 생성: 씨앗 × 깊이마다 방 격자가 풀리고(열쇠→잠금→출구), 깊을수록 커지고 잠금이 는다', () => {
+  let leaves = 0,
+    secrets = 0,
+    n = 0;
+  const lk = {};
+  for (let seed = 1; seed <= 60; seed++)
+    for (const depth of [1, 2, 3, 4, 6, 9, 12, 16, 20]) {
+      const type = depth <= 3 ? 'lobby' : TYPES[(seed + depth) % TYPES.length];
+      const w = S.makeWorld({ seed, depth, type, sub: type === 'replica' ? 'red' : null, epoch: 0 });
+      assert.deepEqual(S.validateWorld(w), [], `seed ${seed} 깊이 ${depth} ${type}`);
+      assert.ok(w.locks <= S.lockCount(depth, type));
+      (lk[depth] ??= []).push(w.locks);
+      assert.ok(w.rooms.some((q) => q.panel), '패널 방');
+      leaves += w.rooms.filter((q) => S.DIRS.filter((d) => q.open[d]).length === 1).length;
+      secrets += w.rooms.some((q) => q.role === 'secret') ? 1 : 0;
+      n++;
+    }
+  assert.ok(leaves / n >= 2, `막다른 방 평균 ${leaves / n}`);
+  assert.ok(secrets / n >= 0.4, `숨은 방 비율 ${secrets / n}`);
+  const avg = (d) => lk[d].reduce((a, b) => a + b, 0) / lk[d].length;
+  assert.equal(avg(1), 0);
+  assert.ok(avg(2) >= 0.7 && avg(20) > avg(4) + 0.5, `잠금 평균 ${[1, 2, 4, 20].map(avg)}`);
+  const [c1, r1] = S.worldSize(1, 'lobby'),
+    [c9, r9] = S.worldSize(12, 'dark');
+  assert.ok(c9 * r9 > c1 * r1);
+  // 같은 씨앗 = 같은 세상
+  const a = S.makeWorld({ seed: 7, depth: 5, type: 'dark', sub: null, epoch: 0 }),
+    b = S.makeWorld({ seed: 7, depth: 5, type: 'dark', sub: null, epoch: 0 });
+  assert.deepEqual(a, b);
+});
+
 test('같은 씨앗이면 같은 층, 다른 씨앗이면 다른 층', () => {
   const a = S.makeFloor(ctxFor(42, 6, 'chase'));
   const b = S.makeFloor(ctxFor(42, 6, 'chase'));
@@ -129,7 +160,34 @@ test('출동마다 1~2줄이 뒤집힌다 (변형)', () => {
   assert.ok(fast.tuning.chaseSpeed > slow.tuning.chaseSpeed);
 });
 
-// ── 걸어서 끝까지: 대역 엔진 + 자동 조작으로 로비 → 지하 여러 층 → 정비 구역 → 다락방 로프 귀환
+// 방 격자 길찾기: 지금 지나갈 수 있는 연결만 (숨은 연결은 부순 것, 잠금은 연 것이나 열쇠 든 것)
+function route(stage, w, from, isGoal, ignoreLocks = false) {
+  const out = stage.outing();
+  const pass = (rm, d) => {
+    if (!rm.open[d]) return false;
+    const eid = S.edgeId(w, rm, d);
+    if (rm.hidden[d] && !out.broken.includes(eid)) return false;
+    const k = rm.lock[d];
+    return ignoreLocks || !k || out.unlocked.includes(eid) || out.wkeys.includes(`${w.depth}:${k}`);
+  };
+  const id = (rm) => `${rm.col},${rm.row}`;
+  const first = new Map([[id(from), null]]);
+  const q = [from];
+  while (q.length) {
+    const rm = q.shift();
+    if (rm !== from && isGoal(rm)) return { room: rm, dir: first.get(id(rm)) };
+    for (const d of S.DIRS) {
+      if (!pass(rm, d)) continue;
+      const b = S.across(w, rm, d);
+      if (!b || first.has(id(b))) continue;
+      first.set(id(b), rm === from ? d : first.get(id(rm)));
+      q.push(b);
+    }
+  }
+  return null;
+}
+
+// ── 걸어서 끝까지: 대역 엔진 + 자동 조작으로 로비 → 층마다 모든 방 정리 → 승강기 → … → 정비 구역 → 다락방 로프 귀환
 function bot(eng) {
   const p = eng.p;
   const plan = eng.plan;
@@ -162,7 +220,7 @@ function bot(eng) {
       k.crouch = true;
       return k;
     }
-    k.x = Math.sign(dx);
+    k.x = Math.abs(dx) < 8 ? 0 : Math.sign(dx);
   } else k.x = 1;
   // 지형
   const ahead = p.x + k.x * 70;
@@ -200,35 +258,70 @@ function bot(eng) {
   return k;
 }
 
-test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·다락방 로프 귀환까지 막힘 없이', () => {
+/** 방 안: 목표 x까지 가는 길의 셔터·주민·밥상·표지 */
+function inTheWay(e, f, tx) {
+  const props = e.props;
+  const px = e.p.x;
+  const lo = Math.min(px, tx) - 30,
+    hi = Math.max(px, tx) + 30;
+  const tag = (p) => p.id + e.plan.id + e.run.seed;
+  for (const sh of f.placed.filter((x) => x.kind === 'shutter').sort((a, b) => Math.abs(a.x - px) - Math.abs(b.x - px))) {
+    const pr = props.find((p) => p.id === `p${sh.id}`);
+    if (!pr?.solid || sh.x < lo || sh.x > hi) continue;
+    if (px > sh.x) return pr; // 뒤편: 손잡이로 올린다
+    if (sh.data.fork !== undefined) {
+      const d = f.placed.find((x) => x.kind === 'door' && x.data.fork === sh.data.fork && x.data.correct);
+      return props.find((p) => p.id === `p${d.id}`);
+    }
+    const order = String(sh.data.order).split('-').map(Number);
+    const done = (bot.seq ??= {});
+    const key = e.run.seed + e.plan.id + sh.id;
+    const n = (done[key] ??= 0);
+    const sw = f.placed.find((x) => x.kind === 'switch' && x.data.group === sh.data.group && x.data.n === order[n]);
+    if (!sw) throw new Error(`스위치 ${order} n=${n}`);
+    const pr2 = props.find((p) => p.id === `p${sw.id}`);
+    if (pr2 && Math.abs(pr2.x - px) < 40 && e.tick % 2 === 0 && e.nearestProp()?.id === pr2.id) done[key] = n + 1;
+    return pr2;
+  }
+  const between = (p) => p.x > lo && p.x < hi;
+  const npc = props.find((p) => p.kind === 'npc' && f.type === 'replica' && between(p) && !(bot.greeted ??= new Set()).has(tag(p)));
+  if (npc) {
+    if (Math.abs(npc.x - px) < 40) bot.greeted.add(tag(npc));
+    return npc;
+  }
+  for (const [kind, set] of [['table', 'ate'], ['sign', 'read']]) {
+    const it = props.find((p) => p.kind === kind && between(p) && !(bot[set] ??= new Set()).has(tag(p)));
+    if (it) {
+      if (Math.abs(it.x - px) < 40) bot[set].add(tag(it));
+      return it;
+    }
+  }
+  return null;
+}
+
+test('걸어서 확인: 로비 L1부터 층마다 모든 방을 정리하고 승강기로 내려가, 정비 구역 다락방 로프로 귀환', () => {
   const metaStore = { m: null, load() { return this.m; }, save(m) { this.m = JSON.parse(JSON.stringify(m)); } };
   const stage = S.createElevatorStage(metaStore);
-  const metro = { gates: 0, keys: 0, sides: 0, ups: 0, shortcuts: 0 };
-  for (const seed of Array.from({ length: 25 }, (_, i) => 11 + i * 37)) {
+  const tally = { unlocked: 0, keys: 0, rewards: 0, ups: 0, rooms: 0, broken: 0 };
+  for (const seed of Array.from({ length: 10 }, (_, i) => 11 + i * 37)) {
     const eng = new DemoEngine(stage, { seed, agent: 'jyaldi' });
     eng.start();
     const seenTypes = new Set();
-    let mode = 'down'; // 지하 6층까지 내려간 뒤 정비 구역으로
+    let mode = 'down'; // 깊이 5까지 내려간 뒤 정비 구역으로
     let presses = 0;
     bot.want = (e) => {
-      const plan = e.plan;
-      const st = plan.stage;
+      const st = e.plan.stage;
       const out = stage.outing();
       const props = e.props;
       const f = st.floor;
       const upPick = props.find((p) => p.id.startsWith('up:'));
       if (upPick) return upPick;
-      if (st.where === 'side') return props.find((p) => p.id === 'xchest' && p.label !== '빈 배낭') ?? props.find((p) => p.id === 'xback');
       if (st.where === 'car') return props.find((p) => p.id === (presses++ % 5 === 0 ? 'greet' : 'btn0')) ?? props.find((p) => p.id === 'btn0');
       if (st.where === 'service') {
         const z = out.service;
-        // 열쇠 찾기 → 들고 위층으로 (방화셔터) / 아니면 다락방 로프
-        const needKey = out.services[out.serviceDepth]?.key && z.keyCell;
-        const goUp = !needKey && out.keys.includes(out.serviceDepth) && !out.gatesOpen.includes(out.serviceDepth);
-        const target = needKey ? z.keyCell : goUp ? z.entryCell : z.atticCell;
+        const target = z.atticCell;
         const [c, r] = out.cell;
-        if (c === target[0] && r === target[1]) return props.find((p) => p.kind === (needKey ? 'key' : goUp ? 'up' : 'rope'));
-        // 칸 길찾기
+        if (c === target[0] && r === target[1]) return props.find((p) => p.kind === 'rope');
         const prev = new Map([[`${c},${r}`, null]]);
         const q = [[c, r]];
         while (q.length) {
@@ -245,64 +338,50 @@ test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·�
       }
       if (!f) return props.find((p) => p.kind === 'van');
       seenTypes.add(f.type);
-      // 잠긴 방화셔터: 열쇠가 있으면 열고, 없으면 셔터 앞 정비 구역 입구로 (열쇠는 그 층 정비 구역에)
-      const gate = f.placed.find((x) => x.kind === 'locked');
-      if (gate && !out.gatesOpen.includes(f.depth) && e.p.x < gate.x + 10 && !f.placed.some((sh) => sh.kind === 'shutter' && sh.x > e.p.x && sh.x < gate.x && e.props.find((q) => q.id === `p${sh.id}`)?.solid) && !props.some((p) => p.kind === 'npc' && f.type === 'replica' && p.x < gate.x && p.x > e.p.x - 30 && !(bot.greeted ??= new Set()).has(p.id + e.plan.id + e.run.seed))) {
-        if (out.keys.includes(f.depth)) return props.find((p) => p.id === `p${gate.id}`);
-        return props.filter((p) => (p.kind === 'servicedoor' || p.kind === 'hatch') && p.x < gate.x).sort((a, b) => Math.abs(a.x - e.p.x) - Math.abs(b.x - e.p.x))[0];
+      const w = stage.worldAt(f.depth);
+      const rm = S.roomAt(w, f.room.col, f.room.row);
+      const wv = stage.mapView().worlds.find((x) => x.depth === f.depth);
+      const clearOf = (q) => !!wv.rooms.find((v) => v.col === q.col && v.row === q.row)?.clear;
+      const go = (x) => inTheWay(e, f, x) ?? { id: '__walk', x };
+      // 방 안: 열쇠 줍기 → 싸움(방을 끝까지 쓸어 본다) → 보상 배낭
+      const key = props.find((p) => p.kind === 'key');
+      if (key) return go(key.x).id === '__walk' ? key : go(key.x);
+      if (!clearOf(rm)) {
+        const sw = (bot.sweep ??= {});
+        const k = e.plan.id + seed;
+        if (sw[k] === undefined) sw[k] = e.p.x < f.width / 2 ? 1 : -1;
+        const tx = sw[k] > 0 ? f.width - 140 : 140;
+        if (Math.abs(e.p.x - tx) < 50) sw[k] = -sw[k];
+        return go(tx);
       }
-      const gx0 = f.placed.find((x) => x.kind === 'locked' && !out.gatesOpen.includes(f.depth))?.x ?? Infinity;
-      // 곁가지 방: 앞쪽 가까운 문은 들어가 본다 (배낭 → 강화)
-      const sd = f.placed.find((x) => x.kind === 'sidedoor' && !out.sides[`${f.depth}:p${x.id}`]?.done && x.x > e.p.x - 30 && x.x < e.p.x + 500 && (x.x < gx0 || e.p.x > gx0) && !f.placed.some((sh) => sh.kind === 'shutter' && sh.x > e.p.x && sh.x < x.x && e.props.find((q) => q.id === `p${sh.id}`)?.solid));
-      if (sd) return props.find((p) => p.id === `p${sd.id}`);
-      // 퍼즐: 정답 문 / 순서대로 스위치
-      for (const sh of f.placed.filter((x) => x.kind === 'shutter')) {
-        const open = !e.props.find((p) => p.id === `p${sh.id}`)?.solid;
-        if (open || e.p.x > sh.x) continue;
-        if (sh.data.fork !== undefined) {
-          const d = f.placed.find((x) => x.kind === 'door' && x.data.fork === sh.data.fork && x.data.correct);
-          return props.find((p) => p.id === `p${d.id}`);
-        }
-        const order = String(sh.data.order).split('-').map(Number);
-        const done = (bot.seq ??= {});
-        const key = e.run.seed + e.plan.id + sh.id;
-        const n = (done[key] ??= 0);
-        const sw = f.placed.find((x) => x.kind === 'switch' && x.data.group === sh.data.group && x.data.n === order[n]);
-        if (!sw) throw new Error(`스위치 ${order} n=${n} says=${e.says.map((x) => x.text)} ev=${JSON.stringify(e.events.slice(-5))}`);
-        const pr = props.find((p) => p.id === `p${sw.id}`);
-        if (pr && Math.abs(pr.x - e.p.x) < 40 && e.tick % 2 === 0 && e.nearestProp()?.id === pr.id) done[key] = n + 1;
-        return pr;
-      }
-      // 재현: 주민에게 인사, 밥상
-      const npc = props.find((p) => p.kind === 'npc' && p.x > e.p.x - 30 && !(bot.greeted ??= new Set()).has(p.id + e.plan.id + e.run.seed) && f.type === 'replica');
-      if (npc) {
-        if (Math.abs(npc.x - e.p.x) < 40) bot.greeted.add(npc.id + e.plan.id + e.run.seed);
-        return npc;
-      }
-      const gx = f.placed.find((x) => x.kind === 'locked' && !out.gatesOpen.includes(f.depth))?.x ?? Infinity;
-      const sign = props.find((p) => p.kind === 'sign' && p.x > e.p.x - 30 && p.x < e.p.x + 400 && (p.x < gx || e.p.x > gx) && !(bot.read ??= new Set()).has(p.id + e.plan.id + e.run.seed));
-      if (sign) {
-        if (Math.abs(sign.x - e.p.x) < 40) bot.read.add(sign.id + e.plan.id + e.run.seed);
-        return sign;
-      }
-      const table = props.find((p) => p.kind === 'table' && p.x > e.p.x - 30 && !(bot.ate ??= new Set()).has(p.id + e.plan.id + e.run.seed));
-      if (table) {
-        if (Math.abs(table.x - e.p.x) < 40) bot.ate.add(table.id + e.plan.id + e.run.seed);
-        return table;
-      }
-      // 정비 구역으로: 앞쪽 입구 먼저 (추격 층은 뒤가 막힌다. 곁가지 방에서 나오면 층 끝 쪽에 있을 수 있다)
-      if (mode === 'service') {
-        const ins = props.filter((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
-        return ins.find((p) => p.x > e.p.x - 30) ?? ins.sort((a, b) => b.x - a.x)[0];
-      }
-      return props.find((p) => p.kind === 'panel');
+      const pack = props.find((p) => p.kind === 'pack' && p.label !== '빈 배낭');
+      if (pack) return go(pack.x).id === '__walk' ? pack : go(pack.x);
+      // 다음 방: 층을 다 정리하기 전에는 안 정리된 방·안 주운 열쇠로, 끝나면 패널(또는 정비 구역 입구)로
+      const done = out.clearedFloors.includes(f.depth);
+      const svc = props.find((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
+      if (done && mode === 'service' && svc) return go(svc.x).id === '__walk' ? svc : go(svc.x);
+      const panel = props.find((p) => p.kind === 'panel');
+      if (done && panel && (mode === 'down' || (rm.col === w.arrival[0] && rm.row === w.arrival[1]))) return go(panel.x).id === '__walk' ? panel : go(panel.x);
+      const isGoal = !done
+        ? (q) => (q.role !== 'secret' && !clearOf(q)) || (q.key && !out.wkeys.includes(`${f.depth}:${q.key}`))
+        : mode === 'service'
+          ? (q) => q.col === w.arrival[0] && q.row === w.arrival[1]
+          : (q) => q.panel;
+      const r = route(stage, w, rm, isGoal);
+      if (!r) throw new Error(`seed ${seed}: 갈 방이 없다 (${f.label}) done=${done} keys=${out.wkeys} unlocked=${out.unlocked}`);
+      const d = r.dir;
+      const gate = f.placed.find((x) => x.kind === 'locked' && x.data.dir === d && props.some((p) => p.id === `p${x.id}`));
+      const door = gate ?? f.placed.find((x) => x.data.dir === d && ['wdoor', 'wup', 'wdown', 'crack', 'vent'].includes(x.kind));
+      if (!door) throw new Error(`seed ${seed}: ${d} 문 없음 (${f.label})`);
+      const pr = props.find((p) => p.id === `p${door.id}`);
+      return go(pr.x).id === '__walk' ? pr : go(pr.x);
     };
     let guard = 0;
-    while (!eng.ended && guard++ < 30 * 60 * 60) {
+    while (!eng.ended && guard++ < 30 * 60 * 120) {
       const out = stage.outing();
-      if (out.depth >= 9 && mode === 'down') mode = 'service';
-      const kk = bot(eng); bot.lastK = kk;
-      if (process.env.TRACE && guard > 30 * 60 * 60 - 3) { const mp = eng.api.movePlayer; eng.api.movePlayer = (x, y) => { console.log('MOVE', x, y, new Error().stack.split('\n').slice(2, 5).join(' | ')); mp(x, y); }; }
+      if (out.depth >= 5 && mode === 'down') mode = 'service';
+      const kk = bot(eng);
+      bot.lastK = kk;
       eng.step(kk);
       // 사물함 뒤 깊이에 숨지 않는다 (검수 16-1·18-1)
       if (eng.plan.stage.where === 'floor')
@@ -313,22 +392,22 @@ test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·�
         }
     }
     const out = stage.outing();
-    metro.gates += out.gatesOpen.length;
-    metro.keys += out.keys.length;
-    metro.sides += Object.values(out.sides).filter((x) => x.done).length;
-    metro.ups += out.upgrades.length;
-    metro.shortcuts += out.shortcuts.length;
-    assert.equal(eng.ended, 'return', `seed ${seed}: 로프로 귀환 (깊이 ${out.depth}, ${eng.plan.title}) x=${Math.round(eng.p.x)} y=${Math.round(eng.p.y)} enc=${eng.encActive} en=${eng.enemies.filter((e) => e.alive).map((e) => `${e.kind}@${Math.round(e.x)},${Math.round(e.y)}`)} terr=${JSON.stringify(eng.plan.stage.terrain.filter((t) => t.x1 > eng.p.x - 400 && t.x0 < eng.p.x + 400))} k=${JSON.stringify(bot.lastK)} goal=${bot.want(eng)?.id} near=${eng.nearestProp()?.id} keys=${out.keys} gates=${out.gatesOpen} where=${out.where} bounds=${eng.bounds} solid=${eng.props.filter((q)=>q.solid).map((q)=>q.id+':'+q.kind+'@'+q.x+'w'+q.w)} ox=${eng.p.px} encDone=${[...eng.encDone]} encs=${eng.plan.encounters.map((e)=>e.triggerX)} hurt=${eng.p.hurtT} atk=${eng.p.atk} says=${eng.says.map((s)=>s.text).join("|")} props=${eng.props.filter((q) => Math.abs(q.x - eng.p.x) < 300).map((q) => q.kind + '@' + q.x + (q.solid ? 'S' : ''))}`);
-    assert.ok(out.visited.length >= 7, `seed ${seed} 층 ${out.visited.length}`);
-    assert.ok(seenTypes.size >= 3, `유형 ${[...seenTypes]}`);
+    tally.unlocked += out.unlocked.length;
+    tally.keys += out.wkeys.length;
+    tally.rewards += out.rewards.length;
+    tally.ups += out.upgrades.length;
+    tally.broken += out.broken.length;
+    tally.rooms += Object.values(out.seenRooms).reduce((a, b) => a + b.length, 0);
+    assert.equal(eng.ended, 'return', `seed ${seed}: 로프로 귀환 (깊이 ${out.depth}, ${eng.plan.title}) x=${Math.round(eng.p.x)} goal=${bot.want(eng)?.id} near=${eng.nearestProp()?.id} cleared=${out.clearedFloors} where=${out.where} says=${eng.says.slice(-4).map((s) => s.text).join('|')} props=${eng.props.filter((q) => Math.abs(q.x - eng.p.x) < 300).map((q) => q.kind + '@' + q.x + (q.solid ? 'S' : ''))}`);
+    assert.deepEqual(out.clearedFloors.slice(0, 4), [1, 2, 3, 4], `seed ${seed}: 층마다 다 정리하고 내려갔다 ${out.clearedFloors}`);
+    assert.ok(seenTypes.size >= 2, `유형 ${[...seenTypes]}`);
   }
-  assert.ok(metaStore.m.deepest >= 9);
-  assert.ok(Object.keys(metaStore.m.known).length >= 5, `송신된 규칙 ${Object.keys(metaStore.m.known)}`);
-  // 출동 단위 메트로배니아: 셔터 → 정비 구역 열쇠 → 되돌아와 열기, 곁가지 방 배낭, 강화 선택, 아래 점검문 지름길
-  console.log('metro', JSON.stringify(metro));
-  assert.ok(metro.gates >= 25 && metro.keys >= metro.gates, `셔터·열쇠 ${JSON.stringify(metro)}`);
-  assert.ok(metro.sides >= 25, `곁가지 ${JSON.stringify(metro)}`);
-  assert.ok(metro.ups >= 25, `강화 ${JSON.stringify(metro)}`);
+  assert.ok(metaStore.m.deepest >= 5);
+  assert.ok(Object.keys(metaStore.m.known).length >= 4, `송신된 규칙 ${Object.keys(metaStore.m.known)}`);
+  console.log('world', JSON.stringify(tally));
+  assert.ok(tally.unlocked >= 10 && tally.keys >= tally.unlocked, `잠금·열쇠 ${JSON.stringify(tally)}`);
+  assert.ok(tally.rewards >= 20 && tally.ups >= 20, `보상·강화 ${JSON.stringify(tally)}`);
+  assert.ok(tally.rooms >= 150, `방 ${JSON.stringify(tally)}`);
 });
 
 test('대사 모듈 연결: board 훅이 맡으면 인사·닫힘 소품을 치우고, 돌려준 결과로 총애를 바꾼다', () => {
@@ -351,7 +430,24 @@ test('대사 모듈 연결: board 훅이 맡으면 인사·닫힘 소품을 치�
   const k = { x: 0, y: 0, run: false, jump: false, attack: false, interact: false, crouch: false };
   eng.step(k);
   assert.deepEqual(calls[0], { announce: 1 });
+  // 패널 있는 방까지 문으로 (클리어했다고 치고)
+  stage.outing().clearedFloors.push(1);
+  for (let n = 0; n < 30 && !eng.props.some((p) => p.kind === 'panel'); n++) {
+    const w = stage.worldAt(1);
+    const f = eng.plan.stage.floor;
+    const r = route(stage, w, S.roomAt(w, f.room.col, f.room.row), (q) => q.panel, true);
+    const door = f.placed.find((x) => x.data.dir === r.dir && ['wdoor', 'wup', 'wdown'].includes(x.kind));
+    eng.encDone = new Set(eng.plan.encounters.map((_, i) => i));
+    eng.bounds = [0, eng.plan.length];
+    eng.p.x = door.x;
+    eng.enemies = [];
+    eng.encActive = -1;
+    eng.step({ ...k, interact: true });
+    for (let i = 0; i < 3; i++) eng.step(k);
+  }
   const panel = eng.props.find((p) => p.kind === 'panel');
+  eng.encDone = new Set(eng.plan.encounters.map((_, i) => i));
+  eng.bounds = [0, eng.plan.length];
   eng.p.x = panel.x;
   eng.step({ ...k, interact: true });
   for (let i = 0; i < 5 && eng.plan.stage.where !== 'car'; i++) eng.step(k);
@@ -369,30 +465,64 @@ test('대사 모듈 연결: board 훅이 맡으면 인사·닫힘 소품을 치�
   assert.ok(stage.outing().found.includes('greet'), '인사 규칙을 찾은 것으로 남아야 함');
 });
 
-test('메트로배니아: 해치 → 정비 구역 → 아래 점검문(지름길) → 위층 점검문으로 되돌아 올라가기, 층은 그대로 기억', () => {
+test('방 격자: 문으로 옆·위아래 방, 돌아오면 같은 방, 잠금은 열쇠로, 클리어 전 패널·아래 점검문은 꺼짐, 정비 구역 다녀오기', () => {
   const metaStore = { m: null, load() { return this.m; }, save(m) { this.m = JSON.parse(JSON.stringify(m)); } };
   const stage = S.createElevatorStage(metaStore);
   const eng = new DemoEngine(stage, { seed: 4242, agent: 'jyaldi' });
   eng.start();
   const idle = { x: 0, y: 0, run: false, jump: false, attack: false, interact: false, crouch: false };
+  const out = () => stage.outing();
   const use = (pred) => {
     const pr = eng.props.find(pred);
     assert.ok(pr, `소품 없음 (${eng.plan.title}) ${eng.props.map((q) => q.kind + ':' + q.id).join(' ')}`);
+    eng.encDone = new Set(eng.plan.encounters.map((_, i) => i));
+    eng.bounds = [0, eng.plan.length];
     eng.p.x = pr.x;
     eng.encActive = -1;
     eng.enemies = [];
-    eng.step({ ...idle, interact: true });
+    eng.step({ ...idle, interact: true, crouch: true });
     for (let i = 0; i < 3; i++) eng.step(idle);
     return pr;
   };
-  const out = () => stage.outing();
-  const l1 = eng.plan;
-  // L1: 바닥 보급품 하나 줍기 (없으면 건너뜀)
-  const item = eng.props.find((q) => q.kind === 'item');
-  if (item) use((q) => q.id === item.id);
-  use((q) => q.kind === 'hatch' || q.kind === 'servicedoor');
+  const here = () => eng.plan.stage.floor.room;
+  const doorTo = (d) => {
+    const f = eng.plan.stage.floor;
+    const gate = f.placed.find((x) => x.kind === 'locked' && x.data.dir === d && eng.props.some((p) => p.id === `p${x.id}`));
+    const door = gate ?? f.placed.find((x) => x.data.dir === d && ['wdoor', 'wup', 'wdown'].includes(x.kind));
+    return use((q) => q.id === `p${door.id}`);
+  };
+  /** 문을 E로 열며 목표 방까지 (지금 지나갈 수 있는 길만) */
+  const travel = (isGoal) => {
+    for (let n = 0; n < 40; n++) {
+      const w = stage.worldAt(out().depth);
+      const rm = S.roomAt(w, here().col, here().row);
+      if (isGoal(rm)) return rm;
+      const r = route(stage, w, rm, isGoal);
+      assert.ok(r, `길 없음 ${here().col},${here().row}`);
+      doorTo(r.dir);
+    }
+    throw new Error('방을 못 찾음');
+  };
+  const w1 = stage.worldAt(1);
+  assert.deepEqual(S.validateWorld(w1), []);
+  assert.deepEqual([here().col, here().row], w1.arrival);
+  const a1 = eng.plan;
+  // 옆 방으로 갔다가 돌아오면 같은 방(다시 만들지 않음), 들어온 문 옆에 선다
+  const arr = S.roomAt(w1, ...w1.arrival);
+  const d0 = S.DIRS.find((d) => arr.open[d] && !arr.hidden[d] && !arr.lock[d]);
+  doorTo(d0);
+  const nb = S.across(w1, arr, d0);
+  assert.deepEqual([here().col, here().row], [nb.col, nb.row]);
+  doorTo(S.OPP[d0]);
+  assert.equal(eng.plan, a1, '같은 방');
+  // 클리어 전: 패널은 꺼져 있다
+  travel((q) => q.panel);
+  use((q) => q.kind === 'panel');
+  assert.equal(eng.plan.stage.where, 'floor', '클리어 전에는 승강기를 못 탄다');
+  // 정비 구역: 도착 방 점검문 → 아래 점검문은 잠김 → 위로 나오면 같은 방
+  travel((q) => q.col === w1.arrival[0] && q.row === w1.arrival[1]);
+  use((q) => q.kind === 'servicedoor' || q.kind === 'hatch');
   assert.equal(out().where, 'service');
-  // 칸을 따라 아래 점검문까지
   const walk = (target, thing) => {
     for (let n = 0; n < 30; n++) {
       const z = out().service;
@@ -409,36 +539,44 @@ test('메트로배니아: 해치 → 정비 구역 → 아래 점검문(지름�
       while (prev.get(cur) !== `${c},${r}`) cur = prev.get(cur);
       const [nx, ny] = cur.split(',').map(Number);
       const kind = nx > c ? 'right' : nx < c ? 'left' : ny > r ? 'ladder_down' : 'ladder_up';
-      eng.p.crouching = true;
-      const pr = eng.props.find((p) => p.kind === kind);
-      eng.p.x = pr.x;
-      eng.encActive = -1;
-      eng.enemies = [];
-      eng.step({ ...idle, interact: true, crouch: true });
-      for (let i = 0; i < 3; i++) eng.step({ ...idle, crouch: true });
+      use((p) => p.kind === kind);
     }
     throw new Error('정비 구역 길 못 찾음');
   };
   walk(out().service.downCell, 'down');
-  assert.equal(out().where, 'floor');
-  assert.equal(out().depth, 2);
-  assert.ok(out().shortcuts.includes(2), '아래층 위층 점검문이 열린 지름길');
-  assert.ok(Math.abs(eng.p.x - 1210) < 40, `위층 점검문 앞에 나온다 x=${eng.p.x}`);
-  const f2 = eng.plan;
-  // 위층 점검문으로 되돌아 올라간다 → 정비 구역 아래 점검문 칸 (다시 짜였지만 아래 점검문 자리는 그대로)
-  const upper = f2.stage.floor.placed.find((q) => q.kind === 'upper');
-  use((q) => q.id === `p${upper.id}`);
-  assert.equal(out().where, 'service');
-  assert.deepEqual(out().cell, out().service.downCell);
-  assert.equal(out().services[1].reroll, 1, '나갔다 들어오면 다시 짜인다');
+  assert.equal(out().where, 'service', '클리어 전에는 아래 점검문도 잠김');
   walk(out().service.entryCell, 'up');
   assert.equal(out().where, 'floor');
-  assert.equal(out().depth, 1);
-  assert.equal(eng.plan, l1, '같은 층 (다시 만들지 않음)');
-  if (item) assert.ok(!eng.props.some((q) => q.id === item.id), '주운 보급품은 그대로 없다');
-  // 지도: 두 층과 정비 구역, 지름길 표시
+  assert.equal(eng.plan, a1, '들어간 방으로 돌아온다');
+  // 클리어했다고 치고 아래로: L2는 잠금이 하나
+  out().clearedFloors.push(1);
+  use((q) => q.kind === 'servicedoor' || q.kind === 'hatch');
+  walk(out().service.downCell, 'down');
+  assert.equal(out().depth, 2);
+  const w2 = stage.worldAt(2);
+  assert.equal(w2.locks, 1);
+  assert.deepEqual(S.validateWorld(w2), []);
+  // 잠긴 연결 앞까지 → 열쇠 없이는 안 열린다
+  const lockRoom = w2.rooms.find((q) => S.DIRS.some((d) => q.lock[d] && q.region === 0));
+  const ld = S.DIRS.find((d) => lockRoom.lock[d]);
+  travel((q) => q === lockRoom);
+  doorTo(ld);
+  assert.deepEqual([here().col, here().row], [lockRoom.col, lockRoom.row], '열쇠 없이 잠금 통과');
+  // 열쇠 방 → 줍기 → 돌아와 열기
+  const keyRoom = w2.rooms.find((q) => q.key === 1);
+  travel((q) => q === keyRoom);
+  use((q) => q.kind === 'key');
+  assert.ok(out().wkeys.includes('2:1'));
+  travel((q) => q === lockRoom);
+  doorTo(ld);
+  if (ld === 'l' || ld === 'r') doorTo(ld); // 방화셔터를 연 뒤 문
+  const past = S.across(w2, lockRoom, ld);
+  assert.deepEqual([here().col, here().row], [past.col, past.row], '열쇠로 열고 지나감');
+  assert.ok(out().unlocked.includes(S.edgeId(w2, lockRoom, ld)));
+  // 지도: 두 층, 연 잠금은 초록
   const m = stage.mapView();
-  assert.deepEqual(m.floors.map((f) => f.depth), [1, 2]);
-  assert.ok(m.services.some((s) => s.depth === 1 && s.cells.some((c) => c.seen) && s.shortcut));
-  assert.ok(m.floors[1].marks.some((k) => k.kind === 'up' && k.state === 'open'));
+  assert.deepEqual(m.worlds.map((x) => x.depth), [1, 2]);
+  const mv = m.worlds[1].rooms.find((q) => q.col === lockRoom.col && q.row === lockRoom.row);
+  assert.equal(mv.lock[ld].state, 'open');
+  assert.ok(m.services.some((x) => x.depth === 1 && x.cells.some((c) => c.seen)));
 });

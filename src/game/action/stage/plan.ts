@@ -57,12 +57,14 @@ export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [numb
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
 /** 메트로배니아 소품은 이미 있는 그림 종류로 그린다 (그림 없는 종류는 엔진이 안 그린다). 뜻은 module이 placed.kind로 가른다 */
-export const METRO_ART: Record<string, string> = { upper: 'chasedoor', sidedoor: 'door', locked: 'firegate' };
+export const METRO_ART: Record<string, string> = { upper: 'chasedoor', sidedoor: 'door', locked: 'firegate', wdoor: 'door', wup: 'hq_stairs_up', wdown: 'hq_stairs_down', reward: 'pack' };
+/** 심층은 사람 건물이 아니다: 위로는 매달린 줄, 아래로는 무너진 바닥 */
+const DEEP_ART: Record<string, string> = { wup: 'rope', wdown: 'fall' };
 
 export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
   const props: PropSpec[] = f.placed.map((p) => ({
     id: `p${p.id}`,
-    kind: METRO_ART[p.kind] ?? p.kind,
+    kind: (f.type === 'deep' ? DEEP_ART[p.kind] : undefined) ?? METRO_ART[p.kind] ?? p.kind,
     x: p.x,
     y: laneY(p.lane),
     w: p.w,
@@ -242,7 +244,7 @@ export function endingPlan(id: string): StagePlan {
 /* ── 소품 겹침 금지 (검수 12-2) ──
    기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
-const FIXED_PROPS = new Set(['firegate', 'crack', 'vent', 'key', 'elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const FIXED_PROPS = new Set(['firegate', 'hq_stairs_up', 'hq_stairs_down', 'pack', 'crack', 'vent', 'key', 'elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
 const BOARD_GAP = 1400;
 // 소품 그림 폭: 그림이 있으면 그 실제 폭(자판기·소파처럼 넓은 것이 문·명패를 가렸다, 검수 22), 없으면 종류별 기본
 const artW = (p: PropSpec, floorType?: string) => {

@@ -5,7 +5,8 @@ import type { Encounter, FloorPlan, GameEvent, PropSpec, RunConfigCore, StageApi
 import { B12, FLOOR_TYPES, depthLabel } from './data/floortypes';
 import { RULE, ruleText } from './data/rules';
 import { CLOSE_SPAM_LINE, LONELY_LINE, MUTTER, STUCK_LINE, announce, defaultCallout, dealTruth, elevatorButtons, greetLine, type ElevatorButton, type ElevatorLines } from './elevator';
-import { UPPER_X, makeFloor, pickSub, pickType } from './gen/floor';
+import { makeFloor, pickSub, pickType } from './gen/floor';
+import { DIRS, KEY_MARK, OPP, across, edgeId, makeWorld, roomAt, roomFloor } from './gen/world';
 import { cellAt, makeService } from './gen/service';
 import { makeSide } from './gen/side';
 import { SET_BONUS, SET_LABEL, UPGRADE_BY_ID, powerOf, setCounts, upgradeChoices, type Upgrade } from './upgrades';
@@ -13,8 +14,8 @@ import { CHOICE_LABEL, PASSENGER_LABEL, defaultTalk, type PassengerChoice, type 
 import { carPlan, cellPlan, endingPlan, floorPlan, narrowBackSpan, segAt, sidePlan, type StagePlan } from './plan';
 import { mix, rng } from './rng';
 import { addFavor, currentKnown, exitOpen, newMeta, newOuting, reshuffle, ruleVersion, sendFound, type Outing, type StageMeta, type Target } from './state';
-import { LANE_DEPTH, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Placed, type SpawnHook, type Terrain } from './types';
-import type { MapFloor, MapMark, MapService, RunMap } from './runmap';
+import { LANE_DEPTH, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Dir, type Floor, type FloorType, type Placed, type SpawnHook, type Terrain, type World, type WorldRoom } from './types';
+import type { MapRoom, MapService, MapWorld, RunMap } from './runmap';
 
 const DT = 1 / 30;
 
@@ -135,6 +136,8 @@ export interface ElevatorStage extends StageModule {
   debugFillExit(): void;
   /** 출동 지도 (지도 화면·미니맵이 그린다). 출동 중이 아니면 null */
   mapView(): RunMap | null;
+  /** 그 깊이의 방 격자 (시험·시연판) */
+  worldAt(depth: number): World | null;
   resetMeta(): void;
 }
 
@@ -276,30 +279,73 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     }
   };
 
-  // ── 층 만들기
+  // ── 층 만들기: 문이 열리면 그 깊이의 세상(방 격자)을 씨앗으로 짜고, 들어온 방 하나를 판으로 (gen/world.ts)
+  const worlds = new Map<number, World>();
+  let announceNext = false;
+  const worldOf = (depth: number, type: FloorType, sub: Floor['sub']): World => {
+    let w = worlds.get(depth);
+    if (!w) {
+      w = makeWorld({ seed: out!.seed, depth, type, sub, epoch: meta.epoch });
+      worlds.set(depth, w);
+      log(`${w.label} 세상: ${w.cols}×${w.rows} 방 · 정답 길 ${w.path.length}칸 · 잠금 ${w.locks} · 보상 방 ${w.rooms.filter((q) => q.role === 'reward').length}${w.rooms.some((q) => q.role === 'secret') ? ' · 숨은 방' : ''}${w.rooms.some((q) => q.wrap.r) ? ' · 끝이 이어진 복도' : ''}`);
+    }
+    return w;
+  };
+  /** 들어온 쪽 출입구 옆에서 시작 (왼쪽 문으로 들어오면 그 문 오른쪽) */
+  const entryX = (f: Floor, from: Dir | undefined): number => {
+    if (!from) return 240;
+    const pl = f.placed.find((q) => q.data.dir === from && (q.kind === 'wdoor' || q.kind === 'wup' || q.kind === 'wdown' || q.kind === 'crack' || q.kind === 'vent'));
+    if (!pl) return from === 'r' ? f.width - 200 : 240;
+    return from === 'l' ? pl.x + 120 : from === 'r' ? pl.x - 120 : pl.x + 70;
+  };
+  /** 다른 방에서 연 잠금·부순 벽·주운 열쇠·받은 보상을 이 방 소품에도 */
+  const syncRoom = (plan: StagePlan, w: World) => {
+    const o = out!;
+    const f = plan.stage.floor!;
+    const rm = roomAt(w, f.room!.col, f.room!.row)!;
+    const props = plan.props ?? [];
+    for (const pl of f.placed) {
+      const id = `p${pl.id}`;
+      const i = props.findIndex((q) => q.id === id);
+      if (i < 0) continue;
+      const d = pl.data.dir as Dir | undefined;
+      const eid = d ? edgeId(w, rm, d) : '';
+      if (pl.kind === 'locked' && pl.data.lock !== undefined && o.unlocked.includes(eid)) props.splice(i, 1);
+      else if ((pl.kind === 'wup' || pl.kind === 'wdown') && pl.data.lock !== undefined && o.unlocked.includes(eid)) props[i].label = pl.label.replace(/^잠긴 /, '').replace(/ [①②③④]$/, '') + ` · ${across(w, rm, d!)!.name}`;
+      else if (pl.kind === 'crack' && o.broken.includes(eid)) props[i].label = '부서진 벽 틈 (숨은 방)';
+      else if (pl.kind === 'vent' && o.broken.includes(eid)) props[i].label = '열린 덕트 (숨은 방)';
+    }
+  };
   const buildFloorPlan = (t: Extract<Target, { to: 'floor' }>): StagePlan => {
     const o = out!;
-    // 한 출동 안에서 깊이마다 층은 하나: 정비 구역으로 되돌아와도, 승강기로 와도 같은 층
+    // 한 출동 안에서 깊이마다 세상은 하나: 정비 구역으로 되돌아와도, 승강기로 와도 같은 세상
     const known = o.floorTypes[t.depth];
     if (known) (t.type = known.type), (t.sub = known.sub);
-    const key = `floor:${t.depth}`;
-    const fresh = !nodes.has(key);
-    const plan = visit(
-      key,
-      () => {
-        const f = makeFloor({ seed: o.seed, depth: t.depth, type: t.type, sub: t.sub, danger: o.danger, growth: o.growth, flags: o.flags, epoch: meta.epoch, exitOpen: t.depth === 1 && exitOpen(meta), tired: o.tired, secret: o.secretDepth === t.depth });
-        log(`${f.label} 도착 · 조각 ${f.segments.length - 2 - (f.guardian ? 1 : 0)}개 · 폭 ${f.width}px${f.fallback ? ` · 고정 배치 ${f.fallback}` : ''}${f.guardian ? ` · 수호자 ${FLOOR_TYPES[f.type].guardians.find((g) => g.kind === f.guardian)?.label ?? f.guardian}` : ''}${f.tuning.keyGate ? ' · 잠긴 방화셔터' : ''}${f.placed.some((p) => p.kind === 'crack' || p.kind === 'vent') ? ' · 숨은 길' : ''}`);
-        return floorPlan(f, `floor:${t.depth}:${++planN}`, t.startX ?? 240);
-      },
-      t.startX ?? 240,
-    );
+    const freshDepth = !known;
+    const w = worldOf(t.depth, t.type, t.sub);
+    const [c, rw] = t.room ?? w.arrival;
+    const rm = roomAt(w, c, rw)!;
+    const plan = visit(`room:${t.depth}:${c},${rw}`, () => {
+      const f = roomFloor(w, rm, { seed: o.seed, danger: o.danger, growth: o.growth, flags: o.flags, epoch: meta.epoch, exitOpen: t.depth === 1 && exitOpen(meta), tired: o.tired });
+      return floorPlan(f, `room:${t.depth}:${c},${rw}:${++planN}`, 240);
+    });
     const f = plan.stage.floor!;
+    const x = t.startX ?? entryX(f, t.from);
+    plan.startX = x;
+    rt!.prevX = rt!.safeX = x;
+    // 추격: 그것은 들어온 쪽에서 쫓아온다. 오른쪽 문으로 들어온 방은 (거꾸로 쫓을 수 없어) 잠잠하다
+    if (plan.type === 'chase') rt!.chaseX = t.from === 'r' ? -1e9 : x - 600;
+    syncRoom(plan, w);
     o.floorTypes[t.depth] = { type: f.type, sub: f.sub };
     o.depth = t.depth;
     o.where = 'floor';
     o.floor = f;
     o.tired = false;
-    if (fresh) {
+    o.room = [c, rw];
+    const seen = (o.seenRooms[t.depth] ??= []);
+    if (!seen.includes(`${c},${rw}`)) seen.push(`${c},${rw}`);
+    announceNext = freshDepth;
+    if (freshDepth) {
       if (!o.visited.some((v) => v.depth === t.depth)) o.visited.push({ depth: t.depth, type: f.type });
       if (o.lastTypes[o.lastTypes.length - 1] !== f.type || o.lastTypes.length === 0) o.lastTypes.push(f.type);
     }
@@ -308,6 +354,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     save();
     return plan;
   };
+  void makeFloor;
 
   const buildCell = (t: Extract<Target, { to: 'service' }>): StagePlan => {
     const o = out!;
@@ -325,7 +372,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
 
   const buildSide = (t: Extract<Target, { to: 'side' }>): StagePlan => {
     const o = out!;
-    const f = nodes.get(`floor:${t.depth}`)!.plan.stage.floor!;
+    const f = (nodes.get(`floor:${t.depth}`) ?? node)!.plan.stage.floor!;
     o.where = 'side';
     return visit(`side:${t.depth}:${t.door}`, () => sidePlan(makeSide(o.seed, f, t.door, t.secret, t.label), f, `side:${t.depth}:${t.door}:${++planN}`), 260);
   };
@@ -499,7 +546,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       }
     }
     // 추격: 자동으로 다가오는 벽. 문을 닫으면 느려지고, 뒤돌아보면 빨라진다.
-    if (f.type === 'chase') {
+    if (f.type === 'chase' && r.chaseX > -1e8) {
       const end = f.segments[f.segments.length - 1].x;
       if (p.x < end - 200 && r.t > 1.2) {
         let v = tune.chaseSpeed * DT;
@@ -537,10 +584,14 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       if (r.squeeze < 15 && !r.warned.has('sq')) r.warned.add('sq'), foundRule(api, 'p_wall', p.x);
       if (r.squeeze <= 0 && r.hurtCd <= 0) (r.hurtCd = 1), api.hurtPlayer(6);
     }
+    // 닫힌 셔터는 양쪽 다 막는다 (방은 오른쪽에서도 들어온다)
     for (const sh of f.placed.filter((x) => x.kind === 'shutter'))
-      if (!r.opened.has(`p${sh.id}`) && p.x > sh.x - 26 && r.prevX <= sh.x - 26 + 40) api.movePlayer(Math.min(p.x, sh.x - 30), p.y);
+      if (!r.opened.has(`p${sh.id}`)) {
+        if (r.prevX < sh.x && p.x > sh.x - 26) api.movePlayer(Math.min(p.x, sh.x - 30), p.y);
+        else if (r.prevX >= sh.x && p.x < sh.x + 26) api.movePlayer(Math.max(p.x, sh.x + 30), p.y);
+      }
     // 잠긴 방화셔터: 열쇠 전에는 지나갈 수 없다. 처음 다가가면 어디서 열쇠를 찾는지 한 줄
-    for (const g of f.placed.filter((x) => x.kind === 'locked')) {
+    for (const g of f.placed.filter((x) => x.kind === 'locked' && x.data.lock === undefined)) {
       if (out!.gatesOpen.includes(f.depth)) break;
       if (p.x > g.x - 26 && r.prevX <= g.x - 26 + 40) api.movePlayer(Math.min(p.x, g.x - 30), p.y);
       if (Math.abs(p.x - g.x) < 260 && !r.warned.has('gate')) {
@@ -692,12 +743,14 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       save();
     },
     mapView: () => mapView(),
+    worldAt: (d: number) => worlds.get(d) ?? null,
 
     firstFloor(run: RunConfigCore): FloorPlan {
       out = newOuting(meta, { seed: run.seed, agent: run.agent, danger: run.danger });
       meta.outings++;
       planN = 0;
       nodes.clear();
+      worlds.clear();
       node = null;
       const plan = buildFloorPlan({ to: 'floor', depth: 1, type: 'lobby', sub: null });
       log(`출동 ${meta.outings}회째 · 씨앗 ${run.seed}${out.variants.length ? ` · 이번 출동 변형: ${out.variants.map((v) => RULE[v].variant!.text.replace('이번 출동: ', '')).join(' / ')}` : ''}`);
@@ -714,6 +767,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         rt = null;
         node = null;
         nodes.clear();
+        worlds.clear();
         return null;
       }
       const t: Target = o.pending ?? { to: 'floor', depth: o.depth + 1, type: pickType(o.depth + 1, o.lastTypes, o.seed, meta.epoch), sub: null };
@@ -825,7 +879,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       const ch = r.choices.get(prop.id);
       if (ch) return resolveChoice(api, prop, ch);
       // 메트로배니아 장치 (위층 점검문·잠긴 셔터·곁가지 문·금 간 벽·막힌 덕트·열쇠·곁가지 방 안)
-      const mk = pl && (pl.kind === 'upper' || pl.kind === 'sidedoor' || pl.kind === 'locked') ? pl.kind : ['crack', 'vent', 'key'].includes(prop.kind) || (r.plan.stage.where === 'side' && prop.id.startsWith('x')) ? prop.kind : null;
+      const mk = pl && ['upper', 'sidedoor', 'locked', 'wdoor', 'wup', 'wdown', 'reward', 'key'].includes(pl.kind) ? pl.kind : ['crack', 'vent', 'key'].includes(prop.kind) || (r.plan.stage.where === 'side' && prop.id.startsWith('x')) ? prop.kind : null;
       if (mk) return metroInteract(api, prop, mk, pl);
       switch (prop.kind) {
         // ── 층
@@ -835,11 +889,18 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
             foundRule(api, 'noreturn', p.x);
           } else api.world.say('패널을 눌러야 탈 수 있다.', 2);
           break;
-        case 'panel':
+        case 'panel': {
+          const cr = r.plan.stage.where === 'floor' ? curRoom() : null;
+          if (cr && !o.clearedFloors.includes(cr.w.depth)) {
+            const n = roomsLeft(cr.w);
+            api.world.say(`패널이 꺼져 있다. 이 층을 다 정리해야 내려갈 수 있다. (남은 방 ${n}, 지도 Z)`, 3);
+            break;
+          }
           if (pl?.data.exit) api.world.say('패널에 EXIT 불이 들어와 있다.', 2);
           api.world.emit({ type: 'ding', x: p.x });
           finishWith(api, { to: 'car' });
           break;
+        }
         case 'mirror': {
           const tired = rng(mix(o.seed, o.ride, o.depth, 55))() < 0.35;
           foundRule(api, 'mirror', p.x);
@@ -868,6 +929,15 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           break;
         case 'b12':
           foundRule(api, 'b12', p.x);
+          break;
+        case 'shutter':
+          // 방은 양쪽에서 들어온다: 셔터 뒤편(오른쪽)에서는 손잡이로 그냥 올린다
+          if (pl && !r.opened.has(prop.id) && p.x > prop.x) {
+            r.opened.add(prop.id);
+            api.setProp(prop.id, { solid: false, label: '열린 셔터', h: 20 });
+            api.world.emit({ type: 'door', x: p.x, id: 'switch' });
+            api.world.say('셔터 뒤편 손잡이로 올렸다.', 2);
+          } else if (pl && !r.opened.has(prop.id)) api.world.say('닫힌 셔터. 이쪽에서는 표지와 문, 스위치로 연다.', 2);
           break;
         case 'door':
           if (pl && pl.data.fork !== undefined) {
@@ -919,6 +989,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         case 'servicedoor':
           o.returnX = prop.x;
           o.hatchX[o.depth] = prop.x;
+          o.hatchRoom[o.depth] = [o.room[0], o.room[1]];
           api.world.emit({ type: 'door', x: p.x, id: 'service' });
           finishWith(api, enterService(o.depth, 'top'));
           break;
@@ -996,21 +1067,29 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           const up = nodes.get(`floor:${d}`)?.plan.stage.floor;
           const hx = o.hatchX[d] ?? up?.placed.find((q) => q.kind === 'hatch' || q.kind === 'servicedoor')?.x ?? 240;
           api.world.emit({ type: 'door', x: p.x, id: 'hatch' });
-          finishWith(api, { to: 'floor', depth: d, type: o.floorTypes[d]?.type ?? 'lobby', sub: o.floorTypes[d]?.sub ?? null, startX: hx });
+          finishWith(api, { to: 'floor', depth: d, type: o.floorTypes[d]?.type ?? 'lobby', sub: o.floorTypes[d]?.sub ?? null, startX: hx, room: o.hatchRoom[d] });
           break;
         }
         case 'down': {
+          if (!o.clearedFloors.includes(o.serviceDepth)) {
+            api.world.say(`잠겨 있다. 위 층(${depthLabel(o.serviceDepth)})을 다 정리해야 아래로 열린다.`, 3);
+            break;
+          }
           // 아래 점검문 → 아래층 시작 홀의 위층 점검문으로 나온다. 그 문은 이제 열려 있다 (지름길: 아래층에서 정비 구역으로 되돌아 올라갈 수 있다)
           const d = o.serviceDepth + 1;
           if (!o.shortcuts.includes(d)) {
             o.shortcuts.push(d);
             log(`지름길: ${depthLabel(d)} 위층 점검문을 열었다`);
           }
-          patchAt(`floor:${d}`, upperId(d) ?? '', { label: '위층 점검문 (열림 · 정비 구역)' });
-          finishWith(api, { to: 'floor', depth: d, type: o.floorTypes[d]?.type ?? pickType(d, o.lastTypes, o.seed, meta.epoch, 888), sub: o.floorTypes[d]?.sub ?? null, startX: UPPER_X + 110 });
+          // 아래 세상의 도착 홀로 나온다 (정비 구역은 세상과 세상 사이의 틈)
+          finishWith(api, { to: 'floor', depth: d, type: o.floorTypes[d]?.type ?? pickType(d, o.lastTypes, o.seed, meta.epoch, 888), sub: o.floorTypes[d]?.sub ?? null });
           break;
         }
         case 'fall': {
+          if (!o.clearedFloors.includes(o.serviceDepth)) {
+            api.world.say(`잠겨 있다. 위 층(${depthLabel(o.serviceDepth)})을 다 정리해야 아래로 열린다.`, 3);
+            break;
+          }
           const d = o.serviceDepth + 2;
           api.hurtPlayer(10, true);
           log('승강로 틈새로 떨어졌다 (깊이 +2)');
@@ -1140,6 +1219,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const r = rt!;
     const o = out!;
     const plan = r.plan;
+    if (plan.stage.where === 'floor') checkFloorClear(api);
     api.world.light = r.light;
     api.world.noise = 0;
     api.note('stage.depth', o.depth);
@@ -1153,8 +1233,12 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       api.world.say(sd.secret ? '벽 너머에 방이 있었다. 누군가 숨겨 둔 배낭.' : plan.encounters.length ? `${sd.label}. 안에 뭔가 있다.` : `${sd.label}.`, 2.5);
       return;
     }
-    if (plan.stage.where === 'floor') {
+    if (plan.stage.where === 'floor' && !announceNext && plan.stage.floor?.room) {
+      const f = plan.stage.floor;
+      api.world.say(`${f.room!.name}${plan.encounters.length ? '' : ''}`, 1.6);
+    } else if (plan.stage.where === 'floor') {
       const f = plan.stage.floor!;
+      announceNext = false;
       api.world.emit({ type: 'ding', x: plan.startX });
       const first = o.depth === 1 && o.visited.length === 1;
       const told = hooks.announce?.({ depth: f.depth, type: f.type, label: FLOOR_TYPES[f.type].label, hint: FLOOR_TYPES[f.type].hint, first, agent: o.agent });
@@ -1365,6 +1449,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       const enc = api.world.floor.encounters[e.index];
       if (enc) {
         node.cleared.add(enc.triggerX);
+        checkFloorClear(api);
         if (enc.waves.some((w) => w.some((s) => s.boss))) offerUpgrade(api, '수호자를 쓰러뜨렸다');
         else if (++o.fightsWon % 3 === 0) offerUpgrade(api, `싸움 ${o.fightsWon}판째`);
       }
@@ -1393,6 +1478,12 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           api.world.fx('boom', pr.x, Y_TOP + 30, 100);
           api.world.emit({ type: 'door', x: pr.x, id: 'crack' });
           api.world.say('벽이 무너졌다. 안쪽에 방이 있다. (E)', 2.5);
+          const cr = curRoom();
+          const pl = cr && r.plan.stage.floor?.placed.find((q) => `p${q.id}` === pr.id);
+          if (cr && pl?.data.dir) {
+            const eid = edgeId(cr.w, cr.rm, pl.data.dir as Dir);
+            if (!o.broken.includes(eid)) o.broken.push(eid);
+          }
           log(`숨은 길: ${o.floor?.label} 금 간 벽을 부쉈다`);
         } else if (left === 2) api.world.say('벽이 울린다. 금이 더 벌어진다.', 1.2);
       }
@@ -1408,11 +1499,122 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     finishWith(api, { to: 'side', depth: o.depth, door: prop.id, secret, label });
   };
 
+  // ── 방 격자 세상: 옆·위·아래 방으로, 잠금·열쇠·숨은 벽·보상
+  const curRoom = () => {
+    const o = out!;
+    const w = worlds.get(o.depth);
+    const f = rt?.plan.stage.floor;
+    return w && f?.room ? { w, rm: roomAt(w, f.room.col, f.room.row)! } : null;
+  };
+  /** 방 정리: 들어가 봤고 그 방 싸움을 다 이겼다 */
+  const roomClear = (d: number, rm: WorldRoom) => {
+    const n = nodes.get(`room:${d}:${rm.col},${rm.row}`);
+    return !!n && n.cleared.size >= n.all.length;
+  };
+  /** 층 클리어까지 남은 방 (숨은 방은 선택) */
+  const roomsLeft = (w: World) => w.rooms.filter((rm) => rm.role !== 'secret' && !roomClear(w.depth, rm)).length;
+  /** 마지막 방을 정리한 순간 한 번: 패널이 켜진다 */
+  const checkFloorClear = (api: StageApi) => {
+    const o = out!;
+    const cr = curRoom();
+    if (!cr || o.clearedFloors.includes(cr.w.depth) || roomsLeft(cr.w) > 0) return;
+    o.clearedFloors.push(cr.w.depth);
+    api.world.emit({ type: 'ding', x: api.world.player.x });
+    api.world.say(`${cr.w.label}: 모든 방을 정리했다. 승강기 패널에 불이 들어온다.`, 4);
+    log(`${cr.w.label} 클리어`);
+  };
+  const hasKey = (k: number) => out!.wkeys.includes(`${out!.depth}:${k}`);
+  /** 잠금 열기: 열쇠가 있거나 만능 열쇠(강화)면 연다 */
+  const unlock = (api: StageApi, w: World, eid: string, k: number): boolean => {
+    const o = out!;
+    if (o.unlocked.includes(eid)) return true;
+    const master = o.upgrades.includes('master') && !o.upgrades.includes('master:used');
+    if (!hasKey(k) && !master) {
+      api.world.say(`잠겨 있다. 열쇠 ${KEY_MARK[k]} 이 이 층 어딘가에 있다. (지도 Z)`, 3);
+      return false;
+    }
+    if (!hasKey(k)) o.upgrades.push('master:used');
+    o.unlocked.push(eid);
+    api.world.emit({ type: 'door', x: api.world.player.x, id: 'gate' });
+    api.world.shake(8, 3);
+    api.world.say(hasKey(k) ? `열쇠 ${KEY_MARK[k]} 이 맞는다. 열렸다.` : '만능 열쇠로 땄다.', 2.5);
+    log(`${w.label} 잠금 ${KEY_MARK[k]} 을 열었다`);
+    return true;
+  };
+  const goRoom = (api: StageApi, d: Dir) => {
+    const cr = curRoom();
+    if (!cr) return;
+    const b = across(cr.w, cr.rm, d)!;
+    api.world.emit({ type: 'door', x: api.world.player.x, id: d === 'l' || d === 'r' ? 'room' : 'stairs' });
+    finishWith(api, { to: 'floor', depth: cr.w.depth, type: cr.w.type, sub: cr.w.sub, room: [b.col, b.row], from: OPP[d] });
+  };
+  const worldInteract = (api: StageApi, prop: PropSpec, pl: Placed): boolean => {
+    const o = out!;
+    const cr = curRoom();
+    if (!cr) return false;
+    const { w, rm } = cr;
+    const p = api.world.player;
+    const d = pl.data.dir as Dir | undefined;
+    switch (pl.kind) {
+      case 'wdoor':
+        goRoom(api, d!);
+        return true;
+      case 'wup':
+      case 'wdown': {
+        const k = rm.lock[d!];
+        if (k && !unlock(api, w, edgeId(w, rm, d!), k)) return true;
+        goRoom(api, d!);
+        return true;
+      }
+      case 'locked':
+        if (pl.data.lock === undefined) return false;
+        if (unlock(api, w, edgeId(w, rm, d!), Number(pl.data.lock))) api.setProp(prop.id, null);
+        return true;
+      case 'key': {
+        const k = Number(pl.data.key);
+        api.setProp(prop.id, null);
+        if (!hasKey(k)) o.wkeys.push(`${o.depth}:${k}`);
+        api.world.emit({ type: 'pickup', x: p.x, id: 'key' });
+        api.world.say(`열쇠 ${KEY_MARK[k]} 을 주웠다. 맞는 잠금은 지도(Z)에 빨갛게.`, 3);
+        log(`${w.label} 열쇠 ${KEY_MARK[k]}`);
+        return true;
+      }
+      case 'reward': {
+        const id = `${o.depth}:${rm.col},${rm.row}`;
+        if (o.rewards.includes(id)) return void api.world.say('빈 배낭이다.', 1.5), true;
+        if (node && node.cleared.size < node.all.length) return void api.world.say('먼저 이 방의 것들을 정리하자.', 1.5), true;
+        o.rewards.push(id);
+        api.setProp(prop.id, { label: '빈 배낭' });
+        offerUpgrade(api, rm.role === 'secret' ? '숨겨 둔 배낭' : '선배가 남긴 배낭');
+        return true;
+      }
+      case 'crack':
+        if (!d) return false;
+        if (prop.label?.includes('부서진')) {
+          const eid = edgeId(w, rm, d);
+          if (!o.broken.includes(eid)) o.broken.push(eid);
+          goRoom(api, d);
+        } else api.world.say('금 간 벽. 세게 치면 무너질 것 같다.', 2);
+        return true;
+      case 'vent': {
+        if (!d) return false;
+        const eid = edgeId(w, rm, d);
+        if (!o.broken.includes(eid) && !p.crouching) return void api.world.say('막힌 덕트. ↓ 앉은 채로 E — 덮개를 뜯는다.', 2.5), true;
+        if (!o.broken.includes(eid)) o.broken.push(eid), log(`숨은 길: ${w.label} 막힌 덕트를 뜯었다`);
+        api.setProp(prop.id, { label: '열린 덕트 (숨은 방)' });
+        goRoom(api, d);
+        return true;
+      }
+    }
+    return false;
+  };
+
   const metroInteract = (api: StageApi, prop: PropSpec, kind: string, pl: Placed | undefined) => {
     const o = out!;
     const r = rt!;
     const p = api.world.player;
     const depth = o.depth;
+    if (pl && worldInteract(api, prop, pl)) return;
     switch (kind) {
       case 'upper':
         if (o.shortcuts.includes(depth)) {
@@ -1545,29 +1747,56 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     const o = out;
     if (!o) return null;
     const scout = o.upgrades.includes('scout');
-    const floors: MapFloor[] = [];
-    for (const d of Object.keys(o.floorTypes).map(Number).sort((a, b) => a - b)) {
-      const n = nodes.get(`floor:${d}`);
-      const f = n?.plan.stage.floor;
-      if (!n || !f) continue;
-      const ex: [number, number] = o.explored[d] ?? [0, 0];
-      const seen = (x: number) => x >= ex[0] - 150 && x <= ex[1] + 150;
-      const marks: MapMark[] = [];
-      for (const pl of f.placed) {
-        const prop = n.plan.props?.find((q) => q.id === `p${pl.id}`);
-        const side = o.sides[`${d}:p${pl.id}`];
-        let mk: MapMark | null = null;
-        if (pl.kind === 'hatch' || pl.kind === 'servicedoor') mk = { x: pl.x, kind: 'service', state: '' };
-        else if (pl.kind === 'upper') mk = { x: pl.x, kind: 'up', state: o.shortcuts.includes(d) ? 'open' : 'locked' };
-        else if (pl.kind === 'locked') mk = { x: pl.x, kind: 'gate', state: o.gatesOpen.includes(d) ? 'open' : o.keys.includes(d) ? 'key' : 'locked' };
-        else if (pl.kind === 'sidedoor') mk = { x: pl.x, kind: 'side', state: side?.done ? 'done' : '' };
-        else if ((pl.kind === 'crack' || pl.kind === 'vent') && (side || /부서진|열린/.test(prop?.label ?? ''))) mk = { x: pl.x, kind: 'secret', state: side?.done ? 'done' : '' };
-        else if (pl.kind === 'panel') mk = { x: pl.x, kind: 'elevator', state: '' };
-        if (mk && seen(mk.x)) marks.push(mk);
+    const worldsV: MapWorld[] = [];
+    for (const d of [...worlds.keys()].sort((a, b) => a - b)) {
+      const w = worlds.get(d)!;
+      const seen = new Set(o.seenRooms[d] ?? []);
+      const known = new Set(seen);
+      // 가 본 방의 문 너머 방은 「?」로 보인다 (숨은 연결은 부순 뒤에만)
+      for (const rm of w.rooms) {
+        if (!seen.has(`${rm.col},${rm.row}`)) continue;
+        for (const dd of DIRS) {
+          if (!rm.open[dd] || (rm.hidden[dd] && !o.broken.includes(edgeId(w, rm, dd)))) continue;
+          const b = across(w, rm, dd);
+          if (b) known.add(`${b.col},${b.row}`);
+        }
       }
-      const g = f.spawns.find((s) => s.role === 'guardian');
-      if (g && seen(g.x)) marks.push({ x: g.x, kind: 'boss', state: '' });
-      floors.push({ depth: d, label: f.label, type: f.type, width: f.width, explored: ex, marks });
+      const rooms: MapRoom[] = [];
+      for (const rm of w.rooms) {
+        const id = `${rm.col},${rm.row}`;
+        const isSeen = seen.has(id);
+        if (!known.has(id) && !(scout && rm.role !== 'secret')) continue;
+        const lock: MapRoom['lock'] = {};
+        const broken: MapRoom['broken'] = {};
+        const open = { ...rm.open };
+        for (const dd of DIRS) {
+          if (!rm.open[dd]) continue;
+          const eid = edgeId(w, rm, dd);
+          const k = rm.lock[dd];
+          if (k) lock[dd] = { n: k, state: o.unlocked.includes(eid) ? 'open' : o.wkeys.includes(`${d}:${k}`) ? 'key' : 'locked' };
+          if (rm.hidden[dd]) {
+            open[dd] = false;
+            if (o.broken.includes(eid)) broken[dd] = true;
+          }
+        }
+        rooms.push({
+          col: rm.col,
+          row: rm.row,
+          seen: isSeen,
+          open,
+          wrap: rm.wrap,
+          lock,
+          broken,
+          role: rm.role,
+          key: rm.key && (isSeen || scout) && !o.wkeys.includes(`${d}:${rm.key}`) ? rm.key : null,
+          panel: rm.panel && isSeen,
+          guardian: rm.guardian && isSeen,
+          clear: isSeen && roomClear(d, rm),
+          reward: (rm.role === 'reward' || rm.role === 'secret') && (isSeen || scout) ? (o.rewards.includes(`${d}:${id}`) ? 'done' : 'full') : null,
+          name: rm.name,
+        });
+      }
+      worldsV.push({ depth: d, label: w.label, cols: w.cols, rows: w.rows, rooms });
     }
     const services: MapService[] = [];
     for (const [ds, sv] of Object.entries(o.services)) {
@@ -1588,15 +1817,24 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       });
     }
     // 목표 방향 한 줄
-    const cur = nodes.get(`floor:${o.depth}`)?.plan.stage.floor;
-    let goal = '아래로: 승강기 패널, 또는 정비 구역 아래 점검문. 귀환은 다락방 로프.';
+    let goal = '아래로: 승강기 패널(▮)이 있는 방을 찾는다. 귀환은 정비 구역 다락방 로프.';
+    const cr = o.where === 'floor' ? curRoom() : null;
     if (o.where === 'service') {
       const sv = o.services[o.serviceDepth];
       goal = sv?.key ? '정비 구역: 열쇠를 찾는다. 다락방(★)에서 쉬고 로프로 귀환할 수 있다.' : '정비 구역: 아래 점검문으로 다음 층, 해치로 위층, 다락방(★)에 로프.';
-    } else if (o.where === 'side') goal = '곁가지 방: 배낭을 열고 나간다.';
-    else if (o.where === 'car') goal = '승강기: 버튼을 고른다.';
-    else if (cur?.tuning.keyGate && !o.gatesOpen.includes(o.depth)) goal = o.keys.includes(o.depth) ? '열쇠가 있다. 방화셔터를 연다.' : '방화셔터가 잠겼다. 이 층 정비 구역(▼)에서 열쇠를 찾는다.';
-    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, cell: o.where === 'service' ? o.cell : null, sideX: o.where === 'side' ? o.returnX : null, floors, services, keys: o.keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
+    } else if (o.where === 'car') goal = '승강기: 버튼을 고른다.';
+    else if (cr) {
+      const held = Array.from({ length: cr.w.locks }, (_, i) => i + 1).filter((k) => o.wkeys.includes(`${o.depth}:${k}`));
+      const lockedLeft = cr.w.rooms.some((rm) => DIRS.some((dd) => rm.lock[dd] && !o.unlocked.includes(edgeId(cr.w, rm, dd))));
+      const left = roomsLeft(cr.w);
+      if (!o.clearedFloors.includes(o.depth) && !lockedLeft) goal = `이 층을 다 정리하면 승강기 패널이 켜진다. 남은 방 ${left}.`;
+      else if (o.clearedFloors.includes(o.depth)) goal = '층 정리 끝. 승강기 패널(▮)로 더 내려가거나, 다락방 로프로 귀환한다.';
+      else if (lockedLeft && held.length) goal = `열쇠 ${held.map((k) => KEY_MARK[k]).join('')} 이 있다. 지도에서 노랗게 표시된 잠긴 길로.`;
+      else if (lockedLeft) goal = '잠긴 길(빨강)이 있다. 열려 있는 방들을 뒤져 열쇠를 찾는다.';
+    }
+    const keys = o.wkeys.filter((k) => k.startsWith(`${o.depth}:`)).map((k) => KEY_MARK[Number(k.split(':')[1])]);
+    const f = rt?.plan.stage.floor;
+    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, room: o.where === 'floor' && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, cell: o.where === 'service' ? o.cell : null, worlds: worldsV, services, keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
   };
 
   return mod;
