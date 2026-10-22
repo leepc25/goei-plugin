@@ -64,6 +64,9 @@ export class Player extends Fighter {
   charging = false;
   /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
   fightT = 0;
+  /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
+  ally: { x: number; y: number; dir: 1 | -1; phase: 'in' | 'act' | 'out'; clip: string; f: number; ft: number; hitOn: boolean; id: number } | null = null;
+  private allyN = 0;
   /** 강화 선택 등이 곱하는 공격력 배수 */
   dmgMul = 1;
   // 게이지
@@ -143,6 +146,12 @@ export class Player extends Fighter {
       else hurt.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
     }
     const hit: Hit[] = [];
+    const al = this.ally;
+    if (al?.hitOn) {
+      const a = al.dir === 1 ? al.x + 260 : al.x - 640,
+        b = al.dir === 1 ? al.x + 640 : al.x - 260;
+      hit.push({ x0: a, x1: b, z0: 0, z1: 320, y: al.y, dy: 70, attackId: al.id, dmg: 30 * this.dmgMul, react: 'down', dir: al.dir, push: 16, lift: 16, stop: 8, strength: 3, armorBreak: true, noise: 1 });
+    }
     if (this.move?.hits && this.phase === 'free') {
       for (const mh of this.move.hits) {
         if (!mh.at.includes(this.mf)) continue;
@@ -354,6 +363,7 @@ export class Player extends Fighter {
 
     if (this.fightT > 0) this.fightT--;
     if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
+    this.stepAlly(world);
     if (this.stepReact(world)) {
       this.running = this.guarding = this.crouching = this.charging = false;
       this.chargeT = -1;
@@ -572,6 +582,43 @@ export class Player extends Fighter {
     this.x -= this.dir * 2;
   }
 
+  private callAlly(world: WorldView) {
+    if (this.ally) return;
+    if (this.gauge < 50) return world.say('지원 호출: 필살 게이지 절반 필요', 1);
+    this.gauge -= 50;
+    const d = this.dir;
+    this.ally = { x: this.x - d * 580, y: Math.min(world.lane[1], this.y + 30), dir: d, phase: 'in', clip: 'walk', f: 0, ft: 0, hitOn: false, id: 9_000_000 + ++this.allyN };
+    world.say('「길 비켜.」', 1.4);
+  }
+
+  private stepAlly(world: WorldView) {
+    const a = this.ally;
+    if (!a) return;
+    a.hitOn = false;
+    a.ft++;
+    if (a.phase === 'in') {
+      a.x += a.dir * 12;
+      if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+      if ((this.x - a.x) * a.dir <= 150) Object.assign(a, { phase: 'act', clip: 'support', f: 3, ft: 0 });
+    } else if (a.phase === 'act') {
+      if (a.ft >= 3) {
+        a.ft = 0;
+        a.f++;
+        if (a.f === 5) {
+          a.hitOn = true;
+          world.fx('boom', a.x + a.dir * 450, a.y, 150);
+          world.shake(10, 3);
+          world.emit({ type: 'ability', x: a.x, move: 'support' });
+        }
+        if (a.f >= (this.clips.support?.length || 10)) Object.assign(a, { phase: 'out', clip: 'walk', f: 0, ft: 0, dir: -a.dir });
+      }
+    } else {
+      a.x += a.dir * 12;
+      if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+      if (Math.abs(a.x - this.x) > 900) this.ally = null;
+    }
+  }
+
   /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
   private tryGrabFront(world: WorldView): boolean {
     for (const b of world.bodies) {
@@ -630,6 +677,7 @@ export class Player extends Fighter {
       this.wantInteract = false;
       return;
     }
+    if (p.pressed.has('ally')) this.callAlly(world);
     // F 연쇄 폭파, G 벽 통째로 (숙련 동작)
     if (!this.crouching && !this.carry && p.pressed.has('chain')) return this.play('chain', world);
     if (!this.crouching && !this.carry && p.pressed.has('wall')) return this.play('wall', world);

@@ -65,6 +65,64 @@ const CHIPS: Record<NpcDef['group'], string[]> = {
   resident: ['안녕하세요', '여기 사세요?', '실례했습니다'],
 };
 
+const FACE_PX = 44; // 얼굴 칸 132px = 3배 (도트 격자가 딱 맞게)
+const FACE_BG = [35, 45, 50];
+/** 얼굴 그림을 도트로: 44칸으로 줄이고 가장자리에 이어진 흰 바탕은 패널 색으로 메운다. 읽지 못하는 그림(다른 출처)은 그대로 */
+function pixelFace(src: string): Promise<HTMLElement> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const plain = () => {
+      const i = document.createElement('img');
+      i.alt = '';
+      i.src = src;
+      resolve(i);
+    };
+    img.onerror = plain;
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = c.height = FACE_PX;
+        const g = c.getContext('2d')!;
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        const sx = (img.naturalWidth - side) / 2;
+        const sy = Math.max(0, (img.naturalHeight - side) * 0.15);
+        g.imageSmoothingEnabled = true;
+        g.drawImage(img, sx, sy, side, side, 0, 0, FACE_PX, FACE_PX);
+        const d = g.getImageData(0, 0, FACE_PX, FACE_PX);
+        const a = d.data;
+        // 바탕색 = 네 귀퉁이 평균. 그 색에 가까운 가장자리 이어진 칸을 메운다 (흰 바탕·밝은 회색 바탕 모두)
+        // 위 두 귀퉁이만 본다 (아래 귀퉁이는 보통 옷)
+        const corner = [0, 1, FACE_PX - 2, FACE_PX - 1, FACE_PX, 2 * FACE_PX - 1];
+        const ref = [0, 1, 2].map((k) => corner.reduce((t, i) => t + a[i * 4 + k], 0) / corner.length);
+        const light = (i: number) => a[i * 4 + 3] < 40 || Math.hypot(a[i * 4] - ref[0], a[i * 4 + 1] - ref[1], a[i * 4 + 2] - ref[2]) < 60;
+        const seen = new Uint8Array(FACE_PX * FACE_PX);
+        const stack: number[] = [];
+        for (let k = 0; k < FACE_PX; k++) stack.push(k, (FACE_PX - 1) * FACE_PX + k, k * FACE_PX, k * FACE_PX + FACE_PX - 1);
+        // 밝은 바탕일 때만 (어두운 귀퉁이는 머리카락일 수 있다)
+        if (ref[0] * 0.3 + ref[1] * 0.59 + ref[2] * 0.11 < 150) stack.length = 0;
+        while (stack.length) {
+          const i = stack.pop()!;
+          if (seen[i] || !light(i)) continue;
+          seen[i] = 1;
+          a.set([...FACE_BG, 255], i * 4);
+          const x = i % FACE_PX;
+          if (x > 0) stack.push(i - 1);
+          if (x < FACE_PX - 1) stack.push(i + 1);
+          if (i >= FACE_PX) stack.push(i - FACE_PX);
+          if (i < FACE_PX * (FACE_PX - 1)) stack.push(i + FACE_PX);
+        }
+        // 색을 계단으로 (매끈한 그라데이션 대신 도트 색면)
+        for (let i = 0; i < a.length; i += 4) for (let k = 0; k < 3; k++) a[i + k] = Math.min(255, Math.round(a[i + k] / 16) * 16);
+        g.putImageData(d, 0, 0);
+        resolve(c);
+      } catch {
+        plain(); // 다른 출처 그림이라 픽셀을 못 읽음
+      }
+    };
+    img.src = src;
+  });
+}
+
 export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: RelationStore): NpcTalk {
   const style = document.createElement('style');
   style.textContent = css;
@@ -72,7 +130,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
   const el = document.createElement('div');
   el.className = 'gnp gk-panel gk-font';
   el.hidden = true;
-  el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-acts"></div><div class="gnp-chips"></div></div><div class="gnp-say"><input class="gnp-in gk-slot gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gk-btn gnp-send" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
+  el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
   layer.append(el);
   const $ = <T extends HTMLElement>(s: string) => el.querySelector<T>(s)!;
   const face = $('.gnp-face');
@@ -104,18 +162,32 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     p.textContent = text;
     log.append(p);
     while (log.childElementCount > 40) log.firstElementChild!.remove();
-    log.scrollTop = log.scrollHeight;
+    fitLog();
     return p;
+  };
+  /** 대화 줄은 위에서부터, 넘치면 오래된 윗줄을 통째로 감춘다 (반쯤 잘린 줄이 남지 않게).
+   *  폰에서 입력하는 동안(창이 위로, 아래는 키보드)은 마지막 주고받은 것(내 말·상대 말·결과 줄)만 보인다 */
+  const fitLog = () => {
+    const ps = [...log.children] as HTMLElement[];
+    for (const q of ps) q.hidden = false;
+    if (el.classList.contains('typing')) {
+      let from = -1;
+      ps.forEach((q, i) => q.classList.contains('me') && (from = i));
+      if (from < 0) from = Math.max(0, ps.length - 1);
+      ps.forEach((q, i) => (q.hidden = i < from));
+    }
+    for (let i = 0; i < ps.length - 1 && log.scrollHeight > log.clientHeight + 1; i++) ps[i].hidden = true;
   };
 
   const drawFavor = () => {
     if (!target) return;
     const f = rel().favor;
     let h = '';
-    for (let v = FAVOR_MIN; v <= FAVOR_MAX; v++) if (v) h += `<i class="${v > 0 && f >= v ? 'up' : v < 0 && f <= v ? 'down' : ''}"></i>`;
+    // 왼쪽 세 칸 = 미움(붉은), 가운데 금 = 0, 오른쪽 세 칸 = 호감(금빛)
+    for (let v = FAVOR_MIN; v <= FAVOR_MAX; v++) h += v ? `<i class="${v > 0 && f >= v ? 'up' : v < 0 && f <= v ? 'down' : v < 0 ? 'neg' : ''}"></i>` : '<b></b>';
     favorEl.innerHTML = h;
     favorEl.title = `호감 ${FAVOR_WORD(f)}`;
-    stateEl.textContent = FAVOR_WORD(f);
+    stateEl.textContent = `호감 ${FAVOR_WORD(f)} ${f > 0 ? '+' : ''}${f}`;
   };
 
   const drawActs = () => {
@@ -230,7 +302,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     if (my !== token) return; // 기다리는 동안 닫았다
     wait.className = '';
     wait.textContent = reply;
-    log.scrollTop = log.scrollHeight;
+    fitLog();
     r.met++;
     r.log = [...r.log, { role: 'user' as const, content: text }, { role: 'assistant' as const, content: reply }].slice(-12);
     setBusy(false);
@@ -272,6 +344,9 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
       input.blur();
     }
   });
+  // 폰: 입력하는 동안 창을 위로 올리고 입력칸을 이름 바로 아래에 둔다 (소프트 키보드가 아래 절반을 덮는다)
+  input.addEventListener('focus', () => el.classList.contains('coarse') && (el.classList.add('typing'), fitLog()));
+  input.addEventListener('blur', () => (el.classList.remove('typing'), fitLog()));
   for (const ev of ['keyup', 'pointerdown', 'touchstart', 'wheel'] as const) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
 
   /** 창이 열린 동안 키: E·Space 첫 버튼, 1~9 버튼, Enter·T 입력칸, Esc 닫기. 게임으로는 안 넘긴다 */
@@ -297,7 +372,9 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     token++;
     setBusy(false);
     el.style.setProperty('--who', d.color);
-    el.classList.toggle('coarse', typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches);
+    const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+    el.classList.toggle('coarse', coarse);
+    input.placeholder = coarse ? '직접 말하기' : '직접 말하기 (Enter)';
     nameEl.textContent = t.name ?? d.name;
     // 얼굴 그림이 있는 사람만 얼굴 칸 (없으면 글자 상자 대신 칸을 접는다)
     face.innerHTML = '';
@@ -305,7 +382,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     if (d.photo && host.photo) {
       const my = token;
       void Promise.resolve(host.photo(d.photo)).then((src) => {
-        if (src && my === token) (face.innerHTML = `<img alt="" src="${esc(src)}">`), (face.hidden = false);
+        if (src && my === token) void pixelFace(src).then((node) => my === token && (face.replaceChildren(node), (face.hidden = false)));
       });
     }
     log.innerHTML = '';
@@ -318,6 +395,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     chips.hidden = false;
     chips.innerHTML = CHIPS[d.group].map((c) => `<button type="button" class="gk-font" data-chip>${esc(c)}</button>`).join('');
     el.hidden = false;
+    fitLog();
     window.addEventListener('keydown', keys, true);
     host.onOpen?.(true);
     host.sfx?.('panelButton');
