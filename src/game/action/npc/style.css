@@ -1,0 +1,48 @@
+/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */
+.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:340px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}
+.gnp[hidden]{display:none}
+.gnp-face[hidden]{display:none}
+.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:var(--who,#555);display:grid;place-items:center;overflow:visible}
+.gnp-face>img{object-fit:cover;object-position:50% 15%}
+.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}
+.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}
+.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}
+.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}
+.gnp-favor{display:flex;gap:4px;align-items:center}
+.gnp-favor i{width:12px;height:12px;background:#3a3f44;box-shadow:inset 0 0 0 2px #1b1f22;display:block}
+.gnp-favor i.up{background:#e6c35a}
+.gnp-favor i.down{background:#c0453a}
+.gnp-state{font-size:18px;color:#b8ae96}
+.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}
+.gnp-log{flex:1;min-height:0;overflow-y:auto;-webkit-mask-image:linear-gradient(transparent,#000 22px);mask-image:linear-gradient(transparent,#000 22px);padding-top:10px;display:flex;flex-direction:column;gap:6px;padding-right:6px;scrollbar-width:thin;scrollbar-color:#6b6250 transparent;user-select:text;-webkit-user-select:text}
+.gnp-log p{margin:0;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}
+.gnp-log p.me{color:#9fc7b6}
+.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}
+.gnp-log p.sys{font-size:18px;color:#e6c35a}
+.gnp-log p.sys::before{content:'◆ '}
+.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}
+@keyframes gnp-blink{50%{opacity:.35}}
+.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}
+.gnp-acts{display:flex;flex-wrap:wrap;gap:2px 6px}
+.gnp-acts[hidden]{display:none}
+.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}
+.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}
+.gnp-say{display:flex;gap:8px;align-items:center}
+.gnp-in{flex:1;min-width:0;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}
+.gnp-in::placeholder{color:#6b6250}
+.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;box-shadow:none}
+.gnp-say .gk-btn{font-size:20px;padding:2px 14px;white-space:nowrap}
+.gnp-say .gk-btn:disabled{opacity:.45;cursor:default}
+.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}
+.gnp-chips[hidden]{display:none}
+.gnp-chips button{font-size:17px;padding:3px 10px;color:#b8ae96;background:rgba(0,0,0,.35);border:2px solid #4a4436;border-radius:0;cursor:pointer;text-shadow:1px 1px 0 #000}
+.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}
+.gnp-note{font-size:16px;color:#c98a6a;min-height:0}
+.gnp-note:empty{display:none}
+/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */
+.gnp.coarse{height:380px}
+.gnp.coarse .gnp-log p{font-size:26px}
+.gnp.coarse .gnp-in{height:60px;font-size:30px}
+.gnp.coarse .gk-btn{font-size:24px}
+.gnp.coarse .gnp-chips button{font-size:22px}
+.gnp.coarse .gnp-face{flex-basis:110px;width:110px;height:110px}

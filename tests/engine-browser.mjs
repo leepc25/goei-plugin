@@ -88,6 +88,9 @@ try {
   await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'spot:jaemtri'); w.player.x = d.x; });
   await page.waitForTimeout(100);
   await page.keyboard.press('KeyE');
+  // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
+  await page.waitForSelector('.gnp:not([hidden])');
+  await page.keyboard.press('KeyE');
   await page.waitForSelector('[data-mission]', { state: 'visible' });
   await S(page, 'pc-hq-panel');
   await page.click('[data-mission]');
