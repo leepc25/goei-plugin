@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T11:48:07.989913+00:00",
+  "observed_at": "2026-10-22T20:48:07.989913+09:00",
   "deliveries": [
     {
       "character": "rojemon",
@@ -68,6 +68,19 @@
       "html": "release/demo/geshugan-full.html",
       "charged_generations": 31,
       "visual_status": "owner delivered20 frames,30 paid generations rejected; independent full review pending",
+      "user_visual_approval": false
+    },
+    {
+      "character": "spangdal",
+      "commit": "3d88692b290b3f46a313ab369ffea4c78b8094d2",
+      "branch": "codex/art-spangdal-resume",
+      "html": "release/demo/spangdal-full.html",
+      "charged_generations": 59,
+      "additional_paid_generations": 0,
+      "override_slots": 92,
+      "modified_clips": 21,
+      "visual_status": "owner delivered; coordinator verified commit and sampled super review sheet",
+      "remaining": "pierce3 fingertips; slash2 hand alternation; toss repetition/recovery; weapon-removed sleeve silhouettes",
       "user_visual_approval": false
     }
   ]
