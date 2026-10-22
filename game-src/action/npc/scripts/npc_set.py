@@ -158,6 +158,8 @@ def supported(ps):   # 절뚝 걸음 + 앞팔을 앞사람 어깨 위로 걸침(
     return out
 FOLLOW=lambda hands: (lambda t: cower_walk(t,hands))
 # 민간인: (등급 full/core, 자세 변환, 걸음 손 자리, 몸가짐 한 마디)
+# 2026-10-22 사용자: 공용 몸 6종(BODY)만 17동작 전부 생성, 옷·머리·소품은 코드로 얹어 20종 이상. 나머지는 나중에 개별 추가(지금 생성 안 함).
+BODY=['missing_worker','worker_f','student','child','grandma','grandpa']
 CIV={
  'missing_worker':('full',dict(lean=6,tilt=6,stance=0.9,arm=0.8,bounce=0),((4,24),(1,25)),'dazed and exhausted'),
  'worker_f':('full',dict(lean=4,tilt=4,stance=0.8,arm=0.9,bounce=0),((10,10),(8,8)),'frazzled and shaky'),
@@ -169,7 +171,7 @@ CIV={
  'courier':('full',dict(lean=0,tilt=0,stance=1.15,arm=1.1,bounce=0),((10,12),(6,16)),'tense and jumpy'),
  'repairman':('full',dict(lean=-2,tilt=0,stance=1.2,arm=1.0,bounce=0),((8,16),(4,20)),'gruff but shaken'),
  'pajama':('full',dict(lean=5,tilt=4,stance=0.75,arm=0.9,bounce=0),((10,4),(8,5)),'half asleep and frightened'),
- 'grandpa':('core',dict(lean=10,tilt=6,stance=0.8,arm=0.7,bounce=0,crouch=2),((-6,20),(-8,20)),'stiff and slow, elderly'),
+ 'grandpa':('full',dict(lean=10,tilt=6,stance=0.8,arm=0.7,bounce=0,crouch=2),((-6,20),(-8,20)),'stiff and slow, elderly'),
  'clerk':('core',dict(lean=4,tilt=6,stance=0.9,arm=1.0,bounce=0),((10,10),(8,8)),'nervous and twitchy'),
  'cleaner':('core',dict(lean=6,tilt=4,stance=0.9,arm=0.9,bounce=0),((12,12),(10,13)),'worried, sturdy'),
  'hiker':('core',dict(lean=0,tilt=-2,stance=1.25,arm=1.05,bounce=0),((8,14),(4,18)),'loud and stiff'),
@@ -253,7 +255,14 @@ def unflip(p):   # 거꾸로 꺾인 팔꿈치·무릎을 바로잡음(audit_join
 def clips(id):
     c=hq(id) if id in HQ else merchant(id) if id in MER else civilian(id) if id in CIV else passenger(id)
     return {n:(fit(a),[unflip(p) for p in ps]) for n,(a,ps) in c.items()}
-ALL=HQ+MER+list(CIV)+['passenger_3y','passenger_pack']
+ALL=HQ+MER+BODY+['passenger_3y','passenger_pack']
+# 생성 순서(사용자 2026-10-22 03:17): 1단계 = 게임에 바로 필요한 것(본부 대기·걷기·달리기·말하기·고유 동작, 상인 28, 민간인 몸 6×17, 승객), 2단계 = 본부 생활 전체 목록.
+def phase1(id):
+    c=clips(id)
+    if id in HQ:
+        keep=['idle','walk','run','talk','turn','nod','point','wave','surprise','smile']+SIG[id]+(['bathin_k','bathout_k'] if id=='konjyuce' else [])
+        return [n for n in c if n in keep]
+    return list(c)
 def cost(nf): return 3 if nf<=8 else 4   # 실측 2026-10-22: 4장도 3회
 if __name__=='__main__':
     tot={}

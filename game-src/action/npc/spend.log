@@ -250,3 +250,127 @@ hint: wait for a job to finish, then retry
 10-22 02:23:45 base clerk-3 create_image_pixen -> 03e3af0e-4cb0-42ec-9484-3bc43de55c98
 10-22 02:23:47 clip konjyuce/lift 8f -> 0f61e3ea-da55-45f0-9eaa-0499eda95a9a
 10-22 02:24:48 base cleaner-0 create_image_pixen -> 3046cfe3-5389-4a8a-b95d-8bb0372837cd
+10-22 02:25:41 base cleaner-1 create_image_pixen -> 01cdfe2d-0e94-42b0-8bfd-60b799448901
+10-22 02:25:42 base cleaner-2 create_image_pixen -> a599288d-4485-47af-8b76-4d9d6285176a
+10-22 02:26:03 clip jaemtri/pickup 6f -> 7c3fbd9a-ca34-4efc-97e2-b4bb251b1c09
+10-22 02:26:14 clip jaemtri/drink 7f -> 40782d31-53dd-4efb-bdd8-e86b49ca7ca7
+10-22 02:26:47 clip jaemtri/eat 6f -> 22ee6825-f1ef-4727-8a49-4635c9238070
+10-22 02:27:08 base cleaner-3 create_image_pixen -> aa272509-add8-42c7-8281-2980054751c5
+10-22 02:27:46 base hiker-0 create_image_pixen -> 513166f3-4839-4789-bd61-d3a3d99510bc
+10-22 02:27:47 base hiker-1 create_image_pixen -> 3bf87d65-823a-4125-986f-f37070b17022
+10-22 02:27:47 base hiker-2 create_image_pixen -> de66e55b-157a-4f27-893f-de995f918305
+10-22 02:29:15 clip jaemtri/tired 4f -> 0e71ff3d-3473-4ba7-b7e6-c6afa37e2483
+10-22 02:29:15 clip jaemtri/talk 6f -> 3fd02bb3-6dff-42ff-bd83-f7ee242075ad
+10-22 02:29:26 base hiker-3 create_image_pixen -> 78a112d8-bdf6-45a6-b221-4a9127997af1
+10-22 02:29:52 clip jaemtri/shush 4f -> a9969286-ef56-45b7-8d4c-fce9ecf5e353
+10-22 02:30:04 clip jaemtri/glare 4f -> bfbdf565-5702-4302-a094-ce659618ce81
+10-22 02:30:17 base rider-0 create_image_pixen -> 2cda7ab6-22ea-463f-9724-f9a7c7068e8b
+10-22 02:30:37 estimate 00.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:31:19 base rider-1 create_image_pixen -> 167af6d3-4710-4f6a-960e-e2b199dee6d5
+10-22 02:31:32 base rider-2 create_image_pixen -> be644e04-5beb-45d2-bffa-5c82508dedaf
+10-22 02:32:23 clip jaemtri/turn 3f -> ac2c0f89-6160-44d8-9ecf-73a488ea3f1d
+10-22 02:32:34 base rider-3 create_image_pixen -> bb909807-fd12-44b5-af0e-12526a1cd610
+10-22 02:32:35 clip jaemtri/fall 3f -> 21dfdc51-e65b-4ef2-a642-a708d3360ac7
+10-22 02:32:54 clip madeokhee/idle 4f -> b8a40533-3982-4d11-bd2b-64b221ece7d3
+10-22 02:33:10 clip jaemtri/land 5f -> 1bacf3bf-50c3-4da8-be12-e17cb288630a
+10-22 02:33:32 estimate yunjia-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:34:00 base collegian-0 create_image_pixen -> 23f5f860-5a8e-40de-9529-478199c95baf
+10-22 02:34:08 clip jaemtri/stairs 8f -> 1b51681f-cfe1-43b5-afbc-eecc2c123ad1
+10-22 02:34:19 clip jaemtri/ladder 9f -> c1aa707d-f21c-4751-af81-8babf6c48b9b
+10-22 02:34:22 profile yunjia-11 gen_h75 target80 animate_with_skeleton_v3 -> 7dd68a81-f95c-4328-a689-43e02f1a3e44
+10-22 02:34:25 estimate worker_f-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:34:37 base collegian-1 create_image_pixen -> 108ae2f6-8456-4b90-9f16-c78bfc22fd0e
+10-22 02:34:54 clip jaemtri/rope 6f -> c30098bf-1fa5-449f-9f00-5a992c2a62b1
+10-22 02:35:28 base collegian-2 create_image_pixen -> 937f9967-fc23-45a3-8e8c-654e8aa6c1b7
+10-22 02:35:46 clip madeokhee/walk 8f -> 0ab06072-6b88-479b-b008-8836293bc569
+10-22 02:36:08 clip madeokhee/turn 3f -> 138e3e16-bd78-400c-beff-6961f859e4ee
+10-22 02:38:22 base collegian-3 create_image_pixen -> 8ec1971e-be19-4e89-bd74-7cde116dd0a1
+10-22 02:38:29 clip madeokhee/talk 6f -> 2d00c08b-65b5-4ed8-99c2-4a7f8bbc9451
+10-22 02:38:35 base lady-0 create_image_pixen -> d32fa3e9-dbcc-4382-91d9-6cfec03129eb
+10-22 02:38:44 clip jaemtri/mantle 6f -> af0ab7e0-ca11-433f-af71-bdc6cebaa603
+10-22 02:39:48 clip jaemtri/vault 5f -> 19645cc7-62a7-42ec-bbcf-aa150059b21d
+10-22 02:40:28 clip madeokhee/greet 5f -> 6c8395f6-8ed7-4a0a-a64e-a6cd93fd0d63
+10-22 02:40:32 clip jaemtri/sneak 8f -> 5bc46535-5adc-44d4-86f3-8d9b3ea4c03d
+10-22 02:40:51 profile worker_f-2 gen_h81 target88 animate_with_skeleton_v3 -> db838241-7c78-4262-b153-05f978609afc
+10-22 02:40:54 estimate grandma-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:41:47 clip madeokhee/nod 5f -> 09e161e4-2ffb-4365-9826-9a6d650b6ec2
+10-22 02:42:04 base lady-1 create_image_pixen -> 5a87a4d9-4f0f-4281-a122-2d7eb8bdbd32
+10-22 02:42:19 clip madeokhee/headshake 6f -> f4ecaebc-3a40-443f-83fa-8547e1fb8348
+10-22 02:42:19 clip madeokhee/handover 5f -> 8c826828-a5c8-488f-9962-d14603e0eee0
+10-22 02:42:29 base lady-2 create_image_pixen -> bafd0574-1d32-47e8-bda9-648f8fdb4e97
+10-22 02:42:42 base lady-3 create_image_pixen -> 7c7d9021-99a1-49c8-9a7c-ca34a15f20ef
+10-22 02:42:58 clip jaemtri/idle_light 4f -> c26d4911-c709-4e3b-b53a-33755490655b
+10-22 02:43:09 clip jaemtri/walk_light 8f -> f5d6e9d1-615b-47fd-86ee-84b189782010
+10-22 02:43:32 clip jaemtri/run_light 8f -> 3bc38d47-8ab8-4dfa-8df9-8fca578c00ec
+10-22 02:43:56 base cook-0 create_image_pixen -> 90fe6d43-c122-4174-9caa-9e58b8747b3a
+10-22 02:44:16 clip jaemtri/lookback 6f -> a585f3a7-a1e3-4170-8040-a32210d1cec0
+10-22 02:44:41 clip jaemtri/hide 5f -> affb55d2-a68d-42f5-ac78-527684003ec3
+10-22 02:45:28 clip jaemtri/door 7f -> e92b68f5-047f-4843-847a-bc500025e48a
+10-22 02:45:44 profile grandma-1 gen_h76 target80 animate_with_skeleton_v3 -> b2337a61-3188-43c3-a4ec-5acf544833aa
+10-22 02:45:48 estimate grandpa-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:46:00 base cook-1 create_image_pixen -> ab1363b1-49da-4f64-9b1b-bc123a4d06c1
+10-22 02:46:01 base cook-2 create_image_pixen -> a7221674-51b9-4b66-94cc-c653a6003501
+10-22 02:46:26 profile grandpa-3 gen_h83 target86 animate_with_skeleton_v3 -> 1cb0c4e4-2491-469c-9315-18a179f5fd04
+10-22 02:46:28 estimate student-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:46:38 base cook-3 create_image_pixen -> 8a4ba4bd-ee44-4a32-be44-8ff5889e2462
+10-22 02:46:54 profile student-1 gen_h85 target86 animate_with_skeleton_v3 -> 93d5f9f9-a5ec-4297-a9fe-bc9d099e0c66
+10-22 02:46:57 estimate child-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:47:09 profile child-2 gen_h52 target58 animate_with_skeleton_v3 -> a0ded836-9d71-4495-874b-b5ccecc9508d
+10-22 02:47:14 estimate courier-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:47:15 clip jaemtri/doorclose 6f -> a94bdef2-4c66-4568-b1a9-10f916ddfaf2
+10-22 02:47:19 base batch generations_remaining: 16804.90 -> generations_remaining: 16402.90
+10-22 02:47:40 estimate collegian-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:47:57 estimate 00.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:48:04 profile courier-2 gen_h88 target90 animate_with_skeleton_v3 -> 2625ce14-0931-42d8-bb19-41ef7f6f5fc9
+10-22 02:48:05 profile collegian-0 gen_h86 target90 animate_with_skeleton_v3 -> 01ce677b-098b-4f63-a32b-d290c046fdd6
+10-22 02:48:09 clip survivor_f/tremble 4f -> 68f82ece-b9df-4b9d-a5b7-5972def6636f
+10-22 02:48:09 estimate repairman-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:48:11 estimate lady-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:48:52 clip survivor_f/cover 4f -> 8d5c4e39-f993-437d-b1b9-07c04958b3d8
+10-22 02:49:03 clip survivor_f/recoil 6f -> 4b668983-1867-4d4d-bbe0-c1a9ee27dd37
+10-22 02:49:13 profile repairman-3 gen_h90 target92 animate_with_skeleton_v3 -> 1dda7ae5-ece4-475e-b0ae-88b0a43a98aa
+10-22 02:49:14 estimate pajama-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:49:36 clip jaemtri/knock 6f -> 1371872f-ecec-4b9c-b3cb-2eefe4cf453c
+10-22 02:50:05 profile pajama-1 gen_h79 target86 animate_with_skeleton_v3 -> 5478a7dd-7be6-4ea7-8436-415a65e3f1c6
+10-22 02:50:05 profile lady-3 gen_h90 target88 animate_with_skeleton_v3 -> 1b153134-51dc-450c-89a7-5bf49d0106f3
+10-22 02:50:07 estimate cook-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:50:09 estimate clerk-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:50:54 clip jaemtri/push 8f -> 37a9d62b-6970-483f-8a27-7c846900581f
+10-22 02:51:06 clip madeokhee/receive 5f -> 6f52546b-0763-4221-8c64-95d88fc659d1
+10-22 02:51:11 profile clerk-1 gen_h91 target88 animate_with_skeleton_v3 -> 41fe7427-05f6-49fa-b0f2-dc767a69c97c
+10-22 02:51:13 estimate cleaner-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:51:14 profile cleaner-1 gen_h84 target84 animate_with_skeleton_v3 -> dbae8b90-6f89-4aa1-bd23-2abb672bcbad
+10-22 02:51:17 estimate hiker-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:51:22 clip survivor_f/flee 8f -> b861bc4e-7273-4c6c-b917-893794f0bd40
+10-22 02:51:46 profile cook-2 gen_h86 target90 animate_with_skeleton_v3 -> dae310a2-ca33-410a-bec5-d04737925495
+10-22 02:52:20 profile hiker-2 gen_h88 target90 animate_with_skeleton_v3 -> 08ca0caf-8ea3-48b7-ab38-3666efc53170
+10-22 02:52:22 estimate rider-pad.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:53:06 clip madeokhee/count 6f -> 20009ca3-4b6e-4dbc-9217-c06ad0cc9293
+10-22 02:53:13 profile batch generations_remaining: 16392.90 -> generations_remaining: 16253.90
+10-22 02:53:29 estimate 00.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:53:38 profile rider-2 gen_h87 target90 animate_with_skeleton_v3 -> 5e0ecd12-6556-4d08-a98b-cc00017f6fbe
+10-22 02:53:39 clip jaemtri/idle_box 4f -> 0864eb31-3076-4f74-be25-43bb4cb00508
+10-22 02:54:42 clip madeokhee/point 4f -> 3f3f5d0e-f882-41c5-83b4-0414875dc931
+10-22 02:54:42 clip madeokhee/armscross 4f -> 43b58bee-f1ce-4898-bdac-7b869eb225a4
+10-22 02:54:42 clip collegian/tremble 4f -> c4a38442-1076-46c7-8c60-ef218eba384a
+10-22 02:54:55 clip survivor_f/trip 6f -> 7ca3f543-8f4f-4ad2-bfc3-10010ba1ca9f
+10-22 02:55:07 profile batch generations_remaining: 16800.90 -> generations_remaining: 16190.80
+10-22 02:55:29 clip jaemtri/walk_box 8f -> 0eae0706-24b3-4879-b8b3-f01be5c66caa
+10-22 02:55:50 estimate 00.png usage {'type': 'generations', 'generations': 0.1}
+10-22 02:56:16 clip jaemtri/run_box 8f -> 5e3fa465-c7cd-4320-8f06-75e752fb3839
+10-22 02:57:03 clip survivor_f/crawl 8f -> 234cf9ea-3ab4-427b-95b8-5fbf824dd7d6
+10-22 02:57:09 clip yunjia/idle 4f -> 23c7bc67-7ae4-4cd3-97e4-ba6cff7c270b
+10-22 02:57:09 clip collegian/cover 4f -> c97b292d-ce1b-4a74-8714-cb9e2ce5e17d
+10-22 02:57:32 clip collegian/recoil 6f -> 513e7d1b-51b0-455a-82cf-ddf82514d150
+10-22 02:57:41 clip madeokhee/think 4f -> 33af23da-d271-4a3a-b0cf-8b1c76868c0a
+10-22 02:57:52 clip yunjia/walk 8f -> ef1b5635-77d0-44a6-9e55-570b26bc4399
+10-22 02:58:16 clip collegian/flee 8f -> 287cf106-e94e-4d54-a14a-c2c222a0e404
+10-22 02:59:08 clip yunjia/turn 3f -> 8153de30-c178-4474-ac55-8b6e41918f7d
+10-22 02:59:28 clip survivor_f/scoot 6f -> 26a41052-b391-4cc8-85ec-100a95730f74
+10-22 02:59:29 clip survivor_f/wail 6f -> 0ea56333-de59-43fe-86cc-7b1c94f73442
+10-22 02:59:30 clip yunjia/talk 6f -> 115cc843-51ac-4dae-8d88-9e7a536197e1
+10-22 02:59:31 clip madeokhee/smile 4f -> 5254834b-7499-4784-a7bc-c985b977887c
+10-22 02:59:52 clip madeokhee/laugh 6f -> 809a9085-ef2b-4494-9a60-2280855754aa
+10-22 03:00:18 clip yunjia/greet 8f -> cc4ed324-6b2a-4e11-ad83-58ccb563151f
+10-22 03:00:27 clip jaemtri/lever 5f -> 088dfd1e-3d2c-4de5-a664-be70845a3b28
+10-22 03:00:31 clip collegian/crawl 8f -> fd2957fd-f58b-435e-9338-15909a9413f6
