@@ -5,7 +5,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); F = os.path.join(HERE, '../fu
 out, names = sys.argv[1], sys.argv[2:]
 rows = [[Image.open(os.path.join(HERE, '../../jyaldi-v5/full/clips/idle/00.png')), Image.open(F + '/base.png')]]
 for n in names: rows.append([Image.open(f) for f in sorted(glob.glob(f'{F}/clips/{n}/*.png'))])
-cw, ch, k, per = 120, 110, 3, 8
+cw, ch, k, per = 170, 110, 2, 8
 nr = sum(max(1, (len(r) + per - 1) // per) for r in rows)
 o = Image.new('RGBA', (cw * per * k, ch * nr * k), (88, 96, 104, 255)); y = 0
 for r in rows:

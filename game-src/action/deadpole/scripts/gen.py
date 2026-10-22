@@ -31,7 +31,7 @@ def fetch(n,j):
     for f in os.listdir(d): os.remove(f'{d}/{f}')
     for i in range(nf): pl.poll(j,f'{d}/{i:02d}.png',index=i,tries=5)
 if __name__=='__main__':
-    seed=11
+    seed=11; MAXJ=2   # 동시 작업 상한(2026-10-22 사용자 확정: 요원 스레드당 2칸)
     for a in sys.argv[1:]:
         if a.startswith('--seed='): seed=int(a[7:])
     names=[a for a in sys.argv[1:] if not a.startswith('--')] or list(rig.CLIPS)
@@ -41,6 +41,7 @@ if __name__=='__main__':
         last={}
         for ln in open(pl.LOG):
             if 'gen RESET' in ln: last={}   # 기준 그림을 바꾼 뒤엔 그 전 작업을 이어받지 않음
+            if 'gen DROP ' in ln: last.pop(ln.split('gen DROP ')[1].split()[0],None)   # 검수에서 버린 클립은 새로 생성
             m=re.search(r'gen (\S+) \d+f -> ([0-9a-f-]{36})',ln)
             if m: last[m.group(1)]=m.group(2)
         for n in list(names):
@@ -48,7 +49,7 @@ if __name__=='__main__':
             elif os.path.exists(f'{OUT}/{n}/00.png'): names.remove(n)
     queue=list(names); spent=0
     while queue or pend:
-        while queue and len(pend)<8:   # 칸이 없으면(rate limit) 기다리지 말고 끝난 작업부터 받음
+        while queue and len(pend)<MAXJ:   # 칸이 없으면(rate limit) 기다리지 말고 끝난 작업부터 받음
             n=queue[0]; j,t=pl.submit('animate_with_skeleton_v3',args_for(n,seed),tries=1)
             if t.startswith('RATE') or t.startswith('EXC'): break
             queue.pop(0); pl.log(f'gen {n} {len(rig.CLIPS[n][2])}f -> {j} {t[:80]}')

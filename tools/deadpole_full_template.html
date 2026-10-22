@@ -117,8 +117,8 @@ const G = { x: 360, z: 0.55, y: 0, vy: 0, vx: 0, dir: 1, clip: 'idle', f: 0, t: 
   items: { coffee: 2, snack: 2, bandage: 2 }, dmgLog: [], rewindCD: 0, clues: 2, mapCells: 3, scentT: 0, trackT: 0 };
 const keys = new Set();
 const FX = { stop: 0, shake: 0, sparks: [], dust: [], rings: [], text: [], flash: 0, cut: 0, fade: 0, muzzle: [], tracer: [], rewind: 0, back: [] };
-const ENEMIES = [mkE(820, 0.5, 'blade'), mkE(1040, 0.7, 'blunt')];
-function mkE(x, z, kind) { return { x, z, y: 0, vx: 0, vy: 0, hp: 60, state: 'idle', t: 0, flash: 0, face: -1, home: x, kind, cd: 1.5 + Math.random() }; }
+const ENEMIES = [mkE(820, 0.45, 'blade', 160), mkE(1040, 0.75, 'blunt', 320)];   // keep = 다가오는 거리(둘이 겹치지 않게)
+function mkE(x, z, kind, keep) { return { x, z, y: 0, vx: 0, vy: 0, hp: 60, state: 'idle', t: 0, flash: 0, face: -1, home: x, kind, keep, reach: kind === 'blade' ? 110 : 200, cd: 4 + Math.random() * 2 }; }
 const WALL = { x: 1230 };
 const PICK = [{ kind: 'pipe', x: 560, z: 0.8, label: '쇠파이프' }, { kind: 'shotgun', x: 700, z: 0.3, label: '산탄총' }, { kind: 'brick', x: 220, z: 0.8, label: '벽돌' }];
 const PROJ = [];
@@ -592,13 +592,15 @@ function updateEnemies(dt) {
     else if (e.state === 'hit') { e.x += e.vx * dt * 60; e.vx *= Math.pow(0.8, dt * 60); e.t -= dt; if (e.t <= 0) e.state = 'idle'; }
     else if (e.state === 'fly') { e.x += e.vx * dt * 60; e.vy += 0.8 * dt * 60; e.y += e.vy * dt * 60; if (e.y >= 0) { e.y = 0; if (e.vy > 6) { e.vy = -e.vy * 0.35; } else { e.vy = 0; e.state = 'down'; e.t = 1.4; } for (let i = 0; i < 5; i++) FX.dust.push({ x: e.x, y: groundY(e.z), vx: (i - 2) * 2.5, vy: -2, t: 0.35 }); } }
     else if (e.state === 'down') { e.t -= dt; if (e.t <= 0) { e.state = 'idle'; if (e.hp <= 0) e.hp = 60; } }
-    else if (e.state === 'wind') { e.t -= dt; if (e.t <= 0) { e.state = 'idle'; e.cd = 2.2 + Math.random() * 1.2; e.swing = 0.15; if (Math.abs(e.x - G.x) < 150 && Math.abs(e.z - G.z) < 0.14) hurt(e, e.kind === 'blade' ? 12 : 14, e.kind); } }
+    else if (e.state === 'wind') { e.t -= dt; if (e.t <= 0) { e.state = 'idle'; e.cd = 3.5 + Math.random() * 1.5; e.swing = 0.15; if (Math.abs(e.x - G.x) < e.reach + 40 && Math.abs(e.z - G.z) < 0.14) hurt(e, e.kind === 'blade' ? 12 : 14, e.kind); } }
     else if (e.state === 'idle' && !G.taunt) {
       const d = G.x - e.x; e.face = Math.sign(d) || e.face;
-      if (Math.abs(d) > 130) e.x += Math.sign(d) * 1.2 * dt * 60;
-      if (Math.abs(e.z - G.z) > 0.03) e.z += Math.sign(G.z - e.z) * 0.002 * dt * 60;
+      const near = Math.abs(d) <= e.keep + 20 && e.cd < 1.2;   // 칠 차례가 오면 붙음, 아니면 제자리 거리 유지
+      const want = near ? e.reach : e.keep;
+      if (Math.abs(d) > want) e.x += Math.sign(d) * 1.2 * dt * 60;
+      if (near && Math.abs(e.z - G.z) > 0.03) e.z += Math.sign(G.z - e.z) * 0.003 * dt * 60;
       e.cd -= dt;
-      if (atk && e.cd <= 0 && Math.abs(d) < 150 && Math.abs(e.z - G.z) < 0.14 && !G.dead) { e.state = 'wind'; e.t = 0.45; }
+      if (atk && e.cd <= 0 && Math.abs(d) < e.reach + 40 && Math.abs(e.z - G.z) < 0.14 && !G.dead) { e.state = 'wind'; e.t = 0.45; }
     }
     e.x = Math.max(100, Math.min(WALL.x - 70, e.x));
   }

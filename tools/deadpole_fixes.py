@@ -53,16 +53,88 @@ def clean(im):
         if len(c) < 24:
             for x, y in c:
                 px[x, y] = (0, 0, 0, 0)
+    # 팔레트 색(피부·셔츠 흰색)으로 그린 불꽃·연기: 몸 테두리(검은 외곽선)의 가장 앞 x보다 앞에 있는 밝은 점은 효과
+    if comps:
+        lum = lambda p: 0.3 * p[0] + 0.59 * p[1] + 0.11 * p[2]
+        dark = [x for x, y in comps[0] if lum(px[x, y]) < 40]
+        if dark:
+            front = max(dark)
+            for y in range(im.height):
+                for x in range(front + 2, im.width):
+                    if px[x, y][3]:
+                        px[x, y] = (0, 0, 0, 0)
+    for c in sorted(components(im), key=len, reverse=True)[1:]:
+        if len(c) < 24:
+            for x, y in c:
+                px[x, y] = (0, 0, 0, 0)
     return im
 
 
-FIX = {}   # 클립: 함수(장 목록) → 장 목록 (검수 결함 보정)
+def clip_frames(name):
+    d = os.path.join(HERE, '..', 'game-src', 'action', 'deadpole', 'full', 'clips', name)
+    return [Image.open(os.path.join(d, f)).convert('RGBA') for f in sorted(os.listdir(d)) if f.endswith('.png')]
+
+
+def warm_suit(im):
+    """GPT 탈의 앞 장은 2차 기준 그림(쟈알디 청회색 정장)으로 그려짐 → 청회색 점을 3차 숯빛 정장 단계로 밝기 맞춰 바꿈"""
+    ramp = sorted({c for c in palette() if max(c) < 80 and abs(c[0] - c[2]) < 12}, key=lambda c: 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2])
+    lum = lambda c: 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+    im = im.copy(); px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a and b > r + 6 and max(r, g, b) < 150:
+                L = lum((r, g, b)) * 0.92
+                px[x, y] = (*min(ramp, key=lambda c: abs(lum(c) - L)), 255)
+    return im
+
+
+def grey_gun(im):
+    """총구 끝에 남은 주황·갈색 점(불꽃 찌꺼기): 얼굴 피부보다 8px 앞에 있는 따뜻한 색은 장갑 낀 손 앞이라 총뿐 → 같은 밝기의 회색으로"""
+    im = im.copy(); px = im.load()
+    warm = lambda p: p[0] - p[2] > 40 and p[0] > 100
+    skin = [x for y in range(im.height) for x in range(im.width) if px[x, y][3] and warm(px[x, y]) and px[x, y][0] > 200]
+    if not skin:
+        return im
+    face = min(skin) + 14   # 얼굴 뒤 끝 + 얼굴 폭 남짓 (불꽃 점도 밝은 주황이라 max는 못 씀)
+    lum = lambda c: 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+    greys = sorted({c for c in palette() if abs(c[0] - c[2]) < 18}, key=lum)
+    for y in range(im.height):
+        for x in range(face + 8, im.width):
+            q = px[x, y]
+            if q[3] and warm(q):
+                px[x, y] = (*min(greys, key=lambda c: abs(lum(c) - lum(q) * 0.6)), 255)
+    return im
+
+
+def unsmear(im, x1, color):
+    """x < x1 범위의 한 색 점을 지움 (머리 뒤 회색 번짐)"""
+    im = im.copy(); px = im.load()
+    for y in range(im.height):
+        for x in range(x1):
+            if px[x, y][3] and px[x, y][:3] in color:
+                px[x, y] = (0, 0, 0, 0)
+    return im
+
+
+GUN = ('ready', 'fire', 'step', 'draw', 'cq1', 'cq2', 'cq3', 'kneel', 'kneelwalk', 'kneelshot', 'catch', 'contact', 'reload')
+
+
+# 클립: 함수(장 목록) → 장 목록 (검수 결함 보정)
+FIX = {
+    'undress': lambda fr: [warm_suit(f) for f in fr],
+    # 옷깃 잡기: 다시 만든 것도 잡는 손 대신 겨누고 쏘는 그림 → 칼날 잡기 앞 3장(앞손이 튀어나가 움켜쥠, 뒷손 권총)을 씀
+    'sniffground': lambda fr: [unsmear(f, 50, {(106, 112, 123), (158, 162, 166), (214, 215, 217)}) if i == 2 else f for i, f in enumerate(fr)],
+    'collar': lambda fr: [clean(f) for f in clip_frames('catch')[:3]] + [clean(clip_frames('catch')[2])],
+}
 
 
 def apply(key, src, frames):
     if src in GPT:
-        return frames
+        return FIX[key](frames) if key in FIX else frames
     frames = [clean(f) for f in frames]
+    if key in GUN:
+        frames = [grey_gun(f) for f in frames]
     if key in FIX:
         frames = FIX[key](frames)
     return frames
