@@ -48,7 +48,7 @@ try {
       if (xs[xs.length - 1] < L - 400) xs.push(L - 300);
       let k = 0;
       for (const x of xs) {
-        await E((x) => window.__goeiEngine.world.api.movePlayer(x), x);
+        await E((x) => window.__goeiEngine.world.api.movePlayer(x, 668), x);
         await page.waitForTimeout(500);
         await page.screenshot({ path: `${OUT}/${vp.name}-${id}-${++k}.png` });
       }
