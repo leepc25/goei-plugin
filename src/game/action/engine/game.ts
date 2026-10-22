@@ -241,6 +241,9 @@ export class Game {
 
   deploy(run: RunConfigCore, saved?: RunCheckpoint) {
     const stage = this.mods.stages.find((s) => s.id === run.stageId) ?? this.mods.stages[0];
+    // 본부의 MissionLaunch에는 stageId가 없을 수 있다. 실제 선택된 무대를
+    // 출동·월드·저장에 공통으로 남겨 기본 무대로 출동한 기록도 복원한다.
+    run = { ...run, stageId: stage.id };
     this.inHub = false;
     this.run = run;
     this.runStage = stage;
@@ -270,9 +273,11 @@ export class Game {
   }
 
   async resume(saved: RunCheckpoint) {
-    if (saved.version !== 1 || !this.mods.stages.some(s => s.id === saved.run.stageId && s.restore)) throw new Error('지원하지 않는 출동 저장');
+    // v1 초기 저장은 기본 무대의 ID를 생략했다. 명시된 알 수 없는 ID는 거부한다.
+    const stageId = saved.run.stageId ?? this.mods.stages[0]?.id;
+    if (saved.version !== 1 || !this.mods.stages.some(s => s.id === stageId && s.restore)) throw new Error('지원하지 않는 출동 저장');
     if (this.mods.hq) { this.showHq(); await this.mods.hq.ready?.(); }
-    this.deploy(saved.run, saved);
+    this.deploy({ ...saved.run, stageId }, saved);
     this.world?.say('출동 복원 완료. 전투 중 중단한 경우 마지막 안전 지점부터 이어집니다.', 4);
   }
 

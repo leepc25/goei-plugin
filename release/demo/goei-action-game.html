@@ -7212,6 +7212,7 @@ var Game = class {
   /* ───────── 출동 ───────── */
   deploy(run, saved) {
     const stage = this.mods.stages.find((s2) => s2.id === run.stageId) ?? this.mods.stages[0];
+    run = { ...run, stageId: stage.id };
     this.inHub = false;
     this.run = run;
     this.runStage = stage;
@@ -7239,12 +7240,13 @@ var Game = class {
     this.mods.saveCheckpoint?.({ version: 1, run: this.run, stage, world: w.snapshot(), savedAt: Date.now() });
   }
   async resume(saved) {
-    if (saved.version !== 1 || !this.mods.stages.some((s2) => s2.id === saved.run.stageId && s2.restore)) throw new Error("지원하지 않는 출동 저장");
+    const stageId = saved.run.stageId ?? this.mods.stages[0]?.id;
+    if (saved.version !== 1 || !this.mods.stages.some((s2) => s2.id === stageId && s2.restore)) throw new Error("지원하지 않는 출동 저장");
     if (this.mods.hq) {
       this.showHq();
       await this.mods.hq.ready?.();
     }
-    this.deploy(saved.run, saved);
+    this.deploy({ ...saved.run, stageId }, saved);
     this.world?.say("출동 복원 완료. 전투 중 중단한 경우 마지막 안전 지점부터 이어집니다.", 4);
   }
   /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
