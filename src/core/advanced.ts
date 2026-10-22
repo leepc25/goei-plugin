@@ -4,7 +4,7 @@
 import { CONTEXT as GN_CONTEXT, HISTORY as GN_HISTORY, LIMITS as GN_LIMITS } from './gnet';
 import { COOLDOWN as PH_COOLDOWN, HISTORY as PH_HISTORY, LIMITS as PH_LIMITS } from './phone';
 
-export type AdvFeature = 'gn' | 'ph' | 'nw' | 'gen';
+export type AdvFeature = 'gn' | 'ph' | 'nw' | 'hq' | 'gen';
 
 export interface AdvItem {
   key: string;
@@ -140,6 +140,21 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       ],
     },
   ],
+  // 본부 방문 대화 (2026-10-22 설계 2판): 지침은 카드 「Visit」 로어북, 여기는 보낼 자료와 길이
+  hq: [
+    {
+      title: '참고 자료',
+      chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '주인공·페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 1), chip('secondary', '2차 참조', 0), chip('interlude', '같은 막간 다른 대화', 1)],
+      items: [turns(6), budget],
+    },
+    {
+      title: '대화',
+      items: [
+        { key: 'model', label: '대화 모델', type: 'pick', def: 'aux', opts: [['aux', '보조'], ['main', '메인']] },
+        num('line_chars', '답 길이', 80, 20, 400, '자', { hint: '말풍선 한 장은 80자 안팎이에요' }),
+      ],
+    },
+  ],
   nw: [
     {
       title: '참고 자료',
@@ -154,7 +169,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
   ],
 };
 
-const PREFIX: Record<AdvFeature, string> = { gn: '$lb_cfg_lb-gn.adv_', ph: '$ph_adv_', nw: '$nw_adv_', gen: '$gen_' };
+const PREFIX: Record<AdvFeature, string> = { gn: '$lb_cfg_lb-gn.adv_', ph: '$ph_adv_', nw: '$nw_adv_', hq: '$hq_adv_', gen: '$gen_' };
 
 export const advItems = (f: AdvFeature): AdvItem[] => ADV[f].flatMap((g) => [...(g.chips ?? []), ...g.items]);
 export const advItem = (f: AdvFeature, key: string): AdvItem | undefined => advItems(f).find((i) => i.key === key);
@@ -202,7 +217,7 @@ export interface RefToggles {
   secondary: boolean;
 }
 
-export function refToggles(state: State, f: 'gn' | 'ph' | 'nw'): RefToggles {
+export function refToggles(state: State, f: 'gn' | 'ph' | 'nw' | 'hq'): RefToggles {
   const on = (k: string, d: boolean) => (advItem(f, k) ? advOn(state, f, k) : d);
   return {
     description: on('desc', true), authors: on('authors', true), persona: on('persona', true), active: on('active', true),
@@ -211,7 +226,7 @@ export function refToggles(state: State, f: 'gn' | 'ph' | 'nw'): RefToggles {
 }
 
 /** 이 기능의 요청 토큰 상한. 기능 값이 0이면 공통 값, 그것도 0이면 제한 없음(0) */
-export function budgetFor(state: State, f: 'gn' | 'ph' | 'nw'): number {
+export function budgetFor(state: State, f: 'gn' | 'ph' | 'nw' | 'hq'): number {
   return advNum(state, f, 'budget') || advNum(state, 'gen', 'budget');
 }
 

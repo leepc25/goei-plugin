@@ -3,7 +3,13 @@ import type { Chat, LoreEntry } from './types';
 
 export const VISIT_KEY = 'goeiHqVisitV1';
 export const VISIT_LORE = '본부 방문 대화 기록';
-export interface VisitTurn { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string }
+export interface VisitTurn {
+  id: string; at: number; agentId: string; name: string; user: string; reply: string;
+  /** 주인공 요원 이름 (캐릭터로 플레이일 때) */
+  visitor?: string;
+  /** 이 대화가 일어난 자리: 그때 마지막 본편 메시지 (막간 끼우기의 기준) */
+  anchor?: string;
+}
 export interface VisitRecord { turns: VisitTurn[] }
 export type VisitRoom = 'office' | 'lounge' | 'infirmary' | 'quarters';
 export function visitRoom(a: CardAgent): VisitRoom | null {
@@ -13,6 +19,12 @@ export function visitRoom(a: CardAgent): VisitRoom | null {
   if (/수면|취침/.test(a.state)) return 'quarters';
   if (/휴게|휴식/.test(a.state)) return 'lounge';
   return !a.locked && /내근|대기/.test(a.state) ? 'office' : null;
+}
+/** 채팅의 지금 자리: 마지막 메시지의 chatId (없으면 메시지 수) */
+export function anchorOf(chat: Chat): string {
+  const msgs = Array.isArray(chat.message) ? chat.message as { chatId?: string }[] : [];
+  const last = msgs[msgs.length - 1];
+  return last?.chatId ? String(last.chatId) : `#${msgs.length}`;
 }
 export function visitRecord(chat: Chat): VisitRecord {
   const v = chat[VISIT_KEY] as VisitRecord | undefined;

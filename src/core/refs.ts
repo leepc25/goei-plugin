@@ -27,7 +27,7 @@ export interface RefSource {
 /** 참고 자료로 쓰면 안 되는 내부 로어북 */
 const INTERNAL = new Set([
   'World catalog', 'Agent roster', 'Directive', 'Faction display', 'Start trigger', 'LB Backend', 'GNet', 'Wiki', 'Phone',
-  'Phone tabs', 'Settings', '⚙️설정', '괴이봇 플러그인 매니페스트', '괴이봇 명부', 'Plugin manifest', 'Directory', 'WIKI_DIAGNOSTIC',
+  'Phone tabs', 'Visit', 'Settings', '⚙️설정', '괴이봇 플러그인 매니페스트', '괴이봇 명부', 'Plugin manifest', 'Directory', 'WIKI_DIAGNOSTIC',
 ]);
 export const ACTIVE_BOOKS = ['📜Faction', '🙂Roster'];
 export const PERSONA_SOURCE = '사용자 페르소나';

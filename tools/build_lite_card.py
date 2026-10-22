@@ -595,6 +595,19 @@ def add_image_lore(lore):
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 
 
+VISIT_GUIDE = ROOT / 'card' / 'visit-guide.txt'
+VISIT_HEAD = '<!-- Visit: 본부 방문 대화 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->'
+
+
+def add_visit_guide(lore):
+    """본부 방문 대화 지침(card/visit-guide.txt)을 괴담톡 Phone처럼 ⚙️설정 폴더의 키 없는 항목으로 넣는다 (플러그인 core/visitPrompt.ts)"""
+    settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    entry = {'key': '', 'secondkey': '', 'comment': 'Visit', 'content': VISIT_HEAD + '\n\n' + VISIT_GUIDE.read_text(encoding='utf-8').strip() + '\n',
+             'mode': 'normal', 'insertorder': 100, 'alwaysActive': False, 'selective': False, 'useRegex': False,
+             'folder': settings['key'], 'bookVersion': 2}
+    return [e for e in lore if e.get('comment') != 'Visit'] + [entry]
+
+
 def shrink_maps(others):
     """원본 지도(1402px)를 assets/maps 의 줄인 지도(1100px, AVIF 품질 50)로 바꾼다. 이름·경로는 그대로"""
     swapped = 0
@@ -673,7 +686,7 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_image_lore(add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore))))))
+    lore = add_visit_guide(add_image_lore(add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))))
     lore, manifest['keys'] = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({
