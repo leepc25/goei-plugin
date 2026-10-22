@@ -98,7 +98,7 @@ def creator_notes(original):
         '<div style="color:#9DB0AC;font-size:13px">괴이봇 2탄 기반 · 플러그인 전용</div></div></div>'
         f'<div style="{h3}">준비</div>'
         + _step(1, '플러그인 설치', '설정 → 플러그인에서 goei-plugin.js를 추가해요.')
-        + _step(2, '에셋 모듈 임포트', '캐릭터 이미지 출력에 필요해요.')
+        + _step(2, '에셋 모듈은 필요 없어요', '캐릭터 이미지가 봇 카드에 들어 있어요. 예전 에셋 모듈은 꺼 주세요.')
         + f'<div style="{h3}">플레이</div>'
         + _step(1, '유령 버튼', '채팅창 구석의 유령 버튼을 눌러요.')
         + _step(2, '세력 · 첫 장면 · 언어', '고른 뒤 출발을 누르면 첫 장면이 열려요.')
@@ -552,6 +552,8 @@ def update_payload(data, risu, module, version, min_plugin):
 WIKI_DIRS = ('Anomalies', 'Mystic Sites', 'Factions', 'Situations', 'Shared', 'Bases')  # Situations: 그림 없는 상황의 공용 그림, Shared: 공용 조직·거점, Bases: 기본 거점 바깥 「Base 영문명」
 # 요원 기본 그림 「영문명_default」 (사용자가 2026-10-19 올림). 큰 사진이자 얼굴 틀로 자르는 원본 (src/host/assets.ts AGENT_CROPS)
 AGENT_DIR = 'agents'
+# 캐릭터 표정 그림 「영문명_표정」 (사용자가 2026-10-22 정리·AVIF 변환, 예전 에셋 모듈을 대신한다). 채팅 이미지 태그 <img=영문명_표정>
+PORTRAIT_DIR = 'portraits'
 # 예전 시작 화면 세력 기본 그림. 사진 규칙에서 뺐다 (세력 그림은 명부 영문명)
 DROP_ASSETS = {'f01', 'f02', 'f03', 'f04', 'f05'}
 
@@ -568,6 +570,7 @@ def add_wiki_assets(data, others):
     added = 0
     files = [f for folder in WIKI_DIRS for f in sorted((ROOT / 'assets' / 'wiki' / folder).glob('*.avif'))]
     files += sorted((ROOT / 'assets' / AGENT_DIR).glob('*_default.avif'))
+    files += sorted((ROOT / 'assets' / PORTRAIT_DIR).glob('*/*.avif'))
     for f in files:
         if f.stem.lower() in have:
             continue
@@ -578,6 +581,18 @@ def add_wiki_assets(data, others):
         others[path] = f.read_bytes()
         others[f'x_meta/wiki{added:03d}.json'] = b'{"type":"AVIF"}'
     return added
+
+
+# 이미지 태그 로어북 2개 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김): Asset = 메인 모델 출력 지침(언제나 켬), Image tag = 보조 모델 자료(core/asset.ts)
+IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
+
+
+def add_image_lore(lore):
+    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다"""
+    books = json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data']
+    names = {b['comment'] for b in books}
+    settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 
 
 def shrink_maps(others):
@@ -658,7 +673,7 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))
+    lore = add_image_lore(add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore))))))
     lore, manifest['keys'] = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     lore.append({

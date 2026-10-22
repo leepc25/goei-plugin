@@ -116,10 +116,10 @@ export interface PicSource {
 /** 얼굴 틀을 따로 맞추지 않은 요원: 카우보이샷의 위쪽 가운데 */
 export const DEFAULT_CROP = '50,16,44';
 
-/** 카드에 든 요원 기본 그림(영문명_default, assets/agents)마다 맞춘 얼굴 틀. 없으면 DEFAULT_CROP (2026-10-19 그림을 보고 맞춤) */
+/** 카드에 든 요원 기본 그림(영문명_default, assets/agents)마다 맞춘 얼굴 틀. 없으면 DEFAULT_CROP (2026-10-19 그림을 보고 맞춤, Aileen은 2026-10-22 새 그림) */
 export const AGENT_CROPS: Record<string, string> = {
   'Aestheticism': '53,18,40',
-  'Aileen': '48,17,44',
+  'Aileen': '43,21,46',
   'Baek Sa-heon': '50,18,44',
   'Cha Yeo-jin': '54,18,44',
   'Cho Seong-choon': '48,18,44',

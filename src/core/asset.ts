@@ -22,7 +22,7 @@ const fail = (field: string, why: string) => new AssetError(`${IMAGE_BOOK} 이�
 /** Image tag 로어북 (원본 WG.auxImageData). 같은 이름이 여럿이면 이어 붙이지 않고 마지막 것 */
 export function readImageData(lore: LoreEntry[]): ImageData {
   const books = lore.filter((e) => e.comment === IMAGE_BOOK && typeof e.content === 'string' && e.content.trim() && e.content.trim() !== '[]');
-  if (!books.length) throw fail('읽기', '로어북이 없거나 비어 있습니다. 에셋 모듈이 켜져 있는지 확인하세요.');
+  if (!books.length) throw fail('읽기', '로어북이 없거나 비어 있습니다. 봇 카드를 업데이트했는지 확인하세요.');
   let src: Record<string, unknown>;
   try {
     src = JSON.parse(String(books[books.length - 1].content).replace(/^﻿/, '').trim());
