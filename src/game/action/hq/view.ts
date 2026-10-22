@@ -79,6 +79,8 @@ const depthText = (d: number) => (d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '—')
 
 export function createHq(): HqModule {
   let ready = Promise.resolve();
+  let loaded = false;
+  let mountId = 0;
   let s: HqSave = newSave();
   let host: HqHost | null = null;
   let root: HTMLElement | null = null;
@@ -105,7 +107,7 @@ export function createHq(): HqModule {
   const idlers: Record<string, { x: number; to: number; wait: number }> = {};
 
   const ctx = (): LineCtx => ({ agent: s.selected, agentName: AGENT_BY_ID[s.selected].name, fatigue: s.agents[s.selected].fatigue, day: s.day, rand });
-  const save = () => host?.save(saveText(s)).catch(() => {});
+  const save = () => loaded ? host?.save(saveText(s)).catch(() => {}) : undefined;
   const placeAt = (x: number): PlaceDef | null => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
 
   // ── 그리기 ──
@@ -430,6 +432,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   };
 
   const onClick = (ev: Event) => {
+    if (!loaded) return;
     const t = (ev.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!t || t.disabled || !host) return;
     const d = t.dataset;
@@ -545,6 +548,8 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     },
     ready: () => ready,
     mount(r, h, opt) {
+      const mounting = ++mountId;
+      loaded = false;
       root = r;
       host = h;
       walk = opt?.walk !== false;
@@ -570,13 +575,16 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       render();
       ready = (async () => {
         const got = parseSave(await h.load().catch(() => null));
+        if (mounting !== mountId) return;
         if (got) s = got;
-        // 출동 중에 앱을 닫았다면: 출동 기록이 없으니 후송 취급으로 정리한다 (아이템은 이미 출동으로 넘어갔다)
+        loaded = true;
+        // 복원 가능 여부는 저장 봉투를 소유한 엔진이 판단한다. 본부 로딩은 active를 소비하지 않는다.
         if (s.active && !h.resuming?.()) {
-          s.active = null;
-          notice = '지난 출동이 끝나지 않은 채 닫혔어요. 요원은 후송된 것으로 처리했어요.';
+          notice = '진행 중인 출동이 있어요. 시작 화면에서 이어하기로 돌아가세요.';
         }
-        card = (await h.link?.card().catch(() => null)) ?? null;
+        const nextCard = (await h.link?.card().catch(() => null)) ?? null;
+        if (mounting !== mountId) return;
+        card = nextCard;
         render();
         wrap?.focus({ preventScroll: true });
       })();
@@ -590,6 +598,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     },
     places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s, p.id), opens: p.opens })),
     openPlace(id) {
+      if (!loaded) return;
       if (!placeOpen(s, id)) return;
       overlay = null;
       panel = id;
@@ -607,7 +616,10 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     isOpen: () => (walk ? !!overlay : !!(overlay || panel)),
     close: () => (walk ? ((overlay = null), render()) : closeOne()),
     onReturn(result, l) {
-      const ls = settle(s, l, result, rand);
+      const previous = s.last;
+      settle(s, l, result, rand);
+      // 중복·불일치 결과로 정산 창을 새로 열거나 진행 중인 출동을 가리지 않는다.
+      if (s.last === previous) return;
       evacJust = result.how === 'evac';
       pending = null;
       overlay = 'settle';
@@ -619,11 +631,12 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       if (wrap) (wrap.hidden = false), wrap.focus({ preventScroll: true });
       void save();
       render();
-      void ls;
     },
     unmount() {
       cancelAnimationFrame(raf);
       void save();
+      loaded = false;
+      mountId++;
       window.removeEventListener('pointerup', onPointer);
       window.removeEventListener('pointercancel', onPointer);
       window.removeEventListener('keydown', onKey);
