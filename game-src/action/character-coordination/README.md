@@ -51,3 +51,9 @@
 3. 블라렛·살라딘 담당은 `review.md`의 결함과 생성기 자동 재시도/동시 8건 설정을 먼저 수정한다. 큰 자세 변경은 수정된 뼈대와 첫 장 관절을 대조한다.
 4. 호출별 현재 차감 견적을 고지하고 기존 승인 범위에서 1건 제출한다. 결과 원본·요청 해시·작업 ID·실제 비용을 총괄 큐에 취합한다.
 5. 신규 그림이 실제 반영된 전용 HTML을 PC·모바일로 검수하고 전달한다. 이 패키지에는 신규 그림이나 신규 시연판이 없다.
+
+## 인증 재확인 · 2026-10-22 19:24 KST
+
+사용자의 인증 완료 알림 뒤 실제 `get_balance`를 다시 호출했으나 `401 Missing Authorization header`였다. 현재 환경 spec/observed revision 4, secrets 빈 목록, PIXELLAB_API_KEY와 PIXELLAB_API_TOKEN 모두 미전달. 네트워크는 enforced. PixelLab 플러그인 검색도 결과 없음. 증거: `evidence/auth-recheck-20261022T102423Z.json`. 설정 화면의 인증 정보가 이 실행 환경에 적용됐는지 확인이 필요하다. 유료 제출·회수 0건.
+
+새 담당 브랜치 확인: 큐라스 `codex/art-kyuras-resume` (`ed5a83e2`), 쟈알디 `codex/art-jyaldi-resume` (`b00f414a`). 담당 작업에는 중복 착수하지 않았다. 브랜치 존재 확인은 이 인계 패키지의 수신 확인을 뜻하지 않는다.

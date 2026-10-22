@@ -1,0 +1,46 @@
+{
+  "observed_at": "2026-10-22T10:24:23.416387+00:00",
+  "tool": "get_balance",
+  "credential_variable_presence": {
+    "PIXELLAB_API_TOKEN": false,
+    "PIXELLAB_API_KEY": false
+  },
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Error calling tool 'get_balance': 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "environment_observation": {
+    "observations_current": true,
+    "spec_revision": "4",
+    "observed_spec_revision": "4",
+    "secrets": [],
+    "network_policy_state": "enforced"
+  },
+  "plugin_discovery": {
+    "query": "PixelLab",
+    "results": 0
+  },
+  "conclusion": "현재 실행 환경에 인증 전달 안 됨. get_balance isError=true / 401. 현재 잔액·실행 작업·한도 미확인. 유료 호출 0.",
+  "ownership_refs": {
+    "kyuras": {
+      "branch": "codex/art-kyuras-resume",
+      "commit": "ed5a83e27523ffd6c844932c307a00627f626454",
+      "thread_id": "01a16319-335c-7370-b9d8-c333a3d2e087"
+    },
+    "jyaldi": {
+      "branch": "codex/art-jyaldi-resume",
+      "commit": "b00f414aa349ea9b1c3ff2244bfba63f17053482",
+      "thread_id": "01a16318-fc35-7188-8b83-f1cb29560086"
+    }
+  }
+}
