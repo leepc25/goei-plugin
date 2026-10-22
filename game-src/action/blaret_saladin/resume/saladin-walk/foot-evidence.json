@@ -1,0 +1,181 @@
+{
+  "note": "Opaque pixels in y162..169, not automatic contact classification. Pair with visual review.",
+  "frames": [
+    {
+      "frame": 0,
+      "lowest_shoe_clusters": [
+        [
+          82,
+          98
+        ],
+        [
+          105,
+          123
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          110.57,
+          160.0
+        ],
+        "LEFT LEG": [
+          85.61,
+          160.0
+        ]
+      }
+    },
+    {
+      "frame": 1,
+      "lowest_shoe_clusters": [
+        [
+          95,
+          101
+        ],
+        [
+          105,
+          123
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          110.57,
+          160.0
+        ],
+        "LEFT LEG": [
+          92.9,
+          157.06
+        ]
+      }
+    },
+    {
+      "frame": 2,
+      "lowest_shoe_clusters": [
+        [
+          104,
+          122
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          110.57,
+          160.0
+        ],
+        "LEFT LEG": [
+          110.57,
+          155.85
+        ]
+      }
+    },
+    {
+      "frame": 3,
+      "lowest_shoe_clusters": [
+        [
+          104,
+          122
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          110.57,
+          160.0
+        ],
+        "LEFT LEG": [
+          128.2,
+          157.06
+        ]
+      }
+    },
+    {
+      "frame": 4,
+      "lowest_shoe_clusters": [
+        [
+          104,
+          121
+        ],
+        [
+          130,
+          146
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          110.57,
+          160.0
+        ],
+        "LEFT LEG": [
+          135.53,
+          160.0
+        ]
+      }
+    },
+    {
+      "frame": 5,
+      "lowest_shoe_clusters": [
+        [
+          118,
+          126
+        ],
+        [
+          130,
+          146
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          117.86,
+          157.06
+        ],
+        "LEFT LEG": [
+          135.53,
+          160.0
+        ]
+      }
+    },
+    {
+      "frame": 6,
+      "lowest_shoe_clusters": [
+        [
+          130,
+          145
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          135.53,
+          155.85
+        ],
+        "LEFT LEG": [
+          135.53,
+          160.0
+        ]
+      }
+    },
+    {
+      "frame": 7,
+      "lowest_shoe_clusters": [
+        [
+          129,
+          145
+        ],
+        [
+          148,
+          149
+        ],
+        [
+          151,
+          162
+        ]
+      ],
+      "requested_ankles": {
+        "RIGHT LEG": [
+          153.16,
+          157.06
+        ],
+        "LEFT LEG": [
+          135.53,
+          160.0
+        ]
+      }
+    }
+  ]
+}

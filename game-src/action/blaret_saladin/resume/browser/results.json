@@ -4,7 +4,9 @@
       "name": "pc",
       "width": 1280,
       "height": 900,
-      "clips": 2,
+      "clips": 6,
+      "all_frame_geometry_checks": 336,
+      "loop_root_wrap": true,
       "frame_step": true,
       "horizontal_overflow": false
     },
@@ -12,7 +14,9 @@
       "name": "mobile-landscape",
       "width": 844,
       "height": 390,
-      "clips": 2,
+      "clips": 6,
+      "all_frame_geometry_checks": 336,
+      "loop_root_wrap": true,
       "frame_step": true,
       "horizontal_overflow": false
     },
@@ -20,7 +24,9 @@
       "name": "mobile-portrait",
       "width": 390,
       "height": 844,
-      "clips": 2,
+      "clips": 6,
+      "all_frame_geometry_checks": 336,
+      "loop_root_wrap": true,
       "frame_step": true,
       "horizontal_overflow": false
     }

@@ -1,0 +1,13 @@
+{
+  "request_sha256": "1c78e71f465b24b151421ea89b2c60aeb779ae3ccd62da8c0780f7d122b75dc6",
+  "received_at": "2026-10-22T11:41:55.775Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 6bce13df-7d64-47e5-ba79-650cdea00aa4\njob_id: 6bce13df-7d64-47e5-ba79-650cdea00aa4\nsize: 256x256px\nmask: custom mask\nfill: A 2 by 2 sprite sheet: the SAME battle nun in each cell. In EACH masked region add her SECOND far hand holding ONE separate silver semiautomatic pistol pointing right at low waist height. Two pistols per character, one in each hand. Black long sleeve connects the new far hand to her torso. Small pixel art gun and normal human hand. Preserve the existing upper pistol. Transparent background. No extra people, effects, or text.\ntransparent: True\nseed: 122\nasset_id: 180f010a-4c27-5028-80fb-f690e3a9e31f\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"6bce13df-7d64-47e5-ba79-650cdea00aa4\")"
+      }
+    ],
+    "isError": false
+  }
+}

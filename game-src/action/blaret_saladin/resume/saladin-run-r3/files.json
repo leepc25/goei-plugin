@@ -1,0 +1,154 @@
+{
+  "00.png": {
+    "sha256": "f9bee9dbd3d227d6bf2b36199ad732e6dca6287cbec49e02d12cb9a8c0ba54a0",
+    "bbox": [
+      79,
+      76,
+      147,
+      166
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 0,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "01.png": {
+    "sha256": "c1691766056100f60f760de88dcb21598d48d4035866f48bfef8068de0db37b5",
+    "bbox": [
+      88,
+      77,
+      153,
+      166
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 1,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "02.png": {
+    "sha256": "dff9ffbc09f06557dc2dbde25fcfeae0535987c2399d93f06bc0c5d0cd2e5b4b",
+    "bbox": [
+      105,
+      78,
+      167,
+      167
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 2,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "03.png": {
+    "sha256": "1bab76081cafa2373aa8109765678bd282c041af9951aa54eb9a5582d35751f3",
+    "bbox": [
+      116,
+      78,
+      180,
+      168
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 3,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "04.png": {
+    "sha256": "e1a0aa159d50d7177f195fbb1bd7d4ed6e2cbf5f645559720bb5a823ae76d595",
+    "bbox": [
+      115,
+      76,
+      187,
+      168
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 4,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "05.png": {
+    "sha256": "2c3caf787ed4784fda5de148c0e0b6462278db325710068f6f94e620ca9bb4c6",
+    "bbox": [
+      132,
+      78,
+      195,
+      165
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 5,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "06.png": {
+    "sha256": "50f7332b9d94f5c7540a6838de759a1dee066fcc5d630f96e44491fdac1359c4",
+    "bbox": [
+      143,
+      78,
+      204,
+      166
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 6,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  },
+  "07.png": {
+    "sha256": "1243741ba5fc56b2b868983be63b66c5a1f60127f9da18ce018b867743e2e27e",
+    "bbox": [
+      156,
+      78,
+      221,
+      166
+    ],
+    "size": [
+      256,
+      176
+    ],
+    "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+    "index": 7,
+    "alpha_extrema": [
+      0,
+      255
+    ]
+  }
+}

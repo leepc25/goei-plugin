@@ -1,0 +1,62 @@
+{
+  "basis": "Visual shoe/heel contact in foot-evidence.json. Frames0-3 near support heel105; frames4-7 far support heel130. Cycle48 moves frame0 rear heel82 to130. No per-frame engine velocity is added.",
+  "cycle_dx": 48,
+  "frames": [
+    {
+      "frame": 0,
+      "dx": 0,
+      "dy": 0,
+      "input_sha256": "39714e87604e60026f4ad3868ad8e47efd6f7f17af5dc8a958a172685e000459",
+      "output_sha256": "5e4bc408b31e70492605cc89f1fc61191cf53f6652162bbdc35afb7fa6fd1981"
+    },
+    {
+      "frame": 1,
+      "dx": 0,
+      "dy": 0,
+      "input_sha256": "e92b970b502f7ecf04cf97a8b5697dbdb78a716e3630f07c131bead481af838b",
+      "output_sha256": "9bf17ea644f07ba9847fd2f48e559c5dd3cfad027889751919bcc71433e07da8"
+    },
+    {
+      "frame": 2,
+      "dx": 1,
+      "dy": 0,
+      "input_sha256": "cc7bedacc518d1358f7a07b77f9d7e2289f0920d65628e23b83a9482f9146558",
+      "output_sha256": "daaadb5b885844a4de457ca9076e8b838e1d598a58e66c25b813aaa5e5a39b5e"
+    },
+    {
+      "frame": 3,
+      "dx": 1,
+      "dy": 0,
+      "input_sha256": "392c311033ed367aa2e7152f6b9c5ad14b32231843b1eaf8ab764105e39a5ae9",
+      "output_sha256": "9ec5a0851beb69ff4c180f415fb614605eae6f464bfa1b17aa629fd2ab9f6076"
+    },
+    {
+      "frame": 4,
+      "dx": 0,
+      "dy": 0,
+      "input_sha256": "75b9a5cdb643671a00a0ce30aa0b56f4d97144ff2af8ff891cc0252c52cbb61a",
+      "output_sha256": "428a73a1b10c0ca63769b857fc3cb0352fea093106b7d564234b901946c14c0b"
+    },
+    {
+      "frame": 5,
+      "dx": 0,
+      "dy": 0,
+      "input_sha256": "915bbbdce0d44135ef2c20a3075e72403578ae7bff9ba9c10699219f926336ed",
+      "output_sha256": "d94320b1debefffaf9e589d3defcdda25652751cfb13551d578c5de9a1fa3d16"
+    },
+    {
+      "frame": 6,
+      "dx": 0,
+      "dy": 0,
+      "input_sha256": "9d3f3ddbaf3ce0894c1cdc4a90962153cfad565c018abb3a3b3494578165ae5b",
+      "output_sha256": "cf5bc93ebf5c17fb464e5eca1d7942622484ee888087fe1a88a255ab45f874ff"
+    },
+    {
+      "frame": 7,
+      "dx": 1,
+      "dy": 0,
+      "input_sha256": "44266807bf453f5ba80170b29fc92f3e4e604c13379e9088426da6eaa76da2f2",
+      "output_sha256": "82f105a92a4fe437ac1bd11a1d4dc3e67c13a257ccc365208ac7033186f86528"
+    }
+  ]
+}

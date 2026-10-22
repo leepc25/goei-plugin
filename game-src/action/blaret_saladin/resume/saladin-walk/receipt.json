@@ -1,0 +1,13 @@
+{
+  "request_sha256": "5a243dcc2ac9318657d9bae8bdab5fb7fafe07d2e2fa73d08524f90bd76957c6",
+  "received_at": "2026-10-22T11:45:03.282Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 5d78c846-5658-40d0-b3a2-31c119818707\njob_id: 5d78c846-5658-40d0-b3a2-31c119818707\ndescription: huge bearded man, dark brown skin, short black beard, white wrapped turban, black suit, white shirt, black tie, black shoes, ammo pouches and explosive packs strapped across the chest, scimitar scabbard at the hip, a curved scimitar in the near hand and an assault rifle in the far hand, one character only, isolated, strict right side profile, no effects, no other people\naction: relentless heavy advance, chest out, shoulders rolling with every stomping step\nframes: 8\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"5d78c846-5658-40d0-b3a2-31c119818707\")\nasset_id: 3a038cb0-ff98-5647-af1e-948ba2686b48\nasset_status: pending (saved to your gallery when generation completes)"
+      }
+    ],
+    "isError": false
+  }
+}

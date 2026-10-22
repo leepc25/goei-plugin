@@ -1,0 +1,22 @@
+{
+  "00.png": {
+    "sha256": "860048145240bebc30a2747183a63e742757ac3fad15f1fd1df7458d95b73314",
+    "source_frame": 0,
+    "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4"
+  },
+  "01.png": {
+    "sha256": "2604d93e29f0444cdb16c43f44177ec9a7097521f3d4da5291bbbc0571a81a2e",
+    "source_frame": 1,
+    "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4"
+  },
+  "02.png": {
+    "sha256": "a0f6a17f355fd213703022267a228d77f430da15775f3fbe501576a7a4d5139e",
+    "source_frame": 2,
+    "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4"
+  },
+  "03.png": {
+    "sha256": "990064663fd7c6e5a8efecfe7fce361a9e4e0dc6522503085bb3c1f9831b2bcc",
+    "source_frame": 3,
+    "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4"
+  }
+}

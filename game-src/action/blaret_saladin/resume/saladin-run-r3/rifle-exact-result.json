@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "image_id: 78721d2f-835f-4446-8969-de02180ed0ae\ncanvas: 256x176, 8 frame(s)\n1. patch_pixels: 157 px changed\n2. patch_pixels: 155 px changed\n3. patch_pixels: 144 px changed\n4. patch_pixels: 149 px changed\n5. patch_pixels: 162 px changed\n6. patch_pixels: 149 px changed\n7. patch_pixels: 148 px changed\n8. patch_pixels: 150 px changed\nsheet rows: frames [1, 2, 5]\n8 frames changed, in 110,121,211,137; see every one: inspect 78721d2f-835f-4446-8969-de02180ed0ae --frames 1,2,3,4,5,6,7,8 --region 110,121,211,137\npalette (19): #0d1111ff x7466, #212526ff x6891, #000000ff x1616, #575856ff x929, #34393dff x926, #1c140bff x754, #838584ff x659, #bcbcbbff x540, #824e38ff x434, #2b2519ff x431, #a3a4a3ff x358, #3b3222ff x330, #dbdcdcff x287, #331f14ff x285, #683d2aff x234, #0f0b03ff x183, … +3 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/78721d2f-835f-4446-8969-de02180ed0ae/: frames.png, animation.gif\nnext: edit 78721d2f-835f-4446-8969-de02180ed0ae --changes […]"
+    }
+  ],
+  "paid_generations": 0
+}

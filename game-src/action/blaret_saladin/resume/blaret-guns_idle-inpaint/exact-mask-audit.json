@@ -1,0 +1,9 @@
+{
+  "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4",
+  "outside_mask_raw_changes": 0,
+  "outside_mask_visible_changes": 0,
+  "changed_pixels": 1217,
+  "input_sha256": "85be75de0db8eddafee227a37e4e1382db16d5bc15612d7d9279da6023713808",
+  "output_sha256": "0389d6e2399f61830fa078cb96e4cd9188f56fecaee91b291ece27852c09028f",
+  "candidate": "sheet-exact.png"
+}

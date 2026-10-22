@@ -1,0 +1,114 @@
+[
+  {
+    "frame": 0,
+    "side": "RIGHT",
+    "upper_length": 14.996725829326882,
+    "forearm_length": 16.65533639408103,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 0,
+    "side": "LEFT",
+    "upper_length": 11.446493038481263,
+    "forearm_length": 6.656307685196046,
+    "wrist_below_neck_px": 15.24888117586545
+  },
+  {
+    "frame": 1,
+    "side": "RIGHT",
+    "upper_length": 15.011311617576919,
+    "forearm_length": 16.63880364930123,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 1,
+    "side": "LEFT",
+    "upper_length": 11.447274554233436,
+    "forearm_length": 5.324630766541449,
+    "wrist_below_neck_px": 14.33714602636499
+  },
+  {
+    "frame": 2,
+    "side": "RIGHT",
+    "upper_length": 14.996725829326873,
+    "forearm_length": 16.646579084004028,
+    "wrist_below_neck_px": 17.999999999999986
+  },
+  {
+    "frame": 2,
+    "side": "LEFT",
+    "upper_length": 11.455295732542215,
+    "forearm_length": 8.12965668155796,
+    "wrist_below_neck_px": 16.27942577891656
+  },
+  {
+    "frame": 3,
+    "side": "RIGHT",
+    "upper_length": 15.01131161757691,
+    "forearm_length": 16.63003763315044,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 3,
+    "side": "LEFT",
+    "upper_length": 11.455295732542226,
+    "forearm_length": 14.554618873745877,
+    "wrist_below_neck_px": 20.75811421358877
+  },
+  {
+    "frame": 4,
+    "side": "RIGHT",
+    "upper_length": 14.99672582932689,
+    "forearm_length": 16.646579084004017,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 4,
+    "side": "LEFT",
+    "upper_length": 11.455295732542226,
+    "forearm_length": 17.447257572466796,
+    "wrist_below_neck_px": 22.757982173350598
+  },
+  {
+    "frame": 5,
+    "side": "RIGHT",
+    "upper_length": 15.01131161757691,
+    "forearm_length": 16.63003763315044,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 5,
+    "side": "LEFT",
+    "upper_length": 11.455295732542234,
+    "forearm_length": 14.554618873745898,
+    "wrist_below_neck_px": 20.758114213588797
+  },
+  {
+    "frame": 6,
+    "side": "RIGHT",
+    "upper_length": 14.996725829326873,
+    "forearm_length": 16.646579084004028,
+    "wrist_below_neck_px": 17.999999999999986
+  },
+  {
+    "frame": 6,
+    "side": "LEFT",
+    "upper_length": 11.455295732542211,
+    "forearm_length": 8.129656681557952,
+    "wrist_below_neck_px": 16.27942577891656
+  },
+  {
+    "frame": 7,
+    "side": "RIGHT",
+    "upper_length": 15.01131161757691,
+    "forearm_length": 16.63003763315044,
+    "wrist_below_neck_px": 18.0
+  },
+  {
+    "frame": 7,
+    "side": "LEFT",
+    "upper_length": 11.447274554233436,
+    "forearm_length": 5.324630766541449,
+    "wrist_below_neck_px": 14.33714602636499
+  }
+]

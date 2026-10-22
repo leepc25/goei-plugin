@@ -1,0 +1,63 @@
+{
+  "workbench_id": "78721d2f-835f-4446-8969-de02180ed0ae",
+  "paid_generations": 0,
+  "server_export_equals_guarded_decisions": true,
+  "frames": [
+    {
+      "frame": 0,
+      "changed_pixels": 157,
+      "raw_sha256": "f9bee9dbd3d227d6bf2b36199ad732e6dca6287cbec49e02d12cb9a8c0ba54a0",
+      "corrected_sha256": "ff78eb71d33eb35d3c2d0e99e1a3c5d296ad04d298837e03ab22c3503ca5dde6",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 1,
+      "changed_pixels": 155,
+      "raw_sha256": "c1691766056100f60f760de88dcb21598d48d4035866f48bfef8068de0db37b5",
+      "corrected_sha256": "c45149a5326cf78a7270d07eb86cb7fe5ef0ae180c07eab27e7dbb92b1f4f056",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 2,
+      "changed_pixels": 144,
+      "raw_sha256": "dff9ffbc09f06557dc2dbde25fcfeae0535987c2399d93f06bc0c5d0cd2e5b4b",
+      "corrected_sha256": "fc5cf39694ae58816e4f4543ba9d7ccbdd69f1fb4a6b3479a1dce750c3d43fb1",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 3,
+      "changed_pixels": 149,
+      "raw_sha256": "1bab76081cafa2373aa8109765678bd282c041af9951aa54eb9a5582d35751f3",
+      "corrected_sha256": "64e025fba009706f081365e53c1fee25439c16d0364936f1b97d78e920257009",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 4,
+      "changed_pixels": 162,
+      "raw_sha256": "e1a0aa159d50d7177f195fbb1bd7d4ed6e2cbf5f645559720bb5a823ae76d595",
+      "corrected_sha256": "b348e7dab892af27f2cee2af231146b01ec72148f0528c85e14845e32a0970d6",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 5,
+      "changed_pixels": 149,
+      "raw_sha256": "2c3caf787ed4784fda5de148c0e0b6462278db325710068f6f94e620ca9bb4c6",
+      "corrected_sha256": "cb9ddf02de5fa2b6fcea0ed287a3c1fcb300a42716d82cc848edd1fcb591d12d",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 6,
+      "changed_pixels": 148,
+      "raw_sha256": "50f7332b9d94f5c7540a6838de759a1dee066fcc5d630f96e44491fdac1359c4",
+      "corrected_sha256": "97099cb89cb4608d086f689201cc2759704b879b34dc03d684b71979c2ed480c",
+      "face_and_legs_unchanged": true
+    },
+    {
+      "frame": 7,
+      "changed_pixels": 150,
+      "raw_sha256": "1243741ba5fc56b2b868983be63b66c5a1f60127f9da18ce018b867743e2e27e",
+      "corrected_sha256": "acb8b304b63510d6a512f3df47785e4fd22fab8de804bbda34e66f63840ea2d1",
+      "face_and_legs_unchanged": true
+    }
+  ]
+}

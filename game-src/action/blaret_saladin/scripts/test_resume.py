@@ -28,5 +28,29 @@ class SafetyTests(unittest.TestCase):
             self.assertLess(max(x[0] for x in xy)-min(x[0] for x in xy),.04)
             self.assertLess(max(x[1] for x in xy)-min(x[1] for x in xy),.04)
         self.assertAlmostEqual(frames[7]['LEFT LEG'][0],frames[0]['LEFT LEG'][0]+r['root_motion']['cycle_dx'],delta=.04)
+    def test_masked_repair_keeps_every_unmasked_pixel(self):
+        from PIL import Image
+        import numpy as np
+        p=ROOT/'blaret-guns_idle-inpaint'
+        source=np.array(Image.open(p/'input.png').convert('RGBA'));new=np.array(Image.open(p/'sheet-exact.png').convert('RGBA'));mask=np.array(Image.open(p/'mask.png').convert('L'))>0
+        self.assertTrue(np.array_equal(source[~mask],new[~mask]))
+    def test_raw_frames_kept_after_alignment_and_repair(self):
+        import hashlib
+        for key in ['blaret-guns_idle','saladin-walk','saladin-run','saladin-run-r2','saladin-run-r3']:
+            p=ROOT/key;files=json.loads((p/'files.json').read_text())
+            for name,meta in files.items():self.assertEqual(hashlib.sha256((p/name).read_bytes()).hexdigest(),meta['sha256'])
+
+    def test_rifle_server_export_matches_guarded_edit(self):
+        import collect_run_repair
+        collect_run_repair.main()
+
+    def test_completed_ledger_and_approval_states(self):
+        m=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
+        self.assertEqual(len(m['ledger']),9)
+        self.assertEqual(len({x['job_id'] for x in m['ledger']}),9)
+        self.assertEqual(m['actual_generations'],34)
+        self.assertEqual(m['completion_confirmed_generations'],34)
+        self.assertEqual(len(m['entries']),6)
+        self.assertTrue(all(not e['qa']['user_approved'] for e in m['entries']))
 
 if __name__=='__main__':unittest.main()

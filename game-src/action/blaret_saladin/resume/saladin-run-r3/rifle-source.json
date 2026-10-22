@@ -1,0 +1,102 @@
+{
+  "source": "saladin-walk/00.png",
+  "source_sha256": "39714e87604e60026f4ad3868ad8e47efd6f7f17af5dc8a958a172685e000459",
+  "frames": [
+    {
+      "frame": 0,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 4,
+      "dy": 11,
+      "changed_pixels": 157
+    },
+    {
+      "frame": 1,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 10,
+      "dy": 12,
+      "changed_pixels": 155
+    },
+    {
+      "frame": 2,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 24,
+      "dy": 13,
+      "changed_pixels": 144
+    },
+    {
+      "frame": 3,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 38,
+      "dy": 12,
+      "changed_pixels": 149
+    },
+    {
+      "frame": 4,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 44,
+      "dy": 11,
+      "changed_pixels": 162
+    },
+    {
+      "frame": 5,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 49,
+      "dy": 12,
+      "changed_pixels": 149
+    },
+    {
+      "frame": 6,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 63,
+      "dy": 13,
+      "changed_pixels": 148
+    },
+    {
+      "frame": 7,
+      "source_rect": [
+        108,
+        112,
+        152,
+        128
+      ],
+      "dx": 77,
+      "dy": 12,
+      "changed_pixels": 150
+    }
+  ]
+}

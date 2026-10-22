@@ -1,10 +1,17 @@
 {
   "blaret-guns_idle": {
-    "status": "불합격 · 추가 보정 필요",
-    "notes": "0–3: 얼굴·복식·접지 유지. 한 자루는 보이나 원측 권총/손이 분명하지 않음. 기존 가슴 앞 손 모임은 해소. 같은 skeleton 재발주 금지.",
+    "status": "쌍권총 수정 · 사용자 검수 전",
+    "notes": "보정된 네 원본에서 총 두 자루와 두 손 확인. 얼굴·체형·복식·발은 마스크 밖 픽셀 변화 0. 네 번째 장의 가까운 팔이 갑자기 내려가므로 재생 순서 0→1→2→1로 정리(4칸, 서로 다른 그림 3장). PixelLab 부분 생성 뒤 본인의 같은 클립 손을 무료 정밀 복사했고, 원본 네 장은 전부 보존. 사용자 시각 승인 전.",
     "user_approved": false,
     "generated": true,
-    "internal_pass": false
+    "internal_pass": true,
+    "source_dir": "blaret-guns_idle-inpaint/restored",
+    "frame_order": [
+      0,
+      1,
+      2,
+      1
+    ]
   },
   "blaret-stake_finish": {
     "status": "타인 혼입 해소 · 준비 자세 보완",
@@ -12,5 +19,91 @@
     "user_approved": false,
     "generated": true,
     "internal_pass": false
+  },
+  "blaret-super_ready": {
+    "status": "얼굴 가림 수정 · 사용자 검수 전",
+    "notes": "0–7 전부 같은 얼굴·베일·체형·복식 유지. 2–7의 팔이 얼굴 앞에서 우측으로 이동해 얼굴과 눈이 보이고 뒤돌아선 듯한 결함 해소. 발 접지 유지. 양손 위로 들어 올리는 준비 동작이 읽힘. 기술·내부 검수 통과가 사용자 시각 승인은 아님.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": true
+  },
+  "saladin-walk": {
+    "status": "무장 걷기 제작 · 사용자 검수 전",
+    "notes": "0–7: 터번·수염·정장·체형과 칼/소총 유지. 지지발 그림을 측정해 2·3·7장을 1px 오른쪽으로 정렬. 0–3 근측 뒤꿈치 x105, 4–7 원측 x130, 다음 0장의 원측 뒤꿈치 x82+48=130. 4장은 지지발 교체. 팔/무기의 소규모 윤곽 변화는 남음.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": true,
+    "source_dir": "saladin-walk/aligned",
+    "pixel_dx": [
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "root_override": {
+      "per_frame": [
+        0.0,
+        3.655,
+        12.48,
+        21.305,
+        24.96,
+        28.615,
+        37.44,
+        46.265
+      ],
+      "cycle_dx": 48,
+      "apply": "sprite contains progression; actor moves only on loop wrap",
+      "right_contact": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "left_contact": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "basis": "visible heel contact measured from actual generated PNGs; raw requested cycle49.92 remains in request.json"
+    }
+  },
+  "saladin-run": {
+    "status": "불합격 · 얼굴 가림",
+    "notes": "0–7 전부 칼팔이 얼굴 앞을 지나 얼굴을 가린다. 다리의 전진/의상/무장 유지와 별개로 본인 가독성 불합격. 원본과 비용은 보존하고 재설계 결과와 비교.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false,
+    "exclude_from_demo": true
+  },
+  "saladin-run-r2": {
+    "status": "불합격 · 얼굴 가림 잔존",
+    "notes": "팔 길이를 유지하고 앞으로 벌렸으나 생성물은 여전히 얼굴을 팔로 가림. 추가 동일한 머리 위 자세 반복 중단.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false,
+    "old_source_dir": "saladin-run",
+    "exclude_from_demo": true
+  },
+  "saladin-slash1": {
+    "status": "첫 베기 제작 · 추가 보완 표시",
+    "notes": "0 준비 → 1–2 칼 들어 올림 → 3–4 내려베기 → 5 회수. 얼굴/복식/체형 유지, 앞발을 딛고 체중 전진. 1–2 얼굴이 칼팔에 잠깐 가려짐. 4–5 소총이 몸과 팔에 가려 두 무장 구분이 약함. 팔이 겹치는 프레임을 합격으로 숨기지 않고 비교판에서 확인하도록 남김.",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false
+  },
+  "saladin-run-r3": {
+    "status": "얼굴·무장 복구 · 접지 보완 필요",
+    "user_approved": false,
+    "generated": true,
+    "internal_pass": false,
+    "old_source_dir": "saladin-run-r2",
+    "notes": "0–7 모두 얼굴·터번·수염·정장 유지. 머리 위 팔 자세를 버리고 본인 걷기 원본으로 입력을 바꿔 얼굴 가림 해소. 누락된 소총은 같은 캐릭터 걷기 0장의 파지/소총을 몸 이동에 맞춰 무료 정밀 복사. 서버 PNG와 변경 지시가 8장 모두 일치하고 얼굴/다리 픽셀 변화 0. 부츠 최하단 y164–167과 지지발 윤곽 변화가 남아 접지/반복 경계는 조건부. 요청 주기79.04px는 실측 접지 합격값이 아님. 실패 r1/r2와 원본 보존, 사용자 승인 전.",
+    "source_dir": "saladin-run-r3/with-rifle"
   }
 }

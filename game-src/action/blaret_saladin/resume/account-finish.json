@@ -1,0 +1,27 @@
+{
+  "checked_at_utc": "2026-10-22T12:21:19.793Z",
+  "balance": {
+    "content": [
+      {
+        "type": "text",
+        "text": "credits: $0.00\ngenerations_remaining: 13958.30\ngenerations_used: 5396.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+      }
+    ],
+    "isError": false
+  },
+  "jobs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "no active jobs (nothing pending or processing)\nhint: list_jobs(include_recent=true) also shows jobs that finished in the last 30 minutes"
+      }
+    ],
+    "isError": false
+  },
+  "pending_processing_limit": 20,
+  "submission_spacing_seconds": 2,
+  "limit_source": "Live PixelLab help checked at session start; subscription 2x changes allowance, not queue cap.",
+  "our_paid_completed_jobs": 9,
+  "our_actual_generations": 34,
+  "cost_basis": "Sum of nine completion charged receipts, never shared balance delta."
+}
