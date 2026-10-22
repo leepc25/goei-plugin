@@ -3,7 +3,7 @@
   "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "branch": "codex/character-production-control",
   "account": {
-    "observed_at": "2026-10-22T10:24:27.514530+00:00",
+    "observed_at": "2026-10-22T10:33:19.910829+00:00",
     "balance": null,
     "active_jobs": null,
     "concurrency_limit": null,
@@ -12,15 +12,15 @@
     "observations": {
       "get_balance": {
         "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T102427514482Z/get_balance.json"
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/get_balance.json"
       },
       "list_jobs": {
         "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T102427514482Z/list_jobs.json"
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/list_jobs.json"
       },
       "search_help": {
         "ok": false,
-        "evidence": "game-src/action/character-resume/control-evidence/20261022T102427514482Z/search_help.json"
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T103319910779Z/search_help.json"
       }
     },
     "note": "성공 응답의 단위·필드 확인 후 잔액/한도 기입. 실패 또는 미확인은 null이며 0이 아님."
@@ -125,7 +125,7 @@
     "deadpole 20 bathing frames"
   ],
   "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
-  "observed_at": "2026-10-22T10:24:27.514530+00:00",
+  "observed_at": "2026-10-22T10:33:19.910829+00:00",
   "per_owner_in_flight_limit": 1,
   "dispatch_enabled": false,
   "dispatch_blocker": "현재 계정 인증·잔액·실행 중 작업·동시 한도 미확인",

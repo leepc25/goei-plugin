@@ -1,0 +1,29 @@
+{
+  "observed_at": "2026-10-22T10:33:21.772555+00:00",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "search_help",
+      "arguments": {
+        "question": "How can I read my current account tier and concurrent background-job limit without generating or cancelling anything? Give the read-only API or MCP operation; do not infer my tier from old records."
+      }
+    }
+  },
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  },
+  "ok": false
+}
