@@ -115,7 +115,7 @@ try {
             const w = window.__goeiEngine.world;
             for (const b of w.bodies) if (b.team === 'enemy') (b.hp = 0), (b.alive = false);
           });
-          await page.waitForTimeout(600);
+          await page.waitForTimeout(1300); // 피해 숫자가 사라진 뒤
           if (shoot) await S(`floor${f + 1}-after`);
           continue;
         }

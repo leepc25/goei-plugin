@@ -306,13 +306,13 @@ export class Fx {
     const inK = Math.min(1, t.t / 0.3),
       outK = t.t > 1.5 ? (t.t - 1.5) / 0.4 : 0;
     c.globalAlpha = Math.max(0, inK * (1 - outK));
-    const text = !t.depth || t.name.startsWith(t.depth) ? t.name || t.depth : `${t.depth} · ${t.name}`;
-    const y = 112;
+    // 층 숫자는 오른쪽 위 HUD(L1)에 있으니 이름만, 그 바로 아래 오른쪽 끝에 (독립 검수: 「L1 · 로비」가 「L1」과 겹침)
+    const text = t.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, '') || t.depth;
     c.font = pfont(22).f;
-    const pw = Math.round(c.measureText(text).width + 64) & ~3,
+    const pw = (Math.round(c.measureText(text).width + 40) + 3) & ~3,
       ph = t.variant ? 64 : 44,
-      px = Math.round(W / 2 - pw / 2) & ~3,
-      py = y - 32;
+      px = (Math.round(W - 16 - pw) >> 2) << 2,
+      py = 62;
     c.fillStyle = '#0c0f12';
     c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
     c.fillStyle = '#b8873a';
@@ -321,9 +321,11 @@ export class Fx {
     c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
     // 도트 글꼴 (시스템 글꼴 금지)
     c.textAlign = 'center';
+    c.textBaseline = 'middle';
     c.fillStyle = '#ece2c8';
-    c.fillText(text, W / 2, y - (t.variant ? 4 : 0));
-    if (t.variant) (c.font = pfont(11).f), (c.fillStyle = '#f0b45a'), c.fillText(`변형 · ${t.variant}`, W / 2, y + 20);
+    c.fillText(text, px + pw / 2, py + 22);
+    if (t.variant) (c.font = pfont(11).f), (c.fillStyle = '#f0b45a'), c.fillText(`변형 · ${t.variant}`, px + pw / 2, py + 48);
+    c.textBaseline = 'alphabetic';
     c.textAlign = 'left';
     c.globalAlpha = 1;
   }

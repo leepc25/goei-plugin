@@ -424,7 +424,8 @@ export class Hud {
     while (c.measureText(t).width > 900 && t.length > 4) t = t.slice(0, -2);
     if (t !== text) t += '…';
     const w = c.measureText(t).width + 40;
-    const y = compact ? H - 210 : H - 128;
+    // 화면 맨 아래 띠: 몸통을 가로지르지 않게 (독립 검수: 자막이 캐릭터 허리를 관통)
+    const y = H - 44;
     plate(c, W / 2 - w / 2, y, w, 36, 18);
     label(c, t, W / 2, y + 25, 17, '#fff8e6', 'center', 600);
   }

@@ -94,7 +94,8 @@ const TONES: [number, number, number, number][] = [
 const toned = new Map<string, HTMLCanvasElement>();
 /** 0이면 원래 색. 층 깊이를 넣는다 (그리기 전에 한 번) */
 export function setFloorTone(depth: number) {
-  tone = depth > 0 ? (depth - 1) % TONES.length : 0;
+  // 벽 묶음 자체를 층마다 바꾸므로(placeFor) 색조는 4층부터 한 바퀴 돈 뒤에만
+  tone = depth > 3 ? Math.floor((depth - 1) / 3) % TONES.length : 0;
 }
 function tonedImage(key: string, im: HTMLImageElement): CanvasImageSource {
   if (!tone || typeof document === 'undefined') return im;
@@ -282,7 +283,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
 }
 
 /** 층 유형·고정 방 → 그림 장소 (docs/GPT요청_게임배경.md의 장소 이름). */
-export function placeFor(where: string, floorType: string | undefined, ref: string, sub?: string | null): string {
+export function placeFor(where: string, floorType: string | undefined, ref: string, sub?: string | null, depth?: number): string {
   // 재현의 층 하위 변형(붉은 벽·빈집)은 자기 벽 그림 (바닥은 아파트 바닥, FLOOR_ALT)
   if (where === 'floor' && floorType === 'replica' && sub && !ref.startsWith('room:') && walls(`apt_${sub}`).length) return `apt_${sub}`;
   if (where === 'car') return 'el_car';
@@ -293,6 +294,11 @@ export function placeFor(where: string, floorType: string | undefined, ref: stri
   // 침묵·어둠·퍼즐·심층은 자기 그림(GPT요청_게임배경_층별)이 들어오면 그것, 아직이면 비슷한 층을 빌린다
   const t = floorType ?? '';
   if (['silent', 'dark', 'puzzle', 'deep'].includes(t) && walls(t).length) return t;
+  // 로비 층이 이어지면 같은 복도로 보인다: 깊이마다 다른 벽 묶음 (독립 검수: L1·L2·L3 동일, 색조만으로는 불가)
+  if (where === 'floor' && t === 'lobby' && depth && depth > 1) {
+    const alt = ['lobby', 'el_hall', 'chase'][(depth - 1) % 3];
+    if (walls(alt).length) return alt;
+  }
   return ({ lobby: 'lobby', chase: 'chase', trial: 'test', replica: 'apt', puzzle: 'test', silent: 'chase', dark: 'chase', deep: 'service' } as Record<string, string>)[t] ?? 'lobby';
 }
 
@@ -797,7 +803,8 @@ export function drawPipeBundle(ctx: CanvasRenderingContext2D, x0: number, x1: nu
 /** 낮은 막이 줄 (GPT props_objects 1~9 중 낮은 것: 줄무늬 콘크리트 턱·모래주머니·화단·철제 통·팔레트).
  * 좁은 길의 앞줄(화면 아래)을 키 큰 차단대 대신 무릎 높이로 막는다 (독립 검수: 차단대 몰림). fy = 받침이 닿는 바닥 y */
 export function drawLowRow(ctx: CanvasRenderingContext2D, x0: number, x1: number, fy: number, seed: number): boolean {
-  const ORDER = [1, 6, 4, 1, 5, 2, 6, 1, 4];
+  // 철제 통(5)은 빈 회색 칸처럼 보여 뺀다 (독립 검수)
+  const ORDER = [1, 6, 4, 2, 1, 4, 6, 1, 2];
   const ims = ORDER.map((n) => objImage('props', n));
   if (ims.some((im) => !im)) return false;
   // 그림 폭을 차례로 이어 붙여 [x0, x1]을 채우고, 남는 폭은 가운데 맞춤

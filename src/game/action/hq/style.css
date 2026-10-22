@@ -109,7 +109,7 @@
 .hq-talk-body { flex: 1; min-width: 0; }
 .hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }
 .hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }
-.hq-kit { margin: 0 0 8px; color: #c9cfc6; font-size: 18px; line-height: 1.45; word-break: keep-all; }
+.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }
 .hq-choices { display: flex; flex-direction: column; gap: 6px; }
 .hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }
@@ -124,7 +124,7 @@
   .hq-line { font-size: 15px; margin: 2px 0 6px; }
   .hq .hq-choice { font-size: 14px; padding: 6px 10px; }
   .hq-choices { flex-direction: row; flex-wrap: wrap; }
-  .hq-kit { font-size: 14px; margin-bottom: 4px; }
+  .hq-kit { font-size: 15px; margin-bottom: 4px; }
 }
 .hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }
 @media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }
@@ -134,3 +134,5 @@
 
 /* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */
 .hq-talk, .hq-choice { word-break: keep-all; }
+/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */
+.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }

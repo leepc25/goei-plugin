@@ -1723,7 +1723,7 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-r, var(--tp-u)) * 2); height: calc(var(--tp-r, var(--tp-u)) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }
 .tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }
 /* 가로 화면: 쉬는 스틱은 그리지 않는다 (누른 자리에 나타남) */
-.tp-float .tp-base:not(.on) { opacity: 0; }
+.tp-float .tp-base:not(.on) { opacity: calc(var(--tp-a) * 0.45); } /* 쉬는 자리에 흐리게: 이동 입력이 어디인지 보이게 (독립 검수) */
 .tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-r, var(--tp-u)) * 0.95); height: calc(var(--tp-r, var(--tp-u)) * 0.95); margin: calc(var(--tp-r, var(--tp-u)) * -0.475) 0 0 calc(var(--tp-r, var(--tp-u)) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 .tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }
 .tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }
@@ -1820,6 +1820,9 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .tp .tp-b.pl.hint { box-shadow: none; filter: brightness(1.3) drop-shadow(0 0 0 #f2c94c) drop-shadow(0 0 4px #f2c94c); }
 .tp .tp-b.pl.full { box-shadow: none; }
 .tp .tp-b.pl .tp-ring { display: none; }
+/* 아이템 칸: 판을 단추 상자 전체에 맞춰 늘려 수량 숫자가 판 안에 들어오게 (독립 검수: 수량이 칸 밖) */
+.tp .tp-b.pl.item { background-size: 100% 100%; }
+.tp .tp-side .tp-b.pl.item u, .tp .tp-b.pl.item u { right: 10px; bottom: 6px; font-size: 18px; }
 `;
 
 // src/game/action/ui/stage.ts
@@ -2286,7 +2289,7 @@ var Hud = class {
     while (c.measureText(t2).width > 900 && t2.length > 4) t2 = t2.slice(0, -2);
     if (t2 !== text) t2 += "…";
     const w = c.measureText(t2).width + 40;
-    const y = compact ? H3 - 210 : H3 - 128;
+    const y = H3 - 44;
     plate(c, W3 / 2 - w / 2, y, w, 36, 18);
     label(c, t2, W3 / 2, y + 25, 17, "#fff8e6", "center", 600);
   }
@@ -2663,10 +2666,9 @@ var Fx = class {
   drawTitle(c, t2) {
     const inK = Math.min(1, t2.t / 0.3), outK = t2.t > 1.5 ? (t2.t - 1.5) / 0.4 : 0;
     c.globalAlpha = Math.max(0, inK * (1 - outK));
-    const text = !t2.depth || t2.name.startsWith(t2.depth) ? t2.name || t2.depth : `${t2.depth} · ${t2.name}`;
-    const y = 112;
+    const text = t2.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, "") || t2.depth;
     c.font = pfont(22).f;
-    const pw = Math.round(c.measureText(text).width + 64) & ~3, ph = t2.variant ? 64 : 44, px = Math.round(W4 / 2 - pw / 2) & ~3, py = y - 32;
+    const pw = Math.round(c.measureText(text).width + 40) + 3 & ~3, ph = t2.variant ? 64 : 44, px = Math.round(W4 - 16 - pw) >> 2 << 2, py = 62;
     c.fillStyle = "#0c0f12";
     c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
     c.fillStyle = "#b8873a";
@@ -2674,9 +2676,11 @@ var Fx = class {
     c.fillStyle = "rgba(16,20,24,0.94)";
     c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
     c.textAlign = "center";
+    c.textBaseline = "middle";
     c.fillStyle = "#ece2c8";
-    c.fillText(text, W4 / 2, y - (t2.variant ? 4 : 0));
-    if (t2.variant) c.font = pfont(11).f, c.fillStyle = "#f0b45a", c.fillText(`변형 · ${t2.variant}`, W4 / 2, y + 20);
+    c.fillText(text, px + pw / 2, py + 22);
+    if (t2.variant) c.font = pfont(11).f, c.fillStyle = "#f0b45a", c.fillText(`변형 · ${t2.variant}`, px + pw / 2, py + 48);
+    c.textBaseline = "alphabetic";
     c.textAlign = "left";
     c.globalAlpha = 1;
   }
@@ -4379,17 +4383,20 @@ function mountGameShell(box2, o = {}) {
     },
     openPause() {
       if (menu.isOpen) return;
+      const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+      const kb = !coarse && (!hud2.last?.device || hud2.last.device === "kb");
+      const key = (k) => kb ? k : void 0;
       menu.open({
         id: "pause",
         title: "일시정지",
         sub: o.pauseInfo?.() ?? "",
         items: [
           ...hud2.last ? [{ type: "html", html: statusHtml(hud2.last) }] : [],
-          { type: "button", label: "계속", sub: "Esc", act: () => menu.closeAll() },
+          { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
           { type: "button", label: "설정", act: () => shell2.openSettings() },
           { type: "button", label: "조작법", act: () => shell2.openControls() },
-          { type: "button", label: "자동 전환", sub: "X", act: () => (menu.closeAll(), tap("KeyX")) },
-          { type: "button", label: "판정 보기", sub: "H", act: () => (menu.closeAll(), tap("KeyH")) },
+          { type: "button", label: "자동 전환", sub: key("X"), act: () => (menu.closeAll(), tap("KeyX")) },
+          { type: "button", label: "판정 보기", sub: key("H"), act: () => (menu.closeAll(), tap("KeyH")) },
           ...o.onRetreat ? [{ type: "button", label: "본부로 귀환", sub: "후송 처리", danger: true, act: () => void shell2.confirm("출동을 포기하고 본부로 돌아갈까요? 송신하지 않은 정보는 절반만 남습니다.", "귀환", "계속 싸운다").then((y) => y && (menu.closeAll(), o.onRetreat())) }] : [],
           { type: "button", label: "타이틀로", act: () => void shell2.confirm("타이틀 화면으로 나갈까요? 진행은 저장됩니다.").then((y) => y && (o.onTitle ? o.onTitle() : shell2.openTitle())) }
         ]

@@ -531,28 +531,29 @@ const cache = new WeakMap<Enemy, Board & { key: string }>();
 /** 그림 모양이 있는 종은 true를 돌려 주고, 없으면 상자 그리기에 맡긴다 */
 // 같은 종이 여럿 나와도 복제처럼 보이지 않게: 한 마리마다 옷 색·머리색·체격·키를 조금씩 (독립 검수: 회색 클론 반복)
 const OUTFITS: [string, string, string][] = [
-  ['#6a4a3a', '#2e2a26', '#2a1e16'],
-  ['#3e5a4a', '#262e2a', '#141414'],
-  ['#5a5070', '#2a2834', '#3a2a1e'],
-  ['#7a6a4a', '#3a3428', '#5a4a3a'],
-  ['#44546e', '#22262e', '#101012'],
-  ['#704848', '#2c2224', '#1c1a1a'],
+  ['#8a3a34', '#2e2a2c', '#1c1612'], // 붉은 재킷
+  ['#3f6a52', '#2a2f2c', '#141414'], // 녹색 점퍼
+  ['#5c4f86', '#2a2836', '#3a2a1e'], // 보라 카디건
+  ['#a08450', '#3d3426', '#5a4a3a'], // 낙타색 코트
+  ['#3c5a8a', '#22283a', '#101012'], // 파란 셔츠
+  ['#7a5a3c', '#4a3c2c', '#24201c'], // 갈색 양복
+  ['#c8b890', '#3a4458', '#2a2622'], // 베이지 니트
+  ['#4a4a52', '#6a5a46', '#c8c4bc'], // 회색 정장, 흰머리
 ];
 function varied(e: Enemy, L: Look): { L: Look; scale: number } {
   if (L.shape !== 'human' || e.boss || e.kind.startsWith('fb_')) return { L, scale: 1 };
   const v = (e.id * 2654435761) >>> 0;
-  if (v % 5 === 0) return { L, scale: 1 };
   const o = OUTFITS[v % OUTFITS.length];
-  const k = 0.35 + ((v >> 4) % 3) * 0.12;
+  const k = 0.75 + ((v >> 4) % 3) * 0.12;
   return {
     L: {
       ...L,
-      top: mix(L.top ?? '#5a5a5a', o[0], k),
-      bottom: mix(L.bottom ?? '#2a2a2a', o[1], k),
-      hair: (v >> 7) % 2 ? o[2] : L.hair,
-      bulk: (L.bulk ?? 0.16) * (0.88 + ((v >> 9) % 4) * 0.06),
+      top: mix(L.top ?? '#5a5a5a', o[0], Math.min(1, k)),
+      bottom: mix(L.bottom ?? '#2a2a2a', o[1], Math.min(1, k)),
+      hair: (v >> 7) % 3 ? o[2] : L.hair,
+      bulk: (L.bulk ?? 0.16) * (0.86 + ((v >> 9) % 4) * 0.07),
     },
-    scale: 0.93 + ((v >> 12) % 4) * 0.035,
+    scale: 0.92 + ((v >> 12) % 4) * 0.04,
   };
 }
 

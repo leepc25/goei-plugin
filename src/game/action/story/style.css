@@ -20,7 +20,7 @@
 .gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}
 .gsy-body{flex:1;min-width:0}
 .gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}
-.gsy-text{margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}
+.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}
 .gsy-box.narr{border-top-color:#555}
 .gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}
 .gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}

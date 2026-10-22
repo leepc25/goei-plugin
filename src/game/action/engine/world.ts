@@ -235,6 +235,7 @@ export class World implements WorldView {
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
     this.banner = { text: f.banner ?? f.title, t: 70 };
+    this.subtitle = null; // 지난 방·층 대사를 끌고 오지 않는다 (독립 검수: 탕비실 대사가 보급실까지)
     this.floors++;
     this.emit({ type: 'enter:floor', floor: f });
   }
@@ -359,8 +360,9 @@ export class World implements WorldView {
       if (!e.alive || b.team === 'player' || b instanceof Fighter || !e.def || e.z > 0) continue;
       if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
       if (e.def.keep && e.def.keep[1] < 30) continue;
-      if (Math.abs(e.y - p.y) > 30) continue;
-      const min = 56 + e.def.w * 0.25;
+      // 깊이 50 안쪽이면 그림이 포개진다: 요원과 적이 한 몸처럼 겹치지 않게 (독립 검수)
+      if (Math.abs(e.y - p.y) > 50) continue;
+      const min = 70 + e.def.w * 0.3;
       const dx = e.x - p.x;
       if (Math.abs(dx) >= min) continue;
       const s = dx === 0 ? -p.dir : Math.sign(dx);
