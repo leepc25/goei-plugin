@@ -22,6 +22,7 @@ export interface HqHost {
   /** 자동 저장 (슬롯 0) */
   load(): Promise<string | null>;
   save(data: string): Promise<void>;
+  resuming?(): boolean;
   /** 수동 저장 슬롯 1~3 (bridge.saves). 없으면 Esc 메뉴에 슬롯이 안 보인다 */
   saves?: SaveSlots;
   link?: MainLink;
@@ -47,6 +48,7 @@ export interface HqPlaceView {
 export interface HqModule {
   /** walk:false = 엔진이 본부를 걷는 벨트 장면으로 그리고, root에는 메뉴 창만 띄운다 (게임_통합_규격 4장) */
   mount(root: HTMLElement, host: HqHost, opt?: { walk?: boolean }): void;
+  ready(): Promise<void>;
   places(): HqPlaceView[];
   /** 그 장소 메뉴 창 (엔진: 문 앞에서 E) */
   openPlace(id: PlaceId): void;
@@ -76,6 +78,7 @@ const VW = 1280,
 const depthText = (d: number) => (d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '—');
 
 export function createHq(): HqModule {
+  let ready = Promise.resolve();
   let s: HqSave = newSave();
   let host: HqHost | null = null;
   let root: HTMLElement | null = null;
@@ -540,6 +543,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     get state() {
       return s;
     },
+    ready: () => ready,
     mount(r, h, opt) {
       root = r;
       host = h;
@@ -564,11 +568,11 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         window.addEventListener('blur', blur);
       }
       render();
-      void (async () => {
+      ready = (async () => {
         const got = parseSave(await h.load().catch(() => null));
         if (got) s = got;
         // 출동 중에 앱을 닫았다면: 출동 기록이 없으니 후송 취급으로 정리한다 (아이템은 이미 출동으로 넘어갔다)
-        if (s.active) {
+        if (s.active && !h.resuming?.()) {
           s.active = null;
           notice = '지난 출동이 끝나지 않은 채 닫혔어요. 요원은 후송된 것으로 처리했어요.';
         }

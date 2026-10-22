@@ -17,6 +17,7 @@ import { Bullet, Dummy, Thug } from './bodies';
 import { Fighter, overlap } from './fighter';
 import type { Pad } from './input';
 import { Player } from './player';
+import { encodeState, decodeState } from './checkpoint';
 
 export type EnemyFactory = (spec: SpawnSpec, world: WorldView) => Body;
 export type ItemUse = (slot: number, api: StageApi) => false | { anim: 'drink' | 'eat' | 'bandage' | 'toss'; consumed: boolean; label?: string };
@@ -34,13 +35,14 @@ export interface Fx {
 
 export function mulberry32(seed: number) {
   let a = seed >>> 0;
-  return () => {
+  const next = () => {
     a = (a + 0x6d2b79f5) >>> 0;
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  return Object.assign(next, { state: () => a, restore: (v: number) => { a = v >>> 0; } });
 }
 
 /** 엔진 기본 적: 허수아비 + 임시 적 (적 모듈에 없는 종류도 이걸로) */
@@ -50,7 +52,7 @@ const STOP_DEFAULT = { none: 1, flinch: 3, stagger: 4, launch: 6, down: 6, bind:
 
 export class World implements WorldView {
   tick = 0;
-  rand: () => number;
+  rand: ReturnType<typeof mulberry32>;
   player: Player;
   bodies: Body[] = [];
   floor!: FloorPlan;
@@ -80,7 +82,28 @@ export class World implements WorldView {
   kills = 0;
   floors = 0;
   notes: Record<string, unknown> = {};
-  ended: 'next' | 'withdraw' | 'evac' | null = null;
+  ended: 'next' | 'withdraw' | 'return' | 'evac' | null = null;
+  itemState?: { snapshot(): unknown; restore(v: unknown): void };
+  /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
+  canCheckpoint() {
+    return !this.ended && this.player.hp > 0 && this.player.phase === 'free' && !this.player.move && !this.player.airborne && !this.player.grabbed
+      && this.encActive < 0 && !this.bodies.some(b => b.alive && b.hp > 0 && b.team !== 'player' && this.threat(b));
+  }
+  snapshot(): string {
+    const keys = ['x', 'y', 'dir', 'hp', 'hpMax', 'ammo', 'mag', 'reserve', 'gauge', 'guardMeter', 'skillCd', 'maxCombo', 'ward', 'dmgMul'] as const;
+    return encodeState({ tick: this.tick, kills: this.kills, floors: this.floors, notes: this.notes, rng: this.rand.state(),
+      player: Object.fromEntries(keys.map(k => [k, this.player[k]])), items: this.itemState?.snapshot() });
+  }
+  restore(state: string) {
+    const s = decodeState<{ tick: number; kills: number; floors: number; notes: Record<string, unknown>; rng: number; player: Partial<Player>; items: unknown }>(state);
+    if (!s.player || !(Number(s.player.hp) > 0)) throw new Error('손상된 출동 상태');
+    this.tick = s.tick; this.kills = s.kills; this.floors = s.floors; this.notes = s.notes;
+    Object.assign(this.player, s.player);
+    this.player.px = this.player.x; this.player.py = this.player.y;
+    this.itemState?.restore(s.items);
+    this.rand.restore(s.rng);
+    this.camera();
+  }
   deadT = 0;
   private hitMemo = new Map<string, number>();
   private listeners: ((e: GameEvent) => void)[] = [];
@@ -234,6 +257,8 @@ export class World implements WorldView {
     p.y = p.py = (this.lane[0] + this.lane[1]) / 2;
     p.z = p.pz = 0;
     p.vx = p.vy = p.vz = 0;
+    p.move = null; p.moveKey = ''; p.grabbed = null;
+    p.enter('free'); p.stop = 0;
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
     this.banner = { text: f.banner ?? f.title, t: 70 };

@@ -129,6 +129,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   const loadout = run.launch?.items ?? [{ id: 'medkit', n: 2 }, { id: 'flash', n: 2 }, { id: 'adrenaline', n: 1 }, null];
   const ir: ItemRun = createItemRun('jyaldi', loadout.map((s) => (s ? { id: s.id, n: s.n } : null)));
   let field: Field = createField(run.seed, 1);
+  const fields = new Map<string, Field>();
   const p = w.player;
   p.mag = p.ammo = ir.mag || p.mag;
   p.reserve = ir.reserve;
@@ -242,7 +243,10 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
 
   w.on((e) => {
     if (e.type === 'enter:floor') {
+      const remembered = fields.get(e.floor.id);
+      if (remembered) { field = remembered; syncCarry(); return; }
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
+      fields.set(e.floor.id, field);
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       // 문·벽 가구 앞, 지형 위, 적이 생겨날 자리를 비운다 (검수 12-2, 17)
       // 층 소품은 그림 폭으로 (점검문처럼 표 폭보다 그림이 넓은 것, 겹침 시험)
@@ -318,6 +322,19 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     ],
     configurable: true,
   });
+  w.itemState = {
+    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed }),
+    restore(value) {
+      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number; shopSeed: number };
+      if (!s?.inventory || !Array.isArray(s.fields)) throw new Error('손상된 아이템 저장');
+      Object.assign(ir, s.inventory);
+      fields.clear(); for (const [k, v] of s.fields) fields.set(k, v);
+      field = fields.get(s.current)!;
+      if (!field) throw new Error('방 아이템 저장 누락');
+      lastReserve = s.lastReserve; shopSeed = s.shopSeed;
+      syncSlots(); syncCarry();
+    },
+  };
   return {
     run: ir,
     /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */

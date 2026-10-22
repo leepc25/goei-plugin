@@ -76,7 +76,13 @@ export type PlacedKind =
   | 'locked' // 잠긴 방화셔터: 그 층 정비 구역의 열쇠로 연다
   | 'sidedoor' // 곁가지 방 문 (끝에 보상)
   | 'crack' // 금 간 벽: 때려 부수면 숨은 방
-  | 'vent'; // 막힌 덕트: 앉은 채 E로 숨은 방
+  | 'vent' // 막힌 덕트: 앉은 채 E로 숨은 방
+  // ── 층 = 방 격자 세상 (gen/world.ts)
+  | 'wdoor' // 옆 방으로 (좌·우 끝)
+  | 'wup' // 위 방으로 (계단·사다리)
+  | 'wdown' // 아래 방으로 (계단·구멍)
+  | 'key' // 열쇠: data.key = 잠금 번호
+  | 'reward'; // 보상 배낭 (강화 선택)
 export interface Placed {
   id: number;
   kind: PlacedKind;
@@ -137,6 +143,8 @@ export interface Floor {
   palette: Palette;
   fallback: '' | 'A' | 'B';
   tries: number;
+  /** 방 격자 세상의 방 하나면 그 자리와 이름 */
+  room?: { col: number; row: number; name: string };
 }
 
 export interface Palette {
@@ -203,4 +211,51 @@ export interface SideRoom {
   fight: string[];
   elite: boolean;
   palette: Palette;
+}
+
+// ── 층 = 방 격자 세상 (원작: 주머니 차원. 층마다 다른 세상, 지하는 사람의 건축이 사라진 미궁)
+// 문이 열릴 때마다 씨앗으로 짠다: 정답 길(무작위 걸음) → 가지 → 잠금·열쇠 → 순환·숨은 방 → 방 역할.
+export type Dir = 'l' | 'r' | 'u' | 'd';
+export type RoomRole = 'arrival' | 'exit' | 'path' | 'fight' | 'trap' | 'device' | 'key' | 'reward' | 'secret' | 'branch';
+export interface WorldRoom {
+  col: number;
+  row: number;
+  open: Record<Dir, boolean>;
+  /** 반대편 끝과 이어진 연결 (끝없는 복도) */
+  wrap: Partial<Record<Dir, boolean>>;
+  /** 잠긴 연결: 잠금 번호 (그 번호 열쇠로 연다) */
+  lock: Partial<Record<Dir, number>>;
+  /** 숨은 연결: 이쪽에서는 금 간 벽·막힌 덕트로 보인다 */
+  hidden: Partial<Record<Dir, 'crack' | 'vent'>>;
+  role: RoomRole;
+  /** 도착 방에서 몇 칸 (잠금 무시) */
+  dist: number;
+  /** 잠금 구역 번호 (0 = 도착 쪽) */
+  region: number;
+  onPath: boolean;
+  /** 놓인 열쇠 번호 */
+  key: number | null;
+  /** 승강기 패널이 있는 방 (출구 방 말고도 가끔) */
+  panel: boolean;
+  guardian: boolean;
+  passenger: boolean;
+  /** 이 방에 꼭 넣을 장치 조각 (퍼즐 갈림문·스위치, 밥상 등) */
+  need: string[];
+  chunks: number;
+  name: string;
+}
+export interface World {
+  depth: number;
+  type: FloorType;
+  sub: ReplicaSub | null;
+  seed: number;
+  cols: number;
+  rows: number;
+  rooms: WorldRoom[];
+  arrival: [number, number];
+  exit: [number, number];
+  /** 잠금 수 (열쇠 1..locks) */
+  locks: number;
+  path: [number, number][];
+  label: string;
 }

@@ -337,7 +337,7 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   const evac = r.how === 'evac';
   const success = r.how === 'return' && r.missionDone;
   const agent = AGENT_BY_ID[l.agent];
-  lines.push(evac ? `후송: ${josa(agent.name, '이', '가')} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, '이', '가')} 다락방 로프로 철수했다. 성공 보상은 없다.`);
+  lines.push(evac ? `후송: ${josa(agent.name, '이', '가')} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, '이', '가')} 출동을 포기하고 돌아왔다. 성공 보상은 없다.`);
 
   // 규칙서: 송신한 정보는 전부, 안 보낸 정보는 후송이면 절반
   const unsent = r.found.filter((f) => !r.sent.includes(f));

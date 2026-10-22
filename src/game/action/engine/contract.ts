@@ -167,7 +167,7 @@ export interface StageApi {
   hurtPlayer(dmg: number, stagger?: boolean): void;
   heal(n: number): void;
   note(key: string, value: unknown): void;
-  finish(how: 'next' | 'withdraw'): void;
+  finish(how: 'next' | 'withdraw' | 'return'): void;
   /** 플레이어를 옮김 (구덩이 복귀·낮은 천장·단·추격 밀기). 속도는 0으로 */
   movePlayer(x: number, y?: number): void;
 }
@@ -175,6 +175,8 @@ export interface StageApi {
 export interface StageModule {
   id: string;
   label: string;
+  snapshot?(): string | null;
+  restore?(state: string): FloorPlan;
   firstFloor(run: RunConfigCore): FloorPlan;
   /** null = 출동 끝(귀환) */
   nextFloor(run: RunConfigCore, prev: FloorPlan, how: 'next' | 'withdraw'): FloorPlan | null;
@@ -211,6 +213,7 @@ export interface HqHostCore {
 }
 export interface HqModuleLike {
   mount(root: HTMLElement, host: HqHostCore): void;
+  ready?(): Promise<void>;
   onReturn(result: RunResultCore, run: RunConfigCore): void;
   unmount(): void;
   /** 본부를 엔진 벨트 장면으로 걷게 할 때: 본부 층 (없으면 DOM 본부만) */

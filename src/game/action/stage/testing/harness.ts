@@ -50,7 +50,7 @@ export class DemoEngine {
   notes: Record<string, unknown> = {};
   floors = 0;
   kills = 0;
-  private pendingFinish: 'next' | 'withdraw' | null = null;
+  private pendingFinish: 'next' | 'withdraw' | 'return' | null = null;
   private nextId = 1;
   private rand: () => number;
   events: GameEvent[] = [];
@@ -230,7 +230,7 @@ export class DemoEngine {
       bd = 61;
     for (const pr of this.props) {
       const d = Math.abs(pr.x - this.p.x);
-      if (d < bd && pr.kind !== 'prop' && (pr.kind !== 'shutter' || pr.label === '잠긴 방화셔터')) (bd = d), (best = pr);
+      if (d < bd && pr.kind !== 'prop' && (pr.kind !== 'shutter' || pr.label === '잠긴 방화셔터' || (pr.solid && this.p.x > pr.x))) (bd = d), (best = pr);
     }
     return best;
   }
@@ -363,7 +363,7 @@ export class DemoEngine {
     if (this.pendingFinish) {
       const how = this.pendingFinish;
       this.pendingFinish = null;
-      const next = this.stage.nextFloor(this.run, this.plan, how);
+      const next = how === 'return' ? null : this.stage.nextFloor(this.run, this.plan, how);
       if (next) this.load(next as StagePlan);
       else if (!this.ended) {
         this.ended = 'return';
