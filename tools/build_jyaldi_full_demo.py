@@ -47,7 +47,7 @@ DEFS = [
     D('block', 'blockfront', '18 가드(전면)', 16),
     D('evade', 'evade', '20 회피(방향 대시)', 18),
     D('grab', 'grab2', '21 잡기', 14),
-    D('grabknee', 'grabknee2', '22 잡기 타격(무릎)', 14, hits=[2], hold=0.05),
+    D('grabknee', 'grabknee', '22 잡기 타격(무릎)', 14, hits=[2], hold=0.05),
     D('grabblast', 'grabblast', '23 잡기 폭파(던지기 대신)', 12, hits=[4], hold=0.1),
     D('super', 'super', '24 필살기', 14, hits=[6], hold=0.2),
     D('pickup', 'pickup', '25 상호작용·줍기', 10),

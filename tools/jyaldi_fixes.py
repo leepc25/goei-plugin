@@ -23,7 +23,7 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 # 샤워·목욕·용변·탈의는 GPT 납품(2026-10-22 4b904ee, 수건으로 가림, 샤워는 뒷모습 머리 감기). 옛 보정(머리색 바꾸기·가구 분리)은 옛 그림용이라 뺌
 # undress/showerturn and section-8 shower/bath were redrawn at final scale;
 # preserve their approved size, hair palette, and y=135 sole baseline.
-GPT_CLIPS = {'toilet'}
+GPT_CLIPS = set()
 # Section 8: anchors measured on the final 192x144 drawings, not the retired rig.
 GPT_STYLE_ANCHORS = {
     'shower': [

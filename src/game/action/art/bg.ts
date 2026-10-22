@@ -3,6 +3,7 @@
 // 도트 1px = 화면 2px. 벽 칸 320×220 도트 = 화면 640×440, 바닥 무늬 128 도트.
 
 import { HQ_SCENES } from '../hq/map';
+import { HQ_WALL_DECO } from '../hq/wallDeco';
 
 export type BgPack = Record<string, Record<string, string>>; // 장소 → 이름 → data URL
 
@@ -58,6 +59,22 @@ const FLOOR_PLATES: Record<string, [number, number, number, number][]> = {
   apt_vacant_wall_1: [[95, 40, 120, 48]],
   silent_wall_3: [[140, 30, 180, 37]],
 };
+/** 방 이름 → 명패 그림 번호 (plates_objects: 1 공구 2 책 3 침대 4 회의 5 상자 6 전화 7 십자 8 열쇠 9 아파트 호수판) */
+function plateFor(room: string): number {
+  if (/^\d+$/.test(room)) return 9;
+  const t: [RegExp, number][] = [[/기계|정비|보급|공방/, 1], [/자료|서고|열람|고문서|연구|감정/, 2], [/숙직|의무/, 3], [/회의|면담|대응|팀|사무/, 4], [/창고|격리/, 5], [/상담|통신/, 6], [/의무|치료/, 7], [/관리|부장|별관|실장/, 8]];
+  return t.find(([re]) => re.test(room))?.[1] ?? 4;
+}
+/** 명패 그림을 빈 명패 칸(x, y, w, h 화면 px) 가운데에, 다른 그림과 같은 도트 크기(1도트 = 2px)로 덮는다 */
+function drawPlate(ctx: CanvasRenderingContext2D, room: string, x: number, y: number, w: number, h: number) {
+  const im = objImage('plates', plateFor(room));
+  if (!im) return;
+  const k = 2;
+  const dw = im.width * k,
+    dh = im.height * k;
+  ctx.drawImage(im, Math.round(x + (w - dw) / 2), Math.round(y + (h - dh) / 2), dw, dh);
+}
+
 const PLATE_NAMES: Record<string, string[]> = {
   lobby: ['관리실', '자료실', '숙직실', '기계실', '상담실', '회의실', '창고'],
   apt: ['301', '302', '303', '304', '404', '305'],
@@ -90,16 +107,13 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
     } else ctx.drawImage(im, bx, 0, bw, wallBottom);
     const name = names[(k + (hash(place) % names.length)) % names.length];
     (FLOOR_PLATES[name] ?? []).forEach(([px0, py0, px1, py1], j) => {
+      // 빈 명패 자리에 GPT 명패 그림(방 기호, 보강 2번)을 붙인다. 글씨는 쓰지 않는다
       const list = PLATE_NAMES[place.split(':')[0]] ?? PLATE_NAMES.lobby;
-      const text = list[hash(`${place}:${Math.round(bx)}:${j}`) % list.length];
+      const room = list[hash(`${place}:${Math.round(bx)}:${j}`) % list.length];
       const kx = bw / 320,
         ky = wallBottom / 220;
-      const cx = flip ? bx + (320 - (px0 + px1) / 2) * kx : bx + ((px0 + px1) / 2) * kx;
-      ctx.fillStyle = /silent/.test(place) ? '#3a2a14' : /apt/.test(place) ? '#d8d4c8' : '#2b2f2c'; // 아파트 호수판은 어두운 판
-      ctx.font = `bold ${Math.max(9, Math.round((py1 - py0) * ky * 0.66))}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, cx, ((py0 + py1) / 2) * ky + ky / 2, (px1 - px0 - 2) * kx);
+      const x0 = flip ? bx + (320 - px1) * kx : bx + px0 * kx;
+      drawPlate(ctx, room, x0, py0 * ky, (px1 - px0) * kx, (py1 - py0) * ky);
     });
   }
   wallLight(ctx, x, w, wallBottom);
@@ -274,8 +288,15 @@ export const HQ_PLACE: Record<string, string> = {
 const HQ_WALLS: Record<string, string[]> = {
   hq_office: ['hq_office', 'hq_jaemtri'],
   hq_supply: ['hq_supply', 'hq_workshop'],
-  hq_lab: ['hq_lab', 'hq_jaemtri:hq_jaemtri_wall_4'],
   hq_lobby: ['hq_lobby', 'lobby:lobby_wall_1'],
+  // 문 그림이 없는 방은 이웃 방의 문 칸을 빌린다: 엔진이 그린 문이 책장·창·게시판을 덮지 않게 (통합 검수 23, tests/hq-walls.test.mjs)
+  hq_chief: ['hq_chief', 'hq_office:hq_office_wall_3'],
+  hq_interview: ['hq_interview', 'hq_office:hq_office_wall_3'],
+  hq_appraisal: ['hq_appraisal', 'hq_containment:hq_containment_wall_3'],
+  hq_lab: ['hq_lab', 'hq_jaemtri:hq_jaemtri_wall_4', 'hq_containment:hq_containment_wall_1'],
+  hq_training: ['hq_training', 'hq_workshop:hq_workshop_wall_3'],
+  hq_tooth: ['hq_tooth', 'hq_containment:hq_containment_wall_4'],
+  hq_pasta: ['hq_pasta', 'hq_pantry:hq_pantry_wall_4'],
 };
 /** 바닥 그림이 없는 장소가 빌리는 바닥. */
 const FLOOR_ALT: Record<string, string> = {
@@ -299,7 +320,7 @@ const DOOR_FOR: Record<string, string> = {
   // 2층 복도: 의무실은 흰 여닫이문, 면담실은 나무문 (같은 문 둘이 나란하면 칸막이처럼 보인다)
   'f2:clinic': 'hq_corridor_wall_4', 'f2:interview': 'hq_corridor_wall_3',
 };
-/** 문 옆 빈 명패 (도트 x0, y0, x1, y1): 문이 이어지는 방 이름을 적는다. */
+/** 문 옆 빈 명패 (도트 x0, y0, x1, y1): 문이 이어지는 방 기호 명패를 붙인다. */
 const PLATES: Record<string, [number, number, number, number]> = {
   hq_corridor_wall_3: [220, 52, 247, 63], hq_corridor_wall_4: [209, 62, 236, 72],
 };
@@ -308,6 +329,34 @@ const SCENE_NAME = new Map(HQ_SCENES.map((s) => [s.id as string, s.name]));
 function doorType(kind: string): 'door' | 'stairs' | 'elevator' {
   return kind.startsWith('stairs') ? 'stairs' : kind === 'elevator' ? 'elevator' : 'door';
 }
+
+/** 벽 칸 그림 없이 엔진이 덧그리는 문의 반폭(화면 px): 엘리베이터는 2층 복도 엘리베이터 조각, 계단은 로비 계단 물건 그림. */
+function overlayHalf(kind: string, k: number): number {
+  if (kind === 'elevator') return ((213 - 108) * k) / 2;
+  const ref = BY_KIND[`hq_${kind}`];
+  const im = ref ? objImage(ref[0], ref[1]) : null;
+  if (im) return im.width;
+  return kind.startsWith('stairs') ? 140 : 0;
+}
+/** 민벽 띠: 채움 칸 그림 중 장식이 없는 가장 넓은 도트 구간 [장소, 그림, [u0, u1]] (hq/wallDeco.ts) */
+function plainStrip(fill: [string, string][], m = 4): [string, string, [number, number]] | null {
+  let best: [string, string, [number, number]] | null = null;
+  for (const [p, n] of fill) {
+    const deco = HQ_WALL_DECO[n];
+    if (!deco) continue;
+    const hole = DOOR_WALLS[n];
+    let cur = 6;
+    // 문이 그려진 칸이면 문 구멍(+문틀)도 장식처럼 피한다
+    for (const [a, b] of [...deco, ...(hole ? [[hole[0] - 14, hole[1] + 14] as [number, number]] : []), [314, 320] as [number, number]].sort((u, v) => u[0] - v[0])) {
+      if (a - m > cur + m && (!best || a - cur - 2 * m > best[2][1] - best[2][0])) best = [p, n, [cur + m, a - m]];
+      cur = Math.max(cur, b);
+    }
+  }
+  return best && best[2][1] - best[2][0] >= 6 ? best : null;
+}
+
+/** 민벽 띠 고르기: 같은 방 칸에서 넉넉히 → 좁게(장식 사이 틈) → 문 칸을 빌린 방이면 빌린 칸의 민벽 */
+const plainOf = (fill: [string, string][], cands: [string, string][]) => plainStrip(fill) ?? plainStrip(fill, 1) ?? plainStrip(cands);
 
 /**
  * 본부 장면 벽: 엔진 문 자리에 문이 그려진 벽 칸을 문 구멍이 맞게 놓고, 사이는 문 없는 칸으로 채운다.
@@ -324,7 +373,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
   const fill = plain.length ? plain : cands;
   const k = wallBottom / 220; // 화면 px / 도트
   const bayW = 320 * k;
-  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string; flip?: boolean; label?: string };
+  type Piece = { p: string; n: string; x: number; a: number; b: number; door?: string; flip?: boolean; label?: string; blank?: [number, number] };
   const pieces: Piece[] = [];
   for (const d of [...doors].sort((a, b) => a.x - b.x)) {
     const want = DOOR_FOR[`${sceneId}:${d.id}`];
@@ -332,15 +381,33 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     const t = d.kind === 'main' && cands.some(([, n]) => DOOR_WALLS[n]?.[2] === 'main') ? 'main' : doorType(d.kind);
     const ok = cands.filter(([, n]) => DOOR_WALLS[n]?.[2] === t);
     const pick = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d.id}`) % Math.max(1, ok.length)];
-    if (!pick) continue;
+    if (!pick) {
+      // 문 칸이 없는 엘리베이터·계단: 그 뒤는 장식 없는 민벽으로 (게시판·소화전을 덮지 않게, 통합 검수 22·23)
+      const half = overlayHalf(d.kind, k);
+      const st = plainOf(fill, cands);
+      if (half && st) pieces.push({ p: st[0], n: st[1], x: d.x - half - 12, a: d.x - half - 12, b: d.x + half + 12, blank: st[2] });
+      continue;
+    }
     const [x0, x1] = DOOR_WALLS[pick[1]];
     const bx = d.x - ((x0 + x1) / 2) * k;
     pieces.push({ p: pick[0], n: pick[1], x: bx, a: bx, b: bx + bayW, door: d.id, label: d.to && SCENE_NAME.get(d.to) });
   }
-  // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다)
+  // 벽에 붙은 가구(사물함 줄·책장·화이트보드…) 뒤도 민벽으로: 가구가 벽 그림 속 창·게시판을 반쯤 가리지 않게
+  const sc = HQ_SCENES.find((x) => x.id === sceneId);
+  const strip = plainOf(fill, cands);
+  for (const t of sc?.things ?? []) {
+    if (!t.wall || !strip) continue;
+    const sz = propArtSize(t.kind, undefined);
+    if (sz) pieces.push({ p: strip[0], n: strip[1], x: t.x - sz.w / 2 - 12, a: t.x - sz.w / 2 - 12, b: t.x + sz.w / 2 + 12, blank: strip[2] });
+  }
+  pieces.sort((u, v) => u.a - v.a);
+  // 겹치는 문 칸은 두 문 사이 가운데서 자른다 (문 구멍은 남는다). 민벽 조각과 겹치면 민벽을 남긴다
   for (let i = 1; i < pieces.length; i++) {
     const L = pieces[i - 1], R = pieces[i];
-    if (L.b > R.a) {
+    if (L.b <= R.a) continue;
+    if (R.blank && !L.blank) L.b = R.a;
+    else if (L.blank && !R.blank) R.a = L.b;
+    else {
       const m = (L.b + R.a) / 2;
       L.b = m;
       R.a = m;
@@ -363,12 +430,40 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
       fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1), flip });
     }
   }
+  // 칸 이음매·장면 끝에서 반쯤 잘리는 벽 장식(창·게시판 반쪽)은 통째로 민벽으로 덮는다 (통합 검수 23, tests/hq-walls.test.mjs)
+  const plainSt = plainOf(fill, cands);
+  if (plainSt) {
+    for (const pc of [...fills, ...pieces]) {
+      if (pc.blank) continue;
+      let a = Math.max(pc.a, pc.x, 0),
+        b = Math.min(pc.b, pc.x + bayW, length);
+      const spans = (HQ_WALL_DECO[pc.n] ?? []).map(([u0, u1]) => (pc.flip ? [pc.x + bayW - u1 * k, pc.x + bayW - u0 * k] : [pc.x + u0 * k, pc.x + u1 * k])).sort((u, v) => u[0] - v[0]);
+      for (const [d0, d1] of spans) {
+        if (d1 <= a || d0 >= b || (d0 >= a - 1 && d1 <= b + 1)) continue;
+        const blank = (x0: number, x1: number) => x1 - x0 > 1 && pieces.push({ p: plainSt[0], n: plainSt[1], x: x0, a: x0, b: x1, blank: plainSt[2] });
+        if (d0 < a) {
+          blank(a, Math.min(d1, b));
+          a = Math.min(d1, b);
+        } else {
+          blank(Math.max(d0, a), b);
+          b = Math.max(d0, a);
+        }
+      }
+      pc.a = a;
+      pc.b = b;
+    }
+  }
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   const covered = new Set<string>();
   for (const pc of [...fills, ...pieces]) {
     const im = image(pc.p, pc.n);
     if (!im) continue;
+    if (pc.blank) {
+      const [u0, u1] = pc.blank;
+      ctx.drawImage(im, u0, 0, u1 - u0, im.height, pc.a, 0, pc.b - pc.a, wallBottom);
+      continue;
+    }
     const a = Math.max(pc.a, pc.x), b = Math.min(pc.b, pc.x + bayW);
     if (b <= a) continue;
     if (pc.flip) {
@@ -383,11 +478,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     const pl = PLATES[pc.n];
     if (pl && pc.label && pc.x + pl[0] * k >= a && pc.x + pl[2] * k <= b) {
       const [x0, y0, x1, y1] = pl;
-      ctx.fillStyle = '#2b2f2c';
-      ctx.font = `bold ${Math.round((y1 - y0) * k * 0.62)}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(pc.label, pc.x + ((x0 + x1) / 2) * k, ((y0 + y1) / 2) * k + k / 2, (x1 - x0 - 3) * k);
+      drawPlate(ctx, pc.label, pc.x + x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k);
     }
   }
   // 이 장소 벽 그림에 엘리베이터가 없으면 2층 복도 엘리베이터(문틀째)를 잘라 붙인다
@@ -400,7 +491,7 @@ export function drawHqWall(ctx: CanvasRenderingContext2D, place: string, sceneId
     covered.add(d.id);
   }
   // 잘린 이음매에 기둥
-  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && e - pc.x > 2 && pc.x + bayW - e > 2) seamPillar(ctx, e, wallBottom, 14);
+  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && (pc.blank || (e - pc.x > 2 && pc.x + bayW - e > 2))) seamPillar(ctx, e, wallBottom, 14);
   // 이웃 칸 끝 색이 크게 다르면(나무 책장 ↔ 크림 벽, 유리 ↔ 베이지) 기둥으로 갈라 이음매가 아니라 벽 모서리로 읽히게
   const all = [...fills, ...pieces].sort((u, v) => u.a - v.a);
   for (let i = 1; i < all.length; i++) {
@@ -481,6 +572,7 @@ const FLOOR_LABEL: Record<string, [RegExp, [string, number]][]> = {
 
 const BY_LABEL: [RegExp, ObjRef][] = [
   [/자판기/, ['lobby', 3]], [/소파/, ['lobby', 2]], [/정수기/, ['lobby', 5]], [/화분/, ['lobby', 4]], [/우산/, ['el_hall', 3]],
+  [/옷걸이|외투/, ['props', 11]], [/대걸레|청소/, ['props', 15]], [/접이|쌓인 의자/, ['props', 16]], [/수레|카트/, ['props', 17]], [/고무나무/, ['props', 18]],
   [/게시판|표지|안내|액자|점수판|번호표|점검표|목표|시계|사진/, ['lobby', 6]],
   [/책장/, ['hq_jaemtri', 9]], [/그릇|선반/, ['hq_pantry', 8]], [/카펫/, ['apt', 4]], [/형광등|블라인드/, ['chase', 8]], [/의자/, ['chase', 2]],
   [/배관/, ['service', 8]], [/캐비닛|틈새|셔터/, ['chase', 6]], [/문짝|잠긴 문|문틀|방화문/, ['chase', 1]], [/신발장/, ['apt', 2]],
@@ -514,6 +606,30 @@ const BY_KIND: Record<string, ObjRef> = {
   locker_row: ['hq_supply', 4], workbench: ['hq_workshop', 1], cargo_cart: ['hq_supply', 3], shelf: ['hq_supply', 1],
 };
 
+/** 바닥에 서는 층 소품 (props_objects_2: 10 정수기 11 옷걸이 12 우산꽂이 14 신발장 15 대걸레 16 접이 의자 17 짐수레 18 화분, 13 소화기함은 벽) */
+const PROPS_2 = [10, 11, 12, 14, 15, 16, 17, 18];
+/** 표지판 그림 번호 (signs_objects: 1 층 안내도 2 비상구(벽) 3 미끄럼 주의 4 엘리베이터 안내 5 점검표 6 진입 금지 7 코르크 게시판 8 나무 게시판 9 재떨이) */
+function signFor(kind: string, label: string, h: number): number {
+  if (kind === 'checklist' || /점검/.test(label)) return 5;
+  if (/규칙|금지/.test(label)) return 6;
+  if (/표지|주의|미끄/.test(label)) return 3;
+  if (/순서|게시판|사진|분실/.test(label)) return 7;
+  if (kind === 'goalwall' || /목표|시험|점수|긁힌|액자|시계/.test(label)) return 8;
+  if (kind === 'map' || /지도|안내도/.test(label)) return 1;
+  return [1, 4, 7][h % 3];
+}
+
+/** 벽 높이(문 위)에 다는 표지: 바닥 발 y와 상관없이 화면 y = WALL_HIGH 에 아래 끝을 둔다 */
+export const WALL_HIGH = 104;
+export function isHighSign(kind: string, label: string | undefined): boolean {
+  return kind === 'sign' && !!label?.includes('읽어야');
+}
+
+/** 물건 그림이 묶음에 있는가 (그림이 아직 안 읽혔어도: 층 배치 때와 그릴 때 같은 그림을 고르게) */
+function hasObj(place: string, n: number): boolean {
+  return !!pack()[place]?.[`objects/${place}_objects_${n}`];
+}
+
 function objImage(place: string, n: number): HTMLImageElement | null {
   return image(place, `objects/${place}_objects_${n}`);
 }
@@ -536,10 +652,18 @@ export function propArtRef(kind: string, label: string | undefined, sx: number, 
   else if (label) {
     // 층마다 자기 물건 그림이 있으면 먼저 (침묵·어둠·퍼즐·심층)
     const own = FLOOR_LABEL[floorType ?? '']?.find(([re]) => re.test(label))?.[1];
-    if (own && objImage(own[0], own[1])) ref = own;
+    if (own && hasObj(own[0], own[1])) ref = own;
     else ref = BY_LABEL.find(([re]) => re.test(label))?.[1];
   }
-  if (ref === undefined && kind === 'prop') ref = floorType === 'deep' && objImage('deep', 1) ? ['deep', 1 + (Math.abs(Math.round(sx / 97)) % 9)] : ['chase', 5];
+  // 이름으로 못 고른 꾸밈 소품: 이름마다 정해진 그림 하나 (화면 x로 고르면 걸을 때 그림이 바뀌고 막는 폭도 틀어진다)
+  const h = hash(`${kind}:${label ?? ''}`);
+  if (ref === undefined && kind === 'prop')
+    ref = floorType === 'deep' && hasObj('deep', 1) ? ['deep', 1 + (h % 9)] : pack().props ? ['props', PROPS_2[h % PROPS_2.length]] : ['chase', 5];
+  // 갈림길 표지: 문이 줄지은 벽 앞에 세울 자리가 없다 → 문 위 벽에 다는 비상구형 표지 (WALL_HIGH, 바닥을 차지하지 않음)
+  if (isHighSign(kind, label)) ref = pack().signs ? ['signs', 2] : ref;
+  // 서 있는 판(옛 로비 6번 흰 판 + 코드 포스터) → GPT 표지판 그림 (보강 1번)
+  if (ref && ref.length === 2 && ref[0] === 'lobby' && ref[1] === 6 && pack().signs) ref = ['signs', signFor(kind, label ?? '', h)];
+  void sx;
   return ref;
 }
 
@@ -573,10 +697,10 @@ function objSize(place: string, n: number): { w: number; h: number } | null {
   return out;
 }
 
-/** 이 소품이 서 있는 판(로비 6번 입간판 그림)으로 그려지는가 */
+/** 이 소품이 서 있는 판(표지판 그림)으로 그려지는가 */
 export function isStandBoard(kind: string, label: string | undefined, floorType?: string): boolean {
   const r = propArtRef(kind, label, 0, floorType);
-  return !!r && r.length === 2 && r[0] === 'lobby' && r[1] === 6;
+  return !!r && r.length === 2 && ((r[0] === 'lobby' && r[1] === 6) || (r[0] === 'signs' && r[1] !== 9));
 }
 
 function drawCeilingHatch(ctx: CanvasRenderingContext2D, sx: number) {
@@ -607,6 +731,31 @@ function drawCeilingHatch(ctx: CanvasRenderingContext2D, sx: number) {
   ctx.restore();
 }
 
+/** 낮은 천장: 배관 그림을 가로로 이어 붙여 천장(0)부터 bottom까지 다발로. 줄마다 반 칸 어긋나고 번갈아 뒤집는다 */
+export function drawPipeBundle(ctx: CanvasRenderingContext2D, x0: number, x1: number, bottom: number): boolean {
+  const im = objImage('dark', 3);
+  if (!im) return false;
+  const w = im.width * 2,
+    h = im.height * 2 - 12; // 줄끼리 조금 겹쳐 틈 없이
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.beginPath();
+  ctx.rect(x0, 0, x1 - x0, bottom);
+  ctx.clip();
+  for (let row = 0, y = bottom - im.height * 2; y > -h; row++, y -= h)
+    for (let x = x0 - (row % 2 ? w / 2 : 0); x < x1; x += w) {
+      if (row % 2) {
+        ctx.save();
+        ctx.translate(x + w, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(im, 0, y, w, im.height * 2);
+        ctx.restore();
+      } else ctx.drawImage(im, x, y, w, im.height * 2);
+    }
+  ctx.restore();
+  return true;
+}
+
 /** 소품 하나를 그림으로. true면 처리됨(그렸거나, 그리지 않는 게 맞는 자리). false면 그림이 아직 없어 부른 쪽 대역. */
 export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: string | undefined, sx: number, y: number, floorType?: string): boolean {
   if (kind === 'hatch') {
@@ -630,113 +779,9 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
       ctx.drawImage(a, Math.round(sx - a.width * 2), Math.round(y - a.height * 2), a.width * 2, a.height * 2);
       ctx.drawImage(b, Math.round(sx), Math.round(y - b.height * 2), b.width * 2, b.height * 2);
     } else ok = false;
-  } else ok = drawObj(ctx, ref[0], ref[1], sx, y) > 0;
-  // 빈 흰 판(로비 6번)에 포스터 그림 (통합 검수 2-4, 12-3). 판 면 = 도트 (16,5)~(64,61)
-  if (ok && ref.length === 2 && ref[0] === 'lobby' && ref[1] === 6) {
-    const im = objImage('lobby', 6)!;
-    boardFace(ctx, sx - im.width + 32, y - im.height * 2 + 10, 96, 112, kind, label ?? '');
-  }
+  } else ok = drawObj(ctx, ref[0], ref[1], sx, isHighSign(kind, label) ? WALL_HIGH : y) > 0;
   ctx.restore();
   return ok;
-}
-
-/** 표지판 면: 머리 글씨 두 자 + 글줄 무늬. 종류마다 머리 글씨·무늬가 다르다. */
-function boardFace(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, kind: string, label: string) {
-  // 글씨 머리띠(「안내」「점검」)와 점선 글줄은 층마다 반복되는 이름표처럼 보였다(검수 12-3): 내용을 도트 포스터 그림으로.
-  // 2px 한 칸. 같은 종류라도 자리(x)에 따라 그림을 바꿔 줄지어 같은 판이 서지 않게.
-  const head =
-    /시험|점수/.test(label) ? '시험' : /순서/.test(label) ? '순서' : /규칙/.test(label) ? '규칙' : /표지/.test(label) ? '표지' : kind === 'checklist' || /점검/.test(label) ? '점검' : kind === 'goalwall' || /목표/.test(label) ? '목표' : /긁힌/.test(label) ? '' : '안내';
-  x = Math.round(x);
-  y = Math.round(y);
-  const v = hash(`${kind}:${label}:${x}`) % 3;
-  const P = (cx: number, cy: number, cw: number, ch: number, c: string) => {
-    ctx.fillStyle = c;
-    ctx.fillRect(x + cx * 2, y + cy * 2, cw * 2, ch * 2);
-  };
-  // 그림은 가로 40칸 기준: 판 가운데로
-  const W = 40,
-    H = Math.floor(h / 2) - 4;
-  x += (Math.floor(w / 2) - W) & ~1;
-  y += 4;
-  const K = '#2e3036',
-    R = '#b0342c',
-    G = '#2f8a52',
-    B = '#2f5c96',
-    Y = '#e0b52c';
-  ctx.save();
-  const lines = (cy: number, n: number, c = '#8a8c92') => {
-    for (let i = 0; i < n; i++) {
-      const lw = W - 8 - ((i * 7 + v * 3) % 9);
-      for (let gx = 0; gx < lw; gx += 4) P(4 + gx, cy + i * 3, Math.min(3, lw - gx), 1, c);
-    }
-  };
-  if (head === '안내') {
-    if (v === 0) {
-      // 층 안내도: 방 칸 + 현재 위치 빨간 점 + 화살표
-      P(3, 3, W - 6, 1, B);
-      for (const [rx, ry, rw, rh] of [[4, 7, 12, 9], [18, 7, 15, 9], [4, 18, 29, 8]] as const) {
-        P(rx, ry, rw, 1, K); P(rx, ry + rh, rw, 1, K); P(rx, ry, 1, rh, K); P(rx + rw - 1, ry, 1, rh + 1, K);
-      }
-      P(24, 21, 3, 3, R);
-      P(8, 30, 14, 1, K); P(20, 29, 1, 3, K); P(19, 28, 1, 5, K);
-      lines(35, 3);
-    } else if (v === 1) {
-      // 비상구 그림: 초록 판에 달리는 사람
-      P(4, 4, W - 8, 18, G);
-      P(10, 7, 3, 3, '#e8f0e6'); P(10, 10, 3, 6, '#e8f0e6'); P(8, 12, 7, 2, '#e8f0e6'); P(7, 16, 3, 3, '#e8f0e6'); P(13, 16, 3, 3, '#e8f0e6');
-      P(20, 9, 10, 8, '#e8f0e6'); P(22, 11, 6, 6, G);
-      lines(26, 5);
-    } else {
-      // 엘리베이터 이용 안내: 문 두 짝 그림 + 위아래 세모
-      P(8, 5, 22, 18, '#9aa0a6'); P(18, 5, 1, 18, K); P(8, 5, 22, 1, K);
-      P(13, 25, 3, 1, K); P(12, 26, 5, 1, K); P(22, 26, 5, 1, K); P(23, 27, 3, 1, K);
-      lines(31, 4);
-    }
-  } else if (head === '점검') {
-    // 점검표: 칸 표 + 체크 표시 + 빨간 도장
-    P(3, 3, W - 6, 2, K);
-    for (let r = 0; r < 6; r++) {
-      P(4, 8 + r * 5, W - 8, 1, '#9a9ca2');
-      lines(6 + r * 5, 1);
-      if ((r + v) % 3 !== 2) { P(W - 9, 9 + r * 5 - 2, 1, 1, G); P(W - 8, 9 + r * 5 - 1, 1, 1, G); P(W - 7, 9 + r * 5 - 3, 1, 2, G); }
-    }
-    P(W - 14, H - 10, 8, 1, R); P(W - 14, H - 4, 8, 1, R); P(W - 15, H - 9, 1, 5, R); P(W - 6, H - 9, 1, 5, R); P(W - 12, H - 7, 4, 1, R);
-  } else if (head === '표지') {
-    // 경고 표지: 노랑·검정 테두리, 양쪽 화살표 (어느 쪽인지는 읽어야 안다)
-    for (let i = 0; i < W; i += 4) { P(i, 0, 2, 2, Y); P(i + 2, 0, 2, 2, K); P(i, H - 2, 2, 2, K); P(i + 2, H - 2, 2, 2, Y); }
-    P(6, 20, W - 12, 3, K);
-    for (let k = 0; k < 6; k++) { P(6 + k, 21 - k, 1, 1 + k * 2, K); P(W - 7 - k, 21 - k, 1, 1 + k * 2, K); }
-    lines(30, 3);
-  } else if (head === '규칙') {
-    // 규칙 표지: 빨간 금지 동그라미 + 글줄 (「표지」의 양쪽 화살표와 다른 그림, 검수 14-1)
-    const cx = Math.floor(W / 2), cy = 13;
-    for (let yy = -9; yy <= 9; yy++)
-      for (let xx = -9; xx <= 9; xx++) {
-        const r = xx * xx + yy * yy;
-        if (r <= 81 && r >= 46) P(cx + xx, cy + yy, 1, 1, R);
-        else if (r < 46 && Math.abs(xx - yy) <= 1) P(cx + xx, cy + yy, 1, 1, R);
-      }
-    P(cx - 2, cy - 4, 4, 8, K);
-    lines(27, 4);
-  } else if (head === '순서') {
-    for (let i = 0; i < 3; i++) {
-      P(5 + i * 11, 8, 8, 8, K); P(6 + i * 11, 9, 6, 6, '#e8e4d8');
-      for (let d = 0; d <= i; d++) P(7 + i * 11 + d * 2, 11, 1, 2, R);
-    }
-    P(5, 20, W - 10, 1, K);
-    lines(24, 5);
-  } else if (head === '목표' || head === '시험') {
-    // 붉은 테두리 + 과녁 (목표·시험 판은 다르게 보이게)
-    P(0, 0, W, 2, R); P(0, H - 2, W, 2, R); P(0, 0, 2, H, R); P(W - 2, 0, 2, H, R);
-    const cx = Math.floor(W / 2), cy = 14;
-    for (const [r, c] of [[9, R], [7, '#e8e4d8'], [5, R], [3, '#e8e4d8'], [1, R]] as const) P(cx - r, cy - r, r * 2 + 1, r * 2 + 1, c);
-    lines(28, 4);
-  } else {
-    // 긁힌 글씨: 비뚤어진 긁힘
-    ctx.fillStyle = '#5a2a2a';
-    for (let i = 0; i < 6; i++) ctx.fillRect(x + 6 + ((i * 13) % (W * 2 - 40)), y + 8 + i * 12, 14 + ((i * 7) % 20), 3);
-  }
-  ctx.restore();
 }
 
 /**

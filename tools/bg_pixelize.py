@@ -39,6 +39,11 @@ HEIGHTS = json.loads((ROOT / 'game-src/art/bg/heights.json').read_text()) if (RO
 KEY = (255, 0, 255)
 
 
+# 바닥 원본에서 쓸 부분: 탕비실은 바둑판 4×4칸(칸 = 무늬 1/4), 거리는 아래 연석·하수구 띠를 뺀 보도 (GPT요청_배경보강 5·6)
+FLOOR_CONTRAST = {'hq_pantry_floor': 0.4}
+FLOOR_CROP = {'hq_pantry_floor': (0, 0, 512, 512), 'hq_street_floor': (0, 0, 864, 864)}
+
+
 def kind_of(stem: str) -> str:
     if re.search(r'_objects(_\d+)?$', stem):
         return 'objects'
@@ -211,8 +216,10 @@ def run_place(place: Path) -> dict:
         if size:
             if k == 'wall':
                 src = trim_bottom(src)
-            # 바닥은 잔무늬가 지글거리지 않게 명암을 덜 올린다(줄은 코드가 긋는다)
-            jobs.append((f.stem, aspect_crop(tone(src, 1.05 if k == 'floor' else CONTRAST), size), size, k))
+            if f.stem in FLOOR_CROP:  # 원본 바닥 일부만 (칸을 크게, 연석 띠 빼기)
+                src = src.crop(FLOOR_CROP[f.stem])
+            # 바닥은 잔무늬가 지글거리지 않게 명암을 덜 올린다. 바둑판 바닥은 칸끼리 밝기 차를 더 줄인다
+            jobs.append((f.stem, aspect_crop(tone(src, FLOOR_CONTRAST.get(f.stem, 1.05) if k == 'floor' else CONTRAST), size), size, k))
         elif k == 'objects':
             hs = HEIGHTS.get(f.stem, [])
             # 두 번째 시트(<장소>_objects_2)는 번호를 이어 붙인다: 10~18
@@ -220,19 +227,21 @@ def run_place(place: Path) -> dict:
             base, off = m.group(1), (int(m.group(2) or 1) - 1) * 9
             for i, o in enumerate(cut_objects(src), 1):
                 nh = max(1, round((hs[i - 1] if i <= len(hs) else 1.0) * DPM))
-                jobs.append((f'objects/{base}_{i + off}', tone(o), (max(1, round(o.width * nh / o.height)), nh), k))
+                jobs.append((f'objects/{base}_{i + off}', tone(o), (max(1, round(o.width * nh / o.height)), nh), f'objects:{f.stem}'))
     if not jobs:
         return {}
     # 벽·바닥과 물건은 팔레트를 따로: 큰 벽이 색을 다 차지하면 작은 물건 색(파란 모니터, 빨간 의자)이 사라진다
-    scene = [j[1] for j in jobs if j[3] != 'objects']
-    objs = [j[1].convert('RGB') for j in jobs if j[3] == 'objects']
-    pals = {'scene': place_palette(scene) if scene else None, 'objects': place_palette(objs) if objs else None}
+    # 물건 모음은 시트마다 팔레트를 따로 (엘리베이터 시트의 회색 철판이 다른 시트의 금색에 끌려 노란 띠가 됐다)
+    scene = [j[1] for j in jobs if not j[3].startswith('objects')]
+    pals = {'scene': place_palette(scene) if scene else None}
+    for sk in {j[3] for j in jobs if j[3].startswith('objects')}:
+        pals[sk] = place_palette([j[1].convert('RGB') for j in jobs if j[3] == sk])
     out_dir = OUT / place.name
     (out_dir / 'objects').mkdir(parents=True, exist_ok=True)
     meta: dict = {}
     for name, im, size, k in jobs:
-        q = mode_down(im, size, pals['objects' if k == 'objects' else 'scene'])
-        if k == 'objects':
+        q = mode_down(im, size, pals[k if k.startswith('objects') else 'scene'])
+        if k.startswith('objects'):
             # 바깥 테두리 1도트가 들어가도록 한 칸씩 여유
             pad = Image.new('RGBA', (q.width + 2, q.height + 1))
             pad.paste(q, (1, 0))
@@ -280,7 +289,7 @@ DOOR_FILL: dict[str, list[tuple[tuple[int, ...], str]]] = {
     'chase_wall_4': [((44, 119), 'chase/objects/chase_objects_1')],
     'dark_wall_3': [((27, 88), 'hq_workshop/objects/hq_workshop_objects_9')],
     'deep_wall_1': [((122, 201), 'lobby/objects/lobby_objects_9')],
-    'el_hall_wall_1': [((116, 204), 'el_hall/objects/el_hall_objects_1+el_hall/objects/el_hall_objects_2')],
+    'el_hall_wall_1': [((116, 204), 'el_hall/objects/el_hall_objects_10+el_hall/objects/el_hall_objects_11')],
     'el_hall_wall_3': [((116, 204), 'lobby/objects/lobby_objects_9')],
     'el_hall_wall_4': [((119, 204), 'lobby/objects/lobby_objects_9')],
     'guardian_405_wall': [((54, 140), 'chase/objects/chase_objects_1')],
@@ -315,68 +324,6 @@ def door_hole(dark: np.ndarray, x0: int, x1: int) -> np.ndarray:
     return best
 
 
-def fix_streaks() -> None:
-    """엘리베이터 문짝(el_hall 물건 1·2): GPT 그림의 번진 세로 그라데이션·노란 띠 대신 도트 금속 문짝을 다시 그린다
-    (불합격 7, 검수 12-5). 문틀(1은 왼쪽, 2는 오른쪽)은 그대로 두고 문판만: 계단식 3단 음영, 짧은 결 줄, 반사 띠, 가운데 이음 모서리."""
-    for n in (1, 2):
-        f = OUT / f'el_hall/objects/el_hall_objects_{n}.png'
-        if not f.exists():
-            continue
-        px = np.asarray(Image.open(f).convert('RGBA')).copy()
-        h, w = px.shape[:2]
-        lum = px[:, :, :3].astype(int) @ np.array([299, 587, 114]) // 1000
-        x0, x1 = (18, w - 1) if n == 1 else (1, w - 18)
-        mid = (x0 + x1) // 2
-        rows = np.nonzero(lum[:, mid] > 45)[0]
-        if not len(rows):
-            continue
-        y0, y1 = int(rows.min()), int(rows.max()) + 1
-        rng = np.random.default_rng(11 + n)
-        base = np.array([132, 128, 120])
-        panel = np.zeros((y1 - y0, x1 - x0, 3))
-        # 세로 결: 3~6칸 묶음마다 밝기 조금씩
-        x = 0
-        while x < x1 - x0:
-            k = int(rng.integers(3, 7))
-            panel[:, x:x + k] = base + int(rng.integers(-6, 7))
-            x += k
-        ph = y1 - y0
-        panel[: ph * 12 // 100] -= 22          # 위쪽 그늘 (계단식)
-        panel[ph * 12 // 100: ph * 22 // 100] -= 10
-        panel[ph * 86 // 100:] -= 18           # 발판
-        panel[ph * 86 // 100] = base - 50
-        # 반사 띠: 이음 쪽에서 1/3 지점, 폭 5칸 (그 안에서 한 칸 더 밝게)
-        seam_right = n == 1
-        rx = (x1 - x0) * 2 // 3 if seam_right else (x1 - x0) // 3 - 5
-        panel[ph * 22 // 100: ph * 86 // 100, rx:rx + 5] += 16
-        panel[ph * 22 // 100: ph * 86 // 100, rx + 2] += 10
-        # 짧은 긁힘 몇 개
-        for _ in range(6):
-            yy, xx = int(rng.integers(ph // 4, ph * 4 // 5)), int(rng.integers(2, x1 - x0 - 8))
-            panel[yy, xx:xx + int(rng.integers(3, 7))] -= 18
-        # 가운데 이음 모서리: 밝은 1칸 + 어두운 1칸
-        if seam_right:
-            panel[:, -2] = base + 30
-            panel[:, -1] = (40, 40, 44)
-        else:
-            panel[:, 0] = (40, 40, 44)
-            panel[:, 1] = base + 30
-        px[y0:y1, x0:x1, :3] = np.clip(panel, 0, 255).astype(np.uint8)
-        px[y0:y1, x0:x1, 3] = 255
-        # 문틀 기둥도 번진 초록 그라데이션 대신 청동색 3단 (밝은 모서리, 몸통, 안쪽 그늘)
-        fx0, fx1 = (1, 16) if n == 1 else (w - 16, w - 1)
-        fr = np.zeros((h - 2, fx1 - fx0, 3)) + (74, 64, 50)
-        hi, sh = (1, 2), (-3, -2)
-        for c in hi:
-            fr[:, c if n == 1 else -1 - c] = (112, 98, 74)
-        for c in sh:
-            fr[:, c if n == 1 else -1 - c] = (44, 38, 30)
-        fr[: (h - 2) // 8] -= 14
-        px[1:h - 1, fx0:fx1, :3] = np.clip(fr, 0, 255).astype(np.uint8)
-        px[1:h - 1, fx0:fx1, 3] = 255
-        Image.fromarray(px, 'RGBA').save(f, optimize=True)
-
-
 # 밝기 경계가 문턱값 근처라 외곽선이 점선처럼 끊긴 벽 (본부 로비 허리선, 불합격 4)
 UNDASH = ('hq_lobby',)
 
@@ -404,168 +351,32 @@ def undash(places: set[str]) -> None:
             Image.fromarray(px, 'RGBA').save(f, optimize=True)
 
 
-def scribble(px: np.ndarray, x0: int, y0: int, x1: int, rng: np.random.Generator, col: tuple[int, int, int]) -> None:
-    """손글씨 한 줄: 1도트 굵기, 2~6칸 조각과 1칸 틈 (글자가 아니라 글씨 느낌만)."""
-    x = x0
-    while x < x1:
-        n = int(rng.integers(2, 7))
-        e = min(x1, x + n)
-        px[y0, x:e, :3] = col
-        if rng.random() < 0.35 and e - x > 2:  # 글자 획이 위로 솟은 곳
-            px[y0 - 1, x + 1, :3] = col
-        x = e + int(rng.integers(1, 3))
+# 벽 그림 속 빈 게시판·액자·화이트보드 자리에 GPT 게시판 그림(boards_objects, 보강 3번)을 붙인다 (검수 8·12-2: 빈 회색 판).
+# 그림 이름 → [(도트 x0, y0, x1, y1, 게시판 번호)]. 번호: 1 코르크 게시판, 3 풍경화, 6 화이트보드
+BOARD_PASTE = {
+    'hq_office/hq_office_wall_2': [(48, 66, 168, 128, 6), (184, 63, 278, 131, 1)],
+    'lobby/lobby_wall_4': [(128, 69, 208, 134, 1), (235, 65, 279, 128, 3)],
+    'hq_office/objects/hq_office_objects_13': [(22, 6, 186, 90, 6)],
+}
 
 
-def decorate_boards(places: set[str]) -> None:
-    """본부 사무실 화이트보드·게시판이 빈 판으로 보인다(불합격 8): 메모·사진·핀·낙서를 도트로 그려 넣는다."""
-    rng = np.random.default_rng(7)
-    ink_b, ink_r, ink_k = (52, 74, 140), (168, 52, 46), (40, 42, 46)
-    yellow, pink, mint = (226, 204, 96), (222, 150, 160), (150, 204, 170)
-
-    def note(px, x, y, c, w=8, h=8):
-        px[y:y + h, x:x + w, :3] = c
-        px[y + h, x + 1:x + w + 1, :3] = (60, 60, 56)  # 그늘
-        for k in range(2, h - 1, 2):
-            px[y + k, x + 1:x + w - 1 - (k % 3), :3] = tuple(int(v * 0.55) for v in c)
-
-    def photo(px, x, y, w=9, h=11):
-        px[y:y + h, x:x + w, :3] = (232, 230, 220)
-        px[y + 1:y + h - 3, x + 1:x + w - 1, :3] = (70, 78, 84)
-        px[y + 3:y + h - 3, x + 3:x + w - 3, :3] = (110, 96, 84)  # 사람 실루엣처럼 보이는 덩어리
-        px[y + 2:y + 4, x + w // 2 - 1:x + w // 2 + 1, :3] = (110, 96, 84)
-
-    def pin(px, x, y, c):
-        px[y:y + 2, x:x + 2, :3] = c
-        px[y, x, :3] = tuple(min(255, v + 70) for v in c)
-
-    # 1) 벽 칸 2의 화이트보드 (도트 48~168, 66~128) + 게시판 (184~278, 63~131)
-    f = OUT / 'hq_office/hq_office_wall_2.png'
-    if f.exists() and 'hq_office' in places:
-        px = np.asarray(Image.open(f).convert('RGBA')).copy()
-        for i, y in enumerate(range(72, 96, 4)):
-            scribble(px, 54, y, 54 + int(rng.integers(30, 52)), rng, ink_b if i % 3 else ink_k)
-        # 상자 두 개와 화살표 (사건 정리)
-        for bx, by in ((112, 72), (140, 90)):
-            px[by, bx:bx + 18, :3] = ink_r; px[by + 10, bx:bx + 18, :3] = ink_r
-            px[by:by + 11, bx, :3] = ink_r; px[by:by + 11, bx + 17, :3] = ink_r
-            scribble(px, bx + 3, by + 5, bx + 15, rng, ink_k)
-        for k in range(14):
-            px[82 + k * 8 // 14, 129 + k, :3] = ink_r
-        px[89:91, 141:143, :3] = ink_r
-        scribble(px, 54, 104, 100, rng, ink_k); scribble(px, 54, 109, 88, rng, ink_b)
-        note(px, 104, 104, yellow); note(px, 116, 108, pink); note(px, 150, 108, mint)
-        photo(px, 88, 112)
-        for x, y, c in ((92, 111, ink_r), (107, 103, (60, 120, 200)), (153, 107, ink_k)):
-            pin(px, x, y, c)
-        # 게시판: 종이마다 글씨 줄 + 핀, 사진 두 장, 빨간 실
-        papers = ((192, 71, 212, 101), (221, 75, 239, 96), (248, 73, 262, 89), (267, 86, 274, 97),
-                  (192, 109, 206, 124), (215, 103, 233, 124), (245, 99, 266, 126))
-        for i, (x0, y0, x1, y1) in enumerate(papers):
-            for ly in range(y0 + 4, y1 - 1, 3):
-                scribble(px, x0 + 2, ly, x1 - 1 - int(rng.integers(0, 5)), rng, (84, 86, 92))
-            pin(px, (x0 + x1) // 2, y0, (ink_r, (60, 120, 200), (230, 190, 60))[i % 3])
-        photo(px, 226, 112); photo(px, 252, 76, 8, 10)
-        pin(px, 230, 111, ink_r); pin(px, 256, 75, ink_r)
-        # 빨간 실: 사진 둘과 첫 종이를 잇는다
-        for (ax, ay), (bx, by) in (((202, 72), (256, 76)), ((256, 76), (230, 112))):
-            n = max(abs(bx - ax), abs(by - ay))
-            for k in range(1, n):
-                px[ay + (by - ay) * k // n + 1, ax + (bx - ax) * k // n, :3] = (190, 40, 40)
-        Image.fromarray(px, 'RGBA').save(f, optimize=True)
-    # 1-2) 층 로비 벽 칸 4의 게시판·액자 (검수 12-2: 안이 무늬 없는 회색 블록) → 코르크 위 공고문·사진·핀, 액자는 풍경화
-    f = OUT / 'lobby/lobby_wall_4.png'
-    if f.exists() and 'lobby' in places:
-        rng_office, rng = rng, np.random.default_rng(9)  # 장소마다 따로 (다시 뽑을 때 결과가 같게)
-        px = np.asarray(Image.open(f).convert('RGBA')).copy()
-        bx0, by0, bx1, by1 = 128, 69, 208, 134
-        cork = np.zeros((by1 - by0, bx1 - bx0, 3)) + (112, 86, 60)
-        cork += rng.integers(-10, 11, cork.shape[:2])[:, :, None]
-        px[by0:by1, bx0:bx1, :3] = np.clip(cork, 0, 255).astype(np.uint8)
-        sheets = ((132, 73, 152, 99, (226, 222, 208)), (156, 72, 174, 92, (232, 226, 190)), (178, 74, 204, 96, (214, 220, 226)),
-                  (133, 104, 151, 130, (230, 226, 214)), (156, 98, 176, 124, (226, 222, 208)), (181, 102, 203, 129, (236, 232, 220)))
-        for i, (x0, y0, x1, y1, c) in enumerate(sheets):
-            px[y0 + 1:y1 + 1, x0 + 1:x1 + 1, :3] = (70, 52, 36)  # 그늘
-            px[y0:y1, x0:x1, :3] = c
-            if i == 2:  # 층 안내도: 방 칸들
-                for (rx, ry, rw, rh) in ((2, 4, 9, 6), (12, 4, 11, 6), (2, 12, 21, 7)):
-                    px[y0 + ry, x0 + rx:x0 + rx + rw, :3] = ink_k; px[y0 + ry + rh, x0 + rx:x0 + rx + rw, :3] = ink_k
-                    px[y0 + ry:y0 + ry + rh + 1, x0 + rx, :3] = ink_k; px[y0 + ry:y0 + ry + rh + 1, x0 + rx + rw - 1, :3] = ink_k
-                px[y0 + 7:y0 + 9, x0 + 16:x0 + 18, :3] = ink_r
-            elif i == 4:  # 사람 찾기 공고: 사진 + 글줄
-                photo(px, x0 + 6, y0 + 3, 8, 10)
-                for ly in range(y0 + 16, y1 - 2, 3):
-                    scribble(px, x0 + 2, ly, x1 - 3, rng, (84, 86, 92))
-            else:
-                px[y0 + 2:y0 + 4, x0 + 2:x1 - 2, :3] = (ink_r if i % 2 else ink_b)  # 제목 띠
-                for ly in range(y0 + 7, y1 - 2, 3):
-                    scribble(px, x0 + 2, ly, x1 - 2 - int(rng.integers(0, 5)), rng, (84, 86, 92))
-            pin(px, (x0 + x1) // 2, y0, (ink_r, (60, 120, 200), (230, 190, 60))[i % 3])
-        # 액자: 저녁 산과 호수 풍경 (도트)
-        ax0, ay0, ax1, ay1 = 235, 65, 279, 128
-        hgt = ay1 - ay0
-        for yy in range(hgt):
-            t = yy / hgt
-            px[ay0 + yy, ax0:ax1, :3] = np.array((70 + 60 * t, 82 + 40 * t, 120 - 10 * t)).astype(np.uint8) if t < 0.55 else (52, 70, 84)
-        for xx in range(ax1 - ax0):  # 산 능선
-            top = int(hgt * (0.32 + 0.12 * abs(np.sin(xx / 7.0)) + 0.06 * np.sin(xx / 3.1)))
-            px[ay0 + top:ay0 + int(hgt * 0.56), ax0 + xx, :3] = (46, 58, 62)
-        px[ay0 + int(hgt * 0.56), ax0:ax1, :3] = (150, 150, 140)   # 물가 빛
-        px[ay0 + 8:ay0 + 12, ax1 - 14:ax1 - 10, :3] = (236, 214, 150)  # 해
-        for k in range(3):
-            px[ay0 + int(hgt * 0.62) + k * 6, ax1 - 18 + k:ax1 - 8 - k, :3] = (180, 168, 130)  # 물에 비친 해
-        Image.fromarray(px, 'RGBA').save(f, optimize=True)
-        rng = rng_office
-    # 2) 바퀴 달린 화이트보드 물건 (판 면 도트 22~186, 6~90)
-    f = OUT / 'hq_office/objects/hq_office_objects_13.png'
-    if f.exists() and 'hq_office' in places:
-        px = np.asarray(Image.open(f).convert('RGBA')).copy()
-        for i, y in enumerate(range(14, 46, 5)):
-            scribble(px, 60, y, 60 + int(rng.integers(40, 80)), rng, ink_b if i % 2 else ink_k)
-        # 간단한 층 지도: 칸 세 개를 잇는 선
-        for k, (bx, by) in enumerate(((62, 54), (92, 54), (122, 64))):
-            px[by, bx:bx + 20, :3] = ink_k; px[by + 12, bx:bx + 20, :3] = ink_k
-            px[by:by + 13, bx, :3] = ink_k; px[by:by + 13, bx + 19, :3] = ink_k
-            if k == 2:
-                px[by + 4:by + 9, bx + 8:bx + 12, :3] = ink_r  # 표시한 방
-        px[60, 82:92, :3] = ink_k; px[60:70, 112, :3] = ink_k
-        note(px, 22 + 30, 70, yellow, 9, 9); note(px, 150, 18, pink)
-        scribble(px, 30, 84, 120, rng, ink_r)
-        Image.fromarray(px, 'RGBA').save(f, optimize=True)
-
-
-# 원본 바닥이 잘게 반복되는 바둑판이라 투명 격자처럼 보이는 곳 (검수 5·12): 원본 평균색으로 도트 타일을 새로 깐다.
-# 장소 → (칸 가로, 칸 세로, 줄마다 반 칸 어긋남, 칸끼리 밝기 차)
-PROC_FLOOR = {'hq_pantry': (32, 32, False, 6), 'hq_street': (32, 16, True, 12)}
-
-
-def soften_floors(places: set[str]) -> None:
-    for pl, (tw, th, bond, var) in PROC_FLOOR.items():
-        f = OUT / pl / f'{pl}_floor.png'
-        if pl not in places or not f.exists():
+def paste_boards(places: set[str]) -> None:
+    sheet = RAW / 'boards/boards_objects.png'
+    if not sheet.exists():
+        return
+    boards = cut_objects(Image.open(sheet))
+    for name, spots in BOARD_PASTE.items():
+        place = name.split('/')[0]
+        f = OUT / f'{name}.png'
+        if place not in places or not f.exists():
             continue
-        src = np.asarray(Image.open(f).convert('RGB')).astype(float)
-        base = src.reshape(-1, 3).mean(0)
-        size = src.shape[0]
-        rng = np.random.default_rng(5)
-        out = np.zeros((size, size, 3))
-        for row in range(size // th):
-            off = tw // 2 if bond and row % 2 else 0
-            for col in range(-1, size // tw + 1):
-                x0 = col * tw + off
-                tone = base + float(rng.integers(-var, var + 1)) + (0 if bond else (var if (row + col) % 2 else -var) * 0.6)
-                xs = np.arange(x0, x0 + tw) % size
-                out[row * th:(row + 1) * th][:, xs] = tone
-                # 칸 위 모서리 밝게, 아래·오른쪽 줄눈 어둡게
-                out[row * th, xs] = tone + 10
-                out[(row + 1) * th - 1, xs] = base - 34
-                out[row * th:(row + 1) * th, (x0 + tw - 1) % size] = base - 34
-        out += rng.normal(0, 3.0, out.shape[:2])[:, :, None]  # 잔결
-        for _ in range(5):  # 얼룩·닳은 자리
-            cy, cx, r = int(rng.integers(0, size)), int(rng.integers(0, size)), int(rng.integers(3, 7))
-            yy, xx = np.ogrid[:size, :size]
-            m = ((yy - cy) ** 2 + ((xx - cx) / 1.6) ** 2) < r * r
-            out[m] -= 9
-        Image.fromarray(np.clip(out, 0, 255).astype(np.uint8), 'RGB').convert('RGBA').save(f, optimize=True)
+        im = Image.open(f).convert('RGBA')
+        for x0, y0, x1, y1, n in spots:
+            b = tone(boards[n - 1]).resize((x1 - x0, y1 - y0), Image.Resampling.BOX)
+            q = b.convert('RGB').quantize(24, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).convert('RGBA')
+            q.putalpha(b.getchannel('A').point(lambda v: 255 if v > 127 else 0))
+            im.alpha_composite(q, (x0, y0))
+        im.save(f, optimize=True)
 
 
 def fill_doors(places: set[str]) -> None:
@@ -660,10 +471,8 @@ def main(argv: list[str]) -> None:
         meta = run_place(p)
         print(f'{p.name}: {len(meta)}개')
     if not __import__("os").environ.get("NOFILL"):
-        fix_streaks()
         undash({p.name for p in places})
-        soften_floors({p.name for p in places})
-        decorate_boards({p.name for p in places})
+        paste_boards({p.name for p in places})
         fill_doors({p.name for p in places})
 
 
