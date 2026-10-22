@@ -1,0 +1,28 @@
+before generations_remaining: 15652.30
+done support
+sub gearup
+done tired
+sub turn
+done turn
+sub fall
+done gearup
+sub land
+done fall
+sub ladder
+done land
+sub mantle
+done ladder
+done mantle
+sub vault
+sub crawl
+done vault
+sub sneak
+done sneak
+sub lookback
+done crawl
+sub hide
+done lookback
+done hide
+sub readwall
+done readwall
+after generations_remaining: 15261.30

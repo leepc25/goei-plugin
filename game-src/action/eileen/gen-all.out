@@ -1,1 +1,8 @@
-before generations_remaining: 16341.40
+before generations_remaining: 15734.70
+done idle_pipe
+done walk_pipe
+done shotgun
+done idle_shotgun
+done walk_shotgun
+done run_shotgun
+sub support

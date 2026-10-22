@@ -56,7 +56,7 @@ if __name__=='__main__':
         if resume and n in last and not os.path.isdir(f'{OUT}/{n}'): pend[n]=last[n]
         elif resume and os.path.isdir(f'{OUT}/{n}'): continue
         else: queue.append(n)
-    MAXP=10   # 작업 칸을 다른 요원 스레드와 같이 씀
+    MAXP=int(os.environ.get('MAXP','2'))   # 요원 스레드당 동시 2개(사용자 2026-10-22)
     while queue or pend:
         while queue and len(pend)<MAXP:
             n=queue.pop(0); j,t=submit(n,boot)

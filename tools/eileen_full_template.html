@@ -30,6 +30,19 @@
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
+  /* 휴대폰 가로: 게임 화면을 화면 높이에 맞추고 터치 버튼을 화면 위에 겹침 */
+  @media (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+    .wrap { padding: 0 0 40px; display: flex; flex-direction: column; }
+    .wrap > .screen { order: -1; }
+    h1 { font-size: 14px; padding: 0 10px; }
+    .screen { width: min(100vw, calc(100svh * 16 / 9)); max-width: none; margin: 0 auto; }
+    .pad.show { position: fixed; left: 0; right: 0; bottom: 0; top: 0; pointer-events: none; display: block; z-index: 5; }
+    .pad.show .g { position: absolute; pointer-events: auto; }
+    .pad.show .dpad { left: 8px; bottom: 8px; grid-template-columns: repeat(3, 46px); gap: 4px; }
+    .pad.show .acts { right: 8px; bottom: 8px; grid-template-columns: repeat(5, 46px); gap: 4px; }
+    .pad.show button { min-height: 34px; font-size: 10px; background: rgba(42,51,58,.55); border-color: rgba(200,210,220,.35); }
+    .pad.show button.on { background: rgba(120,150,170,.7); }
+  }
 </style>
 <div class="wrap">
   <h1>에일린 전 동작 시연판 · 쟈알디와 다른 규칙(소총 페어·페어·조준, 떼어내기, 권총 전환, 판독, 순차 저격)</h1>
@@ -167,6 +180,7 @@ function onKey(code, down) {
   if (G.lock) {
     if (code === 'KeyA' && G.air) { airShot(); return; }
     if (code === 'KeyA' && ['pair1', 'pair2', 'muzzle', 'buttstroke'].includes(G.clip)) G.queued = 'A';
+    else if (['KeyS', 'KeyR', 'KeyD', 'KeyW', 'KeyE', 'KeyF', 'KeyG', 'KeyQ'].includes(code) && !G.down) G.queued = code;   // 동작 중 누른 키는 끝나자마자 실행(선입력)
     return;
   }
   if (G.grab) { if (code === 'KeyA') play('grabshot', { lock: true }); else if (code === 'KeyE') play('shove', { lock: true }); return; }
@@ -342,6 +356,7 @@ function clipDone() {
   if (k === 'evade' || k === 'pushkick' || k === 'shove') G.queued = null;
   if (then) then();
   if (G.queued === 'A' && !G.down) { G.queued = null; attackA(); return; }
+  if (G.queued && G.queued !== 'A' && !G.down) { const q = G.queued; G.queued = null; play(idleClip()); const held = keys.has(q); keys.delete(q); onKey(q, true); if (!held) keys.delete(q); if (G.lock || G.clip !== idleClip()) return; }
   G.queued = null;
   if (G.aHeld && !G.pistol && !G.hq && !G.crouch && ['pair1', 'pair2', 'aimshot', 'guard', 'precise'].includes(k)) { G.aiming = true; G.steady = 0; play('aim'); return; }
   if (c.loop && G.loops > 1) { G.loops--; G.f = 0; G.t = 0; G.frameSeen = -1; return; }
@@ -393,7 +408,11 @@ function tick(now) {
     e.flash -= dt; e.marked = Math.max(0, e.marked - dt);
     if (e.state === 'hit') { e.x += e.vx * 60 * dt; e.vx *= 0.8; e.t -= dt; if (e.t <= 0) e.state = 'idle'; }
     else if (e.state === 'down' || e.state === 'dead') { e.x += e.vx * 60 * dt; e.vx *= 0.9; if (e.y < 0) { e.vy += 40 * dt; e.y = Math.min(0, e.y + e.vy * 60 * dt * 0.5); } e.t -= dt; if (e.t <= 0) { if (e.state === 'dead') Object.assign(e, mkE(e.x > 640 ? 1200 : 1100, Math.random(), e.big), { x: 1240 }); else e.state = 'idle'; } }
-    else if (e.state === 'idle') { const dx = G.x - e.x; e.face = Math.sign(dx) || -1; if (Math.abs(dx) > 70 && !G.hq) e.x += Math.sign(dx) * 0.6 * 60 * dt; e.z += Math.sign(G.z - e.z) * Math.min(Math.abs(G.z - e.z), 0.15 * dt); }
+    else if (e.state === 'idle') {
+      const dx = G.x - e.x; e.face = Math.sign(dx) || -1;
+      let push = 0; for (const o of ENEMIES) if (o !== e && o.state !== 'dead' && Math.abs(o.x - e.x) < 70 && Math.abs(o.z - e.z) < 0.2) push += Math.sign(e.x - o.x || 1);   // 서로 겹치지 않게
+      e.x += push * 1.2 * 60 * dt;
+      if (Math.abs(dx) > 70 && !G.hq) e.x += Math.sign(dx) * 0.6 * 60 * dt; e.z += Math.sign(G.z - e.z) * Math.min(Math.abs(G.z - e.z), 0.15 * dt); }
   }
   // 효과
   for (const k of ['sparks', 'tracers', 'flashes', 'brass', 'text']) FX[k] = FX[k].filter(p => (p.t -= dt) > 0);

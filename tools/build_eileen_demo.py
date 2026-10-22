@@ -99,7 +99,7 @@ def is_gun(src):
     return any(k in pr for k in ('in both hands', 'one-handed', 'pistol', 'shotgun', 'carbine held', 'carbine dropping')) or pr.startswith('a compact black carbine held')
 
 
-LEGS = {'pushkick', 'shove', 'slide', 'support', 'vault', 'mantle', 'down', 'getup', 'land', 'fall', 'crawl'}   # 다리·몸이 손보다 앞으로 나가는 클립
+LEGS = {'pushkick', 'shove', 'slide', 'vault', 'mantle', 'down', 'getup', 'land', 'fall', 'crawl'}   # 다리·몸이 손보다 앞으로 나가는 클립
 
 
 def drop_small(a, n=40, far=300):
@@ -128,13 +128,13 @@ def strip_fx(im, src, i):
         fx = ((r > 170) & (g > 90) & (b < 150) & (r - b > 60)) | ((r > 225) & (g > 225) & (b > 215))
         cols = np.arange(a.shape[1])[None, :]
         a[fx & (cols > wx + 3)] = 0
-        if erig.CLIPS[src][2] == 'H':   # 본부 클립: 손에 생성기가 그린 물건(공구·컵·부품)을 지움 — 머리 높이는 건드리지 않음
+        if erig.CLIPS[src][2] == 'H' or src in ('mantle', 'vault', 'support'):   # 본부 클립 + 먼지·연기가 남는 클립: 손에 생성기가 그린 물건(공구·컵·부품)을 지움 — 머리 높이는 건드리지 않음
             mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
             skin = (r > 140) & (r > g) & (g > b) & (r - b > 40)
             suit = (mx < 110) & (mx - mn < 40)
             rows = np.arange(a.shape[0])[:, None]
             a[(~skin) & (~suit) & (cols > wx + 4) & (rows > p['NECK'][1] + rig.DY + 6) & (a[..., 3] > 0)] = 0
-        if is_gun(src) and src not in LEGS:
+        if is_gun(src) and src not in LEGS and 'pipe' not in src:   # 쇠파이프는 회색이라 총 규칙에서 뺌
             mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
             gunpx = (mx < 110) & (mx - mn < 40)
             a[(~gunpx) & (cols > wx + 6) & (a[..., 3] > 0)] = 0
