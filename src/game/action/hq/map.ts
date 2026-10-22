@@ -67,7 +67,7 @@ export const HQ_SCENES: HqScene[] = [
     [],
     [{ kind: 'guard_desk', x: 400, w: 260, h: 120 }, { kind: 'mailboxes', x: 600, w: 120, h: 150, wall: true }, { kind: 'plant', x: 650, w: 60, h: 130 }]),
   S('f2', '2층', '2F', 1640, 'corridor',
-    [{ id: 'elev', x: 330, kind: 'elevator' }, { id: 'down', x: 60, kind: 'stairs_down', to: 'lobby', toDoor: 'up' }, { id: 'up', x: 1500, kind: 'stairs_up', to: 'office', toDoor: 'down' }, { id: 'clinic', x: 640, kind: 'door', to: 'clinic', toDoor: 'out' }, { id: 'interview', x: 1040, kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview' }],
+    [{ id: 'elev', x: 380, kind: 'elevator' }, { id: 'down', x: 130, kind: 'stairs_down', to: 'lobby', toDoor: 'up' }, { id: 'up', x: 1500, kind: 'stairs_up', to: 'office', toDoor: 'down' }, { id: 'clinic', x: 640, kind: 'door', to: 'clinic', toDoor: 'out' }, { id: 'interview', x: 1040, kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview' }],
     [],
     [{ kind: 'window', x: 1250, w: 140, h: 120, wall: true }, { kind: 'hydrant_box', x: 840, w: 70, h: 110, wall: true }]),
   S('clinic', '의무실', '2F', 1280, 'clinic',
@@ -80,7 +80,7 @@ export const HQ_SCENES: HqScene[] = [
     [{ kind: 'blinds', x: 560, w: 260, h: 150, wall: true }, { kind: 'table_small', x: 560, w: 200, h: 80 }, { kind: 'chair', x: 440, w: 50, h: 100 }, { kind: 'chair', x: 680, w: 50, h: 100 }, { kind: 'recorder', x: 560, w: 30, h: 16, sign: true }]),
   // 3층: 엘리베이터에서 내리면 유리문 → 큰 사무실. 잼트리 자리는 입구 바로 옆
   S('office', '종합대응팀', '3F', 3200, 'office',
-    [{ id: 'elev', x: 330, kind: 'elevator' }, { id: 'down', x: 60, kind: 'stairs_down', to: 'f2', toDoor: 'up' }, { id: 'chief', x: 2450, kind: 'door', to: 'chief', toDoor: 'out' }, { id: 'pantry', x: 2950, kind: 'door', to: 'pantry', toDoor: 'out' }],
+    [{ id: 'elev', x: 380, kind: 'elevator' }, { id: 'down', x: 130, kind: 'stairs_down', to: 'f2', toDoor: 'up' }, { id: 'chief', x: 2450, kind: 'door', to: 'chief', toDoor: 'out' }, { id: 'pantry', x: 2950, kind: 'door', to: 'pantry', toDoor: 'out' }],
     [
       { id: 'jaemtri', x: 700, place: 'jaemtri', who: '잼트리', verb: '임무' },
       { id: 'agents', x: 1400, place: 'office', who: '요원들', verb: '요원' },
@@ -111,18 +111,18 @@ export const HQ_SCENES: HqScene[] = [
   // 계단(그림 폭 최대 280)과 엘리베이터(폭 약 210 + 호출 단추) 사이는 그림 반폭 합 이상 띄운다 (통합 검수 22).
   // 지하 1층: 창고형 정비·보급실, 옆 철문으로 훈련장
   S('supply', '정비·보급실', 'B1', 2240, 'supply',
-    [{ id: 'elev', x: 390, kind: 'elevator' }, { id: 'up', x: 90, kind: 'stairs_up', to: 'lobby', toDoor: 'down' }, { id: 'down', x: 640, kind: 'stairs_down', to: 'b2', toDoor: 'up', needs: 'appraisal' }, { id: 'training', x: 2140, kind: 'steel', to: 'training', toDoor: 'out', needs: 'training' }],
+    [{ id: 'elev', x: 430, kind: 'elevator' }, { id: 'up', x: 150, kind: 'stairs_up', to: 'lobby', toDoor: 'down' }, { id: 'down', x: 700, kind: 'stairs_down', to: 'b2', toDoor: 'up', needs: 'appraisal' }, { id: 'training', x: 2140, kind: 'steel', to: 'training', toDoor: 'out', needs: 'training' }],
     [
-      { id: 'locker', x: 940, place: 'supply', who: '콘쥬스', verb: '장비' },
+      { id: 'locker', x: 1010, place: 'supply', who: '콘쥬스', verb: '장비' },
     ],
-    [{ kind: 'locker_row', x: 940, w: 300, h: 250, wall: true }, { kind: 'workbench', x: 1300, w: 240, h: 110 }, { kind: 'shelf', x: 1580, w: 220, h: 280, wall: true }, { kind: 'shelf', x: 1830, w: 220, h: 280, wall: true }, { kind: 'cargo_cart', x: 1120, w: 130, h: 90, sign: true }]),
+    [{ kind: 'locker_row', x: 1010, w: 300, h: 250, wall: true }, { kind: 'workbench', x: 1420, w: 240, h: 110 }, { kind: 'shelf', x: 1640, w: 220, h: 280, wall: true }, { kind: 'shelf', x: 1880, w: 220, h: 280, wall: true }, { kind: 'cargo_cart', x: 1250, w: 130, h: 90, sign: true }]),
   S('training', '훈련장', 'B1', 2560, 'training',
     [{ id: 'out', x: 110, kind: 'steel', to: 'supply', toDoor: 'training' }],
     [{ id: 'dummy', x: 900, place: 'training', verb: '훈련' }],
     [{ kind: 'mat', x: 900, w: 700, h: 20 }, { kind: 'dummy', x: 1000, w: 70, h: 200 }, { kind: 'record_board', x: 600, w: 200, h: 140, wall: true }, { kind: 'shooting_lane', x: 1900, w: 900, h: 140 }]),
   // 지하 2층: 카드키. 보안문 → 격리 구역 복도(전시) → 감정실 · 연구실 · 끝 철문
   S('b2', '격리 구역', 'B2', 2560, 'containment',
-    [{ id: 'elev', x: 390, kind: 'elevator' }, { id: 'up', x: 90, kind: 'stairs_up', to: 'supply', toDoor: 'down' }, { id: 'appraisal', x: 860, kind: 'door', to: 'appraisal', toDoor: 'out' }, { id: 'lab', x: 1360, kind: 'security', to: 'lab', toDoor: 'out', needs: 'lab' }, { id: 'tooth', x: 2440, kind: 'steel', to: 'tooth', toDoor: 'out', needs: 'tooth' }],
+    [{ id: 'elev', x: 430, kind: 'elevator' }, { id: 'up', x: 150, kind: 'stairs_up', to: 'supply', toDoor: 'down' }, { id: 'appraisal', x: 920, kind: 'door', to: 'appraisal', toDoor: 'out' }, { id: 'lab', x: 1360, kind: 'security', to: 'lab', toDoor: 'out', needs: 'lab' }, { id: 'tooth', x: 2440, kind: 'steel', to: 'tooth', toDoor: 'out', needs: 'tooth' }],
     [{ id: 'showcase', x: 1900, place: 'gallery', verb: '전시' }],
     [{ kind: 'security_gate', x: 620, w: 80, h: 300, wall: true }, { kind: 'showcase', x: 1800, w: 160, h: 200 }, { kind: 'showcase', x: 2050, w: 160, h: 200 }, { kind: 'warning_light', x: 1060, w: 30, h: 30, wall: true }]),
   S('appraisal', '감정실', 'B2', 1280, 'appraisal',

@@ -23,7 +23,7 @@ run_folder notebook papers phonelook phone towel handover smoke music walllean s
 # 샤워·목욕·용변·탈의는 GPT 납품(2026-10-22 4b904ee, 수건으로 가림, 샤워는 뒷모습 머리 감기). 옛 보정(머리색 바꾸기·가구 분리)은 옛 그림용이라 뺌
 # undress/showerturn and section-8 shower/bath were redrawn at final scale;
 # preserve their approved size, hair palette, and y=135 sole baseline.
-GPT_CLIPS = {'toilet'}
+GPT_CLIPS = set()
 # Section 8: anchors measured on the final 192x144 drawings, not the retired rig.
 GPT_STYLE_ANCHORS = {
     'shower': [
@@ -78,7 +78,7 @@ LIGHT_ERASE = {
     'push': [(1, 76, 108, 88, 137), (1, 28, 52, 44, 82), (2, 28, 52, 44, 82)],
 }
 # 독립 검수(2026-10-21 16시) 회색 조각: 떼어 낸 물건·효과의 찌꺼기
-DEBRIS = set('floorrest hurtidle point nausea door carry1_walk pat gearcheck idle_light sneak seatmouth toss push'.split())
+DEBRIS = set('floorrest hurtidle point nausea door carry1_walk pat gearcheck idle_light sneak seatmouth toss push grabknee'.split())
 OUTSIDE_FX |= DEBRIS; DETACHED |= DEBRIS
 
 
@@ -238,6 +238,11 @@ def apply(key, fr, pr=None, src=None, idx=None):
         for i, f in enumerate(fr):
             a = np.array(f); b = np.array(pr[i]); b[:, 95:] = a[:, 95:]; a[:, 95:] = 0
             fr[i] = Image.fromarray(a); pr[i] = Image.fromarray(b)
+    if key in ('shower', 'bath', 'showerturn', 'undress'):   # 검수 9차: GPT 장마다 외곽선이 검정/연갈색으로 바뀌어 깜빡임 → 바깥 1px을 순검정으로 통일
+        for i, f in enumerate(fr):
+            a = np.array(f); al = a[:, :, 3] > 0; p = np.pad(al, 1)
+            edge = al & ~(p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:])
+            a[edge, :3] = 0; a[edge, 3] = 255; fr[i] = Image.fromarray(a)
     if key in GPT_CLIPS:                       # GPT 납품(4b904ee): 키가 PixelLab 그림보다 약 10% 커서 발 기준(57,136)으로 0.9배
         def sc(f, k=0.9):
             w, h = f.size; s = f.resize((round(w * k), round(h * k)), Image.NEAREST)

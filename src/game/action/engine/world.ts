@@ -75,6 +75,8 @@ export class World implements WorldView {
   /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
   cutin = 0;
   showBoxes = false;
+  /** 이번 프레임에 머리 위 상호작용 아이콘이 떴나 (말풍선을 그 위로 올린다) */
+  hintShown = false;
   kills = 0;
   floors = 0;
   notes: Record<string, unknown> = {};
@@ -477,6 +479,7 @@ export class World implements WorldView {
       const e = encs[this.encIndex];
       if (e && p.x >= e.triggerX) {
         this.encActive = this.encIndex;
+        this.goT = 0; // 다음 싸움이 시작되면 「전진」을 끈다
         this.encWave = 0;
         this.bounds = [e.lockFrom, e.lockTo];
         this.spawnWave();
@@ -514,7 +517,7 @@ export class World implements WorldView {
     cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
     this.camX = cx;
     // 싸움 중에는 화면 밖으로 못 나감
-    if (this.encActive >= 0) p.x = Math.max(cx + 30, Math.min(cx + SCREEN_W - 30, p.x));
+    if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x)); // 몸 전체가 보이게
   }
 
   /** 보스 체력 막대용 */

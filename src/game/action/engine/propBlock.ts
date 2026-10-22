@@ -6,6 +6,8 @@ export interface BlockProp {
   w: number;
   /** 물건 뒤쪽 막는 깊이 (키 큰 상자 더미는 뒤에 서면 다리가 박혀 보인다). 없으면 PROP_DEPTH */
   back?: number;
+  /** 물건 앞쪽 막는 깊이. 키 큰 물건(상자 더미) 바로 앞에 서면 다리가 물건 위에 걸쳐 앉은 듯 보인다 (검수 23). 없으면 PROP_DEPTH */
+  front?: number;
 }
 export interface BlockBody {
   x: number;
@@ -21,10 +23,11 @@ export const PROP_DEPTH = 50;
 const STEP = 9;
 
 const backOf = (p: BlockProp) => p.back ?? PROP_DEPTH;
+const frontOf = (p: BlockProp) => p.front ?? PROP_DEPTH;
 /** 이 자리(x, y)가 물건 막힌 칸 안인가: 요원·적·생성 자리 모두 이 하나로 잰다 (검수 18) */
 export function insideProp(p: BlockProp, x: number, y: number, pad = 0): boolean {
   const dy = y - p.y;
-  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < PROP_DEPTH + pad;
+  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < frontOf(p) + pad;
 }
 
 /** 밀고 난 뒤에도 몸과 겹친 물건 번호들을 돌려준다 (제자리에 묶인 적: 숨은 적·잠든 적은 AI가 자리를 되돌린다) */
@@ -34,7 +37,7 @@ export function blockByProps(bodies: BlockBody[], props: BlockProp[], lane: [num
     if (b.z > 4) continue; // 뛰어넘는 중
     for (const p of props) {
       if (!insideProp(p, b.x, b.y)) continue;
-      const front = p.y + PROP_DEPTH,
+      const front = p.y + frontOf(p),
         rear = p.y - backOf(p);
       const okF = front <= lane[1],
         okR = rear >= lane[0];

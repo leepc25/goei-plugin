@@ -502,7 +502,8 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
       // 싸움 중(가까이 적이 있을 때)엔 띄우지 않는다: 피해 숫자·말풍선과 겹친다 (검수 12-5)
       const fighting = w.bodies.some((b) => b.alive && b.team !== 'player' && b.kind !== 'bullet' && b.kind !== 'item' && Math.abs(b.x - w.player.x) < 520);
-      if (!fighting && w.props.some((p) => p.label && near(w, p))) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
+      w.hintShown = !fighting && w.props.some((p) => p.label && near(w, p));
+      if (w.hintShown) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
