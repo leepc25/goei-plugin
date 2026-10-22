@@ -1,0 +1,397 @@
+{
+  "generator": "built-in image_gen.imagegen",
+  "pixelLabCalls": 0,
+  "date": "2026-10-22",
+  "technicalConversion": {
+    "canvas": [
+      192,
+      144
+    ],
+    "sampling": "nearest neighbor; full canvas",
+    "alpha": "binary at50%",
+    "paletteLimit": 80,
+    "outline": "#0D1213 inside opaque boundary;1pixel",
+    "alignment": "whole-canvas translation only;sole135"
+  },
+  "finalPromptSet": [
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri, adult late twenties woman, brown shoulder-length-plus wavy hair, green eye, elegant relaxed posture, full adult figure exactly as reference. Frame undress/01: still fully dressed in black skirt suit jacket, white shirt and black necktie, dark stockings and black high heels. Both hands raised to jacket buttons at the front of chest, clearly unfastening the jacket. Visible forearm bent forward, hands meet at logical(66,72), elbow(62,85). Top of hair y43, sole135. Keep jacket on in this frame.",
+      "sourceName": "exec-e648e7ca-7d80-4d58-bbf5-f9cb5db31807.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri, adult late twenties, brown wavy hair below shoulders and green eye, elegant relaxed build. undress/02: jacket now absent, white long-sleeved collared shirt with black necktie still worn, black knee-length pencil skirt, black stockings and high heel shoes still on. Arms lowered loosely, relaxed wrist beside hip. Exactly same unrotated pure right-facing profile, head y43, soles y135, body center57 as fully dressed reference. Keep shirt tucked into skirt. Do not draw removed jacket or hold any garment.",
+      "sourceName": "exec-bc4116a8-ddb0-4212-9b28-49939fc48051.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 3,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult late twenties woman. Frame undress/03: white long-sleeved collared shirt, black necktie, black pencil skirt, dark stockings and black high heels; NO jacket. Brown wavy hair and green eye unchanged. Both hands raised carefully to collar at logical (66,64), untying the black necktie, near elbow at(60,79), forearms angled upward to throat. Elegant composed posture. True right-facing side view, fixed head top y43 and sole y135. Clothing covers body completely. Same reference silhouette and adult build.",
+      "sourceName": "exec-607146f1-4381-4789-ab47-f3b2ee283a24.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 4,
+      "prompt": "Precise sprite clothing edit. Image1 is the FIXED GEOMETRY edit target (fully clothed brown-haired adult woman). Image2 shows the clothing desired, but is too tall and is only the towel design reference. Start from Image1 and preserve the EXACT face, hair, leg length, foot locations, head top, pose, proportions, canvas and camera. Change ONLY clothing: remove jacket/shirt/tie, replace torso clothing with an opaque securely closed WHITE bath towel from upper chest just below armpits through knees. Leave a black skirt hem and dark stockings and black heels below. Bare shoulders and arms, arm remains down at same location. The overall silhouette height MUST be exactly equal to Image1; DO NOT copy taller geometry from Image2. Keep precise right-facing profile, crisp single-pixel dark outline and flat pixel shading. Single character on actual transparent background, no props or ground. This is Jaemtri undress/04 replacement. Preserve 4:3 canvas and original empty space; logical192x144, body x57, crown y44, sole135, 92px total height. Keep the hair as in Image1, do not enlarge it.",
+      "sourceName": "exec-93944b09-2a7c-4258-86e6-354434663ae2.png",
+      "replacement": true
+    },
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 6,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri, adult woman late twenties. Final wardrobe-transition frame06: standing upright in ONLY a securely fastened opaque WHITE bath towel covering her upper chest to knees, bare shoulders and arms, bare calves and BARE FEET. No shoes, stockings, skirt, shirt, jacket or necktie. Calm elegant resting stance, arms down, empty hand at hip. Preserve exactly the same brown wavy hair below shoulders, green eye, face and adult proportions of reference. Use reference as fixed geometry edit target: do not zoom, enlarge or change camera. Full character logicalheight92px,crown44,soles135,bodycenter57. Pure right-facing complete side view. Towel stays rigidly secure and covers all private parts. No scene or other objects.",
+      "sourceName": "exec-f9b856d6-9971-4e06-bf92-6aa0d261059c.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "showerturn",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult woman, late twenties. Frame showerturn/01, midway turn from right-facing side toward back: THREE-QUARTER REAR view, back and back of head prominent with only tiny right facial profile. Brown wavy hair below shoulders, exactly same head size and figure as reference. Secure WHITE opaque bath towel straight across upper chest/back just below armpits down to knees, bare feet, arms lowered, hands alongside thighs. Upright elegant relaxed stance. Exact same full-body scale as reference; crown logical y45, sole135, height91, center57. Preserve hair length, keep shoulders natural, no looking at camera. Single sprite, no scene or effects.",
+      "sourceName": "exec-5c98dc13-0866-4f92-be77-5d1d4389d996.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "showerturn",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult woman late twenties. Frame showerturn/02: COMPLETE BACK VIEW, no face or eyes visible. Long brown wavy hair drapes down the upper back to below shoulders at same length as references. Both shoulders symmetrical, ARMS DOWN along sides, hands alongside thighs, relaxed elegant upright posture. Secure opaque WHITE towel from just below armpits to knees, bare feet. Feet point away, legs close together. Same body volume and height90-92logicalpx, headtop45, soles135, central body axis x57. Preserve pixel scale and canvas framing; do not enlarge. Only the back-facing NPC on transparency.",
+      "sourceName": "exec-4685215f-09fa-476e-99a7-9cf8756c13ac.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri, adult woman late twenties. Hair-washing loop frame shower/00. Use input rear-view sprite as FIXED full-body geometry: head, towel, legs, feet and hair length unchanged. COMPLETE BACK VIEW. Raise both arms toward crown to shampoo hair: both hands actually MEET at top center of head logical(57,44), fingers pressed into hair, small white foam on top. Elbows at(45,53)and(69,53), directed FORWARD beside head, anatomically natural shoulder rotation; do not clasp hands behind neck or back of head. White towel stays securely covering chest/back below armpits to knees, bare feet. Brown wavy hair below shoulders unchanged except crown lather. Bodycenter57, crown45, sole135; hands/foam can extend only to y39. Gentle elegant gesture, no water or fixtures. Same small figure and logical pixel size as reference.",
+      "sourceName": "exec-f174aeea-f92f-46b6-bb72-36bd7194a3ba.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult woman late twenties. Hair-washing loop shower/01, continue exact rear-view frame in Image1. Preserve every part below shoulders, all hair length, white knee-length securely closed towel, leg positions, feet, body size and canvas. Change ONLY small hand action: both hands touch crown in small foam patch; left fingers curl inward and right fingers spread and rub1logicalpx to right. Left elbow rises1px and right elbow lowers1px relative to Image1, elbows aimed forward beside head, never behind neck. Brown wavy hair, bare feet, no face visible. Same headtop45 and soles135, center57. Small gentle elegant shampoo massage motion. No objects, scenery or added effects.",
+      "sourceName": "exec-bebae242-dbcf-49fa-81c2-5d1805924d46.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult late twenties woman, shampoo loop shower/02. Image1 is exact anchor. COMPLETE BACK VIEW, arms raised and both hands touching at crown in SMALL foam patch. Preserve body/towel/legs/hair/feet geometry exactly. Change ONLY both wrists rotating inward: fingertips scrub toward center, left elbow moves1logicalpixel inward, right elbow moves1pixel outward, shoulders relaxed. Crown stays y45, sole135, bodycenter57, head size unchanged. Brown waves below shoulders, secure opaque white chest-to-knee towel, bare feet, no face visible. No extra foam trails or water.",
+      "sourceName": "exec-d33b3062-f5c4-428a-865c-7ec5c9bbd837.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 3,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult late twenties woman, hair-washing loop shower/03. Exact complete rear-view identity and geometry of reference. White opaque towel securely from armpits to knees, brown waves down upper back, bare feet. Preserve all lower body pixels and position. Small motion change only: both palms press down into SMALL crown foam, fingertips curl, shoulders lower1logicalpx, elbows move slightly forward closer to head (not behind head), natural inward flexion. Both hands stay together on TOP of head. Same small head, bodycenter57, haircrown45, sole135; no zoom, no reframing, no water, props or scene.",
+      "sourceName": "exec-fc72773e-4f35-45fa-aedb-7a2bdb0be8d5.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 4,
+      "prompt": "PIXEL ART EDIT, fixed camera and fixed 4:3 canvas. This input is the target sprite. Keep ALL geometry and all canvas whitespace unchanged, especially the towel, hair length, shoulder position, legs and feet. Do not zoom, recenter, magnify or reframe. Edit ONLY the fingertips at the crown and the elbow bends by one logical pixel: the right fingers curl inward into the existing SMALL foam, left fingers straighten, right elbow rises1pixel and left elbow lowers1pixel. This is frame04 of a subtle shampoo loop for Jaemtri, adult late twenties woman, complete back view. White secure chest-to-knee towel, brown wavy shoulder-length-plus hair, bare feet, modest coverage all unchanged. The whole figure must remain 90-94logicalpixels tall in a192x144 logicalcanvas, center x57, soles y135, top of foam y44. Keep the large empty right and upper canvas regions exactly. Thin1px dark outline and3-4flat shade steps, transparent background. Output ONE frame. No text or extra elements.",
+      "sourceName": "exec-75b893e4-6620-4cc3-851f-0bd0d28c6edb.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "shower",
+      "frame": 5,
+      "prompt": "PIXEL ART EDIT of the input, fixed transparent4:3 canvas. Preserve ALL body, towel, hair and feet geometry and the exact camera/whitespace. Do not zoom or enlarge. Jaemtri, adult late twenties woman, complete BACK VIEW, secure opaque white chest-to-knee bath towel. Frame shower/05, last frame of gentle shampoo loop: keep both hands on crown with small existing white lather, relax finger curl halfway back toward initial pose, move left elbow down1logicalpx and right elbow inward1logicalpx. Elbows forward beside head, no hand behind neck. Brown wavy hair length and bare feet unchanged. Logical192x144,crown45,sole135,center57,totalheight90-94pixels including foam. One character only,1px dark outline,50-90colors,3-4flatshades,no scenery,no water,text or objects. Change only fingertips and tiny elbow angles.",
+      "sourceName": "exec-46759aaa-ba8b-468d-a2ff-7926be9c8f6f.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "bath",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Jaemtri adult woman late twenties, seated rest loop bath/00. Image1 is EXACT identity, brown wavy shoulder-length-plus hair, green eye, body volume and WHITE opaque towel. Image2 is POSE AND CANVAS PLACEMENT ONLY, a different character: do NOT use its black hair, face or beige towel. Draw Jaemtri sitting directly with buttocks at logical(52,128), both knees raised at(76,104), both arms wrapped loosely around knees, bare feet flat at(81,135), pure RIGHT-FACING SIDE VIEW. Secure WHITE bath towel stays closed, covering chest, hips and thighs; no exposed private parts. Calm elegant posture, shoulders relaxed, face neutral. Same head and limb sizes as standing input; seated crown y69 and total projected height67logicalpixels; DO NOT enlarge seated figure to standing height. Entire sprite bounded approximately x37..92,y69..135, bodyaxis57, large empty canvas above/right. Only character, no seat, bath, water or ground.",
+      "sourceName": "exec-39941d50-63dd-470a-b559-3508b2d113ff.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "bath",
+      "frame": 1,
+      "prompt": "PIXEL ART EDIT, keep input fixed transparent4:3 canvas and sprite scale. Jaemtri adult late twenties woman in secure opaque WHITE bath towel, seated side view facing right, knees raised and arms hugging knees, bare feet. This is bath/01 inhale frame: ONLY raise shoulders and head by1logicalpixel in a192x144logicalcanvas, expand upper chest subtly with breath. Preserve head size, same green eye/brown wavy hair, body proportions, towel coverage, hip and foot positions, all whitespace. Soles stayy135, hips approximately128, central bodyaxis57, seated crown about68. Do not zoom or enlarge. Towel continues to cover torso/hips/thighs completely. Relaxed elegant expression. 1pxdarkoutline,3-4flatshadelevels,50-90colors,no water/scene/props/text.",
+      "sourceName": "exec-a817eebd-50a1-4297-82d5-23f3ccc35ce3.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "bath",
+      "frame": 2,
+      "prompt": "PIXEL ART EDIT: preserve input exact transparent4:3 canvas, no zoom/reframe. Jaemtri adult late twenties seated rest frame bath/02, pure right-facing side profile. Same brown wavy hair, green eye and adult proportions, same securely closed white towel covering chest/hips/thighs, bare feet at y135, same hips/knees and hands hugging knees. This is slow EXHALE: compared with input bath00, lower shoulders and head1logicalpx, relax neck slightly, eyelid slightly softened. Keep head size unchanged and towel/legs/feet pixel positions fixed. Logical192x144,centerbody57,seatedcrown70,hipapprox128. One-pixel dark outline,3-4flatshading levels,50-90colors. Character only, no ground,water,furniture,objects or text.",
+      "sourceName": "exec-ccd15550-cc81-42a3-bd87-9a66389624d2.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "bath",
+      "frame": 3,
+      "prompt": "PIXEL ART EDIT of input with fixed canvas and scale. Jaemtri adult late twenties woman, bath/03 final breathing-loop frame. Same seated right-facing side pose hugging knees, secure opaque white towel covering chest/hips/thighs, same brown waves and green eye. Gently return from exhale toward rest: head and shoulders at same height as reference bath00 but slight1logicalpixel neck relaxation, eyelid relaxed with a calm expression. Keep hands, knees, hip position, head size and bare feet exactly fixed; soles y135, seated crown69,bodyaxis57 in192x144logicalcanvas. No zoom, no reframing. Thin1pxdarkoutline,50-90colors,3-4flatshades, transparentbackground, no scene,objects,water,text or ground.",
+      "sourceName": "exec-a53c9af0-17b6-4162-9d93-0c42b4b5434a.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija, male adult scientist in his mid-forties, exact identity of input: tousled spiky WHITE hair, round BLACK goggles over eyes, prominent nose and small pale chin facial hair as visible in reference, lean mature build, jovial energetic posture. Frame undress/00, fully dressed resting stance: white knee-length lab coat, white collared shirt, black necktie, black trousers, black shoes. Arms lowered with relaxed empty hands. Exact pure RIGHT-FACING SIDE PROFILE, fixed canvas and reference framing, do not zoom. Character96logicalpixels high, hairtop40,soles135,bodycenter57. Same head size and limb proportions as reference. Thin1px nearlyblackoutline and3-4flatshading steps,70colors. Single NPC, no other objects.",
+      "sourceName": "exec-ef794038-6fce-4b56-a8b2-d26540364db5.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 1,
+      "prompt": "PIXEL ART EDIT of the input, Gognija adult male scientist mid-forties, frame undress/01. Preserve fixed transparent4:3 canvas, same face, spiky white hair, black round goggles, pale short chin beard, mature lean frame, lab coat, shirt, tie, trousers and shoes. Fully clothed. Change ONLY arms: both hands move to chest-front lab-coat buttons, elbows bend boldly outward in his jovial energetic manner, hands meet at logical(65,71), near elbow(60,86). Pure right-facing side profile, bodycenter57,hairtop40,soles135,96logicalpixels tall in192x144canvas. Do not zoom/recenter/enlarge. Empty hands and no other objects. Thin1pxdarkoutline,3-4flatshades,50-90colors. No ground or text.",
+      "sourceName": "exec-bc3c2a37-5ddd-4b0a-934f-f4ebc2a4ed9e.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 2,
+      "prompt": "Fixed-canvas PIXEL ART EDIT of input. Gognija adult male mid-forties, same spiky white hair, round black goggles over eyes and pale short chin beard, same lean mature proportions. Frame undress/02: remove ONLY lab coat; now wearing white long-sleeved collared shirt, black necktie, black trousers and black shoes. Arms lowered casually, hands empty, jovial upright stance. Preserve exact head size and length of legs, same right-facing complete side profile and same camera/whitespace; do not zoom. Logical192x144canvas,bodycenter57,hairtop40,soles135,height96pixels. 1pxdarkoutline,50-90colors,3-4flatpixelshades,transparent background. No discarded coat, props or scene.",
+      "sourceName": "exec-5f2f06bc-6ea7-4da9-be67-6ce88cbef7dc.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 3,
+      "prompt": "Fixed-canvas PIXEL ART EDIT, Gognija adult male scientist mid-forties, undress/03. Preserve exact input anatomy, spiky white hair, round black goggles over eyes, pale short chin beard, shirt/trousers/shoes. NO lab coat. Raise both empty hands boldly to shirt collar to loosen black necktie, front hand at logical(66,60), elbow at(59,79), jovial energetic but pure right-facing side profile. Same lean build and head size. Do not zoom or change whitespace.192x144logicalcanvas,bodyaxis57,hairtop40,soles135,height96pixels.1pxdarkoutline,3-4flatshades,50-90colors,actualtransparentbackground. No removed clothing,ground,scene,objects or text.",
+      "sourceName": "exec-5a639d43-c8ca-4a08-a884-3d0cbbaac272.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 4,
+      "prompt": "Fixed-canvas PIXEL ART EDIT. Gognija adult MALE scientist mid-forties, undress/04. Keep exact input head size, spiky white hair, short pale chin beard, mature lean body, leg length and right-facing pure side profile. Shirt and tie now absent; ordinary bare MALE upper torso with a lean unmuscular build. Secure opaque WHITE bath towel wrapped from WAIST through KNEES, fully covering hips and thighs; black trousers still worn beneath it, visible on lower legs, black shoes still on. Round black goggles pushed UP onto forehead, eyes now uncovered. Arms lowered, hands empty at sides, jovial relaxed posture. No lab coat or discarded garments. No zoom/reframe: logical192x144,bodycenter57,hairtop40,soles135,height96px.1pxdarkoutline,3-4flatshades,50-90colors,transparentbackground,no objects,ground or text.",
+      "sourceName": "exec-ca51989d-3bb9-4c5f-8584-791620a6f311.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 5,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija adult MALE scientist mid-forties, undress/05. Image1 is identity and scale reference. Image2 is POSE PLACEMENT ONLY, a different character whose face/hair/body/clothes must NOT be used. Gognija bends energetically forward at waist toward right, knees a little bent, both hands reach black trousers at KNEE HEIGHT, visible wrist near(78,112). Secure opaque WHITE towel remains fixed from waist to knees, fully covering hips and thighs; trouser legs visible below towel and black shoes still worn. Ordinary bare male upper torso, same lean body and limb lengths. Spiky white hair, small white chin beard, black goggles ON FOREHEAD. Feet fixed around x50..70,sole135. Bent crown now y58,headcenter(82,68),hip(56,94), hands(78,112). Entire bent figure fits x46..99,y58..135, only78logicalpixels tall; do not magnify it to standing height. Pure right-facing side view, empty hands, no discarded clothes or objects.",
+      "sourceName": "exec-3c0250bb-5776-4084-8a81-577d479eef46.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "undress",
+      "frame": 6,
+      "prompt": "Fixed-canvas PIXEL ART EDIT. Gognija adult MALE scientist mid-forties, final wardrobe-transition frame06. Preserve exact input upright pose, lean body, spiky white hair, short pale chin beard and black goggles ON FOREHEAD. Secure opaque WHITE towel from waist to knees, ordinary bare male upper torso. Remove trousers and shoes so lower legs and feet are now bare. Arms down, hands empty, relaxed lively stance, pure right-facing side profile. All private parts remain completely covered by towel. Same head/limb scale, do not zoom or reframe.192x144logicalcanvas,bodyaxis57,hairtop40,soles135,height96pixels.1pxnearlyblackoutline,50-90colors,3-4flatshades,transparentbackground. No discarded clothes, scene, ground, text or objects.",
+      "sourceName": "exec-281779bd-3c77-457c-9286-9a092d93c3ab.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "showerturn",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija adult male scientist mid-forties, frame showerturn/01. Turn same input body from right side toward back to THREE-QUARTER REAR view, tiny right facial edge still visible. Lean mature body, spiky white hair and short pale chin beard unchanged, round black goggles remain ON FOREHEAD with headstrap visible. Secure opaque WHITE towel WAIST to KNEES, bare upper male torso and bare feet. Arms lowered casually at sides, hands empty. Same body scale96px,headtop40,soles135,center57 in192x144logicalcanvas. Preserve framing and empty space, do not zoom/enlarge.1pxdarkoutline,3-4flatshades,50-90colors, transparentbackground. Character only.",
+      "sourceName": "exec-41fc843a-b64b-4001-b289-a73ebb060dcc.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "showerturn",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija adult MALE scientist mid-forties, frame showerturn/02. COMPLETE BACK VIEW, no face or eyes. Same mature lean torso and limb proportions, spiky WHITE hair. Black goggles stay on FOREHEAD, black strap seen around rear head. Secure opaque WHITE waist-to-knee towel, bare feet pointing away, arms DOWN at sides and hands empty. Symmetric rear stance. Exact same96px body scale, hairtop40, sole135,centralaxis57 in192x144logicalcanvas. Preserve framing/whitespace and hair/leg sizes; do not zoom or enlarge. Thin1pxdarkoutline,3-4flatshades,50-90colors,transparentbackground. No scenery, water or props.",
+      "sourceName": "exec-a96ed7da-0a1a-4c32-b1db-1010e97cc7b7.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija adult male scientist mid-forties, shampoo loop shower/00. Use input exact rear body geometry/canvas, no zoom or reframing. COMPLETE BACK VIEW. Raise both arms boldly to wash spiky WHITE hair: both hands MEET at crown logical(57,40), fingers massage hair, elbows at(42,50)and(72,50), bent FORWARD beside head, not behind neck. BIG fluffy white soap foam at crown (larger than other NPCs), only a compact mound above hair, no droplets elsewhere. Black goggles remain ON FOREHEAD, rear black headstrap visible. Lean mature male upper back, secure opaque WHITE waist-to-knee towel, bare feet and same legs. Bodycenter57,hairtop40,soles135 in192x144logicalcanvas,foam may extendto34. Single NPC, no water or fixtures.",
+      "sourceName": "exec-821c9877-d31e-4b46-8b6f-8cf224fabc1b.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 1,
+      "prompt": "PIXEL ART EDIT of input, fixed canvas and exact sprite scale. Gognija adult male mid-forties, shampoo loop shower/01, COMPLETE BACK VIEW. Preserve ALL geometry below shoulders, lean mature body, secure white WAIST-to-KNEE towel, legs, feet, spiky white hair and black goggle headstrap. Change ONLY hands/elbows slightly: left palm scrubs inward through BIG crown foam, right fingertips spread1logicalpixel outward; left elbow rises1px,right elbow lowers1px, both elbows forward beside head and hands together on TOP of head. No hands behind neck. No zoom/reframe.192x144logicalcanvas,axis57,soles135,hairtop40,foamtop34.1pxdarkoutline,50-90colors,3-4flatshades,transparentbackground. Character only,no water,props,text or scene.",
+      "sourceName": "exec-07cc9bf3-3d24-4d9f-ad62-836c067589b7.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 2,
+      "prompt": "PIXEL ART EDIT of input, exact fixed4:3 transparentcanvas, no zoom/enlargement. Gognija adult male scientist mid-forties, shower/02 subtle energetic shampoo-loop variant. COMPLETE BACK VIEW. Preserve exact body, legs, feet, towel, spiky white hair and black goggle strap. Change only wrists/fingers/elbows by1logicalpx: both fingers curl toward crown center into BIG compact soapfoam, left elbow tucks1px inward,right elbow opens1px outward. Elbows forward beside head, both hands stay together on top of hair. White waist-to-knee towel securely closed, bare feet.192x144logicalcanvas,axis57,soles135,hairtop40,foamtop34. Thin1pxdarkoutline,3-4flatshades,50-90colors. No added water,props,scenery,text or drips.",
+      "sourceName": "exec-a7cde2de-1787-4bd3-ab13-f1ab8c7f3907.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 3,
+      "prompt": "PIXEL ART EDIT, input is fixed geometry target, do not zoom/reframe. Gognija adult male mid-forties, complete BACK VIEW, shampoo loop shower/03. Same mature lean frame, white spiky hair, black goggle headstrap, secure opaque white waist-to-knee towel, same bare feet. Change ONLY shampoo hand action: both palms press down into large compact white foam at crown, fingers flex, shoulders dip1logicalpixel and elbows move1px forward toward head. Both hands remain together on TOP of head; no arms behind neck. Preserve all lower-body positions, towel shape and canvas whitespace. Logical192x144,center57,soles135,hairtop40,foamtop34. Thin1pxdarkoutline,3-4flatshades,50-90colors,transparentbackground. No water, props, scenery, text or falling foam.",
+      "sourceName": "exec-ed638713-1708-4b83-9d60-705c52d7c75e.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 4,
+      "prompt": "PIXEL ART EDIT of input exact fixed transparent4:3 canvas; preserve body scale and framing. Gognija adult MALE mid-forties, complete back view, shampoo loop shower/04. Same lean mature body, same spiky white hair and black goggle headstrap, secure white waist-to-knee towel, same bare feet. Change only small shampoo movement: right fingers curl inward into BIG compact crown foam,left fingers spread1logicalpixel outward; right elbow rises1px,left elbow lowers1px, elbows forward beside head, both hands remain together at TOP of head. Bodycenter57,soles135,hairtop40,foamtop34 on192x144logicalcanvas. Do not enlarge,zoom or move lower body. Thin1pxdarkoutline,3-4flatshades,50-90colors. No scene,water,props,text or droplets.",
+      "sourceName": "exec-1706d580-96d0-43cb-833b-063ac2cb5d72.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "shower",
+      "frame": 5,
+      "prompt": "PIXEL ART EDIT, preserve input exact camera,4:3transparentcanvas,body and whitespace. Gognija adult male scientist mid-forties, shampoo loop shower/05 final return frame, complete BACK VIEW. Same spiky white hair, goggle strap on rear head with goggles on forehead, secure opaque white waist-to-knee towel, mature lean body, bare feet. Only adjust fingers and elbows: relax both hands halfway back toward starting shape while touching crown in BIG compact white soapfoam; left elbow lowers1logicalpx,right elbow comes inward1px. Arms stay forward beside head, hands never behind neck. Lower-body positions and scale fixed.192x144logical,axis57,soles135,hairtop40,foamtop34.1pxdarkoutline,50-90colors,3-4flatshades. No water,objects,ground,scene or text.",
+      "sourceName": "exec-66063f3a-e1bc-4b1a-9109-d58454d4800b.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "bath",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE final game sprite frame on a transparent 4:3 canvas, no sheet. Same NPC identity, face, build, head size, hair length, shading and palette as references. Render a 192x144 logical pixel canvas at 8x nearest-neighbor scale (1536x1152 requested); the person stays small and left-aligned, body center logical x57, feet fixed at y135, with large empty transparent right side. Strict right-facing complete side profile unless explicitly rear view; never show both shoulders or both eyes in side profile. Thin 1 logical pixel nearly-black outline, 3-4 flat shade levels, 50-90 colors; no smooth gradients, antialiasing, extra characters, text, ground, shadows, walls, fixtures, water, steam, furniture, discarded or held clothing. Hands empty. Preserve alpha. Gognija adult MALE scientist mid-forties, seated rest bath/00. Image1 is exact identity and adult lean body reference, spiky white hair, short pale chin beard, black round goggles ON FOREHEAD. Image2 is seated POSE/CANVAS PLACEMENT ONLY, a different character: do not use its female body, black hair, face or beige towel. Draw Gognija sitting with buttocks at logical(52,128), both knees raised around(76,102), bare feet at(84,135), arms wrapping knees loosely, slightly jovial relaxed expression, pure RIGHT-FACING SIDE VIEW. His secure opaque WHITE towel stays at WAIST through KNEES, fully covers hips/thighs; ordinary male bare chest and arms. Keep same head size and limb lengths as standing input. Seated crown y65,totalprojectedheight71pixels, entire sprite about x37..95,y65..135. Do not enlarge to standing height or zoom. No seat, ground, water, objects or scene.",
+      "sourceName": "exec-7f7ce2c2-3c0c-4b26-828a-02abd8f5efca.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "bath",
+      "frame": 1,
+      "prompt": "PIXEL ART EDIT, fixed4:3transparentcanvas and exact scale/whitespace. Gognija adult MALE scientist mid-forties, bath/01 INHALE. Same seated right-facing side pose hugging raised knees, secure opaque WHITE WAIST-to-KNEE towel covering hips/thighs, bare male chest, bare feet. Same spiky white hair, small pale chin beard and round black goggles ON FOREHEAD. Change ONLY head and shoulders rising1logicalpixel with breath; upper chest expands minimally. Keep hip/knee/hand/foot positions and head size unchanged.192x144logical,axis57,soles135,seatedcrown64,hipapprox128. Do not zoom,enlarge or reframe. Thin1pxdarkoutline,50-90colors,3-4flatshades. No scene, water, seat, ground, objects or text.",
+      "sourceName": "exec-4db0b8e8-12d1-4bfc-8e74-5157b556286f.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "bath",
+      "frame": 2,
+      "prompt": "PIXEL ART EDIT, preserve input exact fixed4:3transparentcanvas and sprite scale. Gognija adult MALE scientist mid-forties, bath/02 EXHALE, pure right-facing side view sitting with knees raised and arms wrapped around knees. Same spiky white hair, pale short chin beard, black round goggles ON FOREHEAD, secure opaque WHITE WAIST-to-KNEE towel covering hips/thighs, bare feet. Change ONLY head/shoulders lowered1logicalpixel relative to bath00, relaxed neck and slight softening of eyelid with breath. Preserve all hip/knee/hand/foot positions and head size.192x144logicalcanvas,axis57,soles135,hipapprox128. Do not zoom/enlarge/reframe.1pxdarkoutline,3-4flatshades,50-90colors. Character only,no water,ground,seat,props,text or scenery.",
+      "sourceName": "exec-1669f1c3-9116-4c75-9f5f-73f98c442b43.png",
+      "replacement": false
+    },
+    {
+      "id": "gognija",
+      "clip": "bath",
+      "frame": 3,
+      "prompt": "Make a tiny local edit to THIS EXACT IMAGE. Preserve canvas, all blank space, exact sprite size, all proportions, head size, hair, towel, legs, hands, knees, feet and camera. NO ZOOM, NO CROP, NO ENLARGEMENT. On a192x144logicalcanvas keep the entire seated figure inside x31..90 AND y70..135, only66pixels tall, exactly like the input. Gognija is an adult man mid-forties, seated side profile hugging knees, black goggles on forehead, spiky white hair, short pale beard, white waist-to-knee towel. For breathing frame bath03, change ONLY eyelid onepixel softer and shoulder highlight onepixel relaxed, returning to neutral breathing height. Everything else stays pixel-for-pixel the same. Transparent4:3background. One character, no objects or text. Keep same dark1pxoutline and50-90color palette.",
+      "sourceName": "exec-07c2c171-61aa-4a52-b38f-a67d0c52ce0f.png",
+      "replacement": false
+    },
+    {
+      "id": "dejure",
+      "clip": "undress",
+      "frame": 0,
+      "prompt": "Reproduce THIS EXACT reference pixel sprite at its original scale and placement. Fixed transparent4:3canvas. NO ZOOM, NO ENLARGEMENT, NO RECENTERING. Dejure is a24-year-old adult woman in black business skirt suit, white shirt, black necktie, bare lower legs and black low shoes, long pink waist-length twin ponytails, pink eyes. Preserve exact adult face/head size, silhouette and proportions of input; shy shoulders and arms at sides. Strict right-facing side profile. On the192x144logicalcanvas the ENTIRE character including hair must stay inside x28..72 and y49..135, only87logicalpixels tall; top35% ofcanvas and all x>73 emptytransparent. Body center57, soles135. Keep input shape and pixel scale rather than filling image. Draw one clean production frame undress00,thin1pxdarkoutline,3-4flatshades,50-90colors. No extra elements,text,ground or objects.",
+      "sourceName": "exec-a8b6192f-0931-441f-9549-671a8216c995.png",
+      "replacement": false
+    },
+    {
+      "id": "dejure",
+      "clip": "undress",
+      "frame": 1,
+      "prompt": "PIXEL ART EDIT of this exact input, fixed4:3transparentcanvas, no zoom/reframe/enlargement. Dejure is a24-year-old ADULT woman, long pink twin ponytails, pink eyes, petite adult figure, shy hunched shoulders. Frame undress/01, fully clothed in same black business skirt suit jacket, white collared shirt and black necktie, black skirt and low black shoes, bare lower legs. Change ONLY hands/forearms: both hands move carefully to jacket buttons at chest front, fingertips together, near hand logical(66,76), elbow(60,87), hesitant small gesture. Preserve hair length/head size/body/feet and all whitespace. Strict right-facing SIDE PROFILE.192x144logicalcanvas,bodycenter57,soles135,hairtop49,totalheight87pixels,entirefigurex28..74.1pxdarkoutline,3-4flatshades,50-90colors. Hands empty,no props,discarded clothes,ground,text or scene.",
+      "sourceName": "exec-5cf806c0-9c4c-4bbb-8b9f-33ce5e7c6520.png",
+      "replacement": false
+    },
+    {
+      "id": "dejure",
+      "clip": "undress",
+      "frame": 2,
+      "prompt": "Fixed-canvas PIXEL ART EDIT of exact input, Dejure24-year-old ADULT woman, frame undress/02. Preserve exact face/headsize, long pink waist-length twin ponytails,pinkeye,petiteadult anatomy and shy slightly hunched posture. Remove ONLY black suit jacket. She now wears white long-sleeved collared shirt with black necktie, black skirt, bare lowerlegs and low black shoes. Arms lowered with empty hands close to thighs. Pure RIGHT-facing SIDE PROFILE. Do not zoom,reframe,enlarge or recenter; keep ALL whitespace.192x144logicalcanvas,bodyaxis57,soles135,crown49,height87pixels,figurex28..73. Thin1pxdarkoutline,3-4flatshades,50-90colors,transparentbackground. No discarded jacket,scene,objects,ground or text.",
+      "sourceName": "exec-52548649-dc20-4a28-8def-a5abcf5a1643.png",
+      "replacement": false
+    },
+    {
+      "id": "dejure",
+      "clip": "undress",
+      "frame": 3,
+      "prompt": "PIXEL ART EDIT of exact input. Dejure24-year-old ADULT woman, frame undress/03. Same adult face/headsize, long pink twin ponytails,pinkeye,petiteadultbuild,shy hunched shoulders. White long-sleeved collared shirt with black necktie, black skirt, bare lower legs and low black shoes; no jacket. Change ONLY arms/hands: both hands carefully loosen black tie at collar, near wrist logical(66,66), elbow(61,84), small hesitant gesture and shoulders drawn in. Pure RIGHT-facing complete SIDE PROFILE. Preserve body, hair, feet, canvas and scale exactly; no zoom/enlarge/recenter.192x144logical,axis57,crown49,soles135,height87pixels.1pxdarkoutline,50-90colors,3-4flatshades,transparentbackground. Hands empty,no discarded clothes,props,scene,ground or text.",
+      "sourceName": "recovered-dejure03.png",
+      "replacement": false
+    },
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "frame": 0,
+      "promptSpec": "Adult late-twenties Jaemtri, full black skirt suit, white shirt/black tie, black stockings/heels. Relaxed right-facing side profile. Brown waves and green eye matching profile reference. Logical192x144,center57,soles135,height92. Thin near-black1pxoutline,3-4shades,~70colors,transparentbackground,character only.",
+      "recordType": "reconstructed original spec"
+    },
+    {
+      "id": "jaemtri",
+      "clip": "showerturn",
+      "frame": 0,
+      "recordType": "same newly generated boundary pose",
+      "copyOf": "jaemtri/undress/06"
+    },
+    {
+      "id": "gognija",
+      "clip": "showerturn",
+      "frame": 0,
+      "recordType": "same newly generated boundary pose",
+      "copyOf": "gognija/undress/06"
+    }
+  ],
+  "blocked": [
+    {
+      "id": "jaemtri",
+      "clip": "undress",
+      "n": 5,
+      "reason": "Image generation output moderation blocked; earlier draft has incorrect scale and is not delivered."
+    },
+    {
+      "id": "dejure",
+      "clips": {
+        "undress": [
+          4,
+          5,
+          6
+        ],
+        "showerturn": [
+          0,
+          1,
+          2
+        ],
+        "shower": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "bath": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "reason": "Towel clothing-edit request rejected at input moderation; remaining towel scenes not generated."
+    }
+  ]
+}
