@@ -61,6 +61,8 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     label: p.kind === 'item' && p.data.item ? `${p.label}:${p.data.item}` : p.label, // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
     solid: p.kind === 'shutter' ? !p.data.open : undefined,
   }));
+  // 천장 해치 = 벽에 기대 세운 사다리: 복도 한가운데가 아니라 벽선에 (검수 21)
+  for (const p of props) if (p.kind === 'hatch') p.y = Y_TOP;
   // 승객·사는 척하는 주민·로비의 직원은 처음에 소품(말 걸 수 있음)이고, 규칙을 어기면 층 tick이 적으로 바꾼다
   for (const s of f.spawns) {
     if (s.role === 'passenger') props.push({ id: `h${s.id}`, kind: 'passenger', x: s.x, y: laneY(s.lane), w: 50, h: 150, label: '떠도는 승객' });
@@ -189,7 +191,7 @@ export function endingPlan(id: string): StagePlan {
 /* ── 소품 겹침 금지 (검수 12-2) ──
    기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
-const FIXED_PROPS = new Set(['elevator', 'mirror', 'hatch', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const FIXED_PROPS = new Set(['elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
 const BOARD_GAP = 1400;
 const artW = (p: PropSpec) => Math.max(p.w, p.kind === 'item' || p.kind === 'belonging' || p.kind === 'mark' ? 60 : p.kind === 'passenger' || p.kind === 'npc' ? 80 : 130);
 
@@ -222,6 +224,8 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
     if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false; // 구덩이·단은 앞쪽이 원근으로 넓어진다
     if (spaced && boardLike(p) && kept.some((q) => q !== p && Math.abs(q.x - x) <= BOARD_GAP)) return false;
+    // 사다리(천장 해치)도 한 화면에 하나
+    if (spaced && p.kind === 'hatch' && placed.some((q) => q !== p && q.kind === 'hatch' && Math.abs(q.x - x) <= BOARD_GAP)) return false;
     return true;
   };
   let spaced = true;
@@ -232,7 +236,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     for (let d = -reach; d <= reach; d += 24) {
       const x = p.x + d;
       if (!free(p, x)) continue;
-      const md = Math.min(...kept.filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
+      const md = Math.min(...(p.kind === 'hatch' ? placed.filter((q) => q.kind === 'hatch') : kept).filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
       if (md > bd) (bd = md), (best = x);
     }
     spaced = true;
@@ -243,7 +247,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x: number | null = null;
     // 판은 다른 판과 한 화면 떨어진 자리를 더 멀리까지 찾는다
-    const reach = boardLike(p) ? 1800 : 480;
+    const reach = boardLike(p) || p.kind === 'hatch' ? 1800 : 480;
     for (let d = 0; d <= reach; d += 24) {
       if (free(p, p.x + d)) {
         x = p.x + d;
@@ -254,7 +258,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
         break;
       }
     }
-    if (x === null && boardLike(p) && !decor.has(p)) x = farthest(p, f.width);
+    if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch')) x = farthest(p, f.width);
     if (decor.has(p)) {
       const near = x === null ? null : kept.reduce<PropSpec | null>((n, q) => (!n || Math.abs(q.x - x!) < Math.abs(n.x - x!) ? q : n), null);
       if (x === null || kept.length >= 3 || (near && near.kind === p.kind && near.label === p.label)) {

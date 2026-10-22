@@ -38,6 +38,13 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
       seedR = seed;
       M.furnishFloor(field, { ...plan, props: M.furnishAvoid(plan) }, lane, rnd);
       const items = field.ents.filter((e) => e.type === 'prop');
+      // 사다리(천장 해치)는 벽선에, 문·벽 장식 앞이 아니고, 한 화면에 하나 (검수 21)
+      const hatches = plan.props.filter((q) => q.kind === 'hatch').sort((a, b) => a.x - b.x);
+      hatches.forEach((h, i) => {
+        assert.equal(h.y, lane[0], `${type} ${depth} ${seed}: 사다리 벽선`);
+        if (i) assert.ok(h.x - hatches[i - 1].x > 1280, `${type} ${depth} ${seed}: 사다리 둘이 한 화면 ${hatches.map((q) => q.x)}`);
+        for (const [a, b] of plan.keepOut ?? []) assert.ok(h.x + 30 <= a || h.x - 30 >= b, `${type} ${depth} ${seed}: 사다리@${h.x} 문 앞 [${Math.round(a)}, ${Math.round(b)}]`);
+      });
       // 문·벽 가구 앞이 비었다
       for (const it of items) {
         const w = M.PROPS[it.prop].w;

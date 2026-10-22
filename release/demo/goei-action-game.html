@@ -16322,6 +16322,7 @@ function floorPlan(f, id, startX = 240) {
     // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
     solid: p.kind === "shutter" ? !p.data.open : void 0
   }));
+  for (const p of props2) if (p.kind === "hatch") p.y = Y_TOP;
   for (const s2 of f.spawns) {
     if (s2.role === "passenger") props2.push({ id: `h${s2.id}`, kind: "passenger", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "떠도는 승객" });
     if (s2.role === "resident") props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
@@ -16441,7 +16442,7 @@ function endingPlan(id) {
   plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
   return plan;
 }
-var FIXED_PROPS = /* @__PURE__ */ new Set(["elevator", "mirror", "hatch", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
+var FIXED_PROPS = /* @__PURE__ */ new Set(["elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
 var BOARD_GAP = 1400;
 var artW = (p) => Math.max(p.w, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
 function spreadProps(f, props2, startX) {
@@ -16467,6 +16468,7 @@ function spreadProps(f, props2, startX) {
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
     if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false;
     if (spaced && boardLike(p) && kept.some((q) => q !== p && Math.abs(q.x - x) <= BOARD_GAP)) return false;
+    if (spaced && p.kind === "hatch" && placed.some((q) => q !== p && q.kind === "hatch" && Math.abs(q.x - x) <= BOARD_GAP)) return false;
     return true;
   };
   let spaced = true;
@@ -16476,7 +16478,7 @@ function spreadProps(f, props2, startX) {
     for (let d2 = -reach; d2 <= reach; d2 += 24) {
       const x = p.x + d2;
       if (!free(p, x)) continue;
-      const md = Math.min(...kept.filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
+      const md = Math.min(...(p.kind === "hatch" ? placed.filter((q) => q.kind === "hatch") : kept).filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
       if (md > bd) bd = md, best = x;
     }
     spaced = true;
@@ -16486,7 +16488,7 @@ function spreadProps(f, props2, startX) {
   const order = (p) => boardLike(p) ? decor.has(p) ? 1 : 0 : 2;
   for (const p of [...props2].filter((q) => !fixed2(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x = null;
-    const reach = boardLike(p) ? 1800 : 480;
+    const reach = boardLike(p) || p.kind === "hatch" ? 1800 : 480;
     for (let d2 = 0; d2 <= reach; d2 += 24) {
       if (free(p, p.x + d2)) {
         x = p.x + d2;
@@ -16497,7 +16499,7 @@ function spreadProps(f, props2, startX) {
         break;
       }
     }
-    if (x === null && boardLike(p) && !decor.has(p)) x = farthest(p, f.width);
+    if (x === null && (boardLike(p) && !decor.has(p) || p.kind === "hatch")) x = farthest(p, f.width);
     if (decor.has(p)) {
       const near2 = x === null ? null : kept.reduce((n, q) => !n || Math.abs(q.x - x) < Math.abs(n.x - x) ? q : n, null);
       if (x === null || kept.length >= 3 || near2 && near2.kind === p.kind && near2.label === p.label) {
