@@ -1,0 +1,20 @@
+before generations_remaining: 14646.30
+sub buttstroke
+sub stepup
+done buttstroke
+sub carry1_run
+done stepup
+sub door
+done carry1_run
+sub doorclose
+done door
+sub hurtidle
+done doorclose
+sub limp
+done hurtidle
+sub collapse
+done collapse
+sub victory
+done limp
+done victory
+after generations_remaining: 14505.30

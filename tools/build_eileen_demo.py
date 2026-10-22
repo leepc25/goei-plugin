@@ -32,7 +32,7 @@ FW, FH, FOOT, ANCHOR = 192, 144, 136, 57
 # 그림 안에서 총을 쏘는(반동) 장 = 엔진이 총구 불꽃·탄도선·명중을 내는 장. 근접은 닿는 장
 SHOTS = {'pair1': [3, 5], 'pair2': [2, 4], 'aimshot': [3], 'kneelfire': [1, 3], 'airshot': [3], 'pistolfire': [1], 'grabshot': [1],
          'precise': [1], 'super': [6, 8], 'suppress': [2, 4, 6], 'cover': [3, 5], 'support': [4], 'shotgun': [1]}
-MELEE = {'muzzle': [3], 'buttstroke': [3], 'pushkick': [2], 'shove': [2], 'slide': [2], 'pipe': [3]}
+MELEE = {'muzzle': [3], 'buttstroke': [4], 'pushkick': [2], 'shove': [2], 'slide': [2], 'pipe': [3]}
 FPS = {'idle': 4, 'guard': 5, 'talk': 6, 'walk': 11, 'step': 10, 'run': 15, 'jump': 12, 'crouch': 14, 'crouchwalk': 10, 'kneelfire': 16,
        'pair1': 18, 'pair2': 20, 'aimshot': 12, 'muzzle': 16, 'buttstroke': 14, 'pushkick': 13, 'slide': 14, 'airshot': 14,
        'transition': 14, 'pistolfire': 20, 'pistolreload': 10, 'reload': 9, 'reload_empty': 8, 'read': 8, 'aim': 4, 'precise': 12,
@@ -42,7 +42,7 @@ ADVK = {'evade', 'slide', 'pushkick', 'shove'}   # 끝 장에서 몸이 옮겨 �
 GROUPS = {'5-1': '전투', '5-2': '기본 클립 (몸만, 물건·장면은 엔진)', '5-3': '지형·이동', '5-4': '탐사', '5-5': '상태·결과',
           '5-6': '본부 업무', '5-7': '생활·여가', '5-8': '사교', '5-9': '감정', '5-10': '씻기 (GPT)'}
 NAMES = {'pair1': '페어 1 (A 1타)', 'pair2': '페어 2 (A 2타)', 'aimshot': '조준 1발 (A 3타)', 'muzzle': '떼어내기 1: 총구 찌르기',
-         'buttstroke': '떼어내기 2: 개머리판', 'pushkick': '떼어내기 3: 밀어차기', 'transition': '소총 → 권총 전환 (S)', 'read': '판독 (D)',
+         'buttstroke': '떼어내기 2: 총몸 내려찍기', 'pushkick': '떼어내기 3: 밀어차기', 'transition': '소총 → 권총 전환 (S)', 'read': '판독 (D)',
          'aim': '정밀 조준 유지 (A 홀드)', 'precise': '정밀 1발 (A 떼기)', 'super': '필살기 「증명해.」', 'evade': '이탈 백스텝 (Shift)',
          'reload': '전술 재장전', 'reload_empty': '빈 탄창 재장전', 'kneelfire': '무릎 쏴 페어', 'slide': '슬라이딩 (달리며 A)',
          'airshot': '공중 하향 사격', 'suppress': '숙련 3 제압 사격', 'cover': '숙련 6 엄폐 사격', 'support': '지원 등장', 'block': '소총 막기 (Q)',
@@ -94,7 +94,7 @@ def pose(src, i):
 def is_gun(src):
     """총을 손에 든 클립(멘 총·맨손 제외)"""
     if src in ('engage', 'victory', 'gearup'): return True
-    if src not in erig.CLIPS or erig.CLIPS[src][2] not in 'RF': return False
+    if src not in erig.CLIPS or erig.CLIPS[src][2] not in 'RFQ': return False
     pr = (erig.CLIPS[src][1] or '').split(',')[0]
     return any(k in pr for k in ('in both hands', 'one-handed', 'pistol', 'shotgun', 'carbine held', 'carbine dropping')) or pr.startswith('a compact black carbine held')
 
@@ -117,6 +117,16 @@ def drop_small(a, n=40, far=300):
     return a
 
 
+SKIN_PAL = np.array([[int(h[k:k + 2], 16) for k in (0, 2, 4)] for h in
+                     'FFD4BB F7B79D EDA68D E1967F D68A75 C37B68 B26855 A06151 945645'.split()])
+
+
+def is_skin(a):
+    """기준 그림에서 뽑은 피부 팔레트와 가까운 색(거리 20 안)."""
+    d = np.abs(a[..., None, :3].astype(int) - SKIN_PAL[None, None]).sum(axis=3).min(axis=2)
+    return d < 20
+
+
 def strip_fx(im, src, i):
     """효과는 게임 코드가 그린다. 몸과 떨어진 작은 조각(40px 미만), 손목보다 앞의 불꽃·빛 픽셀,
     총 클립이면 앞 손목보다 6px 앞에서 총(검고 무채색)이 아닌 픽셀(연기·탄피·불꽃 찌꺼기)을 지운다."""
@@ -125,8 +135,9 @@ def strip_fx(im, src, i):
         p = pose(src, i)
         wx = max(p['RIGHT ARM'][0], p['LEFT ARM'][0]) + rig.DX
         r, g, b = [a[..., c].astype(int) for c in range(3)]
-        fx = ((r > 170) & (g > 90) & (b < 150) & (r - b > 60)) | ((r > 225) & (g > 225) & (b > 215))
         cols = np.arange(a.shape[1])[None, :]
+        skin = is_skin(a) & (cols <= wx + 12)   # 총을 쥔 손가락(피부색)은 손목 앞 12px까지 남김 — 지우면 총이 손에서 떠 보임. 그 앞 살색 = 연기
+        fx = (((r > 170) & (g > 90) & (b < 150) & (r - b > 60)) | ((r > 225) & (g > 225) & (b > 215))) & ~skin
         a[fx & (cols > wx + 3)] = 0
         if erig.CLIPS[src][2] == 'H' or src in ('mantle', 'vault', 'support'):   # 본부 클립 + 먼지·연기가 남는 클립: 손에 생성기가 그린 물건(공구·컵·부품)을 지움 — 머리 높이는 건드리지 않음
             mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
@@ -137,8 +148,14 @@ def strip_fx(im, src, i):
         if is_gun(src) and src not in LEGS and 'pipe' not in src:   # 쇠파이프는 회색이라 총 규칙에서 뺌
             mx = np.maximum(np.maximum(r, g), b); mn = np.minimum(np.minimum(r, g), b)
             gunpx = (mx < 110) & (mx - mn < 40)
-            a[(~gunpx) & (cols > wx + 6) & (a[..., 3] > 0)] = 0
+            a[(~gunpx) & (~skin) & (cols > wx + 6) & (a[..., 3] > 0)] = 0
         a = drop_small(a)
+        if is_gun(src):   # 총구 앞에 떨어져 남은 불꽃 테두리·연기 덩어리(몸과 이어지지 않고 손목보다 앞에만 있음)
+            lab, k = label(a[..., 3] > 0)
+            if k > 1:
+                sz = np.bincount(lab.ravel()); main = 1 + int(np.argmax(sz[1:]))
+                for j in range(1, k + 1):
+                    if j != main and np.nonzero((lab == j).any(axis=0))[0].min() > wx + 4: a[lab == j] = 0
         if erig.CLIPS[src][2] == 'H':   # 몸과 떨어진 덩어리 중 피부·머리색이 없는 것 = 물건
             lab, k = label(a[..., 3] > 0)
             if k > 1:

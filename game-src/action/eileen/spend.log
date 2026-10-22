@@ -378,3 +378,125 @@ job_id: 7558b66a-2ac9-471f-b944-5c650d2ba509
 description: short compact adult woman agent, faded cream platinum blonde 
 10-22 03:42:20 gen readwall done
 10-22 03:42:20 gen after generations_remaining: 15261.30
+10-22 03:59:04 gen before generations_remaining: 15035.30
+10-22 03:59:04 gen down 7f base=R -> id: d12f77ed-f345-432f-b3d5-a612024c093f
+job_id: d12f77ed-f345-432f-b3d5-a612024c093f
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 03:59:04 gen getup 7f base=R -> id: ad9af16d-f97c-4f1c-a75c-2410b208b0d9
+job_id: ad9af16d-f97c-4f1c-a75c-2410b208b0d9
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:01:03 gen down done
+10-22 04:01:05 gen getup done
+10-22 04:01:05 gen mantle 5f base=F -> id: bf32c251-4771-483f-a4f8-4f6d385d067b
+job_id: bf32c251-4771-483f-a4f8-4f6d385d067b
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:01:05 gen prone 5f base=F -> id: 3b38e339-0d55-4dc3-8404-d8330fd7054e
+job_id: 3b38e339-0d55-4dc3-8404-d8330fd7054e
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:02:51 gen prone done
+10-22 04:03:05 gen mantle done
+10-22 04:03:06 gen after generations_remaining: 14975.30
+10-22 04:03:21 keyframe Q seed61 -> id: d45fc517-be9f-464f-b89f-c9993158e7c0
+job_id: d45fc517-be9f-464f-b89f-c9993158e7c0
+model: pixen
+edit: Add a compact black carbine rifle slung diago
+10-22 04:03:21 keyframe Q seed62 -> id: 1ebaadbf-b10b-463d-b4b7-9bba626efcd0
+job_id: 1ebaadbf-b10b-463d-b4b7-9bba626efcd0
+model: pixen
+edit: Add a compact black carbine rifle slung diago
+10-22 04:04:45 keyframe B seed71 -> id: d2761010-2f1e-4ed5-a164-cf92c02ab1bc
+job_id: d2761010-2f1e-4ed5-a164-cf92c02ab1bc
+model: pixen
+edit: Change only the rifle and arms: she has spun 
+10-22 04:04:46 keyframe B seed72 -> id: 646378c9-ad45-4928-97e7-2407e1ff557a
+job_id: 646378c9-ad45-4928-97e7-2407e1ff557a
+model: pixen
+edit: Change only the rifle and arms: she has spun 
+10-22 04:05:28 gen before generations_remaining: 14948.30
+10-22 04:05:28 gen reload 6f base=R -> id: f80e7616-5f4e-400d-a7fd-761a6a5b8b5e
+job_id: f80e7616-5f4e-400d-a7fd-761a6a5b8b5e
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:05:29 gen block 4f base=R -> id: 4d4141de-939f-468b-a7f2-523ace499bbc
+job_id: 4d4141de-939f-468b-a7f2-523ace499bbc
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:06:48 gen block done
+10-22 04:06:48 gen grab 4f base=R -> id: 7176205d-15d7-4934-a0e9-bca3c8af12ce
+job_id: 7176205d-15d7-4934-a0e9-bca3c8af12ce
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:07:15 gen reload done
+10-22 04:07:16 gen grabshot 4f base=R -> id: c481b78f-2323-42a6-b8b5-2ae643a060f7
+job_id: c481b78f-2323-42a6-b8b5-2ae643a060f7
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:08:22 gen grabshot done
+10-22 04:08:23 gen pickup 6f base=F -> id: c1635de7-57f4-4ba5-9e17-e488931efed9
+job_id: c1635de7-57f4-4ba5-9e17-e488931efed9
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:10:24 gen pickup done
+10-22 04:10:24 gen toss 6f base=F -> id: 4a3ac97f-ee19-4712-abbb-408f8d83a754
+job_id: 4a3ac97f-ee19-4712-abbb-408f8d83a754
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:12:35 gen toss done
+10-22 04:19:10 gen grab done
+10-22 04:19:10 gen after generations_remaining: 14746.30
+10-22 04:19:24 gen before generations_remaining: 14739.30
+10-22 04:19:25 gen crawl 9f base=P -> id: 631dfadc-0b4d-4cc7-aedc-74d3b6e44206
+job_id: 631dfadc-0b4d-4cc7-aedc-74d3b6e44206
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:19:26 gen holster 5f base=Q -> id: eaf55e9f-9206-4003-992e-60588f70e21f
+job_id: eaf55e9f-9206-4003-992e-60588f70e21f
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:21:11 gen holster done
+10-22 04:21:12 gen pistolfire 4f base=Q -> id: 2a5bf37f-d326-4bc0-a9c2-3db599297228
+job_id: 2a5bf37f-d326-4bc0-a9c2-3db599297228
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:21:26 gen crawl done
+10-22 04:21:27 gen pistolreload 6f base=Q -> id: 1b8a73e8-3f05-432f-b91e-201eb4f3968a
+job_id: 1b8a73e8-3f05-432f-b91e-201eb4f3968a
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:23:26 gen pistolreload done
+10-22 04:24:30 gen pistolfire done
+10-22 04:24:31 gen after generations_remaining: 14651.30
+10-22 04:24:46 gen before generations_remaining: 14646.30
+10-22 04:24:47 gen buttstroke 7f base=R -> id: beceb9df-d05e-4221-94ae-1e66c10a185e
+job_id: beceb9df-d05e-4221-94ae-1e66c10a185e
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:24:51 gen stepup 6f base=F -> id: 56bc0f5e-8a91-44ab-b557-92507e890602
+job_id: 56bc0f5e-8a91-44ab-b557-92507e890602
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:26:36 gen buttstroke done
+10-22 04:26:37 gen carry1_run 8f base=H -> id: e46122aa-4310-4923-92b7-1fd1888476c7
+job_id: e46122aa-4310-4923-92b7-1fd1888476c7
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:27:17 gen stepup done
+10-22 04:27:18 gen door 7f base=R -> id: e4b31307-fd80-49aa-bef7-7ef97f64cf6c
+job_id: e4b31307-fd80-49aa-bef7-7ef97f64cf6c
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:28:24 gen carry1_run done
+10-22 04:28:25 gen doorclose 6f base=R -> id: 5eb469ee-085a-4bb2-8b0b-9f84489fb9c1
+job_id: 5eb469ee-085a-4bb2-8b0b-9f84489fb9c1
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:29:33 gen door done
+10-22 04:29:33 gen hurtidle 5f base=R -> id: 62382605-e3e1-46fb-b355-6c836c1c85d4
+job_id: 62382605-e3e1-46fb-b355-6c836c1c85d4
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:30:39 gen doorclose done
+10-22 04:30:39 gen limp 8f base=R -> id: 39faf892-2946-4d55-ba5c-749450040bf5
+job_id: 39faf892-2946-4d55-ba5c-749450040bf5
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:30:53 gen hurtidle done
+10-22 04:30:54 gen collapse 8f base=R -> id: 4837ebea-ab06-4298-812d-295be1196c20
+job_id: 4837ebea-ab06-4298-812d-295be1196c20
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:32:53 gen collapse done
+10-22 04:32:53 gen victory 8f base=R -> id: 3eafdf29-0706-421c-b309-066728e8e7d4
+job_id: 3eafdf29-0706-421c-b309-066728e8e7d4
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:33:34 gen limp done
+10-22 04:34:40 gen victory done
+10-22 04:34:40 gen after generations_remaining: 14505.30
+10-22 04:34:41 gen before generations_remaining: 14505.30
+10-22 04:34:41 gen block 4f base=R -> id: cbb856ff-f549-46bf-9f97-95f4c8fcafe8
+job_id: cbb856ff-f549-46bf-9f97-95f4c8fcafe8
+description: short compact adult woman agent, faded cream platinum blonde 
+10-22 04:37:05 gen block done
+10-22 04:37:05 gen after generations_remaining: 14458.30

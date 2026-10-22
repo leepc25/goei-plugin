@@ -1,0 +1,14 @@
+before generations_remaining: 14948.30
+sub reload
+sub block
+done block
+sub grab
+done reload
+sub grabshot
+done grabshot
+sub pickup
+done pickup
+sub toss
+done toss
+done grab
+after generations_remaining: 14746.30

@@ -50,7 +50,11 @@ def apply(key, fr, idx, get):
     fr = list(fr); idx = list(idx)
     if key == 'crawl': fr = floor_fix(fr, 136, whole=True)   # 무릎·발끝이 캔버스 아래로 잘림 → 8px 올림(잘린 줄은 결함 목록)
     elif key in ('slide', 'turn', 'sneak'): fr = floor_fix(fr)
-    if key == 'pistolfire':
+    if key == 'transition':
+        h = get('holster')
+        if h:   # 2차: 1~5장 녹음·소총 사라짐 → 권총 기준 그림에서 뽑은 '권총 집어넣기'를 거꾸로(= 뽑기). 0장(소총 낮춤)만 남김
+            fr = [fr[0]] + h[::-1]; idx = [idx[0]] + [('holster', i) for i in range(len(h))][::-1]
+    if key == 'pistolfire' and erig.CLIPS['pistolfire'][2] != 'Q':
         # 결함: 생성기가 권총 대신 소총을 들려 놓음 → 권총 전환 끝 장(권총 두 손 조준)으로 다시 짬, 반동은 손·총만 위로
         t = get('transition')
         if t:
@@ -58,12 +62,14 @@ def apply(key, fr, idx, get):
             x0 = int(xs.max()) - 26   # 앞팔 끝~권총
             fr = [base, shift_region(base, x0, -3, -1), shift_region(base, x0, -1), base]
             idx = [len(t) - 1] * 4; idx = [('transition', i) for i in idx]
-    if key == 'pistolreload':
+    if key == 'pistolreload' and erig.CLIPS['pistolreload'][2] != 'Q':
         t = get('transition')
         if t and len(fr) >= 6:
             for i in (0, 4, 5): fr[i] = t[-1]; idx[i] = ('transition', len(t) - 1)
     if key == 'read' and len(fr) > 6:
         fr[6] = erase_nondark(fr[6], 97, 95, 104, 112)   # 총구 아래로 늘어진 가는 선
+    if key == 'pipe' and len(fr) > 2:
+        fr[2], idx[2] = fr[1], idx[1]   # 2장 얼굴이 녹음 → 뒤로 든 장을 한 장 더 붙잡음(내려치기 직전 멈칫)
     if key in PIPE_DIR:
         for n, raw in enumerate(idx):
             p = erig.CLIPS[key][3][min(raw, len(erig.CLIPS[key][3]) - 1)]

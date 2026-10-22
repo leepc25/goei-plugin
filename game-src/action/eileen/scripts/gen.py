@@ -20,7 +20,7 @@ def ref(base,boot):
 def submit(n,boot=False,seed=11):
     act,prop,base,ps=erig.CLIPS[n]
     url,fkp=ref(base,boot)
-    d=DESC+(VEST if base in 'FR' else '')+(', '+prop if prop else '')+TAILD
+    d=DESC+(VEST if base in 'FRPQB' else '')+(', '+prop if prop else '')+TAILD
     args={'description':d,'action':act,'direction':'east','first_frame_url':url,'first_frame_keypoints':fkp,
           'keypoints':[rig.kp(p) for p in ps],'seed':seed}
     t=''

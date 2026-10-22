@@ -13,8 +13,9 @@
   .screen canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
   .bar { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 8px 0; }
   .bar label { white-space: nowrap; }
-  .keys { color: #b8b4a4; font-size: 13px; margin: 8px 0; }
-  .keys b { color: #e8e6e0; }
+  .keys { color: #b8b4a4; font-size: 13px; margin: 10px 0; display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; }
+  .keys dt { color: #e8e6e0; font-weight: bold; }
+  .keys dd { margin: 0; }
   .grp { grid-column: 1 / -1; margin: 18px 0 2px; font-size: 15px; }
   .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-top: 14px; }
   .clip { background: #1b2228; border-radius: 8px; padding: 8px; cursor: pointer; }
@@ -26,7 +27,10 @@
   .pad button { min-height: 44px; font-size: 12px; line-height: 1.25; word-break: keep-all; background: #2a333a; color: #e8e6e0; border: 1px solid #4a5560; border-radius: 8px; padding: 0 4px; user-select: none; -webkit-user-select: none; touch-action: none; }
   .pad button.on { background: #4a5a68; }
   .dpad { grid-template-columns: repeat(3, 48px); align-content: start; }
-  .acts { grid-template-columns: repeat(5, 1fr); flex: 1; }
+  .acts { grid-template-columns: repeat(4, 1fr); flex: 1; }
+  .extra { grid-template-columns: repeat(7, 1fr); flex-basis: 100%; display: none; }
+  .pad.more .extra { display: grid; }
+  .pad { flex-wrap: wrap; }
   .pad.show { display: flex; }
   h2 { font-size: 15px; margin: 18px 0 4px; }
   .miss { color: #ff9a8a; }
@@ -39,7 +43,9 @@
     .pad.show { position: fixed; left: 0; right: 0; bottom: 0; top: 0; pointer-events: none; display: block; z-index: 5; }
     .pad.show .g { position: absolute; pointer-events: auto; }
     .pad.show .dpad { left: 8px; bottom: 8px; grid-template-columns: repeat(3, 46px); gap: 4px; }
-    .pad.show .acts { right: 8px; bottom: 8px; grid-template-columns: repeat(5, 46px); gap: 4px; }
+    .pad.show .acts { right: 8px; bottom: 8px; grid-template-columns: repeat(4, 50px); gap: 4px; }
+    .pad.show .extra { right: 8px; top: 8px; grid-template-columns: repeat(7, 46px); gap: 4px; }
+    .pad.show:not(.more) .extra { display: none; }
     .pad.show button { min-height: 34px; font-size: 10px; background: rgba(42,51,58,.55); border-color: rgba(200,210,220,.35); }
     .pad.show button.on { background: rgba(120,150,170,.7); }
   }
@@ -59,21 +65,34 @@
     <div class="g dpad">
       <span></span><button data-k="ArrowUp">↑</button><span></span>
       <button data-k="ArrowLeft">←</button><button data-k="ArrowDown">↓</button><button data-k="ArrowRight">→</button>
-      <button data-k="ShiftLeft">Shift</button><button data-k="Space">점프</button><button data-k="KeyE">E 잡기</button>
+      <button data-k="ShiftLeft">달리기</button><button data-k="Space">점프</button><span></span>
     </div>
     <div class="g acts">
-      <button data-k="KeyA">A 사격</button><button data-k="KeyS">S 권총</button><button data-k="KeyD">D 판독</button><button data-k="KeyQ">Q 막기</button><button data-k="KeyW">W 필살</button>
-      <button data-k="KeyR">R 장전</button><button data-k="KeyF">F 제압</button><button data-k="KeyG">G 엄폐</button><button data-k="KeyC">C 지원</button><button data-k="KeyT">T 말</button>
-      <button data-k="Digit1">1 물</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button>
-      <button data-k="KeyV">V 피로</button><button data-k="KeyB">B 본부</button><button data-k="KeyL">L 약실</button><button data-k="KeyO">O 출동 준비</button><button data-k="KeyP">P 정리</button>
+      <button data-k="KeyA">A 사격</button><button data-k="KeyS">S 권총</button><button data-k="KeyD">D 판독</button><button data-k="KeyQ">Q 막기</button>
+      <button data-k="KeyW">W 필살</button><button data-k="KeyR">R 장전</button><button data-k="KeyE">E 잡기</button><button id="more" class="more">더보기</button>
+    </div>
+    <div class="g extra" id="extra">
+      <button data-k="KeyF">F 제압</button><button data-k="KeyG">G 엄폐</button><button data-k="KeyC">C 지원</button><button data-k="KeyT">T 말</button><button data-k="KeyH">H 맞기</button><button data-k="KeyK">K 다운</button><button data-k="KeyV">V 피로</button>
+      <button data-k="Digit1">1 물</button><button data-k="Digit2">2 간식</button><button data-k="Digit3">3 붕대</button><button data-k="KeyB">B 본부</button><button data-k="KeyL">L 약실</button><button data-k="KeyO">O 출동 준비</button><button data-k="KeyP">P 정리</button>
     </div>
   </div>
-  <div class="keys">
-    <b>이동</b> ←→ 좌우, ↑↓ 앞뒤 · 전투 중 걸음 = 전술 보행(총 고정, 걸으며 A 쏘면 걸음이 멈추지 않음) · <b>Shift</b> 누른 채 = 달리기, 짧게 = 이탈 백스텝(무조건 뒤로, 무적) · <b>Space</b> 점프(공중 A = 하향 사격) · <b>↓↓</b> 무릎 쏴(A = 무릎 쏴 페어, ↑ 일어서기)<br>
-    <b>A</b> 페어(2발) → 페어(2발) → 조준 1발 · 적이 바짝 붙어 있으면 <b>떼어내기</b>: 총구 찌르기 → 개머리판 → 밀어차기(넘어뜨리고 반 걸음 뒤로) · <b>A 길게</b> = 정밀 조준, 떼면 관통 1발 · 달리며 A = 슬라이딩 → 무릎 쏴(다음 첫 발 2배)<br>
-    <b>S</b> 권총 전환 / 다시 누르면 소총 · <b>R</b> 재장전(탄이 남았으면 전술, 0이면 빈 탄창 — 탄창마다 남은 수를 따로 기억) · <b>D</b> 판독: 화면 적 표식 8초 + 규칙 힌트(쿨다운 6초) · <b>Q</b> 유지 = 소총 막기 · <b>W</b> 「증명해.」 순차 저격(컷인)<br>
-    <b>E</b> 붙은 적 잡기 → A 접사, E 밀어차 넘어뜨리기 · <b>F</b> 숙련 3 제압 사격 · <b>G</b> 숙련 6 엄폐 사격 · <b>C</b> 지원 등장 · <b>1·2·3</b> 물·간식·붕대 · <b>T</b> 말 · <b>H</b> 약 피격 · <b>K</b> 다운(다시 K 또는 잠시 뒤 기상) · <b>V</b> 피로 · <b>B</b> 본부/현장 · <b>L</b> 약실 확인 · <b>O</b> 출동 준비 · <b>P</b> 임무 끝 정리
-  </div>
+  <dl class="keys">
+    <dt>이동</dt><dd>←→ 좌우, ↑↓ 앞뒤. 전투 중엔 전술 보행(걸으며 A를 쏴도 걸음이 안 멈춤)</dd>
+    <dt>Shift</dt><dd>누른 채 = 달리기, 짧게 = 이탈 백스텝(무조건 뒤로, 무적)</dd>
+    <dt>Space</dt><dd>점프. 공중에서 A = 아래로 쏘기</dd>
+    <dt>↓↓</dt><dd>무릎 쏴(A = 무릎 쏴 페어, ↑ 일어서기)</dd>
+    <dt>A</dt><dd>페어(2발) → 페어(2발) → 조준 1발. 길게 = 정밀 조준, 떼면 관통 1발. 달리며 A = 슬라이딩 → 무릎 쏴(다음 첫 발 2배)</dd>
+    <dt>A (붙은 적)</dt><dd>떼어내기: 총구 찌르기 → 개머리판 → 밀어차기(넘어뜨리고 반 걸음 뒤로)</dd>
+    <dt>S</dt><dd>권총 전환, 다시 누르면 소총</dd>
+    <dt>R</dt><dd>재장전. 탄이 남았으면 전술, 0이면 빈 탄창. 탄창마다 남은 수를 따로 기억</dd>
+    <dt>D</dt><dd>판독: 화면 적 표식 8초 + 규칙 힌트(쿨다운 6초)</dd>
+    <dt>Q</dt><dd>누르는 동안 소총 막기</dd>
+    <dt>W</dt><dd>「증명해.」 순차 저격(컷인)</dd>
+    <dt>E</dt><dd>붙은 적 잡기 → A 접사, E 밀어차 넘어뜨리기</dd>
+    <dt>F · G · C</dt><dd>제압 사격(숙련 3) · 엄폐 사격(숙련 6) · 지원 등장</dd>
+    <dt>1 · 2 · 3</dt><dd>물 · 간식 · 붕대</dd>
+    <dt>그 밖</dt><dd>T 말 · H 약 피격 · K 다운(다시 K 또는 잠시 뒤 기상) · V 피로 · B 본부/현장 · L 약실 확인 · O 출동 준비 · P 임무 끝 정리</dd>
+  </dl>
   <h2>동작 목록 (누르면 화면에서 재생)</h2>
   <div id="missing" class="miss"></div>
   <div class="list" id="list"></div>
@@ -277,7 +296,8 @@ function standUp() { G.lying = false; play('getup', { lock: true, then: () => { 
 const GAME_KEY = c => c.startsWith('Arrow') || c === 'Space' || c.startsWith('Shift') || c.startsWith('Key') || c.startsWith('Digit');
 addEventListener('keydown', e => { if (!GAME_KEY(e.code)) return; e.preventDefault(); if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur(); if (e.repeat) return; onKey(e.code, true); }, { passive: false });
 addEventListener('keyup', e => onKey(e.code, false));
-for (const b of document.querySelectorAll('#pad button')) {
+$('more').onclick = () => $('pad').classList.toggle('more');
+for (const b of document.querySelectorAll('#pad button[data-k]')) {
   const k = b.dataset.k;
   b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('on'); onKey(k, true); });
   const up = () => { b.classList.remove('on'); onKey(k, false); };
@@ -488,6 +508,8 @@ function drawEileen() {
   if (G.aiming) { const m = muzzlePt(); const wob = Math.max(0, 1 - G.steady / 0.8) * 8 * Math.sin(performance.now() / 70); ctx.strokeStyle = 'rgba(159,196,220,.6)'; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(G.dir > 0 ? 1280 : 0, m.y + wob); ctx.stroke(); ctx.setLineDash([]); }
 }
 function hud() {
+  ctx.fillStyle = 'rgba(8,12,16,.62)'; ctx.beginPath(); ctx.roundRect(12, 10, 340, 142, 10); ctx.fill();   // 천장 조명 위에서도 읽히게
+  ctx.fillStyle = 'rgba(8,12,16,.5)'; ctx.beginPath(); ctx.roundRect(1000, 10, 268, 30, 8); ctx.fill();
   ctx.textAlign = 'left'; ctx.font = 'bold 22px system-ui'; ctx.fillStyle = '#e8e6e0'; ctx.fillText('에일린', 24, 36);
   ctx.fillStyle = '#222'; ctx.fillRect(24, 46, 220, 10); ctx.fillStyle = '#7fc27a'; ctx.fillRect(24, 46, 220 * G.hp / 100, 10);
   ctx.fillStyle = '#222'; ctx.fillRect(24, 60, 220, 6); ctx.fillStyle = G.gauge >= 100 ? '#9fc4dc' : '#5b7688'; ctx.fillRect(24, 60, 220 * G.gauge / 100, 6);
