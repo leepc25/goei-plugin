@@ -1,0 +1,440 @@
+{
+  "male_request": {
+    "width": 128,
+    "height": 256,
+    "no_background": true,
+    "seed": 10222026,
+    "max_colors": 48,
+    "description": "One single full-body adult Korean male player persona for a grounded modern supernatural investigation headquarters game. NEW original character. Short neat black hair, black two-piece trouser business suit, white collared shirt, plain black leather formal shoes. No tie, no weapon, no equipment. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, eye-level side-scrolling camera, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Crisp native pixel art with consistent small 1px clusters, selective dark outlines, controlled detailed pixel shading, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Match the supplied headquarters reference ONLY for muted nocturnal palette and warm/cool lighting balance; do not draw any room, furniture or wall art. Transparent background, no floor, no cast shadow, no text, only one static person.",
+    "style_image": {
+      "url": "upload:549612df-e2ba-4b67-858a-6e694aa12359",
+      "usage_description": "Headquarters environment colour and illumination reference only. Dark teal ambient shadows, subdued warm amber overhead lighting. Create a new person; do not copy any objects or composition."
+    },
+    "style_options": {
+      "color_palette": true,
+      "shading": true,
+      "detail": false,
+      "outline": false
+    }
+  },
+  "male_receipt": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"background_job_id\": \"223ae844-ba7a-46ea-803a-f886d0b8f98d\",\n  \"image_id\": \"bc8619b0-2610-53be-9470-6de218dc6b17\",\n  \"status\": \"processing\",\n  \"source_image_id\": \"bc8619b0-2610-53be-9470-6de218dc6b17\",\n  \"job_id\": \"223ae844-ba7a-46ea-803a-f886d0b8f98d\",\n  \"description\": \"One single full-body adult Korean male player persona for a grounded modern supernatural investigation headquarters game. NEW original character. Short neat black hair, black two-piece trouser business suit, white collared shirt, plain black leather formal shoes. No tie, no weapon, no equipment. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, eye-level side-scrolling camera, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Crisp native pixel art with consistent small 1px clusters, selective dark outlines, controlled detailed pixel shading, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Match the supplied headquarters reference ONLY for muted nocturnal palette and warm/cool lighting balance; do not draw any room, furniture or wall art. Transparent background, no floor, no cast shadow, no text, only one static person.\",\n  \"seed\": 10222026,\n  \"image_size\": {\n    \"width\": 128,\n    \"height\": 256\n  },\n  \"output_count\": 1,\n  \"estimated_generations\": 9,\n  \"pricing_provisional\": true,\n  \"poll_tool\": \"get_image\",\n  \"download_path\": \"/mcp/images/223ae844-ba7a-46ea-803a-f886d0b8f98d/download\"\n}\nPoll get_image(job_id=\"223ae844-ba7a-46ea-803a-f886d0b8f98d\"). The source_image_id is usable after completion; it is an image ID, not a character/object ID. Actual usage is reported on completion. cancel_job(job_id=...) cancels unfinished work."
+      }
+    ],
+    "structuredContent": {
+      "background_job_id": "223ae844-ba7a-46ea-803a-f886d0b8f98d",
+      "image_id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+      "status": "processing",
+      "source_image_id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+      "job_id": "223ae844-ba7a-46ea-803a-f886d0b8f98d",
+      "description": "One single full-body adult Korean male player persona for a grounded modern supernatural investigation headquarters game. NEW original character. Short neat black hair, black two-piece trouser business suit, white collared shirt, plain black leather formal shoes. No tie, no weapon, no equipment. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, eye-level side-scrolling camera, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Crisp native pixel art with consistent small 1px clusters, selective dark outlines, controlled detailed pixel shading, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Match the supplied headquarters reference ONLY for muted nocturnal palette and warm/cool lighting balance; do not draw any room, furniture or wall art. Transparent background, no floor, no cast shadow, no text, only one static person.",
+      "seed": 10222026,
+      "image_size": {
+        "width": 128,
+        "height": 256
+      },
+      "output_count": 1,
+      "estimated_generations": 9,
+      "pricing_provisional": true,
+      "poll_tool": "get_image",
+      "download_path": "/mcp/images/223ae844-ba7a-46ea-803a-f886d0b8f98d/download"
+    },
+    "isError": false
+  },
+  "male_result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "status: completed\nid: 223ae844-ba7a-46ea-803a-f886d0b8f98d\njob_id: 223ae844-ba7a-46ea-803a-f886d0b8f98d\nframes: 1\ntransparent: yes\nasset_id: bc8619b0-2610-53be-9470-6de218dc6b17\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 9 generations\ndownload: https://api.pixellab.ai/mcp/images/223ae844-ba7a-46ea-803a-f886d0b8f98d/download"
+      }
+    ],
+    "structuredContent": {
+      "job_id": "223ae844-ba7a-46ea-803a-f886d0b8f98d",
+      "status": "completed",
+      "frames": 1,
+      "download_url": "https://api.pixellab.ai/mcp/images/223ae844-ba7a-46ea-803a-f886d0b8f98d/download",
+      "download_urls": [
+        "https://api.pixellab.ai/mcp/images/223ae844-ba7a-46ea-803a-f886d0b8f98d/download"
+      ],
+      "asset": {
+        "id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+        "type": "image",
+        "status": "saved"
+      },
+      "charged_generations": 9
+    },
+    "isError": false
+  },
+  "female_request": {
+    "width": 128,
+    "height": 256,
+    "no_background": true,
+    "seed": 10222027,
+    "max_colors": 48,
+    "description": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Neat black chin-length bob haircut, black tailored blazer and knee-length black business skirt suit, white collared shirt, plain black closed-toe formal shoes with low practical heels. No tie, no weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+    "style_image": {
+      "source_image_id": "bc8619b0-2610-53be-9470-6de218dc6b17",
+      "usage_description": "Use this newly created male persona only as the paired character's art-style reference: identical pixel density, rendering detail, adult body proportions, right-facing three-quarter side-scroller view, charcoal black cloth palette, muted skin and warm overhead-left lighting. Make a distinct woman with bob hair and skirt suit; do not retain the male subject."
+    },
+    "style_options": {
+      "color_palette": true,
+      "shading": true,
+      "detail": true,
+      "outline": true
+    }
+  },
+  "female_receipt": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"background_job_id\": \"b4e09af1-0a9c-4a95-b383-98bcc32b76ec\",\n  \"image_id\": \"4db87d5a-70bb-5169-a83d-36222e6bb9ae\",\n  \"status\": \"processing\",\n  \"source_image_id\": \"4db87d5a-70bb-5169-a83d-36222e6bb9ae\",\n  \"job_id\": \"b4e09af1-0a9c-4a95-b383-98bcc32b76ec\",\n  \"description\": \"One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Neat black chin-length bob haircut, black tailored blazer and knee-length black business skirt suit, white collared shirt, plain black closed-toe formal shoes with low practical heels. No tie, no weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.\",\n  \"seed\": 10222027,\n  \"image_size\": {\n    \"width\": 128,\n    \"height\": 256\n  },\n  \"output_count\": 1,\n  \"estimated_generations\": 9,\n  \"pricing_provisional\": true,\n  \"poll_tool\": \"get_image\",\n  \"download_path\": \"/mcp/images/b4e09af1-0a9c-4a95-b383-98bcc32b76ec/download\"\n}\nPoll get_image(job_id=\"b4e09af1-0a9c-4a95-b383-98bcc32b76ec\"). The source_image_id is usable after completion; it is an image ID, not a character/object ID. Actual usage is reported on completion. cancel_job(job_id=...) cancels unfinished work."
+      }
+    ],
+    "structuredContent": {
+      "background_job_id": "b4e09af1-0a9c-4a95-b383-98bcc32b76ec",
+      "image_id": "4db87d5a-70bb-5169-a83d-36222e6bb9ae",
+      "status": "processing",
+      "source_image_id": "4db87d5a-70bb-5169-a83d-36222e6bb9ae",
+      "job_id": "b4e09af1-0a9c-4a95-b383-98bcc32b76ec",
+      "description": "One single full-body adult Korean female player persona for the SAME grounded modern supernatural investigation headquarters game as the style reference. NEW original woman, not a recolor. Neat black chin-length bob haircut, black tailored blazer and knee-length black business skirt suit, white collared shirt, plain black closed-toe formal shoes with low practical heels. No tie, no weapon, no equipment, no handbag. Natural relaxed standing idle pose: both feet resting on the ground, arms hanging loosely beside her body, both bare hands clearly visible OUTSIDE all pockets, fingers relaxed. Body and face turned three-quarter toward screen RIGHT, EXACTLY the same direction and eye-level side-scrolling camera as the male style reference, NOT top-down. Realistic adult proportions about 7 heads tall, normal-sized head, not chibi. Full head and shoes entirely visible. Figure fills almost the full vertical canvas, target 244px tall on a 128x256 canvas, only 6px top and bottom safety margin, centered. Match the reference man's precise native pixel density, selective dark outlines, controlled pixel shading, realistic proportions, contrast and lighting. Crisp native 1px clusters, no antialiasing. Black cloth uses charcoal and muted blue-gray shadows with subtle warm amber highlights from an overhead-left interior lamp; subdued natural skin; off-white shirt still clearly reads white. Transparent background, no floor, no cast shadow, no text, only one static woman.",
+      "seed": 10222027,
+      "image_size": {
+        "width": 128,
+        "height": 256
+      },
+      "output_count": 1,
+      "estimated_generations": 9,
+      "pricing_provisional": true,
+      "poll_tool": "get_image",
+      "download_path": "/mcp/images/b4e09af1-0a9c-4a95-b383-98bcc32b76ec/download"
+    },
+    "isError": false
+  },
+  "capabilities": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"name\": \"Pro Flash\",\n  \"revision\": \"pro-flash-presets-48-128-2026-09-29\",\n  \"grid_recovery\": \"Creation recovers the pixel grid the model drew with Unzoom. An exact grid is kept; drift of at most one pixel is recovered on the expected grid. Images with a background must fill the canvas, so any other size is redrawn with image-to-pixel-art on the generated box only. Sprites without a background keep their own pixels, centred on the canvas, while the drawn pixel is close to the requested one; coarser or oversized sprites are redrawn. Experimental 16x16 creation always uses image-to-pixel-art. Editing and inpainting start at 32x32 and never use image-to-pixel-art conversion.\",\n  \"operations\": {\n    \"create\": {\n      \"sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        },\n        {\n          \"width\": 24,\n          \"height\": 24\n        },\n        {\n          \"width\": 32,\n          \"height\": 32\n        },\n        {\n          \"width\": 32,\n          \"height\": 48\n        },\n        {\n          \"width\": 48,\n          \"height\": 48\n        },\n        {\n          \"width\": 64,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 96\n        },\n        {\n          \"width\": 128,\n          \"height\": 128\n        }\n      ],\n      \"experimental_sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        }\n      ],\n      \"custom_sizes\": {\n        \"enabled\": true,\n        \"min_width\": 16,\n        \"min_height\": 16,\n        \"max_width\": 256,\n        \"max_height\": 256,\n        \"step\": 4,\n        \"beta\": true\n      },\n      \"max_reference_images\": 0,\n      \"supports_no_background\": true,\n      \"supports_style_options\": true,\n      \"output_count\": 1\n    },\n    \"edit\": {\n      \"sizes\": [\n        {\n          \"width\": 32,\n          \"height\": 32\n        },\n        {\n          \"width\": 32,\n          \"height\": 48\n        },\n        {\n          \"width\": 64,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 96\n        },\n        {\n          \"width\": 128,\n          \"height\": 128\n        }\n      ],\n      \"experimental_sizes\": [],\n      \"custom_sizes\": {\n        \"enabled\": true,\n        \"min_width\": 32,\n        \"min_height\": 32,\n        \"max_width\": 256,\n        \"max_height\": 256,\n        \"step\": 4,\n        \"beta\": true\n      },\n      \"max_reference_images\": 1,\n      \"supports_no_background\": true,\n      \"supports_style_options\": false,\n      \"output_count\": 1,\n      \"edit_methods\": [\n        \"text\",\n        \"reference\"\n      ],\n      \"canvas_growth\": false,\n      \"reference_image_fit\": \"native dimensions must fit the edit canvas\"\n    },\n    \"inpaint\": {\n      \"sizes\": [\n        {\n          \"width\": 32,\n          \"height\": 32\n        },\n        {\n          \"width\": 32,\n          \"height\": 48\n        },\n        {\n          \"width\": 64,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 96\n        },\n        {\n          \"width\": 128,\n          \"height\": 128\n        }\n      ],\n      \"experimental_sizes\": [],\n      \"custom_sizes\": {\n        \"enabled\": true,\n        \"min_width\": 32,\n        \"min_height\": 32,\n        \"max_width\": 256,\n        \"max_height\": 256,\n        \"step\": 4,\n        \"beta\": true\n      },\n      \"max_reference_images\": 1,\n      \"supports_no_background\": true,\n      \"supports_style_options\": false,\n      \"output_count\": 1,\n      \"canvas_growth\": false,\n      \"crop_to_mask_values\": [\n        true\n      ],\n      \"output_methods\": [\n        \"New layer with changes\",\n        \"Modify current layer, only changes\",\n        \"Modify current layer\"\n      ],\n      \"mask\": {\n        \"white_rgb\": \"generate\",\n        \"black_rgb\": \"preserve\",\n        \"alpha\": \"ignored\",\n        \"binary_rgb_required\": true\n      },\n      \"context\": {\n        \"bounding_box_required\": true,\n        \"max_width_multiple\": 3,\n        \"max_height_multiple\": 3,\n        \"native_pixels\": true\n      }\n    },\n    \"character\": {\n      \"sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        },\n        {\n          \"width\": 24,\n          \"height\": 24\n        },\n        {\n          \"width\": 32,\n          \"height\": 32\n        },\n        {\n          \"width\": 32,\n          \"height\": 48\n        },\n        {\n          \"width\": 48,\n          \"height\": 48\n        },\n        {\n          \"width\": 64,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 96\n        },\n        {\n          \"width\": 128,\n          \"height\": 128\n        }\n      ],\n      \"experimental_sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        }\n      ],\n      \"custom_sizes\": {\n        \"enabled\": true,\n        \"min_width\": 16,\n        \"min_height\": 16,\n        \"max_width\": 256,\n        \"max_height\": 256,\n        \"step\": 4,\n        \"beta\": true\n      },\n      \"max_reference_images\": 0,\n      \"supports_no_background\": true,\n      \"supports_style_options\": true,\n      \"output_count\": 8,\n      \"n_directions\": [\n        8\n      ],\n      \"includes_first_direction\": true,\n      \"supports_existing_source\": true,\n      \"rotation_canvas\": \"Native source padded to a square, minimum 32 pixels, aligned to four pixels.\"\n    },\n    \"object\": {\n      \"sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        },\n        {\n          \"width\": 24,\n          \"height\": 24\n        },\n        {\n          \"width\": 32,\n          \"height\": 32\n        },\n        {\n          \"width\": 32,\n          \"height\": 48\n        },\n        {\n          \"width\": 48,\n          \"height\": 48\n        },\n        {\n          \"width\": 64,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 64\n        },\n        {\n          \"width\": 96,\n          \"height\": 96\n        },\n        {\n          \"width\": 128,\n          \"height\": 128\n        }\n      ],\n      \"experimental_sizes\": [\n        {\n          \"width\": 16,\n          \"height\": 16\n        }\n      ],\n      \"custom_sizes\": {\n        \"enabled\": true,\n        \"min_width\": 16,\n        \"min_height\": 16,\n        \"max_width\": 256,\n        \"max_height\": 256,\n        \"step\": 4,\n        \"beta\": true\n      },\n      \"max_reference_images\": 0,\n      \"supports_no_background\": true,\n      \"supports_style_options\": true,\n      \"output_count\": \"n_directions\",\n      \"n_directions\": [\n        1,\n        8\n      ],\n      \"includes_first_direction\": true,\n      \"supports_existing_source\": true,\n      \"rotation_canvas\": \"Eight views use the square V3 canvas; one direction keeps the native size.\"\n    }\n  },\n  \"style_reference_fit\": \"native dimensions must fit the target canvas; smaller references are centered without resizing\",\n  \"cost\": {\n    \"image\": 9,\n    \"rotations\": 0,\n    \"total\": 9,\n    \"provisional\": true\n  }\n}"
+      }
+    ],
+    "structuredContent": {
+      "name": "Pro Flash",
+      "revision": "pro-flash-presets-48-128-2026-09-29",
+      "grid_recovery": "Creation recovers the pixel grid the model drew with Unzoom. An exact grid is kept; drift of at most one pixel is recovered on the expected grid. Images with a background must fill the canvas, so any other size is redrawn with image-to-pixel-art on the generated box only. Sprites without a background keep their own pixels, centred on the canvas, while the drawn pixel is close to the requested one; coarser or oversized sprites are redrawn. Experimental 16x16 creation always uses image-to-pixel-art. Editing and inpainting start at 32x32 and never use image-to-pixel-art conversion.",
+      "operations": {
+        "create": {
+          "sizes": [
+            {
+              "width": 16,
+              "height": 16
+            },
+            {
+              "width": 24,
+              "height": 24
+            },
+            {
+              "width": 32,
+              "height": 32
+            },
+            {
+              "width": 32,
+              "height": 48
+            },
+            {
+              "width": 48,
+              "height": 48
+            },
+            {
+              "width": 64,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 96
+            },
+            {
+              "width": 128,
+              "height": 128
+            }
+          ],
+          "experimental_sizes": [
+            {
+              "width": 16,
+              "height": 16
+            }
+          ],
+          "custom_sizes": {
+            "enabled": true,
+            "min_width": 16,
+            "min_height": 16,
+            "max_width": 256,
+            "max_height": 256,
+            "step": 4,
+            "beta": true
+          },
+          "max_reference_images": 0,
+          "supports_no_background": true,
+          "supports_style_options": true,
+          "output_count": 1
+        },
+        "edit": {
+          "sizes": [
+            {
+              "width": 32,
+              "height": 32
+            },
+            {
+              "width": 32,
+              "height": 48
+            },
+            {
+              "width": 64,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 96
+            },
+            {
+              "width": 128,
+              "height": 128
+            }
+          ],
+          "experimental_sizes": [],
+          "custom_sizes": {
+            "enabled": true,
+            "min_width": 32,
+            "min_height": 32,
+            "max_width": 256,
+            "max_height": 256,
+            "step": 4,
+            "beta": true
+          },
+          "max_reference_images": 1,
+          "supports_no_background": true,
+          "supports_style_options": false,
+          "output_count": 1,
+          "edit_methods": [
+            "text",
+            "reference"
+          ],
+          "canvas_growth": false,
+          "reference_image_fit": "native dimensions must fit the edit canvas"
+        },
+        "inpaint": {
+          "sizes": [
+            {
+              "width": 32,
+              "height": 32
+            },
+            {
+              "width": 32,
+              "height": 48
+            },
+            {
+              "width": 64,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 96
+            },
+            {
+              "width": 128,
+              "height": 128
+            }
+          ],
+          "experimental_sizes": [],
+          "custom_sizes": {
+            "enabled": true,
+            "min_width": 32,
+            "min_height": 32,
+            "max_width": 256,
+            "max_height": 256,
+            "step": 4,
+            "beta": true
+          },
+          "max_reference_images": 1,
+          "supports_no_background": true,
+          "supports_style_options": false,
+          "output_count": 1,
+          "canvas_growth": false,
+          "crop_to_mask_values": [
+            true
+          ],
+          "output_methods": [
+            "New layer with changes",
+            "Modify current layer, only changes",
+            "Modify current layer"
+          ],
+          "mask": {
+            "white_rgb": "generate",
+            "black_rgb": "preserve",
+            "alpha": "ignored",
+            "binary_rgb_required": true
+          },
+          "context": {
+            "bounding_box_required": true,
+            "max_width_multiple": 3,
+            "max_height_multiple": 3,
+            "native_pixels": true
+          }
+        },
+        "character": {
+          "sizes": [
+            {
+              "width": 16,
+              "height": 16
+            },
+            {
+              "width": 24,
+              "height": 24
+            },
+            {
+              "width": 32,
+              "height": 32
+            },
+            {
+              "width": 32,
+              "height": 48
+            },
+            {
+              "width": 48,
+              "height": 48
+            },
+            {
+              "width": 64,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 96
+            },
+            {
+              "width": 128,
+              "height": 128
+            }
+          ],
+          "experimental_sizes": [
+            {
+              "width": 16,
+              "height": 16
+            }
+          ],
+          "custom_sizes": {
+            "enabled": true,
+            "min_width": 16,
+            "min_height": 16,
+            "max_width": 256,
+            "max_height": 256,
+            "step": 4,
+            "beta": true
+          },
+          "max_reference_images": 0,
+          "supports_no_background": true,
+          "supports_style_options": true,
+          "output_count": 8,
+          "n_directions": [
+            8
+          ],
+          "includes_first_direction": true,
+          "supports_existing_source": true,
+          "rotation_canvas": "Native source padded to a square, minimum 32 pixels, aligned to four pixels."
+        },
+        "object": {
+          "sizes": [
+            {
+              "width": 16,
+              "height": 16
+            },
+            {
+              "width": 24,
+              "height": 24
+            },
+            {
+              "width": 32,
+              "height": 32
+            },
+            {
+              "width": 32,
+              "height": 48
+            },
+            {
+              "width": 48,
+              "height": 48
+            },
+            {
+              "width": 64,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 64
+            },
+            {
+              "width": 96,
+              "height": 96
+            },
+            {
+              "width": 128,
+              "height": 128
+            }
+          ],
+          "experimental_sizes": [
+            {
+              "width": 16,
+              "height": 16
+            }
+          ],
+          "custom_sizes": {
+            "enabled": true,
+            "min_width": 16,
+            "min_height": 16,
+            "max_width": 256,
+            "max_height": 256,
+            "step": 4,
+            "beta": true
+          },
+          "max_reference_images": 0,
+          "supports_no_background": true,
+          "supports_style_options": true,
+          "output_count": "n_directions",
+          "n_directions": [
+            1,
+            8
+          ],
+          "includes_first_direction": true,
+          "supports_existing_source": true,
+          "rotation_canvas": "Eight views use the square V3 canvas; one direction keeps the native size."
+        }
+      },
+      "style_reference_fit": "native dimensions must fit the target canvas; smaller references are centered without resizing",
+      "cost": {
+        "image": 9,
+        "rotations": 0,
+        "total": 9,
+        "provisional": true
+      }
+    },
+    "isError": false
+  }
+}

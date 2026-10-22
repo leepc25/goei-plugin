@@ -1,0 +1,32 @@
+{
+  "female_result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "status: completed\nid: b4e09af1-0a9c-4a95-b383-98bcc32b76ec\njob_id: b4e09af1-0a9c-4a95-b383-98bcc32b76ec\nframes: 1\ntransparent: yes\nasset_id: 4db87d5a-70bb-5169-a83d-36222e6bb9ae\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 9 generations\ndownload: https://api.pixellab.ai/mcp/images/b4e09af1-0a9c-4a95-b383-98bcc32b76ec/download"
+      }
+    ],
+    "structuredContent": {
+      "job_id": "b4e09af1-0a9c-4a95-b383-98bcc32b76ec",
+      "status": "completed",
+      "frames": 1,
+      "download_url": "https://api.pixellab.ai/mcp/images/b4e09af1-0a9c-4a95-b383-98bcc32b76ec/download",
+      "download_urls": [
+        "https://api.pixellab.ai/mcp/images/b4e09af1-0a9c-4a95-b383-98bcc32b76ec/download"
+      ],
+      "asset": {
+        "id": "4db87d5a-70bb-5169-a83d-36222e6bb9ae",
+        "type": "image",
+        "status": "saved"
+      },
+      "charged_generations": 9
+    },
+    "isError": false
+  },
+  "actual_generations_total": 18,
+  "approved_image_count": 2,
+  "actual_output_count": 2,
+  "animations_generated": 0,
+  "rotations_generated": 0,
+  "regenerations": 0
+}
