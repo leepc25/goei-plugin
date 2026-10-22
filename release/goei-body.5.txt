@@ -1,4 +1,5 @@
-k-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
+="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
+    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
     const cand = markCandidates(recent, current3);
     const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
         <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
@@ -432,7 +433,7 @@ k-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지�
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.40" : "0";
+  var PLUGIN_VERSION = true ? "0.16.41" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -497,7 +498,7 @@ k-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지�
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.40" : "";
+  var VERSION = true ? "0.16.41" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -3837,12 +3838,4 @@ ${note.trim()}` : card2;
     field2.place = placeKey(ev, x.catalog);
     field2.filter = "all";
     field2.confirmEnd = null;
-    return true;
-  }
-  async function handleField(action, value, ctx2, env2, opening) {
-    const v = value ?? "";
-    switch (action) {
-      case "map-region":
-        field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
-        field2.place = null;
-        field2.confirmE
+    re

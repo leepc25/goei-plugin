@@ -4214,10 +4214,16 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     modBusy ??= (async () => {
       let rows2 = [];
       try {
+        const idx = await risuai.getCurrentCharacterIndex();
+        const char = Number.isInteger(idx) && idx >= 0 ? await risuai.getCharacterFromIndex(idx) : null;
+        rows2 = (char?.additionalAssets ?? []).filter(isRow);
+      } catch {
+      }
+      try {
         const db = await risuai.getDatabase(["modules", "enabledModules"]);
         const on2 = new Set(db?.enabledModules ?? []);
         const mods = [...db?.modules ?? []].sort((a, b) => Number(on2.has(b.id)) - Number(on2.has(a.id)));
-        rows2 = mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []);
+        rows2 = rows2.concat(mods.flatMap((m) => Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
       } catch {
       }
       const changed = JSON.stringify(rows2) !== JSON.stringify(modRows);
@@ -4258,7 +4264,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   var DEFAULT_CROP = "50,16,44";
   var AGENT_CROPS = {
     "Aestheticism": "53,18,40",
-    "Aileen": "48,17,44",
+    "Aileen": "43,21,46",
     "Baek Sa-heon": "50,18,44",
     "Cha Yeo-jin": "54,18,44",
     "Cho Seong-choon": "48,18,44",
@@ -4485,5 +4491,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   function defaultsConfirm(pane) {
     if (defaultsAsk.pane !== pane || !defaultsAsk.what) return "";
     const save2 = defaultsAsk.what === "save";
-    const text = save2 ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
-    return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button c
+    const text =

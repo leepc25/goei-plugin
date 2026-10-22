@@ -1664,11 +1664,17 @@ if (fixture.globalLore.some(packed)) {
   const body = await page.evaluate(() => window.__chat.message.at(-1).data);
   assert.equal(body, '쟈알디가 웃었다.\n\n<img=Jyaldi_smile>\n\n쟈알디는 문을 열었다.\n[▣|2025.01.01|03:00 AM|☀️|4°C|관리국 본부|없음]', '캐릭터당 1장, 상태창은 그대로');
   // 이미지 자료가 없으면 본문은 그대로 두고 설정 탭에 이유를 남긴다
-  await page.evaluate(() => { window.__moduleLore = []; });
+  // (카드에도 Image tag가 들었으니 시험 동안 카드 것도 뺀다)
+  const cardImageBook = await page.evaluate(() => {
+    window.__moduleLore = [];
+    const i = window.__char.globalLore.findIndex((e) => e.comment === 'Image tag');
+    return i < 0 ? null : window.__char.globalLore.splice(i, 1)[0];
+  });
   await fire('쟈알디가 다시 웃었다.');
   assert.equal(await page.evaluate(() => window.__chat.message.at(-1).data), '쟈알디가 다시 웃었다.');
   assert.match(await page.evaluate(() => window.__chat.scriptstate.$goei_asset_note), /Image tag/);
   assert.equal(await page.evaluate(() => window.__calls.llm.length), n0 + 1, '자료가 없으면 모델을 부르지 않음');
+  if (cardImageBook) await page.evaluate((b) => window.__char.globalLore.push(b), cardImageBook);
   // 메인모델로 돌리면 보충하지 않는다
   await page.click('[data-action="set-asset-model"][data-value="main"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_asset_model === 'main');
