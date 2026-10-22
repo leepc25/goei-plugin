@@ -1,0 +1,25 @@
+{
+  "job_id": "7282832d-aa8a-4969-b050-096a6a4832ed",
+  "internal_review": "accepted_for_independent_demo",
+  "user_visual_approval": false,
+  "non_looping": true,
+  "frame_checks": [
+    {"index": 0, "phase": "raised fist matches body summon endpoint", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 1, "phase": "intentional held pose, same as 0", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 2, "phase": "intentional held pose, same as 0", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 3, "phase": "near elbow begins bending", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 4, "phase": "fist passes head height", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 5, "phase": "fist approaches chest guard", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 6, "phase": "guard settles", "helmet_armor_hands": "preserved", "sole_y": 187},
+    {"index": 7, "phase": "guard holds before existing idle", "helmet_armor_hands": "preserved", "sole_y": 187}
+  ],
+  "face": "Closed helmet intentionally hides face in every armor frame; body endpoint bald head and beard unchanged.",
+  "size_and_anchor": "Body and armor maintain different designed sizes; scale 1.09 is the skeleton mapping, not a resampling of original sprite pixels. Shared renderer anchor positions use body x86/sole169 and armor x100/sole187.",
+  "grounding": "Both planted feet inspected visually in contact.png. Alpha bbox bottom alone is not the contact test.",
+  "end_boundary": "New07 to existing a_idle00 has small pixel differences but no observed arm/foot pose jump; end-seam.png preserved. Not pixel-identical.",
+  "remaining": ["chop1 frame1 back-facing head", "cleave frame4 shirt flash", "walk stride contact and cycle boundary review"],
+  "generation_failures_this_run": [],
+  "paid_submissions": 1,
+  "actual_cost": 3,
+  "cost_unit": "generations"
+}

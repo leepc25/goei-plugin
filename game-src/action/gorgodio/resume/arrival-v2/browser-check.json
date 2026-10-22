@@ -1,0 +1,53 @@
+[
+  {
+    "name": "pc",
+    "width": 1280,
+    "height": 900,
+    "job": "7282832d-aa8a-4969-b050-096a6a4832ed",
+    "count": 8,
+    "stripWidth": 2048,
+    "overflow": false,
+    "errors": [],
+    "result": "pass",
+    "tested": [
+      "new eight-frame strip",
+      "D body to armor transition",
+      "movement",
+      "armor attack"
+    ]
+  },
+  {
+    "name": "phone",
+    "width": 390,
+    "height": 844,
+    "job": "7282832d-aa8a-4969-b050-096a6a4832ed",
+    "count": 8,
+    "stripWidth": 2048,
+    "overflow": false,
+    "errors": [],
+    "result": "pass",
+    "tested": [
+      "new eight-frame strip",
+      "D body to armor transition",
+      "movement",
+      "armor attack"
+    ]
+  },
+  {
+    "name": "landscape",
+    "width": 844,
+    "height": 390,
+    "job": "7282832d-aa8a-4969-b050-096a6a4832ed",
+    "count": 8,
+    "stripWidth": 2048,
+    "overflow": false,
+    "errors": [],
+    "result": "pass",
+    "tested": [
+      "new eight-frame strip",
+      "D body to armor transition",
+      "movement",
+      "armor attack"
+    ]
+  }
+]

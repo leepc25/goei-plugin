@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-22T10:40:17.386Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 7282832d-aa8a-4969-b050-096a6a4832ed\njob_id: 7282832d-aa8a-4969-b050-096a6a4832ed\ndescription: huge figure fully encased in near-future powered plate armor, dark blue-grey steel plates with black joints, thin glowing cyan lines, closed rounded helmet with a narrow cyan visor and no face, massive gauntlets, heavy armored boots, folded wing-shaped booster fins on the back\naction: Hold raised near fist, lower it into guard with both feet planted\nframes: 8\nsize: 256x192px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"7282832d-aa8a-4969-b050-096a6a4832ed\")\nasset_id: 0986ca23-2249-5641-8340-0675822cb945\nasset_status: pending (saved to your gallery when generation completes)"
+      }
+    ],
+    "isError": false
+  }
+}

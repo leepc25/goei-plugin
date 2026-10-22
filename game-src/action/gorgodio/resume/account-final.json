@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-22T10:46:33.280Z",
+  "balance": {
+    "content": [
+      {
+        "type": "text",
+        "text": "credits: $0.00\ngenerations_remaining: 14085.30\ngenerations_used: 5269.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+      }
+    ],
+    "isError": false
+  },
+  "jobs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "7 jobs:\na3743d39-b041-4287-96ad-c62228b484b3 processing 9%, eta ~135s (animation, 14s old)\nd5d8b068-9501-40be-9538-7c2fe192cdc8 processing 32%, eta ~30s (edit_image_pixen, 14s old)\n76884626-42e9-4626-980a-37663c8aac8f processing 19%, eta ~120s (animation, 29s old)\n5ce7b76d-7f1a-43e5-a28a-76f10b039fbd processing 10%, eta ~103s (animation, 46s old)\nee5ef44a-a16d-4ed1-a494-6578590bb498 processing 34%, eta ~108s (inpainting_v3, 55s old)\n9f98ad15-77c1-4eda-8023-a90762053267 processing 13%, eta ~399s (animation, 59s old)\n4206757c-145c-4b9a-8211-2e585da3df75 processing 16%, eta ~392s (animation, 1m14s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  },
+  "owner_pending": 0,
+  "owner_actual_cost": 3,
+  "unit": "generations",
+  "job_id": "7282832d-aa8a-4969-b050-096a6a4832ed"
+}

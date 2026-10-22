@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-22T10:40:17.399Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "3 jobs:\nd4017c4c-d084-4bc0-88b7-eb0df8dfe9e3 processing 14%, eta ~421s (animation, 1m8s old)\n4ee67072-3bcb-431e-b62b-a1f2446761ea processing 15%, eta ~396s (animation, 1m9s old)\ndf3b56fb-5426-4491-888f-f94a4192e5cf processing 20%, eta ~431s (animation, 1m47s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  }
+}

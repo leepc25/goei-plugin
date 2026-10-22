@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-22T10:43:47.265Z",
+  "content": [
+    {
+      "type": "text",
+      "text": "status: completed\nid: 7282832d-aa8a-4969-b050-096a6a4832ed\njob_id: 7282832d-aa8a-4969-b050-096a6a4832ed\nframes: 8\ntransparent: yes\nasset_id: 0986ca23-2249-5641-8340-0675822cb945\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/7282832d-aa8a-4969-b050-096a6a4832ed/download?index=0 ... ?index=7"
+    },
+    {
+      "type": "text",
+      "text": "(4 more frames not shown — fetch them from the download URLs above)"
+    }
+  ]
+}
