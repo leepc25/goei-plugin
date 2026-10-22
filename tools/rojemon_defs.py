@@ -3,7 +3,7 @@
 # make: 'pl' = PixelLab animate_with_skeleton_v3 로 생성 / 'code' = 그림 없음(코드) / 'gpt' = GPT 의뢰(알몸·하의 내림)
 #       'base:<클립>' = 로제몬 자신의 기본 클립 + 엔진 오브젝트·손 좌표 물건으로 조합(생성 없음)
 # body: 'roje' 본체 / 'kid' 꼬마 인형(로제몬 고유 소지품 인형) / 'man' 마네킹(현장의 그릇)
-# 회수: 뼈대 v3 실측(2026-10-21 spend.log) 3장=2, 4~8장=3, 9~15장=4
+# 회수: 뼈대 v3 공식 요금(도구 설명) 3장=2, 4~14장=3, 15장=4
 
 ROWS = []
 def R(clip, row, group, name, frames, how, ref='', make='pl', body='roje', en=''):
@@ -12,7 +12,7 @@ def R(clip, row, group, name, frames, how, ref='', make='pl', body='roje', en=''
 def cost(r):
     if r['make'] != 'pl': return 0
     f = r['frames']
-    return 2 if f <= 3 else 3 if f <= 8 else 4
+    return 2 if f <= 3 else 3 if f <= 14 else 4
 
 # ───────────── 전투 (본체) ─────────────
 G = '전투'
@@ -228,12 +228,13 @@ R('annoyed', '155', T, '짜증', 4, '눈을 굴리며 고개를 젖히고 "하�
 R('think', '156', T, '생각(추론)', 4, '입술을 손가락으로 톡톡, 눈만 위로', '위키 「직접 읽기보다 추론」', en='tapping her lips with a finger, eyes looking up, thinking')
 R('bored', '157', T, '지루함', 4, '벽 없이 서서 이 발 저 발 체중 옮기며 머리카락 끝을 꼬음', '', en='shifting her weight foot to foot, twirling a lock of hair')
 
-# 158~169 알몸·하의 내림 장면: GPT 의뢰 (Claude 생성 안 함)
-T = '씻기(GPT)'
-for c, n, f in [('undress', '탈의 → 수건', 7), ('showerturn', '샤워 앞 돌아서기', 3), ('showerin', '샤워 부스 들어가기', 6), ('shower', '샤워', 6), ('showerout', '샤워 끝나고 나오기', 6),
-                ('bathin', '욕조 들어가기', 6), ('bath', '욕조에서 쉬기', 4), ('bathout', '욕조에서 나오기', 6), ('toiletin', '화장실 들어가 앉기', 6), ('toilet', '변기에 앉아 휴대폰', 4),
-                ('toiletout', '일어나 물 내리고 나오기', 6), ('handwash', '세면대 손 씻기', 6)]:
-    R(c, '158~169', T, n, f, 'GPT 의뢰서(기준 그림 확정 후 즉시)', make='gpt')
+# 158~169 씻기: GPT는 탈의·돌아서기·샤워·목욕 4클립만(쟈알디 최종 납품과 같은 구성). 나머지는 기본 클립 + 엔진 오브젝트
+T = '씻기'
+for c, n, f in [('undress', '탈의 → 수건', 7), ('showerturn', '샤워 앞 돌아서기', 3), ('shower', '샤워', 6), ('bath', '목욕(욕조 안에 앉기)', 4)]:
+    R(c, '158~169', T, n, f, 'GPT 의뢰서 docs/캐릭터제작서/의뢰서_로제몬_탈의·샤워·목욕_GPT.md', make='gpt')
+for c, n, b in [('showerin', '샤워 부스 들어가기', 'walk'), ('showerout', '샤워 끝나고 나오기', 'walk'), ('bathin', '욕조 들어가기', 'stepover'), ('bathout', '욕조에서 나오기', 'stepover'),
+                ('toiletin', '화장실 들어가 앉기', 'chairsit'), ('toilet', '변기에 앉아 휴대폰', 'seathold'), ('toiletout', '일어나 나오기', 'chairsit'), ('handwash', '세면대 손 씻기', 'handswork')]:
+    R(c, '158~169', T, n, 0, f'기본 클립 {b} + 엔진 오브젝트(부스·욕조·변기·세면대)', make='base:' + b)
 
 # ───────────── 인형 ─────────────
 K = '꼬마 인형'

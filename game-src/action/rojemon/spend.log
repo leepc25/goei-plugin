@@ -1,0 +1,72 @@
+2026-10-22 01:37:25 base_gen c2 seed2 pal0 -> {
+  "background_job_id": "0dfa56e8-ca8f-4a56-b267-495751ea5d91",
+  "image_id": "7095145a-6f3c-55f3-b1a3-524fb7f05ab5",
+  "status": "processing",
+  "source_image_id": "7095145a-6f3c-55f3-b1a3-524fb7f05
+2026-10-22 01:37:25 base_gen c1 seed1 pal0 -> {
+  "background_job_id": "e7a74b72-042a-4a54-bf45-87392d50dcfb",
+  "image_id": "33280661-39bc-5763-8371-1c494815b5a4",
+  "status": "processing",
+  "source_image_id": "33280661-39bc-5763-8371-1c494815b
+2026-10-22 01:37:25 base_gen c4 seed4 pal1 -> {
+  "background_job_id": "6b9f9b81-3224-4695-abb0-fd6fd1ab5d1a",
+  "image_id": "347fb892-97e7-5202-93e4-c36541a19f5c",
+  "status": "processing",
+  "source_image_id": "347fb892-97e7-5202-93e4-c36541a19
+2026-10-22 01:37:26 base_gen c3 seed3 pal1 -> {
+  "background_job_id": "d78b5959-c4ee-49d2-ae76-effba41c41cf",
+  "image_id": "3ba1c1c8-1c2f-5451-98e4-6f0222395150",
+  "status": "processing",
+  "source_image_id": "3ba1c1c8-1c2f-5451-98e4-6f0222395
+2026-10-22 01:39:13 base_gen c1~c4 수령, 사용자 승인 01:37:49 '일단 만들어봐'. 잔액 8655(공유)
+2026-10-22 01:41:15 puppet_base man seed1 -> {
+  "background_job_id": "6c59365e-dd84-42c5-9117-4d88f1fc37f9",
+  "image_id": "00a50bc1-d81e-5ed7-98fb-9d2450ff6179",
+ 
+2026-10-22 01:41:15 puppet_base kid seed2 -> {
+  "background_job_id": "5d54009e-534b-446d-9885-e4f7d979669b",
+  "image_id": "b032e1f8-ffe7-5a5d-9914-c0600e2f3a73",
+ 
+2026-10-22 01:41:15 puppet_base kid seed1 -> {
+  "background_job_id": "d230c1a8-6243-4239-8cc6-c692d05ea7b1",
+  "image_id": "6eece544-f1cd-52b7-928f-7e69a0621866",
+ 
+2026-10-22 01:41:15 puppet_base man seed2 -> {
+  "background_job_id": "4d94ddb1-de8e-40e7-8d39-d5ef10be2d6a",
+  "image_id": "06a9797d-9c17-5f06-a279-3de369c868df",
+ 
+2026-10-22 01:41:52 puppet_base kid2 done
+2026-10-22 01:41:58 puppet_base kid1 done
+2026-10-22 01:42:11 puppet_base man1 done
+2026-10-22 01:42:23 puppet_base man2 done
+2026-10-22 01:49:37 gen idle 4f -> id: 8dbf1172-3bee-49ff-bf1f-98ac5e8cc767
+job_id: 8dbf1172-3bee-49ff-bf1f-98ac5e8cc767
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:49:38 gen cue1 5f -> id: 3f0a926a-42b2-41dc-a93c-3926fe7ffc43
+job_id: 3f0a926a-42b2-41dc-a93c-3926fe7ffc43
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:51:31 gen idle done
+2026-10-22 01:52:20 gen cue1 done
+2026-10-22 01:53:00 시험 idle·cue1 6회(8513→8456 공유 잔액). idle 무릎 굽음 → 골반 92.5로 올려 다시
+2026-10-22 01:53:01 gen idle_snack 6f -> id: 1cc9391d-0531-4392-97ce-320e70136ade
+job_id: 1cc9391d-0531-4392-97ce-320e70136ade
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:01 gen engage 4f -> id: 884deed4-e6ac-4603-83a9-87681e79f3c1
+job_id: 884deed4-e6ac-4603-83a9-87681e79f3c1
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:02 gen guard 4f -> id: dda6740d-9329-4f36-8d04-76244f45bdd4
+job_id: dda6740d-9329-4f36-8d04-76244f45bdd4
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:02 gen walk 8f -> id: 23ec9ff4-f4ca-47b1-92e7-875e6e4641e5
+job_id: 23ec9ff4-f4ca-47b1-92e7-875e6e4641e5
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:02 gen step 6f -> id: b4a071c8-a1b0-4ade-a9f9-1cef0c9f3e81
+job_id: b4a071c8-a1b0-4ade-a9f9-1cef0c9f3e81
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:03 gen run 8f -> id: 2bb2f7e8-7245-47b4-b07f-92739e08c276
+job_id: 2bb2f7e8-7245-47b4-b07f-92739e08c276
+description: petite young woman agent, long wavy pale 
+2026-10-22 01:53:03 gen jump 7f -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 01:53:20 gen idle done
