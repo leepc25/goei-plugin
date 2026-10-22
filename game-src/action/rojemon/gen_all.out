@@ -1,0 +1,8 @@
+before generations_remaining: 15037.30 todo 3
+resume man_grab
+resume man_throw
+done man_grab
+sub walllean
+done man_throw
+done walllean
+after generations_remaining: 14998.30

@@ -18,8 +18,8 @@ def _base_pose():
         out[k]=(nx-rig.DX+2.5,ny-rig.DY)
     return out
 BASE_POSE=_base_pose()
-DESC=('petite young adult woman agent, small slim body, long straight black hair to the waist with blunt straight-cut bangs over the forehead, '
-      'pale skin with a faint blush, soft round brown eyes, gentle shy expression, black suit with a hip-length jacket and blue-grey highlights, '
+DESC=('petite young adult woman agent, small slim body, long straight black hair hanging straight down the back to the hips, blunt straight-cut bangs over the forehead, '
+      'pale skin with a faint blush, soft round brown eyes, gentle shy expression, very dark warm charcoal suit with no blue, open hip-length jacket, '
       'white shirt, black necktie, black gloves, black shoes, seen strictly from the side in profile facing right, character only, '
       'empty transparent background, no furniture, no visual effects, no muzzle flash, no sparks, no light or glow')
 def args_for(n,seed):
@@ -31,7 +31,7 @@ def fetch(n,j):
     for f in os.listdir(d): os.remove(f'{d}/{f}')
     for i in range(nf): pl.poll(j,f'{d}/{i:02d}.png',index=i,tries=5)
 if __name__=='__main__':
-    seed=11
+    seed=11; MAXJ=2   # 동시 작업 상한(2026-10-22 사용자 확정: 요원 스레드당 2칸)
     for a in sys.argv[1:]:
         if a.startswith('--seed='): seed=int(a[7:])
     names=[a for a in sys.argv[1:] if not a.startswith('--')] or list(rig.CLIPS)
@@ -40,6 +40,8 @@ if __name__=='__main__':
     if '--resume' in sys.argv:
         last={}
         for ln in open(pl.LOG):
+            if 'gen RESET' in ln: last={}   # 기준 그림을 바꾼 뒤엔 그 전 작업을 이어받지 않음
+            if 'gen DROP ' in ln: last.pop(ln.split('gen DROP ')[1].split()[0],None)   # 검수에서 버린 클립은 새로 생성
             m=re.search(r'gen (\S+) \d+f -> ([0-9a-f-]{36})',ln)
             if m: last[m.group(1)]=m.group(2)
         for n in list(names):
@@ -47,9 +49,10 @@ if __name__=='__main__':
             elif os.path.exists(f'{OUT}/{n}/00.png'): names.remove(n)
     queue=list(names); spent=0
     while queue or pend:
-        while queue and len(pend)<8:
-            n=queue.pop(0); j,t=pl.submit('animate_with_skeleton_v3',args_for(n,seed))
-            pl.log(f'gen {n} {len(rig.CLIPS[n][2])}f -> {j} {t[:80]}')
+        while queue and len(pend)<MAXJ:   # 칸이 없으면(rate limit) 기다리지 말고 끝난 작업부터 받음
+            n=queue[0]; j,t=pl.submit('animate_with_skeleton_v3',args_for(n,seed),tries=1)
+            if t.startswith('RATE') or t.startswith('EXC'): break
+            queue.pop(0); pl.log(f'gen {n} {len(rig.CLIPS[n][2])}f -> {j} {t[:80]}')
             if j: pend[n]=j; print('sub',n,flush=True)
             else: print('SUBFAIL',n,t[:300],flush=True); pl.log(f'gen SUBFAIL {n} {t[:200]}')
         time.sleep(12)

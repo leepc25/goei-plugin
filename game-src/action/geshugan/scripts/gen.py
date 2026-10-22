@@ -12,17 +12,18 @@ def log(s): open(f'{ROOT}/spend.log','a').write(time.strftime('%Y-%m-%d %H:%M:%S
 def bal(): return mcp.text(mcp.tool('get_balance',{})).split('\n')[1]
 SEED=int(([a for a in sys.argv if a.startswith('--seed=')] or ['--seed=21'])[0][7:])
 PAR=int(([a for a in sys.argv if a.startswith('--par=')] or ['--par=6'])[0][6:])
+def short(a):
+    """action은 100자 이름표(스키마). 넘으면 마지막 쉼표·콜론에서 자름."""
+    if len(a)<=100: return a
+    c=a[:100]; k=max(c.rfind(','),c.rfind(':')); return c[:k] if k>40 else c
 def submit(n):
     act,_,ps=R.CLIPS[n]
-    args={'description':DESC,'action':act[:100],'direction':'east','first_frame_url':REF,'first_frame_keypoints':J.kp(J.anatomic(R.BASE)),
+    args={'description':DESC,'action':short(act),'direction':'east','first_frame_url':REF,'first_frame_keypoints':J.kp(J.anatomic(R.BASE)),
           'keypoints':[J.kp(p) for p in ps],'seed':SEED}
     t='?'
-    for k in range(6):
-        try:
-            t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
-            if re.search(r'job_id',t): break
-        except Exception as e: t='EXC '+str(e)
-        time.sleep(10*(k+1))
+    try: t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
+    except Exception as e: t='EXC '+str(e)
+    if 'rate limit' in t or t.startswith('EXC'): return None,'BUSY '+t   # 계정 동시 작업 20개 한도(다른 스레드와 공유): 막지 않고 뒤에 다시
     log(f'{n} {len(ps)}f seed{SEED} -> {t[:160]}')
     m=re.search(r'job_id["\s:]+([0-9a-f-]{36})',t); return m.group(1) if m else None,t
 def fetch(n,j):
@@ -44,6 +45,8 @@ if __name__=='__main__':
             if m: last[m.group(1)]=m.group(2)
             m=re.search(r' gen (\S+) done',ln)
             if m: last.pop(m.group(1),None); last[m.group(1)+'#done']=1
+            m=re.search(r' gen (\S+) (rejected|FAIL)',ln)
+            if m: last.pop(m.group(1),None); last.pop(m.group(1)+'#done',None)
     queue=[]; pend={}
     for n in names:
         if '--fresh' not in sys.argv and last.get(n+'#done'): continue
@@ -53,6 +56,7 @@ if __name__=='__main__':
         while queue and len(pend)<PAR:
             n=queue.pop(0); j,t=submit(n)
             if j: pend[n]=j; print('sub',n,flush=True)
+            elif t.startswith('BUSY'): queue.insert(0,n); break
             else: print('SUBFAIL',n,t[:300],flush=True)
         time.sleep(15)
         for n,j in list(pend.items()):

@@ -47,11 +47,17 @@ try {
   await S(page, 'pc-hitbox');
   await page.keyboard.press('KeyH');
   await page.waitForTimeout(900);
-  // 사격
+  // 사격: 첫 S는 뽑기만, 다음 S가 한 발 (쟈알디 시연판과 같게)
   await page.keyboard.press('KeyS');
   await page.waitForTimeout(500);
+  assert.equal((await st(page)).ammo, 8, '뽑기만 해서는 탄이 그대로');
+  await page.keyboard.press('KeyS');
+  await page.waitForTimeout(400);
   const s3 = await st(page);
   assert.ok(s3.ammo < 8, '사격 후 탄 감소');
+  const muzzle = await page.evaluate(() => Math.max(0, ...window.__goeiEngine.world.bodies.filter((b) => b.kind === 'bullet').map((b) => b.z)));
+  assert.ok(muzzle === 0 || muzzle > 150, `총알이 손 높이에서 나감 (z ${muzzle})`);
+  await page.waitForTimeout(1900);
   // 점프·회피·앉기
   await page.keyboard.press('Space');
   await page.waitForTimeout(150);
@@ -87,6 +93,9 @@ try {
   await S(page, 'pc-hq');
   await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'spot:jaemtri'); w.player.x = d.x; });
   await page.waitForTimeout(100);
+  await page.keyboard.press('KeyE');
+  // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
+  await page.waitForSelector('.gnp:not([hidden])');
   await page.keyboard.press('KeyE');
   await page.waitForSelector('[data-mission]', { state: 'visible' });
   await S(page, 'pc-hq-panel');

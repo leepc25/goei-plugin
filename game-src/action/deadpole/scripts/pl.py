@@ -6,11 +6,13 @@ _s=importlib.util.spec_from_file_location('jmcp',os.path.join(HERE,'../../jyaldi
 LOG=os.path.join(HERE,'../spend.log')
 def log(s): open(LOG,'a').write(time.strftime('%Y-%m-%d %H:%M:%S')+' '+s+'\n')
 def bal(): return mcp.text(mcp.tool('get_balance',{})).split('\n')[1]
-def submit(tool,args):
-    for k in range(60):
+def submit(tool,args,tries=60):
+    for k in range(tries):
         try: t=mcp.text(mcp.tool(tool,args))
         except Exception as e: t='EXC '+str(e); time.sleep(5); continue
-        if 'rate limit' in t.lower(): time.sleep(30); continue
+        if 'rate limit' in t.lower():
+            if tries==1: return None,'RATE '+t
+            time.sleep(30); continue
         break
     m=re.search(r'job_id["\s:]+([0-9a-f-]{36})',t) or re.search(r'id: ([0-9a-f-]{36})',t)
     return (m.group(1) if m else None),t

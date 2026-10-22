@@ -119,8 +119,20 @@ export interface GameViewport {
   onChange(cb: () => void): () => void;
 }
 
+/** NPC 자유 대화 (설계안 docs/NPC_자유대화.md). 사용자가 대화창에 보낼 때만 부른다. 본편 채팅에는 아무것도 쓰지 않는다 */
+export interface GameTalk {
+  /** 리스 모델 호출 (메인·보조, 플러그인 제공 모델 허용). 답 원문 */
+  model(messages: { role: 'system' | 'user' | 'assistant'; content: string }[], which: 'main' | 'aux'): Promise<string>;
+  /** 지금 채팅 카드의 로어북에서 이름이 같은 항목 본문 (CBS를 이 채팅 변수로 푼 것). 없으면 null */
+  lore(name: string): Promise<string | null>;
+  /** 본편 최근 채팅 n마디 (「이름: 글」, 한 마디 300자 이내). 게임 설정에서 켰을 때만 부른다 */
+  recent(n: number): Promise<string[]>;
+}
+
 export interface GameBridge {
   readonly api: 1;
+  /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
+  talk?: GameTalk;
   /** 시작 화면에서 사용자가 고른 저장 칸. 여기서 불러오고 여기에 저장한다 */
   readonly slot: SlotId;
   saves: GameSaves;

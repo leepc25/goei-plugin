@@ -45,3 +45,243 @@ description: athletic adult woman agent, snow-white chin-length bob haircu
 job_id: a23d5f12-c116-43fd-b676-fa9cc3eabe8f
 description: athletic adult woman agent, snow-white chin-length bob haircu
 2026-10-22 01:52:36 gen idle done
+2026-10-22 01:53:25 gen stance rejected
+2026-10-22 01:54:31 gen chain3 rejected
+2026-10-22 01:54:32 gen after generations_remaining: 8400
+2026-10-22 01:55:44 gen before generations_remaining: 8365.90
+2026-10-22 01:59:19 gen chain3 15f seed21 -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 01:59:30 gen stance 4f seed21 -> id: ff8007b1-7280-4de2-9eb6-9a1cddfb1218
+job_id: ff8007b1-7280-4de2-9eb6-9a1cddfb1218
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:02:56 gen stance done
+2026-10-22 02:02:56 gen after generations_remaining: 8222.90
+2026-10-22 02:02:57 gen before generations_remaining: 8222.90
+2026-10-22 02:03:09 gen cubespin 7f seed21 -> id: f5eb6054-a466-4ffc-a6cd-d5672fbb4d19
+job_id: f5eb6054-a466-4ffc-a6cd-d5672fbb4d19
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:03:09 gen scan 6f seed21 -> id: efa5a8fd-5125-4c3a-9823-1bae87bd820a
+job_id: efa5a8fd-5125-4c3a-9823-1bae87bd820a
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:04:04 gen before generations_remaining: 8187.90
+2026-10-22 02:08:14 gen engage 5f seed21 -> id: c93d9ed7-878f-4dfe-9248-db79145d83d0
+job_id: c93d9ed7-878f-4dfe-9248-db79145d83d0
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:13:54 gen walk 8f seed21 -> id: edc4a9c6-8c07-4248-ab06-b1ba4505684d
+job_id: edc4a9c6-8c07-4248-ab06-b1ba4505684d
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:13:55 gen step 6f seed21 -> id: 33abbae0-dfd9-468a-b718-87334629d88b
+job_id: 33abbae0-dfd9-468a-b718-87334629d88b
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:15:59 gen run 8f seed21 -> id: 177c1e4e-741c-455e-8b42-77d2adbba4d5
+job_id: 177c1e4e-741c-455e-8b42-77d2adbba4d5
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:16:29 gen before generations_remaining: 17259.50
+2026-10-22 02:16:29 gen jump 8f seed21 -> id: c08b48a3-f6ac-46cd-8fc0-64f0a24c08bc
+job_id: c08b48a3-f6ac-46cd-8fc0-64f0a24c08bc
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:16:47 gen cubespin done
+2026-10-22 02:16:49 gen scan done
+2026-10-22 02:16:50 gen engage done
+2026-10-22 02:16:53 gen walk done
+2026-10-22 02:16:54 gen step done
+2026-10-22 02:18:18 gen crouch 4f seed21 -> id: a314a0c5-5a69-43da-a2f5-c10d2a1576d2
+job_id: a314a0c5-5a69-43da-a2f5-c10d2a1576d2
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:18:36 gen crouchwalk 8f seed21 -> id: f85f6631-3178-4963-959c-054e1ab041e2
+job_id: f85f6631-3178-4963-959c-054e1ab041e2
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:18:54 gen run done
+2026-10-22 02:19:29 gen jump done
+2026-10-22 02:19:47 gen lowmark 7f seed21 -> id: 0e239da3-30d1-4afe-b5ba-800c665c48ff
+job_id: 0e239da3-30d1-4afe-b5ba-800c665c48ff
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:20:03 gen chain3 15f seed21 -> id: ba79a0bc-0db2-4654-b087-02198dd23ebd
+job_id: ba79a0bc-0db2-4654-b087-02198dd23ebd
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:20:04 gen tackle 8f seed21 -> id: 5bfb2bbb-b7b2-4727-a745-98567bc69956
+job_id: 5bfb2bbb-b7b2-4727-a745-98567bc69956
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:20:39 gen crouch done
+2026-10-22 02:21:31 gen crouchwalk done
+2026-10-22 02:22:57 gen tackle done
+2026-10-22 02:24:03 gen airstomp 6f seed21 -> id: e52b40b4-917d-476d-a241-282f09dfcb1a
+job_id: e52b40b4-917d-476d-a241-282f09dfcb1a
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:24:38 gen lowmark done
+2026-10-22 02:25:31 gen chain3 done
+2026-10-22 02:25:47 gen airmark 5f seed21 -> id: 5863506e-bf19-41f8-b814-d4ecadd366c6
+job_id: 5863506e-bf19-41f8-b814-d4ecadd366c6
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:26:05 gen airstomp done
+2026-10-22 02:27:59 gen airmark done
+2026-10-22 02:28:15 gen designate 4f seed21 -> id: f888960d-1f83-47a4-b82a-5ee5f9bc2345
+job_id: f888960d-1f83-47a4-b82a-5ee5f9bc2345
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:30:08 gen designate done
+2026-10-22 02:30:08 gen clench 5f seed21 -> id: 1aa000dc-9fad-4c6e-a47b-15860877d8ce
+job_id: 1aa000dc-9fad-4c6e-a47b-15860877d8ce
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:30:41 gen hold 7f seed21 -> id: b2d49183-fc86-4013-a858-63c7a8c05055
+job_id: b2d49183-fc86-4013-a858-63c7a8c05055
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:31:14 gen holdloop 4f seed21 -> id: 14bae266-d56b-40f6-8748-10734e4a717c
+job_id: 14bae266-d56b-40f6-8748-10734e4a717c
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:32:04 gen clench done
+2026-10-22 02:32:21 gen fling 7f seed21 -> id: d4b91f2b-c039-4dc2-a55f-02f9bca00dbe
+job_id: d4b91f2b-c039-4dc2-a55f-02f9bca00dbe
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:32:21 gen parry 6f seed21 -> id: 51950cf0-0436-499c-99d5-49492e2cda1e
+job_id: 51950cf0-0436-499c-99d5-49492e2cda1e
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:32:40 gen hold done
+2026-10-22 02:32:41 gen holdloop done
+2026-10-22 02:32:58 gen parryfail 5f seed21 -> id: 6c22817e-6209-48cd-b66c-c14a740dd661
+job_id: 6c22817e-6209-48cd-b66c-c14a740dd661
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:32:59 gen tkleap 7f seed21 -> id: c7ff1e31-d1ec-43d8-aad4-a821c6b54c67
+job_id: c7ff1e31-d1ec-43d8-aad4-a821c6b54c67
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:34:24 gen parry done
+2026-10-22 02:34:43 gen fling done
+2026-10-22 02:34:45 gen tkleap done
+2026-10-22 02:35:34 gen grab 5f seed21 -> id: 7ee819af-dfc6-465c-9e1b-03855dd1cb13
+job_id: 7ee819af-dfc6-465c-9e1b-03855dd1cb13
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:35:51 gen parryfail done
+2026-10-22 02:35:51 gen grabreap 8f seed21 -> id: 82045912-01a8-4315-a1ab-9794d9987b87
+job_id: 82045912-01a8-4315-a1ab-9794d9987b87
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:35:52 gen grabcrush 8f seed21 -> id: b6747450-0f2d-4ca5-b13d-dca1b43bdf22
+job_id: b6747450-0f2d-4ca5-b13d-dca1b43bdf22
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:37:16 gen grab done
+2026-10-22 02:38:09 gen grabcrush done
+2026-10-22 02:38:42 gen super 10f seed21 -> id: 874b0249-f411-45c0-8250-9eef92842343
+job_id: 874b0249-f411-45c0-8250-9eef92842343
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:39:16 gen grabreap done
+2026-10-22 02:40:55 gen super done
+2026-10-22 02:40:55 gen chain2 8f seed21 -> id: edb279c9-1ee1-4f18-a3ac-7746b4f63e1c
+job_id: edb279c9-1ee1-4f18-a3ac-7746b4f63e1c
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:42:48 gen support 10f seed21 -> id: fb8a40ad-fc0f-44fe-9a16-2a6a81f6d689
+job_id: fb8a40ad-fc0f-44fe-9a16-2a6a81f6d689
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:43:56 gen chain2 done
+2026-10-22 02:45:51 gen focus 6f seed21 -> id: 5fb06280-a89a-4141-b2af-02c3093a3601
+job_id: 5fb06280-a89a-4141-b2af-02c3093a3601
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:48:05 gen focus done
+2026-10-22 02:50:14 gen tkswing 7f seed21 -> id: 92b0767f-3164-497a-b31d-c96824bade5e
+job_id: 92b0767f-3164-497a-b31d-c96824bade5e
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:51:53 gen support done
+2026-10-22 02:53:14 gen gunclench 5f seed21 -> id: 0500cea8-cb44-4c55-84e9-c6db4a5acac0
+job_id: 0500cea8-cb44-4c55-84e9-c6db4a5acac0
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:54:55 gen tkswing done
+2026-10-22 02:54:57 gen gunclench done
+2026-10-22 02:54:57 gen pickup 6f seed21 -> id: da2fa436-5e8f-4bb8-a086-4615cc7d337a
+job_id: da2fa436-5e8f-4bb8-a086-4615cc7d337a
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:57:11 gen toss 6f seed21 -> id: ade3268e-acc9-48ea-b311-7ab6c7e46646
+job_id: ade3268e-acc9-48ea-b311-7ab6c7e46646
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:57:28 gen drink 6f seed21 -> id: 3752c2cc-beb9-4b8e-9729-91fc5a8663ab
+job_id: 3752c2cc-beb9-4b8e-9729-91fc5a8663ab
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:57:45 gen pickup done
+2026-10-22 02:58:02 gen eat 6f seed21 -> id: 10cadac0-363b-4d30-a548-aa99e58fc21c
+job_id: 10cadac0-363b-4d30-a548-aa99e58fc21c
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 02:58:56 gen toss done
+2026-10-22 02:59:31 gen drink done
+2026-10-22 02:59:49 gen eat done
+2026-10-22 03:02:13 gen bandage 6f seed21 -> id: a18c6c9f-c700-4f4a-a201-b20b377aa5e9
+job_id: a18c6c9f-c700-4f4a-a201-b20b377aa5e9
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:04:22 gen hit 5f seed21 -> id: f9ec42f4-0a80-4617-b294-96bc4e1f15a9
+job_id: f9ec42f4-0a80-4617-b294-96bc4e1f15a9
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:05:29 gen bandage done
+2026-10-22 03:07:06 gen hit done
+2026-10-22 03:10:35 gen down 8f seed21 -> id: 42e26944-d6ce-49a9-a562-7bea351bebc1
+job_id: 42e26944-d6ce-49a9-a562-7bea351bebc1
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:10:36 gen getup 8f seed21 -> id: 6f15e1f9-7e30-4e75-ae11-4ded8c4226b4
+job_id: 6f15e1f9-7e30-4e75-ae11-4ded8c4226b4
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:11:25 gen talk 4f seed21 -> id: db77166f-a21a-48e2-bd5a-b41e4e30bce0
+job_id: db77166f-a21a-48e2-bd5a-b41e4e30bce0
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:11:43 gen tired 4f seed21 -> id: 64f15d28-2819-4b33-9294-5ed5024579dd
+job_id: 64f15d28-2819-4b33-9294-5ed5024579dd
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:12:54 gen down done
+2026-10-22 03:12:56 gen talk done
+2026-10-22 03:13:14 gen getup done
+2026-10-22 03:13:15 gen tired done
+2026-10-22 03:13:23 gen before generations_remaining: 15734.70
+2026-10-22 03:14:10 gen stepup 7f seed21 -> id: 727850c6-7ce9-4920-a2d5-c55fd4bcc68f
+job_id: 727850c6-7ce9-4920-a2d5-c55fd4bcc68f
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:14:27 gen stepover 6f seed21 -> id: 9f62a9a0-8b1b-4b20-acfd-f15cb3e50bee
+job_id: 9f62a9a0-8b1b-4b20-acfd-f15cb3e50bee
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:16:53 gen stepup done
+2026-10-22 03:17:26 gen liesit 7f seed21 -> id: 1fb31687-41b4-4643-a51f-436e7b67d9e2
+job_id: 1fb31687-41b4-4643-a51f-436e7b67d9e2
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:17:54 gen before generations_remaining: 15652.30
+2026-10-22 03:18:43 gen stepover done
+2026-10-22 03:18:44 gen turn 3f seed21 -> id: d18645d6-6445-43a2-93f4-65ddcc5ddf11
+job_id: d18645d6-6445-43a2-93f4-65ddcc5ddf11
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:21:00 gen liesit done
+2026-10-22 03:21:02 gen fall 3f seed21 -> id: aa0947e8-52f5-4b63-acc7-e157afe46793
+job_id: aa0947e8-52f5-4b63-acc7-e157afe46793
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:21:18 gen turn done
+2026-10-22 03:21:19 gen land 7f seed21 -> id: 4c7ac4d1-4f63-44b4-84ee-972c9e3fbab1
+job_id: 4c7ac4d1-4f63-44b4-84ee-972c9e3fbab1
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:24:48 gen fall done
+2026-10-22 03:25:22 gen land done
+2026-10-22 03:25:22 gen after generations_remaining: 15525.30
+2026-10-22 03:35:09 gen 2차 수정: lowmark parry pickup drink eat bandage 첫 판 rejected/<n>-v1 (독립 검수 f622d66)
+2026-10-22 03:35:10 gen before generations_remaining: 15375.30
+2026-10-22 03:35:10 gen lowmark 8f seed21 -> id: 1b50de69-3d13-45dd-a9c1-a425f1e78b72
+job_id: 1b50de69-3d13-45dd-a9c1-a425f1e78b72
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:35:11 gen parry 6f seed21 -> id: cdba4b4d-eb1e-4e31-872c-5151e38fd4a1
+job_id: cdba4b4d-eb1e-4e31-872c-5151e38fd4a1
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:38:57 gen parry done
+2026-10-22 03:39:06 gen pickup 7f seed21 -> id: 2afe3f23-5902-4c69-a797-dff39889b378
+job_id: 2afe3f23-5902-4c69-a797-dff39889b378
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:39:23 gen lowmark done
+2026-10-22 03:39:24 gen drink 8f seed21 -> id: 047612e7-f62b-4c68-b6cc-6327a733b46c
+job_id: 047612e7-f62b-4c68-b6cc-6327a733b46c
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:42:23 gen drink done
+2026-10-22 03:42:23 gen eat 6f seed21 -> id: e9b44404-77cf-4be2-a122-28910e5ee5d6
+job_id: e9b44404-77cf-4be2-a122-28910e5ee5d6
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:42:56 gen pickup done
+2026-10-22 03:42:57 gen bandage 6f seed21 -> id: f63c7567-4e90-4c19-8dba-9f4d342796f0
+job_id: f63c7567-4e90-4c19-8dba-9f4d342796f0
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:45:07 gen eat done
+2026-10-22 03:46:01 gen bandage done
+2026-10-22 03:46:01 gen after generations_remaining: 15192.30
+2026-10-22 03:46:24 gen bandage 2판 rejected/bandage-v2(감는 손이 안 보임)
+2026-10-22 03:46:25 gen before generations_remaining: 15186.30
+2026-10-22 03:46:25 gen bandage 6f seed21 -> id: abcfe668-028e-4a3f-b1ee-7670b855baff
+job_id: abcfe668-028e-4a3f-b1ee-7670b855baff
+description: athletic adult woman agent, snow-white chin-length bob haircu
+2026-10-22 03:48:32 gen bandage done
+2026-10-22 03:48:32 gen after generations_remaining: 15152.30

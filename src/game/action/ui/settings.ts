@@ -23,6 +23,10 @@ export interface UiSettings {
   vibrate: boolean;
   /** 피해 숫자 */
   numbers: boolean;
+  /** NPC 대화에 쓸 모델: 본편 주 모델·보조 모델 */
+  talkModel: 'main' | 'aux';
+  /** NPC 대화에 본편 최근 채팅 두 줄을 같이 보낸다 */
+  talkRecent: boolean;
 }
 
 export const DEFAULT_SETTINGS: UiSettings = {
@@ -41,6 +45,8 @@ export const DEFAULT_SETTINGS: UiSettings = {
   lefty: false,
   vibrate: true,
   numbers: true,
+  talkModel: 'main',
+  talkRecent: false,
 };
 
 export interface SettingsStore {

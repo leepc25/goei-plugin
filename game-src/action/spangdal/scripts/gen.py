@@ -4,7 +4,7 @@ import sys,time,base64,re,os
 sys.path.insert(0,'../../jyaldi-v5/scripts'); sys.path.insert(0,'.'); import mcp,rig
 DESC=('slim adult woman agent, short wavy nearly black dark purple bob to the jaw, side bangs hiding the far eye, pale skin, one dull gold eye, '
       'faint closed-mouth half smile, black suit with a hip-length jacket and blue-grey highlights, white shirt, black necktie, '
-      'knee-length black pencil skirt, black stockings, low black heels, empty hands, '
+      'knee-length black pencil skirt, black stockings, low black heels, open empty hands with straight fingers, never clenched fists, '
       'seen strictly from the side in profile facing right, character only, no background, no furniture, no weapon in hand, '
       'no visual effects, no explosions, no sparks, no light or glow')
 OUT='../full/clips'
@@ -21,10 +21,10 @@ def submit(n,seed=11):
     act,prop,ps=rig.CLIPS[n]
     args={'description':DESC+(', '+prop if prop else ''),'action':act[:100],'direction':'east','first_frame_url':REF,
           'first_frame_keypoints':REF_KP,'keypoints':[rig.kp(p) for p in ps],'seed':seed}
-    for k in range(80):
+    for k in range(3):
         try: t=mcp.text(mcp.tool('animate_with_skeleton_v3',args))
         except Exception as e: t='EXC '+str(e); time.sleep(5); continue
-        if 'rate limit' in t.lower() or 'too many' in t.lower(): time.sleep(30); continue
+        if 'rate limit' in t.lower() or 'too many' in t.lower(): return None,'RATE'   # 작업 칸이 차면 바로 돌아가 받기부터
         break
     log(f'{n} {len(ps)}f -> {t[:160]}')
     m=re.search(r'job_id["\s:]+([0-9a-f-]{36})',t); return m.group(1) if m else None,t
@@ -39,7 +39,7 @@ def fetch(n,j):
         im=[x for x in (r or {}).get('result',{}).get('content',[]) if x.get('type')=='image']
         if im: open(f'{d}/{i:02d}.png','wb').write(base64.b64decode(im[0]['data']))
 if __name__=='__main__':
-    skip={'--ref','--refkp'}
+    skip={'--ref','--refkp','--max'}
     names=[]; it=iter(sys.argv[1:])
     for a in it:
         if a in skip: next(it); continue
@@ -53,10 +53,11 @@ if __name__=='__main__':
             if m: resume[m.group(1)]=m.group(2)
     pend={}; queue=list(names)
     while queue or pend:
-        while queue and len(pend)<12:
+        while queue and len(pend)<int(arg('--max','2')):
             n=queue.pop(0)
             if n in resume: pend[n]=resume[n]; continue
             j,t=submit(n)
+            if t=='RATE': queue.insert(0,n); break
             if j: pend[n]=j; print('sub',n,flush=True)
             else: print('SUBFAIL',n,t[:300],flush=True)
         time.sleep(15)

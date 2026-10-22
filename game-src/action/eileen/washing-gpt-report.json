@@ -1,0 +1,389 @@
+{
+  "generator": "built-in image_gen",
+  "brief": "docs/캐릭터제작서/의뢰서_에일린_씻기_GPT.md",
+  "new_palette_validation": "14 frames passed; undress 00-05 preserved per skip-existing instruction after brief update",
+  "normalization": "nearest-neighbor size, thresholded original alpha preserved separately during palette remapping",
+  "preview": "release/demo/eileen-washing.html",
+  "frames": [
+    {
+      "path": "game-src/action/eileen/clips/undress/00.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        45,
+        71,
+        136
+      ],
+      "off_palette_colors": 1025,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/01.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        42,
+        45,
+        72,
+        136
+      ],
+      "off_palette_colors": 1022,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/02.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        43,
+        45,
+        71,
+        136
+      ],
+      "off_palette_colors": 954,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/03.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        45,
+        70,
+        136
+      ],
+      "off_palette_colors": 1010,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/04.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        45,
+        70,
+        136
+      ],
+      "off_palette_colors": 1175,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/05.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        40,
+        58,
+        74,
+        136
+      ],
+      "off_palette_colors": 1209,
+      "preserved_before_updated_request": true
+    },
+    {
+      "path": "game-src/action/eileen/clips/undress/06.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        45,
+        44,
+        70,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/showerturn/00.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        45,
+        44,
+        70,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/showerturn/01.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        43,
+        44,
+        72,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/showerturn/02.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        41,
+        44,
+        73,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/00.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        37,
+        44,
+        78,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/01.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        38,
+        44,
+        77,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/02.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        39,
+        42,
+        76,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/03.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        39,
+        42,
+        76,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/04.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        39,
+        42,
+        75,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/shower/05.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        37,
+        44,
+        77,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/bath/00.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        80,
+        96,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/bath/01.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        79,
+        96,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/bath/02.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        80,
+        96,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    },
+    {
+      "path": "game-src/action/eileen/clips/bath/03.png",
+      "size": [
+        192,
+        144
+      ],
+      "alpha": [
+        0,
+        255
+      ],
+      "bbox": [
+        44,
+        81,
+        96,
+        136
+      ],
+      "off_palette_colors": 0,
+      "preserved_before_updated_request": false
+    }
+  ]
+}

@@ -40,7 +40,7 @@ KEY = (255, 0, 255)
 
 
 # 바닥 원본에서 쓸 부분: 탕비실은 바둑판 4×4칸(칸 = 무늬 1/4), 거리는 아래 연석·하수구 띠를 뺀 보도 (GPT요청_배경보강 5·6)
-FLOOR_CONTRAST = {'hq_pantry_floor': 0.4}
+FLOOR_CONTRAST = {'hq_pantry_floor': 0.25}
 FLOOR_CROP = {'hq_pantry_floor': (0, 0, 512, 512), 'hq_street_floor': (0, 0, 864, 864)}
 
 
@@ -356,6 +356,8 @@ def undash(places: set[str]) -> None:
 BOARD_PASTE = {
     'hq_office/hq_office_wall_2': [(48, 66, 168, 128, 6), (184, 63, 278, 131, 1)],
     'lobby/lobby_wall_4': [(128, 69, 208, 134, 1), (235, 65, 279, 128, 3)],
+    # 안내 데스크 뒤 빈 유리 판 (독립 검수: 빈 회색 판넬) → 층 안내도 + 인증서 액자
+    'lobby/lobby_wall_2': [(104, 64, 150, 110, 7), (164, 66, 214, 108, 5)],
     'hq_office/objects/hq_office_objects_13': [(22, 6, 186, 90, 6)],
 }
 

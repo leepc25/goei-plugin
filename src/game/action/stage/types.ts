@@ -70,7 +70,13 @@ export type PlacedKind =
   | 'symbol' // 표시 체계 무리의 벽 기호
   | 'chasedoor' // 추격 층 닫을 수 있는 문
   | 'prop' // 장식(글자만)
-  | 'b12'; // 벽에 적힌 B-12
+  | 'b12' // 벽에 적힌 B-12
+  // ── 메트로배니아 (기본기획서 6.2·8.2, 스테이지 설계서 4.2)
+  | 'upper' // 위층 정비 구역으로 오르는 점검문 (아래에서는 잠김, 위에서 내려오면 열린 지름길)
+  | 'locked' // 잠긴 방화셔터: 그 층 정비 구역의 열쇠로 연다
+  | 'sidedoor' // 곁가지 방 문 (끝에 보상)
+  | 'crack' // 금 간 벽: 때려 부수면 숨은 방
+  | 'vent'; // 막힌 덕트: 앉은 채 E로 숨은 방
 export interface Placed {
   id: number;
   kind: PlacedKind;
@@ -147,7 +153,7 @@ export interface Palette {
 export type CellKind = 'entry' | 'duct' | 'support' | 'slope' | 'shaft' | 'attic' | 'down' | 'plain';
 export interface ServiceThing {
   id: number;
-  kind: 'up' | 'down' | 'ladder_up' | 'ladder_down' | 'left' | 'right' | 'rope' | 'bed' | 'intercom' | 'memo' | 'map' | 'pack' | 'gear' | 'checklist' | 'item' | 'symbol' | 'merchant' | 'fall';
+  kind: 'up' | 'down' | 'ladder_up' | 'ladder_down' | 'left' | 'right' | 'rope' | 'bed' | 'intercom' | 'memo' | 'map' | 'pack' | 'gear' | 'checklist' | 'item' | 'symbol' | 'merchant' | 'fall' | 'key';
   x: number;
   lane: number;
   label: string;
@@ -179,4 +185,22 @@ export interface ServiceZone {
   downCell: [number, number];
   shaftCell: [number, number] | null;
   predatorAfter: number;
+  /** 위층 잠긴 셔터의 열쇠가 놓인 칸 (없으면 null) */
+  keyCell: [number, number] | null;
+  /** 칸마다 싸움 한 판 (적 kind 목록). 키 = "col,row" */
+  fights: Record<string, string[]>;
+}
+
+// ── 곁가지 방 (한 화면). 층의 sidedoor·crack·vent에서 들어가고, 같은 자리로 나온다.
+export interface SideRoom {
+  depth: number;
+  /** 들어온 층 소품 id (p<n>) */
+  door: string;
+  secret: boolean;
+  label: string;
+  /** 상자: 강화 선택. 숨은 방은 상자 + 회수물 */
+  loot: { kind: 'chest' | 'item' | 'gear'; x: number; item?: string }[];
+  fight: string[];
+  elite: boolean;
+  palette: Palette;
 }

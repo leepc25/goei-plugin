@@ -116,7 +116,7 @@ const hollow: EnemyDef = {
   h: H,
   body: humanoid(66, H, 16, 8),
   armor: 0,
-  types: ['chase', 'replica', 'trial', 'puzzle', 'dark', 'silent'],
+  types: ['lobby', 'chase', 'replica', 'trial', 'puzzle', 'dark', 'silent'],
   ai: 'rush',
   keep: [30, 80],
   drop: 'common',

@@ -23,6 +23,8 @@ export const FLOOR_TYPES: Record<FloorType, FloorTypeDef> = {
     enemies: [
       { kind: 'lurker', label: '해롭지 않아 보이는 것', price: 8 },
       { kind: 'shooter', label: '창구 직원', price: 15 },
+      // 로비에 둘만 나오면 같은 모양이 반복된다 (독립 검수: 클론 적)
+      { kind: 'hollow', label: '더는 사람이 아닌 것', price: 12 },
     ],
     palette: { wall: '#4a5459', floor: '#6d6a5f', trim: '#2f3638', accent: '#d8c27a', fog: 'rgba(0,0,0,0)' },
   },

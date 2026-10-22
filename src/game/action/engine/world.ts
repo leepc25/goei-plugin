@@ -98,6 +98,8 @@ export class World implements WorldView {
   threat: (b: Body) => boolean = () => true;
   /** E를 눌렀을 때 (적 모듈 규칙 신호 등). 가장 가까운 소품을 같이 준다 */
   interactHooks: ((prop: PropSpec | null) => void)[] = [];
+  /** E를 눌렀을 때 대화를 열었으면 true (그러면 원래 E 처리를 하지 않는다) */
+  talkHook: ((prop: PropSpec | null) => boolean) | null = null;
   /** 몸 아래에 덧그리기 (바닥 물건 등). ctx는 화면 좌표 */
   underlays: ((ctx: CanvasRenderingContext2D, camX: number) => void)[] = [];
   itemUse: ItemUse | null = null;
@@ -235,6 +237,7 @@ export class World implements WorldView {
     p.dir = 1;
     this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
     this.banner = { text: f.banner ?? f.title, t: 70 };
+    this.subtitle = null; // 지난 방·층 대사를 끌고 오지 않는다 (독립 검수: 탕비실 대사가 보급실까지)
     this.floors++;
     this.emit({ type: 'enter:floor', floor: f });
   }
@@ -312,8 +315,16 @@ export class World implements WorldView {
       const d = Math.abs(pr.x - p.x);
       if (d < 60 && (!best || d < Math.abs(best.x - p.x))) best = pr;
     }
+    // 말을 걸 수 있는 사람(본부 자리 주인·상인·주민·승객·난입한 백일몽)이면 대화창이 먼저 (npc/, engine/npcLink.ts)
+    if (!p.carry && this.talkHook?.(best)) return;
     // 든 게 있거나 가까운 층 물건이 없으면 E는 아이템 줍기·내려놓기 먼저
     if ((p.carry || !best) && this.pickHook?.()) return;
+    this.interactWith(best);
+  }
+
+  /** 원래 E가 하던 일 (대화창의 「거래」「인사」 같은 버튼이 부른다) */
+  interactWith(best: PropSpec | null) {
+    const p = this.player;
     for (const h of this.interactHooks) h(best);
     if (best && this.stage?.onInteract) {
       p.play('pickup', this);
@@ -359,12 +370,14 @@ export class World implements WorldView {
       if (!e.alive || b.team === 'player' || b instanceof Fighter || !e.def || e.z > 0) continue;
       if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
       if (e.def.keep && e.def.keep[1] < 30) continue;
-      if (Math.abs(e.y - p.y) > 30) continue;
-      const min = 56 + e.def.w * 0.25;
+      // 깊이 50 안쪽이면 그림이 포개진다: 요원과 적이 한 몸처럼 겹치지 않게 (독립 검수)
+      const dy = Math.abs(e.y - p.y);
+      if (dy > 85) continue;
+      const min = (84 + e.def.w * 0.35) * (dy > 45 ? 0.8 : 1);
       const dx = e.x - p.x;
       if (Math.abs(dx) >= min) continue;
       const s = dx === 0 ? -p.dir : Math.sign(dx);
-      e.x += s * Math.min(12, min - Math.abs(dx));
+      e.x += s * Math.min(16, min - Math.abs(dx));
     }
   }
 
@@ -377,12 +390,14 @@ export class World implements WorldView {
       for (let j = i + 1; j < list.length; j++) {
         const a = list[i],
           b = list[j];
-        if (Math.abs(a.y - b.y) > 40) continue;
-        const min = 50 + (a.def!.w + b.def!.w) * 0.45;
+        // 앞뒤로 조금 떨어져 있어도 그림은 포개진다: 깊이 75 안쪽이면 옆으로 벌린다 (독립 검수: 적이 세로로 쌓임)
+        const dy = Math.abs(a.y - b.y);
+        if (dy > 95) continue;
+        const min = (70 + (a.def!.w + b.def!.w) * 0.5) * (dy > 50 ? 0.8 : 1);
         const dx = b.x - a.x;
         if (Math.abs(dx) >= min) continue;
         const s = dx === 0 ? (a.id < b.id ? 1 : -1) : Math.sign(dx);
-        const push = Math.min(6, (min - Math.abs(dx)) / 2);
+        const push = Math.min(10, (min - Math.abs(dx)) / 2);
         a.x -= s * push;
         b.x += s * push;
       }

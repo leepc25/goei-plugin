@@ -1,6 +1,6 @@
 // 화면 효과: 땅 그림자, 어두운 층 조명·림라이트, 피격 섬광(하얀 실루엣), 흔들림, 스파크·충격파, 피해 숫자,
 // 층 제목, 전환(암전·승강기 문·조리개·지직). 엔진은 onEvent 로 사건만 알려 주면 된다.
-import { FONT, label } from './hud';
+import { FONT, label, pfont, setPixelText } from './hud';
 import { H as H0, W as W0 } from './stage';
 
 // 캔버스 크기 (채우기면 가로가 넓다). 그리는 함수가 정한다
@@ -112,7 +112,7 @@ export class Fx {
         break;
       case 'hurt':
         this.shake(5 + (e.strength ?? 1) * 3, 0.18);
-        this.flash('#ff2020', 0.25, 0.28);
+        this.flash('#ff2020', 0.1, 0.2); // 화면 전체가 붉게 물들지 않게 약하게 (독립 검수)
         this.rumble?.(0.6, 140);
         break;
       case 'blast':
@@ -226,7 +226,7 @@ export class Fx {
     this.pops = this.pops.filter((p) => p.t < 0.9);
     if (this.title) {
       this.title.t += dt;
-      if (this.title.t > 2.8) this.title = null;
+      if (this.title.t > 1.9) this.title = null;
     }
     this.dim = Math.max(0, this.dim - dt * 1.2);
     if (this.tr) {
@@ -268,7 +268,9 @@ export class Fx {
       const a = p.t > 0.6 ? 1 - (p.t - 0.6) / 0.3 : 1;
       const sc = p.t < 0.1 ? 1 + (0.1 - p.t) * 6 : 1;
       c.globalAlpha = a;
+      setPixelText(true); // 피해 숫자도 도트 글꼴
       label(c, p.text, p.x, p.y, (p.big ? 46 : 34) * sc, p.color, 'center', 900);
+      setPixelText(false);
     }
     c.restore();
   }
@@ -300,16 +302,31 @@ export class Fx {
 
   private drawTitle(c: CanvasRenderingContext2D, t: { depth: string; name: string; variant?: string; t: number }) {
     // 짧은 층 제목 한 줄만 (검수 4-7: 위아래 검은 띠·가운데 반투명 띠·큰 L1 글자 없음)
-    const inK = Math.min(1, t.t / 0.35),
-      outK = t.t > 2.3 ? (t.t - 2.3) / 0.5 : 0;
-    c.globalAlpha = inK * (1 - outK);
-    const text = !t.depth || t.name.startsWith(t.depth) ? t.name || t.depth : `${t.depth} · ${t.name}`;
-    const y = H * 0.24;
-    label(c, text, W / 2, y, 30, '#ece2c8', 'center', 800);
-    c.fillStyle = 'rgba(240,180,90,0.9)';
-    const lw = 180 * easeOut(Math.min(1, t.t / 0.6));
-    c.fillRect(W / 2 - lw / 2, y + 12, lw, 2);
-    if (t.variant) label(c, `변형 · ${t.variant}`, W / 2, y + 40, 16, '#f0b45a', 'center');
+    // 벽에 붙은 글씨로 읽히지 않게 천장 띠에 어두운 도트 판을 받쳐 잠깐만 (독립 검수: 층 제목이 벽·문 위에 남음)
+    const inK = Math.min(1, t.t / 0.3),
+      outK = t.t > 1.5 ? (t.t - 1.5) / 0.4 : 0;
+    c.globalAlpha = Math.max(0, inK * (1 - outK));
+    // 층 숫자는 오른쪽 위 HUD(L1)에 있으니 이름만, 그 바로 아래 오른쪽 끝에 (독립 검수: 「L1 · 로비」가 「L1」과 겹침)
+    const text = t.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, '') || t.depth;
+    c.font = pfont(22).f;
+    const pw = (Math.round(c.measureText(text).width + 40) + 3) & ~3,
+      ph = t.variant ? 64 : 44,
+      px = (Math.round(W - 16 - pw) >> 2) << 2,
+      py = 62;
+    c.fillStyle = '#0c0f12';
+    c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
+    c.fillStyle = '#b8873a';
+    c.fillRect(px, py, pw, ph);
+    c.fillStyle = 'rgba(16,20,24,0.94)';
+    c.fillRect(px + 4, py + 4, pw - 8, ph - 8);
+    // 도트 글꼴 (시스템 글꼴 금지)
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillStyle = '#ece2c8';
+    c.fillText(text, px + pw / 2, py + 22);
+    if (t.variant) (c.font = pfont(11).f), (c.fillStyle = '#f0b45a'), c.fillText(`변형 · ${t.variant}`, px + pw / 2, py + 48);
+    c.textBaseline = 'alphabetic';
+    c.textAlign = 'left';
     c.globalAlpha = 1;
   }
 
@@ -362,7 +379,9 @@ export class Fx {
       if (hold >= 1 && tr.text) {
         c.fillStyle = '#120604';
         c.fillRect(W / 2 - 90, 70, 180, 70);
+        setPixelText(true);
         label(c, tr.text, W / 2, 124, 44, '#ff8a40', 'center', 900);
+        setPixelText(false);
       }
     } else if (tr.kind === 'iris') {
       const r = Math.hypot(W, H) * (1 - k);

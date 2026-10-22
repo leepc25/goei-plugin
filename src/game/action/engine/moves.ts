@@ -83,9 +83,28 @@ export const MOVES: Record<string, MoveDef> = {
     clip: 'groundblast', ticks: T(2, 2, 3, 6, 4, 4), armor: [0, 3, 2],
     hits: [{ at: [3], dmg: 18, react: 'launch', push: 5, lift: 20, stop: 7, strength: 3, low: true, box: [-70, 90, 0, 40], dy: 40, shake: 8, noise: 0.8 }],
   },
+  // D 길게: 충전(charge 반복) 뒤 놓으면 큰 폭파 (쟈알디 단독 시연판과 같게)
+  bigblast: {
+    clip: 'blast', ticks: T(0, 0, 2, 7, 5, 3, 3, 3), armor: [0, 4, 3],
+    hits: [{ at: [3], dmg: 40, react: 'down', push: 20, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [10, 120, 0, 100], dy: 50, shake: 12, noise: 1 }],
+  },
+  // F: 숙련 3 연쇄 폭파 (앞으로 세 번), G: 숙련 6 벽 통째로
+  chain: {
+    clip: 'chain', ticks: T(2, 3, 3, 3, 3, 3, 3, 3), armor: [1, 5, 2],
+    hits: [
+      { at: [1], dmg: 12, react: 'stagger', push: 6, stop: 4, strength: 2, box: [20, 70, 10, 90], dy: 34, shake: 4, noise: 0.5 },
+      { at: [3], dmg: 12, react: 'stagger', push: 8, stop: 4, strength: 2, box: [50, 110, 10, 90], dy: 34, shake: 5, noise: 0.5 },
+      { at: [5], dmg: 18, react: 'down', push: 14, lift: 14, stop: 7, strength: 3, armorBreak: true, box: [80, 150, 10, 100], dy: 40, shake: 8, noise: 0.8 },
+    ],
+  },
+  wall: {
+    clip: 'wall', ticks: T(2, 3, 3, 3, 8, 4, 3, 3), armor: [0, 5, 3],
+    hits: [{ at: [4], dmg: 34, react: 'down', push: 24, lift: 10, stop: 10, strength: 3, armorBreak: true, box: [20, 140, 0, 120], dy: 70, shake: 12, noise: 1 }],
+  },
   fire: { clip: 'fire', ticks: T(2, 2, 2, 1) },
-  draw: { clip: 'draw', ticks: T(1, 1, 1, 1, 1) },
-  reload: { clip: 'reload', ticks: T(3, 3, 3, 3, 3, 3) },
+  draw: { clip: 'draw', ticks: T(2, 2, 2, 2, 2) },
+  holster: { clip: 'holster', ticks: T(2, 2, 2, 2, 2) },
+  reload: { clip: 'reload', ticks: T(4, 4, 4, 4) },
   evade: { clip: 'evade', ticks: T(1, 2, 2, 2, 2, 2), invuln: [0, 4], lunge: [15, 0.84] },
   land: { clip: 'land', ticks: T(1, 2, 2), free: true },
   // 잡기 타격: 무릎. 세 번째는 잡기 폭파로 넘어감
@@ -110,6 +129,8 @@ export const MOVES: Record<string, MoveDef> = {
   // 임시 무기: 판정은 아이템 모듈이 낸다 (내구도·물건 부수기와 같이). 엔진은 동작만
   wswing: { clip: 'pipe', ticks: T(2, 2, 2, 3, 4, 5), lunge: [5, 0.75] },
   wfire: { clip: 'fire', ticks: T(2, 2, 2, 1) },
+  // 산탄총·기관단총은 어깨에 견착해서 쏜다
+  wshot: { clip: 'shotgun', ticks: T(1, 3, 3, 2, 2) },
 };
 
 export const COMBO = ['jab', 'cross', 'power'] as const;

@@ -40,7 +40,7 @@ const PALE = '#9c968a';
 const GREY = '#6f6d68';
 const LOOKS: Record<string, Look> = {
   lurker: { shape: 'human', bulk: 0.16, head: 0.075, hunch: 0.05, eye: '#f2efe6', top: '#5d6670', bottom: '#2c3138', skin: PALE, hair: '#1c1c1e', extras: ['tie'] },
-  hollow: { shape: 'human', bulk: 0.15, arm: 0.5, head: 0.07, hunch: 0.08, eye: '', top: '#6b5f4f', bottom: '#3b342c', skin: GREY },
+  hollow: { shape: 'human', bulk: 0.15, arm: 0.5, head: 0.07, hunch: 0.08, eye: '#d8d4c8', top: '#6b5f4f', bottom: '#3b342c', skin: GREY },
   shooter: { shape: 'human', bulk: 0.13, arm: 0.48, head: 0.07, hunch: 0.03, eye: '#ffd760', top: '#c9c3b4', bottom: '#3d4048', skin: PALE, acc: '#5a4c3a', hair: '#24201c', extras: ['strap'] },
   thief: { shape: 'human', bulk: 0.16, head: 0.072, hunch: 0.07, eye: '#e8e2d0', top: '#55603f', bottom: '#3a3a40', skin: '#a08670', acc: '#7a5a3a', extras: ['cap', 'backpack'] },
   charger: { shape: 'human', bulk: 0.27, head: 0.07, hunch: 0.16, leg: 0.4, eye: '#ff6a3a', top: '#7a4a32', bottom: '#3a2c26', skin: '#8a6a5a', acc: '#d8d0c0', extras: ['target'] },
@@ -529,9 +529,40 @@ function mix(hex: string, to: string, k: number): string {
 const cache = new WeakMap<Enemy, Board & { key: string }>();
 
 /** 그림 모양이 있는 종은 true를 돌려 주고, 없으면 상자 그리기에 맡긴다 */
+// 같은 종이 여럿 나와도 복제처럼 보이지 않게: 한 마리마다 옷 색·머리색·체격·키를 조금씩 (독립 검수: 회색 클론 반복)
+const OUTFITS: [string, string, string][] = [
+  ['#8a3a34', '#2e2a2c', '#1c1612'], // 붉은 재킷
+  ['#3f6a52', '#2a2f2c', '#141414'], // 녹색 점퍼
+  ['#5c4f86', '#2a2836', '#3a2a1e'], // 보라 카디건
+  ['#a08450', '#3d3426', '#5a4a3a'], // 낙타색 코트
+  ['#3c5a8a', '#22283a', '#101012'], // 파란 셔츠
+  ['#7a5a3c', '#4a3c2c', '#24201c'], // 갈색 양복
+  ['#c8b890', '#3a4458', '#2a2622'], // 베이지 니트
+  ['#4a4a52', '#6a5a46', '#c8c4bc'], // 회색 정장, 흰머리
+];
+function varied(e: Enemy, L: Look): { L: Look; scale: number } {
+  if (L.shape !== 'human' || e.boss || e.kind.startsWith('fb_')) return { L, scale: 1 };
+  const v = (e.id * 2654435761) >>> 0;
+  const o = OUTFITS[v % OUTFITS.length];
+  const k = 0.75 + ((v >> 4) % 3) * 0.12;
+  return {
+    L: {
+      ...L,
+      top: mix(L.top ?? '#5a5a5a', o[0], Math.min(1, k)),
+      bottom: mix(L.bottom ?? '#2a2a2a', o[1], Math.min(1, k)),
+      hair: (v >> 7) % 3 ? o[2] : L.hair,
+      // 얼굴도 회색 가면처럼 보이지 않게 사람 피부색 몇 가지 (독립 검수: 회색 무표정)
+      skin: mix(L.skin ?? '#a8927e', ['#c8a080', '#b08460', '#d4b090', '#9a7458'][(v >>> 14) % 4], 0.75),
+      bulk: (L.bulk ?? 0.16) * (0.86 + ((v >> 9) % 4) * 0.07),
+    },
+    scale: 0.92 + ((v >> 12) % 4) * 0.04,
+  };
+}
+
 export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
-  const L = lookFor(e.kind);
-  if (!L || typeof document === 'undefined') return false;
+  const L0 = lookFor(e.kind);
+  if (!L0 || typeof document === 'undefined') return false;
+  const { L, scale } = varied(e, L0);
   const p = poseOf(e);
   const base = e.def.color;
   const col: Record<Part, string> = {
@@ -546,7 +577,7 @@ export function drawFigure(e: Enemy, ctx: Ctx, outline: string): boolean {
   const flash = e.flash > 0 && p.lie === 0 && e.state !== 'dead' && e.state !== 'down';
   const transform = (x: Board['x']) => {
     x.setTransform(1 / PIXEL, 0, 0, 1 / PIXEL, OX, OY + (e.mem.cling && L.shape === 'spider' ? -40 : 40));
-    x.scale(e.dir, 1);
+    x.scale(e.dir * scale, scale);
     const upright = L.shape === 'human' || L.shape === 'hand';
     if (e.mem.cling && L.shape === 'spider') x.scale(1, -1);
     if (p.lie > 0 && !upright) {
