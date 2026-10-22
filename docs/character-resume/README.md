@@ -6,6 +6,8 @@
 
 [독립 검수판 실행](https://rawcdn.githack.com/leepc25/goei-plugin/dd89bf03f557cdf45a34fab38a336c855466672f/release/demo/character-production-resume.html) · [HTML 소스](https://github.com/leepc25/goei-plugin/blob/dd89bf03f557cdf45a34fab38a336c855466672f/release/demo/character-production-resume.html). 수정 그림이 없는 기존 원본 검수판이다. PC·모바일 가로/세로 실행 검수는 통과했으며 실제 기기 사용자 시각 승인은 대기다.
 
+원격 전달 확인: GitHub 원본은 HTTP 200, 592,024바이트, SHA-256 `ec3365fbd3e19165fe95e5524f6de1a5c20c2c0da505b810be805401f57bf06b`로 검수본과 같다. 이 실행 환경에서는 rawcdn.githack.com과 raw.githack.com 모두 HTTP 403(error 1010)을 반환했다. 실행 CDN 접근 성공을 주장하지 않는다. 열리지 않으면 [단일 HTML 다운로드](https://raw.githubusercontent.com/leepc25/goei-plugin/dd89bf03f557cdf45a34fab38a336c855466672f/release/demo/character-production-resume.html)를 저장해 브라우저에서 연다. 외부 이미지 요청은 없다.
+
 - 단일 HTML: `release/demo/character-production-resume.html`. 최신 원본 89장 내장, 쟈알디 A/A2/가드 비교, 걷기·달리기 조작, 큐라스 기본 공격, 에일린 전투 자세, 장넘김·속도·반복 경계 검수. 네트워크 없이 열린다. 기존 그림의 결함은 남아 있다.
 - 쟈알디 8장씩 새 뼈대/요청문: `game-src/action/jyaldi-v5/resume/`. **미제출**이다. 지지발 고정, 반대 팔·다리, 같은 뼈 길이, 가상 다음 0장 반복 경계 검사 포함. 가려진 참조 관절은 추정값이므로 최종 검수 대기다.
 - 장별 시각 검사: [쟈알디](jyaldi-audit.md), [큐라스](kyuras-audit.md), [에일린·다른 요원](other-agents-audit.md). 생성 완료·내부 검수·사용자 시각 승인을 구분했다.
