@@ -78,22 +78,26 @@ test('feature defaults keep only setting variables', () => {
   S.setPrefs({});
 });
 
-test('주인공 이미지: 기본 끔, Asset 로어북은 켜고 주인공을 고른 채팅에서만 {{user}} 금지를 뺀다', async () => {
-  const { evaluate } = await import('../dist-test/core.mjs');
+test('주인공 이미지: 기본 끔, 켜면 Asset 로어북의 {{user}} 금지 줄만 사라지고 끄면 명단에서 주인공을 뺀다', async () => {
+  const { evaluate, hidePlayerTag } = await import('../dist-test/core.mjs');
   assert.equal(S.basicSettings([], {}).assetPlayer, false);
   assert.equal(S.basicVars(S.basicSettings([], {}))['$st_asset_player'], '0');
   assert.equal(S.basicSettings([], { $st_asset_player: '1' }).assetPlayer, true);
   const book = JSON.parse(readFileSync(new URL('../card/image-lore.json', import.meta.url), 'utf8')).data.find((e) => e.comment === 'Asset');
   const run = (vars) => evaluate(book.content, { vars: { $st_asset_on: '1', $st_asset_model: 'main', ...vars }, char: 'Anomaly', user: 'Jyaldi' });
-  for (const vars of [{}, { $st_player: 'P001' }, { $st_asset_player: '1' }]) {
-    const t = run(vars);
-    assert.match(t, /Do not create tags for Jyaldi\./);
-    assert.doesNotMatch(t, /IS a defined character|\{\{/);
-  }
-  const on = run({ $st_asset_player: '1', $st_player: 'P001' });
-  assert.match(on, /The protagonist Jyaldi \(the character the user plays\) IS a defined character/);
-  assert.doesNotMatch(on, /tags for Jyaldi|solely on Jyaldi|If only Jyaldi|\{\{/);
+  const off = run({});
+  assert.match(off, /Do NOT generate tags for Jyaldi or undefined characters\./);
+  assert.match(off, /Do not create tags for Jyaldi\./);
+  assert.match(off, /solely on Jyaldi, narration/);
+  assert.match(off, /If only Jyaldi, undefined NPCs/);
+  const on = run({ $st_asset_player: '1' });
+  assert.doesNotMatch(on, /\{\{|tags for Jyaldi|solely on Jyaldi|If only Jyaldi/);
+  assert.match(on, /Do NOT generate tags for undefined characters\./);
   assert.match(on, /If only undefined NPCs, or pure narration/);
+  const msgs = [{ role: 'system', content: off }, { role: 'user', content: 'Jyaldi, hi' }];
+  const hid = hidePlayerTag(msgs, ['Jyaldi']);
+  assert.match(hid[0].content, /- Characters \{name\}: Aileen, Deadpole, Spangdal, Dejure, Geshugan, Gognija, Gorgodio, Jaemtri, Konjyuce,/);
+  assert.equal(hid[1], msgs[1]);
 });
 
 test('보조모델: 주인공 이미지를 끄면 주인공은 태그 후보에서 빠진다', () => {
