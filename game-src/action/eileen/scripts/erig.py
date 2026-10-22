@@ -21,8 +21,11 @@ def clip(name,action,poses,base,prop=''):
     assert 3<=len(poses)<=15,(name,len(poses))
     action=action.replace('side view: ','').replace('side view, ','')   # 옆모습은 설명(DESC)에 따로 넣음
     if len(action)>100: LONG.append((name,len(action)))
+    if isinstance(poses,TL): TAIL.add(name)
     CLIPS[name]=(action,prop,base,[small(anatomic(p)) for p in poses])
-def tail(ps,loop): return ps+[ps[0] if loop else ps[-1]]   # 생성기가 끝 장을 기준 그림으로 되돌리는 버릇 → 버릴 장(빌더 auto_trim)
+class TL(list): pass
+TAIL=set()   # 끝에 버릴 장을 붙인 클립(빌더가 마지막 장을 뺌)
+def tail(ps,loop): return TL(ps+[ps[0] if loop else ps[-1]])   # 생성기가 끝 장을 기준 그림으로 되돌리는 버릇 → 버릴 장(빌더 auto_trim)
 cyc=lambda t:(math.cos(2*math.pi*t),math.sin(2*math.pi*t))
 
 # ── 무기 설명(그림에 그림. 총구 불꽃·탄피·빛은 코드) ──
@@ -186,7 +189,7 @@ D1=P((X-4,62),-20,SIDE,-0.1,(X+10,G),(X-12,G-2),head=(4,-8),**PT)
 D2=P((X-12,72),-50,0,0,(X+10,G-10),(X,G-8),head=(4,-8),**PT)
 D3=P((X-16,92),-80,0,0,(X+18,G-12),(X+10,G-6),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
 D4=P((X-14,94),-88,0,0,(X+28,G-6),(X+22,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
-clip('down','side view: knocked backward off her feet, lands curled on her back hugging the rifle to her chest, never lets go',
+clip('down','side view: knocked off her feet backward, lands on her back hugging the rifle, never lets go',
      [D1,D2,D3,D4,D4,D4,D4],'R',RIF_PORT)
 GU1=P((X-8,90),-40,0,0,(X+20,G),(X+8,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
 clip('getup','side view: rolls up to one knee into a kneeling aim, then stands into low ready',
