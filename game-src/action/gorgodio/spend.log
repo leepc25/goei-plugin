@@ -422,3 +422,129 @@ description: huge figure fully encased in near-future powered plate armor,
 03:43:16 gen a_idle 4f seed11 -> id: 0752de8c-5e34-443f-9854-5b75cfdb88ba
 job_id: 0752de8c-5e34-443f-9854-5b75cfdb88ba
 description: huge figure fully encased in near-future powered plate armor,
+03:46:14 gen a_arrive done
+03:46:15 gen a_walk 8f seed11 -> id: dd5882e7-5c43-46bc-a2e7-887debd5fe50
+job_id: dd5882e7-5c43-46bc-a2e7-887debd5fe50
+description: huge figure fully encased in near-future powered plate armor,
+03:46:32 gen a_idle done
+03:46:33 gen a_glide 6f seed11 -> id: 35092729-291d-460c-981e-461a452b76ac
+job_id: 35092729-291d-460c-981e-461a452b76ac
+description: huge figure fully encased in near-future powered plate armor,
+03:50:07 gen a_glide done
+03:50:07 gen a_jump 8f seed11 -> id: 41cacc44-8c6d-4559-9101-a4c10992c4a1
+job_id: 41cacc44-8c6d-4559-9101-a4c10992c4a1
+description: huge figure fully encased in near-future powered plate armor,
+03:50:41 gen a_walk done
+03:50:42 gen a_land 3f seed11 -> id: e31f1525-44e9-436c-bf50-1d6d1213595c
+job_id: e31f1525-44e9-436c-bf50-1d6d1213595c
+description: huge figure fully encased in near-future powered plate armor,
+03:53:22 gen a_land done
+03:53:22 gen a_crouch 4f seed11 -> id: 5735c6c7-0bd2-4d61-a2ea-43a4c3af12ac
+job_id: 5735c6c7-0bd2-4d61-a2ea-43a4c3af12ac
+description: huge figure fully encased in near-future powered plate armor,
+03:56:03 gen a_crouch done
+03:56:03 gen a_swat 6f seed11 -> id: 1d571a49-69bd-49ce-8d69-e1e3814aaa72
+job_id: 1d571a49-69bd-49ce-8d69-e1e3814aaa72
+description: huge figure fully encased in near-future powered plate armor,
+03:56:21 gen a_jump done
+03:56:22 gen a_hammer 6f seed11 -> id: f3f00107-ff5d-43cf-8fc5-190cadb95b98
+job_id: f3f00107-ff5d-43cf-8fc5-190cadb95b98
+description: huge figure fully encased in near-future powered plate armor,
+03:59:16 gen a_swat done
+03:59:17 gen a_axe 8f seed11 -> id: 5f96416d-725a-4cfb-8f24-f071e46d58b7
+job_id: 5f96416d-725a-4cfb-8f24-f071e46d58b7
+description: huge figure fully encased in near-future powered plate armor,
+04:02:15 gen a_axe done
+04:02:15 gen a_stomp 6f seed11 -> id: 18d7e61a-bb90-4748-adfa-ad9e6d7e0998
+job_id: 18d7e61a-bb90-4748-adfa-ad9e6d7e0998
+description: huge figure fully encased in near-future powered plate armor,
+04:03:21 gen a_hammer done
+04:03:22 gen a_lariat 6f seed11 -> id: 534154a0-0205-4325-8d25-2ab78a99534c
+job_id: 534154a0-0205-4325-8d25-2ab78a99534c
+description: huge figure fully encased in near-future powered plate armor,
+04:05:23 gen a_stomp done
+04:05:23 gen a_dive 6f seed11 -> id: 4469b7f8-fcd4-4ecf-b998-f57d6e0807cc
+job_id: 4469b7f8-fcd4-4ecf-b998-f57d6e0807cc
+description: huge figure fully encased in near-future powered plate armor,
+04:05:57 gen a_lariat done
+04:05:58 gen a_rubble 8f seed11 -> id: 45a841c3-adbb-4c55-ac89-84fb4aa25512
+job_id: 45a841c3-adbb-4c55-ac89-84fb4aa25512
+description: huge figure fully encased in near-future powered plate armor,
+04:07:51 gen a_dive done
+04:07:52 gen a_charge 8f seed11 -> id: 804a642a-342a-43cf-9ae8-e3c03968da45
+job_id: 804a642a-342a-43cf-9ae8-e3c03968da45
+description: huge figure fully encased in near-future powered plate armor,
+04:08:59 gen a_rubble done
+04:08:59 gen a_vent 4f seed11 -> id: f6e48a68-0abe-47c7-a125-ad158db9c342
+job_id: f6e48a68-0abe-47c7-a125-ad158db9c342
+description: huge figure fully encased in near-future powered plate armor,
+04:10:39 gen a_vent done
+04:10:39 gen a_guard 4f seed11 -> id: dd78bc17-4153-4e86-ad1d-ecef7243f8f8
+job_id: dd78bc17-4153-4e86-ad1d-ecef7243f8f8
+description: huge figure fully encased in near-future powered plate armor,
+04:12:31 gen a_guard done
+04:12:32 gen a_guardwalk 6f seed11 -> id: 41042d61-8c98-40fa-a5a2-e6031e5917de
+job_id: 41042d61-8c98-40fa-a5a2-e6031e5917de
+description: huge figure fully encased in near-future powered plate armor,
+04:14:41 gen a_guardwalk done
+04:14:42 gen a_boost 6f seed11 -> id: 8f6edf3d-2ba0-4b72-a6ce-c0aa33539eab
+job_id: 8f6edf3d-2ba0-4b72-a6ce-c0aa33539eab
+description: huge figure fully encased in near-future powered plate armor,
+04:15:33 gen a_charge done
+04:15:34 gen a_grab 4f seed11 -> id: f5592a5a-ff1a-4790-a0f0-0ed666d11bab
+job_id: f5592a5a-ff1a-4790-a0f0-0ed666d11bab
+description: huge figure fully encased in near-future powered plate armor,
+04:17:15 gen a_boost done
+04:17:16 gen a_grab done
+04:17:17 gen a_grabhit 4f seed11 -> id: 877b60dd-c82d-4882-b2f1-03220ccc19e4
+job_id: 877b60dd-c82d-4882-b2f1-03220ccc19e4
+description: huge figure fully encased in near-future powered plate armor,
+04:17:17 gen a_throw 8f seed11 -> id: a74ed871-486e-42ed-82c3-d2574e168157
+job_id: a74ed871-486e-42ed-82c3-d2574e168157
+description: huge figure fully encased in near-future powered plate armor,
+04:18:54 gen a_grabhit done
+04:18:54 gen a_smash 6f seed11 -> id: 0da8739f-69b5-4d28-8cef-db5a20e3f373
+job_id: 0da8739f-69b5-4d28-8cef-db5a20e3f373
+description: huge figure fully encased in near-future powered plate armor,
+04:20:00 gen a_throw done
+04:20:01 gen a_pillar 8f seed11 -> id: 9f7ed015-7d8d-4914-be64-4748961efc4b
+job_id: 9f7ed015-7d8d-4914-be64-4748961efc4b
+description: huge figure fully encased in near-future powered plate armor,
+04:21:07 gen a_smash done
+04:21:08 gen a_carry2 8f seed11 -> id: c455f00f-85a6-4041-8d3c-7a08929dfd2a
+job_id: c455f00f-85a6-4041-8d3c-7a08929dfd2a
+description: huge figure fully encased in near-future powered plate armor,
+04:22:29 gen a_pillar done
+04:22:30 gen a_super 9f seed11 -> id: 61b6f9bd-ddaa-498e-a747-d4dcb35bd44b
+job_id: 61b6f9bd-ddaa-498e-a747-d4dcb35bd44b
+description: huge figure fully encased in near-future powered plate armor,
+04:23:36 gen a_carry2 done
+04:23:36 gen a_break 4f seed11 -> id: 5aa27907-ab18-4d02-881e-1f344bf46749
+job_id: 5aa27907-ab18-4d02-881e-1f344bf46749
+description: huge figure fully encased in near-future powered plate armor,
+04:24:43 gen a_super done
+04:24:44 gen a_support 10f seed11 -> id: c5bd34ee-0fc7-453a-b28b-be3ba2bff6a5
+job_id: c5bd34ee-0fc7-453a-b28b-be3ba2bff6a5
+description: huge figure fully encased in near-future powered plate armor,
+04:25:17 gen a_break done
+04:27:57 gen a_support done
+04:28:25 gen idle_light 4f seed11 -> id: 9d04c783-e9b9-4bac-a7c6-a3c16ddfb622
+job_id: 9d04c783-e9b9-4bac-a7c6-a3c16ddfb622
+description: huge bald man, two meters tall, muscular wrestler build with 
+04:28:25 gen walk_light 8f seed11 -> id: cd67407a-b326-4c2a-98e4-9b61adea7bc3
+job_id: cd67407a-b326-4c2a-98e4-9b61adea7bc3
+description: huge bald man, two meters tall, muscular wrestler build with 
+04:30:02 gen idle_light done
+04:30:03 gen run_light 8f seed11 -> id: eb88ea37-92a6-4302-af5f-67ce6f283d72
+job_id: eb88ea37-92a6-4302-af5f-67ce6f283d72
+description: huge bald man, two meters tall, muscular wrestler build with 
+04:32:29 gen run_light done
+04:32:29 gen lookback 6f seed11 -> id: 007826b0-1e26-4d1a-91a1-37c1ed602146
+job_id: 007826b0-1e26-4d1a-91a1-37c1ed602146
+description: huge bald man, two meters tall, muscular wrestler build with 
+04:33:03 gen walk_light done
+04:33:03 gen hide 5f seed11 -> id: f93f1586-84f5-43f8-b40b-5feaa14c93ce
+job_id: f93f1586-84f5-43f8-b40b-5feaa14c93ce
+description: huge bald man, two meters tall, muscular wrestler build with 
+04:35:13 gen lookback done
+04:35:30 gen hide done

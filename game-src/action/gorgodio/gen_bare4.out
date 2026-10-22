@@ -1,0 +1,13 @@
+before generations_remaining: 14594.30
+resume pending [] new 5
+sub idle_light
+sub walk_light
+done idle_light
+sub run_light
+done run_light
+sub lookback
+done walk_light
+sub hide
+done lookback
+done hide
+after generations_remaining: 14481.30

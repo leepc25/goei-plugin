@@ -34,11 +34,11 @@ TIMING = {
     'shotgun': (12, False, [1]), 'tired': (4, True), 'turn': (12, False), 'fall': (8, True), 'land': (12, False), 'ladder': (8, True),
     'crawl': (8, True), 'sneak': (8, True), 'limp': (8, True), 'victory': (8, False), 'liftput': (9, False),
     'a_arrive': (10, False), 'a_idle': (5, True), 'a_walk': (9, True), 'a_glide': (12, True), 'a_jump': (12, False), 'a_land': (12, False),
-    'a_crouch': (14, False), 'a_swat': (15, False, [2]), 'a_hammer': (15, False, [3]), 'a_axe': (13, False, [5]), 'a_stomp': (12, False, [3]),
-    'a_lariat': (14, False, [2]), 'a_dive': (14, False, [4]), 'a_rubble': (10, False, [6]), 'a_charge': (14, False, [3, 5]),
+    'a_crouch': (14, False), 'a_swat': (15, False, [3]), 'a_hammer': (15, False, [4]), 'a_axe': (13, False, [5]), 'a_stomp': (12, False, [4]),
+    'a_lariat': (14, False, [2, 3]), 'a_dive': (14, False, [4]), 'a_rubble': (10, False, [7]), 'a_charge': (14, False, [3, 5]),
     'a_vent': (8, False), 'a_guard': (16, False), 'a_guardwalk': (9, True), 'a_boost': (16, False), 'a_grab': (14, False),
-    'a_grabhit': (14, False, [2]), 'a_throw': (12, False, [5]), 'a_smash': (12, False, [3]), 'a_pillar': (9, False), 'a_carry2': (12, True),
-    'a_super': (12, False), 'a_break': (8, False), 'a_support': (12, False, [6]),
+    'a_grabhit': (14, False, [2]), 'a_throw': (12, False, [5]), 'a_smash': (12, False, [4]), 'a_pillar': (9, False), 'a_carry2': (12, True),
+    'a_super': (12, False), 'a_break': (8, False), 'a_support': (12, False, [4]),
 }
 LOOP_WORDS = ('idle', 'walk', 'run', 'wait', 'rest', 'doze', 'typing', 'ride', 'bedlie', 'seat', 'hurt', 'fear', 'armscross', 'bored', 'sad',
               'cry', 'itch', 'think', 'brushteeth', 'handswork', 'handshead', 'holdlook', 'handear', 'sweep', 'liehold', 'shower', 'bath')
@@ -104,7 +104,7 @@ def main():
     # 설계서 표 순서대로 정렬(묶음이 흩어지지 않게)
     pos = {n: i for i, n in enumerate(labels)}
     order.sort(key=lambda t: pos.get(t[1], 9999))
-    manifest = {'sets': SETS, 'clips': {}, 'missing': []}
+    manifest = {'sets': SETS, 'clips': {}, 'missing': [], 'later': []}
     strips = {}
     final = os.path.join(GD, 'full', 'final'); os.makedirs(final, exist_ok=True)
     for setname, clip in order:
@@ -115,7 +115,8 @@ def main():
         if fr: fr, idx = FIX.apply(clip, fr, idx)
         grp, lab = labels.get(clip, ('기타', clip))
         if not fr:
-            manifest['missing'].append(clip); continue
+            # 생활·사교·감정·탐사 묶음은 사용자 결정(2026-10-22 03:17)으로 나중 → 따로 셈
+            (manifest['missing'] if grp.startswith(('전투', '지형', '장갑')) else manifest['later']).append(clip); continue
         D = SETS[setname]
         data = strip(fr, D['w'], D['h'])
         strips[clip] = base64.b64encode(data).decode()
@@ -134,7 +135,7 @@ def main():
             .replace('__BG__', base64.b64encode(open(BG, 'rb').read()).decode()).replace('__NBARE__', str(nb)).replace('__NARMOR__', str(na)))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, 'w', encoding='utf-8').write(html)
-    print('wrote', OUT, len(html) // 1024, 'KB', 'bare', nb, 'armor', na, 'missing', manifest['missing'])
+    print('wrote', OUT, len(html) // 1024, 'KB', 'bare', nb, 'armor', na, 'missing', manifest['missing'], 'later', len(manifest['later']))
 
 
 if __name__ == '__main__':

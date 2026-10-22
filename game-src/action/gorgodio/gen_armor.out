@@ -1,0 +1,64 @@
+LONG a_axe 109 double axe handle: both gauntlets clasped high overhead, then slammed down with the whole body, knees bending
+before generations_remaining: 15232.30
+resume pending [] new 28
+sub a_arrive
+sub a_idle
+done a_arrive
+sub a_walk
+done a_idle
+sub a_glide
+done a_glide
+sub a_jump
+done a_walk
+sub a_land
+done a_land
+sub a_crouch
+done a_crouch
+sub a_swat
+done a_jump
+sub a_hammer
+LONG a_axe 109 double axe handle: both gauntlets clasped high overhead, then slammed down with the whole body, knees bending
+before generations_remaining: 15042.30
+resume pending ['a_hammer', 'a_swat'] new 19
+done a_swat
+sub a_axe
+done a_axe
+sub a_stomp
+done a_hammer
+sub a_lariat
+done a_stomp
+sub a_dive
+done a_lariat
+sub a_rubble
+done a_dive
+sub a_charge
+done a_rubble
+sub a_vent
+done a_vent
+sub a_guard
+done a_guard
+sub a_guardwalk
+done a_guardwalk
+sub a_boost
+done a_charge
+sub a_grab
+done a_boost
+done a_grab
+sub a_grabhit
+sub a_throw
+done a_grabhit
+sub a_smash
+done a_throw
+sub a_pillar
+done a_smash
+sub a_carry2
+done a_pillar
+sub a_super
+done a_carry2
+sub a_break
+done a_super
+sub a_support
+done a_break
+done a_support
+after generations_remaining: 14598.30
+ALLDONE
