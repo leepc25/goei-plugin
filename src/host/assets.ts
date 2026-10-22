@@ -33,7 +33,7 @@ async function load(path: string, ext: string): Promise<string | null> {
 type Row = [string, string, string?];
 const isRow = (a: unknown): a is Row => Array.isArray(a) && typeof a[0] === 'string' && typeof a[1] === 'string';
 
-// 표정 세트(「이름_default」 등)는 카드가 아니라 따로 까는 에셋 모듈에 들어 있다. 창을 열 때 모듈 에셋 목록을 읽어 둔다
+// 표정 세트(「이름_default」 등)는 따로 까는 에셋 모듈이나 카드 에셋에 들어 있다. 창을 열 때 지금 카드 → 모듈 순으로 에셋 목록을 읽어 둔다
 let modRows: Row[] = [];
 let modVer = 0;
 let modBusy: Promise<boolean> | null = null;
@@ -42,10 +42,17 @@ export function loadModuleAssets(): Promise<boolean> {
   modBusy ??= (async () => {
     let rows: Row[] = [];
     try {
+      const idx = await risuai.getCurrentCharacterIndex();
+      const char = Number.isInteger(idx) && idx >= 0 ? ((await risuai.getCharacterFromIndex(idx)) as CharacterSnapshot | null) : null;
+      rows = ((char?.additionalAssets ?? []) as unknown[]).filter(isRow);
+    } catch {
+      /* 카드를 못 읽으면 모듈만 */
+    }
+    try {
       const db = await risuai.getDatabase(['modules', 'enabledModules']);
       const on = new Set(db?.enabledModules ?? []);
       const mods = [...(db?.modules ?? [])].sort((a, b) => Number(on.has(b.id)) - Number(on.has(a.id)));
-      rows = mods.flatMap((m) => (Array.isArray(m.assets) ? m.assets.filter(isRow) : []));
+      rows = rows.concat(mods.flatMap((m) => (Array.isArray(m.assets) ? m.assets.filter(isRow) : [])));
     } catch {
       /* 권한이 없거나 못 읽으면 카드 에셋만 쓴다 */
     }
