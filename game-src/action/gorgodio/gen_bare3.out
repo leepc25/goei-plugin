@@ -1,0 +1,27 @@
+before generations_remaining: 15649.30
+resume pending ['carry2_run', 'carry2_walk'] new 11
+done carry2_walk
+sub turn
+done carry2_run
+sub fall
+done fall
+sub land
+done turn
+sub ladder
+done land
+sub mantle
+done ladder
+sub vault
+done mantle
+sub crawl
+done vault
+sub sneak
+done crawl
+done sneak
+sub door
+sub push
+done door
+sub limp
+done push
+done limp
+after generations_remaining: 15232.30

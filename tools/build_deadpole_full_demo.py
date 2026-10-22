@@ -56,8 +56,8 @@ FPS = {'idle': 5, 'ready': 6, 'walk': 10, 'step': 12, 'run': 14, 'jump': 12, 'kn
 META = {
     'cq1': dict(hits=[2], hold=0.03), 'cq2': dict(hits=[2, 3], hold=0.03, adv=9), 'cq3': dict(hits=[2, 3, 4, 5], hold=0.04, origin=9, adv=-4),
     'kneelshot': dict(hits=[2]), 'slide': dict(hits=[3, 4], adv=10), 'airshot': dict(hits=[2, 4]), 'fire': dict(hits=[1]),
-    'draw': dict(hits=[2]), 'contact': dict(hits=[2], hold=0.06), 'counter': dict(hits=[2], hold=0.08), 'tomoe': dict(hits=[4], hold=0.1),
-    'pipe': dict(hits=[3], hold=0.05), 'shotgun': dict(hits=[1, 4]), 'toss': dict(hits=[3]), 'roll': dict(adv=44), 'super': dict(adv=7),
+    'draw': dict(hits=[2]), 'contact': dict(hits=[2], hold=0.06), 'counter': dict(hits=[2], hold=0.08), 'tomoe': dict(hits=[4], hold=0.1, origin=28),
+    'pipe': dict(hits=[3], hold=0.05), 'down': dict(origin=24), 'superrise': dict(origin=24), 'shotgun': dict(hits=[1, 4]), 'toss': dict(hits=[3]), 'roll': dict(adv=44), 'super': dict(adv=7),
 }
 CQ = {'cq1': (0, 4), 'cq2': (4, 8), 'cq3': (8, 15)}
 GPT = [('undress', '탈의 (GPT)'), ('showerturn', '샤워 돌아서기 (GPT)'), ('shower', '샤워 (GPT)'), ('bath', '목욕 (GPT)')]

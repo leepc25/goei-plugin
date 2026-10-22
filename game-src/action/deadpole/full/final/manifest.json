@@ -250,7 +250,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 15002
+   "bytes": 14625
   },
   "fire": {
    "label": "권총 발사",
@@ -288,7 +288,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 14270
+   "bytes": 13884
   },
   "sniff": {
    "label": "고유기 충전",
@@ -324,7 +324,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 6,
-   "bytes": 12761
+   "bytes": 12943
   },
   "roll": {
    "label": "회피",
@@ -348,7 +348,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 4,
-   "bytes": 8912
+   "bytes": 8980
   },
   "contact": {
    "label": "잡기 타격",
@@ -376,7 +376,7 @@
    "hold": 0.08,
    "group": "전투·기본",
    "frames": 5,
-   "bytes": 8411
+   "bytes": 8406
   },
   "tomoe": {
    "label": "던지기",
@@ -386,11 +386,11 @@
     4
    ],
    "adv": 0,
-   "origin": 0,
+   "origin": 28,
    "hold": 0.1,
    "group": "전투·기본",
    "frames": 9,
-   "bytes": 23550
+   "bytes": 23355
   },
   "super": {
    "label": "필살기",
@@ -402,7 +402,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 15255
+   "bytes": 15500
   },
   "superrise": {
    "label": "(새) 필살 되감기 부활",
@@ -410,11 +410,11 @@
    "loop": false,
    "hits": [],
    "adv": 0,
-   "origin": 0,
+   "origin": 24,
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 19067
+   "bytes": 19482
   },
   "pickup": {
    "label": "줍기",
@@ -496,11 +496,11 @@
    "loop": false,
    "hits": [],
    "adv": 0,
-   "origin": 0,
+   "origin": 24,
    "hold": 0,
    "group": "전투·기본",
    "frames": 7,
-   "bytes": 14436
+   "bytes": 18618
   },
   "die": {
    "label": "(새) 사망",
@@ -613,7 +613,7 @@
    "hold": 0,
    "group": "전투·기본",
    "frames": 9,
-   "bytes": 24526
+   "bytes": 24533
   },
   "idle_pipe": {
    "label": "idle_pipe",

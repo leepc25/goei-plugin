@@ -201,8 +201,10 @@ TM3=P((X-8,HY+36),-80,0,0,(X+18,G-30),(X+6,G-2),('r',10,-20),('r',8,-18),lk=KNEE
 TM4=P((X-8,HY+37),-90,0,0,(X+4,G-46),(X+8,G-2),('r',-4,-24),('r',-6,-22),lk=KNEE_UP,rk=KNEE_UP,tilt=-20,le=ELB_UP,re=ELB_UP)
 TM5=P((X-8,HY+37),-92,0,0,(X-10,G-36),(X+8,G-2),('r',-14,-14),('r',-12,-12),lk=KNEE_UP,rk=KNEE_UP,tilt=-24,le=ELB_UP,re=ELB_UP)
 TM6=P((X-8,HY+38),-92,0,0,(X+26,G-6),(X+20,G-4),('r',4,14),('r',2,16),lk=KNEE_UP,rk=KNEE_UP,tilt=-24)
-clip('tomoe','judo sacrifice throw: grips the collar, pulls forward while dropping onto her back, plants a foot up high and kicks it up over her head with both hands following through, ends lying on her back',
-     [CL(),TM1,TM2,TM3,TM4,TM5,TM6,TM6,TM6,TM6])
+# 누운 장이 캔버스 왼쪽(x=0)에서 잘려 2차 검수 불합격 → 통째로 오른쪽으로 옮겨 그리고 게임은 origin으로 되돌림(build META)
+LIE_SHIFT = {'tomoe': 28, 'down': 24, 'superrise': 24}
+clip('tomoe','judo sacrifice throw: pulls forward, drops onto her back, kicks a foot up over her head, ends lying',
+     [sh(p, LIE_SHIFT['tomoe']) for p in [CL(),TM1,TM2,TM3,TM4,TM5,TM6,TM6,TM6,TM6]])
 SW=lambda t: walkf(t,stride=8,tilt=10)
 SOPEN=lambda u: P((X+10,HY),1,0,0,(X+15,G),(X+6,G),('r',6+17*u,20-20*u),('r',-4-15*u,20-20*u),le=('e',2+9*u,14-14*u),re=('e',-3-6*u,14-14*u),tilt=14)
 clip('super','walks forward, opens both empty arms straight out at shoulder height, one forward one back',
@@ -210,8 +212,8 @@ clip('super','walks forward, opens both empty arms straight out at shoulder heig
 # 필살 되감기 부활: 누운 자세(die 끝)에서 거꾸로 일으켜 세워짐
 LIEDEAD=P((X-6,HY+37),-90,0,0,(X+30,G),(X+28,G),('r',6,22),('r',4,24),le=('e',1,12),re=('e',0,12),tilt=20)
 RISE=lambda u: P((X-6+6*u,HY+37-37*u),-90+91*u,0,0,(X+30-25*u,G-6*math.sin(math.pi*u)),(X+28-31*u,G-4*math.sin(math.pi*u)),('r',-6+14*u,10+9*u),('r',-8+15*u,12+8*u),tilt=20-14*u,lk=KNEE_UP,rk=KNEE_UP)
-clip('superrise','rewinding back to life: rises from lying flat as if pulled upright by time in reverse, hair floating up, lands on both feet with narrowed eyes',
-     tail([LIEDEAD,RISE(.2),RISE(.4),RISE(.6),RISE(.8),RISE(1),READY()],False))
+clip('superrise','rises from lying flat as if time runs backward, hair floating up, lands on both feet, eyes narrowed',
+     [sh(p, LIE_SHIFT['superrise']) for p in tail([LIEDEAD,RISE(.2),RISE(.4),RISE(.6),RISE(.8),RISE(1),READY()],False)])
 PKA=P((X,HY+18),18,0,0,(X+10,G),(X+2,G),('r',22,18),('r',20,20),le=('e',8,12),re=('e',6,13),lk=KNEE_UP,rk=KNEE_UP,tilt=18)
 PKB=P((X,HY+18),12,0,0,(X+10,G),(X+2,G),('r',10,12),('r',9,13),le=('e',2,12),re=('e',1,13),lk=KNEE_UP,rk=KNEE_UP,tilt=10)
 clip('pickup','squats with knees together, both empty hands reach to the floor, brings them up to her chest, stands',
@@ -233,7 +235,7 @@ D1=P((X-4,HY),-25,0,0,(X+10,G),(X-12,G-2),('r',8,-8),('r',-4,-6))
 D2=P((X-12,HY+2),-55,0,0,(X+10,G-12),(X+2,G-10),('r',4,-18),('r',-6,-14))
 D3=sh(P((X-16,HY+24),-78,0,0,(X+14,G-28),(X+6,G-20),('r',2,-22),('r',-8,-12),lk=KNEE_UP,rk=KNEE_UP,tilt=25),8)
 D4=sh(P((X-12,HY+35),-90,0,0,(X+26,G-2),(X+20,G),('r',12,0),('r',8,-4),tilt=35,le=ELB_UP,re=ELB_UP),16)
-clip('down','heavy hit: small body thrown far backward through the air, lands on her back, long hair fanned out',tail([D1,D2,D3,D4,D4,D4,D4],False))
+clip('down','heavy hit: thrown backward through the air, lands flat on her back, long hair fanned out',[sh(p, LIE_SHIFT['down']) for p in tail([D1,D2,D3,D4,D4,D4,D4],False)])
 # 사망: 실신식 무너짐(무릎 → 엉덩이 → 옆구리 → 어깨), 힘 빠진 팔
 DI1=P((X,HY+6),6,0,0,(X+5,G),(X-3,G),('r',4,24),('r',3,25),le=('e',0,14),re=('e',-1,14),tilt=20)
 DI2=P((X-2,HY+16),10,0,0,(X+6,G),(X-2,G),('r',2,26),('r',1,26),tilt=28,lk=KNEE_FWD,rk=KNEE_FWD)

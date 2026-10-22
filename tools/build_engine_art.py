@@ -36,6 +36,10 @@ CLIPS = {
     'idle_shotgun': 'idle_shotgun', 'run_shotgun': 'run_shotgun', 'idle_pipe': 'idle_pipe', 'walk_pipe': 'walk_pipe',
     'carry2_idle': 'carry2_idle', 'carry2_walk': 'carry2_walk', 'carry2_run': 'carry2_run', 'support': 'support', 'glove': 'glove',
 }
+# 본부 자리 동작 (생활 클립, hub host.act가 순서대로 재생). 「본부 다시 만들기」 스레드 요청 2026-10-22
+for _k in ('chairsit typing seatthink seatmouth doze liesit bedlie liehold handswork brushteeth gearcheck '
+           'undress showerturn shower stepover bath holdlook').split():
+    CLIPS[_k] = _k
 FW, FH = 192, 144
 
 

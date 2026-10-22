@@ -87,7 +87,7 @@ function measure(k, im) {
 }
 for (const [k, b64] of Object.entries(STRIPS)) { const im = new Image(); im.onload = () => measure(k, im); im.src = 'data:image/png;base64,' + b64; imgs[k] = im; }
 const bgImg = new Image(); bgImg.src = 'data:image/png;base64,' + BG64;
-if (M.missing.length) $('missing').textContent = '아직 그림이 없는 동작: ' + M.missing.join(', ');
+$('missing').textContent = (M.missing.length ? '아직 그림이 없는 전투·이동 동작: ' + M.missing.join(', ') + ' · ' : '') + (M.later.length ? '생활·사교·감정·탐사 ' + M.later.length + '개는 다음 차례(전투·이동 먼저)' : '');
 
 const FAR_Y = 400, NEAR_Y = 700, groundY = z => FAR_Y + (NEAR_Y - FAR_Y) * z;
 const has = k => !!(M.clips[k] && imgs[k]);
@@ -573,9 +573,12 @@ function drawKnife() {
   else if (K.state === 'floor') drawCleaver(K.x, groundY(K.z) - 8, Math.PI / 2 + 0.3, 1);
   if ((K.state === 'stuck' || K.state === 'floor') && !G.armor && Math.abs(K.x - G.x) < 160) { ctx.fillStyle = '#ffe9a0'; ctx.font = 'bold 18px system-ui'; ctx.textAlign = 'center'; ctx.fillText('E 칼 뽑기', K.x, groundY(K.z) - (K.state === 'stuck' ? 240 : 50)); }
 }
-function drawWall() {
-  if (WALL.broken > 0) { ctx.fillStyle = '#20262c'; ctx.fillRect(1236, 160, 44, 560); ctx.fillStyle = 'rgba(255,220,150,.25)'; ctx.fillRect(1236, 300, 44, 420); return; }
-  ctx.fillStyle = '#4a4f55'; ctx.fillRect(1236, 160, 44, 560); ctx.fillStyle = '#3a3f45'; for (let y = 180; y < 720; y += 40) ctx.fillRect(1236, y, 44, 4);
+function drawWall() {   // 오른쪽 끝 = 배경의 벽. 평소엔 그리지 않고, 뚫린 뒤에만 구멍(각진 검정)과 빛
+  if (!(WALL.broken > 0)) return;
+  ctx.fillStyle = '#07090b'; ctx.beginPath();
+  const pts = [[1280, 250], [1246, 262], [1230, 300], [1240, 352], [1222, 410], [1238, 470], [1226, 540], [1244, 610], [1280, 640]];
+  pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,214,150,.18)'; ctx.fillRect(1240, 300, 40, 320);
 }
 function draw() {
   ctx.save();
@@ -605,7 +608,8 @@ function drawPlayer() {
   const gy = groundY(G.z);
   ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.beginPath(); ctx.ellipse(G.x, gy + 4, (G.armor ? 46 : 38) * S, 6 * S, 0, 0, Math.PI * 2); ctx.fill();
   if (G.grab && G.grab.state === 'grabbed') drawEnemy(G.grab);
-  sprite(G.clip, G.f, G.x, gy + G.y, G.dir, G.inv > 0 && !G.super ? 0.6 : 1);
+  const lift = G.clip === 'a_glide' || G.clip === 'a_lariat' ? 4 * S : 0;   // 결함 21: 활강 그림은 발이 땅에 붙어 있어 엔진이 띄움
+  sprite(G.clip, G.f, G.x, gy + G.y - lift, G.dir, G.inv > 0 && !G.super ? 0.6 : 1);
   if ($('box').checked) { const b = boxes[G.clip] && boxes[G.clip][G.f], D = dims(G.clip); if (b) { ctx.strokeStyle = HIT[G.clip] ? '#f55' : '#5f5'; ctx.lineWidth = 2; const x0 = G.dir > 0 ? G.x + (b.x0 - D.anchor) * S : G.x - (b.x1 - D.anchor) * S; ctx.strokeRect(x0, gy + G.y + (b.y0 - D.foot) * S, (b.x1 - b.x0) * S, (b.y1 - b.y0) * S); } }
   if (G.talkT > 0) bubble(G.x + G.dir * 30, gy + G.y - (G.armor ? 380 : 330), G.talkLine);
   if (G.armor && $('fx').checked && (G.clip === 'a_glide' || G.clip === 'a_charge' || G.clip === 'a_boost' || G.clip === 'a_lariat')) { for (let i = 0; i < 3; i++) { ctx.fillStyle = i ? '#4fd0ff' : '#e8fbff'; ctx.fillRect(G.x - G.dir * (70 + i * 26 + Math.random() * 10), gy - 220 + Math.random() * 20, 18, 10); } }
