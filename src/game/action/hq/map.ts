@@ -38,6 +38,7 @@ export interface HqSpot {
   verb: string;
   face?: 1 | -1;
   act?: string[];
+  seat?: { x: number; y: number };
 }
 /** 바닥 위 상자 (집기). x = 가운데, y = 앞 모서리(바닥에 닿는 선), d = 뒤로 깊이, h = 높이. 모두 화면 px */
 export interface HqBox {
@@ -160,6 +161,7 @@ export const HQ_SCENES: HqScene[] = [
     ],
     fixtures: [], things: [],
     spots: [
+      { id: 'seat', x: 250, y: 560, verb: '앉기', face: 1, act: ['chairsit'], seat: { x: 275, y: 505 } },
       { id: 'jaemtri', x: 680, y: 470, place: 'jaemtri', verb: '임무 게시판', face: 1 },
       { id: 'agents', x: 110, y: 450, place: 'office', verb: '요원' },
       { id: 'chief', x: 800, y: 470, place: 'chief', verb: '결재' },

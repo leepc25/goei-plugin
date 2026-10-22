@@ -264,6 +264,7 @@ export class World implements WorldView {
     p.y = p.py = (this.lane[0] + this.lane[1]) / 2;
     p.z = p.pz = 0;
     p.vx = p.vy = p.vz = 0;
+    p.seat = null;
     p.move = null; p.moveKey = ''; p.grabbed = null;
     p.enter('free'); p.stop = 0;
     p.resetLocomotion();

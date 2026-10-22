@@ -86,8 +86,30 @@ try {
       await walk('x', 650); await walk('y', 620); await walk('x', 420);
       const front = await state(); assert.ok(front.y >= 620);
       await page.screenshot({ path: `${out}/${name}-desk-front.png` });
-      results.push({ name, pass: true, initial, returned, behind, front });
-      console.log(`PASS ${name}: mission UI, north-door round trip, real desk rear/front walking`);
+      await walk('x', 250); await walk('y', 560); await interact();
+      await page.waitForFunction(() => __goeiEngine.world.player.seat?.frame === 4);
+      const seated = await page.evaluate(() => {
+        const p = __goeiEngine.world.player;
+        return { x: p.x, y: p.y, dir: p.dir, anim: p.anim() };
+      });
+      assert.deepEqual(seated, { x: 275, y: 505, dir: 1, anim: { clip: 'chairsit', frame: 4, origin: 0 } });
+      await page.screenshot({ path: `${out}/${name}-seated.png` });
+      // Movement and combat must not slide the seated body or queue an attack.
+      await page.keyboard.down('ArrowRight'); await page.keyboard.press('KeyA');
+      await page.waitForTimeout(500); await page.keyboard.up('ArrowRight');
+      assert.equal(await page.evaluate(() => __goeiEngine.world.player.x), 275);
+      await interact();
+      await page.waitForFunction(() => !__goeiEngine.world.player.seat);
+      assert.equal(await page.evaluate(() => __goeiEngine.world.player.move), null);
+      await page.screenshot({ path: `${out}/${name}-stood.png` });
+      await interact();
+      await page.waitForFunction(() => __goeiEngine.world.player.seat?.frame === 4);
+      await interact(); await page.waitForFunction(() => !__goeiEngine.world.player.seat);
+      await walk('y', 620); await walk('x', 1084); await walk('y', 446); await interact();
+      await page.waitForFunction(() => __goeiEngine.world.floor.id === 'hq:f2');
+      assert.equal(await page.evaluate(() => __goeiEngine.world.player.seat), null);
+      results.push({ name, pass: true, initial, returned, behind, front, seated });
+      console.log(`PASS ${name}: mission UI, north-door round trip, real desk rear/front walking, seat/stand twice and leave`);
     } catch (error) {
       await page.screenshot({ path: `${out}/${name}-failure.png` });
       results.push({ name, pass: false, state: await state(), error: String(error) });

@@ -95,6 +95,20 @@ export class Player extends Fighter {
   carry: { kind: 'prop' | 'weapon'; id: string; hold: 'over' | 'hand'; cls?: 'melee' | 'gun' } | null = null;
   /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
   itemAct: ((k: 'attack' | 'shoot') => string | null) | null = null;
+  seat: { clip: string; frame: number; tick: number; rising: boolean; exit: { x: number; y: number } } | null = null;
+
+  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {
+    if (!this.clips[clip]?.length || this.z > 0 || this.phase !== 'free' || (this.move && this.moveKey !== 'pickup')) return false;
+    this.cancelMove(); this.buf = null;
+    this.running = this.guarding = this.crouching = this.charging = false;
+    this.chargeT = -1; this.wantItem = 0; this.wantSuper = false;
+    this.vx = this.vy = this.vz = 0;
+    this.x = this.px = x; this.y = this.py = y; this.dir = face;
+    this.resetLocomotion();
+    this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
+    return true;
+  }
+
   wantInteract = false;
   wantItem = 0;
   wantSuper = false;
@@ -185,6 +199,7 @@ export class Player extends Fighter {
 
   /** 지금 보여 줄 클립·장 */
   anim(): AnimRef {
+    if (this.seat) return { clip: this.seat.clip, frame: this.seat.frame, origin: 0 };
     const c = this.animClock;
     const loop = (clip: string, every: number): AnimRef => {
       const n = this.clips[clip]?.length || 1;
@@ -389,6 +404,23 @@ export class Player extends Fighter {
   }
 
   tick(world: WorldView, p: Pad) {
+    if (this.seat) {
+      const s = this.seat;
+      this.wantInteract = false; this.wantItem = 0; this.wantSuper = false;
+      this.buf = null;
+      if (p.pressed.has('interact') && !s.rising) { s.rising = true; s.tick = 0; }
+      if (++s.tick >= 4) {
+        s.tick = 0;
+        if (s.rising) {
+          if (s.frame > 0) s.frame--;
+          else {
+            this.x = this.px = s.exit.x; this.y = this.py = s.exit.y;
+            this.seat = null; this.resetLocomotion();
+          }
+        } else s.frame = Math.min(s.frame + 1, this.clips[s.clip].length - 1);
+      }
+      return;
+    }
     this.animClock++;
     if (this.comboTimer > 0) this.comboTimer--;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;

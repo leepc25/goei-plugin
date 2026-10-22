@@ -31,6 +31,7 @@ export function navigationTarget(props: readonly PropSpec[], x: number): PropSpe
 }
 
 export function navigationFeedback(w: World, map?: RunMap | null): NavigationFeedback {
+  if (w.player.seat) return { objective: '본부 · 의자에서 휴식 중', target: { id: 'seat:stand', text: '일어나기', kind: 'interact' } };
   const stage = w.stage as NavigationStage | undefined;
   const m = map === undefined ? stage?.mapView?.() : map;
   const plan = (w.floor as Partial<StagePlan>).stage;

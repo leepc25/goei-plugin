@@ -5,6 +5,7 @@
 // 집기는 바닥 위 상자(앞면 + 윗면)로 몸과 깊이 순서로 섞여 그려지고, 몸은 상자를 뚫고 지나가지 못한다.
 // 방 그림(GPT 전체 그림 + 앞 레이어)이 오기 전까지는 같은 자리·크기의 색 상자로 그린다.
 // 화면에 방 이름·층·잠김 이유 같은 글씨를 쓰지 않는다.
+import type { Player } from './player';
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
@@ -82,7 +83,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.filter(b => sc.id !== 'office' || b.kind === 'desk').map((b) => ({ y: b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+      depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
         drawBox(c, b, sc.look);
       } })),
@@ -204,9 +205,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         opening.t = OPEN_T;
         then();
       }
-      if (solids.length) blockByProps([p as never], solids, scene?.lane ?? LANE);
+      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
-      const t = target(p.x, p.y);
+      const t = (p as Player).seat ? null : target(p.x, p.y);
       const id = t?.id ?? null;
       if (id !== near) {
         if (near) a.setProp(near, null);
@@ -227,6 +228,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
         if (!s?.open) return;
         if (s.place) return host.openPlace(s.place);
+        if (s.seat && s.act?.[0]) {
+          const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
+          (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
+          return;
+        }
         // 자리 동작: 그 자리에 서서 보는 쪽을 맞춘다 (생활 클립 재생은 host.act)
         if (s.y !== undefined) a.movePlayer(s.x, s.y);
         if (s.face) (a.world.player as { dir: 1 | -1 }).dir = s.face;
