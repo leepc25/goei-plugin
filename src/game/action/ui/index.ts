@@ -232,17 +232,21 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     },
     openPause() {
       if (menu.isOpen) return;
+      // 터치·패드에서는 키보드 글자 힌트를 숨긴다 (독립 검수: 폰 일시정지에 Esc/X/H)
+      const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+      const kb = !coarse && (!hud.last?.device || hud.last.device === 'kb');
+      const key = (k: string) => (kb ? k : undefined);
       menu.open({
         id: 'pause',
         title: '일시정지',
         sub: o.pauseInfo?.() ?? '',
         items: [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
-          { type: 'button', label: '계속', sub: 'Esc', act: () => menu.closeAll() },
+          { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
-          { type: 'button', label: '자동 전환', sub: 'X', act: () => (menu.closeAll(), tap('KeyX')) },
-          { type: 'button', label: '판정 보기', sub: 'H', act: () => (menu.closeAll(), tap('KeyH')) },
+          { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },
+          { type: 'button', label: '판정 보기', sub: key('H'), act: () => (menu.closeAll(), tap('KeyH')) },
           ...(o.onRetreat ? [{ type: 'button' as const, label: '본부로 귀환', sub: '후송 처리', danger: true, act: () => void shell.confirm('출동을 포기하고 본부로 돌아갈까요? 송신하지 않은 정보는 절반만 남습니다.', '귀환', '계속 싸운다').then((y) => y && (menu.closeAll(), o.onRetreat!())) }] : []),
           { type: 'button', label: '타이틀로', act: () => void shell.confirm('타이틀 화면으로 나갈까요? 진행은 저장됩니다.').then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) },
         ],

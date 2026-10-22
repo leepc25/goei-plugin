@@ -187,11 +187,17 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
   const placedOf = (prop: PropSpec): Placed | undefined => (prop.id.startsWith('p') ? rt?.plan.stage.floor?.placed.find((p) => `p${p.id}` === prop.id) : undefined);
   const hookOf = (id: string): SpawnHook | undefined => (id.startsWith('h') ? rt?.plan.stage.floor?.spawns.find((s) => `h${s.id}` === id) : undefined);
 
+  const ruleSaid = new Map<string, number>();
   const foundRule = (api: StageApi, id: string, x: number) => {
     if (!out || !RULE[id]) return;
     const text = ruleText(id, ruleVersion(meta, id));
     const already = meta.known[id] === ruleVersion(meta, id) || out.found.includes(id);
-    api.world.say(`규칙: ${text}${out.variants.includes(id) ? `\n${RULE[id].variant!.text}` : ''}`, 4);
+    // 아는 규칙은 다시 읽어도 20초에 한 번만 자막으로 (독립 검수: 규칙 자막 상시 노출)
+    const now = api.world.tick;
+    if (!already || now - (ruleSaid.get(id) ?? -9999) > 600) {
+      ruleSaid.set(id, now);
+      api.world.say(`규칙: ${text}${out.variants.includes(id) ? `\n${RULE[id].variant!.text}` : ''}`, 4);
+    }
     if (!already) {
       out.found.push(id);
       api.world.emit({ type: 'ruleFound', x, id });
