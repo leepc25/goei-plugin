@@ -503,8 +503,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (!game?.inHub && w.stage === elevator) {
         const m = elevator.mapView();
         const t = performance.now() / 1000;
-        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
-        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+        // 폰처럼 화면이 작게 줄면 지도 글자·표식을 그만큼 키운다
+        const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
       } else mapOpen = false;
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);

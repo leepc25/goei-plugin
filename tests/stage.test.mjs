@@ -290,7 +290,11 @@ test('걸어서 확인: 로비 L1부터 승강기·지하 층·정비 구역·�
         if (Math.abs(table.x - e.p.x) < 40) bot.ate.add(table.id + e.plan.id + e.run.seed);
         return table;
       }
-      if (mode === 'service') return props.find((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
+      // 정비 구역으로: 앞쪽 입구 먼저 (추격 층은 뒤가 막힌다. 곁가지 방에서 나오면 층 끝 쪽에 있을 수 있다)
+      if (mode === 'service') {
+        const ins = props.filter((p) => p.kind === 'servicedoor' || p.kind === 'hatch');
+        return ins.find((p) => p.x > e.p.x - 30) ?? ins.sort((a, b) => b.x - a.x)[0];
+      }
       return props.find((p) => p.kind === 'panel');
     };
     let guard = 0;

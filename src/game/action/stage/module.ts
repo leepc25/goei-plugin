@@ -1517,7 +1517,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     opts.forEach((u, i) => {
       const id = `up:${u.id}`;
       r.choices.set(id, { hook: stub, choice: 'upgrade', up: u.id });
-      api.setProp(id, { id, kind: 'choice', x: Math.min(r.plan.length - 80, p.x + 100 + i * 110), y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
+      api.setProp(id, { id, kind: 'choice', x: p.x > 500 ? p.x - 120 - i * 110 : Math.min(r.plan.length - 80, p.x + 100 + i * 110), y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
     });
   };
 

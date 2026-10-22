@@ -406,24 +406,32 @@ function addMetro(f: Floor, ctx: GenContext, r: Rng) {
   const chunks = f.segments.filter((s) => s.ref.startsWith('chunk:'));
   const terr = f.segments.flatMap((s) => s.terrain);
   const clearAt = (x: number, d = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  // 꾸밈 소품(뜻 없는 prop)은 비켜 줄 수 있다: 장치 자리가 없으면 그것을 치우고 놓는다 (예전에는 자리가 없으면 그냥 빠졌다)
+  const decor = (p: Placed) => p.kind === 'prop' && !Object.keys(p.data).length;
+  const clearIfMoved = (x: number, d: number) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  /** 조각 범위 안에서 20px 간격으로 자리를 찾는다. 먼저 빈 자리, 없으면 꾸밈 소품을 치운 자리 */
+  const spot = (segs: FloorSegment[], d: number, ok: (x: number) => boolean = () => true, shuffled = false): number | null => {
+    let xs = segs.flatMap((c) => Array.from({ length: 27 }, (_, k) => c.x + 60 + k * 20));
+    if (shuffled) xs = shuffle(r, xs);
+    for (const pass of [clearAt, clearIfMoved])
+      for (const x of xs)
+        if (pass(x, d) && ok(x)) {
+          f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d));
+          return x;
+        }
+    return null;
+  };
   if (depth >= 2) f.placed.push(place('upper', hall.x + UPPER_X, 0, 70, '위층 점검문', {}));
   // 잠긴 셔터
   if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
-    let gx = -1;
-    for (let i = Math.max(2, Math.floor(chunks.length * 0.5)); i < chunks.length && gx < 0; i++) {
-      const x = chunks[i].x + 30;
-      if (clearAt(x, 110) && !f.placed.some((p) => p.kind === 'shutter' && Math.abs(p.x - x) < 300)) gx = x;
-    }
+    // 셔터는 지형(낮은 천장 책상·구덩이·단)에서 넉넉히 떨어뜨린다: 책상 그림이 셔터를 가렸다 (검수 e8c97af-5). L2는 반드시 하나라 못 찾으면 조금 좁혀 다시
+    const gateAt = (gap: number) => spot(chunks.slice(Math.max(2, Math.floor(chunks.length * 0.5))), 110, (x) => !f.placed.some((p) => p.kind === 'shutter' && Math.abs(p.x - x) < 300) && !terr.some((t) => x > t.x0 - gap && x < t.x1 + gap));
+    const gx = gateAt(260) ?? (depth === 2 ? gateAt(170) ?? gateAt(100) : null) ?? -1;
     if (gx > 0) {
       const before = f.placed.filter((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < gx - 100);
       if (!before.length) {
-        for (const c of chunks.slice(0, 3)) {
-          const x = c.x + 460;
-          if (x < gx - 200 && clearAt(x, 80)) {
-            f.placed.push(place('servicedoor', x, 0, 70, '점검문'));
-            break;
-          }
-        }
+        const sx = spot(chunks.filter((c) => c.x + 600 < gx - 200), 80);
+        if (sx !== null) f.placed.push(place('servicedoor', sx, 0, 70, '점검문'));
       }
       if (f.placed.some((p) => (p.kind === 'hatch' || p.kind === 'servicedoor') && p.x < gx - 100)) {
         f.placed.push(place('locked', gx, MID, 40, '잠긴 방화셔터', { key: depth }));
@@ -435,22 +443,16 @@ function addMetro(f: Floor, ctx: GenContext, r: Rng) {
   const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
   // 장치 조각(갈림길·스위치·밥상)에는 두지 않는다: 문·스위치와 E가 겹친다
   const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
-  const cand = shuffle(r, plainChunks.map((c) => c.x + 120 + Math.floor(r() * 400)));
-  let made = 0;
-  for (const x of cand) {
-    if (made >= want) break;
-    if (!clearAt(x, 120)) continue;
+  for (let made = 0; made < want; made++) {
+    const x = spot(plainChunks, 120, () => true, true);
+    if (x === null) break;
     f.placed.push(place('sidedoor', x, 0, 80, pick(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby!), { side: made }));
-    made++;
   }
   // 숨은 길
   if (ctx.secret) {
-    for (const x of shuffle(r, plainChunks.map((c) => c.x + 200 + Math.floor(r() * 240)))) {
-      if (!clearAt(x, 120)) continue;
-      const crack = r() < 0.55;
-      f.placed.push(place(crack ? 'crack' : 'vent', x, crack ? 0 : MID, crack ? 90 : 60, crack ? '금 간 벽' : '막힌 덕트', { hp: 3 }));
-      break;
-    }
+    const crack = r() < 0.55;
+    const x = spot(plainChunks, 120, () => true, true);
+    if (x !== null) f.placed.push(place(crack ? 'crack' : 'vent', x, crack ? 0 : MID, crack ? 90 : 60, crack ? '금 간 벽' : '막힌 덕트', { hp: 3 }));
   }
 }
 const SIDE_NAMES: Partial<Record<FloorType, string[]>> = {

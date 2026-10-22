@@ -262,7 +262,9 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.group !== undefined).map((q) => `p${q.id}`));
   // 규칙 표지는 지우지 않지만(읽어야 한다) 겹치면 옮긴다
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
-  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  // 잠긴 셔터 앞 해치는 열쇠 길이라 옮기지 않는다 (밀려서 셔터 뒤로 넘어가면 열쇠를 가지러 갈 수 없다)
+  const gateX = f.placed.find((q) => q.kind === 'locked')?.x ?? -1;
+  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60 || (p.kind === 'hatch' && p.x < gateX);
   // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
   // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
   const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
@@ -275,8 +277,12 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   // 점검문(철문)은 덩이 안 자리만 정해져 있다: 벽 그림의 문·게시판 앞이면 가까운 빈 벽으로 민다 (검수 22: 철문이 게시판을 가림)
   for (const p of props.filter((q) => q.kind === 'servicedoor' || (q.kind === 'chasedoor' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'upper')) || (q.kind === 'door' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'sidedoor')) || q.kind === 'crack')) {
     const h = artW(p, f.type) / 2;
+    // 잠긴 셔터 앞 정비 구역 입구는 밀려도 셔터 앞에 남아야 한다 (열쇠를 가지러 갈 길)
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
     const ok = (x: number) =>
       x - h >= 40 && x + h <= f.width - 40 &&
+      (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) &&
       !keepOut.some(([a, b]) => x + h + 8 > a && x - h - 8 < b) &&
       !terr.some((t) => x + h > t.x0 - 20 && x - h < t.x1 + 20) &&
       !props.some((q) => q !== p && (q.kind === 'shutter' || q.kind === 'firegate') && Math.abs(q.x - x) < h + 120) &&
@@ -298,8 +304,12 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   // 갈림길·순서 표지(자리가 뜻이라 고정)도 문·벽 문·다른 고정 소품을 가리면 가까운 빈 벽으로 조금만 민다 (뜻이 바뀌지 않는 거리 안)
   for (const p of props.filter((q) => boardLike(q) && meaning.has(q.id))) {
     const h = artW(p, f.type) / 2;
+    // 잠긴 셔터 앞 정비 구역 입구는 밀려도 셔터 앞에 남아야 한다 (열쇠를 가지러 갈 길)
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
     const ok = (x: number) =>
       x - h >= 40 && x + h <= f.width - 40 &&
+      (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) &&
       !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) &&
       !props.some((q) => q !== p && fixed(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
     if (ok(p.x)) continue;

@@ -16570,23 +16570,28 @@ function addMetro(f, ctx, r) {
   const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
   const terr = f.segments.flatMap((s2) => s2.terrain);
   const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
+  const clearIfMoved = (x, d3) => !f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
+  const spot = (segs, d3, ok = () => true, shuffled2 = false) => {
+    let xs = segs.flatMap((c) => Array.from({ length: 27 }, (_, k) => c.x + 60 + k * 20));
+    if (shuffled2) xs = shuffle2(r, xs);
+    for (const pass of [clearAt, clearIfMoved])
+      for (const x of xs)
+        if (pass(x, d3) && ok(x)) {
+          f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d3));
+          return x;
+        }
+    return null;
+  };
   if (depth >= 2) f.placed.push(place2("upper", hall.x + UPPER_X, 0, 70, "위층 점검문", {}));
   if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
-    let gx = -1;
-    for (let i = Math.max(2, Math.floor(chunks.length * 0.5)); i < chunks.length && gx < 0; i++) {
-      const x = chunks[i].x + 30;
-      if (clearAt(x, 110) && !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300)) gx = x;
-    }
+    const gateAt = (gap) => spot(chunks.slice(Math.max(2, Math.floor(chunks.length * 0.5))), 110, (x) => !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300) && !terr.some((t) => x > t.x0 - gap && x < t.x1 + gap));
+    const gx = gateAt(260) ?? (depth === 2 ? gateAt(170) ?? gateAt(100) : null) ?? -1;
     if (gx > 0) {
       const before = f.placed.filter((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100);
       if (!before.length) {
-        for (const c of chunks.slice(0, 3)) {
-          const x = c.x + 460;
-          if (x < gx - 200 && clearAt(x, 80)) {
-            f.placed.push(place2("servicedoor", x, 0, 70, "점검문"));
-            break;
-          }
-        }
+        const sx = spot(chunks.filter((c) => c.x + 600 < gx - 200), 80);
+        if (sx !== null) f.placed.push(place2("servicedoor", sx, 0, 70, "점검문"));
       }
       if (f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < gx - 100)) {
         f.placed.push(place2("locked", gx, MID, 40, "잠긴 방화셔터", { key: depth }));
@@ -16596,21 +16601,15 @@ function addMetro(f, ctx, r) {
   }
   const want = depth === 1 ? 1 : 1 + (r() < 0.45 ? 1 : 0);
   const plainChunks = chunks.slice(1).filter((c) => !CHUNK_BY_ID[c.ref.slice(6)]?.device);
-  const cand = shuffle2(r, plainChunks.map((c) => c.x + 120 + Math.floor(r() * 400)));
-  let made = 0;
-  for (const x of cand) {
-    if (made >= want) break;
-    if (!clearAt(x, 120)) continue;
+  for (let made = 0; made < want; made++) {
+    const x = spot(plainChunks, 120, () => true, true);
+    if (x === null) break;
     f.placed.push(place2("sidedoor", x, 0, 80, pick3(r, SIDE_NAMES[type] ?? SIDE_NAMES.lobby), { side: made }));
-    made++;
   }
   if (ctx.secret) {
-    for (const x of shuffle2(r, plainChunks.map((c) => c.x + 200 + Math.floor(r() * 240)))) {
-      if (!clearAt(x, 120)) continue;
-      const crack = r() < 0.55;
-      f.placed.push(place2(crack ? "crack" : "vent", x, crack ? 0 : MID, crack ? 90 : 60, crack ? "금 간 벽" : "막힌 덕트", { hp: 3 }));
-      break;
-    }
+    const crack = r() < 0.55;
+    const x = spot(plainChunks, 120, () => true, true);
+    if (x !== null) f.placed.push(place2(crack ? "crack" : "vent", x, crack ? 0 : MID, crack ? 90 : 60, crack ? "금 간 벽" : "막힌 덕트", { hp: 3 }));
   }
 }
 var SIDE_NAMES = {
@@ -16751,8 +16750,8 @@ var thing = (kind, x, lane, label3, data = {}) => ({ id: tid++, kind, x, lane, l
 function makeService(ctx) {
   tid = 1;
   const fixed2 = rng(mix2(ctx.seed, ctx.depth, 6060));
-  const cols = ctx.depth <= 3 ? 2 : range(fixed2, 2, 3);
-  const rows = Math.min(5, 3 + Math.floor(Math.max(0, ctx.depth - 3) / 4));
+  const cols = 2;
+  const rows = ctx.depth <= 3 ? 2 : 3;
   const entryCell = [Math.floor(fixed2() * cols), 0];
   let atticCell = [Math.floor(fixed2() * cols), 1 + Math.floor(fixed2() * (rows - 1))];
   if (atticCell[0] === entryCell[0] && atticCell[1] === 1 && rows > 2) atticCell = [atticCell[0], 2];
@@ -17171,7 +17170,8 @@ function spreadProps(f, props2, startX) {
   const taken = [];
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
-  const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  const gateX = f.placed.find((q) => q.kind === "locked")?.x ?? -1;
+  const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60 || p.kind === "hatch" && p.x < gateX;
   const boardLike = (p) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
   const must = (p) => meaning.has(p.id) || ruled.has(p.id);
   const kept = props2.filter((p) => boardLike(p) && fixed2(p));
@@ -17179,7 +17179,9 @@ function spreadProps(f, props2, startX) {
   for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
   for (const p of props2.filter((q) => q.kind === "servicedoor" || q.kind === "chasedoor" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "upper") || q.kind === "door" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "sidedoor") || q.kind === "crack")) {
     const h = artW(p, f.type) / 2;
-    const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
+    const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && (!gate || Math.sign(x2 - gate.x) === side && Math.abs(x2 - gate.x) > h + 120) && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
     if (ok(p.x)) continue;
     let x = null;
     for (let d3 = 24; d3 <= 1600 && x === null; d3 += 24) x = ok(p.x + d3) ? p.x + d3 : ok(p.x - d3) ? p.x - d3 : null;
@@ -17195,7 +17197,9 @@ function spreadProps(f, props2, startX) {
   }
   for (const p of props2.filter((q) => boardLike(q) && meaning.has(q.id))) {
     const h = artW(p, f.type) / 2;
-    const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
+    const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
     if (ok(p.x)) continue;
     for (let d3 = 12; d3 <= 360; d3 += 12) {
       if (ok(p.x - d3)) {
@@ -19188,7 +19192,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
     opts.forEach((u, i) => {
       const id = `up:${u.id}`;
       r.choices.set(id, { hook: stub, choice: "upgrade", up: u.id });
-      api.setProp(id, { id, kind: "choice", x: Math.min(r.plan.length - 80, p.x + 100 + i * 110), y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
+      api.setProp(id, { id, kind: "choice", x: p.x > 500 ? p.x - 120 - i * 110 : Math.min(r.plan.length - 80, p.x + 100 + i * 110), y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
     });
   };
   const applyUpgrade = (api, u) => {
@@ -19274,7 +19278,7 @@ function itemName2(id) {
 
 // src/game/action/stage/runmap.ts
 var C3 = {
-  bg: "rgba(10,12,16,0.94)",
+  bg: "#0a0c10",
   frame: "#c8a24a",
   dim: "#2b3138",
   floor: "#56616b",
@@ -19300,6 +19304,15 @@ function txt(c, s2, x, y, size2, color, align = "left") {
   c.strokeText(s2, x, y);
   c.fillStyle = color;
   c.fillText(s2, x, y);
+}
+function fitTxt(c, s2, x, y, size2, color, maxW) {
+  let n = size2;
+  const font2 = (z) => `700 ${z}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
+  c.font = font2(n);
+  while (c.measureText(s2).width > maxW && n > size2 * 0.75) c.font = font2(--n);
+  let t = s2;
+  while (t.length > 2 && c.measureText(t).width > maxW) t = t.slice(0, -2) + "…";
+  txt(c, t, x, y, n, color);
 }
 function glyph(c, m, x, y, s2) {
   const R = (dx, dy, w, h, col) => {
@@ -19353,23 +19366,24 @@ function hereDot(c, x, y, t) {
   c.lineWidth = 2;
   c.strokeRect(Math.round(x) - 5, Math.round(y) - 5, 10, 10);
 }
-function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
+function drawRunMap(c, m, px, t, U = 1, W5 = 1280, H6 = 720) {
   c.save();
   c.fillStyle = C3.bg;
   c.fillRect(0, 0, W5, H6);
   c.strokeStyle = C3.frame;
   c.lineWidth = 4;
   c.strokeRect(24, 20, W5 - 48, H6 - 40);
-  txt(c, "출동 지도", 48, 60, 26, C3.text);
-  txt(c, `열쇠 ${m.keys.length ? m.keys.map((d3) => d3 <= 3 ? `L${d3}` : `B-${d3 - 3}`).join(" ") : "없음"}  ·  강화 ${m.upgrades.length}`, W5 - 48, 60, 16, C3.sub, "right");
-  txt(c, m.goal, 48, 90, 17, "#ffd76a");
-  const x0 = 140, x1 = W5 - 60;
+  txt(c, "출동 지도", 48, 40 + 20 * U, 26 * U, C3.text);
+  txt(c, `열쇠 ${m.keys.length ? m.keys.map((d3) => d3 <= 3 ? `L${d3}` : `B-${d3 - 3}`).join(" ") : "없음"}  ·  강화 ${m.upgrades.length}`, W5 - 48, 40 + 20 * U, 16 * U, C3.sub, "right");
+  fitTxt(c, m.goal, 48, 52 + 38 * U, 17 * U, "#ffd76a", W5 - 96);
+  const x0 = 100 + 40 * U, x1 = W5 - 60;
   const maxW = Math.max(6e3, ...m.floors.map((f) => f.width));
   const k = (x1 - x0) / maxW;
-  const pitch = 132;
-  const top = 128;
+  const pitch = Math.round(132 + (U - 1) * 70);
+  const top = Math.round(70 + 58 * U);
+  const legendH = U > 1.3 ? 70 : 40;
   const idx = Math.max(0, m.floors.findIndex((f) => f.depth === m.depth));
-  const visible = Math.floor((H6 - top - 60) / pitch);
+  const visible = Math.max(1, Math.floor((H6 - top - legendH - 20) / pitch));
   const first = Math.max(0, Math.min(idx - Math.floor(visible / 2), m.floors.length - visible));
   const rowY = /* @__PURE__ */ new Map();
   m.floors.slice(first, first + visible + 1).forEach((f, i) => rowY.set(f.depth, top + i * pitch));
@@ -19377,8 +19391,8 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
     const y = rowY.get(f.depth);
     if (y === void 0 || y > H6 - 50) continue;
     const label3 = f.depth <= 3 ? `L${f.depth}` : `B-${f.depth - 3}`;
-    txt(c, label3, x0 - 16, y + 18, 20, f.depth === m.depth ? "#fff" : C3.sub, "right");
-    txt(c, f.label.replace(/^[^·]*· /, ""), x0 - 16, y + 36, 11, C3.sub, "right");
+    txt(c, label3, x0 - 16, y + 18, 20 * U, f.depth === m.depth ? "#fff" : C3.sub, "right");
+    txt(c, f.label.replace(/^[^·]*· /, ""), x0 - 16, y + 22 + 16 * U, 12 * U, C3.sub, "right");
     const w = f.width * k;
     c.fillStyle = C3.dim;
     c.fillRect(x0, y, w, 22);
@@ -19392,13 +19406,13 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
       const gx = x0 + mk.x * k;
       if (mk.kind === "side" || mk.kind === "secret") {
         c.fillStyle = mk.state === "done" ? "#3b3b3b" : "#5b4520";
-        c.fillRect(gx - 9, y - 22, 18, 16);
+        c.fillRect(gx - 9 * U, y - 6 - 16 * U, 18 * U, 16 * U);
         c.strokeStyle = "#000";
-        c.strokeRect(gx - 9, y - 22, 18, 16);
+        c.strokeRect(gx - 9 * U, y - 6 - 16 * U, 18 * U, 16 * U);
         c.fillStyle = "#000";
         c.fillRect(gx - 1, y - 6, 2, 6);
-        glyph(c, mk, gx, y - 13, 1.6);
-      } else glyph(c, mk, gx, y + 11, 2);
+        glyph(c, mk, gx, y - 13, 1.6 * U);
+      } else glyph(c, mk, gx, y + 11, 2 * U);
     }
     if (f.depth === m.depth && m.where === "floor") hereDot(c, x0 + px * k, y + 11, t);
     if (f.depth === m.depth && m.where === "side" && m.sideX !== null) hereDot(c, x0 + m.sideX * k, y - 14, t);
@@ -19406,7 +19420,8 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
   for (const s2 of m.services) {
     const y = rowY.get(s2.depth);
     if (y === void 0) continue;
-    const cw = 30, ch = 16, gap = 6;
+    const gap = 6;
+    const ch = Math.max(8, Math.min(16 * U, Math.floor((pitch - 46) / s2.rows) - gap)), cw = Math.round(30 * U);
     const gw = s2.cols * (cw + gap) - gap;
     const gx = Math.max(x0, Math.min(x1 - gw, x0 + s2.hatchX * k - gw / 2));
     const gy = y + 34;
@@ -19416,9 +19431,11 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
     c.moveTo(x0 + s2.hatchX * k, y + 22);
     c.lineTo(x0 + s2.hatchX * k, gy);
     c.stroke();
+    const nameLeft = gx + gw + 12 + 100 * U > x1;
+    txt(c, "정비 구역", nameLeft ? gx - 10 : gx + gw + 10, gy + 14 * U, 13 * U, C3.svcSeen, nameLeft ? "right" : "left");
     for (const cell of s2.cells) {
       const cx = gx + cell.col * (cw + gap), cy = gy + cell.row * (ch + gap);
-      if (cell.row * (ch + gap) + gy > y + pitch - 8) continue;
+      if (cy + ch > y + pitch - 4) continue;
       if (!cell.seen && !cell.key && cell.kind !== "attic") continue;
       c.fillStyle = cell.seen ? C3.svcSeen : "#3a2e1c";
       c.fillRect(cx, cy, cw, ch);
@@ -19455,7 +19472,7 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
       }
     }
   }
-  const ly = H6 - 34;
+  let ly = H6 - (U > 1.3 ? 64 : 34);
   let lx = 48;
   const legend = [
     [{ x: 0, kind: "service", state: "" }, "정비 구역 입구"],
@@ -19466,50 +19483,61 @@ function drawRunMap(c, m, px, t, W5 = 1280, H6 = 720) {
     [{ x: 0, kind: "elevator", state: "" }, "승강기 패널"],
     [{ x: 0, kind: "boss", state: "" }, "수호자"]
   ];
+  const ls = Math.round(13 * U);
   for (const [mk, s2] of legend) {
-    glyph(c, mk, lx + 8, ly - 4, 2);
-    txt(c, s2, lx + 22, ly + 2, 13, C3.sub);
-    c.font = "700 13px system-ui";
-    lx += 40 + c.measureText(s2).width;
+    c.font = `700 ${ls}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
+    const iw = 30 * U + c.measureText(s2).width;
+    if (lx + iw > W5 - 48) lx = 48, ly += ls + 12;
+    glyph(c, mk, lx + 8 * U, ly - 4 * U, 2 * U);
+    txt(c, s2, lx + 20 * U, ly + 2, ls, C3.sub);
+    lx += iw + 22;
   }
-  txt(c, "Z · Tab · M 닫기", W5 - 48, ly + 2, 13, C3.sub, "right");
+  txt(c, "Z · Tab · M 닫기", W5 - 48, 40 + 20 * U + 22 * U, 12 * U, C3.sub, "right");
   c.restore();
 }
-function drawMiniMap(c, m, px, t, x = 740, y = 16, w = 400, h = 62) {
+function drawMiniMap(c, m, px, t, U = 1) {
+  if (m.where !== "floor" && m.where !== "side" && m.where !== "service") return;
+  const phone = U > 1.3;
+  const x = phone ? 300 : 740, y = phone ? 8 : 16, w = phone ? 560 : 400, h = phone ? 112 : 62;
+  const fs = phone ? 22 : 12;
   c.save();
-  c.fillStyle = "rgba(10,12,16,0.72)";
+  c.fillStyle = "rgba(10,12,16,0.82)";
   c.fillRect(x, y, w, h);
   c.strokeStyle = "rgba(200,162,74,0.85)";
   c.lineWidth = 2;
   c.strokeRect(x, y, w, h);
+  fitTxt(c, m.goal, x + 8, y + fs + 4, fs, "#ffd76a", w - 16);
+  const top = y + fs + 12;
   const f = m.floors.find((q) => q.depth === m.depth);
   if ((m.where === "floor" || m.where === "side") && f) {
     const span = 7e3;
     const k = (w - 16) / span;
     const cx = m.where === "side" && m.sideX !== null ? m.sideX : px;
     const a = Math.max(0, Math.min(f.width - span, cx - span / 2));
-    const bx = x + 8 - a * k, by = y + 30;
+    const bh = phone ? 22 : 12;
+    const bx = x + 8 - a * k, by = y + h - bh - (phone ? 10 : 8);
+    const gs = phone ? 2.4 : 1.4;
     c.save();
     c.beginPath();
-    c.rect(x + 4, y + 4, w - 8, h - 8);
+    c.rect(x + 4, top - 4, w - 8, y + h - top);
     c.clip();
     c.fillStyle = C3.dim;
-    c.fillRect(bx, by, f.width * k, 12);
+    c.fillRect(bx, by, f.width * k, bh);
     c.fillStyle = C3.seen;
-    c.fillRect(bx + Math.max(0, f.explored[0]) * k, by, (Math.min(f.width, f.explored[1]) - Math.max(0, f.explored[0])) * k, 12);
+    c.fillRect(bx + Math.max(0, f.explored[0]) * k, by, (Math.min(f.width, f.explored[1]) - Math.max(0, f.explored[0])) * k, bh);
     for (const mk of f.marks) {
-      if (mk.kind === "side" || mk.kind === "secret") glyph(c, mk, bx + mk.x * k, by - 9, 1.3);
-      else glyph(c, mk, bx + mk.x * k, by + 6, 1.4);
+      if (mk.kind === "side" || mk.kind === "secret") glyph(c, mk, bx + mk.x * k, by - 5 * gs, gs * 0.9);
+      else glyph(c, mk, bx + mk.x * k, by + bh / 2, gs);
     }
-    hereDot(c, bx + cx * k, by + 6, t);
+    hereDot(c, bx + cx * k, by + bh / 2, t);
     c.restore();
-    txt(c, m.goal, x + 8, y + 20, 12, "#ffd76a");
   } else if (m.where === "service") {
     const s2 = m.services.find((q) => q.depth === m.depth);
     if (s2) {
       const rows = Math.max(1, s2.rows);
-      const gap = 2, ch = Math.max(3, Math.min(10, Math.floor((h - 32) / rows) - gap)), cw = Math.min(26, Math.floor((w - 20) / s2.cols) - gap);
-      const gx = x + w - 10 - s2.cols * (cw + gap), gy = y + 28;
+      const gap = 2, ch = Math.max(3, Math.min(phone ? 18 : 10, Math.floor((y + h - top - 4) / rows) - gap)), cw = Math.min(phone ? 44 : 26, Math.floor((w - 20) / s2.cols) - gap);
+      const gx = x + w - 10 - s2.cols * (cw + gap), gy = top;
+      txt(c, "정비 구역", gx - 10, gy + ch + 4, phone ? 18 : 11, C3.svcSeen, "right");
       for (const cell of s2.cells) {
         if (!cell.seen && !cell.key && cell.kind !== "attic") continue;
         const cx = gx + cell.col * (cw + gap), cy = gy + cell.row * (ch + gap);
@@ -19520,9 +19548,8 @@ function drawMiniMap(c, m, px, t, x = 740, y = 16, w = 400, h = 62) {
         if (cell.key) c.fillStyle = C3.key, c.fillRect(cx + 3, cy + 1, 8, Math.max(2, ch - 2));
         if (m.cell && m.cell[0] === cell.col && m.cell[1] === cell.row) hereDot(c, cx + cw / 2, cy + ch / 2, t);
       }
-      txt(c, m.goal, x + 8, y + 20, 12, "#ffd76a");
     }
-  } else txt(c, m.where === "car" ? "승강기 안" : "", x + 8, y + 36, 14, C3.text);
+  }
   c.restore();
 }
 
@@ -26429,8 +26456,9 @@ function engineModules(box3, bridge) {
       if (!game?.inHub && w.stage === elevator) {
         const m = elevator.mapView();
         const t = performance.now() / 1e3;
-        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
-        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+        const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
       } else mapOpen = false;
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
