@@ -1,0 +1,43 @@
+{
+ "march": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "slash": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "rise": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 14,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ }
+}

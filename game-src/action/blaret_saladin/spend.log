@@ -1,0 +1,134 @@
+10-22 02:18:04 base blaret seed61 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:05 base blaret seed62 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:05 base blaret seed63 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:05 base saladin seed61 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:05 base blaret seed64 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:05 base saladin seed62 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:06 base saladin seed63 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:18:06 base saladin seed64 1 validation error for call[edit_image_pixen] description   String should have at most 500 characters [type=string_too_long, input_value='Change her into a diff
+10-22 02:19:58 base blaret seed61 id: 89e2f8d6-2c38-45d1-81cb-a6ad89346eb0 job_id: 89e2f8d6-2c38-45d1-81cb-a6ad89346eb0 model: pixen edit: Make her a Catholic battle nun, same side pose, size, o
+10-22 02:20:30 base saladin seed61 id: c13e0621-3ea2-445c-9a5f-d40d2a1f74c1 job_id: c13e0621-3ea2-445c-9a5f-d40d2a1f74c1 model: pixen edit: Make her a huge bearded man: much broader shoulders, th
+10-22 02:20:30 base saladin seed62 id: 4ddf3b27-6073-41f4-92bf-70192fd811ad job_id: 4ddf3b27-6073-41f4-92bf-70192fd811ad model: pixen edit: Make her a huge bearded man: much broader shoulders, th
+10-22 02:22:32 base blaret seed62 id: ddccbc39-4a17-4478-8860-3854693ca7ca job_id: ddccbc39-4a17-4478-8860-3854693ca7ca model: pixen edit: Make her a Catholic battle nun, same side pose, size, o
+10-22 02:23:33 base saladin seed63 id: 5f339ac4-5e95-4f3f-b488-05cf94764301 job_id: 5f339ac4-5e95-4f3f-b488-05cf94764301 model: pixen edit: Make her a huge bearded man: much broader shoulders, th
+10-22 02:26:39 base saladin seed64 id: 9b5c05e6-a3e4-4416-ad7f-733437ab4b21 job_id: 9b5c05e6-a3e4-4416-ad7f-733437ab4b21 model: pixen edit: Make her a huge bearded man: much broader shoulders, th
+10-22 02:28:10 base blaret seed63 id: 48482c3e-f519-40de-868e-0556e41e115f job_id: 48482c3e-f519-40de-868e-0556e41e115f model: pixen edit: Make her a Catholic battle nun, same side pose, size, o
+10-22 02:30:44 base blaret seed64 id: bc920c8c-c144-4228-b125-92807d3ab3d4 job_id: bc920c8c-c144-4228-b125-92807d3ab3d4 model: pixen edit: Make her a Catholic battle nun, same side pose, size, o
+10-22 02:41:04 base crusader seed81 id: 5aeec7d4-9aa2-4eba-9258-3fb9b13ecb56 job_id: 5aeec7d4-9aa2-4eba-9258-3fb9b13ecb56 model: pixen edit: Make her a desert holy warrior man: chainmail under a w
+10-22 02:42:06 base horse seed81 id: de62c555-27ef-43ea-81cb-9a8306a12b1b job_id: de62c555-27ef-43ea-81cb-9a8306a12b1b model: pixen description: Side-view pixel art sprite for a 1990s arcade be
+10-22 02:42:12 base crusader seed82 id: de7ffaf9-1df2-442a-b42f-2313948597af job_id: de7ffaf9-1df2-442a-b42f-2313948597af model: pixen edit: Make her a desert holy warrior man: chainmail under a w
+10-22 02:44:40 base highmamluk seed81 id: f1941506-69ef-47e1-bd30-4f3a949d84c2 job_id: f1941506-69ef-47e1-bd30-4f3a949d84c2 model: pixen edit: Make her a mamluk elite warrior man: lamellar armor, sp
+10-22 02:46:45 base2 saladin seed71 id: 8d95368a-70b2-4b54-8ffb-20d9fbbf1760 job_id: 8d95368a-70b2-4b54-8ffb-20d9fbbf1760 model: pixen edit: Make her a huge bearded man, broad shoulders, thick arm
+10-22 02:47:13 base highmamluk seed82 id: 64dec870-6332-49a0-b6a7-71e4e32c2388 job_id: 64dec870-6332-49a0-b6a7-71e4e32c2388 model: pixen edit: Make her a mamluk elite warrior man: lamellar armor, sp
+10-22 02:47:48 gen blaret/idle 7f -> id: ea6cac81-30ea-49c4-984a-46365577c59e job_id: ea6cac81-30ea-49c4-984a-46365577c59e description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:48:45 base horse seed82 id: 40c21969-f1ca-4910-99f9-92cf59d8eb91 job_id: 40c21969-f1ca-4910-99f9-92cf59d8eb91 model: pixen description: Side-view pixel art sprite for a 1990s arcade be
+10-22 02:49:46 base knight seed81 id: 1ed45f88-08e8-4662-a799-9b22362b91f7 job_id: 1ed45f88-08e8-4662-a799-9b22362b91f7 model: pixen edit: Make her an armored holy knight: polished silver full p
+10-22 02:50:40 gen blaret/walk 8f -> id: 16d3f2a6-5519-4b53-bb62-33a84ab0f91d job_id: 16d3f2a6-5519-4b53-bb62-33a84ab0f91d description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:51:21 gen blaret/cut1 6f -> id: 44c142bc-c39b-4288-813f-3664447498a0 job_id: 44c142bc-c39b-4288-813f-3664447498a0 description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:51:43 gen blaret/run 8f -> id: 437c6576-9dde-4570-abd3-aa12dd1d9267 job_id: 437c6576-9dde-4570-abd3-aa12dd1d9267 description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:52:14 gen blaret/blink 5f -> id: 776b6ecc-f77d-4ed1-a933-475c9e8244a0 job_id: 776b6ecc-f77d-4ed1-a933-475c9e8244a0 description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:53:20 base2 saladin seed72 id: d34d48b7-2801-4042-b539-3b4d837a3b27 job_id: d34d48b7-2801-4042-b539-3b4d837a3b27 model: pixen edit: Make her a huge bearded man, broad shoulders, thick arm
+10-22 02:53:21 base knight seed82 id: 5da8f37b-7481-4b61-9612-3612d4eb11db job_id: 5da8f37b-7481-4b61-9612-3612d4eb11db model: pixen edit: Make her an armored holy knight: polished silver full p
+10-22 02:54:20 base highmamluk seed83 id: bc45dc90-8226-4cef-bf7b-465e4ab57fd8 job_id: bc45dc90-8226-4cef-bf7b-465e4ab57fd8 model: pixen edit: Make her a mamluk elite warrior man: lamellar armor, sp
+10-22 02:56:25 gen blaret/fire 6f -> id: 525dffff-577a-4d2e-8abb-357ef15fb11f job_id: 525dffff-577a-4d2e-8abb-357ef15fb11f description: battle nun: black veil to the shoulders with a thin white for
+10-22 02:56:42 gen blaret/idle done
+10-22 02:57:01 gen highmamluk/run 8f -> id: 551f97a0-89ad-4361-9a34-9c8e6aa73db2 job_id: 551f97a0-89ad-4361-9a34-9c8e6aa73db2 description: elite mamluk warrior in lamellar armor and a spiked helmet, a
+10-22 02:57:15 gen blaret/cut1 done
+10-22 02:57:24 base2 saladin seed73 id: 9d8bbbed-5259-4bae-b09e-0052d966d379 job_id: 9d8bbbed-5259-4bae-b09e-0052d966d379 model: pixen edit: Make her a huge bearded man, broad shoulders, thick arm
+10-22 02:58:50 gen blaret/fire done
+10-22 02:59:56 base2 saladin seed74 id: 8e2af97f-85be-4c8d-8a15-fa21605e05b4 job_id: 8e2af97f-85be-4c8d-8a15-fa21605e05b4 model: pixen edit: Make her a huge bearded man, broad shoulders, thick arm
+10-22 03:00:24 gen blaret/draw 6f -> id: 332106ff-65a0-4565-8e99-133e91619e2e job_id: 332106ff-65a0-4565-8e99-133e91619e2e description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:00:30 base crusader seed83 id: fc21917c-5d82-4534-b344-4fc0781c4cb5 job_id: fc21917c-5d82-4534-b344-4fc0781c4cb5 model: pixen edit: Make her a desert holy warrior man: chainmail under a w
+10-22 03:01:30 gen highmamluk/run done
+10-22 03:01:59 base modernspirit seed81 id: 5858ab8e-c3ba-4943-87c1-ab64a1f6e6cd job_id: 5858ab8e-c3ba-4943-87c1-ab64a1f6e6cd model: pixen edit: Make her a modern soldier man: desert combat fatigues, 
+10-22 03:02:47 gen saladin/idle 7f -> id: 0a82814c-e03a-4e3d-879d-956184d4f0fa job_id: 0a82814c-e03a-4e3d-879d-956184d4f0fa description: huge bearded man, dark brown skin, short black beard, white w
+10-22 03:04:00 base knight seed83 id: a2f40d1f-81c0-42e4-a788-24831bcf2aef job_id: a2f40d1f-81c0-42e4-a788-24831bcf2aef model: pixen edit: Make her an armored holy knight: polished silver full p
+10-22 03:04:58 gen blaret/guns_idle 4f -> id: 1adf05b7-5a8b-49c2-b7f5-b7e27ff5c3b9 job_id: 1adf05b7-5a8b-49c2-b7f5-b7e27ff5c3b9 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:05:14 gen knight/idle 4f -> id: f98623e7-4ac5-4432-be16-723dd73fcef5 job_id: f98623e7-4ac5-4432-be16-723dd73fcef5 description: armored holy knight in polished silver full plate armor and a
+10-22 03:05:29 gen blaret/fire_split 6f -> id: 2a7dd337-af57-4efe-b5de-461089ef6895 job_id: 2a7dd337-af57-4efe-b5de-461089ef6895 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:05:29 gen blaret/jump 8f -> id: d4bb88e3-7136-4337-94e5-d618beb50f23 job_id: d4bb88e3-7136-4337-94e5-d618beb50f23 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:06:01 gen crusader/march 8f -> id: d165f7de-0e8d-4ab4-9952-6e93e2e43313 job_id: d165f7de-0e8d-4ab4-9952-6e93e2e43313 description: desert holy warrior: chainmail under a white robe, white turb
+10-22 03:06:16 base horse seed83 id: f224a03f-a2e8-461a-bedd-3c0605d95677 job_id: f224a03f-a2e8-461a-bedd-3c0605d95677 model: pixen description: Side-view pixel art sprite for a 1990s arcade be
+10-22 03:06:33 base modernspirit seed82 id: 4409a67a-7d52-4448-a0d6-e74937c12a0b job_id: 4409a67a-7d52-4448-a0d6-e74937c12a0b model: pixen edit: Make her a modern soldier man: desert combat fatigues, 
+10-22 03:07:31 gen blaret/air_fire 8f -> id: 52e4cef0-99ad-4f9f-ad44-2ad8f75b5dbd job_id: 52e4cef0-99ad-4f9f-ad44-2ad8f75b5dbd description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:07:48 gen knight/march 8f -> id: c4e869ea-f780-4f2d-8fa8-6e5c5a85293b job_id: c4e869ea-f780-4f2d-8fa8-6e5c5a85293b description: armored holy knight in polished silver full plate armor and a
+10-22 03:07:48 gen blaret/walk done
+10-22 03:07:51 gen blaret/run done
+10-22 03:07:52 gen blaret/blink done
+10-22 03:07:54 gen blaret/draw done
+10-22 03:07:55 gen blaret/guns_idle done
+10-22 03:07:57 gen blaret/fire_split done
+10-22 03:08:33 gen crusader/slash 6f -> id: 43978ce2-4b23-4817-8ecf-83a85bbe1349 job_id: 43978ce2-4b23-4817-8ecf-83a85bbe1349 description: desert holy warrior: chainmail under a white robe, white turb
+10-22 03:08:52 gen saladin/draw 8f -> id: 934bbb9f-2519-4204-95de-58a653f83cfa job_id: 934bbb9f-2519-4204-95de-58a653f83cfa description: huge bearded man, dark brown skin, short black beard, white w
+10-22 03:08:58 base horse192 seed91 id: cac50e89-53b4-462a-b1f3-f05e5960315f job_id: cac50e89-53b4-462a-b1f3-f05e5960315f model: pixen description: Side-view pixel art sprite for a 1990s arcade be
+10-22 03:09:04 gen crusader/rise 8f -> id: 8d351ada-cf70-4f69-acef-c7c6ff84b9a6 job_id: 8d351ada-cf70-4f69-acef-c7c6ff84b9a6 description: desert holy warrior: chainmail under a white robe, white turb
+10-22 03:09:22 gen crusader/march done
+10-22 03:12:31 base horse192 seed92 id: b0e78175-fb60-4583-a61c-60ad878e9471 job_id: b0e78175-fb60-4583-a61c-60ad878e9471 model: pixen description: Side-view pixel art sprite for a 1990s arcade be
+10-22 03:12:47 gen crusader/rise done
+10-22 03:12:58 gen saladin/armed_idle 4f -> id: fe0c6e05-e4e6-4682-8a3d-57fdb6dcc387 job_id: fe0c6e05-e4e6-4682-8a3d-57fdb6dcc387 description: huge bearded man, dark brown skin, short black beard, white w
+10-22 03:13:02 gen blaret/reload 8f -> id: 5ba04eb9-016a-40b1-86c4-a16c60efd2fd job_id: 5ba04eb9-016a-40b1-86c4-a16c60efd2fd description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:13:05 gen crusader/slash done
+10-22 03:13:33 gen modernspirit/fire 6f -> id: 3fac3ec8-7736-4258-960d-89439426cf35 job_id: 3fac3ec8-7736-4258-960d-89439426cf35 description: modern soldier spirit in combat fatigues and a bomb vest, a r
+10-22 03:14:20 gen blaret/jump done
+10-22 03:14:23 gen blaret/air_fire done
+10-22 03:15:44 gen blaret/reload done
+10-22 03:15:44 gen blaret/stake_throw 6f -> id: de8f7708-6221-43c7-a7f4-a1e73f00d241 job_id: de8f7708-6221-43c7-a7f4-a1e73f00d241 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:19:16 gen blaret/stake_throw done
+10-22 03:19:16 gen blaret/stake_finish 8f -> id: b0e40ddb-6d3c-4f86-b6b3-31ca4120fe89 job_id: b0e40ddb-6d3c-4f86-b6b3-31ca4120fe89 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:23:44 gen blaret/stake_finish done
+10-22 03:24:47 gen blaret/extract 10f -> id: b0f95e52-806a-4205-8afb-88c2b218d693 job_id: b0f95e52-806a-4205-8afb-88c2b218d693 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:30:05 gen blaret/extract done
+10-22 03:30:05 gen blaret/sword_idle 4f -> id: cefb299e-d0cb-40ad-8329-8b0a656d671b job_id: cefb299e-d0cb-40ad-8329-8b0a656d671b description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:34:07 gen blaret/sword_idle done
+10-22 03:34:07 gen blaret/cut2 6f -> id: 4329fbcb-c5e6-4007-b7c6-1b4ea69924c0 job_id: 4329fbcb-c5e6-4007-b7c6-1b4ea69924c0 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:38:44 gen blaret/cut2 done
+10-22 03:39:15 gen blaret/cut3 8f -> id: 5d6aa02d-01a1-4a44-974d-33ca66fb4620 job_id: 5d6aa02d-01a1-4a44-974d-33ca66fb4620 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:42:25 gen blaret/cut3 done
+10-22 03:42:26 gen blaret/lunge 7f -> id: 06a79c81-08b1-4a72-b406-4dd944327513 job_id: 06a79c81-08b1-4a72-b406-4dd944327513 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:45:53 gen blaret/lunge done
+10-22 03:45:54 gen blaret/rise 8f -> id: 96c85e81-6ec7-45ac-bc99-fe3e530b1f1a job_id: 96c85e81-6ec7-45ac-bc99-fe3e530b1f1a description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:49:20 gen blaret/rise done
+10-22 03:49:21 gen blaret/plunge 8f -> id: 14d4ec1b-47e5-40a6-9bfc-d6bb219d1008 job_id: 14d4ec1b-47e5-40a6-9bfc-d6bb219d1008 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:52:16 gen blaret/plunge done
+10-22 03:52:16 gen blaret/sword_break 5f -> id: a44116dd-a853-4583-8ec5-5f7f59c08749 job_id: a44116dd-a853-4583-8ec5-5f7f59c08749 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:55:27 gen blaret/sword_break done
+10-22 03:55:27 gen blaret/palm 6f -> id: c9fd2195-53db-41b1-9075-1f1d91b44de4 job_id: c9fd2195-53db-41b1-9075-1f1d91b44de4 description: battle nun: black veil to the shoulders with a thin white for
+10-22 03:59:56 gen blaret/palm done
+10-22 03:59:56 gen blaret/wave 8f -> id: 0f46aedd-f336-41cf-b62d-6cca2aef5af3 job_id: 0f46aedd-f336-41cf-b62d-6cca2aef5af3 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:03:40 gen blaret/wave done
+10-22 04:03:40 gen blaret/click 8f -> id: 9e191fee-9f4f-42e3-b75a-fae24af01738 job_id: 9e191fee-9f4f-42e3-b75a-fae24af01738 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:07:09 gen blaret/click done
+10-22 04:07:09 gen blaret/guard 4f -> id: fc7eb006-d9d3-4b15-9336-dfb5302556d2 job_id: fc7eb006-d9d3-4b15-9336-dfb5302556d2 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:08:45 gen blaret/guard done
+10-22 04:08:46 gen blaret/high_kick 6f -> id: 7c6ee9c4-9720-42eb-84c1-c9488186d878 job_id: 7c6ee9c4-9720-42eb-84c1-c9488186d878 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:11:59 gen blaret/high_kick done
+10-22 04:11:59 gen blaret/sidestep 5f -> id: 943cc20a-7132-45fb-b59c-b181cda4a653 job_id: 943cc20a-7132-45fb-b59c-b181cda4a653 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:13:51 gen blaret/sidestep done
+10-22 04:13:51 gen blaret/backflip 8f -> id: f889e479-79c8-4eaf-8cc8-cae163872c42 job_id: f889e479-79c8-4eaf-8cc8-cae163872c42 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:18:20 gen blaret/backflip done
+10-22 04:18:21 gen blaret/cathedral 10f -> id: ce7e7311-60f2-4dc2-ac9a-e493148e3b79 job_id: ce7e7311-60f2-4dc2-ac9a-e493148e3b79 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:21:19 gen blaret/cathedral done
+10-22 04:21:20 gen blaret/command 6f -> id: ef5c4ce6-d25f-4d63-bcd2-a3ff4c92edca job_id: ef5c4ce6-d25f-4d63-bcd2-a3ff4c92edca description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:29:44 gen blaret/command done
+10-22 04:29:44 gen blaret/super_ready 8f -> id: efa836a3-162e-4603-87f2-2b6d338efa0f job_id: efa836a3-162e-4603-87f2-2b6d338efa0f description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:32:24 gen blaret/super_ready done
+10-22 04:32:24 gen blaret/super_cut 10f -> id: d7681913-7e0e-496b-bcd7-03f1134350d1 job_id: d7681913-7e0e-496b-bcd7-03f1134350d1 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:35:05 gen blaret/super_cut done
+10-22 04:35:05 gen blaret/hit 4f -> id: db08e29d-9483-4586-8bf8-11a5b03a1da5 job_id: db08e29d-9483-4586-8bf8-11a5b03a1da5 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:36:40 gen blaret/hit done
+10-22 04:36:41 gen blaret/stagger 6f -> id: 7bb3c95b-7b5e-48aa-b985-9c43a43d4792 job_id: 7bb3c95b-7b5e-48aa-b985-9c43a43d4792 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:39:09 gen blaret/stagger done
+10-22 04:39:09 gen blaret/down 7f -> id: 48498f3a-cb30-4fb9-a35a-8898e380d8e9 job_id: 48498f3a-cb30-4fb9-a35a-8898e380d8e9 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:41:48 gen blaret/down done
+10-22 04:41:49 gen blaret/getup 6f -> id: bd8c0aa7-b461-4311-8d03-573ad6a92f1f job_id: bd8c0aa7-b461-4311-8d03-573ad6a92f1f description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:46:18 gen blaret/getup done
+10-22 04:46:18 gen blaret/halfblood 6f -> id: 01f35ef6-853c-4a68-ba02-5b8453b32c41 job_id: 01f35ef6-853c-4a68-ba02-5b8453b32c41 description: battle nun: black veil to the shoulders with a thin white for
+10-22 04:49:13 gen blaret/halfblood done
+10-22 04:49:14 gen blaret/wrath 6f -> id: b5942442-f540-469e-b194-2840fc3b58fc job_id: b5942442-f540-469e-b194-2840fc3b58fc description: battle nun: black veil to the shoulders with a thin white for
+10-22 05:25:15 gen saladin/idle done
+10-22 05:25:16 gen knight/idle done
+10-22 05:25:18 gen knight/march done
+10-22 05:25:20 gen saladin/draw done
+10-22 05:25:21 gen saladin/armed_idle done
+10-22 05:25:23 gen modernspirit/fire done
+10-22 05:25:25 gen blaret/wrath done

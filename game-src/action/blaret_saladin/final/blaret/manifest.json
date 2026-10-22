@@ -1,0 +1,543 @@
+{
+ "idle": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 5,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "walk": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "run": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "blink": {
+  "frames": 4,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "draw": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "guns_idle": {
+  "frames": 4,
+  "w": 256,
+  "h": 176,
+  "fps": 6,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "fire": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": true,
+  "hits": [
+   0,
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "fire_split": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 14,
+  "loop": false,
+  "hits": [
+   2,
+   4
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "jump": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "air_fire": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   2,
+   3,
+   4
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "reload": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "stake_throw": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   4
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "stake_finish": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   5
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "extract": {
+  "frames": 9,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "sword_idle": {
+  "frames": 3,
+  "w": 256,
+  "h": 176,
+  "fps": 6,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "cut1": {
+  "frames": 5,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": false,
+  "hits": [
+   2
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "cut2": {
+  "frames": 5,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "cut3": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 14,
+  "loop": false,
+  "hits": [
+   5
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "lunge": {
+  "frames": 7,
+  "w": 256,
+  "h": 176,
+  "fps": 16,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "rise": {
+  "frames": 7,
+  "w": 256,
+  "h": 176,
+  "fps": 14,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "plunge": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 14,
+  "loop": false,
+  "hits": [
+   4
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "sword_break": {
+  "frames": 5,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "palm": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "wave": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   5
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "click": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "guard": {
+  "frames": 4,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": true,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "high_kick": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [
+   2
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "sidestep": {
+  "frames": 5,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "backflip": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "cathedral": {
+  "frames": 10,
+  "w": 256,
+  "h": 176,
+  "fps": 8,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "command": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "super_ready": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "super_cut": {
+  "frames": 8,
+  "w": 256,
+  "h": 176,
+  "fps": 12,
+  "loop": false,
+  "hits": [
+   3
+  ],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "hit": {
+  "frames": 4,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "stagger": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "down": {
+  "frames": 7,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "getup": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "halfblood": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ },
+ "wrath": {
+  "frames": 6,
+  "w": 256,
+  "h": 176,
+  "fps": 10,
+  "loop": false,
+  "hits": [],
+  "foot": [
+   96,
+   168
+  ],
+  "kind": "전투"
+ }
+}
