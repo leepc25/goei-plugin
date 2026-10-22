@@ -1,0 +1,501 @@
+{
+  "character": "rojemon",
+  "date": "2026-10-22",
+  "requested_frames": 20,
+  "available_frames": 13,
+  "complete": false,
+  "tool": "built-in image_gen",
+  "generation_attempts": 18,
+  "notes": [
+    "완료 아님: 20장 중 13장. undress/04, undress/06, bath/00 생성은 도구 안전 심사에서 차단됨. showerturn/00 및 bath/01~03은 동일 장·자세 의존으로 보류.",
+    "undress/00은 의뢰서의 동일 장 지시대로 idle/00을 바이트 그대로 복사. 기준 그림 자체에 명시 팔레트 외 7색이 있어 그대로 보존함.",
+    "신규 12장은 192x144, 알파 0/255, 지정 전체 팔레트, 접지 y135 검사 통과. 최근접 축소·팔레트 양자화·외곽 검정 변환 수행.",
+    "head_top_y 실측은 피부/거품/검정 외곽선을 제외한 라벤더 영역의 상단. 일부 shower 장은 46으로, 검정 테두리 포함 머리끝 좌표와 1px 차이가 있을 수 있음. 정밀 검수 필요.",
+    "장별 손·몸 표 완전 합격 아님. undress/03은 앞팔/뒷팔의 시각적 구분 및 뒷무릎 들어올림이 불명확하고 검수 필요. 교정 생성 1회로 해결되지 않아 초안으로 남김.",
+    "shower 손 이동 2px 및 몸 중심 x57±4, 거품 개수/크기, 수건만의 3색 한정, 키·체형 연결은 별도 픽셀/시각 검수 필요. 자동 전체 팔레트 합격을 세부 동작 합격으로 해석하지 않음.",
+    "생성 그림은 내장 image_gen 사용. PixelLab 호출 없음. 미생성 프레임에 대체 그림/가짜 파일을 만들지 않음.",
+    "release/demo/rojemon-full.html 및 게임 런타임에는 미반영. review.html은 이 납품 파일만 내장한 검수용 애니메이션 뷰어."
+  ],
+  "frames": [
+    {
+      "clip": "undress",
+      "frame": 0,
+      "prompt": "의뢰서 지정: clips/idle/00.png 그대로 복사",
+      "generation_count": 0,
+      "commit": "9a408e1be30cee765eb6360caf7732dbf8d4939d",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/undress/00.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          33,
+          43,
+          71,
+          136
+        ],
+        "head_top_y": 43,
+        "sole_bottom_y": 135,
+        "body_width": 38,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 29,
+        "palette_ok": false
+      },
+      "path": "game-src/action/rojemon/clips/undress/00.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "undress",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. Game animation asset, ONE single frame undress/01, not a sheet. The two input images are the approved Rojemon character references; the second is the exact idle proportions and pixel scale. Draw the SAME adult woman aged 23 in exactly the same low-resolution pixel art style and right-facing side view, with petite adult proportions, long muted lavender wavy hair past waist, blunt fringe, purple eye and annoyed pout. Change pose: both arms thrown behind her shoulders to shrug off the black suit jacket, chest slightly forward, chin slightly lowered. White shirt, black tie, black knee-length pencil skirt, bare lower legs, black low-heel shoes stay fully on. Two hands behind her body, no extra limbs. Nonsexual everyday clothing change.\nOutput genuine transparent PNG, logical canvas exactly 192x144, body center x57, head top y44, sole bottom y135, same body dimensions as the reference. If delivered enlarged, use exact integer nearest-neighbor pixel blocks for a 192x144 logical grid. Keep the entire empty canvas and small character placement as reference. Crisp ONE logical pixel pure-black #000000 outline, no antialias, no blur, no gradients. Upper-left light, 2-3 shade cel clusters. Use ONLY these colors: skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; shirt #f2f0ec #c8c6c4; suit #383e43 #282f34 #1b2025 #0d1012; outline/shoes #000000. Character only, no text, ground, shadow, water, furniture or discarded clothing.",
+      "generation_count": 1,
+      "source": "generated_images/exec-34816e65-c56d-48c2-b32c-b6e85fb4acd3.png",
+      "commit": "9d8cae3487d635a1d56bde59392373147d8e4d7d",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/undress/01.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          28,
+          44,
+          70,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 42,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 28,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/undress/01.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "undress",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. Game animation asset, ONE single frame undress/02, not a sheet. The two input images are the approved Rojemon character references; the second is the exact idle proportions and pixel scale. Draw the SAME adult woman aged 23 in exactly the same low-resolution pixel art style and right-facing side view, with petite adult proportions, long muted lavender wavy hair past waist, blunt fringe, purple eye and annoyed pout. Change pose: NO JACKET. White long-sleeved collared shirt, black tie and black pencil skirt with black low-heel shoes. Her near/right hand grips the tie knot and sharply pulls DOWN in front of her chest. Far/left arm hangs straight beside her body. Fully clothed throughout, both arms clearly shown. Right-facing exact profile and same 92px petite adult body proportions. Nonsexual everyday clothing change.\nOutput genuine transparent PNG, logical canvas exactly 192x144, body center x57, head top y44, sole bottom y135, same body dimensions as the reference. If delivered enlarged, use exact integer nearest-neighbor pixel blocks for a 192x144 logical grid. Keep the entire empty canvas and small character placement as reference. Crisp ONE logical pixel pure-black #000000 outline, no antialias, no blur, no gradients. Upper-left light, 2-3 shade cel clusters. Use ONLY these colors: skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; shirt #f2f0ec #c8c6c4; suit #383e43 #282f34 #1b2025 #0d1012; outline/shoes #000000. Character only, no text, ground, shadow, water, furniture or discarded clothing. Correction: near arm pulls tie, far arm hangs down.",
+      "generation_count": 2,
+      "source": "generated_images/exec-de154ec6-434d-4364-849b-1606e2187a78.png",
+      "commit": "f8a6e51dc5887b3e6104098955f81eef284d0c54",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/undress/02.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          30,
+          44,
+          70,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 40,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 28,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/undress/02.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "undress",
+      "frame": 3,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame undress/03. Strict right-facing side profile. No jacket or shirt; she wears the beige chest-to-knee wrap over her black skirt. Balances on one straight planted near/right leg; the far/left knee lifts up and bends so its shoe is reachable. NEAR RIGHT ARM extends FORWARD horizontally for balance; FAR LEFT hand reaches to hold the heel of the lifted rear foot's black shoe as she takes that shoe off. Stable closed modest wrap, knees close. Long hair drapes behind her, slight annoyed concentration. Do not show loose clothes, extra shoe, skin underneath the wrap, or extra hands.",
+      "generation_count": 2,
+      "source": "generated_images/exec-18a0c340-fa30-44b6-9250-c5772e821255.png",
+      "commit": "30d4906d3c3595e1abb6a27e073f5fb9a2c840a0",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/undress/03.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          32,
+          44,
+          87,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 55,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 27,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/undress/03.png",
+      "visual_review": "needs_revision_near_far_arms_and_lifted_knee",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "undress",
+      "frame": 4,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame undress/04. Right facing strict side profile. Both bare feet planted with knees together. She BENDS FORWARD at the waist and both hands at KNEE height grasp the waistband of the black pencil skirt, lowering that skirt off over her opaque beige chest-to-knee bath wrap. Both hands same height holding opposite skirt edges. The opaque towel stays securely closed over her torso and hips and upper legs throughout. No underwear, no nudity. Hair falls forward following gravity. This is a practical covered clothing-changing motion, no sensual pose. Keep anatomical limb lengths and head size equal to reference, bent pose naturally shorter than idle.",
+      "generation_count": 1,
+      "status": "blocked",
+      "reason": "image generation safety system rejected input category sexual; request ID 21f813f9-a85f-40d3-a158-806f14da6763",
+      "path": "game-src/action/rojemon/clips/undress/04.png"
+    },
+    {
+      "clip": "undress",
+      "frame": 5,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame undress/05: already dressed in a secure opaque knee-length beige bath wrap, barefoot, standing straight in right-facing side profile. She sweeps her long hair BACK away from her face. NEAR RIGHT hand is behind the top of her head, palm in hair just behind crown; FAR LEFT hand is at the nape of the neck pushing hair back down behind her back. Both elbows bent, hands at DIFFERENT heights. Facial expression neutral and slightly annoyed. Practical grooming pose only.",
+      "generation_count": 1,
+      "source": "generated_images/exec-ec1777f2-ae05-4f1b-83f5-5a140788bc03.png",
+      "commit": "e3f5daec141237d921cba138572322b19a9e4573",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/undress/05.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          37,
+          44,
+          67,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 30,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 25,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/undress/05.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "undress",
+      "frame": 6,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame undress/06. Standing in exactly the idle reference pose and proportions, right-facing side profile, rear leg straight supporting her weight, nearer knee slightly forward. NEAR RIGHT hand clenched with back of knuckles resting ON her waist; FAR LEFT arm hangs straight down beside her body. Barefoot. Already wearing ONLY a fully secure opaque beige chest-to-knee bath wrap. Same long wavy lavender hair behind back, slightly annoyed pout. This is a neutral standing pose.",
+      "generation_count": 1,
+      "status": "blocked",
+      "reason": "imagegen input moderation category other; request ID 1e2b4d3e-bb6f-41d0-8945-2d00ccf18a4c",
+      "path": "game-src/action/rojemon/clips/undress/06.png"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 0,
+      "prompt": "undress/06 동일 장 복사",
+      "generation_count": 0,
+      "status": "blocked_dependency",
+      "reason": "undress/06 not generated",
+      "path": "game-src/action/rojemon/clips/showerturn/00.png"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame showerturn/01. A neutral turning-around pose, THREE QUARTER REAR view, body rotated away but head still faces screen right in profile with annoyed pout. BOTH arms lowered loosely at sides, empty hands. Barefoot standing. Opaque beige knee-length bath wrap stays closed and covers chest, torso, hips, thighs. Her long lavender wavy hair lies down her back. Keep exact same adult anatomy as reference; show only one frame.",
+      "generation_count": 1,
+      "source": "generated_images/exec-6859c2ee-6b89-4147-a70e-d5ef2443b790.png",
+      "commit": "df55044a308ca21d8ecd473716e5becc6dce7fc7",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/showerturn/01.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          36,
+          44,
+          68,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 32,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 26,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/showerturn/01.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "showerturn",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame showerturn/02. Turn the reference from three-quarter rear to EXACT FULL BACK VIEW. Face entirely hidden, back of head centered. Both arms relaxed hanging straight at sides, both hands empty. Both bare feet face away. Opaque beige chest-to-knee bath wrap has a small fastening knot visible at UPPER BACK along its top edge; long hair divides slightly so knot can be seen. No other change to height, body build, wrap length or lavender wavy hair. Upright neutral posture.",
+      "generation_count": 1,
+      "source": "generated_images/exec-2066b2ce-65e6-4064-9c50-b4a20c279982.png",
+      "commit": "f0134f83c65c377ac294ee9b934c2163c2dfb91e",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/showerturn/02.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          39,
+          44,
+          74,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 35,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 25,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/showerturn/02.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/00. Full back view EXACTLY as reference, same body/wrap/feet/height. She washes her hair with head slightly bowed, damp lavender hair lies against back. RIGHT palm rests on TOP of head at crown, right elbow out to screen right, starting scrubbing. LEFT hand holds hair ends at WAIST height, left elbow bent close beside body. Add only 3-5 tiny solid offwhite #f4f2ee foam clusters of 2-4 logical pixels on top of HAIR. No foam anywhere else. No water or shower booth. Wrap secure. Preserve silhouette except specified arms.",
+      "generation_count": 1,
+      "source": "generated_images/exec-ce01de4d-43c8-49c9-8675-3897282c5ea8.png",
+      "commit": "0557a9114d83d998fe38d7b46dcb538473f6c380",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/00.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          42,
+          44,
+          77,
+          136
+        ],
+        "head_top_y": 46,
+        "sole_bottom_y": 135,
+        "body_width": 35,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 26,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/00.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 1,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/01, precise animation inbetween edit of the reference. Keep entire body, feet, knee-length beige wrap, face-hidden rear view, height and hairstyle IDENTICAL to reference shower00. ONLY right palm scrubbing crown shifts two LOGICAL pixels toward screen RIGHT, left hand gripping hair tips at waist squeezes downward by two LOGICAL pixels. (Two logical pixels is about 18 source-image pixels.) Arms follow these tiny hand changes naturally. Keep same 3-5 small offwhite #f4f2ee foam spots only on crown. Do not change head, legs, body scale, camera, crop, towel or canvas.",
+      "generation_count": 1,
+      "source": "generated_images/exec-02f6f394-997e-4d7c-bd97-22259a7179da.png",
+      "commit": "1b2cc41fe3e04b4db999fa9f0ce8f1426c321e16",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/01.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          43,
+          44,
+          79,
+          136
+        ],
+        "head_top_y": 45,
+        "sole_bottom_y": 135,
+        "body_width": 36,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 26,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/01.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 2,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/02, precise inbetween of shower00 reference. Full rear view, head bowed very slightly. RIGHT palm stays on crown but moves two logical pixels LEFT of its position in shower00 to scrub. LEFT hand has RELEASED hair tips and is now rising, open empty hand at CHEST height beside left shoulder blade, halfway toward head. Clear distinction: right hand high on head, left hand below at chest. Same body, wrap, bare feet, same size and original canvas. Damp hair draped against back. Keep only 3-5 small 2-4px #f4f2ee foam clusters on hair crown.",
+      "generation_count": 1,
+      "source": "generated_images/exec-42b3eb9c-09ab-4089-a67f-394f76f00c07.png",
+      "commit": "8dc793ad4c9205def6648a1612cf0b097828fde1",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/02.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          42,
+          44,
+          78,
+          136
+        ],
+        "head_top_y": 46,
+        "sole_bottom_y": 135,
+        "body_width": 36,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 25,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/02.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 3,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/03. Full back view same character and secure wrap as reference. SWAP HAND ROLES: LEFT palm now on TOP of head at crown, left elbow out to screen LEFT. RIGHT hand is lowered and grips the hair ends at WAIST height, right elbow close to side. Exactly two arms. Keep feet/body/head scale/towel identical; head slightly bowed, hair damp against back. Just 3-5 tiny 2-4 logical pixel #f4f2ee foam clusters on head, none elsewhere. No change in camera.",
+      "generation_count": 1,
+      "source": "generated_images/exec-04a22841-59b5-4d84-88fc-c3c15e7167e2.png",
+      "commit": "b2601912b6326e5f867e471752c79668ef185cda",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/03.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          39,
+          44,
+          74,
+          136
+        ],
+        "head_top_y": 46,
+        "sole_bottom_y": 135,
+        "body_width": 35,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 25,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/03.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 4,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/04, inbetween edit of shower03 reference. Keep body/feet/wrap/hair/head/camera and pose identical. LEFT hand continues rubbing on crown, sliding slightly along crown. RIGHT hand still grips hair ends at waist and squeezes DOWN by exactly TWO logical pixels (~18px of source). Left hand stays on head; right hand stays low. This must be a tiny motion, no body translation. Preserve only 3-5 tiny #f4f2ee foam clusters on top of hair.",
+      "generation_count": 1,
+      "source": "generated_images/exec-96d267c1-0d7b-403b-a79a-bc88541659c2.png",
+      "commit": "97e2d0488416330c5cde93bbfdaf8bcf46fdf0be",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/04.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          39,
+          44,
+          74,
+          136
+        ],
+        "head_top_y": 46,
+        "sole_bottom_y": 135,
+        "body_width": 35,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 24,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/04.png",
+      "acceptance": "pending_visual_and_pixel_motion_review"
+    },
+    {
+      "clip": "shower",
+      "frame": 5,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, standing head top y44 and soles y135. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame shower/05, final loop transition. Full back view, keep same standing body/wrap/feet/head scale and lavender hair as reference. RIGHT hand moves from hair ends to the small beige wrap fastening KNOT at upper back, holding it to secure the wrap. LEFT hand has lowered from crown to EAR height on the left side of head, halfway down. No hand remains on crown. Both elbows naturally bent. Opaque beige wrap remains closed from chest to knees. Keep only a few tiny #f4f2ee foam clusters on hair crown, no water. Corrected by horizontal mirror to fix left/right roles.",
+      "generation_count": 2,
+      "source": "generated_images/exec-a086c194-9a10-40a2-8b37-81c29dd5cc0f.png",
+      "status": "delivered",
+      "measurements": {
+        "file": "game-src/action/rojemon/clips/shower/05.png",
+        "size": [
+          192,
+          144
+        ],
+        "bbox": [
+          39,
+          44,
+          75,
+          136
+        ],
+        "head_top_y": 46,
+        "sole_bottom_y": 135,
+        "body_width": 36,
+        "alpha_values": [
+          0,
+          255
+        ],
+        "colors": 26,
+        "palette_ok": true
+      },
+      "path": "game-src/action/rojemon/clips/shower/05.png",
+      "acceptance": "pending_visual_and_pixel_motion_review",
+      "commit": "8d816188a5186101aafd25b19c2acaefac32d698"
+    },
+    {
+      "clip": "bath",
+      "frame": 0,
+      "prompt": "Use case: identity-preserve. ONE animation frame of Rojemon, same adult 23-year-old woman and same pixel art style/proportions as approved reference. Petite adult body, small waist, long muted lavender wavy hair past waist, blunt bangs, purple eyes, pouting lips. Nonsexual everyday routine, neutral sprite design. Exact logical canvas 192x144 transparent PNG, body center x57, seated contact baseline y135, preserve adult head and limb pixel size from reference. Same pixel scale throughout, full body. 1px pure black outline, 2-3 cel shades, upper-left light, no antialiasing or gradients. If enlarged use integer nearest-neighbor pixel blocks. Color palette ONLY: outline #000000; skin #ffd8b0 #fdc79f #f8b898 #eda284 #e48c77 #d47f6e #bd8667; hair #d8bfd4 #b9a2c6 #a591bb #9284b2 #8677aa #6c6492 #504d77 #393659; eyes #605493 #191b31; suit #383e43 #282f34 #1b2025 #0d1012; towel #e6dcc4 #cbbd9c #a8987a. Her opaque beige bath wrap covers chest through knees securely and modestly in all poses. Character alone, no environment, no water, no floor, no steam, no text, no props or discarded clothing. Exactly two arms and legs. Frame bath/00. RIGHT-FACING STRICT SIDE PROFILE. Adult woman already wearing secure opaque beige chest-through-knee wrap, resting SEATED with knees raised together and both feet on ground. BOTH hands are planted FLAT on ground BEHIND her hips, straight arms support torso leaning BACK by 25 degrees, far hand 2 logical pixels behind near hand. Her head tilts back slightly and eyes CLOSED, quiet resting face. Long lavender hair falls behind her. Towel drapes over entire torso, lap and thighs through knees securely. Hands must be on floor BEHIND hips, NOT holding knees and NOT resting on lap. Character only on transparent background, no actual floor line or tub. Sitting posture naturally much shorter than standing reference, same head size and limb lengths, body centered x57.",
+      "generation_count": 1,
+      "status": "blocked",
+      "reason": "imagegen output moderation sexual, request ID eae503a8-5a2b-48a9-a370-2967870552ac",
+      "path": "game-src/action/rojemon/clips/bath/00.png"
+    },
+    {
+      "clip": "bath",
+      "frame": 1,
+      "prompt": "bath00와 동일, 어깨·머리 1px 위",
+      "generation_count": 0,
+      "status": "blocked_dependency",
+      "reason": "bath/00 pose blocked; no same-pose retry",
+      "path": "game-src/action/rojemon/clips/bath/01.png"
+    },
+    {
+      "clip": "bath",
+      "frame": 2,
+      "prompt": "bath00와 같은 높이",
+      "generation_count": 0,
+      "status": "blocked_dependency",
+      "reason": "bath/00 pose blocked; no same-pose retry",
+      "path": "game-src/action/rojemon/clips/bath/02.png"
+    },
+    {
+      "clip": "bath",
+      "frame": 3,
+      "prompt": "bath00와 동일, 어깨·머리 1px 아래, 앞발 발끝1px",
+      "generation_count": 0,
+      "status": "blocked_dependency",
+      "reason": "bath/00 pose blocked; no same-pose retry",
+      "path": "game-src/action/rojemon/clips/bath/03.png"
+    }
+  ]
+}

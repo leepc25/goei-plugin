@@ -12857,8 +12857,8 @@
    "origin": 0,
    "hold": 0.0,
    "group": "씻기·집안일·운동",
-   "frames": 7,
-   "bytes": 31323,
+   "frames": 10,
+   "bytes": 19374,
    "prop": false
   },
   "showerturn": {
