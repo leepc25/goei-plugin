@@ -68,8 +68,10 @@ def main():
             row = jobs.setdefault(job_id, {'job_id':job_id,'character':folder,'actual_cost':None,
                 'cost_status':'unverified_requires_per_job_server_usage','evidence':[]})
             row['evidence'].append({'path':path.relative_to(ROOT).as_posix(),'line':number,'text':line})
-    receipt_path = HERE / 'evidence/walk-completed.json'
-    if receipt_path.exists():
+    receipt_paths = [HERE / 'evidence/walk-completed.json', *sorted((HERE / 'walk-contact-v2').glob('*-completed.json'))]
+    for receipt_path in receipt_paths:
+        if not receipt_path.exists():
+            continue
         receipt = json.loads(receipt_path.read_text(encoding='utf-8'))['structuredContent']
         if receipt['job_id'] in jobs:
             jobs[receipt['job_id']].update(actual_cost=receipt['charged_generations'], cost_unit='generations', cost_status='server_receipt_verified', cost_evidence=receipt_path.relative_to(ROOT).as_posix())

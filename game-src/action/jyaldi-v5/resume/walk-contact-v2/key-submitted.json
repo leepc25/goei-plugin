@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-22T11:44:07.834Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca\njob_id: 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca\ndescription: adult woman agent, long straight black hair, red eyes, blue-grey shaded black suit with a hip-length jacket, white shirt, black tie, black gloves, black shoes, right hip holster, identical proportions and palette to reference, character only\naction: upright walking contact, passing, opposite contact key poses\nframes: 3\nsize: 192x144px\ntransparent: True\ncost: 2 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"4a4e18c2-d2f4-4604-9620-2127d4b8d3ca\")\nasset_id: 5d7fac44-ca40-5c8c-93c8-2eaf3efbffd8\nasset_status: pending (saved to your gallery when generation completes)"
+      }
+    ],
+    "isError": false
+  },
+  "preflight": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "credits: $0.00\ngenerations_remaining: 14005.30\ngenerations_used: 5349.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "2 jobs:\nc40aab31-b7a6-4d05-aeaf-907041ed603c processing 21%, eta ~118s (animation, 31s old)\n6bce13df-7d64-47e5-ba79-650cdea00aa4 processing 20%, eta ~132s (inpainting_v3, 33s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "- End frame: `animate_image` accepts `last_frame_url` (or `last_frame_base64`) for interpolation and pins the motion’s ending pose. The docs don’t say whether the supplied end image is included as a stored frame, so don’t assume it is.\n- Cost: at 192×144 with `frame_count=4`, the documented formula is `ceil(width × height × frames / 65,536)` = **2 generations**.\n- Exact shoe fixes: `pixelart_workbench` is free and deterministic. Use `inspect` to identify exact pixel colors, then `edit` to change only the shoe pixels; it returns a new drawing ID."
+          }
+        ],
+        "isError": false
+      }
+    }
+  ]
+}

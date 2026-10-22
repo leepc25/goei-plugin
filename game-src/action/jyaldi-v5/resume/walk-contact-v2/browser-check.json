@@ -1,0 +1,50 @@
+[
+  {
+    "name": "desktop",
+    "width": 1280,
+    "height": 900,
+    "errors": [],
+    "overflow": false,
+    "images": true,
+    "state": {
+      "frame": 0,
+      "playing": false,
+      "world": 40,
+      "facing": 1,
+      "ready": true,
+      "source": "new"
+    }
+  },
+  {
+    "name": "mobile",
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "overflow": false,
+    "images": true,
+    "state": {
+      "frame": 0,
+      "playing": false,
+      "world": 40,
+      "facing": 1,
+      "ready": true,
+      "source": "new"
+    }
+  },
+  {
+    "name": "portrait",
+    "width": 390,
+    "height": 844,
+    "errors": [],
+    "overflow": false,
+    "images": true,
+    "state": {
+      "frame": 0,
+      "playing": false,
+      "world": 40,
+      "facing": 1,
+      "ready": true,
+      "source": "new"
+    }
+  }
+]

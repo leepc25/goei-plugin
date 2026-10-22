@@ -1,0 +1,256 @@
+{
+  "observed_at": "2026-10-22T11:49:40.701Z",
+  "free": true,
+  "first": {
+    "operations": [
+      {
+        "operation": "patch_pixels",
+        "layer": "image",
+        "frames": [
+          1
+        ],
+        "pixels": [
+          [
+            44,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            45,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            46,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            47,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            48,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            51,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            52,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            53,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            54,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            55,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            56,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            57,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            58,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            59,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            60,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            61,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            64,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            65,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            66,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            67,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            68,
+            135,
+            "#00000000",
+            "#000000ff"
+          ],
+          [
+            69,
+            135,
+            "#00000000",
+            "#000000ff"
+          ]
+        ],
+        "reason": "Observed heel and rear sole stop one pixel above target y135; add matching black outsole only."
+      }
+    ],
+    "response": [
+      {
+        "type": "text",
+        "text": "image_id: 6806e6f5-0753-4695-8d1c-6bf5110e6d8f  (edited from 19954a31-0cba-4214-b40f-ff38785c23f3)\ncanvas: 192x144, 1 frame(s)\n1. patch_pixels: 22 px changed\nsheet rows: frames [1]\npalette (32): #3e4d59ff x511, #000000ff x430, #24282bff x344, #1a1e21ff x245, #15191aff x245, #2e353cff x227, #0d1213ff x150, #3a464eff x112, #4b5963ff x29, #626f70ff x26, #343d44ff x21, #fddbb6ff x15, #414e56ff x12, #505f6cff x10, #2a3135ff x6, #b56b32ff x6, … +16 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/6806e6f5-0753-4695-8d1c-6bf5110e6d8f/: image.png, frames.png, animation.gif\nnext: edit 6806e6f5-0753-4695-8d1c-6bf5110e6d8f --changes […]"
+      }
+    ]
+  },
+  "opposite": {
+    "operations": [
+      {
+        "operation": "copy_region",
+        "layer": "image",
+        "frames": [
+          2
+        ],
+        "source_layer": "image",
+        "source_frame": 1,
+        "region": [
+          140,
+          0,
+          150,
+          3
+        ],
+        "at": [
+          95,
+          123
+        ],
+        "reason": "Remove observed raised toe outside ankle, using known transparent pixels."
+      },
+      {
+        "operation": "copy_region",
+        "layer": "image",
+        "frames": [
+          2
+        ],
+        "source_layer": "image",
+        "source_frame": 1,
+        "region": [
+          44,
+          127,
+          84,
+          136
+        ],
+        "at": [
+          64,
+          127
+        ],
+        "reason": "Same character shoe contacts translated20px, flat soles at135; preserve upper legs."
+      }
+    ],
+    "response": [
+      {
+        "type": "text",
+        "text": "image_id: 2552c533-8ad2-45d8-98fd-88f733242b8c  (edited from ce835757-d74c-4324-8028-d02863740473)\ncanvas: 192x144, 2 frame(s)\n1. copy_region: 20 px changed, 44 matched\n2. copy_region: 255 px changed, 410 matched\nsheet rows: frames [2]\npalette (34): #3e4d59ff x990, #000000ff x830, #24282bff x638, #15191aff x541, #1a1e21ff x526, #2e353cff x429, #3a464eff x300, #0d1213ff x264, #626f70ff x63, #4b5963ff x62, #343d44ff x40, #fddbb6ff x28, #414e56ff x24, #2a3135ff x15, #505f6cff x15, #be9775ff x13, … +18 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/2552c533-8ad2-45d8-98fd-88f733242b8c/: frames.png, animation.gif\nnext: edit 2552c533-8ad2-45d8-98fd-88f733242b8c --changes […]"
+      }
+    ]
+  },
+  "endpoint": {
+    "operations": [
+      {
+        "operation": "copy_region",
+        "layer": "image",
+        "frames": [
+          1
+        ],
+        "source_layer": "image",
+        "source_frame": 1,
+        "region": [
+          0,
+          0,
+          151,
+          143
+        ],
+        "at": [
+          40,
+          0
+        ],
+        "reason": "Exact loop endpoint: same contact pose translated one40px cycle without rescaling."
+      },
+      {
+        "operation": "copy_region",
+        "layer": "image",
+        "frames": [
+          1
+        ],
+        "source_layer": "image",
+        "source_frame": 1,
+        "region": [
+          152,
+          0,
+          191,
+          143
+        ],
+        "at": [
+          0,
+          0
+        ],
+        "reason": "Clear old left margin with transparent source pixels."
+      }
+    ],
+    "response": [
+      {
+        "type": "text",
+        "text": "image_id: 6f52c86f-9d50-469e-b817-c014d06d3ab9  (edited from 6806e6f5-0753-4695-8d1c-6bf5110e6d8f)\ncanvas: 192x144, 1 frame(s)\n1. copy_region: 4834 px changed, 21888 matched\n2. copy_region: 38 px changed, 5760 matched\nsheet rows: frames [1]\npalette (32): #3e4d59ff x511, #000000ff x430, #24282bff x344, #1a1e21ff x245, #15191aff x245, #2e353cff x227, #0d1213ff x150, #3a464eff x112, #4b5963ff x29, #626f70ff x26, #343d44ff x21, #fddbb6ff x15, #414e56ff x12, #505f6cff x10, #2a3135ff x6, #b56b32ff x6, … +16 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/6f52c86f-9d50-469e-b817-c014d06d3ab9/: image.png, frames.png, animation.gif\nnext: edit 6f52c86f-9d50-469e-b817-c014d06d3ab9 --changes […]"
+      }
+    ]
+  }
+}

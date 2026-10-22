@@ -1,0 +1,33 @@
+{
+  "free": true,
+  "operations": [
+    {
+      "operation": "copy_region",
+      "layer": "image",
+      "frames": [
+        2,
+        3,
+        4
+      ],
+      "source_layer": "image",
+      "source_frame": 1,
+      "region": [
+        62,
+        127,
+        84,
+        136
+      ],
+      "at": [
+        62,
+        127
+      ],
+      "reason": "Observed stationary right shoe redraw flicker1px; lock only this stance shoe to the same-character contact pixel contour."
+    }
+  ],
+  "response": [
+    {
+      "type": "text",
+      "text": "image_id: 8a5cf80b-8328-4449-bbb3-aa618707282e  (edited from 0478c20c-906e-49d7-b318-ce2fa89ee99b)\ncanvas: 192x144, 5 frame(s)\n1. copy_region: 307 px changed, 690 matched\nsheet rows: frames [2, 3, 4]\npalette (94): #000000ff x2173, #3e4d59ff x2150, #24282bff x1463, #15191aff x1054, #1a1e21ff x1043, #2e353cff x964, #0d1213ff x883, #3a464eff x668, #343d44ff x116, #0a0c0cff x99, #4b5963ff x92, #2a3135ff x62, #fddbb6ff x60, #414e56ff x47, #626f70ff x33, #505f6cff x21, … +78 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/8a5cf80b-8328-4449-bbb3-aa618707282e/: frames.png, animation.gif\nnext: edit 8a5cf80b-8328-4449-bbb3-aa618707282e --changes […]"
+    }
+  ]
+}

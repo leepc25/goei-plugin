@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-22T11:52:45.154Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 7977bf40-dbbd-482b-8b2d-e150d4c38b63\njob_id: 7977bf40-dbbd-482b-8b2d-e150d4c38b63\naction: Continue walking forward one half-step: the near right leg swings forward past the planted far left leg into the supplied next contact pose. Keep the far left shoe planted at the same image position until contact, upright torso, nearly straight supporting knee, naturally opposing arm swing.\nframes: 4\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 102205\nasset_id: 16fc3811-2bb5-5c32-b826-0aeeb3e9f0db\nasset_status: pending (saved when generation completes)\ncost: 2 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"7977bf40-dbbd-482b-8b2d-e150d4c38b63\")"
+      }
+    ],
+    "isError": false
+  }
+}

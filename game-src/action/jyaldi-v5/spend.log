@@ -1812,3 +1812,11 @@ description: tall slim adult woman agent, long straight black hair to the
 2026-10-22T10:44:54.183231+00:00 LOCAL authenticated MCP Jyaldi walk skeleton-v3 8 frames 192x144. job_id: df3b56fb-5426-4491-888f-f94a4192e5cf
 quote=3 generations; server charged_generations=3; completed/raw 8 recovered; input_sha256=fa72194d31e4f08b1612d99b7ffcf056a6d67d8e1ff2b51139424afc631e3b0a; arguments_sha256=2fd1253190bf7e0e97dbd380c3ec88f9a7cfecdfd64557f0d5b72bdfede6318b
 quality HOLD: frame4 contact, frame6/7 sole height and crouched posture. No repeated paid request. Evidence resume/evidence/walk-completed.json. Shared balance delta not used. run unsubmitted.
+
+2026-10-22T11:45:04.872628+00:00 walk-contact-v2 keyposes job_id: 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca; 3 frames; quoted2, server cost2 generations; request eb75de964ef6e9d38917b4d58e78d8a39cfdeb70f1dd80e8acdab80a98c144fb; processing.
+
+2026-10-22T11:50:37.668155+00:00 walk-contact-v2 segment1 job_id: 134e1800-0f54-4dba-969e-d9b1b1d9f15e; pinned endpoints4 frames; quoted2, server cost2 generations. Keyposes completed charged2, deterministic shoe edits free.
+
+2026-10-22T11:53:34.149359+00:00 walk-contact-v2 segment2 job_id: 7977bf40-dbbd-482b-8b2d-e150d4c38b63; pinned endpoints4 frames; quoted2, server cost2 generations. Segment1 completed charged2. Continuation charged6 total.
+
+2026-10-22T12:03:38.874613+00:00 walk-contact-v2 completed: key3+segment1+segment2 charged_generations=2+2+2=6 confirmed by server completion receipts. All raw outputs retained, free PixelLab contact edits, eight reviewed frames. User visual approval pending; no run submitted.

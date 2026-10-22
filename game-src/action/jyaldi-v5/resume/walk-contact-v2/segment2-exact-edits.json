@@ -1,0 +1,52 @@
+{
+  "free": true,
+  "operations": [
+    {
+      "operation": "copy_region",
+      "layer": "image",
+      "frames": [
+        2,
+        3
+      ],
+      "source_layer": "image",
+      "source_frame": 1,
+      "region": [
+        92,
+        132,
+        104,
+        136
+      ],
+      "at": [
+        92,
+        132
+      ],
+      "reason": "Far stance toe is visible while near swing foot crosses left of it; lock only visible toe sole, preserve foreground swing."
+    },
+    {
+      "operation": "copy_region",
+      "layer": "image",
+      "frames": [
+        4
+      ],
+      "source_layer": "image",
+      "source_frame": 1,
+      "region": [
+        82,
+        132,
+        89,
+        136
+      ],
+      "at": [
+        82,
+        132
+      ],
+      "reason": "Near moving shoe occludes far toe; stabilize only exposed far heel without painting over foreground foot."
+    }
+  ],
+  "response": [
+    {
+      "type": "text",
+      "text": "image_id: e1f18ba3-5b6b-44cf-9d84-123bb3970a5a  (edited from a389a9bd-d026-4b7f-bba1-63d7b81ac89a)\ncanvas: 192x144, 5 frame(s)\n1. copy_region: 74 px changed, 130 matched\n2. copy_region: 9 px changed, 40 matched\nsheet rows: frames [2, 3, 4]\npalette (85): #3e4d59ff x2296, #000000ff x2252, #24282bff x1566, #1a1e21ff x1184, #15191aff x1043, #2e353cff x999, #0d1213ff x768, #3a464eff x454, #0a0c0cff x107, #343d44ff x92, #4b5963ff x68, #414e56ff x64, #fddbb6ff x62, #626f70ff x43, #2a3135ff x29, #f8cfa6ff x23, … +69 more\ndownload https://api.pixellab.ai/mcp/pixel-tools/e1f18ba3-5b6b-44cf-9d84-123bb3970a5a/: frames.png, animation.gif\nnext: edit e1f18ba3-5b6b-44cf-9d84-123bb3970a5a --changes […]"
+    }
+  ]
+}

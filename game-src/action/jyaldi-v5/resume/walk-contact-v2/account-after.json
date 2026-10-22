@@ -1,0 +1,28 @@
+{
+  "observed_at": "2026-10-22T12:02:49.115Z",
+  "balance": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "credits: $0.00\ngenerations_remaining: 13964.30\ngenerations_used: 5390.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "jobs": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "1 jobs:\n32193e13-5db2-47a6-9915-6724df241eee processing 24%, eta ~112s (animation, 37s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "note": "Other owners share the account. This continuation charged6 by per-job receipts, not balance delta."
+}

@@ -2,7 +2,7 @@
   "basis": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
   "scope": "eight agent spend.log submission records only; not live account job list",
   "note": "Historical balance changes and batch estimates are not per-job actual charges. Unknown cost is null, not zero.",
-  "job_count": 1024,
+  "job_count": 1027,
   "jobs": [
     {
       "job_id": "42b12cee-9e7b-496e-a721-69deaf28c853",
@@ -6886,6 +6886,51 @@
       ],
       "cost_unit": "generations",
       "cost_evidence": "game-src/action/jyaldi-v5/resume/evidence/walk-completed.json"
+    },
+    {
+      "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+      "character": "jyaldi-v5",
+      "actual_cost": 2,
+      "cost_status": "server_receipt_verified",
+      "evidence": [
+        {
+          "path": "game-src/action/jyaldi-v5/spend.log",
+          "line": 1816,
+          "text": "2026-10-22T11:45:04.872628+00:00 walk-contact-v2 keyposes job_id: 4a4e18c2-d2f4-4604-9620-2127d4b8d3ca; 3 frames; quoted2, server cost2 generations; request eb75de964ef6e9d38917b4d58e78d8a39cfdeb70f1dd80e8acdab80a98c144fb; processing."
+        }
+      ],
+      "cost_unit": "generations",
+      "cost_evidence": "game-src/action/jyaldi-v5/resume/walk-contact-v2/key-completed.json"
+    },
+    {
+      "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
+      "character": "jyaldi-v5",
+      "actual_cost": 2,
+      "cost_status": "server_receipt_verified",
+      "evidence": [
+        {
+          "path": "game-src/action/jyaldi-v5/spend.log",
+          "line": 1818,
+          "text": "2026-10-22T11:50:37.668155+00:00 walk-contact-v2 segment1 job_id: 134e1800-0f54-4dba-969e-d9b1b1d9f15e; pinned endpoints4 frames; quoted2, server cost2 generations. Keyposes completed charged2, deterministic shoe edits free."
+        }
+      ],
+      "cost_unit": "generations",
+      "cost_evidence": "game-src/action/jyaldi-v5/resume/walk-contact-v2/segment1-completed.json"
+    },
+    {
+      "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "character": "jyaldi-v5",
+      "actual_cost": 2,
+      "cost_status": "server_receipt_verified",
+      "evidence": [
+        {
+          "path": "game-src/action/jyaldi-v5/spend.log",
+          "line": 1820,
+          "text": "2026-10-22T11:53:34.149359+00:00 walk-contact-v2 segment2 job_id: 7977bf40-dbbd-482b-8b2d-e150d4c38b63; pinned endpoints4 frames; quoted2, server cost2 generations. Segment1 completed charged2. Continuation charged6 total."
+        }
+      ],
+      "cost_unit": "generations",
+      "cost_evidence": "game-src/action/jyaldi-v5/resume/walk-contact-v2/segment2-completed.json"
     },
     {
       "job_id": "a08976c6-2b55-4991-b172-fad06e0d65ae",

@@ -1,0 +1,239 @@
+{
+  "character": "jyaldi",
+  "clip": "walk",
+  "frame_count": 8,
+  "frame_size": [
+    192,
+    144
+  ],
+  "fps": 12,
+  "cycle_delta_x": 40,
+  "root_x": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35
+  ],
+  "method": "upright keyposes + pinned-endpoint half-steps + free exact PixelLab shoe edits",
+  "jobs": [
+    {
+      "stage": "key",
+      "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+      "actual_generations": 2,
+      "request_sha256": "eb75de964ef6e9d38917b4d58e78d8a39cfdeb70f1dd80e8acdab80a98c144fb",
+      "receipt": "key-completed.json",
+      "server_frames": 3
+    },
+    {
+      "stage": "segment1",
+      "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
+      "actual_generations": 2,
+      "request_sha256": "343f7069595cfde7d987d9c3815b2056ed9ecf88760ecdeab26285002e74a654",
+      "receipt": "segment1-completed.json",
+      "server_frames": 5
+    },
+    {
+      "stage": "segment2",
+      "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "actual_generations": 2,
+      "request_sha256": "8a084b78f15b6b883bb03f0c2c7f027740a01f6986518246be0c73950b72c461",
+      "receipt": "segment2-completed.json",
+      "server_frames": 5
+    }
+  ],
+  "continuation_actual_generations": 6,
+  "including_prior_walk_generations": 9,
+  "generated": true,
+  "review_status": "targeted_contact_repair_verified_user_review_pending",
+  "user_visual_approval": false,
+  "engine_integrated": false,
+  "review_message": "지지무릎·접지 수정본입니다. 지지 구간의 보이는 밑창을 고정했고, 전8장 최하단은135px입니다. 가려진 발과 전체 작화는 사용자 시각 승인 전이며 통합 게임에는 아직 적용하지 않았습니다.",
+  "limitations": [
+    "Far stance foot is partly occluded in frames5-7; only visible sole regions are verified exact, not hidden full shoe.",
+    "Interpolation redraws cloth/hair shading; no claim of pixel-identical character identity across all frames."
+  ],
+  "frames": [
+    {
+      "frame": 0,
+      "segment": 1,
+      "source_index": 0,
+      "sha256": "15c7e0e29d3e223063682c381b17bcf54bc8519008a31a1fba268e8515a39b23",
+      "bbox": [
+        36,
+        36,
+        84,
+        136
+      ],
+      "stance_region": [
+        62,
+        127,
+        85,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": null
+    },
+    {
+      "frame": 1,
+      "segment": 1,
+      "source_index": 1,
+      "sha256": "4b597be8ae155f047171da53cb0d90c83e33f110137db7c679c8ca16c0f917fd",
+      "bbox": [
+        45,
+        36,
+        84,
+        136
+      ],
+      "stance_region": [
+        62,
+        127,
+        85,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": null
+    },
+    {
+      "frame": 2,
+      "segment": 1,
+      "source_index": 2,
+      "sha256": "93abfa1ee6624117a6b90ac0df920603e0b192b615bfe2c2d35a2ee3797d1951",
+      "bbox": [
+        48,
+        34,
+        84,
+        136
+      ],
+      "stance_region": [
+        62,
+        127,
+        85,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": null
+    },
+    {
+      "frame": 3,
+      "segment": 1,
+      "source_index": 3,
+      "sha256": "b7af018232de7fa9fbe53a36ab127d0e42c0dafae67a8431e44c19e755ef12d9",
+      "bbox": [
+        53,
+        35,
+        95,
+        136
+      ],
+      "stance_region": [
+        62,
+        127,
+        85,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": null
+    },
+    {
+      "frame": 4,
+      "segment": 2,
+      "source_index": 0,
+      "sha256": "2cb3843b8fe3682d07f55666ca8284cac20c46bfe08483cedbb5439372497d2a",
+      "bbox": [
+        55,
+        36,
+        104,
+        136
+      ],
+      "stance_region": [
+        82,
+        127,
+        105,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": null
+    },
+    {
+      "frame": 5,
+      "segment": 2,
+      "source_index": 1,
+      "sha256": "a9db566922f2c2aa7a290254160b3ac26f565a67d69bf6ea919841bd6fcd95b2",
+      "bbox": [
+        61,
+        36,
+        104,
+        136
+      ],
+      "stance_region": [
+        92,
+        132,
+        105,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": "far shoe partly occluded by near swing foot; only visible sole locked"
+    },
+    {
+      "frame": 6,
+      "segment": 2,
+      "source_index": 2,
+      "sha256": "89beb4c03c80c305414eff650e232c3faaa2841639c701eb0b89e4bf75a977b6",
+      "bbox": [
+        65,
+        35,
+        104,
+        136
+      ],
+      "stance_region": [
+        92,
+        132,
+        105,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": "far shoe partly occluded by near swing foot; only visible sole locked"
+    },
+    {
+      "frame": 7,
+      "segment": 2,
+      "source_index": 3,
+      "sha256": "44d091d123e1e8b145d943fa1b0e21ffa7b79647f62576008cdb194d222162ed",
+      "bbox": [
+        72,
+        34,
+        111,
+        136
+      ],
+      "stance_region": [
+        82,
+        132,
+        90,
+        137
+      ],
+      "visible_stance_pixels_exact": true,
+      "upper_pixels_unchanged": true,
+      "occlusion_note": "far shoe partly occluded by near swing foot; only visible sole locked"
+    }
+  ],
+  "originals_preserved": [
+    "keys-raw",
+    "segment1-raw",
+    "segment2-raw"
+  ],
+  "exact_edit_evidence": [
+    "exact-edits.json",
+    "segment1-exact-edits.json",
+    "segment2-exact-edits.json"
+  ]
+}

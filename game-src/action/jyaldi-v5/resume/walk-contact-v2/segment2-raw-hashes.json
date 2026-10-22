@@ -1,0 +1,76 @@
+{
+  "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+  "charged_generations": 2,
+  "frames": [
+    {
+      "index": 0,
+      "sha256": "de0dd084a02e074b210d924a01d575beefdffbd1b6727a48fcfbbc588ddb879c",
+      "size": [
+        192,
+        144
+      ],
+      "bbox": [
+        55,
+        36,
+        104,
+        136
+      ]
+    },
+    {
+      "index": 1,
+      "sha256": "0bb528731c547defc93ee4760c37e5e570ff3a7984470cfe9d30b009dd83afb5",
+      "size": [
+        192,
+        144
+      ],
+      "bbox": [
+        61,
+        36,
+        102,
+        136
+      ]
+    },
+    {
+      "index": 2,
+      "sha256": "6ae2138c2a989cbfcf64cf870e89bca93cd4c4d19de7fa48b699e3308db01ae8",
+      "size": [
+        192,
+        144
+      ],
+      "bbox": [
+        65,
+        35,
+        102,
+        136
+      ]
+    },
+    {
+      "index": 3,
+      "sha256": "da6ecb47f68f05bf18cd9d16822aefb06535e1e06a989e4d6efa775eb20db4f5",
+      "size": [
+        192,
+        144
+      ],
+      "bbox": [
+        72,
+        34,
+        111,
+        136
+      ]
+    },
+    {
+      "index": 4,
+      "sha256": "58996e8b484fab963d704977cfa8cb2b68d6a4dcd689962ee36dbf4eb752294f",
+      "size": [
+        192,
+        144
+      ],
+      "bbox": [
+        79,
+        37,
+        124,
+        136
+      ]
+    }
+  ]
+}

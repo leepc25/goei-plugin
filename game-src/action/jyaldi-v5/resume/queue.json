@@ -1,20 +1,20 @@
 {
-  "observed_at": "2026-10-22T10:44:54.183231+00:00",
+  "observed_at": "2026-10-22T11:59:48.833502+00:00",
   "branch": "codex/art-jyaldi-resume",
   "account": {
-    "balance_observed": 14117.3,
-    "active_jobs_observed": 5,
+    "balance_observed": 13964.3,
+    "active_jobs_observed": 1,
     "account_specific_concurrency_limit": null,
     "tier_documented_concurrency_limit": 20,
-    "evidence": "evidence/local-after.json",
-    "note": "Timestamped shared account snapshot. Not current forever; balance delta not attributed."
+    "evidence": "walk-contact-v2/account-after.json",
+    "note": "Timestamped shared-account observation; per-job receipts assign cost."
   },
   "per_owner_inflight_limit": 1,
   "global_lock_acquired": false,
-  "new_paid_calls": 1,
-  "new_actual_charge": 3,
+  "new_paid_calls": 4,
+  "new_actual_charge": 9,
   "walk": {
-    "state": "completed_quality_hold",
+    "state": "superseded_by_walk_contact_v2",
     "frames": 8,
     "quote_generations": 3,
     "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
@@ -25,7 +25,7 @@
     "evidence": "evidence/walk-completed.json"
   },
   "run": {
-    "state": "not_submitted_wait_for_walk_quality_correction",
+    "state": "not_submitted_following_walk_review",
     "job_id": null,
     "actual_cost": null
   },
@@ -59,5 +59,44 @@
     "controller_thread": "01a1632e-358b-7931-b8ab-c3487b5b6095",
     "controller_branch": "codex/character-production-control",
     "this_owner": "jyaldi only; controller ledger untouched"
+  },
+  "walk_contact_v2": {
+    "state": "completed_contact_repair_verified_user_review_pending",
+    "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+    "frames": 3,
+    "quoted_generations": 2,
+    "actual_generations": 6,
+    "basis": "submission server cost",
+    "planned_max_this_continuation": 6,
+    "method": "3 keyposes then pinned-endpoint interpolation",
+    "key_job_completed": true,
+    "segment1_job": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
+    "segment2_job": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+    "jobs": [
+      {
+        "stage": "key",
+        "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+        "actual_generations": 2,
+        "request_sha256": "eb75de964ef6e9d38917b4d58e78d8a39cfdeb70f1dd80e8acdab80a98c144fb",
+        "receipt": "key-completed.json",
+        "server_frames": 3
+      },
+      {
+        "stage": "segment1",
+        "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
+        "actual_generations": 2,
+        "request_sha256": "343f7069595cfde7d987d9c3815b2056ed9ecf88760ecdeab26285002e74a654",
+        "receipt": "segment1-completed.json",
+        "server_frames": 5
+      },
+      {
+        "stage": "segment2",
+        "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+        "actual_generations": 2,
+        "request_sha256": "8a084b78f15b6b883bb03f0c2c7f027740a01f6986518246be0c73950b72c461",
+        "receipt": "segment2-completed.json",
+        "server_frames": 5
+      }
+    ]
   }
 }

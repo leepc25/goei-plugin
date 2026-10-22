@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-22T11:50:08.287Z",
+  "response": {
+    "content": [
+      {
+        "type": "text",
+        "text": "id: 134e1800-0f54-4dba-969e-d9b1b1d9f15e\njob_id: 134e1800-0f54-4dba-969e-d9b1b1d9f15e\naction: Walk forward one half-step: the far left leg swings past the planted near right leg into the supplied opposite contact pose; keep the near right shoe planted at the same image position throughout, straighten the supporting knee, upright torso, naturally opposing arms.\nframes: 4\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 102204\nasset_id: 0ca7ea9d-677c-5d58-b375-63ccdfeca15a\nasset_status: pending (saved when generation completes)\ncost: 2 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"134e1800-0f54-4dba-969e-d9b1b1d9f15e\")"
+      }
+    ],
+    "isError": false
+  }
+}
