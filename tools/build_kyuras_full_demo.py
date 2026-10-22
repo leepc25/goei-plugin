@@ -170,7 +170,12 @@ def main():
             drawn = (f1 - f0) if f0 is not None and f1 is not None else 0
             slide = round(d['adv'] - drawn, 1)
         manifest['clips'][d['key']] = {k: d[k] for k in ('label', 'fps', 'loop', 'adv', 'origin', 'hold', 'group')} | {'hits': hits, 'slide': slide, 'frames': len(fr), 'bytes': len(data), 'prop': False}
+        sh = kyuras_fixes.SHIFT.get(d['key'], 0)
+        if sh: manifest['clips'][d['key']]['origin'] = sh
         anc = None if d['key'] in GPT else kyuras_fixes.anchors(d['key'], idx)
+        if anc and sh:
+            for q in anc:
+                for kk in ('hand', 'hand2', 'hip'): q[kk][0] += sh
         if anc: manifest['clips'][d['key']]['anchors'] = anc
     json.dump(manifest, open(os.path.join(final, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     hands = {k: [[a['hand'][0], a['hand'][1], (a['angle'] + 90) % 360] for a in v['anchors']] for k, v in manifest['clips'].items() if v.get('anchors')}

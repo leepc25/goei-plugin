@@ -822,7 +822,17 @@ function drawPickups() {
   }
 }
 // 든 물건(그림에 없음): 손 좌표에 붙임
+// 서툰 허리 사격 클립은 생성기가 총을 거의 안 그림 → 앞손 손목 좌표·팔 각도에 산탄총을 붙임(대기·걷기·달리기 클립은 그림에 총이 있음)
+function drawGun() {
+  const c = C(), a = c && c.anchors && c.anchors[Math.min(G.f, c.anchors.length - 1)]; if (!a) return;
+  const h = handPos(), ang = a.angle * Math.PI / 180;
+  ctx.save(); ctx.translate(Math.round(h.x), Math.round(h.y)); ctx.scale(G.dir * S, S); ctx.rotate(Math.max(-0.6, Math.min(0.4, ang)));
+  const r = (x, y, w, hh, col) => { ctx.fillStyle = '#000'; ctx.fillRect(x - 1, y - 1, w + 2, hh + 2); ctx.fillStyle = col; ctx.fillRect(x, y, w, hh); };
+  r(-14, -1, 12, 4, '#6b4a32'); r(-3, -2, 34, 3, '#2c3036'); r(4, 1, 12, 2, '#4a3a2c');
+  ctx.restore();
+}
 function drawHeld() {
+  if (G.clip === 'shotgun') drawGun();
   const k = heldTag(); if (!k || G.weapon === 'shotgun' || G.weapon === 'pipe') return;   // 쇠파이프·산탄총은 무기별 클립에 그려져 있음
   const h = handPos(), h2 = handPos('hand2'), x = (h.x + h2.x) / 2, y = (h.y + h2.y) / 2;
   ctx.fillStyle = '#9a4a36'; ctx.fillRect(x - 11 * S, y - 8 * S, 22 * S, 9 * S); ctx.strokeStyle = '#4a2218'; ctx.lineWidth = 2; ctx.strokeRect(x - 11 * S, y - 8 * S, 22 * S, 9 * S);

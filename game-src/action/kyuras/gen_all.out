@@ -1,3 +1,38 @@
 before 15649
 done drum 8
 sub toss
+done toss 6
+sub drink
+done pickup 6
+sub eat
+done drink 7
+sub bandage
+done eat 6
+sub hit
+done hit 4
+sub down
+done bandage 6
+sub getup
+done down 7
+done getup 7
+sub talk
+sub tired
+done talk 4
+sub support
+done tired 4
+sub pipe
+done support 10
+sub idle_pipe
+done idle_pipe 4
+sub walk_pipe
+done pipe 6
+sub shotgun
+done walk_pipe 8
+sub idle_shotgun
+done shotgun 5
+sub walk_shotgun
+done idle_shotgun 4
+sub run_shotgun
+done walk_shotgun 8
+done run_shotgun 8
+after 15136

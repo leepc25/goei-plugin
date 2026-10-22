@@ -13,7 +13,8 @@ krig = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(krig)
 R = krig.R
 
 DROP_CLIPS = set()       # 버림: 생성기가 자세를 못 그린 클립
-DROP_FRAMES = {}         # {클립: {원본 장 번호, ...}} 깨진 장 빼기
+DROP_FRAMES = {'support': {1}}   # {클립: {원본 장 번호, ...}} 깨진 장 빼기. support 1 = 흐릿하게 번진 잔상 장
+SHIFT = {'down': 4, 'getup': 4}  # 캔버스 왼쪽 끝에서 뒤통수가 잘린 클립: 오른쪽으로 옮기고 잘린 머리 끝을 둥글게 그려 넣음(빌더가 origin으로 위치 보정)
 ORDER = {}               # {클립: [원본 장 번호 순서]}
 ERASE = {}               # {클립: [(원본 장, x0, y0, x1, y1), ...]} 그림에 섞여 나온 효과·가구 지우기
 
@@ -117,6 +118,21 @@ def drop_specks(im, maxn=40):
     return Image.fromarray(a)
 
 
+def cap_left(im, k):
+    """오른쪽으로 k px 옮긴 뒤, 원래 x=0에 닿아 잘렸던 줄을 둥글게 이어 그림(바깥 1px 외곽선)"""
+    a = np.array(im); o = np.zeros_like(a); o[:, k:] = a[:, :-k]
+    rows = [y for y in range(a.shape[0]) if a[y, 0, 3] > 0]
+    if rows:
+        y0, y1 = rows[0], rows[-1]; mid = (y0 + y1) / 2; half = max(1, (y1 - y0) / 2)
+        for y in rows:
+            ext = int(round(k * (1 - ((y - mid) / half) ** 2) ** 0.5))
+            col = a[y, 0]
+            for i in range(1, ext + 1):
+                o[y, k - i] = col if i < ext else (0, 0, 0, 255)
+            if ext == 0: o[y, k - 1] = (0, 0, 0, 255)
+    return Image.fromarray(o)
+
+
 GPT = {'undress', 'showerturn', 'shower', 'bath'}
 
 
@@ -125,6 +141,8 @@ def apply(key, fr, idx):
     fr = list(fr); idx = list(idx)
     if key not in GPT:
         fr = [drop_specks(clean_stray_hair(f)) for f in fr]
+    if key in SHIFT:
+        fr = [cap_left(f, SHIFT[key]) for f in fr]
     for i, x0, y0, x1, y1 in ERASE.get(key, []):
         if i in idx:
             j = idx.index(i); a = np.array(fr[j]); a[y0:y1, x0:x1] = 0; fr[j] = Image.fromarray(a)
