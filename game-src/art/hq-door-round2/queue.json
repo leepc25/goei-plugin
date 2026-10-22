@@ -1,0 +1,33 @@
+{
+  "schema": "goei-hq-door-queue/1",
+  "owner_branch": "codex/pixellab-doors-round2",
+  "owner_thread": "01a162c2-da6b-73f6-9edc-89aeacc190a7",
+  "updated_at": "2026-10-22T10:17:44.140643+00:00",
+  "state": "awaiting_auth_not_submitted",
+  "reservation_id": "hq-glass-n-round2-01",
+  "request": "glass-n-closed.request.json",
+  "request_sha256": "528f4a56c4f3625c5ffa2ee39bc6bb08efc45f27e7e5e259f7ce70e803c323c5",
+  "tool": "create_image_pixen",
+  "planned_calls": 1,
+  "documented_generations_per_call": 1,
+  "job_id": null,
+  "actual_generation_calls": 0,
+  "actual_generation_charge": 0,
+  "account_balance": null,
+  "active_jobs": null,
+  "coordination": {
+    "lead_thread": "01a162c7-9305-728e-a2b4-35d0f479d097",
+    "lead_branch": "codex/character-production-resume",
+    "observed_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+    "lead_existing_jobs": [
+      "11826541-47d1-40de-9664-f05f1838bb23",
+      "9fe0e770-b992-4299-a4c1-90d6e591828a"
+    ],
+    "lead_planned_generations": 6,
+    "lead_queue_observed": true,
+    "message_delivered": false,
+    "acknowledged": false,
+    "note": "No send_message_to_thread tool exposed. Publish this reservation on own branch; does not assert cross-session exclusion. Recheck remote queue and live jobs before submission; do not cancel or regenerate character jobs."
+  },
+  "retry_policy": "No automatic resubmission. After uncertain response, recover job before any new generation."
+}

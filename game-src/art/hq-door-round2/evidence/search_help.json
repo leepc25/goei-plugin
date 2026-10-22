@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-10-22T10:16:25.005855+00:00",
+  "tool": "search_help",
+  "arguments": {
+    "question": "HQ front-elevation sliding glass door 96x144, no_background=true, view=side, direction=south. Confirm create_image_pixen cost, free balance/list_jobs/get_image/search_help calls, concurrency limit and failed/timed-out job billing/recovery. Can one closed sprite be separated into fixed frame and sliding leaves locally, preserving pixel alignment without a second generation?"
+  },
+  "http_status": 200,
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "error: 401: Missing Authorization header. Please configure your MCP client with 'Authorization: Bearer YOUR_API_TOKEN'"
+        }
+      ],
+      "isError": true
+    }
+  }
+}

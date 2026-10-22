@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>본부 출입구 검수</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#10171f;color:#e8f0f6;font:16px system-ui,sans-serif}
+main{max-width:1320px;margin:auto;padding:20px}h1{font-size:24px;margin:0 0 8px}p{color:#aebdca;line-height:1.6;margin:8px 0 14px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}button,label.control{min-height:44px;border:1px solid #657583;background:#23313f;color:inherit;border-radius:8px;padding:10px 14px;font:inherit;display:inline-flex;align-items:center;gap:8px}button:disabled{opacity:.4}button[aria-pressed=true]{background:#24594d;border-color:#8ad6c0}button:focus-visible,input:focus-visible{outline:3px solid #eabb65;outline-offset:3px}
+.stage{background:#080e14;border:1px solid #3d4d5b;border-radius:8px;overflow:hidden}canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.detail{width:min(100%,480px);margin-top:18px}.detail canvas{background:#253340}small{display:block;color:#aebdca;line-height:1.6;margin-top:12px}#status{padding:10px 14px;background:#41321d;border-left:3px solid #eabb65;color:#ffe5b9}.detail p{padding:0 12px}input{accent-color:#79d9bf} @media(max-width:500px){main{padding:12px}h1{font-size:21px}.controls{gap:7px}button,label.control{font-size:14px;padding:10px}}
+</style>
+<main><h1>본부 출입구 검수</h1><p>실제 본부 복도 위에서 문 크기, 문턱, 별도 출입구 표식을 확인합니다.</p>
+<p id="status" role="status"></p>
+<div class="controls">
+ <button id="original" aria-pressed="true">기존 화면</button>
+ <button id="closed" aria-pressed="false">새 문 닫힘</button>
+ <button id="open" aria-pressed="false">새 문 열림</button>
+ <label class="control"><input type="checkbox" id="marker" checked>출입구 표식</label>
+ <label class="control"><input type="checkbox" id="guides">문턱·발 기준선</label>
+</div>
+<div class="stage"><canvas id="scene" width="1280" height="720" aria-label="본부 복도 합성 검수 화면"></canvas></div>
+<div class="stage detail"><p>문 주변 확대 · 모바일에서도 경계 확인</p><canvas id="detail" width="480" height="720" aria-label="문과 바닥 확대 화면"></canvas></div>
+<small id="note"></small>
+</main><script>
+const DATA=/*PAYLOAD*/;
+const $=id=>document.getElementById(id);const images={};let state='original';
+async function init(){
+  for(const [name,src] of Object.entries({original:DATA.original,background:DATA.background,marker:DATA.marker,...DATA.states})){
+    images[name]=new Image();images[name].src=src;await images[name].decode();
+  }
+  const ready=!!images.closed&&!!images.open;
+  $('status').textContent=ready?'새 문 자산 합성 검수 · 최종 게임 반영 및 사용자 승인 전입니다.':'PixelLab 문 원본 대기 · 현재는 기존 문과 별도 표식 시안만 표시합니다. 새 문 제작 완료본이 아닙니다.';
+  for(const name of ['closed','open'])$(name).disabled=!images[name];
+  for(const name of ['original','closed','open'])$(name).onclick=()=>{state=name;render()};
+  $('marker').onchange=render;$('guides').onchange=render;
+  $('note').textContent='화면 기준: '+DATA.scene.sourceCommit.slice(0,8)+' · 문턱 y=440 / 도착 발 y=486 · 표식 48×16 원본, 2배 표시. 캡처 속 캐릭터는 기존 화면의 비교 자료이며 신규 제작물이 아닙니다.';
+  render();window.reviewReady=true;
+}
+function render(){
+ const canvas=$('scene'),c=canvas.getContext('2d'),x=DATA.scene.screenDoorX;c.imageSmoothingEnabled=false;
+ c.clearRect(0,0,1280,720);c.drawImage(images.original,0,0);
+ if(state!=='original'){
+   // Replace only the doorway area with the actual game background capture.
+   c.drawImage(images.background,x-100,160,200,282,x-100,160,200,282);
+   const s=DATA.manifest.states[state],a=s.anchor||DATA.manifest.anchor_target;
+   c.drawImage(images[state],x-a[0]*2,440-a[1]*2,images[state].width*2,images[state].height*2);
+ }
+ if($('marker').checked)c.drawImage(images.marker,x-48,448,96,32);
+ if($('guides').checked){
+   c.lineWidth=1;c.setLineDash([6,4]);
+   for(const [y,col,label] of [[440,'#ffda75','문턱 440'],[486,'#8ce8e3','도착 발 486']]){
+     c.strokeStyle=col;c.beginPath();c.moveTo(x-120,y+.5);c.lineTo(x+170,y+.5);c.stroke();
+     c.fillStyle=col;c.font='14px sans-serif';c.fillText(label,x-112,y-5);
+   }c.setLineDash([]);
+ }
+ for(const name of ['original','closed','open'])$(name).setAttribute('aria-pressed',String(state===name));
+ const z=$('detail').getContext('2d');z.imageSmoothingEnabled=false;z.clearRect(0,0,480,720);z.drawImage(canvas,x-120,160,240,360,0,0,480,720);
+ window.reviewState={state,marker:$('marker').checked,guides:$('guides').checked};
+}
+init().catch(e=>{$('status').textContent='검수 그림을 열지 못했습니다: '+e.message;throw e});
+</script></html>

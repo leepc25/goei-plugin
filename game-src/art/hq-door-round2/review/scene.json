@@ -1,0 +1,26 @@
+{
+  "scene": "hq:f2",
+  "camX": 1043,
+  "door": {
+    "id": "office",
+    "x": 1364,
+    "kind": "glass",
+    "to": "office",
+    "toDoor": "out",
+    "open": true
+  },
+  "player": {
+    "x": 1607,
+    "y": 486
+  },
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "screenDoorX": 321,
+  "thresholdY": 440,
+  "arrivalY": 486,
+  "errors": [],
+  "sourceCommit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "captureMethod": "Keyboard office → corridor; original game canvas + offscreen real drawBackground without f2.office only"
+}

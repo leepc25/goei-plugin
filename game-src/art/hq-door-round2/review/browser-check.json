@@ -1,0 +1,41 @@
+{
+  "results": [
+    {
+      "name": "pc",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "touch": false,
+      "doorStates": [],
+      "overflow": false,
+      "errors": [],
+      "externalRequests": []
+    },
+    {
+      "name": "mobile-landscape",
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "touch": true,
+      "doorStates": [],
+      "overflow": false,
+      "errors": [],
+      "externalRequests": []
+    },
+    {
+      "name": "mobile-portrait",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "touch": true,
+      "doorStates": [],
+      "overflow": false,
+      "errors": [],
+      "externalRequests": []
+    }
+  ],
+  "scope": "Review UI and existing scene + separate marker. Empty doorStates means no new door asset validated."
+}

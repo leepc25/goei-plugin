@@ -1,0 +1,43 @@
+{
+  "schema": "goei-hq-door-delivery/1",
+  "id": "glass-n-round2",
+  "status": "awaiting_pixellab_auth_no_door_asset",
+  "user_visual_approval": false,
+  "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "canvas_target": [
+    96,
+    144
+  ],
+  "anchor_target": [
+    48,
+    136
+  ],
+  "scale": 2,
+  "opening_target": [
+    8,
+    11,
+    80,
+    125
+  ],
+  "world_anchor": {
+    "x": "door.x",
+    "y": 440
+  },
+  "world_canvas_origin": {
+    "x": "door.x - 96",
+    "y": 168
+  },
+  "measurement_status": "Targets only; replace with measured values after generation",
+  "states": {},
+  "raw": null,
+  "job_id": null,
+  "marker": "layers/entry-marker.manifest.json",
+  "missing": [
+    "PixelLab original",
+    "closed/open transparent PNGs",
+    "fixed frame and leaf layers",
+    "measured state manifests",
+    "billed usage",
+    "asset integration patch"
+  ]
+}

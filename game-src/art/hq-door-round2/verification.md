@@ -1,5 +1,18 @@
 # 검증 기록 · PixelLab 본부 출입구 round2
 
+## 재개 검수 · 2026-10-22 (현재 상태)
+
+최신 통합 소스 `7f8fdfb0c5a6cef096d412d3d872aec6eae7de81`를 별도 worktree에서 빌드하고 실제 키보드로 office → f2까지 이동해 현재 화면을 보존했다. 문만 제외한 배경은 같은 게임의 `drawBackground`를 offscreen canvas에 호출해 얻었으며 원본 본부 그림을 덧칠하지 않았다.
+
+- 독립 검수판 `review/index.html`: 현재 문 + 새 기하 표식 시안. PixelLab 새 문 PNG는 아직 없고 닫힘/열림 버튼은 비활성화다. `review/browser-check.json`의 빈 `doorStates`가 이 한계를 표시한다.
+- Chromium PC 1280×800, 모바일 가로 844×390, 세로 390×844에서 가로 넘침·pageerror·외부 이미지 요청 없음. 모바일은 Playwright tap 이벤트로 표식/기준선 토글과 캔버스 픽셀 변화를 확인했다. 물리적 휴대폰 검수는 아니다.
+- 표식 48×16, RGBA, 외부 alpha=0 확인. 표시 y=448~480은 문턱 440 아래, 도착 발 486 위다. 원본 코드/앵커/해시를 레이어 manifest에 보존했다. 사용자 시각 승인 전 시안이다.
+- `npm run typecheck`, `npm run build` 통과. `node --test tests/hub-doors.test.mjs tests/hq-layout.test.mjs tests/hq-walls.test.mjs`: 9검사 통과, 문 28개 전환 확인. 공용 소스는 변경하지 않았다.
+- 공개 MCP 스키마에 기존 요청 JSON 검증 통과. `get_balance`, `list_jobs(include_recent=true)`, `search_help`는 실제 호출했으나 인증 누락 401. 계정 잔액/작업 수/조회 과금 정책은 미확인이다. 생성 호출 0회, 생성 차감 0회.
+- 미완료: PixelLab 실제 인증, 기존 문 작업 존재 여부의 서버 확인/회수, 신규 문 원본과 두 상태/레이어, 실제 과금 증거, 문 상태 동일 프레임 검증, 새 문 PC/모바일 합성 검수, 실행 가능한 자산 연결 패치.
+
+## 이하: 이전 준비 검증 기록
+
 기준: `0d43a4496bff1cdc7c0122e273a43475c9134356`. 2026-10-22 한국 시간.
 **신규 그림 검수가 아니라 현행 출입 동작·제작 기준 조사 결과다.**
 

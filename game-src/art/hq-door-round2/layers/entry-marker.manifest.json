@@ -1,0 +1,34 @@
+{
+  "schema": "goei-hq-door-layer/1",
+  "id": "entry-marker",
+  "file": "entry-marker.png",
+  "provenance": "Original geometric indicator drawn by build-review.py; not a PixelLab image",
+  "size": [
+    48,
+    16
+  ],
+  "anchor": [
+    24,
+    8
+  ],
+  "scale": 2,
+  "world_anchor": {
+    "x": "door.x",
+    "y": 464
+  },
+  "world_bounds_y": [
+    448,
+    480
+  ],
+  "draw_order": "floor after door, before actors",
+  "generated_text": false,
+  "alpha_bbox": [
+    2,
+    1,
+    47,
+    16
+  ],
+  "sha256": "12d12f1a9919784c648db9cb2139d30694c5f809e3989b5228afddfad2fe2406",
+  "paid_generation_calls": 0,
+  "user_visual_approval": false
+}
