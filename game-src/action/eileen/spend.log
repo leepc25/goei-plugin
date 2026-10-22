@@ -502,3 +502,9 @@ description: short compact adult woman agent, faded cream platinum blonde
 10-22 04:37:05 gen after generations_remaining: 14458.30
 
 2026-10-22T19:29:23+09:00 resume auth_recheck=401 current_balance=unknown active_jobs=unknown concurrency_limit=unknown paid_submissions=0 actual_new_cost=0; existing washing 20 frames packed, 83 frames reviewed; user_visual_approval=pending
+
+2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=edit_image_pixen job_id=ddafed99-d4d6-4b51-bbb4-c01ce660ef68 actual_cost=1 generations state=recovered_rejected evidence=resume/live-20261022/precise-edit/result.json
+2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=animate_image job_id=e92bce68-f025-4757-94b0-b16566cebe5d actual_cost=4 generations state=recovered_rejected evidence=resume/live-20261022/transition-bridge/result.json
+2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=animate_with_skeleton_v3 job_id=5ce7b76d-7f1a-43e5-a28a-76f10b039fbd actual_cost=3 generations state=recovered_rejected evidence=resume/live-20261022/transition-rig/result.json
+2026-10-22T19:54:56+09:00 local-resume-20261022 verified-charge tool=edit_image job_id=296587c6-95c3-4b93-92a7-d164ddb10506 actual_cost=10 generations state=recovered_rejected evidence=resume/live-20261022/transition-pro/result.json
+2026-10-22T19:54:56+09:00 local-resume-20261022 total_actual=18 generations; free_exact_edits=2; applied_precision_frames=2; support_placement_frames=10; washing_regeneration=0; user_visual_approval=pending

@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.join(SRC, 'scripts'))
 sys.path.insert(0, os.path.join(ROOT, 'game-src', 'action', 'jyaldi-v5', 'scripts'))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import erig, rig
+import resume_grounding
 try:
     import eileen_fixes
 except ImportError:
@@ -218,9 +219,13 @@ def anchors(src, idx, frames):
     return out
 
 
-def strip(frames):
+def strip(frames, previous_path=None):
     s = Image.new('RGBA', (FW * len(frames), FH), (0, 0, 0, 0))
     for i, f in enumerate(frames): s.paste(f, (i * FW, 0))
+    if previous_path and os.path.isfile(previous_path):
+        previous = Image.open(previous_path).convert('RGBA')
+        if previous.size == s.size and previous.tobytes() == s.tobytes():
+            return open(previous_path, 'rb').read()
     b = io.BytesIO(); s.save(b, 'PNG', optimize=True); return b.getvalue()
 
 
@@ -256,16 +261,33 @@ def main():
         if k in erig.TAIL and len(idx) > 3: idx = idx[:-1]
         fr = [strip_fx(fr[i], d['src'], i) for i in idx]
         if eileen_fixes: fr, idx = eileen_fixes.apply(k, fr, idx, processed)
-        data = strip(fr)
+        if k == 'precise':
+            # Exact PixelLab edits, original raw clips preserved. The Pixen full
+            # redraw and rejected transition candidates are never selected here.
+            exact = os.path.join(SRC, 'resume', 'live-20261022', 'precise-edit')
+            fr[1] = strip_fx(Image.open(os.path.join(exact, 'exact-result.png')).convert('RGBA'), k, 1)
+            fr[2] = Image.open(os.path.join(exact, 'exact-02.png')).convert('RGBA')
+        anchor_frames = fr
+        fr, grounding_offsets = resume_grounding.apply(k, fr)
+        data = strip(fr, os.path.join(final, k + '.png'))
         strips[k] = base64.b64encode(data).decode()
         open(os.path.join(final, k + '.png'), 'wb').write(data)
         c = {x: d[x] for x in ('label', 'desc', 'group', 'fps', 'loop', 'hits', 'shots', 'adv', 'base')} | {'frames': len(fr), 'bytes': len(data)}
         if k in ('undress', 'showerturn', 'shower', 'bath'):
             c['provenance'] = 'received-gpt-existing'
             c['visualApproval'] = 'pending'
+        if k == 'precise':
+            c['provenance'] = 'pixellab-exact-pixel-edit-20261022'
+            c['editedFrames'] = [1, 2]
+            c['editedPixelCounts'] = [19, 18]
+            c['visualApproval'] = 'pending'
         if k == 'shower':
             c['loopStart'] = 2  # 0~1 머리끈 풀기는 첫 회만, 의뢰서의 2~5장 반복
-        anc = anchors(d['src'], idx, fr)
+        anc = anchors(d['src'], idx, anchor_frames)
+        anc = resume_grounding.shift_anchors(anc, grounding_offsets)
+        if any(grounding_offsets):
+            c['groundingOffsetsY'] = grounding_offsets
+            c['visualApproval'] = 'pending'
         if anc:
             c['anchors'] = anc
             if k in ADVK: c['adv'] = anc[-1]['hip'][0] - anc[0]['hip'][0]

@@ -1,0 +1,74 @@
+[
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "path": "game-src/action/eileen/base",
+    "tree_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8"
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "path": "game-src/action/eileen/clips",
+    "tree_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688"
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "path": "game-src/action/eileen/spend.log",
+    "tree_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d"
+  },
+  {
+    "ref": "origin/codex/metroidvania-run-system",
+    "commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "tree_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7"
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+    "path": "game-src/action/eileen/base",
+    "tree_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8"
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+    "path": "game-src/action/eileen/clips",
+    "tree_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688"
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+    "path": "game-src/action/eileen/spend.log",
+    "tree_sha256": "6291a599883a8edb637828bb6a0781da0434978c1b9d3708adac1597ab4b0a1d"
+  },
+  {
+    "ref": "origin/codex/character-production-resume",
+    "commit": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "tree_sha256": "70f29a11c97d33cff135d8ab2e55f760898a4fb5d8f749df215987a584de47f7"
+  },
+  {
+    "ref": "HEAD",
+    "commit": "3ffba08966fab71f1cb69e5d25900c13d781fcb6",
+    "path": "game-src/action/eileen/base",
+    "tree_sha256": "5b4532c58b4a4db35c2664f4218828cb8edb82961a943021c441d081a4fba8c8"
+  },
+  {
+    "ref": "HEAD",
+    "commit": "3ffba08966fab71f1cb69e5d25900c13d781fcb6",
+    "path": "game-src/action/eileen/clips",
+    "tree_sha256": "59b0166dbb8d2aaa9a03c402a6e90eacbfd3ef3fa1d83c813e8456ac06cfd688"
+  },
+  {
+    "ref": "HEAD",
+    "commit": "3ffba08966fab71f1cb69e5d25900c13d781fcb6",
+    "path": "game-src/action/eileen/spend.log",
+    "tree_sha256": "fdd326a9e09585417a9f53dc112f6ea94b81364cf74dc56678678020953f8f01"
+  },
+  {
+    "ref": "HEAD",
+    "commit": "3ffba08966fab71f1cb69e5d25900c13d781fcb6",
+    "path": "game-src/action/eileen/final/manifest.json",
+    "tree_sha256": "1fd5defabb17085a9ebb0171c8ecdf7b9769bd3224e8874314a78bd96ca5c157"
+  }
+]

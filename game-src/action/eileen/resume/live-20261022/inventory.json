@@ -1,0 +1,430 @@
+{
+  "observed_at": "2026-10-22T20:43:11+09:00",
+  "files": [
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/account-end.json",
+      "sha256": "133d434535fdc61d572ac7bd038b9eb4857c0a0d2f144c7568aeeaddbd8add8b",
+      "bytes": 1142
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/account-start.json",
+      "sha256": "690cf428c5c0b12902746f416f0805d6fe845f4d8eaef21d1771acc62f86bc80",
+      "bytes": 1142
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/browser-compat/browser-check.json",
+      "sha256": "6b5d0df0c071f8c14df067691ef036cbbefd8d4ab54ec2b45ab21ad8bc941b61",
+      "bytes": 1303
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/browser-compat/demo-mobile-landscape.png",
+      "sha256": "a8be735a7ee18aa5748014b5e3362f67619fa4cee2bc1f0e59db8ab10bbc017f",
+      "bytes": 385104
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/browser-compat/demo-mobile-portrait.png",
+      "sha256": "a8085a3c255fa5784305e053fa99ca4a9b3c58814b4836d971aba1d707212111",
+      "bytes": 162505
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/browser-compat/demo-pc.png",
+      "sha256": "02b4f3a6b83c70f55c7a012adf8f7cec8a1b678ea39c39ebe59c90265510d769",
+      "bytes": 1049292
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/candidate-frame-review.json",
+      "sha256": "434d858d84008b496b21bedb88b71fa915d5db61f73501c3a1204badf157feb7",
+      "bytes": 20395
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/delivery-frame-review.json",
+      "sha256": "742a36dccf7de7ac7b7e8ced22b2598db0849d3524efb533e75c27fef785786e",
+      "bytes": 16528
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/game-mobile.png",
+      "sha256": "c7b68d8ef212ffcd2379d41a0e893f6069a0da07a3a5321aeb19ee6309890256",
+      "bytes": 166739
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/game-pc.png",
+      "sha256": "a8b69909d74b33e56bd6cde832fc3771e561b4a87980af938151c9848740e740",
+      "bytes": 950018
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/ledger.json",
+      "sha256": "5fbb70f419b83cecc9355391b7bcade3535c1a611fd83bbd1c088d7e1c3bd22a",
+      "bytes": 11257
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/limp-delivery-review.png",
+      "sha256": "64544491f382e29cf7ec4a971f36e0e0bfdf422105508c88c81cc42c2ab5c3e2",
+      "bytes": 48622
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-compare.png",
+      "sha256": "c46070d3eb54089d861d87d005335bc56dd42afdf491f7cec7f9ee7617b19b92",
+      "bytes": 19817
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-delivery-review.png",
+      "sha256": "593fb50b23c175fec2b430e3b7358d947f8f5c786363e780bb332739be0696e4",
+      "bytes": 33000
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/02-clean.png",
+      "sha256": "dfae47f1b7ec07ec9fe76dbe2e5f9f9f74a9c442c34e0c040292f8c509da0db9",
+      "bytes": 4361
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-02-changes.json",
+      "sha256": "f34d948bdfaae510d21cc9ed2cc7c49bb9b80be906b13a03ed25ff1423be31bf",
+      "bytes": 1711
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-02-result.json",
+      "sha256": "a7cb7f202a6ec637ce7da4999840f071e2c5d5cf092f72d9eb404ddad40afec4",
+      "bytes": 745
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-02.png",
+      "sha256": "c1aef370cb801dccb7df716fe2df6923394c7b75f85132d08d93990145dad765",
+      "bytes": 5015
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-changes.json",
+      "sha256": "4e456d5958a7595495274427710ea8c7fbc78b7c656d8253374429e0c507679b",
+      "bytes": 1745
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-result.json",
+      "sha256": "41f7033ab03b3645364b7088bc62549bfc1a30883bde0db8084d55d85e767773",
+      "bytes": 745
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/exact-result.png",
+      "sha256": "0c1a86f8be158f8a9eccd794e275ea258da1e62166709d271ba45f2f0e89ff09",
+      "bytes": 5072
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/request.json",
+      "sha256": "8e99d8b2ba2032c1895f6faeca6fc8ea44b56c6c4d232878733d3814061fab7b",
+      "bytes": 7742
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/result.json",
+      "sha256": "9f31c68cfdb337b255bcc6f598fb66718a47827d795c26af2a2489578ace0e12",
+      "bytes": 994
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/result.png",
+      "sha256": "82f67b138b339b84420dd8fe60f5e933b19903b2ca7cb7ae1df6e6784693d650",
+      "bytes": 6013
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/precise-edit/submission.json",
+      "sha256": "4851724d97e74cb7faef13df146571513cbc850f47e92fe240acc9230085005a",
+      "bytes": 864
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/pushkick-delivery-review.png",
+      "sha256": "ceff0688f371fe05f2e407c53af27910474009a6ec19bdebe2badffec04b4a40",
+      "bytes": 45006
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/README.md",
+      "sha256": "d3cb94e82c8d9f9322406ba97ae06e83455041f4c151c0fe897b3085b95a036e",
+      "bytes": 6422
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/review-mobile.png",
+      "sha256": "0d65163acb9e750ac1ce3e9c79a5ece6b2992161fb27dc7f95e7f844d6256151",
+      "bytes": 29802
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/review-pc.png",
+      "sha256": "c585b8041aafe56ca634db012eb94f6bf2f8ceff974324fdfc330a2f17ef7414",
+      "bytes": 32787
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/source-comparison.json",
+      "sha256": "8f5306a997017cfc261ee40c2dc06a3d2f58f639ca5ade173f6a6dffffa9f9df",
+      "bytes": 2990
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/step-delivery-review.png",
+      "sha256": "72a6c0d0d785d3985d53fd0a28719247f99d7a631e0a1672b4ac8bc3a24c4273",
+      "bytes": 37572
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/00.png",
+      "sha256": "9e7b3467ad77be948f0880c4184c86a33974d1544b696539aae65e73720b1fa0",
+      "bytes": 4881
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/01.png",
+      "sha256": "b2283adc2b5003dc82d92fa6b2630e6d12f92fa3a70cf878e534a2698f231b0a",
+      "bytes": 5385
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/02.png",
+      "sha256": "70e797c7471c1ebb0d658dedd522fd0d392cc222572f1e597323b94b7df225b9",
+      "bytes": 5330
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/03.png",
+      "sha256": "ddb559a4b55f094f4d1039f9b8fa98be4f56ece2932ae824c711f3344b89278f",
+      "bytes": 5192
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/04.png",
+      "sha256": "cb867233312623e8228b43470926d1d5c0b33af3f1d13d4dc253a9209d9cb681",
+      "bytes": 5106
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/05.png",
+      "sha256": "9d2d205401e992ada4982701586af2999d91da30df2200ad2ed0f92c1082d0f7",
+      "bytes": 5046
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/06.png",
+      "sha256": "c2f98620308db4abed3a9e66511ceef147fbd1b55b915e1a26fbaf35c00dceec",
+      "bytes": 5183
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/07.png",
+      "sha256": "e590a812123511bbdfb32af1f05498c39b27040e82c0fd59f80a572127a6e55a",
+      "bytes": 5192
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/08.png",
+      "sha256": "163f867c8bdc1e09f5e7ea4523ed05b7c2c629e891adf657bdf237d1c6e43eba",
+      "bytes": 5260
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/endpoint-0.png",
+      "sha256": "8df46c53489856284decf6bfee39e3fbdff59ec90c2e3571b3940bcd251a0b18",
+      "bytes": 4257
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/endpoint-1.png",
+      "sha256": "e70172d4024991e8ea0b512cc9eca0baf51606962cb028d3f2cc4be68c8ea916",
+      "bytes": 4214
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/request.json",
+      "sha256": "1941ea512b4d6b1c34f816084a409b33ceeac883192618b7a58a937115f78f8b",
+      "bytes": 12341
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/result.json",
+      "sha256": "a788ffebe5d94db21b38422c0d17feb27027bce5b8fca19d5cf79467c9553a20",
+      "bytes": 1937
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/review.png",
+      "sha256": "a67e15b5255b84181ae9b650890007003a1fafcde358d08795d725641be2abf6",
+      "bytes": 51305
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/submission.json",
+      "sha256": "f3f6ff8cb896a63937373125256d5cba2351a59201e68067e17896136779bd8e",
+      "bytes": 827
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/00.png",
+      "sha256": "2de39380a0cebe569a1b1d37b5b01ae59eff05158e327187b294c5c439cb5d8b",
+      "bytes": 4550
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/01.png",
+      "sha256": "715a2c1086f2df06514988ac50bf8565c1a150e671fbcb3ce4258b95af9486a0",
+      "bytes": 4414
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/02.png",
+      "sha256": "ca849d3524a3233288dbe5f50b095e08daa1fcc91d9ad8776d35aea3fcd7891a",
+      "bytes": 4002
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/03.png",
+      "sha256": "106b5a2ebe1db9ba2c37207cac1469cc09be3796115399d58fa5fceac9014b26",
+      "bytes": 4056
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/04.png",
+      "sha256": "cbda82a158d88bba78ea6eedc96524cd7d6a51a791cd4200a8ea5d90f26023c2",
+      "bytes": 4115
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/05.png",
+      "sha256": "9778ee757c60db8e3c93b288c0eaf4a6b4aede0698592496a919e77afe3cc6d9",
+      "bytes": 4413
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/06.png",
+      "sha256": "b395f1194bd29f3420eb19c4c00366fa75621b52f5aed5f6e50128223b52033d",
+      "bytes": 4424
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-00.png",
+      "sha256": "b5340255a2d4fcded9748c395ea4c921224562a40fc155971b03b3ba5751a035",
+      "bytes": 4122
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-01.png",
+      "sha256": "661acd4082e5ad1052205f07be1f45bcb7d5f41f37a90a47550e31fd5f1632bb",
+      "bytes": 4037
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-02.png",
+      "sha256": "79a2c074fe3b55eedb2120ff480f821731dfd1c4f29f64dd77d1d4bd2af2e450",
+      "bytes": 3548
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-03.png",
+      "sha256": "5877a308ebc0ebc985f923b4a079e93f8be9be0b461e4bfaea918191c2ac6abc",
+      "bytes": 3567
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-04.png",
+      "sha256": "118eac7d367808ee934625362c4e5d3f78987d83c8d4722eecc368695f6d7079",
+      "bytes": 3663
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-05.png",
+      "sha256": "96b85a60c5523f4a8d89859767e73d37ca231adebe4855970d4181ab6c05f8c8",
+      "bytes": 3930
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-06.png",
+      "sha256": "2e244bed0c50284ceaf17be0825a7845d873f0929207223c97bf1c9102a8710a",
+      "bytes": 3996
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-00.png",
+      "sha256": "c9051940a8e80531d3e759a0b7fae0b61678f8528073c2e12fb6848b2282392e",
+      "bytes": 3440
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-01.png",
+      "sha256": "ebe4e323c688ccbe43bb69a191b3b89bdc9d71c310bcc7312a27e0cbb0ba4d97",
+      "bytes": 3413
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-02.png",
+      "sha256": "3cf4f80f057700b616fca25a0b9ee6e03c23548cf8b7618740c6cb45604ea220",
+      "bytes": 3094
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-03.png",
+      "sha256": "179cd08da7bccbf57b2a0b92b4f65687aa9bf1569bd1a612c1dd2612c7c7c319",
+      "bytes": 2734
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-04.png",
+      "sha256": "042f336dac40f8bfa0fd599913485b39028f8c7362f82e02c92abc1eccb46b17",
+      "bytes": 3014
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-05.png",
+      "sha256": "3a7e407967816806f0665dfe0622917ac6341110e7103805a03defa60f631bd7",
+      "bytes": 3527
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-06.png",
+      "sha256": "cdf2750a306ce84e185f6b6b2ef8c1ede33419bb2146b6e993f755d04909a4da",
+      "bytes": 3583
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/request.json",
+      "sha256": "415666a241cd03c7c2b6ea1bb6a44d3cde729954275f5c76e1f0cb59691d5972",
+      "bytes": 33025
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/result.json",
+      "sha256": "d2d6e5bc826a066c2fee163a36cd09de6dbfb7fc4ddfa3d706f07a2782c4808a",
+      "bytes": 1743
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/review.png",
+      "sha256": "f59288bc72154016545baf644f1f0584e6f2f95d1f4b2d6f7fa14d777eb9002a",
+      "bytes": 35893
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-pro/submission.json",
+      "sha256": "2a5c12c782f98ce905a163191d76ef9fc8aac22288ffde28cc64834a89a25337",
+      "bytes": 1136
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/00.png",
+      "sha256": "a40b25c3dcf52125246cada257fe074e64f3c1fb13e43800dc21bcb8845ea507",
+      "bytes": 4729
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/01.png",
+      "sha256": "e9d6ce0e66ee1c68d20a5fead04a0dae2a6cdcc527b80c424d24110c7afa116c",
+      "bytes": 4789
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/02.png",
+      "sha256": "9f4d843f43156a59aa26aa8a2da3de3b13a7615e23bf4a1eba1a8c120a6e71bd",
+      "bytes": 4398
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/03.png",
+      "sha256": "f5a3a65b10392f5008969a76d7ead603b240a92c728bea7368e03b19365c0d39",
+      "bytes": 3921
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/04.png",
+      "sha256": "8e528ed598cab6063f38f4c018413cf255e8285dfcfc335e96705cebca11f223",
+      "bytes": 4230
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/05.png",
+      "sha256": "833723c4d6a97d01a7accb946ff165fff1f2d1ecf7d7f1fbed5bc6ac98018cb9",
+      "bytes": 4884
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/06.png",
+      "sha256": "cb7450a95e76dbe4e9e25504595fd50e562c39a572eca5ea79c44b9365d734f7",
+      "bytes": 4991
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/07.png",
+      "sha256": "bf8d10005e1bb026398c2894ae9e07e5cbc19e1b12dbd1cc348728931de86a4a",
+      "bytes": 4419
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/request.json",
+      "sha256": "aa565daa1b39dc7736f170815d8bb9f3c652086444e486f23771115c0b065d3a",
+      "bytes": 29619
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/result.json",
+      "sha256": "0d5af0cc975298761e8173c9ba8a1d913e2e5dc8b6143ccf26a8bdf78ebfb501",
+      "bytes": 1707
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/review.png",
+      "sha256": "12210d253bb0a64fb25a7a0dc9c9ac65c4a9e7fc715a0ddcc6377127be43c359",
+      "bytes": 34491
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/skeleton.png",
+      "sha256": "8fed686aa92b28e82fedd2b81428c4c66670f593fcd8a0120ba078ed2c6f5ebc",
+      "bytes": 5266
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/transition-rig/submission.json",
+      "sha256": "4a974c79b86f4eca24943be6e5ff80128973b450a5ea71d533fa9d155cd9f404",
+      "bytes": 954
+    },
+    {
+      "path": "game-src/action/eileen/resume/live-20261022/validation.json",
+      "sha256": "3478659cf8e339eec9be624f86276ec3797ebfd6f8f988e096772a8c3c190edd",
+      "bytes": 607
+    }
+  ]
+}

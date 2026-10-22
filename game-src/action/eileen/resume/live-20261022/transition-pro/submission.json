@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: 296587c6-95c3-4b93-92a7-d164ddb10506\njob_id: 296587c6-95c3-4b93-92a7-d164ddb10506\nmode: text\nframes: 7\nsize: 80x80px\ntransparent: True\nedit: Fix these seven frames consistently. Preserve the exact pose, body dimensions, canvas position, hands, clothing, blonde ponytail, shading and pixel grid in each frame. Make every face a strict right-facing side profile, not looking at camera. Each frame has exactly ONE compact black carbine: restore its solid shoulder stock, receiver, short barrel and magazine, following its EXISTING position and angle in EACH frame. Frames 1-2: held in front, 3-4: lowering beside hip, 5-7: carried behind left shoulder. Never add another gun or a pistol. Keep stock separate from hair. Do not move the arms or feet or add any new body parts. Transparent background.\nseed: 110\nasset_id: 5305e6d0-70fc-58c4-b5fc-d7544c5b9b51\nasset_status: pending (saved when generation completes)\ncost: ~10 generations\nstatus: processing (~30-90s)\n\nhint: get_image(job_id=\"296587c6-95c3-4b93-92a7-d164ddb10506\")"
+    }
+  ],
+  "isError": false
+}

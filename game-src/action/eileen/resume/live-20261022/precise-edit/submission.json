@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: ddafed99-d4d6-4b51-bbb4-c01ce660ef68\njob_id: ddafed99-d4d6-4b51-bbb4-c01ce660ef68\nmodel: pixen\nedit: Preserve the exact pose, compact adult body, clothes, hands, rifle length, pixel grid and transparent background. Keep the face in strict right-facing profile. Make the rifle stock rest against the shoulder below the cheek with a clear silhouette separate from the blonde ponytail and hair; remove the stock crossing through hair. Do not add effects or change the hand grip.\nsource: 192x144px\nsize: 192x144px\ntransparent: True\nseed: 73\nasset_id: a7c2835e-130f-55fd-bfc6-6a81c593ee16\nasset_status: pending (saved when generation completes)\ncost: 1 generation\nstatus: processing (~10-40s)\n\nhint: get_image(job_id=\"ddafed99-d4d6-4b51-bbb4-c01ce660ef68\")"
+    }
+  ],
+  "isError": false
+}

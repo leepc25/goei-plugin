@@ -1,0 +1,31 @@
+{
+  "changed_strips": [
+    "limp",
+    "precise",
+    "pushkick",
+    "step"
+  ],
+  "exact_edit_pixels": [
+    19,
+    18
+  ],
+  "support_frames": 10,
+  "raw_clips_and_base_unchanged": true,
+  "visual_approval": "pending",
+  "browser": [
+    {
+      "viewport": "pc",
+      "review_loaded": true,
+      "scrub_and_play": true,
+      "weapon_toggle_both_directions": true,
+      "page_errors": []
+    },
+    {
+      "viewport": "mobile",
+      "review_loaded": true,
+      "scrub_and_play": true,
+      "weapon_toggle_both_directions": true,
+      "page_errors": []
+    }
+  ]
+}

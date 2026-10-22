@@ -11,7 +11,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[4]
 ART=ROOT/'game-src/action/eileen'
-OUT=ART/'resume/review'
+OUT=ART/os.environ.get('EILEEN_REVIEW_OUTPUT','resume/review')
 OUT.mkdir(parents=True,exist_ok=True)
 manifest=json.loads((ART/'final/manifest.json').read_text())
 assert len(manifest['clips'])==93

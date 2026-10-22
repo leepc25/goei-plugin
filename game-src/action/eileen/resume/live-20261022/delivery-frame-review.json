@@ -1,0 +1,702 @@
+[
+  {
+    "clip": "precise",
+    "frame": 0,
+    "changed_pixels": 0,
+    "before_bbox": [
+      44,
+      48,
+      107,
+      137
+    ],
+    "after_bbox": [
+      44,
+      48,
+      107,
+      137
+    ],
+    "rgba_sha256": "04eb4f35244d35b6e03124fb885276e82e06e5a8696b856e839668cef49e31e1",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "unchanged",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "precise",
+    "frame": 1,
+    "changed_pixels": 19,
+    "before_bbox": [
+      26,
+      47,
+      94,
+      137
+    ],
+    "after_bbox": [
+      26,
+      47,
+      94,
+      137
+    ],
+    "rgba_sha256": "bd3f6b5b7ae4a93d405f6774699b6480b8fa3fa9180707d816df9d6cdb96a3c1",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "unchanged",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "precise",
+    "frame": 2,
+    "changed_pixels": 18,
+    "before_bbox": [
+      33,
+      47,
+      103,
+      137
+    ],
+    "after_bbox": [
+      33,
+      47,
+      103,
+      137
+    ],
+    "rgba_sha256": "5b0b545cb875da75b85d0ba3f41774a970db8ab6a2b3cc9a68fd9f577e94bacb",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "unchanged",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "precise",
+    "frame": 3,
+    "changed_pixels": 0,
+    "before_bbox": [
+      43,
+      48,
+      108,
+      137
+    ],
+    "after_bbox": [
+      43,
+      48,
+      108,
+      137
+    ],
+    "rgba_sha256": "a48c09e1f9127bcce7811b806cdc939ddd90c6e7598daba01bec5d9ccc15df1b",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "unchanged",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "precise",
+    "frame": 4,
+    "changed_pixels": 0,
+    "before_bbox": [
+      44,
+      49,
+      110,
+      137
+    ],
+    "after_bbox": [
+      44,
+      49,
+      110,
+      137
+    ],
+    "rgba_sha256": "83a0e87ebcb5d70f36bf40944fe67ac57ab374e29eced9178daac4760def5bb5",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "unchanged",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 0,
+    "changed_pixels": 0,
+    "before_bbox": [
+      44,
+      47,
+      101,
+      137
+    ],
+    "after_bbox": [
+      44,
+      47,
+      101,
+      137
+    ],
+    "rgba_sha256": "ea88e724115a9ed90e08ab1857a401bd051edb7599e76445a37ef23c0e7d1ba4",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 1,
+    "changed_pixels": 1518,
+    "before_bbox": [
+      37,
+      47,
+      80,
+      135
+    ],
+    "after_bbox": [
+      37,
+      49,
+      80,
+      137
+    ],
+    "rgba_sha256": "baecb72adaa5a5d3443dcac77fcf7dca85dc177c51538b17415fc583c6660e14",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 2,
+    "changed_pixels": 1894,
+    "before_bbox": [
+      30,
+      47,
+      104,
+      135
+    ],
+    "after_bbox": [
+      30,
+      49,
+      104,
+      137
+    ],
+    "rgba_sha256": "92b4d2bcab2de5f85cc12dbbcc3f5545647ae50b1aaf03f771cf7cdd4b4d6277",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 3,
+    "changed_pixels": 1914,
+    "before_bbox": [
+      30,
+      47,
+      104,
+      135
+    ],
+    "after_bbox": [
+      30,
+      49,
+      104,
+      137
+    ],
+    "rgba_sha256": "58dfc7c99241ea18170c7ed0584f085c0d56395cea06c279824ddf113bb053b9",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 4,
+    "changed_pixels": 1813,
+    "before_bbox": [
+      33,
+      47,
+      90,
+      135
+    ],
+    "after_bbox": [
+      33,
+      49,
+      90,
+      137
+    ],
+    "rgba_sha256": "65fa7dd6666f6580ddd659f01a20bd03f422fb7f425a69077ad0c54f86b1122d",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 5,
+    "changed_pixels": 0,
+    "before_bbox": [
+      33,
+      47,
+      90,
+      137
+    ],
+    "after_bbox": [
+      33,
+      47,
+      90,
+      137
+    ],
+    "rgba_sha256": "1fbac4caf57cf2b87a5413faed69e5cefc848b58838dc71e1f7f2316309deda1",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "pushkick",
+    "frame": 6,
+    "changed_pixels": 0,
+    "before_bbox": [
+      33,
+      47,
+      90,
+      137
+    ],
+    "after_bbox": [
+      33,
+      47,
+      90,
+      137
+    ],
+    "rgba_sha256": "eab0c2ff12647a042f06d3bd1991a6e2db3980765b9b6749bc9760a1881a734e",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 0,
+    "changed_pixels": 0,
+    "before_bbox": [
+      44,
+      48,
+      103,
+      137
+    ],
+    "after_bbox": [
+      44,
+      48,
+      103,
+      137
+    ],
+    "rgba_sha256": "536c0c49d1f8a5907f804edb6cc701195361ffa57f3765b8d2891663c6ab2b3d",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 1,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      48,
+      103,
+      137
+    ],
+    "after_bbox": [
+      47,
+      48,
+      103,
+      137
+    ],
+    "rgba_sha256": "ab797e652db652781bdf1d1bee60f8b8c127f9c955928918c9ce1410b5c70113",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 2,
+    "changed_pixels": 1464,
+    "before_bbox": [
+      47,
+      48,
+      103,
+      138
+    ],
+    "after_bbox": [
+      47,
+      47,
+      103,
+      137
+    ],
+    "rgba_sha256": "5e91b89568e1fec434dbc3061e1d528dcffbceb6684c290211f3eeb2983f97f3",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 3,
+    "changed_pixels": 1611,
+    "before_bbox": [
+      46,
+      48,
+      103,
+      138
+    ],
+    "after_bbox": [
+      46,
+      47,
+      103,
+      137
+    ],
+    "rgba_sha256": "4fe51094f63d01942395280b35fb1a33208dafce9701c733b992031b132a0375",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 4,
+    "changed_pixels": 1683,
+    "before_bbox": [
+      43,
+      48,
+      103,
+      138
+    ],
+    "after_bbox": [
+      43,
+      47,
+      103,
+      137
+    ],
+    "rgba_sha256": "3006bae94cfd9485e0eb3908a2fb5905c3dbb43a3e93bb7a0f4857006326266d",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 5,
+    "changed_pixels": 0,
+    "before_bbox": [
+      45,
+      48,
+      103,
+      137
+    ],
+    "after_bbox": [
+      45,
+      48,
+      103,
+      137
+    ],
+    "rgba_sha256": "c1abd4b8c7043928114d70b123bdfa476057e9c6215930208e93727d8a5de492",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 6,
+    "changed_pixels": 1508,
+    "before_bbox": [
+      47,
+      48,
+      103,
+      138
+    ],
+    "after_bbox": [
+      47,
+      47,
+      103,
+      137
+    ],
+    "rgba_sha256": "14b6e3a27301d26595a20c29bc543ef682f5cccd2ac8dca6b1129c041f6cd8a8",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "step",
+    "frame": 7,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      48,
+      103,
+      137
+    ],
+    "after_bbox": [
+      47,
+      48,
+      103,
+      137
+    ],
+    "rgba_sha256": "8c40ff7d67a09a1e8f4f3aa5c204349a82108f2d6378414a737a3ee13d117ec2",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 0,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "after_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "rgba_sha256": "f3e469d58f97576f8f68c47e289ac586eeae97fd4ea758eac1437d91e3e08a40",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 1,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "after_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "rgba_sha256": "45c55da9ff5a84ae4feafc492f43d57122d090725ab2627e4204503fa8a3e31e",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 2,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "after_bbox": [
+      47,
+      49,
+      99,
+      137
+    ],
+    "rgba_sha256": "651b1fd08d910d77cdce3b30c22b71ece1d3defe0f452f52ad004e49ce70bba7",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 3,
+    "changed_pixels": 1903,
+    "before_bbox": [
+      45,
+      52,
+      98,
+      139
+    ],
+    "after_bbox": [
+      45,
+      50,
+      98,
+      137
+    ],
+    "rgba_sha256": "22df1753dcb3c37b578c52cea6e10b491ec4f68bff67f6a36697a7eb1b8ba7bb",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 4,
+    "changed_pixels": 1985,
+    "before_bbox": [
+      42,
+      53,
+      97,
+      139
+    ],
+    "after_bbox": [
+      42,
+      51,
+      97,
+      137
+    ],
+    "rgba_sha256": "1b7a1d024ddcc507fc5413fcdae6a76e4486dfcc445b022c3c59e6f55c9c532a",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 5,
+    "changed_pixels": 0,
+    "before_bbox": [
+      44,
+      51,
+      98,
+      137
+    ],
+    "after_bbox": [
+      44,
+      51,
+      98,
+      137
+    ],
+    "rgba_sha256": "e084e0d67822e36fc5b3078e98b9675fd85f380a6083b1bc6a10f69f2dc48169",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 6,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      49,
+      99,
+      136
+    ],
+    "after_bbox": [
+      47,
+      49,
+      99,
+      136
+    ],
+    "rgba_sha256": "8085a8e6a9173086a45446c8c1b0664db7ce0d29d0794bdf06448966d0d8350e",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  },
+  {
+    "clip": "limp",
+    "frame": 7,
+    "changed_pixels": 0,
+    "before_bbox": [
+      47,
+      49,
+      99,
+      136
+    ],
+    "after_bbox": [
+      47,
+      49,
+      99,
+      136
+    ],
+    "rgba_sha256": "f05c4418eb9164cf8dc10948234583838ba9e91186a2cea93d2d7e6afbe4fbea",
+    "face": "preserved",
+    "body": "preserved",
+    "clothing": "preserved",
+    "hands": "preserved; contact anchors shifted with placement",
+    "grounding": "support-only reviewed offsets",
+    "loop_boundary": "first/last unchanged",
+    "visual_approval": "pending"
+  }
+]

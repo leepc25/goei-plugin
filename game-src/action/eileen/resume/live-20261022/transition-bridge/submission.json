@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: e92bce68-f025-4757-94b0-b16566cebe5d\njob_id: e92bce68-f025-4757-94b0-b16566cebe5d\naction: Keeping both feet planted and the head facing right, the support hand lowers the rifle muzzle and smoothly guides the rifle on its sling around the side onto the back; the right hand releases the grip and reaches the hip holster. Short controlled motion, same body, no turning toward camera, no walking, no effects.\nframes: 8\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 108\nasset_id: 40d7ebf5-d08d-5d91-a78a-d20d9cf8a962\nasset_status: pending (saved when generation completes)\ncost: 4 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"e92bce68-f025-4757-94b0-b16566cebe5d\")"
+    }
+  ],
+  "isError": false
+}

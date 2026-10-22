@@ -1,0 +1,251 @@
+{
+  "observed_at": "2026-10-22T20:43:11+09:00",
+  "branch": "codex/art-eileen-resume",
+  "paid_jobs": [
+    {
+      "owner": "eileen",
+      "folder": "precise-edit",
+      "job_id": "ddafed99-d4d6-4b51-bbb4-c01ce660ef68",
+      "tool": "edit_image_pixen",
+      "estimated_generations": 1,
+      "actual_cost": 1.0,
+      "cost_unit": "generations",
+      "cost_source": "precise-edit/result.json charged response",
+      "request_sha256": "8e99d8b2ba2032c1895f6faeca6fc8ea44b56c6c4d232878733d3814061fab7b",
+      "inputs": [
+        {
+          "path": "game-src/action/eileen/clips/precise/01.png",
+          "sha256": "75a76e1e015897be50a4563bc292921cee21641e0dadd0d81c3b1f0849fb5e27"
+        }
+      ],
+      "recovered": true,
+      "output_count": 1,
+      "state": "recovered_rejected",
+      "reason": "Face/stock separation improves but head top y47 -> y39 and body pose drifts. Full AI redraw rejected; exact pixel edits selected instead.",
+      "visual_approval": "not_requested_for_rejected_candidate",
+      "outputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/precise-edit/result.png",
+          "sha256": "82f67b138b339b84420dd8fe60f5e933b19903b2ca7cb7ae1df6e6784693d650"
+        }
+      ]
+    },
+    {
+      "owner": "eileen",
+      "folder": "transition-bridge",
+      "job_id": "e92bce68-f025-4757-94b0-b16566cebe5d",
+      "tool": "animate_image",
+      "estimated_generations": 4,
+      "actual_cost": 4.0,
+      "cost_unit": "generations",
+      "cost_source": "transition-bridge/result.json charged response",
+      "request_sha256": "1941ea512b4d6b1c34f816084a409b33ceeac883192618b7a58a937115f78f8b",
+      "inputs": [
+        {
+          "path": "game-src\\action\\eileen\\resume\\live-20261022\\transition-bridge\\endpoint-0.png",
+          "sha256": "8df46c53489856284decf6bfee39e3fbdff59ec90c2e3571b3940bcd251a0b18"
+        },
+        {
+          "path": "game-src\\action\\eileen\\resume\\live-20261022\\transition-bridge\\endpoint-1.png",
+          "sha256": "e70172d4024991e8ea0b512cc9eca0baf51606962cb028d3f2cc4be68c8ea916"
+        }
+      ],
+      "recovered": true,
+      "output_count": 9,
+      "state": "recovered_rejected",
+      "reason": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+      "visual_approval": "not_requested_for_rejected_candidate",
+      "outputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/00.png",
+          "sha256": "9e7b3467ad77be948f0880c4184c86a33974d1544b696539aae65e73720b1fa0"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/01.png",
+          "sha256": "b2283adc2b5003dc82d92fa6b2630e6d12f92fa3a70cf878e534a2698f231b0a"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/02.png",
+          "sha256": "70e797c7471c1ebb0d658dedd522fd0d392cc222572f1e597323b94b7df225b9"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/03.png",
+          "sha256": "ddb559a4b55f094f4d1039f9b8fa98be4f56ece2932ae824c711f3344b89278f"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/04.png",
+          "sha256": "cb867233312623e8228b43470926d1d5c0b33af3f1d13d4dc253a9209d9cb681"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/05.png",
+          "sha256": "9d2d205401e992ada4982701586af2999d91da30df2200ad2ed0f92c1082d0f7"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/06.png",
+          "sha256": "c2f98620308db4abed3a9e66511ceef147fbd1b55b915e1a26fbaf35c00dceec"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/07.png",
+          "sha256": "e590a812123511bbdfb32af1f05498c39b27040e82c0fd59f80a572127a6e55a"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-bridge/08.png",
+          "sha256": "163f867c8bdc1e09f5e7ea4523ed05b7c2c629e891adf657bdf237d1c6e43eba"
+        }
+      ]
+    },
+    {
+      "owner": "eileen",
+      "folder": "transition-rig",
+      "job_id": "5ce7b76d-7f1a-43e5-a28a-76f10b039fbd",
+      "tool": "animate_with_skeleton_v3",
+      "estimated_generations": 3,
+      "actual_cost": 3.0,
+      "cost_unit": "generations",
+      "cost_source": "transition-rig/result.json charged response",
+      "request_sha256": "aa565daa1b39dc7736f170815d8bb9f3c652086444e486f23771115c0b065d3a",
+      "inputs": [
+        {
+          "path": "game-src\\action\\eileen\\base\\R-side.png",
+          "sha256": "75f131dca187201071021728f5e2928a35118e75f8188b405c8a95883fccff67"
+        }
+      ],
+      "recovered": true,
+      "output_count": 8,
+      "state": "recovered_rejected",
+      "reason": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+      "visual_approval": "not_requested_for_rejected_candidate",
+      "outputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/00.png",
+          "sha256": "a40b25c3dcf52125246cada257fe074e64f3c1fb13e43800dc21bcb8845ea507"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/01.png",
+          "sha256": "e9d6ce0e66ee1c68d20a5fead04a0dae2a6cdcc527b80c424d24110c7afa116c"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/02.png",
+          "sha256": "9f4d843f43156a59aa26aa8a2da3de3b13a7615e23bf4a1eba1a8c120a6e71bd"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/03.png",
+          "sha256": "f5a3a65b10392f5008969a76d7ead603b240a92c728bea7368e03b19365c0d39"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/04.png",
+          "sha256": "8e528ed598cab6063f38f4c018413cf255e8285dfcfc335e96705cebca11f223"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/05.png",
+          "sha256": "833723c4d6a97d01a7accb946ff165fff1f2d1ecf7d7f1fbed5bc6ac98018cb9"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/06.png",
+          "sha256": "cb7450a95e76dbe4e9e25504595fd50e562c39a572eca5ea79c44b9365d734f7"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-rig/07.png",
+          "sha256": "bf8d10005e1bb026398c2894ae9e07e5cbc19e1b12dbd1cc348728931de86a4a"
+        }
+      ]
+    },
+    {
+      "owner": "eileen",
+      "folder": "transition-pro",
+      "job_id": "296587c6-95c3-4b93-92a7-d164ddb10506",
+      "tool": "edit_image",
+      "estimated_generations": 15,
+      "actual_cost": 10.0,
+      "cost_unit": "generations",
+      "cost_source": "transition-pro/result.json charged response",
+      "request_sha256": "415666a241cd03c7c2b6ea1bb6a44d3cde729954275f5c76e1f0cb59691d5972",
+      "inputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-00.png",
+          "sha256": "c9051940a8e80531d3e759a0b7fae0b61678f8528073c2e12fb6848b2282392e"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-01.png",
+          "sha256": "ebe4e323c688ccbe43bb69a191b3b89bdc9d71c310bcc7312a27e0cbb0ba4d97"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-02.png",
+          "sha256": "3cf4f80f057700b616fca25a0b9ee6e03c23548cf8b7618740c6cb45604ea220"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-03.png",
+          "sha256": "179cd08da7bccbf57b2a0b92b4f65687aa9bf1569bd1a612c1dd2612c7c7c319"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-04.png",
+          "sha256": "042f336dac40f8bfa0fd599913485b39028f8c7362f82e02c92abc1eccb46b17"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-05.png",
+          "sha256": "3a7e407967816806f0665dfe0622917ac6341110e7103805a03defa60f631bd7"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/input-06.png",
+          "sha256": "cdf2750a306ce84e185f6b6b2ef8c1ede33419bb2146b6e993f755d04909a4da"
+        }
+      ],
+      "recovered": true,
+      "output_count": 7,
+      "state": "recovered_rejected",
+      "reason": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+      "visual_approval": "not_requested_for_rejected_candidate",
+      "outputs": [
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-00.png",
+          "sha256": "b5340255a2d4fcded9748c395ea4c921224562a40fc155971b03b3ba5751a035"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-01.png",
+          "sha256": "661acd4082e5ad1052205f07be1f45bcb7d5f41f37a90a47550e31fd5f1632bb"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-02.png",
+          "sha256": "79a2c074fe3b55eedb2120ff480f821731dfd1c4f29f64dd77d1d4bd2af2e450"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-03.png",
+          "sha256": "5877a308ebc0ebc985f923b4a079e93f8be9be0b461e4bfaea918191c2ac6abc"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-04.png",
+          "sha256": "118eac7d367808ee934625362c4e5d3f78987d83c8d4722eecc368695f6d7079"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-05.png",
+          "sha256": "96b85a60c5523f4a8d89859767e73d37ca231adebe4855970d4181ab6c05f8c8"
+        },
+        {
+          "path": "game-src/action/eileen/resume/live-20261022/transition-pro/crop-06.png",
+          "sha256": "2e244bed0c50284ceaf17be0825a7845d873f0929207223c97bf1c9102a8710a"
+        }
+      ]
+    }
+  ],
+  "paid_submit_count": 4,
+  "actual_new_cost": 18.0,
+  "cost_unit": "generations",
+  "balance_delta_used_for_cost": false,
+  "free_exact_edits": [
+    {
+      "image_id": "f5621540-ebeb-43e3-871d-2dfdbceffe15",
+      "frame": "precise01",
+      "changed_pixels": 19,
+      "actual_cost": 0
+    },
+    {
+      "image_id": "4e74f296-d7bf-453b-a90e-bf8858ec1c7c",
+      "frame": "precise02",
+      "changed_pixels": 18,
+      "actual_cost": 0
+    }
+  ],
+  "max_owner_inflight": 1,
+  "kyuras_recovery_owner": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+  "historical_cost_note": "Earlier reported332 is historical, not revalidated billing; historical job IDs remain in ../job-ledger.json."
+}

@@ -1,0 +1,577 @@
+[
+  {
+    "candidate": "precise-edit",
+    "frame": 0,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "single frame differs from neighboring poses",
+    "issues": "Face/stock separation improves but head top y47 -> y39 and body pose drifts. Full AI redraw rejected; exact pixel edits selected instead.",
+    "bbox": [
+      28,
+      39,
+      102,
+      138
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "82f67b138b339b84420dd8fe60f5e933b19903b2ca7cb7ae1df6e6784693d650",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 0,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      44,
+      47,
+      101,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "9e7b3467ad77be948f0880c4184c86a33974d1544b696539aae65e73720b1fa0",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 1,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      41,
+      48,
+      95,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "b2283adc2b5003dc82d92fa6b2630e6d12f92fa3a70cf878e534a2698f231b0a",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 2,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      33,
+      48,
+      82,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "70e797c7471c1ebb0d658dedd522fd0d392cc222572f1e597323b94b7df225b9",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 3,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      31,
+      48,
+      77,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "ddb559a4b55f094f4d1039f9b8fa98be4f56ece2932ae824c711f3344b89278f",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 4,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      31,
+      47,
+      77,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "cb867233312623e8228b43470926d1d5c0b33af3f1d13d4dc253a9209d9cb681",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 5,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      33,
+      46,
+      77,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "9d2d205401e992ada4982701586af2999d91da30df2200ad2ed0f92c1082d0f7",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 6,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      35,
+      47,
+      80,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "c2f98620308db4abed3a9e66511ceef147fbd1b55b915e1a26fbaf35c00dceec",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 7,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      36,
+      47,
+      79,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "e590a812123511bbdfb32af1f05498c39b27040e82c0fd59f80a572127a6e55a",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-bridge",
+    "frame": 8,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Frames02-04 duplicate front/back rifle; front rifle disappears. Endpoint interpolation does not preserve prop identity.",
+    "bbox": [
+      36,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "163f867c8bdc1e09f5e7ea4523ed05b7c2c629e891adf657bdf237d1c6e43eba",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 0,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      44,
+      47,
+      101,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "a40b25c3dcf52125246cada257fe074e64f3c1fb13e43800dc21bcb8845ea507",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 1,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      44,
+      47,
+      96,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "e9d6ce0e66ee1c68d20a5fead04a0dae2a6cdcc527b80c424d24110c7afa116c",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 2,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      44,
+      47,
+      83,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "9f4d843f43156a59aa26aa8a2da3de3b13a7615e23bf4a1eba1a8c120a6e71bd",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 3,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      44,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "f5a3a65b10392f5008969a76d7ead603b240a92c728bea7368e03b19365c0d39",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 4,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      38,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "8e528ed598cab6063f38f4c018413cf255e8285dfcfc335e96705cebca11f223",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 5,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      30,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "833723c4d6a97d01a7accb946ff165fff1f2d1ecf7d7f1fbed5bc6ac98018cb9",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 6,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      31,
+      47,
+      78,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "cb7450a95e76dbe4e9e25504595fd50e562c39a572eca5ea79c44b9365d734f7",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-rig",
+    "frame": 7,
+    "face": "profile consistency fails or not proven",
+    "body": "stance broadly retained",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "frame bounds inspected; not enough to prove contact",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Arm path improved but rifle becomes thin/deformed at02-04. Frame07 returns weapon to front. Face remains partly front-facing. Rejected.",
+    "bbox": [
+      44,
+      47,
+      81,
+      137
+    ],
+    "size": [
+      192,
+      144
+    ],
+    "sha256": "bf8d10005e1bb026398c2894ae9e07e5cbc19e1b12dbd1cc348728931de86a4a",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 0,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      19,
+      3,
+      75,
+      76
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "b5340255a2d4fcded9748c395ea4c921224562a40fc155971b03b3ba5751a035",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 1,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      19,
+      3,
+      70,
+      76
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "661acd4082e5ad1052205f07be1f45bcb7d5f41f37a90a47550e31fd5f1632bb",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 2,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      19,
+      3,
+      57,
+      76
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "79a2c074fe3b55eedb2120ff480f821731dfd1c4f29f64dd77d1d4bd2af2e450",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 3,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      13,
+      3,
+      66,
+      76
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "5877a308ebc0ebc985f923b4a079e93f8be9be0b461e4bfaea918191c2ac6abc",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 4,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      13,
+      7,
+      55,
+      80
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "118eac7d367808ee934625362c4e5d3f78987d83c8d4722eecc368695f6d7079",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 5,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      0,
+      7,
+      47,
+      80
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "96b85a60c5523f4a8d89859767e73d37ca231adebe4855970d4181ab6c05f8c8",
+    "decision": "reject"
+  },
+  {
+    "candidate": "transition-pro",
+    "frame": 6,
+    "face": "profile consistency fails or not proven",
+    "body": "pose/placement drift",
+    "clothing": "black suit and olive vest retained; pixel mass not approved",
+    "hands": "rifle contact not approved",
+    "grounding": "original legs outside crop unchanged but crop seam broken",
+    "loop_boundary": "one-shot; transition-rig07 returns to starting weapon state",
+    "issues": "Upper crop body position changes. Frames00-03 leave gaps at knee boundary; frame03 rotates rifle horizontally instead of preserving path. Rejected.",
+    "bbox": [
+      2,
+      7,
+      48,
+      80
+    ],
+    "size": [
+      80,
+      80
+    ],
+    "sha256": "2e244bed0c50284ceaf17be0825a7845d873f0929207223c97bf1c9102a8710a",
+    "decision": "reject"
+  }
+]

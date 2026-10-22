@@ -1,0 +1,75 @@
+{
+  "rgba_pack_matches_all_20_sources": true,
+  "clips": 93,
+  "results": [
+    {
+      "viewport": "pc",
+      "width": 1280,
+      "height": 800,
+      "touch": false,
+      "shower_frames_observed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3
+      ],
+      "movement_x": 406.24199999999996,
+      "page_errors": [],
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": "mobile-landscape",
+      "width": 844,
+      "height": 390,
+      "touch": true,
+      "shower_frames_observed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3
+      ],
+      "movement_x": 409.9859999999999,
+      "page_errors": [],
+      "horizontal_overflow": false
+    },
+    {
+      "viewport": "mobile-portrait",
+      "width": 390,
+      "height": 844,
+      "touch": true,
+      "shower_frames_observed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3,
+        4,
+        5,
+        2,
+        3
+      ],
+      "movement_x": 407.50199999999995,
+      "page_errors": [],
+      "horizontal_overflow": false
+    }
+  ]
+}
