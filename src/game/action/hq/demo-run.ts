@@ -115,7 +115,7 @@ export function runMission(box: HTMLElement, l: MissionLaunch, done: (r: RunResu
     finished = true;
     const tmp = structuredClone(meta);
     graySettle(run, tmp);
-    const how = run.ended === 'evac' ? 'evac' : withdrew ? 'withdraw' : tmp.missionsDone.includes(l.goal.id) ? 'return' : 'withdraw';
+    const how = run.ended === 'evac' ? 'evac' : withdrew ? 'withdraw' : 'return';
     const r: RunResult = {
       ...emptyResult(how),
       missionDone: tmp.missionsDone.includes(l.goal.id) && how === 'return',

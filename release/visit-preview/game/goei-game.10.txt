@@ -1,0 +1,2806 @@
+.name === "evac" && !w.ended) w.ended = "evac";
+          else if (e.name === "hurtPlayer") w.api.hurtPlayer(d3.dmg ?? 10);
+          else if (e.name === "debuff" && d3.text) w.say(d3.text, 1.5);
+        });
+        const items = linkItems(w, run);
+        npc.attach(w, { items, hq: false });
+        if (run.stageId === "itemroom") items.showcase();
+        w.hooks.push(() => items.tick());
+        w.underlays.push((c, camX) => items.draw(c, camX));
+      },
+      toHqResult,
+      afterRun: (how, done2) => {
+        let fired = false;
+        const once = () => fired ? void 0 : (fired = true, done2());
+        if (how === "return" && world?.notes.missionDone !== false) dinnerDue = !story.flags.cut_dinner;
+        if (!cutOnce(how === "evac" ? "evac" : "attic", once)) once();
+      },
+      drawIdle: (name, ctx, t) => {
+        if (name === "title") drawTitleBg(ctx, t);
+      },
+      boot: (g2) => {
+        void session.ready.then(() => {
+          elevator.reloadMeta();
+          if (bridge?.visit) g2.start_new();
+          else if (!bootFromUrl(g2)) g2.toTitle();
+        });
+        return true;
+      },
+      dispose: () => {
+        window.removeEventListener("pagehide", saveOnHide);
+        document.removeEventListener("visibilitychange", saveOnHide);
+        npc.dispose();
+        unmountItems();
+        const g2 = globalThis;
+        delete g2.__goeiStory;
+        delete g2.__goeiNpc;
+        delete g2.__goeiStoryStart;
+        world = null;
+        game = null;
+        window.removeEventListener("keydown", storyKeys, true);
+        offMapKey();
+        window.removeEventListener("keydown", titleInput, true);
+        window.removeEventListener("pointerdown", titleInput, true);
+        if (openingT) clearTimeout(openingT);
+        window.removeEventListener("keydown", hqKeys, true);
+        window.removeEventListener("keydown", floorKeys, true);
+        saveFlags();
+        storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+        story.dispose();
+        setLineProvider(null);
+        visit?.dispose();
+        audio.dispose();
+        shell.dispose();
+      }
+    };
+    return {
+      mods,
+      box: shell.stage.root,
+      bind: (g2) => {
+        game = g2;
+      }
+    };
+  }
+  function bootFromUrl(g2) {
+    let q;
+    try {
+      q = new URLSearchParams(location.search);
+    } catch {
+      return false;
+    }
+    const start = q.get("start");
+    if (!start) return false;
+    const [k, v] = start.split("=");
+    if (k === "hq") g2.start_new();
+    else if (k === "stage") g2.start_new(v || void 0);
+    else if (k === "arena") g2.start_new("arena");
+    else if (k === "items") g2.start_new("itemroom");
+    else if (k === "story") {
+      g2.start_new("dummy");
+      if (v) globalThis.__goeiStoryStart?.(v);
+    } else return false;
+    return true;
+  }
+  function bubbleGap(world, gx) {
+    const cam = world.camX;
+    const solid = (world.floor.keepOut ?? []).filter(([a, b]) => b - a >= 60).map(([a, b]) => [a - cam, b - cam]);
+    for (const pr of world.floor.props ?? []) {
+      if (!/door|elevator|exit|panel|shutter|mirror|goalwall/.test(pr.kind)) continue;
+      const h = Math.max(pr.w, 200) / 2 + 20;
+      solid.push([pr.x - h - cam, pr.x + h - cam]);
+    }
+    solid.sort((a, b) => a[0] - b[0]);
+    const gaps = [];
+    let at2 = Math.max(0, gx - 520);
+    const end = Math.min(1280, gx + 520);
+    for (const [a, b] of solid) {
+      if (b <= at2) continue;
+      if (a >= end) break;
+      if (a - at2 >= 300) gaps.push([at2, a]);
+      at2 = Math.max(at2, b);
+    }
+    if (end - at2 >= 300) gaps.push([at2, end]);
+    if (!gaps.length) return null;
+    const dist = (g2) => gx < g2[0] ? g2[0] - gx : gx > g2[1] ? gx - g2[1] : 0;
+    gaps.sort((a, b) => dist(a) - dist(b));
+    return dist(gaps[0]) < 360 ? gaps[0] : null;
+  }
+
+  // src/game/action/engine/touch.ts
+  var CSS2 = `
+.gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
+.gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
+.gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
+.gt-knob{position:absolute;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,255,255,.4);display:none}
+.gt-btns{position:absolute;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,52px);gap:6px;pointer-events:auto}
+.gt-b{width:52px;height:52px;border-radius:12px;background:rgba(20,26,30,.6);border:2px solid rgba(255,255,255,.3);color:#e8eef0;font:600 14px sans-serif;display:flex;align-items:center;justify-content:center;touch-action:none}
+.gt-b.on{background:rgba(255,211,106,.6);color:#111}
+.gt-b.big{background:rgba(180,60,50,.6)}
+.gt-top{position:absolute;right:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
+`;
+  var BTNS = [
+    ["super", "필살"],
+    ["guard", "가드"],
+    ["reload", "장전"],
+    ["item1", "1"],
+    ["skill", "폭파"],
+    ["shoot", "사격"],
+    ["shift", "회피"],
+    ["item2", "2"],
+    ["jump", "점프"],
+    ["attack", "공격", "big"],
+    ["interact", "E"],
+    ["hitbox", "판정"]
+  ];
+  function mountTouch(root, input) {
+    const st = document.createElement("style");
+    st.textContent = CSS2;
+    const wrap = document.createElement("div");
+    wrap.className = "gt-wrap";
+    wrap.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
+    root.append(st, wrap);
+    const grid = wrap.querySelector(".gt-btns");
+    for (const [b, label3, cls] of BTNS) {
+      const d3 = document.createElement("div");
+      d3.className = "gt-b" + (cls ? " " + cls : "");
+      d3.dataset.b = b;
+      d3.textContent = label3;
+      grid.appendChild(d3);
+    }
+    wrap.querySelectorAll(".gt-b").forEach((el) => {
+      const b = el.dataset.b;
+      const on = (e) => {
+        e.preventDefault();
+        el.setPointerCapture(e.pointerId);
+        el.classList.add("on");
+        input.press(b);
+      };
+      const off2 = () => {
+        el.classList.remove("on");
+        input.release(b);
+      };
+      el.addEventListener("pointerdown", on);
+      el.addEventListener("pointerup", off2);
+      el.addEventListener("pointercancel", off2);
+    });
+    const stick = wrap.querySelector(".gt-stick");
+    const ring = wrap.querySelector(".gt-ring");
+    const knob = wrap.querySelector(".gt-knob");
+    let id = -1;
+    let ox = 0;
+    let oy = 0;
+    const held = /* @__PURE__ */ new Set();
+    const set = (b, v) => {
+      if (v && !held.has(b)) held.add(b), input.press(b);
+      if (!v && held.has(b)) held.delete(b), input.release(b);
+    };
+    const move3 = (x, y) => {
+      const dx = x - ox;
+      const dy = y - oy;
+      const r = Math.min(50, Math.hypot(dx, dy));
+      const a = Math.atan2(dy, dx);
+      knob.style.left = ox + Math.cos(a) * r + "px";
+      knob.style.top = oy + Math.sin(a) * r + "px";
+      const T3 = 18;
+      set("left", dx < -T3);
+      set("right", dx > T3);
+      set("up", dy < -T3);
+      set("down", dy > T3);
+    };
+    stick.addEventListener("pointerdown", (e) => {
+      if (id >= 0) return;
+      e.preventDefault();
+      id = e.pointerId;
+      stick.setPointerCapture(id);
+      const r = stick.getBoundingClientRect();
+      ox = e.clientX - r.left;
+      oy = e.clientY - r.top;
+      ring.style.display = knob.style.display = "block";
+      ring.style.left = ox + "px";
+      ring.style.top = oy + "px";
+      move3(ox, oy);
+    });
+    stick.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== id) return;
+      const r = stick.getBoundingClientRect();
+      move3(e.clientX - r.left, e.clientY - r.top);
+    });
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = -1;
+      ring.style.display = knob.style.display = "none";
+      for (const b of [...held]) set(b, false);
+    };
+    stick.addEventListener("pointerup", end);
+    stick.addEventListener("pointercancel", end);
+    return () => {
+      wrap.remove();
+      st.remove();
+    };
+  }
+
+  // src/game/action/main.ts
+  var CSS3 = `
+.goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
+.goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
+.goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
+.goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
+.goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:rgba(20,24,27,.92);border:2px solid #6d767b;pointer-events:auto;z-index:20}
+.goei-engine-elev[hidden]{display:none}
+.goei-engine-elev button{width:64px;height:52px;border-radius:50%;border:2px solid #9aa6ad;background:#2c3236;color:#ece6d4;font:bold 20px sans-serif;cursor:pointer}
+.goei-engine-elev button.here{border-color:#ffb34a;color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.35;cursor:default}
+.goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
+`;
+  function mountGame(box2, bridge) {
+    const st = document.createElement("style");
+    st.textContent = CSS3;
+    const root = document.createElement("div");
+    root.className = "goei-engine";
+    const stage = document.createElement("div");
+    stage.className = "goei-engine-stage";
+    stage.innerHTML = '<div class="goei-engine-loading">불러오는 중…</div>';
+    root.appendChild(stage);
+    box2.append(st, root);
+    let game = null;
+    let offTouch = null;
+    let dead = false;
+    const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
+    const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
+    const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
+    const startRoom = prepareStartRoom(bridge?.assets ? (f) => bridge.assets.url("start-room", f) : void 0);
+    void Promise.all([loadArt(urlOf), startRoom.ready]).then(([art5]) => {
+      if (dead) return;
+      stage.remove();
+      root.style.display = "block";
+      const wiring = engineModules(root, bridge);
+      game = new Game(wiring.box, art5, wiring.mods);
+      wiring.bind(game);
+      if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
+      game.start();
+      globalThis.__goeiEngine = game;
+    }).catch(() => {
+      if (!dead) stage.textContent = "시작방 그림을 불러오지 못했습니다. 새로고침해 주세요.";
+    });
+    return () => {
+      dead = true;
+      releaseDoorArt();
+      releaseHqArt();
+      startRoom.dispose();
+      offTouch?.();
+      game?.destroy();
+      const g2 = globalThis;
+      if (g2.__goeiEngine === game) delete g2.__goeiEngine;
+      game = null;
+      root.remove();
+      st.remove();
+    };
+  }
+
+  // src/game/play.ts
+  var mountPlay = (box2, bridge) => mountGame(box2, bridge);
+
+  // src/game/style.css
+  var style_default4 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }\n.goei-game .gg-squad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px; margin: 0; box-sizing: border-box; }\n.goei-game .gg-ag { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 8px; row-gap: 3px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 6px 8px; margin: 0; min-width: 0; }\n.goei-game .gg-ag.ready { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-ag.down { opacity: .55; }\n.goei-game .gg-face { grid-row: 1 / 4; width: 40px; height: 40px; border-radius: 8px; background-repeat: no-repeat; background-size: 320px 40px; }\n.goei-game .gg-nm { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-bar { height: 5px; border-radius: 3px; background: var(--gg-line); overflow: hidden; }\n.goei-game .gg-bar b { display: block; height: 100%; width: 100%; transform-origin: left; background: #5dc98a; }\n.goei-game .gg-bar.sk b { background: var(--gg-signal); }\n.goei-game .gg-ag.low .gg-bar.hp b { background: var(--gg-danger); }\n.goei-game .gg-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--gg-bg); z-index: 2; }\n.goei-game .gg-sheet[hidden] { display: none; }\n.goei-game .gg-sh-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 0; border-bottom: 1px solid var(--gg-line); }\n.goei-game .gg-sh-head b { flex: 1; font-size: 15px; }\n.goei-game .gg-sh-body { flex: 1; overflow-y: auto; padding: 12px; margin: 0; }\n.goei-game .gg-sh-foot { display: flex; gap: 8px; padding: 10px 12px; margin: 0; border-top: 1px solid var(--gg-line); }\n.goei-game .gg-sh-foot .gg-tb { flex: 1; padding: 10px; font-weight: 700; }\n.goei-game .gg-tb.primary { background: var(--gg-accent); border-color: var(--gg-signal); }\n.goei-game .gg-tb[disabled] { opacity: .45; cursor: default; }\n.goei-game .gg-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }\n.goei-game .gg-pk { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 10px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 8px; margin: 0; }\n.goei-game .gg-pk.on { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-pk .gg-face { grid-row: 1 / 3; width: 48px; height: 48px; background-size: 384px 48px; }\n.goei-game .gg-pk small { color: var(--gg-dim); font-size: 12px; }\n.goei-game .gg-rec { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; max-width: 420px; margin: 0 auto; padding: 4px; }\n.goei-game .gg-rec dt { color: var(--gg-dim); }\n.goei-game .gg-rec dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }\n.goei-game .gg-rec .gg-sec { grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gg-line); font-weight: 700; }\n.goei-game .gg-load { color: var(--gg-dim); padding: 16px; margin: 0; }\n@media (max-width: 520px) {\n  .goei-game .gg-squad { gap: 4px; padding: 6px; }\n  .goei-game .gg-ag { grid-template-columns: minmax(0, 1fr); padding: 6px; justify-items: stretch; }\n  .goei-game .gg-ag .gg-face { grid-row: auto; justify-self: center; }\n  .goei-game .gg-nm { text-align: center; font-size: 12px; }\n  .goei-game .gg-pick { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }\n}\n";
+
+  // src/game/assets.ts
+  var PACK_VERSION = 1;
+  var PACK_ID = "patrol";
+  var SHEET_FILES = {
+    jyaldi: "a-jyaldi",
+    gorgo: "a-gorgo",
+    geshu: "a-geshu",
+    deadfall: "a-deadfall",
+    spandal: "a-spandal",
+    eileen: "a-eileen",
+    curas: "a-curas",
+    rose: "a-rose",
+    corner: "e-corner",
+    watchman: "e-watchman",
+    statue: "e-statue",
+    master: "e-master"
+  };
+  var BACK_FILES = {
+    "belt-school": "bg-belt-school",
+    "room-classroom": "bg-room-classroom",
+    "room-lab": "bg-room-lab",
+    "room-broadcast": "bg-room-broadcast",
+    "room-courtyard": "bg-room-courtyard",
+    "belt-camp": "bg-belt-camp"
+  };
+  var FACE_FILE = "faces";
+  var PACK_FILES = [...Object.values(SHEET_FILES), ...Object.values(BACK_FILES), FACE_FILE];
+  var PACK_NAME = `goei-game-${PACK_ID}.pack`;
+  function parsePack(b, required = PACK_FILES) {
+    try {
+      if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
+      const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
+      const head = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
+      if (typeof head.id !== "string" || typeof head.version !== "number" || !head.atlas || !Array.isArray(head.files))
+        return null;
+      const base2 = 12 + len;
+      const files = /* @__PURE__ */ new Map();
+      for (const row of head.files) {
+        if (!Array.isArray(row)) return null;
+        const [name, at2, n] = row;
+        if (typeof name !== "string" || typeof at2 !== "number" || typeof n !== "number" || base2 + at2 + n > b.length)
+          return null;
+        files.set(name, b.slice(base2 + at2, base2 + at2 + n));
+      }
+      if (!required.every((f) => files.has(f))) return null;
+      return { id: head.id, version: head.version, atlas: head.atlas, files };
+    } catch {
+      return null;
+    }
+  }
+
+  // src/game/data.ts
+  var AGENTS3 = [
+    { id: "jyaldi", name: "쟈알디", role: "공격", hp: 130, atk: 18, range: 150, rate: 1.4, charge: 9, skill: "blast", skillName: "폭발", power: 3.2, face: 0 },
+    { id: "gorgo", name: "고르고디오", role: "방어", hp: 220, atk: 14, range: 46, rate: 1.6, charge: 10, skill: "guard", skillName: "중장갑", power: 5, face: 1 },
+    { id: "geshu", name: "게슈간", role: "제어", hp: 116, atk: 13, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "염동력", power: 3, face: 2 },
+    { id: "deadfall", name: "데드폴", role: "회복", hp: 124, atk: 10, range: 130, rate: 1.5, charge: 11, skill: "heal", skillName: "시간 역행", power: 0.45, face: 3 },
+    { id: "spandal", name: "스팡달", role: "공격", hp: 112, atk: 21, range: 52, rate: 1.2, charge: 9, skill: "bind", skillName: "그림자 가시", power: 2, face: 4 },
+    { id: "eileen", name: "에일린", role: "지원", hp: 120, atk: 14, range: 180, rate: 1, charge: 11, skill: "rally", skillName: "조준 지시", power: 6, face: 5 },
+    { id: "curas", name: "큐라스", role: "공격", hp: 126, atk: 18, range: 150, rate: 1.4, charge: 10, skill: "blast", skillName: "발화", power: 2.6, face: 6 },
+    { id: "rose", name: "로제몬", role: "지원", hp: 118, atk: 11, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "정신 간섭", power: 3.5, face: 7 }
+  ];
+  var ENEMIES = {
+    corner: { id: "corner", name: "모퉁이 귀신", hp: 70, atk: 9, range: 34, rate: 1.5, speed: 48, scale: 1, boss: false },
+    watchman: { id: "watchman", name: "야간 경비", hp: 95, atk: 11, range: 40, rate: 1.8, speed: 38, scale: 1, boss: false },
+    statue: { id: "statue", name: "움직이는 동상", hp: 900, atk: 22, range: 70, rate: 2.4, speed: 16, scale: 2, boss: true },
+    master: { id: "master", name: "악몽의 주인", hp: 1300, atk: 26, range: 80, rate: 2.2, speed: 20, scale: 2, boss: true }
+  };
+  var ROOMS2 = [
+    { back: "belt-school", name: "본관 복도" },
+    { back: "room-classroom", name: "교실" },
+    { back: "room-lab", name: "과학실" },
+    { back: "room-broadcast", name: "방송실" },
+    { back: "room-courtyard", name: "중앙 정원" }
+  ];
+  var CAMP = { back: "belt-camp", name: "은신처" };
+  var AF = {
+    walk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    idle: 12,
+    attack: [14, 15, 16, 17],
+    attackHit: 1,
+    skill: [18, 19, 20, 21, 22, 23],
+    skillHit: 3,
+    hurt: 24,
+    down: [25, 26, 27],
+    rise: [28, 29],
+    /** 앉아서 쉬기·먹기·마시기·정비 */
+    rest: [30, 31, 32, 33]
+  };
+  var EF = {
+    move: [0, 1, 2, 3, 4, 5],
+    attack: [7, 8, 9, 10, 11],
+    attackHit: 2,
+    skill: [12, 13, 14, 15, 16, 17],
+    skillHit: 3,
+    hurt: 19,
+    die: [20, 21, 22, 23]
+  };
+  var TUNE = {
+    /** 논리 화면 높이. 배경(320×180)을 2배로 그린 높이 */
+    sceneH: 360,
+    /** 요원 걷는 속도 (논리 픽셀/초) */
+    walkSpeed: 44,
+    /** 걷기 그림 한 칸당 이동 거리 */
+    strideStep: 6,
+    /** 방 하나의 길이 */
+    roomLen: 1500,
+    /** 순찰이 깊어질 때마다 적 체력·공격력 배율 증가 */
+    depthScale: 0.12,
+    /** 은신처 휴식 시간 (초) */
+    campTime: 7,
+    /** 응답을 기다리는 동안 진행 속도 */
+    waitingSpeed: 1.25,
+    /** 저장 최소 간격 (밀리초) */
+    saveGap: 5e3
+  };
+
+  // src/game/sim.ts
+  var SAVE_VERSION = 1;
+  var DEFAULT_SQUAD = ["gorgo", "jyaldi", "eileen", "deadfall"];
+  function newMeta2() {
+    return { version: SAVE_VERSION, squad: [...DEFAULT_SQUAD], patrols: 0, best: 0, wipes: 0, kills: {}, depth: 1 };
+  }
+  function readMeta(raw) {
+    const m = newMeta2();
+    if (!raw) return m;
+    try {
+      const o = JSON.parse(raw);
+      if (!o || typeof o !== "object") return m;
+      const ids = new Set(AGENTS3.map((a) => a.id));
+      if (Array.isArray(o.squad)) {
+        const s2 = [...new Set(o.squad.filter((id) => ids.has(id)))];
+        if (s2.length === 4) m.squad = s2;
+      }
+      const n = (v, d3) => typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : d3;
+      m.patrols = n(o.patrols, 0);
+      m.best = n(o.best, 0);
+      m.wipes = n(o.wipes, 0);
+      m.depth = Math.max(1, n(o.depth, 1));
+      if (o.kills && typeof o.kills === "object") {
+        for (const k of Object.keys(ENEMIES)) m.kills[k] = n(o.kills[k], 0);
+      }
+    } catch {
+    }
+    return m;
+  }
+  var agentDef = (id) => AGENTS3.find((a) => a.id === id);
+  var isAgent2 = (u) => u.side === "a";
+  var alive = (u) => u.act !== "down" && u.act !== "dead" && u.act !== "rise";
+  function rand2(run) {
+    let t = run.seed = run.seed + 1831565813 | 0;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+  var SLOT_BACK = [0, 38, 76, 114];
+  var SLOT_LANE = [1, 0, 1, 0];
+  function makeAgent(run, id, slot, x) {
+    const d3 = agentDef(id);
+    return {
+      uid: ++run.seq,
+      side: "a",
+      kind: id,
+      x: x - SLOT_BACK[slot],
+      lane: SLOT_LANE[slot],
+      hp: d3.hp,
+      max: d3.hp,
+      act: "walk",
+      t: 0,
+      cd: 0.4 * slot,
+      gauge: 0.35 + 0.15 * slot,
+      stride: slot * 17,
+      bound: 0,
+      slot,
+      ready: 0,
+      hit: false,
+      flash: 0,
+      gone: 0
+    };
+  }
+  function scaled(run, base2) {
+    return Math.round(base2 * (1 + (run.depth - 1) * TUNE.depthScale));
+  }
+  function makeEnemy(run, id, x, lane) {
+    const d3 = ENEMIES[id];
+    const hp = scaled(run, d3.hp);
+    return {
+      uid: ++run.seq,
+      side: "e",
+      kind: id,
+      x,
+      lane,
+      hp,
+      max: hp,
+      act: "walk",
+      t: 0,
+      cd: 0.6 + rand2(run),
+      gauge: 6,
+      stride: rand2(run) * 30,
+      bound: 0,
+      slot: 0,
+      ready: 0,
+      hit: false,
+      flash: 0,
+      gone: 0
+    };
+  }
+  function pickRooms(run) {
+    const order = ROOMS2.map((_, i) => i).sort(() => rand2(run) - 0.5);
+    return [0, ...order.filter((i) => i !== 0).slice(0, 2)];
+  }
+  function wavesFor(run) {
+    const n = run.room === 2 ? 3 : 2 + (rand2(run) < 0.5 ? 1 : 0);
+    const len = TUNE.roomLen;
+    return Array.from({ length: n }, (_, i) => Math.round((i + 1) / (n + 1) * len * 0.9 + rand2(run) * 60));
+  }
+  function newRun(meta, seed = Date.now() | 0) {
+    const run = {
+      phase: "patrol",
+      pt: 0,
+      depth: meta.depth,
+      rooms: [],
+      room: 0,
+      x: 180,
+      waves: [],
+      units: [],
+      fx: [],
+      seq: 0,
+      seed,
+      guard: 0,
+      rally: 0,
+      cam: 0
+    };
+    run.rooms = pickRooms(run);
+    run.waves = wavesFor(run);
+    formSquad(run, meta.squad, "walk");
+    return run;
+  }
+  function formSquad(run, squad, act2) {
+    const order = [...squad].sort((a, b) => agentDef(a).range - agentDef(b).range);
+    const keep = new Map(run.units.filter(isAgent2).map((u) => [u.kind, u]));
+    run.units = run.units.filter((u) => !isAgent2(u));
+    order.forEach((id, slot) => {
+      const u = makeAgent(run, id, slot, run.x);
+      const old = keep.get(id);
+      if (old) u.hp = Math.max(1, old.hp), u.gauge = old.gauge;
+      u.act = act2;
+      run.units.push(u);
+    });
+  }
+  function campLayout(run) {
+    for (const a of agents(run)) a.x = 70 + a.slot * 74;
+  }
+  function applySquad(run, meta, squad) {
+    meta.squad = [...squad];
+    run.phase = "camp";
+    run.pt = 0;
+    run.units = [];
+    run.fx = [];
+    run.x = 220;
+    formSquad(run, meta.squad, "rest");
+    campLayout(run);
+  }
+  function agents(run) {
+    return run.units.filter(isAgent2);
+  }
+  function enemies(run) {
+    return run.units.filter((u) => u.side === "e");
+  }
+  function spawnWave2(run, viewW) {
+    const edge2 = Math.max(run.x + 160, run.cam + viewW + 30);
+    const last = run.room === 2 && run.waves.length === 0;
+    const regular = ["corner", "watchman"];
+    if (last) {
+      const boss2 = run.depth % 2 === 1 ? "statue" : "master";
+      run.units.push(makeEnemy(run, boss2, edge2 + 60, 1));
+      run.units.push(makeEnemy(run, regular[Math.floor(rand2(run) * 2)], edge2 + 10, 0));
+      return;
+    }
+    const n = Math.min(5, 2 + Math.floor(rand2(run) * 2) + Math.floor((run.depth - 1) / 2));
+    for (let i = 0; i < n; i++) {
+      run.units.push(makeEnemy(run, regular[Math.floor(rand2(run) * 2)], edge2 + i * 46 + rand2(run) * 20, i % 2));
+    }
+  }
+  function addNum(run, u, amount, heal2 = false, big = false) {
+    const h = u.side === "e" && ENEMIES[u.kind].scale === 2 ? 170 : 96;
+    let y = footY(u) - h;
+    while (run.fx.some((f) => (f.kind === "num" || f.kind === "heal") && f.t < 0.35 && Math.abs(f.x - u.x) < 20 && Math.abs(f.y - y) < 12)) y -= 13;
+    run.fx.push({ kind: heal2 ? "heal" : "num", x: u.x + (rand2(run) * 10 - 5), y, t: 0, life: 0.8, text: String(Math.round(amount)), big });
+  }
+  function footY(u) {
+    return u.lane === 1 ? 336 : 318;
+  }
+  function damage(run, from, to, amount, big = false) {
+    if (!alive(to)) return;
+    let v = amount * (0.9 + rand2(run) * 0.2);
+    if (to.side === "a" && run.guard > 0) v *= 0.5;
+    if (from.side === "a" && run.rally > 0) v *= 1.4;
+    to.hp = Math.max(0, to.hp - v);
+    to.flash = 0.12;
+    addNum(run, to, v, false, big);
+    if (to.hp <= 0) {
+      to.act = to.side === "a" ? "down" : "dead";
+      to.t = 0;
+    } else if (to.act === "idle" || to.act === "walk") {
+      to.act = "hurt";
+      to.t = 0;
+    }
+  }
+  function nearest(from, pool) {
+    let best;
+    for (const u of pool) if (alive(u) && (!best || Math.abs(u.x - from.x) < Math.abs(best.x - from.x))) best = u;
+    return best;
+  }
+  var ATTACK_TIME = 0.5;
+  var SKILL_TIME = 0.9;
+  var HURT_TIME = 0.22;
+  var DOWN_TIME = 0.6;
+  var DIE_TIME = 0.8;
+  function frameOf(u) {
+    if (u.side === "a") {
+      switch (u.act) {
+        case "walk":
+          return AF.walk[Math.floor(u.stride / TUNE.strideStep) % AF.walk.length];
+        case "attack":
+          return AF.attack[Math.min(AF.attack.length - 1, Math.floor(u.t / ATTACK_TIME * AF.attack.length))];
+        case "skill":
+          return AF.skill[Math.min(AF.skill.length - 1, Math.floor(u.t / SKILL_TIME * AF.skill.length))];
+        case "hurt":
+          return AF.hurt;
+        case "down":
+          return AF.down[Math.min(AF.down.length - 1, Math.floor(u.t / DOWN_TIME * AF.down.length))];
+        case "rise":
+          return AF.rise[Math.min(AF.rise.length - 1, Math.floor(u.t / 0.4 * AF.rise.length))];
+        case "rest":
+          return AF.rest[(Math.floor(u.t / 2.2) + u.slot) % AF.rest.length];
+        default:
+          return AF.idle;
+      }
+    }
+    switch (u.act) {
+      case "walk":
+        return EF.move[Math.floor(u.stride / 7) % EF.move.length];
+      case "attack":
+        return EF.attack[Math.min(EF.attack.length - 1, Math.floor(u.t / enemyAttackTime(u) * EF.attack.length))];
+      case "skill":
+        return EF.skill[Math.min(EF.skill.length - 1, Math.floor(u.t / SKILL_TIME * EF.skill.length))];
+      case "hurt":
+        return EF.hurt;
+      case "dead":
+        return EF.die[Math.min(EF.die.length - 1, Math.floor(u.t / DIE_TIME * EF.die.length))];
+      default:
+        return EF.move[Math.floor(u.t * 4) % 2];
+    }
+  }
+  var enemyAttackTime = (u) => ENEMIES[u.kind].boss ? 0.8 : 0.6;
+  function trigger(run, uid) {
+    const u = run.units.find((x) => x.uid === uid);
+    if (!u || !alive(u) || u.gauge < 1 || run.phase !== "patrol") return false;
+    if (!enemies(run).some(alive)) return false;
+    startSkill(u);
+    return true;
+  }
+  function startSkill(u) {
+    u.act = "skill";
+    u.t = 0;
+    u.hit = false;
+    u.gauge = 0;
+    u.ready = 0;
+  }
+  function applySkill(run, u, foes, team) {
+    const d3 = agentDef(u.kind);
+    const target = nearest(u, foes);
+    switch (d3.skill) {
+      case "blast": {
+        if (!target) return;
+        run.fx.push({ kind: "boom", x: target.x, y: footY(target) - 40, t: 0, life: 0.5 });
+        for (const f of foes) if (alive(f) && Math.abs(f.x - target.x) < 110) damage(run, u, f, d3.atk * d3.power, true);
+        return;
+      }
+      case "heal":
+        for (const a of team) {
+          if (!alive(a)) continue;
+          const v = Math.min(a.max - a.hp, a.max * d3.power);
+          a.hp += v;
+          if (v > 0) addNum(run, a, v, true);
+        }
+        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 40, t: 0, life: 0.7 });
+        return;
+      case "guard":
+        run.guard = d3.power;
+        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
+        return;
+      case "rally":
+        run.rally = d3.power;
+        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
+        return;
+      case "bind":
+        if (!target) return;
+        for (const f of foes) {
+          if (!alive(f) || Math.abs(f.x - target.x) > 70) continue;
+          f.bound = ENEMIES[f.kind].boss ? d3.power / 2 : d3.power;
+          damage(run, u, f, d3.atk * 1.5);
+          run.fx.push({ kind: "bind", x: f.x, y: footY(f) - 30, t: 0, life: f.bound });
+        }
+        return;
+    }
+  }
+  function stepAgent(run, u, dt, foes, team) {
+    const d3 = agentDef(u.kind);
+    u.t += dt;
+    u.flash = Math.max(0, u.flash - dt);
+    if (u.act === "down" || u.act === "rest") return;
+    if (u.act === "rise") {
+      if (u.t > 0.4) u.act = "idle", u.t = 0;
+      return;
+    }
+    u.cd -= dt;
+    if (foes.some(alive)) u.gauge = Math.min(1, u.gauge + dt / d3.charge);
+    if (u.act === "hurt") {
+      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "attack") {
+      const target2 = nearest(u, foes);
+      if (!u.hit && u.t >= ATTACK_TIME * AF.attackHit / AF.attack.length) {
+        u.hit = true;
+        if (target2 && Math.abs(target2.x - u.x) <= d3.range + 12) damage(run, u, target2, d3.atk);
+      }
+      if (u.t >= ATTACK_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "skill") {
+      if (!u.hit && u.t >= SKILL_TIME * AF.skillHit / AF.skill.length) {
+        u.hit = true;
+        applySkill(run, u, foes, team);
+      }
+      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    const target = nearest(u, foes);
+    if (u.gauge >= 1) {
+      u.ready += dt;
+      if (target && u.ready > 1.8 && target.x - u.x < d3.range + 40) return startSkill(u);
+    }
+    const home = run.x - SLOT_BACK[u.slot];
+    let goal = home;
+    if (target && target.x - u.x < d3.range + 140) {
+      goal = Math.min(Math.max(home, target.x - d3.range + 8), target.x - 18);
+    }
+    const dx = goal - u.x;
+    if (Math.abs(dx) > 0.5) {
+      const step4 = Math.sign(dx) * Math.min(Math.abs(dx), TUNE.walkSpeed * 1.25 * dt);
+      u.x += step4;
+      u.stride += Math.abs(step4);
+      if (u.act !== "walk") u.act = "walk", u.t = 0;
+      return;
+    }
+    if (target && Math.abs(target.x - u.x) <= d3.range + 4 && u.cd <= 0) {
+      u.act = "attack";
+      u.t = 0;
+      u.hit = false;
+      u.cd = d3.rate;
+      return;
+    }
+    if (u.act !== "idle") u.act = "idle", u.t = 0;
+  }
+  function stepEnemy(run, u, dt, team) {
+    const d3 = ENEMIES[u.kind];
+    u.t += dt;
+    u.flash = Math.max(0, u.flash - dt);
+    if (u.act === "dead") {
+      u.gone += dt;
+      return;
+    }
+    if (u.bound > 0) {
+      u.bound = Math.max(0, u.bound - dt);
+      if (u.act === "walk" || u.act === "attack") u.act = "idle", u.t = 0;
+      return;
+    }
+    u.cd -= dt;
+    if (u.act === "hurt") {
+      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    const guardian = run.guard > 0 ? team.find((a) => a.kind === "gorgo" && alive(a)) : void 0;
+    const target = guardian ?? nearest(u, team);
+    if (u.act === "attack") {
+      const at2 = enemyAttackTime(u);
+      if (!u.hit && u.t >= at2 * EF.attackHit / EF.attack.length) {
+        u.hit = true;
+        if (target && Math.abs(target.x - u.x) <= d3.range + 14) damage(run, u, target, scaled(run, d3.atk));
+      }
+      if (u.t >= at2) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (u.act === "skill") {
+      if (!u.hit && u.t >= SKILL_TIME * EF.skillHit / EF.skill.length) {
+        u.hit = true;
+        run.fx.push({ kind: "boom", x: u.x - 70, y: footY(u) - 30, t: 0, life: 0.5 });
+        for (const a of team) if (alive(a) && u.x - a.x < 170) damage(run, u, a, scaled(run, d3.atk) * 1.3, true);
+      }
+      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
+      return;
+    }
+    if (!target) {
+      if (u.act !== "idle") u.act = "idle", u.t = 0;
+      return;
+    }
+    if (d3.boss) {
+      u.gauge -= dt;
+      if (u.gauge <= 0 && u.x - target.x < 190) {
+        u.gauge = 7 + rand2(run) * 3;
+        u.act = "skill";
+        u.t = 0;
+        u.hit = false;
+        return;
+      }
+    }
+    const gap = u.x - target.x;
+    if (gap > d3.range) {
+      const step4 = Math.min(gap - d3.range, d3.speed * dt);
+      u.x -= step4;
+      u.stride += step4;
+      if (u.act !== "walk") u.act = "walk", u.t = 0;
+      return;
+    }
+    if (u.cd <= 0) {
+      u.act = "attack";
+      u.t = 0;
+      u.hit = false;
+      u.cd = d3.rate;
+      return;
+    }
+    if (u.act !== "idle") u.act = "idle", u.t = 0;
+  }
+  function step2(run, meta, dt, viewW) {
+    const res = { changed: false };
+    run.pt += dt;
+    run.guard = Math.max(0, run.guard - dt);
+    run.rally = Math.max(0, run.rally - dt);
+    for (const f of run.fx) f.t += dt;
+    run.fx = run.fx.filter((f) => f.t < f.life);
+    const team = agents(run);
+    const foes = enemies(run);
+    if (run.phase === "camp") {
+      for (const a of team) {
+        a.t += dt;
+        a.hp = Math.min(a.max, a.hp + a.max * 0.25 * dt);
+        if (a.act !== "rest") a.act = "rest", a.t = 0;
+      }
+      if (run.pt >= TUNE.campTime) {
+        run.phase = "fade";
+        run.pt = 0;
+        run.depth = meta.depth;
+        run.rooms = pickRooms(run);
+        run.room = 0;
+        run.x = 180;
+        run.units = [];
+        formSquad(run, meta.squad, "walk");
+        run.waves = wavesFor(run);
+        run.fx = [];
+      }
+      return res;
+    }
+    if (run.phase === "fade" || run.phase === "retreat") {
+      if (run.phase === "retreat" && run.pt >= 1.2) {
+        run.phase = "camp";
+        run.pt = 0;
+        run.units = [];
+        run.x = 220;
+        formSquad(run, meta.squad, "rest");
+        campLayout(run);
+        for (const a of agents(run)) a.hp = Math.max(1, a.max * 0.3);
+      }
+      if (run.phase === "fade" && run.pt >= 0.6) run.phase = "patrol", run.pt = 0;
+      return res;
+    }
+    for (const u of team) stepAgent(run, u, dt, foes, team);
+    for (const u of foes) stepEnemy(run, u, dt, team);
+    for (const f of foes) {
+      if (f.act === "dead" && f.gone > 1.6) {
+        meta.kills[f.kind] = (meta.kills[f.kind] ?? 0) + 1;
+        res.changed = true;
+      }
+    }
+    run.units = run.units.filter((u) => !(u.side === "e" && u.act === "dead" && u.gone > 1.6));
+    const livingFoes = enemies(run).some(alive);
+    if (!team.some(alive)) {
+      meta.wipes += 1;
+      res.changed = true;
+      run.phase = "retreat";
+      run.pt = 0;
+      return res;
+    }
+    const engaged = livingFoes && enemies(run).some((e) => alive(e) && e.x - run.x < 130);
+    if (!engaged) {
+      const lagging = team.some((a) => alive(a) && run.x - SLOT_BACK[a.slot] - a.x > 30);
+      if (!lagging) run.x += TUNE.walkSpeed * dt;
+    }
+    if (run.waves.length && run.x >= run.waves[0] - 140) {
+      run.waves.shift();
+      spawnWave2(run, viewW);
+    }
+    if (!livingFoes && !run.waves.length && run.x >= TUNE.roomLen && !enemies(run).length) {
+      if (run.room < 2) {
+        run.room += 1;
+        run.phase = "fade";
+        run.pt = 0;
+        run.x = 180;
+        for (const a of team) {
+          if (!alive(a)) a.act = "rise", a.t = 0, a.hp = a.max * 0.25;
+          a.x = run.x - SLOT_BACK[a.slot];
+        }
+        run.waves = wavesFor(run);
+      } else {
+        meta.patrols += 1;
+        meta.best = Math.max(meta.best, run.depth);
+        meta.depth = run.depth + 1;
+        res.changed = true;
+        run.phase = "camp";
+        run.pt = 0;
+        run.units = [];
+        run.x = 220;
+        formSquad(run, meta.squad, "rest");
+        campLayout(run);
+        for (const a of agents(run)) a.hp = Math.max(1, a.max * 0.5);
+      }
+    }
+    return res;
+  }
+
+  // src/game/render.ts
+  var H6 = TUNE.sceneH;
+  function loadImage(src) {
+    return new Promise((ok, fail) => {
+      const img4 = new Image();
+      img4.onload = () => ok(img4);
+      img4.onerror = () => fail(new Error("그림을 불러오지 못했습니다"));
+      img4.src = src;
+    });
+  }
+  var Renderer = class {
+    canvas;
+    ctx;
+    sheets = /* @__PURE__ */ new Map();
+    backs = /* @__PURE__ */ new Map();
+    /** 기기 픽셀 기준 배율 (논리 1픽셀 = 기기 k픽셀) */
+    k = 1;
+    /** 논리 화면 폭 */
+    w = 480;
+    /** 위에서 잘라 낸 높이 (논리 픽셀) */
+    top = 0;
+    cam = 0;
+    ready = false;
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+    }
+    atlas = {};
+    async load(art5) {
+      this.atlas = art5.atlas;
+      await Promise.all([
+        ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art5.url(v)))),
+        ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art5.url(v))))
+      ]);
+      this.ready = true;
+    }
+    /** 들어갈 칸의 CSS 크기에 맞춰 배율과 논리 폭을 정한다 */
+    layout(cssW, cssH, dpr) {
+      const devW = Math.max(1, Math.floor(cssW * dpr));
+      const devH = Math.max(1, Math.floor(cssH * dpr));
+      this.k = Math.max(1, Math.min(Math.floor(devH / (H6 * 0.8)), Math.floor(devW / 360)));
+      this.w = Math.min(960, Math.floor(devW / this.k));
+      this.top = H6 - Math.floor(devH / this.k);
+      const cw = this.w * this.k;
+      const ch = (H6 - this.top) * this.k;
+      if (this.canvas.width !== cw || this.canvas.height !== ch) {
+        this.canvas.width = cw;
+        this.canvas.height = ch;
+      }
+      this.canvas.style.width = `${cw / dpr}px`;
+      this.canvas.style.height = `${ch / dpr}px`;
+    }
+    back(run) {
+      return run.phase === "camp" || run.phase === "retreat" && run.pt > 0.6 ? CAMP.back : ROOMS2[run.rooms[run.room]].back;
+    }
+    camera(run, snap) {
+      const team = run.units.filter((u) => u.side === "a");
+      const foes = run.units.filter((u) => u.side === "e" && alive(u));
+      let goal;
+      if (run.phase === "camp" || !team.length) goal = 0;
+      else {
+        const front = Math.max(...team.map((u) => u.x));
+        const back = Math.min(...team.map((u) => u.x));
+        const near2 = foes.length ? Math.min(...foes.map((u) => u.x)) : Infinity;
+        if (near2 - front < this.w * 0.75) goal = (back + Math.min(near2 + 60, back + this.w - 40)) / 2 - this.w / 2;
+        else goal = front - this.w * 0.45;
+      }
+      goal = Math.max(0, goal);
+      this.cam = snap ? goal : this.cam + (goal - this.cam) * 0.08;
+      return Math.round(this.cam);
+    }
+    draw(run, snapCam = false) {
+      if (!this.ready) return;
+      const c = this.ctx;
+      c.setTransform(this.k, 0, 0, this.k, 0, -this.top * this.k);
+      c.imageSmoothingEnabled = false;
+      const cam = run.phase === "fade" && run.pt < 0.05 ? this.camera(run, true) : this.camera(run, snapCam);
+      run.cam = cam;
+      const bg = this.backs.get(this.back(run));
+      if (bg) {
+        const tw = bg.width * 2;
+        for (let x = -(cam % tw); x < this.w; x += tw) {
+          c.drawImage(bg, x, 0, tw, H6);
+        }
+        if (this.top < 0) {
+          const g2 = c.createLinearGradient(0, this.top, 0, 0);
+          g2.addColorStop(0, "#05070a");
+          g2.addColorStop(1, this.topColor(bg));
+          c.fillStyle = g2;
+          c.fillRect(0, this.top, this.w, -this.top);
+        }
+      }
+      const units = [...run.units].sort((a, b) => a.lane - b.lane || (a.side === "e" ? 1 : 0) - (b.side === "e" ? 1 : 0));
+      for (const u of units) this.shadow(u, cam);
+      for (const u of units) this.unit(u, cam);
+      this.effects(run, cam);
+      this.bossBar(run);
+      if (run.phase === "fade" || run.phase === "retreat") {
+        const a = run.phase === "fade" ? 1 - run.pt / 0.6 : Math.min(1, run.pt / 0.6) - Math.max(0, (run.pt - 0.6) / 0.6);
+        c.fillStyle = `rgba(0,0,0,${Math.max(0, Math.min(1, a))})`;
+        c.fillRect(0, this.top, this.w, H6 - this.top);
+      }
+    }
+    tops = /* @__PURE__ */ new Map();
+    topColor(bg) {
+      let v = this.tops.get(bg);
+      if (!v) {
+        const cv = document.createElement("canvas");
+        cv.width = bg.width;
+        cv.height = 3;
+        const cx = cv.getContext("2d");
+        cx.drawImage(bg, 0, 0);
+        const d3 = cx.getImageData(0, 0, bg.width, 3).data;
+        let r = 0, gr = 0, b = 0;
+        for (let i = 0; i < d3.length; i += 4) r += d3[i], gr += d3[i + 1], b += d3[i + 2];
+        const n = d3.length / 4;
+        v = `rgb(${Math.round(r / n)},${Math.round(gr / n)},${Math.round(b / n)})`;
+        this.tops.set(bg, v);
+      }
+      return v;
+    }
+    scaleOf(u) {
+      return u.side === "e" ? ENEMIES[u.kind].scale : 1;
+    }
+    shadow(u, cam) {
+      if (u.side === "e" && u.act === "dead" && u.gone > 0.8) return;
+      const c = this.ctx;
+      const s2 = this.scaleOf(u);
+      const x = Math.round(u.x - cam);
+      const y = footY(u);
+      c.fillStyle = "rgba(0,0,0,.35)";
+      c.fillRect(x - 14 * s2, y - 2, 28 * s2, 3);
+      c.fillRect(x - 10 * s2, y - 3, 20 * s2, 5);
+    }
+    unit(u, cam) {
+      const f = this.atlas[u.kind][frameOf(u)];
+      const img4 = this.sheets.get(u.kind);
+      if (!f || !img4) return;
+      const [sx, sy, w, h, ax, ay] = f;
+      const s2 = this.scaleOf(u);
+      const c = this.ctx;
+      const x = Math.round(u.x - cam);
+      const y = footY(u);
+      if (x < -200 || x > this.w + 200) return;
+      c.save();
+      if (u.side === "e" && u.act === "dead") c.globalAlpha = Math.max(0, 1 - Math.max(0, u.gone - 0.8) / 0.8);
+      if (u.side === "e") {
+        c.translate(x, 0);
+        c.scale(-1, 1);
+        c.drawImage(img4, sx, sy, w, h, -ax * s2, y - ay * s2, w * s2, h * s2);
+        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, -ax * s2, y - ay * s2, s2);
+      } else {
+        c.drawImage(img4, sx, sy, w, h, x - ax, y - ay, w, h);
+        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, x - ax, y - ay, 1);
+      }
+      c.restore();
+      if (u.side === "e" && !ENEMIES[u.kind].boss && alive(u) && u.hp < u.max) {
+        const bw = 26;
+        const top = y - this.atlas[u.kind][0][6] - 8;
+        c.fillStyle = "rgba(0,0,0,.6)";
+        c.fillRect(x - bw / 2 - 1, top - 1, bw + 2, 4);
+        c.fillStyle = "#e0524a";
+        c.fillRect(x - bw / 2, top, Math.max(1, Math.round(bw * u.hp / u.max)), 2);
+      }
+    }
+    flashOver(img4, sx, sy, w, h, dx, dy, s2) {
+      const c = this.ctx;
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.55;
+      c.drawImage(img4, sx, sy, w, h, dx, dy, w * s2, h * s2);
+      c.globalCompositeOperation = "source-over";
+      c.globalAlpha = 1;
+    }
+    effects(run, cam) {
+      const c = this.ctx;
+      for (const f of run.fx) {
+        const p = f.t / f.life;
+        const x = Math.round(f.x - cam);
+        if (f.kind === "num" || f.kind === "heal") {
+          const y = Math.round(f.y - p * 16);
+          c.globalAlpha = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
+          c.font = `700 ${f.big ? 14 : 11}px system-ui, sans-serif`;
+          c.textAlign = "center";
+          c.lineWidth = 3;
+          c.strokeStyle = "rgba(0,0,0,.85)";
+          c.strokeText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
+          c.fillStyle = f.kind === "heal" ? "#7be3a3" : f.big ? "#ffd166" : "#f4f1ea";
+          c.fillText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
+          c.globalAlpha = 1;
+        } else if (f.kind === "boom") {
+          const r = Math.round(10 + p * 34);
+          c.globalAlpha = 1 - p;
+          c.fillStyle = "#ffb347";
+          pixelRing(c, x, Math.round(f.y), r, 3);
+          c.fillStyle = "#fff1c1";
+          pixelRing(c, x, Math.round(f.y), Math.round(r * 0.6), 2);
+          c.globalAlpha = 1;
+        } else if (f.kind === "ring") {
+          c.globalAlpha = 1 - p;
+          c.fillStyle = "#9ff0d0";
+          pixelRing(c, x, Math.round(f.y), Math.round(12 + p * 30), 2);
+          c.globalAlpha = 1;
+        } else if (f.kind === "bind") {
+          c.fillStyle = "rgba(190,140,255,.85)";
+          const ph = Math.floor(f.t * 8) % 2;
+          for (let i = 0; i < 6; i++) {
+            const a = i / 6 * Math.PI * 2 + ph * 0.5;
+            c.fillRect(Math.round(x + Math.cos(a) * 16) - 1, Math.round(f.y + Math.sin(a) * 6) - 1, 3, 2);
+          }
+        }
+      }
+    }
+    bossBar(run) {
+      const boss2 = run.units.find((u) => u.side === "e" && ENEMIES[u.kind].boss && alive(u));
+      if (!boss2) return;
+      const c = this.ctx;
+      const bw = Math.min(260, this.w - 40);
+      const x = Math.round((this.w - bw) / 2);
+      c.fillStyle = "rgba(0,0,0,.65)";
+      const y = this.top + 10;
+      c.fillRect(x - 2, y, bw + 4, 8);
+      c.fillStyle = "#c8433b";
+      c.fillRect(x, y + 2, Math.max(1, Math.round(bw * boss2.hp / boss2.max)), 4);
+      c.font = "700 11px system-ui, sans-serif";
+      c.textAlign = "center";
+      c.lineWidth = 3;
+      c.strokeStyle = "rgba(0,0,0,.85)";
+      c.strokeText(ENEMIES[boss2.kind].name, this.w / 2, y + 24);
+      c.fillStyle = "#f4f1ea";
+      c.fillText(ENEMIES[boss2.kind].name, this.w / 2, y + 24);
+    }
+  };
+  function pixelRing(c, cx, cy, r, size2) {
+    const n = Math.max(8, Math.round(r * 0.9));
+    for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2;
+      c.fillRect(Math.round(cx + Math.cos(a) * r) - (size2 >> 1), Math.round(cy + Math.sin(a) * r * 0.45) - (size2 >> 1), size2, size2);
+    }
+  }
+
+  // src/game/index.ts
+  var lastRun = null;
+  var STEP4 = 1 / 30;
+  var esc6 = (s2) => s2.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  var faces = "";
+  function faceStyle(id, size2) {
+    return `background-image:url('${faces}');background-position:${-agentDef(id).face * size2}px 0`;
+  }
+  function mountGame2(box2, host) {
+    let disposed = false;
+    let raf = 0;
+    const root = document.createElement("div");
+    root.className = "goei-game";
+    const style = document.createElement("style");
+    style.textContent = style_default4;
+    root.innerHTML = `
+    <div class="gg-top"><span class="gg-place"></span><span class="gg-steps"></span><span class="gg-depth"></span><span class="gg-sp"></span>
+      <button class="gg-tb" data-act="squad">편성</button><button class="gg-tb" data-act="rec">기록</button></div>
+    <div class="gg-stage"><canvas aria-label="관리국 순찰 화면"></canvas><div class="gg-load">불러오는 중</div></div>
+    <div class="gg-squad"></div>
+    <div class="gg-sheet" hidden></div>`;
+    box2.append(style, root);
+    const $ = (sel) => root.querySelector(sel);
+    const canvas = $("canvas");
+    const stage = $(".gg-stage");
+    const squadEl = $(".gg-squad");
+    const sheet = $(".gg-sheet");
+    const renderer = new Renderer(canvas);
+    let meta = readMeta(null);
+    let run = null;
+    let dirty = false;
+    let lastSave = Date.now();
+    let saving = false;
+    let speed = host.waiting() ? TUNE.waitingSpeed : 1;
+    let picking = [];
+    const save2 = (force = false) => {
+      if (!dirty || saving || !force && Date.now() - lastSave < TUNE.saveGap) return;
+      dirty = false;
+      saving = true;
+      lastSave = Date.now();
+      host.save(JSON.stringify(meta)).catch(() => dirty = true).finally(() => saving = false);
+    };
+    const fit3 = () => {
+      renderer.layout(stage.clientWidth, stage.clientHeight, window.devicePixelRatio || 1);
+      if (run) renderer.draw(run, true);
+    };
+    const ro = new ResizeObserver(() => !disposed && fit3());
+    ro.observe(stage);
+    let topKey = "";
+    const drawTop = () => {
+      if (!run) return;
+      const camp = run.phase === "camp" || run.phase === "retreat" && run.pt > 0.6;
+      const key2 = `${camp}|${run.room}|${run.depth}`;
+      if (key2 === topKey) return;
+      topKey = key2;
+      $(".gg-place").textContent = camp ? CAMP.name : ROOMS2[run.rooms[run.room]].name;
+      $(".gg-depth").textContent = `순찰 ${run.depth}`;
+      $(".gg-steps").innerHTML = camp ? "" : [0, 1, 2].map((i) => `<i class="${i < run.room ? "done" : i === run.room ? "now" : ""}${i === 2 ? " boss" : ""}"></i>`).join("");
+    };
+    let cardKey = "";
+    const drawCards = () => {
+      if (!run) return;
+      const team = [...agents(run)].sort((a, b) => meta.squad.indexOf(a.kind) - meta.squad.indexOf(b.kind));
+      const key2 = team.map((u) => u.uid).join(",");
+      if (key2 !== cardKey) {
+        cardKey = key2;
+        squadEl.innerHTML = team.map((u) => {
+          const d3 = agentDef(u.kind);
+          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc6(d3.name)} ${esc6(d3.skillName)}">
+          <span class="gg-face" style="${faceStyle(d3.id, 40)}"></span><span class="gg-nm">${esc6(d3.name)}</span>
+          <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
+        }).join("");
+      }
+      const foesUp = run.units.some((u) => u.side === "e" && alive(u));
+      for (const u of team) {
+        const el = squadEl.querySelector(`[data-uid="${u.uid}"]`);
+        if (!el) continue;
+        const hp = u.hp / u.max;
+        el.querySelector(".hp b").style.transform = `scaleX(${hp.toFixed(3)})`;
+        el.querySelector(".sk b").style.transform = `scaleX(${Math.min(1, u.gauge).toFixed(3)})`;
+        el.classList.toggle("ready", u.gauge >= 1 && alive(u) && run.phase === "patrol" && foesUp);
+        el.classList.toggle("down", !alive(u) && u.act !== "rest");
+        el.classList.toggle("low", hp < 0.3);
+      }
+    };
+    const openSquad = () => {
+      picking = [...meta.squad];
+      sheet.hidden = false;
+      drawSquadSheet();
+    };
+    const drawSquadSheet = () => {
+      sheet.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
+      <div class="gg-sh-body"><div class="gg-pick">${AGENTS3.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
+        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc6(a.name)}</b><small>${esc6(a.role)} · ${esc6(a.skillName)}</small></button>`).join("")}</div></div>
+      <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
+    };
+    const openRecord = () => {
+      sheet.hidden = false;
+      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc6(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
+      sheet.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
+      <div class="gg-sh-body"><dl class="gg-rec">
+        <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
+        <dt class="gg-sec">처치</dt>${kills}</dl></div>`;
+    };
+    root.addEventListener("click", (ev) => {
+      const t = ev.target.closest("button");
+      if (!t || !run) return;
+      const act2 = t.dataset.act;
+      if (act2 === "squad") return openSquad();
+      if (act2 === "rec") return openRecord();
+      if (act2 === "close") return void (sheet.hidden = true);
+      if (act2 === "apply" && picking.length === 4) {
+        applySquad(run, meta, picking);
+        dirty = true;
+        cardKey = topKey = "";
+        sheet.hidden = true;
+        return;
+      }
+      if (t.dataset.pick) {
+        const id = t.dataset.pick;
+        if (picking.includes(id)) picking = picking.filter((x) => x !== id);
+        else if (picking.length < 4) picking.push(id);
+        return drawSquadSheet();
+      }
+      if (t.dataset.uid) trigger(run, Number(t.dataset.uid));
+    });
+    const unwait = host.onWaiting((w) => speed = w ? TUNE.waitingSpeed : 1);
+    let acc = 0;
+    let prev = 0;
+    let uiT = 0;
+    const frame2 = (now) => {
+      if (disposed) return;
+      raf = requestAnimationFrame(frame2);
+      if (!run || document.hidden) {
+        prev = now;
+        return;
+      }
+      const dt = Math.min(0.25, prev ? (now - prev) / 1e3 : 0);
+      prev = now;
+      acc += dt * speed;
+      while (acc >= STEP4) {
+        acc -= STEP4;
+        if (step2(run, meta, STEP4, renderer.w).changed) dirty = true;
+      }
+      renderer.draw(run);
+      uiT += dt;
+      if (uiT > 0.1) {
+        uiT = 0;
+        drawTop();
+        drawCards();
+        save2();
+      }
+    };
+    void (async () => {
+      try {
+        const art5 = await host.art();
+        faces = art5.url(FACE_FILE);
+        const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art5)]);
+        if (disposed) return;
+        meta = readMeta(raw);
+        run = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);
+        $(".gg-load").remove();
+        fit3();
+        drawTop();
+        drawCards();
+        raf = requestAnimationFrame(frame2);
+      } catch {
+        if (!disposed) $(".gg-load").textContent = "그림을 불러오지 못했습니다";
+      }
+    })();
+    return () => {
+      if (disposed) return;
+      disposed = true;
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      unwait();
+      if (run) lastRun = { run, squad: meta.squad.join() };
+      save2(true);
+      style.remove();
+      root.remove();
+    };
+  }
+
+  // src/game/action/style.css
+  var style_default5 = ".ga {\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  background: #09121c;\n  color: #e6e2cd;\n  font: 13px monospace;\n  box-sizing: border-box;\n  overflow: hidden;\n  outline: none;\n  color-scheme: dark;\n}\n.ga * {\n  box-sizing: border-box;\n}\n.ga button {\n  font: inherit;\n  color: inherit;\n  background: #172b3b;\n  border: 2px solid #667e86;\n  border-radius: 0;\n  padding: 7px 10px;\n  cursor: pointer;\n  touch-action: none;\n}\n.ga button:focus-visible {\n  outline: 3px solid #ffd899;\n  outline-offset: 1px;\n}\n.ga button:disabled {\n  opacity: 0.4;\n  cursor: default;\n}\n.ga-hud {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  align-items: center;\n  padding: 8px;\n  border-bottom: 2px solid #354e5b;\n}\n.ga-hud progress {\n  width: 95px;\n  height: 10px;\n  accent-color: #e3a666;\n}\n.ga-hud span {\n  white-space: nowrap;\n}\n.ga-fit {\n  flex: 1;\n  min-height: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  background: #040a10;\n  overflow: hidden;\n}\n.ga canvas {\n  display: block;\n  image-rendering: pixelated;\n  touch-action: none;\n  outline: none;\n}\n.ga-foot {\n  flex: none;\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 5px;\n  padding: 6px;\n  border-top: 2px solid #354e5b;\n}\n.ga-note {\n  font-size: 11px;\n  color: #a9bdc3;\n  padding: 4px 8px;\n  margin: 0;\n}\n.ga-msg {\n  flex: 1;\n  min-width: 140px;\n  color: #ffda9b;\n}\n.ga-controls {\n  display: flex;\n  gap: 5px;\n  flex-wrap: wrap;\n}\n.ga-menu {\n  position: absolute;\n  inset: 0;\n  background: #07121aef;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 16px;\n  padding: 20px;\n  text-align: center;\n  z-index: 2;\n}\n.ga-menu[hidden] {\n  display: none;\n}\n.ga-menu p {\n  max-width: 500px;\n  margin: 0;\n  line-height: 1.8;\n}\n.ga [data-busy] {\n  color: #a9bdc3;\n}\n.ga[data-save-error='true'] [data-busy] {\n  color: #ff9981;\n}\n@media (max-width: 760px) {\n  .ga {\n    font-size: 11px;\n  }\n  .ga-hud {\n    gap: 5px;\n    padding: 4px;\n  }\n  .ga-hud progress {\n    width: 52px;\n  }\n  .ga button {\n    padding: 7px;\n    min-height: 40px;\n  }\n  .ga-foot {\n    gap: 4px;\n  }\n  .ga-controls {\n    flex: 1;\n    justify-content: flex-end;\n  }\n  .ga-note {\n    font-size: 10px;\n  }\n  .ga-msg {\n    width: 100%;\n    flex: auto;\n    order: 2;\n  }\n  .ga-controls button {\n    min-width: 44px;\n    min-height: 44px;\n  }\n}\n\n.ga-stick {\n  position: relative;\n  flex: none;\n  width: 110px;\n  height: 90px;\n  border: 2px solid #607b89;\n  background: repeating-linear-gradient(0deg, #162633 0 15px, #1c303c 15px 16px);\n  touch-action: none;\n  user-select: none;\n  display: grid;\n  place-items: center;\n  overflow: hidden;\n}\n.ga-stick span {\n  position: absolute;\n  top: 3px;\n  font-size: 10px;\n  color: #9cb7c4;\n}\n.ga-stick i {\n  display: block;\n  width: 34px;\n  height: 30px;\n  border: 3px solid #d8b981;\n  background: #2e4b5c;\n  pointer-events: none;\n}\n@media (max-width: 760px) {\n  .ga-foot {\n    display: grid;\n    grid-template-columns: 132px minmax(0, 1fr);\n    gap: 6px;\n    padding: 6px;\n  }\n  .ga-stick {\n    width: 124px;\n    height: 124px;\n    align-self: center;\n    grid-column: 1;\n    grid-row: 1;\n  }\n  .ga-controls {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 4px;\n    grid-column: 2;\n    grid-row: 1;\n  }\n  .ga-controls button {\n    padding: 3px;\n    min-width: 0;\n    min-height: 44px;\n    font-size: 10px;\n  }\n  .ga-msg {\n    grid-column: 1/-1;\n    grid-row: 2;\n    min-width: 0;\n  }\n  .ga-foot [data-busy] {\n    grid-column: 1;\n    grid-row: 3;\n  }\n  .ga-foot > [data-do='restart'] {\n    grid-column: 2;\n    grid-row: 3;\n  }\n  .ga-note {\n    line-height: 1.6;\n  }\n}\n";
+
+  // src/game/action/space.ts
+  var SCENE = {
+    width: 1280,
+    height: 720,
+    backgroundWidth: 640,
+    backgroundHeight: 360,
+    floorBack: 460,
+    floorMin: 480,
+    floorMax: 680,
+    referenceY: 530,
+    nativeAdultHeight: 128,
+    actorScale: 2,
+    adultHeight: 256,
+    enemyScale: 2,
+    doorHeight: 340
+  };
+  function depthScale(_footY) {
+    return 1;
+  }
+  var GAIT = { walk: 160, run: 192, crouch: 112 };
+  var MOTION = { walkSpeed: 200, runSpeed: 360 };
+
+  // src/game/action/motion.ts
+  var ATTACK = {
+    melee1: {
+      ticks: [4, 1, 2, 3, 6],
+      contact: 5,
+      damage: 18,
+      reach: 124,
+      stop: 3,
+      push: 18
+    },
+    melee2: {
+      ticks: [4, 1, 2, 4, 7],
+      contact: 5,
+      damage: 24,
+      reach: 132,
+      stop: 3,
+      push: 24
+    },
+    melee3: {
+      ticks: [5, 3, 1, 3, 6, 10],
+      contact: 9,
+      damage: 38,
+      reach: 148,
+      stop: 5,
+      push: 66
+    },
+    lowkick: {
+      ticks: [5, 3, 11],
+      contact: 5,
+      damage: 22,
+      reach: 150,
+      stop: 3,
+      push: 26
+    },
+    airattack: {
+      ticks: [4, 5, 9],
+      contact: 4,
+      damage: 26,
+      reach: 155,
+      stop: 4,
+      push: 35
+    },
+    dashattack: {
+      ticks: [4, 2, 4, 12],
+      contact: 6,
+      damage: 32,
+      reach: 142,
+      stop: 4,
+      push: 48
+    }
+  };
+  var strikeDuration = (name) => ATTACK[name].ticks.reduce((a, b) => a + b, 0) / 60;
+  var strikeContact = (name) => ATTACK[name].contact / 60;
+  function isStrike(name) {
+    return name in ATTACK;
+  }
+
+  // src/game/action/sim.ts
+  var WIDTH = 1280;
+  var HEIGHT2 = 720;
+  var SAVE_VERSION2 = 4;
+  var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+  var body = (id, kind, x, y, hp) => ({
+    id,
+    kind,
+    x,
+    y,
+    z: 0,
+    vz: 0,
+    dir: kind === "jyaldi" ? 1 : -1,
+    hp,
+    max: hp,
+    act: "idle",
+    t: 0,
+    duration: 0,
+    fired: false,
+    inv: 0,
+    flash: 0,
+    cooldown: 0,
+    armor: false,
+    stride: 0,
+    speed: 0,
+    push: 0
+  });
+  function newRun2() {
+    return {
+      version: SAVE_VERSION2,
+      player: {
+        ...body(1, "jyaldi", 220, 510, 200),
+        energy: 100,
+        gauge: 100,
+        guard: 100,
+        dashCd: 0,
+        items: [3, 2, 2],
+        attackBuffer: 0,
+        crouching: false
+      },
+      enemies: [
+        body(2, "corner", 760, 480, 130),
+        body(3, "watchman", 1030, 560, 145),
+        body(4, "corner", 1130, 510, 130),
+        body(5, "watchman", 940, 610, 145)
+      ],
+      bolts: [],
+      effects: [],
+      time: 0,
+      auto: false,
+      phase: "combat",
+      nextId: 6,
+      cutin: 0,
+      hitstop: 0,
+      kills: 0,
+      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기",
+      shake: 0,
+      practice: false
+    };
+  }
+  function practiceRun() {
+    const r = newRun2();
+    r.practice = true;
+    r.player.x = 440;
+    r.player.y = 570;
+    r.message = "동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격";
+    r.enemies.forEach((e, i) => {
+      e.x = i ? 1200 : 530;
+      e.y = i ? 680 : 570;
+      e.hp = i ? 0 : 1e3;
+      e.max = i ? e.max : 1e3;
+      if (i) {
+        e.act = "dead";
+        e.t = 2;
+      }
+    });
+    r.kills = 3;
+    return r;
+  }
+  function act(b, name, duration) {
+    b.act = name;
+    b.t = 0;
+    b.duration = duration;
+    b.fired = false;
+  }
+  function fx(r, kind, x, y, z = 65) {
+    if (r.effects.length >= 64) r.effects.shift();
+    const duration = kind === "blast" ? 0.55 : 0.22;
+    r.effects.push({ x, y, z, t: 0, duration, kind });
+  }
+  function facing(a, b) {
+    return (b.x - a.x) * a.dir >= -8;
+  }
+  function damage2(r, b, amount, source, down2 = false, stop = down2 ? 5 / 60 : 3 / 60, push = down2 ? 66 : 18) {
+    if (b.hp <= 0 || b.inv > 0) return false;
+    const p = r.player;
+    if (b === p && ["guard", "crouch", "crouchwalk"].includes(p.act) && facing(p, source) && p.guard > 0) {
+      p.guard = Math.max(0, p.guard - amount * 2);
+      p.flash = 0.08;
+      fx(r, "guard", p.x + p.dir * 40, p.y, p.act === "crouch" ? 105 : 165);
+      if (!p.guard) {
+        act(p, "stun", 0.65);
+        r.message = "가드 붕괴! 거리를 확보하세요.";
+      }
+      return false;
+    }
+    b.hp = Math.max(0, b.hp - amount);
+    b.flash = 0.12;
+    const impactHeight = source.act === "lowkick" ? 35 : source.act === "airattack" ? Math.min(190, source.z + 105) : 165;
+    fx(r, "hit", b.x, b.y, b.z + impactHeight);
+    r.hitstop = Math.max(r.hitstop, stop);
+    r.shake = Math.max(r.shake, down2 ? 6 : 2);
+    b.push = source.dir * push * 8;
+    if (b === p) {
+      p.inv = 0.5;
+      p.gauge = clamp2(p.gauge + 7, 0, 100);
+    } else p.gauge = clamp2(p.gauge + amount * 0.35, 0, 100);
+    if (b.hp <= 0) {
+      act(b, "dead", 1);
+      if (b !== p) r.kills++;
+    } else if (!b.armor) act(b, down2 ? "down" : "hurt", down2 ? 0.9 : 0.23);
+    return true;
+  }
+  function move2(b, x, y, speed, dt, face = true) {
+    const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
+    b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
+    b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
+    const distance = Math.hypot(b.x - ox, b.y - oy);
+    b.speed = Math.min(1200, distance / dt);
+    if (b.z === 0 && b.act !== "dash")
+      b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
+    if (x && face) b.dir = x > 0 ? 1 : -1;
+  }
+  function nearTarget(r) {
+    const p = r.player;
+    return r.enemies.find(
+      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
+    );
+  }
+  function bolt(r, b, enemy) {
+    if (r.bolts.length >= 48) return;
+    const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
+    const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
+    r.bolts.push({
+      id: r.nextId++,
+      x: b.x + b.dir * muzzleX,
+      y: b.y,
+      z: b.z + muzzleHeight,
+      vx: b.dir * (enemy ? 410 : 1e3),
+      life: 1.7,
+      enemy
+    });
+    fx(r, "shot", b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
+  }
+  function item(r, i) {
+    const p = r.player;
+    if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
+    if (i === 0) {
+      if (p.hp >= p.max) return;
+      p.hp = Math.min(p.max, p.hp + 70);
+    }
+    if (i === 1) {
+      if (p.guard >= 100) return;
+      p.guard = 100;
+    }
+    if (i === 2) {
+      if (p.energy >= 100) return;
+      p.energy = 100;
+    }
+    p.items[i]--;
+    r.message = ["회복제 사용", "방어 회복제 사용", "능력 회복제 사용"][i];
+  }
+  function autoInput(r) {
+    const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
+    const e = live.sort(
+      (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y)
+    )[0];
+    if (!e) return { x: 0, y: 0 };
+    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find(
+      (e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30
+    );
+    return {
+      x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
+      run: Math.abs(dx) > 260,
+      y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
+      attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || Math.abs(dx) > 360 && r.time % 1.8 < 0.45),
+      skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
+      dash: !!threat,
+      ult: p.gauge >= 100 && live.length >= 2,
+      item: p.hp < 95 ? 0 : void 0
+    };
+  }
+  function step3(r, raw, dt) {
+    if (!Number.isFinite(dt) || dt <= 0) return;
+    dt = Math.min(dt, 1 / 30);
+    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
+    r.shake = Math.max(0, r.shake - dt * 24);
+    if (r.phase !== "combat") {
+      r.player.t += dt;
+      for (const enemy of r.enemies) if (enemy.act === "dead") enemy.t += dt;
+      return;
+    }
+    const p = r.player, input = r.auto ? autoInput(r) : raw;
+    p.attackBuffer = input.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
+    if (r.cutin > 0) {
+      r.cutin = Math.max(0, r.cutin - dt);
+      return;
+    }
+    if (r.hitstop > 0) {
+      r.hitstop = Math.max(0, r.hitstop - dt);
+      return;
+    }
+    r.time += dt;
+    for (const b of [p, ...r.enemies]) {
+      b.t += dt;
+      b.inv = Math.max(0, b.inv - dt);
+      b.flash = Math.max(0, b.flash - dt);
+      b.cooldown = Math.max(0, b.cooldown - dt);
+      if (b.push) {
+        b.x = clamp2(b.x + b.push * dt, 55, WIDTH - 55);
+        b.push *= Math.exp(-dt * 10);
+        if (Math.abs(b.push) < 1) b.push = 0;
+      }
+      if (b.z > 0 || b.vz > 0) {
+        b.vz -= 1e3 * dt;
+        b.z = Math.max(0, b.z + b.vz * dt);
+        if (!b.z) {
+          b.vz = 0;
+          if (b === p && ["jump", "walk", "run", "idle", "airattack", "shot"].includes(b.act))
+            act(b, "land", 0.12);
+        }
+      }
+      if (b.act === "down" && b.t >= b.duration) {
+        act(b, "rise", 0.35);
+        b.inv = 0.55;
+      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(b.act) && b.t >= b.duration) {
+        const next = b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee2" ? "melee3" : null;
+        if (next) {
+          act(b, next, strikeDuration(next));
+          p.attackBuffer = 0;
+        } else {
+          if (b === p && b.act === "melee3") b.cooldown = 0.18;
+          act(b, "idle", 0);
+        }
+        b.armor = false;
+      }
+    }
+    p.energy = Math.min(100, p.energy + dt * 9);
+    p.dashCd = Math.max(0, p.dashCd - dt);
+    if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
+    if (input.item !== void 0) item(r, input.item);
+    if (["idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(p.act)) {
+      if (r.auto) {
+        const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+        if (target) p.dir = target.x >= p.x ? 1 : -1;
+      }
+      if (input.x && !r.auto) p.dir = input.x > 0 ? 1 : -1;
+      if (input.jump && p.z === 0) {
+        p.vz = 600;
+        p.crouching = false;
+      }
+      if (input.guard && input.y > 0 && !p.z && !p.vz) p.crouching = true;
+      if (!input.guard) p.crouching = false;
+      if (input.ult && p.gauge >= 100) {
+        p.gauge = 0;
+        act(p, "ult", 0.9);
+        p.armor = true;
+        p.inv = 1.05;
+        r.cutin = 0.75;
+        r.message = "집중 파괴";
+      } else if (input.dash && p.dashCd <= 0) {
+        if (input.x) p.dir = Math.sign(input.x);
+        act(p, "dash", 0.3);
+        p.inv = 0.24;
+        p.dashCd = 0.8;
+      } else if (input.guard && !p.z && !p.vz) {
+        p.act = p.crouching ? input.x ? "crouchwalk" : "crouch" : "guard";
+        if (input.x) p.dir = Math.sign(input.x);
+        if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
+          act(p, "lowkick", strikeDuration("lowkick"));
+          p.attackBuffer = 0;
+          p.cooldown = 0.35;
+        } else if (p.act === "crouchwalk") move2(p, input.x, 0, 85, dt);
+      } else if (input.skill && p.energy >= 35) {
+        p.energy -= 35;
+        act(p, "skill", 0.48);
+        p.armor = true;
+      } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
+        p.attackBuffer = 0;
+        if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
+          act(p, "airattack", strikeDuration("airattack"));
+        } else if (!p.z && !p.vz && input.run && input.x) {
+          act(p, "dashattack", strikeDuration("dashattack"));
+        } else if (!p.z && !p.vz && nearTarget(r)) {
+          act(p, "melee1", strikeDuration("melee1"));
+          p.cooldown = 0;
+        } else {
+          act(p, "shot", 0.24);
+          p.cooldown = 0.28;
+        }
+      } else {
+        const x = clamp2(input.x, -1, 1), y = clamp2(input.y, -1, 1);
+        const running = !!input.run;
+        p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running ? "run" : "walk" : "idle";
+        move2(p, x, y, p.z ? 240 : running ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
+      }
+    }
+    if (p.act === "dash" && p.attackBuffer > 0 && p.t < 0.16) {
+      act(p, "dashattack", strikeDuration("dashattack"));
+      p.attackBuffer = 0;
+      p.inv = 0;
+    }
+    if (p.act === "dash" && p.t >= 0.04 && p.t < 0.16) move2(p, input.x || p.dir, input.y, 1200, dt);
+    if (p.act === "dashattack" && p.t < strikeContact("dashattack"))
+      move2(p, p.dir, 0, 420, dt, false);
+    if (p.act === "airattack" && p.z > 0) move2(p, p.dir, 0, 160, dt, false);
+    if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
+      p.fired = true;
+      const finish = p.act === "melee3", attack2 = ATTACK[p.act];
+      const oldX = p.x;
+      let connected = false;
+      for (const e of r.enemies)
+        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < attack2.reach && Math.abs(e.y - p.y) < 35 && (p.act === "airattack" ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60))
+          connected = damage2(
+            r,
+            e,
+            attack2.damage,
+            p,
+            finish || p.act === "dashattack",
+            attack2.stop / 60,
+            attack2.push
+          ) || connected;
+      if (connected) p.t = strikeContact(p.act);
+      if (finish && connected) fx(r, "blast", p.x + p.dir * 120, p.y, 150);
+      r.message = p.act === "lowkick" ? "하단차기" : p.act === "airattack" ? "공중차기" : p.act === "dashattack" ? "대시 어깨치기" : finish ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 오른 장타" : "근접 1타 · 왼 장타";
+      if (connected) return;
+    }
+    if (p.act === "shot" && p.t >= 0.03 && !p.fired) {
+      p.fired = true;
+      bolt(r, p, false);
+    }
+    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.3 : 0.14) && !p.fired) {
+      p.fired = true;
+      const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
+      fx(r, "blast", x, p.y, 70);
+      for (const e of r.enemies)
+        if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
+          damage2(r, e, ultimate ? 70 : 45, p, true);
+    }
+    for (const e of r.enemies) {
+      if (r.practice) continue;
+      if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
+      if (e.act === "shot") {
+        if (!e.fired && e.t >= e.duration - 0.12) {
+          e.fired = true;
+          if (e.kind === "watchman") bolt(r, e, true);
+          else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
+            damage2(r, p, 16, e, true);
+        }
+        continue;
+      }
+      const dx = p.x - e.x, dy = p.y - e.y, range2 = e.kind === "watchman" ? 550 : 90;
+      e.dir = dx >= 0 ? 1 : -1;
+      if (Math.abs(dx) < range2 && Math.abs(dy) < 25 && e.cooldown <= 0) {
+        act(e, "shot", e.kind === "watchman" ? 0.85 : 0.65);
+        e.cooldown = e.kind === "watchman" ? 1.7 : 1.2;
+      } else {
+        move2(
+          e,
+          Math.abs(dx) > range2 * 0.8 ? Math.sign(dx) : 0,
+          Math.abs(dy) > 15 ? Math.sign(dy) : 0,
+          e.kind === "watchman" ? 75 : 125,
+          dt
+        );
+        e.act = "walk";
+      }
+    }
+    for (const b of r.bolts) {
+      const old = b.x;
+      b.x += b.vx * dt;
+      b.life -= dt;
+      const targets = b.enemy ? [p] : r.enemies;
+      const candidates = targets.filter(
+        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 125 : 245) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
+      ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
+      if (candidates[0]) {
+        damage2(r, candidates[0], b.enemy ? 12 : 18, {
+          ...p,
+          x: old,
+          dir: Math.sign(b.vx)
+        });
+        b.life = 0;
+      }
+    }
+    r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
+    if (p.hp <= 0) {
+      r.phase = "evacuated";
+      act(p, "defeat", 0.8);
+      r.message = "작전 지속 불가 · 본부 후송";
+    } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
+      r.phase = "cleared";
+      act(p, "victory", 0.7);
+      r.message = "훈련 완료 · 전원 제압";
+    }
+  }
+  function serialize(r) {
+    return JSON.stringify(r);
+  }
+  function restore(raw) {
+    try {
+      if (!raw || raw.length > 12e4) return null;
+      const r = JSON.parse(raw);
+      if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
+        for (const b of [r.player, ...r.enemies]) {
+          b.stride = b.stride ?? 0;
+          b.speed = b.speed ?? 0;
+          b.push = 0;
+          b.y = clamp2(b.y, SCENE.floorMin, SCENE.floorMax);
+        }
+        for (const bolt2 of r.bolts ?? []) bolt2.y = clamp2(bolt2.y, SCENE.floorMin, SCENE.floorMax);
+        r.version = SAVE_VERSION2;
+        r.shake = 0;
+        r.practice = false;
+        r.player.attackBuffer = 0;
+        r.player.crouching = false;
+      }
+      const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
+      const actions = [
+        "idle",
+        "walk",
+        "run",
+        "jump",
+        "land",
+        "melee1",
+        "melee2",
+        "melee3",
+        "shot",
+        "skill",
+        "ult",
+        "dash",
+        "guard",
+        "crouch",
+        "crouchwalk",
+        "lowkick",
+        "airattack",
+        "dashattack",
+        "stun",
+        "victory",
+        "defeat",
+        "hurt",
+        "down",
+        "rise",
+        "dead"
+      ];
+      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200) && finite(b.push, -1200, 1200);
+      if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
+        return null;
+      const p = r.player;
+      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !finite(p.attackBuffer, 0, 0.13) || typeof p.crouching !== "boolean" || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
+        return null;
+      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || !finite(r.shake, 0, 10) || typeof r.practice !== "boolean" || typeof r.message !== "string" || r.message.length > 150)
+        return null;
+      if (r.phase === "combat" && (p.hp <= 0 || !r.practice && r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
+        return null;
+      if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
+        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
+      ))
+        return null;
+      r.effects = [];
+      return r;
+    } catch {
+      return null;
+    }
+  }
+
+  // src/game/action/animation.ts
+  function clipIndex(phase, frames, times) {
+    if (!frames.length) return 0;
+    const p = Math.max(0, Math.min(0.999999, phase));
+    if (!times || times.length !== frames.length) return Math.floor(p * frames.length);
+    const duration = times.reduce((sum, value) => sum + value, 0);
+    if (duration <= 0) return 0;
+    let cursor = p * duration;
+    for (let i = 0; i < times.length; i++) {
+      if (cursor < times[i]) return i;
+      cursor -= times[i];
+    }
+    return frames.length - 1;
+  }
+
+  // src/game/action/render.ts
+  var ActionRenderer = class {
+    constructor(canvas) {
+      this.canvas = canvas;
+      canvas.width = WIDTH;
+      canvas.height = HEIGHT2;
+      this.ctx = canvas.getContext("2d");
+    }
+    debugGround = false;
+    images = /* @__PURE__ */ new Map();
+    art = null;
+    disposed = false;
+    preview = null;
+    ctx;
+    async load(art5) {
+      this.art = art5;
+      await Promise.all(
+        ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
+          const img4 = new Image();
+          await new Promise((resolve, reject) => {
+            img4.onload = () => resolve();
+            img4.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
+            img4.src = art5.url(name);
+          });
+          if (!this.disposed) this.images.set(name, img4);
+        })
+      );
+    }
+    dispose() {
+      this.disposed = true;
+      this.images.clear();
+      this.art = null;
+    }
+    rect(x, y, w, h, color) {
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+    sprite(b, frame2, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
+      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame2] ?? null, img4 = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
+      if (!f || !img4) return;
+      scale *= depthScale(b.y);
+      const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
+      c.save();
+      c.translate(Math.round(x), Math.round(y));
+      c.scale(b.dir, 1);
+      if (b.flash > 0) c.filter = "brightness(1.8)";
+      c.drawImage(
+        img4,
+        sx,
+        sy,
+        w,
+        h,
+        Math.round(-ax * scale),
+        Math.round(-ay * scale),
+        Math.round(w * scale),
+        Math.round(h * scale)
+      );
+      c.restore();
+    }
+    drawPose(run, clip, phase) {
+      const previousCutin = run.cutin;
+      this.preview = { clip: clip === "cutin" ? "idle" : clip, phase };
+      if (clip === "cutin") run.cutin = Math.max(1e-3, 0.75 * (1 - phase));
+      this.draw(run);
+      run.cutin = previousCutin;
+      this.preview = null;
+    }
+    frame(b, r) {
+      const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
+      if (b.kind === "jyaldi") {
+        const clips = this.art?.atlas.action?.clips;
+        if (this.preview) {
+          const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
+          return frames[clipIndex(
+            this.preview.phase,
+            frames,
+            this.art?.atlas.action?.frameTimes?.[this.preview.clip]
+          )];
+        }
+        let name = b.act === "idle" ? "idle" : b.act;
+        if (name === "idle" && clips?.relaxed && !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70))
+          name = "relaxed";
+        if (b.act === "guard" && b.flash > 0) name = "guard_hit";
+        if ((b.z > 0 || b.vz > 0) && !["airattack", "shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
+          name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
+        if (name === "dead") name = "down";
+        if (name === "shot" && b.z > 0 && clips?.airfire) name = "airfire";
+        const clip = clips?.[name] ?? clips?.idle ?? [0];
+        const phase = b.act === "walk" || b.act === "run" || b.act === "crouchwalk" ? b.stride : name === "idle" ? r.time % 1.2 / 1.2 : name === "guard" || name === "crouch" ? r.time % 1 : name === "jump_up" ? Math.max(0, Math.min(0.999, (600 - b.vz) / 500)) : name === "jump_apex" ? Math.max(0, Math.min(0.999, (100 - b.vz) / 200)) : name === "jump_down" ? Math.min(0.999, -b.vz / 600) : progress;
+        return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
+      }
+      if (b.act === "dead" || b.act === "down")
+        return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
+      if (b.act === "rise") return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
+      if (b.act === "hurt") return progress < 0.4 ? 19 : 20;
+      if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
+      return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
+    }
+    draw(r) {
+      const c = this.ctx, p = r.player;
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.imageSmoothingEnabled = false;
+      this.rect(0, 0, WIDTH, HEIGHT2, "#0a111b");
+      const shake = Math.round(Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake / 2) * 2;
+      c.translate(shake, 0);
+      const bg = this.images.get("bg-bureau-action");
+      if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT2);
+      if (this.debugGround) {
+        for (let x = 0; x < WIDTH; x += 32)
+          this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, "#b4e2e533");
+        for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
+          this.rect(0, y, WIDTH, 1, "#b4e2e533");
+      }
+      for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
+        if (b !== p && b.hp <= 0 && b.t > 1) continue;
+        const visualFrame = b.kind === "jyaldi" ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
+        const lift = visualFrame ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2) : 0;
+        const ground = depthScale(b.y), air = Math.max(0.25, 1 - (b.z + lift) / 240);
+        this.rect(b.x - 32 * ground, b.y - 3, 64 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
+        this.rect(b.x - 24 * ground, b.y - 2, 48 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
+        if (b.kind === "jyaldi" && b.z === 0) {
+          const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
+          for (const [dx, dy] of contact)
+            this.rect(
+              b.x + dx * b.dir * ground * (this.art?.atlas.action?.scale ?? 2) - 7,
+              b.y + dy * ground * (this.art?.atlas.action?.scale ?? 2) - 1,
+              14,
+              3,
+              "#02070bc0"
+            );
+        }
+        if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
+          const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
+          this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
+          this.rect(b.x - 7, b.y - 280, 14, 20, "#ffb35c");
+        }
+        const jolt = b.act === "hurt" && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
+        this.sprite(b, this.frame(b, r), void 0, b.x + jolt, b.y - b.z);
+        if (b.act === "stun") {
+          for (let i = 0; i < 3; i++) {
+            const angle = r.time * 7 + i * Math.PI * 2 / 3;
+            const x = b.x + Math.cos(angle) * 28, y = b.y - b.z - 252 + Math.sin(angle) * 8;
+            this.rect(x - 4, y - 2, 8, 4, "#ffe6a1");
+            this.rect(x - 2, y - 4, 4, 8, "#ffe6a1");
+          }
+        }
+        if (b.armor && b.hp > 0) {
+          this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
+        }
+        if (b.act === "guard" || b.act === "crouch" || b.act === "crouchwalk") {
+          const sy = b.y - (b.act === "crouch" ? 95 : 165);
+          for (let i = 0; i < 4; i++)
+            this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
+        }
+        if (b.kind !== "jyaldi" && b.hp > 0) {
+          const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
+          const healthTop = b.y - (enemyFrame?.[5] ?? 120) * SCENE.enemyScale - 12;
+          this.rect(b.x - 34, healthTop, 68, 6, "#060c12");
+          this.rect(b.x - 34, healthTop, 68 * b.hp / b.max, 6, "#e9896d");
+        }
+        if (b === p && p.inv > 0) {
+          this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
+        }
+      }
+      for (const b of r.bolts) {
+        this.rect(b.x - 12, b.y - b.z, 24, 4, b.enemy ? "#ff7b6b" : "#ffe5ad");
+      }
+      for (const f of r.effects) {
+        const t = f.t / f.duration, radius = f.kind === "blast" ? 20 + t * 190 : 8 + t * 22, x = f.x, y = f.y - f.z;
+        c.globalAlpha = 1 - t;
+        const color = f.kind === "guard" ? "#9ce5ff" : "#ffd18b";
+        const rays = f.kind === "blast" ? 20 : 8;
+        for (let i = 0; i < rays; i++) {
+          const angle = i / rays * Math.PI * 2, rad = radius * (i % 2 ? 0.7 : 1);
+          const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3, py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
+          this.rect(px, py, f.kind === "blast" ? 6 : 3, f.kind === "blast" ? 6 : 3, color);
+        }
+        if (t < 0.35) {
+          this.rect(x - 5, y - 16, 10, 32, "#fff1d0");
+          this.rect(x - 16, y - 5, 32, 10, "#fff1d0");
+        }
+        c.globalAlpha = 1;
+      }
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      if (r.cutin > 0) {
+        this.rect(0, 0, WIDTH, HEIGHT2, "#030b17bb");
+        this.rect(0, 165, WIDTH, 320, "#172c46");
+        for (let i = 0; i < 18; i++)
+          this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
+        this.sprite(
+          { ...p, dir: 1 },
+          this.art?.atlas.action?.clips.cutin?.[Math.min(
+            (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
+            Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
+          )] ?? 0,
+          (this.art?.atlas.action?.scale ?? 2) * 1.5,
+          340 + (1 - r.cutin / 0.75) * 80,
+          530
+        );
+        c.fillStyle = "#ffdf9e";
+        c.font = "bold 58px monospace";
+        c.fillText("집중 파괴", 660, 330);
+        c.font = "22px monospace";
+        c.fillText("쟈알디 · 집중 파괴", 665, 380);
+      }
+      if (r.phase !== "combat" && p.t > 0.8) {
+        this.rect(390, 52, 790, 150, "#07121aee");
+        c.strokeStyle = "#d9b67a";
+        c.lineWidth = 4;
+        c.strokeRect(390, 52, 790, 150);
+        c.fillStyle = "#f4dfb2";
+        c.font = "bold 42px monospace";
+        c.textAlign = "center";
+        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 785, 115);
+        c.font = "24px monospace";
+        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 785, 165);
+        c.textAlign = "left";
+      }
+    }
+  };
+
+  // src/game/action/index.ts
+  var writes = /* @__PURE__ */ new WeakMap();
+  function mountAction(box2, host) {
+    const root = document.createElement("section");
+    root.className = "ga";
+    root.tabIndex = 0;
+    root.setAttribute("aria-label", "쟈알디 1인 전투 검증판");
+    const style = document.createElement("style");
+    style.textContent = style_default5;
+    root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
+  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
+  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
+    box2.append(style, root);
+    const $ = (s2) => root.querySelector(s2);
+    const canvas = $("canvas"), fit3 = $(".ga-fit"), menu = $(".ga-menu"), renderer = new ActionRenderer(canvas);
+    let run = newRun2(), ready = false, disposed = false, paused = true, raf = 0, last = 0, acc = 0, dirty = false, saving = false, lastSave = 0, saveError = false;
+    let stickId = null, stickX = 0, stickY = 0;
+    const stick = $(".ga-stick"), thumb = $(".ga-stick i");
+    let target = null;
+    const keys2 = /* @__PURE__ */ new Set(), pointers = /* @__PURE__ */ new Map();
+    let edges2 = {};
+    const clear2 = () => {
+      keys2.clear();
+      pointers.clear();
+      edges2 = {};
+      target = null;
+      stickId = null;
+      stickX = stickY = 0;
+      thumb.style.transform = "translate(0,0)";
+    };
+    const text2 = (selector, value) => {
+      const e = $(selector);
+      if (e.textContent !== value) e.textContent = value;
+    };
+    const hud = () => {
+      const p = run.player;
+      if (root.dataset.action !== p.act) root.dataset.action = p.act;
+      for (const [name, value] of Object.entries({
+        hp: p.hp,
+        energy: p.energy,
+        guard: p.guard,
+        gauge: p.gauge
+      }))
+        $(`[data-meter="${name}"]`).value = value;
+      text2("[data-hp]", String(Math.ceil(p.hp)));
+      text2('[data-do="auto"]', run.auto ? "F 자동 ON" : "F 수동");
+      text2(".ga-msg", run.message);
+      text2(
+        "[data-busy]",
+        saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty ? "진행 중" : "저장됨"
+      );
+      root.dataset.saveError = String(saveError);
+      ["Q 회복", "W 방어", "E 능력"].forEach((label3, i) => {
+        const b = $(`[data-item="${i}"]`);
+        b.textContent = `${label3} ${p.items[i]}`;
+        b.disabled = run.phase !== "combat" || p.items[i] <= 0;
+      });
+    };
+    const save2 = async (force = false) => {
+      if (!ready || !dirty) return;
+      if (saving && !force) return;
+      if (!force && performance.now() - lastSave < 5e3) return;
+      const data = serialize(run);
+      dirty = false;
+      saving = true;
+      lastSave = performance.now();
+      const task = (writes.get(host) ?? Promise.resolve()).then(() => host.save(data));
+      writes.set(
+        host,
+        task.catch(() => {
+        })
+      );
+      try {
+        await task;
+        saveError = false;
+      } catch {
+        dirty = true;
+        saveError = true;
+      } finally {
+        saving = false;
+        if (!disposed) hud();
+      }
+    };
+    const pause = (value) => {
+      paused = value;
+      clear2();
+      acc = 0;
+      last = 0;
+      menu.hidden = !value;
+      text2("[data-menu-title]", "일시정지");
+      text2(
+        "[data-menu-text]",
+        "Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. F로 자동 전투를 켜고 끌 수 있습니다."
+      );
+      $('[data-do="resume"]').disabled = !ready;
+      if (value) void save2(true);
+    };
+    const restart = (practice = false) => {
+      if (!ready) return;
+      run = practice ? practiceRun() : newRun2();
+      dirty = true;
+      pause(false);
+      void save2(true);
+      root.focus();
+      hud();
+    };
+    const toggle = () => {
+      if (!ready || paused) return;
+      clear2();
+      run.auto = !run.auto;
+      dirty = true;
+      void save2(true);
+      hud();
+    };
+    const manual = () => {
+      if (run.auto) {
+        run.auto = false;
+        dirty = true;
+      }
+    };
+    const codes = {
+      ArrowUp: "up",
+      ArrowDown: "down",
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      KeyZ: "attack",
+      KeyA: "guard",
+      ShiftLeft: "run",
+      ShiftRight: "run"
+    };
+    const once = {
+      KeyX: "jump",
+      KeyC: "skill",
+      ShiftLeft: "dash",
+      ShiftRight: "dash",
+      KeyS: "ult"
+    };
+    const abort = new AbortController(), signal = abort.signal;
+    root.addEventListener(
+      "keydown",
+      (ev) => {
+        const e = ev;
+        if (e.target.matches("input,textarea,select,[contenteditable=true]")) return;
+        if (e.code === "Escape") {
+          e.preventDefault();
+          if (!e.repeat && ready) pause(!paused);
+          return;
+        }
+        if (paused || !ready) return;
+        if (e.code === "KeyF") {
+          e.preventDefault();
+          if (!e.repeat) toggle();
+          return;
+        }
+        if (!codes[e.code] && !once[e.code] && !["KeyQ", "KeyW", "KeyE"].includes(e.code)) return;
+        e.preventDefault();
+        manual();
+        target = null;
+        if (codes[e.code]) keys2.add(codes[e.code]);
+        if (!e.repeat && once[e.code]) edges2[once[e.code]] = true;
+        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code))
+          edges2.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
+      },
+      { signal }
+    );
+    root.addEventListener(
+      "keyup",
+      (ev) => {
+        const e = ev;
+        if (codes[e.code]) keys2.delete(codes[e.code]);
+      },
+      { signal }
+    );
+    root.addEventListener(
+      "focusout",
+      (e) => {
+        if (!root.contains(e.relatedTarget)) {
+          clear2();
+          if (ready && !run.auto && !paused) pause(true);
+        }
+      },
+      { signal }
+    );
+    window.addEventListener(
+      "blur",
+      () => {
+        if (ready) pause(true);
+      },
+      { signal }
+    );
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden && ready) pause(true);
+      },
+      { signal }
+    );
+    root.addEventListener(
+      "click",
+      (e) => {
+        const b = e.target.closest("[data-do]");
+        if (!b) return;
+        if (b.dataset.do === "auto") toggle();
+        if (b.dataset.do === "pause" && ready) pause(!paused);
+        if (b.dataset.do === "resume" && ready) {
+          pause(false);
+          root.focus();
+        }
+        if (b.dataset.do === "restart") restart();
+        if (b.dataset.do === "practice") restart(true);
+      },
+      { signal }
+    );
+    root.addEventListener(
+      "pointerdown",
+      (e) => {
+        const b = e.target.closest(
+          "[data-hold],[data-edge],[data-item]"
+        );
+        if (!b || b.disabled || paused || !ready) return;
+        e.preventDefault();
+        root.focus();
+        manual();
+        target = null;
+        b.setPointerCapture(e.pointerId);
+        if (b.dataset.hold) pointers.set(e.pointerId, b.dataset.hold);
+        if (b.dataset.edge) {
+          edges2[b.dataset.edge] = true;
+          if (b.dataset.edge === "dash") pointers.set(e.pointerId, "run");
+        }
+        if (b.dataset.item !== void 0) edges2.item = Number(b.dataset.item);
+      },
+      { signal }
+    );
+    const updateStick = (e) => {
+      const b = stick.getBoundingClientRect(), dx = (e.clientX - b.left - b.width / 2) / (b.width * 0.35), dy = (e.clientY - b.top - b.height / 2) / (b.height * 0.35), len = Math.max(1, Math.hypot(dx, dy));
+      stickX = Math.abs(dx) < 0.18 ? 0 : dx / len;
+      stickY = Math.abs(dy) < 0.18 ? 0 : dy / len;
+      thumb.style.transform = `translate(${stickX * 28}px,${stickY * 28}px)`;
+    };
+    stick.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (!ready || paused || stickId !== null) return;
+        e.preventDefault();
+        root.focus();
+        manual();
+        target = null;
+        stickId = e.pointerId;
+        stick.setPointerCapture(e.pointerId);
+        updateStick(e);
+      },
+      { signal }
+    );
+    stick.addEventListener(
+      "pointermove",
+      (e) => {
+        if (e.pointerId === stickId) updateStick(e);
+      },
+      { signal }
+    );
+    const release = (e) => {
+      pointers.delete(e.pointerId);
+      if (e.pointerId === stickId) {
+        stickId = null;
+        stickX = stickY = 0;
+        thumb.style.transform = "translate(0,0)";
+      }
+    };
+    root.addEventListener("pointerup", release, { signal });
+    root.addEventListener("pointercancel", release, { signal });
+    root.addEventListener("lostpointercapture", release, { signal });
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault(), { signal });
+    canvas.addEventListener(
+      "pointerdown",
+      (e) => {
+        if (paused || !ready) return;
+        e.preventDefault();
+        root.focus();
+        manual();
+        const b = canvas.getBoundingClientRect();
+        const x = Math.max(55, Math.min(1225, (e.clientX - b.left) / b.width * 1280)), y = (e.clientY - b.top) / b.height * 720;
+        if (e.button === 2) {
+          edges2.dash = true;
+          target = {
+            x,
+            y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+            attack: false
+          };
+          return;
+        }
+        const enemy = run.enemies.find(
+          (a) => a.hp > 0 && Math.abs(a.x - x) < 90 && y > a.y - SCENE.adultHeight && y < a.y + 20
+        );
+        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : {
+          x,
+          y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
+          attack: false
+        };
+      },
+      { signal }
+    );
+    const input = () => {
+      const held = /* @__PURE__ */ new Set([...keys2, ...pointers.values()]);
+      const p = run.player;
+      let x = Number(held.has("right")) - Number(held.has("left")) + stickX, y = Number(held.has("down")) - Number(held.has("up")) + stickY, attack2 = held.has("attack");
+      if (target?.id) {
+        const e = run.enemies.find((e2) => e2.id === target?.id && e2.hp > 0);
+        if (e) {
+          target.x = e.x;
+          target.y = e.y;
+        } else target = null;
+      }
+      if (target) {
+        const dx = target.x - p.x, dy = target.y - p.y;
+        x = Math.abs(dx) > (target.attack ? 300 : 10) ? Math.sign(dx) : 0;
+        y = Math.abs(dy) > 12 ? Math.sign(dy) : 0;
+        attack2 = target.attack && Math.abs(dx) < 600 && Math.abs(dy) < 25;
+        if (target.attack) p.dir = dx >= 0 ? 1 : -1;
+        if (!target.attack && !x && !y) target = null;
+      }
+      const result = {
+        x,
+        y,
+        attack: attack2,
+        run: held.has("run") || Math.hypot(stickX, stickY) > 0.95,
+        guard: held.has("guard"),
+        ...edges2
+      };
+      edges2 = {};
+      return result;
+    };
+    const resize = () => {
+      const scale = Math.max(0.01, Math.min(fit3.clientWidth / 1280, fit3.clientHeight / 720));
+      canvas.style.width = `${Math.floor(1280 * scale)}px`;
+      canvas.style.height = `${Math.floor(720 * scale)}px`;
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(fit3);
+    let waiting = host.waiting();
+    const offWaiting = host.onWaiting((value) => {
+      waiting = value;
+    });
+    let hudTime = 0;
+    const frame2 = (now) => {
+      if (disposed) return;
+      if (ready && !paused && !document.hidden) {
+        const wasCombat = run.phase === "combat";
+        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0);
+        let ticks = 0;
+        while (acc >= 1 / 60 && ticks++ < 8) {
+          step3(run, input(), 1 / 60);
+          acc -= 1 / 60;
+          dirty = true;
+        }
+        void save2(wasCombat && run.phase !== "combat");
+      } else acc = 0;
+      last = now;
+      if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run);
+      if (now - hudTime > 120) {
+        hud();
+        hudTime = now;
+      }
+      raf = requestAnimationFrame(frame2);
+    };
+    void (async () => {
+      try {
+        const [raw, art5] = await Promise.all([
+          (writes.get(host) ?? Promise.resolve()).then(() => host.load()),
+          host.art()
+        ]);
+        if (disposed) return;
+        const restored = restore(raw);
+        run = restored ?? newRun2();
+        await renderer.load(art5);
+        root.dataset.artProfile = art5.atlas.action?.profile ?? "unknown";
+        if (disposed) return;
+        ready = true;
+        if (raw && !restored) {
+          run.message = "저장을 읽지 못해 새 훈련을 시작합니다.";
+        }
+        pause(true);
+        text2("[data-menu-title]", "쟈알디 · 1인 전투 검증판");
+        text2(
+          "[data-menu-text]",
+          "계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다."
+        );
+        $('[data-do="restart"]').hidden = false;
+        resize();
+        hud();
+      } catch (e) {
+        if (!disposed) {
+          text2("[data-menu-title]", "검증판을 열지 못했습니다");
+          text2("[data-menu-text]", e instanceof Error ? e.message : String(e));
+        }
+      }
+    })();
+    raf = requestAnimationFrame(frame2);
+    return () => {
+      if (disposed) return;
+      clear2();
+      void save2(true);
+      disposed = true;
+      cancelAnimationFrame(raf);
+      abort.abort();
+      observer.disconnect();
+      offWaiting();
+      renderer.dispose();
+      root.remove();
+      style.remove();
+    };
+  }
+
+  // src/core/update.ts
+  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/codex/run-resume-fix/release/visit-preview" : "";
+
+  // src/host/assets.ts
+  function toBytes(data) {
+    if (data instanceof Uint8Array) return data;
+    if (data instanceof ArrayBuffer) return new Uint8Array(data);
+    if (Array.isArray(data)) return new Uint8Array(data);
+    if (data && typeof data === "object") {
+      const values = Object.values(data);
+      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
+    }
+    return null;
+  }
+
+  // src/host/gamepack.ts
+  var KEY2 = `goei:game-pack:${PACK_ID}`;
+  var PackError = class extends Error {
+  };
+  async function stored() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY2);
+      const v = typeof raw === "string" ? JSON.parse(raw) : null;
+      return v && typeof v.version === "number" && v.atlas && v.files && PACK_FILES.every((f) => typeof v.files[f] === "string") ? v : null;
+    } catch {
+      return null;
+    }
+  }
+  async function packState() {
+    const s2 = await stored();
+    return !s2 ? "none" : s2.version !== PACK_VERSION ? "old" : "ready";
+  }
+  async function downloadPack() {
+    if (!UPDATE_BASE) throw new PackError("받을 곳이 정해지지 않았어요. 팩 파일을 직접 넣어 주세요.");
+    const url = `${UPDATE_BASE}/${PACK_NAME}?t=${Date.now()}`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
+        const b = r?.ok ? toBytes(r.data) : null;
+        if (b && parsePack(b)) return b;
+      } catch {
+      }
+    }
+    try {
+      const res = await risuai.nativeFetch(url, { method: "GET" });
+      if (res.ok) {
+        const b = new Uint8Array(await res.arrayBuffer());
+        if (parsePack(b)) return b;
+      }
+    } catch {
+    }
+    throw new PackError("그림을 받지 못했어요. 잠시 뒤 다시 받거나 팩 파일을 직접 넣어 주세요.");
+  }
+  function base64(b) {
+    let out = "";
+    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
+    return btoa(out);
+  }
+  async function installPack(bytes) {
+    const pack2 = parsePack(bytes);
+    if (!pack2 || pack2.id !== PACK_ID) throw new PackError("괴이 ː 이면세계 순찰 그림 팩 파일이 아니에요.");
+    if (pack2.version !== PACK_VERSION) throw new PackError("플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.");
+    const files = {};
+    for (const name of PACK_FILES) files[name] = base64(pack2.files.get(name));
+    await risuai.pluginStorage.setItem(KEY2, JSON.stringify({ version: pack2.version, atlas: pack2.atlas, files }));
+    art4 = null;
+  }
+  var art4 = null;
+  function loadArt2() {
+    art4 ??= (async () => {
+      const s2 = await stored();
+      if (!s2 || s2.version !== PACK_VERSION) throw new PackError("그림 팩이 없어요.");
+      const urls = /* @__PURE__ */ new Map();
+      for (const name of PACK_FILES) {
+        const b = Uint8Array.from(atob(s2.files[name]), (c) => c.charCodeAt(0));
+        urls.set(name, URL.createObjectURL(new Blob([b], { type: "image/png" })));
+      }
+      return { atlas: s2.atlas, url: (f) => urls.get(f) ?? "" };
+    })();
+    art4.catch(() => art4 = null);
+    return art4;
+  }
+
+  // src/host/actionpack.ts
+  var ACTION_FILES = ["a-jyaldi-action", "bg-bureau-action", "e-corner", "e-watchman"];
+  var KEY3 = "goei:game-pack:action-normal-v4";
+  var VERSION = 4;
+  var loaded = null;
+  async function stored2() {
+    try {
+      const raw = await risuai.pluginStorage.getItem(KEY3);
+      if (typeof raw !== "string") return null;
+      const s2 = JSON.parse(raw);
+      return s2 && s2.version === VERSION && s2.atlas?.action && ACTION_FILES.every((f) => typeof s2.files?.[f] === "string") ? s2 : null;
+    } catch {
+      return null;
+    }
+  }
+  async function actionPackState() {
+    return await stored2() ? "ready" : "none";
+  }
+  async function installActionPack(bytes) {
+    const pack2 = parsePack(bytes, ACTION_FILES);
+    if (!pack2 || pack2.id !== "action" || pack2.version !== VERSION || !pack2.atlas.action)
+      throw new PackError(
+        "1인 액션용 그림 팩이 아닙니다. goei-game-action-normal-v4.pack을 넣어 주세요."
+      );
+    const files = {};
+    for (const [name, b] of pack2.files) {
+      let str = "";
+      for (let i = 0; i < b.length; i += 32768)
+        str += String.fromCharCode(...b.subarray(i, i + 32768));
+      files[name] = btoa(str);
+    }
+    await risuai.pluginStorage.setItem(
+      KEY3,
+      JSON.stringify({ version: VERSION, atlas: pack2.atlas, files })
+    );
+    loaded = null;
+  }
+  async function downloadActionPack() {
+    const url = `${UPDATE_BASE}/goei-game-action-normal-v4.pack`;
+    const legacy = risuai.risuFetch;
+    if (legacy) {
+      try {
+        const r = await legacy(url, {
+          method: "GET",
+          plainFetchForce: true,
+          rawResponse: true
+        });
+        const b = r.ok ? toBytes(r.data) : null;
+        if (b && parsePack(b, ACTION_FILES)) return b;
+      } catch {
+      }
+    }
+    try {
+      const r = await risuai.nativeFetch(url, { method: "GET" });
+      if (r.ok) {
+        const b = new Uint8Array(await r.arrayBuffer());
+        if (parsePack(b, ACTION_FILES)) return b;
+      }
+    } catch {
+    }
+    throw new PackError(
+      "새 액션 그림을 받지 못했어요. goei-game-action-normal-v4.pack을 파일로 넣어 주세요."
+    );
+  }
+  function loadActionArt() {
+    loaded ??= (async () => {
+      const s2 = await stored2();
+      if (!s2) throw new PackError("새 액션 그림이 없습니다.");
+      return {
+        atlas: s2.atlas,
+        url: (name) => s2.files[name] ? `data:image/png;base64,${s2.files[name]}` : ""
+      };
+    })();
+    loaded.catch(() => {
+      loaded = null;
+    });
+    return loaded;
+  }
+
+  // src/game/legacy.ts
+  var hostFor = (bridge, mode) => {
+    const key2 = mode === "action" ? "goei:game-action:v1" : "goei:game";
+    return {
+      load: async () => {
+        const v = await risuai.pluginStorage.getItem(key2);
+        return typeof v === "string" ? v : null;
+      },
+      save: (data) => risuai.pluginStorage.setItem(key2, data),
+      waiting: bridge.waiting,
+      onWaiting: bridge.onWaiting,
+      narrow: bridge.narrow,
+      art: mode === "action" ? loadActionArt : loadArt2
+    };
+  };
+  function mountLegacy(box2, bridge, mode) {
+    let unmount = null;
+    let generation = 0;
+    const errText = (e) => e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
+    function packPanel(old, done2) {
+      const action = mode === "action";
+      box2.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
+      <b>${action ? "새 액션 그림 받기" : old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
+      <p>${old ? "플러그인이 바뀌어 그림을 새로 받아야 해요." : "게임 그림은 처음 한 번만 받아요. 받은 그림은 Risu에 저장돼요."}</p>
+      <p class="gx-gp-msg" hidden></p>
+      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">${action ? "액션 그림 받기" : "순찰 그림 받기 (0.7MB)"}</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
+    </div></div>`;
+      const msg = box2.querySelector(".gx-gp-msg");
+      const btns = [...box2.querySelectorAll(".gx-gp-btn")];
+      const picker = document.createElement("input");
+      picker.type = "file";
+      picker.accept = ".pack";
+      picker.hidden = true;
+      box2.append(picker);
+      const say = (t) => (msg.hidden = !t, msg.textContent = t);
+      const run = async (get) => {
+        btns.forEach((b) => b.disabled = true);
+        say("받는 중");
+        try {
+          const bytes = await get();
+          say("저장하는 중");
+          await (action ? installActionPack(bytes) : installPack(bytes));
+          done2();
+        } catch (e) {
+          say(errText(e));
+          btns.forEach((b) => b.disabled = false);
+        }
+      };
+      box2.querySelector('[data-gp="get"]').addEventListener("click", () => void run(action ? downloadActionPack : downloadPack));
+      box2.querySelector('[data-gp="file"]').addEventListener("click", () => picker.click());
+      picker.addEventListener("change", () => {
+        const f = picker.files?.[0];
+        picker.value = "";
+        if (f) void run(async () => new Uint8Array(await f.arrayBuffer()));
+      });
+    }
+    async function start() {
+      const current = ++generation;
+      unmount?.();
+      unmount = null;
+      const isAction = mode === "action";
+      const state2 = await (isAction ? actionPackState() : packState());
+      if (current !== generation) return;
+      if (state2 !== "ready") return packPanel(state2 === "old", () => void start());
+      try {
+        await (isAction ? loadActionArt() : loadArt2());
+      } catch {
+        if (current === generation) packPanel(false, () => void start());
+        return;
+      }
+      if (current !== generation) return;
+      box2.innerHTML = "";
+      unmount = mode === "action" ? mountAction(box2, hostFor(bridge, mode)) : mountGame2(box2, hostFor(bridge, mode));
+    }
+    void start();
+    return () => {
+      generation++;
+      unmount?.();
+      unmount = null;
+      box2.innerHTML = "";
+    };
+  }
+
+  // src/game/entry.ts
+  var mod = {
+    version: "0.16.40-visit.1",
+    mount: (box2, bridge) => mountPlay(box2, bridge),
+    // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
+    legacy: {
+      patrol: (box2, bridge) => mountLegacy(box2, bridge, "patrol"),
+      action: (box2, bridge) => mountLegacy(box2, bridge, "action")
+    }
+  };
+  globalThis.__goeiGame = mod;
+})();

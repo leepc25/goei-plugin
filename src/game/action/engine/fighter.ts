@@ -1,10 +1,10 @@
 // 몸 공통: 위치·속도·중력·피격 반응(부록 E.1)·다운·기상 무적·띄움 횟수 제한. 플레이어와 엔진 기본 적이 같이 쓴다.
 // 적 스레드(enemy/)도 원하면 이 반응 규칙을 가져다 쓸 수 있다.
 import type { Body, Hit, HitResult, WBox, WorldView } from './contract';
+import { newBodyId } from './ids';
 
 export const GRAVITY = 2.6;
-let nextId = 1;
-export const newId = () => nextId++;
+export const newId = newBodyId;
 
 export type Phase = 'free' | 'act' | 'hurt' | 'air-hurt' | 'down' | 'getup' | 'held' | 'dead';
 

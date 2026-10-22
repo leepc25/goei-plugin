@@ -50,10 +50,12 @@ export class DemoEngine {
   notes: Record<string, unknown> = {};
   floors = 0;
   kills = 0;
-  private pendingFinish: 'next' | 'withdraw' | null = null;
+  private pendingFinish: 'next' | 'withdraw' | 'return' | null = null;
   private nextId = 1;
   private rand: () => number;
   events: GameEvent[] = [];
+  /** 실제로 전달된 E 입력만 기록한다. 목표 조회는 입력이 아니다. */
+  interactions: { floor: string; id: string; tick: number }[] = [];
   onFloor?: (plan: StagePlan) => void;
   onEnd?: (how: 'return' | 'evac') => void;
   constructor(
@@ -230,7 +232,7 @@ export class DemoEngine {
       bd = 61;
     for (const pr of this.props) {
       const d = Math.abs(pr.x - this.p.x);
-      if (d < bd && pr.kind !== 'prop' && (pr.kind !== 'shutter' || pr.label === '잠긴 방화셔터')) (bd = d), (best = pr);
+      if (d < bd && pr.kind !== 'prop' && (pr.kind !== 'shutter' || pr.label === '잠긴 방화셔터' || (pr.solid && this.p.x > pr.x))) (bd = d), (best = pr);
     }
     return best;
   }
@@ -357,13 +359,16 @@ export class DemoEngine {
     // 상호작용
     if (k.interact) {
       const pr = this.nearestProp();
-      if (pr) this.stage.onInteract?.(this.api, this.plan, pr);
+      if (pr) {
+        this.interactions.push({ floor: this.plan.id, id: pr.id, tick: this.tick });
+        this.stage.onInteract?.(this.api, this.plan, pr);
+      }
     }
     this.stage.tick?.(this.api, this.plan);
     if (this.pendingFinish) {
       const how = this.pendingFinish;
       this.pendingFinish = null;
-      const next = this.stage.nextFloor(this.run, this.plan, how);
+      const next = how === 'return' ? null : this.stage.nextFloor(this.run, this.plan, how);
       if (next) this.load(next as StagePlan);
       else if (!this.ended) {
         this.ended = 'return';

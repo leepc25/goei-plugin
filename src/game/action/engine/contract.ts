@@ -86,6 +86,8 @@ export type GameEvent =
 
 /** 적·층·아이템이 보는 세계 */
 export interface WorldView {
+  /** 회수품은 아이템 가방 하나에서만 보관·소비하고 출동 저장에 포함한다. */
+  recovery?: { has(id: string): boolean; add(id: string): boolean; take(id: string): boolean };
   readonly tick: number;
   rand(): number;
   readonly player: Body & PlayerState;
@@ -155,7 +157,7 @@ export interface FloorPlan {
   /** 몸들 위에 그림 (어둠·안개 등, 선택). 없으면 엔진이 world.light < 1일 때 어둡게 덮는다 */
   drawForeground?(ctx: CanvasRenderingContext2D, camX: number, world: WorldView): void;
   /** 몸과 깊이(y) 순서로 섞어 그릴 바닥 위 물건 줄 (월드 좌표). y = 바닥에 닿는 선, x0~x1 = 그림 폭 */
-  depthLayers?: { y: number; x0: number; x1: number; draw(ctx: CanvasRenderingContext2D): void }[];
+  depthLayers?: { y: number; x0: number; x1: number; occludedSilhouette?: boolean; draw(ctx: CanvasRenderingContext2D): void }[];
   /** 바닥 물건을 두면 안 되는 x 구간 (벽 그림 속 문·가구 앞 등) */
   keepOut?: [number, number][];
 }
@@ -167,7 +169,7 @@ export interface StageApi {
   hurtPlayer(dmg: number, stagger?: boolean): void;
   heal(n: number): void;
   note(key: string, value: unknown): void;
-  finish(how: 'next' | 'withdraw'): void;
+  finish(how: 'next' | 'withdraw' | 'return'): void;
   /** 플레이어를 옮김 (구덩이 복귀·낮은 천장·단·추격 밀기). 속도는 0으로 */
   movePlayer(x: number, y?: number): void;
 }
@@ -175,6 +177,8 @@ export interface StageApi {
 export interface StageModule {
   id: string;
   label: string;
+  snapshot?(): string | null;
+  restore?(state: string): FloorPlan;
   firstFloor(run: RunConfigCore): FloorPlan;
   /** null = 출동 끝(귀환) */
   nextFloor(run: RunConfigCore, prev: FloorPlan, how: 'next' | 'withdraw'): FloorPlan | null;
@@ -211,6 +215,7 @@ export interface HqHostCore {
 }
 export interface HqModuleLike {
   mount(root: HTMLElement, host: HqHostCore): void;
+  ready?(): Promise<void>;
   onReturn(result: RunResultCore, run: RunConfigCore): void;
   unmount(): void;
   /** 본부를 엔진 벨트 장면으로 걷게 할 때: 본부 층 (없으면 DOM 본부만) */

@@ -247,8 +247,8 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },
           { type: 'button', label: '판정 보기', sub: key('H'), act: () => (menu.closeAll(), tap('KeyH')) },
-          ...(o.onRetreat ? [{ type: 'button' as const, label: '본부로 귀환', sub: '후송 처리', danger: true, act: () => void shell.confirm('출동을 포기하고 본부로 돌아갈까요? 송신하지 않은 정보는 절반만 남습니다.', '귀환', '계속 싸운다').then((y) => y && (menu.closeAll(), o.onRetreat!())) }] : []),
-          { type: 'button', label: '타이틀로', act: () => void shell.confirm('타이틀 화면으로 나갈까요? 진행은 저장됩니다.').then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) },
+          ...(o.onRetreat ? [{ type: 'button' as const, label: '출동 포기 · 긴급 철수', sub: '안전 귀환은 다락방 로프', danger: true, act: () => void shell.confirm('출동을 포기하고 철수할까요? 안전 귀환보다 회수 보상이 줄어듭니다.', '철수', '계속 싸운다').then((y) => y && (menu.closeAll(), o.onRetreat!())) }] : []),
+          { type: 'button', label: '타이틀로', act: () => void shell.confirm('타이틀로 나갈까요? 이어하기는 마지막 안전 지점부터입니다. 전투 중 얻거나 사용한 물품·체력도 그 시점으로 돌아갑니다.').then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) },
         ],
       });
     },

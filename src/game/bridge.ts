@@ -129,7 +129,18 @@ export interface GameTalk {
   recent(n: number): Promise<string[]>;
 }
 
+export interface VisitState {
+  agents: { id: string; name: string; state: string; situation: string; room: string | null }[];
+  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string }[];
+}
+export interface GameVisit {
+  state(): Promise<VisitState>;
+  send(agentId: string, text: string, which: 'main' | 'aux'): Promise<VisitState>;
+}
+
 export interface GameBridge {
+  /** 봇 보조 본부 방문. 응답은 시작한 채팅에 즉시 기록된다. */
+  visit?: GameVisit;
   readonly api: 1;
   /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
   talk?: GameTalk;

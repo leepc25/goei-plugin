@@ -70,6 +70,10 @@ test('바닥 물건은 문 앞·적 생성 자리에 놓이지 않고, 적은 �
       }
       // 사다리(천장 해치)는 벽선에, 문·벽 장식 앞이 아니고, 한 화면에 하나 (검수 21)
       const hatches = plan.props.filter((q) => q.kind === 'hatch').sort((a, b) => a.x - b.x);
+      const gateX = f.placed.find(q => q.kind === 'locked')?.x;
+      if (gateX && f.placed.some(q => q.kind === 'hatch' && q.x < gateX)) {
+        assert.ok(hatches.some(q => q.x < gateX), `${type} ${depth} ${seed}: 셔터 앞 열쇠 길 보존`);
+      }
       hatches.forEach((h, i) => {
         assert.equal(h.y, lane[0], `${type} ${depth} ${seed}: 사다리 벽선`);
         if (i) assert.ok(h.x - hatches[i - 1].x > 1280, `${type} ${depth} ${seed}: 사다리 둘이 한 화면 ${hatches.map((q) => q.x)}`);

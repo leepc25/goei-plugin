@@ -1,17 +1,27 @@
 import type { GameEvent, Hit, React, WBox } from '../engine/contract';
+import { newAttackId } from '../engine/ids';
 import { PROPS, WEAPONS } from './data';
 import { damageProp, explode, type Field, type ItemEvent, type PropEnt } from './field';
 import { useWeapon, type ItemRun } from './inventory';
 /**
- * 엔진(docs/게임_모듈_연결.md) 쪽 모양으로 바꾸는 얇은 층. 타입만 가져오고 엔진 코드는 부르지 않는다.
+ * 엔진(docs/게임_모듈_연결.md) 쪽 모양으로 바꾸는 얇은 층. 판정 타입과 공통 공격 번호 발급만 공유한다.
  * 엔진이 적 판정을 직접 할 때: stepField에 targets를 빈 배열로 넘기고
  *   projectileHits(field) → 적 피격 상자와 겹치면 hitProp(field, run, projId, targetId)
  *   breakableBoxes(field) → 플레이어 공격 상자와 겹치면 strikeProp(field, run, propId, dmg)
  */
 
 const TICK = 30;
-let attackSeq = 900000;
+const projectileAttackIds = new WeakMap<object, number>();
 const react = (knockdown: boolean, kb: number): React => (knockdown ? 'down' : kb >= 140 ? 'stagger' : 'flinch');
+
+/** 적 모듈은 attackId로 중복 피격을 막는다. 서로 다른 아이템 타격에 상수 ID를 재사용하지 않는다. */
+export function itemHit(e: Extract<ItemEvent, { t: 'hit' }>, sourceX: number): Hit {
+  return {
+    attackId: newAttackId(), x0: e.x, x1: e.x, z0: 0, z1: 0, y: e.y,
+    dmg: e.damage, react: react(e.knockdown, e.knockback),
+    dir: e.x < sourceX ? -1 : 1, push: e.knockback / TICK, armorBreak: e.armorBreak,
+  };
+}
 
 /** 날아가는 투척물·탄을 엔진 Hit 상자로. projId로 hitProp을 부른다. */
 export function projectileHits(field: Field): (Hit & { projId: number })[] {
@@ -19,9 +29,11 @@ export function projectileHits(field: Field): (Hit & { projId: number })[] {
   for (const p of field.projs) {
     if (p.kind === 'grenade') continue;
     const half = p.kind === 'prop' ? 34 : 14;
+    let attackId = projectileAttackIds.get(p);
+    if (attackId === undefined) projectileAttackIds.set(p, (attackId = newAttackId()));
     out.push({
       projId: p.id,
-      attackId: 1_000_000 + p.id,
+      attackId,
       x0: p.x - half,
       x1: p.x + half,
       z0: p.z - (p.kind === 'prop' ? 30 : 8),

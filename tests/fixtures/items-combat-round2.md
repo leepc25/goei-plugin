@@ -1,0 +1,72 @@
+# 아이템 전투 2차 인계
+
+- 기준: `0d43a4496bff1cdc7c0122e273a43475c9134356`.
+- 브랜치: `codex/items-combat-round2`.
+- `origin/codex/metroidvania-run-system`을 명시적으로 fetch한 뒤 기준 커밋에서 독립 worktree를 생성했다. fetch 당시 원격 끝은 `0a132852`; 그 이후 변경은 가져오지 않았다.
+- 수정 소스는 `src/game/action/items/{inventory,engine,field}.ts` 세 파일뿐이다. 캐릭터·데이터 수치·상점·드랍 표·공용 엔진 소스는 변경하지 않았다.
+
+## 재현과 수정
+
+| 재현 | 수정 결과 |
+| --- | --- |
+| 회복약 2/3 + 나머지 세 칸 포화 상태에서 회복약 3개 묶음 획득 | 1개만 추가하고 남은 2개를 바닥에 보존. 획득 이벤트도 실제 획득량만 반환 |
+| 회수품 5/6칸에서 점검표 2개 묶음 획득 | 1개만 가방에 추가, 잔량 보존. 포화·빈 칸 확보·JSON 왕복 후 중복 없음 |
+| 예비탄 31/32에서 권총탄 상자 획득 | 1발 추가하고 `ammoLeft: 7`을 바닥 저장에 보존. 재장전 후 나머지 회수. 기존 저장의 해당 필드가 없으면 기존 상자 단위로 계산 |
+| 체력 최대에서 회복 조각 밟기 | 바닥에 남김. 같은 틱에 여러 조각과 회복약 입력이 겹쳐도 필요한 조각만 소비 |
+| 0개로 전달된 출동 보급품 | 1개로 부활시키지 않음. 음수 수량 추가로 기존 수량이 줄어드는 문제도 차단 |
+| 근접 공격으로 드럼통 폭발 → 같은 공격 목록의 상자 처리 | 이미 파괴된 개체를 재처리하지 않아 중복 드랍과 `splice(-1)`에 의한 다른 개체 삭제 방지 |
+| 같은 종류 드럼통 두 개 인접 배치 | 개체별로 한 번씩 연쇄 폭발 |
+| 방 끝을 향해 섬광·연막 투척 | 경계 밖에서 소멸하지 않고 방 안에 착지하여 효과 발생 |
+| 실제 Enemy에 임시 쇠파이프 두 번 사용 | 공용 연결 패치 적용 시 서로 다른 공격 ID로 두 번째 피해도 적용, 처치 수·사망 이벤트 1회 |
+| 실제 Enemy 앞 섬광·연막 사용 | 공용 연결 패치 적용 시 섬광 60틱 기절, 연막 40% 둔화·영역 이탈 후 회복 |
+
+수정 전 새 검사에서 모듈 결함 9건과 공용 연결 결함 2건을 재현했다. 이후 연막 연결 누락도 별도로 재현했다. 같은 틱 회복 낭비 방지와 기존 정상 World 흐름까지 포함한 최종 검사는 14개다.
+
+## 공용 연결 패치 — 통합 담당 적용
+
+`items-combat-round2-itemsLink.patch`는 **현재 브랜치의 공용 소스에는 적용하지 않았다.** 적용 대상은 `src/game/action/engine/itemsLink.ts` 하나다.
+
+1. items import에 `itemHit`, `pickupHealAmount`, `slowAt`; 적 모듈 `Enemy` import 추가.
+2. `apply()`의 `hit`: 상수 `attackId: -1` 대신 `itemHit()` 사용. 실제 처치 수 갱신, Fighter가 자체 발행하는 사망 이벤트는 중복 발행하지 않음.
+3. `apply()`의 섬광: 실제 Enemy 상태 기계에도 기절 연결. 체력 피해 0인 섬광을 `Enemy.applyHit()`에 넣으면 최소 피해 1이 생기므로 직접 기절 상태만 설정.
+4. `apply()`의 회복 조각: 이벤트의 실제 획득 수량으로 회복.
+5. `tick()`의 `stepField` 직후: 연막 안의 Enemy에 기존 둔화 타이머 연결.
+
+저장소 루트에서:
+
+```sh
+git apply --check tests/fixtures/items-combat-round2-itemsLink.patch
+git apply tests/fixtures/items-combat-round2-itemsLink.patch
+npm run typecheck
+ITEMS_COMBAT_LINK_PATCH=current node --test tests/items-combat-round2.test.mjs
+```
+
+통합 담당의 최신 수정과 충돌하면 위 함수 위치를 기준으로 수동 반영한다. 임시 파일에 패치를 적용한 타입 검사와 아래 가상 연결 검사를 모두 통과했다.
+
+## 검증과 재실행
+
+```sh
+npm run typecheck
+npm run build
+node --test tests/items.test.mjs tests/items-combat-round2.test.mjs tests/run-system.test.mjs
+# 공용 소스를 수정하지 않고 임시 복사본에만 patch를 적용하여 번들링
+ITEMS_COMBAT_LINK_PATCH=1 node --test tests/items-combat-round2.test.mjs
+npm test
+node tests/items-combat-round2-browser.mjs
+```
+
+- 가상 연결 검사: 14/14 통과. 기본 실행에서는 공용 연결 검사 3개를 명시적으로 건너뛴다.
+- 최종 전체 `npm test`: 350개 중 332개 통과, 실패 0, 건너뜀 18(기존 15 + 미적용 공용 연결 3).
+- 점검표의 실제 스테이지 가방 포화·획득·저장·거래·감정 통합은 기존 `run-system.test.mjs`를 그대로 통과했다.
+- 새 World 검사는 소비·회복·무기 교환·방 상태 재사용·체크포인트 복원을 확인한다. 방 왕복은 테스트용 목적지 주입을 사용하며 실제 출구 보행 검사는 아니다.
+- Chromium: 빌드된 원본 `dist/goei-action-game.html`에서 숫자 키 회복 검증. 이어서 같은 HTML 자산과 패치 적용 번들로 E 줍기, 포화 잔량, 점검표, S 총 꺼내기/사격, A 연속 타격·처치, 의자 들기/던지기, 경계 섬광/연막 투척을 실제 키 입력으로 검증했다. 희귀 조건 설정에는 위치·소지품·적 fixture 주입을 사용했다. PC 1280×720 검사이며 모바일/전체 출동 완주 검사는 아니다.
+- Chromium 오류 0. 증거는 `dist-test/items-combat-round2-browser/`의 JSON·PNG·패치 적용 HTML이며 생성물은 커밋하지 않는다. 스크립트에서 `PLAYWRIGHT_MODULE`, `CHROMIUM_PATH`를 지정할 수 있다.
+- 정상 `npm run build`가 생성한 추적 HTML 변경은 검증 후 되돌렸다. 공용 파일·원래 worktree는 보존한다.
+
+## 남은 연결과 한계
+
+- 위 연결 패치를 통합하기 전에는 실제 게임의 연속 아이템 피해·섬광·연막·묶음 회복 연결 수정이 활성화되지 않는다.
+- 기존 공용 코드에는 소금 영역의 적 진입 차단, 출혈/오염의 지속 상태 및 해제, 임시 날붙이의 출혈 적용 연결이 없다. 이번 패치가 이 상태 시스템까지 완성한 것은 아니다. 통합 담당의 적/플레이어 상태 계약과 함께 연결해야 한다.
+- `targets()`가 모든 적을 `human: true`로 넘기는 기존 분류도 남아 있다. 사람형 보정과 수호자별 상태 면역 정책은 전체 적 종류에 대해 검증하지 않았다.
+- 바닥 재방문·저장은 검사했지만 진행 중인 투사체/장판의 방 밖 시간 처리 정책과 모든 깊이 수동 완주는 이번 검증 범위 밖이다.
+- 그림은 기존 런타임을 회귀 확인에만 사용했다. 캐릭터 품질 승인이나 새 그림 제작 결과가 아니다.

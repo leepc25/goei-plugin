@@ -1,0 +1,20 @@
+--- a/src/game/action/stage/module.ts
++++ b/src/game/action/stage/module.ts
+@@ -340,7 +340,7 @@
+     plan.startX = x;
+     rt!.prevX = rt!.safeX = x;
+     // 추격: 그것은 들어온 쪽에서 쫓아온다. 오른쪽 문으로 들어온 방은 (거꾸로 쫓을 수 없어) 잠잠하다
+-    if (plan.type === 'chase') rt!.chaseX = t.from === 'r' ? -1e9 : x - 600;
++    if (plan.type === 'chase') rt!.chaseX = t.from === 'r' || x >= f.width / 2 ? -1e9 : x - 600;
+     syncRoom(plan, w);
+     o.floorTypes[t.depth] = { type: f.type, sub: f.sub };
+     o.depth = t.depth;
+@@ -555,6 +555,8 @@
+       }
+     }
+     // 추격: 자동으로 다가오는 벽. 문을 닫으면 느려지고, 뒤돌아보면 빨라진다.
++    // 방 통과 목표를 달성한 뒤에는 열쇠·이전 출입구로 되돌아갈 수 있다.
++    if (f.type === 'chase' && f.room && r.traversed) r.chaseX = plan.stage.fx.chaseX = -1e9;
+     if (f.type === 'chase' && r.chaseX > -1e8) {
+       const end = f.segments[f.segments.length - 1].x;
+       if (p.x < end - 200 && r.t > 1.2) {

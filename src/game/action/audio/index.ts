@@ -4,11 +4,12 @@
 //   audio.floor('dark');                             // 층 들어갈 때: 음악 + 환경음
 //   audio.duck(1.5);                                 // 필살기 컷인
 // AudioContext는 처음 소리를 낼 때 만든다. 다른 봇에서는 아무것도 하지 않는다.
-import { type AudioSettings, type Bus, type Out, BUSES, DEFAULT_SETTINGS, buildGraph, cleanSettings, sliderGain } from './engine';
+import { type AudioSettings, type Bus, type Out, BUSES, DEFAULT_SETTINGS, buildGraph, cleanSettings, sliderGain, AudioScope, busOut, oneShot } from './engine';
 import { SFX, SFX_IDS, SURFACE_SFX, type SfxId, type Surface } from './sfx';
 import { Player, compileSong, type Compiled } from './music';
 import { SONGS, type SongId } from './songs';
 import { startAmbience, type Scene } from './ambience';
+import type { VideoTrack } from './videoTrack';
 
 export { SFX, SFX_IDS, type SfxId, type Surface } from './sfx';
 export { SONGS, SONG_IDS, type SongId } from './songs';
@@ -126,11 +127,14 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   let out: Out | null = null;
   let disposed = false;
   let userPaused = false;
+  let cutscene = false;
+  const media = new Set<VideoTrack>();
   let scene: Scene | null = null;
   let amb: ReturnType<typeof startAmbience> | null = null;
   let song: { id: SongId; player: Player } | null = null;
   let resumeSong: SongId | null = null; // 알림곡이 끝나면 돌아갈 곡
-  let jingleTimer = 0;
+  let jingleEnd: number | null = null;
+  let rootScope: AudioScope | null = null;
   let pumpTimer = 0;
   const lastAt = new Map<string, number>();
   const voices: number[] = []; // 끝나는 시각들
@@ -142,29 +146,34 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   const ready = (async () => {
     try {
       const raw = await opts.load?.();
-      if (raw != null) settings = cleanSettings(typeof raw === 'string' ? JSON.parse(raw) : raw);
+      if (raw != null && !disposed) settings = cleanSettings(typeof raw === 'string' ? JSON.parse(raw) : raw);
     } catch {
       /* 손상된 설정은 기본값 */
     }
     applyVolumes();
   })();
   let saveTimer = 0;
+  const saveNow = () => {
+    saveTimer = 0;
+    try { void Promise.resolve(opts.save?.(JSON.stringify(settings))).catch(() => {}); }
+    catch { /* 저장 실패는 소리에 영향 없음 */ }
+  };
   const persist = () => {
     clearTimeout(saveTimer);
-    saveTimer = window.setTimeout(() => {
-      try {
-        void opts.save?.(JSON.stringify(settings));
-      } catch {
-        /* 저장 실패는 소리에 영향 없음 */
-      }
-    }, 400);
+    saveTimer = window.setTimeout(saveNow, 400);
   };
+  function syncMedia() {
+    for (const track of media) track.setPolicy(settings.muted ? 0 : sliderGain(settings.master) * sliderGain(settings.sfx), userPaused);
+  }
   function applyVolumes() {
+    syncMedia();
     if (!graph || !ctx) return;
     const t = ctx.currentTime;
     for (const b of BUSES) {
-      const v = b === 'master' ? (settings.muted ? 0 : sliderGain(settings.master)) : sliderGain(settings[b]);
-      graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
+      const v = b === 'master' ? ((settings.muted || cutscene) ? 0 : sliderGain(settings.master)) : sliderGain(settings[b]);
+      graph.gains[b].gain.cancelScheduledValues(t);
+      if (v === 0) graph.gains[b].gain.setValueAtTime(0, t);
+      else graph.gains[b].gain.setTargetAtTime(v, t, 0.03);
     }
   }
 
@@ -186,9 +195,14 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
       return null;
     }
     graph = buildGraph(ctx, ctx.destination);
-    out = graph.out;
+    rootScope = new AudioScope(graph.out);
+    out = rootScope.out;
     applyVolumes();
-    ctx.addEventListener('statechange', () => listeners.forEach((f) => f()));
+    ctx.addEventListener('statechange', () => {
+      if (disposed) return;
+      if (ctx?.state !== 'running' && opts.autoUnlock !== false) attachUnlock();
+      listeners.forEach((f) => f());
+    });
     return out;
   }
 
@@ -199,33 +213,37 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     const fresh = !out;
     const o = create();
     if (!o || !ctx) return false;
+    const current = ctx;
     if (fresh) {
-      if (scene) {
-        amb = startAmbience(o, scene);
-        music(SCENE_SONG[scene], 1.2);
-      } else if (wantSong) music(wantSong);
-      wantSong = null;
+      if (scene) amb = startAmbience(o, scene);
+      music(wantSong, 1.2);
     }
+    if (userPaused || document.hidden) return false;
     try {
       const nav = navigator as unknown as { audioSession?: { type: string } };
       if (nav.audioSession && nav.audioSession.type !== 'playback') nav.audioSession.type = 'playback';
     } catch {
       /* 없는 브라우저 */
     }
-    if (ctx.state !== 'running' && !userPaused) {
+    if (current.state !== 'running') {
+      const prime = new AudioScope(o);
       try {
         // 빈 버퍼 하나를 바로 재생해야 iOS가 풀린다
-        const b = ctx.createBufferSource();
-        b.buffer = ctx.createBuffer(1, 1, 22050);
-        b.connect(ctx.destination);
+        const b = prime.source(current.createBufferSource());
+        b.buffer = current.createBuffer(1, 1, 22050);
+        b.connect(current.destination);
         b.start(0);
-        await ctx.resume();
+        prime.seal();
+        await current.resume();
       } catch {
+        prime.dispose();
         return false;
       }
     }
-    if (ctx.state === 'running') detachUnlock();
-    return ctx.state === 'running';
+    if (disposed || ctx !== current) return false;
+    if (userPaused || document.hidden) { void current.suspend().catch(() => {}); return false; }
+    if (current.state === 'running') { detachUnlock(); pump(); }
+    return current.state === 'running';
   }
   const UNLOCK_EVENTS = ['pointerdown', 'touchend', 'mousedown', 'keydown'] as const;
   const onGesture = () => void unlock();
@@ -240,17 +258,17 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   // 화면을 떠나면 멈추고, 돌아오면 다시 (배터리·백그라운드 소리 방지)
   const onVis = () => {
     if (!ctx) return;
-    if (document.hidden) void ctx.suspend();
-    else if (!userPaused) void ctx.resume();
+    if (document.hidden) void ctx.suspend().catch(() => {});
+    else if (!userPaused) void unlock();
   };
   document.addEventListener('visibilitychange', onVis);
 
   // ── 효과음 ──
   function play(id: SfxId, o: { vol?: number; pan?: number; pitch?: number; at?: number } = {}) {
     const ao = ensure();
-    if (!ao || !ctx || ctx.state !== 'running') return false;
+    if (!ao || !ctx || ctx.state !== 'running' || userPaused || document.hidden) return false;
     const def = SFX[id];
-    if (!def) return false;
+    if (!def || cutscene) return false;
     const now = ctx.currentTime;
     const gap = def.group === 'step' ? STEP_GAP : (MIN_GAP[id] ?? 0.015);
     if (now - (lastAt.get(id) ?? -1) < gap) return false;
@@ -259,7 +277,7 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     if (voices.length >= MAX_VOICES && (def.group === 'step' || def.group === 'world')) return false;
     lastAt.set(id, now);
     const t = Math.max(now, o.at ?? now) + 0.005;
-    const dur = def.fn(ao, t, { vol: o.vol ?? 1, pan: o.pan ?? 0, pitch: o.pitch ?? 1, dest: ao[def.bus] });
+    const dur = oneShot(busOut(ao, def.bus), scoped => def.fn(scoped, t, { vol: o.vol ?? 1, pan: o.pan ?? 0, pitch: o.pitch ?? 1, dest: ao[def.bus] }));
     const end = t + dur;
     const i = voices.findIndex((v) => v > end);
     voices.splice(i < 0 ? voices.length : i, 0, end);
@@ -305,7 +323,11 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     return c;
   }
   function pump() {
-    if (!ctx || !song) return;
+    if (!ctx || !song || ctx.state !== 'running' || userPaused || document.hidden) return;
+    if (jingleEnd !== null && ctx.currentTime >= jingleEnd) {
+      music(resumeSong, 0.5);
+      return;
+    }
     // 백그라운드에서 타이머가 늦어져도 끊기지 않게 넉넉히 미리 예약
     song.player.schedule(ctx.currentTime + 0.4, ctx.currentTime);
   }
@@ -314,18 +336,16 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   }
 
   function music(id: SongId | null, fade = 1) {
-    const o = ensure();
-    if (!o || !ctx) {
-      wantSong = id;
-      return;
-    }
-    clearTimeout(jingleTimer);
+    wantSong = id;
+    jingleEnd = null;
     resumeSong = null;
+    const o = ensure();
+    if (!o || !ctx) return;
     if (song?.id === id && !song.player.ended) return;
     const t = ctx.currentTime;
     song?.player.fadeOut(t, fade);
     song = null;
-    if (!id) return;
+    if (!id) { clearInterval(pumpTimer); pumpTimer = 0; return; }
     const player = new Player(o, songOf(id), t + Math.min(0.15, fade * 0.3));
     song = { id, player };
     startPump();
@@ -339,12 +359,7 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     const back = then !== undefined ? then : (resumeSong ?? song?.id ?? null);
     music(id, 0.25);
     resumeSong = back;
-    const len = song!.player.lengthSec;
-    jingleTimer = window.setTimeout(() => {
-      const b = resumeSong;
-      resumeSong = null;
-      if (b) music(b, 0.5);
-    }, (len + 0.8) * 1000);
+    jingleEnd = song!.player.startAt + song!.player.lengthSec + 0.8;
   }
 
   /** 음악을 잠깐 낮춘다 (컷인·규칙 발견) */
@@ -361,6 +376,7 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
   function floor(s: Scene | null) {
     if (s === scene) return;
     scene = s;
+    wantSong = s ? SCENE_SONG[s] : null;
     const o = ensure();
     if (!o) return;
     amb?.stop();
@@ -368,9 +384,30 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
     music(s ? SCENE_SONG[s] : null, 1.2);
   }
 
+  function setPaused(paused: boolean) {
+    if (disposed || userPaused === paused) return;
+    userPaused = paused;
+    syncMedia();
+    if (paused) void ctx?.suspend().catch(() => {});
+    else if (ctx) void unlock();
+  }
+
   return {
     ready,
     unlock,
+    /** Called once for each story media element, before its first play(). */
+    attachMedia(track: VideoTrack) {
+      if (disposed) return track.dispose();
+      media.add(track);
+      track.onDispose(() => media.delete(track));
+      syncMedia();
+    },
+    setCutscene(active: boolean) {
+      if (cutscene === active) return;
+      cutscene = active;
+      applyVolumes();
+    },
+    setPaused(paused: boolean) { setPaused(paused); },
     get unlocked() {
       return ctx?.state === 'running';
     },
@@ -404,26 +441,30 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
       persist();
     },
     /** 게임 일시정지: 모든 소리를 멈춘다 */
-    pause() {
-      userPaused = true;
-      void ctx?.suspend();
-    },
-    resume() {
-      userPaused = false;
-      void unlock();
-    },
+    pause() { setPaused(true); },
+    resume() { setPaused(false); },
     onState(f: () => void) {
       listeners.add(f);
       return () => listeners.delete(f);
     },
     dispose() {
+      if (disposed) return;
       disposed = true;
       detachUnlock();
       document.removeEventListener('visibilitychange', onVis);
       clearInterval(pumpTimer);
-      clearTimeout(jingleTimer);
-      amb?.stop(0.1);
-      void ctx?.close();
+      clearTimeout(saveTimer);
+      if (saveTimer) saveNow();
+      jingleEnd = null;
+      amb?.stop(0);
+      rootScope?.dispose();
+      listeners.clear();
+      for (const track of media) track.dispose();
+      media.clear();
+      song = null;
+      amb = null;
+      scene = null;
+      void ctx?.close().catch(() => {});
       ctx = null;
       out = null;
       graph = null;

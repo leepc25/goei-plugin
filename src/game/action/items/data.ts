@@ -163,6 +163,7 @@ export const RELICS: Record<string, RelicDef> = {
   oddcoin: { id: 'oddcoin', name: '뒤집힌 동전', value: 35, research: 4 },
   rustkey: { id: 'rustkey', name: '녹슨 승강기 열쇠', value: 45, research: 6 },
   photo: { id: 'photo', name: '얼굴 없는 사진', value: 40, research: 8 },
+  checklist: { id: 'checklist', name: '서명란이 빈 점검표', value: 40, research: 8 },
   tooth: { id: 'tooth', name: '누군가의 이빨', value: 25, research: 5 },
   dreamcatcher: { id: 'dreamcatcher', name: '꿈결 수집기', value: 120, research: 30, rare: true },
   blackbox: { id: 'blackbox', name: '승강기 블랙박스', value: 150, research: 40, rare: true },

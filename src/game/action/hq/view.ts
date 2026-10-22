@@ -7,7 +7,7 @@ import { lines, type Line, type LineCtx } from './lines';
 import { boardNames, reportPayload, rosterFor, type CardView, type MainLink } from './link';
 import {
   appraise, approveDanger, buy, canDeploy, doResearch, equip, equipRelic, interview, launch, masteryLevel, masteryNext, missionBoard, noteDeadlines, openToothBox,
-  pickCoffee, placeOpen, researchOpen, saveTitle, setDanger, settle, statsFor, supplyCatalog, supplyOpen, treat, unequip, unlocksAt, variantFor, itemName, DANGER_COST, TOOTH_COST, TREAT_COST, type MissionCard,
+  pickCoffee, placeOpen, researchOpen, restDay, saveTitle, setDanger, settle, statsFor, supplyCatalog, supplyOpen, treat, unequip, unlocksAt, variantFor, itemName, DANGER_COST, TOOTH_COST, TREAT_COST, type MissionCard,
 } from './logic';
 import { iconCanvas } from './runmenu';
 import { hqMap, type HqMapView } from './map';
@@ -22,6 +22,7 @@ export interface HqHost {
   /** 자동 저장 (슬롯 0) */
   load(): Promise<string | null>;
   save(data: string): Promise<void>;
+  resuming?(): boolean;
   /** 수동 저장 슬롯 1~3 (bridge.saves). 없으면 Esc 메뉴에 슬롯이 안 보인다 */
   saves?: SaveSlots;
   link?: MainLink;
@@ -47,6 +48,7 @@ export interface HqPlaceView {
 export interface HqModule {
   /** walk:false = 엔진이 본부를 걷는 벨트 장면으로 그리고, root에는 메뉴 창만 띄운다 (게임_통합_규격 4장) */
   mount(root: HTMLElement, host: HqHost, opt?: { walk?: boolean }): void;
+  ready(): Promise<void>;
   places(): HqPlaceView[];
   /** 그 장소 메뉴 창 (엔진: 문 앞에서 E) */
   openPlace(id: PlaceId): void;
@@ -76,6 +78,10 @@ const VW = 1280,
 const depthText = (d: number) => (d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '—');
 
 export function createHq(): HqModule {
+  let ready = Promise.resolve();
+  let loaded = false;
+  let mountId = 0;
+  let slotBusy = false;
   let s: HqSave = newSave();
   let host: HqHost | null = null;
   let root: HTMLElement | null = null;
@@ -102,7 +108,7 @@ export function createHq(): HqModule {
   const idlers: Record<string, { x: number; to: number; wait: number }> = {};
 
   const ctx = (): LineCtx => ({ agent: s.selected, agentName: AGENT_BY_ID[s.selected].name, fatigue: s.agents[s.selected].fatigue, day: s.day, rand });
-  const save = () => host?.save(saveText(s)).catch(() => {});
+  const save = () => loaded ? host?.save(saveText(s)).catch(() => {}) : undefined;
   const placeAt = (x: number): PlaceDef | null => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
 
   // ── 그리기 ──
@@ -270,7 +276,7 @@ export function createHq(): HqModule {
       case 'pantry':
         return `${head}<h3>출동 전 커피 한 잔 (다음 출동 1회)</h3><div class="hq-row">${COFFEES.map((c) => `<button data-coffee="${c.id}" class="${s.coffee === c.id ? 'sel' : ''}">${esc(c.name)}<br><small>${esc(c.effect)}${c.who ? ` · ${esc(c.who)}` : ''}</small></button>`).join('')}</div>`;
       case 'clinic':
-        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc(a.name)}</b> <span>${s.agents[a.id].injured ? `부상 · ${s.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s.agents[a.id].fatigue}`}</span>${s.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ''}</div>`).join('')}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p>`;
+        return `${head}${AGENTS.map((a) => `<div class="hq-slotrow"><b>${esc(a.name)}</b> <span>${s.agents[a.id].injured ? `부상 · ${s.agents[a.id].injured}일 휴식 필요` : `건강 · 피로 ${s.agents[a.id].fatigue}`}</span>${s.agents[a.id].injured ? `<button data-treat="${a.id}">치료 (예산 ${TREAT_COST})</button>` : ''}</div>`).join('')}<p class="hq-dim">피로는 연속 출동마다 쌓이고(시작 체력 -6%씩) 하루 쉬면 풀린다. 부상은 후송될 때 생긴다.</p><button data-rest="day"${s.active ? ' disabled' : ''}>하루 휴식 (치료비 없음)</button>`;
       case 'interview':
         return `${head}${s.rescued.length ? s.rescued.map((w) => `<div class="hq-slotrow"><b>${esc(SURVIVORS[w]?.name ?? w)}</b><button data-interview="${w}">${s.interviewed.includes(w) ? '다시 듣기' : '면담'}</button></div>`).join('') : '<p>아직 구조한 사람이 없어요.</p>'}`;
       case 'training':
@@ -427,6 +433,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
   };
 
   const onClick = (ev: Event) => {
+    if (!loaded || slotBusy) return;
     const t = (ev.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!t || t.disabled || !host) return;
     const d = t.dataset;
@@ -440,23 +447,36 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     if (d.relic !== undefined) return say(equipRelic(s, Number(d.slot), d.relic || null));
     if (d.coffee) return say(pickCoffee(s, s.coffee === d.coffee ? null : d.coffee));
     if (d.treat) return say(treat(s, d.treat as AgentId));
+    if (d.rest) return say(restDay(s));
     if (d.interview) return say(interview(s, d.interview));
     if (d.research) return say(doResearch(s, d.research));
     if (d.danger) return (setDanger(s, Number(d.danger)), say(`위험 단계 ${s.danger}`));
     if (d.saveslot) {
+      slotBusy = true;
       pickSlot = Number(d.saveslot);
-      void host.saves?.write(pickSlot, saveText(s), { ...saveTitle(s), schema: HQ_SCHEMA }).then(() => ((notice = `슬롯 ${pickSlot}에 저장했어요.`), refreshSlots()));
+      const savingSlot = pickSlot, mounting = mountId;
+      void host.saves?.write(savingSlot, saveText(s), { ...saveTitle(s), schema: HQ_SCHEMA }).then(() => {
+        if (mounting !== mountId) return;
+        notice = `슬롯 ${savingSlot}에 저장했어요.`;
+        void refreshSlots();
+      }).catch(() => mounting === mountId && say('저장하지 못했어요. 저장 장치를 확인한 뒤 다시 시도해 주세요.')).finally(() => { if (mounting === mountId) slotBusy = false; });
       return;
     }
     if (d.loadslot) {
-      void host.saves?.read(Number(d.loadslot)).then((txt) => {
+      slotBusy = true;
+      const mounting = mountId;
+      const loading = host.saves?.restore ? host.saves.restore(Number(d.loadslot)) : host.saves?.read(Number(d.loadslot));
+      void loading?.then((txt) => {
+        if (mounting !== mountId) return;
         const got = parseSave(txt);
         if (!got) return say('불러오지 못했어요 (모양이 다른 저장).');
         s = got;
-        overlay = null;
+        overlay = got.active ? 'menu' : null;
         panel = null;
-        say(`슬롯 ${d.loadslot}을(를) 불러왔어요.`);
-      });
+        selMission = null;
+        pending = null;
+        say(`슬롯 ${d.loadslot}을(를) 불러왔어요.${got.active ? ' 진행 중인 출동은 시작 화면의 이어하기로 복원하세요.' : ''}`);
+      }).catch(() => mounting === mountId && say('불러오지 못했어요. 현재 본부 기록은 유지합니다.')).finally(() => { if (mounting === mountId) slotBusy = false; });
       return;
     }
     switch (d.act) {
@@ -540,7 +560,11 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     get state() {
       return s;
     },
+    ready: () => ready,
     mount(r, h, opt) {
+      const mounting = ++mountId;
+      loaded = false;
+      slotBusy = false;
       root = r;
       host = h;
       walk = opt?.walk !== false;
@@ -564,15 +588,18 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
         window.addEventListener('blur', blur);
       }
       render();
-      void (async () => {
+      ready = (async () => {
         const got = parseSave(await h.load().catch(() => null));
+        if (mounting !== mountId) return;
         if (got) s = got;
-        // 출동 중에 앱을 닫았다면: 출동 기록이 없으니 후송 취급으로 정리한다 (아이템은 이미 출동으로 넘어갔다)
-        if (s.active) {
-          s.active = null;
-          notice = '지난 출동이 끝나지 않은 채 닫혔어요. 요원은 후송된 것으로 처리했어요.';
+        loaded = true;
+        // 복원 가능 여부는 저장 봉투를 소유한 엔진이 판단한다. 본부 로딩은 active를 소비하지 않는다.
+        if (s.active && !h.resuming?.()) {
+          notice = '진행 중인 출동이 있어요. 시작 화면에서 이어하기로 돌아가세요.';
         }
-        card = (await h.link?.card().catch(() => null)) ?? null;
+        const nextCard = (await h.link?.card().catch(() => null)) ?? null;
+        if (mounting !== mountId) return;
+        card = nextCard;
         render();
         wrap?.focus({ preventScroll: true });
       })();
@@ -586,6 +613,7 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     },
     places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s, p.id), opens: p.opens })),
     openPlace(id) {
+      if (!loaded) return;
       if (!placeOpen(s, id)) return;
       overlay = null;
       panel = id;
@@ -603,7 +631,10 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
     isOpen: () => (walk ? !!overlay : !!(overlay || panel)),
     close: () => (walk ? ((overlay = null), render()) : closeOne()),
     onReturn(result, l) {
-      const ls = settle(s, l, result, rand);
+      const previous = s.last;
+      settle(s, l, result, rand);
+      // 중복·불일치 결과로 정산 창을 새로 열거나 진행 중인 출동을 가리지 않는다.
+      if (s.last === previous) return;
       evacJust = result.how === 'evac';
       pending = null;
       overlay = 'settle';
@@ -615,11 +646,12 @@ ${can.ok ? '' : `<p class="hq-warn">${esc(can.why)}</p>`}</div>
       if (wrap) (wrap.hidden = false), wrap.focus({ preventScroll: true });
       void save();
       render();
-      void ls;
     },
     unmount() {
       cancelAnimationFrame(raf);
       void save();
+      loaded = false;
+      mountId++;
       window.removeEventListener('pointerup', onPointer);
       window.removeEventListener('pointercancel', onPointer);
       window.removeEventListener('keydown', onKey);

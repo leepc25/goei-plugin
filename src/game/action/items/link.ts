@@ -30,6 +30,7 @@ export function spawnEnemyDrops(field: Field, run: ItemRun, drops: EnemyDrop[], 
     ev.push({ t: 'drop', kind: k, ref, x, y });
   };
   for (const d of drops) {
+    if (!Number.isSafeInteger(d.n) || d.n <= 0) continue;
     switch (d.item) {
       case 'cash': {
         // 큰 값은 몇 덩이로
@@ -56,10 +57,10 @@ export function spawnEnemyDrops(field: Field, run: ItemRun, drops: EnemyDrop[], 
         for (let i = 0; i < d.n; i++) put('relic', COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
         break;
       case 'dream':
-        put('relic', 'dreamcatcher');
+        for (let i = 0; i < d.n; i++) put('relic', 'dreamcatcher');
         break;
       case 'key':
-        put('relic', 'rustkey');
+        for (let i = 0; i < d.n; i++) put('relic', 'rustkey');
         break;
     }
   }

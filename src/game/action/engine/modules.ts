@@ -4,12 +4,17 @@
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
+import { mountVisit } from '../../visit';
 import { createGameAudio } from '../audio';
+import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
+import { navigationFeedback } from './navigationFeedback';
+import { syncNavigationButton } from '../ui/navigationButton';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
-import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
+import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
+import { bindEnemyInteractions } from './enemyInteractions';
 import { createElevatorStage } from '../stage';
 import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
@@ -23,6 +28,7 @@ import { drawTitleBg, setHudItemIcon } from '../ui';
 import { SUPPLY_CATALOG, drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
+import { SessionStore } from './sessionStore';
 
 const local = (key: string) => ({
   load: () => {
@@ -48,7 +54,7 @@ const markSaved = () => local(SAVED_KEY).save('1');
 const hasSaved = () => local(SAVED_KEY).load() === '1';
 
 /** 본부 모듈을 엔진 모양으로 감싼다 */
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] } } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
@@ -67,6 +73,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     (place) => whereIs(place as never),
   );
   return {
+    ready: () => hq.ready(),
     hub: () => hub,
     state: () => hq.state,
     goto: (place: string) => hub.goto(place),
@@ -75,8 +82,9 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     mount(r, host) {
       root = r;
       hq.mount(r, {
-        deploy: (l) => host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
+        deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
         load: () => saves.read(slot as never),
+        resuming: ui.resuming,
         save: (d) => (markSaved(), saves.write(slot as never, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' })),
         saves,
         link: bridge?.card
@@ -97,7 +105,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     },
     onReturn(r, run) {
       const l = (run as Launch).launch;
-      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (l as { runId?: string }).runId } as RunResult, l);
+      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (r as unknown as RunResult).runId ?? l.runId } as RunResult, l);
     },
     unmount: () => hq.unmount(),
   };
@@ -108,6 +116,7 @@ function toHqResult(r: RunResultCore, w: World): RunResult {
   const n = r.notes as Partial<RunResult> & Record<string, unknown>;
   return {
     how: r.how,
+    runId: (w.run as Launch).launch?.runId,
     missionDone: (n.missionDone as boolean | undefined) ?? r.how === 'return',
     depth: (n.depth as number | undefined) ?? Math.max(1, w.floor?.depth ?? r.floors),
     floors: r.floors,
@@ -152,6 +161,8 @@ function hudState(w: World, shell: Shell): HudState {
     // 가드 게이지는 가드 중이거나 닳았을 때만
     meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
     compact: shell.touchShown,
+    device: shell.touchShown ? 'touch' : shell.input.last,
+    navigation: navigationFeedback(w),
   };
 }
 
@@ -169,6 +180,8 @@ export interface Wiring {
 }
 
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
+  const rawSaves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
+  const session = new SessionStore(rawSaves, (bridge as { slot?: number })?.slot ?? 0, typeof localStorage === 'undefined' ? undefined : localStorage);
   setSupplyCatalog(SUPPLY_CATALOG as never);
   setHudItemIcon(drawItemIcon as never);
   setItemIconDrawer(drawItemIcon as never);
@@ -176,22 +189,37 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   let game: Game | null = null;
   const shell = mountGameShell(box, {
     synth: true,
-    title: '차원 승강기',
-    sub: 'ANOMALY SIMULATION · 관리국 액션',
-    onNew: () => {
+    title: bridge?.visit ? '본부 방문' : '차원 승강기',
+    sub: bridge?.visit ? '요원들을 만나고 본편 대화를 이어갑니다' : 'ANOMALY SIMULATION · 관리국 액션',
+    pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
+    onNew: async () => {
+      if (bridge?.visit) { game?.start_new(); return; }
+      await session.ready;
+      if (session.checkpoint) { await game?.resume(session.checkpoint); game?.endRun('withdraw'); return; }
       // 새 저장: 영상 깃발을 지운다 (저장마다 한 번)
       for (const k of Object.keys(story.flags)) if (k.startsWith('cut_') || k === 'told_rope') delete story.flags[k];
       saveFlags();
       game?.start_new();
     },
-    onContinue: () => game?.start_new(),
-    hasSave: hasSaved,
-    onRetreat: () => game?.endRun('withdraw'),
-    onTitle: () => game?.toTitle(),
+    onContinue: async () => {
+      if (bridge?.visit) { game?.start_new(); return; }
+      await session.ready;
+      try {
+        if (session.checkpoint) await game?.resume(session.checkpoint);
+        else game?.start_new();
+      } catch {
+        // 원본은 남긴다. 저장 오류를 새 출동으로 조용히 덮어쓰지 않는다.
+        void shell.choose({ title: '출동 복원 실패', lines: ['저장 기록을 읽지 못했습니다. 원본 기록은 보존했습니다.'], options: ['닫기'] });
+      }
+    },
+    hasSave: () => session.hasSave || hasSaved(),
+    onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
+    onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
   });
   const stageStore = {
     load: () => {
+      if (session.meta) return session.meta as never;
       try {
         const t = localStorage.getItem('goei-game-stage');
         return t ? JSON.parse(t) : null;
@@ -200,6 +228,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
     save: (m: unknown) => {
+      session.setMeta(m);
       try {
         localStorage.setItem('goei-game-stage', JSON.stringify(m));
       } catch {
@@ -208,7 +237,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   };
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
+  const visit = bridge?.visit ? mountVisit(shell.stage.ui, bridge.visit) : null;
   const npc = linkNpcTalk({
+    visit: visit ? name => void visit.open(name) : undefined,
     layer: shell.stage.ui,
     bridge,
     settings: () => shell.settings,
@@ -261,6 +292,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
+  const attachVideoAudio = (event: Event) => audio.attachMedia((event as CustomEvent<VideoTrack>).detail);
+  storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
   const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
@@ -362,7 +395,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', storyKeys, true);
-  const saves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
+  const saves: SaveSlots = {
+    ...session.hqSaves,
+    restore: async n => {
+      const hq = await session.hqSaves.restore!(n);
+      if (hq) elevator.reloadMeta();
+      return hq;
+    },
+  };
   // 엘리베이터 층 단추 (본부). 1~5 숫자키·Esc, 누르면 닫힌다
   let floorPick: ((i: number | null) => void) | null = null;
   const floorBox = document.createElement('div');
@@ -412,6 +452,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   let dinnerDue = false;
   const hq = hqAdapter(saves, bridge, {
+    resuming: () => !!session.checkpoint,
     chooseFloor,
     sfx: (n) => audio.play(n as never),
     closed: () => {
@@ -425,9 +466,22 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.preventDefault();
     e.stopImmediatePropagation();
   };
+  const saveOnHide = () => { game?.checkpoint(); void session.flush(); };
+  window.addEventListener('pagehide', saveOnHide);
+  document.addEventListener('visibilitychange', saveOnHide);
   window.addEventListener('keydown', hqKeys, true);
   // 오락실 오프닝: 제목 화면에서 20초 가만히 있으면 opening 영상, 끝나면 다시 기다린다. 아무 입력이나 대기 시간을 처음부터
   let openingT: ReturnType<typeof setTimeout> | null = null;
+  const cancelStoryForScene = () => {
+    if (openingT) clearTimeout(openingT);
+    openingT = null;
+    story.cancel();
+    openingOn = false;
+    const menuEl = shell.stage.root.querySelector<HTMLElement>('.gs-ui');
+    if (menuEl) menuEl.style.visibility = '';
+    storyRoot.style.zIndex = '15';
+    storyRoot.style.visibility = shell.paused ? 'hidden' : '';
+  };
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
@@ -475,21 +529,28 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   ];
   const mods: EngineModules = {
+    saveCheckpoint: v => { markSaved(); session.setCheckpoint(v); },
     stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
     openTitle: () => {
+      cancelStoryForScene();
+      world = null; // 지난 본부 영상 예약도 다음 화면을 가리지 않게 한다.
+      mapOpen = false;
       shell.openTitle();
       armOpening();
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
       syncVolume();
+      audio.setPaused(shell.paused && !openingOn);
+      audio.setCutscene(story.isVideoPlaying());
       story.update(dt);
       shell.frame(dt);
       shell.input.endFrame();
@@ -505,15 +566,20 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
+      if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
+      if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
       if (shell.paused) mapOpen = false;
       if (!game?.inHub && w.stage === elevator) {
         const m = elevator.mapView();
         const t = performance.now() / 1000;
-        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t);
-        else if (m) drawMiniMap(ctx, m, w.player.x, t);
+        // 폰처럼 화면이 작게 줄면 지도 글자·표식을 그만큼 키운다
+        const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
+        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
+        else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
       } else mapOpen = false;
+      syncNavigationButton(shell.canvas, hs.navigation);
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -524,13 +590,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (name === 'hq') shell.play(); // 본부도 걷는 장면: 타이틀 메뉴 닫고 조작·터치 켜기
     },
     onPause: (p) => {
-      if (p) audio.pause();
-      else audio.resume();
       // 메뉴가 열리면 말풍선·GO 표시를 숨긴다
       storyRoot.style.visibility = p ? 'hidden' : '';
       if (world) world.paused = p;
     },
     onWorld: (w, run) => {
+      cancelStoryForScene();
       world = w;
       runAgent = run.agent as AgentId;
       // 첫 출동: 도트 영상 first_entry, 끝나면 로프 안내 자막 한 줄 (영상을 못 틀면 자막만)
@@ -540,10 +605,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         if (!cutOnce('first_entry', () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
       }
       // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
-      if (run.stageId === 'hq') setTimeout(() => world === w && cutOnce('first_day'), 600);
+      // The rebuilt starting room is shown immediately. The old full-frame first_day
+      // film is retired until its replacement uses the new room and layered staging.
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
-      w.notes.runId = `${run.seed}`;
+      w.notes.runId = (run as Launch).launch?.runId;
       // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
       w.on((e) => {
         if (e.type === 'hp:low') w.notes.bigHit = true;
@@ -552,21 +618,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const bossesDown = new Set<number>();
       w.hooks.push(() => {
         for (const bd of w.bodies) {
-          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || (bd.alive && bd.hp > 0)) continue;
+          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
           bossesDown.add(bd.id);
           ((w.notes.bosses ??= []) as string[]).push(bd.kind);
         }
       });
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
-      w.interactHooks.push((prop) => {
-        const p = w.player;
-        const at = { x: p.x, y: p.y };
-        signalEnemies(w as never, { kind: 'greet', ...at } as never);
-        signalEnemies(w as never, { kind: 'door', ...at } as never);
-        if (prop?.kind === 'crevice') signalEnemies(w as never, { kind: 'plug', x: prop.x } as never);
-        if (prop?.kind === 'bowl') signalEnemies(w as never, { kind: 'bowl', x: prop.x, y: prop.y } as never);
-        if (prop?.kind === 'table' || prop?.kind === 'meal') signalEnemies(w as never, { kind: 'mealThanks', ...at } as never);
-      });
+      bindEnemyInteractions(w);
       w.on((e) => {
         if (e.type !== 'custom') return;
         const d = (e.data ?? {}) as { dmg?: number; text?: string };
@@ -591,8 +649,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
     },
-    boot: (g) => bootFromUrl(g),
+    boot: (g) => { void session.ready.then(() => { elevator.reloadMeta(); if (bridge?.visit) g.start_new(); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
+      window.removeEventListener('pagehide', saveOnHide);
+      document.removeEventListener('visibilitychange', saveOnHide);
       npc.dispose();
       unmountItems();
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
@@ -609,8 +669,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('keydown', hqKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
+      storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
       story.dispose();
       setLineProvider(null);
+      visit?.dispose();
       audio.dispose();
       shell.dispose();
     },

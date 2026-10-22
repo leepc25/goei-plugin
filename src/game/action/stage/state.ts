@@ -3,7 +3,7 @@ import { B12 } from './data/floortypes';
 import { RESHUFFLE_POOL, RULE, VARIANT_POOL, ruleText } from './data/rules';
 import { clampFavor } from './elevator';
 import { mix, rng, shuffle } from './rng';
-import type { Floor, FloorType, ServiceZone } from './types';
+import type { Dir, Floor, FloorType, ServiceZone } from './types';
 
 export const META_VERSION = 1;
 export interface StageMeta {
@@ -58,7 +58,7 @@ export function reshuffle(m: StageMeta): string[] {
 
 export type Where = 'floor' | 'car' | 'service' | 'ending' | 'side';
 export type Target =
-  | { to: 'floor'; depth: number; type: FloorType; sub: Floor['sub']; startX?: number }
+  | { to: 'floor'; depth: number; type: FloorType; sub: Floor['sub']; startX?: number; room?: [number, number]; from?: Dir }
   | { to: 'car' }
   | { to: 'service'; col: number; row: number; fromX?: number; side?: 'l' | 'r' | 'u' | 'd' | 'down' }
   | { to: 'side'; depth: number; door: string; secret: boolean; label: string }
@@ -128,6 +128,22 @@ export interface Outing {
   upgradeN: number;
   /** 싸움 이긴 수 (세 판마다 강화) */
   fightsWon: number;
+  // ── 층 = 방 격자 세상 (gen/world.ts)
+  /** 지금 방 [col,row] */
+  room: [number, number];
+  /** 주운 열쇠 "깊이:번호" */
+  wkeys: string[];
+  /** 연 잠금·부순 벽 (gen/world edgeId) */
+  unlocked: string[];
+  broken: string[];
+  /** 깊이별 가 본 방 "col,row" */
+  seenRooms: Record<number, string[]>;
+  /** 보상을 받은 방 "깊이:col,row" */
+  rewards: string[];
+  /** 정비 구역에 들어간 방 (올라올 자리) */
+  hatchRoom: Record<number, [number, number]>;
+  /** 모든 방을 정리한 깊이 (승강기 패널이 켜진다) */
+  clearedFloors: number[];
 }
 
 export function newOuting(meta: StageMeta, o: { seed: number; agent: string; danger?: number }): Outing {
@@ -180,6 +196,14 @@ export function newOuting(meta: StageMeta, o: { seed: number; agent: string; dan
     upgrades: [],
     upgradeN: 0,
     fightsWon: 0,
+    room: [0, 0],
+    wkeys: [],
+    unlocked: [],
+    broken: [],
+    seenRooms: {},
+    rewards: [],
+    hatchRoom: {},
+    clearedFloors: [],
   };
 }
 

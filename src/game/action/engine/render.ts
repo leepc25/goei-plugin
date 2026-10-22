@@ -1,7 +1,6 @@
 // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
 import { pfont } from './pxfont';
 import { drawPropArt } from '../art/bg';
-import { drawHintIcon } from './hint';
 import { drawGoSign } from '../ui/title';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
 import type { Art } from './art';
@@ -82,13 +81,6 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.font = pfont(22).f;
       ctx.fillText('출구', ex + 22, wallTop + 110);
     }
-  }
-
-  /** world.interact와 같은 거리(가로 60) */
-  function near(w: World, p: { x: number }) {
-    // 층에 막 들어와 시작 자리에 서 있는 동안은 띄우지 않는다 (걸어서 다가갔을 때만)
-    if (Math.abs(w.player.x - w.floor.startX) < 4) return false;
-    return Math.abs(w.player.x - p.x) < 60;
   }
 
   function drawProps(w: World, camX: number, list: readonly World['props'][number][] = w.props) {
@@ -414,7 +406,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     draw(w: World, alpha: number) {
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
-      const camX = Math.round(w.camX);
+      const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
@@ -491,7 +483,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 요원이 앞쪽 물건에 가려지면 윤곽을 비쳐 보인다 (완전히 사라지지 않게, 검수 8)
       {
         const pl = w.player;
-        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind)) || layers.some((l) => l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
+        if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !['hubdoor', 'hubspot', 'door', 'elevator', 'hatch'].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
           const q = pos(pl);
           ctx.save();
           ctx.globalAlpha = 0.4;
@@ -501,11 +493,9 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
           ctx.restore();
         }
       }
-      // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
-      // 싸움 중(가까이 적이 있을 때)엔 띄우지 않는다: 피해 숫자·말풍선과 겹친다 (검수 12-5)
-      const fighting = w.bodies.some((b) => b.alive && b.team !== 'player' && b.kind !== 'bullet' && b.kind !== 'item' && Math.abs(b.x - w.player.x) < 520);
-      w.hintShown = !fighting && w.props.some((p) => p.label && near(w, p));
-      if (w.hintShown) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
+      // 실제 조사 대상의 표식. 전투 중에도 잠김 이유는 HUD에서 읽을 수 있다.
+      // 표식은 HUD 안내 띠 안에서 그린다. 머리 위 표식과 안내 띠가 겹치지 않게 한다.
+      w.hintShown = false;
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();

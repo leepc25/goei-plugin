@@ -2,6 +2,7 @@
 // 근접 3연타(잽·스트레이트·강한 스트레이트), 달리며 A 돌진, 공중 A 점프 킥, 앉아 A 하단, S 권총, D 폭파, Q 가드, Shift 회피·달리기, G 환경 무기.
 import type { Body, Hit, HitResult, PlayerState, WBox, WorldView } from '../types';
 import { overlap } from '../geom';
+import { newBodyId, newAttackId } from '../../engine/ids';
 
 export interface Keys {
   left: boolean;
@@ -43,9 +44,8 @@ const MOVES: Record<string, PMove> = {
   env: { id: 'env', start: 10, active: 4, recover: 16, box: [20, 150, 40, 170], dmg: 20, react: 'down', push: 14, armorBreak: true, strength: 3 },
 };
 
-let ids = 1;
 export class ArenaPlayer implements Body, PlayerState {
-  readonly id = 0;
+  readonly id = newBodyId();
   readonly team = 'player' as const;
   readonly kind = 'agent';
   label = '시험 요원';
@@ -176,7 +176,7 @@ export class ArenaPlayer implements Body, PlayerState {
   begin(id: string) {
     this.move = MOVES[id];
     this.mt = 0;
-    this.atk = 5_000_000 + ids++ * 4;
+    this.atk = newAttackId();
     this.buffered = false;
     this.state = id;
     if (id === 'blast') this.noise = 1;
@@ -273,7 +273,7 @@ function box(p: { x: number; y: number; z: number; dir: number }, a: number, b: 
 
 /** 요원 총알 */
 export class Bullet implements Body {
-  readonly id = 800000 + ids++;
+  readonly id = newBodyId();
   readonly team = 'player' as const;
   readonly kind = 'bullet';
   z = 128;
@@ -282,7 +282,7 @@ export class Bullet implements Body {
   alive = true;
   stop = 0;
   t = 0;
-  atk = 6_000_000 + ids++;
+  atk = newAttackId();
   hitOnce = false;
   constructor(
     public x: number,

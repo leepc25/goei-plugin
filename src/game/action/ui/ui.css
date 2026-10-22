@@ -15,6 +15,8 @@
 .gs-ui { position: absolute; inset: 0; pointer-events: none; }
 .gs-ui.menu-on { pointer-events: auto; }
 .gs-touch { position: absolute; inset: 0; pointer-events: none; }
+.gs.exploration-map .tp-b:not([data-id="map"]):not([data-id="menu"]),
+.gs.exploration-map .tp-zone { visibility: hidden; }
 
 /* 세로 화면 안내 */
 .gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }

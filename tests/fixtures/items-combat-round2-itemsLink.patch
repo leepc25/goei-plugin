@@ -1,0 +1,70 @@
+--- a/src/game/action/engine/itemsLink.ts
++++ b/src/game/action/engine/itemsLink.ts
+@@ -11,6 +11,9 @@
+   createItemRun,
+   addItem,
+   addRelic,
++  itemHit,
++  pickupHealAmount,
++  slowAt,
+   drawItemIcon,
+   dropFromKill,
+   spawnEnemyDrops,
+@@ -35,6 +38,7 @@
+ /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
+ const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
+ import { Fighter } from './fighter';
++import { Enemy } from '../enemy';
+ import { PROP_DEPTH, blockByProps, clearSpot, furnishAvoid, nudgeProp } from './propBlock';
+ import type { World } from './world';
+
+@@ -170,10 +174,26 @@
+       if (e.t === 'hit') {
+         const b = w.bodies.find((x) => x.id === e.target);
+         if (!b) continue;
+-        if (e.status === 'stun' && b instanceof Fighter && b.phase === 'free') {
+-          b.enter('hurt', Math.round((e.stun ?? 2) * TICK_HZ));
+-          w.fx('ring', b.x, b.y, 100, '2');
+-        } else if (e.damage > 0) b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage, react: e.knockdown ? 'down' : 'stagger', dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
++        if (e.damage > 0) {
++          const result = b.applyHit(itemHit(e, p.x), w);
++          if (result.killed) {
++            w.kills++;
++            if (!(b instanceof Fighter)) w.emit({ type: 'enemyDie', kind: b.kind, x: b.x });
++          }
++        }
++        if (e.status === 'stun' && b.alive && b.hp > 0) {
++          const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
++          if (b instanceof Enemy && b.inv <= 0 && ['idle', 'walk', 'attack', 'hurt', 'stunned', 'grabbing'].includes(b.state)) {
++            if (b.state === 'grabbing') b.releaseGrab(w);
++            b.move = null; b.vx = b.vy = 0;
++            b.set('stunned'); b.stunT = ticks;
++            w.fx('ring', b.x, b.y, 100, '2');
++          } else if (b instanceof Fighter && b.invuln <= 0 && ['free', 'act', 'hurt'].includes(b.phase)) {
++            b.vx = b.vy = 0;
++            b.enter('hurt', ticks);
++            w.fx('ring', b.x, b.y, 100, '2');
++          }
++        }
+       } else if (e.t === 'use') {
+         const f = e.effect;
+         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
+@@ -182,7 +202,7 @@
+         else if (f.type === 'energy') p.skillCd = 0;
+         else if (f.type === 'ward') p.ward += f.hits;
+       } else if (e.t === 'pickup' && e.kind === 'heal') {
+-        p.hp = Math.min(p.hpMax, p.hp + p.hpMax * 0.08);
++        p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));
+       }
+     }
+     for (const g of toGameEvents(evs, p.x, p.ammo)) w.emit(g as never);
+@@ -374,6 +394,9 @@
+       const hits = p.frame().hit;
+       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
+       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
++      // 적 모듈의 기존 40% 둔화 상태를 연막 영역과 연결한다.
++      for (const b of w.bodies)
++        if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
+       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
+       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
+       const solids = ents.map((e) => itemSolid(e as { x: number; y: number; prop: string }));

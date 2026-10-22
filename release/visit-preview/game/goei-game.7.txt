@@ -1,0 +1,3925 @@
+, passenger: false, need: [], chunks: 2, name: "" });
+    const at2 = (c2, rw) => rooms3[rw * cols + c2];
+    const link = (a, d3) => {
+      const [dx, dy] = STEP2[d3];
+      const b = at2(a.col + dx, a.row + dy);
+      a.open[d3] = true;
+      b.open[OPP[d3]] = true;
+      return b;
+    };
+    const path = [];
+    let c = Math.floor(r() * cols);
+    let row = 0;
+    path.push(at2(c, 0));
+    for (; ; ) {
+      const last = row === rows - 1;
+      let dir = r() < 0.5 ? -1 : 1;
+      if ((dir > 0 ? cols - 1 - c : c) === 0) dir = -dir;
+      const left = dir > 0 ? cols - 1 - c : c;
+      const steps = Math.min(left, last ? Math.max(1, Math.ceil(r() * left)) : Math.floor(r() * (left + 1)));
+      for (let k = 0; k < steps; k++) {
+        path.push(link(path[path.length - 1], dir > 0 ? "r" : "l"));
+        c += dir;
+      }
+      if (last) break;
+      path.push(link(path[path.length - 1], "d"));
+      row++;
+    }
+    for (const p of path) p.onPath = true;
+    const arrival = path[0];
+    const exit = path[path.length - 1];
+    const locks = noLocks ? 0 : Math.min(lockCount(depth, type), Math.max(0, Math.floor((path.length - 2) / 2)));
+    const lockAt = [];
+    for (let k = 1; k <= locks; k++) {
+      const lo = Math.max(2, Math.floor(path.length * (k + 0.3) / (locks + 1.3)));
+      const i = Math.min(path.length - 1, lo + Math.floor(r() * 2));
+      if (!lockAt.includes(i) && i > (lockAt[lockAt.length - 1] ?? 1)) lockAt.push(i);
+    }
+    lockAt.forEach((i, k) => {
+      const a = path[i - 1], b = path[i];
+      const d3 = DIRS.find((d4) => a.col + STEP2[d4][0] === b.col && a.row + STEP2[d4][1] === b.row);
+      a.lock[d3] = k + 1;
+      b.lock[OPP[d3]] = k + 1;
+    });
+    let reg = 0;
+    path.forEach((p, i) => {
+      if (lockAt.includes(i)) reg++;
+      p.region = reg;
+    });
+    const inTree = new Set(path.map((p) => key(p.col, p.row)));
+    const grow = [...path];
+    while (inTree.size < rooms3.length) {
+      const from = r() < 0.3 ? grow[grow.length - 1] : grow[Math.floor(r() * grow.length)];
+      const ds = shuffle2(r, [...DIRS]).filter((d3) => {
+        const [dx, dy] = STEP2[d3];
+        const nc = from.col + dx, nr = from.row + dy;
+        return nc >= 0 && nr >= 0 && nc < cols && nr < rows && !inTree.has(key(nc, nr));
+      });
+      if (!ds.length) {
+        grow.splice(grow.indexOf(from), 1);
+        if (!grow.length) break;
+        continue;
+      }
+      const b = link(from, ds[0]);
+      b.region = from.region;
+      inTree.add(key(b.col, b.row));
+      grow.push(b);
+    }
+    const dist = /* @__PURE__ */ new Map([[key(arrival.col, arrival.row), 0]]);
+    const q = [arrival];
+    while (q.length) {
+      const a = q.shift();
+      for (const d3 of DIRS) {
+        if (!a.open[d3]) continue;
+        const [dx, dy] = STEP2[d3];
+        const b = at2(a.col + dx, a.row + dy);
+        if (dist.has(key(b.col, b.row))) continue;
+        dist.set(key(b.col, b.row), dist.get(key(a.col, a.row)) + 1);
+        q.push(b);
+      }
+    }
+    for (const rm of rooms3) rm.dist = dist.get(key(rm.col, rm.row)) ?? 0;
+    const deg = (rm) => DIRS.filter((d3) => rm.open[d3]).length;
+    const leaves = () => rooms3.filter((rm) => deg(rm) === 1 && rm !== arrival && rm !== exit && !rm.onPath);
+    for (let k = 1; k <= lockAt.length; k++) {
+      const cand = (regs) => rooms3.filter((rm) => regs.includes(rm.region) && rm.key === null && rm !== arrival && rm !== exit);
+      let pool = cand([k - 1]).filter((rm) => deg(rm) === 1 && !rm.onPath);
+      if (!pool.length) pool = cand([k - 1]).filter((rm) => !rm.onPath);
+      if (!pool.length) pool = cand(Array.from({ length: k }, (_, i) => i)).filter((rm) => !rm.onPath);
+      if (!pool.length) pool = cand(Array.from({ length: k }, (_, i) => i));
+      if (!pool.length) pool = [arrival];
+      pool.sort((a, b) => b.dist - a.dist);
+      const at0 = pool[Math.floor(r() * Math.min(2, pool.length))];
+      at0.key = k;
+      at0.role = "key";
+    }
+    const loops = Math.round(rooms3.length / 8);
+    for (let n = 0, tries = 0; n < loops && tries < 200; tries++) {
+      const a = rooms3[Math.floor(r() * rooms3.length)];
+      const d3 = pick3(r, DIRS);
+      const [dx, dy] = STEP2[d3];
+      const nc = a.col + dx, nr = a.row + dy;
+      if (nc < 0 || nr < 0 || nc >= cols || nr >= rows || a.open[d3]) continue;
+      const b = at2(nc, nr);
+      if (b.region !== a.region || a === exit || b === exit || deg(a) === 1 || deg(b) === 1) continue;
+      link(a, d3);
+      n++;
+    }
+    if (depth >= 2 && r() < 0.75) {
+      for (const s2 of shuffle2(r, leaves().filter((rm) => rm.key === null))) {
+        const d3 = DIRS.find((d4) => s2.open[d4]);
+        const [dx, dy] = STEP2[d3];
+        const outer = at2(s2.col + dx, s2.row + dy);
+        const od = OPP[d3];
+        if (od === "u") continue;
+        outer.hidden[od] = od === "d" ? "vent" : "crack";
+        s2.role = "secret";
+        break;
+      }
+    }
+    if (type === "deep" || depth >= 12) {
+      for (let rw = 0; rw < rows; rw++) {
+        const a = at2(cols - 1, rw), b = at2(0, rw);
+        if (a.region !== b.region || a === exit || b === exit || a.open.r) continue;
+        if (r() < (type === "deep" ? 1 : 0.5)) a.open.r = b.open.l = true, a.wrap.r = b.wrap.l = true;
+      }
+    }
+    arrival.role = "arrival";
+    exit.role = "exit";
+    exit.panel = true;
+    const gp = type === "deep" ? 1 : depth === 3 ? 1 : depth < 3 ? 0 : Math.min(1, 0.35 + (depth - 4) * 0.05);
+    exit.guardian = r() < gp;
+    let rewards = 0;
+    for (const rm of shuffle2(r, leaves())) {
+      if (rm.role !== "branch") continue;
+      if (rewards < 2 + Math.floor(depth / 6)) rm.role = "reward", rewards++;
+    }
+    for (const rm of path.slice(1, -1)) rm.role = rm.key !== null ? "key" : pick3(r, ["fight", "fight", "trap", "path"]);
+    if (depth >= 4) {
+      const extra = rooms3.filter((rm) => rm.region === lockAt.length && rm.role === "branch" && deg(rm) === 1);
+      if (extra.length && r() < 0.5) extra[Math.floor(r() * extra.length)].panel = true;
+    }
+    const need = [];
+    if (type === "puzzle") need.push("p_fork", "p_switch");
+    if (type === "replica" && (ctx.sub ?? "pretending") === "pretending") need.push(r() < 0.5 ? "r_living" : "r_kitchen");
+    if (type === "replica" && ctx.sub === "vacant") need.push("r_storage");
+    if (type === "chase") need.push("h_doors");
+    if (type === "trial") arrival.need.push("t_marks");
+    const devRooms = shuffle2(r, path.slice(1, -1).filter((rm) => rm.key === null));
+    need.forEach((id, i) => {
+      const rm = devRooms[i] ?? arrival;
+      rm.need.push(id);
+      if (rm !== arrival) rm.role = "device";
+    });
+    if (depth >= 2 && type !== "deep" && r() < 0.5) {
+      const c2 = rooms3.filter((rm) => rm !== arrival && rm.role !== "secret");
+      c2[Math.floor(r() * c2.length)].passenger = true;
+    }
+    for (const rm of rooms3) {
+      rm.chunks = rm.role === "arrival" ? type === "trial" ? 3 : 2 : rm.role === "exit" ? 1 + Math.floor(r() * 2) : rm.role === "reward" || rm.role === "secret" || rm.role === "key" ? 2 : rm.role === "fight" ? 3 : rm.role === "device" ? Math.max(2, rm.need.length + 1) : 2 + Math.floor(r() * 2);
+      if (rm.open.u && rm.open.d) rm.chunks = Math.max(rm.chunks, 3);
+      if (type === "lobby" && depth === 1) rm.chunks = Math.min(rm.chunks, 3);
+    }
+    const names = ROOM_NAMES[type === "replica" ? `replica:${ctx.sub ?? "pretending"}` : type] ?? ROOM_NAMES.lobby;
+    const nameR = shuffle2(r, [...names]);
+    rooms3.forEach((rm, i) => {
+      rm.name = rm.role === "arrival" ? "엘리베이터 홀" : rm.role === "exit" ? "승강기 홀" : rm.role === "secret" ? "숨은 방" : nameR[i % nameR.length];
+    });
+    const def = FLOOR_TYPES[type];
+    return {
+      depth,
+      type,
+      sub: ctx.sub,
+      seed: ctx.seed,
+      cols,
+      rows,
+      rooms: rooms3,
+      arrival: [arrival.col, arrival.row],
+      exit: [exit.col, exit.row],
+      locks: lockAt.length,
+      path: path.map((p) => [p.col, p.row]),
+      label: `${depthLabel(depth)} · ${def.label}${ctx.sub ? ` (${REPLICA_SUB_LABEL[ctx.sub]})` : ""}`
+    };
+  }
+  var roomAt = (w, c, r) => c >= 0 && r >= 0 && c < w.cols && r < w.rows ? w.rooms[r * w.cols + c] : void 0;
+  function across(w, rm, d3) {
+    if (rm.wrap[d3]) return roomAt(w, d3 === "r" ? 0 : w.cols - 1, rm.row);
+    const [dx, dy] = STEP2[d3];
+    return roomAt(w, rm.col + dx, rm.row + dy);
+  }
+  function edgeId(w, rm, d3) {
+    const b = across(w, rm, d3);
+    const a1 = `${rm.col},${rm.row},${d3}`, a2 = `${b.col},${b.row},${OPP[d3]}`;
+    return `${w.depth}:${a1 < a2 ? a1 : a2}`;
+  }
+  function validateWorld(w) {
+    const bad = [];
+    const keys2 = /* @__PURE__ */ new Set();
+    let seen2 = /* @__PURE__ */ new Set();
+    for (let round = 0; round <= w.locks + 1; round++) {
+      seen2 = /* @__PURE__ */ new Set([key(...w.arrival)]);
+      const q = [roomAt(w, ...w.arrival)];
+      while (q.length) {
+        const a = q.shift();
+        if (a.key !== null) keys2.add(a.key);
+        for (const d3 of DIRS) {
+          if (!a.open[d3]) continue;
+          const l = a.lock[d3];
+          if (l && !keys2.has(l)) continue;
+          const b = across(w, a, d3);
+          if (!b || seen2.has(key(b.col, b.row))) continue;
+          if (a.hidden[d3]) continue;
+          seen2.add(key(b.col, b.row));
+          q.push(b);
+        }
+      }
+    }
+    if (!seen2.has(key(...w.exit))) bad.push("출구에 못 닿음");
+    for (const rm of w.rooms) if (rm.role !== "secret" && !seen2.has(key(rm.col, rm.row))) bad.push(`필수 방에 못 닿음: ${rm.col},${rm.row}`);
+    for (let k = 1; k <= w.locks; k++) if (!keys2.has(k)) bad.push(`열쇠 ${k} 못 주움`);
+    if (w.rooms.some((rm) => rm.key !== null && rm.role === "secret")) bad.push("열쇠가 숨은 방에");
+    if (w.locks) {
+      const s2 = /* @__PURE__ */ new Set([key(...w.arrival)]);
+      const q = [roomAt(w, ...w.arrival)];
+      while (q.length) {
+        const a = q.shift();
+        for (const d3 of DIRS) {
+          if (!a.open[d3] || a.lock[d3] || a.hidden[d3]) continue;
+          const b = across(w, a, d3);
+          if (s2.has(key(b.col, b.row))) continue;
+          s2.add(key(b.col, b.row));
+          q.push(b);
+        }
+      }
+      if (s2.has(key(...w.exit))) bad.push("잠금을 돌아가는 길");
+    }
+    return bad;
+  }
+  var MID2 = LANE_DEPTH / 2;
+  var xid = 1e3;
+  var put = (f, kind, x, lane, w, label3, data = {}) => {
+    const p = { id: xid++, kind, x: Math.round(x), lane: Math.round(lane), w, label: label3, data };
+    f.placed.push(p);
+    return p;
+  };
+  var KEY_MARK = ["", "①", "②", "③", "④"];
+  function roomFloor(w, rm, g2) {
+    xid = 1e3;
+    const f = makeRoomFloor({
+      ...g2,
+      depth: w.depth,
+      type: w.type,
+      sub: w.sub,
+      exitOpen: rm.role === "exit" && g2.exitOpen,
+      room: {
+        col: rm.col,
+        row: rm.row,
+        name: rm.name,
+        chunks: rm.chunks,
+        need: rm.need,
+        arrival: rm.role === "arrival",
+        exit: rm.role === "exit",
+        guardian: rm.guardian,
+        passenger: rm.passenger,
+        rules: rm.role === "arrival" || rm.role === "device" || w.depth >= 4 && rm.dist === 1,
+        goal: rm.role === "arrival" && w.type === "trial",
+        enemies: !(rm.role === "arrival" && w.depth <= 1) && rm.role !== "secret",
+        index0: rm.dist
+      }
+    });
+    const r = rng(mix2(w.seed, w.depth, rm.col, rm.row, 777));
+    const W5 = f.width;
+    const terrainNear = (x) => f.segments.some((s2) => s2.terrain.some((t) => x > t.x0 - 110 && x < t.x1 + 110));
+    const decor = (p) => p.kind === "prop" && !Object.keys(p.data).length;
+    const free = (x, d3, soft = false) => x > 80 && x < W5 - 80 && !terrainNear(x) && !f.placed.some((p) => (!soft || !decor(p)) && Math.abs(p.x - x) < d3);
+    const spot = (want, d3, lo = 120, hi = W5 - 120) => {
+      const xs = [];
+      for (let k = 0; k < 200; k++) {
+        const x = want + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 20;
+        if (x >= lo && x <= hi) xs.push(x);
+      }
+      for (const soft of [false, true])
+        for (const x of xs)
+          if (free(x, d3, soft)) {
+            f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < d3));
+            return x;
+          }
+      const fallbackXs = Array.from({ length: Math.max(0, Math.floor(hi) - Math.ceil(lo) + 1) }, (_, i) => Math.ceil(lo) + i).sort((a, b) => Math.abs(a - want) - Math.abs(b - want) || a - b);
+      for (const gap of [d3, 80])
+        for (const x of fallbackXs)
+          if (!f.placed.some((p) => !decor(p) && Math.abs(p.x - x) < gap)) {
+            f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < gap));
+            for (const segment of f.segments) segment.terrain = segment.terrain.filter((t) => !(x > t.x0 - 110 && x < t.x1 + 110));
+            return x;
+          }
+      throw new Error(`장치 자리 없음: seed=${w.seed} depth=${w.depth} room=${rm.col},${rm.row} x=${want}`);
+    };
+    const nb = (d3) => across(w, rm, d3);
+    const label3 = (d3) => {
+      const b = nb(d3);
+      const arrow = { l: "←", r: "→", u: "↑", d: "↓" }[d3];
+      return d3 === "l" ? `${arrow} ${b.name}` : `${b.name} ${arrow}`;
+    };
+    for (const d3 of ["l", "r"]) {
+      if (!rm.open[d3]) continue;
+      const x = d3 === "l" ? 70 : W5 - 70;
+      const hidden = rm.hidden[d3];
+      if (hidden) {
+        put(f, "crack", d3 === "l" ? spot(240, 120, 120, W5 / 2) : spot(W5 - 240, 120, W5 / 2, W5 - 120), 0, 90, "금 간 벽", { dir: d3, hp: 3 });
+        continue;
+      }
+      f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < 140));
+      put(f, "wdoor", x, 0, 90, rm.wrap[d3] ? `${label3(d3)} (끝이 이어진다)` : label3(d3), { dir: d3 });
+      const l = rm.lock[d3];
+      if (l) put(f, "locked", d3 === "l" ? spot(190, 120, 150, 420) : spot(W5 - 190, 120, W5 - 420, W5 - 150), MID2, 40, `잠긴 방화셔터 ${KEY_MARK[l]}`, { dir: d3, lock: l });
+    }
+    for (const d3 of ["u", "d"]) {
+      if (!rm.open[d3]) continue;
+      const hidden = rm.hidden[d3];
+      const want = d3 === "u" ? W5 * 0.35 : W5 * 0.65;
+      const x = spot(want, 150, 260, W5 - 260);
+      if (hidden) {
+        put(f, "vent", x, MID2, 60, "막힌 덕트", { dir: d3 });
+        continue;
+      }
+      const l = rm.lock[d3];
+      const name = w.type === "deep" ? d3 === "u" ? "매달린 줄" : "무너진 바닥" : w.type === "replica" ? d3 === "u" ? "계단실 (위층)" : "계단실 (아래층)" : d3 === "u" ? "올라가는 계단" : "내려가는 계단";
+      put(f, d3 === "u" ? "wup" : "wdown", x, 0, 110, l ? `잠긴 ${name} ${KEY_MARK[l]}` : `${name} · ${nb(d3).name}`, { dir: d3, ...l ? { lock: l } : {} });
+    }
+    if (rm.key !== null) put(f, "key", spot(W5 * 0.6, 120), 80, 40, `열쇠 ${KEY_MARK[rm.key]}`, { key: rm.key });
+    if (rm.role === "reward" || rm.role === "secret") put(f, "reward", spot(W5 - 300, 120), 90, 60, rm.role === "secret" ? "숨겨 둔 배낭 (강화)" : "선배가 남긴 배낭 (강화)", {});
+    if (rm.role === "secret") {
+      put(f, "item", spot(W5 * 0.4, 100), 120, 28, "보급품", { item: pick3(r, ["heal", "guard", "light"]) });
+    }
+    if (rm.panel && rm.role !== "exit") {
+      const x = spot(W5 - 420, 200, 300, W5 - 200);
+      put(f, "elevator", x, 0, 160, "열린 엘리베이터");
+      put(f, "panel", spot(x + 170 < W5 - 80 ? x + 170 : x - 170, 120), 0, 80, "승강기 패널");
+    }
+    if (rm.role === "arrival" && w.type !== "deep" && !f.placed.some((p) => p.kind === "hatch" || p.kind === "servicedoor")) put(f, "servicedoor", spot(Math.min(W5 - 300, ROOM_W + 400), 140), 0, 70, "점검문");
+    const entries = [240, ...f.placed.filter((p) => p.data.dir && ["wdoor", "wup", "wdown", "crack", "vent"].includes(p.kind)).map((p) => p.x + (p.data.dir === "l" ? 120 : p.data.dir === "r" ? -120 : 70))];
+    for (const segment of f.segments) segment.terrain = segment.terrain.filter((t) => !entries.some((x) => x > t.x0 - 130 && x < t.x1 + 130));
+    const doors = f.placed.filter((p) => p.data.dir);
+    for (const p of f.placed) if (!p.data.dir && ["item", "symbol", "prop", "mark", "hatch", "servicedoor"].includes(p.kind) && doors.some((d3) => Math.abs(d3.x - p.x) < 120)) p.x = spot(W5 / 2, 120);
+    void CHUNK_W;
+    void B12;
+    return f;
+  }
+
+  // src/game/action/stage/gen/service.ts
+  var tid = 1;
+  var thing = (kind, x, lane, label3, data = {}) => ({ id: tid++, kind, x, lane, label: label3, data });
+  function makeService(ctx) {
+    tid = 1;
+    const fixed2 = rng(mix2(ctx.seed, ctx.depth, 6060));
+    const cols = 2;
+    const rows = ctx.depth <= 3 ? 2 : 3;
+    const entryCell = [Math.floor(fixed2() * cols), 0];
+    let atticCell = [Math.floor(fixed2() * cols), 1 + Math.floor(fixed2() * (rows - 1))];
+    if (atticCell[0] === entryCell[0] && atticCell[1] === 1 && rows > 2) atticCell = [atticCell[0], 2];
+    let downCell = [Math.floor(fixed2() * cols), rows - 1];
+    if (downCell[0] === atticCell[0] && downCell[1] === atticCell[1]) downCell = [(downCell[0] + 1) % cols, rows - 1];
+    const r = rng(mix2(ctx.seed, ctx.depth, ctx.reroll, 7070));
+    const idx = (c, rw) => rw * cols + c;
+    const cells = [];
+    for (let rw = 0; rw < rows; rw++)
+      for (let c = 0; c < cols; c++)
+        cells.push({ col: c, row: rw, kind: "plain", open: { u: false, r: false, d: false, l: false }, duct: { r: false, l: false }, width: ROOM_W, segments: [], things: [], label: "" });
+    const seen2 = /* @__PURE__ */ new Set([idx(...entryCell)]);
+    const stack = [entryCell];
+    const link = (a, b, duct2 = false) => {
+      const A = cells[idx(...a)], B2 = cells[idx(...b)];
+      if (b[0] > a[0]) A.open.r = B2.open.l = true, A.duct.r = B2.duct.l = duct2;
+      else if (b[0] < a[0]) A.open.l = B2.open.r = true, A.duct.l = B2.duct.r = duct2;
+      else if (b[1] > a[1]) A.open.d = B2.open.u = true;
+      else A.open.u = B2.open.d = true;
+    };
+    while (stack.length) {
+      const [c, rw] = stack[stack.length - 1];
+      const nb = shuffle2(r, [
+        [c + 1, rw],
+        [c - 1, rw],
+        [c, rw + 1],
+        [c, rw - 1]
+      ]).filter(([x, y]) => x >= 0 && y >= 0 && x < cols && y < rows && !seen2.has(idx(x, y)));
+      if (!nb.length) {
+        stack.pop();
+        continue;
+      }
+      const n = nb[0];
+      seen2.add(idx(...n));
+      link([c, rw], n, n[1] === rw && r() < 0.4);
+      stack.push(n);
+    }
+    for (let k = 0; k < 1 + Math.floor(r() * 2); k++) {
+      const c = Math.floor(r() * cols), rw = Math.floor(r() * rows);
+      if (c + 1 < cols && r() < 0.5) link([c, rw], [c + 1, rw], r() < 0.4);
+      else if (rw + 1 < rows) link([c, rw], [c, rw + 1]);
+    }
+    const shaftCands = cells.filter((x) => !(x.col === atticCell[0] && x.row === atticCell[1]) && !(x.col === downCell[0] && x.row === downCell[1]) && !(x.col === entryCell[0] && x.row === entryCell[1]));
+    const shaft = ctx.depth >= 4 && r() < 0.6 && shaftCands.length ? pick3(r, shaftCands) : null;
+    for (const cell of cells) {
+      const at2 = (a) => cell.col === a[0] && cell.row === a[1];
+      cell.kind = at2(atticCell) ? "attic" : at2(entryCell) ? "entry" : at2(downCell) ? "down" : cell === shaft ? "shaft" : pick3(r, ["duct", "support", "slope", "plain"]);
+      const terrain = [];
+      const segs = [];
+      if (cell.kind === "attic") {
+        segs.push({ ref: "room:attic", x: 0, w: ROOM_W, flip: false, terrain: [] });
+      } else {
+        for (let k = 0; k < 2; k++) {
+          const kindPool = cell.kind === "duct" ? ["v_duct", "v_duct2", "v_plain"] : cell.kind === "support" ? ["v_support", "v_plain"] : cell.kind === "slope" ? ["v_slope", "v_plain"] : cell.kind === "shaft" ? ["v_gapline", "v_plain"] : ["v_plain", "v_gapline", "v_support"];
+          const t = CHUNK_BY_ID[pick3(r, kindPool)] ?? SERVICE_CHUNKS[0];
+          const flip = r() < 0.5;
+          const tr = t.terrain.map((x) => flip ? flipTerrain(x) : x).map((x) => ({ ...x, x0: x.x0 + k * CHUNK_W, x1: x.x1 + k * CHUNK_W }));
+          segs.push({ ref: `chunk:${t.id}`, x: k * CHUNK_W, w: CHUNK_W, flip, terrain: tr });
+          terrain.push(...tr);
+          if (r() < 0.45) cell.things.push(thing("item", k * CHUNK_W + 200 + Math.floor(r() * 240), 40 + Math.floor(r() * 80), "버려진 보급품", { item: pick3(r, ["heal", "light", "ammo", "guard"]) }));
+        }
+      }
+      if (cell.duct.l) segs[0].terrain = segs[0].terrain.filter((t) => t.kind === "low" || t.x0 > 320), segs[0].terrain.push({ kind: "low", x0: 0, x1: 140 });
+      if (cell.duct.r) {
+        const sg = segs[segs.length - 1];
+        sg.terrain = sg.terrain.filter((t) => t.kind === "low" || t.x1 < ROOM_W - 320);
+        sg.terrain.push({ kind: "low", x0: ROOM_W - 140, x1: ROOM_W });
+      }
+      cell.segments = segs;
+      if (cell.open.l) cell.things.push(thing("left", 40, LANE_DEPTH / 2, cell.duct.l ? "← 덕트 (앉아서)" : "← 옆 칸"));
+      if (cell.open.r) cell.things.push(thing("right", ROOM_W - 40, LANE_DEPTH / 2, cell.duct.r ? "덕트 (앉아서) →" : "옆 칸 →"));
+      if (cell.open.u) cell.things.push(thing("ladder_up", 560, 0, "지지대 ↑"));
+      if (cell.open.d) cell.things.push(thing("ladder_down", 720, 0, "지지대 ↓"));
+      if (cell.kind === "entry") cell.things.push(thing("up", 400, 0, "해치 (위층으로)"));
+      if (cell.kind === "down") cell.things.push(thing("down", 880, 0, "아래 점검문 (다음 층)"));
+      if (cell.kind === "shaft") cell.things.push(thing("fall", 920, LANE_DEPTH, "승강로 틈새 (아래가 끝없이 보인다)"));
+      if (r() < 0.2 && cell.kind !== "attic") cell.things.push(thing("symbol", 1e3, 0, "벽 기호", { attic: `${atticCell[0]},${atticCell[1]}` }));
+      if (cell.kind === "attic") {
+        const ar = rng(mix2(ctx.seed, ctx.depth, 8080));
+        cell.things.push(thing("rope", 120, 0, "귀환 로프"));
+        cell.things.push(thing("bed", 300, 100, "낡은 매트 (휴식)"));
+        cell.things.push(thing("intercom", 480, 0, "인터폰 (송신·거래)"));
+        cell.things.push(thing("memo", 820, 0, "벽 메모: 「여기 오래 있지 마」", { rule: "attic", writer: ar() < 0.5 }));
+        cell.things.push(thing("map", 960, 0, "대충 그린 지도"));
+        if (ar() < 0.7) cell.things.push(thing("pack", 1080, 120, "버려진 배낭", { item: pick3(ar, ["heal", "heal", "light", "guard"]) }));
+        if (ar() < 0.5) cell.things.push(thing("gear", 660, 140, "용도 모를 장비"));
+        if (ar() < 0.5) cell.things.push(thing("checklist", 1180, 140, "서명란이 빈 점검표", { rule: "entry" }));
+        if (ar() < 0.3) cell.things.push(thing("merchant", 1180, 40, "중림 상인"));
+      }
+      const pits = cell.segments.flatMap((s2) => s2.terrain).filter((t) => t.kind === "pit" || t.kind === "block");
+      for (const t of cell.things) for (const p of pits) if (t.x > p.x0 - 50 && t.x < p.x1 + 50) t.x = p.x1 + 60 > ROOM_W - 80 ? p.x0 - 60 : p.x1 + 60;
+      const isWay = (t) => !["item", "symbol", "pack", "gear", "checklist", "merchant", "key"].includes(t.kind);
+      cell.things.sort((a, b) => Number(isWay(b)) - Number(isWay(a)));
+      const kept = [];
+      for (const t of cell.things) {
+        let tries = 0;
+        while (kept.some((k) => Math.abs(k.x - t.x) < 70) && tries++ < 12) {
+          if (!isWay(t)) break;
+          t.x += t.x > ROOM_W / 2 ? -75 : 75;
+        }
+        if (kept.some((k) => Math.abs(k.x - t.x) < 70)) continue;
+        kept.push(t);
+      }
+      cell.things = kept;
+      cell.label = labelOf(cell.kind);
+    }
+    const predatorAfter = ctx.flags.includes("attic_short") ? 60 : 90;
+    const dist = /* @__PURE__ */ new Map([[entryCell.join(","), 0]]);
+    const q = [entryCell];
+    while (q.length) {
+      const [c, rw] = q.shift();
+      const cell = cells[idx(c, rw)];
+      const d3 = dist.get(`${c},${rw}`);
+      for (const [k, dc, dr] of [["r", 1, 0], ["l", -1, 0], ["d", 0, 1], ["u", 0, -1]])
+        if (cell.open[k] && !dist.has(`${c + dc},${rw + dr}`)) dist.set(`${c + dc},${rw + dr}`, d3 + 1), q.push([c + dc, rw + dr]);
+    }
+    let keyCell = null;
+    if (ctx.key) {
+      const cands = cells.filter((c) => c.kind !== "attic" && c.kind !== "entry").sort((a, b) => (dist.get(`${b.col},${b.row}`) ?? 0) - (dist.get(`${a.col},${a.row}`) ?? 0) + (r() - 0.5) * 0.6);
+      const kc = cands[0];
+      if (kc) {
+        keyCell = [kc.col, kc.row];
+        const x = [300, 640, 980].find((x2) => !kc.things.some((t) => Math.abs(t.x - x2) < 80) && !kc.segments.flatMap((s2) => s2.terrain).some((t) => (t.kind === "pit" || t.kind === "block") && x2 > t.x0 - 60 && x2 < t.x1 + 60)) ?? 640;
+        kc.things.push(thing("key", x, 80, `정비 열쇠 (${ctx.depth <= 3 ? `L${ctx.depth}` : `B-${ctx.depth - 3}`} 방화셔터)`, { depth: ctx.depth }));
+      }
+    }
+    const fights = {};
+    const fr = rng(mix2(ctx.seed, ctx.depth, ctx.reroll, 9191));
+    const mobs = ctx.depth <= 3 ? ["lurker", "hollow"] : ["crawler", "charger", "shade", "lurker"];
+    for (const c of cells) {
+      if (c.kind === "attic" || c.kind === "entry") continue;
+      if (fr() < Math.min(0.75, 0.35 + ctx.depth * 0.04)) fights[`${c.col},${c.row}`] = Array.from({ length: 1 + Math.floor(fr() * (ctx.depth <= 3 ? 2 : 3)) }, () => pick3(fr, mobs));
+    }
+    return { depth: ctx.depth, seed: ctx.seed, reroll: ctx.reroll, cols, rows, cells, atticCell, entryCell, downCell, shaftCell: shaft ? [shaft.col, shaft.row] : null, predatorAfter, keyCell, fights };
+  }
+  function labelOf(k) {
+    return { entry: "해치 밑", duct: "덕트", support: "지지대 사이", slope: "기울어진 바닥", shaft: "승강로 틈새", attic: "선배들의 다락방", down: "아래 점검문 앞", plain: "배관 통로" }[k];
+  }
+  var cellAt = (z, col, row) => z.cells[row * z.cols + col];
+
+  // src/game/action/stage/gen/side.ts
+  var hashId = (s2) => [...s2].reduce((h, c) => h * 31 + c.charCodeAt(0) | 0, 7);
+  function makeSide(seed, f, door, secret, label3) {
+    const r = rng(mix2(seed, f.depth, hashId(door), secret ? 2 : 1, 6161));
+    const pool = FLOOR_TYPES[f.type].enemies.length ? FLOOR_TYPES[f.type].enemies : FLOOR_TYPES.lobby.enemies;
+    const n = secret ? r() < 0.35 ? 1 : 0 : f.depth <= 1 ? 1 + Math.floor(r() * 2) : 2 + Math.floor(r() * Math.min(3, 1 + f.depth / 3));
+    const fight = Array.from({ length: n }, () => pick3(r, pool).kind);
+    const loot = [{ kind: "chest", x: 1e3 }];
+    if (secret) loot.push({ kind: "gear", x: 720 }, { kind: "item", x: 560, item: pick3(r, ["heal", "guard", "light"]) });
+    else if (r() < 0.5) loot.push({ kind: "item", x: 620, item: pick3(r, ["heal", "ammo", "light"]) });
+    return { depth: f.depth, door, secret, label: secret ? `숨은 방` : label3, loot, fight, elite: secret || f.depth >= 6, palette: f.palette };
+  }
+
+  // src/game/action/stage/upgrades.ts
+  var UPGRADES = [
+    { id: "hp", set: "body", label: "단단한 몸", text: "최대 체력 +30, 바로 30 회복" },
+    { id: "blood", set: "body", label: "피의 맛", text: "적을 쓰러뜨릴 때마다 체력 +5" },
+    { id: "ward", set: "body", label: "부적 두 장", text: "다음 피격 두 번을 막는다" },
+    { id: "power", set: "fist", label: "무거운 주먹", text: "타격 피해 +20%" },
+    { id: "spirit", set: "fist", label: "기합", text: "때릴 때마다 필살 게이지가 더 찬다" },
+    { id: "rush", set: "fist", label: "몰아치기", text: "적을 쓰러뜨린 뒤 3초 동안 피해 +30%" },
+    { id: "quiet", set: "rule", label: "조용한 발", text: "내는 소리 절반 (침묵의 층)" },
+    { id: "battery", set: "rule", label: "여분 배터리", text: "빛이 사그라드는 속도 절반 (어둠의 층)" },
+    { id: "master", set: "rule", label: "만능 열쇠", text: "잠긴 방화셔터 하나를 열쇠 없이 연다" },
+    { id: "scout", set: "rule", label: "선배의 지도", text: "정비 구역 다락방·열쇠 자리가 지도에 보인다" },
+    { id: "rest", set: "rule", label: "깊은 잠", text: "다락방 매트에서 한 번 더 쉴 수 있다" }
+  ];
+  var UPGRADE_BY_ID = Object.fromEntries(UPGRADES.map((u) => [u.id, u]));
+  var SET_LABEL = { body: "몸", fist: "주먹", rule: "규칙" };
+  var SET_BONUS = { body: "계열 완성 · 몸: 최대 체력 +50", fist: "계열 완성 · 주먹: 피해 +15%", rule: "계열 완성 · 규칙: 승강기 총애 +1" };
+  function upgradeChoices(seed, n, taken) {
+    const pool = UPGRADES.filter((u) => !taken.includes(u.id));
+    return shuffle2(rng(mix2(seed, n, 4141)), [...pool]).slice(0, 3);
+  }
+  function setCounts(taken) {
+    const c = { body: 0, fist: 0, rule: 0 };
+    for (const id of taken) if (UPGRADE_BY_ID[id]) c[UPGRADE_BY_ID[id].set]++;
+    return c;
+  }
+  function powerOf(taken) {
+    return 1 + (taken.includes("power") ? 0.2 : 0) + (setCounts(taken).fist >= 3 ? 0.15 : 0);
+  }
+
+  // src/game/action/stage/passengers.ts
+  var PASSENGER_LABEL = {
+    three_years: "삼 년째 승객",
+    markers: "표시 체계 무리",
+    supply: "배낭 멘 승객",
+    nothuman: "승객 옷을 입은 것",
+    missing: "야근하다 들어온 회사원"
+  };
+  function defaultTalk(kind, long, hasFork) {
+    const story = long ? ["나 여기 삼 년째야. 처음엔 회사 엘리베이터였지. 야근하고, 1층 누르고, 띵. 그 뒤로 별걸 다 봤어. 아내 얼굴이 기억이 안 나. 아니, 기억은 나는데…", "그러니까 내 말 들어."] : ["나 여기 오래 있었어. 내 말 들어."];
+    switch (kind) {
+      case "three_years":
+        return [...story, hasFork ? "저쪽 문 말고 이쪽." : "다음 버튼은… 내가 알아."];
+      case "markers":
+        return ["벽에 동그라미 있지? 동그라미 안에 줄 하나면 위험, 비어 있으면 쉼터야.", "우리끼리 남기는 표시야. 너도 남겨."];
+      case "supply":
+        return long ? ["배낭 무겁지? 나도 그랬어. 다락방에 숨겨 둔 게 있는데, 같이 가면 나눠 줄게. 정말이야, 나 혼자 다 못 먹어."] : ["다락방 오른쪽 구석에 하나 숨겨 놨어."];
+      case "nothuman":
+        return ["…………", "(얼굴을 보려 하면 고개가 같이 돈다)"];
+      case "missing":
+        return ["저… 관리국이세요? 야근하다가 1층을 눌렀는데요…", "같이 나가게 해 주세요. 부탁이에요."];
+    }
+  }
+  var CHOICE_LABEL = { help: "돕는다 (E)", ignore: "무시한다 (E)", rob: "뺏는다 (E)" };
+
+  // src/game/action/stage/plan.ts
+  function narrowBack(t, terr = []) {
+    if (t.kind !== "narrow" || t.lane0 <= 0) return null;
+    const H7 = 126;
+    const xs = [];
+    for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
+    if (!xs.length) xs.push((t.x0 + t.x1) / 2);
+    let a = xs[0] - H7, b = xs[xs.length - 1] + H7;
+    let clipped = false;
+    for (const o of terr) {
+      if (o === t || o.kind !== "narrow") continue;
+      if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) a = (o.x1 + t.x0) / 2, clipped = true;
+      else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) b = (t.x1 + o.x0) / 2, clipped = true;
+    }
+    const wall = lockerWall.get(t);
+    const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
+    if (!clipped) return { span: [a, b], xs: open(xs) };
+    if (b - a < 2 * H7) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+    const fit3 = [];
+    for (let x = a + H7; x <= b - H7; x += 100) fit3.push(x);
+    if (fit3[fit3.length - 1] < b - H7 - 1) fit3.push(b - H7);
+    return { span: [a, b], xs: open(fit3) };
+  }
+  var lockerWall = /* @__PURE__ */ new WeakMap();
+  var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
+  var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
+  var METRO_ART = { childdoor: "door", childkey: "key", upper: "chasedoor", sidedoor: "door", locked: "firegate", wdoor: "door", wup: "hq_stairs_up", wdown: "hq_stairs_down", reward: "pack" };
+  var DEEP_ART = { wup: "rope", wdown: "fall" };
+  function floorPlan(f, id, startX = 240) {
+    const props2 = f.placed.filter((p) => p.kind !== "childkey").map((p) => ({
+      id: `p${p.id}`,
+      kind: (f.type === "deep" ? DEEP_ART[p.kind] : void 0) ?? METRO_ART[p.kind] ?? p.kind,
+      x: p.x,
+      y: laneY(p.lane),
+      w: p.w,
+      h: propH(p.kind),
+      label: p.kind === "item" && p.data.item ? `${p.label}:${p.data.item}` : p.label,
+      // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
+      solid: p.kind === "shutter" ? !p.data.open : p.kind === "locked" ? true : void 0
+    }));
+    for (const p of props2) if (p.kind === "hatch") p.y = Y_TOP;
+    for (const s2 of f.spawns) {
+      if (s2.role === "passenger") props2.push({ id: `h${s2.id}`, kind: "passenger", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "떠도는 승객" });
+      if (s2.role === "resident") props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "주민 (사는 척)" });
+      if (s2.role === "enemy" && s2.data.harmless) props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
+    }
+    const doorSpans = spreadProps(f, props2, startX);
+    const lockerHalf = (propArtSize("clutter", "사물함")?.w ?? 150) / 2;
+    for (const sg of f.segments) for (const t of sg.terrain) if (t.kind === "narrow") lockerWall.set(t, { spans: doorSpans, half: lockerHalf });
+    const encounters = [];
+    if (!NOLOCK_TYPES.has(f.type)) {
+      const groups = /* @__PURE__ */ new Map();
+      for (const s2 of f.spawns.filter((s3) => s3.role === "enemy" && !s3.data.harmless)) {
+        const seg2 = segAt(f.segments, s2.x);
+        const waves = groups.get(seg2.x) ?? [[], []];
+        waves[Math.min(1, s2.wave)].push({ kind: s2.kind, x: s2.x, y: clearOfProps(props2, s2.x, laneY(s2.lane)), elite: s2.elite || void 0 });
+        groups.set(seg2.x, waves);
+      }
+      for (const [x, waves] of groups) {
+        const lockFrom = Math.max(0, x - 320);
+        encounters.push({ triggerX: x + 120, lockFrom, lockTo: Math.min(f.width, lockFrom + 1280), waves: waves.filter((w) => w.length) });
+      }
+      const g2 = f.spawns.find((s2) => s2.role === "guardian" && !s2.data.onFail && !s2.data.survive && s2.kind !== "elder");
+      if (g2) {
+        const room2 = segAt(f.segments, g2.x);
+        encounters.push({ triggerX: room2.x + 200, lockFrom: room2.x, lockTo: room2.x + room2.w, waves: [[{ kind: g2.kind, x: g2.x, y: laneY(g2.lane), boss: true, elite: g2.elite || void 0 }]] });
+      }
+      encounters.sort((a, b) => a.triggerX - b.triggerX);
+      if (f.room && encounters.length) {
+        const waves = encounters.flatMap((e) => e.waves);
+        encounters.splice(0, encounters.length, { triggerX: 0, lockFrom: 0, lockTo: f.width, waves });
+      }
+    }
+    const plan = {
+      id,
+      title: f.label,
+      type: f.type,
+      depth: f.depth,
+      length: f.width,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      keepOut: doorSpans,
+      palette: { wall: f.palette.wall, floor: f.palette.floor, accent: f.palette.accent },
+      banner: f.label,
+      stage: { where: "floor", terrain: f.segments.flatMap((s2) => s2.terrain), floor: f, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, f.segments, f.palette, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function cellPlan(z, cell, id, startX) {
+    const props2 = cell.things.map((t) => ({ id: `s${t.id}`, kind: t.kind, x: t.x, y: laneY(t.lane), w: 60, h: t.kind === "rope" ? 260 : t.kind.startsWith("ladder") ? 220 : 110, label: t.label }));
+    const pal = { wall: "#4a3a24", floor: "#33291c", trim: "#1e170e", accent: "#f0b860", fog: "rgba(0,0,0,0)" };
+    const fight = z.fights?.[`${cell.col},${cell.row}`];
+    const encounters = fight?.length ? [{ triggerX: 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + i * 53 % 110) }))] }] : [];
+    const plan = {
+      id,
+      title: `정비 구역 (${depthLabel(z.depth)} 아래) · ${cell.label}`,
+      type: "service",
+      depth: z.depth,
+      length: cell.width,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: cell.kind === "attic" ? "선배들의 다락방" : `정비 구역 · ${cell.label}`,
+      stage: { where: "service", terrain: cell.segments.flatMap((s2) => s2.terrain), cell, zone: z, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, cell.segments, pal, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function carPlan(id, buttons, depth) {
+    const props2 = [
+      { id: "getoff", kind: "getoff", x: 90, y: Y_TOP, w: 60, h: 160, label: "내렸다 다시 타기" },
+      { id: "greet", kind: "greet", x: 260, y: Y_TOP, w: 60, h: 110, label: "인사하기 (E)" },
+      { id: "mirror", kind: "mirror", x: 420, y: Y_TOP, w: 70, h: 150, label: "거울" },
+      { id: "close", kind: "close", x: 600, y: Y_TOP, w: 40, h: 60, label: "닫힘 버튼" }
+    ];
+    buttons.forEach(
+      (b, i) => props2.push({ id: `btn${i}`, kind: "button", x: 760 + i * 120, y: Y_TOP, w: 60, h: 60, label: b.exit ? "EXIT" : `${b.label}${b.shown ? ` · ${FLOOR_TYPES[b.type].label}` : " · ?"}` })
+    );
+    const pal = { wall: "#5d5146", floor: "#3a332c", trim: "#221d18", accent: "#ffcf70", fog: "rgba(0,0,0,0)" };
+    const segs = [{ ref: "room:car", x: 0, w: ROOM_W, flip: false, terrain: [] }];
+    const plan = {
+      id,
+      title: `승강기 안 · ${depthLabel(depth)}`,
+      type: "car",
+      depth,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 160,
+      exitX: Infinity,
+      encounters: [],
+      props: props2,
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: "승강기",
+      stage: { where: "car", terrain: [], buttons, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
+    return plan;
+  }
+  function sidePlan(room2, parent, id) {
+    const props2 = [{ id: "xback", kind: "door", x: 170, y: Y_TOP, w: 90, h: 180, label: "나가는 문 (복도로)" }];
+    for (const l of room2.loot) {
+      if (l.kind === "chest") props2.push({ id: "xchest", kind: "pack", x: l.x, y: laneY(90), w: 60, h: 60, label: "선배가 남긴 배낭 (강화)" });
+      else if (l.kind === "gear") props2.push({ id: "xgear", kind: "gear", x: l.x, y: laneY(130), w: 50, h: 50, label: "용도 모를 장비" });
+      else props2.push({ id: `xitem${l.x}`, kind: "item", x: l.x, y: laneY(120), w: 28, h: 28, label: `보급품:${l.item ?? "heal"}` });
+    }
+    const segs = [
+      { ref: `chunk:side_${room2.door}_a`, x: 0, w: CHUNK_W, flip: false, terrain: [] },
+      { ref: `chunk:side_${room2.door}_b`, x: CHUNK_W, w: CHUNK_W, flip: true, terrain: [] }
+    ];
+    const encounters = room2.fight.length ? [{ triggerX: 330, lockFrom: 0, lockTo: ROOM_W, waves: [room2.fight.map((kind, i) => ({ kind, x: 780 + i * 130, y: laneY(20 + i * 61 % 130), elite: room2.elite && i === 0 || void 0 }))] }] : [];
+    const plan = {
+      id,
+      title: `${parent.label} · ${room2.label}`,
+      type: parent.type,
+      depth: parent.depth,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 260,
+      exitX: Infinity,
+      encounters,
+      props: props2,
+      palette: { wall: room2.palette.wall, floor: room2.palette.floor, accent: room2.palette.accent },
+      banner: room2.secret ? `숨은 방 · ${room2.label}` : room2.label,
+      stage: { where: "side", terrain: [], floor: parent, side: room2, fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, room2.palette, plan);
+    plan.drawForeground = (ctx, camX, world) => drawFront(ctx, camX, world, plan);
+    return plan;
+  }
+  function endingPlan(id) {
+    const pal = { wall: "#c9c4b4", floor: "#9a9483", trim: "#6b675b", accent: "#ffffff", fog: "rgba(0,0,0,0)" };
+    const segs = [{ ref: "room:exit_hall", x: 0, w: ROOM_W, flip: false, terrain: [] }];
+    const plan = {
+      id,
+      title: "로비 · 진짜",
+      type: "ending",
+      depth: 0,
+      length: ROOM_W,
+      lane: [Y_TOP, Y_BOTTOM],
+      startX: 200,
+      exitX: Infinity,
+      encounters: [],
+      props: [{ id: "van", kind: "van", x: 1e3, y: Y_TOP, w: 220, h: 140, label: "관리국 차량 (귀환)" }],
+      palette: { wall: pal.wall, floor: pal.floor, accent: pal.accent },
+      banner: "문을 열고 나왔다. 로비였다. 진짜.",
+      stage: { where: "ending", terrain: [], fx: { light: 1, chaseX: -9999, squeeze: 0, noise: 0, red: false } }
+    };
+    plan.drawBackground = (ctx, camX) => drawBack(ctx, camX, segs, pal, plan);
+    return plan;
+  }
+  var FIXED_PROPS = /* @__PURE__ */ new Set(["firegate", "hq_stairs_up", "hq_stairs_down", "pack", "crack", "vent", "key", "elevator", "mirror", "panel", "chasedoor", "b12", "goalwall", "switch", "shutter", "door", "servicedoor", "rope", "up", "down", "fall", "ladder_up", "ladder_down", "left", "right", "intercom", "button", "getoff", "close", "greet"]);
+  var BOARD_GAP = 1400;
+  var artW = (p, floorType) => {
+    const base2 = Math.max(p.w, p.kind === "firegate" ? 170 : 0, p.kind === "item" || p.kind === "belonging" || p.kind === "mark" ? 60 : p.kind === "passenger" || p.kind === "npc" ? 80 : 130);
+    if (p.kind === "item" || p.kind === "belonging" || p.kind === "mark" || p.kind === "passenger" || p.kind === "npc") return base2;
+    return Math.max(base2, propArtSize(p.kind, p.label, floorType)?.w ?? 0);
+  };
+  function spreadProps(f, props2, startX) {
+    const wallY = Y_TOP + 40;
+    const keepOut = [];
+    for (const sg of f.segments) keepOut.push(...wallSolidSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
+    const wallDoors = keepOut.filter(([a, b]) => b - a >= 100);
+    const terr = f.segments.flatMap((sg) => sg.terrain).filter((t) => t.kind === "block" || t.kind === "pit" || t.kind === "narrow" || t.kind === "low");
+    const taken = [];
+    const meaning = new Set(f.placed.filter((q) => q.data.fork !== void 0 || q.data.group !== void 0).map((q) => `p${q.id}`));
+    const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
+    const gateX = f.placed.find((q) => q.kind === "locked")?.x ?? -1;
+    const fixed2 = (p) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.kind !== "hatch" && p.x < startX + 60 && (!f.room || ruled.has(p.id));
+    const boardLike = (p) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
+    const must = (p) => meaning.has(p.id) || ruled.has(p.id);
+    const kept = props2.filter((p) => boardLike(p) && fixed2(p));
+    const decor = new Set(props2.filter((p) => boardLike(p) && !must(p) && !fixed2(p)));
+    for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
+    for (const p of props2.filter((q) => q.kind === "servicedoor" || q.kind === "chasedoor" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "upper") || q.kind === "door" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "sidedoor") || q.kind === "crack")) {
+      const h = artW(p, f.type) / 2;
+      const gate2 = gateX >= 0 ? { x: gateX } : null;
+      const side = gate2 ? Math.sign(p.x - gate2.x) : 0;
+      const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && (!gate2 || Math.sign(x2 - gate2.x) === side && Math.abs(x2 - gate2.x) > h + 120) && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+      if (ok(p.x)) continue;
+      let x = null;
+      for (let d3 = 24; d3 <= 1600 && x === null; d3 += 24) x = ok(p.x + d3) ? p.x + d3 : ok(p.x - d3) ? p.x - d3 : null;
+      if (x === null)
+        for (const [a, b] of [...wallDoors].sort((u, v) => Math.abs((u[0] + u[1]) / 2 - p.x) - Math.abs((v[0] + v[1]) / 2 - p.x))) {
+          const c = (a + b) / 2;
+          if (b - a > 2 * h || keepOut.some(([a2, b2]) => (a2 !== a || b2 !== b) && c + h > a2 && c - h < b2)) continue;
+          if (terr.some((t) => c + h > t.x0 - 20 && c - h < t.x1 + 20) || props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - c) < h + artW(q, f.type) / 2 + 16)) continue;
+          x = c;
+          break;
+        }
+      if (x !== null) p.x = x;
+    }
+    for (const p of props2.filter((q) => boardLike(q) && meaning.has(q.id))) {
+      const h = artW(p, f.type) / 2;
+      const gate2 = gateX >= 0 ? { x: gateX } : null;
+      const side = gate2 ? Math.sign(p.x - gate2.x) : 0;
+      const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && (!gate2 || Math.sign(x - gate2.x) === side && Math.abs(x - gate2.x) > h + 120) && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && q.solid && Math.abs(q.x - x) < 120) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
+      if (ok(p.x)) continue;
+      for (let d3 = 12; d3 <= 360; d3 += 12) {
+        if (ok(p.x - d3)) {
+          p.x -= d3;
+          break;
+        }
+        if (ok(p.x + d3)) {
+          p.x += d3;
+          break;
+        }
+      }
+    }
+    for (const p of props2) if (fixed2(p)) taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
+    for (const g2 of f.placed.filter((q) => q.kind === "locked")) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g2.x - 150, b: g2.x + 150, y });
+    const free = (p, x) => {
+      const h = artW(p, f.type) / 2;
+      if (p.kind === "hatch" && p.x < gateX && x + h + 120 >= gateX) return false;
+      if (f.room && f.placed.some((q) => (q.data.dir || ["key", "switch", "goalwall", "panel"].includes(q.kind)) && `p${q.id}` !== p.id && Math.abs(q.x - x) < 120)) return false;
+      if (props2.some((q) => q !== p && q.solid && Math.abs(q.x - x) < 120)) return false;
+      if (x - h < 40 || x + h > f.width - 40) return false;
+      if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
+      if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
+      if (terr.some((t) => x + h > t.x0 - 80 && x - h < t.x1 + 80)) return false;
+      if (spaced && boardLike(p) && kept.some((q) => q !== p && Math.abs(q.x - x) <= BOARD_GAP)) return false;
+      if (spaced && p.kind === "hatch" && placed.some((q) => q !== p && q.kind === "hatch" && Math.abs(q.x - x) <= BOARD_GAP)) return false;
+      return true;
+    };
+    let spaced = true;
+    const farthest = (p, reach) => {
+      spaced = p.kind === "hatch";
+      let best = null, bd = -1;
+      for (let d3 = -reach; d3 <= reach; d3 += 24) {
+        const x = p.x + d3;
+        if (!free(p, x)) continue;
+        const md = Math.min(...(p.kind === "hatch" ? placed.filter((q) => q.kind === "hatch") : kept).filter((q) => q !== p).map((q) => Math.abs(q.x - x)), 1e9);
+        if (md > bd) bd = md, best = x;
+      }
+      spaced = true;
+      return best;
+    };
+    const placed = props2.filter(fixed2);
+    const order = (p) => p.kind === "hatch" ? -1 : boardLike(p) ? decor.has(p) ? 1 : 0 : 2;
+    for (const p of [...props2].filter((q) => !fixed2(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
+      let x = null;
+      const reach = boardLike(p) || p.kind === "hatch" ? 1800 : p.y <= wallY ? 900 : 480;
+      for (let d3 = 0; d3 <= reach; d3 += 24) {
+        if (free(p, p.x + d3)) {
+          x = p.x + d3;
+          break;
+        }
+        if (d3 && free(p, p.x - d3)) {
+          x = p.x - d3;
+          break;
+        }
+      }
+      if (x === null && (boardLike(p) && !decor.has(p) || p.kind === "hatch" || p.kind === "npc" || p.kind === "passenger")) x = farthest(p, f.width);
+      if (x === null && p.kind === "hatch" && placed.some((q) => q.kind === "hatch" && q.x < gateX === p.x < gateX)) {
+        props2.splice(props2.indexOf(p), 1);
+        continue;
+      }
+      if (x === null && (p.kind === "npc" || p.kind === "passenger")) {
+        const originalY = p.y;
+        for (const y of [Y_BOTTOM - 30, (Y_TOP + Y_BOTTOM) / 2, Y_TOP + 60]) {
+          p.y = y;
+          x = farthest(p, f.width);
+          if (x !== null) break;
+        }
+        if (x === null) p.y = originalY;
+      }
+      if (x === null && p.kind === "prop" && p.y <= wallY && !must(p) && p.label !== "거꾸로 가는 시계") {
+        props2.splice(props2.indexOf(p), 1);
+        continue;
+      }
+      if (decor.has(p)) {
+        const near2 = x === null ? null : kept.reduce((n, q) => !n || Math.abs(q.x - x) < Math.abs(n.x - x) ? q : n, null);
+        if (x === null || kept.length >= 3 || near2 && near2.kind === p.kind && near2.label === p.label) {
+          props2.splice(props2.indexOf(p), 1);
+          continue;
+        }
+      }
+      if (!must(p) && p.kind === "prop" && placed.some((q) => q.kind === p.kind && q.label === p.label && Math.abs(q.x - (x ?? p.x)) < 640)) {
+        props2.splice(props2.indexOf(p), 1);
+        continue;
+      }
+      p.x = x ?? p.x;
+      placed.push(p);
+      if (boardLike(p)) kept.push(p);
+      taken.push({ a: p.x - artW(p, f.type) / 2, b: p.x + artW(p, f.type) / 2, y: p.y });
+    }
+    return keepOut;
+  }
+  function clearOfProps(props2, x, y) {
+    const hit2 = (yy) => props2.some((p) => Math.abs(p.y - yy) < 70 && Math.abs(p.x - x) < artW(p) / 2 + 40);
+    if (!hit2(y)) return y;
+    for (const d3 of [90, -90, 160, -160]) {
+      const yy = Math.max(Y_TOP + 10, Math.min(Y_BOTTOM - 10, y + d3));
+      if (!hit2(yy)) return yy;
+    }
+    return y;
+  }
+  function propH(kind) {
+    return { elevator: 200, panel: 90, mirror: 130, childdoor: 180, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 }[kind] ?? 80;
+  }
+  function segAt(segs, x) {
+    return segs.find((s2) => x >= s2.x && x < s2.x + s2.w) ?? segs[segs.length - 1];
+  }
+  var CEIL = 40;
+  function drawBack(ctx, camX, segs, pal, plan) {
+    const [y0, y1] = plan.lane ?? [Y_TOP, Y_BOTTOM];
+    const where = plan.stage.where === "side" ? "floor" : plan.stage.where;
+    const vx0 = camX - 40, vx1 = camX + 1320;
+    const cx = camX + 640;
+    setFloorTone(where === "floor" ? plan.depth ?? 1 : 0);
+    for (const s2 of segs) {
+      if (s2.x + s2.w < vx0 || s2.x > vx1) continue;
+      const room2 = s2.ref.startsWith("room:");
+      const place3 = placeFor(where, plan.stage.floor?.type, s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth);
+      const floorPlace = where === "floor" ? placeFor("floor", plan.stage.floor?.type, "", null, plan.stage.floor?.depth) : place3;
+      if (drawWallCell(ctx, place3, s2.ref, s2.x, s2.w, s2.flip, y0)) {
+        const i = segs.indexOf(s2);
+        const prev = i > 0 ? placeFor(where, plan.stage.floor?.type, segs[i - 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
+        if (prev !== place3) seamPillar(ctx, s2.x, y0);
+        const next = i + 1 < segs.length ? placeFor(where, plan.stage.floor?.type, segs[i + 1].ref, plan.stage.floor?.sub, plan.stage.floor?.depth) : place3;
+        if (next !== place3) seamPillar(ctx, s2.x + s2.w, y0);
+        if (!drawFloor(ctx, floorPlace, s2.x, s2.x + s2.w, y0, 720) && !drawFloor(ctx, place3, s2.x, s2.x + s2.w, y0, 720)) {
+          ctx.fillStyle = pal.floor;
+          ctx.fillRect(s2.x, y0, s2.w, 720 - y0);
+        }
+        continue;
+      }
+      ctx.fillStyle = pal.wall;
+      ctx.fillRect(s2.x, CEIL, s2.w, y0 - CEIL);
+      ctx.fillStyle = pal.trim;
+      ctx.fillRect(s2.x, 0, s2.w, CEIL);
+      ctx.fillRect(s2.x, y0 - 18, s2.w, 18);
+      ctx.fillRect(s2.x, CEIL, 3, y0 - CEIL);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect(s2.x, CEIL + 40, s2.w, 8);
+      ctx.fillStyle = pal.floor;
+      ctx.fillRect(s2.x, y0, s2.w, 720 - y0);
+      ctx.strokeStyle = "rgba(0,0,0,0.28)";
+      ctx.lineWidth = 2;
+      for (const f of [0.12, 0.28, 0.48, 0.72]) {
+        const yy = y0 + (y1 - y0) * f;
+        ctx.beginPath();
+        ctx.moveTo(s2.x, yy);
+        ctx.lineTo(s2.x + s2.w, yy);
+        ctx.stroke();
+      }
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(0,0,0,0.2)";
+      for (let x = Math.ceil(s2.x / 120) * 120; x < s2.x + s2.w; x += 120) {
+        ctx.beginPath();
+        ctx.moveTo(cx + (x - cx) * 0.78, y0);
+        ctx.lineTo(cx + (x - cx) * 1.12, 720);
+        ctx.stroke();
+      }
+      const g2 = ctx.createLinearGradient(0, y0, 0, y0 + 40);
+      g2.addColorStop(0, "rgba(0,0,0,0.35)");
+      g2.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g2;
+      ctx.fillRect(s2.x, y0, s2.w, 40);
+      void room2;
+    }
+    const layers = [];
+    plan.depthLayers = layers;
+    const allTerr = segs.flatMap((s2) => s2.terrain);
+    for (const s2 of segs) if (!(s2.x + s2.w < vx0 || s2.x > vx1)) for (const t of s2.terrain) drawTerrain(ctx, t, pal, y0, y1, placeFor(where, plan.stage.floor?.type, where === "floor" ? "" : s2.ref, plan.stage.floor?.sub, plan.stage.floor?.depth), layers, allTerr);
+    drawMetro(ctx, plan, vx0, vx1, y0);
+    void CHUNK_W;
+  }
+  function drawMetro(ctx, plan, vx0, vx1, y0) {
+    const P = 3;
+    const f = plan.stage.floor;
+    for (const p of plan.props ?? []) {
+      if (p.x < vx0 - 100 || p.x > vx1 + 100) continue;
+      const x = Math.round(p.x);
+      const pl = f && p.id.startsWith("p") ? f.placed.find((z) => `p${z.id}` === p.id) : void 0;
+      if (p.kind === "crack") {
+        const broken = !!p.label?.includes("부서진");
+        ctx.save();
+        if (broken) {
+          ctx.fillStyle = "#0b0a09";
+          ctx.beginPath();
+          ctx.moveTo(x - 50, y0 - 6);
+          ctx.lineTo(x - 56, y0 - 120);
+          ctx.lineTo(x - 30, y0 - 168);
+          ctx.lineTo(x + 18, y0 - 176);
+          ctx.lineTo(x + 52, y0 - 130);
+          ctx.lineTo(x + 48, y0 - 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = "#6b6258";
+          for (let i = 0; i < 9; i++) ctx.fillRect(x - 64 + i * 37 % 128, y0 + 4 + i * 13 % 18, P * 3, P * 2);
+        } else {
+          ctx.strokeStyle = "rgba(20,16,12,0.85)";
+          ctx.lineWidth = P;
+          const lines3 = [
+            [0, -30, -20, -70, -8, -110, -34, -150],
+            [0, -30, 24, -64, 14, -100, 40, -138],
+            [-8, -110, 10, -126],
+            [14, -100, -4, -84]
+          ];
+          for (const l of lines3) {
+            ctx.beginPath();
+            ctx.moveTo(x + l[0], y0 + l[1]);
+            for (let i = 2; i < l.length; i += 2) ctx.lineTo(x + l[i], y0 + l[i + 1]);
+            ctx.stroke();
+          }
+          ctx.fillStyle = "rgba(255,255,255,0.12)";
+          ctx.fillRect(x - 22, y0 - 74, P * 2, P);
+          ctx.fillRect(x + 20, y0 - 66, P * 2, P);
+        }
+        ctx.restore();
+      } else if (p.kind === "firegate") {
+        const hw = 74, top = y0 - 236;
+        ctx.fillStyle = "#1a1c1f";
+        ctx.fillRect(x - hw - 10, top - 26, hw * 2 + 20, 30);
+        ctx.fillStyle = "#3b4046";
+        ctx.fillRect(x - hw - 6, top - 22, hw * 2 + 12, 20);
+        ctx.fillStyle = "#26292d";
+        ctx.fillRect(x - hw - 10, top, 10, y0 - top + 4);
+        ctx.fillRect(x + hw, top, 10, y0 - top + 4);
+        for (let yy = top; yy < y0; yy += 12) {
+          ctx.fillStyle = "#7d848b";
+          ctx.fillRect(x - hw, yy, hw * 2, 9);
+          ctx.fillStyle = "#5a6168";
+          ctx.fillRect(x - hw, yy + 9, hw * 2, 3);
+          ctx.fillStyle = "#9aa1a8";
+          ctx.fillRect(x - hw, yy, hw * 2, 2);
+        }
+        ctx.fillStyle = "#3c4146";
+        ctx.fillRect(x - hw, y0 - 14, hw * 2, 14);
+        ctx.fillStyle = "#c23a2c";
+        ctx.fillRect(x - 30, top + 70, 60, 34);
+        ctx.fillStyle = "#ffe9d0";
+        ctx.fillRect(x - 24, top + 78, 48, 4);
+        ctx.fillRect(x - 24, top + 90, 30, 4);
+        ctx.fillStyle = "#e8c35a";
+        ctx.fillRect(x + hw - 30, y0 - 90, 18, 26);
+        ctx.fillStyle = "#1a1408";
+        ctx.fillRect(x + hw - 23, y0 - 84, 4, 8);
+        ctx.fillRect(x + hw - 22, y0 - 76, 2, 6);
+        for (let i = 0; i < 10; i++) {
+          ctx.fillStyle = i % 2 ? "#1a1a1a" : "#d9b02a";
+          ctx.beginPath();
+          ctx.moveTo(x - hw + i * 15, y0);
+          ctx.lineTo(x - hw + i * 15 + 15, y0);
+          ctx.lineTo(x - hw + i * 15 + 5, y0 + 250);
+          ctx.lineTo(x - hw + i * 15 - 10, y0 + 250);
+          ctx.closePath();
+          ctx.fill();
+        }
+      } else if (p.kind === "vent") {
+        const open = !!p.label?.includes("열린");
+        const vy = y0 - 64;
+        ctx.fillStyle = "#2a2d30";
+        ctx.fillRect(x - 40, vy, 80, 48);
+        ctx.fillStyle = open ? "#050505" : "#575d62";
+        ctx.fillRect(x - 34, vy + 6, 68, 36);
+        if (!open) {
+          ctx.fillStyle = "#2f3336";
+          for (let i = 0; i < 6; i++) ctx.fillRect(x - 34, vy + 9 + i * 6, 68, P);
+          ctx.fillStyle = "#8a8f93";
+          for (const [dx, dy] of [[-36, 2], [32, 2], [-36, 40], [32, 40]]) ctx.fillRect(x + dx, vy + dy, P, P);
+        }
+      } else if (p.kind === "key") {
+        const t = (typeof performance !== "undefined" ? performance.now() : 0) / 300;
+        const ky = Math.round(p.y - 40 + Math.sin(t) * 4);
+        ctx.save();
+        ctx.fillStyle = "rgba(255,214,110,0.22)";
+        ctx.beginPath();
+        ctx.arc(x, ky, 30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#3a2a08";
+        ctx.fillRect(x - 16, ky - 10, 14, 20);
+        ctx.fillRect(x - 4, ky - 3, 26, 6);
+        ctx.fillStyle = "#f2c14e";
+        ctx.fillRect(x - 13, ky - 7, 8, 14);
+        ctx.fillRect(x - 2, ky - 1, 22, 3);
+        ctx.fillRect(x + 12, ky + 2, 3, 6);
+        ctx.fillRect(x + 18, ky + 2, 3, 5);
+        ctx.fillStyle = "#3a2a08";
+        ctx.fillRect(x - 10, ky - 3, 3, 6);
+        ctx.restore();
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillRect(x - 18, Math.round(p.y) - 4, 36, 6);
+      } else if (pl && (pl.kind === "upper" || pl.kind === "sidedoor")) {
+        const h = propArtSize(p.kind, p.label, f?.type)?.h ?? 190;
+        const ly = Math.round(Y_TOP - h - 18);
+        const col = pl.kind === "upper" ? p.label?.includes("열림") ? "#5fe08a" : "#e0503c" : p.label?.includes("비었다") ? "#3a3a3a" : "#ffb840";
+        ctx.fillStyle = "#1c1f22";
+        ctx.fillRect(x - 12, ly - 4, 24, 14);
+        ctx.fillStyle = col;
+        ctx.fillRect(x - 8, ly, 16, 6);
+        if (!p.label?.includes("비었다")) {
+          ctx.fillStyle = col + "33";
+          ctx.fillRect(x - 20, ly - 10, 40, 26);
+        }
+      }
+    }
+  }
+  function drawBarricade(ctx, x0, x1, fy) {
+    const w = x1 - x0;
+    const bw = Math.max(w, 160), bx0 = x0 + (w - bw) / 2;
+    const n = Math.max(1, Math.round((bw - 20) / 170)), sw = (bw - 20) / n;
+    for (let i = 0; i < n; i++) {
+      const x = Math.round(bx0 + 10 + i * sw), x2 = Math.round(bx0 + 10 + (i + 1) * sw - 10);
+      ctx.fillStyle = "rgba(0,0,0,0.3)";
+      ctx.fillRect(x - 10, fy - 6, x2 - x + 20, 12);
+      for (const px of [x, x2 - 16]) {
+        ctx.fillStyle = "#2b2d30";
+        ctx.fillRect(px - 14, fy - 10, 44, 12);
+        ctx.fillStyle = "#5d6166";
+        ctx.fillRect(px, fy - 132, 16, 124);
+        ctx.fillStyle = "#878c91";
+        ctx.fillRect(px, fy - 132, 5, 124);
+        ctx.fillStyle = "#3c3f43";
+        ctx.fillRect(px + 12, fy - 132, 4, 124);
+      }
+      for (const ry of [fy - 122, fy - 72]) {
+        for (let sx = x; sx < x2; sx += 24) {
+          ctx.fillStyle = (sx - x) / 24 % 2 ? "#1d1d1f" : "#e2b23a";
+          ctx.fillRect(sx, ry, Math.min(24, x2 - sx), 24);
+        }
+        ctx.fillStyle = "rgba(255,255,255,0.2)";
+        ctx.fillRect(x, ry, x2 - x, 3);
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillRect(x, ry + 20, x2 - x, 4);
+      }
+    }
+  }
+  function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) {
+    const w = t.x1 - t.x0;
+    switch (t.kind) {
+      case "pit": {
+        const tf = ctx.getTransform();
+        const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+        const k = 0.45 / (720 - y0);
+        const px = (x, y) => x + (x - mid) * k * (y - y0);
+        const jag = (i) => Math.sin(t.x0 * 0.13 + i * 2.7) * 7 + Math.sin(i * 5.1) * 4;
+        const n = 10;
+        const edge2 = (x, side) => {
+          const pts = [];
+          for (let i = 0; i <= n; i++) {
+            const y = y0 + (y1 + 30 - y0) * i / n;
+            pts.push([px(x, y) + side * jag(i + (side > 0 ? 20 : 0)), y]);
+          }
+          return pts;
+        };
+        const L = edge2(t.x0, 1), R = edge2(t.x1, -1);
+        const hole = new Path2D();
+        L.forEach(([x, y], i) => i ? hole.lineTo(x, y) : hole.moveTo(x, y));
+        for (let i = R.length - 1; i >= 0; i--) hole.lineTo(R[i][0], R[i][1]);
+        hole.closePath();
+        const g2 = ctx.createLinearGradient(0, y0, 0, 720);
+        g2.addColorStop(0, "#050506");
+        g2.addColorStop(0.5, "#0c0d10");
+        g2.addColorStop(1, "#16181c");
+        ctx.fillStyle = g2;
+        ctx.fill(hole);
+        ctx.save();
+        ctx.clip(hole);
+        ctx.fillStyle = "#5a5c5e";
+        ctx.fillRect(t.x0 - 40, y0, w + 80, 14);
+        ctx.fillStyle = "#3a3b3d";
+        ctx.fillRect(t.x0 - 40, y0 + 14, w + 80, 8);
+        ctx.fillStyle = "rgba(70,72,74,0.9)";
+        ctx.beginPath();
+        L.forEach(([x, y], i) => i ? ctx.lineTo(x + 12, y) : ctx.moveTo(x + 12, y));
+        for (let i = L.length - 1; i >= 0; i--) ctx.lineTo(L[i][0], L[i][1]);
+        ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle = "rgba(200,196,186,0.55)";
+        ctx.lineWidth = 3;
+        for (const side of [L, R]) {
+          ctx.beginPath();
+          side.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+          ctx.stroke();
+        }
+        ctx.strokeStyle = "#6b4a32";
+        ctx.lineWidth = 3;
+        for (let i = 1; i < n; i += 3) {
+          const [lx, ly] = L[i], [rx, ry] = R[i];
+          ctx.beginPath();
+          ctx.moveTo(lx - 4, ly);
+          ctx.lineTo(lx + 26 + jag(i) * 2, ly + 10);
+          ctx.moveTo(rx + 4, ry);
+          ctx.lineTo(rx - 22 - jag(i + 3) * 2, ry + 12);
+          ctx.stroke();
+        }
+        ctx.fillStyle = "#8d8a84";
+        for (let i = 0; i < 8; i++) {
+          const e = i % 2 ? L : R;
+          const [x, y] = e[i * 3 % e.length];
+          ctx.fillRect(Math.round(x + (i % 2 ? -14 : 8)), Math.round(y - 4), 6, 4);
+        }
+        break;
+      }
+      case "block": {
+        const tf = ctx.getTransform();
+        const mid = (ctx.canvas.width / 2 - tf.e) / (tf.a || 1);
+        const h = Math.min(t.h, 28);
+        const depth = (y) => 0.62 + 0.38 * (y - y0) / Math.max(1, y1 - y0);
+        const f0 = mid + (t.x0 - mid) / 0.81, f1 = mid + (t.x1 - mid) / 0.81;
+        const at2 = (xf, y) => mid + (xf - mid) * depth(y);
+        const quad = (pts, fill) => {
+          ctx.fillStyle = fill;
+          ctx.beginPath();
+          pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+          ctx.closePath();
+          ctx.fill();
+        };
+        const topPts = [[at2(f0, y0), y0 - h], [at2(f1, y0), y0 - h], [at2(f1, y1), y1 - h], [at2(f0, y1), y1 - h]];
+        ctx.save();
+        ctx.filter = "blur(6px)";
+        quad([[at2(f0, y0) - 6, y0], [at2(f1, y0) + 6, y0], [at2(f1, y1) + 14, y1 + 4], [at2(f0, y1) - 14, y1 + 4]], "rgba(0,0,0,0.35)");
+        ctx.restore();
+        const side = (xf) => {
+          const g2 = ctx.createLinearGradient(0, y0, 0, y1);
+          g2.addColorStop(0, "#3b3d3f");
+          g2.addColorStop(1, "#55585a");
+          quad([[at2(xf, y0), y0 - h], [at2(xf, y1), y1 - h], [at2(xf, y1), y1], [at2(xf, y0), y0]], g2);
+        };
+        if (t.x1 < mid) side(f1);
+        else if (t.x0 > mid) side(f0);
+        const fp = floorPattern(ctx, place3);
+        ctx.save();
+        ctx.beginPath();
+        topPts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+        ctx.closePath();
+        ctx.clip();
+        if (fp) {
+          ctx.imageSmoothingEnabled = false;
+          fp.setTransform(new DOMMatrix([2, 0, 0, 1, 0, y0 - h]));
+          ctx.fillStyle = fp;
+        } else ctx.fillStyle = pal.floor;
+        const tx0 = Math.min(at2(f0, y0), at2(f0, y1)) - 4, tx1 = Math.max(at2(f1, y0), at2(f1, y1)) + 4;
+        ctx.fillRect(tx0, y0 - h, tx1 - tx0, y1 - y0);
+        ctx.strokeStyle = "rgba(10,10,16,0.45)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const ownGrid = floorHasGrid(place3);
+        for (let d3 = 0, k = 0; !ownGrid && y0 + d3 < y1; k++) {
+          ctx.moveTo(at2(f0, y0 + d3) - 4, Math.round(y0 + d3) - h);
+          ctx.lineTo(at2(f1, y0 + d3) + 4, Math.round(y0 + d3) - h);
+          d3 += 22 + k * 9;
+        }
+        for (let wx = Math.ceil(f0 / 128) * 128; !ownGrid && wx < f1; wx += 128) {
+          ctx.moveTo(at2(wx, y0), y0 - h);
+          ctx.lineTo(wx, y1 - h);
+        }
+        ctx.stroke();
+        const sh = ctx.createLinearGradient(0, y0 - h, 0, 720 - h);
+        sh.addColorStop(0, "rgba(0,0,0,0.28)");
+        sh.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = sh;
+        ctx.fillRect(tx0, y0 - h, tx1 - tx0, y1 - y0);
+        ctx.restore();
+        ctx.strokeStyle = "rgba(230,230,224,0.35)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(at2(f0, y1), y1 - h);
+        ctx.lineTo(at2(f0, y0), y0 - h);
+        ctx.lineTo(at2(f1, y0), y0 - h);
+        ctx.lineTo(at2(f1, y1), y1 - h);
+        ctx.stroke();
+        const fx0 = at2(f0, y1), fx1 = at2(f1, y1);
+        const fg = ctx.createLinearGradient(0, y1 - h, 0, y1);
+        fg.addColorStop(0, "#6d6f70");
+        fg.addColorStop(1, "#3f4143");
+        quad([[fx0, y1 - h], [fx1, y1 - h], [fx1, y1], [fx0, y1]], fg);
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        for (let x = fx0 + 40; x < fx1 - 8; x += 64) ctx.fillRect(Math.round(x), y1 - h + 3, 2, h - 5);
+        ctx.fillStyle = "rgba(255,255,255,0.25)";
+        ctx.fillRect(fx0, y1 - h, fx1 - fx0, 2);
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(fx0, y1 - 2, fx1 - fx0, 2);
+        for (let i = 0; i < 3; i++) {
+          const cx = fx0 + (Math.sin(t.x0 * 0.7 + i * 2.3) + 1) / 2 * (fx1 - fx0 - 20) + 6;
+          quad([[cx, y1 - h], [cx + 10, y1 - h], [cx + 4, y1 - h + 6]], "#2e3032");
+        }
+        break;
+      }
+      case "low": {
+        const x0 = Math.round(t.x0 / 4) * 4, x1 = Math.round(t.x1 / 4) * 4;
+        const by = Math.round((y0 - 236) / 4) * 4;
+        if (drawPipeBundle(ctx, x0, x1, by + 32)) break;
+        const bands = [[0.45, "#2b2c2e"], [0.3, "#45474a"], [0.25, "#5b5e61"]];
+        let yy = 0;
+        for (const [k, c] of bands) {
+          const h = Math.round(by * k / 4) * 4;
+          ctx.fillStyle = c;
+          ctx.fillRect(x0, yy, x1 - x0, h);
+          yy += h;
+        }
+        ctx.fillStyle = "#5b5e61";
+        ctx.fillRect(x0, yy, x1 - x0, by - yy);
+        ctx.fillStyle = "#8a8d8f";
+        ctx.fillRect(x0, by - 8, x1 - x0, 4);
+        ctx.fillStyle = "#1c1d1f";
+        ctx.fillRect(x0, by - 4, x1 - x0, 4);
+        ctx.fillStyle = "#232426";
+        ctx.fillRect(x0, 0, 8, by);
+        ctx.fillRect(x1 - 8, 0, 8, by);
+        ctx.fillStyle = "rgba(0,0,0,0.18)";
+        for (let x = x0 + 40; x < x1 - 20; x += 96) ctx.fillRect(x, 24, 4, by - 40);
+        ctx.fillStyle = "rgba(90,60,40,0.35)";
+        for (let x = x0 + 60; x < x1 - 30; x += 150) ctx.fillRect(x, by - 28, 20, 12);
+        const pipe = (py, ph) => {
+          const cs = ["#2a2d2e", "#7c8280", "#b9bdba", "#6a706f", "#3a3f41"];
+          const st = ph / cs.length;
+          cs.forEach((c, i) => {
+            ctx.fillStyle = c;
+            ctx.fillRect(x0 + 8, py + Math.round(i * st), x1 - x0 - 16, Math.ceil(st));
+          });
+        };
+        pipe(by, 20);
+        pipe(by + 20, 12);
+        for (let x = x0 + 32; x < x1 - 24; x += 112) {
+          ctx.fillStyle = "#1e2021";
+          ctx.fillRect(x, by - 2, 8, 36);
+          ctx.fillStyle = "#9a9e9c";
+          ctx.fillRect(x + 2, by, 2, 30);
+        }
+        break;
+      }
+      case "narrow": {
+        const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
+        const row = (label3, y) => {
+          let ok = true;
+          for (let x = t.x0 + 50; x < t.x1 - 20 && ok; x += 100) ok = drawPropArt(ctx, "clutter", label3, x, y);
+          return ok;
+        };
+        if (a > y0 && layers) {
+          const nb = narrowBack(t, segTerrain);
+          layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
+            if (!nb.xs.length) return void (drawLowRow(c, nb.span[0], nb.span[1], a, nb.span[0] + 7) || drawBarricade(c, nb.span[0], nb.span[1], a));
+            const half = (propArtSize("clutter", "사물함")?.w ?? 150) / 2;
+            let from = nb.span[0];
+            for (const x of [...nb.xs, Infinity]) {
+              const to = x === Infinity ? nb.span[1] : x - half;
+              if (to - from > 40 && !drawLowRow(c, from, to, a, from + 7)) drawBarricade(c, from, to, a);
+              from = Math.max(from, x + half);
+            }
+            for (const x of nb.xs) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
+          } });
+        } else if (a > y0 && !row("사물함", a)) {
+          ctx.fillStyle = pal.wall;
+          ctx.fillRect(t.x0, y0 - 40, w, a - y0 + 40);
+          ctx.fillStyle = pal.trim;
+          ctx.fillRect(t.x0, y0 - 40, 6, a - y0 + 40);
+          ctx.fillRect(t.x1 - 6, y0 - 40, 6, a - y0 + 40);
+        }
+        if (b < y1) {
+          const fy = Math.min(y1 + 10, b + 150);
+          if (!drawLowRow(ctx, t.x0, t.x1, Math.min(y1 + 6, b + 70), t.x0)) drawBarricade(ctx, t.x0, t.x1, fy);
+        }
+        break;
+      }
+      case "redfloor": {
+        const a = laneYIn(t.lane0, y0, y1), b = laneYIn(t.lane1, y0, y1);
+        const cy = (a + b) / 2, ry = Math.max(14, (b - a) / 2);
+        ctx.save();
+        for (let i = 0, n = Math.max(2, Math.round(w / 140)); i < n; i++) {
+          const cx = t.x0 + (i + 0.5) / n * w + Math.sin(t.x0 + i * 7.3) * 18;
+          const rx = w / n * 0.75;
+          const g2 = ctx.createRadialGradient(cx, cy, 4, cx, cy, rx);
+          g2.addColorStop(0, "rgba(120,8,10,0.62)");
+          g2.addColorStop(0.7, "rgba(90,6,8,0.35)");
+          g2.addColorStop(1, "rgba(60,0,0,0)");
+          ctx.fillStyle = g2;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry * (0.8 + 0.2 * Math.cos(i * 2.1)), 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+        break;
+      }
+      case "glass":
+        ctx.strokeStyle = "rgba(200,240,255,0.5)";
+        for (let x = t.x0; x < t.x1; x += 18) {
+          ctx.beginPath();
+          ctx.moveTo(x, y0 + x * 7 % (y1 - y0));
+          ctx.lineTo(x + 12, y0 + x * 13 % (y1 - y0));
+          ctx.stroke();
+        }
+        label2(ctx, "깨진 유리 (소리)", t.x0 + 4, y0 + 20, "#bfe8ff");
+        break;
+    }
+  }
+  var laneYIn = (lane, y0, y1) => y0 + lane / 160 * (y1 - y0);
+  function label2(_ctx, _s, _x, _y, _c) {
+  }
+  function drawFront(ctx, camX, world, plan) {
+    const fx2 = plan.stage.fx;
+    const vw = ctx.canvas.width;
+    if (fx2.chaseX > -9e3) {
+      const g2 = ctx.createLinearGradient(fx2.chaseX - 300, 0, fx2.chaseX + 40, 0);
+      g2.addColorStop(0, "rgba(60,0,0,0.95)");
+      g2.addColorStop(1, "rgba(160,20,20,0.85)");
+      ctx.fillStyle = g2;
+      ctx.fillRect(fx2.chaseX - 1600, 100, 1640, 640);
+    }
+    if (fx2.light < 0.99) {
+      const p = world.player;
+      const r = 80 + fx2.light * 520;
+      ctx.save();
+      ctx.translate(camX, 0);
+      const px = p.x - camX, py = p.y - p.z - 80;
+      const g2 = ctx.createRadialGradient(px, py, r * 0.35, px, py, r);
+      g2.addColorStop(0, "rgba(0,0,0,0)");
+      g2.addColorStop(1, "rgba(0,0,0,0.97)");
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, vw, 720);
+      ctx.restore();
+    }
+    if (fx2.squeeze > 0) {
+      const w = Math.min(560, fx2.squeeze * 560);
+      ctx.fillStyle = "rgba(30,10,50,0.9)";
+      ctx.fillRect(camX, 0, w / 2, 720);
+      ctx.fillRect(camX + vw - w / 2, 0, w / 2, 720);
+    }
+    if (fx2.red) {
+      ctx.fillStyle = "rgba(160,0,0,0.12)";
+      ctx.fillRect(camX, 0, vw, 720);
+    }
+  }
+
+  // src/game/action/stage/state.ts
+  var META_VERSION = 1;
+  function newMeta() {
+    return { version: META_VERSION, epoch: 0, ruleVer: {}, known: {}, favor: 0, deepest: 0, bestFloors: 0, outings: 0, exits: 0, lonelyHeard: false, mapHint: null };
+  }
+  var ruleVersion = (m, id) => m.ruleVer[id] ?? 0;
+  var currentKnown = (m) => Object.keys(m.known).filter((id) => m.known[id] === ruleVersion(m, id));
+  function exitOpen(m) {
+    return currentKnown(m).length >= 10 && m.favor >= 3 && m.deepest >= B12;
+  }
+  function reshuffle(m) {
+    m.exits++;
+    m.epoch++;
+    const r = rng(mix2(m.epoch, m.exits, 4242));
+    const pool = shuffle2(r, RESHUFFLE_POOL.filter((id) => ruleVersion(m, id) + 1 < RULE[id].texts.length));
+    const changed = pool.slice(0, 3);
+    for (const id of changed) m.ruleVer[id] = ruleVersion(m, id) + 1;
+    m.favor = 0;
+    m.lonelyHeard = false;
+    return changed;
+  }
+  function newOuting(meta, o) {
+    const r = rng(mix2(o.seed, meta.epoch, 1234));
+    const variants = shuffle2(r, [...VARIANT_POOL]).slice(0, 1 + Math.floor(r() * 2));
+    return {
+      seed: o.seed,
+      agent: o.agent,
+      danger: o.danger ?? 0,
+      growth: Math.min(5, Math.floor(meta.outings / 4)),
+      variants,
+      flags: variants.map((id) => RULE[id].variant.flag),
+      depth: 1,
+      lastTypes: [],
+      visited: [],
+      found: [],
+      sent: [],
+      where: "floor",
+      floor: null,
+      service: null,
+      serviceDepth: 0,
+      cell: [0, 0],
+      serviceTime: 0,
+      rerolls: 0,
+      returnX: 0,
+      greeted: false,
+      closeCount: 0,
+      rideAttack: false,
+      stuck: 0,
+      reveal: false,
+      tired: false,
+      deals: 0,
+      pending: null,
+      rescued: [],
+      escort: null,
+      items: [],
+      favorDelta: 0,
+      log: [],
+      ending: false,
+      ride: 0,
+      floorTypes: {},
+      keys: [],
+      gatesOpen: [],
+      shortcuts: [],
+      secretDepth: r() < 0.75 ? 2 + Math.floor(r() * 4) : 0,
+      services: {},
+      explored: {},
+      hatchX: {},
+      sides: {},
+      upgrades: [],
+      upgradeN: 0,
+      fightsWon: 0,
+      room: [0, 0],
+      wkeys: [],
+      unlocked: [],
+      broken: [],
+      seenRooms: {},
+      rewards: [],
+      hatchRoom: {},
+      clearedFloors: []
+    };
+  }
+  function addFavor(meta, out, n, why) {
+    const before = meta.favor;
+    meta.favor = clampFavor(meta.favor + n);
+    out.favorDelta += meta.favor - before;
+    if (meta.favor !== before) out.log.push(`총애 ${n > 0 ? "+" : ""}${n} (${why}) → ${meta.favor}`);
+  }
+  function sendFound(meta, out) {
+    const sent = [];
+    for (const id of out.found) {
+      meta.known[id] = ruleVersion(meta, id);
+      sent.push(id);
+    }
+    out.sent.push(...sent);
+    out.found = [];
+    return sent;
+  }
+
+  // src/game/action/stage/module.ts
+  var DT = 1 / 30;
+  function createElevatorStage(store2, hooks = {}) {
+    let meta = store2.load() ?? newMeta();
+    let out = null;
+    let rt = null;
+    let planN = 0;
+    const save2 = () => store2.save(meta);
+    const log = (s2) => {
+      out?.log.push(s2);
+      hooks.log?.(s2);
+    };
+    const newRt = (plan) => ({
+      plan,
+      t: 0,
+      prevX: plan.startX,
+      prevY: 590,
+      safeX: plan.startX,
+      stillT: 0,
+      noise: 0,
+      light: plan.type === "dark" ? 1 : plan.type === "deep" ? 0.08 : 1,
+      summonCd: 0,
+      stalkCd: 0,
+      chaseX: plan.type === "chase" ? plan.startX - 400 : -9999,
+      chaseSlow: 0,
+      backT: 0,
+      surge: 0,
+      squeeze: plan.stage.floor?.tuning.squeeze ?? 0,
+      squeezeMax: plan.stage.floor?.tuning.squeeze ?? 0,
+      switchSeq: {},
+      opened: /* @__PURE__ */ new Set(),
+      greeted: /* @__PURE__ */ new Set(),
+      woke: /* @__PURE__ */ new Set(),
+      mealOk: /* @__PURE__ */ new Set(),
+      spawned: /* @__PURE__ */ new Set(),
+      talked: /* @__PURE__ */ new Set(),
+      choices: /* @__PURE__ */ new Map(),
+      kills: 0,
+      enemyTotal: plan.encounters.reduce((n, e) => n + e.waves.reduce((m, w) => m + w.filter((s2) => !s2.boss).length, 0), 0) + (plan.stage.floor?.spawns.filter((s2) => s2.role === "enemy" && !s2.data.harmless && plan.type === "chase").length ?? 0),
+      trial: plan.stage.floor?.goal ? { on: !meta || !out?.flags.includes("trial_mid"), read: false, t: plan.stage.floor.goal.time, found: 0, done: false, failed: false, stopT: 0 } : null,
+      guardianSpawned: false,
+      guardianSkip: false,
+      guardianDefeated: false,
+      traversed: false,
+      penaltyKind: null,
+      predator: false,
+      rested: false,
+      sentHere: false,
+      warned: /* @__PURE__ */ new Set(),
+      hurtCd: 0,
+      red: false,
+      revisit: false,
+      crack: /* @__PURE__ */ new Map(),
+      restN: 0
+    });
+    const nodes = /* @__PURE__ */ new Map();
+    let node = null;
+    const visit = (key2, make, startX) => {
+      let n = nodes.get(key2);
+      if (!n) {
+        const plan = make();
+        n = { plan, rt: newRt(plan), all: plan.encounters.slice(), cleared: /* @__PURE__ */ new Set() };
+        nodes.set(key2, n);
+      } else {
+        const r = n.rt;
+        r.t = 0;
+        r.revisit = true;
+        r.stillT = 0;
+        r.hurtCd = 0;
+        r.predator = false;
+        r.summonCd = Math.max(r.summonCd, 3);
+        if (n.plan.type === "chase") r.chaseX = (startX ?? n.plan.startX) - 600;
+      }
+      if (startX !== void 0) n.plan.startX = startX;
+      if (!n.rt.wallFaceDefeated) {
+        for (const s2 of n.plan.stage.floor?.spawns ?? [])
+          if (s2.kind === "wallface" && s2.data.rule === "r11") n.rt.spawned.delete(s2.id);
+      }
+      n.rt.prevX = n.rt.safeX = n.plan.startX;
+      const cleared = n.cleared;
+      n.plan.encounters = n.all.filter((e) => !cleared.has(e.triggerX));
+      node = n;
+      rt = n.rt;
+      return n.plan;
+    };
+    const track = (api) => {
+      const t = Object.create(api);
+      t.setProp = (id, patch) => {
+        api.setProp(id, patch);
+        const props2 = rt?.plan.props;
+        if (!props2) return;
+        const i = props2.findIndex((q) => q.id === id);
+        if (patch === null) {
+          if (i >= 0) props2.splice(i, 1);
+        } else if (i >= 0) props2[i] = { ...props2[i], ...patch };
+        else props2.push({ id, kind: "decor", x: 0, y: Y_TOP, w: 40, h: 40, ...patch });
+      };
+      return t;
+    };
+    const patchAt = (key2, id, patch) => {
+      const pr = nodes.get(key2)?.plan.props?.find((q) => q.id === id);
+      if (pr) Object.assign(pr, patch);
+    };
+    let later = [];
+    const defer = (run) => {
+      const plan = rt?.plan.id;
+      return (res) => {
+        if (plan) later.push({ plan, run: (api) => run(api, res) });
+      };
+    };
+    const placedOf = (prop) => prop.id.startsWith("p") ? rt?.plan.stage.floor?.placed.find((p) => `p${p.id}` === prop.id) : void 0;
+    const hookOf = (id) => id.startsWith("h") ? rt?.plan.stage.floor?.spawns.find((s2) => `h${s2.id}` === id) : void 0;
+    const ruleSaid = /* @__PURE__ */ new Map();
+    const foundRule = (api, id, x) => {
+      if (!out || !RULE[id]) return;
+      const text2 = ruleText(id, ruleVersion(meta, id));
+      const already = meta.known[id] === ruleVersion(meta, id) || out.found.includes(id);
+      const now = api.world.tick;
+      if (!already || now - (ruleSaid.get(id) ?? -9999) > 600) {
+        ruleSaid.set(id, now);
+        api.world.say(`규칙: ${text2}${out.variants.includes(id) ? `
+${RULE[id].variant.text}` : ""}`, 4);
+      }
+      if (!out.found.includes(id) && !out.sent.includes(id)) {
+        out.found.push(id);
+        api.note("stage.found", [...out.found]);
+      }
+      if (!already) {
+        api.world.emit({ type: "ruleFound", x, id });
+        log(`규칙 발견 (미송신): ${text2}`);
+      }
+    };
+    const worlds = /* @__PURE__ */ new Map();
+    let announceNext = false;
+    const worldOf = (depth, type, sub) => {
+      let w = worlds.get(depth);
+      if (!w) {
+        w = makeWorld({ seed: out.seed, depth, type, sub, epoch: meta.epoch });
+        worlds.set(depth, w);
+        log(`${w.label} 세상: ${w.cols}×${w.rows} 방 · 정답 길 ${w.path.length}칸 · 잠금 ${w.locks} · 보상 방 ${w.rooms.filter((q) => q.role === "reward").length}${w.rooms.some((q) => q.role === "secret") ? " · 숨은 방" : ""}${w.rooms.some((q) => q.wrap.r) ? " · 끝이 이어진 복도" : ""}`);
+      }
+      return w;
+    };
+    const entryX = (f, from) => {
+      if (!from) return 240;
+      const pl = f.placed.find((q) => q.data.dir === from && (q.kind === "wdoor" || q.kind === "wup" || q.kind === "wdown" || q.kind === "crack" || q.kind === "vent"));
+      if (!pl) return from === "r" ? f.width - 200 : 240;
+      return from === "l" ? pl.x + 120 : from === "r" ? pl.x - 120 : pl.x + 70;
+    };
+    const syncRoom = (plan, w) => {
+      const o = out;
+      const f = plan.stage.floor;
+      const rm = roomAt(w, f.room.col, f.room.row);
+      const props2 = plan.props ?? [];
+      for (const pl of f.placed) {
+        const id = `p${pl.id}`;
+        const i = props2.findIndex((q) => q.id === id);
+        if (i < 0) continue;
+        const d3 = pl.data.dir;
+        const eid = d3 ? edgeId(w, rm, d3) : "";
+        if (pl.kind === "locked" && pl.data.lock !== void 0 && o.unlocked.includes(eid)) props2.splice(i, 1);
+        else if ((pl.kind === "wup" || pl.kind === "wdown") && pl.data.lock !== void 0 && o.unlocked.includes(eid)) props2[i].label = pl.label.replace(/^잠긴 /, "").replace(/ [①②③④]$/, "") + ` · ${across(w, rm, d3).name}`;
+        else if (pl.kind === "crack" && o.broken.includes(eid)) props2[i].label = "부서진 벽 틈 (숨은 방)";
+        else if (pl.kind === "vent" && o.broken.includes(eid)) props2[i].label = "열린 덕트 (숨은 방)";
+      }
+    };
+    const buildFloorPlan = (t) => {
+      const o = out;
+      const known = o.floorTypes[t.depth];
+      if (known) t.type = known.type, t.sub = known.sub;
+      const freshDepth = !known;
+      const w = worldOf(t.depth, t.type, t.sub);
+      const [c, rw] = t.room ?? w.arrival;
+      const rm = roomAt(w, c, rw);
+      const plan = visit(`room:${t.depth}:${c},${rw}`, () => {
+        const f2 = roomFloor(w, rm, { seed: o.seed, danger: o.danger, growth: o.growth, flags: o.flags, epoch: meta.epoch, exitOpen: t.depth === 1 && exitOpen(meta), tired: o.tired });
+        return floorPlan(f2, `room:${t.depth}:${c},${rw}:${++planN}`, 240);
+      });
+      const f = plan.stage.floor;
+      const x = t.startX ?? entryX(f, t.from);
+      plan.startX = x;
+      rt.prevX = rt.safeX = x;
+      if (plan.type === "chase") rt.chaseX = t.from === "r" || x >= f.width / 2 ? -1e9 : x - 600;
+      syncRoom(plan, w);
+      o.floorTypes[t.depth] = { type: f.type, sub: f.sub };
+      o.depth = t.depth;
+      o.where = "floor";
+      o.floor = f;
+      o.tired = false;
+      o.room = [c, rw];
+      const seen2 = o.seenRooms[t.depth] ??= [];
+      if (!seen2.includes(`${c},${rw}`)) seen2.push(`${c},${rw}`);
+      announceNext = freshDepth;
+      if (freshDepth) {
+        if (!o.visited.some((v) => v.depth === t.depth)) o.visited.push({ depth: t.depth, type: f.type });
+        if (o.lastTypes[o.lastTypes.length - 1] !== f.type || o.lastTypes.length === 0) o.lastTypes.push(f.type);
+      }
+      if (t.depth > meta.deepest) meta.deepest = t.depth;
+      meta.bestFloors = Math.max(meta.bestFloors, o.visited.length);
+      save2();
+      return plan;
+    };
+    void makeFloor;
+    const buildCell = (t) => {
+      const o = out;
+      const z = o.service;
+      o.cell = [t.col, t.row];
+      o.where = "service";
+      const cell = cellAt(z, t.col, t.row);
+      const downX = cell.things.find((x) => x.kind === "down")?.x ?? 880;
+      const upX = cell.things.find((x) => x.kind === "ladder_up")?.x ?? 560;
+      const ladderDownX = cell.things.find((x) => x.kind === "ladder_down")?.x ?? 720;
+      const startX = t.side === "l" ? 120 : t.side === "r" ? ROOM_W - 120 : t.side === "u" ? upX : t.side === "d" ? ladderDownX : t.side === "down" ? Math.max(120, downX - 110) : 400;
+      const sv = o.services[z.depth];
+      const k = `${t.col},${t.row}`;
+      if (sv && !sv.seen.includes(k)) sv.seen.push(k);
+      return visit(`cell:${z.depth}:${z.reroll}:${k}`, () => cellPlan(z, cell, `service:${z.depth}:${k}:${++planN}`, startX), startX);
+    };
+    const buildSide = (t) => {
+      const o = out;
+      const f = (nodes.get(`floor:${t.depth}`) ?? node).plan.stage.floor;
+      o.where = "side";
+      return visit(`side:${t.depth}:${t.door}`, () => sidePlan(makeSide(o.seed, f, t.door, t.secret, t.label), f, `side:${t.depth}:${t.door}:${++planN}`), 260);
+    };
+    const enterService = (depth, from) => {
+      const o = out;
+      const sv = o.services[depth] ??= { reroll: -1, seen: [], key: false };
+      sv.reroll++;
+      sv.seen = [];
+      if (sv.reroll > 0) log("정비 구역이 다시 짜였다 (다락방·로프 위치는 그대로)");
+      const f = nodes.get(`floor:${depth}`)?.plan.stage.floor;
+      sv.key = !!f?.tuning.keyGate && !o.keys.includes(depth) && !o.gatesOpen.includes(depth);
+      o.service = sv.zone = makeService({ seed: o.seed, depth, reroll: sv.reroll, flags: o.flags, epoch: meta.epoch, key: sv.key });
+      o.serviceDepth = depth;
+      o.serviceTime = 0;
+      o.rerolls = sv.reroll;
+      const c = from === "top" ? o.service.entryCell : o.service.downCell;
+      return { to: "service", col: c[0], row: c[1], side: from === "top" ? "u" : "down" };
+    };
+    const buttonsNow = () => {
+      const o = out;
+      const bs = elevatorButtons({ seed: o.seed + o.ride * 17, depth: o.depth, favor: meta.favor, epoch: meta.epoch, last: o.lastTypes, reveal: o.reveal, deepest: meta.deepest, exitOpen: exitOpen(meta) });
+      for (const b of bs) {
+        const k = o.floorTypes[b.depth];
+        if (k && !b.exit) b.type = k.type, b.sub = k.sub;
+      }
+      return bs;
+    };
+    const finishWith = (api, t) => {
+      if (node && node.cleared.size < node.all.length) return void api.world.say("전투 중에는 방을 나갈 수 없다. 먼저 이 방을 정리하자.", 2);
+      if (rt?.plan.stage.where === "floor" && api.world.bodies.some((b) => b.alive && b.hp > 0 && b.boss)) return void api.world.say("수호자를 해결해야 길이 열린다.", 2);
+      out.pending = t;
+      api.finish("next");
+    };
+    const wake = (api, why, x, radius = 600) => {
+      const f = rt?.plan.stage.floor;
+      if (!f || !rt) return;
+      let n = 0;
+      for (const s2 of f.spawns) {
+        const id = `h${s2.id}`;
+        if ((s2.role === "resident" || s2.role === "enemy" && s2.data.harmless) && !rt.woke.has(id) && Math.abs(s2.x - x) < radius) {
+          rt.woke.add(id);
+          api.setProp(id, null);
+          api.spawn({ kind: s2.role === "resident" ? "resident" : "lurker", x: s2.x, y: laneY(s2.lane) });
+          n++;
+        }
+      }
+      if (n) {
+        api.world.say(`${why} — ${n > 1 ? `${["", "", "둘", "셋", "넷", "다섯"][n] ?? "여럿"}이` : "하나가"} 깨어났다`, 3);
+        api.world.shake(8, 4);
+        log(`규칙 위반: ${why}`);
+      }
+    };
+    const childRuleBroken = () => [...nodes.values()].some((n) => n.plan.stage.floor?.depth === out.depth && n.rt.wallFaceBroken);
+    const knowsChildRule = () => out.found.includes("r11") || currentKnown(meta).includes("r11");
+    const dropChildKey = (api) => {
+      const r = rt, f = r.plan.stage.floor;
+      if (!r.childFightStarted || r.childKeyDropped || r.guardianDefeated || !knowsChildRule() || childRuleBroken()) return;
+      const key2 = f?.placed.find((p) => p.kind === "childkey");
+      if (!key2) return;
+      r.childKeyDropped = true;
+      api.setProp(`p${key2.id}`, { kind: "key", x: key2.x, y: laneY(key2.lane), w: key2.w, h: 40, label: key2.label });
+      api.world.emit({ type: "custom", name: "childKeyDropped", data: { depth: f.depth } });
+      api.world.say("벽의 사람 모양을 건드리지 않았다. 아이 방 문 앞에 열쇠가 떨어졌다. (E)", 3);
+    };
+    const terrain = (api, terr) => {
+      const r = rt;
+      const p = api.world.player;
+      const lane = (p.y - Y_TOP) / (Y_BOTTOM - Y_TOP) * LANE_DEPTH;
+      let blocked = false;
+      for (const t of terr) {
+        const inX = p.x > t.x0 && p.x < t.x1;
+        const wasIn = r.prevX > t.x0 && r.prevX < t.x1;
+        switch (t.kind) {
+          case "pit":
+            if (inX && p.z <= 0.5 && !p.airborne) {
+              api.hurtPlayer(12, true);
+              r.safeX = r.prevX < t.x0 ? Math.min(r.safeX, t.x0 - 120) : Math.max(r.safeX, t.x1 + 120);
+              api.movePlayer(r.safeX);
+              api.world.say("떨어졌다. 구덩이는 점프로.", 2);
+              api.world.emit({ type: "down", x: p.x, who: "player" });
+              return;
+            }
+            break;
+          case "block":
+            if (inX && !wasIn && p.z < t.h - 6) blocked = true;
+            break;
+          case "low":
+            if (inX && !p.crouching) {
+              blocked = true;
+              if (!r.warned.has("low")) r.warned.add("low"), api.world.say("천장이 낮다. ↓ 앉아서 지나간다.", 2);
+            }
+            break;
+          case "narrow": {
+            let M3 = 120;
+            for (const o of terr) if (o !== t && o.kind === "narrow") M3 = Math.min(M3, Math.max(0, (o.x0 >= t.x1 ? o.x0 - t.x1 : t.x0 - o.x1) / 2 - 40));
+            const back = narrowBackSpan(t, terr) ?? [t.x0 - M3, t.x1 + M3];
+            const inB = (x) => x > back[0] - 44 && x < back[1] + 44, inF = (x) => x > t.x0 - M3 && x < t.x1 + M3;
+            const out2 = (lane < t.lane0 - 2 && inB(p.x) ? inB(r.prevX) ? "clamp" : "block" : null) ?? (lane > t.lane1 + 2 && inF(p.x) ? inF(r.prevX) ? "clamp" : "block" : null);
+            if (out2 === "block") blocked = true;
+            else if (out2 === "clamp") api.movePlayer(p.x, laneY(Math.max(t.lane0, Math.min(t.lane1, lane))));
+            if (back && t.lane0 > 0)
+              for (const b of api.world.bodies) {
+                if (!b.alive || b.team === "player" || b.kind === "bullet" || b.kind === "item") continue;
+                const bl = (b.y - Y_TOP) / (Y_BOTTOM - Y_TOP) * LANE_DEPTH;
+                if (bl < t.lane0 && inB(b.x)) b.y = laneY(t.lane0);
+              }
+            break;
+          }
+          case "redfloor":
+            if (inX && lane >= t.lane0 && lane <= t.lane1 && p.z <= 0.5 && r.hurtCd <= 0) {
+              r.hurtCd = 1.2;
+              r.red = true;
+              api.hurtPlayer(10);
+              foundRule(api, "r_red", p.x);
+              wake(api, "붉은 바닥을 밟았다", p.x, 500);
+            }
+            break;
+          case "glass":
+            if (inX && p.z <= 0.5 && Math.abs(p.x - r.prevX) > 0.5) r.noise += (p.running ? 0.03 : 0.012) * (rt.plan.stage.floor?.tuning.noiseMul ?? 1) * quietK();
+            break;
+        }
+      }
+      if (blocked) api.movePlayer(r.prevX, p.y);
+      else if (!terr.some((t) => t.kind === "pit" && p.x > t.x0 - 30 && p.x < t.x1 + 30) && p.z <= 0.5) r.safeX = p.x;
+    };
+    const spawnGuardianNear = (api, why) => {
+      const f = rt.plan.stage.floor;
+      const g2 = f.spawns.find((s2) => s2.role === "guardian");
+      const kind = g2?.kind ?? FLOOR_TYPES[f.type].guardians[0]?.kind ?? "guard";
+      const p = api.world.player;
+      api.spawn({ kind, x: p.x + (p.dir === 1 ? -420 : 420), y: p.y, boss: true });
+      api.world.emit({ type: "bossRoar", x: p.x, kind });
+      api.world.say(`${why}: ${FLOOR_TYPES[f.type].guardians.find((x) => x.kind === kind)?.label ?? kind}`, 3);
+      log(`수호자 등장 (${why})`);
+      return kind;
+    };
+    const floorRules = (api) => {
+      const r = rt;
+      const plan = r.plan;
+      const f = plan.stage.floor;
+      const p = api.world.player;
+      const moved = Math.hypot(p.x - r.prevX, p.y - r.prevY) > 0.3;
+      r.stillT = moved || p.airborne ? 0 : r.stillT + DT;
+      const tune = f.tuning;
+      if (f.type === "silent" || f.type === "deep") {
+        if (p.running && moved) r.noise += 0.02 * tune.noiseMul * quietK();
+        r.noise = Math.max(0, r.noise - 4e-3);
+        api.world.noise = Math.min(1, r.noise);
+        r.summonCd -= DT;
+        if (r.noise >= 1 && r.summonCd <= 0) {
+          r.summonCd = 20;
+          r.noise = 0.4;
+          foundRule(api, "silent", p.x);
+          if (f.type === "deep") api.spawn({ kind: "toucher", x: p.x + 160, y: p.y });
+          else spawnGuardianNear(api, "소리가 찼다");
+        }
+      }
+      if (f.type === "dark" || f.type === "deep") {
+        if (f.type === "dark") r.light = Math.max(0.12, r.light - DT / 9 * tune.lightFade * (out.upgrades.includes("battery") ? 0.5 : 1));
+        api.world.light = r.light;
+        r.stalkCd -= DT;
+        if (r.stillT > 1.5 && r.stalkCd <= 0) {
+          r.stalkCd = 6;
+          api.spawn({ kind: f.type === "deep" ? "toucher" : "warmth", x: p.x + (r.t % 2 < 1 ? -260 : 260), y: p.y });
+          api.world.say(f.type === "deep" ? "무언가가 어깨를 만진다." : "멈췄다. 누군가 체온을 잰다.", 2.5);
+          foundRule(api, "dark", p.x);
+        }
+      }
+      if (f.type === "chase" && f.room && r.traversed) r.chaseX = plan.stage.fx.chaseX = -1e9;
+      if (f.type === "chase" && r.chaseX > -1e8) {
+        const end = f.segments[f.segments.length - 1].x;
+        if (p.x < end - 200 && r.t > 1.2) {
+          let v = tune.chaseSpeed * DT;
+          if (r.chaseSlow > 0) v *= 0.35, r.chaseSlow -= DT;
+          if (r.surge > 0) v *= 1.6, r.surge -= DT;
+          if (p.x - r.chaseX > 750) v *= 2.5;
+          r.chaseX += v;
+        }
+        if (p.dir === -1 && !p.airborne) r.backT += DT;
+        else r.backT = 0;
+        if (r.backT > 0.6 && r.surge <= 0) {
+          r.surge = 2;
+          api.world.say("뒤를 봤다. 그것이 빨라진다.", 2);
+          foundRule(api, "c_back", p.x);
+        }
+        if (p.x < r.chaseX + 30 && r.hurtCd <= 0) {
+          r.hurtCd = 1;
+          api.hurtPlayer(18, true);
+          api.movePlayer(r.chaseX + 260);
+          api.world.shake(10, 6);
+        }
+        plan.stage.fx.chaseX = r.chaseX;
+      }
+      if (f.type === "chase" || f.type === "deep") {
+        for (const s2 of f.spawns)
+          if ((s2.role === "enemy" || f.type === "deep" && s2.role === "stalker") && !s2.data.harmless && !r.spawned.has(s2.id) && Math.abs(s2.x - p.x) < 700) {
+            r.spawned.add(s2.id);
+            api.spawn({ kind: s2.kind, x: s2.x, y: laneY(s2.lane), elite: s2.elite || void 0 });
+          }
+      }
+      if (f.type === "puzzle") {
+        r.squeeze -= DT;
+        plan.stage.fx.squeeze = r.squeeze < 15 ? Math.min(1, (15 - r.squeeze) / 15) : 0;
+        if (r.squeeze < 15 && !r.warned.has("sq")) r.warned.add("sq"), foundRule(api, "p_wall", p.x);
+        if (r.squeeze <= 0 && r.hurtCd <= 0) r.hurtCd = 1, api.hurtPlayer(6);
+      }
+      for (const sh of f.placed.filter((x) => x.kind === "shutter"))
+        if (!r.opened.has(`p${sh.id}`)) {
+          if (r.prevX < sh.x && p.x > sh.x - 26) api.movePlayer(Math.min(p.x, sh.x - 30), p.y);
+          else if (r.prevX >= sh.x && p.x < sh.x + 26) api.movePlayer(Math.max(p.x, sh.x + 30), p.y);
+        }
+      for (const g2 of f.placed.filter((x) => x.kind === "locked" && x.data.lock === void 0)) {
+        if (out.gatesOpen.includes(f.depth)) break;
+        if (p.x > g2.x - 26 && r.prevX <= g2.x - 26 + 40) api.movePlayer(Math.min(p.x, g2.x - 30), p.y);
+        if (Math.abs(p.x - g2.x) < 260 && !r.warned.has("gate")) {
+          r.warned.add("gate");
+          api.world.say(out.keys.includes(f.depth) ? "방화셔터. 정비 열쇠가 있다. E로 연다." : "방화셔터가 잠겨 있다. 열쇠는 이 층 정비 구역 어딘가 (해치·점검문으로).", 3.5);
+        }
+      }
+      if (f.type === "replica") {
+        for (const s2 of f.spawns.filter((s3) => s3.kind === "wallface" && s3.data.rule === "r11"))
+          if (!r.wallFaceDefeated && !r.spawned.has(s2.id) && Math.abs(s2.x - p.x) < 700) {
+            r.spawned.add(s2.id);
+            api.spawn({ kind: s2.kind, x: s2.x, y: laneY(s2.lane) });
+          }
+        dropChildKey(api);
+        const nogreet = out.flags.includes("replica_nogreet");
+        for (const s2 of f.spawns.filter((s3) => s3.role === "resident")) {
+          const id = `h${s2.id}`;
+          if (r.woke.has(id)) continue;
+          if (!nogreet && !r.greeted.has(id) && p.x > s2.x + 60 && r.prevX <= s2.x + 60) {
+            foundRule(api, "r_greet", p.x);
+            wake(api, "인사 없이 지나갔다", s2.x, 200);
+          }
+          if (p.running && moved && Math.abs(p.x - s2.x) < 300) {
+            foundRule(api, "r_quiet", p.x);
+            wake(api, "복도에서 뛰었다", s2.x, 400);
+          }
+        }
+        for (const tb of f.placed.filter((x) => x.kind === "table" && !x.data.guardian))
+          if (!r.mealOk.has(`p${tb.id}`) && p.x > tb.x + tb.w / 2 + 20 && r.prevX <= tb.x + tb.w / 2 + 20) {
+            r.mealOk.add(`p${tb.id}`);
+            foundRule(api, "r_meal", p.x);
+            wake(api, "밥상을 그냥 지나쳤다", tb.x, 700);
+          }
+      }
+      if (f.type === "lobby") {
+        for (const s2 of f.spawns.filter((s3) => s3.role === "enemy" && s3.data.harmless)) {
+          const id = `h${s2.id}`;
+          if (r.woke.has(id)) continue;
+          const near2 = Math.abs(p.x - s2.x) < 260;
+          const away = s2.x > p.x && p.dir === -1 || s2.x < p.x && p.dir === 1;
+          if (near2 && away) {
+            r.backT += DT;
+            if (r.backT > 1.4) {
+              r.backT = 0;
+              foundRule(api, "lobby", p.x);
+              wake(api, "등을 보였다", s2.x, 80);
+            }
+          }
+        }
+        if (p.running && moved && f.placed.some((x) => x.kind === "prop" && x.label === "거꾸로 가는 시계" && Math.abs(x.x - p.x) < 240) && r.summonCd <= 0) {
+          r.summonCd = 12;
+          foundRule(api, "l_clock", p.x);
+          api.spawn({ kind: "lurker", x: p.x - 300, y: p.y });
+          api.world.say("시계 앞에서 뛰었다. 등 뒤가 서늘하다.", 2.5);
+        }
+        r.summonCd -= DT;
+      }
+      if (r.trial && f.goal) {
+        const tr = r.trial;
+        const goalX = f.placed.find((x) => x.kind === "goalwall").x;
+        if (!tr.on && p.x > goalX) tr.on = true;
+        if (tr.on && !tr.done && !tr.failed) {
+          tr.t -= DT;
+          if (f.goal.kind === "nostop") {
+            tr.stopT = r.stillT;
+            if (tr.stopT > 1.2) fail(api, "멈췄다");
+            if (p.x > f.segments[f.segments.length - 2].x) succeed(api);
+          }
+          if (f.goal.kind === "marks" && tr.found >= f.goal.need) succeed(api);
+          if (f.goal.kind === "clear" && r.kills >= Math.max(1, r.enemyTotal)) succeed(api);
+          if (tr.t <= 0) fail(api, "시간 초과");
+        }
+      }
+      if (!r.guardianSpawned) {
+        const g2 = f.spawns.find((s2) => s2.role === "guardian");
+        if (g2 && (g2.kind === "elder" || g2.data.survive)) {
+          const room2 = segAt(f.segments, g2.x);
+          if (p.x > room2.x + 380) {
+            r.guardianSpawned = true;
+            if (r.guardianSkip) {
+              api.world.say("노부부가 고개를 끄덕인다. 「잘 먹었어요?」 …지나가도 된다.", 3.5);
+              addFavor(meta, out, 1, "수호자를 규칙으로 통과");
+              save2();
+            } else if (g2.data.survive) {
+              for (let k = 0; k < 3; k++) api.spawn({ kind: "toucher", x: room2.x + 400 + k * 260, y: laneY(30 + k * 50) });
+              api.world.say("만지는 것들. 멈추지 말고, 소리 내지 말고, 지나가라.", 4);
+            } else {
+              api.spawn({ kind: g2.kind, x: g2.x, y: laneY(g2.lane), boss: true, elite: g2.elite || void 0 });
+              api.world.emit({ type: "combat:boss", index: 0 });
+            }
+          }
+        }
+      }
+      if (out.escort && !r.warned.has("esc")) r.warned.add("esc"), api.world.say("회사원이 뒤를 따라온다. 다락방 로프까지 데려가자.", 3);
+    };
+    const succeed = (api) => {
+      const tr = rt.trial;
+      tr.done = true;
+      api.heal(40);
+      out.items.push("heal");
+      addFavor(meta, out, 1, "시험 목표 달성");
+      save2();
+      api.world.say("목표 달성. 벽의 글씨가 지워진다. (회복 + 보급품 + 총애 +1)", 4);
+      api.note("stage.trial", "success");
+      log("시험 층 목표 달성");
+    };
+    const fail = (api, why) => {
+      const tr = rt.trial;
+      tr.failed = true;
+      api.note("stage.trial", "fail");
+      foundRule(api, "trial", api.world.player.x);
+      rt.penaltyKind = spawnGuardianNear(api, `시험 실패 (${why})`);
+    };
+    const serviceRules = (api) => {
+      const r = rt;
+      const o = out;
+      o.serviceTime += DT;
+      api.world.light = r.light;
+      const lim = o.service.predatorAfter;
+      if (o.serviceTime > lim - 20 && !r.warned.has("pred")) {
+        r.warned.add("pred");
+        api.world.say("덕트 저편에서 무언가 큰 것이 기어 오는 소리.", 3);
+      }
+      if (o.serviceTime > lim && !r.predator) {
+        r.predator = true;
+        const p = api.world.player;
+        api.spawn({ kind: "predator", x: p.x < 640 ? ROOM_W - 80 : 80, y: p.y, boss: true });
+        api.world.say("포식자. 여기 오래 있으면 안 됐다.", 3);
+        foundRule(api, "attic", p.x);
+        log(`포식자 등장 (정비 구역 ${Math.round(o.serviceTime)}초)`);
+      }
+    };
+    const mod2 = {
+      id: "elevator",
+      label: "차원 승강기",
+      meta: () => meta,
+      outing: () => out,
+      reloadMeta: () => {
+        meta = store2.load() ?? newMeta();
+      },
+      snapshot: () => out && rt && !later.length ? encodeState({ version: 1, meta, out, planN, nodes, worlds, current: rt, announceNext, rushT }) : null,
+      restore(state2) {
+        const s2 = decodeState(state2);
+        if (s2.version !== 1 || !s2.out || !(s2.nodes instanceof Map) || !s2.current?.plan) throw new Error("지원하지 않는 출동 저장");
+        const revive = (r) => {
+          const p = r.plan, d3 = p.stage;
+          const live = d3.where === "floor" ? floorPlan(d3.floor, p.id, p.startX) : d3.where === "service" ? cellPlan(d3.zone, d3.cell, p.id, p.startX) : d3.where === "car" ? carPlan(p.id, d3.buttons, p.depth) : d3.where === "side" ? sidePlan(d3.side, d3.floor, p.id) : endingPlan(p.id);
+          Object.assign(live, p);
+          r.plan = live;
+          return r;
+        };
+        nodes.clear();
+        worlds.clear();
+        node = null;
+        later = [];
+        ruleSaid.clear();
+        for (const [k, n] of s2.nodes) {
+          n.rt = revive(n.rt);
+          n.plan = n.rt.plan;
+          if (!n.rt.wallFaceDefeated) {
+            for (const sp of n.plan.stage.floor?.spawns ?? [])
+              if (sp.kind === "wallface" && sp.data.rule === "r11") n.rt.spawned.delete(sp.id);
+          }
+          const guardian = n.plan.stage.floor?.spawns.find((g2) => g2.role === "guardian");
+          if (guardian && !n.rt.guardianSkip && !n.rt.guardianDefeated) {
+            if (guardian.kind === "elder") n.rt.guardianSpawned = false;
+            if (guardian.kind === "family208") {
+              n.all = n.all.map((enc) => {
+                const guards = enc.waves.flat().filter((sp) => sp.kind === "family208");
+                if (!guards.length || !n.cleared.has(enc.triggerX)) return enc;
+                n.cleared.delete(enc.triggerX);
+                return { ...enc, waves: [guards] };
+              });
+            }
+          }
+          n.plan.encounters = n.all.filter((e) => !n.cleared.has(e.triggerX));
+          nodes.set(k, n);
+          if (n.plan.id === s2.current.plan.id) node = n;
+        }
+        for (const [k, w] of s2.worlds) worlds.set(k, w);
+        rt = node?.rt ?? revive(s2.current);
+        meta = s2.meta;
+        out = s2.out;
+        planN = s2.planN;
+        announceNext = s2.announceNext;
+        rushT = s2.rushT;
+        if (rt.plan.stage.floor) out.floor = rt.plan.stage.floor;
+        save2();
+        return rt.plan;
+      },
+      debugFillExit() {
+        for (const id of ["entry", "noreturn", "close", "greet", "mirror", "lobby", "attic", "passenger", "trial", "dark", "silent", "exit"]) meta.known[id] = ruleVersion(meta, id);
+        meta.favor = 3;
+        meta.deepest = Math.max(meta.deepest, B12);
+        save2();
+      },
+      resetMeta() {
+        meta = newMeta();
+        save2();
+      },
+      mapView: () => mapView(),
+      worldAt: (d3) => worlds.get(d3) ?? null,
+      firstFloor(run) {
+        out = newOuting(meta, { seed: run.seed, agent: run.agent, danger: run.danger });
+        meta.outings++;
+        planN = 0;
+        nodes.clear();
+        worlds.clear();
+        later = [];
+        ruleSaid.clear();
+        rushT = 0;
+        node = null;
+        const plan = buildFloorPlan({ to: "floor", depth: 1, type: "lobby", sub: null });
+        log(`출동 ${meta.outings}회째 · 씨앗 ${run.seed}${out.variants.length ? ` · 이번 출동 변형: ${out.variants.map((v) => RULE[v].variant.text.replace("이번 출동: ", "")).join(" / ")}` : ""}`);
+        return plan;
+      },
+      nextFloor(_run, _prev, how) {
+        const o = out;
+        if (!o) return null;
+        if (how === "withdraw") {
+          const sent = sendFound(meta, o);
+          save2();
+          log(o.ending ? "출구로 나왔다." : `귀환 로프로 돌아왔다. 송신 ${sent.length}줄`);
+          rt = null;
+          node = null;
+          nodes.clear();
+          worlds.clear();
+          return null;
+        }
+        const t = o.pending ?? { to: "floor", depth: o.depth + 1, type: pickType(o.depth + 1, o.lastTypes, o.seed, meta.epoch), sub: null };
+        o.pending = null;
+        let plan;
+        if (t.to === "car") {
+          o.where = "car";
+          o.ride++;
+          o.greeted = false;
+          o.closeCount = 0;
+          o.rideAttack = false;
+          o.stuck = meta.favor <= -2 ? 10 : 0;
+          plan = carPlan(`car:${++planN}`, buttonsNow(), o.depth);
+          rt = newRt(plan);
+          node = null;
+        } else if (t.to === "service") plan = buildCell(t);
+        else if (t.to === "side") plan = buildSide(t);
+        else if (t.to === "ending") {
+          o.where = "ending";
+          plan = endingPlan(`ending:${++planN}`);
+          rt = newRt(plan);
+          node = null;
+        } else {
+          if (t.type === "replica" && !t.sub) t.sub = pickSub(o.seed, t.depth, meta.epoch);
+          plan = buildFloorPlan(t);
+        }
+        return plan;
+      },
+      tick(api, floor) {
+        if (!rt || rt.plan.id !== floor.id || !out) return;
+        api = track(api);
+        const r = rt;
+        const p = api.world.player;
+        if (r.t === 0) onEnter(api);
+        if (later.length) {
+          const now = later.filter((l) => l.plan === r.plan.id);
+          later = [];
+          for (const l of now) l.run(api);
+        }
+        r.t += DT;
+        r.hurtCd -= DT;
+        const where = r.plan.stage.where;
+        metroTick(api);
+        if (where === "floor" || where === "service") terrain(api, r.plan.stage.terrain);
+        if (where === "floor") {
+          floorRules(api);
+          if (Math.abs(p.x - r.plan.startX) >= Math.min(600, r.plan.length * 0.4)) r.traversed = true;
+          checkFloorClear(api);
+        }
+        if (where === "service") serviceRules(api);
+        if (where === "car" && out.stuck > 0) {
+          out.stuck -= DT;
+          if (out.stuck <= 0) api.world.say("…문이 닫혔어요.", 2);
+        }
+        r.plan.stage.fx.light = api.world.light;
+        r.plan.stage.fx.noise = api.world.noise;
+        r.plan.stage.fx.red = r.red;
+        r.prevX = api.world.player.x;
+        r.prevY = api.world.player.y;
+        void p;
+      },
+      onEvent(api, floor, e) {
+        if (!rt || rt.plan.id !== floor.id || !out) return;
+        api = track(api);
+        metroEvent(api, e);
+        const f = rt.plan.stage.floor;
+        const mul = (f?.tuning.noiseMul ?? 1) * quietK();
+        const loud = f && (f.type === "silent" || f.type === "deep");
+        switch (e.type) {
+          case "enter:floor":
+            checkFloorClear(api);
+            break;
+          case "run:end":
+            if (e.how === "return") sendFound(meta, out);
+            api.note("depth", Math.max(out.depth, ...out.visited.map((v) => v.depth)));
+            api.note("found", [...out.found]);
+            api.note("sent", [...out.sent]);
+            api.note("rescued", [...out.rescued]);
+            api.note("stage.clearedFloors", [...out.clearedFloors]);
+            api.note("stage.upgrades", [...out.upgrades]);
+            save2();
+            break;
+          case "land":
+            if (loud) rt.noise += 0.12 * mul;
+            break;
+          case "hit":
+            if (loud) rt.noise += (0.06 + e.strength * 0.04) * mul;
+            if (rt.plan.stage.where === "car" && !out.rideAttack) {
+              out.rideAttack = true;
+              addFavor(meta, out, -2, "승강기 안에서 공격");
+              api.world.say("…여기서 그러지 마요.", 2.5);
+              save2();
+            }
+            break;
+          case "shot":
+            if (loud) rt.noise += 0.25 * mul;
+            break;
+          case "whiff":
+            if (loud) rt.noise += 0.03 * mul;
+            if (rt.plan.stage.where === "car" && !out.rideAttack) {
+              out.rideAttack = true;
+              addFavor(meta, out, -2, "승강기 안에서 공격");
+              api.world.say("…여기서 그러지 마요.", 2.5);
+              save2();
+            }
+            break;
+          case "bossRoar":
+            if (e.kind === "family208" && f?.guardian === "family208") rt.childFightStarted = true;
+            break;
+          case "enemyDie": {
+            if (e.kind === "wallface" && f?.type === "replica" && f.sub === "red") rt.wallFaceDefeated = true;
+            rt.kills++;
+            const guardian = f?.spawns.find((s2) => s2.role === "guardian");
+            if (guardian && !["elder", "family208"].includes(guardian.kind) && enemyKind(e.kind) === enemyKind(guardian.kind)) {
+              rt.guardianDefeated = true;
+              offerGuardianUpgrade(api);
+            }
+            if (f?.spawns.some((s2) => s2.role === "guardian" && ["elder", "family208"].includes(s2.kind)) && ["elder_f", "elder_m", "family_f", "family_m"].includes(e.kind)) {
+              rt.guardianKills = [.../* @__PURE__ */ new Set([...rt.guardianKills ?? [], e.kind])];
+              const kind = f.spawns.find((s2) => s2.role === "guardian").kind;
+              const pair = kind === "elder" ? ["elder_f", "elder_m"] : ["family_f", "family_m"];
+              if (pair.every((k) => rt.guardianKills.includes(k))) {
+                rt.guardianDefeated = true;
+                api.world.emit({ type: "custom", name: "guardianCleared", data: { kind, how: "kill" } });
+              }
+            }
+            if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
+            break;
+          }
+          case "custom": {
+            const d3 = e.data;
+            if (e.name === "ruleBroken" && d3?.rule === "r11" && f?.type === "replica" && f.sub === "red") {
+              rt.wallFaceBroken = true;
+              foundRule(api, "r11", api.world.player.x);
+            }
+            if (e.name === "guardianCleared" && d3?.kind && f?.spawns.some((s2) => s2.role === "guardian" && s2.kind === d3.kind)) {
+              if (d3.how === "rule" || d3.how === "endure") rt.guardianSkip = true;
+              if (d3.kind === "elder" && d3.how === "kill") api.note("stage.elderDefeated", true);
+              if (d3.how === "kill" && rt.guardianDefeated) offerGuardianUpgrade(api);
+            }
+            break;
+          }
+          case "item":
+            if (e.id === "light") rt.light = 1;
+            break;
+        }
+      },
+      onInteract(api, floor, prop) {
+        if (!rt || rt.plan.id !== floor.id || !out) return;
+        api = track(api);
+        const o = out;
+        const r = rt;
+        const p = api.world.player;
+        const pl = r.plan.stage.where === "floor" ? placedOf(prop) : void 0;
+        if (pl?.kind === "childkey") {
+          if (!r.childKeyDropped || r.childKeyTaken || !r.plan.props?.some((q) => q.id === prop.id)) return;
+          if (childRuleBroken()) return void api.world.say("벽의 사람 모양을 공격했다. 이 열쇠는 돌아가지 않는다.", 2.5);
+          r.childKeyTaken = true;
+          api.setProp(prop.id, null);
+          api.world.emit({ type: "pickup", x: p.x, id: "childkey" });
+          return void api.world.say("아이 방 열쇠를 주웠다. 208호 안의 잠긴 문을 열 수 있다.", 2.5);
+        }
+        if (pl?.kind === "childdoor") {
+          if (r.opened.has(prop.id)) return void api.world.say("이미 열린 아이 방 문이다.", 1.5);
+          if (!knowsChildRule() || childRuleBroken() || !r.childKeyTaken) return void api.world.say("잠긴 아이 방 문. 벽의 사람 모양을 건드리지 말라는 규칙과 전용 열쇠가 필요하다.", 3);
+          r.opened.add(prop.id);
+          api.setProp(prop.id, { label: "열린 아이 방 문" });
+          api.world.emit({ type: "door", x: prop.x, id: "childdoor" });
+          api.world.emit({ type: "custom", name: "guardianRule", data: { kind: "childDoor" } });
+          return void api.world.say("문을 열었다. 두 사람이 그쪽을 보며 잠시 멈춘다.", 2.5);
+        }
+        const ch = r.choices.get(prop.id);
+        if (ch) return resolveChoice(api, prop, ch);
+        const mk = pl && ["upper", "sidedoor", "locked", "wdoor", "wup", "wdown", "reward", "key"].includes(pl.kind) ? pl.kind : ["crack", "vent", "key"].includes(prop.kind) || r.plan.stage.where === "side" && prop.id.startsWith("x") ? prop.kind : null;
+        if (mk) return metroInteract(api, prop, mk, pl);
+        switch (prop.kind) {
+          // ── 층
+          case "elevator":
+            if (r.plan.stage.where === "floor" && prop.label === "타고 온 엘리베이터") {
+              api.world.say("문이 열리지 않는다. 패널에는 없던 숫자가 빼곡하다.", 3);
+              foundRule(api, "noreturn", p.x);
+            } else api.world.say("패널을 눌러야 탈 수 있다.", 2);
+            break;
+          case "panel": {
+            const cr = r.plan.stage.where === "floor" ? curRoom() : null;
+            if (cr && !o.clearedFloors.includes(cr.w.depth)) {
+              const n = roomsLeft(cr.w);
+              api.world.say(`패널이 꺼져 있다. 이 층을 다 정리해야 내려갈 수 있다. (남은 방 ${n}, 지도 Z)`, 3);
+              break;
+            }
+            if (pl?.data.exit) api.world.say("패널에 EXIT 불이 들어와 있다.", 2);
+            api.world.emit({ type: "ding", x: p.x });
+            finishWith(api, { to: "car" });
+            break;
+          }
+          case "mirror": {
+            const tired = rng(mix2(o.seed, o.ride, o.depth, 55))() < 0.35;
+            foundRule(api, "mirror", p.x);
+            const inCar = r.plan.stage.where === "car";
+            if (inCar) o.tired = tired;
+            if (hooks.mirror?.({ tired, inCar, agent: o.agent }, defer((api2, res) => res.off && inCar && finishWith(api2, { to: "car" })))) break;
+            if (inCar) {
+              if (tired) o.tired = true, api.world.say("거울 속 얼굴이 피곤해 보인다. (내려서 다시 타면 바뀐다. 그대로 가면 다음 층 위협 +30%)", 4);
+              else o.tired = false, api.world.say("거울 속 얼굴은 괜찮아 보인다.", 2);
+            } else api.world.say(tired ? "거울 속 얼굴이 피곤해 보인다." : "거울 속 얼굴. 나다. 아마도.", 2.5);
+            break;
+          }
+          case "checklist":
+            foundRule(api, "entry", p.x);
+            if (api.world.recovery?.has("checklist")) break;
+            if (api.world.recovery?.add("checklist")) {
+              api.setProp(prop.id, null);
+              api.world.say("서명란이 빈 점검표를 회수품 가방에 넣었다.", 2.5);
+            } else api.world.say("회수품 가방이 가득 찼다. 빈칸이 필요하다.", 2.5);
+            break;
+          case "sign":
+            if (pl?.data.rule) {
+              foundRule(api, String(pl.data.rule), p.x);
+              if (pl.data.arrow) api.world.say(`표지: 「${pl.data.arrow}」${o.flags.includes("puzzle_mirror") && o.variants.includes("p_sign") ? "\n(이번 출동 표지는 거울에 비친 것)" : ""}`, 4);
+              if (pl.data.order) api.world.say(`순서 표지: ${String(pl.data.order).split("-").map((n) => "①②③④"[Number(n) - 1]).join(" → ")}`, 4);
+            }
+            break;
+          case "symbol":
+            api.world.say(pl?.data.danger ? "동그라미 안에 줄 하나: 이 근처는 위험." : "빈 동그라미: 이 근처는 쉼터.", 2.5);
+            break;
+          case "b12":
+            foundRule(api, "b12", p.x);
+            break;
+          case "shutter":
+            if (pl && !r.opened.has(prop.id) && p.x > prop.x) {
+              r.opened.add(prop.id);
+              api.setProp(prop.id, { solid: false, label: "열린 셔터", h: 20 });
+              api.world.emit({ type: "door", x: p.x, id: "switch" });
+              api.world.say("셔터 뒤편 손잡이로 올렸다.", 2);
+            } else if (pl && !r.opened.has(prop.id)) api.world.say("닫힌 셔터. 이쪽에서는 표지와 문, 스위치로 연다.", 2);
+            break;
+          case "door":
+            if (pl && pl.data.fork !== void 0) {
+              const sh = r.plan.stage.floor.placed.find((x) => x.kind === "shutter" && x.data.fork === pl.data.fork);
+              if (r.opened.has(`p${sh.id}`)) break;
+              if (pl.data.correct) {
+                r.opened.add(`p${sh.id}`);
+                api.setProp(`p${sh.id}`, { solid: false, label: "열린 셔터", h: 20 });
+                api.movePlayer(sh.x + 80);
+                api.world.emit({ type: "door", x: p.x, id: "fork-ok" });
+                api.world.say("문 너머로 나왔다. 셔터 뒤편이다.", 2.5);
+              } else {
+                api.hurtPlayer(10, true);
+                r.squeeze -= 10;
+                const sign = r.plan.stage.floor.placed.find((x) => x.kind === "sign" && x.data.fork === pl.data.fork);
+                api.movePlayer(sign ? sign.x : p.x - 300);
+                api.world.say("함정. 문 너머는 처음 그 복도였다. (벽이 10초 더 조여 온다)", 3);
+                foundRule(api, "p_sign", p.x);
+              }
+            }
+            break;
+          case "switch":
+            if (pl?.data.bell) {
+              api.world.say("뎅—", 1);
+              if (r.plan.stage.floor?.type === "silent") r.noise += 0.5;
+              break;
+            }
+            if (pl && pl.data.group !== void 0) {
+              const g2 = String(pl.data.group);
+              const sh = r.plan.stage.floor.placed.find((x) => x.kind === "shutter" && String(x.data.group) === g2);
+              if (r.opened.has(`p${sh.id}`)) break;
+              const want = String(sh.data.order).split("-").map(Number);
+              const seq = r.switchSeq[g2] ??= [];
+              seq.push(Number(pl.data.n));
+              api.world.emit({ type: "door", x: p.x, id: "switch" });
+              if (want[seq.length - 1] !== seq[seq.length - 1]) {
+                r.switchSeq[g2] = [];
+                r.squeeze -= 10;
+                api.world.say("틀린 순서. 스위치가 전부 튀어 올라온다. (벽 -10초)", 2.5);
+                foundRule(api, "p_order", p.x);
+              } else if (seq.length === want.length) {
+                r.opened.add(`p${sh.id}`);
+                api.setProp(`p${sh.id}`, { solid: false, label: "열린 셔터", h: 20 });
+                api.world.say("셔터가 올라간다.", 2);
+              } else api.world.say(`딸깍 (${seq.length}/${want.length})`, 1);
+            }
+            break;
+          case "hatch":
+          case "servicedoor":
+            o.returnX = prop.x;
+            o.hatchX[o.depth] = prop.x;
+            o.hatchRoom[o.depth] = [o.room[0], o.room[1]];
+            api.world.emit({ type: "door", x: p.x, id: "service" });
+            finishWith(api, enterService(o.depth, "top"));
+            break;
+          case "goalwall":
+            if (r.trial) {
+              r.trial.read = true;
+              r.trial.on = true;
+              foundRule(api, "trial", p.x);
+              api.world.say(`벽: 「${r.plan.stage.floor.goal.text}」`, 4);
+            }
+            break;
+          case "mark":
+            if (r.trial && !r.opened.has(prop.id)) {
+              r.opened.add(prop.id);
+              r.trial.found++;
+              api.setProp(prop.id, null);
+              api.world.say(`표식 ${r.trial.found}/${r.plan.stage.floor.goal.need}`, 1.5);
+            }
+            break;
+          case "table":
+            r.mealOk.add(prop.id);
+            foundRule(api, "r_meal", p.x);
+            api.world.say("「잘 먹었습니다.」", 2);
+            if (pl?.data.guardian) api.world.emit({ type: "custom", name: "guardianRule", data: { kind: "mealThanks" } });
+            break;
+          case "item":
+          case "pack": {
+            const item2 = String(pl?.data.item ?? r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.item ?? "heal");
+            api.setProp(prop.id, null);
+            o.items.push(item2);
+            if (item2 === "heal") api.heal(25);
+            if (item2 === "light") r.light = 1;
+            api.world.emit({ type: "pickup", x: p.x, id: item2 });
+            api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+            break;
+          }
+          case "belonging":
+            api.setProp(prop.id, null);
+            foundRule(api, "r_things", p.x);
+            for (let k = 0; k < 2; k++) api.spawn({ kind: "resident", x: p.x + (k ? 300 : -300), y: p.y, elite: true });
+            api.world.say("남의 물건에 손을 댔다. 집이 일어난다.", 3);
+            r.red = true;
+            break;
+          case "chasedoor":
+            if (p.x > prop.x + 10 && !r.opened.has(prop.id)) {
+              r.opened.add(prop.id);
+              r.chaseSlow = 2.5;
+              api.setProp(prop.id, { label: "닫힌 방화문" });
+              api.world.emit({ type: "door", x: p.x, id: "close" });
+              api.world.say("문을 닫았다. 뒤의 것이 문을 부수느라 느려진다.", 2);
+              foundRule(api, "c_door", p.x);
+            } else if (!r.opened.has(prop.id)) api.world.say("지나간 뒤에 닫아야 한다.", 1.5);
+            break;
+          case "npc": {
+            const h = hookOf(prop.id);
+            if (!h) break;
+            if (h.role === "resident") {
+              if (o.flags.includes("replica_nogreet")) {
+                foundRule(api, "r_greet", p.x);
+                wake(api, "눈을 마주치고 인사했다 (이번 출동에는 다름)", h.x, 200);
+              } else {
+                r.greeted.add(prop.id);
+                foundRule(api, "r_greet", p.x);
+                api.world.say("「안녕하세요.」 …주민이 고개를 끄덕인다.", 2);
+              }
+            } else api.world.say("「안녕하세요. 편하게 둘러보세요.」", 2);
+            break;
+          }
+          case "passenger":
+            talkPassenger(api, prop);
+            break;
+          // ── 정비 구역
+          case "up": {
+            const d3 = o.serviceDepth;
+            const up = nodes.get(`floor:${d3}`)?.plan.stage.floor;
+            const hx = o.hatchX[d3] ?? up?.placed.find((q) => q.kind === "hatch" || q.kind === "servicedoor")?.x ?? 240;
+            api.world.emit({ type: "door", x: p.x, id: "hatch" });
+            finishWith(api, { to: "floor", depth: d3, type: o.floorTypes[d3]?.type ?? "lobby", sub: o.floorTypes[d3]?.sub ?? null, startX: hx, room: o.hatchRoom[d3] });
+            break;
+          }
+          case "down": {
+            if (!o.clearedFloors.includes(o.serviceDepth)) {
+              api.world.say(`잠겨 있다. 위 층(${depthLabel(o.serviceDepth)})을 다 정리해야 아래로 열린다.`, 3);
+              break;
+            }
+            const d3 = o.serviceDepth + 1;
+            if (!o.shortcuts.includes(d3)) {
+              o.shortcuts.push(d3);
+              log(`지름길: ${depthLabel(d3)} 위층 점검문을 열었다`);
+            }
+            finishWith(api, { to: "floor", depth: d3, type: o.floorTypes[d3]?.type ?? pickType(d3, o.lastTypes, o.seed, meta.epoch, 888), sub: o.floorTypes[d3]?.sub ?? null });
+            break;
+          }
+          case "fall": {
+            if (!o.clearedFloors.includes(o.serviceDepth)) {
+              api.world.say(`잠겨 있다. 위 층(${depthLabel(o.serviceDepth)})을 다 정리해야 아래로 열린다.`, 3);
+              break;
+            }
+            const d3 = o.serviceDepth + 2;
+            api.hurtPlayer(10, true);
+            log("승강로 틈새로 떨어졌다 (깊이 +2)");
+            finishWith(api, { to: "floor", depth: d3, type: pickType(d3, o.lastTypes, o.seed, meta.epoch, 999), sub: null, startX: 240 });
+            break;
+          }
+          case "left":
+          case "right":
+          case "ladder_up":
+          case "ladder_down": {
+            const [c, rw] = o.cell;
+            const t = prop.kind === "left" ? { to: "service", col: c - 1, row: rw, side: "r" } : prop.kind === "right" ? { to: "service", col: c + 1, row: rw, side: "l" } : prop.kind === "ladder_up" ? { to: "service", col: c, row: rw - 1, side: "d" } : { to: "service", col: c, row: rw + 1, side: "u" };
+            if ((prop.kind === "left" || prop.kind === "right") && cellAt(o.service, c, rw).duct[prop.kind === "left" ? "l" : "r"] && !p.crouching) {
+              api.world.say("덕트다. ↓ 앉은 채로 E.", 1.5);
+              break;
+            }
+            finishWith(api, t);
+            break;
+          }
+          case "rope":
+            if (o.escort) o.rescued.push(o.escort), addFavor(meta, o, 1, "승객을 구함"), o.escort = null;
+            api.note("stage.rescued", o.rescued);
+            api.world.say("귀환 로프를 잡았다. 승강로를 한참 올라간다…", 3);
+            sendFound(meta, o);
+            save2();
+            api.finish("return");
+            break;
+          case "bed":
+            if (r.restN >= (o.upgrades.includes("rest") ? 2 : 1)) api.world.say("더 쉬면 위험하다.", 1.5);
+            else r.restN++, r.rested = true, api.heal(999), api.world.say("잠깐 눈을 붙였다. 체력 회복.", 2);
+            break;
+          case "intercom":
+            if (!r.sentHere) {
+              r.sentHere = true;
+              const sent = sendFound(meta, o);
+              save2();
+              api.world.say(sent.length ? `송신 완료: 규칙 ${sent.length}줄. 이제 후송돼도 남는다.` : "보낼 단서가 없다. (다시 E = 승강기와 거래)", 3);
+              if (o.escort) o.rescued.push(o.escort), addFavor(meta, o, 1, "승객을 구함"), o.escort = null, api.world.say("회사원을 로프로 먼저 올려 보냈다.", 2.5);
+            } else if (o.deals >= 1) api.world.say("인터폰: 「한 번이면 충분하잖아요.」", 2);
+            else offerDeal(api, prop);
+            break;
+          case "memo":
+            foundRule(api, "attic", p.x);
+            if (r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.writer) api.world.say("메모 옆에 누가 쪼그려 앉아 있다. 「…너도 오래 있지 마.」", 3);
+            break;
+          case "map":
+            o.reveal = true;
+            meta.mapHint = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, 3);
+            save2();
+            api.world.say(`지도: 다음 승강기 버튼의 층 유형이 보인다. 아래층은 아마 「${FLOOR_TYPES[meta.mapHint].label}」.`, 3.5);
+            break;
+          case "gear":
+            api.setProp(prop.id, null);
+            o.items.push("gear");
+            api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
+            break;
+          case "merchant":
+            break;
+          // 상점 창은 아이템 모듈이 엔진 interactHooks에서 연다
+          // ── 승강기 안
+          case "greet":
+            if (o.greeted) api.world.say(greetLine(meta.favor, false, false), 2);
+            else doGreet(api, true);
+            break;
+          case "close":
+            o.closeCount++;
+            if (o.closeCount >= 3 || o.flags.includes("close_any") && o.closeCount === 1) doSpam(api, true);
+            else api.world.say("딸깍.", 0.8);
+            break;
+          case "getoff":
+            finishWith(api, { to: "car" });
+            break;
+          case "button": {
+            if (o.stuck > 0) {
+              api.world.say(`${STUCK_LINE} (${Math.ceil(o.stuck)}초)`, 2);
+              if (!r.warned.has("stuckspawn")) r.warned.add("stuckspawn"), api.spawn({ kind: o.depth <= 3 ? "lurker" : "charger", x: 80, y: 600 });
+              break;
+            }
+            const b = r.plan.stage.buttons[Number(prop.id.slice(3))];
+            if (b.exit) {
+              o.ending = true;
+              sendFound(meta, o);
+              const changed = reshuffle(meta);
+              save2();
+              log(`EXIT. 승강기가 재편됐다: ${changed.map((id) => RULE[id].texts[ruleVersion(meta, id) - 1]).join(" / ")} → 새 줄로`);
+              api.note("stage.exit", true);
+              finishWith(api, { to: "ending" });
+              break;
+            }
+            finishWith(api, { to: "floor", depth: b.depth, type: b.type, sub: b.sub });
+            break;
+          }
+          case "van":
+            api.world.say("인터폰 마지막 한 줄: 「또 와요.」", 4);
+            api.finish("return");
+            break;
+        }
+      }
+    };
+    const doGreet = (api, talk, given) => {
+      const o = out;
+      o.greeted = true;
+      foundRule(api, "greet", api.world.player.x);
+      if (o.flags.includes("greet_flip")) {
+        addFavor(meta, o, -1, "말 걸지 말라는 날 인사함");
+        if (talk) api.world.say(greetLine(meta.favor, false, true), 2.5);
+      } else {
+        const gain = given !== void 0 ? Math.max(0, Math.min(1, given - meta.favor)) : rng(mix2(o.seed, o.ride, 31))() < 0.5 ? 1 : 0;
+        if (gain) addFavor(meta, o, 1, "인사");
+        if (talk) api.world.say(greetLine(meta.favor, !!gain, false), 2.5);
+        if (talk && meta.favor >= 3 && !meta.lonelyHeard) meta.lonelyHeard = true, api.world.say(LONELY_LINE, 5);
+      }
+      save2();
+    };
+    const doSpam = (api, talk) => {
+      const o = out;
+      addFavor(meta, o, -1, "닫힘 연타");
+      foundRule(api, "close", api.world.player.x);
+      if (talk) api.world.say(CLOSE_SPAM_LINE, 2.5);
+      o.closeCount = -99;
+      save2();
+    };
+    const onEnter = (api) => {
+      const r = rt;
+      const o = out;
+      const plan = r.plan;
+      if (plan.stage.where === "floor") checkFloorClear(api);
+      api.world.light = r.light;
+      api.world.noise = 0;
+      api.note("stage.depth", o.depth);
+      api.note("stage.visitedCount", o.visited.length);
+      api.note("stage.visited", o.visited.map((v) => `${depthLabel(v.depth)} ${FLOOR_TYPES[v.type].label}`));
+      if (r.revisit) {
+        api.world.say(plan.stage.where === "floor" ? `돌아왔다 · ${plan.stage.floor.label}` : plan.stage.where === "side" ? `${plan.banner}` : `${plan.banner}`, 2);
+        return;
+      }
+      if (plan.stage.where === "side") {
+        const sd = plan.stage.side;
+        api.world.say(sd.secret ? "벽 너머에 방이 있었다. 누군가 숨겨 둔 배낭." : plan.encounters.length ? `${sd.label}. 안에 뭔가 있다.` : `${sd.label}.`, 2.5);
+        return;
+      }
+      if (plan.stage.where === "floor" && !announceNext && plan.stage.floor?.room) {
+        const f = plan.stage.floor;
+        api.world.say(`${f.room.name}${plan.encounters.length ? "" : ""}`, 1.6);
+      } else if (plan.stage.where === "floor") {
+        const f = plan.stage.floor;
+        announceNext = false;
+        api.world.emit({ type: "ding", x: plan.startX });
+        const first = o.depth === 1 && o.visited.length === 1;
+        const told = hooks.announce?.({ depth: f.depth, type: f.type, label: FLOOR_TYPES[f.type].label, hint: FLOOR_TYPES[f.type].hint, first, agent: o.agent });
+        if (!told) api.world.say(first ? "띵. 1층입니다. 문이 열립니다. …로비 같은데, 로비가 아니다." : announce(f.depth, f.type), 4);
+        if (f.goal && !o.flags.includes("trial_mid")) api.world.say(`벽에 큰 글씨: 「${f.goal.text}」 (E로 읽기)`, 4);
+      } else if (plan.stage.where === "car") {
+        const info = { depth: o.depth, ftype: o.lastTypes.at(-1) ?? "", favor: meta.favor, agent: o.agent, ride: o.ride, stuck: Math.max(0, o.stuck), greetFlip: o.flags.includes("greet_flip"), closeAny: o.flags.includes("close_any") };
+        const byStory = hooks.board?.(
+          info,
+          defer((api2, res) => {
+            if (res.act === "greet" && !out.greeted) doGreet(api2, false, res.favor);
+            else if (res.act === "spam" && out.closeCount >= 0) doSpam(api2, false);
+          })
+        );
+        if (byStory) {
+          api.setProp("greet", null);
+          api.setProp("close", null);
+          if (o.stuck > 0) log("총애가 낮아 문이 안 닫힌다 (10초)");
+          return;
+        }
+        const lines3 = hooks.elevator;
+        const n = o.ride;
+        const call = rng(mix2(o.seed, n, 7))() < 0.4 ? lines3?.callout?.(o.agent, meta.favor, n) ?? defaultCallout(o.agent, meta.favor) : MUTTER[n % MUTTER.length];
+        api.world.say(o.stuck > 0 ? STUCK_LINE : call, 3.5);
+        if (o.stuck > 0) log("총애가 낮아 문이 안 닫힌다 (10초)");
+      } else if (plan.stage.where === "service") {
+        const c = plan.stage.cell;
+        if (c.kind === "attic" && !r.warned.has("attic")) api.world.say("선배들의 다락방. 벽에 긁어 쓴 글씨: 「여기 오래 있지 마」", 3);
+      } else if (plan.stage.where === "ending") api.world.say("…1층입니다. 문이 열립니다.", 4);
+    };
+    const talkPassenger = (api, prop) => {
+      const r = rt;
+      const o = out;
+      const h = hookOf(prop.id);
+      if (!h) return;
+      const kind = h.kind;
+      const fork = !!h.data.fork;
+      if (!r.talked.has(prop.id)) {
+        const info = { kind, honest: !!h.data.honest, long: !!h.data.long, fork, knowsRule: currentKnown(meta).includes("passenger"), agent: o.agent, depth: o.depth };
+        if (hooks.meetPassenger?.(info, defer((api2, res) => applyPassenger(api2, prop, h, res.choice)))) {
+          r.talked.add(prop.id);
+          return;
+        }
+      }
+      const lines3 = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
+      api.world.say(`${PASSENGER_LABEL[kind]}: ${lines3.join(" ")}`, 5);
+      if (r.talked.has(prop.id)) return;
+      r.talked.add(prop.id);
+      if (o.agent === "rojemon") api.world.say(h.data.honest ? "(로제몬: 진짜야.)" : "(로제몬: 거짓말이야.)", 3);
+      ["help", "ignore", "rob"].forEach((c, i) => {
+        const id = `${prop.id}:${c}`;
+        r.choices.set(id, { hook: h, choice: c });
+        api.setProp(id, { id, kind: "choice", x: prop.x + 90 + i * 90, y: prop.y + 40, w: 60, h: 40, label: CHOICE_LABEL[c] });
+      });
+    };
+    const clearChoices = (api, prefix) => {
+      for (const id of [...rt.choices.keys()].filter((k) => k.startsWith(prefix))) {
+        rt.choices.delete(id);
+        api.setProp(id, null);
+      }
+    };
+    const resolveChoice = (api, prop, ch) => {
+      const o = out;
+      const p = api.world.player;
+      if (ch.choice === "deal") {
+        clearChoices(api, "deal:");
+        return applyDeal(api, ch.deal);
+      }
+      if (ch.choice === "upgrade") {
+        clearChoices(api, "up:");
+        return applyUpgrade(api, UPGRADE_BY_ID[ch.up]);
+      }
+      clearChoices(api, `h${ch.hook.id}:`);
+      applyPassenger(api, prop, ch.hook, ch.choice);
+    };
+    const applyDeal = (api, deal) => {
+      const o = out;
+      if (deal === "skip" && !o.clearedFloors.includes(o.serviceDepth)) return void api.world.say("이 층의 방을 먼저 정리해야 아래로 갈 수 있다.", 3);
+      const cost = o.items.find((i) => i === "gear") ?? (api.world.recovery?.has("checklist") ? "checklist" : o.items.find((i) => i !== "checklist"));
+      if (!cost) return api.world.say("인터폰: 「줄 게 없으면 거래도 없어요.」", 2.5);
+      if (cost === "checklist") {
+        if (!api.world.recovery?.take(cost)) return;
+      } else o.items.splice(o.items.indexOf(cost), 1);
+      o.deals++;
+      const truth = dealTruth(meta.favor, rng(mix2(o.seed, o.deals, meta.favor, 11))());
+      log(`승강기와 거래: ${deal} (${itemName2(cost)} 줌) · ${truth ? "참" : "거짓"}`);
+      if (deal === "reveal") {
+        o.reveal = true;
+        const ty = pickType(o.serviceDepth + 1, o.lastTypes, o.seed, meta.epoch, truth ? 3 : 4);
+        api.world.say(`인터폰: 「다음은 ${FLOOR_TYPES[ty].label}예요.」${truth ? "" : " (…정말일까)"}`, 3.5);
+      } else if (deal === "skip") {
+        const d3 = o.serviceDepth + (truth ? 3 : 1);
+        api.world.say(`인터폰: 「아래로 모셔다 드릴게요.」`, 2.5);
+        finishWith(api, { to: "floor", depth: d3, type: pickType(d3, o.lastTypes, o.seed, meta.epoch, 77), sub: null });
+      } else {
+        api.world.say(truth ? "인터폰: 「매트 밑을 봐요.」 (회복약 2개)" : "인터폰: 「매트 밑을 봐요.」 …아무것도 없다.", 3);
+        if (truth) o.items.push("heal", "heal"), api.heal(30);
+      }
+      save2();
+    };
+    const applyPassenger = (api, prop, h, c) => {
+      const o = out;
+      const p = api.world.player;
+      const kind = h.kind;
+      const honest = !!h.data.honest;
+      log(`승객 조우: ${PASSENGER_LABEL[kind]} · ${{ help: "돕기", ignore: "무시", rob: "뺏기", follow: "따라가기" }[c]} · ${honest ? "진실" : "거짓"}`);
+      if (c === "follow" && kind !== "three_years") c = "ignore";
+      if (c === "ignore") return void api.world.say("지나쳤다.", 1.5);
+      if (c === "rob") {
+        api.setProp(`h${h.id}`, null);
+        if (!honest || kind === "nothuman") {
+          api.spawn({ kind: kind === "nothuman" ? "nothuman" : "thief", x: prop.x, y: prop.y });
+          api.world.say("승객이 돌변했다.", 2);
+        } else o.items.push("heal"), api.world.say("배낭에서 회복약을 빼앗았다. 승객은 말없이 사라졌다.", 2.5);
+        return;
+      }
+      const f = rt.plan.stage.floor;
+      switch (kind) {
+        case "three_years": {
+          foundRule(api, "passenger", p.x);
+          const doors = f?.placed.filter((x) => x.kind === "door" && x.data.fork !== void 0) ?? [];
+          if (doors.length) {
+            const pointed = doors.filter((d3) => honest ? d3.data.correct : !d3.data.correct)[0];
+            api.setProp(`p${pointed.id}`, { label: `${pointed.label} ← 승객이 가리킨 문` });
+            api.world.say(`승객이 ${pointed.label}을 가리킨다.`, 2.5);
+          } else {
+            o.reveal = honest || o.reveal;
+            api.world.say(honest ? "다음 승강기 버튼의 유형을 알려 줬다." : "다음 층 얘기를 한참 했다. 믿을 만한지는 모르겠다.", 2.5);
+          }
+          break;
+        }
+        case "markers":
+          o.reveal = true;
+          api.world.say("벽 기호 읽는 법을 배웠다. 다음 버튼 유형이 보인다.", 2.5);
+          break;
+        case "supply":
+          if (honest) o.items.push("heal"), api.heal(20), api.world.say("승객이 보급품을 나눠 줬다.", 2);
+          else api.setProp(`h${h.id}`, null), api.spawn({ kind: "thief", x: prop.x, y: prop.y }), api.world.say("「그 배낭, 이리 내.」 승객이 덤빈다.", 2.5);
+          break;
+        case "nothuman":
+          api.setProp(`h${h.id}`, null);
+          api.spawn({ kind: "nothuman", x: prop.x, y: prop.y });
+          api.world.say("승객 옷을 입은 것이 고개를 든다. 얼굴이…", 2.5);
+          break;
+        case "missing":
+          o.escort = `missing:${o.depth}`;
+          api.setProp(`h${h.id}`, null);
+          api.world.say("회사원이 따라온다. 다락방 로프나 인터폰까지 데려가면 구조.", 3);
+          break;
+      }
+    };
+    const offerDeal = (api, prop) => {
+      const r = rt;
+      const items = [...out.items.filter((id) => id !== "checklist"), ...api.world.recovery?.has("checklist") ? ["checklist"] : []];
+      const hookStub = { id: 0, role: "passenger", kind: "deal", x: 0, lane: 0, wave: 0, elite: false, data: {} };
+      if (hooks.deal?.({ favor: meta.favor, items }, defer((api2, res) => res.deal && applyDeal(api2, res.deal)))) return;
+      api.world.say(`인터폰: 「거래할래요? 회수물 하나면 돼요.」 (가진 것: ${items.map(itemName2).join(", ") || "없음"})`, 4);
+      [
+        ["reveal", "다음 층 유형"],
+        ["skip", "더 아래로 (깊이 +2)"],
+        ["supply", "보급품 위치"]
+      ].forEach(([d3, label3], i) => {
+        const id = `deal:${d3}`;
+        r.choices.set(id, { hook: hookStub, choice: "deal", deal: d3 });
+        api.setProp(id, { id, kind: "choice", x: prop.x + 100 + i * 90, y: prop.y + 60, w: 60, h: 40, label: label3 });
+      });
+    };
+    const quietK = () => out?.upgrades.includes("quiet") ? 0.5 : 1;
+    const upperId = (d3) => {
+      const f = nodes.get(`floor:${d3}`)?.plan.stage.floor;
+      const u = f?.placed.find((q) => q.kind === "upper");
+      return u ? `p${u.id}` : null;
+    };
+    let rushT = 0;
+    const metroTick = (api) => {
+      const o = out;
+      const r = rt;
+      const p = api.world.player;
+      if (r.plan.stage.where === "floor") {
+        const w = r.plan.length;
+        const e = o.explored[o.depth] ??= [Math.max(0, p.x - 700), Math.min(w, p.x + 700)];
+        e[0] = Math.max(0, Math.min(e[0], p.x - 700));
+        e[1] = Math.min(w, Math.max(e[1], p.x + 700));
+      }
+      rushT = Math.max(0, rushT - DT);
+      p.dmgMul = powerOf(o.upgrades) * (rushT > 0 ? 1.3 : 1);
+    };
+    const metroEvent = (api, e) => {
+      const o = out;
+      const r = rt;
+      const p = api.world.player;
+      if (e.type === "combat:clear" && node) {
+        const enc = api.world.floor.encounters[e.index];
+        if (enc) {
+          node.cleared.add(enc.triggerX);
+          checkFloorClear(api);
+          if (enc.waves.some((w) => w.some((s2) => s2.boss))) offerGuardianUpgrade(api);
+          else if (++o.fightsWon % 3 === 0) offerUpgrade(api, `싸움 ${o.fightsWon}판째`);
+        }
+      }
+      if (e.type === "enemyDie") {
+        if (o.upgrades.includes("blood")) api.heal(5);
+        if (o.upgrades.includes("rush")) rushT = 3;
+      }
+      if (e.type === "hit" && e.kind !== "enemy" && o.upgrades.includes("spirit")) {
+        const pl = p;
+        pl.gauge = Math.min(100, pl.gauge + 2);
+      }
+      if ((e.type === "whiff" || e.type === "hit" || e.type === "ability" || e.type === "super") && r.plan.stage.where === "floor") {
+        for (const pr of api.world.floor === r.plan ? r.plan.props ?? [] : []) {
+          if (pr.kind !== "crack" || pr.label?.includes("부서진")) continue;
+          const dx = pr.x - p.x;
+          if (Math.abs(dx) > 130 || Math.abs(dx) > 30 && Math.sign(dx) !== p.dir) continue;
+          const left = (r.crack.get(pr.id) ?? 3) - (e.type === "ability" || e.type === "super" ? 3 : 1);
+          r.crack.set(pr.id, left);
+          api.world.shake(4, 3);
+          api.world.fx("dust", pr.x, Y_TOP + 30, 120);
+          if (left <= 0) {
+            api.setProp(pr.id, { label: "부서진 벽 틈 (숨은 방)" });
+            api.world.shake(10, 6);
+            api.world.fx("boom", pr.x, Y_TOP + 30, 100);
+            api.world.emit({ type: "door", x: pr.x, id: "crack" });
+            api.world.say("벽이 무너졌다. 안쪽에 방이 있다. (E)", 2.5);
+            const cr = curRoom();
+            const pl = cr && r.plan.stage.floor?.placed.find((q) => `p${q.id}` === pr.id);
+            if (cr && pl?.data.dir) {
+              const eid = edgeId(cr.w, cr.rm, pl.data.dir);
+              if (!o.broken.includes(eid)) o.broken.push(eid);
+            }
+            log(`숨은 길: ${o.floor?.label} 금 간 벽을 부쉈다`);
+          } else if (left === 2) api.world.say("벽이 울린다. 금이 더 벌어진다.", 1.2);
+        }
+      }
+    };
+    const enterSide = (api, prop, secret, label3) => {
+      const o = out;
+      const key2 = `${o.depth}:${prop.id}`;
+      o.sides[key2] ??= { done: false, secret, x: prop.x };
+      o.returnX = prop.x;
+      api.world.emit({ type: "door", x: prop.x, id: "side" });
+      finishWith(api, { to: "side", depth: o.depth, door: prop.id, secret, label: label3 });
+    };
+    const curRoom = () => {
+      const o = out;
+      const w = worlds.get(o.depth);
+      const f = rt?.plan.stage.floor;
+      return w && f?.room ? { w, rm: roomAt(w, f.room.col, f.room.row) } : null;
+    };
+    const roomClear = (d3, rm) => {
+      const n = nodes.get(`room:${d3}:${rm.col},${rm.row}`);
+      if (!n || n.cleared.size < n.all.length) return false;
+      const r = n.rt, f = n.plan.stage.floor;
+      if (r.trial && !r.trial.done) return false;
+      const g2 = f?.spawns.find((s2) => s2.role === "guardian");
+      if (g2 && !g2.data.onFail && !g2.data.survive && f?.type !== "chase" && !r.guardianSkip && !r.guardianDefeated) return false;
+      if ((f?.type === "chase" || f?.type === "deep" || g2?.data.survive) && !r.traversed) return false;
+      return true;
+    };
+    const roomsLeft = (w) => w.rooms.filter((rm) => rm.role !== "secret" && !roomClear(w.depth, rm)).length;
+    const checkFloorClear = (api) => {
+      const o = out;
+      const cr = curRoom();
+      if (!cr || o.clearedFloors.includes(cr.w.depth) || roomsLeft(cr.w) > 0) return;
+      o.clearedFloors.push(cr.w.depth);
+      api.world.emit({ type: "ding", x: api.world.player.x });
+      api.world.say(`${cr.w.label}: 모든 방을 정리했다. 승강기 패널에 불이 들어온다.`, 4);
+      log(`${cr.w.label} 클리어`);
+    };
+    const hasKey = (k) => out.wkeys.includes(`${out.depth}:${k}`);
+    const unlock = (api, w, eid, k) => {
+      const o = out;
+      if (o.unlocked.includes(eid)) return true;
+      const master = o.upgrades.includes("master") && !o.upgrades.includes("master:used");
+      if (!hasKey(k) && !master) {
+        api.world.say(`잠겨 있다. 열쇠 ${KEY_MARK[k]} 이 이 층 어딘가에 있다. (지도 Z)`, 3);
+        return false;
+      }
+      if (!hasKey(k)) o.upgrades.push("master:used");
+      o.unlocked.push(eid);
+      api.world.emit({ type: "door", x: api.world.player.x, id: "gate" });
+      api.world.shake(8, 3);
+      api.world.say(hasKey(k) ? `열쇠 ${KEY_MARK[k]} 이 맞는다. 열렸다.` : "만능 열쇠로 땄다.", 2.5);
+      log(`${w.label} 잠금 ${KEY_MARK[k]} 을 열었다`);
+      return true;
+    };
+    const goRoom = (api, d3) => {
+      const cr = curRoom();
+      if (!cr) return;
+      const b = across(cr.w, cr.rm, d3);
+      api.world.emit({ type: "door", x: api.world.player.x, id: d3 === "l" || d3 === "r" ? "room" : "stairs" });
+      finishWith(api, { to: "floor", depth: cr.w.depth, type: cr.w.type, sub: cr.w.sub, room: [b.col, b.row], from: OPP[d3] });
+    };
+    const worldInteract = (api, prop, pl) => {
+      const o = out;
+      const cr = curRoom();
+      if (!cr) return false;
+      const { w, rm } = cr;
+      const p = api.world.player;
+      const d3 = pl.data.dir;
+      switch (pl.kind) {
+        case "wdoor":
+        case "wup":
+        case "wdown": {
+          const k = rm.lock[d3];
+          if (k && !unlock(api, w, edgeId(w, rm, d3), k)) return true;
+          goRoom(api, d3);
+          return true;
+        }
+        case "locked":
+          if (pl.data.lock === void 0) return false;
+          if (unlock(api, w, edgeId(w, rm, d3), Number(pl.data.lock))) api.setProp(prop.id, null);
+          return true;
+        case "key": {
+          const k = Number(pl.data.key);
+          api.setProp(prop.id, null);
+          if (!hasKey(k)) o.wkeys.push(`${o.depth}:${k}`);
+          api.world.emit({ type: "pickup", x: p.x, id: "key" });
+          api.world.say(`열쇠 ${KEY_MARK[k]} 을 주웠다. 맞는 잠금은 지도(Z)에 빨갛게.`, 3);
+          log(`${w.label} 열쇠 ${KEY_MARK[k]}`);
+          return true;
+        }
+        case "reward": {
+          const id = `${o.depth}:${rm.col},${rm.row}`;
+          if (o.rewards.includes(id)) return void api.world.say("빈 배낭이다.", 1.5), true;
+          if (node && node.cleared.size < node.all.length) return void api.world.say("먼저 이 방의 것들을 정리하자.", 1.5), true;
+          o.rewards.push(id);
+          api.setProp(prop.id, { label: "빈 배낭" });
+          offerUpgrade(api, rm.role === "secret" ? "숨겨 둔 배낭" : "선배가 남긴 배낭");
+          return true;
+        }
+        case "crack":
+          if (!d3) return false;
+          if (prop.label?.includes("부서진")) {
+            const eid = edgeId(w, rm, d3);
+            if (!o.broken.includes(eid)) o.broken.push(eid);
+            goRoom(api, d3);
+          } else api.world.say("금 간 벽. 세게 치면 무너질 것 같다.", 2);
+          return true;
+        case "vent": {
+          if (!d3) return false;
+          const eid = edgeId(w, rm, d3);
+          if (!o.broken.includes(eid) && !p.crouching) return void api.world.say("막힌 덕트. ↓ 앉은 채로 E — 덮개를 뜯는다.", 2.5), true;
+          if (!o.broken.includes(eid)) o.broken.push(eid), log(`숨은 길: ${w.label} 막힌 덕트를 뜯었다`);
+          api.setProp(prop.id, { label: "열린 덕트 (숨은 방)" });
+          goRoom(api, d3);
+          return true;
+        }
+      }
+      return false;
+    };
+    const metroInteract = (api, prop, kind, pl) => {
+      const o = out;
+      const r = rt;
+      const p = api.world.player;
+      const depth = o.depth;
+      if (pl && worldInteract(api, prop, pl)) return;
+      switch (kind) {
+        case "upper":
+          if (o.shortcuts.includes(depth)) {
+            api.world.emit({ type: "door", x: p.x, id: "service" });
+            finishWith(api, enterService(depth - 1, "bottom"));
+          } else api.world.say("반대편에서 잠겨 있다. 위층 정비 구역의 아래 점검문으로 내려오면 열린다.", 3);
+          break;
+        case "locked": {
+          if (o.gatesOpen.includes(depth)) break;
+          const master = o.upgrades.includes("master") && !o.upgrades.includes("master:used");
+          if (o.keys.includes(depth) || master) {
+            if (!o.keys.includes(depth)) o.upgrades.push("master:used");
+            o.gatesOpen.push(depth);
+            api.setProp(prop.id, null);
+            api.world.emit({ type: "door", x: p.x, id: "gate" });
+            api.world.shake(8, 3);
+            api.world.say(o.keys.includes(depth) ? "열쇠가 맞는다. 방화셔터가 올라간다." : "만능 열쇠로 셔터를 땄다.", 2.5);
+            log(`${o.floor?.label} 방화셔터를 열었다`);
+          } else api.world.say("잠겨 있다. 열쇠는 이 층 정비 구역 어딘가에 있다. (해치·점검문으로 내려가 찾기)", 3.5);
+          break;
+        }
+        case "sidedoor":
+          if (o.sides[`${depth}:${prop.id}`]?.done) api.world.say("이미 뒤진 방이다.", 1.5);
+          else enterSide(api, prop, false, String(pl?.label ?? prop.label ?? "옆방"));
+          break;
+        case "crack":
+          if (prop.label?.includes("부서진")) enterSide(api, prop, true, "숨은 방");
+          else api.world.say("금 간 벽. 세게 치면 무너질 것 같다.", 2);
+          break;
+        case "vent":
+          if (prop.label?.includes("열린")) enterSide(api, prop, true, "숨은 방");
+          else if (!p.crouching) api.world.say("막힌 덕트. ↓ 앉은 채로 E — 덮개를 뜯는다.", 2.5);
+          else {
+            api.setProp(prop.id, { label: "열린 덕트 (숨은 방)" });
+            log(`숨은 길: ${o.floor?.label} 막힌 덕트를 뜯었다`);
+            enterSide(api, prop, true, "숨은 방");
+          }
+          break;
+        case "key": {
+          const d3 = Number(r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.depth ?? o.serviceDepth);
+          api.setProp(prop.id, null);
+          if (!o.keys.includes(d3)) o.keys.push(d3);
+          const sv = o.services[o.serviceDepth];
+          if (sv) sv.key = false;
+          if (o.service) o.service.keyCell = null;
+          api.world.emit({ type: "pickup", x: p.x, id: "key" });
+          api.world.say(`정비 열쇠를 주웠다. ${depthLabel(d3)} 방화셔터를 열 수 있다. (해치로 올라가거나, 그냥 아래로 내려가도 된다)`, 4);
+          log(`정비 열쇠 (${depthLabel(d3)})`);
+          break;
+        }
+        // ── 곁가지 방 안
+        case "door": {
+          const sd = r.plan.stage.side;
+          finishWith(api, { to: "floor", depth: sd.depth, type: o.floorTypes[sd.depth].type, sub: o.floorTypes[sd.depth].sub, startX: o.sides[`${sd.depth}:${sd.door}`]?.x ?? o.returnX });
+          break;
+        }
+        case "pack": {
+          const sd = r.plan.stage.side;
+          const st = o.sides[`${sd.depth}:${sd.door}`];
+          if (node && node.cleared.size < node.all.length) return void api.world.say("먼저 이 방의 것들을 정리하자.", 1.5);
+          if (!st || st.done) return void api.world.say("빈 배낭이다.", 1.5);
+          st.done = true;
+          api.setProp(prop.id, { label: "빈 배낭" });
+          const doorLabel = nodes.get(`floor:${sd.depth}`)?.plan.props?.find((q) => q.id === sd.door)?.label ?? "";
+          patchAt(`floor:${sd.depth}`, sd.door, { label: `${doorLabel} (비었다)` });
+          offerUpgrade(api, sd.secret ? "숨겨 둔 배낭" : "선배가 남긴 배낭");
+          break;
+        }
+        case "gear":
+          api.setProp(prop.id, null);
+          o.items.push("gear");
+          api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
+          break;
+        case "item": {
+          const item2 = String(prop.label?.split(":")[1] ?? "heal");
+          api.setProp(prop.id, null);
+          o.items.push(item2);
+          if (item2 === "heal") api.heal(25);
+          if (item2 === "light") r.light = 1;
+          api.world.emit({ type: "pickup", x: p.x, id: item2 });
+          api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+          break;
+        }
+      }
+    };
+    const offerGuardianUpgrade = (api) => {
+      if (!rt.guardianDefeated || rt.guardianRewarded) return;
+      rt.guardianRewarded = true;
+      offerUpgrade(api, "수호자를 쓰러뜨렸다");
+    };
+    const offerUpgrade = (api, why) => {
+      const o = out;
+      const r = rt;
+      const opts = upgradeChoices(o.seed, o.upgradeN++, o.upgrades);
+      if (!opts.length) {
+        api.heal(40);
+        return void api.world.say(`${why}: 더 고를 강화가 없다. 체력 회복.`, 2);
+      }
+      const view = opts.map((u) => ({ id: u.id, label: u.label, text: u.text, set: SET_LABEL[u.set] }));
+      if (hooks.pickUpgrade?.({ why, options: view }, defer((api2, i) => applyUpgrade(api2, opts[Math.max(0, Math.min(opts.length - 1, i))])))) return;
+      api.world.say(`${why}: 강화 하나를 고른다 (E)`, 3);
+      const stub = { id: 0, role: "passenger", kind: "upgrade", x: 0, lane: 0, wave: 0, elite: false, data: {} };
+      const p = api.world.player;
+      opts.forEach((u, i) => {
+        const id = `up:${u.id}`;
+        r.choices.set(id, { hook: stub, choice: "upgrade", up: u.id });
+        const want = p.x > 500 ? p.x - 120 - i * 110 : Math.min(r.plan.length - 80, p.x + 100 + i * 110);
+        const candidates = Array.from({ length: Math.floor((r.plan.length - 160) / 30) }, (_, n) => 80 + n * 30).sort((a, b) => Math.abs(a - want) - Math.abs(b - want));
+        const x = candidates.find((x2) => !r.plan.props?.some((q) => Math.abs(q.x - x2) < 85) && !r.plan.stage.terrain.some((t) => x2 > t.x0 - 60 && x2 < t.x1 + 60)) ?? want;
+        api.setProp(id, { id, kind: "choice", x, y: p.y + 40, w: 60, h: 40, label: `${u.label}: ${u.text}` });
+      });
+    };
+    const applyUpgrade = (api, u) => {
+      const o = out;
+      if (!u || o.upgrades.includes(u.id)) return;
+      o.upgrades.push(u.id);
+      const pl = api.world.player;
+      if (u.id === "hp") pl.hpMax += 30, api.heal(30);
+      if (u.id === "ward") pl.ward = (pl.ward ?? 0) + 2;
+      let bonus = "";
+      if (setCounts(o.upgrades)[u.set] === 3) {
+        bonus = `
+${SET_BONUS[u.set]}`;
+        if (u.set === "body") pl.hpMax += 50, api.heal(50);
+        if (u.set === "rule") addFavor(meta, o, 1, "규칙 계열 완성"), save2();
+      }
+      api.world.say(`강화: ${u.label} — ${u.text}${bonus}`, 3.5);
+      api.world.emit({ type: "custom", name: "upgrade", data: { id: u.id } });
+      api.note("stage.upgrades", o.upgrades.filter((id) => UPGRADE_BY_ID[id]).map((id) => UPGRADE_BY_ID[id].label));
+      log(`강화 선택: ${u.label}${bonus ? " (계열 완성)" : ""}`);
+    };
+    const mapView = () => {
+      const o = out;
+      if (!o) return null;
+      const scout = o.upgrades.includes("scout");
+      const worldsV = [];
+      for (const d3 of [...worlds.keys()].sort((a, b) => a - b)) {
+        const w = worlds.get(d3);
+        const seen2 = new Set(o.seenRooms[d3] ?? []);
+        const known = new Set(seen2);
+        for (const rm of w.rooms) {
+          if (!seen2.has(`${rm.col},${rm.row}`)) continue;
+          for (const dd2 of DIRS) {
+            if (!rm.open[dd2] || rm.hidden[dd2] && !o.broken.includes(edgeId(w, rm, dd2))) continue;
+            const b = across(w, rm, dd2);
+            if (b) known.add(`${b.col},${b.row}`);
+          }
+        }
+        const rooms3 = [];
+        for (const rm of w.rooms) {
+          const id = `${rm.col},${rm.row}`;
+          const isSeen = seen2.has(id);
+          if (!known.has(id) && !(scout && rm.role !== "secret")) continue;
+          const lock = {};
+          const broken = {};
+          const open = { ...rm.open };
+          for (const dd2 of DIRS) {
+            if (!rm.open[dd2]) continue;
+            const eid = edgeId(w, rm, dd2);
+            const k = rm.lock[dd2];
+            if (k) lock[dd2] = { n: k, state: o.unlocked.includes(eid) ? "open" : o.wkeys.includes(`${d3}:${k}`) ? "key" : "locked" };
+            if (rm.hidden[dd2]) {
+              open[dd2] = false;
+              if (o.broken.includes(eid)) broken[dd2] = true;
+            }
+          }
+          rooms3.push({
+            col: rm.col,
+            row: rm.row,
+            seen: isSeen,
+            open,
+            wrap: rm.wrap,
+            lock,
+            broken,
+            role: rm.role,
+            key: rm.key && (isSeen || scout) && !o.wkeys.includes(`${d3}:${rm.key}`) ? rm.key : null,
+            panel: rm.panel && isSeen,
+            service: isSeen && !!nodes.get(`room:${d3}:${id}`)?.plan.props?.some((p) => p.kind === "hatch" || p.kind === "servicedoor"),
+            guardian: rm.guardian && isSeen,
+            clear: isSeen && roomClear(d3, rm),
+            reward: (rm.role === "reward" || rm.role === "secret") && (isSeen || scout) ? o.rewards.includes(`${d3}:${id}`) ? "done" : "full" : null,
+            name: rm.name
+          });
+        }
+        worldsV.push({ depth: d3, label: w.label, cols: w.cols, rows: w.rows, rooms: rooms3 });
+      }
+      const services = [];
+      for (const [ds, sv] of Object.entries(o.services)) {
+        const z = sv.zone;
+        if (!z) continue;
+        const d3 = Number(ds);
+        services.push({
+          depth: d3,
+          cols: z.cols,
+          rows: z.rows,
+          hatchX: o.hatchX[d3] ?? nodes.get(`floor:${d3}`)?.plan.stage.floor?.placed.find((q) => q.kind === "hatch" || q.kind === "servicedoor")?.x ?? 600,
+          shortcut: o.shortcuts.includes(d3 + 1),
+          cells: z.cells.map((c) => {
+            const seen2 = sv.seen.includes(`${c.col},${c.row}`);
+            const keyHere = !!z.keyCell && z.keyCell[0] === c.col && z.keyCell[1] === c.row && (seen2 || scout);
+            return { col: c.col, row: c.row, open: c.open, seen: seen2 || scout && c.kind === "attic", kind: c.kind === "attic" && !(seen2 || scout) ? "plain" : c.kind, key: keyHere };
+          })
+        });
+      }
+      let goal = "아래로: 승강기 패널(▮)이 있는 방을 찾는다. 귀환은 정비 구역 다락방 로프.";
+      const cr = o.where === "floor" ? curRoom() : null;
+      if (o.where === "service") {
+        const sv = o.services[o.serviceDepth];
+        goal = sv?.key ? "정비 구역: 열쇠를 찾는다. 다락방(★)에서 쉬고 로프로 귀환할 수 있다." : "정비 구역: 아래 점검문으로 다음 층, 해치로 위층, 다락방(★)에 로프.";
+      } else if (o.where === "car") goal = "승강기: 버튼을 고른다.";
+      else if (cr) {
+        const held = Array.from({ length: cr.w.locks }, (_, i) => i + 1).filter((k) => o.wkeys.includes(`${o.depth}:${k}`));
+        const lockedLeft = cr.w.rooms.some((rm) => DIRS.some((dd2) => rm.lock[dd2] && !o.unlocked.includes(edgeId(cr.w, rm, dd2))));
+        const left = roomsLeft(cr.w);
+        if (!o.clearedFloors.includes(o.depth) && !lockedLeft) goal = `이 층을 다 정리하면 승강기 패널이 켜진다. 남은 방 ${left}.`;
+        else if (o.clearedFloors.includes(o.depth)) goal = "층 정리 끝. 승강기 패널(▮)로 더 내려가거나, 다락방 로프로 귀환한다.";
+        else if (lockedLeft && held.length) goal = `열쇠 ${held.map((k) => KEY_MARK[k]).join("")} 이 있다. 지도에서 노랗게 표시된 잠긴 길로.`;
+        else if (lockedLeft) goal = "잠긴 길(빨강)이 있다. 열려 있는 방들을 뒤져 열쇠를 찾는다.";
+      }
+      const keys2 = o.wkeys.filter((k) => k.startsWith(`${o.depth}:`)).map((k) => KEY_MARK[Number(k.split(":")[1])]);
+      const f = rt?.plan.stage.floor;
+      return { where: o.where, depth: o.where === "service" ? o.serviceDepth : o.depth, room: o.where === "floor" && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, panelReady: o.clearedFloors.includes(o.where === "service" ? o.serviceDepth : o.depth), cell: o.where === "service" ? o.cell : null, worlds: worldsV, services, keys: keys2, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
+    };
+    return mod2;
+  }
+  function itemName2(id) {
+    return { heal: "회복약", light: "손전등", guard: "방어 강화", ammo: "탄약", gear: "용도 모를 장비", checklist: "점검표" }[id] ?? id;
+  }
+
+  // src/game/action/stage/runmap.ts
+  var C3 = { bg: "#0c141e", text: "#ecf3fa", sub: "#b4c5d5", here: "#ffe18a", seen: "#64859e", clear: "#73dcad", locked: "#ff8582", key: "#ffe18a", panel: "#8ad7ff", service: "#e3b7ff" };
+  var DIRS2 = ["u", "r", "d", "l"];
+  var STEP3 = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] };
+  var ARROW2 = { l: "←", r: "→", u: "↑", d: "↓" };
+  var NUMBER = (n) => "①②③④"[n - 1] ?? String(n);
+  var LOCK_COLOR = { locked: C3.locked, key: C3.key, open: C3.clear };
+  function text(c, value, x, y, size2, color = C3.text, align = "left") {
+    c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
+    c.textAlign = align;
+    c.textBaseline = "middle";
+    c.fillStyle = color;
+    c.fillText(value, x, y);
+  }
+  function fit2(c, value, x, y, size2, width, color = C3.text) {
+    c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
+    let s2 = value;
+    while (s2.length && c.measureText(s2).width > width) s2 = s2.slice(0, -1);
+    if (s2 !== value) s2 = s2.slice(0, -1) + "…";
+    text(c, s2, x, y, size2, color);
+  }
+  function lines2(c, value, x, y, size2, width) {
+    c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
+    let line2 = "", row = 0;
+    for (const char of value) {
+      if (line2 && c.measureText(line2 + char).width > width) {
+        text(c, line2, x, y + row++ * size2 * 1.5, size2, C3.here);
+        line2 = "";
+      }
+      line2 += char;
+    }
+    if (line2) text(c, line2, x, y + row++ * size2 * 1.5, size2, C3.here);
+    return row * size2 * 1.5;
+  }
+  function frame(c, x, y, w, h) {
+    c.fillStyle = C3.bg;
+    c.fillRect(x, y, w, h);
+    c.strokeStyle = "#3b536a";
+    c.lineWidth = 2;
+    c.strokeRect(x, y, w, h);
+  }
+  function check(c, x, y, size2, color = C3.clear) {
+    c.strokeStyle = color;
+    c.lineWidth = Math.max(2, size2 / 5);
+    c.beginPath();
+    c.moveTo(x - size2 / 2, y);
+    c.lineTo(x - size2 / 8, y + size2 / 3);
+    c.lineTo(x + size2 / 2, y - size2 / 3);
+    c.stroke();
+  }
+  function marker(c, x, y, size2) {
+    c.fillStyle = C3.here;
+    c.beginPath();
+    c.moveTo(x, y - size2 / 2);
+    c.lineTo(x + size2 / 2, y);
+    c.lineTo(x, y + size2 / 2);
+    c.lineTo(x - size2 / 2, y);
+    c.closePath();
+    c.fill();
+  }
+  function roomSymbols(r) {
+    return [r.key ? `K${NUMBER(r.key)}` : "", r.panel ? "P" : "", r.service ? "S" : "", r.reward === "full" ? "+" : r.reward === "done" ? "−" : "", r.guardian ? "!" : "", r.role === "secret" ? "◇" : "", r.role === "arrival" ? "入" : ""].filter(Boolean).join(" ");
+  }
+  function mapExits(m) {
+    const r = m.worlds.find((w) => w.depth === m.depth)?.rooms.find((r2) => r2.col === m.room?.[0] && r2.row === m.room?.[1]);
+    if (m.where !== "floor" || !r) return m.where === "service" ? "사다리·덕트 앞에서 조사 · 낮은 통로는 앉아서 이동" : "승강기 버튼을 조사해 다음 층 선택";
+    return DIRS2.filter((d3) => r.open[d3] || r.broken[d3]).map((d3) => {
+      const lock = r.lock[d3];
+      return `${ARROW2[d3]} ${lock ? `${NUMBER(lock.n)} ${lock.state === "locked" ? "잠김" : lock.state === "key" ? "해제 가능" : "열림"}` : r.broken[d3] ? "숨은 길" : "연결"}${r.wrap[d3] ? " ↔ 순환" : ""}`;
+    }).join("   ");
+  }
+  function rooms2(c, m, w, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
+    const at2 = (r) => [x + (r.col - c0) * (cw + gap), y + (r.row - r0) * (ch + gap)];
+    const drawn = /* @__PURE__ */ new Set();
+    for (const r of w.rooms.filter((r2) => r2.seen)) {
+      const [rx, ry] = at2(r);
+      for (const d3 of DIRS2) {
+        if (!r.open[d3] && !r.broken[d3]) continue;
+        const [dx, dy] = STEP3[d3];
+        const a = `${r.col},${r.row}`, b = `${r.col + dx},${r.row + dy}`;
+        const id = [a, b].sort().join(":");
+        if (drawn.has(id)) continue;
+        drawn.add(id);
+        const lock = r.lock[d3];
+        const color = lock ? LOCK_COLOR[lock.state] : r.broken[d3] ? C3.service : C3.seen;
+        const sx = rx + cw / 2 + dx * cw / 2, sy = ry + ch / 2 + dy * ch / 2;
+        c.strokeStyle = color;
+        c.lineWidth = Math.max(3, 2 * scale);
+        c.beginPath();
+        c.moveTo(sx, sy);
+        c.lineTo(sx + dx * gap, sy + dy * gap);
+        c.stroke();
+        if (lock && lock.state !== "open") {
+          const mx = sx + dx * gap / 2, my = sy + dy * gap / 2;
+          c.fillStyle = C3.bg;
+          c.fillRect(mx - 7 * scale, my - 7 * scale, 14 * scale, 14 * scale);
+          text(c, NUMBER(lock.n), mx, my, 14 * scale, color, "center");
+        } else if (lock) check(c, sx + dx * gap / 2, sy + dy * gap / 2, 8 * scale);
+        else if (r.wrap[d3]) text(c, ARROW2[d3], sx + dx * gap / 2, sy, 15 * scale, C3.sub, "center");
+      }
+    }
+    for (const r of w.rooms) {
+      const [rx, ry] = at2(r);
+      const current = m.where === "floor" && w.depth === m.depth && r.col === m.room?.[0] && r.row === m.room?.[1];
+      c.fillStyle = r.seen ? r.clear ? "#193c37" : "#273d51" : "#111e2b";
+      c.fillRect(rx, ry, cw, ch);
+      c.strokeStyle = current ? C3.here : r.seen ? r.clear ? C3.clear : C3.seen : "#8296a8";
+      c.lineWidth = current ? 3 * scale : 1.5 * scale;
+      c.setLineDash(r.seen ? [] : [5 * scale, 3 * scale]);
+      c.strokeRect(rx, ry, cw, ch);
+      c.setLineDash([]);
+      if (!r.seen) {
+        text(c, "?", rx + cw / 2, ry + ch / 2, 16 * scale, C3.sub, "center");
+        continue;
+      }
+      const statusSize = Math.min(8 * scale, ch / 4);
+      if (r.clear) check(c, rx + cw - statusSize, ry + statusSize * 0.65, statusSize);
+      else if (r.role !== "secret") text(c, "·", rx + cw - statusSize, ry + statusSize * 0.65, 18 * scale, C3.locked, "center");
+      if (mini) {
+        if (current) marker(c, rx + cw / 2, ry + ch / 2, Math.min(ch * 0.5, 14 * scale));
+        continue;
+      }
+      const named = ch >= 44 * scale && cw >= 95 * scale;
+      fit2(c, roomSymbols(r), rx + 5, ry + ch * (named ? 0.4 : 0.65), 13 * scale, cw - 10, r.panel ? C3.panel : C3.here);
+      if (named) fit2(c, r.name, rx + 20 * scale, ry + ch - 13 * scale, 12 * scale, cw - 24 * scale, C3.sub);
+      if (current) marker(c, rx + 9 * scale, ry + ch - 9 * scale, 9 * scale);
+    }
+  }
+  function service2(c, m, s2, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
+    const known = new Set(s2.cells.filter((q) => q.seen || q.key || q.kind === "attic").map((q) => `${q.col},${q.row}`));
+    for (const q of s2.cells.filter((q2) => q2.seen)) for (const d3 of DIRS2) {
+      if (!q.open[d3]) continue;
+      const [dx, dy] = STEP3[d3];
+      known.add(`${q.col + dx},${q.row + dy}`);
+      const x0 = x + (q.col - c0) * (cw + gap) + cw / 2, y0 = y + (q.row - r0) * (ch + gap) + ch / 2;
+      c.strokeStyle = C3.service;
+      c.lineWidth = 3 * scale;
+      c.beginPath();
+      c.moveTo(x0, y0);
+      c.lineTo(x0 + dx * (cw / 2 + gap), y0 + dy * (ch / 2 + gap));
+      c.stroke();
+    }
+    for (const q of s2.cells) {
+      if (!known.has(`${q.col},${q.row}`)) continue;
+      const rx = x + (q.col - c0) * (cw + gap), ry = y + (q.row - r0) * (ch + gap);
+      const current = q.col === m.cell?.[0] && q.row === m.cell?.[1];
+      c.fillStyle = q.seen ? "#39304d" : "#191c2b";
+      c.fillRect(rx, ry, cw, ch);
+      c.strokeStyle = current ? C3.here : C3.service;
+      c.lineWidth = (current ? 3 : 1) * scale;
+      c.setLineDash(q.seen ? [] : [5, 4]);
+      c.strokeRect(rx, ry, cw, ch);
+      c.setLineDash([]);
+      const symbol = !q.seen && q.kind !== "attic" && !q.key ? "?" : q.kind === "attic" ? "R" : q.key ? "K" : q.kind === "down" ? m.panelReady === false ? "×" : "↓" : q.kind === "entry" ? "↑" : "";
+      text(c, symbol, rx + cw / 2, ry + ch / 2, (mini ? 12 : 16) * scale, C3.text, "center");
+      if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
+    }
+  }
+  function drawRunMap(c, m, _px, _t, U = 1, W5 = c.canvas.width, H7 = c.canvas.height) {
+    setExplorationMap(c.canvas, true);
+    const v = mapViewport(c.canvas, U, W5, H7), S2 = v.scale, left = v.margin, right = W5 - left;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.fillStyle = C3.bg;
+    c.fillRect(0, 0, W5, H7);
+    const world = m.worlds.find((w) => w.depth === m.depth);
+    const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
+    fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
+    text(c, v.touch ? "「지도」로 닫기" : "Z / Tab / M 닫기", right, 35 * S2, 13 * S2, C3.sub, "right");
+    text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
+    const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
+    const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
+    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H7 - 48 * S2;
+    const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
+    const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
+    fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
+    const sx = mapRight + 24 * S2;
+    const legend = m.where === "service" ? [
+      ["◆", "현재 칸", C3.here],
+      ["?", "점선 · 미탐색", C3.sub],
+      ["R", "다락방 · 휴식 / 귀환 로프", C3.service],
+      ["↑", "위층 점검문", C3.sub],
+      [m.panelReady === false ? "×" : "↓", `아래 점검문 · ${m.panelReady === void 0 ? "목표 확인" : m.panelReady ? "하강 가능" : "층 정리 전 잠김"}`, C3.sub],
+      ["K", "열쇠", C3.key],
+      ["─", "발견한 연결", C3.service]
+    ] : [
+      ["◆", "현재 방 · 노란 테두리", C3.here],
+      ["?", "점선 · 미탐색 방", C3.sub],
+      ["✓ / ·", "정리 완료 / 미정리", C3.clear],
+      ["①", "잠김 · 같은 번호 열쇠 필요", C3.locked],
+      ["①", "열쇠 보유 · 문에서 조사", C3.key],
+      ["✓", "초록 연결 · 열린 길", C3.clear],
+      ["K / P", "열쇠 / 승강기 패널", C3.panel],
+      ["+ / −", "보상 남음 / 수령 완료", C3.here],
+      ["S / 入", "정비 입구 / 도착 방", C3.service],
+      ["! / ◇", "수호자 / 숨은 방(선택)", C3.sub]
+    ];
+    legend.forEach(([mark, label3, color], i) => {
+      text(c, mark, sx, top + i * 19 * S2, 14 * S2, color);
+      text(c, label3, sx + 47 * S2, top + i * 19 * S2, 12.5 * S2, C3.sub);
+    });
+    const hintY = top + legend.length * 19 * S2 + 8 * S2;
+    if (m.where === "floor") {
+      const panel = m.panelReady === void 0 ? "패널: 위 목표 안내 확인" : m.panelReady ? "패널 켜짐 · 조사해서 하강" : "패널 꺼짐 · 층 목표 해결";
+      text(c, panel, sx, hintY, 13 * S2, C3.panel);
+      text(c, "귀환: 점검문 → 정비 → R 로프", sx, hintY + 23 * S2, 12.5 * S2, C3.service);
+    } else if (m.where === "service") {
+      text(c, "R 로프 조사 → 안전 귀환", sx, hintY, 13 * S2, C3.service);
+      text(c, "메뉴의 긴급 철수는 보상 감소", sx, hintY + 23 * S2, 12.5 * S2, C3.sub);
+    }
+    const zone = m.where === "service" ? m.services.find((s2) => s2.depth === m.depth) : world;
+    if (zone && mapW > 0 && mapH > 0) {
+      const gap = 12 * S2;
+      const cw = Math.min(150 * S2, (mapW - gap * (zone.cols - 1)) / zone.cols);
+      const ch = Math.min(68 * S2, (mapH - gap * (zone.rows - 1)) / zone.rows);
+      const gx = left + (mapW - (cw + gap) * zone.cols + gap) / 2, gy = top + 24 * S2 + (mapH - (ch + gap) * zone.rows + gap) / 2;
+      c.save();
+      c.beginPath();
+      c.rect(left - 6, top + 18 * S2, mapW + 12, mapH + 12);
+      c.clip();
+      if (m.where === "service") service2(c, m, zone, gx, gy, cw, ch, gap, S2);
+      else rooms2(c, m, zone, gx, gy, cw, ch, gap, S2);
+      c.restore();
+    }
+    fit2(c, mapExits(m), left, H7 - 23 * S2, 13 * S2, right - left, C3.sub);
+    c.restore();
+  }
+  function drawMiniMap(c, m, _px, _t, U = 1) {
+    setExplorationMap(c.canvas, false);
+    if (m.where !== "floor" && m.where !== "service") return;
+    const v = mapViewport(c.canvas, U), S2 = v.scale;
+    const x = v.touch ? 560 : 740, y = 12, width = v.width - x - (v.touch ? 155 : 130);
+    const h = 100 * S2;
+    if (width < 230) return;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    frame(c, x, y, width, h);
+    const mapW = Math.min(width * 0.42, 150 * S2), tx = x + 10 * S2, tw = width - mapW - 24 * S2;
+    text(c, m.where === "service" ? "정비 · R 로프 귀환" : `열쇠 ${m.keys.join(" ") || "없음"}`, tx, y + 16 * S2, 13 * S2, C3.key);
+    const shortGoal = m.where === "service" ? "다락방을 찾아 조사" : m.goal.startsWith("층 정리 끝") ? "패널로 하강 / 로프로 귀환" : m.goal.includes("노랗게") ? "노란 잠금 앞에서 조사" : m.goal.includes("잠긴 길") ? "열린 방에서 열쇠 찾기" : m.goal.match(/남은 방 \d+/)?.[0] ? `${m.goal.match(/남은 방 \d+/)[0]} · 목표 해결` : "방의 목표를 확인";
+    fit2(c, shortGoal, tx, y + 44 * S2, 14 * S2, tw, C3.text);
+    fit2(c, v.touch ? "「지도」 전체 / 범례" : "Z · Tab · M 전체 지도", tx, y + 77 * S2, 12.5 * S2, tw, C3.sub);
+    const gap = 5 * S2, cw = (mapW - 2 * gap - 16) / 3, ch = (h - 20 - 2 * gap) / 3;
+    const gx = x + width - mapW + 4, gy = y + 10;
+    c.save();
+    c.beginPath();
+    c.rect(gx - 3, gy - 3, mapW - 2, h - 14);
+    c.clip();
+    if (m.where === "floor" && m.room) {
+      const w = m.worlds.find((w2) => w2.depth === m.depth);
+      if (w) rooms2(c, m, w, gx, gy, cw, ch, gap, S2, m.room[0] - 1, m.room[1] - 1, true);
+    } else if (m.cell) {
+      const s2 = m.services.find((s3) => s3.depth === m.depth);
+      if (s2) service2(c, m, s2, gx, gy, cw, ch, gap, S2, m.cell[0] - 1, m.cell[1] - 1, true);
+    }
+    c.restore();
+    c.restore();
+  }
+
+  // src/game/action/story/style.css
+  var style_default2 = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
+
+  // src/game/action/story/script.ts
+  var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
+  var ScriptError = class extends Error {
+  };
+  function parseSay(body2, line2, where) {
+    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body2);
+    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body2}`);
+    const mood = m[2] ?? "base";
+    if (!MOODS.has(mood)) throw new ScriptError(`${where}:${line2} 모르는 표정: ${m[2]}`);
+    return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
+  }
+  function parseScripts(src, where = "script") {
+    const out = [];
+    let cur = null;
+    const lines3 = src.split(/\r?\n/);
+    for (let i = 0; i < lines3.length; i++) {
+      const n = i + 1;
+      const raw = lines3[i].trim();
+      if (!raw || raw.startsWith("//")) continue;
+      if (raw.startsWith("===")) {
+        cur = { id: raw.slice(3).trim(), nodes: [], labels: {} };
+        if (!cur.id) throw new ScriptError(`${where}:${n} 대본 id가 비었어요`);
+        out.push(cur);
+        continue;
+      }
+      if (!cur) throw new ScriptError(`${where}:${n} === 대본id 앞에 내용이 있어요`);
+      const nodes = cur.nodes;
+      const prev = nodes[nodes.length - 1];
+      if (raw.startsWith("--")) {
+        const label3 = raw.slice(2).trim();
+        if (cur.labels[label3] !== void 0) throw new ScriptError(`${where}:${n} 표지 중복: ${label3}`);
+        cur.labels[label3] = nodes.length;
+        continue;
+      }
+      if (raw.startsWith("~")) {
+        const say = parseSay(raw.slice(1).trim(), n, where);
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "pick" && !labelHere) prev.lines.push(say);
+        else nodes.push({ t: "pick", lines: [say], line: n });
+        continue;
+      }
+      if (raw.startsWith("*")) {
+        const m = /^\*\s*(.+?)\s*->\s*([\w.]+)\s*(.*)$/.exec(raw);
+        if (!m) throw new ScriptError(`${where}:${n} 선택지 형식: * 글 -> 표지 [if 조건] [set ...]`);
+        const opt = { text: m[1], to: m[2] };
+        for (const b of m[3].matchAll(/\[(if|set)\s+([^\]]+)\]/g)) opt[b[1]] = b[2].trim();
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "choice" && !labelHere) prev.options.push(opt);
+        else nodes.push({ t: "choice", options: [opt], line: n });
+        continue;
+      }
+      if (raw.startsWith(">")) {
+        const cmd = raw.slice(1).trim();
+        const [head, ...rest] = cmd.split(/\s+/);
+        const tail = cmd.slice(head.length).trim();
+        if (head === "set") {
+          const m = /^([\w.]+)\s*(\+=|-=|=)\s*(.+)$/.exec(tail);
+          if (!m) throw new ScriptError(`${where}:${n} set 형식: > set 이름 = 식`);
+          nodes.push({ t: "set", key: m[1], op: m[2], expr: m[3], line: n });
+        } else if (head === "goto") {
+          const m = /^([\w.]+)(?:\s+if\s+(.+))?$/.exec(tail);
+          if (!m) throw new ScriptError(`${where}:${n} goto 형식: > goto 표지 [if 조건]`);
+          nodes.push({ t: "goto", to: m[1], if: m[2], line: n });
+        } else if (head === "emit") {
+          nodes.push({ t: "emit", event: rest[0] ?? "", arg: rest.slice(1).join(" "), line: n });
+        } else if (head === "call") {
+          nodes.push({ t: "call", script: tail, line: n });
+        } else if (head === "agent" || head === "line") {
+          nodes.push({ t: "agentline", tag: rest[0] ?? "", who: rest[1] ?? "agent", line: n });
+        } else if (head === "end") {
+          nodes.push({ t: "end", line: n });
+        } else throw new ScriptError(`${where}:${n} 모르는 명령: ${head}`);
+        continue;
+      }
+      nodes.push(parseSay(raw, n, where));
+    }
+    return out;
+  }
+  function lex(src) {
+    const out = [];
+    const re = /\s*(?:(\d+(?:\.\d+)?)|'([^']*)'|"([^"]*)"|([A-Za-z_가-힣][\w.가-힣]*)|(==|!=|>=|<=|&&|\|\||[<>!+\-()]))/y;
+    let i = 0;
+    while (i < src.length) {
+      if (/^\s*$/.test(src.slice(i))) break;
+      re.lastIndex = i;
+      const m = re.exec(src);
+      if (!m) throw new ScriptError(`조건식을 읽을 수 없어요: ${src}`);
+      i = re.lastIndex;
+      if (m[1] !== void 0) out.push({ k: "num", v: m[1] });
+      else if (m[2] !== void 0 || m[3] !== void 0) out.push({ k: "str", v: m[2] ?? m[3] });
+      else if (m[4] !== void 0) out.push({ k: "id", v: m[4] });
+      else out.push({ k: "op", v: m[5] });
+    }
+    return out;
+  }
+  function evaluate(src, flags) {
+    const t = lex(src);
+    let p = 0;
+    const peek = () => t[p]?.v;
+    const eat = (v2) => {
+      if (t[p]?.v !== v2) throw new ScriptError(`조건식에 ${v2}가 필요해요: ${src}`);
+      p++;
+    };
+    const num = (v2) => typeof v2 === "number" ? v2 : typeof v2 === "boolean" ? +v2 : Number(v2) || 0;
+    const truthy2 = (v2) => typeof v2 === "string" ? v2 !== "" && v2 !== "0" : !!v2;
+    const prim = () => {
+      const k = t[p++];
+      if (!k) throw new ScriptError(`조건식이 끝났어요: ${src}`);
+      if (k.k === "num") return Number(k.v);
+      if (k.k === "str") return k.v;
+      if (k.k === "id") return k.v === "true" ? true : k.v === "false" ? false : flags[k.v] ?? 0;
+      if (k.v === "(") {
+        const v2 = or();
+        eat(")");
+        return v2;
+      }
+      if (k.v === "-") return -num(prim());
+      if (k.v === "!") return !truthy2(prim());
+      throw new ScriptError(`조건식에서 ${k.v}를 예상하지 못했어요: ${src}`);
+    };
+    const add = () => {
+      let v2 = prim();
+      while (peek() === "+" || peek() === "-") v2 = t[p++].v === "+" ? num(v2) + num(prim()) : num(v2) - num(prim());
+      return v2;
+    };
+    const cmp = () => {
+      const a = add();
+      const op = peek();
+      if (op && ["==", "!=", ">=", "<=", ">", "<"].includes(op)) {
+        p++;
+        const b = add();
+        if (op === "==") return typeof a === typeof b ? a === b : String(a) === String(b);
+        if (op === "!=") return typeof a === typeof b ? a !== b : String(a) !== String(b);
+        const x = num(a), y = num(b);
+        return op === ">=" ? x >= y : op === "<=" ? x <= y : op === ">" ? x > y : x < y;
+      }
+      return a;
+    };
+    const not = () => peek() === "!" ? (p++, !truthy2(not())) : cmp();
+    const and = () => {
+      let v2 = not();
+      while (peek() === "&&") {
+        p++;
+        const r = not();
+        v2 = truthy2(v2) && truthy2(r);
+      }
+      return v2;
+    };
+    const or = () => {
+      let v2 = and();
+      while (peek() === "||") {
+        p++;
+        const r = and();
+        v2 = truthy2(v2) || truthy2(r);
+      }
+      return v2;
+    };
+    const v = or();
+    if (p < t.length) throw new ScriptError(`조건식 뒤에 남은 것이 있어요: ${src}`);
+    return v;
+  }
+  var test = (src, flags) => !src || (() => {
+    const v = evaluate(src, flags);
+    return typeof v === "string" ? v !== "" && v !== "0" : !!v;
+  })();
+  var CLAMPS = { favor: [-3, 3] };
+  function applySet(key2, op, expr, flags) {
+    const v = evaluate(expr, flags);
+    if (op === "=") flags[key2] = v;
+    else {
+      const cur = Number(flags[key2] ?? 0) || 0;
+      flags[key2] = op === "+=" ? cur + (Number(v) || 0) : cur - (Number(v) || 0);
+    }
+    const c = CLAMPS[key2];
+    if (c && typeof flags[key2] === "number") flags[key2] = Math.max(c[0], Math.min(c[1], flags[key2]));
+  }
+  function applySets(src, flags) {
+    if (!src) return;
+    for (const part of src.split(";")) {
+      const m = /^\s*([\w.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
+      if (m) applySet(m[1], m[2], m[3], flags);
+    }
+  }
+  var ScriptLibrary = class {
+    scripts = /* @__PURE__ */ new Map();
+    add(src, where) {
+      for (const s2 of parseScripts(src, where)) {
+        if (this.scripts.has(s2.id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
+        this.scripts.set(s2.id, s2);
+      }
+      return this;
+    }
+    get(id) {
+      const s2 = this.scripts.get(id);
+      if (!s2) throw new ScriptError(`없는 대본: ${id}`);
+      return s2;
+    }
+    /** 모든 goto·선택지·call이 실제로 있는 곳을 가리키는지 */
+    validate() {
+      const errs = [];
+      for (const s2 of this.scripts.values())
+        for (const n of s2.nodes) {
+          const target = (to) => to === "end" || s2.labels[to] !== void 0 || errs.push(`${s2.id}:${n.line} 없는 표지 ${to}`);
+          if (n.t === "goto") target(n.to);
+          if (n.t === "choice") n.options.forEach((o) => target(o.to));
+          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s2.id}:${n.line} 없는 대본 ${n.script}`);
+          try {
+            if (n.t === "goto" && n.if) evaluate(n.if, {});
+            if (n.t === "set") evaluate(n.expr, {});
+            if (n.t === "choice") n.options.forEach((o) => o.if && evaluate(o.if, {}));
+          } catch (e) {
+            errs.push(`${s2.id}:${n.line} ${e.message}`);
+          }
+        }
+      return errs;
+    }
+  };
+  var StoryRunner = class {
+    constructor(lib, ctx) {
+      this.lib = lib;
+      this.ctx = ctx;
+    }
+    stack = [];
+    pending = null;
+    /** 지금 보이는 걸음 */
+    current = { kind: "end" };
+    get done() {
+      return this.current.kind === "end";
+    }
+    start(id) {
+      this.stack = [{ script: this.lib.get(id), pc: 0 }];
+      this.pending = null;
+      this.ctx.flags.agent = this.ctx.agent;
+      this.ctx.flags[`seen.${id}`] = (Number(this.ctx.flags[`seen.${id}`]) || 0) + 1;
+      return this.current = this.run();
+    }
+    next() {
+      if (this.pending) return this.current;
+      return this.current = this.run();
+    }
+    choose(index) {
+      const opts = this.pending;
+      if (!opts) return this.current;
+      const opt = opts[index];
+      if (!opt) return this.current;
+      this.pending = null;
+      applySets(opt.set, this.ctx.flags);
+      this.jump(opt.to);
+      return this.current = this.run();
+    }
+    /** 바로 끝까지 넘김. 선택지가 나오면 거기서 멈춘다. */
+    skip() {
+      let s2 = this.current;
+      for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
+      return s2;
+    }
+    fill(text2) {
+      const f = this.ctx.flags;
+      return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
+    }
+    jump(to) {
+      const top = this.stack[this.stack.length - 1];
+      if (!top) return;
+      if (to === "end") top.pc = top.script.nodes.length;
+      else top.pc = top.script.labels[to] ?? top.script.nodes.length;
+    }
+    say(n) {
+      const who = n.who === "agent" ? this.ctx.agent : n.who;
+      return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
+    }
+    run() {
+      const { flags, rng: rng2 } = this.ctx;
+      for (let guard3 = 0; guard3 < 2e3; guard3++) {
+        const top = this.stack[this.stack.length - 1];
+        if (!top) {
+          delete flags.d100;
+          return { kind: "end" };
+        }
+        flags.d100 = Math.floor(rng2() * 100);
+        const n = top.script.nodes[top.pc];
+        if (!n) {
+          this.stack.pop();
+          continue;
+        }
+        top.pc++;
+        switch (n.t) {
+          case "say":
+            return this.say(n);
+          case "pick":
+            return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
+          case "agentline": {
+            const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
+            if (!text2) break;
+            const who = n.who === "agent" ? this.ctx.agent : n.who;
+            return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
+          }
+          case "choice": {
+            const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
+            if (!visible.length) break;
+            this.pending = n.options;
+            return { kind: "choice", options: visible.map(({ o, index }) => ({ text: this.fill(o.text), index })) };
+          }
+          case "set":
+            applySet(n.key, n.op, n.expr, flags);
+            break;
+          case "goto":
+            if (test(n.if, flags)) this.jump(n.to);
+            break;
+          case "emit":
+            this.ctx.emit?.(n.event, this.fill(n.arg));
+            break;
+          case "call":
+            this.stack.push({ script: this.lib.get(n.script), pc: 0 });
+            break;
+          case "end":
+            this.stack = [];
+            delete flags.d100;
+            return { kind: "end" };
+        }
+      }
+      throw new ScriptError("대본이 끝없이 돌아요");
+    }
+  };
+
+  // src/game/action/story/scripts/hq.ts
+  var hq_default = String.raw`
+=== jaemtri_desk
+> goto again if met_jaemtri
+jaemtri(smile): 어머, 후배, 왔어?
+jaemtri(smile): 잼트리 요원이라고 불러. 그거면 돼. …아니다, 언니라고 불러도 돼. 다들 결국 그렇게 되거든.
+jaemtri: 여기가 임무 창구야. 온라인 순찰로 찾은 괴담 글, 실종 신고, 생존자 진술. 전부 이 태블릿으로 들어와.
+jaemtri(serious): 그리고 하나만. 현장에서 들은 이름은 여기 와서 말하지 마. 코드네임 제도는 철저하거든.
+jaemtri(smile): 자, 그럼 일 얘기 할까?
+> set met_jaemtri = 1
+> goto menu
+-- again
+~ jaemtri(smile): 왔어? 커피 먼저 할래, 일 먼저 할래?
+~ jaemtri(smile): 어머, 후배. 얼굴 좋아졌네. 앉아.
+~ jaemtri: 태블릿에 새 글 올라왔어. 볼래?
+~ jaemtri(smile): 우리 후배 고생했지~ 자, 서류부터.
+-- menu
+* 임무 게시판 -> board
+* 규칙서 열람 -> rulebook
+* 커피 한 잔 -> coffee [if !coffee]
+* 그냥 이야기하기 -> free
+* 나중에 올게요 -> bye
+-- board
+jaemtri: 지금 들어온 건 차원 승강기 건이야. 낡은 건물 엘리베이터, 점검표 서명란이 빈 거.
+* [조사] 로비에서 규칙 2개 확인, 로프로 귀환 -> m1 [if !done_m1]
+* [진압] 로비 L3 경비원 -> m2 [if do

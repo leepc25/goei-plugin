@@ -5,8 +5,9 @@ import { buildGamePack, buildPack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION;
 // 업데이트 주소: package.json의 goei.updateBase (저장소 release 폴더 raw 주소). 있으면 Risu 플러그인 탭이 이 주소로 플러그인을 갱신한다
-const updateBase = String(pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
+const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
   '//@display-name 괴이: 이면세계',
@@ -175,7 +176,7 @@ await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, for
 }
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
-await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/engine-demo.js' });
+await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
 {
   const art = {
     atlas: `data:image/png;base64,${readFileSync('game-pack/jyaldi/atlas.png').toString('base64')}`,
@@ -202,8 +203,16 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
     }
   }
+  const startRoom = {};
+  for (const key of ['room', 'workstation']) {
+    startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
+  }
+  const hqDoor = {};
+  for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
+    hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
+  }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_START_ROOM__=${JSON.stringify(startRoom)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

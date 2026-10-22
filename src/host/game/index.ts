@@ -5,11 +5,13 @@ import { cardPhoto, readCard, takeReport } from './card';
 import { gameAssets } from './packs';
 import { gameSaves } from './saves';
 import { gameTalk } from './talk';
+import { createVisit } from './visit';
 import type { ViewportCtl } from './viewport';
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void): GameBridge {
   return {
     api: 1,
+    visit: createVisit(),
     slot,
     saves: gameSaves,
     assets: gameAssets,

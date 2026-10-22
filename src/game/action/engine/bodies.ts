@@ -1,6 +1,7 @@
 // 엔진 기본 몸: 허수아비, 임시 적(적 모듈이 없을 때만), 총알. 전부 회색 상자. 진짜 적·수호자는 enemy/ 몫이다.
 import type { Body, Hit, HitResult, SpawnSpec, WBox, WorldView } from './contract';
 import { Fighter, newId, toWorld } from './fighter';
+import { newAttackId } from './ids';
 
 /** 허수아비: 쓰러지지 않고 체력이 다시 찬다. 콤보 연습용 */
 export class Dummy extends Fighter {
@@ -121,7 +122,7 @@ export class Thug extends Fighter {
       }
       case 'windup':
         if (this.aiT >= (this.boss ? 18 : 13)) {
-          this.atk = newId();
+          this.atk = newAttackId();
           this.hitDone = 0;
           this.set('strike');
           this.x += this.dir * 6;
@@ -167,6 +168,7 @@ export class Bullet implements Body {
   readonly id = newId();
   readonly team = 'player' as const;
   readonly kind = 'bullet';
+  private readonly attackId = newAttackId();
   hp = 1;
   hpMax = 1;
   alive = true;
@@ -183,7 +185,7 @@ export class Bullet implements Body {
   frame() {
     const x0 = this.dir > 0 ? this.x - 44 : this.x;
     return {
-      hit: [{ x0, x1: x0 + 44, z0: this.z - 10, z1: this.z + 10, y: this.y, dy: 14, attackId: this.id, dmg: 7, react: 'flinch' as const, dir: this.dir, push: 2, stop: 2, strength: 1 as const, noise: 0.6 }],
+      hit: [{ x0, x1: x0 + 44, z0: this.z - 10, z1: this.z + 10, y: this.y, dy: 14, attackId: this.attackId, dmg: 7, react: 'flinch' as const, dir: this.dir, push: 2, stop: 2, strength: 1 as const, noise: 0.6 }],
       hurt: [],
     };
   }

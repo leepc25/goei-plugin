@@ -8,6 +8,8 @@
 //   setDropHook(fn)                      → 처치 드랍 (아이템 모듈 dropFromKill과 연결)
 //   isThreat(body)                       → 싸움 구간을 막는 적인가 (평화로운 주민·수호자 대기 상태는 아님)
 import { AI_BRAINS } from './ai';
+import { KIND_ALIAS } from './kinds';
+export { KIND_ALIAS } from './kinds';
 import { Enemy, type Affix } from './enemy';
 import { GUARDIANS, GUARDIAN_BRAINS } from './guardians';
 import { setSpawner } from './registry';
@@ -30,13 +32,6 @@ scaleAll(ALL_DEFS);
 export const DEF_BY_KIND: Record<string, EnemyDef> = Object.fromEntries(ALL_DEFS.map((d) => [d.kind, d]));
 
 /** 층 모듈(stage/)이 쓰는 이름 → 이 모듈의 종류. solo = 짝을 스스로 부른다 (노부부·208호 가족) */
-export const KIND_ALIAS: Record<string, { kind: string; solo?: boolean }> = {
-  nothuman: { kind: 'hollow' },
-  warmth: { kind: 'shade' },
-  conductor: { kind: 'proctor' },
-  elder: { kind: 'elder_f', solo: true },
-  family208: { kind: 'family_f', solo: true },
-};
 // 엔진은 DEF_BY_KIND[spec.kind]로 우리 적인지 본다. 별칭도 여기서 찾히게 한다
 for (const [k, a] of Object.entries(KIND_ALIAS)) if (!DEF_BY_KIND[k] && DEF_BY_KIND[a.kind]) DEF_BY_KIND[k] = DEF_BY_KIND[a.kind];
 export function hasKind(kind: string): boolean {

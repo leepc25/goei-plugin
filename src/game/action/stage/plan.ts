@@ -57,12 +57,14 @@ export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [numb
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
 /** 메트로배니아 소품은 이미 있는 그림 종류로 그린다 (그림 없는 종류는 엔진이 안 그린다). 뜻은 module이 placed.kind로 가른다 */
-export const METRO_ART: Record<string, string> = { upper: 'chasedoor', sidedoor: 'door', locked: 'firegate' };
+export const METRO_ART: Record<string, string> = { childdoor: 'door', childkey: 'key', upper: 'chasedoor', sidedoor: 'door', locked: 'firegate', wdoor: 'door', wup: 'hq_stairs_up', wdown: 'hq_stairs_down', reward: 'pack' };
+/** 심층은 사람 건물이 아니다: 위로는 매달린 줄, 아래로는 무너진 바닥 */
+const DEEP_ART: Record<string, string> = { wup: 'rope', wdown: 'fall' };
 
 export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
-  const props: PropSpec[] = f.placed.map((p) => ({
+  const props: PropSpec[] = f.placed.filter(p => p.kind !== 'childkey').map((p) => ({
     id: `p${p.id}`,
-    kind: METRO_ART[p.kind] ?? p.kind,
+    kind: (f.type === 'deep' ? DEEP_ART[p.kind] : undefined) ?? METRO_ART[p.kind] ?? p.kind,
     x: p.x,
     y: laneY(p.lane),
     w: p.w,
@@ -101,6 +103,12 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
       encounters.push({ triggerX: room.x + 200, lockFrom: room.x, lockTo: room.x + room.w, waves: [[{ kind: g.kind, x: g.x, y: laneY(g.lane), boss: true, elite: g.elite || undefined }]] });
     }
     encounters.sort((a, b) => a.triggerX - b.triggerX);
+    // 방은 네 방향에서 들어온다. 방 전체를 한 전투로 묶어 역방향 진입 때
+    // 이전 구간에 가두거나 적을 화면 밖에 남기는 일을 막는다.
+    if (f.room && encounters.length) {
+      const waves = encounters.flatMap(e => e.waves);
+      encounters.splice(0, encounters.length, { triggerX: 0, lockFrom: 0, lockTo: f.width, waves });
+    }
   }
   const plan: StagePlan = {
     id,
@@ -129,7 +137,7 @@ export function cellPlan(z: ServiceZone, cell: ServiceCell, id: string, startX: 
   // 칸 싸움: 칸 가운데에서 한 판 (들어온 쪽 반대편에서 나온다)
   const fight = z.fights?.[`${cell.col},${cell.row}`];
   const encounters: Encounter[] = fight?.length
-    ? [{ triggerX: startX < 640 ? startX + 200 : 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + ((i * 53) % 110)) }))] }]
+    ? [{ triggerX: 0, lockFrom: 0, lockTo: ROOM_W, waves: [fight.map((kind, i) => ({ kind, x: startX < 640 ? 980 - i * 120 : 300 + i * 120, y: laneY(30 + ((i * 53) % 110)) }))] }]
     : [];
   const plan: StagePlan = {
     id,
@@ -242,7 +250,7 @@ export function endingPlan(id: string): StagePlan {
 /* ── 소품 겹침 금지 (검수 12-2) ──
    기능이 있는 자리(문·승강기·패널·스위치·셔터·해치…)는 그대로 두고, 꾸밈 소품(그림 소품·입간판·탁자·물건·사람)만 옮긴다.
    ① 소품끼리 같은 깊이에서 그림 폭이 겹치지 않게 ② 벽에 붙은 소품은 벽 그림 속 문·가구 앞을 피하게 ③ 지형(단·구덩이·좁은 길) 위에 놓지 않게. */
-const FIXED_PROPS = new Set(['firegate', 'crack', 'vent', 'key', 'elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
+const FIXED_PROPS = new Set(['firegate', 'hq_stairs_up', 'hq_stairs_down', 'pack', 'crack', 'vent', 'key', 'elevator', 'mirror', 'panel', 'chasedoor', 'b12', 'goalwall', 'switch', 'shutter', 'door', 'servicedoor', 'rope', 'up', 'down', 'fall', 'ladder_up', 'ladder_down', 'left', 'right', 'intercom', 'button', 'getoff', 'close', 'greet']);
 const BOARD_GAP = 1400;
 // 소품 그림 폭: 그림이 있으면 그 실제 폭(자판기·소파처럼 넓은 것이 문·명패를 가렸다, 검수 22), 없으면 종류별 기본
 const artW = (p: PropSpec, floorType?: string) => {
@@ -262,7 +270,9 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   const meaning = new Set(f.placed.filter((q) => q.data.fork !== undefined || q.data.group !== undefined).map((q) => `p${q.id}`));
   // 규칙 표지는 지우지 않지만(읽어야 한다) 겹치면 옮긴다
   const ruled = new Set(f.placed.filter((q) => q.data.rule).map((q) => `p${q.id}`));
-  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || p.x < startX + 60;
+  // 잠긴 셔터 앞 해치는 열쇠 길이다. 같은 쪽에서 벽 그림을 피하도록 옮긴다.
+  const gateX = f.placed.find((q) => q.kind === 'locked')?.x ?? -1;
+  const fixed = (p: PropSpec) => FIXED_PROPS.has(p.kind) || meaning.has(p.id) || (p.kind !== 'hatch' && p.x < startX + 60 && (!f.room || ruled.has(p.id)));
   // 입간판(로비 6번 판 그림으로 그려지는 것 전부)은 한 화면에 하나 (검수 13-2, 14-1: 화면마다 2~3개, 같은 「비상구」 둘이 나란히).
   // 규칙·갈림길 표지는 남기고, 뜻 없는 꾸밈 판은 다른 판과 1400px 안이거나 앞 판과 같은 것이면 뺀다.
   const boardLike = (p: PropSpec) => isStandBoard(p.kind, p.label, f.type) && !isHighSign(p.kind, p.label);
@@ -275,8 +285,12 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   // 점검문(철문)은 덩이 안 자리만 정해져 있다: 벽 그림의 문·게시판 앞이면 가까운 빈 벽으로 민다 (검수 22: 철문이 게시판을 가림)
   for (const p of props.filter((q) => q.kind === 'servicedoor' || (q.kind === 'chasedoor' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'upper')) || (q.kind === 'door' && f.placed.some((z) => `p${z.id}` === q.id && z.kind === 'sidedoor')) || q.kind === 'crack')) {
     const h = artW(p, f.type) / 2;
+    // 잠긴 셔터 앞 정비 구역 입구는 밀려도 셔터 앞에 남아야 한다 (열쇠를 가지러 갈 길)
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
     const ok = (x: number) =>
       x - h >= 40 && x + h <= f.width - 40 &&
+      (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) &&
       !keepOut.some(([a, b]) => x + h + 8 > a && x - h - 8 < b) &&
       !terr.some((t) => x + h > t.x0 - 20 && x - h < t.x1 + 20) &&
       !props.some((q) => q !== p && (q.kind === 'shutter' || q.kind === 'firegate') && Math.abs(q.x - x) < h + 120) &&
@@ -298,9 +312,14 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   // 갈림길·순서 표지(자리가 뜻이라 고정)도 문·벽 문·다른 고정 소품을 가리면 가까운 빈 벽으로 조금만 민다 (뜻이 바뀌지 않는 거리 안)
   for (const p of props.filter((q) => boardLike(q) && meaning.has(q.id))) {
     const h = artW(p, f.type) / 2;
+    // 잠긴 셔터 앞 정비 구역 입구는 밀려도 셔터 앞에 남아야 한다 (열쇠를 가지러 갈 길)
+    const gate = gateX >= 0 ? { x: gateX } : null;
+    const side = gate ? Math.sign(p.x - gate.x) : 0;
     const ok = (x: number) =>
       x - h >= 40 && x + h <= f.width - 40 &&
+      (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) &&
       !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) &&
+      !props.some(q => q !== p && q.solid && Math.abs(q.x - x) < 120) &&
       !props.some((q) => q !== p && fixed(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
     if (ok(p.x)) continue;
     for (let d = 12; d <= 360; d += 12) {
@@ -319,6 +338,11 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   for (const g of f.placed.filter((q) => q.kind === 'locked')) for (const y of [Y_TOP, (Y_TOP + Y_BOTTOM) / 2, Y_BOTTOM]) taken.push({ a: g.x - 150, b: g.x + 150, y });
   const free = (p: PropSpec, x: number) => {
     const h = artW(p, f.type) / 2;
+    if (p.kind === 'hatch' && p.x < gateX && x + h + 120 >= gateX) return false;
+    // E 선택은 깊이(y)를 보지 않는다. 다른 줄의 물건도 필수 장치의
+    // x를 차지하면 열쇠·스위치 입력을 가로챌 수 있다.
+    if (f.room && f.placed.some(q => (q.data.dir || ['key', 'switch', 'goalwall', 'panel'].includes(q.kind)) && `p${q.id}` !== p.id && Math.abs(q.x - x) < 120)) return false;
+    if (props.some(q => q !== p && q.solid && Math.abs(q.x - x) < 120)) return false;
     if (x - h < 40 || x + h > f.width - 40) return false;
     if (taken.some((t) => Math.abs(t.y - p.y) < 90 && x + h + 16 > t.a && x - h - 16 < t.b)) return false;
     if (p.y <= wallY && keepOut.some(([a, b]) => x + h > a && x - h < b)) return false;
@@ -331,7 +355,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
   let spaced = true;
   // 한 화면 간격 자리가 없으면(짧은 층에 규칙 표지 셋) 다른 판과 가장 먼 빈자리
   const farthest = (p: PropSpec, reach: number): number | null => {
-    spaced = false;
+    spaced = p.kind === 'hatch';
     let best: number | null = null, bd = -1;
     for (let d = -reach; d <= reach; d += 24) {
       const x = p.x + d;
@@ -343,7 +367,7 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
     return best;
   };
   const placed: PropSpec[] = props.filter(fixed);
-  const order = (p: PropSpec) => (boardLike(p) ? (decor.has(p) ? 1 : 0) : 2);
+  const order = (p: PropSpec) => p.kind === 'hatch' ? -1 : (boardLike(p) ? (decor.has(p) ? 1 : 0) : 2);
   for (const p of [...props].filter((q) => !fixed(q)).sort((a, b) => order(a) - order(b) || a.x - b.x)) {
     let x: number | null = null;
     // 판은 다른 판과 한 화면 떨어진 자리를 더 멀리까지 찾는다
@@ -358,7 +382,23 @@ function spreadProps(f: Floor, props: PropSpec[], startX: number): [number, numb
         break;
       }
     }
-    if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch')) x = farthest(p, f.width);
+    if (x === null && ((boardLike(p) && !decor.has(p)) || p.kind === 'hatch' || p.kind === 'npc' || p.kind === 'passenger')) x = farthest(p, f.width);
+    // 같은 셔터 쪽의 정비구역 입구가 이미 있으면 겹치는 추가 사다리는 생략한다.
+    if (x === null && p.kind === 'hatch' && placed.some(q => q.kind === 'hatch' && (q.x < gateX) === (p.x < gateX))) {
+      props.splice(props.indexOf(p), 1);
+      continue;
+    }
+    // 짧은 방의 주민·승객이 같은 줄에 몰려도 셔터 앞에 남겨 두지 않는다.
+    // 다른 깊이 줄의 빈자리까지 찾되 E 접근 간격은 그대로 지킨다.
+    if (x === null && (p.kind === 'npc' || p.kind === 'passenger')) {
+      const originalY = p.y;
+      for (const y of [Y_BOTTOM - 30, (Y_TOP + Y_BOTTOM) / 2, Y_TOP + 60]) {
+        p.y = y;
+        x = farthest(p, f.width);
+        if (x !== null) break;
+      }
+      if (x === null) p.y = originalY;
+    }
     // 벽에 붙는 꾸밈 소품이 문·명패·벽 장식을 피할 자리가 없으면 빼 버린다 (검수 22: 자판기가 문·게시판을 가림)
     if (x === null && p.kind === 'prop' && p.y <= wallY && !must(p) && p.label !== '거꾸로 가는 시계') {
       props.splice(props.indexOf(p), 1);
@@ -397,7 +437,7 @@ function clearOfProps(props: PropSpec[], x: number, y: number): number {
 }
 
 function propH(kind: string): number {
-  return ({ elevator: 200, panel: 90, mirror: 130, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 } as Record<string, number>)[kind] ?? 80;
+  return ({ elevator: 200, panel: 90, mirror: 130, childdoor: 180, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 } as Record<string, number>)[kind] ?? 80;
 }
 
 export function segAt(segs: FloorSegment[], x: number): FloorSegment {

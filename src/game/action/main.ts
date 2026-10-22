@@ -1,5 +1,8 @@
 // 게임 진입점. 플러그인(코드 팩)과 시연판이 모두 이것 하나를 부른다: mountGame(box, bridge) → 정리 함수.
 import type { GameBridge } from '../bridge';
+import { prepareStartRoom } from './art/startRoom';
+import { prepareHqTextures } from './art/hqTextures';
+import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { loadArt } from './engine/art';
 import { Game } from './engine/game';
 import { engineModules } from './engine/modules';
@@ -34,7 +37,10 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   let offTouch: (() => void) | null = null;
   let dead = false;
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
-  void loadArt(urlOf).then((art) => {
+  const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
+  const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
+  const startRoom = prepareStartRoom(bridge?.assets ? f => bridge.assets!.url('start-room', f) : undefined);
+  void Promise.all([loadArt(urlOf), startRoom.ready]).then(([art]) => {
     if (dead) return;
     stage.remove();
     root.style.display = 'block';
@@ -44,9 +50,12 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
     game.start();
     (globalThis as { __goeiEngine?: Game }).__goeiEngine = game;
-  });
+  }).catch(() => { if (!dead) stage.textContent = '시작방 그림을 불러오지 못했습니다. 새로고침해 주세요.'; });
   return () => {
     dead = true;
+    releaseDoorArt();
+    releaseHqArt();
+    startRoom.dispose();
     offTouch?.();
     game?.destroy();
     const g = globalThis as { __goeiEngine?: Game };

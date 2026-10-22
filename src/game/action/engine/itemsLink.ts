@@ -10,6 +10,10 @@ import {
   createField,
   createItemRun,
   addItem,
+  addRelic,
+  itemHit,
+  pickupHealAmount,
+  slowAt,
   drawItemIcon,
   dropFromKill,
   spawnEnemyDrops,
@@ -19,6 +23,7 @@ import {
   createShopPanel,
   VENDORS,
   type ShopPanel,
+  type Shop,
   type VendorId,
   type EnemyDrop,
   stepField,
@@ -34,6 +39,7 @@ import { drawPropArt, isHighSign, propArtSize } from '../art/bg';
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
 import { Fighter } from './fighter';
+import { Enemy } from '../enemy';
 import { PROP_DEPTH, blockByProps, clearSpot, furnishAvoid, nudgeProp } from './propBlock';
 import type { World } from './world';
 
@@ -129,11 +135,29 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   const loadout = run.launch?.items ?? [{ id: 'medkit', n: 2 }, { id: 'flash', n: 2 }, { id: 'adrenaline', n: 1 }, null];
   const ir: ItemRun = createItemRun('jyaldi', loadout.map((s) => (s ? { id: s.id, n: s.n } : null)));
   let field: Field = createField(run.seed, 1);
+  const fields = new Map<string, Field>();
   const p = w.player;
   p.mag = p.ammo = ir.mag || p.mag;
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   (w as unknown as { itemRun: ItemRun }).itemRun = ir;
+  w.recovery = {
+    has: id => ir.bag.some(b => b?.id === id),
+    add: id => addRelic(ir, id),
+    take: id => {
+      const i = ir.bag.findIndex(b => b?.id === id);
+      if (i < 0) return false;
+      ir.bag[i] = null;
+      return true;
+    },
+  };
+  const recordInventory = () => {
+    w.notes.cash = ir.cash;
+    w.notes.shards = ir.shards;
+    w.notes.debt = ir.debt;
+    w.notes.bag = ir.bag.map(b => b ? { ...b } : null);
+    w.notes.itemsLeft = ir.loadout.map(s => s ? { ...s } : null);
+  };
   (w as unknown as { itemField: () => Field }).itemField = () => field;
 
   const syncSlots = () => {
@@ -151,10 +175,34 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       if (e.t === 'hit') {
         const b = w.bodies.find((x) => x.id === e.target);
         if (!b) continue;
-        if (e.status === 'stun' && b instanceof Fighter && b.phase === 'free') {
-          b.enter('hurt', Math.round((e.stun ?? 2) * TICK_HZ));
-          w.fx('ring', b.x, b.y, 100, '2');
-        } else if (e.damage > 0) b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage, react: e.knockdown ? 'down' : 'stagger', dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
+        if (e.damage > 0) {
+          // 마지막 탄/내구도 소멸 또는 비행 중 무기 교체에도 발사 당시 종류를 유지한다.
+          const cls = WEAPONS[e.source]?.cls;
+          const scale = cls === 'melee' ? p.progression.stats.power : cls === 'gun' ? p.progression.stats.aim : 1;
+          const result = b.applyHit(itemHit({ ...e, damage: e.damage * scale }, p.x), w);
+          // 아이템도 실제 명중/아머 관통 때 기본 공격과 같은 콤보·게이지 경로를 쓴다.
+          // 무적/가드는 체력 변화와 무관하게 기본 전투와 동일하게 명중 보상을 주지 않는다.
+          if (result.kind === 'hit' || result.kind === 'armor') p.onConnect(w, !!result.killed);
+          if (result.killed) {
+            w.kills++;
+            if (!(b instanceof Fighter)) w.emit({ type: 'enemyDie', kind: b.kind, x: b.x });
+          }
+        }
+        if (e.status === 'stun' && b.alive && b.hp > 0) {
+          const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
+          // TV 충돌/전격의 넘어뜨리기가 먼저 적용돼 air가 되어도 같은 전격의 기절은 유지한다.
+          const shockKnockdown = e.damage > 0 && e.knockdown && b instanceof Enemy && b.state === 'air';
+          if (b instanceof Enemy && b.inv <= 0 && (['idle', 'walk', 'attack', 'hurt', 'stunned', 'grabbing'].includes(b.state) || shockKnockdown)) {
+            if (b.state === 'grabbing') b.releaseGrab(w);
+            b.move = null; b.vx = b.vy = 0;
+            b.set('stunned'); b.stunT = ticks;
+            w.fx('ring', b.x, b.y, 100, '2');
+          } else if (b instanceof Fighter && b.invuln <= 0 && ['free', 'act', 'hurt'].includes(b.phase)) {
+            b.vx = b.vy = 0;
+            b.enter('hurt', ticks);
+            w.fx('ring', b.x, b.y, 100, '2');
+          }
+        }
       } else if (e.t === 'use') {
         const f = e.effect;
         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
@@ -163,7 +211,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         else if (f.type === 'energy') p.skillCd = 0;
         else if (f.type === 'ward') p.ward += f.hits;
       } else if (e.t === 'pickup' && e.kind === 'heal') {
-        p.hp = Math.min(p.hpMax, p.hp + p.hpMax * 0.08);
+        p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));
       }
     }
     for (const g of toGameEvents(evs, p.x, p.ammo)) w.emit(g as never);
@@ -241,8 +289,12 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   };
 
   w.on((e) => {
+    if (e.type === 'run:end') recordInventory();
     if (e.type === 'enter:floor') {
+      const remembered = fields.get(e.floor.id);
+      if (remembered) { field = remembered; syncCarry(); return; }
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
+      fields.set(e.floor.id, field);
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       // 문·벽 가구 앞, 지형 위, 적이 생겨날 자리를 비운다 (검수 12-2, 17)
       // 층 소품은 그림 폭으로 (점검문처럼 표 폭보다 그림이 넓은 것, 겹침 시험)
@@ -265,11 +317,17 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
 
   // 중림 상인: 층 모듈의 merchant 소품 앞 E
   let shopSeed = run.seed ^ 0x5151;
+  const shops = new Map<string, Shop>();
   w.interactHooks.push((prop) => {
     if (prop?.kind !== 'merchant' || !shopPanel || shopPanel.isOpen()) return;
     const ids = Object.keys(VENDORS) as VendorId[];
     const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? 'madeokhee';
-    const shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
+    const shopKey = JSON.stringify([w.floor.id, prop.id, vendor]);
+    let shop = shops.get(shopKey);
+    if (!shop) {
+      shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
+      shops.set(shopKey, shop);
+    }
     lastReserve = ir.reserve = p.reserve;
     shopPanel.open(shop, ir, (r) => {
       if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
@@ -277,7 +335,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       apply([]);
       syncCarry();
       w.emit({ type: 'pickup', x: p.x, id: 'shop' });
-    }, () => w.say(VENDORS[vendor].bye, 2));
+    }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
   });
 
   const hitSeen = new Set<string>();
@@ -318,6 +376,20 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     ],
     configurable: true,
   });
+  w.itemState = {
+    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed, shops: [...shops] }),
+    restore(value) {
+      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number; shopSeed: number; shops?: [string, Shop][] };
+      if (!s?.inventory || !Array.isArray(s.fields)) throw new Error('손상된 아이템 저장');
+      Object.assign(ir, s.inventory);
+      fields.clear(); for (const [k, v] of s.fields) fields.set(k, v);
+      field = fields.get(s.current)!;
+      if (!field) throw new Error('방 아이템 저장 누락');
+      lastReserve = s.lastReserve; shopSeed = s.shopSeed;
+      shops.clear(); for (const [k, v] of s.shops ?? []) shops.set(k, v);
+      syncSlots(); syncCarry();
+    },
+  };
   return {
     run: ir,
     /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */
@@ -338,6 +410,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       const hits = p.frame().hit;
       if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
       apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+      // 적 모듈의 기존 40% 둔화 상태를 연막 영역과 연결한다.
+      for (const b of w.bodies)
+        if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
       const solids = ents.map((e) => itemSolid(e as { x: number; y: number; prop: string }));
@@ -360,12 +435,8 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         });
       }
       syncCarry();
-      w.notes.cash = ir.cash;
+      recordInventory();
       w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
-      w.notes.shards = ir.shards;
-      w.notes.debt = ir.debt;
-      w.notes.bag = ir.bag.map((b) => (b ? { id: b.id, name: b.name } : null));
-      w.notes.itemsLeft = ir.loadout.map((s) => (s ? { id: s.id, n: s.n } : null));
     },
     draw(c: CanvasRenderingContext2D, camX: number) {
       for (const e of field.ents) {

@@ -62,10 +62,13 @@ export interface StoryApi {
   talk(npc: TalkNpcId, onDone?: () => void): void;
   update(dt: number): void;
   isBlocking(): boolean;
+  isVideoPlaying(): boolean;
   /** 대화 넘기기 (키보드 등) */
   advance(): void;
   choose(n: number): void;
   skip(): void;
+  /** World replacement/disposal: close without executing completion callbacks. */
+  cancel(): void;
   dispose(): void;
 }
 
@@ -113,6 +116,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   let talkNpc: TalkNpcId | null = null;
   let doneCb: (() => void) | undefined;
   let blocking = false;
+  let disposed = false;
 
   const agent = () => host.getAgent();
   const syncAgent = () => {
@@ -247,6 +251,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   };
 
   const cutscene = (id: string, onDone?: () => void) => {
+    if (disposed) return;
     if (opts.cutscenes !== 'script') {
       // 도트 영상. 목록에 없거나 파일을 못 불러오면 바로 끝(onDone)
       const v = VIDEOS[id];
@@ -263,6 +268,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
         return;
       }
       // 받은 컷신은 프레임 폴더 index.json에 이름이 있다
+      video.setPaused(!!host.paused?.());
       void video.play(
         base,
         v.cuts,
@@ -394,6 +400,19 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   };
   root.addEventListener('keydown', keys);
 
+  const cancel = () => {
+    doneCb = sceneDone = talkDone = undefined;
+    scene = null;
+    talkNpc = null;
+    runner.current = { kind: 'end' };
+    video.cancel();
+    ui.close();
+    ui.setSkippable(false);
+    ui.fade('clear', 0);
+    panel.close();
+    refresh();
+  };
+
   return {
     flags,
     library: lib,
@@ -405,10 +424,13 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     advance,
     choose,
     skip: () => (video.open ? video.finish() : scene?.skip()),
+    cancel,
     isBlocking: () => blocking,
+    isVideoPlaying: () => video.open,
     update(dt: number) {
       now += dt;
       const p = !!host.paused?.();
+      video.setPaused(p);
       if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
       ui.update(dt);
       if (scene) {
@@ -425,8 +447,10 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
       }
     },
     dispose() {
+      if (disposed) return;
+      disposed = true;
       root.removeEventListener('keydown', keys);
-      video.finish();
+      cancel();
       video.el.remove();
       ui.dispose();
       panel.el.remove();

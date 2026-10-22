@@ -156,6 +156,17 @@ export function treat(s: HqSave, agent: AgentId): string {
   rec.injured = 0;
   return `${AGENT_BY_ID[agent].name} 치료 완료 (예산 -${TREAT_COST})`;
 }
+/** 출동할 건강한 요원이나 치료비가 없어도 기존 하루 휴식 규칙으로 회복할 수 있다. */
+export function restDay(s: HqSave): string {
+  if (s.active) return '출동 중에는 본부에서 휴식할 수 없어요.';
+  if (!AGENTS.some(a => s.agents[a.id].injured > 0 || s.agents[a.id].fatigue > 0)) return '모두 충분히 쉬었어요.';
+  for (const a of AGENTS) {
+    s.agents[a.id].fatigue = 0;
+    s.agents[a.id].injured = Math.max(0, s.agents[a.id].injured - 1);
+  }
+  s.day++;
+  return '하루 쉬었다. 피로가 풀리고 부상 회복에 하루가 지났다. (출동 보상 없음)';
+}
 export function appraise(s: HqSave): string[] {
   if (!s.appraisal.length) return ['감정할 회수물이 없어요.'];
   const lines: string[] = [];
@@ -243,6 +254,9 @@ export function variantFor(seed: number) {
 export function launch(s: HqSave, missionId: string, seed: number): MissionLaunch | string {
   const m = MISSION_BY_ID[missionId];
   if (!m) return '임무를 고르세요.';
+  if (m.requires && !s.missionsDone.includes(m.requires)) return '앞 임무를 먼저 완료해야 해요.';
+  if (s.failedRescues.includes(m.id)) return '마감이 지난 구조 요청이에요.';
+  if (!m.repeat && s.missionsDone.includes(m.id)) return '이미 완료한 임무예요. 게시판에서 다음 임무를 골라 주세요.';
   const can = canDeploy(s, s.selected);
   if (!can.ok) return can.why;
   if (s.active) return '이미 출동 중이에요.';
@@ -273,49 +287,54 @@ export function launch(s: HqSave, missionId: string, seed: number): MissionLaunc
   return l;
 }
 
-/** 출동 중 앱을 닫았다가 다시 열었는데 출동 상태가 없으면: 출동 포기 = 후송 취급 */
-export function abandonActive(s: HqSave) {
-  s.active = null;
-}
-
 // ── 엔진 결과 정리 ──
 /** 구조된 사람 id (층 모듈은 'missing:5' 같은 id를 쓴다) → 면담실 생존자 id */
 export const survivorId = (id: string) => (SURVIVORS[id] ? id : id.startsWith('missing') ? 'worker' : id);
 const arr = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
 /** 층 모듈 기록(stage.*)을 RunResult 칸으로 옮긴다. 엔진이 notes를 넘겨주면 쓴다. */
 export function normalizeResult(r: RunResult): RunResult {
-  const n = r.notes;
-  if (!n) return r;
-  const out = { ...r };
-  const found = arr(n['stage.found']);
-  if (!out.found.length && found.length) out.found = found;
-  const sent = arr(n['stage.sent']);
-  if (!out.sent.length && sent.length) out.sent = sent;
-  const rescued = arr(n['stage.rescued']);
-  if (!out.rescued.length && rescued.length) out.rescued = rescued;
-  out.rescued = [...new Set(out.rescued.map(survivorId))];
+  const n = r.notes ?? {};
+  const merge = (values: string[], key: string) => [...new Set([...values, ...arr(n[key]), ...arr(n[`stage.${key}`])])];
+  const sent = merge(r.sent, 'sent');
+  const out = {
+    ...r,
+    // 층은 송신하면 found를 비운다. 송신한 줄도 이번 출동에서 확인한 규칙이다.
+    found: [...new Set([...merge(r.found, 'found'), ...sent])],
+    sent,
+    rescued: [...new Set(merge(r.rescued, 'rescued').map(survivorId))],
+    bag: r.bag.map((b) => b ? { ...b } : null),
+    itemsLeft: r.itemsLeft.map((x) => x ? { ...x } : null),
+  };
   if (typeof n['stage.depth'] === 'number') out.depth = Math.max(out.depth, n['stage.depth'] as number);
   return out;
 }
 /** 임무 달성 판정은 본부가 한다 (층 모듈은 임무를 모른다). 귀환해야 성공. */
 export function judgeMission(g: MissionGoal, r: RunResult): boolean {
-  if (r.how !== 'return') return false;
-  const n = r.notes;
-  if (!n) return r.missionDone;
-  const visited = arr(n['stage.visited']).join(' ');
+  r = normalizeResult(r);
+  if (r.how !== 'return' || r.depth < g.depth) return false;
+  const n = r.notes ?? {};
+  const visited = arr(n['stage.visited']);
   const bosses = arr(n.bosses);
   switch (g.kind) {
     case '조사':
-      if (g.id === 'm3') return visited.includes('추격') && r.depth >= g.depth;
+      if (g.id === 'm3') {
+        // 방문만 하고 다락방으로 빠져나온 것은 추격 층 통과가 아니다.
+        const cleared = Array.isArray(n['stage.clearedFloors']) ? n['stage.clearedFloors'] : [];
+        return visited.some((v) => {
+          const match = /^(?:L(\d+)|B-(\d+))\s+.*추격/.exec(v);
+          return !!match && cleared.includes(match[1] ? Number(match[1]) : Number(match[2]) + 3);
+        });
+      }
       if (g.id === 'm8') return n['stage.trial'] === 'success';
-      if (g.id === 'm5') return visited.includes('재현') && r.found.length >= (g.rules ?? 1);
+      if (g.id === 'm5') return visited.some((v) => v.includes('재현')) && r.found.filter((id) => id.startsWith('r_')).length >= (g.rules ?? 1);
       return r.found.length >= (g.rules ?? 1);
     case '구조':
-      return r.rescued.length > 0;
+      return g.rescue ? r.rescued.includes(survivorId(g.rescue)) : r.rescued.length > 0;
     case '진압':
-      return r.depth >= g.depth && (n.boss === true || bosses.length > 0);
+      if (g.id === 'm6') return n['stage.elderDefeated'] === true || bosses.includes('elder') || (bosses.includes('elder_f') && bosses.includes('elder_m'));
+      return bosses.includes(g.id === 'm2' ? 'guard' : g.id);
     case '회수':
-      return r.bag.some((b) => b?.id === g.recover) || n[`stage.${g.recover}`] === true;
+      return !!g.recover && r.bag.some((b) => b?.id === g.recover);
     case '기록':
       return r.depth >= g.depth;
   }
@@ -327,9 +346,11 @@ export const MASTERY_GAIN = (r: RunResult) => 20 + r.floors * 10 + (r.missionDon
 
 export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand): string[] {
   // 같은 출동을 두 번 정산하지 않는다 (다시 열기·이중 호출)
-  const id = raw.runId ?? l.runId;
-  if (s.last?.runId === id && id) return s.last.lines;
-  if (s.active && l.runId && s.active.runId !== l.runId) return ['다른 출동의 결과라 정산하지 않았어요.'];
+  const id = l.runId;
+  if (!id || (raw.runId !== undefined && raw.runId !== id)) return ['출동 id가 다른 결과라 정산하지 않았어요.'];
+  if (s.last?.runId === id) return s.last.lines;
+  // active를 소비하는 정산만 허용한다. 이전 결과를 여러 출동 뒤 재전달해도 보상은 늘지 않는다.
+  if (!s.active || s.active.runId !== id || s.active.mission !== l.goal.id || s.active.agent !== l.agent || s.active.seed !== l.seed) return ['진행 중인 출동과 다른 결과라 정산하지 않았어요.'];
   const lines: string[] = [];
   const r0 = normalizeResult(raw);
   const r = { ...r0, missionDone: judgeMission(l.goal, r0) };
@@ -337,11 +358,11 @@ export function settle(s: HqSave, l: MissionLaunch, raw: RunResult, rand: Rand):
   const evac = r.how === 'evac';
   const success = r.how === 'return' && r.missionDone;
   const agent = AGENT_BY_ID[l.agent];
-  lines.push(evac ? `후송: ${josa(agent.name, '이', '가')} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, '이', '가')} 다락방 로프로 철수했다. 성공 보상은 없다.`);
+  lines.push(evac ? `후송: ${josa(agent.name, '이', '가')} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === 'return' ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, '이', '가')} 출동을 포기하고 돌아왔다. 성공 보상은 없다.`);
 
   // 규칙서: 송신한 정보는 전부, 안 보낸 정보는 후송이면 절반
   const unsent = r.found.filter((f) => !r.sent.includes(f));
-  const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
+  const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : [...r.sent, ...r.found];
   let added = 0;
   for (const id of kept) if (!s.rulebook.includes(id)) (s.rulebook.push(id), added++);
   if (added || (evac && unsent.length)) lines.push(`규칙서 +${added}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ''}`);

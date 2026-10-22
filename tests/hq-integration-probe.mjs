@@ -1,0 +1,30 @@
+// 통합 담당 전달용 재현. 알려진 결함을 성공 조건으로 고정하지 않고 실제 경계 값을 출력한다.
+import { build } from 'esbuild';
+const out = await build({ stdin: { contents: `
+export { createElevatorStage } from './src/game/action/stage';
+export { World } from './src/game/action/engine/world';
+export { linkItems } from './src/game/action/engine/itemsLink';
+export { createEnemy } from './src/game/action/enemy';
+export { newSave } from './src/game/action/hq/state';
+export { launch, settle, appraise } from './src/game/action/hq/logic';
+export { emptyResult } from './src/game/action/hq/contract';
+`, resolveDir: process.cwd() }, bundle: true, format: 'esm', write: false, loader: { '.css': 'text' } });
+const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
+const stage = M.createElevatorStage({ load: () => null, save() {} });
+const run = { agent: 'jyaldi', seed: 42, stageId: 'elevator' };
+const w = new M.World(run, {}, stage), items = M.linkItems(w, run);
+w.enterFloor(stage.firstFloor(run));
+const checklist = w.props.find(p => p.kind === 'checklist');
+if (!checklist) throw new Error('재현 seed 42의 점검표 없음');
+stage.onInteract(w.api, w.floor, checklist);
+items.tick();
+w.emit({ type: 'run:end', how: 'return' });
+console.log('checklist', JSON.stringify({ stageItems: stage.outing().items, bag: w.notes.bag, note: w.notes['stage.checklist'] ?? null }));
+items.run.bag[0] = { id: 'photo', name: '얼굴 없는 사진', research: 8, value: 40 };
+items.tick();
+const hq = M.newSave(), launch = M.launch(hq, 'm1', 42);
+M.settle(hq, launch, { ...M.emptyResult('withdraw'), bag: w.notes.bag }, () => 0.9);
+M.appraise(hq);
+console.log('appraisal', JSON.stringify({ inventory: items.run.bag[0], result: w.notes.bag[0], researchAwarded: hq.currencies.research }));
+const elder = M.createEnemy('elder', 300, 500, () => 0.9);
+console.log('elder', JSON.stringify({ stageKind: 'elder', actualKind: elder.kind, solo: elder.mem.solo, hqAccepts: "bosses:['elder'] 또는 ['elder_f','elder_m']" }));

@@ -1,0 +1,63 @@
+{
+ "version": "0.16.40-visit.1",
+ "code": {
+  "parts": [
+   "goei-game.1.txt",
+   "goei-game.2.txt",
+   "goei-game.3.txt",
+   "goei-game.4.txt",
+   "goei-game.5.txt",
+   "goei-game.6.txt",
+   "goei-game.7.txt",
+   "goei-game.8.txt",
+   "goei-game.9.txt",
+   "goei-game.10.txt"
+  ],
+  "length": 1827997,
+  "bytes": 1916978
+ },
+ "packs": [
+  {
+   "id": "hq-door-round2",
+   "hash": "f994ddb735d5a20e",
+   "bytes": 11232,
+   "parts": [
+    "hq-door-round2.1.bin"
+   ],
+   "required": true
+  },
+  {
+   "id": "hq-textures",
+   "hash": "8c3ec7555251d51f",
+   "bytes": 177926,
+   "parts": [
+    "hq-textures.1.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "jyaldi",
+   "hash": "f9ddba2dce4f4bc4",
+   "bytes": 1283015,
+   "parts": [
+    "jyaldi.1.bin",
+    "jyaldi.2.bin",
+    "jyaldi.3.bin"
+   ],
+   "required": true
+  },
+  {
+   "id": "start-room",
+   "hash": "9310910349b4d9e9",
+   "bytes": 2279262,
+   "parts": [
+    "start-room.1.bin",
+    "start-room.2.bin",
+    "start-room.3.bin",
+    "start-room.4.bin",
+    "start-room.5.bin"
+   ],
+   "required": true
+  }
+ ]
+}

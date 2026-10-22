@@ -3,7 +3,7 @@
 // - 칸 하나 = 정비 구역 조각 2개(화면 하나). 가로 이웃은 칸 끝 통로(덕트면 앉아서), 세로 이웃은 사다리(지지대).
 // - 다락방(휴식·송신·거래·귀환 로프)·입구·아래 점검문 위치는 고정, 나갔다 들어오면 나머지가 다시 짜인다(reroll).
 import { CHUNK_BY_ID, SERVICE_CHUNKS, flipTerrain } from '../data/chunks';
-import { mix, pick, range, rng, shuffle } from '../rng';
+import { mix, pick, rng, shuffle } from '../rng';
 import { CHUNK_W, LANE_DEPTH, ROOM_W, type ServiceCell, type ServiceThing, type ServiceZone, type Terrain } from '../types';
 
 let tid = 1;
@@ -24,8 +24,9 @@ export function makeService(ctx: ServiceContext): ServiceZone {
   tid = 1;
   // 고정 부분: 크기·입구·다락방·아래 점검문은 reroll과 무관
   const fixed = rng(mix(ctx.seed, ctx.depth, 6060));
-  const cols = ctx.depth <= 3 ? 2 : range(fixed, 2, 3);
-  const rows = Math.min(5, 3 + Math.floor(Math.max(0, ctx.depth - 3) / 4));
+  // 스테이지 설계서 4.1·2.1: 세로 미로 3~6칸, 한 구간 1~2분. 로비 아래는 2×2, 지하는 2×3 (예전 2~3×3~5는 너무 길었다)
+  const cols = 2;
+  const rows = ctx.depth <= 3 ? 2 : 3;
   const entryCell: [number, number] = [Math.floor(fixed() * cols), 0];
   let atticCell: [number, number] = [Math.floor(fixed() * cols), 1 + Math.floor(fixed() * (rows - 1))];
   if (atticCell[0] === entryCell[0] && atticCell[1] === 1 && rows > 2) atticCell = [atticCell[0], 2];

@@ -1,0 +1,11 @@
+--- a/src/game/action/stage/module.ts
++++ b/src/game/action/stage/module.ts
+@@ -1860,2 +1860,3 @@
+           panel: rm.panel && isSeen,
++          service: isSeen && !!nodes.get(`room:${d}:${id}`)?.plan.stage.floor?.placed.some(p => p.kind === 'hatch' || p.kind === 'servicedoor'),
+           guardian: rm.guardian && isSeen,
+@@ -1904,3 +1905,3 @@
+     const f = rt?.plan.stage.floor;
+-    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, room: o.where === 'floor' && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, cell: o.where === 'service' ? o.cell : null, worlds: worldsV, services, keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
++    return { where: o.where, depth: o.where === 'service' ? o.serviceDepth : o.depth, room: o.where === 'floor' && f?.room ? [f.room.col, f.room.row] : null, roomW: f?.width ?? 1280, panelReady: o.clearedFloors.includes(o.where === 'service' ? o.serviceDepth : o.depth), cell: o.where === 'service' ? o.cell : null, worlds: worldsV, services, keys, upgrades: o.upgrades.filter((id) => UPGRADE_BY_ID[id]), goal, seed: o.seed };
+   };

@@ -1,4 +1,4 @@
-import { AMMO_PICKUP, CLINIC, ITEMS, LOANS, RELICS, SIGNATURES, VENDORS, WEAPONS, priceAt, type VendorId } from './data';
+import { AMMO_PICKUP, CLINIC, ITEMS, LOANS, SIGNATURES, VENDORS, WEAPONS, priceAt, type VendorId } from './data';
 import { addAmmo, addItem, canAddItem, equip, type ItemRun } from './inventory';
 import { rand } from './field';
 /** 출동 중 중림 상인. 현금만 받는다(13장). 진열은 출동 시드와 층으로 정해져 다시 열어도 같다. */
@@ -81,12 +81,23 @@ export function openShop(vendor: VendorId, run: ItemRun, depth: number, seed: nu
 
 export type BuyResult =
   | { ok: true; got: string; heal?: number; cure?: string[]; hpCost?: number }
-  | { ok: false; why: 'cash' | 'stock' | 'full' | 'ammoFull' | 'loan' };
+  | { ok: false; why: 'cash' | 'stock' | 'full' | 'ammoFull' | 'loan'; currency?: 'hp'; message?: string };
+/** 체력 거래 직전 엔진의 현재 상태. 지급과 체력 차감은 같은 호출 안에서 처리한다. */
+export interface BuyContext {
+  hp: number;
+  max: number;
+  /** 현재 걸려 있고 onBuy에서 실제 제거할 수 있는 상태만 전달한다. */
+  curable?: readonly string[];
+}
 /** 하나 산다. 체력·상태 적용은 엔진 몫(heal 비율, cure 목록, hpCost 비율을 돌려준다). */
-export function buy(shop: Shop, run: ItemRun, key: string): BuyResult {
+export function buy(shop: Shop, run: ItemRun, key: string, ctx?: BuyContext): BuyResult {
   const o = shop.offers.find(x => x.key === key);
   if (!o || o.stock <= 0) return { ok: false, why: 'stock' };
   if (run.cash < o.price) return { ok: false, why: 'cash' };
+  // 엔진의 최소 체력 1 보정으로 대가가 사라지지 않도록, 지급 전에 전액 지불을 확인한다.
+  // 체력 정보가 연결되지 않은 호출도 무료 지급으로 처리하지 않는다.
+  if (o.hpCost && (!ctx || !Number.isFinite(ctx.hp) || !Number.isFinite(ctx.max) || ctx.max <= 0 || ctx.hp - ctx.max * o.hpCost < 1))
+    return { ok: false, why: 'cash', currency: 'hp' };
   let res: BuyResult;
   switch (o.kind) {
     case 'item':
@@ -105,7 +116,10 @@ export function buy(shop: Shop, run: ItemRun, key: string): BuyResult {
       break;
     case 'clinic': {
       const c = CLINIC.find(x => x.id === o.ref)!;
-      res = { ok: true, got: o.name, heal: c.heal, cure: c.cure };
+      const heal = ctx && Number.isFinite(ctx.hp) && Number.isFinite(ctx.max) && ctx.hp > 0 && ctx.hp < ctx.max ? c.heal : 0;
+      const cure = c.cure.filter(status => ctx?.curable?.includes(status));
+      if (!heal && !cure.length) return { ok: false, why: 'stock', message: '지금은 받을 수 있는 치료가 없다' };
+      res = { ok: true, got: o.name, heal, cure };
       break;
     }
     case 'loan': {
@@ -135,7 +149,7 @@ export function buy(shop: Shop, run: ItemRun, key: string): BuyResult {
 export function sell(shop: Shop, run: ItemRun, bagIndex: number): number {
   const b = run.bag[bagIndex];
   if (!shop.buys || !b) return 0;
-  const price = Math.round((RELICS[b.id]?.value ?? b.value) * (1 + shop.depth * 0.03));
+  const price = sellPrice(shop, b.value);
   run.bag[bagIndex] = null;
   run.cash += price;
   return price;

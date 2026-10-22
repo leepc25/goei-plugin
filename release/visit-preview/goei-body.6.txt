@@ -1,0 +1,2143 @@
+> {
+      const p = roster.find((r) => r.id === id);
+      if (!p || lockedState(x, id)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
+      return p.name || p.english;
+    });
+  }
+  function partyLabel(names4, support) {
+    return ["나", ...names4, ...support > 0 ? [`지원 ×${support}`] : []].join(", ");
+  }
+  async function compose2(ctx2, env2, build) {
+    env2.setBusy(true);
+    env2.setNotice("");
+    env2.render();
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        return build(latest, x).chat;
+      });
+      resetField();
+      const sent = await sendNow();
+      env2.setBusy(false);
+      if (!sent) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await env2.close();
+      await env2.refresh();
+    } catch (error) {
+      env2.setBusy(false);
+      env2.setNotice(error instanceof Error ? error.message : String(error));
+      env2.render();
+    }
+  }
+  function depart(ctx2, env2) {
+    const target = field2.target;
+    const note = field2.note;
+    const team = [...field2.team];
+    const support = field2.support;
+    return compose2(ctx2, env2, (latest, x) => {
+      if (!target) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest;
+      if (target.type === "event") {
+        const ev = activeEvents(x.world).find((e) => e.key === target.key);
+        if (!x.on || !ev) throw new DirectiveError("선택한 상황이 끝났거나 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, ev.name, locName(ev.loc));
+      } else if (target.type === "facility") {
+        const lm = x.catalog.landmarks.find((l) => l.name === target.name);
+        if (!lm) throw new DirectiveError("시설 목록이 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ""));
+      } else {
+        dest = destination(d, locName(target.loc));
+      }
+      const names4 = partyNames(x, team);
+      const body4 = sceneDirective(d, dest, names4, support, false);
+      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body4), note) };
+    });
+  }
+  function sendMission(ctx2, env2, opening) {
+    const kind = field2.mpick;
+    const name = field2.mname;
+    const note = field2.note;
+    const team = [...field2.team];
+    const support = field2.support;
+    return compose2(ctx2, env2, (latest, x) => {
+      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest = destination(d, name);
+      if (kind === "lm") {
+        const lm = x.catalog.landmarks.find((l) => l.name === name);
+        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
+      } else if (kind === "ms") {
+        const site = x.world.ms.find((m) => m.name === name);
+        if (site) dest = destination(d, name, locName(site.loc));
+      }
+      const names4 = partyNames(x, team);
+      let chat = latest;
+      if (x.on) {
+        const w = structuredClone(x.world);
+        const last2 = (latest.message ?? []).at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body4 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body4), note) };
+    });
+  }
+  async function saveWorld(ctx2, env2, change) {
+    env2.setBusy(true);
+    env2.setNotice("");
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      });
+      env2.setBusy(false);
+      await env2.refresh();
+    } catch (error) {
+      env2.setBusy(false);
+      env2.setNotice(error instanceof Error ? error.message : String(error));
+      env2.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field2.region = sidoOf(ev.loc);
+    field2.place = placeKey(ev, x.catalog);
+    field2.filter = "all";
+    field2.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env2, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field2.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field2.place = null;
+        field2.confirmEnd = null;
+        env2.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code) || !key2) return true;
+          field2.region = code;
+          field2.mapq = "";
+          v2 = key2;
+        }
+        field2.confirmEnd = null;
+        if (action === "map-place" && isPC() && field2.place === v2 && sameTarget(field2.target, v2)) {
+          field2.place = null;
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field2.target = placeTarget(v2);
+        env2.render();
+        return true;
+      }
+      case "map-unplace":
+        field2.place = null;
+        field2.target = null;
+        field2.confirmEnd = null;
+        toStep("goal", env2);
+        return true;
+      case "map-filter":
+        field2.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env2.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field2.target, v)) {
+          field2.target = null;
+          env2.render();
+          return true;
+        }
+        field2.target = placeTarget(v);
+        toStep("team", env2);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env2);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field2.target, ev.key)) {
+          field2.target = null;
+          field2.confirmEnd = null;
+          env2.render();
+          return true;
+        }
+        field2.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field2.region = sidoOf(ev.loc);
+        field2.confirmEnd = null;
+        toStep("team", env2);
+        return true;
+      }
+      case "end-event":
+        if (field2.confirmEnd !== v) {
+          field2.confirmEnd = v;
+          env2.render();
+          return true;
+        }
+        field2.confirmEnd = null;
+        if (field2.target?.type === "event" && field2.target.key === v) field2.target = null;
+        await saveWorld(ctx2, env2, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field2.team.indexOf(v);
+        if (i >= 0) field2.team.splice(i, 1);
+        else if (field2.team.length + field2.support < TEAM_MAX) field2.team.push(v);
+        env2.render();
+        return true;
+      }
+      case "support": {
+        const next = field2.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field2.team.length, next)) field2.support = next;
+        env2.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env2);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field2.mkind = v;
+          field2.query = "";
+        }
+        env2.render();
+        return true;
+      case "mission-open":
+        field2.mopen = field2.mopen === v ? "" : v;
+        env2.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field2.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field2.mname === name && field2.mpick === kind && field2.mopen !== `${kind}:${name}`) {
+          field2.mname = null;
+          env2.render();
+          return true;
+        }
+        field2.mname = name;
+        field2.mpick = kind;
+        toStep("team", env2);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env2, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        field2.mname = null;
+        toStep("goal", env2);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env2, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/lorecheck.ts
+  var esc16 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증" };
+  function item(p, risu = false) {
+    const r = p.reasons[0];
+    const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc16(p.entry.name)}</b><small>${esc16(why)}</small></div><span class="lc-kind">${SLOTS[p.entry.kind].label}</span></div>`;
+  }
+  function loreCheckBox(ctx2) {
+    const mode2 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
+    const opts = (m) => loreOptions(ctx2.char, ctx2.chat, m);
+    const now = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode2));
+    if (!now) return "";
+    const other = computeLore(ctx2.char.globalLore, ctx2.chat, opts(mode2 === "risu" ? "plugin" : "risu"));
+    const names4 = (l) => new Set(l.map((p) => p.entry.name));
+    const mine = names4(now.picks);
+    const theirs = names4(other.picks);
+    const size = now.picks.reduce((n, p) => n + tokens(p.entry.content), 0);
+    const list4 = now.picks.length ? now.picks.map((p) => item(p, mode2 === "risu")).join("") : '<p class="ps-note">지금은 켤 로어북이 없어요.</p>';
+    const only = (l, not, risu) => l.filter((p) => !not.has(p.entry.name)).map((p) => item(p, risu)).join("");
+    const otherIf = mode2 === "risu" ? "플러그인이 고르면" : "Risu가 직접 켜면";
+    const more = only(other.picks, mine, mode2 !== "risu");
+    const less = only(now.picks, theirs, mode2 === "risu");
+    const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
+    return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
+    <section class="ps-group"><h3>${mode2 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
+    <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
+  </div></details>`;
+  }
+
+  // src/ui/settings.ts
+  var THEME_KEY = "$st_fixed_theme";
+  var settingsUi = { confirmOff: false, busy: false, notice: "", info: "", scope: "chat", confirm: "" };
+  function resetSettings() {
+    settingsUi.confirmOff = false;
+    settingsUi.notice = "";
+    settingsUi.scope = "chat";
+    settingsUi.confirm = "";
+  }
+  var esc17 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function seg4(action, cur, items, disabled = false) {
+    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
+  }
+  function field3(label, control2, help) {
+    return `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
+  }
+  var dimSlider = (n, busy5) => `<label class="st-range"><input type="range" min="0" max="100" step="5" value="${n}" data-input="dim" data-change="set-dim" aria-label="창 바깥 불투명도"${busy5 ? " disabled" : ""}><output>${n}%</output></label>`;
+  var pctSlider = (action, n, r, label, busy5) => `<label class="st-range"><input type="range" min="${r.min}" max="${r.max}" step="${r.step}" value="${n}" data-input="pct" data-change="${action}" aria-label="${label}"${busy5 ? " disabled" : ""}><output>${n}%</output></label>`;
+  function recentControl(key2, v, label, busy5) {
+    const n = v ?? IMG_RECENT.def;
+    const all = n === 0;
+    return `<div class="st-recent">${seg4(`set-${key2}-mode`, all ? "all" : "recent", [["recent", "최근만"], ["all", "전부"]], busy5)}` + (all ? "" : `<label class="st-range"><input type="range" min="${IMG_RECENT.min}" max="${IMG_RECENT.max}" step="1" value="${n}" data-input="count" data-change="set-${key2}" aria-label="${label}"${busy5 ? " disabled" : ""}><output>${n}개</output></label>`) + "</div>";
+  }
+  var group3 = (title2, body4, note = "") => `<section class="ps-group"><h3>${title2}</h3>${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body4}</div></section>`;
+  function worldOffVars() {
+    return { $st_anomaly_on: "0", [WORLD_KEY]: "", $an_report: "", $in_report: "", $ms_report: "", $ag_report: "" };
+  }
+  function current2(ctx2, scope) {
+    const lore = ctx2.char.globalLore;
+    if (scope !== "chat") return { basic: basicDefaults(lore), world: worldDefaults(lore), theme: getPrefs().theme ?? "dark" };
+    const cur = String(ctx2.chat.scriptstate?.[THEME_KEY] ?? "");
+    return {
+      basic: basicSettings(lore, ctx2.chat.scriptstate),
+      world: worldSettings(lore, ctx2.chat.scriptstate),
+      theme: cur === "dark" || cur === "paper" ? cur : "light"
+    };
+  }
+  function stepper(action, key2, shown2, canDown, canUp, label, busy5) {
+    return `<div class="st-step"><button class="gx-step" data-action="${action}" data-value="${key2}:-" ${!canDown || busy5 ? "disabled" : ""} aria-label="${esc17(label)} 줄이기">−</button>
+    <b>${esc17(shown2)}</b><button class="gx-step" data-action="${action}" data-value="${key2}:+" ${!canUp || busy5 ? "disabled" : ""} aria-label="${esc17(label)} 늘리기">+</button></div>`;
+  }
+  function worldStep(key2) {
+    if (key2.endsWith("_p") || key2 === "landmark_share") return 10;
+    if (key2.endsWith("_ttl")) return 6;
+    return 1;
+  }
+  function worldRow(w, key2, label, unit, busy5) {
+    const f = WORLD_SPEC.find((x) => x.key === key2);
+    const v = w[key2];
+    const max = f.max ?? 99;
+    return field3(esc17(label), stepper("set-world", key2, `${v}${unit}`, v > 0, v < max, label, busy5), "");
+  }
+  function worldKind(w, k, name, busy5) {
+    const expire2 = w[`${k}_expire`] === 1;
+    return `<div class="ps-card"><h4>${name}</h4><div class="ps-rows">
+    ${worldRow(w, `${k}_cap`, "동시 최대", "개", busy5)}
+    ${worldRow(w, `${k}_p`, "발생 확률", "%", busy5)}
+    ${field3("자동 종료", seg4("set-world", expire2 ? `${k}_expire:1` : `${k}_expire:0`, [[`${k}_expire:1`, "ON"], [`${k}_expire:0`, "OFF"]], busy5), "")}
+    ${expire2 ? worldRow(w, `${k}_ttl`, "RP 유지 시간", "시간", busy5) : ""}
+    ${k === "incident" ? worldRow(w, "landmark_share", "거점 비율", "%", busy5) : ""}
+  </div></div>`;
+  }
+  var CONFIRM = {
+    chat: {
+      save: ["지금 설정으로 새 채팅 기본값을 덮어쓸까요?", "덮어쓰기"],
+      load: ["저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.", "불러오기"]
+    },
+    card: {
+      save: ["고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.", "덮어쓰기"],
+      load: ["고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?", "되돌리기"]
+    }
+  };
+  function scopeBar(scope, canChat) {
+    const items = [[canChat ? "chat" : "defaults", "설정"], ["card", "명부"]];
+    const tabs2 = `<div class="gx-segs st-scope">${items.map(([k, label]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label}</button>`).join("")}</div>`;
+    const btns = scope === "card" ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === "chat" ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : "";
+    const kind = scope === "card" ? "card" : "chat";
+    const c = settingsUi.confirm && scope !== "defaults" ? CONFIRM[kind][settingsUi.confirm] : null;
+    const yes = kind === "card" ? settingsUi.confirm === "save" ? "dir-save" : "dir-reset" : "set-bar-yes";
+    const confirm2 = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
+    return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm2}`;
+  }
+  function settingsTab(ctx2, scope = "chat", canChat = true) {
+    if (scope === "card") {
+      return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
+    }
+    const { basic: s4, world, theme } = current2(ctx2, scope);
+    const on2 = scope === "chat" ? worldOn(ctx2.chat) : s4.anomalyOn;
+    const busy5 = settingsUi.busy;
+    const anomaly = settingsUi.confirmOff && scope === "chat" ? `<div class="st-confirm"><p>끄면 지금 상황판의 괴이·사건·특수·요원 상태를 비워요. 다시 켜도 이전 상태는 돌아오지 않아요.</p>
+        <div class="gx-row-btns"><button class="gx-mini danger" data-action="set-anomaly" data-value="off-yes" ${busy5 ? "disabled" : ""}>끄기</button>
+        <button class="gx-mini" data-action="set-anomaly" data-value="off-no">취소</button></div></div>` : seg4("set-anomaly", on2 ? "on" : "off", [["on", "ON"], ["off", "OFF"]], busy5);
+    const note = String(ctx2.chat.scriptstate?.[ASSET_NOTE] ?? "");
+    return `<main class="gx-body gx-settings">
+    ${scopeBar(scope, canChat)}
+    ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc17(settingsUi.notice)}</div>` : ""}
+    ${scope === "chat" && canChat ? group3("기능별 설정", `<div class="st-feats">${[["gnet", "괴담넷", ICONS.gnet], ["phone", "괴담톡", ICONS.phone], ["wiki", "위키", ICONS.wiki]].map(([k, label, icon2]) => `<button class="gx-mini st-feat" data-action="feature-set" data-value="${k}">${icon2}${label} 설정</button>`).join("")}</div>`) : ""}
+    ${group3("화면", [
+      field3("테마", seg4("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), "채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요."),
+      field3("상태창", seg4("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요."),
+      field3("메뉴 위치", seg4("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 메뉴 목록을 놓을 쪽이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
+      field3("요원 칸", seg4("set-agents", getPrefs().agents ?? "wall", [["wall", "모니터"], ["list", "목록"]], busy5), "상황판 요원 칸 모양이에요. 이 기기의 모든 채팅에 같이 적용돼요."),
+      field3("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy5), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.")
+    ].join(""))}
+    ${group3("캐릭터 이미지", [
+      field3("에셋 출력", seg4("set-asset", s4.assetOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요."),
+      s4.assetOn ? field3("이미지 크기", pctSlider("set-img-size", getPrefs().imgSize ?? IMG_SIZE.def, IMG_SIZE, "이미지 크기", busy5), "채팅 속 캐릭터 이미지 칸의 크기예요. 100%가 원래 크기이고, 채팅 폭보다 커지지는 않아요. 이 기기의 모든 채팅에 같이 적용돼요.") : "",
+      s4.assetOn ? field3("접힌 높이", pctSlider("set-img-fold", getPrefs().imgFold ?? IMG_FOLD.def, IMG_FOLD, "접힌 높이", busy5), "이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 접혔을 때 그림 높이의 몇 %를 보여 줄지예요. 원래는 68%(정사각형)이고 100%면 접지 않아요.") : "",
+      s4.assetOn ? field3("이미지 표시 범위", recentControl("img-show", getPrefs().imgShow, "이미지 표시 메시지 수", busy5), "이미지를 띄울 메시지예요. 「최근만」이면 마지막 메시지부터 정한 개수까지만 띄워요(원래 6개). 바꾼 값은 메시지를 다시 그릴 때 반영돼요.") : "",
+      s4.assetOn ? field3("요청 속 이미지 태그", recentControl("img-send", getPrefs().imgSend, "태그를 남길 메시지 수", busy5), "모델에 보내는 대화 기록에서 이미지 태그를 남길 메시지예요. 오래된 태그를 빼면 토큰이 줄어요. 최근 태그는 모델이 태그 쓰는 법을 따라 하도록 남겨요(원래 6개).") : "",
+      s4.assetOn ? field3("출력 모델", seg4("set-asset-model", s4.assetModel, [["main", "메인모델"], ["aux", "보조모델"]], busy5), "메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.") : "",
+      s4.assetOn && s4.assetModel === "aux" ? field3("캐릭터당 이미지 수", seg4("set-asset-limit", String(s4.assetLimit), [["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]], busy5), "보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수") : ""
+    ].join(""))}
+    ${scope === "chat" && s4.assetOn && s4.assetModel === "aux" && note ? `<p class="gx-hint">최근 보충: ${esc17(note)}</p>` : ""}
+    ${group3("상황판", [
+      field3("괴이 발생 · 요원 시스템", anomaly, scope === "chat" ? "ON이면 괴이·사건·특수가 자동으로 발생하고 응답마다 지도와 요원 상태를 갱신해요. OFF로 바꾸면 현재 상황판을 비워요. 커스텀 임무는 OFF에서도 쓸 수 있어요." : "새 채팅을 상황판을 켠 채로 시작할지 정해요."),
+      field3("요원 표시 인원", stepper("set-agent", "n", `${s4.agentLimit}명`, s4.agentLimit > 0, s4.agentLimit < AGENT_MAX, "요원 표시 인원", busy5), `상황판과 편성에 보일 등록 요원 수 (0~${AGENT_MAX}명, 0이면 숨김)`),
+      field3("지원 투입", seg4("set-support", s4.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.")
+    ].join(""))}
+    <details class="ps-adv st-world" data-keep="world-gen"${keepOpen("world-gen")}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
+      <div class="ps-cards">
+        ${worldKind(world, "preset", "프리셋 괴이", busy5)}${worldKind(world, "random", "랜덤 괴이", busy5)}
+        ${worldKind(world, "incident", "사건", busy5)}${worldKind(world, "mystic", "특수", busy5)}
+        <div class="ps-card"><h4>추가 발생 여유분</h4><div class="ps-rows">
+          ${worldRow(world, "extra_cap", "괴이", "개", busy5)}${worldRow(world, "extra_in_cap", "사건", "개", busy5)}${worldRow(world, "extra_ms_cap", "특수", "개", busy5)}</div>
+          <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
+      </div>
+    </div></details>
+    ${advSections("gen", scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars, scope === "chat" && canChat ? { 1: loreCheckBox(ctx2) } : {})}
+    ${updateGroup(ctx2)}
+    ${toast("st", settingsUi.info, (t) => {
+      if (settingsUi.info === t) settingsUi.info = "";
+    })}
+  </main>`;
+  }
+  async function save(ctx2, env2, change) {
+    settingsUi.busy = true;
+    settingsUi.notice = "";
+    env2.render();
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const vars = change(latest);
+        return vars ? { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...vars } } : null;
+      });
+    } catch (error) {
+      settingsUi.notice = error instanceof Error ? error.message : String(error);
+    }
+    settingsUi.busy = false;
+    await env2.refresh();
+  }
+  function withBasic(ctx2, chat, patch) {
+    return basicVars({ ...basicSettings(ctx2.char.globalLore, chat.scriptstate), ...patch });
+  }
+  async function saveDefaults(env2, change) {
+    settingsUi.busy = true;
+    settingsUi.notice = "";
+    env2.render();
+    try {
+      await savePrefs(change);
+    } catch (error) {
+      settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    settingsUi.busy = false;
+    env2.render();
+  }
+  var basicPatch = (env2, patch) => saveDefaults(env2, (p) => ({ ...p, basic: { ...p.basic, ...patch } }));
+  function nextWorld(w, v) {
+    const [key2, op] = v.split(":");
+    const f = WORLD_SPEC.find((x) => x.key === key2);
+    if (!f || op === void 0) return null;
+    const cur = w[f.key];
+    const step = worldStep(f.key);
+    const n = op === "+" ? cur + step : op === "-" ? cur - step : Number(op);
+    if (!Number.isFinite(n)) return null;
+    const clamped = Math.min(f.max ?? 99, Math.max(0, f.fraction ? n : Math.round(n)));
+    return clamped === cur ? null : [f.key, clamped];
+  }
+  async function handleSettings(action, value, ctx2, env2, scope = "chat") {
+    const v = value ?? "";
+    const lore = ctx2.char.globalLore;
+    if (action === "set-bar") {
+      settingsUi.confirm = v === "save" || v === "load" ? v : "";
+      env2.render();
+      return true;
+    }
+    if (action === "set-bar-no") {
+      settingsUi.confirm = "";
+      env2.render();
+      return true;
+    }
+    if (action === "set-bar-yes") {
+      const what = settingsUi.confirm;
+      settingsUi.confirm = "";
+      if (what === "save") {
+        const cur = current2(ctx2, "chat");
+        await saveDefaults(env2, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
+        if (!settingsUi.notice) await saveVarDefaults(["$gen_"], ctx2.chat.scriptstate).catch((error) => settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+        if (!settingsUi.notice) settingsUi.info = "지금 설정을 새 채팅 기본값으로 저장했어요.";
+        env2.render();
+      } else if (what === "load") {
+        const d = current2(ctx2, "defaults");
+        await save(ctx2, env2, (chat) => {
+          const vars = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(["$gen_"], chat.scriptstate) };
+          for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
+          if (worldOn(chat)) {
+            const ss = { ...chat.scriptstate ?? {}, ...vars };
+            Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
+          }
+          return vars;
+        });
+        if (!settingsUi.notice) settingsUi.info = "새 채팅 기본값을 지금 채팅에 불러왔어요.";
+        env2.render();
+      } else env2.render();
+      return true;
+    }
+    if (action === "set-status" && ["auto", "dark", "light", "paper", "off"].includes(v ?? "")) {
+      await saveDefaults(env2, (p) => ({ ...p, status: v === "auto" ? void 0 : v }));
+      repaintTheme();
+      return true;
+    }
+    if (action === "set-img-size" || action === "set-img-fold") {
+      const size = imgSize(v);
+      const fold = imgFold(v);
+      if (action === "set-img-size" && size !== null) await saveDefaults(env2, (p) => ({ ...p, imgSize: size === IMG_SIZE.def ? void 0 : size }));
+      else if (action === "set-img-fold" && fold !== null) await saveDefaults(env2, (p) => ({ ...p, imgFold: fold === IMG_FOLD.def ? void 0 : fold }));
+      repaintTheme();
+      return true;
+    }
+    if (/^set-img-(show|send)(-mode)?$/.test(action)) {
+      const key2 = action.includes("show") ? "imgShow" : "imgSend";
+      const cur = getPrefs()[key2];
+      const n = action.endsWith("-mode") ? v === "all" ? 0 : cur === 0 || cur === void 0 ? IMG_RECENT.def : cur : imgRecent(v);
+      if (n !== null) await saveDefaults(env2, (p) => ({ ...p, [key2]: n === IMG_RECENT.def ? void 0 : n }));
+      return true;
+    }
+    if (action === "set-agents") {
+      await saveDefaults(env2, (p) => ({ ...p, agents: v === "list" ? "list" : void 0 }));
+      return true;
+    }
+    if (action === "set-nav" || action === "set-dim") {
+      const n = Number(v);
+      if (action === "set-nav" && (v === "left" || v === "right")) await saveDefaults(env2, (p) => ({ ...p, nav: v === "right" ? "right" : void 0 }));
+      else if (action === "set-dim" && Number.isInteger(n) && n >= 0 && n <= 100) await saveDefaults(env2, (p) => ({ ...p, dim: n }));
+      return true;
+    }
+    if (action === "set-scope") {
+      settingsUi.scope = v === "defaults" || v === "card" ? v : "chat";
+      settingsUi.confirmOff = false;
+      settingsUi.confirm = "";
+      env2.render();
+      return true;
+    }
+    if (scope === "defaults") {
+      const d = current2(ctx2, "defaults");
+      switch (action) {
+        case "set-anomaly":
+          if (v === "on" || v === "off") await basicPatch(env2, { anomalyOn: v === "on" });
+          return true;
+        case "set-agent": {
+          const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith("+") ? 1 : -1)));
+          if (next !== d.basic.agentLimit) await basicPatch(env2, { agentLimit: next });
+          return true;
+        }
+        case "set-theme":
+          if (v === "light" || v === "dark" || v === "paper") await saveDefaults(env2, (p) => ({ ...p, theme: v }));
+          return true;
+        case "set-support":
+          await basicPatch(env2, { supportOn: v === "1" });
+          return true;
+        case "set-asset":
+          await basicPatch(env2, { assetOn: v === "1" });
+          return true;
+        case "set-asset-model":
+          if (v === "main" || v === "aux") await basicPatch(env2, { assetModel: v });
+          return true;
+        case "set-asset-limit": {
+          const n = Number(v);
+          if (Number.isInteger(n) && n >= 1 && n <= 4) await basicPatch(env2, { assetLimit: n });
+          return true;
+        }
+        case "set-world": {
+          const hit3 = nextWorld(d.world, v);
+          if (hit3) await saveDefaults(env2, (p) => ({ ...p, world: { ...p.world, [hit3[0]]: hit3[1] } }));
+          return true;
+        }
+      }
+      return false;
+    }
+    switch (action) {
+      case "set-world":
+        await save(ctx2, env2, (chat) => {
+          const hit3 = nextWorld(worldSettings(lore, chat.scriptstate), v);
+          return hit3 ? { [wgKey(hit3[0])]: String(hit3[1]) } : null;
+        });
+        return true;
+      case "set-anomaly":
+        if (v === "off") {
+          if (!worldOn(ctx2.chat)) return true;
+          settingsUi.confirmOff = true;
+          env2.render();
+          return true;
+        }
+        if (v === "off-no") {
+          settingsUi.confirmOff = false;
+          env2.render();
+          return true;
+        }
+        settingsUi.confirmOff = false;
+        if (v === "off-yes") {
+          await save(ctx2, env2, (chat) => worldOn(chat) ? worldOffVars() : null);
+          return true;
+        }
+        if (v === "on") {
+          await save(ctx2, env2, (chat) => {
+            if (worldOn(chat)) return null;
+            const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+            return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? ""));
+          });
+        }
+        return true;
+      case "set-agent":
+        await save(ctx2, env2, (chat) => {
+          const cur = basicSettings(lore, chat.scriptstate).agentLimit;
+          const next = Math.min(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
+          if (next === cur) return null;
+          const vars = withBasic(ctx2, chat, { agentLimit: next });
+          if (worldOn(chat)) {
+            const ss = { ...chat.scriptstate ?? {}, ...vars };
+            Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
+          }
+          return vars;
+        });
+        return true;
+      case "set-theme":
+        if (v !== "light" && v !== "dark" && v !== "paper") return true;
+        await save(ctx2, env2, (chat) => chat.scriptstate?.[THEME_KEY] === v ? null : { [THEME_KEY]: v });
+        return true;
+      case "set-support":
+        await save(ctx2, env2, (chat) => withBasic(ctx2, chat, { supportOn: v === "1" }));
+        return true;
+      case "set-asset":
+        await save(ctx2, env2, (chat) => withBasic(ctx2, chat, { assetOn: v === "1" }));
+        if (setImgHidden(v !== "1")) repaintTheme();
+        return true;
+      case "set-asset-model":
+        if (v !== "main" && v !== "aux") return true;
+        await save(ctx2, env2, (chat) => withBasic(ctx2, chat, { assetModel: v }));
+        return true;
+      case "set-asset-limit": {
+        const n = Number(v);
+        if (!Number.isInteger(n) || n < 1 || n > 4) return true;
+        await save(ctx2, env2, (chat) => withBasic(ctx2, chat, { assetLimit: n }));
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
+  var root = null;
+  var view2 = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy4 = false;
+  var notice2 = "";
+  var GNET_ON = true;
+  var TABS2 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "settings"];
+  var tab = "board";
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env = {
+    render: () => render(),
+    refresh: () => refresh(),
+    close: () => close(),
+    setNotice: (text) => {
+      notice2 = text;
+    },
+    setBusy: (on2) => {
+      busy4 = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render(),
+    refresh: () => refresh(),
+    current: () => view2.kind === "started" ? view2.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render(), refresh: () => refresh() };
+  var shown = false;
+  var phoneEnv = {
+    render: () => render(),
+    refresh: () => refresh(),
+    visible: () => shown && tab === "phone" && view2.kind === "started",
+    close: async () => {
+      await close();
+      await refresh();
+    }
+  };
+  var esc18 = (s4) => String(s4 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot() {
+    if (root) return root;
+    setImageRedraw(() => view2.kind === "picker" ? renderPicker() : render());
+    const style = document.createElement("style");
+    style.textContent = style_default;
+    document.head.appendChild(style);
+    root = document.createElement("div");
+    root.className = "gx";
+    document.body.appendChild(root);
+    root.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files2 = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files2.length) void addPhotos(pickFor, files2);
+    });
+    let downOutside = false;
+    root.addEventListener("pointerdown", (ev) => downOutside = ev.target === root);
+    root.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root) {
+        if (downOutside) void handle("close");
+        downOutside = false;
+        return;
+      }
+      const pick3 = t.closest("[data-pick-photo]");
+      if (pick3) {
+        if (pick3.hasAttribute("disabled") || busy4) return;
+        pickFor = pick3.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void handle("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const take = el.dataset.take ? root?.querySelector(`[name="${el.dataset.take}"]`)?.value : void 0;
+      void handle(el.dataset.action, take ?? el.dataset.value);
+    });
+    root.addEventListener("pointerdown", (ev) => {
+      const box = ev.target.closest?.("[data-crop]");
+      const img = box?.querySelector("img");
+      if (!box || !img) return;
+      ev.preventDefault();
+      const key2 = box.dataset.crop ?? "";
+      const frame = box.querySelector(".dir-crop-frame");
+      const move = (e) => {
+        const r = img.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const w = cropValue(key2)[2];
+        const half = w / 100 * r.width / 2;
+        const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
+        const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
+        const c = [px / r.width * 100, py / r.height * 100, w];
+        setCrop(key2, c);
+        if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
+      };
+      move(ev);
+      box.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        box.removeEventListener("pointermove", move);
+        box.removeEventListener("pointerup", up);
+        box.removeEventListener("pointercancel", up);
+        render();
+      };
+      box.addEventListener("pointermove", move);
+      box.addEventListener("pointerup", up);
+      box.addEventListener("pointercancel", up);
+    });
+    root.addEventListener("pointerdown", (ev) => {
+      const grip = ev.target.closest?.("[data-drag-agent]");
+      const row6 = grip?.closest("[data-agent-row]");
+      if (!grip || !row6 || !root) return;
+      ev.preventDefault();
+      const box = root;
+      const group4 = row6.dataset.agentGroup ?? "";
+      const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row6 && r.dataset.agentGroup === group4);
+      let drop = null;
+      const mark2 = (next) => {
+        drop?.el.classList.remove("drop-before", "drop-after");
+        drop = next;
+        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
+      };
+      const move = (e) => {
+        let best = null;
+        let gap = Infinity;
+        for (const r of rows2) {
+          const b = r.getBoundingClientRect();
+          const d = Math.abs(e.clientY - (b.top + b.height / 2));
+          if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+        }
+        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
+      };
+      row6.classList.add("dragging");
+      box.classList.add("dir-dragging");
+      grip.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        grip.removeEventListener("pointermove", move);
+        grip.removeEventListener("pointerup", up);
+        grip.removeEventListener("pointercancel", up);
+        row6.classList.remove("dragging");
+        box.classList.remove("dir-dragging");
+        const target = drop;
+        mark2(null);
+        if (target) void handle("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      };
+      grip.addEventListener("pointermove", move);
+      grip.addEventListener("pointerup", up);
+      grip.addEventListener("pointercancel", up);
+    });
+    root.addEventListener("change", (ev) => {
+      if (ev.target.dataset?.input === "dir-crop-size") render();
+    });
+    const photoTarget = (el) => {
+      const box = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box ? box.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+    };
+    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+    if (!widthWatch) {
+      widthWatch = true;
+      matchMedia("(max-width: 760px)").addEventListener?.("change", () => root && render());
+    }
+    root.addEventListener("paste", (ev) => {
+      const prefix = photoTarget(ev.target);
+      const files2 = imageFiles(ev.clipboardData?.items);
+      if (!prefix || !files2.length) return;
+      ev.preventDefault();
+      void addPhotos(prefix, files2);
+    });
+    root.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    root.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files2 = imageFiles(ev.dataTransfer.files);
+      if (files2.length) void addPhotos(prefix, files2);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render();
+      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render();
+    });
+    root.addEventListener("keydown", (ev) => {
+      const el = ev.target;
+      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
+        const send2 = root?.querySelector(".ph-send");
+        ev.preventDefault();
+        if (send2 && !send2.disabled) void handle("ph-send", send2.dataset.value);
+        return;
+      }
+      if (ev.key !== "Enter" || ev.isComposing || !el?.dataset?.enter) return;
+      ev.preventDefault();
+      void handle(el.dataset.enter, el.value);
+    });
+    root.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      const input2 = form.querySelector("input");
+      if (form.dataset.submit) void handle(form.dataset.submit, input2?.value ?? "");
+    });
+    root.addEventListener("change", (ev) => {
+      const el = ev.target;
+      if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+    });
+    root.addEventListener("input", (ev) => {
+      const el = ev.target;
+      if (el?.dataset?.input === "dim" && root) {
+        paintVeil(root, Number(el.value));
+        const out = el.parentElement?.querySelector("output");
+        if (out) out.textContent = `${el.value}%`;
+        return;
+      }
+      if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
+        const out = el.parentElement?.querySelector("output");
+        if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
+        return;
+      }
+      if (el?.dataset?.input === "wiki-query" && view2.kind === "started") {
+        wiki.query = el.value;
+        const box2 = root?.querySelector(".nw .ph-content");
+        if (box2) box2.innerHTML = wikiList(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "wiki-home-query" && view2.kind === "started") {
+        wiki.homeQuery = el.value;
+        const box2 = root?.querySelector(".nw-hero-res");
+        if (box2) box2.innerHTML = wikiHomeResults(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+      if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
+      if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
+      if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
+      if (el?.dataset?.input === "ph-query" && view2.kind === "started") {
+        const box2 = root?.querySelector(".ph-content");
+        if (box2) box2.innerHTML = phoneContent(view2.ctx, el.value);
+        return;
+      }
+      if (el?.dataset?.input === "ph-pick-q" && view2.kind === "started") {
+        phoneInput("ph-pick-q", el.value);
+        const box2 = root?.querySelector(".ph-pick");
+        if (box2) box2.innerHTML = phonePickList(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "dir-q" && (view2.kind === "started" || view2.kind === "picker")) {
+        dirUi.q = el.value;
+        const box2 = root?.querySelector(".dir-list");
+        if (box2) box2.innerHTML = directoryList(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "dir-crop-size") {
+        const key2 = el.dataset.key ?? "";
+        const [x, y] = cropValue(key2);
+        setCrop(key2, [x, y, Number(el.value)]);
+        const frame = root?.querySelector("[data-crop] .dir-crop-frame");
+        if (frame) frame.style.width = `${el.value}%`;
+        return;
+      }
+      if (el?.dataset?.input === "dir-photo-q" && (view2.kind === "started" || view2.kind === "picker")) {
+        dirUi.pickQ = el.value;
+        const box2 = root?.querySelector(".dir-pics");
+        if (box2) box2.innerHTML = directoryPhotoList(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "dir-ext-q" && (view2.kind === "started" || view2.kind === "picker")) {
+        dirUi.addQ = el.value;
+        const box2 = root?.querySelector(".dir-ext-list");
+        if (box2) box2.innerHTML = directoryExtList(view2.ctx);
+        return;
+      }
+      if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root?.querySelector(".dir-bar") ?? null);
+      if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+      if (el?.dataset?.input === "field-note") return void (field2.note = el.value);
+      if (el?.dataset?.input === "map-query" && view2.kind === "started") {
+        const box2 = root?.querySelector(".gx-mapsug");
+        if (box2) box2.innerHTML = mapSuggestFor(view2.ctx, el.value);
+        return;
+      }
+      if (el?.dataset?.input === "start-note") {
+        const had = !!(draft.situation ?? "").trim();
+        draft.situation = el.value;
+        if (had !== !!el.value.trim()) root?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy4);
+        return;
+      }
+      if (el?.dataset?.input !== "mission-query") return;
+      field2.query = el.value;
+      const box = root?.querySelector(".gx-mbox");
+      if (box && (view2.kind === "started" || view2.kind === "opening")) box.innerHTML = missionList(view2.ctx, view2.kind === "opening");
+    });
+    bindAgentTips(root);
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Escape") return;
+      if (evUi.pop || agUi.pop) {
+        evUi.pop = agUi.pop = "";
+        render();
+        return;
+      }
+      void close();
+    });
+    return root;
+  }
+  async function addPhotos(prefix, files2) {
+    if (view2.kind !== "started") return;
+    const ui = prefix === "gn" ? gnet : prefix === "ph" ? phone : null;
+    if (!ui) return;
+    if (prefix === "gn" && !gnet.compose) return;
+    if (prefix === "ph") {
+      const r = readPhone(view2.ctx.chat).rooms[phone.room ?? ""];
+      if (!r || !r.members.length || r.pending) return;
+    }
+    for (const file of files2) {
+      if (ui.attach.length >= ATTACH_MAX) {
+        ui.notice = `첨부는 ${ATTACH_MAX}개까지예요.`;
+        break;
+      }
+      try {
+        const { asset, preview } = await savePhoto(file);
+        addPhoto(ui.attach, asset, preview);
+        ui.notice = "";
+      } catch (error) {
+        ui.notice = error instanceof Error ? error.message : String(error);
+        break;
+      }
+    }
+    render();
+  }
+  var widthWatch = false;
+  async function openApp(opts = {}) {
+    ensureRoot();
+    if (opts.quietIfNotLite) {
+      const ctx2 = await loadContext().catch(() => null);
+      if (!ctx2 || !readManifest(ctx2.char.globalLore)) return;
+    }
+    view2 = { kind: "loading" };
+    notice2 = "";
+    render();
+    shown = true;
+    if (root) startCctvFx(root);
+    await risuai.showContainer("fullscreen");
+    await refresh();
+    void loadModuleAssets().then((changed) => {
+      if (shown && changed) render();
+    });
+    void readUser().then((u) => {
+      if (shown && (u.name || u.photo)) render();
+    });
+    void checkLatest(settingsEnv);
+  }
+  async function openWiki2(title2) {
+    await openApp({ quietIfNotLite: true });
+    if (view2.kind === "started") await handle("wiki-goto", title2);
+  }
+  async function refresh() {
+    try {
+      const ctx2 = await loadContext();
+      if (ctx2) await prepareBaseDocs(ctx2.char.globalLore).catch(() => void 0);
+      if (!ctx2) {
+        view2 = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
+      } else {
+        const manifest = readManifest(ctx2.char.globalLore);
+        const phase = chatPhase(ctx2.chat);
+        if (manifest) {
+          applyAdvanced(ctx2.chat.scriptstate);
+          void readPersona();
+        }
+        const chatKey4 = `${ctx2.charIndex}:${ctx2.chatIndex}`;
+        if (chatKey4 !== lastChat) {
+          lastChat = chatKey4;
+          navHist.clear();
+          resetField(true);
+          resetWiki();
+          resetGnet();
+          resetPhone();
+          resetSettings();
+          resetDirectory();
+          pickerPrefs = false;
+          repick = false;
+        }
+        const cur = currentChoice(ctx2.chat);
+        const facs = factionList(ctx2.char.globalLore);
+        const presetStaged = phase === "staged" && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === "preset";
+        if (!manifest) view2 = { kind: "not-lite", name: String(ctx2.char.name ?? "") };
+        else if (phase === "started") view2 = { kind: "started", ctx: ctx2 };
+        else if (presetStaged && !repick) view2 = { kind: "opening", ctx: ctx2 };
+        else {
+          view2 = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
+          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "" };
+          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
+          if (draft.faction && !findScenario(draft.faction, draft.fm ?? 0, facs)) draft.fm = defaultScenario(draft.faction, facs);
+        }
+      }
+    } catch (error) {
+      view2 = { kind: "error", message: `채팅 정보를 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}` };
+    }
+    render();
+  }
+  async function close() {
+    shown = false;
+    stopCctvFx();
+    closeGame();
+    await risuai.hideContainer();
+  }
+  async function stagedTheme(ctx2, value) {
+    if (value !== "light" && value !== "dark" && value !== "paper") return;
+    try {
+      const saved = await updateChat(
+        ctx2.charIndex,
+        ctx2.chatIndex,
+        (chat) => (chat.message ?? []).length || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
+      );
+      if (saved) ctx2.chat = saved;
+    } catch (error) {
+      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    render();
+  }
+  async function handle(action, value) {
+    if (busy4) return;
+    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
+    if (agUi.pop && action !== "agent-info") agUi.pop = "";
+    if (action.startsWith("adv-") && (view2.kind === "started" || view2.kind === "picker" && pickerPrefs)) {
+      await handleAdvanced(action, value, view2.ctx, { render, refresh }, view2.kind === "started" ? "chat" : "defaults");
+      return;
+    }
+    if (view2.kind === "started" && action.startsWith("wiki-") && await handleWiki(action, value, view2.ctx, wikiEnv)) return;
+    if (view2.kind === "started" && action.startsWith("gn-") && await handleGnet(action, value, view2.ctx, gnetEnv)) return;
+    if (view2.kind === "started" && action.startsWith("ph-") && await handlePhone(action, value, view2.ctx, phoneEnv)) return;
+    if (action === "prefs-open" || action === "prefs-close") {
+      pickerPrefs = action === "prefs-open";
+      resetSettings();
+      resetDirectory();
+      settingsUi.scope = "defaults";
+      return render();
+    }
+    if ((view2.kind === "started" || view2.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
+      if (action === "dir-save" || action === "dir-reset") settingsUi.confirm = "";
+      await handleDirectory(action, value, view2.ctx, settingsEnv);
+      return;
+    }
+    if (view2.kind === "picker" && pickerPrefs && action.startsWith("set-")) {
+      if (settingsUi.busy) return;
+      await handleSettings(action, value, view2.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
+      if (action === "set-theme" && view2.kind === "picker" && view2.staged) await stagedTheme(view2.ctx, value);
+      return;
+    }
+    if (view2.kind === "started" && action.startsWith("set-")) {
+      if (!settingsUi.busy) await handleSettings(action, value, view2.ctx, settingsEnv, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope);
+      return;
+    }
+    if (action === "upd-go") {
+      if (view2.kind === "started") tab = "settings", settingsUi.scope = "chat";
+      else if (view2.kind === "picker") pickerPrefs = true;
+      render();
+      root?.querySelector(".upd-ver")?.closest(".ps-group")?.scrollIntoView({ block: "start" });
+      return;
+    }
+    if (action.startsWith("upd-") && (view2.kind === "started" || view2.kind === "picker") && await handleUpdate(action, view2.ctx, settingsEnv)) return;
+    if (action === "pick-event" && view2.kind === "started" && tab !== "map") {
+      await handleField(action, value, view2.ctx, env, false);
+      if (field2.target?.type === "event" && field2.target.key === value && showOnMap(view2.ctx, value ?? "")) {
+        tab = "map";
+        evUi.pop = "";
+        field2.step = "goal";
+        notice2 = "";
+        render();
+      }
+      return;
+    }
+    if ((view2.kind === "started" || view2.kind === "opening") && await handleField(action, value, view2.ctx, env, view2.kind === "opening")) return;
+    switch (action) {
+      case "close":
+        return close();
+      case "game-open":
+        return openGame(view2.kind === "started" ? root?.querySelector(".gx-panel") ?? null : null);
+      case "game-close":
+        return closeGame();
+      case "faction": {
+        const facs = view2.kind === "picker" ? factionList(view2.ctx.char.globalLore) : SCENARIOS.factions;
+        const f = findFaction(value ?? "", facs);
+        if (!f) return;
+        if (draft.faction !== f.code) {
+          draft.fm = defaultScenario(f.code, facs);
+          draft.player = "";
+        }
+        draft.faction = f.code;
+        notice2 = "";
+        return renderPicker();
+      }
+      case "lang":
+        if (value === "ko" || value === "en") draft.lang = value;
+        return renderPicker();
+      case "fm":
+        draft.fm = Number(value);
+        notice2 = "";
+        return renderPicker();
+      case "player": {
+        draft.player = value ?? "";
+        if (draft.player && draft.faction && view2.kind === "picker") {
+          const f = findFaction(draft.faction, factionList(view2.ctx.char.globalLore));
+          if (f && findScenario(f.code, draft.fm ?? 0, factionList(view2.ctx.char.globalLore))?.kind === "opening") draft.fm = f.scenarios.find((x) => x.kind !== "opening")?.fm;
+        }
+        notice2 = "";
+        return renderPicker();
+      }
+      case "start":
+        return start();
+      case "nav-tab":
+        if (value === tab && value !== "board" && !matchMedia("(max-width: 760px)").matches) value = "board";
+      // falls through
+      case "tab":
+        tab = TABS2.includes(value) ? value : "board";
+        notice2 = "";
+        field2.confirmEnd = null;
+        resetSettings();
+        render();
+        if (view2.kind === "started" && tab === "phone") openCheck(view2.ctx, phoneEnv);
+        if (view2.kind === "started" && tab === "gnet") gnetOpenCheck(view2.ctx, gnetEnv);
+        return;
+      case "nav-back":
+      case "nav-fwd": {
+        markUi.pop = false;
+        const run3 = navStep(action === "nav-back" ? -1 : 1);
+        return run3 ? run3() : render();
+      }
+      case "mk-pop":
+        markUi.pop = !markUi.pop;
+        return render();
+      case "mk-go": {
+        const m = marks()[Number(value)];
+        if (!m || view2.kind !== "started") return;
+        markUi.pop = false;
+        closeDrawer();
+        if (gameOpen()) closeGame();
+        return applyNav(openable(view2.ctx, m.s));
+      }
+      case "mk-here":
+      case "mk-add": {
+        if (view2.kind !== "started") return;
+        const m = action === "mk-here" ? markOf(navState()) : markCandidates(recentMarks(), markOf(navState()))[Number(value)];
+        if (m) await addMark(m);
+        return render();
+      }
+      case "mk-del":
+        await removeMarkAt(Number(value));
+        return render();
+      case "feature-set":
+        if (view2.kind !== "started") return;
+        if (value === "phone") Object.assign(phone, { view: "settings", invite: null, picked: [] });
+        else if (value === "gnet" && GNET_ON) Object.assign(gnet, { settings: true, compose: null, attachMenu: false });
+        else if (value === "wiki") openWikiSettings();
+        else return;
+        tab = value;
+        notice2 = "";
+        resetSettings();
+        return render();
+      case "ops-sel":
+        opsUi.sel = value ?? "";
+        field2.confirmEnd = null;
+        render();
+        if (matchMedia("(max-width: 760px)").matches) root?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      case "ops-mode":
+        opsUi.mode = value === "map" ? "map" : "feed";
+        return render();
+      case "ev-pop":
+        evUi.pop = evUi.pop === value ? "" : value ?? "";
+        return render();
+      case "board-map":
+        if (view2.kind !== "started" || !showOnMap(view2.ctx, value ?? "")) return;
+        tab = "map";
+        notice2 = "";
+        return render();
+      case "id-card": {
+        if (view2.kind !== "started") return;
+        showIdCard(idCard(view2.ctx));
+        return;
+      }
+      case "agents-view":
+        if (value !== "wall" && value !== "list") return;
+        await savePrefs((p) => ({ ...p, agents: value === "list" ? "list" : void 0 }));
+        return render();
+      case "agent-info":
+        agUi.pop = agUi.pop === value ? "" : value ?? "";
+        return render();
+      case "agent-talk":
+        if (view2.kind !== "started") return;
+        tab = "phone";
+        notice2 = "";
+        resetField();
+        if (!await openAgentDm(view2.ctx, phoneEnv, value ?? "")) render();
+        if (view2.kind === "started") openCheck(view2.ctx, phoneEnv);
+        return;
+      case "wiki-goto":
+        if (view2.kind !== "started") return;
+        tab = "wiki";
+        resetWiki();
+        gnet.compose = null;
+        phone.view = phone.view === "room" ? "room" : "list";
+        resetField();
+        await handleWiki("wiki-write", value, view2.ctx, wikiEnv);
+        return;
+      case "repick":
+        repick = true;
+        notice2 = "";
+        return refresh();
+      case "world-on":
+        return turnWorldOn();
+    }
+  }
+  async function start() {
+    if (view2.kind !== "picker" || !draft.faction || !draft.fm) return;
+    const { ctx: ctx2, manifest } = view2;
+    busy4 = true;
+    notice2 = "";
+    render();
+    try {
+      const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm, ...draft.player ? { player: draft.player } : {} };
+      const lore = ctx2.char.globalLore ?? [];
+      let world = null;
+      try {
+        if (basicDefaults(lore).anomalyOn) world = startWorldVars(parseCatalog(lore), worldDefaults(lore), choice.faction, Math.random, draft.player ?? "");
+      } catch (error) {
+        console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      const plan = planStart(choice, manifest, lore, ctx2.char.alternateGreetings?.length ?? 0, world);
+      const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
+      if (plan.kind === "direct" && !situation) throw new StartError("시작할 상황을 적어 주세요.");
+      setOpeningHint(plan.kind === "opening" ? ctx2.char.alternateGreetings?.[plan.fmIndex] ?? null : null);
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
+        const next = applyStart(chat, plan);
+        if (situation) next.message = [...next.message ?? [], newMessage2(startRecord(situation))];
+        const theme = getPrefs().theme ?? "dark";
+        return {
+          ...next,
+          scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...getPrefs().vars ?? {}, ...next.scriptstate ?? {} }
+        };
+      });
+      if (!saved) throw new StartError("저장하지 못했어요.");
+      if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(", ")}`);
+      busy4 = false;
+      repick = false;
+      if (plan.kind === "preset") {
+        resetField(true);
+        return refresh();
+      }
+      draft.situation = "";
+      if (situation && !await sendNow()) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await close();
+      await refresh();
+    } catch (error) {
+      busy4 = false;
+      notice2 = error instanceof Error ? error.message : String(error);
+      render();
+    }
+  }
+  async function turnWorldOn() {
+    if (view2.kind !== "started") return;
+    const { ctx: ctx2 } = view2;
+    busy4 = true;
+    notice2 = "";
+    render();
+    try {
+      const catalog = parseCatalog(ctx2.char.globalLore);
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (worldOn(chat)) return null;
+        const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...startWorldVars(catalog, worldSettings(ctx2.char.globalLore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? "")) } };
+      });
+      busy4 = false;
+      await refresh();
+    } catch (error) {
+      busy4 = false;
+      notice2 = error instanceof Error ? error.message : String(error);
+      render();
+    }
+  }
+  var TAB_TITLE = {
+    board: "상황판",
+    map: "임무",
+    mission: "커스텀",
+    gnet: "괴담넷",
+    phone: "괴담톡",
+    wiki: "위키",
+    settings: "설정"
+  };
+  function header(sub, extra = "") {
+    return `<header class="gx-head">
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${BRAND.name}</b><small>${esc18(sub)}</small></div></div>
+    <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  var gameShown = () => {
+    if (globalThis.__goeiGame === true) return true;
+    try {
+      return localStorage.getItem("goei:game") === "1";
+    } catch {
+      return false;
+    }
+  };
+  function startedHeader(ctx2) {
+    return `<header class="gx-head">
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b>${BRAND.name}</b><small aria-label="${BRAND.sub}">${[...BRAND.sub].map((ch) => ch === " " ? '<i class="sp">&nbsp;</i>' : `<i>${ch}</i>`).join("")}</small></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-head-act">
+      ${gameShown() ? `<button class="gx-x" data-action="game-open" aria-label="관리국 순찰" title="관리국 순찰">${ICONS.game}</button>` : ""}
+      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc18(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
+      <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
+      <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  function renderPicker() {
+    const facs = root?.querySelectorAll(".gx-facs .gx-fac");
+    const main = root?.querySelector(".gx-body");
+    if (!root || view2.kind !== "picker" || !facs?.length || !main || root.querySelector(".gx-settings")) return render();
+    const tpl = document.createElement("template");
+    tpl.innerHTML = body3();
+    const next = tpl.content.querySelectorAll(".gx-facs .gx-fac");
+    if (next.length !== facs.length) return render();
+    next.forEach((b, i) => {
+      if (b.classList.contains("has-img") !== facs[i].classList.contains("has-img")) return void facs[i].replaceWith(b);
+      facs[i].className = b.className;
+      facs[i].setAttribute("aria-pressed", b.getAttribute("aria-pressed") ?? "false");
+    });
+    const sections2 = main.querySelectorAll(":scope > section");
+    const fresh = tpl.content.querySelectorAll(".gx-body > section");
+    if (sections2.length !== fresh.length) return render();
+    for (let i = 1; i < sections2.length; i++) sections2[i].replaceWith(fresh[i]);
+    const foot = root.querySelector(".gx-foot");
+    const nfoot = tpl.content.querySelector(".gx-foot");
+    if (foot && nfoot) foot.replaceWith(nfoot);
+    else return render();
+  }
+  var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups";
+  function render() {
+    if (!root) return;
+    const nav = view2.kind === "started";
+    const scroller = root.querySelector(".gx-body");
+    const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
+    const inner = root.dataset.tab === tab ? [...root.querySelectorAll(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+    const log = root.querySelector(".ph-log");
+    const logRoom = root.dataset.room ?? "";
+    const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
+    const gnKey = `${gnet.sub}:${gnet.open}:${gnet.openDm}`;
+    const gnKeep = tab === "gnet" && root.dataset.tab === "gnet" && root.dataset.gn === gnKey ? [".gn .ph-content", ".gn-pane .gn-doc"].map((q) => root.querySelector(q)?.scrollTop ?? 0) : null;
+    const act = document.activeElement;
+    const focusSel = act && root.contains(act) && act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
+    const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
+    root.dataset.theme = themeOf();
+    const pf = getPrefs();
+    root.dataset.nav = pf.nav ?? "left";
+    paintVeil(root, pf.dim ?? DIM_DEFAULT);
+    root.innerHTML = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body3()}</div>`;
+    if (dirUi.scrollTo) {
+      dirUi.scrollTo = "";
+      root.querySelector(".dir-row.open")?.scrollIntoView({ block: "center" });
+    }
+    root.dataset.tab = tab;
+    if (focusSel) {
+      const el = [...root.querySelectorAll(focusSel)].find((x) => x.offsetParent);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (caret) try {
+          el.setSelectionRange(caret[0], caret[1]);
+        } catch {
+        }
+      }
+    }
+    reattachGame(view2.kind === "started" ? root.querySelector(".gx-panel") : null);
+    const next = root.querySelector(".gx-body");
+    if (next && keep) next.scrollTop = keep;
+    if (inner.length) root.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+    const nlog = root.querySelector(".ph-log");
+    root.dataset.room = phone.room ?? "";
+    if (nlog) {
+      nlog.scrollTop = logKeep < 0 ? nlog.scrollHeight : logKeep;
+      if (logKeep < 0) nlog.querySelectorAll("img").forEach((img) => img.addEventListener("load", () => nlog.scrollTop = nlog.scrollHeight, { once: true }));
+    }
+    root.dataset.gn = gnKey;
+    if (gnKeep) [".gn .ph-content", ".gn-pane .gn-doc"].forEach((q, i) => {
+      const el = root.querySelector(q);
+      if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
+    });
+    hydratePhotos(root);
+    bindMapZoom(root);
+    bindMbar(root, () => void handle("close"));
+    bindDrawer(root, () => void handle("mk-pop"));
+    bindWikiSide(root, (v) => void handle("wiki-list", v));
+    bindFootnotes(root);
+    const stBar = root.querySelector(".gx-settings > .st-scopebar");
+    if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
+    bindSwipeBack(root, navStep);
+    if (view2.kind === "started") navHist.record(navState());
+    root.querySelectorAll('.gx-nh[data-action^="nav-"]').forEach((b) => b.disabled = !navHist.can(b.dataset.action === "nav-back" ? -1 : 1));
+    setCurrentTheme(themeName(root.dataset.theme));
+  }
+  function boardDrawer() {
+    if (!matchMedia("(max-width: 760px)").matches) return "";
+    return drawerHtml(markSlots(), "", "gx-bdrawer");
+  }
+  var navHist = new NavHistory();
+  function navState() {
+    const s4 = { tab };
+    if (tab === "wiki") s4.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
+    if (tab === "phone") s4.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
+    if (tab === "gnet") s4.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === "post" || gnet.compose?.kind === "newdm" ? gnet.compose : null };
+    if (tab === "map" || tab === "mission") s4.f = field2.step;
+    if (tab === "settings") s4.d = dirUi.open;
+    return s4;
+  }
+  function markState(s4) {
+    const o = JSON.parse(JSON.stringify(s4));
+    if (o.w) o.w.list = false;
+    if (o.g) o.g.c = null;
+    if (o.p && o.p.view !== "room" && o.p.view !== "settings" && o.p.view !== "notice") Object.assign(o.p, { view: "list", room: null, n: null });
+    return o;
+  }
+  var PH_SUB = { contacts: "연락처", chats: "대화", notices: "공지" };
+  function markOf(raw) {
+    const s4 = markState(raw);
+    const ctx2 = view2.kind === "started" ? view2.ctx : null;
+    let name = TAB_TITLE[s4.tab];
+    if (s4.w) name = s4.w.view === "doc" || s4.w.view === "compose" ? s4.w.title || "위키" : s4.w.view === "settings" ? "위키 설정" : s4.w.view === "new" ? "위키 새 문서" : "위키 메인";
+    if (s4.p) {
+      const r = s4.p.view === "room" && s4.p.room && ctx2 ? readPhone(ctx2.chat).rooms[s4.p.room] : void 0;
+      name = r ? roomLabel(r) : s4.p.view === "settings" ? "괴담톡 설정" : `괴담톡 ${PH_SUB[s4.p.sub] ?? ""}`.trim();
+    }
+    if (s4.g) {
+      const post = s4.g.open !== null && ctx2 ? findPost(readGnet(ctx2.chat), s4.g.open) : void 0;
+      name = s4.g.s ? "괴담넷 설정" : post ? post.title || "괴담넷 글" : s4.g.dm ? `${s4.g.dm} 쪽지` : s4.g.sub === "dm" ? "괴담넷 쪽지" : "괴담넷";
+    }
+    if (s4.f === "team") name = `${name} 편성`;
+    if (s4.tab === "settings" && s4.d) name = "명부";
+    return { s: s4, name };
+  }
+  function recentMarks() {
+    const seen2 = /* @__PURE__ */ new Set();
+    return navHist.recent().filter((s4) => s4.tab !== "settings").map(markOf).filter((m) => {
+      const k = JSON.stringify(m.s);
+      return !seen2.has(k) && (seen2.add(k), true);
+    });
+  }
+  function openable(ctx2, s4) {
+    const o = JSON.parse(JSON.stringify(s4));
+    if (!TABS2.includes(o.tab)) o.tab = "board";
+    if (o.p?.room && !readPhone(ctx2.chat).rooms[o.p.room]) Object.assign(o.p, { view: "list", room: null });
+    return o;
+  }
+  function applyNav(s4) {
+    tab = s4.tab;
+    notice2 = "";
+    field2.confirmEnd = null;
+    if (s4.w) Object.assign(wiki, { view: s4.w.view, title: s4.w.title, listOpen: s4.w.list });
+    if (s4.p) Object.assign(phone, { sub: s4.p.sub, tab: s4.p.tab, view: s4.p.view, room: s4.p.room, openNotice: s4.p.n });
+    if (s4.g) Object.assign(gnet, { sub: s4.g.sub, open: s4.g.open, openDm: s4.g.dm, settings: s4.g.s, compose: s4.g.c });
+    if (s4.d !== void 0) dirUi.open = s4.d;
+    if (s4.f && s4.f !== field2.step) return void handle("field-step", s4.f);
+    render();
+  }
+  function navStep(dir2) {
+    const go2 = (action, value) => () => void handle(action, value);
+    if (view2.kind === "picker") return dir2 < 0 && pickerPrefs ? go2("prefs-close") : null;
+    if (view2.kind === "opening") return dir2 < 0 ? go2("repick") : null;
+    if (view2.kind !== "started") return null;
+    if (gameOpen()) return dir2 < 0 ? () => closeGame() : null;
+    if (evUi.pop && dir2 < 0) return () => void handle("ev-pop", evUi.pop);
+    if (agUi.pop && dir2 < 0) return () => void handle("agent-info", agUi.pop);
+    if (!navHist.can(dir2)) return null;
+    return () => {
+      const s4 = navHist.go(dir2);
+      if (s4) applyNav(s4);
+    };
+  }
+  function themeOf() {
+    const ctx2 = view2.kind === "started" || view2.kind === "opening" || view2.kind === "picker" ? view2.ctx : null;
+    const v = String(ctx2?.chat.scriptstate?.["$st_fixed_theme"] ?? "");
+    if (v === "light" || v === "paper" || v === "dark") return v;
+    if (view2.kind === "picker") return getPrefs().theme ?? "dark";
+    return "light";
+  }
+  function startedBody(ctx2) {
+    switch (tab) {
+      case "map":
+        return mapTab(ctx2, env, notice2, busy4);
+      case "mission":
+        return missionTab(ctx2, false, notice2, busy4);
+      case "wiki":
+        return wikiTab(ctx2);
+      case "gnet":
+        return gnetTab(ctx2, gnetEnv);
+      case "phone":
+        return phoneTab(ctx2, phoneEnv);
+      case "settings": {
+        const html = settingsTab(ctx2, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope);
+        return html.includes("ph-drawer") ? html : html + boardDrawer();
+      }
+      default:
+        return board(ctx2);
+    }
+  }
+  function body3() {
+    switch (view2.kind) {
+      case "loading":
+        return `${header("불러오는 중")}<div class="gx-empty">채팅 정보를 읽는 중이에요…</div>`;
+      case "error":
+        return `${header("오류")}<div class="gx-empty">${esc18(view2.message)}</div>`;
+      case "not-lite":
+        return `${header("연결 안 됨")}<div class="gx-empty">
+        <p><b>${esc18(view2.name || "이 캐릭터")}</b>는 ${BRAND.name} 카드가 아니에요.</p>
+        <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
+      </div>`;
+      case "started":
+        evSeenReset();
+        return `${tabs()}${startedHeader(view2.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view2.ctx)}${notice2 && tab !== "map" && tab !== "mission" ? `<div class="${noticeClass(notice2)} gx-notice" role="alert">${esc18(notice2)}</div>` : ""}${startedBody(view2.ctx)}</div>${evPopup(boardClock(view2.ctx))}${tab === "board" ? agentPopup() : ""}${markPop(markOf(navState()), recentMarks())}`;
+      case "opening":
+        return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view2.ctx, true, notice2, busy4)}</div>`;
+      case "picker":
+        if (pickerPrefs)
+          return `${header("새 채팅 기본 설정", `<button class="gx-x" data-action="prefs-close" aria-label="시작 화면으로">${ICONS.back}</button>`)}<div class="gx-content">${settingsTab(view2.ctx, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope, false)}</div>`;
+        return `${header(view2.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view2.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>`)}<div class="gx-content">${updateBanner(view2.ctx)}${picker()}</div>`;
+    }
+  }
+  function picker() {
+    const facs = view2.kind === "picker" ? factionList(view2.ctx.char.globalLore) : SCENARIOS.factions;
+    const f = draft.faction ? findFaction(draft.faction, facs) : void 0;
+    const sc = f && draft.fm ? findScenario(f.code, draft.fm, facs) : void 0;
+    const factions = facs.filter((x) => !x.hidden).map(
+      (x) => {
+        const img = view2.kind === "picker" ? imageUrl(view2.ctx.char, factionPic(view2.ctx.char, x)) : null;
+        return `<button class="gx-fac${x.code === draft.faction ? " on" : ""}${img ? " has-img" : ""}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
+        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc18(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc18(x.name)}</b><span>${esc18(x.blurb)}</span></span></button>`;
+      }
+    ).join("");
+    const langs = SCENARIOS.languages.map(
+      (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc18(l.label)}</button>`
+    ).join("");
+    const playing = !!draft.player;
+    const scenarios = f ? f.scenarios.filter((s4) => !playing || s4.kind !== "opening").map((s4) => {
+      return `<button class="gx-sc${s4.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s4.fm}" aria-pressed="${s4.fm === draft.fm}">
+            <b>${String(s4.fm).padStart(2, "0")}</b><span>${esc18(s4.label)}</span></button>`;
+    }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
+    const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
+          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc18(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
+    const ready = !!(f && sc) && (sc.kind !== "direct" || !!(draft.situation ?? "").trim()) && !(playing && sc.kind === "opening");
+    const ctxP = view2.kind === "picker" ? view2.ctx : null;
+    const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
+    const me = userInfo();
+    const who = f ? `<div class="gx-who">${[
+      `<button class="gx-whoc${!playing ? " on" : ""}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc18(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`,
+      ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? " on" : ""}" data-action="player" data-value="${esc18(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ""}<span class="gx-whot"><b>${esc18(a.name)}</b>${a.rank ? `<small>${esc18(a.rank)}</small>` : ""}</span></button>`)
+    ].join("")}</div>${playing ? '<div class="gx-hint">고른 요원이 주인공이 돼요. 첫 장면은 직접 입력이나 커스텀 임무로 시작해요.</div>' : ""}` : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
+    const shown2 = f ? f.scenarios.filter((s4) => !playing || s4.kind !== "opening").length : 0;
+    return `<main class="gx-body">
+    <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
+    <section><h2><i>2</i>주인공</h2>${who}</section>
+    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc18(f.name)} · ${shown2}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
+  </main>
+  <footer class="gx-foot">
+    ${f && sc ? `<div class="gx-foot-sum">${esc18(f.name)}${playing ? ` · ${esc18(people.find((a) => a.id === draft.player)?.name ?? "")}` : ""} · ${String(sc.fm).padStart(2, "0")} ${esc18(sc.label)}</div>` : ""}
+    ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc18(notice2)}</div>` : ""}
+    <button class="gx-start" data-action="start" ${ready && !busy4 ? "" : "disabled"}>${busy4 ? "시작하는 중…" : "출 발"}</button>
+  </footer>`;
+  }
+  function tabs() {
+    const unreadPhone = view2.kind === "started" && phoneUnread(view2.ctx);
+    const cur = tab === "mission" ? "map" : tab;
+    const item2 = (id, label, icon2, cls = "", badge2 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${(cls === "mob" ? cur === id : tab === id) ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label}</span>${badge2}</button>`;
+    const ctx2 = view2.kind === "started" ? view2.ctx : null;
+    return `<nav class="gx-nav" aria-label="주요 화면">
+    ${ctx2 ? brand(ctx2) : ""}
+    ${item2("board", "상황판", ICONS.board)}
+    ${item2("map", "임무", ICONS.map, "desk")}
+    ${item2("map", "임무", ICONS.map, "mob")}
+    ${item2("mission", "커스텀", ICONS.mission, "desk")}
+    ${item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : "")}
+    ${GNET_ON ? item2("gnet", "괴담넷", ICONS.gnet) : ""}
+    ${item2("wiki", "위키", ICONS.wiki)}
+    ${item2("settings", "설정", ICONS.settings, "desk", ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
+    <span class="gx-nav-gap"></span>
+    ${ctx2 ? navHistBar(markOf(navState())) : ""}
+    ${mbarHtml([
+      item2("wiki", "위키", ICONS.wiki),
+      item2("map", "임무", ICONS.map, "mob"),
+      item2("board", "상황판", ICONS.board, "home"),
+      item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ""),
+      ...GNET_ON ? [item2("gnet", "괴담넷", ICONS.gnet)] : []
+    ])}
+  </nav>`;
+  }
+  function brand(ctx2) {
+    return `<div class="gx-nav-brand">
+      ${idCard(ctx2)}
+    </div>`;
+  }
+  function idCard(ctx2) {
+    const facs = factionList(ctx2.char.globalLore);
+    const code = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "") || currentChoice(ctx2.chat).faction || "";
+    const f = code ? findFaction(code, facs) : void 0;
+    const img = f ? imageUrl(ctx2.char, factionPic(ctx2.char, f)) : null;
+    const w = worldOn(ctx2.chat) ? readWorld(ctx2.chat) : null;
+    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
+    const time2 = (w ? clock(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
+    const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
+    const line2 = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc18(value)}</em></span>` : "";
+    const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc18(time2)}</span><span>${esc18(weather)}</span></span>` : "";
+    const status = line2("위치", st?.place ?? "") + line2("목표", st?.target ?? "") + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : "");
+    const u = userInfo();
+    const pa = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
+    const paPic = pa ? imageUrl(ctx2.char, facePic(ctx2.char, pa, true)) : null;
+    const name = pa?.name || u.name || "나";
+    const photoUrl2 = pa ? paPic : u.photo;
+    const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc18(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+    return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc18(img)}')"></span>` : ""}
+      ${photo}
+      <span class="gx-id-who"><b>${esc18(name)}</b><small>${esc18([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>
+      ${status ? `<span class="gx-op-st">${status}</span>` : ""}
+    </div>`;
+  }
+  function selfName(ctx2, code, name) {
+    const c = parseCatalog(ctx2.char.globalLore);
+    const outside = factionNames(c, void 0)[code];
+    return outside && name === outside ? factionNames(c, code)[code] ?? name : name;
+  }
+  function clock(minute) {
+    if (minute === null) return "";
+    const d = new Date(minute * 6e4);
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  }
+  function board(ctx2) {
+    if (!worldOn(ctx2.chat)) {
+      return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
+      <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
+      ${notice2 ? `<div class="${noticeClass(notice2)}" role="alert">${esc18(notice2)}</div>` : ""}
+      <button class="gx-start" data-action="world-on" ${busy4 ? "disabled" : ""}>${busy4 ? "켜는 중…" : "상황판 켜기"}</button></div>`;
+    }
+    let catalog;
+    try {
+      catalog = parseCatalog(ctx2.char.globalLore);
+    } catch (error) {
+      return `<div class="gx-empty">${esc18(error instanceof Error ? error.message : String(error))}</div>`;
+    }
+    const w = readWorld(ctx2.chat);
+    const faction = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
+    const roster = rosterFor(w, catalog, faction, worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit);
+    const byName = new Map(roster.map((p) => [p.name, p]));
+    const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
+    const display = factionNames(catalog, faction);
+    const ownName = display[faction] ?? "";
+    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n) => n.trim());
+    const chips3 = (codes) => peopleChips(ctx2.char, names4(codes), byName, ownName);
+    const cards = [];
+    const add = (kind, i, locCode, c) => {
+      const key2 = keys.get(`${kind}${i}`);
+      if (!key2) return;
+      cards.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field2.confirmEnd === key2, selected: field2.target?.type === "event" && field2.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
+    };
+    const since = (m) => elapsedText(w.minute, m);
+    const sit = (t) => t ? `<span class="gx-evc-sit">${esc18(t)}</span>` : "";
+    const locText = (loc, m) => `${esc18(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
+    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
+    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', chips: chips3(e.deploy ?? ""), extra: sit(e.situation) }));
+    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc18(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
+    for (const e of endedShown(w)) {
+      const name = e.name || "이름 미확인";
+      cards.push({ kind: e.kind, name, grade: e.grade, loc: esc18(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind) });
+    }
+    const sentTo = (codes, id) => (codes ?? "").split(",").map((x) => x.trim()).includes(id);
+    const deployedAt = (id) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id))?.name ?? "";
+    const dir2 = readDirectory(ctx2.char.globalLore ?? []).agents;
+    const agents = roster.map((p) => {
+      const rec = w.agents[p.id];
+      const st = rec?.st ?? "미정";
+      const c = agentContact(ctx2, p.id);
+      const big = p.english ? mainPic(ctx2.char, dir2.find((x) => x.english === p.english) ?? { english: p.english }) : "";
+      return {
+        id: p.id,
+        name: p.name,
+        english: p.english ?? "",
+        st: stLabel(st),
+        side: st === "작전투입" ? "op" : agentLocked(rec) ? "lock" : "ok",
+        situation: rec?.situation ?? "",
+        dept: p.department ?? "",
+        rank: p.rank ?? "",
+        face: avatar(ctx2.char, p.english, p.name, "sq"),
+        photo: big ? imageUrl(ctx2.char, big) : null,
+        deployed: st === "작전투입" ? deployedAt(p.id) : "",
+        wiki: c ? c.wiki : null
+      };
+    });
+    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc18(w.promoted.join(", "))}</p>` : "";
+    const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
+    const cnt = (cls, label, n) => `<em class="${cls}">${label}<i>${n}</i></em>`;
+    const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
+    const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
+    const clock2 = boardClock(ctx2);
+    return `<main class="gx-body gx-board">
+    ${opsBoard(cards, { mapUrl: boardMapUrl(ctx2, env), clock: clock2, counts, empty: "지금 발생한 상황이 없어요." })}
+    ${agentPanel(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
+  </main>${boardDrawer()}`;
+  }
+  function boardClock(ctx2) {
+    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
+    return [st?.date, st?.time].filter(Boolean).join(" ");
+  }
+
+  // src/body.ts
+  var PLUGIN_ID = "goei-plugin";
+  var WATCH_MS = 1e3;
+  var liteNow = false;
+  async function onBeforeRequest(messages, type) {
+    if (type !== "model" || !Array.isArray(messages)) return messages;
+    setWaiting(true);
+    setOpeningHint(null);
+    messages = unwrapCalls(unwrapScenes(messages).messages).messages;
+    const marked = (t) => typeof t === "string" && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
+    if (messages.some((m) => marked(m?.content))) {
+      messages = messages.map((m) => marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m);
+    }
+    if (liteNow || messages.some((m) => typeof m?.content === "string" && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
+    if (liteNow) {
+      messages = stripHistoryTags(messages);
+      messages = await fixLore(messages).catch(() => messages);
+      messages = await withPlayer(messages).catch(() => messages);
+      messages = trimRoster(messages);
+      const ctx2 = await moduleContext(sceneText(messages)).catch(() => []);
+      if (ctx2.length) {
+        const at = messages.map((m) => m?.role).lastIndexOf("user");
+        const add = ctx2.map((c) => ({ role: "system", content: c }));
+        messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+      }
+    }
+    if (!messages.some((m) => typeof m?.content === "string" && m.content.includes(SEED_OPEN))) return messages;
+    try {
+      const charIndex = await risuai.getCurrentCharacterIndex();
+      const chatIndex = await risuai.getCurrentChatIndex();
+      const chat = await risuai.getChatFromIndex(charIndex, chatIndex);
+      if (!chat) return messages;
+      return processRequest(messages, chat).messages;
+    } catch (error) {
+      console.log(`[goei] beforeRequest 실패: ${error instanceof Error ? error.message : String(error)}`);
+      return messages;
+    }
+  }
+  function loreFor(char, chat, input2) {
+    const mode2 = advValue(chat.scriptstate, "gen", "lore_mode");
+    const player = playerAgent(char.globalLore, chat.scriptstate);
+    return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode2, userInfo().name), input: input2, ...player ? { exclude: [player.lore] } : {} });
+  }
+  async function storeLore(charIndex, chatIndex, input2) {
+    let char = await risuai.getCharacterFromIndex(charIndex);
+    if (!char || !readManifest(char.globalLore)) return;
+    const cur0 = await risuai.getChatFromIndex(charIndex, chatIndex);
+    const mode2 = advValue(cur0?.scriptstate, "gen", "lore_mode");
+    if (syncDecorators(char.globalLore, mode2)) {
+      await updateCharacterLore(charIndex, (lore) => syncDecorators(lore, mode2));
+      char = await risuai.getCharacterFromIndex(charIndex) ?? char;
+    }
+    const c = char;
+    await updateChat(charIndex, chatIndex, (cur) => {
+      const got = loreFor(c, cur, input2);
+      if (!got || sameVars(cur.scriptstate, got.vars)) return null;
+      return { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...got.vars } };
+    });
+  }
+  async function onInput(text) {
+    if (!liteNow || typeof text !== "string") return text;
+    try {
+      await storeLore(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex(), text);
+    } catch (error) {
+      console.log(`[goei] 로어북 고르기 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    return text;
+  }
+  async function fixLore(messages) {
+    const charIndex = await risuai.getCurrentCharacterIndex();
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    const chat = await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex());
+    if (!char || !chat) return messages;
+    const got = loreFor(char, chat);
+    if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
+    return patchSlots(messages, chat.scriptstate, got.vars).messages;
+  }
+  async function withPlayer(messages) {
+    const charIndex = await risuai.getCurrentCharacterIndex();
+    const char = await risuai.getCharacterFromIndex(charIndex);
+    const chat = await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex());
+    const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : void 0;
+    if (!char || !chat || !agent) return messages;
+    const env2 = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
+    return applyPlayer(messages, playerBlock(char.globalLore, agent, env2), await readPersona(), userInfo().name, agent.name);
+  }
+  var rulesCache = null;
+  async function moduleContext(scene) {
+    const charIndex = await risuai.getCurrentCharacterIndex();
+    const chatIndex = await risuai.getCurrentChatIndex();
+    const chat = await risuai.getChatFromIndex(charIndex, chatIndex);
+    const ss = chat?.scriptstate;
+    const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
+    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
+    const wantWiki = wikiContextOn(ss);
+    if (!chat || !wantGnet && !wantPhone && !wantWiki) return [];
+    applyAdvanced(ss);
+    if (rulesCache?.charIndex !== charIndex) {
+      const char = await risuai.getCharacterFromIndex(charIndex);
+      const src = { char: { globalLore: char?.globalLore }, chat };
+      rulesCache = { charIndex, gnet: mainContextRules(src), phone: mainContextRules2(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
+    }
+    const focus = makeFocus(scene, rulesCache.registry);
+    const rules2 = rulesCache;
+    const parts = [];
+    if (wantGnet && rules2.gnet) {
+      const st = readGnet(chat);
+      const own = CONTEXT.tokens;
+      if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rules2.gnet, focus)) });
+    }
+    if (wantPhone && rules2.phone) {
+      try {
+        const st = readPhone(chat);
+        const notices = readBulletins(chat);
+        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules2.phone, focus)) });
+      } catch (error) {
+        console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
+    return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
+  }
+  function withCap(box, key2, cap, run3) {
+    const keep = box[key2];
+    box[key2] = cap;
+    try {
+      return run3();
+    } finally {
+      box[key2] = keep;
+    }
+  }
+  function stripHistoryTags(messages) {
+    if (!messages.some((m) => m?.role === "assistant" && typeof m.content === "string" && hasWorldTags(m.content))) return messages;
+    return messages.map((m) => m?.role === "assistant" && typeof m.content === "string" && hasWorldTags(m.content) ? { ...m, content: cleanOutput(m.content) } : m);
+  }
+  async function onOutput(arg) {
+    setWaiting(false);
+    try {
+      const char = arg.char;
+      const chat = arg.chat;
+      if (!char || !chat || !readManifest(char.globalLore)) return;
+      const raw = chat.message?.[arg.messageIndex]?.data;
+      if (typeof raw !== "string") return;
+      let latest = null;
+      if (chat.scriptstate?.["$st_anomaly_on"] === "1") {
+        const catalog = parseCatalog(char.globalLore);
+        latest = await updateChat(
+          arg.characterIndex,
+          arg.chatIndex,
+          (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
+        );
+      }
+      let now = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
+      if (!now || chatPhase(now) !== "started") return;
+      now.message ??= [];
+      const missing = (ss) => {
+        const vars = { ...missingBasicVars(char.globalLore, ss), ...staleFactionVars(char.globalLore, ss) };
+        return Object.keys(vars).length ? vars : null;
+      };
+      if (missing(now.scriptstate)) {
+        now = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const vars = missing(cur.scriptstate);
+          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
+        }) ?? now;
+      }
+      await storeLore(arg.characterIndex, arg.chatIndex).catch(() => {
+      });
+      if (now.message.some((m) => typeof m.data === "string" && isUnsent(m.data))) now = await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent) ?? now;
+      await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {
+      });
+      await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
+      const phoneAuto = phoneSettings(now.scriptstate).auto;
+      const gnetAuto = gnetSettings(now.scriptstate).auto;
+      if (phoneAuto || gnetAuto) {
+        const fresh = async () => {
+          const c = await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex) ?? now;
+          c.message ??= [];
+          return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char, chat: c };
+        };
+        void (async () => {
+          applyAdvanced(now.scriptstate);
+          await readPersona();
+          const phoneFail = (error) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const gnetFail = (error) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const model2 = phoneSettings(now.scriptstate).model;
+          if (phoneAuto && gnetAuto && gnetSettings(now.scriptstate).model === model2) {
+            const joint = new Joint(model2);
+            await Promise.all([
+              autoRefresh(await fresh(), arg.messageIndex, void 0, joint).catch(phoneFail).finally(() => joint.done("phone")),
+              autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done("gnet"))
+            ]);
+            return;
+          }
+          if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
+          if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
+        })();
+      }
+    } catch (error) {
+      console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  var escHtml = (s4) => s4.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function unsentRow() {
+    const p = cardPalette2();
+    unsentShown();
+    return `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span><button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button>`;
+  }
+  function sceneCardHtml(s4) {
+    const p = cardPalette2();
+    const unsent = s4.unsent ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s4.target)}</span><span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s4.party)}</span>${unsent}</div>`;
+  }
+  function startCardHtml(body4, unsent) {
+    const p = cardPalette2();
+    const row6 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p.text};white-space:pre-wrap">${escHtml(body4.trim())}</span>${row6}</div>`;
+  }
+  function unsentMarkHtml() {
+    return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
+  }
+  function openingHintHtml() {
+    const p = cardPalette2();
+    openingShown();
+    return `<div data-goei-card="opening" style="${cardStyle()}display:flex;flex-wrap:wrap;margin-top:14px"><span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span><button type="button" data-goei-repick="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">재선택</button></div>`;
+  }
+  function callCardHtml(target) {
+    const p = cardPalette2();
+    return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
+  }
+  function isLanding(text) {
+    return text.includes('data-goei="landing"') || text.includes("ANOMALY SIMULATION") && text.includes("버튼을 눌러 시작하세요");
+  }
+  function landingHtml2() {
+    return landingHtml(cardPalette2());
+  }
+  function cardPalette2() {
+    return cardPalette(currentTheme());
+  }
+  function cardStyle() {
+    const p = cardPalette2();
+    return `display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  }
+  function onDisplay(text) {
+    if (typeof text !== "string") return text;
+    const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text);
+    let out = text;
+    if (isLanding(text)) out = landingHtml2();
+    else {
+      if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+      if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
+      if (hasCall(out)) out = renderCalls(out, callCardHtml);
+      if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
+      if (hasStatusTag(out)) out = renderStatus(out);
+      if (hasImgTag(out)) {
+        const pick3 = modulePicker();
+        if (liteNow || imgTagsKnown(out, pick3)) out = renderImgTags(out, pick3, getPrefs().imgShow ?? IMG_RECENT.def);
+      }
+      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
+      if (wantsOpeningHint(text)) out += openingHintHtml();
+    }
+    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
+    return out;
+  }
+  async function readSnapshot(fab) {
+    const none = { charIndex: -1, chatIndex: -1, chatScreen: false };
+    try {
+      const charIndex = await risuai.getCurrentCharacterIndex();
+      if (!Number.isInteger(charIndex) || charIndex < 0) return none;
+      const chatIndex = await risuai.getCurrentChatIndex();
+      const chatScreen = await fab.chatScreenVisible();
+      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
+    } catch {
+      return none;
+    }
+  }
+  async function isLiteCharacter(charIndex) {
+    if (charIndex < 0) return false;
+    try {
+      const char = await risuai.getCharacterFromIndex(charIndex);
+      const lite = !!readManifest(char?.globalLore);
+      if (lite && char) prefetchFactions(char);
+      return lite;
+    } catch {
+      return false;
+    }
+  }
+  async function readTheme(snap) {
+    if (snap.chatIndex < 0) return;
+    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
+    if (!chat) return;
+    const on2 = chat.scriptstate?.["$st_asset_on"];
+    const changed = setImgHidden(on2 === void 0 || on2 === null || on2 === "" ? getPrefs().basic.assetOn === false : on2 === "0" || on2 === 0 || on2 === false);
+    const before = currentTheme();
+    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
+    if (changed && currentTheme() === before) repaintTheme();
+  }
+  function startWatcher(fab) {
+    const state = new WatchState();
+    let stopped = false;
+    let timer3;
+    const tick3 = async () => {
+      try {
+        const snap = await readSnapshot(fab);
+        const lite = state.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
+        if (stopped) return;
+        const next = state.update(snap, lite);
+        liteNow = state.lite;
+        if (next.changed) {
+          if (next.fabVisible) {
+            await readTheme(snap).catch(() => {
+            });
+            await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
+            });
+            await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
+            });
+          }
+          await fab.setVisible(next.fabVisible, next.intro);
+        }
+      } catch (error) {
+        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (!stopped) timer3 = setTimeout(() => void tick3(), WATCH_MS);
+      }
+    };
+    void tick3();
+    return () => {
+      stopped = true;
+      clearTimeout(timer3);
+    };
+  }
+  async function start2() {
+    await loadPrefs();
+    void loadModuleAssets();
+    setWikiOpener((title2) => void openWiki2(title2));
+    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+    let stopWatcher = null;
+    let fab = null;
+    try {
+      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+      const f = fab;
+      void f.setTheme(currentTheme());
+      onThemeChange((t) => void f.setTheme(t).catch(() => {
+      }));
+      stopWatcher = startWatcher(fab);
+    } catch (error) {
+      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      await risuai.registerButton(
+        { name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` },
+        () => void openApp({ quietIfNotLite: true })
+      );
+    }
+    return {
+      beforeRequest: onBeforeRequest,
+      input: onInput,
+      output: onOutput,
+      display: onDisplay,
+      unload: async () => {
+        stopWatcher?.();
+        await fab?.remove().catch(() => {
+        });
+      }
+    };
+  }
+
+  // src/body-entry.ts
+  globalThis.__goeiBody = { version: "0.16.40-visit.1", start: start2 };
+})();

@@ -7,8 +7,10 @@ import type { Art } from './art';
 import { Input, type Pad } from './input';
 import { makeRenderer, type Renderer } from './render';
 import { World, type EnemyFactory, type ItemUse } from './world';
+import type { RunCheckpoint } from './checkpoint';
 
 export interface EngineModules {
+  saveCheckpoint?(value: RunCheckpoint | null): void;
   stages: StageModule[];
   enemyFactory?: EnemyFactory;
   itemUse?: ItemUse;
@@ -29,6 +31,8 @@ export interface EngineModules {
   onPlay?: () => void;
   /** 매 화면 프레임 (dt 초) */
   frame?: (dt: number) => void;
+  /** 불투명 컷씬이 전체 화면을 덮을 때 배경 월드를 다시 그리지 않는다. */
+  covered?: () => boolean;
   /** 세계 그리기 뒤에 덧그리기 (ui HUD·효과 등) */
   overlay?: (ctx: CanvasRenderingContext2D, world: World | null, dt: number) => void;
   /** 장면 바뀜: 'title' | 'hq' | 'battle' | 'result' */
@@ -126,8 +130,10 @@ export class Game {
         this.wasPaused = paused;
         this.mods.onPause?.(paused);
       }
-      this.scene.draw(paused ? 1 : this.acc / T);
-      this.mods.overlay?.(this.ctx, this.world, dt);
+      if (!this.mods.covered?.()) {
+        this.scene.draw(paused ? 1 : this.acc / T);
+        this.mods.overlay?.(this.ctx, this.world, dt);
+      }
     };
     this.raf = requestAnimationFrame(frame);
   }
@@ -146,6 +152,7 @@ export class Game {
   }
 
   destroy() {
+    this.checkpoint();
     this.dead = true;
     cancelAnimationFrame(this.raf);
     this.world = null;
@@ -162,6 +169,7 @@ export class Game {
   /* ───────── 제목·본부 ───────── */
 
   toTitle() {
+    this.checkpoint();
     this.world = null;
     this.inHub = false;
     this.paused = false;
@@ -235,8 +243,11 @@ export class Game {
 
   /* ───────── 출동 ───────── */
 
-  deploy(run: RunConfigCore) {
+  deploy(run: RunConfigCore, saved?: RunCheckpoint) {
     const stage = this.mods.stages.find((s) => s.id === run.stageId) ?? this.mods.stages[0];
+    // 본부의 MissionLaunch에는 stageId가 없을 수 있다. 실제 선택된 무대를
+    // 출동·월드·저장에 공통으로 남겨 기본 무대로 출동한 기록도 복원한다.
+    run = { ...run, stageId: stage.id };
     this.inHub = false;
     this.run = run;
     this.runStage = stage;
@@ -246,12 +257,32 @@ export class Game {
     if (this.mods.itemUse) w.itemUse = this.mods.itemUse;
     for (const l of this.mods.listeners ?? []) w.on(l);
     this.mods.onWorld?.(w, run);
-    w.enterFloor(stage.firstFloor(run));
+    w.enterFloor(saved && stage.restore ? stage.restore(saved.stage) : stage.firstFloor(run));
+    if (saved) w.restore(saved.world);
     this.world = w;
     this.paused = false;
     this.scene = this.battleScene(w);
     this.mods.onPlay?.();
     this.mods.onScene?.('battle');
+    this.checkpoint(true);
+  }
+
+  /** 전투 도중에는 직전 안전 지점을 유지한다. HP·탄·드랍도 함께 되돌린다. */
+  checkpoint(force = false) {
+    const w = this.world;
+    if (!w || this.inHub || !this.run || !w.canCheckpoint() || (!force && this.mods.blocking?.())) return;
+    const stage = this.runStage?.snapshot?.();
+    if (!stage) return;
+    this.mods.saveCheckpoint?.({ version: 1, run: this.run, stage, world: w.snapshot(), savedAt: Date.now() });
+  }
+
+  async resume(saved: RunCheckpoint) {
+    // v1 초기 저장은 기본 무대의 ID를 생략했다. 명시된 알 수 없는 ID는 거부한다.
+    const stageId = saved.run.stageId ?? this.mods.stages[0]?.id;
+    if (saved.version !== 1 || !this.mods.stages.some(s => s.id === stageId && s.restore)) throw new Error('지원하지 않는 출동 저장');
+    if (this.mods.hq) { this.showHq(); await this.mods.hq.ready?.(); }
+    this.deploy({ ...saved.run, stageId }, saved);
+    this.world?.say('출동 복원 완료. 전투 중 중단한 경우 마지막 안전 지점부터 이어집니다.', 4);
   }
 
   /** 출동 끝내기 (철수 메뉴 등에서도 부른다) */
@@ -260,7 +291,7 @@ export class Game {
     if (!w || this.inHub) return;
     const result: RunResultCore = {
       how,
-      floors: w.floors,
+      floors: Number(w.notes['stage.visitedCount'] ?? w.floors),
       kills: w.kills,
       maxCombo: w.player.maxCombo,
       timeSec: Math.round(w.tick / TICK_HZ),
@@ -273,17 +304,17 @@ export class Game {
     this.paused = false;
     if (this.mods.hq && this.run) {
       const run = this.run;
-      const back = () => {
-        // 정산을 먼저: 본부 지도의 시작 장면(후송이면 의무실)이 정산 결과를 보고 정해진다
-        this.mods.hq!.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, run);
-        this.showHq();
-      };
+      // 영상보다 정산·저장을 먼저 한다. 영상을 보는 중 닫아도 보상이 사라지지 않는다.
+      this.mods.hq.onReturn((this.mods.toHqResult?.(result, w) ?? result) as RunResultCore, run);
+      this.mods.saveCheckpoint?.(null);
+      const back = () => this.showHq();
       if (this.mods.afterRun) {
         this.scene = this.idleScene('cutscene');
         this.mods.afterRun(how, back);
       } else back();
       return;
     }
+    this.mods.saveCheckpoint?.(null);
     this.scene = this.resultScene(result);
     this.mods.onScene?.('result');
   }
@@ -309,13 +340,14 @@ export class Game {
           const how = w.ended;
           if (how === 'next') {
             const next = this.runStage!.nextFloor(this.run!, w.floor, 'next');
-            if (next) w.enterFloor(next);
+            if (next) { w.enterFloor(next); this.checkpoint(true); }
             else this.endRun('return');
-          } else this.endRun(how === 'withdraw' ? 'withdraw' : 'evac');
+          } else this.endRun(how);
         }
+        else if (w.tick % 60 === 0) this.checkpoint();
       },
       draw: (a) => {
-        this.renderer.draw(w, this.paused ? 1 : a);
+        this.renderer.draw(w, this.paused || this.mods.blocking?.() || this.mods.hq?.isOpen?.() ? 1 : a);
         if (this.paused) this.drawMenu('일시정지', ['계속', w.showBoxes ? '판정 보기 끄기' : '판정 보기 켜기', '철수 (출동 끝내기)', '처음으로']);
       },
     };

@@ -80,7 +80,7 @@ export const FLOOR_TYPES: Record<FloorType, FloorTypeDef> = {
     rules: ['r_greet', 'r_quiet', 'r_meal'],
     guardians: [
       { kind: 'elder', label: '405호 노부부', weakness: '「잘 먹었습니다」로 전투 생략' },
-      { kind: 'family208', label: '208호 가족', weakness: '붉은 것을 밟지 않으면 문이 열린다' },
+      { kind: 'family208', label: '208호 가족', weakness: '벽 얼굴을 공격하지 말고 규칙을 알아내라. 아이 방 열쇠로 문을 열면 잠시 멈춘다' },
       { kind: 'risenhouse', label: '일어난 집', weakness: '물건을 제자리에' },
     ],
     enemies: [{ kind: 'resident', label: '사는 척하는 주민', price: 10 }],
@@ -113,7 +113,7 @@ export const REPLICA_SUB_LABEL: Record<ReplicaSub, string> = { vacant: '빈집',
 export const REPLICA_SUB_RULES: Record<ReplicaSub, string[]> = {
   vacant: ['r_things'],
   pretending: ['r_greet', 'r_quiet', 'r_meal'],
-  red: ['r_red', 'r_quiet'],
+  red: ['r_red', 'r_quiet', 'r11'],
 };
 export const REPLICA_SUB_GUARDIAN: Record<ReplicaSub, string> = { vacant: 'risenhouse', pretending: 'elder', red: 'family208' };
 
