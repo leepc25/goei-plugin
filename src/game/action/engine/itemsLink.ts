@@ -58,6 +58,37 @@ function drawFloorArt(c: CanvasRenderingContext2D, id: string, x: number, y: num
   return true;
 }
 
+/** 층 모듈의 보급품(kind 'item', label 「보급품:ammo」). 탄약은 회색 상자(service 7)로 읽혀서 탄약 상자 + 황동 탄을 크게 (검수19). 처리했으면 true */
+export function drawSupply(c: CanvasRenderingContext2D, label: string | undefined, x: number, y: number, tick: number): boolean {
+  if (label?.split(':')[1] !== 'ammo') return false;
+  const all = (typeof window !== 'undefined' && (window as { __GOEI_ITEM_ART__?: Record<string, { src: string; w: number; h: number }> }).__GOEI_ITEM_ART__) || {};
+  const box = all.ammo_box,
+    rounds = all.rounds;
+  if (!box || !rounds) return false;
+  const im = (src: string) => {
+    let i = floorImgs.get(src);
+    if (!i) floorImgs.set(src, (i = Object.assign(new Image(), { src })));
+    return i.complete && i.naturalWidth ? i : null;
+  };
+  const a = im(box.src),
+    b = im(rounds.src);
+  if (!a || !b) return false;
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.35)';
+  c.beginPath();
+  c.ellipse(x, y, 40, 9, 0, 0, Math.PI * 2);
+  c.fill();
+  // 바닥 회색과 갈리게 노란 테두리 빛, 천천히 깜빡
+  c.imageSmoothingEnabled = false;
+  const glow = 0.35 + 0.2 * Math.sin(tick / 8);
+  c.shadowColor = `rgba(255,214,90,${glow})`;
+  c.shadowBlur = 10;
+  c.drawImage(a, Math.round(x - 40), Math.round(y - box.h * 4), box.w * 4, box.h * 4);
+  c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+  c.restore();
+  return true;
+}
+
 /** 환경 물건(가구)은 손에 드는 배율이 아니라 실제 크기: 그림 높이를 PROPS[id].h(화면 px)에 맞춘다. 아래 가운데 = (x, y) */
 function drawPropSized(c: CanvasRenderingContext2D, id: string, x: number, y: number): boolean {
   const d = PROPS[id];

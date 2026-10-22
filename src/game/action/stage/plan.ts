@@ -58,7 +58,7 @@ export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
     y: laneY(p.lane),
     w: p.w,
     h: propH(p.kind),
-    label: p.kind === 'sign' ? p.label : p.label,
+    label: p.kind === 'item' && p.data.item ? `${p.label}:${p.data.item}` : p.label, // 보급품:ammo → 바닥 그림을 종류대로 (itemsLink drawSupply)
     solid: p.kind === 'shutter' ? !p.data.open : undefined,
   }));
   // 승객·사는 척하는 주민·로비의 직원은 처음에 소품(말 걸 수 있음)이고, 규칙을 어기면 층 tick이 적으로 바꾼다

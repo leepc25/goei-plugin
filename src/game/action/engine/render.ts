@@ -8,6 +8,7 @@ import { Bullet } from './bodies';
 import { Fighter } from './fighter';
 import type { Player } from './player';
 import type { World } from './world';
+import { drawSupply } from './itemsLink';
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -111,6 +112,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       }
       // 배경 물건 그림(art/bg)이 있으면 그것, 없으면 회색 상자 대역
       // 그림이 아직 없는 소품은 회색 상자 대역을 그리지 않는다 (재검수 3-1). 판정 보기(H)일 때만 상자
+      if (p.kind === 'item' && drawSupply(ctx, p.label, sx, p.y, w.tick)) continue;
       if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type) && w.showBoxes) {
         ctx.fillStyle = p.kind === 'door' || p.kind === 'elevator' ? '#4d5b63' : p.kind === 'pickup' ? '#c9a640' : '#59636a';
         ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
