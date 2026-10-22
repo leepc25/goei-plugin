@@ -1,6 +1,76 @@
 {
-  "observed_at": "2026-10-22 10:45:25 UTC",
+  "observed_at": "2026-10-22T11:48:07.989913+00:00",
   "reviews": [
+    {
+      "character": "kyuras",
+      "clip": "snap1_free_hand_edit",
+      "status": "review_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "finding": "4x side-by-side review confirms ring-shaped loading and folded middle-finger release replace fist silhouettes. Angular fingers remain a user review question. Independent diff confirms only220 hand-area pixels changed.",
+      "source": "resume/snap1-hand-compare-4x.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "run_shotgun_free_hand_edit",
+      "status": "review_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Previously hidden front hand now visible at sleeve end in2-6. Same recovered body retained. Runtime weapon anchor adjusted by owner; final source verification pending.",
+      "source": "generated/b0156046-4b3b-4d0d-b4e7-a21da470eb67/frames.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "walk_pipe",
+      "status": "review_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "finding": "Shoulder carrying pose stable, stepping alternates. Face has slight3/4 drift; boundary playback remains user review.",
+      "source": "generated/9f98ad15-77c1-4eda-8023-a90762053267/sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "shotgun",
+      "status": "review_candidate",
+      "frames_reviewed": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "finding": "One-handed hip shot raises forearm with recoil and returns. Face/clothing/body remain identifiable, no generated weapon included.",
+      "source": "generated/27a5c819-12b3-4f7b-82ae-fe0a56f55a04/sheet.png",
+      "user_visual_approval": false,
+      "reviewer": "coordinator/direct image inspection"
+    },
     {
       "character": "kyuras",
       "clip": "idle_shotgun",
@@ -127,6 +197,13 @@
       "source": "resume/live/down/contact.png",
       "user_visual_approval": false,
       "reviewer": "coordinator/direct image inspection"
+    },
+    {
+      "character": "kyuras",
+      "clip": "snap2/snap3",
+      "status": "review_candidate",
+      "finding": "Direct inspection of all6+7 edited frames: raised rear hand and crossed releases visible. Exact-edit assertions restrict378+464 changed pixels to guarded hands. Installed final frames verified. User approval pending; no final browser rerun.",
+      "user_visual_approval": false
     }
   ]
 }

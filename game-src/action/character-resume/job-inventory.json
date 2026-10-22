@@ -2,15 +2,37 @@
   "observed_at": "2026-10-22T10:16:19.210968+00:00",
   "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "note": "작업 ID 명시 줄만 수집. 이미지 UUID·문자열 id는 작업 ID로 추측하지 않음. 잔액 차이를 작업 비용으로 배분하지 않음. 로그 실패 문구는 서버 최종 상태를 뜻하지 않음.",
-  "job_count": 1447,
+  "job_count": 1457,
   "jobs": [
     {
       "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
       "character": "blaret-saladin",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#429ad77b-ed3b-4337-9524-075adf0a262c"
+      },
       "local_receipt_record": "verified-local-receipts.json#429ad77b-ed3b-4337-9524-075adf0a262c",
+      "cost_status": "completed_server_receipt_verified"
+    },
+    {
+      "job_id": "5d78c846-5658-40d0-b3a2-31c119818707",
+      "character": "blaret-saladin",
+      "sources": [],
+      "actual_cost": null,
+      "local_receipt_record": "verified-local-receipts.json#5d78c846-5658-40d0-b3a2-31c119818707",
       "cost_status": "submission_receipt_only_completion_charge_pending"
+    },
+    {
+      "job_id": "6bce13df-7d64-47e5-ba79-650cdea00aa4",
+      "character": "blaret-saladin",
+      "sources": [],
+      "actual_cost": {
+        "generations": 10.0,
+        "evidence": "verified-local-receipts.json#6bce13df-7d64-47e5-ba79-650cdea00aa4"
+      },
+      "local_receipt_record": "verified-local-receipts.json#6bce13df-7d64-47e5-ba79-650cdea00aa4",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "76884626-42e9-4626-980a-37663c8aac8f",
@@ -3482,9 +3504,12 @@
       "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
       "character": "deadpole",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 2.0,
+        "evidence": "verified-local-receipts.json#0d951568-6645-4872-8dc8-30511d65023a"
+      },
       "local_receipt_record": "verified-local-receipts.json#0d951568-6645-4872-8dc8-30511d65023a",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "1e42c268-074f-4050-bb9b-a9d254c12aa3",
@@ -3854,6 +3879,17 @@
           "line": 348
         }
       ]
+    },
+    {
+      "job_id": "296587c6-95c3-4b93-92a7-d164ddb10506",
+      "character": "eileen",
+      "sources": [],
+      "actual_cost": {
+        "generations": 10.0,
+        "evidence": "verified-local-receipts.json#296587c6-95c3-4b93-92a7-d164ddb10506"
+      },
+      "local_receipt_record": "verified-local-receipts.json#296587c6-95c3-4b93-92a7-d164ddb10506",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "2a5bf37f-d326-4bc0-a9c2-3db599297228",
@@ -8358,6 +8394,17 @@
           "line": 151
         }
       ]
+    },
+    {
+      "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+      "character": "jyaldi",
+      "sources": [],
+      "actual_cost": {
+        "generations": 2.0,
+        "evidence": "verified-local-receipts.json#4a4e18c2-d2f4-4604-9620-2127d4b8d3ca"
+      },
+      "local_receipt_record": "verified-local-receipts.json#4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
@@ -14125,9 +14172,12 @@
       "job_id": "27a5c819-12b3-4f7b-82ae-fe0a56f55a04",
       "character": "kyuras",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#27a5c819-12b3-4f7b-82ae-fe0a56f55a04"
+      },
       "local_receipt_record": "verified-local-receipts.json#27a5c819-12b3-4f7b-82ae-fe0a56f55a04",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "29054c45-be03-4603-ba76-6898d8ee96b5",
@@ -14451,6 +14501,17 @@
           "line": 190
         }
       ]
+    },
+    {
+      "job_id": "57e6577c-6ee1-4dea-8c84-532a513c7cb3",
+      "character": "kyuras",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#57e6577c-6ee1-4dea-8c84-532a513c7cb3"
+      },
+      "local_receipt_record": "verified-local-receipts.json#57e6577c-6ee1-4dea-8c84-532a513c7cb3",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "5d22c673-efc8-4b24-b4e8-ab56fc7b2987",
@@ -14934,6 +14995,17 @@
           "line": 84
         }
       ]
+    },
+    {
+      "job_id": "e5b19b7d-ca40-4632-a057-ed262452c973",
+      "character": "kyuras",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#e5b19b7d-ca40-4632-a057-ed262452c973"
+      },
+      "local_receipt_record": "verified-local-receipts.json#e5b19b7d-ca40-4632-a057-ed262452c973",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "e84955eb-da2f-49a8-b0b3-d423662eb8d5",
@@ -16457,6 +16529,17 @@
       ]
     },
     {
+      "job_id": "1175b029-993f-4179-90f7-b362c6358ad7",
+      "character": "spangdal",
+      "sources": [],
+      "actual_cost": {
+        "generations": 10.0,
+        "evidence": "verified-local-receipts.json#1175b029-993f-4179-90f7-b362c6358ad7"
+      },
+      "local_receipt_record": "verified-local-receipts.json#1175b029-993f-4179-90f7-b362c6358ad7",
+      "cost_status": "completed_server_receipt_verified"
+    },
+    {
       "job_id": "1418ff48-dd2f-46cb-a04c-f43ad242fa16",
       "character": "spangdal",
       "actual_cost": null,
@@ -17162,6 +17245,17 @@
       ]
     },
     {
+      "job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "character": "spangdal",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#896b959c-f221-462b-a84f-c37c117c8377"
+      },
+      "local_receipt_record": "verified-local-receipts.json#896b959c-f221-462b-a84f-c37c117c8377",
+      "cost_status": "completed_server_receipt_verified"
+    },
+    {
       "job_id": "8ad2f79f-9c3a-43dc-99cb-273b6941e059",
       "character": "spangdal",
       "actual_cost": null,
@@ -17357,9 +17451,12 @@
       "job_id": "a3743d39-b041-4287-96ad-c62228b484b3",
       "character": "spangdal",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#a3743d39-b041-4287-96ad-c62228b484b3"
+      },
       "local_receipt_record": "verified-local-receipts.json#a3743d39-b041-4287-96ad-c62228b484b3",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "a6bb0eab-42b5-4633-b52d-8b477f3c102a",
@@ -17384,6 +17481,17 @@
           "line": 62
         }
       ]
+    },
+    {
+      "job_id": "aa4b5980-880c-4ee9-8171-3f47dd2d994f",
+      "character": "spangdal",
+      "sources": [],
+      "actual_cost": {
+        "generations": 10.0,
+        "evidence": "verified-local-receipts.json#aa4b5980-880c-4ee9-8171-3f47dd2d994f"
+      },
+      "local_receipt_record": "verified-local-receipts.json#aa4b5980-880c-4ee9-8171-3f47dd2d994f",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "aae9f487-440a-4070-9e21-1bd74a75e2ee",
@@ -17528,6 +17636,17 @@
           "line": 243
         }
       ]
+    },
+    {
+      "job_id": "c40aab31-b7a6-4d05-aeaf-907041ed603c",
+      "character": "spangdal",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#c40aab31-b7a6-4d05-aeaf-907041ed603c"
+      },
+      "local_receipt_record": "verified-local-receipts.json#c40aab31-b7a6-4d05-aeaf-907041ed603c",
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "c48994d8-f322-40cd-a957-1fb9ba1f5860",
@@ -20841,5 +20960,5 @@
       "text": "2026-10-22 03:13:08 base edge 104 -> error: rate limit exceeded (20/20 jobs)"
     }
   ],
-  "local_receipts_verified_at": "2026-10-22T10:50:20.862102+00:00"
+  "local_receipts_verified_at": "2026-10-22T11:47:22.119720+00:00"
 }

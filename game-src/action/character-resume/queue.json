@@ -3,14 +3,14 @@
   "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "branch": "codex/character-production-control",
   "account": {
-    "observed_at": "2026-10-22 10:46:11 UTC",
+    "observed_at": "2026-10-22T11:46:22.267Z",
     "authentication": "native_mcp_success",
-    "balance_generations": 14085.3,
-    "active_jobs": 5,
+    "balance_generations": 13990.3,
+    "active_jobs": 2,
     "documented_tier_limit": 20,
     "account_specific_limit": null,
     "limit_note": "Tier 3 documentation: 20; no separate account cap returned",
-    "evidence": "control-evidence/local-auth-20261022/snapshot-20261022104611.json"
+    "evidence": "control-evidence/local-auth-20261022/snapshot-20261022114622.json"
   },
   "items": [
     {
@@ -149,7 +149,7 @@
     "deadpole 20 bathing frames"
   ],
   "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
-  "observed_at": "2026-10-22 10:46:11 UTC",
+  "observed_at": "2026-10-22T11:46:22.267Z",
   "per_owner_in_flight_limit": 1,
   "dispatch_enabled": true,
   "dispatch_blocker": null,
@@ -278,12 +278,12 @@
       "variants": 1,
       "tool": "create_image_pixen",
       "reserved_generation_calls": 1,
-      "quoted_charge": null,
-      "quote_status": "담당자가 공식 비용 재확인 중",
-      "state": "reserved_by_other_session_pending_gallery_recovery_check",
-      "job_id": null,
-      "actual_charge": null,
-      "delivery_sha": null,
+      "quoted_charge": 1,
+      "quote_status": "담당자가 get_image completed / charged 1 generation 전달",
+      "state": "delivered_cost_reconciled",
+      "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+      "actual_charge": 1,
+      "delivery_sha": "17ec31076d41863bae52e32f0491b8014af7119e",
       "do_not_generate_in_character_queue": true,
       "opening_plan": "동일 문틀·문짝 로컬 분리; 추가 유료 생성 예약 없음",
       "received_at": "2026-10-22T19:36:28.507035+09:00",
@@ -295,7 +295,84 @@
         "active_jobs": 0,
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
       },
-      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중"
+      "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중",
+      "asset_id": "4d996bf4-cba3-559f-8c23-de805a905fe8",
+      "charge_unit": "generations",
+      "submitted_generation_calls": 1,
+      "remaining_reserved_generation_calls": 0,
+      "updated_at": "2026-10-22T19:50:46.562117+09:00",
+      "cost_evidence": {
+        "source": "committed_completed_job_receipt_verified",
+        "independently_fetched_here": false,
+        "reported_cost": 1,
+        "unit": "generation",
+        "repository_receipt_verified": true,
+        "delivery_commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+        "path": "game-src/art/hq-door-round2/evidence/get-image-result.json"
+      },
+      "recovery": {
+        "reported_complete": true,
+        "canvas": [
+          96,
+          144
+        ],
+        "mode": "RGBA",
+        "delivery_sha": "17ec31076d41863bae52e32f0491b8014af7119e",
+        "assembly_status": "로컬 조립·상태 분리 완료; 담당 납품",
+        "original_sha256": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03"
+      },
+      "reported_balance_change": {
+        "before": "14160.30",
+        "after": "14159.30",
+        "source": "문 담당 세션 전달",
+        "note": "공유 계정 전체의 현재 잔액으로 간주하지 않음; 개별 과금은 작업 영수증 기준"
+      },
+      "repeat_generation": false,
+      "cost_ledger_status": "complete",
+      "delivery": {
+        "root": "game-src/art/hq-door-round2/",
+        "review_url": "https://rawcdn.githack.com/leepc25/goei-plugin/17ec31076d41863bae52e32f0491b8014af7119e/game-src/art/hq-door-round2/review/index.html",
+        "handoff_url": "https://github.com/leepc25/goei-plugin/blob/17ec31076d41863bae52e32f0491b8014af7119e/game-src/art/hq-door-round2/DELIVERY.md",
+        "anchor": [
+          48,
+          136
+        ],
+        "aperture": [
+          8,
+          11,
+          80,
+          125
+        ],
+        "display_scale": 2,
+        "world_threshold": [
+          1364,
+          440
+        ],
+        "png_origin": [
+          1268,
+          168
+        ],
+        "marker_center": [
+          1364,
+          464
+        ],
+        "verification_evidence": "docs/character-resume/evidence/hq-door-delivery-verification.json"
+      },
+      "reported_validation": {
+        "frame_static_across_9_steps": true,
+        "integration_capture_commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+        "pc_and_mobile_emulation": true,
+        "proposed_renderer_three_states_pixel_match": true,
+        "note": "담당 전달/납품서 기록; 이 세션에서 브라우저 재검사하지 않음"
+      },
+      "pending_completion_scopes": [
+        "사용자 시각 승인",
+        "실기기 검사",
+        "메인 통합",
+        "이동 회귀검사"
+      ],
+      "user_visual_approval": false,
+      "main_integrated": false
     },
     {
       "reservation_id": "hq-first-day-corridor-round2-01a1632e",
@@ -303,14 +380,14 @@
       "owner_branch": "codex/pixellab-cutscene-round2",
       "asset": "첫 출근 빈 본부 복도 문 열림 1컷의 배경 원본",
       "background_images": 1,
-      "tool": null,
+      "tool": "create_image_pixen",
       "reserved_generation_calls": 1,
-      "quoted_charge": null,
-      "quote_status": "담당자가 정확한 도구·비용 조사 중",
-      "state": "reserved_by_other_session_pending_quote",
-      "job_id": null,
-      "actual_charge": null,
-      "delivery_sha": null,
+      "quoted_charge": 1,
+      "quote_status": "담당자가 서버 영수증 cost=1 generation 전달",
+      "state": "delivered_cost_reconciled",
+      "job_id": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
+      "actual_charge": 1,
+      "delivery_sha": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
       "do_not_generate_in_character_queue": true,
       "character_generation_calls": 0,
       "separate_door_generation_calls": 0,
@@ -325,19 +402,135 @@
         "generations_remaining": "14160.30",
         "active_jobs": 0,
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      },
+      "canvas": [
+        320,
+        180
+      ],
+      "transparent_background": false,
+      "charge_unit": "generations",
+      "submitted_generation_calls": 1,
+      "remaining_reserved_generation_calls": 0,
+      "additional_ai_animation_calls": 0,
+      "updated_at": "2026-10-22T19:52:31.752698+09:00",
+      "cost_evidence": {
+        "source": "committed_completed_job_receipt_verified",
+        "independently_fetched_here": false,
+        "reported_cost": 1,
+        "unit": "generation",
+        "repository_receipt_verified": true,
+        "delivery_commit": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
+        "path": "game-src/art/cutscene-production-round2/receipts/background-completed.json"
+      },
+      "animation_plan": {
+        "local_composited_unique_positions": 17,
+        "shared_source": "본부 문 담당 새 레이어",
+        "previous_proposed_animation_generations": 4,
+        "proposal_status": "취소된 생성 계획; 제출/과금/서버 작업 취소를 의미하지 않음",
+        "additional_ai_calls": 0
+      },
+      "cost_ledger_status": "complete",
+      "asset_id": "0994a2a6-29b0-5451-a0db-041ca0cbcac6",
+      "recovery": {
+        "reported_complete": true,
+        "repository_original_verified": true,
+        "canvas": [
+          320,
+          180
+        ],
+        "raw_sha256": "2320a2612324b6bb97f9f0baf1cddb5e4104631e9786a751f6433c0f0fe950b1"
+      },
+      "delivery": {
+        "root": "game-src/art/cutscene-production-round2/",
+        "review_url": "https://raw.githack.com/leepc25/goei-plugin/5487e49e36f5cd3c016213b47fe87bf3e48b37f9/game-src/art/cutscene-production-round2/round2-review.html",
+        "canvas": [
+          640,
+          360
+        ],
+        "duration_ms": 2400,
+        "unique_composited_frames": 17,
+        "ai_animation_calls": 0,
+        "shared_door_source_commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+        "shared_door_additional_charge": 0,
+        "verification_evidence": "docs/character-resume/evidence/corridor-delivery-verification.json",
+        "replacement_target": "first_day/c3 총6초 중 앞2.4초 문 열림",
+        "remaining_main_scope": "뒤3.6초 인사/캐릭터·자막·오디오·로딩·게임 통합"
+      },
+      "reported_validation": {
+        "normal_and_quarter_speed": true,
+        "loop": true,
+        "pc_mobile_touch_emulation": true,
+        "remote_full_playback": true,
+        "source": "담당자 전달 및 납품 검증 기록; 이 세션에서 브라우저 재실행 안 함"
+      },
+      "pending_completion_scopes": [
+        "사용자 시각 승인",
+        "실제 모바일 기기 검사",
+        "캐릭터 인사 장면 및 최종 통합"
+      ],
+      "user_visual_approval": false,
+      "main_integrated": false
+    },
+    {
+      "reservation_id": "spangdal-first-hit-hand-01a1632e82b9",
+      "owner_thread_id": "01a1632e-82b9-7e41-94f9-e52607f4d591",
+      "owner_branch": "codex/art-spangdal-resume",
+      "reported_source_commit": "986d1602",
+      "character": "spangdal",
+      "asset": "1타 손 기준 마스크 인페인팅",
+      "canvas": [
+        192,
+        144
+      ],
+      "tool": null,
+      "method": "mask_inpainting",
+      "reserved_generation_calls": 1,
+      "quoted_charge": 10,
+      "charge_unit": "generations",
+      "quote_status": "담당자 전달 견적; 이 세션 독립 가격 조회 아님",
+      "state": "reserved_by_other_session_pending_submission",
+      "max_concurrent_submissions": 1,
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "do_not_repeat": "기존 실패한 pixen 손 편집",
+      "followup_scope": "공격·빈손 파지·이동 검수; 후속 유료 호출은 이번 예약에 포함하지 않음",
+      "excluded_scope": [
+        "kyuras paid job recovery",
+        "kyuras regeneration"
+      ],
+      "reported_previous_session": {
+        "state": "idle",
+        "new_png_count": 0
+      },
+      "received_at": "2026-10-22T19:38:39.536028+09:00",
+      "reported_account_snapshot": {
+        "source": "스팡달 로컬 담당 세션 전달; 이 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "MCP 인증 성공이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "subscription_plan": "Tier3",
+        "active_jobs": 0,
+        "note": "최초 조회 기록; 제출 직전 활성 작업 재조회 필요. 동시 실행 한도는 별도 미확인"
+      },
+      "coordination": {
+        "asset_conflict": false,
+        "other_pending_reservations": [
+          "hq-glass-door-round2-01a1632c",
+          "hq-first-day-corridor-round2-01a1632e"
+        ],
+        "note": "담당 범위 중복 없음. 계정 동시 제출 슬롯 확보를 뜻하지 않음"
       }
     }
   ],
   "coordinator_direct_generation_calls": 0,
   "delegated_generation_costs": "verified-local-receipts.json",
   "queue_check": {
-    "observed_at": "2026-10-22 10:46:11 UTC",
+    "observed_at": "2026-10-22T11:46:22.267Z",
     "active_by_owner": {
-      "blaret-saladin": 1,
-      "eileen": 1,
-      "geshugan": 1,
-      "kyuras": 1,
-      "deadpole": 1
+      "spangdal": 1,
+      "blaret-saladin": 1
     },
     "unattributed_active_ids": [],
     "per_owner_violations": {},

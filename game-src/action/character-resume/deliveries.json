@@ -1,6 +1,20 @@
 {
-  "observed_at": "2026-10-22 10:51:10 UTC",
+  "observed_at": "2026-10-22T11:48:07.989913+00:00",
   "deliveries": [
+    {
+      "character": "rojemon",
+      "commit": "8e8f16bab177ee39b3219dd2e51a9099bbdff1a3",
+      "branch": "codex/art-rojemon-resume",
+      "html": "release/demo/rojemon-resume.html",
+      "frames": 16,
+      "charged_generations": 7,
+      "visual_status": "selective playback candidate; one paid edit rejected",
+      "remaining": "walk/run/other hand defects",
+      "user_visual_approval": false,
+      "external_mirror_status": "owner observed rawcdn HEAD403; do not claim hosted playback verified",
+      "local_demo_url": "http://127.0.0.1:13850/rojemon-resume.html",
+      "local_demo_status": "owner reported HTTP200"
+    },
     {
       "character": "jyaldi",
       "commit": "ae4ca04785882a9de6d466d759e95dbbe085d020",
@@ -21,6 +35,39 @@
       "charged_generations": 3,
       "visual_status": "arrival corrected; user approval pending",
       "remaining": "chop1 back of head; cleave shirt flash; walk detailed grounding/loop",
+      "user_visual_approval": false
+    },
+    {
+      "character": "kyuras",
+      "commit": "7aaef6d19699ab298fd7d87563938126d3d63acd",
+      "branch": "codex/art-kyuras-resume",
+      "html": "release/demo/kyuras-full.html",
+      "new_frames": 35,
+      "recovered_frames": 12,
+      "charged_generations": 18,
+      "historical_recovered_charge": 6,
+      "free_edit_pixels": 1192,
+      "visual_status": "candidate; 47 source frames verified, final build54 clips missing0, recovery tests7 passed",
+      "remaining": "finger readability user review; slight head angle drift; old down afterimage",
+      "user_visual_approval": false
+    },
+    {
+      "character": "deadpole",
+      "commit": "85922529bfe7738fabb3522c9428527ab7576655",
+      "branch": "codex/art-deadpole-resume",
+      "html": "release/demo/deadpole-resume.html",
+      "charged_generations": 11,
+      "visual_status": "owner delivered; independent full review pending",
+      "remaining": "pointing-like grip; bridge supporting foot slide",
+      "user_visual_approval": false
+    },
+    {
+      "character": "geshugan",
+      "commit": "54c4d129133fd80a0142570586cf0716f9023c39",
+      "branch": "codex/art-geshugan-resume",
+      "html": "release/demo/geshugan-full.html",
+      "charged_generations": 31,
+      "visual_status": "owner delivered20 frames,30 paid generations rejected; independent full review pending",
       "user_visual_approval": false
     }
   ]
