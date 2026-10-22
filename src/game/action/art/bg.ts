@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const cache = new Map<string, HTMLImageElement | null>();
+const cache = new Map<string, { src: string; im: HTMLImageElement }>();
 const patterns = new Map<string, CanvasPattern | null>();
 
 function pack(): BgPack {
@@ -22,19 +22,57 @@ function pack(): BgPack {
 
 function image(place: string, name: string): HTMLImageElement | null {
   const key = `${place}/${name}`;
-  if (cache.has(key)) {
-    const im = cache.get(key)!;
-    return im && im.complete && im.naturalWidth ? im : null;
-  }
   const src = pack()[place]?.[name];
-  if (!src) {
-    cache.set(key, null);
-    return null;
+  const previous = cache.get(key);
+  if (previous && previous.src === src) {
+    const im = previous.im;
+    return im.complete && im.naturalWidth ? im : null;
   }
+  if (previous) {
+    cache.delete(key);
+    // 자산 팩 교체 시 원본에 의존한 색조·무늬·끝 색도 다시 만든다.
+    patterns.clear();
+    toned.clear();
+    edges.clear();
+  }
+  // 팩이 나중에 들어올 수 있다. 없는 그림을 영구적인 null로 기억하지 않는다.
+  if (!src) return null;
   const im = new Image();
   im.src = src;
-  cache.set(key, im);
+  cache.set(key, { src, im });
   return null;
+}
+
+/** 화면 좌표 소품과 카메라 이동된 월드 그림 모두 같은 판정. 확대·반전도 반영한다. */
+function outsideCanvas(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, t = ctx.getTransform?.()): boolean {
+  const canvas = ctx.canvas;
+  if (!t || !canvas || !Number.isFinite(canvas.width)) return false;
+  const cx = t.a * (x + w / 2) + t.c * (y + h / 2) + t.e;
+  const cy = t.b * (x + w / 2) + t.d * (y + h / 2) + t.f;
+  const rx = Math.abs(t.a * w / 2) + Math.abs(t.c * h / 2);
+  const ry = Math.abs(t.b * w / 2) + Math.abs(t.d * h / 2);
+  // 1px 여유: 경계의 소수 좌표·안티앨리어싱을 자르지 않는다.
+  return cx + rx < -1 || cx - rx > canvas.width + 1 || cy + ry < -1 || cy - ry > canvas.height + 1;
+}
+
+// CanvasGradient는 생성 당시 좌표 변환을 기억한다. 수직 그라데이션은 가로 카메라
+// 이동에 영향받지 않지만, 높이·확대·세로 이동·기울기가 바뀌면 다시 만든다.
+const gradients = new WeakMap<CanvasRenderingContext2D, Map<string, CanvasGradient>>();
+function verticalGradient(ctx: CanvasRenderingContext2D, y0: number, y1: number, from: string, to: string): CanvasGradient {
+  const t = ctx.getTransform?.();
+  const key = t ? `${t.c},${t.d},${t.c ? t.e : 0},${t.f},${y0},${y1},${from},${to}` : '';
+  let entries = gradients.get(ctx);
+  const cached = key && entries?.get(key);
+  if (cached) return cached;
+  const g = ctx.createLinearGradient(0, y0, 0, y1);
+  g.addColorStop(0, from);
+  g.addColorStop(1, to);
+  if (key) {
+    if (!entries) gradients.set(ctx, entries = new Map());
+    if (entries.size >= 32) entries.delete(entries.keys().next().value!);
+    entries.set(key, g);
+  }
+  return g;
 }
 
 /** place는 '장소' 또는 '장소:갈래'(수호자 방: guardian:guard → guardian_guard_wall*). */
@@ -127,7 +165,10 @@ export function drawWallCell(ctx: CanvasRenderingContext2D, place: string, ref: 
   const bw = w / bays;
   ctx.save();
   ctx.imageSmoothingEnabled = false;
+  const view = ctx.getTransform?.();
   for (let i = 0; i < bays; i++) {
+    // 명패가 칸 밖으로 조금 돌출할 수 있어 좌우 한 도트 칸의 여유를 둔다.
+    if (outsideCanvas(ctx, x + i * bw - 320, 0, bw + 640, wallBottom, view)) continue;
     // 칸은 월드 위치 순서로 돌려 쓴다: 이웃한 칸이 같은 그림이 되지 않게 (통합 검수: 로비 문 4개 반복)
     const k = Math.round((x + i * bw) / 640);
     const im0 = image(place.split(':')[0], names[(k + (hash(place) % names.length)) % names.length]);
@@ -209,14 +250,10 @@ export function wallDecoSpans(place: string, x: number, w: number, flip: boolean
 /** 벽 명암 단계: 천장 쪽 두 단, 걸레받이 쪽 한 단을 어둡게 (부드러운 그라데이션 대신 도트처럼 끊어진 띠). */
 function wallLight(ctx: CanvasRenderingContext2D, x: number, w: number, bottom: number) {
   // 천장 쪽 그늘과 걸레받이 그늘: 띠 세 겹은 무늬처럼 보여서(불합격 4) 매끈한 그라데이션으로
-  const top = ctx.createLinearGradient(0, 0, 0, bottom * 0.32);
-  top.addColorStop(0, 'rgba(8,8,14,0.42)');
-  top.addColorStop(1, 'rgba(8,8,14,0)');
+  const top = verticalGradient(ctx, 0, bottom * 0.32, 'rgba(8,8,14,0.42)', 'rgba(8,8,14,0)');
   ctx.fillStyle = top;
   ctx.fillRect(x, 0, w, Math.round(bottom * 0.32));
-  const foot = ctx.createLinearGradient(0, bottom * 0.9, 0, bottom);
-  foot.addColorStop(0, 'rgba(8,8,14,0)');
-  foot.addColorStop(1, 'rgba(8,8,14,0.34)');
+  const foot = verticalGradient(ctx, bottom * 0.9, bottom, 'rgba(8,8,14,0)', 'rgba(8,8,14,0.34)');
   ctx.fillStyle = foot;
   ctx.fillRect(x, Math.round(bottom * 0.9), w, Math.round(bottom * 0.1) + 1);
 }
@@ -226,6 +263,7 @@ const OWN_GRID = new Set(['hq_pantry', 'hq_street', 'puzzle']);
 
 /** 바닥 띠(y0~y1)를 무늬로 깐다. 무늬는 월드 x에 붙고, 깊이는 모이는 줄과 뒤쪽 어둡게로 읽힌다. */
 export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, y0: number, y1: number): boolean {
+  if (outsideCanvas(ctx, x0, y0, x1 - x0, y1 - y0)) return true;
   place = place.split(':')[0];
   // 탕비실 바닥 그림은 도트화하면 투명 체커처럼 보인다 (독립 검수 fb99e85): 복도 바닥을 빌린다
   if (place === 'hq_pantry') place = 'hq_corridor';
@@ -237,7 +275,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
   let pat = patterns.get(key);
   if (pat === undefined) {
     pat = ctx.createPattern(tonedImage(`${place}/${name}`, im), 'repeat');
-    patterns.set(key, pat);
+    if (pat) patterns.set(key, pat);
   }
   if (!pat) return false;
   ctx.save();
@@ -275,9 +313,7 @@ export function drawFloor(ctx: CanvasRenderingContext2D, place: string, x0: numb
   ctx.stroke();
   ctx.restore();
   // 뒤쪽 어둡게 (깊이 읽힘)
-  const g = ctx.createLinearGradient(0, y0, 0, y1);
-  g.addColorStop(0, 'rgba(0,0,0,0.35)');
-  g.addColorStop(1, 'rgba(0,0,0,0)');
+  const g = verticalGradient(ctx, y0, y1, 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)');
   ctx.fillStyle = g;
   ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
   ctx.restore();
@@ -680,13 +716,6 @@ function objImage(place: string, n: number): HTMLImageElement | null {
   return image(place, `objects/${place}_objects_${n}`);
 }
 
-function drawObj(ctx: CanvasRenderingContext2D, place: string, n: number, x: number, y: number): number {
-  const im = objImage(place, n);
-  if (!im) return 0;
-  ctx.drawImage(im, Math.round(x - im.width), Math.round(y - im.height * 2), im.width * 2, im.height * 2);
-  return im.width * 2;
-}
-
 /** 소품이 쓸 물건 그림 [장소, 번호]. undefined = 그림 없음(부른 쪽 대역), null = 그리지 않음. */
 export function propArtRef(kind: string, label: string | undefined, sx: number, floorType?: string): ObjRef | undefined {
   let ref: ObjRef | undefined;
@@ -727,11 +756,13 @@ export function propArtSize(kind: string, label: string | undefined, floorType?:
 }
 
 /** 물건 그림 도트 크기: 그림이 읽히기 전(층 배치 때)에도 PNG 머리(IHDR)에서 바로 읽는다 */
-const sizeCache = new Map<string, { w: number; h: number } | null>();
+const sizeCache = new Map<string, { src: string; size: { w: number; h: number } | null }>();
 function objSize(place: string, n: number): { w: number; h: number } | null {
   const key = `${place}/${n}`;
-  if (sizeCache.has(key)) return sizeCache.get(key)!;
   const src = pack()[place]?.[`objects/${place}_objects_${n}`];
+  if (!src) return null;
+  const cached = sizeCache.get(key);
+  if (cached?.src === src) return cached.size;
   let out: { w: number; h: number } | null = null;
   const m = typeof src === 'string' ? /^data:image\/png;base64,(.{32})/.exec(src) : null;
   if (m && typeof atob === 'function') {
@@ -739,7 +770,7 @@ function objSize(place: string, n: number): { w: number; h: number } | null {
     const u = (i: number) => ((b.charCodeAt(i) << 24) | (b.charCodeAt(i + 1) << 16) | (b.charCodeAt(i + 2) << 8) | b.charCodeAt(i + 3)) >>> 0;
     out = { w: u(16), h: u(20) };
   }
-  sizeCache.set(key, out);
+  sizeCache.set(key, { src, size: out });
   return out;
 }
 
@@ -751,6 +782,7 @@ export function isStandBoard(kind: string, label: string | undefined, floorType?
 
 function drawCeilingHatch(ctx: CanvasRenderingContext2D, sx: number) {
   const x = Math.round(sx - 56);
+  if (outsideCanvas(ctx, x - 20, 0, 136, 84)) return;
   const R = (rx: number, ry: number, rw: number, rh: number, c: string) => {
     ctx.fillStyle = c;
     ctx.fillRect(x + rx, ry, rw, rh);
@@ -783,13 +815,17 @@ export function drawPipeBundle(ctx: CanvasRenderingContext2D, x0: number, x1: nu
   if (!im) return false;
   const w = im.width * 2,
     h = im.height * 2 - 12; // 줄끼리 조금 겹쳐 틈 없이
+  if (h <= 0) return false;
+  if (outsideCanvas(ctx, x0, 0, x1 - x0, bottom)) return true;
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   ctx.beginPath();
   ctx.rect(x0, 0, x1 - x0, bottom);
   ctx.clip();
+  const view = ctx.getTransform?.();
   for (let row = 0, y = bottom - im.height * 2; y > -h; row++, y -= h)
     for (let x = x0 - (row % 2 ? w / 2 : 0); x < x1; x += w) {
+      if (outsideCanvas(ctx, x, y, w, im.height * 2, view)) continue;
       if (row % 2) {
         ctx.save();
         ctx.translate(x + w, 0);
@@ -822,7 +858,12 @@ export function drawLowRow(ctx: CanvasRenderingContext2D, x0: number, x1: number
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   let x = Math.round(x0 + (x1 - x0 - tot) / 2);
+  const view = ctx.getTransform?.();
   for (const im of pick) {
+    if (outsideCanvas(ctx, x, fy - im.height * 2, im.width * 2, Math.max(im.height * 2, 4) + 4, view)) {
+      x += im.width * 2;
+      continue;
+    }
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x + 4, fy - 6, im.width * 2 - 8, 10);
     ctx.drawImage(im, x, fy - im.height * 2, im.width * 2, im.height * 2);
@@ -845,19 +886,24 @@ export function drawPropArt(ctx: CanvasRenderingContext2D, kind: string, label: 
   const ref = propArtRef(kind, label, sx, floorType);
   if (ref === undefined) return false;
   if (ref === null) return true;
+  const a = objImage(ref[0], ref[1]);
+  const b = ref.length === 4 ? objImage(ref[2], ref[3]) : null;
+  if (!a || (ref.length === 4 && !b)) return false;
+  const base = isHighSign(kind, label) ? WALL_HIGH : y;
+  const left = Math.round(sx - a.width * (b ? 2 : 1));
+  const height = Math.max(a.height, b?.height ?? 0) * 2;
+  const view = ctx.getTransform?.();
+  if (outsideCanvas(ctx, left, Math.round(base - height), (a.width + (b?.width ?? 0)) * 2, height, view)) return true;
   ctx.save();
   ctx.imageSmoothingEnabled = false;
-  let ok = true;
-  if (ref.length === 4) {
-    const a = objImage(ref[0], ref[1]),
-      b = objImage(ref[2], ref[3]);
-    if (a && b) {
-      ctx.drawImage(a, Math.round(sx - a.width * 2), Math.round(y - a.height * 2), a.width * 2, a.height * 2);
-      ctx.drawImage(b, Math.round(sx), Math.round(y - b.height * 2), b.width * 2, b.height * 2);
-    } else ok = false;
-  } else ok = drawObj(ctx, ref[0], ref[1], sx, isHighSign(kind, label) ? WALL_HIGH : y) > 0;
+  if (b) {
+    for (const [im, x] of [[a, left], [b, Math.round(sx)]] as const) {
+      const dy = Math.round(base - im.height * 2);
+      if (!outsideCanvas(ctx, x, dy, im.width * 2, im.height * 2, view)) ctx.drawImage(im, x, dy, im.width * 2, im.height * 2);
+    }
+  } else ctx.drawImage(a, left, Math.round(base - a.height * 2), a.width * 2, a.height * 2);
   ctx.restore();
-  return ok;
+  return true;
 }
 
 /**
@@ -880,12 +926,13 @@ export function floorPattern(ctx: CanvasRenderingContext2D, place: string): Canv
   let pat = patterns.get(key);
   if (pat === undefined) {
     pat = ctx.createPattern(im, 'repeat');
-    patterns.set(key, pat);
+    if (pat) patterns.set(key, pat);
   }
   return pat ?? null;
 }
 
 export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: number, x1: number, yTop: number, yBot: number, face = 0): boolean {
+  if (yBot > yTop && outsideCanvas(ctx, x0, yTop, x1 - x0, yBot - yTop)) return true;
   let p = place.split(':')[0];
   if (!Object.keys(pack()[p] ?? {}).some((n) => n.endsWith('_floor')) && FLOOR_ALT[p]) p = FLOOR_ALT[p];
   const name = Object.keys(pack()[p] ?? {}).find((n) => n.endsWith('_floor'));
@@ -895,7 +942,7 @@ export function drawLedge(ctx: CanvasRenderingContext2D, place: string, x0: numb
   let pat = patterns.get(key);
   if (pat === undefined) {
     pat = ctx.createPattern(tonedImage(`${p}/${name}`, im), 'repeat');
-    patterns.set(key, pat);
+    if (pat) patterns.set(key, pat);
   }
   if (!pat) return false;
   ctx.save();
