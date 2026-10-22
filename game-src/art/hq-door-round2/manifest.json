@@ -1,9 +1,9 @@
 {
   "schema": "goei-hq-door-delivery/1",
   "id": "glass-n-round2",
-  "status": "awaiting_pixellab_auth_no_door_asset",
+  "status": "delivered_for_visual_review",
   "user_visual_approval": false,
-  "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "source_commit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
   "canvas_target": [
     96,
     144
@@ -27,17 +27,177 @@
     "x": "door.x - 96",
     "y": 168
   },
-  "measurement_status": "Targets only; replace with measured values after generation",
-  "states": {},
-  "raw": null,
-  "job_id": null,
+  "measurement_status": "Measured and normalized without resampling; see preparation.json",
+  "states": {
+    "closed": {
+      "file": "states/closed.png",
+      "size": [
+        96,
+        144
+      ],
+      "anchor": [
+        48,
+        136
+      ],
+      "alpha_bbox": [
+        3,
+        5,
+        93,
+        138
+      ],
+      "sha256": "b29fdc0157085f53034a2a67311b356ba355779b311e31ad2f143c1adf829154",
+      "schema": "goei-hq-door-state/1",
+      "state": "closed",
+      "progress": 0,
+      "opening": [
+        8,
+        11,
+        80,
+        125
+      ],
+      "scale": 2,
+      "fixed_frame": "layers/frame.png",
+      "frame_sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+    },
+    "half": {
+      "file": "states/half.png",
+      "size": [
+        96,
+        144
+      ],
+      "anchor": [
+        48,
+        136
+      ],
+      "alpha_bbox": [
+        3,
+        5,
+        93,
+        138
+      ],
+      "sha256": "b6466006b95796d019b381d4eb14577ebb4d91cc051f266887d9b436b038a97c",
+      "schema": "goei-hq-door-state/1",
+      "state": "half",
+      "progress": 0.5,
+      "opening": [
+        8,
+        11,
+        80,
+        125
+      ],
+      "scale": 2,
+      "fixed_frame": "layers/frame.png",
+      "frame_sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+    },
+    "open": {
+      "file": "states/open.png",
+      "size": [
+        96,
+        144
+      ],
+      "anchor": [
+        48,
+        136
+      ],
+      "alpha_bbox": [
+        3,
+        5,
+        93,
+        138
+      ],
+      "sha256": "17d3794d33cd2205d0f81af1d9ebcc77f8117bfa87760e19bc731880ca03d2d5",
+      "schema": "goei-hq-door-state/1",
+      "state": "open",
+      "progress": 1,
+      "opening": [
+        8,
+        11,
+        80,
+        125
+      ],
+      "scale": 2,
+      "fixed_frame": "layers/frame.png",
+      "frame_sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+    }
+  },
+  "raw": "raw/pixellab-d0105c20.png",
+  "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
   "marker": "layers/entry-marker.manifest.json",
-  "missing": [
-    "PixelLab original",
-    "closed/open transparent PNGs",
-    "fixed frame and leaf layers",
-    "measured state manifests",
-    "billed usage",
-    "asset integration patch"
-  ]
+  "missing": [],
+  "canvas": [
+    96,
+    144
+  ],
+  "anchor": [
+    48,
+    136
+  ],
+  "opening": [
+    8,
+    11,
+    80,
+    125
+  ],
+  "generation_calls": 1,
+  "charged_generations": 1,
+  "integration_status": "handoff_patch_only_not_applied",
+  "layers": {
+    "frame": "layers/frame.png",
+    "aperture": "layers/aperture.png",
+    "left": {
+      "file": "layers/leaf-left.png",
+      "size": [
+        40,
+        125
+      ],
+      "closed_origin": [
+        8,
+        11
+      ],
+      "travel": [
+        -40,
+        0
+      ]
+    },
+    "right": {
+      "file": "layers/leaf-right.png",
+      "size": [
+        40,
+        125
+      ],
+      "closed_origin": [
+        48,
+        11
+      ],
+      "travel": [
+        40,
+        0
+      ]
+    }
+  },
+  "animation": {
+    "files": [
+      "frames/open-00.png",
+      "frames/open-01.png",
+      "frames/open-02.png",
+      "frames/open-03.png",
+      "frames/open-04.png",
+      "frames/open-05.png",
+      "frames/open-06.png",
+      "frames/open-07.png",
+      "frames/open-08.png"
+    ],
+    "progress": [
+      0.0,
+      0.125,
+      0.25,
+      0.375,
+      0.5,
+      0.625,
+      0.75,
+      0.875,
+      1.0
+    ],
+    "note": "Mechanical review samples, not newly generated frames; integration uses its existing open progress."
+  }
 }

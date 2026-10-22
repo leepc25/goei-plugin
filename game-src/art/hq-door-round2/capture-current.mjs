@@ -15,7 +15,7 @@ const server=createServer(async(req,res)=>{
   res.setHeader('Content-Type','text/html');res.end(await readFile(build));
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
 const errors=[];
 try {
   const page=await browser.newPage({viewport:{width:1280,height:720}});

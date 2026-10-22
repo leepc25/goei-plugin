@@ -1,0 +1,1 @@
+{"observed_at":"2026-10-22T10:36:52.679Z","result":{"content":[{"type":"text","text":"no active jobs, and none finished in the last 30 minutes\nnote: completed/failed rows are deleted 8 hours after they finish, so older work is gone from here either way"}],"isError":false}}

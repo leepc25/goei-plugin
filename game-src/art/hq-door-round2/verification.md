@@ -1,3 +1,9 @@
+# 최신 검수 결과 · 2026-10-22 실제 납품
+
+아래 이전 인증 대기 기록 대신 현재 결과는 `DELIVERY.md`와 `evidence/pixel-check.json`, `evidence/integration-check.json`, `review/browser-check.json`을 따른다. 원본1장/차감1회, 닫힘·절반·열림96×144, 고정 영역9단계 동일성, PC·모바일 모의검사 통과. 사용자 시각 승인·물리 모바일 기기 검수·최종 게임 반영은 미완료다.
+
+---
+
 # 검증 기록 · PixelLab 본부 출입구 round2
 
 ## 재개 검수 · 2026-10-22 (현재 상태)

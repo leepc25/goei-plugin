@@ -1,0 +1,30 @@
+{
+  "file": "states/half.png",
+  "size": [
+    96,
+    144
+  ],
+  "anchor": [
+    48,
+    136
+  ],
+  "alpha_bbox": [
+    3,
+    5,
+    93,
+    138
+  ],
+  "sha256": "b6466006b95796d019b381d4eb14577ebb4d91cc051f266887d9b436b038a97c",
+  "schema": "goei-hq-door-state/1",
+  "state": "half",
+  "progress": 0.5,
+  "opening": [
+    8,
+    11,
+    80,
+    125
+  ],
+  "scale": 2,
+  "fixed_frame": "layers/frame.png",
+  "frame_sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+}

@@ -13,6 +13,8 @@ main{max-width:1320px;margin:auto;padding:20px}h1{font-size:24px;margin:0 0 8px}
  <button id="original" aria-pressed="true">기존 화면</button>
  <button id="closed" aria-pressed="false">새 문 닫힘</button>
  <button id="open" aria-pressed="false">새 문 열림</button>
+ <button id="animate" aria-pressed="false">개폐 반복</button>
+ <label class="control">열림 <input id="progress" type="range" min="0" max="8" value="0" aria-label="문 열림 단계"></label>
  <label class="control"><input type="checkbox" id="marker" checked>출입구 표식</label>
  <label class="control"><input type="checkbox" id="guides">문턱·발 기준선</label>
 </div>
@@ -21,15 +23,19 @@ main{max-width:1320px;margin:auto;padding:20px}h1{font-size:24px;margin:0 0 8px}
 <small id="note"></small>
 </main><script>
 const DATA=/*PAYLOAD*/;
-const $=id=>document.getElementById(id);const images={};let state='original';
+const $=id=>document.getElementById(id);const images={};const frames=[];let state='closed',timer=null;
 async function init(){
   for(const [name,src] of Object.entries({original:DATA.original,background:DATA.background,marker:DATA.marker,...DATA.states})){
     images[name]=new Image();images[name].src=src;await images[name].decode();
   }
   const ready=!!images.closed&&!!images.open;
+  for(const src of DATA.frames||[]){const im=new Image();im.src=src;await im.decode();frames.push(im)}
   $('status').textContent=ready?'새 문 자산 합성 검수 · 최종 게임 반영 및 사용자 승인 전입니다.':'PixelLab 문 원본 대기 · 현재는 기존 문과 별도 표식 시안만 표시합니다. 새 문 제작 완료본이 아닙니다.';
   for(const name of ['closed','open'])$(name).disabled=!images[name];
-  for(const name of ['original','closed','open'])$(name).onclick=()=>{state=name;render()};
+  const stop=()=>{clearInterval(timer);timer=null;$('animate').setAttribute('aria-pressed','false')};
+  for(const name of ['original','closed','open'])$(name).onclick=()=>{stop();state=name;render()};
+  $('progress').oninput=()=>{stop();state='progress';render()};
+  $('animate').onclick=()=>{if(timer){stop();return}let t=0;state='progress';$('animate').setAttribute('aria-pressed','true');timer=setInterval(()=>{const k=t++%32;$('progress').value=k<8?k:k<16?8:k<24?24-k:0;render()},70)};
   $('marker').onchange=render;$('guides').onchange=render;
   $('note').textContent='화면 기준: '+DATA.scene.sourceCommit.slice(0,8)+' · 문턱 y=440 / 도착 발 y=486 · 표식 48×16 원본, 2배 표시. 캡처 속 캐릭터는 기존 화면의 비교 자료이며 신규 제작물이 아닙니다.';
   render();window.reviewReady=true;
@@ -40,8 +46,9 @@ function render(){
  if(state!=='original'){
    // Replace only the doorway area with the actual game background capture.
    c.drawImage(images.background,x-100,160,200,282,x-100,160,200,282);
-   const s=DATA.manifest.states[state],a=s.anchor||DATA.manifest.anchor_target;
-   c.drawImage(images[state],x-a[0]*2,440-a[1]*2,images[state].width*2,images[state].height*2);
+   const s=DATA.manifest.states[state==='progress'?'closed':state],a=s.anchor||DATA.manifest.anchor_target;
+   const im=state==='progress'?frames[Number($('progress').value)]:images[state];
+   c.drawImage(im,x-a[0]*2,440-a[1]*2,im.width*2,im.height*2);
  }
  if($('marker').checked)c.drawImage(images.marker,x-48,448,96,32);
  if($('guides').checked){
@@ -53,7 +60,7 @@ function render(){
  }
  for(const name of ['original','closed','open'])$(name).setAttribute('aria-pressed',String(state===name));
  const z=$('detail').getContext('2d');z.imageSmoothingEnabled=false;z.clearRect(0,0,480,720);z.drawImage(canvas,x-120,160,240,360,0,0,480,720);
- window.reviewState={state,marker:$('marker').checked,guides:$('guides').checked};
+ window.reviewState={state,progress:Number($('progress').value)/8,marker:$('marker').checked,guides:$('guides').checked};
 }
 init().catch(e=>{$('status').textContent='검수 그림을 열지 못했습니다: '+e.message;throw e});
 </script></html>

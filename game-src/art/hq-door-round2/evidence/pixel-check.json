@@ -1,0 +1,27 @@
+{
+  "size": [
+    96,
+    144
+  ],
+  "anchor": [
+    48,
+    136
+  ],
+  "opening": [
+    8,
+    11,
+    80,
+    125
+  ],
+  "frames_tested": 9,
+  "fixed_pixels_identical": true,
+  "open_aperture_uniform": true,
+  "outside_alpha_zero": true,
+  "frame_bbox": [
+    3,
+    5,
+    93,
+    138
+  ],
+  "user_visual_approval": false
+}

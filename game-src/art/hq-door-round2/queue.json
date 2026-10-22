@@ -1,20 +1,27 @@
 {
   "schema": "goei-hq-door-queue/1",
   "owner_branch": "codex/pixellab-doors-round2",
-  "owner_thread": "01a162c2-da6b-73f6-9edc-89aeacc190a7",
-  "updated_at": "2026-10-22T10:17:44.140643+00:00",
-  "state": "awaiting_auth_not_submitted",
+  "owner_thread": "01a1632c-ef37-7b13-b0b2-099b78b84713",
+  "updated_at": "2026-10-22T10:48:03.230030+00:00",
+  "state": "completed_asset_delivered_pending_integration",
   "reservation_id": "hq-glass-n-round2-01",
   "request": "glass-n-closed.request.json",
-  "request_sha256": "528f4a56c4f3625c5ffa2ee39bc6bb08efc45f27e7e5e259f7ce70e803c323c5",
+  "request_sha256": "22f6fec55c2dfb62fef2d6c494ef3c0568c470ca9de7256bf9a4f5f818ed9ff5",
   "tool": "create_image_pixen",
   "planned_calls": 1,
   "documented_generations_per_call": 1,
-  "job_id": null,
-  "actual_generation_calls": 0,
-  "actual_generation_charge": 0,
-  "account_balance": null,
-  "active_jobs": null,
+  "job_id": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+  "actual_generation_calls": 1,
+  "actual_generation_charge": 1,
+  "account_balance": {
+    "before": 14160.3,
+    "immediately_after_door": 14159.3,
+    "later_shared_account": 14158.3
+  },
+  "active_jobs": {
+    "at_initial_check": 0,
+    "at_door_completion": 0
+  },
   "coordination": {
     "lead_thread": "01a162c7-9305-728e-a2b4-35d0f479d097",
     "lead_branch": "codex/character-production-resume",
@@ -26,10 +33,13 @@
     "lead_planned_generations": 6,
     "lead_queue_observed": true,
     "message_delivered": true,
-    "acknowledged": false,
-    "note": "Reservation and costs posted on character lead delivery commit. No direct thread messaging tool or acknowledgement. Recheck remote queue and live jobs before submission; do not cancel or regenerate character jobs.",
-    "channel": "GitHub comment on character lead delivery commit",
-    "message_url": "https://github.com/leepc25/goei-plugin/commit/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4#commitcomment-206122314"
+    "acknowledged": true,
+    "note": "Character lead recorded completed door job, charge1, and no additional door reservation; final delivery SHA follows.",
+    "channel": "direct thread messaging",
+    "message_url": "https://github.com/leepc25/goei-plugin/commit/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4#commitcomment-206122314",
+    "lead_receipt_commit_short": "f4c613ef"
   },
-  "retry_policy": "No automatic resubmission. After uncertain response, recover job before any new generation."
+  "retry_policy": "No automatic resubmission. After uncertain response, recover job before any new generation.",
+  "asset_id": "4d996bf4-cba3-559f-8c23-de805a905fe8",
+  "additional_reserved_generations": 0
 }

@@ -1,0 +1,30 @@
+{
+  "file": "states/closed.png",
+  "size": [
+    96,
+    144
+  ],
+  "anchor": [
+    48,
+    136
+  ],
+  "alpha_bbox": [
+    3,
+    5,
+    93,
+    138
+  ],
+  "sha256": "b29fdc0157085f53034a2a67311b356ba355779b311e31ad2f143c1adf829154",
+  "schema": "goei-hq-door-state/1",
+  "state": "closed",
+  "progress": 0,
+  "opening": [
+    8,
+    11,
+    80,
+    125
+  ],
+  "scale": 2,
+  "fixed_frame": "layers/frame.png",
+  "frame_sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+}

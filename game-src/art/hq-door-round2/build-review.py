@@ -21,7 +21,7 @@ im.save(ROOT/'layers/entry-marker.png')
 def uri(path):
     return 'data:image/png;base64,'+base64.b64encode(path.read_bytes()).decode()
 
-scene = json.loads((ROOT/'review/scene.json').read_text())
+scene = json.loads((ROOT/'review/scene.json').read_text(encoding='utf-8'))
 marker = ROOT/'layers/entry-marker.png'
 marker_manifest = {
     'schema': 'goei-hq-door-layer/1', 'id': 'entry-marker', 'file': 'entry-marker.png',
@@ -32,10 +32,10 @@ marker_manifest = {
     'alpha_bbox': list(im.getbbox()), 'sha256': hashlib.sha256(marker.read_bytes()).hexdigest(),
     'paid_generation_calls': 0, 'user_visual_approval': False,
 }
-(ROOT/'layers/entry-marker.manifest.json').write_text(json.dumps(marker_manifest, ensure_ascii=False, indent=2)+'\n')
+(ROOT/'layers/entry-marker.manifest.json').write_text(json.dumps(marker_manifest, ensure_ascii=False, indent=2)+'\n',encoding='utf-8')
 manifest_path = ROOT/'manifest.json'
 if manifest_path.exists():
-    manifest = json.loads(manifest_path.read_text())
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
 else:
     manifest = {
         'schema': 'goei-hq-door-delivery/1', 'id': 'glass-n-round2',
@@ -55,8 +55,11 @@ states = {}
 for name, state in manifest['states'].items():
     states[name] = uri(ROOT/state['file'])
 payload = {'scene': scene, 'manifest': manifest, 'states': states,
+           'frames': [uri(ROOT/f) for f in manifest.get('animation',{}).get('files',[])],
            'original': uri(ROOT/'review/current-original.png'),
            'background': uri(ROOT/'review/current-background.png'), 'marker': uri(marker)}
-template = (ROOT/'review-template.html').read_text()
-(ROOT/'review/index.html').write_text(template.replace('/*PAYLOAD*/', json.dumps(payload,ensure_ascii=False)))
+manifest['source_commit']=scene['sourceCommit']
+manifest_path.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+template = (ROOT/'review-template.html').read_text(encoding='utf-8')
+(ROOT/'review/index.html').write_text(template.replace('/*PAYLOAD*/', json.dumps(payload,ensure_ascii=False)),encoding='utf-8')
 print('Built review/index.html; door states:', list(states), '; marker: 48x16 RGBA')

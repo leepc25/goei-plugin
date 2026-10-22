@@ -21,6 +21,6 @@
   "thresholdY": 440,
   "arrivalY": 486,
   "errors": [],
-  "sourceCommit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "sourceCommit": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
   "captureMethod": "Keyboard office → corridor; original game canvas + offscreen real drawBackground without f2.office only"
 }

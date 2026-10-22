@@ -1,0 +1,25 @@
+{
+  "session": "01a1632c-ef37-7b13-b0b2-099b78b84713",
+  "calls": {
+    "get_balance": 5,
+    "list_jobs": 1,
+    "list_images": 1,
+    "list_objects": 1,
+    "search_help": 1,
+    "create_image_pixen": 1,
+    "wait_for_jobs": 1,
+    "get_image": 1
+  },
+  "paid_generation_calls": 1,
+  "charged_generations": 1,
+  "new_generated_images": 1,
+  "locally_assembled_states": 3,
+  "local_animation_samples": 9,
+  "local_marker": 1,
+  "generation_retry_calls": 0,
+  "notes": [
+    "Image download is result retrieval, not generation.",
+    "Old auth-failure evidence retained; live-* and receipt supersede it.",
+    "Request file SHA includes checkout newline convention; semantic arguments are recorded in tool receipt."
+  ]
+}

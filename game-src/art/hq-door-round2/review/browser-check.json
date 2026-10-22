@@ -7,7 +7,11 @@
         "height": 800
       },
       "touch": false,
-      "doorStates": [],
+      "doorStates": [
+        "closed",
+        "half",
+        "open"
+      ],
       "overflow": false,
       "errors": [],
       "externalRequests": []
@@ -19,7 +23,11 @@
         "height": 390
       },
       "touch": true,
-      "doorStates": [],
+      "doorStates": [
+        "closed",
+        "half",
+        "open"
+      ],
       "overflow": false,
       "errors": [],
       "externalRequests": []
@@ -31,11 +39,15 @@
         "height": 844
       },
       "touch": true,
-      "doorStates": [],
+      "doorStates": [
+        "closed",
+        "half",
+        "open"
+      ],
       "overflow": false,
       "errors": [],
       "externalRequests": []
     }
   ],
-  "scope": "Review UI and existing scene + separate marker. Empty doorStates means no new door asset validated."
+  "scope": "Actual closed/open images, distinct rendered states, timed opening, separate marker, floor guides. Desktop and mobile viewport emulation; no physical mobile device used."
 }

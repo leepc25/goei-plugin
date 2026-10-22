@@ -1,0 +1,22 @@
+{
+  "matches": [
+    {
+      "state": "closed",
+      "drew": true,
+      "exact": true
+    },
+    {
+      "state": "half",
+      "drew": true,
+      "exact": true
+    },
+    {
+      "state": "open",
+      "drew": true,
+      "exact": true
+    }
+  ],
+  "disposedFallback": true,
+  "missingFallback": true,
+  "errors": []
+}
