@@ -1,0 +1,10 @@
+{
+  "observedRevision": "5",
+  "observationsCurrent": true,
+  "networkPolicyState": "enforced",
+  "secrets": [],
+  "runtimeVariables": [],
+  "outboundIdentities": [],
+  "userReportedConnectionLocation": "this-chat-cloud-environment",
+  "status": "configuration-update-applied-but-no-auth-binding-reported"
+}
