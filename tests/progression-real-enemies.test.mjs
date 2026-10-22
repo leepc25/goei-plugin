@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { build } from 'esbuild';
-const out=await build({stdin:{contents:`export * from './src/game/action/stage';export {World} from './src/game/action/engine/world';export {createEnemy,isThreat,signalEnemies} from './src/game/action/enemy';`,resolveDir:process.cwd()},bundle:true,format:'esm',write:false,loader:{'.css':'text'}});
+const out=await build({stdin:{contents:`export * from './src/game/action/stage';export {World} from './src/game/action/engine/world';export {bindEnemyInteractions} from './src/game/action/engine/enemyInteractions';export {createEnemy,isThreat,signalEnemies} from './src/game/action/enemy';`,resolveDir:process.cwd()},bundle:true,format:'esm',write:false,loader:{'.css':'text'}});
 const M=await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 const clips=JSON.parse(readFileSync('game-pack/jyaldi/frames.json','utf8')).clips;
 const idle={mx:0,my:0,run:false,evade:false,downDouble:false,held:new Set(),pressed:new Set(),released:new Set()};
@@ -90,8 +90,8 @@ function elderTableScene(){
  c.w.player.x=c.w.player.px=table.x;c.w.player.y=c.w.player.py=table.y;
  for(let i=0;i<3;i++)c.w.step(idle);
  assert.equal(c.w.bodies.filter(b=>b.kind==='elder_f'||b.kind==='elder_m').length,2);
- // engine/modules.ts의 현행 밥상 연결과 동일. 실제 E→신호→스테이지 상호작용 순서.
- c.w.interactHooks.push(prop=>{if(prop?.kind==='table'||prop?.kind==='meal')M.signalEnemies(c.w,{kind:'mealThanks',x:c.w.player.x,y:c.w.player.y})});
+ // 실제 엔진 어댑터. 스테이지가 확인한 전용 밥상 성공만 적 모듈에 전달한다.
+ M.bindEnemyInteractions(c.w);
  const events=[];c.w.on(e=>events.push(e));
  const useTable=()=>{c.w.player.x=c.w.player.px=table.x;c.w.player.y=c.w.player.py=table.y;c.w.player.phase='free';c.w.player.move=null;c.w.step({...idle,pressed:new Set(['interact'])})};
  return {...c,events,useTable};
@@ -113,4 +113,16 @@ test('405호 적대 후 실제 밥상 E: 규칙 통과·방 정리·안전 저�
  for(let i=0;i<60;i++){c.w.player.hp=c.w.player.hpMax;c.w.step(idle)}
  assert.equal(c.roomClear(),false);assert.equal(c.w.canCheckpoint(),false);
  assert.equal(c.events.filter(e=>e.type==='custom'&&e.name==='guardianCleared').length,0);
+});
+
+test('일반 식탁 모양을 조사해도 405호 규칙 성공으로 간주하지 않는다',()=>{
+ const c=elderTableScene();
+ // 같은 그림 종류를 쓰는 소품은 405호 전용 placed 데이터가 없다.
+ const table=c.w.props.find(p=>p.kind==='table');
+ c.w.props=[{...table,id:'ordinary-table'}];
+ c.w.player.phase='free';c.w.player.move=null;
+ c.w.step({...idle,pressed:new Set(['interact'])});
+ assert.ok(c.w.bodies.filter(b=>b.kind.startsWith('elder_')).every(b=>b.mem.mode==='table'));
+ assert.equal(c.roomClear(),false);
+ assert.equal(c.events.filter(e=>e.type==='custom'&&e.name==='guardianRule').length,0);
 });

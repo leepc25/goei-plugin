@@ -39,6 +39,8 @@ export class VideoPlayer {
   private raf = 0;
   private started = 0;
   private audioTime = 0;
+  private paused = false;
+  private resetClock: (() => void) | null = null;
   private detachClock: (() => void) | null = null;
   /** 재생 중인가 (불러오는 중 포함) */
   open = false;
@@ -70,7 +72,7 @@ export class VideoPlayer {
 
   /** base = 컷 폴더 주소(끝에 /), cuts = 컷 길이(초), ready = 프레임이 있다고 알려졌나(false면 불러 보지 않고 끝) */
   async play(base: string, cuts: number[], subs: VideoSub[], onDone: () => void, ready: Promise<boolean> = Promise.resolve(true), sound = false) {
-    this.finish();
+    this.cancel();
     const token = ++this.token;
     this.subs = subs;
     this.lens = cuts;
@@ -88,7 +90,8 @@ export class VideoPlayer {
     this.ctx.fillStyle = '#000';
     this.ctx.fillRect(0, 0, W, H);
     const active = () => token === this.token;
-    const first = (await ready) && active() ? await loadCut(base, 1, active) : null;
+    const available = await ready.catch(() => false);
+    const first = available && active() ? await loadCut(base, 1, active) : null;
     if (token !== this.token) return;
     if (!first) return this.finish();
     this.cuts[0] = first;
@@ -103,6 +106,7 @@ export class VideoPlayer {
     this.started = performance.now();
     let elapsed = 0, last = this.started, buffering = false;
     const resetClock = () => { last = performance.now(); };
+    this.resetClock = resetClock;
     document.addEventListener('visibilitychange', resetClock);
     this.detachClock = () => document.removeEventListener('visibilitychange', resetClock);
     const duration = this.lens.reduce((a, b) => a + b, 0);
@@ -112,7 +116,7 @@ export class VideoPlayer {
     const tick = () => {
       if (token !== this.token) return;
       const now = performance.now();
-      if (document.hidden || this.audio?.blocked) {
+      if (this.paused || document.hidden || this.audio?.blocked) {
         last = now;
         this.raf = requestAnimationFrame(tick);
         return;
@@ -185,6 +189,19 @@ export class VideoPlayer {
     if (performance.now() - this.started > 1000) this.finish();
   }
 
+  /** Menu policy also applies to silent clips, which have no VideoTrack. */
+  setPaused(paused: boolean) {
+    if (this.paused === paused) return;
+    this.paused = paused;
+    this.resetClock?.();
+  }
+
+  /** Replacement/disposal is not successful completion of the previous scene. */
+  cancel() {
+    this.done = null;
+    this.finish();
+  }
+
   /** 건너뛰기·끝·실패 모두 여기로 */
   finish() {
     if (!this.open) return;
@@ -193,6 +210,7 @@ export class VideoPlayer {
     cancelAnimationFrame(this.raf);
     this.detachClock?.();
     this.detachClock = null;
+    this.resetClock = null;
     this.audio?.dispose();
     this.audio = null;
     this.el.hidden = true;

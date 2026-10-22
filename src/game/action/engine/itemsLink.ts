@@ -180,6 +180,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
           const cls = WEAPONS[e.source]?.cls;
           const scale = cls === 'melee' ? p.progression.stats.power : cls === 'gun' ? p.progression.stats.aim : 1;
           const result = b.applyHit(itemHit({ ...e, damage: e.damage * scale }, p.x), w);
+          // 아이템도 실제 명중/아머 관통 때 기본 공격과 같은 콤보·게이지 경로를 쓴다.
+          // 무적/가드는 체력 변화와 무관하게 기본 전투와 동일하게 명중 보상을 주지 않는다.
+          if (result.kind === 'hit' || result.kind === 'armor') p.onConnect(w, !!result.killed);
           if (result.killed) {
             w.kills++;
             if (!(b instanceof Fighter)) w.emit({ type: 'enemyDie', kind: b.kind, x: b.x });
@@ -187,7 +190,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         }
         if (e.status === 'stun' && b.alive && b.hp > 0) {
           const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
-          if (b instanceof Enemy && b.inv <= 0 && ['idle', 'walk', 'attack', 'hurt', 'stunned', 'grabbing'].includes(b.state)) {
+          // TV 충돌/전격의 넘어뜨리기가 먼저 적용돼 air가 되어도 같은 전격의 기절은 유지한다.
+          const shockKnockdown = e.damage > 0 && e.knockdown && b instanceof Enemy && b.state === 'air';
+          if (b instanceof Enemy && b.inv <= 0 && (['idle', 'walk', 'attack', 'hurt', 'stunned', 'grabbing'].includes(b.state) || shockKnockdown)) {
             if (b.state === 'grabbing') b.releaseGrab(w);
             b.move = null; b.vx = b.vy = 0;
             b.set('stunned'); b.stunT = ticks;

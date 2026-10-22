@@ -261,7 +261,7 @@ export function explode(
   if (b.damage) {
     for (const t of targets)
       if (Math.hypot(t.x - x, (t.y - y) * 2) < b.radius)
-        ev.push({ t: 'hit', target: t.id, damage: b.damage, knockback: 180, knockdown, stun: b.type === 'shock' ? 1 : undefined, x: t.x, y: t.y, source });
+        ev.push({ t: 'hit', target: t.id, damage: b.damage, knockback: 180, knockdown, status: b.type === 'shock' ? 'stun' : undefined, stun: b.type === 'shock' ? 1 : undefined, x: t.x, y: t.y, source });
     // 폭발은 다른 물건도 부순다(연쇄)
     for (const e of field.ents.slice())
       if (e.type === 'prop' && Math.hypot(e.x - x, (e.y - y) * 2) < b.radius && field.ents.includes(e))

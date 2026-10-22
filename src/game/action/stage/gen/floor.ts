@@ -350,6 +350,11 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
   if (type === 'dark') spawns.push(hook('stalker', 'warmth', 0, MID, 0, false, { follows: true }));
   if (type === 'deep') for (let k = 0; k < (room ? 2 : 6); k++) spawns.push(hook('stalker', 'toucher', chunkBase[Math.min(chunkBase.length - 1, 1 + (k % Math.max(1, chunkBase.length - 1)))].x + 320, r() * LANE_DEPTH, 0, false, {}));
 
+  // 규칙 11: 벽 얼굴은 지나칠 수 있는 환경 위협이다. 전투 잠금·처치 목표에 넣지 않는다.
+  if (type === 'replica' && sub === 'red' && chunkBase.length) {
+    spawns.push(hook('stalker', 'wallface', chunkBase[0].x + 320, 0, 0, false, { rule: 'r11' }));
+  }
+
   // ── B-12 낙서 (원문 여담 반전: 수호자 확률 2배)
   const b12mark = depth > 4 && type !== 'deep' && (!room || room.arrival) && r() < 0.15;
   if (b12mark) placed.push(place('b12', chunkBase[0].x + 300, 0, 80, 'B-12', { rule: 'b12' }));
@@ -367,6 +372,11 @@ function buildFloor(ctx: GenContext, seed: number, fallback: 'A' | 'B' | null): 
       spawns.push(hook('guardian', g.kind, gx + 640, MID, 0, false, { label: g.label, weakness: g.weakness, survive: true }));
     } else {
       spawns.push(hook('guardian', g.kind, gx + 900, MID, 0, depth >= 9, { label: g.label, weakness: g.weakness, onFail: type === 'trial' }));
+      if (g.kind === 'family208') {
+        placed.push(place('sign', gx + 240, 0, 50, '생존자의 쪽지', { rule: 'r11' }));
+        placed.push(place('childkey', gx + 650, MID, 40, '아이 방 열쇠', { rule: 'r11' }));
+        placed.push(place('childdoor', gx + 1060, 0, 90, '잠긴 아이 방 문', { rule: 'r11' }));
+      }
       if (g.kind === 'elder') placed.push(place('table', gx + 520, 40, 160, '405호 밥상', { rule: 'r_meal', guardian: true }));
       if (g.kind === 'legs') for (let k = 0; k < 3; k++) placed.push(place('prop', gx + 200 + k * 300, 120, 60, '틈새 (밀어 막기)', { gap: k }));
       if (g.kind === 'guard' || g.kind === 'conductor') placed.push(place('prop', gx + 120, 0, 40, '순찰 경로 표시'));

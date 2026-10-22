@@ -3984,7 +3984,7 @@ function explode(field, run, b, x, y, source, targets, knockdown) {
   if (b.damage) {
     for (const t of targets)
       if (Math.hypot(t.x - x, (t.y - y) * 2) < b.radius)
-        ev.push({ t: "hit", target: t.id, damage: b.damage, knockback: 180, knockdown, stun: b.type === "shock" ? 1 : void 0, x: t.x, y: t.y, source });
+        ev.push({ t: "hit", target: t.id, damage: b.damage, knockback: 180, knockdown, status: b.type === "shock" ? "stun" : void 0, stun: b.type === "shock" ? 1 : void 0, x: t.x, y: t.y, source });
     for (const e of field.ents.slice())
       if (e.type === "prop" && Math.hypot(e.x - x, (e.y - y) * 2) < b.radius && field.ents.includes(e))
         ev.push(...damageProp(field, run, e, b.damage, targets));
@@ -9329,6 +9329,7 @@ function linkItems(w, run) {
           const cls = WEAPONS[e.source]?.cls;
           const scale = cls === "melee" ? p.progression.stats.power : cls === "gun" ? p.progression.stats.aim : 1;
           const result = b.applyHit(itemHit({ ...e, damage: e.damage * scale }, p.x), w);
+          if (result.kind === "hit" || result.kind === "armor") p.onConnect(w, !!result.killed);
           if (result.killed) {
             w.kills++;
             if (!(b instanceof Fighter)) w.emit({ type: "enemyDie", kind: b.kind, x: b.x });
@@ -9336,7 +9337,8 @@ function linkItems(w, run) {
         }
         if (e.status === "stun" && b.alive && b.hp > 0) {
           const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
-          if (b instanceof Enemy && b.inv <= 0 && ["idle", "walk", "attack", "hurt", "stunned", "grabbing"].includes(b.state)) {
+          const shockKnockdown = e.damage > 0 && e.knockdown && b instanceof Enemy && b.state === "air";
+          if (b instanceof Enemy && b.inv <= 0 && (["idle", "walk", "attack", "hurt", "stunned", "grabbing"].includes(b.state) || shockKnockdown)) {
             if (b.state === "grabbing") b.releaseGrab(w);
             b.move = null;
             b.vx = b.vy = 0;
@@ -17097,6 +17099,22 @@ function syncNavigationButton(canvas, navigation) {
   });
 }
 
+// src/game/action/engine/enemyInteractions.ts
+function bindEnemyInteractions(w) {
+  w.interactHooks.push((prop) => {
+    const at2 = { x: w.player.x, y: w.player.y };
+    signalEnemies(w, { kind: "greet", ...at2 });
+    signalEnemies(w, { kind: "door", ...at2 });
+    if (prop?.kind === "crevice") signalEnemies(w, { kind: "plug", x: prop.x });
+    if (prop?.kind === "bowl") signalEnemies(w, { kind: "bowl", x: prop.x, y: prop.y });
+  });
+  w.on((event) => {
+    if (event.type !== "custom" || event.name !== "guardianRule") return;
+    const kind = event.data?.kind;
+    if (kind === "mealThanks" || kind === "childDoor") signalEnemies(w, { kind });
+  });
+}
+
 // src/game/action/stage/data/floortypes.ts
 var FLOOR_TYPES = {
   lobby: {
@@ -17165,7 +17183,7 @@ var FLOOR_TYPES = {
     rules: ["r_greet", "r_quiet", "r_meal"],
     guardians: [
       { kind: "elder", label: "405호 노부부", weakness: "「잘 먹었습니다」로 전투 생략" },
-      { kind: "family208", label: "208호 가족", weakness: "붉은 것을 밟지 않으면 문이 열린다" },
+      { kind: "family208", label: "208호 가족", weakness: "벽 얼굴을 공격하지 말고 규칙을 알아내라. 아이 방 열쇠로 문을 열면 잠시 멈춘다" },
       { kind: "risenhouse", label: "일어난 집", weakness: "물건을 제자리에" }
     ],
     enemies: [{ kind: "resident", label: "사는 척하는 주민", price: 10 }],
@@ -17197,7 +17215,7 @@ var REPLICA_SUB_LABEL = { vacant: "빈집", pretending: "사는 척", red: "붉�
 var REPLICA_SUB_RULES = {
   vacant: ["r_things"],
   pretending: ["r_greet", "r_quiet", "r_meal"],
-  red: ["r_red", "r_quiet"]
+  red: ["r_red", "r_quiet", "r11"]
 };
 var REPLICA_SUB_GUARDIAN = { vacant: "risenhouse", pretending: "elder", red: "family208" };
 function depthLabel(depth) {
@@ -17233,6 +17251,7 @@ var RULES = [
   { id: "r_quiet", scope: "replica", texts: ["아파트: 복도에서 뛰지 마라."], breach: "주민이 깨어남" },
   { id: "r_meal", scope: "replica", texts: ["아파트: 밥상 앞에서는 「잘 먹었습니다」(E)."], breach: "주민이 깨어남" },
   { id: "r_things", scope: "replica", texts: ["빈집: 남의 물건에 손대지 마라."], breach: "집이 일어난다" },
+  { id: "r11", scope: "replica", texts: ["붉은 벽: 벽에 묻힌 사람 모양을 공격하지 마라."], breach: "바닥의 손 군집이 깨어남" },
   { id: "r_red", scope: "replica", texts: ["붉은 벽: 붉은 바닥을 밟지 마라."], breach: "바닥의 손" },
   { id: "l_clock", scope: "lobby", texts: ["로비: 거꾸로 가는 시계 앞에서는 걸어라."], breach: "해롭지 않아 보이는 것" },
   { id: "b12", scope: "common", texts: ["벽에 B-12가 적힌 층은 수호자가 두 배로 자주 나온다."], breach: "—" }
@@ -17630,6 +17649,9 @@ function buildFloor(ctx, seed, fallback) {
   }
   if (type === "dark") spawns.push(hook2("stalker", "warmth", 0, MID, 0, false, { follows: true }));
   if (type === "deep") for (let k = 0; k < (room2 ? 2 : 6); k++) spawns.push(hook2("stalker", "toucher", chunkBase[Math.min(chunkBase.length - 1, 1 + k % Math.max(1, chunkBase.length - 1))].x + 320, r() * LANE_DEPTH, 0, false, {}));
+  if (type === "replica" && sub === "red" && chunkBase.length) {
+    spawns.push(hook2("stalker", "wallface", chunkBase[0].x + 320, 0, 0, false, { rule: "r11" }));
+  }
   const b12mark = depth > 4 && type !== "deep" && (!room2 || room2.arrival) && r() < 0.15;
   if (b12mark) placed.push(place2("b12", chunkBase[0].x + 300, 0, 80, "B-12", { rule: "b12" }));
   let guardian = null;
@@ -17643,6 +17665,11 @@ function buildFloor(ctx, seed, fallback) {
       spawns.push(hook2("guardian", g2.kind, gx + 640, MID, 0, false, { label: g2.label, weakness: g2.weakness, survive: true }));
     } else {
       spawns.push(hook2("guardian", g2.kind, gx + 900, MID, 0, depth >= 9, { label: g2.label, weakness: g2.weakness, onFail: type === "trial" }));
+      if (g2.kind === "family208") {
+        placed.push(place2("sign", gx + 240, 0, 50, "생존자의 쪽지", { rule: "r11" }));
+        placed.push(place2("childkey", gx + 650, MID, 40, "아이 방 열쇠", { rule: "r11" }));
+        placed.push(place2("childdoor", gx + 1060, 0, 90, "잠긴 아이 방 문", { rule: "r11" }));
+      }
       if (g2.kind === "elder") placed.push(place2("table", gx + 520, 40, 160, "405호 밥상", { rule: "r_meal", guardian: true }));
       if (g2.kind === "legs") for (let k = 0; k < 3; k++) placed.push(place2("prop", gx + 200 + k * 300, 120, 60, "틈새 (밀어 막기)", { gap: k }));
       if (g2.kind === "guard" || g2.kind === "conductor") placed.push(place2("prop", gx + 120, 0, 40, "순찰 경로 표시"));
@@ -18520,10 +18547,10 @@ function narrowBack(t, terr = []) {
 var lockerWall = /* @__PURE__ */ new WeakMap();
 var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
 var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
-var METRO_ART = { upper: "chasedoor", sidedoor: "door", locked: "firegate", wdoor: "door", wup: "hq_stairs_up", wdown: "hq_stairs_down", reward: "pack" };
+var METRO_ART = { childdoor: "door", childkey: "key", upper: "chasedoor", sidedoor: "door", locked: "firegate", wdoor: "door", wup: "hq_stairs_up", wdown: "hq_stairs_down", reward: "pack" };
 var DEEP_ART = { wup: "rope", wdown: "fall" };
 function floorPlan(f, id, startX = 240) {
-  const props2 = f.placed.map((p) => ({
+  const props2 = f.placed.filter((p) => p.kind !== "childkey").map((p) => ({
     id: `p${p.id}`,
     kind: (f.type === "deep" ? DEEP_ART[p.kind] : void 0) ?? METRO_ART[p.kind] ?? p.kind,
     x: p.x,
@@ -18840,7 +18867,7 @@ function clearOfProps(props2, x, y) {
   return y;
 }
 function propH(kind) {
-  return { elevator: 200, panel: 90, mirror: 130, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 }[kind] ?? 80;
+  return { elevator: 200, panel: 90, mirror: 130, childdoor: 180, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 }[kind] ?? 80;
 }
 function segAt(segs, x) {
   return segs.find((s2) => x >= s2.x && x < s2.x + s2.w) ?? segs[segs.length - 1];
@@ -19540,6 +19567,10 @@ function createElevatorStage(store2, hooks = {}) {
       if (n.plan.type === "chase") r.chaseX = (startX ?? n.plan.startX) - 600;
     }
     if (startX !== void 0) n.plan.startX = startX;
+    if (!n.rt.wallFaceDefeated) {
+      for (const s2 of n.plan.stage.floor?.spawns ?? [])
+        if (s2.kind === "wallface" && s2.data.rule === "r11") n.rt.spawned.delete(s2.id);
+    }
     n.rt.prevX = n.rt.safeX = n.plan.startX;
     const cleared = n.cleared;
     n.plan.encounters = n.all.filter((e) => !cleared.has(e.triggerX));
@@ -19585,11 +19616,13 @@ function createElevatorStage(store2, hooks = {}) {
       api.world.say(`규칙: ${text2}${out.variants.includes(id) ? `
 ${RULE[id].variant.text}` : ""}`, 4);
     }
-    if (!already) {
+    if (!out.found.includes(id) && !out.sent.includes(id)) {
       out.found.push(id);
+      api.note("stage.found", [...out.found]);
+    }
+    if (!already) {
       api.world.emit({ type: "ruleFound", x, id });
       log(`규칙 발견 (미송신): ${text2}`);
-      api.note("stage.found", [...out.found]);
     }
   };
   const worlds = /* @__PURE__ */ new Map();
@@ -19670,7 +19703,9 @@ ${RULE[id].variant.text}` : ""}`, 4);
     o.where = "service";
     const cell = cellAt(z, t.col, t.row);
     const downX = cell.things.find((x) => x.kind === "down")?.x ?? 880;
-    const startX = t.side === "l" ? 120 : t.side === "r" ? ROOM_W - 120 : t.side === "u" ? 560 : t.side === "d" ? 720 : t.side === "down" ? Math.max(120, downX - 110) : 400;
+    const upX = cell.things.find((x) => x.kind === "ladder_up")?.x ?? 560;
+    const ladderDownX = cell.things.find((x) => x.kind === "ladder_down")?.x ?? 720;
+    const startX = t.side === "l" ? 120 : t.side === "r" ? ROOM_W - 120 : t.side === "u" ? upX : t.side === "d" ? ladderDownX : t.side === "down" ? Math.max(120, downX - 110) : 400;
     const sv = o.services[z.depth];
     const k = `${t.col},${t.row}`;
     if (sv && !sv.seen.includes(k)) sv.seen.push(k);
@@ -19730,6 +19765,18 @@ ${RULE[id].variant.text}` : ""}`, 4);
       api.world.shake(8, 4);
       log(`규칙 위반: ${why}`);
     }
+  };
+  const childRuleBroken = () => [...nodes.values()].some((n) => n.plan.stage.floor?.depth === out.depth && n.rt.wallFaceBroken);
+  const knowsChildRule = () => out.found.includes("r11") || currentKnown(meta).includes("r11");
+  const dropChildKey = (api) => {
+    const r = rt, f = r.plan.stage.floor;
+    if (!r.childFightStarted || r.childKeyDropped || r.guardianDefeated || !knowsChildRule() || childRuleBroken()) return;
+    const key2 = f?.placed.find((p) => p.kind === "childkey");
+    if (!key2) return;
+    r.childKeyDropped = true;
+    api.setProp(`p${key2.id}`, { kind: "key", x: key2.x, y: laneY(key2.lane), w: key2.w, h: 40, label: key2.label });
+    api.world.emit({ type: "custom", name: "childKeyDropped", data: { depth: f.depth } });
+    api.world.say("벽의 사람 모양을 건드리지 않았다. 아이 방 문 앞에 열쇠가 떨어졌다. (E)", 3);
   };
   const terrain = (api, terr) => {
     const r = rt;
@@ -19887,6 +19934,12 @@ ${RULE[id].variant.text}` : ""}`, 4);
       }
     }
     if (f.type === "replica") {
+      for (const s2 of f.spawns.filter((s3) => s3.kind === "wallface" && s3.data.rule === "r11"))
+        if (!r.wallFaceDefeated && !r.spawned.has(s2.id) && Math.abs(s2.x - p.x) < 700) {
+          r.spawned.add(s2.id);
+          api.spawn({ kind: s2.kind, x: s2.x, y: laneY(s2.lane) });
+        }
+      dropChildKey(api);
       const nogreet = out.flags.includes("replica_nogreet");
       for (const s2 of f.spawns.filter((s3) => s3.role === "resident")) {
         const id = `h${s2.id}`;
@@ -20032,6 +20085,10 @@ ${RULE[id].variant.text}` : ""}`, 4);
       for (const [k, n] of s2.nodes) {
         n.rt = revive(n.rt);
         n.plan = n.rt.plan;
+        if (!n.rt.wallFaceDefeated) {
+          for (const sp of n.plan.stage.floor?.spawns ?? [])
+            if (sp.kind === "wallface" && sp.data.rule === "r11") n.rt.spawned.delete(sp.id);
+        }
         const guardian = n.plan.stage.floor?.spawns.find((g2) => g2.role === "guardian");
         if (guardian && !n.rt.guardianSkip && !n.rt.guardianDefeated) {
           if (guardian.kind === "elder") n.rt.guardianSpawned = false;
@@ -20170,7 +20227,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
           break;
         case "run:end":
           if (e.how === "return") sendFound(meta, out);
-          api.note("depth", out.depth);
+          api.note("depth", Math.max(out.depth, ...out.visited.map((v) => v.depth)));
           api.note("found", [...out.found]);
           api.note("sent", [...out.sent]);
           api.note("rescued", [...out.rescued]);
@@ -20202,9 +20259,17 @@ ${RULE[id].variant.text}` : ""}`, 4);
             save2();
           }
           break;
-        case "enemyDie":
+        case "bossRoar":
+          if (e.kind === "family208" && f?.guardian === "family208") rt.childFightStarted = true;
+          break;
+        case "enemyDie": {
+          if (e.kind === "wallface" && f?.type === "replica" && f.sub === "red") rt.wallFaceDefeated = true;
           rt.kills++;
-          if (e.kind === rt.plan.stage.floor?.spawns.find((s2) => s2.role === "guardian")?.kind) rt.guardianDefeated = true;
+          const guardian = f?.spawns.find((s2) => s2.role === "guardian");
+          if (guardian && !["elder", "family208"].includes(guardian.kind) && enemyKind(e.kind) === enemyKind(guardian.kind)) {
+            rt.guardianDefeated = true;
+            offerGuardianUpgrade(api);
+          }
           if (f?.spawns.some((s2) => s2.role === "guardian" && ["elder", "family208"].includes(s2.kind)) && ["elder_f", "elder_m", "family_f", "family_m"].includes(e.kind)) {
             rt.guardianKills = [.../* @__PURE__ */ new Set([...rt.guardianKills ?? [], e.kind])];
             const kind = f.spawns.find((s2) => s2.role === "guardian").kind;
@@ -20216,11 +20281,17 @@ ${RULE[id].variant.text}` : ""}`, 4);
           }
           if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
           break;
+        }
         case "custom": {
           const d3 = e.data;
+          if (e.name === "ruleBroken" && d3?.rule === "r11" && f?.type === "replica" && f.sub === "red") {
+            rt.wallFaceBroken = true;
+            foundRule(api, "r11", api.world.player.x);
+          }
           if (e.name === "guardianCleared" && d3?.kind && f?.spawns.some((s2) => s2.role === "guardian" && s2.kind === d3.kind)) {
             if (d3.how === "rule" || d3.how === "endure") rt.guardianSkip = true;
             if (d3.kind === "elder" && d3.how === "kill") api.note("stage.elderDefeated", true);
+            if (d3.how === "kill" && rt.guardianDefeated) offerGuardianUpgrade(api);
           }
           break;
         }
@@ -20236,6 +20307,23 @@ ${RULE[id].variant.text}` : ""}`, 4);
       const r = rt;
       const p = api.world.player;
       const pl = r.plan.stage.where === "floor" ? placedOf(prop) : void 0;
+      if (pl?.kind === "childkey") {
+        if (!r.childKeyDropped || r.childKeyTaken || !r.plan.props?.some((q) => q.id === prop.id)) return;
+        if (childRuleBroken()) return void api.world.say("벽의 사람 모양을 공격했다. 이 열쇠는 돌아가지 않는다.", 2.5);
+        r.childKeyTaken = true;
+        api.setProp(prop.id, null);
+        api.world.emit({ type: "pickup", x: p.x, id: "childkey" });
+        return void api.world.say("아이 방 열쇠를 주웠다. 208호 안의 잠긴 문을 열 수 있다.", 2.5);
+      }
+      if (pl?.kind === "childdoor") {
+        if (r.opened.has(prop.id)) return void api.world.say("이미 열린 아이 방 문이다.", 1.5);
+        if (!knowsChildRule() || childRuleBroken() || !r.childKeyTaken) return void api.world.say("잠긴 아이 방 문. 벽의 사람 모양을 건드리지 말라는 규칙과 전용 열쇠가 필요하다.", 3);
+        r.opened.add(prop.id);
+        api.setProp(prop.id, { label: "열린 아이 방 문" });
+        api.world.emit({ type: "door", x: prop.x, id: "childdoor" });
+        api.world.emit({ type: "custom", name: "guardianRule", data: { kind: "childDoor" } });
+        return void api.world.say("문을 열었다. 두 사람이 그쪽을 보며 잠시 멈춘다.", 2.5);
+      }
       const ch = r.choices.get(prop.id);
       if (ch) return resolveChoice(api, prop, ch);
       const mk = pl && ["upper", "sidedoor", "locked", "wdoor", "wup", "wdown", "reward", "key"].includes(pl.kind) ? pl.kind : ["crack", "vent", "key"].includes(prop.kind) || r.plan.stage.where === "side" && prop.id.startsWith("x") ? prop.kind : null;
@@ -20375,6 +20463,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
           r.mealOk.add(prop.id);
           foundRule(api, "r_meal", p.x);
           api.world.say("「잘 먹었습니다.」", 2);
+          if (pl?.data.guardian) api.world.emit({ type: "custom", name: "guardianRule", data: { kind: "mealThanks" } });
           break;
         case "item":
         case "pack": {
@@ -20792,7 +20881,7 @@ ${RULE[id].variant.text}` : ""}`, 4);
       if (enc) {
         node.cleared.add(enc.triggerX);
         checkFloorClear(api);
-        if (enc.waves.some((w) => w.some((s2) => s2.boss))) offerUpgrade(api, "수호자를 쓰러뜨렸다");
+        if (enc.waves.some((w) => w.some((s2) => s2.boss))) offerGuardianUpgrade(api);
         else if (++o.fightsWon % 3 === 0) offerUpgrade(api, `싸움 ${o.fightsWon}판째`);
       }
     }
@@ -21036,6 +21125,11 @@ ${RULE[id].variant.text}` : ""}`, 4);
         break;
       }
     }
+  };
+  const offerGuardianUpgrade = (api) => {
+    if (!rt.guardianDefeated || rt.guardianRewarded) return;
+    rt.guardianRewarded = true;
+    offerUpgrade(api, "수호자를 쓰러뜨렸다");
   };
   const offerUpgrade = (api, why) => {
     const o = out;
@@ -23472,6 +23566,8 @@ var VideoPlayer = class {
   raf = 0;
   started = 0;
   audioTime = 0;
+  paused = false;
+  resetClock = null;
   detachClock = null;
   /** 재생 중인가 (불러오는 중 포함) */
   open = false;
@@ -23500,7 +23596,7 @@ var VideoPlayer = class {
   }
   /** base = 컷 폴더 주소(끝에 /), cuts = 컷 길이(초), ready = 프레임이 있다고 알려졌나(false면 불러 보지 않고 끝) */
   async play(base2, cuts, subs, onDone, ready = Promise.resolve(true), sound = false) {
-    this.finish();
+    this.cancel();
     const token = ++this.token;
     this.subs = subs;
     this.lens = cuts;
@@ -23518,7 +23614,8 @@ var VideoPlayer = class {
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(0, 0, W4, H5);
     const active = () => token === this.token;
-    const first = await ready && active() ? await loadCut(base2, 1, active) : null;
+    const available = await ready.catch(() => false);
+    const first = available && active() ? await loadCut(base2, 1, active) : null;
     if (token !== this.token) return;
     if (!first) return this.finish();
     this.cuts[0] = first;
@@ -23534,6 +23631,7 @@ var VideoPlayer = class {
     const resetClock = () => {
       last = performance.now();
     };
+    this.resetClock = resetClock;
     document.addEventListener("visibilitychange", resetClock);
     this.detachClock = () => document.removeEventListener("visibilitychange", resetClock);
     const duration = this.lens.reduce((a, b) => a + b, 0);
@@ -23543,7 +23641,7 @@ var VideoPlayer = class {
     const tick = () => {
       if (token !== this.token) return;
       const now = performance.now();
-      if (document.hidden || this.audio?.blocked) {
+      if (this.paused || document.hidden || this.audio?.blocked) {
         last = now;
         this.raf = requestAnimationFrame(tick);
         return;
@@ -23610,6 +23708,17 @@ var VideoPlayer = class {
   skipSoft() {
     if (performance.now() - this.started > 1e3) this.finish();
   }
+  /** Menu policy also applies to silent clips, which have no VideoTrack. */
+  setPaused(paused) {
+    if (this.paused === paused) return;
+    this.paused = paused;
+    this.resetClock?.();
+  }
+  /** Replacement/disposal is not successful completion of the previous scene. */
+  cancel() {
+    this.done = null;
+    this.finish();
+  }
   /** 건너뛰기·끝·실패 모두 여기로 */
   finish() {
     if (!this.open) return;
@@ -23618,6 +23727,7 @@ var VideoPlayer = class {
     cancelAnimationFrame(this.raf);
     this.detachClock?.();
     this.detachClock = null;
+    this.resetClock = null;
     this.audio?.dispose();
     this.audio = null;
     this.el.hidden = true;
@@ -24367,6 +24477,7 @@ function mountStory(root, host, opts = {}) {
   let talkNpc = null;
   let doneCb;
   let blocking = false;
+  let disposed = false;
   const agent = () => host.getAgent();
   const syncAgent = () => {
     const a = agent();
@@ -24491,6 +24602,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     }
   };
   const cutscene = (id, onDone) => {
+    if (disposed) return;
     if (opts.cutscenes !== "script") {
       const v = VIDEOS[id];
       flags[`seen.cs.${id}`] = 1;
@@ -24505,6 +24617,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
         onDone?.();
         return;
       }
+      video.setPaused(!!host.paused?.());
       void video.play(
         base2,
         v.cuts,
@@ -24628,6 +24741,18 @@ ${who}: ${text2.replace(/\n/g, " ")}
     }
   };
   root.addEventListener("keydown", keys);
+  const cancel = () => {
+    doneCb = sceneDone = talkDone = void 0;
+    scene = null;
+    talkNpc = null;
+    runner.current = { kind: "end" };
+    video.cancel();
+    ui.close();
+    ui.setSkippable(false);
+    ui.fade("clear", 0);
+    panel.close();
+    refresh();
+  };
   return {
     flags,
     library: lib,
@@ -24639,11 +24764,13 @@ ${who}: ${text2.replace(/\n/g, " ")}
     advance,
     choose,
     skip: () => video.open ? video.finish() : scene?.skip(),
+    cancel,
     isBlocking: () => blocking,
     isVideoPlaying: () => video.open,
     update(dt) {
       now += dt;
       const p = !!host.paused?.();
+      video.setPaused(p);
       if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
       ui.update(dt);
       if (scene) {
@@ -24660,8 +24787,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
       }
     },
     dispose() {
+      if (disposed) return;
+      disposed = true;
       root.removeEventListener("keydown", keys);
-      video.finish();
+      cancel();
       video.el.remove();
       ui.dispose();
       panel.el.remove();
@@ -28314,6 +28443,8 @@ var SessionStore = class {
       if (cached && cached.revision > remote.revision) this.persist();
     }).catch(() => {
       this.error = "저장 칸을 읽지 못했습니다. 이 기기의 복구 기록을 사용합니다.";
+    }).then(() => {
+      this.loaded = true;
     });
     this.hqSaves = {
       list: () => saves.list(),
@@ -28322,7 +28453,7 @@ var SessionStore = class {
         return n === slot ? this.value.hq : parse(await saves.read(n)).hq;
       },
       write: async (n, hq2, info) => {
-        await this.ready;
+        if (!this.loaded) await this.ready;
         if (n !== slot) {
           let oldRevision = 0;
           try {
@@ -28342,6 +28473,9 @@ var SessionStore = class {
           return saves.write(n, text2, { ...info, schema: "goei-session/1" });
         }
         this.value.hq = hq2;
+        const completed = parseSave(hq2);
+        const run = this.value.checkpoint?.run;
+        if (!completed?.active && completed?.last && completed.last.runId === (run?.launch?.runId ?? run?.runId)) this.value.checkpoint = null;
         this.persist();
         await this.flush();
       },
@@ -28368,6 +28502,7 @@ var SessionStore = class {
   }
   value = empty();
   queue = Promise.resolve();
+  loaded = false;
   ready;
   error = null;
   hqSaves;
@@ -28814,6 +28949,16 @@ function engineModules(box3, bridge) {
   document.addEventListener("visibilitychange", saveOnHide);
   window.addEventListener("keydown", hqKeys, true);
   let openingT = null;
+  const cancelStoryForScene = () => {
+    if (openingT) clearTimeout(openingT);
+    openingT = null;
+    story.cancel();
+    openingOn = false;
+    const menuEl = shell.stage.root.querySelector(".gs-ui");
+    if (menuEl) menuEl.style.visibility = "";
+    storyRoot.style.zIndex = "15";
+    storyRoot.style.visibility = shell.paused ? "hidden" : "";
+  };
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
@@ -28873,6 +29018,9 @@ function engineModules(box3, bridge) {
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
     openTitle: () => {
+      cancelStoryForScene();
+      world = null;
+      mapOpen = false;
       shell.openTitle();
       armOpening();
     },
@@ -28923,6 +29071,7 @@ function engineModules(box3, bridge) {
       if (world) world.paused = p;
     },
     onWorld: (w, run) => {
+      cancelStoryForScene();
       world = w;
       runAgent = run.agent;
       if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
@@ -28946,15 +29095,7 @@ function engineModules(box3, bridge) {
         }
       });
       w.threat = (b) => DEF_BY_KIND[b.kind] ? isThreat(b) : true;
-      w.interactHooks.push((prop) => {
-        const p = w.player;
-        const at2 = { x: p.x, y: p.y };
-        signalEnemies(w, { kind: "greet", ...at2 });
-        signalEnemies(w, { kind: "door", ...at2 });
-        if (prop?.kind === "crevice") signalEnemies(w, { kind: "plug", x: prop.x });
-        if (prop?.kind === "bowl") signalEnemies(w, { kind: "bowl", x: prop.x, y: prop.y });
-        if (prop?.kind === "table" || prop?.kind === "meal") signalEnemies(w, { kind: "mealThanks", ...at2 });
-      });
+      bindEnemyInteractions(w);
       w.on((e) => {
         if (e.type !== "custom") return;
         const d3 = e.data ?? {};

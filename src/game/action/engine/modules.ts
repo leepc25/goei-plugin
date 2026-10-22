@@ -12,7 +12,8 @@ import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
-import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
+import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
+import { bindEnemyInteractions } from './enemyInteractions';
 import { createElevatorStage } from '../stage';
 import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
@@ -466,6 +467,16 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   window.addEventListener('keydown', hqKeys, true);
   // 오락실 오프닝: 제목 화면에서 20초 가만히 있으면 opening 영상, 끝나면 다시 기다린다. 아무 입력이나 대기 시간을 처음부터
   let openingT: ReturnType<typeof setTimeout> | null = null;
+  const cancelStoryForScene = () => {
+    if (openingT) clearTimeout(openingT);
+    openingT = null;
+    story.cancel();
+    openingOn = false;
+    const menuEl = shell.stage.root.querySelector<HTMLElement>('.gs-ui');
+    if (menuEl) menuEl.style.visibility = '';
+    storyRoot.style.zIndex = '15';
+    storyRoot.style.visibility = shell.paused ? 'hidden' : '';
+  };
   const armOpening = () => {
     if (openingT) clearTimeout(openingT);
     openingT = null;
@@ -524,6 +535,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
     openTitle: () => {
+      cancelStoryForScene();
+      world = null; // 지난 본부 영상 예약도 다음 화면을 가리지 않게 한다.
+      mapOpen = false;
       shell.openTitle();
       armOpening();
     },
@@ -576,6 +590,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (world) world.paused = p;
     },
     onWorld: (w, run) => {
+      cancelStoryForScene();
       world = w;
       runAgent = run.agent as AgentId;
       // 첫 출동: 도트 영상 first_entry, 끝나면 로프 안내 자막 한 줄 (영상을 못 틀면 자막만)
@@ -603,15 +618,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         }
       });
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
-      w.interactHooks.push((prop) => {
-        const p = w.player;
-        const at = { x: p.x, y: p.y };
-        signalEnemies(w as never, { kind: 'greet', ...at } as never);
-        signalEnemies(w as never, { kind: 'door', ...at } as never);
-        if (prop?.kind === 'crevice') signalEnemies(w as never, { kind: 'plug', x: prop.x } as never);
-        if (prop?.kind === 'bowl') signalEnemies(w as never, { kind: 'bowl', x: prop.x, y: prop.y } as never);
-        if (prop?.kind === 'table' || prop?.kind === 'meal') signalEnemies(w as never, { kind: 'mealThanks', ...at } as never);
-      });
+      bindEnemyInteractions(w);
       w.on((e) => {
         if (e.type !== 'custom') return;
         const d = (e.data ?? {}) as { dmg?: number; text?: string };

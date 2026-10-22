@@ -26,6 +26,7 @@ const parse = (raw: string | null): Session => {
 export class SessionStore {
   private value = empty();
   private queue: Promise<void> = Promise.resolve();
+  private loaded = false;
   readonly ready: Promise<void>;
   error: string | null = null;
   readonly hqSaves: SaveSlots;
@@ -37,12 +38,12 @@ export class SessionStore {
       const remote = parse(raw);
       if (!cached || remote.revision > cached.revision) this.value = remote;
       if (cached && cached.revision > remote.revision) this.persist();
-    }).catch(() => { this.error = '저장 칸을 읽지 못했습니다. 이 기기의 복구 기록을 사용합니다.'; });
+    }).catch(() => { this.error = '저장 칸을 읽지 못했습니다. 이 기기의 복구 기록을 사용합니다.'; }).then(() => { this.loaded = true; });
     this.hqSaves = {
       list: () => saves.list(),
       read: async n => { await this.ready; return n === slot ? this.value.hq : parse(await saves.read(n)).hq; },
       write: async (n, hq, info) => {
-        await this.ready;
+        if (!this.loaded) await this.ready;
         if (n !== slot) {
           let oldRevision = 0;
           try { oldRevision = parse(await saves.read(n)).revision; } catch { /* 명시한 슬롯 덮어쓰기는 손상된 이전 기록에도 가능 */ }
@@ -53,6 +54,11 @@ export class SessionStore {
           return saves.write(n, text, { ...info, schema: 'goei-session/1' });
         }
         this.value.hq = hq;
+        // Game.endRun은 HQ 정산 직후 체크포인트 제거를 호출한다. 이 둘 사이에도
+        // 저널이 복구 가능하도록, 완료한 출동의 HQ와 체크포인트를 한 봉투로 쓴다.
+        const completed = parseSave(hq);
+        const run = this.value.checkpoint?.run as { runId?: string; launch?: { runId?: string } } | undefined;
+        if (!completed?.active && completed?.last && completed.last.runId === (run?.launch?.runId ?? run?.runId)) this.value.checkpoint = null;
         this.persist();
         await this.flush();
       },

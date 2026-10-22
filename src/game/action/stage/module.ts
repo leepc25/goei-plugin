@@ -119,7 +119,15 @@ interface Runtime {
   guardianSpawned: boolean;
   guardianSkip: boolean;
   guardianDefeated: boolean;
+  /** 수호자 처치 강화 선택은 이벤트 재전달·재방문에도 한 번만. */
+  guardianRewarded?: boolean;
   guardianKills?: string[];
+  /** 규칙 11: 이 방에서 얼굴을 공격한 기록. 층의 모든 방 기록을 함께 검사한다. */
+  wallFaceBroken?: boolean;
+  wallFaceDefeated?: boolean;
+  childFightStarted?: boolean;
+  childKeyDropped?: boolean;
+  childKeyTaken?: boolean;
   traversed: boolean;
   penaltyKind: string | null;
   predator: boolean;
@@ -230,6 +238,9 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       if (n.plan.type === 'chase') r.chaseX = (startX ?? n.plan.startX) - 600;
     }
     if (startX !== undefined) n.plan.startX = startX;
+    // 몸은 방 이동/저장에 포함되지 않는다. 살아서 지나친 환경 얼굴만 다시 배치한다.
+    if (!n.rt.wallFaceDefeated) for (const s of n.plan.stage.floor?.spawns ?? [])
+      if (s.kind === 'wallface' && s.data.rule === 'r11') n.rt.spawned.delete(s.id);
     n.rt.prevX = n.rt.safeX = n.plan.startX;
     const cleared = n.cleared;
     n.plan.encounters = n.all.filter((e) => !cleared.has(e.triggerX));
@@ -279,11 +290,14 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       ruleSaid.set(id, now);
       api.world.say(`규칙: ${text}${out.variants.includes(id) ? `\n${RULE[id].variant!.text}` : ''}`, 4);
     }
-    if (!already) {
+    // 영구 지식과 이번 출동의 확인 실적은 별개다. 송신 뒤 재독도 중복 집계하지 않는다.
+    if (!out.found.includes(id) && !out.sent.includes(id)) {
       out.found.push(id);
+      api.note('stage.found', [...out.found]);
+    }
+    if (!already) {
       api.world.emit({ type: 'ruleFound', x, id });
       log(`규칙 발견 (미송신): ${text}`);
-      api.note('stage.found', [...out.found]);
     }
   };
 
@@ -371,7 +385,10 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     o.where = 'service';
     const cell = cellAt(z, t.col, t.row);
     const downX = cell.things.find((x) => x.kind === 'down')?.x ?? 880;
-    const startX = t.side === 'l' ? 120 : t.side === 'r' ? ROOM_W - 120 : t.side === 'u' ? 560 : t.side === 'd' ? 720 : t.side === 'down' ? Math.max(120, downX - 110) : 400;
+    // Terrain clearance can relocate ladders; arrive at the generated counterpart.
+    const upX = cell.things.find((x) => x.kind === 'ladder_up')?.x ?? 560;
+    const ladderDownX = cell.things.find((x) => x.kind === 'ladder_down')?.x ?? 720;
+    const startX = t.side === 'l' ? 120 : t.side === 'r' ? ROOM_W - 120 : t.side === 'u' ? upX : t.side === 'd' ? ladderDownX : t.side === 'down' ? Math.max(120, downX - 110) : 400;
     const sv = o.services[z.depth];
     const k = `${t.col},${t.row}`;
     if (sv && !sv.seen.includes(k)) sv.seen.push(k);
@@ -438,6 +455,19 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       api.world.shake(8, 4);
       log(`규칙 위반: ${why}`);
     }
+  };
+
+  const childRuleBroken = () => [...nodes.values()].some(n => n.plan.stage.floor?.depth === out!.depth && n.rt.wallFaceBroken);
+  const knowsChildRule = () => out!.found.includes('r11') || currentKnown(meta).includes('r11');
+  const dropChildKey = (api: StageApi) => {
+    const r = rt!, f = r.plan.stage.floor;
+    if (!r.childFightStarted || r.childKeyDropped || r.guardianDefeated || !knowsChildRule() || childRuleBroken()) return;
+    const key = f?.placed.find(p => p.kind === 'childkey');
+    if (!key) return;
+    r.childKeyDropped = true;
+    api.setProp(`p${key.id}`, { kind: 'key', x: key.x, y: laneY(key.lane), w: key.w, h: 40, label: key.label });
+    api.world.emit({ type: 'custom', name: 'childKeyDropped', data: { depth: f!.depth } });
+    api.world.say('벽의 사람 모양을 건드리지 않았다. 아이 방 문 앞에 열쇠가 떨어졌다. (E)', 3);
   };
 
   // ── 지형: 구덩이·단·낮은 천장·좁은 길·붉은 바닥·유리 (층 tick이 맡는다, 엔진은 movePlayer만)
@@ -617,6 +647,12 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
     }
     // 재현: 인사·뛰지 않기·밥상. 빈집은 남의 물건, 붉은 벽은 붉은 바닥(지형).
     if (f.type === 'replica') {
+      for (const s of f.spawns.filter(s => s.kind === 'wallface' && s.data.rule === 'r11'))
+        if (!r.wallFaceDefeated && !r.spawned.has(s.id) && Math.abs(s.x - p.x) < 700) {
+          r.spawned.add(s.id);
+          api.spawn({ kind: s.kind, x: s.x, y: laneY(s.lane) });
+        }
+      dropChildKey(api);
       const nogreet = out!.flags.includes('replica_nogreet');
       for (const s of f.spawns.filter((s) => s.role === 'resident')) {
         const id = `h${s.id}`;
@@ -766,6 +802,8 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       nodes.clear(); worlds.clear(); node = null; later = []; ruleSaid.clear();
       for (const [k, n] of s.nodes) {
         n.rt = revive(n.rt); n.plan = n.rt.plan;
+        if (!n.rt.wallFaceDefeated) for (const sp of n.plan.stage.floor?.spawns ?? [])
+          if (sp.kind === 'wallface' && sp.data.rule === 'r11') n.rt.spawned.delete(sp.id);
         const guardian = n.plan.stage.floor?.spawns.find(g => g.role === 'guardian');
         if (guardian && !n.rt.guardianSkip && !n.rt.guardianDefeated) {
           // 구형 저장은 비적대 상태의 노부부/가족을 안전하다고 보고 몸 없이 저장했다.
@@ -905,7 +943,9 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           break;
         case 'run:end':
           if (e.how === 'return') sendFound(meta, out);
-          api.note('depth', out.depth);
+          // 지름길로 상층에 돌아가 귀환해도 이번 출동의 최심 도달 기록은 남는다.
+          // 영구 meta.deepest를 쓰면 이전 출동 기록으로 임무가 성공하므로 visited만 본다.
+          api.note('depth', Math.max(out.depth, ...out.visited.map(v => v.depth)));
           api.note('found', [...out.found]);
           api.note('sent', [...out.sent]);
           api.note('rescued', [...out.rescued]);
@@ -937,9 +977,18 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
             save();
           }
           break;
-        case 'enemyDie':
+        case 'bossRoar':
+          if (e.kind === 'family208' && f?.guardian === 'family208') rt.childFightStarted = true;
+          break;
+        case 'enemyDie': {
+          if (e.kind === 'wallface' && f?.type === 'replica' && f.sub === 'red') rt.wallFaceDefeated = true;
           rt.kills++;
-          if (e.kind === rt.plan.stage.floor?.spawns.find(s => s.role === 'guardian')?.kind) rt.guardianDefeated = true;
+          const guardian = f?.spawns.find(s => s.role === 'guardian');
+          // conductor는 실제 개체가 proctor다. 쌍 수호자는 별칭 첫 개체 하나로 완료시키지 않는다.
+          if (guardian && !['elder', 'family208'].includes(guardian.kind) && enemyKind(e.kind) === enemyKind(guardian.kind)) {
+            rt.guardianDefeated = true;
+            offerGuardianUpgrade(api);
+          }
           if (f?.spawns.some(s => s.role === 'guardian' && ['elder', 'family208'].includes(s.kind)) && ['elder_f', 'elder_m', 'family_f', 'family_m'].includes(e.kind)) {
             rt.guardianKills = [...new Set([...(rt.guardianKills ?? []), e.kind])];
             const kind = f.spawns.find(s => s.role === 'guardian')!.kind;
@@ -951,12 +1000,20 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           }
           if (rt.trial?.failed && rt.penaltyKind && enemyKind(e.kind) === enemyKind(rt.penaltyKind)) rt.trial.done = true;
           break;
+        }
         case 'custom': {
-          const d = e.data as { kind?: string; how?: string } | undefined;
+          const d = e.data as { kind?: string; how?: string; rule?: string } | undefined;
+          if (e.name === 'ruleBroken' && d?.rule === 'r11' && f?.type === 'replica' && f.sub === 'red') {
+            rt.wallFaceBroken = true;
+            foundRule(api, 'r11', api.world.player.x);
+          }
           if (e.name === 'guardianCleared' && d?.kind && f?.spawns.some(s => s.role === 'guardian' && s.kind === d.kind)) {
             if (d.how === 'rule' || d.how === 'endure') rt.guardianSkip = true;
             // 진압과 규칙 준수는 서로 다른 결과다.
             if (d.kind === 'elder' && d.how === 'kill') api.note('stage.elderDefeated', true);
+            // 동적 소환 수호자는 encounter의 boss 목록에 없다. 처치 확정 때 선택 보상을 준다.
+            // 평화 통과/버티기는 처치가 아니며, 별도 드랍·일반전투 보상은 여기서 만들지 않는다.
+            if (d.how === 'kill' && rt.guardianDefeated) offerGuardianUpgrade(api);
           }
           break;
         }
@@ -973,6 +1030,23 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       const r = rt;
       const p = api.world.player;
       const pl = r.plan.stage.where === 'floor' ? placedOf(prop) : undefined;
+      if (pl?.kind === 'childkey') {
+        if (!r.childKeyDropped || r.childKeyTaken || !r.plan.props?.some(q => q.id === prop.id)) return;
+        if (childRuleBroken()) return void api.world.say('벽의 사람 모양을 공격했다. 이 열쇠는 돌아가지 않는다.', 2.5);
+        r.childKeyTaken = true;
+        api.setProp(prop.id, null);
+        api.world.emit({ type: 'pickup', x: p.x, id: 'childkey' });
+        return void api.world.say('아이 방 열쇠를 주웠다. 208호 안의 잠긴 문을 열 수 있다.', 2.5);
+      }
+      if (pl?.kind === 'childdoor') {
+        if (r.opened.has(prop.id)) return void api.world.say('이미 열린 아이 방 문이다.', 1.5);
+        if (!knowsChildRule() || childRuleBroken() || !r.childKeyTaken) return void api.world.say('잠긴 아이 방 문. 벽의 사람 모양을 건드리지 말라는 규칙과 전용 열쇠가 필요하다.', 3);
+        r.opened.add(prop.id);
+        api.setProp(prop.id, { label: '열린 아이 방 문' });
+        api.world.emit({ type: 'door', x: prop.x, id: 'childdoor' });
+        api.world.emit({ type: 'custom', name: 'guardianRule', data: { kind: 'childDoor' } });
+        return void api.world.say('문을 열었다. 두 사람이 그쪽을 보며 잠시 멈춘다.', 2.5);
+      }
       // 선택지 (승객·거래·강화)
       const ch = r.choices.get(prop.id);
       if (ch) return resolveChoice(api, prop, ch);
@@ -1115,6 +1189,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           r.mealOk.add(prop.id);
           foundRule(api, 'r_meal', p.x);
           api.world.say('「잘 먹었습니다.」', 2);
+          if (pl?.data.guardian) api.world.emit({ type: 'custom', name: 'guardianRule', data: { kind: 'mealThanks' } });
           // 수호자는 실제 평화 소멸의 guardianCleared(rule) 이벤트로만 해결한다.
           // 밥상 E만으로 적대 상태나 소멸 대기 시간을 우회하지 않는다.
           break;
@@ -1558,7 +1633,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       if (enc) {
         node.cleared.add(enc.triggerX);
         checkFloorClear(api);
-        if (enc.waves.some((w) => w.some((s) => s.boss))) offerUpgrade(api, '수호자를 쓰러뜨렸다');
+        if (enc.waves.some((w) => w.some((s) => s.boss))) offerGuardianUpgrade(api);
         else if (++o.fightsWon % 3 === 0) offerUpgrade(api, `싸움 ${o.fightsWon}판째`);
       }
     }
@@ -1812,6 +1887,13 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
         break;
       }
     }
+  };
+
+  const offerGuardianUpgrade = (api: StageApi) => {
+    // 비적대 수호자는 살아 있어도 combat:clear가 발생한다. 실제 처치 기록만 보상 근거다.
+    if (!rt!.guardianDefeated || rt!.guardianRewarded) return;
+    rt!.guardianRewarded = true;
+    offerUpgrade(api, '수호자를 쓰러뜨렸다');
   };
 
   /** 강화 셋 중 하나 (기본기획서 15.2) */

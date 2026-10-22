@@ -39,6 +39,7 @@ export const RULES: RuleDef[] = [
   { id: 'r_quiet', scope: 'replica', texts: ['아파트: 복도에서 뛰지 마라.'], breach: '주민이 깨어남' },
   { id: 'r_meal', scope: 'replica', texts: ['아파트: 밥상 앞에서는 「잘 먹었습니다」(E).'], breach: '주민이 깨어남' },
   { id: 'r_things', scope: 'replica', texts: ['빈집: 남의 물건에 손대지 마라.'], breach: '집이 일어난다' },
+  { id: 'r11', scope: 'replica', texts: ['붉은 벽: 벽에 묻힌 사람 모양을 공격하지 마라.'], breach: '바닥의 손 군집이 깨어남' },
   { id: 'r_red', scope: 'replica', texts: ['붉은 벽: 붉은 바닥을 밟지 마라.'], breach: '바닥의 손' },
   { id: 'l_clock', scope: 'lobby', texts: ['로비: 거꾸로 가는 시계 앞에서는 걸어라.'], breach: '해롭지 않아 보이는 것' },
   { id: 'b12', scope: 'common', texts: ['벽에 B-12가 적힌 층은 수호자가 두 배로 자주 나온다.'], breach: '—' },

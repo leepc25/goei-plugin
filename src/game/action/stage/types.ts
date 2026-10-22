@@ -57,6 +57,8 @@ export type PlacedKind =
   | 'mirror'
   | 'checklist'
   | 'door' // 갈림길 문: data.correct
+  | 'childdoor' // 208호 아이 방: 규칙 11 전용 열쇠로 한 번 연다
+  | 'childkey' // 규칙 11 준수 시 드랍하는 아이 방 열쇠 (일반 잠금 번호와 별개)
   | 'shutter' // 막힌 셔터: 정답 문·스위치로 열림
   | 'switch' // 스위치: data.order
   | 'hatch' // 천장 해치 → 정비 구역

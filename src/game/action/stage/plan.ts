@@ -57,12 +57,12 @@ export const narrowBackSpan = (t: Terrain, terr: readonly Terrain[] = []): [numb
 const NOLOCK_TYPES = new Set(['chase', 'deep']);
 
 /** 메트로배니아 소품은 이미 있는 그림 종류로 그린다 (그림 없는 종류는 엔진이 안 그린다). 뜻은 module이 placed.kind로 가른다 */
-export const METRO_ART: Record<string, string> = { upper: 'chasedoor', sidedoor: 'door', locked: 'firegate', wdoor: 'door', wup: 'hq_stairs_up', wdown: 'hq_stairs_down', reward: 'pack' };
+export const METRO_ART: Record<string, string> = { childdoor: 'door', childkey: 'key', upper: 'chasedoor', sidedoor: 'door', locked: 'firegate', wdoor: 'door', wup: 'hq_stairs_up', wdown: 'hq_stairs_down', reward: 'pack' };
 /** 심층은 사람 건물이 아니다: 위로는 매달린 줄, 아래로는 무너진 바닥 */
 const DEEP_ART: Record<string, string> = { wup: 'rope', wdown: 'fall' };
 
 export function floorPlan(f: Floor, id: string, startX = 240): StagePlan {
-  const props: PropSpec[] = f.placed.map((p) => ({
+  const props: PropSpec[] = f.placed.filter(p => p.kind !== 'childkey').map((p) => ({
     id: `p${p.id}`,
     kind: (f.type === 'deep' ? DEEP_ART[p.kind] : undefined) ?? METRO_ART[p.kind] ?? p.kind,
     x: p.x,
@@ -437,7 +437,7 @@ function clearOfProps(props: PropSpec[], x: number, y: number): number {
 }
 
 function propH(kind: string): number {
-  return ({ elevator: 200, panel: 90, mirror: 130, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 } as Record<string, number>)[kind] ?? 80;
+  return ({ elevator: 200, panel: 90, mirror: 130, childdoor: 180, door: 180, shutter: 200, servicedoor: 170, hatch: 30, goalwall: 140, table: 50, chasedoor: 190, sign: 60, switch: 50, mark: 30, item: 28, belonging: 28 } as Record<string, number>)[kind] ?? 80;
 }
 
 export function segAt(segs: FloorSegment[], x: number): FloorSegment {

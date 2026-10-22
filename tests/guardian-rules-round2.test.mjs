@@ -16,8 +16,8 @@
  * 공용 World 프레임 맵은 Body 참조를 사용한다. 별도 패치 주입이나
  * ID 카운터 보정 없이 아래 모든 회귀를 기본 실행한다.
  * stage의 실제 수호자 쌍 집계/복원은 progression-real-enemies.test.mjs에서 검증한다.
- * 아이 방 성공 분기의 childDoor 신호 연결은 아직 stage에 없으며 이 검사는
- * 신호를 받은 수호자의 반응만 검증한다.
+ * 아이 방의 실제 규칙 발견/열쇠/문 E 연결은 progression-real-child-door.test.mjs에서
+ * 검증한다. 이 파일은 신호를 받은 수호자의 반응을 검증한다.
  *
  * Chromium fixture는 실제 World/Input과 키보드를 쓰지만 stage/HQ는 붙이지 않는다.
  * 아이 방 성공 신호만 명시 주입한다. 전체 출동/잠금/정산 연결 검증으로 해석하지 않는다.
