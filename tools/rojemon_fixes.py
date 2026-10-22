@@ -11,8 +11,17 @@ def _shift(im, dx, dy):
     out = Image.new('RGBA', im.size, (0, 0, 0, 0)); out.paste(im, (dx, dy)); return out
 
 
+def _sole(im, foot):
+    """발이 바닥선 아래로 1~2px 빠진 장(생성기 버릇)을 바닥선에 올림."""
+    bb = im.split()[3].getbbox()
+    if bb and foot < bb[3] <= foot + 2:
+        return _shift(im, 0, foot - bb[3])
+    return im
+
+
 def apply(src, frames, idx):
-    pairs = list(zip(frames, idx))
+    foot = 88 if src.startswith('kid_') else 136
+    pairs = [(_sole(f, foot), i) for f, i in zip(frames, idx)]
     if src in SHIFT:
         pairs = [(_shift(f, *SHIFT[src][i]) if i in SHIFT[src] else f, i) for f, i in pairs]
     if src in ORDER:
