@@ -40,6 +40,7 @@ if __name__=='__main__':
     if '--resume' in sys.argv:
         last={}
         for ln in open(pl.LOG):
+            if 'gen RESET' in ln: last={}   # 기준 그림을 바꾼 뒤엔 그 전 작업을 이어받지 않음
             m=re.search(r'gen (\S+) \d+f -> ([0-9a-f-]{36})',ln)
             if m: last[m.group(1)]=m.group(2)
         for n in list(names):
@@ -47,9 +48,10 @@ if __name__=='__main__':
             elif os.path.exists(f'{OUT}/{n}/00.png'): names.remove(n)
     queue=list(names); spent=0
     while queue or pend:
-        while queue and len(pend)<8:
-            n=queue.pop(0); j,t=pl.submit('animate_with_skeleton_v3',args_for(n,seed))
-            pl.log(f'gen {n} {len(rig.CLIPS[n][2])}f -> {j} {t[:80]}')
+        while queue and len(pend)<8:   # 칸이 없으면(rate limit) 기다리지 말고 끝난 작업부터 받음
+            n=queue[0]; j,t=pl.submit('animate_with_skeleton_v3',args_for(n,seed),tries=1)
+            if t.startswith('RATE') or t.startswith('EXC'): break
+            queue.pop(0); pl.log(f'gen {n} {len(rig.CLIPS[n][2])}f -> {j} {t[:80]}')
             if j: pend[n]=j; print('sub',n,flush=True)
             else: print('SUBFAIL',n,t[:300],flush=True); pl.log(f'gen SUBFAIL {n} {t[:200]}')
         time.sleep(12)
