@@ -473,7 +473,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.16.42" : "0";
+  var PLUGIN_VERSION = true ? "0.16.43" : "0";
 
   // src/host/game/fetch.ts
   var GAME_BASE = UPDATE_BASE ? `${UPDATE_BASE}/game` : "";
@@ -538,7 +538,7 @@
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.16.42" : "";
+  var VERSION = true ? "0.16.43" : "";
   var codeVersion = (code) => /^\/\/ goei-game (\S+)/.exec(code)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -1448,7 +1448,20 @@ ${memory}` },
   var checked = false;
   var skipped = "";
   var SKIP_KEY = "goei:update-skip";
+  function withTimeout(p, ms, what) {
+    return new Promise((resolve, reject) => {
+      const t = setTimeout(() => reject(new Error(`${what}을(를) ${Math.round(ms / 1e3)}초 안에 받지 못했어요.`)), ms);
+      p.then((v) => (clearTimeout(t), resolve(v)), (e) => (clearTimeout(t), reject(e)));
+    });
+  }
   async function getText2(name) {
+    try {
+      return await withTimeout(getTextOnce(name), 4e4, name);
+    } catch {
+      return await withTimeout(getTextOnce(name), 6e4, name);
+    }
+  }
+  async function getTextOnce(name) {
     const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
     const legacy = risuai.risuFetch;
     lastDirect = legacy ? "" : "risuFetch 없음";
@@ -1478,14 +1491,17 @@ ${memory}` },
     }
     return body4;
   }
-  async function loadPayload() {
+  async function loadPayload(onPart) {
     const index2 = await getJson("card-update.json");
     if (index2 && "card" in index2) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
     if (!Array.isArray(index2?.parts)) return index2;
     let text = "";
+    let n = 0;
+    onPart?.(0, index2.parts.length);
     for (const name of index2.parts) {
       if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
       text += await getText2(name);
+      onPart?.(++n, index2.parts.length);
     }
     if (typeof index2.length === "number" && text.length !== index2.length) {
       throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text.length}/${index2.length}자)`);
@@ -1562,7 +1578,7 @@ ${memory}` },
       `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc12(cur)}`}${cardNew ? ` → <b>v${esc12(L.card)}</b>` : ""}</span>`,
       !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
     ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy5 ? "disabled" : ""}>${busy5 && !updateUi.payload ? "확인 중…" : "새 버전 확인"}</button>`;
+    let actions = `<button class="gx-mini" data-action="upd-check" ${busy5 ? "disabled" : ""}>${busy5 && !updateUi.payload ? esc12(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
     if (cardNew && !needPlugin) {
       actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy5 ? "disabled" : ""}>${busy5 ? esc12(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy5 ? "disabled" : ""}>카드 업데이트 준비</button>`;
     }
@@ -1617,12 +1633,18 @@ ${memory}` },
     }
     updateUi.busy = true;
     updateUi.notice = "";
+    if (action === "upd-prepare") updateUi.progress = "카드 읽는 중…";
     env2.render();
     try {
       const char = await risuai.getCharacterFromIndex(ctx2.charIndex);
       if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
       if (action === "upd-prepare") {
-        const p = await loadPayload();
+        const p = await loadPayload((n, total) => {
+          updateUi.progress = `카드 정보 받는 중 ${n}/${total}`;
+          env2.render();
+        });
+        updateUi.progress = "카드와 비교하는 중…";
+        env2.render();
         if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe2(p)})`);
         if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
         updateUi.payload = p;
@@ -3814,13 +3836,4 @@ ${memory}` },
       if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
       return `<ul class="gx-list gx-mlist">${rows2.map((r) => row6(field2.mkind, r)).join("")}</ul>`;
     }
-    const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) => k !== field2.mkind)];
-    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
-    return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
-  }
-  function missionTab(ctx2, opening, notice3, busy5) {
-    const x = readCtx(ctx2);
-    if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
-    const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
-    const p = x.world.pending;
-    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div cla
+    const order = [field2.mkind, ...["an", "ms", "lm"].filter((k) =>

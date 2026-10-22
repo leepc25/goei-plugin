@@ -1,4 +1,13 @@
-ss="gx-ctxbar"><span>요청 대기 · ${esc15(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
+ k !== field2.mkind)];
+    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row6(g.k, r)).join("")}`).join("");
+    return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
+  }
+  function missionTab(ctx2, opening, notice3, busy5) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return `<div class="gx-empty">${esc15(x)}</div>`;
+    const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field2.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field2.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
+    const p = x.world.pending;
+    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc15(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
     const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
     return `<main class="gx-body gx-field gx-mission" data-step="${field2.step}">
     ${stepBar(field2.mname, opening ? void 0 : "map")}
@@ -2174,5 +2183,5 @@ ${note.trim()}` : card2;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.16.42", start: start2 };
+  globalThis.__goeiBody = { version: "0.16.43", start: start2 };
 })();

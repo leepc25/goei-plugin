@@ -35,7 +35,24 @@ const SKIP_KEY = 'goei:update-skip';
  * 다른 파일 요청에도 그대로 돌려준다(카드 파일을 달라 했는데 version.json이 옴).
  * 그래서 Risu 본 화면에서 직접 받는 risuFetch(plainFetchForce)를 먼저 쓰고, 안 되면 nativeFetch로 받는다.
  */
+/** 받기 하나가 멈추면 끝없이 「확인 중」으로 남지 않게 시간을 둔다 (2026-10-22 사용자: 카드 업데이트 준비가 안 넘어감) */
+function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`${what}을(를) ${Math.round(ms / 1000)}초 안에 받지 못했어요.`)), ms);
+    p.then((v) => (clearTimeout(t), resolve(v)), (e) => (clearTimeout(t), reject(e)));
+  });
+}
+
 async function getText(name: string): Promise<string> {
+  try {
+    return await withTimeout(getTextOnce(name), 40000, name);
+  } catch {
+    // 한 번 더 (느린 프록시·일시 끊김)
+    return await withTimeout(getTextOnce(name), 60000, name);
+  }
+}
+
+async function getTextOnce(name: string): Promise<string> {
   const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
   const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
   lastDirect = legacy ? '' : 'risuFetch 없음';
@@ -74,14 +91,17 @@ async function getJson(name: string): Promise<unknown> {
  * 카드 데이터는 1MB가 넘어서 Risu 웹 프록시가 한 번에 못 넘긴다. card-update.json은 조각 목록이고,
  * 조각(card-update.N.txt)을 차례로 받아 이어 붙인다.
  */
-async function loadPayload(): Promise<unknown> {
+async function loadPayload(onPart?: (n: number, total: number) => void): Promise<unknown> {
   const index = (await getJson('card-update.json')) as { parts?: unknown; length?: unknown; card?: unknown };
   if (index && 'card' in index) throw new Error('Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.');
   if (!Array.isArray(index?.parts)) return index;
   let text = '';
+  let n = 0;
+  onPart?.(0, index.parts.length);
   for (const name of index.parts) {
     if (typeof name !== 'string' || !/^card-update\.\d+\.txt$/.test(name)) throw new Error('카드 업데이트 목록 형식이 달라요.');
     text += await getText(name);
+    onPart?.(++n, index.parts.length);
   }
   if (typeof index.length === 'number' && text.length !== index.length) {
     throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text.length}/${index.length}자)`);
@@ -166,7 +186,7 @@ export function updateGroup(ctx: ChatContext): string {
   const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
   rows.push(row('카드', `<span class="upd-ver">${cur === '0' ? '이전 판' : `v${esc(cur)}`}${cardNew ? ` → <b>v${esc(L!.card)}</b>` : ''}</span>`,
     !lite ? '이 채팅의 카드는 Lite 카드가 아니에요.' : cardNew ? (needPlugin ? '플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요.' : '채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요.') : L ? '최신이에요.' : ''));
-  let actions = `<button class="gx-mini" data-action="upd-check" ${busy ? 'disabled' : ''}>${busy && !updateUi.payload ? '확인 중…' : '새 버전 확인'}</button>`;
+  let actions = `<button class="gx-mini" data-action="upd-check" ${busy ? 'disabled' : ''}>${busy && !updateUi.payload ? esc(updateUi.progress || '확인 중…') : '새 버전 확인'}</button>`;
   if (cardNew && !needPlugin) {
     actions += updateUi.plan
       ? `<button class="gx-mini primary" data-action="upd-apply" ${busy ? 'disabled' : ''}>${busy ? esc(updateUi.progress || '적용 중…') : '카드에 적용'}</button>`
@@ -219,12 +239,18 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
   }
   updateUi.busy = true;
   updateUi.notice = '';
+  if (action === 'upd-prepare') updateUi.progress = '카드 읽는 중…';
   env.render();
   try {
     const char = (await risuai.getCharacterFromIndex(ctx.charIndex)) as Record<string, unknown> | null;
     if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
     if (action === 'upd-prepare') {
-      const p = await loadPayload();
+      const p = await loadPayload((n, total) => {
+        updateUi.progress = `카드 정보 받는 중 ${n}/${total}`;
+        env.render();
+      });
+      updateUi.progress = '카드와 비교하는 중…';
+      env.render();
       if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe(p)})`);
       if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
       updateUi.payload = p;
