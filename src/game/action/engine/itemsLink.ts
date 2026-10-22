@@ -28,7 +28,7 @@ import {
   type Target,
 } from '../items';
 import { TICK_HZ, type Body, type RunConfigCore } from './contract';
-import { drawPropArt, propArtSize } from '../art/bg';
+import { drawPropArt, isHighSign, propArtSize } from '../art/bg';
 
 /** 층에 깔아도 되는 부서지는 물건: 배경 물건 그림이 있거나 아이콘이 물건처럼 보이는 것 */
 const PROP_ART = new Set(['chair', 'pot', 'tv', 'table', 'crate']);
@@ -58,33 +58,41 @@ function drawFloorArt(c: CanvasRenderingContext2D, id: string, x: number, y: num
   return true;
 }
 
-/** 층 모듈의 보급품(kind 'item', label 「보급품:ammo」). 탄약은 회색 상자(service 7)로 읽혀서 탄약 상자 + 황동 탄을 크게 (검수19). 처리했으면 true */
+/** 보급품 종류 → 바닥에 그릴 아이템 그림. 큰 나무 상자 더미(service 7)로 그리면 길 한가운데 가구처럼 보여
+ * 몸이 그 위에 걸터앉은 듯 겹쳤다 (검수 23): 주울 물건은 작게, 노란 빛으로 */
+const SUPPLY_ART: Record<string, string> = { heal: 'medkit', guard: 'charm', light: 'flash', gear: 'unknown_device', checklist: 'photo' };
+/** 층 모듈의 보급품(kind 'item', label 「보급품:ammo」). 탄약은 탄약 상자 + 황동 탄을 크게 (검수19), 나머지는 그 아이템 그림. 처리했으면 true */
 export function drawSupply(c: CanvasRenderingContext2D, label: string | undefined, x: number, y: number, tick: number): boolean {
-  if (label?.split(':')[1] !== 'ammo') return false;
+  const id = label?.startsWith('보급품') ? label.split(':')[1] ?? 'heal' : null;
+  if (!id) return false;
   const all = (typeof window !== 'undefined' && (window as { __GOEI_ITEM_ART__?: Record<string, { src: string; w: number; h: number }> }).__GOEI_ITEM_ART__) || {};
-  const box = all.ammo_box,
-    rounds = all.rounds;
-  if (!box || !rounds) return false;
+  const box = all[id === 'ammo' ? 'ammo_box' : SUPPLY_ART[id] ?? 'ammo_box'],
+    rounds = id === 'ammo' ? all.rounds : null;
+  if (!box || (id === 'ammo' && !rounds)) return false;
   const im = (src: string) => {
     let i = floorImgs.get(src);
     if (!i) floorImgs.set(src, (i = Object.assign(new Image(), { src })));
     return i.complete && i.naturalWidth ? i : null;
   };
   const a = im(box.src),
-    b = im(rounds.src);
-  if (!a || !b) return false;
+    b = rounds ? im(rounds.src) : null;
+  if (!a || (rounds && !b)) return false;
+  // 탄약 상자는 4배, 작은 아이템 그림은 화면 키 약 56px이 되게
+  const k = id === 'ammo' ? 4 : Math.max(2, Math.min(4, Math.round(56 / box.h)));
   c.save();
   c.fillStyle = 'rgba(0,0,0,0.35)';
   c.beginPath();
-  c.ellipse(x, y, 40, 9, 0, 0, Math.PI * 2);
+  c.ellipse(x, y, Math.max(24, (box.w * k) / 2), 9, 0, 0, Math.PI * 2);
   c.fill();
   // 바닥 회색과 갈리게 노란 테두리 빛, 천천히 깜빡
   c.imageSmoothingEnabled = false;
   const glow = 0.35 + 0.2 * Math.sin(tick / 8);
   c.shadowColor = `rgba(255,214,90,${glow})`;
   c.shadowBlur = 10;
-  c.drawImage(a, Math.round(x - 40), Math.round(y - box.h * 4), box.w * 4, box.h * 4);
-  c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+  if (rounds && b) {
+    c.drawImage(a, Math.round(x - 40), Math.round(y - box.h * 4), box.w * 4, box.h * 4);
+    c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+  } else c.drawImage(a, Math.round(x - (box.w * k) / 2), Math.round(y - box.h * k), box.w * k, box.h * k);
   c.restore();
   return true;
 }
@@ -236,7 +244,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
       // 층마다 들 물건 둘, 부술 물건 둘, 임시 무기 하나 (층 소품·출구를 피해서)
       // 문·벽 가구 앞, 지형 위, 적이 생겨날 자리를 비운다 (검수 12-2, 17)
-      furnishFloor(field, { ...e.floor, props: furnishAvoid(e.floor, w.bodies.filter((b) => b.alive && b.team !== 'player')) }, w.lane, () => w.rand());
+      // 층 소품은 그림 폭으로 (점검문처럼 표 폭보다 그림이 넓은 것, 겹침 시험)
+      const artProps = (e.floor.props ?? []).map((q) => ({ ...q, w: Math.max(q.w, (propArtSize(q.kind, q.label, e.floor.type)?.w ?? 0) + 40) }));
+      furnishFloor(field, { ...e.floor, props: furnishAvoid({ ...e.floor, props: artProps }, w.bodies.filter((b) => b.alive && b.team !== 'player')) }, w.lane, () => w.rand());
       // 요원 시작 자리도 같은 규칙으로 물건 밖에
       const st = clearSpot(p.x, p.y, allSolids(), w.lane);
       p.x = p.px = st.x;
@@ -274,14 +284,16 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   const lastX = new WeakMap<object, number>();
   // 층 바닥에 선 꾸밈 물건(상자 더미·탁자): 몸이 뚫지 않게 (검수 17-2). 벽에 붙은 것(깊이 맨 뒤)은 빼고
   // 그림 크기로 막는다: 폭 = 그림 폭, 뒤쪽 깊이 = 그림 키의 3/4 (키 큰 상자 더미 뒤에 서면 다리가 박혀 보인다, 검수 18-2)
+  // 앞쪽 깊이도 그림 키에 맞춘다: 키 100 상자 더미 앞 50px에 서면 다리가 상자 위에 걸쳐 앉은 듯 보였다 (검수 23)
+  const frontFor = (h: number) => Math.min(90, Math.max(PROP_DEPTH, h * 0.8));
   const floorSolids = () =>
     w.props
       .filter((q) => (q.kind === 'prop' || q.kind === 'table' || q.kind === 'clutter') && q.y > w.lane[0] + 20)
       .map((q) => {
         const a = propArtSize(q.kind, q.label, w.floor?.type);
-        return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)) };
+        return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)), front: frontFor(a?.h ?? 0), h: a?.h ?? 0 };
       });
-  const itemSolid = (e: { x: number; y: number; prop: string }) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)) });
+  const itemSolid = (e: { x: number; y: number; prop: string }) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)), front: frontFor(PROPS[e.prop].h), h: PROPS[e.prop].h });
   const allSolids = () => [...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => itemSolid(e as { x: number; y: number; prop: string })), ...floorSolids()];
   // 적은 처음부터 물건 밖에 생겨난다 (검수 17-1: 나중에 옮기면 첫 화면엔 겹쳐 보임)
   w.spawnAdjust = (s) => {
@@ -290,6 +302,21 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   };
   // 검사 스크립트용: 바닥 물건 목록 (화면 검수에서 물건·몸 겹침을 숫자로 잰다)
   Object.defineProperty(w, 'itemField', { get: () => field, configurable: true });
+  Object.defineProperty(w, 'solidsNow', { get: () => allSolids(), configurable: true });
+  // 그려지는 층 소품·바닥 물건의 화면 상자 (x 가운데, y 발, 폭·키): 겹침 시험이 벽 장식·서로와 맞대 본다
+  Object.defineProperty(w, 'propRects', {
+    get: () => [
+      ...w.props
+        .filter((q) => !['hubdoor', 'hubspot', 'hatch'].includes(q.kind) && !isHighSign(q.kind, q.label))
+        .map((q) => {
+          const a = propArtSize(q.kind, q.label, w.floor?.type);
+          return a ? { x: q.x, y: q.y, w: a.w, h: a.h, what: `${q.kind}:${q.label ?? ''}` } : null;
+        })
+        .filter(Boolean),
+      ...field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[(e as { prop: string }).prop].w, h: PROPS[(e as { prop: string }).prop].h, what: `물건:${(e as { prop: string }).prop}` })),
+    ],
+    configurable: true,
+  });
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
