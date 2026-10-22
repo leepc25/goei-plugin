@@ -47,11 +47,17 @@ try {
   await S(page, 'pc-hitbox');
   await page.keyboard.press('KeyH');
   await page.waitForTimeout(900);
-  // 사격
+  // 사격: 첫 S는 뽑기만, 다음 S가 한 발 (쟈알디 시연판과 같게)
   await page.keyboard.press('KeyS');
   await page.waitForTimeout(500);
+  assert.equal((await st(page)).ammo, 8, '뽑기만 해서는 탄이 그대로');
+  await page.keyboard.press('KeyS');
+  await page.waitForTimeout(400);
   const s3 = await st(page);
   assert.ok(s3.ammo < 8, '사격 후 탄 감소');
+  const muzzle = await page.evaluate(() => Math.max(0, ...window.__goeiEngine.world.bodies.filter((b) => b.kind === 'bullet').map((b) => b.z)));
+  assert.ok(muzzle === 0 || muzzle > 150, `총알이 손 높이에서 나감 (z ${muzzle})`);
+  await page.waitForTimeout(1900);
   // 점프·회피·앉기
   await page.keyboard.press('Space');
   await page.waitForTimeout(150);

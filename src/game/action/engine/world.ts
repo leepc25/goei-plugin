@@ -381,12 +381,12 @@ export class World implements WorldView {
           b = list[j];
         // 앞뒤로 조금 떨어져 있어도 그림은 포개진다: 깊이 75 안쪽이면 옆으로 벌린다 (독립 검수: 적이 세로로 쌓임)
         const dy = Math.abs(a.y - b.y);
-        if (dy > 75) continue;
-        const min = (50 + (a.def!.w + b.def!.w) * 0.45) * (dy > 40 ? 0.75 : 1);
+        if (dy > 95) continue;
+        const min = (70 + (a.def!.w + b.def!.w) * 0.5) * (dy > 50 ? 0.8 : 1);
         const dx = b.x - a.x;
         if (Math.abs(dx) >= min) continue;
         const s = dx === 0 ? (a.id < b.id ? 1 : -1) : Math.sign(dx);
-        const push = Math.min(6, (min - Math.abs(dx)) / 2);
+        const push = Math.min(10, (min - Math.abs(dx)) / 2);
         a.x -= s * push;
         b.x += s * push;
       }

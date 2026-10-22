@@ -269,7 +269,7 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
       }
     }
     if (n) {
-      api.world.say(`${why} — ${n}이(가) 깨어났다`, 3);
+      api.world.say(`${why} — ${n > 1 ? `${['', '', '둘', '셋', '넷', '다섯'][n] ?? '여럿'}이` : '하나가'} 깨어났다`, 3);
       api.world.shake(8, 4);
       log(`규칙 위반: ${why}`);
     }

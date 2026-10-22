@@ -360,7 +360,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
 
   function overlayText(w: World) {
     if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
-      drawGoSign(ctx, 800, 30, w.tick / 30); // 천장 띠(아이템 칸 오른쪽): 문·게시판을 가리지 않게 (독립 검수)
+      drawGoSign(ctx, 790, 18, w.tick / 30); // 천장 띠(아이템 칸 오른쪽): 문·게시판을 가리지 않게 (독립 검수)
     }
     if (w.banner && opt.hud) {
       const a = Math.min(1, w.banner.t / 15);

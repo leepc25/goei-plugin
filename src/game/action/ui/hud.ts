@@ -541,7 +541,8 @@ export function statusHtml(s: HudState | null): string {
   const fav = s.favor > 0 ? `+${s.favor}` : String(s.favor);
   const rows = [
     s.floor.depth || s.floor.name ? `<tr><th>층</th><td>${esc((s.floor.depth && !s.floor.name.startsWith(s.floor.depth) ? [s.floor.depth, s.floor.name] : [s.floor.name || s.floor.depth]).filter(Boolean).join(' · '))}${s.floor.variant ? ` · ${esc(s.floor.variant)}` : ''}</td></tr>` : '',
-    `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget} · 연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
+    `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget}</td></tr>`,
+    `<tr><th></th><td>연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
     `<tr><th>승강기 총애</th><td>${fav}</td></tr>`,
     s.ruleCount ? `<tr><th>규칙서</th><td>찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}</td></tr>` : '',
     ...(s.rules ?? []).map((r) => `<tr><th></th><td>${esc(r.text)}</td></tr>`),
