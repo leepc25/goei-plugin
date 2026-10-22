@@ -11,5 +11,7 @@
     "layers/leaf-left.png": "8f5d6995aef1ab6b051e51f6f0d0031afa7863804e76c70af4e808b9a58cf6e7",
     "layers/leaf-right.png": "6ade9f725f7932932fbf8407400c904729eebaa5ea2b3d02b857eda1507511ec",
     "raw/pixellab-d0105c20.png": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03"
-  }
+  },
+  "commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+  "committedLayersMatch": true
 }
