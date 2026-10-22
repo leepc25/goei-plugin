@@ -37,8 +37,9 @@ OLD_MANIFEST = '괴이봇 플러그인 매니페스트'
 SETTINGS_FOLDER_NAME = '⚙️설정'
 MANIFEST_KEY = ''  # 빈 키: Risu가 키워드로 활성화하지 않음
 # 상태창(📊상태창)은 v0.16.31부터 플러그인이 그린다
-KEEP_REGEX = ('🖼️에셋줄바꿈', '🖼️에셋출력', '🖼️에셋리퀘제거')
-STATUS_CSS = re.compile(r'(\.dv-status|\.dv-time|\.dv-date|\.dv-wx|\.dv-loc|\.dv-target|\.ib-asset)')
+# 이미지 태그 정규식 3개(🖼️에셋줄바꿈·에셋출력·에셋리퀘제거)와 .ib-asset CSS는 v0.16.40부터 플러그인(core/imgtag.ts)이 맡는다
+KEEP_REGEX = ()
+STATUS_CSS = re.compile(r'(\.dv-status|\.dv-time|\.dv-date|\.dv-wx|\.dv-loc|\.dv-target)')
 
 GHOST_SVG = (
     '<svg width="30" height="30" viewBox="0 0 24 24" fill="#5EEAD4" aria-hidden="true"><path fill-rule="evenodd" '
@@ -178,8 +179,6 @@ def status_css(background_html):
     parts = []
     for theme, cond in THEMES:
         rules = keep_status_rules(render(css, {'st_fixed_theme': theme or 'null'}))
-        # 에셋 그림 상자는 배경색 없이: 투명 PNG·AVIF의 빈 곳으로 테마 색이 비치지 않게
-        rules = [re.sub(r'(\.ib-asset-hover \{[^}]*?background-color:\s*)[^;]+;', r'\1transparent;', r) for r in rules]
         if '{{' in ''.join(rules):
             raise ValueError('배경 CSS에 해석되지 않은 CBS가 남았습니다')
         parts.append(cond + '\n' + '\n'.join(rules) + '\n' + '{{/if}}' * cond.count('{{#if'))

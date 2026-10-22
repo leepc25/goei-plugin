@@ -690,11 +690,36 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
       await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).display === 'none');
       await page.click('[data-action="set-status"][data-value="auto"]');
       await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).backgroundColor === 'rgb(35, 45, 50)');
+      // 캐릭터 이미지 태그: 플러그인이 그림 칸으로, 설정 「이미지 크기」·「접힌 높이」 막대가 바로 반영, 에셋 출력 OFF면 숨김
+      const img = await page.evaluate(() => window.__calls.handlers.display('앞.<img=Jyaldi_smile>뒤'));
+      assert.ok(img.includes('class="gim"') && img.includes('{{raw::Jyaldi_smile}}') && !img.includes('<img='), img);
+      await page.evaluate((h) => document.querySelector('#msg').insertAdjacentHTML('beforeend', h), risu(img));
+      const box = () => page.evaluate(() => { const c = getComputedStyle(document.querySelector('#msg .x-risu-gim')); return [c.display, c.maxWidth, c.aspectRatio]; });
+      assert.deepEqual((await box()).slice(1), ['512px', '832 / 826.88']);
+      await page.$eval('[data-change="set-img-size"]', (el) => { el.value = '150'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); });
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).maxWidth === '768px');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgSize === 150);
+      await page.$eval('[data-change="set-img-fold"]', (el) => { el.value = '40'; el.dispatchEvent(new Event('change', { bubbles: true })); });
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).aspectRatio === '832 / 486.4');
+      if (shots) { await page.$eval('[data-change="set-img-fold"]', (el) => el.scrollIntoView({ block: 'center' })); await page.screenshot({ path: `${shots}/9-img-settings.png` }); }
+      // 표시 범위·요청 속 태그: 최근만(기본 6개) ↔ 전부, 개수 막대
+      await page.click('[data-action="set-img-show-mode"][data-value="all"]');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgShow === 0);
+      assert.ok(!(await page.evaluate(() => window.__calls.handlers.display('<img=Jyaldi_smile>'))).includes('{{#when'), '전부면 조건 없음');
+      await page.$eval('[data-change="set-img-send"]', (el) => { el.value = '3'; el.dispatchEvent(new Event('change', { bubbles: true })); });
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgSend === 3);
+      if (shots) { await page.$eval('[data-change="set-img-send"]', (el) => el.scrollIntoView({ block: 'center' })); await page.screenshot({ path: `${shots}/9-img-recent.png` }); }
+      await page.click('[data-action="set-img-show-mode"][data-value="recent"]');
+      await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgShow === undefined);
+      await page.click('[data-action="set-asset"][data-value="0"]');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).display === 'none');
+      await page.click('[data-action="set-asset"][data-value="1"]');
+      await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).display === 'block');
     }
     assert.deepEqual(errors, []);
     await page.close();
   }
-  console.log('PASS 상태창: 플러그인 그리기·요일·공휴일·지난 장면·말풍선·위키 이름·배색 설정');
+  console.log('PASS 상태창: 플러그인 그리기·요일·공휴일·지난 장면·말풍선·위키 이름·배색 설정 + 이미지 칸 설정');
 }
 
 // 10) 상황판 없이 시작한 채팅에서 켜기

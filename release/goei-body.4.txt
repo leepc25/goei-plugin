@@ -1,4 +1,56 @@
-r { content: ""; display: block; clear: both; }
+variant-numeric: tabular-nums; }
+.gx-support { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.gx-support span { margin-right: auto; color: var(--dim); }
+.gx-support b { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.gx-step { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: var(--void); font-size: 17px; }
+.gx-step:disabled { opacity: .4; }
+.gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
+/* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
+.gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
+.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.gx-mlist li.gx-mgrp:first-child { padding-top: 0; }
+.gx-mlist li.gx-mgrp small { font-weight: 400; }
+.gx-mapcol .gx-segs { align-self: flex-start; }
+/* 커스텀 탭 (v0.16.21): 종류 고르기와 검색을 한 줄에. 종류는 임무 탭 상황 필터와 같은 칩, 남는 폭은 검색 */
+.gx-mfilter { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.gx-mfilter .gx-chip { flex: none; min-height: 36px; padding: 0 14px; }
+.gx-mfilter .gx-search { flex: 1; width: auto; min-width: 0; min-height: 36px; margin-left: 4px; border-radius: 999px; padding: 0 14px; font-size: 13px; }
+.gx-mapcol .gx-hint, .gx-mapcol > .gx-muted { margin: 0; }
+
+@media (max-width: 760px) {
+  .gx-field { grid-template-columns: 1fr; }
+  .gx-field > .gx-mapcol { position: static; }
+  .gx-mapcol .gx-canvas:not(.ph) { width: auto; }
+  .gx-mapimg { width: 100%; max-height: none; }
+  .gx-mbox { max-height: none; }
+  .gx-mlist { grid-template-columns: minmax(0, 1fr); }
+  .gx-mapcol .gx-segs { align-self: stretch; display: flex; }
+  .gx-mapcol .gx-seg { flex: 1; min-width: 0; padding: 0 8px; }
+}
+
+/* 위키 */
+.nw { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; padding-bottom: 20px; }
+.nw-nav { display: flex; gap: 6px; }
+.nw-search { display: flex; gap: 8px; }
+.nw-search .gx-search { flex: 1; }
+.nw-search .gx-mini { min-height: 40px; padding: 0 16px; }
+.nw-req summary, .nw-meta summary, .nw-fail summary { cursor: pointer; color: var(--mint); font-size: 14px; }
+.nw-reqbox { margin-top: 8px; padding: 10px 12px; resize: vertical; min-height: 64px; line-height: 1.5; }
+.nw-req .gx-muted { margin: 6px 0 0; font-size: 13px; }
+.nw-settings { display: grid; grid-template-columns: max-content 1fr; gap: 8px 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.nw-settings label { font-size: 13px; color: var(--dim); }
+.gx-segs-sm .gx-seg { min-width: 0; min-height: 34px; padding: 0 12px; font-size: 14px; }
+.nw-busy { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent); background: var(--accent-bg); color: var(--signal); font-size: 14px; }
+.nw-spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--signal); animation: nwspin .9s linear infinite; flex: none; }
+@keyframes nwspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .nw-spin { animation: none; } }
+.nw-compose { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.nw-compose p { margin: 0; }
+.nw-title { margin: 0; font-size: 24px; color: var(--text); letter-spacing: -.01em; }
+.nw-doc { display: flex; flex-direction: column; gap: 12px; }
+.nw-dochead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--accent-line); }
+.nw-body { font-size: 16px; line-height: 1.75; color: var(--text); }
+.nw-body::after { content: ""; display: block; clear: both; }
 .nw-p { margin: 0 0 12px; }
 .nw-h { margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 20px; color: var(--text); }
 .nw-h span { color: var(--nw, var(--signal)); }
@@ -1460,6 +1512,7 @@ details.gx-gl-card:not([open]) { gap: 0; }
 /* 설정 → 창 바깥 불투명도 막대 */
 .st-range { display: flex; align-items: center; gap: 12px; min-width: min(260px, 100%); }
 .st-range input { flex: 1; accent-color: var(--signal); }
+.st-recent { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 14px; }
 .st-range output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--sub); }
 
 /* 메인 설정 맨 위 「기능별 설정」: 세 기능 설정을 바로 여는 단추 */
@@ -1480,6 +1533,8 @@ details.gx-gl-card:not([open]) { gap: 0; }
 @media (max-width: 640px) {
   .gx .ps-ctl:has(> .st-range) { width: 100%; }
   .gx .st-range { width: 100%; }
+  .gx .ps-ctl:has(> .st-recent) { width: 100%; }
+  .gx .st-recent { justify-content: flex-start; }
 }
 
 /* 즐겨찾기 (2026-10-20): PC 메뉴 맨 아래 ‹ ★ ›, 모바일 상황판 서랍 다섯 칸, 둘 다 같은 ★ 창 */
@@ -2185,83 +2240,4 @@ button.mk-go:hover { color: var(--signal); }
     const full = list4.length >= MARK_MAX;
     const mine = list4.length ? `<ul class="mk-rows">${list4.map((m, i) => `<li class="mk-row"><button class="mk-go" data-action="mk-go" data-value="${i}">${icon(m)}<span>${esc10(m.name)}</span></button>
         <button class="ph-tool sm" data-action="mk-del" data-value="${i}" aria-label="${esc10(m.name)} 빼기" title="빼기">${ICONS.close}</button></li>`).join("")}</ul>` : '<p class="mk-empty">아래 지금 화면이나 최근 본 화면의 ＋를 누르면 여기에 담겨요. 빼려면 오른쪽 ×를 누르세요.</p>';
-    const here = current3 && !isMarked(current3) ? `<button class="mk-here" data-action="mk-here" ${full ? "disabled" : ""}>${ICONS.plus}<span>지금 화면 · ${esc10(current3.name)}</span></button>` : "";
-    const cand = markCandidates(recent, current3);
-    const more = cand.length ? `<h4>최근 본 화면</h4><ul class="mk-rows">${cand.map((m, i) => `<li class="mk-row"><span class="mk-go">${icon(m)}<span>${esc10(m.name)}</span></span>
-        <button class="ph-tool sm" data-action="mk-add" data-value="${i}" aria-label="${esc10(m.name)} 추가" title="추가" ${full ? "disabled" : ""}>${ICONS.plus}</button></li>`).join("")}</ul>` : "";
-    return `<button class="mk-scrim" data-action="mk-pop" aria-label="즐겨찾기 닫기"></button>
-    <div class="mk-pop" role="dialog" aria-label="즐겨찾기">
-      <div class="mk-head"><b>즐겨찾기</b><small>${list4.length}/${MARK_MAX}</small><button class="ph-tool sm" data-action="mk-pop" aria-label="닫기">${ICONS.close}</button></div>
-      ${mine}${here}${full ? '<p class="mk-empty">5개까지 넣을 수 있어요. 하나를 빼면 더 넣을 수 있어요.</p>' : ""}${more}
-    </div>`;
-  }
-  function navHistBar(current3) {
-    return `<div class="gx-navhist">
-    <button class="gx-nh" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>
-    <button class="gx-nh mk-star${markUi.pop ? " on" : ""}${current3 && isMarked(current3) ? " marked" : ""}" data-action="mk-pop" aria-label="즐겨찾기" title="즐겨찾기" aria-expanded="${markUi.pop}">${ICONS.star}</button>
-    <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
-  }
-  function markSlots() {
-    const list4 = marks();
-    if (!list4.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
-    return Array.from({ length: MARK_MAX }, (_, i) => {
-      const m = list4[i];
-      return m ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc10(m.name)}" title="${esc10(m.name)}">${icon(m)}<span class="ph-tool-l">${esc10(m.name)}</span></button>` : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;
-    }).join("");
-  }
-
-  // src/ui/swipeback.ts
-  var SKIP = "input, textarea, select, [contenteditable], .gx-canvas, .gx-mbar, .gx-nav, .nw-rail, .nw-panel, .nw-scrim, .nw-edge, .ph-drawer";
-  var FIRE = 72;
-  var bound = /* @__PURE__ */ new WeakSet();
-  function inSideScroller(el, root2) {
-    for (let n = el; n && n !== root2; n = n.parentElement) {
-      if (n.scrollWidth > n.clientWidth + 2) {
-        const ox = getComputedStyle(n).overflowX;
-        if (ox === "auto" || ox === "scroll") return true;
-      }
-    }
-    return false;
-  }
-  function bindSwipeBack(root2, step) {
-    if (bound.has(root2)) return;
-    bound.add(root2);
-    let x0 = 0;
-    let y0 = 0;
-    let mode2 = "off";
-    let act = null;
-    let sign = 1;
-    let box = null;
-    const reset = (animate) => {
-      if (!box) return;
-      const el = box;
-      el.style.transition = animate ? "transform .2s ease, opacity .2s ease" : "";
-      el.style.transform = "";
-      el.style.opacity = "";
-      if (animate) setTimeout(() => el.style.transition = "", 220);
-      box = null;
-    };
-    root2.addEventListener("touchstart", (e) => {
-      mode2 = "off";
-      if (e.touches.length !== 1 || !matchMedia("(max-width: 760px)").matches) return;
-      const t = e.target;
-      if (t.closest(SKIP) || inSideScroller(t, root2)) return;
-      x0 = e.touches[0].clientX;
-      y0 = e.touches[0].clientY;
-      mode2 = "wait";
-    }, { passive: true });
-    root2.addEventListener("touchmove", (e) => {
-      if (mode2 === "off") return;
-      const dx = e.touches[0].clientX - x0;
-      const dy = e.touches[0].clientY - y0;
-      if (mode2 === "wait") {
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        act = Math.abs(dx) > Math.abs(dy) * 1.4 ? step(dx > 0 ? -1 : 1) : null;
-        sign = dx > 0 ? 1 : -1;
-        if (!act) return void (mode2 = "off");
-        mode2 = "back";
-        box = root2.querySelector(".gx-content");
-      }
-      if (box) {
-        const d = Math.max(0, Math.min(dx * sign * 0.6, 120));
-        box.style.tran
+    const here = current3 && !isMarked(current3) ? `<button class="m

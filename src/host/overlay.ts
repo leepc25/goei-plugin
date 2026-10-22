@@ -7,12 +7,14 @@ import { LANDING_CSS } from '../ui/landing';
 import { cardVarsCss, PALETTES, type ThemeName } from '../ui/theme';
 import { statusCss } from '../ui/status';
 import { getPrefs } from '../core/settings';
+import { imgCss, imgHidden } from '../core/imgtag';
 
 /** 시작 메시지 안내(host/openinghint.ts): 대화가 시작되면(메시지가 하나라도 생기면) 숨긴다. 첫 장면은 .chat-message-container 밖에 있다 */
 const OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
 
-/** 채팅 속 카드·상태창 배색 (상태창은 설정 「상태창」을 따른다) */
-const chatCss = (t: ThemeName) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? 'auto', t);
+/** 채팅 속 카드·상태창 배색 (상태창은 설정 「상태창」을, 캐릭터 이미지 칸은 「이미지 크기」·「접는 정도」·에셋 출력을 따른다) */
+const chatCss = (t: ThemeName) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? 'auto', t)
+  + imgCss(getPrefs().imgSize, getPrefs().imgFold, imgHidden());
 
 /** 창과 같은 배색을 x-goei-theme 속성별 CSS 변수로 (본 화면에서는 style 속성으로 변수를 못 넣을 수 있어 선택자로 나눈다) */
 function themeVars(sel: string): string {

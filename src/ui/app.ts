@@ -325,6 +325,11 @@ function ensureRoot(): HTMLElement {
       if (out) out.textContent = `${el.value}%`;
       return;
     }
+    if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
+      const out = el.parentElement?.querySelector('output');
+      if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;
+      return;
+    }
     if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
       wiki.query = el.value;
       const box = root?.querySelector('.nw .ph-content');

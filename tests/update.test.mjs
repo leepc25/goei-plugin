@@ -83,3 +83,9 @@ test('예전 카드 업데이트: 괴이봇 명부 → Directory, 옛 데이터 
   assert.ok(saved['시작 로어북']['A00-1'].length && saved['괴담톡 탭'].tabs.length);
   assert.equal(cardVersion(lore), p.version);
 });
+
+test('update: image tag regexes move to the plugin and are removed from old cards', () => {
+  const char = { name: 'x', chats: [], globalLore: [], customscript: [{ comment: '🖼️에셋줄바꿈' }, { comment: '🖼️에셋출력' }, { comment: '🖼️에셋리퀘제거' }, { comment: '내 정규식' }] };
+  const payload = { schema: 1, version: '0.16.40', minPlugin: '0.16.40', data: { globalLore: [{ comment: '괴이봇 플러그인 매니페스트', content: '{"version":"0.16.40"}' }], customscript: [] } };
+  assert.deepEqual(planUpdate(char, payload).next.customscript.map((r) => r.comment), ['내 정규식']);
+});
