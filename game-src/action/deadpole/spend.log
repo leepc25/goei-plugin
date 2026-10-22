@@ -400,3 +400,5 @@ job_id: 9ee067d8-9aac-4310-a6ed-6591ac8
 2026-10-22 04:37:57 gen down done
 2026-10-22 04:40:33 gen superrise done
 2026-10-22 04:40:33 gen after generations_remaining: 14422.30
+
+{"observed_at": "2026-10-22T10:29:17.650794+00:00", "event": "codex_art_deadpole_resume_auth_probe", "paid_calls": 0, "actual_new_charge": 0, "balance": null, "active_jobs": null, "concurrency_limit": null, "status": "service_401_missing_authorization", "historical_job_costs": "unconfirmed", "evidence": "resume/account-check.json; resume/auth-recheck.json", "owner": "deadpole", "kyuras_recovery": "delegated_to_kyuras_owner_not_called"}

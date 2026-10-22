@@ -1,0 +1,28 @@
+{
+  "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "delivery_status": "repository_handoff_available; recipient_receipt_unconfirmed",
+  "common": [
+    "docs/character-resume/README.md",
+    "tools/build_character_resume_demo.py",
+    "tools/character_resume_demo.html",
+    "tests/character-resume-browser.py"
+  ],
+  "jyaldi": [
+    "game-src/action/jyaldi-v5/resume",
+    "docs/character-resume/jyaldi-audit.md"
+  ],
+  "kyuras": [
+    "tools/recover_character_jobs.py",
+    "tests/character-recovery.test.py",
+    "docs/character-resume/kyuras-audit.md"
+  ],
+  "other_characters": [
+    "docs/character-resume/other-agents-audit.md"
+  ],
+  "kyuras_recovery_owner": "큐라스 담당; 이 브랜치는 조회·회수·재생성하지 않음",
+  "kyuras_jobs": [
+    "11826541-47d1-40de-9664-f05f1838bb23",
+    "9fe0e770-b992-4299-a4c1-90d6e591828a"
+  ],
+  "instructions": "담당 경로만 git restore --source=<source_commit> -- <path>로 가져온다. 전체 브랜치 병합 금지."
+}

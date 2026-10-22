@@ -1,0 +1,3095 @@
+{
+  "system_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "preparation_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "deadpole_changed_since_preparation": "",
+  "files": [
+    {
+      "path": "game-src/action/deadpole/full/base/base_kp.png",
+      "sha256": "87d29c35c949d21d197d49cf0455304492c3470a83281873e3263578cd3e7f12"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/base_v2_e821.png",
+      "sha256": "786a704e64adb3634bc002ece4364be90af287b74d1e6bf32500258f4bd15521"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/compare1.png",
+      "sha256": "2dc378ab78cf5fd6ac95a6aa0f0de65af57745409529c01d201145775542301d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/compare2.png",
+      "sha256": "70e41f8e23be9a80c911b4190d578ae1dce7df2c12f4a5bedf33eea6b249e8ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/compare3.png",
+      "sha256": "55904135d30a788474fe299d53f4b538ab70050b7fdabd80864ef1b4b455a1fd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/compare4.png",
+      "sha256": "53358b371dcca13fbc0d6c9a75ab776038dcf51c9cfa233518f0abbcf590415f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/e811.png",
+      "sha256": "e27794a9cca7a70a80235608d339e6f789d8b0f74cc61fb428f2769891b721ef"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/e812.png",
+      "sha256": "5b4647ecfa5023c29a0eddba4e1f262e6841880bdf38befe1d842fbfe44823c4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/e821.png",
+      "sha256": "611207854773e509c060281cfac9d584d0f9f983c0ca64ca2a9639e83d0e970d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/e822.png",
+      "sha256": "8dc66ceead02d9ed2408bc86a20fe67d7405512df2344c4c9762f7c6e16811be"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/e823.png",
+      "sha256": "71507bbcbc3d329261e7eb382e969c2d5cd9d34b0ba6c36a4baaae5be3f078a0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/f931.png",
+      "sha256": "40bbb7938b1bc5e2e80a0bba8a50dabe9453881dc6f288857939b23af4e5f9f1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/f932.png",
+      "sha256": "3c952d0f573646b042a21913d4ae16ccf327977a24edee6b397ab5ccda55c97f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/f933.png",
+      "sha256": "845c046e7fac185951d83bd9fba514fc2c6af007c4bbe6edbacc48540b376171"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/g941.png",
+      "sha256": "e7c276324ed0c1f23a2592a33a40af142154df44da7b5f41e90043cf150edf86"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/g942.png",
+      "sha256": "be0671f270f0063d4bc37256cf8b5202f718006990de1b4bc5364b6b888b3388"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/heads.png",
+      "sha256": "a16b93ccfe6c73487795516bab309aa569dbfa89d3c2f89771b296980976743e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/p84a.png",
+      "sha256": "6b14626729b333ccb151b3fd119d258e9ad4dec5a3e9aeeda58df8ee072cb872"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/p84b.png",
+      "sha256": "61e35f8c3d67c0d41863922efa2ae3b8a6f194eb47301b732608b156a3a1ec22"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/p88a.png",
+      "sha256": "3c74a612053f5ac67ee76e10f3fe5c37bfe6345ed45a634a7c2d044b2e3c199c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/p88b.png",
+      "sha256": "953a4e948b62e69efbfc009cbb3fda5054c7892b29cfaac491fc53fbae104d55"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/s88_box.png",
+      "sha256": "786a704e64adb3634bc002ece4364be90af287b74d1e6bf32500258f4bd15521"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/s88_g942.png",
+      "sha256": "e44cd36ae3af0bba82b185109745b51dc9d239f4b17ae84e920d92872400a00a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base/s88_near.png",
+      "sha256": "52fd5e379a6c8593942a3cabf10ec62552b3dc987ae0abca140e2f192fa7da18"
+    },
+    {
+      "path": "game-src/action/deadpole/full/base.png",
+      "sha256": "e44cd36ae3af0bba82b185109745b51dc9d239f4b17ae84e920d92872400a00a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/00.png",
+      "sha256": "a937ce787cc8bc8883de4e3e6c73ceaaca431cb48189f32bd39f6557ce23010a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/01.png",
+      "sha256": "4e53d95155dc310e145a580f8f1c6a49e59cacc8a7c5dac8cbbb6926a2f21ca5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/02.png",
+      "sha256": "ced5ce0ab03a4117fd1ab0641427138c81c8f47716f4f9667e0fc195371fa220"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/03.png",
+      "sha256": "fce254360cd96b7cec9447e5715a335a774efa95a81b047da6179d2ff678dba4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/04.png",
+      "sha256": "22a0b52a3b17af8c489494dc0cef94e8f9c125373dac5c2606044e85f329d12c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/airshot/05.png",
+      "sha256": "f8473940c8ddfffe21e1cce4e2f491aedd1ffbcb4a2dbf1368861275f25a94d7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/00.png",
+      "sha256": "21e136a3ba706c173dda9f4dbd64fba41bf8aa2db1a77021dabe829366c813c2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/01.png",
+      "sha256": "a844e34faed3832ef9b0334d98ca193dd04df73b691bc3d3e27fd285d2d938a9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/02.png",
+      "sha256": "c32224e5111c447156ec4daa5ad4ac51f7015cede58b075d69789758a386b3a5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/03.png",
+      "sha256": "64ad601511ee1ea07541f865d0ffcd7123696882b95a98075ae8259465c685a1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/04.png",
+      "sha256": "c076a13cad49e8424ac15e074deec247a662f6342c80c382632b4b742e31908f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/05.png",
+      "sha256": "e2edda991e50605d83c498e7f790ae2de20162f208e6b039e8b42609ae5661d9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bandage/06.png",
+      "sha256": "eee25fbaa072b8720300d4103c880e08271311e72ede888725c4c9b13d917de6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/00.png",
+      "sha256": "49dfd3c5191059d5905b965054e17b662c0ec0ea26adcf5848b8f3779ec5ef2f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/01.png",
+      "sha256": "f8c75d8d0b5c52c8b7b75313613c8c1149d1739840f1640d81f91fd03a49fff2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/02.png",
+      "sha256": "0309ba5ef2805aa98046e70980ee3ef1851d51136e45802a57201e193a34fcda"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/bath/03.png",
+      "sha256": "21b60e2fb7162a66c73dfcd5aaca4c49f966dd0b9ec64f651cf31407643b56ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_idle/00.png",
+      "sha256": "88942f695309c3292fa635b44439c0c7b07d6a3f156039fdf95f34e2268e7051"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_idle/01.png",
+      "sha256": "decaced45fc74c664e57573266b3c92dd3ac7bb01e0dc160eaa2b7fcdaeb7b50"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_idle/02.png",
+      "sha256": "75b48b3023d4b50572db1af8089fbfff2a4058560017b6cc1850602a5c69ceaf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_idle/03.png",
+      "sha256": "9cc21f687e15bde4dfba6ce0cb71995a5734b4f77423935e6c48d02310e5457a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/00.png",
+      "sha256": "f7f3754cb84c24263a40ec3d92258eac6e0757290de640cb8fbb244909ff3b7a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/01.png",
+      "sha256": "0de358b26823b97cbc5a6554c4856ff76762e4be734c2e86f2fdb61ff98debf5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/02.png",
+      "sha256": "7e56771546e11c39cba16a12b70d331f5643c202b3ad0d39ec75f6e1289449ed"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/03.png",
+      "sha256": "6aa7172fe1049e83ea550e3cb3349fc342f4669db04299b4ccb086f958389cf2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/04.png",
+      "sha256": "00a2fd705eafe86db99aa7062563f81480915fded9dc71e14673ea5a047cb138"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/05.png",
+      "sha256": "c51593eb4256f4647de3e4a829810eb6abd2fb724c800cd24f41c6e6720462e9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/06.png",
+      "sha256": "3ad8589ef3e67c2e4c3b493bbb3ac5c0e7edafbc6b93fd1528eee81fa0f09562"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_run/07.png",
+      "sha256": "90d021a12941267243574cc46ef5706f98eba91a4c6b8ea37d4f43d54075508e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/00.png",
+      "sha256": "3330bc9f8bb902c94c54bbc336a4630e2c8f9f004087f47d13efa8a628e47f4f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/01.png",
+      "sha256": "82e7458e1d744805b5243082f064759b8b45db82ec713ad4a5e44d17fd72a647"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/02.png",
+      "sha256": "82cd5fc43f8ad8f4ead1ea81f8bab8e338023654cb0e0380aad2b80d98f3b643"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/03.png",
+      "sha256": "2a72991526054dab56ce07cc19fe1380e819dbd48185ea0ee24fb907b5732c50"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/04.png",
+      "sha256": "bbbbf7b4757f1bb71b8b3b64df7ba2ae96cc1fcf8aa2f3ef71172fb413e23602"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/05.png",
+      "sha256": "f54297fab2dd206c6ff700404cf457fa29bb04a79c53d279732e491954cfead3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/06.png",
+      "sha256": "b13a1b984f35f5276624fc7ca2d35134c8e319e9720db9bafcc5752cff5356ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/carry2_walk/07.png",
+      "sha256": "66f22a91219b842ff70a663700641a0a4e53d1275588a3bb9263492ab34a6f5d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/00.png",
+      "sha256": "915b452e4a988bb44e1d3d4898023f1c4da46e36db59b10e8dde1fa51e0b8f62"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/01.png",
+      "sha256": "3feb6a3cef9212506f90ea01af6f9450da98ef1e4e4b9d1dff8088c2882668f9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/02.png",
+      "sha256": "92d39ad0e9d3036f9bcb0d5321af5732a110817c4a72cd9fe0779e411f7613b6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/03.png",
+      "sha256": "6b4bbda44cfcff65b9d19ebcca554fa0ffcda4240285e24b1660e840026601ff"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/04.png",
+      "sha256": "9e764df757303428d26ef968f6b4b3d7727c76c61582deaf7821449d6bb65b4a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/05.png",
+      "sha256": "407bd2751d907df2560c011b833fa1ae6c1abc0757b898c52a51761dd724f074"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/catch/06.png",
+      "sha256": "d11693d411cae79ffb50adf9eaf08cc30cd85f0c940ee46332c64985f0035e8a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/collar/00.png",
+      "sha256": "4aacbe70ed9879b391c9f05b02769d28df5689fde6c4b96c209bce3b5d8cae91"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/collar/01.png",
+      "sha256": "0ccba457e4f94949d608a70c94ba8958cdb345c2c3c41308b7580ce8b21d8d7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/collar/02.png",
+      "sha256": "6b4165b7d89783efe842be2e44ed8a7fecbe53243f0eefc1b99065bea07831b3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/collar/03.png",
+      "sha256": "0b1752234a14159703cedb24c0366234c22bd7d624e5abcf1de435a8c56ed29f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/00.png",
+      "sha256": "603165589f416f63d2dc900eb222b6aa976ec0c458b990813b7b61e98b478714"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/01.png",
+      "sha256": "76ec5bddb0a07d2afd5a42077f6a92ed4527261c5892cb1030840c8da3280f4e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/02.png",
+      "sha256": "a0cb3c964e4cdfa8912f2caa426e2bead0a1aedd190070022f37b56f9b198e18"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/03.png",
+      "sha256": "a7ac8cb8ccd9fecf025642b9ec6b1ff404a7320679802f82576dc305b4d84b1c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/04.png",
+      "sha256": "efd03fecb0bafca19c58c2a64269c149163052023d33b440e273daf6c6f85569"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/contact/05.png",
+      "sha256": "858bf7b153a99995429bc19811be2e80c24e3b64d1233910b82c1d7cb12aa193"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cover/00.png",
+      "sha256": "b66b9131851c4a198329a79247e5b33a609b36f54263a780ba02e779ca00aed0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cover/01.png",
+      "sha256": "fdcc5ec25155bd0b9936137f765f31ff81f75671e6751b4bd5fc039a18f64b13"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cover/02.png",
+      "sha256": "536c452f25662d464970a69ec78027803095f09f03c4b15351768f4a1eab9b10"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cover/03.png",
+      "sha256": "1e85261b9d84d157884a560f7beaaad0e1829fcaecb7ea21ea7c60bc9e732685"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/00.png",
+      "sha256": "0bc580afbf573ccb996b4a51379e75b0bf88e51f9ce299af3b203d4546907ad4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/01.png",
+      "sha256": "48af93a67796a7335fd197b365f50dcfe81c279502f7f3b960750796e7431e06"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/02.png",
+      "sha256": "9c756430dd1eac00e07d535018904e5647979ba73376244bf140decf422f97fc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/03.png",
+      "sha256": "9d7714f3f41979956465c3a42abaf7bcfe927437f8cb4892ff20462180bd35f7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/04.png",
+      "sha256": "3ba84b0faf31e1dc8f5c80cd80cc5e348aecbc3971c8718998a7a181664e5ae8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/05.png",
+      "sha256": "baeda73a79dadb7b96bfe5a5c382b5bafeb26d0e9fe641923899b0d4e534d696"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/06.png",
+      "sha256": "e8c503df7a65a219ff4d9cc4ed498385fd22255cc073d619b54f4f22efb618db"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/07.png",
+      "sha256": "c98f2baf05f780ec387fb5ecca4070298517d402b8d193f7337729aa28d12f89"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/08.png",
+      "sha256": "3a436d0fc48dc48563fdb8129d4402027216ab7fd9d8630a359c264648b375f5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/09.png",
+      "sha256": "f8c314ca63a3c9016263442ea2ee2460b0d863b44b65ff80f0b79beb56214028"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/10.png",
+      "sha256": "42c43dbefc5f3a23b805fd502bd43fa2c162616569d9de71b13b3c9e44ebb99b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/11.png",
+      "sha256": "3df8b269451f6935d73ccd598d431002f0c3d282237de8fdccb1988eab9aeec7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/12.png",
+      "sha256": "189092b36cc99a95dc2fc9886eee8df87b755eca419967fdc5363247553eb45e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/13.png",
+      "sha256": "8fc467897dd3da12a9b9360edc10e708080599f90b0e52ebb6089a692f2277df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/cq/14.png",
+      "sha256": "a1c920494691c8c471595a57cc1aba56f6462c4eb31ffdc43adb0d0051985d91"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/00.png",
+      "sha256": "98ed189f448b75c8e5e8087f5c605803c2bb9e7a0e8e07c9768f727903ee387b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/01.png",
+      "sha256": "581bc2871650020c1194131a6d8d9215dc7cf556bc7b9b9e58cbd6b33d0306a7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/02.png",
+      "sha256": "c62458f584b2794410002071ad8a390652eb40c25d0cd6b4923db4febc50eab0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/03.png",
+      "sha256": "06055ddbcbe9e6e8129cfe6c46c2e851c144cea21c810d2208bc6bca24c25e22"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/04.png",
+      "sha256": "076f10fa448a9ce335306b0402a4c55dcce519a17285b163399212be66df5ae6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/05.png",
+      "sha256": "8cee727c13e63161a7f1925c1eb0c46e317c9b82481d00f4b50db924ed17dec9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/06.png",
+      "sha256": "66d3fe84ccca5d19a321f54c754a051f05eac44957f6887289ba3991bd11486a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/crawl/07.png",
+      "sha256": "a858df1899897810905f7c6c2f993f4ca3bca1e0d6084c3101442165ad6c18dd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/00.png",
+      "sha256": "9bf1ad67069bf2c102e4909d168690ffac05ef78ab364345e0ee8644712a3ee3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/01.png",
+      "sha256": "6f89cb848ceeb1193c427a5c4c678b23b78d91107f4af46fba8a42ac2cbf9d1d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/02.png",
+      "sha256": "807306753d989c431ff8414264ff451e5b5bb44156abf4e723dc58498b2e40fe"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/03.png",
+      "sha256": "99129a001a1cce139f40d96216cb4be0279b323640d04efaa0543205072d6d4a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/04.png",
+      "sha256": "188af6fc1892499290422161403436b92066b4274177feb78c5914049ec73882"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/05.png",
+      "sha256": "92026eae21da41566ce12d0ad0c5f691b9946e4ee4f224301473c23ce2ba2164"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/06.png",
+      "sha256": "8e9fb9e70956d467dc228440b9bd4c5c2ca2a674abf9b66041d0bb2dd928301c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/die/07.png",
+      "sha256": "20a525a2840b44f4d6f1f5d987da0c29396cbba47dff560c0ae534bafe0e60f7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/00.png",
+      "sha256": "d4aed65def15defea5787b89eff5498026c24a01450b647c078c251ad6598e43"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/01.png",
+      "sha256": "5f60ca96aa871e9ceb074f33284188cc7ee5490a2fddf26a28404df94e449870"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/02.png",
+      "sha256": "686c7362b4a3f7b92891c979c5f069c57af639a51286a456e466b150b044113e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/03.png",
+      "sha256": "5a59a182099fe1bf547e0053f2e2837bff65afbdc9f6a492cfa0c2db49dbaa5e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/04.png",
+      "sha256": "576508a2da392b0a6613de8b7003734aeea9c821b809299db5ba6ef9fbe75580"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/05.png",
+      "sha256": "a94514fd05f3f4ffcc187a61133cc6383db643a1bd034d96b8daace596679f24"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/06.png",
+      "sha256": "01243ede61bb63d040768ddeeec2dd88c87adbc932afa52940759bd316c842d4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/down/07.png",
+      "sha256": "67df10978b28275d08d4ce444a41e64b882133f09421ff0fd1af141131c7b532"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/draw/00.png",
+      "sha256": "2665ed133ee779d322789be41a01bac10b318b53654aa160b19170140850ec39"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/draw/01.png",
+      "sha256": "3f3db3d9dff0837c3b6516829a5aa27cfdc258d8cc8fc94e326e5a9c49324424"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/draw/02.png",
+      "sha256": "c2eafaad420382b9ce7fd59a445199683bc121261d04c3fb1fecc8de32d7b024"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/draw/03.png",
+      "sha256": "b4d0103934a76a40f9d3aec038929351d19d645a31b698d549e23ed3f0a7c9ba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/00.png",
+      "sha256": "277b81763e8689ae926cbf71aa06012c5cbc3a120705b6988896f5ae526aa6e7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/01.png",
+      "sha256": "2a332af957e9189626e8158152d448051e8f31404b4f6ea886a8dd20adf06d4a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/02.png",
+      "sha256": "a3e55273fa12637ad7b763b6fc15a4f0ae7499a3c31f10e9b3c4f9e59359f2a7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/03.png",
+      "sha256": "d09a6bbd26497ff5181a2cfb76165ed3aabf06249fd3cfe02d871954a45c8e4f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/04.png",
+      "sha256": "588653d6ccc221c6a73a938961f3f9f0651c692a9d3c2235bfb172776bcdd3df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/05.png",
+      "sha256": "e02af1ff1a35f1fe96ad1fac075e2372da310f44dc18d84f1168368873680dc9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/06.png",
+      "sha256": "3aad1e69e9965d8cb1eb98aec1e79177b268a0a6a32771d8f04c7520cf475826"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/drink/07.png",
+      "sha256": "0718c252cd345e10efa9841390e118c0acd3827a63d63f78e6010ef3b04c1fba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/00.png",
+      "sha256": "69311cec336956ff92553a159da12d77a9398e06b36a79478b640984bc2f3c7d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/01.png",
+      "sha256": "0c4fe30721693f76027ae313fd711df82952c051042e8f8161284211e8d5e466"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/02.png",
+      "sha256": "6b6b3fa2da80db5adfa9d39f87f38d03fcfd26b5e64cb17ecf714ead20c539d8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/03.png",
+      "sha256": "7610977e2d109dcf62bf7e526979533195ad7b4b5cfb583e2a3d11766d289d26"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/04.png",
+      "sha256": "63a61e29136cf14a0c0b991f80b33d9f3d0d4cbde926c540c3952358cc5fc0b4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/05.png",
+      "sha256": "f6b08e70610fa50c9ac9d88bdd999ec5e5c607d1edf08b97cb654023313c370f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/eat/06.png",
+      "sha256": "6ff003e270586157ca11d155a7ec85811f8b66033c94dd3935eaecf422507c6b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fall/00.png",
+      "sha256": "1d5071d866d37e99bbefc9295e657a8911248877cd27f87828485060b2140d8d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fall/01.png",
+      "sha256": "cf71fa004ce86978e5c80b9363cf314922e37c1b24914d8e7a34e98ebb7ff68e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fall/02.png",
+      "sha256": "7b6e99398c0661fd43fd8c73f426040677d395022415e0a8e2655f5acd9ae4d5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fire/00.png",
+      "sha256": "12e911f3c6b33058c0346ce3c855370de154695134dddba0c153829308212585"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fire/01.png",
+      "sha256": "7313799fc4859e08a176f74f6aa600fccceb8591ee9ac821cb072e9738daa871"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fire/02.png",
+      "sha256": "863ea56e529e6dbd5fd41a1aec51b051a711ad309fb669d1d02d0f2700f6b79a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/fire/03.png",
+      "sha256": "32a4cc5497881bcf3062788e83f9ba84e057f5def05fd86239a0e4f04f294d63"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/00.png",
+      "sha256": "cafbe1fcb63e4b40d651907010dce05eecfdb9a3846e52a730f279bf83e671e7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/01.png",
+      "sha256": "3d33f921fd7b14601a0ed9d7b2a7724291ac9dea6133e4d70d6f22ce7cd928c8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/02.png",
+      "sha256": "4d7ad9b56a3ecfb83107601412febfe450221e78406499826ea6e4b9b5c247f2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/03.png",
+      "sha256": "b8e66b22dd35e51be4ee2b8b90ad0f6a7dea6f1e1462d41fbd8c509201eb4f97"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/04.png",
+      "sha256": "666fbd88b66420db37b11e030abc38d767bc4e36d1b11ffe07fa2ac3459815b9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/05.png",
+      "sha256": "3fb5defba08c2b7fc4798146fe13b3b356c348e78130d70da1636a5c40f74baf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/getup/06.png",
+      "sha256": "24084c66c12cc461020fd41a87e74f5596a1fce96f4d8350b5ccf8681ca0480c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/00.png",
+      "sha256": "ddfdf473d3062cb745fd0710f1c7ee6592d2207ecf7ff3edbf4025303416bff1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/01.png",
+      "sha256": "00fefdb219f63e4ce1cfb86691fa23f85b3e1d38b8f085a2d6e83e2259f2eeec"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/02.png",
+      "sha256": "72f5f5d341967598a22a3754847b4f472db3a987da50d6c74b1428409a1c2413"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/03.png",
+      "sha256": "7d5e1897cce689420a549a22372ce8dd2c87cf4875f07164c7a8b194ff48c4e6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/04.png",
+      "sha256": "3a0707a5df3ce95ba2d2ad208d4248351e7e65a98ca19b032c40ba961fe170db"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hide/05.png",
+      "sha256": "d805bded5d1d0f7c4b5c3ffb2dc39abc65dd50e81d4f92d75e711144750ca044"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hit/00.png",
+      "sha256": "a1c34c1a86577e4662fa87401c5083124607fca5d6c23e5d58c134036f4584a7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hit/01.png",
+      "sha256": "380fd0abf34a5ddb6fdd77579a94dda7afac08002add32d01d658c87fd255b8b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hit/02.png",
+      "sha256": "a725cb72b6cd4b5f00886243e9b59ed634675ea2051bb67553b5771f56831db8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/hit/03.png",
+      "sha256": "9e3e0173f8361dc2bdcf92fa301c88d7e1f413386a4f9ee7d0abf58582cd0836"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/00.png",
+      "sha256": "f591284c8291e052341f40634aa4784f5b5c9df5bcf7efb87a5876ccb71f304f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/01.png",
+      "sha256": "b5d38b6d272bbada85739e9f013fb29cb7c3419d469a4e7940c427ed085c5da0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/02.png",
+      "sha256": "0d2ca8cfe7d801d103a11a972c7ad48a5639ccdcddf6fdfb2ccf74a13b6b8d9b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/03.png",
+      "sha256": "f4bd115efb239085d27094f0c89467b848b4f9a1c3453c1e7cb4da03152c808d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/04.png",
+      "sha256": "fd01d9e8c11cefbca10c8b6ceea8b6141a4e09f367bbedbfbd4331efe31ab71a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/holster/05.png",
+      "sha256": "22cf9394fdabd3911d05b452757cca233b2ee94a90606a328266a81c1edcc2cf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle/00.png",
+      "sha256": "b542d8e378294e568fc79d1c48df06a67298bbcdb4af9b2e156f1efa52a141d9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle/01.png",
+      "sha256": "d3616eadca0788ca219dd9b5d6ffa45a65877b128e6c31ac04a5d5ac46b3e1dd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle/02.png",
+      "sha256": "c3adbc2c4f5cfaf5b242cdfee8edb7cfd016b7ef9b0492553d69a3deaa99b00b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle/03.png",
+      "sha256": "f3ea04eb2bc03a9a039c524c5c17fe2521e029b6147426f91c6126966f55fc23"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_light/00.png",
+      "sha256": "c1e48106bcd543353429d116062a73b4d9eaea8baa99d37e32041a83c29273fc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_light/01.png",
+      "sha256": "e7047d263c99c29754e39bb0463cefcdc1aa4790d7731995260c09ff6c96b119"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_light/02.png",
+      "sha256": "2f75d0747409d4119a7e91e7e18b887d24aa290d61f16daf75a0b872be6b7501"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_light/03.png",
+      "sha256": "551f26e4295de00d3d3d2edefac346fd84563c7c3d9a9275e4aaeef02255d78e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_pipe/00.png",
+      "sha256": "484b7e9c0e32da4ebde0e199b190a18ac2bbef239418f41e28949fa37257d4c7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_pipe/01.png",
+      "sha256": "a6fa8224151ce425783e7d97b787eab04de6ad067658a9ba262fecd1abd4694d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_pipe/02.png",
+      "sha256": "357294b579758273065ccbda6e84d23fcee228a0f8cd5c3e549609fd3a24e003"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_pipe/03.png",
+      "sha256": "add5b9b200f9b44b8c2b59a8da30eb586bae41940bbbd66d3696dee605885de2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_shotgun/00.png",
+      "sha256": "c762a91beaa5b8870fdbe9d51e0042ec1cced934ae2fce1c56ab98e0cdb7144a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_shotgun/01.png",
+      "sha256": "39170664f80e603835feb1b7ab29e557b37bff12f5061733b5f8e7d89029658c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_shotgun/02.png",
+      "sha256": "c2e94dfb24625e1a54efe6bcb51940e9fd928d5a65015e41ca2243621c9aabfb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/idle_shotgun/03.png",
+      "sha256": "11e1c5ce581e5590c9c251c6b6f1478c465af036998f55d1ed1c9f0c9e9649ad"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/00.png",
+      "sha256": "22a865b101028c5dee31023de4862f254d146227ce3cad2c6c04463afb413b72"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/01.png",
+      "sha256": "daea3cd8be1d0613c80da212ee0c7efe6d1fa61fd6ab4024d46c0f5e601249ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/02.png",
+      "sha256": "7e81746350e0605e1d8190e8ed9fd1a18b1aca0cd4d1ac760fef7c605cbaef3b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/03.png",
+      "sha256": "9632db621bc5b897e6f1697d37b107ecd3abc81c9e86442992906bf9a8b402db"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/04.png",
+      "sha256": "cb4da182ef04c47bbd0b2ad6b16e2058c6201f7bf32bfdd7cd257edf6daab467"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/05.png",
+      "sha256": "4e1d168c6447bc8d49af048305b73bc7ba887b33a86c0e1e38d6ddd06dc1d6ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/06.png",
+      "sha256": "d08cc1f6bb8e5526e9605832dd3a14f2219df2ee467c5d6ac8e09e9ddbcde7a9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/jump/07.png",
+      "sha256": "57123f1a94ae606ffb8d4b02cea77694b76bb3996237c8a4f9a68d352ccc71cc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneel/00.png",
+      "sha256": "d944b8302d94073d818c4099a430348a6fd4ceb37e12f3a9a23ec7d1588e6604"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneel/01.png",
+      "sha256": "ac1a38720a8eae9fdf2c1f2a284126b2dec124001f5eb5e9b230bc1bbfc1f447"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneel/02.png",
+      "sha256": "bdb9f14cca7b87f207d66ab59dc90d03ad5b7fbe649b4c7f4faa9e64065e42e0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneel/03.png",
+      "sha256": "63744337e72e8629dc731127d46dd122d8b1d27acd58a0196c255d8a3a95fb39"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/00.png",
+      "sha256": "d5af7824cac318a4fcb0239e3778153bda4dadc573734ecffe0b03c7208dee3a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/01.png",
+      "sha256": "4e44922508cf95264ad9fc25a953464a90d1f5099e5ea6034d042523e9d06430"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/02.png",
+      "sha256": "b8cf9f90a643aeb399de2b63105253af88ada057916d91afbeff1fd8f1298e82"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/03.png",
+      "sha256": "de44b7e50342264ce5b37189706fd54599afcb6e3626c6b6364c925a058ecc82"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/04.png",
+      "sha256": "678933ecff0cb0c3ae31d9737b09838cd572f85610cf333f9be82f5321c2d7ca"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelshot/05.png",
+      "sha256": "aa5ceebb52e906498f2619137119818344db6e02d364b9d5650d0f6f4a8afb29"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/00.png",
+      "sha256": "b0721ffd1e49dc1fda1c987f9c8f8433a71c774c8c8db37dfe7136c168eaacf1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/01.png",
+      "sha256": "0f20076e87f31d5f9f492b0fc6ec03aa1833a391a21008fd4dfd2a8190dedff3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/02.png",
+      "sha256": "6943c0e11fb84728f3c75462b478dd1862cc97bbdf1ff9abd990488bf2ddc52f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/03.png",
+      "sha256": "f28d8c420890a0c84f810cbc1b2f3145eed334c76e43db54a993ce324c90d97d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/04.png",
+      "sha256": "101bdf4ebdf62411f73eb798a530bfce6131b24584a4ebb7a94a10c7cf6a0c23"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/05.png",
+      "sha256": "6ef6edf45dc05d84e3c5fde32b5da37b8071cf9f3bbb0126791db2a8f0a7d499"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/06.png",
+      "sha256": "49f5767085d0d3e4199c86083a36c6ac8f1718c3fa809ce7ebd9f6dd25f4bd8c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/kneelwalk/07.png",
+      "sha256": "4a2b7265da638484240e1d2cf22cf56d6c8996057f906ef6c3548ee21bb594a9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/00.png",
+      "sha256": "8c5116255ed15703aa51f1615e153cb22cf93f359264d8844e9a36e73ce9a37b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/01.png",
+      "sha256": "a588e2a69cdd3199895f4a834cb2698cee6e6146b5cef62d29a3e7fafdd28e70"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/02.png",
+      "sha256": "c9ddeb6b4e6da712ff0be6b7d23969497a843570d31e39932fa5e8c4189177b5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/03.png",
+      "sha256": "ba4a45733477977a7ac9c3d683555b71545f33389a255499a4cbadb570c8e490"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/04.png",
+      "sha256": "2155675084df32071048764d27fdbbd4935d0b6e0df027d51a52d4226e4a4b50"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/05.png",
+      "sha256": "004228a117f9f9730ac8f29311ba53cee56d9d8bfbad7ba25b24694eb48b6a8d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/06.png",
+      "sha256": "7d80df88440f14e0b6d9084226e490c414fddcbdc634a2f04388f7d0de52301e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ladder/07.png",
+      "sha256": "ffbbd1e32011e76c7de046c5757a933d61193cd5cec0480ae5f15f2e44ce0d91"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/land/00.png",
+      "sha256": "969c59a8ccecf68e0d8a3534f4e2a9e87ce22bb606c4eb635ec834622ea51179"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/land/01.png",
+      "sha256": "1c3f66169848b744ab649bd8aac70cadb637aa98d01d8c454026d0c1c26d1291"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/land/02.png",
+      "sha256": "3f3e95adc899c875df26336be259feb5715334b505605009711fa5c22929d048"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/00.png",
+      "sha256": "cbaeb730769cec20952ab9ec6895427c85e4386cd4d54b12a2c4b4bab782fe2c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/01.png",
+      "sha256": "09e7b544a7da76ec4268a6e0a04f828219cbff44d2b22306bf598dde51620239"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/02.png",
+      "sha256": "61c44d21c8ae76a6b49d0bd14923abee6f530d34e591289e4e6e4ffa5f89b4a1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/03.png",
+      "sha256": "373bcfb0a2a64bd60c538793435a8e9ea4349184755d9709564bd73f46b9b02e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/04.png",
+      "sha256": "cb21d146ef1c1f0031d5f0e6a9956c562742c2ccf2364b64cdffa6adfd2a5f63"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/05.png",
+      "sha256": "57a5a61dc32c3aac6c3a01e3d7adb3580c43ade6afcb7d6647ba92a059b1715d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/lookback/06.png",
+      "sha256": "4d922e2a5a14edd044f44541fc1330be297dd75d1de23e76922f425acc80977a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/00.png",
+      "sha256": "49f57168c699273f2ece02125511908676d42ced732b5c0686ee244a34df60c5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/01.png",
+      "sha256": "1c5243eea07cc0b5fe38dd8d875faeab38dc294c384e8a4b371085bd43a027c7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/02.png",
+      "sha256": "f940c8f70433a908fa05d299cd22e9d12226ab1b7398573764669befab32b386"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/03.png",
+      "sha256": "925e75343a943d1cf93bc57c1929480d0eb12378a5766508f13cf77fa35eed33"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/04.png",
+      "sha256": "0b873130ceddfd73cb3ad1534c37a32fd99380e358dd84edb39f1b1224d5ec7b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/mantle/05.png",
+      "sha256": "f1095a82474ba8cb7967bdb3656e0c8ad61f9102239aa0f6d3d2d4e4fc4da6a8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/00.png",
+      "sha256": "a74f879a80269d1c632f1dc78210070c054e3fda262b8382bb52c18a229fdcc8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/01.png",
+      "sha256": "ba758f76cabaf137b5fc63e9a5fc8168397e9070e06f4e0e7ef66d828a012b6d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/02.png",
+      "sha256": "1da06b7e69b728ef4ffa484f4cc2f083ae3643ce66ce3a1fc5ddcbd856da50d8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/03.png",
+      "sha256": "781e302b4ad3e5a0a8dea2cd0cc22e148a58ca7101adc9f9b1e733ab3b7a3fdb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/04.png",
+      "sha256": "9b79da424186c1ff3af92ff2f649ff3abda06c82ff438d127c07f5bb029a6d67"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/05.png",
+      "sha256": "4e20bafd1cb7c7ecb5ae861623bfa3952d5f3982d21e6178daf87ccd7870e76d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pickup/06.png",
+      "sha256": "1c7720b02d0cf535abb56ab0b77c7369158149988fd886c9af632fe49b29eb86"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/00.png",
+      "sha256": "8c0baed27ad97cc7e817252b17176773d34fd4dd911c15ab87aaf16b7ff33b31"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/01.png",
+      "sha256": "1720cb29bcbe32747bcb91bc79d36e4a9b332e6aa66dd0d5a548f4bcbf65a370"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/02.png",
+      "sha256": "f1b3730d7c9b34af3adaba8e4dac2d876f0d678128ba66315014aac29b4048aa"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/03.png",
+      "sha256": "411680c80e799390e7ffbe6dc6de5c6b63d219fab7a92df4a3c81b212700d7e3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/04.png",
+      "sha256": "da93f8f15a6724e0c3a4e95e1cc220048696ab230c1da022c0354c602df10c26"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/05.png",
+      "sha256": "f2106af1b4c507cf479a8f0e3b2520bc09b8d8486308718e41cc2847a389ad5a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/06.png",
+      "sha256": "82c4ab2acc012badf0cecc35fead74fe7347262059a6474e8b90f0781c35ed64"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/pipe/07.png",
+      "sha256": "88ba2fb90772b5b9d16208dd49804a55411525a9b159fb41024f4191cfd412a0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/00.png",
+      "sha256": "92d6e85cc11b56a6d167268dbcad25e9408cb7db067c461b04d98b9e42bcce06"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/01.png",
+      "sha256": "4871eae1726b279dad2a3ac15cd62914651199a0f12fc0846d3e8022e7e0b016"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/02.png",
+      "sha256": "a6a35c5dd4cae198c6e1ea5f85c06f7b387d2385c1ab9cfa98f0916c9e8e0201"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/03.png",
+      "sha256": "2bd7fbf3a3dfb859edeee616d5847f9736c7fb2a4e03238878044d709a62880a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/04.png",
+      "sha256": "e54493f0d1e4d6eb6dd79c275d9ad8b42f172bbea26daa93f7cd3cb1f9a70b55"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/05.png",
+      "sha256": "cf9a4ac9211d308c1b9fcd98b94b593970dd756eff6ea627e34f9cdddfab3246"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/06.png",
+      "sha256": "ab3ab7f20daa7af30522bd442e9caf3dfa6578a4ef7b8358930d783b2617afdb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/purge/07.png",
+      "sha256": "0ea4a606b27bea64b5990bf997fce7c1b44c5cab04790d6a07706dce13a4c8b5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ready/00.png",
+      "sha256": "b2e49191239035d8fc64afd414ad6c534bee0896f0d03e7f45ac64b9453894fc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ready/01.png",
+      "sha256": "b92ddfd98a3417c3ca8f38c2eb5b9f049e4e86c5440918d052434ff6d90c2e1c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ready/02.png",
+      "sha256": "1b8907eba5102c850cece6fa71369732cdf6a02ee1871bd1b411929f35a35034"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/ready/03.png",
+      "sha256": "c216949ddd58eb5e48dfcdf53de1abe777cee4be8cb3f114c061bf40edbc62f3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/00.png",
+      "sha256": "3eb1947b904e96b8db985c1ddeac91e1b5662d448cd7b8cb7887707445ebe5df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/01.png",
+      "sha256": "618fa3b04f245f0e15ee26fe3026b3c429df182b444bbc4b41a46adf8ee9a9d0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/02.png",
+      "sha256": "7eee32a16286f5ca37b0ae24382579021fd4aa4be0eaedf8a18f941e3f6f541b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/03.png",
+      "sha256": "bc3e721cb9a0ea98098b5b35a965882e1ee8fe9fe2a16c5f60c1d6023f112b59"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/04.png",
+      "sha256": "aa9cc7ce0bfea5b0b3777ece9ecdb10761f9270dcdcdbdeb9757a7034944dc2a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/05.png",
+      "sha256": "ce855dde917dade4a3001d79082cf7ac07bc5db50b7810c1d79af1f6e8feb337"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/reload/06.png",
+      "sha256": "4adebff16fe79badbefa14aed5eb32c73a618c4b2efcde4cf8e75c300376e278"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/00.png",
+      "sha256": "32c9454eaec204edc74d12f95b292a9017beccbcbae599248ec539ff3a826af8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/01.png",
+      "sha256": "6914979ffea29a597172b17fb5cf16e609efa4dd2ba71c68956f73d5ffed9d41"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/02.png",
+      "sha256": "c8c6c5a254320154a6f4cf749c5b686bd15ea98f8d288e8f9ada650f4cadd3c6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/03.png",
+      "sha256": "da9e160e042844caf617dfdbbcb176240bd8fbda73aefc45e469ea25edf2d013"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/04.png",
+      "sha256": "6a67aba749cabfa04d8a65e1f45700070228b4d1cd9e37220c1c7d74c4cd58da"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/05.png",
+      "sha256": "6330275ade5ab05260757ef6d7439feb25628c4820e1951090556bf993906471"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/06.png",
+      "sha256": "d7e636b430e9c98ab4f6e76b09f31cca7594519bcf6bb3e1fb570a6b04d8959d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/07.png",
+      "sha256": "066d81d4978c704c7289a8f7b0302dcb2c51b1ddb6bed04c3e7c91ddaf34e695"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/08.png",
+      "sha256": "7da9954856b43d03492d6cf6fbf23f7064613441c6ff33b288f5a0c2d6e4d7a9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/09.png",
+      "sha256": "df93c502dacefae6828d901956d89da139ccda09c5767c35be05f5cbf81453a8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/10.png",
+      "sha256": "8568264105809e01dbc25bf175729f0de8c3d22e25520bc512e8266f01e1a45a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/revive/11.png",
+      "sha256": "564111e73448f9234997ffb1cbe5cedf6101187b8c416353141516708ec49ee5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/00.png",
+      "sha256": "7221254287db85f7a30de2b3107e52c82785ae15f1d3efa1b036830df7cd0eb7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/01.png",
+      "sha256": "65f961874dbb2f1fd02b0bf2c19425f6089577874eca53befcc9f26c6e54b90c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/02.png",
+      "sha256": "0c0e3b5fc1bfbe938ed335e7444ac223a361ccfbb78cd4fef8819dbe2fb268c8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/03.png",
+      "sha256": "b66002f356189bcb9419b4b6f7b569f14931a85f554db5224c07ff545a818bae"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/04.png",
+      "sha256": "bd6133eb49798565f90f241fef6b792a75a0f2d42f74508d8ffb440ebf41b119"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/05.png",
+      "sha256": "2c7e4ebce4023a994be3dd3fe44b80e574c2d60d76974553941edd3296240e43"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/06.png",
+      "sha256": "6458c2db03fe9537dde3d3260b70bb183e0bbcd7adca5ea82b053595f548287a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewind/07.png",
+      "sha256": "34461b4c080c1b537b47ebc00de32d70393da2a383173dea8f4a4e55effa7edc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/00.png",
+      "sha256": "6739e7fe0a42c155362126bce62cf38288dc7a4a13939c580a740446fcc3f57c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/01.png",
+      "sha256": "9b1749b3034e1a0e48a473f25a65beba471190e55113576e718f0803dfac8c5e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/02.png",
+      "sha256": "a3c05106b7b8dfc81677a85d7a58140d1db02e01f12ae3e363173ed077cf480b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/03.png",
+      "sha256": "db6eb2407ccc6278806bc8faa9935945b084d892442350a496adbc530d968dee"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/04.png",
+      "sha256": "acaef90c4e86f4641bf6882ab4dc702577184d1110f267db8b7bb8ae3ae9dd3e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/05.png",
+      "sha256": "a1314c9befb4646ce34c0960536540df9cfebaaa9c4a9806ffbf8ec6e475b4a8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/rewindother/06.png",
+      "sha256": "4358d8fdcbdcf5bad108781bd4c8d1bf2477ee9fdb746f838620280517d73317"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/00.png",
+      "sha256": "1e0c4937477c6521334f4c8601d1d667cc2b3ab51bae23b721d4294faaff6c2f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/01.png",
+      "sha256": "6516db77ddf756f2deedf64c6bc80c320d79e0529b15e67827841c94ec293d3f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/02.png",
+      "sha256": "3ecb9847e2b1ace927fd35189fa3f5754faee0a1cc95adccff653e616b7bfb40"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/03.png",
+      "sha256": "3316ce3252707cacb5f8684f11e98879b0fd4398af91ece879211968e7ce9678"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/04.png",
+      "sha256": "e31e58a7657ebf58bd933d6457d00de4c0b231c016523dfabad092908710c1d3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/05.png",
+      "sha256": "72ee37b983c145ae66b8a206a8f8832ba65b8df0395f506d3df163c73759c1c8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/06.png",
+      "sha256": "713e7884b60a7bb19e184f311895c5d5145ac2ca0eed5ec7365f1ed3db053ba8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/roll/07.png",
+      "sha256": "5aa6611e9d6a1ecd3e2c0d2f5c68f72d5c89e6e5fc509654af1e81d3b0f76d26"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/00.png",
+      "sha256": "b0a7ff49cf0ce06730855c556c01b5c0ecd4945f59c092ca795e2118135af5d1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/01.png",
+      "sha256": "5e381bb8b8345ead14e68a15f411d44d25e8f7815c4f8521f9964743d9bbacc2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/02.png",
+      "sha256": "a5d3334da66944798c333c95898eadd9881317698ad1241e50e50811181ce56a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/03.png",
+      "sha256": "d2d01ddc4f1a3909a5ffbd7481ebbe7db1b671ee2dcbc6fadec6d8c0656e7299"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/04.png",
+      "sha256": "db3a3880a79b8e595bb7c4e3f9a62811a3db749657066f621d571f5306535e0a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/05.png",
+      "sha256": "05933f32ed36195d8a30fed3ac8d782283eff0b8f9485837646cdc26a5a09da7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/06.png",
+      "sha256": "8895b6bff4cc4e8093a714e8873bd679b779d117a82d4bcec2c39542caa86666"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run/07.png",
+      "sha256": "beaf01d14422503099c891043ac8d6e9b84df3f33e6ab7f0b39a8084e590df52"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/00.png",
+      "sha256": "3c3e8c98866127794e246491b9cdcefe8600d0b83bdd8b663c06388cb3edbeef"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/01.png",
+      "sha256": "9d5078c06c5fdd784db76e135ed8f54c1566b1a12312c60a4ad5d646fc90da7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/02.png",
+      "sha256": "2424d9330c1eb458ab49a88c6f48ce2d56c8300281d44e0aa9ca5c390f04ea73"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/03.png",
+      "sha256": "6beafd7e3165cd7e564cf9a1ed05ad2e76408617d4a19e386f4bde5ae5948b68"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/04.png",
+      "sha256": "45c571b0991afcb64e9297950748651d51a09f29255a28707b37d9bb1563d645"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/05.png",
+      "sha256": "cedc69fc3399d687a785939124f92a6c89b95c7e049f70feca314c864f5933fc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/06.png",
+      "sha256": "06adb9ff15f0b0194d5f59776d0b9463a49b2a1504c193059be6e6983f5dd91f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_light/07.png",
+      "sha256": "1605f228fbf991405b3ac44d08c635a8dfa8299cfaa8ea6a4dece2dbe3c540f9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/00.png",
+      "sha256": "a124f055d45b77e1ac81606f4c062ff0c39f434b166686368034bcb9624d7d23"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/01.png",
+      "sha256": "c29b9534d9eeeeb5df95d46642b35e0d2fbc7861ae6c57de915fc21ca25de0ef"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/02.png",
+      "sha256": "14add4b7b825bde04d00aac93679304e320470e7a78ed7e546acd333bfc66068"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/03.png",
+      "sha256": "1eb956b6c72697e20d7010742098cf7d6f877f603d0bfb85d5d2c54b9b522598"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/04.png",
+      "sha256": "ddbea4c1cbef3ade6623234f6d8c7f17839dcb6781de0534d3644b398f81c983"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/05.png",
+      "sha256": "a6f69114c870807d8afd9ddf9df1fa60438d3230c0648f536fb40e3dcf4e7461"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/06.png",
+      "sha256": "e0942b04728aa9e9ce9bc9ae4715c308a13f486e2801028d08df2033a97cbb5d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/run_shotgun/07.png",
+      "sha256": "091c8747e7bd1a4cb3f2daea8a4edb1aadae5e280c8ddc46cdf98ef501e2ec70"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/00.png",
+      "sha256": "441f92322c1270dde1654659813faa1cda4a8da8de8856cf07f3e068dd65026d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/01.png",
+      "sha256": "5a6de16dbc91089137f2f8cb785addcb2378806c6a1ee1a3945b4814afdc6edc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/02.png",
+      "sha256": "f2727d81ef8e022e249f0cac4bc929f399137f6d215fc343106bb9d0fa3b9a55"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/03.png",
+      "sha256": "b11c07ab196f55950fae45a87179dd81ced79ef7a69ff3d6fea3831be04904d9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/04.png",
+      "sha256": "b4dc88fb042bf8c925503228ab6f10160e19db43c9a76a75be045077ea4dcba7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/05.png",
+      "sha256": "f109985070f2b1251b9277b2d9325c4a889bfec19db1baacc0f7600b490d80c5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shotgun/06.png",
+      "sha256": "792762eb8c835f1f8278f6d6628c07f783337ebd2a013947402b890bfd1bb681"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/00.png",
+      "sha256": "31c5831bb4c44e80bca8f31758903b5a5ba07d0a5ef6061be5523fe34cd795db"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/01.png",
+      "sha256": "805f08783c971f5bf92d87f3f1dc082fa3589036013557f6c5f4f0a114059403"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/02.png",
+      "sha256": "22390f339d16713c322fdf9bb08de13b400b6df8e6c3f3e9da9180f25d62a80e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/03.png",
+      "sha256": "29e29ea72c9ccf4828869f5f4c81f89721f7c90579b942cfcf7876fbc9077e69"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/04.png",
+      "sha256": "8d9bdd633d072eb6a6d1b90d1ea82196de6033bd749114687c3bd2019b2d0731"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/shower/05.png",
+      "sha256": "190ebe8913b17841ca433b382706c2b95d652011a8c86801d65b0f4f17edfd16"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/00.png",
+      "sha256": "9a42f4be6c1f198d0d4925c8f26e53af3aff6d6865a4401cc27a35273d55943e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/01.png",
+      "sha256": "ac5e161913dc88b55249c3937ed438c12d3a3fd200deebd7e77bd6fec81c0b7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/showerturn/02.png",
+      "sha256": "1c97b4a2a73489260ef43a6c61a34e4c414bba9cf9981cf140a1f7c924387de5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/00.png",
+      "sha256": "4ce9ae39654280fd2a528861844e8b18a047321117185b07298a1da85f5872c6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/01.png",
+      "sha256": "b57d9b830bf6fdb1ef1f7a078262193f5115912de671c75eb1dc71f608ec50ee"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/02.png",
+      "sha256": "b71fb0e429e69d9070184a7403610e1800916e0c94753afe6a2e0488f1a32492"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/03.png",
+      "sha256": "bf5be375db77f0d4da274266b05d330254f17b5e85ef46552db8fd1fd9c3f071"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/04.png",
+      "sha256": "e61df96d1ff4923e834ab424574c1cc618ec4a027bb7f4be0f20dd6e0c1f4f80"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/05.png",
+      "sha256": "a44d2a5b755862ec39e692814f749bacbc1f61641758f9d3808f1ab7e82830cf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/06.png",
+      "sha256": "45840abb9a07707e55411397dcc841b078a3a174337cd8b735b2b414f7791c01"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/slide/07.png",
+      "sha256": "a54564070542948f10f19acaaa73281a10716b031f1f87f4eaf4f8dc459ee41b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/00.png",
+      "sha256": "62b92b0e81665022c597649c11f20ef65f8cbf34b7a12742873865da44ba5d57"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/01.png",
+      "sha256": "abbc9a02f533e065476076835ba3812cb4a0e3db98dd2de3c344efcb494aa02b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/02.png",
+      "sha256": "8505decb0449a0f103168d6822bfdbbc2ad5655fd7547af4f608389dc5990756"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/03.png",
+      "sha256": "afe103cd5734985723387d53b32aef861b423ef8994449361674989d32e008db"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/04.png",
+      "sha256": "a0a3d4b029e9cc7dcebbd1c0dc8e73688b839b04bed8753ada9f5b217baba919"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/05.png",
+      "sha256": "8f6f801e44c620cd809fc06fe5896451ff5e319b40f95a9fd55468d121900231"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/06.png",
+      "sha256": "e9810f4f3614067e0f2fc215b565dc74e0784bfb9301a059e9a86f2d8a1c09bc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sneak/07.png",
+      "sha256": "bd7981786f80a3873c0d59096b24c36e15d250eaa558f3d49b56915e22d3546a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniff/00.png",
+      "sha256": "5693820a51e83674ac3025f5445240d26c3ab3762b4198d9790ecc6b726f3884"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniff/01.png",
+      "sha256": "eaf09c4a66bf78565baa17ae61c357cc61227f0b79639fb95ef1c5f44e7f3b58"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniff/02.png",
+      "sha256": "72185a75ddf4a5162f483e889f6a3d916fe14cdbb093239942699048f4d2b14d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniff/03.png",
+      "sha256": "3009c10aebbd994da078094734bfa19dfee1992b16b1e793c8396d971a2a53f4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/00.png",
+      "sha256": "0de74704fb77d4d4d3368997501e48d338c1f68f012f4afc8586d61860bfd8be"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/01.png",
+      "sha256": "56cfd2b99de60140e9020a70891504f731002b9b3eacb4ae9206189035b5387c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/02.png",
+      "sha256": "a5f5741eedd8df64f78d94127e4568dc25506c0332410342a8a0a5b0d3148eb0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/03.png",
+      "sha256": "61e86cb04b36947e209f4fe4c4c4e030fa76f36508c50b807d1add2e387178e6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/04.png",
+      "sha256": "524084737402b1ad46bfdd2ab6c50f094e5dfeafe069fc41853a14fe160aaa7b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/sniffground/05.png",
+      "sha256": "3f6dc07591203cecce58e166c22b5063224d9f31df00f2e4fe2feabbc969f362"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/00.png",
+      "sha256": "dc0172ca9a9d69c7169d7ac787fb00ae352b392492ae9c1db3b5011de775caa7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/01.png",
+      "sha256": "25a659073f312707bdbcee6faf1791147a8cda9ca22c0d0124fac1633a56275a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/02.png",
+      "sha256": "7d4e00dec0ccffff1957e27f9d043b0e168ea4261fdd3213a535e6bcc1468888"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/03.png",
+      "sha256": "d6e9a0719ab770b18a3e43b7f5ba8c48c47331531ce45407194c4cdc6a149b45"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/04.png",
+      "sha256": "9ea4afae8f57c4b962017bdef8fb32e61ef16019cec934bd915be42d1ab2aefd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/05.png",
+      "sha256": "db5a670ec682681cc89beef8f32e97470a1413a72ba01ceabe1954f5b474468c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/06.png",
+      "sha256": "35ea978e4842e25677aff1bf40d704da7446d5b67623a2ec919ec1ef93e567f8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/step/07.png",
+      "sha256": "21d7bbacf08fbc1935941bc16f2e311fef06435e4a778aca4cc14d3c4c52f801"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/00.png",
+      "sha256": "7a8aa793e95d4ee9c38b083f34b48c599d962b99c66a5f9dd90ffd07812786f4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/01.png",
+      "sha256": "7684affa50f46819a231be7fcf47dcf25ac9e2cd10a3a07c40169fb6512f94d3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/02.png",
+      "sha256": "681dead5860c9bdc9d13dadecf602f781cc3e909c49e14055f649c7e8e013b82"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/03.png",
+      "sha256": "f060829335031a332797b8d8cd52f780bb739fa0d6bf002a381b6dd6d23c75b4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/04.png",
+      "sha256": "f6b24762920acf2c2e96d86c10ee976df2f345a771df4ed2cfe72a2d91c95400"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/05.png",
+      "sha256": "9388c16e24eb4856ca242f395eda76d3fd652ccd25f7afc057f3da99968cb017"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/06.png",
+      "sha256": "de8746b3f2f920042508a491de1e59036b277796812990921a095151593d5920"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/super/07.png",
+      "sha256": "c384fa5deeed6db54042affe379411006bdb618bb09305c94bf4727f8f38f550"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/00.png",
+      "sha256": "f6ebf0409dcb6f02a3ec4c9a68f63082b786676c03bb1e76926ec4db971347b9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/01.png",
+      "sha256": "9cc742becd51070367ba72b15a1a6f050cb4ef1f079448da005473c4f1166a8f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/02.png",
+      "sha256": "39c1d974478c8dc6d711308ab433294b173f8e9f62819185ea6a6181caafd019"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/03.png",
+      "sha256": "59ff9560ab55eb50abb1006ffcbfc9181811e4bb7e65d482c3cdd9fbb68be4c4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/04.png",
+      "sha256": "39d27463b0554cf46430031df798053e2de97d03d075d79f047f25017eb7321e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/05.png",
+      "sha256": "1e1da6a3331d0104eb3a0f952ee447eb8d4388c087977d6cb7d2056bbf832576"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/06.png",
+      "sha256": "c8bd468b99fa54c871d20cbe6b1a0126f954f6b4eb02c14ceed3039049ec1c69"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/superrise/07.png",
+      "sha256": "d985b2953752d80b3ad18d2642b7a0a2c1efd9ec839c934fc0df402d15a3861c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/00.png",
+      "sha256": "ab1912d0167d3b8d1b2ae48fe9a276cf1d8cd27cdfd4e82ba11657c57a989e4d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/01.png",
+      "sha256": "0e6b312da2bc799beb4bd86dc99e822f0e76ded2d07bd87c5c3f7adbe711e6f3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/02.png",
+      "sha256": "20d1096eba8252c4c702079eef69b7e88a9c6c6c06d4f84cfe8b69d32df892bd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/03.png",
+      "sha256": "5407413d6caabd2b06045f0969a60a071196b3ec3d80e17198d6fe18fbc6a65c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/04.png",
+      "sha256": "dbd801adeea04b570e2527da79f5f35908b6356a88e29b8c1ec18316aad573df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/05.png",
+      "sha256": "1ddb740887e1085e7425aa775a170134ecd191015a12ef29f1980d813827c8f8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/06.png",
+      "sha256": "04f78ab8df3b1053bdbdd8c60a1c01b9c6a2111300ac60fd6cc94f0e625e2dcb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/07.png",
+      "sha256": "9883e1d8d64549c083ea2379057c95b355c4064b5b7db1c8be0f7a3d10d10210"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/08.png",
+      "sha256": "4678f0c4d9b51b7dd7fff5c68d619828a3a7b6b9f4a18a804cb4b8862a7b0d51"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/support/09.png",
+      "sha256": "b89b4161241d1a074e9b5089a3a46bd7f79de7ad088280bd1731bdb2787963a7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/00.png",
+      "sha256": "f88fce0996d80f4c87165c0b308a7d43941cc09965d3ca2eec078eec330faaef"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/01.png",
+      "sha256": "0d3417825875cd269ed0e06474cae210c05de10aab9768957781aa499a9d6d75"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/02.png",
+      "sha256": "dd371778b976029a4480f058953aff0c555061b12c5994a4104ac46aad446ea9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/03.png",
+      "sha256": "0006290ed0a6ea7917ef74514ad08fdb93fd29758af6a5789a8faac1ba5e7299"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/04.png",
+      "sha256": "833a0681ad9ad3ab57dc0944030a7521e3747b29f1f307ae82f75446be72688d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/05.png",
+      "sha256": "9a6639d8cbca49a70eed72d5b6b3aeb4cc592dd59cdd460c3d1e5b973e8b4877"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/06.png",
+      "sha256": "f3b13cabf42339397bc77f4b748cb4180735694824fc879081a63ff0cf4d545f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tidy/07.png",
+      "sha256": "69f13290540461fbd7e6d4dd2b9210e95d87e844c94a67e861c997ae82547799"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tired/00.png",
+      "sha256": "a496e56fd58f11f443af39c64804c6df34f30c3cf11e097a73b936cb66a7d889"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tired/01.png",
+      "sha256": "cf31bb9dd412a353968352cb9a368db123ec2faa7f7626ae6613178749fba0c4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tired/02.png",
+      "sha256": "ff6aef70abbc6bc5eb46153a297ac779d1e5c9221ad0ab667aa6f0e1378febb2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tired/03.png",
+      "sha256": "a96cc8d5402bcc6f8e03a732f8d0beb872695e1a0a56094f2be28c24a9cca1d4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/00.png",
+      "sha256": "45ae07f5e3cdd13b370716baa44a617a426b59f361d54981b508121b4c6b4920"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/01.png",
+      "sha256": "3e8ed17d2d223621c19886115979fa46a191d8d688e311bcc1e959a9b3e8803e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/02.png",
+      "sha256": "33c20269fc3c387405cf0f8a26d13c4ae1092c1f0332f5d9986aa5925a2452cd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/03.png",
+      "sha256": "0f28d7bfbb9ab8309d7b2c4a29039ed6842b6f708ddb7fc2c23ad6866c5699b1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/04.png",
+      "sha256": "6e8908312682726dfe7e2cabdad178c2fd4b777a98ae411130d251765f744e82"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/05.png",
+      "sha256": "c730a5c4f17ad6236baded8ba3211b26d603063a29f1fafbc51989bbe2c4841e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/06.png",
+      "sha256": "93365518d0666cfc011f08ed6495456820478f61560920794ca193ba1f422f80"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/07.png",
+      "sha256": "396f0f765d2b7b0c7c2aee9dc00f5a6f2520c2f8e4b64f9df0629e3a2be6dfb8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/08.png",
+      "sha256": "58211c93b58b9790680170c3bf867c43f05738333c1af16836b4bec84bdbf4eb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/tomoe/09.png",
+      "sha256": "0ba8d04695d3bc7b305312f2bf17ac87f639e43b0a18a9f0e6c78d416a59742f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/00.png",
+      "sha256": "e8faa4897bd86efcd1d72488d1dee74c89b610c5460ad0b634ac8acd288a0a1b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/01.png",
+      "sha256": "16e3ef8827e091130609bb33171bb50f32b179af9e0e84a71e13fc6fe6ece7be"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/02.png",
+      "sha256": "49c0b5b32127ce628a40a58f66d7d2bd882171c7cab42f48f45e03d456066f79"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/03.png",
+      "sha256": "709f3cb95e6d6391c5ebe917f4288f99e7028c6d8f24034084bf15d88899eb11"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/04.png",
+      "sha256": "51e065eb8c5a1048fa87900e1b4269de7d3330cf28515039735953364db2cc09"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/05.png",
+      "sha256": "1e0eabbc5ba06e4c87b8b51c5bdc5befa8935c603db21c0eef3eea5c3585e57b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/toss/06.png",
+      "sha256": "56e5dc1bb093f8dfff4022dded7870bac5caf1b546df4853c1e6069eea9c5309"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/turn/00.png",
+      "sha256": "4ae0efffa5813f31d487a46d85de32ea8b99ed038e3fc6144046cb07dd5099a3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/turn/01.png",
+      "sha256": "b2accfa0f933a0bec021cd39f971f7abaa65bc42e8f16aca46e920d162fa170b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/turn/02.png",
+      "sha256": "b1cb9c1f88a375cc456e8f7ab2e82442d6956fee5e08dfbc62712eb36b57f39e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/00.png",
+      "sha256": "b62cd57f64bb0e31671e4405fcdb27e01fc640dc8627ac853f5f78b936b4d5c8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/01.png",
+      "sha256": "7adebf831349b13dd2d722b70826774e19dd00f62414bc60cf4fb42f03dce5e4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/02.png",
+      "sha256": "a1850f060c18d198203b9d7039322e8e80305cc5ebd6bc8f3960a515befdc45b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/03.png",
+      "sha256": "c22bc53f7bbdbc7ea093a410ad54ccea0757a8bb1349be31c6c1ea46dd239981"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/04.png",
+      "sha256": "6c10b8e4dbfdde2d229759ef71bac45189bfb544a6d59fbfebcb43184a142f23"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/05.png",
+      "sha256": "3c1bbab425ee8e63c4f5714f095cd381e7db2b79dfac5eb3883b46afe881434f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/undress/06.png",
+      "sha256": "9a42f4be6c1f198d0d4925c8f26e53af3aff6d6865a4401cc27a35273d55943e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/vault/00.png",
+      "sha256": "447ab7465f67b35d6e2d22a3ef558fcbd69feaae36287c3615c5d1feb747e0ca"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/vault/01.png",
+      "sha256": "2702b3822fc9559acf7cba950b145a60bc15c7184e420c216db2e8929cf16ce4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/vault/02.png",
+      "sha256": "e9ee42b0ebaf01f3e075027732f05c72d62e59774446eb5e02f1fd5feec36bcd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/vault/03.png",
+      "sha256": "09c7d872fe6d6a379dc1393e1a4b0d28f0541038761e0ce43b577cf4f8c08135"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/vault/04.png",
+      "sha256": "49f9fcbdc3e0dbeb598d955e7e5df53ed0ef17fcb670ea927dc862d09e81a5c4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/00.png",
+      "sha256": "d36370c75379273b107c6ad66f8d30a43a8b22f4407f6f94377a324761190be9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/01.png",
+      "sha256": "2d6f7be58a4e2dfbb225f3f7b13f7ef77046dbfa6c2a8dae98489f34c6eb8682"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/02.png",
+      "sha256": "57dd32cbc9ce8d13dfcc53be582112d2ada343023eaba615584fac11117beed6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/03.png",
+      "sha256": "a6bbc4cd34367dc7307a9f0e0b3ebf83e7fbc2f15a388111afae2e1444036a23"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/04.png",
+      "sha256": "747c017120c74f7b014b408f8944bcd9ed4c8dc43a02204c8343fabfd55883b3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/05.png",
+      "sha256": "fc8b7fdfa3cc723e10a4aff5337fa71dba1a48d412810c70f1fac103ac6c0958"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/06.png",
+      "sha256": "3dbe42c5cea63fc44308540de70b9daf4fcee7f75d8a7df2f45ee1a3d2f90112"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk/07.png",
+      "sha256": "127a5fc8155a15b2b19958880688c876cf086d7329739fd8ff0fba30879fc13c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/00.png",
+      "sha256": "70eb480c7f34e195335d7869978a557c2fa008b8db1f413f5a039cb05b5d5fb6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/01.png",
+      "sha256": "cd844cb2cc7dbb90a856c74fc8cca2d6876e6abae4e5ae6431405208a0cf3786"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/02.png",
+      "sha256": "a0127ca7dba700696a4d2b11497fe04ab5a5eae4e880ea958c057d43bee47782"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/03.png",
+      "sha256": "6198edbc0ae30c59471c1328f94ee91f37a88a5d9a9729f0e49736c908289ea9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/04.png",
+      "sha256": "ef9aa905d56bd9613baab1efe52b5a380e6b166914d3767512b5529e632955fb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/05.png",
+      "sha256": "33f9d1feae2c461d77dffdbfc02ddca1f87f1e620479392cc2dbadecedffcf59"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/06.png",
+      "sha256": "99520b2dbe185d280a3c61f5d86f4db4e7ff6b9279a6510b6a3973f6516cb097"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_light/07.png",
+      "sha256": "8c365c8514b70eb6dd82412446e2123fbd1b53b0972bc53afa79d0b9c09a9f9d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/00.png",
+      "sha256": "5701569f5076f4b10fd7c40ff0d3e85295e6a9c36140b362cc3ab18ceed13c0d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/01.png",
+      "sha256": "6a21dd9720859bb58508feb098ec12a8c724109a7eda49483d9730a27a726f4c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/02.png",
+      "sha256": "4619ad6929b9d4d076bf95f1d84354ddc75deea3bb03b9b268ca8bd361073d94"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/03.png",
+      "sha256": "91b8df3f7c5497e86e9c281239ae2c534e99e3e0aca2a1c6292d3b6d57800bc2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/04.png",
+      "sha256": "3a206a9b0b4675b572fcec17a8f65dbeef3e6241f9a26bfcc78868e55a7139e5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/05.png",
+      "sha256": "3be605a3786c04e897c31313ee351c793aef44d1622462597dbea53f0ffaa2d4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/06.png",
+      "sha256": "1874245b711d0ccda4a80b5e65fd349922aa837b2ddad8c45edbf21f385043d4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_pipe/07.png",
+      "sha256": "5f1eb124e7bae774452b305cf003a0d37fe155300b067bb133f00293f356df97"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/00.png",
+      "sha256": "d98351d4b68a7f78860fbf463b266d706b0878143a930d08026a9f2b91f43f13"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/01.png",
+      "sha256": "2b786ede3b790b8927b880c439e32f1838fd1810e59cf6d2b99eea93f8c9b333"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/02.png",
+      "sha256": "608e10788ee19285e25c206d864007adc845df05a7689291df481f5f12f46e32"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/03.png",
+      "sha256": "a5f5d76c4709fb04cea4b6b006688f95c1a480566be97696df3abf91040d0642"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/04.png",
+      "sha256": "7dc5d1d35dd9eaaba69516dd4096575242d2845eec7127ad72f33d7eeac8804e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/05.png",
+      "sha256": "c624990ebc64f4dc64f573f74c759c95905243c035e81cf9832efa73e2f0a729"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/06.png",
+      "sha256": "6d50e7ec8f84e34c2d0e1abe9a5fe57de35eb3bea73ee37aa261102037457d94"
+    },
+    {
+      "path": "game-src/action/deadpole/full/clips/walk_shotgun/07.png",
+      "sha256": "6fee420d67909f80662526567d6696452efeafef48bca313cdca7b0256651f61"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/airshot.png",
+      "sha256": "42b96d258f6f378571aa4ed9e066c5ce68e124a1975e72e1d2512674e845ff65"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/bandage.png",
+      "sha256": "b87ee09e5ff667c886cd1368c7defbe072e8ac76ff73a5bfd065bf976ab1aa7a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/bath.png",
+      "sha256": "3fd9c31395067fc65f8a8e2d66e102f1985d5c921e82ada1a5f362d71b22737e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/carry2_idle.png",
+      "sha256": "2b34f9c95f506c79072464887ab7bd8fba5d8464a35cc468d7fc5952a03faa7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/carry2_run.png",
+      "sha256": "3cad3e605b2df30b73d23e9cea367451cea492a98af0e4d65a410d9ac62a2ae8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/carry2_walk.png",
+      "sha256": "b146f89c58853aa721dba0c40282c43b426a79999b658d87372b8fabd8e47e7a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/catch.png",
+      "sha256": "9fbfa85641379d9efec13b87b36ba1c1876cc4747bf65f6420d339a8f6261102"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/collar.png",
+      "sha256": "a9a8e3d1b1cb1090002b94efbda7c380a277a9a2caa1feab8f853058811e3a12"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/contact.png",
+      "sha256": "4125f17bc9613172f242117c8ea4bd293d8012367833566eb1547ad633dabf43"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/counter.png",
+      "sha256": "4125f17bc9613172f242117c8ea4bd293d8012367833566eb1547ad633dabf43"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/cover.png",
+      "sha256": "03c3466008ba13de2b9447dd27ff7e99ac157a41d736966772ec53bef834cdb3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/cq1.png",
+      "sha256": "b85b8a8cce2f15700d369e93a779eb886cef317209e342cad27ff57f53f8ce28"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/cq2.png",
+      "sha256": "40fa03322407c2fbd4372544f90794dec466772db5d1e0e8d3fa9ab53ded7899"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/cq3.png",
+      "sha256": "a354255b3542f2effad13e520662fe90665afc9a3b411cd7f068b924d5fb49e8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/crawl.png",
+      "sha256": "da08bc87451c7b2cd811d706f11c555b79c25758b1d3b94aa1658f66b915d5dc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/die.png",
+      "sha256": "44c756f4e2f934aa1182aad411bdda0c67336ddb9b68ed99352d677aec4babce"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/down.png",
+      "sha256": "b6fe213669bf6470db1f158cec454f7f24b205389437d42e4016a6d05b903562"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/draw.png",
+      "sha256": "dfb0d6eaa17bb76c77248eecb92bd0a3443cd2f2a9318233f6840dd636211569"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/drink.png",
+      "sha256": "a85ccd07025eadd42419e242578027c15e92bfdbe7e01ec754f71d3ef6034bba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/eat.png",
+      "sha256": "77c80eb259fa3f895f92a450d515548311d00e7ee3d713ed29551cdb29b3ffb1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/fall.png",
+      "sha256": "46b2652673c41173670a24c68e18099fb5ee32ab56a4750060bc4efd728e932c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/fire.png",
+      "sha256": "bb2e8931a4217c847500e2ce114cebfc5b2d3c28e218546fdbc4c91c00156ef2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/getup.png",
+      "sha256": "423869ebeab8c31bbf5f45ae2d929b00e33a1f7a4bb62512d043bc8d5fddb399"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/hide.png",
+      "sha256": "ff402f1fb9da340b4a143a191578c1b4d9df27e8108e46cc695e985101db1d92"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/hit.png",
+      "sha256": "c0d672eee5d52ca61a2b90d85a066f032669280fbbb00fa279d02868a8d71b9f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/holster.png",
+      "sha256": "b36657df7416febe52b2b69ca62104a969377179bf145ba9c5acf255d0128960"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/idle.png",
+      "sha256": "88d23ac1584ba1a3a9c24ddf50a148a7d4ae78705afb026f2214c773cf11d988"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/idle_light.png",
+      "sha256": "60353422747198e287c1b7b1472c47d6772fbdb79f508f080857507508d315c3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/idle_pipe.png",
+      "sha256": "feb8f89294b8f6f7cbafa80c32907e235070a79f0e7cdf9706bb84bffb5b6d63"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/idle_shotgun.png",
+      "sha256": "9d8dc6e7f474bb83078db02170649b712b12f36d090d2621eddbc3e81ee1d8ee"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/jump.png",
+      "sha256": "360ac5e6de0edcd232fe16952e7d596948f13d336eb3f97ddecab44bb17a9d9e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/kneel.png",
+      "sha256": "ddcb9a4480fc81d00940d9f26ddf3443b4409fb379a6f709ce790ef2f2f6ccb2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/kneelshot.png",
+      "sha256": "737754bf60eefcdd085ed7e3e1b1e93e8540d457642b6a0301ea1e708cf194d1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/kneelwalk.png",
+      "sha256": "d8474a3c69646cabc30d2c2a9f13b9e6d8a36cfafed85df29509d73f98d76593"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/ladder.png",
+      "sha256": "1564354466237b49c46f688caf8519e6a3eb877842495da04070df3722fe0e8a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/land.png",
+      "sha256": "c39149c9ee0c20cf1a783c6d23fdd7586a03c25a9c880dd90a2b3134950a2552"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/lookback.png",
+      "sha256": "3ad18bab586a1dfd78b171ee77e37cf1468c1f75682f10ed72a38ae2ac13eb02"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/mantle.png",
+      "sha256": "9a78585b5e00be035529d3bd63b22e5f82fe26d079f9dc2f53f49ee7d6810b12"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/pickup.png",
+      "sha256": "bd44c8cda5b1694f17319c160319e1409a800fcc1ad1339d82770daf37569948"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/pipe.png",
+      "sha256": "53bba58e30a0c31bdea7c9030baa68ceec720ab83bed30fa9b91f74e6a3f5fca"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/purge.png",
+      "sha256": "96a5c524b7b6149c35e8ed08c975aaced001f03a714ca56c65bdcd6400fa8e57"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/ready.png",
+      "sha256": "78fdac022c3c88feb2178eceae7a16cbd062a3e02f322abdc9f83d1487620734"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/reload.png",
+      "sha256": "5be824d2c0d838d0747a48e83074ad9fc956e367b37b179a2474426ba6a46a8d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/revive.png",
+      "sha256": "7cf8c2329c8ee89b1c8abad6ec72439af9ada07cf85b4c69fb4e9d7ccd52cc1a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/rewind.png",
+      "sha256": "e5e3a59c2cf8828bbfb7ef7f0c4f833d14b0dab362f29527e8e8d1f2d431a1e1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/rewindother.png",
+      "sha256": "2be9888c65503a5266b8ef7d2480825543acf4e82b8390c7f67ced94044384e7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/roll.png",
+      "sha256": "7d45e243b8dcf73b21c480c65936fe870f3efe3742fae464f577549ef2d20262"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/run.png",
+      "sha256": "212a5abfb3e54a9c06c9f1a6a897892e1eb083cdc58bdfface7c1b3add6e391f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/run_light.png",
+      "sha256": "85fe75aad2cd084d2d86ba9c009528163e3a816c46602c31bf8c5d666eeb29f6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/run_shotgun.png",
+      "sha256": "238c5867c2eb6b728ded27c47fcda41a6d004528ddd833bcc69527fbabef7842"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/shotgun.png",
+      "sha256": "afd3cdd5c95906922cb02684c4bbb23299084debefabfaf4d0af11eae7537d44"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/shower.png",
+      "sha256": "e72cbc51379cfaf85d53b269f09dea455e617bcf30f057a40acaecfed5fc4fa7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/showerturn.png",
+      "sha256": "a54682bacbe65320c6ec6b21479a28ab184032ccbf858d02381b8e08919cb9f5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/slide.png",
+      "sha256": "229244893f11f3e9a43a6426fba8bcd18a976c2622bd3e2ae14d6a7952f8e6df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/sneak.png",
+      "sha256": "b198a8d10520ecdc35e6ab0c5fb16dd98f22fd0844ebfb71f7be5e7aae82877e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/sniff.png",
+      "sha256": "098f24c536ddb0681d1032be24d89303a27bf17aba5fb70b2aa1206a288b446c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/sniffground.png",
+      "sha256": "f722473adeb8fc26d15445b4312b5a2d8677767de1cc8178b9827388f89f53d8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/step.png",
+      "sha256": "e65a6faf79692d39fd25d95de409347dc95277a4d88cda94d833fcb15f663e6e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/super.png",
+      "sha256": "1cdf71b0b4248dc8749db6807e903687645d952ca4aa890f1871560a2e044c77"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/superrise.png",
+      "sha256": "48618a606bb86b8b1891086072064ea94f4173490b9869ee99b4f2b220616a11"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/support.png",
+      "sha256": "086fe37145c6a8058b0ed81267f7913d27e20fe654c391292bc37a93ade28d93"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/talk.png",
+      "sha256": "073c5f9c3eff1bc26df7aab75b24abf221b6d892339d4594c032970bc3db2d35"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/tidy.png",
+      "sha256": "4294796cd920de9710090fb24f40fc928507a1622c7f69891f26b084e7144afa"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/tired.png",
+      "sha256": "373274ba7b093471687801346d872932ddf5fa893c63ab273cff761e2234472c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/tomoe.png",
+      "sha256": "e6c291cb50b90e1d5a8d02d9afac0f70b43d43327755e45d50519007608c7f82"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/toss.png",
+      "sha256": "25e85ac44e54a74b20999cce6d487ea415c6ad8a8c6766a98dcfc9956117c3de"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/turn.png",
+      "sha256": "c2ac06877038cb02d7b7e5071c2df7fd720854a22e686e9548a53c06df8992a0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/undress.png",
+      "sha256": "f73b4147f3c27f7e9e4a866de7096504acca739fdd6cac0f67d9cc3fd7d14b3a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/vault.png",
+      "sha256": "a1d6946a45814890d732740251b6226f58623d48ceaf04ee2ed5f4528a74e7ba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/walk.png",
+      "sha256": "c172a032d82f8ff20a67947d7e06ffe04162b0733d9459bc6d0570da99fc40f8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/walk_light.png",
+      "sha256": "3f4457c1090a701db55064ac80f23f29be862e8cc845fc12b1174c49187fbc00"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/walk_pipe.png",
+      "sha256": "edd399c503816d29bc991ac7a46c2a95af78b298ccef641895ee35389e3e26cf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/walk_shotgun.png",
+      "sha256": "39aa4c877a617c619d7ccf4ba8544a04703d6b34b7d75460039eeab1b90b67c9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/gpt-bathing/contact.png",
+      "sha256": "f03f40753962687a622b5896a06cdabdeabe1894bda7a4240288ec03235c2308"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/00.png",
+      "sha256": "f4fb40825ecb290fb2a3341d4066467909334c0c17d0374c76abe89f24656b8e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/01.png",
+      "sha256": "a4f019e5db69b4b043f2025f4e7a6b212b4fb4d1b893b4c47d797ae88f977f60"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/02.png",
+      "sha256": "6affaf39f2e2692a9001289c381400944e375b5883bed50eabf3e08d79e74406"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/03.png",
+      "sha256": "14e9c6211ac551a9cedafb625a2cc20fdb69633fbb99651862c4c833f7ed2e7f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/04.png",
+      "sha256": "6a4c2a38d9277d483255a25c2365732ae774fd947662b07d4c3e6d28cc6887f0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/airshot/05.png",
+      "sha256": "ca9128dde0509b1098975f7c73a9b0bfe336020f7b66c60dd4d345e048b527cd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/00.png",
+      "sha256": "c9692f89577e8578f03f5e17aae223fd4abe9e7d8510e7e513afcbf33b977eb3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/01.png",
+      "sha256": "198a3c34ba6bf29410aa0f3abae723b753be13128d28fec716a286bc0ccc72ba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/02.png",
+      "sha256": "959ceba57c0b464139c1c8d7c95d4313c300b0e7784723d932491daeec293408"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/03.png",
+      "sha256": "316dc0d203895b3751524315a3c8a2f0092b79bc8436fdb7a88a33c2793dcc16"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/04.png",
+      "sha256": "44abb745cb983c757e5bac4e8f6fcb82dc5b0b20e7d1d0cf91b2b3dc464aa7ce"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/05.png",
+      "sha256": "949243cbe0e8aa5b67807b8efda50cf33b4ff417f9339aecefc14875f1a60fee"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/catch/06.png",
+      "sha256": "af3ab341c11f8076fe46db02f42160768182980edc4d016f29f8b41f4e77505c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/collar/00.png",
+      "sha256": "35323803d816369169b44a1301dcc1c344cd83bf5472dc25c3d3cca0d879d52c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/collar/01.png",
+      "sha256": "bd9de84039d87a267e1280079ff1ee736658c9776f9c8580ea58de9dfe5fd7e6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/collar/02.png",
+      "sha256": "4035a9f97f88606ce83b68d1f18c29a61f9e6694ed6863793d07acaa0b8859f4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/collar/03.png",
+      "sha256": "76430cd89e3093c4cea7e4ec30482c1cc862283b80a0edd541fad5999079c35e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/00.png",
+      "sha256": "7e5a032994bf3e3261ad6d77e9da05a5e735c8878361ed40dac4bdc20c0f93ab"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/01.png",
+      "sha256": "414d937c6c724cc2d196ab7f9ca751209abc4880d38ba0f15535ad4e5a7e5fed"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/02.png",
+      "sha256": "e859fef93ffefdbf1649cec43b31546355a8eb415e43d4f83809fda9cfdf2f04"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/03.png",
+      "sha256": "12bb6d958ae0c50ed466bde3dc592f13b33b52dad56e9cff25ef064e732de643"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/04.png",
+      "sha256": "3c40d448f8a0e66e8ef66c148f6d650d69d32ab7bfbf4c989b0de523d276a629"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/contact/05.png",
+      "sha256": "3f0b4d74381129828256341d3044e2cd2dd3b4b5bd62b4b336a14ba8f3d954dd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cover/00.png",
+      "sha256": "43a7e6ba7d219c625691b27472bee25189d69c4cd7dc3486b679869d43f1804b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cover/01.png",
+      "sha256": "3e395fd6bfd8e7695fbf71176eac343eac68d4758dcf77cf117ee493c9d93d35"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cover/02.png",
+      "sha256": "29acf3bcfa9b52e94212b58b15cedfaab3aee417fb5d3aed8d6748e20f70adb0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cover/03.png",
+      "sha256": "c668e8ba962616a88b971fce16fbecca324b1752e60c9b04bc6e38b06e78dea3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/00.png",
+      "sha256": "5505159d7f74b926735d929eab5e5eb870c618aee845f1a81ff43cd73c64cbb8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/01.png",
+      "sha256": "12427ec56935f196d9b954567a49e7ee5e9a412d0695d9ce9cb1f4b5927b4d5e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/02.png",
+      "sha256": "f3bb85cd6e94470bd0165835966b542e972c5248c74c3e2f230a214c1d1f68ee"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/03.png",
+      "sha256": "9faab2f14df6c97d9a439338720658890252d32866520a41993b743c06cbd3b7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/04.png",
+      "sha256": "396fe5bbdd76636e398d9af0dafd883578b10895685b169e6e61c022d0a8eeb8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/05.png",
+      "sha256": "fc74c6996e2549a20ab9adb89e1ce53756a612f8d415d775c1bd3d25f4341a55"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/06.png",
+      "sha256": "f78ed29d608721533791331e0e8764792afaa94736c78df1fea490de6f91d2f7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/07.png",
+      "sha256": "58301ccb405da52324011bf76f7220515fe0bd535b1a4f11a3db1a9684f0780a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/08.png",
+      "sha256": "b7daca1a78226ecefd35ec162a4eb6632431d37228e460c012a8797ac11f49d3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/09.png",
+      "sha256": "3d0d78680e7e8ee7435557b7984f4c54700c3b59ad7141893bd72e547e66829e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/10.png",
+      "sha256": "7b02e78e92ca5b88fe46e8d6c649ce6179054351bbbb3f22ecaa60ebf0ea27ba"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/11.png",
+      "sha256": "07d4ed01709b3f00774aa926843ace0424e8d85ecf3102f3cdf23f90859823b3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/12.png",
+      "sha256": "8e7ba5f4411e33ead856385d12b0685241c324f89c092e413e0ac3a3861480cf"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/13.png",
+      "sha256": "a9e26b44c34da5d0cf0deb78b2e93b96eac2a530ebb7851a0fcea332842d248d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/cq/14.png",
+      "sha256": "ad5013f5a1108081f11d2210d946e29630a248364a4a593288f02378b47cb4dd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/00.png",
+      "sha256": "d682cb18cb1c0b033fdd41b669f1dc4cc9c2df461c97ec18ddcd434df6497716"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/01.png",
+      "sha256": "0c32521d6d34cafd55b9a3a65d276697cbc0ef459fdca9a49b220736f90ab90e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/02.png",
+      "sha256": "5be940ccd6d35c3ed07c26709da977c3eca0c73076e6e4a4328096364afc884b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/03.png",
+      "sha256": "f1307999ca24b305514f5511de82d4b69c42063fb9d26771d3bb6daa29b04129"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/04.png",
+      "sha256": "e696e6b6eafbf3da5155ada44d7cb90c12a2640a712d476e0344cc93a5ba4c68"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/05.png",
+      "sha256": "85fd00af1c9b0958aa30c9062be5c68e12af6da79120f9d9b601837d09477f02"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/pickup/06.png",
+      "sha256": "7bca9a0fdb884d0f6bf2fe7da37be4045541409516208f14136fcb3a896174d3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/00.png",
+      "sha256": "859c327c220ff8dcabd63bfd83c11695dc77342245447195aa695e534a9f0f0d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/01.png",
+      "sha256": "01f0756a12cd72d0ff0a2fba13757fd68c45a92a1b9792722c46b8b7f69874f1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/02.png",
+      "sha256": "96b89ad31d1b81c47d8a075932ca9026d06e41bef4857e7d622277bd0925de19"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/03.png",
+      "sha256": "9d1df2b3c6e0fab4b222ead97de1bd2938f065371a0b319ce2078c05e4d6a679"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/04.png",
+      "sha256": "39f6ce6cbb59689e9cb679c7a5428e00008ec0621e7431385a6357f90236682e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/05.png",
+      "sha256": "bab6c2fdd8410d409930fcccc6f9b5ae7c8b849f7b2a8f21063866d473e70202"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/06.png",
+      "sha256": "9da88d44e6063bf6048c4a5819f32b6096c375d357680d4bf7a483005e520409"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/slide/07.png",
+      "sha256": "8c4da6d827a27cc33009b15fb9367e27aaab7ca2071a9c9d0aa77743f5a096a1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/00.png",
+      "sha256": "353590cd664c875b528f4d0658eeca5f3c80c6add0a2141cc98928c5981a88bc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/01.png",
+      "sha256": "5aa19860947ac79853f3983fdea14935f0ac619c189f7eceda542b1853f568d4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/02.png",
+      "sha256": "6636e35ceb8dc793d3773b2350c51c2e983d037c717b2e37e63fe0e888e11caa"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/03.png",
+      "sha256": "03ca38666c5b367e35c851286beb227ffb2a195b9e03390d272260b9215e5f49"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/04.png",
+      "sha256": "5390604ed687963215a435cd7e26438b205feeacec0f88931c498628ef06a5a1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/05.png",
+      "sha256": "be046a29e6098c197b6ebfd0522bd106ec65beb5a7cb6dc92576efd4c4a03316"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/06.png",
+      "sha256": "71ad7433f088e7b37001e8fd986c4098dd33e25e9f94798c5b8f7b3ff4aad76f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/super/07.png",
+      "sha256": "731bcbb2e09c92e803dec1d1501eb2572cd913ddbad84ac735622e6cfdccd668"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/00.png",
+      "sha256": "299d488c2674ee4141664b46d18955e6be8a2f6f35c80bf467cb8414d97f8b09"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/01.png",
+      "sha256": "5413b74e715971d4c433864dd6db564a2e102a29690f5ab818dd279e384de12b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/02.png",
+      "sha256": "31fd5a195fdf6b569d524fc0ead8c34d259017cc2834d31a0c555f8c4323dc29"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/03.png",
+      "sha256": "b2700c5a78b321c394fabf1d1a720165bcb8247d351970c926be9323c932bad0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/04.png",
+      "sha256": "279bfd0a537d7c74b9e21b7dcdf9a19084aace42cab2ff18fd8f468bacbf5435"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/05.png",
+      "sha256": "517922ee030ed02b393f236a61caf4feb6ad4fd956f8b4b76ddf141961ae771b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/06.png",
+      "sha256": "276372c4f0982bfcaf52209208967c416321b6282466564a950d5f5093555ea5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/07.png",
+      "sha256": "d51ea84701a3376f3c4a00e010f41d3e9a1b17ed6cb0b819743a374a01250f8c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/08.png",
+      "sha256": "19b0f34b0f2e85079cbb70629a3fcf43ea5a8a9cda0968288ca82b636ebafaf3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r1/support/09.png",
+      "sha256": "97896943735b33695552eb0c348ce8e7414cffd105716efa8477c543d164e705"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/00.png",
+      "sha256": "89230dd53ab01bb6ef7a179de0e56a74ed7e2013fe1e8eeb9d12628352a97cd1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/01.png",
+      "sha256": "35b4857dc8914003e410bab6ad39d63756d0fa8a50e669ef6847965522a540f9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/02.png",
+      "sha256": "c633f2b0f6c61a6a68cfe060c547f4acaad534ccbeaf3d09c1fc8f7596bfcf45"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/03.png",
+      "sha256": "3c6f55933474f171636ed27b15955870510c497d6cab441f4dd57eb5f48321a6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/04.png",
+      "sha256": "f792dc6f8ad79a7f7a97efa9e6e57ece7954b32a46a4bc447b576a26cd985908"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/05.png",
+      "sha256": "e26f25463c3b976131cce640975712a03bb9a66692a45c095b7b869348932e5e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/06.png",
+      "sha256": "826886dece5449d8c5a824e38ddf92de5f31fdc5066b5cfd26af85ff8516df70"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/down/07.png",
+      "sha256": "338c9cb744e5fff448607da90bcda3c17c4d8313811057cfb035ecc5487c1614"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/00.png",
+      "sha256": "9d8bc53d7034882da81ee4f04d13280a2a622dd1655d0931488de8f8ee6f167e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/01.png",
+      "sha256": "cdb33adcc9f2eb185cf549912b9d1b026c5d5d9fa9c4a37a9dd7626479b35902"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/02.png",
+      "sha256": "d94d866d5b25bfbeb0e43d834d2a76a530eb2cc4d5b050fb6571ae4083d95014"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/03.png",
+      "sha256": "65d83e9bb6b7f0c1626aea0aa1347e15c9c1cfe6aabf88c671987d0a5601c770"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/04.png",
+      "sha256": "e76c63891d2dc1abab3d9b4f7681b538c5a0cdf8cd98bde63332e3b6403c0840"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/05.png",
+      "sha256": "ec62ee344b1b5d6ca9744e99fe728950387140b412f14305110ce91ec6ff6534"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/06.png",
+      "sha256": "da9c1e7f838a97793a3fcb8136221da19f81459bc3c577732cbd40336f55008a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/superrise/07.png",
+      "sha256": "6ceea1f288868581f06d826c3ed88fdbba565e22bb72dee149e590426b41933a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/00.png",
+      "sha256": "d434ae1102b9283d72b38da3f70c13014bf2c0f92e4527d5b5e1b26a45202c20"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/01.png",
+      "sha256": "5dbebd10f640a23781870f5b945090253dc435d50974e58f3f522ba34126c826"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/02.png",
+      "sha256": "6cc5f1432ddb5fffa1f35e136408e5208be726dcaab4d2f57d60e6b2b7a7fbea"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/03.png",
+      "sha256": "fda79cb94109c02eff28971c05ef7d8f6707ab97c19c7e73a43d4e0ea345ffa7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/04.png",
+      "sha256": "3524bf8d0489624d030a3f8db0923180630901eadd173abc40d24babb540fb03"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/05.png",
+      "sha256": "d8408f5f20cb9bdc3758b3a1dfcbd533b480933154c41ea867097cc8c2bf5741"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/06.png",
+      "sha256": "b9355fa56fe7b0cb56b5592da70e20f184a35f8a2800c9563cd7ae3087531206"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/07.png",
+      "sha256": "1615d0ecd8a2f33c09f7907e66f2a95d316ec333c4de75628d1a6733ab756722"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/08.png",
+      "sha256": "307db3bf0ce6ba88bb6866f2486d3afbf99a8b4a7f68fab781afb0f8f8b1c2b5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_r2/tomoe/09.png",
+      "sha256": "8617df582c85fb98ae57bb9b29e003997c502fce1d3ed81a6f0c1f4128e1fdf9"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/collar.v3bad/00.png",
+      "sha256": "899f826173a6cbcabac9b5a6aef6df6a6679e44657276c9414413dc9a71994fe"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/collar.v3bad/01.png",
+      "sha256": "de01d49bed29dc24d293b309e024bafa3ded9979c15d096853716b1e887c537f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/collar.v3bad/02.png",
+      "sha256": "603a3bdec4017f66cb4f2a5645a70c2e63058d244e746b15984799d36ea56fea"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/collar.v3bad/03.png",
+      "sha256": "90f26cbc0da9c27ee3b6980917e003149ab7e5458141519249eb0c74b4986f15"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/00.png",
+      "sha256": "3ca5dd820f95cac92dda8dce96616d34153fbaee8b6eadfec6e90ec9c4e2ac63"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/01.png",
+      "sha256": "8052da1a009f1dce63ed26b41295f950d5670082e58cc7bb38fbb2a1c97a53cb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/02.png",
+      "sha256": "9de8595f67a49bb59ca6ba46c9c5adacd005a0fff3a6eb89db903e8937a68bb1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/03.png",
+      "sha256": "c6688f04515f000dbcc6dda6bfc8df74f3c2dfd3c9100a89fd60e361f34b840c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/04.png",
+      "sha256": "5319f07718108e709ef1fc4741651c2e0834a23b47623a48b7ae98ce21647e32"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/05.png",
+      "sha256": "8e9d2fce226a57b0277dcba9f704c177c862a9d294d5a292d75a7ddc91472d4c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/06.png",
+      "sha256": "f9c90519d081f023ffd3990b6925baa8a53c56d12be94dfb7af7f4f40d111476"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/07.png",
+      "sha256": "849f249bd9dc6d99961ba66f0a65d2942c83df5000528f62799a33252fefbe75"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/08.png",
+      "sha256": "76d3826bea223ab7c89d223b89117ff0067213e9b9a37383420c0852f3c5d893"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/09.png",
+      "sha256": "8ad557b219d4fae1de99577ba6af9c8ce5a256683f3831bd190b15154ecf95e8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/10.png",
+      "sha256": "b15f4ce1bfb9b62a44e6ce45d3c9c79586fc3f698cbf83472b66ac712286dc68"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/11.png",
+      "sha256": "4190a0a2ba80aeb259bdb3fcf5828c293401d760f680aee5e93286529e8a88aa"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/12.png",
+      "sha256": "6fc2256f93d9b2e30b45d33fdd15d309a83305c09c299288000f9438d2a5396b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/13.png",
+      "sha256": "b68d9f537fdfbaa998a350d1fea584adb09d898d3f1965bfd8c816c0dfc9608b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/cq/14.png",
+      "sha256": "b4a76774ebfa794d5313f4f8dac9c2bf730df61e31dc709aaab866765eaa6748"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw/00.png",
+      "sha256": "e37aa58da774a3a1e69adad70f80aca168fb9f23b0ee4f0f378c677ab3a361ac"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw/01.png",
+      "sha256": "5ddeb391a86b835c8f8d230af66a3283636ca7d771a8c58deb8831c6519881af"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw/02.png",
+      "sha256": "7dae808850fe99cde21e887febf55b923a74b77854a830c174f2ae768d955dc1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw/03.png",
+      "sha256": "a66d3bcb1a4bba3f617a07a66837f933b477162598f53ec0d4d201159014c93b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw.b/00.png",
+      "sha256": "e37aa58da774a3a1e69adad70f80aca168fb9f23b0ee4f0f378c677ab3a361ac"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw.b/01.png",
+      "sha256": "5ddeb391a86b835c8f8d230af66a3283636ca7d771a8c58deb8831c6519881af"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw.b/02.png",
+      "sha256": "7dae808850fe99cde21e887febf55b923a74b77854a830c174f2ae768d955dc1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/draw.b/03.png",
+      "sha256": "a66d3bcb1a4bba3f617a07a66837f933b477162598f53ec0d4d201159014c93b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/00.png",
+      "sha256": "9fcebb11c814f79e8eaffd09a68b44d86052b0bc745d5eeea14a19868c43d45f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/01.png",
+      "sha256": "f8d7f7e25a5493f5444ee5b39f5b6f5252f3299a9f4ba7d21cdedbbdc5585c6d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/02.png",
+      "sha256": "846649aa9debb13db04b50defa669eccb1746db4e841b38517f1744035ac1414"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/03.png",
+      "sha256": "12ccb1979891d88c14201222757f9780c5af61e19cc3611b7049c517631aeb4b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/04.png",
+      "sha256": "8d8b4f3227b5f49329fe61249a7964cda9afc51fec8068a37be05dc69f5290e3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/holster.b/05.png",
+      "sha256": "01138ccdf635d7582d9d95384223eb00a6eb1489a55017a880d64ffcffc94586"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle/00.png",
+      "sha256": "b62cd57f64bb0e31671e4405fcdb27e01fc640dc8627ac853f5f78b936b4d5c8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle/01.png",
+      "sha256": "4f95a3e1affca690eb00fb841f06c38cea59f7d623255a52e13b354d7d5dadf4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle/02.png",
+      "sha256": "5163afc59f43a2414cb279744fc7ee3a10196454816fbd83c0a4dede55a38f5a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle/03.png",
+      "sha256": "292050aaf2c9f5c271735f47b01557c56de9b56d3071d289bbc6de21bb36c56f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle_pipe.sword/00.png",
+      "sha256": "ed8e14303614d84653bd97fdfb2967b098c6f5b2ad6b871f793a89ea0ea0e6ca"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle_pipe.sword/01.png",
+      "sha256": "442c9440c2a649de47db40f311b8193e7cbcbcd6c66d269fb58516af7415bc90"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle_pipe.sword/02.png",
+      "sha256": "cb1b96d7c46b5f653c95e554b1b29bb1c4f09bc751bc933b49dc3d604c736d0a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/idle_pipe.sword/03.png",
+      "sha256": "d6d43de71a771b41a3ce0c46966015c164b0e52d27011c57a5e50f94fe2de383"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/00.png",
+      "sha256": "75a95a04fa23caba7d7304652dd21967fc985a0b5534e4cfb42f3257a60cb39a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/01.png",
+      "sha256": "4618d22f2f4679eb9e5e69a5e0bd3a78ee130a56dfcbbd4f42348c580a4bc2c0"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/02.png",
+      "sha256": "839652a0f1d304ca52f4c7348d5ddba14cd9917852669ec361da22f8b61dd52f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/03.png",
+      "sha256": "5c632583e50ac67143eeca18c62c2bf1bf4d7fbeaa695cafbb41d714a077dd8d"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/04.png",
+      "sha256": "54274acf4d36bb1f2780b0420f48831c931deeddac6e5d38f6008f8ad7727036"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/05.png",
+      "sha256": "efa8a21b6e57ecd2bdc59444786572316c5bf30298bcc4f2a0608be3919be2bd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/06.png",
+      "sha256": "7657406a735a12fb9f05df44c3cab8c8d831ea155a39b79ca25ff099f5d3426e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/jump.b/07.png",
+      "sha256": "12f5dac661f541a4106df36e564fb6ca4fb52ca2be858f52eff1fdc6429d56f2"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel/00.png",
+      "sha256": "3814b1d68b1b3eb780db326bfb03675beda6370c0f4431fcdc0fc9249251d814"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel/01.png",
+      "sha256": "e49f67449013f0c5a96da04e1b64c31283ef84c4e03c01d0bd17f31f06b9e4fb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel/02.png",
+      "sha256": "0abdcace29fac3c10737ba298bf15e8a6bb56f0def20c08a4552152cf3fc0b7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel/03.png",
+      "sha256": "e4647d96839b95e28bc6e026acc5a80aed57001cacd7aaee71eb4ee94282daf7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel.b/00.png",
+      "sha256": "3814b1d68b1b3eb780db326bfb03675beda6370c0f4431fcdc0fc9249251d814"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel.b/01.png",
+      "sha256": "e49f67449013f0c5a96da04e1b64c31283ef84c4e03c01d0bd17f31f06b9e4fb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel.b/02.png",
+      "sha256": "0abdcace29fac3c10737ba298bf15e8a6bb56f0def20c08a4552152cf3fc0b7c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/kneel.b/03.png",
+      "sha256": "e4647d96839b95e28bc6e026acc5a80aed57001cacd7aaee71eb4ee94282daf7"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready/00.png",
+      "sha256": "ac43df3fe5d1907e76ed7ac6c74f14851c10af564754a239c6666707b322d4df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready/01.png",
+      "sha256": "406cbe4a20b78e1ddfc744a8e73b03e667d2696f37700606fe5a191a01b05d0c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready/02.png",
+      "sha256": "f9217d0e427efa75f6bb14e0abc598596827beda56cb2b02329c67b5aa209cac"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready/03.png",
+      "sha256": "abf53f744e7c1594b62e09bfce9e3aad55c22d735fd7305dea7d72d3b1621729"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready.b/00.png",
+      "sha256": "ac43df3fe5d1907e76ed7ac6c74f14851c10af564754a239c6666707b322d4df"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready.b/01.png",
+      "sha256": "406cbe4a20b78e1ddfc744a8e73b03e667d2696f37700606fe5a191a01b05d0c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready.b/02.png",
+      "sha256": "f9217d0e427efa75f6bb14e0abc598596827beda56cb2b02329c67b5aa209cac"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/ready.b/03.png",
+      "sha256": "abf53f744e7c1594b62e09bfce9e3aad55c22d735fd7305dea7d72d3b1621729"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/00.png",
+      "sha256": "c60551ff55025e5ca5d37d16f39f28d494dc118671673f3c0fe010e70b4ea45a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/01.png",
+      "sha256": "7c32abe9d295d9aca18f5f428b6deae1f046202af2eccae6a7e721865e066fe1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/02.png",
+      "sha256": "f78cfd53b1053ea1c08f810f4436b4edade6bd93e333956b9a945493ac435067"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/03.png",
+      "sha256": "7594480014e1e36d06e04c2d17db6404272f6e480e977a57a81fddde53b6830c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/04.png",
+      "sha256": "4d72ba3e1d9956e1807aa266953ba20a218a13783d19585b5eeea1d7f79bc14b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/05.png",
+      "sha256": "015dbf6bdd9bca9c3d4e0ff04431294c2c468151fbf684be2bbb4848858bb484"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/06.png",
+      "sha256": "9811ad70e9e459debd022a682839ba0f1642cfa328f2bae1b00df4b165494281"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/run.b/07.png",
+      "sha256": "9e2e3f77e5d812c38caf6a8212a63029371da5e7da09a3611a8f0ea60afa110a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/00.png",
+      "sha256": "dc1e536c9f248fbf70583fab8af8c8c34aa3a7b9bc4974612b7c246a6e3481fb"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/01.png",
+      "sha256": "40ab90cdc1aa40bde06dc2adc8d4bdc64a46a319b3292c5af09000f7b278606b"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/02.png",
+      "sha256": "3d56497c4fee02b060fc2c28f083962b6f316ef2ca1875349bb0192d4127e422"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/03.png",
+      "sha256": "17c52ba034e71eea7a642b43bbda5e98daa3a40bad42e021dc6c8b3bb740aac4"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/04.png",
+      "sha256": "e9a59c5e04c969389006f70f032d66a0ef1d74ddf909346241b2c30a38d78425"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/05.png",
+      "sha256": "6ce987b9f8baf70d8391348c48d91151008fd265db937dfc8833df11518dfd62"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/06.png",
+      "sha256": "754601de601fef5bd55c09f41f82fb8b6ba7696ccb30ef664adaacabb3f980a8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/step.b/07.png",
+      "sha256": "1f7fd7ffe93700f832df65b5eb010ec413883c051f1464720920a87d84ffb280"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/00.png",
+      "sha256": "e46e534b27f0d61ca457f2bf91afd88675910e3851712590362cf58fd556247e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/01.png",
+      "sha256": "838f13c9fdee3d494477f95988999d271b24c182c8d2177812e78cefc762be01"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/02.png",
+      "sha256": "2ac788e59f6cd9a52b7c8f4e8973582028cd806b355b76a62cd3b00b03f6d9cd"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/03.png",
+      "sha256": "09a51d7f959870657bb476d900e8676d0ae332ee9b990a9032a685145387ecde"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/04.png",
+      "sha256": "55d2ac663615c3bcf17172f6baa69c44a6c645d1a6183006fbc0db192a6cd2c3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/05.png",
+      "sha256": "15370ae50e5f27b010d9722358f2e5193c14d3975e3c651628ae16b79927e8ae"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/06.png",
+      "sha256": "b2f04abb6e9df11dae98028c97a897cf183732b156c95395455145ec5d45bd16"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/super.v3bad/07.png",
+      "sha256": "6b43cccf04e704d224b8d7b642da8692d8ef18369ca331f925f97f8b3afe5406"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/00.png",
+      "sha256": "8e6a9e692d82f0d860a28d9c8524bd78f98af91cbcb153ba840bffbba7518e3c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/01.png",
+      "sha256": "bd50994b7c89085c9a85a376ca7b49e62c71a7f5519c4b1bc0a722b0638f0b30"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/02.png",
+      "sha256": "a107c77ff4e0aeea43591e85fbb251f4445dcafc68ca4dd7e10d611bcd4c97b1"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/03.png",
+      "sha256": "b932bf61e995e46c4f8c5c5da1538f5f17e4fe5386b13fb1f9e9bbec4ee31ee5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/04.png",
+      "sha256": "511aa26373275ac3c0b031cfca9a9df46f5f30da80424356de2495f3fd6a8819"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/05.png",
+      "sha256": "04afbc3726adb9c173ad4907c18c768539d169312eb7d64cc23abd1eeb90ff1a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/06.png",
+      "sha256": "8817c91ed3f2b8259f0396e35cad57b29b0f12cdee80574d5e2fc5dceff24689"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/tidy.b/07.png",
+      "sha256": "f0bcad4f7269d4e760b57905478651328feefd45366914af11864519b45ff64f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/00.png",
+      "sha256": "c1f49bdc3251b7f68e6adfb409e759cf751f09cba47e3cd50e77339148c64957"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/01.png",
+      "sha256": "6dff09936fa544c7be7c34c85f1249b2a3bf3daabcafc370a44bfd34e8f8194a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/02.png",
+      "sha256": "de07026a98db09c1ec33e740d94c53e400872e9adab605626f01ef4ed3c5f65c"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/03.png",
+      "sha256": "cd9551f23e2e03fe5d272dc1e3d631ca4172be679a8815a21791f5c8a941d1cc"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/04.png",
+      "sha256": "11418026ca0d0837fc3ffc09fd9db761491fece63c0bdc6ab9ca06bf9af79dd3"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/05.png",
+      "sha256": "144aa73e9891a49daaa87fd63bc0e52a24bc5b1eec86f956c1957054dfd91586"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/06.png",
+      "sha256": "90be4e5f13e59c500eb844ca90a06990677baa02deeb169e5a8a518280ee1a1e"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk/07.png",
+      "sha256": "d0cf9561d21e1e8c67443658ffafe8b6c5dc82e5480e669533b1020ea6db5b5a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/00.png",
+      "sha256": "e5afdf21bef39cefdbd58f1812c9c166ec5d37a11a0fd65fe5181bbda60ca695"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/01.png",
+      "sha256": "3cc75e5c1a694275822c821a59fa337d5088dac8e190e5b92aac07b80d3d0c6f"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/02.png",
+      "sha256": "31db68e68f3d54ed234d36452f42f593a06fd2546ea778609a9291fb79830f13"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/03.png",
+      "sha256": "f510bab68e8840973675907da9f5342117073bde852904b599bb312d7c1efde8"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/04.png",
+      "sha256": "3a13f946bf8f6c7de949cde6f0a65fbf3e28864c5ae00c359657c6f2a6f09ff5"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/05.png",
+      "sha256": "ec6196bcaba43f547320ec1c3af63e84d394e276d38e78673987c553508bcf9a"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/06.png",
+      "sha256": "6beb5c4bf6efb5b2f8fae6d96ab21aa77b856808d7917ccb6d973047ab5993b6"
+    },
+    {
+      "path": "game-src/action/deadpole/full/old_v2/walk_pipe.sword/07.png",
+      "sha256": "729642f49d4de23354049a972b7919ceaec0ffd2f447a90dc9d334219b4ec670"
+    },
+    {
+      "path": "game-src/action/deadpole/spend.log",
+      "sha256": "8ed55e3154ab08b0efff07b598609e4bb3a1b4adb7a82167dfb62d51ac6a6d31"
+    },
+    {
+      "path": "game-src/action/deadpole/full/final/manifest.json",
+      "sha256": "bff80be2b20a1e9c153c4806bf76503cc5b01a64f1e77713bc75a9038306a3f4"
+    }
+  ]
+}

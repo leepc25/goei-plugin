@@ -1,0 +1,30 @@
+{
+  "estimate_only": true,
+  "jobs": [
+    {
+      "clip": "pipe_body",
+      "frames": 8,
+      "estimate": 3
+    },
+    {
+      "clip": "cq1_body",
+      "frames": 4,
+      "estimate": 3
+    },
+    {
+      "clip": "cq3_palm",
+      "frames": 6,
+      "estimate": 3
+    },
+    {
+      "clip": "catch_body",
+      "frames": 6,
+      "estimate": 3
+    },
+    {
+      "clip": "counter_body",
+      "frames": 5,
+      "estimate": 3
+    }
+  ]
+}

@@ -549,7 +549,9 @@ def draw(p,s=2):
         d.line([q[a],q[b]],fill=c,width=s)
     d.ellipse([q['NOSE'][0]-3,q['NOSE'][1]-3,q['NOSE'][0]+3,q['NOSE'][1]+3],fill=(255,230,80,255))
     return im
-def cost(n): return 2 if n<=3 else 3 if n<=8 else 4
+def cost(n):
+    if not 3 <= n <= 15: raise ValueError('skeleton-v3는 3~15장')
+    return 2 if n == 3 else 4 if n == 15 else 3
 if __name__=='__main__':
     names=sys.argv[1:] or list(CLIPS)
     out=os.path.join(HERE,'../plan'); os.makedirs(out,exist_ok=True)

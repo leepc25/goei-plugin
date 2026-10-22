@@ -1,0 +1,31 @@
+{
+  "owner": "deadpole",
+  "branch": "codex/art-deadpole-resume",
+  "max_submitted_per_owner": 1,
+  "account_balance": null,
+  "account_active_jobs": null,
+  "account_concurrency_limit": null,
+  "account_status": "authentication_missing_401",
+  "historical_approved_cap": 475,
+  "historical_reported_spend_approx": 315,
+  "historical_exact_spend": null,
+  "remaining_approved_budget_exact": null,
+  "new_paid_calls": 0,
+  "new_actual_charge": 0,
+  "historical_deadpole_job_count": 110,
+  "visual_approval": "pending",
+  "generation_status": "not_started_auth_blocked",
+  "priorities": [
+    "pipe body-only",
+    "cq1 horizontal retention",
+    "cq3 distinct palm shove",
+    "catch to counter continuous boundary"
+  ],
+  "never_regenerate": [
+    "undress",
+    "showerturn",
+    "shower",
+    "bath"
+  ],
+  "note": "담당 배정은 기록했으나 다른 실행 환경의 배타 잠금이나 현재 계정 큐 확인을 대신하지 않는다."
+}

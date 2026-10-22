@@ -25,13 +25,20 @@ DESC=('petite young adult woman agent, small slim body, long straight black hair
 def args_for(n,seed):
     act,prop,ps=rig.CLIPS[n]
     return {'description':DESC+(', '+prop if prop else ''),'action':act[:100],'direction':'east','first_frame_url':pl.b64(BASE),
-            'first_frame_keypoints':rig.kp(BASE_POSE),'keypoints':[rig.kp(p) for p in ps],'seed':seed}
+            'first_frame_keypoints':rig.kp(BASE_POSE),'keypoints':[rig.kp(p) for p in ps],'view':'side','seed':seed}
 def fetch(n,j):
-    nf=len(rig.CLIPS[n][2]); d=f'{OUT}/{n}'; os.makedirs(d,exist_ok=True)
-    for f in os.listdir(d): os.remove(f'{d}/{f}')
-    for i in range(nf): pl.poll(j,f'{d}/{i:02d}.png',index=i,tries=5)
+    # Preserve delivered originals; each paid job is recovered into its own folder.
+    nf=len(rig.CLIPS[n][2]); d=f'{OUT}/../../resume/candidates/{n}/{j}'; os.makedirs(d,exist_ok=True)
+    for i in range(nf):
+        path=f'{d}/{i:02d}.png'
+        if os.path.exists(path): continue
+        result=pl.poll(j,path,index=i,tries=5)
+        if result!='ok': raise RuntimeError(f'{n} {j} frame {i}: {result}; 원본 유지, 재생성 금지')
 if __name__=='__main__':
-    seed=11; MAXJ=2   # 동시 작업 상한(2026-10-22 사용자 확정: 요원 스레드당 2칸)
+    # The old generator encodes baked-in weapons and does not preserve requests/usage.
+    # Keep importable helpers for comparison, but do not use it for new paid work.
+    raise SystemExit('구 생성기 제출 중지: resume/README.md의 빈손·요청 해시·계정 큐 절차를 따르세요.')
+    seed=11; MAXJ=1
     for a in sys.argv[1:]:
         if a.startswith('--seed='): seed=int(a[7:])
     names=[a for a in sys.argv[1:] if not a.startswith('--')] or list(rig.CLIPS)
