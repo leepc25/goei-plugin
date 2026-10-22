@@ -22,6 +22,6 @@ GPT가 이 저장소에 그림을 올리는 일감 목록. 한 줄에 한 요청
 | docs/캐릭터제작서/의뢰서_게슈간_샤워·목욕_GPT.md | 게슈간 탈의 7장·샤워 앞 돌아서기 3장·샤워 6장·목욕 4장 = 20장 (192×144 투명, 기준 그림 game-src/action/geshugan/base/G0.png) | game-src/action/geshugan/clips/<클립>/NN.png | 요청 |
 | docs/캐릭터제작서/의뢰서_데드폴_탈의·샤워·목욕_GPT.md | 데드폴 탈의 7 + 돌아서기 3 + 샤워 6 + 목욕 4 = 20장(192×144 투명, 수건 차림, 데드폴 키·그림체). **기준 그림 base.png·idle/00.png가 main에 올라온 뒤 시작** | game-src/action/deadpole/full/clips/<클립>/NN.png | 요청(기준 그림 올림 3040638) |
 | docs/캐릭터제작서/의뢰서_큐라스_샤워·목욕_GPT.md | 큐라스 탈의 7 + 샤워 앞 돌아서기 3 + 샤워 6 + 목욕 4 = 20장(192×144 투명, 기준 game-src/action/kyuras/base/A.png, 허리 수건) | game-src/action/kyuras/clips/undress·showerturn·shower·bath/NN.png | 요청 |
-| docs/캐릭터제작서/의뢰서_에일린_씻기_GPT.md | 에일린 탈의 7·돌아서기 3·샤워 6·목욕 4 = 20장(192×144 투명, 옆모습, 캐릭터만). 기준 그림 game-src/action/eileen/base/H-side.png | game-src/action/eileen/clips/undress·showerturn·shower·bath/NN.png | 요청 |
+| docs/캐릭터제작서/의뢰서_에일린_씻기_GPT.md | 에일린 탈의 7·돌아서기 3·샤워 6·목욕 4 = 20장(192×144 투명, 옆모습, 캐릭터만). 기준 그림 game-src/action/eileen/base/H-side.png | game-src/action/eileen/clips/undress·showerturn·shower·bath/NN.png | 받음 |
 | docs/캐릭터제작서/의뢰서_고르고디오_샤워·목욕_GPT.md | 고르고디오 탈의 7·샤워 앞 돌아서기 3·샤워 6·목욕 4 = 20장 (224×176 투명, 수건 차림, 캐릭터만) | game-src/action/gorgodio/full/clips/<undress·showerturn·shower·bath>/NN.png | 시작 가능(기준 그림 full/ref.png) |
 | docs/캐릭터제작서/의뢰서_쟈알디_샤워·목욕·용변_GPT.md 9절 | 쟈알디 탈의 사이 장 추가: 7장 → 10장(재킷 젖히기·소매 빼기·셔츠 벗기·수건 여미기) | game-src/action/jyaldi-v5/full/clips/undress/00~09.png | 요청 |
