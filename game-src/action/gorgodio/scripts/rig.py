@@ -73,14 +73,14 @@ SK2=P((X-6,114),-10,0,0,(X+20,G-44),(X-12,G),('a',X+16,110),('a',X+2,114),lk=KNE
 SK3=P((X+2,134),10,0,0,(X+22,G),(X-16,G),('a',X+22,132),('a',X+8,134))
 clip('stomp','side view in profile: sumo stomp, lifts the lead leg high with the knee bent, then stamps it down hard into a deep squat',[G0,SK1,SK2,lerp(SK2,SK3,.6),SK3,lerp(SK3,G0,.5)],KNIFE)
 # 9·10·11 칼리 각도 1 → 2 → 두 손 내려찍기 (커밋형, 뒤로 갈수록 깊게)
-C1A=P((X-2,120),0,0,0,(X+21,G),(X-19,G-1),(10,-16),(18,10),le=('e',-6,-4),re=('e',6,18))     # 칼을 가까운 어깨 위로
+C1A=P((X-2,120),-4,0,0,(X+21,G),(X-19,G-1),(18,-27),(18,10),le=('e',14,-9),re=('e',6,18))     # 칼을 앞머리 위로 치켜듦(팔이 얼굴 옆·뒤를 지나면 생성기가 뒷모습으로 돎: 결함 1)
 C1B=P((X+8,126),18,0,0,(X+33,G),(X-17,G-2),(36,38),(14,14),re=('e',6,18))                      # 앞발 디디며 사선 아래로 끝까지
 clip('chop1','side view in profile: raises the knife over the near shoulder, chops diagonally down with a forward step, weight dropping',
      [G0,C1A,staged(C1A,C1B,.55),C1B,lerp(C1B,GUARD(8),.5)],KNIFE_UP)
 C2B=P((X+14,124),12,0,0,(X+39,G),(X-9,G-3),(34,-12),(12,16),le=('e',18,4),re=('e',4,18))      # 아래에서 앞 위로 되돌려 올려벰, 뒷발 끌려옴
 clip('chop2','side view in profile: from low, swings the knife back up diagonally in a rising backhand cut, rear foot slides in',
      [GUARD(8),lerp(GUARD(8),C2B,.35),staged(GUARD(8),C2B,.7),C2B,C2B,lerp(C2B,GUARD(14),.5)],KNIFE_UP)
-CVA=P((X+10,116),-8,0,0,(X+37,G),(X-11,G-2),(8,-30),(12,-26),le=('e',4,-8),re=('e',8,-6))    # 두 손으로 머리 위로(앞쪽) 치켜듦
+CVA=P((X+10,116),-8,0,0,(X+37,G),(X-11,G-2),(20,-30),(23,-26),le=('e',14,-10),re=('e',16,-8))    # 두 손으로 머리 위로(앞쪽) 치켜듦
 CVB=P((X+22,136),30,0,0,(X+49,G),(X-5,G-1),(34,30),(30,28),le=('e',16,14),re=('e',14,14))     # 무릎 굽혀 몸 전체로 내려찍음
 clip('cleave','side view in profile: lifts the knife high in both hands, then hacks straight down with the whole body, knees bending',
      [GUARD(14),lerp(GUARD(14),CVA,.5),CVA,CVA,staged(CVA,CVB,.6),CVB,CVB],KNIFE_UP)
@@ -103,7 +103,7 @@ SP4=P((X+4,144),70,0,0,(X-30,G),(X-34,G),('a',X+38,158),('a',X+34,158),tilt=-30)
 clip('splash','side view in profile: in the air spreads out flat and dives belly first, lands prone, then pushes himself up',
      [JA(10),SP1,SP2,SP3,SP3,SP4,KNEEL(),STAND(0)])
 # 14·15 식칼 던지기(오버핸드): 칼을 머리 옆 위로 들고 빈손으로 겨눔 → 눈높이에서 놓고 팔을 끝까지 따라 내림
-KR=P((X-4,118),-4,0,0,(X+19,G),(X-21,G),(4,-22),(36,-2),le=('e',-2,-6))
+KR=P((X-4,118),-4,0,0,(X+19,G),(X-21,G),(-12,-12),(36,-2),le=('e',4,-1))
 clip('kready','side view in profile: raises the knife beside his head, other arm pointing forward to aim, weight on the rear foot',[G0,lerp(G0,KR,.5),KR,KR],KNIFE_UP)
 KT1=P((X+6,120),14,0,0,(X+25,G),(X-15,G-3),(34,-4),(12,16),le=('e',16,-2))
 KT2=P((X+10,124),28,0,0,(X+27,G),(X-9,G-6),(30,36),(6,20))
@@ -115,7 +115,7 @@ clip('kpull','side view in profile: squats, grips a handle low in front, twists 
      [STAND(0),lerp(STAND(0),KP1,.6),KP1,KP2,lerp(KP2,G0,.5),G0],'holding a heavy cleaver-like kitchen knife by the handle')
 # 16·17 승인 요청: 발 벌려 버티고 주먹을 하늘로(앞쪽 위), 가슴 펴고 외침
 SM0=P((X-2,126),12,0,0,(X+19,G),(X-21,G),(16,14),(12,16),tilt=10)
-SM1=P((X,118),-6,0,0,(X+19,G),(X-21,G),(16,-40),(10,18),le=('e',12,-12),tilt=-18,head=(10,-8))
+SM1=P((X,118),-6,0,0,(X+19,G),(X-21,G),(26,-36),(10,18),le=('e',17,-13),tilt=-18,head=(10,-8))
 clip('summon','side view in profile: plants his feet wide, gathers, then thrusts his near fist straight up and shouts, chest out',
      [STAND(0),SM0,SM0,staged(SM0,SM1,.5),SM1,jit(SM1,0,-1,['RIGHT ARM']),SM1,SM1])
 clip('summonhold','side view in profile: holds the fist raised to the sky and keeps shouting, chest heaving',[SM1,jit(SM1,0,1,['NECK','NOSE','EYE','EAR']),SM1,jit(SM1,0,-1,['RIGHT ARM'])])
