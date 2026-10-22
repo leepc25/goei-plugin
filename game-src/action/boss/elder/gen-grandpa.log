@@ -1,0 +1,13 @@
+before 16724.4 clips 11
+sub idle
+sub walk
+sub hug
+sub squeeze
+done idle
+done walk
+done hug
+sub stomp
+sub block
+sub argue
+done squeeze
+done stomp

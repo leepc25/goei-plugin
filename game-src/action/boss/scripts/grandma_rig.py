@@ -1,0 +1,41 @@
+# 405호 할머니 (2단계, 256×256, 키 약 150). 기준 ../elder/base/grandma.png. 작고 굽은 몸, 얼굴이 거꾸로. 던지는 밥상·숟가락·국은 엔진 소품(손 좌표).
+import math,os,brig as R
+_D=os.path.dirname(os.path.abspath(__file__))
+REF=f'{_D}/../elder/base/grandma.png'; FIRST=R.first_from(f'{_D}/../elder/base/grandma.skel.json')
+DESC=('small hunched elderly Korean grandmother with an upside-down face (eyes where the mouth should be, smiling mouth where the eyes should be), grey permed curly hair, '
+      'faded flower-pattern baggy momppe trousers, plum cardigan, stained apron, rubber slippers')
+B=R.Body(thigh=33,shin=28,uarm=24,farm=22,torso=39,G=194,k=1.5,head=R.rot((24,-13),-16.6))
+P,lerp,staged,sh,jit=B.P,R.lerp,R.staged,R.sh,R.jit
+KNEE_UP,ELB_UP,ELB_OUT=R.KNEE_UP,R.ELB_UP,R.ELB_OUT
+X=87; G=B.G; CLIPS={}
+def clip(n,a,ps): assert 3<=len(ps)<=15,(n,len(ps)); CLIPS[n]=('side view in profile facing right: '+a,[R.anatomic(p) for p in ps])
+I=lambda b=0,**k: P((X,137+b),17,0,0,(96,G),(80,G),**({**dict(lh=('r',10,40),rh=('r',4,42)),**k}))
+clip('idle','hunched old woman wipes her hands on her apron, smiling, slight bob',[I(0),I(1,lh=('r',12,44)),I(1,lh=('r',8,40)),I(0)])
+def wk(t):
+    c=math.cos(2*math.pi*t); sn=math.sin(2*math.pi*t)
+    return P((X+2,138+abs(c)),20,0,0.15*c,(X+2+10*c,G-4*max(0,-sn)),(X+2-10*c,G-4*max(0,sn)),('r',12,40),('r',2,42))
+clip('walk','quick shuffling steps, hunched, hands clasped at her apron',[wk(i/8) for i in range(8)])
+OF=I(0,lh=('r',36,10),tilt=-6)
+clip('invite','beckons warmly with the near hand inviting someone to sit and eat',[I(0),OF,jit(OF,0,-6,['RIGHT ARM']),OF,jit(OF,0,-6,['RIGHT ARM']),I(0)])
+TU=P((X-2,134),0,0,0,(X+10,G),(X-12,G),('r',6,-36),('r',-4,-38),le=ELB_UP,re=ELB_UP,tilt=-10)
+TT=P((X+8,140),30,0,0,(X+22,G),(X-10,G),('r',40,-6),('r',36,0))
+clip('throw','squats low, straightens up lifting both empty hands high over her head, then thrusts both arms forward in a big hurling motion',[I(0),P((X,146),30,0,0,(X+12,G),(X-12,G),('r',28,40),('r',24,42)),staged(I(0),TU,.5),TU,TU,staged(TU,TT,.5),TT,lerp(TT,I(0),.5),I(0)])
+def sp(i): return P((X+4,138),22,0,0,(X+14,G),(X-10,G),('r',30+(10 if i%2 else 0),4-(12 if i%2 else 0)),('r',4,40))
+clip('spoons','rapid-fire flicking of the near wrist again and again, flinging things',[I(0)]+[sp(i) for i in range(7)])
+SW=P((X-2,134),6,0.6,0.3,(X+12,G),(X-12,G),('r',-10,-30),('r',4,40),le=ELB_UP)
+SS=P((X+10,142),36,-0.6,-0.3,(X+24,G),(X-10,G),('r',40,30),('r',4,40))
+clip('smack','winds the near arm far up and back, then brings it down in a huge open-palm back smack, stepping in',[I(0),staged(I(0),SW,.5),SW,SW,SS,SS,lerp(SS,I(0),.5),I(0)])
+SC=P((X+4,146),40,0,0,(X+14,G),(X-12,G),('r',24,48),('r',20,46))
+SF=P((X+6,138),10,0,0,(X+16,G),(X-12,G),('r',36,-20),('r',30,-14),le=ELB_UP,re=ELB_UP)
+clip('splash','bends to scoop with both hands from low, then flings upward and forward in a splash',[I(0),staged(I(0),SC,.5),SC,staged(SC,SF,.5),SF,SF,lerp(SF,I(0),.5),I(0)])
+AR=lambda a: P((X-2,136),6,0.4,0.2,(X+8,G),(X-10,G),('r',-20+12*a,-8),('r',2,40),tilt=-14+6*a)
+clip('argue','turns aside, scolds angrily, jabbing a finger back over her shoulder',[I(0),AR(0),AR(1),AR(0),AR(1),I(0)])
+HL=P((X-6,134),-6,0.3,0.2,(X+8,G),(X-12,G),('r',8,36),('r',-6,38),tilt=-14)
+clip('hit','hit reaction: jolts back, head snaps',[I(0),HL,lerp(HL,I(0),.5),I(0)])
+FR=P((X-4,136),8,0,0,(X+8,G),(X-12,G),('r',14,10),('r',10,12),tilt=-18)
+clip('freeze','startled, freezes stiff, hands up at her chest, staring toward the door',[I(0),lerp(I(0),FR,.5),FR,jit(FR,0,-1,['NOSE']),FR,FR])
+GR=lambda b: P((X+2,160+b),40,0,0,(X+18,G),(X-6,G),('r',30,44),('r',24,46),tilt=12,lk=KNEE_UP)
+clip('groggy','stunned, slumps to her knees, arms hanging, head drooping',[I(0),lerp(I(0),GR(0),.5),GR(0),GR(2),GR(0),GR(2)])
+LU=P((X+18,146),50,0,0,(X+40,G),(X-6,G),('r',40,-10),('r',38,0),tilt=-30)
+clip('lunge','lunges forward with arms reaching and her head thrust out, mouth gaping to devour',[I(0),staged(I(0),LU,.4),staged(I(0),LU,.8),LU,LU,jit(LU,4,2,['NOSE','EYE','EAR']),LU])
+if __name__=='__main__': R.preview(B,CLIPS,REF,f'{_D}/../elder/preview-grandma.png',FIRST); print(len(CLIPS))

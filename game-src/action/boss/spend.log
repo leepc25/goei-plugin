@@ -1,0 +1,241 @@
+2026-10-22 02:21:28 guard-base create_image_pro_flash -> {
+  "background_job_id": "5ddf4181-c8aa-4b01-afc5-26ecd02b129f",
+  "image_id": "3e7aed35-26c8-5cf0-948c-3f2d2ec0f1dd",
+  "status": "processing",
+  "source_image
+2026-10-22 02:21:29 guard-base create_image_pro_flash -> {
+  "background_job_id": "0ae32c6a-c243-418e-9ffd-62a7258b96a7",
+  "image_id": "a1dd4ed0-3096-5eac-b93d-8518beadc1e7",
+  "status": "processing",
+  "source_image
+2026-10-22 02:21:38 guard-base create_image_pixen -> id: 82a3416e-b2c5-4d2b-affa-3fa2cf1f7319
+job_id: 82a3416e-b2c5-4d2b-affa-3fa2cf1f7319
+model: pixen
+description: full body side view in profile facing right, a m
+2026-10-22 02:21:46 guard-base create_image_pixen -> id: 010211ee-5c2f-4eb4-bc16-f27c6831de7c
+job_id: 010211ee-5c2f-4eb4-bc16-f27c6831de7c
+model: pixen
+description: full body side view in profile facing right, a m
+2026-10-22 02:28:34 guard/idle 4f seed31 animate_with_skeleton_v3 -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 02:28:43 guard/combo 8f seed31 animate_with_skeleton_v3 -> id: ed989e44-b8d8-4e73-b170-9937850afb67
+job_id: ed989e44-b8d8-4e73-b170-9937850afb67
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 02:28:46 guard-small edit_image_pixen -> id: adab4a72-b8a4-4170-bdf2-4116ab2bb41f
+job_id: adab4a72-b8a4-4170-bdf2-4116ab2bb41f
+model: pixen
+edit: Change this woman into a thin hunched old male night se
+2026-10-22 02:30:48 guard-small edit_image_pixen -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 02:32:01 elder-base create_image_pro_flash -> {
+  "background_job_id": "7ddbf563-f69e-45ef-81af-4a5924f7ae33",
+  "image_id": "b269bbb3-fdbc-525f-8a3f-8a4f010c2103",
+  "status": "processing",
+  "source_image
+2026-10-22 02:32:26 elder-base create_image_pro_flash -> {
+  "background_job_id": "4fe3f4c3-f4ec-4ca9-a7d5-464199b42e69",
+  "image_id": "9e0dd1d4-f732-580f-828a-b946687025ca",
+  "status": "processing",
+  "source_image
+2026-10-22 02:32:26 elder-base create_image_pro_flash -> {
+  "background_job_id": "b9345bbd-a077-47b1-91ef-4a42589b4a72",
+  "image_id": "7d398faa-cec6-5c06-90bc-cd864415260d",
+  "status": "processing",
+  "source_image
+2026-10-22 02:32:37 guard/combo done
+2026-10-22 02:32:50 guard-small edit_image_pixen -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 02:33:35 guard/idle 4f seed31 animate_with_skeleton_v3 -> id: 9865f112-158f-4ef3-afac-3c474320fe09
+job_id: 9865f112-158f-4ef3-afac-3c474320fe09
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 02:35:37 guard/walk 8f seed31 animate_with_skeleton_v3 -> id: 35bd3a4c-fc7a-4d8e-aa49-92dc82d6309e
+job_id: 35bd3a4c-fc7a-4d8e-aa49-92dc82d6309e
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 02:35:58 guard/combo 8f seed31 animate_with_skeleton_v3 -> id: dbc714ee-cd55-4a76-be2f-5e151c9c5e2f
+job_id: dbc714ee-cd55-4a76-be2f-5e151c9c5e2f
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 02:36:14 grandma/idle 4f seed31 animate_with_skeleton_v3 -> id: 8ee79a83-a7b4-433d-957f-71d0fdb946e0
+job_id: 8ee79a83-a7b4-433d-957f-71d0fdb946e0
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:37:04 grandpa/idle 4f seed31 animate_with_skeleton_v3 -> id: 9c163af1-1ad5-4aa4-bfde-3396e9a6f9fb
+job_id: 9c163af1-1ad5-4aa4-bfde-3396e9a6f9fb
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 02:37:04 grandpa/walk 8f seed31 animate_with_skeleton_v3 -> id: 67efa109-2a6a-4199-b254-cbf52eb7e76e
+job_id: 67efa109-2a6a-4199-b254-cbf52eb7e76e
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 02:37:56 grandma/walk 8f seed31 animate_with_skeleton_v3 -> id: 7dc20280-627d-45d2-ae54-719b02b86145
+job_id: 7dc20280-627d-45d2-ae54-719b02b86145
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:38:38 grandma/invite 6f seed31 animate_with_skeleton_v3 -> id: 78068d9c-548a-4cf0-ab9e-628b729a9c9e
+job_id: 78068d9c-548a-4cf0-ab9e-628b729a9c9e
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:39:07 grandpa/hug 9f seed31 animate_with_skeleton_v3 -> id: 08626d8b-a7b6-49ff-bbf6-3dbacaae02ac
+job_id: 08626d8b-a7b6-49ff-bbf6-3dbacaae02ac
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 02:39:19 grandma/throw 9f seed31 animate_with_skeleton_v3 -> id: f8736944-6a1a-4c62-9240-0d3876479823
+job_id: f8736944-6a1a-4c62-9240-0d3876479823
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:39:37 grandma/idle done
+2026-10-22 02:39:38 grandma/spoons 8f seed31 animate_with_skeleton_v3 -> id: f08c39d5-164d-41cd-9cf7-a78f289d86ba
+job_id: f08c39d5-164d-41cd-9cf7-a78f289d86ba
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:40:29 grandma/walk done
+2026-10-22 02:40:30 grandma/smack 8f seed31 animate_with_skeleton_v3 -> id: b6fb9948-8a7c-4004-9f04-caed75302131
+job_id: b6fb9948-8a7c-4004-9f04-caed75302131
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:41:30 guard/charge 9f seed31 animate_with_skeleton_v3 -> id: 8c01cf39-af3d-4cdd-9366-e62ef6ecba62
+job_id: 8c01cf39-af3d-4cdd-9366-e62ef6ecba62
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 02:41:37 grandma/invite done
+2026-10-22 02:41:41 grandma/throw done
+2026-10-22 02:43:27 family-base create_image_pro_flash -> {
+  "background_job_id": "b5805448-5c69-4b40-bc24-9d737595c577",
+  "image_id": "226c7655-2096-5519-accc-89388a92e40c",
+  "status": "processing",
+  "source_image
+2026-10-22 02:43:27 family-base create_image_pro_flash -> {
+  "background_job_id": "47312945-eaf9-4bff-8291-d9a35ec71400",
+  "image_id": "35ce090c-5883-55b0-a322-d324446f18ff",
+  "status": "processing",
+  "source_image
+2026-10-22 02:45:37 legs-part create_image_pixen -> id: 566fca45-e2da-4c3e-84cb-b34d96f8c4ca
+job_id: 566fca45-e2da-4c3e-84cb-b34d96f8c4ca
+model: pixen
+description: side view facing right, a long horizontal creatu
+2026-10-22 02:45:38 legs-part create_image_pixen -> id: 94baa103-8185-4e03-abe8-1f1121c9ea1d
+job_id: 94baa103-8185-4e03-abe8-1f1121c9ea1d
+model: pixen
+description: side view facing right, a long horizontal creatu
+2026-10-22 02:47:22 legs-part create_image_pixen -> id: cf2414de-fabd-47f2-8bfa-7937af99990a
+job_id: cf2414de-fabd-47f2-8bfa-7937af99990a
+model: pixen
+description: side view facing right, a long creature body sha
+2026-10-22 02:49:10 grandma/splash 8f seed31 animate_with_skeleton_v3 -> id: 972d4e38-49b9-4e7b-911f-b0e5dd613b8c
+job_id: 972d4e38-49b9-4e7b-911f-b0e5dd613b8c
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:50:25 legs-part create_image_pixen -> id: 918196e4-671c-43ff-b652-f52c2bb445fa
+job_id: 918196e4-671c-43ff-b652-f52c2bb445fa
+model: pixen
+description: side view facing right, a long creature body sha
+2026-10-22 02:50:44 grandpa/squeeze 4f seed31 animate_with_skeleton_v3 -> id: ab79996f-3621-4698-9c1e-3bb93109beb5
+job_id: ab79996f-3621-4698-9c1e-3bb93109beb5
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 02:51:01 grandpa/idle done
+2026-10-22 02:51:05 grandpa/walk done
+2026-10-22 02:51:09 grandpa/hug done
+2026-10-22 02:51:27 legs-part create_image_pixen -> id: 87f768be-92e5-4c52-a0fa-1a1bc88d02a0
+job_id: 87f768be-92e5-4c52-a0fa-1a1bc88d02a0
+model: pixen
+description: side view facing right, a bald human-like head w
+2026-10-22 02:52:11 grandpa/stomp 8f seed31 animate_with_skeleton_v3 -> id: 73ec7f00-df6a-47b9-a8f3-af5000809606
+job_id: 73ec7f00-df6a-47b9-a8f3-af5000809606
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 02:52:55 family-base create_image_pro_flash -> {
+  "background_job_id": "53918761-bb4e-4900-8743-97b075d1289f",
+  "image_id": "9d357136-aa13-51c0-9067-b2bc382cd762",
+  "status": "processing",
+  "source_image
+2026-10-22 02:54:43 grandma/argue 6f seed31 animate_with_skeleton_v3 -> id: c833c4b6-81da-43fc-bed8-e3038ec37b1f
+job_id: c833c4b6-81da-43fc-bed8-e3038ec37b1f
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 02:55:05 grandma/spoons done
+2026-10-22 02:55:09 grandma/smack done
+2026-10-22 02:55:12 grandma/splash done
+2026-10-22 02:56:34 grandma/hit 4f seed31 animate_with_skeleton_v3 -> id: 87df8938-4888-4314-99f9-02229fb34613
+job_id: 87df8938-4888-4314-99f9-02229fb34613
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 03:01:23 guard/slam 10f seed31 animate_with_skeleton_v3 -> id: c7ec37a8-7c5f-43e0-8bb0-b77a5bcc7d99
+job_id: c7ec37a8-7c5f-43e0-8bb0-b77a5bcc7d99
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:01:24 legs-part create_image_pixen -> id: bfc9a5b0-edb3-40fa-a9e4-df3f09482f30
+job_id: bfc9a5b0-edb3-40fa-a9e4-df3f09482f30
+model: pixen
+description: side view facing right, a bald human-like head w
+2026-10-22 03:01:24 legs-part create_image_pixen -> id: 17796575-011f-4539-837d-85fd50d2ba77
+job_id: 17796575-011f-4539-837d-85fd50d2ba77
+model: pixen
+description: side view facing right, a bald human-like head s
+2026-10-22 03:01:42 guard/idle done
+2026-10-22 03:01:45 guard/walk done
+2026-10-22 03:01:46 guard/combo FAIL
+2026-10-22 03:01:50 guard/charge done
+2026-10-22 03:01:50 guard/slam FAIL
+2026-10-22 03:02:10 guard/reach 8f seed31 animate_with_skeleton_v3 -> id: 1bf36670-53e2-4879-a539-a79e1e245336
+job_id: 1bf36670-53e2-4879-a539-a79e1e245336
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:02:52 guard/parry 6f seed31 animate_with_skeleton_v3 -> id: f0523f50-e602-409f-8074-019645b105f4
+job_id: f0523f50-e602-409f-8074-019645b105f4
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:03:09 grandma/freeze 6f seed31 animate_with_skeleton_v3 -> id: d1f7e2b2-8ca9-474b-9db2-ea2e1ed1a18b
+job_id: d1f7e2b2-8ca9-474b-9db2-ea2e1ed1a18b
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 03:03:51 grandpa/block 6f seed31 animate_with_skeleton_v3 -> id: 3a2153c2-0b05-4a26-b331-9b44968753ba
+job_id: 3a2153c2-0b05-4a26-b331-9b44968753ba
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:05:40 grandpa/argue 6f seed31 animate_with_skeleton_v3 -> id: 38f493fb-9bbf-4079-be82-9edb9a97bf83
+job_id: 38f493fb-9bbf-4079-be82-9edb9a97bf83
+description: tall thin elderly Korean grandfather with an upside-down face
+2026-10-22 03:05:58 grandpa/squeeze done
+2026-10-22 03:06:02 grandpa/stomp done
+2026-10-22 03:06:59 guard/whistle 6f seed31 animate_with_skeleton_v3 -> id: e2b43552-47a5-4671-9f43-5749dc4008f0
+job_id: e2b43552-47a5-4671-9f43-5749dc4008f0
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:07:00 guard/push 6f seed31 animate_with_skeleton_v3 -> id: 4280be5b-1cd9-4089-ad0a-93cc6e7a5203
+job_id: 4280be5b-1cd9-4089-ad0a-93cc6e7a5203
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:07:15 grandma/groggy 6f seed31 animate_with_skeleton_v3 -> id: c960a4de-cb31-416f-a71c-38c318281951
+job_id: c960a4de-cb31-416f-a71c-38c318281951
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 03:07:33 grandma/argue done
+2026-10-22 03:07:41 grandma/hit done
+2026-10-22 03:07:44 grandma/freeze done
+2026-10-22 03:08:33 legs-part create_image_pixen -> id: 557ff9e0-180d-419d-8f89-a93a7b14aa36
+job_id: 557ff9e0-180d-419d-8f89-a93a7b14aa36
+model: pixen
+description: side view facing right, a bald human-like head s
+2026-10-22 03:09:36 legs-part create_image_pixen -> id: de6ccd2e-bddf-4b47-928a-c3ae504dc532
+job_id: de6ccd2e-bddf-4b47-928a-c3ae504dc532
+model: pixen
+description: side view facing right, a bald human-like head l
+2026-10-22 03:09:49 giant/idle 4f seed31 animate_with_skeleton_v3 -> id: de85e618-95c1-406f-b729-e7ea1386337b
+job_id: de85e618-95c1-406f-b729-e7ea1386337b
+description: grotesque giant swollen elderly Korean grandmother with an up
+2026-10-22 03:10:08 grandma/lunge 7f seed31 animate_with_skeleton_v3 -> id: d16bd5ed-2e2e-4f83-9a33-cf9961211b6b
+job_id: d16bd5ed-2e2e-4f83-9a33-cf9961211b6b
+description: small hunched elderly Korean grandmother with an upside-down 
+2026-10-22 03:11:30 grandma/groggy done
+2026-10-22 03:12:19 legs-part create_image_pixen -> id: 15ce303d-6a19-47bd-94a0-c91d53ba6112
+job_id: 15ce303d-6a19-47bd-94a0-c91d53ba6112
+model: pixen
+description: side view facing right, a bald human-like head l
+2026-10-22 03:12:19 legs-part create_image_pixen -> id: 12063fc5-cd61-461c-a4ae-b7081d307e1e
+job_id: 12063fc5-cd61-461c-a4ae-b7081d307e1e
+model: pixen
+description: side view facing right, a bald human-like head r
+2026-10-22 03:12:38 family-base create_image_pro_flash -> {
+  "background_job_id": "addbc083-4818-40fa-b5f8-32c4a292ca4f",
+  "image_id": "c948bae2-1d2b-54c4-b594-39109506c248",
+  "status": "processing",
+  "source_image
+2026-10-22 03:13:05 grandma/lunge done
+2026-10-22 03:13:08 guard/hit 4f seed31 animate_with_skeleton_v3 -> id: e1bee11d-8f9e-4c0c-b2c2-309943f32301
+job_id: e1bee11d-8f9e-4c0c-b2c2-309943f32301
+description: monstrous towering elongated night security guard, faded grey
+2026-10-22 03:13:21 legs-part create_image_pixen -> id: 5181eba6-db53-4fea-90d5-12c0016465ba
+job_id: 5181eba6-db53-4fea-90d5-12c0016465ba
+model: pixen
+description: side view facing right, a bald human-like head r
+2026-10-22 03:13:27 guard/reach done
+2026-10-22 03:13:54 guard/parry done (recovered)
+2026-10-22 03:14:00 grandpa/block done (recovered)
+2026-10-22 03:14:05 grandpa/argue done (recovered)
+2026-10-22 03:14:09 guard/whistle done (recovered)
+2026-10-22 03:14:12 guard/push done (recovered)
+2026-10-22 03:14:16 giant/idle done (recovered)
+2026-10-22 03:14:40 guard/hit done (recovered)
+2026-10-22 03:15:02 guard/combo 8f seed31 animate_with_skeleton_v3 -> id: c985998e-4654-4323-8810-a3aa9fa356cd
+job_id: c985998e-4654-4323-8810-a3aa9fa356cd
+description: monstrous towering elongated night security guard, faded grey
