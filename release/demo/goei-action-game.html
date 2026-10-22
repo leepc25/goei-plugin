@@ -4977,7 +4977,11 @@ function linkItems(w, run) {
         if (e.status === "stun" && b instanceof Fighter && b.phase === "free") {
           b.enter("hurt", Math.round((e.stun ?? 2) * TICK_HZ));
           w.fx("ring", b.x, b.y, 100, "2");
-        } else if (e.damage > 0) b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage, react: e.knockdown ? "down" : "stagger", dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
+        } else if (e.damage > 0) {
+          const cls = WEAPONS[e.source]?.cls;
+          const scale = cls === "melee" ? p.progression.stats.power : cls === "gun" ? p.progression.stats.aim : 1;
+          b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage * scale, react: e.knockdown ? "down" : "stagger", dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
+        }
       } else if (e.t === "use") {
         const f = e.effect;
         if (f.type === "heal") p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);

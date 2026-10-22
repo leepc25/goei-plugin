@@ -173,7 +173,13 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         if (e.status === 'stun' && b instanceof Fighter && b.phase === 'free') {
           b.enter('hurt', Math.round((e.stun ?? 2) * TICK_HZ));
           w.fx('ring', b.x, b.y, 100, '2');
-        } else if (e.damage > 0) b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage, react: e.knockdown ? 'down' : 'stagger', dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
+        } else if (e.damage > 0) {
+          // 마지막 탄/내구도를 쓴 뒤에는 held가 비고, 날아가는 동안 무기를 바꿀 수도 있다.
+          // 피해를 만든 무기의 ID로 판별해 물건 투척·파괴 폭발에는 무기 배율을 붙이지 않는다.
+          const cls = WEAPONS[e.source]?.cls;
+          const scale = cls === 'melee' ? p.progression.stats.power : cls === 'gun' ? p.progression.stats.aim : 1;
+          b.applyHit({ x0: b.x, x1: b.x, z0: 0, z1: 0, y: b.y, attackId: -1, dmg: e.damage * scale, react: e.knockdown ? 'down' : 'stagger', dir: e.x < p.x ? -1 : 1, push: e.knockback / 30, armorBreak: e.armorBreak }, w);
+        }
       } else if (e.t === 'use') {
         const f = e.effect;
         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
