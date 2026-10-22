@@ -7,7 +7,8 @@
 // 화면에 방 이름·층·잠김 이유 같은 글씨를 쓰지 않는다.
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
-import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt } from '../art/bg';
+import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall, drawHqFurniture } from '../art/bg';
+import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
@@ -69,7 +70,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
-    const place = HQ_PLACE[sc.look] ?? HQ_PLACE[sc.id] ?? 'hq_office';
+    const place = HQ_PLACE[sc.id] ?? HQ_PLACE[sc.look] ?? 'hq_office';
     return {
       id: `hq:${sc.id}`,
       title: sc.name,
@@ -80,7 +81,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: b.y, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => drawBox(c, b, sc.look) })),
+      depthLayers: sc.boxes.map((b) => ({ y: b.y, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+        if (sc.id === 'office' && drawHqFurniture(c, b.kind, b.x, b.y, b.w)) return;
+        drawBox(c, b, sc.look);
+      } })),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.legacy) {
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
@@ -97,8 +101,16 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           return;
         }
         drawRoomShell(c, sc, camX);
-        for (const f of sc.fixtures) drawFixture(c, f, sc.look, camX);
-        for (const d of sc.doors) if (!isS(d)) drawDoorN(c, d, sc.look, openOf(d.id), camX);
+        const textured = (sc.id === 'office' || sc.id === 'f2') && drawHqTextureWall(c, place, len, camX);
+        if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+        for (const f of sc.fixtures) {
+          // Windows/boards are already painted in the wall tiles; keep functional signage.
+          if (!textured || f.kind === 'directory' || f.kind === 'screen') drawFixture(c, f, sc.look, camX);
+        }
+        for (const d of sc.doors) if (!isS(d)) {
+          if (sc.id === 'f2' && d.id === 'office' && d.kind === 'glass' && drawHqDoorRound2(c, d.x, openOf(d.id), d.open)) continue;
+          drawDoorN(c, d, sc.look, openOf(d.id), camX);
+        }
         for (const d of sc.doors) if (isS(d)) drawFloorExit(c, d, openOf(d.id), camX);
       },
       drawForeground(c: CanvasRenderingContext2D, camX: number, w: WorldView) {

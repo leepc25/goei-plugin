@@ -1,5 +1,7 @@
 // 게임 진입점. 플러그인(코드 팩)과 시연판이 모두 이것 하나를 부른다: mountGame(box, bridge) → 정리 함수.
 import type { GameBridge } from '../bridge';
+import { prepareHqTextures } from './art/hqTextures';
+import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { loadArt } from './engine/art';
 import { Game } from './engine/game';
 import { engineModules } from './engine/modules';
@@ -34,6 +36,8 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   let offTouch: (() => void) | null = null;
   let dead = false;
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
+  const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
+  const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
   void loadArt(urlOf).then((art) => {
     if (dead) return;
     stage.remove();
@@ -47,6 +51,8 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   });
   return () => {
     dead = true;
+    releaseDoorArt();
+    releaseHqArt();
     offTouch?.();
     game?.destroy();
     const g = globalThis as { __goeiEngine?: Game };
