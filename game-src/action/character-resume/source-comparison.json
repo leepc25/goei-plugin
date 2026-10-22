@@ -1,0 +1,30 @@
+{
+  "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "changed_paths": [
+    "game-src/action/character-resume/delivery/manifest.json",
+    "game-src/action/character-resume/delivery/strips/jyaldi/run.png",
+    "game-src/action/character-resume/delivery/strips/jyaldi/walk.png",
+    "game-src/action/character-resume/delivery/strips/kyuras/snap1.png",
+    "game-src/action/character-resume/delivery/strips/kyuras/snap2.png",
+    "game-src/action/character-resume/delivery/strips/kyuras/snap3.png",
+    "game-src/action/character-resume/delivery/strips/kyuras/walk_shotgun.png",
+    "game-src/action/character-resume/queue.json",
+    "game-src/action/character-resume/spend.jsonl",
+    "game-src/action/jyaldi-v5/resume/README.md",
+    "game-src/action/jyaldi-v5/resume/build_drafts.py",
+    "game-src/action/jyaldi-v5/resume/reference-coordinate-grid.png",
+    "game-src/action/jyaldi-v5/resume/reference-overlay.png",
+    "game-src/action/jyaldi-v5/resume/reference.json",
+    "game-src/action/jyaldi-v5/resume/run-motion.json",
+    "game-src/action/jyaldi-v5/resume/run-request.draft.json",
+    "game-src/action/jyaldi-v5/resume/run-skeleton.png",
+    "game-src/action/jyaldi-v5/resume/validation.json",
+    "game-src/action/jyaldi-v5/resume/walk-motion.json",
+    "game-src/action/jyaldi-v5/resume/walk-request.draft.json",
+    "game-src/action/jyaldi-v5/resume/walk-skeleton.png",
+    "game-src/action/jyaldi-v5/spend.log",
+    "game-src/action/kyuras/spend.log"
+  ],
+  "finding": "차이는 준비 산출물과 이전 재개 조사 로그. 해당 캐릭터 최신 원본·manifest는 동일. 별도 담당 후속 제출은 다시 fetch 후 비교 필요."
+}

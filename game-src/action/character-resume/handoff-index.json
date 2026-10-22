@@ -1,0 +1,187 @@
+{
+  "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "instruction": "필요 파일만 git show 또는 restore로 선택 반입. 브랜치 전체 merge 금지. 기존 원본은 변경하지 않음.",
+  "files": [
+    {
+      "recipient": "kyuras",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tools/recover_character_jobs.py",
+      "sha256": "80a8649e5257cb248c5f42dc522a1319c3ad8dd3a8f5e3061fe76b64247166f3",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/recover_character_jobs.py"
+    },
+    {
+      "recipient": "kyuras",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tests/character-recovery.test.py",
+      "sha256": "e47840f4a09ca792314ed9918147a81a1be41dbacaa3f0e2e7497805e3839aed",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tests/character-recovery.test.py"
+    },
+    {
+      "recipient": "kyuras",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "docs/character-resume/kyuras-audit.md",
+      "sha256": "57f8ebbddb4776413a8b579ebd942eb0543ef0b969576628b14c515f3ed95054",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/kyuras-audit.md"
+    },
+    {
+      "recipient": "kyuras",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "review/character-resume/kyuras-inventory.json",
+      "sha256": "a2d01a3b0ba1232558b864ed9b8b9f2c1adac5eb3b87d1bbdf0c99e39875ec21",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/review/character-resume/kyuras-inventory.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "docs/character-resume/jyaldi-audit.md",
+      "sha256": "0eeb541932b7b7670d1fc40cdc450a54ffcb48e13ac0c73099dc2198a412fd5d",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/jyaldi-audit.md"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/README.md",
+      "sha256": "568ab04e2bca126417c4217657ecebe7853230202605e81dfeb1ef1a668adbfd",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/README.md"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/build_drafts.py",
+      "sha256": "55193e53e481462224219e0bb5c256ae61f797a0517f5104fa3677bfc7603640",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/build_drafts.py"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/reference.json",
+      "sha256": "b291244a667717e14e12cec456e2fd742dd9e19c9f6307a7e5e077aafc29d742",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/reference.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/walk-motion.json",
+      "sha256": "69d0921a88e90d85410d47c7b59f5c2ef610d012c1d37610b964ff28c4353851",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/walk-motion.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/run-motion.json",
+      "sha256": "0dc6afc64f7c97d394799040cf84ab387e276a2e131c5da7ef9d21da353ecad5",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/run-motion.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/walk-request.draft.json",
+      "sha256": "5e7376f3ab60342e9e0859371bc53fa87cd9d37e8d4752cb413e18c14fee74d3",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/walk-request.draft.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/run-request.draft.json",
+      "sha256": "bcd9d743988c2d6fabeb6090766a8685c5e9bd48d40259ec40e967b811430d3d",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/run-request.draft.json"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/validation.json",
+      "sha256": "627489d56bb9f4a729c5bbc52b25b84d0602b7d0be96b30c965891301ea1aa1b",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/validation.json"
+    },
+    {
+      "recipient": "other_owners",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "docs/character-resume/other-agents-audit.md",
+      "sha256": "b953451cd644629ccac29953752aaed433e57621604a82329e57076e73f04ac7",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/other-agents-audit.md"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tools/build_character_delivery.py",
+      "sha256": "45e17a398a4ae0d09c837f8d7ada1459c8b7a883eae7bfe4db42bea7238bc559",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_delivery.py"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tests/character-delivery.test.py",
+      "sha256": "7b5f6ae5e9734dabf391c89dafc2b1af82ef93fd2a5024de35186690a7016f2a",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tests/character-delivery.test.py"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tools/build_character_resume_demo.py",
+      "sha256": "d0a5b4209c099264a05fa76db16c4bcda98175f05cbc27cc72f7adf3f0815569",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/build_character_resume_demo.py"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tools/character_resume_demo.html",
+      "sha256": "aa62825c94ea5b24672594c8f97bce402515a0cb4a350bd59be2042b822e8bcf",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tools/character_resume_demo.html"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "tests/character-resume-browser.py",
+      "sha256": "0ea72f469b7b70564d1029e471eae752f3e5beafef22dada440694161987e54d",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/tests/character-resume-browser.py"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "docs/character-resume/engine-integration.md",
+      "sha256": "8f56e862ec45f7aa0f89b6c17815e39481258ea3e844c86316e4bf284971beee",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/engine-integration.md"
+    },
+    {
+      "recipient": "review",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "docs/character-resume/demo-independent-review.md",
+      "sha256": "67266b029418b269634e999d5bb9e1f017c5c647abe73c5f106e8b52c458768c",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/docs/character-resume/demo-independent-review.md"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/reference-coordinate-grid.png",
+      "sha256": "7d73c1dd85b2e2bc5503b2b0ae1fce00d5c42d3ae65d49d69b443590292218e8",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/reference-coordinate-grid.png"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/reference-overlay.png",
+      "sha256": "80ab0def0b4ec633419f46eadb079b690dffd9a9d2e05ae98986e78f2251fc2a",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/reference-overlay.png"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/run-skeleton.png",
+      "sha256": "7ea39da0ed6c9dfaba8ffbec4334708f016c5c7b7de22eaf8d4c882ce76c389d",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/run-skeleton.png"
+    },
+    {
+      "recipient": "jyaldi",
+      "source_commit": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+      "path": "game-src/action/jyaldi-v5/resume/walk-skeleton.png",
+      "sha256": "96623053463f456b21567e07e1a96d8192cff0738500331dbfb0cb23350d8cdb",
+      "url": "https://github.com/leepc25/goei-plugin/blob/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4/game-src/action/jyaldi-v5/resume/walk-skeleton.png"
+    }
+  ],
+  "delivered_kyuras": {
+    "branch": "codex/art-kyuras-resume",
+    "commit": "ed5a83e27523ffd6c844932c307a00627f626454",
+    "handoff_url": "https://github.com/leepc25/goei-plugin/blob/ed5a83e27523ffd6c844932c307a00627f626454/game-src/action/kyuras/resume/README.md",
+    "status": "authentication_blocked_no_recovery"
+  }
+}

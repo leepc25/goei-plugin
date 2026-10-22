@@ -1,0 +1,81 @@
+{
+  "observed_at": "2026-10-22T10:20:13.150481+00:00",
+  "source": "https://api.pixellab.ai/mcp tools/list",
+  "tools": [
+    {
+      "name": "search_help",
+      "description": "Ask for help using PixelLab MCP tools, workflows, or features.\nA knowledge agent searches our docs and returns a concise answer.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "description": "What you need help with (tools, workflows, billing, features, deployment). Include the context you are working in. Max 2000 characters.",
+            "maxLength": 2000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "get_balance",
+      "description": "Check your account balance: remaining credits (USD) and subscription generations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    },
+    {
+      "name": "list_jobs",
+      "description": "List your active background jobs (pending + processing).\n\nUse this to find stuck jobs you can cancel with cancel_job.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_recent": {
+            "default": false,
+            "description": "Include recently completed/failed jobs (last 30 min). Default: only active jobs.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "_meta": {
+        "fastmcp": {
+          "tags": []
+        }
+      }
+    }
+  ]
+}

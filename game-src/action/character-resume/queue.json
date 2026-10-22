@@ -1,0 +1,134 @@
+{
+  "schema": "goei-character-production-queue/2",
+  "system_base": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
+  "branch": "codex/character-production-control",
+  "account": {
+    "observed_at": "2026-10-22T10:16:19.324428+00:00",
+    "balance": null,
+    "active_jobs": null,
+    "concurrency_limit": null,
+    "paid_generation_calls": 0,
+    "new_generation_charge": 0,
+    "observations": {
+      "get_balance": {
+        "ok": false,
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/get_balance.json"
+      },
+      "list_jobs": {
+        "ok": false,
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/list_jobs.json"
+      },
+      "search_help": {
+        "ok": false,
+        "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/search_help.json"
+      }
+    },
+    "note": "성공 응답의 단위·필드 확인 후 잔액/한도 기입. 실패 또는 미확인은 null이며 0이 아님."
+  },
+  "new_generation_calls": 0,
+  "new_generation_charge": 0,
+  "items": [
+    {
+      "priority": 1,
+      "character": "kyuras",
+      "clip": "idle_shotgun",
+      "frames": 4,
+      "job_id": "11826541-47d1-40de-9664-f05f1838bb23",
+      "state": "recovery_only_auth_blocked",
+      "regenerate": false,
+      "original_job_usage": null,
+      "owner_branch": "codex/art-kyuras-resume",
+      "owner_status": "delegated_to_kyuras_owner",
+      "actual_cost": null,
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+    },
+    {
+      "priority": 1,
+      "character": "kyuras",
+      "clip": "run_shotgun",
+      "frames": 8,
+      "job_id": "9fe0e770-b992-4299-a4c1-90d6e591828a",
+      "state": "recovery_only_auth_blocked",
+      "regenerate": false,
+      "original_job_usage": null,
+      "owner_branch": "codex/art-kyuras-resume",
+      "owner_status": "delegated_to_kyuras_owner",
+      "actual_cost": null,
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+    },
+    {
+      "priority": 2,
+      "character": "jyaldi",
+      "clip": "walk",
+      "frames": 8,
+      "state": "skeleton_design_pending_auth_and_review",
+      "tool": "animate_with_skeleton_v3",
+      "job_id": null,
+      "actual_charge": 0,
+      "owner_branch": null,
+      "owner_status": "awaiting_existing_character_owner",
+      "historical_public_estimate_generations": 3,
+      "quote_requires_refresh": true
+    },
+    {
+      "priority": 3,
+      "character": "jyaldi",
+      "clip": "run",
+      "frames": 8,
+      "state": "after_walk_frame_review",
+      "tool": "animate_with_skeleton_v3",
+      "job_id": null,
+      "actual_charge": 0,
+      "owner_branch": null,
+      "owner_status": "awaiting_existing_character_owner",
+      "historical_public_estimate_generations": 3,
+      "quote_requires_refresh": true
+    },
+    {
+      "priority": 4,
+      "character": "kyuras",
+      "clips": [
+        "snap1",
+        "snap2",
+        "snap3",
+        "idle_pipe",
+        "walk_pipe",
+        "shotgun"
+      ],
+      "state": "redesign_review_before_quote",
+      "current_estimate": null,
+      "owner_branch": "codex/art-kyuras-resume",
+      "owner_status": "delegated_to_kyuras_owner",
+      "owner_commit": "ed5a83e27523ffd6c844932c307a00627f626454"
+    },
+    {
+      "priority": 5,
+      "character": "eileen",
+      "clips": [
+        "transition",
+        "buttstroke",
+        "pushkick",
+        "step",
+        "limp"
+      ],
+      "state": "combat_pose_review_before_quote",
+      "current_estimate": null,
+      "owner_branch": null,
+      "owner_status": "awaiting_existing_character_owner"
+    }
+  ],
+  "never_duplicate_from_stale_handoff": [
+    "jyaldi grabknee/undress/showerturn/shower",
+    "kyuras walk_shotgun and bathing originals",
+    "eileen showerturn/shower/bath",
+    "gorgodio undress/showerturn/shower/bath",
+    "deadpole 20 bathing frames"
+  ],
+  "preparation_source": "087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4",
+  "observed_at": "2026-10-22T10:17:27.262025+00:00",
+  "per_owner_in_flight_limit": 1,
+  "dispatch_enabled": false,
+  "dispatch_blocker": "현재 계정 인증·잔액·실행 중 작업·동시 한도 미확인",
+  "coordination": "총괄만 제출 허가를 기록. 담당은 제출 직전 최신 원격 원장·계정 큐를 대조. Git 원장은 분산 잠금이 아님. 여러 환경에서 독립 제출 금지.",
+  "known_jobs_ledger": "job-inventory.json"
+}

@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-10-22T10:16:19.324428+00:00",
+  "balance": null,
+  "active_jobs": null,
+  "concurrency_limit": null,
+  "paid_generation_calls": 0,
+  "new_generation_charge": 0,
+  "observations": {
+    "get_balance": {
+      "ok": false,
+      "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/get_balance.json"
+    },
+    "list_jobs": {
+      "ok": false,
+      "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/list_jobs.json"
+    },
+    "search_help": {
+      "ok": false,
+      "evidence": "game-src/action/character-resume/control-evidence/20261022T101619324331Z/search_help.json"
+    }
+  },
+  "note": "성공 응답의 단위·필드 확인 후 잔액/한도 기입. 실패 또는 미확인은 null이며 0이 아님."
+}
