@@ -145,6 +145,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   }
 
   function drawPlayer(p: Player, x: number, y: number, z: number, w: World) {
+    if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {

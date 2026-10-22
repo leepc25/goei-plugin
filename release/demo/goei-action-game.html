@@ -5117,6 +5117,7 @@ function makeRenderer(ctx, art3, opt) {
     for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
   }
   function drawPlayer(p, x, y, z, w) {
+    if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
@@ -5654,6 +5655,9 @@ var Player = class extends Fighter {
   charging = false;
   /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
   fightT = 0;
+  /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
+  ally = null;
+  allyN = 0;
   /** 강화 선택 등이 곱하는 공격력 배수 */
   dmgMul = 1;
   // 게이지
@@ -5723,6 +5727,11 @@ var Player = class extends Fighter {
       else hurt2.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
     }
     const hit2 = [];
+    const al = this.ally;
+    if (al?.hitOn) {
+      const a = al.dir === 1 ? al.x + 260 : al.x - 640, b = al.dir === 1 ? al.x + 640 : al.x - 260;
+      hit2.push({ x0: a, x1: b, z0: 0, z1: 320, y: al.y, dy: 70, attackId: al.id, dmg: 30 * this.dmgMul, react: "down", dir: al.dir, push: 16, lift: 16, stop: 8, strength: 3, armorBreak: true, noise: 1 });
+    }
     if (this.move?.hits && this.phase === "free") {
       for (const mh of this.move.hits) {
         if (!mh.at.includes(this.mf)) continue;
@@ -5915,6 +5924,7 @@ var Player = class extends Fighter {
     this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
     if (this.fightT > 0) this.fightT--;
     if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
+    this.stepAlly(world);
     if (this.stepReact(world)) {
       this.running = this.guarding = this.crouching = this.charging = false;
       this.chargeT = -1;
@@ -6113,6 +6123,41 @@ var Player = class extends Fighter {
     world.fx("spark", this.x + this.dir * mx, this.y, mz);
     this.x -= this.dir * 2;
   }
+  callAlly(world) {
+    if (this.ally) return;
+    if (this.gauge < 50) return world.say("지원 호출: 필살 게이지 절반 필요", 1);
+    this.gauge -= 50;
+    const d3 = this.dir;
+    this.ally = { x: this.x - d3 * 580, y: Math.min(world.lane[1], this.y + 30), dir: d3, phase: "in", clip: "walk", f: 0, ft: 0, hitOn: false, id: 9e6 + ++this.allyN };
+    world.say("「길 비켜.」", 1.4);
+  }
+  stepAlly(world) {
+    const a = this.ally;
+    if (!a) return;
+    a.hitOn = false;
+    a.ft++;
+    if (a.phase === "in") {
+      a.x += a.dir * 12;
+      if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+      if ((this.x - a.x) * a.dir <= 150) Object.assign(a, { phase: "act", clip: "support", f: 3, ft: 0 });
+    } else if (a.phase === "act") {
+      if (a.ft >= 3) {
+        a.ft = 0;
+        a.f++;
+        if (a.f === 5) {
+          a.hitOn = true;
+          world.fx("boom", a.x + a.dir * 450, a.y, 150);
+          world.shake(10, 3);
+          world.emit({ type: "ability", x: a.x, move: "support" });
+        }
+        if (a.f >= (this.clips.support?.length || 10)) Object.assign(a, { phase: "out", clip: "walk", f: 0, ft: 0, dir: -a.dir });
+      }
+    } else {
+      a.x += a.dir * 12;
+      if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+      if (Math.abs(a.x - this.x) > 900) this.ally = null;
+    }
+  }
   /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
   tryGrabFront(world) {
     for (const b of world.bodies) {
@@ -6166,6 +6211,7 @@ var Player = class extends Fighter {
       this.wantInteract = false;
       return;
     }
+    if (p.pressed.has("ally")) this.callAlly(world);
     if (!this.crouching && !this.carry && p.pressed.has("chain")) return this.play("chain", world);
     if (!this.crouching && !this.carry && p.pressed.has("wall")) return this.play("wall", world);
     const g2 = p.held.has("guard") && this.guardMeter > 0;
