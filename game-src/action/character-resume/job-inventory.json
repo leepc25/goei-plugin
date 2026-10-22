@@ -2,8 +2,16 @@
   "observed_at": "2026-10-22T10:16:19.210968+00:00",
   "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "note": "작업 ID 명시 줄만 수집. 이미지 UUID·문자열 id는 작업 ID로 추측하지 않음. 잔액 차이를 작업 비용으로 배분하지 않음. 로그 실패 문구는 서버 최종 상태를 뜻하지 않음.",
-  "job_count": 1461,
+  "job_count": 1463,
   "jobs": [
+    {
+      "job_id": "32193e13-5db2-47a6-9915-6724df241eee",
+      "character": "blaret-saladin",
+      "sources": [],
+      "actual_cost": null,
+      "local_receipt_record": "verified-local-receipts.json#32193e13-5db2-47a6-9915-6724df241eee",
+      "cost_status": "submission_receipt_only_completion_charge_pending"
+    },
     {
       "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
       "character": "blaret-saladin",
@@ -19,9 +27,12 @@
       "job_id": "4bf8106e-b076-4288-8a2d-913f41543755",
       "character": "blaret-saladin",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#4bf8106e-b076-4288-8a2d-913f41543755"
+      },
       "local_receipt_record": "verified-local-receipts.json#4bf8106e-b076-4288-8a2d-913f41543755",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "5d78c846-5658-40d0-b3a2-31c119818707",
@@ -43,6 +54,17 @@
         "evidence": "verified-local-receipts.json#6bce13df-7d64-47e5-ba79-650cdea00aa4"
       },
       "local_receipt_record": "verified-local-receipts.json#6bce13df-7d64-47e5-ba79-650cdea00aa4",
+      "cost_status": "completed_server_receipt_verified"
+    },
+    {
+      "job_id": "74a230a4-772b-4f9e-b9fe-822807b18f80",
+      "character": "blaret-saladin",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#74a230a4-772b-4f9e-b9fe-822807b18f80"
+      },
+      "local_receipt_record": "verified-local-receipts.json#74a230a4-772b-4f9e-b9fe-822807b18f80",
       "cost_status": "completed_server_receipt_verified"
     },
     {
@@ -8443,9 +8465,12 @@
       "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
       "character": "jyaldi",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 2.0,
+        "evidence": "verified-local-receipts.json#7977bf40-dbbd-482b-8b2d-e150d4c38b63"
+      },
       "local_receipt_record": "verified-local-receipts.json#7977bf40-dbbd-482b-8b2d-e150d4c38b63",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "df3b56fb-5426-4491-888f-f94a4192e5cf",
@@ -21001,5 +21026,5 @@
       "text": "2026-10-22 03:13:08 base edge 104 -> error: rate limit exceeded (20/20 jobs)"
     }
   ],
-  "local_receipts_verified_at": "2026-10-22T11:52:51.150774+00:00"
+  "local_receipts_verified_at": "2026-10-22T12:05:01.916484+00:00"
 }

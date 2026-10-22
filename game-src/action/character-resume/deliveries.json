@@ -16,17 +16,6 @@
       "local_demo_status": "owner reported HTTP200"
     },
     {
-      "character": "jyaldi",
-      "commit": "ae4ca04785882a9de6d466d759e95dbbe085d020",
-      "branch": "codex/art-jyaldi-resume",
-      "html": "release/demo/jyaldi-walk-resume.html",
-      "frames": 8,
-      "charged_generations": 3,
-      "visual_status": "HOLD",
-      "remaining": "walk contact4, sole height6/7, low pelvis; run not submitted",
-      "user_visual_approval": false
-    },
-    {
       "character": "gorgodio",
       "commit": "466ef1f6a4cb7d027c6d8e418559ebb3163aa451",
       "branch": "codex/art-gorgodio-resume",
@@ -81,6 +70,19 @@
       "modified_clips": 21,
       "visual_status": "owner delivered; coordinator verified commit and sampled super review sheet",
       "remaining": "pierce3 fingertips; slash2 hand alternation; toss repetition/recovery; weapon-removed sleeve silhouettes",
+      "user_visual_approval": false
+    },
+    {
+      "character": "jyaldi",
+      "commit": "ac5b12551510e89b74a104b9498134e4275c6a8a",
+      "branch": "codex/art-jyaldi-resume",
+      "html": "release/demo/jyaldi-walk-contact-v2.html",
+      "charged_generations": 9,
+      "latest_pass_charge": 6,
+      "frames": 8,
+      "cycle_pixels": 40,
+      "visual_status": "owner delivered contact-v2; independent full playback review outstanding",
+      "remaining": "run not submitted; do not swap atlas without cycle adjustment",
       "user_visual_approval": false
     }
   ]
