@@ -1,6 +1,6 @@
 # 캐릭터 제작 총괄 인계
 
-2026-10-22 19:16 KST 계정 무료 조회 기준. 현재 **인증 차단**이며 제작 완료가 아니다.
+2026-10-22 19:24 KST 계정 무료 재조회 기준. 현재 **인증 차단**이며 제작 완료가 아니다.
 
 총괄 브랜치 `codex/character-production-control`, 시스템 기준 `7f8fdfb0c5a6cef096d412d3d872aec6eae7de81`.
 준비 브랜치 `codex/character-production-resume`는 `087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4`로 고정했다.
@@ -15,7 +15,7 @@
 - 개별 작업의 서버 실제 비용은 아직 확인하지 못했다. `actual_cost=null`. 과거 `charged` 등 비용 주장과 실패 문구는 별도 배열에 원문·줄번호를 보존한다. 공유 계정 잔액 차이를 한 작업의 비용으로 계산하지 않는다.
 - 각 담당은 서버 usage/영수증의 단위와 원문을 함께 제출한다. USD와 구독 생성 횟수를 합산하지 않는다. 서버에 비용이 없으면 추정으로 채우지 않는다.
 
-계정 조회 재개(환경 비밀 변수 `PIXELLAB_API_TOKEN` 또는 승인된 MCP 인증 연결 후):
+계정 조회 재개(환경 비밀 변수 `PIXELLAB_API_TOKEN` 또는 `PIXELLAB_API_KEY`, 또는 승인된 MCP 인증 연결 후):
 
 ```bash
 python3 game-src/action/character-resume/control.py account

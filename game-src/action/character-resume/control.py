@@ -47,7 +47,7 @@ def account():
     """Keep inherited proxy/CA; token is optional because proxy auth may exist."""
     stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     folder = HERE / 'control-evidence' / stamp
-    token = os.environ.get('PIXELLAB_API_TOKEN', '')
+    token = os.environ.get('PIXELLAB_API_TOKEN') or os.environ.get('PIXELLAB_API_KEY', '')
     summary = {'observed_at': now(), 'balance': None, 'active_jobs': None,
                'concurrency_limit': None, 'paid_generation_calls': 0,
                'new_generation_charge': 0, 'observations': {}}
