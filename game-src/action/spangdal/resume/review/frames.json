@@ -24,22 +24,21 @@
   {
     "clip": "stab1",
     "frame": 1,
-    "rendered_rgba_sha256": "917634d2ee64fe3bd4b41202513076e068ef2c3a327ff65da644dc67524a9b17",
+    "rendered_rgba_sha256": "b5528f8e6c177fdf2646795bcf13cd1e3d7e87dfdad5c5307dec2e8ff5a6d80a",
     "bbox": [
       43,
       53,
-      126,
+      119,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 1,
-      "dy": 0,
-      "correction": "resume/corrected/stab1/01.png"
+      "dy": 0
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 퇴보 지적에 따라 수정 전 그림 복구. 손끝 결함을 해결한 것으로 표시하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -47,7 +46,7 @@
   {
     "clip": "stab1",
     "frame": 2,
-    "rendered_rgba_sha256": "cdcd795ca1f9e693d1af3aaa261e98643f5dca25b7c1ead37a9cbdd9fb35f2f3",
+    "rendered_rgba_sha256": "02b2f4041cdbe27da470b0c04ca5970537e8614ce04d3563a4a626ee1a9d364f",
     "bbox": [
       47,
       54,
@@ -58,11 +57,10 @@
     "source": {
       "clip": "stab1",
       "frame": 2,
-      "dy": 0,
-      "correction": "resume/corrected/stab1/02.png"
+      "dy": 0
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 퇴보 지적에 따라 수정 전 그림 복구. 손끝 결함을 해결한 것으로 표시하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -70,22 +68,21 @@
   {
     "clip": "stab1",
     "frame": 3,
-    "rendered_rgba_sha256": "681630fae0c3c82976ff744710cb64da328ef869467c4154d39e7e9020affa23",
+    "rendered_rgba_sha256": "2a7baccad73e4fa2133cff7b5c124b07ef19b847b064cb84e19e20dac213f677",
     "bbox": [
       47,
       54,
-      131,
+      127,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 3,
-      "dy": 0,
-      "correction": "resume/corrected/stab1/03.png"
+      "dy": 0
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 퇴보 지적에 따라 수정 전 그림 복구. 손끝 결함을 해결한 것으로 표시하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -93,22 +90,21 @@
   {
     "clip": "stab1",
     "frame": 4,
-    "rendered_rgba_sha256": "a8a0729cd1d3cd596c21299bd3cba94e899a7942f205dccf3155c454b9427550",
+    "rendered_rgba_sha256": "ea15b92222ba4d305baf3c1529a83a2baf27efd7e0880d917282637a882d745a",
     "bbox": [
       45,
       53,
-      111,
+      110,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "stab1",
       "frame": 4,
-      "dy": 0,
-      "correction": "resume/corrected/stab1/04.png"
+      "dy": 0
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 관수 손 후보 반영. 손목 연결·손날 폭 검수; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 퇴보 지적에 따라 수정 전 그림 복구. 손끝 결함을 해결한 것으로 표시하지 않음",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -270,22 +266,21 @@
   {
     "clip": "pierce3",
     "frame": 0,
-    "rendered_rgba_sha256": "6f29fa7443adea6aab880fe0dfb4be0b09916623bc45a34fc9f5fb4655e53156",
+    "rendered_rgba_sha256": "b7a67120a5eb2d8169a54eab65fb27c88fd54961a742400dd12d0bf70c342fa4",
     "bbox": [
-      48,
+      47,
       51,
-      101,
+      98,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 0,
-      "dy": 0,
-      "correction": "resume/corrected/pierce3/00.png"
+      "dy": 0
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -293,22 +288,21 @@
   {
     "clip": "pierce3",
     "frame": 1,
-    "rendered_rgba_sha256": "2577826d47477d01f9f15605574201686f7ea5c5a2e0d15b1ffb0ef037ea70b9",
+    "rendered_rgba_sha256": "4ecb8a205be1f06d568003563732fb04e34a5bb44d0f573c49682bd81b55f521",
     "bbox": [
-      53,
-      55,
-      104,
+      51,
+      54,
+      101,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 1,
-      "dy": 0,
-      "correction": "resume/corrected/pierce3/01.png"
+      "dy": -1
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -316,22 +310,21 @@
   {
     "clip": "pierce3",
     "frame": 2,
-    "rendered_rgba_sha256": "8b358cd8dc04f833e5bbafd54076f860c89847788ea6e04d093e22c9329d8029",
+    "rendered_rgba_sha256": "5c35355ca7b8c3a1898f327c8e147ebe31d280174f703af969eda3d13a1d30a2",
     "bbox": [
-      50,
+      49,
       53,
-      120,
+      129,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 2,
-      "dy": 0,
-      "correction": "resume/corrected/pierce3/02.png"
+      "dy": -1
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -339,22 +332,21 @@
   {
     "clip": "pierce3",
     "frame": 3,
-    "rendered_rgba_sha256": "6590d1c9bfc26b01ab1e8fbae2c430b26702c40e5515ef9adec9ded93205ab17",
+    "rendered_rgba_sha256": "19cded202b5adbdb2f83bf2b152b2eee23968f1eeab0461e2fa0b4388425d595",
     "bbox": [
       53,
       57,
-      138,
+      140,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 3,
-      "dy": -1,
-      "correction": "resume/corrected/pierce3/03.png"
+      "dy": -2
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -362,22 +354,21 @@
   {
     "clip": "pierce3",
     "frame": 4,
-    "rendered_rgba_sha256": "df335e478c5da9cc2754bf4ec757e2c276932512d256b6bbdb2c9d55580dd03c",
+    "rendered_rgba_sha256": "51c549f43dd74cfae3bfc2f8c6d1c65cca885c20e5d1f13267a19fee2d7bc40a",
     "bbox": [
-      55,
-      59,
-      139,
+      53,
+      57,
+      140,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 4,
-      "dy": -1,
-      "correction": "resume/corrected/pierce3/04.png"
+      "dy": -2
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -385,22 +376,21 @@
   {
     "clip": "pierce3",
     "frame": 5,
-    "rendered_rgba_sha256": "0aab9a57d64ef3d93aca37b76dfbe11f641de0b373459c83aca34bbbe3c45080",
+    "rendered_rgba_sha256": "55ffcb507aa77c11e7cb556bc00a7ed3d440f10bc883829149b8afe1591f56cb",
     "bbox": [
-      55,
-      58,
-      139,
+      53,
+      57,
+      140,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 5,
-      "dy": -1,
-      "correction": "resume/corrected/pierce3/05.png"
+      "dy": -2
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -408,22 +398,21 @@
   {
     "clip": "pierce3",
     "frame": 6,
-    "rendered_rgba_sha256": "17acb209aca435f8b3f94cc16b9eb42f68ca118faaf21ec3008e2bf3448ed40b",
+    "rendered_rgba_sha256": "6eee91ce5e6571a19437762b0a1c124dcceaf5ebdedb6428a8558ac5ad4c0d66",
     "bbox": [
-      55,
-      55,
-      128,
+      53,
+      53,
+      126,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 6,
-      "dy": -1,
-      "correction": "resume/corrected/pierce3/06.png"
+      "dy": -2
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false
@@ -431,22 +420,21 @@
   {
     "clip": "pierce3",
     "frame": 7,
-    "rendered_rgba_sha256": "fcdd7e8096ac316524d25a531858a3fb105e96918b23288066fbc67efb093f50",
+    "rendered_rgba_sha256": "1412d31e82b2d931415380dc152e289991000fef1fb329ae5d037aedbed7b1ba",
     "bbox": [
-      55,
+      53,
       50,
-      107,
+      106,
       136
     ],
     "opaque_bottom_y": 135,
     "source": {
       "clip": "pierce3",
       "frame": 7,
-      "dy": -2,
-      "correction": "resume/corrected/pierce3/07.png"
+      "dy": -1
     },
     "face_body_clothing": "기준 S0·손수정본과 비교 열람. 프레임별 사용자 승인 없음",
-    "hands_grounding_and_motion": "새 X 교차 자세 반영. 준비2·회수6 손끝은 추가 수정 후보; 사용자 승인 대기",
+    "hands_grounding_and_motion": "사용자 반려: 새 교차 후보는 팔꿈치가 접혀 찌르기가 약해짐. 수정 전 런지/팔 뻗기 복구; 교차 설계 미해결",
     "loop_boundary": "비반복: 다음 자세 진입 별도 확인",
     "review_state": "needs_clip_review_or_correction",
     "user_visual_approval": false

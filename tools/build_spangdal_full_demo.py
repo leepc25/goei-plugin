@@ -22,6 +22,13 @@ _cwd = os.getcwd(); os.chdir(os.path.join(BASE, 'scripts'))
 import rig   # noqa: E402  (rig는 쟈알디 skel을 상대 경로로 읽음)
 os.chdir(_cwd)
 FW, FH, FOOT, ANCHOR = 192, 144, 136, 68
+with open(os.path.join(BASE, 'resume', 'runtime-selection.json'), encoding='utf-8') as f:
+    DISABLED_CORRECTIONS = set(json.load(f)['disabled_correction_clips'])
+
+def correction_file(k, filename):
+    if k in DISABLED_CORRECTIONS: return None
+    path = os.path.join(BASE, 'resume', 'corrected', k, filename)
+    return path if os.path.isfile(path) else None
 
 # 전투 클립 재생 값: fps, 반복, 타격 장(None = 손이 가장 멀리 나간 장 자동), 그림 안 전진 px, 멈춤
 COMBAT = {
@@ -74,8 +81,8 @@ def frames_of(k):
     fs = []
     for f in sorted(os.listdir(d)):
         if not f.endswith('.png'): continue
-        override = os.path.join(BASE, 'resume', 'corrected', k, f)
-        fs.append(Image.open(override if os.path.isfile(override) else os.path.join(d, f)).convert('RGBA'))
+        override = correction_file(k, f)
+        fs.append(Image.open(override or os.path.join(d, f)).convert('RGBA'))
     if k in rig.CLIPS and k not in NUDE and len(fs) == len(rig.CLIPS[k][2]) and len(fs) > 3:
         fs = fs[:-1]   # 뼈대 끝 장 = 버릴 장(rig.tail)
     return fs
@@ -142,7 +149,7 @@ def clean(k, fr, with_sources=False):
             sources[i] = {'clip': src, 'frame': j % len(alt), 'dy': 0}
     out = []
     for i, f in enumerate(fr):
-        corrected = os.path.isfile(os.path.join(BASE, 'resume', 'corrected', k, f'{i:02}.png'))
+        corrected = correction_file(k, f'{i:02}.png') is not None
         if corrected: sources[i]['correction'] = f'resume/corrected/{k}/{i:02}.png'
         for r in ([] if corrected else FIX_ERASE.get(k, {}).get(i, [])):
             f.paste((0, 0, 0, 0), r)
@@ -180,8 +187,8 @@ def gpt_clean(fr):
 def hands_of(k, n, sources=None):
     """뼈대 손목·팔꿈치 → [[앞손 x, y, 각도], [뒷손 x, y, 각도]] (각도: 팔꿈치→손목, 오른쪽 0°, 시계 방향 +)."""
     import math
-    override = os.path.join(BASE, 'resume', 'corrected', k, 'hands.json')
-    if os.path.isfile(override):
+    override = correction_file(k, 'hands.json')
+    if override:
         with open(override, encoding='utf-8') as f:
             hands = json.load(f)[:n]
         if sources:

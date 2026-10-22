@@ -1,0 +1,6 @@
+{
+  "disabled_correction_clips": ["stab1", "pierce3"],
+  "reason": "User rejected the resumed three-hit combo as a regression. Restore pre-resume thrust silhouettes and frame continuity; keep paid candidates and receipts for comparison only.",
+  "baseline_commit": "986d160287a9b6c4c98a5434d86d12507c38f50d",
+  "user_visual_approval": false
+}

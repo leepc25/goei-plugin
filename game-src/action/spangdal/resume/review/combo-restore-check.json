@@ -1,0 +1,25 @@
+{
+  "baseline_commit": "986d160287a9b6c4c98a5434d86d12507c38f50d",
+  "clips": [
+    {
+      "clip": "stab1",
+      "frames": 6,
+      "all_pixels_equal_to_baseline": true,
+      "hands_and_timing_equal": true
+    },
+    {
+      "clip": "slash2",
+      "frames": 6,
+      "all_pixels_equal_to_baseline": true,
+      "hands_and_timing_equal": true
+    },
+    {
+      "clip": "pierce3",
+      "frames": 8,
+      "all_pixels_equal_to_baseline": true,
+      "hands_and_timing_equal": true
+    }
+  ],
+  "additional_cost": 0,
+  "reason": "User rejected resumed combo; restoration is not a claim of visual improvement."
+}
