@@ -679,7 +679,7 @@ var HQ_SCENES = [
     "2F",
     1640,
     "corridor",
-    [{ id: "elev", x: 330, kind: "elevator" }, { id: "down", x: 60, kind: "stairs_down", to: "lobby", toDoor: "up" }, { id: "up", x: 1500, kind: "stairs_up", to: "office", toDoor: "down" }, { id: "clinic", x: 640, kind: "door", to: "clinic", toDoor: "out" }, { id: "interview", x: 1040, kind: "door", to: "interview", toDoor: "out", needs: "interview" }],
+    [{ id: "elev", x: 380, kind: "elevator" }, { id: "down", x: 130, kind: "stairs_down", to: "lobby", toDoor: "up" }, { id: "up", x: 1500, kind: "stairs_up", to: "office", toDoor: "down" }, { id: "clinic", x: 640, kind: "door", to: "clinic", toDoor: "out" }, { id: "interview", x: 1040, kind: "door", to: "interview", toDoor: "out", needs: "interview" }],
     [],
     [{ kind: "window", x: 1250, w: 140, h: 120, wall: true }, { kind: "hydrant_box", x: 840, w: 70, h: 110, wall: true }]
   ),
@@ -710,7 +710,7 @@ var HQ_SCENES = [
     "3F",
     3200,
     "office",
-    [{ id: "elev", x: 330, kind: "elevator" }, { id: "down", x: 60, kind: "stairs_down", to: "f2", toDoor: "up" }, { id: "chief", x: 2450, kind: "door", to: "chief", toDoor: "out" }, { id: "pantry", x: 2950, kind: "door", to: "pantry", toDoor: "out" }],
+    [{ id: "elev", x: 380, kind: "elevator" }, { id: "down", x: 130, kind: "stairs_down", to: "f2", toDoor: "up" }, { id: "chief", x: 2450, kind: "door", to: "chief", toDoor: "out" }, { id: "pantry", x: 2950, kind: "door", to: "pantry", toDoor: "out" }],
     [
       { id: "jaemtri", x: 700, place: "jaemtri", who: "잼트리", verb: "임무" },
       { id: "agents", x: 1400, place: "office", who: "요원들", verb: "요원" }
@@ -759,11 +759,11 @@ var HQ_SCENES = [
     "B1",
     2240,
     "supply",
-    [{ id: "elev", x: 390, kind: "elevator" }, { id: "up", x: 90, kind: "stairs_up", to: "lobby", toDoor: "down" }, { id: "down", x: 640, kind: "stairs_down", to: "b2", toDoor: "up", needs: "appraisal" }, { id: "training", x: 2140, kind: "steel", to: "training", toDoor: "out", needs: "training" }],
+    [{ id: "elev", x: 430, kind: "elevator" }, { id: "up", x: 150, kind: "stairs_up", to: "lobby", toDoor: "down" }, { id: "down", x: 700, kind: "stairs_down", to: "b2", toDoor: "up", needs: "appraisal" }, { id: "training", x: 2140, kind: "steel", to: "training", toDoor: "out", needs: "training" }],
     [
-      { id: "locker", x: 940, place: "supply", who: "콘쥬스", verb: "장비" }
+      { id: "locker", x: 1010, place: "supply", who: "콘쥬스", verb: "장비" }
     ],
-    [{ kind: "locker_row", x: 940, w: 300, h: 250, wall: true }, { kind: "workbench", x: 1300, w: 240, h: 110 }, { kind: "shelf", x: 1580, w: 220, h: 280, wall: true }, { kind: "shelf", x: 1830, w: 220, h: 280, wall: true }, { kind: "cargo_cart", x: 1120, w: 130, h: 90, sign: true }]
+    [{ kind: "locker_row", x: 1010, w: 300, h: 250, wall: true }, { kind: "workbench", x: 1420, w: 240, h: 110 }, { kind: "shelf", x: 1640, w: 220, h: 280, wall: true }, { kind: "shelf", x: 1880, w: 220, h: 280, wall: true }, { kind: "cargo_cart", x: 1250, w: 130, h: 90, sign: true }]
   ),
   S(
     "training",
@@ -782,7 +782,7 @@ var HQ_SCENES = [
     "B2",
     2560,
     "containment",
-    [{ id: "elev", x: 390, kind: "elevator" }, { id: "up", x: 90, kind: "stairs_up", to: "supply", toDoor: "down" }, { id: "appraisal", x: 860, kind: "door", to: "appraisal", toDoor: "out" }, { id: "lab", x: 1360, kind: "security", to: "lab", toDoor: "out", needs: "lab" }, { id: "tooth", x: 2440, kind: "steel", to: "tooth", toDoor: "out", needs: "tooth" }],
+    [{ id: "elev", x: 430, kind: "elevator" }, { id: "up", x: 150, kind: "stairs_up", to: "supply", toDoor: "down" }, { id: "appraisal", x: 920, kind: "door", to: "appraisal", toDoor: "out" }, { id: "lab", x: 1360, kind: "security", to: "lab", toDoor: "out", needs: "lab" }, { id: "tooth", x: 2440, kind: "steel", to: "tooth", toDoor: "out", needs: "tooth" }],
     [{ id: "showcase", x: 1900, place: "gallery", verb: "전시" }],
     [{ kind: "security_gate", x: 620, w: 80, h: 300, wall: true }, { kind: "showcase", x: 1800, w: 160, h: 200 }, { kind: "showcase", x: 2050, w: 160, h: 200 }, { kind: "warning_light", x: 1060, w: 30, h: 30, wall: true }]
   ),
@@ -851,6 +851,64 @@ function hqMap(s2, justEvacuated = false) {
     start: justEvacuated ? { scene: "clinic", x: 560 } : { scene: "office", x: 560 }
   };
 }
+
+// src/game/action/hq/wallDeco.ts
+var HQ_WALL_DECO = {
+  hq_appraisal_wall_1: [[20, 300]],
+  hq_appraisal_wall_2: [[10, 310]],
+  hq_chief_wall_1: [[10, 310]],
+  hq_chief_wall_2: [[15, 158], [165, 260], [266, 310]],
+  hq_clinic_wall_1: [[30, 128], [210, 288]],
+  hq_clinic_wall_2: [[105, 213]],
+  hq_clinic_wall_3: [[35, 196], [235, 275]],
+  hq_clinic_wall_4: [[218, 262]],
+  hq_containment_wall_1: [[0, 14], [300, 320]],
+  hq_containment_wall_2: [[25, 295]],
+  hq_containment_wall_3: [[30, 60], [215, 242]],
+  hq_containment_wall_4: [[45, 75], [245, 300]],
+  hq_containment_wall_5: [[50, 270]],
+  hq_corridor_wall_1: [[215, 228]],
+  hq_corridor_wall_2: [[33, 108], [140, 278]],
+  hq_corridor_wall_3: [[95, 115], [220, 247]],
+  hq_corridor_wall_4: [[208, 236]],
+  hq_interview_wall_1: [[65, 262]],
+  hq_interview_wall_2: [[47, 235], [250, 285]],
+  hq_jaemtri_wall_1: [[25, 40], [52, 270], [282, 296]],
+  hq_jaemtri_wall_2: [[20, 300]],
+  hq_jaemtri_wall_3: [[12, 22], [35, 290], [300, 312]],
+  hq_jaemtri_wall_4: [[55, 105], [128, 248], [255, 265]],
+  hq_lab_wall_1: [[15, 305]],
+  hq_lab_wall_2: [[10, 310]],
+  hq_lobby_wall_1: [[148, 300]],
+  hq_lobby_wall_2: [[250, 287]],
+  hq_office_wall_1: [[20, 300]],
+  hq_office_wall_2: [[38, 278]],
+  hq_office_wall_3: [[212, 222], [260, 288]],
+  hq_office_wall_4: [[33, 40], [55, 297]],
+  hq_office_wall_5: [[25, 295]],
+  hq_office_wall_6: [[20, 310]],
+  hq_pantry_wall_1: [[30, 290]],
+  hq_pantry_wall_2: [[30, 40], [155, 298]],
+  hq_pantry_wall_3: [[40, 55], [92, 230], [255, 295]],
+  hq_pantry_wall_4: [[45, 112], [222, 272]],
+  hq_pasta_wall_1: [[50, 280]],
+  hq_pasta_wall_2: [[33, 288]],
+  hq_street_wall_1: [[10, 65], [255, 310]],
+  hq_street_wall_2: [[25, 302]],
+  hq_street_wall_3: [[10, 190]],
+  hq_street_wall_4: [[0, 320]],
+  hq_supply_wall_1: [[30, 280]],
+  hq_supply_wall_2: [[258, 284]],
+  hq_tooth_wall_2: [[185, 295]],
+  hq_training_wall_1: [[168, 275]],
+  hq_training_wall_2: [[45, 280]],
+  hq_training_wall_3: [[25, 295]],
+  hq_training_wall_4: [[62, 100], [162, 275]],
+  hq_workshop_wall_1: [[118, 302]],
+  hq_workshop_wall_2: [[20, 310]],
+  hq_workshop_wall_3: [[240, 292]],
+  hq_workshop_wall_4: [[25, 135], [160, 265], [275, 290]]
+};
 
 // src/game/action/art/bg.ts
 var cache = /* @__PURE__ */ new Map();
@@ -1107,8 +1165,15 @@ var HQ_PLACE = {
 var HQ_WALLS = {
   hq_office: ["hq_office", "hq_jaemtri"],
   hq_supply: ["hq_supply", "hq_workshop"],
-  hq_lab: ["hq_lab", "hq_jaemtri:hq_jaemtri_wall_4"],
-  hq_lobby: ["hq_lobby", "lobby:lobby_wall_1"]
+  hq_lobby: ["hq_lobby", "lobby:lobby_wall_1"],
+  // 문 그림이 없는 방은 이웃 방의 문 칸을 빌린다: 엔진이 그린 문이 책장·창·게시판을 덮지 않게 (통합 검수 23, tests/hq-walls.test.mjs)
+  hq_chief: ["hq_chief", "hq_office:hq_office_wall_3"],
+  hq_interview: ["hq_interview", "hq_office:hq_office_wall_3"],
+  hq_appraisal: ["hq_appraisal", "hq_containment:hq_containment_wall_3"],
+  hq_lab: ["hq_lab", "hq_jaemtri:hq_jaemtri_wall_4", "hq_containment:hq_containment_wall_1"],
+  hq_training: ["hq_training", "hq_workshop:hq_workshop_wall_3"],
+  hq_tooth: ["hq_tooth", "hq_containment:hq_containment_wall_4"],
+  hq_pasta: ["hq_pasta", "hq_pantry:hq_pantry_wall_4"]
 };
 var FLOOR_ALT = {
   hq_chief: "hq_office",
@@ -1158,6 +1223,28 @@ var SCENE_NAME = new Map(HQ_SCENES.map((s2) => [s2.id, s2.name]));
 function doorType(kind) {
   return kind.startsWith("stairs") ? "stairs" : kind === "elevator" ? "elevator" : "door";
 }
+function overlayHalf(kind, k) {
+  if (kind === "elevator") return (213 - 108) * k / 2;
+  const ref = BY_KIND[`hq_${kind}`];
+  const im = ref ? objImage(ref[0], ref[1]) : null;
+  if (im) return im.width;
+  return kind.startsWith("stairs") ? 140 : 0;
+}
+function plainStrip(fill, m = 4) {
+  let best = null;
+  for (const [p, n] of fill) {
+    const deco = HQ_WALL_DECO[n];
+    if (!deco) continue;
+    const hole = DOOR_WALLS[n];
+    let cur = 6;
+    for (const [a, b] of [...deco, ...hole ? [[hole[0] - 14, hole[1] + 14]] : [], [314, 320]].sort((u, v) => u[0] - v[0])) {
+      if (a - m > cur + m && (!best || a - cur - 2 * m > best[2][1] - best[2][0])) best = [p, n, [cur + m, a - m]];
+      cur = Math.max(cur, b);
+    }
+  }
+  return best && best[2][1] - best[2][0] >= 6 ? best : null;
+}
+var plainOf = (fill, cands) => plainStrip(fill) ?? plainStrip(fill, 1) ?? plainStrip(cands);
 function drawHqWall(ctx, place3, sceneId, length, wallBottom, doors) {
   const cands = [];
   for (const src of HQ_WALLS[place3] ?? [place3]) {
@@ -1175,14 +1262,30 @@ function drawHqWall(ctx, place3, sceneId, length, wallBottom, doors) {
     const t = d2.kind === "main" && cands.some(([, n]) => DOOR_WALLS[n]?.[2] === "main") ? "main" : doorType(d2.kind);
     const ok = cands.filter(([, n]) => DOOR_WALLS[n]?.[2] === t);
     const pick6 = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d2.id}`) % Math.max(1, ok.length)];
-    if (!pick6) continue;
+    if (!pick6) {
+      const half = overlayHalf(d2.kind, k);
+      const st = plainOf(fill, cands);
+      if (half && st) pieces.push({ p: st[0], n: st[1], x: d2.x - half - 12, a: d2.x - half - 12, b: d2.x + half + 12, blank: st[2] });
+      continue;
+    }
     const [x0, x1] = DOOR_WALLS[pick6[1]];
     const bx = d2.x - (x0 + x1) / 2 * k;
     pieces.push({ p: pick6[0], n: pick6[1], x: bx, a: bx, b: bx + bayW, door: d2.id, label: d2.to && SCENE_NAME.get(d2.to) });
   }
+  const sc = HQ_SCENES.find((x) => x.id === sceneId);
+  const strip = plainOf(fill, cands);
+  for (const t of sc?.things ?? []) {
+    if (!t.wall || !strip) continue;
+    const sz = propArtSize(t.kind, void 0);
+    if (sz) pieces.push({ p: strip[0], n: strip[1], x: t.x - sz.w / 2 - 12, a: t.x - sz.w / 2 - 12, b: t.x + sz.w / 2 + 12, blank: strip[2] });
+  }
+  pieces.sort((u, v) => u.a - v.a);
   for (let i = 1; i < pieces.length; i++) {
     const L = pieces[i - 1], R = pieces[i];
-    if (L.b > R.a) {
+    if (L.b <= R.a) continue;
+    if (R.blank && !L.blank) L.b = R.a;
+    else if (L.blank && !R.blank) R.a = L.b;
+    else {
       const m = (L.b + R.a) / 2;
       L.b = m;
       R.a = m;
@@ -1203,12 +1306,38 @@ function drawHqWall(ctx, place3, sceneId, length, wallBottom, doors) {
       fills.push({ p, n, x, a: x, b: Math.min(x + bayW, g1), flip });
     }
   }
+  const plainSt = plainOf(fill, cands);
+  if (plainSt) {
+    for (const pc of [...fills, ...pieces]) {
+      if (pc.blank) continue;
+      let a = Math.max(pc.a, pc.x, 0), b = Math.min(pc.b, pc.x + bayW, length);
+      const spans = (HQ_WALL_DECO[pc.n] ?? []).map(([u0, u1]) => pc.flip ? [pc.x + bayW - u1 * k, pc.x + bayW - u0 * k] : [pc.x + u0 * k, pc.x + u1 * k]).sort((u, v) => u[0] - v[0]);
+      for (const [d0, d1] of spans) {
+        if (d1 <= a || d0 >= b || d0 >= a - 1 && d1 <= b + 1) continue;
+        const blank = (x0, x1) => x1 - x0 > 1 && pieces.push({ p: plainSt[0], n: plainSt[1], x: x0, a: x0, b: x1, blank: plainSt[2] });
+        if (d0 < a) {
+          blank(a, Math.min(d1, b));
+          a = Math.min(d1, b);
+        } else {
+          blank(Math.max(d0, a), b);
+          b = Math.max(d0, a);
+        }
+      }
+      pc.a = a;
+      pc.b = b;
+    }
+  }
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   const covered = /* @__PURE__ */ new Set();
   for (const pc of [...fills, ...pieces]) {
     const im = image(pc.p, pc.n);
     if (!im) continue;
+    if (pc.blank) {
+      const [u0, u1] = pc.blank;
+      ctx.drawImage(im, u0, 0, u1 - u0, im.height, pc.a, 0, pc.b - pc.a, wallBottom);
+      continue;
+    }
     const a = Math.max(pc.a, pc.x), b = Math.min(pc.b, pc.x + bayW);
     if (b <= a) continue;
     if (pc.flip) {
@@ -1237,7 +1366,7 @@ function drawHqWall(ctx, place3, sceneId, length, wallBottom, doors) {
     ctx.drawImage(el, cx0, cy0, cx1 - cx0, cy1 - cy0, Math.round(d2.x - w / 2), Math.round(wallBottom - h - 2 * k), w, h);
     covered.add(d2.id);
   }
-  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && e - pc.x > 2 && pc.x + bayW - e > 2) seamPillar(ctx, e, wallBottom, 14);
+  for (const pc of [...fills, ...pieces]) for (const e of [pc.a, pc.b]) if (e > 0 && e < length && (pc.blank || e - pc.x > 2 && pc.x + bayW - e > 2)) seamPillar(ctx, e, wallBottom, 14);
   const all = [...fills, ...pieces].sort((u, v) => u.a - v.a);
   for (let i = 1; i < all.length; i++) {
     const L = all[i - 1], R = all[i];
@@ -4418,9 +4547,10 @@ function createShopPanel(root) {
 var PROP_DEPTH = 50;
 var STEP = 9;
 var backOf = (p) => p.back ?? PROP_DEPTH;
+var frontOf = (p) => p.front ?? PROP_DEPTH;
 function insideProp(p, x, y, pad = 0) {
   const dy = y - p.y;
-  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < PROP_DEPTH + pad;
+  return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < frontOf(p) + pad;
 }
 function blockByProps(bodies, props2, lane) {
   const stuck = /* @__PURE__ */ new Set();
@@ -4428,7 +4558,7 @@ function blockByProps(bodies, props2, lane) {
     if (b.z > 4) continue;
     for (const p of props2) {
       if (!insideProp(p, b.x, b.y)) continue;
-      const front = p.y + PROP_DEPTH, rear = p.y - backOf(p);
+      const front = p.y + frontOf(p), rear = p.y - backOf(p);
       const okF = front <= lane[1], okR = rear >= lane[0];
       const want = okF && okR ? front - b.y < b.y - rear ? front : rear : okF ? front : okR ? rear : null;
       if (b.px !== void 0 && !insideProp(p, b.px, b.y)) {
@@ -4490,29 +4620,34 @@ function drawFloorArt(c, id, x, y) {
   c.imageSmoothingEnabled = prev;
   return true;
 }
+var SUPPLY_ART = { heal: "medkit", guard: "charm", light: "flash", gear: "unknown_device", checklist: "photo" };
 function drawSupply(c, label3, x, y, tick) {
-  if (label3?.split(":")[1] !== "ammo") return false;
+  const id = label3?.startsWith("보급품") ? label3.split(":")[1] ?? "heal" : null;
+  if (!id) return false;
   const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
-  const box3 = all.ammo_box, rounds = all.rounds;
-  if (!box3 || !rounds) return false;
+  const box3 = all[id === "ammo" ? "ammo_box" : SUPPLY_ART[id] ?? "ammo_box"], rounds = id === "ammo" ? all.rounds : null;
+  if (!box3 || id === "ammo" && !rounds) return false;
   const im = (src) => {
     let i = floorImgs.get(src);
     if (!i) floorImgs.set(src, i = Object.assign(new Image(), { src }));
     return i.complete && i.naturalWidth ? i : null;
   };
-  const a = im(box3.src), b = im(rounds.src);
-  if (!a || !b) return false;
+  const a = im(box3.src), b = rounds ? im(rounds.src) : null;
+  if (!a || rounds && !b) return false;
+  const k = id === "ammo" ? 4 : Math.max(2, Math.min(4, Math.round(56 / box3.h)));
   c.save();
   c.fillStyle = "rgba(0,0,0,0.35)";
   c.beginPath();
-  c.ellipse(x, y, 40, 9, 0, 0, Math.PI * 2);
+  c.ellipse(x, y, Math.max(24, box3.w * k / 2), 9, 0, 0, Math.PI * 2);
   c.fill();
   c.imageSmoothingEnabled = false;
   const glow = 0.35 + 0.2 * Math.sin(tick / 8);
   c.shadowColor = `rgba(255,214,90,${glow})`;
   c.shadowBlur = 10;
-  c.drawImage(a, Math.round(x - 40), Math.round(y - box3.h * 4), box3.w * 4, box3.h * 4);
-  c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+  if (rounds && b) {
+    c.drawImage(a, Math.round(x - 40), Math.round(y - box3.h * 4), box3.w * 4, box3.h * 4);
+    c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+  } else c.drawImage(a, Math.round(x - box3.w * k / 2), Math.round(y - box3.h * k), box3.w * k, box3.h * k);
   c.restore();
   return true;
 }
@@ -4673,17 +4808,19 @@ function linkItems(w, run) {
   const hitSeen = /* @__PURE__ */ new Set();
   const overlapT = /* @__PURE__ */ new WeakMap();
   const lastX = /* @__PURE__ */ new WeakMap();
+  const frontFor = (h) => Math.min(90, Math.max(PROP_DEPTH, h * 0.8));
   const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => {
     const a = propArtSize(q.kind, q.label, w.floor?.type);
-    return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)) };
+    return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)), front: frontFor(a?.h ?? 0), h: a?.h ?? 0 };
   });
-  const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)) });
+  const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)), front: frontFor(PROPS[e.prop].h), h: PROPS[e.prop].h });
   const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => itemSolid(e)), ...floorSolids()];
   w.spawnAdjust = (s2) => {
     const q = clearSpot(s2.x, s2.y, allSolids(), w.lane);
     return q.x === s2.x && q.y === s2.y ? s2 : { ...s2, x: q.x, y: q.y };
   };
   Object.defineProperty(w, "itemField", { get: () => field, configurable: true });
+  Object.defineProperty(w, "solidsNow", { get: () => allSolids(), configurable: true });
   return {
     run: ir,
     /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
@@ -16344,13 +16481,16 @@ function narrowBack(t, terr = []) {
     if (o.x1 <= t.x0 && (o.x1 + t.x0) / 2 > a) a = (o.x1 + t.x0) / 2, clipped = true;
     else if (o.x0 >= t.x1 && (t.x1 + o.x0) / 2 < b) b = (t.x1 + o.x0) / 2, clipped = true;
   }
-  if (!clipped) return { span: [a, b], xs };
+  const wall = lockerWall.get(t);
+  const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
+  if (!clipped) return { span: [a, b], xs: open(xs) };
   if (b - a < 2 * H6) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
   const fit2 = [];
   for (let x = a + H6; x <= b - H6; x += 100) fit2.push(x);
   if (fit2[fit2.length - 1] < b - H6 - 1) fit2.push(b - H6);
-  return { span: [a, b], xs: fit2 };
+  return { span: [a, b], xs: open(fit2) };
 }
+var lockerWall = /* @__PURE__ */ new WeakMap();
 var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
 var NOLOCK_TYPES = /* @__PURE__ */ new Set(["chase", "deep"]);
 function floorPlan(f, id, startX = 240) {
@@ -16372,6 +16512,8 @@ function floorPlan(f, id, startX = 240) {
     if (s2.role === "enemy" && s2.data.harmless) props2.push({ id: `h${s2.id}`, kind: "npc", x: s2.x, y: laneY(s2.lane), w: 50, h: 150, label: "평범한 직원" });
   }
   const doorSpans = spreadProps(f, props2, startX);
+  const lockerHalf = (propArtSize("clutter", "사물함")?.w ?? 150) / 2;
+  for (const sg of f.segments) for (const t of sg.terrain) if (t.kind === "narrow") lockerWall.set(t, { spans: doorSpans, half: lockerHalf });
   const encounters = [];
   if (!NOLOCK_TYPES.has(f.type)) {
     const groups = /* @__PURE__ */ new Map();
@@ -16897,6 +17039,13 @@ function drawTerrain(ctx, t, pal, y0, y1, place3 = "", layers, segTerrain = []) 
         const nb = narrowBack(t, segTerrain);
         layers.push({ y: a, x0: nb.span[0], x1: nb.span[1], draw: (c) => {
           if (!nb.xs.length) return drawBarricade(c, nb.span[0], nb.span[1], a);
+          const half = (propArtSize("clutter", "사물함")?.w ?? 150) / 2;
+          let from = nb.span[0];
+          for (const x of [...nb.xs, Infinity]) {
+            const to = x === Infinity ? nb.span[1] : x - half;
+            if (to - from > 40) drawBarricade(c, from, to, a);
+            from = Math.max(from, x + half);
+          }
           for (const x of nb.xs) if (!drawPropArt(c, "clutter", "사물함", x, a)) break;
         } });
       } else if (a > y0 && !row("사물함", a)) {
