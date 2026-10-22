@@ -246,6 +246,32 @@ def civilian(id):
     names=FULL if CIV[id][0]=='full' else CORE
     return {n:(civ_action(id,n),civ_poses(id,n)) for n in names}
 
+# ════════ 관리국 일반 직원 공용 몸 4종: 생활 13동작, 전투 없음 (사용자 2026-10-22 04:11 「아무튼 만들어」) ════════
+# 머리·안경·옷 색·조끼·헬멧은 코드로 얹으므로 그림엔 몸만. 쓰는 곳: 행정실, 로비 보안, 진압팀 사무실, 훈련장.
+STAFF={'staff_m':dict(lean=1,tilt=2,stance=0.9,arm=0.9,bounce=0),'staff_f':dict(lean=1,tilt=2,stance=0.8,arm=0.85,bounce=0),
+       'squad_m':dict(lean=-1,tilt=-1,stance=1.2,arm=1.0,bounce=0),'squad_f':dict(lean=-1,tilt=-1,stance=1.1,arm=1.0,bounce=0)}
+SROW={  # 클립: (쟈알디 뼈대, 사무 직원 문장, 진압팀 문장)
+ 'walk':('walk','ordinary office walk, relaxed small steps, arms swinging a little','firm upright walk, even steps, arms swinging little'),
+ 'idle':('idle','standing relaxed, breathing, weight shifting slightly','standing upright at ease, feet apart, breathing'),
+ 'sit':('chairsit','lowers into a seated pose with nothing under, hands to the lap','sits down briskly with nothing under, hands on the knees'),
+ 'typing':('typing','seated, typing in the air at desk height, steady','seated upright, typing fast in the air at desk height'),
+ 'doze':('doze','seated, arms folded, dozing, head dropping and jerking up','seated, arms folded, nodding off, catching himself'),
+ 'walk_folder':('walk_folder','walking, both arms hugging flat against the chest','brisk walk, both arms flat against the chest'),
+ 'drink':('drink','lifts the near hand to the mouth for a sip, then lowers it','one quick sip, hand to the mouth, then back down'),
+ 'phone':('phone','standing, near hand held to the ear, talking, nodding','standing, near hand at the ear, short clipped replies'),
+ 'chat':('gesture','chatting casually, small open-hand gestures, smiling','talking briefly, small firm hand gestures'),
+ 'stretch':('stretch','big stretch, fingers laced, arms straight up overhead','stretches arms overhead, rolls the shoulders'),
+ 'yawn':('yawn','yawns, covering the mouth with the hand, head tipped back','stifles a yawn behind the hand, straightens up'),
+ 'walk_box':('walk_box','walking, both forearms level at the chest, hands open','steady walk, both forearms level at the chest'),
+ 'gearcheck':('gearcheck','looks down, both hands working at waist height, checking','looks down, both hands checking at the hip, methodical'),
+}
+def staff(id):
+    st=STAFF[id]; j=1 if id.startswith('squad') else 0
+    out={n:(v[1+j],RS(T(v[0]),st)) for n,v in SROW.items()}
+    if id.endswith('_m'): out={n:(a.replace('herself','himself'),ps) for n,(a,ps) in out.items()}
+    else: out={n:(a.replace('himself','herself').replace('catching himself','catching herself'),ps) for n,(a,ps) in out.items()}
+    return out
+
 def passenger(id): return dict(npc_rig.NPCS[id]['clips'])
 
 def fit(a):   # 100자 넘으면 마지막 쉼표 앞에서 자름
@@ -263,9 +289,9 @@ def unflip(p):   # 거꾸로 꺾인 팔꿈치·무릎을 바로잡음(audit_join
         if AJ.cross(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])<-0.12: q[f'{s} KNEE']=_refl(q[f'{s} HIP'],q[f'{s} KNEE'],q[f'{s} LEG'])
     return q
 def clips(id):
-    c=hq(id) if id in HQ else merchant(id) if id in MER else civilian(id) if id in CIV else passenger(id)
+    c=hq(id) if id in HQ else merchant(id) if id in MER else civilian(id) if id in CIV else staff(id) if id in STAFF else passenger(id)
     return {n:(fit(a),[unflip(p) for p in ps]) for n,(a,ps) in c.items()}
-ALL=HQ+MER+BODY+['passenger_3y','passenger_pack']
+ALL=HQ+MER+BODY+['passenger_3y','passenger_pack']+list(STAFF)
 # 생성 순서(사용자 2026-10-22 03:17): 1단계 = 게임에 바로 필요한 것(본부 대기·걷기·달리기·말하기·고유 동작, 상인 28, 민간인 몸 6×17, 승객), 2단계 = 본부 생활 전체 목록.
 def phase1(id):
     c=clips(id)
