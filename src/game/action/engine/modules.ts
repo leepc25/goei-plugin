@@ -4,6 +4,7 @@
 //   hq/    본부와 임무 흐름 (createHq)
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
+import { mountVisit } from '../../visit';
 import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
@@ -81,7 +82,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     mount(r, host) {
       root = r;
       hq.mount(r, {
-        deploy: (l) => host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
+        deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
         load: () => saves.read(slot as never),
         resuming: ui.resuming,
         save: (d) => (markSaved(), saves.write(slot as never, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' })),
@@ -188,10 +189,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   let game: Game | null = null;
   const shell = mountGameShell(box, {
     synth: true,
-    title: '차원 승강기',
-    sub: 'ANOMALY SIMULATION · 관리국 액션',
+    title: bridge?.visit ? '본부 방문' : '차원 승강기',
+    sub: bridge?.visit ? '요원들을 만나고 본편 대화를 이어갑니다' : 'ANOMALY SIMULATION · 관리국 액션',
     pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
     onNew: async () => {
+      if (bridge?.visit) { game?.start_new(); return; }
       await session.ready;
       if (session.checkpoint) { await game?.resume(session.checkpoint); game?.endRun('withdraw'); return; }
       // 새 저장: 영상 깃발을 지운다 (저장마다 한 번)
@@ -200,6 +202,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       game?.start_new();
     },
     onContinue: async () => {
+      if (bridge?.visit) { game?.start_new(); return; }
       await session.ready;
       try {
         if (session.checkpoint) await game?.resume(session.checkpoint);
@@ -210,8 +213,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
     },
     hasSave: () => session.hasSave || hasSaved(),
-    onRetreat: () => game?.endRun('withdraw'),
-    onTitle: () => game?.toTitle(),
+    onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
+    onTitle: () => bridge?.visit ? bridge.close?.() : game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
   });
   const stageStore = {
@@ -234,7 +237,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
   };
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
+  const visit = bridge?.visit ? mountVisit(shell.stage.ui, bridge.visit) : null;
   const npc = linkNpcTalk({
+    visit: visit ? name => void visit.open(name) : undefined,
     layer: shell.stage.ui,
     bridge,
     settings: () => shell.settings,
@@ -529,7 +534,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     enemyFactory,
     hq,
     hud: false,
-    blocking: () => story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
     covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
@@ -644,7 +649,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t);
     },
-    boot: (g) => { void session.ready.then(() => { elevator.reloadMeta(); if (!bootFromUrl(g)) g.toTitle(); }); return true; },
+    boot: (g) => { void session.ready.then(() => { elevator.reloadMeta(); if (bridge?.visit) g.start_new(); else if (!bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       window.removeEventListener('pagehide', saveOnHide);
       document.removeEventListener('visibilitychange', saveOnHide);
@@ -667,6 +672,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
       story.dispose();
       setLineProvider(null);
+      visit?.dispose();
       audio.dispose();
       shell.dispose();
     },

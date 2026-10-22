@@ -25,6 +25,7 @@ import { SURVIVORS } from '../hq/data';
 import { VENDORS } from '../items/data';
 
 export interface NpcLinkOpts {
+  visit?: (name?: string) => void;
   /** 대화창을 넣을 1280×720 층 (껍데기 stage.ui) */
   layer: HTMLElement;
   bridge?: Partial<GameBridge>;
@@ -162,6 +163,7 @@ export function linkNpcTalk(o: NpcLinkOpts): NpcLink {
     const sc = hub.current();
     const spot = sc?.spots.find((s) => `spot:${s.id}` === prop.id) as (HqSpot & { open?: boolean }) | undefined;
     if (!sc || !spot || spot.open === false || !spot.who) return false;
+    if (o.visit) { o.visit(spot.who); return true; }
     const me = o.agent();
     const place = `관리국 본부 ${sc.floor} ${sc.name}`;
     const facts = [`본부 ${o.day()}일차`];

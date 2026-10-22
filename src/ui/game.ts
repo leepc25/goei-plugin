@@ -71,9 +71,9 @@ function filesHtml(f: Files): string {
 // 저장 칸 고르기·불러오기는 게임 안 본부가 맡는다(hq 모듈, bridge.saves). 여기서는 시작 버튼과 마지막 저장만 보인다
 function startHtml(slots: SlotInfo[], last: SlotId | null, ready: boolean): string {
   const s = slots.find((x) => x.slot === last) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-  return `<section class="gx-gl-card"><b>차원 승강기</b>
+  return `<section class="gx-gl-card"><b>본부 방문</b>
     <p>${s ? `마지막 저장: ${esc(s.title)} · ${when(s.savedAt)}${s.summary ? ` · ${esc(s.summary)}` : ''}` : '저장 칸은 게임 안 본부에서 고르고 불러와요.'}</p>
-    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? '' : ' disabled'}>${s ? '이어하기' : '게임 시작'}</button></section>`;
+    <button class="gx-gp-btn primary gx-gl-cont" data-g="play"${ready ? '' : ' disabled'}>본부 들어가기</button></section>`;
 }
 
 function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: number): string {
@@ -225,7 +225,7 @@ function setHead(): void {
   if (!head) return;
   const inGame = view !== 'home';
   layer?.classList.toggle('gx-playing', inGame);
-  head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === 'patrol' ? '관리국 순찰' : view === 'action' ? '1인 전투 검증판' : '차원 승강기'}</b></div></div>
+  head.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>${view === 'patrol' ? '관리국 순찰' : view === 'action' ? '1인 전투 검증판' : '본부 방문'}</b></div></div>
     <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ''}
     <button class="gx-x" data-g="full" aria-label="${viewport?.full ? '전체화면 끄기' : '전체화면'}" aria-pressed="${!!viewport?.full}">${ICONS.expand}</button>
     <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
