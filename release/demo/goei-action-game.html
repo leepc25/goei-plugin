@@ -662,25 +662,26 @@ var HQ_SCENES = [
     [],
     [{ kind: "streetlamp", x: 300, w: 30, h: 360 }, { kind: "streetlamp", x: 1150, w: 30, h: 360 }, { kind: "bike", x: 860, w: 120, h: 80 }]
   ),
+  // 로비: 엘리베이터는 우편함 오른쪽 칸, 계단 두 개는 그 오른쪽 칸들에 (그림 확인 2026-10-22)
   S(
     "lobby",
     "1층 로비",
     "1F",
-    1280,
+    2160,
     "lobby",
-    [{ id: "main", x: 140, kind: "main", to: "street", toDoor: "main" }, { id: "elev", x: 820, kind: "elevator" }, { id: "up", x: 1120, kind: "stairs_up", to: "f2", toDoor: "down" }, { id: "down", x: 1220, kind: "stairs_down", to: "supply", toDoor: "up" }],
+    [{ id: "main", x: 140, kind: "main", to: "street", toDoor: "main" }, { id: "elev", x: 985, kind: "elevator" }, { id: "up", x: 1455, kind: "stairs_up", to: "f2", toDoor: "down" }, { id: "down", x: 1925, kind: "stairs_down", to: "supply", toDoor: "up" }],
     [],
-    [{ kind: "guard_desk", x: 400, w: 260, h: 120 }, { kind: "mailboxes", x: 600, w: 120, h: 150, wall: true }, { kind: "plant", x: 1e3, w: 60, h: 130 }]
+    [{ kind: "guard_desk", x: 400, w: 260, h: 120 }, { kind: "mailboxes", x: 600, w: 120, h: 150, wall: true }, { kind: "plant", x: 650, w: 60, h: 130 }]
   ),
   S(
     "f2",
     "2층",
     "2F",
-    1280,
+    1640,
     "corridor",
-    [{ id: "elev", x: 160, kind: "elevator" }, { id: "down", x: 40, kind: "stairs_down", to: "lobby", toDoor: "up" }, { id: "up", x: 1240, kind: "stairs_up", to: "office", toDoor: "down" }, { id: "clinic", x: 560, kind: "door", to: "clinic", toDoor: "out" }, { id: "interview", x: 920, kind: "door", to: "interview", toDoor: "out", needs: "interview" }],
+    [{ id: "elev", x: 330, kind: "elevator" }, { id: "down", x: 60, kind: "stairs_down", to: "lobby", toDoor: "up" }, { id: "up", x: 1500, kind: "stairs_up", to: "office", toDoor: "down" }, { id: "clinic", x: 640, kind: "door", to: "clinic", toDoor: "out" }, { id: "interview", x: 1040, kind: "door", to: "interview", toDoor: "out", needs: "interview" }],
     [],
-    [{ kind: "window", x: 740, w: 140, h: 120, wall: true }, { kind: "hydrant_box", x: 360, w: 70, h: 110, wall: true }]
+    [{ kind: "window", x: 1250, w: 140, h: 120, wall: true }, { kind: "hydrant_box", x: 840, w: 70, h: 110, wall: true }]
   ),
   S(
     "clinic",
@@ -709,17 +710,17 @@ var HQ_SCENES = [
     "3F",
     3200,
     "office",
-    [{ id: "elev", x: 120, kind: "elevator" }, { id: "down", x: 30, kind: "stairs_down", to: "f2", toDoor: "up" }, { id: "chief", x: 2450, kind: "door", to: "chief", toDoor: "out" }, { id: "pantry", x: 2950, kind: "door", to: "pantry", toDoor: "out" }],
+    [{ id: "elev", x: 330, kind: "elevator" }, { id: "down", x: 60, kind: "stairs_down", to: "f2", toDoor: "up" }, { id: "chief", x: 2450, kind: "door", to: "chief", toDoor: "out" }, { id: "pantry", x: 2950, kind: "door", to: "pantry", toDoor: "out" }],
     [
-      { id: "jaemtri", x: 620, place: "jaemtri", who: "잼트리", verb: "임무" },
+      { id: "jaemtri", x: 700, place: "jaemtri", who: "잼트리", verb: "임무" },
       { id: "agents", x: 1400, place: "office", who: "요원들", verb: "요원" }
     ],
     [
-      { kind: "glass_door", x: 300, w: 120, h: 300, wall: true },
-      { kind: "whiteboard", x: 760, w: 240, h: 150, wall: true },
-      { kind: "desk_monitors", x: 620, w: 260, h: 130 },
-      { kind: "condensed_milk_coffee", x: 560, w: 20, h: 26, sign: true },
-      { kind: "cardigan_chair", x: 690, w: 60, h: 110, sign: true },
+      { kind: "glass_door", x: 500, w: 120, h: 300, wall: true },
+      { kind: "whiteboard", x: 840, w: 240, h: 150, wall: true },
+      { kind: "desk_monitors", x: 700, w: 260, h: 130 },
+      { kind: "condensed_milk_coffee", x: 640, w: 20, h: 26, sign: true },
+      { kind: "cardigan_chair", x: 770, w: 60, h: 110, sign: true },
       { kind: "window", x: 1150, w: 300, h: 170, wall: true },
       { kind: "window", x: 1650, w: 300, h: 170, wall: true },
       { kind: "desk_row", x: 1200, w: 420, h: 110 },
@@ -750,18 +751,19 @@ var HQ_SCENES = [
     [{ id: "coffee", x: 460, place: "pantry", who: "동료", verb: "커피" }],
     [{ kind: "sink_counter", x: 460, w: 360, h: 120 }, { kind: "coffee_machine", x: 420, w: 70, h: 80, sign: true }, { kind: "mix_coffee_box", x: 520, w: 50, h: 40, sign: true }, { kind: "fridge", x: 760, w: 110, h: 250 }, { kind: "table_small", x: 640, w: 160, h: 80 }]
   ),
+  // 계단(그림 폭 최대 280)과 엘리베이터(폭 약 210 + 호출 단추) 사이는 그림 반폭 합 이상 띄운다 (통합 검수 22).
   // 지하 1층: 창고형 정비·보급실, 옆 철문으로 훈련장
   S(
     "supply",
     "정비·보급실",
     "B1",
-    1920,
+    2240,
     "supply",
-    [{ id: "elev", x: 120, kind: "elevator" }, { id: "up", x: 30, kind: "stairs_up", to: "lobby", toDoor: "down" }, { id: "down", x: 260, kind: "stairs_down", to: "b2", toDoor: "up", needs: "appraisal" }, { id: "training", x: 1820, kind: "steel", to: "training", toDoor: "out", needs: "training" }],
+    [{ id: "elev", x: 390, kind: "elevator" }, { id: "up", x: 90, kind: "stairs_up", to: "lobby", toDoor: "down" }, { id: "down", x: 640, kind: "stairs_down", to: "b2", toDoor: "up", needs: "appraisal" }, { id: "training", x: 2140, kind: "steel", to: "training", toDoor: "out", needs: "training" }],
     [
-      { id: "locker", x: 640, place: "supply", who: "콘쥬스", verb: "장비" }
+      { id: "locker", x: 940, place: "supply", who: "콘쥬스", verb: "장비" }
     ],
-    [{ kind: "locker_row", x: 640, w: 300, h: 250, wall: true }, { kind: "workbench", x: 960, w: 240, h: 110 }, { kind: "shelf", x: 1250, w: 220, h: 280, wall: true }, { kind: "shelf", x: 1500, w: 220, h: 280, wall: true }, { kind: "cargo_cart", x: 820, w: 130, h: 90, sign: true }]
+    [{ kind: "locker_row", x: 940, w: 300, h: 250, wall: true }, { kind: "workbench", x: 1300, w: 240, h: 110 }, { kind: "shelf", x: 1580, w: 220, h: 280, wall: true }, { kind: "shelf", x: 1830, w: 220, h: 280, wall: true }, { kind: "cargo_cart", x: 1120, w: 130, h: 90, sign: true }]
   ),
   S(
     "training",
@@ -780,9 +782,9 @@ var HQ_SCENES = [
     "B2",
     2560,
     "containment",
-    [{ id: "elev", x: 120, kind: "elevator" }, { id: "up", x: 30, kind: "stairs_up", to: "supply", toDoor: "down" }, { id: "appraisal", x: 760, kind: "door", to: "appraisal", toDoor: "out" }, { id: "lab", x: 1360, kind: "security", to: "lab", toDoor: "out", needs: "lab" }, { id: "tooth", x: 2440, kind: "steel", to: "tooth", toDoor: "out", needs: "tooth" }],
+    [{ id: "elev", x: 390, kind: "elevator" }, { id: "up", x: 90, kind: "stairs_up", to: "supply", toDoor: "down" }, { id: "appraisal", x: 860, kind: "door", to: "appraisal", toDoor: "out" }, { id: "lab", x: 1360, kind: "security", to: "lab", toDoor: "out", needs: "lab" }, { id: "tooth", x: 2440, kind: "steel", to: "tooth", toDoor: "out", needs: "tooth" }],
     [{ id: "showcase", x: 1900, place: "gallery", verb: "전시" }],
-    [{ kind: "security_gate", x: 330, w: 80, h: 300, wall: true }, { kind: "showcase", x: 1800, w: 160, h: 200 }, { kind: "showcase", x: 2050, w: 160, h: 200 }, { kind: "warning_light", x: 1060, w: 30, h: 30, wall: true }]
+    [{ kind: "security_gate", x: 620, w: 80, h: 300, wall: true }, { kind: "showcase", x: 1800, w: 160, h: 200 }, { kind: "showcase", x: 2050, w: 160, h: 200 }, { kind: "warning_light", x: 1060, w: 30, h: 30, wall: true }]
   ),
   S(
     "appraisal",
@@ -846,7 +848,7 @@ function hqMap(s2, justEvacuated = false) {
   return {
     scenes: HQ_SCENES.map((sc) => ({ ...sc, doors: sc.doors.map((d2) => ({ ...d2, open: ok(d2.needs) })), spots: sc.spots.map((p) => ({ ...p, open: ok(p.place) })) })),
     elevator: ELEVATOR.map((e) => ({ ...e, open: ok(e.needs) })),
-    start: justEvacuated ? { scene: "clinic", x: 560 } : { scene: "office", x: 420 }
+    start: justEvacuated ? { scene: "clinic", x: 560 } : { scene: "office", x: 560 }
   };
 }
 
