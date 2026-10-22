@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "status: completed\nid: 21ec4c32-1bf3-4dba-a2c4-a8368d8af51f\njob_id: 21ec4c32-1bf3-4dba-a2c4-a8368d8af51f\nframes: 1\ntransparent: no — every pixel is opaque. If you asked for no_background, background removal did not find one; retry or describe the subject on a plain background.\nasset_id: 0994a2a6-29b0-5451-a0db-041ca0cbcac6\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 1 generation\ndownload: https://api.pixellab.ai/mcp/images/21ec4c32-1bf3-4dba-a2c4-a8368d8af51f/download"
+    }
+  ]
+}

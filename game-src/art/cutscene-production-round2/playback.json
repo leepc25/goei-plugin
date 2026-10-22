@@ -1,0 +1,41 @@
+{
+  "order": [
+    "frames/final/0000.png",
+    "frames/final/0001.png",
+    "frames/final/0002.png",
+    "frames/final/0003.png",
+    "frames/final/0004.png",
+    "frames/final/0005.png",
+    "frames/final/0006.png",
+    "frames/final/0007.png",
+    "frames/final/0008.png",
+    "frames/final/0009.png",
+    "frames/final/0010.png",
+    "frames/final/0011.png",
+    "frames/final/0012.png",
+    "frames/final/0013.png",
+    "frames/final/0014.png",
+    "frames/final/0015.png",
+    "frames/final/0016.png"
+  ],
+  "ms": [
+    400,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    500
+  ],
+  "durationMs": 2400
+}

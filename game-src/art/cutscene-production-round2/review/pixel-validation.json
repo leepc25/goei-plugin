@@ -1,0 +1,36 @@
+{
+  "uniqueFrames": 17,
+  "duplicateFrames": 0,
+  "changedPixelsOutsideAperture": 0,
+  "sourceSize": [
+    320,
+    180
+  ],
+  "finalSize": [
+    640,
+    360
+  ],
+  "integerScale": 2,
+  "doorOpeningWidths": [
+    0,
+    2,
+    4,
+    8,
+    12,
+    18,
+    24,
+    32,
+    40,
+    48,
+    56,
+    62,
+    68,
+    72,
+    76,
+    78,
+    80
+  ],
+  "thresholdSourceY": 156,
+  "durationMs": 2400,
+  "aiAnimationFrames": 0
+}

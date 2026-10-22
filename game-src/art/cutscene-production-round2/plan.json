@@ -1,6 +1,6 @@
 {
   "id": "first-day-empty-hall-door-round2",
-  "status": "blocked-before-generation",
+  "status": "produced-for-visual-review",
   "baseCommit": "0d43a4496bff1cdc7c0122e273a43475c9134356",
   "canvas": {
     "width": 640,
@@ -23,13 +23,28 @@
       "fillRemainder": "#111720"
     }
   },
-  "generatedFrames": [],
-  "generationCalls": 0,
-  "chargedGenerations": 0,
-  "blockers": [
-    "Actual get_balance and list_jobs rejected: 401 Missing Authorization header.",
-    "Account balance, current jobs, billing and live generation coordination unverified."
+  "generatedFrames": [
+    "frames/source/0000.png",
+    "frames/source/0001.png",
+    "frames/source/0002.png",
+    "frames/source/0003.png",
+    "frames/source/0004.png",
+    "frames/source/0005.png",
+    "frames/source/0006.png",
+    "frames/source/0007.png",
+    "frames/source/0008.png",
+    "frames/source/0009.png",
+    "frames/source/0010.png",
+    "frames/source/0011.png",
+    "frames/source/0012.png",
+    "frames/source/0013.png",
+    "frames/source/0014.png",
+    "frames/source/0015.png",
+    "frames/source/0016.png"
   ],
+  "generationCalls": 1,
+  "chargedGenerations": 1,
+  "blockers": [],
   "paletteSource": "src/game/action/engine/hub.ts LOOKS.hall (text values only)",
   "palette": [
     "#1f2733",
@@ -41,7 +56,6 @@
   ],
   "doorStandard": {
     "branch": "codex/pixellab-doors-round2",
-    "commit": "09e955d21aa3de669ced4bced5200dc0ae9e34c5",
     "type": "double-sliding-frosted-glass",
     "frame": "charcoal with brushed steel edges",
     "glass": "blue-grey, horizontal frosted band",
@@ -52,18 +66,20 @@
     ],
     "thresholdSourceY": 156,
     "openingSourceRect": [
-      200,
+      188,
       31,
       80,
       125
     ],
-    "status": "latest peer design, no approved generated door asset"
+    "status": "shared new door source; user visual approval pending",
+    "sourceJob": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+    "referenceProvenance": "references/hq-door/provenance.json"
   },
   "design": {
     "durationMs": 2400,
     "frameCount": 17,
-    "generatedAnimationFrames": 16,
-    "inputFramesReturnedByAPI": 1,
+    "generatedAnimationFrames": 0,
+    "inputFramesReturnedByAPI": 0,
     "ms": [
       400,
       100,
@@ -107,43 +123,43 @@
       {
         "frame": 17,
         "openFraction": 1,
-        "role": "fully open; empty office"
+        "role": "fully open; dark empty aperture"
       }
     ],
     "camera": "locked side-on belt-scroll; shallow floor; front-facing doorway",
     "characters": false,
     "loop": false,
-    "note": "Intermediate opening fractions are QA targets, not model guarantees. Returned input is counted once; no duplicate-frame smoothing."
+    "note": "17 distinct composites; AI animation not submitted; no duplicated frames",
+    "animationMethod": "integer translation of shared new door layers"
   },
   "production": {
-    "status": "waiting-for-authentication",
+    "status": "completed-for-review",
     "background": {
       "tool": "create_image_pixen",
       "width": 320,
       "height": 180,
-      "generations": 1
+      "generations": 1,
+      "jobId": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
+      "recovered": true
     },
     "doorRegion": {
-      "x": 192,
+      "x": 180,
       "y": 20,
       "width": 96,
       "height": 144
     },
     "animation": {
-      "tool": "animate_image",
-      "frame_count": 16,
-      "expectedReturnedFrames": 17,
-      "estimatedGenerations": 4
+      "tool": "local integer layer composition",
+      "uniqueFrames": 17,
+      "aiGenerationCalls": 0,
+      "chargedGenerations": 0
     },
-    "estimatedGenerationCalls": 2,
-    "estimatedTotalGenerations": 5,
-    "estimateFormula": "1 + ceil(96*144*16/65536)",
-    "accountQuoteConfirmed": false,
+    "actualGenerationCalls": 1,
+    "actualTotalGenerations": 1,
+    "accountQuoteConfirmed": true,
     "actualUSD": null,
-    "enhancePrompt": false,
-    "firstFrameGate": "Inspect exact 320x180 output, palette, empty corridor and measured opening before any animation submission. Recompute crop/estimate if geometry differs; no blind retry.",
-    "composite": "Keep the source background immutable. Paste animation only through reviewed aperture mask; restore frame/wall/floor from original. No crossfade or repeated image synthesis. Preserve unmasked raw returned frames for drift inspection.",
-    "fallback": "If moving glass edges or interiors fail visual QA, investigate before changing technique; no automatic paid retry."
+    "firstFrameGate": "Passed visual inspection before frame production; review/first-frame-review.json",
+    "composite": "Shared fixed frame and prepared background; translate leaves only inside aperture; raw originals retained"
   },
   "integration": {
     "target": "first_day/c3 opening environment segment",
@@ -153,5 +169,13 @@
     "characterSegmentOwner": "character-production lead",
     "status": "proposal; timing and subtitles must be reconciled by main integrator",
     "sharedFilesModified": false
+  },
+  "actualPalette": "review/palette.json",
+  "generationPlan": {
+    "actualTool": "create_image_pixen",
+    "actualCalls": 1,
+    "chargedGenerations": 1,
+    "aiAnimationCalls": 0,
+    "previousAnimationReservation": "cancelled before submission"
   }
 }

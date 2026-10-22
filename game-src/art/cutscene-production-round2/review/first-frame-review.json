@@ -1,0 +1,16 @@
+{
+  "reviewedAt": "2026-10-22",
+  "reviewer": "Codex visual inspection",
+  "file": "first-frame-640.png",
+  "beforeAnimationProduction": true,
+  "pass": true,
+  "observations": [
+    "Empty front-elevation corridor; no characters or human silhouettes.",
+    "Shared new frosted-glass double door; charcoal/brushed rim matches door owner source.",
+    "Door frame top fits under ceiling; threshold y156, composition origin180,20.",
+    "320x180 source uses nearest-neighbor integer2 display; no stretch.",
+    "Generated background contained an unwanted narrow door despite negative instruction. Shared opaque door covers it; raw background preserved. No retry.",
+    "Generated floor starts higher than plan. Fixed-layer preparation inserts12 wall rows instead of scaling art."
+  ],
+  "userVisualApproval": false
+}

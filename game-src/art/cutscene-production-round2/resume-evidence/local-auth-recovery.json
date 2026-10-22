@@ -1,0 +1,50 @@
+{
+  "initialBalance": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "credits: $0.00\ngenerations_remaining: 14160.30\ngenerations_used: 5194.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "initialJobs": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "no active jobs, and none finished in the last 30 minutes\nnote: completed/failed rows are deleted 8 hours after they finish, so older work is gone from here either way"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "galleryRecovery": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "no gallery image matches 'corridor'\nhint: list_images() with no filter shows all of them"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "help": {
+    "status": "fulfilled",
+    "value": {
+      "content": [
+        {
+          "type": "text",
+          "text": "- `create_image_pixen`: accepts 320×180: both dimensions are multiples of 4, and the canvas is under the 512×512 area limit. It costs **1 generation**.\n- `create_image_pixflux`: also accepts 320×180 under its MCP size limits, and costs **1 generation**. For an opaque background, set `no_background=false`.\n- `create_image_pro`: supports labelled geometry references via `reference_images` and a fixed palette via `palette` (optionally `palette_name`). I don’t have an exact verified quote for **320×180**; its cost depends on the rendered canvas. No call made.\n- `get_image`, `list_images`, and `list_jobs` are free. To recover an image made on the website, find it with `list_images(search=...)`, then retrieve it with `get_image(\"gallery:<id>\")`."
+        }
+      ],
+      "isError": false
+    }
+  }
+}

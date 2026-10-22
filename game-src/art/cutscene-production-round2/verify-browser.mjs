@@ -1,86 +1,50 @@
-// Run from repository root. Outputs stay in this task's ignored evidence directory.
 import assert from 'node:assert/strict';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { createServer } from 'node:http';
-import { createRequire } from 'node:module';
-import { spawn } from 'node:child_process';
-import { build } from 'esbuild';
-const here = new URL('./', import.meta.url);
-const evidence = new URL('evidence/', here);
-await mkdir(evidence, { recursive: true });
-await import('./build-review.mjs');
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright');
-const fixture = await build({ stdin: {
-  contents: `import {VideoPlayer} from './src/game/action/story/video';window.video=new VideoPlayer(document.body);`,
-  resolveDir: process.cwd(),
-}, bundle: true, format: 'iife', write: false, loader: { '.css': 'text' } });
-const server = createServer(async (req, res) => {
-  try {
-    if (req.url === '/review') {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.end(await readFile(new URL('round2-review.html', here)));
-    }
-    if (req.url === '/fixture.js') {
-      res.setHeader('Content-Type', 'text/javascript');
-      return res.end(fixture.outputFiles[0].text);
-    }
-    if (req.url === '/baseline') return res.end('<body><script src="/fixture.js"></script>');
-    if (/^\/original\/c[1-4]\/(timing\.json|\d{4}\.png)$/.test(req.url)) {
-      res.setHeader('Content-Type', req.url.endsWith('.png') ? 'image/png' : 'application/json');
-      return res.end(await readFile(`game-src/art/cutscene/frames/first_day/${req.url.slice('/original/'.length)}`));
-    }
-    res.writeHead(404).end();
-  } catch { res.writeHead(404).end(); }
-});
-await new Promise(r => server.listen(0, '127.0.0.1', r));
-const origin = `http://127.0.0.1:${server.address().port}`;
-let browser;
-try {
-  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  const errors = [];
-  page.on('pageerror', e => errors.push(String(e)));
-  await page.goto(origin + '/review');
-  assert.match(await page.locator('#status').innerText(), /신규 프레임 0장/);
-  assert.equal(await page.locator('button').isDisabled(), true);
-  assert.equal(await page.locator('img,canvas,video').count(), 0, 'No substitute art in blocked review');
-  await page.screenshot({ path: new URL('round2-review-pc.png', evidence).pathname, fullPage: true });
-  await page.setViewportSize({ width: 844, height: 390 });
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-  await page.screenshot({ path: new URL('round2-review-mobile.png', evidence).pathname, fullPage: true });
-  await page.goto(origin + '/baseline');
-  await page.evaluate(() => {
-    window.draws = []; window.finished = 0;
-    const original = CanvasRenderingContext2D.prototype.drawImage;
-    CanvasRenderingContext2D.prototype.drawImage = function (img, ...args) {
-      window.draws.push({ path: new URL(img.src).pathname, at: performance.now(), width: img.naturalWidth, height: img.naturalHeight });
-      return original.call(this, img, ...args);
-    };
-    void window.video.play('/original/', [4, 4, 6, 4], [], () => { window.finished++; window.finishedAt = performance.now(); });
-  });
-  await page.waitForFunction(() => window.finished === 1, {}, { timeout: 25000 });
-  const result = await page.evaluate(() => ({ draws: window.draws, finished: window.finished, finishedAt: window.finishedAt }));
-  assert.deepEqual([...new Set(result.draws.map(d => d.path.split('/')[2]))], ['c1', 'c2', 'c3', 'c4']);
-  assert.ok(result.draws.every(d => d.width === 640 && d.height === 360));
-  const firstHoldMs = result.draws[1].at - result.draws[0].at;
-  assert.ok(firstHoldMs >= 1550, 'Existing first hold is really displayed, not merely present in JSON');
-  assert.deepEqual(errors, []);
-  await writeFile(new URL('round2-baseline-playback.json', evidence), JSON.stringify({ ...result, firstHoldMs, errors }, null, 2) + '\n');
-  console.log(`PASS original first_day c1–c4 playback; first hold ${Math.round(firstHoldMs)}ms; blocked review PC/mobile`);
-} finally {
-  await browser?.close();
-  await new Promise(r => server.close(r));
-}
-
-// Preserve the integration owner's regression test; change only its output filename in an ignored copy.
-const regression = await readFile('tests/door-video-browser.mjs', 'utf8');
-const originalShot = '/workspace/goei-hq-door-fixed.png';
-assert.ok(regression.includes(originalShot), 'Check upstream test output location before copying');
-const regressionPath = new URL('round2-door-video-regression.mjs', evidence);
-await writeFile(regressionPath, regression.replace(originalShot, new URL('round2-hq-door-baseline.png', evidence).pathname));
-await new Promise((resolve, reject) => {
-  const child = spawn(process.execPath, [regressionPath.pathname], { stdio: 'inherit' });
-  child.on('error', reject);
-  child.on('close', code => code === 0 ? resolve() : reject(new Error(`Existing regression exited ${code}`)));
-});
+import {readFile,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'C:/Users/leepc/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const root=new URL('./',import.meta.url),url=new URL('round2-review.html',root).href;
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+const results={browser:'Chrome headless',realMobileDevice:false,errors:[],cases:[]};
+try{
+ for(const config of [{name:'pc',width:1100,height:850,mobile:false,scale:2},{name:'mobile-portrait',width:390,height:844,mobile:true,scale:1},{name:'mobile-landscape',width:844,height:390,mobile:true,scale:2}]){
+  const context=await browser.newContext({viewport:{width:config.width,height:config.height},isMobile:config.mobile,hasTouch:config.mobile,deviceScaleFactor:config.mobile?3:1});
+  const page=await context.newPage();page.on('pageerror',e=>results.errors.push(String(e)));
+  await page.goto(url);await page.waitForFunction(()=>window.reviewState?.().ready);
+  const bounds=await page.locator('canvas').boundingBox();assert.equal(bounds.width,320*config.scale);assert.equal(bounds.height,180*config.scale);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.screenshot({path:fileURLToPath(new URL('review/'+config.name+'-closed.png',root)),fullPage:true});
+  const activate=async selector=> config.mobile?await page.locator(selector).tap():await page.locator(selector).click();
+  await activate('#play');
+  await page.waitForFunction(()=>window.reviewState().playing);
+  await page.waitForFunction(()=>window.reviewState().elapsed===2400,{},{timeout:5000});
+  assert.equal((await page.evaluate(()=>window.reviewState())).index,16);
+  await page.screenshot({path:fileURLToPath(new URL('review/'+config.name+'-open.png',root)),fullPage:true});
+  await activate('#prev');assert.equal((await page.evaluate(()=>window.reviewState())).index,15);
+  await activate('#next');assert.equal((await page.evaluate(()=>window.reviewState())).index,16);
+  await page.locator('#speed').selectOption('.25');await activate('#restart');
+  await page.waitForTimeout(1200);
+  const slow=await page.evaluate(()=>window.reviewState());assert.ok(slow.elapsed>=240&&slow.elapsed<=380,JSON.stringify(slow));assert.equal(slow.index,0);
+  await activate('#play');const paused=(await page.evaluate(()=>window.reviewState())).elapsed;
+  await page.waitForTimeout(160);assert.equal((await page.evaluate(()=>window.reviewState())).elapsed,paused);
+  await page.locator('#speed').selectOption('1');await page.locator('#loop').check();await activate('#restart');
+  await page.waitForFunction(()=>window.reviewState().loops>=1,{},{timeout:5000});
+  assert.equal((await page.evaluate(()=>window.reviewState())).playing,true);
+  await activate('#play');
+  results.cases.push({...config,canvasBounds:bounds,normalCompleted:true,slowElapsedAt1200ms:slow.elapsed,pauseStable:true,frameStep:true,loopRestarts:true,horizontalOverflow:false});
+  await context.close();
+ }
+ const page=await browser.newPage({viewport:{width:1100,height:850}});
+ await page.goto(url);await page.waitForFunction(()=>window.reviewState?.().ready);
+ await page.evaluate(()=>{window.observed=[];window.observe=setInterval(()=>{const s=window.reviewState();if(s.playing)window.observed.push({index:s.index,time:performance.now()})},10)});
+ await page.locator('#play').click();await page.waitForFunction(()=>window.reviewState().elapsed===2400,{},{timeout:5000});
+ const observed=await page.evaluate(()=>{clearInterval(window.observe);return window.observed});
+ assert.deepEqual([...new Set(observed.map(x=>x.index))],Array.from({length:17},(_,i)=>i));
+ results.normalFrameObservation=observed.filter((r,i)=>i===0||r.index!==observed[i-1].index);
+ results.normalObservedSpanMs=observed.at(-1).time-observed[0].time;
+ assert.ok(results.normalObservedSpanMs>2300&&results.normalObservedSpanMs<2600);
+ assert.deepEqual(results.errors,[]);
+ await writeFile(new URL('review/browser-validation.json',root),JSON.stringify(results,null,2)+'\n');
+ console.log(JSON.stringify(results,null,2));
+}finally{await browser.close()}

@@ -1,0 +1,57 @@
+{
+  "raw_size": [
+    96,
+    144
+  ],
+  "raw_alpha_bbox": [
+    4,
+    4,
+    92,
+    139
+  ],
+  "raw_sha256": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03",
+  "raw_issue": "Two separate leaves; no common fixed frame; panel height135 versus target125.",
+  "source_leaf_rects_xywh": [
+    [
+      4,
+      4,
+      40,
+      135
+    ],
+    [
+      52,
+      4,
+      40,
+      135
+    ]
+  ],
+  "removed_source_rows_in_each_leaf_y_half_open": [
+    64,
+    74
+  ],
+  "reason": "Remove 10 repeated frosted-band rows to meet125px opening; preserve top/bottom and all other source pixels without scaling.",
+  "frame": "Locally constructed rectangular frame using three sampled PixelLab rim colours.",
+  "frame_colors": [
+    [
+      142,
+      143,
+      142,
+      255
+    ],
+    [
+      52,
+      61,
+      63,
+      255
+    ],
+    [
+      50,
+      58,
+      59,
+      255
+    ]
+  ],
+  "no_resampling": true,
+  "ai_edit_calls": 0,
+  "text_in_asset": false
+}

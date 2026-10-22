@@ -1,0 +1,11 @@
+{
+  "description": "Empty modern Seoul administrative headquarters corridor, side-on belt-scroll game background. Straight front elevation of north wall, orthographic, no vanishing-point perspective. Navy painted wall #1f2733 #2a3544 with charcoal steel supports, subtle walnut horizontal trim #4d3a2c, restrained cold white fluorescent light #cfe4ff. Grey floor #7f8994 #76808b only bottom 24 pixels, wall-floor seam at y156. Quiet institutional interior, crisp native pixel art, medium detail, clean readable block shading, limited muted palette. Ceiling top 18 pixels. Left half: a low simple built-in walnut bench and one small blank charcoal wall panel, no text. Right half x190 to290 y20 to156: plain uninterrupted navy wall reserved for a separately composited tall doorway, no furniture, no wall decoration, no door, no frame, no opening. No people, characters, faces, hands, reflections of people, silhouettes, portraits, letters, numbers, logos, pets, blur, gradients, antialiasing. Wide 320x180 shot.",
+  "width": 320,
+  "height": 180,
+  "no_background": false,
+  "view": "side",
+  "direction": "south",
+  "outline": "selective outline",
+  "detail": "medium detail",
+  "seed": 102222
+}

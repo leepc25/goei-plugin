@@ -1,19 +1,8 @@
-# 환경 컷 요청문 · 재개판
+# 최종 실행 요청과 동작
+실제 PixelLab 배경 요청은 background-local.request.json. 단1회 제출했고 receipts/에 job/차감/회수를 보존했다.
+background.request.json과 resume-evidence/의 구형 계획은 역사 기록이며 재실행하지 않는다.
 
-실행 가능한 배경 인자는 `background.request.json`에 있다. 아직 미제출이다.
-캐릭터/이전 컷씬/기존 반려 이미지 입력은 없다. 숯색 프레임·청회색 젖빛 유리의
-정면 양쪽 미닫이문을 사용한다. 첫 장 구도를 실제 검수하기 전에는 동작 요청을 만들지 않는다.
-
-## 동작 요청 초안 (이미지 인자 미지정, 미제출)
-
-The two frosted glass door leaves slide horizontally apart once, left leaf to the left and right leaf to the right, disappearing into their wall pockets. Slowly separate, accelerate through the middle, then ease to a fully open stop. Reveal an empty quiet office, no people or silhouettes. Keep the charcoal doorframe, threshold, wall, floor, frosted band and camera steady. No swinging, rotation, closing, bounce, zoom or pan.
-
-`frame_count=16`, 새 배경에서 검수한 96×144 crop, 불투명.
-최신 계약상 입력 index 0과 신규 16장, 총 17장을 회수한다. 0장을 중복해 장수를 늘리지 않는다.
-중간 열린 폭은 검수 목표이지 모델이 강제 보장하는 값이 아니다.
-
-## 무료 도움말
-
-`inspect-pixellab.py`에 정확한 크기·차감·17장 반환·실패 과금·동시 작업 한도·고정 배경 보장
-질문을 넣었다. 실제 계정 인증 후 응답을 읽고 불일치가 있으면 계획과 비용부터 수정한다.
-추가 끝 장 편집은 현재 예약에 없으며 동작 실패를 프롬프트 변경만으로 반복하지 않는다.
+첫 프레임을 review/first-frame-640.png에서 검수한 뒤 문을 제작했다.
+AI동작 프롬프트는 제출하지 않았다. 본부 문 담당 신규 leaf-left/leaf-right를 같은 aperture 안에서 정수좌표 이동:
+0,1,2,4,6,9,12,16,20,24,28,31,34,36,38,39,40px.
+왼쪽은 음수, 오른쪽은 양수로 이동한다. 문틀과 배경은 고정. 17프레임 해시 모두 다르다.

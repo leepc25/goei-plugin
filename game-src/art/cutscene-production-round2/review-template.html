@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>첫 출근 · 빈 본부 복도</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101720;color:#dce5eb}
+*{box-sizing:border-box}body{margin:0;padding:24px 16px;min-width:320px}main{max-width:920px;margin:auto}
+header{display:flex;align-items:end;justify-content:space-between;gap:16px;border-bottom:1px solid #34434f;padding-bottom:18px}
+h1{font-size:26px;margin:6px 0}.eyebrow{color:#9bc6c7;font-size:12px;letter-spacing:2px}.tag{font-size:12px;border:1px solid #586c78;padding:6px 10px;border-radius:20px;white-space:nowrap}
+.stage{background:#080d13;display:flex;justify-content:center;align-items:center;margin:24px -16px 14px;min-height:210px;overflow:auto}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;width:320px;height:180px;flex-shrink:0}
+@media(min-width:672px){canvas{width:640px;height:360px}.stage{min-height:400px}}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}button,select{font:inherit;border:1px solid #627982;background:#22313c;color:#edf4f6;border-radius:6px;min-height:44px;padding:8px 14px;cursor:pointer}button:disabled{opacity:.45;cursor:wait}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a7d9db;outline-offset:3px}
+.primary{background:#9fc9c9;color:#101b24;border-color:#9fc9c9}.check{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 8px}
+input[type=checkbox]{width:20px;height:20px}input[type=range]{width:100%;margin:18px 0;accent-color:#9fc9c9;min-height:26px}
+.readout{display:flex;justify-content:space-between;gap:10px;color:#acbec8;font-variant-numeric:tabular-nums;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}.card{border-top:1px solid #34434f;padding:12px 0}.card b{display:block;font-size:18px;margin-bottom:6px}.card span{color:#9fb0bc;font-size:13px}
+.note{font-size:13px;color:#a9bac4;line-height:1.7}details{margin-top:20px}summary{cursor:pointer;min-height:44px;padding:10px 0}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;padding:8px;border-bottom:1px solid #34434f}
+@media(max-width:480px){body{padding-top:16px}header{align-items:start}.tag{max-width:100px;white-space:normal}h1{font-size:22px}.cards{grid-template-columns:1fr}.card{padding:8px 0}.card b{display:inline;margin-right:12px}}
+</style></head><body><main>
+<header><div><div class="eyebrow">FIRST DAY · ENVIRONMENT CUT 01</div><h1>첫 출근 — 빈 본부 복도</h1></div><span class="tag">환경 컷 검수 후보</span></header>
+<div class="stage"><canvas id="screen" width="640" height="360" aria-label="빈 본부 복도의 유리 미닫이문이 열리는 환경 컷"></canvas></div>
+<div class="readout"><output id="state" aria-live="polite">프레임 불러오는 중</output><output id="counter">—</output></div>
+<input id="scrub" type="range" min="0" max="16" value="0" step="1" aria-label="프레임 선택" disabled>
+<div class="controls"><button id="play" class="primary" disabled>재생</button><button id="restart" disabled>처음부터</button><button id="prev" aria-label="이전 프레임" disabled>이전 장</button><button id="next" aria-label="다음 프레임" disabled>다음 장</button><select id="speed" aria-label="재생 속도"><option value="1">정상 속도 · 1×</option><option value=".25">느린 재생 · 0.25×</option></select><label class="check"><input id="loop" type="checkbox">반복</label></div>
+<div class="cards"><div class="card"><b>2.40초 / 17장</b><span>서로 다른 문짝 위치 · 정지 구간 포함</span></div><div class="card"><b>640 × 360</b><span>320×180 원본 · 정수 2배</span></div><div class="card"><b>고정 카메라</b><span>문틀·벽·바닥 픽셀 고정</span></div></div>
+<p class="note">정상 재생은 문이 열린 상태에서 끝납니다. 반복은 닫힌 첫 장으로 돌아가는 검수용 컷 전환이며, 자연스러운 순환 동작이 아닙니다. 모바일 세로 화면에서는 원본 1배(320×180)와 여백을 사용합니다.</p>
+<p class="note">PixelLab 신규 배경 1장 + 본부 문 담당의 신규 문 원본을 공유했습니다. 문 동작은 원본 문짝 레이어의 정수 좌표 이동으로 제작했습니다. AI 동작 생성 0회, 중복 프레임 0장. 캐릭터·오디오·최종 게임 통합 및 사용자 시각 승인은 포함하지 않습니다.</p>
+<details><summary>프레임별 시간과 문 열림 확인</summary><div class="table-wrap"><table><thead><tr><th>프레임</th><th>시작</th><th>유지 시간</th><th>문짝 이동 / 열린 폭 (원본 px)</th></tr></thead><tbody id="timings"></tbody></table></div></details>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+const payload=JSON.parse(document.getElementById('payload').textContent), m=payload.manifest;
+const screen=document.getElementById('screen'), ctx=screen.getContext('2d');
+const play=document.getElementById('play'),restart=document.getElementById('restart'),prev=document.getElementById('prev'),next=document.getElementById('next'),speed=document.getElementById('speed'),loop=document.getElementById('loop'),scrub=document.getElementById('scrub'),state=document.getElementById('state'),counter=document.getElementById('counter');
+let images=[],playing=false,elapsed=0,last=0,index=0,loops=0,ready=false;
+const starts=[];let total=0;m.playback.ms.forEach(ms=>{starts.push(total);total+=ms});
+function pick(t){for(let i=starts.length-1;i>=0;i--)if(t>=starts[i])return i;return 0}
+function render(){index=pick(elapsed);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,640,360);ctx.drawImage(images[index],0,0,640,360);scrub.value=index;play.textContent=playing?'일시정지':elapsed>=total?'다시 재생':'재생';state.textContent=elapsed>=total?'재생 완료 · 문 열림':playing?'재생 중':'일시정지';counter.textContent=(index+1)+' / '+images.length+'장 · '+(elapsed/1000).toFixed(2)+' / '+(total/1000).toFixed(2)+'초'}
+function seek(i){playing=false;elapsed=starts[Math.max(0,Math.min(images.length-1,i))];render()}
+function begin(){if(!ready)return;if(elapsed>=total)elapsed=0;playing=true;last=performance.now();render()}
+function tick(now){if(playing){elapsed+=(now-last)*Number(speed.value);if(elapsed>=total){if(loop.checked){loops+=Math.floor(elapsed/total);elapsed%=total}else{elapsed=total;playing=false}}render()}last=now;requestAnimationFrame(tick)}
+play.onclick=()=>{if(playing){playing=false;render()}else begin()};
+restart.onclick=()=>{elapsed=0;begin()};prev.onclick=()=>seek(index-1);next.onclick=()=>seek(index+1);scrub.oninput=()=>seek(Number(scrub.value));
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing){playing=false;render()}});
+window.reviewState=()=>({ready,playing,index,elapsed,loops,speed:Number(speed.value),loop:loop.checked,total,frames:images.length,source:'new-art'});
+m.frames.forEach((f,i)=>{const tr=document.createElement('tr');[i+1,starts[i]+' ms',m.playback.ms[i]+' ms',f.leafOffsetPx+' / '+f.openWidthPx].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});document.getElementById('timings').append(tr)});
+Promise.all(payload.images.map(src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('PNG decode failed'));im.src=src}))).then(result=>{images=result;ready=true;document.querySelectorAll('button,#scrub').forEach(e=>e.disabled=false);render();requestAnimationFrame(tick)}).catch(e=>{state.textContent='이미지 오류: '+e.message});
+</script></main></body></html>

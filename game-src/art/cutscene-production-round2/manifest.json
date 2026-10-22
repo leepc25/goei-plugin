@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "first-day-empty-hall-door-round2",
-  "status": "blocked-authentication",
+  "status": "produced-for-visual-review",
   "canvas": {
     "width": 640,
     "height": 360,
@@ -14,23 +14,206 @@
       0,
       0
     ],
-    "displayScale": 1,
     "resample": "nearest-neighbor",
     "mobile": {
       "portraitSourceScale": 1,
       "landscapeSourceScale": 2,
       "center": true,
-      "fillRemainder": "#111720"
+      "fillRemainder": "#101720"
     }
   },
-  "frames": [],
+  "frames": [
+    {
+      "index": 0,
+      "sourceFile": "frames/source/0000.png",
+      "file": "frames/final/0000.png",
+      "ms": 400,
+      "leafOffsetPx": 0,
+      "openWidthPx": 0,
+      "sha256": "b0dbcfe311aca473f1a39647ae714685798bd0460b1b678d62981a41cca18883",
+      "sourceSha256": "4f13b32ad82a77c046231ddb09a67d7fed032af6a197352df777dd54c2517d57",
+      "rgbaSha256": "3b5555459ce3056f7596701ed85c53e5f2e9e91e815ed83a8a85032f4f60d448"
+    },
+    {
+      "index": 1,
+      "sourceFile": "frames/source/0001.png",
+      "file": "frames/final/0001.png",
+      "ms": 100,
+      "leafOffsetPx": 1,
+      "openWidthPx": 2,
+      "sha256": "434f74103ec146ee1462d346e2a4feeaa8bfb351defbaa262e3f1fd84ef40277",
+      "sourceSha256": "8e43a369628d8b37b9a58f0b0248d88bc7384345116eb253b7c8c541589bcc19",
+      "rgbaSha256": "c6ce26aaf2b73c2b446ec9e5c99d9b65ab0c81327a0ea9f9f6756b3bc956f7a5"
+    },
+    {
+      "index": 2,
+      "sourceFile": "frames/source/0002.png",
+      "file": "frames/final/0002.png",
+      "ms": 100,
+      "leafOffsetPx": 2,
+      "openWidthPx": 4,
+      "sha256": "98df9195d41064bbfc5c4cefda99a77fa39a34dcc8af4b0d1b88423c0a7290b7",
+      "sourceSha256": "7e111c64d3a9594984b9ef2366e23ceafe0647d22b98e50bf1bd597d81a8a0d5",
+      "rgbaSha256": "a93ec972d55d31d53a20075fc8d3edfa78e56acfd136af2126545b73408652ce"
+    },
+    {
+      "index": 3,
+      "sourceFile": "frames/source/0003.png",
+      "file": "frames/final/0003.png",
+      "ms": 100,
+      "leafOffsetPx": 4,
+      "openWidthPx": 8,
+      "sha256": "5076c3d4c05e687b2609c08b65bd1c75076af7fc6d66f26c131710bfcd186947",
+      "sourceSha256": "38678393a184ff94cc8a67824ee8896ef88d8242341d19e8f31e2b98cccfc088",
+      "rgbaSha256": "60d822ab49af268dbacc818ebd58e02456ae93263a8c28a350caa2e433cea01d"
+    },
+    {
+      "index": 4,
+      "sourceFile": "frames/source/0004.png",
+      "file": "frames/final/0004.png",
+      "ms": 100,
+      "leafOffsetPx": 6,
+      "openWidthPx": 12,
+      "sha256": "a17379ca92a29450c1606f33e68161e16c6cb6fba0a0cfefb1aca70672b2efbd",
+      "sourceSha256": "d3ebc2a4beccf06bb77baed7ae34a87d91773d4e8b62afe42f0ec9fa0e7ffbb9",
+      "rgbaSha256": "dcfbadfcacd0ea381118af2706fe36b0d9e691fb5c396f0bb971b3062d989c59"
+    },
+    {
+      "index": 5,
+      "sourceFile": "frames/source/0005.png",
+      "file": "frames/final/0005.png",
+      "ms": 100,
+      "leafOffsetPx": 9,
+      "openWidthPx": 18,
+      "sha256": "928ecbea5bd64c0736343436f51a71ab0b708717459b321e421de41d7a9b6246",
+      "sourceSha256": "6b65138377a0d9d6991356cd87afbf1581b38e7c5c27369593840aa03fc468c5",
+      "rgbaSha256": "14db0b31e0cadcce9466e53612c61d75ff3a698890bc0ef81bf8cd7870482f79"
+    },
+    {
+      "index": 6,
+      "sourceFile": "frames/source/0006.png",
+      "file": "frames/final/0006.png",
+      "ms": 100,
+      "leafOffsetPx": 12,
+      "openWidthPx": 24,
+      "sha256": "931d7f624fb827c017c13e56a88049a62805b2685daa8c69c6a6934c07ff00a1",
+      "sourceSha256": "c413ae20e9083efbf05e202a0d03b5c9ce66518186c394bf5b15910f2bb3e1d9",
+      "rgbaSha256": "a38f01353c6ca2a1b1cc91ada56372240f94bb04070b6727f6af8fba24b358ec"
+    },
+    {
+      "index": 7,
+      "sourceFile": "frames/source/0007.png",
+      "file": "frames/final/0007.png",
+      "ms": 100,
+      "leafOffsetPx": 16,
+      "openWidthPx": 32,
+      "sha256": "22bbd61e3582b1fe69ced2f3bd6c8b8fbc9eea7a6441fc970ef34479b4fe0943",
+      "sourceSha256": "e1f1d1ee667d525cc1f200e1739a586e6d9c1d97443af5993b87e5da2cfdb0de",
+      "rgbaSha256": "0f5f03cc2956f4501c22534764e85713f62ef82ccafe81cdfd020cb7675bd39e"
+    },
+    {
+      "index": 8,
+      "sourceFile": "frames/source/0008.png",
+      "file": "frames/final/0008.png",
+      "ms": 100,
+      "leafOffsetPx": 20,
+      "openWidthPx": 40,
+      "sha256": "23717792c2cfb76b3af2bf85ce8d0c6a5c69cb06d9f8a2783968a50b5adca84d",
+      "sourceSha256": "d073e182291cc20a6c41b756b519c35712398c855a427daf289ba74368d39486",
+      "rgbaSha256": "c4d473aca9978ead69c7f4f535b867baeb68f969ebd342e478554b649f35c440"
+    },
+    {
+      "index": 9,
+      "sourceFile": "frames/source/0009.png",
+      "file": "frames/final/0009.png",
+      "ms": 100,
+      "leafOffsetPx": 24,
+      "openWidthPx": 48,
+      "sha256": "4f169243e3286651626a1ba22568f85b16f80a3221baa54a9ab9cac24aadf279",
+      "sourceSha256": "16747457b4e962161f569761045feb72a13a61db2f996da9f2daf6d153d91bba",
+      "rgbaSha256": "daf7b193a7412bfb7837a1411c69963667bf75b502dbebacf4d00df20fd3ed2a"
+    },
+    {
+      "index": 10,
+      "sourceFile": "frames/source/0010.png",
+      "file": "frames/final/0010.png",
+      "ms": 100,
+      "leafOffsetPx": 28,
+      "openWidthPx": 56,
+      "sha256": "b77150c8a5cf076c79dbfaa84aea52fe147fe22bb410e3d984b5e1622ebab4ca",
+      "sourceSha256": "2ec8dcfebdbd492ee7cb01215822f2bee70a84d81c6d4deadecbc3d3f08b1aa8",
+      "rgbaSha256": "7175822f21a5ad326383cf0ea9ea8f85be65dcd735192090e6338823e4148980"
+    },
+    {
+      "index": 11,
+      "sourceFile": "frames/source/0011.png",
+      "file": "frames/final/0011.png",
+      "ms": 100,
+      "leafOffsetPx": 31,
+      "openWidthPx": 62,
+      "sha256": "88f49036d860d8c80b0fbba182686fb3dbbc7335c80e6e0a7699f4ba309b2173",
+      "sourceSha256": "a05bf50c04b98d913ee9bc381685e45b5070bfd6fbc5ee573c150f6f34e2f8a5",
+      "rgbaSha256": "3c17c78f8f194603b4b98323741be6f9cd834fa64ba8b4c96d9a716f4f9ae108"
+    },
+    {
+      "index": 12,
+      "sourceFile": "frames/source/0012.png",
+      "file": "frames/final/0012.png",
+      "ms": 100,
+      "leafOffsetPx": 34,
+      "openWidthPx": 68,
+      "sha256": "5d48bbee487022b003893c3baacac3faa4671b7dfaafb898dc6e03ead34f70b2",
+      "sourceSha256": "7757f90213bac93c11a0069b80b0f76034290b6ed39fd3a385284723801745ad",
+      "rgbaSha256": "203ddf29c418eb8dde6fdc126399a6a55151803574503fb3333215b675f62f58"
+    },
+    {
+      "index": 13,
+      "sourceFile": "frames/source/0013.png",
+      "file": "frames/final/0013.png",
+      "ms": 100,
+      "leafOffsetPx": 36,
+      "openWidthPx": 72,
+      "sha256": "3a4b77f0bbd0c539865b214b7359006b3ea419b21d067ed148d4ce75d8a042f6",
+      "sourceSha256": "ede9635f9aa41c5579f3ca78b3d57dd85084f8d0e27d82fab7f20018043f07e3",
+      "rgbaSha256": "d1688d36e560b6fc0ceb8d6e195898c67d2f293ce2d63619fe4b982b95594879"
+    },
+    {
+      "index": 14,
+      "sourceFile": "frames/source/0014.png",
+      "file": "frames/final/0014.png",
+      "ms": 100,
+      "leafOffsetPx": 38,
+      "openWidthPx": 76,
+      "sha256": "ccdac12ab6c3e66dfa4fd66f717605c5572dfb9afb5ce811dc5aefc3c4e9727e",
+      "sourceSha256": "291e26b153649a805b172779a292d5d29659d1e09a9be173aabfdb6d15d1f465",
+      "rgbaSha256": "806a907cf1fe08592522cdb350f4bb40ca7750d19a1177e5149a2a056341fd40"
+    },
+    {
+      "index": 15,
+      "sourceFile": "frames/source/0015.png",
+      "file": "frames/final/0015.png",
+      "ms": 100,
+      "leafOffsetPx": 39,
+      "openWidthPx": 78,
+      "sha256": "4ac1ff53ea0820200b8ffac7214c987501c4f738e4b50f856972ddd895b296ed",
+      "sourceSha256": "596582d150a7f3052352d14506873e48597e6d6e66f94528b92ecb5872926c1f",
+      "rgbaSha256": "aa4b0033bdabe81995a535938fb0c0aabe842b02cbbb640bc3c0dfcd069be6d0"
+    },
+    {
+      "index": 16,
+      "sourceFile": "frames/source/0016.png",
+      "file": "frames/final/0016.png",
+      "ms": 500,
+      "leafOffsetPx": 40,
+      "openWidthPx": 80,
+      "sha256": "6850883c25f48e3ad05b36d58e761789d22f8f60e105139882bbce356fb1ea8e",
+      "sourceSha256": "de056509a0cb689df1b283bef9a7be32407971370c23fd8004175aa0dfd71619",
+      "rgbaSha256": "459dfbb63439d6cc535681883da3d4c6061ebdf1f393776d097fd10f998705b1"
+    }
+  ],
   "playback": {
-    "order": [],
-    "ms": [],
-    "durationMs": 0
-  },
-  "plannedPlayback": {
     "order": [
+      0,
       1,
       2,
       3,
@@ -46,8 +229,7 @@
       13,
       14,
       15,
-      16,
-      17
+      16
     ],
     "ms": [
       400,
@@ -68,17 +250,62 @@
       100,
       500
     ],
-    "durationMs": 2400
+    "durationMs": 2400,
+    "loop": false
   },
-  "sourceJobs": [],
-  "actualGeneratedImages": 0,
-  "actualPaidCalls": 0,
-  "actualChargedGenerations": 0,
-  "accountBalance": null,
+  "composition": {
+    "doorOrigin": [
+      180,
+      20
+    ],
+    "openingXYWH": [
+      188,
+      31,
+      80,
+      125
+    ],
+    "thresholdSourceY": 156,
+    "fixedFrameSource": "references/hq-door/layers/frame.png",
+    "backgroundPreparation": "Insert twelve copies of source wall row143 at y144..155; shift original floor rows144..167 to156..179. No resampling.",
+    "camera": "locked",
+    "characters": false,
+    "animation": "deterministic integer translation of shared new PixelLab leaves clipped to fixed aperture"
+  },
+  "sourceJobs": [
+    {
+      "jobId": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
+      "role": "new corridor",
+      "tool": "create_image_pixen",
+      "chargedGenerations": 1,
+      "recovered": true
+    },
+    {
+      "jobId": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+      "role": "shared new door from door owner",
+      "chargedGenerations": 1,
+      "chargedTo": "codex/pixellab-doors-round2",
+      "newCallHere": false,
+      "recovered": true
+    }
+  ],
+  "actualGeneratedImages": 1,
+  "actualPaidCalls": 1,
+  "actualChargedGenerations": 1,
+  "sharedSourceImages": 1,
+  "aiAnimationGeneratedFrames": 0,
+  "compositedUniqueFrames": 17,
+  "duplicateFrames": 0,
+  "accountBalance": {
+    "before": 14160.3,
+    "afterObservation": 14158.3,
+    "creditsUSD": 0,
+    "note": "Shared account delta includes door owner. This task cost is server receipt 1 generation, not balance subtraction.",
+    "usdCharge": null
+  },
   "review": {
-    "firstFrame": "not-generated",
-    "desktop": "not-run-on-new-art",
-    "mobile": "not-run-on-new-art",
+    "firstFrame": "agent inspected before animation",
+    "desktop": "passed Chrome 1100x850",
+    "mobile": "passed touch emulation 390x844 and 844x390; physical device not tested",
     "visualApproval": false
   },
   "integration": {
@@ -86,8 +313,8 @@
     "originalDurationMs": 6000,
     "environmentDurationMs": 2400,
     "remainingCharacterSegmentMs": 3600,
-    "characterSegmentOwner": "character-production lead",
-    "status": "proposal; timing and subtitles must be reconciled by main integrator",
+    "characterSegmentOwner": "character production",
+    "status": "Main integrator reconciles timing and captions; no automatic replacement",
     "sharedFilesModified": false
   }
 }

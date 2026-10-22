@@ -1,2 +1,4 @@
 evidence/
 *.html
+!round2-review.html
+!review-template.html

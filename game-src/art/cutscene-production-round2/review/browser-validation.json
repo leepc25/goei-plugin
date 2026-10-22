@@ -1,0 +1,135 @@
+{
+  "browser": "Chrome headless",
+  "realMobileDevice": false,
+  "errors": [],
+  "cases": [
+    {
+      "name": "pc",
+      "width": 1100,
+      "height": 850,
+      "mobile": false,
+      "scale": 2,
+      "canvasBounds": {
+        "x": 230,
+        "y": 149,
+        "width": 640,
+        "height": 360
+      },
+      "normalCompleted": true,
+      "slowElapsedAt1200ms": 303.40000001788144,
+      "pauseStable": true,
+      "frameStep": true,
+      "loopRestarts": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "mobile-portrait",
+      "width": 390,
+      "height": 844,
+      "mobile": true,
+      "scale": 1,
+      "canvasBounds": {
+        "x": 35,
+        "y": 147,
+        "width": 320,
+        "height": 180
+      },
+      "normalCompleted": true,
+      "slowElapsedAt1200ms": 300.12500001788135,
+      "pauseStable": true,
+      "frameStep": true,
+      "loopRestarts": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "mobile-landscape",
+      "width": 844,
+      "height": 390,
+      "mobile": true,
+      "scale": 2,
+      "canvasBounds": {
+        "x": 102,
+        "y": 149,
+        "width": 640,
+        "height": 360
+      },
+      "normalCompleted": true,
+      "slowElapsedAt1200ms": 300.25,
+      "pauseStable": true,
+      "frameStep": true,
+      "loopRestarts": true,
+      "horizontalOverflow": false
+    }
+  ],
+  "normalFrameObservation": [
+    {
+      "index": 0,
+      "time": 69.80000007152557
+    },
+    {
+      "index": 1,
+      "time": 470.10000002384186
+    },
+    {
+      "index": 2,
+      "time": 569.9000000953674
+    },
+    {
+      "index": 3,
+      "time": 669.4000000953674
+    },
+    {
+      "index": 4,
+      "time": 769.1000000238419
+    },
+    {
+      "index": 5,
+      "time": 869.2000000476837
+    },
+    {
+      "index": 6,
+      "time": 960.1000000238419
+    },
+    {
+      "index": 7,
+      "time": 1068.7000000476837
+    },
+    {
+      "index": 8,
+      "time": 1169.4000000953674
+    },
+    {
+      "index": 9,
+      "time": 1268.9000000953674
+    },
+    {
+      "index": 10,
+      "time": 1369.7000000476837
+    },
+    {
+      "index": 11,
+      "time": 1470
+    },
+    {
+      "index": 12,
+      "time": 1569.1000000238419
+    },
+    {
+      "index": 13,
+      "time": 1669.8000000715256
+    },
+    {
+      "index": 14,
+      "time": 1769.4000000953674
+    },
+    {
+      "index": 15,
+      "time": 1869.5
+    },
+    {
+      "index": 16,
+      "time": 1960
+    }
+  ],
+  "normalObservedSpanMs": 2389.100000023842
+}

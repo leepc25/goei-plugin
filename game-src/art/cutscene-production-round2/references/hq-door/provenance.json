@@ -1,0 +1,15 @@
+{
+  "branch": "codex/pixellab-doors-round2",
+  "copiedFrom": "peer local worktree during active production",
+  "jobId": "d0105c20-4b44-4ebb-b3a5-32ea1a4158c1",
+  "userVisualApproval": false,
+  "files": {
+    "manifest.json": "0df475ebae9d8593db55e69ab26ce02b62edcc5c64566c6debda70a20e1b15f9",
+    "preparation.json": "0ec627d57a6befa93457f72f0eb6f101531caeb4c1450d656b5607be20b393e3",
+    "layers/aperture.png": "f8be96b85bd8c4063350d56d02bd693b4f47d974290ede3204ac6d65195f9c70",
+    "layers/frame.png": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7",
+    "layers/leaf-left.png": "8f5d6995aef1ab6b051e51f6f0d0031afa7863804e76c70af4e808b9a58cf6e7",
+    "layers/leaf-right.png": "6ade9f725f7932932fbf8407400c904729eebaa5ea2b3d02b857eda1507511ec",
+    "raw/pixellab-d0105c20.png": "8b3fa629ea7e2055768425e7800cd90998e4886163d47370b04bd55ab384eb03"
+  }
+}
