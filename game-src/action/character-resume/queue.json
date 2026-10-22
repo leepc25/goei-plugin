@@ -150,6 +150,58 @@
         "active_jobs": 0,
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
       }
+    },
+    {
+      "reservation_id": "spangdal-first-hit-hand-01a1632e82b9",
+      "owner_thread_id": "01a1632e-82b9-7e41-94f9-e52607f4d591",
+      "owner_branch": "codex/art-spangdal-resume",
+      "reported_source_commit": "986d1602",
+      "character": "spangdal",
+      "asset": "1타 손 기준 마스크 인페인팅",
+      "canvas": [
+        192,
+        144
+      ],
+      "tool": null,
+      "method": "mask_inpainting",
+      "reserved_generation_calls": 1,
+      "quoted_charge": 10,
+      "charge_unit": "generations",
+      "quote_status": "담당자 전달 견적; 이 세션 독립 가격 조회 아님",
+      "state": "reserved_by_other_session_pending_submission",
+      "max_concurrent_submissions": 1,
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "do_not_repeat": "기존 실패한 pixen 손 편집",
+      "followup_scope": "공격·빈손 파지·이동 검수; 후속 유료 호출은 이번 예약에 포함하지 않음",
+      "excluded_scope": [
+        "kyuras paid job recovery",
+        "kyuras regeneration"
+      ],
+      "reported_previous_session": {
+        "state": "idle",
+        "new_png_count": 0
+      },
+      "received_at": "2026-10-22T19:38:39.536028+09:00",
+      "reported_account_snapshot": {
+        "source": "스팡달 로컬 담당 세션 전달; 이 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "MCP 인증 성공이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "subscription_plan": "Tier3",
+        "active_jobs": 0,
+        "note": "최초 조회 기록; 제출 직전 활성 작업 재조회 필요. 동시 실행 한도는 별도 미확인"
+      },
+      "coordination": {
+        "asset_conflict": false,
+        "other_pending_reservations": [
+          "hq-glass-door-round2-01a1632c",
+          "hq-first-day-corridor-round2-01a1632e"
+        ],
+        "note": "담당 범위 중복 없음. 계정 동시 제출 슬롯 확보를 뜻하지 않음"
+      }
     }
   ]
 }
