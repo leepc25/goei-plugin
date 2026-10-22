@@ -1,0 +1,5 @@
+sub lurker ['air', 'lie', 'getup', 'snap_tele', 'snap_hit', 'snap_rec', 'claw_tele']
+sub hollow ['air', 'lie', 'getup', 'lunge_tele', 'lunge_hit', 'lunge_rec', 'hug_tele']
+done lurker ['air', 'lie', 'getup', 'snap_tele', 'snap_hit', 'snap_rec', 'claw_tele']
+done hollow ['air', 'lie', 'getup', 'lunge_tele', 'lunge_hit', 'lunge_rec', 'hug_tele']
+generations_remaining: 16591.30

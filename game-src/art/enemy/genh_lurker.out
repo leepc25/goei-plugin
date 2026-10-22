@@ -1,0 +1,3 @@
+sub lurker ['idle', 'walk', 'hurt_l', 'hurt_h']
+done lurker ['idle', 'walk', 'hurt_l', 'hurt_h']
+generations_remaining: 16995

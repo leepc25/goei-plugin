@@ -1,0 +1,9 @@
+base pending 0
+clip pending [('shooter', ['air', 'lie', 'getup', 'sit', 'standup', 'toss_tele', 'toss_hit', 'toss_rec']), ('thief', ['idle', 'walk', 'hurt_l', 'hurt_h']), ('crawler', 'walk'), ('crawler', 'idle'), ('crawler', 'nip')]
+failed shooter ['air', 'lie', 'getup', 'sit', 'standup', 'toss_tele', 'toss_hit', 'toss_rec']
+got thief ['idle', 'walk', 'hurt_l', 'hurt_h']
+got crawler walk
+got crawler idle
+got crawler nip
+left 0 0
+generations_remaining: 15687.30

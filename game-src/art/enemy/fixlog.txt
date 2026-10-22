@@ -1,0 +1,8 @@
+hollow/clips/air/00.png 떠 있는 조각 74px 지움
+hollow/clips/air/01.png 떠 있는 조각 18px 지움
+hollow/clips/getup/00.png 떠 있는 조각 3px 지움
+charger/clips/air/01.png 떠 있는 조각 77px 지움
+charger/clips/air/02.png 떠 있는 조각 45px 지움
+hollow/clips/getup/00.png 떠 있는 조각 121px 지움
+charger air 01 +8px x, walk 03 -3px y (발바닥 맞춤); edge shatter k 6→5
+crawler idle 떠 있는 흰 덩이 지움(keep .35); lurker turn 3장째 = 몸 전체 반전

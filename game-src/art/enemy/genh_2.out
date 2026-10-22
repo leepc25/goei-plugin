@@ -1,0 +1,18 @@
+sub shooter ['idle', 'walk', 'hurt_l', 'hurt_h']
+sub shooter ['air', 'lie', 'getup', 'sit', 'standup', 'toss_tele', 'toss_hit', 'toss_rec']
+sub shooter ['jab_tele', 'jab_hit', 'jab_rec']
+sub charger ['idle', 'walk', 'hurt_l', 'hurt_h']
+sub charger ['air', 'lie', 'getup', 'ram_tele', 'ram_hit', 'ram_rec', 'butt_tele']
+sub charger ['butt_hit', 'butt_rec', 'dizzy']
+done shooter ['idle', 'walk', 'hurt_l', 'hurt_h']
+FAIL shooter ['air', 'lie', 'getup', 'sit', 'standup', 'toss_tele', 'toss_hit', 'toss_rec'] status: failed
+id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+job_id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+error: Generation failed (Invalid request: 4 validation errors for AnimateWithSkeletonV3Request
+keypoints.1.14.x
+  Input should be greater than or equal to 0 [type=greater_than_equal, input_value=-0.
+done shooter ['jab_tele', 'jab_hit', 'jab_rec']
+done charger ['idle', 'walk', 'hurt_l', 'hurt_h']
+done charger ['air', 'lie', 'getup', 'ram_tele', 'ram_hit', 'ram_rec', 'butt_tele']
+done charger ['butt_hit', 'butt_rec', 'dizzy']
+generations_remaining: 16354.40

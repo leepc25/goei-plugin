@@ -1,0 +1,58 @@
+sub shooter 101 16df041f-680d-46f0-a3db-c8b86c48099b
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/hollow/101.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/hollow/102.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/hollow/103.png
+sub shooter 102 eae93717-4d36-4f90-9b95-ec8ead29f870
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/hollow/104.png
+sub shooter 103 df366c02-7d1e-4fe0-bb70-7a22ccfcb011
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/shooter/101.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/shooter/102.png
+sub shooter 104 966d8579-c5c2-4eb8-82e2-2a591f506a73
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/shooter/103.png
+sub charger 101 d1b78bc6-9802-41af-97b5-fe92fee6ac89
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/shooter/104.png
+sub charger 102 509a6f14-ee85-46e1-82c0-21351b7d100c
+sub charger 103 497be72e-599a-4947-831c-62d9abddabaf
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/charger/101.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/charger/102.png
+sub charger 104 3892d7bc-bacb-4a03-a5c4-f2b07ffed07e
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/charger/103.png
+sub thief 101 af4d7510-bffb-4ea1-acbe-bdc89132f6bb
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/charger/104.png
+sub thief 102 f2485d6b-4afa-4004-b72f-367d2fa18a2d
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/thief/101.png
+sub thief 103 eb92aab0-4f55-4794-a6eb-be2f9d7663f8
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/thief/102.png
+sub thief 104 784cd244-e026-4c6b-b0a8-7bf22713d499
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/thief/103.png
+sub crawler 101 3933230e-13b9-46fb-87aa-095f724aa0eb
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/thief/104.png
+sub crawler 102 c2057e0d-5356-4a37-9602-7908b988cad4
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/crawler/101.png
+sub crawler 103 29d9675e-f770-4a93-ad21-db7922f86413
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/crawler/102.png
+sub crawler 104 6a1e0d61-7add-48c2-b3f1-ce143e843488
+sub predator 101 error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/crawler/103.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/crawler/104.png
+sub predator 102 555b16e8-92e5-41cb-90de-fa89a36c88c6
+sub predator 103 f43fd0a1-76e9-436b-866a-c7b0432a3e00
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/predator/102.png
+sub predator 104 ad502245-a720-4ef7-916a-5624b452b4f0
+sub edge 101 da97b09b-466a-4921-a904-b73f48ff2978
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/predator/103.png
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/predator/104.png
+sub edge 102 40547ee4-837e-4aa1-ba25-b9690a9696fa
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/edge/101.png
+sub edge 103 error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+ok /home/user/goei-plugin/game-src/art/enemy/scripts/../cand/edge/102.png
+sub edge 104 error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+sub shade 101 e504cf4c-abe9-4beb-be04-efe7478dff43
+sub shade 102 9f114f37-e30e-4716-bc27-6fc0154e8ed1
+sub shade 103 1223f023-1217-4570-abe1-13133b4e8bec
