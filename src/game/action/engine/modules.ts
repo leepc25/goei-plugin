@@ -482,8 +482,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
+      if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
-      else if (hs.message && !npc.isOpen()) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄 (대화창이 열려 있으면 같은 말이 두 번 나오지 않게 숨김)
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);

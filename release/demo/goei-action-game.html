@@ -22030,7 +22030,7 @@ function tint2(kind) {
 }
 
 // src/game/action/npc/style.css
-var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#7d8a92;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.up{background:#e6c35a}\n.gnp-favor i.down{background:#c0453a}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;height:300px;padding:6px 74px}\n.gnp.coarse.typing .gnp-head{order:-2}\n.gnp.coarse.typing .gnp-say{order:-1}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:110px;width:110px;height:110px}\n";
+var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n";
 
 // src/core/cbs.ts
 var truthy = (v) => v === "1" || v.toLowerCase() === "true";
@@ -24269,7 +24269,7 @@ var CHIPS = {
   passenger: ["당신은 누구죠?", "어느 쪽 문이에요?", "도와줄 수 있어요?"],
   resident: ["안녕하세요", "여기 사세요?", "실례했습니다"]
 };
-var FACE_PX = 36;
+var FACE_PX = 44;
 var FACE_BG = [35, 45, 50];
 function pixelFace(src) {
   return new Promise((resolve) => {
@@ -24293,9 +24293,9 @@ function pixelFace(src) {
         g2.drawImage(img4, sx, sy, side, side, 0, 0, FACE_PX, FACE_PX);
         const d3 = g2.getImageData(0, 0, FACE_PX, FACE_PX);
         const a = d3.data;
-        const corner = [0, FACE_PX - 1, FACE_PX * (FACE_PX - 1), FACE_PX * FACE_PX - 1];
-        const ref = [0, 1, 2].map((k) => corner.reduce((t, i) => t + a[i * 4 + k], 0) / 4);
-        const light = (i) => a[i * 4 + 3] < 40 || Math.hypot(a[i * 4] - ref[0], a[i * 4 + 1] - ref[1], a[i * 4 + 2] - ref[2]) < 52;
+        const corner = [0, 1, FACE_PX - 2, FACE_PX - 1, FACE_PX, 2 * FACE_PX - 1];
+        const ref = [0, 1, 2].map((k) => corner.reduce((t, i) => t + a[i * 4 + k], 0) / corner.length);
+        const light = (i) => a[i * 4 + 3] < 40 || Math.hypot(a[i * 4] - ref[0], a[i * 4 + 1] - ref[1], a[i * 4 + 2] - ref[2]) < 60;
         const seen2 = new Uint8Array(FACE_PX * FACE_PX);
         const stack = [];
         for (let k = 0; k < FACE_PX; k++) stack.push(k, (FACE_PX - 1) * FACE_PX + k, k * FACE_PX, k * FACE_PX + FACE_PX - 1);
@@ -24311,7 +24311,7 @@ function pixelFace(src) {
           if (i >= FACE_PX) stack.push(i - FACE_PX);
           if (i < FACE_PX * (FACE_PX - 1)) stack.push(i + FACE_PX);
         }
-        for (let i = 0; i < a.length; i += 4) for (let k = 0; k < 3; k++) a[i + k] = Math.min(255, Math.round(a[i + k] / 24) * 24);
+        for (let i = 0; i < a.length; i += 4) for (let k = 0; k < 3; k++) a[i + k] = Math.min(255, Math.round(a[i + k] / 16) * 16);
         g2.putImageData(d3, 0, 0);
         resolve(c);
       } catch {
@@ -24364,9 +24364,10 @@ function createNpcTalk(layer, host, store2) {
     const ps = [...log.children];
     for (const q of ps) q.hidden = false;
     if (el.classList.contains("typing")) {
-      let last = -1;
-      ps.forEach((q, i) => !q.classList.contains("me") && !q.classList.contains("sys") && (last = i));
-      ps.forEach((q, i) => q.hidden = i < last || i > last && !q.classList.contains("sys"));
+      let from = -1;
+      ps.forEach((q, i) => q.classList.contains("me") && (from = i));
+      if (from < 0) from = Math.max(0, ps.length - 1);
+      ps.forEach((q, i) => q.hidden = i < from);
     }
     for (let i = 0; i < ps.length - 1 && log.scrollHeight > log.clientHeight + 1; i++) ps[i].hidden = true;
   };
@@ -24374,7 +24375,7 @@ function createNpcTalk(layer, host, store2) {
     if (!target) return;
     const f = rel().favor;
     let h = "";
-    for (let v = FAVOR_MIN2; v <= FAVOR_MAX2; v++) if (v) h += `<i class="${v > 0 && f >= v ? "up" : v < 0 && f <= v ? "down" : ""}"></i>`;
+    for (let v = FAVOR_MIN2; v <= FAVOR_MAX2; v++) h += v ? `<i class="${v > 0 && f >= v ? "up" : v < 0 && f <= v ? "down" : v < 0 ? "neg" : ""}"></i>` : "<b></b>";
     favorEl.innerHTML = h;
     favorEl.title = `호감 ${FAVOR_WORD(f)}`;
     stateEl.textContent = `호감 ${FAVOR_WORD(f)} ${f > 0 ? "+" : ""}${f}`;
@@ -25459,8 +25460,9 @@ function engineModules(box3, bridge) {
       ctx.restore();
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
+      if (npc.isOpen()) hs.message = void 0;
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
-      else if (hs.message && !npc.isOpen()) shell.hud.drawMessage(ctx, hs.message, hs.compact);
+      else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact);
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
