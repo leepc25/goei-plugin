@@ -9,6 +9,7 @@ import { loadVarDefaults, savePrefs, saveVarDefaults } from '../host/prefs';
 import { advSections } from './advanced';
 import { loreCheckBox } from './lorecheck';
 import { ASSET_NOTE } from '../core/asset';
+import { IMG_FOLD_DEFAULT, IMG_SIZE_DEFAULT, imgFold, imgSize, setImgHidden } from '../core/imgtag';
 import type { Chat, ScriptState } from '../core/types';
 import { parseCatalog, readWorld, startWorldVars, WORLD_KEY, worldOn, worldVars } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
@@ -173,6 +174,8 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     ].join(''))}
     ${group('캐릭터 이미지', [
       field('에셋 출력', seg('set-asset', s.assetOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '본문에 등장하는 캐릭터의 등록 이미지를 표시하도록 이미지 태그를 적어요. 이미지와 태그 목록은 에셋 모듈에 있어요.'),
+      s.assetOn ? field('이미지 크기', seg('set-img-size', getPrefs().imgSize ?? IMG_SIZE_DEFAULT, [['s', '작게'], ['m', '중간'], ['l', '기본'], ['xl', '크게']], busy), '채팅 속 캐릭터 이미지 칸의 최대 너비예요. 이 기기의 모든 채팅에 같이 적용돼요.') : '',
+      s.assetOn ? field('접는 정도', seg('set-img-fold', getPrefs().imgFold ?? IMG_FOLD_DEFAULT, [['more', '많이'], ['square', '기본'], ['less', '조금'], ['open', '안 접음']], busy), '이미지는 위쪽만 보이게 접혀 있다가 누르거나 마우스를 올리면 펼쳐져요. 「많이」는 가로로 납작하게, 「안 접음」은 처음부터 전체를 보여 줘요.') : '',
       s.assetOn ? field('출력 모델', seg('set-asset-model', s.assetModel, [['main', '메인모델'], ['aux', '보조모델']], busy), '메인모델은 본문과 함께 적고, 보조모델은 응답이 끝난 뒤 한 번 더 불러 태그를 보충해요.') : '',
       s.assetOn && s.assetModel === 'aux' ? field('캐릭터당 이미지 수', seg('set-asset-limit', String(s.assetLimit), [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']], busy), '보조모델이 한 응답에서 캐릭터 한 명에게 붙일 이미지 태그의 최대 개수') : '',
     ].join(''))}
@@ -293,6 +296,14 @@ export async function handleSettings(action: string, value: string | undefined, 
     repaintTheme();
     return true;
   }
+  if (action === 'set-img-size' || action === 'set-img-fold') {
+    const size = imgSize(v);
+    const fold = imgFold(v);
+    if (action === 'set-img-size' && size) await saveDefaults(env, (p) => ({ ...p, imgSize: size === IMG_SIZE_DEFAULT ? undefined : size }));
+    else if (action === 'set-img-fold' && fold) await saveDefaults(env, (p) => ({ ...p, imgFold: fold === IMG_FOLD_DEFAULT ? undefined : fold }));
+    repaintTheme();
+    return true;
+  }
   if (action === 'set-agents') {
     await saveDefaults(env, (p) => ({ ...p, agents: v === 'list' ? 'list' : undefined }));
     return true;
@@ -401,6 +412,8 @@ export async function handleSettings(action: string, value: string | undefined, 
       return true;
     case 'set-asset':
       await save(ctx, env, (chat) => withBasic(ctx, chat, { assetOn: v === '1' }));
+      // 끄면 채팅 속 그림 칸도 바로 숨긴다
+      if (setImgHidden(v !== '1')) repaintTheme();
       return true;
     case 'set-asset-model':
       if (v !== 'main' && v !== 'aux') return true;

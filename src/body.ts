@@ -31,7 +31,9 @@ import { updateCharacterLore, updateChat } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
-import { cardPalette as themedCardPalette, currentTheme, onThemeChange, setCurrentTheme, themeName } from './ui/theme';
+import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintTheme, setCurrentTheme, themeName } from './ui/theme';
+import { hasImgTag, renderImgTags, setImgHidden } from './core/imgtag';
+import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { openApp, openWiki } from './ui/app';
 import { GHOST_ICON } from './ui/icons';
@@ -366,6 +368,8 @@ function onDisplay(text: string): string {
     if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
     // 상태창은 카드 정규식 대신 플러그인이 그린다 (칸이 어긋나도 깨지지 않게, 설정의 배색으로)
     if (hasStatusTag(out)) out = renderStatus(out);
+    // 캐릭터 이미지 태그는 카드 정규식 대신 플러그인이 그림 칸으로 (Lite 채팅에서만. 아니면 카드 정규식이 그대로 처리)
+    if (liteNow && hasImgTag(out)) out = renderImgTags(out, modulePicker());
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();
   }
@@ -404,7 +408,12 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
   if (snap.chatIndex < 0) return;
   const chat = (await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex)) as { message?: unknown[]; scriptstate?: Record<string, unknown> } | null;
   if (!chat) return;
+  // 이 채팅의 에셋 출력이 꺼져 있으면 채팅 속 그림 칸을 숨긴다 (변수가 없으면 새 채팅 기본값)
+  const on = chat.scriptstate?.['$st_asset_on'];
+  const changed = setImgHidden(on === undefined || on === null || on === '' ? getPrefs().basic.assetOn === false : on === '0' || on === 0 || on === false);
+  const before = currentTheme();
   setCurrentTheme(themeName(chat.scriptstate?.['$st_fixed_theme'], chat.message?.length ? 'light' : themeName(getPrefs().theme)));
+  if (changed && currentTheme() === before) repaintTheme();
 }
 
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과
@@ -452,6 +461,8 @@ export interface BodyHandlers {
 /** 본체 시작: 설정을 읽고 플로팅 버튼·채팅 감시를 켠다. Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다 */
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
+  // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
+  void loadModuleAssets();
   setWikiOpener((title) => void openWiki(title));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;

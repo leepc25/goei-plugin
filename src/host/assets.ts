@@ -76,6 +76,12 @@ function modRow(name: string): Row | undefined {
   return modIndex.exact.get(name) ?? modIndex.lower.get(name.toLowerCase());
 }
 
+/** 채팅 속 이미지 태그용: 모듈 에셋에 그 이름이 있으면 실제 이름. 목록을 아직 못 읽었으면 pick 없음(태그를 그대로 믿는다) */
+export function modulePicker(): ((name: string) => string | null) | undefined {
+  if (!modRows.length) return undefined;
+  return (name) => modRow(name)?.[0] ?? null;
+}
+
 /** 카드 에셋 → 모듈 에셋 순으로 그 이름(대소문자 무시)의 줄 */
 function findRow(char: CharacterSnapshot, name: string): Row | undefined {
   const lower = name.toLowerCase();
