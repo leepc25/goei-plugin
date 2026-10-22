@@ -1,0 +1,121 @@
+{
+  "verified_at": "2026-10-22T19:52:31.752698+09:00",
+  "delivery_commit": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
+  "job_id": "21ec4c32-1bf3-4dba-a2c4-a8368d8af51f",
+  "receipt_path": "game-src/art/cutscene-production-round2/receipts/background-completed.json",
+  "receipt_sha256": "49e1ab130d14ebc400af8e83429c36e2ed9301be43ab4a2b432f4273f4989af5",
+  "charged_generations": 1,
+  "raw_sha256": "2320a2612324b6bb97f9f0baf1cddb5e4104631e9786a751f6433c0f0fe950b1",
+  "unique_frames": 17,
+  "duration_ms": 2400,
+  "outside_aperture_unchanged": true,
+  "exact_integer_2x": true,
+  "door_source_commit": "17ec31076d41863bae52e32f0491b8014af7119e",
+  "shared_layers": [
+    {
+      "file": "frame.png",
+      "sha256": "1b995bc5f230eba58d5ad0f8ab57ef7da09a868ff95834bdccb6cbe90864d4d7"
+    },
+    {
+      "file": "aperture.png",
+      "sha256": "f8be96b85bd8c4063350d56d02bd693b4f47d974290ede3204ac6d65195f9c70"
+    },
+    {
+      "file": "leaf-left.png",
+      "sha256": "8f5d6995aef1ab6b051e51f6f0d0031afa7863804e76c70af4e808b9a58cf6e7"
+    },
+    {
+      "file": "leaf-right.png",
+      "sha256": "6ade9f725f7932932fbf8407400c904729eebaa5ea2b3d02b857eda1507511ec"
+    }
+  ],
+  "frames": [
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0000.png",
+      "sha256": "b0dbcfe311aca473f1a39647ae714685798bd0460b1b678d62981a41cca18883",
+      "ms": 400
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0001.png",
+      "sha256": "434f74103ec146ee1462d346e2a4feeaa8bfb351defbaa262e3f1fd84ef40277",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0002.png",
+      "sha256": "98df9195d41064bbfc5c4cefda99a77fa39a34dcc8af4b0d1b88423c0a7290b7",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0003.png",
+      "sha256": "5076c3d4c05e687b2609c08b65bd1c75076af7fc6d66f26c131710bfcd186947",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0004.png",
+      "sha256": "a17379ca92a29450c1606f33e68161e16c6cb6fba0a0cfefb1aca70672b2efbd",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0005.png",
+      "sha256": "928ecbea5bd64c0736343436f51a71ab0b708717459b321e421de41d7a9b6246",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0006.png",
+      "sha256": "931d7f624fb827c017c13e56a88049a62805b2685daa8c69c6a6934c07ff00a1",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0007.png",
+      "sha256": "22bbd61e3582b1fe69ced2f3bd6c8b8fbc9eea7a6441fc970ef34479b4fe0943",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0008.png",
+      "sha256": "23717792c2cfb76b3af2bf85ce8d0c6a5c69cb06d9f8a2783968a50b5adca84d",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0009.png",
+      "sha256": "4f169243e3286651626a1ba22568f85b16f80a3221baa54a9ab9cac24aadf279",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0010.png",
+      "sha256": "b77150c8a5cf076c79dbfaa84aea52fe147fe22bb410e3d984b5e1622ebab4ca",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0011.png",
+      "sha256": "88f49036d860d8c80b0fbba182686fb3dbbc7335c80e6e0a7699f4ba309b2173",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0012.png",
+      "sha256": "5d48bbee487022b003893c3baacac3faa4671b7dfaafb898dc6e03ead34f70b2",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0013.png",
+      "sha256": "3a4b77f0bbd0c539865b214b7359006b3ea419b21d067ed148d4ce75d8a042f6",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0014.png",
+      "sha256": "ccdac12ab6c3e66dfa4fd66f717605c5572dfb9afb5ce811dc5aefc3c4e9727e",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0015.png",
+      "sha256": "4ac1ff53ea0820200b8ffac7214c987501c4f738e4b50f856972ddd895b296ed",
+      "ms": 100
+    },
+    {
+      "file": "game-src/art/cutscene-production-round2/frames/final/0016.png",
+      "sha256": "6850883c25f48e3ad05b36d58e761789d22f8f60e105139882bbce356fb1ea8e",
+      "ms": 500
+    }
+  ],
+  "review_html_unchanged_from_link_commit": true,
+  "verification_scope": "납품 커밋 영수증/PNG/시간표/레이어 해시 확인. 이 세션의 브라우저 재검수·사용자 시각 승인 아님."
+}
