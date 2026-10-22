@@ -120,6 +120,36 @@
         "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
       },
       "existing_results": "기존 문 담당 기록 생성 0건; gallery 회수 여부 확인 중"
+    },
+    {
+      "reservation_id": "hq-first-day-corridor-round2-01a1632e",
+      "owner_thread_id": "01a1632e-0093-7c30-9af7-39fedb2b4fac",
+      "owner_branch": "codex/pixellab-cutscene-round2",
+      "asset": "첫 출근 빈 본부 복도 문 열림 1컷의 배경 원본",
+      "background_images": 1,
+      "tool": null,
+      "reserved_generation_calls": 1,
+      "quoted_charge": null,
+      "quote_status": "담당자가 정확한 도구·비용 조사 중",
+      "state": "reserved_by_other_session_pending_quote",
+      "job_id": null,
+      "actual_charge": null,
+      "delivery_sha": null,
+      "do_not_generate_in_character_queue": true,
+      "character_generation_calls": 0,
+      "separate_door_generation_calls": 0,
+      "depends_on_reservation": "hq-glass-door-round2-01a1632c",
+      "door_plan": "본부 문 담당 최신 원본을 공유받아 합성; 별도 문 발주 없음",
+      "submission_policy": "1건씩 제출",
+      "received_at": "2026-10-22T19:37:09.130786+09:00",
+      "reported_account_snapshot": {
+        "source": "컷씬 환경 담당 세션 전달; 이 캐릭터 세션에서 독립 조회하지 않음",
+        "observed_at": null,
+        "authentication": "로컬 인증 정상이라고 전달받음",
+        "generations_remaining": "14160.30",
+        "active_jobs": 0,
+        "note": "전달 당시 조회 기록이며 현재 계정값이나 이 세션 인증 복구를 의미하지 않음"
+      }
     }
   ]
 }
