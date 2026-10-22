@@ -310,6 +310,7 @@ export class TouchPad {
     let best: Btn | null = null,
       bd = Infinity;
     for (const b of this.btns) {
+      if (this.root.closest('.exploration-map') && b.id !== 'map' && b.id !== 'menu') continue;
       if (b.hw) {
         // 네모 단추: 띠 안에서 붙어 있으므로 여유 없이 칸 그대로 (사이 틈은 가까운 쪽)
         const d = Math.max(Math.abs(x - b.cx!) / (b.hw + 3), Math.abs(y - b.cy!) / (b.hh! + 3));
@@ -354,6 +355,7 @@ export class TouchPad {
       this.hold(b, true);
       return;
     }
+    if (this.root.closest('.exploration-map')) return;
     const zr = this.zr;
     const zx = p.x - zr.x,
       zy = p.y - zr.y;

@@ -371,19 +371,19 @@ function treat(s2, agent) {
 }
 function appraise(s2) {
   if (!s2.appraisal.length) return ["감정할 회수물이 없어요."];
-  const lines2 = [];
+  const lines3 = [];
   let sum = 0;
   for (const b of s2.appraisal) {
     if (!b) continue;
     const r = b.research ?? 1;
     sum += r;
-    lines2.push(`${b.name} → 연구 자료 ${r}`);
+    lines3.push(`${b.name} → 연구 자료 ${r}`);
   }
   s2.currencies.research += sum;
   s2.appraisal = [];
   s2.flags.firstAppraisal = true;
-  lines2.push(`연구 자료 +${sum}`);
-  return lines2;
+  lines3.push(`연구 자료 +${sum}`);
+  return lines3;
 }
 function researchOpen(s2) {
   return RESEARCH.filter((r) => !s2.researchDone.includes(r.id) && (!r.requires || s2.researchDone.includes(r.requires)));
@@ -526,19 +526,19 @@ function settle(s2, l, raw, rand2) {
   const id = raw.runId ?? l.runId;
   if (s2.last?.runId === id && id) return s2.last.lines;
   if (s2.active && l.runId && s2.active.runId !== l.runId) return ["다른 출동의 결과라 정산하지 않았어요."];
-  const lines2 = [];
+  const lines3 = [];
   const r0 = normalizeResult(raw);
   const r = { ...r0, missionDone: judgeMission(l.goal, r0) };
   const m = MISSION_BY_ID[l.goal.id];
   const evac = r.how === "evac";
   const success = r.how === "return" && r.missionDone;
   const agent = AGENT_BY_ID[l.agent];
-  lines2.push(evac ? `후송: ${josa(agent.name, "이", "가")} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === "return" ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, "이", "가")} 출동을 포기하고 돌아왔다. 성공 보상은 없다.`);
+  lines3.push(evac ? `후송: ${josa(agent.name, "이", "가")} 의무실 침대에서 깨어났다.` : success ? `귀환: ${agent.name}, 임무 「${m.title}」 성공.` : r.how === "return" ? `귀환: 임무 「${m.title}」 미달성. 성공 보상은 없다.` : `철수: ${josa(agent.name, "이", "가")} 출동을 포기하고 돌아왔다. 성공 보상은 없다.`);
   const unsent = r.found.filter((f) => !r.sent.includes(f));
   const kept = evac ? [...r.sent, ...unsent.filter((_, i) => i % 2 === 0)] : r.found.slice();
   let added2 = 0;
   for (const id2 of kept) if (!s2.rulebook.includes(id2)) s2.rulebook.push(id2), added2++;
-  if (added2 || evac && unsent.length) lines2.push(`규칙서 +${added2}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ""}`);
+  if (added2 || evac && unsent.length) lines3.push(`규칙서 +${added2}줄${evac && unsent.length ? ` (미송신 ${unsent.length}줄 중 ${Math.ceil(unsent.length / 2)}줄만 남음)` : ""}`);
   const cashToBudget = Math.floor(r.cash * CASH_RATE[r.how]);
   let budget = cashToBudget + (evac ? Math.floor(r.budget / 2) : r.budget);
   let teeth = evac ? Math.floor(r.teeth / 2) : r.teeth;
@@ -558,8 +558,8 @@ function settle(s2, l, raw, rand2) {
     if (pay < r.debt && s2.relicsOwned.length) {
       const taken = s2.relicsOwned.pop();
       s2.relics = s2.relics.map((x) => x === taken ? null : x);
-      lines2.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 압류당했다.`);
-    } else lines2.push(`사채 ${r.debt} 상환`);
+      lines3.push(`사채를 다 못 갚아 유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 압류당했다.`);
+    } else lines3.push(`사채 ${r.debt} 상환`);
   }
   s2.currencies.budget = Math.max(0, s2.currencies.budget + budget);
   s2.currencies.teeth += teeth;
@@ -569,22 +569,22 @@ function settle(s2, l, raw, rand2) {
   if (teeth) got.push(`이빨 +${teeth}`);
   if (research) got.push(`연구 자료 +${research}`);
   if (evac && r.cash > 0) got.push(`현금 ${r.cash} 잃음`);
-  lines2.push(got.length ? got.join(" · ") : "얻은 재화 없음");
+  lines3.push(got.length ? got.join(" · ") : "얻은 재화 없음");
   const bag = r.bag.filter((b) => !!b);
   const keptBag = evac ? bag.filter((_, i) => i % 2 === 0) : bag;
   if (keptBag.length) {
     s2.appraisal.push(...keptBag);
     s2.flags.firstRecovery = true;
-    lines2.push(`회수물 ${keptBag.length}개 감정 대기${evac && bag.length > keptBag.length ? ` (${bag.length - keptBag.length}개 잃음)` : ""}`);
+    lines3.push(`회수물 ${keptBag.length}개 감정 대기${evac && bag.length > keptBag.length ? ` (${bag.length - keptBag.length}개 잃음)` : ""}`);
   }
   if (!evac) {
     s2.loadout = r.itemsLeft.slice(0, 4).map((x) => x && x.n > 0 ? { ...x } : null);
     while (s2.loadout.length < 4) s2.loadout.push(null);
   } else {
     const lost = r.itemsLeft.filter((x) => x && x.n > 0).length;
-    if (lost) lines2.push(`가져간 아이템을 잃었다 (${lost}칸)`);
+    if (lost) lines3.push(`가져간 아이템을 잃었다 (${lost}칸)`);
   }
-  for (const who of r.rescued) if (!s2.rescued.includes(who)) s2.rescued.push(who), s2.flags.firstRescue = true, lines2.push(`구조: ${SURVIVORS[who]?.name ?? who} → 면담실`);
+  for (const who of r.rescued) if (!s2.rescued.includes(who)) s2.rescued.push(who), s2.flags.firstRescue = true, lines3.push(`구조: ${SURVIVORS[who]?.name ?? who} → 면담실`);
   const rec = s2.agents[l.agent];
   const before = masteryLevel(rec.xp);
   const gain = MASTERY_GAIN(r);
@@ -592,11 +592,11 @@ function settle(s2, l, raw, rand2) {
   rec.runs++;
   rec.deepest = Math.max(rec.deepest, r.depth);
   const after = masteryLevel(rec.xp);
-  lines2.push(`${agent.name} 숙련 경험 +${gain}${after > before ? ` → 숙련 ${after}단계!` : ""}`);
+  lines3.push(`${agent.name} 숙련 경험 +${gain}${after > before ? ` → 숙련 ${after}단계!` : ""}`);
   for (let lv = before + 1; lv <= after; lv++) {
     const u = MASTERY_UNLOCKS[lv];
     if (!u) continue;
-    lines2.push(`  숙련 ${lv}: ${u.label}${u.move ? ` · ${lv === 3 ? agent.moveA : agent.moveB}` : ""}`);
+    lines3.push(`  숙련 ${lv}: ${u.label}${u.move ? ` · ${lv === 3 ? agent.moveA : agent.moveB}` : ""}`);
     if (u.id === "relic_own") s2.relicsOwned.push(`own_${l.agent}`);
   }
   for (const a of AGENTS) {
@@ -609,21 +609,21 @@ function settle(s2, l, raw, rand2) {
   }
   if (evac && rand2() < 0.15 + 0.05 * l.danger) {
     rec.injured = 1;
-    lines2.push(`${agent.name} 부상: 다음 출동 1회 쉬어야 한다 (의무실에서 예산 ${TREAT_COST}로 바로 치료 가능)`);
+    lines3.push(`${agent.name} 부상: 다음 출동 1회 쉬어야 한다 (의무실에서 예산 ${TREAT_COST}로 바로 치료 가능)`);
   }
   if (evac && l.danger >= 2 && l.relics.length && rand2() < 0.1) {
     const taken = l.relics[Math.floor(rand2() * l.relics.length)];
     s2.relicsOwned = s2.relicsOwned.filter((x) => x !== taken);
     s2.relics = s2.relics.map((x) => x === taken ? null : x);
     s2.lostRelics.push(taken);
-    lines2.push(`유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
+    lines3.push(`유물 「${RELICS[taken].name}」${josa(RELICS[taken].name, "을", "를").slice(RELICS[taken].name.length)} 괴이에 빼앗겼다. 이빨 요정 상자에서 다시 나올 수도 있다.`);
   }
   s2.runs++;
   for (const [id2, until] of Object.entries(s2.deadlines)) {
     if (s2.missionsDone.includes(id2) || s2.failedRescues.includes(id2)) continue;
     if (s2.runs >= until && !(success && id2 === m.id)) {
       s2.failedRescues.push(id2);
-      lines2.push(`구조 요청 「${MISSION_BY_ID[id2].title}」 마감을 넘겼다. 다음에 만나면 더는 사람이 아닐 것이다.`);
+      lines3.push(`구조 요청 「${MISSION_BY_ID[id2].title}」 마감을 넘겼다. 다음에 만나면 더는 사람이 아닐 것이다.`);
     }
   }
   s2.deepest = Math.max(s2.deepest, r.depth);
@@ -636,8 +636,8 @@ function settle(s2, l, raw, rand2) {
   s2.mission = null;
   const { notes: _notes, ...lastResult } = r;
   void _notes;
-  s2.last = { runId: id ?? "", mission: m.id, agent: l.agent, how: r.how, lines: lines2, result: { ...lastResult, runId: id }, day: s2.day - 1 };
-  return lines2;
+  s2.last = { runId: id ?? "", mission: m.id, agent: l.agent, how: r.how, lines: lines3, result: { ...lastResult, runId: id }, day: s2.day - 1 };
+  return lines3;
 }
 function reportText(s2) {
   const l = s2.last;
@@ -2110,6 +2110,8 @@ var ui_default = `.gs { position: relative; width: 100%; height: 100%; overflow:
 .gs-ui { position: absolute; inset: 0; pointer-events: none; }
 .gs-ui.menu-on { pointer-events: auto; }
 .gs-touch { position: absolute; inset: 0; pointer-events: none; }
+.gs.exploration-map .tp-b:not([data-id="map"]):not([data-id="menu"]),
+.gs.exploration-map .tp-zone { visibility: hidden; }
 
 /* 세로 화면 안내 */
 .gs-rotate { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(2,4,7,0.94); z-index: 20; text-align: center; padding: 24px; }
@@ -2360,6 +2362,19 @@ function mountStage(box3) {
   return s2;
 }
 
+// src/game/action/ui/mapLayout.ts
+function mapViewport(canvas, requestedScale = 1, width = canvas.width, height = canvas.height) {
+  const rect2 = canvas.getBoundingClientRect();
+  const turned = canvas.closest(".gs")?.classList.contains("turned");
+  const displayWidth = turned ? rect2.height : rect2.width;
+  const scale = Math.max(1, Math.min(2.4, displayWidth > 0 ? width / displayWidth : requestedScale));
+  const touch2 = !!canvas.closest(".gs")?.querySelector(".tp:not(.hide)") || typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+  return { width, height, scale, touch: !!touch2, margin: touch2 ? 108 : 32 };
+}
+function setExplorationMap(canvas, open) {
+  canvas.closest(".gs")?.classList.toggle("exploration-map", open);
+}
+
 // src/game/action/ui/hud.ts
 var W2 = W;
 var H2 = H;
@@ -2438,8 +2453,8 @@ var Hud = class {
   /** 마지막으로 그린 상태 (일시정지 메뉴가 재화·총애·규칙을 보여 줄 때 쓴다) */
   last = null;
   lastItems = [];
-  toast(text, color = C.text) {
-    this.toasts.push({ text, color, t: 0 });
+  toast(text2, color = C.text) {
+    this.toasts.push({ text: text2, color, t: 0 });
     if (this.toasts.length > 5) this.toasts.shift();
   }
   reset() {
@@ -2450,6 +2465,7 @@ var Hud = class {
     this.lastItems = [];
   }
   draw(c, s2, dt) {
+    setExplorationMap(c.canvas, false);
     this.t += dt;
     this.track(s2, dt);
     c.save();
@@ -2667,7 +2683,7 @@ var Hud = class {
     }
   }
   boss(c, b, compact) {
-    const w = 640, x = W2 / 2 - w / 2, y = compact ? 84 : H2 - 128;
+    const w = 640, x = W2 / 2 - w / 2, y = H2 - 128;
     label(c, b.name, x, y - 6, 16, "#f0c0b0");
     c.fillStyle = "rgba(0,0,0,0.7)";
     c.fillRect(x, y, w, 14);
@@ -2684,14 +2700,14 @@ var Hud = class {
     label(c, `${s2.timer.label} ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`, W2 / 2, 40, 26, t < 10 ? C.hpLow : "#bfe0f0", "center", 900);
   }
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
-  drawMessage(c, text, compact) {
-    this.message(c, text, compact);
+  drawMessage(c, text2, compact) {
+    this.message(c, text2, compact);
   }
-  message(c, text, compact) {
+  message(c, text2, compact) {
     c.font = font(17, 600);
-    let t = text;
+    let t = text2;
     while (c.measureText(t).width > 900 && t.length > 4) t = t.slice(0, -2);
-    if (t !== text) t += "…";
+    if (t !== text2) t += "…";
     const w = c.measureText(t).width + 40;
     const y = H2 - 44;
     plate(c, W2 / 2 - w / 2, y, w, 36, 18);
@@ -2816,14 +2832,14 @@ function art(name) {
   return im && im.complete && im.naturalWidth ? im : null;
 }
 var textCache = /* @__PURE__ */ new Map();
-function pixelText(text, size2, top, bottom, weight = 900, pixel = false) {
+function pixelText(text2, size2, top, bottom, weight = 900, pixel = false) {
   const ready = pixel && typeof document !== "undefined" && document.fonts?.check(`11px "${PIXEL_FONT}"`);
-  const key2 = `${text}|${size2}|${top}|${bottom}|${weight}|${pixel}|${ready}`;
+  const key2 = `${text2}|${size2}|${top}|${bottom}|${weight}|${pixel}|${ready}`;
   const hit2 = textCache.get(key2);
   if (hit2) return hit2;
   const m = document.createElement("canvas").getContext("2d");
   m.font = pixel ? `${size2}px "${PIXEL_FONT}", ${FONT}` : `${weight} ${size2}px ${FONT}`;
-  const w = Math.ceil(m.measureText(text).width) + 6, h = Math.ceil(size2 * 1.3) + 6;
+  const w = Math.ceil(m.measureText(text2).width) + 6, h = Math.ceil(size2 * 1.3) + 6;
   const mask = document.createElement("canvas");
   mask.width = w;
   mask.height = h;
@@ -2831,7 +2847,7 @@ function pixelText(text, size2, top, bottom, weight = 900, pixel = false) {
   g2.font = m.font;
   g2.textBaseline = pixel ? "top" : "middle";
   g2.fillStyle = "#fff";
-  g2.fillText(text, 3, pixel ? 3 : h / 2 + 1);
+  g2.fillText(text2, 3, pixel ? 3 : h / 2 + 1);
   const d3 = g2.getImageData(0, 0, w, h);
   for (let i = 3; i < d3.data.length; i += 4) d3.data[i] = d3.data[i] > 110 ? 255 : 0;
   g2.putImageData(d3, 0, 0);
@@ -3371,8 +3387,8 @@ function drawItemArt(ctx, id, x, y, size2) {
   const a = art2(id);
   const im = a && img3(a);
   if (!a || !im) return false;
-  const fit2 = Math.min(size2 / a.w, size2 / a.h);
-  const k = fit2 >= 1 ? Math.floor(fit2) : fit2;
+  const fit3 = Math.min(size2 / a.w, size2 / a.h);
+  const k = fit3 >= 1 ? Math.floor(fit3) : fit3;
   const w = a.w * k, h = a.h * k;
   const prev = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
@@ -5263,9 +5279,9 @@ function makeRenderer(ctx, art3, opt) {
     }
   }
   let ghostK = 1;
-  function sprite(clip, frame, origin, x, y, dir, alpha = 1) {
+  function sprite(clip, frame2, origin, x, y, dir, alpha = 1) {
     const list = art3.clips[clip];
-    const fi = list?.[Math.min(frame, list.length - 1)];
+    const fi = list?.[Math.min(frame2, list.length - 1)];
     if (!fi || !art3.atlas) return false;
     ctx.save();
     ctx.globalAlpha = alpha * ghostK;
@@ -6713,9 +6729,9 @@ var World = class {
     this.add(new Bullet(o.x, o.y, o.z, o.dir));
     this.fx("flash", o.x, o.y, o.z);
   }
-  fx(kind, x, y, z, text) {
+  fx(kind, x, y, z, text2) {
     const life = { spark: 10, "spark-big": 14, dust: 12, flash: 3, boom: 16, ring: 9, text: 30 }[kind];
-    this.fxs.push({ kind, x, y, z, t: 0, life, text, seed: Math.floor(this.rand() * 1e6) });
+    this.fxs.push({ kind, x, y, z, t: 0, life, text: text2, seed: Math.floor(this.rand() * 1e6) });
     if (this.fxs.length > 80) this.fxs.shift();
   }
   shake(ticks, power = 2) {
@@ -6724,8 +6740,8 @@ var World = class {
   }
   /** 자막이 뜬 틱 */
   subtitleAt = 0;
-  say(text, seconds = 2) {
-    this.subtitle = { text, t: Math.round(seconds * 30) };
+  say(text2, seconds = 2) {
+    this.subtitle = { text: text2, t: Math.round(seconds * 30) };
     this.subtitleAt = this.tick;
   }
   /** 생성 자리 고치기 (바닥 물건 위에 생겨나지 않게, itemsLink가 단다) */
@@ -7091,9 +7107,9 @@ var Game = class {
       this.booted = true;
       queueMicrotask(() => this.mods.boot?.(this));
     }
-    const frame = (now) => {
+    const frame2 = (now) => {
       if (this.dead) return;
-      this.raf = requestAnimationFrame(frame);
+      this.raf = requestAnimationFrame(frame2);
       if (!this.last) this.last = now;
       let dt = (now - this.last) / 1e3;
       this.last = now;
@@ -7113,7 +7129,7 @@ var Game = class {
       this.scene.draw(paused ? 1 : this.acc / T3);
       this.mods.overlay?.(this.ctx, this.world, dt);
     };
-    this.raf = requestAnimationFrame(frame);
+    this.raf = requestAnimationFrame(frame2);
   }
   /** 시험용: 틱을 n번 바로 돌린다 */
   advance(n) {
@@ -7427,8 +7443,8 @@ var Game = class {
         c.fillText(how, SCREEN_W / 2, 200);
         c.fillStyle = "#e8eef0";
         c.font = pfont(30).f;
-        const lines2 = [`처치 ${r.kills}`, `최대 콤보 ${r.maxCombo}`, `층 ${r.floors}`, `시간 ${r.timeSec}초`, `남은 체력 ${r.hpLeft}`];
-        lines2.forEach((l, i) => c.fillText(l, SCREEN_W / 2, 290 + i * 48));
+        const lines3 = [`처치 ${r.kills}`, `최대 콤보 ${r.maxCombo}`, `층 ${r.floors}`, `시간 ${r.timeSec}초`, `남은 체력 ${r.hpLeft}`];
+        lines3.forEach((l, i) => c.fillText(l, SCREEN_W / 2, 290 + i * 48));
         c.fillStyle = "#8e9aa1";
         c.font = pfont(22).f;
         c.fillText("A 또는 화면을 누르면 처음으로", SCREEN_W / 2, 600);
@@ -9926,11 +9942,11 @@ var Fx = class {
   ring(x, y, r0, r1, color, width, life) {
     this.rings.push({ x, y, r0, r1, color, width, life, t: 0 });
   }
-  pop(x, y, text, color, big) {
+  pop(x, y, text2, color, big) {
     let n = 0;
     for (const p of this.pops) if (p.t < 0.6 && Math.abs(p.x - x) < 70 && Math.abs(p.y - y) < 90) n++;
     const side = n % 2 ? 1 : -1;
-    this.pops.push({ x: x + (n ? side * (28 + 14 * n) : (Math.random() - 0.5) * 16), y: y - n * 34, text, color, t: 0, big });
+    this.pops.push({ x: x + (n ? side * (28 + 14 * n) : (Math.random() - 0.5) * 16), y: y - n * 34, text: text2, color, t: 0, big });
   }
   /** 흔들림 오프셋: 카메라에 더한다 */
   camera() {
@@ -10029,9 +10045,9 @@ var Fx = class {
   drawTitle(c, t) {
     const inK = Math.min(1, t.t / 0.3), outK = t.t > 1.5 ? (t.t - 1.5) / 0.4 : 0;
     c.globalAlpha = Math.max(0, inK * (1 - outK));
-    const text = t.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, "") || t.depth;
+    const text2 = t.name.replace(/^\s*(L\d+|B-?\d+)\s*·\s*/, "") || t.depth;
     c.font = pfont2(22).f;
-    const pw = Math.round(c.measureText(text).width + 40) + 3 & ~3, ph = t.variant ? 64 : 44, px = Math.round(W3 - 16 - pw) >> 2 << 2, py = 62;
+    const pw = Math.round(c.measureText(text2).width + 40) + 3 & ~3, ph = t.variant ? 64 : 44, px = Math.round(W3 - 16 - pw) >> 2 << 2, py = 62;
     c.fillStyle = "#0c0f12";
     c.fillRect(px - 4, py - 4, pw + 8, ph + 8);
     c.fillStyle = "#b8873a";
@@ -10041,7 +10057,7 @@ var Fx = class {
     c.textAlign = "center";
     c.textBaseline = "middle";
     c.fillStyle = "#ece2c8";
-    c.fillText(text, px + pw / 2, py + 22);
+    c.fillText(text2, px + pw / 2, py + 22);
     if (t.variant) c.font = pfont2(11).f, c.fillStyle = "#f0b45a", c.fillText(`변형 · ${t.variant}`, px + pw / 2, py + 48);
     c.textBaseline = "alphabetic";
     c.textAlign = "left";
@@ -10807,18 +10823,18 @@ var localStore = {
       return null;
     }
   },
-  save(text) {
+  save(text2) {
     try {
-      localStorage.setItem(KEY, text);
+      localStorage.setItem(KEY, text2);
     } catch {
     }
   }
 };
-function parseSettings(text) {
+function parseSettings(text2) {
   const s2 = { ...DEFAULT_SETTINGS2 };
-  if (!text) return s2;
+  if (!text2) return s2;
   try {
-    const o = JSON.parse(text);
+    const o = JSON.parse(text2);
     for (const k of Object.keys(s2)) {
       const v = o[k];
       if (v !== void 0 && typeof v === typeof s2[k]) s2[k] = v;
@@ -11095,6 +11111,7 @@ var TouchPad = class {
   hit(x, y) {
     let best = null, bd = Infinity;
     for (const b of this.btns) {
+      if (this.root.closest(".exploration-map") && b.id !== "map" && b.id !== "menu") continue;
       if (b.hw) {
         const d4 = Math.max(Math.abs(x - b.cx) / (b.hw + 3), Math.abs(y - b.cy) / (b.hh + 3));
         if (d4 < 1 && d4 < bd) best = b, bd = d4;
@@ -11137,6 +11154,7 @@ var TouchPad = class {
       this.hold(b, true);
       return;
     }
+    if (this.root.closest(".exploration-map")) return;
     const zr = this.zr;
     const zx = p.x - zr.x, zy = p.y - zr.y;
     if (this.stickPid === null && zx >= 0 && zy >= 0 && zx <= zr.w && zy <= zr.h) {
@@ -11429,28 +11447,28 @@ function mountGameShell(box3, o = {}) {
         );
       });
     },
-    confirm(text, yes = "예", no = "아니오") {
+    confirm(text2, yes = "예", no = "아니오") {
       return new Promise((res) => {
         menu.open({
           id: "confirm",
           title: "확인",
           back: () => (menu.pop(), res(false)),
           items: [
-            { type: "html", html: `<p>${esc(text)}</p>` },
+            { type: "html", html: `<p>${esc(text2)}</p>` },
             { type: "button", label: yes, act: () => (menu.pop(), res(true)) },
             { type: "button", label: no, act: () => (menu.pop(), res(false)) }
           ]
         });
       });
     },
-    info(title2, lines2, button = "확인") {
+    info(title2, lines3, button = "확인") {
       return new Promise((res) => {
         menu.open({
           id: "info",
           title: title2,
           look: "wide",
           back: () => (menu.pop(), res()),
-          items: [{ type: "html", html: lines2.map((l) => `<p>${esc(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
+          items: [{ type: "html", html: lines3.map((l) => `<p>${esc(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
         });
       });
     },
@@ -11511,11 +11529,11 @@ function newSave() {
     records: { bestFloors: 0, bestKills: 0, fastestReturn: 0 }
   };
 }
-function parseSave(text) {
-  if (!text) return null;
+function parseSave(text2) {
+  if (!text2) return null;
   let d3;
   try {
-    d3 = JSON.parse(text);
+    d3 = JSON.parse(text2);
   } catch {
     return null;
   }
@@ -11653,14 +11671,14 @@ function createHq() {
     if (bark && bark.t > 0) {
       bark.t -= dt;
       c.font = "15px sans-serif";
-      const text = `${bark.who}: ${bark.text}`;
-      const w = Math.min(560, c.measureText(text).width + 24);
+      const text2 = `${bark.who}: ${bark.text}`;
+      const w = Math.min(560, c.measureText(text2).width + 24);
       const bx = Math.max(cam + 8, Math.min(cam + VW - w - 8, bark.x - w / 2));
       c.fillStyle = "#f2ecd8";
       c.fillRect(bx, 110, w, 34);
       c.fillStyle = "#1a1a1a";
       c.textAlign = "left";
-      c.fillText(text.length > 44 ? text.slice(0, 43) + "…" : text, bx + 12, 133);
+      c.fillText(text2.length > 44 ? text2.slice(0, 43) + "…" : text2, bx + 12, 133);
     }
     c.restore();
   };
@@ -11773,9 +11791,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
   }).join("") : ""}
 <div class="hq-row"><button data-act="reset">처음부터 (본부 기록 지우기)</button></div></div></div>${walk ? "" : `<h3>장소로 가기</h3><div class="hq-row">${PLACES.filter((p) => placeOpen(s2, p.id)).map((p) => `<button data-go="${p.id}">${esc2(p.name)}</button>`).join("")}</div>`}<div class="hq-row"><button class="primary" data-act="close">닫기 (Esc)</button></div>`;
   const bar2 = () => `<div class="hq-bar"><b>본부 · ${s2.day}일차</b><span>예산 ${s2.currencies.budget}</span><span>연구 자료 ${s2.currencies.research}</span><span>이빨 ${s2.currencies.teeth}</span><span>규칙서 ${s2.rulebook.length}줄</span><button data-act="close" class="hq-x" aria-label="닫기">닫기 (Esc)</button></div>`;
-  const talkBox = (who, text, choices, extra = "") => {
+  const talkBox = (who, text2, choices, extra = "") => {
     const ph = photoOf(who);
-    return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc2(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc2(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc2(who)}</b><p class="hq-line gk-font">${esc2(text)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
+    return `<div class="hq-talk gk-panel fresh" role="dialog" aria-label="${esc2(who)}"><div class="hq-face gk-face">${ph ? `<img src="${ph}" alt="">` : `<i>${esc2(who.slice(0, 1))}</i>`}</div><div class="hq-talk-body"><b class="hq-who gk-font">${esc2(who)}</b><p class="hq-line gk-font">${esc2(text2)}</p>${extra}<div class="hq-choices">${choices}</div></div><button data-act="close" class="hq-x" aria-label="닫기">✕</button></div>`;
   };
   const pitch = (c) => {
     const d3 = c.def;
@@ -11798,9 +11816,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     if (!selMission || !cards.some((c) => c.def.id === selMission)) selMission = cards[0]?.def.id ?? null;
     const say2 = lines("npc:jaemtri", ctx())[0];
     const sel = cards.find((c) => c.def.id === selMission);
-    const text = sel ? `${pitch(sel)} 끝나면 예산 ${sel.def.reward.budget} 나와요.` : say2?.text ?? "오늘은 들어온 건이 없어요.";
+    const text2 = sel ? `${pitch(sel)} 끝나면 예산 ${sel.def.reward.budget} 나와요.` : say2?.text ?? "오늘은 들어온 건이 없어요.";
     const opts = cards.slice(0, 3).map((c) => `<button class="gk-btn hq-choice${selMission === c.def.id ? " on" : ""}" data-mission="${c.def.id}">${esc2(c.def.kind)} · ${esc2(c.def.short)}</button>`).join("");
-    return talkBox("잼트리", text, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? "" : "disabled"}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
+    return talkBox("잼트리", text2, `${opts}<div class="hq-choice-row"><button class="gk-btn hq-choice primary" data-act="brief" ${selMission ? "" : "disabled"}>이걸로 할게요</button><button class="gk-btn hq-choice" data-act="close">나중에</button></div>`);
   };
   const briefTalk = () => {
     const m = MISSION_BY_ID[selMission];
@@ -11903,8 +11921,8 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       return;
     }
     if (d3.loadslot) {
-      void host.saves?.read(Number(d3.loadslot)).then((txt2) => {
-        const got = parseSave(txt2);
+      void host.saves?.read(Number(d3.loadslot)).then((txt) => {
+        const got = parseSave(txt);
         if (!got) return say("불러오지 못했어요 (모양이 다른 저장).");
         s2 = got;
         overlay = null;
@@ -13125,8 +13143,8 @@ var Enemy = class {
   set(s2) {
     if (this.state !== s2) this.state = s2, this.st = 0;
   }
-  say(text, ticks = 60) {
-    this.bubble = text;
+  say(text2, ticks = 60) {
+    this.bubble = text2;
     this.bubbleT = ticks;
   }
   face(x) {
@@ -13543,21 +13561,21 @@ function drawEnemy(e, ctx) {
   if (e.bubble) drawBubble(ctx, e.bubble, e.x, e.y - e.z - e.def.h - 30);
   ctx.restore();
 }
-function drawBubble(ctx, text, x, bottom) {
+function drawBubble(ctx, text2, x, bottom) {
   const P = 3;
   ctx.save();
   ctx.font = `700 22px '${PIXEL_FONT}', 'Galmuri11', monospace`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const tw = Math.ceil(ctx.measureText(text).width / P) * P;
+  const tw = Math.ceil(ctx.measureText(text2).width / P) * P;
   const w = tw + 15 * P;
   const h = 14 * P;
   const x0 = Math.round((x - w / 2) / P) * P;
   const y0 = Math.round((bottom - h - 4 * P) / P) * P;
-  const frame = kitPiece("slot");
+  const frame2 = kitPiece("slot");
   ctx.fillStyle = "#16130f";
   ctx.fillRect(x0 + P, y0 + P, w - 2 * P, h - 2 * P);
-  if (frame?.complete && frame.naturalWidth) nine(ctx, frame, kitSlice("slot"), x0, y0, w, h, 1);
+  if (frame2?.complete && frame2.naturalWidth) nine(ctx, frame2, kitSlice("slot"), x0, y0, w, h, 1);
   else {
     ctx.strokeStyle = "#8a7a58";
     ctx.lineWidth = P;
@@ -13569,9 +13587,9 @@ function drawBubble(ctx, text, x, bottom) {
   ctx.fillStyle = "#16130f";
   for (let i = 0; i < 3; i++) ctx.fillRect(tx - (2 - i) * P, y0 + h + i * P - P, (2 - i) * 2 * P + P, P);
   ctx.fillStyle = "#000";
-  ctx.fillText(text, x + 2, y0 + h / 2 + 2);
+  ctx.fillText(text2, x + 2, y0 + h / 2 + 2);
   ctx.fillStyle = "#ece6d4";
-  ctx.fillText(text, x, y0 + h / 2);
+  ctx.fillText(text2, x, y0 + h / 2);
   ctx.restore();
 }
 function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
@@ -17056,11 +17074,11 @@ function makeWorld(ctx) {
 function buildWorld(ctx, r, noLocks = false) {
   const { depth, type } = ctx;
   const [cols, rows] = worldSize(depth, type);
-  const rooms = [];
+  const rooms2 = [];
   for (let row2 = 0; row2 < rows; row2++)
     for (let col = 0; col < cols; col++)
-      rooms.push({ col, row: row2, open: { l: false, r: false, u: false, d: false }, wrap: {}, lock: {}, hidden: {}, role: "branch", dist: 0, region: 0, onPath: false, key: null, panel: false, guardian: false, passenger: false, need: [], chunks: 2, name: "" });
-  const at2 = (c2, rw) => rooms[rw * cols + c2];
+      rooms2.push({ col, row: row2, open: { l: false, r: false, u: false, d: false }, wrap: {}, lock: {}, hidden: {}, role: "branch", dist: 0, region: 0, onPath: false, key: null, panel: false, guardian: false, passenger: false, need: [], chunks: 2, name: "" });
+  const at2 = (c2, rw) => rooms2[rw * cols + c2];
   const link = (a, d3) => {
     const [dx, dy] = STEP2[d3];
     const b = at2(a.col + dx, a.row + dy);
@@ -17109,7 +17127,7 @@ function buildWorld(ctx, r, noLocks = false) {
   });
   const inTree = new Set(path.map((p) => key(p.col, p.row)));
   const grow = [...path];
-  while (inTree.size < rooms.length) {
+  while (inTree.size < rooms2.length) {
     const from = r() < 0.3 ? grow[grow.length - 1] : grow[Math.floor(r() * grow.length)];
     const ds = shuffle2(r, [...DIRS]).filter((d3) => {
       const [dx, dy] = STEP2[d3];
@@ -17139,11 +17157,11 @@ function buildWorld(ctx, r, noLocks = false) {
       q.push(b);
     }
   }
-  for (const rm of rooms) rm.dist = dist.get(key(rm.col, rm.row)) ?? 0;
+  for (const rm of rooms2) rm.dist = dist.get(key(rm.col, rm.row)) ?? 0;
   const deg = (rm) => DIRS.filter((d3) => rm.open[d3]).length;
-  const leaves = () => rooms.filter((rm) => deg(rm) === 1 && rm !== arrival && rm !== exit && !rm.onPath);
+  const leaves = () => rooms2.filter((rm) => deg(rm) === 1 && rm !== arrival && rm !== exit && !rm.onPath);
   for (let k = 1; k <= lockAt.length; k++) {
-    const cand = (regs) => rooms.filter((rm) => regs.includes(rm.region) && rm.key === null && rm !== arrival && rm !== exit);
+    const cand = (regs) => rooms2.filter((rm) => regs.includes(rm.region) && rm.key === null && rm !== arrival && rm !== exit);
     let pool = cand([k - 1]).filter((rm) => deg(rm) === 1 && !rm.onPath);
     if (!pool.length) pool = cand([k - 1]).filter((rm) => !rm.onPath);
     if (!pool.length) pool = cand(Array.from({ length: k }, (_, i) => i)).filter((rm) => !rm.onPath);
@@ -17154,9 +17172,9 @@ function buildWorld(ctx, r, noLocks = false) {
     at0.key = k;
     at0.role = "key";
   }
-  const loops = Math.round(rooms.length / 8);
+  const loops = Math.round(rooms2.length / 8);
   for (let n = 0, tries = 0; n < loops && tries < 200; tries++) {
-    const a = rooms[Math.floor(r() * rooms.length)];
+    const a = rooms2[Math.floor(r() * rooms2.length)];
     const d3 = pick3(r, DIRS);
     const [dx, dy] = STEP2[d3];
     const nc = a.col + dx, nr = a.row + dy;
@@ -17197,7 +17215,7 @@ function buildWorld(ctx, r, noLocks = false) {
   }
   for (const rm of path.slice(1, -1)) rm.role = rm.key !== null ? "key" : pick3(r, ["fight", "fight", "trap", "path"]);
   if (depth >= 4) {
-    const extra = rooms.filter((rm) => rm.region === lockAt.length && rm.role === "branch" && deg(rm) === 1);
+    const extra = rooms2.filter((rm) => rm.region === lockAt.length && rm.role === "branch" && deg(rm) === 1);
     if (extra.length && r() < 0.5) extra[Math.floor(r() * extra.length)].panel = true;
   }
   const need = [];
@@ -17213,17 +17231,17 @@ function buildWorld(ctx, r, noLocks = false) {
     if (rm !== arrival) rm.role = "device";
   });
   if (depth >= 2 && type !== "deep" && r() < 0.5) {
-    const c2 = rooms.filter((rm) => rm !== arrival && rm.role !== "secret");
+    const c2 = rooms2.filter((rm) => rm !== arrival && rm.role !== "secret");
     c2[Math.floor(r() * c2.length)].passenger = true;
   }
-  for (const rm of rooms) {
+  for (const rm of rooms2) {
     rm.chunks = rm.role === "arrival" ? type === "trial" ? 3 : 2 : rm.role === "exit" ? 1 + Math.floor(r() * 2) : rm.role === "reward" || rm.role === "secret" || rm.role === "key" ? 2 : rm.role === "fight" ? 3 : rm.role === "device" ? Math.max(2, rm.need.length + 1) : 2 + Math.floor(r() * 2);
     if (rm.open.u && rm.open.d) rm.chunks = Math.max(rm.chunks, 3);
     if (type === "lobby" && depth === 1) rm.chunks = Math.min(rm.chunks, 3);
   }
   const names = ROOM_NAMES[type === "replica" ? `replica:${ctx.sub ?? "pretending"}` : type] ?? ROOM_NAMES.lobby;
   const nameR = shuffle2(r, [...names]);
-  rooms.forEach((rm, i) => {
+  rooms2.forEach((rm, i) => {
     rm.name = rm.role === "arrival" ? "엘리베이터 홀" : rm.role === "exit" ? "승강기 홀" : rm.role === "secret" ? "숨은 방" : nameR[i % nameR.length];
   });
   const def = FLOOR_TYPES[type];
@@ -17234,7 +17252,7 @@ function buildWorld(ctx, r, noLocks = false) {
     seed: ctx.seed,
     cols,
     rows,
-    rooms,
+    rooms: rooms2,
     arrival: [arrival.col, arrival.row],
     exit: [exit.col, exit.row],
     locks: lockAt.length,
@@ -17633,10 +17651,10 @@ function narrowBack(t, terr = []) {
   const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
   if (!clipped) return { span: [a, b], xs: open(xs) };
   if (b - a < 2 * H6) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
-  const fit2 = [];
-  for (let x = a + H6; x <= b - H6; x += 100) fit2.push(x);
-  if (fit2[fit2.length - 1] < b - H6 - 1) fit2.push(b - H6);
-  return { span: [a, b], xs: open(fit2) };
+  const fit3 = [];
+  for (let x = a + H6; x <= b - H6; x += 100) fit3.push(x);
+  if (fit3[fit3.length - 1] < b - H6 - 1) fit3.push(b - H6);
+  return { span: [a, b], xs: open(fit3) };
 }
 var lockerWall = /* @__PURE__ */ new WeakMap();
 var narrowBackSpan = (t, terr = []) => narrowBack(t, terr)?.span ?? null;
@@ -18042,13 +18060,13 @@ function drawMetro(ctx, plan, vx0, vx1, y0) {
       } else {
         ctx.strokeStyle = "rgba(20,16,12,0.85)";
         ctx.lineWidth = P;
-        const lines2 = [
+        const lines3 = [
           [0, -30, -20, -70, -8, -110, -34, -150],
           [0, -30, 24, -64, 14, -100, 40, -138],
           [-8, -110, 10, -126],
           [14, -100, -4, -84]
         ];
-        for (const l of lines2) {
+        for (const l of lines3) {
           ctx.beginPath();
           ctx.moveTo(x + l[0], y0 + l[1]);
           for (let i = 2; i < l.length; i += 2) ctx.lineTo(x + l[i], y0 + l[i + 1]);
@@ -18683,18 +18701,18 @@ function createElevatorStage(store2, hooks = {}) {
   const ruleSaid = /* @__PURE__ */ new Map();
   const foundRule = (api, id, x) => {
     if (!out || !RULE[id]) return;
-    const text = ruleText(id, ruleVersion(meta, id));
+    const text2 = ruleText(id, ruleVersion(meta, id));
     const already = meta.known[id] === ruleVersion(meta, id) || out.found.includes(id);
     const now = api.world.tick;
     if (!already || now - (ruleSaid.get(id) ?? -9999) > 600) {
       ruleSaid.set(id, now);
-      api.world.say(`규칙: ${text}${out.variants.includes(id) ? `
+      api.world.say(`규칙: ${text2}${out.variants.includes(id) ? `
 ${RULE[id].variant.text}` : ""}`, 4);
     }
     if (!already) {
       out.found.push(id);
       api.world.emit({ type: "ruleFound", x, id });
-      log(`규칙 발견 (미송신): ${text}`);
+      log(`규칙 발견 (미송신): ${text2}`);
       api.note("stage.found", [...out.found]);
     }
   };
@@ -19687,9 +19705,9 @@ ${RULE[id].variant.text}` : ""}`, 4);
         if (o.stuck > 0) log("총애가 낮아 문이 안 닫힌다 (10초)");
         return;
       }
-      const lines2 = hooks.elevator;
+      const lines3 = hooks.elevator;
       const n = o.ride;
-      const call = rng(mix2(o.seed, n, 7))() < 0.4 ? lines2?.callout?.(o.agent, meta.favor, n) ?? defaultCallout(o.agent, meta.favor) : MUTTER[n % MUTTER.length];
+      const call = rng(mix2(o.seed, n, 7))() < 0.4 ? lines3?.callout?.(o.agent, meta.favor, n) ?? defaultCallout(o.agent, meta.favor) : MUTTER[n % MUTTER.length];
       api.world.say(o.stuck > 0 ? STUCK_LINE : call, 3.5);
       if (o.stuck > 0) log("총애가 낮아 문이 안 닫힌다 (10초)");
     } else if (plan.stage.where === "service") {
@@ -19711,8 +19729,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
         return;
       }
     }
-    const lines2 = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
-    api.world.say(`${PASSENGER_LABEL[kind]}: ${lines2.join(" ")}`, 5);
+    const lines3 = hooks.passenger?.talk?.(kind, !!h.data.honest, !!h.data.long) ?? defaultTalk(kind, !!h.data.long, fork);
+    api.world.say(`${PASSENGER_LABEL[kind]}: ${lines3.join(" ")}`, 5);
     if (r.talked.has(prop.id)) return;
     r.talked.add(prop.id);
     if (o.agent === "rojemon") api.world.say(h.data.honest ? "(로제몬: 진짜야.)" : "(로제몬: 거짓말이야.)", 3);
@@ -20163,7 +20181,7 @@ ${SET_BONUS[u.set]}`;
           if (b) known.add(`${b.col},${b.row}`);
         }
       }
-      const rooms = [];
+      const rooms2 = [];
       for (const rm of w.rooms) {
         const id = `${rm.col},${rm.row}`;
         const isSeen = seen2.has(id);
@@ -20181,7 +20199,7 @@ ${SET_BONUS[u.set]}`;
             if (o.broken.includes(eid)) broken[dd2] = true;
           }
         }
-        rooms.push({
+        rooms2.push({
           col: rm.col,
           row: rm.row,
           seen: isSeen,
@@ -20198,7 +20216,7 @@ ${SET_BONUS[u.set]}`;
           name: rm.name
         });
       }
-      worldsV.push({ depth: d3, label: w.label, cols: w.cols, rows: w.rows, rooms });
+      worldsV.push({ depth: d3, label: w.label, cols: w.cols, rows: w.rows, rooms: rooms2 });
     }
     const services = [];
     for (const [ds, sv] of Object.entries(o.services)) {
@@ -20244,283 +20262,261 @@ function itemName2(id) {
 }
 
 // src/game/action/stage/runmap.ts
-var C3 = {
-  bg: "#0a0c10",
-  frame: "#c8a24a",
-  dim: "#2b3138",
-  floor: "#56616b",
-  seen: "#a9b7bf",
-  text: "#e9e4d4",
-  sub: "#8f9aa1",
-  here: "#ffffff",
-  svc: "#8a6a3c",
-  svcSeen: "#c79a55",
-  gateLocked: "#e0503c",
-  gateOpen: "#5fe08a",
-  key: "#f2c14e",
-  side: "#ffb840",
-  boss: "#d0406a",
-  elev: "#7fc3ff"
-};
-function txt(c, s2, x, y, size2, color, align = "left") {
-  c.font = `700 ${size2}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
+var C3 = { bg: "#0c141e", text: "#ecf3fa", sub: "#b4c5d5", here: "#ffe18a", seen: "#64859e", clear: "#73dcad", locked: "#ff8582", key: "#ffe18a", panel: "#8ad7ff", service: "#e3b7ff" };
+var DIRS2 = ["u", "r", "d", "l"];
+var STEP3 = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] };
+var ARROW = { l: "←", r: "→", u: "↑", d: "↓" };
+var NUMBER = (n) => "①②③④"[n - 1] ?? String(n);
+var LOCK_COLOR = { locked: C3.locked, key: C3.key, open: C3.clear };
+function text(c, value, x, y, size2, color = C3.text, align = "left") {
+  c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
   c.textAlign = align;
-  c.textBaseline = "alphabetic";
-  c.lineWidth = 4;
-  c.strokeStyle = "rgba(0,0,0,0.8)";
-  c.strokeText(s2, x, y);
+  c.textBaseline = "middle";
   c.fillStyle = color;
-  c.fillText(s2, x, y);
+  c.fillText(value, x, y);
 }
-function fitTxt(c, s2, x, y, size2, color, maxW) {
-  let n = size2;
-  const font2 = (z) => `700 ${z}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
-  c.font = font2(n);
-  while (c.measureText(s2).width > maxW && n > size2 * 0.75) c.font = font2(--n);
-  let t = s2;
-  while (t.length > 2 && c.measureText(t).width > maxW) t = t.slice(0, -2) + "…";
-  txt(c, t, x, y, n, color);
+function fit2(c, value, x, y, size2, width, color = C3.text) {
+  c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
+  let s2 = value;
+  while (s2.length && c.measureText(s2).width > width) s2 = s2.slice(0, -1);
+  if (s2 !== value) s2 = s2.slice(0, -1) + "…";
+  text(c, s2, x, y, size2, color);
 }
-function glyph(c, m, x, y, s2) {
-  const R = (dx, dy, w, h, col) => {
-    c.fillStyle = col;
-    c.fillRect(Math.round(x + dx * s2), Math.round(y + dy * s2), Math.ceil(w * s2), Math.ceil(h * s2));
-  };
-  switch (m.kind) {
-    case "service":
-      R(-3, -4, 6, 2, C3.svcSeen);
-      R(-2, -2, 4, 2, C3.svcSeen);
-      R(-1, 0, 2, 2, C3.svcSeen);
-      break;
-    case "up":
-      R(-1, -4, 2, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
-      R(-2, -2, 4, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
-      R(-3, 0, 6, 2, m.state === "open" ? C3.gateOpen : C3.gateLocked);
-      break;
-    case "gate":
-      R(-1.5, -6, 3, 12, m.state === "open" ? C3.gateOpen : C3.gateLocked);
-      if (m.state !== "open") R(-0.5, -1, 1, 2, "#000");
-      if (m.state === "key") R(-4, -8, 8, 2, C3.key);
-      break;
-    case "side":
-      R(-2.5, -5, 5, 7, m.state === "done" ? "#555" : C3.side);
-      R(-1.5, -4, 3, 5, "#1a1a1a");
-      break;
-    case "secret":
-      R(-3, -3, 6, 6, m.state === "done" ? "#555" : "#d9a6ff");
-      R(-1, -1, 2, 2, "#1a1a1a");
-      break;
-    case "elevator":
-      R(-3, -5, 6, 8, C3.elev);
-      R(-0.5, -5, 1, 8, "#123");
-      break;
-    case "boss":
-      R(-3, -4, 6, 5, C3.boss);
-      R(-2, -3, 1, 1, "#000");
-      R(1, -3, 1, 1, "#000");
-      R(-2, 1, 4, 1, C3.boss);
-      break;
-    case "start":
-      R(-2, -4, 4, 6, "#9aa");
-      break;
-    case "key":
-      R(-4, -3, 4, 4, C3.key);
-      R(-3, -2, 2, 2, "#000");
-      R(0, -2, 5, 2, C3.key);
-      R(3, 0, 1, 2, C3.key);
-      break;
-  }
-}
-function hereDot(c, x, y, t) {
-  const on = Math.floor(t * 3) % 2 === 0;
-  c.fillStyle = on ? C3.here : "#ffd76a";
-  c.fillRect(Math.round(x) - 4, Math.round(y) - 4, 8, 8);
-  c.strokeStyle = "#000";
-  c.lineWidth = 2;
-  c.strokeRect(Math.round(x) - 5, Math.round(y) - 5, 10, 10);
-}
-var LOCK_COL = { locked: C3.gateLocked, key: C3.key, open: C3.gateOpen };
-var STEP_D = { l: [-1, 0], r: [1, 0], u: [0, -1], d: [0, 1] };
-function drawRooms(c, m, wd, x, y, cw, ch, gap, c0, r0, px, t, U) {
-  const at2 = (rm) => [x + (rm.col - c0) * (cw + gap), y + (rm.row - r0) * (ch + gap)];
-  const here = m.where === "floor" && m.depth === wd.depth && m.room;
-  const gs = Math.max(1, Math.min(cw / 34, ch / 18, 2.4 * U));
-  for (const rm of wd.rooms) {
-    if (!rm.seen) continue;
-    const [rx, ry] = at2(rm);
-    for (const d3 of ["l", "r", "u", "d"]) {
-      if (!rm.open[d3] && !rm.broken[d3]) continue;
-      const lk = rm.lock[d3];
-      c.fillStyle = rm.broken[d3] ? "#d9a6ff" : lk ? LOCK_COL[lk.state] : C3.seen;
-      const th = Math.max(3, Math.round(gap * 0.6));
-      if (rm.wrap[d3]) {
-        const ax = d3 === "r" ? rx + cw + 2 : rx - 2;
-        c.fillRect(d3 === "r" ? ax : ax - gap, ry + ch / 2 - th / 2, gap, th);
-        c.fillRect(d3 === "r" ? ax + gap - 2 : ax - gap - 2, ry + ch / 2 - th, 4, th * 2);
-        continue;
-      }
-      if (d3 === "l") c.fillRect(rx - gap, ry + ch / 2 - th / 2, gap, th);
-      if (d3 === "r") c.fillRect(rx + cw, ry + ch / 2 - th / 2, gap, th);
-      if (d3 === "u") c.fillRect(rx + cw / 2 - th / 2, ry - gap, th, gap);
-      if (d3 === "d") c.fillRect(rx + cw / 2 - th / 2, ry + ch, th, gap);
-      if (lk && lk.state !== "open" && gap >= 10) {
-        const [dx, dy] = STEP_D[d3];
-        txt(c, "①②③④"[lk.n - 1] ?? "", rx + cw / 2 + dx * (cw / 2 + gap / 2) + (dy ? th + 4 : -6), ry + ch / 2 + dy * (ch / 2 + gap / 2) + (dx ? -th - 2 : 5), Math.round(11 * U), LOCK_COL[lk.state]);
-      }
+function lines2(c, value, x, y, size2, width) {
+  c.font = `600 ${size2}px "Pretendard", "Noto Sans KR", system-ui, sans-serif`;
+  let line2 = "", row = 0;
+  for (const char of value) {
+    if (line2 && c.measureText(line2 + char).width > width) {
+      text(c, line2, x, y + row++ * size2 * 1.5, size2, C3.here);
+      line2 = "";
     }
+    line2 += char;
   }
-  for (const rm of wd.rooms) {
-    const [rx, ry] = at2(rm);
-    const cur = here && here[0] === rm.col && here[1] === rm.row;
-    c.fillStyle = rm.seen ? cur ? "#56636d" : "#3a454e" : "#161a1f";
-    c.fillRect(rx, ry, cw, ch);
-    c.lineWidth = cur ? 3 : 2;
-    c.strokeStyle = cur ? "#ffd76a" : rm.seen ? "#000" : "#3a454e";
-    if (!rm.seen) c.setLineDash([4, 3]);
-    c.strokeRect(rx, ry, cw, ch);
-    c.setLineDash([]);
-    if (!rm.seen) {
-      if (ch >= 16) txt(c, "?", rx + cw / 2, ry + ch / 2 + 5 * gs, Math.round(8 * gs), "#4b5660", "center");
-      continue;
-    }
-    const icons = [];
-    if (rm.role === "arrival") icons.push({ kind: "start", state: "" });
-    if (rm.panel) icons.push({ kind: "elevator", state: "" });
-    if (rm.guardian) icons.push({ kind: "boss", state: "" });
-    if (rm.reward) icons.push({ kind: rm.role === "secret" ? "secret" : "side", state: rm.reward === "done" ? "done" : "" });
-    if (rm.key) icons.push({ kind: "key", state: "" });
-    const step2 = 12 * gs;
-    icons.forEach((g2, i) => glyph(c, g2, rx + cw / 2 + (i - (icons.length - 1) / 2) * step2, ry + ch * (cw >= 90 && ch >= 44 ? 0.38 : 0.5), gs));
-    if (cw >= 90 && ch >= 44) {
-      c.save();
-      c.beginPath();
-      c.rect(rx + 2, ry, cw - 4, ch);
-      c.clip();
-      txt(c, rm.name, rx + cw / 2, ry + ch - 7, Math.round(Math.min(12 * U, ch / 3.6)), C3.sub, "center");
-      c.restore();
-    }
-    if (!rm.clear && rm.role !== "secret") c.fillStyle = C3.gateLocked, c.fillRect(rx + cw - 4 - 3 * gs, ry + 4, 3 * gs, 3 * gs);
-    if (cur) hereDot(c, rx + 6 + Math.max(0, Math.min(1, px / Math.max(1, m.roomW))) * (cw - 12), ry + ch * 0.72, t);
-  }
+  if (line2) text(c, line2, x, y + row++ * size2 * 1.5, size2, C3.here);
+  return row * size2 * 1.5;
 }
-function drawService(c, m, s2, gx, gy, cw, ch, gap, px, t) {
-  for (const cell of s2.cells) {
-    if (!cell.seen && !cell.key && cell.kind !== "attic") continue;
-    const cx = gx + cell.col * (cw + gap), cy = gy + cell.row * (ch + gap);
-    c.fillStyle = cell.seen ? C3.svcSeen : "#3a2e1c";
-    c.fillRect(cx, cy, cw, ch);
-    c.strokeStyle = "#000";
-    c.lineWidth = 2;
-    c.strokeRect(cx, cy, cw, ch);
-    c.fillStyle = C3.svcSeen;
-    if (cell.seen) {
-      if (cell.open.r) c.fillRect(cx + cw, cy + ch / 2 - 2, gap, 4);
-      if (cell.open.d) c.fillRect(cx + cw / 2 - 2, cy + ch, 4, gap);
-    }
-    if (cell.kind === "attic") c.fillStyle = "#fff3a0", c.fillRect(cx + cw / 2 - 1, cy + 3, 3, Math.max(2, ch - 6)), c.fillRect(cx + cw / 2 - 5, cy + ch / 2 - 1, 11, 3);
-    if (cell.kind === "down" && ch >= 14) glyph(c, { kind: "service", state: "" }, cx + cw / 2, cy + ch / 2, Math.min(2, ch / 10));
-    if (cell.key) c.fillStyle = C3.key, c.fillRect(cx + 4, cy + 3, 8, Math.max(2, ch - 6));
-    if (m.where === "service" && m.depth === s2.depth && m.cell && m.cell[0] === cell.col && m.cell[1] === cell.row) hereDot(c, cx + 6 + px / 1280 * (cw - 12), cy + ch / 2, t);
-  }
-}
-function drawRunMap(c, m, px, t, U = 1, W5 = 1280, H6 = 720) {
-  c.save();
+function frame(c, x, y, w, h) {
   c.fillStyle = C3.bg;
-  c.fillRect(0, 0, W5, H6);
-  c.strokeStyle = C3.frame;
-  c.lineWidth = 4;
-  c.strokeRect(24, 20, W5 - 48, H6 - 40);
-  txt(c, "출동 지도", 48, 40 + 20 * U, 26 * U, C3.text);
-  txt(c, `열쇠 ${m.keys.length ? m.keys.join(" ") : "없음"}  ·  강화 ${m.upgrades.length}`, W5 - 48, 40 + 20 * U, 16 * U, C3.sub, "right");
-  fitTxt(c, m.goal, 48, 52 + 38 * U, 17 * U, "#ffd76a", W5 - 96);
-  const top = Math.round(78 + 58 * U);
-  const legendH = U > 1.3 ? 84 : 46;
-  const bottom = H6 - legendH - 12;
-  const listW = Math.round(150 * U);
-  const lh = Math.round(22 * U);
-  const shown = m.worlds.slice(-Math.max(1, Math.floor((bottom - top) / lh)));
-  shown.forEach((wd, i) => {
-    const cur = wd.depth === m.depth;
-    fitTxt(c, `${cur ? "▶ " : "  "}${wd.label}`, 48, top + 14 * U + i * lh, 14 * U, cur ? "#fff" : C3.sub, listW - 10);
-  });
-  const ax = 48 + listW + 16, aw = W5 - 60 - ax, ah = bottom - top;
-  if (m.where === "service") {
-    const s2 = m.services.find((q) => q.depth === m.depth);
-    if (s2) {
-      const gap = 8;
-      const cw = Math.min(120 * U, Math.floor((aw - (s2.cols - 1) * gap) / s2.cols)), ch = Math.min(60 * U, Math.floor((ah - 30 * U - (s2.rows - 1) * gap) / s2.rows));
-      const gx = ax + (aw - (s2.cols * (cw + gap) - gap)) / 2;
-      txt(c, `정비 구역 · 층과 층 사이 틈`, gx, top + 16 * U, 16 * U, C3.svcSeen);
-      drawService(c, m, s2, gx, top + 30 * U, cw, ch, gap, px, t);
-    }
-  } else {
-    const wd = m.worlds.find((q) => q.depth === m.depth);
-    if (wd) {
-      const gap = Math.round(14 * U);
-      const cw = Math.min(170 * U, Math.floor((aw - (wd.cols - 1) * gap) / wd.cols)), ch = Math.min(Math.round(cw * 0.56), Math.floor((ah - (wd.rows - 1) * gap) / wd.rows));
-      const gw = wd.cols * (cw + gap) - gap, gh = wd.rows * (ch + gap) - gap;
-      drawRooms(c, m, wd, ax + (aw - gw) / 2, top + (ah - gh) / 2, cw, ch, gap, 0, 0, px, t, U);
-    }
-  }
-  let ly = H6 - (U > 1.3 ? 72 : 40);
-  let lx = 48;
-  const legend = [
-    [{ kind: "start", state: "" }, "도착한 방"],
-    [{ kind: "elevator", state: "" }, "승강기 패널"],
-    [{ kind: "key", state: "" }, "열쇠"],
-    [C3.gateLocked, "잠긴 길"],
-    [C3.gateOpen, "연 길"],
-    [{ kind: "side", state: "" }, "보상 배낭"],
-    [{ kind: "secret", state: "" }, "숨은 방"],
-    [{ kind: "boss", state: "" }, "수호자"],
-    ["#e0503c", "안 정리된 방 (점)"]
-  ];
-  const ls = Math.round(13 * U);
-  for (const [g2, s2] of legend) {
-    c.font = `700 ${ls}px "Galmuri11", "DungGeunMo", system-ui, sans-serif`;
-    const iw = 30 * U + c.measureText(s2).width;
-    if (lx + iw > W5 - 48) lx = 48, ly += ls + 14;
-    if (typeof g2 === "string") c.fillStyle = g2, c.fillRect(lx, ly - 7 * U, 16 * U, 5 * U);
-    else glyph(c, g2, lx + 8 * U, ly - 4 * U, 2 * U);
-    txt(c, s2, lx + 22 * U, ly + 2, ls, C3.sub);
-    lx += iw + 22;
-  }
-  txt(c, "Z · Tab · M 닫기", W5 - 48, 40 + 20 * U + 22 * U, 12 * U, C3.sub, "right");
-  c.restore();
-}
-function drawMiniMap(c, m, px, t, U = 1) {
-  if (m.where !== "floor" && m.where !== "service") return;
-  const phone = U > 1.3;
-  const x = phone ? 300 : 740, y = phone ? 8 : 16, w = phone ? 560 : 400, h = phone ? 124 : 72;
-  const fs = phone ? 22 : 12;
-  c.save();
-  c.fillStyle = "rgba(10,12,16,0.82)";
   c.fillRect(x, y, w, h);
-  c.strokeStyle = "rgba(200,162,74,0.85)";
+  c.strokeStyle = "#3b536a";
   c.lineWidth = 2;
   c.strokeRect(x, y, w, h);
-  fitTxt(c, m.goal, x + 8, y + fs + 4, fs, "#ffd76a", w - 16);
-  const top = y + fs + 10;
+}
+function check(c, x, y, size2, color = C3.clear) {
+  c.strokeStyle = color;
+  c.lineWidth = Math.max(2, size2 / 5);
   c.beginPath();
-  c.rect(x + 3, top - 2, w - 6, y + h - top);
-  c.clip();
-  if (m.where === "floor") {
-    const wd = m.worlds.find((q) => q.depth === m.depth);
-    if (wd && m.room) {
-      const cols = 5, rows = 3, gap = phone ? 8 : 5;
-      const ch = Math.floor((y + h - top - 4 - (rows - 1) * gap) / rows), cw = Math.min(Math.floor((w - 16 - (cols - 1) * gap) / cols), ch * 3);
-      const gw = cols * (cw + gap) - gap;
-      drawRooms(c, m, wd, x + (w - gw) / 2, top, cw, ch, gap, m.room[0] - 2, m.room[1] - 1, px, t, phone ? 1.4 : 0.8);
-    }
-  } else {
-    const s2 = m.services.find((q) => q.depth === m.depth);
-    if (s2) {
-      const gap = 2, ch = Math.max(3, Math.min(phone ? 18 : 10, Math.floor((y + h - top - 4) / Math.max(1, s2.rows)) - gap)), cw = Math.min(phone ? 44 : 26, Math.floor((w - 20) / s2.cols) - gap);
-      const gx = x + w - 10 - s2.cols * (cw + gap);
-      txt(c, "정비 구역", gx - 10, top + ch + 4, phone ? 18 : 11, C3.svcSeen, "right");
-      drawService(c, m, s2, gx, top, cw, ch, gap, px, t);
+  c.moveTo(x - size2 / 2, y);
+  c.lineTo(x - size2 / 8, y + size2 / 3);
+  c.lineTo(x + size2 / 2, y - size2 / 3);
+  c.stroke();
+}
+function marker(c, x, y, size2) {
+  c.fillStyle = C3.here;
+  c.beginPath();
+  c.moveTo(x, y - size2 / 2);
+  c.lineTo(x + size2 / 2, y);
+  c.lineTo(x, y + size2 / 2);
+  c.lineTo(x - size2 / 2, y);
+  c.closePath();
+  c.fill();
+}
+function roomSymbols(r) {
+  return [r.key ? `K${NUMBER(r.key)}` : "", r.panel ? "P" : "", r.service ? "S" : "", r.reward === "full" ? "+" : r.reward === "done" ? "−" : "", r.guardian ? "!" : "", r.role === "secret" ? "◇" : "", r.role === "arrival" ? "入" : ""].filter(Boolean).join(" ");
+}
+function mapExits(m) {
+  const r = m.worlds.find((w) => w.depth === m.depth)?.rooms.find((r2) => r2.col === m.room?.[0] && r2.row === m.room?.[1]);
+  if (m.where !== "floor" || !r) return m.where === "service" ? "사다리·덕트 앞에서 조사 · 낮은 통로는 앉아서 이동" : "승강기 버튼을 조사해 다음 층 선택";
+  return DIRS2.filter((d3) => r.open[d3] || r.broken[d3]).map((d3) => {
+    const lock = r.lock[d3];
+    return `${ARROW[d3]} ${lock ? `${NUMBER(lock.n)} ${lock.state === "locked" ? "잠김" : lock.state === "key" ? "해제 가능" : "열림"}` : r.broken[d3] ? "숨은 길" : "연결"}${r.wrap[d3] ? " ↔ 순환" : ""}`;
+  }).join("   ");
+}
+function rooms(c, m, w, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
+  const at2 = (r) => [x + (r.col - c0) * (cw + gap), y + (r.row - r0) * (ch + gap)];
+  const drawn = /* @__PURE__ */ new Set();
+  for (const r of w.rooms.filter((r2) => r2.seen)) {
+    const [rx, ry] = at2(r);
+    for (const d3 of DIRS2) {
+      if (!r.open[d3] && !r.broken[d3]) continue;
+      const [dx, dy] = STEP3[d3];
+      const a = `${r.col},${r.row}`, b = `${r.col + dx},${r.row + dy}`;
+      const id = [a, b].sort().join(":");
+      if (drawn.has(id)) continue;
+      drawn.add(id);
+      const lock = r.lock[d3];
+      const color = lock ? LOCK_COLOR[lock.state] : r.broken[d3] ? C3.service : C3.seen;
+      const sx = rx + cw / 2 + dx * cw / 2, sy = ry + ch / 2 + dy * ch / 2;
+      c.strokeStyle = color;
+      c.lineWidth = Math.max(3, 2 * scale);
+      c.beginPath();
+      c.moveTo(sx, sy);
+      c.lineTo(sx + dx * gap, sy + dy * gap);
+      c.stroke();
+      if (lock && lock.state !== "open") {
+        const mx = sx + dx * gap / 2, my = sy + dy * gap / 2;
+        c.fillStyle = C3.bg;
+        c.fillRect(mx - 7 * scale, my - 7 * scale, 14 * scale, 14 * scale);
+        text(c, NUMBER(lock.n), mx, my, 14 * scale, color, "center");
+      } else if (lock) check(c, sx + dx * gap / 2, sy + dy * gap / 2, 8 * scale);
+      else if (r.wrap[d3]) text(c, ARROW[d3], sx + dx * gap / 2, sy, 15 * scale, C3.sub, "center");
     }
   }
+  for (const r of w.rooms) {
+    const [rx, ry] = at2(r);
+    const current = m.where === "floor" && w.depth === m.depth && r.col === m.room?.[0] && r.row === m.room?.[1];
+    c.fillStyle = r.seen ? r.clear ? "#193c37" : "#273d51" : "#111e2b";
+    c.fillRect(rx, ry, cw, ch);
+    c.strokeStyle = current ? C3.here : r.seen ? r.clear ? C3.clear : C3.seen : "#8296a8";
+    c.lineWidth = current ? 3 * scale : 1.5 * scale;
+    c.setLineDash(r.seen ? [] : [5 * scale, 3 * scale]);
+    c.strokeRect(rx, ry, cw, ch);
+    c.setLineDash([]);
+    if (!r.seen) {
+      text(c, "?", rx + cw / 2, ry + ch / 2, 16 * scale, C3.sub, "center");
+      continue;
+    }
+    const statusSize = Math.min(8 * scale, ch / 4);
+    if (r.clear) check(c, rx + cw - statusSize, ry + statusSize * 0.65, statusSize);
+    else if (r.role !== "secret") text(c, "·", rx + cw - statusSize, ry + statusSize * 0.65, 18 * scale, C3.locked, "center");
+    if (mini) {
+      if (current) marker(c, rx + cw / 2, ry + ch / 2, Math.min(ch * 0.5, 14 * scale));
+      continue;
+    }
+    const named = ch >= 44 * scale && cw >= 95 * scale;
+    fit2(c, roomSymbols(r), rx + 5, ry + ch * (named ? 0.4 : 0.65), 13 * scale, cw - 10, r.panel ? C3.panel : C3.here);
+    if (named) fit2(c, r.name, rx + 20 * scale, ry + ch - 13 * scale, 12 * scale, cw - 24 * scale, C3.sub);
+    if (current) marker(c, rx + 9 * scale, ry + ch - 9 * scale, 9 * scale);
+  }
+}
+function service2(c, m, s2, x, y, cw, ch, gap, scale, c0 = 0, r0 = 0, mini = false) {
+  const known = new Set(s2.cells.filter((q) => q.seen || q.key || q.kind === "attic").map((q) => `${q.col},${q.row}`));
+  for (const q of s2.cells.filter((q2) => q2.seen)) for (const d3 of DIRS2) {
+    if (!q.open[d3]) continue;
+    const [dx, dy] = STEP3[d3];
+    known.add(`${q.col + dx},${q.row + dy}`);
+    const x0 = x + (q.col - c0) * (cw + gap) + cw / 2, y0 = y + (q.row - r0) * (ch + gap) + ch / 2;
+    c.strokeStyle = C3.service;
+    c.lineWidth = 3 * scale;
+    c.beginPath();
+    c.moveTo(x0, y0);
+    c.lineTo(x0 + dx * (cw / 2 + gap), y0 + dy * (ch / 2 + gap));
+    c.stroke();
+  }
+  for (const q of s2.cells) {
+    if (!known.has(`${q.col},${q.row}`)) continue;
+    const rx = x + (q.col - c0) * (cw + gap), ry = y + (q.row - r0) * (ch + gap);
+    const current = q.col === m.cell?.[0] && q.row === m.cell?.[1];
+    c.fillStyle = q.seen ? "#39304d" : "#191c2b";
+    c.fillRect(rx, ry, cw, ch);
+    c.strokeStyle = current ? C3.here : C3.service;
+    c.lineWidth = (current ? 3 : 1) * scale;
+    c.setLineDash(q.seen ? [] : [5, 4]);
+    c.strokeRect(rx, ry, cw, ch);
+    c.setLineDash([]);
+    const symbol = !q.seen && q.kind !== "attic" && !q.key ? "?" : q.kind === "attic" ? "R" : q.key ? "K" : q.kind === "down" ? m.panelReady === false ? "×" : "↓" : q.kind === "entry" ? "↑" : "";
+    text(c, symbol, rx + cw / 2, ry + ch / 2, (mini ? 12 : 16) * scale, C3.text, "center");
+    if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
+  }
+}
+function drawRunMap(c, m, _px, _t, U = 1, W5 = c.canvas.width, H6 = c.canvas.height) {
+  setExplorationMap(c.canvas, true);
+  const v = mapViewport(c.canvas, U, W5, H6), S2 = v.scale, left = v.margin, right = W5 - left;
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.fillStyle = C3.bg;
+  c.fillRect(0, 0, W5, H6);
+  const world = m.worlds.find((w) => w.depth === m.depth);
+  const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
+  fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
+  text(c, v.touch ? "「지도」로 닫기" : "Z / Tab / M 닫기", right, 35 * S2, 13 * S2, C3.sub, "right");
+  text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
+  const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
+  const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
+  const top = 94 * S2 + goalHeight + 20 * S2, bottom = H6 - 48 * S2;
+  const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
+  const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
+  fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
+  const sx = mapRight + 24 * S2;
+  const legend = m.where === "service" ? [
+    ["◆", "현재 칸", C3.here],
+    ["?", "점선 · 미탐색", C3.sub],
+    ["R", "다락방 · 휴식 / 귀환 로프", C3.service],
+    ["↑", "위층 점검문", C3.sub],
+    [m.panelReady === false ? "×" : "↓", `아래 점검문 · ${m.panelReady === void 0 ? "목표 확인" : m.panelReady ? "하강 가능" : "층 정리 전 잠김"}`, C3.sub],
+    ["K", "열쇠", C3.key],
+    ["─", "발견한 연결", C3.service]
+  ] : [
+    ["◆", "현재 방 · 노란 테두리", C3.here],
+    ["?", "점선 · 미탐색 방", C3.sub],
+    ["✓ / ·", "정리 완료 / 미정리", C3.clear],
+    ["①", "잠김 · 같은 번호 열쇠 필요", C3.locked],
+    ["①", "열쇠 보유 · 문에서 조사", C3.key],
+    ["✓", "초록 연결 · 열린 길", C3.clear],
+    ["K / P", "열쇠 / 승강기 패널", C3.panel],
+    ["+ / −", "보상 남음 / 수령 완료", C3.here],
+    ["S / 入", "정비 입구 / 도착 방", C3.service],
+    ["! / ◇", "수호자 / 숨은 방(선택)", C3.sub]
+  ];
+  legend.forEach(([mark, label3, color], i) => {
+    text(c, mark, sx, top + i * 19 * S2, 14 * S2, color);
+    text(c, label3, sx + 47 * S2, top + i * 19 * S2, 12.5 * S2, C3.sub);
+  });
+  const hintY = top + legend.length * 19 * S2 + 8 * S2;
+  if (m.where === "floor") {
+    const panel = m.panelReady === void 0 ? "패널: 위 목표 안내 확인" : m.panelReady ? "패널 켜짐 · 조사해서 하강" : "패널 꺼짐 · 층 목표 해결";
+    text(c, panel, sx, hintY, 13 * S2, C3.panel);
+    text(c, "귀환: 점검문 → 정비 → R 로프", sx, hintY + 23 * S2, 12.5 * S2, C3.service);
+  } else if (m.where === "service") {
+    text(c, "R 로프 조사 → 안전 귀환", sx, hintY, 13 * S2, C3.service);
+    text(c, "메뉴의 긴급 철수는 보상 감소", sx, hintY + 23 * S2, 12.5 * S2, C3.sub);
+  }
+  const zone = m.where === "service" ? m.services.find((s2) => s2.depth === m.depth) : world;
+  if (zone && mapW > 0 && mapH > 0) {
+    const gap = 12 * S2;
+    const cw = Math.min(150 * S2, (mapW - gap * (zone.cols - 1)) / zone.cols);
+    const ch = Math.min(68 * S2, (mapH - gap * (zone.rows - 1)) / zone.rows);
+    const gx = left + (mapW - (cw + gap) * zone.cols + gap) / 2, gy = top + 24 * S2 + (mapH - (ch + gap) * zone.rows + gap) / 2;
+    c.save();
+    c.beginPath();
+    c.rect(left - 6, top + 18 * S2, mapW + 12, mapH + 12);
+    c.clip();
+    if (m.where === "service") service2(c, m, zone, gx, gy, cw, ch, gap, S2);
+    else rooms(c, m, zone, gx, gy, cw, ch, gap, S2);
+    c.restore();
+  }
+  fit2(c, mapExits(m), left, H6 - 23 * S2, 13 * S2, right - left, C3.sub);
+  c.restore();
+}
+function drawMiniMap(c, m, _px, _t, U = 1) {
+  setExplorationMap(c.canvas, false);
+  if (m.where !== "floor" && m.where !== "service") return;
+  const v = mapViewport(c.canvas, U), S2 = v.scale;
+  const x = v.touch ? 560 : 740, y = 12, width = v.width - x - (v.touch ? 155 : 130);
+  const h = 100 * S2;
+  if (width < 230) return;
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  frame(c, x, y, width, h);
+  const mapW = Math.min(width * 0.42, 150 * S2), tx = x + 10 * S2, tw = width - mapW - 24 * S2;
+  text(c, m.where === "service" ? "정비 · R 로프 귀환" : `열쇠 ${m.keys.join(" ") || "없음"}`, tx, y + 16 * S2, 13 * S2, C3.key);
+  const shortGoal = m.where === "service" ? "다락방을 찾아 조사" : m.goal.startsWith("층 정리 끝") ? "패널로 하강 / 로프로 귀환" : m.goal.includes("노랗게") ? "노란 잠금 앞에서 조사" : m.goal.includes("잠긴 길") ? "열린 방에서 열쇠 찾기" : m.goal.match(/남은 방 \d+/)?.[0] ? `${m.goal.match(/남은 방 \d+/)[0]} · 목표 해결` : "방의 목표를 확인";
+  fit2(c, shortGoal, tx, y + 44 * S2, 14 * S2, tw, C3.text);
+  fit2(c, v.touch ? "「지도」 전체 / 범례" : "Z · Tab · M 전체 지도", tx, y + 77 * S2, 12.5 * S2, tw, C3.sub);
+  const gap = 5 * S2, cw = (mapW - 2 * gap - 16) / 3, ch = (h - 20 - 2 * gap) / 3;
+  const gx = x + width - mapW + 4, gy = y + 10;
+  c.save();
+  c.beginPath();
+  c.rect(gx - 3, gy - 3, mapW - 2, h - 14);
+  c.clip();
+  if (m.where === "floor" && m.room) {
+    const w = m.worlds.find((w2) => w2.depth === m.depth);
+    if (w) rooms(c, m, w, gx, gy, cw, ch, gap, S2, m.room[0] - 1, m.room[1] - 1, true);
+  } else if (m.cell) {
+    const s2 = m.services.find((s3) => s3.depth === m.depth);
+    if (s2) service2(c, m, s2, gx, gy, cw, ch, gap, S2, m.cell[0] - 1, m.cell[1] - 1, true);
+  }
+  c.restore();
   c.restore();
 }
 
@@ -20541,10 +20537,10 @@ function parseSay(body, line2, where) {
 function parseScripts(src, where = "script") {
   const out = [];
   let cur = null;
-  const lines2 = src.split(/\r?\n/);
-  for (let i = 0; i < lines2.length; i++) {
+  const lines3 = src.split(/\r?\n/);
+  for (let i = 0; i < lines3.length; i++) {
     const n = i + 1;
-    const raw = lines2[i].trim();
+    const raw = lines3[i].trim();
     if (!raw || raw.startsWith("//")) continue;
     if (raw.startsWith("===")) {
       cur = { id: raw.slice(3).trim(), nodes: [], labels: {} };
@@ -20783,9 +20779,9 @@ var StoryRunner = class {
     for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
     return s2;
   }
-  fill(text) {
+  fill(text2) {
     const f = this.ctx.flags;
-    return text.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
+    return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
   }
   jump(to) {
     const top = this.stack[this.stack.length - 1];
@@ -20818,10 +20814,10 @@ var StoryRunner = class {
         case "pick":
           return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
         case "agentline": {
-          const text = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
-          if (!text) break;
+          const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
+          if (!text2) break;
           const who = n.who === "agent" ? this.ctx.agent : n.who;
-          return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text), mood: "base" };
+          return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
         }
         case "choice": {
           const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
@@ -22411,11 +22407,11 @@ var BarkPicker = class {
     if (now - this.last < gap) return null;
     if (!this.always && now - (this.lastTag.get(r.tag) ?? -1e9) < (r.cool ?? this.tagCool)) return null;
     if (!this.always && this.rng() >= r.chance) return null;
-    const text = agentLine(agent, r.tag, this.rng);
-    if (!text) return null;
+    const text2 = agentLine(agent, r.tag, this.rng);
+    if (!text2) return null;
     this.last = now;
     this.lastTag.set(r.tag, now);
-    return { tag: r.tag, text };
+    return { tag: r.tag, text: text2 };
   }
 };
 
@@ -22877,7 +22873,7 @@ var PERSONAS = {
     ])
   )
 };
-function buildMessages(npc, agent, flags, history, text) {
+function buildMessages(npc, agent, flags, history, text2) {
   const p = PERSONAS[npc];
   const me = AGENTS2[agent];
   const state2 = [
@@ -22896,7 +22892,7 @@ function buildMessages(npc, agent, flags, history, text) {
 - ${state2.join("\n- ")}`,
     "규칙: 한국어로 1~3문장, 120자 이내. 대사만 쓴다(이름표·따옴표·괄호 지문·별표 금지). 상대의 행동이나 대사를 대신 쓰지 않는다. 실제 사람의 본명을 만들지 않는다. 게임 밖 이야기(현실 시스템, AI임)는 하지 않는다."
   ].filter(Boolean).join("\n\n");
-  return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text }];
+  return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text2 }];
 }
 function sanitize(raw, name) {
   let t = raw.replace(/<[^>]+>/g, "").trim();
@@ -22970,14 +22966,14 @@ var OFFLINE = {
     default: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요."]
   }
 };
-function offlineReply(npc, text, agent, rng2 = Math.random) {
+function offlineReply(npc, text2, agent, rng2 = Math.random) {
   const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
   const table = OFFLINE[npc];
   if (!table) {
-    const tag = /괜찮|다쳤|아파/.test(text) ? "hp_low" : /출동|가자|임무/.test(text) ? "offer" : pick6(["settle", "find", "win", "offer"]);
+    const tag = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick6(["settle", "find", "win", "offer"]);
     return agentLine(npc, tag, rng2) ?? "…";
   }
-  for (const [re, lines2] of table.rules) if (re.test(text)) return pick6(lines2);
+  for (const [re, lines3] of table.rules) if (re.test(text2)) return pick6(lines3);
   return pick6(table.default);
 }
 var FreeTalk = class {
@@ -23002,8 +22998,8 @@ var FreeTalk = class {
     if (npc) this.logs.delete(npc);
     else this.logs.clear();
   }
-  async reply(npc, text, agent, flags) {
-    const clean = text.trim().slice(0, 200);
+  async reply(npc, text2, agent, flags) {
+    const clean = text2.trim().slice(0, 200);
     if (!clean) return { text: "…", source: "offline" };
     const log = this.history(npc).slice();
     let out;
@@ -23108,7 +23104,7 @@ var StoryUI = class {
     this.textEl.textContent = this.full;
     this.box.classList.add("done");
   }
-  line(cast, text, mood) {
+  line(cast, text2, mood) {
     this.choicesEl.hidden = true;
     this.box.hidden = false;
     this.box.dataset.mood = mood;
@@ -23119,7 +23115,7 @@ var StoryUI = class {
     const src = cast.photo ? this.photo(cast.photo) : void 0;
     this.photoEl.hidden = !cast.name;
     this.photoEl.innerHTML = src ? `<img alt="" src="${esc4(src)}">` : `<span>${esc4(cast.name.slice(0, 1))}</span>`;
-    this.full = text;
+    this.full = text2;
     this.shown = 0;
     this.textEl.textContent = "";
   }
@@ -23139,11 +23135,11 @@ var StoryUI = class {
     this.skipEl.hidden = !on;
   }
   /** key: 말하는 자리. 같은 자리의 앞 말풍선은 바로 지운다 */
-  bubble(text, anchor, ms, color, name = "", key2 = name) {
+  bubble(text2, anchor, ms, color, name = "", key2 = name) {
     const el = document.createElement("div");
     el.className = "gsy-bubble";
     el.style.setProperty("--who", color);
-    el.innerHTML = `${name ? `<b>${esc4(name)}</b>` : ""}${esc4(text)}`;
+    el.innerHTML = `${name ? `<b>${esc4(name)}</b>` : ""}${esc4(text2)}`;
     this.bubbleLayer.append(el);
     for (const b of this.bubbles)
       if (b.key === key2) {
@@ -23154,9 +23150,9 @@ var StoryUI = class {
     this.bubbles.push({ el, left: ms / 1e3, anchor, key: key2 });
     this.place(this.bubbles[this.bubbles.length - 1]);
   }
-  caption(text, ms) {
+  caption(text2, ms) {
     this.captionEl.hidden = false;
-    this.captionEl.textContent = text;
+    this.captionEl.textContent = text2;
     this.captionEl.classList.remove("out");
     this.captionLeft = ms / 1e3;
   }
@@ -23239,10 +23235,10 @@ var TalkPanel = class {
     this.add("npc", greeting);
     this.input.focus({ preventScroll: true });
   }
-  add(who, text) {
+  add(who, text2) {
     const p = document.createElement("p");
     p.className = who;
-    p.textContent = text;
+    p.textContent = text2;
     this.log.append(p);
     this.log.scrollTop = this.log.scrollHeight;
     return p;
@@ -23271,7 +23267,7 @@ var G = CAST.gognija.name;
 var hqLines = (tag, c) => {
   const r = c.rand;
   const a = c.agent;
-  const me = (text) => ({ who: c.agentName || nameOf(a), text });
+  const me = (text2) => ({ who: c.agentName || nameOf(a), text: text2 });
   const t = (who, ...xs) => [{ who, text: pick5(xs, r) }];
   const male = a === "gorgodio" || a === "kyuras";
   const boss2 = a === "jyaldi";
@@ -23484,17 +23480,17 @@ agent: ${p.lines[1]}
     if (runner.current.kind === "choice") show(runner.choose(index));
   };
   const anchorOf = (id) => () => host.anchor?.(id) ?? null;
-  const bark = (who, text, ms = 2600) => {
+  const bark = (who, text2, ms = 2600) => {
     const id = who === "agent" ? agent() : who;
     const c = castOf(id, agent());
     const key2 = AGENTS2[id] ? "agent" : id;
-    ui.bubble(text, anchorOf(key2), ms, c.color, who === "elevator" ? "승강기" : "", key2);
+    ui.bubble(text2, anchorOf(key2), ms, c.color, who === "elevator" ? "승강기" : "", key2);
   };
-  const singleLine = (who, text) => {
+  const singleLine = (who, text2) => {
     const tmp = "__line";
     lib.scripts.delete(tmp);
     lib.add(`=== ${tmp}
-${who}: ${text.replace(/\n/g, " ")}
+${who}: ${text2.replace(/\n/g, " ")}
 `, "line");
     say(tmp);
   };
@@ -23514,7 +23510,7 @@ ${who}: ${text.replace(/\n/g, " ")}
     bark: (who, t, ms) => bark(who, t, ms),
     emit: (e, a) => host.emit?.(e, a),
     dialogue: (id) => say(id),
-    line: (who, text) => singleLine(who, text),
+    line: (who, text2) => singleLine(who, text2),
     agentLine: (tag) => {
       const t = lookupLine(agent(), tag, flags, rng2);
       if (t) singleLine("agent", t);
@@ -23588,14 +23584,14 @@ ${who}: ${text.replace(/\n/g, " ")}
     talkDone = void 0;
     cb?.();
   };
-  panel.onSend = async (text) => {
+  panel.onSend = async (text2) => {
     const npc = talkNpc;
     if (!npc) return;
-    panel.add("me", text);
+    panel.add("me", text2);
     panel.waiting(true);
     const p = panel.add("npc", "…");
     p.classList.add("wait");
-    const res = await talker.reply(npc, text, agent(), flags);
+    const res = await talker.reply(npc, text2, agent(), flags);
     p.classList.remove("wait");
     p.textContent = res.text;
     panel.waiting(false);
@@ -24525,33 +24521,33 @@ function blockEnd(s2, from) {
   }
   return null;
 }
-function evaluate2(text, env) {
-  if (!text.includes("{{")) return text;
+function evaluate2(text2, env) {
+  if (!text2.includes("{{")) return text2;
   let out = "";
   let i = 0;
-  while (i < text.length) {
-    const j = text.indexOf("{{", i);
+  while (i < text2.length) {
+    const j = text2.indexOf("{{", i);
     if (j < 0) {
-      out += text.slice(i);
+      out += text2.slice(i);
       break;
     }
-    out += text.slice(i, j);
-    const k = closeOf(text, j);
+    out += text2.slice(i, j);
+    const k = closeOf(text2, j);
     if (k < 0) {
-      out += text.slice(j);
+      out += text2.slice(j);
       break;
     }
-    const raw = text.slice(j + 2, k - 2);
+    const raw = text2.slice(j + 2, k - 2);
     const head = raw.trim();
     if (head.startsWith("#if") || head.startsWith("#when")) {
-      const b = blockEnd(text, k);
+      const b = blockEnd(text2, k);
       if (!b) {
-        out += text.slice(j, k);
+        out += text2.slice(j, k);
         i = k;
         continue;
       }
       const yes = head.startsWith("#if") ? truthy(evaluate2(head.replace(/^#if(::)?/, ""), env).trim()) : whenCond(head, env);
-      const body = yes ? text.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text.slice(b.elseEnd, b.close) : "";
+      const body = yes ? text2.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text2.slice(b.elseEnd, b.close) : "";
       out += evaluate2(body, env);
       i = b.end;
       continue;
@@ -24590,7 +24586,7 @@ var MERCHANT_NPCS = {
   shinyuri: d2({ id: "shinyuri", name: "신유리", sheet: "신유리", group: "merchant", color: "#3d3550", photo: "Shin Yuri", role: "중림 사채업자. 출동 중 현금을 빌려주고 귀환 후 예산으로 받아 간다.", speech: "낮고 무뚝뚝한 반말. 위험한 상대에게만 존댓말. 위협할 땐 음절을 끊어 센다.", effects: ["favor", "trade", "hint", "leave"], greet: ["급하지? 돈은 있어. 이자도 있고.", "서명하든지, 나가든지."], lines: ["십. 퍼센트. 주마다.", "울려면 밖에서 울어. 눈물에 책상 녹슬어.", "돈은 없고 이능이랑 콩팥 두 개는 있네. 그걸로 하자.", "날짜 잊지 마."] }),
   munhyeran: d2({ id: "munhyeran", name: "문혜란", sheet: "문혜란", group: "merchant", color: "#a3672d", photo: "Mun Hye-ran", role: "중림 해결사·브로커. 프리랜서에게 일을 붙여 주고 수수료를 뗀다.", speech: "크고 연극적으로 친한 척하는 반말, 웃으면서 거절하고 조항 번호로 다시 말한다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어이, 어이, 이게 누구야! 앉아, 앉아. 밥 먹었어? 상관없어, 서명 먼저 밥은 나중, 하하하!"], lines: ["재협상? 하하하! …9조에 안 된다고 돼 있어.", "이건 깎는 게 아니야, 친구. 더 나쁜 계약에서 지켜 주는 거지.", "이 조건 5분만 따뜻해. 그다음엔 더 배고픈 놈한테 판다.", "하하, 그래그래. 그래서 할 거야 말 거야?"] })
 };
-var dd = (id, name, photo, mask, role, speech, greet, lines2, effects = ["favor", "hint", "join", "hostile", "leave", "trade"]) => d2({ id, name, sheet: name, group: "daydream", color: "#7a6aa8", photo, role: `백일몽 주식회사 ${role}. ${mask} 가면.`, speech, effects, greet, lines: lines2 });
+var dd = (id, name, photo, mask, role, speech, greet, lines3, effects = ["favor", "hint", "join", "hostile", "leave", "trade"]) => d2({ id, name, sheet: name, group: "daydream", color: "#7a6aa8", photo, role: `백일몽 주식회사 ${role}. ${mask} 가면.`, speech, effects, greet, lines: lines3 });
 var DAYDREAM_NPCS = {
   leejaheon: dd("leejaheon", "이자헌", "Lee Ja-heon", "흰 도마뱀", "D조 조장·과장. 맨손 괴력", "감정 없는 하십시오체, 아주 짧게. 엉뚱한 질문에도 진지하게.", ["확인했습니다.", "물러나 주십시오."], ["예.", "그렇습니까.", "권장하지 않는 행동입니다.", "선천적 요인과 후천적 학습의 결과입니다."]),
   eunhaje: dd("eunhaje", "은하제", "Eun Ha-je", "송골매", "D조 대리. 전직 기자, 규칙 해석·지도", "낮고 건조한 반말, 「~구만」「~잖냐」. 욕을 섞고 자기 죽음으로 농담.", ["왔냐?", "그래, 뭐."], ["그만둬도 나쁜 선택 아니야.", "미친놈들 뒤 캐서 먹고살았지.", "맞혀 볼 준비나 해.", "담배는… 아니다, 됐어."]),
@@ -24685,24 +24681,24 @@ var Relations = class {
 var DROP = /* @__PURE__ */ new Set(["Appearance"]);
 var CAP = { Background: 2, Abilities: 2 };
 var LIMIT = 2600;
-function trimSheet(text) {
-  const parts = text.replace(/^@@[^\n]*\n?/gm, "").trim().split(/^(#### .+)$/m);
+function trimSheet(text2) {
+  const parts = text2.replace(/^@@[^\n]*\n?/gm, "").trim().split(/^(#### .+)$/m);
   const out = [parts[0].trim()];
   for (let i = 1; i < parts.length; i += 2) {
     const head = parts[i].slice(5).trim();
     if (DROP.has(head)) continue;
-    let lines2 = (parts[i + 1] ?? "").trim().split("\n").filter((l) => l.trim() && l.trim() !== "---");
+    let lines3 = (parts[i + 1] ?? "").trim().split("\n").filter((l) => l.trim() && l.trim() !== "---");
     if (CAP[head]) {
       const keep = [];
       let n = 0;
-      for (const l of lines2) {
+      for (const l of lines3) {
         if (l.trimStart().startsWith("- ") && ++n > CAP[head]) break;
         keep.push(l);
       }
-      lines2 = keep;
+      lines3 = keep;
     }
     out.push(`#### ${head}
-${lines2.join("\n")}`);
+${lines3.join("\n")}`);
   }
   const s2 = out.filter(Boolean).join("\n\n");
   return s2.length <= LIMIT ? s2 : s2.slice(0, LIMIT).replace(/\n[^\n]*$/, "");
@@ -24850,9 +24846,9 @@ function decide(tags, c) {
   if (out.some((e) => e.kind === "hostile")) return out.filter((e) => e.kind !== "join" && e.kind !== "trade" && e.kind !== "calm" && e.kind !== "gift");
   return out;
 }
-function offlineLine(def, text, rng2 = Math.random) {
+function offlineLine(def, text2, rng2 = Math.random) {
   const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
-  for (const [re, lines2] of def.rules ?? []) if (re.test(text)) return pick6(lines2);
+  for (const [re, lines3] of def.rules ?? []) if (re.test(text2)) return pick6(lines3);
   return pick6(def.lines);
 }
 
@@ -26629,10 +26625,10 @@ function createNpcTalk(layer, host, store2) {
   let sheetCache = /* @__PURE__ */ new Map();
   const keyOf = (t) => t.key ?? t.npc;
   const rel = () => relations.get(keyOf(target), !!target.key);
-  const line2 = (cls, text) => {
+  const line2 = (cls, text2) => {
     const p = document.createElement("p");
     if (cls) p.className = cls;
-    p.textContent = text;
+    p.textContent = text2;
     log.append(p);
     while (log.childElementCount > 40) log.firstElementChild.remove();
     fitLog();
@@ -26671,18 +26667,18 @@ function createNpcTalk(layer, host, store2) {
   async function sheetText(d3) {
     if (!d3.sheet) return void 0;
     if (sheetCache.has(d3.sheet)) return sheetCache.get(d3.sheet) ?? void 0;
-    let text = null;
+    let text2 = null;
     try {
       const live = await host.lore?.(d3.sheet);
-      if (live) text = trimSheet(live);
+      if (live) text2 = trimSheet(live);
     } catch {
     }
-    if (!text) {
+    if (!text2) {
       const raw = sheets_default[d3.sheet];
-      text = raw ? evaluate2(raw, { vars: { $st_faction: host.faction?.() ?? "" } }) : null;
+      text2 = raw ? evaluate2(raw, { vars: { $st_faction: host.faction?.() ?? "" } }) : null;
     }
-    sheetCache.set(d3.sheet, text);
-    return text ?? void 0;
+    sheetCache.set(d3.sheet, text2);
+    return text2 ?? void 0;
   }
   const close = () => {
     if (!target) return;
@@ -26724,13 +26720,13 @@ function createNpcTalk(layer, host, store2) {
     } else fire();
   };
   async function send(textIn) {
-    const text = textIn.trim().slice(0, 200);
-    if (!text || !target || busy) return;
+    const text2 = textIn.trim().slice(0, 200);
+    if (!text2 || !target || busy) return;
     const t = target;
     const d3 = def;
     const r = rel();
     const my = token;
-    line2("me", text);
+    line2("me", text2);
     chips.hidden = true;
     const wait = line2("wait", "…");
     setBusy(true);
@@ -26744,7 +26740,7 @@ function createNpcTalk(layer, host, store2) {
       try {
         const a = AGENTS2[host.agent()] ?? AGENTS2.jyaldi;
         const [sheet, meta] = await Promise.all([sheetText(d3), host.meta?.(d3).catch(() => null)]);
-        const messages = buildPrompt({ def: d3, target: t, sheet, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text });
+        const messages = buildPrompt({ def: d3, target: t, sheet, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text: text2 });
         const raw = await Promise.race([
           model(messages, { signal: ctrl.signal }),
           new Promise((_, rej) => ctrl.signal.addEventListener("abort", () => rej(new Error("응답이 25초 넘게 없어요"))))
@@ -26754,18 +26750,18 @@ function createNpcTalk(layer, host, store2) {
         reply = got.text;
         if (my === token) effects = decide(got.tags, { def: d3, target: t, rel: r, hinted, day: host.day?.() ?? 0 });
       } catch (e) {
-        reply = offlineLine(d3, text, rng2);
+        reply = offlineLine(d3, text2, rng2);
         if (my === token) note.textContent = `모델 응답 실패: ${(e instanceof Error ? e.message : String(e)).slice(0, 80)} · 미리 쓴 대사로 대신했어요`;
       } finally {
         clearTimeout(timer);
       }
-    } else reply = offlineLine(d3, text, rng2);
+    } else reply = offlineLine(d3, text2, rng2);
     if (my !== token) return;
     wait.className = "";
     wait.textContent = reply;
     fitLog();
     r.met++;
-    r.log = [...r.log, { role: "user", content: text }, { role: "assistant", content: reply }].slice(-12);
+    r.log = [...r.log, { role: "user", content: text2 }, { role: "assistant", content: reply }].slice(-12);
     setBusy(false);
     apply(effects);
     relations.save();
@@ -27389,14 +27385,14 @@ var SessionStore = class {
   }
   persist() {
     this.value.revision = Math.max(Date.now(), this.value.revision + 1);
-    const text = JSON.stringify(this.value);
+    const text2 = JSON.stringify(this.value);
     try {
-      this.journal?.setItem(this.key, text);
+      this.journal?.setItem(this.key, text2);
     } catch {
       this.error = "기기 복구 기록을 쓰지 못했습니다.";
     }
     this.queue = this.queue.catch(() => {
-    }).then(() => this.saves.write(this.slot, text, {
+    }).then(() => this.saves.write(this.slot, text2, {
       title: this.value.checkpoint ? "출동 중 · 안전 지점" : "자동 저장",
       summary: "본부 · 규칙서 · 출동 기록",
       schema: "goei-session/1"
