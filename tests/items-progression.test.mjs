@@ -6,6 +6,7 @@ import { build } from 'esbuild';
 const out = await build({ stdin: { contents: `
 export { World } from './src/game/action/engine/world';
 export { Dummy } from './src/game/action/engine/bodies';
+export { createEnemy } from './src/game/action/enemy';
 export { linkItems } from './src/game/action/engine/itemsLink';
 export { equip, placeProp, spawnPickup } from './src/game/action/items';
 export { newSave } from './src/game/action/hq/state';
@@ -114,4 +115,21 @@ test('저장 복원: 임시 무기 원래 피해와 남은 횟수 유지, 본부
     near(lost(d), weapon === 'pipe' ? 22 * 1.4 : 13 * 1.5);
     assert.equal(restored.items.run.held.uses, 1);
   }
+});
+
+// 공용 적의 공격 ID 중복 방지와 본부 배율이 함께 작동하는지 확인한다.
+test('본부 힘 강화와 공용 적 반복 타격: 두 타격으로 처치하고 사망/처치를 한 번만 기록', () => {
+  const c = setup(1.5, 3);
+  const enemy = M.createEnemy('fb_smg', c.world.player.x + 60, c.world.player.y, () => .5);
+  enemy.set('idle'); enemy.hp = enemy.hpMax = 60;
+  c.world.add(enemy);
+  const deaths = [];
+  c.world.on(e => { if (e.type === 'enemyDie' && e.kind === enemy.kind) deaths.push(e); });
+  M.equip(c.items.run, 'pipe');
+  c.world.player.itemAct('attack');
+  assert.equal(enemy.hp, 27);
+  c.world.player.itemAct('attack');
+  assert.ok(enemy.hp <= 0);
+  assert.equal(c.world.kills, 1);
+  assert.equal(deaths.length, 1);
 });

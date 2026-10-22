@@ -60,7 +60,11 @@ test('전용 유물은 폭파 판정 크기만 +20%, 기본 공격과 원본 동
  near(b.x1-b.x0,(a.x1-a.x0)*1.2);near(b.z1-b.z0,(a.z1-a.z0)*1.2);near(b.dy,a.dy*1.2);near(b.dmg,a.dmg);
  near((b.x0+b.x1)/2,(a.x0+a.x1)/2);
  for(const w of [basic,owned]){w.player.play('jab',w);w.player.mf=2}
- assert.deepEqual(owned.player.frame().hit,basic.player.frame().hit);
+ const baseHits=basic.player.frame().hit,ownedHits=owned.player.frame().hit;
+ assert.equal(baseHits.length,1);assert.equal(ownedHits.length,1);
+ assert.notEqual(ownedHits[0].attackId,baseHits[0].attackId,'서로 다른 공격은 전역 고유 ID를 사용한다');
+ const withoutId=hits=>hits.map(({attackId,...judgment})=>judgment);
+ assert.deepEqual(withoutId(ownedHits),withoutId(baseHits));
 });
 
 test('숙련3/6 실제 입력 해금, 연습 모드는 기존 기술 사용 가능',()=>{

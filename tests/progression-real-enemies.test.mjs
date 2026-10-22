@@ -82,3 +82,35 @@ test('추격 역방향 진입과 B-12: 벽/encounter 유무와 별개로 근처 
   c.w.step(idle);assert.equal(c.w.bodies.filter(b=>b.kind===target.kind).length,first,'같은 spawn 반복 생성 없음');
  }
 });
+
+function elderTableScene(){
+ const c=setup(4,'replica',5,'pretending',true);finishRegular(c);
+ const placed=c.w.floor.stage.floor.placed.find(p=>p.kind==='table'&&p.data.guardian);
+ const table=c.w.props.find(p=>p.id===`p${placed.id}`);assert.ok(table,'405호 전용 밥상');
+ c.w.player.x=c.w.player.px=table.x;c.w.player.y=c.w.player.py=table.y;
+ for(let i=0;i<3;i++)c.w.step(idle);
+ assert.equal(c.w.bodies.filter(b=>b.kind==='elder_f'||b.kind==='elder_m').length,2);
+ // engine/modules.ts의 현행 밥상 연결과 동일. 실제 E→신호→스테이지 상호작용 순서.
+ c.w.interactHooks.push(prop=>{if(prop?.kind==='table'||prop?.kind==='meal')M.signalEnemies(c.w,{kind:'mealThanks',x:c.w.player.x,y:c.w.player.y})});
+ const events=[];c.w.on(e=>events.push(e));
+ const useTable=()=>{c.w.player.x=c.w.player.px=table.x;c.w.player.y=c.w.player.py=table.y;c.w.player.phase='free';c.w.player.move=null;c.w.step({...idle,pressed:new Set(['interact'])})};
+ return {...c,events,useTable};
+}
+test('405호 실제 밥상 E: 평화 신호 직후는 미정리, 노부부 소멸 완료 뒤에만 방·저장 해제',()=>{
+ const c=elderTableScene();assert.equal(c.roomClear(),false);c.useTable();
+ assert.ok(c.w.bodies.filter(b=>b.kind.startsWith('elder_')).every(b=>b.mem.mode==='peace'));
+ assert.equal(c.roomClear(),false,'밥상 클릭만으로 guardianSkip를 앞당기지 않는다');
+ assert.equal(c.w.canCheckpoint(),false,'소멸 중인 수호자가 남은 저장 금지');
+ for(let i=0;i<60;i++)c.w.step(idle);
+ assert.equal(c.roomClear(),true);assert.equal(c.w.canCheckpoint(),true);
+ assert.equal(c.events.filter(e=>e.type==='custom'&&e.name==='guardianCleared'&&e.data.how==='rule').length,1);
+ assert.equal(c.w.notes['stage.elderDefeated'],undefined,'평화 통과는 m6 진압 실적 아님');
+});
+test('405호 적대 후 실제 밥상 E: 규칙 통과·방 정리·안전 저장을 우회하지 않는다',()=>{
+ const c=elderTableScene();M.signalEnemies(c.w,{kind:'turnAway'});c.useTable();
+ assert.ok(c.w.bodies.filter(b=>b.kind.startsWith('elder_')).every(b=>b.mem.mode==='fight'));
+ assert.equal(c.roomClear(),false,'적대한 밥상 E가 guardianSkip를 만들지 않는다');
+ for(let i=0;i<60;i++){c.w.player.hp=c.w.player.hpMax;c.w.step(idle)}
+ assert.equal(c.roomClear(),false);assert.equal(c.w.canCheckpoint(),false);
+ assert.equal(c.events.filter(e=>e.type==='custom'&&e.name==='guardianCleared').length,0);
+});

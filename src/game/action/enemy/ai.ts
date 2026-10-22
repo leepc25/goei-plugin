@@ -6,6 +6,7 @@ import { Enemy, stillTicks, type Brain } from './enemy';
 import type { Attack } from './roster';
 import type { WorldView } from './types';
 import { spawnInto } from './registry';
+import { walkTo } from './navigation';
 
 export const MAX_ATTACKERS = 2;
 
@@ -65,8 +66,14 @@ export function approach(e: Enemy, w: WorldView, keep = e.def.keep, wait = false
   for (const b of w.bodies)
     if (b !== e && b instanceof Enemy && b.alive && b.state !== 'dead' && Math.sign(p.x - b.x) === Math.sign(dx) && Math.abs(p.x - b.x) < adx) rank++;
   const back = Math.min(rank, 3) * 110;
-  const far = (wait ? keep[1] + 140 : keep[1]) + back;
-  const near = keep[0] + back;
+  let far = (wait ? keep[1] + 140 : keep[1]) + back;
+  let near = keep[0] + back;
+  // 공격권이 있는데 줄 간격/선호 거리 때문에 사거리 밖에서 영구 대기하지 않는다.
+  // 호명·자세 같은 비공격 동작의 긴 범위는 교전 사거리로 세지 않는다.
+  if (!wait && !e.boss) {
+    const ranges = e.def.attacks.filter(a => cond(e, a, w) && a.move.frames.some(f => f.hit.length || f.fire)).map(a => a.range[1]);
+    if (ranges.length) far = Math.min(far, Math.max(...ranges)), near = Math.min(near, far);
+  }
   let mx = 0;
   if (adx > far) mx = Math.sign(dx);
   else if (adx < near) mx = -Math.sign(dx);
@@ -80,8 +87,10 @@ export function approach(e: Enemy, w: WorldView, keep = e.def.keep, wait = false
   if (ny) e.y += Math.sign(ny) * Math.min(2, sp * 0.5);
   const ty = p.y + (wait ? e.laneOff : 0);
   const my = Math.abs(ty - e.y) > 4 ? Math.sign(ty - e.y) : 0;
-  e.x += mx * sp;
-  e.y += my * sp * 0.6;
+  if (e.boss) {
+    e.x += mx * sp;
+    e.y += my * sp * 0.6;
+  } else if (mx || my) walkTo(e, w, mx ? p.x - Math.sign(dx) * (adx > far ? far : near) : e.x, my ? ty : e.y);
   e.set(mx || my ? 'walk' : 'idle');
 }
 
@@ -146,9 +155,17 @@ const ambush: Brain = {
 const ceiling: Brain = {
   tick(e, w) {
     if (e.age === 1) ((e.mem.cling = true), (e.z = 280));
+    // 피격으로 동작이 끊겼으면 천장 고정을 풀어 공통 중력·기상 처리가 진행되게 한다.
+    if (['hurt', 'stunned', 'air', 'down', 'bound'].includes(e.state)) {
+      e.mem.cling = false;
+      e.mem.climb = false;
+      e.mem.groundT = 0;
+    }
     if (e.state === 'idle' || e.state === 'walk') {
       if (!e.mem.cling && e.mem.groundT !== undefined && ++e.mem.groundT > 150) e.mem.climb = true;
       if (e.mem.climb) {
+        e.mem.cling = true; // 오르는 동안 중력이 상승량을 다시 빼앗지 않는다.
+        e.vz = 0;
         e.z += 9;
         if (e.z >= 280) ((e.z = 280), (e.mem.cling = true), (e.mem.climb = false), (e.mem.groundT = undefined));
         return true;
@@ -201,12 +218,11 @@ const stain: Brain = {
     const dx = p.x - e.x,
       dy = p.y - e.y;
     if (lit(e, w)) {
-      e.x -= Math.sign(dx) * e.speed() * 1.4;
+      walkTo(e, w, dx > 0 ? w.bounds[0] + 10 : w.bounds[1] - 10, e.y, e.speed() * 1.4);
       return e.set('walk');
     }
     const sp = e.speed() * (still > 20 ? 2 : 1);
-    e.x += Math.sign(dx) * Math.min(Math.abs(dx), sp);
-    e.y += Math.sign(dy) * Math.min(Math.abs(dy), sp * 0.7);
+    walkTo(e, w, p.x, p.y, sp, sp * 0.7);
     e.set('walk');
     const rise = e.def.attacks[0];
     if (Math.abs(dx) < 30 && Math.abs(dy) < 20 && e.cd('rise') <= 0 && (still > 20 || w.rand() < 0.02)) e.start(rise.move, w, rise.cd);
@@ -233,7 +249,7 @@ const invisible: Brain = {
     }
     // 서성임
     if (!e.mem.wander || e.age % 90 === 0) e.mem.wander = (w.rand() - 0.5) * 300;
-    e.x += Math.sign(e.mem.wander) * e.speed() * 0.4;
+    walkTo(e, w, e.mem.wander < 0 ? w.bounds[0] + 10 : w.bounds[1] - 10, e.y, e.speed() * 0.4);
     e.set('walk');
   },
   drawUnder(e, ctx) {
@@ -268,7 +284,7 @@ const rule: Brain = {
     const p = w.player;
     const adx = Math.abs(p.x - e.x);
     e.face(p.x);
-    if (e.mem.greeted) {
+    if (e.mem.greeted && e.lastHurt < 0) {
       if (adx < 200 && !e.bubble && w.rand() < 0.01) e.say('…어서 가요', 50);
       return true;
     }
@@ -285,11 +301,13 @@ const rule: Brain = {
       e.hostile = true;
       e.mem.turnedAt = w.tick;
       e.say(why === 'run' ? '복도에서 뛰면 안 되지' : why === 'rude' ? '인사도 안 하네' : '…', 50);
-      e.set('stunned');
-      e.stunT = 20;
+      if (why !== 'hit') {
+        e.set('stunned');
+        e.stunT = 20;
+      }
       w.emit({ type: 'custom', name: 'ruleBroken', data: { rule: why === 'run' ? 'r_quiet' : 'r_greet', id: e.id } });
       w.emit({ type: 'enemyTell', x: e.x, kind: e.kind });
-      return true;
+      return why !== 'hit';
     }
     return true;
   },
@@ -345,8 +363,7 @@ const floorgrab: Brain = {
     const p = w.player;
     const dx = p.x - e.x,
       dy = p.y - e.y;
-    e.x += Math.sign(dx) * Math.min(Math.abs(dx), e.speed());
-    e.y += Math.sign(dy) * Math.min(Math.abs(dy), e.speed() * 0.6);
+    walkTo(e, w, p.x, p.y);
     e.set('walk');
     const a = e.def.attacks[0];
     if (Math.abs(dx) < 34 && Math.abs(dy) < 18 && !p.airborne && e.cd(a.move.id) <= 0) e.start(a.move, w, a.cd);
@@ -420,8 +437,8 @@ const duelist: Brain = {
 const rival: Brain = {
   tick(e, w) {
     if (e.state === 'flee') {
-      e.x += e.mem.fleeDir * 6;
       const [b0, b1] = w.bounds;
+      walkTo(e, w, e.mem.fleeDir < 0 ? b0 - 126 : b1 + 126, e.y, 6);
       if (e.x < b0 - 120 || e.x > b1 + 120) {
         e.alive = false;
         w.emit({ type: 'custom', name: 'enemyEscape', data: { id: e.id, kind: e.kind } });
@@ -466,8 +483,7 @@ const touch: Brain = {
       dy = p.y - e.y;
     const sp = e.speed() * (drawn ? 1.8 : 0.5);
     e.face(p.x);
-    e.x += Math.sign(dx) * Math.min(Math.abs(dx), sp);
-    e.y += Math.sign(dy) * Math.min(Math.abs(dy), sp * 0.6);
+    walkTo(e, w, p.x, p.y, sp);
     e.set('walk');
     const a = e.def.attacks[0];
     if (Math.abs(dx) < 50 && Math.abs(dy) < 18 && e.cd(a.move.id) <= 0) e.start(a.move, w, a.cd);

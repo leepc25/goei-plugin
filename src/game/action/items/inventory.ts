@@ -58,7 +58,7 @@ export function createItemRun(agent: string, loadout?: (Slot | null)[]): ItemRun
   const slots: (Slot | null)[] = [];
   for (let i = 0; i < SLOT_COUNT; i++) {
     const s = loadout?.[i];
-    slots.push(s && ITEMS[s.id] ? { id: s.id, n: Math.max(1, Math.min(ITEMS[s.id].max, s.n | 0)) } : null);
+    slots.push(s && ITEMS[s.id] && Number.isFinite(s.n) && s.n >= 1 ? { id: s.id, n: Math.min(ITEMS[s.id].max, Math.floor(s.n)) } : null);
   }
   return {
     agent: sig.agent,
@@ -82,7 +82,7 @@ export const DEFAULT_LOADOUT: (Slot | null)[] = [{ id: 'medkit', n: 2 }, { id: '
 /** 소모품을 칸에 넣는다. 같은 종류 칸에 먼저, 없으면 빈 칸. 넣은 수를 돌려준다. */
 export function addItem(run: ItemRun, id: string, n = 1): number {
   const def = ITEMS[id];
-  if (!def) return 0;
+  if (!def || !Number.isSafeInteger(n) || n <= 0) return 0;
   let left = n;
   for (const s of run.loadout) {
     if (s && s.id === id && s.n < def.max) {
@@ -127,7 +127,7 @@ function useless(effect: ItemEffect, c?: UseContext): boolean {
 /** 1~4 칸 사용(slot은 0부터). 소비했으면 효과를, 아니면 null. 적용(체력 등)은 엔진 몫. */
 export function useItem(run: ItemRun, slot: number, ctx?: UseContext): { id: string; effect: ItemEffect } | null {
   const s = run.loadout[slot];
-  if (!s || run.itemCd > 0) return null;
+  if (!s || s.n <= 0 || run.itemCd > 0) return null;
   const def = ITEMS[s.id];
   if (!def || (!def.always && useless(def.effect, ctx))) return null;
   s.n--;
@@ -151,6 +151,9 @@ export function addRelic(run: ItemRun, id: string): boolean {
   return true;
 }
 export const bagFree = (run: ItemRun) => run.bag.filter(b => !b).length;
+
+/** 기존 엔진의 회복 조각 효과. 바닥에서 받을 수량 판정과 실제 HP 적용이 같은 값을 쓴다. */
+export const pickupHealAmount = (max: number, amount = 1) => max * 0.08 * amount;
 
 // ---------- 고유 원거리 탄 ----------
 export const usesAmmo = (run: ItemRun) => (SIGNATURES[run.agent]?.ammo ?? 'none') !== 'none';

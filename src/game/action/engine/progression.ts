@@ -72,4 +72,4 @@ export function masteryMove(p: RunProgression, key: string, move: MoveDef): Move
 }
 /** 한 동작 안의 두 폭발이 엔진의 동일 공격 중복 판정에 합쳐지지 않게 한다. */
 export const masteryHitId = (p: RunProgression, key: string, frame: number, id: number) =>
-  id * 2 + (key === 'super' && p.moves.includes('ult2') && frame >= 8 ? 1 : 0);
+  id + (key === 'super' && p.moves.includes('ult2') && frame >= 8 ? 1 : 0);

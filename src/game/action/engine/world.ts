@@ -16,6 +16,7 @@ import type { FrameInfo } from './art';
 import { Bullet, Dummy, Thug } from './bodies';
 import { Fighter, overlap } from './fighter';
 import type { Pad } from './input';
+import { newAttackId } from './ids';
 import { Player } from './player';
 import { initializeProgression, progressionHit } from './progression';
 import { encodeState, decodeState } from './checkpoint';
@@ -166,7 +167,7 @@ export class World implements WorldView {
       },
       hurtPlayer: (dmg, stagger = true) => {
         const p = this.player;
-        if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: -this.tick, dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this);
+        if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this);
         else p.hp = Math.max(0, p.hp - dmg);
       },
       heal: (n) => {
@@ -404,7 +405,7 @@ export class World implements WorldView {
       const e = b as Body & { def?: { w: number; keep?: [number, number] }; state?: string; face?: number };
       if (!e.alive || b.team === 'player' || b instanceof Fighter || !e.def || e.z > 0) continue;
       if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
-      if (e.def.keep && e.def.keep[1] < 30) continue;
+      if (e.kind === 'toucher' || (e.def.keep && e.def.keep[1] < 30)) continue;
       // 깊이 50 안쪽이면 그림이 포개진다: 요원과 적이 한 몸처럼 겹치지 않게 (독립 검수)
       const dy = Math.abs(e.y - p.y);
       if (dy > 85) continue;
@@ -467,14 +468,14 @@ export class World implements WorldView {
 
   private resolveHits() {
     const all = [this.player as Body, ...this.bodies].filter((b) => b.alive);
-    const frames = new Map(all.map((b) => [b.id, b.frame()]));
+    const frames = new Map(all.map((b) => [b, b.frame()]));
     for (const a of all) {
-      const fa = frames.get(a.id)!;
+      const fa = frames.get(a)!;
       if (!fa.hit.length) continue;
       for (const h of fa.hit)
         for (const t of all) {
           if (t === a || t.team === a.team || t.team === 'neutral' || !t.alive) continue;
-          const ft = frames.get(t.id)!;
+          const ft = frames.get(t)!;
           if (!ft.hurt.some((hb) => overlap(h, hb))) continue;
           const key = `${a.id}:${h.attackId}:${t.id}`;
           if (this.hitMemo.has(key)) continue;

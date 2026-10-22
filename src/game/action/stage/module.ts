@@ -1115,7 +1115,8 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
           r.mealOk.add(prop.id);
           foundRule(api, 'r_meal', p.x);
           api.world.say('「잘 먹었습니다.」', 2);
-          if (pl?.data.guardian) r.guardianSkip = true;
+          // 수호자는 실제 평화 소멸의 guardianCleared(rule) 이벤트로만 해결한다.
+          // 밥상 E만으로 적대 상태나 소멸 대기 시간을 우회하지 않는다.
           break;
         case 'item':
         case 'pack': {

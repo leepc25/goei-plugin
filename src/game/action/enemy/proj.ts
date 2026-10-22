@@ -1,6 +1,7 @@
 // 적 발사체. 엔진 몸(Body, team 'enemy')으로 world.add 한다. 맞으면(플레이어 피격 상자와 겹치면) 다음 틱에 사라진다.
 import type { Body, Hit, HitResult, WBox, WorldView } from './types';
 import { overlap } from './geom';
+import { newBodyId, newAttackId } from '../engine/ids';
 import { armDebuff, checkDebuffs } from './debuff';
 import type { Debuff } from './types';
 
@@ -49,10 +50,8 @@ export const PROJ: Record<string, ProjDef> = {
   whistle: { label: '호루라기', w: 20, h: 200, z: 0, speed: 0, life: 22, dmg: 6, react: 'stagger', push: 12, grow: 18, pierce: true, unblockable: true, debuff: { kind: 'fear', ticks: 45 }, color: '#f0e9a0' },
 };
 
-let nextProjId = 900000;
-
 export class Proj implements Body {
-  readonly id = nextProjId++;
+  readonly id = newBodyId();
   readonly team = 'enemy' as const;
   readonly kind: string;
   x: number;
@@ -121,7 +120,7 @@ export class Proj implements Body {
     checkDebuffs(world);
     if (this.done) return void (this.alive = false);
     this.t++;
-    if (d.every && this.t % d.every === 0) this.attackId = nextProjId++ * 7;
+    if (d.every && this.t % d.every === 0) this.attackId = newAttackId();
     this.x += this.vx;
     if (d.gravity) {
       this.z += this.vz;

@@ -86,7 +86,10 @@ export class Input {
   }
 
   clear() {
-    for (const b of this.down) this.edgesUp.add(b);
+    // Cancellation is not a tap/release: discard unsampled actions and double-tap history.
+    this.edgesDown.clear();
+    this.edgesUp.clear();
+    this.lastTap = {};
     this.down.clear();
     this.dashDir = 0;
     this.shiftTicks = -1;

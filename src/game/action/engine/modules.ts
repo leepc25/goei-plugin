@@ -5,8 +5,11 @@
 // 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
 import type { GameBridge } from '../../bridge';
 import { createGameAudio } from '../audio';
+import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
 import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
+import { navigationFeedback } from './navigationFeedback';
+import { syncNavigationButton } from '../ui/navigationButton';
 import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
@@ -156,6 +159,8 @@ function hudState(w: World, shell: Shell): HudState {
     // 가드 게이지는 가드 중이거나 닳았을 때만
     meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
     compact: shell.touchShown,
+    device: shell.touchShown ? 'touch' : shell.input.last,
+    navigation: navigationFeedback(w),
   };
 }
 
@@ -281,6 +286,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const storyRoot = document.createElement('div');
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15';
   shell.stage.root.appendChild(storyRoot);
+  const attachVideoAudio = (event: Event) => audio.attachMedia((event as CustomEvent<VideoTrack>).detail);
+  storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
   const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
@@ -523,6 +530,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onPlay: () => shell.play(),
     frame: (dt) => {
       syncVolume();
+      audio.setPaused(shell.paused && !openingOn);
+      audio.setCutscene(story.isVideoPlaying());
       story.update(dt);
       shell.frame(dt);
       shell.input.endFrame();
@@ -538,8 +547,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
       const hs = hudState(w, shell);
       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
+      if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
+      if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
       if (shell.paused) mapOpen = false;
       if (!game?.inHub && w.stage === elevator) {
         const m = elevator.mapView();
@@ -549,6 +560,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
         else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
       } else mapOpen = false;
+      syncNavigationButton(shell.canvas, hs.navigation);
       shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
@@ -559,8 +571,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (name === 'hq') shell.play(); // 본부도 걷는 장면: 타이틀 메뉴 닫고 조작·터치 켜기
     },
     onPause: (p) => {
-      if (p) audio.pause();
-      else audio.resume();
       // 메뉴가 열리면 말풍선·GO 표시를 숨긴다
       storyRoot.style.visibility = p ? 'hidden' : '';
       if (world) world.paused = p;
@@ -646,6 +656,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       window.removeEventListener('keydown', hqKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
+      storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
       story.dispose();
       setLineProvider(null);
       audio.dispose();

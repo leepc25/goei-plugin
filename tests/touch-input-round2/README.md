@@ -1,0 +1,69 @@
+# 터치·패드 입력 2차 인계
+
+기준: `0d43a449`, 브랜치: `codex/touch-input-round2` (2026-10-22).
+`origin/codex/metroidvania-run-system`을 명시적으로 fetch한 뒤 독립 worktree에서 작업했다.
+기존 `/workspace/goei-plugin` 작업 공간은 수정하지 않았다.
+
+## 수정과 재현
+
+| 재현 | 원인 | 담당 파일 수정 |
+| --- | --- | --- |
+| 공격을 누른 손가락을 빈 곳/화면 밖으로 이동 | 버튼이 없을 때 기존 버튼을 해제하지 않음 | `ui/touch.ts`: 빈 곳은 버튼 해제 후 재진입 허용, 화면 밖은 해당 포인터 종료 |
+| 스틱 끝 → 중앙 → 끝을 250ms 안에 왕복하고 놓음 | 해제 예약 취소 시 Shift 참조 수가 중복 증가 | `ui/touch.ts`: 예약된 누름을 재사용하고 전체 해제 시 타이머를 항상 취소 |
+| 터치 이동 중 다른 손가락으로 지도 열기/닫기 | 숨겨진 스틱이 계속 눌린 채 복귀 | `ui/touch.ts`: 지도·메뉴 진입 시 터치 상태·캡처 초기화 |
+| 캡처 상실, 창 포커스 상실, 크기 변경 | InputHub와 터치 내부 포인터/방향/타이머 상태 불일치 | `ui/touch.ts`: 생명주기 해제 및 캡처 실패 시 window 종료 이벤트 수신 |
+| 키보드 A + 터치 공격 후 키보드만 놓음 | 엔진이 장치별 원본 키와 합쳐진 키를 중복 수신 | `ui/input.ts`: synth 모드에서는 합쳐진 눌림/뗌만 엔진에 전달 |
+| 메뉴를 열고 키보드 공격 | 메뉴에서 가로챈 원본 키가 엔진에도 전달 | `ui/input.ts`: 합성 전달 모드에서 원본 이벤트 전파 차단 |
+| 두 Shift를 누르고 하나만 놓기 / 이동 중 입력칸으로 초점 이동 후 놓기 | 별칭 키 조기 해제 / 입력칸 keyup 무시 | `ui/input.ts`: 물리 키별 추적, 입력칸에서도 해제 처리 |
+| 패드 버튼을 누른 채 더 짧은 버튼 배열의 패드로 교체 | 새 배열에 없는 이전 버튼을 해제하지 않음 | `ui/gamepad.ts`: 패드 식별자·인덱스 변경 및 누락 버튼 해제 |
+
+`keys.ts`의 배치는 그대로다. 캐릭터·자산은 수정하지 않았다. 공용 엔진 입력 취소 패치는 시스템 통합 때 반영했다.
+키보드 합성 전달은 기존처럼 UI가 엔진보다 먼저 attach되는 구조를 사용한다.
+상위 capture 단계의 대화/본부 단축키 처리는 유지한다.
+
+## 검증 실행
+
+저장소 루트에서 실행한다. 브라우저 스크립트는 자체 로컬 HTTP 서버를 열고 종료한다.
+테스트별 Node 격리를 사용하며 `--test-isolation=none`은 사용하지 않는다.
+
+```sh
+npm ci
+npm run typecheck
+npm run build
+npm test
+node tests/touch-input-round2/engine-patch.mjs
+PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright \
+CHROMIUM_PATH=/usr/bin/chromium \
+node tests/touch-input-round2/browser.mjs
+```
+
+수정 전 비교도 파일을 덮어쓰지 않고 실행할 수 있다. 입력 소스 3개만 지정 커밋에서 메모리로 읽어 fixture와 실제 게임을 묶는다. 수정 전 실패로 종료 코드 1이 예상된다.
+
+```sh
+SOURCE_REF=0d43a449 SHOTS=out/touch-input-round2-baseline \
+node tests/touch-input-round2/browser.mjs
+```
+
+- 타입 검사·빌드 통과.
+- 전체 회귀: 39개 테스트 파일, 337개 검사 중 322개 통과·15개 기존 skip·실패 0.
+- Chromium: 844×390 / 667×375에서 26개 검사 모두 통과. 같은 검사에 기준 커밋 입력 소스를 넣으면 17개 실패·9개 통과로 결함을 재현했다. CDP `Input.dispatchTouchEvent`로 실제 브라우저 touch/pointer 경로를 사용한다. DOM PointerEvent로 터치를 대체하지 않는다.
+- 실제 게임: 이동+공격, 이동 중 조사 입력, 누른 스틱을 남겨 둔 지도 열기/닫기 및 시뮬레이션 정지, 메뉴 계속 후 재이동, 화면 밖 이동 해제.
+- 실제 본부: 첫 출근 컷신만 skip으로 준비한 뒤 가구를 돌아 문까지 **터치로 걷고 조사 버튼으로 2층 복도에 도착**. 좌표 주입·goto·문 상태 조작 없음.
+- 입력 fixture: 같은 버튼의 두 손가락 독립 해제, 공격→조사→빈 곳→재진입, 스틱 왕복 Shift 해제, 키보드/터치 및 패드/터치 혼용, 활성 캡처 상실·blur, 키 별칭·입력칸 keyup.
+- 패드: Gamepad API 모의 장치. 실제 게임 루프의 이동·공격·지도 왕복·Start 메뉴/B 복귀와 재이동, 연결 해제, 짧은 버튼 배열로 교체를 검사한다.
+- 결과와 스크린샷: `out/touch-input-round2/results.json`, `844x390-{map,play,hq-door}.png`, `667x375-{map,play,hq-door}.png`. 기준 비교는 별도 `out/touch-input-round2-baseline/`.
+- 로컬 조작 검증판: `dist/goei-action-game.html` (수정 코드 적용, 그림 변경 없음). 생성 HTML과 빌드 산출물은 커밋하지 않는다.
+
+## 공용 연결 패치 (통합 완료)
+
+`engine-input-reset.patch`의 `Input.clear()` 변경을 실제 `src/game/action/engine/input.ts`에 적용했다. 패치 파일은 기존 인계 기록으로 보존하며 다시 적용하지 않는다.
+
+취소 시 미처리 눌림/뗌과 두 번 누르기 이력을 버려, 취소한 공격이나 Shift가 다음 틱에서 공격·회피로 실행되지 않는다. 정상적인 짧은 Shift 회피는 유지한다.
+
+`engine-patch.mjs`는 현재 통합 소스를 직접 검사한다. 수정 전 코드의 결함을 항상 기대하거나 임시 패치를 적용하지 않는다. `touch-input-round2.test.mjs`에도 입력 취소, 달리기·앉기 두 번 누르기 이력 초기화, 정상 회피 회귀 검사를 추가했다.
+
+통합 후 타입 검사·해당 단위 검사·엔진 직접 검사가 통과했다. Chromium 844×390 / 667×375에서 기존 26개와 새 blur 취소 2개, 총 28개 검사가 통과했다. 두 크기 모두 첫방의 실제 터치 보행→조사→2층 복도 도착을 확인했다. 전체 빌드와 별도로 `SOURCE_REF=HEAD` 메모리 번들을 사용했으며, 덮어쓰는 UI 입력 3파일이 작업트리와 HEAD에서 동일함을 확인했다. 엔진은 현재 작업트리 소스로 검증했다. 결과는 `/workspace/goei-touch-integration-evidence/results.json`에 저장했다.
+
+## 남은 범위
+
+실물 Android/iOS 터치 화면, Safari, 실물 게임패드·진동, 플러그인 호스트 안의 회전 좌표는 미검증이다. Chromium 터치 에뮬레이션/모의 패드 검증을 하드웨어 검증으로 주장하지 않는다. 전체 층 완주나 캐릭터 시각 품질 승인도 이번 범위가 아니다.

@@ -1,0 +1,99 @@
+--- a/src/game/action/engine/modules.ts
++++ b/src/game/action/engine/modules.ts
+@@ -7,6 +7,8 @@
+ import { createGameAudio } from '../audio';
+ import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+ import { mountGameShell, type HudState, type Shell } from '../ui';
++import { navigationFeedback } from './navigationFeedback';
++import { syncNavigationButton } from '../ui/navigationButton';
+ import type { GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
+ import type { EngineModules, Game } from './game';
+ import { DEF_BY_KIND, arenaStage, createEnemy, isThreat, signalEnemies } from '../enemy';
+@@ -156,6 +158,8 @@
+     // 가드 게이지는 가드 중이거나 닳았을 때만
+     meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
+     compact: shell.touchShown,
++    device: shell.touchShown ? 'touch' : shell.input.last,
++    navigation: navigationFeedback(w),
+   };
+ }
+ 
+@@ -531,8 +535,10 @@
+       shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+       const hs = hudState(w, shell);
+       if (npc.isOpen()) hs.message = undefined; // 대화창이 열려 있으면 자막·안내 한 줄은 숨긴다 (같은 말이 두 번, 폰 키보드 자리)
++      if (mods.blocking?.() || shell.paused) hs.navigation = undefined;
+       if (!game?.inHub) shell.hud.draw(ctx, hs, dt); // 본부에서는 전투 HUD 없음
+       else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact); // 본부 목소리는 아래 자막 한 줄
++      if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+       if (shell.paused) mapOpen = false;
+       if (!game?.inHub && w.stage === elevator) {
+         const m = elevator.mapView();
+@@ -542,6 +548,7 @@
+         if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
+         else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
+       } else mapOpen = false;
++      syncNavigationButton(shell.canvas, hs.navigation);
+       shell.touch.setItems(hs.items);
+       shell.touch.setGauge(w.player.gauge / 100);
+       shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
+--- a/src/game/action/engine/render.ts
++++ b/src/game/action/engine/render.ts
+@@ -1,7 +1,6 @@
+ // 그리기: 1280×720 논리 캔버스. 배경(회색 상자) → 그림자 → 몸(깊이 순) → 효과 → 어둠 → 판정 보기 → 컷인 → HUD.
+ import { pfont } from './pxfont';
+ import { drawPropArt } from '../art/bg';
+-import { drawHintIcon } from './hint';
+ import { drawGoSign } from '../ui/title';
+ import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
+ import type { Art } from './art';
+@@ -82,13 +81,6 @@
+       ctx.font = pfont(22).f;
+       ctx.fillText('출구', ex + 22, wallTop + 110);
+     }
+-  }
+-
+-  /** world.interact와 같은 거리(가로 60) */
+-  function near(w: World, p: { x: number }) {
+-    // 층에 막 들어와 시작 자리에 서 있는 동안은 띄우지 않는다 (걸어서 다가갔을 때만)
+-    if (Math.abs(w.player.x - w.floor.startX) < 4) return false;
+-    return Math.abs(w.player.x - p.x) < 60;
+   }
+ 
+   function drawProps(w: World, camX: number, list: readonly World['props'][number][] = w.props) {
+@@ -501,11 +493,9 @@
+           ctx.restore();
+         }
+       }
+-      // 상호작용 안내는 글씨 대신 요원 머리 위 작은 도트 아이콘 하나 (검수 4-2)
+-      // 싸움 중(가까이 적이 있을 때)엔 띄우지 않는다: 피해 숫자·말풍선과 겹친다 (검수 12-5)
+-      const fighting = w.bodies.some((b) => b.alive && b.team !== 'player' && b.kind !== 'bullet' && b.kind !== 'item' && Math.abs(b.x - w.player.x) < 520);
+-      w.hintShown = !fighting && w.props.some((p) => p.label && near(w, p));
+-      if (w.hintShown) drawHintIcon(ctx, w.player.x - camX, w.player.y - w.player.z - 300, w.tick);
++      // 실제 조사 대상의 표식. 전투 중에도 잠김 이유는 HUD에서 읽을 수 있다.
++      // 표식은 HUD 안내 띠 안에서 그린다. 머리 위 표식과 안내 띠가 겹치지 않게 한다.
++      w.hintShown = false;
+       drawFx(w, camX);
+       if (w.floor.drawForeground) {
+         ctx.save();
+--- a/src/game/action/engine/hub.ts
++++ b/src/game/action/engine/hub.ts
+@@ -8,7 +8,6 @@
+ import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
+ import { SCREEN_H, SCREEN_W } from './contract';
+ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt } from '../art/bg';
+-import { drawHintIcon } from './hint';
+ import { blockByProps, clearSpot, type BlockProp } from './propBlock';
+ import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
+ 
+@@ -108,9 +107,7 @@
+         if (enterTick < 0) enterTick = now;
+         const age = (now - enterTick) / (1000 / 30);
+         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
+-        const show = near && fadeOut <= 0 && !opening && !host.busy?.();
+-        if (show) (w as { hintShown?: boolean }).hintShown = true;
+-        if (show) drawHintIcon(c, w.player.x, w.player.y - w.player.z - 300, w.tick);
++        // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
+         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
+         if (dark > 0) {
+           c.fillStyle = `rgba(0,0,0,${dark})`;

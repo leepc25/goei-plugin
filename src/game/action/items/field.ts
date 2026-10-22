@@ -1,11 +1,11 @@
-import { DROP_TABLES, ITEMS, PICKUP, PROPS, RELICS, WEAPONS, type PickupKind, type Status } from './data';
+import { AMMO_PICKUP, DROP_TABLES, ITEMS, PICKUP, PROPS, SIGNATURES, WEAPONS, type PickupKind, type Status } from './data';
 import {
   addAmmo,
   addItem,
   addRelic,
-  canAddItem,
   equip,
   fireSignature,
+  pickupHealAmount,
   tickRun,
   useItem,
   usesAmmo,
@@ -25,6 +25,8 @@ export interface Pickup {
   /** 아이템·회수물·무기 id */
   ref?: string;
   amount: number;
+  /** 일부 보충하고 바닥에 남은 실제 탄 수. 없는 구형 저장은 amount개 탄약 상자로 해석한다. */
+  ammoLeft?: number;
   /** 임시 무기 남은 횟수(버린 무기) */
   uses?: number;
   x: number;
@@ -232,6 +234,8 @@ function propBox(e: PropEnt, p: { x: number; y: number; z: number }, pad = 0): b
 
 /** 환경 물건에 피해. 부서지면 표를 굴리고 효과를 터뜨린다. */
 export function damageProp(field: Field, run: ItemRun, e: PropEnt, dmg: number, targets: Target[] = []): ItemEvent[] {
+  // 한 공격의 복사 목록에 있어도 앞선 연쇄 폭발이 이미 제거했을 수 있다.
+  if (!field.ents.includes(e)) return [];
   const def = PROPS[e.prop];
   if (def.use === 'throw') return [];
   e.hp -= dmg;
@@ -260,7 +264,7 @@ export function explode(
         ev.push({ t: 'hit', target: t.id, damage: b.damage, knockback: 180, knockdown, stun: b.type === 'shock' ? 1 : undefined, x: t.x, y: t.y, source });
     // 폭발은 다른 물건도 부순다(연쇄)
     for (const e of field.ents.slice())
-      if (e.type === 'prop' && e.prop !== source && Math.hypot(e.x - x, (e.y - y) * 2) < b.radius && field.ents.includes(e))
+      if (e.type === 'prop' && Math.hypot(e.x - x, (e.y - y) * 2) < b.radius && field.ents.includes(e))
         ev.push(...damageProp(field, run, e, b.damage, targets));
   }
   return ev;
@@ -405,8 +409,10 @@ export function interact(field: Field, run: ItemRun, actor: Actor): ItemEvent[] 
   }
   return take(field, run, best, true);
 }
-function take(field: Field, run: ItemRun, p: Pickup, manual: boolean): ItemEvent[] {
+function take(field: Field, run: ItemRun, p: Pickup, manual: boolean, ctx?: UseContext): ItemEvent[] {
+  if (!field.ents.includes(p)) return [];
   const at = { x: p.x, y: p.y };
+  let amount = p.amount;
   switch (p.kind) {
     case 'cash':
       run.cash += p.amount;
@@ -415,16 +421,30 @@ function take(field: Field, run: ItemRun, p: Pickup, manual: boolean): ItemEvent
       run.shards += p.amount;
       break;
     case 'heal':
+      if (ctx) {
+        if (ctx.hp >= ctx.max) return [];
+        amount = Math.min(p.amount, Math.ceil((ctx.max - ctx.hp) / pickupHealAmount(ctx.max)));
+        ctx.hp = Math.min(ctx.max, ctx.hp + pickupHealAmount(ctx.max, amount));
+      }
       break;
-    case 'ammo':
-      if (!addAmmo(run)) return [{ t: 'full', kind: 'ammo' }];
-      break;
+    case 'ammo': {
+      const ammo = SIGNATURES[run.agent]?.ammo;
+      if (!ammo || ammo === 'none') return [];
+      p.ammoLeft ??= AMMO_PICKUP[ammo].amount * p.amount;
+      amount = addAmmo(run, p.ammoLeft);
+      if (!amount) return manual ? [{ t: 'full', kind: 'ammo' }] : [];
+      p.ammoLeft -= amount;
+      if (!p.ammoLeft) field.ents.splice(field.ents.indexOf(p), 1);
+      return [{ t: 'pickup', kind: p.kind, amount, ...at }];
+    }
     case 'item':
-      if (!canAddItem(run, p.ref!)) return manual ? [{ t: 'full', kind: 'item', ref: p.ref }] : [];
-      addItem(run, p.ref!, p.amount);
+      amount = addItem(run, p.ref!, p.amount);
+      if (!amount) return manual ? [{ t: 'full', kind: 'item', ref: p.ref }] : [];
       break;
     case 'relic':
-      if (!addRelic(run, p.ref!)) return manual ? [{ t: 'full', kind: 'relic', ref: p.ref }] : [];
+      amount = 0;
+      while (amount < p.amount && addRelic(run, p.ref!)) amount++;
+      if (!amount) return manual ? [{ t: 'full', kind: 'relic', ref: p.ref }] : [];
       break;
     case 'weapon': {
       const prev = equip(run, p.ref!, p.uses);
@@ -433,8 +453,9 @@ function take(field: Field, run: ItemRun, p: Pickup, manual: boolean): ItemEvent
       return [{ t: 'equip', weapon: p.ref!, dropped: prev?.id }];
     }
   }
-  field.ents.splice(field.ents.indexOf(p), 1);
-  return [{ t: 'pickup', kind: p.kind, ref: p.ref, amount: p.amount, ...at }];
+  p.amount -= amount;
+  if (p.amount <= 0) field.ents.splice(field.ents.indexOf(p), 1);
+  return [{ t: 'pickup', kind: p.kind, ref: p.ref, amount, ...at }];
 }
 
 /**
@@ -452,6 +473,8 @@ export function stepField(
   melee?: { damage: number; reach: number },
 ): ItemEvent[] {
   const ev: ItemEvent[] = [];
+  // 같은 틱의 회복 조각 여러 개 및 뒤따르는 회복약 입력도 이미 예정된 회복을 고려한다.
+  ctx = ctx ? { ...ctx } : undefined;
   if (tickRun(run, dt)) ev.push({ t: 'reloaded' });
   const b = field.bounds;
   // 바닥 물건
@@ -482,7 +505,7 @@ export function stepField(
       e.x += (actor.x - e.x) * Math.min(1, dt * 14);
       e.y += (actor.y - e.y) * Math.min(1, dt * 14);
     }
-    if ((auto && d < PICKUP.touch) || ((e.kind === 'item' || e.kind === 'relic') && d < PICKUP.touch)) ev.push(...take(field, run, e, false));
+    if ((auto && d < PICKUP.touch) || ((e.kind === 'item' || e.kind === 'relic') && d < PICKUP.touch)) ev.push(...take(field, run, e, false, ctx));
   }
   // 입력
   if (input.interact) ev.push(...interact(field, run, actor));
@@ -522,7 +545,13 @@ export function stepField(
     }
     let done = p.life <= 0 || p.x < b.x0 - 60 || p.x > b.x1 + 60;
     if (p.kind === 'grenade') {
-      if (p.z <= 0) {
+      // 벽으로 던져도 소비한 소모품은 방 안에 떨어져 효과를 낸다.
+      if (p.x < b.x0 || p.x > b.x1) {
+        p.x = Math.max(b.x0, Math.min(b.x1, p.x));
+        p.vx = 0;
+      }
+      done = p.life <= 0;
+      if (p.z <= 0 || done) {
         const def = ITEMS[p.ref].effect;
         if (def.type === 'flash') {
           ev.push(burst(field, 'flash', p.x, p.y, def.radius, 0.4));

@@ -1,6 +1,6 @@
 // 음악: 작은 트래커. 곡은 글자로 적고(songs.ts), 악기는 전부 코드 합성이다.
 // 소리 결은 90년대 아케이드 FM 칩(YM 계열) 느낌: FM 전자 피아노·FM 베이스·네모파 리드·짧은 드럼.
-import { type Out, perc, adsr, osc, noise, filt, gainNode, shaper, mtof } from './engine';
+import { type Out, perc, adsr, osc, noise, filt, gainNode, shaper, mtof, AudioScope, busOut, oneShot, ownNode } from './engine';
 
 // ── 악보 글자 ─────────────────────────────────────────────────────────
 // 음표 칸: 공백으로 나눈 낱말 하나가 16분음표 한 칸.
@@ -408,6 +408,8 @@ export const stepSec = (bpm: number) => 60 / bpm / 4;
 /** 곡 하나를 연주하는 상태. 실시간 재생과 오프라인 시험이 같은 함수를 쓴다 */
 export class Player {
   readonly out: GainNode;
+  private scope: AudioScope;
+  private sends: GainNode[];
   private chanNodes = new Map<string, AudioNode>();
   step = 0;
   nextTime: number;
@@ -416,9 +418,14 @@ export class Player {
   constructor(
     private o: Out,
     readonly song: Compiled,
-    startAt: number,
+    readonly startAt: number,
   ) {
+    this.scope = new AudioScope(busOut(o, 'music'));
+    o = this.o = this.scope.out;
     this.out = gainNode(o, 1, o.music);
+    const verb = gainNode(o, 1, o.verb), room = gainNode(o, 1, o.room);
+    this.sends = [this.out, verb, room];
+    this.o = { ...o, verb, room };
     this.nextTime = startAt;
     for (const [name, c] of Object.entries(song.chans)) {
       const d = c.def;
@@ -426,12 +433,12 @@ export class Player {
       let tail: AudioNode = g;
       if (d.drive) tail = tail.connect(shaper(o, d.drive));
       if (d.pan) {
-        const p = o.ctx.createStereoPanner();
+        const p = ownNode(o, o.ctx.createStereoPanner());
         p.pan.value = d.pan;
         tail = tail.connect(p);
       }
       tail.connect(this.out);
-      if (d.verb) tail.connect(gainNode(o, d.verb, o.verb));
+      if (d.verb) tail.connect(gainNode(o, d.verb, this.o.verb));
       this.chanNodes.set(name, g);
     }
   }
@@ -455,12 +462,12 @@ export class Player {
         if (!evs) continue;
         const dest = this.chanNodes.get(name)!;
         for (const e of evs) {
-          if ('kind' in e) drum(this.o, dest, t, e.kind, 1);
+          if ('kind' in e) oneShot(this.o, o => drum(o, dest, t, e.kind, 1));
           else {
             const inst = INST[c.def.inst as Exclude<InstId, 'drums'>];
             for (const n of e.notes) {
               const sour = s.def.wrong && Math.random() < s.def.wrong ? (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.7) : 0;
-              inst(this.o, dest, t, mtof(n + sour), e.len * sec * 0.95, e.vel);
+              oneShot(this.o, o => inst(o, dest, t, mtof(n + sour), e.len * sec * 0.95, e.vel));
             }
           }
         }
@@ -477,11 +484,13 @@ export class Player {
   }
 
   fadeOut(t: number, sec: number) {
-    const g = this.out.gain;
-    g.cancelScheduledValues(t);
-    g.setValueAtTime(g.value, t);
-    g.linearRampToValueAtTime(0.0001, t + sec);
+    for (const node of this.sends) {
+      const g = node.gain;
+      g.cancelScheduledValues(t);
+      g.setValueAtTime(g.value, t);
+      g.linearRampToValueAtTime(0, t + sec);
+    }
     this.ended = true;
-    setTimeout(() => this.out.disconnect(), (sec + 2) * 1000);
+    this.scope.stopAt(t + sec);
   }
 }

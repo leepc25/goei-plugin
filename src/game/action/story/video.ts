@@ -3,6 +3,7 @@
 // 첫 컷을 못 불러오면 바로 끝낸다.
 import type { VideoSub } from './scripts/videos';
 import { ensureKit } from '../ui/kit';
+import { VideoTrack } from '../audio/videoTrack';
 
 const W = 640;
 const H = 360;
@@ -23,7 +24,7 @@ export class VideoPlayer {
   readonly el: HTMLElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private audio: HTMLAudioElement | null = null;
+  private audio: VideoTrack | null = null;
   private sub: HTMLElement;
   private skipBtn: HTMLButtonElement;
   private soundBtn: HTMLButtonElement;
@@ -37,6 +38,8 @@ export class VideoPlayer {
   private token = 0;
   private raf = 0;
   private started = 0;
+  private audioTime = 0;
+  private detachClock: (() => void) | null = null;
   /** 재생 중인가 (불러오는 중 포함) */
   open = false;
 
@@ -59,8 +62,7 @@ export class VideoPlayer {
     this.skipBtn.addEventListener('click', (e) => (e.stopPropagation(), this.finish()));
     this.soundBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (this.audio) this.audio.muted = false;
-      this.soundBtn.hidden = true;
+      this.audio?.enable(this.audioTime);
     });
     // 화면을 눌러도 건너뛴다 (1초 뒤부터, 실수 방지)
     el.addEventListener('click', () => this.skipSoft());
@@ -75,6 +77,7 @@ export class VideoPlayer {
     this.cuts = cuts.map(() => undefined);
     this.done = onDone;
     this.open = true;
+    this.audioTime = 0;
     this.started = performance.now();
     this.el.hidden = false;
     this.sub.hidden = true;
@@ -99,6 +102,9 @@ export class VideoPlayer {
     if (sound) this.startAudio(`${base}sound.ogg`, token);
     this.started = performance.now();
     let elapsed = 0, last = this.started, buffering = false;
+    const resetClock = () => { last = performance.now(); };
+    document.addEventListener('visibilitychange', resetClock);
+    this.detachClock = () => document.removeEventListener('visibilitychange', resetClock);
     const duration = this.lens.reduce((a, b) => a + b, 0);
     this.loading.hidden = true;
     this.draw(0);
@@ -106,6 +112,11 @@ export class VideoPlayer {
     const tick = () => {
       if (token !== this.token) return;
       const now = performance.now();
+      if (document.hidden || this.audio?.blocked) {
+        last = now;
+        this.raf = requestAnimationFrame(tick);
+        return;
+      }
       const t = elapsed + (now - last) / 1000;
       last = now;
       let at = t, index = 0;
@@ -117,11 +128,10 @@ export class VideoPlayer {
       } else {
         this.loading.hidden = true;
         if (buffering && this.audio) {
-          this.audio.currentTime = elapsed;
-          void this.audio.play().catch(() => {});
+          this.audio.resume(elapsed);
         }
         buffering = false;
-        elapsed = t;
+        elapsed = this.audioTime = t;
         if (t >= duration) return this.finish();
         this.draw(t);
         this.showSub(t);
@@ -132,14 +142,8 @@ export class VideoPlayer {
   }
 
   private startAudio(url: string, token: number) {
-    const a = new Audio(url);
-    this.audio = a;
-    a.addEventListener('error', () => (this.soundBtn.hidden = true));
-    a.play().catch(() => {
-      // 소리 있는 자동 재생이 막히면 소리 없이 틀고 「소리 켜기」를 보인다
-      if (token !== this.token || a.error) return;
-      a.muted = true;
-      a.play().then(() => token === this.token && (this.soundBtn.hidden = false)).catch(() => {});
+    this.audio = new VideoTrack(this.el, url, show => {
+      if (token === this.token) this.soundBtn.hidden = !show;
     });
   }
 
@@ -187,7 +191,9 @@ export class VideoPlayer {
     this.open = false;
     this.token++;
     cancelAnimationFrame(this.raf);
-    this.audio?.pause();
+    this.detachClock?.();
+    this.detachClock = null;
+    this.audio?.dispose();
     this.audio = null;
     this.el.hidden = true;
     this.cuts = [];

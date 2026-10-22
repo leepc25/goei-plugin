@@ -2,6 +2,7 @@
 import { PIXEL, type Body, type Hit, type HitResult, type WBox, type WorldView } from './contract';
 import { Fighter, GRAVITY, toWorld } from './fighter';
 import type { Pad } from './input';
+import { newAttackId } from './ids';
 import { COMBO, MOVES, type MoveDef } from './moves';
 import type { FrameInfo } from './art';
 import { progressionFor, progressionHit, defendedHit, isBlastMove, canUseMasteryMove, masteryMove, masteryHitId } from './progression';
@@ -67,7 +68,6 @@ export class Player extends Fighter {
   fightT = 0;
   /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
   ally: { x: number; y: number; dir: 1 | -1; phase: 'in' | 'act' | 'out'; clip: string; f: number; ft: number; hitOn: boolean; id: number } | null = null;
-  private allyN = 0;
   /** 강화 선택 등이 곱하는 공격력 배수 */
   dmgMul = 1;
   progression = progressionFor();
@@ -332,7 +332,8 @@ export class Player extends Fighter {
     this.moveKey = key;
     this.mf = 0;
     this.mft = 0;
-    this.attackId++;
+    // 숙련 필살의 두 번째 폭발 번호까지 예약한다.
+    this.attackId = newAttackId(2);
     this.connected = false;
     this.running = false;
     this.guarding = false;
@@ -629,7 +630,7 @@ export class Player extends Fighter {
     if (this.gauge < 50) return world.say('지원 호출: 필살 게이지 절반 필요', 1);
     this.gauge -= 50;
     const d = this.dir;
-    this.ally = { x: this.x - d * 580, y: Math.min(world.lane[1], this.y + 30), dir: d, phase: 'in', clip: 'walk', f: 0, ft: 0, hitOn: false, id: 9_000_000 + ++this.allyN };
+    this.ally = { x: this.x - d * 580, y: Math.min(world.lane[1], this.y + 30), dir: d, phase: 'in', clip: 'walk', f: 0, ft: 0, hitOn: false, id: newAttackId() };
     world.say('「길 비켜.」', 1.4);
   }
 

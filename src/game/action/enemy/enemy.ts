@@ -1,6 +1,8 @@
 // 적 몸 하나 (엔진 Body). 상태 기계 공통 부분: 등장 → 생각(brain) → 공격 동작(장별 판정) → 피격 반응(부록 E.1·E.2) → 다운·기상 → 죽음·드랍.
 // 적마다 다른 행동은 brains.ts의 Brain이 맡는다 (ai.ts 일반 적, guardians.ts 수호자).
 import { toWorld } from './geom';
+import { newBodyId, bumpBodyIds, newAttackId } from '../engine/ids';
+export { newAttackId } from '../engine/ids';
 import { PROJ, Proj } from './proj';
 import type { AiKind, EnemyDef } from './roster';
 import type { Armor, Body, Debuff, FrameBoxes, Hit, HitResult, LocalBox, Move, Part, PartBox, RuleSignal, WBox, WorldView } from './types';
@@ -46,12 +48,8 @@ export interface Brain {
 
 export const REACT_RANK: Record<Hit['react'], number> = { none: 0, flinch: 1, stagger: 2, launch: 2, down: 3, bind: 3 };
 
-let nextEnemyId = 1;
-let nextAttack = 1_000_000;
 /** 같은 세계에서 몸을 다시 만들 때(불러오기) id 겹침 방지 */
-export function bumpIds(n: number) {
-  nextEnemyId = Math.max(nextEnemyId, n + 1);
-}
+export const bumpIds = bumpBodyIds;
 
 const still = new WeakMap<object, { x: number; y: number; tick: number; n: number }>();
 /** 플레이어가 움직이지 않은 틱 수 (어둠의 층 체온, 그림자·얼룩) */
@@ -70,7 +68,7 @@ export function stillTicks(w: WorldView): number {
 }
 
 export class Enemy implements Body {
-  readonly id = nextEnemyId++;
+  readonly id = newBodyId();
   readonly team = 'enemy' as const;
   readonly kind: string;
   label: string;
@@ -189,7 +187,7 @@ export class Enemy implements Body {
   start(move: Move, w: WorldView, cd = 0) {
     this.move = move;
     this.mf = 0;
-    this.atk = nextAttack += 8;
+    this.atk = newAttackId(move.specs.length);
     this.mem.last = move.id;
     this.set('attack');
     if (cd) this.cds[move.id] = Math.round(cd * (this.has('fast') ? 0.7 : 1));
@@ -342,7 +340,7 @@ export class Enemy implements Body {
     this.grabT = g.ticks;
     this.grabEvery = g.every ?? 10;
     this.grabDmg = Math.max(1, Math.round(g.dmgPerTick * this.grabEvery * this.power));
-    this.grabHitId = nextAttack += 8;
+    this.grabHitId = newAttackId();
     this.mem.grabbedAt = w.tick;
     w.emit({ type: 'custom', name: 'enemyGrab', data: { id: this.id, kind: this.kind, ticks: g.ticks } });
   }
@@ -350,7 +348,7 @@ export class Enemy implements Body {
     const p = w.player;
     this.face(p.x);
     this.grabBox = { x0: p.x - 12, x1: p.x + 12, z0: p.z + 40, z1: p.z + 120, y: p.y, dy: 30 };
-    if (this.st % this.grabEvery === 0) this.grabHitId = nextAttack += 8;
+    if (this.st % this.grabEvery === 0) this.grabHitId = newAttackId();
     if (--this.grabT <= 0 || !p.alive) this.releaseGrab(w);
   }
   releaseGrab(w: WorldView | null) {
@@ -367,7 +365,7 @@ export class Enemy implements Body {
     if (!d) return;
     const x = d.grow || d.speed === 0 ? (opts.x ?? this.x) : (opts.x ?? this.x + this.dir * (this.def.w * 0.5));
     const y = opts.y ?? (name === 'beam' ? w.player.y : this.y);
-    const p = new Proj(d, name, x, y, opts.dir ?? this.dir, this.id, (nextAttack += 8), this.power);
+    const p = new Proj(d, name, x, y, opts.dir ?? this.dir, this.id, newAttackId(), this.power);
     if (name === 'shard') p.z = this.z;
     w.add(p);
     if (name === 'bullet') w.emit({ type: 'custom', name: 'enemyShot', data: { x: this.x } });
@@ -694,9 +692,4 @@ function drawBoxes(e: Enemy, ctx: CanvasRenderingContext2D, f: ReturnType<Enemy[
 function flat(e: Enemy): LocalBox[] {
   const w = Math.max(e.def.w, e.def.h * 0.8);
   return [{ fx0: -w * 0.5, fx1: w * 0.5, z0: e.def.hover ?? 0, z1: (e.def.hover ?? 0) + Math.min(36, e.def.h * 0.3), dy: 20, part: 'torso' }];
-}
-
-/** 동작 밖 공격용 새 attackId */
-export function newAttackId(): number {
-  return (nextAttack += 8);
 }

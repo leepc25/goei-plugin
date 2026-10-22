@@ -1,6 +1,6 @@
 // 층별 환경음: 계속 깔리는 소리(웅웅·바람·형광등) + 가끔 들리는 사건 소리(문 쾅, 속삭임, 보이지 않는 발소리).
 // 침묵의 층은 거의 무음, 어둠의 층은 발소리 파문 위주 (기본 기획서 20.2).
-import { type Out, gainNode, osc, noise, filt } from './engine';
+import { type Out, gainNode, osc, noise, filt, AudioScope, busOut, oneShot } from './engine';
 import { SFX, type SfxId } from './sfx';
 
 export type Scene = 'title' | 'hq' | 'lobby' | 'chase' | 'replica' | 'trial' | 'dark' | 'silent' | 'puzzle' | 'service' | 'boss';
@@ -97,43 +97,50 @@ const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 
 /** 환경음 하나를 켠다. stop()으로 서서히 끈다 */
 export function startAmbience(o: Out, scene: Scene, fadeIn = 1.5) {
+  const scope = new AudioScope(busOut(o, 'amb'));
+  o = scope.out;
   const ctx = o.ctx;
   const spec = AMBIENCE[scene];
   const out = gainNode(o, 0, o.amb);
+  const verb = gainNode(o, 1, o.verb), room = gainNode(o, 1, o.room);
+  o = { ...o, verb, room };
   const t0 = ctx.currentTime;
   out.gain.setValueAtTime(0.0001, t0);
   out.gain.linearRampToValueAtTime(1, t0 + fadeIn);
   const long = 86400;
-  const srcs: AudioScheduledSourceNode[] = [];
   for (const l of spec.layers) {
     const g = gainNode(o, l.vol, out);
     if (l.kind === 'hum') {
       // 형광등·냉장고 웅: 기본음 + 배음, 아주 느리게 흔들림
-      for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.3], [4, 0.15]] as const) srcs.push(osc(o, 'sine', l.f * k, t0, long, gainNode(o, v, g)));
+      for (const [k, v] of [[1, 1], [2, 0.5], [3, 0.3], [4, 0.15]] as const) osc(o, 'sine', l.f * k, t0, long, gainNode(o, v, g));
       const wob = gainNode(o, l.vol * 0.3);
       wob.connect(g.gain);
-      srcs.push(osc(o, 'sine', 0.13, t0, long, wob));
+      osc(o, 'sine', 0.13, t0, long, wob);
     } else if (l.kind === 'rumble') {
-      srcs.push(noise(o, t0, long, filt(o, 'lowpass', l.f, 1.5, g), true));
+      noise(o, t0, long, filt(o, 'lowpass', l.f, 1.5, g), true);
       const wob = gainNode(o, l.vol * 0.4);
       wob.connect(g.gain);
-      srcs.push(osc(o, 'sine', 0.07, t0, long, wob));
+      osc(o, 'sine', 0.07, t0, long, wob);
     } else if (l.kind === 'air') {
-      srcs.push(noise(o, t0, long, filt(o, 'bandpass', l.f, 0.6, g)));
+      noise(o, t0, long, filt(o, 'bandpass', l.f, 0.6, g));
       const wob = gainNode(o, l.vol * 0.6);
       wob.connect(g.gain);
-      srcs.push(osc(o, 'sine', 0.05, t0, long, wob));
+      osc(o, 'sine', 0.05, t0, long, wob);
     } else {
-      srcs.push(osc(o, 'sine', l.f, t0, long, g));
+      osc(o, 'sine', l.f, t0, long, g);
     }
   }
-  const timers: number[] = [];
+  const timers = new Set<number>();
+  const later = (f: () => void, ms: number) => {
+    const id = window.setTimeout(() => { timers.delete(id); f(); }, ms);
+    timers.add(id);
+  };
   let live = true;
   const fire = (e: Ev) => {
     if (!live) return;
     if (ctx.state !== 'running') {
       // 멈춘 동안 쌓였다가 한꺼번에 터지지 않게 건너뛴다
-      timers.push(window.setTimeout(() => fire(e), e.gap[0] * 1000));
+      later(() => fire(e), e.gap[0] * 1000);
       return;
     }
     const vol = rnd(e.vol[0], e.vol[1]);
@@ -142,23 +149,25 @@ export function startAmbience(o: Out, scene: Scene, fadeIn = 1.5) {
     const t = ctx.currentTime + 0.05;
     if (e.id === 'typing') {
       const n = 4 + Math.floor(Math.random() * 10);
-      for (let i = 0; i < n; i++) SFX.switchClick.fn(o, t + i * rnd(0.07, 0.16), { vol: vol * rnd(0.5, 1), pan, pitch: rnd(1.2, 1.8), dest: out });
-    } else SFX[e.id].fn(o, t, { vol, pan, pitch, dest: out });
-    timers.push(window.setTimeout(() => fire(e), rnd(e.gap[0], e.gap[1]) * 1000));
+      for (let i = 0; i < n; i++) oneShot(o, ao => SFX.switchClick.fn(ao, t + i * rnd(0.07, 0.16), { vol: vol * rnd(0.5, 1), pan, pitch: rnd(1.2, 1.8), dest: out }));
+    } else oneShot(o, ao => SFX[e.id as SfxId].fn(ao, t, { vol, pan, pitch, dest: out }));
+    later(() => fire(e), rnd(e.gap[0], e.gap[1]) * 1000);
   };
-  for (const e of spec.events) timers.push(window.setTimeout(() => fire(e), rnd(e.gap[0] * 0.3, e.gap[1] * 0.6) * 1000));
+  for (const e of spec.events) later(() => fire(e), rnd(e.gap[0] * 0.3, e.gap[1] * 0.6) * 1000);
   return {
     scene,
     stop(fade = 1.2) {
+      if (!live) return;
       live = false;
       for (const id of timers) clearTimeout(id);
+      timers.clear();
       const t = ctx.currentTime;
-      out.gain.cancelScheduledValues(t);
-      out.gain.setValueAtTime(out.gain.value, t);
-      out.gain.linearRampToValueAtTime(0.0001, t + fade);
-      // 계속 도는 발진기는 꺼서 정리한다
-      for (const n of srcs) try { n.stop(t + fade + 0.1); } catch { /* 이미 멈춤 */ }
-      window.setTimeout(() => out.disconnect(), (fade + 0.5) * 1000);
+      for (const node of [out, verb, room]) {
+        node.gain.cancelScheduledValues(t);
+        node.gain.setValueAtTime(node.gain.value, t);
+        node.gain.linearRampToValueAtTime(0, t + fade);
+      }
+      scope.stopAt(t + fade);
     },
   };
 }
