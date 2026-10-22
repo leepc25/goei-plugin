@@ -4,6 +4,7 @@
 **실제 새 그림이 내장된 단일 HTML과 환경 프레임 납품 완료. 사용자 시각 승인과 게임 통합은 별도다.**
 
 - 검수판: [round2-review.html](round2-review.html). 인터넷 없이 파일을 열어 정상/0.25배/반복/정지/장 넘김을 사용한다.
+- [원격 재생 검수판](https://raw.githack.com/leepc25/goei-plugin/5487e49e36f5cd3c016213b47fe87bf3e48b37f9/game-src/art/cutscene-production-round2/round2-review.html): 안내 화면이 나오면 Open the page를 누른다. 실제 재생 완주 및 내장 프레임/manifest 일치를 확인했다. 호스팅 서비스가 추가 스크립트를 삽입하므로 HTML 전체 바이트는 로컬과 다르며, 오프라인 원본은 외부 스크립트가 없다. 검증 기록은 review/remote-validation.json.
 - 원본 합성 320×180, 최종640×360, nearest-neighbor 정수2배, 여백0. 모바일 세로는 원본1배 중앙 배치.
 - 2,400ms = 첫400ms + 중간15장×100ms + 끝500ms. 재생 순서0000..0016.
 - 17개 고유 합성 프레임. AI 애니메이션 생성0장, 복제 프레임0장.

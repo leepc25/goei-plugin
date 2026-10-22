@@ -1,0 +1,23 @@
+{
+  "url": "https://raw.githack.com/leepc25/goei-plugin/5487e49e36f5cd3c016213b47fe87bf3e48b37f9/game-src/art/cutscene-production-round2/round2-review.html",
+  "status": 200,
+  "externalContentNotice": true,
+  "contentType": "text/html; charset=utf-8",
+  "payloadSha256": "96311d84cfc89ec021e4792160af2fc2182f857240c91b56a34b460c60543aeb",
+  "payloadMatchesLocal": true,
+  "fullHtmlMatchesLocal": false,
+  "hostAddsScript": true,
+  "normalPlayback": {
+    "ready": true,
+    "playing": false,
+    "index": 16,
+    "elapsed": 2400,
+    "loops": 0,
+    "speed": 1,
+    "loop": false,
+    "total": 2400,
+    "frames": 17,
+    "source": "new-art"
+  },
+  "errors": []
+}
