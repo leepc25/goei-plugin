@@ -91,6 +91,12 @@ try {
     await page.waitForTimeout(1500);
     for (let f = 0; f < FLOORS; f++) {
       let fights = 0;
+      // 강화 선택 창 등 메뉴가 떠 있으면 한 장 찍고 첫 항목을 고른다 (메트로배니아 구조: 층 끝 강화)
+      for (let t = 0; t < 40 && !(await E(() => !!window.__goeiEngine.world?.floor && !window.__goeiEngine.world.ended)); t++) {
+        await page.waitForTimeout(500);
+        if (t === 4) await S(`floor${f + 1}-choice`);
+        if (t >= 4) await page.keyboard.press('Enter');
+      }
       await page.waitForFunction(() => window.__goeiEngine.world?.floor && !window.__goeiEngine.world.ended);
       // 컷신·대사가 막고 있으면 넘긴다
       for (let i = 0; i < 6; i++) await page.keyboard.press('KeyE').catch(() => {});
