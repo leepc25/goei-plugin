@@ -311,3 +311,44 @@
 | `props/props_objects_2.png` | 신규: 층 소품 9종 | `4f63ece2` |
 
 신규 6장은 1536×1024 RGBA PNG이며 투명 픽셀을 확인했다. 기존 바닥 2장은 1024×1024다. 원본 납품이며 도트화·물건별 자르기·이음새·게임 연결과 후속 시각 검수는 별도다. 기존 바닥의 재제작 요구는 이번 건너뛰기 지시로 수행하지 않았다.
+
+
+## 관리국 본부 3판 원본 · 2026-10-22
+
+`docs/GPT요청_본부3판.md`의 29장 전부 내장 image_gen으로 신규 제작해 한 장마다 main에 커밋·푸시했다(기존 파일 0장). 벽 15장·바닥 6장·문/코어 시트 2장·집기 시트 5장·정면 외관 1장. 목욕탕 샤워 벽은 기본 타일에 맞춰 수정했고, 집기 시트 욕조는 첫 칸 크기로 줄여 수정했다.
+
+벽·외관·시트는 1536×1024, 바닥은 1024×1024 PNG다. 시트 7장은 RGBA이며 실제 투명 픽셀을 전수 확인했다. 생성기가 다른 크기의 정사각형으로 출력한 바닥은 비율을 유지해 1024×1024로 저장했다. 각 PNG 옆 `.production.json`에 요청문과 생성 원본 경로·규격·해시가 있다.
+
+| 파일 | 최종 그림 커밋 |
+|---|---|
+| [hq3_office/hq3_office_wall_1.png](hq3_office/hq3_office_wall_1.png) | `decc76fd` |
+| [hq3_office/hq3_office_wall_2.png](hq3_office/hq3_office_wall_2.png) | `b071fffe` |
+| [hq3_office/hq3_office_wall_3.png](hq3_office/hq3_office_wall_3.png) | `ff5e2e6e` |
+| [hq3_office/hq3_office_floor.png](hq3_office/hq3_office_floor.png) | `b3c393f0` |
+| [hq3_hall/hq3_hall_wall_1.png](hq3_hall/hq3_hall_wall_1.png) | `808edb09` |
+| [hq3_hall/hq3_hall_wall_2.png](hq3_hall/hq3_hall_wall_2.png) | `00723560` |
+| [hq3_hall/hq3_hall_floor.png](hq3_hall/hq3_hall_floor.png) | `c8bdd4f7` |
+| [hq3_life/hq3_life_wall_1.png](hq3_life/hq3_life_wall_1.png) | `839ad5e2` |
+| [hq3_life/hq3_life_wall_2.png](hq3_life/hq3_life_wall_2.png) | `bc9decc1` |
+| [hq3_life/hq3_life_wall_3.png](hq3_life/hq3_life_wall_3.png) | `9a68ca02` |
+| [hq3_life/hq3_life_floor.png](hq3_life/hq3_life_floor.png) | `23bd19f6` |
+| [hq3_bath/hq3_bath_wall_1.png](hq3_bath/hq3_bath_wall_1.png) | `7169020f` |
+| [hq3_bath/hq3_bath_wall_2.png](hq3_bath/hq3_bath_wall_2.png) | `2c4b0d9c` |
+| [hq3_bath/hq3_bath_wall_3.png](hq3_bath/hq3_bath_wall_3.png) | `06d3c16e` |
+| [hq3_bath/hq3_bath_floor.png](hq3_bath/hq3_bath_floor.png) | `34a0b3a1` |
+| [hq3_lab/hq3_lab_wall_1.png](hq3_lab/hq3_lab_wall_1.png) | `eaee5948` |
+| [hq3_lab/hq3_lab_wall_2.png](hq3_lab/hq3_lab_wall_2.png) | `6ab34eec` |
+| [hq3_lab/hq3_lab_wall_3.png](hq3_lab/hq3_lab_wall_3.png) | `ff31023b` |
+| [hq3_lab/hq3_lab_floor.png](hq3_lab/hq3_lab_floor.png) | `2207bbe8` |
+| [hq3_labhall/hq3_labhall_wall_1.png](hq3_labhall/hq3_labhall_wall_1.png) | `b1057c27` |
+| [hq3_labhall/hq3_labhall_floor.png](hq3_labhall/hq3_labhall_floor.png) | `eccf9e1a` |
+| [hq3_doors/hq3_doors_objects.png](hq3_doors/hq3_doors_objects.png) | `0439c0b3` |
+| [hq3_doors/hq3_doors_objects_2.png](hq3_doors/hq3_doors_objects_2.png) | `4151c5fd` |
+| [hq3_office/hq3_office_objects.png](hq3_office/hq3_office_objects.png) | `4dc74876` |
+| [hq3_life/hq3_life_objects.png](hq3_life/hq3_life_objects.png) | `63553ae2` |
+| [hq3_bath/hq3_bath_objects.png](hq3_bath/hq3_bath_objects.png) | `1e47a8f4` |
+| [hq3_lab/hq3_lab_objects.png](hq3_lab/hq3_lab_objects.png) | `92a5ea90` |
+| [hq3_training/hq3_training_objects.png](hq3_training/hq3_training_objects.png) | `525b4dc0` |
+| [hq3_facade/hq3_facade.png](hq3_facade/hq3_facade.png) | `375e6ccf` |
+
+[29개 파일 전수 검사·전체 해시·후속 작업](hq3-production-20261022.json). 도트화·조각 분리·실제 W/D/H와 기준점 맞춤·문짝 연결·게임 통합은 후속 작업이다. 타일 경계의 픽셀 일치는 검증하지 않았으며, 일부 집기의 사선 원근·추가 의자와 치수 비례는 후속 보정이 필요하다. 원본 수령 기록이며 전체 시각 규격 합격이나 게임 반영 완료를 의미하지 않는다.
