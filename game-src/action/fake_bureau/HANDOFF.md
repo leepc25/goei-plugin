@@ -7,7 +7,7 @@
   - clips/<대상>/<클립>/NN.png = 생성 원본 장, final/<대상>/<클립>.png = 정리된 가로 스트립 + manifest.json(장 수, 손 좌표·아래팔 각도, 발바닥 y=136, 오른쪽을 봄)
   - final/{sword,riot,burn}/v<n>/ = 일반 요원 얼굴 변형(코드로 머리색·수염·반창고·흉터 등, 생성 0회)
   - scripts/clips.py = 클립별 동작 문장과 뼈대, fixes.py = 장 빼기 목록, qa/notes.md = 검수 메모
-- 시연판: release/demo/fake-bureau.html (이도형 39, 곽성주 21, 일반 3타입 대기 동작만)
+- 시연판: https://rawcdn.githack.com/leepc25/goei-plugin/cd7cc6d78f9359ce669ce1ba19a9ab2a20dd5acb/release/demo/fake-bureau.html (release/demo/fake-bureau.html, (이도형 39, 곽성주 21, 일반 3타입 대기 동작만). 별도 검수는 못 돌림.)
 
 ## 진행
 - 다 됨 62클립: 이도형 39/39, 곽성주 21/29, 검사·진압·소각 각 1/19(대기만)
