@@ -1,0 +1,178 @@
+10-22 01:56:43 base dohyeong-0 create_image_pixen job=72d9cf34-e2fb-4570-81cb-d23257c97bed cost=1 -> 'id: 72d9cf34-e2fb-4570-81cb-d23257c97bed\njob_id: 72d9cf34-e2fb-4570-81cb-d23257c97bed\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:14 base dohyeong-1 create_image_pixen job=4c8455c5-7590-4364-84d9-bf3b854098a7 cost=1 -> 'id: 4c8455c5-7590-4364-84d9-bf3b854098a7\njob_id: 4c8455c5-7590-4364-84d9-bf3b854098a7\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:14 base dohyeong-2 create_image_pixen job=cb3a8164-95f9-4de9-9249-38e6b9a23a47 cost=1 -> 'id: cb3a8164-95f9-4de9-9249-38e6b9a23a47\njob_id: cb3a8164-95f9-4de9-9249-38e6b9a23a47\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:15 base dohyeong-3 create_image_pixen job=bcb5f725-34c6-4044-b55e-7b55ea357b9f cost=1 -> 'id: bcb5f725-34c6-4044-b55e-7b55ea357b9f\njob_id: bcb5f725-34c6-4044-b55e-7b55ea357b9f\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:46 base seongju-0 create_image_pixen job=15f1eebe-8238-492a-9a84-8f0f82cda56c cost=1 -> 'id: 15f1eebe-8238-492a-9a84-8f0f82cda56c\njob_id: 15f1eebe-8238-492a-9a84-8f0f82cda56c\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:46 base seongju-1 create_image_pixen job=b3ffdfc9-a6b0-40cd-80c9-853a32afc3ec cost=1 -> 'id: b3ffdfc9-a6b0-40cd-80c9-853a32afc3ec\njob_id: b3ffdfc9-a6b0-40cd-80c9-853a32afc3ec\nmodel: pixen\ndescription: Side-vie'
+10-22 01:57:47 base seongju-2 create_image_pixen job=a7e37c58-47d4-4465-82c9-5024454ee990 cost=1 -> 'id: a7e37c58-47d4-4465-82c9-5024454ee990\njob_id: a7e37c58-47d4-4465-82c9-5024454ee990\nmodel: pixen\ndescription: Side-vie'
+10-22 02:00:52 base seongju-3 create_image_pixen job=e46e2ff3-e646-4124-ab18-c506f64a90d8 cost=1 -> 'id: e46e2ff3-e646-4124-ab18-c506f64a90d8\njob_id: e46e2ff3-e646-4124-ab18-c506f64a90d8\nmodel: pixen\ndescription: Side-vie'
+10-22 02:01:24 base sword-0 create_image_pixen job=250fd4a7-fe12-4d70-99aa-7a3509dece5c cost=1 -> 'id: 250fd4a7-fe12-4d70-99aa-7a3509dece5c\njob_id: 250fd4a7-fe12-4d70-99aa-7a3509dece5c\nmodel: pixen\ndescription: Side-vie'
+10-22 02:05:33 base:dohyeong-0 done
+10-22 02:05:33 base:dohyeong-1 done
+10-22 02:05:34 base:dohyeong-2 done
+10-22 02:05:34 base:dohyeong-3 done
+10-22 02:05:34 base:seongju-0 done
+10-22 02:05:35 base:seongju-1 done
+10-22 02:05:36 base:seongju-2 done
+10-22 02:05:36 base:seongju-3 done
+10-22 02:05:37 base:sword-0 done
+10-22 02:06:28 base:sword-1 create_image_pixen job=d661f805-88e1-43a6-b212-164701cccc34 cost=1
+estimate dohyeong cost=0.1 {'type': 'generations', 'generations': 0.1}
+estimate seongju cost=0.1 {'type': 'generations', 'generations': 0.1}
+estimate seongju cost=0.1 {'type': 'generations', 'generations': 0.1}
+10-22 02:07:07 base:sword-1 done
+10-22 02:07:07 base:sword-2 create_image_pixen job=45cf28ff-42dc-41cd-a87c-0b560b2fa614 cost=1
+10-22 02:07:49 base:sword-2 done
+10-22 02:10:19 base:sword-3 create_image_pixen job=d85c8984-5a45-4463-a53b-00ed82117a4c cost=1
+10-22 02:10:33 base:riot-0 create_image_pixen job=10b34bdf-8eb7-43dd-84ad-56e5d8a88110 cost=1
+10-22 02:11:01 base:sword-3 done
+10-22 02:11:54 base:riot-0 done
+10-22 02:11:54 base:riot-1 create_image_pixen job=a5bcd9cb-63c6-4910-925e-d95b365a78d4 cost=1
+10-22 02:12:47 base:riot-1 done
+10-22 02:13:41 base:riot-2 create_image_pixen job=dda6fe6b-6c3a-4821-99e2-8981cd15a41d cost=1
+10-22 02:13:41 base:riot-3 create_image_pixen job=59de6290-2769-4a20-be23-6036b5dac95b cost=1
+10-22 02:14:08 base:riot-2 done
+10-22 02:14:35 base:riot-3 done
+10-22 02:14:35 base:burn-0 create_image_pixen job=6478a71f-401c-4e0e-b27b-166e1954cdc6 cost=1
+10-22 02:15:16 base:burn-0 done
+10-22 02:15:30 base:burn-1 create_image_pixen job=c5332677-af99-44b8-8866-cf4b20b1a905 cost=1
+10-22 02:15:30 base:burn-2 create_image_pixen job=4c66eece-16b3-4ebb-97d3-69e2c37102d8 cost=1
+10-22 02:15:46 base:burn-3 create_image_pixen job=4a2fe470-d063-4002-9ff7-38c5e7c35ce1 cost=1
+10-22 02:15:59 base:burn-1 done
+10-22 02:16:15 dohyeong:idle@ref animate_with_skeleton_v3 job=8d2d2090-cf99-4102-b805-6a646fc3a5d9 cost=3
+10-22 02:16:29 base:burn-2 done
+10-22 02:16:29 base:burn-3 done
+10-22 02:18:16 seongju:idle@ref animate_with_skeleton_v3 job=c95a20ca-c072-4218-a05b-a978e31752a2 cost=3
+estimate sword cost=0.1 {'type': 'generations', 'generations': 0.1}
+estimate riot cost=0.1 {'type': 'generations', 'generations': 0.1}
+estimate burn cost=0.1 {'type': 'generations', 'generations': 0.1}
+10-22 02:19:50 dohyeong:idle@ref done
+10-22 02:20:56 seongju:idle@ref done
+10-22 02:20:57 sword:idle@ref animate_with_skeleton_v3 job=b0ee568a-f425-4939-b5e2-3c0be5b27449 cost=3
+10-22 02:23:11 sword:idle@ref done
+10-22 02:24:03 riot:idle@ref animate_with_skeleton_v3 job=4bdf3d82-4b30-4f69-ba6e-aaff0401831c cost=3
+10-22 02:25:10 riot:idle@ref done
+10-22 02:25:36 burn:idle@ref animate_with_skeleton_v3 job=d32d2a5c-9f2a-46a5-851c-22382e98589a cost=3
+10-22 02:26:30 dohyeong:smoke animate_with_skeleton_v3 job=b3a8ae17-eb73-42fa-ad0e-b9ef3f123d60 cost=3
+10-22 02:26:30 dohyeong:flick animate_with_skeleton_v3 job=54a3b783-f2dc-4dfa-9bac-e799ac97ef5c cost=3
+10-22 02:26:31 dohyeong:walk animate_with_skeleton_v3 job=46f85725-0600-41b4-a4ad-a4000c572d60 cost=3
+10-22 02:27:02 burn:idle@ref done
+10-22 02:28:25 dohyeong:stance animate_with_skeleton_v3 job=cdce700e-3f27-4fed-93bb-b3d0167fd438 cost=3
+10-22 02:29:36 dohyeong:smoke done
+10-22 02:29:38 dohyeong:flick done
+10-22 02:29:54 dohyeong:walk done
+10-22 02:30:22 dohyeong:stance done
+10-22 02:34:26 sword:idle@ref2 animate_with_skeleton_v3 job=1d01bca0-de4e-41f1-96f8-3981e05ad4cb cost=3
+10-22 02:35:58 riot:idle@ref2 animate_with_skeleton_v3 job=fb697a4a-f010-4835-9a97-bd9cc54cce24 cost=3
+10-22 02:36:51 burn:idle@ref2 animate_with_skeleton_v3 job=4ddc5bae-a6c0-4ba1-9efd-5b1bee58bb0d cost=3
+10-22 02:37:05 sword:idle@ref2 done
+10-22 02:37:33 dohyeong:run animate_with_skeleton_v3 job=1d87f9b1-dec7-4d72-84f9-4340cea9fd0d cost=3
+10-22 02:37:49 riot:idle@ref2 done
+10-22 02:38:04 burn:idle@ref2 done
+10-22 02:38:56 dohyeong:vanish animate_with_skeleton_v3 job=8caea162-4678-4745-b85e-9d0c392a5272 cost=3
+10-22 02:38:57 dohyeong:reappear animate_with_skeleton_v3 job=22948924-86c6-43b2-99cc-b73465c1d6cc cost=3
+10-22 02:39:54 dohyeong:cut1 animate_with_skeleton_v3 job=ad0fcae5-3ccd-4726-bb19-823bb02c52e7 cost=3
+10-22 02:39:54 dohyeong:cut2 animate_with_skeleton_v3 job=34e82d24-789a-4a5d-8bb9-66cb83efe0de cost=3
+10-22 02:40:37 dohyeong:run done
+10-22 02:40:53 dohyeong:vanish done
+10-22 02:41:53 dohyeong:reappear done
+10-22 02:42:22 dohyeong:cut2 done
+10-22 02:42:37 dohyeong:cut1 done
+10-22 02:44:08 dohyeong:cut3 animate_with_skeleton_v3 job=7afd6151-2de3-4d00-aa1f-ff8211d85f06 cost=3
+10-22 02:44:35 dohyeong:cut4 animate_with_skeleton_v3 job=4f01fcf9-d8a5-4440-9713-1f8a5624575b cost=3
+10-22 02:46:21 dohyeong:thrust animate_with_skeleton_v3 job=b1ca6594-d1a7-4556-94b7-b0bc764c16d9 cost=3
+10-22 02:47:05 dohyeong:cut4 done
+10-22 02:50:09 dohyeong:thrust done
+10-22 02:51:55 dohyeong:cut3 done
+10-22 02:52:27 dohyeong:launcher animate_with_skeleton_v3 job=c412cff0-df1a-46c9-993c-3421cf5edcd0 cost=3
+10-22 02:55:06 dohyeong:launcher done
+10-22 02:58:31 dohyeong:jump animate_with_skeleton_v3 job=ec53dd62-e1c0-4939-8dbe-da61d02517ea cost=3
+10-22 02:58:32 dohyeong:aircut animate_with_skeleton_v3 job=ad42fa85-6ef0-42eb-8e21-ec41a24994f7 cost=3
+10-22 02:59:39 dohyeong:dashcut animate_with_skeleton_v3 job=459cc197-e8a7-41fe-9079-62d1810d087d cost=3
+10-22 03:01:31 dohyeong:kanpa animate_with_skeleton_v3 job=5406d6fe-f749-4cd7-abb7-50fcb9479e6c cost=3
+10-22 03:01:46 dohyeong:jump done
+10-22 03:02:30 dohyeong:dashcut done
+10-22 03:03:24 dohyeong:kanpa done
+10-22 03:03:25 dohyeong:counter animate_with_skeleton_v3 job=06a48d3d-32d4-404b-b8af-078382817fe1 cost=3
+10-22 03:03:25 dohyeong:bulletcut animate_with_skeleton_v3 job=b3ba7582-aca6-4342-956f-272742ea427e cost=3
+10-22 03:03:26 dohyeong:hamster animate_with_skeleton_v3 job=7b3fa8b3-7df3-4ac5-805f-a0aef9268009 cost=3
+10-22 03:03:41 dohyeong:aircut done
+10-22 03:04:22 dohyeong:sidestep animate_with_skeleton_v3 job=925d77ed-81fb-45bc-a4bd-03c37df5a66a cost=3
+10-22 03:04:36 dohyeong:guard animate_with_skeleton_v3 job=81b48e66-5751-49d2-b9ec-c850c1de54c1 cost=3
+10-22 03:05:50 dohyeong:counter done
+10-22 03:06:06 dohyeong:bulletcut done
+10-22 03:06:08 dohyeong:kick animate_with_skeleton_v3 job=bfc7ed77-c9fd-47b1-8c4a-7d64d4a4af1e cost=3
+10-22 03:06:22 dohyeong:guard done
+10-22 03:06:37 dohyeong:sidestep done
+10-22 03:06:38 dohyeong:grab animate_with_skeleton_v3 job=f0e895aa-9464-4c9b-8a2b-d8ac914298d3 cost=3
+10-22 03:06:53 dohyeong:hamster done
+10-22 03:08:00 dohyeong:grabslam animate_with_skeleton_v3 job=f8648987-b115-4e64-a1fc-6381ee01e932 cost=3
+10-22 03:08:59 dohyeong:kick done
+10-22 03:10:09 dohyeong:grabslam done
+10-22 03:10:38 dohyeong:grab done
+10-22 03:11:04 dohyeong:laugh animate_with_skeleton_v3 job=33093843-c24c-46fb-8aaa-5e750b609509 cost=3
+10-22 03:13:56 dohyeong:laugh done
+10-22 03:14:09 dohyeong:namecall animate_with_skeleton_v3 job=ba59acee-3bad-43f8-9f7a-4a64aae9de99 cost=3
+10-22 03:19:30 dohyeong:namecall done
+10-22 03:19:31 dohyeong:relight animate_with_skeleton_v3 job=50060297-7c0c-4551-8b93-52933a531ee7 cost=3
+10-22 03:27:01 dohyeong:relight done
+10-22 03:27:01 dohyeong:super_ready animate_with_skeleton_v3 job=a44de955-2d90-416b-a5e2-d0b4d3111092 cost=3
+10-22 03:31:09 dohyeong:super_ready done
+10-22 03:31:12 dohyeong:super_cut animate_with_skeleton_v3 job=ba1be0c5-2eca-4e53-b776-f2be97609862 cost=3
+10-22 03:36:25 dohyeong:super_cut done
+10-22 03:36:26 dohyeong:super_end animate_with_skeleton_v3 job=0a7d42f3-29ae-49b9-ad53-dd27a407b4b1 cost=3
+10-22 03:40:17 dohyeong:super_end done
+10-22 03:40:18 dohyeong:hit animate_with_skeleton_v3 job=4565e02b-45c0-49b7-b87a-d228eb62bc32 cost=3
+10-22 03:42:39 dohyeong:hit done
+10-22 03:42:39 dohyeong:stagger animate_with_skeleton_v3 job=5b76f3b2-e26a-40da-8f45-ddaeb1d99508 cost=3
+10-22 03:46:06 dohyeong:stagger done
+10-22 03:46:07 dohyeong:down animate_with_skeleton_v3 job=6b4e3c51-776d-42ae-8428-14ab1c4c4363 cost=3
+10-22 03:49:09 dohyeong:down done
+10-22 03:49:10 dohyeong:getup animate_with_skeleton_v3 job=65de98de-feeb-40e5-898d-4f14f023b6a7 cost=3
+10-22 03:52:11 dohyeong:getup done
+10-22 03:52:11 dohyeong:shake animate_with_skeleton_v3 job=64e98751-2f10-4d18-b61f-a7dd135744e5 cost=3
+10-22 03:56:55 dohyeong:shake done
+10-22 03:56:56 dohyeong:flee animate_with_skeleton_v3 job=cf20a7d0-8e3b-4084-bccf-f8395b711e7c cost=3
+10-22 04:00:10 dohyeong:flee done
+10-22 04:00:11 dohyeong:flee_hurt animate_with_skeleton_v3 job=c57db87f-d89b-46a8-9893-6da2d1399a71 cost=3
+10-22 04:02:37 dohyeong:flee_hurt done
+10-22 04:02:38 seongju:intro animate_with_skeleton_v3 job=7fb96ac6-e18c-4134-8397-39e19fe6ac2d cost=3
+10-22 04:05:39 seongju:intro done
+10-22 04:05:39 seongju:walk animate_with_skeleton_v3 job=21119e94-7ea5-48bf-9d25-12b9ac31aa36 cost=3
+10-22 04:08:42 seongju:walk done
+10-22 04:08:42 seongju:turn animate_with_skeleton_v3 job=f1b8aa94-425d-4bcb-b462-0813753fcaeb cost=3
+10-22 04:12:22 seongju:turn done
+10-22 04:12:23 seongju:raise animate_with_skeleton_v3 job=bd31fed7-f023-4f5a-a02b-13e456afa19e cost=3
+10-22 04:13:54 seongju:raise done
+10-22 04:13:55 seongju:spinup animate_with_skeleton_v3 job=f41846bd-f1d6-4635-bff6-f213b05ed041 cost=3
+10-22 04:16:42 seongju:spinup done
+10-22 04:16:43 seongju:fire animate_with_skeleton_v3 job=4699e83b-a032-4efd-8572-0b4b0c22dd67 cost=3
+10-22 04:19:30 seongju:fire done
+10-22 04:19:31 seongju:sweep animate_with_skeleton_v3 job=d9accedc-45d5-45e4-8e11-45c8f413d071 cost=3
+10-22 04:24:16 seongju:sweep done
+10-22 04:24:16 seongju:overheat animate_with_skeleton_v3 job=fecd0e6d-747f-490c-8e23-af4055c62ba1 cost=3
+10-22 04:29:02 seongju:overheat done
+10-22 04:29:03 seongju:reload animate_with_skeleton_v3 job=944f50fa-1d07-437d-a8b6-a37678cd94b2 cost=3
+10-22 04:32:43 seongju:reload done
+10-22 04:32:43 seongju:megaphone animate_with_skeleton_v3 job=209bc4d1-c110-4a2e-9efc-b0e6df6f552d cost=3
+10-22 04:35:24 seongju:megaphone done
+10-22 04:35:25 seongju:wall animate_with_skeleton_v3 job=8e7c0546-32c5-415e-959a-0a3a1f9079a1 cost=3
+10-22 04:40:46 seongju:wall done
+10-22 04:40:46 seongju:stomp animate_with_skeleton_v3 job=fb5110e9-4bdb-48b4-94db-095905df46a4 cost=3
+10-22 04:42:56 seongju:stomp done
+10-22 04:42:57 seongju:charge animate_with_skeleton_v3 job=9163c0e5-3617-4f9e-b108-1e6f0a1c106b cost=3
+10-22 04:51:44 seongju:charge done
+10-22 04:51:45 seongju:swing animate_with_skeleton_v3 job=072629ed-071b-4c28-9bf2-bc1468e791aa cost=3
+10-22 04:54:08 seongju:swing done
+10-22 04:54:09 seongju:doubleswing animate_with_skeleton_v3 job=b8c12962-aca5-47dc-9b71-fc584088e462 cost=3
+10-22 04:59:33 seongju:doubleswing done
+10-22 04:59:33 seongju:panzer animate_with_skeleton_v3 job=a5fc0fd5-b550-43e0-bf7d-01892f60ee11 cost=3
+10-22 05:03:27 seongju:panzer done
+10-22 05:03:28 seongju:rage animate_with_skeleton_v3 job=95e039d2-b0c0-4db3-824d-f939c1841bce cost=3
+10-22 05:06:36 seongju:rage done
+10-22 05:06:36 seongju:hit_front animate_with_skeleton_v3 job=72697bd4-0300-46a7-8df9-21296d31e45a cost=2
+10-22 05:08:59 seongju:hit_front done
+10-22 05:08:59 seongju:hit_back animate_with_skeleton_v3 job=60be9a01-f933-4900-bf0e-7d85fa263f98 cost=3
+10-22 05:11:11 seongju:hit_back done
+10-22 05:11:12 seongju:kneel animate_with_skeleton_v3 job=b55f4490-86fb-46d8-a893-6c45eef7b6fa cost=3
+10-22 05:25:43 seongju:kneel done

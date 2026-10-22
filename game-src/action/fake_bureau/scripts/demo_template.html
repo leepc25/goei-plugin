@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>가짜 관리국 도트 시연판</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #11161b; color: #e8e6e0; font: 14px/1.5 system-ui, sans-serif; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 10px 16px 40px; }
+  h1 { font-size: 17px; margin: 6px 0 2px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
+  .bar button { background: #232d32; color: #e8e6e0; border: 1px solid #34424a; border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  .bar button.on { background: #3d5a6b; border-color: #5f8aa1; }
+  .bar label { margin-left: 8px; white-space: nowrap; }
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .clip { background: #1b2228; border-radius: 8px; padding: 8px; }
+  .clip canvas { width: 100%; background: #6e7880; image-rendering: pixelated; border-radius: 4px; display: block; }
+  .clip b { font-size: 13px; }
+  .clip small { color: #9aa3ad; margin-left: 4px; }
+  #cmp { margin: 8px 0 14px; background: #1b2228; border-radius: 8px; padding: 8px; }
+  #cmp canvas { width: 100%; max-width: 900px; image-rendering: pixelated; background: #6e7880; display: block; }
+</style>
+<div class="wrap">
+  <h1>가짜 관리국 도트 시연판</h1>
+  <div style="color:#9aa3ad">검은 정장·선글라스. 모든 클립은 오른쪽을 봄(왼쪽은 엔진이 뒤집음). 칼 궤적·총구 불꽃·불·연기는 게임 코드가 그림.</div>
+  <div class="bar" id="who"></div>
+  <div class="bar" id="var"></div>
+  <div class="bar">
+    <label>속도 <select id="spd"><option value="160">느리게</option><option value="100" selected>보통</option><option value="60">빠르게</option></select></label>
+  </div>
+  <div id="cmp"><div style="margin-bottom:4px">키 비교: 쟈알디(왼쪽)와 같은 축척·같은 바닥선</div><canvas id="cv" width="10" height="144"></canvas></div>
+  <div class="list" id="list"></div>
+</div>
+<script>
+const DATA=/*DATA*/null, JY=/*JY*/"";
+let cur=Object.keys(DATA)[0], vr='0', timers=[];
+const imgs={};
+function img(src){ if(!imgs[src]){ const i=new Image(); i.src=src; imgs[src]=i; } return imgs[src]; }
+function whoBar(){ const b=document.getElementById('who'); b.innerHTML='';
+  for(const k in DATA){ const t=document.createElement('button'); t.textContent=DATA[k].name; t.className=k===cur?'on':''; t.onclick=()=>{cur=k;vr='0';render();}; b.appendChild(t);} }
+function varBar(){ const b=document.getElementById('var'); b.innerHTML=''; const vs=DATA[cur].variants; const ks=Object.keys(vs); if(!ks.length){return;}
+  b.appendChild(Object.assign(document.createElement('span'),{textContent:'얼굴 변형: '}));
+  for(const k of ['0',...ks.filter(x=>x!=='0')]){ const t=document.createElement('button'); t.textContent=k==='0'?'기본':vs[k]; t.className=k===vr?'on':''; t.onclick=()=>{vr=k;render();}; b.appendChild(t);} }
+function cmp(){ const d=DATA[cur], cv=document.getElementById('cv'), c=d.clips.idle; const jw=192;
+  cv.width=jw+d.w; cv.height=144; const x=cv.getContext('2d'); x.imageSmoothingEnabled=false; x.clearRect(0,0,cv.width,144);
+  const j=img(JY), m=img(c.img[vr]||c.img['0']); const go=()=>{ x.drawImage(j,0,0,192,144,0,0,192,144); x.drawImage(m,0,0,d.w,d.h,jw,0,d.w,d.h); x.fillStyle='#e05050'; x.fillRect(0,136,cv.width,1); };
+  if(j.complete&&m.complete) go(); else { j.onload=go; m.onload=go; } }
+function render(){ timers.forEach(clearInterval); timers=[]; whoBar(); varBar(); cmp();
+  const d=DATA[cur], L=document.getElementById('list'); L.innerHTML='';
+  for(const n in d.clips){ const c=d.clips[n]; const box=document.createElement('div'); box.className='clip';
+    box.innerHTML=`<b>${c.ko}</b><small>${n} · ${c.f}장</small>`; const cv=document.createElement('canvas'); cv.width=d.w; cv.height=d.h; box.appendChild(cv); L.appendChild(box);
+    const x=cv.getContext('2d'); x.imageSmoothingEnabled=false; const im=img(c.img[vr]||c.img['0']); let i=0;
+    const step=()=>{ if(!im.complete) return; x.clearRect(0,0,d.w,d.h); x.drawImage(im,i*d.w,0,d.w,d.h,0,0,d.w,d.h); x.fillStyle='rgba(224,80,80,.6)'; x.fillRect(0,136,d.w,1); i=(i+1)%c.f; };
+    step(); timers.push(setInterval(step,+document.getElementById('spd').value)); } }
+document.getElementById('spd').onchange=render;
+render();
+</script>
+</html>
