@@ -68,11 +68,15 @@ async function run(view, tag) {
   assert.match(sys, /잼트리/);
   assert.match(sys, /젖은 복도/, '상황판 사건이 들어간다');
   assert.doesNotMatch(sys, /오늘은 좀 쉬자/, '최근 채팅은 기본으로 안 보낸다');
+  // 보낸 뒤 입력칸에서 빠지면(키보드 닫힘) 창은 아래 배치로 돌아온다
+  await page.evaluate(() => document.activeElement.blur());
+  assert.equal(await page.locator('.gnp.typing').count(), 0);
   await S('2-hq-reply');
   if (view.isMobile) {
     // 폰 소프트 키보드: 입력칸을 누르면 창이 위로 올라가고 입력칸이 이름 바로 아래로 온다. 키보드(아래 55%)는 회색 판으로 흉내
     await page.tap('.gnp-in');
     await page.waitForSelector('.gnp.typing');
+    assert.ok(await page.isVisible('.gnp-acts'), '입력 중에도 원래 하던 일 버튼');
     const [r, ih] = await page.evaluate(() => [document.querySelector('.gnp-in').getBoundingClientRect().bottom, innerHeight]);
     assert.ok(r < ih * 0.45, `키보드 위에 입력칸 (${Math.round(r)}/${ih})`);
     await page.evaluate(() => { const k = document.createElement('div'); k.id = 'fakekb'; k.textContent = '(소프트 키보드 자리)'; k.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:55%;background:#3b3f44;color:#aaa;font:16px sans-serif;display:grid;place-items:center;z-index:99999'; document.body.append(k); });
@@ -123,7 +127,14 @@ async function run(view, tag) {
   await page.waitForFunction(() => !document.querySelector('.gnp-log p.wait'));
   assert.match(await page.textContent('.gnp-log'), /단서:/);
   assert.match(await page.evaluate(() => window.__prompts.at(-1)[0].content), /차원 승강기/);
+  await page.evaluate(() => document.activeElement.blur());
   await S('6-floor-hint');
+  if (view.isMobile) {
+    await page.tap('.gnp-in');
+    await page.waitForSelector('.gnp.typing');
+    await S('6b-floor-typing');
+    await page.evaluate(() => document.activeElement.blur());
+  }
   // 모델 실패 → 미리 쓴 대사
   await page.evaluate(() => { window.__goeiNpc.talk.close(); });
   const blocked = await page.evaluate(() => window.__goeiEngine.world.paused || false);
