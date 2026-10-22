@@ -1,0 +1,211 @@
+2026-10-22 02:12:54 base lurker 101 -> id: 70505694-f65d-4f48-a304-e6ca6470ead2
+job_id: 70505694-f65d-4f48-a304-e6ca6470ead2
+mode
+2026-10-22 02:16:23 base lurker 102 -> id: 11f3cf6a-c8b9-4ac0-abd1-0ebfb0cf272f
+job_id: 11f3cf6a-c8b9-4ac0-abd1-0ebfb0cf272f
+mode
+2026-10-22 02:16:23 base lurker 103 -> id: edd860ef-cce0-4a7b-9cee-d087bd42c045
+job_id: edd860ef-cce0-4a7b-9cee-d087bd42c045
+mode
+2026-10-22 02:16:24 base lurker 104 -> id: 79c3a9ce-f74b-4864-8e5c-44169c9f2f74
+job_id: 79c3a9ce-f74b-4864-8e5c-44169c9f2f74
+mode
+2026-10-22 02:19:01 base prop shooter/knife_0 101 -> error: canvas must be square when either side is below 32, got 32x16 — use 16x16, or raise
+2026-10-22 02:19:01 base prop shooter/knife_0 102 -> error: canvas must be square when either side is below 32, got 32x16 — use 16x16, or raise
+2026-10-22 02:20:51 base hollow 101 -> id: aa64f974-58eb-46c2-95fe-13e81a3827ed
+job_id: aa64f974-58eb-46c2-95fe-13e81a3827ed
+mode
+2026-10-22 02:21:07 base prop edge/chip 101 -> id: c59f4768-00c1-4f10-9bcc-fffa79efda10
+job_id: c59f4768-00c1-4f10-9bcc-fffa79efda10
+mode
+2026-10-22 02:21:07 base hollow 102 -> id: 67784346-fe78-4ebf-829f-f1ec9506ae7f
+job_id: 67784346-fe78-4ebf-829f-f1ec9506ae7f
+mode
+2026-10-22 02:21:39 base prop edge/chip 102 -> id: 0789f51a-1cb1-4c38-a837-ded1d05866eb
+job_id: 0789f51a-1cb1-4c38-a837-ded1d05866eb
+mode
+2026-10-22 02:21:39 base prop mannequin/arm 101 -> error: canvas must be square when either side is below 32, got 48x16 — use 16x16, or raise
+2026-10-22 02:21:39 base prop mannequin/arm 102 -> error: canvas must be square when either side is below 32, got 48x16 — use 16x16, or raise
+2026-10-22 02:22:10 base hollow 103 -> id: 41222a7d-ed92-4b2e-9c6a-3643dbb9a453
+job_id: 41222a7d-ed92-4b2e-9c6a-3643dbb9a453
+mode
+2026-10-22 02:22:42 base prop hanged/noose 101 -> id: 9d0ac074-f955-4b9f-b463-657c811605ee
+job_id: 9d0ac074-f955-4b9f-b463-657c811605ee
+mode
+2026-10-22 02:22:43 base hollow 104 -> id: 6cc0ec97-73ae-4c35-b30f-ac331deebc4e
+job_id: 6cc0ec97-73ae-4c35-b30f-ac331deebc4e
+mode
+2026-10-22 02:22:43 base prop hanged/noose 102 -> id: 9d501fc0-3a44-4816-854d-afba1201d503
+job_id: 9d501fc0-3a44-4816-854d-afba1201d503
+mode
+2026-10-22 02:23:10 base shooter 101 -> id: 16df041f-680d-46f0-a3db-c8b86c48099b
+job_id: 16df041f-680d-46f0-a3db-c8b86c48099b
+mode
+2026-10-22 02:23:28 base shooter 102 -> id: eae93717-4d36-4f90-9b95-ec8ead29f870
+job_id: eae93717-4d36-4f90-9b95-ec8ead29f870
+mode
+2026-10-22 02:23:57 genh lurker [idle,walk,hurt_l,hurt_h] 14f seed21 -> id: f997ba33-2879-440e-9132-f308dc270382
+job_id: f997ba33-2879-440e-9132-f308dc270382
+description: pale tired office wor
+2026-10-22 02:24:14 edit hollow edit1.png -> id: 3d36e895-623f-4e20-ba20-88006b4b6813
+job_id: 3d36e895-623f-4e20-ba20-88006b4b6813
+model: pixen
+e
+2026-10-22 02:24:30 base shooter 103 -> id: df366c02-7d1e-4fe0-bb70-7a22ccfcb011
+job_id: df366c02-7d1e-4fe0-bb70-7a22ccfcb011
+mode
+2026-10-22 02:25:17 base prop tv402/tv_0 101 -> id: db65e540-5204-42a4-9336-d19114949f2a
+job_id: db65e540-5204-42a4-9336-d19114949f2a
+mode
+2026-10-22 02:26:48 genh lurker [idle,walk,hurt_l,hurt_h] done
+2026-10-22 02:26:50 base prop tv402/tv_0 102 -> id: 4ced378e-e2e7-4ef9-b1ac-e9c4ed9f5657
+job_id: 4ced378e-e2e7-4ef9-b1ac-e9c4ed9f5657
+mode
+2026-10-22 02:26:50 base shooter 104 -> id: 966d8579-c5c2-4eb8-82e2-2a591f506a73
+job_id: 966d8579-c5c2-4eb8-82e2-2a591f506a73
+mode
+2026-10-22 02:30:51 base charger 101 -> id: d1b78bc6-9802-41af-97b5-fe92fee6ac89
+job_id: d1b78bc6-9802-41af-97b5-fe92fee6ac89
+mode
+2026-10-22 02:30:52 base charger 102 -> id: 509a6f14-ee85-46e1-82c0-21351b7d100c
+job_id: 509a6f14-ee85-46e1-82c0-21351b7d100c
+mode
+2026-10-22 02:32:11 genh lurker [air,lie,getup,snap_tele,snap_hit,snap_rec,claw_tele] 13f seed21 -> id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+job_id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+description: pale tired office wor
+2026-10-22 02:32:11 genh lurker [claw_hit,claw_rec] 3f seed21 -> id: 21877578-731e-43c2-b395-2d69f095f91c
+job_id: 21877578-731e-43c2-b395-2d69f095f91c
+description: pale tired office wor
+2026-10-22 02:32:27 base charger 103 -> id: 497be72e-599a-4947-831c-62d9abddabaf
+job_id: 497be72e-599a-4947-831c-62d9abddabaf
+mode
+2026-10-22 02:32:32 genh hollow [idle,walk,hurt_l,hurt_h] 14f seed21 -> id: aa42f6d8-9efa-4a32-9b8f-f2f49c30176d
+job_id: aa42f6d8-9efa-4a32-9b8f-f2f49c30176d
+description: gaunt man in a worn b
+2026-10-22 02:33:14 genh hollow [air,lie,getup,lunge_tele,lunge_hit,lunge_rec,hug_tele] 13f seed21 -> id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+job_id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+description: gaunt man in a worn b
+2026-10-22 02:33:14 genh hollow [hug_hit,hug_rec,hug_hold,swipe_tele,swipe_hit,swipe_rec] 9f seed21 -> id: 190cb3e3-2c47-4673-8870-1f527d41bc23
+job_id: 190cb3e3-2c47-4673-8870-1f527d41bc23
+description: gaunt man in a worn b
+2026-10-22 02:33:30 genh lurker [air,lie,getup,snap_tele,snap_hit,snap_rec,claw_tele] FAIL status: failed
+id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+job_id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+error: Generation failed (Invalid request: 5 validation errors for AnimateWithSkeletonV3Request
+key
+2026-10-22 02:33:31 genh lurker [claw_hit,claw_rec] done
+2026-10-22 02:33:31 genh hollow [air,lie,getup,lunge_tele,lunge_hit,lunge_rec,hug_tele] FAIL status: failed
+id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+job_id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+error: Generation failed (Invalid request: 5 validation errors for AnimateWithSkeletonV3Request
+key
+2026-10-22 02:34:18 base charger 104 -> id: 3892d7bc-bacb-4a03-a5c4-f2b07ffed07e
+job_id: 3892d7bc-bacb-4a03-a5c4-f2b07ffed07e
+mode
+2026-10-22 02:35:22 base thief 101 -> id: af4d7510-bffb-4ea1-acbe-bdc89132f6bb
+job_id: af4d7510-bffb-4ea1-acbe-bdc89132f6bb
+mode
+2026-10-22 02:35:26 genh hollow [hug_hit,hug_rec,hug_hold,swipe_tele,swipe_hit,swipe_rec] done
+2026-10-22 02:35:45 genh hollow [idle,walk,hurt_l,hurt_h] done
+2026-10-22 02:36:22 genh lurker [air,lie,getup,snap_tele,snap_hit,snap_rec,claw_tele] 13f seed21 -> id: 05b40230-5acd-435c-9360-61d378a77c38
+job_id: 05b40230-5acd-435c-9360-61d378a77c38
+description: pale tired office wor
+2026-10-22 02:36:57 base thief 102 -> id: f2485d6b-4afa-4004-b72f-367d2fa18a2d
+job_id: f2485d6b-4afa-4004-b72f-367d2fa18a2d
+mode
+2026-10-22 02:37:04 genh hollow [air,lie,getup,lunge_tele,lunge_hit,lunge_rec,hug_tele] 13f seed21 -> id: 8d19fb8c-d4ad-473f-adbd-17858e30763f
+job_id: 8d19fb8c-d4ad-473f-adbd-17858e30763f
+description: gaunt man in a worn b
+2026-10-22 02:37:21 genh shooter [idle,walk,hurt_l,hurt_h] 14f seed21 -> id: 03c1727f-510e-4dae-bef7-2da0c105d281
+job_id: 03c1727f-510e-4dae-bef7-2da0c105d281
+description: neat woman clerk in a
+2026-10-22 02:37:28 base thief 103 -> id: eb92aab0-4f55-4794-a6eb-be2f9d7663f8
+job_id: eb92aab0-4f55-4794-a6eb-be2f9d7663f8
+mode
+2026-10-22 02:38:15 base thief 104 -> id: 784cd244-e026-4c6b-b0a8-7bf22713d499
+job_id: 784cd244-e026-4c6b-b0a8-7bf22713d499
+mode
+2026-10-22 02:38:56 genh lurker [air,lie,getup,snap_tele,snap_hit,snap_rec,claw_tele] done
+2026-10-22 02:41:02 genh hollow [air,lie,getup,lunge_tele,lunge_hit,lunge_rec,hug_tele] done
+2026-10-22 02:41:36 base crawler 101 -> id: 3933230e-13b9-46fb-87aa-095f724aa0eb
+job_id: 3933230e-13b9-46fb-87aa-095f724aa0eb
+mode
+2026-10-22 02:41:46 genh shooter [air,lie,getup,sit,standup,toss_tele,toss_hit,toss_rec] 14f seed21 -> id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+job_id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+description: neat woman clerk in a
+2026-10-22 02:41:46 genh shooter [jab_tele,jab_hit,jab_rec] 5f seed21 -> id: 2beeb131-fb40-4ed9-becb-fd94ae3960c0
+job_id: 2beeb131-fb40-4ed9-becb-fd94ae3960c0
+description: neat woman clerk in a
+2026-10-22 02:42:40 base crawler 102 -> id: c2057e0d-5356-4a37-9602-7908b988cad4
+job_id: c2057e0d-5356-4a37-9602-7908b988cad4
+mode
+2026-10-22 02:42:49 genh charger [idle,walk,hurt_l,hurt_h] 14f seed21 -> id: d566d4be-828d-4111-8c75-9a82f190452e
+job_id: d566d4be-828d-4111-8c75-9a82f190452e
+description: huge hulking bald bru
+2026-10-22 02:45:34 genh charger [air,lie,getup,ram_tele,ram_hit,ram_rec,butt_tele] 14f seed21 -> id: 1b1cf439-2965-43a5-84b1-ea9687bcaf85
+job_id: 1b1cf439-2965-43a5-84b1-ea9687bcaf85
+description: huge hulking bald bru
+2026-10-22 02:46:38 base crawler 103 -> id: 29d9675e-f770-4a93-ad21-db7922f86413
+job_id: 29d9675e-f770-4a93-ad21-db7922f86413
+mode
+2026-10-22 02:46:54 base crawler 104 -> id: 6a1e0d61-7add-48c2-b3f1-ce143e843488
+job_id: 6a1e0d61-7add-48c2-b3f1-ce143e843488
+mode
+2026-10-22 02:47:57 genh charger [butt_hit,butt_rec,dizzy] 5f seed21 -> id: f2b36aeb-5d1a-40f5-9aa1-18c23641050b
+job_id: f2b36aeb-5d1a-40f5-9aa1-18c23641050b
+description: huge hulking bald bru
+2026-10-22 02:48:19 genh shooter [idle,walk,hurt_l,hurt_h] done
+2026-10-22 02:48:20 genh shooter [air,lie,getup,sit,standup,toss_tele,toss_hit,toss_rec] FAIL status: failed
+id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+job_id: 0790388c-0c2a-4136-b7b9-f841b1de27ad
+error: Generation failed (Invalid request: 4 validation errors for AnimateWithSkeletonV3Request
+key
+2026-10-22 02:48:22 genh shooter [jab_tele,jab_hit,jab_rec] done
+2026-10-22 02:48:26 genh charger [idle,walk,hurt_l,hurt_h] done
+2026-10-22 02:49:18 genh charger [air,lie,getup,ram_tele,ram_hit,ram_rec,butt_tele] done
+2026-10-22 02:49:20 genh charger [butt_hit,butt_rec,dizzy] done
+2026-10-22 02:52:07 base predator 101 -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 02:55:18 base predator 102 -> id: 555b16e8-92e5-41cb-90de-fa89a36c88c6
+job_id: 555b16e8-92e5-41cb-90de-fa89a36c88c6
+mode
+2026-10-22 02:58:44 base predator 103 -> id: f43fd0a1-76e9-436b-866a-c7b0432a3e00
+job_id: f43fd0a1-76e9-436b-866a-c7b0432a3e00
+mode
+2026-10-22 02:58:45 base predator 104 -> id: ad502245-a720-4ef7-916a-5624b452b4f0
+job_id: ad502245-a720-4ef7-916a-5624b452b4f0
+mode
+2026-10-22 02:59:49 base edge 101 -> id: da97b09b-466a-4921-a904-b73f48ff2978
+job_id: da97b09b-466a-4921-a904-b73f48ff2978
+mode
+2026-10-22 03:02:44 base edge 102 -> id: 40547ee4-837e-4aa1-ba25-b9690a9696fa
+job_id: 40547ee4-837e-4aa1-ba25-b9690a9696fa
+mode
+2026-10-22 03:05:40 genh thief [idle,walk,hurt_l,hurt_h] 14f seed21 -> id: 1a289305-d595-4502-af03-a10e37fb5119
+job_id: 1a289305-d595-4502-af03-a10e37fb5119
+description: wiry man with a large
+2026-10-22 03:07:56 base edge 103 -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 03:12:31 anim crawler walk 8f -> id: 9cc9d285-8383-4ef6-8aae-07ffd6c4b3fc
+job_id: 9cc9d285-8383-4ef6-8aae-07ffd6c4b3fc
+action: scuttling forwar
+2026-10-22 03:13:08 base edge 104 -> error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+2026-10-22 03:13:08 base shade 101 -> id: e504cf4c-abe9-4beb-be04-efe7478dff43
+job_id: e504cf4c-abe9-4beb-be04-efe7478dff43
+mode
+2026-10-22 03:13:09 base shade 102 -> id: 9f114f37-e30e-4716-bc27-6fc0154e8ed1
+job_id: 9f114f37-e30e-4716-bc27-6fc0154e8ed1
+mode
+2026-10-22 03:13:13 anim crawler idle 4f -> id: d0590cde-0e96-451d-ae31-153bbbb6ed59
+job_id: d0590cde-0e96-451d-ae31-153bbbb6ed59
+action: legs twitching a
+2026-10-22 03:13:26 base shade 103 -> id: 1223f023-1217-4570-abe1-13133b4e8bec
+job_id: 1223f023-1217-4570-abe1-13133b4e8bec
+mode
+2026-10-22 03:13:54 anim crawler nip 6f -> id: aaeb3358-ac75-4726-979b-cd0c08c92eab
+job_id: aaeb3358-ac75-4726-979b-cd0c08c92eab
+action: rears up lifting

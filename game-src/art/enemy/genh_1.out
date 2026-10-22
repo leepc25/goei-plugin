@@ -1,0 +1,21 @@
+sub lurker ['air', 'lie', 'getup', 'snap_tele', 'snap_hit', 'snap_rec', 'claw_tele']
+sub lurker ['claw_hit', 'claw_rec']
+sub hollow ['idle', 'walk', 'hurt_l', 'hurt_h']
+sub hollow ['air', 'lie', 'getup', 'lunge_tele', 'lunge_hit', 'lunge_rec', 'hug_tele']
+sub hollow ['hug_hit', 'hug_rec', 'hug_hold', 'swipe_tele', 'swipe_hit', 'swipe_rec']
+FAIL lurker ['air', 'lie', 'getup', 'snap_tele', 'snap_hit', 'snap_rec', 'claw_tele'] status: failed
+id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+job_id: 577bf905-8c6d-46fd-9588-5eb7777727c6
+error: Generation failed (Invalid request: 5 validation errors for AnimateWithSkeletonV3Request
+keypoints.1.0.x
+  Input should be greater than or equal to 0 [type=greater_than_equal, input_value=-0.0
+done lurker ['claw_hit', 'claw_rec']
+FAIL hollow ['air', 'lie', 'getup', 'lunge_tele', 'lunge_hit', 'lunge_rec', 'hug_tele'] status: failed
+id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+job_id: 22a54380-79f4-4ac3-9e5d-5fd009e7ef82
+error: Generation failed (Invalid request: 5 validation errors for AnimateWithSkeletonV3Request
+keypoints.1.0.x
+  Input should be greater than or equal to 0 [type=greater_than_equal, input_value=-0.0
+done hollow ['hug_hit', 'hug_rec', 'hug_hold', 'swipe_tele', 'swipe_hit', 'swipe_rec']
+done hollow ['idle', 'walk', 'hurt_l', 'hurt_h']
+generations_remaining: 16741.40
