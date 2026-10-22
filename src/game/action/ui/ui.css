@@ -34,7 +34,7 @@
 .tp-base { position: absolute; left: 0; top: 0; width: calc(var(--tp-r, var(--tp-u)) * 2); height: calc(var(--tp-r, var(--tp-u)) * 2); border-radius: 50%; border: 2px solid rgba(236,230,212,0.28); background: radial-gradient(circle, rgba(20,28,34,0.35), rgba(20,28,34,0.15)); opacity: calc(var(--tp-a) * 0.7); pointer-events: none; }
 .tp-base.on { opacity: var(--tp-a); border-color: rgba(236,230,212,0.5); }
 /* 가로 화면: 쉬는 스틱은 그리지 않는다 (누른 자리에 나타남) */
-.tp-float .tp-base:not(.on) { opacity: calc(var(--tp-a) * 0.45); } /* 쉬는 자리에 흐리게: 이동 입력이 어디인지 보이게 (독립 검수) */
+.tp-float .tp-base:not(.on) { opacity: calc(var(--tp-a) * 0.8); } /* 쉬는 자리에 흐리게: 이동 입력이 어디인지 보이게 (독립 검수) */
 .tp-knob { position: absolute; left: 50%; top: 50%; width: calc(var(--tp-r, var(--tp-u)) * 0.95); height: calc(var(--tp-r, var(--tp-u)) * 0.95); margin: calc(var(--tp-r, var(--tp-u)) * -0.475) 0 0 calc(var(--tp-r, var(--tp-u)) * -0.475); border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(240,236,224,0.85), rgba(150,160,166,0.65)); box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 .tp-b { position: absolute; left: 0; top: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16,22,27,0.42); border: 2px solid rgba(236,230,212,0.38); color: #ece6d4; opacity: var(--tp-a); pointer-events: none; line-height: 1.05; text-shadow: 0 1px 2px #000; }
 .tp-b b { font-size: calc(var(--tp-u) * 0.25); font-weight: 800; }

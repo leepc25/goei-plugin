@@ -371,12 +371,13 @@ export class World implements WorldView {
       if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
       if (e.def.keep && e.def.keep[1] < 30) continue;
       // 깊이 50 안쪽이면 그림이 포개진다: 요원과 적이 한 몸처럼 겹치지 않게 (독립 검수)
-      if (Math.abs(e.y - p.y) > 50) continue;
-      const min = 70 + e.def.w * 0.3;
+      const dy = Math.abs(e.y - p.y);
+      if (dy > 85) continue;
+      const min = (84 + e.def.w * 0.35) * (dy > 45 ? 0.8 : 1);
       const dx = e.x - p.x;
       if (Math.abs(dx) >= min) continue;
       const s = dx === 0 ? -p.dir : Math.sign(dx);
-      e.x += s * Math.min(12, min - Math.abs(dx));
+      e.x += s * Math.min(16, min - Math.abs(dx));
     }
   }
 

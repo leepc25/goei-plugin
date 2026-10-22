@@ -40,7 +40,7 @@ const PALE = '#9c968a';
 const GREY = '#6f6d68';
 const LOOKS: Record<string, Look> = {
   lurker: { shape: 'human', bulk: 0.16, head: 0.075, hunch: 0.05, eye: '#f2efe6', top: '#5d6670', bottom: '#2c3138', skin: PALE, hair: '#1c1c1e', extras: ['tie'] },
-  hollow: { shape: 'human', bulk: 0.15, arm: 0.5, head: 0.07, hunch: 0.08, eye: '', top: '#6b5f4f', bottom: '#3b342c', skin: GREY },
+  hollow: { shape: 'human', bulk: 0.15, arm: 0.5, head: 0.07, hunch: 0.08, eye: '#d8d4c8', top: '#6b5f4f', bottom: '#3b342c', skin: GREY },
   shooter: { shape: 'human', bulk: 0.13, arm: 0.48, head: 0.07, hunch: 0.03, eye: '#ffd760', top: '#c9c3b4', bottom: '#3d4048', skin: PALE, acc: '#5a4c3a', hair: '#24201c', extras: ['strap'] },
   thief: { shape: 'human', bulk: 0.16, head: 0.072, hunch: 0.07, eye: '#e8e2d0', top: '#55603f', bottom: '#3a3a40', skin: '#a08670', acc: '#7a5a3a', extras: ['cap', 'backpack'] },
   charger: { shape: 'human', bulk: 0.27, head: 0.07, hunch: 0.16, leg: 0.4, eye: '#ff6a3a', top: '#7a4a32', bottom: '#3a2c26', skin: '#8a6a5a', acc: '#d8d0c0', extras: ['target'] },

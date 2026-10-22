@@ -140,7 +140,7 @@ function hudState(w: World, shell: Shell): HudState {
     maxEnergy: 75,
     gauge: p.gauge,
     armor: p.armor,
-    weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 6 : null },
+    weapon: heldWeapon(w) ?? { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null },
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
     favor: 0,
@@ -315,7 +315,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
           }
         }
         // 놀이판(게임 화면) 안쪽으로만: 폰 가로의 좌우 버튼 띠에 걸치지 않게
-        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: ox, maxX: Math.min(maxX ?? Infinity, ox + 1280 * k) };
+        let lo = ox,
+          hi = Math.min(maxX ?? Infinity, ox + 1280 * k);
+        // 문·승강기·벽 가구 앞을 피해, 머리에서 가장 가까운 빈 벽 구간 안에 말풍선을 둔다 (독립 검수: 말풍선이 문을 가림)
+        const gap = bubbleGap(world, gx);
+        if (gap) {
+          lo = Math.max(lo, ox + gap[0] * k);
+          hi = Math.min(hi, ox + gap[1] * k);
+        }
+        return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
       paused: () => shell.paused && !openingOn,
@@ -614,4 +622,30 @@ function bootFromUrl(g: Game): boolean {
     if (v) (globalThis as { __goeiStoryStart?: (id: string) => void }).__goeiStoryStart?.(v);
   } else return false;
   return true;
+}
+
+/** 화면 x(게임 좌표) 근처에서 문·승강기·벽 가구와 겹치지 않는 폭 300 이상 빈 구간 [시작, 끝] (화면 좌표) */
+function bubbleGap(world: World, gx: number): [number, number] | null {
+  const cam = world.camX;
+  const solid: [number, number][] = (world.floor.keepOut ?? []).filter(([a, b]) => b - a >= 60).map(([a, b]) => [a - cam, b - cam]);
+  for (const pr of world.floor.props ?? []) {
+    if (!/door|elevator|exit|panel|shutter|mirror|goalwall/.test(pr.kind)) continue;
+    const h = Math.max(pr.w, 200) / 2 + 20;
+    solid.push([pr.x - h - cam, pr.x + h - cam]);
+  }
+  solid.sort((a, b) => a[0] - b[0]);
+  const gaps: [number, number][] = [];
+  let at = Math.max(0, gx - 520);
+  const end = Math.min(1280, gx + 520);
+  for (const [a, b] of solid) {
+    if (b <= at) continue;
+    if (a >= end) break;
+    if (a - at >= 300) gaps.push([at, a]);
+    at = Math.max(at, b);
+  }
+  if (end - at >= 300) gaps.push([at, end]);
+  if (!gaps.length) return null;
+  const dist = (g: [number, number]) => (gx < g[0] ? g[0] - gx : gx > g[1] ? gx - g[1] : 0);
+  gaps.sort((a, b) => dist(a) - dist(b));
+  return dist(gaps[0]) < 360 ? gaps[0] : null;
 }

@@ -314,9 +314,9 @@ export class Hud {
     label(c, String(w.mag), x + 20, y, 26, empty ? C.hpLow : '#fff', 'left', 900);
     c.font = font(26, 900);
     const mw = c.measureText(String(w.mag)).width;
-    label(c, `/ ${w.reserve}`, x + 26 + mw, y, 16, C.dim, 'left', 800);
+    label(c, `예비 ${w.reserve}`, x + 26 + mw, y, 16, C.dim, 'left', 800);
     c.font = font(16, 800);
-    const ex = x + 34 + mw + c.measureText(`/ ${w.reserve}`).width + 8;
+    const ex = x + 34 + mw + c.measureText(`예비 ${w.reserve}`).width + 8;
     if (w.temp) label(c, `${w.temp.name} ${w.temp.uses}회`, ex, y, 15, C.amber, 'left', 800);
     else if (w.reload != null) {
       bar(c, ex, y - 12, 90, 8, w.reload, '#e8e0b0', '#000');

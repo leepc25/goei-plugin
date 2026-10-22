@@ -511,6 +511,7 @@ export class Player extends Fighter {
   private startSkill(world: WorldView, p: Pad) {
     this.skillCd = SKILL_CD;
     if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+    else this.faceNearest(world);
     this.gunOut = 0;
     this.play(this.crouching ? 'groundblast' : 'blast', world);
     if (!this.crouching && p.held.has('skill')) this.chargeT = 0;
@@ -520,7 +521,11 @@ export class Player extends Fighter {
   private stepCharge(world: WorldView, p: Pad) {
     this.vx = this.vy = 0;
     this.chargeT++;
-    if (this.chargeT % 6 === 0) world.fx('spark', this.x + this.dir * 34 * PIXEL, this.y, 66 * PIXEL);
+    if (this.chargeT % 8 === 0) {
+      // 손끝 앞에서 작게 (몸·얼굴을 덮지 않게)
+      const hd = this.clips.charge?.[0]?.hand;
+      world.fx('spark', this.x + this.dir * ((hd ? hd[0] : 37) + 14) * PIXEL, this.y, (hd ? hd[1] : 70) * PIXEL);
+    }
     if (!p.held.has('skill')) {
       this.charging = false;
       this.chargeT = -1;
@@ -617,6 +622,19 @@ export class Player extends Fighter {
       if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
       if (Math.abs(a.x - this.x) > 900) this.ally = null;
     }
+  }
+
+  /** 방향키 없이 칠 때: 등 뒤에만 적이 붙어 있으면 그쪽으로 돈다 (독립 검수: 허공을 침) */
+  private faceNearest(world: WorldView) {
+    let front = Infinity,
+      back = Infinity;
+    for (const b of world.bodies) {
+      if (b.team !== 'enemy' || !b.alive || Math.abs(b.y - this.y) > 60) continue;
+      const d = (b.x - this.x) * this.dir;
+      if (d >= 0) front = Math.min(front, d);
+      else back = Math.min(back, -d);
+    }
+    if (back < 220 && front > 260) this.dir = (-this.dir) as 1 | -1;
   }
 
   /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
@@ -719,6 +737,7 @@ export class Player extends Fighter {
     }
     if (this.take('attack')) {
       if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      else this.faceNearest(world);
       if (this.crouching) return this.play('lowkick', world);
       if (this.running) return this.play('dash', world);
       const next = this.comboTimer > 0 && this.comboStep > 0 ? COMBO[this.comboStep] : 'jab';
