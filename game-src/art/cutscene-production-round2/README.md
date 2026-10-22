@@ -64,8 +64,11 @@ review/browser-validation.json: Chrome PC1100×850, 모바일 세로390×844/가
 교체 대상은 first_day/c3(기존8~14초, 총6초)의 앞쪽 문 열림 환경 구간2.4초다.
 c2 걷기 컷 또는 c3 전체를 자동 교체하지 않는다. 뒤3.6초의 인사 캐릭터 장면은 다른 담당이다.
 
-통합 담당은 승인된 frames/final/0000.png..0016.png 및 timing.json을 새로운 통합 c3에 사용하고,
-playback.json/manifest.json의 명시적 순서·시간을 보존한다. 열린 마지막 프레임에서 캐릭터 장면으로 연결한다.
+공용 재생기는 0001.png부터 읽으므로 frames/final/0000.png..0016.png를 그대로 복사하면 안 된다.
+통합 담당은 별도 준비된 integration/environment/c1/0001.png..0017.png와 timing.json을 새로운 통합 c3의 앞부분으로 사용한다.
+뒤 캐릭터 프레임은0018부터 이어 붙이고, 양쪽 ms 배열을 연결해 합계6000ms를 확인한다. 열린 마지막 프레임에서 캐릭터 장면으로 연결한다.
+integration/environment-runtime.zip은 같은 번호 변환본과 contract.json을 포함한다. c1은 단독 테스트용 이름이며 최종 교체 위치는c3이다.
+기존 공용 VideoPlayer 코드를 TypeScript 타입만 지워 그대로 실행한 검증에서17장 모두 로딩·표시·종료에 통과했다. integration/runtime-validation.json에 코드 해시와 실측을 보존했다.
 원본first_day/c3, 공용엔진, 로딩, 오디오, 자막 파일은 이 브랜치에서 수정하지 않았다.
 기존8/10.5초 자막 정합, 전체6초 편집, 오디오 생명주기와 최종 게임 반영은 메인 통합 담당 범위다.
 

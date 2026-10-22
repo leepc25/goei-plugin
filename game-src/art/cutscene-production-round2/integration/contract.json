@@ -1,0 +1,120 @@
+{
+  "status": "environment-only-not-full-c3",
+  "deliveryCommit": "eda9a6e4c414fa4f4c316cb3d0f0d0265e288f3f",
+  "sourceIndexBase": 0,
+  "runtimeIndexBase": 1,
+  "runtimeTestBase": "integration/environment/",
+  "runtimeTestCuts": [
+    2.4
+  ],
+  "finalTarget": "first_day/c3",
+  "environmentDurationMs": 2400,
+  "requiredCharacterDurationMs": 3600,
+  "fullC3DurationMs": 6000,
+  "mergeRule": "Copy environment files to c3/0001..0017; append new character segment as0018 onward; concatenate ms arrays and require sum6000. Never replace entire6s cut with this2.4s subset.",
+  "subtitleCaveat": "Current first_day subtitle at8s starts with empty corridor; character segment begins10.4s and next subtitle10.5s. Main integrator must reconcile speech/timing.",
+  "mapping": [
+    {
+      "source": "frames/final/0000.png",
+      "runtimeFile": "c1/0001.png",
+      "sha256": "b0dbcfe311aca473f1a39647ae714685798bd0460b1b678d62981a41cca18883",
+      "ms": 400
+    },
+    {
+      "source": "frames/final/0001.png",
+      "runtimeFile": "c1/0002.png",
+      "sha256": "434f74103ec146ee1462d346e2a4feeaa8bfb351defbaa262e3f1fd84ef40277",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0002.png",
+      "runtimeFile": "c1/0003.png",
+      "sha256": "98df9195d41064bbfc5c4cefda99a77fa39a34dcc8af4b0d1b88423c0a7290b7",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0003.png",
+      "runtimeFile": "c1/0004.png",
+      "sha256": "5076c3d4c05e687b2609c08b65bd1c75076af7fc6d66f26c131710bfcd186947",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0004.png",
+      "runtimeFile": "c1/0005.png",
+      "sha256": "a17379ca92a29450c1606f33e68161e16c6cb6fba0a0cfefb1aca70672b2efbd",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0005.png",
+      "runtimeFile": "c1/0006.png",
+      "sha256": "928ecbea5bd64c0736343436f51a71ab0b708717459b321e421de41d7a9b6246",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0006.png",
+      "runtimeFile": "c1/0007.png",
+      "sha256": "931d7f624fb827c017c13e56a88049a62805b2685daa8c69c6a6934c07ff00a1",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0007.png",
+      "runtimeFile": "c1/0008.png",
+      "sha256": "22bbd61e3582b1fe69ced2f3bd6c8b8fbc9eea7a6441fc970ef34479b4fe0943",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0008.png",
+      "runtimeFile": "c1/0009.png",
+      "sha256": "23717792c2cfb76b3af2bf85ce8d0c6a5c69cb06d9f8a2783968a50b5adca84d",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0009.png",
+      "runtimeFile": "c1/0010.png",
+      "sha256": "4f169243e3286651626a1ba22568f85b16f80a3221baa54a9ab9cac24aadf279",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0010.png",
+      "runtimeFile": "c1/0011.png",
+      "sha256": "b77150c8a5cf076c79dbfaa84aea52fe147fe22bb410e3d984b5e1622ebab4ca",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0011.png",
+      "runtimeFile": "c1/0012.png",
+      "sha256": "88f49036d860d8c80b0fbba182686fb3dbbc7335c80e6e0a7699f4ba309b2173",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0012.png",
+      "runtimeFile": "c1/0013.png",
+      "sha256": "5d48bbee487022b003893c3baacac3faa4671b7dfaafb898dc6e03ead34f70b2",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0013.png",
+      "runtimeFile": "c1/0014.png",
+      "sha256": "3a4b77f0bbd0c539865b214b7359006b3ea419b21d067ed148d4ce75d8a042f6",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0014.png",
+      "runtimeFile": "c1/0015.png",
+      "sha256": "ccdac12ab6c3e66dfa4fd66f717605c5572dfb9afb5ce811dc5aefc3c4e9727e",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0015.png",
+      "runtimeFile": "c1/0016.png",
+      "sha256": "4ac1ff53ea0820200b8ffac7214c987501c4f738e4b50f856972ddd895b296ed",
+      "ms": 100
+    },
+    {
+      "source": "frames/final/0016.png",
+      "runtimeFile": "c1/0017.png",
+      "sha256": "6850883c25f48e3ad05b36d58e761789d22f8f60e105139882bbce356fb1ea8e",
+      "ms": 500
+    }
+  ]
+}
