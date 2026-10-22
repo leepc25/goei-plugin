@@ -61,15 +61,14 @@
     },
     {
       "character": "spangdal",
-      "commit": "3d88692b290b3f46a313ab369ffea4c78b8094d2",
+      "commit": "9facaa4e1b686de3af38ca9067ba1450cbdd1fa6",
       "branch": "codex/art-spangdal-resume",
       "html": "release/demo/spangdal-full.html",
       "charged_generations": 59,
       "additional_paid_generations": 0,
-      "override_slots": 92,
-      "modified_clips": 21,
-      "visual_status": "owner delivered; coordinator verified commit and sampled super review sheet",
-      "remaining": "pierce3 fingertips; slash2 hand alternation; toss repetition/recovery; weapon-removed sleeve silhouettes",
+      "modified_clips": 19,
+      "visual_status": "Owner reports direct user rejection of three-hit regression. stab1/pierce3 candidates withdrawn; complete three-hit runtime restored to986d1602. Not a new improvement.",
+      "remaining": "Full three-hit linked comparison required before any future promotion; previous candidate override count92 is historical and no longer current",
       "user_visual_approval": false
     },
     {
