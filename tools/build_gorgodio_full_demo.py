@@ -22,15 +22,15 @@ OUT = os.path.join(ROOT, 'release', 'demo', 'gorgodio-full.html')
 DOC = os.path.join(ROOT, 'docs', '캐릭터제작서', '동작설계_gorgodio.md')
 SETS = {'bare': dict(w=224, h=176, foot=168, anchor=86), 'armor': dict(w=256, h=192, foot=184, anchor=100)}
 
-# fps, 반복, 타격(또는 발사·회수) 장
+# fps, 반복, 타격(또는 발사·회수) 장 — 원본 장 번호(장 빼기 뒤 번호는 아래에서 다시 셈)
 TIMING = {
     'idle': (5, True), 'beard': (7, False), 'guard': (6, True), 'engage': (12, False), 'step': (12, True), 'walk': (10, True), 'run': (14, True),
-    'jump': (12, False), 'crouch': (14, False), 'crouchwalk': (9, True), 'stomp': (12, False, [3]), 'chop1': (16, False, [2]), 'chop2': (16, False, [2]),
-    'cleave': (13, False, [4]), 'tsuppari': (16, False, [1, 4, 6]), 'bigboot': (14, False, [2]), 'splash': (12, False, [3]), 'kready': (14, False),
+    'jump': (12, False), 'crouch': (14, False), 'crouchwalk': (9, True), 'stomp': (12, False, [4]), 'chop1': (16, False, [3]), 'chop2': (16, False, [3]),
+    'cleave': (13, False, [5]), 'tsuppari': (16, False, [1, 4, 6]), 'bigboot': (14, False, [2]), 'splash': (12, False, [3]), 'kready': (14, False),
     'kthrow': (16, False, [2]), 'kpull': (10, False, [4]), 'summon': (10, False, [3]), 'summonhold': (8, True), 'block': (16, False),
     'shove': (14, False, [2]), 'brace': (14, False), 'bearhug': (14, False), 'headbutt': (14, False, [2]), 'press': (12, False, [5]),
     'suplex': (12, False, [5]), 'pickup': (10, False), 'toss': (12, False, [3]), 'drink': (7, False, [4]), 'eat': (7, False, [4]),
-    'bandage': (7, False, [5]), 'hit': (14, False), 'down': (12, False), 'getup': (9, False), 'talk': (6, True), 'pipe': (12, False, [3]),
+    'bandage': (7, False, [5]), 'hit': (14, False), 'down': (12, False), 'getup': (9, False), 'talk': (6, True), 'pipe': (10, False, [4]),
     'shotgun': (12, False, [1]), 'tired': (4, True), 'turn': (12, False), 'fall': (8, True), 'land': (12, False), 'ladder': (8, True),
     'crawl': (8, True), 'sneak': (8, True), 'limp': (8, True), 'victory': (8, False), 'liftput': (9, False),
     'a_arrive': (10, False), 'a_idle': (5, True), 'a_walk': (9, True), 'a_glide': (12, True), 'a_jump': (12, False), 'a_land': (12, False),
@@ -121,7 +121,7 @@ def main():
         strips[clip] = base64.b64encode(data).decode()
         open(os.path.join(final, clip + '.png'), 'wb').write(data)
         t = TIMING.get(clip) or (6, any(w in clip for w in LOOP_WORDS))
-        c = {'label': lab, 'group': grp, 'set': setname, 'fps': t[0], 'loop': t[1], 'hits': list(t[2]) if len(t) > 2 else [], 'frames': len(fr)}
+        c = {'label': lab, 'group': grp, 'set': setname, 'fps': t[0], 'loop': t[1], 'hits': [idx.index(h) for h in t[2] if h in idx] if len(t) > 2 else [], 'frames': len(fr)}
         anc = anchors(R, 'idle' if clip == 'talk' else clip, [0, 0] if clip == 'talk' else idx)
         if anc: c['anchors'] = anc
         manifest['clips'][clip] = c

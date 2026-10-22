@@ -30,8 +30,18 @@ def fetch(n,j,nf):
             except Exception: time.sleep(5)
         im=[x for x in r['result']['content'] if x.get('type')=='image']
         if im: open(f'{OUT}/{n}/{i:02d}.png','wb').write(base64.b64decode(im[0]['data']))
-def run(items,par=16):
-    pend={}; queue=list(items)
+PAR=int(([a.split('=')[1] for a in sys.argv if a.startswith('--par=')] or ['2'])[0])   # 동시 작업 수(2026-10-22 요원 스레드당 최대 2)
+def pending_from_log():
+    """spend.log에서 제출됐지만 받지 않은 작업 {이름: (job, 장 수)}"""
+    sub={}; done=set()
+    for l in open('../spend.log'):
+        m=re.match(r'\S+ gen (\S+) (\d+)f seed\d+ -> id: ([0-9a-f-]{36})',l)
+        if m: sub[m.group(1)]=(m.group(3),int(m.group(2)))
+        m=re.match(r'\S+ gen (\S+) (done|FAIL)',l)
+        if m: done.add(m.group(1))
+    return {k:v for k,v in sub.items() if k not in done}
+def run(items,par=None,pend=None):
+    par=par or PAR; pend=dict(pend or {}); queue=list(items)
     while queue or pend:
         while queue and len(pend)<par:
             n,act,prop,ps,ref,refkp=queue.pop(0); j,t=submit(n,act,prop,ps,ref,refkp)
@@ -50,6 +60,11 @@ if __name__=='__main__':
         run([('pbase','standing still, then a low fighting stance','',R.PBASE,b64('../full/base.png' if not ARM else '../armor/base.png'),R.BASE_KP)])
     else:
         names=[a for a in sys.argv[1:] if not a.startswith('--')] or list(B.CLIPS)
+        pend={}
+        if '--resume' in sys.argv:   # 끊긴 묶음 이어 하기: 받지 못한 작업부터 받고, 폴더 없는 클립만 새로 제출
+            pend={k:v for k,v in pending_from_log().items() if k in B.CLIPS and (not os.path.isdir(f'{OUT}/{k}'))}
+            names=[n for n in names if n not in pend and not os.path.isdir(f'{OUT}/{n}')]
+            print('resume pending',sorted(pend),'new',len(names),flush=True)
         ref=b64(R.REF_PNG)
-        run([(n,*B.CLIPS[n],ref,R.REF_POSE) for n in names])
+        run([(n,*B.CLIPS[n],ref,R.REF_POSE) for n in names],pend=pend)
     print('after',bal(),flush=True)
