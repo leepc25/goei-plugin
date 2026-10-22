@@ -25,9 +25,11 @@
     ],
     "lead_planned_generations": 6,
     "lead_queue_observed": true,
-    "message_delivered": false,
+    "message_delivered": true,
     "acknowledged": false,
-    "note": "No send_message_to_thread tool exposed. Publish this reservation on own branch; does not assert cross-session exclusion. Recheck remote queue and live jobs before submission; do not cancel or regenerate character jobs."
+    "note": "Reservation and costs posted on character lead delivery commit. No direct thread messaging tool or acknowledgement. Recheck remote queue and live jobs before submission; do not cancel or regenerate character jobs.",
+    "channel": "GitHub comment on character lead delivery commit",
+    "message_url": "https://github.com/leepc25/goei-plugin/commit/087dec121b9d65ad1c91fd3b1d5b1d669ba70fe4#commitcomment-206122314"
   },
   "retry_policy": "No automatic resubmission. After uncertain response, recover job before any new generation."
 }

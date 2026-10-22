@@ -1,0 +1,14 @@
+{
+  "results": [
+    {
+      "url": "https://raw.githubusercontent.com/leepc25/goei-plugin/8bb8064c01338d69b9cfea1c3fb098a777e417ec/game-src/art/hq-door-round2/review/index.html",
+      "status": 200,
+      "sha256": "ffa7bc36c23ecd9693d8a5b5ac97ae6600807de93a4f42d08649df2a93bcbab7",
+      "matches_local": true
+    },
+    {
+      "url": "https://rawcdn.githack.com/leepc25/goei-plugin/8bb8064c01338d69b9cfea1c3fb098a777e417ec/game-src/art/hq-door-round2/review/index.html",
+      "status": 403
+    }
+  ]
+}
