@@ -1,0 +1,15 @@
+before generations_remaining: 16988
+sub chop1
+sub cleave
+sub kready
+SUBFAIL kthrow error: rate limit exceeded (20/20 jobs)
+
+hint: wait for a job to finish, then retry
+sub summon
+sub summonhold
+done chop1
+done cleave
+done kready
+done summon
+done summonhold
+after generations_remaining: 16452.30
