@@ -1,0 +1,21 @@
+{
+  "name": "hq3_office_objects",
+  "group": "hq3_office",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nPIECE SHEET RULES\nA sheet of separate game pieces, 1536x1024, transparent background (or a perfectly flat #FF00FF magenta background with nothing on it). 3x3 grid, one piece per cell, each fully inside its cell with margin, filling most of the cell. No cast shadows on the ground.\nCAMERA for every piece (very important): the front of the piece is parallel to the image (never turned left or right, no 3/4 view), and the camera looks down from above at a steep angle, so the TOP surface is visible as a band ABOVE the front face. The top band's height is about 0.3 x the real depth of the piece, measured on the same scale as its width (a 1 m wide, 1 m deep, 0.75 m tall desk = front face 0.75 tall, top band 0.3 tall above it, 1 wide). Sizes are given as W (left-right) x D (depth, front-to-back) x H (height) in meters; keep those proportions.\nChairs and anything a person sits on sideways are drawn in exact SIDE PROFILE facing RIGHT (the sitter would look to the right).\n\nhq3_office_objects (response team / suppression team / administration)\n1 desk island end view: two pairs of office desks back to back (W 1.6 x D 2.0 x H 0.75), a low frosted-glass divider down the middle of the top, two slim monitors back to back on top, a convenience-store coffee cup and a few papers on each side.\n2 operator desk: L-shaped desk with three monitors and a headset (W 0.8 x D 1.6 x H 0.75), cable tray, walnut top, dark front.\n3 chief's desk: larger walnut desk with one monitor, a desk lamp and neat files (W 0.9 x D 1.8 x H 0.75).\n4 office chair, SIDE PROFILE facing right: black mesh back 1.05 m, seat 0.48 m, five-star base.\n5 meeting table (W 1.4 x D 1.2 x H 0.75), walnut top, metal legs, a tablet and a water bottle on it.\n6 high reception counter (W 0.6 x D 2.2 x H 1.1), walnut front with a metal band, a small monitor and a document tray on top.\n7 standing gear bench (W 1.0 x D 1.6 x H 0.95): steel work bench with a body-armor vest, a helmet and a holster laid out neatly.\n8 locker bank seen from its side end (W 0.3 x D 4.2 x H 2.0): dark grey metal lockers, the long top band shows the row.\n9 low cabinet (W 0.3 x D 2.2 x H 1.0) walnut, closed.",
+  "transparent": true,
+  "source": "/workspace/generated_images/exec-31720c6a-51ac-4d6d-8088-16216fd120ef.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "e8454b3948b55a5f3a68abcb7172437ed771522d975af208fdb4cd04cd1a95bc",
+  "alpha_extrema": [
+    0,
+    254
+  ]
+}
