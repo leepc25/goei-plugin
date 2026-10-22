@@ -15,6 +15,15 @@ export interface ImageData {
   keywordSet: Set<string>;
   /** 소문자 이름·별칭 → 영문명 (둘 이상을 가리키면 false) */
   aliases: Map<string, string | false>;
+  /** 「주인공 이미지」 ON: 「{{user}} 태그 금지」 줄을 뺀다 (메인모델 Asset 로어북과 같음) */
+  allowUser?: boolean;
+}
+
+/** 「주인공 이미지」 ON일 때의 자료. self(캐릭터로 플레이하지 않을 때의 페르소나 이름)는 명단에 넣는다 */
+export function withUser(d: ImageData, self?: string): ImageData {
+  const n = self?.trim() ?? '';
+  if (!n || n.includes('_') || d.characters.includes(n)) return { ...d, allowUser: true };
+  return { ...d, allowUser: true, characters: [...d.characters, n], aliases: new Map(d.aliases).set(n.toLowerCase(), n) };
 }
 
 const fail = (field: string, why: string) => new AssetError(`${IMAGE_BOOK} 이미지 자료 오류 (${field}): ${why}`);
@@ -143,7 +152,7 @@ export function assetPrompt(active: string[], paras: string[], d: ImageData, lim
     '- MUST tag every visible listed character at least ONCE when they appear and are the focus.',
     '- Tag at first appearance AND when emotion changes SIGNIFICANTLY (smile → cry, calm → angry, neutral → shocked).',
     '- DO NOT tag minor variations (smile → bigger smile = SAME tag, skip).',
-    '- DO NOT tag {{user}}, the narrator, or undefined NPCs.',
+    d.allowUser ? '- DO NOT tag the narrator or undefined NPCs.' : '- DO NOT tag {{user}}, the narrator, or undefined NPCs.',
     '- DO NOT invent character names or keywords. Use only the lists below.',
     '',
     '## HARD LIMIT (per-character, independent count)',

@@ -123,3 +123,19 @@ test('페르소나 이름 태그는 표정과 상관없이 유저 사진 칸', a
   const pick2 = (n) => (n === '영지_smile' ? '영지_smile' : null);
   assert.match(imgtag.renderImgTags('<img=영지_smile>', pick2, 0, '영지'), /raw::영지_smile/);
 });
+
+test('보조모델도 같은 구조: ON이면 {{user}} 금지 줄을 빼고 페르소나를 명단에', () => {
+  const base = A.readImageData([{ comment: 'Image tag', content: JSON.stringify({ characters: ['Aileen'], sfw_keywords: ['default', 'smile'], kor_to_eng: { 에일린: 'Aileen' } }) }]);
+  const text = '영지가 웃었다.\n\n에일린이 웃었다.';
+  const off = A.planAsset(text, base, 2).messages[0].content;
+  assert.match(off, /DO NOT tag \{\{user\}\}/);
+  assert.match(off, /## Allowed Character Names.*\n(Aileen)\n/);
+  const d = A.withUser(base, '영지');
+  const job = A.planAsset(text, d, 2);
+  assert.doesNotMatch(job.messages[0].content, /\{\{user\}\}/);
+  assert.match(job.messages[0].content, /## Allowed Character Names.*\nAileen \| 영지\n/);
+  assert.equal(A.finishAsset(job, '[{"line":1,"tag":"<img=\\"영지_smile\\">"}]', d, 2), '영지가 웃었다.\n\n<img=영지_smile>\n\n에일린이 웃었다.');
+  const agentOnly = A.planAsset(text, A.withUser(base), 2).messages[0].content;
+  assert.doesNotMatch(agentOnly, /\{\{user\}\}/);
+  assert.match(agentOnly, /## Allowed Character Names.*\nAileen\n/);
+});

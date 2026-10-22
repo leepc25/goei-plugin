@@ -1,11 +1,12 @@
 // 응답이 끝난 뒤 보조 모델로 이미지 태그를 보충한다 (원본 onOutput → imgTagFireCore).
 // 에셋 모듈의 Image tag 로어북은 모듈에 있을 수 있어서 getCurrentLorebookEntries로 읽는다.
-import { ASSET_NOTE, AssetError, finishAsset, planAsset, readImageData } from '../core/asset';
+import { ASSET_NOTE, AssetError, finishAsset, planAsset, readImageData, withUser } from '../core/asset';
 import { playerAgent } from '../core/player';
 import { basicSettings } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
 import { runModel } from './llm';
 import { updateChat } from './risu';
+import { userInfo } from './user';
 
 export interface AssetTarget {
   charIndex: number;
@@ -35,9 +36,11 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     } catch {
       entries = t.lore ?? [];
     }
-    const data = readImageData(entries);
-    const agent = s.assetPlayer ? undefined : playerAgent(t.lore, t.chat.scriptstate);
-    const exclude = agent ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
+    // 메인모델과 같은 구조: 「주인공 이미지」 ON이면 {{user}} 금지를 빼고, 캐릭터로 플레이하지 않으면 페르소나를 명단에. OFF면 주인공 요원을 명단에서 뺀다
+    const agent = playerAgent(t.lore, t.chat.scriptstate);
+    const base = readImageData(entries);
+    const data = s.assetPlayer ? withUser(base, agent ? undefined : userInfo().name) : base;
+    const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     const job = planAsset(msg.data, data, s.assetLimit, exclude);
     if (!job) return;
     const raw = await runModel(job.messages, 'aux');
