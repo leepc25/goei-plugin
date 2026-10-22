@@ -3,7 +3,7 @@
 import argparse
 import base64
 from datetime import datetime, timezone
-import fcntl
+from contextlib import contextmanager
 import hashlib
 import io
 import json
@@ -28,6 +28,21 @@ def now():
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
+
+
+@contextmanager
+def owner_lock(path):
+    """Exclusive file creation works across Windows and POSIX worktrees.
+
+    A crashed process leaves evidence for manual reconciliation, never silent retry.
+    """
+    fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    try:
+        os.write(fd, (str(os.getpid())+'\n').encode())
+        yield
+    finally:
+        os.close(fd)
+        path.unlink()
 
 
 def save(path, value):
@@ -63,6 +78,8 @@ def designs():
 
 
 def prepare():
+    if any((OUT/'attempts').glob('*/state.json')):
+        raise ValueError('실제 제출 기록이 있어 요청을 덮어쓰지 않습니다. 새 검토 작업 이름을 사용하세요.')
     desc = ('petite adult woman, long straight black hair to hips, blunt bangs, pale face, '
             'warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, '
             'strict right-facing profile, empty hands, character only, transparent background, '
@@ -104,6 +121,8 @@ def submit(name, queue_reviewed, reference_reviewed):
     if (datetime.now(timezone.utc)-datetime.fromisoformat(snapshot['observed_at'])).total_seconds() > 180:
         raise ValueError('inspect로 현재 계정 상태를 다시 확인하세요')
     request = json.loads((OUT/'requests'/f'{name}.json').read_text())
+    if request.get('status') != 'draft_not_submitted':
+        raise ValueError('이미 제출되었거나 다른 작업으로 대체된 요청: '+name)
     if request['input_sha256'] != sha(BASE.read_bytes()):
         raise ValueError('입력 그림 해시 변경')
     raw = json.dumps(request['arguments'], sort_keys=True, separators=(',', ':')).encode()
@@ -112,8 +131,7 @@ def submit(name, queue_reviewed, reference_reviewed):
     # Shared among local worktrees. Remote workers still require coordinator review.
     common = subprocess.check_output(['git', 'rev-parse', '--git-common-dir'], cwd=ROOT, text=True).strip()
     lock = (ROOT/ common).resolve()/'deadpole-production.lock'
-    with lock.open('a') as handle:
-        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    with owner_lock(lock):
         for p in (OUT/'attempts').glob('*/state.json'):
             if json.loads(p.read_text())['state'] != 'recovered':
                 raise ValueError('미회수 또는 결과 불명 작업이 있습니다. 재제출 금지: '+str(p))

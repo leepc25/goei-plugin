@@ -1,0 +1,44 @@
+[
+  {
+    "stage": "local_request_persistence",
+    "error": "Windows command line exceeded process limit",
+    "paid_call_sent": false,
+    "actual_charge": 0,
+    "resolution": "Copy request file rather than inline its large JSON in a shell command"
+  },
+  {
+    "stage": "offline_tests",
+    "error": "Bundled Python did not include jsonschema",
+    "paid_call_sent": false,
+    "actual_charge": 0,
+    "resolution": "Install test-only package under ignored resume/.test-deps; all seven inherited tests passed"
+  },
+  {
+    "stage": "source_preservation_test",
+    "error": "Linux inventory SHA differs for Git CRLF text checkout",
+    "paid_call_sent": false,
+    "actual_charge": 0,
+    "resolution": "Compare exact binary hashes; accept LF-normalized JSON hashes only and also verify git diff leaves original full/ unchanged"
+  },
+  {
+    "stage": "visual_review",
+    "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
+    "defect": "High hand reads as pointing instead of gripping",
+    "actual_charge": 3,
+    "resolution": "Preserve candidate and mark hand silhouette as held; no repeated skeleton generation. Next suitable method is a hand-specific masked correction with a reviewed gripping silhouette"
+  },
+  {
+    "stage": "visual_review",
+    "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+    "defect": "Frame 7 to 8 changes body position abruptly at concatenated skeleton boundary",
+    "actual_charge": 3,
+    "resolution": "Change method to animate_image interpolation with the two newly generated endpoint frames fixed; separate job 0d951568-6645-4872-8dc8-30511d65023a, additional actual charge 2 generations"
+  },
+  {
+    "stage": "interpolation_endpoint_verification",
+    "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
+    "actual_charge": 2,
+    "defect": "Returned last frame differs from supplied endpoint by 366 pixels; intermediate frames contain detached white effects and support-foot sliding",
+    "resolution": "Use original supplied endpoint in runtime; display only x<120 for bridge intermediates to exclude detached effects; mark grounding held; no repeated paid call"
+  }
+]

@@ -1,0 +1,664 @@
+{
+  "clips": [
+    {
+      "name": "pipe",
+      "label": "쇠파이프 휘두르기",
+      "frames": 7,
+      "fps": 12,
+      "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea",
+      "source_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "source_sha256": [
+        "17d7ea3bb22ba686fbc86f59184bcf8c2848d12f75a6ad9e35b75638f4240eaa",
+        "ab64b6ed4df05e0422c5dc04c618ae8ed537d5ff74ed7f19133fa9c2060a1719",
+        "06d6aa5c1bbe0080ca7f01b3e4ade85b8e7ee6fe7906ada29a32a9ff6e680a63",
+        "8a400fe34b24f5bb6e3c860d8a31be7e482e67818d5b9601998be77bd6a1acc2",
+        "f3f3106fc1e0123b5561e4cb69e1e274a3f1cc7a09686bfdef7cf3ef31b4e32a",
+        "80b8fa4419d78a973eccc722be7c613e87f86402285db666085c69f54ba7a0ee",
+        "d93d2236221a4413dc394151936a10683e8f768585f54ddfbf9992f504b1c79c"
+      ],
+      "old_frames": 7,
+      "anchors": [
+        {
+          "x": 69,
+          "y": 76,
+          "angle": -35,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 58,
+          "y": 64,
+          "angle": 185,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 74,
+          "y": 75,
+          "angle": -55,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 91,
+          "y": 86,
+          "angle": 12,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 82,
+          "y": 98,
+          "angle": 35,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 61,
+          "y": 76,
+          "angle": -35,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 61,
+          "y": 76,
+          "angle": -35,
+          "prop": "pipe",
+          "grip": [
+            3,
+            5
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "수정 후보",
+        "note": "무기 잔재·잘림 제거. 같은 파이프 소품을 전 장에 사용. 양손은 한 덩어리로 읽히며 후퇴 동작은 짧습니다."
+      }
+    },
+    {
+      "name": "cq1",
+      "label": "근접 1타 · 낮은 리텐션",
+      "frames": 4,
+      "fps": 14,
+      "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+      "source_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "source_sha256": [
+        "bec24079e9b5149c8d3ae3d528490896b4a8cc392e261f5f5ce155df73a38484",
+        "45c192e28e283ce761fde03c0abd275f3a291e7881955dd84463a190e4d5dc00",
+        "430d1a2636794d1aaac19f4a5640c5e9f6ac36d0a2b8fbf0d3e094afd2002bc7",
+        "824f78fd634c4fc202bc31e669d21bc82ab128d21328d3b19e48a865bf9e5f16"
+      ],
+      "old_frames": 4,
+      "anchors": [
+        {
+          "x": 72,
+          "y": 85,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 75,
+          "y": 82,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 74,
+          "y": 82,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 75,
+          "y": 82,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "수정 후보",
+        "note": "손과 총구를 얼굴 아래로 낮췄습니다. 총구 수평 유지. 작은 손목 반동은 추가 확인 대상입니다."
+      }
+    },
+    {
+      "name": "cq2",
+      "label": "근접 2타 · 두 손 뻗기",
+      "frames": 4,
+      "fps": 14,
+      "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+      "source_indices": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "source_sha256": [
+        "1b860120efcf5e3564b77c8c373d005ea4b7ec837eb2f841031ba93d52ebf09c",
+        "beb9eb2d8cc0323b1af425e13f14c7cea417b0dc40bb1b0fb7004b80f05582e4",
+        "0e74cfa4757196074939f48835e743b009faf1b6075afed507b6c8351a12521f",
+        "0ffcb5e1f36322ba245281b966efbd56c2743a4c80f8893e8798d7b4a9a12627"
+      ],
+      "old_frames": 4,
+      "anchors": [
+        {
+          "x": 81,
+          "y": 80,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 102,
+          "y": 73,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 100,
+          "y": 72,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 102,
+          "y": 73,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "수정 후보",
+        "note": "두 손 뻗기·반동을 신규 생성했습니다. 3타 연결은 끝장 고정 보간을 적용했으나 접지 결함은 보류입니다."
+      }
+    },
+    {
+      "name": "cq_bridge",
+      "label": "2타 → 3타 연결",
+      "frames": 3,
+      "fps": 14,
+      "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
+      "source_indices": [
+        1,
+        2,
+        3
+      ],
+      "source_sha256": [
+        "d725c41fe349aa0c24557011f8536b4ce16ca5559c7231148c065b630da2ab2c",
+        "5a049a574772ba7f71145c862e9b0bdd827e992c7141aed5483cbd1e8ec1a39b",
+        "061c3d856004640e17c70a3eeed5ce63540cde292ff1a8e17b7e4ad6940e3ea6"
+      ],
+      "old_frames": 7,
+      "anchors": [
+        {
+          "x": 99,
+          "y": 73,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 94,
+          "y": 76,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 87,
+          "y": 81,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        -1,
+        -1,
+        0
+      ],
+      "draw_width": 120,
+      "user_visual_approval": false,
+      "review": {
+        "status": "보류 · 접지",
+        "note": "양끝 그림을 고정해 자세 튐은 줄였습니다. 중간 장의 지지발 미끄러짐은 남았습니다. 몸과 떨어진 오른쪽 흰 효과는 표시에서만 제외했습니다."
+      }
+    },
+    {
+      "name": "cq3",
+      "label": "근접 3타 · 손바닥 밀기",
+      "frames": 6,
+      "fps": 12,
+      "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+      "source_indices": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_sha256": [
+        "4198d4ce913c6a32a95318af1c882025dc3789020f5a0a20f9794f77e383baa8",
+        "e06380b5b11012ddaa11f542e6a6fb8db07e6f508452235cc6a805f1301c4440",
+        "a0a848e0f6abaf570dc6833b021f699c82e1fb99410ff1efcfa8e4439f2016b8",
+        "a21bec5e878eca857075c6dc535e79420df8a7aaae10f9445f989aaf0d70a187",
+        "9ddecb7572ac15227f35d7a84d4b605cb4ed18f774bf495731e2cdd91d648b8f",
+        "6b8f0157e377a4718ce57c5601edcc502efe728b6e47b228225aaaa973ff5883"
+      ],
+      "old_frames": 7,
+      "anchors": [
+        {
+          "x": 82,
+          "y": 84,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 74,
+          "y": 83,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 70,
+          "y": 80,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 70,
+          "y": 80,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 74,
+          "y": 84,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 82,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "수정 후보",
+        "note": "얼굴을 가리던 손을 앞으로 열어 손바닥 밀기가 보이도록 바꿨습니다. 뒷손 권총은 낮게 유지합니다."
+      }
+    },
+    {
+      "name": "catch",
+      "label": "칼날 잡기",
+      "frames": 6,
+      "fps": 12,
+      "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
+      "source_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "source_sha256": [
+        "73e92520c8fadd154072d55cdf8c44bd13c6c6b3783be80cd7ccb8048a7b039b",
+        "bb7bf6a35a48eee418e161b33fc246aa0626e6ad47a4d4dd833d3a85b40c4443",
+        "410e627e83b4c6607e86fad68bbed0a030f7af89ac969169ffed5aed7b922d95",
+        "ae7d419eb41b16fe1c9a048a1a2e78ff690cc4883e6a9775536e9afa034359c2",
+        "b83d2e49729c39490d2f6475aa3a5d64796816fa52d2abf3c185e78c82f5e7ff",
+        "994cb47e6fe92d7df102b97121ebdd0d8971fd58cc204400585a93c1989bd668"
+      ],
+      "old_frames": 6,
+      "anchors": [
+        {
+          "x": 79,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 80,
+          "y": 79,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 76,
+          "y": 80,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 76,
+          "y": 80,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 78,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 78,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        -1,
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "보류 · 손 모양",
+        "note": "전환·무기 잔재는 개선됐지만 높은 손이 잡기보다 가리키기로 보입니다. 최종 합격하지 않았습니다."
+      }
+    },
+    {
+      "name": "counter",
+      "label": "잡은 채 맞쏘기",
+      "frames": 5,
+      "fps": 12,
+      "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
+      "source_indices": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "source_sha256": [
+        "994cb47e6fe92d7df102b97121ebdd0d8971fd58cc204400585a93c1989bd668",
+        "d6aac919651203f5280c0c0d816cb8a7e232ab40b8583718a30d08c9e4c9506c",
+        "f8ccec7b5af8d2a9516de6342a6f231d899946b92f5761dc0adc6ec5fb904272",
+        "183abda6e08656a331a2dbb14dafc59f3445e43d27235dd47704f8d7d7a63f7b",
+        "3d374045a975bc4fb0bcb9a15e1285344d6ef02efc348d08e27ef7f015c40aaf"
+      ],
+      "old_frames": 5,
+      "anchors": [
+        {
+          "x": 78,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 81,
+          "y": 87,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 79,
+          "y": 87,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 81,
+          "y": 87,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        },
+        {
+          "x": 78,
+          "y": 86,
+          "angle": 0,
+          "prop": "pistol",
+          "grip": [
+            5,
+            10
+          ],
+          "source": "visual_review_generated_pixels"
+        }
+      ],
+      "offsets": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      "draw_width": 192,
+      "user_visual_approval": false,
+      "review": {
+        "status": "전환 수정 / 손 모양 보류",
+        "note": "잡기 끝 장과 같은 그림·바닥 보정·소품 위치로 시작해 경계 튐을 제거했습니다. 잡는 손 표현은 보류입니다."
+      }
+    }
+  ],
+  "weapons": {
+    "pipe": {
+      "source": "game-src/art/items/dot/pipe.png",
+      "sha256": "17b395d1a8d34ae47a76c21333d6e665e0f0f7fe36b2226818d4bd34bf45a73f"
+    },
+    "pistol": {
+      "source": "game-src/art/items/dot/sig_deadpole_pistol.png",
+      "sha256": "c07aa3143776543286d3f11bab2fddca06df3d5cc28839790b862cde6e213786"
+    }
+  },
+  "user_visual_approval": false,
+  "boundary": {
+    "catch_last_counter_first": "same immutable generated frame 05.png",
+    "shared_source_index": 5
+  },
+  "scope": "independent review only; no engine or shared atlas change"
+}

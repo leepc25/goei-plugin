@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>데드폴 · 전투 수정 검수판</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#11171b;color:#e4e4df;font:15px/1.5 system-ui,sans-serif}main{max-width:1180px;margin:auto;padding:18px}h1{font-size:21px;margin:0}p{margin:6px 0 14px;color:#bac4c9}.tag{color:#eabb83}.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}button,select{font:inherit;background:#26333b;border:1px solid #607480;border-radius:6px;padding:8px 12px;color:inherit;min-height:44px;cursor:pointer}button.active{background:#3e6159;border-color:#9ad6b9}label{white-space:nowrap}canvas{display:block;width:100%;height:auto;image-rendering:pixelated;background:#5a636b;border:1px solid #82929a}input[type=range]{flex:1;min-width:120px}#note{min-height:48px;padding:10px;background:#1d292f;border-left:3px solid #cda06b}#actions{display:flex;flex-wrap:wrap;gap:8px}small{color:#aab7bc}#receipt{overflow-wrap:anywhere}details{margin-top:18px}.framebar{display:flex;align-items:center;gap:8px;margin:10px 0}#frame{min-width:85px;font-variant-numeric:tabular-nums}@media(max-width:700px){main{padding:9px}h1{font-size:18px}p{font-size:13px}.bar{gap:6px}button,select{padding:7px 8px;font-size:13px}#note{font-size:13px}canvas{max-height:58vh;object-fit:contain}}
+</style>
+<main><h1>데드폴 · 전투 수정 검수판 <span class="tag">시각 승인 전</span></h1>
+<p>왼쪽은 기존 결과, 오른쪽은 이번에 생성한 수정 후보입니다. 프레임을 넘겨 손·얼굴·발·무기 길이를 비교할 수 있습니다.</p>
+<div id="actions"></div>
+<div class="bar"><button id="play">일시정지</button><button id="chain">잡기 → 맞쏘기</button><button id="combo">근접 3연타</button><label>속도 <select id="speed"><option value="0.25">0.25배</option><option value="0.5">0.5배</option><option value="1" selected>1배</option></select></label><label><input id="props" type="checkbox" checked> 별도 소품</label><label><input id="guides" type="checkbox" checked> 접지·손 표시</label></div>
+<canvas id="view" width="1152" height="432" aria-label="기존과 신규 데드폴 동작 비교"></canvas>
+<div class="framebar"><button id="prev" aria-label="이전 프레임">◀</button><input id="seek" aria-label="프레임 선택" type="range" min="0" max="6" value="0"><button id="next" aria-label="다음 프레임">▶</button><output id="frame"></output></div>
+<div id="note"></div><p><small>조작: Space 재생/정지 · ←/→ 프레임 이동 · A 근접 3연타 · Q 잡기→맞쏘기 · P 파이프. 이번 공격과 전환만 시험하는 독립판입니다.</small></p>
+<details><summary>제작 기록·검수 범위</summary><p id="receipt"></p><p>원본 그림은 보존했습니다. 몸 그림과 별도 소품을 분리했으며, 손 좌표는 회수한 그림에서 확인한 위치입니다. 생성 완료·내부 검수·사용자 승인은 별도 상태입니다. 반려·보류 항목은 정식 게임에 적용하지 않았습니다.</p></details>
+</main><script>
+const DATA=__DATA__;
+const $=id=>document.getElementById(id),canvas=$('view'),ctx=canvas.getContext('2d');
+const images={},weapons={};let current=DATA.clips[0],frame=0,playing=true,elapsed=0,last=0,chain=[],loaded=false;
+const imageLoad=(key,src,target)=>new Promise((ok,no)=>{const im=new Image();im.onload=()=>{target[key]=im;ok()};im.onerror=no;im.src=src});
+Promise.all([...DATA.clips.flatMap(c=>[imageLoad(c.name,c.image,images),imageLoad(c.name+'-old',c.old_image,images)]),...Object.entries(DATA.weapons).map(([k,s])=>imageLoad(k,s,weapons))]).then(()=>{loaded=true;select(current.name);requestAnimationFrame(tick)}).catch(e=>{$('note').textContent='그림을 읽지 못했습니다. '+e});
+function select(name,keepChain=false){const c=DATA.clips.find(c=>c.name===name);if(!c)return;if(!keepChain)chain=[];current=c;frame=0;elapsed=0;$('seek').max=c.frames-1;$('note').textContent=c.review.status+' · '+c.review.note;$('receipt').textContent='작업 ID: '+c.job_id+' / 새 원본 '+c.frames+'장 / 사용자 승인 대기';document.querySelectorAll('#actions button').forEach(b=>b.classList.toggle('active',b.dataset.name===name));render()}
+function sequence(names){if(names.some(n=>!DATA.clips.some(c=>c.name===n)))return;chain=names.slice(1);select(names[0],true);playing=true;$('play').textContent='일시정지'}
+DATA.clips.forEach(c=>{const b=document.createElement('button');b.textContent=c.label;b.dataset.name=c.name;b.onclick=()=>select(c.name);$('actions').append(b)});
+$('chain').onclick=()=>sequence(['catch','counter']);$('combo').onclick=()=>sequence(['cq1','cq2',...(DATA.clips.some(c=>c.name==='cq_bridge')?['cq_bridge']:[]),'cq3']);
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'일시정지':'재생'};
+function step(delta){playing=false;chain=[];$('play').textContent='재생';frame=(frame+delta+current.frames)%current.frames;render()}
+$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);$('seek').oninput=e=>{playing=false;chain=[];$('play').textContent='재생';frame=+e.target.value;render()};
+document.addEventListener('keydown',e=>{if(['INPUT','SELECT','BUTTON'].includes(document.activeElement.tagName))return;if(['Space','ArrowLeft','ArrowRight','KeyA','KeyQ','KeyP'].includes(e.code))e.preventDefault();if(e.code==='Space')$('play').click();if(e.code==='ArrowLeft')step(-1);if(e.code==='ArrowRight')step(1);if(e.code==='KeyA')$('combo').click();if(e.code==='KeyQ')$('chain').click();if(e.code==='KeyP')select('pipe')});
+for(const id of ['props','guides'])$(id).onchange=render;
+function render(){if(!loaded)return;ctx.imageSmoothingEnabled=false;ctx.fillStyle='#5a636b';ctx.fillRect(0,0,1152,432);ctx.fillStyle='#edf1ee';ctx.font='18px sans-serif';ctx.fillText('기존 · 비교 전용',24,32);ctx.fillText('신규 · '+current.label,600,32);ctx.strokeStyle='#87959b';ctx.beginPath();ctx.moveTo(576,0);ctx.lineTo(576,432);ctx.stroke();
+ const oldFrame=Math.min(current.old_frames-1,Math.floor(frame*current.old_frames/current.frames));
+ for(const side of [0,1]){const ox=side*576+30,oy=10,z=3;const im=images[current.name+(side?'':'-old')],idx=side?frame:oldFrame,dy=side?(current.offsets[frame]||0):0;
+ ctx.save();ctx.translate(ox,oy);ctx.scale(z,z);
+ if(side&&$('props').checked){const a=current.anchors[frame];if(a&&a.prop){const w=weapons[a.prop];ctx.save();ctx.translate(a.x,a.y+dy);ctx.rotate(a.angle*Math.PI/180);ctx.drawImage(w,-a.grip[0],-a.grip[1]);ctx.restore()}}
+ const dw=side?current.draw_width:192;ctx.drawImage(im,idx*192,0,dw,144,0,dy,dw,144);
+ if($('guides').checked){ctx.lineWidth=.4;ctx.strokeStyle='#e4af94';ctx.beginPath();ctx.moveTo(0,135);ctx.lineTo(192,135);ctx.stroke();if(side){const a=current.anchors[frame];if(a){ctx.strokeStyle='#9bf2cf';ctx.beginPath();ctx.arc(a.x,a.y+dy,2.5,0,Math.PI*2);ctx.stroke()}}}ctx.restore();}
+ $('seek').value=frame;$('frame').textContent=(frame+1)+' / '+current.frames+'장';
+}
+function tick(t){const dt=Math.min((t-last)/1000,.1);last=t;if(playing){elapsed+=dt*Number($('speed').value);if(elapsed>=1/current.fps){elapsed=0;frame++;if(frame>=current.frames){if(chain.length){const n=chain.shift();select(n,true);if(n==='counter')frame=1;}else frame=0;}}}render();requestAnimationFrame(tick)}
+window.reviewState=()=>({clip:current.name,frame,frames:current.frames,playing,loaded,userVisualApproval:false});
+</script></html>

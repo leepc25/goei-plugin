@@ -1,0 +1,12 @@
+{
+  "state": "recovered",
+  "started_at": "2026-10-22T10:38:47.369Z",
+  "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea",
+  "actual_cost": {
+    "amount": 3,
+    "unit": "generations",
+    "source": "result.json"
+  },
+  "user_visual_approval": false,
+  "internal_review": "conditional_candidate"
+}

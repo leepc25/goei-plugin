@@ -1,0 +1,62 @@
+{
+  "jobs": [
+    {
+      "clip": "pipe_body",
+      "tool": "animate_with_skeleton_v3",
+      "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea",
+      "asset_id": "bcce17db-90ba-564f-94ac-62c7d2dd1715",
+      "frames_returned": 8,
+      "input_sha256": "e44cd36ae3af0bba82b185109745b51dc9d239f4b17ae84e920d92872400a00a",
+      "last_frame_sha256": null,
+      "request_sha256": "654970922ab01cceb3b61b05af365d249c31297ac94c88ebe8b2d7f9b769c329",
+      "actual_generations": 3,
+      "cost_evidence": "attempts/pipe_body/result.json",
+      "status": "recovered",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "catch_counter",
+      "tool": "animate_with_skeleton_v3",
+      "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
+      "asset_id": "39fec92e-01e5-58c3-bc99-351e26c19e02",
+      "frames_returned": 10,
+      "input_sha256": "e44cd36ae3af0bba82b185109745b51dc9d239f4b17ae84e920d92872400a00a",
+      "last_frame_sha256": null,
+      "request_sha256": "524f48ceb405c2c2d17480f435723a703e166cee0fcabcf6e2c66e8ebab93d05",
+      "actual_generations": 3,
+      "cost_evidence": "attempts/catch_counter/result.json",
+      "status": "recovered",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "close_combo",
+      "tool": "animate_with_skeleton_v3",
+      "job_id": "4206757c-145c-4b9a-8211-2e585da3df75",
+      "asset_id": "7745d95b-214e-5049-b6d6-a6dadddbbb14",
+      "frames_returned": 14,
+      "input_sha256": "e44cd36ae3af0bba82b185109745b51dc9d239f4b17ae84e920d92872400a00a",
+      "last_frame_sha256": null,
+      "request_sha256": "772ba8d2a2898a56a7c1dee25a8f4d5b5e19340abac64db6aeef6a6d684d6325",
+      "actual_generations": 3,
+      "cost_evidence": "attempts/close_combo/result.json",
+      "status": "recovered",
+      "user_visual_approval": false
+    },
+    {
+      "clip": "combo_bridge",
+      "tool": "animate_image",
+      "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
+      "asset_id": "3cb1858d-6b31-5380-9772-96463f0682bf",
+      "frames_returned": 5,
+      "input_sha256": "0ffcb5e1f36322ba245281b966efbd56c2743a4c80f8893e8798d7b4a9a12627",
+      "last_frame_sha256": "4198d4ce913c6a32a95318af1c882025dc3789020f5a0a20f9794f77e383baa8",
+      "request_sha256": "dfc3c3dabeb51c08d61d08a123ca87189b2ace67854c28470b5c5ca1911bf93b",
+      "actual_generations": 2,
+      "cost_evidence": "attempts/combo_bridge/result.json",
+      "status": "recovered",
+      "user_visual_approval": false
+    }
+  ],
+  "total_actual_generations": 11,
+  "shared_balance_delta_used": false
+}

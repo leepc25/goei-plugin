@@ -1,0 +1,20 @@
+{
+  "job_id": "0d951568-6645-4872-8dc8-30511d65023a",
+  "status": "completed",
+  "frames": 5,
+  "download_url": "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=0",
+  "download_urls": [
+    "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=0",
+    "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=1",
+    "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=2",
+    "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=3",
+    "https://api.pixellab.ai/mcp/images/0d951568-6645-4872-8dc8-30511d65023a/download?index=4"
+  ],
+  "asset": {
+    "id": "3cb1858d-6b31-5380-9772-96463f0682bf",
+    "type": "image",
+    "status": "saved"
+  },
+  "charged_generations": 2,
+  "frame": 0
+}

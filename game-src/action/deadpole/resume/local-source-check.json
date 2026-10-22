@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-22T10:56:53.191616+00:00",
+  "refs": {
+    "metroidvania-run-system": "59a2a883c6aca00f8c0e1e5fc2c421a6da770528",
+    "character-production-resume": "6b8000ea3f51a9ac9cc437995c5a2edc0e77b2eb",
+    "art-deadpole-resume": "eb3059a6e27929d8844b7bd980b2b887457437b1"
+  },
+  "deadpole_full_diff_against_system": "",
+  "integration": "no merge; continued existing Deadpole branch; own paths only",
+  "original_files_preserved": 771,
+  "handoff_received_from_coordinator": "01a1632e-358b-7931-b8ab-c3487b5b6095",
+  "kyuras_recovery": "not queried or retrieved"
+}

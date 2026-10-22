@@ -1,0 +1,90 @@
+[
+  {
+    "index": 0,
+    "sha256": "17d7ea3bb22ba686fbc86f59184bcf8c2848d12f75a6ad9e35b75638f4240eaa",
+    "bbox": [
+      41,
+      49,
+      77,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 1,
+    "sha256": "ab64b6ed4df05e0422c5dc04c618ae8ed537d5ff74ed7f19133fa9c2060a1719",
+    "bbox": [
+      38,
+      49,
+      78,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 2,
+    "sha256": "06d6aa5c1bbe0080ca7f01b3e4ade85b8e7ee6fe7906ada29a32a9ff6e680a63",
+    "bbox": [
+      43,
+      49,
+      83,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 3,
+    "sha256": "8a400fe34b24f5bb6e3c860d8a31be7e482e67818d5b9601998be77bd6a1acc2",
+    "bbox": [
+      47,
+      50,
+      94,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 4,
+    "sha256": "f3f3106fc1e0123b5561e4cb69e1e274a3f1cc7a09686bfdef7cf3ef31b4e32a",
+    "bbox": [
+      46,
+      52,
+      88,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 5,
+    "sha256": "80b8fa4419d78a973eccc722be7c613e87f86402285db666085c69f54ba7a0ee",
+    "bbox": [
+      34,
+      49,
+      69,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 6,
+    "sha256": "d93d2236221a4413dc394151936a10683e8f768585f54ddfbf9992f504b1c79c",
+    "bbox": [
+      34,
+      49,
+      69,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  },
+  {
+    "index": 7,
+    "sha256": "94d05732a9c1350bc1311af926c0a2ac2cf23123787e465efc66c8b45cad2eba",
+    "bbox": [
+      34,
+      49,
+      69,
+      135
+    ],
+    "job_id": "4ee67072-3bcb-431e-b62b-a1f2446761ea"
+  }
+]

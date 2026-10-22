@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: 0d951568-6645-4872-8dc8-30511d65023a\njob_id: 0d951568-6645-4872-8dc8-30511d65023a\naction: Small controlled backward step, lower the rear hand to waist height while opening the front palm, keep feet planted until weight transfers.\nframes: 4\nsize: 192x144px\ntransparent: True\nlast_frame: yes (interpolating to it)\nseed: 1022\nasset_id: 3cb1858d-6b31-5380-9772-96463f0682bf\nasset_status: pending (saved when generation completes)\ncost: 2 generations\nstatus: processing (~30-180s)\n\nhint: get_image(job_id=\"0d951568-6645-4872-8dc8-30511d65023a\")"
+    }
+  ],
+  "isError": false
+}

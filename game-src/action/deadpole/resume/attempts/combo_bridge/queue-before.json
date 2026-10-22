@@ -1,0 +1,1 @@
+{"content":[{"type":"text","text":"1 jobs:\ncd0766c8-87f7-4b50-8a9c-a7d79c5c3896 processing 63%, eta ~34s (inpainting_v3, 57s old)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"}],"isError":false}

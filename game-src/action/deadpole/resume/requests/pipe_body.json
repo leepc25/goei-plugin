@@ -1005,7 +1005,7 @@
   "request_sha256": "654970922ab01cceb3b61b05af365d249c31297ac94c88ebe8b2d7f9b769c329",
   "estimated_generations": 3,
   "actual_cost": null,
-  "status": "draft_not_submitted",
+  "status": "submitted_and_recovered_do_not_resubmit",
   "user_visual_approval": false,
   "reference_keypoints_status": "inherited_estimate_requires_image_alignment_review"
 }

@@ -785,7 +785,8 @@
   "request_sha256": "5ba899b2f4769ab159431e8a5693447370c1302172a0fb9d2aef5769895cd161",
   "estimated_generations": 3,
   "actual_cost": null,
-  "status": "draft_not_submitted",
+  "status": "superseded_do_not_submit",
   "user_visual_approval": false,
-  "reference_keypoints_status": "inherited_estimate_requires_image_alignment_review"
+  "reference_keypoints_status": "inherited_estimate_requires_image_alignment_review",
+  "superseded_by": "catch_counter"
 }

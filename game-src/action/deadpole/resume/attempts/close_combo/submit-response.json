@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: 4206757c-145c-4b9a-8211-2e585da3df75\njob_id: 4206757c-145c-4b9a-8211-2e585da3df75\ndescription: petite adult woman, long straight black hair to hips, blunt bangs, pale face, warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, strict right-facing profile, empty hands, character only, transparent background, no held objects, no weapons, no effects\naction: low chest retention recoil, two hands extend, recoil, open palm shove and recover\nframes: 14\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"4206757c-145c-4b9a-8211-2e585da3df75\")\nasset_id: 7745d95b-214e-5049-b6d6-a6dadddbbb14\nasset_status: pending (saved to your gallery when generation completes)"
+    }
+  ],
+  "isError": false
+}

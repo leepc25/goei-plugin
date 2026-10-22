@@ -1,0 +1,17 @@
+{
+  "original_files_preserved": 771,
+  "recovered_frames": 37,
+  "unique_jobs": [
+    "4ee67072-3bcb-431e-b62b-a1f2446761ea",
+    "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
+    "4206757c-145c-4b9a-8211-2e585da3df75",
+    "0d951568-6645-4872-8dc8-30511d65023a"
+  ],
+  "actual_generations": 11,
+  "shared_boundary_pixels_identical": true,
+  "shared_boundary_offset_and_prop_identical": true,
+  "request_and_frame_hashes_verified": true,
+  "runtime_uses_original_endpoints": true,
+  "returned_interpolation_last_frame_identical": false,
+  "user_visual_approval": false
+}

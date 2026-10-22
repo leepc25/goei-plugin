@@ -1,0 +1,26 @@
+{
+  "tested_at": "2026-10-22T11:41:34.599Z",
+  "clips": [
+    "pipe",
+    "cq1",
+    "cq2",
+    "cq_bridge",
+    "cq3",
+    "catch",
+    "counter"
+  ],
+  "viewports": [
+    [
+      1280,
+      860
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "errors": [],
+  "chain_pass": true,
+  "frame_controls_pass": true,
+  "mobile_horizontal_overflow": false
+}

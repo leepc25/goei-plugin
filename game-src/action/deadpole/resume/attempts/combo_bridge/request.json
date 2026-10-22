@@ -1,0 +1,17 @@
+{
+  "tool": "animate_image",
+  "arguments": {
+    "action": "Small controlled backward step, lower the rear hand to waist height while opening the front palm, keep feet planted until weight transfers.",
+    "first_frame_url": "https://api.pixellab.ai/mcp/images/4206757c-145c-4b9a-8211-2e585da3df75/download?index=7",
+    "last_frame_url": "https://api.pixellab.ai/mcp/images/4206757c-145c-4b9a-8211-2e585da3df75/download?index=8",
+    "frame_count": 4,
+    "no_background": true,
+    "seed": 1022
+  },
+  "input_sha256": "0ffcb5e1f36322ba245281b966efbd56c2743a4c80f8893e8798d7b4a9a12627",
+  "last_frame_sha256": "4198d4ce913c6a32a95318af1c882025dc3789020f5a0a20f9794f77e383baa8",
+  "estimated_generations": 2,
+  "reason": "skeleton subclip boundary spatial discontinuity; changed method to pinned-endpoint interpolation",
+  "user_visual_approval": false,
+  "request_sha256": "dfc3c3dabeb51c08d61d08a123ca87189b2ace67854c28470b5c5ca1911bf93b"
+}

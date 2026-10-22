@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "id: d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\njob_id: d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\ndescription: petite adult woman, long straight black hair to hips, blunt bangs, pale face, warm charcoal open hip-length suit jacket, white shirt, black tie and gloves, strict right-facing profile, empty hands, character only, transparent background, no held objects, no weapons, no effects\naction: catch a wrist, sidestep, low hand extends and recoils, high hand holds\nframes: 10\nsize: 192x144px\ntransparent: True\ncost: 3 generations\nstatus: processing (~5 min)\n\nhint: get_image(job_id=\"d9e65b7a-aca2-48db-b2d9-1ae5d15823e4\")\nasset_id: 39fec92e-01e5-58c3-bc99-351e26c19e02\nasset_status: pending (saved to your gallery when generation completes)"
+    }
+  ],
+  "isError": false
+}

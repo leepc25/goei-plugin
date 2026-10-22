@@ -12,6 +12,23 @@ import rig
 
 
 class ResumeTests(unittest.TestCase):
+    def test_owner_lock_is_exclusive_and_released(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'owner.lock'
+            with production.owner_lock(path):
+                self.assertTrue(path.exists())
+                with self.assertRaises(FileExistsError):
+                    with production.owner_lock(path): pass
+            self.assertFalse(path.exists())
+
+    def test_prepare_cannot_overwrite_submitted_requests(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp); state=out/'attempts/paid/state.json'
+            state.parent.mkdir(parents=True);state.write_text('{}')
+            with patch.object(production,'OUT',out),patch.object(production,'save') as save:
+                with self.assertRaises(ValueError): production.prepare()
+                save.assert_not_called()
+
     def test_missing_auth_does_not_open_network(self):
         with patch.dict(os.environ, {}, clear=True), patch('urllib.request.urlopen') as network:
             with self.assertRaises(RuntimeError):

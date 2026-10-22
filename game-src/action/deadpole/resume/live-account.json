@@ -1,0 +1,25 @@
+{
+  "observed_at": "2026-10-22T10:55:23.199Z",
+  "balance": {
+    "content": [
+      {
+        "type": "text",
+        "text": "credits: $0.00\ngenerations_remaining: 14021.30\ngenerations_used: 5333.70\ngenerations_total: 19355\nnote: fractions come from small steps billed per use — prompt enhancement 0.05, skeleton estimation and colour reduction 0.1, sprite import 0.25, /chat builder model calls — most are not jobs, so list_jobs does not show them\nsubscription: active (Tier 3: Pixel Architect 2x)\ngenerations_reset: 2026-11-20\nnote: generations_total is this cycle's allowance (prorated on a mid-cycle upgrade); it refills on generations_reset"
+      }
+    ],
+    "isError": false
+  },
+  "jobs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "33 jobs:\ne5b19b7d-ca40-4632-a057-ed262452c973 processing 3%, eta ~144s (animation, 5s old)\n296587c6-95c3-4b93-92a7-d164ddb10506 completed (edit_images, 2m33s ago)\naa4b5980-880c-4ee9-8171-3f47dd2d994f completed (inpainting_v3, 2m45s ago)\n57e6577c-6ee1-4dea-8c84-532a513c7cb3 completed (animation, 2m49s ago)\n429ad77b-ed3b-4337-9524-075adf0a262c processing 31%, eta ~453s (animation, 3m23s old)\n0d951568-6645-4872-8dc8-30511d65023a completed (animation, 3m56s ago)\ncd0766c8-87f7-4b50-8a9c-a7d79c5c3896 completed (inpainting_v3, 4m55s ago)\n27a5c819-12b3-4f7b-82ae-fe0a56f55a04 completed (animation, 5m20s ago)\na3743d39-b041-4287-96ad-c62228b484b3 completed (animation, 7m18s ago)\nd5d8b068-9501-40be-9538-7c2fe192cdc8 completed (edit_image_pixen, 7m19s ago)\n76884626-42e9-4626-980a-37663c8aac8f completed (animation, 7m33s ago)\n5ce7b76d-7f1a-43e5-a28a-76f10b039fbd completed (animation, 7m50s ago)\nee5ef44a-a16d-4ed1-a494-6578590bb498 completed (inpainting_v3, 7m59s ago)\n9f98ad15-77c1-4eda-8023-a90762053267 completed (animation, 8m3s ago)\n4206757c-145c-4b9a-8211-2e585da3df75 completed (animation, 8m19s ago)\n3000e1b3-fee3-478b-a0ce-00b276a8f0c3 completed (inpainting_v3, 9m53s ago)\n11526db3-3927-47df-a600-5f55e1473bcc completed (animation, 10m55s ago)\nf06a14de-204f-47b2-badd-dfd49796f148 completed (animation, 11m10s ago)\n2fce7c21-c96f-492c-a404-e5cdeb9a6450 completed (animation, 11m26s ago)\nc679844b-e541-48e4-9006-4b615ddb9dcc completed (edit_images, 11m27s ago)\nd9e65b7a-aca2-48db-b2d9-1ae5d15823e4 completed (animation, 11m30s ago)\n4af04357-fbfe-49e9-8ebb-b10a1765e7a2 completed (inpainting_v3, 12m31s ago)\ne92bce68-f025-4757-94b0-b16566cebe5d completed (animation, 13m16s ago)\n3b131a96-b98f-4c4f-b220-146ce3706ceb completed (animation, 13m20s ago)\n7282832d-aa8a-4969-b050-096a6a4832ed completed (animation, 13m38s ago)\nc2c9cbc3-8a1e-40fa-b776-6112e7e5a82a completed (edit_image_pixen, 14m42s ago)\nd4017c4c-d084-4bc0-88b7-eb0df8dfe9e3 completed (animation, 14m48s ago)\n4ee67072-3bcb-431e-b62b-a1f2446761ea completed (animation, 14m49s ago)\n6aa5567e-0ffc-45df-a3a3-702ca373d66c completed (inpainting_v3, 15m3s ago)\nddafed99-d4d6-4b51-bbb4-c01ce660ef68 completed (edit_image_pixen, 15m3s ago)\ndf3b56fb-5426-4491-888f-f94a4192e5cf completed (animation, 15m27s ago)\n21ec4c32-1bf3-4dba-a2c4-a8368d8af51f completed (generation, 15m36s ago)\nd0105c20-4b44-4ebb-b3a5-32ea1a4158c1 completed (generation, 16m34s ago)\nhint: cancel_job(job_id=\"...\") to release a stuck job's concurrency slot"
+      }
+    ],
+    "isError": false
+  },
+  "concurrency_limit": 20,
+  "concurrency_source": "PixelLab search_help live response: Tier3 Pixel Architect 2x still20",
+  "owner": "deadpole",
+  "owner_pending": 0
+}

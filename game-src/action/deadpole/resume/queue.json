@@ -2,19 +2,19 @@
   "owner": "deadpole",
   "branch": "codex/art-deadpole-resume",
   "max_submitted_per_owner": 1,
-  "account_balance": null,
-  "account_active_jobs": null,
-  "account_concurrency_limit": null,
-  "account_status": "authentication_missing_401",
+  "account_balance": 14021.3,
+  "account_active_jobs": 2,
+  "account_concurrency_limit": 20,
+  "account_status": "authenticated_local_mcp",
   "historical_approved_cap": 475,
   "historical_reported_spend_approx": 315,
   "historical_exact_spend": null,
   "remaining_approved_budget_exact": null,
-  "new_paid_calls": 0,
-  "new_actual_charge": 0,
+  "new_paid_calls": 4,
+  "new_actual_charge": 11,
   "historical_deadpole_job_count": 110,
   "visual_approval": "pending",
-  "generation_status": "not_started_auth_blocked",
+  "generation_status": "4_jobs_recovered_partial_visual_hold",
   "priorities": [
     "pipe body-only",
     "cq1 horizontal retention",
@@ -27,5 +27,7 @@
     "shower",
     "bath"
   ],
-  "note": "담당 배정은 기록했으나 다른 실행 환경의 배타 잠금이나 현재 계정 큐 확인을 대신하지 않는다."
+  "note": "실제비용은 각 job 서버 charged_generations 합계. 계정 잔액 감소에는 다른 담당 작업 포함. 과거 정확한 잔여승인량은 여전히 미확인.",
+  "account_observed_at": "2026-10-22T10:55:23.199Z",
+  "owner_active_jobs": 0
 }

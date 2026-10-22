@@ -1,0 +1,401 @@
+{
+  "pipe": [
+    {
+      "x": 69,
+      "y": 76,
+      "angle": -35,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 58,
+      "y": 64,
+      "angle": 185,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 74,
+      "y": 75,
+      "angle": -55,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 91,
+      "y": 86,
+      "angle": 12,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 82,
+      "y": 98,
+      "angle": 35,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 61,
+      "y": 76,
+      "angle": -35,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 61,
+      "y": 76,
+      "angle": -35,
+      "prop": "pipe",
+      "grip": [
+        3,
+        5
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "catch": [
+    {
+      "x": 79,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 80,
+      "y": 79,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 76,
+      "y": 80,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 76,
+      "y": 80,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 78,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 78,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "counter": [
+    {
+      "x": 78,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 81,
+      "y": 87,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 79,
+      "y": 87,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 81,
+      "y": 87,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 78,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "cq1": [
+    {
+      "x": 72,
+      "y": 85,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 75,
+      "y": 82,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 74,
+      "y": 82,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 75,
+      "y": 82,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "cq2": [
+    {
+      "x": 81,
+      "y": 80,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 102,
+      "y": 73,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 100,
+      "y": 72,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 102,
+      "y": 73,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "cq3": [
+    {
+      "x": 82,
+      "y": 84,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 74,
+      "y": 83,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 70,
+      "y": 80,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 70,
+      "y": 80,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 74,
+      "y": 84,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 82,
+      "y": 86,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ],
+  "cq_bridge": [
+    {
+      "x": 99,
+      "y": 73,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 94,
+      "y": 76,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    },
+    {
+      "x": 87,
+      "y": 81,
+      "angle": 0,
+      "prop": "pistol",
+      "grip": [
+        5,
+        10
+      ],
+      "source": "visual_review_generated_pixels"
+    }
+  ]
+}
