@@ -21,8 +21,11 @@ def clip(name,action,poses,base,prop=''):
     assert 3<=len(poses)<=15,(name,len(poses))
     action=action.replace('side view: ','').replace('side view, ','')   # 옆모습은 설명(DESC)에 따로 넣음
     if len(action)>100: LONG.append((name,len(action)))
+    if isinstance(poses,TL): TAIL.add(name)
     CLIPS[name]=(action,prop,base,[small(anatomic(p)) for p in poses])
-def tail(ps,loop): return ps+[ps[0] if loop else ps[-1]]   # 생성기가 끝 장을 기준 그림으로 되돌리는 버릇 → 버릴 장(빌더 auto_trim)
+class TL(list): pass
+TAIL=set()   # 끝에 버릴 장을 붙인 클립(빌더가 마지막 장을 뺌)
+def tail(ps,loop): return TL(ps+[ps[0] if loop else ps[-1]])   # 생성기가 끝 장을 기준 그림으로 되돌리는 버릇 → 버릴 장(빌더 auto_trim)
 cyc=lambda t:(math.cos(2*math.pi*t),math.sin(2*math.pi*t))
 
 # ── 무기 설명(그림에 그림. 총구 불꽃·탄피·빛은 코드) ──
@@ -106,10 +109,12 @@ MZ0=P((X-2,60),4,SIDE,-0.1,(X+8,G),(X-10,G-1),R(6,12),R(18,14),le=E(0,15),re=E(8
 MZ1=P((X+8,60),14,SIDE,-0.1,(X+20,G),(X-6,G-2),R(18,9),R(32,8),le=E(6,14),re=E(18,11))
 clip('muzzle','side view: drives the rifle forward with both hands in a short muzzle thrust at chest height, rear foot pushing',
      [L0,MZ0,staged(MZ0,MZ1,.6),MZ1,lerp(MZ1,L0,.5)],'R',RIF)
-BS0=P((X,60),2,0.3,0.2,(X+9,G),(X-9,G-1),R(-4,18),R(14,6),le=E(-4,13),re=E(8,10))
-BS1=P((X+6,60),10,-0.9,-0.5,(X+14,G),(X-8,G-2),R(22,-2),R(10,10),le=E(14,6),re=E(6,12))
-clip('buttstroke','side view: hips turn first, then the rear hand swings the rifle stock forward and up: a horizontal butt stroke',
-     [L0,BS0,staged(BS0,BS1,.5),BS1,BS1,lerp(BS1,L0,.5)],'R',RIF)
+# 2차: 개머리판 돌려치기는 생성기·pixen 모두 총을 거꾸로 못 그림(검수: "개머리판 치기가 없다") → 같은 떼어내기 2단을
+# '총몸 내려찍기'로 바꿈: 두 손으로 총을 가로로 이마 위까지 들었다가 한 걸음 들어가며 적 쇄골에 내려찍음(가로 총은 생성기가 그림)
+BS0=P((X-1,61),2,SIDE,-0.1,(X+8,G),(X-9,G-1),R(4,-12),R(18,-11),le=E(4,2),re=E(14,2),tilt=-6)
+BS1=P((X+8,61),14,SIDE,-0.1,(X+20,G),(X-6,G-2),R(20,12),R(33,12),le=E(8,14),re=E(18,12),tilt=12)
+clip('buttstroke','side view: raises the rifle horizontally overhead in both hands, steps in and slams it down forward',
+     [L0,BS0,BS0,staged(BS0,BS1,.5),BS1,BS1,lerp(BS1,L0,.5)],'R',RIF+', held horizontally')
 PK0=P((X-2,58),-4,SIDE,-0.1,(X+12,G-36),(X-8,G),R(8,10),R(14,4),le=E(1,15),re=E(7,12),lk=KNEE_UP)
 PK1=P((X-4,58),-12,SIDE,-0.1,(X+36,G-34),(X-8,G),R(8,10),R(14,4),le=E(1,15),re=E(7,12))
 clip('pushkick','side view: rifle pulled to the chest, lifts the knee and pushes the heel straight forward, then steps back',
@@ -126,14 +131,19 @@ PI0=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),head=(6,-6),**PIS)
 clip('transition','side view: lets the rifle drop on its sling, draws the pistol from the hip and aims it with both hands',
      [L0,lerp(L0,TR1,.6),TR1,TR2,lerp(TR2,PI0,.5),PI0],'R','a compact black carbine dropping onto its sling, then a black pistol in both hands')
 PR=jit(PI0,-2,-4,['RIGHT ARM','LEFT ARM'])
-clip('pistolfire','side view: two-handed pistol aim, fires, wrists flip up a little, back on target',[PI0,PR,lerp(PR,PI0,.5),PI0],'R',PISTOL+', '+RIF_SLUNG)
+# 2차: 권총 클립은 권총 기준 그림 Q(권총 두 손 + 등에 멘 소총, keyframe.py)에서 뽑음. 1차 R 기준은 권총 대신 소총을 그림
+clip('pistolfire','side view: two-handed pistol aim, fires, wrists flip up a little, back on target',[PI0,PR,lerp(PR,PI0,.5),PI0],'Q',PISTOL+', '+RIF_BACK)
+# 권총 집어넣기(S로 소총 복귀). 거꾸로 돌리면 권총 뽑기 = transition 1장 뒤(빌더)
+clip('holster','side view: lowers the pistol, slides it into the hip holster, both hands come back to her chest',
+     [PI0,lerp(PI0,TR2,.5),TR2,TR1,lerp(TR1,TR2,.6)],'Q','a black pistol, '+RIF_BACK)
 PL1=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),R(16,12),A(X+2,64),le=E(4,15),re=E(-2,16),tilt=12)
 PL2=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),R(16,12),R(16,16),le=E(4,15),re=E(6,16),tilt=12)
 clip('pistolreload','side view: pulls the pistol in close, drops the magazine, fetches a new one from the belt, slaps it in, aims',
-     [PI0,PL2,PL1,PL2,lerp(PL2,PI0,.5),PI0],'R',PISTOL+', '+RIF_SLUNG)
-RL1=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),R(11,11),A(X+6,52),le=E(2,15),re=E(2,13),tilt=10)
-RL2=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),R(11,11),R(16,19),le=E(2,15),re=E(6,16),tilt=14)
-clip('reload','side view: tactical reload, takes a fresh magazine from the vest, swaps it under the rifle, eyes stay up',
+     [PI0,PL2,PL1,PL2,lerp(PL2,PI0,.5),PI0],'Q',PISTOL+', '+RIF_BACK)
+# 2차: 받침손(먼 손)은 총열 덮개에서 떼지 않음(1차는 손을 떼자 총이 줄어듦). 가까운 손만 조끼 탄창 → 탄창 구멍
+RL1=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),A(X+8,66),R(20,16),le=E(-2,15),re=E(10,16),tilt=10)
+RL2=P((X,59),6,SIDE,-0.1,(X+8,G),(X-8,G-1),R(13,17),R(20,16),le=E(3,16),re=E(10,16),tilt=14)
+clip('reload','side view: tactical reload: far hand holds the rifle steady, near hand takes a vest magazine and inserts it',
      [A0,lerp(A0,L0,.6),RL1,RL2,RL2,lerp(RL2,L0,.5)],'R',RIF)
 RE1=P((X,59),8,SIDE,-0.1,(X+8,G),(X-8,G-1),R(12,13),R(18,20),le=E(3,15),re=E(8,16),tilt=16)
 RE2=P((X,59),8,SIDE,-0.1,(X+8,G),(X-8,G-1),R(12,13),A(X+6,52),le=E(3,15),re=E(2,13),tilt=12)
@@ -149,14 +159,17 @@ clip('aim','side view: holding a precise aim, shoulders forward, breath held, bo
 PRC=REC(sh(AIM(-6,0.5,0,4),0),3)
 clip('precise','side view: fires one heavy precise shot, strong recoil shoves the shoulder back, rear foot slides, re-aims',
      [AH(0),PRC,lerp(PRC,AH(0),.4),lerp(PRC,AH(0),.75),AH(0)],'R',RIF_AIM)
-BK=P((X-1,62),6,SIDE,-0.1,(X+8,G),(X-9,G-1),R(5,-8),R(19,-7),le=E(5,4),re=E(15,4),tilt=16)
-clip('block','side view: raises the rifle horizontally in both hands in front of her face to block, chin tucked, knees bent',[L0,lerp(L0,BK,.5),BK,BK],'R',RIF+', held horizontally')
+# 3차: 가로 총은 옆에서 보면 조준과 같아 보임(2차 검수) → 총을 세워 몸 앞을 가림(뒷손 아래 손잡이, 앞손 위 총열 덮개), 턱 당김
+BK=P((X-1,62),4,SIDE,-0.1,(X+8,G),(X-9,G-1),R(11,20),R(13,-1),le=E(3,15),re=E(10,9),tilt=14)
+clip('block','side view: holds the rifle upright in front of her body in both hands, muzzle up, braced to block',[L0,lerp(L0,BK,.5),BK,BK],'R','a compact black carbine held vertically, muzzle up')
 EV1=P((X-6,61),4,SIDE,-0.1,(X+2,G-3),(X-20,G),tilt=4,**LR); EV2=P((X-14,61),4,SIDE,-0.1,(X-6,G),(X-24,G-2),tilt=4,**LR)
 clip('evade','side view: two quick shuffle steps backward, toe to heel, rifle stays pointed forward',[L0,EV1,lerp(EV1,EV2,.5),EV2,LOW(-16),LOW(-18)],'R',RIF_LOW)
-GB=P((X+6,60),8,SIDE,-0.1,(X+16,G),(X-8,G-1),R(20,16),R(24,2),le=E(6,16),re=E(16,6))
-clip('grab','side view: far hand grabs a collar and pulls, near hand jams the rifle muzzle up under their chin',
-     [L0,staged(L0,GB,.5),GB,GB],'R','a compact black carbine held one-handed at the hip, muzzle up')
-clip('grabshot','side view: holding the collar, fires one contact shot, short recoil',[GB,REC(GB,1.5),lerp(REC(GB,1.5),GB,.5),GB],'R','a compact black carbine held one-handed at the hip, muzzle up')
+# 2차: 두 손으로 총을 쥔 채 앞으로 붙어 총구를 위로 들어 턱 밑에 박음(1차 한 손 총은 총 아래가 부서짐)
+GB=P((X+8,60),10,SIDE,-0.1,(X+18,G),(X-6,G-1),R(10,14),R(21,6),le=E(2,16),re=E(12,12))
+RIF_UP=RIF+', muzzle angled upward at 30 degrees'
+clip('grab','side view: steps in close and jams the rifle muzzle up under an enemy chin with both hands',
+     [L0,staged(L0,GB,.5),GB,GB],'R',RIF_UP)
+clip('grabshot','side view: muzzle pressed under a chin, fires one contact shot, short recoil',[GB,REC(GB,1.5),lerp(REC(GB,1.5),GB,.5),GB],'R',RIF_UP)
 SV1=P((X-2,58),-6,SIDE,-0.1,(X+14,G-34),(X-8,G),R(8,10),R(14,4),le=E(1,15),re=E(7,12),lk=KNEE_UP)
 SV2=P((X-6,58),-14,SIDE,-0.1,(X+34,G-26),(X-10,G),R(8,10),R(14,4),le=E(1,15),re=E(7,12))
 clip('shove','side view: lets go of the collar and push-kicks the enemy down, steps back and returns to low ready',
@@ -167,11 +180,12 @@ SPt=lambda a: P((X,80),8,SIDE-0.15*a,-0.1,(X+16,G),(X-17,G-1),head=(6,-6+a),tilt
 clip('super','side view: drops to one knee, swaps the magazine fast, shoulders the rifle, fires single shots turning slightly',
      [L0,lerp(L0,KN_(),.6),SPm,SPm,KN_(),SPt(0),REC(SPt(0)),SPt(1),REC(SPt(1)),SPt(0)],'R',RIF_AIM)
 PKu=P((X+2,76),20,SIDE,-0.1,(X+12,G),(X-14,G-1),R(7,16),A(X+24,G-2),le=E(1,15),re=E(12,14),tilt=18,lk=KNEE_UP)
-clip('pickup','side view: rifle in the near hand muzzle down, bends the knees (not the waist) and picks up with the other hand',
-     [L0,lerp(L0,PKu,.5),PKu,PKu,lerp(PKu,L0,.5),L0],'R','a compact black carbine held one-handed, muzzle down')
-TS0=P((X,59),2,SIDE,-0.1,(X+8,G),(X-8,G-1),R(7,16),R(-6,24),le=E(1,15),re=E(-4,14))
-TS1=P((X+2,59),8,SIDE,-0.1,(X+10,G),(X-8,G-1),R(7,16),R(26,4),le=E(1,15),re=E(14,8))
-clip('toss','side view: rifle in the near hand, swings the other arm back and lobs underhand forward',[L0,TS0,lerp(TS0,TS1,.5),TS1,lerp(TS1,L0,.5),L0],'R','a compact black carbine held one-handed, muzzle down')
+S0=STAND(0)
+clip('pickup','side view: bends the knees (not the waist), picks something up from the floor with the far hand, stands',
+     [S0,lerp(S0,PKu,.5),PKu,PKu,lerp(PKu,S0,.5),S0],'F',RIF_BACK)   # 2차: 소총은 등에(1차 한 손 소총이 사라짐)
+TS0=P((X,59),2,SIDE,-0.1,(X+8,G),(X-8,G-1),R(3,32),R(-6,24),re=E(-4,14))
+TS1=P((X+2,59),8,SIDE,-0.1,(X+10,G),(X-8,G-1),R(3,32),R(26,4),re=E(14,8))
+clip('toss','side view: swings the far arm back and lobs something underhand forward, near hand at her side',[S0,TS0,lerp(TS0,TS1,.5),TS1,lerp(TS1,S0,.5),S0],'F',RIF_BACK)   # 2차: 소총은 등에
 DRF=lambda t: P((X,57),3,0,0,(X+7,G),(X-5,G),R(7,-1+2*(1-t)),R(2,34),le=E(9,6),tilt=-10*t)
 clip('drink','side view: one quick gulp from a bottle, eyes stay forward, done',tail([STAND(0,lh=R(10,14),le=E(4,15)),DRF(0),DRF(1),DRF(0),STAND(0,lh=R(10,14),le=E(4,15))],False),'F',RIF_BACK)
 EAF=lambda t: P((X,57),4,0,0,(X+7,G),(X-5,G),R(7,1+2*t),R(2,34),le=E(9,6),head=(5+1.5*(t-.5)*2,-7))
@@ -183,12 +197,12 @@ clip('bandage','side view: wraps a bandage tight around her forearm, pulls the e
 HT=jit(LOW(-3),-2,0,['NECK','RIGHT SHOULDER','LEFT SHOULDER','NOSE','RIGHT EYE','LEFT EYE','RIGHT EAR','LEFT EAR'])
 clip('hit','side view: light hit, body jolts back but the rifle muzzle stays pointed forward',[L0,HT,lerp(HT,L0,.5),L0],'R',RIF_LOW)
 D1=P((X-4,62),-20,SIDE,-0.1,(X+10,G),(X-12,G-2),head=(4,-8),**PT)
-D2=P((X-12,72),-50,0,0,(X+10,G-10),(X,G-8),head=(4,-8),**PT)
-D3=P((X-16,92),-80,0,0,(X+18,G-12),(X+10,G-6),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
-D4=P((X-14,94),-88,0,0,(X+28,G-6),(X+22,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
-clip('down','side view: knocked backward off her feet, lands curled on her back hugging the rifle to her chest, never lets go',
+D2=P((X-2,72),-50,0,0,(X+10,G-10),(X,G-8),head=(4,-8),**PT)
+D3=P((X+2,92),-80,0,0,(X+36,G-12),(X+28,G-6),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
+D4=P((X+4,94),-88,0,0,(X+46,G-6),(X+40,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
+clip('down','side view: knocked off her feet backward, lands on her back hugging the rifle, never lets go',
      [D1,D2,D3,D4,D4,D4,D4],'R',RIF_PORT)
-GU1=P((X-8,90),-40,0,0,(X+20,G),(X+8,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
+GU1=P((X+4,90),-40,0,0,(X+32,G),(X+20,G-2),head=(5,-6),lk=KNEE_UP,rk=KNEE_UP,**PT)
 clip('getup','side view: rolls up to one knee into a kneeling aim, then stands into low ready',
      [D4,GU1,lerp(GU1,KN_(),.5),KN_(),lerp(KN_(),L0,.5),L0,L0],'R',RIF_PORT)
 clip('talk','side view: standing still, only the mouth moves, eyes lowered',[STAND(0,tilt=6),STAND(0,tilt=6)]+[STAND(0,tilt=6)],'H')
@@ -291,18 +305,20 @@ def ladE(t):
     return P((X+2,58),2,0,0,(X+14,92-7*c),(X+12,92+7*c-8),A(X+18,14+6*c),A(X+18,22-6*c),lk=KNEE_UP,rk=KNEE_UP,le=ELB_OUT,re=ELB_OUT)
 clip('ladder','side view: climbing motion, short quick alternating hands and feet, body close, ladder not drawn',tail([ladE(i/8) for i in range(8)],True),'F',RIF_BACK)
 MAe=P((X+4,58),20,0,0,(X+8,G),(X-6,G),A(X+18,60),A(X+16,60))
-MJe=P((X+8,40),34,0,0,(X+4,70),(X-2,74),A(X+20,58),A(X+18,58),lk=KNEE_UP,rk=KNEE_UP,le=ELB_OUT,re=ELB_OUT)
-MKe=P((X+14,28),30,0,0,(X+22,58),(X+6,64),A(X+24,60),A(X+22,60),lk=KNEE_UP,rk=KNEE_UP)
-MSe=P((X+22,17),3,0,0,(X+28,60),(X+18,60))
-clip('mantle','side view: springs up onto a waist-high ledge, hooks the elbows, tucks the knees small and stands on top',[STAND(0),MAe,MJe,MKe,MSe],'F',RIF_BACK)
+MJe=P((X+8,50),34,0,0,(X+4,G-22),(X-2,G-18),A(X+20,58),A(X+18,58),lk=KNEE_UP,rk=KNEE_UP,le=ELB_OUT,re=ELB_OUT)
+MKe=P((X+14,46),30,0,0,(X+22,G-26),(X+6,G-20),A(X+24,60),A(X+22,60),lk=KNEE_UP,rk=KNEE_UP)
+MSe=P((X+22,39),3,0,0,(X+28,G-18),(X+18,G-18))
+clip('mantle','side view: springs up onto a knee-high ledge, hooks the elbows, tucks the knees small and stands on top',[STAND(0),MAe,MJe,MKe,MSe],'F',RIF_BACK)
 VAe=P((X+8,60),20,0,0,(X+18,G),(X-4,G-2),A(X+26,62),R(2,34))
 VBe=P((X+26,46),10,0.6,0.3,(X+42,62),(X+34,58),A(X+26,62),R(-6,10),lk=KNEE_UP,rk=KNEE_UP)
 VCe=P((X+44,60),6,0,0,(X+52,G-2),(X+38,G-6))
 clip('vault','side view: speed vault, one hand on a waist-high obstacle, swings both legs over to the side, lands running',[walkE(0),VAe,VBe,VCe,P((X+48,58),4,0,0,(X+56,G),(X+42,G))],'F',RIF_BACK)
 def crawlE(t):
     c,s=cyc(t)
-    return P((X-14,90),78,0,0,(X-38+5*c,G),(X-40-5*c,G-1),A(X+18+5*c,G-2),A(X+12-5*c,G-1),head=(7,-3),tilt=-38,le=E(2,22),re=E(0,22))
-clip('crawl','side view: low crawl on forearms and knees, body flat to the floor, head up',tail([crawlE(i/8) for i in range(8)],True),'F',RIF_BACK)
+    return P((X+6,G-6),86,0,0,(X-38+3*c,G-4),(X-40-3*c,G-5),A(X+34+5*c,G-2),A(X+28-5*c,G-1),head=(7,-3),tilt=-38,le=E(2,22),re=E(0,22))
+PRK=P((X+2,80),40,0,0,(X+10,G),(X-14,G-1),A(X+22,G-2),A(X+16,G-1),lk=KNEE_UP,head=(7,-4),tilt=-10)
+clip('prone','side view: drops to her knees, hands to the floor, then lies flat on her stomach propped on her forearms',tail([STAND(0),lerp(STAND(0),PRK,.6),PRK,crawlE(0)],False),'F',RIF_BACK)
+clip('crawl','side view: low crawl on forearms and knees, body flat to the floor, head up',tail([crawlE(i/8) for i in range(8)],True),'P',RIF_BACK)
 clip('sneak','side view: very low slow tactical walk on the balls of the feet, rifle at low ready, head level',
      [tac(i/8,LR,10,64) for i in range(8)],'R',RIF_LOW)
 LKB=lambda a: P((X,59),5,SIDE+0.9*a,-0.1+0.3*a,(X+8,G),(X-8,G-1),R(9,15),R(22-4*a,21),le=E(1,15),re=E(10-3*a,17),head=(5-9*a,-7))

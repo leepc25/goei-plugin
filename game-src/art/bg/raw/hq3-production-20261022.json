@@ -1,0 +1,385 @@
+{
+  "request": "docs/GPT요청_본부3판.md",
+  "count": 29,
+  "new_images": 29,
+  "skipped": 0,
+  "tool": "image_gen",
+  "status": "raw-delivered",
+  "images": [
+    {
+      "path": "game-src/art/bg/raw/hq3_office/hq3_office_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1441610,
+      "sha256": "513a9e306f4bbb0cda18bd5800b69142d2ef84469c5c4c627225df629e358fa8",
+      "commit": "decc76fd4d30b17073ffce89755778041a8faf2f"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_office/hq3_office_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1650345,
+      "sha256": "9be0fbf81ee530a00e293f2a2b66673170b18c6b7a7d31f4fee4ef626ae9d02f",
+      "commit": "b071fffe2c3c5027fdbdf790d0a3d849a092205d"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_office/hq3_office_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1808483,
+      "sha256": "bd6579b6e3f71b1a58c5db958d79c79fcadacebaa28554ef257873bccee38567",
+      "commit": "ff5e2e6e6b1a9b3af5890f4e40dce3d5ca279db1"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_office/hq3_office_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1024832,
+      "sha256": "c3cfa75b05746c56a04f7c002830040454c677cc9824b40edfa6828f69cd276e",
+      "commit": "b3c393f0a9c8c1810c5ec99e5fb23e8d7b1da2f5"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_hall/hq3_hall_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1422947,
+      "sha256": "889dcb58297f5d82789d2c6574d6ab3e0b2b8c5a02d2ae25c470bf04b0a84f63",
+      "commit": "808edb09ffac517aa0f794044409cc6f2b6abfb9"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_hall/hq3_hall_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1805166,
+      "sha256": "7b3705863393f1bb9c4e82496c501a91abc3dbcb2d681ab8a850e661e5cc50c8",
+      "commit": "007235600791be20ba25bedf03ab5ad2b99604d2"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_hall/hq3_hall_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1232889,
+      "sha256": "4a18f1edbfac53ae2ad1798ac728b674c76ebc4098ec73c1aae0de9ed50c80b3",
+      "commit": "c8bdd4f787757beacfe24c7d94752db4f176f4de"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_life/hq3_life_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1428878,
+      "sha256": "1376c391f7663bfaf7025e4a490d18b47dd6c9629b1a5be1af5e43443dc2b128",
+      "commit": "839ad5e2b207c50396952c7b165a2e24bbe244df"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_life/hq3_life_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1432090,
+      "sha256": "9a7a9ac8a0912e5d3bbef29a6770fb06b5955e2d8d6b655cf243260baf87a551",
+      "commit": "bc9decc1cc55415dc739496ba712dd74fc2f2fcd"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_life/hq3_life_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1545224,
+      "sha256": "b8b13cd537ecfc10bbb08b4c84bad261211966b16eea30021c9aa45a19699f29",
+      "commit": "9a68ca02c072822a735385298dcef4713cedda8c"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_life/hq3_life_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 930526,
+      "sha256": "ffb5258fd3b707aba12a0f9cc99d2261fd34ac11c7ef7d1bda6ee95a088aeafc",
+      "commit": "23bd19f68856db1dbf4e597f1547f975a768c6eb"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_bath/hq3_bath_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1321600,
+      "sha256": "c4962a4eb101b8550c9de5936417a458ce01b952fd87b3e30a941971122a7f5d",
+      "commit": "7169020fbbba52d7004e4de056e787494025f8a2"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_bath/hq3_bath_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1298932,
+      "sha256": "bd27ca32101450aa1d48af19917d77e39a4c7d1ed9d3fbcc7e47946a4597015f",
+      "commit": "2c4b0d9c4c5bd3a7ece15b6f50bb6e51359a288c"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_bath/hq3_bath_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1471726,
+      "sha256": "7dccad629eda23b841aeecf4e460f1bba8c0a39b352028bdef3a0ca585b7cde2",
+      "commit": "06d3c16eb1cfcbcb28c4a701b8700aa39e5327d1"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_bath/hq3_bath_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 780178,
+      "sha256": "17c4e59c7a7f14ed452ae191d998bb019e47f5d352add03a8f7864f259c088a3",
+      "commit": "34a0b3a187e14f6cb5969c1840ea568386dc1d53"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_lab/hq3_lab_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1440960,
+      "sha256": "3ea049db0ecbf237d4e5b16d0707cc26f70493aee15df89998ef5317bc4b9f86",
+      "commit": "eaee59486dd9cdb8fca88de7696cae185be0dd2a"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_lab/hq3_lab_wall_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1307103,
+      "sha256": "245dfd9af42713e496c1be2707cc5f8173c573a47796156c9171ebee70e620e6",
+      "commit": "6ab34eec9d6496ed5f980c4874e80c655c201d04"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_lab/hq3_lab_wall_3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1456996,
+      "sha256": "b612261739a024e597581d816be713d9a287ec14f9a78e4aff334b56a368bed1",
+      "commit": "ff31023be88dcc6a1dcccd8084c6ecde4dbd7e1d"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_lab/hq3_lab_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 767754,
+      "sha256": "b18b34dd920b9b6bfd2eb4698392981dbf0ac2c8eee6d7cdbb21ed20c07c7d2b",
+      "commit": "2207bbe807962b9eb707d385f1623e003542255d"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_labhall/hq3_labhall_wall_1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1429856,
+      "sha256": "c28620cba116616f77c11d9e7ff048dd170d57dca749d966cc1689759ca65311",
+      "commit": "b1057c274be5f92d7176a3f96a4500312f66679e"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_labhall/hq3_labhall_floor.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 869317,
+      "sha256": "c815604c7b26d88c5692fc1341626ff1cb6c60757eaf0a4ef669ea834c0833e6",
+      "commit": "eccf9e1aa0d4f591d8e18cc52244536b7bd5be66"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_doors/hq3_doors_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1363873,
+      "sha256": "efde866eaad734c4350d345e0ec3021033415f379342bfa8c14eebf9c6cb2736",
+      "commit": "0439c0b3c241dbf8793bcaee93588689c158df4d"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_doors/hq3_doors_objects_2.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1516527,
+      "sha256": "79ee172f291a6afc8f78924f8efbe56eb467e943fb520122daa81f23bdd1e2e1",
+      "commit": "4151c5fd32a5501830c5875617c094fa26287ac6"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_office/hq3_office_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1710410,
+      "sha256": "e8454b3948b55a5f3a68abcb7172437ed771522d975af208fdb4cd04cd1a95bc",
+      "commit": "4dc748767e4fc65cf0e3c72f78c9e81e757912f2"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_life/hq3_life_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1672456,
+      "sha256": "ae9ccedb417d1dae8b23399fc236a292f1e8fb8c13894a8f280ed8e4dc5bb821",
+      "commit": "63553ae241db5729fa97129e8f6fe5b3e38da3ee"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_bath/hq3_bath_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1639577,
+      "sha256": "10075d08c24d64964daa440be3c6895a8c33f5e365697d2e7f776b93f2084a4a",
+      "commit": "1e47a8f467fc99dc45833b2ee428ec6a3b859c88"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_lab/hq3_lab_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1479235,
+      "sha256": "5dc3201b5c05743798ff9669f5d0e06e92ecb97f455bc44eb222ee75ccb5ae28",
+      "commit": "92a5ea904247393fb981323a81de4319b31d37c7"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_training/hq3_training_objects.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "bytes": 1721593,
+      "sha256": "56d6b7d545f41b7ab4a8101a0797b21f85ce1183dd7e6baa81870867c7f8470a",
+      "commit": "525b4dc04e5bdd1476b343d187b745c8d05f5dbc"
+    },
+    {
+      "path": "game-src/art/bg/raw/hq3_facade/hq3_facade.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "bytes": 1975308,
+      "sha256": "551defb77b1c14875b6574cd9357581506e9868ce80373cf9287dd93b7057c85",
+      "commit": "375e6ccfe7d321ff48e1c58b4b577ed743686673"
+    }
+  ],
+  "follow_up": [
+    "도트화, 집기별 자르기·실제 치수와 기준점, 문짝 연결 및 게임 배치는 Claude 후속 작업",
+    "벽·바닥 타일 경계가 픽셀 단위로 일치하는지는 미검증: 정밀 이음새 보정 필요",
+    "집기 일부에 사선 원근·추가 의자가 있어 엄밀한 정면 투영과 치수 비례는 후속 보정 필요. 원본 수령을 시각 규격 전항목 합격으로 간주하지 않음",
+    "요청서가 참조한 docs/본부_설계_2판.md와 /mnt/project-files/game/본부/본부_배치도.html은 이 작업 환경에 없어 요청서 개별 항목을 기준으로 제작"
+  ]
+}

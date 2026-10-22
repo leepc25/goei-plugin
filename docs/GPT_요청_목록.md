@@ -27,7 +27,7 @@ GPT가 이 저장소에 그림을 올리는 일감 목록. 한 줄에 한 요청
 | docs/캐릭터제작서/의뢰서_쟈알디_샤워·목욕·용변_GPT.md 9절 | 쟈알디 탈의 사이 장 추가: 7장 → 10장(재킷 젖히기·소매 빼기·셔츠 벗기·수건 여미기) | game-src/action/jyaldi-v5/full/clips/undress/00~09.png | 받음(5e424c9, 시연판 반영) |
 | docs/GPT요청_검수보강2.md | 통합 독립 검수(3dc57b5) 그림 결함 6장: 판 모음 1장(화이트보드·점검표·게시판 글줄을 회색 막대 대신 낙서 손글씨로, 감정실 투영기·라이트테이블, 빛무리 없는 경고등) + 격리 구역 벽 5장 덮어쓰기(경고등 붉은 빛무리 제거) | game-src/art/bg/raw/boards/boards_objects_2.png · hq_containment/hq_containment_wall_1~5.png (덮어씀) | 요청 |
 | docs/GPT요청_방타일.md | 절차 생성 방 타일 세트 35장: 11개 장소마다 벽 조각 1장(1536×1024, 256×512 칸 6×2, 발 줄 y=492, 이음새 일치) + 바닥 타일 1장(1024×1024, 512 칸 2×2) + 앞 가림막 1장(1536×1024 투명, 3×2) / 공통 방 역할 물건 2장 | game-src/art/bg/raw/<장소>/<장소>_mod·_tiles·_front.png · props/room_roles_1~2.png | 요청 |
-| docs/GPT요청_본부3판.md | 관리국 본부 3판: 벽·바닥 타일 21장(hq3_office·hall·life·bath·lab·labhall), 문·코어 조각 2장, 집기 조각 5장(office·life·bath·lab·training), 건물 정면 외관 1장 = 29장. 세련된 첨단 기관, 글자 없음 | game-src/art/bg/raw/hq3_<묶음>/<이름>.png | 요청 |
+| docs/GPT요청_본부3판.md | 관리국 본부 3판: 벽·바닥 타일 21장(hq3_office·hall·life·bath·lab·labhall), 문·코어 조각 2장, 집기 조각 5장(office·life·bath·lab·training), 건물 정면 외관 1장 = 29장. 세련된 첨단 기관, 글자 없음 | game-src/art/bg/raw/hq3_<묶음>/<이름>.png | 받음 29/29장 · 원본 개별 커밋·푸시 완료. 도트화·정밀 이음새·일부 집기 투영/치수 보정·게임 연결 후속. 목록/검사 game-src/art/bg/raw/README.md, hq3-production-20261022.json |
 
 ## 스팡달 납품 기록 · 2026-10-22
 

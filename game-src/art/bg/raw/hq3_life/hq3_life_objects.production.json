@@ -1,0 +1,21 @@
+{
+  "name": "hq3_life_objects",
+  "group": "hq3_life",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nPIECE SHEET RULES\nA sheet of separate game pieces, 1536x1024, transparent background (or a perfectly flat #FF00FF magenta background with nothing on it). 3x3 grid, one piece per cell, each fully inside its cell with margin, filling most of the cell. No cast shadows on the ground.\nCAMERA for every piece (very important): the front of the piece is parallel to the image (never turned left or right, no 3/4 view), and the camera looks down from above at a steep angle, so the TOP surface is visible as a band ABOVE the front face. The top band's height is about 0.3 x the real depth of the piece, measured on the same scale as its width (a 1 m wide, 1 m deep, 0.75 m tall desk = front face 0.75 tall, top band 0.3 tall above it, 1 wide). Sizes are given as W (left-right) x D (depth, front-to-back) x H (height) in meters; keep those proportions.\nChairs and anything a person sits on sideways are drawn in exact SIDE PROFILE facing RIGHT (the sitter would look to the right).\n\nhq3_life_objects (rest room & pantry, interview room, restroom)\n1 pantry island counter (W 1.4 x D 1.6 x H 1.0): quartz top with a coffee machine, a box of instant mix coffee sticks, a kettle and a few mugs; walnut front.\n2 small two-person cafe table (W 0.8 x D 0.8 x H 0.75), round-cornered, with two snacks.\n3 long sofa seen from the front, long side to the camera (W 4.0 x D 0.9 x H 0.85), dark teal fabric, a throw cushion at the left end, long enough to lie on.\n4 vending machine (W 0.6 x D 1.6 x H 1.8), lit front with rows of drinks drawn as simple colored blocks, no text.\n5 soft armchair, SIDE PROFILE facing right (seat 0.45 m, back 0.95 m), warm brown fabric.\n6 low coffee table (W 0.8 x D 0.7 x H 0.45) with a tissue box and a cup of warm tea with steam.\n7 tea trolley (W 0.8 x D 0.6 x H 0.9) with a teapot and cups.\n8 washbasin island (W 0.6 x D 1.6 x H 0.85) with a double-sided mirror panel standing on it up to 1.8 m, two basins, chrome taps.\n9 restroom stall row seen from its side end (W 1.9 x D 4.4 x H 2.1): three grey partition stalls with doors facing left, all closed.",
+  "transparent": true,
+  "source": "/workspace/generated_images/exec-6a81645c-2c92-43e5-aa79-e0d716def523.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "ae9ccedb417d1dae8b23399fc236a292f1e8fb8c13894a8f280ed8e4dc5bb821",
+  "alpha_extrema": [
+    0,
+    254
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "hq3_lab_objects",
+  "group": "hq3_lab",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nPIECE SHEET RULES\nA sheet of separate game pieces, 1536x1024, transparent background (or a perfectly flat #FF00FF magenta background with nothing on it). 3x3 grid, one piece per cell, each fully inside its cell with margin, filling most of the cell. No cast shadows on the ground.\nCAMERA for every piece (very important): the front of the piece is parallel to the image (never turned left or right, no 3/4 view), and the camera looks down from above at a steep angle, so the TOP surface is visible as a band ABOVE the front face. The top band's height is about 0.3 x the real depth of the piece, measured on the same scale as its width (a 1 m wide, 1 m deep, 0.75 m tall desk = front face 0.75 tall, top band 0.3 tall above it, 1 wide). Sizes are given as W (left-right) x D (depth, front-to-back) x H (height) in meters; keep those proportions.\nChairs and anything a person sits on sideways are drawn in exact SIDE PROFILE facing RIGHT (the sitter would look to the right).\n\nhq3_lab_objects (isolation laboratory, infirmary)\n1 supply counter (W 0.6 x D 2.2 x H 1.05): white counter with a cyan light edge, a small parts tray and a scanner pad on top.\n2 tall equipment shelf seen from its side end (W 0.3 x D 3.0 x H 1.9): white metal shelf with grey equipment cases.\n3 research bench (W 2.0 x D 1.6 x H 0.9): white lab bench with a microscope, a sample rack and a glowing tablet.\n4 appraisal bench (W 1.4 x D 1.6 x H 0.9) with a laser scanner arm shining a thin cyan line onto a small wooden box of teeth (the box closed).\n5 lab stool, SIDE PROFILE facing right (seat 0.65 m), white with a chrome base.\n6 coffee cart (W 0.9 x D 0.6 x H 0.95) with a big mug and a box of instant mix coffee sticks.\n7 infirmary bed seen from its LONG side (W 2.0 x D 0.9 x H 0.6): white sheet, pillow at the LEFT end, steel frame, the head of the bed at the left.\n8 medicine cabinet seen from its side end (W 0.3 x D 2.6 x H 1.8), white with glass doors.\n9 tooth-box shelf seen from its side end (W 0.3 x D 3.6 x H 1.9): white shelf with rows of small closed wooden boxes.",
+  "transparent": true,
+  "source": "/workspace/generated_images/exec-ed8c43eb-a84c-4506-a039-2c923d2fdbcd.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "5dc3201b5c05743798ff9669f5d0e06e92ecb97f455bc44eb222ee75ccb5ae28",
+  "alpha_extrema": [
+    0,
+    254
+  ]
+}

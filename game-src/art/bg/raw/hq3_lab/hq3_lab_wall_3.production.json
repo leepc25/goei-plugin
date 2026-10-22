@@ -1,0 +1,17 @@
+{
+  "name": "hq3_lab_wall_3",
+  "group": "hq3_lab",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nWALL TILE RULES\nStraight-on front elevation of a section of interior wall, camera facing the wall exactly: no vanishing point, no side walls, no ceiling plane, no floor plane. 1536x1024 landscape. The wall fills the image from top to bottom: the top 6% is a dark ceiling edge with one thin LED cove light line under it, the bottom 9% is the baseboard panel where the floor starts. The image must tile seamlessly left-right (the left edge continues into the right edge). Scale: full image height = 2.9 m, a door is 2.1 m. Draw ONLY things built into the wall (windows, wall screens, panels, lights). NO doors, NO furniture, nothing standing on the floor.\n\nhq3_lab (underground: isolation laboratory, infirmary, training hall) — WALL TILE RULES\nhq3_lab_wall_3 — training wall: the same white panels with a large dark record display (blank bars and dots, no text) and a horizontal black safety stripe.\nSF PANEL MATERIAL: neutral dim off-white composite flat panels 1.2 m wide, thin dark seams, dark grey lower wall panel. Large simple cel-shaded forms, cyan accents. No wood and no stone grain.",
+  "transparent": false,
+  "source": "/workspace/generated_images/exec-8aa868cf-82ff-4098-a60b-7627aff7b9aa.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGB",
+  "sha256": "b612261739a024e597581d816be713d9a287ec14f9a78e4aff334b56a368bed1"
+}

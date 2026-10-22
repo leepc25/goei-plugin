@@ -1,0 +1,10 @@
+before generations_remaining: 14739.30
+sub crawl
+sub holster
+done holster
+sub pistolfire
+done crawl
+sub pistolreload
+done pistolreload
+done pistolfire
+after generations_remaining: 14651.30

@@ -1,0 +1,21 @@
+{
+  "name": "hq3_training_objects",
+  "group": "hq3_training",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nPIECE SHEET RULES\nA sheet of separate game pieces, 1536x1024, transparent background (or a perfectly flat #FF00FF magenta background with nothing on it). 3x3 grid, one piece per cell, each fully inside its cell with margin, filling most of the cell. No cast shadows on the ground.\nCAMERA for every piece (very important): the front of the piece is parallel to the image (never turned left or right, no 3/4 view), and the camera looks down from above at a steep angle, so the TOP surface is visible as a band ABOVE the front face. The top band's height is about 0.3 x the real depth of the piece, measured on the same scale as its width (a 1 m wide, 1 m deep, 0.75 m tall desk = front face 0.75 tall, top band 0.3 tall above it, 1 wide). Sizes are given as W (left-right) x D (depth, front-to-back) x H (height) in meters; keep those proportions.\nChairs and anything a person sits on sideways are drawn in exact SIDE PROFILE facing RIGHT (the sitter would look to the right).\n\nhq3_training_objects (training hall)\n1 heavy punching bag hanging from a ceiling chain (bag 1.2 m tall, bottom at 0.5 m), black leather.\n2 weight bench with a barbell on the rack (W 1.6 x D 0.6 x H 0.5).\n3 low obstacle wall seen end-on (W 0.35 x D 5.1 x H 0.9): padded orange-and-black block wall, the long top band shows it crossing the hall.\n4 shooting range counter seen end-on (W 0.4 x D 5.1 x H 1.1) with ear muffs and dividers between four lanes.\n5 paper target on a rail stand (1.8 m), a plain round target, no numbers.\n6 rubber floor mat (W 3.0 x D 2.0), flat, only the top surface (a dark blue square with a border).\n7 equipment rack with gloves and pads (W 1.2 x D 0.4 x H 1.4).\n8 water dispenser (0.4 x 0.4 x 1.2).\n9 kettlebell set on a low rack (W 1.0 x D 0.4 x H 0.4).",
+  "transparent": true,
+  "source": "/workspace/generated_images/exec-19e14780-ef16-4beb-82b8-caefbda54b2d.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "sha256": "56d6b7d545f41b7ab4a8101a0797b21f85ce1183dd7e6baa81870867c7f8470a",
+  "alpha_extrema": [
+    0,
+    254
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "hq3_facade",
+  "group": "hq3_facade",
+  "prompt": "STYLE (same for every image)\n2D side-scrolling beat-'em-up game art in the spirit of 1990s arcade brawlers, set in present-day Seoul. Subject: the headquarters of a secret government agency that handles supernatural anomalies. It must look SLEEK, MODERN, CLEAN AND HIGH-TECH, refined and expensive, like a new government intelligence building. Never old, never shabby, never a factory, never a cheap small company, no stains, no rust, no peeling paint, no clutter.\nAbove-ground finish: deep navy and charcoal walls, warm walnut wood panels, satin brushed-metal trims, frosted glass with a clear band, thin cool-white LED cove lights, light grey stone or polished floor.\nUnderground finish (\"the other world\"): white composite wall panels with thin seams, glowing cyan light lines, black glass, automatic sliding doors, clean SF laboratory look.\nNight shift, moderately dark overall so the characters stand out; no pure white areas, no big saturated areas except the cyan/amber accent lights.\nClean flat cel shading with 2-3 tone steps, crisp hard edges, bold dark outlines about 6-8 px thick around every object and major shape, FEW LARGE simple shapes (it will be shrunk to a small pixel-art screen), no fine texture, no noise, no grain, no blur. NOT pixel art.\nNO people, no silhouettes of people, NO text, letters, numbers or readable logos anywhere (signs use colored bands and simple pictograms only).\n\nhq3_facade — STYLE only (no wall rules). 1536x1024 landscape, straight-on front elevation of the building seen from the street at night, no vanishing point.\nA large modern office building in Jongno, Seoul, 6 storeys, filling the image width; its ground floor sits at the bottom 15% of the image with the sidewalk line at the very bottom.\nMake it UNMISTAKABLY a secret government agency headquarters: a dark granite and black-glass facade, a large brushed-metal emblem on the facade above the entrance (the same simple geometric eye-inside-a-door-frame shape, NO letters), a wide canopy over a double glass entrance in the center, two slim security bollards, a flagpole without a readable flag, discreet security cameras, cyan-white LED lines along the floor slabs.\nOnly the 1st and 2nd floors are lit (warm white offices behind glass); the upper floors are dark. A faint shimmering translucent veil effect over the whole building (the perception veil that hides it from ordinary people), very subtle.\nNO people, no cars, no text anywhere.",
+  "transparent": false,
+  "source": "/workspace/generated_images/exec-5a835a8a-cc30-4dbe-984c-b2221d2e72e8.png",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGB",
+  "sha256": "551defb77b1c14875b6574cd9357581506e9868ce80373cf9287dd93b7057c85"
+}

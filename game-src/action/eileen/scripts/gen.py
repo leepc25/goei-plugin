@@ -20,7 +20,7 @@ def ref(base,boot):
 def submit(n,boot=False,seed=11):
     act,prop,base,ps=erig.CLIPS[n]
     url,fkp=ref(base,boot)
-    d=DESC+(VEST if base in 'FR' else '')+(', '+prop if prop else '')+TAILD
+    d=DESC+(VEST if base in 'FRPQB' else '')+(', '+prop if prop else '')+TAILD
     args={'description':d,'action':act,'direction':'east','first_frame_url':url,'first_frame_keypoints':fkp,
           'keypoints':[rig.kp(p) for p in ps],'seed':seed}
     t=''
@@ -56,7 +56,7 @@ if __name__=='__main__':
         if resume and n in last and not os.path.isdir(f'{OUT}/{n}'): pend[n]=last[n]
         elif resume and os.path.isdir(f'{OUT}/{n}'): continue
         else: queue.append(n)
-    MAXP=10   # 작업 칸을 다른 요원 스레드와 같이 씀
+    MAXP=int(os.environ.get('MAXP','2'))   # 요원 스레드당 동시 2개(사용자 2026-10-22)
     while queue or pend:
         while queue and len(pend)<MAXP:
             n=queue.pop(0); j,t=submit(n,boot)
