@@ -2,15 +2,18 @@
   "observed_at": "2026-10-22T10:16:19.210968+00:00",
   "source_commit": "7f8fdfb0c5a6cef096d412d3d872aec6eae7de81",
   "note": "작업 ID 명시 줄만 수집. 이미지 UUID·문자열 id는 작업 ID로 추측하지 않음. 잔액 차이를 작업 비용으로 배분하지 않음. 로그 실패 문구는 서버 최종 상태를 뜻하지 않음.",
-  "job_count": 1463,
+  "job_count": 1464,
   "jobs": [
     {
       "job_id": "32193e13-5db2-47a6-9915-6724df241eee",
       "character": "blaret-saladin",
       "sources": [],
-      "actual_cost": null,
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#32193e13-5db2-47a6-9915-6724df241eee"
+      },
       "local_receipt_record": "verified-local-receipts.json#32193e13-5db2-47a6-9915-6724df241eee",
-      "cost_status": "submission_receipt_only_completion_charge_pending"
+      "cost_status": "completed_server_receipt_verified"
     },
     {
       "job_id": "429ad77b-ed3b-4337-9524-075adf0a262c",
@@ -76,6 +79,17 @@
         "evidence": "verified-local-receipts.json#76884626-42e9-4626-980a-37663c8aac8f"
       },
       "local_receipt_record": "verified-local-receipts.json#76884626-42e9-4626-980a-37663c8aac8f",
+      "cost_status": "completed_server_receipt_verified"
+    },
+    {
+      "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+      "character": "blaret-saladin",
+      "sources": [],
+      "actual_cost": {
+        "generations": 3.0,
+        "evidence": "verified-local-receipts.json#d5071dc4-6245-442f-a2f8-5fef10159f0c"
+      },
+      "local_receipt_record": "verified-local-receipts.json#d5071dc4-6245-442f-a2f8-5fef10159f0c",
       "cost_status": "completed_server_receipt_verified"
     },
     {
@@ -21026,5 +21040,5 @@
       "text": "2026-10-22 03:13:08 base edge 104 -> error: rate limit exceeded (20/20 jobs)"
     }
   ],
-  "local_receipts_verified_at": "2026-10-22T12:05:01.916484+00:00"
+  "local_receipts_verified_at": "2026-10-22T12:26:51.529988+00:00"
 }

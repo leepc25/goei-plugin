@@ -1,5 +1,5 @@
 {
-  "observed_at": "2026-10-22T12:05:01.916484+00:00",
+  "observed_at": "2026-10-22T12:26:51.529988+00:00",
   "jobs": [
     {
       "job_id": "f06a14de-204f-47b2-badd-dfd49796f148",
@@ -74,12 +74,27 @@
     {
       "job_id": "32193e13-5db2-47a6-9915-6724df241eee",
       "character": "blaret-saladin",
-      "charged_generations": null,
+      "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
-      "server_status": "processing",
+      "server_status": "completed",
       "evidence": [
-        10
+        10,
+        11
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
+      "job_id": "d5071dc4-6245-442f-a2f8-5fef10159f0c",
+      "character": "blaret-saladin",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        12,
+        13
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -92,8 +107,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        11,
-        12
+        14,
+        15
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -106,8 +121,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        13,
-        14
+        16,
+        17
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -120,21 +135,6 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        15,
-        16,
-        17
-      ],
-      "user_visual_approval": false,
-      "billing_period": "current_resume"
-    },
-    {
-      "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
-      "character": "jyaldi",
-      "charged_generations": 2.0,
-      "submission_cost_generations": 2.0,
-      "estimated_generations": null,
-      "server_status": "completed",
-      "evidence": [
         18,
         19,
         20
@@ -143,7 +143,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
+      "job_id": "4a4e18c2-d2f4-4604-9620-2127d4b8d3ca",
       "character": "jyaldi",
       "charged_generations": 2.0,
       "submission_cost_generations": 2.0,
@@ -158,7 +158,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "job_id": "134e1800-0f54-4dba-969e-d9b1b1d9f15e",
       "character": "jyaldi",
       "charged_generations": 2.0,
       "submission_cost_generations": 2.0,
@@ -173,6 +173,21 @@
       "billing_period": "current_resume"
     },
     {
+      "job_id": "7977bf40-dbbd-482b-8b2d-e150d4c38b63",
+      "character": "jyaldi",
+      "charged_generations": 2.0,
+      "submission_cost_generations": 2.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        27,
+        28,
+        29
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
       "job_id": "11526db3-3927-47df-a600-5f55e1473bcc",
       "character": "kyuras",
       "charged_generations": 3.0,
@@ -180,9 +195,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        27,
-        28,
-        29
+        30,
+        31,
+        32
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -195,10 +210,10 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        30,
-        31,
-        49,
-        50
+        33,
+        34,
+        52,
+        53
       ],
       "user_visual_approval": false,
       "billing_period": "historical_paid_recovery"
@@ -211,31 +226,16 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        32,
-        33,
-        51,
-        52
+        35,
+        36,
+        54,
+        55
       ],
       "user_visual_approval": false,
       "billing_period": "historical_paid_recovery"
     },
     {
       "job_id": "27a5c819-12b3-4f7b-82ae-fe0a56f55a04",
-      "character": "kyuras",
-      "charged_generations": 3.0,
-      "submission_cost_generations": 3.0,
-      "estimated_generations": null,
-      "server_status": "completed",
-      "evidence": [
-        34,
-        35,
-        36
-      ],
-      "user_visual_approval": false,
-      "billing_period": "current_resume"
-    },
-    {
-      "job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
       "character": "kyuras",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -250,7 +250,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "57e6577c-6ee1-4dea-8c84-532a513c7cb3",
+      "job_id": "3b131a96-b98f-4c4f-b220-146ce3706ceb",
       "character": "kyuras",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -265,7 +265,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "e5b19b7d-ca40-4632-a057-ed262452c973",
+      "job_id": "57e6577c-6ee1-4dea-8c84-532a513c7cb3",
       "character": "kyuras",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -280,7 +280,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "9f98ad15-77c1-4eda-8023-a90762053267",
+      "job_id": "e5b19b7d-ca40-4632-a057-ed262452c973",
       "character": "kyuras",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -295,6 +295,21 @@
       "billing_period": "current_resume"
     },
     {
+      "job_id": "9f98ad15-77c1-4eda-8023-a90762053267",
+      "character": "kyuras",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        49,
+        50,
+        51
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
       "job_id": "ddafed99-d4d6-4b51-bbb4-c01ce660ef68",
       "character": "eileen",
       "charged_generations": 1.0,
@@ -302,9 +317,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        53,
-        54,
-        55
+        56,
+        57,
+        58
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -317,21 +332,6 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        56,
-        57,
-        58
-      ],
-      "user_visual_approval": false,
-      "billing_period": "current_resume"
-    },
-    {
-      "job_id": "ad4c134d-a12b-493f-996f-aa9fa2340811",
-      "character": "eileen",
-      "charged_generations": 10.0,
-      "submission_cost_generations": null,
-      "estimated_generations": 10.0,
-      "server_status": "completed",
-      "evidence": [
         59,
         60,
         61
@@ -340,7 +340,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "296587c6-95c3-4b93-92a7-d164ddb10506",
+      "job_id": "ad4c134d-a12b-493f-996f-aa9fa2340811",
       "character": "eileen",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -355,11 +355,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "5ce7b76d-7f1a-43e5-a28a-76f10b039fbd",
+      "job_id": "296587c6-95c3-4b93-92a7-d164ddb10506",
       "character": "eileen",
-      "charged_generations": 3.0,
-      "submission_cost_generations": 3.0,
-      "estimated_generations": null,
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
       "server_status": "completed",
       "evidence": [
         65,
@@ -370,8 +370,8 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "c40aab31-b7a6-4d05-aeaf-907041ed603c",
-      "character": "spangdal",
+      "job_id": "5ce7b76d-7f1a-43e5-a28a-76f10b039fbd",
+      "character": "eileen",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
       "estimated_generations": null,
@@ -385,11 +385,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "6aa5567e-0ffc-45df-a3a3-702ca373d66c",
+      "job_id": "c40aab31-b7a6-4d05-aeaf-907041ed603c",
       "character": "spangdal",
-      "charged_generations": 10.0,
-      "submission_cost_generations": null,
-      "estimated_generations": 10.0,
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
         71,
@@ -400,11 +400,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "896b959c-f221-462b-a84f-c37c117c8377",
+      "job_id": "6aa5567e-0ffc-45df-a3a3-702ca373d66c",
       "character": "spangdal",
-      "charged_generations": 3.0,
-      "submission_cost_generations": 3.0,
-      "estimated_generations": null,
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
       "server_status": "completed",
       "evidence": [
         74,
@@ -415,7 +415,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "a3743d39-b041-4287-96ad-c62228b484b3",
+      "job_id": "896b959c-f221-462b-a84f-c37c117c8377",
       "character": "spangdal",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -430,11 +430,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "aa4b5980-880c-4ee9-8171-3f47dd2d994f",
+      "job_id": "a3743d39-b041-4287-96ad-c62228b484b3",
       "character": "spangdal",
-      "charged_generations": 10.0,
-      "submission_cost_generations": null,
-      "estimated_generations": 10.0,
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
         80,
@@ -445,7 +445,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "1175b029-993f-4179-90f7-b362c6358ad7",
+      "job_id": "aa4b5980-880c-4ee9-8171-3f47dd2d994f",
       "character": "spangdal",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -460,7 +460,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "3000e1b3-fee3-478b-a0ce-00b276a8f0c3",
+      "job_id": "1175b029-993f-4179-90f7-b362c6358ad7",
       "character": "spangdal",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -475,7 +475,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "4af04357-fbfe-49e9-8ebb-b10a1765e7a2",
+      "job_id": "3000e1b3-fee3-478b-a0ce-00b276a8f0c3",
       "character": "spangdal",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -490,11 +490,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a",
-      "character": "geshugan",
-      "charged_generations": 1.0,
-      "submission_cost_generations": 1.0,
-      "estimated_generations": null,
+      "job_id": "4af04357-fbfe-49e9-8ebb-b10a1765e7a2",
+      "character": "spangdal",
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
       "server_status": "completed",
       "evidence": [
         92,
@@ -505,11 +505,11 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "cd0766c8-87f7-4b50-8a9c-a7d79c5c3896",
+      "job_id": "c2c9cbc3-8a1e-40fa-b776-6112e7e5a82a",
       "character": "geshugan",
-      "charged_generations": 10.0,
-      "submission_cost_generations": null,
-      "estimated_generations": 10.0,
+      "charged_generations": 1.0,
+      "submission_cost_generations": 1.0,
+      "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
         95,
@@ -520,7 +520,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "ee5ef44a-a16d-4ed1-a494-6578590bb498",
+      "job_id": "cd0766c8-87f7-4b50-8a9c-a7d79c5c3896",
       "character": "geshugan",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -535,7 +535,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "c679844b-e541-48e4-9006-4b615ddb9dcc",
+      "job_id": "ee5ef44a-a16d-4ed1-a494-6578590bb498",
       "character": "geshugan",
       "charged_generations": 10.0,
       "submission_cost_generations": null,
@@ -550,6 +550,21 @@
       "billing_period": "current_resume"
     },
     {
+      "job_id": "c679844b-e541-48e4-9006-4b615ddb9dcc",
+      "character": "geshugan",
+      "charged_generations": 10.0,
+      "submission_cost_generations": null,
+      "estimated_generations": 10.0,
+      "server_status": "completed",
+      "evidence": [
+        104,
+        105,
+        106
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
       "job_id": "d9e65b7a-aca2-48db-b2d9-1ae5d15823e4",
       "character": "deadpole",
       "charged_generations": 3.0,
@@ -557,8 +572,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        104,
-        105
+        107,
+        108
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -571,8 +586,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        106,
-        107
+        109,
+        110
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -585,8 +600,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        108,
-        109
+        111,
+        112
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -599,8 +614,8 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        110,
-        111
+        113,
+        114
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -613,21 +628,6 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        112,
-        113
-      ],
-      "user_visual_approval": false,
-      "billing_period": "current_resume"
-    },
-    {
-      "job_id": "d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3",
-      "character": "rojemon",
-      "charged_generations": 3.0,
-      "submission_cost_generations": 3.0,
-      "estimated_generations": null,
-      "server_status": "completed",
-      "evidence": [
-        114,
         115,
         116
       ],
@@ -635,7 +635,7 @@
       "billing_period": "current_resume"
     },
     {
-      "job_id": "2fce7c21-c96f-492c-a404-e5cdeb9a6450",
+      "job_id": "d4017c4c-d084-4bc0-88b7-eb0df8dfe9e3",
       "character": "rojemon",
       "charged_generations": 3.0,
       "submission_cost_generations": 3.0,
@@ -650,6 +650,21 @@
       "billing_period": "current_resume"
     },
     {
+      "job_id": "2fce7c21-c96f-492c-a404-e5cdeb9a6450",
+      "character": "rojemon",
+      "charged_generations": 3.0,
+      "submission_cost_generations": 3.0,
+      "estimated_generations": null,
+      "server_status": "completed",
+      "evidence": [
+        120,
+        121,
+        122
+      ],
+      "user_visual_approval": false,
+      "billing_period": "current_resume"
+    },
+    {
       "job_id": "d5d8b068-9501-40be-9538-7c2fe192cdc8",
       "character": "rojemon",
       "charged_generations": 1.0,
@@ -657,9 +672,9 @@
       "estimated_generations": null,
       "server_status": "completed",
       "evidence": [
-        120,
-        121,
-        122
+        123,
+        124,
+        125
       ],
       "user_visual_approval": false,
       "billing_period": "current_resume"
@@ -741,6 +756,27 @@
       "path": "game-src/action/blaret_saladin/resume/saladin-run-r2/receipt.json",
       "sha256": "ba78edc33d343418b0bf0616d23e0bfe5af404ad307a4fc27fa4364af2655594",
       "receipt_text": "id: 32193e13-5db2-47a6-9915-6724df241eee\njob_id: 32193e13-5db2-47a6-9915-6724df241eee\ndescription: huge bearded man, dark brown skin, short black beard, white wrapped turban, black suit, white shirt, black tie, black shoes, ammo pouches and explosive packs strapped across the chest, scimitar scabbard at the hip, a curved scimitar in the near hand and an assault rifle in the far hand, one character only, isolated, strict right side profile, no effects, no other people\naction: charging run, scimitar held diagonally forward above shoulder, face clear\nframes: 8\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"32193e13-5db2-47a6-9915-6724df241eee\")\nasset_id: d15c555e-b010-5348-b73c-8b406408d3f1\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/saladin-run-r2/result.json",
+      "sha256": "7c52b1ef8317923b82d37b7909b03e9813ebbaa5e443df463a26def2e69bebcc",
+      "receipt_text": "status: completed\nid: 32193e13-5db2-47a6-9915-6724df241eee\njob_id: 32193e13-5db2-47a6-9915-6724df241eee\nframes: 8\ntransparent: yes\nasset_id: d15c555e-b010-5348-b73c-8b406408d3f1\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/32193e13-5db2-47a6-9915-6724df241eee/download?index=0 ... ?index=7",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/saladin-run-r3/receipt.json",
+      "sha256": "d96275a742e63af5f8c3c890f57f9a64715daa0de2ec2ab61063182d742d0e95",
+      "receipt_text": "id: d5071dc4-6245-442f-a2f8-5fef10159f0c\njob_id: d5071dc4-6245-442f-a2f8-5fef10159f0c\ndescription: huge bearded man, dark brown skin, short black beard, white wrapped turban, black suit, white shirt, black tie, black shoes, ammo pouches and explosive packs strapped across the chest, scimitar scabbard at the hip, a curved scimitar in the near hand and an assault rifle in the far hand, one character only, isolated, strict right side profile, no effects, no other people\naction: low-guard charging run, scimitar hand below the chest, rifle at waist, face unobstructed\nframes: 8\nsize: 256x176px\ntransparent: True\ncost: 3 generations\nstatus: processing (~4 min)\n\nhint: get_image(job_id=\"d5071dc4-6245-442f-a2f8-5fef10159f0c\")\nasset_id: f2b68566-e0fc-5eab-aa4f-05e4e038d020\nasset_status: pending (saved to your gallery when generation completes)",
+      "source": "local owner worktree; commit verification pending"
+    },
+    {
+      "owner": "blaret-saladin",
+      "path": "game-src/action/blaret_saladin/resume/saladin-run-r3/result.json",
+      "sha256": "2b9159cc60d8d19ff71ea647642e44c354493fd6cb1e1cbe65f02f8f1991b0bf",
+      "receipt_text": "status: completed\nid: d5071dc4-6245-442f-a2f8-5fef10159f0c\njob_id: d5071dc4-6245-442f-a2f8-5fef10159f0c\nframes: 8\ntransparent: yes\nasset_id: f2b68566-e0fc-5eab-aa4f-05e4e038d020\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 3 generations\ndownload: https://api.pixellab.ai/mcp/images/d5071dc4-6245-442f-a2f8-5fef10159f0c/download?index=0 ... ?index=7",
       "source": "local owner worktree; commit verification pending"
     },
     {
@@ -1528,7 +1564,7 @@
       "source": "local owner worktree; commit verification pending"
     }
   ],
-  "current_confirmed_charged_generations": 194.0,
+  "current_confirmed_charged_generations": 200.0,
   "historical_recovered_generations": 6.0,
   "note": "Only explicit server receipt fields. Missing cost remains null; submission cost and completed charged are separate. Balances are not attributed."
 }

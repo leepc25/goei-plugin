@@ -96,6 +96,20 @@
       "visual_status": "owner delivered; coordinator inspected latest sequence sheet",
       "remaining": "frame03 occlusion;05 to06 face and equipment silhouette discontinuity; strict side view",
       "user_visual_approval": false
+    },
+    {
+      "character": "blaret-saladin",
+      "commit": "9f635e8b50085b6dfbf44de2572e21d00171996c",
+      "branch": "codex/art-blaret-saladin-resume",
+      "html": "release/demo/blaret-saladin-resume.html",
+      "charged_generations": 34,
+      "completed_paid_jobs": 9,
+      "playback_slots": 42,
+      "unique_frames": 41,
+      "clips": 6,
+      "visual_status": "owner delivered; owner internal pass3/rework3; coordinator checked delivery ledger, full visual review outstanding",
+      "remaining": "stake preparation face occlusion; slash weapon occlusion; run grounding; wider production list incomplete",
+      "user_visual_approval": false
     }
   ]
 }
